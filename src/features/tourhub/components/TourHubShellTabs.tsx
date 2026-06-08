@@ -80,7 +80,7 @@ export const TourHubShellTabs: React.FC = () => {
     <section
       className="relative"
       style={{
-        background: '#0A0E14',
+        background: '#F8FAFC',
         display: 'flex',
         alignItems: 'stretch',
       }}
@@ -118,7 +118,7 @@ export const TourHubShellTabs: React.FC = () => {
                   borderRadius: 0,
                   border: 'none',
                   background: 'transparent',
-                  color: isActive ? '#FFFFFF' : 'var(--hcp-t-60)',
+                  color: isActive ? '#0A0E14' : '#64748B',
                   fontFamily: 'inherit',
                   fontSize: 14,
                   fontWeight: isActive ? 700 : 600,
@@ -135,7 +135,7 @@ export const TourHubShellTabs: React.FC = () => {
                   style={{
                     display: 'inline-block',
                     paddingBottom: 4,
-                    borderBottom: isActive ? '1.5px solid #FFFFFF' : '1.5px solid transparent',
+                    borderBottom: isActive ? '1.5px solid #0A0E14' : '1.5px solid transparent',
                   }}
                 >
                   {tab.label}
@@ -155,7 +155,7 @@ export const TourHubShellTabs: React.FC = () => {
               bottom: 0,
               width: 34,
               pointerEvents: 'none',
-              background: 'linear-gradient(to right, rgba(10,14,20,0), #0A0E14)',
+              background: 'linear-gradient(to right, rgba(248,250,252,0), #F8FAFC)',
             }}
           />
         )}
