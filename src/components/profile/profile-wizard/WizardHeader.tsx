@@ -14,40 +14,38 @@ interface Props {
 export function WizardHeader({ step, isFirstStep, onBack, onClose, onSkip }: Props) {
   return (
     <div
-      className="flex items-center justify-between px-4 bg-background border-b border-border"
+      className="flex items-end justify-between px-4 bg-background"
       style={{
         paddingTop: 'calc(max(env(safe-area-inset-top, 0px), 47px) + 8px)',
-        height: 'calc(max(env(safe-area-inset-top, 0px), 47px) + 64px)',
+        paddingBottom: 12,
       }}
     >
-      {/* Left — hide on first step when Skip is available, show back on subsequent steps */}
-      {(!isFirstStep || !onSkip) ? (
+      {/* Left: back/close + eyebrow + big step title (Activity layout) */}
+      <div className="flex items-center gap-3 min-w-0">
         <button
           onClick={isFirstStep ? onClose : onBack}
           style={{ width: 36, height: 36, borderRadius: '50%', background: 'rgba(15,23,42,0.05)', border: '0.5px solid rgba(15,23,42,0.10)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, cursor: 'pointer' }}
           aria-label={isFirstStep ? 'Close' : 'Back'}
         >
-          {isFirstStep
-            ? <X size={16} strokeWidth={2.5} />
-            : <ChevronLeft size={18} strokeWidth={2.5} />
-          }
+          {isFirstStep ? <X size={16} strokeWidth={2.5} /> : <ChevronLeft size={18} strokeWidth={2.5} />}
         </button>
-      ) : (
-        <div className="w-9 h-9 flex-shrink-0" />
-      )}
-
-      {/* Centre — title */}
-      <div className="text-center">
-        <p style={{ fontFamily: GEIST, fontSize: 16, fontWeight: 800, color: '#0F172A', letterSpacing: '-0.015em', margin: 0 }}>
-          Edit Profile
-        </p>
+        <div className="min-w-0">
+          <div style={{ marginBottom: 6 }}>
+            <span style={{ fontFamily: GEIST, fontSize: 9, fontWeight: 800, color: '#64748B', letterSpacing: '0.16em', textTransform: 'uppercase' }}>
+              Step {step} of 3
+            </span>
+          </div>
+          <h1 style={{ fontFamily: GEIST, fontSize: 34, fontWeight: 800, color: '#0F172A', letterSpacing: '-0.025em', lineHeight: 1, margin: 0, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+            {STEP_TITLES[step]}
+          </h1>
+        </div>
       </div>
 
-      {/* Right — Skip or Close */}
+      {/* Right: Skip (onboarding) or close — retained wizard control */}
       {onSkip ? (
         <button
           onClick={onSkip}
-          className="flex items-center justify-center min-h-[44px] -mr-2 text-[12px] font-normal"
+          className="flex items-center justify-center min-h-[44px] -mr-2 text-[12px] font-normal flex-shrink-0"
           style={{ color: '#64748B' }}
         >
           Skip for now

@@ -121,7 +121,7 @@ export function SettingsPageV2() {
           <div style={{ marginBottom: 2 }}>
             <SectionEyebrow label="Profile" />
           </div>
-          <h1 style={{ fontSize: 22, fontWeight: 800, color: '#0F172A', letterSpacing: '-0.025em', margin: 0 }}>
+          <h1 style={{ fontFamily: 'Geist, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif', fontSize: 34, fontWeight: 800, color: '#0F172A', letterSpacing: '-0.025em', lineHeight: 1, margin: 0 }}>
             Settings
           </h1>
         </div>
