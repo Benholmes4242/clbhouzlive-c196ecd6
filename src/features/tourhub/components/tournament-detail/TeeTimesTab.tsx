@@ -141,7 +141,7 @@ function TeeTimeGroupCard({ group, searchQuery, tournamentName, scoreByPlayer, s
                   return <span style={{ fontSize: '12px', fontWeight: 700, color: INK, width: '64px', textAlign: 'right' as const, flexShrink: 0 }}>{s.status === 'CUT' || s.status === 'MC' ? 'MC' : s.status}</span>;
                 }
                 const val = s.score == null ? '—' : s.score === 0 ? 'E' : s.score < 0 ? String(s.score) : `+${s.score}`;
-                const color = s.score == null ? INK : s.score < 0 ? SCORE_UNDER_PAR_LIGHT : s.score > 0 ? SCORE_OVER_PAR_LIGHT : INK;
+                const color = s.score == null ? INK : s.score < 0 ? SCORE_OVER_PAR_LIGHT : INK;
                 const posStr = s.position == null ? '' : `${s.tied ? 'T' : ''}${s.position}`;
                 return (
                   <span style={{ display: 'inline-flex', alignItems: 'baseline', gap: 6, width: '64px', justifyContent: 'flex-end', flexShrink: 0 }}>
