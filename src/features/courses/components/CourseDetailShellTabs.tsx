@@ -97,7 +97,7 @@ export const CourseDetailShellTabs: React.FC<CourseDetailShellTabsProps> = ({
                 style={{
                   display: 'inline-block',
                   paddingBottom: 4,
-                  borderBottom: isActive ? '1.5px solid #FFFFFF' : '1.5px solid transparent',
+                  borderBottom: isActive ? '1.5px solid #0A0E14' : '1.5px solid transparent',
                 }}
               >
                 {tab.label}
