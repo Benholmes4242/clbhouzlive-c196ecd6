@@ -96,27 +96,28 @@ const NavigationBar: React.FC<NavigationBarProps> = ({
           >
             <div className="relative">
               <Icon
-                className={cn(
-                  "h-[24px] w-[24px] [stroke-width:1.5]",
-                  isLive && tab.id === 'tourhub'
-                    ? "opacity-100"
-                    : isLive
-                    ? "text-green-500 opacity-100"
-                    : isLightTheme
-                      ? isActive
-                        ? useAmberActive ? "text-amber-700 opacity-100" : "text-slate-800 opacity-100"
-                        : "text-slate-500 opacity-90"
-                      : isDimmed
-                        ? "text-[hsl(var(--clubhouse-text-dimmed))]"
-                        : "text-[hsl(var(--clubhouse-text-muted))]"
-                )}
-                style={{
-                  transform: isActive ? 'scale(1.1)' : 'scale(1)',
-                  transition: 'all var(--motion-fast) var(--ease-pop)',
-                  ...(isClubhouseTheme && isActive && !isLive && { color: useAmberActive ? '#F79E1B' : 'rgba(255,255,255,1.0)' }),
-                  ...(tab.id === 'tourhub' && isLive && { color: '#22C55E' }),
-                }}
-              />
+              className={cn(
+                "h-[24px] w-[24px] [stroke-width:1.5]",
+                isLive && tab.id === 'tourhub'
+                  ? "opacity-100"
+                  : isLive
+                  ? "text-green-500 opacity-100"
+                  : isLightTheme
+                    ? isActive
+                      ? "opacity-100"
+                      : "opacity-90"
+                    : isDimmed
+                      ? "text-[hsl(var(--clubhouse-text-dimmed))]"
+                      : "text-[hsl(var(--clubhouse-text-muted))]"
+              )}
+              style={{
+                transform: isActive ? 'scale(1.1)' : 'scale(1)',
+                transition: 'all var(--motion-fast) var(--ease-pop)',
+                ...(isLightTheme && !isLive && { color: isActive ? '#0A0E14' : '#64748B' }),
+                ...(isClubhouseTheme && isActive && !isLive && { color: useAmberActive ? '#F79E1B' : '#F8FAFC' }),
+                ...(tab.id === 'tourhub' && isLive && { color: '#22C55E' }),
+              }}
+            />
 
               {/* Tab badge */}
               {(tabBadges[tab.id] ?? 0) > 0 && (
@@ -145,16 +146,15 @@ const NavigationBar: React.FC<NavigationBarProps> = ({
                   isLive
                     ? "text-green-500"
                     : isLightTheme
-                      ? isActive 
-                        ? useAmberActive ? "text-amber-700" : "text-slate-800"
-                        : "text-slate-500"
+                      ? ""
                       : isDimmed 
                         ? "text-[hsl(var(--clubhouse-text-dimmed))]" 
                         : "text-[hsl(var(--clubhouse-text-muted))]"
                 )}
                 style={{
                   transition: 'color var(--motion-fast) var(--ease-standard)',
-                  ...(isClubhouseTheme && isActive && !isLive && { color: useAmberActive ? '#F79E1B' : 'rgba(255,255,255,1.0)' }),
+                  ...(isLightTheme && !isLive && { color: isActive ? '#0A0E14' : '#64748B' }),
+                  ...(isClubhouseTheme && isActive && !isLive && { color: useAmberActive ? '#F79E1B' : '#F8FAFC' }),
                   ...(tab.id === 'tourhub' && isLive && { color: '#22C55E' }),
                 }}
               >

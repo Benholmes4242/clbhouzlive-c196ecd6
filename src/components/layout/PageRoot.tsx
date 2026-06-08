@@ -4,16 +4,12 @@ import { cn } from "@/lib/utils";
 import { useMedianStatusBar } from "@/hooks/useMedianStatusBar";
 
 /**
- * Routes that keep the light Dispatch chrome (notch/status bar stays cream).
- * Every other route inherits the dark handicap chrome by default.
+ * Routes that keep the dark chrome (notch/status bar stays dark).
+ * Only Clubhouse feed and Handicap stay dark; every other route is light.
  */
-function isLightChromeRoute(pathname: string): boolean {
+function isDarkChromeRoute(pathname: string): boolean {
   if (pathname === '/' || pathname === '/clubhouse') return true;
-  if (pathname === '/profile' || pathname.startsWith('/profile/')) return true;
-  if (pathname === '/notificationmessages') return true;
-  if (pathname === '/settings') return true;
-  if (pathname === '/edit-profile') return true;
-  if (pathname === '/quick-edit-profile') return true;
+  if (pathname === '/handicap' || pathname.startsWith('/handicap/')) return true;
   return false;
 }
 
@@ -44,7 +40,7 @@ export const PageRoot = React.forwardRef<HTMLDivElement, PageRootProps>(
     // Route-aware default: every page except Clubhouse and Profile inherits
     // the dark handicap chrome (notch + status bar + canvas).
     const location = useLocation();
-    const resolvedDark = dark ?? !isLightChromeRoute(location.pathname);
+    const resolvedDark = dark ?? isDarkChromeRoute(location.pathname);
 
     // Default light chrome for the Clubhouse/Profile pages; dark elsewhere.
     useMedianStatusBar(

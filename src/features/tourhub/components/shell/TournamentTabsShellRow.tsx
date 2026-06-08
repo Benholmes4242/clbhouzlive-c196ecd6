@@ -1,7 +1,7 @@
 import { memo } from 'react';
 import type { TournamentTab } from '../tournament-detail';
 
-import { FONT, SHELL_BG, SURFACE, WHITE_ALPHA_06, WHITE_ALPHA_55 } from '../../_shared/tokens';
+import { FONT } from '../../_shared/tokens';
 
 interface TabDef {
   value: TournamentTab;
@@ -41,8 +41,8 @@ function TournamentTabsShellRowInner({ activeTab, onChange }: Props) {
           display: 'flex',
           gap: 8,
           padding: '0 16px',
-          background: SHELL_BG,
-          borderBottom: `0.5px solid ${WHITE_ALPHA_06}`,
+          background: '#F8FAFC',
+          borderBottom: `0.5px solid rgba(15,23,42,0.08)`,
           overflowX: 'auto',
           overflowY: 'hidden',
           WebkitOverflowScrolling: 'touch',
@@ -65,7 +65,7 @@ function TournamentTabsShellRowInner({ activeTab, onChange }: Props) {
                 padding: '0 4px',
                 fontSize: 14,
                 fontWeight: isActive ? 700 : 600,
-                color: isActive ? SURFACE : WHITE_ALPHA_55,
+                color: isActive ? '#0A0E14' : '#64748B',
                 background: 'transparent',
                 border: 'none',
                 letterSpacing: '-0.005em',
@@ -79,7 +79,7 @@ function TournamentTabsShellRowInner({ activeTab, onChange }: Props) {
                 style={{
                   display: 'inline-block',
                   paddingBottom: 4,
-                  borderBottom: `1.5px solid ${isActive ? SURFACE : 'transparent'}`,
+                  borderBottom: `1.5px solid ${isActive ? '#0A0E14' : 'transparent'}`,
                 }}
               >
                 {tab.label}

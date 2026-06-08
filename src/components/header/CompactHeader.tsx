@@ -129,10 +129,9 @@ const CompactHeader: React.FC<CompactHeaderProps> = ({ className }) => {
   // Routes that should show back arrow instead of logo
   const isBackArrowRoute = isDiscoverSubPage || isTop100Route || isCourseDetailRoute || isEditProfileRoute || isFriendsActivityRoute || isAchievementsRoute || isMessagesRoute || isHandicapRoute || isWatchSubpageRoute || isTourDeepRoute;
   
-  // Dark chrome is now the default across the app. Only the Clubhouse feed and
-  // Profile pages keep the light Dispatch chrome (identity pill, search icon,
-  // posting-as menu palette).
-  const isDarkChrome = !(isClubhouseChromeRoute || isProfileChromeRoute);
+  // Light chrome is now the default across the app. Only Handicap keeps the
+  // dark terminal header. (Clubhouse feed uses its own ClubhouseHeaderNew.)
+  const isDarkChrome = isHandicapRoute;
   const useDarkChrome = isDarkChrome && !searchOpen;
   const useLightTheme = !useDarkChrome;
 

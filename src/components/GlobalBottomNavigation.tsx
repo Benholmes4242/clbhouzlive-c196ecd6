@@ -94,8 +94,8 @@ const GlobalBottomNavigation: React.FC<GlobalBottomNavigationProps> = ({ chromeS
   const isWarmGradientRoute = WARM_GRADIENT_ROUTES.some(r => location.pathname.startsWith(r));
   const isTourHubRoute = location.pathname.startsWith('/tourhub');
   const isHandicapRoute = location.pathname.startsWith('/handicap');
-  /** Routes that use dark chrome on the bottom nav (handicap + clubhouse + tour hub). */
-  const isDarkChromeRoute = isClubhouseRoute || isHandicapRoute || isTourHubRoute;
+  /** Routes that use dark chrome on the bottom nav (clubhouse feed + handicap only). */
+  const isDarkChromeRoute = isClubhouseRoute || isHandicapRoute;
   
   const showNavigation = isVisible && !shouldHideForRoute;
 
@@ -173,9 +173,11 @@ const GlobalBottomNavigation: React.FC<GlobalBottomNavigationProps> = ({ chromeS
               className="chrome-bottom-nav clubhouse-footer"
               data-chrome="bottom-nav"
               style={{
-                // Unified dark bottom nav across every route (matches feed matte).
-                background: '#0A0E14',
-                borderTop: '0.5px solid rgba(255,255,255,0.06)',
+                // Route-aware: dark on Clubhouse/Handicap, light everywhere else.
+                background: isDarkChromeRoute ? '#0A0E14' : '#F8FAFC',
+                borderTop: isDarkChromeRoute
+                  ? '0.5px solid rgba(255,255,255,0.06)'
+                  : '0.5px solid rgba(15,23,42,0.08)',
                 paddingBottom: 'max(env(safe-area-inset-bottom, 0px), 20px)',
                 transition: 'all var(--motion-slow) cubic-bezier(0.22, 1, 0.36, 1)',
               }}
@@ -184,14 +186,15 @@ const GlobalBottomNavigation: React.FC<GlobalBottomNavigationProps> = ({ chromeS
                 activeTab={activeTab}
                 onTabClick={handleTabClickWithCamera}
                 onPrefetch={handleNavPrefetch}
-                variant={'clubhouse'}
+                variant={isDarkChromeRoute ? 'clubhouse' : 'default'}
                 isDimmed={false}
-                useAmberActive={isWarmGradientRoute}
+                useAmberActive={false}
                 showBorder={false}
                 tabBadges={{ courses: unseenFriendReviews }}
                 liveTabs={liveTabs}
                 isTourHubActive={isTourHubRoute}
               />
+
             </div>
           </motion.div>
         )}
