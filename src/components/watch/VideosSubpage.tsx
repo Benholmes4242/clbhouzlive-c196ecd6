@@ -53,8 +53,8 @@ export default function VideosSubpage() {
           <VideosCategoryRail userId={userId} mood={mood} />
           <VideosFollowingRail userId={userId} />
 
-          <MoreToWatchDivider />
-          <VideosFullFeed userId={userId} />
+          <MoreToWatchDivider mood={mood} />
+          <VideosFullFeed userId={userId} mood={mood} />
         </div>
 
         <ScrollToTopGlass />

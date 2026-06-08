@@ -105,7 +105,7 @@ function VideoFeedCardInner({ post, index, allPosts, userId }: VideoFeedCardProp
           position: 'relative',
           width: '100%',
           aspectRatio: '16/9',
-          borderRadius: 12,
+          borderRadius: 0,
           overflow: 'hidden',
           background: 'transparent',
           border: 'none',
