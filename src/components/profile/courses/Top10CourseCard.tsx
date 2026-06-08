@@ -74,7 +74,7 @@ export const Top10CourseCard: React.FC<Top10CourseCardProps> = ({
           className
         )}
         style={{
-          boxShadow: '0 8px 24px -6px rgba(15,23,42,0.28), 0 2px 8px -2px rgba(15,23,42,0.16)',
+          boxShadow: 'none',
         }}
       >
         {/* Background image - full bleed */}
