@@ -258,9 +258,26 @@ const FeedCardImpl: React.FC<FeedCardProps> = ({
         </button>
       ) : null}
 
+      {/* Course eyebrow + location (above caption) */}
+      {post.courseName && (() => {
+        const courseLocation = [post.courseRegion || post.courseSubCountry, post.courseCountry]
+          .filter(Boolean)
+          .join(', ');
+        return (
+          <div style={{ padding: '10px 14px 0' }}>
+            <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: '0.06em', textTransform: 'uppercase', color: T60 }}>
+              {post.courseName}
+            </div>
+            {courseLocation && (
+              <div style={{ fontSize: 12, color: T40, marginTop: 2 }}>{courseLocation}</div>
+            )}
+          </div>
+        );
+      })()}
+
       {/* Body — caption */}
       {post.caption && (
-        <div style={{ padding: '10px 14px 4px' }}>
+        <div style={{ padding: '8px 14px 4px' }}>
           <div
             style={{
               fontSize: 14,
@@ -274,9 +291,6 @@ const FeedCardImpl: React.FC<FeedCardProps> = ({
           >
             {post.caption}
           </div>
-          {post.courseName && (
-            <div style={{ fontSize: 12, color: T60, marginTop: 4 }}>{post.courseName}</div>
-          )}
         </div>
       )}
 
