@@ -35,14 +35,11 @@ export function TourHubShell({ children, immersive = false }: TourHubShellProps)
     );
   }
 
-  // Match handicap page: dark PageRoot canvas + default (non-immersive)
-  // status bar so the safe-area notch renders as the same dark band as the
-  // header chrome. PageRoot dark adds .hcp-dark and pads for the bottom nav.
+  // Light chrome: Tour Hub now uses the global light page treatment.
   return (
     <PageRoot
-      dark
       className="min-h-screen w-full"
-      style={{ background: 'var(--hcp-bg-0)' }}
+      style={{ background: '#F8FAFC' }}
     >
       {children}
     </PageRoot>
