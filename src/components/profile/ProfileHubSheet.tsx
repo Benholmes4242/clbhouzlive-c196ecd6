@@ -549,16 +549,18 @@ function ProfileHubSheet({
                     />
                   </div>
 
-                  <div style={{ height: '0.5px', background: HAIRLINE, margin: '0 -16px' }} />
+                  {/* ── 2. Handicap masthead — personal profiles only (business has no handicap) ── */}
+                  {activeProfileType === 'personal' && (
+                    <>
+                      <div style={{ height: '0.5px', background: HAIRLINE, margin: '0 -16px' }} />
+                      <div style={{ marginTop: 18 }}>
+                        <HandicapMasthead userId={localActiveId} onConnectTap={handleConnectHandicap} />
+                      </div>
+                    </>
+                  )}
 
-                  {/* ── 2. Handicap masthead (UNCHANGED — kept rich) ── */}
-                  <div style={{ marginTop: 18 }}>
-                    <HandicapMasthead userId={localActiveId} onConnectTap={handleConnectHandicap} />
-                  </div>
-
-
-                  {/* View handicap link (data state only) */}
-                  {stripVariant === 'full' && (
+                  {/* View handicap link (data state only, personal only) */}
+                  {activeProfileType === 'personal' && stripVariant === 'full' && (
                     <div
                       style={{
                         display: 'flex',
