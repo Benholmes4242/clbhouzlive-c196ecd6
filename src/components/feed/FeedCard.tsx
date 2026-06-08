@@ -267,9 +267,26 @@ const FeedCardImpl: React.FC<FeedCardProps> = ({
           .join(', ');
         return (
           <div style={{ padding: '10px 14px 0' }}>
-          <div style={{ fontSize: 12, color: T60 }}>
-            {post.courseName}
-          </div>
+            {post.courseId ? (
+              <button
+                type="button"
+                onClick={() => onCourse?.(post)}
+                style={{
+                  display: 'block',
+                  background: 'transparent',
+                  border: 'none',
+                  padding: 0,
+                  textAlign: 'left',
+                  fontSize: 12,
+                  color: T60,
+                  cursor: 'pointer',
+                }}
+              >
+                {post.courseName}
+              </button>
+            ) : (
+              <div style={{ fontSize: 12, color: T60 }}>{post.courseName}</div>
+            )}
             {courseLocation && (
               <div style={{ fontSize: 11, color: T60, marginTop: 2 }}>{courseLocation}</div>
             )}
