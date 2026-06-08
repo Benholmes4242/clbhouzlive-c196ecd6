@@ -683,20 +683,8 @@ export const AddCourseModal: React.FC<AddCourseModalProps> = ({
         height: '100%',
         background: BG_SURFACE,
       }}>
-        {/* Header — editorial */}
+        {/* Header */}
         <div style={{ padding: '0 20px 16px', position: 'relative' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 8 }}>
-            <div style={{ width: 3, height: 10, background: AMBER }} />
-            <span style={{
-              fontSize: 10,
-              fontWeight: 800,
-              letterSpacing: '0.25em',
-              color: INK_SUBTLE,
-              textTransform: 'uppercase',
-            }}>
-              The Very Best You've Played
-            </span>
-          </div>
           <h2
             id="add-course-title"
             style={{
