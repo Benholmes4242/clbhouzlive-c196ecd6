@@ -408,8 +408,8 @@ export const LoopCard = React.memo(function LoopCard({
                   useFullscreenFeedStore.getState().open(allPosts, cardIndex);
                 }
               }}
-              className="mt-1.5 text-[11px] font-bold uppercase tracking-wide"
-              style={{ color: '#F7931E', letterSpacing: '0.04em' }}
+              className="mt-1.5 text-[11px] font-bold uppercase tracking-wide text-foreground"
+              style={{ letterSpacing: '0.04em' }}
             >
               Read review →
             </button>
