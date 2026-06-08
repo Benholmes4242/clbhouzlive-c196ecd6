@@ -8,6 +8,7 @@ import UserCoursesContent from './UserCoursesContent';
 import Top100CoursesHubPanel from './Top100CoursesHubPanel';
 import Top100LeaderboardPanel from './Top100LeaderboardPanel';
 import ExploreTabContent from '@/components/explore-tab-new/ExploreTabContent';
+import RateNudge from './RateNudge';
 
 
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
