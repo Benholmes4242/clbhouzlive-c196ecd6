@@ -112,9 +112,10 @@ const ClubhouseContent = () => {
   const { isRehydrating } = useRehydrationSafe();
   const queryClient = useQueryClient();
 
-  useEffect(() => {
-    queryClient.invalidateQueries({ queryKey: ['media-feed', 'suggested'] });
-  }, [queryClient]);
+  // Note: do NOT invalidate the suggested feed on every mount — it caused a
+  // cold refetch + full video/HLS teardown each time the user returned to
+  // Clubhouse, tipping the WebView over its renderer/video-element budget and
+  // producing a black/white screen. React Query's staleTime handles freshness.
   const { pathname } = useLocation();
   
   useEffect(() => {

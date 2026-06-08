@@ -72,6 +72,12 @@ export interface FeedCardProps {
   onCourse?: (post: FeedPost) => void;
   /** True when this card is the most-in-view → drives inline video autoplay. */
   isActive?: boolean;
+  /**
+   * Whether this card should actually mount a `<video>` element. iOS WebViews
+   * cap concurrent `<video>` decoders, so we only mount the active card +
+   * immediate neighbours; other cards show the thumbnail poster only.
+   */
+  mountVideo?: boolean;
   /** Initial carousel slide for multi-media posts (from persisted store). */
   initialMediaIndex?: number;
   /** Notified when user swipes the multi-media carousel. */
@@ -91,6 +97,7 @@ const FeedCardImpl: React.FC<FeedCardProps> = ({
   onReviewTap,
   onCourse,
   isActive = false,
+  mountVideo = false,
   initialMediaIndex = 0,
   onCarouselIndexChange,
 }) => {
@@ -209,6 +216,7 @@ const FeedCardImpl: React.FC<FeedCardProps> = ({
           items={items}
           isCardActive={isActive}
           initialIndex={initialMediaIndex}
+          mountVideo={mountVideo}
           onIndexChange={(idx) => onCarouselIndexChange?.(post, idx)}
           onOpen={(idx) => onOpenMedia(post, idx)}
         />
@@ -235,11 +243,28 @@ const FeedCardImpl: React.FC<FeedCardProps> = ({
             }}
           >
             {media.type === 'video' ? (
-              <InlineVideo
-                item={media}
-                isActive={isActive}
-                objectFit="cover"
-              />
+              mountVideo ? (
+                <InlineVideo
+                  item={media}
+                  isActive={isActive}
+                  objectFit="cover"
+                />
+              ) : media.thumbnailUrl ? (
+                <img
+                  src={media.thumbnailUrl}
+                  alt={post.caption || post.displayName}
+                  loading="lazy"
+                  style={{
+                    position: 'absolute',
+                    inset: 0,
+                    width: '100%',
+                    height: '100%',
+                    objectFit: 'cover',
+                    objectPosition: 'center',
+                    display: 'block',
+                  }}
+                />
+              ) : null
             ) : mediaUrl ? (
               <img
                 src={mediaUrl}
