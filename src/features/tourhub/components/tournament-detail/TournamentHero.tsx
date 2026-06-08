@@ -66,7 +66,7 @@ export function TournamentHero({ tournament, imageUrl }: TournamentHeroProps) {
       <div
         style={{
           position: 'relative',
-          height: '220px',
+          height: '268px',
           overflow: 'hidden',
         }}
       >
@@ -104,7 +104,7 @@ export function TournamentHero({ tournament, imageUrl }: TournamentHeroProps) {
             position: 'absolute',
             inset: 0,
             background:
-              'linear-gradient(to bottom, rgba(15,23,42,0.55) 0%, rgba(15,23,42,0.0) 35%, rgba(15,23,42,0.75) 70%, rgba(15,23,42,1) 100%)',
+              'linear-gradient(to bottom, rgba(15,23,42,0.40) 0%, rgba(15,23,42,0.0) 25%, rgba(15,23,42,0.05) 65%, rgba(15,23,42,0.15) 100%)',
           }}
         />
 
@@ -140,35 +140,45 @@ export function TournamentHero({ tournament, imageUrl }: TournamentHeroProps) {
         )}
 
         {/* Bottom — location + tournament name */}
-        <div style={{ position: 'absolute', bottom: 0, left: 16, right: 16, paddingBottom: 14 }}>
-          <h1 style={{ fontSize: 22, fontWeight: 800, color: SURFACE, letterSpacing: '-0.025em', lineHeight: 1.15, margin: '0 0 6px' }}>
+        <div style={{ position: 'absolute', bottom: 52, left: 16, right: 16 }}>
+          <h1 style={{ fontSize: 22, fontWeight: 800, color: SURFACE, letterSpacing: '-0.025em', lineHeight: 1.15, margin: '0 0 6px', textShadow: '0 1px 6px rgba(0,0,0,0.6)' }}>
             {tournament.name}
           </h1>
           {(tournament.venue_city || tournament.venue_country) && (
             <div style={{
               fontSize: 13,
               fontWeight: 500,
-              color: 'rgba(255,255,255,0.70)',
+              color: 'rgba(255,255,255,0.85)',
               letterSpacing: '-0.005em',
+              textShadow: '0 1px 4px rgba(0,0,0,0.6)',
             }}>
               {[tournament.venue_city, expandCountry(tournament.venue_country)].filter(Boolean).join(', ')}
             </div>
           )}
         </div>
-      </div>
 
-      {/* 3-col stat grid on slate */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', borderTop: `0.5px solid ${WHITE_ALPHA_08}` }}>
-        {[
-          { label: 'PURSE', value: formattedPurse ?? '—' },
-          { label: 'PAR', value: tournament.venue_par ? `Par ${tournament.venue_par}` : '—' },
-          { label: 'YARDS', value: tournament.venue_yardage ? `${tournament.venue_yardage.toLocaleString()}` : '—' },
-        ].map((s, i) => (
-          <div key={s.label} style={{ padding: '9px 0 11px', textAlign: 'center' as const, borderRight: i < 2 ? `0.5px solid ${WHITE_ALPHA_06}` : 'none' }}>
-            <div style={{ fontSize: 9, fontWeight: 800, color: 'rgba(255,255,255,0.40)', letterSpacing: '0.16em', marginBottom: '3px' }}>{s.label}</div>
-            <div style={{ fontSize: 14, fontWeight: 800, color: SURFACE, letterSpacing: '-0.025em', fontVariantNumeric: 'tabular-nums' }}>{s.value}</div>
-          </div>
-        ))}
+        {/* PURSE/PAR/YARDS — glass bar over the photo */}
+        <div style={{
+          position: 'absolute',
+          left: 0, right: 0, bottom: 0,
+          display: 'grid',
+          gridTemplateColumns: 'repeat(3, 1fr)',
+          background: 'rgba(10,14,20,0.18)',
+          backdropFilter: 'blur(22px) saturate(160%)',
+          WebkitBackdropFilter: 'blur(22px) saturate(160%)',
+          borderTop: '0.5px solid rgba(255,255,255,0.22)',
+        }}>
+          {[
+            { label: 'PURSE', value: formattedPurse ?? '—' },
+            { label: 'PAR', value: tournament.venue_par ? `Par ${tournament.venue_par}` : '—' },
+            { label: 'YARDS', value: tournament.venue_yardage ? `${tournament.venue_yardage.toLocaleString()}` : '—' },
+          ].map((s, i) => (
+            <div key={s.label} style={{ padding: '9px 0 11px', textAlign: 'center' as const, borderRight: i < 2 ? '0.5px solid rgba(255,255,255,0.14)' : 'none' }}>
+              <div style={{ fontSize: 9, fontWeight: 800, color: 'rgba(255,255,255,0.80)', letterSpacing: '0.16em', marginBottom: '3px', textShadow: '0 1px 2px rgba(0,0,0,0.5)' }}>{s.label}</div>
+              <div style={{ fontSize: 14, fontWeight: 800, color: SURFACE, letterSpacing: '-0.025em', fontVariantNumeric: 'tabular-nums', textShadow: '0 1px 4px rgba(0,0,0,0.65)' }}>{s.value}</div>
+            </div>
+          ))}
+        </div>
       </div>
     </div>
   );
