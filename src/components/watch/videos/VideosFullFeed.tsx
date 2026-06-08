@@ -8,6 +8,7 @@ import VideoFeedCard from './VideoFeedCard';
 interface VideosFullFeedProps {
   userId: string | undefined;
   mood: VideosMoodId;
+  searchQuery?: string;
 }
 
 /**
