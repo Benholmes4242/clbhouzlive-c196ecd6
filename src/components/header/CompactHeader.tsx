@@ -219,12 +219,12 @@ const CompactHeader: React.FC<CompactHeaderProps> = ({ className }) => {
         )}
         style={{
           top: 0,
-          background: isDarkChrome ? '#0A0E14' : 'hsl(var(--background))',
-          backdropFilter: isDarkChrome ? 'none' : 'blur(20px)',
-          WebkitBackdropFilter: isDarkChrome ? 'none' : 'blur(20px)',
+          background: useDarkChrome ? '#0A0E14' : 'hsl(var(--background))',
+          backdropFilter: useDarkChrome ? 'none' : 'blur(20px)',
+          WebkitBackdropFilter: useDarkChrome ? 'none' : 'blur(20px)',
           height: `calc(${contentHeight}px + var(--sat, 0px))`,
           paddingTop: 'var(--sat, 0px)',
-          borderBottom: isDarkChrome
+          borderBottom: useDarkChrome
             ? '1px solid rgba(255,255,255,0.06)'
             : `0.5px solid hsl(var(--border) / 0.5)`,
           boxShadow: 'none',
