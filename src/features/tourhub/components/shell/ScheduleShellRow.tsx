@@ -14,13 +14,6 @@ import {
   INK_FAINT,
   INK_TINT_06,
   INK_TINT_07,
-  SHELL_BG,
-  SURFACE,
-  WHITE_ALPHA_06,
-  WHITE_ALPHA_10,
-  WHITE_ALPHA_18,
-  WHITE_ALPHA_55,
-  WHITE_ALPHA_65,
 } from '../../_shared/tokens';
 
 interface ChipDef {
