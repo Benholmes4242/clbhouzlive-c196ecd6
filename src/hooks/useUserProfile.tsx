@@ -76,14 +76,14 @@ export const useUserProfile = (userId: string | undefined | null) => {
         .from('user_profiles')
         .select('*') // Full profile needed for this hook
         .eq('id', userId)
-        .single();
+        .maybeSingle();
 
       if (error) {
         console.error('[useUserProfile] Error fetching profile:', error);
         throw error;
       }
-
-      return data as UserProfile;
+      // maybeSingle returns null (no error) when there's no row — caller handles null.
+      return data as UserProfile | null;
     },
     enabled: !!userId,
     staleTime: 0, // Always refetch after invalidation
