@@ -8,7 +8,7 @@ import { motion } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import { BatchPlayerAvatar } from '../PlayerAvatar';
 import { playerRoute } from '../../routes';
-import { AMBER, INK, INK_FAINT, INK_MUTE, INK_TINT_02, INK_TINT_07, LEADER_GOLD_TINT_10, SCORE_OVER_PAR_LIGHT, SCORE_UNDER_PAR_LIGHT, SURFACE } from '../../_shared/tokens';
+import { AMBER, INK, INK_FAINT, INK_MUTE, INK_TINT_02, INK_TINT_07, LEADER_GOLD_TINT_10, SCORE_OVER_PAR_LIGHT, SURFACE } from '../../_shared/tokens';
 
 function abbrevName(full: string): string {
   const parts = full.trim().split(/\s+/);
