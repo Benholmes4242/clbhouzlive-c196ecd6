@@ -30,7 +30,7 @@ import { useEditProfileRoute } from '@/hooks/useEditProfileRoute';
 import { useUserProfile } from '@/hooks/useUserProfile';
 import { useWhsConnection, useHandicapTrend } from '@/lib/whs/hooks';
 import HandicapMasthead from '@/components/profile/HandicapMasthead';
-import ProfileStatStrip from '@/components/profile/ProfileStatStrip';
+
 import { ProfileSwitcherPopover } from '@/components/profile/ProfileSwitcherPopover';
 import { useProfileSheetStats } from '@/hooks/useProfileSheetStats';
 import { analyticsEvents } from '@/utils/analyticsEvents';
@@ -554,16 +554,6 @@ function ProfileHubSheet({
                     <HandicapMasthead userId={localActiveId} onConnectTap={handleConnectHandicap} />
                   </div>
 
-                  {/* ── 3. Stat strip (now a grouped card) ── */}
-                  <div style={{ marginTop: 18 }}>
-                    <ProfileStatStrip
-                      variant={stripVariant}
-                      rounds30d={stats.rounds30d}
-                      lowIndex={stats.lowIndex}
-                      reviewsCount={stats.reviewsCount}
-                      coursesPlayed={stats.coursesPlayed}
-                    />
-                  </div>
 
                   {/* View handicap link (data state only) */}
                   {stripVariant === 'full' && (
@@ -571,7 +561,7 @@ function ProfileHubSheet({
                       style={{
                         display: 'flex',
                         justifyContent: 'flex-end',
-                        paddingTop: 8,
+                        paddingTop: 12,
                       }}
                     >
                       <button
