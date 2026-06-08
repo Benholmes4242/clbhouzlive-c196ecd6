@@ -255,6 +255,7 @@ function TiedChasersRowDark({
   avatars,
   isLast,
   onTap,
+  isResults = false,
 }: {
   rank: string;
   count: number;
@@ -262,6 +263,7 @@ function TiedChasersRowDark({
   avatars: (string | null)[];
   isLast: boolean;
   onTap?: () => void;
+  isResults?: boolean;
 }) {
   return (
     <div
