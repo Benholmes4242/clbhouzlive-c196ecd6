@@ -15,7 +15,7 @@ import { useTourTournament, useTourLeaderboard } from '../hooks/useTourHubData';
 import { useLeaderboardRealtime } from '../hooks/useLeaderboardRealtime';
 import { useSingleCourseImage } from '../hooks/useCourseImageResolver';
 import { getCourseImage } from '../utils/placeholders';
-import { EventWinnerCard } from '../components/EventWinnerCard';
+
 import { EventMomentsList } from '../components/EventMomentsList';
 
 import {
@@ -187,7 +187,6 @@ export function TournamentDetailPage() {
             animate={{ opacity: 1 }}
             transition={{ duration: 0.3 }}
           >
-            {isCompleted && tournamentId && <EventWinnerCard tournamentId={tournamentId} />}
             {isCompleted && tournamentId && <EventMomentsList tournamentId={tournamentId} limit={5} />}
             
             {hasLeaderboard && (
