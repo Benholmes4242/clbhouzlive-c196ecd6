@@ -2,7 +2,7 @@ import { memo, useEffect, useRef } from 'react';
 import { Pin } from '@/components/watch/proshop/Pin';
 import type { FeedPost } from '@/components/media-system/types/media';
 import { useFullscreenFeedStore } from '@/store/fullscreenFeedStore';
-import clbhouzLogo from '@/assets/clbhouz-logo.png';
+
 
 interface ExploreTileProps {
   post: FeedPost;
@@ -39,19 +39,13 @@ function ExploreTileInner({ post, index, allPosts, variant = 'tile', feature = f
 
   const posterSrc = media.thumbnailUrl || media.imageUrl || '';
   const courseName = post.courseName || post.review?.courseName;
-  const rating = post.review?.rating;
+  
 
   const { open } = useFullscreenFeedStore();
 
   const handleTap = () => {
     open(allPosts ?? [post], index);
   };
-
-  const scale = feature || variant === 'hero' ? 1.15 : 1;
-  const ratingFs = 12 * scale;
-  const ratingIcon = 12 * scale;
-  const ratingPadY = 4 * scale;
-  const ratingPadX = 8 * scale;
 
   return (
     <button
@@ -73,25 +67,6 @@ function ExploreTileInner({ post, index, allPosts, variant = 'tile', feature = f
         />
       )}
 
-      {rating != null && rating > 0 && (
-        <span
-          className="absolute flex items-center leading-none"
-          style={{
-            top: 8, right: 8, gap: 4 * scale,
-            padding: `${ratingPadY}px ${ratingPadX}px`,
-            borderRadius: 9999,
-            background: 'rgba(10,14,20,0.52)',
-            backdropFilter: 'blur(14px) saturate(150%)',
-            WebkitBackdropFilter: 'blur(14px) saturate(150%)',
-            border: '1px solid rgba(255,255,255,0.16)',
-            maxWidth: 'calc(100% - 16px)',
-            overflow: 'hidden',
-          }}
-        >
-          <img src={clbhouzLogo} alt="" style={{ width: ratingIcon, height: ratingIcon, objectFit: 'contain' }} />
-          <span style={{ fontSize: ratingFs, fontWeight: 700, color: '#fff', textShadow: '0 1px 4px rgba(0,0,0,0.55)' }}>{rating.toFixed(1)}</span>
-        </span>
-      )}
 
       {courseName && (
         <div
