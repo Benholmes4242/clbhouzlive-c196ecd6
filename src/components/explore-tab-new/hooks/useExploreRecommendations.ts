@@ -21,11 +21,13 @@ export function useExploreRecommendations(
   userId: string | undefined,
   mood: ExploreMoodId,
   limit = 4,
+  opts?: { fresh?: boolean },
 ) {
+  const fresh = opts?.fresh ?? false;
   return useQuery({
-    queryKey: ['explore-recs', userId, mood, limit],
+    queryKey: ['explore-recs', userId, mood, limit, fresh],
     enabled: !!userId,
-    staleTime: 5 * 60 * 1000,
+    staleTime: fresh ? 0 : 5 * 60 * 1000,
     gcTime: 15 * 60 * 1000,
     queryFn: async (): Promise<ExploreRecRow[]> => {
       const { data, error } = await supabase.rpc('get_explore_recommendations', {

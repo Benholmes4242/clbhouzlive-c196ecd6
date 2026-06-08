@@ -1,4 +1,4 @@
-import { memo } from 'react';
+import { memo, useMemo, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Sparkles } from 'lucide-react';
 import { useExploreRecommendations, type ExploreRecRow } from './hooks/useExploreRecommendations';
@@ -151,7 +151,40 @@ function RecCard({ rec, onTap }: { rec: ExploreRecRow; onTap: () => void }) {
 
 function ExploreRecommendationsInner({ userId, mood }: ExploreRecommendationsProps) {
   const navigate = useNavigate();
-  const { data: recs = [], isLoading } = useExploreRecommendations(userId, mood, 4);
+  const isPicked = mood === 'foryou';
+  const { data: recs = [], isLoading } = useExploreRecommendations(
+    userId,
+    mood,
+    isPicked ? 15 : 4,
+    { fresh: isPicked },
+  );
+
+  const seedRef = useRef(Math.random());
+  const displayRecs = useMemo<ExploreRecRow[]>(() => {
+    if (!isPicked) return recs;
+    if (recs.length === 0) return recs;
+    const seen = new Set<string>();
+    const unique: ExploreRecRow[] = [];
+    for (const r of recs) {
+      if (seen.has(r.course_id)) continue;
+      seen.add(r.course_id);
+      unique.push(r);
+    }
+    let s = Math.floor(seedRef.current * 2 ** 32) || 1;
+    const rand = () => {
+      s |= 0;
+      s = (s + 0x6D2B79F5) | 0;
+      let t = Math.imul(s ^ (s >>> 15), 1 | s);
+      t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+      return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+    };
+    const arr = unique.slice();
+    for (let i = arr.length - 1; i > 0; i--) {
+      const j = Math.floor(rand() * (i + 1));
+      [arr[i], arr[j]] = [arr[j], arr[i]];
+    }
+    return arr.slice(0, 3);
+  }, [recs, isPicked]);
 
   if (isLoading) {
     return (
@@ -170,7 +203,7 @@ function ExploreRecommendationsInner({ userId, mood }: ExploreRecommendationsPro
     );
   }
 
-  if (recs.length === 0) {
+  if (displayRecs.length === 0) {
     if (mood === 'friends') {
       return (
         <section style={{ padding: '0 0 0' }}>
@@ -185,7 +218,7 @@ function ExploreRecommendationsInner({ userId, mood }: ExploreRecommendationsPro
     return null;
   }
 
-  const tier = recs[0]?.filter_tier;
+  const tier = displayRecs[0]?.filter_tier;
   const tierLabel =
     tier === 'expanded' ? 'Broader set' :
     tier === 'relaxed' ? 'Widened the net' :
@@ -200,7 +233,7 @@ function ExploreRecommendationsInner({ userId, mood }: ExploreRecommendationsPro
         sub={tierLabel ?? MOOD_SUBHEADS[mood]}
       />
       <div className="flex gap-3 px-4 overflow-x-auto scrollbar-hide" style={{ paddingBottom: 4 }}>
-        {recs.map(rec => (
+        {displayRecs.map(rec => (
           <RecCard key={rec.course_id} rec={rec} onTap={() => navigate(`/courses/${rec.course_id}`)} />
         ))}
       </div>
