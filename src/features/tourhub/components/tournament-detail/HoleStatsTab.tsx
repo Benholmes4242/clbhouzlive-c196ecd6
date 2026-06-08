@@ -13,10 +13,10 @@ import { ConnectHandicapCue } from '@/components/courses/course-detail/ConnectHa
 
 // Local hole-distribution ramp (mirrors src/features/courses/components/holes/_constants.ts).
 // Duplicated intentionally to keep tourhub self-contained — no cross-feature import.
-const C_BIRDIE = '#F7931E';  // amber — birdie or better
+const C_BIRDIE = '#9F1D1D';  // red — birdie or better (good = red)
 const C_PAR    = '#94A3B8';  // slate — par
-const C_BOGEY  = '#EF4444';  // red — bogey
-const C_DOUBLE = '#991B1B';  // maroon — double or worse
+const C_BOGEY  = '#0F172A';  // ink — bogey (over par = dark)
+const C_DOUBLE = '#475569';  // slate-600 — double or worse (muted dark)
 const INK_HOLE = '#0F172A';
 
 interface HoleStatsTabProps {
@@ -379,9 +379,9 @@ function computeDist(hole: ProcessedHole) {
 }
 
 function avgColor(pct: number) {
-  if (pct > 0.75) return '#991B1B';
-  if (pct > 0.45) return '#EF4444';
-  return '#94A3B8';
+  if (pct > 0.75) return '#0F172A';  // hardest -> ink (dark)
+  if (pct > 0.45) return '#475569';  // hard -> slate-600 (muted dark)
+  return '#9F1D1D';                   // easiest -> red (good for the player)
 }
 
 function DistributionBar({ dist }: { dist: ReturnType<typeof computeDist> }) {
@@ -402,9 +402,9 @@ function DistributionBar({ dist }: { dist: ReturnType<typeof computeDist> }) {
 
 function FeatureCard({ kind, hole }: { kind: 'hardest' | 'easiest'; hole: ProcessedHole }) {
   const isHardest = kind === 'hardest';
-  const tint   = isHardest ? 'rgba(153,27,27,0.06)' : 'rgba(247,147,30,0.07)';
-  const border = isHardest ? 'rgba(153,27,27,0.18)' : 'rgba(247,147,30,0.22)';
-  const eyebrowColor = isHardest ? '#991B1B' : AMBER;
+  const tint   = isHardest ? 'rgba(15,23,42,0.05)' : 'rgba(159,29,29,0.06)';
+  const border = isHardest ? 'rgba(15,23,42,0.16)' : 'rgba(159,29,29,0.20)';
+  const eyebrowColor = isHardest ? '#0F172A' : '#9F1D1D';
   const playsTo = (hole.par + hole.avgDiff).toFixed(1);
   return (
     <div style={{ flex: 1, background: tint, border: `1px solid ${border}`, borderRadius: 12, padding: '12px 14px 14px' }}>
@@ -431,8 +431,8 @@ function HoleStatRow({
   const ramp = avgColor(pct);
   const avgLabel = hole.avgDiff > 0 ? `+${hole.avgDiff.toFixed(2)}` : hole.avgDiff.toFixed(2);
   const tag =
-    hole.holeNumber === hardestNumber ? { l: 'Hardest', c: '#991B1B' as const } :
-    hole.holeNumber === easiestNumber ? { l: 'Easiest', c: AMBER } :
+    hole.holeNumber === hardestNumber ? { l: 'Hardest', c: '#0F172A' as const } :
+    hole.holeNumber === easiestNumber ? { l: 'Easiest', c: '#9F1D1D' as const } :
     null;
   const rounds = hole.totalPlayers;
 
