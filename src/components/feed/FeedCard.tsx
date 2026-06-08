@@ -269,7 +269,7 @@ const FeedCardImpl: React.FC<FeedCardProps> = ({
             {post.courseName}
           </div>
             {courseLocation && (
-              <div style={{ fontSize: 12, color: T60, marginTop: 2 }}>{courseLocation}</div>
+              <div style={{ fontSize: 11, color: T60, marginTop: 2 }}>{courseLocation}</div>
             )}
           </div>
         );
