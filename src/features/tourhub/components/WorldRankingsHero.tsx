@@ -292,7 +292,7 @@ function NumberOneCard({
           )}
         </div>
 
-        {/* Player + score row */}
+        {/* Player row — avatar + stacked name / country / points (points moved below country so the name + country use the full width and never truncate) */}
         <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
           <div style={{ position: 'relative', flexShrink: 0 }}>
             <div
@@ -368,36 +368,46 @@ function NumberOneCard({
                 display: 'flex',
                 alignItems: 'center',
                 gap: 5,
+                minWidth: 0,
               }}
             >
               <CountryFlag country={entry.player.country ?? ''} size="sm" />
-              {toTitleCase(entry.player.country ?? '')}
+              <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                {toTitleCase(entry.player.country ?? '')}
+              </span>
             </div>
-          </div>
 
-          <div style={{ textAlign: 'right' }}>
+            {/* Total points — moved under country */}
             <div
               style={{
-                fontSize: 26,
-                fontWeight: 800,
-                color: INK,
-                fontVariantNumeric: 'tabular-nums',
-                lineHeight: 1,
-                letterSpacing: '-0.02em',
+                display: 'flex',
+                alignItems: 'baseline',
+                gap: 6,
+                marginTop: 10,
               }}
             >
-              {entry.total_points != null ? entry.total_points.toFixed(2) : '—'}
-            </div>
-            <div
-              style={{
-                fontSize: 9,
-                fontWeight: 700,
-                color: INK_FAINT,
-                letterSpacing: '0.12em',
-                marginTop: 4,
-              }}
-            >
-              TOTAL POINTS
+              <span
+                style={{
+                  fontSize: 22,
+                  fontWeight: 800,
+                  color: INK,
+                  fontVariantNumeric: 'tabular-nums',
+                  lineHeight: 1,
+                  letterSpacing: '-0.02em',
+                }}
+              >
+                {entry.total_points != null ? entry.total_points.toFixed(2) : '—'}
+              </span>
+              <span
+                style={{
+                  fontSize: 9,
+                  fontWeight: 700,
+                  color: INK_FAINT,
+                  letterSpacing: '0.12em',
+                }}
+              >
+                TOTAL POINTS
+              </span>
             </div>
           </div>
         </div>
