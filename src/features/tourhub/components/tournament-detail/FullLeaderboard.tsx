@@ -188,7 +188,7 @@ export function FullLeaderboard({
               aria-label={`Sort by round ${r}`}
               style={{
                 width: '19px', textAlign: 'center', fontSize: '9px', fontWeight: 800,
-                color: active ? AMBER : INK, letterSpacing: '0.14em', flexShrink: 0,
+                color: INK, letterSpacing: '0.14em', flexShrink: 0,
                 background: 'none', border: 'none', padding: 0, cursor: 'pointer',
                 fontVariantNumeric: 'tabular-nums',
               }}
@@ -203,7 +203,7 @@ export function FullLeaderboard({
           aria-label="Sort by total"
           style={{
             width: '34px', textAlign: 'center', fontSize: '9px', fontWeight: 800,
-            color: sortRound == null ? AMBER : INK, letterSpacing: '0.14em', flexShrink: 0,
+            color: INK, letterSpacing: '0.14em', flexShrink: 0,
             background: 'none', border: 'none', padding: 0, cursor: 'pointer',
           }}
         >
