@@ -223,18 +223,20 @@ const BreakdownsPickerSheet: React.FC<BreakdownsPickerSheetProps> = ({
                       whiteSpace: 'nowrap',
                     }}
                   >
-                    <span
-                      style={{
-                        color: '#0F172A',
-                        fontVariantNumeric: 'tabular-nums',
-                      }}
-                    >
-                      {int}.{dec}
-                    </span>
+                    {mode !== 'review' && (
+                      <span
+                        style={{
+                          color: '#0F172A',
+                          fontVariantNumeric: 'tabular-nums',
+                        }}
+                      >
+                        {int}.{dec}
+                      </span>
+                    )}
                     {dateText && (
                       <>
-                        <span style={{ color: '#CBD5E1' }}> · </span>
-                        <span>ADDED {dateText}</span>
+                        {mode !== 'review' && <span style={{ color: '#CBD5E1' }}> · </span>}
+                        <span>{mode === 'review' ? 'PLAYED ' : 'ADDED '}{dateText}</span>
                       </>
                     )}
                   </div>
