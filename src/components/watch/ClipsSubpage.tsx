@@ -1,9 +1,10 @@
-import { useRef, useEffect } from 'react';
+import { useRef, useEffect, useState } from 'react';
 import { useNavigationType } from 'react-router-dom';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import PageRoot from '@/components/layout/PageRoot';
 import ScrollToTopGlass from '@/components/common/ScrollToTopGlass';
 import ShellSlot from '@/components/header/ShellSlot';
+import { useDebouncedValue } from '@/hooks/useDebouncedValue';
 import { useWatchFeed } from './hooks/useWatchFeed';
 import WatchAutoplay from './WatchAutoplay';
 import WatchGrid from './WatchGrid';
@@ -20,16 +21,26 @@ import { MoreToExploreDivider } from './clips/MoreToExploreDivider';
 
 const CREAM = '#F8FAFC';
 
-/**
- * Clips subpage — fixed-shell variant. Editorial header (kicker + h1) and
- * mood chips live in <ShellSlot>; body offsets by var(--shell-extra-h).
- */
 export default function ClipsSubpage() {
   const navigationType = useNavigationType();
   const { session } = useSupabaseSession();
   const userId = session?.user?.id;
   const { mood, setMood } = useClipsMood();
   const gridRef = useRef<HTMLDivElement>(null);
+
+  const [searchOpen, setSearchOpen] = useState(false);
+  const [searchRaw, setSearchRaw] = useState('');
+  const searchQuery = useDebouncedValue(searchRaw.trim(), 180);
+  const isSearching = searchQuery.length > 0;
+
+  const handleSearchOpen = () => {
+    setSearchOpen(true);
+    if (mood !== 'for_you') setMood('for_you');
+  };
+  const handleSearchClose = () => {
+    setSearchOpen(false);
+    setSearchRaw('');
+  };
 
   useEffect(() => {
     if (navigationType !== 'POP') {
@@ -43,7 +54,12 @@ export default function ClipsSubpage() {
   const watchMood = clipsMoodToWatchMood(mood);
   const {
     posts, isLoading, isError, hasNextPage, isFetchingNextPage, fetchNextPage, refetch,
-  } = useWatchFeed({ userId, filter: 'trending', mood: watchMood });
+  } = useWatchFeed({
+    userId,
+    filter: 'trending',
+    mood: isSearching ? undefined : watchMood,
+    searchQuery: isSearching ? searchQuery : undefined,
+  });
 
   const activeLabel = clipsMoodLabel(mood);
   const isFiltered = mood !== 'for_you';
@@ -52,35 +68,64 @@ export default function ClipsSubpage() {
     <WatchActionsProvider>
       <PageRoot className="min-h-screen" hasBottomNav={true} style={{ background: CREAM }}>
         <ShellSlot>
-          <ClipsMoodChips active={mood} onChange={setMood} />
+          <ClipsMoodChips
+            active={mood}
+            onChange={setMood}
+            searchOpen={searchOpen}
+            searchValue={searchRaw}
+            onSearchOpen={handleSearchOpen}
+            onSearchChange={setSearchRaw}
+            onSearchClose={handleSearchClose}
+          />
         </ShellSlot>
 
         <div style={{ paddingTop: 'var(--chrome-total-h, 0px)' }}>
-          <ClipOfTheWeekHero />
-          <LightningRoundRail userId={userId} mood={mood} />
-          <ClipsCourseAnchoredRail userId={userId} mood={mood} />
-          <ClipsMostLovedRail userId={userId} mood={mood} />
+          {isSearching ? (
+            <>
+              <WatchAutoplay posts={posts} gridRef={gridRef as React.RefObject<HTMLDivElement>} />
+              <WatchGrid
+                posts={posts}
+                isLoading={isLoading}
+                isError={isError}
+                hasNextPage={hasNextPage}
+                isFetchingNextPage={isFetchingNextPage}
+                fetchNextPage={fetchNextPage}
+                refetch={refetch}
+                gridRef={gridRef as React.RefObject<HTMLDivElement>}
+                userId={userId}
+                emptyTitle="No clips found"
+                emptyMessage={`Nothing matches "${searchQuery}" — try another search.`}
+              />
+            </>
+          ) : (
+            <>
+              <ClipOfTheWeekHero />
+              <LightningRoundRail userId={userId} mood={mood} />
+              <ClipsCourseAnchoredRail userId={userId} mood={mood} />
+              <ClipsMostLovedRail userId={userId} mood={mood} />
 
-          <MoreToExploreDivider mood={mood} />
+              <MoreToExploreDivider mood={mood} />
 
-          <WatchAutoplay posts={posts} gridRef={gridRef as React.RefObject<HTMLDivElement>} />
-          <WatchGrid
-            posts={posts}
-            isLoading={isLoading}
-            isError={isError}
-            hasNextPage={hasNextPage}
-            isFetchingNextPage={isFetchingNextPage}
-            fetchNextPage={fetchNextPage}
-            refetch={refetch}
-            gridRef={gridRef as React.RefObject<HTMLDivElement>}
-            userId={userId}
-            emptyTitle={isFiltered ? 'No clips here yet.' : 'No shorts yet'}
-            emptyMessage={
-              isFiltered && activeLabel
-                ? `Nothing matches "${activeLabel}" right now — try another filter.`
-                : 'Check back soon for new content'
-            }
-          />
+              <WatchAutoplay posts={posts} gridRef={gridRef as React.RefObject<HTMLDivElement>} />
+              <WatchGrid
+                posts={posts}
+                isLoading={isLoading}
+                isError={isError}
+                hasNextPage={hasNextPage}
+                isFetchingNextPage={isFetchingNextPage}
+                fetchNextPage={fetchNextPage}
+                refetch={refetch}
+                gridRef={gridRef as React.RefObject<HTMLDivElement>}
+                userId={userId}
+                emptyTitle={isFiltered ? 'No clips here yet.' : 'No shorts yet'}
+                emptyMessage={
+                  isFiltered && activeLabel
+                    ? `Nothing matches "${activeLabel}" right now — try another filter.`
+                    : 'Check back soon for new content'
+                }
+              />
+            </>
+          )}
         </div>
 
         <ScrollToTopGlass />
