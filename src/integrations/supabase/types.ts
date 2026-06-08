@@ -20069,6 +20069,16 @@ export type Database = {
         Args: { other_user_id: string }
         Returns: string
       }
+      get_played_unrated_courses: {
+        Args: { p_user_id: string }
+        Returns: {
+          course_id: string
+          last_played: string
+          name: string
+          region: string
+          thumbnail_image: string
+        }[]
+      }
       get_player_titles_in_reach: {
         Args: { p_limit?: number; p_user_id: string; p_window?: string }
         Returns: {
