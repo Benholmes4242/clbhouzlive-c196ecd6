@@ -494,10 +494,10 @@ const SectionEyebrow: React.FC<{ label: string; noBar?: boolean }> = ({ label, n
   }}>
     {!noBar && <div style={{ width: 3, height: 9, background: AMBER }} />}
     <span style={{
-      fontSize: 10,
+      fontSize: 9,
       fontWeight: 800,
-      letterSpacing: '0.22em',
-      color: INK_SUBTLE,
+      letterSpacing: '0.16em',
+      color: '#64748B',
       textTransform: 'uppercase',
     }}>
       {label}
