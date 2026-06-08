@@ -682,51 +682,20 @@ export const AddCourseModal: React.FC<AddCourseModalProps> = ({
         display: 'flex',
         flexDirection: 'column',
         height: '100%',
-        background: BG_SURFACE,
+        background: '#FFFFFF',
       }}>
-        {/* Header */}
-        <div style={{ padding: '0 20px 16px', position: 'relative' }}>
-          <h2
-            id="add-course-title"
-            style={{
-              fontFamily: FONT_SERIF,
-              fontSize: 26,
-              fontWeight: 900,
-              color: INK,
-              letterSpacing: '-0.02em',
-              margin: 0,
-              lineHeight: 1.1,
-            }}
-          >
-            Your Personal Top 10
-          </h2>
-          <button
-            onClick={onClose}
-            style={{
-              position: 'absolute',
-              top: -4,
-              right: 16,
-              width: 36,
-              height: 36,
-              borderRadius: '50%',
-              background: 'rgba(15,23,42,0.05)',
-              border: 0,
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              cursor: 'pointer',
-              color: INK_SOFT,
-            }}
-            aria-label="Close"
-          >
-            <X size={18} strokeWidth={2.25} />
-          </button>
-        </div>
+        {/* Canonical Dispatch sheet header */}
+        <SheetHeader
+          eyebrow="YOUR COURSES"
+          title={<span id="add-course-title">Personal Top 10</span>}
+          onClose={onClose}
+          borderBottom={false}
+        />
 
         {/* 10 / 10 status line */}
         {topTen.length === 10 && (
           <div style={{
-            padding: '8px 20px 12px',
+            padding: '4px 16px 10px',
             display: 'flex',
             alignItems: 'baseline',
             gap: 6,
@@ -744,7 +713,8 @@ export const AddCourseModal: React.FC<AddCourseModalProps> = ({
         <div style={{
           display: 'flex',
           gap: 24,
-          padding: '0 20px',
+          padding: '0 16px',
+          borderBottom: `0.5px solid rgba(15,23,42,0.08)`,
         }}>
           {(['manage', 'add'] as const).map(tab => {
             const isActive = activeTab === tab;
@@ -767,19 +737,20 @@ export const AddCourseModal: React.FC<AddCourseModalProps> = ({
                 }}
               >
                 <span style={{
-                  fontSize: 16,
-                  fontWeight: 800,
+                  fontSize: 14,
+                  fontWeight: isActive ? 800 : 600,
                   color: isActive ? INK : INK_SUBTLE,
                   letterSpacing: '-0.01em',
                   display: 'inline-block',
-                  paddingBottom: 6,
-                  borderBottom: isActive ? '1.5px solid #0F172A' : '1.5px solid transparent',
+                  paddingBottom: 8,
+                  marginBottom: -1,
+                  borderBottom: isActive ? '2px solid #0F172A' : '2px solid transparent',
                 }}>
                   {label}
                 </span>
                 {count !== null && (
                   <span style={{
-                    fontSize: 12,
+                    fontSize: 11,
                     fontWeight: 700,
                     color: isActive ? INK_SOFT : INK_SUBTLE,
                     fontVariantNumeric: 'tabular-nums',
@@ -791,6 +762,7 @@ export const AddCourseModal: React.FC<AddCourseModalProps> = ({
             );
           })}
         </div>
+
 
         {/* Search input — only on Add tab, natural height */}
         {activeTab === 'add' && (
