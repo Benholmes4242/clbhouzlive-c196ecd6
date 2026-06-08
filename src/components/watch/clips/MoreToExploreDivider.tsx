@@ -1,11 +1,22 @@
 import { memo } from 'react';
+import { clipsMoodLabel, clipsMoodSub, type ClipsMoodId } from './hooks/useClipsMood';
+
+interface MoreToExploreDividerProps {
+  mood?: ClipsMoodId;
+}
 
 /**
  * Visual break between the Pro Shop editorial sections (above) and the
- * existing 2-col masonry feed (below). Slightly heavier top padding +
- * hairline border-top signals the section change.
+ * full clips feed (below). Title + sub reflect the active mood filter so
+ * the chips visibly drive the feed below.
  */
-function MoreToExploreDividerInner() {
+function MoreToExploreDividerInner({ mood = 'for_you' }: MoreToExploreDividerProps) {
+  const label = clipsMoodLabel(mood);
+  const sub = clipsMoodSub(mood);
+
+  const title = label ?? 'More to explore';
+  const subtitle = sub ?? 'The full clips feed';
+
   return (
     <div
       style={{
@@ -24,7 +35,7 @@ function MoreToExploreDividerInner() {
           margin: 0,
         }}
       >
-        More to explore
+        {title}
       </h2>
       <p
         style={{
@@ -35,7 +46,7 @@ function MoreToExploreDividerInner() {
           lineHeight: 1.35,
         }}
       >
-        The full clips feed
+        {subtitle}
       </p>
     </div>
   );

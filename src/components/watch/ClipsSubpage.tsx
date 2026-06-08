@@ -11,7 +11,7 @@ import { WatchActionsProvider } from './context/WatchActionsContext';
 
 
 import { ClipsMoodChips } from './clips/ClipsMoodChips';
-import { useClipsMood } from './clips/hooks/useClipsMood';
+import { useClipsMood, clipsMoodToWatchMood, clipsMoodLabel } from './clips/hooks/useClipsMood';
 import { ClipOfTheWeekHero } from './clips/ClipOfTheWeekHero';
 import { LightningRoundRail } from './clips/LightningRoundRail';
 import { ClipsCourseAnchoredRail } from './clips/ClipsCourseAnchoredRail';
@@ -40,9 +40,13 @@ export default function ClipsSubpage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  const watchMood = clipsMoodToWatchMood(mood);
   const {
     posts, isLoading, isError, hasNextPage, isFetchingNextPage, fetchNextPage, refetch,
-  } = useWatchFeed({ userId, filter: 'trending' });
+  } = useWatchFeed({ userId, filter: 'trending', mood: watchMood });
+
+  const activeLabel = clipsMoodLabel(mood);
+  const isFiltered = mood !== 'for_you';
 
   return (
     <WatchActionsProvider>
@@ -57,7 +61,7 @@ export default function ClipsSubpage() {
           <ClipsCourseAnchoredRail userId={userId} mood={mood} />
           <ClipsMostLovedRail userId={userId} mood={mood} />
 
-          <MoreToExploreDivider />
+          <MoreToExploreDivider mood={mood} />
 
           <WatchAutoplay posts={posts} gridRef={gridRef as React.RefObject<HTMLDivElement>} />
           <WatchGrid
@@ -70,6 +74,12 @@ export default function ClipsSubpage() {
             refetch={refetch}
             gridRef={gridRef as React.RefObject<HTMLDivElement>}
             userId={userId}
+            emptyTitle={isFiltered ? 'No clips here yet.' : 'No shorts yet'}
+            emptyMessage={
+              isFiltered && activeLabel
+                ? `Nothing matches "${activeLabel}" right now — try another filter.`
+                : 'Check back soon for new content'
+            }
           />
         </div>
 
