@@ -220,7 +220,7 @@ function WhereYoudRankInner({ userId }: WhereYoudRankProps) {
         sub="Courses you've played — and how close you are"
       />
       <div className="flex gap-3 px-4 overflow-x-auto scrollbar-hide" style={{ paddingBottom: 4 }}>
-        {data.map(row => (
+        {picks.map(row => (
           <RankCard
             key={`${row.course_id}-${row.category}`}
             row={row}
