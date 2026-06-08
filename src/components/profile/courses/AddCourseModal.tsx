@@ -483,15 +483,15 @@ const CourseRow: React.FC<CourseRowProps> = ({
   </div>
 );
 
-// Reusable section eyebrow with amber-bar prefix
-const SectionEyebrow: React.FC<{ label: string }> = ({ label }) => (
+// Reusable section eyebrow with optional amber-bar prefix
+const SectionEyebrow: React.FC<{ label: string; noBar?: boolean }> = ({ label, noBar }) => (
   <div style={{
     padding: '12px 20px 8px',
     display: 'flex',
     alignItems: 'center',
     gap: 8,
   }}>
-    <div style={{ width: 3, height: 9, background: AMBER }} />
+    {!noBar && <div style={{ width: 3, height: 9, background: AMBER }} />}
     <span style={{
       fontSize: 10,
       fontWeight: 800,
