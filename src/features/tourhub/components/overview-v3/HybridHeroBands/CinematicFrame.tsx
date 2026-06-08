@@ -687,6 +687,7 @@ export function CinematicFrame({
               avatars={slot.members.map((m: any) => avatar(m))}
               isLast={isLast}
               onTap={onCtaTap}
+              isResults={isResults}
             />
           );
         } else {
