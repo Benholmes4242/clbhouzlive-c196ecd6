@@ -10,7 +10,7 @@ import { BatchPlayerAvatar } from '../PlayerAvatar';
 import { EditorialEmpty } from './EditorialEmpty';
 import { useTournamentScoringStats } from '../../hooks/useTourHubData';
 import { playerRoute } from '../../routes';
-import { AMBER, INK, INK_FAINT, INK_MUTE, INK_TINT_02, INK_TINT_06, INK_TINT_07, LIVE_DOT, LIVE_INK, SCORE_UNDER_PAR_LIGHT, SURFACE, TREND_DOWN, TREND_UP } from '../../_shared/tokens';
+import { AMBER, INK, INK_FAINT, INK_MUTE, INK_TINT_02, INK_TINT_06, INK_TINT_07, LIVE_DOT, LIVE_INK, SCORE_UNDER_PAR_LIGHT, SLATE_50, SURFACE, TREND_DOWN, TREND_UP } from '../../_shared/tokens';
 
 interface SummaryTabProps {
   tournamentId: string;
@@ -75,8 +75,8 @@ function WinnerCard({ winner, runnerUp, headshotMap, tournamentName }: { winner:
   return (
     <motion.div style={{ marginTop: '8px' }} {...sectionEntrance}>
       {/* Section eyebrow */}
-      <div style={{ padding: '14px 20px 0', background: SURFACE, borderTop: `1px solid ${INK_TINT_07}` }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '10px' }}>
+      <div style={{ padding: '14px 20px 12px', background: SLATE_50 }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
           <span style={{ fontSize: '9px', fontWeight: 800, color: INK_MUTE, letterSpacing: '0.16em', textTransform: 'uppercase' as const }}>Tournament Champion</span>
         </div>
       </div>
@@ -156,8 +156,8 @@ export function SummaryTab({
       {/* Round-by-round scoring */}
       {scoringStats && scoringStats.rounds.length > 0 && (
         <motion.div style={{ marginTop: '8px' }} {...sectionEntrance}>
-          <div style={{ padding: '14px 20px 0', background: SURFACE, borderTop: `1px solid ${INK_TINT_07}` }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '10px' }}>
+          <div style={{ padding: '14px 20px 12px', background: SLATE_50 }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
               <span style={{ fontSize: '9px', fontWeight: 800, color: INK_MUTE, letterSpacing: '0.16em', textTransform: 'uppercase' as const }}>Round Scoring</span>
             </div>
           </div>
@@ -202,8 +202,8 @@ export function SummaryTab({
 
         return (
           <motion.div style={{ marginTop: '8px' }} {...sectionEntrance}>
-            <div style={{ padding: '14px 20px 0', background: SURFACE, borderTop: `1px solid ${INK_TINT_07}` }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '10px' }}>
+            <div style={{ padding: '14px 20px 12px', background: SLATE_50 }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                 <span style={{ fontSize: '9px', fontWeight: 800, color: INK_MUTE, letterSpacing: '0.16em', textTransform: 'uppercase' as const }}>Field Statistics</span>
               </div>
             </div>
@@ -242,14 +242,14 @@ export function SummaryTab({
         const scoreStr = best.score === 0 ? 'E' : best.score < 0 ? String(best.score) : `+${best.score}`;
         return (
           <motion.div style={{ marginTop: '8px' }} {...sectionEntrance}>
-            <div style={{ padding: '14px 20px 0', background: SURFACE, borderTop: `1px solid ${INK_TINT_07}` }}>
-              <div style={{ marginBottom: '10px' }}>
+            <div style={{ padding: '14px 20px 12px', background: SLATE_50 }}>
+              <div>
                 <span style={{ fontSize: '9px', fontWeight: 800, color: INK_MUTE, letterSpacing: '0.16em', textTransform: 'uppercase' as const }}>Best Round of the Week</span>
               </div>
             </div>
             <Link
               {...playerRoute(best.playerId, tournamentName ? { kind: 'tournament', tournamentName } : undefined)}
-              style={{ display: 'flex', alignItems: 'center', gap: '10px', padding: '12px 20px 16px', background: SURFACE, borderBottom: `1px solid ${INK_TINT_07}`, textDecoration: 'none' }}
+              style={{ display: 'flex', alignItems: 'center', gap: '10px', padding: '12px 20px 16px', background: SURFACE, borderTop: `0.5px solid ${INK_TINT_07}`, borderBottom: `1px solid ${INK_TINT_07}`, textDecoration: 'none' }}
               className="active:bg-black/[0.02] transition-colors"
             >
               <BatchPlayerAvatar playerId={best.playerId} playerName={best.name} size="sm" />
