@@ -31,6 +31,7 @@ export interface CardFeedProps {
   onShare: (post: FeedPost) => void;
   onProfile: (post: FeedPost) => void;
   onReviewTap?: (post: FeedPost) => void;
+  onCourse?: (post: FeedPost) => void;
   getLikeState: (post: FeedPost) => { liked: boolean; count: number } | null | undefined;
   getCommentCount: (post: FeedPost) => number;
   onNearEnd?: () => void;
