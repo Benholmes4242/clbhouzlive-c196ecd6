@@ -40,9 +40,9 @@ function PlayerHead({ size = 28, src }: { size?: number; src?: string | null }) 
 }
 
 function liveScoreColour(s: string): string {
-  if (s.startsWith('\u2212') || s.startsWith('-')) return getScoreColor(-1, 'light', 'standard');
-  if (s.startsWith('+')) return getScoreColor(1, 'light', 'standard');
-  return getScoreColor(0, 'light', 'standard');
+  if (s.startsWith('\u2212') || s.startsWith('-')) return getScoreColor(-1, 'dark', 'standard');
+  if (s.startsWith('+')) return getScoreColor(1, 'dark', 'standard');
+  return getScoreColor(0, 'dark', 'standard');
 }
 
 interface ChaserRowProps {
