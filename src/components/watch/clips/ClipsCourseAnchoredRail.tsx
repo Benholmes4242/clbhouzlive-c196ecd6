@@ -74,7 +74,7 @@ function ClipsCourseAnchoredRailInner({ userId, mood }: ClipsCourseAnchoredRailP
     actor,
   );
 
-  if (coursesLoading || postsLoading) return null;
+  if (coursesLoading || postsLoading) return <RailSkeleton variant="rail-portrait" />;
   if (!topCourse || posts.length === 0) return null;
 
   return (
