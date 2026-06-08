@@ -127,7 +127,7 @@ export const CourseStatusToggle: React.FC<CourseStatusToggleProps> = ({
       </div>
 
       {hasNoSelection && (
-        <p style={{ fontSize: 11, color: '#94A3B8', lineHeight: 1.5, margin: 0 }}>
+        <p style={{ fontSize: 11, color: '#94A3B8', lineHeight: 1.5, margin: 0, marginTop: 16 }}>
           Every course you mark becomes part of your journey — view them anytime on your{' '}
           <Link to="/map" style={{ color: '#64748B', textDecoration: 'underline', textUnderlineOffset: 2 }}>
             map
