@@ -203,7 +203,7 @@ function ExploreRecommendationsInner({ userId, mood }: ExploreRecommendationsPro
     );
   }
 
-  if (recs.length === 0) {
+  if (displayRecs.length === 0) {
     if (mood === 'friends') {
       return (
         <section style={{ padding: '0 0 0' }}>
