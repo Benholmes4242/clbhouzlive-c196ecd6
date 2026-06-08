@@ -1,5 +1,5 @@
 import { memo, useEffect, useRef } from 'react';
-import { MapPin } from 'lucide-react';
+import { Pin } from '@/components/watch/proshop/Pin';
 import type { FeedPost } from '@/components/media-system/types/media';
 import { useFullscreenFeedStore } from '@/store/fullscreenFeedStore';
 import clbhouzLogo from '@/assets/clbhouz-logo.png';
@@ -52,11 +52,6 @@ function ExploreTileInner({ post, index, allPosts, variant = 'tile', feature = f
   const ratingIcon = 12 * scale;
   const ratingPadY = 4 * scale;
   const ratingPadX = 8 * scale;
-  const pinFs = 10 * scale;
-  const pinPadY = 3 * scale;
-  const pinPadX = 7 * scale;
-  const pinGap = 4 * scale;
-  const pinBottom = 7 * scale;
 
   return (
     <button
@@ -101,34 +96,14 @@ function ExploreTileInner({ post, index, allPosts, variant = 'tile', feature = f
       {courseName && (
         <div
           style={{
-            position: 'absolute', bottom: pinBottom,
+            position: 'absolute', top: 6,
             left: '50%', transform: 'translateX(-50%)',
-            maxWidth: 'calc(100% - 16px)',
+            maxWidth: 'calc(100% - 24px)',
+            zIndex: 10,
             pointerEvents: 'none',
           }}
         >
-          <div
-            style={{
-              display: 'inline-flex', alignItems: 'center', gap: pinGap,
-              background: 'rgba(10,14,20,0.52)',
-              backdropFilter: 'blur(14px) saturate(150%)',
-              WebkitBackdropFilter: 'blur(14px) saturate(150%)',
-              border: '1px solid rgba(255,255,255,0.16)',
-              borderRadius: 9999, padding: `${pinPadY}px ${pinPadX}px`,
-              maxWidth: '100%',
-              overflow: 'hidden',
-            }}
-          >
-            <MapPin size={11 * scale} color="#fff" strokeWidth={2.5} style={{ flexShrink: 0 }} />
-            <span style={{
-              fontSize: pinFs, fontWeight: 600, color: '#fff',
-              overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
-              minWidth: 0,
-              textShadow: '0 1px 4px rgba(0,0,0,0.55)',
-            }}>
-              {courseName}
-            </span>
-          </div>
+          <Pin size="grid" variant="dark">{courseName}</Pin>
         </div>
       )}
     </button>
