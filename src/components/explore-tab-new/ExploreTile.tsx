@@ -39,7 +39,7 @@ function ExploreTileInner({ post, index, allPosts, variant = 'tile', feature = f
 
   const posterSrc = media.thumbnailUrl || media.imageUrl || '';
   const courseName = post.courseName || post.review?.courseName;
-  const rating = post.review?.rating;
+  
 
   const { open } = useFullscreenFeedStore();
 
