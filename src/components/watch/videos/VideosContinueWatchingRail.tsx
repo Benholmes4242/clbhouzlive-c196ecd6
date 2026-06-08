@@ -20,7 +20,7 @@ function VideosContinueWatchingRailInner({ userId }: VideosContinueWatchingRailP
   const actor = activeActor ? { id: activeActor.id, type: activeActor.type } : null;
   const { data: posts = [], isLoading } = useVideosContinueWatching(userId, actor, 8);
 
-  if (isLoading) return null;
+  if (isLoading) return <RailSkeleton variant="rail-landscape" />;
   if (posts.length === 0) return null;
 
   return (
