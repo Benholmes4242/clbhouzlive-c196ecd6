@@ -218,7 +218,7 @@ function ExploreRecommendationsInner({ userId, mood }: ExploreRecommendationsPro
     return null;
   }
 
-  const tier = recs[0]?.filter_tier;
+  const tier = displayRecs[0]?.filter_tier;
   const tierLabel =
     tier === 'expanded' ? 'Broader set' :
     tier === 'relaxed' ? 'Widened the net' :
