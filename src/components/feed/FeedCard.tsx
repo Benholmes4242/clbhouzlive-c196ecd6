@@ -69,6 +69,7 @@ export interface FeedCardProps {
   onOpenMedia: (post: FeedPost, mediaIndex: number) => void;
   onProfile: (post: FeedPost) => void;
   onReviewTap?: (post: FeedPost) => void;
+  onCourse?: (post: FeedPost) => void;
   /** True when this card is the most-in-view → drives inline video autoplay. */
   isActive?: boolean;
   /** Initial carousel slide for multi-media posts (from persisted store). */
