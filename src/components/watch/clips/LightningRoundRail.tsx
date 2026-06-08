@@ -19,7 +19,7 @@ interface LightningRoundRailProps {
 function LightningRoundRailInner({ userId, mood }: LightningRoundRailProps) {
   const { data: posts = [], isLoading } = useLightningRound(userId, mood);
 
-  if (isLoading) return null;
+  if (isLoading) return <RailSkeleton variant="rail-portrait" />;
   if (posts.length === 0) return null;
 
   return (
