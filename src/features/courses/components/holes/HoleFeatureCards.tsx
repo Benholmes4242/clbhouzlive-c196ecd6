@@ -15,9 +15,9 @@ const Card: React.FC<{
   hole: CourseHole;
 }> = ({ tone, label, hole }) => {
   // Hardest → maroon; Easiest → amber (birdie chance, on-brand celebrate color)
-  const tint = tone === 'hard' ? 'rgba(153,27,27,0.06)' : 'rgba(247,147,30,0.07)';
-  const border = tone === 'hard' ? 'rgba(153,27,27,0.18)' : 'rgba(247,147,30,0.22)';
-  const eyebrow = tone === 'hard' ? C_DOUBLE : AMBER;
+  const tint = tone === 'hard' ? 'rgba(15,23,42,0.05)' : 'rgba(159,29,29,0.06)';
+  const border = tone === 'hard' ? 'rgba(15,23,42,0.16)' : 'rgba(159,29,29,0.20)';
+  const eyebrow = tone === 'hard' ? '#0F172A' : '#9F1D1D';
   const playsTo = (hole.par + hole.avg_to_par).toFixed(1);
   return (
     <div
