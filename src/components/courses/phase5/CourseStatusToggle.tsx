@@ -64,7 +64,7 @@ export const CourseStatusToggle: React.FC<CourseStatusToggleProps> = ({
   const hasNoSelection = status.status === 'none';
 
   return (
-    <div className={cn("space-y-5", className)}>
+    <div className={cn("space-y-7", className)}>
       <div style={{ display: 'flex', gap: 8 }}>
         {/* Mark Played — amber ghost (matches Official Course Website button) */}
         <button
