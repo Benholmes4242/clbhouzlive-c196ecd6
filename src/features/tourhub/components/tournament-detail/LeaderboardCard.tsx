@@ -8,7 +8,7 @@ import { motion } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import { BatchPlayerAvatar } from '../PlayerAvatar';
 import { playerRoute } from '../../routes';
-import { AMBER, INK, INK_FAINT, INK_MUTE, INK_TINT_02, INK_TINT_07, LEADER_GOLD_TINT_10, SCORE_OVER_PAR_LIGHT, SCORE_UNDER_PAR_LIGHT, SURFACE } from '../../_shared/tokens';
+import { AMBER, INK, INK_FAINT, INK_MUTE, INK_TINT_02, INK_TINT_07, LEADER_GOLD_TINT_10, SCORE_OVER_PAR_LIGHT, SURFACE } from '../../_shared/tokens';
 
 function abbrevName(full: string): string {
   const parts = full.trim().split(/\s+/);
@@ -45,7 +45,7 @@ interface LeaderboardCardProps {
 function ScoreToPar({ score, className }: { score: number | null; className?: string }) {
   if (score === null) return <span className={cn(className)} style={{ color: INK_FAINT }}>—</span>;
   const formatted = score === 0 ? 'E' : score > 0 ? `+${score}` : String(score);
-  const color = score < 0 ? SCORE_UNDER_PAR_LIGHT : score > 0 ? SCORE_OVER_PAR_LIGHT : INK_FAINT;
+  const color = score < 0 ? SCORE_OVER_PAR_LIGHT : INK;
   return (
     <span className={cn("font-bold", className)} style={{ fontVariantNumeric: 'tabular-nums', color, letterSpacing: '-0.01em' }}>
       {formatted}

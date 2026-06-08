@@ -10,7 +10,7 @@ import { cn } from '@/lib/utils';
 import { BatchPlayerAvatar } from '../PlayerAvatar';
 import { formatThruDisplay } from '../../utils/formatThruDisplay';
 import { playerRoute } from '../../routes';
-import { AMBER, HAIRLINE_INK_12, INK, INK_FAINT, INK_LIGHT, INK_MUTE, INK_TINT_02, INK_TINT_05, INK_TINT_07, LEADER_GOLD_TINT_10, SCORE_OVER_PAR_LIGHT, SCORE_UNDER_PAR_LIGHT, SURFACE } from '../../_shared/tokens';
+import { AMBER, HAIRLINE_INK_12, INK, INK_FAINT, INK_LIGHT, INK_MUTE, INK_TINT_02, INK_TINT_05, INK_TINT_07, LEADER_GOLD_TINT_10, SCORE_OVER_PAR_LIGHT, SURFACE } from '../../_shared/tokens';
 
 interface RawRoundData {
   thru?: number;
@@ -64,7 +64,7 @@ interface FullLeaderboardProps {
 function ScoreToPar({ score, className, emphasis, size }: { score: number | null; className?: string; emphasis?: boolean; size?: number }) {
   if (score === null) return <span className={cn(className)} style={{ fontVariantNumeric: 'tabular-nums', color: INK }}>—</span>;
   const formatted = score === 0 ? 'E' : score > 0 ? `+${score}` : String(score);
-  const color = score < 0 ? SCORE_UNDER_PAR_LIGHT : score > 0 ? SCORE_OVER_PAR_LIGHT : INK;
+  const color = score < 0 ? SCORE_OVER_PAR_LIGHT : INK;
   return (
     <span className={cn(className)} style={{
       fontVariantNumeric: 'tabular-nums',
@@ -254,15 +254,16 @@ export function FullLeaderboard({
 
                 {roundScores.map((score, ri) => {
                   const isActive = sortRound === ri + 1;
+                  const cellColor = score != null && score < 0 ? SCORE_OVER_PAR_LIGHT : INK;
                   return (
-                    <span key={ri} style={{ width: '19px', textAlign: 'center' as const, fontSize: '11px', fontWeight: isActive && score != null ? 600 : 500, color: INK, flexShrink: 0, fontVariantNumeric: 'tabular-nums' }}>
+                    <span key={ri} style={{ width: '19px', textAlign: 'center' as const, fontSize: '11px', fontWeight: isActive && score != null ? 600 : 500, color: cellColor, flexShrink: 0, fontVariantNumeric: 'tabular-nums' }}>
                       {score != null ? score : '—'}
                     </span>
                   );
                 })}
 
                 <div style={{ width: '34px', textAlign: 'center' as const, flexShrink: 0 }}>
-                  <ScoreToPar score={entry.score} emphasis size={14} />
+                  <ScoreToPar score={entry.score} size={11} />
                 </div>
 
                 <div style={{ width: '48px', textAlign: 'center' as const, flexShrink: 0 }}>
