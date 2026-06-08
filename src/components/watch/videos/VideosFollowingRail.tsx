@@ -16,7 +16,7 @@ interface VideosFollowingRailProps {
 function VideosFollowingRailInner({ userId }: VideosFollowingRailProps) {
   const { data: posts = [], isLoading } = useVideosFollowingRail(userId, 8);
 
-  if (isLoading) return null;
+  if (isLoading) return <RailSkeleton variant="rail-landscape" />;
   if (posts.length === 0) return null;
 
   return (
