@@ -265,9 +265,9 @@ const FeedCardImpl: React.FC<FeedCardProps> = ({
           .join(', ');
         return (
           <div style={{ padding: '10px 14px 0' }}>
-            <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: '0.06em', textTransform: 'uppercase', color: T60 }}>
-              {post.courseName}
-            </div>
+          <div style={{ fontSize: 12, color: T60 }}>
+            {post.courseName}
+          </div>
             {courseLocation && (
               <div style={{ fontSize: 12, color: T40, marginTop: 2 }}>{courseLocation}</div>
             )}
