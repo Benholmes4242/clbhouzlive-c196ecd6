@@ -8,6 +8,7 @@ import { SectionHeader } from '../proshop/SectionHeader';
 import { HRail } from '../proshop/HRail';
 import { VideoRailTile } from './VideoRailTile';
 import { useActiveActor } from '@/context/ActiveActorContext';
+import { RailSkeleton } from '../shared/RailSkeleton';
 
 interface VideosCourseAnchoredRailProps {
   userId: string | undefined;
