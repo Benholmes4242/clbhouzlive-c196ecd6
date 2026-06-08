@@ -16,6 +16,7 @@ import {
   INK_MUTE,
   INK_TINT_02,
   INK_TINT_07,
+  SCORE_OVER_PAR_LIGHT,
   SURFACE,
 } from '../../_shared/tokens';
 
@@ -74,7 +75,7 @@ export function PlayerTournamentHistory({ playerId, playerName }: PlayerTourname
               const score = result.score;
               const scoreStr = formatScore(score);
               const displayScore = isMissed ? '—' : scoreStr;
-              const scoreColor = isMissed ? INK_FAINT : INK;
+              const scoreColor = isMissed ? INK_FAINT : (typeof score === 'number' && score < 0 ? SCORE_OVER_PAR_LIGHT : INK);
 
               const navTarget = tournamentRoute(result.tournament_id, {
                 kind: 'player',
