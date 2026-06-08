@@ -1,17 +1,20 @@
 import { memo } from 'react';
 import { VIDEOS_MOODS, type VideosMoodId } from './hooks/useVideosMood';
+import { ChipRowSearchField, ChipRowSearchTrigger } from '@/components/watch/shared/ChipRowSearchField';
 
 interface VideosMoodChipsProps {
   active: VideosMoodId;
   onChange: (id: VideosMoodId) => void;
+  searchOpen: boolean;
+  searchValue: string;
+  onSearchOpen: () => void;
+  onSearchChange: (v: string) => void;
+  onSearchClose: () => void;
 }
 
-/**
- * Canonical chip strip — matches WatchMoodChips exactly. 30px tall pills,
- * 12px label / 13px emoji, transparent inactive bg, amber active state,
- * 28px right-edge fade.
- */
-function VideosMoodChipsInner({ active, onChange }: VideosMoodChipsProps) {
+function VideosMoodChipsInner({
+  active, onChange, searchOpen, searchValue, onSearchOpen, onSearchChange, onSearchClose,
+}: VideosMoodChipsProps) {
   return (
     <div
       className="relative"
@@ -21,40 +24,56 @@ function VideosMoodChipsInner({ active, onChange }: VideosMoodChipsProps) {
       }}
     >
       <div
-        role="tablist"
-        aria-label="Filter Videos by mood"
-        className="flex gap-1.5 overflow-x-auto scrollbar-hide"
+        className="flex items-center gap-1.5"
         style={{ padding: '8.5px 28px 8.5px 16px' }}
       >
-        {VIDEOS_MOODS.map((m) => {
-          const isActive = active === m.id;
-          return (
-            <button
-              key={m.id}
-              type="button"
-              role="tab"
-              aria-selected={isActive}
-              onClick={() => onChange(m.id)}
-              className="shrink-0 transition-colors active:scale-[0.97] flex items-center"
-              style={{
-                height: 30,
-                padding: '0 11px',
-                fontSize: 12,
-                fontWeight: 600,
-                borderRadius: 15,
-                background: isActive ? 'rgba(255,255,255,0.10)' : 'transparent',
-                border: isActive ? '1px solid rgba(255,255,255,0.55)' : '1px solid rgba(255,255,255,0.18)',
-                color: isActive ? '#FFFFFF' : 'rgba(255,255,255,0.65)',
-                letterSpacing: '-0.01em',
-                gap: 5,
-                whiteSpace: 'nowrap',
-              }}
-            >
-              {(() => { const Icon = m.icon; return <Icon size={14} strokeWidth={2} aria-hidden style={{ flexShrink: 0 }} />; })()}
-              <span>{m.label}</span>
-            </button>
-          );
-        })}
+        {searchOpen ? (
+          <ChipRowSearchField
+            value={searchValue}
+            onChange={onSearchChange}
+            onClose={onSearchClose}
+            placeholder="Search videos..."
+          />
+        ) : (
+          <ChipRowSearchTrigger onOpen={onSearchOpen} />
+        )}
+
+        <div
+          role="tablist"
+          aria-label="Filter Videos by mood"
+          className="flex gap-1.5 overflow-x-auto scrollbar-hide"
+          style={{ flex: 1, minWidth: 0 }}
+        >
+          {VIDEOS_MOODS.map((m) => {
+            const isActive = active === m.id;
+            return (
+              <button
+                key={m.id}
+                type="button"
+                role="tab"
+                aria-selected={isActive}
+                onClick={() => onChange(m.id)}
+                className="shrink-0 transition-colors active:scale-[0.97] flex items-center"
+                style={{
+                  height: 30,
+                  padding: '0 11px',
+                  fontSize: 12,
+                  fontWeight: 600,
+                  borderRadius: 15,
+                  background: isActive ? 'rgba(255,255,255,0.10)' : 'transparent',
+                  border: isActive ? '1px solid rgba(255,255,255,0.55)' : '1px solid rgba(255,255,255,0.18)',
+                  color: isActive ? '#FFFFFF' : 'rgba(255,255,255,0.65)',
+                  letterSpacing: '-0.01em',
+                  gap: 5,
+                  whiteSpace: 'nowrap',
+                }}
+              >
+                {(() => { const Icon = m.icon; return <Icon size={14} strokeWidth={2} aria-hidden style={{ flexShrink: 0 }} />; })()}
+                <span>{m.label}</span>
+              </button>
+            );
+          })}
+        </div>
       </div>
 
       <div
