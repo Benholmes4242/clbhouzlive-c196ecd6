@@ -34,7 +34,8 @@ function ClipOfTheWeekHeroInner() {
     staleTime: 60_000,
   });
 
-  if (isLoading || !pick) return null;
+  if (isLoading) return <RailSkeleton variant="hero-portrait" />;
+  if (!pick) return null;
 
   const handleTap = () => {
     useFullscreenFeedStore.getState().open(
