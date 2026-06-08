@@ -8,6 +8,7 @@ import UserCoursesContent from './UserCoursesContent';
 import Top100CoursesHubPanel from './Top100CoursesHubPanel';
 import Top100LeaderboardPanel from './Top100LeaderboardPanel';
 import ExploreTabContent from '@/components/explore-tab-new/ExploreTabContent';
+import RateNudge from './RateNudge';
 
 
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
@@ -306,29 +307,12 @@ const CoursesContent: React.FC<CoursesContentProps> = ({ username, displayName }
             <ExploreTabContent embedded />
           ) : (
             <div className="px-4" style={{ paddingTop: 'var(--chrome-total-h, 0px)' }}>
-              {/* Rate a Course CTA — slim row */}
+              {/* Rate a Course nudge — data-driven (played-but-unrated) */}
               {user && (
-                <button
-                  onClick={() => setRateSheetOpen(true)}
-                  style={{
-                    width: '100%',
-                    display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-                    padding: '10px 14px', marginTop: 10, marginBottom: 10,
-                    background: 'rgba(247,147,30,0.05)',
-                    border: '1px solid rgba(247,147,30,0.18)',
-                    borderRadius: 12,
-                    cursor: 'pointer',
-                  }}
-                  className="active:scale-[0.97] transition-all"
-                >
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-                    <Star size={14} fill={AMBER} color={AMBER} strokeWidth={0} />
-                    <span style={{ fontSize: 13, fontWeight: 600, color: INK }}>
-                      Rate a course you've played
-                    </span>
-                  </div>
-                  <ChevronRight size={14} color="#c97a10" strokeWidth={2.5} />
-                </button>
+                <RateNudge
+                  userId={user.id}
+                  onEmptyFallback={() => setRateSheetOpen(true)}
+                />
               )}
 
               {activeTab === 'explore' && <CourseExplorer />}
