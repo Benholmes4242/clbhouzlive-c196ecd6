@@ -1,4 +1,4 @@
-import { memo } from 'react';
+import { memo, useMemo, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Crown, Trophy } from 'lucide-react';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
