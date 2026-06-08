@@ -160,7 +160,7 @@ export const CourseMediaTile: React.FC<CourseMediaTileProps> = ({ post, index, f
             src={post.avatarUrl}
             alt={post.displayName}
             size={feature ? 22 : 16}
-            thinRing
+            hideRing
             fallback={post.displayName.charAt(0).toUpperCase()}
           />
           {feature && (
