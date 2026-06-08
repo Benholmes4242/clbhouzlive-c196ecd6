@@ -233,7 +233,7 @@ function ExploreRecommendationsInner({ userId, mood }: ExploreRecommendationsPro
         sub={tierLabel ?? MOOD_SUBHEADS[mood]}
       />
       <div className="flex gap-3 px-4 overflow-x-auto scrollbar-hide" style={{ paddingBottom: 4 }}>
-        {recs.map(rec => (
+        {displayRecs.map(rec => (
           <RecCard key={rec.course_id} rec={rec} onTap={() => navigate(`/courses/${rec.course_id}`)} />
         ))}
       </div>
