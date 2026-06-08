@@ -14,13 +14,6 @@ import {
   INK_FAINT,
   INK_TINT_06,
   INK_TINT_07,
-  SHELL_BG,
-  SURFACE,
-  WHITE_ALPHA_06,
-  WHITE_ALPHA_10,
-  WHITE_ALPHA_18,
-  WHITE_ALPHA_55,
-  WHITE_ALPHA_65,
 } from '../../_shared/tokens';
 
 interface ChipDef {
@@ -88,8 +81,8 @@ function ScheduleShellRowInner() {
       <div
         className="relative"
         style={{
-          background: SHELL_BG,
-          borderBottom: `0.5px solid ${WHITE_ALPHA_06}`,
+          background: '#F8FAFC',
+          borderBottom: '0.5px solid rgba(15,23,42,0.08)',
         }}
       >
         <div
@@ -115,9 +108,9 @@ function ScheduleShellRowInner() {
                     fontSize: 12,
                     fontWeight: 600,
                     borderRadius: 15,
-                    background: isActive ? WHITE_ALPHA_18 : 'transparent',
-                    border: `1px solid ${isActive ? WHITE_ALPHA_55 : WHITE_ALPHA_18}`,
-                    color: isActive ? SURFACE : WHITE_ALPHA_65,
+                    background: isActive ? INK_TINT_06 : 'transparent',
+                    border: `1px solid ${isActive ? 'rgba(15,23,42,0.20)' : INK_TINT_07}`,
+                    color: isActive ? '#0A0E14' : '#64748B',
                     letterSpacing: '-0.01em',
                     whiteSpace: 'nowrap',
                   }}
@@ -133,18 +126,18 @@ function ScheduleShellRowInner() {
             onClick={() => setTourSheetOpen(true)}
             className="shrink-0 active:scale-[0.97] flex items-center"
             aria-label="Filter by tour"
-            style={{
-              height: 30,
-              padding: '0 11px',
-              fontSize: 12,
-              fontWeight: 600,
-              borderRadius: 15,
-              background: activeTour !== 'all' ? WHITE_ALPHA_18 : 'transparent',
-              border: `1px solid ${activeTour !== 'all' ? WHITE_ALPHA_55 : WHITE_ALPHA_18}`,
-              color: activeTour !== 'all' ? SURFACE : WHITE_ALPHA_65,
-              gap: 5,
-              whiteSpace: 'nowrap',
-            }}
+              style={{
+                height: 30,
+                padding: '0 11px',
+                fontSize: 12,
+                fontWeight: 600,
+                borderRadius: 15,
+                background: activeTour !== 'all' ? INK_TINT_06 : 'transparent',
+                border: `1px solid ${activeTour !== 'all' ? 'rgba(15,23,42,0.20)' : INK_TINT_07}`,
+                color: activeTour !== 'all' ? '#0A0E14' : '#64748B',
+                gap: 5,
+                whiteSpace: 'nowrap',
+              }}
           >
             {activeTour !== 'all' && hasTourLogo(activeTour.toLowerCase())
               ? <img src={getTourLogo(activeTour.toLowerCase())} alt="" className="shrink-0" style={{ width: 14, height: 14, objectFit: 'contain' }} />

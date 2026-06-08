@@ -1,7 +1,7 @@
 import { memo } from 'react';
 import { useSearchParams } from 'react-router-dom';
 
-import { SHELL_BG, SURFACE, WHITE_ALPHA_06, WHITE_ALPHA_18, WHITE_ALPHA_55, WHITE_ALPHA_65 } from '../../_shared/tokens';
+import { INK_TINT_06, INK_TINT_07 } from '../../_shared/tokens';
 
 type MetricTab = 'earnings' | 'wins' | 'top10s' | 'movers';
 const VALID_METRICS = new Set<string>(['earnings', 'wins', 'top10s', 'movers']);
@@ -40,8 +40,8 @@ function CollegeShellRowInner() {
     <div
       className="relative"
       style={{
-        background: SHELL_BG,
-        borderBottom: `0.5px solid ${WHITE_ALPHA_06}`,
+        background: '#F8FAFC',
+        borderBottom: '0.5px solid rgba(15,23,42,0.08)',
       }}
     >
       <div
@@ -66,9 +66,9 @@ function CollegeShellRowInner() {
                 fontSize: 12,
                 fontWeight: 600,
                 borderRadius: 15,
-                background: isActive ? WHITE_ALPHA_18 : 'transparent',
-                border: `1px solid ${isActive ? WHITE_ALPHA_55 : WHITE_ALPHA_18}`,
-                color: isActive ? SURFACE : WHITE_ALPHA_65,
+                background: isActive ? INK_TINT_06 : 'transparent',
+                border: `1px solid ${isActive ? 'rgba(15,23,42,0.20)' : INK_TINT_07}`,
+                color: isActive ? '#0A0E14' : '#64748B',
                 letterSpacing: '-0.01em',
                 whiteSpace: 'nowrap',
               }}
