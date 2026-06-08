@@ -5,7 +5,7 @@ interface PinProps {
   children: React.ReactNode;
   variant?: 'dark' | 'light' | 'amber';
   icon?: React.ReactNode;
-  size?: 'sm' | 'md';
+  size?: 'sm' | 'md' | 'grid';
 }
 
 /**
@@ -18,6 +18,7 @@ function PinInner({ children, variant = 'dark', icon, size = 'md' }: PinProps) {
   const isLight = variant === 'light';
   const isAmber = variant === 'amber';
   const isCompact = size === 'sm';
+  const isGrid = size === 'grid';
   const isDark = !isLight; // dark + amber both use dark scrim
 
   const background = isLight
@@ -41,7 +42,7 @@ function PinInner({ children, variant = 'dark', icon, size = 'md' }: PinProps) {
     typeof (icon as any).props?.children === 'string' &&
     /[\u{1F300}-\u{1FAFF}\u{2600}-\u{27BF}]/u.test((icon as any).props.children);
   if (variant === 'dark' && (!icon || isEmojiIcon)) {
-    resolvedIcon = <MapPin size={11} color="#fff" strokeWidth={2.5} />;
+    resolvedIcon = <MapPin size={isGrid ? 10 : 11} color="#fff" strokeWidth={2.5} />;
   }
 
   const glassStyles =
@@ -60,12 +61,12 @@ function PinInner({ children, variant = 'dark', icon, size = 'md' }: PinProps) {
         display: 'inline-flex',
         alignItems: 'center',
         gap: 4,
-        padding: isCompact ? '0 7px' : '4px 8px',
+        padding: isCompact ? '0 7px' : isGrid ? '3px 7px' : '4px 8px',
         height: isCompact ? 18 : undefined,
         borderRadius: 9999,
         background,
         color,
-        fontSize: isCompact ? 9 : 11,
+        fontSize: isCompact ? 9 : isGrid ? 10 : 11,
         fontWeight: isAmber ? 700 : 600,
         lineHeight: 1.2,
         letterSpacing: isAmber ? '0.08em' : undefined,

@@ -142,7 +142,7 @@ const WatchTile: React.FC<WatchTileProps> = ({
             zIndex: 10,
           }}
         >
-          <Pin variant="dark">{post.courseName}</Pin>
+          <Pin variant="dark" size="grid">{post.courseName}</Pin>
         </div>
       )}
 
