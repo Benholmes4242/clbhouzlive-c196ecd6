@@ -140,7 +140,6 @@ export const FriendRoundCardV2: React.FC<Props> = ({
             src={pickAvatarSrc(activity.friend_thumbnail_url, activity.friend_profile_photo_url)}
             alt={activity.friend_name ?? ''}
             size={28}
-            hairlineRing
             userId={activity.friend_user_id ?? undefined}
           />
         </div>
