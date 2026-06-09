@@ -96,10 +96,40 @@ const FriendAvatar: React.FC<{ name: string; url: string | null; size?: number }
   );
 };
 
-const FriendRowAchievement: React.FC<{ name: string; url: string | null; earnedAt: string }> = ({
+const TierBadge: React.FC<{ tier: number }> = ({ tier }) => {
+  const idx = Math.max(1, Math.min(5, tier)) as 1 | 2 | 3 | 4 | 5;
+  const pal = MATERIAL_PALETTES[idx];
+  return (
+    <div
+      style={{
+        flexShrink: 0,
+        minWidth: 22,
+        height: 22,
+        padding: '0 7px',
+        borderRadius: 7,
+        background: pal.tint,
+        border: `0.5px solid ${pal.border}`,
+        color: pal.color,
+        fontSize: 11,
+        fontWeight: 800,
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        fontVariantNumeric: 'tabular-nums',
+        letterSpacing: '0.02em',
+      }}
+      aria-label={`Tier ${tier}`}
+    >
+      T{tier}
+    </div>
+  );
+};
+
+const FriendRowAchievement: React.FC<{ name: string; url: string | null; earnedAt: string; tier: number | null }> = ({
   name,
   url,
   earnedAt,
+  tier,
 }) => (
   <div
     style={{
@@ -115,6 +145,7 @@ const FriendRowAchievement: React.FC<{ name: string; url: string | null; earnedA
       <div style={{ fontSize: 13, fontWeight: 700, color: 'var(--hcp-t-100)' }}>{name}</div>
       <div style={{ fontSize: 10.5, color: 'var(--hcp-t-60)', ...GAM.TABULAR }}>{relativeTime(earnedAt)}</div>
     </div>
+    {tier != null && tier >= 1 && <TierBadge tier={tier} />}
   </div>
 );
 
