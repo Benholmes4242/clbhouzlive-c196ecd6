@@ -162,7 +162,7 @@ export const ChampionsCourseSearch: React.FC<Props> = ({ currentCourseId }) => {
                   style={{
                     fontSize: 13.5,
                     fontWeight: 700,
-                    color: 'var(--hcp-t-100, ' + GAM.INK + ')',
+                    color: 'var(--hcp-t-100)',
                     lineHeight: 1.3,
                     whiteSpace: 'nowrap',
                     overflow: 'hidden',
