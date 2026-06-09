@@ -52,7 +52,7 @@ export const ChampionsCategorySection: React.FC<ChampionsCategorySectionProps> =
         style={{
           fontSize: 10.5,
           fontWeight: 800,
-          color: GAM.DEEP_AMBER,
+          color: 'var(--hcp-t-100)',
           letterSpacing: '0.14em',
           textTransform: 'uppercase',
           display: 'inline-flex',
@@ -67,7 +67,7 @@ export const ChampionsCategorySection: React.FC<ChampionsCategorySectionProps> =
         style={{
           fontSize: 10,
           fontWeight: 700,
-          color: '#aab4c0',
+          color: 'var(--hcp-t-40)',
           letterSpacing: '0.08em',
           textTransform: 'uppercase',
           fontVariantNumeric: 'tabular-nums',
@@ -134,7 +134,7 @@ export const ChampionsCategorySection: React.FC<ChampionsCategorySectionProps> =
             style={{
               fontSize: 10,
               fontWeight: 800,
-              color: 'var(--hcp-accent-celebrate, #B26818)',
+              color: 'var(--hcp-t-100)',
               letterSpacing: '0.10em',
               textTransform: 'uppercase',
               background: 'none',

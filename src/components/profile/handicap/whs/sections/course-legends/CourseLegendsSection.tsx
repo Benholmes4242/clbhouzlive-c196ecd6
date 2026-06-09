@@ -35,8 +35,8 @@ export const WindowToggle: React.FC<{
     style={{
       display: 'inline-flex',
       gap: 3,
-      background: 'var(--hcp-bg-2, rgba(255,255,255,0.04))',
-      border: '1px solid var(--hcp-line)',
+      background: 'rgba(255,255,255,0.08)',
+      border: '0.5px solid rgba(255,255,255,0.12)',
       borderRadius: 999,
       padding: 3,
     }}
@@ -54,8 +54,8 @@ export const WindowToggle: React.FC<{
           style={{
             padding: '6px 14px',
             borderRadius: 999,
-            background: active ? 'var(--hcp-accent-util)' : 'transparent',
-            color: active ? '#FFFFFF' : 'var(--hcp-t-60)',
+            background: active ? '#FFFFFF' : 'transparent',
+            color: active ? '#0A0E14' : 'var(--hcp-t-60)',
             border: 'none',
             fontFamily: FONT,
             fontSize: 11.5,
@@ -104,7 +104,7 @@ const SectionHero: React.FC<{
           gap: 6,
           fontSize: 10,
           fontWeight: 800,
-          color: GOLD,
+          color: 'var(--hcp-t-100)',
           letterSpacing: '0.16em',
           marginBottom: 8,
         }}
@@ -183,7 +183,7 @@ const SectionHero: React.FC<{
           padding: '12px 14px',
         }}
       >
-        <Search size={16} color={GOLD} />
+        <Search size={16} color="rgba(255,255,255,0.55)" />
         <input
           ref={searchInputRef}
           type="text"

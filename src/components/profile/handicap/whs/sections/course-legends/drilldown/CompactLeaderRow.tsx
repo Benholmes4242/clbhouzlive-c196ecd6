@@ -33,7 +33,11 @@ export const CompactLeaderRow: React.FC<Props> = ({ row }) => {
   const isChampion = row.rank === 1;
   const isNew = daysSince(row.attained_at) < NEW_BADGE_DAYS;
 
-  const rowBg = isYou ? 'rgba(247,147,30,0.05)' : '#fff';
+  const rowBg = isYou
+    ? 'rgba(247,147,30,0.10)'
+    : isChampion
+      ? 'var(--hcp-bg-2)'
+      : 'var(--hcp-bg-1)';
   const photoBg = row.photoUrl
     ? `url(${row.photoUrl}) center/cover`
     : 'linear-gradient(135deg, #cbd5e1 0%, #64748b 100%)';
@@ -67,7 +71,7 @@ export const CompactLeaderRow: React.FC<Props> = ({ row }) => {
         alignItems: 'center',
         padding: '9px 14px',
         background: rowBg,
-        boxShadow: 'inset 0 -0.5px 0 rgba(15,23,42,0.07)',
+        boxShadow: 'inset 0 -0.5px 0 var(--hcp-line)',
         fontFamily: GAM.FONT_GEIST,
       }}
     >
@@ -96,7 +100,7 @@ export const CompactLeaderRow: React.FC<Props> = ({ row }) => {
             fontSize: 14,
             fontWeight: 700,
             fontVariantNumeric: 'tabular-nums',
-            color: '#b3bdca',
+            color: 'var(--hcp-t-40)',
             lineHeight: 1,
             textAlign: 'right',
           }}
@@ -112,7 +116,7 @@ export const CompactLeaderRow: React.FC<Props> = ({ row }) => {
           style={{
             fontSize: 14,
             fontWeight: isChampion ? 800 : 600,
-            color: isYou ? GAM.DEEP_AMBER : GAM.INK,
+            color: 'var(--hcp-t-100)',
             letterSpacing: '-0.014em',
             lineHeight: 1.25,
             display: 'inline-flex',
@@ -150,7 +154,7 @@ export const CompactLeaderRow: React.FC<Props> = ({ row }) => {
             fontFamily: GAM.FONT_GEIST,
             fontSize: 15,
             fontWeight: 700,
-            color: isYou || isChampion ? GAM.DEEP_AMBER : GAM.INK,
+            color: 'var(--hcp-t-100)',
             letterSpacing: '-0.02em',
             fontVariantNumeric: 'tabular-nums',
             lineHeight: 1,

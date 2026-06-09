@@ -20,9 +20,9 @@ export const DrilldownHeader: React.FC<Props> = ({
   courseHeaderImage,
 }) => (
   <div
+    className="h-40 md:h-48 lg:h-56"
     style={{
       position: 'relative',
-      height: 160,
       background: courseHeaderImage
         ? 'transparent'
         : 'linear-gradient(180deg, rgba(247,147,30,0.18) 0%, var(--hcp-bg-2) 100%)',

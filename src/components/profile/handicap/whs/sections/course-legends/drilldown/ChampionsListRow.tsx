@@ -36,7 +36,11 @@ export const ChampionsListRow: React.FC<ChampionsListRowProps> = ({
   gapToChampion,
   holdDuration,
 }) => {
-  const rowBg = isSelf ? 'rgba(247,147,30,0.05)' : '#fff';
+  const rowBg = isSelf
+    ? 'rgba(247,147,30,0.10)'
+    : isChampion
+      ? 'var(--hcp-bg-2)'
+      : 'var(--hcp-bg-1)';
   const photoBg = photoUrl
     ? `url(${photoUrl}) center/cover`
     : 'linear-gradient(135deg, #cbd5e1 0%, #64748b 100%)';
@@ -76,7 +80,7 @@ export const ChampionsListRow: React.FC<ChampionsListRowProps> = ({
         alignItems: 'center',
         padding: '10px 16px',
         background: rowBg,
-        boxShadow: 'inset 0 -0.5px 0 rgba(15,23,42,0.07)',
+        boxShadow: 'inset 0 -0.5px 0 var(--hcp-line)',
       }}
     >
       {isChampion && (
@@ -119,7 +123,7 @@ export const ChampionsListRow: React.FC<ChampionsListRowProps> = ({
           style={{
             fontSize: 15,
             fontWeight: isChampion ? 800 : 600,
-            color: isSelf ? GAM.DEEP_AMBER : 'var(--hcp-t-100, ' + GAM.INK + ')',
+            color: 'var(--hcp-t-100)',
             letterSpacing: '-0.014em',
             lineHeight: 1.25,
             marginBottom: 1,
@@ -133,7 +137,7 @@ export const ChampionsListRow: React.FC<ChampionsListRowProps> = ({
         <div
           style={{
             fontSize: 11,
-            color: 'var(--hcp-t-50, #9aa6b2)',
+            color: 'var(--hcp-t-60)',
             fontWeight: 500,
             letterSpacing: '-0.003em',
             fontVariantNumeric: 'tabular-nums',
@@ -149,7 +153,7 @@ export const ChampionsListRow: React.FC<ChampionsListRowProps> = ({
             fontFamily: GAM.FONT_GEIST,
             fontSize: 16,
             fontWeight: 700,
-            color: isSelf || isChampion ? GAM.DEEP_AMBER : 'var(--hcp-t-100, ' + GAM.INK + ')',
+            color: 'var(--hcp-t-100)',
             letterSpacing: '-0.02em',
             fontVariantNumeric: 'tabular-nums',
             lineHeight: 1,

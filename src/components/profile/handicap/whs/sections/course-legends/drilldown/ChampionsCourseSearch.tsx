@@ -58,7 +58,7 @@ export const ChampionsCourseSearch: React.FC<Props> = ({ currentCourseId }) => {
             outline: 'none',
             fontFamily: FONT,
             fontSize: 14,
-            color: 'var(--hcp-t-100, ' + GAM.INK + ')',
+            color: 'var(--hcp-t-100)',
           }}
         />
       </div>
@@ -79,7 +79,7 @@ export const ChampionsCourseSearch: React.FC<Props> = ({ currentCourseId }) => {
             fontFamily: FONT,
             fontSize: 11,
             fontWeight: 600,
-            color: GAM.DEEP_AMBER,
+            color: 'var(--hcp-t-100)',
             letterSpacing: '-0.005em',
           }}
         >
@@ -162,7 +162,7 @@ export const ChampionsCourseSearch: React.FC<Props> = ({ currentCourseId }) => {
                   style={{
                     fontSize: 13.5,
                     fontWeight: 700,
-                    color: 'var(--hcp-t-100, ' + GAM.INK + ')',
+                    color: 'var(--hcp-t-100)',
                     lineHeight: 1.3,
                     whiteSpace: 'nowrap',
                     overflow: 'hidden',

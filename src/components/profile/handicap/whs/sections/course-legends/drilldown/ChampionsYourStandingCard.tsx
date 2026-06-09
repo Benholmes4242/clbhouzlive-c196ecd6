@@ -82,7 +82,7 @@ export const ChampionsYourStandingCard: React.FC<ChampionsYourStandingCardProps>
             style={{
               fontSize: 10,
               fontWeight: 800,
-              color: GAM.DEEP_AMBER,
+              color: 'var(--hcp-t-100)',
               letterSpacing: '0.16em',
               textTransform: 'uppercase',
               marginBottom: 5,
@@ -95,7 +95,7 @@ export const ChampionsYourStandingCard: React.FC<ChampionsYourStandingCardProps>
               style={{
                 fontSize: 21,
                 fontWeight: 800,
-                color: 'var(--hcp-t-100, ' + GAM.INK + ')',
+                color: 'var(--hcp-t-100)',
                 letterSpacing: '-0.025em',
                 lineHeight: 1,
                 whiteSpace: 'nowrap',
@@ -105,12 +105,12 @@ export const ChampionsYourStandingCard: React.FC<ChampionsYourStandingCardProps>
             >
               {displayName}
             </span>
-            <span style={{ fontSize: 11, fontWeight: 700, color: GAM.DEEP_AMBER, fontVariantNumeric: 'tabular-nums', flexShrink: 0 }}>
+            <span style={{ fontSize: 11, fontWeight: 700, color: 'var(--hcp-t-60)', fontVariantNumeric: 'tabular-nums', flexShrink: 0 }}>
               {titlesHeld} of {totalCategories} titles
             </span>
           </div>
           {meta && (
-            <div style={{ fontSize: 11.5, color: 'var(--hcp-t-50, #8a96a3)', fontWeight: 500, letterSpacing: '-0.003em', fontVariantNumeric: 'tabular-nums' }}>
+            <div style={{ fontSize: 11.5, color: 'var(--hcp-t-60)', fontWeight: 500, letterSpacing: '-0.003em', fontVariantNumeric: 'tabular-nums' }}>
               {meta}
             </div>
           )}
@@ -119,12 +119,12 @@ export const ChampionsYourStandingCard: React.FC<ChampionsYourStandingCardProps>
         {bestRank != null && (
           <div style={{ flexShrink: 0, textAlign: 'right', paddingLeft: 8 }}>
             <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'flex-end' }}>
-              <span style={{ fontSize: 16, fontWeight: 600, color: GAM.DEEP_AMBER, marginTop: 4, letterSpacing: '-0.02em' }}>#</span>
-              <span style={{ fontSize: 38, fontWeight: 250, color: GAM.DEEP_AMBER, letterSpacing: '-0.04em', lineHeight: 0.85, fontVariantNumeric: 'tabular-nums' }}>
+              <span style={{ fontSize: 16, fontWeight: 600, color: 'var(--hcp-t-100)', marginTop: 4, letterSpacing: '-0.02em' }}>#</span>
+              <span style={{ fontSize: 38, fontWeight: 250, color: 'var(--hcp-t-100)', letterSpacing: '-0.04em', lineHeight: 0.85, fontVariantNumeric: 'tabular-nums' }}>
                 {bestRank}
               </span>
             </div>
-            <div style={{ fontSize: 8.5, color: '#a89878', letterSpacing: '0.16em', textTransform: 'uppercase', fontWeight: 800, marginTop: 2 }}>
+            <div style={{ fontSize: 8.5, color: 'var(--hcp-t-40)', letterSpacing: '0.16em', textTransform: 'uppercase', fontWeight: 800, marginTop: 2 }}>
               Best rank
             </div>
           </div>
