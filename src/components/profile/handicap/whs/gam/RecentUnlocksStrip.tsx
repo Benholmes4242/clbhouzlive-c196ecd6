@@ -324,11 +324,23 @@ const SectionHeader: React.FC<{ page: number; total: number }> = ({ page, total 
 
 const RecentUnlocksStrip: React.FC<RecentUnlocksStripProps> = ({
   userId,
-  readOnly: _readOnly = false,
+  readOnly = false,
 }) => {
-  const { data, isLoading, isError, refetch } = useRecentUnlocks(userId);
+  const { data, unseenShownIds, isLoading, isError, refetch } = useRecentUnlocks(userId);
   const [page, setPage] = React.useState(0);
   const scrollRef = React.useRef<HTMLDivElement | null>(null);
+
+  const markSeen = useMarkBadgeSeen();
+  const stampedRef = React.useRef<Set<string>>(new Set());
+  React.useEffect(() => {
+    if (readOnly) return;
+    for (const id of unseenShownIds ?? []) {
+      if (stampedRef.current.has(id)) continue;
+      stampedRef.current.add(id);
+      markSeen.mutate(id);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [readOnly, unseenShownIds]);
 
   const handleScroll = React.useCallback(() => {
     const el = scrollRef.current;
