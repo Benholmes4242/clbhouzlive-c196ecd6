@@ -62,7 +62,7 @@ const ForecastCard: React.FC<Props> = ({
   const forecast = buildForecast(allScores ?? [], currentHandicap, 7);
 
   return (
-    <section style={{ marginTop: 32, fontFamily: FONT }}>
+    <section style={{ marginTop: 0, fontFamily: FONT }}>
       <DarkSectionHeader eyebrow={`${possessiveCap} form`} />
       {renderStateCard(forecast, { possessiveLower, subjectCap, subjectLower, hasVerb, needsVerb, viewMode })}
     </section>
@@ -742,7 +742,7 @@ const BrandNewCard: React.FC<{ ctx: CopyCtx }> = ({ ctx }) => (
 // ── Skeleton ────────────────────────────────────────────────────────
 
 const ForecastSkeleton: React.FC<{ eyebrow?: string }> = ({ eyebrow = 'Your form' }) => (
-  <section style={{ marginTop: 32, fontFamily: FONT }}>
+  <section style={{ marginTop: 0, fontFamily: FONT }}>
     <DarkSectionHeader eyebrow={eyebrow} />
     <div
       style={{
