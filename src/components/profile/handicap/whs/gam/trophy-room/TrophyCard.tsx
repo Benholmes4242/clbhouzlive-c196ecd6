@@ -64,6 +64,7 @@ const StandardCard: React.FC<Props> = ({ item, onTap }) => {
   const locked =
     item.kind === 'achievement' && !item.earned && (item.currentValue == null || item.currentValue === 0);
   const dimmed = locked;
+  const glowColor = item.kind === 'achievement' ? rarityColor[item.rarity] : '';
   const pill = pillContent(item);
 
   return (
