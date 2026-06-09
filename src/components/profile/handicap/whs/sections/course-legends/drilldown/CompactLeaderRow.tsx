@@ -100,7 +100,7 @@ export const CompactLeaderRow: React.FC<Props> = ({ row }) => {
             fontSize: 14,
             fontWeight: 700,
             fontVariantNumeric: 'tabular-nums',
-            color: '#b3bdca',
+            color: 'var(--hcp-t-40)',
             lineHeight: 1,
             textAlign: 'right',
           }}
