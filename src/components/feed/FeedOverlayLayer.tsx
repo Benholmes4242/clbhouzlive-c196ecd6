@@ -273,6 +273,44 @@ export const FeedOverlayLayer = memo(function FeedOverlayLayer({
           <VideoScrubber videoEl={activeVideoElement} height={2} variant="default" />
         </div>
       )}
+
+      {/* Bottom-right floating mute toggle — visible only for video posts */}
+      {isVideo && (
+        <button
+          type="button"
+          onClick={(e) => {
+            e.stopPropagation();
+            handleToggleMute();
+          }}
+          aria-label={isMuted ? 'Unmute video' : 'Mute video'}
+          style={{
+            position: 'fixed',
+            right: 16,
+            bottom:
+              bottomOffset !== undefined
+                ? `${bottomOffset + 48}px`
+                : 'calc(var(--bottom-nav-height, 88px) + 48px)',
+            zIndex: Z.echo,
+            width: 40,
+            height: 40,
+            borderRadius: 999,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            background: 'rgba(0,0,0,0.45)',
+            backdropFilter: 'blur(12px)',
+            WebkitBackdropFilter: 'blur(12px)',
+            border: '0.5px solid rgba(255,255,255,0.25)',
+            color: '#fff',
+            cursor: 'pointer',
+            opacity: overlayVisible ? 1 : 0,
+            transition: 'opacity 0.2s',
+            pointerEvents: overlayVisible ? 'auto' : 'none',
+          }}
+        >
+          {isMuted ? <VolumeX size={20} stroke="#fff" /> : <Volume2 size={20} stroke="#fff" />}
+        </button>
+      )}
     </div>
   );
 });
