@@ -58,7 +58,7 @@ export const ChampionsYourStandingCard: React.FC<ChampionsYourStandingCardProps>
           width: 140,
           height: 140,
           borderRadius: '50%',
-          background: 'radial-gradient(circle, rgba(247,147,30,0.10), transparent 70%)',
+          background: 'transparent',
           pointerEvents: 'none',
         }}
       />
