@@ -36,7 +36,11 @@ export const ChampionsListRow: React.FC<ChampionsListRowProps> = ({
   gapToChampion,
   holdDuration,
 }) => {
-  const rowBg = isSelf ? 'rgba(247,147,30,0.05)' : '#fff';
+  const rowBg = isSelf
+    ? 'rgba(247,147,30,0.10)'
+    : isChampion
+      ? 'var(--hcp-bg-2)'
+      : 'var(--hcp-bg-1)';
   const photoBg = photoUrl
     ? `url(${photoUrl}) center/cover`
     : 'linear-gradient(135deg, #cbd5e1 0%, #64748b 100%)';
