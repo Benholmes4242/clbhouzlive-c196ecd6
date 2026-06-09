@@ -73,6 +73,11 @@ function normalizeTiersArray(raw: unknown): number[] {
   return [];
 }
 
+function materialName(t: number) {
+  const l = MATERIAL_PALETTES[Math.min(5, Math.max(1, t)) as 1 | 2 | 3 | 4 | 5].label;
+  return l.charAt(0) + l.slice(1).toLowerCase();
+}
+
 export function normalizeBadge(b: UserBadge): TrophyItem {
   const thresholds = normalizeTiersArray(b.counter_tiers);
   const reached = b.counter_tier ?? 0;
