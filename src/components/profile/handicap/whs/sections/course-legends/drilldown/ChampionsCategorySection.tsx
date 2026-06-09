@@ -67,7 +67,7 @@ export const ChampionsCategorySection: React.FC<ChampionsCategorySectionProps> =
         style={{
           fontSize: 10,
           fontWeight: 700,
-          color: '#aab4c0',
+          color: 'var(--hcp-t-40)',
           letterSpacing: '0.08em',
           textTransform: 'uppercase',
           fontVariantNumeric: 'tabular-nums',
