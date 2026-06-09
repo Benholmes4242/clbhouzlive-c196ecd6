@@ -82,6 +82,21 @@ const OwnerViewRivalries: React.FC<{ userId: string }> = ({ userId }) => {
         }
       />
 
+      {hasFilled && (
+        <p
+          style={{
+            margin: '6px 20px 0',
+            fontSize: 11.5,
+            lineHeight: 1.45,
+            color: 'var(--hcp-t-40)',
+            fontFamily: 'Geist, system-ui, sans-serif',
+          }}
+        >
+          All-time head-to-head record. A round counts when you and your rival played the same course on the same day.
+        </p>
+      )}
+
+
       {isLoading ? (
         <div style={railStyle}>
           {Array.from({ length: 2 }).map((_, i) => <RivalrySkeleton key={i} />)}

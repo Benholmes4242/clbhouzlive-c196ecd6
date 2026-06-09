@@ -18,7 +18,6 @@ import { getProfilePathById } from '@/lib/profileRoutes';
 import {
   WeeklyHighlightsCarousel,
   StreakBadge,
-  RivalryCard,
   ClosestGoalsCarousel,
   TrophyIcons,
   parseBadgesFromJson,
@@ -338,8 +337,7 @@ export function Top100PlayersLeaderboardView({ filters }: Top100PlayersLeaderboa
       {/* MODULE 2: Streak Badge */}
       {me && <StreakBadge userId={currentUser?.id} />}
 
-      {/* MODULE 3: Rivalry Card */}
-      {me && <RivalryCard userId={currentUser?.id} userTop100Count={me.total_top100_played} />}
+
 
       {/* MODULE 4: Closest Goals Carousel */}
       {me && (
