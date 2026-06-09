@@ -8,7 +8,7 @@
  * Server-side enforcement lives in the RPCs (get_legend_holders_for_courses,
  * get_course_legends, get_friends_who_held_legend, get_my_handicap_percentile).
  */
-import { Trophy, Sigma, Globe2, Users, EyeOff, Check } from 'lucide-react';
+import { Globe2, Users, EyeOff, Check } from 'lucide-react';
 import { SectionEyebrow } from '@/components/ui/SectionEyebrow';
 
 export type HandicapVisibility = 'everyone' | 'friends' | 'nobody';
@@ -38,20 +38,17 @@ const OPTIONS: ReadonlyArray<{
 function Block({
   title,
   description,
-  Icon,
   value,
   onChange,
 }: {
   title: string;
   description: string;
-  Icon: typeof Trophy;
   value: HandicapVisibility;
   onChange: (v: HandicapVisibility) => void;
 }) {
   return (
     <div>
-      <div className="flex items-center gap-2" style={{ marginBottom: 6 }}>
-        <Icon size={14} strokeWidth={2.25} style={{ color: INK }} />
+      <div style={{ marginBottom: 6 }}>
         <span
           style={{
             fontFamily: GEIST, fontSize: 13, fontWeight: 700, color: INK,
@@ -126,7 +123,6 @@ export function HandicapVisibilityControl({
       <Block
         title="Course Champions"
         description="Show your name on Champions / Crown Holders rows in course details."
-        Icon={Trophy}
         value={championsVisibility}
         onChange={onChampionsChange}
       />
@@ -134,7 +130,6 @@ export function HandicapVisibilityControl({
       <Block
         title="Handicap Page & Comparisons"
         description="Show your handicap stats and peer comparisons to others on the handicap page."
-        Icon={Sigma}
         value={handicapPageVisibility}
         onChange={onHandicapPageChange}
       />
