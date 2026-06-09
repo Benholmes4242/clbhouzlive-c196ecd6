@@ -58,7 +58,7 @@ export const ChampionsCourseSearch: React.FC<Props> = ({ currentCourseId }) => {
             outline: 'none',
             fontFamily: FONT,
             fontSize: 14,
-            color: 'var(--hcp-t-100, ' + GAM.INK + ')',
+            color: 'var(--hcp-t-100)',
           }}
         />
       </div>
