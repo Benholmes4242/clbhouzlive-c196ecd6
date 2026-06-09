@@ -83,19 +83,6 @@ export const ChampionsListRow: React.FC<ChampionsListRowProps> = ({
         boxShadow: 'inset 0 -0.5px 0 var(--hcp-line)',
       }}
     >
-      {isChampion && (
-        <div
-          aria-hidden
-          style={{
-            position: 'absolute',
-            left: 0,
-            top: 0,
-            bottom: 0,
-            width: 3,
-            background: GAM.GOLD,
-          }}
-        />
-      )}
       {rank === 1 ? (
         <div style={{ display: 'flex', justifyContent: 'flex-end', alignItems: 'center', lineHeight: 0 }} aria-label="Champion">
           <Crown size={15} strokeWidth={2.5} fill={GAM.GOLD} style={{ color: GAM.DEEP_AMBER, flexShrink: 0 }} />
