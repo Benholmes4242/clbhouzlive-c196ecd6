@@ -64,7 +64,7 @@ export const ChampionsYourStandingCard: React.FC<ChampionsYourStandingCardProps>
       />
       <div style={{ display: 'flex', alignItems: 'center', gap: 14, position: 'relative' }}>
         <div style={{ width: 64, height: 64, position: 'relative', flexShrink: 0 }} aria-hidden>
-          <div style={{ position: 'absolute', inset: 0, background: GAM.AMBER, ...squircleMaskStyle }} />
+          <div style={{ position: 'absolute', inset: 0, background: 'var(--hcp-bg-2)', ...squircleMaskStyle }} />
           <div
             style={{
               position: 'absolute',
