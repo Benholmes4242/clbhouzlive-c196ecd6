@@ -18,7 +18,7 @@ export const CourseEyebrow: React.FC<{
         fontSize: 9.5,
         fontWeight: 700,
         letterSpacing: '0.16em',
-        color: AMBER,
+        color: 'var(--hcp-t-100)',
         textTransform: 'uppercase',
         lineHeight: 1.2,
         marginBottom: 4,

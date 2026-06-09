@@ -41,8 +41,8 @@ export const ChampionsYourStandingCard: React.FC<ChampionsYourStandingCardProps>
     <div
       style={{
         margin: '16px 18px',
-        background: 'var(--hcp-champ-card-bg, linear-gradient(135deg, #FFFAEF, #FFF6E3))',
-        border: '1px solid var(--hcp-champ-wash-border, rgba(247,147,30,0.22))',
+        background: 'var(--hcp-bg-1)',
+        border: '1px solid var(--hcp-line)',
         borderRadius: 16,
         padding: 18,
         position: 'relative',
@@ -58,13 +58,13 @@ export const ChampionsYourStandingCard: React.FC<ChampionsYourStandingCardProps>
           width: 140,
           height: 140,
           borderRadius: '50%',
-          background: 'radial-gradient(circle, rgba(247,147,30,0.10), transparent 70%)',
+          background: 'transparent',
           pointerEvents: 'none',
         }}
       />
       <div style={{ display: 'flex', alignItems: 'center', gap: 14, position: 'relative' }}>
         <div style={{ width: 64, height: 64, position: 'relative', flexShrink: 0 }} aria-hidden>
-          <div style={{ position: 'absolute', inset: 0, background: GAM.AMBER, ...squircleMaskStyle }} />
+          <div style={{ position: 'absolute', inset: 0, background: 'var(--hcp-bg-2)', ...squircleMaskStyle }} />
           <div
             style={{
               position: 'absolute',
