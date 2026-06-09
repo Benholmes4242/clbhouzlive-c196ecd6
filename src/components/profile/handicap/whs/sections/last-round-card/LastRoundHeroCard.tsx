@@ -1,4 +1,5 @@
 import React from 'react';
+import { ChevronRight, Flag } from 'lucide-react';
 import { useFriendRoundDetail } from '@/lib/whs/hooks';
 import type { WhsLastRound } from '@/lib/whs/types';
 
@@ -54,6 +55,44 @@ const Col: React.FC<{
   </div>
 );
 
+const Thumb: React.FC<{ src: string | null }> = ({ src }) => {
+  if (!src) {
+    return (
+      <div
+        style={{
+          width: 56,
+          height: 56,
+          borderRadius: 12,
+          flexShrink: 0,
+          background: 'linear-gradient(135deg,#1f2a24,#2c3a2f)',
+          border: '1px solid var(--hcp-line)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+        }}
+      >
+        <Flag size={20} color="var(--hcp-amber)" strokeWidth={2.2} />
+      </div>
+    );
+  }
+  return (
+    <div
+      style={{
+        width: 56,
+        height: 56,
+        borderRadius: 12,
+        flexShrink: 0,
+        overflow: 'hidden',
+        border: '1px solid var(--hcp-line)',
+        backgroundImage: `url(${src})`,
+        backgroundSize: 'cover',
+        backgroundPosition: 'center',
+        backgroundRepeat: 'no-repeat',
+      }}
+    />
+  );
+};
+
 const LastRoundHeroCard: React.FC<Props> = ({
   round,
   onClick,
@@ -100,58 +139,39 @@ const LastRoundHeroCard: React.FC<Props> = ({
         WebkitTapHighlightColor: 'transparent',
       }}
     >
-      <div
-        style={{
-          display: 'flex',
-          justifyContent: 'space-between',
-          alignItems: 'baseline',
-          gap: 12,
-        }}
-      >
-        <span
-          style={{
-            fontSize: 17,
-            fontWeight: 800,
-            color: 'var(--hcp-t-100)',
-            letterSpacing: '-0.01em',
-            overflow: 'hidden',
-            textOverflow: 'ellipsis',
-            whiteSpace: 'nowrap',
-            minWidth: 0,
-          }}
-        >
-          {courseName}
-        </span>
-        <span
-          style={{
-            fontSize: 12,
-            fontWeight: 700,
-            color: 'var(--hcp-amber)',
-            flexShrink: 0,
-            letterSpacing: '0.06em',
-          }}
-        >
-          SCORECARD ›
-        </span>
-      </div>
-
-      {(par != null || slope != null) && (
-        <div
-          style={{
-            fontSize: 12,
-            color: 'var(--hcp-t-40)',
-            fontWeight: 600,
-            marginTop: 4,
-            marginBottom: 14,
-            letterSpacing: '0.04em',
-          }}
-        >
-          {par != null && <>PAR {par}</>}
-          {par != null && slope != null && <> · </>}
-          {slope != null && <>SL {slope}</>}
+      <div style={{ display: 'flex', gap: 14, alignItems: 'center', marginBottom: 16 }}>
+        <Thumb src={round.course_thumbnail_image ?? null} />
+        <div style={{ minWidth: 0, flex: 1 }}>
+          <div
+            style={{
+              fontSize: 17,
+              fontWeight: 800,
+              color: 'var(--hcp-t-100)',
+              letterSpacing: '-0.01em',
+              overflow: 'hidden',
+              textOverflow: 'ellipsis',
+              whiteSpace: 'nowrap',
+            }}
+          >
+            {courseName}
+          </div>
+          {(par != null || slope != null) && (
+            <div
+              style={{
+                fontSize: 12,
+                color: 'var(--hcp-t-40)',
+                fontWeight: 600,
+                marginTop: 3,
+                letterSpacing: '0.04em',
+              }}
+            >
+              {par != null && <>PAR {par}</>}
+              {par != null && slope != null && <> · </>}
+              {slope != null && <>SL {slope}</>}
+            </div>
+          )}
         </div>
-      )}
-      {par == null && slope == null && <div style={{ marginBottom: 14 }} />}
+      </div>
 
       <div style={{ display: 'flex' }}>
         <Col label="Score Diff" value={diffDisplay} color={diffColor} first />
@@ -167,19 +187,20 @@ const LastRoundHeroCard: React.FC<Props> = ({
         />
       </div>
 
-      {handicapDelta != null && (
-        <div
-          style={{
-            fontSize: 12,
-            fontWeight: 700,
-            marginTop: 12,
-            color:
-              handicapDelta > 0 ? 'var(--hcp-bad)' : 'var(--hcp-good-2)',
-          }}
-        >
-          {handicapDelta > 0 ? '↑' : '↓'} {Math.abs(handicapDelta).toFixed(1)} to your index
-        </div>
-      )}
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginTop: 14 }}>
+        {handicapDelta != null ? (
+          <div
+            style={{
+              fontSize: 12,
+              fontWeight: 700,
+              color: handicapDelta > 0 ? 'var(--hcp-bad)' : 'var(--hcp-good-2)',
+            }}
+          >
+            {handicapDelta > 0 ? '↑' : '↓'} {Math.abs(handicapDelta).toFixed(1)} to your index
+          </div>
+        ) : <span />}
+        <ChevronRight size={20} color="var(--hcp-t-60)" strokeWidth={2.4} style={{ flexShrink: 0 }} />
+      </div>
     </button>
   );
 };
