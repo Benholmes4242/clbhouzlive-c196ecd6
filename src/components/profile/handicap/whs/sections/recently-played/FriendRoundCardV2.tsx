@@ -141,6 +141,7 @@ export const FriendRoundCardV2: React.FC<Props> = ({
             alt={activity.friend_name ?? ''}
             size={28}
             hideRing
+            userId={activity.friend_user_id ?? undefined}
           />
         </div>
       </div>
