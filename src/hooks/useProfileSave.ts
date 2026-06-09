@@ -107,15 +107,6 @@ export function useProfileSave(userId: string) {
           .eq('user_profile_id', userId);
       }
 
-      // 5. Sync college follow
-      if (form.collegeId) {
-        await supabase
-          .from('user_followed_colleges')
-          .upsert(
-            { user_id: userId, normalized_name: form.collegeId },
-            { onConflict: 'user_id,normalized_name' }
-          );
-      }
 
       // 6. Invalidate all relevant query keys — await to prevent stale data
       await Promise.all(
