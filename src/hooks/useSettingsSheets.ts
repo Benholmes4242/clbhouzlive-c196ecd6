@@ -2,13 +2,13 @@ import { useState } from 'react';
 
 type SheetKey =
   | 'email' | 'password' | 'blocked' | 'notifications'
-  | 'help' | 'report' | 'contact' | 'legal';
+  | 'help' | 'contact' | 'legal';
 
 type SheetState = Record<SheetKey, boolean>;
 
 const initial: SheetState = {
   email: false, password: false, blocked: false, notifications: false,
-  help: false, report: false, contact: false, legal: false,
+  help: false, contact: false, legal: false,
 };
 
 export function useSettingsSheets() {
