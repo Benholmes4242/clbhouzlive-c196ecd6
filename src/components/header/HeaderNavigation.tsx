@@ -90,20 +90,6 @@ const HeaderNavigation: React.FC<HeaderNavigationProps> = ({ onInteraction, useL
 
   const [showBusinessIntroModal, setShowBusinessIntroModal] = useState(false);
 
-  const { data: profile } = useQuery({
-    queryKey: ['profile-creator-only', user?.id],
-    queryFn: async () => {
-      if (!user?.id) return null;
-      const { data } = await supabase
-        .from('user_profiles')
-        .select('creator_only')
-        .eq('id', user.id)
-        .single();
-      return data;
-    },
-    enabled: !!user?.id,
-    staleTime: 30000,
-  });
 
   const handleProfileClick = () => {
     onInteraction?.();
