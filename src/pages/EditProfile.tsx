@@ -115,7 +115,7 @@ export default function EditProfile() {
   const isDisabled = !isValid || !isDirty || isSaving;
 
   return (
-    <div className="min-h-screen bg-[#F4F6F9] flex flex-col">
+    <div className="min-h-screen bg-[#F8FAFC] flex flex-col">
       {/* Header — Activity layout */}
       <div
         className="flex items-end px-4 pb-4"
