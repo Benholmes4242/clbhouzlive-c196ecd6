@@ -153,7 +153,7 @@ export const ChampionsListRow: React.FC<ChampionsListRowProps> = ({
             fontFamily: GAM.FONT_GEIST,
             fontSize: 16,
             fontWeight: 700,
-            color: isSelf || isChampion ? GAM.DEEP_AMBER : 'var(--hcp-t-100, ' + GAM.INK + ')',
+            color: 'var(--hcp-t-100)',
             letterSpacing: '-0.02em',
             fontVariantNumeric: 'tabular-nums',
             lineHeight: 1,
