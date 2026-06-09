@@ -83,7 +83,7 @@ export function AnonymousGameCard({ game, onRequestJoin, hasRequested, isAccepte
             {participants.slice(0, 3).map((p, idx) => (
               <React.Fragment key={p.user_id}>
                 <button
-                  onClick={() => navigate(getProfilePathById(p.user_id, (p as any).creator_only, p.username))}
+                  onClick={() => navigate(getProfilePathById(p.user_id, null, p.username))}
                   className="hover:text-white transition-colors"
                 >
                   {p.display_name}
