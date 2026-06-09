@@ -57,7 +57,7 @@ export const RivalListRow: React.FC<Props> = ({ rivalry, onTap }) => {
   const pad: (typeof sorted[number] | null)[] = [...sorted];
   while (pad.length < 5) pad.push(null);
 
-  const stripeColor = state === 'winning' ? '#F7931E' : state === 'losing' ? '#9F1D1D' : null;
+  const stripeColor = state === 'winning' ? '#F7931E' : state === 'losing' ? 'var(--hcp-bad)' : null;
 
   const tappable = typeof onTap === 'function';
   const Tag: any = tappable ? 'button' : 'div';
@@ -228,7 +228,7 @@ export const RivalListRow: React.FC<Props> = ({ rivalry, onTap }) => {
                   fontSize: 10,
                   fontWeight: 800,
                   letterSpacing: '0.10em',
-                  color: streak.who === 'you' ? '#FBBC2E' : '#9F1D1D',
+                  color: streak.who === 'you' ? '#FBBC2E' : 'var(--hcp-bad)',
                   whiteSpace: 'nowrap',
                 }}
               >

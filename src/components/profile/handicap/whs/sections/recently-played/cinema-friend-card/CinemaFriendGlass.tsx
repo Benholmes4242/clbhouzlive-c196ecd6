@@ -6,7 +6,7 @@ import { GlassGrossRing } from '../../shared/GrossCounterRing';
 
 const FONT_GEIST = 'Geist, system-ui, -apple-system, BlinkMacSystemFont, sans-serif';
 const GOOD = '#34D399';
-const BAD = '#F87171';
+const BAD = 'var(--hcp-bad)';
 function diffOnPhotoColor(d: number | null): string {
   if (d == null) return '#FFFFFF';
   if (d > 0) return BAD;
