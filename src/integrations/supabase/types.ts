@@ -14692,6 +14692,7 @@ export type Database = {
           business_name: string | null
           business_type: Database["public"]["Enums"]["business_type"] | null
           business_website: string | null
+          champions_visibility: string
           city: string
           college_id: string | null
           college_normalized: string | null
@@ -14719,6 +14720,7 @@ export type Database = {
           gender: string
           golfer_verified_at: string | null
           golfer_verified_by: string | null
+          handicap_page_visibility: string
           handicap_sync_interest: boolean | null
           handicap_sync_interest_at: string | null
           has_completed_onboarding: boolean | null
@@ -14810,6 +14812,7 @@ export type Database = {
           business_name?: string | null
           business_type?: Database["public"]["Enums"]["business_type"] | null
           business_website?: string | null
+          champions_visibility?: string
           city?: string
           college_id?: string | null
           college_normalized?: string | null
@@ -14837,6 +14840,7 @@ export type Database = {
           gender?: string
           golfer_verified_at?: string | null
           golfer_verified_by?: string | null
+          handicap_page_visibility?: string
           handicap_sync_interest?: boolean | null
           handicap_sync_interest_at?: string | null
           has_completed_onboarding?: boolean | null
@@ -14928,6 +14932,7 @@ export type Database = {
           business_name?: string | null
           business_type?: Database["public"]["Enums"]["business_type"] | null
           business_website?: string | null
+          champions_visibility?: string
           city?: string
           college_id?: string | null
           college_normalized?: string | null
@@ -14955,6 +14960,7 @@ export type Database = {
           gender?: string
           golfer_verified_at?: string | null
           golfer_verified_by?: string | null
+          handicap_page_visibility?: string
           handicap_sync_interest?: boolean | null
           handicap_sync_interest_at?: string | null
           has_completed_onboarding?: boolean | null
@@ -18342,6 +18348,7 @@ export type Database = {
         Args: { p_season_id: string }
         Returns: undefined
       }
+      are_friends: { Args: { a: string; b: string }; Returns: boolean }
       are_users_blocked: {
         Args: { user_a: string; user_b: string }
         Returns: boolean
