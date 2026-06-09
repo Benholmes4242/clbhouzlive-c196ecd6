@@ -9,7 +9,7 @@ import { ChampionsEmptyState, ChampionsWindowEmptyState } from './drilldown/Cham
 import {
   legendCategoryLabel,
   legendCategoryIcon,
-  formatLegendValue,
+  formatLegendValueCompact,
 } from '@/lib/gam/visuals';
 import type { LegendCategory, LegendWindow } from '@/lib/gam/types';
 import type { CourseSelection } from './types';
