@@ -89,7 +89,6 @@ const AuthWrapper: React.FC<AuthWrapperProps> = ({ children }) => {
     const isOnboardingExempt =
       isAuthPage ||
       location.pathname === '/edit-profile' ||
-      location.pathname === '/quick-edit-profile' ||
       location.pathname === '/onboarding/account-type';
 
     if (
