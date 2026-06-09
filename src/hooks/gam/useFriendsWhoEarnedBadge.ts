@@ -6,6 +6,7 @@ export interface FriendWhoEarnedBadge {
   friend_name: string;
   friend_avatar_url: string | null;
   earned_at: string;
+  friend_tier: number | null;
 }
 
 /**
