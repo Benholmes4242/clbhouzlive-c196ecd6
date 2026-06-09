@@ -194,9 +194,9 @@ export const SheetHeroGlass: React.FC<Props> = ({
           hasImpact
             ? {
                 display: 'grid',
-                gridTemplateColumns: '1fr 1fr',
-                rowGap: 11,
-                columnGap: 10,
+                gridTemplateColumns: 'repeat(4, 1fr)',
+                columnGap: 8,
+                alignItems: 'baseline',
               }
             : { display: 'flex', justifyContent: 'space-between', alignItems: 'baseline' }
         }
@@ -210,7 +210,7 @@ export const SheetHeroGlass: React.FC<Props> = ({
             <GlassGrossRing
               value={gross != null ? gross : EM_DASH}
               isCounter={isCounter}
-              numeralSize={22}
+              numeralSize={ringSize}
             />
           </div>
         </div>
@@ -219,7 +219,7 @@ export const SheetHeroGlass: React.FC<Props> = ({
         ) : (
           <div style={{ textAlign: 'center' }}>
             <div style={labelStyle}>STABLEFORD</div>
-            <div style={valueStyle('#FFFFFF')}>{stableford != null ? stableford : EM_DASH}</div>
+            <div style={valueStyle('#FFFFFF', valSize)}>{stableford != null ? stableford : EM_DASH}</div>
           </div>
         )}
         {lockMissingStats ? (
@@ -227,7 +227,7 @@ export const SheetHeroGlass: React.FC<Props> = ({
         ) : (
           <div style={{ textAlign: 'center' }}>
             <div style={labelStyle}>SCORE DIFF</div>
-            <div style={valueStyle(differential != null ? AMBER : '#FFFFFF')}>
+            <div style={valueStyle('#FFFFFF', valSize)}>
               {fmtDiffLocal(differential)}
             </div>
           </div>
@@ -236,7 +236,7 @@ export const SheetHeroGlass: React.FC<Props> = ({
         {hasImpact && (
           <div style={{ textAlign: 'center' }}>
             <div style={labelStyle}>HCP IMPACT</div>
-            <div style={valueStyle(impactColor)}>{fmtImpact(handicapDelta!)}</div>
+            <div style={valueStyle(impactColor, valSize)}>{fmtImpact(handicapDelta!)}</div>
           </div>
         )}
       </div>
