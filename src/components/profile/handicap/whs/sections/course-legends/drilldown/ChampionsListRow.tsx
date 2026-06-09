@@ -137,7 +137,7 @@ export const ChampionsListRow: React.FC<ChampionsListRowProps> = ({
         <div
           style={{
             fontSize: 11,
-            color: 'var(--hcp-t-50, #9aa6b2)',
+            color: 'var(--hcp-t-60)',
             fontWeight: 500,
             letterSpacing: '-0.003em',
             fontVariantNumeric: 'tabular-nums',
