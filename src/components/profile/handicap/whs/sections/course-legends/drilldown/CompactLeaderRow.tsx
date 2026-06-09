@@ -71,7 +71,7 @@ export const CompactLeaderRow: React.FC<Props> = ({ row }) => {
         alignItems: 'center',
         padding: '9px 14px',
         background: rowBg,
-        boxShadow: 'inset 0 -0.5px 0 rgba(15,23,42,0.07)',
+        boxShadow: 'inset 0 -0.5px 0 var(--hcp-line)',
         fontFamily: GAM.FONT_GEIST,
       }}
     >
