@@ -716,7 +716,7 @@ const AppInner: React.FC = () => {
                                         </AuthWrapper>
                                         <Sonner />
                                         <GlobalBottomNavigation />
-                                        <GlobalPostStudio />
+                                        <GlobalPostComposer />
                                       </ErrorBoundary>
                                   </VideoPlaybackProvider>
                                 </TopTenProvider>
