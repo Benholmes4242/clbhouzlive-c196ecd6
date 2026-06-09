@@ -103,24 +103,23 @@ const TierBadge: React.FC<{ tier: number }> = ({ tier }) => {
     <div
       style={{
         flexShrink: 0,
-        minWidth: 22,
-        height: 22,
-        padding: '0 7px',
+        minWidth: 'unset',
+        height: 20,
+        padding: '0 8px',
         borderRadius: 7,
         background: pal.tint,
         border: `0.5px solid ${pal.border}`,
         color: pal.color,
-        fontSize: 11,
+        fontSize: 10,
         fontWeight: 800,
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
-        fontVariantNumeric: 'tabular-nums',
-        letterSpacing: '0.02em',
+        letterSpacing: '0.06em',
       }}
       aria-label={`Tier ${tier}`}
     >
-      T{tier}
+      {pal.label}
     </div>
   );
 };
