@@ -19,6 +19,8 @@ import { analyticsEvents } from '@/utils/analyticsEvents';
 
 const WHITE = '#FFFFFF';
 const WHITE_HAIRLINE = 'rgba(255,255,255,0.22)';
+const DARK_INK = '#0F172A';
+const DARK_HAIRLINE = 'rgba(15,23,42,0.18)';
 const AMBER = '#F7931E';
 const SEASON_GREEN = '#10B981';
 const CRIMSON = '#EF4444';
@@ -32,11 +34,9 @@ const BASE_STYLE = {
   padding: '6px 11px',
   borderRadius: 10,
   background: 'transparent',
-  border: `1px solid ${WHITE_HAIRLINE}`,
   cursor: 'pointer',
   fontFamily: 'Geist, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
   height: 26,
-  filter: FLOAT_SHADOW,
 } as const;
 
 function resolveSource(pathname: string): string {
