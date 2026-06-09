@@ -104,7 +104,7 @@ const SectionHero: React.FC<{
           gap: 6,
           fontSize: 10,
           fontWeight: 800,
-          color: GOLD,
+          color: 'var(--hcp-t-100)',
           letterSpacing: '0.16em',
           marginBottom: 8,
         }}
