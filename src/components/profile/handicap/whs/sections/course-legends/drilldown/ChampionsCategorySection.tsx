@@ -134,7 +134,7 @@ export const ChampionsCategorySection: React.FC<ChampionsCategorySectionProps> =
             style={{
               fontSize: 10,
               fontWeight: 800,
-              color: 'var(--hcp-accent-celebrate, #B26818)',
+              color: 'var(--hcp-t-100)',
               letterSpacing: '0.10em',
               textTransform: 'uppercase',
               background: 'none',
