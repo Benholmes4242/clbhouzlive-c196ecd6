@@ -289,15 +289,15 @@ export const CourseLegendsCard: React.FC<Props> = ({
               padding: '4px 8px',
               borderRadius: 999,
               background: 'rgba(0,0,0,0.45)',
-              border: '1px solid rgba(251,188,46,0.40)',
-              color: GAM.GOLD,
+              border: '1px solid rgba(255,255,255,0.30)',
+              color: 'var(--hcp-t-100)',
               fontSize: 10,
               fontWeight: 800,
               letterSpacing: '0.04em',
               ...GAM.TABULAR,
             }}
           >
-            <Crown size={10} strokeWidth={2.4} fill={GAM.GOLD} style={{ color: GAM.DEEP_AMBER }} />
+            <Crown size={10} strokeWidth={2.4} fill="#FFFFFF" style={{ color: '#FFFFFF' }} />
             {heldCount}/{totalSlots} titles
           </div>
         )}
