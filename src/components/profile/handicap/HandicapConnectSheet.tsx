@@ -1,17 +1,17 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { X, Link2Off, Trash2, CheckCircle2, AlertTriangle, ArrowRight } from 'lucide-react';
+import { X, Link2Off, Trash2, CheckCircle2, AlertTriangle } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
 import { Sheet, SheetContent } from '@/components/ui/sheet';
 import { SectionEyebrow } from '@/components/ui/SectionEyebrow';
 import { toast } from 'sonner';
 import { useQueryClient } from '@tanstack/react-query';
 import { callDisconnectWhs, callDeleteWhsData } from '@/lib/whs/api';
-import { whsKeys } from '@/lib/whs/hooks';
+import { useWhsConnection, whsKeys } from '@/lib/whs/hooks';
 import type { WhsConnection } from '@/lib/whs/types';
 import { MiniFlag } from '@/components/profile/handicap/whs/connect/MiniFlag';
-import DisconnectConfirmSheet from './DisconnectConfirmSheet';
-import DeleteAllDataConfirmSheet from './DeleteAllDataConfirmSheet';
+import { WhsConnectScreen } from '@/components/profile/handicap/whs/WhsConnectScreen';
+import DisconnectConfirmSheet from '@/components/settings/sheets/DisconnectConfirmSheet';
+import DeleteAllDataConfirmSheet from '@/components/settings/sheets/DeleteAllDataConfirmSheet';
 
 const INK = '#0F172A';
 const INK_55 = '#64748B';
@@ -23,19 +23,26 @@ const FONT = 'Geist, -apple-system, BlinkMacSystemFont, system-ui, sans-serif';
 interface Props {
   open: boolean;
   onClose: () => void;
-  connection: WhsConnection | null | undefined;
   userId: string | undefined;
+  onConnected?: () => void;
 }
 
-export default function WhsConnectionSheet({ open, onClose, connection, userId }: Props) {
-  const navigate = useNavigate();
+/**
+ * ONE canonical handicap connect sheet used everywhere (Settings, Edit
+ * Profile, Onboarding). When not connected it embeds the existing self-
+ * contained WhsConnectScreen flow (country picker → England Golf form →
+ * syncing → welcome). When connected it shows the manage view lifted from
+ * WhsConnectionSheet (synced facts + disconnect/delete).
+ */
+export default function HandicapConnectSheet({ open, onClose, userId, onConnected }: Props) {
   const queryClient = useQueryClient();
+  const { data: connection } = useWhsConnection(userId);
   const [confirmDisconnect, setConfirmDisconnect] = useState(false);
   const [confirmDelete, setConfirmDelete] = useState(false);
   const [isWorking, setIsWorking] = useState(false);
 
-  const invalidateAll = () => {
-    if (!connection) return;
+  const invalidateAll = (conn?: WhsConnection | null) => {
+    const c = conn ?? connection;
     if (userId) {
       queryClient.invalidateQueries({ queryKey: whsKeys.connection(userId) });
       queryClient.invalidateQueries({ queryKey: whsKeys.friendLeaderboard(userId) });
@@ -43,11 +50,15 @@ export default function WhsConnectionSheet({ open, onClose, connection, userId }
       queryClient.invalidateQueries({ queryKey: whsKeys.friendsActivity(userId) });
       queryClient.invalidateQueries({ queryKey: whsKeys.friendCourseBests(userId) });
     }
-    queryClient.invalidateQueries({ queryKey: whsKeys.trend(connection.id) });
-    queryClient.invalidateQueries({ queryKey: whsKeys.lastRound(connection.id) });
+    if (c) {
+      queryClient.invalidateQueries({ queryKey: whsKeys.trend(c.id) });
+      queryClient.invalidateQueries({ queryKey: whsKeys.lastRound(c.id) });
+      queryClient.invalidateQueries({ queryKey: whsKeys.counters(c.id) });
+      queryClient.invalidateQueries({ queryKey: whsKeys.allScores(c.id) });
+    }
     queryClient.invalidateQueries({ queryKey: ['whs-round-detail'] });
-    queryClient.invalidateQueries({ queryKey: whsKeys.counters(connection.id) });
-    queryClient.invalidateQueries({ queryKey: whsKeys.allScores(connection.id) });
+    queryClient.invalidateQueries({ queryKey: ['profile'] });
+    queryClient.invalidateQueries({ queryKey: ['user-profile'] });
   };
 
   const handleDisconnect = async () => {
@@ -84,9 +95,10 @@ export default function WhsConnectionSheet({ open, onClose, connection, userId }
     }
   };
 
-  const handleConnectCta = () => {
+  const handleConnected = () => {
+    invalidateAll();
+    onConnected?.();
     onClose();
-    navigate('/handicap');
   };
 
   return (
@@ -132,7 +144,9 @@ export default function WhsConnectionSheet({ open, onClose, connection, userId }
                 onDelete={() => setConfirmDelete(true)}
               />
             ) : (
-              <EmptyBody onConnect={handleConnectCta} />
+              <div style={{ padding: '0 8px' }}>
+                <WhsConnectScreen onConnected={handleConnected} onSkip={onClose} />
+              </div>
             )}
           </div>
         </SheetContent>
@@ -156,57 +170,7 @@ export default function WhsConnectionSheet({ open, onClose, connection, userId }
 }
 
 // ─────────────────────────────────────────────────────────────────────
-// EMPTY STATE
-// ─────────────────────────────────────────────────────────────────────
-
-const HeroArt: React.FC = () => (
-  <svg width="120" height="120" viewBox="0 0 120 120" fill="none" aria-hidden>
-    <defs>
-      <radialGradient id="whs-sheet-globe-grad" cx="0.35" cy="0.30" r="0.75">
-        <stop offset="0%" stopColor="#FFE5C2"/>
-        <stop offset="60%" stopColor="#F7931E"/>
-        <stop offset="100%" stopColor="#C97211"/>
-      </radialGradient>
-    </defs>
-    <ellipse cx="60" cy="108" rx="32" ry="4" fill="rgba(15,23,42,0.10)" />
-    <circle cx="60" cy="58" r="42" fill="url(#whs-sheet-globe-grad)" stroke={INK} strokeWidth="2" />
-    <ellipse cx="60" cy="58" rx="42" ry="14" fill="none" stroke="rgba(15,23,42,0.40)" strokeWidth="1" />
-    <ellipse cx="60" cy="58" rx="22" ry="42" fill="none" stroke="rgba(15,23,42,0.40)" strokeWidth="1" />
-    <line x1="18" y1="58" x2="102" y2="58" stroke="rgba(15,23,42,0.40)" strokeWidth="1" />
-    <line x1="60" y1="16" x2="60" y2="-2" stroke={INK} strokeWidth="2" strokeLinecap="round" />
-    <path d="M 60 0 L 78 4 L 60 8 Z" fill={AMBER} stroke={INK} strokeWidth="1.5" strokeLinejoin="round" />
-    <ellipse cx="48" cy="42" rx="8" ry="6" fill="rgba(255,255,255,0.30)" />
-  </svg>
-);
-
-const EmptyBody: React.FC<{ onConnect: () => void }> = ({ onConnect }) => (
-  <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center', padding: '20px 24px 28px' }}>
-    <div style={{ marginBottom: 20 }}>
-      <HeroArt />
-    </div>
-
-    <p style={{ fontSize: 15, lineHeight: 1.5, color: INK_55, margin: '0 0 24px', maxWidth: 320 }}>
-      Link your handicap to track every round, watch your index move, and play against your friends.
-    </p>
-
-    <button
-      onClick={onConnect}
-      style={{
-        width: '100%', maxWidth: 360,
-        display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
-        padding: '14px 18px', borderRadius: 12,
-        background: AMBER, color: '#fff', border: 'none',
-        fontSize: 15, fontWeight: 600, fontFamily: FONT, cursor: 'pointer',
-      }}
-    >
-      Connect handicap
-      <ArrowRight size={18} strokeWidth={2.4} />
-    </button>
-  </div>
-);
-
-// ─────────────────────────────────────────────────────────────────────
-// SYNCED STATE
+// SYNCED STATE (lifted verbatim from WhsConnectionSheet)
 // ─────────────────────────────────────────────────────────────────────
 
 const SyncedBody: React.FC<{
@@ -220,7 +184,6 @@ const SyncedBody: React.FC<{
 
   return (
     <div style={{ padding: '4px 20px 24px' }}>
-      {/* Facts card */}
       <div style={{
         background: '#F8FAFC',
         border: '0.5px solid rgba(15,23,42,0.10)',
@@ -238,7 +201,6 @@ const SyncedBody: React.FC<{
         />
       </div>
 
-      {/* Status pill */}
       <div style={{
         display: 'flex', alignItems: 'center', gap: 8,
         padding: '10px 14px', borderRadius: 999,
@@ -255,12 +217,10 @@ const SyncedBody: React.FC<{
         </span>
       </div>
 
-      {/* Sync frequency info */}
       <p style={{ fontSize: 13, color: INK_55, margin: '0 0 24px', textAlign: 'center', lineHeight: 1.5 }}>
         Your handicap syncs automatically twice daily.
       </p>
 
-      {/* Actions */}
       <button
         onClick={onDisconnect}
         style={{

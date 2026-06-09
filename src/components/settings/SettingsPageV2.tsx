@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { formatDistanceToNow } from 'date-fns';
 import { ChevronLeft, ChevronRight, User, Mail, Lock, Bell, Shield, EyeOff, UserX, HelpCircle, Flag, MessageSquare, FileText, Trash2, LogOut, Eye, BarChart2, Map, Star, Play, Link2, Users } from 'lucide-react';
 import { useWhsConnection } from '@/lib/whs/hooks';
-import WhsConnectionSheet from './sheets/WhsConnectionSheet';
+import HandicapConnectSheet from '@/components/profile/handicap/HandicapConnectSheet';
 import { formatHcp } from '@/lib/formatHcp';
 import { useProfileData } from '@/hooks/useProfileData';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
@@ -418,10 +418,9 @@ export function SettingsPageV2() {
       <ReportProblemSheet open={sheets.report} onClose={() => close('report')} userId={user?.id} />
       <ContactSupportSheet open={sheets.contact} onClose={() => close('contact')} />
       <LegalSheet open={sheets.legal} onClose={() => close('legal')} />
-      <WhsConnectionSheet
+      <HandicapConnectSheet
         open={whsSheetOpen}
         onClose={() => setWhsSheetOpen(false)}
-        connection={whsConnection}
         userId={user?.id}
       />
 
