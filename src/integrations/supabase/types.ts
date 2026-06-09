@@ -6233,6 +6233,7 @@ export type Database = {
           counter_value: number | null
           created_at: string
           earned_at: string
+          first_seen_at: string | null
           id: string
           is_visible: boolean
           seen_by_user: boolean
@@ -6246,6 +6247,7 @@ export type Database = {
           counter_value?: number | null
           created_at?: string
           earned_at?: string
+          first_seen_at?: string | null
           id?: string
           is_visible?: boolean
           seen_by_user?: boolean
@@ -6259,6 +6261,7 @@ export type Database = {
           counter_value?: number | null
           created_at?: string
           earned_at?: string
+          first_seen_at?: string | null
           id?: string
           is_visible?: boolean
           seen_by_user?: boolean
@@ -20722,6 +20725,7 @@ export type Database = {
           description: string
           display_order: number
           earned_at: string
+          first_seen_at: string
           icon_name: string
           is_earned: boolean
           kind: string
