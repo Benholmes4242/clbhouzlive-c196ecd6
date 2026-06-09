@@ -143,4 +143,71 @@ export const AchievementBody: React.FC<Props> = ({ item, viewerUserId }) => {
   );
 };
 
+const TierKey: React.FC = () => {
+  const tiers = [1, 2, 3, 4, 5] as const;
+  return (
+    <div
+      style={{
+        marginTop: 14,
+        padding: '12px 14px',
+        background: 'var(--hcp-bg-1)',
+        border: '1px solid var(--hcp-line)',
+        borderRadius: 12,
+      }}
+    >
+      <div
+        style={{
+          fontSize: 11,
+          color: 'var(--hcp-t-60)',
+          lineHeight: 1.45,
+          marginBottom: 10,
+        }}
+      >
+        Tiered achievements climb through five materials as you progress:
+      </div>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+        {tiers.map((n) => {
+          const p = MATERIAL_PALETTES[n];
+          const name = p.label.charAt(0) + p.label.slice(1).toLowerCase();
+          return (
+            <div key={n} style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+              <span
+                aria-hidden
+                style={{
+                  width: 12,
+                  height: 12,
+                  borderRadius: 3,
+                  background: p.color,
+                  border: `1px solid ${p.border}`,
+                  flexShrink: 0,
+                }}
+              />
+              <span
+                style={{
+                  fontSize: 12,
+                  fontWeight: 700,
+                  color: 'var(--hcp-t-100)',
+                  letterSpacing: '0.02em',
+                }}
+              >
+                {name}
+              </span>
+              <span
+                style={{
+                  fontSize: 11,
+                  color: 'var(--hcp-t-60)',
+                  ...GAM.TABULAR,
+                }}
+              >
+                Level {n}
+              </span>
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  );
+};
+
 export default AchievementBody;
+
