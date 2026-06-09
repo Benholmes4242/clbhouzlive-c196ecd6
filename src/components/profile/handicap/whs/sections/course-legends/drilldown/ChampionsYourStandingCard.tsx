@@ -95,7 +95,7 @@ export const ChampionsYourStandingCard: React.FC<ChampionsYourStandingCardProps>
               style={{
                 fontSize: 21,
                 fontWeight: 800,
-                color: 'var(--hcp-t-100, ' + GAM.INK + ')',
+                color: 'var(--hcp-t-100)',
                 letterSpacing: '-0.025em',
                 lineHeight: 1,
                 whiteSpace: 'nowrap',
