@@ -110,7 +110,7 @@ export const ChampionsYourStandingCard: React.FC<ChampionsYourStandingCardProps>
             </span>
           </div>
           {meta && (
-            <div style={{ fontSize: 11.5, color: 'var(--hcp-t-50, #8a96a3)', fontWeight: 500, letterSpacing: '-0.003em', fontVariantNumeric: 'tabular-nums' }}>
+            <div style={{ fontSize: 11.5, color: 'var(--hcp-t-60)', fontWeight: 500, letterSpacing: '-0.003em', fontVariantNumeric: 'tabular-nums' }}>
               {meta}
             </div>
           )}
