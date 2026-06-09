@@ -28,9 +28,8 @@ export const PULSE_DARK: Record<PulseKind, PulseRarity> = {
     labelBg: 'rgba(159,29,29,0.18)',
     pillBorder: 'rgba(159,29,29,0.50)',
     cardBorder: 'rgba(159,29,29,0.40)',
-    cardSweep:
-      'linear-gradient(135deg, var(--hcp-bg-1) 0%, #151B23 50%, rgba(159,29,29,0.14) 100%)',
-    outerGlow: '0 0 28px -10px rgba(159,29,29,0.45)',
+    cardSweep: 'var(--hcp-bg-1)',
+    outerGlow: null,
     Icon: Swords,
     label: 'At risk',
   },
