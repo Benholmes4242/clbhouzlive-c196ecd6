@@ -253,6 +253,7 @@ export const FriendsBlock: React.FC<Props> = ({ badgeId, legendCategory, legendC
             name={f.friend_name}
             url={f.friend_avatar_url}
             earnedAt={f.earned_at}
+            tier={f.friend_tier}
           />
         ))}
       </div>
