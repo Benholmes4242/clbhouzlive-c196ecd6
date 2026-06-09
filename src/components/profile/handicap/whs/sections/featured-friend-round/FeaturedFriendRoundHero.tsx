@@ -210,7 +210,7 @@ interface StatTileProps {
 const StatTile: React.FC<StatTileProps> = ({ label, value, highlight = 'neutral' }) => {
   const valueColor =
     highlight === 'green' ? '#86EFAC' :
-    highlight === 'red' ? '#FCA5A5' :
+    highlight === 'red' ? 'var(--hcp-bad)' :
     '#fff';
 
   return (

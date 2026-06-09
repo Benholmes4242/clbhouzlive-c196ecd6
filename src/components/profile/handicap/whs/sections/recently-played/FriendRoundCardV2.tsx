@@ -63,7 +63,7 @@ export const FriendRoundCardV2: React.FC<Props> = ({
 
   const diffColor =
     diff != null && diff > 0
-      ? 'var(--hcp-bad-deep)'
+      ? 'var(--hcp-bad)'
       : diff != null && diff < 0
         ? 'var(--hcp-good-deep)'
         : 'var(--hcp-t-100)';
@@ -213,7 +213,7 @@ export const FriendRoundCardV2: React.FC<Props> = ({
                 fontWeight: 800,
                 fontVariantNumeric: 'tabular-nums',
                 letterSpacing: '0.02em',
-                color: hcpDelta < 0 ? '#34D399' : '#F87171',
+                color: hcpDelta < 0 ? '#34D399' : 'var(--hcp-bad)',
                 background:
                   hcpDelta < 0 ? 'rgba(5,150,105,0.22)' : 'rgba(159,29,29,0.22)',
                 border:

@@ -21,7 +21,7 @@ const FONT_GEIST =
   'Geist, system-ui, -apple-system, BlinkMacSystemFont, sans-serif';
 const GOLD  = '#FBBC2E';
 const AMBER = '#F7931E';
-const RED   = '#9F1D1D';
+const RED   = 'var(--hcp-bad)';
 
 interface Props {
   rivalry: FriendRivalryHydrated;

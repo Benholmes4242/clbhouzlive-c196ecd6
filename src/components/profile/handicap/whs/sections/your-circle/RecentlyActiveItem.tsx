@@ -77,7 +77,7 @@ export const RecentlyActiveItem: React.FC<Props> = ({ entry, isActive: _isActive
           marginBottom: 0,
           fontSize: 13,
           fontWeight: 800,
-          color: isPlusHcp ? '#4ADE80' : 'var(--hcp-t-100)',
+          color: isPlusHcp ? 'var(--hcp-bad)' : 'var(--hcp-t-100)',
           fontVariantNumeric: 'tabular-nums',
           letterSpacing: '-0.02em',
           lineHeight: 1,
