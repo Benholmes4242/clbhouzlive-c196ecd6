@@ -128,7 +128,7 @@ const Pattern14Card: React.FC<Props> = ({ connectionId }) => {
           >
             <SummaryStat value={counts.better} label="Better" color="var(--hcp-good-2)" />
             <SummaryStat value={counts.on} label="On pace" color="var(--hcp-t-100)" />
-            <SummaryStat value={counts.worse} label="Worse" color="var(--hcp-bad-2)" />
+            <SummaryStat value={counts.worse} label="Worse" color="var(--hcp-bad)" />
             <div style={{ flex: 1 }} />
             <span
               style={{
@@ -292,7 +292,7 @@ const PatternBar: React.FC<{
     bucket === 'better'
       ? 'var(--hcp-good-2)'
       : bucket === 'worse'
-        ? 'var(--hcp-bad-2)'
+        ? 'var(--hcp-bad)'
         : 'var(--hcp-bg-3)';
 
   const inner = (

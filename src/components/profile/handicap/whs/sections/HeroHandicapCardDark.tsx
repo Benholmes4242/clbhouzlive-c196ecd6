@@ -29,7 +29,7 @@ function TrendRow({ label, delta, borderTop, caption }: TrendRowProps) {
   const color = improved
     ? 'var(--hcp-good-2)'
     : drifted
-      ? 'var(--hcp-bad-2)'
+      ? 'var(--hcp-bad)'
       : 'var(--hcp-t-40)';
   const arrow = improved ? '↓ ' : drifted ? '↑ ' : '';
   return (

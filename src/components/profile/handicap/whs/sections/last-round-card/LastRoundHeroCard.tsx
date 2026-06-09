@@ -79,7 +79,7 @@ const LastRoundHeroCard: React.FC<Props> = ({
     diff == null
       ? 'var(--hcp-t-100)'
       : diff > 0
-        ? 'var(--hcp-bad-2)'
+        ? 'var(--hcp-bad)'
         : 'var(--hcp-good-2)';
 
   return (
@@ -174,7 +174,7 @@ const LastRoundHeroCard: React.FC<Props> = ({
             fontWeight: 700,
             marginTop: 12,
             color:
-              handicapDelta > 0 ? 'var(--hcp-bad-2)' : 'var(--hcp-good-2)',
+              handicapDelta > 0 ? 'var(--hcp-bad)' : 'var(--hcp-good-2)',
           }}
         >
           {handicapDelta > 0 ? '↑' : '↓'} {Math.abs(handicapDelta).toFixed(1)} to your index

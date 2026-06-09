@@ -46,7 +46,7 @@ const fmtDiff = (d: number | null | undefined): string => {
 const diffColor = (d: number | null | undefined): string => {
   if (d === null || d === undefined) return T.inkMute;
   if (d < 0) return 'var(--hcp-good-deep)';
-  if (d > 0) return 'var(--hcp-bad-deep)';
+  if (d > 0) return 'var(--hcp-bad)';
   return T.inkSoft;
 };
 
@@ -79,7 +79,7 @@ const fmtHcpDelta = (n: number | null): HcpDeltaInfo | null => {
   return {
     sign: '\u2191',
     value: n.toFixed(1),
-    color: 'var(--hcp-bad-deep)',
+    color: 'var(--hcp-bad)',
     glow: 'none',
   };
 };
