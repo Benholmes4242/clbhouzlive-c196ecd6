@@ -1,28 +1,32 @@
-// GlobalPostStudio — App-level mount that subscribes to the zustand store
-// Renders PostStudio as a portal whenever isOpen = true
+// GlobalPostComposer — App-level mount that subscribes to usePostStudioStore.
+// Renders <PostComposer/> whenever isOpen is true.
 
 import React, { useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
-import PostStudio from './PostStudio';
+import { PostComposer } from './PostComposer';
 import { usePostStudioStore } from '@/stores/usePostStudioStore';
 
-export function GlobalPostStudio() {
+export function GlobalPostComposer() {
   const { isOpen, initialMedia, initialActorType, initialActorId, returnPath, closePostStudio } =
     usePostStudioStore();
   const navigate = useNavigate();
 
   const handleClose = useCallback(() => {
     closePostStudio();
-    navigate(returnPath || '/');
+    if (returnPath && returnPath !== window.location.pathname) {
+      navigate(returnPath);
+    }
   }, [closePostStudio, navigate, returnPath]);
 
   return (
-    <PostStudio
+    <PostComposer
       open={isOpen}
       onClose={handleClose}
-      initialActorType={initialActorType}
-      initialActorId={initialActorId ?? undefined}
       initialMedia={initialMedia}
+      initialActorType={initialActorType}
+      initialActorId={initialActorId}
     />
   );
 }
+
+export default GlobalPostComposer;

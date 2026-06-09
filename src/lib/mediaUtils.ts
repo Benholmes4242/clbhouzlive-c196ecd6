@@ -1,4 +1,4 @@
-import { ComposerMediaItem } from "@/components/post-studio/types";
+import { ComposerMediaItem } from "@/components/post-composer/types";
 import { validateMediaFile } from "@/constants/postLimits";
 
 export interface MediaValidationResult {
