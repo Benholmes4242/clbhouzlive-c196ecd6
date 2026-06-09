@@ -119,12 +119,12 @@ export const ChampionsYourStandingCard: React.FC<ChampionsYourStandingCardProps>
         {bestRank != null && (
           <div style={{ flexShrink: 0, textAlign: 'right', paddingLeft: 8 }}>
             <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'flex-end' }}>
-              <span style={{ fontSize: 16, fontWeight: 600, color: GAM.DEEP_AMBER, marginTop: 4, letterSpacing: '-0.02em' }}>#</span>
-              <span style={{ fontSize: 38, fontWeight: 250, color: GAM.DEEP_AMBER, letterSpacing: '-0.04em', lineHeight: 0.85, fontVariantNumeric: 'tabular-nums' }}>
+              <span style={{ fontSize: 16, fontWeight: 600, color: 'var(--hcp-t-100)', marginTop: 4, letterSpacing: '-0.02em' }}>#</span>
+              <span style={{ fontSize: 38, fontWeight: 250, color: 'var(--hcp-t-100)', letterSpacing: '-0.04em', lineHeight: 0.85, fontVariantNumeric: 'tabular-nums' }}>
                 {bestRank}
               </span>
             </div>
-            <div style={{ fontSize: 8.5, color: '#a89878', letterSpacing: '0.16em', textTransform: 'uppercase', fontWeight: 800, marginTop: 2 }}>
+            <div style={{ fontSize: 8.5, color: 'var(--hcp-t-40)', letterSpacing: '0.16em', textTransform: 'uppercase', fontWeight: 800, marginTop: 2 }}>
               Best rank
             </div>
           </div>
