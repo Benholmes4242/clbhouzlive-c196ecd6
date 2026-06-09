@@ -19815,6 +19815,7 @@ export type Database = {
           earned_at: string
           friend_avatar_url: string
           friend_name: string
+          friend_tier: number
           friend_user_id: string
         }[]
       }
