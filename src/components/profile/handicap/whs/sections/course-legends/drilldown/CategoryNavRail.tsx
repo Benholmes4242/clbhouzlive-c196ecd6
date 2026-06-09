@@ -46,8 +46,8 @@ export const CategoryNavRail: React.FC<Props> = ({ categories, onSelect }) => (
               gap: 7,
               padding: '6px 7px 6px 11px',
               borderRadius: 999,
-              background: 'rgba(15,23,42,0.03)',
-              border: '1px solid rgba(15,23,42,0.12)',
+              background: 'rgba(255,255,255,0.04)',
+              border: '1px solid var(--hcp-line)',
               cursor: 'pointer',
               whiteSpace: 'nowrap',
             }}
@@ -56,7 +56,7 @@ export const CategoryNavRail: React.FC<Props> = ({ categories, onSelect }) => (
               style={{
                 fontSize: 11,
                 fontWeight: 700,
-                color: '#0F172A',
+                color: 'var(--hcp-t-100)',
                 fontFamily: GAM.FONT_GEIST,
                 letterSpacing: '0.01em',
                 display: 'inline-flex',
