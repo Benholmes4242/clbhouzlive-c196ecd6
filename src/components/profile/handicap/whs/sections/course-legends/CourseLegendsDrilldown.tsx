@@ -196,7 +196,7 @@ export const CourseLegendsDrilldown: React.FC<Props> = ({ selection, hideHeader 
         name: row.user_display_name ?? 'Player',
         photoUrl: row.user_photo_url ?? null,
         value: row.value,
-        valueDisplay: formatLegendValue(cat, row.value),
+        valueDisplay: formatLegendValueCompact(cat, row.value),
         attained_at: row.attained_at,
         isSelf: row.is_self,
         userId: row.user_id ?? null,
