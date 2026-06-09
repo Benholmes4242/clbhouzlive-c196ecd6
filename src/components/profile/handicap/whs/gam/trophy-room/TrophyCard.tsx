@@ -84,7 +84,7 @@ const StandardCard: React.FC<Props> = ({ item, onTap }) => {
         padding: 9,
         cursor: 'pointer',
         textAlign: 'left',
-        opacity: dimmed ? 0.62 : 1,
+        opacity: 1,
         transform: pressed ? 'scale(0.985)' : 'scale(1)',
         transition: 'transform 120ms ease, opacity 160ms ease',
         fontFamily: GAM.FONT_GEIST,
