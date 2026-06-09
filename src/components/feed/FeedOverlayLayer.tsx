@@ -1,4 +1,5 @@
 import React, { memo, useState, useEffect, useCallback } from 'react';
+import { Volume2, VolumeX } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useClubhouseStore } from '@/store/clubhouseStore';
 import { BreathingRoomBottomBar } from './BreathingRoomBottomBar';
