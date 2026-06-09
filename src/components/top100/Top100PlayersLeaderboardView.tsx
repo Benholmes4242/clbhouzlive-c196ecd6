@@ -18,7 +18,6 @@ import { getProfilePathById } from '@/lib/profileRoutes';
 import {
   WeeklyHighlightsCarousel,
   StreakBadge,
-  RivalryCard,
   ClosestGoalsCarousel,
   TrophyIcons,
   parseBadgesFromJson,
