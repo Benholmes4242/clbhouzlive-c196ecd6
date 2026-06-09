@@ -58,4 +58,3 @@ export const PULSE_DARK: Record<PulseKind, PulseRarity> = {
     label: 'Claimed',
   },
 };
-};
