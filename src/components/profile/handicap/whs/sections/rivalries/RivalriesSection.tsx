@@ -56,7 +56,7 @@ const OwnerViewRivalries: React.FC<{ userId: string }> = ({ userId }) => {
             ? 'Loading…'
             : activeCount === 0
               ? 'Pick golfers to track head-to-head.'
-              : 'Auto-picked from your most-played friends.'
+              : 'All-time head-to-head record. A round counts when you and your rival played the same course on the same day.'
         }
         right={
           <button
@@ -82,19 +82,8 @@ const OwnerViewRivalries: React.FC<{ userId: string }> = ({ userId }) => {
         }
       />
 
-      {hasFilled && (
-        <p
-          style={{
-            margin: '-4px 16px 12px',
-            fontSize: 11.5,
-            lineHeight: 1.45,
-            color: 'var(--hcp-t-60)',
-            fontFamily: 'Geist, system-ui, sans-serif',
-          }}
-        >
-          All-time head-to-head record. A round counts when you and your rival played the same course on the same day.
-        </p>
-      )}
+      <div style={{ height: 10 }} />
+
 
 
       {isLoading ? (
