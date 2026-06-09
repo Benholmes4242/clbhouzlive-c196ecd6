@@ -54,7 +54,7 @@ export function CourseTabs({ activeTab, onChange, reviewCount, mediaCount }: Cou
             {isActive && (
               <div style={{
                 position: 'absolute',
-                bottom: 0,
+                bottom: 4,
                 left: 0,
                 right: 0,
                 height: 3,

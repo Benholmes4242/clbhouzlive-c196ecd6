@@ -42,8 +42,8 @@ export const WindowToggle: React.FC<{
     }}
   >
     {([
-      { v: '90d', label: '90D' },
       { v: 'all_time', label: 'All time' },
+      { v: '90d', label: '90D' },
     ] as const).map((o) => {
       const active = window === o.v;
       return (
@@ -212,7 +212,7 @@ export const CourseLegendsSection: React.FC<Props> = ({
   friendName,
 }) => {
   const [query, setQuery] = useState('');
-  const [window, setWindow] = useState<LegendWindow>('90d');
+  const [window, setWindow] = useState<LegendWindow>('all_time');
   const playedQuery = useUserPlayedCourses(userId);
   const homeClubQuery = useUserHomeClubCourses(userId);
   const discoverQuery = useDiscoverCoursesThisWeek();

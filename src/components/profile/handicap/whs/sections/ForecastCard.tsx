@@ -95,8 +95,9 @@ function renderStateCard(f: Forecast, ctx: CopyCtx) {
 const CardShell: React.FC<{
   borderColor?: string;
   bgTint?: string;
+  glow?: 'red' | 'green' | null;
   children: React.ReactNode;
-}> = ({ borderColor, bgTint, children }) => (
+}> = ({ borderColor, bgTint, glow, children }) => (
   <div
     style={{
       margin: '0 16px',
@@ -105,6 +106,12 @@ const CardShell: React.FC<{
       borderRadius: 16,
       overflow: 'hidden',
       fontFamily: FONT,
+      boxShadow:
+        glow === 'red'
+          ? '0 0 24px rgba(239,68,68,0.28)'
+          : glow === 'green'
+            ? '0 0 24px rgba(52,211,153,0.26)'
+            : undefined,
     }}
   >
     {children}
@@ -573,7 +580,7 @@ const NormalCard: React.FC<{ f: Forecast; tone: 'good' | 'amber' | 'neutral'; ct
   }
 
   return (
-    <CardShell>
+    <CardShell glow={tone === 'good' ? 'green' : tone === 'amber' ? 'red' : null}>
       <EyebrowRow left={eyebrowLeft} right={f.whenLabel ?? undefined} color={eyebrowColor} />
       <Headline numberValue={headlineNumber} numberColor={headlineColor} prose={prose} />
       <StripBand f={f} />
@@ -623,7 +630,7 @@ const SharpDropCard: React.FC<{ f: Forecast; ctx: CopyCtx }> = ({ f, ctx }) => (
 const SharpRiseCard: React.FC<{ f: Forecast; ctx: CopyCtx }> = ({ f, ctx }) => {
   const cutTarget = f.cutTarget;
   return (
-    <CardShell>
+    <CardShell glow="red">
       <EyebrowRow left="Form alert" right={f.whenLabel ?? undefined} color={T.badSoft} />
       <Headline
         numberValue={(f.projected ?? 0).toFixed(1)}
