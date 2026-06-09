@@ -3,6 +3,7 @@ import { Lock } from 'lucide-react';
 import { renderBadgeIcon } from '../badgeIcons';
 import { GAM } from '../tokens';
 import { LEGEND_PALETTE, LOCKED_PALETTE, paletteForShowpiece, type RarityPalette } from './_shared/rarityPalette';
+import { rarityColor } from '@/lib/gam/visuals';
 import type { TrophyItem } from './_shared/normalizeTrophyItem';
 import {
   isShowpiece,
@@ -10,6 +11,15 @@ import {
   SHOWPIECE_LOCKED_HINT,
   shortenShowpieceCaption,
 } from './_shared/showpieces';
+
+function rgbaFrom(hex: string, a: number): string {
+  if (!hex.startsWith('#')) return hex;
+  const h = hex.replace('#', '');
+  const r = parseInt(h.slice(0, 2), 16);
+  const g = parseInt(h.slice(2, 4), 16);
+  const b = parseInt(h.slice(4, 6), 16);
+  return `rgba(${r}, ${g}, ${b}, ${a})`;
+}
 
 interface Props {
   item: TrophyItem;
@@ -54,6 +64,7 @@ const StandardCard: React.FC<Props> = ({ item, onTap }) => {
   const locked =
     item.kind === 'achievement' && !item.earned && (item.currentValue == null || item.currentValue === 0);
   const dimmed = locked;
+  const glowColor = item.kind === 'achievement' ? rarityColor[item.rarity] : '';
   const pill = pillContent(item);
 
   return (
@@ -73,7 +84,7 @@ const StandardCard: React.FC<Props> = ({ item, onTap }) => {
         padding: 9,
         cursor: 'pointer',
         textAlign: 'left',
-        opacity: dimmed ? 0.62 : 1,
+        opacity: 1,
         transform: pressed ? 'scale(0.985)' : 'scale(1)',
         transition: 'transform 120ms ease, opacity 160ms ease',
         fontFamily: GAM.FONT_GEIST,
@@ -101,7 +112,26 @@ const StandardCard: React.FC<Props> = ({ item, onTap }) => {
         />
       )}
 
-      {/* Watermark */}
+      {/* Corner glow pad — locked only */}
+      {locked && glowColor && (
+        <div
+          aria-hidden
+          style={{
+            position: 'absolute',
+            right: -8,
+            bottom: 4,
+            width: 92,
+            height: 92,
+            borderRadius: '50%',
+            background: rgbaFrom(glowColor, 0.28),
+            filter: 'blur(18px)',
+            pointerEvents: 'none',
+            zIndex: 0,
+          }}
+        />
+      )}
+
+      {/* Watermark icon — lit in rarity colour when locked, subtle when earned */}
       <div
         aria-hidden
         style={{
@@ -109,9 +139,10 @@ const StandardCard: React.FC<Props> = ({ item, onTap }) => {
           right: -8,
           bottom: 4,
           transform: 'rotate(-12deg)',
-          opacity: dimmed ? 0.04 : 0.08,
-          color: palette.color,
+          opacity: locked ? 0.55 : 0.08,
+          color: locked ? glowColor : palette.color,
           pointerEvents: 'none',
+          zIndex: 1,
         }}
       >
         {renderBadgeIcon(item.iconKey, 92, 'currentColor')}
