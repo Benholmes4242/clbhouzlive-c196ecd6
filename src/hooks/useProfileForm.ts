@@ -22,7 +22,10 @@ function makeInitial(profile: any): ProfileFormData {
     })),
     collegeNormalized: profile?.college_normalized ?? null,
     collegeId: profile?.college_id ?? null,
-    handicapIndex: formHcpFromDb(profile?.eg_handicap_index),
+    // MANUAL handicap entry (maps to user_profiles.manual_handicap_index, NOT
+    // the WHS-synced eg_handicap_index). WHS always wins for display when a
+    // connection is active — see src/lib/handicap/resolveHandicap.ts.
+    handicapIndex: formHcpFromDb(profile?.manual_handicap_index),
     homeClubVisibility: profile?.home_club_visibility ?? 'public',
     additionalClubsVisibility: profile?.additional_clubs_visibility ?? 'public',
     bio: profile?.bio ?? '',
