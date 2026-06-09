@@ -154,7 +154,7 @@ export const CompactLeaderRow: React.FC<Props> = ({ row }) => {
             fontFamily: GAM.FONT_GEIST,
             fontSize: 15,
             fontWeight: 700,
-            color: isYou || isChampion ? GAM.DEEP_AMBER : GAM.INK,
+            color: 'var(--hcp-t-100)',
             letterSpacing: '-0.02em',
             fontVariantNumeric: 'tabular-nums',
             lineHeight: 1,
