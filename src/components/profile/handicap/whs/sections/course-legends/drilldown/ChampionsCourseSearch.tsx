@@ -45,7 +45,7 @@ export const ChampionsCourseSearch: React.FC<Props> = ({ currentCourseId }) => {
           padding: '10px 14px',
         }}
       >
-        <Search size={16} color={GAM.DEEP_AMBER} strokeWidth={2.2} />
+        <Search size={16} color="#94A3B8" strokeWidth={2.2} />
         <input
           type="text"
           value={query}
