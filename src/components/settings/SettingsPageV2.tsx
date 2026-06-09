@@ -42,7 +42,7 @@ import {
 import { Input } from '@/components/ui/input';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { SectionEyebrow } from '@/components/ui/SectionEyebrow';
-import pkg from '../../../package.json';
+const APP_VERSION = '1.0.0';
 
 function maskEmail(email: string): string {
   const [local, domain] = email.split('@');
@@ -297,7 +297,7 @@ export function SettingsPageV2() {
           className="pt-4 text-center"
           style={{ fontFamily: 'Geist, -apple-system, BlinkMacSystemFont, sans-serif', fontSize: 12, color: '#94A3B8', letterSpacing: '0.01em' }}
         >
-          clbhouz · v{(pkg as any).version ?? '0.0.0'}
+          clbhouz · v{APP_VERSION}
         </div>
 
       </div>
