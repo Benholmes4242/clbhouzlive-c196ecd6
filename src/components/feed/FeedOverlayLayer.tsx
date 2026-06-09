@@ -285,14 +285,14 @@ export const FeedOverlayLayer = memo(function FeedOverlayLayer({
           aria-label={isMuted ? 'Unmute video' : 'Mute video'}
           style={{
             position: 'fixed',
-            right: 16,
+            right: 14,
             bottom:
               bottomOffset !== undefined
-                ? `${bottomOffset + 48}px`
-                : 'calc(var(--bottom-nav-height, 88px) + 48px)',
-            zIndex: Z.echo,
-            width: 40,
-            height: 40,
+                ? `${bottomOffset + 10}px`
+                : 'calc(var(--bottom-nav-height, 88px) + 10px)',
+            zIndex: Z.echo + 2,
+            width: 36,
+            height: 36,
             borderRadius: 999,
             display: 'flex',
             alignItems: 'center',
