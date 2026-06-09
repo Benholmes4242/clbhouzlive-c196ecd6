@@ -5,6 +5,7 @@ import { relativeTime } from '@/lib/gam/visuals';
 import { TierRow } from './TierRow';
 import { FriendsBlock } from './FriendsBlock';
 import { isShowpiece } from '../_shared/showpieces';
+import { MATERIAL_PALETTES } from '../_shared/rarityPalette';
 import type { TrophyItem } from '../_shared/normalizeTrophyItem';
 
 interface Props {
