@@ -31,7 +31,6 @@ const CATEGORIES_ORDER_90D: LegendCategory[] = [
   'most_eagles_90d',
   'most_birdies_90d',
   'best_stableford_90d',
-  'best_score_diff_90d',
 ];
 
 const CATEGORIES_ORDER_ALL_TIME: LegendCategory[] = [
@@ -40,7 +39,6 @@ const CATEGORIES_ORDER_ALL_TIME: LegendCategory[] = [
   'most_eagles_all_time',
   'most_birdies_all_time',
   'best_stableford_all_time',
-  'best_score_diff_all_time',
 ];
 
 const SHORT_LABELS: Record<LegendCategory, string> = {

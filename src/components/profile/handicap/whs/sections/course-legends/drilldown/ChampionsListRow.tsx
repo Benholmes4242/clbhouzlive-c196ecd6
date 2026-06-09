@@ -157,20 +157,6 @@ export const ChampionsListRow: React.FC<ChampionsListRowProps> = ({
         >
           {valueDisplay}
         </span>
-        {unitLabel && (
-          <span
-            style={{
-              fontSize: 9,
-              color: 'var(--hcp-t-40, #aab4c0)',
-              fontWeight: 600,
-              letterSpacing: '0.02em',
-              textTransform: 'lowercase',
-              fontVariantNumeric: 'tabular-nums',
-            }}
-          >
-            {unitLabel}
-          </span>
-        )}
       </div>
     </div>
   );

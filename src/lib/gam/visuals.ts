@@ -35,14 +35,14 @@ export const legendCategoryLabel: Record<LegendCategory, string> = {
   lowest_gross_all_time:    'Gross Record',
   best_score_diff_90d:      'Score Legend',
   best_score_diff_all_time: 'Score Legend',
-  most_birdies_90d:         'Birdie Legend',
-  most_birdies_all_time:    'Birdie Legend',
-  best_stableford_90d:      'Stableford Champ',
-  best_stableford_all_time: 'Stableford Champ',
-  most_eagles_90d:          'Eagle Catcher',
-  most_eagles_all_time:     'Eagle Catcher',
-  most_aces_90d:            'Hole-Out Hero',
-  most_aces_all_time:       'Hole-Out Hero',
+  most_birdies_90d:         'Birdies',
+  most_birdies_all_time:    'Birdies',
+  best_stableford_90d:      'Leading Stableford',
+  best_stableford_all_time: 'Leading Stableford',
+  most_eagles_90d:          'Eagles',
+  most_eagles_all_time:     'Eagles',
+  most_aces_90d:            'Aces',
+  most_aces_all_time:       'Aces',
 };
 
 
