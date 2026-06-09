@@ -94,7 +94,7 @@ export const FriendsLeaderboardSection: React.FC<Props> = ({ userId, viewMode = 
   };
 
   return (
-    <section style={{ marginTop: 32 }}>
+    <section style={{ marginTop: 0 }}>
       <DarkSectionHeader
         eyebrow="LEADERBOARD"
         title={

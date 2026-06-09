@@ -32,7 +32,7 @@ export const TrendsView: React.FC<Props> = ({
       role="tabpanel"
       id="handicap-panel-trends"
       aria-labelledby="handicap-tab-trends"
-      style={{ paddingTop: 2 }}
+      style={{ paddingTop: 0 }}
     >
       {/* 1. Forecast */}
       <ForecastCard

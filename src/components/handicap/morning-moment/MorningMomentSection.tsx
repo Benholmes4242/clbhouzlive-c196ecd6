@@ -49,7 +49,7 @@ const MorningMomentSection: React.FC<Props> = ({ userId }) => {
 
   if (friendsLoading) {
     return (
-      <section aria-label="Friends yesterday" style={{ padding: '10px 16px 20px' }}>
+      <section aria-label="Friends yesterday" style={{ padding: '0 16px 20px' }}>
         <SkeletonCard />
       </section>
     );
@@ -58,7 +58,7 @@ const MorningMomentSection: React.FC<Props> = ({ userId }) => {
   if (!hasFriendsData) return null;
 
   return (
-    <section aria-label="Friends yesterday" style={{ padding: '10px 16px 20px' }}>
+    <section aria-label="Friends yesterday" style={{ padding: '0 16px 20px' }}>
       <FriendsYesterdayCard data={friendsData!} userId={userId} />
     </section>
   );

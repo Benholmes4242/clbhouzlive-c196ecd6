@@ -43,7 +43,7 @@ export const TodayView: React.FC<Props> = ({
       role="tabpanel"
       id="handicap-panel-today"
       aria-labelledby="handicap-tab-today"
-      style={{ paddingTop: 16 }}
+      style={{ paddingTop: 0 }}
     >
       {showReauthBanner && (
         <div
