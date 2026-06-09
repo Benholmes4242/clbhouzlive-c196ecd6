@@ -20,7 +20,7 @@ const T = {
   goodPill: 'rgba(5,150,105,0.16)',
   goodBorder: 'rgba(5,150,105,0.35)',
   bad: 'var(--hcp-bad-deep)',
-  badSoft: 'var(--hcp-bad-2)',
+  badSoft: 'var(--hcp-bad)',
   badPill: 'rgba(159,29,29,0.18)',
   badBorder: 'rgba(159,29,29,0.40)',
   amber: 'var(--hcp-amber)',
