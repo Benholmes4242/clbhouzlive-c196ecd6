@@ -285,14 +285,14 @@ export const FeedOverlayLayer = memo(function FeedOverlayLayer({
           aria-label={isMuted ? 'Unmute video' : 'Mute video'}
           style={{
             position: 'fixed',
-            right: 16,
+            right: 14,
             bottom:
               bottomOffset !== undefined
-                ? `${bottomOffset + 48}px`
-                : 'calc(var(--bottom-nav-height, 88px) + 48px)',
-            zIndex: Z.echo,
-            width: 40,
-            height: 40,
+                ? `${bottomOffset + 10}px`
+                : 'calc(var(--bottom-nav-height, 88px) + 10px)',
+            zIndex: Z.echo + 2,
+            width: 36,
+            height: 36,
             borderRadius: 999,
             display: 'flex',
             alignItems: 'center',
@@ -303,9 +303,9 @@ export const FeedOverlayLayer = memo(function FeedOverlayLayer({
             border: '0.5px solid rgba(255,255,255,0.25)',
             color: '#fff',
             cursor: 'pointer',
-            opacity: overlayVisible ? 1 : 0,
+            opacity: 1,
             transition: 'opacity 0.2s',
-            pointerEvents: overlayVisible ? 'auto' : 'none',
+            pointerEvents: 'auto',
           }}
         >
           {isMuted ? <VolumeX size={20} stroke="#fff" /> : <Volume2 size={20} stroke="#fff" />}
