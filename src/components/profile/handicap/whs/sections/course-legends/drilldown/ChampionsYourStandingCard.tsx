@@ -82,7 +82,7 @@ export const ChampionsYourStandingCard: React.FC<ChampionsYourStandingCardProps>
             style={{
               fontSize: 10,
               fontWeight: 800,
-              color: GAM.DEEP_AMBER,
+              color: 'var(--hcp-t-100)',
               letterSpacing: '0.16em',
               textTransform: 'uppercase',
               marginBottom: 5,
