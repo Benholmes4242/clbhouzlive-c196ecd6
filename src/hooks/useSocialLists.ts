@@ -35,7 +35,6 @@ type UserProfileRow = {
   profile_photo_url: string | null;
   home_club: string | null;
   eg_handicap_index: number | null;
-  creator_only: boolean | null;
   profile_type: string | null;
   show_handicap: boolean | null;
 };
@@ -73,7 +72,7 @@ function toSocialUser(profile: UserProfileRow): SocialUser {
     homeClub: profile.home_club,
     handicapIndex: profile.eg_handicap_index,
     showHandicap: profile.show_handicap ?? true,
-    creatorOnly: profile.creator_only ?? false,
+    creatorOnly: false,
     profileType: profile.profile_type || 'personal',
   };
 }
@@ -83,7 +82,7 @@ async function fetchProfilesByIds(ids: string[]): Promise<Map<string, UserProfil
 
   const { data, error } = await supabase
     .from('user_profiles')
-    .select('id, username, display_name, profile_photo_url, home_club, eg_handicap_index, creator_only, profile_type, show_handicap')
+    .select('id, username, display_name, profile_photo_url, home_club, eg_handicap_index, profile_type, show_handicap')
     .in('id', ids)
     .is('deleted_at', null);
 
