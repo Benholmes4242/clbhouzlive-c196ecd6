@@ -116,7 +116,7 @@ export const CompactLeaderRow: React.FC<Props> = ({ row }) => {
           style={{
             fontSize: 14,
             fontWeight: isChampion ? 800 : 600,
-            color: isYou ? GAM.DEEP_AMBER : GAM.INK,
+            color: 'var(--hcp-t-100)',
             letterSpacing: '-0.014em',
             lineHeight: 1.25,
             display: 'inline-flex',
