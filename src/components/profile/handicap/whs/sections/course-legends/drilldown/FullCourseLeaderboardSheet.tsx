@@ -71,9 +71,8 @@ export const FullCourseLeaderboardSheet: React.FC<Props> = ({
       open={open}
       onClose={onClose}
       ariaLabelledBy="course-legends-full-sheet-title"
-      className="hcp-dark"
       style={{
-        background: 'var(--hcp-bg-0)',
+        background: '#F8FAFC',
         maxHeight: '90vh',
         display: 'flex',
         flexDirection: 'column',
@@ -86,11 +85,10 @@ export const FullCourseLeaderboardSheet: React.FC<Props> = ({
           flex: 1,
           minHeight: 0,
           fontFamily: GAM.FONT_GEIST,
-          color: 'var(--hcp-t-100)',
+          color: GAM.INK,
         }}
       >
         <SheetHeader
-          dark
           eyebrow={eyebrow}
           title={<span id="course-legends-full-sheet-title">{courseName}</span>}
           sub={
@@ -107,8 +105,8 @@ export const FullCourseLeaderboardSheet: React.FC<Props> = ({
             gap: 6,
             overflowX: 'auto',
             padding: '12px 16px 14px',
-            background: 'var(--hcp-bg-0)',
-            borderBottom: '1px solid var(--hcp-line)',
+            background: '#F8FAFC',
+            borderBottom: '0.5px solid rgba(15,23,42,0.08)',
             scrollbarWidth: 'none',
             WebkitOverflowScrolling: 'touch',
             flexShrink: 0,
@@ -130,15 +128,13 @@ export const FullCourseLeaderboardSheet: React.FC<Props> = ({
                   gap: 6,
                   padding: '7px 12px',
                   borderRadius: 9,
-                  background: isActive
-                    ? 'linear-gradient(180deg, var(--hcp-accent-util-tint), var(--hcp-accent-util-tint-2))'
-                    : 'rgba(255,255,255,0.025)',
+                  background: isActive ? 'rgba(15,23,42,0.06)' : 'rgba(15,23,42,0.03)',
                   border: isActive
-                    ? '1px solid var(--hcp-accent-util-border)'
-                    : '1px solid rgba(255,255,255,0.04)',
-                  color: isActive ? 'var(--hcp-accent-util)' : 'var(--hcp-t-80)',
+                    ? '1px solid rgba(15,23,42,0.22)'
+                    : '1px solid rgba(15,23,42,0.12)',
+                  color: GAM.INK,
                   fontSize: 11,
-                  fontWeight: 700,
+                  fontWeight: isActive ? 800 : 700,
                   fontFamily: GAM.FONT_GEIST,
                   cursor: 'pointer',
                   whiteSpace: 'nowrap',
@@ -157,9 +153,10 @@ export const FullCourseLeaderboardSheet: React.FC<Props> = ({
             flex: 1,
             minHeight: 0,
             overflowY: 'auto',
-            padding: '8px 16px 24px',
+            padding: '12px 16px 24px',
             paddingBottom: 'env(safe-area-inset-bottom, 16px)',
             WebkitOverflowScrolling: 'touch',
+            background: '#F8FAFC',
           }}
         >
           {activeRows.length === 0 ? (
@@ -167,7 +164,7 @@ export const FullCourseLeaderboardSheet: React.FC<Props> = ({
               style={{
                 padding: '40px 16px',
                 textAlign: 'center',
-                color: 'var(--hcp-t-60)',
+                color: '#64748B',
                 fontSize: 13,
                 lineHeight: 1.5,
               }}
@@ -177,29 +174,20 @@ export const FullCourseLeaderboardSheet: React.FC<Props> = ({
           ) : (
             <div
               style={{
-                background:
-                  'linear-gradient(180deg, rgba(255,255,255,0.025), rgba(255,255,255,0.008))',
-                border: '1px solid var(--hcp-line)',
+                background: '#fff',
+                border: '0.5px solid rgba(15,23,42,0.08)',
                 borderRadius: 12,
-                padding: 5,
-                boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.02)',
+                overflow: 'hidden',
                 display: 'flex',
                 flexDirection: 'column',
               }}
             >
               {activeRows.map((row, i) => (
-                <div key={`${row.rank}-${row.attained_at}-${i}`}>
-                  <CompactLeaderRow row={row} unit={activeDescriptor?.unit ?? ''} />
-                  {i < activeRows.length - 1 && (
-                    <div
-                      style={{
-                        height: 1,
-                        background: 'var(--hcp-hairline)',
-                        margin: '0 10px',
-                      }}
-                    />
-                  )}
-                </div>
+                <CompactLeaderRow
+                  key={`${row.rank}-${row.attained_at}-${i}`}
+                  row={row}
+                  unit={activeDescriptor?.unit ?? ''}
+                />
               ))}
             </div>
           )}
