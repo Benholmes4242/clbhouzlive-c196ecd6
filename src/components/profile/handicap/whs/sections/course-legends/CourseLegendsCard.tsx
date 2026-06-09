@@ -67,9 +67,7 @@ const HolderCell: React.FC<HolderCellProps> = ({ short, unit, holder, selfLabel 
   const isSelf = !!holder?.is_self;
   const isEmpty = !holder;
 
-  const nameColor = isSelf
-    ? GAM.DEEP_AMBER
-    : `var(--hcp-t-100, ${GAM.INK})`;
+  const nameColor = 'var(--hcp-t-100)';
   const valueColor = nameColor;
 
   return (
