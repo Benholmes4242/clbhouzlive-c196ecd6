@@ -79,8 +79,8 @@ const labelStyle: React.CSSProperties = {
   marginBottom: 3,
 };
 
-const valueStyle = (color: string): React.CSSProperties => ({
-  fontSize: 22,
+const valueStyle = (color: string, size: number = 22): React.CSSProperties => ({
+  fontSize: size,
   fontWeight: 300,
   color,
   fontFamily: FONT_MONO,
