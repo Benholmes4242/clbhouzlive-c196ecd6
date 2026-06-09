@@ -1,6 +1,7 @@
 import type { UserBadge, BadgeRarity, BadgeCategory, LegendCategory } from '@/lib/gam/types';
 import type { TopLegendRow } from '@/hooks/gam/useUserTopLegends';
 import { legendCategoryLabel, formatLegendValue } from '@/lib/gam/visuals';
+import { MATERIAL_PALETTES } from './rarityPalette';
 
 export interface TrophyTier {
   tier: number;
