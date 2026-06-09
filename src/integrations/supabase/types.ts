@@ -22374,6 +22374,12 @@ export type Database = {
         Args: { _game_id: string; _user_id: string }
         Returns: boolean
       }
+      user_whs_played_golf_course_ids: {
+        Args: { p_user_id: string }
+        Returns: {
+          course_id: string
+        }[]
+      }
       vault_create_secret: {
         Args: {
           new_description?: string
