@@ -31,7 +31,7 @@ export const LegendsView: React.FC<Props> = ({
       id="handicap-panel-legends"
       aria-labelledby="handicap-tab-legends"
       className="[&>section:first-child]:!mt-0 [&>section:first-child>div:first-child]:!pt-0"
-      style={{ paddingTop: 0 }}
+      style={{ paddingTop: 34 }}
     >
       {/* 1. Friends Leaderboard */}
       <FriendsLeaderboardSection

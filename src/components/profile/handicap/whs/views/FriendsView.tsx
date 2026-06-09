@@ -23,7 +23,7 @@ export const FriendsView: React.FC<Props> = ({
       id="handicap-panel-friends"
       aria-labelledby="handicap-tab-friends"
       className="[&>section:first-child]:!mt-0 [&>section:first-child>div:first-child]:!pt-0"
-      style={{ paddingTop: 0 }}
+      style={{ paddingTop: 34 }}
     >
       {/* 1. Friends Yesterday — hero */}
       {!readOnly && <MorningMoment userId={userId} />}
