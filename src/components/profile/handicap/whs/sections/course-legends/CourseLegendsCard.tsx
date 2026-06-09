@@ -89,28 +89,7 @@ const HolderCell: React.FC<HolderCellProps> = ({ short, unit, holder, selfLabel 
         fontFamily: FONT,
       }}
     >
-      {/* Champion squircle with crown badge overlay */}
-      <div style={{ position: 'relative', flexShrink: 0 }}>
-        <SquircleAvatar photoUrl={holder?.photo_url ?? null} size={30} muted={isEmpty} />
-        {!isEmpty && (
-          <div
-            aria-hidden
-            style={{
-              position: 'absolute',
-              top: -4,
-              left: -4,
-              lineHeight: 0,
-            }}
-          >
-            <Crown
-              size={12}
-              strokeWidth={2.2}
-              fill={GAM.GOLD}
-              style={{ color: GAM.DEEP_AMBER, display: 'block' }}
-            />
-          </div>
-        )}
-      </div>
+      <SquircleAvatar photoUrl={holder?.photo_url ?? null} size={30} muted={isEmpty} />
 
       <div style={{ flex: 1, minWidth: 0 }}>
         <div
