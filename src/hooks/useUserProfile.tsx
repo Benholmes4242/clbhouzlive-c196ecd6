@@ -57,9 +57,6 @@ export interface UserProfile {
   websites?: string[] | null;
   // Notification tracking
   last_notifications_seen_at?: string | null;
-  // Creator mode fields
-  is_creator?: boolean | null;
-  creator_only?: boolean | null;
 }
 
 /**
