@@ -451,7 +451,10 @@ async function getMilestone(userId: string, metric: string): Promise<number> {
 // rates a course between rounds gets credit on the next score post too.
 // ─────────────────────────────────────────────────────────────────────────────
 async function recomputeTop100Milestones(userId: string) {
-  const { data, error } = await supabase
+  const distinctByList = new Map<string, Set<string>>();
+
+  // (a) RATED Top 100 courses
+  const { data: ratedRows, error: ratedErr } = await supabase
     .from("course_top100_memberships")
     .select(`
       course_id,
@@ -462,17 +465,48 @@ async function recomputeTop100Milestones(userId: string) {
     .eq("course_ratings.user_id", userId)
     .not("course_ratings.rating", "is", null);
 
-  if (error) {
-    console.error("[recomputeTop100Milestones] query error", error);
-    return;
+  if (ratedErr) {
+    console.error("[recomputeTop100Milestones] rated query error", ratedErr);
   }
-
-  const distinctByList = new Map<string, Set<string>>();
-  for (const row of data ?? []) {
+  for (const row of ratedRows ?? []) {
     const slug = (row as any).top100_lists?.slug;
     if (!slug || !TOP_100_METRIC_BY_SLUG[slug]) continue;
     if (!distinctByList.has(slug)) distinctByList.set(slug, new Set());
     distinctByList.get(slug)!.add((row as any).course_id);
+  }
+
+  // (b) WHS-PLAYED Top 100 courses (played but maybe never rated).
+  // whs_scores.connection_id → whs_connections.user_id (no direct user_id column).
+  // Fetch user's connection ids first, then membership rows joined to whs_scores by those ids.
+  const { data: connRows, error: connErr } = await supabase
+    .from("whs_connections")
+    .select("id")
+    .eq("user_id", userId);
+  if (connErr) {
+    console.error("[recomputeTop100Milestones] connections query error", connErr);
+  }
+  const connectionIds = (connRows ?? []).map((r: any) => r.id).filter(Boolean);
+
+  if (connectionIds.length > 0) {
+    const { data: playedRows, error: playedErr } = await supabase
+      .from("course_top100_memberships")
+      .select(`
+        course_id,
+        top100_lists!inner ( slug, is_active ),
+        whs_scores!inner ( connection_id )
+      `)
+      .eq("top100_lists.is_active", true)
+      .in("whs_scores.connection_id", connectionIds);
+
+    if (playedErr) {
+      console.error("[recomputeTop100Milestones] played query error", playedErr);
+    }
+    for (const row of playedRows ?? []) {
+      const slug = (row as any).top100_lists?.slug;
+      if (!slug || !TOP_100_METRIC_BY_SLUG[slug]) continue;
+      if (!distinctByList.has(slug)) distinctByList.set(slug, new Set());
+      distinctByList.get(slug)!.add((row as any).course_id);
+    }
   }
 
   const nowIso = new Date().toISOString();
