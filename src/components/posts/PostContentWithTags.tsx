@@ -8,7 +8,6 @@ interface TaggableEntity {
   entity_id: string;
   name: string;
   username: string | null;
-  creator_only?: boolean | null;
 }
 
 interface NestedPostTag {
@@ -27,7 +26,6 @@ interface FlatPostTag {
   username: string | null;
   start_index?: number;
   end_index?: number;
-  creator_only?: boolean | null;
 }
 
 interface NormalizedPostTag {
@@ -70,7 +68,6 @@ const normalizeTags = (tags: Array<NestedPostTag | FlatPostTag>): NormalizedPost
         entity_id: tag.entity_id,
         name: tag.name,
         username: tag.username,
-        creator_only: tag.creator_only,
       },
     };
   });
@@ -85,7 +82,7 @@ const PostContentWithTags: React.FC<PostContentWithTagsProps> = ({
 
   const handleTagClick = (entity: TaggableEntity) => {
     if (entity.entity_type === 'user') {
-      const path = getProfilePathById(entity.entity_id, entity.creator_only, entity.username);
+      const path = getProfilePathById(entity.entity_id, null, entity.username);
       navigate(path);
     } else if (entity.entity_type === 'business') {
       navigate(`/business/${entity.entity_id}`);

@@ -20,8 +20,8 @@ export function GameRoster({ participants, hostUserId }: GameRosterProps) {
     return new Date(a.joined_at || a.created_at).getTime() - new Date(b.joined_at || b.created_at).getTime();
   });
 
-  const handleAvatarClick = (userId: string, username?: string, creatorOnly?: boolean) => {
-    const path = getProfilePathById(userId, creatorOnly, username);
+  const handleAvatarClick = (userId: string, username?: string) => {
+    const path = getProfilePathById(userId, null, username);
     navigate(path);
   };
 
@@ -42,7 +42,7 @@ export function GameRoster({ participants, hostUserId }: GameRosterProps) {
           return (
             <button
               key={participant.id}
-              onClick={() => handleAvatarClick(participant.user_id, profile?.username, (profile as any)?.creator_only)}
+              onClick={() => handleAvatarClick(participant.user_id, profile?.username)}
               className="relative group"
               style={{ zIndex: sortedParticipants.length - index }}
             >
