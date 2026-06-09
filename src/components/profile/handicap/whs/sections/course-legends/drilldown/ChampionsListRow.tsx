@@ -123,7 +123,7 @@ export const ChampionsListRow: React.FC<ChampionsListRowProps> = ({
           style={{
             fontSize: 15,
             fontWeight: isChampion ? 800 : 600,
-            color: isSelf ? GAM.DEEP_AMBER : 'var(--hcp-t-100, ' + GAM.INK + ')',
+            color: 'var(--hcp-t-100)',
             letterSpacing: '-0.014em',
             lineHeight: 1.25,
             marginBottom: 1,
