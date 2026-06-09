@@ -14750,6 +14750,7 @@ export type Database = {
           last_today_view_at: string | null
           location: string | null
           logo_url: string | null
+          manual_handicap_index: number | null
           mini_card_crop_height: number | null
           mini_card_crop_width: number | null
           mini_card_crop_x: number | null
@@ -14869,6 +14870,7 @@ export type Database = {
           last_today_view_at?: string | null
           location?: string | null
           logo_url?: string | null
+          manual_handicap_index?: number | null
           mini_card_crop_height?: number | null
           mini_card_crop_width?: number | null
           mini_card_crop_x?: number | null
@@ -14988,6 +14990,7 @@ export type Database = {
           last_today_view_at?: string | null
           location?: string | null
           logo_url?: string | null
+          manual_handicap_index?: number | null
           mini_card_crop_height?: number | null
           mini_card_crop_width?: number | null
           mini_card_crop_x?: number | null
