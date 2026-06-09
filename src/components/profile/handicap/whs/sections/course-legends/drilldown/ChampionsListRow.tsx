@@ -37,7 +37,7 @@ export const ChampionsListRow: React.FC<ChampionsListRowProps> = ({
   holdDuration,
 }) => {
   const rowBg = isSelf
-    ? 'rgba(247,147,30,0.10)'
+    ? 'rgba(255,255,255,0.08)'
     : isChampion
       ? 'var(--hcp-bg-2)'
       : 'var(--hcp-bg-1)';
