@@ -1,5 +1,6 @@
 import React from 'react';
 import { useRecentUnlocks } from '@/hooks/gam/useRecentUnlocks';
+import { useMarkBadgeSeen } from '@/hooks/gam/useMarkBadgeSeen';
 import { Skeleton, RetryStub } from '../../gam/_shared/GamAtoms';
 import { relativeTime } from '@/lib/gam/visuals';
 import type { RecentUnlock } from '@/lib/gam/types';
