@@ -44,7 +44,7 @@ function monogramLetter(name: string): string {
 export const InviteCard: React.FC<Props> = ({ friend }) => {
   const queryClient = useQueryClient();
   const hcp = friend.friend_handicap_index;
-  const isPlusHandicap = hcp != null && hcp < 0;
+  
 
   const courseHint =
     friend.last_round_course_name && friend.last_round_played_at
@@ -148,7 +148,7 @@ export const InviteCard: React.FC<Props> = ({ friend }) => {
                 fontFamily: FONT_GEIST,
                 fontSize: 12,
                 fontWeight: 800,
-                color: isPlusHandicap ? '#4ADE80' : INK,
+                color: INK,
                 fontVariantNumeric: 'tabular-nums',
                 flexShrink: 0,
               }}
