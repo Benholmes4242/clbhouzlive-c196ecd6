@@ -99,7 +99,7 @@ export const ChampionsListRow: React.FC<ChampionsListRowProps> = ({
       ) : (
         <div
           style={{
-            fontFamily: 'Geist Mono, ui-monospace, monospace',
+            fontFamily: GAM.FONT_GEIST,
             fontSize: 15,
             fontWeight: 700,
             fontVariantNumeric: 'tabular-nums',
@@ -146,7 +146,7 @@ export const ChampionsListRow: React.FC<ChampionsListRowProps> = ({
       <div style={{ textAlign: 'right', flexShrink: 0, display: 'flex', alignItems: 'baseline', gap: 5 }}>
         <span
           style={{
-            fontFamily: 'Geist Mono, ui-monospace, monospace',
+            fontFamily: GAM.FONT_GEIST,
             fontSize: 16,
             fontWeight: 700,
             color: isSelf || isChampion ? GAM.DEEP_AMBER : 'var(--hcp-t-100, ' + GAM.INK + ')',
