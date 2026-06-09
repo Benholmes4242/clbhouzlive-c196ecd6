@@ -303,9 +303,9 @@ export const FeedOverlayLayer = memo(function FeedOverlayLayer({
             border: '0.5px solid rgba(255,255,255,0.25)',
             color: '#fff',
             cursor: 'pointer',
-            opacity: overlayVisible ? 1 : 0,
+            opacity: 1,
             transition: 'opacity 0.2s',
-            pointerEvents: overlayVisible ? 'auto' : 'none',
+            pointerEvents: 'auto',
           }}
         >
           {isMuted ? <VolumeX size={20} stroke="#fff" /> : <Volume2 size={20} stroke="#fff" />}
