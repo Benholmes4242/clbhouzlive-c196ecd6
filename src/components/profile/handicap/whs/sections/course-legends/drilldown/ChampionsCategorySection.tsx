@@ -52,7 +52,7 @@ export const ChampionsCategorySection: React.FC<ChampionsCategorySectionProps> =
         style={{
           fontSize: 10.5,
           fontWeight: 800,
-          color: GAM.DEEP_AMBER,
+          color: 'var(--hcp-t-100)',
           letterSpacing: '0.14em',
           textTransform: 'uppercase',
           display: 'inline-flex',
