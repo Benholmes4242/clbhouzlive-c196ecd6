@@ -1,18 +1,19 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { formatDistanceToNow } from 'date-fns';
-import { ChevronLeft, ChevronRight, User, Mail, Lock, Bell, Shield, EyeOff, UserX, HelpCircle, Flag, MessageSquare, FileText, Trash2, LogOut, Eye, BarChart2, Map, Star, Play, Link2, Users } from 'lucide-react';
+import {
+  ChevronLeft, ChevronRight, User, Mail, Lock, Bell, Shield, UserX,
+  HelpCircle, MessageSquare, FileText, Trash2, LogOut, Eye, BarChart2, Map, Link2, Users,
+} from 'lucide-react';
 import { useWhsConnection } from '@/lib/whs/hooks';
 import HandicapConnectSheet from '@/components/profile/handicap/HandicapConnectSheet';
 import { formatHcp } from '@/lib/formatHcp';
 import { useProfileData } from '@/hooks/useProfileData';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
-import { useCreatorSettings } from '@/hooks/useCreatorSettings';
 import { usePrivacySettings } from '@/hooks/usePrivacySettings';
 import { useDeleteAccount } from '@/hooks/useDeleteAccount';
 import { useSettingsSheets } from '@/hooks/useSettingsSheets';
 import { supabase } from '@/integrations/supabase/client';
-import { useQueryClient } from '@tanstack/react-query';
 import {
   SettingsSection,
   SettingsChevronRow,
@@ -25,11 +26,9 @@ import {
   BlockedUsersSheet,
   NotificationsSheet,
   HelpCentreSheet,
-  ReportProblemSheet,
   ContactSupportSheet,
   LegalSheet,
 } from './sheets';
-import { CreatorWelcomeDialog } from '@/components/creator/CreatorWelcomeDialog';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -43,6 +42,7 @@ import {
 import { Input } from '@/components/ui/input';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { SectionEyebrow } from '@/components/ui/SectionEyebrow';
+const APP_VERSION = '1.0.0';
 
 function maskEmail(email: string): string {
   const [local, domain] = email.split('@');
@@ -64,13 +64,6 @@ export function SettingsPageV2() {
   }, [user?.id, user?.email]);
 
   const isOAuthUser = !user?.app_metadata?.providers?.includes('email');
-  const isPersonalProfile = (profile as any)?.actor_type !== 'business';
-
-  const creator = useCreatorSettings(
-    user?.id,
-    !!(profile as any)?.is_creator,
-    !!(profile as any)?.creator_only,
-  );
 
   const privacy = usePrivacySettings(
     user?.id,
@@ -83,7 +76,6 @@ export function SettingsPageV2() {
 
   const deleteAccount = useDeleteAccount(user?.id);
   const { sheets, open, close } = useSettingsSheets();
-  const queryClient = useQueryClient();
   const { data: whsConnection } = useWhsConnection(user?.id);
   const [whsSheetOpen, setWhsSheetOpen] = useState(false);
 
@@ -92,16 +84,18 @@ export function SettingsPageV2() {
     navigate('/auth');
   };
 
-  // Gate on profile as well as loading — auth race condition (INITIAL_SESSION firing
-  // with session=null before the real session restores) can briefly set loading=false
-  // while profile is still null, causing the full page to render with undefined data.
-  // Since Settings is route-guarded, !profile is only ever true during the load phase.
   if (sessionLoading || loading || !profile) return <SettingsSkeleton />;
 
   const p = profile as any;
   const handicapSuffix = p?.eg_handicap_index != null
     ? ` · ${formatHcp(p.eg_handicap_index)} hcp`
     : '';
+
+  const whsSubtitle = whsConnection
+    ? whsConnection.last_synced_at
+      ? `Connected · synced ${formatDistanceToNow(new Date(whsConnection.last_synced_at), { addSuffix: true })}`
+      : 'Connected'
+    : 'Not connected';
 
   return (
     <div className="min-h-screen bg-[#F8FAFC]">
@@ -158,62 +152,22 @@ export function SettingsPageV2() {
         {/* Account */}
         <SettingsSection title="Account">
           <SettingsChevronRow
+            icon={<User size={18} />}
+            title="Edit Profile"
+            iconTheme="account"
+            onClick={() => navigate('/edit-profile')}
+          />
+          <SettingsChevronRow
             icon={<Mail size={18} />}
             title="Email"
             value={user?.email ? maskEmail(user.email) : undefined}
             iconTheme="account"
             onClick={() => open('email')}
           />
-          <SettingsChevronRow
-            icon={<User size={18} />}
-            title="Username"
-            value={`@${(profile as any)?.username ?? ''}`}
-            onClick={() => {}}
-            iconTheme="account"
-            isLocked
-          />
         </SettingsSection>
 
-        {/* Identity & Creator — personal profiles only */}
-        {isPersonalProfile && (
-          <SettingsSection title="Identity & Creator">
-            <SettingsToggleRow
-              icon={<Shield size={18} />}
-              title="Creator Mode"
-              subtitle="Unlock creator tools and analytics"
-              iconTheme="creator"
-              checked={creator.isCreator}
-              disabled={creator.isUpdating}
-              onCheckedChange={(val) =>
-                val ? creator.setShowEnableConfirm(true) : creator.setShowDisableConfirm(true)
-              }
-            />
-            {creator.isCreator && (
-              <SettingsToggleRow
-                icon={<EyeOff size={18} />}
-                title="Hide Personal Profile"
-                subtitle="Only your creator profile is visible"
-                iconTheme="creator"
-                checked={creator.creatorOnly}
-                disabled={creator.isUpdating}
-                onCheckedChange={(val) =>
-                  val
-                    ? creator.setShowCreatorOnlyConfirm(true)
-                    : creator.setShowDisableCreatorOnlyConfirm(true)
-                }
-              />
-            )}
-            <SettingsChevronRow
-              icon={<Eye size={18} />}
-              title="View Profile"
-              iconTheme="creator"
-              onClick={() => navigate(`/profile/${(profile as any)?.username}`)}
-            />
-          </SettingsSection>
-        )}
-
-        {/* Privacy & Safety */}
-        <SettingsSection title="Privacy & Safety">
+        {/* Privacy */}
+        <SettingsSection title="Privacy">
           <SettingsToggleRow
             icon={<Eye size={18} />}
             title="Public Profile"
@@ -259,33 +213,6 @@ export function SettingsPageV2() {
             disabled={privacy.isUpdatingPeerComparison}
             onCheckedChange={privacy.togglePeerComparison}
           />
-          {/* Top 10 Comments Privacy */}
-          <div className="flex items-center gap-3 px-4 py-3">
-            <div style={{ width: 36, height: 36, borderRadius: 10, background: 'rgba(247,147,30,0.10)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-              <Star size={18} style={{ color: '#F7931E' }} />
-            </div>
-            <div className="flex-1 min-w-0">
-              <p className="text-[15px] font-medium text-foreground">Top 10 Comments</p>
-              <p className="text-[13px] text-muted-foreground">Who can react and comment on your Top 10</p>
-            </div>
-            <select
-              value={(p as any)?.top_ten_comments_privacy ?? 'followers'}
-              onChange={async (e) => {
-                if (!user?.id) return;
-                await supabase
-                  .from('user_profiles')
-                  .update({ top_ten_comments_privacy: e.target.value })
-                  .eq('id', user.id);
-                queryClient.invalidateQueries({ queryKey: ['profile'] });
-                queryClient.invalidateQueries({ queryKey: ['top-ten-privacy'] });
-              }}
-              style={{ borderRadius: 8, border: '0.5px solid rgba(15,23,42,0.12)', background: '#F8FAFC', padding: '6px 10px', fontSize: 13, fontWeight: 500, color: '#0F172A', cursor: 'pointer' }}
-            >
-              <option value="open">Everyone</option>
-              <option value="followers">Followers only</option>
-              <option value="off">Off</option>
-            </select>
-          </div>
           <SettingsChevronRow
             icon={<UserX size={18} />}
             title="Blocked Users"
@@ -294,8 +221,8 @@ export function SettingsPageV2() {
           />
         </SettingsSection>
 
-        {/* Notifications & Watch */}
-        <SettingsSection title="Notifications & Watch">
+        {/* Notifications */}
+        <SettingsSection title="Notifications">
           <SettingsChevronRow
             icon={<Bell size={18} />}
             title="Notification Preferences"
@@ -303,12 +230,16 @@ export function SettingsPageV2() {
             iconTheme="notifications"
             onClick={() => open('notifications')}
           />
+        </SettingsSection>
+
+        {/* Connections */}
+        <SettingsSection title="Connections">
           <SettingsChevronRow
-            icon={<Play size={18} />}
-            title="Watch Preferences"
-            subtitle="Manage saved, dismissed, and personalization signals"
-            iconTheme="notifications"
-            onClick={() => navigate('/settings/watch-preferences')}
+            icon={<Link2 size={18} />}
+            title="England Golf"
+            subtitle={whsSubtitle}
+            iconTheme="account"
+            onClick={() => setWhsSheetOpen(true)}
           />
         </SettingsSection>
 
@@ -323,29 +254,8 @@ export function SettingsPageV2() {
           />
         </SettingsSection>
 
-        {/* Connections */}
-        <SettingsSection title="Connections">
-          <SettingsChevronRow
-            icon={<Link2 size={18} />}
-            title="England Golf"
-            subtitle={
-              whsConnection
-                ? whsConnection.last_synced_at
-                  ? `Last synced ${formatDistanceToNow(new Date(whsConnection.last_synced_at), { addSuffix: true })}`
-                  : 'Connected'
-                : 'Tap to connect'
-            }
-            iconTheme="account"
-            onClick={() => {
-              // Always open the sheet — it has both empty and synced states.
-              // The empty-state CTA inside the sheet navigates to /handicap.
-              setWhsSheetOpen(true);
-            }}
-          />
-        </SettingsSection>
-
-        {/* Support */}
-        <SettingsSection title="Support">
+        {/* Support & Legal */}
+        <SettingsSection title="Support & Legal">
           <SettingsChevronRow
             icon={<HelpCircle size={18} />}
             title="Help Centre"
@@ -353,46 +263,21 @@ export function SettingsPageV2() {
             onClick={() => open('help')}
           />
           <SettingsChevronRow
-            icon={<Flag size={18} />}
-            title="Report a Problem"
-            iconTheme="support"
-            onClick={() => open('report')}
-          />
-          <SettingsChevronRow
             icon={<MessageSquare size={18} />}
-            title="Contact Support"
+            title="Contact Us"
             iconTheme="support"
             onClick={() => open('contact')}
           />
-        </SettingsSection>
-
-        {/* Legal */}
-        <SettingsSection title="Legal">
           <SettingsChevronRow
             icon={<FileText size={18} />}
-            title="Terms of Service"
-            value="ToS"
-            iconTheme="legal"
-            onClick={() => open('legal')}
-          />
-          <SettingsChevronRow
-            icon={<FileText size={18} />}
-            title="Privacy Policy"
-            value="Policy"
-            iconTheme="legal"
-            onClick={() => open('legal')}
-          />
-          <SettingsChevronRow
-            icon={<FileText size={18} />}
-            title="Community Guidelines"
-            value="Guidelines"
+            title="Legal & Policies"
             iconTheme="legal"
             onClick={() => open('legal')}
           />
         </SettingsSection>
 
         {/* Account Actions */}
-        <SettingsSection title="Sign Out & Delete" variant="danger">
+        <SettingsSection title="Account Actions" variant="danger">
           <SettingsChevronRow
             icon={<LogOut size={18} />}
             title="Sign Out"
@@ -407,6 +292,14 @@ export function SettingsPageV2() {
           />
         </SettingsSection>
 
+        {/* Version footer */}
+        <div
+          className="pt-4 text-center"
+          style={{ fontFamily: 'Geist, -apple-system, BlinkMacSystemFont, sans-serif', fontSize: 12, color: '#94A3B8', letterSpacing: '0.01em' }}
+        >
+          clbhouz · v{APP_VERSION}
+        </div>
+
       </div>
 
       {/* Sheets */}
@@ -415,7 +308,6 @@ export function SettingsPageV2() {
       <BlockedUsersSheet open={sheets.blocked} onClose={() => close('blocked')} userId={user?.id} />
       <NotificationsSheet open={sheets.notifications} onClose={() => close('notifications')} userId={user?.id} />
       <HelpCentreSheet open={sheets.help} onClose={() => close('help')} />
-      <ReportProblemSheet open={sheets.report} onClose={() => close('report')} userId={user?.id} />
       <ContactSupportSheet open={sheets.contact} onClose={() => close('contact')} />
       <LegalSheet open={sheets.legal} onClose={() => close('legal')} />
       <HandicapConnectSheet
@@ -423,77 +315,6 @@ export function SettingsPageV2() {
         onClose={() => setWhsSheetOpen(false)}
         userId={user?.id}
       />
-
-      {/* Creator dialogs */}
-      <AlertDialog open={creator.showEnableConfirm} onOpenChange={creator.setShowEnableConfirm}>
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>Enable Creator Mode?</AlertDialogTitle>
-            <AlertDialogDescription>
-              You'll unlock creator tools, analytics, and the ability to monetise your content on clbhouz.
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel>Cancel</AlertDialogCancel>
-            <AlertDialogAction
-              onClick={() => creator.toggleCreatorMode(true)}
-              style={{ background: '#F7931E', color: '#ffffff', boxShadow: '0 2px 10px rgba(247,147,30,0.28)' }}
-            >
-              Enable
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
-
-      <AlertDialog open={creator.showDisableConfirm} onOpenChange={creator.setShowDisableConfirm}>
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>Disable Creator Mode?</AlertDialogTitle>
-            <AlertDialogDescription>
-              Your creator profile and analytics will be hidden. You can re-enable at any time.
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel>Cancel</AlertDialogCancel>
-            <AlertDialogAction
-              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
-              onClick={() => creator.toggleCreatorMode(false)}
-            >
-              Disable
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
-
-      <AlertDialog open={creator.showCreatorOnlyConfirm} onOpenChange={creator.setShowCreatorOnlyConfirm}>
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>Hide Personal Profile?</AlertDialogTitle>
-            <AlertDialogDescription>
-              Your personal profile will be hidden. Only your creator profile will be visible to others.
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel>Cancel</AlertDialogCancel>
-            <AlertDialogAction onClick={() => creator.toggleCreatorOnly(true)}>Confirm</AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
-
-      <AlertDialog open={creator.showDisableCreatorOnlyConfirm} onOpenChange={creator.setShowDisableCreatorOnlyConfirm}>
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>Show Personal Profile?</AlertDialogTitle>
-            <AlertDialogDescription>
-              Your personal profile will become visible again alongside your creator profile.
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel>Cancel</AlertDialogCancel>
-            <AlertDialogAction onClick={() => creator.toggleCreatorOnly(false)}>Confirm</AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
 
       {/* Business warning dialog */}
       <AlertDialog open={deleteAccount.showBusinessWarning} onOpenChange={deleteAccount.setShowBusinessWarning}>
@@ -542,16 +363,6 @@ export function SettingsPageV2() {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
-
-      {/* Creator welcome */}
-      <CreatorWelcomeDialog
-        isOpen={creator.showWelcome}
-        onClose={() => creator.setShowWelcome(false)}
-        onGoToHub={() => {
-          creator.setShowWelcome(false);
-          navigate('/hub');
-        }}
-      />
     </div>
   );
 }
