@@ -59,8 +59,6 @@ export function useProfileSave(userId: string) {
           header_photo_url: headerPhotoUrl,
           home_club: form.homeClubName,
           primary_club_id: form.primaryClubId,
-          college_normalized: form.collegeNormalized,
-          college_id: form.collegeId,
           // Write to manual_handicap_index ONLY. eg_handicap_index is owned
           // exclusively by the WHS connect/sync edge functions.
           manual_handicap_index: parseHcpFormString(form.handicapIndex),

@@ -23,8 +23,6 @@ export interface ProfileFormData {
   homeClubName: string;
   primaryClubId: string | null;
   additionalClubs: ClubEntry[];
-  collegeNormalized: string | null;
-  collegeId: string | null;
   /** MANUAL handicap entry — maps to user_profiles.manual_handicap_index. NEVER the WHS value. */
   handicapIndex: string;
   homeClubVisibility: string;

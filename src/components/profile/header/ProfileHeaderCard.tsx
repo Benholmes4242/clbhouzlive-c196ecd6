@@ -12,7 +12,6 @@ interface ProfileHeaderCardProps {
   // Personal profile fields
   homeClub?: string | null;
   handicap?: number | null;
-  collegeNormalized?: string | null;
   // Business profile fields  
   websiteUrl?: string | null;
   location?: string | null;
@@ -36,7 +35,6 @@ const ProfileHeaderCard: React.FC<ProfileHeaderCardProps> = ({
   username,
   homeClub,
   handicap,
-  collegeNormalized,
   websiteUrl,
   location,
   businessName,
@@ -51,10 +49,8 @@ const ProfileHeaderCard: React.FC<ProfileHeaderCardProps> = ({
   const { user } = useSupabaseSession();
   const { data: followedColleges } = useFollowedColleges(user?.id);
 
-  // Determine the top followed college that isn't the attended one
-  const followedFranchise = followedColleges?.find(
-    f => f.normalized_name !== collegeNormalized
-  )?.normalized_name ?? null;
+  // Top followed college (Tour Hub follow) — drives supporter stamp
+  const followedFranchise = followedColleges?.[0]?.normalized_name ?? null;
   // Format website URL for display
   const formatWebsiteUrl = (url: string) => {
     return url.replace(/^https?:\/\//, '').replace(/\/$/, '');
@@ -121,11 +117,8 @@ const ProfileHeaderCard: React.FC<ProfileHeaderCardProps> = ({
         </div>
       )}
       
-      {/* Row 3b: College stamps (personal only) */}
-      {isPersonal && collegeNormalized && (
-        <CollegeStamp normalizedName={collegeNormalized} className="justify-center" variant="alumni" />
-      )}
-      {isPersonal && !collegeNormalized && followedFranchise && (
+      {/* Row 3b: Supporter college stamp (Tour Hub follow) */}
+      {isPersonal && followedFranchise && (
         <CollegeStamp normalizedName={followedFranchise} className="justify-center" variant="supporter" />
       )}
       
