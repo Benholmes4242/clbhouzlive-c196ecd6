@@ -33,7 +33,11 @@ export const CompactLeaderRow: React.FC<Props> = ({ row }) => {
   const isChampion = row.rank === 1;
   const isNew = daysSince(row.attained_at) < NEW_BADGE_DAYS;
 
-  const rowBg = isYou ? 'rgba(247,147,30,0.05)' : '#fff';
+  const rowBg = isYou
+    ? 'rgba(247,147,30,0.10)'
+    : isChampion
+      ? 'var(--hcp-bg-2)'
+      : 'var(--hcp-bg-1)';
   const photoBg = row.photoUrl
     ? `url(${row.photoUrl}) center/cover`
     : 'linear-gradient(135deg, #cbd5e1 0%, #64748b 100%)';
