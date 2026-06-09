@@ -75,19 +75,6 @@ export const CompactLeaderRow: React.FC<Props> = ({ row }) => {
         fontFamily: GAM.FONT_GEIST,
       }}
     >
-      {isChampion && (
-        <div
-          aria-hidden
-          style={{
-            position: 'absolute',
-            left: 0,
-            top: 0,
-            bottom: 0,
-            width: 3,
-            background: GAM.GOLD,
-          }}
-        />
-      )}
 
       {isChampion ? (
         <div style={{ display: 'flex', justifyContent: 'flex-end', alignItems: 'center', lineHeight: 0 }} aria-label="Champion">
