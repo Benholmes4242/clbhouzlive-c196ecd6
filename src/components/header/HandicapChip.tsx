@@ -19,6 +19,8 @@ import { analyticsEvents } from '@/utils/analyticsEvents';
 
 const WHITE = '#FFFFFF';
 const WHITE_HAIRLINE = 'rgba(255,255,255,0.22)';
+const DARK_INK = '#0F172A';
+const DARK_HAIRLINE = 'rgba(15,23,42,0.18)';
 const AMBER = '#F7931E';
 const SEASON_GREEN = '#10B981';
 const CRIMSON = '#EF4444';
@@ -32,11 +34,9 @@ const BASE_STYLE = {
   padding: '6px 11px',
   borderRadius: 10,
   background: 'transparent',
-  border: `1px solid ${WHITE_HAIRLINE}`,
   cursor: 'pointer',
   fontFamily: 'Geist, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
   height: 26,
-  filter: FLOAT_SHADOW,
 } as const;
 
 function resolveSource(pathname: string): string {
@@ -46,7 +46,7 @@ function resolveSource(pathname: string): string {
   return 'global_header';
 }
 
-export function HandicapChip() {
+export function HandicapChip({ light = false }: { light?: boolean } = {}) {
   const { user } = useSupabaseSession();
   const navigate = useNavigate();
   const location = useLocation();
@@ -54,6 +54,17 @@ export function HandicapChip() {
   const { data: connection, isLoading: whsLoading } = useWhsConnection(user?.id);
   const { data: trendData } = useHandicapTrend(connection?.id);
   const trend = useHandicapTrend90d(connection?.id);
+
+  // Theme-aware tokens
+  const INK = light ? DARK_INK : WHITE;
+  const HAIRLINE = light ? DARK_HAIRLINE : WHITE_HAIRLINE;
+  const shadow = light ? 'none' : FLOAT_SHADOW;
+
+  const baseStyle = {
+    ...BASE_STYLE,
+    border: `1px solid ${HAIRLINE}`,
+    filter: shadow,
+  };
 
   if (!user) return null;
 
@@ -63,7 +74,7 @@ export function HandicapChip() {
       <div
         aria-hidden
         style={{
-          ...BASE_STYLE,
+          ...baseStyle,
           width: 60,
           cursor: 'default',
         }}
@@ -86,7 +97,7 @@ export function HandicapChip() {
         type="button"
         onClick={() => handleTap('disconnected')}
         aria-label="Connect handicap"
-        style={BASE_STYLE}
+        style={baseStyle}
         className="active:scale-[0.97] transition-transform"
       >
         <span
@@ -111,7 +122,7 @@ export function HandicapChip() {
         type="button"
         onClick={() => handleTap('disconnected')}
         aria-label="Connect handicap"
-        style={BASE_STYLE}
+        style={baseStyle}
         className="active:scale-[0.97] transition-transform"
       >
         <span style={{ fontSize: 11, fontWeight: 700, color: AMBER, letterSpacing: '0.04em' }}>
@@ -135,14 +146,14 @@ export function HandicapChip() {
       aria-label={`Handicap ${formattedIndex}${
         direction === 'improving' ? ', improving' : direction === 'drifting' ? ', drifting' : ''
       }`}
-      style={{ ...BASE_STYLE, gap: showArrow ? 6 : 0 }}
+      style={{ ...baseStyle, gap: showArrow ? 6 : 0 }}
       className="active:scale-[0.97] transition-transform"
     >
       <span
         style={{
           fontSize: 12,
           fontWeight: 700,
-          color: WHITE,
+          color: INK,
           fontVariantNumeric: 'tabular-nums',
           letterSpacing: '-0.01em',
         }}
