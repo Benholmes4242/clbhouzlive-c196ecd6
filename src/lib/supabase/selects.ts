@@ -123,7 +123,6 @@ export const PROFILE_FULL_SELECT = `
   location,
   is_verified_golfer,
   is_verified_business,
-  is_creator,
   eg_handicap_index,
   show_handicap,
   home_club,
@@ -160,7 +159,6 @@ export const PROFILE_FULL_SELECT = `
   verified_business_at,
   verified_business_notes,
   last_notifications_seen_at,
-  creator_only,
   is_official_club
 ` as const;
 

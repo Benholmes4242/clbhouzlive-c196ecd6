@@ -59,7 +59,7 @@ export const FriendsTop100Panel: React.FC<FriendsTop100PanelProps> = ({ listId, 
             <div
               key={friend.user_id}
               onClick={() => {
-                const path = getProfilePathById(friend.user_id, (friend as any).creator_only, friend.profile.username);
+                const path = getProfilePathById(friend.user_id, null, friend.profile.username);
                 navigate(path);
               }}
               className="flex-shrink-0 bg-background/50 rounded-xl p-4 cursor-pointer hover:bg-background/70 transition-colors min-w-[160px]"
@@ -96,7 +96,7 @@ export const FriendsTop100Panel: React.FC<FriendsTop100PanelProps> = ({ listId, 
               <div
                 key={friend.user_id}
                 onClick={() => {
-                  const path = getProfilePathById(friend.user_id, (friend as any).creator_only, friend.profile.username);
+                  const path = getProfilePathById(friend.user_id, null, friend.profile.username);
                   navigate(path);
                   setIsModalOpen(false);
                 }}

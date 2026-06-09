@@ -8,8 +8,7 @@ const PROFILE_PREFETCH_SELECT = `
   display_name,
   profile_photo_url,
   bio,
-  is_verified_golfer,
-  is_creator
+  is_verified_golfer
 `;
 
 // Phase 2 Perf: Specific column selects for prefetch

@@ -18,7 +18,6 @@ const PROFILE_PAGE_SELECT = `
   location,
   is_verified_golfer,
   is_verified_business,
-  is_creator,
   created_at,
   is_public,
   home_club,

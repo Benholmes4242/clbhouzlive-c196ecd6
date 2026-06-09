@@ -48,9 +48,9 @@ const StoryBar = () => {
     }
   };
 
-  // Function to handle other users' profile navigation - respects creator_only
-  const handleOtherProfile = async (username: string, userId?: string, creatorOnly?: boolean) => {
-    const path = getProfilePathById(userId || username, creatorOnly, username);
+  // Function to handle other users' profile navigation
+  const handleOtherProfile = async (username: string, userId?: string) => {
+    const path = getProfilePathById(userId || username, null, username);
     navigate(path);
   };
 

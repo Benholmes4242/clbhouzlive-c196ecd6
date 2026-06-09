@@ -75,8 +75,6 @@ import ProfileAchievementsRail from '@/components/profile/ProfileAchievementsRai
 import { AvatarLightbox } from '@/components/shared/AvatarLightbox';
 import { ImageCropModal } from '@/components/business/ImageCropModal';
 import { ProfileTouchDebugProvider, useProfileTouchDebug } from '@/components/profile/debug/ProfileTouchDebugProvider';
-import { CreatorSection } from '@/components/creator-mode/CreatorSection';
-import { CreatorBadge } from '@/components/creator-mode/CreatorBadge';
 import { ProfileTouchDebugPanel } from '@/components/profile/debug/ProfileTouchDebugPanel';
 
 // Background color - uses CSS variable for theme support
@@ -670,12 +668,11 @@ const ProfilePageV2Content: React.FC = () => {
 
       {/* Identity Stack - adjusted for left-aligned avatar */}
       <div className="pt-[68px] px-5 text-left relative z-10 pointer-events-auto">
-        {/* Name + Creator Badge */}
+        {/* Name */}
         <div className="flex items-center gap-2">
           <h1 className="text-[28px] text-foreground" style={{ fontWeight: 900, letterSpacing: '-0.03em' }}>
             {displayName}
           </h1>
-          {profile?.is_creator && <CreatorBadge />}
         </div>
       </div>
 
@@ -1148,11 +1145,6 @@ const ProfilePageV2Content: React.FC = () => {
         />
 
         {/* Achievements Rail removed */}
-
-        {/* Creator Section */}
-        {isPersonal && profileUserId && (
-          <CreatorSection userId={profileUserId} isOwnProfile={isSelf} />
-        )}
 
         {/* Segmented control tabs */}
         <section 

@@ -42,16 +42,8 @@ export const getCreatorDestination = (_context: VideoContext): string => {
 };
 
 /**
- * Creator Toggle Behaviour
- * 
- * When is_creator = ON:
- * - User can publish long-form videos
- * - Their videos appear in Videos tab
- * - Enhanced creator tools on their profile
- * 
- * When is_creator = OFF:
- * - They can still post shorts (Watch)
- * - They do NOT appear as creators in Videos tab
+ * Creator Features (legacy flag — Creator Mode has been removed).
+ * All users can publish long-form videos and appear in the Videos tab.
  */
 export const CREATOR_FEATURES = {
   canPublishLongForm: true,

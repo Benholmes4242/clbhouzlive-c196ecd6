@@ -1,9 +1,9 @@
 /**
- * Permission Utilities for Creator Dual-Path Architecture
- * 
- * Two Creator Paths:
- * - Path A: Business Creator (category = 'Creator') - Teams, brands, agencies
- * - Path B: Creator Mode (is_creator = true) - Individual content creators
+ * Permission Utilities
+ *
+ * Note: Personal "Creator Mode" has been fully removed. The only creator-like
+ * concept that still exists is a Business profile with category === 'Creator',
+ * which is purely informational (no gated features tied to it anymore).
  */
 
 export type ProfileType = 'personal' | 'business';
@@ -11,8 +11,6 @@ export type BusinessCategory = 'Golf Club' | 'University / College' | 'Creator' 
 
 export interface UserProfile {
   id: string;
-  is_creator?: boolean;
-  creator_only?: boolean;
   is_verified?: boolean;
 }
 
@@ -30,81 +28,39 @@ export interface ActiveContext {
 
 /**
  * Check if user has access to personal-only features
- * Blocked for: Active business profile OR creator_only mode
+ * Blocked only when actively using a business profile.
  */
 export const hasPersonalFeatureAccess = (context: ActiveContext): boolean => {
-  // If actively using a business profile, no personal features
-  if (context.activeBusinessId) {
-    return false;
-  }
-  // If personal profile with creator_only enabled, no personal features
-  if (context.userProfile?.creator_only) {
-    return false;
-  }
+  if (context.activeBusinessId) return false;
   return true;
 };
 
 // Specific permission checks
-export const canAccessWorldTop100 = (context: ActiveContext): boolean => {
-  return hasPersonalFeatureAccess(context);
-};
+export const canAccessWorldTop100 = (context: ActiveContext): boolean =>
+  hasPersonalFeatureAccess(context);
 
-export const canAccessFriends = (context: ActiveContext): boolean => {
-  return hasPersonalFeatureAccess(context);
-};
+export const canAccessFriends = (context: ActiveContext): boolean =>
+  hasPersonalFeatureAccess(context);
 
-export const canAccessTop100Club = (context: ActiveContext): boolean => {
-  return hasPersonalFeatureAccess(context);
-};
+export const canAccessTop100Club = (context: ActiveContext): boolean =>
+  hasPersonalFeatureAccess(context);
 
-export const canAccessTop100FriendsSection = (context: ActiveContext): boolean => {
-  return hasPersonalFeatureAccess(context);
-};
+export const canAccessTop100FriendsSection = (context: ActiveContext): boolean =>
+  hasPersonalFeatureAccess(context);
 
-export const canRateCourses = (context: ActiveContext): boolean => {
-  return hasPersonalFeatureAccess(context);
-};
+export const canRateCourses = (context: ActiveContext): boolean =>
+  hasPersonalFeatureAccess(context);
 
 /**
- * Check if user has Creator features (Insights, Analytics, etc.)
- * Available to: Personal with is_creator=true OR Business with category='Creator'
+ * Badge selection
  */
-export const hasCreatorFeatures = (context: ActiveContext): boolean => {
-  // Personal profile with Creator Mode enabled
-  if (!context.activeBusinessId && context.userProfile?.is_creator) {
-    return true;
-  }
-  // Business profile with Creator category
-  if (context.activeBusinessId && context.activeBusiness?.category === 'Creator') {
-    return true;
-  }
-  return false;
-};
-
-/**
- * Determine which badge to show
- */
-export type BadgeType = 'golfer' | 'creator' | null;
+export type BadgeType = 'golfer' | null;
 
 export const getProfileBadge = (
   isPersonal: boolean,
   isVerified: boolean,
-  isCreator: boolean,
-  businessCategory?: string | null
 ): BadgeType => {
-  // Personal with Creator Mode gets orange Creator badge
-  if (isPersonal && isCreator) {
-    return 'creator';
-  }
-  // Personal verified (non-creator) gets green Golfer badge
-  if (isPersonal && isVerified && !isCreator) {
-    return 'golfer';
-  }
-  // Business with Creator category gets orange Creator badge
-  if (!isPersonal && businessCategory === 'Creator') {
-    return 'creator';
-  }
-  // All other business types - no badge
+  if (isPersonal && isVerified) return 'golfer';
   return null;
 };
 
@@ -113,11 +69,9 @@ export const getProfileBadge = (
  */
 export const getHubModules = (context: ActiveContext): string[] => {
   const baseModules = ['messages', 'echo', 'games', 'trips', 'schedule'];
-  
   if (hasPersonalFeatureAccess(context)) {
     return [...baseModules, 'friends'];
   }
-  
   return baseModules;
 };
 
@@ -126,29 +80,16 @@ export const getHubModules = (context: ActiveContext): string[] => {
  */
 export const getProfileTabDestination = (
   context: ActiveContext,
-  userId: string
+  userId: string,
 ): string => {
-  // Active business profile → business profile page
   if (context.activeBusinessId) {
     return `/business/${context.activeBusinessId}`;
   }
-  // Personal profile → profile page
   return `/profile/${userId}`;
 };
 
 /**
  * Check if a user is currently operating as a business
  */
-export const isOperatingAsBusiness = (context: ActiveContext): boolean => {
-  return Boolean(context.activeBusinessId);
-};
-
-/**
- * Check if the active context is a Creator-type business
- */
-export const isCreatorBusiness = (context: ActiveContext): boolean => {
-  return Boolean(
-    context.activeBusinessId && 
-    context.activeBusiness?.category === 'Creator'
-  );
-};
+export const isOperatingAsBusiness = (context: ActiveContext): boolean =>
+  Boolean(context.activeBusinessId);
