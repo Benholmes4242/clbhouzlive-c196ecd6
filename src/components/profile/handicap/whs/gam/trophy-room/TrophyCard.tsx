@@ -3,6 +3,7 @@ import { Lock } from 'lucide-react';
 import { renderBadgeIcon } from '../badgeIcons';
 import { GAM } from '../tokens';
 import { LEGEND_PALETTE, LOCKED_PALETTE, paletteForShowpiece, type RarityPalette } from './_shared/rarityPalette';
+import { rarityColor } from '@/lib/gam/visuals';
 import type { TrophyItem } from './_shared/normalizeTrophyItem';
 import {
   isShowpiece,
@@ -10,6 +11,15 @@ import {
   SHOWPIECE_LOCKED_HINT,
   shortenShowpieceCaption,
 } from './_shared/showpieces';
+
+function rgbaFrom(hex: string, a: number): string {
+  if (!hex.startsWith('#')) return hex;
+  const h = hex.replace('#', '');
+  const r = parseInt(h.slice(0, 2), 16);
+  const g = parseInt(h.slice(2, 4), 16);
+  const b = parseInt(h.slice(4, 6), 16);
+  return `rgba(${r}, ${g}, ${b}, ${a})`;
+}
 
 interface Props {
   item: TrophyItem;
