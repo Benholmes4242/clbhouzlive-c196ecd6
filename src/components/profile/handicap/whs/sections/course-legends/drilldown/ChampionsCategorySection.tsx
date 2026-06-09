@@ -2,7 +2,6 @@ import { GAM } from '../../../gam/tokens';
 import React from 'react';
 import { type LucideIcon } from 'lucide-react';
 import { ChampionsListRow } from './ChampionsListRow';
-import type { LegendWindow } from '@/lib/gam/types';
 
 interface RowData {
   rank: number;
@@ -23,9 +22,6 @@ interface ChampionsCategorySectionProps {
   rows: RowData[];
   maxVisible?: number;
   onFullLeaderboardTap: () => void;
-  /** For cross-course "also champion at Y" lookup on the rank-1 row. */
-  currentCourseId?: string;
-  window?: LegendWindow;
 }
 
 export const ChampionsCategorySection: React.FC<ChampionsCategorySectionProps> = ({
@@ -37,8 +33,6 @@ export const ChampionsCategorySection: React.FC<ChampionsCategorySectionProps> =
   rows,
   maxVisible = 4,
   onFullLeaderboardTap,
-  currentCourseId,
-  window: legendWindow,
 }) => {
   const visible = rows.slice(0, maxVisible);
   const hiddenCount = totalCount - visible.length;
@@ -58,8 +52,8 @@ export const ChampionsCategorySection: React.FC<ChampionsCategorySectionProps> =
         style={{
           fontSize: 10.5,
           fontWeight: 800,
-          color: GAM.AMBER,
-          letterSpacing: '0.16em',
+          color: GAM.DEEP_AMBER,
+          letterSpacing: '0.14em',
           textTransform: 'uppercase',
           display: 'inline-flex',
           alignItems: 'center',
@@ -79,7 +73,7 @@ export const ChampionsCategorySection: React.FC<ChampionsCategorySectionProps> =
           fontVariantNumeric: 'tabular-nums',
         }}
       >
-        {totalCount} · {holdDuration}
+        {holdDuration}
       </div>
     </div>
   );
@@ -98,9 +92,6 @@ export const ChampionsCategorySection: React.FC<ChampionsCategorySectionProps> =
           isChampion={true}
           gapToChampion={null}
           holdDuration={holdDuration}
-          userId={visible[0].userId ?? null}
-          currentCourseId={currentCourseId}
-          window={legendWindow}
         />
         <div
           style={{
@@ -133,9 +124,6 @@ export const ChampionsCategorySection: React.FC<ChampionsCategorySectionProps> =
           isChampion={i === 0}
           gapToChampion={i === 0 ? null : row.gapToChampion}
           holdDuration={i === 0 ? holdDuration : null}
-          userId={i === 0 ? row.userId ?? null : undefined}
-          currentCourseId={i === 0 ? currentCourseId : undefined}
-          window={i === 0 ? legendWindow : undefined}
         />
       ))}
       {hiddenCount > 0 && (
@@ -167,3 +155,4 @@ export const ChampionsCategorySection: React.FC<ChampionsCategorySectionProps> =
 };
 
 export default ChampionsCategorySection;
+

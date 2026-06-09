@@ -369,8 +369,6 @@ export const CourseLegendsDrilldown: React.FC<Props> = ({ selection, hideHeader 
                   holdDuration={holdDurationDisplay}
                   rows={sectionRows}
                   onFullLeaderboardTap={() => setFullLeaderboardCategory(cat)}
-                  currentCourseId={ctx.courseId}
-                  window={window}
                 />
               </div>
             );
