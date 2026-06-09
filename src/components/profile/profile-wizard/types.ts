@@ -39,6 +39,10 @@ export interface ProfileFormData {
   city: string;
   isPublic: boolean;
   gender: string;
+  /** Champions / Crown Holders appearance — 'everyone' | 'friends' | 'nobody'. */
+  championsVisibility: string;
+  /** Handicap page stats + peer comparison visibility — 'everyone' | 'friends' | 'nobody'. */
+  handicapPageVisibility: string;
 }
 
 export const STEP_TITLES: Record<WizardStep, string> = {
