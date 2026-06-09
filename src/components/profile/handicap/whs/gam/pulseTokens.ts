@@ -52,10 +52,10 @@ export const PULSE_DARK: Record<PulseKind, PulseRarity> = {
     labelBg: 'rgba(5,150,105,0.18)',
     pillBorder: 'rgba(5,150,105,0.50)',
     cardBorder: 'rgba(5,150,105,0.38)',
-    cardSweep:
-      'linear-gradient(135deg, var(--hcp-bg-1) 0%, #151B23 50%, rgba(5,150,105,0.16) 100%)',
-    outerGlow: '0 0 28px -10px rgba(5,150,105,0.42)',
+    cardSweep: 'var(--hcp-bg-1)',
+    outerGlow: null,
     Icon: Trophy,
     label: 'Claimed',
   },
+};
 };
