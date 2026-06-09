@@ -19,7 +19,7 @@ function paletteFor(item: TrophyItem) {
   if (item.kind === 'legend') return LEGEND_PALETTE;
   const hasProgress = item.earned || (item.currentValue != null && item.currentValue > 0);
   if (!hasProgress) return LOCKED_PALETTE;
-  if (isShowpiece(item.badgeId)) return paletteForShowpiece(item.reachedTier);
+  if (isShowpiece(item.badgeId)) return paletteForShowpiece(item.reachedTier, item.badgeId);
   return LEGEND_PALETTE;
 }
 
