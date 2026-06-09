@@ -118,8 +118,10 @@ export const SheetHeroGlass: React.FC<Props> = ({
   const impactColor = hasImpact
     ? handicapDelta! < 0
       ? '#34D399'
-      : AMBER
+      : '#f87171'
     : '#FFFFFF';
+  const valSize = hasImpact ? 18 : 22;
+  const ringSize = hasImpact ? 18 : 22;
   const fmtImpact = (d: number): string => {
     const r = Math.round(d * 10) / 10;
     if (r > 0) return `+${r.toFixed(1)}`;
