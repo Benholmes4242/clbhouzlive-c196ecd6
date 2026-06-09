@@ -11,7 +11,9 @@ const INK = 'var(--hcp-t-100)';
 const INK_55 = 'var(--hcp-t-60)';
 const INK_40 = 'var(--hcp-t-40)';
 const HAIRLINE = 'var(--hcp-line-2)';
-const AMBER = '#F7931E';
+const UNDER = '#FFFFFF';
+const OVER = '#f87171';
+const PAR_RING = 'rgba(255,255,255,0.18)';
 
 const FONT_GEIST =
   'Geist, system-ui, -apple-system, BlinkMacSystemFont, sans-serif';
@@ -57,14 +59,14 @@ interface VariantSpec {
 
 const SPECS: Record<Variant, VariantSpec> = {
   empty:  { shape: null,     depth: 0, stroke: HAIRLINE },
-  par:    { shape: null,     depth: 0, stroke: HAIRLINE },
-  birdie: { shape: 'circle', depth: 1, stroke: AMBER },
-  eagle:  { shape: 'circle', depth: 2, stroke: AMBER },
-  alba:   { shape: 'circle', depth: 3, stroke: AMBER },
-  hio:    { shape: 'circle', depth: 3, stroke: AMBER },
-  bogey:  { shape: 'square', depth: 1, stroke: INK },
-  doub:   { shape: 'square', depth: 2, stroke: INK },
-  triple: { shape: 'square', depth: 3, stroke: INK },
+  par:    { shape: null,     depth: 0, stroke: PAR_RING },
+  birdie: { shape: 'circle', depth: 1, stroke: UNDER },
+  eagle:  { shape: 'circle', depth: 2, stroke: UNDER },
+  alba:   { shape: 'circle', depth: 3, stroke: UNDER },
+  hio:    { shape: 'circle', depth: 3, stroke: UNDER },
+  bogey:  { shape: 'square', depth: 1, stroke: OVER },
+  doub:   { shape: 'square', depth: 2, stroke: OVER },
+  triple: { shape: 'square', depth: 3, stroke: OVER },
 };
 
 /**
@@ -227,7 +229,14 @@ export const RoundHoleCell: React.FC<Props> = ({ hole, showPar = true }) => {
             position: 'relative',
             fontSize: 'clamp(12px, 3.4vw, 15px)',
             fontWeight: 700,
-            color: strokes == null ? INK_40 : INK,
+            color:
+              strokes == null
+                ? INK_40
+                : variant === 'par'
+                ? INK_55
+                : spec.shape === 'square'
+                ? OVER
+                : UNDER,
             lineHeight: 1,
             letterSpacing: '-0.02em',
             fontVariantNumeric: 'tabular-nums',
