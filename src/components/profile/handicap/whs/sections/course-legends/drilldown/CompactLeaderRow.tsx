@@ -34,7 +34,7 @@ export const CompactLeaderRow: React.FC<Props> = ({ row }) => {
   const isNew = daysSince(row.attained_at) < NEW_BADGE_DAYS;
 
   const rowBg = isYou
-    ? 'rgba(247,147,30,0.10)'
+    ? 'rgba(255,255,255,0.08)'
     : isChampion
       ? 'var(--hcp-bg-2)'
       : 'var(--hcp-bg-1)';
@@ -75,19 +75,6 @@ export const CompactLeaderRow: React.FC<Props> = ({ row }) => {
         fontFamily: GAM.FONT_GEIST,
       }}
     >
-      {isChampion && (
-        <div
-          aria-hidden
-          style={{
-            position: 'absolute',
-            left: 0,
-            top: 0,
-            bottom: 0,
-            width: 3,
-            background: GAM.GOLD,
-          }}
-        />
-      )}
 
       {isChampion ? (
         <div style={{ display: 'flex', justifyContent: 'flex-end', alignItems: 'center', lineHeight: 0 }} aria-label="Champion">
