@@ -3,6 +3,7 @@ import { GAM } from '../../tokens';
 import { relativeTime } from '@/lib/gam/visuals';
 import { useFriendsWhoEarnedBadge } from '@/hooks/gam/useFriendsWhoEarnedBadge';
 import { useFriendsWhoHeldLegend } from '@/hooks/gam/useFriendsWhoHeldLegend';
+import { MATERIAL_PALETTES } from '../_shared/rarityPalette';
 import type { LegendCategory } from '@/lib/gam/types';
 
 interface Props {
