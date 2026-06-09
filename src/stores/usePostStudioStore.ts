@@ -2,7 +2,7 @@
 // Zustand store so any component can trigger it without prop drilling
 
 import { create } from 'zustand';
-import type { StudioActorType } from '@/components/post-studio/types';
+import type { StudioActorType } from '@/components/post-composer/types';
 
 interface PostStudioStoreState {
   isOpen: boolean;
