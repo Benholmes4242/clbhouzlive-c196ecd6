@@ -80,7 +80,7 @@ export const ChampionsListRow: React.FC<ChampionsListRowProps> = ({
         alignItems: 'center',
         padding: '10px 16px',
         background: rowBg,
-        boxShadow: 'inset 0 -0.5px 0 rgba(15,23,42,0.07)',
+        boxShadow: 'inset 0 -0.5px 0 var(--hcp-line)',
       }}
     >
       {isChampion && (
