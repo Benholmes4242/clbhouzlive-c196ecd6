@@ -102,7 +102,7 @@ export const FullCourseLeaderboardSheet: React.FC<Props> = ({
         <div
           style={{
             display: 'flex',
-            gap: 6,
+            gap: 7,
             overflowX: 'auto',
             padding: '12px 16px 14px',
             background: '#F8FAFC',
@@ -125,9 +125,9 @@ export const FullCourseLeaderboardSheet: React.FC<Props> = ({
                   flexShrink: 0,
                   display: 'inline-flex',
                   alignItems: 'center',
-                  gap: 6,
-                  padding: '7px 12px',
-                  borderRadius: 9,
+                  gap: 7,
+                  padding: '6px 7px 6px 11px',
+                  borderRadius: 999,
                   background: isActive ? 'rgba(15,23,42,0.06)' : 'rgba(15,23,42,0.03)',
                   border: isActive
                     ? '1px solid rgba(15,23,42,0.22)'
@@ -141,7 +141,7 @@ export const FullCourseLeaderboardSheet: React.FC<Props> = ({
                   letterSpacing: '0.01em',
                 }}
               >
-                <Icon size={11} strokeWidth={2.2} />
+                <Icon size={11} strokeWidth={2.4} />
                 {cat.short}
               </button>
             );
