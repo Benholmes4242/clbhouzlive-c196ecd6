@@ -18,9 +18,11 @@ import { useHandicapTrend90d, type HandicapTrend90dDirection } from '@/hooks/use
 import { analyticsEvents } from '@/utils/analyticsEvents';
 
 const WHITE = '#FFFFFF';
-const WHITE_HAIRLINE = 'rgba(255,255,255,0.22)';
+// Match the PostingAsPill (avatar dropdown) borders so the two header
+// controls share the same hairline weight/color.
+const WHITE_HAIRLINE = 'rgba(255,255,255,0.10)';
 const DARK_INK = '#0F172A';
-const DARK_HAIRLINE = 'rgba(15,23,42,0.18)';
+const DARK_HAIRLINE = 'var(--cm-border)';
 const AMBER = '#F7931E';
 const SEASON_GREEN = '#10B981';
 const CRIMSON = '#EF4444';
