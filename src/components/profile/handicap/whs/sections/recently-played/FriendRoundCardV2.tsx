@@ -61,12 +61,7 @@ export const FriendRoundCardV2: React.FC<Props> = ({
   const isCounter = activity.is_counter;
   const playedDate = fmtAbsoluteDate(activity.last_round_played_at);
 
-  const diffColor =
-    diff != null && diff > 0
-      ? 'var(--hcp-bad)'
-      : diff != null && diff < 0
-        ? 'var(--hcp-good-deep)'
-        : 'var(--hcp-t-100)';
+  const diffColor = 'var(--hcp-t-100)';
 
   const ringColor = isCounter
     ? 'rgba(5,150,105,0.55)'
