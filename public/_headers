@@ -1,2 +1,24 @@
+# HTML entry points: never cache — always fetch the current index.html so it
+# references the current (hashed) JS/CSS chunks. Prevents "App couldn't start"
+# after deploys that change chunk hashes.
+/
+  Cache-Control: no-cache, no-store, must-revalidate
+
+/index.html
+  Cache-Control: no-cache, no-store, must-revalidate
+
+# Hashed build assets: safe to cache forever (filename changes on content change).
+/assets/*
+  Cache-Control: public, max-age=31536000, immutable
+
+# Service-worker-style / dynamic JSON that must stay fresh.
+/manifest.json
+  Cache-Control: no-cache
+
+/sw.js
+  Cache-Control: no-cache, no-store, must-revalidate
+
+# Deep-link association file (keep existing content-type, add no-cache).
 /.well-known/apple-app-site-association
   Content-Type: application/json
+  Cache-Control: no-cache

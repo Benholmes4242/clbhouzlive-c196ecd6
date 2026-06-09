@@ -4,11 +4,11 @@ import './utils/bootTimeline';
 import './utils/discoverTimeline';
 // Log app start immediately
 import { logAppStart } from './utils/bootTimeline';
-logAppStart();
+try { logAppStart(); } catch {}
 
 // Cold start manifest warming - prefetch first video manifest ASAP
 import { ManifestWarmer } from './utils/video/ManifestWarmer';
-ManifestWarmer.warmOnStartup();
+try { ManifestWarmer.warmOnStartup(); } catch {}
 
 // Fix 4: Eagerly load HLS.js so it's ready when first video needs it
 import('hls.js').catch(() => {});
