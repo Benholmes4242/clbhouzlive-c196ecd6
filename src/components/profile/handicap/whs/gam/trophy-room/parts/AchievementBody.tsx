@@ -116,6 +116,7 @@ export const AchievementBody: React.FC<Props> = ({ item, viewerUserId }) => {
               <TierRow key={t.tier} tier={t} metric={item.counterMetric} isShowpiece={isShowpiece(item.badgeId)} />
             ))}
           </div>
+          <TierKey />
         </div>
       )}
 
