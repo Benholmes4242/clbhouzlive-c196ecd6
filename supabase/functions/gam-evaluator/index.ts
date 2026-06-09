@@ -475,33 +475,35 @@ async function recomputeTop100Milestones(userId: string) {
     distinctByList.get(slug)!.add((row as any).course_id);
   }
 
-  // (b) WHS-PLAYED Top 100 courses (played but maybe never rated).
-  // whs_scores.connection_id → whs_connections.user_id (no direct user_id column).
-  // Fetch user's connection ids first, then membership rows joined to whs_scores by those ids.
-  const { data: connRows, error: connErr } = await supabase
-    .from("whs_connections")
-    .select("id")
-    .eq("user_id", userId);
-  if (connErr) {
-    console.error("[recomputeTop100Milestones] connections query error", connErr);
+  // (b) WHS-PLAYED Top 100 courses — bridged via whs_courses + whs_course_aliases by name.
+  // whs_scores.course_id is a whs_courses id, NOT a golf_courses id; the two only bridge
+  // through whs_course_aliases (matched by lower(trim(name))). PostgREST can't express
+  // that join, so we use a small SQL helper RPC.
+  const { data: playedGolfCourseRows, error: playedErr } = await supabase.rpc(
+    "user_whs_played_golf_course_ids",
+    { p_user_id: userId },
+  );
+  if (playedErr) {
+    console.error("[recomputeTop100Milestones] whs-played query error", playedErr);
   }
-  const connectionIds = (connRows ?? []).map((r: any) => r.id).filter(Boolean);
+  const playedGolfCourseIds = (playedGolfCourseRows ?? [])
+    .map((r: any) => r.course_id)
+    .filter(Boolean);
 
-  if (connectionIds.length > 0) {
-    const { data: playedRows, error: playedErr } = await supabase
+  if (playedGolfCourseIds.length > 0) {
+    const { data: memRows, error: memErr } = await supabase
       .from("course_top100_memberships")
       .select(`
         course_id,
-        top100_lists!inner ( slug, is_active ),
-        whs_scores!inner ( connection_id )
+        top100_lists!inner ( slug, is_active )
       `)
       .eq("top100_lists.is_active", true)
-      .in("whs_scores.connection_id", connectionIds);
+      .in("course_id", playedGolfCourseIds);
 
-    if (playedErr) {
-      console.error("[recomputeTop100Milestones] played query error", playedErr);
+    if (memErr) {
+      console.error("[recomputeTop100Milestones] membership query error", memErr);
     }
-    for (const row of playedRows ?? []) {
+    for (const row of memRows ?? []) {
       const slug = (row as any).top100_lists?.slug;
       if (!slug || !TOP_100_METRIC_BY_SLUG[slug]) continue;
       if (!distinctByList.has(slug)) distinctByList.set(slug, new Set());
