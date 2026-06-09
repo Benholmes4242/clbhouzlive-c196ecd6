@@ -20,6 +20,7 @@ export interface UserBadge extends BadgeDefinition {
   counter_value: number | null;
   counter_tier: number | null;
   earned_at: string | null;
+  first_seen_at?: string | null;
   is_earned: boolean;
   display_order: number;
 }
