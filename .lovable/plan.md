@@ -1,55 +1,92 @@
-## Brief 3 — Phased UI build plan
+# Unified Edit Profile + Handicap Connection — Rebuild Plan
 
-Brief 3 specifies 11 new surfaces, 4 modifications, and 130+ acceptance tests. This is multi-week work — must be phased. Brief 3 has been copied to `BRIEF_3_UX_FLOWS.md` at repo root as the working contract.
+Implements the rebuild brief end-to-end. Replaces the 3-step wizard and quick-edit page with one single-scroll `/edit-profile`, adds one canonical handicap connect sheet, and introduces a separate manual handicap column (fixing the bug where the profile form overwrites the WHS-synced handicap).
 
-### Phase plan (recommended sequencing)
+---
 
-**Phase 1 — Today tab additions (this PR)**
-The minimum coherent first slice. Touches `/handicap` only.
-- §3 Recent Unlocks strip (inline + card skeleton + empty/loading/error)
-- §4 Legend Status card (inline + tap → sheet)
-- §5 Your Legend Status sheet (modal, grouped Legend / Top 3 / Top 10)
-- §6 Leagues card (inline + promote/relegate bar visual signature)
-- §7 Leagues sheet (full pod standings + How It Works)
-- Wire all three into the Today tab in the order from AT-TODAY-01
+## 1. Database (runs first, separate approval)
 
-**Phase 2 — Streaks expansion**
-- §8.1 Extend grid from "Three Runs to Beat" to 7-streak grid with Freeze indicator
-- §8.2 All Streaks sheet
+Migration on `public.user_profiles`:
+- Add `manual_handicap_index numeric NULL` with a comment describing it as the user-entered fallback used only when no active WHS connection exists.
+- No backfill; no change to `eg_handicap_index`.
 
-**Phase 3 — Rivalry deep view**
-- §9 New route `/handicap/rivalry/:rivalId` (full page)
-- Make existing Friends-tab rivalry cards tappable
+After approval, the Supabase types regenerate automatically and `manual_handicap_index` becomes available to the form.
 
-**Phase 4 — Course Legends tab**
-- §10 Rename "Leaderboard" → "Legends" on Course Detail
-- 5 category cards, top 5 → top 10 expand, "Where You Stand" footer
+## 2. Display resolution helper
 
-**Phase 5 — Achievements sheet rework**
-- §11 Rarity pills, In Progress + Recent Unlocks sections, share button, View/Compare toggle for friend mode
-- Friend-view layout rules from AT-TODAY-02/03
+New `src/lib/handicap/resolveHandicap.ts` exporting `resolveDisplayHandicap({ egHandicapIndex, manualHandicapIndex, hasWhsConnection })`:
+- Returns `{ value, source: 'whs' | 'manual' | 'none' }`.
+- WHS wins whenever a connection is active and `eg_handicap_index` is present; otherwise falls back to manual; otherwise `none`.
 
-**Phase 6 — Notifications & Launch**
-- §12 Bell icon + inbox sheet
-- §13 Launch sheet (one-off post-launch modal)
-- §14 Push deep-link routing (in-app toast + sheet auto-open from query param)
+Wire into:
+- New `/edit-profile` handicap row (Part 5).
+- `GlassmorphicProfileCard` and `HandicapSummaryCard` handicap displays (swap direct `eg_handicap_index` read for the helper). Leaderboard membership keeps its existing WHS-only logic — manual-only users continue to show on profile but not on ranked leaderboards.
 
-Out of this build: §15 launch-sequence ops scripts (admin), §16 replay (admin), §17/§18 are continuous QA criteria.
+## 3. Form model fix (the bug fix)
 
-### What I need from you before writing code
+- `ProfileFormData.handicapIndex` stays as the form string but now maps to the **manual** column. Inline comment added.
+- `useProfileForm.makeInitial`: initialise `handicapIndex` from `profile.manual_handicap_index` (not `eg_handicap_index`).
+- `useProfileSave`: write `manual_handicap_index: parseHcpFormString(form.handicapIndex)`. The form NEVER writes `eg_handicap_index` again — that column is owned exclusively by the WHS sync/connect-whs edge function.
 
-**1. Phase 1 scope confirmation.** Phase 1 alone is 5 new components, 1 modal hook for Legend Sheet, 1 modal hook for Leagues sheet, plus Today-tab wiring. Realistic for a single build pass but already a large diff (~8 new files, ~600 LOC). OK to proceed with all of Phase 1, or trim further to just Recent Unlocks + Legend Status (defer Leagues to its own pass)?
+## 4. One canonical handicap connect sheet
 
-**2. RPC availability check.** The brief assumes these RPCs exist from Brief 1: `get_user_legend_status`, `get_my_pod_standings`, `get_my_streaks`, `get_rivalry_breakdown`, `get_course_legends`, `get_user_achievements_for_viewer`, `gam_mark_badge_seen`. If any are missing, the components will be built against the contract but render empty/error states until the RPCs land. Should I:
-   - (a) Build UI against the contract regardless (graceful empty states), or
-   - (b) Verify each RPC exists first, flag missing ones, build only what's backed?
+New `src/components/profile/handicap/HandicapConnectSheet.tsx`:
+- Props: `{ open, onClose, userId, onConnected? }`.
+- Uses `useWhsConnection(userId)`.
+- No connection → renders `WhsConnectScreen` (the existing self-contained country picker → England Golf form → syncing → welcome flow) inside the bottom-sheet shell. On success, invalidates the WHS query keys (reuses `WhsConnectionSheet`'s `invalidateAll` pattern) and calls `onConnected`.
+- Connected → renders the synced/manage body lifted verbatim from `WhsConnectionSheet` (SyncedBody + Disconnect/Delete confirm sheets).
+- Header: MiniFlag + "England Golf" eyebrow + title ("Connect handicap" / "Connection details").
 
-**3. Data shapes.** Brief 3 describes UX but not return shapes. For Phase 1 I will design hooks against the AT copy (e.g. `useLegendStatus()` returns `{ legendCount, top3Count, top10Count, topTitles: [{category, courseName, courseId}] }`) and adapt to actual RPC output once verified. OK?
+Rewire three entry points to open this sheet:
+1. `SettingsPageV2` — swap `WhsConnectionSheet` for `HandicapConnectSheet`; connects in-sheet (no `/handicap` detour).
+2. New `/edit-profile` handicap row (Part 5).
+3. Onboarding — inherits from #2 because the unified edit page IS the onboarding surface.
 
-### Technical notes
-- All new surfaces use existing Dispatch tokens (white surfaces, 0.5px hairlines, 3px rule markers, amber #F7931E, slate #0F172A, Geist tabular-nums for numbers).
-- Sheets use the existing comments-sheet pattern (36×4px handle, forced light mode where applicable).
-- Avatars 34% squircle.
-- New route `/handicap/rivalry/:rivalId` will be added in Phase 3.
+`/handicap` page stays intact (still hosts the full `WhsConnectScreen` + `HandicapDashboard`).
 
-Reply with answers to 1, 2, 3 and I'll start Phase 1.
+## 5. Unified Edit Profile page
+
+New `src/pages/EditProfile.tsx`: single-scroll page backed by `useProfileForm` + `useProfileSave`, Activity-style header, inline Save at end. Composes existing `edit-v2/` sections:
+- Header photo + profile photo cards.
+- Identity (display name, locked username).
+- Location.
+- Golf group (home club, additional clubs, college selector, golf info) + the smart Handicap row (below).
+- About group (bio + websites).
+- Collapsible social links.
+- Privacy.
+
+**Smart Handicap row** (in the GOLF SectionCard), three states:
+- (a) WHS connected → "Official Handicap" with synced value, green "Synced with England Golf" pill, manage row that opens `HandicapConnectSheet`, "View full stats ›" link to `/handicap`. Manual input hidden (but stored value preserved in form).
+- (b) Not connected, has manual → `HandicapInput` (editable) + prominent "Connect official handicap" button.
+- (c) Not connected, no handicap → primary "Connect official handicap" CTA + helper copy + secondary "or enter manually" reveals `HandicapInput`.
+- Helper copy under connect CTA: "Connect your official WHS handicap to appear on leaderboards, feature in course Champions, and unlock your full stats dashboard."
+
+**First-login gating** (returning users: none):
+- `isNewUser = !profile?.has_completed_onboarding`.
+- Pass `{ requireOnboardingFields: isNewUser }` to `useProfileForm`; require Display Name + Gender. Handicap is never required.
+
+## 6. Routing + retire old pages
+
+- `App.tsx`: `/edit-profile` → new `EditProfile`; delete `/quick-edit-profile` route + import.
+- `useEditProfileRoute.ts`: return `'/edit-profile'` always.
+- `globalHeaderRules.ts`, `PageRoot.tsx`, `AuthWrapper.tsx`, `CompactHeader.tsx`: remove `/quick-edit-profile` references; keep `/edit-profile`.
+- Delete: `QuickEditProfilePage.tsx`, old `EditProfilePage.tsx` wrapper, `PersonalProfileWizard.tsx`, `WizardHeader.tsx`, `WizardProgress.tsx`, `steps/PhotosIdentityStep.tsx`, `steps/GolfInfoStep.tsx`, `steps/AboutStep.tsx`. Remove `PersonalProfileWizard` export from `profile-wizard/index.ts`.
+- Keep: business wizard + steps, `types.ts`, `useProfileForm`, `useProfileSave`, all of `edit-v2/`, `WhsConnectScreen`, `HandicapDashboard`, `useWhsConnection`, `callConnectWhs`.
+
+## Constraints
+
+- Edit-profile form never writes `eg_handicap_index` again.
+- Manual handicap is preserved when WHS connects (fallback on disconnect).
+- No changes to `connect-whs` / `disconnect-whs` edge functions or the WHS sync pipeline.
+- No changes to the business wizard.
+- No `ProfileFormData` fields dropped.
+
+## Ship order
+
+1. Run Part 1 migration (separate approval step).
+2. After types regenerate: ship Parts 2–6 together (helper, form fixes, sheet, page, routing, deletes).
+3. Verify: `grep -rn "quick-edit-profile" src` returns zero; `useProfileSave` no longer writes `eg_handicap_index`; tsc clean.
+
+## Open question
+
+Brief notes leaderboards stay WHS-only by default but flags this for confirmation. **Default chosen: WHS-only for ranked leaderboards; manual handicap shows on profile only.** Flag in commit message; revisit if you want manual users included.
