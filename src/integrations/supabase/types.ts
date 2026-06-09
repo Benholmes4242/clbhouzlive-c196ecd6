@@ -19330,7 +19330,7 @@ export type Database = {
         }[]
       }
       get_course_legends: {
-        Args: { p_course_id: string }
+        Args: { p_course_id: string; p_viewer_id?: string }
         Returns: {
           attained_at: string
           category: string

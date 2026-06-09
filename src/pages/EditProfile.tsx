@@ -27,6 +27,7 @@ import { PrivacySection } from '@/components/profile/edit-v2/PrivacySection';
 import { SocialLinksSection } from '@/components/profile/edit-v2/SocialLinksSection';
 import { DISPLAY_NAME_MAX, USERNAME_MAX } from '@/components/profile/profile-wizard/types';
 import HandicapConnectSheet from '@/components/profile/handicap/HandicapConnectSheet';
+import { HandicapVisibilityControl, type HandicapVisibility } from '@/components/profile/edit-v2/HandicapVisibilityControl';
 
 const GEIST = 'Geist, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif';
 const INK = '#0F172A';
@@ -299,6 +300,15 @@ export default function EditProfile() {
               onToggleManualEntry={() => setShowManualEntry((s) => !s)}
               onOpenConnect={() => setConnectSheetOpen(true)}
               onViewFullStats={() => navigate('/handicap')}
+            />
+          </SectionCard>
+
+          <SectionCard>
+            <HandicapVisibilityControl
+              championsVisibility={(form.championsVisibility as HandicapVisibility) || 'everyone'}
+              handicapPageVisibility={(form.handicapPageVisibility as HandicapVisibility) || 'everyone'}
+              onChampionsChange={(v) => setField('championsVisibility', v)}
+              onHandicapPageChange={(v) => setField('handicapPageVisibility', v)}
             />
           </SectionCard>
 

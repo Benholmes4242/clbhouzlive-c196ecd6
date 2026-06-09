@@ -84,6 +84,8 @@ export function useProfileSave(userId: string) {
           country: form.country.trim(),
           city: form.city.trim(),
           gender: form.gender || null,
+          champions_visibility: form.championsVisibility || 'everyone',
+          handicap_page_visibility: form.handicapPageVisibility || 'everyone',
           has_completed_onboarding: true,
           username_is_custom: true,
           updated_at: new Date().toISOString(),

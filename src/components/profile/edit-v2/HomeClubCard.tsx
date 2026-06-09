@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from 'react';
-import { Search, X, MapPin } from 'lucide-react';
+import { Search, X, MapPin, Check } from 'lucide-react';
 import { useClubSearch } from '@/hooks/useClubSearch';
 import { VisibilityDropdown } from './VisibilityDropdown';
 import { SectionEyebrow } from '@/components/ui/SectionEyebrow';
@@ -12,6 +12,9 @@ interface Props {
   onVisibilityChange: (v: string) => void;
 }
 
+const INK = '#0F172A';
+const GREEN = '#059669';
+
 export function HomeClubCard({
   clubName, clubId, visibility,
   onClubSelect, onVisibilityChange,
@@ -20,6 +23,11 @@ export function HomeClubCard({
   const [isOpen, setIsOpen] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
   const { data: clubs = [], loading: isSearching } = useClubSearch(query);
+
+  // Keep query in sync when the parent updates clubName (e.g. after hydration).
+  useEffect(() => {
+    setQuery(clubName);
+  }, [clubName]);
 
   useEffect(() => {
     const handler = (e: MouseEvent) => {
@@ -31,12 +39,13 @@ export function HomeClubCard({
     return () => document.removeEventListener('mousedown', handler);
   }, []);
 
-  // Auto-select if search returns exactly one result
+  // Auto-select if search returns exactly one result.
   useEffect(() => {
-    if (!isSearching && clubs.length === 1 && query.length >= 2 && isOpen) {
+    if (!isSearching && clubs.length === 1 && query.length >= 2 && isOpen && !clubId) {
       handleSelect(clubs[0].name, clubs[0].id);
     }
-  }, [clubs, isSearching, query, isOpen]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [clubs, isSearching, query, isOpen, clubId]);
 
   const handleSelect = (name: string, id: string | null) => {
     setQuery(name);
@@ -49,6 +58,43 @@ export function HomeClubCard({
     setIsOpen(false);
     onClubSelect('', null);
   };
+
+  // CONFIRMED CHIP: a real club has been chosen from the dropdown.
+  if (clubId) {
+    return (
+      <div className="space-y-3">
+        <div style={{ marginBottom: 8 }}>
+          <SectionEyebrow label="Home Club" />
+        </div>
+        <div
+          className="w-full flex items-center justify-between bg-[#F8FAFC] border border-border/60 rounded-[11px] px-3.5 py-3 min-h-[48px]"
+          style={{ borderColor: 'rgba(15,23,42,0.10)' }}
+        >
+          <div className="flex items-center gap-2.5 min-w-0">
+            <MapPin size={16} className="shrink-0" style={{ color: INK }} />
+            <span className="truncate text-[15px] font-medium" style={{ color: INK }}>
+              {clubName}
+            </span>
+            <Check size={14} strokeWidth={2.5} style={{ color: GREEN, flexShrink: 0 }} />
+          </div>
+          <button
+            type="button"
+            onClick={handleClear}
+            className="text-[12px] font-semibold uppercase tracking-[0.08em] px-2 min-h-[44px] flex items-center"
+            style={{ color: '#64748B' }}
+            aria-label="Change home club"
+          >
+            Change
+          </button>
+        </div>
+
+        <div className="flex items-center justify-between">
+          <p className="text-[12px] text-muted-foreground/70">Visibility</p>
+          <VisibilityDropdown value={visibility as any} onChange={onVisibilityChange as any} />
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-3">
@@ -64,9 +110,8 @@ export function HomeClubCard({
             onChange={(e) => { setQuery(e.target.value); setIsOpen(true); }}
             onFocus={() => setIsOpen(true)}
             onBlur={() => {
-              if (query && query.trim().length > 0) {
-                onClubSelect(query.trim(), null);
-              }
+              // IMPORTANT: do NOT persist typed-but-unselected text here.
+              // A real selection only happens via handleSelect (dropdown row).
               setTimeout(() => setIsOpen(false), 150);
             }}
             placeholder="Search for your home club"
