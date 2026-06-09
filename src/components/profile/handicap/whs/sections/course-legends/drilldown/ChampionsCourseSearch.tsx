@@ -79,7 +79,7 @@ export const ChampionsCourseSearch: React.FC<Props> = ({ currentCourseId }) => {
             fontFamily: FONT,
             fontSize: 11,
             fontWeight: 600,
-            color: GAM.DEEP_AMBER,
+            color: 'var(--hcp-t-100)',
             letterSpacing: '-0.005em',
           }}
         >
