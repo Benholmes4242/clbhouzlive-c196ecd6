@@ -125,9 +125,9 @@ export const CourseLegendsDrilldown: React.FC<Props> = ({ selection, hideHeader 
   const ctx = selection;
 
 
-  const { data, isLoading, isError, refetch } = useCourseLegends(ctx.courseId);
-  const { data: meta } = useCourseMeta(ctx.courseId);
   const { activeActor } = useActiveActor();
+  const { data, isLoading, isError, refetch } = useCourseLegends(ctx.courseId, activeActor?.id);
+  const { data: meta } = useCourseMeta(ctx.courseId);
   const [window, setWindow] = useState<LegendWindow>('90d');
   const [courseHeaderImage, setCourseHeaderImage] = useState<string | null>(null);
   const [fullLeaderboardCategory, setFullLeaderboardCategory] =
