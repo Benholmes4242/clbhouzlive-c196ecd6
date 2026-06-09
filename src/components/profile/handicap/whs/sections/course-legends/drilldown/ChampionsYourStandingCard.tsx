@@ -41,8 +41,8 @@ export const ChampionsYourStandingCard: React.FC<ChampionsYourStandingCardProps>
     <div
       style={{
         margin: '16px 18px',
-        background: 'var(--hcp-champ-card-bg, linear-gradient(135deg, #FFFAEF, #FFF6E3))',
-        border: '1px solid var(--hcp-champ-wash-border, rgba(247,147,30,0.22))',
+        background: 'var(--hcp-bg-1)',
+        border: '1px solid var(--hcp-line)',
         borderRadius: 16,
         padding: 18,
         position: 'relative',
