@@ -85,10 +85,10 @@ const OwnerViewRivalries: React.FC<{ userId: string }> = ({ userId }) => {
       {hasFilled && (
         <p
           style={{
-            margin: '6px 20px 0',
+            margin: '-4px 16px 12px',
             fontSize: 11.5,
             lineHeight: 1.45,
-            color: 'var(--hcp-t-40)',
+            color: 'var(--hcp-t-60)',
             fontFamily: 'Geist, system-ui, sans-serif',
           }}
         >
