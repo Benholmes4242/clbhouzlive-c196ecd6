@@ -152,9 +152,6 @@ export function StackedAvatars({
   const maxVisible = variant === 'chaser' ? 4 : 3;
   const visible = players.slice(0, maxVisible);
   const total = players.length;
-  const ring = variant === 'leader'
-    ? '0 0 0 2px #F8FAFC'
-    : '0 0 0 1.5px #F8FAFC';
   return (
     <div style={{ display: 'flex', alignItems: 'center' }}>
       {visible.map((p, i) => (
@@ -176,7 +173,7 @@ export function StackedAvatars({
             objectFit: 'cover',
             objectPosition: 'center 18%',
             background: 'linear-gradient(135deg, #CBD5E1 0%, #94A3B8 100%)',
-            boxShadow: ring,
+            border: 'none',
           }}
         />
       ))}
