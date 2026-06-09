@@ -36,7 +36,6 @@ export const CinemaFriendEyebrow: React.FC<Props> = ({ activity, showLowestRound
             height: 26,
             borderRadius: '34%',
             overflow: 'hidden',
-            border: '0.5px solid rgba(255,255,255,0.25)',
             background: 'rgba(15,23,42,0.06)',
             flexShrink: 0,
             display: 'flex',
