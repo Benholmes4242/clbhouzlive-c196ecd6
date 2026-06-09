@@ -165,41 +165,72 @@ const TierKey: React.FC = () => {
       >
         Tiered achievements climb through five materials as you progress:
       </div>
-      <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
         {tiers.map((n) => {
           const p = MATERIAL_PALETTES[n];
           const name = p.label.charAt(0) + p.label.slice(1).toLowerCase();
           return (
-            <div key={n} style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+            <div key={n} style={{ display: 'flex', alignItems: 'center', gap: 11 }}>
+              {/* faceted gem swatch (rotated square w/ gradient + soft glow) */}
               <span
                 aria-hidden
                 style={{
-                  width: 12,
-                  height: 12,
-                  borderRadius: 3,
-                  background: p.color,
+                  width: 16,
+                  height: 16,
+                  background: `linear-gradient(135deg, ${p.color} 0%, ${p.color} 45%, ${p.border} 100%)`,
                   border: `1px solid ${p.border}`,
+                  borderRadius: 4,
+                  transform: 'rotate(45deg)',
                   flexShrink: 0,
+                  boxShadow: `0 0 8px -1px ${p.color}`,
                 }}
               />
+              {/* name — fixed width so bars align */}
               <span
                 style={{
-                  fontSize: 12,
+                  fontSize: 12.5,
                   fontWeight: 700,
                   color: 'var(--hcp-t-100)',
                   letterSpacing: '0.02em',
+                  width: 72,
+                  flexShrink: 0,
                 }}
               >
                 {name}
               </span>
+              {/* material progress bar — fills proportionally to tier (1/5 .. 5/5) */}
               <span
                 style={{
-                  fontSize: 11,
-                  color: 'var(--hcp-t-60)',
+                  flex: 1,
+                  height: 4,
+                  borderRadius: 2,
+                  background: 'rgba(255,255,255,0.06)',
+                  overflow: 'hidden',
+                }}
+              >
+                <span
+                  style={{
+                    display: 'block',
+                    height: '100%',
+                    width: `${(n / 5) * 100}%`,
+                    background: p.color,
+                    opacity: 0.9,
+                    borderRadius: 2,
+                  }}
+                />
+              </span>
+              {/* level tag */}
+              <span
+                style={{
+                  fontSize: 10.5,
+                  fontWeight: 700,
+                  color: 'var(--hcp-t-40)',
+                  letterSpacing: '0.06em',
+                  flexShrink: 0,
                   ...GAM.TABULAR,
                 }}
               >
-                Level {n}
+                LVL {n}
               </span>
             </div>
           );
