@@ -59,8 +59,6 @@ export function useProfileSave(userId: string) {
           header_photo_url: headerPhotoUrl,
           home_club: form.homeClubName,
           primary_club_id: form.primaryClubId,
-          college_normalized: form.collegeNormalized,
-          college_id: form.collegeId,
           // Write to manual_handicap_index ONLY. eg_handicap_index is owned
           // exclusively by the WHS connect/sync edge functions.
           manual_handicap_index: parseHcpFormString(form.handicapIndex),
@@ -109,15 +107,6 @@ export function useProfileSave(userId: string) {
           .eq('user_profile_id', userId);
       }
 
-      // 5. Sync college follow
-      if (form.collegeId) {
-        await supabase
-          .from('user_followed_colleges')
-          .upsert(
-            { user_id: userId, normalized_name: form.collegeId },
-            { onConflict: 'user_id,normalized_name' }
-          );
-      }
 
       // 6. Invalidate all relevant query keys — await to prevent stale data
       await Promise.all(

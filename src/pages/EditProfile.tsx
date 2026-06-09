@@ -19,7 +19,7 @@ import { HeaderPhotoCard } from '@/components/profile/edit-v2/HeaderPhotoCard';
 import { ProfilePhotoCard } from '@/components/profile/edit-v2/ProfilePhotoCard';
 import { HomeClubCard } from '@/components/profile/edit-v2/HomeClubCard';
 import { AdditionalClubsList } from '@/components/profile/edit-v2/AdditionalClubsList';
-import { CollegeSelector } from '@/components/profile/edit-v2/CollegeSelector';
+
 import { HandicapInput } from '@/components/profile/edit-v2/HandicapInput';
 import { BioWebsitesSection } from '@/components/profile/edit-v2/BioWebsitesSection';
 import { LocationSection } from '@/components/profile/edit-v2/LocationSection';
@@ -312,16 +312,6 @@ export default function EditProfile() {
             />
           </SectionCard>
 
-          <SectionCard>
-            <CollegeSelector
-              collegeName={form.collegeNormalized}
-              collegeId={form.collegeId}
-              onSelect={(name, id) => {
-                setField('collegeNormalized', name);
-                setField('collegeId', id);
-              }}
-            />
-          </SectionCard>
         </div>
 
         {/* ── About + Privacy ─────────────────────────────── */}
