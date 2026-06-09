@@ -19,7 +19,6 @@ export const RecentlyActiveItem: React.FC<Props> = ({ entry, isActive: _isActive
   const isOnApp = entry.is_clbhouz_user;
 
   const hcpStr = fmtHcp(entry.friend_handicap_index);
-  const isPlusHcp = typeof hcpStr === 'string' && hcpStr.trim().startsWith('+');
 
   const relative = entry.last_round_played_at
     ? fmtRelative(entry.last_round_played_at, { compact: false })
@@ -77,7 +76,7 @@ export const RecentlyActiveItem: React.FC<Props> = ({ entry, isActive: _isActive
           marginBottom: 0,
           fontSize: 13,
           fontWeight: 800,
-          color: isPlusHcp ? 'var(--hcp-bad)' : 'var(--hcp-t-100)',
+          color: 'var(--hcp-t-100)',
           fontVariantNumeric: 'tabular-nums',
           letterSpacing: '-0.02em',
           lineHeight: 1,
