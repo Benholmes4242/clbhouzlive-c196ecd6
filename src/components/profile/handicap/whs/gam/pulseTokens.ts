@@ -40,9 +40,8 @@ export const PULSE_DARK: Record<PulseKind, PulseRarity> = {
     labelBg: 'rgba(255,255,255,0.10)',
     pillBorder: 'rgba(255,255,255,0.30)',
     cardBorder: 'rgba(255,255,255,0.14)',
-    cardSweep:
-      'linear-gradient(135deg, var(--hcp-bg-1) 0%, #151B23 60%, rgba(255,255,255,0.04) 100%)',
-    outerGlow: '0 0 32px -12px rgba(255,255,255,0.18)',
+    cardSweep: 'var(--hcp-bg-1)',
+    outerGlow: null,
     Icon: Target,
     label: 'Chase',
   },
