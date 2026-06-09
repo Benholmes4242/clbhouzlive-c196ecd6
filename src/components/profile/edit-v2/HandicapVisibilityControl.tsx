@@ -123,7 +123,6 @@ export function HandicapVisibilityControl({
       <Block
         title="Course Champions"
         description="Show your name on Champions / Crown Holders rows in course details."
-        Icon={Trophy}
         value={championsVisibility}
         onChange={onChampionsChange}
       />
@@ -131,7 +130,6 @@ export function HandicapVisibilityControl({
       <Block
         title="Handicap Page & Comparisons"
         description="Show your handicap stats and peer comparisons to others on the handicap page."
-        Icon={Sigma}
         value={handicapPageVisibility}
         onChange={onHandicapPageChange}
       />
