@@ -183,7 +183,7 @@ const SectionHero: React.FC<{
           padding: '12px 14px',
         }}
       >
-        <Search size={16} color={GOLD} />
+        <Search size={16} color="rgba(255,255,255,0.55)" />
         <input
           ref={searchInputRef}
           type="text"
