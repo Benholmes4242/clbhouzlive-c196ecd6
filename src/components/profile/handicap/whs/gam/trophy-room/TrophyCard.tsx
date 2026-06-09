@@ -112,7 +112,26 @@ const StandardCard: React.FC<Props> = ({ item, onTap }) => {
         />
       )}
 
-      {/* Watermark */}
+      {/* Corner glow pad — locked only */}
+      {locked && glowColor && (
+        <div
+          aria-hidden
+          style={{
+            position: 'absolute',
+            right: -8,
+            bottom: 4,
+            width: 92,
+            height: 92,
+            borderRadius: '50%',
+            background: rgbaFrom(glowColor, 0.28),
+            filter: 'blur(18px)',
+            pointerEvents: 'none',
+            zIndex: 0,
+          }}
+        />
+      )}
+
+      {/* Watermark icon — lit in rarity colour when locked, subtle when earned */}
       <div
         aria-hidden
         style={{
@@ -120,9 +139,10 @@ const StandardCard: React.FC<Props> = ({ item, onTap }) => {
           right: -8,
           bottom: 4,
           transform: 'rotate(-12deg)',
-          opacity: dimmed ? 0.04 : 0.08,
-          color: palette.color,
+          opacity: locked ? 0.55 : 0.08,
+          color: locked ? glowColor : palette.color,
           pointerEvents: 'none',
+          zIndex: 1,
         }}
       >
         {renderBadgeIcon(item.iconKey, 92, 'currentColor')}
