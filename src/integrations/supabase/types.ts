@@ -14700,7 +14700,6 @@ export type Database = {
           cover_photo_url: string | null
           created_at: string | null
           creator_enabled_at: string | null
-          creator_only: boolean
           deleted_at: string | null
           desktop_crop_height: number | null
           desktop_crop_width: number | null
@@ -14736,7 +14735,6 @@ export type Database = {
           id: string
           instagram_handle: string
           is_business_verified: boolean | null
-          is_creator: boolean
           is_official_club: boolean | null
           is_public: boolean | null
           is_suspended: boolean
@@ -14820,7 +14818,6 @@ export type Database = {
           cover_photo_url?: string | null
           created_at?: string | null
           creator_enabled_at?: string | null
-          creator_only?: boolean
           deleted_at?: string | null
           desktop_crop_height?: number | null
           desktop_crop_width?: number | null
@@ -14856,7 +14853,6 @@ export type Database = {
           id: string
           instagram_handle?: string
           is_business_verified?: boolean | null
-          is_creator?: boolean
           is_official_club?: boolean | null
           is_public?: boolean | null
           is_suspended?: boolean
@@ -14940,7 +14936,6 @@ export type Database = {
           cover_photo_url?: string | null
           created_at?: string | null
           creator_enabled_at?: string | null
-          creator_only?: boolean
           deleted_at?: string | null
           desktop_crop_height?: number | null
           desktop_crop_width?: number | null
@@ -14976,7 +14971,6 @@ export type Database = {
           id?: string
           instagram_handle?: string
           is_business_verified?: boolean | null
-          is_creator?: boolean
           is_official_club?: boolean | null
           is_public?: boolean | null
           is_suspended?: boolean

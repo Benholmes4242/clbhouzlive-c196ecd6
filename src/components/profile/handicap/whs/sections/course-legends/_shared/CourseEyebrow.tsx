@@ -1,5 +1,5 @@
 import React from 'react';
-import { buildEyebrow } from './courseEyebrow';
+import { buildEyebrow } from './eyebrowLabel';
 
 const FONT = 'Geist, -apple-system, BlinkMacSystemFont, system-ui, sans-serif';
 const AMBER = '#F7931E';
