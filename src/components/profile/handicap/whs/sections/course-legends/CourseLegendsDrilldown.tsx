@@ -9,7 +9,7 @@ import { ChampionsEmptyState, ChampionsWindowEmptyState } from './drilldown/Cham
 import {
   legendCategoryLabel,
   legendCategoryIcon,
-  formatLegendValue,
+  formatLegendValueCompact,
 } from '@/lib/gam/visuals';
 import type { LegendCategory, LegendWindow } from '@/lib/gam/types';
 import type { CourseSelection } from './types';
@@ -196,7 +196,7 @@ export const CourseLegendsDrilldown: React.FC<Props> = ({ selection, hideHeader 
         name: row.user_display_name ?? 'Player',
         photoUrl: row.user_photo_url ?? null,
         value: row.value,
-        valueDisplay: formatLegendValue(cat, row.value),
+        valueDisplay: formatLegendValueCompact(cat, row.value),
         attained_at: row.attained_at,
         isSelf: row.is_self,
         userId: row.user_id ?? null,
@@ -324,7 +324,7 @@ export const CourseLegendsDrilldown: React.FC<Props> = ({ selection, hideHeader 
 
           <CategoryNavRail categories={navCategories} onSelect={handleNavSelect} />
 
-          <div>
+          <div style={{ paddingBottom: 50 }}>
           {visibleCategories.map((cat) => {
             const entry = groupedWithTotals.get(cat);
             if (!entry || entry.rows.length === 0) return null;
