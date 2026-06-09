@@ -112,8 +112,7 @@ const VideosSubpageWrapped = lazy(() => import("./components/watch/VideosSubpage
 const AccountTypeOnboarding = lazy(() => import("./pages/onboarding/AccountTypeOnboarding"));
 
 
-const EditProfilePage = lazy(() => import("./pages/EditProfilePage"));
-const QuickEditProfilePage = lazy(() => import("./pages/QuickEditProfilePage"));
+const EditProfilePage = lazy(() => import("./pages/EditProfile"));
 // ProfileHandicapView removed — /profile/handicap now redirects to /handicap (fix brief §2.1)
 const HandicapPage = lazy(() => import("./pages/HandicapPage"));
 const RivalryPage = lazy(() => import("./pages/RivalryPage"));
@@ -328,7 +327,6 @@ function AppRoutes() {
         <Route path="/profile/quest/index" element={<Suspense fallback={<ProfileSkeleton />}><QuestIndexView /></Suspense>} />
         <Route path="/profile/quest/replay" element={<Navigate to="/profile" replace />} />
         <Route path="/edit-profile" element={<Suspense fallback={<ProfileSkeleton />}><EditProfilePage /></Suspense>} />
-        <Route path="/quick-edit-profile" element={<Suspense fallback={<ProfileSkeleton />}><QuickEditProfilePage /></Suspense>} />
         
         
         <Route path="/profile/:username" element={<ProfileWrapped />} />
