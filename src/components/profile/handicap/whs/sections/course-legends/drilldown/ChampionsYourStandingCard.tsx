@@ -105,7 +105,7 @@ export const ChampionsYourStandingCard: React.FC<ChampionsYourStandingCardProps>
             >
               {displayName}
             </span>
-            <span style={{ fontSize: 11, fontWeight: 700, color: GAM.DEEP_AMBER, fontVariantNumeric: 'tabular-nums', flexShrink: 0 }}>
+            <span style={{ fontSize: 11, fontWeight: 700, color: 'var(--hcp-t-60)', fontVariantNumeric: 'tabular-nums', flexShrink: 0 }}>
               {titlesHeld} of {totalCategories} titles
             </span>
           </div>
