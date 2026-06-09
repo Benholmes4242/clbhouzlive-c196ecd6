@@ -30,7 +30,7 @@ export const LegendsView: React.FC<Props> = ({
       role="tabpanel"
       id="handicap-panel-legends"
       aria-labelledby="handicap-tab-legends"
-      style={{ paddingTop: 16 }}
+      style={{ paddingTop: 2 }}
     >
       {/* 1. Friends Leaderboard */}
       <FriendsLeaderboardSection
