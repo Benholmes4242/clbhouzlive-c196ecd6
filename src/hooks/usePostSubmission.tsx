@@ -15,6 +15,10 @@ interface PostSubmissionData {
     name: string;
     country: string;
   } | null;
+  /** Actor type for the post (personal or business). Defaults to 'personal'. */
+  actorType?: 'personal' | 'business';
+  /** Actor id (business id for business posts; defaults to user.id for personal). */
+  actorId?: string | null;
   onSuccess?: () => void;
   onError?: () => void;
 }
@@ -28,6 +32,8 @@ export const usePostSubmission = () => {
     mediaFiles,
     selectedTags,
     courseInfo,
+    actorType = 'personal',
+    actorId,
     onSuccess,
     onError
   }: PostSubmissionData) => {
@@ -62,8 +68,9 @@ export const usePostSubmission = () => {
         .insert({
           user_id: user.id,
           content: content || null,
-          actor_type: 'personal',
-          actor_id: user.id,
+          actor_type: actorType,
+          actor_id: actorId ?? user.id,
+          course_id: courseInfo?.id ?? null,
         })
         .select()
         .single();

@@ -7,7 +7,7 @@ import { uploadToCloudflareR2 } from '@/utils/cloudflareUpload';
 import { uploadToCloudflareStream } from '@/utils/cloudflareStreamUpload';
 import { addDraftMedia, deleteDraftMedia } from './draftService';
 import type { DraftMediaItem } from './types';
-import type { ComposerMediaItem } from '@/components/post-studio/types';
+import type { ComposerMediaItem } from '@/components/post-composer/types';
 
 // Custom bucket type for drafts - uses same R2 bucket with drafts/ prefix
 const DRAFTS_BUCKET_TYPE = 'clbhouz-post-images' as const;

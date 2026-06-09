@@ -40,7 +40,7 @@ import { PostEventsBridge } from '@/events/PostEventsBridge';
 import { UploadToastsBridge } from '@/uploads/UploadToastsBridge';
 import UploadProgressBanner from '@/components/uploads/UploadProgressBanner';
 import GlobalBottomNavigation from '@/components/GlobalBottomNavigation';
-import { GlobalPostStudio } from '@/components/post-studio/GlobalPostStudio';
+import { GlobalPostComposer } from '@/components/post-composer/GlobalPostComposer';
 import { FullscreenFeedOverlay } from '@/components/fullscreen-feed/FullscreenFeedOverlay';
 import { ReviewBottomSheetPortal } from '@/components/posts/ReviewBottomSheetPortal';
 import { CourseMediaViewer } from '@/components/course-media-tab/CourseMediaViewer';

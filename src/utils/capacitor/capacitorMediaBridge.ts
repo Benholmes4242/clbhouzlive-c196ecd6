@@ -9,7 +9,7 @@
 import { Capacitor } from '@capacitor/core';
 import { Camera, CameraResultType, CameraSource, Photo, GalleryPhoto } from '@capacitor/camera';
 import heic2any from 'heic2any';
-import type { ComposerMediaItem } from '@/components/post-studio/types';
+import type { ComposerMediaItem } from '@/components/post-composer/types';
 
 /**
  * Configuration for the native media picker

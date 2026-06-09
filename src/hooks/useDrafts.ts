@@ -19,7 +19,7 @@ import {
 } from '@/services/drafts';
 import { MAX_DRAFTS_PER_USER } from '@/services/drafts/types';
 import type { DraftSaveInput, DraftWithMedia, DraftMediaItem } from '@/services/drafts';
-import type { ComposerMediaItem } from '@/components/post-studio/types';
+import type { ComposerMediaItem } from '@/components/post-composer/types';
 
 const DRAFTS_QUERY_KEY = ['drafts'];
 const DRAFT_COUNT_QUERY_KEY = ['draft-count'];
