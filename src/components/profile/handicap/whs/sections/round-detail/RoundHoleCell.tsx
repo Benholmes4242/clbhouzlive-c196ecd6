@@ -11,7 +11,9 @@ const INK = 'var(--hcp-t-100)';
 const INK_55 = 'var(--hcp-t-60)';
 const INK_40 = 'var(--hcp-t-40)';
 const HAIRLINE = 'var(--hcp-line-2)';
-const AMBER = '#F7931E';
+const UNDER = '#FFFFFF';
+const OVER = '#f87171';
+const PAR_RING = 'rgba(255,255,255,0.18)';
 
 const FONT_GEIST =
   'Geist, system-ui, -apple-system, BlinkMacSystemFont, sans-serif';
