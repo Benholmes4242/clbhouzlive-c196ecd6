@@ -20,7 +20,7 @@ function paletteFor(item: TrophyItem): RarityPalette {
   if (item.kind === 'legend') return LEGEND_PALETTE;
   const hasProgress = item.earned || (item.currentValue != null && item.currentValue > 0);
   if (!hasProgress) return LOCKED_PALETTE;
-  if (isShowpiece(item.badgeId)) return paletteForShowpiece(item.reachedTier);
+  if (isShowpiece(item.badgeId)) return paletteForShowpiece(item.reachedTier, item.badgeId);
   return LEGEND_PALETTE;
 }
 
@@ -216,7 +216,7 @@ const ShowpieceCard: React.FC<Props> = ({ item, onTap }) => {
 
   const currentValue = item.currentValue ?? 0;
   const locked = !item.earned && currentValue === 0;
-  const palette = locked ? LOCKED_PALETTE : paletteForShowpiece(item.reachedTier);
+  const palette = locked ? LOCKED_PALETTE : paletteForShowpiece(item.reachedTier, item.badgeId);
 
   const totalTiers = item.tiers.length;
   const atMax = !locked && item.reachedTier >= totalTiers && totalTiers > 0;

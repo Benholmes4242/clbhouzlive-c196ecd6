@@ -143,10 +143,73 @@ export const MATERIAL_PALETTES: Record<1 | 2 | 3 | 4 | 5, RarityPalette> = {
 };
 
 /**
- * Returns the material-tier palette for a showpiece based on the user's
- * reachedTier. Tier 0 (no progress) is handled by the LOCKED_PALETTE caller-side.
+ * Region palettes for the four regional Top 100 showpieces. Colour by region,
+ * not by tier — so GB&I is always emerald, Europe blue, USA red, World gold.
  */
-export function paletteForShowpiece(reachedTier: number): RarityPalette {
+const REGION_PALETTE: Record<string, RarityPalette> = {
+  top_100_gbni: {
+    color: '#34D399',
+    tint: 'rgba(52,211,153,0.12)',
+    border: 'rgba(52,211,153,0.30)',
+    label: 'GB&I',
+    heroGradient: 'linear-gradient(160deg, rgba(52,211,153,0.22) 0%, var(--hcp-bg-1) 70%)',
+    cardSweep:
+      'linear-gradient(135deg, rgba(52,211,153,0.14) 0%, rgba(52,211,153,0.04) 50%, var(--hcp-bg-1) 100%)',
+    topStripe: null,
+    outerGlow: 'rgba(52,211,153,0.18)',
+    metaColor: '#34D399',
+  },
+  top_100_europe: {
+    color: '#3B82F6',
+    tint: 'rgba(59,130,246,0.12)',
+    border: 'rgba(59,130,246,0.30)',
+    label: 'EUROPE',
+    heroGradient: 'linear-gradient(160deg, rgba(59,130,246,0.22) 0%, var(--hcp-bg-1) 70%)',
+    cardSweep:
+      'linear-gradient(135deg, rgba(59,130,246,0.14) 0%, rgba(59,130,246,0.04) 50%, var(--hcp-bg-1) 100%)',
+    topStripe: null,
+    outerGlow: 'rgba(59,130,246,0.18)',
+    metaColor: '#3B82F6',
+  },
+  top_100_usa: {
+    color: '#EF4444',
+    tint: 'rgba(239,68,68,0.12)',
+    border: 'rgba(239,68,68,0.30)',
+    label: 'USA',
+    heroGradient: 'linear-gradient(160deg, rgba(239,68,68,0.22) 0%, var(--hcp-bg-1) 70%)',
+    cardSweep:
+      'linear-gradient(135deg, rgba(239,68,68,0.14) 0%, rgba(239,68,68,0.04) 50%, var(--hcp-bg-1) 100%)',
+    topStripe: null,
+    outerGlow: 'rgba(239,68,68,0.18)',
+    metaColor: '#EF4444',
+  },
+  top_100_worldwide: {
+    color: '#FBBC2E',
+    tint: 'rgba(251,188,46,0.14)',
+    border: 'rgba(251,188,46,0.32)',
+    label: 'WORLD',
+    heroGradient: 'linear-gradient(160deg, rgba(251,188,46,0.24) 0%, var(--hcp-bg-1) 70%)',
+    cardSweep:
+      'linear-gradient(135deg, rgba(251,188,46,0.16) 0%, rgba(251,188,46,0.04) 50%, var(--hcp-bg-1) 100%)',
+    topStripe: null,
+    outerGlow: 'rgba(251,188,46,0.20)',
+    metaColor: '#FBBC2E',
+  },
+};
+
+export function regionPaletteForBadge(badgeId: string): RarityPalette | null {
+  return REGION_PALETTE[badgeId] ?? null;
+}
+
+/**
+ * Returns palette for a showpiece. Regional Top 100 badges resolve by region;
+ * other showpieces fall back to material tier. Locked (tier 0) handled caller-side.
+ */
+export function paletteForShowpiece(reachedTier: number, badgeId?: string): RarityPalette {
+  if (badgeId) {
+    const r = regionPaletteForBadge(badgeId);
+    if (r) return r;
+  }
   const clamped = Math.max(1, Math.min(5, reachedTier || 1)) as 1 | 2 | 3 | 4 | 5;
   return MATERIAL_PALETTES[clamped];
 }
