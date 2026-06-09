@@ -70,19 +70,6 @@ export const ChampionsCoursePulsePanel: React.FC<Props> = ({ meta }) => {
     <div style={{ background: 'var(--hcp-bg-0)' }}>
       <div
         style={{
-          padding: '10px 18px 0',
-          fontSize: 10,
-          fontWeight: 800,
-          color: GAM.AMBER,
-          letterSpacing: '0.18em',
-          textTransform: 'uppercase',
-          fontFamily: FONT,
-        }}
-      >
-        Course pulse
-      </div>
-      <div
-        style={{
           padding: '12px 18px 16px',
           display: 'grid',
           gridTemplateColumns: 'repeat(4, 1fr)',
