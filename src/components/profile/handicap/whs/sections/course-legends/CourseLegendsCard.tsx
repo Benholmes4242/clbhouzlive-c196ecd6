@@ -95,7 +95,7 @@ const HolderCell: React.FC<HolderCellProps> = ({ short, unit, holder, selfLabel 
             fontSize: 8.5,
             fontWeight: 800,
             letterSpacing: '0.14em',
-            color: GAM.AMBER,
+            color: 'var(--hcp-t-100)',
             lineHeight: 1.2,
             textTransform: 'uppercase',
           }}
