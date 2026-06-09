@@ -7,7 +7,6 @@ import { X, ImagePlus, MapPin, Trophy } from 'lucide-react';
 import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
 import { usePostSubmission } from '@/hooks/usePostSubmission';
-import { usePostStudioStore } from '@/stores/usePostStudioStore';
 import { useActiveActor } from '@/context/ActiveActorContext';
 import { CourseSearchSheet } from './CourseSearchSheet';
 import type { TaggedCourse, StudioActorType } from './types';
