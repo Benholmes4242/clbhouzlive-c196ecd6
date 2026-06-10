@@ -13,6 +13,7 @@ import { HandicapChip } from './HandicapChip';
 import { cn } from '@/lib/utils';
 import { haptic } from '@/utils/haptics';
 import { safeGoBack } from '@/utils/navigation';
+import { useMedianStatusBar } from '@/hooks/useMedianStatusBar';
 
 interface CompactHeaderProps {
   className?: string;
@@ -134,6 +135,21 @@ const CompactHeader: React.FC<CompactHeaderProps> = ({ className }) => {
   const isDarkChrome = isHandicapRoute;
   const useDarkChrome = isDarkChrome && !searchOpen;
   const useLightTheme = !useDarkChrome;
+
+  // While the search overlay is open on a dark-chrome route (handicap), flip the
+  // NATIVE status bar + safe-area shield to the overlay's light surface, and
+  // restore the dark terminal chrome on close. The reapplyKey changing in both
+  // directions is what forces useMedianStatusBar to re-fire on close — the hook
+  // deliberately never restores in its cleanup (grey-flash fix), and PageRoot's
+  // own hook won't re-run.
+  useMedianStatusBar(
+    searchOpen ? 'light' : 'dark',
+    searchOpen ? '#F8FAFC' : '#0A0E14',
+    false,
+    false,
+    isDarkChrome,
+    searchOpen ? 'search-open' : 'search-closed',
+  );
 
   const handleLogoClick = () => {
     if (isBackArrowRoute) {
