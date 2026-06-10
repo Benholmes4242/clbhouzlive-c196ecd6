@@ -853,7 +853,17 @@ const LEGEND_CATS: LegendCfg[] = [
 ];
 
 async function applyCourseLegends(stats: any) {
-  if (!stats.course_id) return;
+  if (!stats.course_id) {
+    console.warn(
+      "[gam-evaluator] applyCourseLegends skipped — stats.course_id is null",
+      {
+        whs_score_id: stats.whs_score_id,
+        user_id: stats.user_id,
+        play_date: stats.play_date,
+      }
+    );
+    return;
+  }
   for (const cfg of LEGEND_CATS) await recomputeLegend(stats.course_id, cfg);
 }
 
