@@ -1,4 +1,5 @@
 import React, { useMemo, useState } from 'react';
+import { createPortal } from 'react-dom';
 import { X, Search, ChevronRight } from 'lucide-react';
 import { WHS_COUNTRIES, type WhsCountry } from '@/lib/whs/whsCountries';
 import { MiniFlag } from './MiniFlag';
@@ -33,19 +34,22 @@ export const CountryPickerSheet: React.FC<Props> = ({ open, onClose, onSelect })
 
   if (!open) return null;
 
-  return (
+  return createPortal(
     <>
       <div
+        data-country-picker
         onClick={onClose}
         style={{
           position: 'fixed', inset: 0,
           background: 'rgba(15,23,42,0.40)',
-          zIndex: 9998,
+          zIndex: 10300,
           animation: 'fadeIn 200ms ease',
+          pointerEvents: 'auto',
         }}
       />
 
       <div
+        data-country-picker
         role="dialog"
         aria-modal="true"
         style={{
@@ -55,12 +59,13 @@ export const CountryPickerSheet: React.FC<Props> = ({ open, onClose, onSelect })
           background: '#FFFFFF',
           borderTopLeftRadius: 20,
           borderTopRightRadius: 20,
-          zIndex: 9999,
+          zIndex: 10301,
           display: 'flex',
           flexDirection: 'column',
           fontFamily: FONT,
           animation: 'slideUp 240ms cubic-bezier(0.32, 0.72, 0, 1)',
           boxShadow: '0 -8px 30px rgba(15,23,42,0.18)',
+          pointerEvents: 'auto',
         }}
       >
         <div style={{ display: 'flex', justifyContent: 'center', paddingTop: 8 }}>
@@ -123,7 +128,7 @@ export const CountryPickerSheet: React.FC<Props> = ({ open, onClose, onSelect })
           </div>
         </div>
 
-        <div style={{ flex: 1, overflowY: 'auto', paddingBottom: 24 }}>
+        <div style={{ flex: 1, overflowY: 'auto', paddingBottom: 'calc(24px + env(safe-area-inset-bottom, 0px))' }}>
           {supported.length > 0 && (
             <>
               <div style={{
@@ -250,7 +255,8 @@ export const CountryPickerSheet: React.FC<Props> = ({ open, onClose, onSelect })
         @keyframes fadeIn { from { opacity: 0 } to { opacity: 1 } }
         @keyframes slideUp { from { transform: translateY(100%) } to { transform: translateY(0) } }
       `}</style>
-    </>
+    </>,
+    document.body,
   );
 };
 
