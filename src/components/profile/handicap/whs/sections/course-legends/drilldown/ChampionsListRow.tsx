@@ -13,6 +13,8 @@ interface ChampionsListRowProps {
   gapToChampion: string | null;
   holdDuration: string | null;
   isNew?: boolean;
+  /** Compact variant for inline duel-card top-5 lists. */
+  compact?: boolean;
 }
 
 const SQUIRCLE_MASK_URL =
@@ -37,6 +39,7 @@ export const ChampionsListRow: React.FC<ChampionsListRowProps> = ({
   gapToChampion,
   holdDuration,
   isNew = false,
+  compact = false,
 }) => {
   const rowBg = isSelf
     ? 'rgba(15,23,42,0.045)'
@@ -47,8 +50,10 @@ export const ChampionsListRow: React.FC<ChampionsListRowProps> = ({
     ? `url(${photoUrl}) center/cover`
     : 'linear-gradient(135deg, #cbd5e1 0%, #64748b 100%)';
 
+  const avatarSize = compact ? 32 : 40;
+
   const avatar = isChampion ? (
-    <div style={{ width: 40, height: 40, position: 'relative', flexShrink: 0 }} aria-hidden>
+    <div style={{ width: avatarSize, height: avatarSize, position: 'relative', flexShrink: 0 }} aria-hidden>
       <div style={{ position: 'absolute', inset: 0, background: photoBg, ...squircleMaskStyle }} />
       <div style={{ position: 'absolute', inset: 0, ...squircleMaskStyle, boxShadow: 'inset 0 0 0 1px rgba(15,23,42,0.08)' }} />
     </div>
@@ -56,8 +61,8 @@ export const ChampionsListRow: React.FC<ChampionsListRowProps> = ({
     <div
       aria-hidden
       style={{
-        width: 40,
-        height: 40,
+        width: avatarSize,
+        height: avatarSize,
         borderRadius: '34%',
         background: photoBg,
         boxShadow: 'inset 0 0 0 1px rgba(15,23,42,0.08)',
@@ -72,15 +77,19 @@ export const ChampionsListRow: React.FC<ChampionsListRowProps> = ({
       ? `${gapToChampion.replace('-', '−')} from champion`
       : '';
 
+  const padY = compact ? '7px' : '10px';
+  const nameSize = compact ? 14 : 15;
+  const valueSize = compact ? 14.5 : 16;
+
   return (
     <div
       style={{
         position: 'relative',
         display: 'grid',
-        gridTemplateColumns: '24px 40px 1fr auto',
-        gap: 14,
+        gridTemplateColumns: compact ? '18px 32px 1fr auto' : '24px 40px 1fr auto',
+        gap: compact ? 12 : 14,
         alignItems: 'center',
-        padding: '10px 16px',
+        padding: `${padY} 16px`,
         background: rowBg,
         boxShadow: 'inset 0 -0.5px 0 var(--hcp-line)',
       }}
@@ -93,7 +102,7 @@ export const ChampionsListRow: React.FC<ChampionsListRowProps> = ({
         <div
           style={{
             fontFamily: GAM.FONT_GEIST,
-            fontSize: 15,
+            fontSize: compact ? 13 : 15,
             fontWeight: 700,
             fontVariantNumeric: 'tabular-nums',
             color: 'var(--hcp-t-30, #b3bdca)',
@@ -110,7 +119,7 @@ export const ChampionsListRow: React.FC<ChampionsListRowProps> = ({
       <div style={{ minWidth: 0 }}>
         <div
           style={{
-            fontSize: 15,
+            fontSize: nameSize,
             fontWeight: isChampion ? 800 : 600,
             color: 'var(--hcp-t-100)',
             letterSpacing: '-0.014em',
@@ -157,7 +166,7 @@ export const ChampionsListRow: React.FC<ChampionsListRowProps> = ({
         <span
           style={{
             fontFamily: GAM.FONT_GEIST,
-            fontSize: 16,
+            fontSize: valueSize,
             fontWeight: 700,
             color: 'var(--hcp-t-100)',
             letterSpacing: '-0.02em',
