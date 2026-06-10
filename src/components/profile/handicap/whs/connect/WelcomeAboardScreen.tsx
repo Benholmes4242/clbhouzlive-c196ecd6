@@ -58,7 +58,7 @@ const SuccessBadge: React.FC = () => (
     <circle cx="50" cy="50" r="40" fill="rgba(5,150,105,0.10)" />
     <circle cx="50" cy="50" r="30" fill="rgba(5,150,105,0.18)" />
     <circle cx="50" cy="50" r="22" fill="url(#check-grad)" />
-    <circle cx="50" cy="50" r="22" fill="none" stroke="rgba(255,255,255,0.25)" strokeWidth="1" />
+    <circle cx="50" cy="50" r="22" fill="none" stroke="rgba(15,23,42,0.15)" strokeWidth="1" />
     <ellipse cx="44" cy="42" rx="6" ry="4" fill="rgba(255,255,255,0.30)" />
     <polyline points="40,50 47,57 60,44"
       stroke="#fff" strokeWidth="3.5"
