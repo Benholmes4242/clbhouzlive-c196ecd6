@@ -16,6 +16,8 @@ export interface ClubEntry {
 export interface ProfileFormData {
   displayName: string;
   username: string;
+  firstName: string;
+  lastName: string;
   profilePhotoUrl: string | null;
   headerPhotoUrl: string | null;
   profilePhotoBlob: Blob | null;
