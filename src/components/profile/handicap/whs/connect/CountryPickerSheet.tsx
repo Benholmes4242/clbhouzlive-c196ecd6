@@ -34,15 +34,17 @@ export const CountryPickerSheet: React.FC<Props> = ({ open, onClose, onSelect })
 
   if (!open) return null;
 
-  return (
+  return createPortal(
     <>
       <div
+        data-country-picker
         onClick={onClose}
         style={{
           position: 'fixed', inset: 0,
           background: 'rgba(15,23,42,0.40)',
-          zIndex: 9998,
+          zIndex: 10300,
           animation: 'fadeIn 200ms ease',
+          pointerEvents: 'auto',
         }}
       />
 
