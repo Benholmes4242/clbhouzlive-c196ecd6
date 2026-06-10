@@ -128,7 +128,7 @@ export const CountryPickerSheet: React.FC<Props> = ({ open, onClose, onSelect })
           </div>
         </div>
 
-        <div style={{ flex: 1, overflowY: 'auto', paddingBottom: 24 }}>
+        <div style={{ flex: 1, overflowY: 'auto', paddingBottom: 'calc(24px + env(safe-area-inset-bottom, 0px))' }}>
           {supported.length > 0 && (
             <>
               <div style={{
