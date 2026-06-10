@@ -79,6 +79,9 @@ export function useProfileForm(profile: any, loading?: boolean) {
   const isDirty = useMemo(() => {
     return (
       form.displayName !== initialData.displayName ||
+      form.username !== initialData.username ||
+      form.firstName !== initialData.firstName ||
+      form.lastName !== initialData.lastName ||
       form.bio !== initialData.bio ||
       form.profilePhotoBlob !== null ||
       form.headerPhotoBlob !== null ||
@@ -102,6 +105,7 @@ export function useProfileForm(profile: any, loading?: boolean) {
       form.handicapPageVisibility !== initialData.handicapPageVisibility
     );
   }, [form, initialData]);
+
 
   const errors = useMemo(() => {
     const e: Partial<Record<keyof ProfileFormData, string>> = {};
