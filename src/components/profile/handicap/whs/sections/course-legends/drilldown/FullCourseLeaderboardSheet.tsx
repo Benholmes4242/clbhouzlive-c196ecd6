@@ -117,6 +117,7 @@ export const FullCourseLeaderboardSheet: React.FC<Props> = ({
           flexDirection: 'column',
           flex: 1,
           minHeight: 0,
+          position: 'relative',
           fontFamily: GAM.FONT_GEIST,
           color: 'var(--hcp-t-100)',
           background: 'var(--hcp-bg-0)',
