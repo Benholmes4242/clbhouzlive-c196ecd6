@@ -12,6 +12,7 @@ interface ChampionsListRowProps {
   isChampion: boolean;
   gapToChampion: string | null;
   holdDuration: string | null;
+  isNew?: boolean;
 }
 
 const SQUIRCLE_MASK_URL =
