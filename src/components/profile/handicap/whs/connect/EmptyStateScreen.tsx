@@ -4,8 +4,6 @@ import { ChevronRight } from 'lucide-react';
 const INK = '#0F172A';
 const INK_55 = '#64748B';
 const AMBER = '#F7931E';
-const INK_ON_DARK = '#F8FAFC';
-const MUTED_ON_DARK = '#94A3B8';
 const FONT = 'Geist, -apple-system, BlinkMacSystemFont, system-ui, sans-serif';
 
 interface Props {
@@ -22,13 +20,13 @@ const HeroArt: React.FC = () => (
         <stop offset="100%" stopColor="#C97211"/>
       </radialGradient>
     </defs>
-    <ellipse cx="60" cy="108" rx="32" ry="4" fill="rgba(0,0,0,0.35)" />
+    <ellipse cx="60" cy="108" rx="32" ry="4" fill="rgba(15,23,42,0.12)" />
     <circle cx="60" cy="58" r="42" fill="url(#globe-grad)" stroke="rgba(15,23,42,0.55)" strokeWidth="2" />
     <ellipse cx="60" cy="58" rx="42" ry="14" fill="none" stroke="rgba(15,23,42,0.40)" strokeWidth="1" />
     <ellipse cx="60" cy="58" rx="22" ry="42" fill="none" stroke="rgba(15,23,42,0.40)" strokeWidth="1" />
     <line x1="18" y1="58" x2="102" y2="58" stroke="rgba(15,23,42,0.40)" strokeWidth="1" />
-    <line x1="60" y1="16" x2="60" y2="-2" stroke="#F8FAFC" strokeWidth="2" strokeLinecap="round" />
-    <path d="M 60 0 L 78 4 L 60 8 Z" fill={AMBER} stroke="#F8FAFC" strokeWidth="1.5" strokeLinejoin="round" />
+    <line x1="60" y1="16" x2="60" y2="-2" stroke="#0F172A" strokeWidth="2" strokeLinecap="round" />
+    <path d="M 60 0 L 78 4 L 60 8 Z" fill={AMBER} stroke="#0F172A" strokeWidth="1.5" strokeLinejoin="round" />
     <ellipse cx="48" cy="42" rx="8" ry="6" fill="rgba(255,255,255,0.30)" />
   </svg>
 );
@@ -56,7 +54,7 @@ export const EmptyStateScreen: React.FC<Props> = ({ onPickCountry, onWhyConnect 
           fontSize: 26,
           fontWeight: 800,
           letterSpacing: '-0.025em',
-          color: INK_ON_DARK,
+          color: INK,
           lineHeight: 1.15,
           margin: '0 0 10px',
           maxWidth: 280,
@@ -68,7 +66,7 @@ export const EmptyStateScreen: React.FC<Props> = ({ onPickCountry, onWhyConnect 
       <p
         style={{
           fontSize: 14,
-          color: MUTED_ON_DARK,
+          color: INK_55,
           lineHeight: 1.5,
           margin: '0 0 28px',
           maxWidth: 290,
@@ -133,11 +131,11 @@ export const EmptyStateScreen: React.FC<Props> = ({ onPickCountry, onWhyConnect 
           type="button"
           onClick={onWhyConnect}
           style={{
-            fontSize: 13, color: MUTED_ON_DARK, fontWeight: 500,
+            fontSize: 13, color: INK_55, fontWeight: 500,
             cursor: 'pointer', border: 'none',
             background: 'transparent', fontFamily: FONT,
             textDecoration: 'underline',
-            textDecorationColor: 'rgba(148,163,184,0.40)',
+            textDecorationColor: 'rgba(100,116,139,0.40)',
             textUnderlineOffset: 3,
           }}
         >

@@ -5,8 +5,6 @@ const INK = '#0F172A';
 const INK_55 = '#64748B';
 const AMBER = '#F7931E';
 const GREEN = '#059669';
-const INK_ON_DARK = '#F8FAFC';
-const MUTED_ON_DARK = '#94A3B8';
 const FONT = 'Geist, -apple-system, BlinkMacSystemFont, system-ui, sans-serif';
 
 interface Props {
@@ -60,7 +58,7 @@ const SuccessBadge: React.FC = () => (
     <circle cx="50" cy="50" r="40" fill="rgba(5,150,105,0.10)" />
     <circle cx="50" cy="50" r="30" fill="rgba(5,150,105,0.18)" />
     <circle cx="50" cy="50" r="22" fill="url(#check-grad)" />
-    <circle cx="50" cy="50" r="22" fill="none" stroke="rgba(255,255,255,0.25)" strokeWidth="1" />
+    <circle cx="50" cy="50" r="22" fill="none" stroke="rgba(15,23,42,0.15)" strokeWidth="1" />
     <ellipse cx="44" cy="42" rx="6" ry="4" fill="rgba(255,255,255,0.30)" />
     <polyline points="40,50 47,57 60,44"
       stroke="#fff" strokeWidth="3.5"
@@ -90,7 +88,7 @@ export const WelcomeAboardScreen: React.FC<Props> = ({
 
       <h2
         style={{
-          fontSize: 24, fontWeight: 800, color: INK_ON_DARK,
+          fontSize: 24, fontWeight: 800, color: INK,
           letterSpacing: '-0.02em',
           margin: '0 0 14px',
         }}
@@ -196,7 +194,7 @@ export const WelcomeAboardScreen: React.FC<Props> = ({
       </div>
 
       <p style={{
-        fontSize: 13.5, color: MUTED_ON_DARK, lineHeight: 1.5,
+        fontSize: 13.5, color: INK_55, lineHeight: 1.5,
         margin: '0 0 22px', maxWidth: 290,
       }}>
         Everything's live — your handicap will update automatically after every counting round.

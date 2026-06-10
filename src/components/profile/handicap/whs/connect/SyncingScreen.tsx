@@ -5,8 +5,6 @@ const INK = '#0F172A';
 const INK_55 = '#64748B';
 const AMBER = '#F7931E';
 const GREEN = '#059669';
-const INK_ON_DARK = '#F8FAFC';
-const MUTED_ON_DARK = '#94A3B8';
 const FONT = 'Geist, -apple-system, BlinkMacSystemFont, system-ui, sans-serif';
 
 const STEPS = [
@@ -89,8 +87,8 @@ export const SyncingScreen: React.FC = () => {
           </circle>
 
           <g transform="translate(70 70)">
-            <line x1="-2" y1="-14" x2="-2" y2="14" stroke={INK_ON_DARK} strokeWidth="2.5" strokeLinecap="round" />
-            <path d="M -2 -12 L 14 -8 L -2 -4 Z" fill={AMBER} stroke={INK_ON_DARK} strokeWidth="1.5" strokeLinejoin="round" />
+            <line x1="-2" y1="-14" x2="-2" y2="14" stroke={INK} strokeWidth="2.5" strokeLinecap="round" />
+            <path d="M -2 -12 L 14 -8 L -2 -4 Z" fill={AMBER} stroke={INK} strokeWidth="1.5" strokeLinejoin="round" />
           </g>
         </svg>
       </div>
@@ -114,12 +112,12 @@ export const SyncingScreen: React.FC = () => {
                   width: 22, height: 22, borderRadius: '50%',
                   flexShrink: 0,
                   display: 'flex', alignItems: 'center', justifyContent: 'center',
-                  background: isDone ? GREEN : isActive ? 'rgba(247,147,30,0.18)' : 'rgba(248,250,252,0.06)',
+                  background: isDone ? GREEN : isActive ? 'rgba(247,147,30,0.18)' : 'rgba(15,23,42,0.05)',
                   border: isDone
                     ? `1.5px solid ${GREEN}`
                     : isActive
                       ? `1.5px solid ${AMBER}`
-                      : '1.5px solid rgba(248,250,252,0.18)',
+                      : '1.5px solid rgba(15,23,42,0.15)',
                   color: '#fff',
                   transition: 'all 400ms ease',
                 }}
@@ -136,7 +134,7 @@ export const SyncingScreen: React.FC = () => {
                 style={{
                   fontSize: 13.5,
                   fontWeight: isActive ? 700 : 500,
-                  color: isActive ? INK_ON_DARK : MUTED_ON_DARK,
+                  color: isActive ? INK : INK_55,
                   transition: 'all 400ms ease',
                 }}
               >

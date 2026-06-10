@@ -207,7 +207,7 @@ const HandicapPageHeader: React.FC<HeaderProps> = ({
   }, [readOnly]);
 
   return (
-    <ShellSlot dark>
+    <ShellSlot dark={readOnly || hasConnection}>
       {readOnly ? (
         <div style={{ padding: '12px 16px 12px' }}>
           <FriendTitleRow
@@ -392,10 +392,13 @@ const HandicapPage: React.FC = () => {
   // on every render in the same order (rules of hooks).
   // `useWhsConnection` is guarded internally by `enabled: !!userId`, so
   // passing undefined is safe — it just stays disabled.
-  const { data: ownConnection } = useWhsConnection(
+  const { data: ownConnection, isLoading: connLoading } = useWhsConnection(
     isFriendView ? undefined : (ownerUserId ?? undefined)
   );
   const hasConnection = isFriendView ? true : !!ownConnection;
+  // Connect flow = own view, query settled, no connection. While loading we stay
+  // dark (current behaviour) so connected users never flash light.
+  const isConnectFlow = !isFriendView && !connLoading && !ownConnection;
 
   if (loading) {
     return <PageRoot><div /></PageRoot>;
@@ -415,7 +418,7 @@ const HandicapPage: React.FC = () => {
   }
 
   return (
-    <PageRoot dark style={{ background: 'var(--hcp-bg-0)' }}>
+    <PageRoot dark={!isConnectFlow} style={{ background: isConnectFlow ? '#F8FAFC' : 'var(--hcp-bg-0)' }}>
       <HandicapPageHeader
         ownerUserId={ownerUserId}
         displayName={displayName}

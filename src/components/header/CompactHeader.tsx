@@ -14,6 +14,7 @@ import { cn } from '@/lib/utils';
 import { haptic } from '@/utils/haptics';
 import { safeGoBack } from '@/utils/navigation';
 import { useMedianStatusBar } from '@/hooks/useMedianStatusBar';
+import { useWhsConnection } from '@/lib/whs/hooks';
 
 interface CompactHeaderProps {
   className?: string;
@@ -132,7 +133,10 @@ const CompactHeader: React.FC<CompactHeaderProps> = ({ className }) => {
   
   // Light chrome is now the default across the app. Only Handicap keeps the
   // dark terminal header. (Clubhouse feed uses its own ClubhouseHeaderNew.)
-  const isDarkChrome = isHandicapRoute;
+  const { data: whsConnection, isLoading: whsConnLoading } = useWhsConnection(user?.id);
+  // The WHS connect flow is a light surface — only the connected dashboard keeps dark chrome.
+  const isHandicapConnectFlow = isHandicapRoute && !whsConnLoading && !whsConnection;
+  const isDarkChrome = isHandicapRoute && !isHandicapConnectFlow;
   const useDarkChrome = isDarkChrome && !searchOpen;
   const useLightTheme = !useDarkChrome;
 
