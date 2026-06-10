@@ -255,13 +255,13 @@ const AuthForm: React.FC<AuthFormProps> = ({ authNotice }) => {
 
         if (data?.session?.user) {
           trackLoginSuccess('apple');
+          setShowSuccessAnimation(true);
         }
-        navigate('/', { replace: true });
       } finally {
         setSubmitting(false);
       }
     },
-    [navigate],
+    [],
   );
 
   const handleAppleSignIn = useCallback(() => {
