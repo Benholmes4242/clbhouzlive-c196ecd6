@@ -44,6 +44,8 @@ export const legendCategoryLabel: Record<LegendCategory, string> = {
   most_eagles_all_time:     'Eagles',
   most_aces_90d:            'Aces',
   most_aces_all_time:       'Aces',
+  most_albatrosses_90d:     'Albatross',
+  most_albatrosses_all_time:'Albatross',
 };
 
 
@@ -64,6 +66,8 @@ export const legendCategoryIcon: Record<LegendCategory, LucideIcon> = {
   most_eagles_all_time:     Award,
   most_aces_90d:            Sparkles,
   most_aces_all_time:       Sparkles,
+  most_albatrosses_90d:     Bird,
+  most_albatrosses_all_time:Bird,
 };
 
 /**
@@ -83,6 +87,8 @@ export const legendCategoryWindow: Record<LegendCategory, '90d' | 'all_time'> = 
   most_eagles_all_time:     'all_time',
   most_aces_90d:            '90d',
   most_aces_all_time:       'all_time',
+  most_albatrosses_90d:     '90d',
+  most_albatrosses_all_time:'all_time',
 };
 
 export const streakLabel: Record<StreakType, string> = {
