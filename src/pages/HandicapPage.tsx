@@ -207,7 +207,7 @@ const HandicapPageHeader: React.FC<HeaderProps> = ({
   }, [readOnly]);
 
   return (
-    <ShellSlot dark>
+    <ShellSlot dark={readOnly || hasConnection}>
       {readOnly ? (
         <div style={{ padding: '12px 16px 12px' }}>
           <FriendTitleRow
