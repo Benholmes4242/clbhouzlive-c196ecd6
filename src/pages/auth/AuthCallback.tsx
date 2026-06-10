@@ -34,11 +34,8 @@ export default function AuthCallback() {
           return;
         }
 
-        const hashParams = new URLSearchParams(window.location.hash.substring(1));
-        if (hashParams.get('type') === 'recovery') {
-          navigate('/auth/reset-password', { replace: true });
-          return;
-        }
+        // Password reset flow has been removed (passwordless OTP); fall through to
+        // the normal onboarding-aware redirect below.
 
         setMessage('Setting up your profile…');
 

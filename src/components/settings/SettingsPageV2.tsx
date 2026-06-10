@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { formatDistanceToNow } from 'date-fns';
 import {
-  ChevronLeft, ChevronRight, User, Mail, Lock, Bell, Shield, UserX,
+  ChevronLeft, ChevronRight, User, Mail, Bell, Shield, UserX,
   HelpCircle, MessageSquare, FileText, Trash2, LogOut, Eye, BarChart2, Map, Link2, Users,
 } from 'lucide-react';
 import { useWhsConnection } from '@/lib/whs/hooks';
@@ -22,7 +22,6 @@ import {
 } from './ui';
 import {
   EmailChangeSheet,
-  PasswordChangeSheet,
   BlockedUsersSheet,
   NotificationsSheet,
   HelpCentreSheet,
@@ -243,16 +242,6 @@ export function SettingsPageV2() {
           />
         </SettingsSection>
 
-        {/* Security */}
-        <SettingsSection title="Security">
-          <SettingsChevronRow
-            icon={<Lock size={18} />}
-            title="Change Password"
-            disabled={isOAuthUser}
-            iconTheme="security"
-            onClick={() => !isOAuthUser && open('password')}
-          />
-        </SettingsSection>
 
         {/* Support & Legal */}
         <SettingsSection title="Support & Legal">
@@ -304,7 +293,7 @@ export function SettingsPageV2() {
 
       {/* Sheets */}
       <EmailChangeSheet open={sheets.email} onClose={() => close('email')} />
-      <PasswordChangeSheet open={sheets.password} onClose={() => close('password')} />
+      
       <BlockedUsersSheet open={sheets.blocked} onClose={() => close('blocked')} userId={user?.id} />
       <NotificationsSheet open={sheets.notifications} onClose={() => close('notifications')} userId={user?.id} />
       <HelpCentreSheet open={sheets.help} onClose={() => close('help')} />
