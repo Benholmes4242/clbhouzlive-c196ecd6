@@ -260,8 +260,9 @@ export const CourseLegendsDrilldown: React.FC<Props> = ({ selection, hideHeader 
           a small connect-WHS cue beneath for non-synced users. */}
       <ChampionsCourseSearch currentCourseId={ctx.courseId} />
 
-      <div style={{ padding: '14px 16px 4px', display: 'flex', justifyContent: 'flex-start' }}>
+      <div style={{ padding: '14px 16px 4px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 12 }}>
         <WindowToggle window={window} setWindow={handleWindowChange} />
+        <ChampionsCoursePulsePanel meta={meta} />
       </div>
 
       <ConnectHandicapCue variant="champions" courseName={ctx.courseName} />
