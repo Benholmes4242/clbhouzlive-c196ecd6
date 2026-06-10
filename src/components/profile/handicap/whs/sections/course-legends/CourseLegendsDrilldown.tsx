@@ -65,22 +65,6 @@ const UNITS: Record<LegendCategory, string> = {
   most_albatrosses_all_time:'',
 };
 
-const UNIT_LABELS: Record<LegendCategory, string> = {
-  best_score_diff_90d:      'vs hcp',
-  best_score_diff_all_time: 'vs hcp',
-  lowest_gross_90d:         'Gross',
-  lowest_gross_all_time:    'Gross',
-  most_birdies_90d:         'Birdies',
-  most_birdies_all_time:    'Birdies',
-  best_stableford_90d:      'Pts',
-  best_stableford_all_time: 'Pts',
-  most_eagles_90d:          'Eagles',
-  most_eagles_all_time:     'Eagles',
-  most_aces_90d:            'Aces',
-  most_aces_all_time:       'Aces',
-  most_albatrosses_90d:     'Albatrosses',
-  most_albatrosses_all_time:'Albatrosses',
-};
 
 function formatHeldDuration(attainedAtIso: string): string {
   const attainedAt = new Date(attainedAtIso);
