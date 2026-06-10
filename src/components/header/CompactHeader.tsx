@@ -13,6 +13,7 @@ import { HandicapChip } from './HandicapChip';
 import { cn } from '@/lib/utils';
 import { haptic } from '@/utils/haptics';
 import { safeGoBack } from '@/utils/navigation';
+import { useMedianStatusBar } from '@/hooks/useMedianStatusBar';
 
 interface CompactHeaderProps {
   className?: string;
