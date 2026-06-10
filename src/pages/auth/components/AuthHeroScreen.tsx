@@ -139,6 +139,40 @@ const AuthHeroScreen: React.FC<AuthHeroScreenProps> = ({ submitting, onSubmitEma
           }}
         >
           <div className="auth-button-6 space-y-3">
+            {showApple && (
+              <>
+                <button
+                  type="button"
+                  onClick={onAppleSignIn}
+                  disabled={submitting}
+                  aria-label="Continue with Apple"
+                  className="w-full flex items-center justify-center gap-2 rounded-[14px] transition-opacity active:opacity-85 disabled:opacity-60"
+                  style={{
+                    minHeight: 52,
+                    background: '#FFFFFF',
+                    border: 'none',
+                    color: '#000000',
+                    fontSize: 15,
+                    fontWeight: 600,
+                  }}
+                >
+                  {submitting ? (
+                    <Loader2 size={18} className="animate-spin" style={{ color: '#000' }} />
+                  ) : (
+                    <>
+                      <AppleLogo size={17} />
+                      <span>Continue with Apple</span>
+                    </>
+                  )}
+                </button>
+
+                <div className="flex items-center gap-3" aria-hidden="true">
+                  <div style={{ flex: 1, height: 1, background: 'rgba(255,255,255,0.10)' }} />
+                  <span style={{ fontSize: 11, color: 'rgba(255,255,255,0.40)' }}>or</span>
+                  <div style={{ flex: 1, height: 1, background: 'rgba(255,255,255,0.10)' }} />
+                </div>
+              </>
+            )}
             <div className="relative">
               <input
                 ref={emailInputRef}
