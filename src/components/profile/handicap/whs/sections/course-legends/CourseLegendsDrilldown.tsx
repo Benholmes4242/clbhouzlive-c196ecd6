@@ -332,20 +332,8 @@ export const CourseLegendsDrilldown: React.FC<Props> = ({ selection, hideHeader 
             const heldDuration = formatHeldDuration(champion.attained_at);
             const holdDurationDisplay = `Held ${heldDuration}`;
 
-            const isLowerBetter =
-              cat === 'best_score_diff_90d' ||
-              cat === 'best_score_diff_all_time' ||
-              cat === 'lowest_gross_90d' ||
-              cat === 'lowest_gross_all_time';
-
-            const formatGap = (rowValue: number): string => {
-              const diff = rowValue - champion.value;
-              if (isLowerBetter) {
-                const v = diff.toFixed(1).replace(/\.0$/, '');
-                return diff > 0 ? `+${v}` : v;
-              }
-              return diff < 0 ? `${diff}` : `+${diff}`;
-            };
+            const formatGap = (rowValue: number): string =>
+              formatGapFromChampion(cat, rowValue, champion.value);
 
             const sectionRows = entry.rows.map((r) => ({
               rank: r.rank,
