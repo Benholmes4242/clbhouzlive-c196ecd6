@@ -10,16 +10,15 @@
  */
 import React, { useEffect, useMemo, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ArrowRight, ShieldCheck, ChevronRight } from 'lucide-react';
+import { ChevronRight } from 'lucide-react';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useWhsConnection, useHandicapTrend } from '@/lib/whs/hooks';
+import { ConnectHandicapCard } from '@/components/shared/ConnectHandicapCard';
 
 // ── Design tokens (Dispatch) ─────────────────────────────────────────────
 const INK = '#0F172A';
-import { INK_SOFT, WHITE_ALPHA_04, WHITE_ALPHA_65 } from '../../_shared/tokens';
 const INK_FAINT = '#94A3B8';
 const AMBER = '#F7931E';
-const AMBER_DEEP = '#D97706';
 const HAIRLINE = 'rgba(15,23,42,0.08)';
 const FONT = 'Geist, system-ui, -apple-system, BlinkMacSystemFont, sans-serif';
 const PAGE_PAD = 16;
