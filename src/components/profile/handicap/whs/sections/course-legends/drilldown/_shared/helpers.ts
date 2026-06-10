@@ -1,3 +1,5 @@
+import type { LegendCategory } from '@/lib/gam/types';
+
 export function formatHeldFor(days: number): string {
   if (days < 1) return 'Held today';
   if (days < 7) return `Held ${days}d`;
@@ -39,3 +41,27 @@ export function rankTier(rank: number) {
 
 /** Entries newer than this get the green "NEW" badge */
 export const NEW_BADGE_DAYS = 7;
+
+/** Categories where a LOWER value beats a higher one. */
+export function isLowerBetterCategory(cat: LegendCategory): boolean {
+  return (
+    cat === 'best_score_diff_90d' ||
+    cat === 'best_score_diff_all_time' ||
+    cat === 'lowest_gross_90d' ||
+    cat === 'lowest_gross_all_time'
+  );
+}
+
+/** Signed gap string from champion, e.g. "+4" or "-60". Matches drilldown display rules. */
+export function formatGapFromChampion(
+  cat: LegendCategory,
+  rowValue: number,
+  championValue: number,
+): string {
+  const diff = rowValue - championValue;
+  if (isLowerBetterCategory(cat)) {
+    const v = diff.toFixed(1).replace(/\.0$/, '');
+    return diff > 0 ? `+${v}` : v;
+  }
+  return diff < 0 ? `${diff}` : `+${diff}`;
+}

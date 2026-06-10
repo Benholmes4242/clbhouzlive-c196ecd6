@@ -3,7 +3,8 @@ import React, { useEffect, useMemo, useState } from 'react';
 import { type LucideIcon } from 'lucide-react';
 import { BottomSheet } from '@/components/ui/BottomSheet';
 import { SheetHeader } from '@/components/ui/SheetHeader';
-import { CompactLeaderRow } from './CompactLeaderRow';
+import { ChampionsListRow } from './ChampionsListRow';
+import { formatGapFromChampion, formatHeldFor, daysSince, NEW_BADGE_DAYS } from './_shared/helpers';
 import type { LegendCategory, LegendWindow } from '@/lib/gam/types';
 
 interface SectionRow {
@@ -72,14 +73,14 @@ export const FullCourseLeaderboardSheet: React.FC<Props> = ({
       onClose={onClose}
       ariaLabelledBy="course-legends-full-sheet-title"
       style={{
-        background: '#0A0E14',
+        background: '#F8FAFC',
         maxHeight: '90vh',
         display: 'flex',
         flexDirection: 'column',
       }}
     >
       <div
-        className="hcp-dark"
+        className="hcp-light"
         style={{
           display: 'flex',
           flexDirection: 'column',
@@ -130,11 +131,9 @@ export const FullCourseLeaderboardSheet: React.FC<Props> = ({
                   gap: 7,
                   padding: '6px 7px 6px 11px',
                   borderRadius: 999,
-                  background: isActive ? 'rgba(255,255,255,0.10)' : 'rgba(255,255,255,0.04)',
-                  border: isActive
-                    ? '1px solid rgba(255,255,255,0.22)'
-                    : '1px solid rgba(255,255,255,0.10)',
-                  color: 'var(--hcp-t-100)',
+                  background: isActive ? '#0F172A' : 'var(--hcp-bg-1)',
+                  border: isActive ? '1px solid #0F172A' : '1px solid var(--hcp-line)',
+                  color: isActive ? '#FFFFFF' : 'var(--hcp-t-100)',
                   fontSize: 11,
                   fontWeight: isActive ? 800 : 700,
                   fontFamily: GAM.FONT_GEIST,
@@ -155,7 +154,7 @@ export const FullCourseLeaderboardSheet: React.FC<Props> = ({
             flex: 1,
             minHeight: 0,
             overflowY: 'auto',
-            padding: '12px 16px 24px',
+            padding: '8px 0 24px',
             paddingBottom: 'env(safe-area-inset-bottom, 16px)',
             WebkitOverflowScrolling: 'touch',
             background: 'var(--hcp-bg-0)',
@@ -174,24 +173,29 @@ export const FullCourseLeaderboardSheet: React.FC<Props> = ({
               No entries in this category yet.
             </div>
           ) : (
-            <div
-              style={{
-                background: 'var(--hcp-bg-1)',
-                border: '0.5px solid var(--hcp-line)',
-                borderRadius: 12,
-                overflow: 'hidden',
-                display: 'flex',
-                flexDirection: 'column',
-              }}
-            >
-              {activeRows.map((row, i) => (
-                <CompactLeaderRow
+            activeRows.map((row, i) => {
+              const champion = activeRows[0];
+              const isChampion = i === 0;
+              return (
+                <ChampionsListRow
                   key={`${row.rank}-${row.attained_at}-${i}`}
-                  row={row}
-                  unit={activeDescriptor?.unit ?? ''}
+                  rank={row.rank}
+                  name={row.isSelf ? 'You' : row.name}
+                  photoUrl={row.photoUrl}
+                  valueDisplay={row.valueDisplay}
+                  unitLabel={activeDescriptor?.unit ?? ''}
+                  isSelf={row.isSelf}
+                  isChampion={isChampion}
+                  gapToChampion={
+                    isChampion
+                      ? null
+                      : formatGapFromChampion(activeCategory, row.value, champion.value)
+                  }
+                  holdDuration={isChampion ? formatHeldFor(daysSince(champion.attained_at)) : null}
+                  isNew={daysSince(row.attained_at) < NEW_BADGE_DAYS}
                 />
-              ))}
-            </div>
+              );
+            })
           )}
         </div>
       </div>

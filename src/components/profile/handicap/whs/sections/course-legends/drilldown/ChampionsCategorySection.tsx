@@ -31,7 +31,7 @@ export const ChampionsCategorySection: React.FC<ChampionsCategorySectionProps> =
   totalCount,
   holdDuration,
   rows,
-  maxVisible = 4,
+  maxVisible = 5,
   onFullLeaderboardTap,
 }) => {
   const visible = rows.slice(0, maxVisible);

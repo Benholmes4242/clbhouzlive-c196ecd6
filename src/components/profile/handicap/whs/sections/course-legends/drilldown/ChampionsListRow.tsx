@@ -12,6 +12,7 @@ interface ChampionsListRowProps {
   isChampion: boolean;
   gapToChampion: string | null;
   holdDuration: string | null;
+  isNew?: boolean;
 }
 
 const SQUIRCLE_MASK_URL =
@@ -35,9 +36,10 @@ export const ChampionsListRow: React.FC<ChampionsListRowProps> = ({
   isChampion,
   gapToChampion,
   holdDuration,
+  isNew = false,
 }) => {
   const rowBg = isSelf
-    ? 'rgba(255,255,255,0.08)'
+    ? 'rgba(15,23,42,0.045)'
     : isChampion
       ? 'var(--hcp-bg-2)'
       : 'var(--hcp-bg-1)';
@@ -120,6 +122,23 @@ export const ChampionsListRow: React.FC<ChampionsListRowProps> = ({
           }}
         >
           <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{name}</span>
+          {isNew && (
+            <span
+              style={{
+                fontSize: 8,
+                fontWeight: 800,
+                color: '#16A34A',
+                background: 'rgba(34,197,94,0.10)',
+                padding: '1px 5px',
+                borderRadius: 4,
+                letterSpacing: '0.10em',
+                textTransform: 'uppercase',
+                flexShrink: 0,
+              }}
+            >
+              New
+            </span>
+          )}
         </div>
         <div
           style={{

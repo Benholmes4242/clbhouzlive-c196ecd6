@@ -23,6 +23,7 @@ import { FullCourseLeaderboardSheet } from './drilldown/FullCourseLeaderboardShe
 import { WindowToggle } from './CourseLegendsSection';
 import { ConnectHandicapCue } from '@/components/courses/course-detail/ConnectHandicapCue';
 import { ChampionsCourseSearch } from './drilldown/ChampionsCourseSearch';
+import { formatGapFromChampion } from './drilldown/_shared/helpers';
 
 
 const CATEGORIES_ORDER_90D: LegendCategory[] = [
@@ -48,8 +49,8 @@ const SHORT_LABELS: Record<LegendCategory, string> = {
   lowest_gross_all_time:    'Gross',
   most_birdies_90d:         'Birdie',
   most_birdies_all_time:    'Birdie',
-  best_stableford_90d:      'Stbl',
-  best_stableford_all_time: 'Stbl',
+  best_stableford_90d:      'Stableford',
+  best_stableford_all_time: 'Stableford',
   most_eagles_90d:          'Eagle',
   most_eagles_all_time:     'Eagle',
   most_aces_90d:            'Ace',
@@ -332,20 +333,8 @@ export const CourseLegendsDrilldown: React.FC<Props> = ({ selection, hideHeader 
             const heldDuration = formatHeldDuration(champion.attained_at);
             const holdDurationDisplay = `Held ${heldDuration}`;
 
-            const isLowerBetter =
-              cat === 'best_score_diff_90d' ||
-              cat === 'best_score_diff_all_time' ||
-              cat === 'lowest_gross_90d' ||
-              cat === 'lowest_gross_all_time';
-
-            const formatGap = (rowValue: number): string => {
-              const diff = rowValue - champion.value;
-              if (isLowerBetter) {
-                const v = diff.toFixed(1).replace(/\.0$/, '');
-                return diff > 0 ? `+${v}` : v;
-              }
-              return diff < 0 ? `${diff}` : `+${diff}`;
-            };
+            const formatGap = (rowValue: number): string =>
+              formatGapFromChampion(cat, rowValue, champion.value);
 
             const sectionRows = entry.rows.map((r) => ({
               rank: r.rank,
