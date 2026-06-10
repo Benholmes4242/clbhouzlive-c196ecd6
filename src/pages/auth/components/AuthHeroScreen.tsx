@@ -1,9 +1,10 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { useMedianStatusBar } from '@/hooks/useMedianStatusBar';
 import { Loader2, ArrowRight } from 'lucide-react';
 import { toast } from 'sonner';
 import { z } from 'zod';
 import { safeLocalStorage } from '@/utils/safeLocalStorage';
+import { isMedianApp } from '@/utils/median/isMedianApp';
 
 // Toggle wordmark visibility
 const SHOW_WORDMARK = false;
@@ -17,9 +18,23 @@ const emailSchema = z
 interface AuthHeroScreenProps {
   submitting: boolean;
   onSubmitEmail: (email: string) => Promise<void> | void;
+  onAppleSignIn?: () => void;
 }
 
-const AuthHeroScreen: React.FC<AuthHeroScreenProps> = ({ submitting, onSubmitEmail }) => {
+const AppleLogo: React.FC<{ size?: number }> = ({ size = 17 }) => (
+  <svg
+    width={size}
+    height={size}
+    viewBox="0 0 24 24"
+    fill="#000000"
+    aria-hidden="true"
+    focusable="false"
+  >
+    <path d="M16.365 1.43c0 1.14-.42 2.23-1.17 3.02-.83.88-2.18 1.56-3.27 1.47-.13-1.1.42-2.25 1.16-3.04.83-.9 2.27-1.57 3.28-1.45zM20.5 17.27c-.55 1.27-.82 1.84-1.53 2.96-.99 1.56-2.39 3.5-4.12 3.52-1.54.02-1.94-1-4.03-.99-2.09.01-2.53 1.01-4.07.99-1.73-.02-3.05-1.77-4.04-3.33C.07 16.07-.23 10.99 1.46 8.21c1.2-1.97 3.09-3.12 4.87-3.12 1.81 0 2.95 1 4.45 1 1.46 0 2.35-1 4.45-1 1.58 0 3.26.86 4.46 2.35-3.92 2.15-3.28 7.75-.69 9.83z" />
+  </svg>
+);
+
+const AuthHeroScreen: React.FC<AuthHeroScreenProps> = ({ submitting, onSubmitEmail, onAppleSignIn }) => {
   // Dark status bar + safe-area shield for Median.co wrapper
   useMedianStatusBar('dark', '#0A0E14', true, false);
 
@@ -56,6 +71,7 @@ const AuthHeroScreen: React.FC<AuthHeroScreenProps> = ({ submitting, onSubmitEma
 
   const trimmed = loginEmail.trim();
   const canContinue = trimmed.length > 0 && !submitting;
+  const showApple = useMemo(() => isMedianApp() && !!onAppleSignIn, [onAppleSignIn]);
 
   return (
     <div className="fixed inset-0 flex flex-col">
@@ -123,6 +139,40 @@ const AuthHeroScreen: React.FC<AuthHeroScreenProps> = ({ submitting, onSubmitEma
           }}
         >
           <div className="auth-button-6 space-y-3">
+            {showApple && (
+              <>
+                <button
+                  type="button"
+                  onClick={onAppleSignIn}
+                  disabled={submitting}
+                  aria-label="Continue with Apple"
+                  className="w-full flex items-center justify-center gap-2 rounded-[14px] transition-opacity active:opacity-85 disabled:opacity-60"
+                  style={{
+                    minHeight: 52,
+                    background: '#FFFFFF',
+                    border: 'none',
+                    color: '#000000',
+                    fontSize: 15,
+                    fontWeight: 600,
+                  }}
+                >
+                  {submitting ? (
+                    <Loader2 size={18} className="animate-spin" style={{ color: '#000' }} />
+                  ) : (
+                    <>
+                      <AppleLogo size={17} />
+                      <span>Continue with Apple</span>
+                    </>
+                  )}
+                </button>
+
+                <div className="flex items-center gap-3" aria-hidden="true">
+                  <div style={{ flex: 1, height: 1, background: 'rgba(255,255,255,0.10)' }} />
+                  <span style={{ fontSize: 11, color: 'rgba(255,255,255,0.40)' }}>or</span>
+                  <div style={{ flex: 1, height: 1, background: 'rgba(255,255,255,0.10)' }} />
+                </div>
+              </>
+            )}
             <div className="relative">
               <input
                 ref={emailInputRef}

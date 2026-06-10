@@ -1,5 +1,6 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
 import {
   trackAuthMethodSelected,
@@ -188,6 +189,96 @@ const AuthForm: React.FC<AuthFormProps> = ({ authNotice }) => {
     navigate('/', { replace: true });
   };
 
+  // ---- Native Apple Sign-In (Median bridge) -------------------------------
+  const handleAppleCallback = useCallback(
+    async (response: MedianAppleResponse) => {
+      try {
+        const idToken = (response as MedianAppleSuccess)?.idToken;
+        if (!idToken) {
+          setSubmitting(false);
+          const msg = String((response as MedianAppleError)?.error ?? '');
+          const cancelled = /cancel|1001/i.test(msg);
+          if (!cancelled && msg) {
+            console.error('[apple-auth] native error:', msg);
+            trackAuthFailed('apple', msg);
+            toast.error('Apple Sign-In failed. Please try again.');
+          }
+          return;
+        }
+
+        trackAuthInitiated('apple');
+
+        // Diagnostic: decode claims locally (never log the raw token).
+        try {
+          const claims = JSON.parse(
+            atob(idToken.split('.')[1].replace(/-/g, '+').replace(/_/g, '/')),
+          );
+          console.log('[apple-auth] token claims:', {
+            aud: claims.aud,
+            iss: claims.iss,
+            email: claims.email,
+            email_verified: claims.email_verified,
+            has_nonce: 'nonce' in claims,
+          });
+        } catch {
+          /* non-fatal */
+        }
+
+        const { data, error } = await supabase.auth.signInWithIdToken({
+          provider: 'apple',
+          token: idToken,
+        });
+
+        if (error) {
+          console.error('[apple-auth] supabase rejection:', (error as any).status, error.message);
+          trackAuthFailed('apple', sanitiseErrorForAnalytics(error.message));
+          toast.error('Could not complete Apple Sign-In. Please try again or use email.');
+          setSubmitting(false);
+          return;
+        }
+
+        // Apple sends first/last name ONLY on first-ever sign-in. Persist before navigating.
+        const success = response as MedianAppleSuccess;
+        const first = (success.firstName ?? '').trim();
+        const last = (success.lastName ?? '').trim();
+        if (data?.user && (first || last)) {
+          const { error: nameErr } = await supabase
+            .from('user_profiles')
+            .update({
+              ...(first ? { first_name: first } : {}),
+              ...(last ? { last_name: last } : {}),
+            })
+            .eq('id', data.user.id)
+            .is('first_name', null);
+          if (nameErr) console.error('[apple-auth] name persist failed:', nameErr.message);
+        }
+
+        if (data?.session?.user) {
+          trackLoginSuccess('apple');
+        }
+        navigate('/', { replace: true });
+      } finally {
+        setSubmitting(false);
+      }
+    },
+    [navigate],
+  );
+
+  const handleAppleSignIn = useCallback(() => {
+    trackAuthMethodSelected('apple');
+    const median = window.median;
+    if (!median?.socialLogin?.apple?.login) {
+      toast.error('Apple Sign-In needs the latest app version.');
+      return;
+    }
+    setSubmitting(true);
+    median.socialLogin.apple.login({
+      callback: handleAppleCallback,
+      scope: 'full_name, email',
+    });
+  }, [handleAppleCallback]);
+
+
   const isSheetOpen = step === 'otp';
 
   return (
@@ -204,7 +295,11 @@ const AuthForm: React.FC<AuthFormProps> = ({ authNotice }) => {
         {...(isSheetOpen ? { inert: '' } : {})}
         style={isSheetOpen ? { pointerEvents: 'none' as const } : undefined}
       >
-        <AuthHeroScreen submitting={submitting && step === 'hero'} onSubmitEmail={handleSubmitEmail} />
+        <AuthHeroScreen
+          submitting={submitting && step === 'hero'}
+          onSubmitEmail={handleSubmitEmail}
+          onAppleSignIn={handleAppleSignIn}
+        />
       </div>
 
       <AuthBottomSheet
