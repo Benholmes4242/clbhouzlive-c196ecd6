@@ -105,7 +105,7 @@ export const FullCourseLeaderboardSheet: React.FC<Props> = ({
       ariaLabelledBy="course-legends-full-sheet-title"
       style={{
         background: '#F8FAFC',
-        maxHeight: '90vh',
+        maxHeight: '80dvh',
         display: 'flex',
         flexDirection: 'column',
       }}
