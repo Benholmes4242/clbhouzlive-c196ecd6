@@ -16,6 +16,7 @@ import {
 } from './_shared/tokens';
 import { firstName, formatMonthYear } from './_shared/helpers';
 import { reformatFriendName } from '@/lib/whs/utils/nameFormat';
+import { pickAvatarSrc } from '@/lib/whs/utils/avatarSrc';
 import type { FriendRivalryHydrated } from '@/lib/whs/types';
 import type { RivalryDimension } from '@/lib/whs/utils/useRivalryDimension';
 
@@ -198,7 +199,7 @@ export const HeroScoreboard: React.FC<Props> = ({
             <CentreDivider ties={ties} />
 
             <Side
-              avatarUrl={rivalry.rival_thumbnail_url}
+              avatarUrl={pickAvatarSrc(rivalry.rival_thumbnail_url, (rivalry as any).rival_profile_photo_url)}
               fallbackChar={(rivalFirst[0] ?? '?').toUpperCase()}
               label={rivalFirst.toUpperCase()}
               labelColor={T100}

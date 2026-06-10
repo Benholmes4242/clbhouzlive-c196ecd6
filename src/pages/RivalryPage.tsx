@@ -20,7 +20,7 @@ import { PageRoot } from '@/components/layout/PageRoot';
 import { useRivalryDimension } from '@/lib/whs/utils/useRivalryDimension';
 import { useOpenFriendSheet } from '@/components/friend-sheet/FriendSheetProvider';
 
-import { DossierHeader } from './rivalry-page/DossierHeader';
+import { pickAvatarSrc } from '@/lib/whs/utils/avatarSrc';
 import { HeroScoreboard } from './rivalry-page/HeroScoreboard';
 import { DimensionToggle } from './rivalry-page/DimensionToggle';
 import { ActionRail } from './rivalry-page/ActionRail';
@@ -165,13 +165,6 @@ const RivalryPage: React.FC = () => {
   const isLoading = isFriendView ? friend.isLoading : owner.isLoading;
   const errored = isFriendView ? !!friend.error : !!owner.error;
 
-  // Sticky-header collapse
-  const [scrolled, setScrolled] = useState(false);
-  useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 220);
-    window.addEventListener('scroll', onScroll, { passive: true });
-    return () => window.removeEventListener('scroll', onScroll);
-  }, []);
 
   // Course-filter shared state
   const [courseFilter, setCourseFilter] = useState<string | null>(null);
@@ -322,10 +315,6 @@ const RivalryPage: React.FC = () => {
     }
   };
 
-  const headerSubtitle = row
-    ? `${yourFirstName} vs ${rivalFirst}`
-    : null;
-
   return (
     <PageRoot
       className="hcp-dark"
@@ -334,13 +323,10 @@ const RivalryPage: React.FC = () => {
         minHeight: '100vh',
         fontFamily: FONT,
         color: T100,
+        paddingTop: 'calc(var(--header-h, 55px) + 34px)',
       }}
     >
-      <DossierHeader
-        scrolled={scrolled}
-        subtitle={headerSubtitle}
-        onBack={() => navigate(-1)}
-      />
+
 
       {!viewerId && (
         <div style={{ padding: 48, textAlign: 'center', color: T60 }}>
@@ -373,7 +359,6 @@ const RivalryPage: React.FC = () => {
 
       {viewerId && !isLoading && row && (
         <>
-          <div style={{ height: 16 }} />
           <HeroScoreboard
             rivalry={row}
             dim={dim}
