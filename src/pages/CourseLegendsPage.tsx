@@ -7,12 +7,11 @@ import { ProfileSkeleton } from '@/components/skeletons/ProfileSkeleton';
 import type { CourseSelection } from '@/components/profile/handicap/whs/sections/course-legends/types';
 
 /**
- * Standalone page for a single course's legends.
- * URL: /handicap/legends/courses/:courseId
+ * Standalone page for a single course's legends (Compete-tab drilldown).
  *
- * NOTE: Does NOT use ShellSlot. ShellSlot is for tab nav / pinned chrome
- * below the CompactHeader. This page has no tab nav. The CompactHeader still
- * renders automatically because GlobalHeader is mounted at the App level.
+ * LIGHT page — matches the course-detail Legends tab so the now-light Chase
+ * drilldown reads correctly. `.hcp-light` wrapper ensures every `var(--hcp-*)`
+ * inside the drilldown resolves to the light palette.
  */
 export const CourseLegendsPage: React.FC = () => {
   const { courseId } = useParams<{ courseId: string }>();
@@ -26,8 +25,11 @@ export const CourseLegendsPage: React.FC = () => {
 
   if (metaLoading || !meta) {
     return (
-      <PageRoot dark style={{ background: 'var(--hcp-bg-0)' }}>
-        <main style={{ paddingTop: 'var(--chrome-total-h, 0px)' }}>
+      <PageRoot dark={false} style={{ background: '#F8FAFC' }}>
+        <main
+          className="hcp-light"
+          style={{ paddingTop: 'var(--chrome-total-h, 0px)', background: '#F8FAFC', minHeight: '100vh' }}
+        >
           <ProfileSkeleton />
         </main>
       </PageRoot>
@@ -43,8 +45,11 @@ export const CourseLegendsPage: React.FC = () => {
   };
 
   return (
-    <PageRoot dark style={{ background: 'var(--hcp-bg-0)' }}>
-      <main style={{ paddingTop: 'var(--chrome-total-h, 0px)' }}>
+    <PageRoot dark={false} style={{ background: '#F8FAFC' }}>
+      <main
+        className="hcp-light"
+        style={{ paddingTop: 'var(--chrome-total-h, 0px)', background: '#F8FAFC', minHeight: '100vh' }}
+      >
         <CourseLegendsDrilldown selection={selection} />
       </main>
     </PageRoot>
