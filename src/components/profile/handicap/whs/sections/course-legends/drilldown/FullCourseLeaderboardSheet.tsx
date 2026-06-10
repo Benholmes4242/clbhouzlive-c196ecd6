@@ -64,6 +64,37 @@ export const FullCourseLeaderboardSheet: React.FC<Props> = ({
   const activeDescriptor = tabsToShow.find((c) => c.key === activeCategory);
   const totalForActive = activeEntry?.total ?? 0;
 
+  const listRef = useRef<HTMLDivElement>(null);
+  const selfRowRef = useRef<HTMLDivElement>(null);
+  const [selfOffscreen, setSelfOffscreen] = useState<null | 'above' | 'below'>(null);
+  const selfIndex = activeRows.findIndex((r) => r.isSelf);
+  const selfRank = selfIndex >= 0 ? activeRows[selfIndex].rank : null;
+
+  useEffect(() => {
+    setSelfOffscreen(null);
+    const rowEl = selfRowRef.current;
+    const rootEl = listRef.current;
+    if (!rowEl || !rootEl || !open) return;
+    const obs = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setSelfOffscreen(null);
+        } else {
+          const rowTop = entry.boundingClientRect.top;
+          const rootTop = entry.rootBounds?.top ?? 0;
+          setSelfOffscreen(rowTop < rootTop ? 'above' : 'below');
+        }
+      },
+      { root: rootEl, threshold: 0.4 },
+    );
+    obs.observe(rowEl);
+    return () => obs.disconnect();
+  }, [activeCategory, activeRows, open]);
+
+  const jumpToSelf = () => {
+    selfRowRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  };
+
   const windowLabel = legendWindow === '90d' ? '90 DAYS' : 'ALL TIME';
   const eyebrow = `LEADERBOARD · ${windowLabel}`;
 
