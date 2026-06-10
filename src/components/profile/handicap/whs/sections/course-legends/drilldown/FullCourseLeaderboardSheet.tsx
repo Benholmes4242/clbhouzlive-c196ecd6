@@ -182,6 +182,7 @@ export const FullCourseLeaderboardSheet: React.FC<Props> = ({
         </div>
 
         <div
+          ref={listRef}
           style={{
             flex: 1,
             minHeight: 0,
@@ -209,27 +210,70 @@ export const FullCourseLeaderboardSheet: React.FC<Props> = ({
               const champion = activeRows[0];
               const isChampion = i === 0;
               return (
-                <ChampionsListRow
+                <div
                   key={`${row.rank}-${row.attained_at}-${i}`}
-                  rank={row.rank}
-                  name={row.isSelf ? 'You' : row.name}
-                  photoUrl={row.photoUrl}
-                  valueDisplay={row.valueDisplay}
-                  unitLabel={activeDescriptor?.unit ?? ''}
-                  isSelf={row.isSelf}
-                  isChampion={isChampion}
-                  gapToChampion={
-                    isChampion
-                      ? null
-                      : formatGapFromChampion(activeCategory, row.value, champion.value)
-                  }
-                  holdDuration={isChampion ? formatHeldFor(daysSince(champion.attained_at)) : null}
-                  isNew={daysSince(row.attained_at) < NEW_BADGE_DAYS}
-                />
+                  ref={row.isSelf ? selfRowRef : undefined}
+                  style={{ contentVisibility: 'auto', containIntrinsicSize: 'auto 61px' } as React.CSSProperties}
+                >
+                  <ChampionsListRow
+                    rank={row.rank}
+                    name={row.isSelf ? 'You' : row.name}
+                    photoUrl={row.photoUrl}
+                    valueDisplay={row.valueDisplay}
+                    unitLabel={activeDescriptor?.unit ?? ''}
+                    isSelf={row.isSelf}
+                    isChampion={isChampion}
+                    gapToChampion={
+                      isChampion
+                        ? null
+                        : formatGapFromChampion(activeCategory, row.value, champion.value)
+                    }
+                    holdDuration={isChampion ? formatHeldFor(daysSince(champion.attained_at)) : null}
+                    isNew={daysSince(row.attained_at) < NEW_BADGE_DAYS}
+                  />
+                </div>
               );
             })
           )}
         </div>
+        {selfOffscreen && selfRank != null && (
+          <button
+            type="button"
+            onClick={jumpToSelf}
+            aria-label={`Jump to your position, ranked ${selfRank}`}
+            style={{
+              position: 'absolute',
+              left: '50%',
+              transform: 'translateX(-50%)',
+              bottom: 'calc(14px + env(safe-area-inset-bottom, 0px))',
+              zIndex: 5,
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: 6,
+              height: 36,
+              padding: '0 14px',
+              borderRadius: 999,
+              background: '#0F172A',
+              color: '#FFFFFF',
+              border: 'none',
+              fontFamily: GAM.FONT_GEIST,
+              fontSize: 11.5,
+              fontWeight: 800,
+              letterSpacing: '0.06em',
+              fontVariantNumeric: 'tabular-nums',
+              textTransform: 'uppercase',
+              cursor: 'pointer',
+              boxShadow: '0 4px 16px rgba(15,23,42,0.28)',
+            }}
+          >
+            {selfOffscreen === 'above' ? (
+              <ChevronUp size={12} strokeWidth={2.6} />
+            ) : (
+              <ChevronDown size={12} strokeWidth={2.6} />
+            )}
+            You · #{selfRank}
+          </button>
+        )}
       </div>
     </BottomSheet>
   );
