@@ -5,28 +5,38 @@ import { formatLegendValueCompact } from '@/lib/gam/visuals';
 import type { CourseLegendHolderRow } from '@/hooks/gam/useCourseLegendHolders';
 import { CourseEyebrow } from './_shared/CourseEyebrow';
 import { getFooterCue, FOOTER_INTENT_STYLE } from './footerCue';
-import { CHAMPIONS_ORDER } from './_shared/championsOrder';
+import { CHAMPIONS_ORDER_90D, CHAMPIONS_ORDER_ALL_TIME } from './_shared/championsOrder';
 import { GAM } from '../../gam/tokens';
 
 const FONT = GAM.FONT_GEIST;
 
 /**
- * Canonical category order — Gross → Aces → Eagle → Birdie → Stableford → Score.
- * The grid receives a window-filtered holder map (90d OR all-time), but the
- * cell needs to map either window's key to the same display slot. We resolve
- * by checking both _90d and _all_time variants per slot.
+ * Canonical category order — derived from championsOrder so the Compete-tab
+ * grid stays in lock-step with the drilldown (Gross → Stbl → Ace → Alb →
+ * Eagle → Birdie → Score). The grid receives a window-filtered holder map
+ * (90d OR all-time), but the cell needs to map either window's key to the
+ * same display slot. We resolve by checking both _90d and _all_time variants.
  */
-const SLOTS: Array<{ key: LegendCategory; alt: LegendCategory; short: string; unit: string }> = [
-  { key: 'lowest_gross_90d',     alt: 'lowest_gross_all_time',     short: 'GROSS',  unit: 'gross' },
-  { key: 'most_aces_90d',        alt: 'most_aces_all_time',        short: 'ACE',    unit: 'aces' },
-  { key: 'most_eagles_90d',      alt: 'most_eagles_all_time',      short: 'EAGLE',  unit: 'eagles' },
-  { key: 'most_birdies_90d',     alt: 'most_birdies_all_time',     short: 'BIRDIE', unit: 'birdies' },
-  { key: 'best_stableford_90d',  alt: 'best_stableford_all_time',  short: 'STBL',   unit: 'pts' },
-  { key: 'best_score_diff_90d',  alt: 'best_score_diff_all_time',  short: 'SCORE',  unit: 'diff' },
-];
+const SLOT_META: Record<string, { short: string; unit: string }> = {
+  lowest_gross:     { short: 'GROSS',  unit: 'gross' },
+  best_stableford:  { short: 'STBL',   unit: 'pts' },
+  most_aces:        { short: 'ACE',    unit: 'aces' },
+  most_albatrosses: { short: 'ALB',    unit: 'albatrosses' },
+  most_eagles:      { short: 'EAGLE',  unit: 'eagles' },
+  most_birdies:     { short: 'BIRDIE', unit: 'birdies' },
+  best_score_diff:  { short: 'SCORE',  unit: 'diff' },
+};
 
-// Keep CHAMPIONS_ORDER referenced so the canonical constant is the source of truth.
-void CHAMPIONS_ORDER;
+const SLOTS: Array<{ key: LegendCategory; alt: LegendCategory; short: string; unit: string }> =
+  CHAMPIONS_ORDER_90D.map((key, i) => {
+    const base = key.replace(/_90d$/, '');
+    return {
+      key,
+      alt: CHAMPIONS_ORDER_ALL_TIME[i],
+      short: SLOT_META[base].short,
+      unit: SLOT_META[base].unit,
+    };
+  });
 
 interface HolderCellProps {
   short: string;
@@ -77,9 +87,9 @@ const HolderCell: React.FC<HolderCellProps> = ({ short, unit, holder, selfLabel 
         alignItems: 'center',
         gap: 9,
         padding: '8px 10px',
-        background: isSelf ? 'rgba(255,255,255,0.04)' : 'transparent',
+        background: isSelf ? 'rgba(251,188,46,0.07)' : 'transparent',
         border: isSelf
-          ? '1px solid var(--hcp-line)'
+          ? '1px solid rgba(251,188,46,0.45)'
           : '1px solid transparent',
         borderRadius: 10,
         minWidth: 0,
@@ -92,6 +102,9 @@ const HolderCell: React.FC<HolderCellProps> = ({ short, unit, holder, selfLabel 
       <div style={{ flex: 1, minWidth: 0 }}>
         <div
           style={{
+            display: 'inline-flex',
+            alignItems: 'center',
+            gap: 4,
             fontSize: 8.5,
             fontWeight: 800,
             letterSpacing: '0.14em',
@@ -100,6 +113,14 @@ const HolderCell: React.FC<HolderCellProps> = ({ short, unit, holder, selfLabel 
             textTransform: 'uppercase',
           }}
         >
+          {isSelf && (
+            <Crown
+              size={9}
+              strokeWidth={2.6}
+              fill="#FBBC2E"
+              style={{ color: '#B26818' }}
+            />
+          )}
           {short}
         </div>
         <div
@@ -115,7 +136,7 @@ const HolderCell: React.FC<HolderCellProps> = ({ short, unit, holder, selfLabel 
             letterSpacing: '-0.01em',
           }}
         >
-          {isEmpty ? '—' : (isSelf ? selfLabel : holder!.display_name)}
+          {isEmpty ? 'Unclaimed' : (isSelf ? selfLabel : holder!.display_name)}
         </div>
       </div>
 
