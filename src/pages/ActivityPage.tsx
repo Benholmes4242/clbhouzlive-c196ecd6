@@ -113,13 +113,12 @@ const ActivityPage: React.FC = () => {
     };
   }, [queryClient]);
 
-  // Flip initial-mount flag after first non-empty render so filter-change
-  // re-renders skip the entrance stagger animation.
+  // Mark first paint complete after it renders once; from then on, no entrance animation.
   useEffect(() => {
-    if (!data) return;
-    const t = setTimeout(() => { isInitialMountRef.current = false; }, 1000);
+    if (hasAnimatedIn) return;
+    const t = setTimeout(() => setHasAnimatedIn(true), 600);
     return () => clearTimeout(t);
-  }, [data]);
+  }, [hasAnimatedIn]);
 
   if (isRehydrating) return <ActivityPageSkeleton />;
 
