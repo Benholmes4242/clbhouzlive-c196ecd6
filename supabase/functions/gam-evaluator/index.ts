@@ -853,7 +853,17 @@ const LEGEND_CATS: LegendCfg[] = [
 ];
 
 async function applyCourseLegends(stats: any) {
-  if (!stats.course_id) return;
+  if (!stats.course_id) {
+    console.warn(
+      "[gam-evaluator] applyCourseLegends skipped — stats.course_id is null",
+      {
+        whs_score_id: stats.whs_score_id,
+        user_id: stats.user_id,
+        play_date: stats.play_date,
+      }
+    );
+    return;
+  }
   for (const cfg of LEGEND_CATS) await recomputeLegend(stats.course_id, cfg);
 }
 
@@ -923,7 +933,21 @@ async function recomputeLegend(courseId: string, cfg: LegendCfg) {
       attained_at: r.attained_at,
       is_current: true,
     }));
-    await supabase.from("gam_course_legends").insert(rows);
+    const { error: insertErr } = await supabase
+      .from("gam_course_legends")
+      .insert(rows);
+    if (insertErr) {
+      console.error(
+        "[gam-evaluator] gam_course_legends.insert failed",
+        {
+          courseId,
+          category: cfg.category,
+          rowCount: rows.length,
+          error: insertErr,
+        }
+      );
+      throw insertErr;
+    }
   }
 
   const newTopUser = arr[0]?.user_id ?? null;
