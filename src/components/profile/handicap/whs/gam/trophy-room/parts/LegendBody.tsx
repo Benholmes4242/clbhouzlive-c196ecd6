@@ -26,6 +26,8 @@ const LEGEND_CATEGORY_COPY: Record<LegendCategory, string> = {
   most_eagles_all_time:     'Most eagles ever recorded at this course.',
   most_aces_90d:            'Most hole-in-ones in the last 90 days at this course.',
   most_aces_all_time:       'Most hole-in-ones ever recorded at this course.',
+  most_albatrosses_90d:     'Most albatrosses in the last 90 days at this course.',
+  most_albatrosses_all_time:'Most albatrosses ever recorded at this course.',
 };
 
 const Eyebrow: React.FC<{ children: React.ReactNode; color?: string }> = ({ children, color }) => (
