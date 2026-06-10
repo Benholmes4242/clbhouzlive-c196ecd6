@@ -76,7 +76,7 @@ const ActivityPage: React.FC = () => {
   const navigate = useNavigate();
 
   const hasMarkedSeen = useRef(false);
-  const isInitialMountRef = useRef(true);
+  const [hasAnimatedIn, setHasAnimatedIn] = useState(false);
   const [sessionNewIds, setSessionNewIds] = useState<string[] | null>(null);
   const [sessionNewCount, setSessionNewCount] = useState<number | null>(null);
   const [hasInitializedNew, setHasInitializedNew] = useState(false);
