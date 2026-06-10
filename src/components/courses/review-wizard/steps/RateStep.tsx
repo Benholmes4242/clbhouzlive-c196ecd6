@@ -437,7 +437,6 @@ export function RateStep({
       {/* Category Ratings */}
       <div style={{ padding: '16px 16px 0' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 8 }}>
-          <div style={{ width: 3, height: 12, background: '#F7931E', borderRadius: 1, flexShrink: 0 }} />
           <span style={{ fontSize: 10.5, fontWeight: 800, color: '#94A3B8', letterSpacing: '0.14em', textTransform: 'uppercase' as const }}>Rate each area</span>
         </div>
         
