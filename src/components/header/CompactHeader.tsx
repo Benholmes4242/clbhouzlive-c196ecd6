@@ -14,6 +14,7 @@ import { cn } from '@/lib/utils';
 import { haptic } from '@/utils/haptics';
 import { safeGoBack } from '@/utils/navigation';
 import { useMedianStatusBar } from '@/hooks/useMedianStatusBar';
+import { useWhsConnection } from '@/lib/whs/hooks';
 
 interface CompactHeaderProps {
   className?: string;
