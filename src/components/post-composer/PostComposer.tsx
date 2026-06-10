@@ -9,6 +9,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { usePostSubmission } from '@/hooks/usePostSubmission';
 import { useActiveActor } from '@/context/ActiveActorContext';
 import { CourseSearchSheet } from './CourseSearchSheet';
+import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import type { TaggedCourse, StudioActorType } from './types';
 
 const MAX_CAPTION = 2000;
@@ -158,23 +159,22 @@ export function PostComposer({
           style={{
             paddingTop: 'max(env(safe-area-inset-top, 0px), 47px)',
             paddingBottom: 10,
-            borderBottom: '0.5px solid rgba(15,23,42,0.07)',
-            background: '#ffffff',
+            background: 'transparent',
           }}
         >
           <button
             onClick={onClose}
-            className="flex items-center justify-center"
+            className="flex items-center justify-center active:scale-[0.97] transition-all duration-100"
             style={{
-              width: 32,
-              height: 32,
+              width: 44,
+              height: 44,
               borderRadius: '50%',
-              background: 'rgba(15,23,42,0.05)',
-              border: '1px solid rgba(15,23,42,0.07)',
+              background: '#F5F5F7',
+              border: 'none',
             }}
             aria-label="Close composer"
           >
-            <X className="w-4 h-4" style={{ color: '#0F172A' }} strokeWidth={2.5} />
+            <X size={18} color="#8E8E93" strokeWidth={2} />
           </button>
 
           {/* Segmented toggle */}
@@ -183,10 +183,10 @@ export function PostComposer({
             role="tablist"
             aria-label="Composer mode"
             style={{
-              background: 'rgba(15,23,42,0.05)',
+              background: '#F5F5F7',
               borderRadius: 999,
               padding: 3,
-              border: '1px solid rgba(15,23,42,0.07)',
+              border: '1px solid rgba(15,23,42,0.04)',
             }}
           >
             <button
@@ -198,8 +198,8 @@ export function PostComposer({
                 borderRadius: 999,
                 fontSize: 13,
                 fontWeight: 700,
-                color: mode === 'post' ? '#ffffff' : '#0F172A',
-                background: mode === 'post' ? '#0F172A' : 'transparent',
+                color: mode === 'post' ? '#ffffff' : '#1C1C1E',
+                background: mode === 'post' ? '#1C1C1E' : 'transparent',
                 border: 'none',
                 cursor: 'pointer',
               }}
@@ -217,11 +217,11 @@ export function PostComposer({
                 fontSize: 13,
                 fontWeight: 700,
                 color: isBusiness
-                  ? 'rgba(15,23,42,0.30)'
+                  ? '#AEAEB2'
                   : mode === 'review'
                     ? '#ffffff'
-                    : '#0F172A',
-                background: mode === 'review' && !isBusiness ? '#0F172A' : 'transparent',
+                    : '#1C1C1E',
+                background: mode === 'review' && !isBusiness ? '#1C1C1E' : 'transparent',
                 border: 'none',
                 cursor: isBusiness ? 'not-allowed' : 'pointer',
               }}
@@ -236,16 +236,18 @@ export function PostComposer({
             <button
               onClick={handlePost}
               disabled={!canPost}
+              className="inline-flex items-center justify-center active:scale-[0.96] transition-transform"
               style={{
-                padding: '7px 16px',
+                minHeight: 36,
+                padding: '0 14px',
                 borderRadius: 999,
                 fontSize: 13,
-                fontWeight: 700,
-                color: '#ffffff',
-                background: canPost ? '#F7931E' : 'rgba(15,23,42,0.20)',
+                fontWeight: 600,
+                color: canPost ? '#ffffff' : '#AEAEB2',
+                background: canPost ? '#F7931E' : '#F5F5F7',
                 border: 'none',
                 cursor: canPost ? 'pointer' : 'not-allowed',
-                boxShadow: canPost ? '0 4px 14px rgba(247,147,30,0.32)' : 'none',
+                boxShadow: canPost ? '0 2px 12px rgba(247,147,30,0.22)' : 'none',
                 minWidth: 64,
               }}
             >
@@ -259,34 +261,23 @@ export function PostComposer({
         {/* Posting-as subline */}
         <div
           className="px-5 py-2 flex items-center gap-2"
-          style={{
-            background: '#ffffff',
-            borderBottom: '0.5px solid rgba(15,23,42,0.07)',
-          }}
+          style={{ background: 'transparent' }}
         >
-          {actorInfo.avatarUrl ? (
-            <img
-              src={actorInfo.avatarUrl}
-              alt=""
-              style={{ width: 20, height: 20, borderRadius: '34%', objectFit: 'cover' }}
-            />
-          ) : (
-            <div
-              style={{
-                width: 20,
-                height: 20,
-                borderRadius: '34%',
-                background: 'rgba(15,23,42,0.10)',
-              }}
-            />
-          )}
-          <span style={{ fontSize: 12, color: 'rgba(15,23,42,0.55)' }}>
-            Posting as <span style={{ color: '#0F172A', fontWeight: 600 }}>{actorInfo.name}</span>
+          <SquircleAvatar
+            src={actorInfo.avatarUrl ?? undefined}
+            alt={actorInfo.name}
+            size={20}
+            hideRing
+          />
+
+          <span style={{ fontSize: 12, color: 'rgba(28,28,30,0.55)' }}>
+            Posting as <span style={{ color: '#1C1C1E', fontWeight: 600 }}>{actorInfo.name}</span>
             {isBusiness && (
-              <span style={{ marginLeft: 6, color: 'rgba(15,23,42,0.45)' }}>· Business</span>
+              <span style={{ marginLeft: 6, color: 'rgba(28,28,30,0.45)' }}>· Business</span>
             )}
           </span>
         </div>
+
 
         {/* Body */}
         <div className="flex-1 overflow-y-auto">
