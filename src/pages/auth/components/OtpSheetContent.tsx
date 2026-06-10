@@ -152,7 +152,7 @@ const OtpSheetContent: React.FC<OtpSheetContentProps> = ({
       </div>
 
       {/* Code boxes */}
-      <div className="flex items-center justify-center gap-2" onPaste={(e) => handlePaste(0, e)}>
+      <div className="flex items-center justify-center gap-2">
         {digits.map((d, i) => (
           <input
             key={i}
