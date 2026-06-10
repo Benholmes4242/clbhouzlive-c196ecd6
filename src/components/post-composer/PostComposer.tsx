@@ -265,9 +265,11 @@ export function PostComposer({
         >
           <SquircleAvatar
             src={actorInfo.avatarUrl ?? undefined}
-            name={actorInfo.name}
+            alt={actorInfo.name}
             size={20}
+            hideRing
           />
+
           <span style={{ fontSize: 12, color: 'rgba(28,28,30,0.55)' }}>
             Posting as <span style={{ color: '#1C1C1E', fontWeight: 600 }}>{actorInfo.name}</span>
             {isBusiness && (
