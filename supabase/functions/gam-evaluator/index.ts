@@ -885,7 +885,7 @@ async function recomputeLegend(courseId: string, cfg: LegendCfg) {
     : null;
   let q = supabase
     .from("gam_round_stats")
-    .select("user_id, play_date, birdies, gross_score, score_diff, stableford_points, eagles, holes_in_one")
+    .select("user_id, play_date, birdies, gross_score, score_diff, stableford_points, eagles, holes_in_one, albatrosses")
     .eq("course_id", courseId)
     .eq("holes_played", 18); // Legends are 18-hole rounds only
   if (sinceDate) q = q.gte("play_date", sinceDate);
