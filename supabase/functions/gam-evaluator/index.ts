@@ -933,7 +933,21 @@ async function recomputeLegend(courseId: string, cfg: LegendCfg) {
       attained_at: r.attained_at,
       is_current: true,
     }));
-    await supabase.from("gam_course_legends").insert(rows);
+    const { error: insertErr } = await supabase
+      .from("gam_course_legends")
+      .insert(rows);
+    if (insertErr) {
+      console.error(
+        "[gam-evaluator] gam_course_legends.insert failed",
+        {
+          courseId,
+          category: cfg.category,
+          rowCount: rows.length,
+          error: insertErr,
+        }
+      );
+      throw insertErr;
+    }
   }
 
   const newTopUser = arr[0]?.user_id ?? null;
