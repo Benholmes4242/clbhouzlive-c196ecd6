@@ -392,10 +392,13 @@ const HandicapPage: React.FC = () => {
   // on every render in the same order (rules of hooks).
   // `useWhsConnection` is guarded internally by `enabled: !!userId`, so
   // passing undefined is safe — it just stays disabled.
-  const { data: ownConnection } = useWhsConnection(
+  const { data: ownConnection, isLoading: connLoading } = useWhsConnection(
     isFriendView ? undefined : (ownerUserId ?? undefined)
   );
   const hasConnection = isFriendView ? true : !!ownConnection;
+  // Connect flow = own view, query settled, no connection. While loading we stay
+  // dark (current behaviour) so connected users never flash light.
+  const isConnectFlow = !isFriendView && !connLoading && !ownConnection;
 
   if (loading) {
     return <PageRoot><div /></PageRoot>;
