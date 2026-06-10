@@ -16,8 +16,9 @@ import type { CourseSelection } from './types';
 
 import { DrilldownHeader } from './drilldown/DrilldownHeader';
 import { ChampionsCoursePulsePanel } from './drilldown/ChampionsCoursePulsePanel';
-import { ChampionsYourStandingCard } from './drilldown/ChampionsYourStandingCard';
-import { ChampionsCategorySection } from './drilldown/ChampionsCategorySection';
+import { CrownCabinet } from './drilldown/CrownCabinet';
+import { ChampionsDuelCard } from './drilldown/ChampionsDuelCard';
+import { ChampionsUnclaimedCard } from './drilldown/ChampionsUnclaimedCard';
 import { CategoryNavRail } from './drilldown/CategoryNavRail';
 import { FullCourseLeaderboardSheet } from './drilldown/FullCourseLeaderboardSheet';
 import { WindowToggle } from './CourseLegendsSection';
@@ -64,22 +65,6 @@ const UNITS: Record<LegendCategory, string> = {
   most_albatrosses_all_time:'',
 };
 
-const UNIT_LABELS: Record<LegendCategory, string> = {
-  best_score_diff_90d:      'vs hcp',
-  best_score_diff_all_time: 'vs hcp',
-  lowest_gross_90d:         'Gross',
-  lowest_gross_all_time:    'Gross',
-  most_birdies_90d:         'Birdies',
-  most_birdies_all_time:    'Birdies',
-  best_stableford_90d:      'Pts',
-  best_stableford_all_time: 'Pts',
-  most_eagles_90d:          'Eagles',
-  most_eagles_all_time:     'Eagles',
-  most_aces_90d:            'Aces',
-  most_aces_all_time:       'Aces',
-  most_albatrosses_90d:     'Albatrosses',
-  most_albatrosses_all_time:'Albatrosses',
-};
 
 function formatHeldDuration(attainedAtIso: string): string {
   const attainedAt = new Date(attainedAtIso);
@@ -216,15 +201,13 @@ export const CourseLegendsDrilldown: React.FC<Props> = ({ selection, hideHeader 
 
   const navCategories = useMemo(
     () =>
-      visibleCategories
-        .filter((cat) => (groupedWithTotals.get(cat)?.rows.length ?? 0) > 0)
-        .map((cat) => ({
-          key: cat,
-          short: SHORT_LABELS[cat],
-          icon: legendCategoryIcon[cat],
-          yourRank: yourRanks[cat] ?? null,
-        })),
-    [groupedWithTotals, yourRanks, visibleCategories],
+      visibleCategories.map((cat) => ({
+        key: cat,
+        short: SHORT_LABELS[cat],
+        icon: legendCategoryIcon[cat],
+        yourRank: yourRanks[cat] ?? null,
+      })),
+    [yourRanks, visibleCategories],
   );
 
   const containerRef = useRef<HTMLDivElement>(null);
@@ -261,8 +244,9 @@ export const CourseLegendsDrilldown: React.FC<Props> = ({ selection, hideHeader 
           a small connect-WHS cue beneath for non-synced users. */}
       <ChampionsCourseSearch currentCourseId={ctx.courseId} />
 
-      <div style={{ padding: '14px 16px 4px', display: 'flex', justifyContent: 'flex-start' }}>
+      <div style={{ padding: '14px 16px 4px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 12 }}>
         <WindowToggle window={window} setWindow={handleWindowChange} />
+        <ChampionsCoursePulsePanel meta={meta} />
       </div>
 
       <ConnectHandicapCue variant="champions" courseName={ctx.courseName} />
@@ -302,17 +286,14 @@ export const CourseLegendsDrilldown: React.FC<Props> = ({ selection, hideHeader 
 
       {!isLoading && !isError && (data ?? []).length > 0 && activeWindowHasData && (
         <>
-          <ChampionsCoursePulsePanel meta={meta} />
-
-          <ChampionsYourStandingCard
-            displayName="You"
-            photoUrl={activeActor?.avatarUrl ?? null}
-            titlesHeld={youOwnedCount}
-            totalCategories={visibleCategories.length}
-            bestRank={(() => {
-              const ranks = Object.values(yourRanks).filter((r): r is number => r != null);
-              return ranks.length === 0 ? null : Math.min(...ranks);
-            })()}
+          <CrownCabinet
+            slots={visibleCategories.map((cat) => ({
+              key: cat,
+              short: SHORT_LABELS[cat],
+              icon: legendCategoryIcon[cat],
+              held: yourRanks[cat] === 1,
+            }))}
+            heldCount={youOwnedCount}
             yourRounds={meta?.your_rounds ?? 0}
             yourBest={meta?.your_best ?? null}
           />
@@ -322,33 +303,38 @@ export const CourseLegendsDrilldown: React.FC<Props> = ({ selection, hideHeader 
           <div>
           {visibleCategories.map((cat) => {
             const entry = groupedWithTotals.get(cat);
-            if (!entry || entry.rows.length === 0) return null;
+            if (!entry || entry.rows.length === 0) {
+              return (
+                <div key={cat} data-category={cat}>
+                  <ChampionsUnclaimedCard
+                    category={cat}
+                    categoryLabel={legendCategoryLabel[cat]}
+                    categoryIcon={legendCategoryIcon[cat]}
+                  />
+                </div>
+              );
+            }
             const champion = entry.rows[0];
-            const heldDuration = formatHeldDuration(champion.attained_at);
-            const holdDurationDisplay = `Held ${heldDuration}`;
-
-            const formatGap = (rowValue: number): string =>
-              formatGapFromChampion(cat, rowValue, champion.value);
-
             const sectionRows = entry.rows.map((r) => ({
               rank: r.rank,
               name: r.isSelf ? 'You' : r.name,
               photoUrl: r.photoUrl,
               valueDisplay: r.valueDisplay,
+              value: r.value,
               isSelf: r.isSelf,
-              gapToChampion: r.rank === champion.rank ? null : formatGap(r.value),
+              gapToChampion: r.rank === champion.rank ? null : formatGapFromChampion(cat, r.value, champion.value),
               userId: r.userId,
             }));
-
             return (
               <div key={cat} data-category={cat}>
-                <ChampionsCategorySection
+                <ChampionsDuelCard
+                  category={cat}
                   categoryLabel={legendCategoryLabel[cat]}
                   categoryIcon={legendCategoryIcon[cat]}
-                  unitLabel={UNIT_LABELS[cat] || ''}
-                  totalCount={entry.total}
-                  holdDuration={holdDurationDisplay}
                   rows={sectionRows}
+                  yourRank={yourRanks[cat] ?? null}
+                  holdDuration={`Held ${formatHeldDuration(champion.attained_at)}`}
+                  totalCount={entry.total}
                   onFullLeaderboardTap={() => setFullLeaderboardCategory(cat)}
                 />
               </div>
