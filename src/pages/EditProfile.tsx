@@ -8,6 +8,7 @@ import { useProfileData } from '@/hooks/useProfileData';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useProfileForm } from '@/hooks/useProfileForm';
 import { useProfileSave } from '@/hooks/useProfileSave';
+import { supabase } from '@/integrations/supabase/client';
 import { useWhsConnection } from '@/lib/whs/hooks';
 import { resolveDisplayHandicap } from '@/lib/handicap/resolveHandicap';
 import { formatHcp } from '@/lib/formatHcp';
