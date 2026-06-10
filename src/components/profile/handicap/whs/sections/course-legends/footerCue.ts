@@ -56,6 +56,7 @@ function gapUnit(category: LegendCategory, count: number): string {
   
   if (isEagles(category)) return s ? 'eagle' : 'eagles';
   if (isAces(category)) return s ? 'ace' : 'aces';
+  if (isAlbatrosses(category)) return s ? 'albatross' : 'albatrosses';
   return 'vs hcp';
 }
 
