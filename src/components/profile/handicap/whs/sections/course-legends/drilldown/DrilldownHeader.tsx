@@ -90,7 +90,7 @@ export const DrilldownHeader: React.FC<Props> = ({
           padding: '5px 11px',
           borderRadius: 999,
           background: 'rgba(0,0,0,0.45)',
-          border: '1px solid rgba(255,255,255,0.35)',
+          border: '1px solid rgba(15,23,42,0.10)',
           backdropFilter: 'blur(8px)',
           WebkitBackdropFilter: 'blur(8px)',
           fontSize: 11,
