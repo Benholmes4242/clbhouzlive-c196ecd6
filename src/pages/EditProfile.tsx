@@ -99,7 +99,7 @@ export default function EditProfile() {
         const { count, error } = await supabase
           .from('user_profiles')
           .select('id', { count: 'exact', head: true })
-          .ilike('username', candidate)
+          .ilike('username', candidate.replace(/[\\%_]/g, '\\\\$&'))
           .neq('id', user?.id ?? '');
         if (error) {
           setUsernameStatus('idle');
