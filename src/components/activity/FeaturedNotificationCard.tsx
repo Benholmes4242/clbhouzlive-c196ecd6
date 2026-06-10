@@ -142,10 +142,11 @@ export const FeaturedNotificationCard: React.FC<FeaturedNotificationCardProps> =
   if (isReview) {
     return (
       <motion.div
-        initial={skipAnimation ? false : { opacity: 0, y: 16 }}
-        animate={skipAnimation ? undefined : { opacity: 1, y: 0 }}
-        transition={{ duration: 0.28, delay: index * 0.07, ease: [0.22, 1, 0.36, 1] }}
+        initial={skipAnimation ? false : { opacity: 0 }}
+        animate={skipAnimation ? undefined : { opacity: 1 }}
+        transition={{ duration: 0.24, delay: Math.min(index, 8) * 0.05, ease: [0.22, 1, 0.36, 1] }}
         onClick={onClick}
+        style={{ pointerEvents: 'auto' }}
         className="cursor-pointer active:scale-[0.98] transition-transform"
       >
         <div
