@@ -14,15 +14,9 @@ export function ProfileCompleteNudge() {
   const { profile } = useProfileData();
   const [dismissed, setDismissed] = useState(false);
 
-  // Only show 7-day completion nudge for first 7 days after signup
-  const isRecent = profile?.created_at
-    ? (Date.now() - new Date(profile.created_at).getTime()) < 7 * 24 * 60 * 60 * 1000
-    : false;
-
   const hasPhoto = !!profile?.profile_photo_url;
   const hasHomeClub = !!(profile?.home_club || profile?.primary_club_id);
   const hasBio = !!(profile as any)?.bio;
-  const isComplete = hasPhoto && hasHomeClub;
 
   const genderRaw = (profile as any)?.gender as string | undefined;
   const countryRaw = (profile as any)?.country as string | undefined;
@@ -30,32 +24,25 @@ export function ProfileCompleteNudge() {
   const hasCountry = !!countryRaw?.trim();
   const missingEssentials = !!profile && (!hasGender || !hasCountry);
 
-  // Essentials nudge shows anytime; completion nudge stays gated to first week
-  const shouldShow = missingEssentials || (isRecent && !isComplete);
+  // Only the essentials (gender/country) nudge remains — the 7-day
+  // completion nudge was retired.
+  const shouldShow = missingEssentials;
 
-  // Persist dismissal — essentials: 24h localStorage; completion: session only
+  // Persist dismissal — essentials: 24h localStorage
   useEffect(() => {
     if (missingEssentials) {
       const until = localStorage.getItem(ESSENTIALS_DISMISS_KEY);
       if (until && parseInt(until, 10) > Date.now()) {
         setDismissed(true);
-        return;
       }
-    }
-    if (!missingEssentials && sessionStorage.getItem('profile_nudge_dismissed')) {
-      setDismissed(true);
     }
   }, [missingEssentials]);
 
   const handleDismiss = () => {
-    if (missingEssentials) {
-      localStorage.setItem(
-        ESSENTIALS_DISMISS_KEY,
-        String(Date.now() + 24 * 60 * 60 * 1000),
-      );
-    } else {
-      sessionStorage.setItem('profile_nudge_dismissed', '1');
-    }
+    localStorage.setItem(
+      ESSENTIALS_DISMISS_KEY,
+      String(Date.now() + 24 * 60 * 60 * 1000),
+    );
     setDismissed(true);
   };
 
@@ -67,16 +54,11 @@ export function ProfileCompleteNudge() {
 
   const message = !hasGender
     ? 'Help us match you to similar golfers — set your gender'
-    : !hasCountry
-      ? 'Set your country so we can show how you compare locally'
-      : !hasPhoto
-        ? 'Add a profile photo — golfers with a photo get 3× more connections'
-        : 'Add your home club to appear on leaderboards';
+    : 'Set your country so we can show how you compare locally';
 
   const handleAction = () => {
     if (!hasGender) navigate(`${editRoute}?focus=gender`);
-    else if (!hasCountry) navigate(`${editRoute}?focus=country`);
-    else navigate(editRoute);
+    else navigate(`${editRoute}?focus=country`);
   };
 
   // SVG progress ring calculations
