@@ -217,15 +217,13 @@ export const CourseLegendsDrilldown: React.FC<Props> = ({ selection, hideHeader 
 
   const navCategories = useMemo(
     () =>
-      visibleCategories
-        .filter((cat) => (groupedWithTotals.get(cat)?.rows.length ?? 0) > 0)
-        .map((cat) => ({
-          key: cat,
-          short: SHORT_LABELS[cat],
-          icon: legendCategoryIcon[cat],
-          yourRank: yourRanks[cat] ?? null,
-        })),
-    [groupedWithTotals, yourRanks, visibleCategories],
+      visibleCategories.map((cat) => ({
+        key: cat,
+        short: SHORT_LABELS[cat],
+        icon: legendCategoryIcon[cat],
+        yourRank: yourRanks[cat] ?? null,
+      })),
+    [yourRanks, visibleCategories],
   );
 
   const containerRef = useRef<HTMLDivElement>(null);
