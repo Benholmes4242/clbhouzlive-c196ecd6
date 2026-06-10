@@ -1,6 +1,6 @@
 import { GAM } from '../../../gam/tokens';
-import React, { useEffect, useMemo, useState } from 'react';
-import { type LucideIcon } from 'lucide-react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
+import { type LucideIcon, ChevronDown, ChevronUp } from 'lucide-react';
 import { BottomSheet } from '@/components/ui/BottomSheet';
 import { SheetHeader } from '@/components/ui/SheetHeader';
 import { ChampionsListRow } from './ChampionsListRow';
