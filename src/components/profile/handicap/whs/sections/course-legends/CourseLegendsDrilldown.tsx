@@ -16,8 +16,9 @@ import type { CourseSelection } from './types';
 
 import { DrilldownHeader } from './drilldown/DrilldownHeader';
 import { ChampionsCoursePulsePanel } from './drilldown/ChampionsCoursePulsePanel';
-import { ChampionsYourStandingCard } from './drilldown/ChampionsYourStandingCard';
-import { ChampionsCategorySection } from './drilldown/ChampionsCategorySection';
+import { CrownCabinet } from './drilldown/CrownCabinet';
+import { ChampionsDuelCard } from './drilldown/ChampionsDuelCard';
+import { ChampionsUnclaimedCard } from './drilldown/ChampionsUnclaimedCard';
 import { CategoryNavRail } from './drilldown/CategoryNavRail';
 import { FullCourseLeaderboardSheet } from './drilldown/FullCourseLeaderboardSheet';
 import { WindowToggle } from './CourseLegendsSection';
