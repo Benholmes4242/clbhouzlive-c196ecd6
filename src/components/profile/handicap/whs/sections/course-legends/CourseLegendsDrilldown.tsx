@@ -55,6 +55,8 @@ const SHORT_LABELS: Record<LegendCategory, string> = {
   most_eagles_all_time:     'Eagle',
   most_aces_90d:            'Ace',
   most_aces_all_time:       'Ace',
+  most_albatrosses_90d:     'Albatross',
+  most_albatrosses_all_time:'Albatross',
 };
 
 const UNITS: Record<LegendCategory, string> = {
@@ -70,6 +72,8 @@ const UNITS: Record<LegendCategory, string> = {
   most_eagles_all_time:     '',
   most_aces_90d:            '',
   most_aces_all_time:       '',
+  most_albatrosses_90d:     '',
+  most_albatrosses_all_time:'',
 };
 
 const UNIT_LABELS: Record<LegendCategory, string> = {
@@ -85,6 +89,8 @@ const UNIT_LABELS: Record<LegendCategory, string> = {
   most_eagles_all_time:     'Eagles',
   most_aces_90d:            'Aces',
   most_aces_all_time:       'Aces',
+  most_albatrosses_90d:     'Albatrosses',
+  most_albatrosses_all_time:'Albatrosses',
 };
 
 function formatHeldDuration(attainedAtIso: string): string {

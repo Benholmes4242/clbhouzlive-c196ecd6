@@ -827,7 +827,7 @@ async function checkStreakBadges(userId: string, streakType: string, count: numb
 // ─────────────────────────────────────────────────────────────────────────────
 type LegendCfg = { category: string; windowDays: number | null; sortDir: "asc" | "desc"; metric: string; aggregate: "value" | "sum" | "count" };
 
-// 7 stats × 2 windows (90D + All Time) = 14 legend categories.
+// 8 stats × 2 windows (90D + All Time) = 16 legend categories.
 // Naming convention: <stat>_90d for the rolling window, <stat>_all_time for permanent records.
 // NOTE: legacy names `best_score_diff`, `lowest_gross` were renamed for consistency.
 // Run `gam_reset_user` (via gam-backdate-replay) to wipe old rows and rebuild with the new names.
@@ -844,10 +844,13 @@ const LEGEND_CATS: LegendCfg[] = [
   // ── Best Stableford ──
   { category: "best_stableford_90d",      windowDays: 90,   sortDir: "desc", metric: "stableford_points", aggregate: "value" },
   { category: "best_stableford_all_time", windowDays: null, sortDir: "desc", metric: "stableford_points", aggregate: "value" },
-  // ── Most eagles (NEW) ──
+  // ── Most eagles ──
   { category: "most_eagles_90d",          windowDays: 90,   sortDir: "desc", metric: "eagles",            aggregate: "sum" },
   { category: "most_eagles_all_time",     windowDays: null, sortDir: "desc", metric: "eagles",            aggregate: "sum" },
-  // ── Most hole-in-ones (NEW) ──
+  // ── Most albatrosses ──
+  { category: "most_albatrosses_90d",     windowDays: 90,   sortDir: "desc", metric: "albatrosses",       aggregate: "sum" },
+  { category: "most_albatrosses_all_time",windowDays: null, sortDir: "desc", metric: "albatrosses",       aggregate: "sum" },
+  // ── Most hole-in-ones ──
   { category: "most_aces_90d",            windowDays: 90,   sortDir: "desc", metric: "holes_in_one",      aggregate: "sum" },
   { category: "most_aces_all_time",       windowDays: null, sortDir: "desc", metric: "holes_in_one",      aggregate: "sum" },
 ];
@@ -882,7 +885,7 @@ async function recomputeLegend(courseId: string, cfg: LegendCfg) {
     : null;
   let q = supabase
     .from("gam_round_stats")
-    .select("user_id, play_date, birdies, gross_score, score_diff, stableford_points, eagles, holes_in_one")
+    .select("user_id, play_date, birdies, gross_score, score_diff, stableford_points, eagles, holes_in_one, albatrosses")
     .eq("course_id", courseId)
     .eq("holes_played", 18); // Legends are 18-hole rounds only
   if (sinceDate) q = q.gte("play_date", sinceDate);
