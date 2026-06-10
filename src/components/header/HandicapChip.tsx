@@ -23,7 +23,7 @@ const WHITE = '#FFFFFF';
 const WHITE_HAIRLINE = 'rgba(255,255,255,0.10)';
 const DARK_INK = '#0F172A';
 const DARK_HAIRLINE = 'var(--cm-border)';
-const AMBER = '#F7931E';
+
 const SEASON_GREEN = '#10B981';
 const CRIMSON = '#EF4444';
 
