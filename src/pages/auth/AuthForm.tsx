@@ -295,7 +295,11 @@ const AuthForm: React.FC<AuthFormProps> = ({ authNotice }) => {
         {...(isSheetOpen ? { inert: '' } : {})}
         style={isSheetOpen ? { pointerEvents: 'none' as const } : undefined}
       >
-        <AuthHeroScreen submitting={submitting && step === 'hero'} onSubmitEmail={handleSubmitEmail} />
+        <AuthHeroScreen
+          submitting={submitting && step === 'hero'}
+          onSubmitEmail={handleSubmitEmail}
+          onAppleSignIn={handleAppleSignIn}
+        />
       </div>
 
       <AuthBottomSheet
