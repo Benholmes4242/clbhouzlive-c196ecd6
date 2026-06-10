@@ -205,5 +205,10 @@ export function formatLegendGap(category: LegendCategory, gap: number): string {
       const n = Math.round(abs);
       return `${n} ${n === 1 ? 'ace' : 'aces'}`;
     }
+    case 'most_albatrosses_90d':
+    case 'most_albatrosses_all_time': {
+      const n = Math.round(abs);
+      return `${n} ${n === 1 ? 'albatross' : 'albatrosses'}`;
+    }
   }
 }
