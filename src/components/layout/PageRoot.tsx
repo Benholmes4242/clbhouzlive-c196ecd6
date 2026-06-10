@@ -49,6 +49,7 @@ export const PageRoot = React.forwardRef<HTMLDivElement, PageRootProps>(
       false,
       false,
       !immersiveStatusBar,
+      resolvedDark ? "dark" : "light",
     );
 
     // Bottom nav (64px) + safe area spacer (30px) = 94px clearance
