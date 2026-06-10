@@ -155,120 +155,15 @@ function HandicapMasthead({ userId, onConnectTap, onCardTap }: Props) {
     else navigate('/handicap');
   };
 
-  // ── Connect variant: dark gradient card ──
+  // ── Connect variant: shared ghost-index card ──
   if (state === 'connect') {
     return (
       <div style={{ paddingTop: 14 }}>
-        <button
-          type="button"
-          onClick={onConnectTap}
-          className="w-full text-left active:scale-[0.995] transition-transform"
-          style={{
-            position: 'relative',
-            overflow: 'hidden',
-            display: 'block',
-            background: 'linear-gradient(135deg, #1A1F2C 0%, #0F1419 100%)',
-            borderRadius: 14,
-            border: 'none',
-            padding: '20px 20px 18px',
-            cursor: 'pointer',
-            boxShadow: '0 4px 20px rgba(15,23,42,0.12)',
-          }}
-        >
-          {/* Amber glow */}
-          <div
-            aria-hidden
-            style={{
-              pointerEvents: 'none',
-              position: 'absolute',
-              top: -40,
-              right: -40,
-              width: 160,
-              height: 160,
-              background:
-                'radial-gradient(circle, rgba(247,147,30,0.22) 0%, rgba(247,147,30,0) 70%)',
-            }}
-          />
-          {/* Grid texture */}
-          <div
-            aria-hidden
-            style={{
-              pointerEvents: 'none',
-              position: 'absolute',
-              inset: 0,
-              opacity: 0.04,
-              backgroundImage:
-                'linear-gradient(rgba(255,255,255,1) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,1) 1px, transparent 1px)',
-              backgroundSize: '24px 24px',
-            }}
-          />
-
-          <div style={{ position: 'relative' }}>
-            {/* Eyebrow */}
-            <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 10 }}>
-              <OfficialHandicapMark size={13} color={AMBER} />
-              <span
-                style={{
-                  fontSize: 9.5,
-                  fontWeight: 800,
-                  color: AMBER,
-                  letterSpacing: '0.14em',
-                  textTransform: 'uppercase' as const,
-                }}
-              >
-                WHS · Official Handicap
-              </span>
-            </div>
-
-            {/* Headline */}
-            <div
-              style={{
-                fontSize: 22,
-                fontWeight: 800,
-                color: '#FFFFFF',
-                letterSpacing: '-0.015em',
-                lineHeight: 1.1,
-                marginBottom: 4,
-              }}
-            >
-              Track your handicap.
-            </div>
-
-            {/* Sub */}
-            <div
-              style={{
-                fontSize: 13,
-                fontWeight: 500,
-                color: 'rgba(255,255,255,0.65)',
-                lineHeight: 1.4,
-                maxWidth: 280,
-                marginBottom: 16,
-              }}
-            >
-              Sync your official index, see your trend, compare with friends.
-            </div>
-
-            {/* CTA pill */}
-            <span
-              style={{
-                display: 'inline-flex',
-                alignItems: 'center',
-                gap: 8,
-                padding: '11px 18px',
-                borderRadius: 10,
-                background: `linear-gradient(135deg, ${AMBER}, ${AMBER_DEEP})`,
-                color: '#FFFFFF',
-                fontSize: 13.5,
-                fontWeight: 700,
-                boxShadow: '0 4px 14px rgba(247,147,30,0.40)',
-              }}
-            >
-              Connect handicap
-              <ArrowRight size={14} color="#FFFFFF" strokeWidth={2.4} />
-            </span>
-
-          </div>
-        </button>
+        <ConnectHandicapCard
+          headline="Track your handicap."
+          sub="Sync your official index, see your trend, compare with friends."
+          onTap={onConnectTap}
+        />
       </div>
     );
   }
