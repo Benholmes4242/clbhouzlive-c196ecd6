@@ -87,9 +87,9 @@ const HolderCell: React.FC<HolderCellProps> = ({ short, unit, holder, selfLabel 
         alignItems: 'center',
         gap: 9,
         padding: '8px 10px',
-        background: isSelf ? 'rgba(255,255,255,0.04)' : 'transparent',
+        background: isSelf ? 'rgba(251,188,46,0.07)' : 'transparent',
         border: isSelf
-          ? '1px solid var(--hcp-line)'
+          ? '1px solid rgba(251,188,46,0.45)'
           : '1px solid transparent',
         borderRadius: 10,
         minWidth: 0,
@@ -102,6 +102,9 @@ const HolderCell: React.FC<HolderCellProps> = ({ short, unit, holder, selfLabel 
       <div style={{ flex: 1, minWidth: 0 }}>
         <div
           style={{
+            display: 'inline-flex',
+            alignItems: 'center',
+            gap: 4,
             fontSize: 8.5,
             fontWeight: 800,
             letterSpacing: '0.14em',
@@ -110,6 +113,14 @@ const HolderCell: React.FC<HolderCellProps> = ({ short, unit, holder, selfLabel 
             textTransform: 'uppercase',
           }}
         >
+          {isSelf && (
+            <Crown
+              size={9}
+              strokeWidth={2.6}
+              fill="#FBBC2E"
+              style={{ color: '#B26818' }}
+            />
+          )}
           {short}
         </div>
         <div
@@ -125,7 +136,7 @@ const HolderCell: React.FC<HolderCellProps> = ({ short, unit, holder, selfLabel 
             letterSpacing: '-0.01em',
           }}
         >
-          {isEmpty ? '—' : (isSelf ? selfLabel : holder!.display_name)}
+          {isEmpty ? 'Unclaimed' : (isSelf ? selfLabel : holder!.display_name)}
         </div>
       </div>
 
