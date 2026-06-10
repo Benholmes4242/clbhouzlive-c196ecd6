@@ -92,46 +92,42 @@ export function HandicapChip({ light = false }: { light?: boolean } = {}) {
     navigate('/handicap');
   };
 
+  // Disconnected / no-index state — dashed "empty slot" pill.
+  const disconnectedPill = (
+    <button
+      type="button"
+      onClick={() => handleTap('disconnected')}
+      aria-label="Connect handicap"
+      style={{
+        ...BASE_STYLE,
+        border: `1px dashed ${light ? 'rgba(15,23,42,0.22)' : 'rgba(255,255,255,0.26)'}`,
+        filter: shadow,
+        whiteSpace: 'nowrap',
+      }}
+      className="active:scale-[0.97] transition-transform"
+    >
+      <span
+        style={{
+          fontSize: 11,
+          fontWeight: 700,
+          color: INK,
+          letterSpacing: '0.02em',
+        }}
+      >
+        Connect HCP
+      </span>
+    </button>
+  );
+
   // Disconnected — no WHS connection.
   if (!connection) {
-    return (
-      <button
-        type="button"
-        onClick={() => handleTap('disconnected')}
-        aria-label="Connect handicap"
-        style={baseStyle}
-        className="active:scale-[0.97] transition-transform"
-      >
-        <span
-          style={{
-            fontSize: 11,
-            fontWeight: 700,
-            color: AMBER,
-            letterSpacing: '0.04em',
-          }}
-        >
-          Connect HCP
-        </span>
-      </button>
-    );
+    return disconnectedPill;
   }
 
   const indexValue = trendData?.current ?? null;
   if (indexValue === null) {
     // Connection exists but no current index — fall back to Connect HCP.
-    return (
-      <button
-        type="button"
-        onClick={() => handleTap('disconnected')}
-        aria-label="Connect handicap"
-        style={baseStyle}
-        className="active:scale-[0.97] transition-transform"
-      >
-        <span style={{ fontSize: 11, fontWeight: 700, color: AMBER, letterSpacing: '0.04em' }}>
-          Connect HCP
-        </span>
-      </button>
-    );
+    return disconnectedPill;
   }
 
   const { direction } = trend;
