@@ -6,8 +6,6 @@ const INK = '#0F172A';
 const INK_55 = '#64748B';
 const AMBER = '#F7931E';
 const GREEN = '#059669';
-const INK_ON_DARK = '#F8FAFC';
-const MUTED_ON_DARK = '#94A3B8';
 const FONT = 'Geist, -apple-system, BlinkMacSystemFont, system-ui, sans-serif';
 
 interface Props {
@@ -32,24 +30,25 @@ export const EnglandGolfForm: React.FC<Props> = ({
       <div
         style={{
           display: 'flex', alignItems: 'center', gap: 8,
-          background: 'rgba(248,250,252,0.04)',
-          border: '1px solid rgba(248,250,252,0.10)',
+          background: '#FFFFFF',
+          border: '1px solid rgba(15,23,42,0.08)',
           borderRadius: 12,
           padding: '10px 14px',
           marginBottom: 18,
+          boxShadow: '0 1px 3px rgba(15,23,42,0.04)',
         }}
       >
         <MiniFlag iso="GB-ENG" />
         <div style={{ flex: 1, minWidth: 0 }}>
           <div style={{
-            fontSize: 9, fontWeight: 800, color: MUTED_ON_DARK,
+            fontSize: 9, fontWeight: 800, color: INK_55,
             letterSpacing: '0.14em', textTransform: 'uppercase',
             marginBottom: 1,
           }}>
             CONNECTING TO
           </div>
           <div style={{
-            fontSize: 13.5, fontWeight: 700, color: INK_ON_DARK,
+            fontSize: 13.5, fontWeight: 700, color: INK,
             lineHeight: 1.2,
           }}>
             England Golf · MyEG
@@ -83,7 +82,7 @@ export const EnglandGolfForm: React.FC<Props> = ({
             htmlFor="whs-membership"
             style={{
               display: 'block',
-              fontSize: 13, fontWeight: 600, color: INK_ON_DARK,
+              fontSize: 13, fontWeight: 600, color: INK,
               marginBottom: 6,
             }}
           >
@@ -112,7 +111,7 @@ export const EnglandGolfForm: React.FC<Props> = ({
               opacity: submitting ? 0.5 : 1,
             }}
           />
-          <div style={{ fontSize: 11.5, color: MUTED_ON_DARK, marginTop: 5 }}>
+          <div style={{ fontSize: 11.5, color: INK_55, marginTop: 5 }}>
             Find this on your member card or in MyEG
           </div>
         </div>
@@ -122,7 +121,7 @@ export const EnglandGolfForm: React.FC<Props> = ({
             htmlFor="whs-password"
             style={{
               display: 'block',
-              fontSize: 13, fontWeight: 600, color: INK_ON_DARK,
+              fontSize: 13, fontWeight: 600, color: INK,
               marginBottom: 6,
             }}
           >
@@ -168,7 +167,7 @@ export const EnglandGolfForm: React.FC<Props> = ({
               {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
             </button>
           </div>
-          <div style={{ fontSize: 11.5, color: MUTED_ON_DARK, marginTop: 5 }}>
+          <div style={{ fontSize: 11.5, color: INK_55, marginTop: 5 }}>
             Same password you use for the MyEG app
           </div>
         </div>
@@ -200,8 +199,8 @@ export const EnglandGolfForm: React.FC<Props> = ({
           }}
         >
           <ShieldCheck size={18} color={GREEN} strokeWidth={2.2} style={{ marginTop: 1, flexShrink: 0 }} />
-          <div style={{ fontSize: 12, color: 'rgba(248,250,252,0.78)', lineHeight: 1.45 }}>
-            <span style={{ fontWeight: 700, color: INK_ON_DARK }}>Your password is safe.</span>{' '}
+          <div style={{ fontSize: 12, color: '#334155', lineHeight: 1.45 }}>
+            <span style={{ fontWeight: 700, color: INK }}>Your password is safe.</span>{' '}
             Stored encrypted, used only to fetch your handicap from England Golf. clbhouz staff can't read it. Disconnect anytime.
           </div>
         </div>
@@ -214,9 +213,9 @@ export const EnglandGolfForm: React.FC<Props> = ({
             padding: '14px',
             borderRadius: 999,
             background: !isValid || submitting
-              ? 'rgba(248,250,252,0.10)'
+              ? 'rgba(15,23,42,0.06)'
               : 'linear-gradient(180deg, #FBA738 0%, #F7931E 100%)',
-            color: !isValid || submitting ? 'rgba(248,250,252,0.40)' : '#fff',
+            color: !isValid || submitting ? 'rgba(15,23,42,0.35)' : '#fff',
             fontSize: 15, fontWeight: 700,
             border: 'none',
             cursor: !isValid || submitting ? 'not-allowed' : 'pointer',
@@ -232,7 +231,7 @@ export const EnglandGolfForm: React.FC<Props> = ({
 
         {onSkip && (
           <div style={{
-            textAlign: 'center', fontSize: 13, color: MUTED_ON_DARK,
+            textAlign: 'center', fontSize: 13, color: INK_55,
             paddingTop: 14,
           }}>
             Not a member?{' '}
@@ -240,10 +239,10 @@ export const EnglandGolfForm: React.FC<Props> = ({
               type="button"
               onClick={onSkip}
               style={{
-                color: INK_ON_DARK, fontWeight: 600,
+                color: INK, fontWeight: 600,
                 background: 'transparent', border: 'none', cursor: 'pointer',
                 textDecoration: 'underline',
-                textDecorationColor: 'rgba(248,250,252,0.30)',
+                textDecorationColor: 'rgba(15,23,42,0.30)',
                 textUnderlineOffset: 3,
                 fontFamily: FONT,
               }}
