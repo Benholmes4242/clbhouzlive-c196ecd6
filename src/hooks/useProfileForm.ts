@@ -6,9 +6,18 @@ import { formHcpFromDb } from '@/lib/formatHcp';
 function makeInitial(profile: any): ProfileFormData {
   const social = profile?.social_links ?? {};
 
+  // Onboarding-aware username seed: never show the auto-generated username
+  // to a first-time user. Seed empty so they actively choose one.
+  const seededUsername =
+    profile?.username_is_custom === false && profile?.has_completed_onboarding !== true
+      ? ''
+      : (profile?.username ?? '');
+
   return {
     displayName: profile?.display_name ?? '',
-    username: profile?.username ?? '',
+    username: seededUsername,
+    firstName: profile?.first_name ?? '',
+    lastName: profile?.last_name ?? '',
     profilePhotoUrl: profile?.profile_photo_url ?? null,
     headerPhotoUrl: profile?.header_photo_url ?? null,
     profilePhotoBlob: null,
