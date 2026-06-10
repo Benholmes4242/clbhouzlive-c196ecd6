@@ -109,6 +109,12 @@ export default function HandicapConnectSheet({ open, onClose, userId, onConnecte
           hideCloseButton
           className="p-0 rounded-t-[20px] border-0 max-h-[92dvh] flex flex-col"
           style={{ fontFamily: FONT, color: INK, background: '#fff' }}
+          onPointerDownOutside={(e) => {
+            if ((e.target as HTMLElement)?.closest?.('[data-country-picker]')) e.preventDefault();
+          }}
+          onInteractOutside={(e) => {
+            if ((e.target as HTMLElement)?.closest?.('[data-country-picker]')) e.preventDefault();
+          }}
         >
           {/* Drag handle */}
           <div style={{ display: 'flex', justifyContent: 'center', paddingTop: 8, paddingBottom: 8 }}>
