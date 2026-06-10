@@ -23,6 +23,7 @@ import { FullCourseLeaderboardSheet } from './drilldown/FullCourseLeaderboardShe
 import { WindowToggle } from './CourseLegendsSection';
 import { ConnectHandicapCue } from '@/components/courses/course-detail/ConnectHandicapCue';
 import { ChampionsCourseSearch } from './drilldown/ChampionsCourseSearch';
+import { formatGapFromChampion } from './drilldown/_shared/helpers';
 
 
 const CATEGORIES_ORDER_90D: LegendCategory[] = [
