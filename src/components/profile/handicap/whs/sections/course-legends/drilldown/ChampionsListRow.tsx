@@ -36,9 +36,10 @@ export const ChampionsListRow: React.FC<ChampionsListRowProps> = ({
   isChampion,
   gapToChampion,
   holdDuration,
+  isNew = false,
 }) => {
   const rowBg = isSelf
-    ? 'rgba(255,255,255,0.08)'
+    ? 'rgba(15,23,42,0.045)'
     : isChampion
       ? 'var(--hcp-bg-2)'
       : 'var(--hcp-bg-1)';
