@@ -5,6 +5,7 @@ import {
   TrendingDown,
   Award,
   Sparkles,
+  Bird,
   type LucideIcon,
 } from 'lucide-react';
 import type { BadgeRarity, LegendCategory, StreakType } from './types';
