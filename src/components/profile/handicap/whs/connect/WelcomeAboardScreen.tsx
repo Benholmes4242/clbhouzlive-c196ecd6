@@ -194,7 +194,7 @@ export const WelcomeAboardScreen: React.FC<Props> = ({
       </div>
 
       <p style={{
-        fontSize: 13.5, color: MUTED_ON_DARK, lineHeight: 1.5,
+        fontSize: 13.5, color: INK_55, lineHeight: 1.5,
         margin: '0 0 22px', maxWidth: 290,
       }}>
         Everything's live — your handicap will update automatically after every counting round.
