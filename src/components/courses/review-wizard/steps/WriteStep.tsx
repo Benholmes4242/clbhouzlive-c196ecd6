@@ -392,7 +392,6 @@ export function WriteStep({
         {/* Tappable prompt chips */}
         <div>
           <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 8 }}>
-            <div style={{ width: 3, height: 12, background: '#F7931E', borderRadius: 1, flexShrink: 0 }} />
             <span style={{ fontSize: 10.5, fontWeight: 800, color: '#94A3B8', letterSpacing: '0.14em', textTransform: 'uppercase' as const }}>Write about…</span>
           </div>
           <div className="flex flex-wrap gap-2">
