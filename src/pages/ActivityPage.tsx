@@ -388,8 +388,8 @@ const ActivityPage: React.FC = () => {
                             <FeaturedNotificationCard
                               key={item.id}
                               notification={item}
-                              index={isInitialMountRef.current ? idx : 0}
-                              skipAnimation={!isInitialMountRef.current}
+                              index={hasAnimatedIn ? 0 : Math.min(idx, 8)}
+                              skipAnimation={hasAnimatedIn}
                               onClick={() => handleNotificationClick(item)}
                               onOpenActionsSheet={() => openActionsSheet(item)}
                               currentUserId={user?.id}
