@@ -21,7 +21,13 @@ const CAT_LABEL: Record<LegendCategory, string> = {
   most_eagles_all_time:     'Eagle',
   most_aces_90d:            'Ace',
   most_aces_all_time:       'Ace',
+  most_albatrosses_90d:     'Albatross',
+  most_albatrosses_all_time:'Albatross',
 };
+
+function isAlbatrosses(c: LegendCategory): boolean {
+  return c === 'most_albatrosses_90d' || c === 'most_albatrosses_all_time';
+}
 
 function isScoreDiff(c: LegendCategory): boolean {
   return c === 'best_score_diff_90d' || c === 'best_score_diff_all_time';
