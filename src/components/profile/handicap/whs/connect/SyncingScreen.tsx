@@ -87,8 +87,8 @@ export const SyncingScreen: React.FC = () => {
           </circle>
 
           <g transform="translate(70 70)">
-            <line x1="-2" y1="-14" x2="-2" y2="14" stroke={INK_ON_DARK} strokeWidth="2.5" strokeLinecap="round" />
-            <path d="M -2 -12 L 14 -8 L -2 -4 Z" fill={AMBER} stroke={INK_ON_DARK} strokeWidth="1.5" strokeLinejoin="round" />
+            <line x1="-2" y1="-14" x2="-2" y2="14" stroke={INK} strokeWidth="2.5" strokeLinecap="round" />
+            <path d="M -2 -12 L 14 -8 L -2 -4 Z" fill={AMBER} stroke={INK} strokeWidth="1.5" strokeLinejoin="round" />
           </g>
         </svg>
       </div>
