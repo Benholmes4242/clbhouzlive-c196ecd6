@@ -49,6 +49,7 @@ export const CountryPickerSheet: React.FC<Props> = ({ open, onClose, onSelect })
       />
 
       <div
+        data-country-picker
         role="dialog"
         aria-modal="true"
         style={{
@@ -58,12 +59,13 @@ export const CountryPickerSheet: React.FC<Props> = ({ open, onClose, onSelect })
           background: '#FFFFFF',
           borderTopLeftRadius: 20,
           borderTopRightRadius: 20,
-          zIndex: 9999,
+          zIndex: 10301,
           display: 'flex',
           flexDirection: 'column',
           fontFamily: FONT,
           animation: 'slideUp 240ms cubic-bezier(0.32, 0.72, 0, 1)',
           boxShadow: '0 -8px 30px rgba(15,23,42,0.18)',
+          pointerEvents: 'auto',
         }}
       >
         <div style={{ display: 'flex', justifyContent: 'center', paddingTop: 8 }}>
