@@ -13,9 +13,10 @@
  */
 import { memo, useMemo } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
-import { ArrowDownRight, ArrowUpRight, ArrowRight } from 'lucide-react';
+import { ArrowDownRight, ArrowUpRight } from 'lucide-react';
 import { useWhsConnection, useHandicapTrend, useLastRound, useHandicapHistory } from '@/lib/whs/hooks';
 import { useHandicapTrend12mo } from '@/hooks/useHandicapTrend12mo';
+import { ConnectHandicapCard } from '@/components/shared/ConnectHandicapCard';
 
 const INK = '#0F172A';
 const INK_SOFT = '#475569';
