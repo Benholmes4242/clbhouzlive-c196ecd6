@@ -49,8 +49,9 @@ const Skeleton: React.FC = () => (
       style={{
         height: 156,
         borderRadius: 14,
-        background: 'linear-gradient(135deg, #1A1F2C 0%, #0F1419 100%)',
-        opacity: 0.55,
+        background: '#FFFFFF',
+        border: `0.5px solid ${HAIRLINE}`,
+        opacity: 0.7,
       }}
     />
   </div>
