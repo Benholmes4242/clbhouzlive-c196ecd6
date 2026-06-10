@@ -68,26 +68,6 @@ function classifyState(
   return trend.delta < 0 ? 'improving' : 'drifting';
 }
 
-function OfficialHandicapMark({ size = 13, color = AMBER }: { size?: number; color?: string }) {
-  return (
-    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" aria-hidden="true">
-      <path
-        d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"
-        stroke={color}
-        strokeWidth="2"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      />
-      <path
-        d="M8.5 12l2.5 2.5L15.5 10"
-        stroke={color}
-        strokeWidth="2"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      />
-    </svg>
-  );
-}
 
 function formatHandicap(v: number | null): string {
   if (v === null) return '—';
