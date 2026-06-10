@@ -23,7 +23,7 @@ const INK_SOFT = '#475569';
 const INK_FAINT = '#94A3B8';
 const HAIRLINE = 'rgba(15,23,42,0.08)';
 const AMBER = '#F7931E';
-const AMBER_DEEP = '#D97706';
+
 const SLATE_200 = '#E2E8F0';
 const SEASON_GREEN = '#006747';
 const CRIMSON = '#9F1D1D';
