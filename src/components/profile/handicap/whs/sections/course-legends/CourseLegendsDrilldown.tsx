@@ -352,6 +352,7 @@ export const CourseLegendsDrilldown: React.FC<Props> = ({ selection, hideHeader 
         visibleCategories={sheetCategoryDescriptors}
         initialCategory={fullLeaderboardCategory ?? visibleCategories[0]}
         window={window}
+        yourRanks={yourRanks}
       />
     </div>
   );
