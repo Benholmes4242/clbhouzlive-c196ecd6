@@ -9,6 +9,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { usePostSubmission } from '@/hooks/usePostSubmission';
 import { useActiveActor } from '@/context/ActiveActorContext';
 import { CourseSearchSheet } from './CourseSearchSheet';
+import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import type { TaggedCourse, StudioActorType } from './types';
 
 const MAX_CAPTION = 2000;
