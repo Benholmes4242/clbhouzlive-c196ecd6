@@ -8,6 +8,7 @@ import { useProfileData } from '@/hooks/useProfileData';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useProfileForm } from '@/hooks/useProfileForm';
 import { useProfileSave } from '@/hooks/useProfileSave';
+import { supabase } from '@/integrations/supabase/client';
 import { useWhsConnection } from '@/lib/whs/hooks';
 import { resolveDisplayHandicap } from '@/lib/handicap/resolveHandicap';
 import { formatHcp } from '@/lib/formatHcp';
@@ -70,6 +71,58 @@ export default function EditProfile() {
   const [showManualEntry, setShowManualEntry] = useState(false);
   const [connectSheetOpen, setConnectSheetOpen] = useState(false);
 
+  // ── Onboarding-only state: username availability + display-name auto-fill ──
+  const [usernameStatus, setUsernameStatus] = useState<
+    'idle' | 'invalid' | 'checking' | 'available' | 'taken'
+  >('idle');
+  const [hasTouchedDisplayName, setHasTouchedDisplayName] = useState(false);
+  const usernameCheckRef = useRef<ReturnType<typeof setTimeout>>();
+
+  const USERNAME_RE = /^[a-z0-9_.]{3,20}$/;
+
+  // Debounced availability check while onboarding
+  useEffect(() => {
+    if (!isNewUser.current) return;
+    clearTimeout(usernameCheckRef.current);
+    const candidate = form.username.trim().toLowerCase();
+    if (!candidate) {
+      setUsernameStatus('idle');
+      return;
+    }
+    if (!USERNAME_RE.test(candidate)) {
+      setUsernameStatus('invalid');
+      return;
+    }
+    setUsernameStatus('checking');
+    usernameCheckRef.current = setTimeout(async () => {
+      try {
+        const { count, error } = await supabase
+          .from('user_profiles')
+          .select('id', { count: 'exact', head: true })
+          .ilike('username', candidate)
+          .neq('id', user?.id ?? '');
+        if (error) {
+          setUsernameStatus('idle');
+          return;
+        }
+        setUsernameStatus((count ?? 0) > 0 ? 'taken' : 'available');
+      } catch {
+        setUsernameStatus('idle');
+      }
+    }, 400);
+    return () => clearTimeout(usernameCheckRef.current);
+  }, [form.username, user?.id]);
+
+  // Auto-fill display name from First + Last while user hasn't touched it
+  useEffect(() => {
+    if (!isNewUser.current || hasTouchedDisplayName) return;
+    const combined = `${form.firstName} ${form.lastName}`.trim();
+    if (combined !== form.displayName) {
+      setField('displayName', combined);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [form.firstName, form.lastName, hasTouchedDisplayName]);
+
   const [searchParams] = useSearchParams();
   const golfRef = useRef<HTMLDivElement | null>(null);
   const aboutRef = useRef<HTMLDivElement | null>(null);
@@ -91,8 +144,29 @@ export default function EditProfile() {
   if (loading) return <ProfileSkeleton />;
 
   const handleSave = async () => {
-    // First-login gating: require Display Name + Gender for new users.
+    // First-login gating: ordered validation with one toast each.
     if (isNewUser.current) {
+      const candidate = form.username.trim().toLowerCase();
+      if (!candidate || !USERNAME_RE.test(candidate)) {
+        toast.error('Please choose a username.');
+        return;
+      }
+      if (usernameStatus === 'checking') {
+        toast.error('Checking username availability — please wait.');
+        return;
+      }
+      if (usernameStatus === 'taken') {
+        toast.error('That username is taken — please choose another.');
+        return;
+      }
+      if (!form.firstName.trim()) {
+        toast.error('Please enter your first name.');
+        return;
+      }
+      if (!form.lastName.trim()) {
+        toast.error('Please enter your last name.');
+        return;
+      }
       if (!form.displayName.trim()) {
         toast.error('Please enter a display name.');
         return;
@@ -101,9 +175,18 @@ export default function EditProfile() {
         toast.error('Please select a gender.');
         return;
       }
+      if (!form.country.trim()) {
+        toast.error('Please select your country.');
+        return;
+      }
     }
-    const ok = await save(form);
-    if (ok) {
+    const result = await save(form, { isOnboarding: isNewUser.current });
+    if (result === 'username_taken') {
+      setUsernameStatus('taken');
+      toast.error('That username was just taken — please choose another.');
+      return;
+    }
+    if (result) {
       queryClient.invalidateQueries({ queryKey: ['profile'] });
       if (isNewUser.current) {
         navigate('/', { replace: true });
@@ -112,6 +195,7 @@ export default function EditProfile() {
       }
     }
   };
+
 
   const isDisabled = !isValid || !isDirty || isSaving;
 
@@ -179,10 +263,35 @@ export default function EditProfile() {
 
           <SectionCard noPadding>
             <div>
+              {/* Name (first + last) — onboarding-relevant */}
+              <div className="px-4 pt-4 pb-3" style={{ borderBottom: '0.5px solid rgba(15,23,42,0.07)' }}>
+                <div style={{ marginBottom: 8 }}>
+                  <SectionEyebrow label="Name" required={isNewUser.current} />
+                </div>
+                <div className="flex gap-2">
+                  <input
+                    type="text"
+                    value={form.firstName}
+                    onChange={(e) => setField('firstName', e.target.value)}
+                    placeholder="First name"
+                    className="w-1/2 bg-[#F8FAFC] border border-border/60 rounded-[11px] px-3.5 py-2.5 text-[15px] text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-[hsl(38,92%,50%)]/40 focus:bg-background transition-colors"
+                  />
+                  <input
+                    type="text"
+                    value={form.lastName}
+                    onChange={(e) => setField('lastName', e.target.value)}
+                    placeholder="Last name"
+                    className="w-1/2 bg-[#F8FAFC] border border-border/60 rounded-[11px] px-3.5 py-2.5 text-[15px] text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-[hsl(38,92%,50%)]/40 focus:bg-background transition-colors"
+                  />
+                </div>
+              </div>
+
               {/* Display Name */}
               <div className="px-4 pt-4 pb-3" style={{ borderBottom: '0.5px solid rgba(15,23,42,0.07)' }}>
                 <div className="flex justify-between items-baseline">
-                  <div style={{ marginBottom: 8 }}><SectionEyebrow label="Display Name" /></div>
+                  <div style={{ marginBottom: 8 }}>
+                    <SectionEyebrow label="Display Name" required={isNewUser.current} />
+                  </div>
                   <span className="text-[11px] text-muted-foreground/60">
                     {form.displayName.length}/{DISPLAY_NAME_MAX}
                   </span>
@@ -191,7 +300,7 @@ export default function EditProfile() {
                   type="text"
                   value={form.displayName}
                   maxLength={DISPLAY_NAME_MAX}
-                  onChange={(e) => setField('displayName', e.target.value)}
+                  onChange={(e) => { setHasTouchedDisplayName(true); setField('displayName', e.target.value); }}
                   placeholder="Your full name"
                   className="w-full bg-[#F8FAFC] border border-border/60 rounded-[11px] px-3.5 py-2.5 text-[15px] text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-[hsl(38,92%,50%)]/40 focus:bg-background transition-colors"
                 />
@@ -203,7 +312,9 @@ export default function EditProfile() {
               {/* Username */}
               <div className="px-4 pt-3 pb-4" style={{ borderBottom: '0.5px solid rgba(15,23,42,0.07)' }}>
                 <div className="flex justify-between items-baseline">
-                  <div style={{ marginBottom: 8 }}><SectionEyebrow label="Username" /></div>
+                  <div style={{ marginBottom: 8 }}>
+                    <SectionEyebrow label="Username" required={isNewUser.current && !usernameIsLocked} />
+                  </div>
                   {usernameIsLocked && (
                     <span className="text-[11px] text-muted-foreground/60">
                       Contact{' '}
@@ -220,11 +331,37 @@ export default function EditProfile() {
                     value={form.username}
                     maxLength={USERNAME_MAX}
                     readOnly={usernameIsLocked}
-                    onChange={(e) => !usernameIsLocked && setField('username', e.target.value)}
-                    placeholder="username"
-                    className={`w-full bg-[#F8FAFC] border border-border/60 rounded-[11px] pl-8 pr-3.5 py-2.5 text-[15px] text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-[hsl(38,92%,50%)]/40 focus:bg-background transition-colors ${usernameIsLocked ? 'opacity-50 cursor-not-allowed' : ''}`}
+                    onChange={(e) => {
+                      if (usernameIsLocked) return;
+                      setField('username', e.target.value.toLowerCase());
+                    }}
+                    placeholder="choose a username"
+                    className={`w-full bg-[#F8FAFC] border border-border/60 rounded-[11px] pl-8 pr-24 py-2.5 text-[15px] text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-[hsl(38,92%,50%)]/40 focus:bg-background transition-colors ${usernameIsLocked ? 'opacity-50 cursor-not-allowed' : ''}`}
                   />
+                  {!usernameIsLocked && isNewUser.current && form.username.trim().length > 0 && (
+                    <span className="absolute right-3 top-1/2 -translate-y-1/2 inline-flex items-center gap-1 text-[12px]">
+                      {usernameStatus === 'checking' && (
+                        <span style={{ width: 12, height: 12, border: '2px solid #F7931E', borderTopColor: 'transparent', borderRadius: '50%' }} className="animate-spin" />
+                      )}
+                      {usernameStatus === 'available' && (
+                        <span style={{ color: GREEN, display: 'inline-flex', alignItems: 'center', gap: 4 }}>
+                          <CheckCircle2 size={14} strokeWidth={2.25} /> available
+                        </span>
+                      )}
+                      {usernameStatus === 'taken' && (
+                        <span style={{ color: '#DC2626' }}>taken</span>
+                      )}
+                      {usernameStatus === 'invalid' && (
+                        <span style={{ color: '#DC2626' }}>invalid</span>
+                      )}
+                    </span>
+                  )}
                 </div>
+                {!usernameIsLocked && isNewUser.current && (
+                  <p className="text-[12px] text-muted-foreground mt-1.5">
+                    3–20 characters · lowercase letters, numbers, underscores, periods
+                  </p>
+                )}
               </div>
 
               {/* Gender */}
@@ -241,6 +378,7 @@ export default function EditProfile() {
             </div>
           </SectionCard>
         </div>
+
 
         {/* ── Location ────────────────────────────────────── */}
         <div className="space-y-4 px-4 pb-4">

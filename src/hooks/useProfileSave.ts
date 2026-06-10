@@ -15,7 +15,11 @@ export function useProfileSave(userId: string) {
   const queryClient = useQueryClient();
   const [isSaving, setIsSaving] = useState(false);
 
-  const save = async (form: ProfileFormData): Promise<boolean> => {
+  const save = async (
+    form: ProfileFormData,
+    opts: { isOnboarding?: boolean } = {}
+  ): Promise<boolean | 'username_taken'> => {
+    const { isOnboarding = false } = opts;
     setIsSaving(true);
     try {
       // 1. Upload profile photo if changed
@@ -49,48 +53,59 @@ export function useProfileSave(userId: string) {
       }
 
       // 3. Update user_profiles — fully typed, no `any`
+      const updatePayload: Record<string, any> = {
+        display_name: form.displayName.trim(),
+        first_name: form.firstName.trim() || null,
+        last_name: form.lastName.trim() || null,
+        bio: form.bio.trim(),
+        is_public: form.isPublic,
+        profile_photo_url: profilePhotoUrl,
+        header_photo_url: headerPhotoUrl,
+        home_club: form.homeClubName,
+        primary_club_id: form.primaryClubId,
+        // Write to manual_handicap_index ONLY. eg_handicap_index is owned
+        // exclusively by the WHS connect/sync edge functions.
+        manual_handicap_index: parseHcpFormString(form.handicapIndex),
+        home_club_visibility: form.homeClubVisibility,
+        additional_clubs_visibility: form.additionalClubsVisibility,
+        websites: form.websites.map(w => w.url).filter(Boolean),
+        instagram_handle: form.instagramHandle.replace('@', '').trim(),
+        twitter_handle: form.twitterHandle.replace('@', '').trim(),
+        tiktok_handle: form.tiktokHandle.replace('@', '').trim(),
+        youtube_handle: form.youtubeHandle.replace('@', '').trim(),
+        country: form.country.trim(),
+        city: form.city.trim(),
+        gender: form.gender || null,
+        champions_visibility: form.championsVisibility || 'everyone',
+        handicap_page_visibility: form.handicapPageVisibility || 'everyone',
+        has_completed_onboarding: true,
+        updated_at: new Date().toISOString(),
+      };
+
+      // Only onboarding writes the username + username_is_custom flag.
+      // For returning users the field is read-only in the UI; never trust it.
+      if (isOnboarding) {
+        updatePayload.username = form.username.trim();
+        updatePayload.username_is_custom = true;
+      }
+
       const { error: profileError } = await supabase
         .from('user_profiles')
-        .update({
-          display_name: form.displayName.trim(),
-          bio: form.bio.trim(),
-          is_public: form.isPublic,
-          profile_photo_url: profilePhotoUrl,
-          header_photo_url: headerPhotoUrl,
-          home_club: form.homeClubName,
-          primary_club_id: form.primaryClubId,
-          // Write to manual_handicap_index ONLY. eg_handicap_index is owned
-          // exclusively by the WHS connect/sync edge functions.
-          manual_handicap_index: parseHcpFormString(form.handicapIndex),
-          home_club_visibility: form.homeClubVisibility,
-          additional_clubs_visibility: form.additionalClubsVisibility,
-          websites: form.websites
-            .map(w => w.url)
-            .filter(Boolean),
-          instagram_handle: form.instagramHandle
-            .replace('@', '')
-            .trim(),
-          twitter_handle: form.twitterHandle
-            .replace('@', '')
-            .trim(),
-          tiktok_handle: form.tiktokHandle
-            .replace('@', '')
-            .trim(),
-          youtube_handle: form.youtubeHandle
-            .replace('@', '')
-            .trim(),
-          country: form.country.trim(),
-          city: form.city.trim(),
-          gender: form.gender || null,
-          champions_visibility: form.championsVisibility || 'everyone',
-          handicap_page_visibility: form.handicapPageVisibility || 'everyone',
-          has_completed_onboarding: true,
-          username_is_custom: true,
-          updated_at: new Date().toISOString(),
-        } as any)
+        .update(updatePayload as any)
         .eq('id', userId);
 
-      if (profileError) throw profileError;
+      if (profileError) {
+        const msg = (profileError.message || '').toLowerCase();
+        const isUniqueViolation =
+          (profileError as any).code === '23505' ||
+          msg.includes('uq_user_profiles_username_ci') ||
+          (msg.includes('duplicate') && msg.includes('username'));
+        if (isUniqueViolation) {
+          return 'username_taken';
+        }
+        throw profileError;
+      }
+
 
       // 4. Sync home club to user_home_clubs
       if (form.primaryClubId) {
