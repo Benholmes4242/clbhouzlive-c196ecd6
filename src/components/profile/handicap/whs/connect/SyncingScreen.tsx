@@ -134,7 +134,7 @@ export const SyncingScreen: React.FC = () => {
                 style={{
                   fontSize: 13.5,
                   fontWeight: isActive ? 700 : 500,
-                  color: isActive ? INK_ON_DARK : MUTED_ON_DARK,
+                  color: isActive ? INK : INK_55,
                   transition: 'all 400ms ease',
                 }}
               >
