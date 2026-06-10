@@ -14719,6 +14719,7 @@ export type Database = {
           email_change_requested_at: string | null
           email_change_token: string | null
           featured_post_id: string | null
+          first_name: string | null
           gam_launch_seen_at: string | null
           gender: string
           golfer_verified_at: string | null
@@ -14747,6 +14748,7 @@ export type Database = {
           is_verified: boolean | null
           is_verified_business: boolean
           is_verified_golfer: boolean
+          last_name: string | null
           last_notifications_seen_at: string | null
           last_rating_at: string | null
           last_seen_post_id: string | null
@@ -14839,6 +14841,7 @@ export type Database = {
           email_change_requested_at?: string | null
           email_change_token?: string | null
           featured_post_id?: string | null
+          first_name?: string | null
           gam_launch_seen_at?: string | null
           gender?: string
           golfer_verified_at?: string | null
@@ -14867,6 +14870,7 @@ export type Database = {
           is_verified?: boolean | null
           is_verified_business?: boolean
           is_verified_golfer?: boolean
+          last_name?: string | null
           last_notifications_seen_at?: string | null
           last_rating_at?: string | null
           last_seen_post_id?: string | null
@@ -14959,6 +14963,7 @@ export type Database = {
           email_change_requested_at?: string | null
           email_change_token?: string | null
           featured_post_id?: string | null
+          first_name?: string | null
           gam_launch_seen_at?: string | null
           gender?: string
           golfer_verified_at?: string | null
@@ -14987,6 +14992,7 @@ export type Database = {
           is_verified?: boolean | null
           is_verified_business?: boolean
           is_verified_golfer?: boolean
+          last_name?: string | null
           last_notifications_seen_at?: string | null
           last_rating_at?: string | null
           last_seen_post_id?: string | null
