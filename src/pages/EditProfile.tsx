@@ -263,10 +263,35 @@ export default function EditProfile() {
 
           <SectionCard noPadding>
             <div>
+              {/* Name (first + last) — onboarding-relevant */}
+              <div className="px-4 pt-4 pb-3" style={{ borderBottom: '0.5px solid rgba(15,23,42,0.07)' }}>
+                <div style={{ marginBottom: 8 }}>
+                  <SectionEyebrow label="Name" required={isNewUser.current} />
+                </div>
+                <div className="flex gap-2">
+                  <input
+                    type="text"
+                    value={form.firstName}
+                    onChange={(e) => setField('firstName', e.target.value)}
+                    placeholder="First name"
+                    className="w-1/2 bg-[#F8FAFC] border border-border/60 rounded-[11px] px-3.5 py-2.5 text-[15px] text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-[hsl(38,92%,50%)]/40 focus:bg-background transition-colors"
+                  />
+                  <input
+                    type="text"
+                    value={form.lastName}
+                    onChange={(e) => setField('lastName', e.target.value)}
+                    placeholder="Last name"
+                    className="w-1/2 bg-[#F8FAFC] border border-border/60 rounded-[11px] px-3.5 py-2.5 text-[15px] text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-[hsl(38,92%,50%)]/40 focus:bg-background transition-colors"
+                  />
+                </div>
+              </div>
+
               {/* Display Name */}
               <div className="px-4 pt-4 pb-3" style={{ borderBottom: '0.5px solid rgba(15,23,42,0.07)' }}>
                 <div className="flex justify-between items-baseline">
-                  <div style={{ marginBottom: 8 }}><SectionEyebrow label="Display Name" /></div>
+                  <div style={{ marginBottom: 8 }}>
+                    <SectionEyebrow label="Display Name" required={isNewUser.current} />
+                  </div>
                   <span className="text-[11px] text-muted-foreground/60">
                     {form.displayName.length}/{DISPLAY_NAME_MAX}
                   </span>
@@ -275,7 +300,7 @@ export default function EditProfile() {
                   type="text"
                   value={form.displayName}
                   maxLength={DISPLAY_NAME_MAX}
-                  onChange={(e) => setField('displayName', e.target.value)}
+                  onChange={(e) => { setHasTouchedDisplayName(true); setField('displayName', e.target.value); }}
                   placeholder="Your full name"
                   className="w-full bg-[#F8FAFC] border border-border/60 rounded-[11px] px-3.5 py-2.5 text-[15px] text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-[hsl(38,92%,50%)]/40 focus:bg-background transition-colors"
                 />
@@ -287,7 +312,9 @@ export default function EditProfile() {
               {/* Username */}
               <div className="px-4 pt-3 pb-4" style={{ borderBottom: '0.5px solid rgba(15,23,42,0.07)' }}>
                 <div className="flex justify-between items-baseline">
-                  <div style={{ marginBottom: 8 }}><SectionEyebrow label="Username" /></div>
+                  <div style={{ marginBottom: 8 }}>
+                    <SectionEyebrow label="Username" required={isNewUser.current && !usernameIsLocked} />
+                  </div>
                   {usernameIsLocked && (
                     <span className="text-[11px] text-muted-foreground/60">
                       Contact{' '}
@@ -304,11 +331,37 @@ export default function EditProfile() {
                     value={form.username}
                     maxLength={USERNAME_MAX}
                     readOnly={usernameIsLocked}
-                    onChange={(e) => !usernameIsLocked && setField('username', e.target.value)}
-                    placeholder="username"
-                    className={`w-full bg-[#F8FAFC] border border-border/60 rounded-[11px] pl-8 pr-3.5 py-2.5 text-[15px] text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-[hsl(38,92%,50%)]/40 focus:bg-background transition-colors ${usernameIsLocked ? 'opacity-50 cursor-not-allowed' : ''}`}
+                    onChange={(e) => {
+                      if (usernameIsLocked) return;
+                      setField('username', e.target.value.toLowerCase());
+                    }}
+                    placeholder="choose a username"
+                    className={`w-full bg-[#F8FAFC] border border-border/60 rounded-[11px] pl-8 pr-24 py-2.5 text-[15px] text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-[hsl(38,92%,50%)]/40 focus:bg-background transition-colors ${usernameIsLocked ? 'opacity-50 cursor-not-allowed' : ''}`}
                   />
+                  {!usernameIsLocked && isNewUser.current && form.username.trim().length > 0 && (
+                    <span className="absolute right-3 top-1/2 -translate-y-1/2 inline-flex items-center gap-1 text-[12px]">
+                      {usernameStatus === 'checking' && (
+                        <span style={{ width: 12, height: 12, border: '2px solid #F7931E', borderTopColor: 'transparent', borderRadius: '50%' }} className="animate-spin" />
+                      )}
+                      {usernameStatus === 'available' && (
+                        <span style={{ color: GREEN, display: 'inline-flex', alignItems: 'center', gap: 4 }}>
+                          <CheckCircle2 size={14} strokeWidth={2.25} /> available
+                        </span>
+                      )}
+                      {usernameStatus === 'taken' && (
+                        <span style={{ color: '#DC2626' }}>taken</span>
+                      )}
+                      {usernameStatus === 'invalid' && (
+                        <span style={{ color: '#DC2626' }}>invalid</span>
+                      )}
+                    </span>
+                  )}
                 </div>
+                {!usernameIsLocked && isNewUser.current && (
+                  <p className="text-[12px] text-muted-foreground mt-1.5">
+                    3–20 characters · lowercase letters, numbers, underscores, periods
+                  </p>
+                )}
               </div>
 
               {/* Gender */}
@@ -325,6 +378,7 @@ export default function EditProfile() {
             </div>
           </SectionCard>
         </div>
+
 
         {/* ── Location ────────────────────────────────────── */}
         <div className="space-y-4 px-4 pb-4">
