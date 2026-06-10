@@ -71,6 +71,7 @@ const AuthHeroScreen: React.FC<AuthHeroScreenProps> = ({ submitting, onSubmitEma
 
   const trimmed = loginEmail.trim();
   const canContinue = trimmed.length > 0 && !submitting;
+  const showApple = useMemo(() => isMedianApp() && !!onAppleSignIn, [onAppleSignIn]);
 
   return (
     <div className="fixed inset-0 flex flex-col">
