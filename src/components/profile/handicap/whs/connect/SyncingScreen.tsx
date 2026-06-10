@@ -5,8 +5,6 @@ const INK = '#0F172A';
 const INK_55 = '#64748B';
 const AMBER = '#F7931E';
 const GREEN = '#059669';
-const INK_ON_DARK = '#F8FAFC';
-const MUTED_ON_DARK = '#94A3B8';
 const FONT = 'Geist, -apple-system, BlinkMacSystemFont, system-ui, sans-serif';
 
 const STEPS = [
