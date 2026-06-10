@@ -88,7 +88,7 @@ export const WelcomeAboardScreen: React.FC<Props> = ({
 
       <h2
         style={{
-          fontSize: 24, fontWeight: 800, color: INK_ON_DARK,
+          fontSize: 24, fontWeight: 800, color: INK,
           letterSpacing: '-0.02em',
           margin: '0 0 14px',
         }}
