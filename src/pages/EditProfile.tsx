@@ -70,6 +70,58 @@ export default function EditProfile() {
   const [showManualEntry, setShowManualEntry] = useState(false);
   const [connectSheetOpen, setConnectSheetOpen] = useState(false);
 
+  // ── Onboarding-only state: username availability + display-name auto-fill ──
+  const [usernameStatus, setUsernameStatus] = useState<
+    'idle' | 'invalid' | 'checking' | 'available' | 'taken'
+  >('idle');
+  const [hasTouchedDisplayName, setHasTouchedDisplayName] = useState(false);
+  const usernameCheckRef = useRef<ReturnType<typeof setTimeout>>();
+
+  const USERNAME_RE = /^[a-z0-9_.]{3,20}$/;
+
+  // Debounced availability check while onboarding
+  useEffect(() => {
+    if (!isNewUser.current) return;
+    clearTimeout(usernameCheckRef.current);
+    const candidate = form.username.trim().toLowerCase();
+    if (!candidate) {
+      setUsernameStatus('idle');
+      return;
+    }
+    if (!USERNAME_RE.test(candidate)) {
+      setUsernameStatus('invalid');
+      return;
+    }
+    setUsernameStatus('checking');
+    usernameCheckRef.current = setTimeout(async () => {
+      try {
+        const { count, error } = await supabase
+          .from('user_profiles')
+          .select('id', { count: 'exact', head: true })
+          .ilike('username', candidate)
+          .neq('id', user?.id ?? '');
+        if (error) {
+          setUsernameStatus('idle');
+          return;
+        }
+        setUsernameStatus((count ?? 0) > 0 ? 'taken' : 'available');
+      } catch {
+        setUsernameStatus('idle');
+      }
+    }, 400);
+    return () => clearTimeout(usernameCheckRef.current);
+  }, [form.username, user?.id]);
+
+  // Auto-fill display name from First + Last while user hasn't touched it
+  useEffect(() => {
+    if (!isNewUser.current || hasTouchedDisplayName) return;
+    const combined = `${form.firstName} ${form.lastName}`.trim();
+    if (combined !== form.displayName) {
+      setField('displayName', combined);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [form.firstName, form.lastName, hasTouchedDisplayName]);
+
   const [searchParams] = useSearchParams();
   const golfRef = useRef<HTMLDivElement | null>(null);
   const aboutRef = useRef<HTMLDivElement | null>(null);
@@ -91,8 +143,29 @@ export default function EditProfile() {
   if (loading) return <ProfileSkeleton />;
 
   const handleSave = async () => {
-    // First-login gating: require Display Name + Gender for new users.
+    // First-login gating: ordered validation with one toast each.
     if (isNewUser.current) {
+      const candidate = form.username.trim().toLowerCase();
+      if (!candidate || !USERNAME_RE.test(candidate)) {
+        toast.error('Please choose a username.');
+        return;
+      }
+      if (usernameStatus === 'checking') {
+        toast.error('Checking username availability — please wait.');
+        return;
+      }
+      if (usernameStatus === 'taken') {
+        toast.error('That username is taken — please choose another.');
+        return;
+      }
+      if (!form.firstName.trim()) {
+        toast.error('Please enter your first name.');
+        return;
+      }
+      if (!form.lastName.trim()) {
+        toast.error('Please enter your last name.');
+        return;
+      }
       if (!form.displayName.trim()) {
         toast.error('Please enter a display name.');
         return;
@@ -101,9 +174,18 @@ export default function EditProfile() {
         toast.error('Please select a gender.');
         return;
       }
+      if (!form.country.trim()) {
+        toast.error('Please select your country.');
+        return;
+      }
     }
-    const ok = await save(form);
-    if (ok) {
+    const result = await save(form, { isOnboarding: isNewUser.current });
+    if (result === 'username_taken') {
+      setUsernameStatus('taken');
+      toast.error('That username was just taken — please choose another.');
+      return;
+    }
+    if (result) {
       queryClient.invalidateQueries({ queryKey: ['profile'] });
       if (isNewUser.current) {
         navigate('/', { replace: true });
@@ -112,6 +194,7 @@ export default function EditProfile() {
       }
     }
   };
+
 
   const isDisabled = !isValid || !isDirty || isSaving;
 
