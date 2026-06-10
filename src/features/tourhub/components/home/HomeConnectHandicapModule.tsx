@@ -10,16 +10,15 @@
  */
 import React, { useEffect, useMemo, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ArrowRight, ShieldCheck, ChevronRight } from 'lucide-react';
+import { ChevronRight } from 'lucide-react';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useWhsConnection, useHandicapTrend } from '@/lib/whs/hooks';
+import { ConnectHandicapCard } from '@/components/shared/ConnectHandicapCard';
 
 // ── Design tokens (Dispatch) ─────────────────────────────────────────────
 const INK = '#0F172A';
-import { INK_SOFT, WHITE_ALPHA_04, WHITE_ALPHA_65 } from '../../_shared/tokens';
 const INK_FAINT = '#94A3B8';
 const AMBER = '#F7931E';
-const AMBER_DEEP = '#D97706';
 const HAIRLINE = 'rgba(15,23,42,0.08)';
 const FONT = 'Geist, system-ui, -apple-system, BlinkMacSystemFont, sans-serif';
 const PAGE_PAD = 16;
@@ -50,8 +49,9 @@ const Skeleton: React.FC = () => (
       style={{
         height: 156,
         borderRadius: 14,
-        background: 'linear-gradient(135deg, #1A1F2C 0%, #0F1419 100%)',
-        opacity: 0.55,
+        background: '#FFFFFF',
+        border: `0.5px solid ${HAIRLINE}`,
+        opacity: 0.7,
       }}
     />
   </div>
@@ -96,138 +96,13 @@ const DisconnectedCard: React.FC<{ userId: string; onTap: () => void }> = ({ use
 
   return (
     <div style={{ paddingLeft: PAGE_PAD, paddingRight: PAGE_PAD }}>
-      <button
+      <ConnectHandicapCard
         ref={ref}
-        type="button"
-        onClick={handleClick}
-        className="block w-full text-left active:opacity-95 transition-opacity"
-        style={{
-          position: 'relative',
-          overflow: 'hidden',
-          background: 'linear-gradient(135deg, #1A1F2C 0%, #0F1419 100%)',
-          borderRadius: 14,
-          border: 'none',
-          boxShadow: '0 4px 20px rgba(15,23,42,0.12)',
-          padding: '20px 20px 18px',
-          fontFamily: FONT,
-          color: '#FFFFFF',
-          cursor: 'pointer',
-        }}
-      >
-        {/* Amber radial glow top-right */}
-        <div
-          aria-hidden
-          style={{
-            position: 'absolute',
-            top: -40,
-            right: -40,
-            width: 160,
-            height: 160,
-            background:
-              'radial-gradient(circle, rgba(247,147,30,0.22) 0%, rgba(247,147,30,0) 70%)',
-            pointerEvents: 'none',
-          }}
-        />
-        {/* Subtle grid texture */}
-        <div
-          aria-hidden
-          style={{
-            position: 'absolute',
-            inset: 0,
-            backgroundImage:
-              `linear-gradient(${WHITE_ALPHA_04} 1px, transparent 1px), linear-gradient(90deg, ${WHITE_ALPHA_04} 1px, transparent 1px)`,
-            backgroundSize: '24px 24px',
-            pointerEvents: 'none',
-          }}
-        />
-
-        {/* Content */}
-        <div style={{ position: 'relative', zIndex: 1 }}>
-          {/* Eyebrow */}
-          <div
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: 6,
-              marginBottom: 10,
-              color: AMBER,
-            }}
-          >
-            <ShieldCheck size={13} strokeWidth={2.2} />
-            <span
-              style={{
-                fontSize: 9.5,
-                fontWeight: 800,
-                letterSpacing: '0.14em',
-                textTransform: 'uppercase',
-              }}
-            >
-              WHS · Official handicap
-            </span>
-          </div>
-
-          {/* Headline */}
-          <div
-            style={{
-              fontSize: 22,
-              fontWeight: 800,
-              letterSpacing: '-0.015em',
-              lineHeight: 1.1,
-              marginBottom: 4,
-              color: '#FFFFFF',
-            }}
-          >
-            Personalize your home.
-          </div>
-
-          {/* Sub */}
-          <div
-            style={{
-              fontSize: 13,
-              fontWeight: 500,
-              lineHeight: 1.4,
-              color: WHITE_ALPHA_65,
-              maxWidth: 320,
-              marginBottom: 16,
-            }}
-          >
-            Connect your handicap to see picks for your level, stats from your peers, and your trend over time.
-          </div>
-
-          {/* CTA pill (inline) */}
-          <div style={{ display: 'flex' }}>
-            <span
-              style={{
-                display: 'inline-flex',
-                alignItems: 'center',
-                gap: 8,
-                padding: '11px 18px',
-                borderRadius: 10,
-                background: `linear-gradient(135deg, ${AMBER} 0%, ${AMBER_DEEP} 100%)`,
-                boxShadow: '0 4px 14px rgba(247,147,30,0.40)',
-                color: '#FFFFFF',
-                fontSize: 13.5,
-                fontWeight: 700,
-              }}
-            >
-              Connect handicap
-              <ArrowRight size={14} strokeWidth={2.4} />
-            </span>
-          </div>
-
-          {/* Microcopy */}
-          <div
-            style={{
-              marginTop: 12,
-              fontSize: 10.5,
-              fontWeight: 500,
-              color: 'rgba(255,255,255,0.45)',
-            }}
-          >
-            Takes 30 seconds · We never post on your behalf
-          </div>
-        </div>
-      </button>
+        headline="Personalize your home."
+        sub="Connect your handicap to see picks for your level, stats from your peers, and your trend over time."
+        microcopy="Takes 30 seconds · We never post on your behalf"
+        onTap={handleClick}
+      />
     </div>
   );
 };
