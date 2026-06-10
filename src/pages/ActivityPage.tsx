@@ -76,7 +76,7 @@ const ActivityPage: React.FC = () => {
   const navigate = useNavigate();
 
   const hasMarkedSeen = useRef(false);
-  const isInitialMountRef = useRef(true);
+  const [hasAnimatedIn, setHasAnimatedIn] = useState(false);
   const [sessionNewIds, setSessionNewIds] = useState<string[] | null>(null);
   const [sessionNewCount, setSessionNewCount] = useState<number | null>(null);
   const [hasInitializedNew, setHasInitializedNew] = useState(false);
@@ -113,13 +113,12 @@ const ActivityPage: React.FC = () => {
     };
   }, [queryClient]);
 
-  // Flip initial-mount flag after first non-empty render so filter-change
-  // re-renders skip the entrance stagger animation.
+  // Mark first paint complete after it renders once; from then on, no entrance animation.
   useEffect(() => {
-    if (!data) return;
-    const t = setTimeout(() => { isInitialMountRef.current = false; }, 1000);
+    if (hasAnimatedIn) return;
+    const t = setTimeout(() => setHasAnimatedIn(true), 600);
     return () => clearTimeout(t);
-  }, [data]);
+  }, [hasAnimatedIn]);
 
   if (isRehydrating) return <ActivityPageSkeleton />;
 
@@ -389,8 +388,8 @@ const ActivityPage: React.FC = () => {
                             <FeaturedNotificationCard
                               key={item.id}
                               notification={item}
-                              index={isInitialMountRef.current ? idx : 0}
-                              skipAnimation={!isInitialMountRef.current}
+                              index={hasAnimatedIn ? 0 : Math.min(idx, 8)}
+                              skipAnimation={hasAnimatedIn}
                               onClick={() => handleNotificationClick(item)}
                               onOpenActionsSheet={() => openActionsSheet(item)}
                               currentUserId={user?.id}
