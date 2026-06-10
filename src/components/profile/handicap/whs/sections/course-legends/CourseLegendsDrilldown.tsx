@@ -302,17 +302,14 @@ export const CourseLegendsDrilldown: React.FC<Props> = ({ selection, hideHeader 
 
       {!isLoading && !isError && (data ?? []).length > 0 && activeWindowHasData && (
         <>
-          <ChampionsCoursePulsePanel meta={meta} />
-
-          <ChampionsYourStandingCard
-            displayName="You"
-            photoUrl={activeActor?.avatarUrl ?? null}
-            titlesHeld={youOwnedCount}
-            totalCategories={visibleCategories.length}
-            bestRank={(() => {
-              const ranks = Object.values(yourRanks).filter((r): r is number => r != null);
-              return ranks.length === 0 ? null : Math.min(...ranks);
-            })()}
+          <CrownCabinet
+            slots={visibleCategories.map((cat) => ({
+              key: cat,
+              short: SHORT_LABELS[cat],
+              icon: legendCategoryIcon[cat],
+              held: yourRanks[cat] === 1,
+            }))}
+            heldCount={youOwnedCount}
             yourRounds={meta?.your_rounds ?? 0}
             yourBest={meta?.your_best ?? null}
           />
@@ -322,33 +319,38 @@ export const CourseLegendsDrilldown: React.FC<Props> = ({ selection, hideHeader 
           <div>
           {visibleCategories.map((cat) => {
             const entry = groupedWithTotals.get(cat);
-            if (!entry || entry.rows.length === 0) return null;
+            if (!entry || entry.rows.length === 0) {
+              return (
+                <div key={cat} data-category={cat}>
+                  <ChampionsUnclaimedCard
+                    category={cat}
+                    categoryLabel={legendCategoryLabel[cat]}
+                    categoryIcon={legendCategoryIcon[cat]}
+                  />
+                </div>
+              );
+            }
             const champion = entry.rows[0];
-            const heldDuration = formatHeldDuration(champion.attained_at);
-            const holdDurationDisplay = `Held ${heldDuration}`;
-
-            const formatGap = (rowValue: number): string =>
-              formatGapFromChampion(cat, rowValue, champion.value);
-
             const sectionRows = entry.rows.map((r) => ({
               rank: r.rank,
               name: r.isSelf ? 'You' : r.name,
               photoUrl: r.photoUrl,
               valueDisplay: r.valueDisplay,
+              value: r.value,
               isSelf: r.isSelf,
-              gapToChampion: r.rank === champion.rank ? null : formatGap(r.value),
+              gapToChampion: r.rank === champion.rank ? null : formatGapFromChampion(cat, r.value, champion.value),
               userId: r.userId,
             }));
-
             return (
               <div key={cat} data-category={cat}>
-                <ChampionsCategorySection
+                <ChampionsDuelCard
+                  category={cat}
                   categoryLabel={legendCategoryLabel[cat]}
                   categoryIcon={legendCategoryIcon[cat]}
-                  unitLabel={UNIT_LABELS[cat] || ''}
-                  totalCount={entry.total}
-                  holdDuration={holdDurationDisplay}
                   rows={sectionRows}
+                  yourRank={yourRanks[cat] ?? null}
+                  holdDuration={`Held ${formatHeldDuration(champion.attained_at)}`}
+                  totalCount={entry.total}
                   onFullLeaderboardTap={() => setFullLeaderboardCategory(cat)}
                 />
               </div>
