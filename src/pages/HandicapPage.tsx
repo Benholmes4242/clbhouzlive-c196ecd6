@@ -418,7 +418,7 @@ const HandicapPage: React.FC = () => {
   }
 
   return (
-    <PageRoot dark style={{ background: 'var(--hcp-bg-0)' }}>
+    <PageRoot dark={!isConnectFlow} style={{ background: isConnectFlow ? '#F8FAFC' : 'var(--hcp-bg-0)' }}>
       <HandicapPageHeader
         ownerUserId={ownerUserId}
         displayName={displayName}
