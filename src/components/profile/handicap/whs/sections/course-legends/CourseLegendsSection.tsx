@@ -36,8 +36,8 @@ export const WindowToggle: React.FC<{
       display: 'inline-flex',
       flexShrink: 0,
       gap: 3,
-      background: 'var(--hcp-toggle-track-bg)',
-      border: '0.5px solid var(--hcp-toggle-track-border)',
+      background: 'rgba(255,255,255,0.08)',
+      border: '0.5px solid rgba(255,255,255,0.12)',
       borderRadius: 999,
       padding: 3,
     }}
@@ -55,8 +55,8 @@ export const WindowToggle: React.FC<{
           style={{
             padding: '6px 14px',
             borderRadius: 999,
-            background: active ? 'var(--hcp-toggle-active-bg)' : 'transparent',
-            color: active ? 'var(--hcp-toggle-active-text)' : 'var(--hcp-t-60)',
+            background: active ? '#FFFFFF' : 'transparent',
+            color: active ? '#0A0E14' : 'var(--hcp-t-60)',
             border: 'none',
             fontFamily: FONT,
             fontSize: 11.5,

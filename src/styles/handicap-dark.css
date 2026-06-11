@@ -293,10 +293,6 @@
   --hcp-dash:        rgba(255,255,255,0.22);  /* dashed borders */
   --hcp-bar-neutral: rgba(255,255,255,0.30);  /* chase tension-bar fill */
   --hcp-gold-text:   #FBBC2E;                 /* deep-amber text role (illegible on dark → gold) */
-  --hcp-toggle-track-bg:     rgba(255,255,255,0.08);
-  --hcp-toggle-track-border: rgba(255,255,255,0.12);
-  --hcp-toggle-active-bg:    #FFFFFF;
-  --hcp-toggle-active-text:  #0A0E14;
 }
 .hcp-light {
   --hcp-tint-1:      rgba(15,23,42,0.05);
@@ -305,8 +301,4 @@
   --hcp-dash:        rgba(15,23,42,0.20);
   --hcp-bar-neutral: rgba(15,23,42,0.30);
   --hcp-gold-text:   #B26818;
-  --hcp-toggle-track-bg:     rgba(15,23,42,0.05);
-  --hcp-toggle-track-border: rgba(15,23,42,0.08);
-  --hcp-toggle-active-bg:    #0F172A;
-  --hcp-toggle-active-text:  #FFFFFF;
 }
