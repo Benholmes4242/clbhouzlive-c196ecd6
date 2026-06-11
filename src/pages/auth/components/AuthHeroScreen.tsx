@@ -19,6 +19,8 @@ interface AuthHeroScreenProps {
   submitting: boolean;
   onSubmitEmail: (email: string) => Promise<void> | void;
   onAppleSignIn?: () => void;
+  errorMessage?: string | null;
+  errorNonce?: number;
 }
 
 const AppleLogo: React.FC<{ size?: number }> = ({ size = 17 }) => (
@@ -34,13 +36,25 @@ const AppleLogo: React.FC<{ size?: number }> = ({ size = 17 }) => (
   </svg>
 );
 
-const AuthHeroScreen: React.FC<AuthHeroScreenProps> = ({ submitting, onSubmitEmail, onAppleSignIn }) => {
+const AuthHeroScreen: React.FC<AuthHeroScreenProps> = ({
+  submitting,
+  onSubmitEmail,
+  onAppleSignIn,
+  errorMessage,
+  errorNonce,
+}) => {
   // Dark status bar + safe-area shield for Median.co wrapper
   useMedianStatusBar('dark', '#0A0E14', true, false);
 
   const [loginEmail, setLoginEmail] = useState('');
   const [emailError, setEmailError] = useState<string | null>(null);
+  const [hasEditedSinceError, setHasEditedSinceError] = useState(false);
   const emailInputRef = useRef<HTMLInputElement>(null);
+
+  // Re-announce external errors whenever a new one arrives
+  useEffect(() => {
+    if (errorMessage) setHasEditedSinceError(false);
+  }, [errorMessage, errorNonce]);
 
   // Show session-expired toast on mount (preserved behaviour)
   useEffect(() => {
@@ -181,6 +195,7 @@ const AuthHeroScreen: React.FC<AuthHeroScreenProps> = ({ submitting, onSubmitEma
                 onChange={(e) => {
                   setLoginEmail(e.target.value);
                   if (emailError) setEmailError(null);
+                  setHasEditedSinceError(true);
                 }}
                 onKeyDown={handleEmailKeyDown}
                 placeholder="Email address"
@@ -198,6 +213,15 @@ const AuthHeroScreen: React.FC<AuthHeroScreenProps> = ({ submitting, onSubmitEma
 
             {emailError && (
               <p className="text-red-400 text-[13px] text-center">{emailError}</p>
+            )}
+
+            {errorMessage && !hasEditedSinceError && (
+              <p
+                key={errorNonce}
+                className="text-red-400 text-[13px] text-center auth-error-fade"
+              >
+                {errorMessage}
+              </p>
             )}
 
             <button
@@ -259,8 +283,16 @@ const AuthHeroScreen: React.FC<AuthHeroScreenProps> = ({ submitting, onSubmitEma
           font-size: 15px;
         }
 
+        @keyframes auth-error-fade-in {
+          from { opacity: 0; transform: translateY(-3px); }
+          to   { opacity: 1; transform: translateY(0); }
+        }
+        .auth-error-fade {
+          animation: auth-error-fade-in 0.25s ease-out both;
+        }
+
         @media (prefers-reduced-motion: reduce) {
-          .auth-logo-animate, .auth-tagline-animate, .auth-button-6 {
+          .auth-logo-animate, .auth-tagline-animate, .auth-button-6, .auth-error-fade {
             animation: none; opacity: 1; transform: none;
           }
         }
