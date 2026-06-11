@@ -241,6 +241,8 @@ export const CourseLegendsDrilldown: React.FC<Props> = ({ selection, hideHeader 
         />
       )}
 
+      <ChampionsProvenanceNote />
+
       {/* In-tab course search — always shown (synced + non-synced). Includes
           a small connect-WHS cue beneath for non-synced users. */}
       <ChampionsCourseSearch currentCourseId={ctx.courseId} />
