@@ -16,6 +16,12 @@ const FONT = GAM.FONT_GEIST;
  * Eagle → Birdie → Score). The grid receives a window-filtered holder map
  * (90d OR all-time), but the cell needs to map either window's key to the
  * same display slot. We resolve by checking both _90d and _all_time variants.
+ *
+ * NOTE: `most_rounds_*` is DELIBERATELY excluded here — the Compete-tab card
+ * stays at 7 slots and the hero badge stays `N/7`. The Rounds category is
+ * only surfaced in the Champions drilldown (CourseLegendsDrilldown). Adding
+ * it to SLOT_META would re-enable it here; the filter below is the single
+ * source of truth for the exclusion.
  */
 const SLOT_META: Record<string, { short: string }> = {
   lowest_gross:     { short: 'GROSS' },
@@ -28,14 +34,13 @@ const SLOT_META: Record<string, { short: string }> = {
 };
 
 const SLOTS: Array<{ key: LegendCategory; alt: LegendCategory; short: string }> =
-  CHAMPIONS_ORDER_90D.map((key, i) => {
-    const base = key.replace(/_90d$/, '');
-    return {
-      key,
-      alt: CHAMPIONS_ORDER_ALL_TIME[i],
-      short: SLOT_META[base].short,
-    };
-  });
+  CHAMPIONS_ORDER_90D
+    .map((key, i) => ({ key, alt: CHAMPIONS_ORDER_ALL_TIME[i] }))
+    .filter(({ key }) => !key.startsWith('most_rounds'))
+    .map(({ key, alt }) => {
+      const base = key.replace(/_90d$/, '');
+      return { key, alt, short: SLOT_META[base].short };
+    });
 
 interface HolderCellProps {
   short: string;
