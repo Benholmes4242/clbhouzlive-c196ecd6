@@ -6,7 +6,7 @@
 import React from 'react';
 import type { FriendYesterday, FriendsYesterdayResult } from '@/lib/handicap/useFriendsYesterday';
 import { analyticsEvents } from '@/utils/analyticsEvents';
-import { HeroCard, MiniCard } from './friends-yesterday';
+import { FriendPostcard } from './friends-yesterday';
 import RoundDetailSheet from '@/components/profile/handicap/whs/sections/round-detail/RoundDetailSheet';
 import type { WhsFriendActivityWithImage, FriendLeaderboardEntry } from '@/lib/whs/types';
 import { useOpenFriendSheet } from '@/components/friend-sheet/FriendSheetProvider';
@@ -117,13 +117,16 @@ const FriendsYesterdayCard: React.FC<Props> = ({ data, userId }) => {
   }
   if (friends.length === 0) return null;
 
-  const best = friends[0];
-  const others = friends.slice(1);
+  // Lowest gross identifies the LOWEST-chip recipient (only when 2+ friends played).
+  const lowestId =
+    friends.length > 1
+      ? friends.reduce((lo, f) => (f.score < lo.score ? f : lo), friends[0]).last_round_score_id
+      : null;
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', fontFamily: FONT }}>
       {/* Section eyebrow */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: 7, marginBottom: 12 }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 7, marginBottom: 12, padding: '0 16px' }}>
         <span
           style={{
             width: 6,
@@ -146,38 +149,33 @@ const FriendsYesterdayCard: React.FC<Props> = ({ data, userId }) => {
         </span>
       </div>
 
-      {/* Hero */}
-      <HeroCard friend={best} onClick={() => handleTap(best)} showLowestRound={friends.length > 1} />
-
-      {others.length > 0 && (
-        <>
-          <div style={{ height: 12 }} />
-          <div
-            className="fyc-scroll"
-            style={{
-              display: 'flex',
-              gap: 10,
-              overflowX: 'auto',
-              overflowY: 'hidden',
-              marginRight: -16,
-              paddingRight: 16,
-              scrollSnapType: 'x mandatory',
-              WebkitOverflowScrolling: 'touch',
-              scrollbarWidth: 'none',
-            }}
-          >
-            <style>{`.fyc-scroll::-webkit-scrollbar{display:none}`}</style>
-            {others.map((f, i) => (
-              <MiniCard
-                key={`${f.user_id ?? 'x'}-${i}`}
-                friend={f}
-                rank={i + 2}
-                onClick={() => handleTap(f)}
-              />
-            ))}
-          </div>
-        </>
-      )}
+      <div
+        className="fyc-scroll"
+        style={{
+          display: 'flex',
+          gap: 10,
+          overflowX: 'auto',
+          overflowY: 'hidden',
+          padding: '0 16px 6px',
+          scrollSnapType: 'x mandatory',
+          WebkitOverflowScrolling: 'touch',
+          scrollbarWidth: 'none',
+        }}
+      >
+        <style>{`.fyc-scroll::-webkit-scrollbar{display:none}`}</style>
+        {friends.map((f, i) => (
+          <FriendPostcard
+            key={`${f.user_id ?? f.friend_passport_id ?? 'x'}-${i}`}
+            friend={f}
+            showLowest={
+              !!lowestId &&
+              f.last_round_score_id != null &&
+              f.last_round_score_id === lowestId
+            }
+            onClick={() => handleTap(f)}
+          />
+        ))}
+      </div>
 
       <RoundDetailSheet
         scoreId={sheetActivity?.last_round_score_id ?? null}
