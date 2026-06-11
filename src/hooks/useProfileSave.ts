@@ -54,7 +54,7 @@ export function useProfileSave(userId: string) {
 
       // 3. Update user_profiles — fully typed, no `any`
       const updatePayload: Record<string, any> = {
-        display_name: form.displayName.trim(),
+        display_name: form.displayName.trim() || null,
         first_name: form.firstName.trim() || null,
         last_name: form.lastName.trim() || null,
         bio: form.bio.trim(),
@@ -82,9 +82,16 @@ export function useProfileSave(userId: string) {
         updated_at: new Date().toISOString(),
       };
 
-      // Only onboarding writes the username + username_is_custom flag.
-      // For returning users the field is read-only in the UI; never trust it.
-      if (isOnboarding) {
+      // Drop nulls so we never blow away trigger-seeded display_name / names with blanks.
+      if (updatePayload.display_name == null) delete updatePayload.display_name;
+      if (updatePayload.first_name == null) delete updatePayload.first_name;
+      if (updatePayload.last_name == null) delete updatePayload.last_name;
+
+      // Only onboarding writes the username + username_is_custom flag, AND only
+      // when the user actually entered one. Otherwise we keep the auto-seeded
+      // username from the handle_new_user trigger so a Skip/Save with empty
+      // username doesn't violate the NOT NULL constraint.
+      if (isOnboarding && form.username.trim()) {
         updatePayload.username = form.username.trim();
         updatePayload.username_is_custom = true;
       }
