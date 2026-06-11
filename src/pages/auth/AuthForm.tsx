@@ -391,7 +391,9 @@ const AuthForm: React.FC<AuthFormProps> = ({ authNotice }) => {
           submitting={submitting && step === 'hero'}
           onSubmitEmail={handleSubmitEmail}
           onAppleSignIn={handleAppleSignIn}
+          onGoogleSignIn={handleGoogleSignIn}
         />
+
       </div>
 
       <AuthBottomSheet
