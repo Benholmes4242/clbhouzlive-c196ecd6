@@ -195,6 +195,7 @@ const AuthHeroScreen: React.FC<AuthHeroScreenProps> = ({
                 onChange={(e) => {
                   setLoginEmail(e.target.value);
                   if (emailError) setEmailError(null);
+                  setHasEditedSinceError(true);
                 }}
                 onKeyDown={handleEmailKeyDown}
                 placeholder="Email address"
