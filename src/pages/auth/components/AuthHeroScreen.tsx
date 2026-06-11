@@ -36,7 +36,13 @@ const AppleLogo: React.FC<{ size?: number }> = ({ size = 17 }) => (
   </svg>
 );
 
-const AuthHeroScreen: React.FC<AuthHeroScreenProps> = ({ submitting, onSubmitEmail, onAppleSignIn }) => {
+const AuthHeroScreen: React.FC<AuthHeroScreenProps> = ({
+  submitting,
+  onSubmitEmail,
+  onAppleSignIn,
+  errorMessage,
+  errorNonce,
+}) => {
   // Dark status bar + safe-area shield for Median.co wrapper
   useMedianStatusBar('dark', '#0A0E14', true, false);
 
