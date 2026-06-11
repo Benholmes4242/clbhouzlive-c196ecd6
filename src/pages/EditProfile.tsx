@@ -297,8 +297,9 @@ export default function EditProfile() {
 
       <div
         className="flex-1 overflow-y-auto pt-4"
-        style={{ paddingBottom: 'calc(var(--bottom-nav-height, 88px) + var(--sab) + 24px)' }}
+        style={{ paddingBottom: 24 }}
       >
+
         {/* ── Photos + Identity ───────────────────────────── */}
         <div ref={photosRef} className="space-y-4 px-4 pb-4">
           <HeaderPhotoCard
