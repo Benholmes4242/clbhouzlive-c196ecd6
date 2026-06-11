@@ -35,10 +35,6 @@ export function estGross(pro: ProProfile, c: Required<CourseInputs>): number {
   return clamp(raw, c.par - 9, Math.round(pro.scoring_avg) + 5);
 }
 
-/** Predicted Stableford off scratch. */
-export function estStableford(pro: ProProfile, c: Required<CourseInputs>): number {
-  return clamp(36 + (c.par - estGross(pro, c)), 30, 50);
-}
 
 /** Cumulative totals scaled over the VIEWER's rounds at this course. */
 export function estBirdiesTotal(
