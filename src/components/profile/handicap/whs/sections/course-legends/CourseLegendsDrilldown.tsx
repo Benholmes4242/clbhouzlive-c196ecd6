@@ -276,6 +276,7 @@ export const CourseLegendsDrilldown: React.FC<Props> = ({ selection, hideHeader 
     return pickProBenchmark({
       pros,
       courseId: ctx.courseId,
+      courseName: ctx.courseName,
       course: {
         cr: meta?.course_cr ?? null,
         slope: meta?.course_slope ?? null,
