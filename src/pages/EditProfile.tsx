@@ -570,21 +570,21 @@ export default function EditProfile() {
         <div className="px-4 pt-6 pb-2">
           <Button
             onClick={handleSave}
-            disabled={isDisabled && !isNewUser.current}
+            disabled={isDisabled}
             className="w-full min-h-[52px] rounded-[14px] text-[15px] font-bold border-0 active:opacity-90 transition-opacity"
             style={{
-              background: isDisabled && !isNewUser.current ? 'rgba(15,23,42,0.06)' : AMBER,
-              color: isDisabled && !isNewUser.current ? 'rgba(15,23,42,0.45)' : '#fff',
-              boxShadow: isDisabled && !isNewUser.current ? 'none' : '0 4px 16px rgba(247,147,30,0.28)',
+              background: isDisabled ? 'rgba(15,23,42,0.06)' : AMBER,
+              color: isDisabled ? 'rgba(15,23,42,0.45)' : '#fff',
+              boxShadow: isDisabled ? 'none' : '0 4px 16px rgba(247,147,30,0.28)',
               fontFamily: GEIST,
             }}
           >
             {isSaving ? (
               <><Loader2 size={18} className="animate-spin mr-2" /> Saving…</>
             ) : isNewUser.current ? (
-              'Complete Profile'
+              'Save & continue'
             ) : isDirty ? (
-              'Save Profile'
+              'Save changes'
             ) : (
               'All Saved'
             )}
