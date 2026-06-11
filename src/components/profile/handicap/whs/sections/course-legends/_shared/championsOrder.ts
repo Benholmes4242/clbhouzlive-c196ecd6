@@ -12,6 +12,7 @@ export const CHAMPIONS_ORDER_90D: LegendCategory[] = [
   'most_albatrosses_90d',
   'most_eagles_90d',
   'most_birdies_90d',
+  'most_rounds_90d',
   'best_score_diff_90d',
 ];
 
@@ -22,6 +23,7 @@ export const CHAMPIONS_ORDER_ALL_TIME: LegendCategory[] = [
   'most_albatrosses_all_time',
   'most_eagles_all_time',
   'most_birdies_all_time',
+  'most_rounds_all_time',
   'best_score_diff_all_time',
 ];
 
