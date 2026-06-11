@@ -64,9 +64,8 @@ export const CourseFriendsStrip: React.FC<CourseFriendsStripProps> = ({ courseId
         <div style={{ display: 'flex' }}>
           {visibleFriends.map((friend, index) => {
             const displayName = friend.profile.display_name || friend.profile.username || '?';
-            const initial = displayName[0]?.toUpperCase() || '?';
 
-            return friend.profile.profile_photo_url ? (
+            return (
               <SquircleAvatar
                 key={friend.user_id}
                 src={friend.profile.profile_photo_url}
@@ -75,27 +74,6 @@ export const CourseFriendsStrip: React.FC<CourseFriendsStripProps> = ({ courseId
                 thinRing
                 className={index > 0 ? '-ml-1.5' : ''}
               />
-            ) : (
-              <div
-                key={friend.user_id}
-                className={index > 0 ? '-ml-1.5' : ''}
-                style={{
-                  width: 28,
-                  height: 28,
-                  borderRadius: '50%',
-                  background: '#3B82F6',
-                  color: '#fff',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  fontSize: 11,
-                  fontWeight: 700,
-                  border: '1px solid #F8FAFC',
-                  flexShrink: 0,
-                }}
-              >
-                {initial}
-              </div>
             );
           })}
 
