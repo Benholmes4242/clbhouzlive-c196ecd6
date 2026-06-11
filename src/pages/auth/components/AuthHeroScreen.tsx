@@ -115,7 +115,7 @@ const AuthHeroScreen: React.FC<AuthHeroScreenProps> = ({
       {/* Background */}
       <div
         className="absolute inset-0"
-        style={{ background: 'linear-gradient(180deg, #0A0E14 0%, #0C1119 100%)' }}
+        style={{ background: '#0A0E14' }}
       />
 
       {/* Vignette */}
