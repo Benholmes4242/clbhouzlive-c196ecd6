@@ -24,8 +24,7 @@ import { FullCourseLeaderboardSheet } from './drilldown/FullCourseLeaderboardShe
 import { WindowToggle } from './CourseLegendsSection';
 import { ConnectHandicapCue } from '@/components/courses/course-detail/ConnectHandicapCue';
 import { ChampionsCourseSearch } from './drilldown/ChampionsCourseSearch';
-import { ChampionsProvenanceNote } from './drilldown/ChampionsProvenanceNote';
-import { ChampionsExplainerCard } from './drilldown/ChampionsExplainerCard';
+import { ChampionsInfoCarousel } from './drilldown/ChampionsInfoCarousel';
 import { formatGapFromChampion } from './drilldown/_shared/helpers';
 import { CHAMPIONS_ORDER_90D, CHAMPIONS_ORDER_ALL_TIME } from './_shared/championsOrder';
 
@@ -116,7 +115,6 @@ export const CourseLegendsDrilldown: React.FC<Props> = ({ selection, hideHeader 
     useState<LegendCategory | null>(null);
   const autoSwitchedRef = useRef(false);
   const [autoSwitchedToAllTime, setAutoSwitchedToAllTime] = useState(false);
-  const [explainerOpen, setExplainerOpen] = useState(false);
 
   const has90d = useMemo(
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -243,7 +241,7 @@ export const CourseLegendsDrilldown: React.FC<Props> = ({ selection, hideHeader 
         />
       )}
 
-      <ChampionsProvenanceNote />
+      <ChampionsInfoCarousel window={window} />
 
       {/* In-tab course search — always shown (synced + non-synced). Includes
           a small connect-WHS cue beneath for non-synced users. */}
@@ -306,16 +304,7 @@ export const CourseLegendsDrilldown: React.FC<Props> = ({ selection, hideHeader 
           <CategoryNavRail
             categories={navCategories}
             onSelect={handleNavSelect}
-            infoOpen={explainerOpen}
-            onInfoToggle={() => setExplainerOpen((o) => !o)}
           />
-
-          {explainerOpen && (
-            <ChampionsExplainerCard
-              window={window}
-              onClose={() => setExplainerOpen(false)}
-            />
-          )}
 
           <div>
           {visibleCategories.map((cat) => {
