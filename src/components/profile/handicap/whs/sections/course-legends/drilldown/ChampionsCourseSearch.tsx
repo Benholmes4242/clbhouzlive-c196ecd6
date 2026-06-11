@@ -39,13 +39,13 @@ export const ChampionsCourseSearch: React.FC<Props> = ({ currentCourseId }) => {
           display: 'flex',
           alignItems: 'center',
           gap: 10,
-          background: 'var(--hcp-bg-1, rgba(255,255,255,0.04))',
-          border: '1px solid var(--hcp-line, rgba(15,23,42,0.08))',
+          background: 'var(--hcp-tint-1)',
+          border: '1px solid var(--hcp-line)',
           borderRadius: 12,
           padding: '10px 14px',
         }}
       >
-        <Search size={16} color="#94A3B8" strokeWidth={2.2} />
+        <Search size={16} color="var(--hcp-t-40)" strokeWidth={2.2} />
         <input
           type="text"
           value={query}
