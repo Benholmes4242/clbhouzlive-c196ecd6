@@ -311,7 +311,7 @@ export const ChampionsDuelCard: React.FC<ChampionsDuelCardProps> = ({
         style={{
           marginTop: 12,
           paddingTop: 4,
-          borderTop: '0.5px solid rgba(15,23,42,0.08)',
+          borderTop: '0.5px solid var(--hcp-line)',
           marginLeft: -16,
           marginRight: -16,
         }}
