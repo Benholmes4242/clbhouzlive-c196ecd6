@@ -20,7 +20,13 @@ interface MedianSocialLogin {
       scope?: string;
     }) => void;
   };
+  google: {
+    login: (opts: {
+      callback: (response: unknown) => void;
+    }) => void;
+  };
 }
+
 
 interface Window {
   median?: {

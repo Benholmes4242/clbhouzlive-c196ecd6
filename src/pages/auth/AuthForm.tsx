@@ -278,6 +278,98 @@ const AuthForm: React.FC<AuthFormProps> = ({ authNotice }) => {
     });
   }, [handleAppleCallback]);
 
+  // ---- Native Google Sign-In (Median bridge) ------------------------------
+  const handleGoogleCallback = useCallback(
+    async (response: unknown) => {
+      try {
+        const r = (response ?? {}) as { idToken?: string; error?: string };
+        const idToken = r.idToken;
+        if (!idToken) {
+          setSubmitting(false);
+          const msg = String(r.error ?? '');
+          const cancelled = /cancel|canceled|cancelled|12501/i.test(msg);
+          if (!cancelled && msg) {
+            console.error('[google-auth] native error:', msg);
+            trackAuthFailed('google', msg);
+            toast.error('Google Sign-In failed. Please try again.');
+          }
+          return;
+        }
+
+        trackAuthInitiated('google');
+
+        // Decode claims once for diagnostics + names.
+        let claims: any = null;
+        try {
+          claims = JSON.parse(
+            atob(idToken.split('.')[1].replace(/-/g, '+').replace(/_/g, '/')),
+          );
+          console.log('[google-auth] token claims:', {
+            aud: claims.aud,
+            iss: claims.iss,
+            email: claims.email,
+            email_verified: claims.email_verified,
+            has_nonce: 'nonce' in claims,
+          });
+        } catch {
+          /* non-fatal */
+        }
+
+        const { data, error } = await supabase.auth.signInWithIdToken({
+          provider: 'google',
+          token: idToken,
+        });
+
+        if (error) {
+          console.error('[google-auth] supabase rejection:', (error as any).status, error.message);
+          if (/nonce/i.test(error.message || '')) {
+            console.error(
+              '[google-auth] NONCE MISMATCH - enable Skip nonce checks in the Supabase Google provider settings',
+            );
+          }
+          trackAuthFailed('google', sanitiseErrorForAnalytics(error.message));
+          toast.error('Could not complete Google Sign-In. Please try again or use email.');
+          setSubmitting(false);
+          return;
+        }
+
+        const first = (claims?.given_name ?? '').toString().trim();
+        const last = (claims?.family_name ?? '').toString().trim();
+        if (data?.user && (first || last)) {
+          const { error: nameErr } = await supabase
+            .from('user_profiles')
+            .update({
+              ...(first ? { first_name: first } : {}),
+              ...(last ? { last_name: last } : {}),
+            })
+            .eq('id', data.user.id)
+            .is('first_name', null);
+          if (nameErr) console.error('[google-auth] name persist failed:', nameErr.message);
+        }
+
+        if (data?.session?.user) {
+          trackLoginSuccess('google');
+          setShowSuccessAnimation(true);
+        }
+      } finally {
+        setSubmitting(false);
+      }
+    },
+    [],
+  );
+
+  const handleGoogleSignIn = useCallback(() => {
+    trackAuthMethodSelected('google');
+    const median = window.median;
+    if (!median?.socialLogin?.google?.login) {
+      toast.error('Google Sign-In needs the latest app version.');
+      return;
+    }
+    setSubmitting(true);
+    median.socialLogin.google.login({ callback: handleGoogleCallback });
+  }, [handleGoogleCallback]);
+
+
 
   const isSheetOpen = step === 'otp';
 
@@ -299,7 +391,9 @@ const AuthForm: React.FC<AuthFormProps> = ({ authNotice }) => {
           submitting={submitting && step === 'hero'}
           onSubmitEmail={handleSubmitEmail}
           onAppleSignIn={handleAppleSignIn}
+          onGoogleSignIn={handleGoogleSignIn}
         />
+
       </div>
 
       <AuthBottomSheet
