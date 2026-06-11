@@ -6,6 +6,7 @@ import {
   Award,
   Sparkles,
   Bird,
+  Flag,
   type LucideIcon,
 } from 'lucide-react';
 import type { BadgeRarity, LegendCategory, StreakType } from './types';
