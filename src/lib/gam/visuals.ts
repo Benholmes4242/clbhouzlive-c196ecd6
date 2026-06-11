@@ -71,6 +71,8 @@ export const legendCategoryIcon: Record<LegendCategory, LucideIcon> = {
   most_aces_all_time:       Sparkles,
   most_albatrosses_90d:     Bird,
   most_albatrosses_all_time:Bird,
+  most_rounds_90d:          Flag,
+  most_rounds_all_time:     Flag,
 };
 
 /**
