@@ -88,8 +88,12 @@ const GlobalBottomNavigation: React.FC<GlobalBottomNavigationProps> = ({ chromeS
   }, []);
   
   // Determine if current route should hide navigation
+  const isOnboardingEditProfile =
+    location.pathname === '/edit-profile' &&
+    new URLSearchParams(location.search).get('onboarding') === '1';
   const shouldHideForRoute = HIDDEN_ROUTES.includes(location.pathname) ||
-    HIDDEN_ROUTE_PREFIXES.some(prefix => location.pathname.startsWith(prefix));
+    HIDDEN_ROUTE_PREFIXES.some(prefix => location.pathname.startsWith(prefix)) ||
+    isOnboardingEditProfile;
   const isClubhouseRoute = CLUBHOUSE_ROUTES.includes(location.pathname);
   const isWarmGradientRoute = WARM_GRADIENT_ROUTES.some(r => location.pathname.startsWith(r));
   const isTourHubRoute = location.pathname.startsWith('/tourhub');

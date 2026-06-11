@@ -93,7 +93,7 @@ const AuthWrapper: React.FC<AuthWrapperProps> = ({ children }) => {
       onboardingData !== undefined &&
       !onboardingData.hasCompletedOnboarding
     ) {
-      return <Navigate to="/edit-profile" replace />;
+      return <Navigate to="/edit-profile?onboarding=1" replace />;
     }
   }
 

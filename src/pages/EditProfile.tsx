@@ -12,6 +12,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useWhsConnection } from '@/lib/whs/hooks';
 import { resolveDisplayHandicap } from '@/lib/handicap/resolveHandicap';
 import { formatHcp } from '@/lib/formatHcp';
+import { useMedianStatusBar } from '@/hooks/useMedianStatusBar';
 import { Button } from '@/components/ui/button';
 import { SectionEyebrow } from '@/components/ui/SectionEyebrow';
 import { SectionCard } from '@/components/profile/edit-v2/SectionCard';
@@ -47,6 +48,12 @@ export default function EditProfile() {
   const queryClient = useQueryClient();
   const { user } = useSupabaseSession();
   const { profile, loading } = useProfileData();
+  const [searchParams] = useSearchParams();
+
+  // Light-shield for the notch / status bar on this page.
+  // Must opt-in explicitly or the previous page's dark shield bleeds through
+  // on a cold OAuth land. Render dark icons on the #F8FAFC surface.
+  useMedianStatusBar('light', '#F8FAFC');
 
   const {
     form, setField, isDirty, errors, isValid,
@@ -57,7 +64,48 @@ export default function EditProfile() {
   const { save, isSaving } = useProfileSave(user?.id ?? '');
 
   const usernameIsLocked = !!(profile as any)?.has_completed_onboarding;
-  const isNewUser = useRef(!(profile as any)?.has_completed_onboarding);
+  // Treat as new user when EITHER the profile says onboarding is incomplete OR
+  // we arrived from the AuthWrapper onboarding redirect (?onboarding=1). The
+  // URL flag means the header / nav decisions don't have to wait for the
+  // profile fetch — fixes the "blank header on cold OAuth land" race.
+  const isNewUser = useRef(
+    searchParams.get('onboarding') === '1' ||
+    !(profile as any)?.has_completed_onboarding
+  );
+  // Keep ref in sync once profile resolves (covers the first paint where
+  // profile is still null).
+  useEffect(() => {
+    if (loading) return;
+    isNewUser.current =
+      searchParams.get('onboarding') === '1' ||
+      !(profile as any)?.has_completed_onboarding;
+  }, [loading, profile, searchParams]);
+
+  const [isSkipping, setIsSkipping] = useState(false);
+
+  const skipOnboarding = async () => {
+    if (!user?.id || isSkipping) return;
+    setIsSkipping(true);
+    try {
+      const { error } = await supabase
+        .from('user_profiles')
+        .update({ has_completed_onboarding: true, updated_at: new Date().toISOString() })
+        .eq('id', user.id);
+      if (error) throw error;
+      // Prime the cache so AuthWrapper doesn't immediately re-redirect us back.
+      queryClient.setQueryData(['onboarding-status', user.id], {
+        hasCompletedOnboarding: true,
+        userType: (profile as any)?.user_type ?? null,
+      });
+      await queryClient.invalidateQueries({ queryKey: ['onboarding-status', user.id] });
+      await queryClient.invalidateQueries({ queryKey: ['profile', user.id] });
+      navigate('/', { replace: true });
+    } catch (err: any) {
+      toast.error(err?.message ?? 'Could not skip onboarding. Please try again.');
+    } finally {
+      setIsSkipping(false);
+    }
+  };
 
   const { data: whsConnection } = useWhsConnection(user?.id);
   const hasWhsConnection = !!whsConnection;
@@ -123,7 +171,6 @@ export default function EditProfile() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [form.firstName, form.lastName, hasTouchedDisplayName]);
 
-  const [searchParams] = useSearchParams();
   const golfRef = useRef<HTMLDivElement | null>(null);
   const aboutRef = useRef<HTMLDivElement | null>(null);
   const photosRef = useRef<HTMLDivElement | null>(null);
@@ -141,14 +188,21 @@ export default function EditProfile() {
     }
   }, [loading, searchParams]);
 
-  if (loading) return <ProfileSkeleton />;
+  // For onboarding (cold OAuth land), NEVER block on the skeleton. The
+  // header / chrome must paint immediately so the user has Skip + Save
+  // affordances on first paint. The form sections happily render with empty
+  // defaults until the profile fetch resolves and `useProfileForm` hydrates.
+  // For returning users (deep-link refresh of /edit-profile), keep the
+  // skeleton as-is to avoid a flash of empty fields.
+  if (loading && !isNewUser.current) return <ProfileSkeleton />;
 
   const handleSave = async () => {
-    // First-login gating: ordered validation with one toast each.
-    if (isNewUser.current) {
+    // Onboarding is OPTIONAL — no required fields. We only enforce FORMAT
+    // checks on values the user actually entered (username charset, length).
+    if (isNewUser.current && form.username.trim()) {
       const candidate = form.username.trim().toLowerCase();
-      if (!candidate || !USERNAME_RE.test(candidate)) {
-        toast.error('Please choose a username.');
+      if (!USERNAME_RE.test(candidate)) {
+        toast.error('Username must be 3–20 lowercase letters, numbers, _ or .');
         return;
       }
       if (usernameStatus === 'checking') {
@@ -157,26 +211,6 @@ export default function EditProfile() {
       }
       if (usernameStatus === 'taken') {
         toast.error('That username is taken — please choose another.');
-        return;
-      }
-      if (!form.firstName.trim()) {
-        toast.error('Please enter your first name.');
-        return;
-      }
-      if (!form.lastName.trim()) {
-        toast.error('Please enter your last name.');
-        return;
-      }
-      if (!form.displayName.trim()) {
-        toast.error('Please enter a display name.');
-        return;
-      }
-      if (!form.gender) {
-        toast.error('Please select a gender.');
-        return;
-      }
-      if (!form.country.trim()) {
-        toast.error('Please select your country.');
         return;
       }
     }
@@ -188,6 +222,12 @@ export default function EditProfile() {
     }
     if (result) {
       queryClient.invalidateQueries({ queryKey: ['profile'] });
+      if (user?.id) {
+        queryClient.setQueryData(['onboarding-status', user.id], {
+          hasCompletedOnboarding: true,
+          userType: (profile as any)?.user_type ?? null,
+        });
+      }
       if (isNewUser.current) {
         navigate('/', { replace: true });
       } else {
@@ -197,34 +237,62 @@ export default function EditProfile() {
   };
 
 
-  const isDisabled = !isValid || !isDirty || isSaving;
+  // For onboarding users, "Save & continue" is enabled whenever validation
+  // passes — dirty is NOT required because OAuth prefills already make the
+  // form complete. Existing users keep the dirty gate.
+  const isDisabled = isNewUser.current
+    ? (!isValid || isSaving || isSkipping)
+    : (!isValid || !isDirty || isSaving);
 
   return (
     <div className="min-h-screen bg-[#F8FAFC] flex flex-col">
-      {/* Header — Activity layout */}
+      {/* Header — Activity layout. Onboarding swaps the back chevron for a
+          quiet "Skip for now" and changes the eyebrow / title copy. */}
       <div
-        className="flex items-end px-4 pb-4"
+        className="flex items-end justify-between px-4 pb-4"
         style={{ paddingTop: 'max(env(safe-area-inset-top, 0px), 47px)' }}
       >
         <div className="flex items-center gap-3">
-          <button
-            onClick={() => navigate(-1)}
-            style={{ width: 36, height: 36, borderRadius: '50%', background: 'rgba(15,23,42,0.05)', border: '0.5px solid rgba(15,23,42,0.10)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, cursor: 'pointer' }}
-            aria-label="Back"
-          >
-            <ChevronLeft size={20} strokeWidth={2.5} style={{ color: INK_55 }} />
-          </button>
+          {!isNewUser.current && (
+            <button
+              onClick={() => navigate(-1)}
+              style={{ width: 36, height: 36, borderRadius: '50%', background: 'rgba(15,23,42,0.05)', border: '0.5px solid rgba(15,23,42,0.10)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, cursor: 'pointer' }}
+              aria-label="Back"
+            >
+              <ChevronLeft size={20} strokeWidth={2.5} style={{ color: INK_55 }} />
+            </button>
+          )}
           <div>
             <div style={{ marginBottom: 6 }}>
               <span style={{ fontFamily: GEIST, fontSize: 9, fontWeight: 800, color: INK_55, letterSpacing: '0.16em', textTransform: 'uppercase' }}>
-                Profile
+                {isNewUser.current ? 'Welcome' : 'Profile'}
               </span>
             </div>
             <h1 style={{ fontFamily: GEIST, fontSize: 34, fontWeight: 800, color: INK, letterSpacing: '-0.025em', lineHeight: 1, margin: 0 }}>
-              Edit Profile
+              {isNewUser.current ? 'Set up your profile' : 'Edit Profile'}
             </h1>
           </div>
         </div>
+        {isNewUser.current && (
+          <button
+            onClick={skipOnboarding}
+            disabled={isSkipping}
+            style={{
+              fontFamily: GEIST,
+              fontSize: 13,
+              fontWeight: 700,
+              color: INK_55,
+              background: 'transparent',
+              border: 'none',
+              cursor: isSkipping ? 'default' : 'pointer',
+              padding: '8px 4px',
+              opacity: isSkipping ? 0.5 : 1,
+            }}
+            aria-label="Skip onboarding"
+          >
+            {isSkipping ? 'Skipping…' : 'Skip for now'}
+          </button>
+        )}
       </div>
 
       <div
@@ -266,7 +334,7 @@ export default function EditProfile() {
               {/* Name (first + last) — onboarding-relevant */}
               <div className="px-4 pt-4 pb-3" style={{ borderBottom: '0.5px solid rgba(15,23,42,0.07)' }}>
                 <div style={{ marginBottom: 8 }}>
-                  <SectionEyebrow label="Name" required={isNewUser.current} />
+                  <SectionEyebrow label="Name" />
                 </div>
                 <div className="flex gap-2">
                   <input
@@ -290,7 +358,7 @@ export default function EditProfile() {
               <div className="px-4 pt-4 pb-3" style={{ borderBottom: '0.5px solid rgba(15,23,42,0.07)' }}>
                 <div className="flex justify-between items-baseline">
                   <div style={{ marginBottom: 8 }}>
-                    <SectionEyebrow label="Display Name" required={isNewUser.current} />
+                    <SectionEyebrow label="Display Name" />
                   </div>
                   <span className="text-[11px] text-muted-foreground/60">
                     {form.displayName.length}/{DISPLAY_NAME_MAX}
@@ -313,7 +381,7 @@ export default function EditProfile() {
               <div className="px-4 pt-3 pb-4" style={{ borderBottom: '0.5px solid rgba(15,23,42,0.07)' }}>
                 <div className="flex justify-between items-baseline">
                   <div style={{ marginBottom: 8 }}>
-                    <SectionEyebrow label="Username" required={isNewUser.current && !usernameIsLocked} />
+                    <SectionEyebrow label="Username" />
                   </div>
                   {usernameIsLocked && (
                     <span className="text-[11px] text-muted-foreground/60">
@@ -367,7 +435,7 @@ export default function EditProfile() {
               {/* Gender */}
               <div className="px-4 pt-3 pb-4">
                 <div style={{ marginBottom: 8 }}>
-                  <SectionEyebrow label="Gender" required={isNewUser.current} />
+                  <SectionEyebrow label="Gender" />
                 </div>
                 <SegToggle
                   value={form.gender}
@@ -502,21 +570,21 @@ export default function EditProfile() {
         <div className="px-4 pt-6 pb-2">
           <Button
             onClick={handleSave}
-            disabled={isDisabled && !isNewUser.current}
+            disabled={isDisabled}
             className="w-full min-h-[52px] rounded-[14px] text-[15px] font-bold border-0 active:opacity-90 transition-opacity"
             style={{
-              background: isDisabled && !isNewUser.current ? 'rgba(15,23,42,0.06)' : AMBER,
-              color: isDisabled && !isNewUser.current ? 'rgba(15,23,42,0.45)' : '#fff',
-              boxShadow: isDisabled && !isNewUser.current ? 'none' : '0 4px 16px rgba(247,147,30,0.28)',
+              background: isDisabled ? 'rgba(15,23,42,0.06)' : AMBER,
+              color: isDisabled ? 'rgba(15,23,42,0.45)' : '#fff',
+              boxShadow: isDisabled ? 'none' : '0 4px 16px rgba(247,147,30,0.28)',
               fontFamily: GEIST,
             }}
           >
             {isSaving ? (
               <><Loader2 size={18} className="animate-spin mr-2" /> Saving…</>
             ) : isNewUser.current ? (
-              'Complete Profile'
+              'Save & continue'
             ) : isDirty ? (
-              'Save Profile'
+              'Save changes'
             ) : (
               'All Saved'
             )}
