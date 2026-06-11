@@ -86,8 +86,9 @@ export function pickProBenchmark(args: {
   dateUtcYmd?: string;
   /** Per-visit rotation counter; when provided, supersedes the date-hash seed. */
   visitN?: number | null;
+  courseName: string;
 }): ProBenchmarkPick | null {
-  const { pros, courseId, course, viewerRounds, recordGross, visitN } = args;
+  const { pros, courseId, course, viewerRounds, recordGross, visitN, courseName } = args;
   if (!pros.length) return null;
   if (course.cr == null || course.slope == null || course.par == null || course.slope <= 0) {
     return null;
