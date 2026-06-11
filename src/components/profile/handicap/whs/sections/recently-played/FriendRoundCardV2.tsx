@@ -240,9 +240,9 @@ export const FriendRoundCardV2: React.FC<Props> = ({
                 fontWeight: 800,
                 letterSpacing: '0.12em',
                 textTransform: 'uppercase',
-                color: 'var(--hcp-amber, #F7931E)',
-                background: 'rgba(247,147,30,0.08)',
-                border: '0.5px solid rgba(247,147,30,0.30)',
+                color: 'rgba(255,255,255,0.92)',
+                background: 'rgba(255,255,255,0.08)',
+                border: '0.5px solid rgba(255,255,255,0.22)',
                 flexShrink: 0,
                 lineHeight: 1,
               }}
