@@ -188,7 +188,13 @@ export default function EditProfile() {
     }
   }, [loading, searchParams]);
 
-  if (loading) return <ProfileSkeleton />;
+  // For onboarding (cold OAuth land), NEVER block on the skeleton. The
+  // header / chrome must paint immediately so the user has Skip + Save
+  // affordances on first paint. The form sections happily render with empty
+  // defaults until the profile fetch resolves and `useProfileForm` hydrates.
+  // For returning users (deep-link refresh of /edit-profile), keep the
+  // skeleton as-is to avoid a flash of empty fields.
+  if (loading && !isNewUser.current) return <ProfileSkeleton />;
 
   const handleSave = async () => {
     // Onboarding is OPTIONAL — no required fields. We only enforce FORMAT
