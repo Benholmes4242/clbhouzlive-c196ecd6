@@ -1,10 +1,34 @@
 import React, { useEffect, useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 
+const LAUNCH = new Date(2026, 5, 22, 0, 0, 0); // 22 June 2026, LOCAL midnight
+const APP_STORE_URL = '';   // TODO: fill before 21 June
+const PLAY_STORE_URL = '';  // TODO: fill before 21 June
+
+const GEIST = '"Geist", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif';
+
+function pad2(n: number) {
+  return n < 10 ? `0${n}` : `${n}`;
+}
+
+function getRemaining(target: Date) {
+  const ms = target.getTime() - Date.now();
+  if (ms <= 0) return { ms: 0, d: 0, h: 0, m: 0, s: 0 };
+  const totalSec = Math.floor(ms / 1000);
+  return {
+    ms,
+    d: Math.floor(totalSec / 86400),
+    h: Math.floor((totalSec % 86400) / 3600),
+    m: Math.floor((totalSec % 3600) / 60),
+    s: totalSec % 60,
+  };
+}
+
 const BetaGatePage: React.FC = () => {
   const [logoError, setLogoError] = useState(false);
   const [email, setEmail] = useState('');
   const [submitState, setSubmitState] = useState<'idle' | 'loading' | 'success' | 'duplicate' | 'error'>('idle');
+  const [remaining, setRemaining] = useState(() => getRemaining(LAUNCH));
 
   useEffect(() => {
     document.body.classList.add('route-auth');
@@ -13,14 +37,22 @@ const BetaGatePage: React.FC = () => {
     };
   }, []);
 
+  useEffect(() => {
+    const id = setInterval(() => setRemaining(getRemaining(LAUNCH)), 1000);
+    return () => clearInterval(id);
+  }, []);
+
+  const launched = remaining.ms <= 0;
+
   const handleWaitlistSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!email || !email.includes('@')) return;
     setSubmitState('loading');
+    const cleanEmail = email.trim().toLowerCase();
     try {
       const { error } = await supabase
         .from('beta_waitlist')
-        .insert({ email: email.trim().toLowerCase(), source: 'beta_page' });
+        .insert({ email: cleanEmail, source: 'coming_soon' });
 
       if (error) {
         if (error.code === '23505') {
@@ -31,9 +63,8 @@ const BetaGatePage: React.FC = () => {
         return;
       }
 
-      // Fire notification edge function (non-blocking)
       supabase.functions.invoke('send-waitlist-notification', {
-        body: { email: email.trim().toLowerCase() }
+        body: { email: cleanEmail }
       }).catch(() => {});
 
       setSubmitState('success');
@@ -42,31 +73,74 @@ const BetaGatePage: React.FC = () => {
     }
   };
 
+  const eyebrowStyle: React.CSSProperties = {
+    fontFamily: GEIST,
+    fontSize: 11,
+    fontWeight: 700,
+    letterSpacing: '0.14em',
+    textTransform: 'uppercase',
+    color: '#F7931E',
+    margin: 0,
+  };
+
+  const renderStoreButton = (label: string, url: string) => {
+    const disabled = !url;
+    const btn = (
+      <div
+        style={{
+          minHeight: 52,
+          borderRadius: 14,
+          background: '#FFFFFF',
+          color: '#0A0E14',
+          fontFamily: GEIST,
+          fontWeight: 600,
+          fontSize: 15,
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          padding: '0 20px',
+          opacity: disabled ? 0.4 : 1,
+          textDecoration: 'none',
+          width: '100%',
+          boxSizing: 'border-box',
+        }}
+      >
+        {label}
+      </div>
+    );
+    return (
+      <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 6, minWidth: 0 }}>
+        {disabled ? (
+          <div style={{ width: '100%', pointerEvents: 'none' }}>{btn}</div>
+        ) : (
+          <a href={url} target="_blank" rel="noopener noreferrer" style={{ width: '100%', textDecoration: 'none' }}>
+            {btn}
+          </a>
+        )}
+        {disabled && (
+          <span style={{ fontFamily: GEIST, fontSize: 11, color: 'rgba(255,255,255,0.4)' }}>
+            live later today
+          </span>
+        )}
+      </div>
+    );
+  };
+
   return (
     <div
       style={{
         position: 'fixed',
         inset: 0,
-        background: '#080808',
+        background: '#0A0E14',
         display: 'flex',
         flexDirection: 'column',
         alignItems: 'center',
         justifyContent: 'center',
         zIndex: 9999,
         overflowY: 'auto',
+        fontFamily: GEIST,
       }}
     >
-      {/* Amber radial glow */}
-      <div
-        style={{
-          position: 'absolute',
-          inset: 0,
-          background: 'radial-gradient(ellipse 70% 50% at 50% -10%, rgba(245,166,35,0.18) 0%, transparent 60%)',
-          pointerEvents: 'none',
-        }}
-      />
-
-      {/* Content */}
       <div
         style={{
           position: 'relative',
@@ -74,155 +148,220 @@ const BetaGatePage: React.FC = () => {
           flexDirection: 'column',
           alignItems: 'center',
           gap: 24,
-          padding: '0 32px',
-          maxWidth: 360,
+          padding: '32px',
+          maxWidth: 420,
           width: '100%',
         }}
       >
-        {/* Logo */}
         {!logoError && (
           <img
             src="/images/clbhouz-logo.png"
             alt="clbhouz"
             onError={() => setLogoError(true)}
-            style={{ height: 48, marginBottom: 8 }}
+            style={{ height: 44, marginBottom: 4 }}
           />
         )}
 
-        {/* Headline */}
-        <h1
-          style={{
-            fontFamily: '"Geist", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif',
-            fontSize: 28,
-            fontWeight: 700,
-            color: '#ffffff',
-            margin: 0,
-            textAlign: 'center',
-          }}
-        >
-          Private Beta
-        </h1>
+        {!launched ? (
+          <>
+            <span style={eyebrowStyle}>clbhouz is coming</span>
 
-        {/* Body */}
-        <p
-          style={{
-            fontSize: 15,
-            lineHeight: 1.55,
-            color: 'rgba(255,255,255,0.55)',
-            textAlign: 'center',
-            margin: 0,
-            maxWidth: 300,
-          }}
-        >
-          clbhouz is currently available by invitation only. If you've been invited, download the app via TestFlight to get started.
-        </p>
-
-        {/* Waitlist form */}
-        {submitState === 'success' ? (
-          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8, width: '100%' }}>
-            <span style={{ fontSize: 15, fontWeight: 600, color: '#34D399' }}>
-              ✓ You're on the list!
-            </span>
-            <span style={{ fontSize: 13, color: 'rgba(255,255,255,0.45)', textAlign: 'center' }}>
-              We'll email you when you're invited.
-            </span>
-          </div>
-        ) : (
-          <form onSubmit={handleWaitlistSubmit} style={{ display: 'flex', flexDirection: 'column', gap: 10, width: '100%', maxWidth: 280 }}>
-            <span style={{ fontSize: 13, color: 'rgba(255,255,255,0.45)', textAlign: 'center' }}>
-              Interested in joining early?
-            </span>
-            <input
-              type="email"
-              value={email}
-              onChange={(e) => { setEmail(e.target.value); setSubmitState('idle'); }}
-              placeholder="your@email.com"
-              required
+            {/* Countdown */}
+            <div
               style={{
-                height: 48, borderRadius: 12,
-                background: 'rgba(255,255,255,0.07)',
-                border: `1px solid ${submitState === 'error' || submitState === 'duplicate' ? 'rgba(239,68,68,0.5)' : 'rgba(255,255,255,0.12)'}`,
-                color: '#fff', fontSize: 14,
-                padding: '0 14px', outline: 'none',
-                fontFamily: 'inherit', width: '100%',
-                boxSizing: 'border-box' as const,
-              }}
-            />
-            {submitState === 'duplicate' && (
-              <span style={{ fontSize: 12, color: 'rgba(239,68,68,0.8)', textAlign: 'center' }}>
-                This email is already on the waitlist.
-              </span>
-            )}
-            {submitState === 'error' && (
-              <span style={{ fontSize: 12, color: 'rgba(239,68,68,0.8)', textAlign: 'center' }}>
-                Something went wrong — please try again.
-              </span>
-            )}
-            <button
-              type="submit"
-              disabled={submitState === 'loading'}
-              style={{
-                height: 44, borderRadius: 22,
-                background: 'rgba(255,255,255,0.1)',
-                color: '#fff', fontSize: 14,
-                fontWeight: 600, border: '1px solid rgba(255,255,255,0.15)',
-                cursor: submitState === 'loading' ? 'wait' : 'pointer',
-                opacity: submitState === 'loading' ? 0.6 : 1,
+                display: 'flex',
+                alignItems: 'flex-start',
+                justifyContent: 'center',
+                gap: 8,
+                width: '100%',
               }}
             >
-              {submitState === 'loading' ? 'Joining...' : 'Request Early Access'}
-            </button>
-          </form>
+              {[
+                { v: remaining.d, label: 'days' },
+                { v: remaining.h, label: 'hours' },
+                { v: remaining.m, label: 'mins' },
+                { v: remaining.s, label: 'secs' },
+              ].map((unit, i) => (
+                <React.Fragment key={unit.label}>
+                  <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', minWidth: 56 }}>
+                    <span
+                      style={{
+                        fontFamily: GEIST,
+                        fontSize: 56,
+                        fontWeight: 200,
+                        color: '#FFFFFF',
+                        lineHeight: 1,
+                        fontVariantNumeric: 'tabular-nums',
+                      }}
+                    >
+                      {pad2(unit.v)}
+                    </span>
+                    <span
+                      style={{
+                        fontFamily: GEIST,
+                        fontSize: 10,
+                        fontWeight: 700,
+                        letterSpacing: '0.14em',
+                        textTransform: 'uppercase',
+                        color: 'rgba(255,255,255,0.4)',
+                        marginTop: 10,
+                      }}
+                    >
+                      {unit.label}
+                    </span>
+                  </div>
+                  {i < 3 && (
+                    <span
+                      style={{
+                        fontFamily: GEIST,
+                        fontSize: 40,
+                        fontWeight: 200,
+                        color: 'rgba(255,255,255,0.25)',
+                        lineHeight: 1,
+                      }}
+                    >
+                      :
+                    </span>
+                  )}
+                </React.Fragment>
+              ))}
+            </div>
+
+            <p
+              style={{
+                fontFamily: GEIST,
+                fontSize: 14,
+                lineHeight: 1.55,
+                color: 'rgba(255,255,255,0.55)',
+                textAlign: 'center',
+                margin: 0,
+              }}
+            >
+              On iPhone and Android, 22 June 2026.
+            </p>
+
+            {/* Notify capture */}
+            {submitState === 'success' || submitState === 'duplicate' ? (
+              <div style={{ width: '100%', maxWidth: 380, textAlign: 'center' }}>
+                <span style={{ fontFamily: GEIST, fontSize: 13, color: 'rgba(255,255,255,0.6)' }}>
+                  {submitState === 'duplicate'
+                    ? "You're already on the list."
+                    : "You're on the list. We'll email you on launch day."}
+                </span>
+              </div>
+            ) : (
+              <form
+                onSubmit={handleWaitlistSubmit}
+                style={{ width: '100%', maxWidth: 380, display: 'flex', flexDirection: 'column', gap: 8 }}
+              >
+                <div style={{ display: 'flex', gap: 8, width: '100%' }}>
+                  <input
+                    type="email"
+                    value={email}
+                    onChange={(e) => { setEmail(e.target.value); if (submitState === 'error') setSubmitState('idle'); }}
+                    placeholder="your@email.com"
+                    required
+                    style={{
+                      flex: 1,
+                      height: 48,
+                      borderRadius: 12,
+                      background: 'rgba(255,255,255,0.06)',
+                      border: `1px solid ${submitState === 'error' ? 'rgba(248,113,113,0.5)' : 'rgba(255,255,255,0.12)'}`,
+                      color: '#fff',
+                      fontSize: 14,
+                      padding: '0 14px',
+                      outline: 'none',
+                      fontFamily: GEIST,
+                      boxSizing: 'border-box',
+                      minWidth: 0,
+                    }}
+                  />
+                  <button
+                    type="submit"
+                    disabled={submitState === 'loading'}
+                    style={{
+                      height: 48,
+                      padding: '0 18px',
+                      borderRadius: 12,
+                      background: '#F7931E',
+                      color: '#0A0E14',
+                      fontFamily: GEIST,
+                      fontSize: 14,
+                      fontWeight: 700,
+                      border: 'none',
+                      cursor: submitState === 'loading' ? 'wait' : 'pointer',
+                      opacity: submitState === 'loading' ? 0.7 : 1,
+                      whiteSpace: 'nowrap',
+                    }}
+                  >
+                    {submitState === 'loading' ? '…' : 'Notify me'}
+                  </button>
+                </div>
+                {submitState === 'error' && (
+                  <span style={{ fontFamily: GEIST, fontSize: 13, color: '#f87171' }}>
+                    Something went wrong — please try again.
+                  </span>
+                )}
+              </form>
+            )}
+          </>
+        ) : (
+          <>
+            <span style={eyebrowStyle}>available now</span>
+            <h1
+              style={{
+                fontFamily: GEIST,
+                fontSize: 34,
+                fontWeight: 800,
+                color: '#FFFFFF',
+                margin: 0,
+                textAlign: 'center',
+                letterSpacing: '-0.02em',
+              }}
+            >
+              clbhouz is live.
+            </h1>
+            <p
+              style={{
+                fontFamily: GEIST,
+                fontSize: 14,
+                lineHeight: 1.55,
+                color: 'rgba(255,255,255,0.55)',
+                textAlign: 'center',
+                margin: 0,
+              }}
+            >
+              Download on the App Store or Google Play.
+            </p>
+            <div
+              style={{
+                display: 'flex',
+                gap: 12,
+                width: '100%',
+                maxWidth: 380,
+                flexWrap: 'wrap',
+              }}
+            >
+              {renderStoreButton('App Store', APP_STORE_URL)}
+              {renderStoreButton('Google Play', PLAY_STORE_URL)}
+            </div>
+          </>
         )}
-
-        {/* Divider between waitlist and TestFlight */}
-        {submitState !== 'success' && (
-          <span style={{ fontSize: 12, color: 'rgba(255,255,255,0.2)', letterSpacing: '0.05em' }}>
-            — or —
-          </span>
-        )}
-
-        {/* CTA */}
-        <a
-          href="https://testflight.apple.com/join/clbhouz"
-          target="_blank"
-          rel="noopener noreferrer"
-          style={{
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            width: '100%',
-            maxWidth: 280,
-            height: 52,
-            borderRadius: 26,
-            background: '#F5A623',
-            color: '#000000',
-            fontSize: 15,
-            fontWeight: 600,
-            textDecoration: 'none',
-            border: 'none',
-            cursor: 'pointer',
-            marginTop: 8,
-          }}
-        >
-          Download on TestFlight
-        </a>
-
       </div>
 
-      {/* Footer */}
       <span
         style={{
           position: 'absolute',
-          bottom: 40,
-          fontSize: 11,
-          color: 'rgba(255,255,255,0.15)',
+          bottom: 32,
+          fontFamily: GEIST,
+          fontSize: 10,
+          color: 'rgba(255,255,255,0.25)',
           textTransform: 'uppercase',
-          letterSpacing: '0.1em',
+          letterSpacing: '0.12em',
           fontWeight: 500,
         }}
       >
-        clbhouz · Private Beta
+        clbhouz — clbhouz.co.uk
       </span>
     </div>
   );
