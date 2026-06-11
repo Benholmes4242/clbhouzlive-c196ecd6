@@ -57,9 +57,11 @@ const AuthHeroScreen: React.FC<AuthHeroScreenProps> = ({
   submitting,
   onSubmitEmail,
   onAppleSignIn,
+  onGoogleSignIn,
   errorMessage,
   errorNonce,
 }) => {
+
   // Dark status bar + safe-area shield for Median.co wrapper
   useMedianStatusBar('dark', '#0A0E14', true, false);
 
