@@ -294,104 +294,77 @@ const FeedCardImpl: React.FC<FeedCardProps> = ({
           e.stopPropagation();
           onCourse?.(post);
         };
+        const pill = post.courseRating != null ? (
+          <button
+            type="button"
+            onClick={handleCourseTap}
+            style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: 5,
+              flexShrink: 0,
+              background: 'rgba(255,255,255,0.08)',
+              padding: '3px 8px',
+              borderRadius: 999,
+              border: 'none',
+              color: '#fff',
+              fontSize: 11,
+              fontWeight: 700,
+              fontVariantNumeric: 'tabular-nums',
+              lineHeight: 1,
+              cursor: post.courseId ? 'pointer' : 'default',
+              marginLeft: 8,
+            }}
+          >
+            <img
+              src="/lovable-uploads/2b0e2d79-6b26-4b6b-a27b-8dd5f8cc5aad.png"
+              alt=""
+              aria-hidden="true"
+              style={{ width: 12, height: 12, objectFit: 'contain' }}
+            />
+            {post.courseRating.toFixed(1)}
+          </button>
+        ) : null;
+        const nameEl = post.courseId ? (
+          <button
+            type="button"
+            onClick={handleCourseTap}
+            style={{
+              background: 'transparent',
+              border: 'none',
+              padding: 0,
+              textAlign: 'left',
+              fontSize: 12,
+              color: T60,
+              cursor: 'pointer',
+              minWidth: 0,
+              overflow: 'hidden',
+              textOverflow: 'ellipsis',
+              whiteSpace: 'nowrap',
+            }}
+          >
+            {post.courseName}
+          </button>
+        ) : (
+          <div
+            style={{
+              fontSize: 12,
+              color: T60,
+              minWidth: 0,
+              overflow: 'hidden',
+              textOverflow: 'ellipsis',
+              whiteSpace: 'nowrap',
+            }}
+          >
+            {post.courseName}
+          </div>
+        );
         return (
           <div style={{ padding: '10px 14px 0' }}>
-            {post.courseId ? (
-              <button
-                type="button"
-                onClick={handleCourseTap}
-                style={{
-                  display: 'inline-flex',
-                  alignItems: 'center',
-                  gap: 6,
-                  background: 'transparent',
-                  border: 'none',
-                  padding: 0,
-                  textAlign: 'left',
-                  fontSize: 12,
-                  color: T60,
-                  cursor: 'pointer',
-                  maxWidth: '100%',
-                  overflow: 'hidden',
-                  textOverflow: 'ellipsis',
-                  whiteSpace: 'nowrap',
-                }}
-              >
-                <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                  {post.courseName}
-                </span>
-                {post.courseRating != null && (
-                  <span
-                    style={{
-                      display: 'inline-flex',
-                      alignItems: 'center',
-                      gap: 4,
-                      flexShrink: 0,
-                      background: 'rgba(255,255,255,0.08)',
-                      padding: '2px 6px',
-                      borderRadius: 999,
-                      color: '#fff',
-                      fontSize: 10,
-                      fontWeight: 700,
-                      fontVariantNumeric: 'tabular-nums',
-                      lineHeight: 1,
-                    }}
-                  >
-                    <img
-                      src="/lovable-uploads/2b0e2d79-6b26-4b6b-a27b-8dd5f8cc5aad.png"
-                      alt=""
-                      aria-hidden="true"
-                      style={{ width: 10, height: 10, objectFit: 'contain' }}
-                    />
-                    {post.courseRating.toFixed(1)}
-                  </span>
-                )}
-              </button>
-            ) : (
-              <div
-                style={{
-                  display: 'inline-flex',
-                  alignItems: 'center',
-                  gap: 6,
-                  fontSize: 12,
-                  color: T60,
-                  maxWidth: '100%',
-                  overflow: 'hidden',
-                  textOverflow: 'ellipsis',
-                  whiteSpace: 'nowrap',
-                }}
-              >
-                <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                  {post.courseName}
-                </span>
-                {post.courseRating != null && (
-                  <span
-                    style={{
-                      display: 'inline-flex',
-                      alignItems: 'center',
-                      gap: 4,
-                      flexShrink: 0,
-                      background: 'rgba(255,255,255,0.08)',
-                      padding: '2px 6px',
-                      borderRadius: 999,
-                      color: '#fff',
-                      fontSize: 10,
-                      fontWeight: 700,
-                      fontVariantNumeric: 'tabular-nums',
-                      lineHeight: 1,
-                    }}
-                  >
-                    <img
-                      src="/lovable-uploads/2b0e2d79-6b26-4b6b-a27b-8dd5f8cc5aad.png"
-                      alt=""
-                      aria-hidden="true"
-                      style={{ width: 10, height: 10, objectFit: 'contain' }}
-                    />
-                    {post.courseRating.toFixed(1)}
-                  </span>
-                )}
-              </div>
-            )}
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8 }}>
+              {nameEl}
+              {pill}
+            </div>
             {courseLocation && (
               <div
                 style={{
