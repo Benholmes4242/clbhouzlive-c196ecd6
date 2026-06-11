@@ -18,7 +18,6 @@ export interface CourseInputs {
 /** Categories the band may appear on (base names; window applied by caller). */
 export const PRO_BAND_BASES = [
   'lowest_gross',
-  'best_stableford',
   'most_birdies',
   'most_eagles',
 ] as const;
