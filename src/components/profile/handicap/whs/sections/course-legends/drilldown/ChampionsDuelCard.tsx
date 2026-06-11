@@ -26,9 +26,9 @@ interface ChampionsDuelCardProps {
   onFullLeaderboardTap: () => void;
 }
 
-const INK = '#0F172A';
-const INK_55 = '#64748B';
-const DEEP_AMBER = '#B26818';
+const INK = 'var(--hcp-t-100)';
+const INK_55 = 'var(--hcp-t-60)';
+const DEEP_AMBER = 'var(--hcp-gold-text)';
 const GOLD = '#FBBC2E';
 
 const SQUIRCLE_MASK_URL =
