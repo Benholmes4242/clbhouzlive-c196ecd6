@@ -50,10 +50,8 @@ export default function EditProfile() {
   const { profile, loading } = useProfileData();
   const [searchParams] = useSearchParams();
 
-  // Light-shield for the notch / status bar on this page.
-  // Must opt-in explicitly or the previous page's dark shield bleeds through
-  // on a cold OAuth land. Render dark icons on the #F8FAFC surface.
-  useMedianStatusBar('light', '#F8FAFC');
+  // Status bar is handled by PageRoot — /edit-profile resolves to light chrome
+  // (#F8FAFC) automatically since it's outside PageRoot's dark route list.
 
   const {
     form, setField, isDirty, errors, isValid,
