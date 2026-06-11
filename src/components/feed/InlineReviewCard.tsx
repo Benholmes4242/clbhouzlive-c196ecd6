@@ -199,31 +199,45 @@ export const InlineReviewCard: React.FC<InlineReviewCardProps> = ({
         )}
       </div>
 
-      {/* Location · Read review */}
       {locationStr && (
         <div
           style={{
             fontSize: 13,
             color: 'rgba(255,255,255,0.78)',
             marginTop: 3,
-            display: 'inline-flex',
+            display: 'flex',
             alignItems: 'center',
             gap: 6,
-            flexWrap: 'wrap',
           }}
         >
-          {locationStr}
+          <span style={{ display: 'inline-flex', alignItems: 'center', gap: 6, flexWrap: 'wrap', minWidth: 0 }}>
+            {locationStr}
+            <span style={{ opacity: 0.5 }}>·</span>
+            <span
+              style={{
+                color: '#F7931E',
+                fontWeight: 600,
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: 2,
+              }}
+            >
+              Read review <ChevronRight size={13} color="#F7931E" />
+            </span>
+          </span>
           {courseRating != null && (
             <span
               style={{
+                marginLeft: 'auto',
                 display: 'inline-flex',
                 alignItems: 'center',
-                gap: 4,
+                gap: 5,
+                flexShrink: 0,
                 background: 'rgba(255,255,255,0.08)',
-                padding: '2px 6px',
+                padding: '3px 8px',
                 borderRadius: 999,
                 color: '#fff',
-                fontSize: 10,
+                fontSize: 11,
                 fontWeight: 700,
                 fontVariantNumeric: 'tabular-nums',
                 lineHeight: 1,
@@ -233,23 +247,11 @@ export const InlineReviewCard: React.FC<InlineReviewCardProps> = ({
                 src="/lovable-uploads/2b0e2d79-6b26-4b6b-a27b-8dd5f8cc5aad.png"
                 alt=""
                 aria-hidden="true"
-                style={{ width: 10, height: 10, objectFit: 'contain' }}
+                style={{ width: 12, height: 12, objectFit: 'contain' }}
               />
               {courseRating.toFixed(1)}
             </span>
           )}
-          <span style={{ opacity: 0.5 }}>·</span>
-          <span
-            style={{
-              color: '#F7931E',
-              fontWeight: 600,
-              display: 'inline-flex',
-              alignItems: 'center',
-              gap: 2,
-            }}
-          >
-            Read review <ChevronRight size={13} color="#F7931E" />
-          </span>
         </div>
       )}
     </motion.button>
