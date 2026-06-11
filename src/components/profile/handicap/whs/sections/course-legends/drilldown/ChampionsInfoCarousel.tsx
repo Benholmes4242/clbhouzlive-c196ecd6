@@ -62,7 +62,7 @@ const ExplainerContent: React.FC<{ window: 'all_time' | '90d' }> = ({ window }) 
       </span>
     </div>
     <p style={{ fontSize: 12, fontWeight: 500, color: 'var(--hcp-t-60)', lineHeight: 1.55, margin: 0 }}>
-      The clubhouse records board, digitalised. Lowest gross, best Stableford, most birdies
+      The clubhouse records board, digitalised. Lowest gross, best stableford, most birdies
       and more — ranked from{' '}
       <b style={{ color: 'var(--hcp-t-100)', fontWeight: 700 }}>official WHS scores</b>{' '}
       at this course, {window === 'all_time' ? 'all time' : 'over the last 90 days'}.
