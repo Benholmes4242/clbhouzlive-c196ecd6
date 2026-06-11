@@ -280,11 +280,6 @@ export const CourseLegendsDrilldown: React.FC<Props> = ({ selection, hideHeader 
           a small connect-WHS cue beneath for non-synced users. */}
       <ChampionsCourseSearch currentCourseId={ctx.courseId} />
 
-      <div style={{ padding: '14px 16px 4px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 12 }}>
-        <WindowToggle window={window} setWindow={handleWindowChange} />
-        <ChampionsCoursePulsePanel meta={meta} />
-      </div>
-
       <ConnectHandicapCue variant="champions" courseName={ctx.courseName} />
 
       {autoSwitchedToAllTime && window === 'all_time' && (
@@ -314,10 +309,15 @@ export const CourseLegendsDrilldown: React.FC<Props> = ({ selection, hideHeader 
       )}
 
       {!isLoading && !isError && (data ?? []).length > 0 && !activeWindowHasData && (
-        <ChampionsWindowEmptyState
-          window={window}
-          onSwitch={() => handleWindowChange(window === '90d' ? 'all_time' : '90d')}
-        />
+        <>
+          <div style={{ padding: '14px 16px 4px' }}>
+            <WindowToggle window={window} setWindow={handleWindowChange} />
+          </div>
+          <ChampionsWindowEmptyState
+            window={window}
+            onSwitch={() => handleWindowChange(window === '90d' ? 'all_time' : '90d')}
+          />
+        </>
       )}
 
       {!isLoading && !isError && (data ?? []).length > 0 && activeWindowHasData && (
@@ -330,9 +330,10 @@ export const CourseLegendsDrilldown: React.FC<Props> = ({ selection, hideHeader 
               held: yourRanks[cat] === 1,
             }))}
             heldCount={youOwnedCount}
-            yourRounds={meta?.your_rounds ?? 0}
-            yourBest={meta?.your_best ?? null}
+            window={window}
+            onWindowChange={handleWindowChange}
           />
+
 
           <CategoryNavRail
             categories={navCategories}
