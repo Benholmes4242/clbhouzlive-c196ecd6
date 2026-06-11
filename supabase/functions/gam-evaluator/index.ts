@@ -853,6 +853,12 @@ const LEGEND_CATS: LegendCfg[] = [
   // ── Most hole-in-ones ──
   { category: "most_aces_90d",            windowDays: 90,   sortDir: "desc", metric: "holes_in_one",      aggregate: "sum" },
   { category: "most_aces_all_time",       windowDays: null, sortDir: "desc", metric: "holes_in_one",      aggregate: "sum" },
+  // ── Most rounds played ──
+  // NOTE: 'rounds' is NOT a column on gam_round_stats — recomputeLegend
+  // special-cases cfg.metric === 'rounds' to contribute 1 per qualifying row.
+  // Do NOT add 'rounds' to the SELECT list below; the column doesn't exist.
+  { category: "most_rounds_90d",          windowDays: 90,   sortDir: "desc", metric: "rounds",            aggregate: "sum" },
+  { category: "most_rounds_all_time",     windowDays: null, sortDir: "desc", metric: "rounds",            aggregate: "sum" },
 ];
 
 async function applyCourseLegends(stats: any) {
@@ -896,7 +902,8 @@ async function recomputeLegend(courseId: string, cfg: LegendCfg) {
   const byUser = new Map<string, { value: number; attained_at: string }>();
   for (const r of rounds) {
     let val: number | null = null;
-    if (cfg.aggregate === "value") val = (r as any)[cfg.metric];
+    if (cfg.metric === "rounds") val = 1; // synthetic metric — every qualifying row counts once
+    else if (cfg.aggregate === "value") val = (r as any)[cfg.metric];
     else if (cfg.aggregate === "sum") val = (r as any)[cfg.metric] ?? 0;
     else if (cfg.aggregate === "count") val = 1;
     if (val == null) continue;

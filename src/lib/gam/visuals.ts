@@ -6,6 +6,7 @@ import {
   Award,
   Sparkles,
   Bird,
+  Flag,
   type LucideIcon,
 } from 'lucide-react';
 import type { BadgeRarity, LegendCategory, StreakType } from './types';
@@ -46,6 +47,8 @@ export const legendCategoryLabel: Record<LegendCategory, string> = {
   most_aces_all_time:       'Aces',
   most_albatrosses_90d:     'Albatross',
   most_albatrosses_all_time:'Albatross',
+  most_rounds_90d:          'Rounds',
+  most_rounds_all_time:     'Rounds',
 };
 
 
@@ -68,6 +71,8 @@ export const legendCategoryIcon: Record<LegendCategory, LucideIcon> = {
   most_aces_all_time:       Sparkles,
   most_albatrosses_90d:     Bird,
   most_albatrosses_all_time:Bird,
+  most_rounds_90d:          Flag,
+  most_rounds_all_time:     Flag,
 };
 
 /**
@@ -89,6 +94,8 @@ export const legendCategoryWindow: Record<LegendCategory, '90d' | 'all_time'> = 
   most_aces_all_time:       'all_time',
   most_albatrosses_90d:     '90d',
   most_albatrosses_all_time:'all_time',
+  most_rounds_90d:          '90d',
+  most_rounds_all_time:     'all_time',
 };
 
 export const streakLabel: Record<StreakType, string> = {
@@ -124,6 +131,9 @@ export function formatLegendValue(category: LegendCategory, value: number): stri
     case 'most_albatrosses_90d':
     case 'most_albatrosses_all_time':
       return `${value} albatross${value === 1 ? '' : 'es'}`;
+    case 'most_rounds_90d':
+    case 'most_rounds_all_time':
+      return `${value} round${value === 1 ? '' : 's'}`;
   }
 }
 
@@ -212,6 +222,11 @@ export function formatLegendGap(category: LegendCategory, gap: number): string {
     case 'most_albatrosses_all_time': {
       const n = Math.round(abs);
       return `${n} ${n === 1 ? 'albatross' : 'albatrosses'}`;
+    }
+    case 'most_rounds_90d':
+    case 'most_rounds_all_time': {
+      const n = Math.round(abs);
+      return `${n} ${n === 1 ? 'round' : 'rounds'}`;
     }
   }
 }
