@@ -3,6 +3,8 @@ import { Crown, Swords, type LucideIcon } from 'lucide-react';
 import type { LegendCategory } from '@/lib/gam/types';
 import { ChampionsListRow } from './ChampionsListRow';
 import { duelTension, duelLine } from './_shared/duelTension';
+import { ProBenchmarkBand } from './ProBenchmarkBand';
+import type { ProProfile } from './_shared/proBenchmark';
 
 export interface DuelRow {
   rank: number;
@@ -24,6 +26,12 @@ interface ChampionsDuelCardProps {
   holdDuration: string;
   totalCount: number;
   onFullLeaderboardTap: () => void;
+  proBenchmark?: {
+    pro: ProProfile;
+    value: string;
+    sub: string;
+    chaseLine?: string;
+  } | null;
 }
 
 const INK = 'var(--hcp-t-100)';
@@ -83,6 +91,7 @@ export const ChampionsDuelCard: React.FC<ChampionsDuelCardProps> = ({
   holdDuration,
   totalCount,
   onFullLeaderboardTap,
+  proBenchmark,
 }) => {
   const champion = rows[0];
   const defending = champion?.isSelf === true;
@@ -104,6 +113,7 @@ export const ChampionsDuelCard: React.FC<ChampionsDuelCardProps> = ({
   const fill = duelTension(category, leftValue, rightValue);
 
   let line: string;
+  let isNormalDuelLine = false;
   if (standsAlone) {
     line = 'The champion stands alone. Be the first to challenge.';
   } else if (!selfOnBoard && !defending) {
@@ -112,6 +122,10 @@ export const ChampionsDuelCard: React.FC<ChampionsDuelCardProps> = ({
     line = 'The champion stands alone. Be the first to challenge.';
   } else {
     line = duelLine(category, leftValue, rightValue, defending, false);
+    isNormalDuelLine = true;
+  }
+  if (isNormalDuelLine && proBenchmark?.chaseLine) {
+    line = `${line} — ${proBenchmark.chaseLine}`;
   }
 
   // Status pill text
@@ -169,6 +183,14 @@ export const ChampionsDuelCard: React.FC<ChampionsDuelCardProps> = ({
           {pillText}
         </span>
       </div>
+
+      {proBenchmark && (
+        <ProBenchmarkBand
+          pro={proBenchmark.pro}
+          value={proBenchmark.value}
+          sub={proBenchmark.sub}
+        />
+      )}
 
       {/* Duel row */}
       <div style={{ display: 'grid', gridTemplateColumns: '1fr auto 1fr', gap: 10, alignItems: 'center' }}>

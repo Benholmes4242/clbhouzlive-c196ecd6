@@ -27,6 +27,8 @@ import { ChampionsCourseSearch } from './drilldown/ChampionsCourseSearch';
 import { ChampionsInfoCarousel } from './drilldown/ChampionsInfoCarousel';
 import { formatGapFromChampion } from './drilldown/_shared/helpers';
 import { CHAMPIONS_ORDER_90D, CHAMPIONS_ORDER_ALL_TIME } from './_shared/championsOrder';
+import { useProBenchmarks } from '@/hooks/gam/useProBenchmarks';
+import { pickProBenchmark, PRO_BAND_BASES, type ProBandBase } from './drilldown/_shared/proBenchmark';
 
 
 const CATEGORIES_ORDER_90D: LegendCategory[] = CHAMPIONS_ORDER_90D.filter(c => c !== 'best_score_diff_90d');
@@ -109,6 +111,7 @@ export const CourseLegendsDrilldown: React.FC<Props> = ({ selection, hideHeader 
   const { activeActor } = useActiveActor();
   const { data, isLoading, isError, refetch } = useCourseLegends(ctx.courseId, activeActor?.id);
   const { data: meta } = useCourseMeta(ctx.courseId);
+  const { data: pros } = useProBenchmarks();
   const [window, setWindow] = useState<LegendWindow>('all_time');
   const [courseHeaderImage, setCourseHeaderImage] = useState<string | null>(null);
   const [fullLeaderboardCategory, setFullLeaderboardCategory] =
@@ -230,6 +233,36 @@ export const CourseLegendsDrilldown: React.FC<Props> = ({ selection, hideHeader 
     [visibleCategories],
   );
 
+  // Pro Benchmark band — ALL-TIME window only; silently absent on failure
+  const proBenchmarkPick = useMemo(() => {
+    if (window !== 'all_time') return null;
+    if (!pros || pros.length === 0) return null;
+
+    const eligibleBases: ProBandBase[] = PRO_BAND_BASES.filter((b) => {
+      const cat = `${b}_all_time` as LegendCategory;
+      if (!visibleCategories.includes(cat)) return false;
+      const entry = groupedWithTotals.get(cat);
+      return !!entry && entry.rows.length > 0;
+    });
+    if (eligibleBases.length === 0) return null;
+
+    const recordEntry = groupedWithTotals.get('lowest_gross_all_time' as LegendCategory);
+    const recordGross = recordEntry?.rows[0]?.value ?? null;
+
+    return pickProBenchmark({
+      pros,
+      courseId: ctx.courseId,
+      course: {
+        cr: meta?.course_cr ?? null,
+        slope: meta?.course_slope ?? null,
+        par: meta?.course_par ?? null,
+      },
+      viewerRounds: meta?.your_rounds ?? null,
+      eligibleBases,
+      recordGross,
+    });
+  }, [pros, ctx.courseId, meta, window, groupedWithTotals, visibleCategories]);
+
   return (
     <div ref={containerRef}>
       {!hideHeader && (
@@ -342,6 +375,11 @@ export const CourseLegendsDrilldown: React.FC<Props> = ({ selection, hideHeader 
                   holdDuration={`Held ${formatHeldDuration(champion.attained_at)}`}
                   totalCount={entry.total}
                   onFullLeaderboardTap={() => setFullLeaderboardCategory(cat)}
+                  proBenchmark={
+                    proBenchmarkPick && cat === `${proBenchmarkPick.base}_all_time`
+                      ? proBenchmarkPick
+                      : null
+                  }
                 />
               </div>
             );
