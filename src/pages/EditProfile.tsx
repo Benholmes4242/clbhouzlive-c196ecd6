@@ -12,8 +12,8 @@ import { supabase } from '@/integrations/supabase/client';
 import { useWhsConnection } from '@/lib/whs/hooks';
 import { resolveDisplayHandicap } from '@/lib/handicap/resolveHandicap';
 import { formatHcp } from '@/lib/formatHcp';
-import { useMedianStatusBar } from '@/hooks/useMedianStatusBar';
 import { Button } from '@/components/ui/button';
+import { PageRoot } from '@/components/layout/PageRoot';
 import { SectionEyebrow } from '@/components/ui/SectionEyebrow';
 import { SectionCard } from '@/components/profile/edit-v2/SectionCard';
 import { SegToggle } from '@/components/profile/edit-v2/SegToggle';
@@ -50,10 +50,8 @@ export default function EditProfile() {
   const { profile, loading } = useProfileData();
   const [searchParams] = useSearchParams();
 
-  // Light-shield for the notch / status bar on this page.
-  // Must opt-in explicitly or the previous page's dark shield bleeds through
-  // on a cold OAuth land. Render dark icons on the #F8FAFC surface.
-  useMedianStatusBar('light', '#F8FAFC');
+  // Status bar is handled by PageRoot — /edit-profile resolves to light chrome
+  // (#F8FAFC) automatically since it's outside PageRoot's dark route list.
 
   const {
     form, setField, isDirty, errors, isValid,
@@ -245,7 +243,9 @@ export default function EditProfile() {
     : (!isValid || !isDirty || isSaving);
 
   return (
-    <div className="min-h-screen bg-[#F8FAFC] flex flex-col">
+    <PageRoot hasBottomNav={!isNewUser.current} className="bg-[#F8FAFC]">
+      <div className="min-h-screen bg-[#F8FAFC] flex flex-col w-full">
+
       {/* Header — Activity layout. Onboarding swaps the back chevron for a
           quiet "Skip for now" and changes the eyebrow / title copy. */}
       <div
@@ -297,8 +297,9 @@ export default function EditProfile() {
 
       <div
         className="flex-1 overflow-y-auto pt-4"
-        style={{ paddingBottom: 'calc(var(--bottom-nav-height, 88px) + var(--sab) + 24px)' }}
+        style={{ paddingBottom: 24 }}
       >
+
         {/* ── Photos + Identity ───────────────────────────── */}
         <div ref={photosRef} className="space-y-4 px-4 pb-4">
           <HeaderPhotoCard
@@ -597,9 +598,11 @@ export default function EditProfile() {
         onClose={() => setConnectSheetOpen(false)}
         userId={user?.id}
       />
-    </div>
+      </div>
+    </PageRoot>
   );
 }
+
 
 // ─────────────────────────────────────────────────────────────────────
 // Smart handicap row
