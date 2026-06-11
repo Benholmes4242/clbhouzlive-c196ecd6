@@ -276,7 +276,7 @@ export const ChampionsDuelCard: React.FC<ChampionsDuelCardProps> = ({
             marginTop: 12,
             height: 5,
             borderRadius: 999,
-            background: 'rgba(15,23,42,0.06)',
+            background: 'var(--hcp-tint-1)',
             overflow: 'hidden',
           }}
         >
@@ -287,7 +287,7 @@ export const ChampionsDuelCard: React.FC<ChampionsDuelCardProps> = ({
               borderRadius: 999,
               background: defending
                 ? 'linear-gradient(90deg, #FBBC2E, #F7931E)'
-                : 'rgba(15,23,42,0.30)',
+                : 'var(--hcp-bar-neutral)',
               transition: 'width 300ms ease',
             }}
           />
