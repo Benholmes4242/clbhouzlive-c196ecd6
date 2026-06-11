@@ -17,6 +17,7 @@ import { CourseDetailSkeleton } from '@/components/skeletons/CourseDetailSkeleto
 import { useCourseRatingAggregates } from '@/hooks/useCourseRatingAggregates';
 import { CourseLegendsDrilldown } from '@/components/profile/handicap/whs/sections/course-legends/CourseLegendsDrilldown';
 import CourseHolesTab from '@/features/courses/components/holes/CourseHolesTab';
+import { useCourseMeta } from '@/hooks/gam/useCourseMeta';
 
 
 interface GolfClubViewProps {
