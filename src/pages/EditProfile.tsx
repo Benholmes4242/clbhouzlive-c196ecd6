@@ -435,7 +435,7 @@ export default function EditProfile() {
               {/* Gender */}
               <div className="px-4 pt-3 pb-4">
                 <div style={{ marginBottom: 8 }}>
-                  <SectionEyebrow label="Gender" required={isNewUser.current} />
+                  <SectionEyebrow label="Gender" />
                 </div>
                 <SegToggle
                   value={form.gender}
