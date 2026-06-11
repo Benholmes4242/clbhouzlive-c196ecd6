@@ -133,7 +133,7 @@ export const SheetHeroGlass: React.FC<Props> = ({
     : [
         suffix,
         par != null ? `PAR ${par}` : null,
-        slope != null ? `SL ${slope}` : null,
+        slope != null ? `SLOPE ${slope}` : null,
       ]
         .filter(Boolean)
         .join(' · ')
