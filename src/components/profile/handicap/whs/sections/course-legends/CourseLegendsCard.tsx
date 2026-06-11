@@ -17,30 +17,28 @@ const FONT = GAM.FONT_GEIST;
  * (90d OR all-time), but the cell needs to map either window's key to the
  * same display slot. We resolve by checking both _90d and _all_time variants.
  */
-const SLOT_META: Record<string, { short: string; unit: string }> = {
-  lowest_gross:     { short: 'GROSS',  unit: 'gross' },
-  best_stableford:  { short: 'STBL',   unit: 'pts' },
-  most_aces:        { short: 'ACE',    unit: 'aces' },
-  most_albatrosses: { short: 'ALB',    unit: 'albatrosses' },
-  most_eagles:      { short: 'EAGLE',  unit: 'eagles' },
-  most_birdies:     { short: 'BIRDIE', unit: 'birdies' },
-  best_score_diff:  { short: 'SCORE',  unit: 'diff' },
+const SLOT_META: Record<string, { short: string }> = {
+  lowest_gross:     { short: 'GROSS' },
+  best_stableford:  { short: 'STBL' },
+  most_aces:        { short: 'ACE' },
+  most_albatrosses: { short: 'ALB' },
+  most_eagles:      { short: 'EAGLE' },
+  most_birdies:     { short: 'BIRDIE' },
+  best_score_diff:  { short: 'SCORE' },
 };
 
-const SLOTS: Array<{ key: LegendCategory; alt: LegendCategory; short: string; unit: string }> =
+const SLOTS: Array<{ key: LegendCategory; alt: LegendCategory; short: string }> =
   CHAMPIONS_ORDER_90D.map((key, i) => {
     const base = key.replace(/_90d$/, '');
     return {
       key,
       alt: CHAMPIONS_ORDER_ALL_TIME[i],
       short: SLOT_META[base].short,
-      unit: SLOT_META[base].unit,
     };
   });
 
 interface HolderCellProps {
   short: string;
-  unit: string;
   holder: CourseLegendHolderRow | null;
   category: LegendCategory | null;
   selfLabel: string;
@@ -73,7 +71,7 @@ const SquircleAvatar: React.FC<{ photoUrl: string | null; size?: number; muted?:
   );
 };
 
-const HolderCell: React.FC<HolderCellProps> = ({ short, unit, holder, selfLabel }) => {
+const HolderCell: React.FC<HolderCellProps> = ({ short, holder, selfLabel }) => {
   const isSelf = !!holder?.is_self;
   const isEmpty = !holder;
 
@@ -143,10 +141,9 @@ const HolderCell: React.FC<HolderCellProps> = ({ short, unit, holder, selfLabel 
       <div
         style={{
           display: 'flex',
-          flexDirection: 'column',
-          alignItems: 'flex-end',
+          alignItems: 'center',
+          justifyContent: 'flex-end',
           flexShrink: 0,
-          gap: 1,
         }}
       >
         <div
@@ -163,18 +160,6 @@ const HolderCell: React.FC<HolderCellProps> = ({ short, unit, holder, selfLabel 
             (holder.category as LegendCategory),
             holder.value,
           )}
-        </div>
-        <div
-          style={{
-            fontSize: 8,
-            fontWeight: 600,
-            color: `var(--hcp-t-50, ${GAM.INK_55})`,
-            textTransform: 'uppercase',
-            letterSpacing: '0.06em',
-            lineHeight: 1,
-          }}
-        >
-          {unit}
         </div>
       </div>
     </div>
@@ -364,7 +349,6 @@ export const CourseLegendsCard: React.FC<Props> = ({
               <HolderCell
                 key={slot.key}
                 short={slot.short}
-                unit={slot.unit}
                 holder={row}
                 category={cat}
                 selfLabel={selfLabel}
@@ -376,7 +360,6 @@ export const CourseLegendsCard: React.FC<Props> = ({
               <HolderCell
                 key={slot.key}
                 short={slot.short}
-                unit={slot.unit}
                 holder={row}
                 category={cat}
                 selfLabel={selfLabel}
