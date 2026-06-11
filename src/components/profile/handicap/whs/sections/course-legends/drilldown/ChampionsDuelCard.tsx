@@ -128,9 +128,9 @@ export const ChampionsDuelCard: React.FC<ChampionsDuelCardProps> = ({
     <div
       data-category-section
       style={{
-        background: '#FFFFFF',
-        border: '0.5px solid rgba(15,23,42,0.08)',
-        borderTop: defending ? `2px solid ${GOLD}` : '0.5px solid rgba(15,23,42,0.08)',
+        background: 'var(--hcp-bg-1)',
+        border: '0.5px solid var(--hcp-line)',
+        borderTop: defending ? `2px solid ${GOLD}` : '0.5px solid var(--hcp-line)',
         borderRadius: 16,
         padding: '14px 16px',
         margin: '0 16px 10px',
@@ -161,7 +161,7 @@ export const ChampionsDuelCard: React.FC<ChampionsDuelCardProps> = ({
             letterSpacing: '0.10em',
             padding: '3px 8px',
             borderRadius: 999,
-            background: defending ? 'rgba(251,188,46,0.16)' : 'rgba(15,23,42,0.05)',
+            background: defending ? 'rgba(251,188,46,0.16)' : 'var(--hcp-tint-1)',
             color: defending ? DEEP_AMBER : INK_55,
             whiteSpace: 'nowrap',
           }}
