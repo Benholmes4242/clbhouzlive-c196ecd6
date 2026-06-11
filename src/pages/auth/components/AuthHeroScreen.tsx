@@ -283,8 +283,16 @@ const AuthHeroScreen: React.FC<AuthHeroScreenProps> = ({
           font-size: 15px;
         }
 
+        @keyframes auth-error-fade-in {
+          from { opacity: 0; transform: translateY(-3px); }
+          to   { opacity: 1; transform: translateY(0); }
+        }
+        .auth-error-fade {
+          animation: auth-error-fade-in 0.25s ease-out both;
+        }
+
         @media (prefers-reduced-motion: reduce) {
-          .auth-logo-animate, .auth-tagline-animate, .auth-button-6 {
+          .auth-logo-animate, .auth-tagline-animate, .auth-button-6, .auth-error-fade {
             animation: none; opacity: 1; transform: none;
           }
         }
