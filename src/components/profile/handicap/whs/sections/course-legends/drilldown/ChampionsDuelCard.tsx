@@ -3,6 +3,8 @@ import { Crown, Swords, type LucideIcon } from 'lucide-react';
 import type { LegendCategory } from '@/lib/gam/types';
 import { ChampionsListRow } from './ChampionsListRow';
 import { duelTension, duelLine } from './_shared/duelTension';
+import { ProBenchmarkBand } from './ProBenchmarkBand';
+import type { ProProfile } from './_shared/proBenchmark';
 
 export interface DuelRow {
   rank: number;
@@ -24,6 +26,12 @@ interface ChampionsDuelCardProps {
   holdDuration: string;
   totalCount: number;
   onFullLeaderboardTap: () => void;
+  proBenchmark?: {
+    pro: ProProfile;
+    value: string;
+    sub: string;
+    chaseLine?: string;
+  } | null;
 }
 
 const INK = 'var(--hcp-t-100)';

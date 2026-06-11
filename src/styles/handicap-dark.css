@@ -293,6 +293,12 @@
   --hcp-dash:        rgba(255,255,255,0.22);  /* dashed borders */
   --hcp-bar-neutral: rgba(255,255,255,0.30);  /* chase tension-bar fill */
   --hcp-gold-text:   #FBBC2E;                 /* deep-amber text role (illegible on dark → gold) */
+
+  /* Tour-blue accents — Pro Benchmark band */
+  --hcp-tour-text:   #7EB0FF;
+  --hcp-tour-dim:    rgba(96,165,250,0.10);
+  --hcp-tour-border: rgba(126,176,255,0.35);
+  --hcp-tour-tag-bg: rgba(96,165,250,0.16);
 }
 .hcp-light {
   --hcp-tint-1:      rgba(15,23,42,0.05);
@@ -301,4 +307,10 @@
   --hcp-dash:        rgba(15,23,42,0.20);
   --hcp-bar-neutral: rgba(15,23,42,0.30);
   --hcp-gold-text:   #B26818;
+
+  /* Tour-blue accents — Pro Benchmark band */
+  --hcp-tour-text:   #2563EB;
+  --hcp-tour-dim:    rgba(37,99,235,0.07);
+  --hcp-tour-border: rgba(37,99,235,0.30);
+  --hcp-tour-tag-bg: rgba(37,99,235,0.12);
 }
