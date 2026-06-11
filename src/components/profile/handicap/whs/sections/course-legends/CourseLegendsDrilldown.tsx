@@ -271,8 +271,11 @@ export const CourseLegendsDrilldown: React.FC<Props> = ({ selection, hideHeader 
           youOwnedCount={youOwnedCount}
           totalCategories={visibleCategories.length}
           courseHeaderImage={courseHeaderImage}
+          cr={meta?.course_cr ?? null}
+          slope={meta?.course_slope ?? null}
         />
       )}
+
 
       <ChampionsInfoCarousel window={window} />
 
