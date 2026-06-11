@@ -23,11 +23,11 @@ export const ChampionsUnclaimedCard: React.FC<ChampionsUnclaimedCardProps> = ({
   return (
     <div
       style={{
-        border: '1.5px dashed rgba(15,23,42,0.20)',
+        border: '1.5px dashed var(--hcp-dash)',
         borderRadius: 16,
         padding: 16,
         margin: '0 16px 10px',
-        background: 'rgba(15,23,42,0.012)',
+        background: 'var(--hcp-tint-3)',
         textAlign: 'center',
       }}
     >
@@ -37,7 +37,7 @@ export const ChampionsUnclaimedCard: React.FC<ChampionsUnclaimedCardProps> = ({
           fontWeight: 800,
           letterSpacing: '0.14em',
           textTransform: 'uppercase',
-          color: '#64748B',
+          color: 'var(--hcp-t-60)',
           display: 'inline-flex',
           alignItems: 'center',
           gap: 6,

@@ -39,13 +39,13 @@ export const ChampionsCourseSearch: React.FC<Props> = ({ currentCourseId }) => {
           display: 'flex',
           alignItems: 'center',
           gap: 10,
-          background: 'var(--hcp-bg-1, rgba(255,255,255,0.04))',
-          border: '1px solid var(--hcp-line, rgba(15,23,42,0.08))',
+          background: 'var(--hcp-tint-1)',
+          border: '1px solid var(--hcp-line)',
           borderRadius: 12,
           padding: '10px 14px',
         }}
       >
-        <Search size={16} color="#94A3B8" strokeWidth={2.2} />
+        <Search size={16} color="var(--hcp-t-40)" strokeWidth={2.2} />
         <input
           type="text"
           value={query}
@@ -105,7 +105,7 @@ export const ChampionsCourseSearch: React.FC<Props> = ({ currentCourseId }) => {
                 padding: 12,
                 fontFamily: FONT,
                 fontSize: 12,
-                color: 'var(--hcp-t-50, #94a3b8)',
+                color: 'var(--hcp-t-50)',
               }}
             >
               Searching…
@@ -117,7 +117,7 @@ export const ChampionsCourseSearch: React.FC<Props> = ({ currentCourseId }) => {
                 padding: 12,
                 fontFamily: FONT,
                 fontSize: 12,
-                color: 'var(--hcp-t-50, #94a3b8)',
+                color: 'var(--hcp-t-50)',
               }}
             >
               No matches for "{debounced.trim()}".
@@ -129,8 +129,8 @@ export const ChampionsCourseSearch: React.FC<Props> = ({ currentCourseId }) => {
               key={c.id}
               onClick={() => navigate(`/courses/${c.id}?tab=legends`)}
               style={{
-                background: 'var(--hcp-bg-1, #fff)',
-                border: '1px solid var(--hcp-line, rgba(15,23,42,0.08))',
+                background: 'var(--hcp-bg-1)',
+                border: '1px solid var(--hcp-line)',
                 borderRadius: 12,
                 padding: 12,
                 cursor: 'pointer',
@@ -146,12 +146,12 @@ export const ChampionsCourseSearch: React.FC<Props> = ({ currentCourseId }) => {
                   width: 36,
                   height: 36,
                   borderRadius: '34%',
-                  background: 'linear-gradient(135deg, var(--hcp-bg-3, #e2e8f0), var(--hcp-bg-2, #f1f5f9))',
+                  background: 'linear-gradient(135deg, var(--hcp-bg-3), var(--hcp-bg-2))',
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
                   flexShrink: 0,
-                  color: 'var(--hcp-t-60, #64748b)',
+                  color: 'var(--hcp-t-60)',
                 }}
               >
                 <MapPin size={16} />
@@ -172,7 +172,7 @@ export const ChampionsCourseSearch: React.FC<Props> = ({ currentCourseId }) => {
                   {c.name}
                 </div>
               </div>
-              <ChevronRight size={16} color="var(--hcp-t-60, #94a3b8)" style={{ flexShrink: 0 }} />
+              <ChevronRight size={16} color="var(--hcp-t-60)" style={{ flexShrink: 0 }} />
             </button>
           ))}
         </div>

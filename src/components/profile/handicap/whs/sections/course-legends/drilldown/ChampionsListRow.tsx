@@ -42,7 +42,7 @@ export const ChampionsListRow: React.FC<ChampionsListRowProps> = ({
   compact = false,
 }) => {
   const rowBg = isSelf
-    ? 'rgba(15,23,42,0.045)'
+    ? 'var(--hcp-tint-2)'
     : isChampion
       ? 'var(--hcp-bg-2)'
       : 'var(--hcp-bg-1)';
@@ -55,7 +55,7 @@ export const ChampionsListRow: React.FC<ChampionsListRowProps> = ({
   const avatar = isChampion ? (
     <div style={{ width: avatarSize, height: avatarSize, position: 'relative', flexShrink: 0 }} aria-hidden>
       <div style={{ position: 'absolute', inset: 0, background: photoBg, ...squircleMaskStyle }} />
-      <div style={{ position: 'absolute', inset: 0, ...squircleMaskStyle, boxShadow: 'inset 0 0 0 1px rgba(15,23,42,0.08)' }} />
+      <div style={{ position: 'absolute', inset: 0, ...squircleMaskStyle, boxShadow: 'inset 0 0 0 1px var(--hcp-line)' }} />
     </div>
   ) : (
     <div
@@ -65,7 +65,7 @@ export const ChampionsListRow: React.FC<ChampionsListRowProps> = ({
         height: avatarSize,
         borderRadius: '34%',
         background: photoBg,
-        boxShadow: 'inset 0 0 0 1px rgba(15,23,42,0.08)',
+        boxShadow: 'inset 0 0 0 1px var(--hcp-line)',
         flexShrink: 0,
       }}
     />
@@ -105,7 +105,7 @@ export const ChampionsListRow: React.FC<ChampionsListRowProps> = ({
             fontSize: compact ? 13 : 15,
             fontWeight: 700,
             fontVariantNumeric: 'tabular-nums',
-            color: 'var(--hcp-t-30, #b3bdca)',
+            color: 'var(--hcp-t-30)',
             lineHeight: 1,
             textAlign: 'right',
           }}

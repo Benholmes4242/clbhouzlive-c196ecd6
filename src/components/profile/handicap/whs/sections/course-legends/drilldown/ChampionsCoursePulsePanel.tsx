@@ -23,7 +23,7 @@ export const ChampionsCoursePulsePanel: React.FC<Props> = ({ meta }) => {
         fontSize: 10,
         fontWeight: 700,
         letterSpacing: '0.08em',
-        color: '#94A3B8',
+        color: 'var(--hcp-t-40)',
         fontVariantNumeric: 'tabular-nums',
         textTransform: 'uppercase',
         whiteSpace: 'nowrap',

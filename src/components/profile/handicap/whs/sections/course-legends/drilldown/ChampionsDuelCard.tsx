@@ -26,9 +26,9 @@ interface ChampionsDuelCardProps {
   onFullLeaderboardTap: () => void;
 }
 
-const INK = '#0F172A';
-const INK_55 = '#64748B';
-const DEEP_AMBER = '#B26818';
+const INK = 'var(--hcp-t-100)';
+const INK_55 = 'var(--hcp-t-60)';
+const DEEP_AMBER = 'var(--hcp-gold-text)';
 const GOLD = '#FBBC2E';
 
 const SQUIRCLE_MASK_URL =
@@ -51,7 +51,7 @@ function SquircleAvatar({ photoUrl, size = 38, dashed = false }: { photoUrl: str
           width: size,
           height: size,
           borderRadius: '34%',
-          border: '1.5px dashed rgba(15,23,42,0.25)',
+          border: '1.5px dashed var(--hcp-dash)',
           flexShrink: 0,
         }}
       />
@@ -63,7 +63,7 @@ function SquircleAvatar({ photoUrl, size = 38, dashed = false }: { photoUrl: str
   return (
     <div style={{ width: size, height: size, position: 'relative', flexShrink: 0 }} aria-hidden>
       <div style={{ position: 'absolute', inset: 0, background: photoBg, ...squircleMaskStyle }} />
-      <div style={{ position: 'absolute', inset: 0, ...squircleMaskStyle, boxShadow: 'inset 0 0 0 1px rgba(15,23,42,0.08)' }} />
+      <div style={{ position: 'absolute', inset: 0, ...squircleMaskStyle, boxShadow: 'inset 0 0 0 1px var(--hcp-line)' }} />
     </div>
   );
 }
@@ -128,9 +128,9 @@ export const ChampionsDuelCard: React.FC<ChampionsDuelCardProps> = ({
     <div
       data-category-section
       style={{
-        background: '#FFFFFF',
-        border: '0.5px solid rgba(15,23,42,0.08)',
-        borderTop: defending ? `2px solid ${GOLD}` : '0.5px solid rgba(15,23,42,0.08)',
+        background: 'var(--hcp-bg-1)',
+        border: '0.5px solid var(--hcp-line)',
+        borderTop: defending ? `2px solid ${GOLD}` : '0.5px solid var(--hcp-line)',
         borderRadius: 16,
         padding: '14px 16px',
         margin: '0 16px 10px',
@@ -161,7 +161,7 @@ export const ChampionsDuelCard: React.FC<ChampionsDuelCardProps> = ({
             letterSpacing: '0.10em',
             padding: '3px 8px',
             borderRadius: 999,
-            background: defending ? 'rgba(251,188,46,0.16)' : 'rgba(15,23,42,0.05)',
+            background: defending ? 'rgba(251,188,46,0.16)' : 'var(--hcp-tint-1)',
             color: defending ? DEEP_AMBER : INK_55,
             whiteSpace: 'nowrap',
           }}
@@ -219,7 +219,7 @@ export const ChampionsDuelCard: React.FC<ChampionsDuelCardProps> = ({
         </div>
 
         {/* CENTER */}
-        <Swords size={15} color="#94A3B8" strokeWidth={2} aria-hidden />
+        <Swords size={15} color="var(--hcp-t-40)" strokeWidth={2} aria-hidden />
 
         {/* RIGHT */}
         <div style={{ display: 'flex', alignItems: 'center', gap: 10, minWidth: 0, justifyContent: 'flex-end' }}>
@@ -276,7 +276,7 @@ export const ChampionsDuelCard: React.FC<ChampionsDuelCardProps> = ({
             marginTop: 12,
             height: 5,
             borderRadius: 999,
-            background: 'rgba(15,23,42,0.06)',
+            background: 'var(--hcp-tint-1)',
             overflow: 'hidden',
           }}
         >
@@ -287,7 +287,7 @@ export const ChampionsDuelCard: React.FC<ChampionsDuelCardProps> = ({
               borderRadius: 999,
               background: defending
                 ? 'linear-gradient(90deg, #FBBC2E, #F7931E)'
-                : 'rgba(15,23,42,0.30)',
+                : 'var(--hcp-bar-neutral)',
               transition: 'width 300ms ease',
             }}
           />
@@ -311,7 +311,7 @@ export const ChampionsDuelCard: React.FC<ChampionsDuelCardProps> = ({
         style={{
           marginTop: 12,
           paddingTop: 4,
-          borderTop: '0.5px solid rgba(15,23,42,0.08)',
+          borderTop: '0.5px solid var(--hcp-line)',
           marginLeft: -16,
           marginRight: -16,
         }}

@@ -3,8 +3,8 @@ import React from 'react';
 import { Crown } from 'lucide-react';
 import { EmptyStateTile } from '@/components/profile/handicap/gam/_shared/EmptyStateTile';
 
-const INK = 'var(--hcp-t-100, #0F172A)';
-const SLATE = 'var(--hcp-t-60, #64748b)';
+const INK = 'var(--hcp-t-100)';
+const SLATE = 'var(--hcp-t-60)';
 
 /** No legends in ANY window — the true empty. */
 export const ChampionsEmptyState: React.FC<{ courseName: string | null }> = ({ courseName }) => (
@@ -51,7 +51,7 @@ export const ChampionsWindowEmptyState: React.FC<{
 }> = ({ window, onSwitch }) => (
   <div style={{ padding: '40px 28px 44px', textAlign: 'center', fontFamily: GAM.FONT_GEIST }}>
     <EmptyStateTile tint="slate">
-      <Crown size={30} color="#64748b" strokeWidth={1.8} />
+      <Crown size={30} color="var(--hcp-t-60)" strokeWidth={1.8} />
     </EmptyStateTile>
     <div
       style={{
@@ -76,8 +76,8 @@ export const ChampionsWindowEmptyState: React.FC<{
         display: 'inline-flex',
         alignItems: 'center',
         gap: 6,
-        background: 'var(--hcp-t-100, #0F172A)',
-        color: '#fff',
+        background: 'var(--hcp-t-100)',
+        color: 'var(--hcp-bg-1)',
         border: 'none',
         borderRadius: 999,
         padding: '9px 18px',
