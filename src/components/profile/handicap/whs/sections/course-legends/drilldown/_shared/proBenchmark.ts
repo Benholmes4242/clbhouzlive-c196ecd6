@@ -84,23 +84,47 @@ export function pickProBenchmark(args: {
   eligibleBases: ProBandBase[];
   recordGross?: number | null;
   dateUtcYmd?: string;
+  /** Per-visit rotation counter; when provided, supersedes the date-hash seed. */
+  visitN?: number | null;
 }): ProBenchmarkPick | null {
-  const { pros, courseId, course, viewerRounds, recordGross } = args;
+  const { pros, courseId, course, viewerRounds, recordGross, visitN } = args;
   if (!pros.length) return null;
   if (course.cr == null || course.slope == null || course.par == null || course.slope <= 0) {
     return null;
   }
   const c = course as Required<CourseInputs>;
 
+  const allBases = [...PRO_BAND_BASES];
   const bases = args.eligibleBases.filter((b) =>
     b === 'most_birdies' || b === 'most_eagles' ? (viewerRounds ?? 0) >= 1 : true,
   );
   if (!bases.length) return null;
 
-  const ymd = args.dateUtcYmd ?? new Date().toISOString().slice(0, 10);
-  const h = rotationHash(courseId, ymd);
-  const pro = pros[h % pros.length];
-  const base = bases[(h >>> 3) % bases.length];
+  let proIdx: number;
+  let baseIdx: number;
+  if (typeof visitN === 'number' && Number.isFinite(visitN)) {
+    const n = ((visitN % 1_000_000) + 1_000_000) % 1_000_000;
+    proIdx = n % pros.length;
+    // Lockstep-breaker: if pros.length and allBases.length share a factor,
+    // this still advances both indices independently across visits.
+    baseIdx = (n + Math.floor(n / allBases.length)) % allBases.length;
+  } else {
+    const ymd = args.dateUtcYmd ?? new Date().toISOString().slice(0, 10);
+    const h = rotationHash(courseId, ymd);
+    proIdx = h % pros.length;
+    baseIdx = (h >>> 3) % allBases.length;
+  }
+
+  const pro = pros[proIdx];
+  // Walk the full base list from baseIdx until we hit an eligible base.
+  let base: ProBandBase = bases[0];
+  for (let i = 0; i < allBases.length; i++) {
+    const candidate = allBases[(baseIdx + i) % allBases.length];
+    if (bases.includes(candidate)) {
+      base = candidate;
+      break;
+    }
+  }
   const first = pro.full_name.split(' ')[0];
 
   switch (base) {
