@@ -243,7 +243,9 @@ export default function EditProfile() {
     : (!isValid || !isDirty || isSaving);
 
   return (
-    <div className="min-h-screen bg-[#F8FAFC] flex flex-col">
+    <PageRoot hasBottomNav={!isNewUser.current} className="bg-[#F8FAFC]">
+      <div className="min-h-screen bg-[#F8FAFC] flex flex-col w-full">
+
       {/* Header — Activity layout. Onboarding swaps the back chevron for a
           quiet "Skip for now" and changes the eyebrow / title copy. */}
       <div
