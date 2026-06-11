@@ -11,7 +11,6 @@ export const ChampionsCoursePulsePanel: React.FC<Props> = ({ meta }) => {
   const segs: string[] = [];
   if (meta?.course_cr != null) segs.push(`CR ${meta.course_cr.toFixed(1)}`);
   if (meta?.course_slope != null) segs.push(`SLOPE ${meta.course_slope}`);
-  if (meta?.hardest_hole?.hole_no != null) segs.push(`H${meta.hardest_hole.hole_no}`);
   if (meta?.avg_over_par != null) segs.push(`AVG +${Number(meta.avg_over_par).toFixed(1)}`);
 
   if (segs.length === 0) return null;

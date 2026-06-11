@@ -34,6 +34,7 @@ export const WindowToggle: React.FC<{
   <div
     style={{
       display: 'inline-flex',
+      flexShrink: 0,
       gap: 3,
       background: 'rgba(255,255,255,0.08)',
       border: '0.5px solid rgba(255,255,255,0.12)',
@@ -63,6 +64,7 @@ export const WindowToggle: React.FC<{
             cursor: 'pointer',
             letterSpacing: '0.04em',
             textTransform: 'uppercase',
+            whiteSpace: 'nowrap',
             minWidth: 56,
           }}
         >
