@@ -279,3 +279,26 @@
   color: #0F172A !important;
 }
 
+
+/* ── Chase drilldown paired tokens ─────────────────────────────────
+ * Added for the Compete-tab Chase drilldown so the same components
+ * render correctly on the dark handicap surface AND on the light
+ * Course Detail Champions tab (inside .hcp-light). See
+ * src/components/profile/handicap/whs/sections/course-legends/.
+ */
+.hcp-dark {
+  --hcp-tint-1:      rgba(255,255,255,0.06);  /* chip / pill / toggle / track bg */
+  --hcp-tint-2:      rgba(255,255,255,0.045); /* self-row tint */
+  --hcp-tint-3:      rgba(255,255,255,0.03);  /* faintest wash (unclaimed bg, empty slots) */
+  --hcp-dash:        rgba(255,255,255,0.22);  /* dashed borders */
+  --hcp-bar-neutral: rgba(255,255,255,0.30);  /* chase tension-bar fill */
+  --hcp-gold-text:   #FBBC2E;                 /* deep-amber text role (illegible on dark → gold) */
+}
+.hcp-light {
+  --hcp-tint-1:      rgba(15,23,42,0.05);
+  --hcp-tint-2:      rgba(15,23,42,0.045);
+  --hcp-tint-3:      rgba(15,23,42,0.015);
+  --hcp-dash:        rgba(15,23,42,0.20);
+  --hcp-bar-neutral: rgba(15,23,42,0.30);
+  --hcp-gold-text:   #B26818;
+}
