@@ -22,6 +22,7 @@ export interface InlineReviewCardProps {
   courseRegion?: string | null;
   courseCountry?: string | null;
   courseSubCountry?: string | null;
+  courseRating?: number | null;
   reviewText?: string | null;
   reviewer: {
     name: string;
@@ -49,6 +50,7 @@ export const InlineReviewCard: React.FC<InlineReviewCardProps> = ({
   courseRegion,
   courseCountry,
   courseSubCountry,
+  courseRating,
   reviewer,
   isVisible,
   onTap,
