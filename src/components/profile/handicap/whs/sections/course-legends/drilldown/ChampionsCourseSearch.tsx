@@ -172,7 +172,7 @@ export const ChampionsCourseSearch: React.FC<Props> = ({ currentCourseId }) => {
                   {c.name}
                 </div>
               </div>
-              <ChevronRight size={16} color="var(--hcp-t-60, #94a3b8)" style={{ flexShrink: 0 }} />
+              <ChevronRight size={16} color="var(--hcp-t-60)" style={{ flexShrink: 0 }} />
             </button>
           ))}
         </div>
