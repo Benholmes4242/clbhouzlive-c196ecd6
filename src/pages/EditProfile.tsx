@@ -12,6 +12,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useWhsConnection } from '@/lib/whs/hooks';
 import { resolveDisplayHandicap } from '@/lib/handicap/resolveHandicap';
 import { formatHcp } from '@/lib/formatHcp';
+import { useMedianStatusBar } from '@/hooks/useMedianStatusBar';
 import { Button } from '@/components/ui/button';
 import { SectionEyebrow } from '@/components/ui/SectionEyebrow';
 import { SectionCard } from '@/components/profile/edit-v2/SectionCard';
