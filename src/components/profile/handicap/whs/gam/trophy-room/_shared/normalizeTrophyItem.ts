@@ -64,6 +64,9 @@ function categoryToIconKey(c: LegendCategory): string {
     case 'most_aces_90d':
     case 'most_aces_all_time':
       return 'target';
+    case 'most_rounds_90d':
+    case 'most_rounds_all_time':
+      return 'flag';
   }
 }
 
