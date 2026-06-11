@@ -23,15 +23,13 @@ export const PRO_BAND_BASES = [
 ] as const;
 export type ProBandBase = (typeof PRO_BAND_BASES)[number];
 
-const damp = (slope: number) => 113 / slope;
-const ease = (pro: ProProfile, cr: number, slope: number) =>
-  (pro.tour_cr_baseline - cr) * damp(slope);
+const ease = (pro: ProProfile, cr: number) => pro.tour_cr_baseline - cr;
 
 const clamp = (n: number, lo: number, hi: number) => Math.max(lo, Math.min(hi, n));
 
 /** Predicted single-round gross. Clamped to sane bounds so bad data can't print a 51. */
 export function estGross(pro: ProProfile, c: Required<CourseInputs>): number {
-  const raw = Math.round(pro.scoring_avg - ease(pro, c.cr, c.slope));
+  const raw = Math.round(c.cr - (pro.tour_cr_baseline - pro.scoring_avg));
   return clamp(raw, c.par - 9, Math.round(pro.scoring_avg) + 5);
 }
 
