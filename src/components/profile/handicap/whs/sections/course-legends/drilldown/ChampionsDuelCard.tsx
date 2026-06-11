@@ -219,7 +219,7 @@ export const ChampionsDuelCard: React.FC<ChampionsDuelCardProps> = ({
         </div>
 
         {/* CENTER */}
-        <Swords size={15} color="#94A3B8" strokeWidth={2} aria-hidden />
+        <Swords size={15} color="var(--hcp-t-40)" strokeWidth={2} aria-hidden />
 
         {/* RIGHT */}
         <div style={{ display: 'flex', alignItems: 'center', gap: 10, minWidth: 0, justifyContent: 'flex-end' }}>
