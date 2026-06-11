@@ -303,7 +303,19 @@ export const CourseLegendsDrilldown: React.FC<Props> = ({ selection, hideHeader 
             yourBest={meta?.your_best ?? null}
           />
 
-          <CategoryNavRail categories={navCategories} onSelect={handleNavSelect} />
+          <CategoryNavRail
+            categories={navCategories}
+            onSelect={handleNavSelect}
+            infoOpen={explainerOpen}
+            onInfoToggle={() => setExplainerOpen((o) => !o)}
+          />
+
+          {explainerOpen && (
+            <ChampionsExplainerCard
+              window={window}
+              onClose={() => setExplainerOpen(false)}
+            />
+          )}
 
           <div>
           {visibleCategories.map((cat) => {
