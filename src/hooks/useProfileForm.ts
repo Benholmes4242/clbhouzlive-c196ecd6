@@ -109,7 +109,7 @@ export function useProfileForm(profile: any, loading?: boolean) {
 
   const errors = useMemo(() => {
     const e: Partial<Record<keyof ProfileFormData, string>> = {};
-    if (!form.displayName.trim()) e.displayName = 'Display name is required';
+    // Display name is OPTIONAL (onboarding can be skipped). Only enforce max length.
     if (form.displayName.length > 50) e.displayName = 'Max 50 characters';
     if (form.bio.length > 300) e.bio = 'Max 300 characters';
     form.websites.forEach((w) => {
