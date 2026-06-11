@@ -129,8 +129,8 @@ export const ChampionsCourseSearch: React.FC<Props> = ({ currentCourseId }) => {
               key={c.id}
               onClick={() => navigate(`/courses/${c.id}?tab=legends`)}
               style={{
-                background: 'var(--hcp-bg-1, #fff)',
-                border: '1px solid var(--hcp-line, rgba(15,23,42,0.08))',
+                background: 'var(--hcp-bg-1)',
+                border: '1px solid var(--hcp-line)',
                 borderRadius: 12,
                 padding: 12,
                 cursor: 'pointer',
