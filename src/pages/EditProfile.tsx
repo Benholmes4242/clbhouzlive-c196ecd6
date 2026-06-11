@@ -334,7 +334,7 @@ export default function EditProfile() {
               {/* Name (first + last) — onboarding-relevant */}
               <div className="px-4 pt-4 pb-3" style={{ borderBottom: '0.5px solid rgba(15,23,42,0.07)' }}>
                 <div style={{ marginBottom: 8 }}>
-                  <SectionEyebrow label="Name" required={isNewUser.current} />
+                  <SectionEyebrow label="Name" />
                 </div>
                 <div className="flex gap-2">
                   <input
