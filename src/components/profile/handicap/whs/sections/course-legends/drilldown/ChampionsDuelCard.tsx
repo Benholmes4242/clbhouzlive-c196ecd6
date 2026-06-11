@@ -121,7 +121,7 @@ export const ChampionsDuelCard: React.FC<ChampionsDuelCardProps> = ({
   } else if (defending && !right) {
     line = 'The champion stands alone. Be the first to challenge.';
   } else {
-    line = duelLine(category, leftValue, rightValue, defending, false);
+    line = duelLine(category, leftValue, rightValue, defending, false, (champion?.name ?? '').split(' ')[0]);
     isNormalDuelLine = true;
   }
   if (isNormalDuelLine && proBenchmark?.chaseLine) {
