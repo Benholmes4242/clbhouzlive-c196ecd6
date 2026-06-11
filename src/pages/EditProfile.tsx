@@ -191,11 +191,12 @@ export default function EditProfile() {
   if (loading) return <ProfileSkeleton />;
 
   const handleSave = async () => {
-    // First-login gating: ordered validation with one toast each.
-    if (isNewUser.current) {
+    // Onboarding is OPTIONAL — no required fields. We only enforce FORMAT
+    // checks on values the user actually entered (username charset, length).
+    if (isNewUser.current && form.username.trim()) {
       const candidate = form.username.trim().toLowerCase();
-      if (!candidate || !USERNAME_RE.test(candidate)) {
-        toast.error('Please choose a username.');
+      if (!USERNAME_RE.test(candidate)) {
+        toast.error('Username must be 3–20 lowercase letters, numbers, _ or .');
         return;
       }
       if (usernameStatus === 'checking') {
@@ -204,26 +205,6 @@ export default function EditProfile() {
       }
       if (usernameStatus === 'taken') {
         toast.error('That username is taken — please choose another.');
-        return;
-      }
-      if (!form.firstName.trim()) {
-        toast.error('Please enter your first name.');
-        return;
-      }
-      if (!form.lastName.trim()) {
-        toast.error('Please enter your last name.');
-        return;
-      }
-      if (!form.displayName.trim()) {
-        toast.error('Please enter a display name.');
-        return;
-      }
-      if (!form.gender) {
-        toast.error('Please select a gender.');
-        return;
-      }
-      if (!form.country.trim()) {
-        toast.error('Please select your country.');
         return;
       }
     }
@@ -235,6 +216,12 @@ export default function EditProfile() {
     }
     if (result) {
       queryClient.invalidateQueries({ queryKey: ['profile'] });
+      if (user?.id) {
+        queryClient.setQueryData(['onboarding-status', user.id], {
+          hasCompletedOnboarding: true,
+          userType: (profile as any)?.user_type ?? null,
+        });
+      }
       if (isNewUser.current) {
         navigate('/', { replace: true });
       } else {
@@ -244,7 +231,12 @@ export default function EditProfile() {
   };
 
 
-  const isDisabled = !isValid || !isDirty || isSaving;
+  // For onboarding users, "Save & continue" is enabled whenever validation
+  // passes — dirty is NOT required because OAuth prefills already make the
+  // form complete. Existing users keep the dirty gate.
+  const isDisabled = isNewUser.current
+    ? (!isValid || isSaving || isSkipping)
+    : (!isValid || !isDirty || isSaving);
 
   return (
     <div className="min-h-screen bg-[#F8FAFC] flex flex-col">
