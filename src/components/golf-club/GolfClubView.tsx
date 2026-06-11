@@ -70,6 +70,7 @@ const GolfClubView: React.FC<GolfClubViewProps> = ({ courseId, isInModal = false
   });
 
   const { isLoading: ratingStatsLoading } = useCourseRatingAggregates(courseId);
+  const { data: courseMeta } = useCourseMeta(courseId);
 
   const handleTabChange = useCallback((newTab: string) => {
     setActiveTab(newTab);
