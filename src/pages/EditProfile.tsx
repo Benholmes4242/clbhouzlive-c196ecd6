@@ -48,6 +48,12 @@ export default function EditProfile() {
   const queryClient = useQueryClient();
   const { user } = useSupabaseSession();
   const { profile, loading } = useProfileData();
+  const [searchParams] = useSearchParams();
+
+  // Light-shield for the notch / status bar on this page.
+  // Must opt-in explicitly or the previous page's dark shield bleeds through
+  // on a cold OAuth land. Render dark icons on the #F8FAFC surface.
+  useMedianStatusBar('light', '#F8FAFC');
 
   const {
     form, setField, isDirty, errors, isValid,
@@ -58,7 +64,48 @@ export default function EditProfile() {
   const { save, isSaving } = useProfileSave(user?.id ?? '');
 
   const usernameIsLocked = !!(profile as any)?.has_completed_onboarding;
-  const isNewUser = useRef(!(profile as any)?.has_completed_onboarding);
+  // Treat as new user when EITHER the profile says onboarding is incomplete OR
+  // we arrived from the AuthWrapper onboarding redirect (?onboarding=1). The
+  // URL flag means the header / nav decisions don't have to wait for the
+  // profile fetch — fixes the "blank header on cold OAuth land" race.
+  const isNewUser = useRef(
+    searchParams.get('onboarding') === '1' ||
+    !(profile as any)?.has_completed_onboarding
+  );
+  // Keep ref in sync once profile resolves (covers the first paint where
+  // profile is still null).
+  useEffect(() => {
+    if (loading) return;
+    isNewUser.current =
+      searchParams.get('onboarding') === '1' ||
+      !(profile as any)?.has_completed_onboarding;
+  }, [loading, profile, searchParams]);
+
+  const [isSkipping, setIsSkipping] = useState(false);
+
+  const skipOnboarding = async () => {
+    if (!user?.id || isSkipping) return;
+    setIsSkipping(true);
+    try {
+      const { error } = await supabase
+        .from('user_profiles')
+        .update({ has_completed_onboarding: true, updated_at: new Date().toISOString() })
+        .eq('id', user.id);
+      if (error) throw error;
+      // Prime the cache so AuthWrapper doesn't immediately re-redirect us back.
+      queryClient.setQueryData(['onboarding-status', user.id], {
+        hasCompletedOnboarding: true,
+        userType: (profile as any)?.user_type ?? null,
+      });
+      await queryClient.invalidateQueries({ queryKey: ['onboarding-status', user.id] });
+      await queryClient.invalidateQueries({ queryKey: ['profile', user.id] });
+      navigate('/', { replace: true });
+    } catch (err: any) {
+      toast.error(err?.message ?? 'Could not skip onboarding. Please try again.');
+    } finally {
+      setIsSkipping(false);
+    }
+  };
 
   const { data: whsConnection } = useWhsConnection(user?.id);
   const hasWhsConnection = !!whsConnection;
