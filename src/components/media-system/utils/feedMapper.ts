@@ -115,6 +115,7 @@ export function mapRowToFeedPost(row: FeedRpcRow): FeedPost {
     courseCountry: row.review_course_country || row.course_country || undefined,
     courseRegion: row.review_course_region || row.course_region || undefined,
     courseSubCountry: row.review_course_sub_country || undefined,
+    courseRating: row.course_avg_overall_score != null ? Number(row.course_avg_overall_score) : null,
     courseThumbnailImage: row.course_thumbnail_image ?? null,
     courseLatitude: row.course_latitude ?? null,
     courseLongitude: row.course_longitude ?? null,
