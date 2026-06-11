@@ -51,7 +51,7 @@ function SquircleAvatar({ photoUrl, size = 38, dashed = false }: { photoUrl: str
           width: size,
           height: size,
           borderRadius: '34%',
-          border: '1.5px dashed rgba(15,23,42,0.25)',
+          border: '1.5px dashed var(--hcp-dash)',
           flexShrink: 0,
         }}
       />
@@ -63,7 +63,7 @@ function SquircleAvatar({ photoUrl, size = 38, dashed = false }: { photoUrl: str
   return (
     <div style={{ width: size, height: size, position: 'relative', flexShrink: 0 }} aria-hidden>
       <div style={{ position: 'absolute', inset: 0, background: photoBg, ...squircleMaskStyle }} />
-      <div style={{ position: 'absolute', inset: 0, ...squircleMaskStyle, boxShadow: 'inset 0 0 0 1px rgba(15,23,42,0.08)' }} />
+      <div style={{ position: 'absolute', inset: 0, ...squircleMaskStyle, boxShadow: 'inset 0 0 0 1px var(--hcp-line)' }} />
     </div>
   );
 }
