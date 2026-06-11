@@ -19789,6 +19789,7 @@ export type Database = {
           business_logo_url: string
           business_name: string
           comment_count: number
+          course_avg_overall_score: number
           course_country: string
           course_global_rank: number
           course_id: string
@@ -20433,6 +20434,7 @@ export type Database = {
           business_name: string
           comment_count: number
           country_match: boolean
+          course_avg_overall_score: number
           course_id: string
           course_name: string
           creator_avatar_url: string

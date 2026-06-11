@@ -80,6 +80,8 @@ export interface FeedPost {
   courseCountry?: string;
   courseRegion?: string;
   courseSubCountry?: string;
+  /** Community rating (avg_overall_score from course_rating_aggregates), null when unrated */
+  courseRating?: number | null;
   courseThumbnailImage?: string | null;
   courseLatitude?: number | null;
   courseLongitude?: number | null;
