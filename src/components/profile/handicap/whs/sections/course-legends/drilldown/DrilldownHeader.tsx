@@ -10,6 +10,10 @@ interface Props {
   totalCategories?: number;
   /** Course header photo. Null/undefined → renders gradient fallback. */
   courseHeaderImage?: string | null;
+  /** Course Rating (e.g. 69.4). Hidden when null. */
+  cr?: number | null;
+  /** Slope rating (e.g. 130). Hidden when null. */
+  slope?: number | null;
 }
 
 
@@ -18,7 +22,10 @@ export const DrilldownHeader: React.FC<Props> = ({
   youOwnedCount,
   totalCategories = 6,
   courseHeaderImage,
+  cr = null,
+  slope = null,
 }) => (
+
   <div
     className="h-40 md:h-48 lg:h-56"
     style={{
@@ -131,6 +138,22 @@ export const DrilldownHeader: React.FC<Props> = ({
       >
         {state.courseName}
       </div>
+      {(cr != null || slope != null) && (
+        <div
+          style={{
+            marginTop: 4,
+            fontSize: 11,
+            fontWeight: 700,
+            letterSpacing: '0.08em',
+            color: 'var(--hcp-t-40)',
+            fontVariantNumeric: 'tabular-nums',
+            textShadow: '0 1px 3px rgba(0,0,0,0.45)',
+          }}
+        >
+          {[cr != null ? `CR ${cr}` : null, slope != null ? `SLOPE ${slope}` : null].filter(Boolean).join(' · ')}
+        </div>
+      )}
     </div>
   </div>
 );
+

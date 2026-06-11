@@ -148,6 +148,26 @@ const GolfClubView: React.FC<GolfClubViewProps> = ({ courseId, isInModal = false
           {formatCourseLocation(course)}
         </p>
 
+        {((course as any).course_rating != null || (course as any).slope_rating != null) && (
+          <p
+            className="drop-shadow-lg mb-2"
+            style={{
+              fontSize: 11,
+              fontWeight: 700,
+              letterSpacing: '0.08em',
+              color: 'rgba(255,255,255,0.65)',
+              fontVariantNumeric: 'tabular-nums',
+            }}
+          >
+            {[
+              (course as any).course_rating != null ? `CR ${(course as any).course_rating}` : null,
+              (course as any).slope_rating != null ? `SLOPE ${(course as any).slope_rating}` : null,
+            ]
+              .filter(Boolean)
+              .join(' · ')}
+          </p>
+        )}
+
         {(course.global_rank || course.regional_rank || course.usa_rank) && (
           <CourseRankBadges
             globalRank={course.global_rank ?? null}
