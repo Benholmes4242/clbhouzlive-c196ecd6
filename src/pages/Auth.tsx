@@ -62,7 +62,7 @@ const Auth: React.FC<AuthProps> = ({ defaultSignUp = false }) => {
         const redirectPath = searchParams.get('redirect');
         
         if (!hasProfile || !hasCompletedOnboarding) {
-          navigate("/edit-profile", { replace: true });
+          navigate("/edit-profile?onboarding=1", { replace: true });
         } else {
           navigate(redirectPath || "/", { replace: true });
         }
@@ -89,7 +89,7 @@ const Auth: React.FC<AuthProps> = ({ defaultSignUp = false }) => {
         hasNavigated.current = true;
         const { hasProfile, hasCompletedOnboarding } = await checkProfileAndOnboarding(existingSession.user.id);
         const redirectPath = searchParams.get('redirect');
-        navigate(!hasProfile || !hasCompletedOnboarding ? '/edit-profile' : (redirectPath || '/'), { replace: true });
+        navigate(!hasProfile || !hasCompletedOnboarding ? '/edit-profile?onboarding=1' : (redirectPath || '/'), { replace: true });
         return;
       }
 
@@ -118,7 +118,7 @@ const Auth: React.FC<AuthProps> = ({ defaultSignUp = false }) => {
         hasNavigated.current = true;
         const { hasProfile, hasCompletedOnboarding } = await checkProfileAndOnboarding(session.user.id);
         const redirectPath = searchParams.get('redirect');
-        navigate(!hasProfile || !hasCompletedOnboarding ? '/edit-profile' : (redirectPath || '/'), { replace: true });
+        navigate(!hasProfile || !hasCompletedOnboarding ? '/edit-profile?onboarding=1' : (redirectPath || '/'), { replace: true });
       } catch {}
     };
 
