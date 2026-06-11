@@ -48,7 +48,13 @@ const AuthHeroScreen: React.FC<AuthHeroScreenProps> = ({
 
   const [loginEmail, setLoginEmail] = useState('');
   const [emailError, setEmailError] = useState<string | null>(null);
+  const [hasEditedSinceError, setHasEditedSinceError] = useState(false);
   const emailInputRef = useRef<HTMLInputElement>(null);
+
+  // Re-announce external errors whenever a new one arrives
+  useEffect(() => {
+    if (errorMessage) setHasEditedSinceError(false);
+  }, [errorMessage, errorNonce]);
 
   // Show session-expired toast on mount (preserved behaviour)
   useEffect(() => {
