@@ -117,7 +117,7 @@ export const ChampionsCourseSearch: React.FC<Props> = ({ currentCourseId }) => {
                 padding: 12,
                 fontFamily: FONT,
                 fontSize: 12,
-                color: 'var(--hcp-t-50, #94a3b8)',
+                color: 'var(--hcp-t-50)',
               }}
             >
               No matches for "{debounced.trim()}".
