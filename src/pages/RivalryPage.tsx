@@ -435,6 +435,74 @@ const RivalryPage: React.FC = () => {
   );
 };
 
+const PageEyebrow: React.FC<{
+  firstRoundDate: string | null;
+  totalRounds: number;
+  titleLeft: string;
+  rivalName: string;
+}> = ({ firstRoundDate, totalRounds, titleLeft, rivalName }) => {
+  const since = firstRoundDate
+    ? new Date(firstRoundDate).toLocaleDateString('en-GB', {
+        month: 'short',
+        year: 'numeric',
+      }).toUpperCase()
+    : null;
+  return (
+    <div style={{ padding: '0 16px', marginBottom: 12 }}>
+      <div
+        style={{
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          marginBottom: 8,
+          gap: 12,
+        }}
+      >
+        <div
+          style={{
+            color: AMBER,
+            fontSize: 11,
+            fontWeight: 800,
+            letterSpacing: '0.14em',
+            textTransform: 'uppercase',
+            fontFamily: FONT,
+          }}
+        >
+          Rivalry
+        </div>
+        <div
+          style={{
+            color: 'rgba(248,250,252,0.50)',
+            fontSize: 10,
+            fontWeight: 800,
+            letterSpacing: '0.10em',
+            textTransform: 'uppercase',
+            fontFamily: FONT,
+            fontVariantNumeric: 'tabular-nums',
+            textAlign: 'right',
+          }}
+        >
+          {since ? `Since ${since} · ` : ''}
+          {totalRounds} {totalRounds === 1 ? 'Round' : 'Rounds'}
+        </div>
+      </div>
+      <div
+        style={{
+          color: T100,
+          fontSize: 26,
+          fontWeight: 900,
+          lineHeight: 1.1,
+          letterSpacing: '-0.01em',
+          fontFamily: FONT,
+        }}
+      >
+        {titleLeft} vs {rivalName}
+      </div>
+    </div>
+  );
+};
+
+
 const PrivacyBlockedView: React.FC = () => (
   <div
     style={{
