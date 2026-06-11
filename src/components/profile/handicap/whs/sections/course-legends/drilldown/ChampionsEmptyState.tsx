@@ -51,7 +51,7 @@ export const ChampionsWindowEmptyState: React.FC<{
 }> = ({ window, onSwitch }) => (
   <div style={{ padding: '40px 28px 44px', textAlign: 'center', fontFamily: GAM.FONT_GEIST }}>
     <EmptyStateTile tint="slate">
-      <Crown size={30} color="#64748b" strokeWidth={1.8} />
+      <Crown size={30} color="var(--hcp-t-60)" strokeWidth={1.8} />
     </EmptyStateTile>
     <div
       style={{
