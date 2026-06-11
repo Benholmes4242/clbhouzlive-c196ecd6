@@ -17,6 +17,7 @@ import { CourseDetailSkeleton } from '@/components/skeletons/CourseDetailSkeleto
 import { useCourseRatingAggregates } from '@/hooks/useCourseRatingAggregates';
 import { CourseLegendsDrilldown } from '@/components/profile/handicap/whs/sections/course-legends/CourseLegendsDrilldown';
 import CourseHolesTab from '@/features/courses/components/holes/CourseHolesTab';
+import { useCourseMeta } from '@/hooks/gam/useCourseMeta';
 
 
 interface GolfClubViewProps {
@@ -69,6 +70,7 @@ const GolfClubView: React.FC<GolfClubViewProps> = ({ courseId, isInModal = false
   });
 
   const { isLoading: ratingStatsLoading } = useCourseRatingAggregates(courseId);
+  const { data: courseMeta } = useCourseMeta(courseId);
 
   const handleTabChange = useCallback((newTab: string) => {
     setActiveTab(newTab);
@@ -144,11 +146,11 @@ const GolfClubView: React.FC<GolfClubViewProps> = ({ courseId, isInModal = false
         <h1 className="text-[22px] md:text-[28px] font-extrabold tracking-[-0.3px] text-white drop-shadow-2xl mb-1.5">
           {course.name}
         </h1>
-        <p className="drop-shadow-lg mb-2" style={{ fontSize: '14px', fontWeight: 500, color: 'rgba(255,255,255,0.75)' }}>
+        <p className="drop-shadow-lg mb-1" style={{ fontSize: '14px', fontWeight: 500, color: 'rgba(255,255,255,0.75)' }}>
           {formatCourseLocation(course)}
         </p>
 
-        {((course as any).course_rating != null || (course as any).slope_rating != null) && (
+        {(courseMeta?.course_cr != null || courseMeta?.course_slope != null) && (
           <p
             className="drop-shadow-lg mb-2"
             style={{
@@ -160,8 +162,8 @@ const GolfClubView: React.FC<GolfClubViewProps> = ({ courseId, isInModal = false
             }}
           >
             {[
-              (course as any).course_rating != null ? `CR ${(course as any).course_rating}` : null,
-              (course as any).slope_rating != null ? `SLOPE ${(course as any).slope_rating}` : null,
+              courseMeta?.course_cr != null ? `CR ${courseMeta.course_cr}` : null,
+              courseMeta?.course_slope != null ? `SLOPE ${courseMeta.course_slope}` : null,
             ]
               .filter(Boolean)
               .join(' · ')}
