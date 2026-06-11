@@ -24,6 +24,7 @@ import { FullCourseLeaderboardSheet } from './drilldown/FullCourseLeaderboardShe
 import { WindowToggle } from './CourseLegendsSection';
 import { ConnectHandicapCue } from '@/components/courses/course-detail/ConnectHandicapCue';
 import { ChampionsCourseSearch } from './drilldown/ChampionsCourseSearch';
+import { ChampionsProvenanceNote } from './drilldown/ChampionsProvenanceNote';
 import { formatGapFromChampion } from './drilldown/_shared/helpers';
 import { CHAMPIONS_ORDER_90D, CHAMPIONS_ORDER_ALL_TIME } from './_shared/championsOrder';
 
@@ -239,6 +240,8 @@ export const CourseLegendsDrilldown: React.FC<Props> = ({ selection, hideHeader 
           courseHeaderImage={courseHeaderImage}
         />
       )}
+
+      <ChampionsProvenanceNote />
 
       {/* In-tab course search — always shown (synced + non-synced). Includes
           a small connect-WHS cue beneath for non-synced users. */}
