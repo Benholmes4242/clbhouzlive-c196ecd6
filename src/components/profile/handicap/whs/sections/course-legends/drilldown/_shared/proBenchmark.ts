@@ -86,8 +86,9 @@ export function pickProBenchmark(args: {
   dateUtcYmd?: string;
   /** Per-visit rotation counter; when provided, supersedes the date-hash seed. */
   visitN?: number | null;
+  courseName: string;
 }): ProBenchmarkPick | null {
-  const { pros, courseId, course, viewerRounds, recordGross, visitN } = args;
+  const { pros, courseId, course, viewerRounds, recordGross, visitN, courseName } = args;
   if (!pros.length) return null;
   if (course.cr == null || course.slope == null || course.par == null || course.slope <= 0) {
     return null;
@@ -134,10 +135,10 @@ export function pickProBenchmark(args: {
         pro,
         base,
         value: String(g),
-        sub: `Predicted round here · CR ${c.cr}, slope ${c.slope}`,
+        sub: `Predicted round at ${courseName}`,
         chaseLine:
           recordGross != null && recordGross > g
-            ? `The course record is ${recordGross - g} shy of ${first}'s ${g}`
+            ? `The course record is ${recordGross - g} shy of ${first}'s predicted ${g}`
             : undefined,
       };
     }

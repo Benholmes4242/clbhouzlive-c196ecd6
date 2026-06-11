@@ -156,7 +156,7 @@ export const FullCourseLeaderboardSheet: React.FC<Props> = ({
   // Chase line + status pill
   const chaseLine = champion
     ? selfRow || standsAlone
-      ? duelLine(activeCategory, champion.value, (selfRow ?? champion).value, defending, standsAlone)
+      ? duelLine(activeCategory, champion.value, (selfRow ?? champion).value, defending, standsAlone, (champion.name ?? '').split(' ')[0])
       : 'Not on the board yet'
     : '';
 

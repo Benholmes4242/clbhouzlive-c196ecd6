@@ -34,10 +34,13 @@ export function duelLine(
   opponentValue: number,
   defending: boolean,
   standsAlone: boolean,
+  championFirstName: string,
 ): string {
   if (standsAlone) return 'The champion stands alone. Be the first to challenge.';
   const gap = Math.abs(championValue - opponentValue);
   if (gap === 0) return 'Tied for the crown';
   const gapText = formatLegendGap(cat, gap);
-  return defending ? `Defending by ${gapText}` : `${gapText} to take the crown`;
+  return defending
+    ? `Defending by ${gapText}`
+    : `${gapText} to take the crown from ${championFirstName}`;
 }
