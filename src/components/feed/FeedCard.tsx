@@ -290,30 +290,100 @@ const FeedCardImpl: React.FC<FeedCardProps> = ({
         const courseLocation = [post.courseRegion || post.courseSubCountry, post.courseCountry]
           .filter(Boolean)
           .join(', ');
+        const handleCourseTap = (e: React.MouseEvent) => {
+          e.stopPropagation();
+          onCourse?.(post);
+        };
+        const showRating = post.courseRating != null;
         return (
-          <div style={{ padding: '10px 14px 0' }}>
-            {post.courseId ? (
+          <div
+            style={{
+              padding: '10px 14px 0',
+              display: 'grid',
+              gridTemplateColumns: '1fr auto',
+              gap: 10,
+              alignItems: 'center',
+            }}
+          >
+            <div style={{ minWidth: 0 }}>
+              {post.courseId ? (
+                <button
+                  type="button"
+                  onClick={handleCourseTap}
+                  style={{
+                    display: 'block',
+                    background: 'transparent',
+                    border: 'none',
+                    padding: 0,
+                    textAlign: 'left',
+                    fontSize: 12,
+                    color: T60,
+                    cursor: 'pointer',
+                    maxWidth: '100%',
+                    overflow: 'hidden',
+                    textOverflow: 'ellipsis',
+                    whiteSpace: 'nowrap',
+                  }}
+                >
+                  {post.courseName}
+                </button>
+              ) : (
+                <div
+                  style={{
+                    fontSize: 12,
+                    color: T60,
+                    overflow: 'hidden',
+                    textOverflow: 'ellipsis',
+                    whiteSpace: 'nowrap',
+                  }}
+                >
+                  {post.courseName}
+                </div>
+              )}
+              {courseLocation && (
+                <div
+                  style={{
+                    fontSize: 11,
+                    color: T60,
+                    marginTop: 2,
+                    overflow: 'hidden',
+                    textOverflow: 'ellipsis',
+                    whiteSpace: 'nowrap',
+                  }}
+                >
+                  {courseLocation}
+                </div>
+              )}
+            </div>
+            {showRating && (
               <button
                 type="button"
-                onClick={() => onCourse?.(post)}
+                onClick={post.courseId ? handleCourseTap : undefined}
+                aria-label={`Community rating ${post.courseRating!.toFixed(1)}`}
                 style={{
-                  display: 'block',
-                  background: 'transparent',
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: 6,
+                  background: 'rgba(255,255,255,0.08)',
+                  padding: '4px 9px',
+                  borderRadius: 999,
                   border: 'none',
-                  padding: 0,
-                  textAlign: 'left',
+                  cursor: post.courseId ? 'pointer' : 'default',
+                  color: '#fff',
                   fontSize: 12,
-                  color: T60,
-                  cursor: 'pointer',
+                  fontWeight: 700,
+                  fontVariantNumeric: 'tabular-nums',
+                  lineHeight: 1,
                 }}
               >
-                {post.courseName}
+                <img
+                  src="/lovable-uploads/2b0e2d79-6b26-4b6b-a27b-8dd5f8cc5aad.png"
+                  alt=""
+                  aria-hidden="true"
+                  style={{ width: 14, height: 14, objectFit: 'contain' }}
+                />
+                {post.courseRating!.toFixed(1)}
               </button>
-            ) : (
-              <div style={{ fontSize: 12, color: T60 }}>{post.courseName}</div>
-            )}
-            {courseLocation && (
-              <div style={{ fontSize: 11, color: T60, marginTop: 2 }}>{courseLocation}</div>
             )}
           </div>
         );
