@@ -49,6 +49,9 @@ function isEagles(c: LegendCategory): boolean {
 function isAces(c: LegendCategory): boolean {
   return c === 'most_aces_90d' || c === 'most_aces_all_time';
 }
+function isRounds(c: LegendCategory): boolean {
+  return c === 'most_rounds_90d' || c === 'most_rounds_all_time';
+}
 
 function gapUnit(category: LegendCategory, count: number): string {
   const s = count === 1;
@@ -59,6 +62,7 @@ function gapUnit(category: LegendCategory, count: number): string {
   if (isEagles(category)) return s ? 'eagle' : 'eagles';
   if (isAces(category)) return s ? 'ace' : 'aces';
   if (isAlbatrosses(category)) return s ? 'albatross' : 'albatrosses';
+  if (isRounds(category)) return s ? 'round' : 'rounds';
   return 'vs hcp';
 }
 
