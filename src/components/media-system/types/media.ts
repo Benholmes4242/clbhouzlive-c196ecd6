@@ -80,6 +80,8 @@ export interface FeedPost {
   courseCountry?: string;
   courseRegion?: string;
   courseSubCountry?: string;
+  /** Community rating (avg_overall_score from course_rating_aggregates), null when unrated */
+  courseRating?: number | null;
   courseThumbnailImage?: string | null;
   courseLatitude?: number | null;
   courseLongitude?: number | null;
@@ -486,6 +488,8 @@ export interface FeedRpcRow {
   country_match?: boolean | null;
   top100_list_match?: boolean | null;
   rated_post_course?: boolean | null;
+  /** Community rating averaged over real reviews (from course_rating_aggregates view) */
+  course_avg_overall_score?: number | null;
 }
 
 /** Timing constants */

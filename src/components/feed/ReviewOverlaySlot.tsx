@@ -32,6 +32,7 @@ export const ReviewOverlaySlot: React.FC<ReviewOverlaySlotProps> = ({
       courseRegion={review.courseRegion}
       courseCountry={review.courseCountry}
       courseSubCountry={review.courseSubCountry}
+      courseRating={activePost.courseRating ?? null}
       reviewText={review.reviewText ?? null}
       reviewer={{
         name: activePost.displayName,

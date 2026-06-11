@@ -22,6 +22,7 @@ export interface InlineReviewCardProps {
   courseRegion?: string | null;
   courseCountry?: string | null;
   courseSubCountry?: string | null;
+  courseRating?: number | null;
   reviewText?: string | null;
   reviewer: {
     name: string;
@@ -49,6 +50,7 @@ export const InlineReviewCard: React.FC<InlineReviewCardProps> = ({
   courseRegion,
   courseCountry,
   courseSubCountry,
+  courseRating,
   reviewer,
   isVisible,
   onTap,
@@ -198,7 +200,7 @@ export const InlineReviewCard: React.FC<InlineReviewCardProps> = ({
       </div>
 
       {/* Location · Read review */}
-      {locationStr && (
+      {(locationStr || courseRating != null) && (
         <div
           style={{
             fontSize: 13,
@@ -211,7 +213,32 @@ export const InlineReviewCard: React.FC<InlineReviewCardProps> = ({
           }}
         >
           {locationStr}
-          <span style={{ opacity: 0.5 }}>·</span>
+          {courseRating != null && (
+            <span
+              style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: 6,
+                background: 'rgba(15,23,42,0.05)',
+                padding: '4px 9px',
+                borderRadius: 999,
+                color: '#0F172A',
+                fontSize: 12,
+                fontWeight: 700,
+                fontVariantNumeric: 'tabular-nums',
+                lineHeight: 1,
+              }}
+            >
+              <img
+                src="/lovable-uploads/2b0e2d79-6b26-4b6b-a27b-8dd5f8cc5aad.png"
+                alt=""
+                aria-hidden="true"
+                style={{ width: 14, height: 14, objectFit: 'contain' }}
+              />
+              {courseRating.toFixed(1)}
+            </span>
+          )}
+          {locationStr && <span style={{ opacity: 0.5 }}>·</span>}
           <span
             style={{
               color: '#F7931E',
