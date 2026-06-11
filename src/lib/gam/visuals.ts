@@ -94,6 +94,8 @@ export const legendCategoryWindow: Record<LegendCategory, '90d' | 'all_time'> = 
   most_aces_all_time:       'all_time',
   most_albatrosses_90d:     '90d',
   most_albatrosses_all_time:'all_time',
+  most_rounds_90d:          '90d',
+  most_rounds_all_time:     'all_time',
 };
 
 export const streakLabel: Record<StreakType, string> = {
