@@ -116,6 +116,7 @@ export const CourseLegendsDrilldown: React.FC<Props> = ({ selection, hideHeader 
     useState<LegendCategory | null>(null);
   const autoSwitchedRef = useRef(false);
   const [autoSwitchedToAllTime, setAutoSwitchedToAllTime] = useState(false);
+  const [explainerOpen, setExplainerOpen] = useState(false);
 
   const has90d = useMemo(
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
