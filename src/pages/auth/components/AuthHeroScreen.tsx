@@ -19,6 +19,8 @@ interface AuthHeroScreenProps {
   submitting: boolean;
   onSubmitEmail: (email: string) => Promise<void> | void;
   onAppleSignIn?: () => void;
+  errorMessage?: string | null;
+  errorNonce?: number;
 }
 
 const AppleLogo: React.FC<{ size?: number }> = ({ size = 17 }) => (
