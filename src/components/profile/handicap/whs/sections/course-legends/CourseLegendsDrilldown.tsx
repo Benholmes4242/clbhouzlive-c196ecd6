@@ -239,7 +239,7 @@ export const CourseLegendsDrilldown: React.FC<Props> = ({ selection, hideHeader 
   const visitIncrementedRef = useRef(false);
   if (visitNRef.current === null) {
     try {
-      const raw = window.localStorage.getItem('pro_benchmark_visit_n');
+      const raw = globalThis.localStorage.getItem('pro_benchmark_visit_n');
       const parsed = raw == null ? 0 : parseInt(raw, 10);
       visitNRef.current = Number.isFinite(parsed) ? parsed : 0;
     } catch {
@@ -251,7 +251,7 @@ export const CourseLegendsDrilldown: React.FC<Props> = ({ selection, hideHeader 
     visitIncrementedRef.current = true;
     try {
       const cur = visitNRef.current ?? 0;
-      window.localStorage.setItem('pro_benchmark_visit_n', String(cur + 1));
+      globalThis.localStorage.setItem('pro_benchmark_visit_n', String(cur + 1));
     } catch {
       /* ignore */
     }
