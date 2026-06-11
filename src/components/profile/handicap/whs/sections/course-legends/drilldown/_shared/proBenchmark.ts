@@ -13,6 +13,7 @@ export interface CourseInputs {
   cr: number | null;
   slope: number | null;
   par: number | null;
+  yards: number | null;
 }
 
 /** Categories the band may appear on (base names; window applied by caller). */
@@ -23,13 +24,22 @@ export const PRO_BAND_BASES = [
 ] as const;
 export type ProBandBase = (typeof PRO_BAND_BASES)[number];
 
-const ease = (pro: ProProfile, cr: number) => pro.tour_cr_baseline - cr;
-
 const clamp = (n: number, lo: number, hi: number) => Math.max(lo, Math.min(hi, n));
+
+const TOUR_YARDS = 7200;
+
+/** Extra strokes of edge from course shortness: 1 stroke per 450 yards under
+ *  tour length, capped at 2.5. Null/short data → 0 (current behaviour). */
+export function lengthBonus(courseYards: number | null): number {
+  if (courseYards == null || courseYards < 4000) return 0;
+  return clamp((TOUR_YARDS - courseYards) / 450, 0, 2.5);
+}
 
 /** Predicted single-round gross. Clamped to sane bounds so bad data can't print a 51. */
 export function estGross(pro: ProProfile, c: Required<CourseInputs>): number {
-  const raw = Math.round(c.cr - (pro.tour_cr_baseline - pro.scoring_avg));
+  const raw = Math.round(
+    c.cr - ((pro.tour_cr_baseline - pro.scoring_avg) + lengthBonus(c.yards)),
+  );
   return clamp(raw, c.par - 9, Math.round(pro.scoring_avg) + 5);
 }
 
@@ -40,16 +50,18 @@ export function estBirdiesTotal(
   c: Required<CourseInputs>,
   viewerRounds: number,
 ): number {
-  return Math.round((pro.birdies_per_round + ease(pro, c.cr) / 6) * viewerRounds);
+  const effEase = (pro.tour_cr_baseline - c.cr) + lengthBonus(c.yards);
+  return Math.round((pro.birdies_per_round + effEase / 6) * viewerRounds);
 }
 export function estEaglesTotal(
   pro: ProProfile,
   c: Required<CourseInputs>,
   viewerRounds: number,
 ): number {
+  const effEase = (pro.tour_cr_baseline - c.cr) + lengthBonus(c.yards);
   return Math.max(
     0,
-    Math.round(pro.eagles_per_round * (1 + ease(pro, c.cr) / 12) * viewerRounds),
+    Math.round(pro.eagles_per_round * (1 + effEase / 12) * viewerRounds),
   );
 }
 
