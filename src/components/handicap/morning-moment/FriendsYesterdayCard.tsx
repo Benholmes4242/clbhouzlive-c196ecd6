@@ -126,7 +126,7 @@ const FriendsYesterdayCard: React.FC<Props> = ({ data, userId }) => {
   return (
     <div style={{ display: 'flex', flexDirection: 'column', fontFamily: FONT }}>
       {/* Section eyebrow */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: 7, marginBottom: 12, padding: '0 16px' }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 7, marginBottom: 12 }}>
         <span
           style={{
             width: 6,
@@ -156,6 +156,8 @@ const FriendsYesterdayCard: React.FC<Props> = ({ data, userId }) => {
           gap: 10,
           overflowX: 'auto',
           overflowY: 'hidden',
+          marginLeft: -16,
+          marginRight: -16,
           padding: '0 16px 6px',
           scrollSnapType: 'x mandatory',
           WebkitOverflowScrolling: 'touch',
