@@ -131,6 +131,9 @@ export function formatLegendValue(category: LegendCategory, value: number): stri
     case 'most_albatrosses_90d':
     case 'most_albatrosses_all_time':
       return `${value} albatross${value === 1 ? '' : 'es'}`;
+    case 'most_rounds_90d':
+    case 'most_rounds_all_time':
+      return `${value} round${value === 1 ? '' : 's'}`;
   }
 }
 
