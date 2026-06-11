@@ -440,7 +440,7 @@ export const FriendRoundCardV2: React.FC<Props> = ({
               }}
             >
               {variant === 'clbhouz-not-synced' ? 'Ask to sync' : 'Invite'}
-              <ChevronRight size={11} strokeWidth={2.2} />
+              <ChevronRight size={11} strokeWidth={2.2} color="rgba(255,255,255,0.92)" />
             </button>
           </div>
         )}
