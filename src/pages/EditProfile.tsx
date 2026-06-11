@@ -597,9 +597,11 @@ export default function EditProfile() {
         onClose={() => setConnectSheetOpen(false)}
         userId={user?.id}
       />
-    </div>
+      </div>
+    </PageRoot>
   );
 }
+
 
 // ─────────────────────────────────────────────────────────────────────
 // Smart handicap row
