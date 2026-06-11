@@ -676,10 +676,7 @@ function CommentsSheet({
             </div>
 
             {/* Header */}
-            <div
-              className="flex items-end justify-between px-4 pt-3 pb-0 shrink-0"
-              style={{ borderBottom: '0.5px solid rgba(15,23,42,0.07)' }}
-            >
+            <div className="flex items-end justify-between px-4 pt-3 pb-0 shrink-0">
               {/* Left: tabs with inline counts */}
               <div className="flex items-end gap-6">
                 {(['comments', 'likes'] as const).map((tab) => {
