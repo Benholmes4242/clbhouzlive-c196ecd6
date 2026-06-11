@@ -1,18 +1,14 @@
-/**
- * H2HScoreBanner — "You dominate X of Y categories" headline.
- */
 import React from 'react';
 import {
   FONT,
   TAB,
+  BG_1,
   T100,
-  T60,
-  T40,
-  T80,
+  T50,
   GREEN,
   RED,
+  LINE,
 } from '@/pages/rivalry-page/_shared/tokens';
-import { getH2HTier } from './_shared/tiers';
 
 interface Props {
   myWins: number;
@@ -29,115 +25,84 @@ export const H2HScoreBanner: React.FC<Props> = ({
   total,
   rivalFirstName,
 }) => {
-  const tier = getH2HTier(myWins, theirWins, total, rivalFirstName);
-  const { eyebrow, subcopy, accent, gradient, icon: TierIcon } = tier;
-  const tied = myWins === theirWins;
-  const leaderWins = Math.max(myWins, theirWins);
-
   const safeTotal = Math.max(total, 1);
   const mePct = (myWins / safeTotal) * 100;
   const tiePct = (ties / safeTotal) * 100;
-  const themPct = (theirWins / safeTotal) * 100;
+  const themPct = Math.max(0, 100 - mePct - tiePct);
+  const leader = myWins >= theirWins ? myWins : theirWins;
+  const lead = myWins > theirWins ? 'me' : myWins < theirWins ? 'them' : 'tie';
+
+  const verb =
+    lead === 'me'
+      ? 'Dominating'
+      : lead === 'them'
+        ? 'Trailing'
+        : 'Tied across';
 
   return (
     <section style={{ padding: '0 16px' }}>
       <div
         style={{
           marginTop: 4,
-          padding: 12,
-          background: gradient,
-          border: `1px solid ${accent}40`,
-          borderRadius: 12,
+          background: BG_1,
+          border: `0.5px solid ${LINE}`,
+          borderRadius: 16,
+          padding: '14px 16px',
           fontFamily: FONT,
         }}
       >
         <div
           style={{
-            color: accent,
-            fontSize: 10.5,
-            fontWeight: 800,
-            letterSpacing: '0.14em',
-            textTransform: 'uppercase',
-            display: 'inline-flex',
-            alignItems: 'center',
-            gap: 6,
-          }}
-        >
-          {TierIcon && <TierIcon size={12} strokeWidth={2.5} />}
-          {eyebrow}
-        </div>
-        <div
-          style={{
-            marginTop: 4,
-            color: T100,
-            fontSize: 26,
-            fontWeight: 800,
-            lineHeight: 1.1,
-            letterSpacing: '-0.01em',
-            ...TAB,
-          }}
-        >
-          {tied ? `${myWins}–${theirWins}` : `${leaderWins} of ${total}`}{' '}
-          <span style={{ color: T60, fontSize: 14, fontWeight: 600 }}>
-            categories
-          </span>
-        </div>
-
-        <div
-          style={{
-            marginTop: 4,
-            color: T60,
-            fontSize: 12,
-            fontWeight: 500,
-            fontFamily: FONT,
-          }}
-        >
-          {subcopy}
-        </div>
-
-        <div
-          style={{
-            marginTop: 12,
             display: 'flex',
-            height: 6,
+            alignItems: 'baseline',
+            justifyContent: 'space-between',
+            gap: 12,
+          }}
+        >
+          <div
+            style={{
+              color: T100,
+              fontSize: 13.5,
+              fontWeight: 800,
+              letterSpacing: '-0.005em',
+            }}
+          >
+            {verb}{' '}
+            <span style={{ color: lead === 'them' ? RED : GREEN, ...TAB }}>
+              {leader} of {total}
+            </span>{' '}
+            categories
+          </div>
+          <div
+            style={{
+              color: T50,
+              fontSize: 10,
+              fontWeight: 700,
+              letterSpacing: '0.08em',
+              textTransform: 'uppercase',
+              whiteSpace: 'nowrap',
+              ...TAB,
+            }}
+          >
+            YOU {myWins} · TIED {ties} · {rivalFirstName.toUpperCase()} {theirWins}
+          </div>
+        </div>
+
+        <div
+          style={{
+            marginTop: 10,
+            display: 'flex',
+            gap: 2,
+            height: 5,
             borderRadius: 999,
             overflow: 'hidden',
-            background: 'rgba(255,255,255,0.05)',
           }}
         >
-          {mePct > 0 && (
-            <div style={{ width: `${mePct}%`, background: GREEN }} />
-          )}
+          {mePct > 0 && <div style={{ width: `${mePct}%`, background: GREEN }} />}
           {tiePct > 0 && (
-            <div style={{ width: `${tiePct}%`, background: T40 }} />
+            <div style={{ width: `${tiePct}%`, background: 'rgba(255,255,255,0.20)' }} />
           )}
-          {themPct > 0 && (
-            <div style={{ width: `${themPct}%`, background: RED }} />
-          )}
-        </div>
-
-        <div
-          style={{
-            marginTop: 8,
-            display: 'flex',
-            justifyContent: 'space-between',
-            color: T60,
-            fontSize: 10,
-            fontWeight: 700,
-            letterSpacing: '0.1em',
-            textTransform: 'uppercase',
-            ...TAB,
-          }}
-        >
-          <span>
-            <span style={{ color: GREEN }}>You</span> {myWins}
-          </span>
-          <span>
-            <span style={{ color: T80 }}>Tied</span> {ties}
-          </span>
-          <span>
-            <span style={{ color: RED }}>{rivalFirstName}</span> {theirWins}
-          </span>
+          {themPct > 0 && <div style={{ width: `${themPct}%`, background: RED }} />}
         </div>
       </div>
     </section>

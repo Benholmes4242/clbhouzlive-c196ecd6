@@ -3,14 +3,15 @@ import { MapPin } from 'lucide-react';
 import {
   FONT,
   TAB,
-  BG_1,
   T100,
-  T60,
-  T40,
-  T80,
+  T50,
+  T35,
+  T70,
   GOLD,
   GREEN,
   RED,
+  GREEN_DIM,
+  RED_DIM,
   LINE,
 } from './_shared/tokens';
 import { formatDate } from './_shared/helpers';
@@ -24,13 +25,13 @@ interface Props {
   dim: RivalryDimension;
   rivalFirstName: string;
   youLabel: string;
+  showDivider?: boolean;
 }
 
 export const RoundCard: React.FC<Props> = ({
   round,
   dim,
-  rivalFirstName,
-  youLabel,
+  showDivider = true,
 }) => {
   const outcome =
     dim === 'stableford' ? round.stableford_outcome : round.gross_outcome;
@@ -39,44 +40,34 @@ export const RoundCard: React.FC<Props> = ({
   const themVal =
     dim === 'stableford' ? round.rival_stableford : round.rival_gross;
   const delta = Math.abs((youVal ?? 0) - (themVal ?? 0));
-  const unit = dim === 'stableford' ? ' pts' : '';
+  const unit = dim === 'stableford' ? '' : '';
 
   const youWon = outcome === 'W';
   const themWon = outcome === 'L';
   const tied = outcome === 'T';
 
-  const chipBg = youWon
-    ? 'rgba(5,150,105,0.14)'
-    : themWon
-      ? 'rgba(159,29,29,0.14)'
-      : 'rgba(255,255,255,0.06)';
-  const chipColor = youWon ? GREEN : themWon ? RED : T40;
+  const chipBg = youWon ? GREEN_DIM : themWon ? RED_DIM : 'rgba(255,255,255,0.06)';
+  const chipColor = youWon ? GREEN : themWon ? RED : T50;
+  const chipLabel = tied ? '0' : `${youWon ? '+' : '−'}${delta}${unit}`;
 
   return (
     <div
       style={{
-        padding: 14,
-        background: BG_1,
-        border: `1px solid ${LINE}`,
-        borderRadius: 12,
+        display: 'grid',
+        gridTemplateColumns: '1fr auto auto',
+        gap: 12,
+        alignItems: 'center',
+        padding: '11px 14px',
+        borderBottom: showDivider ? `0.5px solid ${LINE}` : 'none',
         fontFamily: FONT,
       }}
     >
-      {/* Top — date + course */}
-      <div
-        style={{
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'space-between',
-          gap: 10,
-        }}
-      >
+      <div style={{ minWidth: 0 }}>
         <div
           style={{
-            color: T80,
-            fontSize: 12,
+            color: T100,
+            fontSize: 13,
             fontWeight: 700,
-            letterSpacing: '0.02em',
             ...TAB,
           }}
         >
@@ -84,19 +75,20 @@ export const RoundCard: React.FC<Props> = ({
         </div>
         <div
           style={{
+            marginTop: 2,
             display: 'inline-flex',
             alignItems: 'center',
             gap: 4,
-            color: T60,
-            fontSize: 11,
-            fontWeight: 600,
-            maxWidth: '60%',
+            color: T50,
+            fontSize: 10.5,
+            fontWeight: 500,
+            maxWidth: '100%',
             overflow: 'hidden',
             whiteSpace: 'nowrap',
             textOverflow: 'ellipsis',
           }}
         >
-          <MapPin size={11} strokeWidth={2.2} />
+          <MapPin size={9} strokeWidth={2.2} />
           <span
             style={{
               overflow: 'hidden',
@@ -109,82 +101,44 @@ export const RoundCard: React.FC<Props> = ({
         </div>
       </div>
 
-      {/* Main */}
       <div
         style={{
-          marginTop: 10,
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'space-between',
-          gap: 12,
+          display: 'inline-flex',
+          alignItems: 'baseline',
+          fontSize: 15,
+          fontWeight: 800,
+          ...TAB,
         }}
       >
-        <div
+        <span style={{ color: youWon ? GOLD : tied ? T70 : T70 }}>
+          {youVal ?? '—'}
+        </span>
+        <span
           style={{
-            display: 'inline-flex',
-            alignItems: 'center',
-            gap: 12,
-            color: T100,
-            fontSize: 16,
-            fontWeight: 700,
-            ...TAB,
-          }}
-        >
-          <ScoreCell label={youLabel} value={youVal ?? 0} won={youWon} />
-          <span style={{ color: T40, fontSize: 11, fontWeight: 600 }}>vs</span>
-          <ScoreCell
-            label={rivalFirstName}
-            value={themVal ?? 0}
-            won={themWon}
-          />
-        </div>
-        <div
-          style={{
-            padding: '5px 9px',
-            background: chipBg,
-            color: chipColor,
-            border: `1px solid ${chipColor}33`,
-            borderRadius: 999,
+            color: T35,
             fontSize: 11,
-            fontWeight: 800,
-            letterSpacing: '0.02em',
-            ...TAB,
+            margin: '0 5px',
+            fontWeight: 700,
           }}
         >
-          {tied ? 'Tied' : `${youWon ? '+' : '−'}${delta}${unit}`}
-        </div>
+          vs
+        </span>
+        <span style={{ color: themWon ? GOLD : T70 }}>{themVal ?? '—'}</span>
+      </div>
+
+      <div
+        style={{
+          padding: '4px 9px',
+          background: chipBg,
+          color: chipColor,
+          borderRadius: 999,
+          fontSize: 11.5,
+          fontWeight: 800,
+          ...TAB,
+        }}
+      >
+        {chipLabel}
       </div>
     </div>
   );
 };
-
-const ScoreCell: React.FC<{ label: string; value: number; won: boolean }> = ({
-  label,
-  value,
-  won,
-}) => (
-  <div style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-    <div
-      style={{
-        color: T60,
-        fontSize: 10,
-        fontWeight: 700,
-        letterSpacing: '0.08em',
-        textTransform: 'uppercase',
-      }}
-    >
-      {label}
-    </div>
-    <div
-      style={{
-        color: won ? GOLD : T100,
-        fontSize: 20,
-        fontWeight: 800,
-        lineHeight: 1,
-        ...TAB,
-      }}
-    >
-      {value}
-    </div>
-  </div>
-);
