@@ -1,0 +1,1 @@
+UPDATE public.pro_benchmarks SET tour_code='liv' WHERE slug IN ('rahm','dechambeau');
