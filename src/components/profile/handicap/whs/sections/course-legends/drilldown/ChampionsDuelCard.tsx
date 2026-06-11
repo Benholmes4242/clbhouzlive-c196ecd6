@@ -91,6 +91,7 @@ export const ChampionsDuelCard: React.FC<ChampionsDuelCardProps> = ({
   holdDuration,
   totalCount,
   onFullLeaderboardTap,
+  proBenchmark,
 }) => {
   const champion = rows[0];
   const defending = champion?.isSelf === true;
@@ -112,6 +113,7 @@ export const ChampionsDuelCard: React.FC<ChampionsDuelCardProps> = ({
   const fill = duelTension(category, leftValue, rightValue);
 
   let line: string;
+  let isNormalDuelLine = false;
   if (standsAlone) {
     line = 'The champion stands alone. Be the first to challenge.';
   } else if (!selfOnBoard && !defending) {
@@ -120,6 +122,10 @@ export const ChampionsDuelCard: React.FC<ChampionsDuelCardProps> = ({
     line = 'The champion stands alone. Be the first to challenge.';
   } else {
     line = duelLine(category, leftValue, rightValue, defending, false);
+    isNormalDuelLine = true;
+  }
+  if (isNormalDuelLine && proBenchmark?.chaseLine) {
+    line = `${line} — ${proBenchmark.chaseLine}`;
   }
 
   // Status pill text
