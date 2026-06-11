@@ -233,6 +233,36 @@ export const CourseLegendsDrilldown: React.FC<Props> = ({ selection, hideHeader 
     [visibleCategories],
   );
 
+  // Pro Benchmark band — ALL-TIME window only; silently absent on failure
+  const proBenchmarkPick = useMemo(() => {
+    if (window !== 'all_time') return null;
+    if (!pros || pros.length === 0) return null;
+
+    const eligibleBases: ProBandBase[] = PRO_BAND_BASES.filter((b) => {
+      const cat = `${b}_all_time` as LegendCategory;
+      if (!visibleCategories.includes(cat)) return false;
+      const entry = groupedWithTotals.get(cat);
+      return !!entry && entry.rows.length > 0;
+    });
+    if (eligibleBases.length === 0) return null;
+
+    const recordEntry = groupedWithTotals.get('lowest_gross_all_time' as LegendCategory);
+    const recordGross = recordEntry?.rows[0]?.value ?? null;
+
+    return pickProBenchmark({
+      pros,
+      courseId: ctx.courseId,
+      course: {
+        cr: meta?.course_cr ?? null,
+        slope: meta?.course_slope ?? null,
+        par: meta?.course_par ?? null,
+      },
+      viewerRounds: meta?.your_rounds ?? null,
+      eligibleBases,
+      recordGross,
+    });
+  }, [pros, ctx.courseId, meta, window, groupedWithTotals, visibleCategories]);
+
   return (
     <div ref={containerRef}>
       {!hideHeader && (
