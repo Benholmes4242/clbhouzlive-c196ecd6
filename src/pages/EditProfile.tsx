@@ -171,7 +171,6 @@ export default function EditProfile() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [form.firstName, form.lastName, hasTouchedDisplayName]);
 
-  const [searchParams] = useSearchParams();
   const golfRef = useRef<HTMLDivElement | null>(null);
   const aboutRef = useRef<HTMLDivElement | null>(null);
   const photosRef = useRef<HTMLDivElement | null>(null);
