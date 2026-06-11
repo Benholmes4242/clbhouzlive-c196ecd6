@@ -47,6 +47,8 @@ export const legendCategoryLabel: Record<LegendCategory, string> = {
   most_aces_all_time:       'Aces',
   most_albatrosses_90d:     'Albatross',
   most_albatrosses_all_time:'Albatross',
+  most_rounds_90d:          'Rounds',
+  most_rounds_all_time:     'Rounds',
 };
 
 
