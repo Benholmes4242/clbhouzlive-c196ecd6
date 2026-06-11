@@ -9502,6 +9502,48 @@ export type Database = {
           },
         ]
       }
+      pro_benchmarks: {
+        Row: {
+          active: boolean
+          birdies_per_round: number
+          eagles_per_round: number
+          full_name: string
+          id: string
+          initials: string
+          scoring_avg: number
+          slug: string
+          tour_code: string
+          tour_cr_baseline: number
+          updated_at: string
+        }
+        Insert: {
+          active?: boolean
+          birdies_per_round: number
+          eagles_per_round: number
+          full_name: string
+          id?: string
+          initials: string
+          scoring_avg: number
+          slug: string
+          tour_code?: string
+          tour_cr_baseline?: number
+          updated_at?: string
+        }
+        Update: {
+          active?: boolean
+          birdies_per_round?: number
+          eagles_per_round?: number
+          full_name?: string
+          id?: string
+          initials?: string
+          scoring_avg?: number
+          slug?: string
+          tour_code?: string
+          tour_cr_baseline?: number
+          updated_at?: string
+        }
+        Relationships: []
+      }
       profile_analytics_events: {
         Row: {
           action_type: string | null
