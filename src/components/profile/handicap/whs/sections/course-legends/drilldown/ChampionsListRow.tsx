@@ -55,7 +55,7 @@ export const ChampionsListRow: React.FC<ChampionsListRowProps> = ({
   const avatar = isChampion ? (
     <div style={{ width: avatarSize, height: avatarSize, position: 'relative', flexShrink: 0 }} aria-hidden>
       <div style={{ position: 'absolute', inset: 0, background: photoBg, ...squircleMaskStyle }} />
-      <div style={{ position: 'absolute', inset: 0, ...squircleMaskStyle, boxShadow: 'inset 0 0 0 1px rgba(15,23,42,0.08)' }} />
+      <div style={{ position: 'absolute', inset: 0, ...squircleMaskStyle, boxShadow: 'inset 0 0 0 1px var(--hcp-line)' }} />
     </div>
   ) : (
     <div
@@ -65,7 +65,7 @@ export const ChampionsListRow: React.FC<ChampionsListRowProps> = ({
         height: avatarSize,
         borderRadius: '34%',
         background: photoBg,
-        boxShadow: 'inset 0 0 0 1px rgba(15,23,42,0.08)',
+        boxShadow: 'inset 0 0 0 1px var(--hcp-line)',
         flexShrink: 0,
       }}
     />
