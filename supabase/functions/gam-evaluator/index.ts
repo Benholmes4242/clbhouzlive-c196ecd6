@@ -902,7 +902,8 @@ async function recomputeLegend(courseId: string, cfg: LegendCfg) {
   const byUser = new Map<string, { value: number; attained_at: string }>();
   for (const r of rounds) {
     let val: number | null = null;
-    if (cfg.aggregate === "value") val = (r as any)[cfg.metric];
+    if (cfg.metric === "rounds") val = 1; // synthetic metric — every qualifying row counts once
+    else if (cfg.aggregate === "value") val = (r as any)[cfg.metric];
     else if (cfg.aggregate === "sum") val = (r as any)[cfg.metric] ?? 0;
     else if (cfg.aggregate === "count") val = 1;
     if (val == null) continue;
