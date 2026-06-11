@@ -381,7 +381,7 @@ export default function EditProfile() {
               <div className="px-4 pt-3 pb-4" style={{ borderBottom: '0.5px solid rgba(15,23,42,0.07)' }}>
                 <div className="flex justify-between items-baseline">
                   <div style={{ marginBottom: 8 }}>
-                    <SectionEyebrow label="Username" required={isNewUser.current && !usernameIsLocked} />
+                    <SectionEyebrow label="Username" />
                   </div>
                   {usernameIsLocked && (
                     <span className="text-[11px] text-muted-foreground/60">
