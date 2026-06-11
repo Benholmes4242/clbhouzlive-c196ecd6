@@ -184,6 +184,14 @@ export const ChampionsDuelCard: React.FC<ChampionsDuelCardProps> = ({
         </span>
       </div>
 
+      {proBenchmark && (
+        <ProBenchmarkBand
+          pro={proBenchmark.pro}
+          value={proBenchmark.value}
+          sub={proBenchmark.sub}
+        />
+      )}
+
       {/* Duel row */}
       <div style={{ display: 'grid', gridTemplateColumns: '1fr auto 1fr', gap: 10, alignItems: 'center' }}>
         {/* LEFT: crown holder */}
