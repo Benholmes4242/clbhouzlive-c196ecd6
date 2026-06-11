@@ -40,7 +40,7 @@ export function estBirdiesTotal(
   c: Required<CourseInputs>,
   viewerRounds: number,
 ): number {
-  return Math.round((pro.birdies_per_round + ease(pro, c.cr, c.slope) / 6) * viewerRounds);
+  return Math.round((pro.birdies_per_round + ease(pro, c.cr) / 6) * viewerRounds);
 }
 export function estEaglesTotal(
   pro: ProProfile,
@@ -49,7 +49,7 @@ export function estEaglesTotal(
 ): number {
   return Math.max(
     0,
-    Math.round(pro.eagles_per_round * (1 + ease(pro, c.cr, c.slope) / 12) * viewerRounds),
+    Math.round(pro.eagles_per_round * (1 + ease(pro, c.cr) / 12) * viewerRounds),
   );
 }
 
