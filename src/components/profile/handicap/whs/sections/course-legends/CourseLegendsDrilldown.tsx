@@ -375,6 +375,11 @@ export const CourseLegendsDrilldown: React.FC<Props> = ({ selection, hideHeader 
                   holdDuration={`Held ${formatHeldDuration(champion.attained_at)}`}
                   totalCount={entry.total}
                   onFullLeaderboardTap={() => setFullLeaderboardCategory(cat)}
+                  proBenchmark={
+                    proBenchmarkPick && cat === `${proBenchmarkPick.base}_all_time`
+                      ? proBenchmarkPick
+                      : null
+                  }
                 />
               </div>
             );
