@@ -72,7 +72,11 @@
       var recoveryAttempts = parseInt(sessionStorage.getItem('chunkRecoveryAttempts') || '0');
       var BOOT_GRACE_MS = 5000;
       var SCRIPT_START_TIME = Date.now();
-      var ROOT_RENDER_TIMEOUT_MS = 7000;
+      // Dev/preview ships hundreds of unbundled modules; production is fast.
+      // Use a generous deadline on lovableproject.com / localhost to avoid
+      // false-positive reload loops during cold start.
+      var __isDevHost = /lovableproject\.com$|localhost|127\.0\.0\.1/.test(location.hostname);
+      var ROOT_RENDER_TIMEOUT_MS = __isDevHost ? 30000 : 12000;
 
       function showFatalRecoveryUI() {
         sessionStorage.removeItem('chunkRecoveryAttempts');
