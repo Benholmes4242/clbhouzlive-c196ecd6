@@ -138,6 +138,22 @@ export const DrilldownHeader: React.FC<Props> = ({
       >
         {state.courseName}
       </div>
+      {(cr != null || slope != null) && (
+        <div
+          style={{
+            marginTop: 4,
+            fontSize: 11,
+            fontWeight: 700,
+            letterSpacing: '0.08em',
+            color: 'var(--hcp-t-40)',
+            fontVariantNumeric: 'tabular-nums',
+            textShadow: '0 1px 3px rgba(0,0,0,0.45)',
+          }}
+        >
+          {[cr != null ? `CR ${cr}` : null, slope != null ? `SLOPE ${slope}` : null].filter(Boolean).join(' · ')}
+        </div>
+      )}
     </div>
   </div>
 );
+
