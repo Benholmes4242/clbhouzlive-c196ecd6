@@ -135,10 +135,10 @@ export function pickProBenchmark(args: {
         pro,
         base,
         value: String(g),
-        sub: `Predicted round here · CR ${c.cr}, slope ${c.slope}`,
+        sub: `Predicted round at ${courseName}`,
         chaseLine:
           recordGross != null && recordGross > g
-            ? `The course record is ${recordGross - g} shy of ${first}'s ${g}`
+            ? `The course record is ${recordGross - g} shy of ${first}'s predicted ${g}`
             : undefined,
       };
     }
