@@ -119,13 +119,6 @@ export function pickProBenchmark(args: {
             : undefined,
       };
     }
-    case 'best_stableford':
-      return {
-        pro,
-        base,
-        value: `${estStableford(pro, c)} pts`,
-        sub: 'Predicted stableford here, off scratch',
-      };
     case 'most_birdies': {
       const n = estBirdiesTotal(pro, c, viewerRounds!);
       return {
