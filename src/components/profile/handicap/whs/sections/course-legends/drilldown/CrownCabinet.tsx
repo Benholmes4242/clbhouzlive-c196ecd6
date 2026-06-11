@@ -1,6 +1,7 @@
 import React from 'react';
 import { Crown, type LucideIcon } from 'lucide-react';
-import type { LegendCategory } from '@/lib/gam/types';
+import type { LegendCategory, LegendWindow } from '@/lib/gam/types';
+import { WindowToggle } from '../CourseLegendsSection';
 
 export interface CabinetSlot {
   key: LegendCategory;
@@ -12,8 +13,8 @@ export interface CabinetSlot {
 interface CrownCabinetProps {
   slots: CabinetSlot[];
   heldCount: number;
-  yourRounds: number;
-  yourBest: number | null;
+  window: LegendWindow;
+  onWindowChange: (w: LegendWindow) => void;
 }
 
 const AMBER = '#F7931E';
@@ -23,13 +24,10 @@ const INK = 'var(--hcp-t-100)';
 export const CrownCabinet: React.FC<CrownCabinetProps> = ({
   slots,
   heldCount,
-  yourRounds,
-  yourBest,
+  window,
+  onWindowChange,
 }) => {
   const cols = slots.length || 6;
-  const footerParts: string[] = [];
-  if (yourRounds > 0) footerParts.push(`${yourRounds} rounds`);
-  if (yourBest != null) footerParts.push(`best gross ${yourBest}`);
 
   return (
     <div
@@ -110,19 +108,9 @@ export const CrownCabinet: React.FC<CrownCabinetProps> = ({
           );
         })}
       </div>
-      {footerParts.length > 0 && (
-        <div
-          style={{
-            marginTop: 10,
-            fontSize: 11,
-            fontWeight: 500,
-            color: 'var(--hcp-t-60)',
-            fontVariantNumeric: 'tabular-nums',
-          }}
-        >
-          {footerParts.join(' · ')}
-        </div>
-      )}
+      <div style={{ marginTop: 10, display: 'flex', justifyContent: 'flex-start' }}>
+        <WindowToggle window={window} setWindow={onWindowChange} />
+      </div>
     </div>
   );
 };
