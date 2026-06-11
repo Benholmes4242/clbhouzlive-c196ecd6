@@ -3,8 +3,8 @@ import React from 'react';
 import { Crown } from 'lucide-react';
 import { EmptyStateTile } from '@/components/profile/handicap/gam/_shared/EmptyStateTile';
 
-const INK = 'var(--hcp-t-100, #0F172A)';
-const SLATE = 'var(--hcp-t-60, #64748b)';
+const INK = 'var(--hcp-t-100)';
+const SLATE = 'var(--hcp-t-60)';
 
 /** No legends in ANY window — the true empty. */
 export const ChampionsEmptyState: React.FC<{ courseName: string | null }> = ({ courseName }) => (
