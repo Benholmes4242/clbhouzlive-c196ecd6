@@ -10,6 +10,10 @@ interface Props {
   totalCategories?: number;
   /** Course header photo. Null/undefined → renders gradient fallback. */
   courseHeaderImage?: string | null;
+  /** Course Rating (e.g. 69.4). Hidden when null. */
+  cr?: number | null;
+  /** Slope rating (e.g. 130). Hidden when null. */
+  slope?: number | null;
 }
 
 
@@ -18,7 +22,10 @@ export const DrilldownHeader: React.FC<Props> = ({
   youOwnedCount,
   totalCategories = 6,
   courseHeaderImage,
+  cr = null,
+  slope = null,
 }) => (
+
   <div
     className="h-40 md:h-48 lg:h-56"
     style={{
