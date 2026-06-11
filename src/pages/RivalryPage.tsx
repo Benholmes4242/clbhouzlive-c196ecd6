@@ -359,6 +359,17 @@ const RivalryPage: React.FC = () => {
 
       {viewerId && !isLoading && row && (
         <>
+          <PageEyebrow
+            firstRoundDate={firstRoundDate}
+            totalRounds={
+              (row.shared_round_results?.length) ??
+              ((row.gross_record?.wins ?? 0) +
+                (row.gross_record?.losses ?? 0) +
+                (row.gross_record?.ties ?? 0))
+            }
+            titleLeft={isFriendView ? firstName(yourFullName) : 'You'}
+            rivalName={row.rival_name ?? 'Rival'}
+          />
           <HeroScoreboard
             rivalry={row}
             dim={dim}
@@ -370,6 +381,7 @@ const RivalryPage: React.FC = () => {
             currentStreak={currentStreak}
             ownerView={!isFriendView}
           />
+
 
           <div
             style={{
