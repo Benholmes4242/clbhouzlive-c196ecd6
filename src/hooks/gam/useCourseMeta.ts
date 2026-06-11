@@ -13,6 +13,7 @@ export interface CourseMeta {
   your_rounds: number;
   your_best: number | null;
   course_par: number | null;
+  course_yards: number | null;
   course_cr: number | null;
   course_slope: number | null;
   avg_over_par: number | null;

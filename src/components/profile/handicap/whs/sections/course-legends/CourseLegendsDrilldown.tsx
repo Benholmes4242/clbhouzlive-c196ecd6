@@ -281,6 +281,7 @@ export const CourseLegendsDrilldown: React.FC<Props> = ({ selection, hideHeader 
         cr: meta?.course_cr ?? null,
         slope: meta?.course_slope ?? null,
         par: meta?.course_par ?? null,
+        yards: meta?.course_yards ?? null,
       },
       viewerRounds: meta?.your_rounds ?? null,
       eligibleBases,
