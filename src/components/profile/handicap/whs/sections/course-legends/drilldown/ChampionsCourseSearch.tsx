@@ -146,12 +146,12 @@ export const ChampionsCourseSearch: React.FC<Props> = ({ currentCourseId }) => {
                   width: 36,
                   height: 36,
                   borderRadius: '34%',
-                  background: 'linear-gradient(135deg, var(--hcp-bg-3, #e2e8f0), var(--hcp-bg-2, #f1f5f9))',
+                  background: 'linear-gradient(135deg, var(--hcp-bg-3), var(--hcp-bg-2))',
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
                   flexShrink: 0,
-                  color: 'var(--hcp-t-60, #64748b)',
+                  color: 'var(--hcp-t-60)',
                 }}
               >
                 <MapPin size={16} />
