@@ -17,8 +17,8 @@ interface CrownCabinetProps {
 }
 
 const AMBER = '#F7931E';
-const DEEP_AMBER = '#B26818';
-const INK = '#0F172A';
+const HELD_LABEL = 'var(--hcp-gold-text)';
+const INK = 'var(--hcp-t-100)';
 
 export const CrownCabinet: React.FC<CrownCabinetProps> = ({
   slots,
@@ -35,8 +35,8 @@ export const CrownCabinet: React.FC<CrownCabinetProps> = ({
     <div
       style={{
         margin: '12px 16px',
-        background: '#FFFFFF',
-        border: '0.5px solid rgba(15,23,42,0.08)',
+        background: 'var(--hcp-bg-1)',
+        border: '0.5px solid var(--hcp-line)',
         borderRadius: 16,
         padding: '14px 16px',
       }}
@@ -79,15 +79,15 @@ export const CrownCabinet: React.FC<CrownCabinetProps> = ({
                   justifyContent: 'center',
                   background: slot.held
                     ? 'linear-gradient(135deg, #FBBC2E, #E07F0E)'
-                    : 'rgba(15,23,42,0.015)',
-                  border: slot.held ? 'none' : '1.5px dashed rgba(15,23,42,0.20)',
+                    : 'var(--hcp-tint-3)',
+                  border: slot.held ? 'none' : '1.5px dashed var(--hcp-dash)',
                   boxShadow: slot.held ? '0 2px 8px rgba(247,147,30,0.35)' : 'none',
                 }}
               >
                 {slot.held ? (
                   <Crown size={18} strokeWidth={2.4} color="#FFFFFF" fill="rgba(255,255,255,0.35)" />
                 ) : (
-                  <SlotIcon size={15} color="rgba(15,23,42,0.30)" strokeWidth={2.2} />
+                  <SlotIcon size={15} color="var(--hcp-t-30)" strokeWidth={2.2} />
                 )}
               </div>
               <span
@@ -96,7 +96,7 @@ export const CrownCabinet: React.FC<CrownCabinetProps> = ({
                   fontWeight: 800,
                   letterSpacing: '0.08em',
                   textTransform: 'uppercase',
-                  color: slot.held ? DEEP_AMBER : '#94A3B8',
+                  color: slot.held ? HELD_LABEL : 'var(--hcp-t-40)',
                   textAlign: 'center',
                   whiteSpace: 'nowrap',
                   overflow: 'hidden',
@@ -116,7 +116,7 @@ export const CrownCabinet: React.FC<CrownCabinetProps> = ({
             marginTop: 10,
             fontSize: 11,
             fontWeight: 500,
-            color: '#64748B',
+            color: 'var(--hcp-t-60)',
             fontVariantNumeric: 'tabular-nums',
           }}
         >
