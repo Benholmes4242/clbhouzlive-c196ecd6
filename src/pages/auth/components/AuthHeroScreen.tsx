@@ -115,17 +115,9 @@ const AuthHeroScreen: React.FC<AuthHeroScreenProps> = ({
       {/* Background */}
       <div
         className="absolute inset-0"
-        style={{ background: 'linear-gradient(180deg, #0A0E14 0%, #0C1119 100%)' }}
+        style={{ background: '#0A0E14' }}
       />
 
-      {/* Vignette */}
-      <div
-        className="absolute inset-0 pointer-events-none"
-        style={{
-          background:
-            'radial-gradient(ellipse 100% 100% at 50% 50%, transparent 50%, rgba(0, 0, 0, 0.4) 100%)',
-        }}
-      />
 
       {/* Grain */}
       <div
@@ -168,11 +160,7 @@ const AuthHeroScreen: React.FC<AuthHeroScreenProps> = ({
         <div
           className="pb-8 pt-6 -mx-6 px-6"
           style={{
-            background: 'rgba(8, 11, 16, 0.55)',
-            backdropFilter: 'blur(24px)',
-            WebkitBackdropFilter: 'blur(24px)',
-            borderTop: '1px solid rgba(255, 255, 255, 0.06)',
-            boxShadow: '0 -12px 40px rgba(0, 0, 0, 0.6)',
+            background: '#0A0E14',
           }}
         >
           <div className="auth-button-6 space-y-3">

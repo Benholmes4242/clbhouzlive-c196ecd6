@@ -68,20 +68,12 @@ const AuthBottomSheet: React.FC<AuthBottomSheetProps> = ({
             : "translate-y-full opacity-0"
         )}
         style={{
-          background: 'linear-gradient(180deg, #0A0E14 0%, #0C1119 100%)',
+          background: '#0C1119',
           backdropFilter: 'blur(28px)',
           WebkitBackdropFilter: 'blur(28px)',
           borderTop: '1px solid rgba(255, 255, 255, 0.06)',
-          boxShadow: '0 -12px 40px rgba(0, 0, 0, 0.6), 0 -2px 20px rgba(0, 0, 0, 0.3)',
         }}
       >
-        {/* Top edge highlight - subtle premium touch */}
-        <div 
-          className="absolute top-0 left-0 right-0 h-[2px] rounded-t-[32px] pointer-events-none"
-          style={{
-            background: 'linear-gradient(to bottom, rgba(255, 255, 255, 0.06), transparent)',
-          }}
-        />
         
         {/* Handle bar */}
         <div style={{ display: 'flex', justifyContent: 'center', padding: '10px 0 4px' }}>
