@@ -3,11 +3,13 @@ import {
   FONT,
   TAB,
   BG_1,
-  T60,
   T100,
-  T40,
+  T50,
+  T35,
+  AMBER,
+  GREEN,
+  RED,
   LINE,
-  LINE_2,
 } from './_shared/tokens';
 import type { FriendRivalryHydrated } from '@/lib/whs/types';
 import type { RivalryDimension } from '@/lib/whs/utils/useRivalryDimension';
@@ -66,6 +68,8 @@ interface Props {
   onCoursePick: (courseId: string) => void;
 }
 
+const TRACK = 'rgba(255,255,255,0.07)';
+
 export const CoursesPlayedSection: React.FC<Props> = ({
   row,
   dim,
@@ -75,16 +79,15 @@ export const CoursesPlayedSection: React.FC<Props> = ({
   if (courses.length === 0) return null;
 
   return (
-    <section style={{ padding: '24px 16px 8px' }}>
+    <section style={{ padding: '0 16px' }}>
       <div
         style={{
-          color: T60,
+          margin: '26px 2px 10px',
+          color: AMBER,
           fontSize: 11,
           fontWeight: 800,
-          letterSpacing: '0.14em',
+          letterSpacing: '0.16em',
           textTransform: 'uppercase',
-          borderTop: `0.5px solid ${LINE_2}`,
-          paddingTop: 12,
           fontFamily: FONT,
         }}
       >
@@ -92,72 +95,100 @@ export const CoursesPlayedSection: React.FC<Props> = ({
       </div>
       <div
         style={{
-          display: 'grid',
-          gridTemplateColumns: '1fr 1fr',
-          gap: 8,
-          marginTop: 12,
+          background: BG_1,
+          border: `0.5px solid ${LINE}`,
+          borderRadius: 16,
+          overflow: 'hidden',
         }}
       >
-        {courses.map((c) => (
-          <button
-            key={c.course_id}
-            type="button"
-            onClick={() => onCoursePick(c.course_id)}
-            style={{
-              textAlign: 'left',
-              padding: 14,
-              background: BG_1,
-              border: `1px solid ${LINE}`,
-              borderRadius: 12,
-              cursor: 'pointer',
-              color: T100,
-              fontFamily: FONT,
-            }}
-          >
-            <div
+        {courses.map((c, i) => {
+          const decided = c.ownerWins + c.rivalWins;
+          const fill =
+            decided > 0
+              ? Math.max(0.08, Math.min(0.92, c.ownerWins / decided))
+              : 0.5;
+          return (
+            <button
+              key={c.course_id}
+              type="button"
+              onClick={() => onCoursePick(c.course_id)}
               style={{
-                fontSize: 13,
-                fontWeight: 700,
-                lineHeight: 1.25,
-                display: '-webkit-box',
-                WebkitLineClamp: 2,
-                WebkitBoxOrient: 'vertical',
-                overflow: 'hidden',
+                display: 'grid',
+                width: '100%',
+                gridTemplateColumns: '1fr auto',
+                gap: 12,
+                alignItems: 'center',
+                padding: '11px 14px',
+                background: 'transparent',
+                border: 'none',
+                borderBottom:
+                  i < courses.length - 1 ? `0.5px solid ${LINE}` : 'none',
+                cursor: 'pointer',
+                textAlign: 'left',
+                fontFamily: FONT,
               }}
             >
-              {c.course_name}
-            </div>
-            <div
-              style={{
-                marginTop: 8,
-                display: 'flex',
-                alignItems: 'baseline',
-                gap: 6,
-                color: T100,
-                fontSize: 18,
-                fontWeight: 800,
-                ...TAB,
-              }}
-            >
-              <span>{c.ownerWins}</span>
-              <span style={{ color: T40, fontSize: 13, fontWeight: 600 }}>
-                —
-              </span>
-              <span>{c.rivalWins}</span>
-              <span
-                style={{
-                  marginLeft: 'auto',
-                  color: T60,
-                  fontSize: 11,
-                  fontWeight: 600,
-                  ...TAB,
-                }}
-              >
-                {c.rounds}rd{c.ties > 0 ? ` · ${c.ties}T` : ''}
-              </span>
-            </div>
-          </button>
-        ))}
+              <div style={{ minWidth: 0 }}>
+                <div
+                  style={{
+                    color: T100,
+                    fontSize: 13.5,
+                    fontWeight: 700,
+                    lineHeight: 1.2,
+                    overflow: 'hidden',
+                    textOverflow: 'ellipsis',
+                    whiteSpace: 'nowrap',
+                  }}
+                >
+                  {c.course_name}
+                </div>
+                <div
+                  style={{
+                    marginTop: 7,
+                    height: 3,
+                    borderRadius: 999,
+                    background: TRACK,
+                    overflow: 'hidden',
+                  }}
+                >
+                  <div
+                    style={{
+                      width: `${fill * 100}%`,
+                      height: '100%',
+                      background: GREEN,
+                    }}
+                  />
+                </div>
+              </div>
+              <div style={{ textAlign: 'right' }}>
+                <div
+                  style={{
+                    fontSize: 15,
+                    fontWeight: 800,
+                    ...TAB,
+                  }}
+                >
+                  <span style={{ color: GREEN }}>{c.ownerWins}</span>
+                  <span style={{ color: T35, margin: '0 4px' }}>–</span>
+                  <span style={{ color: c.rivalWins > 0 ? RED : T50 }}>
+                    {c.rivalWins}
+                  </span>
+                </div>
+                <div
+                  style={{
+                    marginTop: 2,
+                    color: T50,
+                    fontSize: 9.5,
+                    fontWeight: 600,
+                    ...TAB,
+                  }}
+                >
+                  {c.rounds} rds{c.ties > 0 ? ` · ${c.ties}T` : ''}
+                </div>
+              </div>
+            </button>
+          );
+        })}
       </div>
     </section>
   );

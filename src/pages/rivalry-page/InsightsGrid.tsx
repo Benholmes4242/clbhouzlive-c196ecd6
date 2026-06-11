@@ -1,20 +1,9 @@
 import React from 'react';
 import {
-  Sparkles,
-  TrendingUp,
-  TrendingDown,
-  Trophy,
-  Calendar,
-  type LucideIcon,
-} from 'lucide-react';
-import {
   FONT,
   TAB,
   BG_1,
-  T100,
-  T60,
-  T40,
-  T80,
+  T50,
   AMBER,
   GREEN,
   RED,
@@ -30,80 +19,78 @@ const toneColor: Record<Insight['tone'], string> = {
   positive: GREEN,
   negative: RED,
   amber: AMBER,
-  neutral: T80,
+  neutral: 'rgba(248,250,252,0.80)',
 };
-
-function iconFor(label: string): LucideIcon {
-  if (label === 'Your best margin') return TrendingUp;
-  if (label === 'You play best at') return Trophy;
-  if (label === 'Last meeting') return Calendar;
-  if (label.endsWith("'s best margin")) return TrendingDown;
-  return Sparkles;
-}
 
 export const InsightsGrid: React.FC<Props> = ({ insights }) => {
   if (insights.length === 0) return null;
 
   return (
-    <section style={{ padding: '24px 16px 8px' }}>
+    <section style={{ padding: '0 16px' }}>
       <div
         style={{
-          display: 'inline-flex',
+          display: 'flex',
           alignItems: 'center',
-          gap: 6,
-          color: T60,
-          fontSize: 11,
-          fontWeight: 800,
-          letterSpacing: '0.14em',
-          textTransform: 'uppercase',
-          fontFamily: FONT,
-          marginBottom: 12,
+          margin: '26px 2px 10px',
         }}
       >
-        <Sparkles size={12} strokeWidth={2.4} />
-        Did you know
+        <div
+          style={{
+            color: AMBER,
+            fontSize: 11,
+            fontWeight: 800,
+            letterSpacing: '0.16em',
+            textTransform: 'uppercase',
+            fontFamily: FONT,
+          }}
+        >
+          Did you know
+        </div>
       </div>
       <div
         style={{
-          display: 'grid',
-          gridTemplateColumns: '1fr 1fr',
+          display: 'flex',
           gap: 8,
+          overflowX: 'auto',
+          paddingBottom: 4,
+          marginRight: -16,
+          paddingRight: 16,
+          scrollbarWidth: 'none',
         }}
+        className="scrollbar-none"
       >
         {insights.map((insight, i) => {
-          const Icon = iconFor(insight.label);
           const color = toneColor[insight.tone];
+          const isLongText = insight.value.length > 8;
           return (
             <div
               key={i}
               style={{
-                padding: 14,
+                flexShrink: 0,
+                minWidth: 138,
                 background: BG_1,
-                border: `1px solid ${LINE}`,
-                borderRadius: 12,
+                border: `0.5px solid ${LINE}`,
+                borderRadius: 14,
+                padding: '12px 14px',
                 fontFamily: FONT,
               }}
             >
               <div
                 style={{
-                  display: 'inline-flex',
-                  alignItems: 'center',
-                  gap: 6,
-                  color: T60,
-                  fontSize: 10,
-                  fontWeight: 700,
-                  letterSpacing: '0.08em',
+                  color: T50,
+                  fontSize: 9,
+                  fontWeight: 800,
+                  letterSpacing: '0.10em',
                   textTransform: 'uppercase',
                 }}
               >
-                <Icon size={12} strokeWidth={2.4} color={color} />
                 {insight.label}
               </div>
               <div
                 style={{
                   marginTop: 6,
                   color,
-                  fontSize: 20,
+                  fontSize: isLongText ? 14 : 19,
                   fontWeight: 800,
                   lineHeight: 1.1,
                   ...TAB,
@@ -114,8 +101,8 @@ export const InsightsGrid: React.FC<Props> = ({ insights }) => {
               <div
                 style={{
                   marginTop: 2,
-                  color: T40,
-                  fontSize: 11,
+                  color: T50,
+                  fontSize: 10.5,
                   fontWeight: 500,
                 }}
               >

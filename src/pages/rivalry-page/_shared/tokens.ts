@@ -14,6 +14,11 @@ export const AMBER = '#F7931E';
 export const GOLD = '#FBBC2E';
 export const GREEN = '#059669';
 export const RED = '#9F1D1D';
+export const GREEN_DIM = 'rgba(16,185,129,0.16)';
+export const RED_DIM = 'rgba(248,113,113,0.14)';
+export const T35 = 'rgba(248,250,252,0.35)';
+export const T50 = 'rgba(248,250,252,0.50)';
+export const T70 = 'rgba(248,250,252,0.70)';
 
 export const FONT =
   'Geist, -apple-system, BlinkMacSystemFont, system-ui, sans-serif';

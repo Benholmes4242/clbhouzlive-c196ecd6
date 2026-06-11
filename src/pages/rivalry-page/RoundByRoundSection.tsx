@@ -2,9 +2,10 @@ import React, { useMemo, useState } from 'react';
 import { X } from 'lucide-react';
 import {
   FONT,
-  T60,
-  T80,
+  T50,
+  T70,
   T100,
+  BG_1,
   BG_2,
   LINE,
   LINE_2,
@@ -65,12 +66,25 @@ export const RoundByRoundSection: React.FC<Props> = ({
     return Array.from(m.entries()).map(([id, name]) => ({ id, name }));
   }, [sorted]);
 
-  return (
-    <section ref={scrollAnchor} style={{ padding: '24px 16px 32px' }}>
-      <SectionHeader label="Round-by-round" />
+  const showAllButton = !showAll && filtered.length > INITIAL_LIMIT;
 
-      {/* Filter chips */}
-      <div style={{ display: 'flex', gap: 8, marginTop: 12, flexWrap: 'wrap' }}>
+  return (
+    <section ref={scrollAnchor} style={{ padding: '0 16px 32px' }}>
+      <div
+        style={{
+          margin: '26px 2px 10px',
+          color: AMBER,
+          fontSize: 11,
+          fontWeight: 800,
+          letterSpacing: '0.16em',
+          textTransform: 'uppercase',
+          fontFamily: FONT,
+        }}
+      >
+        Round-by-round
+      </div>
+
+      <div style={{ display: 'flex', gap: 8, marginBottom: 12, flexWrap: 'wrap' }}>
         <Chip
           active={courseFilter === null}
           onClick={() => {
@@ -159,12 +173,11 @@ export const RoundByRoundSection: React.FC<Props> = ({
         </div>
       </div>
 
-      {/* Rows */}
       {visible.length === 0 ? (
         <div
           style={{
             padding: '32px 8px',
-            color: T60,
+            color: T50,
             fontSize: 13,
             textAlign: 'center',
             fontFamily: FONT,
@@ -175,10 +188,10 @@ export const RoundByRoundSection: React.FC<Props> = ({
       ) : (
         <div
           style={{
-            marginTop: 12,
-            display: 'flex',
-            flexDirection: 'column',
-            gap: 8,
+            background: BG_1,
+            border: `0.5px solid ${LINE}`,
+            borderRadius: 16,
+            overflow: 'hidden',
           }}
         >
           {visible.map((r, i) => (
@@ -188,52 +201,34 @@ export const RoundByRoundSection: React.FC<Props> = ({
               dim={dim}
               rivalFirstName={rivalFirstName}
               youLabel={youLabel}
+              showDivider={i < visible.length - 1 || showAllButton}
             />
           ))}
+          {showAllButton && (
+            <button
+              type="button"
+              onClick={() => setShowAll(true)}
+              style={{
+                display: 'block',
+                width: '100%',
+                padding: '13px 0',
+                background: 'transparent',
+                border: 'none',
+                color: T70,
+                fontSize: 12.5,
+                fontWeight: 700,
+                cursor: 'pointer',
+                fontFamily: FONT,
+              }}
+            >
+              Show all {filtered.length} rounds
+            </button>
+          )}
         </div>
-      )}
-
-      {!showAll && filtered.length > INITIAL_LIMIT && (
-        <button
-          type="button"
-          onClick={() => setShowAll(true)}
-          style={{
-            marginTop: 16,
-            width: '100%',
-            padding: 12,
-            background: 'transparent',
-            border: `1px solid ${LINE_2}`,
-            borderRadius: 10,
-            color: T100,
-            fontSize: 13,
-            fontWeight: 700,
-            cursor: 'pointer',
-            fontFamily: FONT,
-          }}
-        >
-          Show all {filtered.length} rounds
-        </button>
       )}
     </section>
   );
 };
-
-const SectionHeader: React.FC<{ label: string }> = ({ label }) => (
-  <div
-    style={{
-      color: T60,
-      fontSize: 11,
-      fontWeight: 800,
-      letterSpacing: '0.14em',
-      textTransform: 'uppercase',
-      borderTop: `0.5px solid ${LINE_2}`,
-      paddingTop: 12,
-      fontFamily: FONT,
-    }}
-  >
-    {label}
-  </div>
-);
 
 const Chip: React.FC<
   React.PropsWithChildren<{ active: boolean; onClick: () => void }>
@@ -246,7 +241,7 @@ const Chip: React.FC<
       background: active ? 'rgba(247,147,30,0.14)' : 'transparent',
       border: `1px solid ${active ? AMBER : LINE_2}`,
       borderRadius: 999,
-      color: active ? AMBER : T80,
+      color: active ? AMBER : T70,
       fontSize: 12,
       fontWeight: 700,
       letterSpacing: '0.04em',

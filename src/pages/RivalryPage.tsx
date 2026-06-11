@@ -359,6 +359,17 @@ const RivalryPage: React.FC = () => {
 
       {viewerId && !isLoading && row && (
         <>
+          <PageEyebrow
+            firstRoundDate={firstRoundDate}
+            totalRounds={
+              (row.shared_round_results?.length) ??
+              ((row.gross_record?.wins ?? 0) +
+                (row.gross_record?.losses ?? 0) +
+                (row.gross_record?.ties ?? 0))
+            }
+            titleLeft={isFriendView ? firstName(yourFullName) : 'You'}
+            rivalName={row.rival_name ?? 'Rival'}
+          />
           <HeroScoreboard
             rivalry={row}
             dim={dim}
@@ -370,6 +381,7 @@ const RivalryPage: React.FC = () => {
             currentStreak={currentStreak}
             ownerView={!isFriendView}
           />
+
 
           <div
             style={{
@@ -422,6 +434,74 @@ const RivalryPage: React.FC = () => {
     </PageRoot>
   );
 };
+
+const PageEyebrow: React.FC<{
+  firstRoundDate: string | null;
+  totalRounds: number;
+  titleLeft: string;
+  rivalName: string;
+}> = ({ firstRoundDate, totalRounds, titleLeft, rivalName }) => {
+  const since = firstRoundDate
+    ? new Date(firstRoundDate).toLocaleDateString('en-GB', {
+        month: 'short',
+        year: 'numeric',
+      }).toUpperCase()
+    : null;
+  return (
+    <div style={{ padding: '0 16px', marginBottom: 12 }}>
+      <div
+        style={{
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          marginBottom: 8,
+          gap: 12,
+        }}
+      >
+        <div
+          style={{
+            color: AMBER,
+            fontSize: 11,
+            fontWeight: 800,
+            letterSpacing: '0.14em',
+            textTransform: 'uppercase',
+            fontFamily: FONT,
+          }}
+        >
+          Rivalry
+        </div>
+        <div
+          style={{
+            color: 'rgba(248,250,252,0.50)',
+            fontSize: 10,
+            fontWeight: 800,
+            letterSpacing: '0.10em',
+            textTransform: 'uppercase',
+            fontFamily: FONT,
+            fontVariantNumeric: 'tabular-nums',
+            textAlign: 'right',
+          }}
+        >
+          {since ? `Since ${since} · ` : ''}
+          {totalRounds} {totalRounds === 1 ? 'Round' : 'Rounds'}
+        </div>
+      </div>
+      <div
+        style={{
+          color: T100,
+          fontSize: 26,
+          fontWeight: 900,
+          lineHeight: 1.1,
+          letterSpacing: '-0.01em',
+          fontFamily: FONT,
+        }}
+      >
+        {titleLeft} vs {rivalName}
+      </div>
+    </div>
+  );
+};
+
 
 const PrivacyBlockedView: React.FC = () => (
   <div

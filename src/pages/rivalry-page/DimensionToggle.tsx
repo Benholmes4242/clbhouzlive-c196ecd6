@@ -1,5 +1,5 @@
 import React from 'react';
-import { FONT, T60, BG_2, LINE, AMBER } from './_shared/tokens';
+import { FONT, T50, AMBER } from './_shared/tokens';
 import type { RivalryDimension } from '@/lib/whs/utils/useRivalryDimension';
 
 interface Props {
@@ -19,8 +19,7 @@ export const DimensionToggle: React.FC<Props> = ({ value, onChange }) => (
     style={{
       display: 'inline-flex',
       padding: 3,
-      background: BG_2,
-      border: `1px solid ${LINE}`,
+      background: 'rgba(255,255,255,0.06)',
       borderRadius: 999,
       gap: 2,
       fontFamily: FONT,
@@ -39,10 +38,10 @@ export const DimensionToggle: React.FC<Props> = ({ value, onChange }) => (
             padding: '6px 14px',
             borderRadius: 999,
             background: active ? AMBER : 'transparent',
-            color: active ? '#1A1300' : T60,
+            color: active ? '#1A1208' : T50,
             border: 'none',
             cursor: 'pointer',
-            fontSize: 11,
+            fontSize: 11.5,
             fontWeight: 800,
             letterSpacing: '0.06em',
             textTransform: 'uppercase',
@@ -56,3 +55,4 @@ export const DimensionToggle: React.FC<Props> = ({ value, onChange }) => (
     })}
   </div>
 );
+
