@@ -246,30 +246,53 @@ export default function EditProfile() {
 
   return (
     <div className="min-h-screen bg-[#F8FAFC] flex flex-col">
-      {/* Header — Activity layout */}
+      {/* Header — Activity layout. Onboarding swaps the back chevron for a
+          quiet "Skip for now" and changes the eyebrow / title copy. */}
       <div
-        className="flex items-end px-4 pb-4"
+        className="flex items-end justify-between px-4 pb-4"
         style={{ paddingTop: 'max(env(safe-area-inset-top, 0px), 47px)' }}
       >
         <div className="flex items-center gap-3">
-          <button
-            onClick={() => navigate(-1)}
-            style={{ width: 36, height: 36, borderRadius: '50%', background: 'rgba(15,23,42,0.05)', border: '0.5px solid rgba(15,23,42,0.10)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, cursor: 'pointer' }}
-            aria-label="Back"
-          >
-            <ChevronLeft size={20} strokeWidth={2.5} style={{ color: INK_55 }} />
-          </button>
+          {!isNewUser.current && (
+            <button
+              onClick={() => navigate(-1)}
+              style={{ width: 36, height: 36, borderRadius: '50%', background: 'rgba(15,23,42,0.05)', border: '0.5px solid rgba(15,23,42,0.10)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, cursor: 'pointer' }}
+              aria-label="Back"
+            >
+              <ChevronLeft size={20} strokeWidth={2.5} style={{ color: INK_55 }} />
+            </button>
+          )}
           <div>
             <div style={{ marginBottom: 6 }}>
               <span style={{ fontFamily: GEIST, fontSize: 9, fontWeight: 800, color: INK_55, letterSpacing: '0.16em', textTransform: 'uppercase' }}>
-                Profile
+                {isNewUser.current ? 'Welcome' : 'Profile'}
               </span>
             </div>
             <h1 style={{ fontFamily: GEIST, fontSize: 34, fontWeight: 800, color: INK, letterSpacing: '-0.025em', lineHeight: 1, margin: 0 }}>
-              Edit Profile
+              {isNewUser.current ? 'Set up your profile' : 'Edit Profile'}
             </h1>
           </div>
         </div>
+        {isNewUser.current && (
+          <button
+            onClick={skipOnboarding}
+            disabled={isSkipping}
+            style={{
+              fontFamily: GEIST,
+              fontSize: 13,
+              fontWeight: 700,
+              color: INK_55,
+              background: 'transparent',
+              border: 'none',
+              cursor: isSkipping ? 'default' : 'pointer',
+              padding: '8px 4px',
+              opacity: isSkipping ? 0.5 : 1,
+            }}
+            aria-label="Skip onboarding"
+          >
+            {isSkipping ? 'Skipping…' : 'Skip for now'}
+          </button>
+        )}
       </div>
 
       <div
