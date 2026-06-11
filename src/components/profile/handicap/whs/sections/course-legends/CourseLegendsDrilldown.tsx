@@ -15,7 +15,7 @@ import type { LegendCategory, LegendWindow } from '@/lib/gam/types';
 import type { CourseSelection } from './types';
 
 import { DrilldownHeader } from './drilldown/DrilldownHeader';
-import { ChampionsCoursePulsePanel } from './drilldown/ChampionsCoursePulsePanel';
+
 import { CrownCabinet } from './drilldown/CrownCabinet';
 import { ChampionsDuelCard } from './drilldown/ChampionsDuelCard';
 import { ChampionsUnclaimedCard } from './drilldown/ChampionsUnclaimedCard';
