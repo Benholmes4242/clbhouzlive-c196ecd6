@@ -676,10 +676,7 @@ function CommentsSheet({
             </div>
 
             {/* Header */}
-            <div
-              className="flex items-end justify-between px-4 pt-3 pb-0 shrink-0"
-              style={{ borderBottom: '0.5px solid rgba(15,23,42,0.07)' }}
-            >
+            <div className="flex items-end justify-between px-4 pt-3 pb-0 shrink-0">
               {/* Left: tabs with inline counts */}
               <div className="flex items-end gap-6">
                 {(['comments', 'likes'] as const).map((tab) => {
@@ -694,7 +691,7 @@ function CommentsSheet({
                         setActiveTab(tab);
                         scrollRef.current?.scrollTo({ top: 0 });
                       }}
-                      className="relative flex items-baseline gap-1.5 pt-[10px] pb-[14px] min-h-[44px] bg-transparent border-0 cursor-pointer"
+                      className="flex items-baseline gap-1.5 pt-[10px] pb-[10px] min-h-[44px] bg-transparent border-0 cursor-pointer"
                     >
                       <span
                         className="whitespace-nowrap transition-colors duration-200"
@@ -704,6 +701,8 @@ function CommentsSheet({
                           letterSpacing: '-0.01em',
                           color: isActive ? INK : INK_SUBTLE,
                           lineHeight: 1.2,
+                          paddingBottom: 4,
+                          borderBottom: isActive ? '1.5px solid #0A0E14' : '1.5px solid transparent',
                         }}
                       >
                         {label}
@@ -721,19 +720,6 @@ function CommentsSheet({
                           {count}
                         </span>
                       )}
-                      {/* Amber underline — 24px fixed, centered */}
-                      <div
-                        className="absolute bottom-0 transition-opacity duration-200"
-                        style={{
-                          left: '50%',
-                          transform: 'translateX(-50%)',
-                          width: 24,
-                          height: 2,
-                          background: AMBER,
-                          borderRadius: 1,
-                          opacity: isActive ? 1 : 0,
-                        }}
-                      />
                     </button>
                   );
                 })}
