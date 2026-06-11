@@ -358,7 +358,7 @@ export default function EditProfile() {
               <div className="px-4 pt-4 pb-3" style={{ borderBottom: '0.5px solid rgba(15,23,42,0.07)' }}>
                 <div className="flex justify-between items-baseline">
                   <div style={{ marginBottom: 8 }}>
-                    <SectionEyebrow label="Display Name" required={isNewUser.current} />
+                    <SectionEyebrow label="Display Name" />
                   </div>
                   <span className="text-[11px] text-muted-foreground/60">
                     {form.displayName.length}/{DISPLAY_NAME_MAX}
