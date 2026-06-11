@@ -215,6 +215,15 @@ const AuthHeroScreen: React.FC<AuthHeroScreenProps> = ({
               <p className="text-red-400 text-[13px] text-center">{emailError}</p>
             )}
 
+            {errorMessage && !hasEditedSinceError && (
+              <p
+                key={errorNonce}
+                className="text-red-400 text-[13px] text-center auth-error-fade"
+              >
+                {errorMessage}
+              </p>
+            )}
+
             <button
               onClick={handleContinue}
               disabled={!canContinue}
