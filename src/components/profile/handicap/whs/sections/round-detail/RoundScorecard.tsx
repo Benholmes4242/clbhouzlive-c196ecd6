@@ -9,8 +9,6 @@ interface Props {
 }
 
 const FONT_GEIST = 'Geist, system-ui, -apple-system, BlinkMacSystemFont, sans-serif';
-const FONT_MONO = "Geist, system-ui, -apple-system, BlinkMacSystemFont, sans-serif";
-const AMBER = '#F7931E';
 
 const NineGrid: React.FC<{ label: string; holes: WhsScoreHole[]; isLast?: boolean }> = ({ label, holes, isLast }) => {
   const total = holes.reduce(
@@ -59,7 +57,7 @@ const NineGrid: React.FC<{ label: string; holes: WhsScoreHole[]; isLast?: boolea
               fontSize: 13,
               fontWeight: 600,
               color: palette.numColor,
-              fontFamily: FONT_MONO,
+              fontFamily: FONT_GEIST,
               letterSpacing: '-0.02em',
             }}
           >
@@ -103,7 +101,7 @@ export const RoundScorecard: React.FC<Props> = ({ holes, isNineHole }) => {
             fontSize: 10,
             fontWeight: 700,
             letterSpacing: '0.18em',
-            color: AMBER,
+            color: '#FFFFFF',
             textTransform: 'uppercase',
           }}
         >

@@ -11,7 +11,7 @@ const INK = 'var(--hcp-t-100)';
 const INK_55 = 'var(--hcp-t-60)';
 const INK_40 = 'var(--hcp-t-40)';
 const HAIRLINE = 'var(--hcp-line-2)';
-const UNDER = '#FFFFFF';
+const UNDER = 'var(--hcp-gold-text)';
 const OVER = '#f87171';
 const PAR_RING = 'rgba(255,255,255,0.18)';
 

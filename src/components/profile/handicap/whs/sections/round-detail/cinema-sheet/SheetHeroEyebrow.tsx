@@ -8,7 +8,7 @@ import type { WhsFriendActivityWithImage } from '@/lib/whs/types';
 
 const FONT_GEIST = 'Geist, system-ui, -apple-system, BlinkMacSystemFont, sans-serif';
 
-const AMBER = '#F7931E';
+
 
 /** Shared between both variants. Returns e.g. "SUNDAY, 3 MAY". */
 function formatRoundDate(iso: string): string {
@@ -21,7 +21,7 @@ function formatRoundDate(iso: string): string {
 const eyebrowLabelStyle: React.CSSProperties = {
   fontSize: 11,
   fontWeight: 700,
-  color: AMBER,
+  color: '#FFFFFF',
   letterSpacing: '0.18em',
   textTransform: 'uppercase',
 };

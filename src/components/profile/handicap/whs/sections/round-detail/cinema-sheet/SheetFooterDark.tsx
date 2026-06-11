@@ -11,7 +11,7 @@ interface Props {
 }
 
 const FONT = 'Geist, system-ui, -apple-system, BlinkMacSystemFont, sans-serif';
-const AMBER = '#F7931E';
+
 
 export const SheetFooterDark: React.FC<Props> = ({
   currentIndex,
@@ -69,7 +69,8 @@ export const SheetFooterDark: React.FC<Props> = ({
                 fontSize: 16,
                 fontWeight: 800,
                 color: 'var(--hcp-t-100)',
-                letterSpacing: '-0.01em',
+                letterSpacing: '-0.02em',
+                fontVariantNumeric: 'tabular-nums',
               }}
             >
               {currentIndex!.toFixed(1)}
@@ -98,9 +99,9 @@ export const SheetFooterDark: React.FC<Props> = ({
           style={{
             padding: '9px 16px',
             borderRadius: 999,
-            background: AMBER,
+            background: '#FFFFFF',
             border: 'none',
-            color: '#1A1300',
+            color: '#0F172A',
             fontWeight: 800,
             fontSize: 12,
             display: 'inline-flex',
