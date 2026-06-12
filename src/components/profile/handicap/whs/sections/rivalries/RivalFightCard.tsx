@@ -1,7 +1,7 @@
 import React, { useMemo } from 'react';
 import { Star } from 'lucide-react';
 import { reformatFriendName } from '@/lib/whs/utils/nameFormat';
-import { initials } from '@/lib/whs/utils/initials';
+import { initials, firstName } from '@/lib/whs/utils/initials';
 import { pickAvatarSrc } from '@/lib/whs/utils/avatarSrc';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { fmtHcp } from '@/lib/whs/format';
