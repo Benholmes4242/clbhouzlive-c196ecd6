@@ -74,6 +74,17 @@ const OtpSheetContent: React.FC<OtpSheetContentProps> = ({
 
     // Paste: multi-char input – distribute across boxes from current index
     if (cleaned.length > 1) {
+      // Overwrite guard: typing into a filled box yields "<old><new>" — treat as retype
+      if (cleaned.length === 2 && cleaned[0] === digits[i]) {
+        setDigit(i, cleaned[1]);
+        if (i < BOX_COUNT - 1) {
+          requestAnimationFrame(() => inputsRef.current[i + 1]?.focus());
+        }
+        const next = [...digits];
+        next[i] = cleaned[1];
+        tryAutoSubmit(next);
+        return;
+      }
       const chars = cleaned.slice(0, BOX_COUNT - i).split('');
       setDigits((prev) => {
         const next = [...prev];
@@ -93,9 +104,10 @@ const OtpSheetContent: React.FC<OtpSheetContentProps> = ({
     }
 
     // Single char
+    const digit = cleaned.slice(-1);
     const next = [...digits];
-    next[i] = cleaned;
-    setDigits(next);
+    next[i] = digit;
+    setDigit(i, digit);
     if (i < BOX_COUNT - 1) {
       inputsRef.current[i + 1]?.focus();
     }
@@ -172,7 +184,7 @@ const OtpSheetContent: React.FC<OtpSheetContentProps> = ({
             inputMode="numeric"
             // eslint-disable-next-line jsx-a11y/no-autofocus
             autoComplete={i === 0 ? 'one-time-code' : 'off'}
-            maxLength={1}
+            
             disabled={submitting}
             aria-label={`Digit ${i + 1}`}
             className="text-center focus:outline-none transition-colors"
