@@ -126,7 +126,7 @@ export const EchoPageComposer = forwardRef<HTMLTextAreaElement, EchoPageComposer
 
         {/* Pill container — reactive amber ring when listening */}
         <div
-          className="flex items-center gap-2 rounded-full pl-4 pr-2 py-2 transition-shadow duration-150"
+          className="flex items-end gap-2 rounded-[22px] pl-4 pr-2 py-2 transition-shadow duration-150"
           style={{
             background: '#ffffff',
             border: '1px solid rgba(15,23,42,0.10)',
@@ -137,9 +137,9 @@ export const EchoPageComposer = forwardRef<HTMLTextAreaElement, EchoPageComposer
                 : 'none',
           }}
         >
-          <input
+          <textarea
             ref={ref}
-            type="text"
+            rows={1}
             value={value}
             onChange={handleChange}
             onKeyDown={handleKeyDown}
@@ -149,8 +149,8 @@ export const EchoPageComposer = forwardRef<HTMLTextAreaElement, EchoPageComposer
             disabled={disabled}
             aria-label="Type a message to Echo"
             maxLength={MAX_INPUT_LENGTH}
-            className="flex-1 bg-transparent outline-none text-[14px] disabled:cursor-not-allowed placeholder:text-[#94A3B8]"
-            style={{ color: '#0F172A', caretColor: '#F7931E' }}
+            className="flex-1 bg-transparent outline-none text-[14px] disabled:cursor-not-allowed placeholder:text-[#94A3B8] resize-none leading-snug"
+            style={{ color: '#0F172A', caretColor: '#F7931E', maxHeight: 120, overflowY: 'auto' }}
           />
 
           {/* Send/Stop/Mic button */}
