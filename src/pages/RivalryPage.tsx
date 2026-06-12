@@ -62,6 +62,34 @@ function useOwnerRivalry(
   return { row, isLoading, error };
 }
 
+function useAdHocRivalry(
+  viewerId: string | undefined,
+  rivalParamId: string | undefined,
+  enabled: boolean,
+) {
+  return useQuery({
+    queryKey: ['rivalry', 'ad-hoc', viewerId, rivalParamId],
+    enabled: enabled && !!viewerId && !!rivalParamId,
+    staleTime: 30_000,
+    queryFn: () => fetchPrimaryRivalryWithOwner(viewerId!, rivalParamId!),
+  });
+}
+
+function useRivalProfileExists(userId: string | undefined, enabled: boolean) {
+  return useQuery({
+    queryKey: ['rival-profile-exists', userId],
+    enabled: enabled && !!userId,
+    staleTime: 5 * 60_000,
+    queryFn: async () => {
+      const { data } = await supabase
+        .from('user_profiles')
+        .select('id')
+        .eq('id', userId!)
+        .maybeSingle();
+      return !!data;
+    },
+  });
+
 function useFriendViewRivalry(
   viewerId: string | undefined,
   friendId: string | undefined,
