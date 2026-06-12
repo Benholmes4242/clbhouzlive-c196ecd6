@@ -374,26 +374,71 @@ export const ChampionsDuelCard: React.FC<ChampionsDuelCardProps> = ({
         </div>
       </div>
 
-      {/* Tension bar */}
-      {showBar && (
-        <div
-          style={{
-            marginTop: 12,
-            height: 5,
-            borderRadius: 999,
-            background: 'var(--hcp-tint-1)',
-            overflow: 'hidden',
-          }}
-        >
+      {/* Chase track: champion at the finish, chaser travelling toward them */}
+      {showTrack && (
+        <div style={{ position: 'relative', height: 30, marginTop: 11 }}>
+          {/* rail */}
           <div
             style={{
-              width: `${fill * 100}%`,
-              height: '100%',
+              position: 'absolute',
+              left: 0,
+              right: 0,
+              top: '50%',
+              height: 4,
+              transform: 'translateY(-50%)',
               borderRadius: 999,
-              background: defending
-                ? 'linear-gradient(90deg, #FBBC2E, #F7931E)'
-                : 'var(--hcp-bar-neutral)',
-              transition: 'width 300ms ease',
+              background: 'var(--hcp-bar-neutral)',
+            }}
+          />
+          {/* progress fill behind the chaser */}
+          <div
+            style={{
+              position: 'absolute',
+              left: 0,
+              top: '50%',
+              height: 4,
+              width: `${pos * 100}%`,
+              transform: 'translateY(-50%)',
+              borderRadius: 999,
+              background: 'linear-gradient(90deg, #FBBC2E, #F7931E)',
+              transition: 'width 400ms cubic-bezier(.2,.8,.2,1)',
+            }}
+          />
+          {/* quarter notches */}
+          {[0.25, 0.5, 0.75].map((p) => (
+            <div
+              key={p}
+              style={{
+                position: 'absolute',
+                left: `${p * 100}%`,
+                top: '50%',
+                width: 1,
+                height: 8,
+                transform: 'translate(-50%,-50%)',
+                background: 'var(--hcp-line)',
+              }}
+            />
+          ))}
+          {/* chaser mini-avatar */}
+          <TrackFace
+            entry={trackChaser}
+            style={{
+              position: 'absolute',
+              left: `calc(${pos * 100}% - 11px)`,
+              top: '50%',
+              transform: 'translateY(-50%)',
+              transition: 'left 400ms cubic-bezier(.2,.8,.2,1)',
+            }}
+          />
+          {/* champion mini-avatar at the finish, crowned */}
+          <TrackFace
+            entry={trackChampion}
+            crowned
+            style={{
+              position: 'absolute',
+              right: -2,
+              top: '50%',
+              transform: 'translateY(-50%)',
             }}
           />
         </div>
@@ -402,7 +447,7 @@ export const ChampionsDuelCard: React.FC<ChampionsDuelCardProps> = ({
       {/* Line */}
       <div
         style={{
-          marginTop: showBar ? 8 : 12,
+          marginTop: showTrack ? 8 : 12,
           fontSize: 11,
           fontWeight: 600,
           color: defending ? DEEP_AMBER : INK_55,
