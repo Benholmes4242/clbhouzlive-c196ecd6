@@ -33,9 +33,8 @@ export const CrownStrip: React.FC<Props> = ({ crowns }) => (
 
 const CrownCell: React.FC<{ crown: CrownInfo }> = ({ crown }) => {
   const { holder, label, you, them, compareKind } = crown;
-  const isYou  = holder === 'you';
-  const isThem = holder === 'them';
-  const color  = isYou ? GOLD : isThem ? DIM : EVEN;
+  const isEven = holder === 'even';
+  const color  = isEven ? EVEN : GOLD;
 
   let valueText: string;
   if (holder === 'even') {
@@ -70,14 +69,14 @@ const CrownCell: React.FC<{ crown: CrownInfo }> = ({ crown }) => {
           color,
         }}
       >
-        {isYou && <CrownIcon size={9} color={GOLD} />}
+        {!isEven && <CrownIcon size={9} color={GOLD} />}
         <span>{label}</span>
       </div>
       <div
         style={{
           fontSize: 12,
           fontWeight: 700,
-          color: isYou ? GOLD : 'rgba(255,255,255,0.78)',
+          color,
           fontVariantNumeric: 'tabular-nums',
           fontFeatureSettings: '"kern" 1, "liga" 1',
           letterSpacing: '-0.01em',
