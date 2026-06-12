@@ -155,7 +155,7 @@ export const RoundByRoundSection: React.FC<Props> = ({
                     padding: '8px 10px',
                     background:
                       courseFilter === opt.id
-                        ? 'rgba(247,147,30,0.12)'
+                        ? 'rgba(255,255,255,0.12)'
                         : 'transparent',
                     border: 'none',
                     color: T100,
