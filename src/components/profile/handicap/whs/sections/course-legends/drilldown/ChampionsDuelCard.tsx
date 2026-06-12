@@ -168,7 +168,7 @@ export const ChampionsDuelCard: React.FC<ChampionsDuelCardProps> = ({
     right = selfRow;
   }
 
-  const showBar = !standsAlone && selfOnBoard;
+  // (legacy showBar removed — chase track uses showTrack below)
   const leftValue = champion?.value ?? 0;
   const rightValue = right?.value ?? 0;
 
