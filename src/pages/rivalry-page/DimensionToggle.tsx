@@ -1,5 +1,5 @@
 import React from 'react';
-import { FONT, T50, AMBER } from './_shared/tokens';
+import { FONT, T50 } from './_shared/tokens';
 import type { RivalryDimension } from '@/lib/whs/utils/useRivalryDimension';
 
 interface Props {
@@ -37,7 +37,7 @@ export const DimensionToggle: React.FC<Props> = ({ value, onChange }) => (
           style={{
             padding: '6px 14px',
             borderRadius: 999,
-            background: active ? AMBER : 'transparent',
+            background: active ? '#FFFFFF' : 'transparent',
             color: active ? '#1A1208' : T50,
             border: 'none',
             cursor: 'pointer',

@@ -247,7 +247,6 @@ export const RivalFightCard: React.FC<Props> = ({
           src={pickAvatarSrc(rivalry.rival_thumbnail_url, rivalry.rival_profile_photo_url)}
           alt={rivalDisplayName}
           fallback={initials(rivalDisplayName)}
-          hairlineRing
         />
 
         <div style={{ minWidth: 0, flex: 1 }}>

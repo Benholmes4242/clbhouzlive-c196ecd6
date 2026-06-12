@@ -114,9 +114,7 @@ export const HeroPortrait: React.FC<HeroPortraitProps> = ({
             height: 100,
             borderRadius: 22,
             objectFit: 'cover',
-            border: '1px solid rgba(247,147,30,0.45)',
-            boxShadow:
-              '0 8px 24px rgba(0,0,0,0.45), 0 0 0 4px rgba(247,147,30,0.08)',
+            boxShadow: '0 8px 24px rgba(0,0,0,0.45)',
             zIndex: 1,
           }}
         />

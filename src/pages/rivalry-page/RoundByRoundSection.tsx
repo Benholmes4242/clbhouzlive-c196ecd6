@@ -9,7 +9,7 @@ import {
   BG_2,
   LINE,
   LINE_2,
-  AMBER,
+  
 } from './_shared/tokens';
 import { RoundCard } from './RoundCard';
 import type { FriendRivalryHydrated } from '@/lib/whs/types';
@@ -73,7 +73,7 @@ export const RoundByRoundSection: React.FC<Props> = ({
       <div
         style={{
           margin: '26px 2px 10px',
-          color: AMBER,
+          color: '#FFFFFF',
           fontSize: 11,
           fontWeight: 800,
           letterSpacing: '0.16em',
@@ -155,7 +155,7 @@ export const RoundByRoundSection: React.FC<Props> = ({
                     padding: '8px 10px',
                     background:
                       courseFilter === opt.id
-                        ? 'rgba(247,147,30,0.12)'
+                        ? 'rgba(255,255,255,0.12)'
                         : 'transparent',
                     border: 'none',
                     color: T100,
@@ -238,10 +238,10 @@ const Chip: React.FC<
     onClick={onClick}
     style={{
       padding: '6px 12px',
-      background: active ? 'rgba(247,147,30,0.14)' : 'transparent',
-      border: `1px solid ${active ? AMBER : LINE_2}`,
+      background: active ? 'rgba(255,255,255,0.12)' : 'transparent',
+      border: `1px solid ${active ? '#FFFFFF' : LINE_2}`,
       borderRadius: 999,
-      color: active ? AMBER : T70,
+      color: active ? '#FFFFFF' : T70,
       fontSize: 12,
       fontWeight: 700,
       letterSpacing: '0.04em',

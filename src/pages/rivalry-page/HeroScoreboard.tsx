@@ -11,7 +11,7 @@ import {
   GOLD,
   GREEN,
   RED,
-  AMBER,
+  
   LINE_2,
 } from './_shared/tokens';
 import { firstName } from './_shared/helpers';
@@ -58,7 +58,7 @@ export const HeroScoreboard: React.FC<Props> = ({
   const youLead = wins > losses;
   const themLead = losses > wins;
   const gradient = youLead
-    ? 'linear-gradient(180deg, rgba(247,147,30,0.08) 0%, rgba(247,147,30,0.02) 50%, rgba(15,23,42,0.6) 100%)'
+    ? 'linear-gradient(180deg, rgba(255,255,255,0.06) 0%, rgba(255,255,255,0.02) 50%, rgba(15,23,42,0.6) 100%)'
     : themLead
       ? 'linear-gradient(180deg, rgba(159,29,29,0.10) 0%, rgba(159,29,29,0.02) 50%, rgba(15,23,42,0.6) 100%)'
       : 'linear-gradient(180deg, rgba(255,255,255,0.04) 0%, rgba(255,255,255,0.01) 100%)';
@@ -86,7 +86,7 @@ export const HeroScoreboard: React.FC<Props> = ({
           position: 'relative',
           background: BG_1,
           backgroundImage: gradient,
-          border: `1px solid rgba(247,147,30,0.20)`,
+          border: `1px solid rgba(255,255,255,0.12)`,
           borderRadius: 16,
           overflow: 'hidden',
         }}
@@ -106,7 +106,7 @@ export const HeroScoreboard: React.FC<Props> = ({
             avatarUrl={yourAvatarUrl}
             fallbackChar={(leftLabel[0] ?? '?').toUpperCase()}
             label={leftLabel.toUpperCase()}
-            labelColor={AMBER}
+            labelColor={T100}
             handicap={yourHandicap}
             winPct={yourPct}
             isSelf
@@ -230,7 +230,7 @@ const SideBlock: React.FC<SideBlockProps> = ({
     style={{
       display: 'flex',
       flexDirection: 'column',
-      alignItems: alignRight ? 'flex-end' : 'flex-start',
+      alignItems: 'center',
       gap: 8,
     }}
   >
@@ -242,9 +242,9 @@ const SideBlock: React.FC<SideBlockProps> = ({
         background: avatarUrl
           ? `url(${avatarUrl}) center/cover`
           : 'rgba(255,255,255,0.06)',
-        border: isSelf
-          ? `2px solid ${AMBER}`
-          : `1px solid ${LINE_2}`,
+      border: isSelf
+        ? `2px solid #FFFFFF`
+        : `1px solid ${LINE_2}`,
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',

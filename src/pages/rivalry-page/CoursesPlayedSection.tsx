@@ -6,7 +6,7 @@ import {
   T100,
   T50,
   T35,
-  AMBER,
+  
   GREEN,
   RED,
   LINE,
@@ -83,7 +83,7 @@ export const CoursesPlayedSection: React.FC<Props> = ({
       <div
         style={{
           margin: '26px 2px 10px',
-          color: AMBER,
+          color: '#FFFFFF',
           fontSize: 11,
           fontWeight: 800,
           letterSpacing: '0.16em',
