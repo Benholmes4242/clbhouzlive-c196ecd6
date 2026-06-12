@@ -9,7 +9,7 @@ import {
   BG_2,
   LINE,
   LINE_2,
-  AMBER,
+  
 } from './_shared/tokens';
 import { RoundCard } from './RoundCard';
 import type { FriendRivalryHydrated } from '@/lib/whs/types';
