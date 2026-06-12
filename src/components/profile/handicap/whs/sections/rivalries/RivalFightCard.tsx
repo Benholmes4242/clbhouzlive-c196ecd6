@@ -267,7 +267,7 @@ export const RivalFightCard: React.FC<Props> = ({
               marginTop: 2,
             }}
           >
-            Hcp {fmtHcp(rivalry.rival_handicap)} · {rivalry.shared_rounds_count} rounds
+            HCP {fmtHcp(rivalry.rival_handicap)} · {rivalry.shared_rounds_count} rounds
           </div>
         </div>
 
