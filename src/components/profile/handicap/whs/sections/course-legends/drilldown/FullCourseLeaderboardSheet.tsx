@@ -109,6 +109,8 @@ export const FullCourseLeaderboardSheet: React.FC<Props> = ({
   const standsAlone = activeRows.length === 1;
   const selfRank = selfRow?.rank ?? null;
 
+  const runnerUp = activeRows.find((r) => !r.isSelf) ?? null;
+
   // Rows in the scrollable list = everything except the pinned champion.
   const listRows = activeRows.slice(1);
 
@@ -154,9 +156,14 @@ export const FullCourseLeaderboardSheet: React.FC<Props> = ({
   const eyebrow = `LEADERBOARD · ${windowLabel}`;
 
   // Chase line + status pill
+  const opponentValue = defending
+    ? (runnerUp?.value ?? champion.value)
+    : (selfRow?.value ?? champion.value);
+  const chaseStandsAlone = defending ? !runnerUp : standsAlone;
+
   const chaseLine = champion
     ? selfRow || standsAlone
-      ? duelLine(activeCategory, champion.value, (selfRow ?? champion).value, defending, standsAlone, (champion.name ?? '').split(' ')[0])
+      ? duelLine(activeCategory, champion.value, opponentValue, defending, chaseStandsAlone, (champion.name ?? '').split(' ')[0])
       : 'Not on the board yet'
     : '';
 
@@ -195,6 +202,7 @@ export const FullCourseLeaderboardSheet: React.FC<Props> = ({
           eyebrow={eyebrow}
           title={<span id="course-legends-full-sheet-title">{courseName}</span>}
           onClose={onClose}
+          borderBottom={false}
         />
 
         {/* Chase line + status pill (replaces the old "Gross Record · N entries" sub) */}
