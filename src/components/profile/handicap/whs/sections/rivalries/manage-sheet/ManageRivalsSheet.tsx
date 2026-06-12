@@ -73,17 +73,24 @@ export const ManageRivalsSheet: React.FC<Props> = ({ userId, open, onClose }) =>
     return rows.filter((r) => r.friend_name.toLowerCase().includes(q));
   }, [leaderboard, currentIdentifiers, query]);
 
-  const busy = upsert.isPending || remove.isPending;
+  const busy = upsert.isPending || remove.isPending || dismiss.isPending || clearDismissal.isPending;
+
+  const identityOf = (
+    friend_user_id: string | null,
+    friend_row_id: string | null,
+  ) =>
+    friend_user_id
+      ? { rival_user_id: friend_user_id, rival_friend_row_id: null }
+      : { rival_user_id: null, rival_friend_row_id: friend_row_id };
 
   const handleAdd = async (
     friend_user_id: string | null,
     friend_row_id: string | null,
   ) => {
     const slotIndex = nextAvailableSlot(rivalries);
-    const identity = friend_user_id
-      ? { rival_user_id: friend_user_id, rival_friend_row_id: null }
-      : { rival_user_id: null, rival_friend_row_id: friend_row_id };
+    const identity = identityOf(friend_user_id, friend_row_id);
     try {
+      await clearDismissal.mutateAsync({ userId, identity });
       await upsert.mutateAsync({ userId, slotIndex, ...identity });
       toast.success('Rival pinned');
     } catch (e: any) {
@@ -92,10 +99,9 @@ export const ManageRivalsSheet: React.FC<Props> = ({ userId, open, onClose }) =>
   };
 
   const handlePinAuto = async (rivalry: FriendRivalryHydrated) => {
-    const identity = rivalry.rival_user_id
-      ? { rival_user_id: rivalry.rival_user_id, rival_friend_row_id: null }
-      : { rival_user_id: null, rival_friend_row_id: rivalry.rival_friend_row_id };
+    const identity = identityOf(rivalry.rival_user_id, rivalry.rival_friend_row_id);
     try {
+      await clearDismissal.mutateAsync({ userId, identity });
       await upsert.mutateAsync({
         userId,
         slotIndex: rivalry.slot_index,
@@ -104,6 +110,16 @@ export const ManageRivalsSheet: React.FC<Props> = ({ userId, open, onClose }) =>
       toast.success(`${firstName(rivalry.rival_name ?? 'Rival')} pinned`);
     } catch (e: any) {
       toast.error(e?.message ?? 'Could not pin rival');
+    }
+  };
+
+  const handleDismissAuto = async (rivalry: FriendRivalryHydrated) => {
+    const identity = identityOf(rivalry.rival_user_id, rivalry.rival_friend_row_id);
+    try {
+      await dismiss.mutateAsync({ userId, identity });
+      toast.success(`${firstName(rivalry.rival_name ?? 'Rival')} won't be suggested again`);
+    } catch (e: any) {
+      toast.error(e?.message ?? 'Could not dismiss');
     }
   };
 
