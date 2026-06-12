@@ -118,7 +118,6 @@ const FriendViewRivalries: React.FC<{
     [ownerLeaderboard],
   );
 
-  const primary = data?.primary ?? null;
   const secondary = data?.secondary ?? [];
 
   const all = useMemo(() => {
