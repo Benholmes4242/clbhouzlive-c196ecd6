@@ -114,6 +114,27 @@ export const AutoPickedRow: React.FC<Props> = ({ rivalry, onPin, onDismiss, busy
       <Pin size={11} strokeWidth={2.4} />
       PIN
     </button>
+    <button
+      onClick={onDismiss}
+      disabled={busy}
+      aria-label={`Stop suggesting ${firstName(rivalry.rival_name ?? 'rival')}`}
+      style={{
+        width: 32,
+        height: 32,
+        marginLeft: 4,
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        background: 'transparent',
+        border: 'none',
+        borderRadius: 8,
+        cursor: busy ? 'wait' : 'pointer',
+        color: 'var(--hcp-t-60)',
+        opacity: busy ? 0.4 : 1,
+      }}
+    >
+      <X size={16} strokeWidth={2.2} />
+    </button>
   </div>
 );
 
