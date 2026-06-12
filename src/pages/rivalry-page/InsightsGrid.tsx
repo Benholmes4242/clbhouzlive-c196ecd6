@@ -18,7 +18,7 @@ interface Props {
 const toneColor: Record<Insight['tone'], string> = {
   positive: GREEN,
   negative: RED,
-  amber: AMBER,
+  amber: '#FFFFFF',
   neutral: 'rgba(248,250,252,0.80)',
 };
 
@@ -52,6 +52,7 @@ export const InsightsGrid: React.FC<Props> = ({ insights }) => {
           display: 'flex',
           gap: 8,
           overflowX: 'auto',
+          scrollSnapType: 'x mandatory',
           paddingBottom: 4,
           marginRight: -16,
           paddingRight: 16,
@@ -68,6 +69,7 @@ export const InsightsGrid: React.FC<Props> = ({ insights }) => {
               style={{
                 flexShrink: 0,
                 minWidth: 138,
+                scrollSnapAlign: 'start',
                 background: BG_1,
                 border: `0.5px solid ${LINE}`,
                 borderRadius: 14,
