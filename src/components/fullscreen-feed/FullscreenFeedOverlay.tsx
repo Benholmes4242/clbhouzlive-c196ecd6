@@ -173,16 +173,16 @@ export function FullscreenFeedOverlay() {
               className="absolute left-4 z-[9030] flex items-center justify-center active:scale-95 transition-all"
               style={{
                 top: "calc(max(env(safe-area-inset-top, 0px), 47px) + 12px)",
-                width: 34,
-                height: 34,
-                borderRadius: 12,
+                width: 44,
+                height: 44,
+                borderRadius: 14,
                 background: 'rgba(0, 0, 0, 0.50)',
                 backdropFilter: 'blur(14px)',
                 WebkitBackdropFilter: 'blur(14px)',
                 border: '1px solid rgba(255, 255, 255, 0.10)',
               }}
             >
-              <X className="h-[18px] w-[18px] text-white" strokeWidth={2.5} />
+              <X className="h-[22px] w-[22px] text-white" strokeWidth={2.5} />
             </button>
 
             {posts.length === 0 ? (

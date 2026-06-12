@@ -275,7 +275,7 @@ export const FeedOverlayLayer = memo(function FeedOverlayLayer({
       )}
 
       {/* Bottom-right floating mute toggle — visible only for video posts */}
-      {isVideo && (
+      {isVideo && bottomOffset === undefined && (
         <button
           type="button"
           onClick={(e) => {
