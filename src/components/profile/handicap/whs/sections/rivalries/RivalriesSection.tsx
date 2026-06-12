@@ -111,7 +111,7 @@ const FriendViewRivalries: React.FC<{
   const { data, isLoading } = useFriendViewRivalriesForProfile(viewerUserId, ownerUserId);
   const { data: ownerLeaderboard } = useFriendLeaderboard(ownerUserId);
   const { data: viewerRivalries = [] } = useFriendRivalries(viewerUserId);
-  const { data: crownsByKey } = useRivalCrowns(ownerUserId);
+  const { data: crownsByKey } = useRivalCrownsForOwner(ownerUserId);
 
   const ownerRow = useMemo(
     () => ownerLeaderboard?.find((e) => e.is_self) ?? null,
