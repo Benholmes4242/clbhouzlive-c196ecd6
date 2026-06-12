@@ -230,7 +230,7 @@ const SideBlock: React.FC<SideBlockProps> = ({
     style={{
       display: 'flex',
       flexDirection: 'column',
-      alignItems: alignRight ? 'flex-end' : 'flex-start',
+      alignItems: 'center',
       gap: 8,
     }}
   >
