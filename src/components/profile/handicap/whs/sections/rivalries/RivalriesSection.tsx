@@ -118,21 +118,15 @@ const FriendViewRivalries: React.FC<{
     [ownerLeaderboard],
   );
 
-  const primary = data?.primary ?? null;
   const secondary = data?.secondary ?? [];
 
   const all = useMemo(() => {
-    const arr: FriendRivalryHydrated[] = [];
-    if (primary) arr.push(primary);
-    arr.push(...secondary);
+    const arr: FriendRivalryHydrated[] = [...secondary];
     return arr
-      .filter((r) => r.rival_user_id !== viewerUserId)
+      .filter((r) => r.rival_user_id !== viewerUserId && r.rival_user_id !== ownerUserId)
       .filter((r) => (r.shared_rounds_count ?? 0) > 0)
       .sort((a, b) => rivalryScore(b) - rivalryScore(a));
-  }, [primary, secondary, viewerUserId]);
-
-  const primaryKey =
-    primary && primary.rival_user_id !== viewerUserId ? rivalKey(primary) : null;
+  }, [secondary, viewerUserId, ownerUserId]);
 
   const viewerKnownRivalKeys = useMemo(() => {
     const s = new Set<string>();
@@ -147,10 +141,9 @@ const FriendViewRivalries: React.FC<{
     (r: FriendRivalryHydrated) => {
       const k = rivalKey(r);
       if (!k) return true;
-      if (primaryKey && k === primaryKey) return false;
       return !viewerKnownRivalKeys.has(k);
     },
-    [primaryKey, viewerKnownRivalKeys],
+    [viewerKnownRivalKeys],
   );
 
   const ownerFirst = useMemo(() => {
