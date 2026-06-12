@@ -128,8 +128,6 @@ const FriendViewRivalries: React.FC<{
       .sort((a, b) => rivalryScore(b) - rivalryScore(a));
   }, [secondary, viewerUserId, ownerUserId]);
 
-  const primaryKey = null;
-
   const viewerKnownRivalKeys = useMemo(() => {
     const s = new Set<string>();
     for (const r of viewerRivalries) {
@@ -143,10 +141,9 @@ const FriendViewRivalries: React.FC<{
     (r: FriendRivalryHydrated) => {
       const k = rivalKey(r);
       if (!k) return true;
-      if (primaryKey && k === primaryKey) return false;
       return !viewerKnownRivalKeys.has(k);
     },
-    [primaryKey, viewerKnownRivalKeys],
+    [viewerKnownRivalKeys],
   );
 
   const ownerFirst = useMemo(() => {
