@@ -387,22 +387,30 @@ const RivalryPage: React.FC = () => {
 
       {viewerId && isLoading && <RivalrySkeleton />}
 
-      {viewerId && !isLoading && (errored || (!row && !isFriendView)) && (
-        <div
-          style={{
-            padding: '64px 24px',
-            textAlign: 'center',
-            fontFamily: FONT,
-          }}
-        >
-          <div style={{ color: T100, fontSize: 16, fontWeight: 700 }}>
-            Rivalry not found
+      {viewerId && !isLoading && (errored || (!row && !isFriendView)) && (() => {
+        const noSharedRounds = !errored && profileExists.data === true;
+        const rivalDisplayFirst = firstName(/* fallback */ null) || 'this player';
+        return (
+          <div
+            style={{
+              padding: '64px 24px',
+              textAlign: 'center',
+              fontFamily: FONT,
+            }}
+          >
+            <div style={{ color: T100, fontSize: 16, fontWeight: 700 }}>
+              {noSharedRounds
+                ? `No shared rounds with ${rivalDisplayFirst} yet`
+                : 'Rivalry not found'}
+            </div>
+            <div style={{ color: T60, fontSize: 13, marginTop: 8 }}>
+              {noSharedRounds
+                ? 'A rivalry starts when you play the same course on the same day.'
+                : 'This rivalry may no longer exist.'}
+            </div>
           </div>
-          <div style={{ color: T60, fontSize: 13, marginTop: 8 }}>
-            This rivalry may no longer exist.
-          </div>
-        </div>
-      )}
+        );
+      })()}
 
       {viewerId && !isLoading && isFriendView && !row && !errored && (
         <PrivacyBlockedView />
