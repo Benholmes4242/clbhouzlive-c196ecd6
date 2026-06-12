@@ -21,6 +21,7 @@ import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import type { FeedPost } from '@/components/media-system/types/media';
 import { InlineVideo } from './InlineVideo';
 import { MediaCarousel } from './MediaCarousel';
+import { FeedFollowPill } from './FeedFollowPill';
 
 const T100 = 'rgba(255,255,255,0.96)';
 const T60 = 'rgba(255,255,255,0.55)';
@@ -82,6 +83,8 @@ export interface FeedCardProps {
   initialMediaIndex?: number;
   /** Notified when user swipes the multi-media carousel. */
   onCarouselIndexChange?: (post: FeedPost, idx: number) => void;
+  onFollow?: (post: FeedPost) => void;
+  currentUserId?: string;
 }
 
 const FeedCardImpl: React.FC<FeedCardProps> = ({
@@ -100,7 +103,14 @@ const FeedCardImpl: React.FC<FeedCardProps> = ({
   mountVideo = false,
   initialMediaIndex = 0,
   onCarouselIndexChange,
+  onFollow,
+  currentUserId,
 }) => {
+  const mountFollowPill =
+    !!onFollow &&
+    post.actorType === 'personal' &&
+    post.creatorRelation !== 'system' &&
+    post.userId !== currentUserId;
   const items = post.mediaItems ?? [];
   const isMulti = items.length > 1;
   const media = items[0];
@@ -169,6 +179,12 @@ const FeedCardImpl: React.FC<FeedCardProps> = ({
 
         {/* Right chips */}
         <div style={{ display: 'flex', alignItems: 'center', gap: 6, flexShrink: 0 }}>
+          {mountFollowPill && (
+            <FeedFollowPill
+              isFollowed={!!post.isFollowedByMe}
+              onFollow={() => onFollow!(post)}
+            />
+          )}
           {isDeal && (
             <span
               style={{

@@ -44,6 +44,8 @@ export interface CardFeedProps {
   hasNextPage?: boolean;
   topPadding?: number | string;
   bottomPadding?: number;
+  onFollow?: (post: FeedPost) => void;
+  currentUserId?: string;
 }
 
 export const CardFeed: React.FC<CardFeedProps> = ({
@@ -60,6 +62,8 @@ export const CardFeed: React.FC<CardFeedProps> = ({
   hasNextPage,
   topPadding = 96,
   bottomPadding = 96,
+  onFollow,
+  currentUserId,
 }) => {
   const virtuosoRef = useRef<VirtuosoHandle | null>(null);
 
@@ -148,6 +152,8 @@ export const CardFeed: React.FC<CardFeedProps> = ({
             mountVideo={mountVideo}
             initialMediaIndex={initialSlide}
             onCarouselIndexChange={getCarouselChangeHandler(post.id)}
+            onFollow={onFollow}
+            currentUserId={currentUserId}
           />
         </div>
       );
@@ -165,6 +171,8 @@ export const CardFeed: React.FC<CardFeedProps> = ({
       onProfile,
       onReviewTap,
       onShare,
+      onFollow,
+      currentUserId,
     ],
   );
 

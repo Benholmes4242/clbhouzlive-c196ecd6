@@ -427,6 +427,8 @@ const ClubhouseContent = () => {
               return { liked: s.isLiked, count: s.count ?? post.likeCount ?? 0 };
             }}
             getCommentCount={(post) => getCommentCount(post)}
+            onFollow={handleFollow}
+            currentUserId={user?.id}
           />
         </>
       ) : (
