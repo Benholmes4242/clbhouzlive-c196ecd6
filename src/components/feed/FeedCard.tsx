@@ -399,24 +399,29 @@ const FeedCardImpl: React.FC<FeedCardProps> = ({
         );
       })()}
 
-      {/* Body — caption */}
-      {post.caption && (
-        <div style={{ padding: '8px 14px 4px' }}>
-          <div
-            style={{
-              fontSize: 14,
-              lineHeight: 1.4,
-              color: T100,
-              display: '-webkit-box',
-              WebkitLineClamp: 3,
-              WebkitBoxOrient: 'vertical',
-              overflow: 'hidden',
-            }}
-          >
-            {post.caption}
+      {/* Body — caption (falls back to review text for review posts) */}
+      {(() => {
+        const body = post.caption || (post.isReview ? post.review?.reviewText ?? '' : '');
+        if (!body) return null;
+        return (
+          <div style={{ padding: '8px 14px 4px' }}>
+            <div
+              style={{
+                fontSize: 14,
+                lineHeight: 1.4,
+                color: T100,
+                display: '-webkit-box',
+                WebkitLineClamp: 3,
+                WebkitBoxOrient: 'vertical',
+                overflow: 'hidden',
+                textOverflow: 'ellipsis',
+              }}
+            >
+              {body}
+            </div>
           </div>
-        </div>
-      )}
+        );
+      })()}
 
       {/* Footer */}
       <div
