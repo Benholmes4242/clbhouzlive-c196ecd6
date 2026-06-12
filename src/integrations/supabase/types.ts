@@ -15263,6 +15263,30 @@ export type Database = {
         }
         Relationships: []
       }
+      user_rival_dismissals: {
+        Row: {
+          created_at: string
+          id: string
+          rival_friend_row_id: string | null
+          rival_user_id: string | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          rival_friend_row_id?: string | null
+          rival_user_id?: string | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          rival_friend_row_id?: string | null
+          rival_user_id?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
       user_rival_overrides: {
         Row: {
           pinned_at: string
