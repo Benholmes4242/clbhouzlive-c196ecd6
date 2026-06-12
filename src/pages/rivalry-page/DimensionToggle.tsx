@@ -1,5 +1,5 @@
 import React from 'react';
-import { FONT, T50, AMBER } from './_shared/tokens';
+import { FONT, T50 } from './_shared/tokens';
 import type { RivalryDimension } from '@/lib/whs/utils/useRivalryDimension';
 
 interface Props {
