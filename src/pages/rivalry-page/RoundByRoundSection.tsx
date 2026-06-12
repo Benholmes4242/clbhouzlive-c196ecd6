@@ -73,7 +73,7 @@ export const RoundByRoundSection: React.FC<Props> = ({
       <div
         style={{
           margin: '26px 2px 10px',
-          color: AMBER,
+          color: '#FFFFFF',
           fontSize: 11,
           fontWeight: 800,
           letterSpacing: '0.16em',
