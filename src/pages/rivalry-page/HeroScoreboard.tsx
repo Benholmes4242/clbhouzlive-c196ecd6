@@ -242,9 +242,6 @@ const SideBlock: React.FC<SideBlockProps> = ({
         background: avatarUrl
           ? `url(${avatarUrl}) center/cover`
           : 'rgba(255,255,255,0.06)',
-      border: isSelf
-        ? `2px solid #FFFFFF`
-        : `1px solid ${LINE_2}`,
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',

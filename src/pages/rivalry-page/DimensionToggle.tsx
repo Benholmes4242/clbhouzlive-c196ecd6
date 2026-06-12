@@ -9,7 +9,7 @@ interface Props {
 
 const OPTS: { v: RivalryDimension; label: string }[] = [
   { v: 'gross', label: 'Gross' },
-  { v: 'stableford', label: 'Stableford' },
+  { v: 'stableford', label: 'Stbl' },
 ];
 
 export const DimensionToggle: React.FC<Props> = ({ value, onChange }) => (
@@ -18,8 +18,9 @@ export const DimensionToggle: React.FC<Props> = ({ value, onChange }) => (
     aria-label="Scoring dimension"
     style={{
       display: 'inline-flex',
-      padding: 3,
+      padding: 2,
       background: 'rgba(255,255,255,0.06)',
+      border: '1px solid rgba(255,255,255,0.08)',
       borderRadius: 999,
       gap: 2,
       fontFamily: FONT,
@@ -35,15 +36,15 @@ export const DimensionToggle: React.FC<Props> = ({ value, onChange }) => (
           aria-selected={active}
           onClick={() => onChange(o.v)}
           style={{
-            padding: '6px 14px',
+            padding: '3px 9px',
             borderRadius: 999,
             background: active ? '#FFFFFF' : 'transparent',
-            color: active ? '#1A1208' : T50,
+            color: active ? '#0F172A' : 'rgba(255,255,255,0.6)',
             border: 'none',
             cursor: 'pointer',
-            fontSize: 11.5,
+            fontSize: 9.5,
             fontWeight: 800,
-            letterSpacing: '0.06em',
+            letterSpacing: '0.08em',
             textTransform: 'uppercase',
             fontFamily: FONT,
             transition: 'background-color 150ms ease, color 150ms ease',

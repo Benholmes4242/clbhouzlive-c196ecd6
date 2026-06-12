@@ -37,7 +37,6 @@ import {
   BG_1,
   T100,
   T60,
-  AMBER,
   LINE_2,
 } from './rivalry-page/_shared/tokens';
 
@@ -520,7 +519,7 @@ const PageEyebrow: React.FC<{
       >
         <div
           style={{
-            color: AMBER,
+            color: '#FFFFFF',
             fontSize: 11,
             fontWeight: 800,
             letterSpacing: '0.14em',
@@ -590,7 +589,7 @@ const PrivacyBlockedView: React.FC = () => (
         display: 'inline-block',
         marginTop: 24,
         padding: '10px 18px',
-        background: AMBER,
+        background: '#FFFFFF',
         color: '#0F172A',
         borderRadius: 999,
         fontWeight: 700,
