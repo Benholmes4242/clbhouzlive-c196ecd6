@@ -244,6 +244,7 @@ export const RivalFightCard: React.FC<Props> = ({
       >
         <SquircleAvatar
           size={44}
+          hideRing
           src={pickAvatarSrc(rivalry.rival_thumbnail_url, rivalry.rival_profile_photo_url)}
           alt={rivalDisplayName}
           fallback={initials(rivalDisplayName)}
