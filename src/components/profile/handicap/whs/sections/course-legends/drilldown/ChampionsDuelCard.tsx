@@ -466,19 +466,7 @@ export const ChampionsDuelCard: React.FC<ChampionsDuelCardProps> = ({
           marginRight: -16,
         }}
       >
-        {standsAlone ? (
-          <div
-            style={{
-              padding: '10px 16px 4px',
-              fontSize: 11.5,
-              fontStyle: 'italic',
-              color: INK_55,
-              textAlign: 'center',
-            }}
-          >
-            The champion stands alone. Be the first to challenge.
-          </div>
-        ) : (
+        {standsAlone ? null : (
           inlineRows.map((row, i) => (
             <ChampionsListRow
               key={`${row.rank}-${i}`}
