@@ -106,7 +106,7 @@ export const HeroScoreboard: React.FC<Props> = ({
             avatarUrl={yourAvatarUrl}
             fallbackChar={(leftLabel[0] ?? '?').toUpperCase()}
             label={leftLabel.toUpperCase()}
-            labelColor={AMBER}
+            labelColor={T100}
             handicap={yourHandicap}
             winPct={yourPct}
             isSelf
