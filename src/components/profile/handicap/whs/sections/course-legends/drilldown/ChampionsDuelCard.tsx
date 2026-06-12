@@ -171,7 +171,15 @@ export const ChampionsDuelCard: React.FC<ChampionsDuelCardProps> = ({
   const showBar = !standsAlone && selfOnBoard;
   const leftValue = champion?.value ?? 0;
   const rightValue = right?.value ?? 0;
-  const fill = duelTension(category, leftValue, rightValue);
+
+  // Chase track participants — champion = crown holder, chaser = the other face.
+  const trackChampion: DuelRow | null = champion ?? null;
+  const trackChaser: DuelRow | null = defending ? (right ?? null) : selfRow;
+  const showTrack = !standsAlone && trackChampion != null && trackChaser != null;
+  const rawProgress = showTrack
+    ? chaseProgress(category, trackChampion!.value, trackChaser!.value)
+    : 0;
+  const pos = Math.max(0.04, Math.min(0.90, rawProgress));
 
   let line: string;
   let isNormalDuelLine = false;
