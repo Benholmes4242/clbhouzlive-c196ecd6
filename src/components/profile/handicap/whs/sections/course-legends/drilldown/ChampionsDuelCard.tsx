@@ -265,6 +265,20 @@ export const ChampionsDuelCard: React.FC<ChampionsDuelCardProps> = ({
       <div style={{ display: 'grid', gridTemplateColumns: '1fr auto 1fr', gap: 10, alignItems: 'center' }}>
         {/* LEFT: crown holder */}
         <div style={{ display: 'flex', alignItems: 'center', gap: 10, minWidth: 0 }}>
+          <span
+            aria-hidden
+            style={{
+              fontSize: 11,
+              fontWeight: 800,
+              color: DEEP_AMBER,
+              fontVariantNumeric: 'tabular-nums',
+              width: 12,
+              textAlign: 'right',
+              flexShrink: 0,
+            }}
+          >
+            1
+          </span>
           <div style={{ position: 'relative', flexShrink: 0 }}>
             <SquircleAvatar photoUrl={champion?.photoUrl ?? null} size={38} />
             <div
