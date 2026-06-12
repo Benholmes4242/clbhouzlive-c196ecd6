@@ -58,7 +58,7 @@ export const HeroScoreboard: React.FC<Props> = ({
   const youLead = wins > losses;
   const themLead = losses > wins;
   const gradient = youLead
-    ? 'linear-gradient(180deg, rgba(247,147,30,0.08) 0%, rgba(247,147,30,0.02) 50%, rgba(15,23,42,0.6) 100%)'
+    ? 'linear-gradient(180deg, rgba(255,255,255,0.06) 0%, rgba(255,255,255,0.02) 50%, rgba(15,23,42,0.6) 100%)'
     : themLead
       ? 'linear-gradient(180deg, rgba(159,29,29,0.10) 0%, rgba(159,29,29,0.02) 50%, rgba(15,23,42,0.6) 100%)'
       : 'linear-gradient(180deg, rgba(255,255,255,0.04) 0%, rgba(255,255,255,0.01) 100%)';
