@@ -194,7 +194,8 @@ const RivalCarousel: React.FC<{
   crownsByKey?: Map<string, import('@/lib/whs/hooks/useRivalCrowns').RivalCrowns>;
   friendViewOwnerId?: string;
   isTapDisabled?: (r: FriendRivalryHydrated) => boolean;
-}> = ({ rivalries, crownsByKey, friendViewOwnerId, isTapDisabled }) => {
+  youLabel?: string;
+}> = ({ rivalries, crownsByKey, friendViewOwnerId, isTapDisabled, youLabel }) => {
   const navigate = useNavigate();
   const railRef = useRef<HTMLDivElement | null>(null);
   const [page, setPage] = useState(0);
