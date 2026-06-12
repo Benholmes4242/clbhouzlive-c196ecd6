@@ -126,9 +126,10 @@ const FriendViewRivalries: React.FC<{
     if (primary) arr.push(primary);
     arr.push(...secondary);
     return arr
+      .filter((r) => r.rival_user_id !== viewerUserId)
       .filter((r) => (r.shared_rounds_count ?? 0) > 0)
       .sort((a, b) => rivalryScore(b) - rivalryScore(a));
-  }, [primary, secondary]);
+  }, [primary, secondary, viewerUserId]);
 
   const primaryKey = primary ? rivalKey(primary) : null;
 
