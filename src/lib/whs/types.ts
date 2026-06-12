@@ -385,7 +385,7 @@ export interface FriendFeaturedRoundHydrated extends FriendFeaturedRound {
   handicap_index_at_time: number | null;
 }
 
-export type RivalrySlotKind = 'regular' | 'chasing' | 'chased_by' | 'pinned';
+export type RivalrySlotKind = 'regular' | 'chasing' | 'chased_by' | 'pinned' | 'adhoc';
 
 export interface FriendRivalry {
   user_id: string;
