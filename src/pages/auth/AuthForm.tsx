@@ -59,6 +59,7 @@ const AuthForm: React.FC<AuthFormProps> = ({ authNotice }) => {
   const [submitting, setSubmitting] = useState(false);
   const [otpError, setOtpError] = useState<string | null>(null);
   const [otpErrorNonce, setOtpErrorNonce] = useState(0);
+  const [otpInfo, setOtpInfo] = useState<string | null>(null);
   const [resendCooldown, setResendCooldown] = useState(0);
 
   const [showSuccessAnimation, setShowSuccessAnimation] = useState(false);
@@ -74,6 +75,7 @@ const AuthForm: React.FC<AuthFormProps> = ({ authNotice }) => {
   }, [resendCooldown]);
 
   const sendCode = async (rawEmail: string): Promise<boolean> => {
+    if (submitting) return false;
     const normalised = rawEmail.trim().toLowerCase();
     setSubmitting(true);
     setOtpError(null);
@@ -125,7 +127,8 @@ const AuthForm: React.FC<AuthFormProps> = ({ authNotice }) => {
   const handleResend = async () => {
     if (resendCooldown > 0 || submitting) return;
     setOtpError(null);
-    await sendCode(email);
+    const ok = await sendCode(email);
+    if (ok) setOtpInfo('New code sent — use the code from the most recent email.');
   };
 
   const handleUseDifferentEmail = () => {
@@ -151,7 +154,7 @@ const AuthForm: React.FC<AuthFormProps> = ({ authNotice }) => {
         const status = (error as { status?: number }).status;
         let friendly = error.message || 'Could not verify code.';
         if (lower.includes('expired')) {
-          friendly = 'That code has expired. Tap resend to get a new one.';
+          friendly = 'That code is no longer valid — if you requested more than one, use the newest email.';
         } else if (lower.includes('invalid') || status === 401 || status === 403) {
           friendly = 'That code is not right. Check the email and try again.';
         }
@@ -406,11 +409,13 @@ const AuthForm: React.FC<AuthFormProps> = ({ authNotice }) => {
           email={email}
           submitting={submitting && step === 'otp'}
           errorMessage={otpError}
+          infoMessage={otpInfo}
           errorNonce={otpErrorNonce}
           resendCooldown={resendCooldown}
           onVerify={handleVerify}
           onResend={handleResend}
           onUseDifferentEmail={handleUseDifferentEmail}
+          onCodeEdit={() => setOtpInfo(null)}
         />
       </AuthBottomSheet>
 
