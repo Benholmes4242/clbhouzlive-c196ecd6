@@ -245,6 +245,7 @@ const RivalCarousel: React.FC<{
                 rank={idx + 1}
                 total={total}
                 onTap={onTap}
+                youLabel={youLabel}
               />
             </div>
           );
