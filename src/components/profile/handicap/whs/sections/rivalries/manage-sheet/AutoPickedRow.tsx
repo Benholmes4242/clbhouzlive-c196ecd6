@@ -1,5 +1,5 @@
 import React from 'react';
-import { Pin } from 'lucide-react';
+import { Pin, X } from 'lucide-react';
 import { initials, firstName } from '@/lib/whs/utils/initials';
 import { pickAvatarSrc } from '@/lib/whs/utils/avatarSrc';
 import { fmtHcp } from '@/lib/whs/format';
@@ -8,6 +8,7 @@ import type { FriendRivalryHydrated } from '@/lib/whs/types';
 interface Props {
   rivalry: FriendRivalryHydrated;
   onPin: () => void;
+  onDismiss: () => void;
   busy: boolean;
 }
 
