@@ -394,7 +394,7 @@ export const ChampionsDuelCard: React.FC<ChampionsDuelCardProps> = ({
           <div
             style={{
               position: 'absolute',
-              left: 0,
+              right: 0,
               top: '50%',
               height: 4,
               width: `${pos * 100}%`,
