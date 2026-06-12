@@ -35,14 +35,15 @@ export const WindowToggle: React.FC<{
     style={{
       display: 'inline-flex',
       flexShrink: 0,
-      gap: 0,
-      background: 'var(--hcp-tint-1)',
+      gap: 2,
+      background: 'rgba(255,255,255,0.06)',
+      border: '1px solid rgba(255,255,255,0.08)',
       borderRadius: 999,
-      padding: 3,
+      padding: 2,
     }}
   >
     {([
-      { v: 'all_time', label: 'All time' },
+      { v: 'all_time', label: 'ALL TIME' },
       { v: '90d', label: '90D' },
     ] as const).map((o) => {
       const active = window === o.v;
@@ -52,20 +53,18 @@ export const WindowToggle: React.FC<{
           type="button"
           onClick={() => setWindow(o.v)}
           style={{
-            padding: '6px 14px',
+            padding: '3px 9px',
             borderRadius: 999,
-            background: active ? 'var(--hcp-bg-1)' : 'transparent',
-            boxShadow: active ? '0 1px 3px rgba(15,23,42,0.12)' : 'none',
-            color: active ? 'var(--hcp-t-100)' : 'var(--hcp-t-50)',
+            background: active ? '#FFFFFF' : 'transparent',
+            color: active ? '#0F172A' : 'rgba(255,255,255,0.6)',
             border: 'none',
             fontFamily: FONT,
-            fontSize: 11.5,
+            fontSize: 9.5,
             fontWeight: 800,
             cursor: 'pointer',
-            letterSpacing: '0.04em',
+            letterSpacing: '0.08em',
             textTransform: 'uppercase',
             whiteSpace: 'nowrap',
-            minWidth: 56,
           }}
         >
           {o.label}
