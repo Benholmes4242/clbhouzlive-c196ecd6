@@ -131,7 +131,8 @@ const FriendViewRivalries: React.FC<{
       .sort((a, b) => rivalryScore(b) - rivalryScore(a));
   }, [primary, secondary, viewerUserId]);
 
-  const primaryKey = primary ? rivalKey(primary) : null;
+  const primaryKey =
+    primary && primary.rival_user_id !== viewerUserId ? rivalKey(primary) : null;
 
   const viewerKnownRivalKeys = useMemo(() => {
     const s = new Set<string>();
