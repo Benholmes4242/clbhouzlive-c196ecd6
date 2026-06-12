@@ -389,8 +389,8 @@ const RivalryPage: React.FC = () => {
       {viewerId && isLoading && <RivalrySkeleton />}
 
       {viewerId && !isLoading && (errored || (!row && !isFriendView)) && (() => {
-        const noSharedRounds = !errored && profileExists.data === true;
-        const rivalDisplayFirst = firstName(/* fallback */ null) || 'this player';
+        const noSharedRounds = !errored && !!profileExists.data?.exists;
+        const rivalDisplayFirst = firstName(profileExists.data?.displayName ?? null) || 'this player';
         return (
           <div
             style={{
