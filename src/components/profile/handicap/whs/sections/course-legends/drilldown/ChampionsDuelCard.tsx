@@ -2,7 +2,7 @@ import React from 'react';
 import { Crown, Swords, type LucideIcon } from 'lucide-react';
 import type { LegendCategory } from '@/lib/gam/types';
 import { ChampionsListRow } from './ChampionsListRow';
-import { duelTension, duelLine } from './_shared/duelTension';
+import { duelTension, duelLine, chaseProgress } from './_shared/duelTension';
 import { ProBenchmarkBand } from './ProBenchmarkBand';
 import type { ProProfile } from './_shared/proBenchmark';
 
