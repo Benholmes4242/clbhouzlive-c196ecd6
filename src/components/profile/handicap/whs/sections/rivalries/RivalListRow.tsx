@@ -151,7 +151,7 @@ export const RivalListRow: React.FC<Props> = ({ rivalry, onTap }) => {
                 marginTop: 1,
               }}
             >
-              Hcp {fmtHcp(rivalry.rival_handicap)} · {rivalry.shared_rounds_count} rounds
+              HCP {fmtHcp(rivalry.rival_handicap)} · {rivalry.shared_rounds_count} rounds
             </div>
           </div>
 
