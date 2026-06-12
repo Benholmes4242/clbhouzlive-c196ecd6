@@ -193,8 +193,27 @@ const RivalryPage: React.FC = () => {
     isFriendView ? friendParam : undefined,
   );
 
-  const row = isFriendView ? friend.data ?? null : owner.row;
-  const isLoading = isFriendView ? friend.isLoading : owner.isLoading;
+  // Owner fallback: if the rivalParam is a valid UUID but no rivalry row
+  // exists in the user's pre-computed list, try a direct fetch (lets the
+  // page work for any user, not just current rivals).
+  const adHocEnabled =
+    !isFriendView &&
+    !owner.isLoading &&
+    !owner.row &&
+    !!rivalParam &&
+    UUID_RE.test(rivalParam);
+  const adHoc = useAdHocRivalry(viewerId, rivalParam, adHocEnabled);
+
+  // When the ad-hoc fetch also returns null, check whether the rival's
+  // profile exists so we can distinguish "no shared rounds" from "unknown id".
+  const profileCheckEnabled =
+    adHocEnabled && !adHoc.isLoading && !adHoc.data && !!rivalParam;
+  const profileExists = useRivalProfileExists(rivalParam, profileCheckEnabled);
+
+  const row = isFriendView ? friend.data ?? null : (owner.row ?? adHoc.data ?? null);
+  const isLoading = isFriendView
+    ? friend.isLoading
+    : owner.isLoading || (adHocEnabled && adHoc.isLoading) || (profileCheckEnabled && profileExists.isLoading);
   const errored = isFriendView ? !!friend.error : !!owner.error;
 
 
