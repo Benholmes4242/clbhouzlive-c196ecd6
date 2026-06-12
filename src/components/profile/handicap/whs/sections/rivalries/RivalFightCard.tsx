@@ -1,7 +1,7 @@
 import React, { useMemo } from 'react';
 import { Star } from 'lucide-react';
 import { reformatFriendName } from '@/lib/whs/utils/nameFormat';
-import { initials } from '@/lib/whs/utils/initials';
+import { initials, firstName } from '@/lib/whs/utils/initials';
 import { pickAvatarSrc } from '@/lib/whs/utils/avatarSrc';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { fmtHcp } from '@/lib/whs/format';
@@ -29,6 +29,7 @@ interface Props {
   rank: number;
   total: number;
   onTap?: () => void;
+  youLabel?: string;
 }
 
 export const RivalFightCard: React.FC<Props> = ({
@@ -37,6 +38,7 @@ export const RivalFightCard: React.FC<Props> = ({
   rank,
   total,
   onTap,
+  youLabel = 'YOU',
 }) => {
   const key = rivalKey(rivalry);
   const [dimension, setDimension] = useRivalryDimension(key);
@@ -105,7 +107,7 @@ export const RivalFightCard: React.FC<Props> = ({
         style={{
           position: 'relative',
           width: '100%',
-          aspectRatio: '16 / 11',
+          aspectRatio: '16 / 6',
           ...(heroPhoto
             ? {
                 backgroundImage: `url(${heroPhoto})`,
@@ -265,7 +267,7 @@ export const RivalFightCard: React.FC<Props> = ({
               marginTop: 2,
             }}
           >
-            Hcp {fmtHcp(rivalry.rival_handicap)} · {rivalry.shared_rounds_count} rounds
+            HCP {fmtHcp(rivalry.rival_handicap)} · {rivalry.shared_rounds_count} rounds
           </div>
         </div>
 
@@ -315,22 +317,78 @@ export const RivalFightCard: React.FC<Props> = ({
           <div
             style={{
               display: 'flex',
-              alignItems: 'baseline',
-              gap: 4,
-              fontVariantNumeric: 'tabular-nums',
+              alignItems: 'center',
+              gap: 8,
               fontFeatureSettings: '"kern" 1, "liga" 1',
-              fontWeight: 800,
-              fontSize: 24,
-              letterSpacing: '-0.02em',
             }}
           >
-            <span style={{ color: isWinningOverall ? GOLD : 'rgba(255,255,255,0.45)' }}>
-              {record.wins}
+            {/* Left column: you / owner */}
+            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 2 }}>
+              <span
+                style={{
+                  color: accentColor,
+                  fontVariantNumeric: 'tabular-nums',
+                  fontWeight: 800,
+                  fontSize: 27,
+                  letterSpacing: '-0.02em',
+                  lineHeight: 1,
+                }}
+              >
+                {record.wins}
+              </span>
+              <span
+                style={{
+                  fontSize: 8.5,
+                  fontWeight: 800,
+                  letterSpacing: '0.12em',
+                  color: accentColor,
+                  textTransform: 'uppercase',
+                  whiteSpace: 'nowrap',
+                }}
+              >
+                {youLabel}
+              </span>
+            </div>
+
+            <span
+              style={{
+                color: 'rgba(255,255,255,0.3)',
+                fontSize: 18,
+                fontWeight: 800,
+                alignSelf: 'flex-start',
+                marginTop: 4,
+              }}
+            >
+              –
             </span>
-            <span style={{ color: 'rgba(255,255,255,0.3)', fontSize: 18 }}>–</span>
-            <span style={{ color: !isWinningOverall && record.losses > record.wins ? RED : 'rgba(255,255,255,0.45)' }}>
-              {record.losses}
-            </span>
+
+            {/* Right column: them */}
+            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 2 }}>
+              <span
+                style={{
+                  color: 'rgba(255,255,255,0.5)',
+                  fontVariantNumeric: 'tabular-nums',
+                  fontWeight: 800,
+                  fontSize: 27,
+                  letterSpacing: '-0.02em',
+                  lineHeight: 1,
+                }}
+              >
+                {record.losses}
+              </span>
+              <span
+                style={{
+                  fontSize: 8.5,
+                  fontWeight: 800,
+                  letterSpacing: '0.12em',
+                  color: 'rgba(255,255,255,0.5)',
+                  textTransform: 'uppercase',
+                  whiteSpace: 'nowrap',
+                }}
+              >
+                {firstName(rivalry.rival_name ?? 'Them')}
+              </span>
+            </div>
           </div>
         </div>
       </div>

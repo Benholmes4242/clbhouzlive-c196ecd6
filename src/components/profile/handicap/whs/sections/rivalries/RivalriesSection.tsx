@@ -181,6 +181,7 @@ const FriendViewRivalries: React.FC<{
           crownsByKey={crownsByKey}
           friendViewOwnerId={ownerUserId}
           isTapDisabled={isTapDisabled}
+          youLabel={ownerFirst ? ownerFirst.toUpperCase() : undefined}
         />
       )}
     </section>
@@ -193,7 +194,8 @@ const RivalCarousel: React.FC<{
   crownsByKey?: Map<string, import('@/lib/whs/hooks/useRivalCrowns').RivalCrowns>;
   friendViewOwnerId?: string;
   isTapDisabled?: (r: FriendRivalryHydrated) => boolean;
-}> = ({ rivalries, crownsByKey, friendViewOwnerId, isTapDisabled }) => {
+  youLabel?: string;
+}> = ({ rivalries, crownsByKey, friendViewOwnerId, isTapDisabled, youLabel }) => {
   const navigate = useNavigate();
   const railRef = useRef<HTMLDivElement | null>(null);
   const [page, setPage] = useState(0);
@@ -243,6 +245,7 @@ const RivalCarousel: React.FC<{
                 rank={idx + 1}
                 total={total}
                 onTap={onTap}
+                youLabel={youLabel}
               />
             </div>
           );
