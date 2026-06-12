@@ -11,7 +11,7 @@ import {
   GOLD,
   GREEN,
   RED,
-  AMBER,
+  
   LINE_2,
 } from './_shared/tokens';
 import { firstName } from './_shared/helpers';
