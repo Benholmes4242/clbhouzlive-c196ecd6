@@ -7,6 +7,8 @@ import {
   useFriendRivalries,
   useUpsertRivalOverride,
   useDeleteRivalOverride,
+  useDismissRival,
+  useClearRivalDismissal,
 } from '@/lib/whs/hooks';
 import { firstName } from '@/lib/whs/utils/initials';
 import { toast } from 'sonner';
@@ -35,6 +37,8 @@ export const ManageRivalsSheet: React.FC<Props> = ({ userId, open, onClose }) =>
   const { data: leaderboard = [], isLoading: lbLoading } = useFriendLeaderboard(userId);
   const upsert = useUpsertRivalOverride();
   const remove = useDeleteRivalOverride();
+  const dismiss = useDismissRival();
+  const clearDismissal = useClearRivalDismissal();
 
   const pinned = useMemo(
     () =>
@@ -69,17 +73,24 @@ export const ManageRivalsSheet: React.FC<Props> = ({ userId, open, onClose }) =>
     return rows.filter((r) => r.friend_name.toLowerCase().includes(q));
   }, [leaderboard, currentIdentifiers, query]);
 
-  const busy = upsert.isPending || remove.isPending;
+  const busy = upsert.isPending || remove.isPending || dismiss.isPending || clearDismissal.isPending;
+
+  const identityOf = (
+    friend_user_id: string | null,
+    friend_row_id: string | null,
+  ) =>
+    friend_user_id
+      ? { rival_user_id: friend_user_id, rival_friend_row_id: null }
+      : { rival_user_id: null, rival_friend_row_id: friend_row_id };
 
   const handleAdd = async (
     friend_user_id: string | null,
     friend_row_id: string | null,
   ) => {
     const slotIndex = nextAvailableSlot(rivalries);
-    const identity = friend_user_id
-      ? { rival_user_id: friend_user_id, rival_friend_row_id: null }
-      : { rival_user_id: null, rival_friend_row_id: friend_row_id };
+    const identity = identityOf(friend_user_id, friend_row_id);
     try {
+      await clearDismissal.mutateAsync({ userId, identity });
       await upsert.mutateAsync({ userId, slotIndex, ...identity });
       toast.success('Rival pinned');
     } catch (e: any) {
@@ -88,10 +99,9 @@ export const ManageRivalsSheet: React.FC<Props> = ({ userId, open, onClose }) =>
   };
 
   const handlePinAuto = async (rivalry: FriendRivalryHydrated) => {
-    const identity = rivalry.rival_user_id
-      ? { rival_user_id: rivalry.rival_user_id, rival_friend_row_id: null }
-      : { rival_user_id: null, rival_friend_row_id: rivalry.rival_friend_row_id };
+    const identity = identityOf(rivalry.rival_user_id, rivalry.rival_friend_row_id);
     try {
+      await clearDismissal.mutateAsync({ userId, identity });
       await upsert.mutateAsync({
         userId,
         slotIndex: rivalry.slot_index,
@@ -100,6 +110,16 @@ export const ManageRivalsSheet: React.FC<Props> = ({ userId, open, onClose }) =>
       toast.success(`${firstName(rivalry.rival_name ?? 'Rival')} pinned`);
     } catch (e: any) {
       toast.error(e?.message ?? 'Could not pin rival');
+    }
+  };
+
+  const handleDismissAuto = async (rivalry: FriendRivalryHydrated) => {
+    const identity = identityOf(rivalry.rival_user_id, rivalry.rival_friend_row_id);
+    try {
+      await dismiss.mutateAsync({ userId, identity });
+      toast.success(`${firstName(rivalry.rival_name ?? 'Rival')} won't be suggested again`);
+    } catch (e: any) {
+      toast.error(e?.message ?? 'Could not dismiss');
     }
   };
 
@@ -197,12 +217,16 @@ export const ManageRivalsSheet: React.FC<Props> = ({ userId, open, onClose }) =>
                   )}
 
                   {autoPicked.length > 0 && (
-                    <Section title="AUTO-PICKED">
+                    <Section
+                      title="AUTO-PICKED"
+                      subtitle="Tap ✕ to stop suggesting someone."
+                    >
                       {autoPicked.map((r) => (
                         <AutoPickedRow
                           key={`auto-${r.slot_index}`}
                           rivalry={r}
                           onPin={() => handlePinAuto(r)}
+                          onDismiss={() => handleDismissAuto(r)}
                           busy={busy}
                         />
                       ))}
@@ -244,7 +268,7 @@ export const ManageRivalsSheet: React.FC<Props> = ({ userId, open, onClose }) =>
   );
 };
 
-const Section: React.FC<{ title: string; children: React.ReactNode }> = ({ title, children }) => (
+const Section: React.FC<{ title: string; subtitle?: string; children: React.ReactNode }> = ({ title, subtitle, children }) => (
   <div style={{ marginTop: 12 }}>
     <p
       style={{
@@ -258,6 +282,11 @@ const Section: React.FC<{ title: string; children: React.ReactNode }> = ({ title
     >
       {title}
     </p>
+    {subtitle && (
+      <p style={{ margin: '0 0 8px', fontSize: 12, color: INK_MUTE, fontFamily: FONT }}>
+        {subtitle}
+      </p>
+    )}
     <div>{children}</div>
   </div>
 );

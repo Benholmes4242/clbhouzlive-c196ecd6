@@ -21,6 +21,9 @@ import {
   fetchUserRivalOverrides,
   upsertUserRivalOverride,
   deleteUserRivalOverride,
+  dismissRival,
+  clearRivalDismissal,
+  type RivalIdentity,
   fetchSharedRounds,
   fetchTrophyAggregates,
 } from './api';
@@ -299,6 +302,30 @@ export function useDeleteRivalOverride() {
     onSuccess: (_, params) => {
       queryClient.invalidateQueries({ queryKey: whsKeys.userRivalOverrides(params.userId) });
       queryClient.invalidateQueries({ queryKey: whsKeys.friendRivalries(params.userId) });
+    },
+  });
+}
+
+export function useDismissRival() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (params: { userId: string; identity: RivalIdentity }) =>
+      dismissRival(params.userId, params.identity),
+    onSuccess: (_, params) => {
+      queryClient.invalidateQueries({ queryKey: whsKeys.friendRivalries(params.userId) });
+      queryClient.invalidateQueries({ queryKey: whsKeys.userRivalOverrides(params.userId) });
+    },
+  });
+}
+
+export function useClearRivalDismissal() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (params: { userId: string; identity: RivalIdentity }) =>
+      clearRivalDismissal(params.userId, params.identity),
+    onSuccess: (_, params) => {
+      queryClient.invalidateQueries({ queryKey: whsKeys.friendRivalries(params.userId) });
+      queryClient.invalidateQueries({ queryKey: whsKeys.userRivalOverrides(params.userId) });
     },
   });
 }

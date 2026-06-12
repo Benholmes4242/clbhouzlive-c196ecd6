@@ -1,5 +1,5 @@
 import React from 'react';
-import { Pin } from 'lucide-react';
+import { Pin, X } from 'lucide-react';
 import { initials, firstName } from '@/lib/whs/utils/initials';
 import { pickAvatarSrc } from '@/lib/whs/utils/avatarSrc';
 import { fmtHcp } from '@/lib/whs/format';
@@ -8,6 +8,7 @@ import type { FriendRivalryHydrated } from '@/lib/whs/types';
 interface Props {
   rivalry: FriendRivalryHydrated;
   onPin: () => void;
+  onDismiss: () => void;
   busy: boolean;
 }
 
@@ -15,7 +16,7 @@ const FONT = 'Geist, system-ui, -apple-system, sans-serif';
 const AMBER = '#F7931E';
 const AMBER_DEEP = '#C97211';
 
-export const AutoPickedRow: React.FC<Props> = ({ rivalry, onPin, busy }) => (
+export const AutoPickedRow: React.FC<Props> = ({ rivalry, onPin, onDismiss, busy }) => (
   <div
     style={{
       display: 'flex',
@@ -112,6 +113,27 @@ export const AutoPickedRow: React.FC<Props> = ({ rivalry, onPin, busy }) => (
     >
       <Pin size={11} strokeWidth={2.4} />
       PIN
+    </button>
+    <button
+      onClick={onDismiss}
+      disabled={busy}
+      aria-label={`Stop suggesting ${firstName(rivalry.rival_name ?? 'rival')}`}
+      style={{
+        width: 32,
+        height: 32,
+        marginLeft: 4,
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        background: 'transparent',
+        border: 'none',
+        borderRadius: 8,
+        cursor: busy ? 'wait' : 'pointer',
+        color: 'var(--hcp-t-60)',
+        opacity: busy ? 0.4 : 1,
+      }}
+    >
+      <X size={16} strokeWidth={2.2} />
     </button>
   </div>
 );

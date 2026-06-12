@@ -15,6 +15,7 @@ import { toast } from 'sonner';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { supabase } from '@/integrations/supabase/client';
 import { useFriendRivalries, useWhsConnection } from '@/lib/whs/hooks';
+import { fetchPrimaryRivalryWithOwner } from '@/lib/whs/friendViewRivalries';
 import type { FriendRivalryHydrated } from '@/lib/whs/types';
 import { PageRoot } from '@/components/layout/PageRoot';
 import { useRivalryDimension } from '@/lib/whs/utils/useRivalryDimension';
@@ -60,6 +61,38 @@ function useOwnerRivalry(
   }, [data, rivalParamId]);
   return { row, isLoading, error };
 }
+
+function useAdHocRivalry(
+  viewerId: string | undefined,
+  rivalParamId: string | undefined,
+  enabled: boolean,
+) {
+  return useQuery({
+    queryKey: ['rivalry', 'ad-hoc', viewerId, rivalParamId],
+    enabled: enabled && !!viewerId && !!rivalParamId,
+    staleTime: 30_000,
+    queryFn: () => fetchPrimaryRivalryWithOwner(viewerId!, rivalParamId!),
+  });
+}
+
+function useRivalProfileExists(userId: string | undefined, enabled: boolean) {
+  return useQuery({
+    queryKey: ['rival-profile-exists', userId],
+    enabled: enabled && !!userId,
+    staleTime: 5 * 60_000,
+    queryFn: async () => {
+      const { data } = await supabase
+        .from('user_profiles')
+        .select('id, display_name')
+        .eq('id', userId!)
+        .maybeSingle();
+      if (!data) return null;
+      return { exists: true, displayName: (data as any).display_name as string | null };
+    },
+  });
+}
+
+
 
 function useFriendViewRivalry(
   viewerId: string | undefined,
@@ -161,8 +194,27 @@ const RivalryPage: React.FC = () => {
     isFriendView ? friendParam : undefined,
   );
 
-  const row = isFriendView ? friend.data ?? null : owner.row;
-  const isLoading = isFriendView ? friend.isLoading : owner.isLoading;
+  // Owner fallback: if the rivalParam is a valid UUID but no rivalry row
+  // exists in the user's pre-computed list, try a direct fetch (lets the
+  // page work for any user, not just current rivals).
+  const adHocEnabled =
+    !isFriendView &&
+    !owner.isLoading &&
+    !owner.row &&
+    !!rivalParam &&
+    UUID_RE.test(rivalParam);
+  const adHoc = useAdHocRivalry(viewerId, rivalParam, adHocEnabled);
+
+  // When the ad-hoc fetch also returns null, check whether the rival's
+  // profile exists so we can distinguish "no shared rounds" from "unknown id".
+  const profileCheckEnabled =
+    adHocEnabled && !adHoc.isLoading && !adHoc.data && !!rivalParam;
+  const profileExists = useRivalProfileExists(rivalParam, profileCheckEnabled);
+
+  const row = isFriendView ? friend.data ?? null : (owner.row ?? adHoc.data ?? null);
+  const isLoading = isFriendView
+    ? friend.isLoading
+    : owner.isLoading || (adHocEnabled && adHoc.isLoading) || (profileCheckEnabled && profileExists.isLoading);
   const errored = isFriendView ? !!friend.error : !!owner.error;
 
 
@@ -336,22 +388,30 @@ const RivalryPage: React.FC = () => {
 
       {viewerId && isLoading && <RivalrySkeleton />}
 
-      {viewerId && !isLoading && (errored || (!row && !isFriendView)) && (
-        <div
-          style={{
-            padding: '64px 24px',
-            textAlign: 'center',
-            fontFamily: FONT,
-          }}
-        >
-          <div style={{ color: T100, fontSize: 16, fontWeight: 700 }}>
-            Rivalry not found
+      {viewerId && !isLoading && (errored || (!row && !isFriendView)) && (() => {
+        const noSharedRounds = !errored && !!profileExists.data?.exists;
+        const rivalDisplayFirst = firstName(profileExists.data?.displayName ?? null) || 'this player';
+        return (
+          <div
+            style={{
+              padding: '64px 24px',
+              textAlign: 'center',
+              fontFamily: FONT,
+            }}
+          >
+            <div style={{ color: T100, fontSize: 16, fontWeight: 700 }}>
+              {noSharedRounds
+                ? `No shared rounds with ${rivalDisplayFirst} yet`
+                : 'Rivalry not found'}
+            </div>
+            <div style={{ color: T60, fontSize: 13, marginTop: 8 }}>
+              {noSharedRounds
+                ? 'A rivalry starts when you play the same course on the same day.'
+                : 'This rivalry may no longer exist.'}
+            </div>
           </div>
-          <div style={{ color: T60, fontSize: 13, marginTop: 8 }}>
-            This rivalry may no longer exist.
-          </div>
-        </div>
-      )}
+        );
+      })()}
 
       {viewerId && !isLoading && isFriendView && !row && !errored && (
         <PrivacyBlockedView />

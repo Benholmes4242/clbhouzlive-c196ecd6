@@ -1099,6 +1099,43 @@ export async function deleteUserRivalOverride(
   if (error) throw error;
 }
 
+export interface RivalIdentity {
+  rival_user_id?: string | null;
+  rival_friend_row_id?: string | null;
+}
+
+export async function dismissRival(
+  userId: string,
+  identity: RivalIdentity,
+): Promise<void> {
+  const rivalUserId = identity.rival_user_id ?? null;
+  const rivalFriendRowId = rivalUserId ? null : (identity.rival_friend_row_id ?? null);
+  if (!rivalUserId && !rivalFriendRowId) return;
+  const { error } = await supabase
+    .from('user_rival_dismissals' as any)
+    .insert({
+      user_id: userId,
+      rival_user_id: rivalUserId,
+      rival_friend_row_id: rivalFriendRowId,
+    });
+  if (error && (error as any).code !== '23505') throw error;
+}
+
+export async function clearRivalDismissal(
+  userId: string,
+  identity: RivalIdentity,
+): Promise<void> {
+  const rivalUserId = identity.rival_user_id ?? null;
+  const rivalFriendRowId = rivalUserId ? null : (identity.rival_friend_row_id ?? null);
+  if (!rivalUserId && !rivalFriendRowId) return;
+  let q = supabase.from('user_rival_dismissals' as any).delete().eq('user_id', userId);
+  q = rivalUserId
+    ? q.eq('rival_user_id', rivalUserId)
+    : q.eq('rival_friend_row_id', rivalFriendRowId);
+  const { error } = await q;
+  if (error) throw error;
+}
+
 // ───────────────────────────────────────────────────────────────────────
 // Shared rounds (H2H) — used by FriendProfileSheet
 // ───────────────────────────────────────────────────────────────────────
