@@ -1,6 +1,6 @@
 import React from 'react';
 import type { LucideIcon } from 'lucide-react';
-import { T100, LINE_2, AMBER, FONT } from './_shared/tokens';
+import { T100, LINE_2, FONT } from './_shared/tokens';
 
 export type FooterAction = {
   label: string;
