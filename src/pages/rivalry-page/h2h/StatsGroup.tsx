@@ -54,7 +54,7 @@ export const StatsGroup: React.FC<Props> = ({ title, stats }) => {
       >
         <div
           style={{
-            color: AMBER,
+            color: '#FFFFFF',
             fontSize: 11,
             fontWeight: 800,
             letterSpacing: '0.16em',
