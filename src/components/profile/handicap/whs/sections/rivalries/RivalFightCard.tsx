@@ -21,7 +21,7 @@ const FONT_GEIST =
   'Geist, system-ui, -apple-system, BlinkMacSystemFont, sans-serif';
 const GOLD  = '#FBBC2E';
 const AMBER = '#F7931E';
-const RED   = 'var(--hcp-bad)';
+const MUTED = 'rgba(255,255,255,0.5)';
 
 interface Props {
   rivalry: FriendRivalryHydrated;
@@ -78,7 +78,10 @@ export const RivalFightCard: React.FC<Props> = ({
     null;
 
   const isWinningOverall = record.wins > record.losses;
-  const accentColor = isWinningOverall ? GOLD : record.losses > record.wins ? RED : '#94A3B8';
+  const themLeads = record.losses > record.wins;
+  const youColor = isWinningOverall ? GOLD : MUTED;
+  const themColor = themLeads ? GOLD : MUTED;
+  const accentColor = isWinningOverall ? GOLD : '#94A3B8';
 
   const tappable = typeof onTap === 'function';
   const Tag: any = tappable ? 'button' : 'div';
@@ -326,7 +329,7 @@ export const RivalFightCard: React.FC<Props> = ({
             <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 2 }}>
               <span
                 style={{
-                  color: accentColor,
+                  color: youColor,
                   fontVariantNumeric: 'tabular-nums',
                   fontWeight: 800,
                   fontSize: 27,
@@ -341,7 +344,7 @@ export const RivalFightCard: React.FC<Props> = ({
                   fontSize: 8.5,
                   fontWeight: 800,
                   letterSpacing: '0.12em',
-                  color: accentColor,
+                  color: youColor,
                   textTransform: 'uppercase',
                   whiteSpace: 'nowrap',
                 }}
@@ -366,7 +369,7 @@ export const RivalFightCard: React.FC<Props> = ({
             <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 2 }}>
               <span
                 style={{
-                  color: 'rgba(255,255,255,0.5)',
+                  color: themColor,
                   fontVariantNumeric: 'tabular-nums',
                   fontWeight: 800,
                   fontSize: 27,
@@ -381,7 +384,7 @@ export const RivalFightCard: React.FC<Props> = ({
                   fontSize: 8.5,
                   fontWeight: 800,
                   letterSpacing: '0.12em',
-                  color: 'rgba(255,255,255,0.5)',
+                  color: themColor,
                   textTransform: 'uppercase',
                   whiteSpace: 'nowrap',
                 }}
