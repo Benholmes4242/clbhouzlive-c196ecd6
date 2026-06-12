@@ -6,7 +6,7 @@ import {
   T100,
   T50,
   T35,
-  AMBER,
+  
   GREEN,
   RED,
   LINE,
