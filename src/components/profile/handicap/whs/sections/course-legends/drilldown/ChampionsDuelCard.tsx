@@ -76,6 +76,67 @@ function SquircleAvatar({ photoUrl, size = 38, dashed = false }: { photoUrl: str
   );
 }
 
+/** Mini avatar (22px squircle) for the chase track. Crowned variant adds the mini crown. */
+function TrackFace({
+  entry,
+  crowned = false,
+  style,
+}: {
+  entry: DuelRow | null;
+  crowned?: boolean;
+  style?: React.CSSProperties;
+}) {
+  const size = 22;
+  const photoUrl = entry?.photoUrl ?? null;
+  const initials = (entry?.name ?? '?')
+    .trim()
+    .split(/\s+/)
+    .slice(0, 2)
+    .map((p) => p[0])
+    .join('')
+    .toUpperCase() || '?';
+  const photoBg = photoUrl
+    ? `url(${photoUrl}) center/cover`
+    : 'linear-gradient(135deg, #cbd5e1 0%, #64748b 100%)';
+  return (
+    <div style={{ width: size, height: size, position: 'relative', flexShrink: 0, ...style }} aria-hidden>
+      <div
+        style={{
+          position: 'absolute',
+          inset: 0,
+          background: photoBg,
+          borderRadius: '34%',
+          overflow: 'hidden',
+          boxShadow: '0 1px 3px rgba(15,23,42,0.18), inset 0 0 0 1px rgba(15,23,42,0.10)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          color: '#fff',
+          fontSize: 9,
+          fontWeight: 800,
+          letterSpacing: '-0.01em',
+        }}
+      >
+        {!photoUrl && initials}
+      </div>
+      {crowned && (
+        <div
+          aria-hidden
+          style={{
+            position: 'absolute',
+            top: -6,
+            left: -3,
+            transform: 'rotate(-18deg)',
+            lineHeight: 0,
+          }}
+        >
+          <Crown size={10} fill={GOLD} color={DEEP_AMBER} strokeWidth={2.4} />
+        </div>
+      )}
+    </div>
+  );
+}
+
 function firstName(name: string): string {
   if (!name) return name;
   if (name === 'You') return 'You';
