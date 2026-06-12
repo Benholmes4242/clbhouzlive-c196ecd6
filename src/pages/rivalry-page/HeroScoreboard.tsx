@@ -86,7 +86,7 @@ export const HeroScoreboard: React.FC<Props> = ({
           position: 'relative',
           background: BG_1,
           backgroundImage: gradient,
-          border: `1px solid rgba(247,147,30,0.20)`,
+          border: `1px solid rgba(255,255,255,0.12)`,
           borderRadius: 16,
           overflow: 'hidden',
         }}
