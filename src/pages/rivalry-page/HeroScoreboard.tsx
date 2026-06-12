@@ -17,6 +17,7 @@ import {
 import { firstName } from './_shared/helpers';
 import { reformatFriendName } from '@/lib/whs/utils/nameFormat';
 import { pickAvatarSrc } from '@/lib/whs/utils/avatarSrc';
+import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import type { FriendRivalryHydrated } from '@/lib/whs/types';
 import type { RivalryDimension } from '@/lib/whs/utils/useRivalryDimension';
 
@@ -234,27 +235,12 @@ const SideBlock: React.FC<SideBlockProps> = ({
       gap: 8,
     }}
   >
-    <div
-      style={{
-        width: 52,
-        height: 52,
-        borderRadius: 14,
-        background: avatarUrl
-          ? `url(${avatarUrl}) center/cover`
-          : 'rgba(255,255,255,0.06)',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        color: T100,
-        fontWeight: 800,
-        fontSize: 18,
-        fontFamily: FONT,
-        flexShrink: 0,
-      }}
-      aria-hidden
-    >
-      {!avatarUrl && fallbackChar}
-    </div>
+    <SquircleAvatar
+      size={52}
+      src={avatarUrl}
+      alt=""
+      fallback={fallbackChar}
+    />
     <div
       style={{
         color: labelColor,
@@ -277,7 +263,7 @@ const SideBlock: React.FC<SideBlockProps> = ({
           ...TAB,
         }}
       >
-        {handicap != null && <span>hcp {Number(handicap).toFixed(1)}</span>}
+        {handicap != null && <span>HCP {Number(handicap).toFixed(1)}</span>}
         {handicap != null && winPct != null && (
           <span style={{ color: T35, margin: '0 4px' }}>·</span>
         )}
