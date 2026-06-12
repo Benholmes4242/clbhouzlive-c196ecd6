@@ -19166,6 +19166,24 @@ export type Database = {
           start_date: string
         }[]
       }
+      get_adhoc_rivalry: {
+        Args: { p_rival_user_id: string }
+        Returns: {
+          computed_at: string
+          gross_record: Json
+          rival_friend_row_id: string
+          rival_handicap: number
+          rival_trend_delta: number
+          rival_user_id: string
+          shared_round_results: Json
+          shared_rounds_count: number
+          shared_rounds_last_90d: number
+          slot_index: number
+          slot_kind: string
+          stableford_record: Json
+          user_id: string
+        }[]
+      }
       get_admin_role: {
         Args: never
         Returns: Database["public"]["Enums"]["admin_role"]
