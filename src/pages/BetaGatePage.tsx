@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { Link } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 
 const LAUNCH = new Date(2026, 5, 22, 0, 0, 0); // 22 June 2026, LOCAL midnight
@@ -240,6 +241,21 @@ const BetaGatePage: React.FC = () => {
               On iPhone and Android, 22 June 2026.
             </p>
 
+            <p
+              style={{
+                fontFamily: GEIST,
+                fontSize: 13,
+                lineHeight: 1.65,
+                color: 'rgba(255,255,255,0.5)',
+                textAlign: 'center',
+                margin: 0,
+                maxWidth: 420,
+              }}
+            >
+              clbhouz is a social platform for golfers: share your rounds, rate and discover the world's best courses, track your official handicap, and compete with friends.
+            </p>
+
+
             {/* Notify capture */}
             {submitState === 'success' || submitState === 'duplicate' ? (
               <div style={{ width: '100%', maxWidth: 380, textAlign: 'center' }}>
@@ -349,20 +365,36 @@ const BetaGatePage: React.FC = () => {
         )}
       </div>
 
-      <span
+      <div
         style={{
           position: 'absolute',
-          bottom: 32,
+          bottom: 28,
+          left: 0,
+          right: 0,
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          gap: 8,
           fontFamily: GEIST,
-          fontSize: 10,
-          color: 'rgba(255,255,255,0.25)',
-          textTransform: 'uppercase',
-          letterSpacing: '0.12em',
-          fontWeight: 500,
         }}
       >
-        clbhouz — clbhouz.co.uk
-      </span>
+        <div style={{ fontSize: 12, color: 'rgba(255,255,255,0.4)' }}>
+          <Link to="/privacy" style={{ color: 'inherit', textDecoration: 'none' }}>Privacy Policy</Link>
+          <span style={{ margin: '0 8px' }}>·</span>
+          <Link to="/terms" style={{ color: 'inherit', textDecoration: 'none' }}>Terms of Service</Link>
+        </div>
+        <span
+          style={{
+            fontSize: 10,
+            color: 'rgba(255,255,255,0.25)',
+            textTransform: 'uppercase',
+            letterSpacing: '0.12em',
+            fontWeight: 500,
+          }}
+        >
+          clbhouz — clbhouz.co.uk
+        </span>
+      </div>
     </div>
   );
 };
