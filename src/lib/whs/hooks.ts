@@ -21,6 +21,9 @@ import {
   fetchUserRivalOverrides,
   upsertUserRivalOverride,
   deleteUserRivalOverride,
+  dismissRival,
+  clearRivalDismissal,
+  type RivalIdentity,
   fetchSharedRounds,
   fetchTrophyAggregates,
 } from './api';
