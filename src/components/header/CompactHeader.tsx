@@ -276,9 +276,9 @@ const CompactHeader: React.FC<CompactHeaderProps> = ({ className }) => {
 
           {/* Center section */}
           {useDarkChrome ? (
-            <div className="flex-1" />
+            <div className="flex-1 min-w-0" />
           ) : (
-          <div className="hidden lg:flex flex-1 justify-center">
+          <div className="hidden lg:flex flex-1 justify-center min-w-0">
             {/* Desktop: main nav links */}
             <nav className="hidden lg:flex items-center gap-1">
               {[
