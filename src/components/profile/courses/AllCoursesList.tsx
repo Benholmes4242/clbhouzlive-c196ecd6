@@ -76,12 +76,8 @@ export const AllCoursesList: React.FC<AllCoursesListProps> = ({
   const { courses: playedUnrated, count: reviewCount } = usePlayedUnratedCourses(userId);
 
   const handleCourseClick = useCallback(
-    (courseId: string, ratingId: string | null) => {
-      if (ratingId) {
-        navigate(`/courses/${courseId}?tab=reviews&review=${ratingId}`);
-      } else {
-        navigate(`/courses/${courseId}`);
-      }
+    (courseId: string) => {
+      navigate(`/courses/${courseId}`);
     },
     [navigate],
   );

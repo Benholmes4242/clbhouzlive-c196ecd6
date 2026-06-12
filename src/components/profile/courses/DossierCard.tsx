@@ -23,7 +23,7 @@ const HAIRLINE_SOFT = '#EEF2F6';
 export interface DossierCardProps {
   course: RatedCourseData;
   rank: number;
-  onCourseClick: (courseId: string, ratingId: string | null) => void;
+  onCourseClick: (courseId: string) => void;
   onFullReview: (courseId: string, ratingId: string | null) => void;
 }
 
@@ -277,7 +277,7 @@ const DossierCard: React.FC<DossierCardProps> = ({
               type="button"
               onClick={(e) => {
                 e.stopPropagation();
-                onCourseClick(course.id, course.rating_id);
+              onCourseClick(course.id);
               }}
               style={{
                 display: 'inline-flex',
