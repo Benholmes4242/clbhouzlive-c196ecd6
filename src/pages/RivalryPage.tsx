@@ -15,7 +15,7 @@ import { toast } from 'sonner';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { supabase } from '@/integrations/supabase/client';
 import { useFriendRivalries, useWhsConnection } from '@/lib/whs/hooks';
-import { fetchPrimaryRivalryWithOwner } from '@/lib/whs/friendViewRivalries';
+import { fetchPrimaryRivalryWithOwner, fetchAdHocRivalry } from '@/lib/whs/friendViewRivalries';
 import type { FriendRivalryHydrated } from '@/lib/whs/types';
 import { PageRoot } from '@/components/layout/PageRoot';
 import { useRivalryDimension } from '@/lib/whs/utils/useRivalryDimension';
@@ -71,7 +71,7 @@ function useAdHocRivalry(
     queryKey: ['rivalry', 'ad-hoc', viewerId, rivalParamId],
     enabled: enabled && !!viewerId && !!rivalParamId,
     staleTime: 30_000,
-    queryFn: () => fetchPrimaryRivalryWithOwner(viewerId!, rivalParamId!),
+    queryFn: () => fetchAdHocRivalry(viewerId!, rivalParamId!),
   });
 }
 
@@ -406,7 +406,7 @@ const RivalryPage: React.FC = () => {
             </div>
             <div style={{ color: T60, fontSize: 13, marginTop: 8 }}>
               {noSharedRounds
-                ? 'A rivalry starts when you play the same course on the same day.'
+                ? 'Play rounds on the same day at the same course to start your rivalry.'
                 : 'This rivalry may no longer exist.'}
             </div>
           </div>

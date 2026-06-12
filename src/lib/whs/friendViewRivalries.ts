@@ -128,6 +128,26 @@ export async function fetchPrimaryRivalryWithOwner(
 }
 
 /**
+ * Ad-hoc rivalry: compute live for any synced friend pair via the
+ * get_adhoc_rivalry RPC. Returns null when no shared rounds exist.
+ */
+export async function fetchAdHocRivalry(
+  viewerId: string,
+  rivalUserId: string,
+): Promise<FriendRivalryHydrated | null> {
+  if (viewerId === rivalUserId) return null;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const { data, error } = await (supabase.rpc as any)('get_adhoc_rivalry', {
+    p_rival_user_id: rivalUserId,
+  });
+  if (error) throw error;
+  const rows = (data as FriendRivalry[]) ?? [];
+  if (rows.length === 0) return null;
+  const hydrated = await hydrateRivalries(viewerId, rows);
+  return hydrated[0] ?? null;
+}
+
+/**
  * Secondary list: owner's OTHER rivalries, server-side filtered by
  * transitive trust + me-vs-owner exclusion. Ordered by computed_at DESC.
  */
