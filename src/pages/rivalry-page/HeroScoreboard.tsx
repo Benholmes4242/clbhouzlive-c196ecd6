@@ -17,6 +17,7 @@ import {
 import { firstName } from './_shared/helpers';
 import { reformatFriendName } from '@/lib/whs/utils/nameFormat';
 import { pickAvatarSrc } from '@/lib/whs/utils/avatarSrc';
+import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import type { FriendRivalryHydrated } from '@/lib/whs/types';
 import type { RivalryDimension } from '@/lib/whs/utils/useRivalryDimension';
 
