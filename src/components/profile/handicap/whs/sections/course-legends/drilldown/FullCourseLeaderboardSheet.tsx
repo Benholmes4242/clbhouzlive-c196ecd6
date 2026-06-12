@@ -157,8 +157,8 @@ export const FullCourseLeaderboardSheet: React.FC<Props> = ({
 
   // Chase line + status pill
   const opponentValue = defending
-    ? (runnerUp?.value ?? champion.value)
-    : (selfRow?.value ?? champion.value);
+    ? (runnerUp?.value ?? champion?.value ?? 0)
+    : (selfRow?.value ?? champion?.value ?? 0);
   const chaseStandsAlone = defending ? !runnerUp : standsAlone;
 
   const chaseLine = champion
