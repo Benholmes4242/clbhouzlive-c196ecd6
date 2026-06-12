@@ -375,7 +375,7 @@ const ClubhouseContent = () => {
         activeTab === 'friends' ? (
           <div
             className="flex flex-col w-full"
-            style={{ paddingTop: 'calc(max(env(safe-area-inset-top, 0px), 47px) + 72px)' }}
+            style={{ paddingTop: 'calc(max(env(safe-area-inset-top, 0px), 47px) + 84px)' }}
           >
             <div className="flex flex-col items-center px-8 text-center pb-6">
               <div className="w-14 h-14 rounded-full bg-white/5 flex items-center justify-center mb-4">
