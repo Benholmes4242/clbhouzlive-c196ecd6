@@ -81,7 +81,7 @@ export const TheirFormSection: React.FC<Props> = ({ handicap }) => {
               ? 'no 30d data'
               : isFlat
                 ? 'flat'
-                : `${Math.abs(delta as number).toFixed(1)} in 30d`}
+                : `${Math.abs(delta as number).toFixed(1)} in 90d`}
           </span>
         </span>
       </div>
