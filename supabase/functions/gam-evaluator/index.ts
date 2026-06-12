@@ -923,7 +923,12 @@ async function recomputeLegend(courseId: string, cfg: LegendCfg) {
   const arr = Array.from(byUser.entries())
     .map(([user_id, v]) => ({ user_id, value: v.value, attained_at: v.attained_at }))
     .filter((r) => (cfg.aggregate === "value" ? r.value != null : r.value > 0))
-    .sort((a, b) => cfg.sortDir === "asc" ? a.value - b.value : b.value - a.value)
+    .sort((a, b) => {
+      const d = cfg.sortDir === "asc" ? a.value - b.value : b.value - a.value;
+      if (d !== 0) return d;
+      if (a.attained_at !== b.attained_at) return a.attained_at < b.attained_at ? -1 : 1;
+      return a.user_id < b.user_id ? -1 : 1;
+    })
     .slice(0, 10);
 
   // Mark old as not current
