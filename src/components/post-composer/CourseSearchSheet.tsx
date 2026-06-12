@@ -87,12 +87,12 @@ export function CourseSearchSheet({
   return (
     <>
       <div
-        className="fixed inset-0 z-[80]"
+        className="fixed inset-0 z-[10000]"
         style={{ background: 'rgba(15,23,42,0.30)' }}
         onClick={onClose}
       />
       <div
-        className="fixed inset-x-0 bottom-0 z-[81] flex flex-col"
+        className="fixed inset-x-0 bottom-0 z-[10001] flex flex-col"
         style={{
           maxHeight: '78vh',
           background: '#ffffff',
