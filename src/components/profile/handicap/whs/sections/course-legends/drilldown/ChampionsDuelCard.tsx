@@ -2,7 +2,7 @@ import React from 'react';
 import { Crown, Swords, type LucideIcon } from 'lucide-react';
 import type { LegendCategory } from '@/lib/gam/types';
 import { ChampionsListRow } from './ChampionsListRow';
-import { duelTension, duelLine } from './_shared/duelTension';
+import { duelLine, chaseProgress } from './_shared/duelTension';
 import { ProBenchmarkBand } from './ProBenchmarkBand';
 import type { ProProfile } from './_shared/proBenchmark';
 
@@ -76,6 +76,67 @@ function SquircleAvatar({ photoUrl, size = 38, dashed = false }: { photoUrl: str
   );
 }
 
+/** Mini avatar (22px squircle) for the chase track. Crowned variant adds the mini crown. */
+function TrackFace({
+  entry,
+  crowned = false,
+  style,
+}: {
+  entry: DuelRow | null;
+  crowned?: boolean;
+  style?: React.CSSProperties;
+}) {
+  const size = 22;
+  const photoUrl = entry?.photoUrl ?? null;
+  const initials = (entry?.name ?? '?')
+    .trim()
+    .split(/\s+/)
+    .slice(0, 2)
+    .map((p) => p[0])
+    .join('')
+    .toUpperCase() || '?';
+  const photoBg = photoUrl
+    ? `url(${photoUrl}) center/cover`
+    : 'linear-gradient(135deg, #cbd5e1 0%, #64748b 100%)';
+  return (
+    <div style={{ width: size, height: size, position: 'relative', flexShrink: 0, ...style }} aria-hidden>
+      <div
+        style={{
+          position: 'absolute',
+          inset: 0,
+          background: photoBg,
+          borderRadius: '34%',
+          overflow: 'hidden',
+          boxShadow: '0 1px 3px rgba(15,23,42,0.18), inset 0 0 0 1px rgba(15,23,42,0.10)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          color: '#fff',
+          fontSize: 9,
+          fontWeight: 800,
+          letterSpacing: '-0.01em',
+        }}
+      >
+        {!photoUrl && initials}
+      </div>
+      {crowned && (
+        <div
+          aria-hidden
+          style={{
+            position: 'absolute',
+            top: -6,
+            left: -3,
+            transform: 'rotate(-18deg)',
+            lineHeight: 0,
+          }}
+        >
+          <Crown size={10} fill={GOLD} color={DEEP_AMBER} strokeWidth={2.4} />
+        </div>
+      )}
+    </div>
+  );
+}
+
 function firstName(name: string): string {
   if (!name) return name;
   if (name === 'You') return 'You';
@@ -107,10 +168,18 @@ export const ChampionsDuelCard: React.FC<ChampionsDuelCardProps> = ({
     right = selfRow;
   }
 
-  const showBar = !standsAlone && selfOnBoard;
+  // (legacy showBar removed — chase track uses showTrack below)
   const leftValue = champion?.value ?? 0;
   const rightValue = right?.value ?? 0;
-  const fill = duelTension(category, leftValue, rightValue);
+
+  // Chase track participants — champion = crown holder, chaser = the other face.
+  const trackChampion: DuelRow | null = champion ?? null;
+  const trackChaser: DuelRow | null = defending ? (right ?? null) : selfRow;
+  const showTrack = !standsAlone && trackChampion != null && trackChaser != null;
+  const rawProgress = showTrack
+    ? chaseProgress(category, trackChampion!.value, trackChaser!.value)
+    : 0;
+  const pos = Math.max(0.04, Math.min(0.90, rawProgress));
 
   let line: string;
   let isNormalDuelLine = false;
@@ -196,6 +265,20 @@ export const ChampionsDuelCard: React.FC<ChampionsDuelCardProps> = ({
       <div style={{ display: 'grid', gridTemplateColumns: '1fr auto 1fr', gap: 10, alignItems: 'center' }}>
         {/* LEFT: crown holder */}
         <div style={{ display: 'flex', alignItems: 'center', gap: 10, minWidth: 0 }}>
+          <span
+            aria-hidden
+            style={{
+              fontSize: 11,
+              fontWeight: 800,
+              color: DEEP_AMBER,
+              fontVariantNumeric: 'tabular-nums',
+              width: 12,
+              textAlign: 'right',
+              flexShrink: 0,
+            }}
+          >
+            1
+          </span>
           <div style={{ position: 'relative', flexShrink: 0 }}>
             <SquircleAvatar photoUrl={champion?.photoUrl ?? null} size={38} />
             <div
@@ -291,26 +374,71 @@ export const ChampionsDuelCard: React.FC<ChampionsDuelCardProps> = ({
         </div>
       </div>
 
-      {/* Tension bar */}
-      {showBar && (
-        <div
-          style={{
-            marginTop: 12,
-            height: 5,
-            borderRadius: 999,
-            background: 'var(--hcp-tint-1)',
-            overflow: 'hidden',
-          }}
-        >
+      {/* Chase track: champion at the finish, chaser travelling toward them */}
+      {showTrack && (
+        <div style={{ position: 'relative', height: 30, marginTop: 11 }}>
+          {/* rail */}
           <div
             style={{
-              width: `${fill * 100}%`,
-              height: '100%',
+              position: 'absolute',
+              left: 0,
+              right: 0,
+              top: '50%',
+              height: 4,
+              transform: 'translateY(-50%)',
               borderRadius: 999,
-              background: defending
-                ? 'linear-gradient(90deg, #FBBC2E, #F7931E)'
-                : 'var(--hcp-bar-neutral)',
-              transition: 'width 300ms ease',
+              background: 'var(--hcp-bar-neutral)',
+            }}
+          />
+          {/* progress fill behind the chaser */}
+          <div
+            style={{
+              position: 'absolute',
+              left: 0,
+              top: '50%',
+              height: 4,
+              width: `${pos * 100}%`,
+              transform: 'translateY(-50%)',
+              borderRadius: 999,
+              background: 'linear-gradient(90deg, #FBBC2E, #F7931E)',
+              transition: 'width 400ms cubic-bezier(.2,.8,.2,1)',
+            }}
+          />
+          {/* quarter notches */}
+          {[0.25, 0.5, 0.75].map((p) => (
+            <div
+              key={p}
+              style={{
+                position: 'absolute',
+                left: `${p * 100}%`,
+                top: '50%',
+                width: 1,
+                height: 8,
+                transform: 'translate(-50%,-50%)',
+                background: 'var(--hcp-line)',
+              }}
+            />
+          ))}
+          {/* chaser mini-avatar */}
+          <TrackFace
+            entry={trackChaser}
+            style={{
+              position: 'absolute',
+              left: `calc(${pos * 100}% - 11px)`,
+              top: '50%',
+              transform: 'translateY(-50%)',
+              transition: 'left 400ms cubic-bezier(.2,.8,.2,1)',
+            }}
+          />
+          {/* champion mini-avatar at the finish, crowned */}
+          <TrackFace
+            entry={trackChampion}
+            crowned
+            style={{
+              position: 'absolute',
+              right: -2,
+              top: '50%',
+              transform: 'translateY(-50%)',
             }}
           />
         </div>
@@ -319,7 +447,7 @@ export const ChampionsDuelCard: React.FC<ChampionsDuelCardProps> = ({
       {/* Line */}
       <div
         style={{
-          marginTop: showBar ? 8 : 12,
+          marginTop: showTrack ? 8 : 12,
           fontSize: 11,
           fontWeight: 600,
           color: defending ? DEEP_AMBER : INK_55,
