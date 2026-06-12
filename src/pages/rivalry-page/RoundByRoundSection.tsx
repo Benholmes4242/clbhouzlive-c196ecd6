@@ -238,10 +238,10 @@ const Chip: React.FC<
     onClick={onClick}
     style={{
       padding: '6px 12px',
-      background: active ? 'rgba(247,147,30,0.14)' : 'transparent',
-      border: `1px solid ${active ? AMBER : LINE_2}`,
+      background: active ? 'rgba(255,255,255,0.12)' : 'transparent',
+      border: `1px solid ${active ? '#FFFFFF' : LINE_2}`,
       borderRadius: 999,
-      color: active ? AMBER : T70,
+      color: active ? '#FFFFFF' : T70,
       fontSize: 12,
       fontWeight: 700,
       letterSpacing: '0.04em',
