@@ -37,7 +37,7 @@ export const DimensionToggle: React.FC<Props> = ({ value, onChange }) => (
           style={{
             padding: '6px 14px',
             borderRadius: 999,
-            background: active ? AMBER : 'transparent',
+            background: active ? '#FFFFFF' : 'transparent',
             color: active ? '#1A1208' : T50,
             border: 'none',
             cursor: 'pointer',
