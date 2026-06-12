@@ -22,7 +22,7 @@ interface EchoPageComposerProps {
   cooldown?: number | null;
 }
 
-export const EchoPageComposer = forwardRef<HTMLInputElement, EchoPageComposerProps>(
+export const EchoPageComposer = forwardRef<HTMLTextAreaElement, EchoPageComposerProps>(
   function EchoPageComposer(
     { value, onChange, onSend, onAbort, isStreaming, disabled, cooldown },
     ref
