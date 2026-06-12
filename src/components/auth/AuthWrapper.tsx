@@ -7,7 +7,7 @@ import { useOnboardingStatus } from '@/hooks/useOnboardingStatus';
 import { isMedianApp } from '@/utils/median/isMedianApp';
 import BetaGatePage from '@/pages/BetaGatePage';
 
-const PUBLIC_PATHS = ['/auth', '/auth/callback', '/post'];
+const PUBLIC_PATHS = ['/auth', '/auth/callback', '/post', '/privacy', '/terms'];
 
 interface AuthWrapperProps {
   children: React.ReactNode;
@@ -68,7 +68,9 @@ const AuthWrapper: React.FC<AuthWrapperProps> = ({ children }) => {
     // Auth pages and onboarding-exempt routes
     const isAuthPage = location.pathname === '/auth'
       || location.pathname === '/auth/callback'
-      || location.pathname.startsWith('/post');
+      || location.pathname.startsWith('/post')
+      || location.pathname === '/privacy'
+      || location.pathname === '/terms';
 
     // If user is not authenticated and not on an auth page, redirect to auth
     if (!user && !isAuthPage) {
