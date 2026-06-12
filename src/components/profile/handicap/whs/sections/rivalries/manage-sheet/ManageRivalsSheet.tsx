@@ -37,6 +37,8 @@ export const ManageRivalsSheet: React.FC<Props> = ({ userId, open, onClose }) =>
   const { data: leaderboard = [], isLoading: lbLoading } = useFriendLeaderboard(userId);
   const upsert = useUpsertRivalOverride();
   const remove = useDeleteRivalOverride();
+  const dismiss = useDismissRival();
+  const clearDismissal = useClearRivalDismissal();
 
   const pinned = useMemo(
     () =>
