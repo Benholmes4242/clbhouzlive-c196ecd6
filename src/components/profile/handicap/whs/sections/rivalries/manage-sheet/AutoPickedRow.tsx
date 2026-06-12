@@ -16,7 +16,7 @@ const FONT = 'Geist, system-ui, -apple-system, sans-serif';
 const AMBER = '#F7931E';
 const AMBER_DEEP = '#C97211';
 
-export const AutoPickedRow: React.FC<Props> = ({ rivalry, onPin, busy }) => (
+export const AutoPickedRow: React.FC<Props> = ({ rivalry, onPin, onDismiss, busy }) => (
   <div
     style={{
       display: 'flex',
