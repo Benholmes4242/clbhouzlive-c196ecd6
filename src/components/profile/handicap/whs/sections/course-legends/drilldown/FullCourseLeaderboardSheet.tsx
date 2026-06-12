@@ -109,6 +109,8 @@ export const FullCourseLeaderboardSheet: React.FC<Props> = ({
   const standsAlone = activeRows.length === 1;
   const selfRank = selfRow?.rank ?? null;
 
+  const runnerUp = activeRows.find((r) => !r.isSelf) ?? null;
+
   // Rows in the scrollable list = everything except the pinned champion.
   const listRows = activeRows.slice(1);
 
