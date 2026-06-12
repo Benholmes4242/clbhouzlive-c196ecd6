@@ -24,7 +24,7 @@ export default function EchoPage() {
   const { conversationId: urlConversationId } = useParams<{ conversationId?: string }>();
   const [searchParams, setSearchParams] = useSearchParams();
   const queryClient = useQueryClient();
-  const composerRef = useRef<HTMLInputElement>(null);
+  const composerRef = useRef<HTMLTextAreaElement>(null);
   const profile = useEchoProfile();
   
   const [input, setInput] = useState('');
