@@ -80,7 +80,7 @@ export const ClubhouseTopBar: React.FC<ClubhouseTopBarProps> = ({
           className="fixed left-0 right-0 z-40 flex items-center justify-center"
           style={{
             top: TOP_STRIP_TOP,
-            padding: '0 16px',
+            padding: '0 clamp(10px, 3vw, 16px)',
             height: 44,
             opacity: hidden ? 0 : 1,
             transform: hidden ? 'translateY(-100%)' : 'translateY(0)',
@@ -88,7 +88,7 @@ export const ClubhouseTopBar: React.FC<ClubhouseTopBarProps> = ({
             transition: 'opacity 240ms cubic-bezier(0.22, 0.61, 0.36, 1), transform 240ms cubic-bezier(0.22, 0.61, 0.36, 1)',
           }}
         >
-          <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 'clamp(8px, 2.2vw, 14px)', maxWidth: '100%', minWidth: 0 }}>
             {!hideTabs && (
               <ClubhouseTabToggle
                 activeTab={activeTab}
@@ -105,7 +105,7 @@ export const ClubhouseTopBar: React.FC<ClubhouseTopBarProps> = ({
                   height: 18,
                   background: 'rgba(255,255,255,0.18)',
                   flexShrink: 0,
-                  margin: '0 2px',
+                  margin: 0,
                 }}
               />
             )}
@@ -116,7 +116,7 @@ export const ClubhouseTopBar: React.FC<ClubhouseTopBarProps> = ({
                 onClick={() => setSearchOpen(true)}
                 aria-label="Search"
                 style={{
-                  width: 30,
+                  width: 26,
                   height: 30,
                   display: 'flex',
                   alignItems: 'center',
@@ -129,7 +129,7 @@ export const ClubhouseTopBar: React.FC<ClubhouseTopBarProps> = ({
                   filter: FLOAT_SHADOW,
                 }}
               >
-                <Search size={22} strokeWidth={FLOAT_STROKE} />
+                <Search size={20} strokeWidth={FLOAT_STROKE} />
               </button>
             )}
 

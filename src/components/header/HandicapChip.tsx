@@ -33,12 +33,13 @@ const FLOAT_SHADOW = 'drop-shadow(0 1px 4px rgba(0,0,0,0.55))';
 const BASE_STYLE = {
   display: 'inline-flex',
   alignItems: 'center',
-  padding: '6px 11px',
+  padding: '6px clamp(7px, 1.8vw, 11px)',
   borderRadius: 10,
   background: 'transparent',
   cursor: 'pointer',
   fontFamily: 'Geist, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
   height: 26,
+  flexShrink: 0,
 } as const;
 
 function resolveSource(pathname: string): string {
