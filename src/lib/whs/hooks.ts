@@ -306,6 +306,30 @@ export function useDeleteRivalOverride() {
   });
 }
 
+export function useDismissRival() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (params: { userId: string; identity: RivalIdentity }) =>
+      dismissRival(params.userId, params.identity),
+    onSuccess: (_, params) => {
+      queryClient.invalidateQueries({ queryKey: whsKeys.friendRivalries(params.userId) });
+      queryClient.invalidateQueries({ queryKey: whsKeys.userRivalOverrides(params.userId) });
+    },
+  });
+}
+
+export function useClearRivalDismissal() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (params: { userId: string; identity: RivalIdentity }) =>
+      clearRivalDismissal(params.userId, params.identity),
+    onSuccess: (_, params) => {
+      queryClient.invalidateQueries({ queryKey: whsKeys.friendRivalries(params.userId) });
+      queryClient.invalidateQueries({ queryKey: whsKeys.userRivalOverrides(params.userId) });
+    },
+  });
+}
+
 export function useSharedRounds(
   userId: string | undefined,
   rivalUserId: string | null,
