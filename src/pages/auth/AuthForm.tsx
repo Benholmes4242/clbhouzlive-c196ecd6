@@ -59,6 +59,7 @@ const AuthForm: React.FC<AuthFormProps> = ({ authNotice }) => {
   const [submitting, setSubmitting] = useState(false);
   const [otpError, setOtpError] = useState<string | null>(null);
   const [otpErrorNonce, setOtpErrorNonce] = useState(0);
+  const [otpInfo, setOtpInfo] = useState<string | null>(null);
   const [resendCooldown, setResendCooldown] = useState(0);
 
   const [showSuccessAnimation, setShowSuccessAnimation] = useState(false);

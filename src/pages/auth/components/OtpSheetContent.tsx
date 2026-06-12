@@ -5,12 +5,15 @@ interface OtpSheetContentProps {
   email: string;
   submitting: boolean;
   errorMessage: string | null;
+  infoMessage?: string | null;
   resendCooldown: number;
   onVerify: (code: string) => Promise<void> | void;
   onResend: () => Promise<void> | void;
   onUseDifferentEmail: () => void;
   /** Bumped by parent when an error fires so we can clear/refocus. */
   errorNonce?: number;
+  /** Called when the user starts editing the code so the parent can clear transient notices. */
+  onCodeEdit?: () => void;
 }
 
 const BOX_COUNT = 6;
