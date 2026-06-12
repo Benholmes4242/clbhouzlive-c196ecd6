@@ -36,7 +36,7 @@ export const InsightsGrid: React.FC<Props> = ({ insights }) => {
       >
         <div
           style={{
-            color: AMBER,
+            color: '#FFFFFF',
             fontSize: 11,
             fontWeight: 800,
             letterSpacing: '0.16em',
