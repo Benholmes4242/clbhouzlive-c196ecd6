@@ -1111,6 +1111,13 @@ export async function dismissRival(
   const rivalUserId = identity.rival_user_id ?? null;
   const rivalFriendRowId = rivalUserId ? null : (identity.rival_friend_row_id ?? null);
   if (!rivalUserId && !rivalFriendRowId) return;
+  // Idempotent: clear any prior dismissal for this identity before re-inserting.
+  let del = supabase.from('user_rival_dismissals' as any).delete().eq('user_id', userId);
+  del = rivalUserId
+    ? del.eq('rival_user_id', rivalUserId)
+    : del.eq('rival_friend_row_id', rivalFriendRowId);
+  const { error: delErr } = await del;
+  if (delErr) throw delErr;
   const { error } = await supabase
     .from('user_rival_dismissals' as any)
     .insert({
