@@ -89,6 +89,9 @@ function useRivalProfileExists(userId: string | undefined, enabled: boolean) {
       return !!data;
     },
   });
+}
+
+
 
 function useFriendViewRivalry(
   viewerId: string | undefined,
