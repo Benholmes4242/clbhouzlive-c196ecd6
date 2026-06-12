@@ -107,7 +107,7 @@ export const RivalFightCard: React.FC<Props> = ({
         style={{
           position: 'relative',
           width: '100%',
-          aspectRatio: '16 / 11',
+          aspectRatio: '16 / 6',
           ...(heroPhoto
             ? {
                 backgroundImage: `url(${heroPhoto})`,
