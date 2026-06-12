@@ -5,8 +5,6 @@ import {
   T100,
   T60,
   T40,
-  AMBER,
-  AMBER_TINT,
   BG_2,
   FONT,
   TAB,
