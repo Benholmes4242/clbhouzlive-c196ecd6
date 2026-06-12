@@ -394,7 +394,7 @@ export const ChampionsDuelCard: React.FC<ChampionsDuelCardProps> = ({
           <div
             style={{
               position: 'absolute',
-              left: 0,
+              right: 0,
               top: '50%',
               height: 4,
               width: `${pos * 100}%`,
@@ -424,7 +424,7 @@ export const ChampionsDuelCard: React.FC<ChampionsDuelCardProps> = ({
             entry={trackChaser}
             style={{
               position: 'absolute',
-              left: `calc(${pos * 100}% - 11px)`,
+              left: `calc(${(1 - pos) * 100}% - 11px)`,
               top: '50%',
               transform: 'translateY(-50%)',
               transition: 'left 400ms cubic-bezier(.2,.8,.2,1)',
@@ -436,7 +436,7 @@ export const ChampionsDuelCard: React.FC<ChampionsDuelCardProps> = ({
             crowned
             style={{
               position: 'absolute',
-              right: -2,
+              left: -2,
               top: '50%',
               transform: 'translateY(-50%)',
             }}
