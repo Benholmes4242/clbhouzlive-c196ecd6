@@ -71,7 +71,7 @@ function useAdHocRivalry(
     queryKey: ['rivalry', 'ad-hoc', viewerId, rivalParamId],
     enabled: enabled && !!viewerId && !!rivalParamId,
     staleTime: 30_000,
-    queryFn: () => fetchPrimaryRivalryWithOwner(viewerId!, rivalParamId!),
+    queryFn: () => fetchAdHocRivalry(viewerId!, rivalParamId!),
   });
 }
 
