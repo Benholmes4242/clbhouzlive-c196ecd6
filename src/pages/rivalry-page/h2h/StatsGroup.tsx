@@ -6,7 +6,7 @@ import {
   FONT,
   TAB,
   BG_1,
-  AMBER,
+  
   GREEN,
   RED,
   T35,
