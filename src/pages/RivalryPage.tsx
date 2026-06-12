@@ -427,7 +427,7 @@ const RivalryPage: React.FC = () => {
                 (row.gross_record?.ties ?? 0))
             }
             titleLeft={isFriendView ? firstName(yourFullName) : 'You'}
-            rivalName={row.rival_name ?? 'Rival'}
+            rivalName={firstName(row.rival_name) ?? 'Rival'}
           />
           <HeroScoreboard
             rivalry={row}
