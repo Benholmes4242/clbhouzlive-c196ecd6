@@ -54,12 +54,19 @@ export const EchoPageComposer = forwardRef<HTMLTextAreaElement, EchoPageComposer
       }
     };
 
-    const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const handleChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
       const newValue = e.target.value;
       if (newValue.length <= MAX_INPUT_LENGTH) {
         onChange(newValue);
       }
     };
+
+    useEffect(() => {
+      const el = (ref as React.RefObject<HTMLTextAreaElement>)?.current;
+      if (!el) return;
+      el.style.height = 'auto';
+      el.style.height = Math.min(el.scrollHeight, 120) + 'px';
+    }, [value, ref]);
 
     const handleButtonClick = () => {
       if (isStreaming) {
