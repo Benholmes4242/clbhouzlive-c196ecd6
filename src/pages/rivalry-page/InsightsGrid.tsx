@@ -4,7 +4,6 @@ import {
   TAB,
   BG_1,
   T50,
-  AMBER,
   GREEN,
   RED,
   LINE,

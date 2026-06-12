@@ -37,7 +37,6 @@ import {
   BG_1,
   T100,
   T60,
-  AMBER,
   LINE_2,
 } from './rivalry-page/_shared/tokens';
 
