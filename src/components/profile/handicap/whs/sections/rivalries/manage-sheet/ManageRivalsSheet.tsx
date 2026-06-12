@@ -217,12 +217,16 @@ export const ManageRivalsSheet: React.FC<Props> = ({ userId, open, onClose }) =>
                   )}
 
                   {autoPicked.length > 0 && (
-                    <Section title="AUTO-PICKED">
+                    <Section
+                      title="AUTO-PICKED"
+                      subtitle="Tap ✕ to stop suggesting someone."
+                    >
                       {autoPicked.map((r) => (
                         <AutoPickedRow
                           key={`auto-${r.slot_index}`}
                           rivalry={r}
                           onPin={() => handlePinAuto(r)}
+                          onDismiss={() => handleDismissAuto(r)}
                           busy={busy}
                         />
                       ))}
