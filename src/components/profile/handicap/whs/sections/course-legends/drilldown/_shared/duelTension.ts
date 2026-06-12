@@ -27,6 +27,25 @@ export function duelTension(cat: LegendCategory, leftValue: number, rightValue: 
   return clamp(0.5 + dominance * 0.42);
 }
 
+/**
+ * 0 = miles away, 1 = level with the champion. Direction-aware via the
+ * same category caps duelTension uses. For count categories (no fixed cap)
+ * progress is chaser / champion, clamped.
+ */
+export function chaseProgress(
+  cat: LegendCategory,
+  championValue: number,
+  chaserValue: number,
+): number {
+  if (isCountCategory(cat)) {
+    if (championValue <= 0) return 1;
+    return Math.max(0, Math.min(chaserValue / championValue, 1));
+  }
+  const cap = VALUE_CAP[cat] ?? 10;
+  const gap = Math.abs(championValue - chaserValue);
+  return 1 - Math.min(gap / cap, 1);
+}
+
 /** The emotional line under the bar. */
 export function duelLine(
   cat: LegendCategory,
