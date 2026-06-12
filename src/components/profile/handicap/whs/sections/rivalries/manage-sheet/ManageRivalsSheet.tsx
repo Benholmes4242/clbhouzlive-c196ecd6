@@ -7,6 +7,8 @@ import {
   useFriendRivalries,
   useUpsertRivalOverride,
   useDeleteRivalOverride,
+  useDismissRival,
+  useClearRivalDismissal,
 } from '@/lib/whs/hooks';
 import { firstName } from '@/lib/whs/utils/initials';
 import { toast } from 'sonner';
