@@ -15,7 +15,7 @@ import { toast } from 'sonner';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { supabase } from '@/integrations/supabase/client';
 import { useFriendRivalries, useWhsConnection } from '@/lib/whs/hooks';
-import { fetchPrimaryRivalryWithOwner } from '@/lib/whs/friendViewRivalries';
+import { fetchPrimaryRivalryWithOwner, fetchAdHocRivalry } from '@/lib/whs/friendViewRivalries';
 import type { FriendRivalryHydrated } from '@/lib/whs/types';
 import { PageRoot } from '@/components/layout/PageRoot';
 import { useRivalryDimension } from '@/lib/whs/utils/useRivalryDimension';
