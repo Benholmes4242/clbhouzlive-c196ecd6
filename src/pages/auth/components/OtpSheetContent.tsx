@@ -184,7 +184,7 @@ const OtpSheetContent: React.FC<OtpSheetContentProps> = ({
             inputMode="numeric"
             // eslint-disable-next-line jsx-a11y/no-autofocus
             autoComplete={i === 0 ? 'one-time-code' : 'off'}
-            maxLength={1}
+            
             disabled={submitting}
             aria-label={`Digit ${i + 1}`}
             className="text-center focus:outline-none transition-colors"
