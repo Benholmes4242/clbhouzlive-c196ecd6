@@ -64,7 +64,10 @@ export const ManageRivalsSheet: React.FC<Props> = ({ userId, open, onClose }) =>
   const candidates = useMemo(() => {
     const rows = (leaderboard ?? []).filter((e) => {
       if (e.is_self) return false;
-      if (e.friend_user_id && currentIdentifiers.has(`u:${e.friend_user_id}`)) return false;
+      // Restrict to synced Clbhouz users — non-linked friends are not eligible auto-pick candidates.
+      if (!e.friend_user_id) return false;
+      if (e.is_clbhouz_user === false) return false;
+      if (currentIdentifiers.has(`u:${e.friend_user_id}`)) return false;
       if (e.friend_row_id && currentIdentifiers.has(`f:${e.friend_row_id}`)) return false;
       return true;
     });
