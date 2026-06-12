@@ -202,6 +202,7 @@ export const FullCourseLeaderboardSheet: React.FC<Props> = ({
           eyebrow={eyebrow}
           title={<span id="course-legends-full-sheet-title">{courseName}</span>}
           onClose={onClose}
+          borderBottom={false}
         />
 
         {/* Chase line + status pill (replaces the old "Gross Record · N entries" sub) */}
