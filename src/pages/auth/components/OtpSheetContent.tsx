@@ -22,11 +22,13 @@ const OtpSheetContent: React.FC<OtpSheetContentProps> = ({
   email,
   submitting,
   errorMessage,
+  infoMessage,
   resendCooldown,
   onVerify,
   onResend,
   onUseDifferentEmail,
   errorNonce = 0,
+  onCodeEdit,
 }) => {
   const [digits, setDigits] = useState<string[]>(() => Array(BOX_COUNT).fill(''));
   const inputsRef = useRef<Array<HTMLInputElement | null>>([]);
@@ -63,6 +65,7 @@ const OtpSheetContent: React.FC<OtpSheetContentProps> = ({
   };
 
   const handleChange = (i: number, raw: string) => {
+    onCodeEdit?.();
     const cleaned = raw.replace(/\D/g, '');
     if (!cleaned) {
       setDigit(i, '');
@@ -102,6 +105,7 @@ const OtpSheetContent: React.FC<OtpSheetContentProps> = ({
   const handleKeyDown = (i: number, e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === 'Backspace' && !digits[i] && i > 0) {
       e.preventDefault();
+      onCodeEdit?.();
       const next = [...digits];
       next[i - 1] = '';
       setDigits(next);
@@ -116,6 +120,7 @@ const OtpSheetContent: React.FC<OtpSheetContentProps> = ({
   };
 
   const handlePaste = (i: number, e: React.ClipboardEvent<HTMLInputElement>) => {
+    onCodeEdit?.();
     const text = e.clipboardData.getData('text');
     const cleaned = text.replace(/\D/g, '');
     if (cleaned.length >= BOX_COUNT) {
@@ -192,10 +197,15 @@ const OtpSheetContent: React.FC<OtpSheetContentProps> = ({
         ))}
       </div>
 
-      {/* Error */}
+      {/* Error / Info */}
       {errorMessage && (
         <p className="text-[13px] text-center" style={{ color: '#f87171' }}>
           {errorMessage}
+        </p>
+      )}
+      {infoMessage && !errorMessage && (
+        <p className="text-[13px] text-center" style={{ color: 'rgba(255,255,255,0.75)' }}>
+          {infoMessage}
         </p>
       )}
 
