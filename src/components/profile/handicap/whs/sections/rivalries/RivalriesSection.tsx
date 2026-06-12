@@ -7,7 +7,7 @@ import ManageRivalsSheet from './manage-sheet/ManageRivalsSheet';
 import { useFriendRivalries, useFriendLeaderboard } from '@/lib/whs/hooks';
 import { useFriendViewRivalriesForProfile } from '@/lib/whs/friendViewRivalries';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
-import { useRivalCrowns } from '@/lib/whs/hooks/useRivalCrowns';
+import { useRivalCrowns, useRivalCrownsForOwner } from '@/lib/whs/hooks/useRivalCrowns';
 import { reformatFriendName } from '@/lib/whs/utils/nameFormat';
 import type { FriendRivalryHydrated } from '@/lib/whs/types';
 import { rivalKey, rivalryScore } from '@/lib/whs/utils/rivalryTiering';
