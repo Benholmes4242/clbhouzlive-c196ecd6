@@ -436,7 +436,7 @@ export const ChampionsDuelCard: React.FC<ChampionsDuelCardProps> = ({
             crowned
             style={{
               position: 'absolute',
-              right: -2,
+              left: -2,
               top: '50%',
               transform: 'translateY(-50%)',
             }}
