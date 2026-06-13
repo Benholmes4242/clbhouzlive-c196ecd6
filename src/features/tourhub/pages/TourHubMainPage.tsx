@@ -45,6 +45,18 @@ export function TourHubMainPage() {
     }
   }, [activeTab, liveFetched, showLive, setSearchParams]);
 
+  // Reset to default tab when bottom-nav icon is re-tapped on this route
+  useEffect(() => {
+    const onRetap = (e: Event) => {
+      if ((e as CustomEvent).detail?.tabId !== 'tourhub') return;
+      setActiveTab('overview');
+      setSearchParams({}, { replace: true });
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    };
+    window.addEventListener('clbhouz-active-tab-retap', onRetap);
+    return () => window.removeEventListener('clbhouz-active-tab-retap', onRetap);
+  }, [setSearchParams]);
+
   const renderTab = () => {
     switch (activeTab) {
       case 'overview':
