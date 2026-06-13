@@ -22,6 +22,7 @@
 
 import type HlsType from 'hls.js';
 import { logVideoTelemetry } from '@/utils/videoTelemetry';
+import { logPoolEvent } from '@/media/mobileVideoDebug';
 
 interface PooledHLSInstance {
   hls: HlsType;
@@ -174,6 +175,7 @@ class HLSPoolManagerClass {
 
     this.pool.set(url, entry);
     this.stats.registered++;
+    logPoolEvent('success', 'register', url, this.stats.registered, this.pool.size);
     logVideoTelemetry('hls_pool_registered', { 
       url, 
       poolSize: this.pool.size 
@@ -215,6 +217,7 @@ class HLSPoolManagerClass {
     if (!entry || entry.isPromoted) {
       logVideoTelemetry('hls_pool_miss', { url, reason: entry ? 'already_promoted' : 'not_found' });
       this.stats.missed++;
+      logPoolEvent('warning', 'miss', url, this.stats.missed, this.pool.size);
       return null;
     }
 
@@ -223,6 +226,7 @@ class HLSPoolManagerClass {
     if (Date.now() - lastPromotion < POOL_CONFIG.promotionCooldown) {
       logVideoTelemetry('hls_pool_cooldown', { url });
       this.stats.missed++;
+      logPoolEvent('warning', 'miss', url, this.stats.missed, this.pool.size);
       return null;
     }
 
@@ -247,6 +251,7 @@ class HLSPoolManagerClass {
       });
 
       this.stats.promoted++;
+      logPoolEvent('success', 'promote', url, this.stats.promoted, this.pool.size);
       return entry.hls;
     } catch (error) {
       logVideoTelemetry('hls_pool_promotion_failed', { url, error: String(error) });
@@ -286,6 +291,7 @@ class HLSPoolManagerClass {
       }
 
       this.stats.demoted++;
+      logPoolEvent('success', 'demote', url, this.stats.demoted, this.pool.size);
       logVideoTelemetry('hls_pool_demoted', { url });
       return true;
     } catch {
@@ -424,8 +430,3 @@ export const HLSPoolManager = new HLSPoolManagerClass();
 
 // Export for type inference
 export type { PooledHLSInstance };
-
-// Temporary Phase 1 verification: expose pool counter stats on window
-if (typeof window !== 'undefined') {
-  (window as any).__hlsPoolStats = () => HLSPoolManager.getStats();
-}
