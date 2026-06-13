@@ -49,6 +49,7 @@ class HLSPoolManagerClass {
   private isLowMemory: boolean = false;
   private memoryCheckIntervalId?: NodeJS.Timeout;
   private visibilityHandler?: () => void;
+  private stats = { registered: 0, demoted: 0, promoted: 0, missed: 0, currentPoolSize: 0 };
 
   constructor() {
     // FIX #9: Initialize memory monitoring and visibility handlers
@@ -172,6 +173,7 @@ class HLSPoolManagerClass {
     };
 
     this.pool.set(url, entry);
+    this.stats.registered++;
     logVideoTelemetry('hls_pool_registered', { 
       url, 
       poolSize: this.pool.size 
@@ -187,13 +189,20 @@ class HLSPoolManagerClass {
   }
 
   /**
-   * Get pool stats for debugging
+   * Get pool debug info (urls and size)
    */
-  getStats(): { poolSize: number; urls: string[] } {
+  getDebugStats(): { poolSize: number; urls: string[] } {
     return {
       poolSize: this.pool.size,
       urls: Array.from(this.pool.keys()),
     };
+  }
+
+  /**
+   * Get pool counter stats for Phase 1 verification
+   */
+  getStats() {
+    return { ...this.stats, currentPoolSize: this.pool.size };
   }
 
   /**
@@ -205,6 +214,7 @@ class HLSPoolManagerClass {
     
     if (!entry || entry.isPromoted) {
       logVideoTelemetry('hls_pool_miss', { url, reason: entry ? 'already_promoted' : 'not_found' });
+      this.stats.missed++;
       return null;
     }
 
@@ -212,6 +222,7 @@ class HLSPoolManagerClass {
     const lastPromotion = this.promotionTimestamps.get(url) || 0;
     if (Date.now() - lastPromotion < POOL_CONFIG.promotionCooldown) {
       logVideoTelemetry('hls_pool_cooldown', { url });
+      this.stats.missed++;
       return null;
     }
 
@@ -235,6 +246,7 @@ class HLSPoolManagerClass {
         bufferedSeconds: this.getBufferedSeconds(entry.hls, targetVideo),
       });
 
+      this.stats.promoted++;
       return entry.hls;
     } catch (error) {
       logVideoTelemetry('hls_pool_promotion_failed', { url, error: String(error) });
@@ -273,6 +285,7 @@ class HLSPoolManagerClass {
         }, ttl);
       }
 
+      this.stats.demoted++;
       logVideoTelemetry('hls_pool_demoted', { url });
       return true;
     } catch {
@@ -411,3 +424,8 @@ export const HLSPoolManager = new HLSPoolManagerClass();
 
 // Export for type inference
 export type { PooledHLSInstance };
+
+// Temporary Phase 1 verification: expose pool counter stats on window
+if (typeof window !== 'undefined') {
+  (window as any).__hlsPoolStats = () => HLSPoolManager.getStats();
+}

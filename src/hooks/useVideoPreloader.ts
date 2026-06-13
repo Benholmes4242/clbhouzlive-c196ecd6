@@ -187,6 +187,6 @@ export function useVideoPreloader(
     getPreloadedVideo: (url: string) => preloadedVideos.current.get(url)?.video,
     promotePreload,
     isPreloaded: (url: string) => HLSPoolManager.has(url) || preloadedVideos.current.has(url),
-    getPoolStats: () => HLSPoolManager.getStats(),
+    getPoolStats: () => HLSPoolManager.getDebugStats(),
   };
 }
