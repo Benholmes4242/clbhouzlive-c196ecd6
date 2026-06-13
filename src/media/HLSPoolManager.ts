@@ -22,6 +22,7 @@
 
 import type HlsType from 'hls.js';
 import { logVideoTelemetry } from '@/utils/videoTelemetry';
+import { logPoolEvent } from '@/media/mobileVideoDebug';
 
 interface PooledHLSInstance {
   hls: HlsType;
