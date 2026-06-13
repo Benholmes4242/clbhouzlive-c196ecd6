@@ -90,7 +90,7 @@ export function RateCourseNudge() {
       </div>
 
       <p style={{ fontSize: 12, color: 'hsl(var(--muted-foreground))', lineHeight: 1.5, marginBottom: 10 }}>
-        Your ratings help the Clbhouz community — and let you see how your scores compare to other golfers.
+        Your ratings help the clbhouz community — and let you see how your scores compare to other golfers.
       </p>
 
       <button
