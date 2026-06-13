@@ -1,17 +1,15 @@
 import { useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { TrendingUp } from 'lucide-react';
 import { useNotableDifficultCourses, type DifficultCourse } from '@/hooks/gam/useNotableDifficultCourses';
 import { ExploreSectionHeader } from './ExploreSectionHeader';
 import {
-  AMBER as _AMBER,
   INK,
   INK_MUTE,
   INK_FAINT,
   HAIRLINE_INK_8,
   INK_TINT_06,
 } from '@/features/courses/_shared/tokens';
-
-void _AMBER;
 
 const MAROON = '#9F1D1D';
 const FONT = 'Geist, -apple-system, BlinkMacSystemFont, system-ui, sans-serif';
