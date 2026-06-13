@@ -360,9 +360,15 @@ const UnifiedVideoPlayerInner = forwardRef<UnifiedVideoPlayerRef, UnifiedVideoPl
         
         if (hlsRef.current) {
           try {
-            hlsRef.current.stopLoad();
-            hlsRef.current.detachMedia();
-            hlsRef.current.destroy();
+            // Phase 1: return to pool for reuse instead of destroying, if pool-eligible.
+            // demote() handles stopLoad + detach internally.
+            if (hlsUrl && HLSPoolManager.has(hlsUrl)) {
+              HLSPoolManager.demote(hlsUrl, hlsRef.current);
+            } else {
+              hlsRef.current.stopLoad();
+              hlsRef.current.detachMedia();
+              hlsRef.current.destroy();
+            }
           } catch {}
           hlsRef.current = null;
         }
@@ -621,12 +627,16 @@ const UnifiedVideoPlayerInner = forwardRef<UnifiedVideoPlayerRef, UnifiedVideoPl
         }
       }, 3000);
 
-      // Cleanup previous HLS instance
+      // Cleanup previous HLS instance — Phase 1: demote pool-eligible instances.
       if (hlsRef.current) {
         try {
-          hlsRef.current.stopLoad();
-          hlsRef.current.detachMedia();
-          hlsRef.current.destroy();
+          if (hlsUrl && HLSPoolManager.has(hlsUrl)) {
+            HLSPoolManager.demote(hlsUrl, hlsRef.current);
+          } else {
+            hlsRef.current.stopLoad();
+            hlsRef.current.detachMedia();
+            hlsRef.current.destroy();
+          }
         } catch {}
         hlsRef.current = null;
       }
@@ -815,7 +825,13 @@ const UnifiedVideoPlayerInner = forwardRef<UnifiedVideoPlayerRef, UnifiedVideoPl
             if (MOBILE_VIDEO_DEBUG) {
               logHlsEvent('MANIFEST_PARSED', cloudflareUid || uniqueMediaId);
             }
-            
+
+            // Phase 1: register cold-init instance in the pool so it can be
+            // demoted back on teardown (otherwise demote() no-ops, instance is destroyed).
+            if (hlsUrl && !HLSPoolManager.has(hlsUrl)) {
+              HLSPoolManager.register(hlsUrl, hls, video);
+            }
+
             if (startTime && startTime > 0) {
               video.currentTime = startTime;
             }
@@ -910,9 +926,14 @@ const UnifiedVideoPlayerInner = forwardRef<UnifiedVideoPlayerRef, UnifiedVideoPl
         
         if (hlsRef.current) {
           try {
-            hlsRef.current.stopLoad();
-            hlsRef.current.detachMedia();
-            hlsRef.current.destroy();
+            // Phase 1: return to pool for reuse instead of destroying, if pool-eligible.
+            if (hlsUrl && HLSPoolManager.has(hlsUrl)) {
+              HLSPoolManager.demote(hlsUrl, hlsRef.current);
+            } else {
+              hlsRef.current.stopLoad();
+              hlsRef.current.detachMedia();
+              hlsRef.current.destroy();
+            }
           } catch {}
           hlsRef.current = null;
         }
