@@ -51,6 +51,7 @@ import {
   logHlsError,
   logVideoElementMount,
   logVideoElementUnmount,
+  logPoolTrace,
 } from '@/media/mobileVideoDebug';
 
 import { getSharedBandwidth, saveSharedBandwidth } from '@/utils/sharedBandwidth';
@@ -362,6 +363,7 @@ const UnifiedVideoPlayerInner = forwardRef<UnifiedVideoPlayerRef, UnifiedVideoPl
           try {
             // Phase 1: return to pool for reuse instead of destroying, if pool-eligible.
             // demote() handles stopLoad + detach internally.
+            logPoolTrace(`teardown: has=${hlsUrl ? HLSPoolManager.has(hlsUrl) : 'noUrl'} url=…${hlsUrl ? hlsUrl.slice(-16) : ''}`);
             if (hlsUrl && HLSPoolManager.has(hlsUrl)) {
               HLSPoolManager.demote(hlsUrl, hlsRef.current);
             } else {
@@ -630,6 +632,7 @@ const UnifiedVideoPlayerInner = forwardRef<UnifiedVideoPlayerRef, UnifiedVideoPl
       // Cleanup previous HLS instance — Phase 1: demote pool-eligible instances.
       if (hlsRef.current) {
         try {
+          logPoolTrace(`teardown: has=${hlsUrl ? HLSPoolManager.has(hlsUrl) : 'noUrl'} url=…${hlsUrl ? hlsUrl.slice(-16) : ''}`);
           if (hlsUrl && HLSPoolManager.has(hlsUrl)) {
             HLSPoolManager.demote(hlsUrl, hlsRef.current);
           } else {
@@ -689,11 +692,12 @@ const UnifiedVideoPlayerInner = forwardRef<UnifiedVideoPlayerRef, UnifiedVideoPl
         const canPlayNatively = (!Hls || !Hls.isSupported()) &&
           (video.canPlayType('application/vnd.apple.mpegurl') !== '' ||
           video.canPlayType('application/vnd.apple.mpegURL') !== '');
-        
 
         const isHlsUrl = hlsUrl.includes('.m3u8');
+        logPoolTrace(`canPlayNatively=${canPlayNatively} isHlsUrl=${isHlsUrl} HlsSupported=${Hls ? Hls.isSupported() : 'noHls'}`);
 
         if (canPlayNatively || !isHlsUrl) {
+          logPoolTrace(`→ NATIVE path (pool skipped) url=…${hlsUrl.slice(-16)}`);
           // Native playback - fetch manifest and select highest quality rendition
           // Native playback - fetch manifest and select highest quality rendition
           // iOS native HLS ignores all query hints, so we parse the manifest ourselves
@@ -719,6 +723,7 @@ const UnifiedVideoPlayerInner = forwardRef<UnifiedVideoPlayerRef, UnifiedVideoPl
 
           // FIX #2: Check HLS Pool for preloaded instance first
           // This promotes pre-created instances instead of creating new ones
+          logPoolTrace(`→ HLS.JS path, checking pool, has=${HLSPoolManager.has(hlsUrl)} url=…${hlsUrl.slice(-16)}`);
           const pooledHls = HLSPoolManager.promote(hlsUrl, video);
           
           if (pooledHls) {
@@ -828,6 +833,7 @@ const UnifiedVideoPlayerInner = forwardRef<UnifiedVideoPlayerRef, UnifiedVideoPl
 
             // Phase 1: register cold-init instance in the pool so it can be
             // demoted back on teardown (otherwise demote() no-ops, instance is destroyed).
+            logPoolTrace(`MANIFEST_PARSED reached, registering=${hlsUrl && !HLSPoolManager.has(hlsUrl)} url=…${hlsUrl.slice(-16)}`);
             if (hlsUrl && !HLSPoolManager.has(hlsUrl)) {
               HLSPoolManager.register(hlsUrl, hls, video);
             }
@@ -927,6 +933,7 @@ const UnifiedVideoPlayerInner = forwardRef<UnifiedVideoPlayerRef, UnifiedVideoPl
         if (hlsRef.current) {
           try {
             // Phase 1: return to pool for reuse instead of destroying, if pool-eligible.
+            logPoolTrace(`teardown: has=${hlsUrl ? HLSPoolManager.has(hlsUrl) : 'noUrl'} url=…${hlsUrl ? hlsUrl.slice(-16) : ''}`);
             if (hlsUrl && HLSPoolManager.has(hlsUrl)) {
               HLSPoolManager.demote(hlsUrl, hlsRef.current);
             } else {
