@@ -111,6 +111,34 @@ export default function VideoDebugPanel() {
                 clear
               </button>
               <button
+                onClick={() => {
+                  const text = logs
+                    .map(l => `${l.formattedTime} [${l.category}] ${l.message}`)
+                    .join('\n');
+                  navigator.clipboard?.writeText(text).then(
+                    () => { /* copied */ },
+                    () => {
+                      const ta = document.createElement('textarea');
+                      ta.value = text;
+                      document.body.appendChild(ta);
+                      ta.select();
+                      try { document.execCommand('copy'); } catch {}
+                      document.body.removeChild(ta);
+                    }
+                  );
+                }}
+                style={{
+                  background: "transparent",
+                  color: "#fff",
+                  border: "1px solid rgba(255,255,255,0.3)",
+                  borderRadius: 4,
+                  padding: "2px 6px",
+                  fontSize: 10,
+                }}
+              >
+                copy
+              </button>
+              <button
                 onClick={() => setOpen(false)}
                 style={{
                   background: "transparent",
