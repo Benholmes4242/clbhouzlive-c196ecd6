@@ -13,6 +13,7 @@ import { ExploreDestinations } from './ExploreDestinations';
 import { TestYourGame } from './TestYourGame';
 import { WhereYoudRank } from './WhereYoudRank';
 import { ToughestCoursesStrip } from './ToughestCoursesStrip';
+import { LatestRecordsStrip } from './LatestRecordsStrip';
 
 import ExploreGrid from './ExploreGrid';
 import ExploreAutoplay from './ExploreAutoplay';
@@ -67,6 +68,7 @@ export default function ExploreTabContent({ embedded: _embedded = false }: Explo
 
       <ExplorePassport userId={userId} />
       {activeRegion === null && <ToughestCoursesStrip userId={userId} />}
+      {activeRegion === null && <LatestRecordsStrip userId={userId} />}
       <ExploreRecommendations userId={userId} mood={mood} />
 
       <ExploreEchoCTA mood={mood} />
