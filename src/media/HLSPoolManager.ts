@@ -173,6 +173,7 @@ class HLSPoolManagerClass {
     };
 
     this.pool.set(url, entry);
+    this.stats.registered++;
     logVideoTelemetry('hls_pool_registered', { 
       url, 
       poolSize: this.pool.size 
@@ -188,13 +189,20 @@ class HLSPoolManagerClass {
   }
 
   /**
-   * Get pool stats for debugging
+   * Get pool debug info (urls and size)
    */
-  getStats(): { poolSize: number; urls: string[] } {
+  getDebugStats(): { poolSize: number; urls: string[] } {
     return {
       poolSize: this.pool.size,
       urls: Array.from(this.pool.keys()),
     };
+  }
+
+  /**
+   * Get pool counter stats for Phase 1 verification
+   */
+  getStats() {
+    return { ...this.stats, currentPoolSize: this.pool.size };
   }
 
   /**
