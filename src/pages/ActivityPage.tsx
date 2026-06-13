@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { cn } from '@/lib/utils';
 import { useNavigate } from 'react-router-dom';
 import { useActivityFeed, ActivityNotification, checkContentExists } from '@/hooks/useActivityFeed';
-import { FeaturedNotificationCard } from '@/components/activity/FeaturedNotificationCard';
+import { NotificationList } from '@/components/activity/notifications/NotificationList';
 import { ActivityEmptyState } from '@/components/activity/ActivityEmptyState';
 import { ActivitySkeleton } from '@/components/activity/ActivitySkeleton';
 import { NotificationActionsSheet } from '@/components/activity/NotificationActionsSheet';
@@ -373,16 +373,13 @@ const ActivityPage: React.FC = () => {
                   return sections.map(section => (
                     <section key={section.label}>
                       <SectionHeader label={section.label} />
-                      <div className="px-4 space-y-2.5 pb-5 pt-2">
-                        {section.items.map(item => (
-                          <FeaturedNotificationCard
-                            key={item.id}
-                            notification={item}
-                            onClick={() => handleNotificationClick(item)}
-                            onOpenActionsSheet={() => openActionsSheet(item)}
-                            currentUserId={user?.id}
-                          />
-                        ))}
+                      <div className="px-4 pb-5 pt-2">
+                        <NotificationList
+                          items={section.items}
+                          onClick={handleNotificationClick}
+                          onOpenActionsSheet={openActionsSheet}
+                          currentUserId={user?.id}
+                        />
                       </div>
                     </section>
                   ));
