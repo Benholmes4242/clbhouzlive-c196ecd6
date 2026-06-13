@@ -76,7 +76,6 @@ const ActivityPage: React.FC = () => {
   const navigate = useNavigate();
 
   const hasMarkedSeen = useRef(false);
-  const [hasAnimatedIn, setHasAnimatedIn] = useState(false);
   const [sessionNewIds, setSessionNewIds] = useState<string[] | null>(null);
   const [sessionNewCount, setSessionNewCount] = useState<number | null>(null);
   const [hasInitializedNew, setHasInitializedNew] = useState(false);
@@ -113,12 +112,6 @@ const ActivityPage: React.FC = () => {
     };
   }, [queryClient]);
 
-  // Mark first paint complete after it renders once; from then on, no entrance animation.
-  useEffect(() => {
-    if (hasAnimatedIn) return;
-    const t = setTimeout(() => setHasAnimatedIn(true), 600);
-    return () => clearTimeout(t);
-  }, [hasAnimatedIn]);
 
   if (isRehydrating) return <ActivityPageSkeleton />;
 
@@ -377,25 +370,19 @@ const ActivityPage: React.FC = () => {
                     );
                   }
 
-                  let globalIndex = 0;
                   return sections.map(section => (
                     <section key={section.label}>
                       <SectionHeader label={section.label} />
                       <div className="px-4 space-y-2.5 pb-5 pt-2">
-                        {section.items.map(item => {
-                          const idx = globalIndex++;
-                          return (
-                            <FeaturedNotificationCard
-                              key={item.id}
-                              notification={item}
-                              index={hasAnimatedIn ? 0 : Math.min(idx, 8)}
-                              skipAnimation={hasAnimatedIn}
-                              onClick={() => handleNotificationClick(item)}
-                              onOpenActionsSheet={() => openActionsSheet(item)}
-                              currentUserId={user?.id}
-                            />
-                          );
-                        })}
+                        {section.items.map(item => (
+                          <FeaturedNotificationCard
+                            key={item.id}
+                            notification={item}
+                            onClick={() => handleNotificationClick(item)}
+                            onOpenActionsSheet={() => openActionsSheet(item)}
+                            currentUserId={user?.id}
+                          />
+                        ))}
                       </div>
                     </section>
                   ));
