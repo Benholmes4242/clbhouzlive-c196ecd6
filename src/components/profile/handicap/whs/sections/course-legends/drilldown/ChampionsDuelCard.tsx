@@ -4,7 +4,7 @@ import type { LegendCategory } from '@/lib/gam/types';
 import { ChampionsListRow } from './ChampionsListRow';
 import { duelLine, chaseProgress } from './_shared/duelTension';
 import { ProBenchmarkBand } from './ProBenchmarkBand';
-import type { ProProfile } from './_shared/proBenchmark';
+import type { ProProfile, ProBandBase } from './_shared/proBenchmark';
 
 export interface DuelRow {
   rank: number;
@@ -28,6 +28,7 @@ interface ChampionsDuelCardProps {
   onFullLeaderboardTap: () => void;
   proBenchmark?: {
     pro: ProProfile;
+    base: ProBandBase;
     value: string;
     sub: string;
     chaseLine?: string;
@@ -256,6 +257,7 @@ export const ChampionsDuelCard: React.FC<ChampionsDuelCardProps> = ({
       {proBenchmark && (
         <ProBenchmarkBand
           pro={proBenchmark.pro}
+          base={proBenchmark.base}
           value={proBenchmark.value}
           sub={proBenchmark.sub}
         />
