@@ -66,6 +66,7 @@ export default function ExploreTabContent({ embedded: _embedded = false }: Explo
       {activeRegion === null && <TestYourGame />}
 
       <ExplorePassport userId={userId} />
+      {activeRegion === null && <ToughestCoursesStrip userId={userId} />}
       <ExploreRecommendations userId={userId} mood={mood} />
 
       <ExploreEchoCTA mood={mood} />
