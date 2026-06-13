@@ -251,6 +251,7 @@ class HLSPoolManagerClass {
       });
 
       this.stats.promoted++;
+      logPoolEvent('success', 'promote', url, this.stats.promoted, this.pool.size);
       return entry.hls;
     } catch (error) {
       logVideoTelemetry('hls_pool_promotion_failed', { url, error: String(error) });
