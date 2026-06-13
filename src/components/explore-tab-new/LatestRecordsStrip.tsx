@@ -1,4 +1,5 @@
 import { useNavigate } from 'react-router-dom';
+import { Crown } from 'lucide-react';
 import {
   useRecentCourseRecords,
   type RecentCourseRecord,
