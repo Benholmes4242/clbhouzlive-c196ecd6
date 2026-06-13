@@ -51,6 +51,7 @@ import {
   logHlsError,
   logVideoElementMount,
   logVideoElementUnmount,
+  logPoolTrace,
 } from '@/media/mobileVideoDebug';
 
 import { getSharedBandwidth, saveSharedBandwidth } from '@/utils/sharedBandwidth';
@@ -362,6 +363,7 @@ const UnifiedVideoPlayerInner = forwardRef<UnifiedVideoPlayerRef, UnifiedVideoPl
           try {
             // Phase 1: return to pool for reuse instead of destroying, if pool-eligible.
             // demote() handles stopLoad + detach internally.
+            logPoolTrace(`teardown: has=${hlsUrl ? HLSPoolManager.has(hlsUrl) : 'noUrl'} url=…${hlsUrl ? hlsUrl.slice(-16) : ''}`);
             if (hlsUrl && HLSPoolManager.has(hlsUrl)) {
               HLSPoolManager.demote(hlsUrl, hlsRef.current);
             } else {
@@ -630,6 +632,7 @@ const UnifiedVideoPlayerInner = forwardRef<UnifiedVideoPlayerRef, UnifiedVideoPl
       // Cleanup previous HLS instance — Phase 1: demote pool-eligible instances.
       if (hlsRef.current) {
         try {
+          logPoolTrace(`teardown: has=${hlsUrl ? HLSPoolManager.has(hlsUrl) : 'noUrl'} url=…${hlsUrl ? hlsUrl.slice(-16) : ''}`);
           if (hlsUrl && HLSPoolManager.has(hlsUrl)) {
             HLSPoolManager.demote(hlsUrl, hlsRef.current);
           } else {
@@ -690,6 +693,7 @@ const UnifiedVideoPlayerInner = forwardRef<UnifiedVideoPlayerRef, UnifiedVideoPl
           (video.canPlayType('application/vnd.apple.mpegurl') !== '' ||
           video.canPlayType('application/vnd.apple.mpegURL') !== '');
         
+        logPoolTrace(`canPlayNatively=${canPlayNatively} isHlsUrl=${isHlsUrl} HlsSupported=${Hls ? Hls.isSupported() : 'noHls'}`);
 
         const isHlsUrl = hlsUrl.includes('.m3u8');
 
