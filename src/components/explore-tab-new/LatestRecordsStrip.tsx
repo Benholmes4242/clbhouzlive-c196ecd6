@@ -70,20 +70,13 @@ export function LatestRecordsStrip(_: Props = {}) {
 
   if (isLoading) {
     return (
-      <section style={{ fontFamily: FONT }}>
+      <section style={{ padding: '0 0 0', fontFamily: FONT }}>
         <ExploreSectionHeader
-          kicker="CHAMPIONS · OFFICIAL WHS DATA"
+          icon={Crown}
           title="Latest course records"
+          sub="Champions · official WHS data"
         />
-        <div
-          className="flex overflow-x-auto no-scrollbar"
-          style={{
-            padding: '0 16px 4px',
-            gap: 12,
-            scrollbarWidth: 'none',
-            WebkitOverflowScrolling: 'touch',
-          }}
-        >
+        <div className="flex gap-3 px-4 overflow-x-auto scrollbar-hide" style={{ paddingBottom: 4 }}>
           {Array.from({ length: 2 }).map((_v, i) => (
             <div
               key={i}
@@ -106,21 +99,13 @@ export function LatestRecordsStrip(_: Props = {}) {
   if (records.length === 0) return null;
 
   return (
-    <section style={{ fontFamily: FONT }}>
+    <section style={{ padding: '0 0 0', fontFamily: FONT }}>
       <ExploreSectionHeader
-        kicker="CHAMPIONS · OFFICIAL WHS DATA"
+        icon={Crown}
         title="Latest course records"
+        sub="Champions · official WHS data"
       />
-      <div
-        className="flex overflow-x-auto no-scrollbar"
-        style={{
-          padding: '0 16px 4px',
-          gap: 12,
-          scrollbarWidth: 'none',
-          WebkitOverflowScrolling: 'touch',
-          scrollSnapType: 'x mandatory',
-        }}
-      >
+      <div className="flex gap-3 px-4 overflow-x-auto scrollbar-hide" style={{ paddingBottom: 4 }}>
         {records.map((r, i) => (
           <RecordHeroCard
             key={`${r.course_id}-${r.category}-${i}`}
@@ -152,7 +137,6 @@ function RecordHeroCard({ record, onTap }: CardProps) {
       style={{
         flexShrink: 0,
         width: CARD_W,
-        scrollSnapAlign: 'start',
         background: '#FFFFFF',
         border: `1px solid ${HAIRLINE_INK_8}`,
         borderRadius: 16,
@@ -193,7 +177,7 @@ function RecordHeroCard({ record, onTap }: CardProps) {
             fontWeight: 800,
             letterSpacing: '0.16em',
             textTransform: 'uppercase',
-            color: GOLD,
+            color: '#FFFFFF',
             textShadow: '0 1px 2px rgba(0,0,0,0.5)',
           }}
         >

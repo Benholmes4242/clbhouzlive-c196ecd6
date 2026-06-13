@@ -37,15 +37,13 @@ export function ToughestCoursesStrip(_: Props = {}) {
 
   if (isLoading) {
     return (
-      <section style={{ fontFamily: FONT }}>
+      <section style={{ padding: '0 0 0', fontFamily: FONT }}>
         <ExploreSectionHeader
-          kicker="OFFICIAL WHS HANDICAP DATA"
+          icon={TrendingUp}
           title="Toughest courses in the network"
+          sub="Official WHS handicap data"
         />
-        <div
-          className="flex overflow-x-auto"
-          style={{ padding: '0 16px', gap: 12, scrollbarWidth: 'none', WebkitOverflowScrolling: 'touch' }}
-        >
+        <div className="flex gap-3 px-4 overflow-x-auto scrollbar-hide" style={{ paddingBottom: 4 }}>
           {Array.from({ length: 3 }).map((_v, i) => (
             <div
               key={i}
@@ -67,21 +65,13 @@ export function ToughestCoursesStrip(_: Props = {}) {
   if (shown.length < 3) return null;
 
   return (
-    <section style={{ fontFamily: FONT }}>
+    <section style={{ padding: '0 0 0', fontFamily: FONT }}>
       <ExploreSectionHeader
-        kicker="OFFICIAL WHS HANDICAP DATA"
+        icon={TrendingUp}
         title="Toughest courses in the network"
+        sub="Official WHS handicap data"
       />
-      <div
-        className="flex overflow-x-auto no-scrollbar"
-        style={{
-          padding: '0 16px 4px',
-          gap: 12,
-          scrollbarWidth: 'none',
-          WebkitOverflowScrolling: 'touch',
-          scrollSnapType: 'x mandatory',
-        }}
-      >
+      <div className="flex gap-3 px-4 overflow-x-auto scrollbar-hide" style={{ paddingBottom: 4 }}>
         {shown.map((c) => (
           <ToughCourseCard
             key={c.course_id}
@@ -113,7 +103,6 @@ function ToughCourseCard({ course, onTap }: CardProps) {
       style={{
         flexShrink: 0,
         width: CARD_W,
-        scrollSnapAlign: 'start',
         background: '#FFFFFF',
         border: `1px solid ${HAIRLINE_INK_8}`,
         borderRadius: 14,
