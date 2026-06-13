@@ -412,7 +412,7 @@ const ClubhouseContent = () => {
         <>
           <CardFeed
             posts={posts}
-            topPadding={'calc(max(env(safe-area-inset-top, 0px), 47px) + 72px - 2px)'}
+            topPadding={'calc(max(env(safe-area-inset-top, 0px), 47px) + 72px - 7px)'}
             onNearEnd={handleNearEnd}
             hasNextPage={hasNextPage}
             onLike={(post) => handleLike(post)}
