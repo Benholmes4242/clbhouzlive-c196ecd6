@@ -147,7 +147,7 @@ export const usePostSubmission = () => {
               .from('post_media')
               .insert({
                 post_id: postData.id,
-                media_type: file.type.startsWith('image/') ? 'image' : 'video',
+                media_type: 'image',
                 media_url: publicUrl
               });
 
