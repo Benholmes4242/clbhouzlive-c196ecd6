@@ -141,13 +141,7 @@ export function getNotificationBadgeIcon(type: string): React.ReactElement {
     case 'business_access_request':
       return <Building2 {...p} />;
     case 'business_access_declined':
-    case 'game_request_declined':
-    case 'trip_request_declined':
-    case 'game_cancelled':
-    case 'trip_cancelled':
       return <XCircle {...p} />;
-    case 'game_request':
-    case 'trip_request':
     case 'friend_course_review':
     case 'course_review':
       return <Flag {...p} />;
@@ -155,21 +149,6 @@ export function getNotificationBadgeIcon(type: string): React.ReactElement {
       return <Star {...p} fill="#FFFFFF" />;
     case 'review_response':
       return <MessageCircle {...p} />;
-    case 'game_request_accepted':
-    case 'trip_request_accepted':
-    case 'game_completed':
-    case 'rsvp_update':
-      return <CheckCircle2 {...p} />;
-    case 'game_reminder_24h':
-    case 'game_reminder_2h':
-      return <Bell {...p} />;
-    case 'game_updated':
-      return <Calendar {...p} />;
-    case 'trip_invite':
-    case 'trip_created':
-    case 'trip_game_added':
-    case 'trip_reminder':
-      return <MapIcon {...p} />;
     default:
       return <Bell {...p} />;
   }
@@ -186,19 +165,11 @@ export function getBadgeColor(type: string): string {
     type === 'business_verification_removed' ||
     type === 'golfer_verification_removed' ||
     type === 'business_verification_revoked' ||
-    type === 'business_access_declined' ||
-    type === 'game_request_declined' ||
-    type === 'trip_request_declined' ||
-    type === 'game_cancelled' ||
-    type === 'trip_cancelled'
+    type === 'business_access_declined'
   ) return '#DC2626';
   if (
     type === 'business_verification_approved' ||
-    type === 'golfer_verification_approved' ||
-    type === 'game_request_accepted' ||
-    type === 'trip_request_accepted' ||
-    type === 'game_completed' ||
-    type === 'rsvp_update'
+    type === 'golfer_verification_approved'
   ) return '#16A34A';
   return '#1E293B';
 }
