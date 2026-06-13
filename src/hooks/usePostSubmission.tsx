@@ -90,59 +90,48 @@ export const usePostSubmission = () => {
             
             console.log(`Uploading file ${index + 1}/${mediaFiles.length}: ${file.name} (${file.size} bytes)`);
             
-            // For videos, try Cloudflare Stream first, then fallback to R2
+            // For videos, use Cloudflare Stream two-step direct upload.
+            // Do NOT fall back to R2 for videos — an mp4 in R2 has no stream_id
+            // and renders as a blank box in the feed's HLS player.
             if (file.type.startsWith('video/')) {
-              try {
-                const formData = new FormData();
-                formData.append('file', file);
-                formData.append('metadata', JSON.stringify({
-                  title: `Post video - ${Date.now()}`,
-                  description: 'Video uploaded from post'
-                }));
-                
-                const streamData = await edgePost('cloudflare-stream-upload', formData);
-                
-                if (streamData?.success && streamData.videoId) {
-                  const hlsUrl = generateStreamHlsUrl(streamData.videoId);
-                  
-                  console.log(`Successfully uploaded video to Cloudflare Stream: ${hlsUrl}`);
-                  
-                  const mediaRecord: any = {
-                    post_id: postData.id,
-                    media_type: 'video',
-                    media_url: hlsUrl,
-                    stream_id: streamData.videoId,
-                  };
+              const initData = await edgePost('cloudflare-stream-upload', {
+                fileName: file.name,
+                fileSize: file.size,
+              });
 
-                  if (streamData.width && streamData.height) {
-                    mediaRecord.width = streamData.width;
-                    mediaRecord.height = streamData.height;
-                    mediaRecord.aspect_ratio = streamData.aspect_ratio 
-                      ? parseFloat(streamData.aspect_ratio.toFixed(4))
-                      : parseFloat((streamData.width / streamData.height).toFixed(4));
-                    console.log(`📐 Storing dimensions: ${streamData.width}x${streamData.height}, AR=${mediaRecord.aspect_ratio}`);
-                  } else {
-                    console.warn('⚠️ Video uploaded but dimensions missing - will need backfill for Clubhouse eligibility');
-                  }
-
-                  if (streamData.duration_seconds) {
-                    mediaRecord.duration_seconds = streamData.duration_seconds;
-                  }
-
-                  const { error: mediaError } = await supabase
-                    .from('post_media')
-                    .insert(mediaRecord);
-
-                  if (mediaError) throw mediaError;
-                  return { success: true, fileName: file.name };
-                }
-                console.log('Cloudflare Stream upload failed, trying R2 fallback');
-              } catch (streamError) {
-                console.log('Cloudflare Stream error, falling back to R2:', streamError);
+              if (!initData?.uploadURL || !initData?.uid) {
+                throw new Error('Failed to initialize Cloudflare Stream upload');
               }
+
+              // Upload file bytes directly to Cloudflare
+              const uploadForm = new FormData();
+              uploadForm.append('file', file);
+              const cfResp = await fetch(initData.uploadURL, {
+                method: 'POST',
+                body: uploadForm,
+              });
+              if (!cfResp.ok) {
+                throw new Error(`Cloudflare direct upload failed (${cfResp.status})`);
+              }
+
+              const hlsUrl = generateStreamHlsUrl(initData.uid);
+              console.log(`Successfully uploaded video to Cloudflare Stream: ${hlsUrl}`);
+
+              const { error: mediaError } = await supabase
+                .from('post_media')
+                .insert({
+                  post_id: postData.id,
+                  media_type: 'video',
+                  media_url: hlsUrl,
+                  stream_id: initData.uid,
+                });
+
+              if (mediaError) throw mediaError;
+              return { success: true, fileName: file.name };
             }
-            
-            // Upload to Cloudflare R2 (for images or video fallback)
+
+            // Images only — upload to Cloudflare R2
+
             const { uploadToCloudflareR2 } = await import('@/utils/cloudflareUpload');
             const uploadResult = await uploadToCloudflareR2(file, 'clbhouz-post-images', fullFileName);
 
@@ -158,7 +147,7 @@ export const usePostSubmission = () => {
               .from('post_media')
               .insert({
                 post_id: postData.id,
-                media_type: file.type.startsWith('image/') ? 'image' : 'video',
+                media_type: 'image',
                 media_url: publicUrl
               });
 
