@@ -217,6 +217,7 @@ class HLSPoolManagerClass {
     if (!entry || entry.isPromoted) {
       logVideoTelemetry('hls_pool_miss', { url, reason: entry ? 'already_promoted' : 'not_found' });
       this.stats.missed++;
+      logPoolEvent('warning', 'miss', url, this.stats.missed, this.pool.size);
       return null;
     }
 
@@ -225,6 +226,7 @@ class HLSPoolManagerClass {
     if (Date.now() - lastPromotion < POOL_CONFIG.promotionCooldown) {
       logVideoTelemetry('hls_pool_cooldown', { url });
       this.stats.missed++;
+      logPoolEvent('warning', 'miss', url, this.stats.missed, this.pool.size);
       return null;
     }
 
