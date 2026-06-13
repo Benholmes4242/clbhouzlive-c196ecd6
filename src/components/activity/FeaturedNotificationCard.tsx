@@ -64,9 +64,6 @@ function getNotificationActionText(notification: ActivityNotification): string {
     case 'friend_accept':
     case 'friend_accepted': return 'accepted your friend request';
     case 'friend_request_sent': return 'Friend request sent';
-    case 'game_request': return 'invited you to a game';
-    case 'game_request_accepted': return 'accepted your game invite';
-    case 'trip_invite': return 'invited you on a trip';
     case 'friend_course_review':
     case 'course_review': return 'reviewed a course';
     case 'business_course_review': return 'left a review';
