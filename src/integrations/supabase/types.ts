@@ -19493,6 +19493,13 @@ export type Database = {
           width: number
         }[]
       }
+      get_course_media_counts: {
+        Args: { p_course_id: string; p_user_id: string }
+        Returns: {
+          photos: number
+          videos: number
+        }[]
+      }
       get_course_meta: { Args: { p_course_id: string }; Returns: Json }
       get_course_of_the_week: {
         Args: never
