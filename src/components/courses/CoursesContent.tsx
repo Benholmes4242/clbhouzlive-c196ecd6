@@ -217,6 +217,20 @@ const CoursesContent: React.FC<CoursesContentProps> = ({ username, displayName }
     setSearchParams(params, { replace: true }); // replace to avoid polluting history
   };
 
+  // Reset to default sub-tab when bottom-nav icon is re-tapped on this route
+  useEffect(() => {
+    const onRetap = (e: Event) => {
+      if ((e as CustomEvent).detail?.tabId !== 'courses') return;
+      const params = new URLSearchParams(searchParams);
+      params.delete('tab');
+      setSearchParams(params, { replace: true });
+      setActiveTab('explore');
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    };
+    window.addEventListener('clbhouz-active-tab-retap', onRetap);
+    return () => window.removeEventListener('clbhouz-active-tab-retap', onRetap);
+  }, [searchParams, setSearchParams]);
+
   // Dynamic subtitle logic
   const getSubtitle = () => {
     // Only show custom subtitles when on "My Courses" tab (user profile pages only)
