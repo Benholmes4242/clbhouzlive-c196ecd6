@@ -19005,6 +19005,21 @@ export type Database = {
           width: number
         }[]
       }
+      get_recent_course_records: {
+        Args: { p_limit?: number }
+        Returns: {
+          attained_at: string
+          category: string
+          course_id: string
+          course_name: string
+          holder_avatar: string
+          holder_name: string
+          holder_username: string
+          thumbnail_image: string
+          user_id: string
+          value: number
+        }[]
+      }
       get_regions_leaderboard: {
         Args: {
           p_current_user_id?: string
