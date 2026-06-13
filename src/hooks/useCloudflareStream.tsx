@@ -48,8 +48,8 @@ export const useCloudflareStream = () => {
         }));
       }
 
-      console.log(`Uploading video to Cloudflare Stream: ${file.name} (${(file.size / 1024 / 1024).toFixed(2)}MB)`);
-      
+      console.log(`Uploading video to Cloudflare Stream (direct upload): ${file.name} (${(file.size / 1024 / 1024).toFixed(2)}MB)`);
+
       // Simulate progress for user feedback
       const progressInterval = setInterval(() => {
         setUploadProgress(prev => {
@@ -59,30 +59,55 @@ export const useCloudflareStream = () => {
         });
       }, 500);
 
-      // Upload to Cloudflare Stream via edge function
-      const data = await edgePost('cloudflare-stream-upload', formData);
+      try {
+        // STEP 1 — init: JSON body, get a direct-upload URL
+        const initData = await edgePost('cloudflare-stream-upload', {
+          fileName: file.name,
+          fileSize: file.size,
+        });
 
-      clearInterval(progressInterval);
+        if (!initData?.uploadURL || !initData?.uid) {
+          throw new Error('Failed to get Cloudflare upload URL');
+        }
 
-      if (!data.success) {
-        console.error('Cloudflare Stream upload failed:', data.error);
-        throw new Error(data.error || 'Upload failed');
+        // STEP 2 — upload bytes DIRECTLY to Cloudflare
+        const uploadForm = new FormData();
+        uploadForm.append('file', file);
+        const cfResp = await fetch(initData.uploadURL, { method: 'POST', body: uploadForm });
+        if (!cfResp.ok) {
+          throw new Error(`Cloudflare direct upload failed (${cfResp.status})`);
+        }
+
+        // STEP 3 — derive URLs from the uid
+        const hlsUrl = generateStreamHlsUrl(initData.uid);
+        const thumbnailUrl = generateStreamThumbnailUrl(initData.uid);
+
+        clearInterval(progressInterval);
+        setUploadProgress(100);
+        options.onProgress?.(100);
+
+        console.log('Video uploaded successfully to Cloudflare Stream:', initData.uid);
+
+        toast.success("Your post is out there!", { duration: 2000 });
+
+        return {
+          success: true,
+          videoId: initData.uid,
+          videoUrl: hlsUrl,
+          thumbnailUrl,
+          thumbnail: thumbnailUrl,
+          urls: {
+            hls: hlsUrl,
+            dash: hlsUrl,
+            thumbnail: thumbnailUrl,
+          },
+          status: 'uploaded',
+        };
+      } catch (innerError) {
+        clearInterval(progressInterval);
+        throw innerError;
       }
 
-      setUploadProgress(100);
-      options.onProgress?.(100);
-
-      console.log('Video uploaded successfully to Cloudflare Stream:', data.videoId);
-
-      toast.success("Your post is out there!", { duration: 2000 });
-
-      return {
-        success: true,
-        videoId: data.videoId,
-        thumbnail: data.thumbnail,
-        urls: data.urls,
-        status: data.status
-      };
 
     } catch (error) {
       console.error('Video upload error:', error);
