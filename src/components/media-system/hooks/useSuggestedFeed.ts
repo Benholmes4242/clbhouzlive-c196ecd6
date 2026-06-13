@@ -18,7 +18,7 @@ export function useSuggestedFeed(userId: string | undefined) {
       try {
         const cursor = typeof pageParam === 'string' ? pageParam : undefined;
 
-        const { data, error } = await supabase.rpc('get_suggested_feed' as any, {
+        const { data, error } = await supabase.rpc('get_suggested_feed_v2' as any, {
           p_user_id: userId,
           p_page_size: PAGE_SIZE,
           ...(cursor ? { p_cursor: cursor } : {}),
