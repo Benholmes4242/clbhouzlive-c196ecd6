@@ -175,6 +175,7 @@ class HLSPoolManagerClass {
 
     this.pool.set(url, entry);
     this.stats.registered++;
+    logPoolEvent('success', 'register', url, this.stats.registered, this.pool.size);
     logVideoTelemetry('hls_pool_registered', { 
       url, 
       poolSize: this.pool.size 
