@@ -6,6 +6,10 @@ import { toast } from 'sonner';
 interface CloudflareStreamUploadResult {
   success: boolean;
   videoId?: string;
+  /** HLS playback URL (alias of urls.hls) */
+  videoUrl?: string;
+  /** Thumbnail URL (alias of urls.thumbnail) */
+  thumbnailUrl?: string;
   thumbnail?: string;
   urls?: {
     hls: string;
@@ -15,6 +19,7 @@ interface CloudflareStreamUploadResult {
   status?: string;
   error?: string;
 }
+
 
 interface UploadOptions {
   title?: string;
