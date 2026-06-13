@@ -161,8 +161,7 @@ const CLUB_COURSE_TYPES = new Set([
   'course_review', 'course_like', 'course_follow', 'course_update', 'event'
 ]);
 
-// Game/Trip types removed — feature decommissioned. Defensive backstop in
-// the source filter below still strips any stray legacy rows from the DB.
+// Game/Trip types removed — feature decommissioned in Stage 2/3.
 
 function getTimeAgo(dateString: string): string {
   const date = new Date(dateString);
@@ -686,12 +685,6 @@ export const useActivityFeed = (tab: ActivityTabId, chipFilter: ChipFilterKind =
         enrichedNotifications = [...enrichedNotifications, ...mockItems];
       }
 
-      // Decommissioned: strip game_/trip_/rsvp_ notifications at the source so
-      // they don't render anywhere and don't count toward unread badges.
-      enrichedNotifications = enrichedNotifications.filter(n => {
-        const t = n.type as string;
-        return !t.startsWith('game_') && !t.startsWith('trip_') && !t.startsWith('rsvp_');
-      });
 
       // Apply mute preferences (client-side filtering)
       if (mutePrefs.mutedTypes.length > 0 || mutePrefs.mutedUserIds.length > 0) {
