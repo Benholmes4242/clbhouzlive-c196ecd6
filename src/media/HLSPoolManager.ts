@@ -291,6 +291,7 @@ class HLSPoolManagerClass {
       }
 
       this.stats.demoted++;
+      logPoolEvent('success', 'demote', url, this.stats.demoted, this.pool.size);
       logVideoTelemetry('hls_pool_demoted', { url });
       return true;
     } catch {
