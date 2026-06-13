@@ -1,8 +1,8 @@
 /**
  * Real-time Notification Subscription Hook
- * 
+ *
  * Subscribes to notifications table for real-time updates.
- * Shows toast notifications for important game/trip notifications.
+ * Shows toast notifications for important notifications.
  */
 
 import { useEffect } from 'react';
@@ -18,21 +18,6 @@ const IMPORTANT_NOTIFICATION_TYPES = new Set([
   'follow',
   'friend_request',
   'friend_accept',
-  // Game notifications
-  'game_request',
-  'game_request_accepted',
-  'game_request_declined',
-  'game_cancelled',
-  'game_updated',
-  'game_reminder_24h',
-  'game_reminder_2h',
-  // Trip notifications
-  'trip_request',
-  'trip_request_accepted',
-  'trip_request_declined',
-  'trip_invite',
-  'trip_cancelled',
-  'trip_updated',
   // Friend course review notifications
   'friend_course_review',
   // Admin invite
@@ -129,38 +114,10 @@ function getToastAction(notification: RealtimeNotification) {
     };
   }
 
-  if (entity_type === 'game' && entity_id) {
-    return {
-      label: 'View',
-      onClick: () => { appNavigate(`/game/${entity_id}`); },
-    };
-  }
-
-  if (entity_type === 'trip' && entity_id) {
-    return {
-      label: 'View',
-      onClick: () => { appNavigate(`/hub?trip=${entity_id}`); },
-    };
-  }
-
   if (type === 'friend_course_review' && data?.course_id) {
     return {
       label: 'View',
       onClick: () => { appNavigate(`/courses/${data.course_id}`); },
-    };
-  }
-
-  if (data?.game_id) {
-    return {
-      label: 'View',
-      onClick: () => { appNavigate(`/game/${data.game_id}`); },
-    };
-  }
-
-  if (data?.trip_id) {
-    return {
-      label: 'View',
-      onClick: () => { appNavigate(`/hub?trip=${data.trip_id}`); },
     };
   }
 
