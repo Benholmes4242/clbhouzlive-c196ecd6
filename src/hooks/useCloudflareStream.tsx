@@ -37,18 +37,8 @@ export const useCloudflareStream = () => {
     setUploadProgress(0);
 
     try {
-      // Create FormData with video file and metadata
-      const formData = new FormData();
-      formData.append('file', file);
-      
-      if (options.title || options.description) {
-        formData.append('metadata', JSON.stringify({
-          title: options.title || file.name,
-          description: options.description
-        }));
-      }
-
       console.log(`Uploading video to Cloudflare Stream (direct upload): ${file.name} (${(file.size / 1024 / 1024).toFixed(2)}MB)`);
+
 
       // Simulate progress for user feedback
       const progressInterval = setInterval(() => {
