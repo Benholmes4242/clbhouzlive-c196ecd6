@@ -13,7 +13,7 @@ import type { ActivityNotification } from '@/hooks/useActivityFeed';
  * Game/Trip types are intentionally NOT migrated — that subsystem is being
  * decommissioned in a separate pass.
  */
-export type NotificationTier = 'line' | 'review' | 'request' | 'trophy' | 'status' | 'legacy';
+export type NotificationTier = 'line' | 'review' | 'request' | 'trophy' | 'status' | 'legacy' | 'hidden';
 
 const LINE_TYPES = new Set([
   'like', 'like_post',
@@ -43,7 +43,7 @@ export function isGameOrTripType(type: string): boolean {
 
 export function getNotificationTier(n: ActivityNotification): NotificationTier {
   const t = n.type;
-  if (isGameOrTripType(t)) return 'legacy';
+  if (isGameOrTripType(t)) return 'hidden';
   if (t === 'friend_request') return 'request';
   if (REVIEW_TYPES.has(t)) return 'review';
   if (TROPHY_TYPES.has(t)) return 'trophy';

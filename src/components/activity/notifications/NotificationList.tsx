@@ -43,6 +43,10 @@ export const NotificationList: React.FC<ItemHandlers & { items: ActivityNotifica
 
   for (const n of items) {
     const tier = getNotificationTier(n);
+    if (tier === 'hidden') {
+      // Game/trip/rsvp_* — decommissioned, render nothing.
+      continue;
+    }
     if (tier === 'line') {
       lineBuffer.push(n);
       continue;

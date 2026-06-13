@@ -155,22 +155,17 @@ function TeeTimeShareCard({
   teeTime: SharedTeeTime; 
   isOwnMessage?: boolean; 
 }) {
-  const navigate = useNavigate();
-
+  // Game/tee-time routing decommissioned — card renders static content only.
   const handleViewDetails = () => {
-    // Navigate to tee time details if available
-    if (teeTime.tee_time_id) {
-      navigate(`/games/${teeTime.tee_time_id}`);
-    }
+    /* no-op: legacy game detail route removed */
   };
 
   return (
     <div 
       className={cn(
-        "rounded-xl overflow-hidden border cursor-pointer transition-shadow hover:shadow-md",
+        "rounded-xl overflow-hidden border",
         isOwnMessage ? "border-primary-foreground/20 bg-primary-foreground/10" : "border-border bg-card"
       )}
-      onClick={handleViewDetails}
     >
       {/* Course Image */}
       {teeTime.course_image_url ? (

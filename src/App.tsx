@@ -27,7 +27,7 @@ import '@/utils/hlsLoader';
 import { useImageUploadSafeguard } from '@/hooks/useImageUploadSafeguard';
 import { useGlobalMemoryMonitor } from '@/hooks/useMemoryMonitor';
 import { usePresenceTracker } from '@/hooks/usePresenceTracker';
-import { useLocationBroadcast } from '@/features/nearby/hooks/useLocationBroadcast';
+// Removed: useLocationBroadcast — nearby/location feature retired
 import { TopTenProvider } from '@/context/TopTenContext';
 import { VideoPlaybackProvider } from '@/context/VideoPlaybackContext';
 import { ActiveActorProvider } from '@/context/ActiveActorContext';
@@ -158,15 +158,14 @@ const AdminV2Shell = lazy(() => import('./features/admin-v2/AdminV2Shell'));
 
 
 const ChannelProfile = lazy(() => import("./pages/ChannelProfile"));
-const GameDetailView = lazy(() => import("./features/game/GameDetailView"));
+// Removed: GameDetailView lazy import — /game/:id now redirects to /clubhouse
 
 // Hub lazy imports removed — Hub page decommissioned
 
 // Echo full-page experience
 const EchoPage = lazy(() => import("./pages/EchoPage"));
 
-// Games feature pages
-const DiscoverGamesPage = lazy(() => import("./features/games/pages/DiscoverGamesPage"));
+// Removed: DiscoverGamesPage lazy import — /games/discover now redirects to /clubhouse
 
 
 // Public Echo Share Page
@@ -430,11 +429,11 @@ function AppRoutes() {
 
 
         <Route path="/channel/:slug" element={<Suspense fallback={<ProfileSkeleton />}><ChannelProfile /></Suspense>} />
-        <Route path="/game/:id" element={<Suspense fallback={<GenericPageSkeleton />}><GameDetailView /></Suspense>} />
-        
-        {/* Games routes */}
-        <Route path="/games/discover" element={<Suspense fallback={<GenericPageSkeleton />}><DiscoverGamesPage /></Suspense>} />
-        <Route path="/nearby" element={<Navigate to="/games/discover" replace />} />
+        <Route path="/game/:id" element={<Navigate to="/clubhouse" replace />} />
+
+        {/* Games routes — decommissioned, redirect to Clubhouse */}
+        <Route path="/games/discover" element={<Navigate to="/clubhouse" replace />} />
+        <Route path="/nearby" element={<Navigate to="/clubhouse" replace />} />
         
         {/* Tour Hub routes */}
         <Route path="/tourhub" element={<Suspense fallback={<GenericPageSkeleton />}><TourHubMainPage /></Suspense>} />
@@ -607,8 +606,7 @@ const AppInner: React.FC = () => {
   // Track user presence for nearby golfers feature
   usePresenceTracker();
   
-  // Continuously broadcast location when visibility is active
-  useLocationBroadcast();
+  // Location broadcast removed — nearby feature retired
   
 // Listen for Top 100 XP notifications
   useTop100XpNotifications();
