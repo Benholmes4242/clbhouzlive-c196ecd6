@@ -692,10 +692,9 @@ const UnifiedVideoPlayerInner = forwardRef<UnifiedVideoPlayerRef, UnifiedVideoPl
         const canPlayNatively = (!Hls || !Hls.isSupported()) &&
           (video.canPlayType('application/vnd.apple.mpegurl') !== '' ||
           video.canPlayType('application/vnd.apple.mpegURL') !== '');
-        
-        logPoolTrace(`canPlayNatively=${canPlayNatively} isHlsUrl=${isHlsUrl} HlsSupported=${Hls ? Hls.isSupported() : 'noHls'}`);
 
         const isHlsUrl = hlsUrl.includes('.m3u8');
+        logPoolTrace(`canPlayNatively=${canPlayNatively} isHlsUrl=${isHlsUrl} HlsSupported=${Hls ? Hls.isSupported() : 'noHls'}`);
 
         if (canPlayNatively || !isHlsUrl) {
           // Native playback - fetch manifest and select highest quality rendition
