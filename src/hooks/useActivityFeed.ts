@@ -723,6 +723,13 @@ export const useActivityFeed = (tab: ActivityTabId, chipFilter: ChipFilterKind =
         enrichedNotifications = [...enrichedNotifications, ...mockItems];
       }
 
+      // Decommissioned: strip game_/trip_/rsvp_ notifications at the source so
+      // they don't render anywhere and don't count toward unread badges.
+      enrichedNotifications = enrichedNotifications.filter(n => {
+        const t = n.type as string;
+        return !t.startsWith('game_') && !t.startsWith('trip_') && !t.startsWith('rsvp_');
+      });
+
       // Apply mute preferences (client-side filtering)
       if (mutePrefs.mutedTypes.length > 0 || mutePrefs.mutedUserIds.length > 0) {
         enrichedNotifications = enrichedNotifications.filter(n =>
