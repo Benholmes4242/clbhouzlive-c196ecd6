@@ -74,6 +74,21 @@ export function useCourseMedia({ userId, courseId, filter }: UseCourseMediaParam
     gcTime: 10 * 60 * 1000,
   });
 
+  const countsQuery = useQuery({
+    queryKey: ['course-media-counts', courseId, userId],
+    enabled: !!userId && !!courseId,
+    staleTime: 2 * 60 * 1000,
+    queryFn: async () => {
+      const { data, error } = await supabase.rpc('get_course_media_counts', {
+        p_user_id: userId,
+        p_course_id: courseId,
+      });
+      if (error) throw error;
+      const row = (data?.[0] ?? { photos: 0, videos: 0 }) as { photos: number; videos: number };
+      return { photos: Number(row.photos), videos: Number(row.videos), total: Number(row.photos) + Number(row.videos) };
+    },
+  });
+
   // Dedup by media_id since the same post can have multiple media items.
   // This array drives the GRID — one tile per media item.
   const allPosts = useMemo(() => {
@@ -97,18 +112,7 @@ export function useCourseMedia({ userId, courseId, filter }: UseCourseMediaParam
     return groupMultiMedia(flat);
   }, [query.data]);
 
-  const mediaCounts = useMemo((): MediaCounts => {
-    const firstPagePosts = query.data?.pages[0]?.posts ?? [];
-    let photos = 0;
-    let videos = 0;
-    for (const post of firstPagePosts) {
-      for (const item of post.mediaItems) {
-        if (item.type === 'image') photos++;
-        else if (item.type === 'video') videos++;
-      }
-    }
-    return { photos, videos, total: photos + videos };
-  }, [query.data]);
+  const mediaCounts: MediaCounts = countsQuery.data ?? { photos: 0, videos: 0, total: 0 };
 
   const resetSeen = useCallback(() => {
     seenPostIds.current = [];
