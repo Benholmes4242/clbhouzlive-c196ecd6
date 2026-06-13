@@ -62,15 +62,39 @@ export const CrownCabinet: React.FC<CrownCabinetProps> = ({
           {heldCount} / {slots.length}
         </span>
       </div>
-      <div style={{ display: 'grid', gridTemplateColumns: `repeat(${cols}, 1fr)`, gap: 8 }}>
+      <div
+        className="no-scrollbar"
+        style={{
+          display: 'flex',
+          gap: 16,
+          overflowX: 'auto',
+          scrollSnapType: 'x mandatory',
+          WebkitOverflowScrolling: 'touch',
+          paddingBottom: 4,
+          marginRight: -16,
+          paddingRight: 16,
+          scrollbarWidth: 'none',
+        }}
+      >
         {slots.map((slot) => {
           const SlotIcon = slot.icon;
           return (
-            <div key={slot.key} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 6, minWidth: 0 }}>
+            <div
+              key={slot.key}
+              style={{
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+                gap: 6,
+                flexShrink: 0,
+                width: 64,
+                scrollSnapAlign: 'start',
+              }}
+            >
               <div
                 style={{
-                  width: 44,
-                  height: 44,
+                  width: 48,
+                  height: 48,
                   borderRadius: 14,
                   display: 'flex',
                   alignItems: 'center',
@@ -90,16 +114,13 @@ export const CrownCabinet: React.FC<CrownCabinetProps> = ({
               </div>
               <span
                 style={{
-                  fontSize: 8,
+                  fontSize: 10,
                   fontWeight: 800,
                   letterSpacing: '0.08em',
                   textTransform: 'uppercase',
                   color: slot.held ? HELD_LABEL : 'var(--hcp-t-40)',
                   textAlign: 'center',
-                  whiteSpace: 'nowrap',
-                  overflow: 'hidden',
-                  textOverflow: 'ellipsis',
-                  maxWidth: '100%',
+                  lineHeight: 1.15,
                 }}
               >
                 {slot.short}
