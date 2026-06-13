@@ -109,6 +109,11 @@ export function logPoolEvent(
   addLogEntry(level, 'POOL', `${emoji} ${kind} #${runningTotal} [${id}] pool=${poolSize}`);
 }
 
+export function logPoolTrace(msg: string): void {
+  if (!isVideoDebugOn()) return;
+  addLogEntry('info', 'PATH', `🔍 ${msg}`);
+}
+
 // ============ Gesture Retry Logging (iOS WebView) ============
 
 export function logGestureRetryQueued(videoId: string): void {
