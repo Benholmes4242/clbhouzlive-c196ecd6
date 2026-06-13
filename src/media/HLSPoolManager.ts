@@ -49,6 +49,7 @@ class HLSPoolManagerClass {
   private isLowMemory: boolean = false;
   private memoryCheckIntervalId?: NodeJS.Timeout;
   private visibilityHandler?: () => void;
+  private stats = { registered: 0, demoted: 0, promoted: 0, missed: 0, currentPoolSize: 0 };
 
   constructor() {
     // FIX #9: Initialize memory monitoring and visibility handlers
