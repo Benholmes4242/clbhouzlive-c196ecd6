@@ -430,8 +430,3 @@ export const HLSPoolManager = new HLSPoolManagerClass();
 
 // Export for type inference
 export type { PooledHLSInstance };
-
-// Temporary Phase 1 verification: expose pool counter stats on window
-if (typeof window !== 'undefined') {
-  (window as any).__hlsPoolStats = () => HLSPoolManager.getStats();
-}
