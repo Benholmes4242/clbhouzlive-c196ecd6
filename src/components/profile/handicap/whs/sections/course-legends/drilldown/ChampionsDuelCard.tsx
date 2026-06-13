@@ -4,7 +4,7 @@ import type { LegendCategory } from '@/lib/gam/types';
 import { ChampionsListRow } from './ChampionsListRow';
 import { duelLine, chaseProgress } from './_shared/duelTension';
 import { ProBenchmarkBand } from './ProBenchmarkBand';
-import type { ProProfile } from './_shared/proBenchmark';
+import type { ProProfile, ProBandBase } from './_shared/proBenchmark';
 
 export interface DuelRow {
   rank: number;
