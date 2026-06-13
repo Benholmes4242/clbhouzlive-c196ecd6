@@ -12,6 +12,7 @@ import { ExploreEchoCTA } from './ExploreEchoCTA';
 import { ExploreDestinations } from './ExploreDestinations';
 import { TestYourGame } from './TestYourGame';
 import { WhereYoudRank } from './WhereYoudRank';
+import { ToughestCoursesStrip } from './ToughestCoursesStrip';
 
 import ExploreGrid from './ExploreGrid';
 import ExploreAutoplay from './ExploreAutoplay';
