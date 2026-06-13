@@ -85,6 +85,21 @@ export function clearDebugLogs(): void {
   subscribers.forEach(fn => fn([]));
 }
 
+// ============ HLS Pool Event Logging ============
+
+export function logPoolEvent(
+  level: DebugLogLevel,
+  kind: 'register' | 'demote' | 'promote' | 'miss',
+  url: string,
+  runningTotal: number,
+  poolSize: number
+): void {
+  if (!MOBILE_VIDEO_DEBUG) return;
+  const id = url.slice(-12);
+  const emoji = kind === 'demote' ? '♻️' : kind === 'promote' ? '⚡' : kind === 'register' ? '📥' : '❌';
+  addLogEntry(level, 'POOL', `${emoji} ${kind} #${runningTotal} [${id}] pool=${poolSize}`);
+}
+
 // ============ Gesture Retry Logging (iOS WebView) ============
 
 export function logGestureRetryQueued(videoId: string): void {
