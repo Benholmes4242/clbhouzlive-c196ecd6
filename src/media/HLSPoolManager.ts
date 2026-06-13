@@ -214,6 +214,7 @@ class HLSPoolManagerClass {
     
     if (!entry || entry.isPromoted) {
       logVideoTelemetry('hls_pool_miss', { url, reason: entry ? 'already_promoted' : 'not_found' });
+      this.stats.missed++;
       return null;
     }
 
@@ -221,6 +222,7 @@ class HLSPoolManagerClass {
     const lastPromotion = this.promotionTimestamps.get(url) || 0;
     if (Date.now() - lastPromotion < POOL_CONFIG.promotionCooldown) {
       logVideoTelemetry('hls_pool_cooldown', { url });
+      this.stats.missed++;
       return null;
     }
 
@@ -244,6 +246,7 @@ class HLSPoolManagerClass {
         bufferedSeconds: this.getBufferedSeconds(entry.hls, targetVideo),
       });
 
+      this.stats.promoted++;
       return entry.hls;
     } catch (error) {
       logVideoTelemetry('hls_pool_promotion_failed', { url, error: String(error) });
@@ -282,6 +285,7 @@ class HLSPoolManagerClass {
         }, ttl);
       }
 
+      this.stats.demoted++;
       logVideoTelemetry('hls_pool_demoted', { url });
       return true;
     } catch {
@@ -420,3 +424,8 @@ export const HLSPoolManager = new HLSPoolManagerClass();
 
 // Export for type inference
 export type { PooledHLSInstance };
+
+// Temporary Phase 1 verification: expose pool counter stats on window
+if (typeof window !== 'undefined') {
+  (window as any).__hlsPoolStats = () => HLSPoolManager.getStats();
+}
