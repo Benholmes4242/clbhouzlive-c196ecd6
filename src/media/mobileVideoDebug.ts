@@ -17,6 +17,15 @@ export const MOBILE_VIDEO_DEBUG = (() => {
   }
 })();
 
+// Runtime in-memory enable so the panel can be flipped on-device without a console.
+let runtimeEnabled = false;
+export function enableVideoDebug() { runtimeEnabled = true; }
+export function disableVideoDebug() { runtimeEnabled = false; }
+export function isVideoDebugOn(): boolean {
+  if (runtimeEnabled) return true;
+  try { return localStorage.getItem('clbhouz-video-debug') === 'true'; } catch { return false; }
+}
+
 // ============ In-Memory Log Store for On-Screen Debug Panel ============
 
 export type DebugLogLevel = 'info' | 'success' | 'warning' | 'error';
@@ -46,7 +55,7 @@ function formatTimestamp(ts: number): string {
 }
 
 function addLogEntry(level: DebugLogLevel, category: string, message: string, data?: any): void {
-  if (!MOBILE_VIDEO_DEBUG) return;
+  if (!isVideoDebugOn()) return;
   
   const entry: DebugLogEntry = {
     id: generateLogId(),
@@ -94,7 +103,7 @@ export function logPoolEvent(
   runningTotal: number,
   poolSize: number
 ): void {
-  if (!MOBILE_VIDEO_DEBUG) return;
+  if (!isVideoDebugOn()) return;
   const id = url.slice(-12);
   const emoji = kind === 'demote' ? '♻️' : kind === 'promote' ? '⚡' : kind === 'register' ? '📥' : '❌';
   addLogEntry(level, 'POOL', `${emoji} ${kind} #${runningTotal} [${id}] pool=${poolSize}`);
