@@ -101,9 +101,13 @@ export const SnapVideoPlayer = memo(function SnapVideoPlayer({
         }
         
       } else {
-        // Far away — fully destroy to free memory
+        // Far away — return to pool if eligible, otherwise destroy to free memory.
         if (hlsRef.current) {
-          hlsRef.current.destroy();
+          if (hlsUrl && HLSPoolManager.has(hlsUrl)) {
+            HLSPoolManager.demote(hlsUrl, hlsRef.current);
+          } else {
+            hlsRef.current.destroy();
+          }
           hlsRef.current = null;
         }
         video.removeAttribute('src');
@@ -171,6 +175,13 @@ export const SnapVideoPlayer = memo(function SnapVideoPlayer({
           hls.loadSource(hlsUrl || mp4Url || '');
           hls.attachMedia(video);
 
+          // Phase 1: register cold-init instance so it can be demoted back on teardown.
+          hls.on(Hls.Events.MANIFEST_PARSED, () => {
+            if (hlsUrl && !HLSPoolManager.has(hlsUrl)) {
+              HLSPoolManager.register(hlsUrl, hls, video);
+            }
+          });
+
           hls.on(Hls.Events.FRAG_LOADED, (_, data) => {
             if (data.frag?.stats?.bwEstimate && data.frag.stats.bwEstimate > 0) {
               saveSharedBandwidth(data.frag.stats.bwEstimate);
@@ -198,7 +209,12 @@ export const SnapVideoPlayer = memo(function SnapVideoPlayer({
     return () => {
       cancelled = true;
       if (hlsRef.current) {
-        hlsRef.current.destroy();
+        // Phase 1: return to pool for reuse instead of destroying, if pool-eligible.
+        if (hlsUrl && HLSPoolManager.has(hlsUrl)) {
+          HLSPoolManager.demote(hlsUrl, hlsRef.current);
+        } else {
+          hlsRef.current.destroy();
+        }
         hlsRef.current = null;
       }
     };
