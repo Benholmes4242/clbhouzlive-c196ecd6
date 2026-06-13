@@ -19,9 +19,7 @@ interface FeaturedNotificationCardProps {
   notification: ActivityNotification;
   onClick: () => void;
   onOpenActionsSheet: () => void;
-  index?: number;
   currentUserId?: string;
-  skipAnimation?: boolean;
 }
 
 const INK = '#0F172A';
@@ -92,9 +90,7 @@ export const FeaturedNotificationCard: React.FC<FeaturedNotificationCardProps> =
   notification,
   onClick,
   onOpenActionsSheet,
-  index = 0,
   currentUserId,
-  skipAnimation = false,
 }) => {
   const actorName = getActorDisplayName(notification);
   const avatarUrl = getActorAvatarUrl(notification);
@@ -142,9 +138,10 @@ export const FeaturedNotificationCard: React.FC<FeaturedNotificationCardProps> =
   if (isReview) {
     return (
       <motion.div
-        initial={skipAnimation ? false : { opacity: 0 }}
-        animate={skipAnimation ? undefined : { opacity: 1 }}
-        transition={{ duration: 0.24, delay: Math.min(index, 8) * 0.05, ease: [0.22, 1, 0.36, 1] }}
+        initial={{ opacity: 0 }}
+        whileInView={{ opacity: 1 }}
+        viewport={{ once: true, margin: '0px 0px -10% 0px' }}
+        transition={{ duration: 0.24, ease: [0.22, 1, 0.36, 1] }}
         onClick={onClick}
         style={{ pointerEvents: 'auto' }}
         className="cursor-pointer active:scale-[0.98] transition-transform"
@@ -248,9 +245,10 @@ export const FeaturedNotificationCard: React.FC<FeaturedNotificationCardProps> =
   // ──────────────────────────── COMPACT SOCIAL CARD ────────────────────────────
   return (
     <motion.div
-      initial={skipAnimation ? false : { opacity: 0 }}
-      animate={skipAnimation ? undefined : { opacity: 1 }}
-      transition={{ duration: 0.24, delay: Math.min(index, 8) * 0.05, ease: [0.22, 1, 0.36, 1] }}
+      initial={{ opacity: 0 }}
+      whileInView={{ opacity: 1 }}
+      viewport={{ once: true, margin: '0px 0px -10% 0px' }}
+      transition={{ duration: 0.24, ease: [0.22, 1, 0.36, 1] }}
       onClick={onClick}
       style={{ pointerEvents: 'auto' }}
       className="cursor-pointer active:scale-[0.98] transition-transform"
