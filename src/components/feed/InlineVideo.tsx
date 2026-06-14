@@ -59,6 +59,18 @@ export const InlineVideo: React.FC<Props> = ({
     let cancelled = false;
 
     if (isNear) {
+      const priority = isActive ? 'playing' : 'preload';
+      const granted = DecoderLimitManager.requestSlot(regId, video, priority, () => {
+        // Evicted: release this element's decoder so a higher-priority tile can use it.
+        try { video.pause(); } catch {}
+        try { video.removeAttribute('src'); video.load(); } catch {}
+        pool.teardown(hlsUrl);
+        reset();
+      });
+      if (!granted) {
+        // Denied — will retry when priority rises (becomes active) or a slot frees.
+        return;
+      }
       video.muted = true;
       video.playsInline = true;
       if (hlsUrl) {
@@ -75,6 +87,7 @@ export const InlineVideo: React.FC<Props> = ({
         cancelled = true;
       };
     } else {
+      DecoderLimitManager.releaseSlot(regId);
       pool.teardown(hlsUrl);
       try {
         video.removeAttribute('src');
@@ -84,6 +97,12 @@ export const InlineVideo: React.FC<Props> = ({
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isNear, hlsUrl, item.mp4Url]);
+
+  // Keep decoder priority in sync with active/near state.
+  useEffect(() => {
+    if (isActive) DecoderLimitManager.updatePriority(regId, 'playing');
+    else if (isNear) DecoderLimitManager.updatePriority(regId, 'visible');
+  }, [isActive, isNear, regId]);
 
   // Register with MediaRuntime (clubhouse surface = concurrency 1).
   useEffect(() => {
