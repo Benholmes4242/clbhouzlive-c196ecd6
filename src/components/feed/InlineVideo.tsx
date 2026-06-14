@@ -33,6 +33,10 @@ export const InlineVideo: React.FC<Props> = ({
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const containerRef = useRef<HTMLDivElement | null>(null);
   const pool = useHlsPool();
+  const isActiveRef = useRef(isActive);
+  useEffect(() => {
+    isActiveRef.current = isActive;
+  }, [isActive]);
 
   const isMuted = useClubhouseStore((s) => s.isMuted);
   const toggleMute = useClubhouseStore((s) => s.toggleMute);
