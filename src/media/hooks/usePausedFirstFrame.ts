@@ -56,7 +56,14 @@ export function usePausedFirstFrame(
       } catch {}
     };
     const onPlaying = () => markFrame();
-    const onCanPlay = () => markFrame();
+    const onCanPlay = () => {
+      markFrame();
+      // Belt-and-braces: if active but still paused when the element becomes
+      // playable, start playback. Closes the play/attach race from the other side.
+      if (activeRef.current && video.paused) {
+        video.play().catch(() => {});
+      }
+    };
 
     const v = video as any;
     if (typeof v.requestVideoFrameCallback === 'function') {
