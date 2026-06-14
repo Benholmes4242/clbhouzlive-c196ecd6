@@ -479,14 +479,26 @@ const UnifiedVideoPlayerInner = forwardRef<UnifiedVideoPlayerRef, UnifiedVideoPl
       const handlePlaying = () => {
         // Note: isBuffering is now managed by useBufferingIndicator hook
         updatePlaybackState('playing');
-        
-        // Poster crossfade: trigger on 'playing' (not 'loadeddata') so the
-        // poster only fades once frames are actively rendering.
+
+        // Poster crossfade fallback: 'playing' fires before first frame paints,
+        // but rVFC below is the precise trigger. Both are guarded by !hasFirstFrame.
         if (!hasFirstFrame) {
           setHasFirstFrame(true);
           setShowPlaceholder(false);
         }
       };
+
+      // Phase 1: precise reveal on first painted frame (iOS Safari 15.4+, modern Chrome).
+      // Falls back to 'playing' handler on older webviews without rVFC.
+      const anyVideo = video as any;
+      if (typeof anyVideo.requestVideoFrameCallback === 'function') {
+        anyVideo.requestVideoFrameCallback(() => {
+          if (!hasFirstFrame) {
+            setHasFirstFrame(true);
+            setShowPlaceholder(false);
+          }
+        });
+      }
 
       const handleCanPlay = () => {
         // [Bootstrap Diagnostic] First video canplay
