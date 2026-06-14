@@ -72,7 +72,6 @@ export const FeedImageCarousel = memo(function FeedImageCarousel({
   feedIndex,
   isSuggestedFeed,
   isActive = false,
-  onDoubleTapLike,
   onZoomChange,
   isFullscreen = false,
 }: FeedImageCarouselProps) {
@@ -306,7 +305,6 @@ export const FeedImageCarousel = memo(function FeedImageCarousel({
                 activeIndex={activeIndex}
                 feedIndex={feedIndex}
                 isSuggestedFeed={isSuggestedFeed}
-                onDoubleTapLike={onDoubleTapLike}
                 isFullscreen={isFullscreen}
               />
             </div>
