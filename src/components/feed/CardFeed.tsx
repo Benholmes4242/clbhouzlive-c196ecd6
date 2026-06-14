@@ -29,7 +29,7 @@ import { FeedCard } from './FeedCard';
 const CANVAS = '#0A0E14';
 
 /** How many neighbours on each side of the active card may mount a <video>. */
-const VIDEO_NEIGHBOUR_RADIUS = 1;
+const VIDEO_NEIGHBOUR_RADIUS = 2;
 
 export interface CardFeedProps {
   posts: FeedPost[];
