@@ -267,6 +267,7 @@ const FeedCardImpl: React.FC<FeedCardProps> = ({
                   item={media}
                   isActive={isActive}
                   isNear={mountVideo}
+                  feedIndex={feedIndex}
                   objectFit="cover"
                 />
 
