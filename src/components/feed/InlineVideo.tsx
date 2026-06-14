@@ -12,7 +12,7 @@ import { usePausedFirstFrame } from '@/media/hooks/usePausedFirstFrame';
 import { MediaRuntime } from '@/media/runtime/MediaRuntime';
 import { DecoderLimitManager } from '@/utils/video/DecoderLimitManager';
 import { extractCloudflareUid } from '@/utils/videoIdUtils';
-import { logTileLife, attachVideoEventLoggers } from '@/media/mobileVideoDebug';
+import { logTileLife, attachVideoEventLoggers, isVideoDebugOn } from '@/media/mobileVideoDebug';
 import type { MediaItem } from '@/components/media-system/types/media';
 
 interface Props {
@@ -52,12 +52,14 @@ export const InlineVideo: React.FC<Props> = ({
 
   // Trace prop changes — the inputs that drive every decision below.
   useEffect(() => {
-    logTileLife(tag, feedIndex, 'PROPS', {
-      isActive,
-      isNear,
-      hasFirstFrame,
-      decoders: DecoderLimitManager.getSlotCount(),
-    });
+    if (isVideoDebugOn()) {
+      logTileLife(tag, feedIndex, 'PROPS', {
+        isActive,
+        isNear,
+        hasFirstFrame,
+        decoders: DecoderLimitManager.getSlotCount(),
+      });
+    }
   }, [isActive, isNear, hasFirstFrame, tag, feedIndex]);
 
   // Attach raw DOM video-event logger once per mount.
@@ -87,14 +89,18 @@ export const InlineVideo: React.FC<Props> = ({
 
     const activeNow = isActiveRef.current;
     const priority = activeNow ? 'playing' : 'preload';
-    logTileLife(tag, feedIndex, 'SLOT_REQUEST', {
-      priority,
-      decoders: DecoderLimitManager.getSlotCount(),
-    });
-    const granted = DecoderLimitManager.requestSlot(regId, video, priority, () => {
-      logTileLife(tag, feedIndex, 'EVICTED_BLACK', {
+    if (isVideoDebugOn()) {
+      logTileLife(tag, feedIndex, 'SLOT_REQUEST', {
+        priority,
         decoders: DecoderLimitManager.getSlotCount(),
       });
+    }
+    const granted = DecoderLimitManager.requestSlot(regId, video, priority, () => {
+      if (isVideoDebugOn()) {
+        logTileLife(tag, feedIndex, 'EVICTED_BLACK', {
+          decoders: DecoderLimitManager.getSlotCount(),
+        });
+      }
       attachedRef.current = false;
       try { video.pause(); } catch {}
       try { video.removeAttribute('src'); video.load(); } catch {}
@@ -102,16 +108,20 @@ export const InlineVideo: React.FC<Props> = ({
       reset();
     });
     if (!granted) {
-      logTileLife(tag, feedIndex, 'SLOT_DENIED_BLACK', {
+      if (isVideoDebugOn()) {
+        logTileLife(tag, feedIndex, 'SLOT_DENIED_BLACK', {
+          priority,
+          decoders: DecoderLimitManager.getSlotCount(),
+        });
+      }
+      return;
+    }
+    if (isVideoDebugOn()) {
+      logTileLife(tag, feedIndex, 'SLOT_GRANTED', {
         priority,
         decoders: DecoderLimitManager.getSlotCount(),
       });
-      return;
     }
-    logTileLife(tag, feedIndex, 'SLOT_GRANTED', {
-      priority,
-      decoders: DecoderLimitManager.getSlotCount(),
-    });
     video.muted = true;
     video.playsInline = true;
     if (hlsUrl) {
@@ -155,9 +165,11 @@ export const InlineVideo: React.FC<Props> = ({
         cancelledRef.current = true;
       };
     } else {
-      logTileLife(tag, feedIndex, 'LEAVE_RADIUS_TEARDOWN', {
-        decoders: DecoderLimitManager.getSlotCount(),
-      });
+      if (isVideoDebugOn()) {
+        logTileLife(tag, feedIndex, 'LEAVE_RADIUS_TEARDOWN', {
+          decoders: DecoderLimitManager.getSlotCount(),
+        });
+      }
       DecoderLimitManager.releaseSlot(regId);
       pool.teardown(hlsUrl);
       attachedRef.current = false;
