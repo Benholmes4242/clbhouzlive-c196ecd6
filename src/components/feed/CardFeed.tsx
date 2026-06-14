@@ -68,16 +68,53 @@ export const CardFeed: React.FC<CardFeedProps> = ({
 }) => {
   const virtuosoRef = useRef<VirtuosoHandle | null>(null);
 
-  // ── Active-card tracking (drives single-video autoplay) ──
-  // Virtuoso reports the items currently in the viewport via `rangeChanged`.
-  // We then pick the middle index as the "active" card. This replaces the
-  // shared IntersectionObserver that lived here previously.
+  // ── Active-card tracking (visibility-based) ──
+  // An IntersectionObserver tracks each rendered card's visibility ratio.
+  // The most-visible card (>= ACTIVATION_THRESHOLD) becomes active. This is
+  // symmetric (fires the same scrolling up or down) and triggers as cards
+  // come into view rather than at viewport edges.
+  const ACTIVATION_THRESHOLD = 0.5;
   const [activeIdx, setActiveIdx] = useState(0);
+  const visibilityRef = useRef<Map<number, number>>(new Map());
+  const observerRef = useRef<IntersectionObserver | null>(null);
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        for (const e of entries) {
+          const idx = Number((e.target as HTMLElement).dataset.cardIndex);
+          if (Number.isNaN(idx)) continue;
+          if (e.isIntersecting) {
+            visibilityRef.current.set(idx, e.intersectionRatio);
+          } else {
+            visibilityRef.current.delete(idx);
+          }
+        }
+        let bestIdx = -1;
+        let bestRatio = 0;
+        visibilityRef.current.forEach((ratio, idx) => {
+          if (ratio > bestRatio) {
+            bestRatio = ratio;
+            bestIdx = idx;
+          }
+        });
+        if (bestIdx >= 0 && bestRatio >= ACTIVATION_THRESHOLD) {
+          setActiveIdx((prev) => (prev === bestIdx ? prev : bestIdx));
+        }
+      },
+      { threshold: [0, 0.25, 0.5, 0.75, 1.0] },
+    );
+    observerRef.current = observer;
+    return () => {
+      observer.disconnect();
+      observerRef.current = null;
+      visibilityRef.current.clear();
+    };
+  }, []);
+
+  // Virtuoso's rangeChanged kept as a no-op; visibility owns activeIdx now.
   const handleRangeChanged = useCallback(
-    ({ startIndex, endIndex }: { startIndex: number; endIndex: number }) => {
-      const mid = Math.floor((startIndex + endIndex) / 2);
-      setActiveIdx((prev) => (prev === mid ? prev : mid));
-    },
+    (_: { startIndex: number; endIndex: number }) => {},
     [],
   );
 
@@ -157,7 +194,14 @@ export const CardFeed: React.FC<CardFeedProps> = ({
       const isActive = index === activeIdx;
       const mountVideo = Math.abs(index - activeIdx) <= VIDEO_NEIGHBOUR_RADIUS;
       return (
-        <div style={{ paddingBottom: 12 }}>
+        <div
+          style={{ paddingBottom: 12 }}
+          data-card-index={index}
+          ref={(el) => {
+            const obs = observerRef.current;
+            if (el && obs) obs.observe(el);
+          }}
+        >
           <FeedCard
             post={post}
             liked={!!likeState?.liked}
