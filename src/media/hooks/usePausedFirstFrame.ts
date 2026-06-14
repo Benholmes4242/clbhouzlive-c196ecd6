@@ -13,7 +13,7 @@
 import { useEffect, useRef, useState } from 'react';
 
 const SEEK_PRIME = 0.001;
-const IOS_FALLBACK_MS = 250;
+const IOS_FALLBACK_MS = 400; // was 250 — must exceed SETTLE_MS(150) + attach margin
 
 export function usePausedFirstFrame(
   videoRef: React.RefObject<HTMLVideoElement>,

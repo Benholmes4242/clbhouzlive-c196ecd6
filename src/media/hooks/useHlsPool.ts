@@ -80,7 +80,9 @@ export function useHlsPool(): HlsPoolHandle {
   const teardown = useCallback((hlsUrl: string) => {
     const hls = hlsRef.current;
     if (!hls) return;
-    if (hlsUrl && HLSPoolManager.has(hlsUrl)) {
+    // Return to pool if this url is pool-managed (promoted OR preloaded).
+    // has() is false for promoted entries, so use isPooled() which covers both.
+    if (hlsUrl && HLSPoolManager.isPooled(hlsUrl)) {
       try { HLSPoolManager.demote(hlsUrl, hls); } catch {}
     } else {
       try { hls.stopLoad?.(); } catch {}

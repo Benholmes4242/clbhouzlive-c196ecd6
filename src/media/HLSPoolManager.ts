@@ -190,6 +190,12 @@ class HLSPoolManagerClass {
     return !!entry && !entry.isPromoted;
   }
 
+  /** True if the url has ANY pool entry (promoted or preloaded). Unlike has(),
+   *  does not exclude promoted entries — used by teardown to demote-not-destroy. */
+  isPooled(url: string): boolean {
+    return this.pool.has(url);
+  }
+
   /**
    * Get pool debug info (urls and size)
    */
