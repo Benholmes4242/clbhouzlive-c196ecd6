@@ -20,6 +20,7 @@ import { useClubhouseStore } from '@/store/clubhouseStore';
 import { useHlsPool } from '@/media/hooks/useHlsPool';
 import { usePausedFirstFrame } from '@/media/hooks/usePausedFirstFrame';
 import { MediaRuntime } from '@/media/runtime/MediaRuntime';
+import { DecoderLimitManager } from '@/utils/video/DecoderLimitManager';
 import { extractCloudflareUid } from '@/utils/videoIdUtils';
 import type { MediaItem } from '@/components/media-system/types/media';
 
