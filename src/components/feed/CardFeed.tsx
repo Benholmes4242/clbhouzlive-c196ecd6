@@ -74,29 +74,9 @@ export const CardFeed: React.FC<CardFeedProps> = ({
   // maintains the on-screen candidate set; a scroll listener re-evaluates
   // continuously as the user scrolls within that set.
   const [activeIdx, setActiveIdx] = useState(0);
-  // playingIdx lags activeIdx until scrolling settles — only the settled
-  // centre tile is promoted to "playing". Prevents load-thrash mid-scroll
-  // (iOS cold HLS attach ~1.3s vs. active-window ~400-800ms during scroll).
-  const [playingIdx, setPlayingIdx] = useState(0);
-  const settleTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const SETTLE_MS = 150;
   const visibilityRef = useRef<Map<number, number>>(new Map());
   const observerRef = useRef<IntersectionObserver | null>(null);
   const cardEls = useRef<Map<number, HTMLElement>>(new Map());
-
-  // Debounce: promote activeIdx → playingIdx only after the centre has
-  // held steady for SETTLE_MS. While scrolling, playingIdx stays put so
-  // no tile is asked to play (frames still paint via the paused-first-frame
-  // primitive on mounted neighbours).
-  useEffect(() => {
-    if (settleTimer.current) clearTimeout(settleTimer.current);
-    settleTimer.current = setTimeout(() => {
-      setPlayingIdx(activeIdx);
-    }, SETTLE_MS);
-    return () => {
-      if (settleTimer.current) clearTimeout(settleTimer.current);
-    };
-  }, [activeIdx]);
 
   const recheckActive = useCallback(() => {
     const viewportCenter = window.innerHeight / 2;
@@ -249,9 +229,8 @@ export const CardFeed: React.FC<CardFeedProps> = ({
     (index: number, post: FeedPost) => {
       const likeState = getLikeState(post);
       const initialSlide = carouselPositions.get(index) ?? 0;
-      const isActive = index === playingIdx; // PLAYS — settle-gated
-      const isNear = Math.abs(index - activeIdx) <= VIDEO_NEIGHBOUR_RADIUS; // mounts + paints frame — instant
-      const mountVideo = isNear;
+      const isActive = index === activeIdx;
+      const mountVideo = Math.abs(index - activeIdx) <= VIDEO_NEIGHBOUR_RADIUS;
       return (
         <div
           style={{ paddingBottom: 12 }}
