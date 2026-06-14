@@ -135,6 +135,7 @@ export const InlineVideo: React.FC<Props> = ({
   // Final cleanup on unmount.
   useEffect(
     () => () => {
+      DecoderLimitManager.releaseSlot(regId);
       pool.teardown(hlsUrl);
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
