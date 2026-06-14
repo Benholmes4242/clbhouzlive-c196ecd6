@@ -194,7 +194,14 @@ export const CardFeed: React.FC<CardFeedProps> = ({
       const isActive = index === activeIdx;
       const mountVideo = Math.abs(index - activeIdx) <= VIDEO_NEIGHBOUR_RADIUS;
       return (
-        <div style={{ paddingBottom: 12 }}>
+        <div
+          style={{ paddingBottom: 12 }}
+          data-card-index={index}
+          ref={(el) => {
+            const obs = observerRef.current;
+            if (el && obs) obs.observe(el);
+          }}
+        >
           <FeedCard
             post={post}
             liked={!!likeState?.liked}
