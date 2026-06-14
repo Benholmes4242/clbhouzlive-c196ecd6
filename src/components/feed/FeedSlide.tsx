@@ -80,7 +80,6 @@ export const FeedSlide = memo(function FeedSlide({
           feedIndex={index}
           isSuggestedFeed={isSuggestedFeed}
           isActive={isActive}
-          onDoubleTapLike={() => onLike?.(post)}
           onZoomChange={onZoomChange}
           isFullscreen={isFullscreen}
         />
@@ -102,7 +101,6 @@ export const FeedSlide = memo(function FeedSlide({
           activeIndex={activeIndex}
           feedIndex={index}
           isSuggestedFeed={isSuggestedFeed}
-          onDoubleTapLike={() => onLike?.(post)}
           onFirstFrameReady={onFirstFrameReady}
           isFullscreen={isFullscreen}
         />

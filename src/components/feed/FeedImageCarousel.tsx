@@ -11,7 +11,6 @@ interface FeedImageCarouselProps {
   feedIndex: number;
   isSuggestedFeed: boolean;
   isActive?: boolean;
-  onDoubleTapLike?: () => void;
   onZoomChange?: (isZoomed: boolean) => void;
   isFullscreen?: boolean;
 }
@@ -73,7 +72,6 @@ export const FeedImageCarousel = memo(function FeedImageCarousel({
   feedIndex,
   isSuggestedFeed,
   isActive = false,
-  onDoubleTapLike,
   onZoomChange,
   isFullscreen = false,
 }: FeedImageCarouselProps) {
@@ -307,7 +305,6 @@ export const FeedImageCarousel = memo(function FeedImageCarousel({
                 activeIndex={activeIndex}
                 feedIndex={feedIndex}
                 isSuggestedFeed={isSuggestedFeed}
-                onDoubleTapLike={onDoubleTapLike}
                 isFullscreen={isFullscreen}
               />
             </div>
