@@ -31,13 +31,16 @@ export function usePausedFirstFrame(
   }, [active]);
 
   // Prime a painted frame while paused.
-  // IMPORTANT: deps are [videoRef] only — flipping `active` must NOT tear
-  // down the reveal listeners + iOS fallback timer mid-prime.
+  // Re-arms on every attachToken bump so re-attaches (e.g. scroll-up after
+  // radius teardown) re-paint the first frame BEFORE activation, independent
+  // of the play()→'playing' roundtrip. `active` flips MUST NOT be in deps —
+  // they would tear down the reveal listeners + iOS fallback timer mid-prime.
   useEffect(() => {
     const video = videoRef.current;
-    if (!video || primedRef.current) return;
-    primedRef.current = true;
+    if (!video) return;
+    // Clear prior frame state for the new source.
     frameRef.current = false;
+    setHasFirstFrame(false);
 
     const markFrame = () => {
       if (frameRef.current) return;
