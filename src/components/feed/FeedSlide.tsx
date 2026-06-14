@@ -103,6 +103,7 @@ export const FeedSlide = memo(function FeedSlide({
           isSuggestedFeed={isSuggestedFeed}
           onFirstFrameReady={onFirstFrameReady}
           isFullscreen={isFullscreen}
+          postId={post.id}
         />
       );
     }

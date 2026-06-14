@@ -46,37 +46,7 @@ export function FullscreenFeedOverlay() {
   const { data: reviewerStats } = useReviewerStats(activePost?.userId);
 
   // Watch-progress tracking lives inside SnapFeed (the actual video host),
-  // which the overlay renders below. Mounting it here as well would
-  // cross-target the inline Clubhouse SnapFeed's DOM via the global selector.
-
-  // Listen for "continue-watching:seek" events dispatched by the
-  // ContinueWatching rail. Seeks the active video to the saved position
-  // once the matching slide mounts.
-  useEffect(() => {
-    if (!isOpen) return;
-    const handler = (e: Event) => {
-      const detail = (e as CustomEvent).detail as { postId: string; seconds: number };
-      if (!detail?.postId || !detail.seconds) return;
-      // Poll until the matching video element is mounted (virtualized feed).
-      let attempts = 0;
-      const trySeek = () => {
-        attempts += 1;
-        const idx = useFullscreenFeedStore.getState().posts.findIndex(p => p.id === detail.postId);
-        if (idx < 0) return;
-        const video = document.querySelector(
-          `[data-snap-feed] [data-index="${idx}"] video`,
-        ) as HTMLVideoElement | null;
-        if (video && isFinite(video.duration) && video.duration > 0) {
-          try { video.currentTime = Math.min(detail.seconds, video.duration - 1); } catch {}
-          return;
-        }
-        if (attempts < 20) window.setTimeout(trySeek, 150);
-      };
-      window.setTimeout(trySeek, 200);
-    };
-    window.addEventListener('continue-watching:seek', handler as EventListener);
-    return () => window.removeEventListener('continue-watching:seek', handler as EventListener);
-  }, [isOpen]);
+  // which the overlay renders below.
 
   const handleViewProfile = useCallback(() => {
     if (!activePost) return;
