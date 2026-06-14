@@ -1,118 +1,136 @@
 /**
- * InlineVideo — muted autoplay video used inside a FeedCard / MediaCarousel slide.
+ * InlineVideo — Clubhouse feed video tile (paused-first-frame model).
  *
- * Phase 2 of the Clubhouse card feed.
- *
- * Lifecycle:
- *  - When `isActive` becomes true, attach HLS via the shared
- *    `attachHlsToTile` helper (mirrors Watch/Friends autoplay surfaces) and
- *    start playback muted.
- *  - When `isActive` is false, pause and tear down the HLS instance so we
- *    never have more than one video buffering or playing.
- *  - The visible poster is the media's thumbnail. Tap is handled by the
- *    parent (opens fullscreen).
+ * Architecture (per Master Brief):
+ *  - The video's OWN first frame is the poster. No thumbnail layer, no
+ *    cross-dissolve, no `attachHlsToTile`. Element stays opacity:0 until
+ *    the first frame paints, then reveals.
+ *  - HLS lifecycle goes through `useHlsPool` (promote → register → demote).
+ *    Teardown DEMOTES instead of destroying — this is what makes scroll-back
+ *    replay instant.
+ *  - `usePausedFirstFrame` forces a paused paint (iOS-safe via seek-to-0.001
+ *    plus a muted micro play→pause fallback), then drives play/pause by
+ *    `isActive` without re-attaching.
+ *  - Registered with MediaRuntime on surface 'clubhouse' (concurrency 1) so
+ *    only one tile plays at a time and the runtime auto-pauses the previous.
  */
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef } from 'react';
 import { Volume2, VolumeX } from 'lucide-react';
 import { useClubhouseStore } from '@/store/clubhouseStore';
-import { attachHlsToTile } from '@/hooks/useTileVideoPlayer';
+import { useHlsPool } from '@/media/hooks/useHlsPool';
+import { usePausedFirstFrame } from '@/media/hooks/usePausedFirstFrame';
+import { MediaRuntime } from '@/media/runtime/MediaRuntime';
+import { extractCloudflareUid } from '@/utils/videoIdUtils';
 import type { MediaItem } from '@/components/media-system/types/media';
 
 interface Props {
   item: MediaItem;
+  /** This tile is the single active (playing) tile. */
   isActive: boolean;
+  /** Tile is within the neighbour radius — pre-decode and hold paused. */
+  isNear: boolean;
   objectFit?: 'cover' | 'contain';
 }
 
-export const InlineVideo: React.FC<Props> = ({ item, isActive, objectFit = 'cover' }) => {
+export const InlineVideo: React.FC<Props> = ({
+  item,
+  isActive,
+  isNear,
+  objectFit = 'cover',
+}) => {
   const videoRef = useRef<HTMLVideoElement | null>(null);
-  const hlsRef = useRef<any>(null);
-  const attachedRef = useRef(false);
-  const [hasFirstFrame, setHasFirstFrame] = useState(false);
+  const containerRef = useRef<HTMLDivElement | null>(null);
+  const pool = useHlsPool();
 
   const isMuted = useClubhouseStore((s) => s.isMuted);
   const toggleMute = useClubhouseStore((s) => s.toggleMute);
   const markUserGestureUnmute = useClubhouseStore((s) => s.markUserGestureUnmute);
 
+  const hlsUrl = item.hlsUrl || '';
+  const regId = extractCloudflareUid(hlsUrl) || item.id;
+
+  const { hasFirstFrame, reset } = usePausedFirstFrame(videoRef, isActive);
+
+  // Attach when near; demote-to-pool when leaving the radius.
   useEffect(() => {
     const video = videoRef.current;
     if (!video) return;
+    let cancelled = false;
 
-    if (isActive && !attachedRef.current) {
-      attachedRef.current = true;
-      const hlsUrl = item.hlsUrl || '';
-      const mp4 = item.mp4Url;
-      video.muted = isMuted;
+    if (isNear) {
+      video.muted = true;
       video.playsInline = true;
-
-      const armFirstFrame = () => {
-        const v = video as any;
-        if (typeof v.requestVideoFrameCallback === 'function') {
-          v.requestVideoFrameCallback(() => setHasFirstFrame(true));
-        } else {
-          const onPlaying = () => setHasFirstFrame(true);
-          video.addEventListener('playing', onPlaying, { once: true });
-        }
-      };
-
       if (hlsUrl) {
-        attachHlsToTile({ hlsUrl, mp4Fallback: mp4, video })
-          .then((hls) => { hlsRef.current = hls; armFirstFrame(); })
-          .catch(() => {});
-      } else if (mp4) {
-        video.src = mp4;
-        video.play().catch(() => {});
-        armFirstFrame();
+        pool.attach(hlsUrl, video, item.mp4Url).then(() => {
+          if (cancelled) return;
+          try {
+            if (video.currentTime < 0.001) video.currentTime = 0.001;
+          } catch {}
+        });
+      } else if (item.mp4Url) {
+        video.src = item.mp4Url;
       }
-    } else if (!isActive && attachedRef.current) {
-      attachedRef.current = false;
-      setHasFirstFrame(false);
-      try { video.pause(); } catch {}
-      try { hlsRef.current?.destroy?.(); } catch {}
-      hlsRef.current = null;
-      try { video.removeAttribute('src'); video.load(); } catch {}
+      return () => {
+        cancelled = true;
+      };
+    } else {
+      pool.teardown(hlsUrl);
+      try {
+        video.removeAttribute('src');
+        video.load();
+      } catch {}
+      reset();
     }
-  }, [isActive, item.hlsUrl, item.mp4Url, isMuted]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isNear, hlsUrl, item.mp4Url]);
 
-  // Reactively update muted state on the live element without re-attaching HLS
+  // Register with MediaRuntime (clubhouse surface = concurrency 1).
+  useEffect(() => {
+    const video = videoRef.current;
+    const container = containerRef.current;
+    if (!video || !isNear) return;
+    MediaRuntime.registerMedia({
+      id: regId,
+      element: video,
+      surface: 'clubhouse',
+      sortIndex: 0,
+      observeTarget: container || video,
+    });
+    return () => MediaRuntime.unregisterMedia(regId);
+  }, [isNear, regId]);
+
+  // Ask runtime to play when active (runtime auto-pauses the previous).
+  useEffect(() => {
+    if (isActive) {
+      MediaRuntime.requestPlay({ id: regId, surface: 'clubhouse', reason: 'autoplay' });
+    }
+  }, [isActive, regId]);
+
+  // Keep muted state live without re-attach.
   useEffect(() => {
     const v = videoRef.current;
-    if (v) v.muted = isMuted;
-  }, [isMuted]);
+    if (v && isActive) v.muted = isMuted;
+  }, [isMuted, isActive]);
 
-  // Reset poster when deactivated
-  useEffect(() => {
-    if (!isActive) setHasFirstFrame(false);
-  }, [isActive]);
-
-  useEffect(() => () => {
-    try { hlsRef.current?.destroy?.(); } catch {}
-    hlsRef.current = null;
-  }, []);
+  // Final cleanup on unmount.
+  useEffect(
+    () => () => {
+      pool.teardown(hlsUrl);
+    },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [],
+  );
 
   return (
-    <div className="absolute inset-0" style={{ position: 'absolute', inset: 0 }}>
-      {item.thumbnailUrl && (
-        <div
-          aria-hidden
-          style={{
-            position: 'absolute',
-            inset: 0,
-            backgroundImage: `url(${item.thumbnailUrl})`,
-            backgroundSize: objectFit === 'contain' ? 'contain' : 'cover',
-            backgroundPosition: 'center',
-            backgroundRepeat: 'no-repeat',
-            opacity: hasFirstFrame ? 0 : 1,
-            transition: 'opacity 200ms ease-out',
-            zIndex: 1,
-          }}
-        />
-      )}
+    <div
+      ref={containerRef}
+      style={{ position: 'absolute', inset: 0, backgroundColor: '#0a0a0a' }}
+    >
       <video
         ref={videoRef}
-        muted={isMuted}
+        muted
         playsInline
-        preload="none"
+        preload="auto"
         style={{
           position: 'absolute',
           inset: 0,
@@ -120,8 +138,10 @@ export const InlineVideo: React.FC<Props> = ({ item, isActive, objectFit = 'cove
           height: '100%',
           objectFit,
           display: 'block',
-          backgroundColor: 'transparent',
-          zIndex: 2,
+          backgroundColor: '#0a0a0a',
+          opacity: hasFirstFrame ? 1 : 0,
+          transition: 'opacity 120ms ease-out',
+          zIndex: 1,
         }}
       />
       {isActive && (

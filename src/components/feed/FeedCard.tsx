@@ -263,8 +263,10 @@ const FeedCardImpl: React.FC<FeedCardProps> = ({
                 <InlineVideo
                   item={media}
                   isActive={isActive}
+                  isNear={mountVideo}
                   objectFit="cover"
                 />
+
               ) : media.thumbnailUrl ? (
                 <img
                   src={media.thumbnailUrl}
