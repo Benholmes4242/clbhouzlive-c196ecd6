@@ -52,12 +52,14 @@ export const InlineVideo: React.FC<Props> = ({
 
   // Trace prop changes — the inputs that drive every decision below.
   useEffect(() => {
-    logTileLife(tag, feedIndex, 'PROPS', {
-      isActive,
-      isNear,
-      hasFirstFrame,
-      decoders: DecoderLimitManager.getSlotCount(),
-    });
+    if (isVideoDebugOn()) {
+      logTileLife(tag, feedIndex, 'PROPS', {
+        isActive,
+        isNear,
+        hasFirstFrame,
+        decoders: DecoderLimitManager.getSlotCount(),
+      });
+    }
   }, [isActive, isNear, hasFirstFrame, tag, feedIndex]);
 
   // Attach raw DOM video-event logger once per mount.
