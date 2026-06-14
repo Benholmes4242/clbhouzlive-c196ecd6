@@ -73,3 +73,12 @@ const root = createRoot(container);
 
 // Render without StrictMode for better performance
 root.render(<App />);
+
+// Register media segment cache service worker (non-fatal if it fails)
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('/media-cache-sw.js').catch(() => {
+      // Caching is an optimization; app works without it
+    });
+  });
+}

@@ -248,6 +248,7 @@ export const InlineVideo: React.FC<Props> = ({
         ref={videoRef}
         muted
         playsInline
+        loop
         preload="auto"
         style={{
           position: 'absolute',
