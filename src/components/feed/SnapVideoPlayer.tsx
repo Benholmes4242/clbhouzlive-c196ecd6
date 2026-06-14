@@ -18,6 +18,7 @@ interface SnapVideoPlayerProps {
   isSuggestedFeed: boolean;
   onFirstFrameReady?: () => void;
   isFullscreen?: boolean;
+  postId: string;
 }
 
 export const SnapVideoPlayer = memo(function SnapVideoPlayer({
