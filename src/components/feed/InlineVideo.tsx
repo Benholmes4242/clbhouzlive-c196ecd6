@@ -4,7 +4,7 @@
  * INSTRUMENTED: every lifecycle decision emits a TILE trace via logTileLife,
  * tagged with `[#feedIndex tag]` for greppable per-tile timelines.
  */
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { Volume2, VolumeX } from 'lucide-react';
 import { useClubhouseStore } from '@/store/clubhouseStore';
 import { useHlsPool } from '@/media/hooks/useHlsPool';
