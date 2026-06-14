@@ -1,18 +1,8 @@
 /**
  * InlineVideo — Clubhouse feed video tile (paused-first-frame model).
  *
- * Architecture (per Master Brief):
- *  - The video's OWN first frame is the poster. No thumbnail layer, no
- *    cross-dissolve, no `attachHlsToTile`. Element stays opacity:0 until
- *    the first frame paints, then reveals.
- *  - HLS lifecycle goes through `useHlsPool` (promote → register → demote).
- *    Teardown DEMOTES instead of destroying — this is what makes scroll-back
- *    replay instant.
- *  - `usePausedFirstFrame` forces a paused paint (iOS-safe via seek-to-0.001
- *    plus a muted micro play→pause fallback), then drives play/pause by
- *    `isActive` without re-attaching.
- *  - Registered with MediaRuntime on surface 'clubhouse' (concurrency 1) so
- *    only one tile plays at a time and the runtime auto-pauses the previous.
+ * INSTRUMENTED: every lifecycle decision emits a TILE trace via logTileLife,
+ * tagged with `[#feedIndex tag]` for greppable per-tile timelines.
  */
 import React, { useEffect, useRef } from 'react';
 import { Volume2, VolumeX } from 'lucide-react';
@@ -22,14 +12,14 @@ import { usePausedFirstFrame } from '@/media/hooks/usePausedFirstFrame';
 import { MediaRuntime } from '@/media/runtime/MediaRuntime';
 import { DecoderLimitManager } from '@/utils/video/DecoderLimitManager';
 import { extractCloudflareUid } from '@/utils/videoIdUtils';
+import { logTileLife, attachVideoEventLoggers } from '@/media/mobileVideoDebug';
 import type { MediaItem } from '@/components/media-system/types/media';
 
 interface Props {
   item: MediaItem;
-  /** This tile is the single active (playing) tile. */
   isActive: boolean;
-  /** Tile is within the neighbour radius — pre-decode and hold paused. */
   isNear: boolean;
+  feedIndex?: number;
   objectFit?: 'cover' | 'contain';
 }
 
@@ -37,6 +27,7 @@ export const InlineVideo: React.FC<Props> = ({
   item,
   isActive,
   isNear,
+  feedIndex,
   objectFit = 'cover',
 }) => {
   const videoRef = useRef<HTMLVideoElement | null>(null);
@@ -47,10 +38,35 @@ export const InlineVideo: React.FC<Props> = ({
   const toggleMute = useClubhouseStore((s) => s.toggleMute);
   const markUserGestureUnmute = useClubhouseStore((s) => s.markUserGestureUnmute);
 
-  const hlsUrl = item.hlsUrl || '';
+  const hlsUrl = (item as any).hlsUrl || '';
+  const mp4Url = (item as any).mp4Url as string | undefined;
   const regId = extractCloudflareUid(hlsUrl) || item.id;
+  const tag = regId.slice(-6);
 
   const { hasFirstFrame, reset } = usePausedFirstFrame(videoRef, isActive);
+
+  // Trace prop changes — the inputs that drive every decision below.
+  useEffect(() => {
+    logTileLife(tag, feedIndex, 'PROPS', {
+      isActive,
+      isNear,
+      hasFirstFrame,
+      decoders: DecoderLimitManager.getSlotCount(),
+    });
+  }, [isActive, isNear, hasFirstFrame, tag, feedIndex]);
+
+  // Attach raw DOM video-event logger once per mount.
+  useEffect(() => {
+    const video = videoRef.current;
+    if (!video) return;
+    logTileLife(tag, feedIndex, 'MOUNT');
+    const detach = attachVideoEventLoggers(video, regId);
+    return () => {
+      logTileLife(tag, feedIndex, 'UNMOUNT');
+      detach();
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   // Attach when near; demote-to-pool when leaving the radius.
   useEffect(() => {
@@ -60,33 +76,54 @@ export const InlineVideo: React.FC<Props> = ({
 
     if (isNear) {
       const priority = isActive ? 'playing' : 'preload';
+      logTileLife(tag, feedIndex, 'SLOT_REQUEST', {
+        priority,
+        decoders: DecoderLimitManager.getSlotCount(),
+      });
       const granted = DecoderLimitManager.requestSlot(regId, video, priority, () => {
-        // Evicted: release this element's decoder so a higher-priority tile can use it.
+        logTileLife(tag, feedIndex, 'EVICTED_BLACK', {
+          decoders: DecoderLimitManager.getSlotCount(),
+        });
         try { video.pause(); } catch {}
         try { video.removeAttribute('src'); video.load(); } catch {}
         pool.teardown(hlsUrl);
         reset();
       });
       if (!granted) {
-        // Denied — will retry when priority rises (becomes active) or a slot frees.
+        logTileLife(tag, feedIndex, 'SLOT_DENIED_BLACK', {
+          priority,
+          decoders: DecoderLimitManager.getSlotCount(),
+        });
         return;
       }
+      logTileLife(tag, feedIndex, 'SLOT_GRANTED', {
+        priority,
+        decoders: DecoderLimitManager.getSlotCount(),
+      });
       video.muted = true;
       video.playsInline = true;
       if (hlsUrl) {
-        pool.attach(hlsUrl, video, item.mp4Url).then(() => {
-          if (cancelled) return;
+        logTileLife(tag, feedIndex, 'ATTACH_START');
+        pool.attach(hlsUrl, video, mp4Url).then(() => {
+          if (cancelled) {
+            logTileLife(tag, feedIndex, 'ATTACH_CANCELLED');
+            return;
+          }
+          logTileLife(tag, feedIndex, 'ATTACH_DONE', { readyState: video.readyState });
           try {
             if (video.currentTime < 0.001) video.currentTime = 0.001;
           } catch {}
         });
-      } else if (item.mp4Url) {
-        video.src = item.mp4Url;
+      } else if (mp4Url) {
+        video.src = mp4Url;
       }
       return () => {
         cancelled = true;
       };
     } else {
+      logTileLife(tag, feedIndex, 'LEAVE_RADIUS_TEARDOWN', {
+        decoders: DecoderLimitManager.getSlotCount(),
+      });
       DecoderLimitManager.releaseSlot(regId);
       pool.teardown(hlsUrl);
       try {
@@ -96,13 +133,18 @@ export const InlineVideo: React.FC<Props> = ({
       reset();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isNear, hlsUrl, item.mp4Url]);
+  }, [isNear, hlsUrl, mp4Url]);
 
   // Keep decoder priority in sync with active/near state.
   useEffect(() => {
-    if (isActive) DecoderLimitManager.updatePriority(regId, 'playing');
-    else if (isNear) DecoderLimitManager.updatePriority(regId, 'visible');
-  }, [isActive, isNear, regId]);
+    if (isActive) {
+      DecoderLimitManager.updatePriority(regId, 'playing');
+      logTileLife(tag, feedIndex, 'PRIORITY→playing');
+    } else if (isNear) {
+      DecoderLimitManager.updatePriority(regId, 'visible');
+      logTileLife(tag, feedIndex, 'PRIORITY→visible');
+    }
+  }, [isActive, isNear, regId, tag, feedIndex]);
 
   // Register with MediaRuntime (clubhouse surface = concurrency 1).
   useEffect(() => {
@@ -116,15 +158,29 @@ export const InlineVideo: React.FC<Props> = ({
       sortIndex: 0,
       observeTarget: container || video,
     });
-    return () => MediaRuntime.unregisterMedia(regId);
-  }, [isNear, regId]);
+    logTileLife(tag, feedIndex, 'RUNTIME_REGISTER');
+    return () => {
+      MediaRuntime.unregisterMedia(regId);
+      logTileLife(tag, feedIndex, 'RUNTIME_UNREGISTER');
+    };
+  }, [isNear, regId, tag, feedIndex]);
 
-  // Ask runtime to play when active (runtime auto-pauses the previous).
+  // Ask runtime to play when active.
   useEffect(() => {
     if (isActive) {
+      const v = videoRef.current;
+      logTileLife(tag, feedIndex, 'REQUEST_PLAY', {
+        hasSrc: !!v?.src,
+        readyState: v?.readyState,
+      });
       MediaRuntime.requestPlay({ id: regId, surface: 'clubhouse', reason: 'autoplay' });
     }
-  }, [isActive, regId]);
+  }, [isActive, regId, tag, feedIndex]);
+
+  // Trace the reveal moment.
+  useEffect(() => {
+    if (hasFirstFrame) logTileLife(tag, feedIndex, 'FRAME_REVEALED');
+  }, [hasFirstFrame, tag, feedIndex]);
 
   // Keep muted state live without re-attach.
   useEffect(() => {
