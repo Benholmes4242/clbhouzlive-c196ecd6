@@ -92,6 +92,27 @@ export const CardFeed: React.FC<CardFeedProps> = ({
     setActiveIndex(activeIdx);
   }, [activeIdx, setActiveIndex]);
 
+  // Warm-start the next 1-2 upcoming videos so they play instantly on arrival.
+  useEffect(() => {
+    const PREFETCH_AHEAD = 2;
+    for (let i = 1; i <= PREFETCH_AHEAD; i++) {
+      const next = posts[activeIdx + i];
+      if (!next) continue;
+      const media = next.mediaItems?.[0];
+      const hlsUrl = media?.hlsUrl;
+      if (hlsUrl) prefetchTile(hlsUrl);
+    }
+  }, [activeIdx, posts]);
+
+  // Warm the first videos on feed mount so even the initial card isn't fully cold.
+  useEffect(() => {
+    if (!posts?.length) return;
+    [0, 1].forEach((i) => {
+      const hlsUrl = posts[i]?.mediaItems?.[0]?.hlsUrl;
+      if (hlsUrl) prefetchTile(hlsUrl);
+    });
+  }, [posts?.length]);
+
   const handleOpenMedia = useCallback(
     (post: FeedPost, mediaIndex: number) => {
       const idx = posts.findIndex((p) => p.id === post.id);
