@@ -12,7 +12,7 @@
  *  - The visible poster is the media's thumbnail. Tap is handled by the
  *    parent (opens fullscreen).
  */
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { Volume2, VolumeX } from 'lucide-react';
 import { useClubhouseStore } from '@/store/clubhouseStore';
 import { attachHlsToTile } from '@/hooks/useTileVideoPlayer';
@@ -28,6 +28,7 @@ export const InlineVideo: React.FC<Props> = ({ item, isActive, objectFit = 'cove
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const hlsRef = useRef<any>(null);
   const attachedRef = useRef(false);
+  const [hasFirstFrame, setHasFirstFrame] = useState(false);
 
   const isMuted = useClubhouseStore((s) => s.isMuted);
   const toggleMute = useClubhouseStore((s) => s.toggleMute);
@@ -43,16 +44,29 @@ export const InlineVideo: React.FC<Props> = ({ item, isActive, objectFit = 'cove
       const mp4 = item.mp4Url;
       video.muted = isMuted;
       video.playsInline = true;
+
+      const armFirstFrame = () => {
+        const v = video as any;
+        if (typeof v.requestVideoFrameCallback === 'function') {
+          v.requestVideoFrameCallback(() => setHasFirstFrame(true));
+        } else {
+          const onPlaying = () => setHasFirstFrame(true);
+          video.addEventListener('playing', onPlaying, { once: true });
+        }
+      };
+
       if (hlsUrl) {
         attachHlsToTile({ hlsUrl, mp4Fallback: mp4, video })
-          .then((hls) => { hlsRef.current = hls; })
+          .then((hls) => { hlsRef.current = hls; armFirstFrame(); })
           .catch(() => {});
       } else if (mp4) {
         video.src = mp4;
         video.play().catch(() => {});
+        armFirstFrame();
       }
     } else if (!isActive && attachedRef.current) {
       attachedRef.current = false;
+      setHasFirstFrame(false);
       try { video.pause(); } catch {}
       try { hlsRef.current?.destroy?.(); } catch {}
       hlsRef.current = null;
@@ -66,6 +80,11 @@ export const InlineVideo: React.FC<Props> = ({ item, isActive, objectFit = 'cove
     if (v) v.muted = isMuted;
   }, [isMuted]);
 
+  // Reset poster when deactivated
+  useEffect(() => {
+    if (!isActive) setHasFirstFrame(false);
+  }, [isActive]);
+
   useEffect(() => () => {
     try { hlsRef.current?.destroy?.(); } catch {}
     hlsRef.current = null;
@@ -73,9 +92,24 @@ export const InlineVideo: React.FC<Props> = ({ item, isActive, objectFit = 'cove
 
   return (
     <div className="absolute inset-0" style={{ position: 'absolute', inset: 0 }}>
+      {item.thumbnailUrl && (
+        <div
+          aria-hidden
+          style={{
+            position: 'absolute',
+            inset: 0,
+            backgroundImage: `url(${item.thumbnailUrl})`,
+            backgroundSize: objectFit === 'contain' ? 'contain' : 'cover',
+            backgroundPosition: 'center',
+            backgroundRepeat: 'no-repeat',
+            opacity: hasFirstFrame ? 0 : 1,
+            transition: 'opacity 200ms ease-out',
+            zIndex: 1,
+          }}
+        />
+      )}
       <video
         ref={videoRef}
-        poster={item.thumbnailUrl || undefined}
         muted={isMuted}
         playsInline
         preload="none"
@@ -86,6 +120,8 @@ export const InlineVideo: React.FC<Props> = ({ item, isActive, objectFit = 'cove
           height: '100%',
           objectFit,
           display: 'block',
+          backgroundColor: 'transparent',
+          zIndex: 2,
         }}
       />
       {isActive && (
