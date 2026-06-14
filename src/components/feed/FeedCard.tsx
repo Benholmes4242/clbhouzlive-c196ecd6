@@ -85,6 +85,8 @@ export interface FeedCardProps {
   onCarouselIndexChange?: (post: FeedPost, idx: number) => void;
   onFollow?: (post: FeedPost) => void;
   currentUserId?: string;
+  /** Feed index — threaded down to InlineVideo for greppable per-tile traces. */
+  feedIndex?: number;
 }
 
 const FeedCardImpl: React.FC<FeedCardProps> = ({
@@ -105,6 +107,7 @@ const FeedCardImpl: React.FC<FeedCardProps> = ({
   onCarouselIndexChange,
   onFollow,
   currentUserId,
+  feedIndex,
 }) => {
   const mountFollowPill =
     !!onFollow &&
@@ -264,6 +267,7 @@ const FeedCardImpl: React.FC<FeedCardProps> = ({
                   item={media}
                   isActive={isActive}
                   isNear={mountVideo}
+                  feedIndex={feedIndex}
                   objectFit="cover"
                 />
 
