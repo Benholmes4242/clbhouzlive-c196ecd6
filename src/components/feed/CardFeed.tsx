@@ -263,6 +263,7 @@ export const CardFeed: React.FC<CardFeedProps> = ({
             onCarouselIndexChange={getCarouselChangeHandler(post.id)}
             onFollow={onFollow}
             currentUserId={currentUserId}
+            feedIndex={index}
           />
         </div>
       );
