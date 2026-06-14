@@ -156,37 +156,33 @@ async function performPrefetch(hlsUrl: string, effectiveVideoId: string): Promis
 }
 
 /**
- * Preload multiple segments in parallel and store in blob cache
+ * Warm multiple segments in parallel. Bytes are not stored in the app layer —
+ * the Service Worker (clbhouz-media-v2) catches them at the HTTP layer.
  */
 async function preloadSegments(
-  segmentLines: string[], 
-  baseUrl: string, 
+  segmentLines: string[],
+  baseUrl: string,
   videoId: string
 ): Promise<void> {
   const segmentPromises = segmentLines.map(async (segmentLine, index) => {
     try {
       const segmentUrl = new URL(segmentLine.trim(), baseUrl).href;
-      
-      const segmentResponse = await fetch(segmentUrl, { 
-        method: 'GET', 
+
+      const segmentResponse = await fetch(segmentUrl, {
+        method: 'GET',
         mode: 'cors',
         credentials: 'omit',
       });
-      
+
       if (segmentResponse.ok) {
-        // Store in blob cache
-        await hlsBlobCache.storeSegment(videoId, segmentUrl, segmentResponse);
-        
+        const blob = await segmentResponse.blob();
         const fromCache = segmentResponse.headers.get('x-cache') === 'HIT';
-        const stats = hlsBlobCache.getStats(videoId);
-        const size = stats?.totalBytes || 0;
-        prefetchDebug.segmentLoaded(videoId, index, fromCache, size);
+        prefetchDebug.segmentLoaded(videoId, index, fromCache, blob.size);
       }
     } catch {
       // Silently ignore individual segment failures
     }
   });
-  
-  // Wait for all segments to load
+
   await Promise.allSettled(segmentPromises);
 }
