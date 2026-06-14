@@ -68,15 +68,47 @@ export const CardFeed: React.FC<CardFeedProps> = ({
 }) => {
   const virtuosoRef = useRef<VirtuosoHandle | null>(null);
 
-  // ── Active-card tracking (visibility-based) ──
-  // An IntersectionObserver tracks each rendered card's visibility ratio.
-  // The most-visible card (>= ACTIVATION_THRESHOLD) becomes active. This is
-  // symmetric (fires the same scrolling up or down) and triggers as cards
-  // come into view rather than at viewport edges.
-  const ACTIVATION_THRESHOLD = 0.5;
+  // ── Active-card tracking (center-proximity) ──
+  // The card whose vertical center is nearest the viewport's vertical center
+  // becomes active. Height-independent + symmetric. IntersectionObserver
+  // maintains the on-screen candidate set; a scroll listener re-evaluates
+  // continuously as the user scrolls within that set.
   const [activeIdx, setActiveIdx] = useState(0);
   const visibilityRef = useRef<Map<number, number>>(new Map());
   const observerRef = useRef<IntersectionObserver | null>(null);
+  const cardEls = useRef<Map<number, HTMLElement>>(new Map());
+
+  const recheckActive = useCallback(() => {
+    const viewportCenter = window.innerHeight / 2;
+    let bestIdx = -1;
+    let bestDist = Infinity;
+
+    visibilityRef.current.forEach((_ratio, idx) => {
+      const el = cardEls.current.get(idx);
+      if (!el) return;
+      const r = el.getBoundingClientRect();
+      const cardCenter = r.top + r.height / 2;
+      const dist = Math.abs(cardCenter - viewportCenter);
+      if (dist < bestDist) {
+        bestDist = dist;
+        bestIdx = idx;
+      }
+    });
+
+    if (bestIdx >= 0) {
+      setActiveIdx((prev) => {
+        if (prev === bestIdx) return prev;
+        const prevEl = cardEls.current.get(prev);
+        if (prevEl) {
+          const pr = prevEl.getBoundingClientRect();
+          const prevDist = Math.abs((pr.top + pr.height / 2) - viewportCenter);
+          // Hysteresis: require new card to be ≥40px closer to center.
+          if (prevDist - bestDist < 40) return prev;
+        }
+        return bestIdx;
+      });
+    }
+  }, []);
 
   useEffect(() => {
     const observer = new IntersectionObserver(
@@ -84,35 +116,41 @@ export const CardFeed: React.FC<CardFeedProps> = ({
         for (const e of entries) {
           const idx = Number((e.target as HTMLElement).dataset.cardIndex);
           if (Number.isNaN(idx)) continue;
-          if (e.isIntersecting) {
-            visibilityRef.current.set(idx, e.intersectionRatio);
-          } else {
-            visibilityRef.current.delete(idx);
-          }
+          if (e.isIntersecting) visibilityRef.current.set(idx, e.intersectionRatio);
+          else visibilityRef.current.delete(idx);
         }
-        let bestIdx = -1;
-        let bestRatio = 0;
-        visibilityRef.current.forEach((ratio, idx) => {
-          if (ratio > bestRatio) {
-            bestRatio = ratio;
-            bestIdx = idx;
-          }
-        });
-        if (bestIdx >= 0 && bestRatio >= ACTIVATION_THRESHOLD) {
-          setActiveIdx((prev) => (prev === bestIdx ? prev : bestIdx));
-        }
+        recheckActive();
       },
-      { threshold: [0, 0.25, 0.5, 0.75, 1.0] },
+      { threshold: [0, 0.01, 0.25, 0.5, 0.75, 1.0] },
     );
     observerRef.current = observer;
     return () => {
       observer.disconnect();
       observerRef.current = null;
       visibilityRef.current.clear();
+      cardEls.current.clear();
     };
-  }, []);
+  }, [recheckActive]);
 
-  // Virtuoso's rangeChanged kept as a no-op; visibility owns activeIdx now.
+  // Re-evaluate on scroll — IntersectionObserver alone doesn't fire
+  // continuously during scroll within the on-screen set.
+  useEffect(() => {
+    let raf = 0;
+    const onScroll = () => {
+      if (raf) return;
+      raf = requestAnimationFrame(() => {
+        raf = 0;
+        recheckActive();
+      });
+    };
+    window.addEventListener('scroll', onScroll, { passive: true, capture: true });
+    return () => {
+      window.removeEventListener('scroll', onScroll, { capture: true } as any);
+      if (raf) cancelAnimationFrame(raf);
+    };
+  }, [recheckActive]);
+
+  // Virtuoso's rangeChanged kept as a no-op; center-proximity owns activeIdx.
   const handleRangeChanged = useCallback(
     (_: { startIndex: number; endIndex: number }) => {},
     [],
@@ -199,7 +237,12 @@ export const CardFeed: React.FC<CardFeedProps> = ({
           data-card-index={index}
           ref={(el) => {
             const obs = observerRef.current;
-            if (el && obs) obs.observe(el);
+            if (el) {
+              cardEls.current.set(index, el);
+              if (obs) obs.observe(el);
+            } else {
+              cardEls.current.delete(index);
+            }
           }}
         >
           <FeedCard
