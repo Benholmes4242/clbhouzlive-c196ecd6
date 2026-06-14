@@ -466,12 +466,19 @@ class MediaRuntimeCore {
       return false;
     }
     
-    // If already playing this one, skip
+    // If already in active set AND element is genuinely playing, skip.
+    // If element is paused (pause was issued outside the runtime, e.g. by
+    // usePausedFirstFrame), the id is stale — fall through to safePlay.
     if (this.state.activeMediaIds.has(id)) {
-      if (DEBUG_MEDIA_RUNTIME) {
-        console.log(`[${performance.now().toFixed(2)}ms] [MediaRuntime] ALREADY_PLAYING`, { id: id.slice(0, 8) });
+      if (node.videoElement && !node.videoElement.paused) {
+        if (DEBUG_MEDIA_RUNTIME) {
+          console.log(`[${performance.now().toFixed(2)}ms] [MediaRuntime] ALREADY_PLAYING`, { id: id.slice(0, 8) });
+        }
+        return true;
       }
-      return true;
+      if (DEBUG_MEDIA_RUNTIME) {
+        console.log(`[${performance.now().toFixed(2)}ms] [MediaRuntime] STALE_ACTIVE_REPLAY`, { id: id.slice(0, 8) });
+      }
     }
     
     // Priority check for user-initiated playback
