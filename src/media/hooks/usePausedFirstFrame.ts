@@ -111,7 +111,7 @@ export function usePausedFirstFrame(
         fallbackTimer.current = null;
       }
     };
-  }, [videoRef]);
+  }, [videoRef, attachToken]);
 
   // Drive play/pause by `active`, WITHOUT re-attaching. Keep decoded when inactive.
   // Safety net: if play() resolves, force the tile visible — opacity:0 while
