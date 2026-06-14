@@ -249,8 +249,9 @@ export const CardFeed: React.FC<CardFeedProps> = ({
     (index: number, post: FeedPost) => {
       const likeState = getLikeState(post);
       const initialSlide = carouselPositions.get(index) ?? 0;
-      const isActive = index === activeIdx;
-      const mountVideo = Math.abs(index - activeIdx) <= VIDEO_NEIGHBOUR_RADIUS;
+      const isActive = index === playingIdx; // PLAYS — settle-gated
+      const isNear = Math.abs(index - activeIdx) <= VIDEO_NEIGHBOUR_RADIUS; // mounts + paints frame — instant
+      const mountVideo = isNear;
       return (
         <div
           style={{ paddingBottom: 12 }}
