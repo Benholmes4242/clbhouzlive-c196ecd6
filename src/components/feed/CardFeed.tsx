@@ -23,6 +23,7 @@ import { Virtuoso, type VirtuosoHandle } from 'react-virtuoso';
 import type { FeedPost } from '@/components/media-system/types/media';
 import { useFullscreenFeedStore } from '@/store/fullscreenFeedStore';
 import { useClubhouseStore } from '@/store/clubhouseStore';
+import { prefetchTile } from '@/hooks/useTileVideoPlayer';
 import { FeedCard } from './FeedCard';
 
 const CANVAS = '#0A0E14';
