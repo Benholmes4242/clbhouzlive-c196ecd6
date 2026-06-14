@@ -107,6 +107,7 @@ const FeedCardImpl: React.FC<FeedCardProps> = ({
   onCarouselIndexChange,
   onFollow,
   currentUserId,
+  feedIndex,
 }) => {
   const mountFollowPill =
     !!onFollow &&
