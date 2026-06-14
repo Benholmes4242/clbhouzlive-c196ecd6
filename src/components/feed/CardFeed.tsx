@@ -237,7 +237,12 @@ export const CardFeed: React.FC<CardFeedProps> = ({
           data-card-index={index}
           ref={(el) => {
             const obs = observerRef.current;
-            if (el && obs) obs.observe(el);
+            if (el) {
+              cardEls.current.set(index, el);
+              if (obs) obs.observe(el);
+            } else {
+              cardEls.current.delete(index);
+            }
           }}
         >
           <FeedCard
