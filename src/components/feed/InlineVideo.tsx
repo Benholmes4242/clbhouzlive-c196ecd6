@@ -117,6 +117,13 @@ export const InlineVideo: React.FC<Props> = ({
           try {
             if (video.currentTime < 0.001) video.currentTime = 0.001;
           } catch {}
+          // Close play/attach race: if still active, re-issue play now that src exists.
+          if (isActiveRef.current) {
+            logTileLife(tag, feedIndex, 'REQUEST_PLAY_AFTER_ATTACH', {
+              readyState: video.readyState,
+            });
+            MediaRuntime.requestPlay({ id: regId, surface: 'clubhouse', reason: 'autoplay' });
+          }
         });
       } else if (mp4Url) {
         video.src = mp4Url;
