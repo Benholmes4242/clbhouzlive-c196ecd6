@@ -175,15 +175,15 @@ export const InlineVideo: React.FC<Props> = ({
     };
   }, [isNear, regId, tag, feedIndex]);
 
-  // Ask runtime to play when active.
+  // Trace-only: play itself is owned by usePausedFirstFrame's [active] effect.
+  // Surface arbitration is still owned by MediaRuntime via register/unregister.
   useEffect(() => {
     if (isActive) {
       const v = videoRef.current;
-      logTileLife(tag, feedIndex, 'REQUEST_PLAY', {
+      logTileLife(tag, feedIndex, 'ACTIVE_FLIP', {
         hasSrc: !!v?.src,
         readyState: v?.readyState,
       });
-      MediaRuntime.requestPlay({ id: regId, surface: 'clubhouse', reason: 'autoplay' });
     }
   }, [isActive, regId, tag, feedIndex]);
 
