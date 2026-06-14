@@ -89,14 +89,18 @@ export const InlineVideo: React.FC<Props> = ({
 
     const activeNow = isActiveRef.current;
     const priority = activeNow ? 'playing' : 'preload';
-    logTileLife(tag, feedIndex, 'SLOT_REQUEST', {
-      priority,
-      decoders: DecoderLimitManager.getSlotCount(),
-    });
-    const granted = DecoderLimitManager.requestSlot(regId, video, priority, () => {
-      logTileLife(tag, feedIndex, 'EVICTED_BLACK', {
+    if (isVideoDebugOn()) {
+      logTileLife(tag, feedIndex, 'SLOT_REQUEST', {
+        priority,
         decoders: DecoderLimitManager.getSlotCount(),
       });
+    }
+    const granted = DecoderLimitManager.requestSlot(regId, video, priority, () => {
+      if (isVideoDebugOn()) {
+        logTileLife(tag, feedIndex, 'EVICTED_BLACK', {
+          decoders: DecoderLimitManager.getSlotCount(),
+        });
+      }
       attachedRef.current = false;
       try { video.pause(); } catch {}
       try { video.removeAttribute('src'); video.load(); } catch {}
@@ -104,16 +108,20 @@ export const InlineVideo: React.FC<Props> = ({
       reset();
     });
     if (!granted) {
-      logTileLife(tag, feedIndex, 'SLOT_DENIED_BLACK', {
+      if (isVideoDebugOn()) {
+        logTileLife(tag, feedIndex, 'SLOT_DENIED_BLACK', {
+          priority,
+          decoders: DecoderLimitManager.getSlotCount(),
+        });
+      }
+      return;
+    }
+    if (isVideoDebugOn()) {
+      logTileLife(tag, feedIndex, 'SLOT_GRANTED', {
         priority,
         decoders: DecoderLimitManager.getSlotCount(),
       });
-      return;
     }
-    logTileLife(tag, feedIndex, 'SLOT_GRANTED', {
-      priority,
-      decoders: DecoderLimitManager.getSlotCount(),
-    });
     video.muted = true;
     video.playsInline = true;
     if (hlsUrl) {
