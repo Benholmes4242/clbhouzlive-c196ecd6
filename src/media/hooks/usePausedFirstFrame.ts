@@ -133,7 +133,6 @@ export function usePausedFirstFrame(
   }, [active, videoRef]);
 
   const reset = () => {
-    primedRef.current = false;
     frameRef.current = false;
     setHasFirstFrame(false);
   };
