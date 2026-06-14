@@ -18,6 +18,7 @@ interface SnapVideoPlayerProps {
   isSuggestedFeed: boolean;
   onFirstFrameReady?: () => void;
   isFullscreen?: boolean;
+  postId?: string;
 }
 
 export const SnapVideoPlayer = memo(function SnapVideoPlayer({
@@ -33,6 +34,7 @@ export const SnapVideoPlayer = memo(function SnapVideoPlayer({
   isSuggestedFeed,
   onFirstFrameReady,
   isFullscreen = false,
+  postId,
 }: SnapVideoPlayerProps) {
   const videoRef = useRef<HTMLVideoElement>(null);
   const [showReplay, setShowReplay] = useState(false);
@@ -143,6 +145,42 @@ export const SnapVideoPlayer = memo(function SnapVideoPlayer({
     video.addEventListener('ended', handleEnded);
     return () => video.removeEventListener('ended', handleEnded);
   }, [duration]);
+
+  // ── Continue-watching seek (event-based, no DOM poll) ──
+  const pendingSeekRef = useRef<number | null>(null);
+  useEffect(() => {
+    if (!postId) return;
+    const onSeek = (e: Event) => {
+      const detail = (e as CustomEvent).detail as { postId: string; seconds: number };
+      if (!detail?.postId || detail.postId !== postId || !detail.seconds) return;
+      const video = videoRef.current;
+      if (!video) { pendingSeekRef.current = detail.seconds; return; }
+      if (isFinite(video.duration) && video.duration > 0) {
+        try { video.currentTime = Math.min(detail.seconds, video.duration - 1); } catch {}
+      } else {
+        pendingSeekRef.current = detail.seconds;
+      }
+    };
+    window.addEventListener('continue-watching:seek', onSeek as EventListener);
+    return () => window.removeEventListener('continue-watching:seek', onSeek as EventListener);
+  }, [postId]);
+
+  useEffect(() => {
+    const video = videoRef.current;
+    if (!video) return;
+    const onMeta = () => {
+      if (pendingSeekRef.current != null && isFinite(video.duration) && video.duration > 0) {
+        try { video.currentTime = Math.min(pendingSeekRef.current, video.duration - 1); } catch {}
+        pendingSeekRef.current = null;
+      }
+    };
+    video.addEventListener('loadedmetadata', onMeta);
+    video.addEventListener('durationchange', onMeta);
+    return () => {
+      video.removeEventListener('loadedmetadata', onMeta);
+      video.removeEventListener('durationchange', onMeta);
+    };
+  }, []);
 
   // ── Tap handling (single tap = play/pause) ──
   const handleTap = useCallback(() => {
