@@ -189,7 +189,7 @@ export const CardFeed: React.FC<CardFeedProps> = ({
 
   // Warm-start the next 1-2 upcoming videos so they play instantly on arrival.
   useEffect(() => {
-    const PREFETCH_AHEAD = 3;
+    const PREFETCH_AHEAD = 2; // was 3 — keep concurrent decoders within iOS cap (3)
     for (let i = 1; i <= PREFETCH_AHEAD; i++) {
       const next = posts[activeIdx + i];
       if (!next) continue;
