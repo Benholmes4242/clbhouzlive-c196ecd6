@@ -165,9 +165,11 @@ export const InlineVideo: React.FC<Props> = ({
         cancelledRef.current = true;
       };
     } else {
-      logTileLife(tag, feedIndex, 'LEAVE_RADIUS_TEARDOWN', {
-        decoders: DecoderLimitManager.getSlotCount(),
-      });
+      if (isVideoDebugOn()) {
+        logTileLife(tag, feedIndex, 'LEAVE_RADIUS_TEARDOWN', {
+          decoders: DecoderLimitManager.getSlotCount(),
+        });
+      }
       DecoderLimitManager.releaseSlot(regId);
       pool.teardown(hlsUrl);
       attachedRef.current = false;
