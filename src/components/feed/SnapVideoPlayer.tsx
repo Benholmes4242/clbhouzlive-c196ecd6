@@ -4,6 +4,7 @@ import { haptic } from '@/utils/haptics';
 import { registerAudioSource, unregisterAudioSource } from '@/utils/globalVideoMute';
 import { useHlsPool } from '@/media/hooks/useHlsPool';
 import { usePausedFirstFrame } from '@/media/hooks/usePausedFirstFrame';
+import { useGaplessLoop } from '@/utils/video/GaplessLoop';
 
 interface SnapVideoPlayerProps {
   hlsUrl: string;
@@ -132,19 +133,8 @@ export const SnapVideoPlayer = memo(function SnapVideoPlayer({
     }
   }, [userPaused, isActive]);
 
-  // ── Gapless loop ──
-  useEffect(() => {
-    const video = videoRef.current;
-    if (!video) return;
-
-    const handleEnded = () => {
-      video.currentTime = 0;
-      video.play().catch(() => {});
-    };
-
-    video.addEventListener('ended', handleEnded);
-    return () => video.removeEventListener('ended', handleEnded);
-  }, [duration]);
+  // Seamless loop while this slide is active (RAF-based, no seek-black seam).
+  useGaplessLoop(videoRef, isActive, false);
 
   // ── Continue-watching seek (event-based, no DOM poll) ──
   const pendingSeekRef = useRef<number | null>(null);
