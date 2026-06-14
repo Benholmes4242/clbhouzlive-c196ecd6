@@ -1,27 +1,9 @@
 import React, { useRef, useEffect, useCallback, useState, memo } from 'react';
 import { useClubhouseStore } from '@/store/clubhouseStore';
-import { loadHlsJs } from '@/utils/hlsLoader';
 import { haptic } from '@/utils/haptics';
-import { HLSPoolManager } from '@/media/HLSPoolManager';
 import { registerAudioSource, unregisterAudioSource } from '@/utils/globalVideoMute';
-
-import { isPrefetchComplete } from '@/utils/hlsPreload';
-import { extractCloudflareUid } from '@/utils/videoIdUtils';
-import { getSharedBandwidth, saveSharedBandwidth } from '@/utils/sharedBandwidth';
-import type HlsType from 'hls.js';
-
-const HLS_CONFIG = {
-  enableWorker: true,
-  lowLatencyMode: false,
-  backBufferLength: 10,
-  maxBufferLength: 30,
-  maxMaxBufferLength: 60,
-  startLevel: -1,
-  capLevelToPlayerSize: false,
-  abrEwmaDefaultEstimate: getSharedBandwidth(),
-};
-
-
+import { useHlsPool } from '@/media/hooks/useHlsPool';
+import { usePausedFirstFrame } from '@/media/hooks/usePausedFirstFrame';
 
 interface SnapVideoPlayerProps {
   hlsUrl: string;
@@ -55,15 +37,17 @@ export const SnapVideoPlayer = memo(function SnapVideoPlayer({
   isFullscreen = false,
 }: SnapVideoPlayerProps) {
   const videoRef = useRef<HTMLVideoElement>(null);
-  const hlsRef = useRef<HlsType | null>(null);
-  const [videoReady, setVideoReady] = useState(false);
   const [showReplay, setShowReplay] = useState(false);
-  
+  const [attachToken, setAttachToken] = useState(0);
+
   const lastTapRef = useRef(0);
   const firstFrameFiredRef = useRef(false);
 
   const isMuted = useClubhouseStore(s => s.isMuted);
   const userPaused = useClubhouseStore(s => s.userPaused);
+
+  const pool = useHlsPool();
+  const { hasFirstFrame, reset } = usePausedFirstFrame(videoRef, isActive, attachToken);
 
   // Register with global audio mutex
   useEffect(() => {
@@ -73,8 +57,6 @@ export const SnapVideoPlayer = memo(function SnapVideoPlayer({
       if (video) {
         video.muted = true;
       }
-      // Do NOT call setIsMuted(true) — this would wipe the user's global preference.
-      // The mutex only silences this specific element; the global preference is unchanged.
     });
     return () => unregisterAudioSource(id);
   }, [feedIndex]);
@@ -86,139 +68,51 @@ export const SnapVideoPlayer = memo(function SnapVideoPlayer({
     ? 'contain'
     : (isSuggestedFeed ? 'cover' : (aspect >= 1.5 ? 'cover' : 'contain'));
 
-  // ── Attach/detach HLS ──
+  // ── Attach/teardown via shared hook (pool-aware demote-not-destroy) ──
   useEffect(() => {
     const video = videoRef.current;
     if (!video) return;
-
-    if (!isActive) {
-      video.pause();
-      const distance = Math.abs(feedIndex - activeIndex);
-      if (distance <= 2) {
-        // Adjacent slide — stop loading but keep buffer intact
-        if (hlsRef.current) {
-          hlsRef.current.stopLoad();
-        }
-        
-      } else {
-        // Far away — return to pool if eligible, otherwise destroy to free memory.
-        if (hlsRef.current) {
-          if (hlsUrl && HLSPoolManager.has(hlsUrl)) {
-            HLSPoolManager.demote(hlsUrl, hlsRef.current);
-          } else {
-            hlsRef.current.destroy();
-          }
-          hlsRef.current = null;
-        }
-        video.removeAttribute('src');
-        video.load();
-        setVideoReady(false);
-        setShowReplay(false);
-        
-      }
-      useClubhouseStore.getState().setActiveVideoElement(null, null);
-      return;
-    }
-
-    // Active — attach
+    const distance = Math.abs(feedIndex - activeIndex);
     let cancelled = false;
 
-    const attach = async () => {
-      
-
-      // If HLS instance already exists (was stopped, not destroyed), resume it
-      if (hlsRef.current) {
-        hlsRef.current.startLoad();
-        video.muted = useClubhouseStore.getState().isMuted;
-        try {
-          await video.play();
-        } catch {
-        // Autoplay blocked — mute this element only to recover playback.
-        video.muted = true;
-        useClubhouseStore.getState().setIsMuted(true);
-        video.play().catch(() => {});
-        }
-        useClubhouseStore.getState().setActiveVideoElement(video, videoRef);
-        return;
-      }
-
-      const Hls = await loadHlsJs();
-
-      if (cancelled) return;
-
-      // Low-memory: use native HLS
-      const deviceMemory = (navigator as any).deviceMemory;
-      const useNative = (deviceMemory && deviceMemory <= 2) || !Hls || !Hls.isSupported();
-
-      if (useNative) {
-        video.src = hlsUrl || mp4Url || '';
-      } else {
-        // Prefetch status check — use Cloudflare UID to match hlsPreload's key
-        const videoId = extractCloudflareUid(hlsUrl) || hlsUrl;
-        const prefetchStatus = isPrefetchComplete(videoId) ? 'hit' : 'miss';
-
-        // Check pool for a pre-buffered instance first
-        const pooledHls = HLSPoolManager.promote(hlsUrl, video);
-
-        if (pooledHls) {
-          hlsRef.current = pooledHls;
-          pooledHls.startLoad();
-
-          pooledHls.on(Hls.Events.FRAG_LOADED, (_, data) => {
-            if (data.frag?.stats?.bwEstimate && data.frag.stats.bwEstimate > 0) {
-              saveSharedBandwidth(data.frag.stats.bwEstimate);
-            }
-          });
-        } else {
-          const hls = new Hls(HLS_CONFIG);
-          hlsRef.current = hls;
-          hls.loadSource(hlsUrl || mp4Url || '');
-          hls.attachMedia(video);
-
-          // Phase 1: register cold-init instance so it can be demoted back on teardown.
-          hls.on(Hls.Events.MANIFEST_PARSED, () => {
-            if (hlsUrl && !HLSPoolManager.has(hlsUrl)) {
-              HLSPoolManager.register(hlsUrl, hls, video);
-            }
-          });
-
-          hls.on(Hls.Events.FRAG_LOADED, (_, data) => {
-            if (data.frag?.stats?.bwEstimate && data.frag.stats.bwEstimate > 0) {
-              saveSharedBandwidth(data.frag.stats.bwEstimate);
-            }
-          });
-        }
-      }
-
+    if (isActive || distance <= 2) {
       video.muted = useClubhouseStore.getState().isMuted;
-      
-      try {
-        await video.play();
-      } catch {
-        // Autoplay blocked — mute this element and sync store so UI matches.
-        video.muted = true;
-        useClubhouseStore.getState().setIsMuted(true);
-        video.play().catch(() => {});
-      }
+      video.playsInline = true;
+      pool.attach(hlsUrl, video, mp4Url).then(() => {
+        if (cancelled) return;
+        setAttachToken((t) => t + 1);
+        try { if (video.currentTime < 0.001) video.currentTime = 0.001; } catch {}
+      });
+      return () => { cancelled = true; };
+    } else {
+      pool.teardown(hlsUrl);
+      reset();
+      try { video.removeAttribute('src'); video.load(); } catch {}
+      setShowReplay(false);
+      useClubhouseStore.getState().setActiveVideoElement(null, null);
+    }
+  }, [isActive, feedIndex, activeIndex, hlsUrl, mp4Url]);
 
+  // ── Active-element store registration (shell concern) ──
+  // Hook owns play(); we own the global active-element pointer.
+  useEffect(() => {
+    const video = videoRef.current;
+    if (!video) return;
+    if (isActive) {
+      video.muted = useClubhouseStore.getState().isMuted;
       useClubhouseStore.getState().setActiveVideoElement(video, videoRef);
-    };
+    } else {
+      try { video.pause(); } catch {}
+    }
+  }, [isActive]);
 
-    attach();
-
-    return () => {
-      cancelled = true;
-      if (hlsRef.current) {
-        // Phase 1: return to pool for reuse instead of destroying, if pool-eligible.
-        if (hlsUrl && HLSPoolManager.has(hlsUrl)) {
-          HLSPoolManager.demote(hlsUrl, hlsRef.current);
-        } else {
-          hlsRef.current.destroy();
-        }
-        hlsRef.current = null;
-      }
-    };
-  }, [isActive, activeIndex, feedIndex, hlsUrl, mp4Url]);
+  // First-frame ready callback (fires once per mount when hook signals frame).
+  useEffect(() => {
+    if (hasFirstFrame && !firstFrameFiredRef.current) {
+      firstFrameFiredRef.current = true;
+      onFirstFrameReady?.();
+    }
+  }, [hasFirstFrame, onFirstFrameReady]);
 
   // ── Sync muted state ──
   useEffect(() => {
@@ -239,39 +133,12 @@ export const SnapVideoPlayer = memo(function SnapVideoPlayer({
     }
   }, [userPaused, isActive]);
 
-  // ── First frame detection + crossfade ──
-  useEffect(() => {
-    const video = videoRef.current;
-    if (!video) return;
-
-    const handlePlaying = () => {
-      setVideoReady(true);
-      if (!firstFrameFiredRef.current) {
-        firstFrameFiredRef.current = true;
-        onFirstFrameReady?.();
-      }
-    };
-
-    const handleWaiting = () => {};
-    const handlePlayingRecovery = () => {};
-
-    video.addEventListener('playing', handlePlaying);
-    video.addEventListener('waiting', handleWaiting);
-    video.addEventListener('playing', handlePlayingRecovery);
-    return () => {
-      video.removeEventListener('playing', handlePlaying);
-      video.removeEventListener('waiting', handleWaiting);
-      video.removeEventListener('playing', handlePlayingRecovery);
-    };
-  }, [onFirstFrameReady]);
-
   // ── Gapless loop ──
   useEffect(() => {
     const video = videoRef.current;
     if (!video) return;
 
     const handleEnded = () => {
-      // All videos loop continuously in the feed
       video.currentTime = 0;
       video.play().catch(() => {});
     };
@@ -284,7 +151,6 @@ export const SnapVideoPlayer = memo(function SnapVideoPlayer({
   const handleTap = useCallback(() => {
     const now = Date.now();
     if (now - lastTapRef.current < 300) {
-      // Double tap
       lastTapRef.current = 0;
       onDoubleTapLike?.();
       haptic('medium');
@@ -292,7 +158,6 @@ export const SnapVideoPlayer = memo(function SnapVideoPlayer({
       lastTapRef.current = now;
       setTimeout(() => {
         if (lastTapRef.current !== 0 && Date.now() - lastTapRef.current >= 280) {
-          // Single tap — toggle play/pause
           const store = useClubhouseStore.getState();
           store.setUserPaused(!store.userPaused);
           lastTapRef.current = 0;
@@ -306,7 +171,6 @@ export const SnapVideoPlayer = memo(function SnapVideoPlayer({
     const video = videoRef.current;
     if (!video) return;
     setShowReplay(false);
-    
     video.currentTime = 0;
     video.play().catch(() => {});
   }, []);
@@ -326,34 +190,23 @@ export const SnapVideoPlayer = memo(function SnapVideoPlayer({
       ) : (
         <div className="absolute inset-0" style={{ background: '#0A0E14' }} aria-hidden="true" />
       )}
-      {/* Poster / thumbnail */}
-      {thumbnailUrl && (
-        <img
-          src={thumbnailUrl}
-          alt=""
-          className="absolute inset-0 w-full h-full"
-          style={{ objectFit, zIndex: 1 }}
-          loading="eager"
-        />
-      )}
 
-      {/* Video element */}
+      {/* Video element — paused first frame is the reveal (no poster img layer). */}
       <video
         ref={videoRef}
         playsInline
         preload="metadata"
-        poster={thumbnailUrl || undefined}
         className="absolute inset-0 w-full h-full"
         style={{
           objectFit,
           zIndex: 2,
-          opacity: videoReady ? 1 : 0,
-          transition: 'opacity 0.2s ease',
+          opacity: hasFirstFrame ? 1 : 0,
+          transition: 'opacity 120ms ease-out',
         }}
       />
 
       {/* Buffering indicator — subtle bottom bar */}
-      {isActive && !videoReady && (
+      {isActive && !hasFirstFrame && (
         <div
           className="absolute bottom-0 left-0 right-0 h-1"
           style={{
