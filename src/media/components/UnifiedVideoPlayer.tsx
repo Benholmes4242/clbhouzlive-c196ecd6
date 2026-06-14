@@ -29,7 +29,7 @@ import { CLOUDFLARE_STREAM_PATTERNS } from '@/media/constants';
 import type { PlaybackState, MediaError, AspectRatio } from '@/media/types';
 import { VideoOverlay } from './VideoOverlay';
 import { registerHlsForDebug, unregisterHlsForDebug } from '@/components/debug/hlsDebugRegistry';
-import { NetworkPriorityManager } from '@/utils/video/NetworkPriorityManager';
+
 import { DecoderLimitManager } from '@/utils/video/DecoderLimitManager';
 import { useGaplessLoop } from '@/utils/video/GaplessLoop';
 import { videoDebug } from '@/config/videoDebug';
@@ -41,7 +41,7 @@ import { extractCloudflareUid } from '@/utils/videoIdUtils';
 import { HLSPoolManager } from '@/media/HLSPoolManager';
 import { useBufferingIndicator } from '@/hooks/useBufferingIndicator';
 import { useAudioFade } from '@/hooks/useAudioFade';
-import { hlsBlobCache } from '@/utils/hlsBlobCache';
+import { videoReadyFlags } from '@/utils/videoReadyFlags';
 import type HlsType from 'hls.js';
 import { 
   MOBILE_VIDEO_DEBUG, 
@@ -508,9 +508,6 @@ const UnifiedVideoPlayerInner = forwardRef<UnifiedVideoPlayerRef, UnifiedVideoPl
           readyState: video.readyState
         });
         
-        // Exit priority mode when first video is ready
-        // (The manager handles the 3s window internally)
-        NetworkPriorityManager.exitPriorityMode();
         
         if (playbackState === 'loading' || playbackState === 'idle') {
           updatePlaybackState('ready');
@@ -663,11 +660,9 @@ const UnifiedVideoPlayerInner = forwardRef<UnifiedVideoPlayerRef, UnifiedVideoPl
         // FIX #1: Wait for prefetch before HLS setup
         // Check if this video is already prefetched and ready
         if (cloudflareUid) {
-          if (hlsBlobCache.isReady(cloudflareUid)) {
-            videoDebug('hlsEvents', 'Using prefetched segments', { uid: cloudflareUid });
-            // Prefetch is complete — proceed with HLS setup immediately
-            // The CachedHlsLoader will use the cached segments
-          } else if (hlsBlobCache.isPending(cloudflareUid)) {
+          if (videoReadyFlags.isReady(cloudflareUid)) {
+            videoDebug('hlsEvents', 'Prefetch ready (SW-cached segments expected)', { uid: cloudflareUid });
+          } else if (videoReadyFlags.isPending(cloudflareUid)) {
             // Prefetch is in progress — wait for it to complete (max 3 seconds)
             videoDebug('hlsEvents', 'Waiting for prefetch to complete', { uid: cloudflareUid });
             // Removed: 3s waitForReady was blocking HLS setup unnecessarily

@@ -158,31 +158,24 @@ class PrefetchDebugger {
     this.log('success', 'HLSPlayer', `CACHE HIT → ${action} (skipped spinner)`, videoId);
   }
 
-  // CACHE VERIFICATION - checks HlsBlobCache (in-memory), not browser Cache API
+  // CACHE VERIFICATION - checks videoReadyFlags (prefetch completion signal).
+  // The real bytes live in the SW Cache Storage (clbhouz-media-v2) and hls.js buffer.
   verifyCacheStatus(videoId: string, _hlsUrl: string): boolean {
-    // Import dynamically to avoid circular dependency issues
-    // The hlsBlobCache is the actual storage mechanism used by prefetch
     try {
-      // Access global singleton directly (exposed on window for debugging)
-      const blobCache = typeof window !== 'undefined' ? (window as any).hlsBlobCache : null;
-      if (!blobCache) {
-        this.log('warn', 'CacheCheck', 'hlsBlobCache not available', videoId);
+      const flags = typeof window !== 'undefined' ? (window as any).videoReadyFlags : null;
+      if (!flags) {
+        this.log('warn', 'CacheCheck', 'videoReadyFlags not available', videoId);
         return false;
       }
-      
-      const isReady = blobCache.isReady(videoId);
-      const stats = blobCache.getStats(videoId);
-      
+      const isReady = flags.isReady(videoId);
       this.cacheHits.set(videoId, isReady);
-      
-      if (isReady && stats) {
-        this.log('success', 'CacheCheck', `BLOB CACHE HIT (${stats.segmentCount} segments, ${Math.round(stats.totalBytes/1024)}KB)`, videoId);
-      } else if (stats) {
-        this.log('warn', 'CacheCheck', `In cache but NOT READY (${stats.segmentCount} segments)`, videoId);
+      if (isReady) {
+        this.log('success', 'CacheCheck', 'PREFETCH READY (segments expected in SW cache)', videoId);
+      } else if (flags.isPending(videoId)) {
+        this.log('warn', 'CacheCheck', 'Prefetch pending', videoId);
       } else {
-        this.log('error', 'CacheCheck', 'NOT IN blob cache', videoId);
+        this.log('error', 'CacheCheck', 'Not prefetched', videoId);
       }
-      
       return isReady;
     } catch {
       this.log('error', 'CacheCheck', 'Cache check failed', videoId);

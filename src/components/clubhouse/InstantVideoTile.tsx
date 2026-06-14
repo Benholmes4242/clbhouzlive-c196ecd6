@@ -18,7 +18,7 @@ import { cn } from '@/lib/utils';
 import { uidFromNode } from '@/utils/cloudflareStreamTransform';
 import { generateStreamHlsUrl, generateStreamThumbnailUrl } from '@/config/cloudflareStream';
 import { HLSPlayer, HLSPlayerRef } from '@/media';
-import { hlsBlobCache } from '@/utils/hlsBlobCache';
+import { videoReadyFlags } from '@/utils/videoReadyFlags';
 import { isPosterFailed } from '@/utils/posterPrefetch';
 
 interface InstantVideoTileProps {
@@ -72,7 +72,7 @@ export const InstantVideoTile = memo(forwardRef<HTMLVideoElement, InstantVideoTi
   
   // Check blob cache on mount
   useEffect(() => {
-    if (uid && hlsBlobCache.isReady(uid)) {
+    if (uid && videoReadyFlags.isReady(uid)) {
       setIsVideoReady(true);
       if (!hasReportedReadyRef.current) {
         hasReportedReadyRef.current = true;
