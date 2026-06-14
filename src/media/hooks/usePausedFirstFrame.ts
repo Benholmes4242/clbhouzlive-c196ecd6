@@ -23,8 +23,16 @@ export function usePausedFirstFrame(
   const primedRef = useRef(false);
   const frameRef = useRef(false);
   const fallbackTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const activeRef = useRef(active);
+
+  // Keep activeRef current without retriggering the prime effect.
+  useEffect(() => {
+    activeRef.current = active;
+  }, [active]);
 
   // Prime a painted frame while paused.
+  // IMPORTANT: deps are [videoRef] only — flipping `active` must NOT tear
+  // down the reveal listeners + iOS fallback timer mid-prime.
   useEffect(() => {
     const video = videoRef.current;
     if (!video || primedRef.current) return;
@@ -47,6 +55,8 @@ export function usePausedFirstFrame(
         if (video.currentTime < SEEK_PRIME) video.currentTime = SEEK_PRIME;
       } catch {}
     };
+    const onPlaying = () => markFrame();
+    const onCanPlay = () => markFrame();
 
     const v = video as any;
     if (typeof v.requestVideoFrameCallback === 'function') {
@@ -54,17 +64,22 @@ export function usePausedFirstFrame(
     }
     video.addEventListener('seeked', onSeeked);
     video.addEventListener('loadeddata', onLoadedData);
+    video.addEventListener('playing', onPlaying);
+    video.addEventListener('canplay', onCanPlay);
 
     // iOS fallback: micro muted play→pause to force decode.
+    // Gated to active cards only — inactive neighbours must NOT force-play
+    // (iOS has a single inline-video decoder; neighbours would steal it).
     fallbackTimer.current = setTimeout(() => {
       if (frameRef.current) return;
+      if (!activeRef.current) return;
       const wasMuted = video.muted;
       video.muted = true;
       video
         .play()
         .then(() => {
           requestAnimationFrame(() => {
-            if (!active) {
+            if (!activeRef.current) {
               try { video.pause(); } catch {}
             }
             video.muted = wasMuted;
@@ -79,19 +94,29 @@ export function usePausedFirstFrame(
     return () => {
       video.removeEventListener('seeked', onSeeked);
       video.removeEventListener('loadeddata', onLoadedData);
+      video.removeEventListener('playing', onPlaying);
+      video.removeEventListener('canplay', onCanPlay);
       if (fallbackTimer.current) {
         clearTimeout(fallbackTimer.current);
         fallbackTimer.current = null;
       }
     };
-  }, [videoRef, active]);
+  }, [videoRef]);
 
   // Drive play/pause by `active`, WITHOUT re-attaching. Keep decoded when inactive.
+  // Safety net: if play() resolves, force the tile visible — opacity:0 while
+  // playing is never correct.
   useEffect(() => {
     const video = videoRef.current;
     if (!video) return;
     if (active) {
-      video.play().catch(() => {});
+      video
+        .play()
+        .then(() => {
+          frameRef.current = true;
+          setHasFirstFrame(true);
+        })
+        .catch(() => {});
     } else {
       try { video.pause(); } catch {}
     }
