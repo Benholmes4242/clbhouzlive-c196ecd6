@@ -1098,34 +1098,35 @@ const UnifiedVideoPlayerInner = forwardRef<UnifiedVideoPlayerRef, UnifiedVideoPl
       <div
         ref={containerRef}
         className={cn(
-          "relative overflow-hidden bg-black",
+          "relative overflow-hidden bg-neutral-900",
           className
         )}
         style={{
           ...aspectRatioStyle,
           ...style,
+          // Bottom layer: poster as container background so any sub-frame gap shows the image, never black
+          ...(poster ? { backgroundImage: `url(${poster})`, backgroundSize: 'cover', backgroundPosition: 'center', backgroundRepeat: 'no-repeat' } : {}),
         }}
         onClick={handleContainerClick}
       >
-        {/* Poster/Placeholder - always render, fade out smoothly */}
-        {/* FIX #6: Faster crossfade (150ms vs 300ms) with snappier easing for TikTok-level responsiveness */}
+        {/* Poster/Placeholder - opaque underneath until video reveals on top */}
+        {/* Phase 1: poster fades slower (300ms) than video appears (150ms) so video covers poster before it disappears */}
         {poster && (
           <div
             className={cn(
               "absolute inset-0 bg-cover bg-center bg-no-repeat z-[1]",
-              "transition-opacity duration-150 ease-out",
+              "transition-opacity duration-300 ease-out",
               hasFirstFrame ? "opacity-0 pointer-events-none" : "opacity-100"
             )}
             style={{ backgroundImage: `url(${poster})` }}
           />
         )}
 
-        {/* Video Element - fade in as poster fades out */}
-        {/* FIX #6: Matched 150ms crossfade timing for seamless poster→video transition */}
+        {/* Video Element - stacked ABOVE poster (z-[2]); appears in 150ms on first real frame */}
         <video
           ref={videoRef}
           className={cn(
-            "absolute inset-0 w-full h-full",
+            "absolute inset-0 w-full h-full z-[2]",
             objectFit === 'cover' ? 'object-cover' : 'object-contain',
             "transition-opacity duration-150 ease-out",
             hasFirstFrame ? "opacity-100" : "opacity-0"
