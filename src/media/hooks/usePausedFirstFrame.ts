@@ -18,9 +18,9 @@ const IOS_FALLBACK_MS = 250;
 export function usePausedFirstFrame(
   videoRef: React.RefObject<HTMLVideoElement>,
   active: boolean,
+  attachToken: number = 0,
 ) {
   const [hasFirstFrame, setHasFirstFrame] = useState(false);
-  const primedRef = useRef(false);
   const frameRef = useRef(false);
   const fallbackTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const activeRef = useRef(active);
