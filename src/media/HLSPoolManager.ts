@@ -36,7 +36,7 @@ interface PooledHLSInstance {
 // Pool configuration
 const POOL_CONFIG = {
   maxInstances: 12,          // Max instances to keep in pool
-  maxInstancesLowMemory: 4,  // FIX #9: Reduced pool size under memory pressure
+  maxInstancesLowMemory: 8,  // was 4 — too small for prefetch-ahead (2) + scroll-back (2-3) + active (1)
   instanceTTL: 30000,        // 30s - auto-cleanup idle instances
   instanceTTLLowMemory: 10000, // FIX #9: 10s - faster cleanup under pressure
   promotionCooldown: 100,    // 100ms - prevent rapid detach/attach cycles
