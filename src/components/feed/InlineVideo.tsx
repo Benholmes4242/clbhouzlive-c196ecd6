@@ -47,7 +47,8 @@ export const InlineVideo: React.FC<Props> = ({
   const regId = extractCloudflareUid(hlsUrl) || item.id;
   const tag = regId.slice(-6);
 
-  const { hasFirstFrame, reset } = usePausedFirstFrame(videoRef, isActive);
+  const [attachToken, setAttachToken] = useState(0);
+  const { hasFirstFrame, reset } = usePausedFirstFrame(videoRef, isActive, attachToken);
 
   // Trace prop changes — the inputs that drive every decision below.
   useEffect(() => {
