@@ -291,6 +291,8 @@ export const CardFeed: React.FC<CardFeedProps> = ({
     },
     [
       activeIdx,
+      playingIdx,        // isActive keys off playingIdx; without this the
+                         // settle-promoted play index never reaches the tiles
       carouselPositions,
       getCarouselChangeHandler,
       getCommentCount,
