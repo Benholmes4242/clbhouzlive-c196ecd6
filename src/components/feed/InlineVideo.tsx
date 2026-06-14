@@ -4,7 +4,7 @@
  * INSTRUMENTED: every lifecycle decision emits a TILE trace via logTileLife,
  * tagged with `[#feedIndex tag]` for greppable per-tile timelines.
  */
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { Volume2, VolumeX } from 'lucide-react';
 import { useClubhouseStore } from '@/store/clubhouseStore';
 import { useHlsPool } from '@/media/hooks/useHlsPool';
@@ -47,7 +47,8 @@ export const InlineVideo: React.FC<Props> = ({
   const regId = extractCloudflareUid(hlsUrl) || item.id;
   const tag = regId.slice(-6);
 
-  const { hasFirstFrame, reset } = usePausedFirstFrame(videoRef, isActive);
+  const [attachToken, setAttachToken] = useState(0);
+  const { hasFirstFrame, reset } = usePausedFirstFrame(videoRef, isActive, attachToken);
 
   // Trace prop changes — the inputs that drive every decision below.
   useEffect(() => {
@@ -117,13 +118,11 @@ export const InlineVideo: React.FC<Props> = ({
           try {
             if (video.currentTime < 0.001) video.currentTime = 0.001;
           } catch {}
-          // Close play/attach race: if still active, re-issue play now that src exists.
-          if (isActiveRef.current) {
-            logTileLife(tag, feedIndex, 'REQUEST_PLAY_AFTER_ATTACH', {
-              readyState: video.readyState,
-            });
-            MediaRuntime.requestPlay({ id: regId, surface: 'clubhouse', reason: 'autoplay' });
-          }
+          // Re-arm the paused-frame prime for THIS attach so the first frame
+          // re-paints on re-attach (e.g. scroll-up after radius teardown),
+          // independent of the play()→'playing' roundtrip. Play itself is owned
+          // by usePausedFirstFrame's [active] effect — no runtime re-play here.
+          setAttachToken((t) => t + 1);
         });
       } else if (mp4Url) {
         video.src = mp4Url;
@@ -176,15 +175,15 @@ export const InlineVideo: React.FC<Props> = ({
     };
   }, [isNear, regId, tag, feedIndex]);
 
-  // Ask runtime to play when active.
+  // Trace-only: play itself is owned by usePausedFirstFrame's [active] effect.
+  // Surface arbitration is still owned by MediaRuntime via register/unregister.
   useEffect(() => {
     if (isActive) {
       const v = videoRef.current;
-      logTileLife(tag, feedIndex, 'REQUEST_PLAY', {
+      logTileLife(tag, feedIndex, 'ACTIVE_FLIP', {
         hasSrc: !!v?.src,
         readyState: v?.readyState,
       });
-      MediaRuntime.requestPlay({ id: regId, surface: 'clubhouse', reason: 'autoplay' });
     }
   }, [isActive, regId, tag, feedIndex]);
 
