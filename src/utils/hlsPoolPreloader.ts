@@ -44,7 +44,8 @@ export async function registerInPool(hlsUrl: string): Promise<void> {
     const hls = new Hls({
       enableWorker: true,
       lowLatencyMode: false,
-      maxBufferLength: 30,
+      maxBufferLength: 12,
+      maxMaxBufferLength: 24,
       startLevel: -1,
       capLevelToPlayerSize: false,
       abrEwmaDefaultEstimate: getSharedBandwidth(),
