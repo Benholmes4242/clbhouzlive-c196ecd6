@@ -114,6 +114,31 @@ export function logPoolTrace(msg: string): void {
   addLogEntry('info', 'PATH', `🔍 ${msg}`);
 }
 
+// ============ Per-Tile Lifecycle Tracing ============
+/**
+ * logTileLife — greppable per-tile lifecycle trace for the Clubhouse feed.
+ * Format: `[#idx tag] PHASE k=v…`
+ */
+export function logTileLife(
+  tag: string,
+  idx: number | undefined,
+  phase: string,
+  data?: Record<string, any>,
+): void {
+  if (!isVideoDebugOn()) return;
+  const idxStr = typeof idx === 'number' ? `#${idx}` : '#?';
+  let suffix = '';
+  if (data) {
+    const parts: string[] = [];
+    for (const k of Object.keys(data)) {
+      const v = data[k];
+      parts.push(`${k}=${typeof v === 'object' ? JSON.stringify(v) : String(v)}`);
+    }
+    if (parts.length) suffix = ' ' + parts.join(' ');
+  }
+  addLogEntry('info', 'TILE', `[${idxStr} ${tag}] ${phase}${suffix}`);
+}
+
 // ============ Gesture Retry Logging (iOS WebView) ============
 
 export function logGestureRetryQueued(videoId: string): void {
