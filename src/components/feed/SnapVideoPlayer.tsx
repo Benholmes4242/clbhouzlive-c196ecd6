@@ -16,7 +16,6 @@ interface SnapVideoPlayerProps {
   activeIndex: number;
   feedIndex: number;
   isSuggestedFeed: boolean;
-  onDoubleTapLike?: () => void;
   onFirstFrameReady?: () => void;
   isFullscreen?: boolean;
 }
@@ -32,7 +31,6 @@ export const SnapVideoPlayer = memo(function SnapVideoPlayer({
   activeIndex,
   feedIndex,
   isSuggestedFeed,
-  onDoubleTapLike,
   onFirstFrameReady,
   isFullscreen = false,
 }: SnapVideoPlayerProps) {
@@ -40,7 +38,6 @@ export const SnapVideoPlayer = memo(function SnapVideoPlayer({
   const [showReplay, setShowReplay] = useState(false);
   const [attachToken, setAttachToken] = useState(0);
 
-  const lastTapRef = useRef(0);
   const firstFrameFiredRef = useRef(false);
 
   const isMuted = useClubhouseStore(s => s.isMuted);
@@ -147,24 +144,11 @@ export const SnapVideoPlayer = memo(function SnapVideoPlayer({
     return () => video.removeEventListener('ended', handleEnded);
   }, [duration]);
 
-  // ── Tap handling (single = play/pause, double = like) ──
+  // ── Tap handling (single tap = play/pause) ──
   const handleTap = useCallback(() => {
-    const now = Date.now();
-    if (now - lastTapRef.current < 300) {
-      lastTapRef.current = 0;
-      onDoubleTapLike?.();
-      haptic('medium');
-    } else {
-      lastTapRef.current = now;
-      setTimeout(() => {
-        if (lastTapRef.current !== 0 && Date.now() - lastTapRef.current >= 280) {
-          const store = useClubhouseStore.getState();
-          store.setUserPaused(!store.userPaused);
-          lastTapRef.current = 0;
-        }
-      }, 310);
-    }
-  }, [onDoubleTapLike]);
+    const store = useClubhouseStore.getState();
+    store.setUserPaused(!store.userPaused);
+  }, []);
 
   // ── Replay handler ──
   const handleReplay = useCallback(() => {
