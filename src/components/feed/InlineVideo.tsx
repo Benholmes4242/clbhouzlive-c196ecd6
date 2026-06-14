@@ -120,10 +120,24 @@ export const InlineVideo: React.FC<Props> = ({
           } catch {}
           // Re-arm the paused-frame prime for THIS attach so the first frame
           // re-paints on re-attach (e.g. scroll-up after radius teardown),
-          // independent of the play()→'playing' roundtrip. Play itself is owned
-          // by usePausedFirstFrame's [active] effect — no runtime re-play here.
+          // independent of the play()→'playing' roundtrip.
           setAttachToken((t) => t + 1);
+          // Post-attach truth: read element state AFTER MSE binding settles.
+          // ACTIVE_FLIP races this .then(); only ATTACH_SETTLED reflects reality.
+          logTileLife(tag, feedIndex, 'ATTACH_SETTLED', {
+            hasSrc: !!video.src,
+            readyState: video.readyState,
+            active: isActiveRef.current,
+            paused: video.paused,
+          });
+          // If this tile is the playing tile when its attach completes, ensure
+          // it plays. Covers scroll-up where canplay may have already fired
+          // before active flipped — the one consolidated post-attach retry.
+          if (isActiveRef.current && video.paused) {
+            video.play().catch(() => {});
+          }
         });
+
       } else if (mp4Url) {
         video.src = mp4Url;
       }

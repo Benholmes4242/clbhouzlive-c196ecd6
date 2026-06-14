@@ -231,6 +231,16 @@ class HLSPoolManagerClass {
     }
 
     try {
+      // Safety guard: refuse to steal a live source from a still-mounted
+      // DIFFERENT element. Normal feed paths are URL-keyed (one tile per URL),
+      // so this only fires on pathological cross-element transfer.
+      const prev = entry.preloadedByVideo;
+      if (prev && prev !== targetVideo && prev.isConnected) {
+        this.stats.missed++;
+        logPoolEvent('warning', 'miss', url, this.stats.missed, this.pool.size);
+        return null;
+      }
+
       // Clear the TTL timeout
       if (entry.timeoutId) {
         clearTimeout(entry.timeoutId);
@@ -239,6 +249,7 @@ class HLSPoolManagerClass {
       // Detach from preload video and attach to target
       entry.hls.detachMedia();
       entry.hls.attachMedia(targetVideo);
+
       
       // Mark as promoted
       entry.isPromoted = true;
