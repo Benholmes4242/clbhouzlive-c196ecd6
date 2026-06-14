@@ -8,7 +8,7 @@
  */
 
 import { prefetchDebug } from './prefetch-debug';
-import { hlsBlobCache } from './hlsBlobCache';
+import { videoReadyFlags } from './videoReadyFlags';
 import { extractCloudflareUid, shortUid } from './videoIdUtils';
 
 // Track in-flight prefetch operations for deduplication
@@ -69,7 +69,8 @@ export const preloadHlsManifest = async (hlsUrl: string, videoId?: string): Prom
   // Start new prefetch and track it
   const prefetchPromise = (async () => {
     prefetchDebug.prefetchInitiated(effectiveVideoId, hlsUrl);
-    
+    videoReadyFlags.markPending(effectiveVideoId);
+
     try {
       await performPrefetch(hlsUrl, effectiveVideoId);
       prefetchComplete.add(effectiveVideoId);
@@ -104,97 +105,84 @@ async function performPrefetch(hlsUrl: string, effectiveVideoId: string): Promis
   prefetchDebug.manifestLoaded(effectiveVideoId, fromCache);
   
   const manifestText = await manifestResponse.text();
-  
-  // Store manifest in blob cache
-  hlsBlobCache.storeManifest(effectiveVideoId, hlsUrl, manifestText);
-  
+
   // Parse manifest to find segment URLs
   const lines = manifestText.split('\n');
-  const segmentLines = lines.filter(line => 
-    (line.endsWith('.ts') || line.endsWith('.m4s') || line.includes('.ts?')) && 
+  const segmentLines = lines.filter(line =>
+    (line.endsWith('.ts') || line.endsWith('.m4s') || line.includes('.ts?')) &&
     !line.startsWith('#')
   );
-  
+
   if (segmentLines.length === 0) {
     // This might be a master playlist - need to fetch the variant playlist first
     const variantLine = lines.find(line => line.endsWith('.m3u8') && !line.startsWith('#'));
     if (variantLine) {
       const variantUrl = new URL(variantLine.trim(), hlsUrl).href;
-      
-      // Fetch variant playlist
+
+      // Fetch variant playlist (warms SW + HTTP cache)
       const variantResponse = await fetch(variantUrl, {
         method: 'GET',
         mode: 'cors',
         credentials: 'omit',
       });
-      
+
       if (variantResponse.ok) {
         const variantText = await variantResponse.text();
-        
-        // Store variant manifest too
-        hlsBlobCache.storeManifest(effectiveVideoId, variantUrl, variantText);
-        
         const variantLines = variantText.split('\n');
-        const variantSegments = variantLines.filter(line => 
-          (line.endsWith('.ts') || line.endsWith('.m4s') || line.includes('.ts?')) && 
+        const variantSegments = variantLines.filter(line =>
+          (line.endsWith('.ts') || line.endsWith('.m4s') || line.includes('.ts?')) &&
           !line.startsWith('#')
         );
-        
+
         if (variantSegments.length > 0) {
-          // Preload first two segments in parallel
+          // Warm first two segments — SW catches the bytes; we just discard the body.
           const segmentsToPreload = variantSegments.slice(0, 2);
           await preloadSegments(segmentsToPreload, variantUrl, effectiveVideoId);
-          
-          // Mark as ready in blob cache
-          hlsBlobCache.markReady(effectiveVideoId);
+
+          videoReadyFlags.markReady(effectiveVideoId);
           prefetchDebug.prefetchComplete(effectiveVideoId, segmentsToPreload.length);
         }
       }
     }
     return;
   }
-  
-  // Preload first two segments in parallel
+
+  // Warm first two segments in parallel
   const segmentsToPreload = segmentLines.slice(0, 2);
   await preloadSegments(segmentsToPreload, hlsUrl, effectiveVideoId);
-  
-  // Mark as ready in blob cache
-  hlsBlobCache.markReady(effectiveVideoId);
+
+  videoReadyFlags.markReady(effectiveVideoId);
   prefetchDebug.prefetchComplete(effectiveVideoId, segmentsToPreload.length);
 }
 
 /**
- * Preload multiple segments in parallel and store in blob cache
+ * Warm multiple segments in parallel. Bytes are not stored in the app layer —
+ * the Service Worker (clbhouz-media-v2) catches them at the HTTP layer.
  */
 async function preloadSegments(
-  segmentLines: string[], 
-  baseUrl: string, 
+  segmentLines: string[],
+  baseUrl: string,
   videoId: string
 ): Promise<void> {
   const segmentPromises = segmentLines.map(async (segmentLine, index) => {
     try {
       const segmentUrl = new URL(segmentLine.trim(), baseUrl).href;
-      
-      const segmentResponse = await fetch(segmentUrl, { 
-        method: 'GET', 
+
+      const segmentResponse = await fetch(segmentUrl, {
+        method: 'GET',
         mode: 'cors',
         credentials: 'omit',
       });
-      
+
       if (segmentResponse.ok) {
-        // Store in blob cache
-        await hlsBlobCache.storeSegment(videoId, segmentUrl, segmentResponse);
-        
+        const blob = await segmentResponse.blob();
         const fromCache = segmentResponse.headers.get('x-cache') === 'HIT';
-        const stats = hlsBlobCache.getStats(videoId);
-        const size = stats?.totalBytes || 0;
-        prefetchDebug.segmentLoaded(videoId, index, fromCache, size);
+        prefetchDebug.segmentLoaded(videoId, index, fromCache, blob.size);
       }
     } catch {
       // Silently ignore individual segment failures
     }
   });
-  
-  // Wait for all segments to load
+
   await Promise.allSettled(segmentPromises);
 }

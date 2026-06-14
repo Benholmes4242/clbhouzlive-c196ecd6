@@ -1,11 +1,11 @@
 /**
  * hlsPoolPreloader — Bridges the prefetch pipeline and HLS pool
  *
- * After hlsPreload downloads segments into hlsBlobCache, this module
- * creates a hidden HLS.js instance attached to a hidden video element,
- * loads the source (served from blob cache via cachedHlsLoader),
- * and registers it in HLSPoolManager so SnapVideoPlayer can promote it
- * instantly on activation — giving sub-100ms first frame.
+ * After hlsPreload warms the manifest + first segments (via the Service
+ * Worker cache), this module creates a hidden HLS.js instance attached
+ * to a hidden video element, loads the source, and registers it in
+ * HLSPoolManager so SnapVideoPlayer can promote it instantly on
+ * activation — giving sub-100ms first frame.
  */
 
 import { HLSPoolManager } from '@/media/HLSPoolManager';

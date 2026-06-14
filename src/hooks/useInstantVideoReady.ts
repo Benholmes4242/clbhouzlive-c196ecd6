@@ -11,7 +11,7 @@
  */
 
 import { useState, useCallback, useRef, useEffect } from 'react';
-import { hlsBlobCache } from '@/utils/hlsBlobCache';
+import { videoReadyFlags } from '@/utils/videoReadyFlags';
 
 interface VideoReadyEntry {
   videoId: string;
@@ -81,7 +81,7 @@ export function useInstantVideoReady(
   
   // Check if video is in blob cache and ready
   const checkCacheReady = useCallback((videoId: string): boolean => {
-    return hlsBlobCache.isReady(videoId);
+    return videoReadyFlags.isReady(videoId);
   }, []);
   
   // Check if video is instant-ready
@@ -90,7 +90,7 @@ export function useInstantVideoReady(
     if (readyMap.get(videoId)?.isReady) return true;
     
     // Then check blob cache
-    if (hlsBlobCache.isReady(videoId)) {
+    if (videoReadyFlags.isReady(videoId)) {
       // Mark it ready in our state too
       markReady(videoId, 'cache');
       return true;
