@@ -11,7 +11,6 @@ interface FeedImageCarouselProps {
   feedIndex: number;
   isSuggestedFeed: boolean;
   isActive?: boolean;
-  onDoubleTapLike?: () => void;
   onZoomChange?: (isZoomed: boolean) => void;
   isFullscreen?: boolean;
 }
