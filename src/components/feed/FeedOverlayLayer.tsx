@@ -260,15 +260,6 @@ export const FeedOverlayLayer = memo(function FeedOverlayLayer({
         isReview={activePost.isReview}
         golfCourse={activePost.isReview ? null : golfCourse ?? null}
         onCourseTap={golfCourse ? handleCourseTap : undefined}
-        followBadge={
-          topActionBar && !activePost.isReview
-            ? {
-                isFollowing: isFollowed,
-                isOwnPost,
-                onFollow: () => onFollow(activePost),
-              }
-            : undefined
-        }
       />
 
       {/* Right-side vertical action rail — hidden in fullscreen top-bar mode */}
