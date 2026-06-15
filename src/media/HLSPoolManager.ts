@@ -307,7 +307,13 @@ class HLSPoolManagerClass {
       if (entry) {
         entry.isPromoted = false;
         entry.preloadedByVideo = newPreloadVideo || null;
-        
+
+        // Clear any existing TTL timer before assigning a new one — otherwise
+        // repeated demotes orphan timers that fire later in unpredictable batches.
+        if (entry.timeoutId) {
+          clearTimeout(entry.timeoutId);
+        }
+
         // FIX #9: Set new TTL based on current memory pressure
         const ttl = this.getTTL();
         entry.timeoutId = setTimeout(() => {
