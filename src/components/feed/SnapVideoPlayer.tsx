@@ -81,7 +81,7 @@ export const SnapVideoPlayer = memo(function SnapVideoPlayer({
     if (shouldAttach) {
       video.muted = useClubhouseStore.getState().isMuted;
       video.playsInline = true;
-      pool.attach(hlsUrl, video, mp4Url).then(() => {
+      pool.attach(hlsUrl, video, mp4Url, isFullscreen ? 'fullscreen' : 'feed').then(() => {
         if (cancelled) return;
         setAttachToken((t) => t + 1);
         try { if (video.currentTime < 0.001) video.currentTime = 0.001; } catch {}
