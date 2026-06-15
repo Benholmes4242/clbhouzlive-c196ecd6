@@ -143,7 +143,8 @@ class HLSPoolManagerClass {
   register(
     url: string, 
     hls: HlsType, 
-    preloadVideo: HTMLVideoElement
+    preloadVideo: HTMLVideoElement,
+    surface: 'feed' | 'fullscreen' = 'feed',
   ): void {
     // GUARD: never clobber a promoted (live, on-screen) instance. If one exists
     // for this URL, destroy the INCOMING duplicate instead and bail. This is the
@@ -175,6 +176,7 @@ class HLSPoolManagerClass {
       created: Date.now(),
       preloadedByVideo: preloadVideo,
       isPromoted: false,
+      surface,
       timeoutId: setTimeout(() => {
         // Auto-cleanup if not promoted within TTL
         if (!this.pool.get(url)?.isPromoted) {
