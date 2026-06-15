@@ -64,10 +64,22 @@ export const SnapVideoPlayer = memo(function SnapVideoPlayer({
 
   const aspect = (height ?? 1) > 0 && (width ?? 0) > 0
     ? (height as number) / (width as number)
-    : 1.0;
+    : 1;
+  // Screen aspect via visualViewport (stable across keyboard/rotation in WebView).
+  const vv = typeof window !== 'undefined' ? window.visualViewport : null;
+  const screenAspect = vv && vv.width > 0
+    ? vv.height / vv.width
+    : (typeof window !== 'undefined' && window.innerWidth > 0
+        ? window.innerHeight / window.innerWidth
+        : 2.17);
+  // Full-bleed when the video is portrait enough to fill without ugly cropping.
+  // 0.85: 9:16 (1.78) / screen (~2.17) ≈ 0.82 — full-bleeds standard vertical;
+  // landscape + square fall below and letterbox.
+  const FULL_BLEED_RATIO = 0.85;
   const objectFit: 'cover' | 'contain' = isFullscreen
-    ? 'contain'
+    ? (aspect >= screenAspect * FULL_BLEED_RATIO ? 'cover' : 'contain')
     : (isSuggestedFeed ? 'cover' : (aspect >= 1.5 ? 'cover' : 'contain'));
+  const isFullBleed = isFullscreen && objectFit === 'cover';
 
   // ── Attach/teardown via shared hook (pool-aware demote-not-destroy) ──
   // Whether this slide should hold an attached instance (active or within radius).
@@ -215,12 +227,29 @@ export const SnapVideoPlayer = memo(function SnapVideoPlayer({
       style={{ background: '#0A0E14' }}
       onClick={handleTap}
     >
-      {/* Backdrop — blurred thumbnail in fullscreen, solid matte otherwise. */}
-      {isFullscreen && thumbnailUrl ? (
-        <div aria-hidden="true" className="absolute inset-0" style={{
-          backgroundImage: `url(${thumbnailUrl})`, backgroundSize: 'cover', backgroundPosition: 'center',
-          filter: 'blur(40px) brightness(0.5) saturate(1.2)', transform: 'scale(1.2)',
-        }} />
+      {/* World-class blurred fill — letterbox (contain) only. Skipped entirely
+          when full-bleed (cover covers the screen — no bars, no blur cost). */}
+      {isFullscreen && thumbnailUrl && !isFullBleed ? (
+        <div aria-hidden="true" className="absolute inset-0 overflow-hidden">
+          {/* Layer 1 — deep wash: heavy blur, oversized to hide edges. */}
+          <div className="absolute inset-0" style={{
+            backgroundImage: `url(${thumbnailUrl})`, backgroundSize: 'cover', backgroundPosition: 'center',
+            filter: 'blur(60px) saturate(1.3) brightness(0.55)', transform: 'scale(1.4)', willChange: 'transform',
+          }} />
+          {/* Layer 2 — edge structure: lighter blur at low opacity (Apple Music/TV trick). */}
+          <div className="absolute inset-0" style={{
+            backgroundImage: `url(${thumbnailUrl})`, backgroundSize: 'cover', backgroundPosition: 'center',
+            filter: 'blur(20px) brightness(0.6)', transform: 'scale(1.05)', opacity: 0.5,
+          }} />
+          {/* Layer 3 — radial vignette: glow focus on the centre frame. */}
+          <div className="absolute inset-0" style={{
+            background: 'radial-gradient(ellipse at center, transparent 55%, rgba(0,0,0,0.55) 100%)',
+          }} />
+          {/* Layer 4 — top/bottom scrims: cinematic bars + caption legibility. */}
+          <div className="absolute inset-0" style={{
+            background: 'linear-gradient(to bottom, rgba(0,0,0,0.35) 0%, transparent 18%, transparent 82%, rgba(0,0,0,0.35) 100%)',
+          }} />
+        </div>
       ) : (
         <div className="absolute inset-0" style={{ background: '#0A0E14' }} aria-hidden="true" />
       )}
@@ -235,6 +264,7 @@ export const SnapVideoPlayer = memo(function SnapVideoPlayer({
           className="absolute inset-0 w-full h-full"
           style={{
             objectFit,
+            objectPosition: 'center',
             zIndex: 1,
             opacity: hasFirstFrame ? 0 : 1,
             transition: 'opacity 120ms ease-out',
@@ -256,12 +286,13 @@ export const SnapVideoPlayer = memo(function SnapVideoPlayer({
         }}
       />
 
-      {/* Buffering indicator — subtle bottom bar */}
+      {/* Buffering indicator — subtle bottom bar (clears home indicator in cover). */}
       {isActive && !hasFirstFrame && (
         <div
           className="absolute bottom-0 left-0 right-0 h-1"
           style={{
             zIndex: 3,
+            marginBottom: 'env(safe-area-inset-bottom, 0px)',
             background: 'linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent)',
             animation: 'pulse 1.5s ease-in-out infinite',
           }}
