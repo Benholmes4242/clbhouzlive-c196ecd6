@@ -81,7 +81,7 @@ export const VisibilityDropdown: React.FC<VisibilityDropdownProps> = ({
                 animate={{ y: 0 }}
                 exit={{ y: '100%' }}
                 transition={{ type: 'spring', damping: 28, stiffness: 300 }}
-                className="fixed bottom-0 left-0 right-0 z-[301] bg-background rounded-t-2xl pb-[env(safe-area-inset-bottom)]"
+                className="fixed bottom-0 left-1/2 -translate-x-1/2 w-full max-w-[480px] z-[301] bg-background rounded-t-2xl pb-[env(safe-area-inset-bottom)]"
               >
                 {/* Handle */}
                 <div className="flex justify-center pt-3 pb-1">
