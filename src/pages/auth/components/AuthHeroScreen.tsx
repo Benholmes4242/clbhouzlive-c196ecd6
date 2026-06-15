@@ -29,7 +29,7 @@ const AppleLogo: React.FC<{ size?: number }> = ({ size = 17 }) => (
     width={size}
     height={size}
     viewBox="0 0 24 24"
-    fill="#000000"
+    fill="#FFFFFF"
     aria-hidden="true"
     focusable="false"
   >
@@ -62,8 +62,8 @@ const AuthHeroScreen: React.FC<AuthHeroScreenProps> = ({
   errorNonce,
 }) => {
 
-  // Dark status bar + safe-area shield for Median.co wrapper
-  useMedianStatusBar('dark', '#0A0E14', true, false);
+  // Light status bar + safe-area shield for Median.co wrapper
+  useMedianStatusBar('light', '#F8FAFC', true, false);
 
   const [loginEmail, setLoginEmail] = useState('');
   const [emailError, setEmailError] = useState<string | null>(null);
@@ -115,16 +115,7 @@ const AuthHeroScreen: React.FC<AuthHeroScreenProps> = ({
       {/* Background */}
       <div
         className="absolute inset-0"
-        style={{ background: '#0A0E14' }}
-      />
-
-
-      {/* Grain */}
-      <div
-        className="absolute inset-0 pointer-events-none opacity-[0.02]"
-        style={{
-          backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E")`,
-        }}
+        style={{ background: '#F8FAFC' }}
       />
 
       <div className="relative flex-1 flex flex-col px-6 pt-safe overflow-y-auto">
@@ -142,15 +133,15 @@ const AuthHeroScreen: React.FC<AuthHeroScreenProps> = ({
             className="h-[90px] md:h-[100px] w-auto relative z-10"
           />
           {SHOW_WORDMARK && (
-            <span className="text-white/90 text-[24px] font-medium tracking-tight">clbhouz</span>
+            <span className="text-[24px] font-medium tracking-tight" style={{ color: '#1C1C1E' }}>clbhouz</span>
           )}
         </div>
 
         {/* Tagline */}
         <div className="flex-1 flex flex-col justify-center items-center text-center -mt-4">
           <h1
-            className="text-[38px] md:text-[44px] font-semibold text-white leading-tight auth-tagline-animate"
-            style={{ letterSpacing: '-0.02em' }}
+            className="text-[38px] md:text-[44px] font-semibold leading-tight auth-tagline-animate"
+            style={{ letterSpacing: '-0.02em', color: '#1C1C1E' }}
           >
             stay in play.
           </h1>
@@ -160,7 +151,7 @@ const AuthHeroScreen: React.FC<AuthHeroScreenProps> = ({
         <div
           className="pb-8 pt-6 -mx-6 px-6"
           style={{
-            background: '#0A0E14',
+            background: '#F8FAFC',
           }}
         >
           <div className="auth-button-6 space-y-3">
@@ -175,15 +166,15 @@ const AuthHeroScreen: React.FC<AuthHeroScreenProps> = ({
                     className="w-full flex items-center justify-center gap-2 rounded-[14px] transition-opacity active:opacity-85 disabled:opacity-60"
                     style={{
                       minHeight: 52,
-                      background: '#FFFFFF',
+                      background: '#000000',
                       border: 'none',
-                      color: '#000000',
+                      color: '#FFFFFF',
                       fontSize: 15,
                       fontWeight: 600,
                     }}
                   >
                     {submitting ? (
-                      <Loader2 size={18} className="animate-spin" style={{ color: '#000' }} />
+                      <Loader2 size={18} className="animate-spin" style={{ color: '#FFFFFF' }} />
                     ) : (
                       <>
                         <AppleLogo size={17} />
@@ -205,7 +196,7 @@ const AuthHeroScreen: React.FC<AuthHeroScreenProps> = ({
                     style={{
                       minHeight: 52,
                       background: '#FFFFFF',
-                      border: 'none',
+                      border: '1px solid rgba(15,23,42,0.12)',
                       color: '#1F1F1F',
                       fontSize: 15,
                       fontWeight: 600,
@@ -223,9 +214,9 @@ const AuthHeroScreen: React.FC<AuthHeroScreenProps> = ({
                 )}
 
                 <div className="flex items-center gap-3" aria-hidden="true">
-                  <div style={{ flex: 1, height: 1, background: 'rgba(255,255,255,0.10)' }} />
-                  <span style={{ fontSize: 11, color: 'rgba(255,255,255,0.40)' }}>or</span>
-                  <div style={{ flex: 1, height: 1, background: 'rgba(255,255,255,0.10)' }} />
+                  <div style={{ flex: 1, height: 1, background: 'rgba(15,23,42,0.10)' }} />
+                  <span style={{ fontSize: 11, color: '#8E8E93' }}>or</span>
+                  <div style={{ flex: 1, height: 1, background: 'rgba(15,23,42,0.10)' }} />
                 </div>
 
               </>
@@ -245,9 +236,9 @@ const AuthHeroScreen: React.FC<AuthHeroScreenProps> = ({
                 disabled={submitting}
                 className="auth-email-input w-full h-[54px] px-6 rounded-[14px] font-medium text-[15px] text-center focus:outline-none transition-all disabled:opacity-50"
                 style={{
-                  background: 'rgba(255,255,255,0.05)',
-                  border: '1px solid rgba(255,255,255,0.10)',
-                  color: 'rgba(255, 255, 255, 0.88)',
+                  background: '#F5F5F7',
+                  border: '1px solid rgba(15,23,42,0.10)',
+                  color: '#1C1C1E',
                 }}
                 autoComplete="email"
                 inputMode="email"
@@ -255,13 +246,14 @@ const AuthHeroScreen: React.FC<AuthHeroScreenProps> = ({
             </div>
 
             {emailError && (
-              <p className="text-red-400 text-[13px] text-center">{emailError}</p>
+              <p className="text-[13px] text-center" style={{ color: '#DC2626' }}>{emailError}</p>
             )}
 
             {errorMessage && !hasEditedSinceError && (
               <p
                 key={errorNonce}
-                className="text-red-400 text-[13px] text-center auth-error-fade"
+                className="text-[13px] text-center auth-error-fade"
+                style={{ color: '#DC2626' }}
               >
                 {errorMessage}
               </p>
@@ -273,9 +265,9 @@ const AuthHeroScreen: React.FC<AuthHeroScreenProps> = ({
               aria-label="Continue"
               className="w-full h-[54px] flex items-center justify-center gap-2 rounded-[14px] font-bold text-[15px] transition-all duration-150 active:scale-[0.98]"
               style={{
-                background: canContinue ? '#F7931E' : 'rgba(255,255,255,0.05)',
-                color: canContinue ? '#FFFFFF' : 'rgba(255,255,255,0.35)',
-                border: canContinue ? 'none' : '1px solid rgba(255,255,255,0.10)',
+                background: canContinue ? '#F7931E' : '#F5F5F7',
+                color: canContinue ? '#FFFFFF' : '#AEAEB2',
+                border: canContinue ? 'none' : '1px solid rgba(15,23,42,0.10)',
                 boxShadow: 'none',
                 cursor: !canContinue ? 'not-allowed' : 'pointer',
               }}
@@ -292,7 +284,7 @@ const AuthHeroScreen: React.FC<AuthHeroScreenProps> = ({
 
             <p
               className="text-center"
-              style={{ fontSize: 12, color: 'rgba(255,255,255,0.40)' }}
+              style={{ fontSize: 12, color: '#8E8E93' }}
             >
               We'll email you a 6-digit code. No password needed.
             </p>
@@ -301,7 +293,7 @@ const AuthHeroScreen: React.FC<AuthHeroScreenProps> = ({
       </div>
 
       <style>{`
-        html, body { background-color: #0A0E14 !important; }
+        html, body { background-color: #F8FAFC !important; }
 
         @keyframes auth-logo-in {
           0% { opacity: 0; transform: scale(0.85) translateY(20px); }
@@ -321,7 +313,7 @@ const AuthHeroScreen: React.FC<AuthHeroScreenProps> = ({
         .auth-button-6 { animation: auth-button-in 0.4s ease-out 0.45s both; }
 
         .auth-email-input::placeholder {
-          color: rgba(255, 255, 255, 0.55);
+          color: #8E8E93;
           font-weight: 500;
           font-size: 15px;
         }
