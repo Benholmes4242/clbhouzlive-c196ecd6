@@ -176,12 +176,12 @@ function KpiGrid({ children }: { children: React.ReactNode }) {
         gridTemplateColumns: 'repeat(2, minmax(0, 1fr))',
         gap: 12,
       }}
-      className="admin-v3-kpi-grid"
+      className="admin-v2-kpi-grid"
     >
       {children}
       <style>{`
         @media (min-width: 720px) {
-          .admin-v3-kpi-grid { grid-template-columns: repeat(4, minmax(0, 1fr)) !important; }
+          .admin-v2-kpi-grid { grid-template-columns: repeat(4, minmax(0, 1fr)) !important; }
         }
       `}</style>
     </section>

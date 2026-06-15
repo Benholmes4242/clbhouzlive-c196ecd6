@@ -69,7 +69,7 @@ async function fetchVerifications(): Promise<VerificationRow[]> {
 export function useVerifications() {
   const qc = useQueryClient();
   const { data = [], isLoading, refetch } = useQuery({
-    queryKey: ['admin-v3', 'verifications'],
+    queryKey: ['admin-v2', 'verifications'],
     queryFn: fetchVerifications,
     staleTime: 30_000,
     refetchInterval: 60_000,
@@ -102,8 +102,8 @@ export function useVerifications() {
     },
     onSuccess: (_, { decision }) => {
       toast.success(`Request ${decision}`);
-      qc.invalidateQueries({ queryKey: ['admin-v3', 'verifications'] });
-      qc.invalidateQueries({ queryKey: ['admin-v3', 'dashboard', 'queue'] });
+      qc.invalidateQueries({ queryKey: ['admin-v2', 'verifications'] });
+      qc.invalidateQueries({ queryKey: ['admin-v2', 'dashboard', 'queue'] });
     },
     onError: (e: Error) => toast.error(e.message || 'Failed to update verification'),
   });

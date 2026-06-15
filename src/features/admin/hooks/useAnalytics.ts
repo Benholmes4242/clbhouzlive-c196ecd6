@@ -115,7 +115,7 @@ async function fetchPlatform(period: AnalyticsPeriod): Promise<PlatformAnalytics
 }
 
 export function usePlatformAnalytics(period: AnalyticsPeriod) {
-  return useQuery({ queryKey: ['admin-v3', 'analytics', 'platform', period], queryFn: () => fetchPlatform(period), staleTime: 5 * 60_000 });
+  return useQuery({ queryKey: ['admin-v2', 'analytics', 'platform', period], queryFn: () => fetchPlatform(period), staleTime: 5 * 60_000 });
 }
 
 // ─── Engagement ───────────────────────────────────────────────────────────────
@@ -190,7 +190,7 @@ async function fetchEngagement(period: AnalyticsPeriod): Promise<EngagementAnaly
 }
 
 export function useEngagementAnalytics(period: AnalyticsPeriod) {
-  return useQuery({ queryKey: ['admin-v3', 'analytics', 'engagement', period], queryFn: () => fetchEngagement(period), staleTime: 5 * 60_000 });
+  return useQuery({ queryKey: ['admin-v2', 'analytics', 'engagement', period], queryFn: () => fetchEngagement(period), staleTime: 5 * 60_000 });
 }
 
 // ─── Retention ────────────────────────────────────────────────────────────────
@@ -293,7 +293,7 @@ async function fetchRetention(): Promise<RetentionData> {
 }
 
 export function useRetentionAnalytics() {
-  return useQuery({ queryKey: ['admin-v3', 'analytics', 'retention'], queryFn: fetchRetention, staleTime: 5 * 60_000 });
+  return useQuery({ queryKey: ['admin-v2', 'analytics', 'retention'], queryFn: fetchRetention, staleTime: 5 * 60_000 });
 }
 
 // ─── Growth ───────────────────────────────────────────────────────────────────
@@ -360,7 +360,7 @@ async function fetchGrowth(period: AnalyticsPeriod): Promise<GrowthData> {
 }
 
 export function useGrowthAnalytics(period: AnalyticsPeriod) {
-  return useQuery({ queryKey: ['admin-v3', 'analytics', 'growth', period], queryFn: () => fetchGrowth(period), staleTime: 5 * 60_000 });
+  return useQuery({ queryKey: ['admin-v2', 'analytics', 'growth', period], queryFn: () => fetchGrowth(period), staleTime: 5 * 60_000 });
 }
 
 // ─── Content ──────────────────────────────────────────────────────────────────
@@ -416,7 +416,7 @@ async function fetchContent(period: AnalyticsPeriod): Promise<ContentAnalyticsDa
 }
 
 export function useContentAnalytics(period: AnalyticsPeriod) {
-  return useQuery({ queryKey: ['admin-v3', 'analytics', 'content', period], queryFn: () => fetchContent(period), staleTime: 5 * 60_000 });
+  return useQuery({ queryKey: ['admin-v2', 'analytics', 'content', period], queryFn: () => fetchContent(period), staleTime: 5 * 60_000 });
 }
 
 // ─── Auth & Security ──────────────────────────────────────────────────────────
@@ -471,5 +471,5 @@ async function fetchAuth(period: AnalyticsPeriod): Promise<AuthAnalyticsData> {
 }
 
 export function useAuthAnalytics(period: AnalyticsPeriod) {
-  return useQuery({ queryKey: ['admin-v3', 'analytics', 'auth', period], queryFn: () => fetchAuth(period), staleTime: 5 * 60_000 });
+  return useQuery({ queryKey: ['admin-v2', 'analytics', 'auth', period], queryFn: () => fetchAuth(period), staleTime: 5 * 60_000 });
 }

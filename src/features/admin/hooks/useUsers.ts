@@ -130,20 +130,20 @@ export function useUsers() {
   const [drawerUserId, setDrawerUserId] = useState<string | null>(null);
 
   const { data: allUsers = [], isLoading, refetch } = useQuery({
-    queryKey: ['admin-v3', 'users', 'all'],
+    queryKey: ['admin-v2', 'users', 'all'],
     queryFn: fetchAllUsers,
     staleTime: 5 * 60_000,
   });
 
   const { data: activeIds = [] } = useQuery({
-    queryKey: ['admin-v3', 'users', 'active-24h'],
+    queryKey: ['admin-v2', 'users', 'active-24h'],
     queryFn: fetchActive24h,
     staleTime: 3 * 60_000,
     enabled: filter === 'active_24h',
   });
 
   const { data: userDetail, isLoading: detailLoading } = useQuery({
-    queryKey: ['admin-v3', 'users', 'detail', drawerUserId],
+    queryKey: ['admin-v2', 'users', 'detail', drawerUserId],
     queryFn: () => fetchUserDetail(drawerUserId!),
     enabled: !!drawerUserId,
     staleTime: 2 * 60_000,
@@ -203,8 +203,8 @@ export function useUsers() {
     },
     onSuccess: (_, { userId, role }) => {
       toast.success(role ? `Role set to ${role}` : 'Role removed');
-      qc.invalidateQueries({ queryKey: ['admin-v3', 'users'] });
-      qc.invalidateQueries({ queryKey: ['admin-v3', 'users', 'detail', userId] });
+      qc.invalidateQueries({ queryKey: ['admin-v2', 'users'] });
+      qc.invalidateQueries({ queryKey: ['admin-v2', 'users', 'detail', userId] });
     },
     onError: () => toast.error('Failed to update role'),
   });

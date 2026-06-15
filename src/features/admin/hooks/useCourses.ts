@@ -112,13 +112,13 @@ export function useCourses() {
   const debounced = useDebouncedValue(search, 250);
 
   const { data, isLoading, refetch } = useQuery({
-    queryKey: ['admin-v3', 'courses', debounced, country, page],
+    queryKey: ['admin-v2', 'courses', debounced, country, page],
     queryFn: () => fetchCourses(debounced, country, page, pageSize),
     staleTime: 60_000,
   });
 
   const { data: countries = [] } = useQuery({
-    queryKey: ['admin-v3', 'courses', 'countries'],
+    queryKey: ['admin-v2', 'courses', 'countries'],
     queryFn: fetchCountries,
     staleTime: 5 * 60_000,
   });
@@ -139,7 +139,7 @@ export function useCourses() {
     },
     onSuccess: () => {
       toast.success('Course updated');
-      qc.invalidateQueries({ queryKey: ['admin-v3', 'courses'] });
+      qc.invalidateQueries({ queryKey: ['admin-v2', 'courses'] });
     },
     onError: () => toast.error('Failed to update course'),
   });
@@ -157,7 +157,7 @@ export function useCourses() {
     },
     onSuccess: () => {
       toast.success('Photo updated');
-      qc.invalidateQueries({ queryKey: ['admin-v3', 'courses'] });
+      qc.invalidateQueries({ queryKey: ['admin-v2', 'courses'] });
     },
     onError: () => toast.error('Failed to upload photo'),
   });
@@ -177,7 +177,7 @@ export function useCourses() {
     },
     onSuccess: () => {
       toast.success('Course deleted');
-      qc.invalidateQueries({ queryKey: ['admin-v3', 'courses'] });
+      qc.invalidateQueries({ queryKey: ['admin-v2', 'courses'] });
     },
     onError: (err: any) => {
       if (err?.counts) toast.error('Cannot delete this course', { description: err.message, duration: 8000 });

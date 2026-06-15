@@ -15,11 +15,11 @@ interface NavItem {
 }
 
 const NAV: NavItem[] = [
-  { to: '/admin-v3/dashboard', label: 'Dashboard', icon: LayoutDashboard },
-  { to: '/admin-v3/users',     label: 'Users',     icon: Users, requireFull: true },
-  { to: '/admin-v3/content',   label: 'Content',   icon: MapPin },
-  { to: '/admin-v3/analytics', label: 'Analytics', icon: BarChart3, requireFull: true },
-  { to: '/admin-v3/system',    label: 'System',    icon: Settings },
+  { to: '/admin-v2/dashboard', label: 'Dashboard', icon: LayoutDashboard },
+  { to: '/admin-v2/users',     label: 'Users',     icon: Users, requireFull: true },
+  { to: '/admin-v2/content',   label: 'Content',   icon: MapPin },
+  { to: '/admin-v2/analytics', label: 'Analytics', icon: BarChart3, requireFull: true },
+  { to: '/admin-v2/system',    label: 'System',    icon: Settings },
 ];
 
 interface Props {

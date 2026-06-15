@@ -39,14 +39,14 @@ export default function DashboardPage() {
   // Header refresh hook-in
   useEffect(() => {
     const handler = () => refetchAll();
-    window.addEventListener('admin-v3:refetch', handler);
-    return () => window.removeEventListener('admin-v3:refetch', handler);
+    window.addEventListener('admin-v2:refetch', handler);
+    return () => window.removeEventListener('admin-v2:refetch', handler);
   }, [refetchAll]);
 
   return (
     <div style={{ padding: 16, display: 'flex', flexDirection: 'column', gap: 16, maxWidth: 1280, margin: '0 auto' }}>
       {/* KPIs */}
-      <section className="admin-v3-kpis">
+      <section className="admin-v2-kpis">
         <KpiCard
           label="Total Users"
           value={kpis.data?.totalUsers.value ?? 0}
@@ -116,7 +116,7 @@ export default function DashboardPage() {
       <EgSyncCard data={egSyncHealth.data} loading={egSyncHealth.isLoading} isError={egSyncHealth.isError} />
 
       {/* Today at a glance */}
-      <section className="admin-v3-twocol">
+      <section className="admin-v2-twocol">
         <ChartCard
           title="Posts by hour (today)"
           loading={glance.isLoading}
@@ -195,14 +195,14 @@ export default function DashboardPage() {
       )}
 
       <style>{`
-        .admin-v3-kpis { display: grid; grid-template-columns: 1fr; gap: 12px; }
-        .admin-v3-twocol { display: grid; grid-template-columns: 1fr; gap: 16px; }
+        .admin-v2-kpis { display: grid; grid-template-columns: 1fr; gap: 12px; }
+        .admin-v2-twocol { display: grid; grid-template-columns: 1fr; gap: 16px; }
         @media (min-width: 640px) {
-          .admin-v3-kpis { grid-template-columns: repeat(2, 1fr); }
+          .admin-v2-kpis { grid-template-columns: repeat(2, 1fr); }
         }
         @media (min-width: 1024px) {
-          .admin-v3-kpis { grid-template-columns: repeat(4, 1fr); }
-          .admin-v3-twocol { grid-template-columns: 1fr 1fr; }
+          .admin-v2-kpis { grid-template-columns: repeat(4, 1fr); }
+          .admin-v2-twocol { grid-template-columns: 1fr 1fr; }
         }
       `}</style>
     </div>
@@ -236,9 +236,9 @@ function Card({ title, action, children }: { title: string; action?: React.React
 
 function ActionQueueCard({ queue, loading }: { queue?: { pendingVerifications: number; pendingInvites: number; expiringAccess: number }; loading: boolean }) {
   const items = [
-    { label: 'Pending Verifications', count: queue?.pendingVerifications ?? 0, to: '/admin-v3/users?tab=verifications', Icon: ShieldCheck },
-    { label: 'Pending Invites',       count: queue?.pendingInvites ?? 0,       to: '/admin-v3/users?tab=invites',       Icon: Mail },
-    { label: 'Expiring Access',       count: queue?.expiringAccess ?? 0,       to: '/admin-v3/users?tab=team',          Icon: Clock },
+    { label: 'Pending Verifications', count: queue?.pendingVerifications ?? 0, to: '/admin-v2/users?tab=verifications', Icon: ShieldCheck },
+    { label: 'Pending Invites',       count: queue?.pendingInvites ?? 0,       to: '/admin-v2/users?tab=invites',       Icon: Mail },
+    { label: 'Expiring Access',       count: queue?.expiringAccess ?? 0,       to: '/admin-v2/users?tab=team',          Icon: Clock },
   ];
   const visible = items.filter(i => i.count > 0);
   const allClear = !loading && visible.length === 0;
@@ -334,7 +334,7 @@ function EgSyncCard({ data, loading, isError }: { data: any; loading: boolean; i
             gridTemplateColumns: 'repeat(2, 1fr)',
             gap: 10,
           }}
-          className="admin-v3-eg-grid"
+          className="admin-v2-eg-grid"
         >
           <StatTile label="Connected" value={data.total_connected ?? 0} />
           <StatTile label="OK" value={data.status_ok_count ?? 0} />
@@ -353,7 +353,7 @@ function EgSyncCard({ data, loading, isError }: { data: any; loading: boolean; i
       )}
       <style>{`
         @media (min-width: 640px) {
-          .admin-v3-eg-grid { grid-template-columns: repeat(4, 1fr) !important; }
+          .admin-v2-eg-grid { grid-template-columns: repeat(4, 1fr) !important; }
         }
       `}</style>
     </Card>

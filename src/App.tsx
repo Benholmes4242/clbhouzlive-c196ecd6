@@ -153,8 +153,7 @@ const Top100List = lazy(() => import("./pages/Top100List"));
 const AchievementsHubPage = lazy(() => import("./pages/AchievementsHubPage"));
 const AchievementsPage = lazy(() => import("./pages/AchievementsPage"));
 const AdminSetupPage = lazy(() => import("./pages/AdminSetupPage"));
-const AdminV2Shell = lazy(() => import('./features/admin-v2/AdminV2Shell'));
-const AdminV3Shell = lazy(() => import('./features/admin/AdminShell'));
+const AdminShell = lazy(() => import('./features/admin/AdminShell'));
 
 
 
@@ -407,25 +406,16 @@ function AppRoutes() {
         <Route path="/admin" element={<Navigate to="/admin-v2/dashboard" replace />} />
         <Route path="/admin/*" element={<Navigate to="/admin-v2/dashboard" replace />} />
 
-        {/* Admin V2 — new standalone console */}
+        {/* Admin — mobile-first console */}
         <Route
           path="/admin-v2/*"
           element={
             <Suspense fallback={<GenericPageSkeleton />}>
-              <AdminV2Shell />
+              <AdminShell />
             </Suspense>
           }
         />
 
-        {/* Admin V3 — next-gen mobile-first console (Phase 1) */}
-        <Route
-          path="/admin-v3/*"
-          element={
-            <Suspense fallback={<GenericPageSkeleton />}>
-              <AdminV3Shell />
-            </Suspense>
-          }
-        />
 
         {/* /create-moment removed — PostStudio is now the sole creation flow */}
         <Route path="/error-logs" element={<ErrorLogPage />} />
