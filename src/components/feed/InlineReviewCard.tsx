@@ -52,14 +52,12 @@ export const InlineReviewCard: React.FC<InlineReviewCardProps> = ({
   courseRegion,
   courseCountry,
   courseSubCountry,
-  courseRating,
   reviewer,
   isVisible,
   onTap,
   reviewerStats,
   courseSubtitle,
   whiteReadReview = false,
-  followBadge,
 }) => {
   const initials = useMemo(
     () =>
