@@ -741,9 +741,12 @@ html.lightbox-open {
    on first render; individual light pages apply their own background via
    body class or component-level styles once they mount.
    ──────────────────────────────────────────────────────────────────────── */
-body.route-clubhouse .app-shell,
-body.route-auth .app-shell {
+body.route-clubhouse .app-shell {
   background-color: #0d0d0d !important;
+}
+
+body.route-auth .app-shell {
+  background-color: #F8FAFC !important;
 }
 
 /* Light routes restore the page background after mount */
