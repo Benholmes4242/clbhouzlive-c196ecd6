@@ -71,7 +71,7 @@ export const SnapVideoPlayer = memo(function SnapVideoPlayer({
 
   // ── Attach/teardown via shared hook (pool-aware demote-not-destroy) ──
   // Whether this slide should hold an attached instance (active or within radius).
-  const shouldAttach = isActive || Math.abs(feedIndex - activeIndex) <= 2;
+  const shouldAttach = isActive || Math.abs(feedIndex - activeIndex) <= 1;
 
   useEffect(() => {
     const video = videoRef.current;
