@@ -202,7 +202,7 @@ export function FullscreenFeedOverlay() {
                 />
               </>
             )}
-            {/* <FullscreenDebugPanel /> — temporarily disabled during feed verification */}
+            <FullscreenDebugPanel />
           </motion.div>
         )}
       </AnimatePresence>
