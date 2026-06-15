@@ -63,7 +63,7 @@ const chipBase: React.CSSProperties = {
   cursor: 'pointer',
   pointerEvents: 'auto',
   fontFamily: 'Geist, system-ui, sans-serif',
-  fontSize: 13,
+  fontSize: 14,
   fontWeight: 700,
   lineHeight: 1,
   filter: ICON_SHADOW,
@@ -150,16 +150,16 @@ export const FeedTopActionBar: React.FC<FeedTopActionBarProps> = ({
               style={chipBase}
             >
               {isMuted ? (
-                <VolumeX size={20} stroke="#fff" strokeWidth={2} />
+                <VolumeX size={22} stroke="#fff" strokeWidth={2} />
               ) : (
-                <Volume2 size={20} stroke="#fff" strokeWidth={2} />
+                <Volume2 size={22} stroke="#fff" strokeWidth={2} />
               )}
             </button>
           )}
         </div>
 
         {/* RIGHT cluster — gap tightens on the smallest phones so the row never wraps. */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: 'clamp(6px, 2vw, 8px)' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 'clamp(5px, 2vw, 8px)' }}>
           <button
             type="button"
             onClick={(e) => {
@@ -170,7 +170,7 @@ export const FeedTopActionBar: React.FC<FeedTopActionBarProps> = ({
             style={likeStr ? chipWithCount : chipBase}
           >
             <Heart
-              size={20}
+              size={24}
               fill={hasLiked ? '#F7931E' : 'transparent'}
               stroke={hasLiked ? '#F7931E' : '#fff'}
               strokeWidth={2}
@@ -196,7 +196,7 @@ export const FeedTopActionBar: React.FC<FeedTopActionBarProps> = ({
             aria-label="Comments"
             style={commentStr ? chipWithCount : chipBase}
           >
-            <MessageCircle size={20} stroke="#fff" strokeWidth={2} />
+            <MessageCircle size={24} stroke="#fff" strokeWidth={2} />
             {commentStr && (
               <span style={{ color: '#fff', fontVariantNumeric: 'tabular-nums' }}>
                 {commentStr}
@@ -213,7 +213,7 @@ export const FeedTopActionBar: React.FC<FeedTopActionBarProps> = ({
             aria-label="Share"
             style={chipBase}
           >
-            <Send size={20} stroke="#fff" strokeWidth={2} />
+            <Send size={24} stroke="#fff" strokeWidth={2} />
           </button>
 
           <button
@@ -225,7 +225,7 @@ export const FeedTopActionBar: React.FC<FeedTopActionBarProps> = ({
             aria-label="More options"
             style={chipBase}
           >
-            <MoreHorizontal size={20} stroke="#fff" strokeWidth={2} />
+            <MoreHorizontal size={24} stroke="#fff" strokeWidth={2} />
           </button>
         </div>
       </div>

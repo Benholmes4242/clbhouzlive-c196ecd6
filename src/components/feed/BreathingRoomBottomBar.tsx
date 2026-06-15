@@ -19,9 +19,6 @@
 
 import React, { useEffect, useRef, useState } from 'react';
 import { motion } from 'framer-motion';
-import { Plus, Check } from 'lucide-react';
-
-
 import { Z } from '@/config/zIndex';
 import PostContentWithTags from '@/components/posts/PostContentWithTags';
 import type { FeedPostTag } from '@/components/media-system/types/media';
@@ -60,13 +57,6 @@ interface BreathingRoomBottomBarProps {
   /** Course tagged on the post. Renders the "posted at" pill above author. */
   golfCourse?: { id: string; name: string } | null;
   onCourseTap?: () => void;
-  /** When provided, render an amber follow "+" badge on the author avatar
-   *  (fullscreen overlay only). */
-  followBadge?: {
-    isFollowing: boolean;
-    isOwnPost: boolean;
-    onFollow: () => void;
-  };
 }
 
 export const BreathingRoomBottomBar: React.FC<BreathingRoomBottomBarProps> = ({
@@ -84,7 +74,6 @@ export const BreathingRoomBottomBar: React.FC<BreathingRoomBottomBarProps> = ({
   isReview = false,
   golfCourse,
   onCourseTap,
-  followBadge,
 }) => {
   const [captionExpandedLocal, setCaptionExpandedLocal] = useState(false);
   const captionExpanded = captionExpandedProp ?? captionExpandedLocal;
