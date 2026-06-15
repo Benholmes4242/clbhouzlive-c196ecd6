@@ -144,6 +144,16 @@ class HLSPoolManagerClass {
     hls: HlsType, 
     preloadVideo: HTMLVideoElement
   ): void {
+    // GUARD: never clobber a promoted (live, on-screen) instance. If one exists
+    // for this URL, destroy the INCOMING duplicate instead and bail. This is the
+    // foot-gun behind the re-attach miss storm — registering over a live decoder
+    // destroyed the active video. Strictly safer for all surfaces.
+    const existing = this.pool.get(url);
+    if (existing?.isPromoted) {
+      try { hls.destroy(); } catch {}
+      return;
+    }
+
     // FIX #9: Use dynamic max based on memory pressure
     const maxInstances = this.getMaxInstances();
     

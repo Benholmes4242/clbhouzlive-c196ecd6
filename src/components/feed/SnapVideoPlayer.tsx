@@ -70,13 +70,15 @@ export const SnapVideoPlayer = memo(function SnapVideoPlayer({
     : (isSuggestedFeed ? 'cover' : (aspect >= 1.5 ? 'cover' : 'contain'));
 
   // ── Attach/teardown via shared hook (pool-aware demote-not-destroy) ──
+  // Whether this slide should hold an attached instance (active or within radius).
+  const shouldAttach = isActive || Math.abs(feedIndex - activeIndex) <= 2;
+
   useEffect(() => {
     const video = videoRef.current;
     if (!video) return;
-    const distance = Math.abs(feedIndex - activeIndex);
     let cancelled = false;
 
-    if (isActive || distance <= 2) {
+    if (shouldAttach) {
       video.muted = useClubhouseStore.getState().isMuted;
       video.playsInline = true;
       pool.attach(hlsUrl, video, mp4Url).then(() => {
@@ -92,7 +94,10 @@ export const SnapVideoPlayer = memo(function SnapVideoPlayer({
       setShowReplay(false);
       useClubhouseStore.getState().setActiveVideoElement(null, null);
     }
-  }, [isActive, feedIndex, activeIndex, hlsUrl, mp4Url]);
+    // Deps: shouldAttach (a boolean that only flips on window enter/exit) — NOT
+    // activeIndex. This converts "re-attach on every swipe" → "attach once on
+    // enter, teardown once on exit", which stops the re-attach/destroy churn.
+  }, [shouldAttach, hlsUrl, mp4Url]);
 
   // ── Active-element store registration (shell concern) ──
   // Hook owns play(); we own the global active-element pointer.
