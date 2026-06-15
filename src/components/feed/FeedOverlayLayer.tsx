@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { useClubhouseStore } from '@/store/clubhouseStore';
 import { BreathingRoomBottomBar } from './BreathingRoomBottomBar';
 import { FeedActionRail } from './FeedActionRail';
+import { FeedTopActionBar } from './FeedTopActionBar';
 import { Z } from '@/config/zIndex';
 import { ReviewOverlaySlot } from './ReviewOverlaySlot';
 import { VideoScrubber } from '@/components/video/VideoScrubber';
