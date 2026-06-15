@@ -60,8 +60,8 @@ img[src*="Silhouette"] {
  * Now using standard body scroll with overscroll prevention.
  */
 html {
-  background-color: #0d0d0d;
-  color-scheme: dark; /* prevents browser-injected white backgrounds on first paint */
+  background-color: #F8FAFC;
+  color-scheme: light;
   height: 100%;
   overflow-x: hidden;
   overflow-y: auto;
@@ -71,8 +71,8 @@ html {
 
 body {
   @apply font-sans;
-  background-color: #0d0d0d;
-  color-scheme: dark; /* prevents browser-injected white backgrounds on first paint */
+  background-color: #F8FAFC;
+  color-scheme: light;
   height: 100%;
   overflow-x: hidden;
   overflow-y: auto;
@@ -763,10 +763,11 @@ html[data-immersive-route='true'] .app-shell {
   background-color: transparent !important;
 }
 
-/* Desktop backdrop behind the app column */
+/* Desktop / iPad backdrop behind the centered app column.
+   Light theme is the app default; Clubhouse paints its own dark page bg. */
 @media (min-width: 480px) {
   body {
-    background-color: #0A0A0A;
+    background-color: #F8FAFC;
   }
 }
 
