@@ -153,8 +153,7 @@ const Top100List = lazy(() => import("./pages/Top100List"));
 const AchievementsHubPage = lazy(() => import("./pages/AchievementsHubPage"));
 const AchievementsPage = lazy(() => import("./pages/AchievementsPage"));
 const AdminSetupPage = lazy(() => import("./pages/AdminSetupPage"));
-const AdminV2Shell = lazy(() => import('./features/admin-v2/AdminV2Shell'));
-const AdminV3Shell = lazy(() => import('./features/admin/AdminShell'));
+const AdminShell = lazy(() => import('./features/admin/AdminShell'));
 
 
 
