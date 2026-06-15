@@ -112,8 +112,22 @@ export const SnapVideoPlayer = memo(function SnapVideoPlayer({
     if (hasFirstFrame && !firstFrameFiredRef.current) {
       firstFrameFiredRef.current = true;
       onFirstFrameReady?.();
+      // Timing: first frame painted → blur is now gone. Ends the blur-visible span.
+      fsTimeEnd(`slide:${feedIndex}`, `🎞️ FRAME_PAINTED #${feedIndex} (blur→video)`);
+      // If this is the slide the viewer opened on, also close the open→visible span.
+      if (isActive) fsTimeEnd('open', `✅ OPEN→FRAME #${feedIndex} (tap→video visible)`);
     }
-  }, [hasFirstFrame, onFirstFrameReady]);
+  }, [hasFirstFrame, onFirstFrameReady, feedIndex, isActive]);
+
+  // Timing: when this slide becomes active, start the blur-visible span.
+  // The gap between this and FRAME_PAINTED IS the blur-on-screen duration.
+  useEffect(() => {
+    if (isActive && !hasFirstFrame) {
+      fsTimeStart(`slide:${feedIndex}`);
+      fsEvent(`👁️ BLUR_VISIBLE #${feedIndex}`, { hasFrame: hasFirstFrame });
+      logTileLife(`fs${feedIndex}`, feedIndex, 'ACTIVE', { hasFirstFrame });
+    }
+  }, [isActive, hasFirstFrame, feedIndex]);
 
   // ── Sync muted state ──
   useEffect(() => {
