@@ -22,7 +22,7 @@ import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useActiveActor } from '@/context/ActiveActorContext';
 import { getActorRouteByType } from '@/types/actor';
 import FullscreenDebugPanel from '@/components/FullscreenDebugPanel';
-import { fsTimeStart, fsEvent } from '@/media/mobileVideoDebug';
+import { fsTimeStart, fsTimeEnd, fsEvent } from '@/media/mobileVideoDebug';
 
 export function FullscreenFeedOverlay() {
   const navigate = useNavigate();
@@ -105,6 +105,9 @@ export function FullscreenFeedOverlay() {
   // Body scroll lock
   useEffect(() => {
     if (isOpen) {
+      // Clear any stale 'open' span left un-closed from a prior session before
+      // starting a fresh one (prevents a leftover span producing a fake duration).
+      fsTimeEnd('open', '(stale open span discarded)');
       // Timing: mark fullscreen open (tap→visible span; ends when first slide paints).
       fsTimeStart('open');
       fsEvent('🚀 FULLSCREEN_OPEN', { startIndex });

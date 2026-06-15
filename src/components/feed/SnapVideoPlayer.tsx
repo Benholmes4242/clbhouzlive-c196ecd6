@@ -119,8 +119,10 @@ export const SnapVideoPlayer = memo(function SnapVideoPlayer({
       onFirstFrameReady?.();
       // Timing: first frame painted → blur is now gone. Ends the blur-visible span.
       fsTimeEnd(`slide:${feedIndex}`, `🎞️ FRAME_PAINTED #${feedIndex} (blur→video)`);
-      // If this is the slide the viewer opened on, also close the open→visible span.
-      if (isActive) fsTimeEnd('open', `✅ OPEN→FRAME #${feedIndex} (tap→video visible)`);
+      // Close the open→visible span on the FIRST slide to paint after open, regardless
+      // of whether isActive has propagated yet (the isActive gate caused stale spans to
+      // be closed seconds later by a different slide → fake multi-second readings).
+      fsTimeEnd('open', `✅ OPEN→FRAME #${feedIndex} (tap→video visible)`);
     }
   }, [hasFirstFrame, onFirstFrameReady, feedIndex, isActive]);
 
