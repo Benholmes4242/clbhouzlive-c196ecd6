@@ -273,14 +273,19 @@ export function SnapFeed({
     return () => el.removeEventListener('scrollend', onScrollEnd);
   }, [setActiveIndex]);
 
-  // ── Prefetch next 2 HLS manifests ──
+  // ── Prefetch ahead: poster IMAGES (cheap, no decoder) + next 2 manifests ──
   useEffect(() => {
-    const next = postsRef.current.slice(activeIndex + 1, activeIndex + 3);
-    next.forEach(post => {
-      const url = post.mediaItems?.[0]?.hlsUrl;
-      if (url) {
-        preloadHlsManifest(url).catch(() => {});
-      }
+    // Crisp first-frame posters — warm 5 ahead; images cost no decoder budget.
+    const posters = postsRef.current.slice(activeIndex + 1, activeIndex + 6);
+    posters.forEach(post => {
+      const thumb = post?.mediaItems?.[0]?.thumbnailUrl;
+      if (thumb) { const img = new Image(); img.src = thumb; }
+    });
+    // Manifests only for the next 2 — network warm, NO decoded instances.
+    const manifests = postsRef.current.slice(activeIndex + 1, activeIndex + 3);
+    manifests.forEach(post => {
+      const url = post?.mediaItems?.[0]?.hlsUrl;
+      if (url) preloadHlsManifest(url).catch(() => {});
     });
   }, [activeIndex]);
 
