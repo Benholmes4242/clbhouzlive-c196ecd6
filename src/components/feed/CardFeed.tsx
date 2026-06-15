@@ -180,6 +180,7 @@ export const CardFeed: React.FC<CardFeedProps> = ({
   const setCarouselPosition = useClubhouseStore((s) => s.setCarouselPosition);
   const carouselPositions = useClubhouseStore((s) => s.carouselPositions);
   const openFullscreen = useFullscreenFeedStore((s) => s.open);
+  const fsOpen = useFullscreenFeedStore((s) => s.isOpen);
 
   // Sync the active card to the global store so other consumers (top-bar
   // carousel chip, fullscreen handoff, etc.) stay in step.
