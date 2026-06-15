@@ -7,7 +7,7 @@ const TONE: Record<Tone, { bg: string; fg: string }> = {
   ok:      { bg: t.okSoft,     fg: t.okText },
   warn:    { bg: t.warnSoft,   fg: t.warnText },
   danger:  { bg: t.dangerSoft, fg: t.dangerText },
-  neutral: { bg: '#F1F5F9',    fg: t.inkMuted },
+  neutral: { bg: t.neutralSoft, fg: t.inkMuted },
 };
 
 export default function StatusPill({
