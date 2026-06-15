@@ -23,7 +23,7 @@ export function useHlsPool(): HlsPoolHandle {
   const hlsRef = useRef<any>(null);
 
   const attach = useCallback(
-    async (hlsUrl: string, video: HTMLVideoElement, mp4Fallback?: string) => {
+    async (hlsUrl: string, video: HTMLVideoElement, mp4Fallback?: string, surface: 'feed' | 'fullscreen' = 'feed') => {
       const { default: Hls } = await import('hls.js');
 
       // Native HLS (iOS Safari): no hls.js instance, pool not applicable.
