@@ -14,6 +14,7 @@ export interface HlsPoolHandle {
     hlsUrl: string,
     video: HTMLVideoElement,
     mp4Fallback?: string,
+    surface?: 'feed' | 'fullscreen',
   ) => Promise<void>;
   teardown: (hlsUrl: string) => void;
 }
