@@ -375,6 +375,7 @@ class HLSPoolManagerClass {
     }
 
     this.pool.delete(url);
+    this.promotionTimestamps.delete(url);
     logVideoTelemetry('hls_pool_cleaned', { url, remainingSize: this.pool.size });
   }
 
