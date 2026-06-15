@@ -127,9 +127,12 @@ export function FullscreenFeedOverlay() {
       return () => {
         document.body.style.overflow = "";
         document.body.classList.remove('route-fullscreen-overlay');
-        if (shield) shield.style.backgroundColor = '#F8FAFC';
-        document.documentElement.style.backgroundColor = 'transparent';
-        document.body.style.backgroundColor = 'transparent';
+        // Restore shield to transparent (NOT #F8FAFC) so the dark feed background
+        // shows through — matches CourseMediaViewer and App.tsx's dark route baseline.
+        // #F8FAFC was a light slate that flashed over the dark feed on return.
+        if (shield) shield.style.backgroundColor = 'transparent';
+        document.documentElement.style.backgroundColor = '';
+        document.body.style.backgroundColor = '';
       };
     }
   }, [isOpen]);
