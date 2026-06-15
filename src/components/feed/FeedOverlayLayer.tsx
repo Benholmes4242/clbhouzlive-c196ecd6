@@ -239,15 +239,6 @@ export const FeedOverlayLayer = memo(function FeedOverlayLayer({
               onReviewTap={() => onReviewTap?.()}
               isVisible={overlayVisible}
               whiteReadReview={topActionBar}
-              followBadge={
-                topActionBar
-                  ? {
-                      isFollowing: isFollowed,
-                      isOwnPost,
-                      onFollow: () => onFollow(activePost),
-                    }
-                  : undefined
-              }
             />
           </div>
         </div>
