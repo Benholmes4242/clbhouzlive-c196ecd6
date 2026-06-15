@@ -204,7 +204,7 @@ export const BreathingRoomBottomBar: React.FC<BreathingRoomBottomBarProps> = ({
           >
             <div style={{ position: 'relative', flexShrink: 0 }}>
               <SquircleAvatar
-                size={40}
+                size={followBadge ? 40 : 32}
                 src={author.avatarUrl}
                 alt={author.displayName}
                 fallback={author.displayName?.[0] ?? '?'}
