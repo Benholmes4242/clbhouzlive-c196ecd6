@@ -42,6 +42,14 @@ export interface InlineReviewCardProps {
   } | null;
   courseSubtitle?: string | null;
   reviewDate?: string | Date | null;
+  /** When true, the "Read review" label + chevron render in white (fullscreen). */
+  whiteReadReview?: boolean;
+  /** When provided, render an amber follow "+" badge on the reviewer avatar. */
+  followBadge?: {
+    isFollowing: boolean;
+    isOwnPost: boolean;
+    onFollow: () => void;
+  };
 }
 
 export const InlineReviewCard: React.FC<InlineReviewCardProps> = ({
@@ -56,6 +64,8 @@ export const InlineReviewCard: React.FC<InlineReviewCardProps> = ({
   onTap,
   reviewerStats,
   courseSubtitle,
+  whiteReadReview = false,
+  followBadge,
 }) => {
   const initials = useMemo(
     () =>
