@@ -211,6 +211,7 @@ export function FullscreenFeedOverlay() {
                 />
               </>
             )}
+            <FullscreenDebugPanel />
           </motion.div>
         )}
       </AnimatePresence>
