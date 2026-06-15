@@ -44,12 +44,6 @@ export interface InlineReviewCardProps {
   reviewDate?: string | Date | null;
   /** When true, the "Read review" label + chevron render in white (fullscreen). */
   whiteReadReview?: boolean;
-  /** When provided, render an amber follow "+" badge on the reviewer avatar. */
-  followBadge?: {
-    isFollowing: boolean;
-    isOwnPost: boolean;
-    onFollow: () => void;
-  };
 }
 
 export const InlineReviewCard: React.FC<InlineReviewCardProps> = ({
