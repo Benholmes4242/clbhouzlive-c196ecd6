@@ -294,6 +294,7 @@ export const CardFeed: React.FC<CardFeedProps> = ({
       activeIdx,
       playingIdx,        // isActive keys off playingIdx; without this the
                          // settle-promoted play index never reaches the tiles
+      fsOpen,            // recompute isActive/isNear when fullscreen opens/closes
       carouselPositions,
       getCarouselChangeHandler,
       getCommentCount,
