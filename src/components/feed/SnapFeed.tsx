@@ -273,13 +273,15 @@ export function SnapFeed({
     return () => el.removeEventListener('scrollend', onScrollEnd);
   }, [setActiveIndex]);
 
-  // ── Prefetch next 2 HLS manifests ──
+  // ── Prefetch next 3 slides: manifest AND decoded first segment (warm pool) ──
   useEffect(() => {
-    const next = postsRef.current.slice(activeIndex + 1, activeIndex + 3);
+    const next = postsRef.current.slice(activeIndex + 1, activeIndex + 4); // 3 ahead (was 2)
     next.forEach(post => {
       const url = post.mediaItems?.[0]?.hlsUrl;
       if (url) {
-        preloadHlsManifest(url).catch(() => {});
+        preloadHlsManifest(url)
+          .then(() => registerInPool(url))   // warms a DECODED instance into the pool
+          .catch(() => {});
       }
     });
   }, [activeIndex]);
