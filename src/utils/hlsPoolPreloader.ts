@@ -22,8 +22,9 @@ const poolPreloadInFlight = new Set<string>();
  * Call this immediately after preloadHlsManifest() resolves.
  */
 export async function registerInPool(hlsUrl: string): Promise<void> {
-  // Skip if already in pool or being prepared
-  if (HLSPoolManager.has(hlsUrl) || poolPreloadInFlight.has(hlsUrl)) {
+  // Skip if the URL already has any pool entry (promoted or waiting) or is being prepared.
+  // has() only means "available to promote" and returns false for live/promoted entries.
+  if (HLSPoolManager.isPooled(hlsUrl) || poolPreloadInFlight.has(hlsUrl)) {
     return;
   }
 
