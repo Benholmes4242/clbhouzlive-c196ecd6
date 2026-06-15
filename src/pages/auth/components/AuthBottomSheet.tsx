@@ -51,12 +51,12 @@ const AuthBottomSheet: React.FC<AuthBottomSheetProps> = ({
         )}
         style={{ 
           backdropFilter: 'blur(4px)',
-          background: 'rgba(0, 0, 0, 0.45)',
+          background: 'rgba(15, 23, 42, 0.35)',
         }}
         onClick={onClose}
       />
       
-      {/* Sheet - matches hero navy surface */}
+      {/* Sheet - light surface */}
       <div 
         className={cn(
           "fixed bottom-0 inset-x-0 mx-auto z-50 w-full max-w-[480px]",
@@ -68,16 +68,16 @@ const AuthBottomSheet: React.FC<AuthBottomSheetProps> = ({
             : "translate-y-full opacity-0"
         )}
         style={{
-          background: '#0C1119',
+          background: '#FFFFFF',
           backdropFilter: 'blur(28px)',
           WebkitBackdropFilter: 'blur(28px)',
-          borderTop: '1px solid rgba(255, 255, 255, 0.06)',
+          borderTop: '1px solid rgba(15, 23, 42, 0.08)',
         }}
       >
         
         {/* Handle bar */}
         <div style={{ display: 'flex', justifyContent: 'center', padding: '10px 0 4px' }}>
-          <div style={{ width: 36, height: 4, borderRadius: 2, background: 'rgba(255,255,255,0.15)' }} />
+          <div style={{ width: 36, height: 4, borderRadius: 2, background: 'rgba(15,23,42,0.15)' }} />
         </div>
         
         {/* Header with close button */}
@@ -88,7 +88,7 @@ const AuthBottomSheet: React.FC<AuthBottomSheetProps> = ({
                 style={{ 
                   fontSize: 20,
                   fontWeight: 900,
-                  color: '#ffffff',
+                  color: '#1C1C1E',
                   letterSpacing: '-0.03em',
                   marginBottom: 4,
                 }}
@@ -98,9 +98,10 @@ const AuthBottomSheet: React.FC<AuthBottomSheetProps> = ({
             )}
             {subtitle && (
               <p 
-                className="text-[14px] text-white/65"
+                className="text-[14px]"
                 style={{ 
                   lineHeight: '1.45',
+                  color: '#8E8E93',
                 }}
               >
                 {subtitle}
@@ -111,10 +112,10 @@ const AuthBottomSheet: React.FC<AuthBottomSheetProps> = ({
             onClick={onClose}
             className="w-8 h-8 flex items-center justify-center rounded-full transition-all active:scale-95"
             style={{
-              background: 'rgba(255, 255, 255, 0.06)',
+              background: '#F5F5F7',
             }}
           >
-            <X className="w-4 h-4 text-white/50" />
+            <X className="w-4 h-4" style={{ color: '#8E8E93' }} />
           </button>
         </div>
         
