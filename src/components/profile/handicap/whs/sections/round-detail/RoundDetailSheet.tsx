@@ -157,7 +157,7 @@ export const RoundDetailSheet: React.FC<Props> = ({
         />
         <DrawerPrimitive.Content
           aria-labelledby="round-detail-sheet-title"
-          className="hcp-dark fixed left-1/2 -translate-x-1/2 w-full max-w-[480px] bottom-0 z-[10002] flex flex-col rounded-t-[20px] outline-none"
+          className="hcp-dark fixed inset-x-0 bottom-0 z-[10002] flex flex-col rounded-t-[20px] outline-none"
           style={{
             background: PAGE_BG,
             height: '75dvh',

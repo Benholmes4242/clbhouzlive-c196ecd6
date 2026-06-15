@@ -694,7 +694,7 @@ const Top100MapView: React.FC<Top100MapViewProps> = ({
       {/* Filter tray — outer wrapper always visible (handle, progress, summary). Inner block (status pills) collapses. */}
       <div 
         className={cn(
-          "glass-card fixed bottom-0 left-1/2 -translate-x-1/2 w-full max-w-[480px] z-30 !rounded-t-3xl !rounded-b-none !overflow-visible px-5 pt-2 pb-[calc(max(0.75rem,env(safe-area-inset-bottom,0px))+12px)] transition-all duration-300",
+          "glass-card fixed bottom-0 left-0 right-0 z-30 !rounded-t-3xl !rounded-b-none !overflow-visible px-5 pt-2 pb-[calc(max(0.75rem,env(safe-area-inset-bottom,0px))+12px)] transition-all duration-300",
           selectedCourse ? 'opacity-0 pointer-events-none translate-y-4' : 'opacity-100 translate-y-0'
         )}
         style={{ borderBottom: 'none', position: 'fixed' }}

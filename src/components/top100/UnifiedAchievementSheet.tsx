@@ -422,7 +422,7 @@ export function UnifiedAchievementSheet({
               if (info.offset.y > 100) onClose();
             }}
             className={cn(
-              'fixed bottom-0 left-1/2 -translate-x-1/2 w-full max-w-[480px] z-[130]',
+              'fixed bottom-0 left-0 right-0 z-[130]',
               'bg-background rounded-t-3xl max-h-[85vh] overflow-hidden',
               'shadow-2xl'
             )}

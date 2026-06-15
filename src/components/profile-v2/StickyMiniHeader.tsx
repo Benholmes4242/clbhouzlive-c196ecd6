@@ -31,7 +31,7 @@ export const StickyMiniHeader: React.FC<StickyMiniHeaderProps> = ({
   return (
     <header
       className={cn(
-        'fixed top-0 left-1/2 -translate-x-1/2 w-full max-w-[480px] z-40 transition-all duration-300',
+        'fixed top-0 left-0 right-0 z-40 transition-all duration-300',
         visible 
           ? 'translate-y-0 opacity-100' 
           : '-translate-y-full opacity-0 pointer-events-none',

@@ -60,8 +60,8 @@ img[src*="Silhouette"] {
  * Now using standard body scroll with overscroll prevention.
  */
 html {
-  background-color: #F8FAFC;
-  color-scheme: light;
+  background-color: #0d0d0d;
+  color-scheme: dark; /* prevents browser-injected white backgrounds on first paint */
   height: 100%;
   overflow-x: hidden;
   overflow-y: auto;
@@ -71,8 +71,8 @@ html {
 
 body {
   @apply font-sans;
-  background-color: #F8FAFC;
-  color-scheme: light;
+  background-color: #0d0d0d;
+  color-scheme: dark; /* prevents browser-injected white backgrounds on first paint */
   height: 100%;
   overflow-x: hidden;
   overflow-y: auto;
@@ -741,12 +741,9 @@ html.lightbox-open {
    on first render; individual light pages apply their own background via
    body class or component-level styles once they mount.
    ──────────────────────────────────────────────────────────────────────── */
-body.route-clubhouse .app-shell {
-  background-color: #0d0d0d !important;
-}
-
+body.route-clubhouse .app-shell,
 body.route-auth .app-shell {
-  background-color: #F8FAFC !important;
+  background-color: #0d0d0d !important;
 }
 
 /* Light routes restore the page background after mount */
@@ -766,11 +763,10 @@ html[data-immersive-route='true'] .app-shell {
   background-color: transparent !important;
 }
 
-/* Desktop / iPad backdrop behind the centered app column.
-   Light theme is the app default; Clubhouse paints its own dark page bg. */
+/* Desktop backdrop behind the app column */
 @media (min-width: 480px) {
   body {
-    background-color: #F8FAFC;
+    background-color: #0A0A0A;
   }
 }
 

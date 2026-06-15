@@ -197,7 +197,7 @@ const ManualHandicapModal: React.FC<ManualHandicapModalProps> = (props) => {
 
           {/* Sheet */}
           <motion.div
-            className="fixed bottom-0 left-1/2 -translate-x-1/2 w-full max-w-[480px] z-[101] bg-background flex flex-col"
+            className="fixed bottom-0 left-0 right-0 z-[101] bg-background flex flex-col"
             style={{
               borderRadius: '20px 20px 0 0',
               paddingBottom: 'max(env(safe-area-inset-bottom, 0px), 16px)',

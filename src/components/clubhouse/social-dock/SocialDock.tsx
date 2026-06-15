@@ -97,7 +97,7 @@ export const SocialDock: React.FC<SocialDockProps> = ({
       {/* Outer wrapper: full-bleed, anchored to bottom */}
       <div
         className={cn(
-          'fixed left-1/2 -translate-x-1/2 w-full max-w-[480px] bottom-0 z-[80]',
+          'fixed inset-x-0 bottom-0 z-[80]',
           'pointer-events-none',
           'transition-all duration-[220ms]',
           isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'

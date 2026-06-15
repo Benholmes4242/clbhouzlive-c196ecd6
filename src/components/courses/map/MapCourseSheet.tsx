@@ -205,7 +205,7 @@ export const MapCourseSheet: React.FC<MapCourseSheetProps> = ({
         role="dialog"
         aria-modal="true"
         aria-labelledby="course-sheet-title"
-        className="glass-card fixed left-1/2 -translate-x-1/2 w-full max-w-[480px] bottom-0 z-50 flex flex-col !rounded-b-none !overflow-visible"
+        className="glass-card fixed left-0 right-0 bottom-0 z-50 flex flex-col !rounded-b-none !overflow-visible"
         style={{ 
           borderRadius: '24px 24px 0 0',
           borderBottom: 'none',

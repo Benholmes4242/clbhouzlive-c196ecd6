@@ -297,7 +297,7 @@ export function RateStep({
             animate={{ y: 0 }}
             exit={{ y: '-100%' }}
             transition={{ duration: 0.2, ease: 'easeOut' }}
-            className="fixed top-0 left-1/2 -translate-x-1/2 w-full max-w-[480px] z-40 bg-slate-50/95 backdrop-blur-md border-b border-slate-200"
+            className="fixed top-0 left-0 right-0 z-40 bg-slate-50/95 backdrop-blur-md border-b border-slate-200"
           >
             <div
               className="px-4 pb-2 flex items-center justify-between"

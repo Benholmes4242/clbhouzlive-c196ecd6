@@ -24,8 +24,8 @@ const MobileModal: React.FC<MobileModalProps> = ({
       <Dialog.Portal>
         <Dialog.Overlay className="fixed inset-0 bg-black/50 z-50" />
         <Dialog.Content className={cn(
-          "fixed bottom-0 left-1/2 -translate-x-1/2 w-full max-w-[480px] bg-background rounded-t-2xl shadow-2xl z-50 max-h-[90vh] overflow-hidden",
-          "md:top-1/2 md:left-1/2 md:-translate-x-1/2 md:-translate-y-1/2 md:bottom-auto md:right-auto",
+          "fixed bottom-0 left-0 right-0 bg-background rounded-t-2xl shadow-2xl z-50 max-h-[90vh] overflow-hidden",
+          "md:top-1/2 md:left-1/2 md:transform md:-translate-x-1/2 md:-translate-y-1/2 md:bottom-auto md:right-auto",
           "md:max-w-2xl md:w-full md:max-h-[80vh] md:rounded-lg",
           "animate-in slide-in-from-bottom-full md:slide-in-from-bottom-0 md:fade-in-0 md:zoom-in-95",
           className

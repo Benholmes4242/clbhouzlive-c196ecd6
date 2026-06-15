@@ -27,7 +27,7 @@
    return (
      <div 
        className={cn(
-         "fixed left-1/2 -translate-x-1/2 w-full max-w-[480px] z-50 py-2 px-4",
+         "fixed left-0 right-0 z-50 py-2 px-4",
          "bg-primary text-primary-foreground text-center text-sm font-medium",
          "flex items-center justify-center gap-2"
        )}

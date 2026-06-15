@@ -183,7 +183,7 @@ const ClubhouseHeaderNew = ({ className, activeTab, onTabChange, chromeState = '
           />
           
           {/* Search pill overlay */}
-          <div className="fixed left-1/2 -translate-x-1/2 w-full max-w-[480px] top-0 z-[70] p-3">
+          <div className="fixed inset-x-0 top-0 z-[70] p-3">
             <div className={cn(
               "rounded-full backdrop-blur-2xl border shadow-hud",
               isDarkContext && "bg-hud-bg border-hud-border",

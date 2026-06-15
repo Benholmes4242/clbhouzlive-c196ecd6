@@ -92,7 +92,7 @@ export function CourseSearchSheet({
         onClick={onClose}
       />
       <div
-        className="fixed bottom-0 left-1/2 -translate-x-1/2 w-full max-w-[480px] z-[10001] flex flex-col"
+        className="fixed inset-x-0 bottom-0 z-[10001] flex flex-col"
         style={{
           maxHeight: '78vh',
           background: '#ffffff',
