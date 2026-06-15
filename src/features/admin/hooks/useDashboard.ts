@@ -201,13 +201,13 @@ async function fetchTodayGlance(): Promise<TodayGlance> {
   if (top3Ids.length > 0) {
     const { data: profiles } = await supabase
       .from('user_profiles')
-      .select('id, display_name, username, avatar_url')
+      .select('id, display_name, username, profile_photo_url')
       .in('id', top3Ids.map(t => t.userId));
     const map = new Map((profiles ?? []).map(p => [p.id, p]));
     topActiveUsers = top3Ids.map(t => ({
       userId: t.userId,
       displayName: map.get(t.userId)?.display_name ?? map.get(t.userId)?.username ?? t.userId.slice(0, 8),
-      avatarUrl: (map.get(t.userId) as any)?.avatar_url ?? null,
+      avatarUrl: map.get(t.userId)?.profile_photo_url ?? null,
       eventCount: t.eventCount,
     }));
   }
