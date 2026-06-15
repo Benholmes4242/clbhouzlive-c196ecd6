@@ -29,20 +29,22 @@ export async function registerInPool(hlsUrl: string): Promise<void> {
   }
 
   poolPreloadInFlight.add(hlsUrl);
+  let preloadVideo: HTMLVideoElement | null = null;
+  let hls: InstanceType<Awaited<ReturnType<typeof loadHlsJs>>> | null = null;
 
   try {
     const Hls = await loadHlsJs();
     if (!Hls || !Hls.isSupported()) return;
 
     // Create hidden video element for preloading
-    const preloadVideo = document.createElement('video');
+    preloadVideo = document.createElement('video');
     preloadVideo.muted = true;
     preloadVideo.playsInline = true;
     preloadVideo.style.cssText = 'position:absolute;width:1px;height:1px;opacity:0;pointer-events:none;';
     document.body.appendChild(preloadVideo);
 
     // Create HLS instance with cached loader so it reads from blob cache
-    const hls = new Hls({
+    hls = new Hls({
       enableWorker: true,
       lowLatencyMode: false,
       maxBufferLength: 12,
@@ -78,11 +80,21 @@ export async function registerInPool(hlsUrl: string): Promise<void> {
     preloadVideo.play().catch(() => {});
     preloadVideo.pause();
 
+    // A radius attach may have pooled/promoted this URL while the hidden preload parsed.
+    // Do not register over an existing entry; discard this now-redundant preload.
+    if (HLSPoolManager.isPooled(hlsUrl)) {
+      try { hls.destroy(); } catch {}
+      preloadVideo.remove();
+      return;
+    }
+
     // Register in pool — ready for instant promotion
     HLSPoolManager.register(hlsUrl, hls, preloadVideo);
 
   } catch {
     // Silent fail — pool miss is acceptable, just slower first frame
+    try { hls?.destroy(); } catch {}
+    preloadVideo?.remove();
   } finally {
     poolPreloadInFlight.delete(hlsUrl);
   }
