@@ -31,7 +31,9 @@ export function mapRowToFeedPost(row: FeedRpcRow): FeedPost {
     id: row.media_id,
     type: row.media_type === 'video' ? 'video' : 'image',
     hlsUrl: streamId ? buildHlsUrl(streamId) : undefined,
-    mp4Url: streamId ? buildMp4Url(streamId) : undefined,
+    // mp4Url intentionally undefined: /downloads/default.mp4 404s (Cloudflare MP4
+    // downloads not enabled). HLS is the always-present primary path.
+    mp4Url: undefined,
     thumbnailUrl: row.poster_url || (streamId ? buildThumbnailUrl(streamId) : undefined),
     imageUrl: row.media_type === 'image' ? row.media_url : undefined,
     width: row.width || 1080,
