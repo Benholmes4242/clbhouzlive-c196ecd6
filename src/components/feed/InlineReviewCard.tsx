@@ -8,7 +8,7 @@
 
 import React, { useMemo } from 'react';
 import { motion } from 'framer-motion';
-import { ChevronRight, Plus, Check } from 'lucide-react';
+import { ChevronRight } from 'lucide-react';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { formatFrostRating, splitCourseName } from '@/lib/frostPanel';
 
@@ -44,12 +44,6 @@ export interface InlineReviewCardProps {
   reviewDate?: string | Date | null;
   /** When true, the "Read review" label + chevron render in white (fullscreen). */
   whiteReadReview?: boolean;
-  /** When provided, render an amber follow "+" badge on the reviewer avatar. */
-  followBadge?: {
-    isFollowing: boolean;
-    isOwnPost: boolean;
-    onFollow: () => void;
-  };
 }
 
 export const InlineReviewCard: React.FC<InlineReviewCardProps> = ({
@@ -58,14 +52,12 @@ export const InlineReviewCard: React.FC<InlineReviewCardProps> = ({
   courseRegion,
   courseCountry,
   courseSubCountry,
-  courseRating,
   reviewer,
   isVisible,
   onTap,
   reviewerStats,
   courseSubtitle,
   whiteReadReview = false,
-  followBadge,
 }) => {
   const initials = useMemo(
     () =>
@@ -167,39 +159,6 @@ export const InlineReviewCard: React.FC<InlineReviewCardProps> = ({
             fallback={initials}
             hideRing
           />
-          {followBadge && !followBadge.isOwnPost && (
-            <button
-              type="button"
-              onClick={(e) => {
-                e.stopPropagation();
-                if (!followBadge.isFollowing) followBadge.onFollow();
-              }}
-              aria-label={followBadge.isFollowing ? 'Following' : 'Follow'}
-              aria-pressed={followBadge.isFollowing}
-              style={{
-                position: 'absolute',
-                bottom: -4,
-                left: '50%',
-                transform: 'translateX(-50%)',
-                width: 16,
-                height: 16,
-                borderRadius: '50%',
-                background: '#F7931E',
-                border: '1.5px solid #000',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                padding: 0,
-                cursor: followBadge.isFollowing ? 'default' : 'pointer',
-              }}
-            >
-              {followBadge.isFollowing ? (
-                <Check size={10} strokeWidth={3} color="#fff" />
-              ) : (
-                <Plus size={10} strokeWidth={3} color="#fff" />
-              )}
-            </button>
-          )}
         </div>
         <span
           style={{
@@ -257,7 +216,6 @@ export const InlineReviewCard: React.FC<InlineReviewCardProps> = ({
         >
           <span style={{ display: 'inline-flex', alignItems: 'center', gap: 6, flexWrap: 'wrap', minWidth: 0 }}>
             {locationStr}
-            <span style={{ opacity: 0.5 }}>·</span>
             <span
               style={{
                 color: whiteReadReview ? '#fff' : '#F7931E',
@@ -274,33 +232,6 @@ export const InlineReviewCard: React.FC<InlineReviewCardProps> = ({
               />
             </span>
           </span>
-          {courseRating != null && (
-            <span
-              style={{
-                marginLeft: 'auto',
-                display: 'inline-flex',
-                alignItems: 'center',
-                gap: 5,
-                flexShrink: 0,
-                background: 'rgba(255,255,255,0.08)',
-                padding: '3px 8px',
-                borderRadius: 999,
-                color: '#fff',
-                fontSize: 11,
-                fontWeight: 700,
-                fontVariantNumeric: 'tabular-nums',
-                lineHeight: 1,
-              }}
-            >
-              <img
-                src="/lovable-uploads/2b0e2d79-6b26-4b6b-a27b-8dd5f8cc5aad.png"
-                alt=""
-                aria-hidden="true"
-                style={{ width: 12, height: 12, objectFit: 'contain' }}
-              />
-              {courseRating.toFixed(1)}
-            </span>
-          )}
         </div>
       )}
     </motion.button>

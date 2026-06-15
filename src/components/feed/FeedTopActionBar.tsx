@@ -45,12 +45,10 @@ const formatCount = (count: number | null | undefined): string | null => {
   return count.toString();
 };
 
-const CHIP_BG = 'rgba(0,0,0,0.42)';
-const CHIP_BORDER = '1px solid rgba(255,255,255,0.12)';
-const CHIP_BLUR = 'blur(14px)';
+// Bare icon buttons — no chip background, no blur, no border. Drop-shadow on
+// the icon itself provides legibility over bright media (Clubhouse-style).
+const ICON_SHADOW = 'drop-shadow(0 1px 3px rgba(0,0,0,0.5))';
 
-// Icon-only chips are a perfect 42×42 square. Chips with inline counts grow
-// horizontally via padding — these are the only chips that need extra width.
 const chipBase: React.CSSProperties = {
   height: 42,
   minWidth: 42,
@@ -59,11 +57,8 @@ const chipBase: React.CSSProperties = {
   justifyContent: 'center',
   gap: 6,
   padding: 0,
-  borderRadius: 13,
-  background: CHIP_BG,
-  backdropFilter: CHIP_BLUR,
-  WebkitBackdropFilter: CHIP_BLUR,
-  border: CHIP_BORDER,
+  background: 'transparent',
+  border: 'none',
   color: '#fff',
   cursor: 'pointer',
   pointerEvents: 'auto',
@@ -71,11 +66,12 @@ const chipBase: React.CSSProperties = {
   fontSize: 13,
   fontWeight: 700,
   lineHeight: 1,
+  filter: ICON_SHADOW,
 };
 
 const chipWithCount: React.CSSProperties = {
   ...chipBase,
-  padding: '0 11px',
+  padding: '0 4px',
 };
 
 export const FeedTopActionBar: React.FC<FeedTopActionBarProps> = ({
