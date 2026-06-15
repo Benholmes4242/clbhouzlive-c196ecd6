@@ -180,6 +180,7 @@ export const CardFeed: React.FC<CardFeedProps> = ({
   const setCarouselPosition = useClubhouseStore((s) => s.setCarouselPosition);
   const carouselPositions = useClubhouseStore((s) => s.carouselPositions);
   const openFullscreen = useFullscreenFeedStore((s) => s.open);
+  const fsOpen = useFullscreenFeedStore((s) => s.isOpen);
 
   // Sync the active card to the global store so other consumers (top-bar
   // carousel chip, fullscreen handoff, etc.) stay in step.
@@ -249,8 +250,8 @@ export const CardFeed: React.FC<CardFeedProps> = ({
     (index: number, post: FeedPost) => {
       const likeState = getLikeState(post);
       const initialSlide = carouselPositions.get(index) ?? 0;
-      const isActive = index === playingIdx; // PLAYS — settle-gated
-      const isNear = Math.abs(index - activeIdx) <= VIDEO_NEIGHBOUR_RADIUS; // mounts + paints frame — instant
+      const isActive = !fsOpen && index === playingIdx; // PLAYS — settle-gated; yields while fullscreen open
+      const isNear = !fsOpen && Math.abs(index - activeIdx) <= VIDEO_NEIGHBOUR_RADIUS; // mounts + paints frame — instant
       const mountVideo = isNear;
       return (
         <div
@@ -293,6 +294,7 @@ export const CardFeed: React.FC<CardFeedProps> = ({
       activeIdx,
       playingIdx,        // isActive keys off playingIdx; without this the
                          // settle-promoted play index never reaches the tiles
+      fsOpen,            // recompute isActive/isNear when fullscreen opens/closes
       carouselPositions,
       getCarouselChangeHandler,
       getCommentCount,
