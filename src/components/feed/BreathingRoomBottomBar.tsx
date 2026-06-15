@@ -73,6 +73,8 @@ export const BreathingRoomBottomBar: React.FC<BreathingRoomBottomBarProps> = ({
   isVisible,
   postId,
   bottomOffset,
+  bottomCalc,
+  rightInset,
   captionExpanded: captionExpandedProp,
   onCaptionExpandedChange,
   author,
@@ -80,6 +82,7 @@ export const BreathingRoomBottomBar: React.FC<BreathingRoomBottomBarProps> = ({
   isReview = false,
   golfCourse,
   onCourseTap,
+  followBadge,
 }) => {
   const [captionExpandedLocal, setCaptionExpandedLocal] = useState(false);
   const captionExpanded = captionExpandedProp ?? captionExpandedLocal;
@@ -102,6 +105,12 @@ export const BreathingRoomBottomBar: React.FC<BreathingRoomBottomBarProps> = ({
   const hasContent = !!golfCourse || !!author || !!caption;
   if (!hasContent) return null;
 
+  const computedBottom = bottomCalc
+    ? bottomCalc(20)
+    : bottomOffset !== undefined
+      ? `${bottomOffset + 20}px`
+      : 'calc(var(--bottom-nav-height, 88px) + 20px)';
+
   return (
     <motion.div
       initial={false}
@@ -109,13 +118,9 @@ export const BreathingRoomBottomBar: React.FC<BreathingRoomBottomBarProps> = ({
       transition={{ duration: 0.18, ease: 'easeOut' }}
       style={{
         position: 'fixed',
-        bottom:
-          bottomOffset !== undefined
-            ? `${bottomOffset + 20}px`
-            : 'calc(var(--bottom-nav-height, 88px) + 20px)',
+        bottom: computedBottom,
         left: 12,
-        // Reserve space for the right-side action rail (rail width ~52px + gap)
-        right: 78,
+        right: rightInset ?? 78,
         zIndex: Z.echo,
         pointerEvents: 'none',
         fontFamily: 'Geist, system-ui, sans-serif',
