@@ -31,6 +31,7 @@ interface PooledHLSInstance {
   preloadedByVideo: HTMLVideoElement | null;
   isPromoted: boolean;
   timeoutId?: NodeJS.Timeout;
+  surface: 'feed' | 'fullscreen';
 }
 
 // Pool configuration
