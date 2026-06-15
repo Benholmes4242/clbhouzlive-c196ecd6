@@ -21,6 +21,8 @@ import { useActivePostDerived } from '@/components/clubhouse/hooks/useActivePost
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useActiveActor } from '@/context/ActiveActorContext';
 import { getActorRouteByType } from '@/types/actor';
+import FullscreenDebugPanel from '@/components/FullscreenDebugPanel';
+import { fsTimeStart, fsEvent } from '@/media/mobileVideoDebug';
 
 export function FullscreenFeedOverlay() {
   const navigate = useNavigate();
