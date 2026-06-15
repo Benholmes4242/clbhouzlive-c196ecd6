@@ -17,6 +17,7 @@ export const adminTheme = {
   dangerText: '#B91C1C',
   warnSoft:   '#FEF3C7',
   warnText:   '#B45309',
+  neutralSoft:'#F1F5F9',
   radius:     { sm: 8, md: 10, lg: 12, xl: 16 },
   shadowCard: '0 1px 3px rgba(15,23,42,0.06), 0 1px 2px rgba(15,23,42,0.04)',
   shadowPop:  '0 8px 24px rgba(15,23,42,0.10)',
