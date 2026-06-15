@@ -205,7 +205,7 @@ export function FullscreenFeedOverlay() {
                 />
               </>
             )}
-            <FullscreenDebugPanel />
+            {/* <FullscreenDebugPanel /> — hidden; re-enable here when debugging needed */}
           </motion.div>
         )}
       </AnimatePresence>
