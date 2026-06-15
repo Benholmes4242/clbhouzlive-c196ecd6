@@ -50,6 +50,7 @@ interface FeedOverlayLayerProps {
   topActionBar?: boolean;
   /** Close handler — when topActionBar is true, rendered as a left-most back chevron chip. */
   onClose?: () => void;
+}
 
 export const FeedOverlayLayer = memo(function FeedOverlayLayer({
   posts,
@@ -70,6 +71,8 @@ export const FeedOverlayLayer = memo(function FeedOverlayLayer({
   activeIndexOverride,
   bottomOffset,
   readOnly = false,
+  topActionBar = false,
+  onClose,
 }: FeedOverlayLayerProps) {
   const navigate = useNavigate();
   const clubhouseActiveIndex = useClubhouseStore((s) => s.activeIndex);
