@@ -19,6 +19,8 @@
 
 import React, { useEffect, useRef, useState } from 'react';
 import { motion } from 'framer-motion';
+import { Plus, Check } from 'lucide-react';
+
 
 import { Z } from '@/config/zIndex';
 import PostContentWithTags from '@/components/posts/PostContentWithTags';
