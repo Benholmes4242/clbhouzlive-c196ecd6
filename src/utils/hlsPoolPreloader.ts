@@ -30,7 +30,7 @@ export async function registerInPool(hlsUrl: string): Promise<void> {
 
   poolPreloadInFlight.add(hlsUrl);
   let preloadVideo: HTMLVideoElement | null = null;
-  let hls: InstanceType<Awaited<ReturnType<typeof loadHlsJs>>> | null = null;
+  let hls: any | null = null;
 
   try {
     const Hls = await loadHlsJs();
