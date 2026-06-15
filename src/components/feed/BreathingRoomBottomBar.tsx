@@ -19,9 +19,6 @@
 
 import React, { useEffect, useRef, useState } from 'react';
 import { motion } from 'framer-motion';
-import { Plus, Check } from 'lucide-react';
-
-
 import { Z } from '@/config/zIndex';
 import PostContentWithTags from '@/components/posts/PostContentWithTags';
 import type { FeedPostTag } from '@/components/media-system/types/media';
@@ -60,13 +57,6 @@ interface BreathingRoomBottomBarProps {
   /** Course tagged on the post. Renders the "posted at" pill above author. */
   golfCourse?: { id: string; name: string } | null;
   onCourseTap?: () => void;
-  /** When provided, render an amber follow "+" badge on the author avatar
-   *  (fullscreen overlay only). */
-  followBadge?: {
-    isFollowing: boolean;
-    isOwnPost: boolean;
-    onFollow: () => void;
-  };
 }
 
 export const BreathingRoomBottomBar: React.FC<BreathingRoomBottomBarProps> = ({
@@ -84,7 +74,6 @@ export const BreathingRoomBottomBar: React.FC<BreathingRoomBottomBarProps> = ({
   isReview = false,
   golfCourse,
   onCourseTap,
-  followBadge,
 }) => {
   const [captionExpandedLocal, setCaptionExpandedLocal] = useState(false);
   const captionExpanded = captionExpandedProp ?? captionExpandedLocal;
@@ -216,43 +205,12 @@ export const BreathingRoomBottomBar: React.FC<BreathingRoomBottomBarProps> = ({
           >
             <div style={{ position: 'relative', flexShrink: 0 }}>
               <SquircleAvatar
-                size={followBadge ? 40 : 32}
+                size={40}
                 src={author.avatarUrl}
                 alt={author.displayName}
                 fallback={author.displayName?.[0] ?? '?'}
                 hideRing
               />
-              {followBadge && !followBadge.isOwnPost && (
-                <span
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    if (!followBadge.isFollowing) followBadge.onFollow();
-                  }}
-                  role="button"
-                  aria-label={followBadge.isFollowing ? 'Following' : 'Follow'}
-                  style={{
-                    position: 'absolute',
-                    bottom: -4,
-                    left: '50%',
-                    transform: 'translateX(-50%)',
-                    width: 18,
-                    height: 18,
-                    borderRadius: '50%',
-                    background: '#F7931E',
-                    border: '1.5px solid #000',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    cursor: followBadge.isFollowing ? 'default' : 'pointer',
-                  }}
-                >
-                  {followBadge.isFollowing ? (
-                    <Check size={11} strokeWidth={3} color="#fff" />
-                  ) : (
-                    <Plus size={11} strokeWidth={3} color="#fff" />
-                  )}
-                </span>
-              )}
             </div>
             <div style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', gap: 1 }}>
               <div style={{ display: 'flex', alignItems: 'baseline', gap: 6, minWidth: 0 }}>
