@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { useClubhouseStore } from '@/store/clubhouseStore';
 import { BreathingRoomBottomBar } from './BreathingRoomBottomBar';
 import { FeedActionRail } from './FeedActionRail';
+import { FeedTopActionBar } from './FeedTopActionBar';
 import { Z } from '@/config/zIndex';
 import { ReviewOverlaySlot } from './ReviewOverlaySlot';
 import { VideoScrubber } from '@/components/video/VideoScrubber';
@@ -43,6 +44,12 @@ interface FeedOverlayLayerProps {
   bottomOffset?: number;
   /** Read-only mode: hides interactive controls on the action rail (only creator avatar shown). */
   readOnly?: boolean;
+  /** When true, render a TOP action bar (fullscreen overlay) instead of the right vertical rail,
+   *  move the creator avatar/follow into the bottom-left chip, lift content above a safe area,
+   *  and use white "Read review" affordance. */
+  topActionBar?: boolean;
+  /** Close handler — when topActionBar is true, rendered as a left-most back chevron chip. */
+  onClose?: () => void;
 }
 
 export const FeedOverlayLayer = memo(function FeedOverlayLayer({
@@ -64,6 +71,8 @@ export const FeedOverlayLayer = memo(function FeedOverlayLayer({
   activeIndexOverride,
   bottomOffset,
   readOnly = false,
+  topActionBar = false,
+  onClose,
 }: FeedOverlayLayerProps) {
   const navigate = useNavigate();
   const clubhouseActiveIndex = useClubhouseStore((s) => s.activeIndex);
@@ -133,6 +142,21 @@ export const FeedOverlayLayer = memo(function FeedOverlayLayer({
     navigate(`/courses/${golfCourse.id}`);
   };
 
+  // When the fullscreen TOP action bar is rendering, we:
+  //  - reserve no right-side gutter for the vertical rail (right: 16 instead of 80)
+  //  - lift every bottom-anchored element above the device safe-inset
+  //  - skip the duplicate bottom-right floating mute (mute lives in the top bar)
+  const bottomCalc = (extra: number): string => {
+    const base = bottomOffset ?? 0;
+    if (topActionBar) {
+      return `calc(max(env(safe-area-inset-bottom, 0px), 24px) + ${base + extra}px)`;
+    }
+    if (bottomOffset !== undefined) return `${bottomOffset + extra}px`;
+    return `calc(var(--bottom-nav-height, 88px) + ${extra}px)`;
+  };
+
+  const reviewRightInset = topActionBar ? 16 : 80;
+
   return (
     <div
       className="fixed inset-0"
@@ -159,38 +183,50 @@ export const FeedOverlayLayer = memo(function FeedOverlayLayer({
         }}
       >
         {/* Chrome foot — feathers the scrim base into the opaque #0A0E14 nav so the
-            nav/scrim seam disappears. Height tracks the real nav via the existing
-            --bottom-nav-height var (fallback 88px) plus a short feather above it. */}
-        <div
-          aria-hidden
-          style={{
-            position: 'absolute',
-            left: 0,
-            right: 0,
-            bottom: 0,
-            height: 'calc(var(--bottom-nav-height, 88px) + 36px)',
-            background:
-              'linear-gradient(to top, #0A0E14 0%, #0A0E14 60%, rgba(10,14,20,0) 100%)',
-            pointerEvents: 'none',
-          }}
-        />
+            nav/scrim seam disappears. Skipped in fullscreen (no nav). */}
+        {!topActionBar && (
+          <div
+            aria-hidden
+            style={{
+              position: 'absolute',
+              left: 0,
+              right: 0,
+              bottom: 0,
+              height: 'calc(var(--bottom-nav-height, 88px) + 36px)',
+              background:
+                'linear-gradient(to top, #0A0E14 0%, #0A0E14 60%, rgba(10,14,20,0) 100%)',
+              pointerEvents: 'none',
+            }}
+          />
+        )}
       </div>
 
-      {/* Mute toggle now lives inside FeedActionRail (top of rail) */}
+      {/* TOP action bar — fullscreen only */}
+      {topActionBar && (
+        <FeedTopActionBar
+          onClose={onClose}
+          isVideo={isVideo}
+          isMuted={isMuted}
+          onToggleMute={handleToggleMute}
+          hasLiked={likeState.isLiked}
+          likesCount={likeState.count}
+          commentsCount={commentCount}
+          onLike={() => onLike(activePost)}
+          onComment={onComment}
+          onShare={() => onShare(activePost)}
+          onMore={onMore}
+          isVisible={overlayVisible}
+        />
+      )}
 
-      {/* Inline Review Card — renders in the bottom slot for review posts.
-          Subcomponent isolates the useReviewerStats hook so it never fires
-          on non-review posts. */}
+      {/* Inline Review Card — renders in the bottom slot for review posts. */}
       {activePost.isReview && activePost.review && (
         <div
           style={{
             position: 'fixed',
             left: 16,
-            right: 80, // leave room for action rail
-            bottom:
-              bottomOffset !== undefined
-                ? `${bottomOffset + 20}px`
-                : 'calc(var(--bottom-nav-height, 88px) + 20px)',
+            right: reviewRightInset,
+            bottom: bottomCalc(20),
             zIndex: Z.echo,
             pointerEvents: overlayVisible ? 'auto' : 'none',
           }}
@@ -199,18 +235,29 @@ export const FeedOverlayLayer = memo(function FeedOverlayLayer({
             activePost={activePost}
             onReviewTap={() => onReviewTap?.()}
             isVisible={overlayVisible}
+            whiteReadReview={topActionBar}
+            followBadge={
+              topActionBar
+                ? {
+                    isFollowing: isFollowed,
+                    isOwnPost,
+                    onFollow: () => onFollow(activePost),
+                  }
+                : undefined
+            }
           />
         </div>
       )}
 
-      {/* Bottom-left content slot (regular posts) — author + caption + course pill.
-          Hidden for review posts via isReview. */}
+      {/* Bottom-left content slot (regular posts) */}
       <BreathingRoomBottomBar
         caption={activePost.isReview ? '' : activePost.caption ?? ''}
         tags={activePost.isReview ? [] : tags}
         isVisible={overlayVisible}
         postId={activePost.id}
         bottomOffset={bottomOffset}
+        bottomCalc={topActionBar ? bottomCalc : undefined}
+        rightInset={topActionBar ? 16 : undefined}
         captionExpanded={captionExpanded}
         onCaptionExpandedChange={setCaptionExpanded}
         author={activePost.isReview ? null : author}
@@ -218,29 +265,40 @@ export const FeedOverlayLayer = memo(function FeedOverlayLayer({
         isReview={activePost.isReview}
         golfCourse={activePost.isReview ? null : golfCourse ?? null}
         onCourseTap={golfCourse ? handleCourseTap : undefined}
+        followBadge={
+          topActionBar && !activePost.isReview
+            ? {
+                isFollowing: isFollowed,
+                isOwnPost,
+                onFollow: () => onFollow(activePost),
+              }
+            : undefined
+        }
       />
 
-      {/* Right-side vertical action rail */}
-      <FeedActionRail
-        creator={creator}
-        isFollowing={isFollowed}
-        isOwnPost={isOwnPost}
-        onCreatorTap={onViewProfile}
-        onFollow={() => onFollow(activePost)}
-        hasLiked={likeState.isLiked}
-        likesCount={likeState.count}
-        commentsCount={commentCount}
-        onLike={() => onLike(activePost)}
-        onComment={onComment}
-        onShare={() => onShare(activePost)}
-        onMore={onMore}
-        isVisible={overlayVisible}
-        bottomOffset={bottomOffset}
-        readOnly={readOnly}
-        isVideo={isVideo}
-        isMuted={isMuted}
-        onToggleMute={handleToggleMute}
-      />
+      {/* Right-side vertical action rail — hidden in fullscreen top-bar mode */}
+      {!topActionBar && (
+        <FeedActionRail
+          creator={creator}
+          isFollowing={isFollowed}
+          isOwnPost={isOwnPost}
+          onCreatorTap={onViewProfile}
+          onFollow={() => onFollow(activePost)}
+          hasLiked={likeState.isLiked}
+          likesCount={likeState.count}
+          commentsCount={commentCount}
+          onLike={() => onLike(activePost)}
+          onComment={onComment}
+          onShare={() => onShare(activePost)}
+          onMore={onMore}
+          isVisible={overlayVisible}
+          bottomOffset={bottomOffset}
+          readOnly={readOnly}
+          isVideo={isVideo}
+          isMuted={isMuted}
+          onToggleMute={handleToggleMute}
+        />
+      )}
 
       {/* Video scrubber — sits between bottom content and action rail on video posts */}
       {isVideo && activeVideoElement && overlayVisible && (
@@ -249,10 +307,7 @@ export const FeedOverlayLayer = memo(function FeedOverlayLayer({
             position: 'fixed',
             left: 0,
             right: 0,
-            bottom:
-              bottomOffset !== undefined
-                ? `${bottomOffset}px`
-                : 'var(--bottom-nav-height, 88px)',
+            bottom: bottomCalc(0),
             height: 2,
             pointerEvents: 'auto',
             zIndex: Z.echo + 1,
@@ -262,8 +317,8 @@ export const FeedOverlayLayer = memo(function FeedOverlayLayer({
         </div>
       )}
 
-      {/* Bottom-right floating mute toggle — visible only for video posts */}
-      {isVideo && bottomOffset === undefined && (
+      {/* Bottom-right floating mute — Clubhouse only (fullscreen mute lives in top bar) */}
+      {isVideo && bottomOffset === undefined && !topActionBar && (
         <button
           type="button"
           onClick={(e) => {
@@ -274,10 +329,7 @@ export const FeedOverlayLayer = memo(function FeedOverlayLayer({
           style={{
             position: 'fixed',
             right: 16,
-            bottom:
-              bottomOffset !== undefined
-                ? `${bottomOffset + 48}px`
-                : 'calc(var(--bottom-nav-height, 88px) + 48px)',
+            bottom: 'calc(var(--bottom-nav-height, 88px) + 48px)',
             zIndex: Z.echo,
             width: 40,
             height: 40,

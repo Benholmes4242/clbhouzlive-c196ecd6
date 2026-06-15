@@ -19,6 +19,8 @@
 
 import React, { useEffect, useRef, useState } from 'react';
 import { motion } from 'framer-motion';
+import { Plus, Check } from 'lucide-react';
+
 
 import { Z } from '@/config/zIndex';
 import PostContentWithTags from '@/components/posts/PostContentWithTags';
@@ -34,6 +36,12 @@ interface BreathingRoomBottomBarProps {
   postId?: string;
   /** Base offset from screen bottom in px. Omit for Clubhouse (respects bottom nav); pass 0 for fullscreen overlay (no nav). */
   bottomOffset?: number;
+  /** When provided, this function computes the bottom CSS value (e.g. wrapped in
+   *  `calc(max(env(safe-area-inset-bottom,0px), 24px) + …)` for the fullscreen overlay).
+   *  Overrides bottomOffset for positioning. */
+  bottomCalc?: (extra: number) => string;
+  /** Right-edge inset in px. Defaults to 78 (reserves room for the vertical action rail). */
+  rightInset?: number;
   /** Controlled caption expansion state (lifted to parent for review panel coordination) */
   captionExpanded?: boolean;
   onCaptionExpandedChange?: (expanded: boolean) => void;
@@ -52,6 +60,13 @@ interface BreathingRoomBottomBarProps {
   /** Course tagged on the post. Renders the "posted at" pill above author. */
   golfCourse?: { id: string; name: string } | null;
   onCourseTap?: () => void;
+  /** When provided, render an amber follow "+" badge on the author avatar
+   *  (fullscreen overlay only). */
+  followBadge?: {
+    isFollowing: boolean;
+    isOwnPost: boolean;
+    onFollow: () => void;
+  };
 }
 
 export const BreathingRoomBottomBar: React.FC<BreathingRoomBottomBarProps> = ({
@@ -60,6 +75,8 @@ export const BreathingRoomBottomBar: React.FC<BreathingRoomBottomBarProps> = ({
   isVisible,
   postId,
   bottomOffset,
+  bottomCalc,
+  rightInset,
   captionExpanded: captionExpandedProp,
   onCaptionExpandedChange,
   author,
@@ -67,6 +84,7 @@ export const BreathingRoomBottomBar: React.FC<BreathingRoomBottomBarProps> = ({
   isReview = false,
   golfCourse,
   onCourseTap,
+  followBadge,
 }) => {
   const [captionExpandedLocal, setCaptionExpandedLocal] = useState(false);
   const captionExpanded = captionExpandedProp ?? captionExpandedLocal;
@@ -89,6 +107,12 @@ export const BreathingRoomBottomBar: React.FC<BreathingRoomBottomBarProps> = ({
   const hasContent = !!golfCourse || !!author || !!caption;
   if (!hasContent) return null;
 
+  const computedBottom = bottomCalc
+    ? bottomCalc(20)
+    : bottomOffset !== undefined
+      ? `${bottomOffset + 20}px`
+      : 'calc(var(--bottom-nav-height, 88px) + 20px)';
+
   return (
     <motion.div
       initial={false}
@@ -96,13 +120,9 @@ export const BreathingRoomBottomBar: React.FC<BreathingRoomBottomBarProps> = ({
       transition={{ duration: 0.18, ease: 'easeOut' }}
       style={{
         position: 'fixed',
-        bottom:
-          bottomOffset !== undefined
-            ? `${bottomOffset + 20}px`
-            : 'calc(var(--bottom-nav-height, 88px) + 20px)',
+        bottom: computedBottom,
         left: 12,
-        // Reserve space for the right-side action rail (rail width ~52px + gap)
-        right: 78,
+        right: rightInset ?? 78,
         zIndex: Z.echo,
         pointerEvents: 'none',
         fontFamily: 'Geist, system-ui, sans-serif',
@@ -182,13 +202,46 @@ export const BreathingRoomBottomBar: React.FC<BreathingRoomBottomBarProps> = ({
               width: '100%',
             }}
           >
-            <SquircleAvatar
-              size={32}
-              src={author.avatarUrl}
-              alt={author.displayName}
-              fallback={author.displayName?.[0] ?? '?'}
-              hideRing
-            />
+            <div style={{ position: 'relative', flexShrink: 0 }}>
+              <SquircleAvatar
+                size={followBadge ? 40 : 32}
+                src={author.avatarUrl}
+                alt={author.displayName}
+                fallback={author.displayName?.[0] ?? '?'}
+                hideRing
+              />
+              {followBadge && !followBadge.isOwnPost && (
+                <span
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    if (!followBadge.isFollowing) followBadge.onFollow();
+                  }}
+                  role="button"
+                  aria-label={followBadge.isFollowing ? 'Following' : 'Follow'}
+                  style={{
+                    position: 'absolute',
+                    bottom: -4,
+                    left: '50%',
+                    transform: 'translateX(-50%)',
+                    width: 18,
+                    height: 18,
+                    borderRadius: '50%',
+                    background: '#F7931E',
+                    border: '1.5px solid #000',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    cursor: followBadge.isFollowing ? 'default' : 'pointer',
+                  }}
+                >
+                  {followBadge.isFollowing ? (
+                    <Check size={11} strokeWidth={3} color="#fff" />
+                  ) : (
+                    <Plus size={11} strokeWidth={3} color="#fff" />
+                  )}
+                </span>
+              )}
+            </div>
             <div style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', gap: 1 }}>
               <div style={{ display: 'flex', alignItems: 'baseline', gap: 6, minWidth: 0 }}>
                 <span

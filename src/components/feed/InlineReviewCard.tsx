@@ -8,7 +8,7 @@
 
 import React, { useMemo } from 'react';
 import { motion } from 'framer-motion';
-import { ChevronRight } from 'lucide-react';
+import { ChevronRight, Plus, Check } from 'lucide-react';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { formatFrostRating, splitCourseName } from '@/lib/frostPanel';
 
@@ -42,6 +42,14 @@ export interface InlineReviewCardProps {
   } | null;
   courseSubtitle?: string | null;
   reviewDate?: string | Date | null;
+  /** When true, the "Read review" label + chevron render in white (fullscreen). */
+  whiteReadReview?: boolean;
+  /** When provided, render an amber follow "+" badge on the reviewer avatar. */
+  followBadge?: {
+    isFollowing: boolean;
+    isOwnPost: boolean;
+    onFollow: () => void;
+  };
 }
 
 export const InlineReviewCard: React.FC<InlineReviewCardProps> = ({
@@ -56,6 +64,8 @@ export const InlineReviewCard: React.FC<InlineReviewCardProps> = ({
   onTap,
   reviewerStats,
   courseSubtitle,
+  whiteReadReview = false,
+  followBadge,
 }) => {
   const initials = useMemo(
     () =>
@@ -149,13 +159,48 @@ export const InlineReviewCard: React.FC<InlineReviewCardProps> = ({
           marginBottom: 8,
         }}
       >
-        <SquircleAvatar
-          size={28}
-          src={reviewer.avatar || undefined}
-          alt={reviewer.name}
-          fallback={initials}
-          hideRing
-        />
+        <div style={{ position: 'relative', flexShrink: 0 }}>
+          <SquircleAvatar
+            size={28}
+            src={reviewer.avatar || undefined}
+            alt={reviewer.name}
+            fallback={initials}
+            hideRing
+          />
+          {followBadge && !followBadge.isOwnPost && (
+            <button
+              type="button"
+              onClick={(e) => {
+                e.stopPropagation();
+                if (!followBadge.isFollowing) followBadge.onFollow();
+              }}
+              aria-label={followBadge.isFollowing ? 'Following' : 'Follow'}
+              aria-pressed={followBadge.isFollowing}
+              style={{
+                position: 'absolute',
+                bottom: -4,
+                left: '50%',
+                transform: 'translateX(-50%)',
+                width: 16,
+                height: 16,
+                borderRadius: '50%',
+                background: '#F7931E',
+                border: '1.5px solid #000',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                padding: 0,
+                cursor: followBadge.isFollowing ? 'default' : 'pointer',
+              }}
+            >
+              {followBadge.isFollowing ? (
+                <Check size={10} strokeWidth={3} color="#fff" />
+              ) : (
+                <Plus size={10} strokeWidth={3} color="#fff" />
+              )}
+            </button>
+          )}
+        </div>
         <span
           style={{
             fontSize: 14,
@@ -215,14 +260,18 @@ export const InlineReviewCard: React.FC<InlineReviewCardProps> = ({
             <span style={{ opacity: 0.5 }}>·</span>
             <span
               style={{
-                color: '#F7931E',
+                color: whiteReadReview ? '#fff' : '#F7931E',
                 fontWeight: 600,
                 display: 'inline-flex',
                 alignItems: 'center',
                 gap: 2,
               }}
             >
-              Read review <ChevronRight size={13} color="#F7931E" />
+              Read review{' '}
+              <ChevronRight
+                size={13}
+                color={whiteReadReview ? '#fff' : '#F7931E'}
+              />
             </span>
           </span>
           {courseRating != null && (

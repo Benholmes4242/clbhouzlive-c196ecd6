@@ -7,6 +7,15 @@ interface ReviewOverlaySlotProps {
   activePost: FeedPost;
   onReviewTap: () => void;
   isVisible: boolean;
+  /** When true, render the "Read review" affordance in white instead of amber. */
+  whiteReadReview?: boolean;
+  /** When provided, render an amber follow "+" badge on the reviewer avatar
+   *  (fullscreen overlay only — Clubhouse omits this). */
+  followBadge?: {
+    isFollowing: boolean;
+    isOwnPost: boolean;
+    onFollow: () => void;
+  };
 }
 
 /**
@@ -18,6 +27,8 @@ export const ReviewOverlaySlot: React.FC<ReviewOverlaySlotProps> = ({
   activePost,
   onReviewTap,
   isVisible,
+  whiteReadReview,
+  followBadge,
 }) => {
   const { data: reviewerStats } = useReviewerStats(activePost.userId);
 
@@ -43,6 +54,8 @@ export const ReviewOverlaySlot: React.FC<ReviewOverlaySlotProps> = ({
       breakdown={review.breakdown ?? null}
       reviewerStats={reviewerStats ?? null}
       reviewDate={activePost.createdAt}
+      whiteReadReview={whiteReadReview}
+      followBadge={followBadge}
     />
   );
 };

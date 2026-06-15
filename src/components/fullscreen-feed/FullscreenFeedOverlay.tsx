@@ -1,6 +1,6 @@
 import React, { useEffect, useCallback } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
-import { X } from 'lucide-react';
+
 import { useNavigate } from 'react-router-dom';
 import { useFullscreenFeedStore } from '@/store/fullscreenFeedStore';
 import { useClubhouseStore } from '@/store/clubhouseStore';
@@ -142,23 +142,8 @@ export function FullscreenFeedOverlay() {
             transition={{ duration: 0.18 }}
             className="fixed inset-0 z-[200] bg-black flex flex-col"
           >
-            <button
-              onClick={close}
-              aria-label="Close"
-              className="absolute left-4 z-[9030] flex items-center justify-center active:scale-95 transition-all"
-              style={{
-                top: "calc(max(env(safe-area-inset-top, 0px), 47px) + 12px)",
-                width: 44,
-                height: 44,
-                borderRadius: 14,
-                background: 'rgba(0, 0, 0, 0.50)',
-                backdropFilter: 'blur(14px)',
-                WebkitBackdropFilter: 'blur(14px)',
-                border: '1px solid rgba(255, 255, 255, 0.10)',
-              }}
-            >
-              <X className="h-[22px] w-[22px] text-white" strokeWidth={2.5} />
-            </button>
+            {/* Close button is now part of the FeedOverlayLayer top action bar (left chevron). */}
+
 
             {posts.length === 0 ? (
               <ClubhouseSkeletonShimmer isVisible={true} isStatic={false} />
@@ -203,6 +188,8 @@ export function FullscreenFeedOverlay() {
                   activeReview={activeReview}
                   isActiveReview={isActiveReview}
                   bottomOffset={0}
+                  topActionBar
+                  onClose={close}
                 />
 
                 <FullscreenCarouselOverlay
