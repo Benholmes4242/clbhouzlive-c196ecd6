@@ -164,7 +164,7 @@ export function SnapFeed({
           const hlsUrl = nextPost?.mediaItems?.[0]?.hlsUrl;
           if (hlsUrl) {
             preloadHlsManifest(hlsUrl)
-              .then(() => registerInPool(hlsUrl))
+              .then(() => registerInPool(hlsUrl, surface))
               .catch(() => {});
           }
           
