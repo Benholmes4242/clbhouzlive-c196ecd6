@@ -4,10 +4,10 @@ import { adminTheme as t } from '../theme';
 type Tone = 'ok' | 'warn' | 'danger' | 'neutral';
 
 const TONE: Record<Tone, { bg: string; fg: string }> = {
-  ok:      { bg: '#DCFCE7', fg: '#15803D' },
-  warn:    { bg: '#FEF3C7', fg: '#B45309' },
-  danger:  { bg: '#FEE2E2', fg: '#B91C1C' },
-  neutral: { bg: '#F1F5F9', fg: t.inkMuted },
+  ok:      { bg: t.okSoft,     fg: t.okText },
+  warn:    { bg: t.warnSoft,   fg: t.warnText },
+  danger:  { bg: t.dangerSoft, fg: t.dangerText },
+  neutral: { bg: '#F1F5F9',    fg: t.inkMuted },
 };
 
 export default function StatusPill({
