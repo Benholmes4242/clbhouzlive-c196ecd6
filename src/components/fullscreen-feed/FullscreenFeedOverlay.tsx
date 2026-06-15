@@ -188,6 +188,8 @@ export function FullscreenFeedOverlay() {
                   activeReview={activeReview}
                   isActiveReview={isActiveReview}
                   bottomOffset={0}
+                  topActionBar
+                  onClose={close}
                 />
 
                 <FullscreenCarouselOverlay
