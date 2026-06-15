@@ -198,7 +198,7 @@ export const FeedTopActionBar: React.FC<FeedTopActionBarProps> = ({
               onComment();
             }}
             aria-label="Comments"
-            style={chipBase}
+            style={commentStr ? chipWithCount : chipBase}
           >
             <MessageCircle size={20} stroke="#fff" strokeWidth={2} />
             {commentStr && (
