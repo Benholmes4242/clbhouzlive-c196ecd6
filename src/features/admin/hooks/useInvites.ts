@@ -61,14 +61,14 @@ async function fetchInvites(): Promise<InviteRow[]> {
 export function useInvites() {
   const qc = useQueryClient();
   const { data = [], isLoading, refetch } = useQuery({
-    queryKey: ['admin-v3', 'invites'],
+    queryKey: ['admin-v2', 'invites'],
     queryFn: fetchInvites,
     staleTime: 60_000,
   });
 
   const invalidate = () => {
-    qc.invalidateQueries({ queryKey: ['admin-v3', 'invites'] });
-    qc.invalidateQueries({ queryKey: ['admin-v3', 'dashboard', 'queue'] });
+    qc.invalidateQueries({ queryKey: ['admin-v2', 'invites'] });
+    qc.invalidateQueries({ queryKey: ['admin-v2', 'dashboard', 'queue'] });
   };
 
   const create = useMutation({

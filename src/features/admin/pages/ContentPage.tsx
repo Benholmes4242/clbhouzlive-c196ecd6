@@ -70,8 +70,8 @@ function CoursesTab() {
 
   useEffect(() => {
     const h = () => c.refetch();
-    window.addEventListener('admin-v3:refetch', h);
-    return () => window.removeEventListener('admin-v3:refetch', h);
+    window.addEventListener('admin-v2:refetch', h);
+    return () => window.removeEventListener('admin-v2:refetch', h);
   }, [c]);
 
   const [drawerId, setDrawerId] = useState<string | null>(null);
@@ -253,7 +253,7 @@ function CourseDetail({
   deleting: boolean;
 }) {
   const { data: course } = useQuery({
-    queryKey: ['admin-v3', 'courses', 'detail', courseId],
+    queryKey: ['admin-v2', 'courses', 'detail', courseId],
     queryFn: async () => {
       if (!courseId) return null;
       const { data } = await supabase
@@ -316,7 +316,7 @@ function CourseDetail({
       description: form.description || null,
     };
     await update(courseId, updates);
-    qc.invalidateQueries({ queryKey: ['admin-v3', 'courses', 'detail', courseId] });
+    qc.invalidateQueries({ queryKey: ['admin-v2', 'courses', 'detail', courseId] });
   };
 
   return (
@@ -711,7 +711,7 @@ function TourDataTab() {
   const PAGE_SIZE = 50;
 
   const { data = [], isLoading, refetch } = useQuery({
-    queryKey: ['admin-v3', 'tour', 'rankings'],
+    queryKey: ['admin-v2', 'tour', 'rankings'],
     queryFn: async () => {
       const { data, error } = await supabase
         .from('tour_season_rankings')
@@ -726,8 +726,8 @@ function TourDataTab() {
 
   useEffect(() => {
     const h = () => refetch();
-    window.addEventListener('admin-v3:refetch', h);
-    return () => window.removeEventListener('admin-v3:refetch', h);
+    window.addEventListener('admin-v2:refetch', h);
+    return () => window.removeEventListener('admin-v2:refetch', h);
   }, [refetch]);
 
   const tours = useMemo(() => {
@@ -889,7 +889,7 @@ function TourPlayersTab() {
   const PAGE_SIZE = 25;
 
   const { data = [], isLoading, refetch } = useQuery({
-    queryKey: ['admin-v3', 'tour', 'players'],
+    queryKey: ['admin-v2', 'tour', 'players'],
     queryFn: async (): Promise<PlayerRow[]> => {
       const batch = 1000;
       let offset = 0; let all: any[] = []; let more = true;
@@ -916,8 +916,8 @@ function TourPlayersTab() {
 
   useEffect(() => {
     const h = () => refetch();
-    window.addEventListener('admin-v3:refetch', h);
-    return () => window.removeEventListener('admin-v3:refetch', h);
+    window.addEventListener('admin-v2:refetch', h);
+    return () => window.removeEventListener('admin-v2:refetch', h);
   }, [refetch]);
 
   const ALL_TOURS = ['pga', 'eur', 'lpga', 'pgad', 'liv', 'champions-tour'];
@@ -944,7 +944,7 @@ function TourPlayersTab() {
       }
     }
     setSyncing(false); setSyncLabel('');
-    queryClient.invalidateQueries({ queryKey: ['admin-v3', 'tour', 'players'] });
+    queryClient.invalidateQueries({ queryKey: ['admin-v2', 'tour', 'players'] });
     const failed = results.filter(r => !r.ok);
     if (failed.length === 0) toast.success('All tours synced');
     else toast.error(`Failed: ${failed.map(r => r.tour).join(', ')}`);
@@ -1173,7 +1173,7 @@ function PhotoSheet({
   })();
 
   const invalidateAndBust = () => {
-    qc.invalidateQueries({ queryKey: ['admin-v3', 'tour', 'players'] });
+    qc.invalidateQueries({ queryKey: ['admin-v2', 'tour', 'players'] });
     onCacheBust();
   };
 

@@ -49,14 +49,14 @@ async function fetchTeam(): Promise<TeamMember[]> {
 export function useTeam() {
   const qc = useQueryClient();
   const { data = [], isLoading, refetch } = useQuery({
-    queryKey: ['admin-v3', 'team'],
+    queryKey: ['admin-v2', 'team'],
     queryFn: fetchTeam,
     staleTime: 2 * 60_000,
   });
 
   const invalidate = () => {
-    qc.invalidateQueries({ queryKey: ['admin-v3', 'team'] });
-    qc.invalidateQueries({ queryKey: ['admin-v3', 'dashboard', 'queue'] });
+    qc.invalidateQueries({ queryKey: ['admin-v2', 'team'] });
+    qc.invalidateQueries({ queryKey: ['admin-v2', 'dashboard', 'queue'] });
   };
 
   const grantFull = useMutation({

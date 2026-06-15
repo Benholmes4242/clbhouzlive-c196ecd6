@@ -115,7 +115,7 @@ function RefreshHeaderButton() {
   const [spinning, setSpinning] = useState(false);
   const onClick = () => {
     setSpinning(true);
-    window.dispatchEvent(new CustomEvent('admin-v3:refetch'));
+    window.dispatchEvent(new CustomEvent('admin-v2:refetch'));
     setTimeout(() => setSpinning(false), 600);
   };
   return (

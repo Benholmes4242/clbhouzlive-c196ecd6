@@ -61,8 +61,8 @@ export default function UsersPage() {
       verifs.refetch();
       invites.refetch();
     };
-    window.addEventListener('admin-v3:refetch', handler);
-    return () => window.removeEventListener('admin-v3:refetch', handler);
+    window.addEventListener('admin-v2:refetch', handler);
+    return () => window.removeEventListener('admin-v2:refetch', handler);
   }, [verifs, invites]);
 
   return (
@@ -93,8 +93,8 @@ function AllUsersTab() {
 
   useEffect(() => {
     const handler = () => refetch();
-    window.addEventListener('admin-v3:refetch', handler);
-    return () => window.removeEventListener('admin-v3:refetch', handler);
+    window.addEventListener('admin-v2:refetch', handler);
+    return () => window.removeEventListener('admin-v2:refetch', handler);
   }, [refetch]);
 
   const filters: { id: UserFilterStatus; label: string; count?: number }[] = [
@@ -622,8 +622,8 @@ function TeamTab() {
 
   useEffect(() => {
     const handler = () => team.refetch();
-    window.addEventListener('admin-v3:refetch', handler);
-    return () => window.removeEventListener('admin-v3:refetch', handler);
+    window.addEventListener('admin-v2:refetch', handler);
+    return () => window.removeEventListener('admin-v2:refetch', handler);
   }, [team]);
 
   if (team.isLoading) return <SkeletonCards />;
@@ -772,8 +772,8 @@ function InvitesTab() {
 
   useEffect(() => {
     const handler = () => invites.refetch();
-    window.addEventListener('admin-v3:refetch', handler);
-    return () => window.removeEventListener('admin-v3:refetch', handler);
+    window.addEventListener('admin-v2:refetch', handler);
+    return () => window.removeEventListener('admin-v2:refetch', handler);
   }, [invites]);
 
   return (

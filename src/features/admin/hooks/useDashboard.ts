@@ -240,12 +240,12 @@ async function fetchRecentAudit(): Promise<RecentAuditEntry[]> {
 export function useDashboard() {
   const results = useQueries({
     queries: [
-      { queryKey: ['admin-v3', 'dashboard', 'kpis'],   queryFn: fetchKpis,         staleTime: 60_000,  refetchInterval: 120_000 },
-      { queryKey: ['admin-v3', 'dashboard', 'queue'],  queryFn: fetchActionQueue,  staleTime: 30_000,  refetchInterval: 60_000  },
-      { queryKey: ['admin-v3', 'dashboard', 'trend'],  queryFn: () => fetchActivityTrend(14), staleTime: 5*60_000, refetchInterval: 10*60_000 },
-      { queryKey: ['admin-v3', 'dashboard', 'audit'],  queryFn: fetchRecentAudit,  staleTime: 30_000,  refetchInterval: 60_000  },
-      { queryKey: ['admin-v3', 'dashboard', 'glance'], queryFn: fetchTodayGlance,  staleTime: 2*60_000, refetchInterval: 5*60_000 },
-      { queryKey: ['admin-v3', 'dashboard', 'eg'],     queryFn: fetchEgSyncHealth, staleTime: 60_000,  refetchInterval: 120_000 },
+      { queryKey: ['admin-v2', 'dashboard', 'kpis'],   queryFn: fetchKpis,         staleTime: 60_000,  refetchInterval: 120_000 },
+      { queryKey: ['admin-v2', 'dashboard', 'queue'],  queryFn: fetchActionQueue,  staleTime: 30_000,  refetchInterval: 60_000  },
+      { queryKey: ['admin-v2', 'dashboard', 'trend'],  queryFn: () => fetchActivityTrend(14), staleTime: 5*60_000, refetchInterval: 10*60_000 },
+      { queryKey: ['admin-v2', 'dashboard', 'audit'],  queryFn: fetchRecentAudit,  staleTime: 30_000,  refetchInterval: 60_000  },
+      { queryKey: ['admin-v2', 'dashboard', 'glance'], queryFn: fetchTodayGlance,  staleTime: 2*60_000, refetchInterval: 5*60_000 },
+      { queryKey: ['admin-v2', 'dashboard', 'eg'],     queryFn: fetchEgSyncHealth, staleTime: 60_000,  refetchInterval: 120_000 },
     ],
   });
 
