@@ -168,7 +168,7 @@ export const BreathingRoomBottomBar: React.FC<BreathingRoomBottomBarProps> = ({
           >
             <span
               style={{
-                fontSize: 13,
+                fontSize: 16,
                 lineHeight: 1,
                 display: 'inline-flex',
                 alignItems: 'center',
@@ -180,7 +180,7 @@ export const BreathingRoomBottomBar: React.FC<BreathingRoomBottomBarProps> = ({
             </span>
             <span
               style={{
-                fontSize: 11,
+                fontSize: 14,
                 fontWeight: 700,
                 color: '#fff',
                 whiteSpace: 'nowrap',
