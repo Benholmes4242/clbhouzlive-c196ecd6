@@ -260,7 +260,7 @@ export const InlineReviewCard: React.FC<InlineReviewCardProps> = ({
             <span style={{ opacity: 0.5 }}>·</span>
             <span
               style={{
-                color: '#F7931E',
+                color: whiteReadReview ? '#fff' : '#F7931E',
                 fontWeight: 600,
                 display: 'inline-flex',
                 alignItems: 'center',
