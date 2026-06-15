@@ -8,7 +8,7 @@
 
 import React, { useMemo } from 'react';
 import { motion } from 'framer-motion';
-import { ChevronRight, Plus, Check } from 'lucide-react';
+import { ChevronRight } from 'lucide-react';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { formatFrostRating, splitCourseName } from '@/lib/frostPanel';
 
