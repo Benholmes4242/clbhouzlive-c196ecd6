@@ -139,6 +139,51 @@ export function logTileLife(
   addLogEntry('info', 'TILE', `[${idxStr} ${tag}] ${phase}${suffix}`);
 }
 
+// ============ Fullscreen Viewer Timing Traces ============
+//
+// Measures the user-visible latencies in the fullscreen viewer:
+//   - tap → fullscreen open → first frame painted   (blur-on-open duration)
+//   - swipe off a slide → next slide first frame     (blur-between-swipes duration)
+// All gated behind isVideoDebugOn(). Surfaced under the 'FS' category.
+
+const fsTimers = new Map<string, number>();
+
+/** Mark the start of a timed fullscreen span (e.g. 'open', or `slide:${idx}`). */
+export function fsTimeStart(key: string): void {
+  if (!isVideoDebugOn()) return;
+  fsTimers.set(key, performance.now());
+}
+
+/** End a timed span and log the elapsed ms. `phase` describes what completed. */
+export function fsTimeEnd(key: string, phase: string, data?: Record<string, any>): void {
+  if (!isVideoDebugOn()) return;
+  const start = fsTimers.get(key);
+  if (start == null) {
+    addLogEntry('info', 'FS', `${phase} (no start) ${fmtFsData(data)}`);
+    return;
+  }
+  const ms = Math.round(performance.now() - start);
+  fsTimers.delete(key);
+  const level: DebugLogLevel = ms > 800 ? 'warning' : ms > 400 ? 'info' : 'success';
+  addLogEntry(level, 'FS', `${phase} ${ms}ms ${fmtFsData(data)}`.trim());
+}
+
+/** A point-in-time fullscreen lifecycle event (open, slide-active, blur-shown, etc). */
+export function fsEvent(phase: string, data?: Record<string, any>): void {
+  if (!isVideoDebugOn()) return;
+  addLogEntry('info', 'FS', `${phase} ${fmtFsData(data)}`.trim());
+}
+
+function fmtFsData(data?: Record<string, any>): string {
+  if (!data) return '';
+  const parts: string[] = [];
+  for (const k of Object.keys(data)) {
+    const v = data[k];
+    parts.push(`${k}=${typeof v === 'object' ? JSON.stringify(v) : String(v)}`);
+  }
+  return parts.join(' ');
+}
+
 // ============ Gesture Retry Logging (iOS WebView) ============
 
 export function logGestureRetryQueued(videoId: string): void {
