@@ -21,6 +21,8 @@ import { useActivePostDerived } from '@/components/clubhouse/hooks/useActivePost
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useActiveActor } from '@/context/ActiveActorContext';
 import { getActorRouteByType } from '@/types/actor';
+import FullscreenDebugPanel from '@/components/FullscreenDebugPanel';
+import { fsTimeStart, fsEvent } from '@/media/mobileVideoDebug';
 
 export function FullscreenFeedOverlay() {
   const navigate = useNavigate();
@@ -103,6 +105,9 @@ export function FullscreenFeedOverlay() {
   // Body scroll lock
   useEffect(() => {
     if (isOpen) {
+      // Timing: mark fullscreen open (tap→visible span; ends when first slide paints).
+      fsTimeStart('open');
+      fsEvent('🚀 FULLSCREEN_OPEN', { startIndex });
       pauseAllAudio();
       document.body.style.overflow = "hidden";
 
@@ -206,6 +211,7 @@ export function FullscreenFeedOverlay() {
                 />
               </>
             )}
+            <FullscreenDebugPanel />
           </motion.div>
         )}
       </AnimatePresence>
