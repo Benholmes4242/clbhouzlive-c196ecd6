@@ -216,7 +216,6 @@ export const InlineReviewCard: React.FC<InlineReviewCardProps> = ({
         >
           <span style={{ display: 'inline-flex', alignItems: 'center', gap: 6, flexWrap: 'wrap', minWidth: 0 }}>
             {locationStr}
-            <span style={{ opacity: 0.5 }}>·</span>
             <span
               style={{
                 color: whiteReadReview ? '#fff' : '#F7931E',
@@ -233,33 +232,6 @@ export const InlineReviewCard: React.FC<InlineReviewCardProps> = ({
               />
             </span>
           </span>
-          {courseRating != null && (
-            <span
-              style={{
-                marginLeft: 'auto',
-                display: 'inline-flex',
-                alignItems: 'center',
-                gap: 5,
-                flexShrink: 0,
-                background: 'rgba(255,255,255,0.08)',
-                padding: '3px 8px',
-                borderRadius: 999,
-                color: '#fff',
-                fontSize: 11,
-                fontWeight: 700,
-                fontVariantNumeric: 'tabular-nums',
-                lineHeight: 1,
-              }}
-            >
-              <img
-                src="/lovable-uploads/2b0e2d79-6b26-4b6b-a27b-8dd5f8cc5aad.png"
-                alt=""
-                aria-hidden="true"
-                style={{ width: 12, height: 12, objectFit: 'contain' }}
-              />
-              {courseRating.toFixed(1)}
-            </span>
-          )}
         </div>
       )}
     </motion.button>
