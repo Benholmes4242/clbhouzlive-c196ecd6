@@ -273,15 +273,15 @@ export function SnapFeed({
     return () => el.removeEventListener('scrollend', onScrollEnd);
   }, [setActiveIndex]);
 
-  // ── Prefetch next 3 slides: manifest AND decoded first segment (warm pool) ──
+  // ── Prefetch next 2 HLS manifests (network warm only — NO decoded instances;
+  //    decoding ahead oversubscribes the iOS decoder budget and starves the
+  //    active slide). Manifest prefetch saves the playlist round-trip safely. ──
   useEffect(() => {
-    const next = postsRef.current.slice(activeIndex + 1, activeIndex + 4); // 3 ahead (was 2)
+    const next = postsRef.current.slice(activeIndex + 1, activeIndex + 3);
     next.forEach(post => {
       const url = post.mediaItems?.[0]?.hlsUrl;
       if (url) {
-        preloadHlsManifest(url)
-          .then(() => registerInPool(url))   // warms a DECODED instance into the pool
-          .catch(() => {});
+        preloadHlsManifest(url).catch(() => {});
       }
     });
   }, [activeIndex]);
