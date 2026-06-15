@@ -34,6 +34,12 @@ interface BreathingRoomBottomBarProps {
   postId?: string;
   /** Base offset from screen bottom in px. Omit for Clubhouse (respects bottom nav); pass 0 for fullscreen overlay (no nav). */
   bottomOffset?: number;
+  /** When provided, this function computes the bottom CSS value (e.g. wrapped in
+   *  `calc(max(env(safe-area-inset-bottom,0px), 24px) + …)` for the fullscreen overlay).
+   *  Overrides bottomOffset for positioning. */
+  bottomCalc?: (extra: number) => string;
+  /** Right-edge inset in px. Defaults to 78 (reserves room for the vertical action rail). */
+  rightInset?: number;
   /** Controlled caption expansion state (lifted to parent for review panel coordination) */
   captionExpanded?: boolean;
   onCaptionExpandedChange?: (expanded: boolean) => void;
@@ -52,6 +58,13 @@ interface BreathingRoomBottomBarProps {
   /** Course tagged on the post. Renders the "posted at" pill above author. */
   golfCourse?: { id: string; name: string } | null;
   onCourseTap?: () => void;
+  /** When provided, render an amber follow "+" badge on the author avatar
+   *  (fullscreen overlay only). */
+  followBadge?: {
+    isFollowing: boolean;
+    isOwnPost: boolean;
+    onFollow: () => void;
+  };
 }
 
 export const BreathingRoomBottomBar: React.FC<BreathingRoomBottomBarProps> = ({
