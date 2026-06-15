@@ -57,6 +57,7 @@ export function SnapFeed({
   onActiveIndexChange,
   activeIndexOverride,
   isFullscreen,
+  surface = 'feed',
 }: SnapFeedProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const slideRefs = useRef<Map<number, HTMLDivElement>>(new Map());
