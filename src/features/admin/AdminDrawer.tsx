@@ -2,6 +2,7 @@ import React, { useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import {
   LayoutDashboard, Users, MapPin, BarChart3, Settings, Shield, ArrowLeft,
+  type LucideIcon,
 } from 'lucide-react';
 import { adminTheme as t } from './theme';
 import type { PanelRole } from '@/hooks/usePanelRole';
@@ -9,7 +10,7 @@ import type { PanelRole } from '@/hooks/usePanelRole';
 interface NavItem {
   to: string;
   label: string;
-  icon: React.ComponentType<{ size?: number }>;
+  icon: LucideIcon;
   requireFull?: boolean;
 }
 
