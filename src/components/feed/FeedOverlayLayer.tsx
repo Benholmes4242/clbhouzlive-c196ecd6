@@ -44,7 +44,12 @@ interface FeedOverlayLayerProps {
   bottomOffset?: number;
   /** Read-only mode: hides interactive controls on the action rail (only creator avatar shown). */
   readOnly?: boolean;
-}
+  /** When true, render a TOP action bar (fullscreen overlay) instead of the right vertical rail,
+   *  move the creator avatar/follow into the bottom-left chip, lift content above a safe area,
+   *  and use white "Read review" affordance. */
+  topActionBar?: boolean;
+  /** Close handler — when topActionBar is true, rendered as a left-most back chevron chip. */
+  onClose?: () => void;
 
 export const FeedOverlayLayer = memo(function FeedOverlayLayer({
   posts,
