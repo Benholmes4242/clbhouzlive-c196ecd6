@@ -6,6 +6,7 @@ import type { FeedPost } from '@/components/media-system/types/media';
 import { haptic } from '@/utils/haptics';
 import { preloadHlsManifest } from '@/utils/hlsPreload';
 import { registerInPool } from '@/utils/hlsPoolPreloader';
+import { HLSPoolManager } from '@/media/HLSPoolManager';
 import { pauseAllAudio } from '@/utils/globalVideoMute';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useWatchProgressTracker } from '@/components/watch/hooks/useWatchProgressTracker';
