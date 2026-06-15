@@ -31,7 +31,7 @@ export default function AdminAccessDenied() {
             height: 48,
             borderRadius: 12,
             background: t.brandSoft,
-            color: t.brand,
+            color: t.brandText,
             margin: '0 auto 14px',
             display: 'flex',
             alignItems: 'center',
