@@ -49,6 +49,8 @@ const CHIP_BG = 'rgba(0,0,0,0.42)';
 const CHIP_BORDER = '1px solid rgba(255,255,255,0.12)';
 const CHIP_BLUR = 'blur(14px)';
 
+// Icon-only chips are a perfect 42×42 square. Chips with inline counts grow
+// horizontally via padding — these are the only chips that need extra width.
 const chipBase: React.CSSProperties = {
   height: 42,
   minWidth: 42,
@@ -56,7 +58,7 @@ const chipBase: React.CSSProperties = {
   alignItems: 'center',
   justifyContent: 'center',
   gap: 6,
-  padding: '0 11px',
+  padding: 0,
   borderRadius: 13,
   background: CHIP_BG,
   backdropFilter: CHIP_BLUR,
@@ -69,6 +71,11 @@ const chipBase: React.CSSProperties = {
   fontSize: 13,
   fontWeight: 700,
   lineHeight: 1,
+};
+
+const chipWithCount: React.CSSProperties = {
+  ...chipBase,
+  padding: '0 11px',
 };
 
 export const FeedTopActionBar: React.FC<FeedTopActionBarProps> = ({
