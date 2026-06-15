@@ -230,7 +230,7 @@ export const FeedActionRail: React.FC<FeedActionRailProps> = ({
         flexDirection: 'column',
         alignItems: 'center',
         gap: 18,
-        pointerEvents: isVisible ? 'auto' : 'none',
+        pointerEvents: 'none',
         fontFamily: 'Geist, system-ui, sans-serif',
       }}
     >
