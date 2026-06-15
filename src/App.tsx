@@ -154,6 +154,7 @@ const AchievementsHubPage = lazy(() => import("./pages/AchievementsHubPage"));
 const AchievementsPage = lazy(() => import("./pages/AchievementsPage"));
 const AdminSetupPage = lazy(() => import("./pages/AdminSetupPage"));
 const AdminV2Shell = lazy(() => import('./features/admin-v2/AdminV2Shell'));
+const AdminV3Shell = lazy(() => import('./features/admin/AdminShell'));
 
 
 
@@ -412,6 +413,16 @@ function AppRoutes() {
           element={
             <Suspense fallback={<GenericPageSkeleton />}>
               <AdminV2Shell />
+            </Suspense>
+          }
+        />
+
+        {/* Admin V3 — next-gen mobile-first console (Phase 1) */}
+        <Route
+          path="/admin-v3/*"
+          element={
+            <Suspense fallback={<GenericPageSkeleton />}>
+              <AdminV3Shell />
             </Suspense>
           }
         />
