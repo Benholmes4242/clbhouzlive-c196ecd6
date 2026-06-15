@@ -103,6 +103,8 @@ const ActionButton: React.FC<ActionButtonProps> = ({
         transition: 'transform 0.12s',
         filter: FLOAT_SHADOW,
         fontFamily: 'Geist, system-ui, sans-serif',
+        pointerEvents: 'auto',
+        touchAction: 'pan-y',
       }}
     >
       <motion.span
@@ -195,6 +197,8 @@ export const FeedActionRail: React.FC<FeedActionRailProps> = ({
         color: '#fff',
         cursor: 'pointer',
         filter: FLOAT_SHADOW,
+        pointerEvents: 'auto',
+        touchAction: 'pan-y',
       }}
     >
       {isMuted ? (
@@ -230,7 +234,7 @@ export const FeedActionRail: React.FC<FeedActionRailProps> = ({
         flexDirection: 'column',
         alignItems: 'center',
         gap: 18,
-        pointerEvents: isVisible ? 'auto' : 'none',
+        pointerEvents: 'none',
         fontFamily: 'Geist, system-ui, sans-serif',
       }}
     >
@@ -266,6 +270,8 @@ export const FeedActionRail: React.FC<FeedActionRailProps> = ({
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
+              pointerEvents: 'auto',
+              touchAction: 'pan-y',
             }}
           >
             <SquircleAvatar
@@ -302,6 +308,8 @@ export const FeedActionRail: React.FC<FeedActionRailProps> = ({
                 gap: 3,
                 position: 'relative',
                 zIndex: 1,
+                pointerEvents: 'auto',
+                touchAction: 'pan-y',
               }}
             >
               <span
