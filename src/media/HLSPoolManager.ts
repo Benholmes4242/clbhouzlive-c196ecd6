@@ -31,6 +31,7 @@ interface PooledHLSInstance {
   preloadedByVideo: HTMLVideoElement | null;
   isPromoted: boolean;
   timeoutId?: NodeJS.Timeout;
+  surface: 'feed' | 'fullscreen';
 }
 
 // Pool configuration
@@ -142,7 +143,8 @@ class HLSPoolManagerClass {
   register(
     url: string, 
     hls: HlsType, 
-    preloadVideo: HTMLVideoElement
+    preloadVideo: HTMLVideoElement,
+    surface: 'feed' | 'fullscreen' = 'feed',
   ): void {
     // GUARD: never clobber a promoted (live, on-screen) instance. If one exists
     // for this URL, destroy the INCOMING duplicate instead and bail. This is the
@@ -174,6 +176,7 @@ class HLSPoolManagerClass {
       created: Date.now(),
       preloadedByVideo: preloadVideo,
       isPromoted: false,
+      surface,
       timeoutId: setTimeout(() => {
         // Auto-cleanup if not promoted within TTL
         if (!this.pool.get(url)?.isPromoted) {
@@ -332,6 +335,25 @@ class HLSPoolManagerClass {
       return false;
     }
   }
+  /**
+   * Fullscreen-only pruning. Cleans any pool entry tagged with `surface` that is
+   * NOT in keepUrls and NOT currently promoted. Entries of OTHER surfaces (e.g.
+   * 'feed') are never touched — the surface filter short-circuits before any
+   * eviction, so the locked feed cannot be pruned by this path.
+   */
+  pruneSurface(surface: 'feed' | 'fullscreen', keepUrls: Iterable<string>): number {
+    const keep = new Set(keepUrls);
+    const toEvict: string[] = [];
+    this.pool.forEach((entry, url) => {
+      if (entry.surface !== surface) return;
+      if (entry.isPromoted) return;
+      if (keep.has(url)) return;
+      toEvict.push(url);
+    });
+    toEvict.forEach(url => this.cleanup(url));
+    return toEvict.length;
+  }
+
 
   /**
    * Cleanup a specific URL entry

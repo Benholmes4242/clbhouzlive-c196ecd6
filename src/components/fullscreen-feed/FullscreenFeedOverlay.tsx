@@ -166,6 +166,7 @@ export function FullscreenFeedOverlay() {
                   onActiveIndexChange={setActiveIndex}
                   activeIndexOverride={activeIndex}
                   isFullscreen
+                  surface="fullscreen"
                 />
 
                 <FeedOverlayLayer

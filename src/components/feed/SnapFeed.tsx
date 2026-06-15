@@ -6,6 +6,7 @@ import type { FeedPost } from '@/components/media-system/types/media';
 import { haptic } from '@/utils/haptics';
 import { preloadHlsManifest } from '@/utils/hlsPreload';
 import { registerInPool } from '@/utils/hlsPoolPreloader';
+import { HLSPoolManager } from '@/media/HLSPoolManager';
 import { pauseAllAudio } from '@/utils/globalVideoMute';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useWatchProgressTracker } from '@/components/watch/hooks/useWatchProgressTracker';
@@ -45,6 +46,8 @@ interface SnapFeedProps {
   activeIndexOverride?: number;
   /** Forwarded to FeedSlide so fullscreen hosts (FullscreenFeedOverlay, CourseMediaViewer) can suppress the inline top-right dots in favour of the segmented FullscreenCarouselOverlay. */
   isFullscreen?: boolean;
+  /** Tags pool entries created by this SnapFeed so fullscreen can prune its own without touching feed entries. */
+  surface?: 'feed' | 'fullscreen';
 }
 
 export function SnapFeed({
@@ -55,6 +58,7 @@ export function SnapFeed({
   onActiveIndexChange,
   activeIndexOverride,
   isFullscreen,
+  surface = 'feed',
 }: SnapFeedProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const slideRefs = useRef<Map<number, HTMLDivElement>>(new Map());
@@ -161,7 +165,7 @@ export function SnapFeed({
           const hlsUrl = nextPost?.mediaItems?.[0]?.hlsUrl;
           if (hlsUrl) {
             preloadHlsManifest(hlsUrl)
-              .then(() => registerInPool(hlsUrl))
+              .then(() => registerInPool(hlsUrl, surface))
               .catch(() => {});
           }
           
@@ -196,6 +200,21 @@ export function SnapFeed({
       if (debounceTimerRef.current) clearTimeout(debounceTimerRef.current);
     };
   }, [setActiveIndex]);
+
+  // Fullscreen-only pruning: on each active-index change, evict any 'fullscreen'-
+  // tagged pool entries that aren't in the 3-URL keep-window [active-1, active, active+1].
+  // Feed-tagged entries are untouchable by this path (pruneSurface filters by surface).
+  useEffect(() => {
+    if (surface !== 'fullscreen') return;
+    const keep: string[] = [];
+    for (const i of [activeIndex - 1, activeIndex, activeIndex + 1]) {
+      const u = postsRef.current[i]?.mediaItems?.[0]?.hlsUrl;
+      if (u) keep.push(u);
+    }
+    HLSPoolManager.pruneSurface('fullscreen', keep);
+  }, [activeIndex, surface]);
+
+
 
   // ── Register/unregister slide refs ──
   const setSlideRef = useCallback((idx: number, el: HTMLDivElement | null) => {
