@@ -111,7 +111,7 @@ export function BottomSheet({
       <div
         ref={sheetRef}
         className={cn(
-          "fixed bottom-0 left-0 right-0 bg-background rounded-t-[20px] transition-transform duration-300 ease-out",
+          "fixed bottom-0 left-1/2 -translate-x-1/2 w-full max-w-[480px] bg-background rounded-t-[20px] transition-transform duration-300 ease-out",
           isAnimating ? "translate-y-0" : "translate-y-full",
           className
         )}

@@ -55,7 +55,7 @@ export function RivalVersusPanel({
             exit={{ y: '100%' }}
             transition={{ type: 'spring', damping: 25, stiffness: 300 }}
             className={cn(
-              'fixed bottom-0 left-0 right-0 z-50',
+              'fixed bottom-0 left-1/2 -translate-x-1/2 w-full max-w-[480px] z-50',
               'bg-background rounded-t-3xl shadow-xl',
               'max-h-[80vh] overflow-y-auto',
               className

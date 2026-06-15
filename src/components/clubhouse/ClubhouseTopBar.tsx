@@ -77,7 +77,7 @@ export const ClubhouseTopBar: React.FC<ClubhouseTopBarProps> = ({
       {/* Single centred cluster: tabs · divider · search · profile */}
       {showCluster && (
         <div
-          className="fixed left-0 right-0 z-40 flex items-center justify-center"
+          className="fixed left-1/2 -translate-x-1/2 w-full max-w-[480px] z-40 flex items-center justify-center"
           style={{
             top: TOP_STRIP_TOP,
             padding: '0 clamp(10px, 3vw, 16px)',
