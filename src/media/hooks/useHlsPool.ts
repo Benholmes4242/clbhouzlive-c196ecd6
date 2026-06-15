@@ -59,7 +59,7 @@ export function useHlsPool(): HlsPoolHandle {
       hls.on(Hls.Events.MANIFEST_PARSED, () => {
         if (hlsUrl && !HLSPoolManager.has(hlsUrl)) {
           try {
-            HLSPoolManager.register(hlsUrl, hls, video);
+            HLSPoolManager.register(hlsUrl, hls, video, surface);
           } catch {}
         }
       });
