@@ -159,39 +159,6 @@ export const InlineReviewCard: React.FC<InlineReviewCardProps> = ({
             fallback={initials}
             hideRing
           />
-          {followBadge && !followBadge.isOwnPost && (
-            <button
-              type="button"
-              onClick={(e) => {
-                e.stopPropagation();
-                if (!followBadge.isFollowing) followBadge.onFollow();
-              }}
-              aria-label={followBadge.isFollowing ? 'Following' : 'Follow'}
-              aria-pressed={followBadge.isFollowing}
-              style={{
-                position: 'absolute',
-                bottom: -4,
-                left: '50%',
-                transform: 'translateX(-50%)',
-                width: 16,
-                height: 16,
-                borderRadius: '50%',
-                background: '#F7931E',
-                border: '1.5px solid #000',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                padding: 0,
-                cursor: followBadge.isFollowing ? 'default' : 'pointer',
-              }}
-            >
-              {followBadge.isFollowing ? (
-                <Check size={10} strokeWidth={3} color="#fff" />
-              ) : (
-                <Plus size={10} strokeWidth={3} color="#fff" />
-              )}
-            </button>
-          )}
         </div>
         <span
           style={{
