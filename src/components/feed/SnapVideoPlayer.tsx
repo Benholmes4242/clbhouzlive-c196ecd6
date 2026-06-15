@@ -218,7 +218,24 @@ export const SnapVideoPlayer = memo(function SnapVideoPlayer({
         <div className="absolute inset-0" style={{ background: '#0A0E14' }} aria-hidden="true" />
       )}
 
-      {/* Video element — paused first frame is the reveal (no poster img layer). */}
+      {/* Crisp first-frame poster — instant arrival frame at same object-fit
+          as the video, sitting above the blur and below the video. No decoder
+          cost. Fades out as the decoded video fades in (identical frame). */}
+      {thumbnailUrl && (
+        <img
+          src={thumbnailUrl}
+          aria-hidden="true"
+          className="absolute inset-0 w-full h-full"
+          style={{
+            objectFit,
+            zIndex: 1,
+            opacity: hasFirstFrame ? 0 : 1,
+            transition: 'opacity 120ms ease-out',
+          }}
+        />
+      )}
+
+      {/* Video element — fades in over the crisp poster (seamless crossfade). */}
       <video
         ref={videoRef}
         playsInline
