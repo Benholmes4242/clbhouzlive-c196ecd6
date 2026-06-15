@@ -13,6 +13,7 @@ import AdminPlaceholder from './components/AdminPlaceholder';
 const DashboardPage = lazy(() => import('./pages/DashboardPage'));
 const UsersPage = lazy(() => import('./pages/UsersPage'));
 const ContentPage = lazy(() => import('./pages/ContentPage'));
+const AnalyticsPage = lazy(() => import('./pages/AnalyticsPage'));
 
 const SECTION_TITLES: Record<string, string> = {
   dashboard: 'Dashboard',
@@ -97,7 +98,7 @@ export default function AdminShell() {
                 <Route path="dashboard" element={<DashboardPage />} />
                 <Route path="users/*"     element={can.manageAdmins ? <UsersPage /> : <AdminAccessDenied />} />
                 <Route path="content/*"   element={<ContentPage />} />
-                <Route path="analytics/*" element={<AdminPlaceholder title="Analytics" />} />
+                <Route path="analytics/*" element={can.manageAdmins ? <AnalyticsPage /> : <AdminAccessDenied />} />
                 <Route path="system/*"    element={<AdminPlaceholder title="System" />} />
                 <Route path="*" element={<Navigate to="dashboard" replace />} />
               </Routes>
