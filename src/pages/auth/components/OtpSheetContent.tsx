@@ -157,15 +157,15 @@ const OtpSheetContent: React.FC<OtpSheetContentProps> = ({
     <div className="space-y-5">
       {/* Subtitle */}
       <div className="space-y-2 text-center">
-        <p className="text-[13px]" style={{ color: 'rgba(255,255,255,0.60)' }}>
+        <p className="text-[13px]" style={{ color: '#8E8E93' }}>
           We sent a code to{' '}
-          <span style={{ color: 'rgba(255,255,255,0.90)', fontWeight: 600 }}>{email}</span>
+          <span style={{ color: '#1C1C1E', fontWeight: 600 }}>{email}</span>
         </p>
         <button
           type="button"
           onClick={onUseDifferentEmail}
           className="text-[13px] underline underline-offset-2"
-          style={{ color: 'rgba(255,255,255,0.60)' }}
+          style={{ color: '#8E8E93' }}
         >
           Use a different email
         </button>
@@ -192,9 +192,9 @@ const OtpSheetContent: React.FC<OtpSheetContentProps> = ({
               width: 44,
               height: 52,
               borderRadius: 12,
-              background: 'rgba(255,255,255,0.06)',
-              border: `1px solid ${d ? '#F7931E' : 'rgba(255,255,255,0.12)'}`,
-              color: '#ffffff',
+              background: '#F5F5F7',
+              border: `1px solid ${d ? '#F7931E' : 'rgba(15,23,42,0.10)'}`,
+              color: '#1C1C1E',
               fontSize: 20,
               fontWeight: 600,
               caretColor: '#F7931E',
@@ -203,7 +203,7 @@ const OtpSheetContent: React.FC<OtpSheetContentProps> = ({
               e.currentTarget.style.borderColor = '#F7931E';
             }}
             onBlur={(e) => {
-              e.currentTarget.style.borderColor = d ? '#F7931E' : 'rgba(255,255,255,0.12)';
+              e.currentTarget.style.borderColor = d ? '#F7931E' : 'rgba(15,23,42,0.10)';
             }}
           />
         ))}
@@ -211,12 +211,12 @@ const OtpSheetContent: React.FC<OtpSheetContentProps> = ({
 
       {/* Error / Info */}
       {errorMessage && (
-        <p className="text-[13px] text-center" style={{ color: '#f87171' }}>
+        <p className="text-[13px] text-center" style={{ color: '#DC2626' }}>
           {errorMessage}
         </p>
       )}
       {infoMessage && !errorMessage && (
-        <p className="text-[13px] text-center" style={{ color: 'rgba(255,255,255,0.75)' }}>
+        <p className="text-[13px] text-center" style={{ color: '#1C1C1E' }}>
           {infoMessage}
         </p>
       )}
@@ -229,9 +229,9 @@ const OtpSheetContent: React.FC<OtpSheetContentProps> = ({
         aria-label="Verify code"
         className="w-full h-[54px] flex items-center justify-center gap-2 rounded-[14px] font-bold text-[15px] transition-all duration-150 active:scale-[0.98]"
         style={{
-          background: canSubmit ? '#F7931E' : 'rgba(255,255,255,0.05)',
-          color: canSubmit ? '#FFFFFF' : 'rgba(255,255,255,0.35)',
-          border: canSubmit ? 'none' : '1px solid rgba(255,255,255,0.10)',
+          background: canSubmit ? '#F7931E' : '#F5F5F7',
+          color: canSubmit ? '#FFFFFF' : '#AEAEB2',
+          border: canSubmit ? 'none' : '1px solid rgba(15,23,42,0.10)',
           cursor: canSubmit ? 'pointer' : 'not-allowed',
         }}
       >
@@ -246,7 +246,7 @@ const OtpSheetContent: React.FC<OtpSheetContentProps> = ({
           disabled={resendCooldown > 0 || submitting}
           className="text-[13px]"
           style={{
-            color: resendCooldown > 0 ? 'rgba(255,255,255,0.30)' : 'rgba(255,255,255,0.60)',
+            color: resendCooldown > 0 ? '#AEAEB2' : '#8E8E93',
             textDecoration: resendCooldown > 0 ? 'none' : 'underline',
             textUnderlineOffset: 2,
             cursor: resendCooldown > 0 ? 'default' : 'pointer',
