@@ -224,28 +224,32 @@ export const FeedOverlayLayer = memo(function FeedOverlayLayer({
         <div
           style={{
             position: 'fixed',
-            left: 16,
-            right: reviewRightInset,
+            left: topActionBar ? 0 : 16,
+            right: topActionBar ? 0 : reviewRightInset,
             bottom: bottomCalc(20),
+            paddingLeft: topActionBar ? 'max(16px, env(safe-area-inset-left, 0px))' : undefined,
+            paddingRight: topActionBar ? 'max(16px, env(safe-area-inset-right, 0px))' : undefined,
             zIndex: Z.echo,
             pointerEvents: overlayVisible ? 'auto' : 'none',
           }}
         >
-          <ReviewOverlaySlot
-            activePost={activePost}
-            onReviewTap={() => onReviewTap?.()}
-            isVisible={overlayVisible}
-            whiteReadReview={topActionBar}
-            followBadge={
-              topActionBar
-                ? {
-                    isFollowing: isFollowed,
-                    isOwnPost,
-                    onFollow: () => onFollow(activePost),
-                  }
-                : undefined
-            }
-          />
+          <div style={{ maxWidth: 640, margin: '0 auto' }}>
+            <ReviewOverlaySlot
+              activePost={activePost}
+              onReviewTap={() => onReviewTap?.()}
+              isVisible={overlayVisible}
+              whiteReadReview={topActionBar}
+              followBadge={
+                topActionBar
+                  ? {
+                      isFollowing: isFollowed,
+                      isOwnPost,
+                      onFollow: () => onFollow(activePost),
+                    }
+                  : undefined
+              }
+            />
+          </div>
         </div>
       )}
 
