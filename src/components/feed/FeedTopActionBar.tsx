@@ -171,7 +171,7 @@ export const FeedTopActionBar: React.FC<FeedTopActionBarProps> = ({
               onLike();
             }}
             aria-label={hasLiked ? 'Unlike' : 'Like'}
-            style={chipBase}
+            style={likeStr ? chipWithCount : chipBase}
           >
             <Heart
               size={20}
