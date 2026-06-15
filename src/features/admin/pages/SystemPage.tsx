@@ -154,7 +154,7 @@ function AuditLogTab() {
         </select>
       }
     >
-      <DataList<AuditEntry>
+      <DataList
         loading={isLoading}
         rows={data?.rows ?? []}
         rowKey={(r) => r.id}
