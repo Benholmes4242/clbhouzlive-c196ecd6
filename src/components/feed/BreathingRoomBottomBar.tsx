@@ -113,6 +113,11 @@ export const BreathingRoomBottomBar: React.FC<BreathingRoomBottomBarProps> = ({
       ? `${bottomOffset + 20}px`
       : 'calc(var(--bottom-nav-height, 88px) + 20px)';
 
+  // Fullscreen (bottomCalc provided) caps the readable column at 640px and
+  // honours landscape safe-area-inset-left/right so notched devices in landscape
+  // don't clip content. Clubhouse keeps the existing edge anchors.
+  const isFullscreen = !!bottomCalc;
+
   return (
     <motion.div
       initial={false}
@@ -121,13 +126,20 @@ export const BreathingRoomBottomBar: React.FC<BreathingRoomBottomBarProps> = ({
       style={{
         position: 'fixed',
         bottom: computedBottom,
-        left: 12,
-        right: rightInset ?? 78,
+        left: isFullscreen ? 0 : 12,
+        right: isFullscreen ? 0 : rightInset ?? 78,
+        paddingLeft: isFullscreen
+          ? `max(12px, env(safe-area-inset-left, 0px))`
+          : undefined,
+        paddingRight: isFullscreen
+          ? `max(${rightInset ?? 12}px, env(safe-area-inset-right, 0px))`
+          : undefined,
         zIndex: Z.echo,
         pointerEvents: 'none',
         fontFamily: 'Geist, system-ui, sans-serif',
       }}
     >
+      <div style={isFullscreen ? { maxWidth: 640, margin: '0 auto' } : undefined}>
       <div style={{ pointerEvents: isVisible ? 'auto' : 'none', display: 'flex', flexDirection: 'column', gap: 8 }}>
         {/* Course tag pill — sits ABOVE author, reads as "posted at" */}
         {golfCourse && (
@@ -362,6 +374,7 @@ export const BreathingRoomBottomBar: React.FC<BreathingRoomBottomBarProps> = ({
               </div>
             );
           })()}
+      </div>
       </div>
     </motion.div>
   );
