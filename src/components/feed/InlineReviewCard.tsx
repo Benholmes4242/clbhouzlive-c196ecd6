@@ -267,7 +267,11 @@ export const InlineReviewCard: React.FC<InlineReviewCardProps> = ({
                 gap: 2,
               }}
             >
-              Read review <ChevronRight size={13} color="#F7931E" />
+              Read review{' '}
+              <ChevronRight
+                size={13}
+                color={whiteReadReview ? '#fff' : '#F7931E'}
+              />
             </span>
           </span>
           {courseRating != null && (
