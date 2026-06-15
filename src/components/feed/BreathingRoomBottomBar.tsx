@@ -202,13 +202,46 @@ export const BreathingRoomBottomBar: React.FC<BreathingRoomBottomBarProps> = ({
               width: '100%',
             }}
           >
-            <SquircleAvatar
-              size={32}
-              src={author.avatarUrl}
-              alt={author.displayName}
-              fallback={author.displayName?.[0] ?? '?'}
-              hideRing
-            />
+            <div style={{ position: 'relative', flexShrink: 0 }}>
+              <SquircleAvatar
+                size={40}
+                src={author.avatarUrl}
+                alt={author.displayName}
+                fallback={author.displayName?.[0] ?? '?'}
+                hideRing
+              />
+              {followBadge && !followBadge.isOwnPost && (
+                <span
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    if (!followBadge.isFollowing) followBadge.onFollow();
+                  }}
+                  role="button"
+                  aria-label={followBadge.isFollowing ? 'Following' : 'Follow'}
+                  style={{
+                    position: 'absolute',
+                    bottom: -4,
+                    left: '50%',
+                    transform: 'translateX(-50%)',
+                    width: 18,
+                    height: 18,
+                    borderRadius: '50%',
+                    background: '#F7931E',
+                    border: '1.5px solid #000',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    cursor: followBadge.isFollowing ? 'default' : 'pointer',
+                  }}
+                >
+                  {followBadge.isFollowing ? (
+                    <Check size={11} strokeWidth={3} color="#fff" />
+                  ) : (
+                    <Plus size={11} strokeWidth={3} color="#fff" />
+                  )}
+                </span>
+              )}
+            </div>
             <div style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', gap: 1 }}>
               <div style={{ display: 'flex', alignItems: 'baseline', gap: 6, minWidth: 0 }}>
                 <span
