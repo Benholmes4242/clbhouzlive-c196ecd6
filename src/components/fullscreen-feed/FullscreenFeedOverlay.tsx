@@ -105,6 +105,9 @@ export function FullscreenFeedOverlay() {
   // Body scroll lock
   useEffect(() => {
     if (isOpen) {
+      // Timing: mark fullscreen open (tap→visible span; ends when first slide paints).
+      fsTimeStart('open');
+      fsEvent('🚀 FULLSCREEN_OPEN', { startIndex });
       pauseAllAudio();
       document.body.style.overflow = "hidden";
 
