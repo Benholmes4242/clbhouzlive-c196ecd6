@@ -89,7 +89,7 @@ export async function registerInPool(hlsUrl: string, surface: 'feed' | 'fullscre
     }
 
     // Register in pool — ready for instant promotion
-    HLSPoolManager.register(hlsUrl, hls, preloadVideo);
+    HLSPoolManager.register(hlsUrl, hls, preloadVideo, surface);
 
   } catch {
     // Silent fail — pool miss is acceptable, just slower first frame
