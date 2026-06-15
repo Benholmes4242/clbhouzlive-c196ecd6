@@ -375,6 +375,7 @@ export const BreathingRoomBottomBar: React.FC<BreathingRoomBottomBarProps> = ({
             );
           })()}
       </div>
+      </div>
     </motion.div>
   );
 };
