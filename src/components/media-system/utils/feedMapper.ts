@@ -8,9 +8,6 @@ function buildHlsUrl(streamId: string): string {
   return `https://${CLOUDFLARE_STREAM_SUBDOMAIN}/${streamId}/manifest/video.m3u8`;
 }
 
-function buildMp4Url(streamId: string): string {
-  return `https://${CLOUDFLARE_STREAM_SUBDOMAIN}/${streamId}/downloads/default.mp4`;
-}
 
 function buildThumbnailUrl(streamId: string): string {
   return `https://${CLOUDFLARE_STREAM_SUBDOMAIN}/${streamId}/thumbnails/thumbnail.jpg?time=0s&height=1080`;
