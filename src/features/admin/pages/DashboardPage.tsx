@@ -270,7 +270,7 @@ function ActionQueueCard({ queue, loading }: { queue?: { pendingVerifications: n
               <div
                 style={{
                   width: 36, height: 36, borderRadius: t.radius.md,
-                  background: t.brandSoft, color: t.brand,
+                  background: t.brandSoft, color: t.brandText,
                   display: 'flex', alignItems: 'center', justifyContent: 'center',
                 }}
               >
