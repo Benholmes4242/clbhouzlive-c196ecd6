@@ -82,20 +82,22 @@ export default function ClipsSubpage() {
         <div style={{ paddingTop: 'var(--chrome-total-h, 0px)' }}>
           {isSearching ? (
             <>
-              <WatchAutoplay posts={posts} gridRef={gridRef as React.RefObject<HTMLDivElement>} />
-              <WatchGrid
-                posts={posts}
-                isLoading={isLoading}
-                isError={isError}
-                hasNextPage={hasNextPage}
-                isFetchingNextPage={isFetchingNextPage}
-                fetchNextPage={fetchNextPage}
-                refetch={refetch}
-                gridRef={gridRef as React.RefObject<HTMLDivElement>}
-                userId={userId}
-                emptyTitle="No clips found"
-                emptyMessage={`Nothing matches "${searchQuery}" — try another search.`}
-              />
+              <WatchAutoplay>
+                <WatchGrid
+                  posts={posts}
+                  isLoading={isLoading}
+                  isError={isError}
+                  hasNextPage={hasNextPage}
+                  isFetchingNextPage={isFetchingNextPage}
+                  fetchNextPage={fetchNextPage}
+                  refetch={refetch}
+                  gridRef={gridRef as React.RefObject<HTMLDivElement>}
+                  userId={userId}
+                  emptyTitle="No clips found"
+                  emptyMessage={`Nothing matches "${searchQuery}" — try another search.`}
+                />
+              </WatchAutoplay>
+
             </>
           ) : (
             <>
@@ -106,24 +108,26 @@ export default function ClipsSubpage() {
 
               <MoreToExploreDivider mood={mood} />
 
-              <WatchAutoplay posts={posts} gridRef={gridRef as React.RefObject<HTMLDivElement>} />
-              <WatchGrid
-                posts={posts}
-                isLoading={isLoading}
-                isError={isError}
-                hasNextPage={hasNextPage}
-                isFetchingNextPage={isFetchingNextPage}
-                fetchNextPage={fetchNextPage}
-                refetch={refetch}
-                gridRef={gridRef as React.RefObject<HTMLDivElement>}
-                userId={userId}
-                emptyTitle={isFiltered ? 'No clips here yet.' : 'No shorts yet'}
-                emptyMessage={
-                  isFiltered && activeLabel
-                    ? `Nothing matches "${activeLabel}" right now — try another filter.`
-                    : 'Check back soon for new content'
-                }
-              />
+              <WatchAutoplay>
+                <WatchGrid
+                  posts={posts}
+                  isLoading={isLoading}
+                  isError={isError}
+                  hasNextPage={hasNextPage}
+                  isFetchingNextPage={isFetchingNextPage}
+                  fetchNextPage={fetchNextPage}
+                  refetch={refetch}
+                  gridRef={gridRef as React.RefObject<HTMLDivElement>}
+                  userId={userId}
+                  emptyTitle={isFiltered ? 'No clips here yet.' : 'No shorts yet'}
+                  emptyMessage={
+                    isFiltered && activeLabel
+                      ? `Nothing matches "${activeLabel}" right now — try another filter.`
+                      : 'Check back soon for new content'
+                  }
+                />
+              </WatchAutoplay>
+
             </>
           )}
         </div>
