@@ -1,5 +1,4 @@
 import React, { useEffect, useRef } from 'react';
-import { useCourseMediaViewerStore } from '@/components/course-media-tab/CourseMediaViewer';
 import { Film } from 'lucide-react';
 import type { FeedPost } from '@/components/media-system/types/media';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
@@ -55,11 +54,7 @@ export const CourseMediaTile: React.FC<CourseMediaTileProps> = ({ post, index, f
       data-course-media-index={index}
       onClick={() => {
         const perMediaPosts = allPosts ?? [post];
-        if (onOpenFullscreen) {
-          onOpenFullscreen(perMediaPosts, index);
-        } else {
-          useCourseMediaViewerStore.getState().open(perMediaPosts, index);
-        }
+        onOpenFullscreen?.(perMediaPosts, index);
       }}
       style={{
         position: 'relative',

@@ -1,5 +1,4 @@
 import React, { useEffect, useRef } from 'react';
-import { useCourseMediaViewerStore } from '@/components/course-media-tab/CourseMediaViewer';
 import { Film } from 'lucide-react';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import type { FeedPost } from '@/components/media-system/types/media';
@@ -53,13 +52,8 @@ export const CourseMediaLandscapeCard: React.FC<CourseMediaLandscapeCardProps> =
       ref={tileRef}
       data-course-media-index={index}
       onClick={() => {
-        // `allPosts` is the per-media array; `index` IS the fullscreen index by construction.
         const perMediaPosts = allPosts ?? [post];
-        if (onOpenFullscreen) {
-          onOpenFullscreen(perMediaPosts, index);
-        } else {
-          useCourseMediaViewerStore.getState().open(perMediaPosts, index);
-        }
+        onOpenFullscreen?.(perMediaPosts, index);
       }}
       style={{
         position: 'relative',

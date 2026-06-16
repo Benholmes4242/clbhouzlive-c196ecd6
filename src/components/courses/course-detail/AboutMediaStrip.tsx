@@ -7,7 +7,8 @@ import { adaptClubMediaArrayToExploreItems } from '@/lib/adapters/clubMediaToExp
 import { useIsMobile } from '@/hooks/use-mobile';
 import { useClubMedia } from '@/hooks/useClubMedia';
 import { generateStreamThumbnailUrl } from '@/config/cloudflareStream';
-import { useCourseMediaViewerStore } from '@/components/course-media-tab/CourseMediaViewer';
+import { useFullscreenFeedStore } from '@/store/fullscreenFeedStore';
+import { flattenPostsToMedia, flatIndexFor } from '@/components/fullscreen-feed/flattenPostsToMedia';
 import type { FeedPost, MediaItem } from '@/components/media-system/types/media';
 import { AMBER } from '@/features/courses/_shared/tokens';
 
@@ -304,7 +305,8 @@ const AboutMediaStrip: React.FC<AboutMediaStripProps> = ({ clubId, onSeeAllClick
                 if (showOverflow) {
                   onSeeAllClick();
                 } else {
-                  useCourseMediaViewerStore.getState().open(feedPosts, index);
+                  const { flat, offsetsByParent } = flattenPostsToMedia(feedPosts);
+                  useFullscreenFeedStore.getState().open(flat, flatIndexFor(offsetsByParent, index, 0), { readOnly: true });
                 }
               }}
               style={{

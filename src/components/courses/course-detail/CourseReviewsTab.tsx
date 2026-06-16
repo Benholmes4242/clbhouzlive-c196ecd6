@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
-import { useCourseMediaViewerStore } from '@/components/course-media-tab/CourseMediaViewer';
+import { useFullscreenFeedStore } from '@/store/fullscreenFeedStore';
+import { flattenPostsToMedia } from '@/components/fullscreen-feed/flattenPostsToMedia';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
@@ -262,7 +263,8 @@ const CourseReviewsTab: React.FC<CourseReviewsTabProps> = ({
         tags: [],
       };
     });
-    useCourseMediaViewerStore.getState().open(posts, startIndex);
+    const { flat } = flattenPostsToMedia(posts);
+    useFullscreenFeedStore.getState().open(flat, startIndex, { readOnly: true });
   }, [courseName]);
 
   const reviews = reviewsData || [];
