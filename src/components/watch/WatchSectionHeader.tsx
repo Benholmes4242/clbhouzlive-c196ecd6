@@ -1,3 +1,4 @@
+import type { ReactNode } from 'react';
 import { SectionHeader as ProShopSectionHeader } from './proshop/SectionHeader';
 
 interface WatchSectionHeaderProps {
@@ -9,17 +10,16 @@ interface WatchSectionHeaderProps {
   /** Action label override; defaults to "See all". */
   seeAllLabel?: string;
   paddingTop?: number;
+  /** Optional left-aligned section mark (icon/glyph). */
+  mark?: ReactNode;
+  /** Override kicker tone; defaults to slate via ProShopSectionHeader. */
+  kickerColor?: 'amber' | 'emerald' | 'slate';
 }
 
 /**
- * Canonical Watch surface section header.
- *
- * Phase 1.5: this is now a thin shim over the Pro Shop `SectionHeader`
- * primitive so every rail on the Watch tab shares the same editorial
- * rhythm (kicker + title + subhead + amber action with chevron).
- *
- * Existing call sites that don't pass `sub` continue to work — they
- * just render kicker + title.
+ * Canonical Watch surface section header — thin shim over the Pro Shop
+ * `SectionHeader` primitive. Phase 1 warmth pass adds `mark` and
+ * `kickerColor` passthroughs for bespoke landing-section identity.
  */
 export default function WatchSectionHeader({
   eyebrow,
@@ -28,15 +28,18 @@ export default function WatchSectionHeader({
   onSeeAll,
   seeAllLabel = 'See all',
   paddingTop,
+  mark,
+  kickerColor,
 }: WatchSectionHeaderProps) {
   return (
     <ProShopSectionHeader
       kicker={eyebrow}
+      kickerColor={kickerColor}
       title={title}
       sub={sub}
       action={onSeeAll ? { label: seeAllLabel, onClick: onSeeAll } : undefined}
       paddingTop={paddingTop}
+      mark={mark}
     />
   );
 }
-
