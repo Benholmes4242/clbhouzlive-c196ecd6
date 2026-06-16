@@ -48,6 +48,8 @@ interface SnapFeedProps {
   isFullscreen?: boolean;
   /** Tags pool entries created by this SnapFeed so fullscreen can prune its own without touching feed entries. */
   surface?: 'feed' | 'fullscreen';
+  /** When true, disables DB hooks (watch-progress, UCP, comments) that require a real post id. Used by gallery/flat viewers with synthetic ids. */
+  readOnly?: boolean;
 }
 
 export function SnapFeed({
@@ -59,6 +61,7 @@ export function SnapFeed({
   activeIndexOverride,
   isFullscreen,
   surface = 'feed',
+  readOnly = false,
 }: SnapFeedProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const slideRefs = useRef<Map<number, HTMLDivElement>>(new Map());
@@ -136,7 +139,7 @@ export function SnapFeed({
   const trackerUserId = session?.user?.id;
   const getTrackerContainer = useCallback(() => containerRef.current, []);
   useWatchProgressTracker({
-    userId: trackerUserId,
+    userId: readOnly ? undefined : trackerUserId,
     activeIndex,
     posts,
     getContainer: getTrackerContainer,
