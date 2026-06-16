@@ -116,8 +116,8 @@ export function LiveLeaderboardTab() {
             overflowY: 'hidden',
             WebkitOverflowScrolling: 'touch',
             scrollbarWidth: 'none',
-            background: SHELL_BG,
-            borderBottom: `0.5px solid ${WHITE_ALPHA_06}`,
+            background: SLATE_50,
+            borderBottom: `0.5px solid ${INK_TINT_07}`,
           }}
         >
           {liveTournaments.map((t) => {
@@ -133,9 +133,9 @@ export function LiveLeaderboardTab() {
                   height: 30,
                   padding: '0 11px',
                   borderRadius: 15,
-                  background: isActive ? WHITE_ALPHA_18 : 'transparent',
-                  border: `1px solid ${isActive ? WHITE_ALPHA_55 : WHITE_ALPHA_18}`,
-                  color: isActive ? SURFACE : WHITE_ALPHA_65,
+                  background: isActive ? INK_TINT_06 : 'transparent',
+                  border: `1px solid ${isActive ? 'rgba(15,23,42,0.20)' : INK_TINT_07}`,
+                  color: isActive ? INK : INK_MUTE,
                   fontFamily: 'Geist, system-ui, -apple-system, BlinkMacSystemFont, sans-serif',
                   fontSize: 12,
                   fontWeight: isActive ? 700 : 600,
