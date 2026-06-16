@@ -131,21 +131,6 @@ export const FriendRoundCardV2: React.FC<Props> = ({
           }}
         />
 
-        <div
-          style={{
-            position: 'absolute',
-            top: 8,
-            left: 8,
-          }}
-        >
-          <SquircleAvatar
-            src={pickAvatarSrc(activity.friend_thumbnail_url, activity.friend_profile_photo_url)}
-            alt={activity.friend_name ?? ''}
-            size={28}
-            hideRing
-            userId={activity.friend_user_id ?? undefined}
-          />
-        </div>
       </div>
 
       {/* Right column — content */}
@@ -324,58 +309,60 @@ export const FriendRoundCardV2: React.FC<Props> = ({
                 {gross ?? '—'}
               </span>
             </div>
-            <div style={{ display: 'flex', alignItems: 'baseline', gap: 5 }}>
-              <span
-                style={{
-                  fontSize: 9,
-                  fontWeight: 800,
-                  letterSpacing: '0.12em',
-                  color: 'var(--hcp-t-60)',
-                  textTransform: 'uppercase',
-                }}
-              >
-                STBL
-              </span>
-              <span
-                style={{
-                  fontSize: 14,
-                  fontWeight: 800,
-                  fontVariantNumeric: 'tabular-nums',
-                  color: 'var(--hcp-t-100)',
-                  letterSpacing: '-0.02em',
-                  lineHeight: 1,
-                }}
-              >
-                {stableford ?? '—'}
-              </span>
-            </div>
-            <div style={{ display: 'flex', alignItems: 'baseline', gap: 5 }}>
-              <span
-                style={{
-                  fontSize: 9,
-                  fontWeight: 800,
-                  letterSpacing: '0.12em',
-                  color: 'var(--hcp-t-60)',
-                  textTransform: 'uppercase',
-                }}
-              >
-                DIFF
-              </span>
-              <span
-                style={{
-                  fontSize: 14,
-                  fontWeight: 800,
-                  fontVariantNumeric: 'tabular-nums',
-                  color: diffColor,
-                  letterSpacing: '-0.02em',
-                  lineHeight: 1,
-                }}
-              >
-                {diff != null
-                  ? `${diff > 0 ? '+' : ''}${diff.toFixed(1)}`
-                  : '—'}
-              </span>
-            </div>
+            {stableford != null && (
+              <div style={{ display: 'flex', alignItems: 'baseline', gap: 5 }}>
+                <span
+                  style={{
+                    fontSize: 9,
+                    fontWeight: 800,
+                    letterSpacing: '0.12em',
+                    color: 'var(--hcp-t-60)',
+                    textTransform: 'uppercase',
+                  }}
+                >
+                  STBL
+                </span>
+                <span
+                  style={{
+                    fontSize: 14,
+                    fontWeight: 800,
+                    fontVariantNumeric: 'tabular-nums',
+                    color: 'var(--hcp-t-100)',
+                    letterSpacing: '-0.02em',
+                    lineHeight: 1,
+                  }}
+                >
+                  {stableford}
+                </span>
+              </div>
+            )}
+            {diff != null && (
+              <div style={{ display: 'flex', alignItems: 'baseline', gap: 5 }}>
+                <span
+                  style={{
+                    fontSize: 9,
+                    fontWeight: 800,
+                    letterSpacing: '0.12em',
+                    color: 'var(--hcp-t-60)',
+                    textTransform: 'uppercase',
+                  }}
+                >
+                  DIFF
+                </span>
+                <span
+                  style={{
+                    fontSize: 14,
+                    fontWeight: 800,
+                    fontVariantNumeric: 'tabular-nums',
+                    color: diffColor,
+                    letterSpacing: '-0.02em',
+                    lineHeight: 1,
+                  }}
+                >
+                  {`${diff > 0 ? '+' : ''}${diff.toFixed(1)}`}
+                </span>
+              </div>
+            )}
             {hasScorecard && (
               <ChevronRight
                 size={16}
