@@ -21,10 +21,11 @@ function VideosFollowingRailInner({ userId }: VideosFollowingRailProps) {
   return (
     <section>
       <SectionHeader
+        paddingTop={20}
         title="From creators you follow"
         sub="New from people you've subscribed to"
       />
-      <HRail>
+      <HRail paddingBottom={10}>
         {posts.map((post, i) => (
           <VideoRailTile key={post.id} post={post} index={i} allPosts={posts} width={280} />
         ))}

@@ -78,7 +78,7 @@ function VideoOfTheWeekHeroInner() {
   };
 
   return (
-    <section style={{ padding: '24px 16px 12px' }}>
+    <section style={{ padding: '16px 16px 4px' }}>
       <Kicker color="amber">Video of the Week</Kicker>
 
       <button

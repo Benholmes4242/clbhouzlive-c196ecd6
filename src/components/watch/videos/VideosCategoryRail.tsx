@@ -30,11 +30,12 @@ function VideosCategoryRailInner({ userId, mood }: VideosCategoryRailProps) {
   return (
     <section>
       <SectionHeader
+        paddingTop={20}
         kicker="In the mood for"
         title={label}
         sub={sub ?? undefined}
       />
-      <HRail>
+      <HRail paddingBottom={10}>
         {posts.map((post, i) => (
           <VideoRailTile key={post.id} post={post} index={i} allPosts={posts} width={280} />
         ))}

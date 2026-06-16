@@ -25,10 +25,11 @@ function VideosContinueWatchingRailInner({ userId }: VideosContinueWatchingRailP
   return (
     <section>
       <SectionHeader
+        paddingTop={20}
         title="Continue watching"
         sub="Pick up where you left off"
       />
-      <HRail>
+      <HRail paddingBottom={10}>
         {posts.map((post, i) => {
           const progress =
             post.totalSeconds && post.totalSeconds > 0
