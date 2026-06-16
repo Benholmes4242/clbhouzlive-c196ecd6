@@ -40,10 +40,24 @@ export const RecentlyPlayedFeed: React.FC<Props> = ({ ownerUserId }) => {
   const { open: openFriendSheet } = useOpenFriendSheet();
 
   const handleOpen = (item: WhsFriendActivityWithImage) => {
+    // State D — Not a Clbhouz user (or unresolvable user_id) → invite-to-join sheet
     if (!item.is_clbhouz_user || !item.friend_user_id) {
       openFriendSheet({ whsOnlyEntry: toWhsOnlyEntry(item), source: 'cinema_friend_card' });
       return;
     }
+    // State C — Clbhouz user but not synced (no friend_connection_id) → friend sheet
+    // (auto-derives the UnsyncedPitchCard state from the snapshot).
+    if (!item.friend_connection_id) {
+      openFriendSheet({ targetUserId: item.friend_user_id, source: 'cinema_friend_card' });
+      return;
+    }
+    // State B — Synced friend, but no detailed scorecard for this round
+    // (EG summary-only). Never open the empty RoundDetailSheet.
+    if (!item.last_round_score_id) {
+      openFriendSheet({ targetUserId: item.friend_user_id, source: 'cinema_friend_card' });
+      return;
+    }
+    // State A — Synced + has scorecard → real scorecard sheet
     setSheetActivity(item);
   };
 
