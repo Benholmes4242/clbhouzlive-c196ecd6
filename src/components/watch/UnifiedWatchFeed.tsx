@@ -74,36 +74,35 @@ export default function UnifiedWatchFeed({ embedded = false }: UnifiedWatchFeedP
         <div style={{ paddingTop: 4, paddingBottom: 8 }}>
           <WatchMoodChips active={mood} onChange={setMood} />
         </div>
-        <WatchAutoplay
-          posts={posts}
-          gridRef={gridRef as React.RefObject<HTMLDivElement>}
-        />
-        <WatchGrid
-          posts={posts}
-          isLoading={isLoading}
-          isError={isError}
-          hasNextPage={hasNextPage}
-          isFetchingNextPage={isFetchingNextPage}
-          fetchNextPage={fetchNextPage}
-          refetch={refetch}
-          gridRef={gridRef as React.RefObject<HTMLDivElement>}
-          userId={userId}
-          emptyEmoji={
-            mood === 'follows' ? '👥'
-            : mood === 'played_courses' ? '⛳'
-            : '⛳'
-          }
-          emptyTitle={
-            mood === 'follows' ? 'No videos from your follows yet'
-            : mood === 'played_courses' ? 'No videos from courses you\u2019ve played'
-            : 'No shorts yet'
-          }
-          emptyMessage={
-            mood === 'follows' ? 'Follow more creators to see their clips here'
-            : mood === 'played_courses' ? 'Log a round to start seeing clips from those courses'
-            : 'Check back soon for new content'
-          }
-        />
+        <WatchAutoplay>
+          <WatchGrid
+            posts={posts}
+            isLoading={isLoading}
+            isError={isError}
+            hasNextPage={hasNextPage}
+            isFetchingNextPage={isFetchingNextPage}
+            fetchNextPage={fetchNextPage}
+            refetch={refetch}
+            gridRef={gridRef as React.RefObject<HTMLDivElement>}
+            userId={userId}
+            emptyEmoji={
+              mood === 'follows' ? '👥'
+              : mood === 'played_courses' ? '⛳'
+              : '⛳'
+            }
+            emptyTitle={
+              mood === 'follows' ? 'No videos from your follows yet'
+              : mood === 'played_courses' ? 'No videos from courses you\u2019ve played'
+              : 'No shorts yet'
+            }
+            emptyMessage={
+              mood === 'follows' ? 'Follow more creators to see their clips here'
+              : mood === 'played_courses' ? 'Log a round to start seeing clips from those courses'
+              : 'Check back soon for new content'
+            }
+          />
+        </WatchAutoplay>
+
       </div>
 
       <ScrollToTopGlass />
