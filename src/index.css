@@ -1899,15 +1899,18 @@ html, body, #root, .app-shell { touch-action: auto; }
    pins the nav to the viewport's left edge. Re-center horizontally by
    anchoring to viewport midpoint. We avoid `transform: translateX(-50%)`
    because framer-motion owns this element's inline transform; instead we
-   use `left: calc(50% - 240px)` so the 480px-wide nav sits centered.
+   use `left: calc(50% - <half-width>)` so the nav sits centered.
+   Width matches the Clubhouse feed column cap (620px) so the nav visually
+   aligns with the content column on tablets.
    iPhone (<768px) is byte-identical — this media query cannot match. */
 @media (min-width: 768px) {
   .global-bottom-nav {
-    left: calc(50% - 240px) !important;
+    left: calc(50% - 310px) !important;
     right: auto !important;
-    width: 480px;
+    width: 620px;
   }
 }
+
 
 /* Ensure pages have bottom padding for the nav when needed */
 .page-with-bottom-nav {
