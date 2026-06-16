@@ -12,7 +12,6 @@ import LongPressTipBanner from './LongPressTipBanner';
 import { WatchActionsProvider } from './context/WatchActionsContext';
 import { useWatchFeed } from './hooks/useWatchFeed';
 import ScrollToTopGlass from '@/components/common/ScrollToTopGlass';
-import { WatchOfTheWeekHero } from './proshop/WatchOfTheWeekHero';
 
 import { WatchMoodChips } from './proshop/WatchMoodChips';
 import { useWatchMood } from './proshop/hooks/useWatchMood';
