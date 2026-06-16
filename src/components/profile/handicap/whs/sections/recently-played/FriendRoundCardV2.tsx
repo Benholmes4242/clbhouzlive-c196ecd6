@@ -1,10 +1,8 @@
 import React, { useMemo } from 'react';
 import { Flame, ChevronRight } from 'lucide-react';
 import { displayName } from '@/lib/whs/utils/initials';
-import { pickAvatarSrc } from '@/lib/whs/utils/avatarSrc';
 import { fmtAbsoluteDate } from '@/lib/whs/utils/nameFormat';
 import { useFriendRoundDetail } from '@/lib/whs/hooks';
-import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import FlagSilhouetteOverlay from '@/components/whs/FlagSilhouetteOverlay';
 import type { WhsFriendActivityWithImage } from '@/lib/whs/types';
 
