@@ -1879,16 +1879,32 @@ html, body, #root, .app-shell { touch-action: auto; }
 .global-bottom-nav {
   /* Ensure it's above all content but below toasts/modals */
   z-index: 100 !important;
-  
-  /* Hardware acceleration for smooth performance */
-  transform: translate3d(0, 0, 0);
-  will-change: transform;
-  
+
+  /* Hardware acceleration for smooth performance.
+     NOTE: transform/will-change intentionally NOT set here — framer-motion
+     animates `transform` inline on this element. Setting it in CSS creates a
+     fight with the inline style and (more importantly) establishes a
+     containing block that breaks the centering shell on iPad. */
+
   /* Ensure it never breaks from transforms in parent elements */
   position: fixed !important;
   bottom: 0;
   left: 0;
   right: 0;
+}
+
+/* iPad (≥768px) — the app-shell widens past 480px, so left:0 + max-w-480
+   pins the nav to the viewport's left edge. Re-center horizontally by
+   anchoring to viewport midpoint. We avoid `transform: translateX(-50%)`
+   because framer-motion owns this element's inline transform; instead we
+   use `left: calc(50% - 240px)` so the 480px-wide nav sits centered.
+   iPhone (<768px) is byte-identical — this media query cannot match. */
+@media (min-width: 768px) {
+  .global-bottom-nav {
+    left: calc(50% - 240px) !important;
+    right: auto !important;
+    width: 480px;
+  }
 }
 
 /* Ensure pages have bottom padding for the nav when needed */
