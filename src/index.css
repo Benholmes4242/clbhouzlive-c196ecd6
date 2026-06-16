@@ -1734,7 +1734,7 @@ body.route-clubhouse .global-header {
   position: fixed;
   inset: 0;
   height: 100svh;
-  width: 100vw;
+  width: 100%;
   background: var(--bg-page);
   overflow: hidden;
 }
