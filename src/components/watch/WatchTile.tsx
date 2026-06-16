@@ -55,21 +55,30 @@ const WatchTile: React.FC<WatchTileProps> = ({
   const isPlaying = ctx?.playingIds.has(mediaId) ?? false;
   const [videoVisible, setVideoVisible] = useState(false);
 
+  // Stable handle to registerMedia — the ctx object identity changes every
+  // time playingIds updates (its memo deps include playingIds). Depending on
+  // ctx inside the ref callback would re-create the callback on every runtime
+  // sync, causing React to unregister+re-register the <video> each tick →
+  // infinite "Maximum update depth" loop. Reading from a ref keeps the ref
+  // callback identity stable across syncs.
+  const registerMediaRef = useRef(ctx?.registerMedia);
+  registerMediaRef.current = ctx?.registerMedia;
+
   // Long-press state
   const longPressTimerRef = useRef<number | null>(null);
   const longPressFiredRef = useRef(false);
   const pressStartRef = useRef<{ x: number; y: number } | null>(null);
 
   // Video element ref callback — registers/unregisters with MediaRuntime.
-  // The runtime needs a real <video> to call play()/pause(); we always render
-  // an empty muted/looped/playsinline element so the runtime can decide BEFORE
-  // we attach HLS. HLS wire-up happens reactively in the isPlaying effect below.
+  // Deps are STABLE (no ctx, no playingIds) so React doesn't re-run it on
+  // every spotlight sync.
   const videoRefCallback = useCallback(
     (el: HTMLVideoElement | null) => {
       videoElRef.current = el;
-      if (!ctx) return;
+      const register = registerMediaRef.current;
+      if (!register) return;
       if (el && tileRef.current) {
-        ctx.registerMedia({
+        register({
           id: mediaId,
           element: el,
           observeTarget: tileRef.current,
@@ -77,10 +86,10 @@ const WatchTile: React.FC<WatchTileProps> = ({
           isCandidate: !!(hlsUrl || mp4Url),
         });
       } else {
-        ctx.registerMedia({ id: mediaId, element: null });
+        register({ id: mediaId, element: null });
       }
     },
-    [ctx, mediaId, index, hlsUrl, mp4Url],
+    [mediaId, index, hlsUrl, mp4Url],
   );
 
   // Attach HLS when runtime says we're the spotlight; demote-to-pool on the
