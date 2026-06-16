@@ -115,6 +115,19 @@ export function SnapFeed({
     requestAnimationFrame(tryScroll);
   }, [startIndex]);
 
+  // ── Explore tab retap / cross-page Explore tap: scroll feed to top ──
+  useEffect(() => {
+    const onRetap = (e: Event) => {
+      const detail = (e as CustomEvent).detail;
+      if (detail?.tabId !== 'clubhouse') return;
+      // Cancel any pending startIndex resume — user explicitly wants the top.
+      hasScrolledToStart.current = true;
+      containerRef.current?.scrollTo({ top: 0, behavior: 'smooth' });
+    };
+    window.addEventListener('clbhouz-active-tab-retap', onRetap);
+    return () => window.removeEventListener('clbhouz-active-tab-retap', onRetap);
+  }, []);
+
   const storeActiveIndex = useClubhouseStore(s => s.activeIndex);
   const setActiveIndex = useClubhouseStore(s => s.setActiveIndex);
   // When an override is supplied (e.g. by FullscreenFeedOverlay which owns its
