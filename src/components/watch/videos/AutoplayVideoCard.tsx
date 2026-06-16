@@ -287,7 +287,7 @@ function AutoplayVideoCardInner({ post, index, allPosts, userId, active, borderR
           </div>
         </div>
 
-        <div style={{ flexShrink: 0, marginRight: -8 }}>
+        <div style={{ flexShrink: 0, marginRight: -8, marginTop: 18 }}>
           <VideoCardMenu postId={post.id} userId={userId} onShare={handleShare} />
         </div>
       </div>
