@@ -13,9 +13,10 @@ interface VideoCardMenuProps {
   postId: string;
   userId?: string;
   onShare: () => void;
+  className?: string;
 }
 
-export const VideoCardMenu = React.memo(function VideoCardMenu({ postId, userId, onShare }: VideoCardMenuProps) {
+export const VideoCardMenu = React.memo(function VideoCardMenu({ postId, userId, onShare, className }: VideoCardMenuProps) {
   const handleCopyLink = async () => {
     const url = `${window.location.origin}/video/${postId}`;
     await navigator.clipboard.writeText(url);
