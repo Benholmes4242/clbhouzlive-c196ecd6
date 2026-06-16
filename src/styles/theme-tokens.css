@@ -283,3 +283,38 @@ button.ghost:hover,
   0%, 100% { opacity: 1; }
   50% { opacity: 0.5; }
 }
+
+/* ============================================================
+ * Tablet (iPad) responsive primitives — Stage T-0 foundations
+ * ============================================================
+ * All rules are gated >= 768px so the phone layout is UNAFFECTED.
+ *
+ * .tablet-modal — apply to a bottom-sheet's root panel to convert
+ * it into a centered modal on iPad. Mirrors the AdminSheet pattern.
+ * Mobile keeps full-width bottom-sheet behaviour untouched.
+ *
+ * .tablet-letterbox-bg — outer wrapper bg painted with the route's
+ * token so the centered column blends edge-to-edge on iPad.
+ */
+
+@media (min-width: 768px) {
+  .tablet-modal {
+    align-self: center !important;
+    width: 100% !important;
+    max-width: 560px !important;
+    max-height: 85dvh !important;
+    border-radius: 18px !important;
+    margin: auto !important;
+  }
+  .tablet-modal-scrim {
+    align-items: center !important;
+    padding: 24px !important;
+  }
+}
+
+@media (min-width: 1024px) {
+  .tablet-modal {
+    max-width: 620px !important;
+    max-height: 82dvh !important;
+  }
+}
