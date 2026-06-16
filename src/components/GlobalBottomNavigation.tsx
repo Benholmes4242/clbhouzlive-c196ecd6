@@ -165,7 +165,7 @@ const GlobalBottomNavigation: React.FC<GlobalBottomNavigationProps> = ({ chromeS
             <motion.div
               className={cn(
                 "global-bottom-nav",
-                "w-full max-w-[480px]",
+                "w-full max-w-[480px] md:max-w-[620px]",
                 "pointer-events-auto",
                 "m-0!"
               )}
