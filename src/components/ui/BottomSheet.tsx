@@ -111,10 +111,13 @@ export function BottomSheet({
       <div
         ref={sheetRef}
         className={cn(
-          "fixed bottom-0 left-0 right-0 bg-background rounded-t-[20px] transition-transform duration-300 ease-out",
-          isAnimating ? "translate-y-0" : "translate-y-full",
+          // Mobile: full-width bottom sheet (UNCHANGED).
+          // Tablet (md+): cap width and center horizontally so iPad gets a panel feel.
+          "fixed bottom-0 left-0 right-0 bg-background rounded-t-[20px] transition-transform duration-300 ease-out md:left-1/2 md:right-auto md:-translate-x-1/2 md:w-full md:max-w-[600px]",
+          isAnimating ? "translate-y-0" : "translate-y-full md:translate-y-full",
           className
         )}
+
         style={{ 
           zIndex: zIndexBase + 1,
           maxHeight: '90vh',
