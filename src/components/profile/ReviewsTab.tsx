@@ -106,10 +106,12 @@ function SummaryBar({
 
 function ReviewCard({ 
   review, 
-  courseId
+  courseId,
+  courseName,
 }: { 
   review: Review; 
   courseId?: string;
+  courseName?: string;
 }) {
   const { user } = useSupabaseSession();
   const queryClient = useQueryClient();
@@ -118,27 +120,48 @@ function ReviewCard({
   const [userVote, setUserVote] = React.useState<'helpful' | 'unhelpful' | 'none'>(review.userVote || 'none');
   const [pending, setPending] = React.useState(false);
 
-  const { openViewer } = useMediaViewer();
-
   const MAX_THUMBS = 3;
 
   const openModal = (index: number) => {
-    if (review.media && review.media.length > 0) {
-      // Transform review media to explore content items for unified player
-      const mediaItems = review.media.map((m, i) => ({
+    if (!review.media || review.media.length === 0) return;
+    const posts: FeedPost[] = review.media.map((m, i) => {
+      const isVideo = m.type === 'video';
+      return {
         id: `${review.id}-media-${i}`,
-        type: m.type as 'video' | 'image',
-        src: m.url,
-        title: review.text?.slice(0, 50) || 'Review media',
-        likes: 0,
-        user: {
-          id: review.id,
-          name: review.user.name,
-          avatar: review.user.avatarUrl,
+        userId: review.id,
+        actorType: 'personal',
+        actorId: review.id,
+        username: '',
+        displayName: review.user.name ?? '',
+        avatarUrl: review.user.avatarUrl ?? '',
+        isVerified: false,
+        caption: '',
+        isReview: true,
+        review: {
+          reviewId: review.id,
+          rating: review.rating10,
+          reviewText: review.text ?? null,
+          courseName: courseName ?? '',
+          courseRegion: undefined,
+          courseCountry: undefined,
+          courseSubCountry: undefined,
         },
-      }));
-      openViewer(mediaItems, index);
-    }
+        mediaItems: [{
+          id: `${review.id}-media-${i}`,
+          type: isVideo ? 'video' : 'image',
+          hlsUrl: isVideo ? m.url : undefined,
+          imageUrl: !isVideo ? m.url : undefined,
+          thumbnailUrl: (m as any).thumbnailUrl ?? m.url,
+          width: 0,
+          height: 0,
+        }],
+        createdAt: review.dateISO,
+        likeCount: 0,
+        commentCount: 0,
+        shareCount: 0,
+      } as unknown as FeedPost;
+    });
+    useFullscreenFeedStore.getState().open(posts, index, { readOnly: true });
   };
 
   // Vote handling logic
