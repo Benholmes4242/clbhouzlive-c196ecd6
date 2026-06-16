@@ -27,7 +27,6 @@ function MoreToWatchDividerInner({ mood }: MoreToWatchDividerProps) {
     <div
       style={{
         padding: '32px 16px 12px',
-        borderTop: '1px solid rgba(15,23,42,0.06)',
         marginTop: 16,
       }}
     >
