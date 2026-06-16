@@ -32,6 +32,7 @@ export function FullscreenFeedOverlay() {
   const hasNextPage = useFullscreenFeedStore(s => s.hasNextPage);
   const fetchNextPage = useFullscreenFeedStore(s => s.fetchNextPage);
   const isFetchingNextPage = useFullscreenFeedStore(s => s.isFetchingNextPage);
+  const readOnly = useFullscreenFeedStore(s => s.readOnly);
 
   // Use the real active actor (personal or business) so users in business
   // mode can like/comment/follow as their business from fullscreen. Falls
@@ -41,6 +42,7 @@ export function FullscreenFeedOverlay() {
   const { handleLike, getActiveLikeState } = useClubhouseLikes({ userId, activeActor });
   const { followOverrides, handleFollowChange, getFollowState } = useClubhouseFollows({ userId });
   const { commentsOpen, overlayVisible, openComments, closeComments, getCommentCount } = useClubhouseComments();
+  const safeOpenComments = useCallback(() => { if (!readOnly) openComments(); }, [readOnly, openComments]);
   const { handleShare } = useClubhouseShare(userId);
   const { activePost, golfCourse, activeReview, isActiveReview } = useActivePostDerived(posts, activeIndex);
   const isOwnPost = !!(userId && activePost?.userId === userId);
@@ -98,9 +100,10 @@ export function FullscreenFeedOverlay() {
     if (!isOpen) return;
     if (!openCommentsInitially) return;
     if (posts.length === 0) return;
+    if (readOnly) { consumeOpenCommentsInitially(); return; }
     openComments();
     consumeOpenCommentsInitially();
-  }, [isOpen, openCommentsInitially, posts.length, openComments, consumeOpenCommentsInitially]);
+  }, [isOpen, openCommentsInitially, posts.length, openComments, consumeOpenCommentsInitially, readOnly]);
 
   // Body scroll lock
   useEffect(() => {
@@ -128,8 +131,9 @@ export function FullscreenFeedOverlay() {
         document.body.style.overflow = "";
         document.body.classList.remove('route-fullscreen-overlay');
         // Restore shield to transparent (NOT #F8FAFC) so the dark feed background
-        // shows through — matches CourseMediaViewer and App.tsx's dark route baseline.
-        // #F8FAFC was a light slate that flashed over the dark feed on return.
+        // shows through — matches the prior CourseMediaViewer behaviour and
+        // App.tsx's dark route baseline. #F8FAFC was a light slate that flashed
+        // over the dark feed on return.
         if (shield) shield.style.backgroundColor = 'transparent';
         document.documentElement.style.backgroundColor = '';
         document.body.style.backgroundColor = '';
@@ -179,7 +183,7 @@ export function FullscreenFeedOverlay() {
                   posts={posts}
                   activeIndexOverride={activeIndex}
                   onLike={handleLike}
-                  onComment={openComments}
+                  onComment={safeOpenComments}
                   onShare={handleShare}
                   onMore={() => {}}
                   getLikeState={getActiveLikeState}
@@ -197,7 +201,9 @@ export function FullscreenFeedOverlay() {
                   bottomOffset={0}
                   topActionBar
                   onClose={close}
+                  readOnly={readOnly}
                 />
+
 
                 <FullscreenCarouselOverlay
                   activePost={activePost}
