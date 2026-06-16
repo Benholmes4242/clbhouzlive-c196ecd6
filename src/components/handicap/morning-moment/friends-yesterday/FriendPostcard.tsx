@@ -27,36 +27,6 @@ const fmtDiffShort = (d: number | null): string | null => {
   return `${sign}${d.toFixed(1)} diff`;
 };
 
-const Avatar: React.FC<{ friend: FriendYesterday }> = ({ friend }) => (
-  <div
-    style={{
-      width: 26,
-      height: 26,
-      borderRadius: '34%',
-      overflow: 'hidden',
-      border: '0.5px solid rgba(255,255,255,0.25)',
-      background: friend.thumbnail_url
-        ? 'rgba(15,23,42,0.06)'
-        : 'linear-gradient(135deg, #3b82f6, #1e3a8a)',
-      display: 'flex',
-      alignItems: 'center',
-      justifyContent: 'center',
-      flexShrink: 0,
-    }}
-  >
-    {friend.thumbnail_url ? (
-      <img
-        src={friend.thumbnail_url}
-        alt={friend.name}
-        style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
-      />
-    ) : (
-      <span style={{ fontSize: 9, fontWeight: 800, color: '#FFFFFF' }}>
-        {friend.initial}
-      </span>
-    )}
-  </div>
-);
 
 const LowestChip: React.FC = () => (
   <div
@@ -318,7 +288,6 @@ export const FriendPostcard: React.FC<Props> = ({ friend, showLowest, onClick })
             zIndex: 2,
           }}
         >
-          <Avatar friend={friend} />
           {showLowest && <LowestChip />}
         </div>
       </div>
