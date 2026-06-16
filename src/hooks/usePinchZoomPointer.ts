@@ -112,17 +112,26 @@ export function usePinchZoomPointer(opts: UsePinchZoomPointerOpts = {}) {
     if (!el) return;
 
     const onPointerDown = (e: PointerEvent) => {
-      // Allow vertical scroll when not zoomed; still collect positions.
-      el.setPointerCapture?.(e.pointerId);
+      // Record the pointer position but DO NOT capture yet. Capturing on the
+      // first finger of an unzoomed image hijacks vertical swipes from the
+      // snap-scroll container. We capture only when the gesture is
+      // unambiguously pinch (2 pointers) or pan-while-zoomed.
       pointers.current.set(e.pointerId, { x: e.clientX, y: e.clientY });
 
       if (pointers.current.size === 1) {
+        // Pan-while-zoomed: capture so the pan is smooth and doesn't bleed
+        // into the scroller.
+        if (scale > 1) {
+          el.setPointerCapture?.(e.pointerId);
+        }
+
         // Double-tap (pointer) zoom
         const now = Date.now();
         if (now - lastTapTime.current < 300 && scale === 1) {
-          // Zoom in on double tap
+          // Zoom in on double tap; capture now that we've entered zoom so the
+          // immediate follow-on gesture is owned by this element.
           setScale(clamp(doubleTapZoom, minScale, maxScale));
-          // No need to preventDefault; we capture pointer
+          el.setPointerCapture?.(e.pointerId);
         }
         lastTapTime.current = now;
 
@@ -134,6 +143,10 @@ export function usePinchZoomPointer(opts: UsePinchZoomPointerOpts = {}) {
       }
 
       if (pointers.current.size === 2) {
+        // Pinch starting — capture BOTH active pointers so neither drops out
+        // if a finger leaves the element bounds mid-pinch.
+        pointers.current.forEach((_, id) => el.setPointerCapture?.(id));
+
         // Initialize pinch
         const [p1, p2] = Array.from(pointers.current.values());
         startDistance.current = distance(p1, p2);
@@ -143,6 +156,7 @@ export function usePinchZoomPointer(opts: UsePinchZoomPointerOpts = {}) {
         lastCenter.current = getCenter();
       }
     };
+
 
     const onPointerMove = (e: PointerEvent) => {
       if (!pointers.current.has(e.pointerId)) return;
