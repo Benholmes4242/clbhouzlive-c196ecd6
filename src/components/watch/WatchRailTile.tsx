@@ -244,19 +244,19 @@ export default function WatchRailTile({
         </div>
       )}
 
-      {/* Optional rank — outlined sans (Geist inherited), top-left */}
+      {/* Optional rank — bold translucent filled marker, top-left */}
       {typeof rank === 'number' && (
         <span
           style={{
             position: 'absolute',
-            top: 4,
-            left: 8,
-            fontSize: 48,
+            top: 2,
+            left: 10,
+            fontSize: 76,
             fontWeight: 900,
             lineHeight: 1,
-            letterSpacing: '-2px',
-            color: 'transparent',
-            WebkitTextStroke: '1.5px rgba(255,255,255,0.3)',
+            letterSpacing: '-0.04em',
+            color: 'rgba(255,255,255,0.32)',
+            textShadow: '0 2px 12px rgba(0,0,0,0.18)',
             pointerEvents: 'none',
             zIndex: 2,
             userSelect: 'none',
