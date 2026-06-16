@@ -68,6 +68,17 @@ export const CardFeed: React.FC<CardFeedProps> = ({
 }) => {
   const virtuosoRef = useRef<VirtuosoHandle | null>(null);
 
+  // Explore tab retap → scroll Clubhouse feed to top
+  useEffect(() => {
+    const onRetap = (e: Event) => {
+      const detail = (e as CustomEvent).detail;
+      if (detail?.tabId !== 'clubhouse') return;
+      virtuosoRef.current?.scrollToIndex({ index: 0, align: 'start', behavior: 'smooth' });
+    };
+    window.addEventListener('clbhouz-active-tab-retap', onRetap);
+    return () => window.removeEventListener('clbhouz-active-tab-retap', onRetap);
+  }, []);
+
   // ── Active-card tracking (center-proximity) ──
   // The card whose vertical center is nearest the viewport's vertical center
   // becomes active. Height-independent + symmetric. IntersectionObserver
