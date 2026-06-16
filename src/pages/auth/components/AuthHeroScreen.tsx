@@ -118,7 +118,7 @@ const AuthHeroScreen: React.FC<AuthHeroScreenProps> = ({
         style={{ background: '#F8FAFC' }}
       />
 
-      <div className="relative flex-1 flex flex-col px-6 pt-safe overflow-y-auto">
+      <div className="relative flex-1 flex flex-col px-6 md:px-0 md:max-w-[420px] md:w-full md:mx-auto pt-safe overflow-y-auto">
         {/* Logo */}
         <div
           className="flex flex-col justify-center items-center gap-3 auth-logo-animate"
@@ -149,7 +149,7 @@ const AuthHeroScreen: React.FC<AuthHeroScreenProps> = ({
 
         {/* Bottom action panel */}
         <div
-          className="pb-8 pt-6 -mx-6 px-6"
+          className="pb-8 pt-6 -mx-6 px-6 md:mx-0 md:px-0"
           style={{
             background: '#F8FAFC',
           }}
