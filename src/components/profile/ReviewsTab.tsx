@@ -12,7 +12,8 @@ import { MediaItem } from '@/types/media';
 import { ExploreContentItem } from '@/components/explore/types';
 import { getStreamPoster } from '@/utils/stream';
 import { FLAGS } from '@/config/flags';
-import { useMediaViewer } from '@/hooks/useMediaViewer';
+import { useFullscreenFeedStore } from '@/store/fullscreenFeedStore';
+import type { FeedPost } from '@/components/media-system/types/media';
 
 type Review = {
   id: string;
