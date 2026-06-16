@@ -73,7 +73,7 @@ export const CardFeed: React.FC<CardFeedProps> = ({
     const onRetap = (e: Event) => {
       const detail = (e as CustomEvent).detail;
       if (detail?.tabId !== 'clubhouse') return;
-      virtuosoRef.current?.scrollToIndex({ index: 0, align: 'start', behavior: 'smooth' });
+      virtuosoRef.current?.scrollTo({ top: 0, behavior: 'smooth' });
     };
     window.addEventListener('clbhouz-active-tab-retap', onRetap);
     return () => window.removeEventListener('clbhouz-active-tab-retap', onRetap);
