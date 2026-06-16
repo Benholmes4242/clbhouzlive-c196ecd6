@@ -6,6 +6,9 @@ import type { FeedPost } from '@/components/media-system/types/media';
 import { useWatchActions } from './context/WatchActionsContext';
 import { Pin } from './proshop/Pin';
 import { haptic } from '@/utils/haptics';
+import { attachHlsToTile } from '@/hooks/useTileVideoPlayer';
+import { HLSPoolManager } from '@/media/HLSPoolManager';
+import type { RegisterMediaFn } from '@/media';
 
 interface WatchRailTileProps {
   post: FeedPost;
@@ -21,12 +24,17 @@ interface WatchRailTileProps {
    * Optional → falls back to global time-only behavior.
    */
   viewedPostIds?: Set<string>;
+  /**
+   * Phase WatchSpotlight-C: when provided, the tile is runtime-arbitrated
+   * (single global 'watch' spotlight, loops while it's the winner).
+   * When omitted, falls back to the legacy "plays once on 40% visible"
+   * per-card IO (used by LightningRoundRail at /watch/clips).
+   */
+  registerMedia?: RegisterMediaFn;
+  playingIds?: Set<string>;
 }
 
 // Hybrid "why" labels — Session 2 of 3.
-// Server-side reasons (TRENDING / NEAR YOU / FROM A COURSE YOU'VE PLAYED)
-// are deferred until we add the joins to get_watch_shorts. For now we derive
-// the two cheap reasons from data already on FeedPost.
 const NEW_THRESHOLD_MS = 24 * 60 * 60 * 1000; // 24h
 const POPULAR_REVIEW_LIKES = 25;
 
@@ -44,10 +52,8 @@ function deriveSurfacingReason(
 
 /**
  * Canonical horizontal-rail tile for the Watch surface.
- * Used by `TrendingThisWeek` (with rank) and `LatestVideosRail` (no rank).
- *
- * Per-card autoplay: plays once when 40% visible, freezes on last frame,
- * shows a glass play affordance afterwards.
+ * Used by `TrendingThisWeek` (runtime-arbitrated spotlight, with rank) and
+ * `LightningRoundRail` (legacy per-card autoplay, no rank).
  */
 export default function WatchRailTile({
   post,
@@ -56,36 +62,108 @@ export default function WatchRailTile({
   rank,
   width = 200,
   viewedPostIds,
+  registerMedia,
+  playingIds,
 }: WatchRailTileProps) {
   const cardRef = useRef<HTMLDivElement>(null);
-  const videoRef = useRef<HTMLVideoElement>(null);
-  const hlsRef = useRef<Hls | null>(null);
+  const videoRef = useRef<HTMLVideoElement | null>(null);
+  const hlsRef = useRef<any>(null);
+
+  // Legacy mode (no registerMedia): plays once on 40% visible.
   const [hasPlayed, setHasPlayed] = useState(false);
-  const [isPlaying, setIsPlaying] = useState(false);
+  const [legacyVisible, setLegacyVisible] = useState(false);
 
   const media = post.mediaItems[0];
   const thumb = media?.thumbnailUrl || media?.imageUrl || '';
   const hlsUrl = media?.hlsUrl || '';
+  const mp4Url = (media as any)?.videoUrl || (media as any)?.mp4Url || '';
 
-  // Per-card IntersectionObserver — autoplay once when 40% visible
+  const runtimeMode = !!registerMedia;
+  const mediaId = `watch-rail-${post.id}`;
+  const isRuntimePlaying = runtimeMode ? (playingIds?.has(mediaId) ?? false) : false;
+
+  // ── Runtime mode: register persistent <video> with MediaRuntime ──
+  const videoRefCallback = useCallback(
+    (el: HTMLVideoElement | null) => {
+      videoRef.current = el;
+      if (!runtimeMode || !registerMedia) return;
+      if (el && cardRef.current) {
+        registerMedia({
+          id: mediaId,
+          element: el,
+          observeTarget: cardRef.current,
+          sortIndex: index,
+          isCandidate: !!(hlsUrl || mp4Url),
+        });
+      } else {
+        registerMedia({ id: mediaId, element: null });
+      }
+    },
+    [runtimeMode, registerMedia, mediaId, index, hlsUrl, mp4Url],
+  );
+
+  // ── Runtime mode: attach HLS when we win the spotlight, demote on exit ──
+  const [videoVisible, setVideoVisible] = useState(false);
   useEffect(() => {
-    const el = cardRef.current;
-    if (!el || !hlsUrl || hasPlayed) return;
+    if (!runtimeMode) return;
+    const v = videoRef.current;
+    if (!v) return;
+    if (!isRuntimePlaying) return;
+    if (!hlsUrl && !mp4Url) return;
 
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting && !hasPlayed) {
-          startAutoplay();
-          observer.disconnect();
+    let cancelled = false;
+    const onReady = () => {
+      if (cancelled) return;
+      setVideoVisible(true);
+      v.play().catch(() => {});
+    };
+
+    if (hlsUrl) {
+      attachHlsToTile({ hlsUrl, mp4Fallback: mp4Url, video: v, onReady })
+        .then((hls) => {
+          if (cancelled) {
+            if (hls && hlsUrl && HLSPoolManager.isPooled(hlsUrl)) {
+              try { HLSPoolManager.demote(hlsUrl, hls); } catch {}
+            } else {
+              try { hls?.destroy?.(); } catch {}
+            }
+            return;
+          }
+          hlsRef.current = hls;
+        })
+        .catch(() => {});
+    } else if (mp4Url) {
+      v.src = mp4Url;
+      v.addEventListener('canplay', onReady, { once: true });
+      v.play().catch(() => {});
+    }
+
+    return () => {
+      cancelled = true;
+      setVideoVisible(false);
+      const hls = hlsRef.current;
+      if (hls) {
+        if (hlsUrl && HLSPoolManager.isPooled(hlsUrl)) {
+          try { HLSPoolManager.demote(hlsUrl, hls); } catch {}
+        } else {
+          try { hls.stopLoad?.(); } catch {}
+          try { hls.detachMedia?.(); } catch {}
+          try { hls.destroy?.(); } catch {}
         }
-      },
-      { threshold: 0.4 },
-    );
-    observer.observe(el);
-    return () => observer.disconnect();
-  }, [hlsUrl, hasPlayed]);
+        hlsRef.current = null;
+      }
+      if (v) {
+        try { v.pause(); } catch {}
+        if (!hlsUrl) {
+          v.removeAttribute('src');
+          try { v.load(); } catch {}
+        }
+      }
+    };
+  }, [runtimeMode, isRuntimePlaying, hlsUrl, mp4Url]);
 
-  const startAutoplay = useCallback(() => {
+  // ── Legacy mode: per-card IO, plays once when 40% visible ──
+  const startLegacyAutoplay = useCallback(() => {
     const video = videoRef.current;
     if (!video || !hlsUrl) return;
 
@@ -105,23 +183,43 @@ export default function WatchRailTile({
       video.play().catch(() => {});
     }
 
-    setIsPlaying(true);
+    setLegacyVisible(true);
 
     video.onended = () => {
-      setIsPlaying(false);
+      setLegacyVisible(false);
       setHasPlayed(true);
-      hlsRef.current?.destroy();
+      hlsRef.current?.destroy?.();
       hlsRef.current = null;
     };
   }, [hlsUrl]);
 
-  // Cleanup on unmount
+  useEffect(() => {
+    if (runtimeMode) return; // skip legacy path
+    const el = cardRef.current;
+    if (!el || !hlsUrl || hasPlayed) return;
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting && !hasPlayed) {
+          startLegacyAutoplay();
+          observer.disconnect();
+        }
+      },
+      { threshold: 0.4 },
+    );
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, [runtimeMode, hlsUrl, hasPlayed, startLegacyAutoplay]);
+
+  // Unmount cleanup (legacy path; runtime path handled by its effect)
   useEffect(() => {
     return () => {
-      hlsRef.current?.destroy();
-      hlsRef.current = null;
+      if (!runtimeMode) {
+        hlsRef.current?.destroy?.();
+        hlsRef.current = null;
+      }
     };
-  }, []);
+  }, [runtimeMode]);
 
   const { openActions } = useWatchActions();
 
@@ -151,7 +249,6 @@ export default function WatchRailTile({
 
   const handleClick = useCallback(() => {
     if (longPressFiredRef.current) {
-      // Long-press already fired → suppress the implicit tap.
       longPressFiredRef.current = false;
       return;
     }
@@ -162,6 +259,8 @@ export default function WatchRailTile({
     () => deriveSurfacingReason(post, viewedPostIds),
     [post, viewedPostIds],
   );
+
+  const showVideo = runtimeMode ? videoVisible : legacyVisible;
 
   return (
     <div
@@ -181,7 +280,6 @@ export default function WatchRailTile({
       onPointerLeave={cancelLongPress}
       onPointerCancel={cancelLongPress}
       onContextMenu={(e) => {
-        // Suppress native long-press context menu so the action sheet wins.
         e.preventDefault();
       }}
     >
@@ -199,19 +297,25 @@ export default function WatchRailTile({
         }}
       />
 
-      {/* Autoplay video layer */}
+      {/* Autoplay video layer — persistent in runtime mode (registered with
+          MediaRuntime; loops while winner of the global 'watch' spotlight).
+          Legacy mode: plays once on 40% visible (LightningRoundRail). */}
       {hlsUrl && (
         <video
-          ref={videoRef}
+          ref={videoRefCallback}
           muted
+          loop={runtimeMode}
           playsInline
+          preload="none"
+          // @ts-ignore webkit-only attribute
+          webkit-playsinline=""
           style={{
             position: 'absolute',
             inset: 0,
             width: '100%',
             height: '100%',
             objectFit: 'cover',
-            opacity: isPlaying ? 1 : 0,
+            opacity: showVideo ? 1 : 0,
             transition: 'opacity 0.3s',
           }}
         />
