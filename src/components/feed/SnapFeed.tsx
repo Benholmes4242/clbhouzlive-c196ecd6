@@ -44,7 +44,7 @@ interface SnapFeedProps {
   startIndex?: number;
   onActiveIndexChange?: (idx: number) => void;
   activeIndexOverride?: number;
-  /** Forwarded to FeedSlide so fullscreen hosts (FullscreenFeedOverlay, CourseMediaViewer) can suppress the inline top-right dots in favour of the segmented FullscreenCarouselOverlay. */
+  /** Forwarded to FeedSlide so the fullscreen viewer (gallery mode included) can suppress the inline top-right dots in favour of the segmented FullscreenCarouselOverlay. */
   isFullscreen?: boolean;
   /** Tags pool entries created by this SnapFeed so fullscreen can prune its own without touching feed entries. */
   surface?: 'feed' | 'fullscreen';
