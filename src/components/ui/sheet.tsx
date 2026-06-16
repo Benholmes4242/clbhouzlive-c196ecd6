@@ -34,11 +34,14 @@ const sheetVariants = cva(
     variants: {
       side: {
         top: "inset-x-0 top-0 border-b data-[state=closed]:slide-out-to-top data-[state=open]:slide-in-from-top",
+        // Mobile: full-width bottom sheet (UNCHANGED).
+        // Tablet (md+): convert to centered modal so iPad doesn't render a stretched phone sheet.
         bottom:
-          "inset-x-0 bottom-0 border-t max-h-[92dvh] overflow-hidden flex flex-col data-[state=closed]:slide-out-to-bottom data-[state=open]:slide-in-from-bottom",
+          "inset-x-0 bottom-0 border-t max-h-[92dvh] overflow-hidden flex flex-col data-[state=closed]:slide-out-to-bottom data-[state=open]:slide-in-from-bottom md:inset-x-auto md:bottom-auto md:top-1/2 md:left-1/2 md:-translate-x-1/2 md:-translate-y-1/2 md:w-full md:max-w-[560px] md:max-h-[85dvh] md:rounded-2xl md:border",
         left: "inset-y-0 left-0 h-full w-3/4 border-r data-[state=closed]:slide-out-to-left data-[state=open]:slide-in-from-left sm:max-w-sm",
         right:
           "inset-y-0 right-0 h-full w-3/4  border-l data-[state=closed]:slide-out-to-right data-[state=open]:slide-in-from-right sm:max-w-sm",
+
       },
     },
     defaultVariants: {
