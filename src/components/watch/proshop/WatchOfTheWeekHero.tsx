@@ -13,6 +13,7 @@ import { isPostLikedByMe } from '@/lib/likedPostIds';
 import { useMediaAutoplay } from '@/media';
 import { attachHlsToTile } from '@/hooks/useTileVideoPlayer';
 import { HLSPoolManager } from '@/media/HLSPoolManager';
+import { MediaRuntime } from '@/media/runtime';
 // Note: useNavigate import previously here was unused.
 
 function formatDuration(seconds: number | null): string {
