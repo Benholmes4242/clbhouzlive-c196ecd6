@@ -46,6 +46,10 @@ export interface AutoplayVideoCardProps {
   mediaId: string;
   /** Runtime says this card is the spotlight winner. */
   isPlaying: boolean;
+  /** Runtime IO says this card is currently a visible candidate (≥ start
+   * threshold). Drives lazy HLS attach BEFORE isPlaying to break the
+   * no_src ↔ isPlaying deadlock. */
+  isVisibleCandidate?: boolean;
   /** Tie-breaker for runtime selection (lower = higher priority). */
   sortIndex?: number;
 }
@@ -59,6 +63,7 @@ function AutoplayVideoCardInner({
   registerMedia,
   mediaId,
   isPlaying,
+  isVisibleCandidate = false,
   sortIndex,
 }: AutoplayVideoCardProps) {
   const navigate = useNavigate();
