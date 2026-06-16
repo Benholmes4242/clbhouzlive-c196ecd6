@@ -87,6 +87,17 @@ export async function attachHlsToTile({
     // Do NOT set hls.currentLevel = 0 — let ABR pick quality
     video.play().catch(() => {});
     onReady?.();
+    // Register cold-init into the pool so a later swipe-back can promote()
+    // instead of cold-rebuilding. Guard against double-register if a parallel
+    // preloader already pooled this URL.
+    if (hlsUrl && !HLSPoolManager.isPooled(hlsUrl)) {
+      try {
+        HLSPoolManager.register(hlsUrl, hls, video, 'feed');
+        // register() marks the entry as not-promoted; immediately promote it
+        // back onto this live <video> so the pool reflects reality.
+        HLSPoolManager.promote(hlsUrl, video);
+      } catch {}
+    }
   });
 
   hls.on(Hls.Events.FRAG_LOADED, (_: any, data: any) => {
