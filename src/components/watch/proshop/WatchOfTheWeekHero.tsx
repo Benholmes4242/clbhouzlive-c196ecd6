@@ -17,7 +17,7 @@ import { HLSPoolManager } from '@/media/HLSPoolManager';
 
 function formatDuration(seconds: number | null): string {
   if (!seconds) return '';
-  const k m = Math.floor(seconds / 60);
+  const m = Math.floor(seconds / 60);
   const s = Math.floor(seconds % 60);
   return `${m}:${s.toString().padStart(2, '0')}`;
 }
