@@ -13,6 +13,7 @@ import { haptic } from '@/utils/haptics';
 import { ExpandableCaption } from '@/components/posts/ExpandableCaption';
 import { attachHlsToTile } from '@/hooks/useTileVideoPlayer';
 import { HLSPoolManager } from '@/media/HLSPoolManager';
+import { MediaRuntime } from '@/media/runtime';
 import type { RegisterMediaFn } from '@/media';
 
 function formatHMS(seconds: number | null | undefined): string {
