@@ -35,6 +35,7 @@ type ReviewsTabProps = {
   reviews: Review[];
   onThumbClick?: (reviewIndex: number, mediaIndex: number) => void;
   courseId?: string;           // For query invalidation after voting
+  courseName?: string;         // Surfaced to the fullscreen review card
 };
 
 export default function ReviewsTab({
