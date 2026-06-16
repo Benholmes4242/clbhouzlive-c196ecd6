@@ -50,10 +50,7 @@ export default function UnifiedWatchFeed({ embedded = false }: UnifiedWatchFeedP
     <div className="min-h-screen" style={{ background: 'hsl(var(--background))' }}>
       <LongPressTipBanner />
 
-      {/* ── Pro Shop: Watch of the Week editorial hero ── */}
-      <WatchOfTheWeekHero />
-
-      {/* ── Quick clips — portrait shelf (moved above Latest for fast engagement) ── */}
+      {/* ── Quick clips — portrait shelf (first section now that hero is removed) ── */}
       <TrendingThisWeek />
 
       {/* ── Latest videos — full-width YouTube-style stack ── */}
