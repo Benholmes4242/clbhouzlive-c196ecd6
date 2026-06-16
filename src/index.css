@@ -735,6 +735,14 @@ html.lightbox-open {
   margin-right: auto;
 }
 
+/* iPad portrait and up — release the phone-width cap so the app
+   fills the canvas. iPhone (<768px) keeps the 480px column untouched. */
+@media (min-width: 768px) {
+  .app-shell {
+    max-width: 820px;
+  }
+}
+
 /* ── BOOT FLASH PREVENTION ─────────────────────────────────────────────────
    The app shell defaults to --bg-page (#F8FAFC) which causes a white flash
    between the splash screen and Clubhouse skeleton. Force the shell to black
