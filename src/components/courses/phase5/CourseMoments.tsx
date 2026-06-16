@@ -4,8 +4,9 @@
 import React, { useMemo, useCallback } from 'react';
 import { Play } from 'lucide-react';
 import { useUserCourseMoments } from '@/hooks/useUserCourseMoments';
-import { useMediaViewer } from '@/hooks/useMediaViewer';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
+import { useFullscreenFeedStore } from '@/store/fullscreenFeedStore';
+import type { FeedPost } from '@/components/media-system/types/media';
 
 interface CourseMomentsProps {
   courseId: string;
@@ -19,32 +20,47 @@ export const CourseMoments: React.FC<CourseMomentsProps> = ({
 }) => {
   const { data: moments, isLoading } = useUserCourseMoments(courseId);
   const { user } = useSupabaseSession();
-  const { openViewer } = useMediaViewer();
 
-  const fullscreenItems = useMemo(() => {
+  const fullscreenPosts = useMemo<FeedPost[]>(() => {
     if (!moments?.length) return [];
-    return moments.map((moment, index) => ({
-      id: moment.id,
-      postId: moment.id,
-      mediaIndex: index,
-      mediaUrl: moment.mediaUrl,
-      mediaType: moment.mediaType as 'video' | 'image',
-      posterUrl: moment.posterUrl,
-      creatorId: user?.id || '',
-      creatorName: 'Golfer',
-      creatorUsername: '',
-      creatorAvatar: undefined,
+    return moments.map((m) => ({
+      id: m.id,
+      userId: user?.id ?? '',
+      actorType: 'personal',
+      actorId: user?.id ?? '',
+      username: '',
+      displayName: '',
+      avatarUrl: '',
+      isVerified: false,
+      creatorRelation: 'none',
+      caption: m.caption ?? '',
+      mediaItems: [{
+        id: m.id,
+        type: m.mediaType,
+        hlsUrl: m.mediaType === 'video' ? m.mediaUrl : undefined,
+        imageUrl: m.mediaType === 'image' ? m.mediaUrl : undefined,
+        thumbnailUrl: m.posterUrl,
+        width: 0,
+        height: 0,
+      }],
+      createdAt: m.createdAt,
       likeCount: 0,
       commentCount: 0,
+      shareCount: 0,
+      review: null,
+      isReview: false,
+      isLikedByMe: false,
+      isFollowedByMe: false,
       courseName,
-    }));
-  }, [moments, user?.id, courseName]);
+      courseId,
+    }) as FeedPost);
+  }, [moments, user?.id, courseName, courseId]);
 
   const handleMomentTap = useCallback((index: number) => {
-    if (fullscreenItems.length > 0) {
-      openViewer(fullscreenItems, index);
+    if (fullscreenPosts.length > 0) {
+      useFullscreenFeedStore.getState().open(fullscreenPosts, index, { readOnly: true });
     }
-  }, [fullscreenItems, openViewer]);
+  }, [fullscreenPosts]);
 
   if (isLoading) {
     return (
