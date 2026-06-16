@@ -33,6 +33,8 @@ interface WatchRailTileProps {
    */
   registerMedia?: RegisterMediaFn;
   playingIds?: Set<string>;
+  /** Visible-candidate set from useMediaAutoplay; drives lazy HLS attach. */
+  visibleIds?: Set<string>;
 }
 
 // Hybrid "why" labels — Session 2 of 3.
