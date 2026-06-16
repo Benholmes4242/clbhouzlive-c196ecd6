@@ -167,6 +167,27 @@ function ClipsMostLovedRailInner({ userId, mood }: ClipsMostLovedRailProps) {
               />
             ) : null}
 
+            {/* Rank ghost number — matches Quick clips (Phase 2) */}
+            <span
+              aria-hidden
+              style={{
+                position: 'absolute',
+                top: 2,
+                left: 10,
+                fontSize: 76,
+                fontWeight: 900,
+                lineHeight: 1,
+                letterSpacing: '-0.04em',
+                color: 'rgba(255,255,255,0.32)',
+                textShadow: '0 2px 12px rgba(0,0,0,0.18)',
+                pointerEvents: 'none',
+                zIndex: 2,
+                userSelect: 'none',
+              }}
+            >
+              {idx + 1}
+            </span>
+
             {row.course_name ? (
               <div
                 style={{
