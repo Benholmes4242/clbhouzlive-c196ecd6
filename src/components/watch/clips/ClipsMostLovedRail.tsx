@@ -198,44 +198,6 @@ function ClipsMostLovedRailInner({ userId, mood }: ClipsMostLovedRailProps) {
               }}
             />
 
-            {/* Canonical glass-pill+avatar creator chip */}
-            <div
-              style={{
-                position: 'absolute',
-                bottom: 8,
-                left: 8,
-                display: 'flex',
-                alignItems: 'center',
-                gap: 6,
-                background: 'rgba(0,0,0,0.6)',
-                borderRadius: 999,
-                padding: '2px 8px 2px 2px',
-                maxWidth: 'calc(100% - 16px)',
-                pointerEvents: 'none',
-              }}
-            >
-              <div style={{ flexShrink: 0 }}>
-                <SquircleAvatar
-                  src={row.avatar_url}
-                  alt={row.display_name || row.username || ''}
-                  size={18}
-                  hideRing
-                />
-              </div>
-              <span
-                style={{
-                  fontSize: 11,
-                  fontWeight: 600,
-                  color: 'white',
-                  whiteSpace: 'nowrap',
-                  overflow: 'hidden',
-                  textOverflow: 'ellipsis',
-                  maxWidth: 130,
-                }}
-              >
-                {row.display_name || row.username || ''}
-              </span>
-            </div>
 
             {/* Likes — amber heart, bottom-right (mirrors MostLovedRail) */}
             <div
