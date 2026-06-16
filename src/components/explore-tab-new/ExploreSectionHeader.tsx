@@ -117,7 +117,20 @@ function ExploreSectionHeaderInner({
         padding: `${paddingTop}px ${paddingX}px 12px`,
       }}
     >
-      {Icon ? (
+      {mark ? (
+        <div
+          style={{
+            display: 'flex',
+            alignItems: 'flex-start',
+            gap: 12,
+            minWidth: 0,
+            flex: 1,
+          }}
+        >
+          <div style={{ flexShrink: 0, marginTop: kicker ? 2 : 0 }}>{mark}</div>
+          {textColumn}
+        </div>
+      ) : Icon ? (
         <div
           style={{
             display: 'flex',
