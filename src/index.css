@@ -1911,7 +1911,7 @@ html, body, #root, .app-shell { touch-action: auto; }
    never disturb horizontal alignment. */
 @media (min-width: 768px) {
   .global-bottom-nav-shell {
-    width: min(100vw, 620px);
+    max-width: 620px;
   }
 }
 
