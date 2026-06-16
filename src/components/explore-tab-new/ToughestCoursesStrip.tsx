@@ -1,6 +1,6 @@
 import { useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { TrendingUp } from 'lucide-react';
+import { ToughestMark } from './DiscoverMarks';
 import { useNotableDifficultCourses, type DifficultCourse } from '@/hooks/gam/useNotableDifficultCourses';
 import { ExploreSectionHeader } from './ExploreSectionHeader';
 import {
@@ -39,8 +39,7 @@ export function ToughestCoursesStrip(_: Props = {}) {
     return (
       <section style={{ padding: '0 0 0', fontFamily: FONT }}>
         <ExploreSectionHeader
-          icon={TrendingUp}
-          iconTone="ink"
+          mark={<ToughestMark />}
           title="Toughest courses"
           sub="Official WHS handicap data"
         />
@@ -68,8 +67,7 @@ export function ToughestCoursesStrip(_: Props = {}) {
   return (
     <section style={{ padding: '0 0 0', fontFamily: FONT }}>
       <ExploreSectionHeader
-        icon={TrendingUp}
-        iconTone="ink"
+        mark={<ToughestMark />}
         title="Toughest courses"
         sub="Official WHS handicap data"
       />
