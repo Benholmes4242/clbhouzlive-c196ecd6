@@ -119,7 +119,15 @@ export default function TrendingThisWeek({ enabled = true }: TrendingThisWeekPro
       <HRail paddingBottom={4}>
         {topPosts.map((post, i) => (
           <div key={post.id} style={{ scrollSnapAlign: 'start' }}>
-            <WatchRailTile post={post} index={i} allPosts={topPosts} rank={i + 1} viewedPostIds={viewedPostIds} />
+            <WatchRailTile
+              post={post}
+              index={i}
+              allPosts={topPosts}
+              rank={i + 1}
+              viewedPostIds={viewedPostIds}
+              registerMedia={registerMedia}
+              playingIds={playingIds}
+            />
           </div>
         ))}
       </HRail>
