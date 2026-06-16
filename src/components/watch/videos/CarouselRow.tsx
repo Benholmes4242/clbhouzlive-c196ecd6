@@ -2,7 +2,8 @@ import { useEffect, useRef, useState } from 'react';
 import type { FeedPost } from '@/components/media-system/types/media';
 import AutoplayVideoCard from './AutoplayVideoCard';
 import { prefetchTile } from '@/hooks/useTileVideoPlayer';
-import { MediaRuntime, type RegisterMediaFn } from '@/media/runtime';
+import { MediaRuntime } from '@/media/runtime';
+import type { RegisterMediaFn } from '@/media';
 
 interface CarouselRowProps {
   items: FeedPost[];
