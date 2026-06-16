@@ -118,16 +118,6 @@ export const FriendRoundCardV2: React.FC<Props> = ({
           <FlagSilhouetteOverlay opacity={0.18} />
         )}
 
-        <div
-          aria-hidden
-          style={{
-            position: 'absolute',
-            inset: 0,
-            background:
-              'linear-gradient(180deg, rgba(5,8,16,0.25) 0%, rgba(5,8,16,0.55) 100%)',
-            pointerEvents: 'none',
-          }}
-        />
 
       </div>
 
