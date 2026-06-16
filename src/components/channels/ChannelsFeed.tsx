@@ -1,21 +1,21 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useChannelsFeed } from '@/hooks/channels/useChannelsFeed';
 import { ChannelVideoCard } from './ChannelVideoCard';
 import { useDiscoverQuery } from '@/utils/useDiscoverQuery';
 import { useInView } from 'react-intersection-observer';
 import { InlineSpinner } from '@/components/ui/InlineSpinner';
-import { useMediaViewer } from '@/hooks/useMediaViewer';
+import { useFullscreenFeedStore } from '@/store/fullscreenFeedStore';
+import type { FeedPost } from '@/components/media-system/types/media';
 
 export const ChannelsFeed: React.FC = () => {
   const { sub } = useDiscoverQuery();
-  const { data, isLoading, isFetchingNextPage, hasNextPage, fetchNextPage } = useChannelsFeed({ 
-    subFilter: sub || 'all' 
+  const { data, isLoading, isFetchingNextPage, hasNextPage, fetchNextPage } = useChannelsFeed({
+    subFilter: sub || 'all',
   });
 
   const { ref: loadMoreRef } = useInView({
     onChange: (inView) => {
       if (!inView) return;
-      
       if (hasNextPage && !isFetchingNextPage) {
         fetchNextPage();
       }
@@ -23,39 +23,59 @@ export const ChannelsFeed: React.FC = () => {
     threshold: 0.5,
   });
 
-  const { openViewer } = useMediaViewer();
+  const allVideos = data?.pages.flatMap((page) => page.items) || [];
 
-  const allVideos = data?.pages.flatMap(page => page.items) || [];
+  // Shared mapper — open() and appendPosts() must produce identical shapes.
+  const toFeedPost = (v: any): FeedPost =>
+    ({
+      id: v.id,
+      userId: v.user_id,
+      actorType: 'personal',
+      actorId: v.user_id,
+      username: v.user_profiles?.username ?? '',
+      displayName: v.user_profiles?.display_name ?? v.user_profiles?.username ?? '',
+      avatarUrl: v.user_profiles?.profile_photo_url ?? '',
+      isVerified: !!v.user_profiles?.is_verified,
+      creatorRelation: 'none',
+      caption: v.content ?? '',
+      mediaItems: (v.post_media ?? []).map((m: any) => ({
+        id: m.id,
+        type: m.media_type === 'video' ? 'video' : 'image',
+        hlsUrl: m.media_type === 'video' ? m.media_url : undefined,
+        imageUrl: m.media_type === 'video' ? undefined : m.media_url,
+        thumbnailUrl: m.poster_url ?? undefined,
+        width: m.width ?? 0,
+        height: m.height ?? 0,
+      })),
+      createdAt: v.created_at,
+      likeCount: v.likes_count ?? 0,
+      commentCount: v.comments_count ?? 0,
+      shareCount: 0,
+      review: null,
+      isReview: false,
+      isLikedByMe: false, // TODO: hydrate from query if useChannelsFeed adds it
+      isFollowedByMe: false,
+    }) as FeedPost;
 
   const handleVideoPlay = (video: any) => {
-    // Convert channel videos to ExploreContentItem-compatible format for shared fullscreen viewer
-    const items = allVideos.map(v => ({
-      id: v.id,
-      src: v.post_media[0]?.media_url || '',
-      type: 'video' as const,
-      thumbnailSrc: v.post_media[0]?.poster_url || v.post_media[0]?.media_url || '',
-      title: v.content || '',
-      user: {
-        id: v.user_id,
-        name: v.user_profiles?.display_name || v.user_profiles?.username || 'Unknown',
-        username: v.user_profiles?.username || '',
-        avatar: v.user_profiles?.profile_photo_url || '',
-      },
-      media: v.post_media.map((m: any) => ({
-        id: m.id,
-        media_type: m.media_type,
-        media_url: m.media_url,
-        poster_url: m.poster_url,
-        stream_id: m.stream_id,
-      })),
-      likes: 0,
-      comments: 0,
-      durationSeconds: v.post_media[0]?.duration_seconds,
-    }));
-
-    const startIndex = items.findIndex(i => i.id === video.id);
-    openViewer(items, startIndex >= 0 ? startIndex : 0);
+    const posts = allVideos.map(toFeedPost);
+    const startIndex = Math.max(0, posts.findIndex((p) => p.id === video.id));
+    useFullscreenFeedStore.getState().open(posts, startIndex, {
+      // social ON — no readOnly
+      hasNextPage,
+      fetchNextPage: hasNextPage ? () => fetchNextPage() : undefined,
+      isFetchingNextPage,
+    });
   };
+
+  // Keep the overlay's post list in sync as more pages load.
+  useEffect(() => {
+    const store = useFullscreenFeedStore.getState();
+    if (!store.isOpen) return;
+    store.appendPosts(allVideos.map(toFeedPost));
+    store.setPaginationState({ hasNextPage, isFetchingNextPage });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [allVideos.length, hasNextPage, isFetchingNextPage]);
 
   if (isLoading && allVideos.length === 0) {
     return (
@@ -81,15 +101,10 @@ export const ChannelsFeed: React.FC = () => {
     <div className="max-w-6xl mx-auto px-2 md:px-4 py-4">
       <div className="space-y-2">
         {allVideos.map((video) => (
-          <ChannelVideoCard 
-            key={video.id} 
-            video={video}
-            onPlay={handleVideoPlay}
-          />
+          <ChannelVideoCard key={video.id} video={video} onPlay={handleVideoPlay} />
         ))}
       </div>
 
-      {/* Load more trigger */}
       {hasNextPage && (
         <div ref={loadMoreRef} className="py-8 flex justify-center">
           {isFetchingNextPage && (
