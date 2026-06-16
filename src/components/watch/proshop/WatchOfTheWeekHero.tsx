@@ -76,7 +76,7 @@ function WatchOfTheWeekHeroInner() {
 
   // ── Phase WatchSpotlight-D: register hero as a 'watch' spotlight candidate.
   // sortIndex: 0 so it wins at the top of the page when equally visible.
-  const { registerMedia, playingIds } = useMediaAutoplay({
+  const { registerMedia, playingIds, visibleIds } = useMediaAutoplay({
     mode: 'grid',
     surface: 'watch',
     startThreshold: 0.5,
@@ -85,6 +85,7 @@ function WatchOfTheWeekHeroInner() {
   const mediaId = effectivePick ? `watch-hero-${effectivePick.post_id}` : '';
   const hlsUrl = effectivePick?.hls_url ?? undefined;
   const isPlaying = !!mediaId && playingIds.has(mediaId);
+  const isVisibleCandidate = !!mediaId && visibleIds.has(mediaId);
   const [videoVisible, setVideoVisible] = useState(false);
 
   // Stable ref-callback pattern (same loop-fix as WatchTile).
