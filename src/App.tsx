@@ -44,7 +44,7 @@ import { GlobalPostComposer } from '@/components/post-composer/GlobalPostCompose
 import { FullscreenFeedOverlay } from '@/components/fullscreen-feed/FullscreenFeedOverlay';
 import { ReviewBottomSheetPortal } from '@/components/posts/ReviewBottomSheetPortal';
 
-import { MediaViewerOverlay } from '@/components/shared/MediaViewerOverlay';
+
 import { UploadResilienceProvider } from '@/contexts/UploadResilienceContext';
 import { FriendSheetProvider } from '@/components/friend-sheet/FriendSheetProvider';
 import { useUploadGuard } from '@/hooks/useUploadGuard';
@@ -157,7 +157,7 @@ const AdminShell = lazy(() => import('./features/admin/AdminShell'));
 
 
 
-const ChannelProfile = lazy(() => import("./pages/ChannelProfile"));
+
 // Removed: GameDetailView lazy import — /game/:id now redirects to /clubhouse
 
 // Hub lazy imports removed — Hub page decommissioned
@@ -429,7 +429,7 @@ function AppRoutes() {
         
 
 
-        <Route path="/channel/:slug" element={<Suspense fallback={<ProfileSkeleton />}><ChannelProfile /></Suspense>} />
+        
         <Route path="/game/:id" element={<Navigate to="/clubhouse" replace />} />
 
         {/* Games routes — decommissioned, redirect to Clubhouse */}
@@ -701,8 +701,6 @@ const AppInner: React.FC = () => {
                                             </Suspense>
                                             {/* Fullscreen Feed Overlay - portal-based, renders above everything */}
                                             <FullscreenFeedOverlay />
-                                            
-                                            <MediaViewerOverlay />
                                             {/* Unified ReviewBottomSheet portal — single mount, store-driven */}
                                             <ReviewBottomSheetPortal />
                                           </FriendSheetProvider>
