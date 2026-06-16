@@ -87,16 +87,13 @@ export async function attachHlsToTile({
     // Do NOT set hls.currentLevel = 0 — let ABR pick quality
     video.play().catch(() => {});
     onReady?.();
-    // Register cold-init into the pool so a later swipe-back can promote()
-    // instead of cold-rebuilding. Guard against double-register if a parallel
-    // preloader already pooled this URL.
+    // Register cold-init into the pool so teardown can demote() (keeping the
+    // instance warm) and a future mount can promote() instead of rebuilding.
+    // Mirrors useHlsPool.attach exactly: register-only, no immediate promote
+    // — the cross-element safety guard in HLSPoolManager.promote refuses to
+    // steal media from a still-connected preloadedByVideo.
     if (hlsUrl && !HLSPoolManager.isPooled(hlsUrl)) {
-      try {
-        HLSPoolManager.register(hlsUrl, hls, video, 'feed');
-        // register() marks the entry as not-promoted; immediately promote it
-        // back onto this live <video> so the pool reflects reality.
-        HLSPoolManager.promote(hlsUrl, video);
-      } catch {}
+      try { HLSPoolManager.register(hlsUrl, hls, video, 'feed'); } catch {}
     }
   });
 
