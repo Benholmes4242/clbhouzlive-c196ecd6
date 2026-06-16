@@ -28,6 +28,10 @@ export const FriendRoundCardV2: React.FC<Props> = ({
   onInviteClick,
 }) => {
   const isSynced = variant === 'clbhouz-synced';
+  // State B: synced friend whose round summary exists but has no detailed
+  // scorecard (e.g. EG published summary only). Card still renders the synced
+  // summary row, but we suppress the chevron / "tap for card" affordance.
+  const hasScorecard = isSynced && !!activity.last_round_score_id;
 
   const { data: detail } = useFriendRoundDetail(
     isSynced ? activity.last_round_score_id : null,
@@ -374,11 +378,13 @@ export const FriendRoundCardV2: React.FC<Props> = ({
                   : '—'}
               </span>
             </div>
-            <ChevronRight
-              size={16}
-              strokeWidth={2.2}
-              style={{ color: 'var(--hcp-t-40)', marginLeft: 'auto', flexShrink: 0 }}
-            />
+            {hasScorecard && (
+              <ChevronRight
+                size={16}
+                strokeWidth={2.2}
+                style={{ color: 'var(--hcp-t-40)', marginLeft: 'auto', flexShrink: 0 }}
+              />
+            )}
           </div>
         ) : (
           <div
