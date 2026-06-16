@@ -19,13 +19,6 @@ const FALLBACK_BG =
 const SCRIM =
   'linear-gradient(180deg, rgba(0,0,0,0.45) 0%, rgba(0,0,0,0.10) 40%, rgba(0,0,0,0) 100%)';
 
-const fmtDiffShort = (d: number | null): string | null => {
-  if (d == null) return null;
-  const sign = d > 0 ? '+' : '';
-  return `${sign}${d.toFixed(1)} diff`;
-};
-
-
 const LowestChip: React.FC = () => (
   <div
     style={{
@@ -67,20 +60,21 @@ const STATUS_BASE: React.CSSProperties = {
 
 const EnrichedStatus: React.FC<{ friend: FriendYesterday }> = ({ friend }) => {
   const sf = friend.stableford;
-  const diffText = fmtDiffShort(friend.differential);
-  const parts: string[] = [];
-  if (sf != null) parts.push(`${sf} pts`);
-  if (diffText) parts.push(diffText);
+  const diff = friend.differential;
   return (
-    <div
-      style={{
-        ...STATUS_BASE,
-        fontWeight: 600,
-        color: 'rgba(255,255,255,0.60)',
-        fontVariantNumeric: 'tabular-nums',
-      }}
-    >
-      {parts.join(' · ')}
+    <div style={{ ...STATUS_BASE, display: 'flex', alignItems: 'baseline', gap: 12 }}>
+      {sf != null && (
+        <div style={{ display: 'flex', alignItems: 'baseline', gap: 5 }}>
+          <span style={{ fontSize: 9, fontWeight: 800, letterSpacing: '0.12em', color: 'var(--hcp-t-60)', textTransform: 'uppercase' }}>STBL</span>
+          <span style={{ fontSize: 14, fontWeight: 800, fontVariantNumeric: 'tabular-nums', color: 'var(--hcp-t-100)', letterSpacing: '-0.02em', lineHeight: 1 }}>{sf}</span>
+        </div>
+      )}
+      {diff != null && (
+        <div style={{ display: 'flex', alignItems: 'baseline', gap: 5 }}>
+          <span style={{ fontSize: 9, fontWeight: 800, letterSpacing: '0.12em', color: 'var(--hcp-t-60)', textTransform: 'uppercase' }}>DIFF</span>
+          <span style={{ fontSize: 14, fontWeight: 800, fontVariantNumeric: 'tabular-nums', color: 'var(--hcp-t-100)', letterSpacing: '-0.02em', lineHeight: 1 }}>{`${diff > 0 ? '+' : ''}${diff.toFixed(1)}`}</span>
+        </div>
+      )}
     </div>
   );
 };
