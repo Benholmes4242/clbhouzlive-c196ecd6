@@ -102,6 +102,10 @@ export function useMediaAutoplay(options: UseMediaAutoplayOptions = {}) {
   
   // State - reflects what MediaRuntime says is playing
   const [playingIds, setPlayingIds] = useState<Set<string>>(new Set());
+  // Visible candidates set — mirrors the IO hysteresis (start/stop thresholds).
+  // Surfaces like Watch use this to lazy-attach HLS (set <video>.src) BEFORE
+  // the runtime calls safePlay, breaking the no_src ↔ isPlaying deadlock.
+  const [visibleIds, setVisibleIdsState] = useState<Set<string>>(new Set());
   
   // Scroll protection
   const isScrolling = useRef(false);
