@@ -13,9 +13,10 @@ interface VideoCardMenuProps {
   postId: string;
   userId?: string;
   onShare: () => void;
+  className?: string;
 }
 
-export const VideoCardMenu = React.memo(function VideoCardMenu({ postId, userId, onShare }: VideoCardMenuProps) {
+export const VideoCardMenu = React.memo(function VideoCardMenu({ postId, userId, onShare, className }: VideoCardMenuProps) {
   const handleCopyLink = async () => {
     const url = `${window.location.origin}/video/${postId}`;
     await navigator.clipboard.writeText(url);
@@ -57,7 +58,7 @@ export const VideoCardMenu = React.memo(function VideoCardMenu({ postId, userId,
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <button
-          className="p-3 -mr-3 rounded-full hover:bg-muted transition-colors"
+          className={`p-3 -mr-3 rounded-full hover:bg-muted transition-colors ${className || ''}`}
           aria-label="More options"
         >
           <MoreHorizontal className="w-5 h-5 text-muted-foreground" />
