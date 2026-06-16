@@ -65,6 +65,11 @@ export const useNavigationHandlers = () => {
         // Only scroll to top when navigating to different pages, not when staying on profile or hub
         setTimeout(() => {
           window.scrollTo({ top: 0, left: 0, behavior: 'smooth' });
+          // Clubhouse feed scrolls an inner snap container, not the window:
+          if (tab.id === 'clubhouse') {
+            (document.querySelector('[data-snap-feed]') as HTMLElement | null)?.scrollTo({ top: 0, behavior: 'smooth' });
+            window.dispatchEvent(new CustomEvent('clbhouz-active-tab-retap', { detail: { tabId: 'clubhouse' } }));
+          }
         }, 50);
       }
     }
