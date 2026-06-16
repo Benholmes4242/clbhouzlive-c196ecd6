@@ -13,7 +13,7 @@ import { WatchActionsProvider } from './context/WatchActionsContext';
 import { useWatchFeed } from './hooks/useWatchFeed';
 import ScrollToTopGlass from '@/components/common/ScrollToTopGlass';
 import { WatchOfTheWeekHero } from './proshop/WatchOfTheWeekHero';
-import { CourseAnchoredRail } from './proshop/CourseAnchoredRail';
+
 import { WatchMoodChips } from './proshop/WatchMoodChips';
 import { useWatchMood } from './proshop/hooks/useWatchMood';
 
@@ -54,14 +54,11 @@ export default function UnifiedWatchFeed({ embedded = false }: UnifiedWatchFeedP
       {/* ── Pro Shop: Watch of the Week editorial hero ── */}
       <WatchOfTheWeekHero />
 
-      {/* ── Latest videos — full-width YouTube-style stack ── */}
-      <LatestVideosRail />
-
-      {/* ── Quick clips — portrait shelf ── */}
+      {/* ── Quick clips — portrait shelf (moved above Latest for fast engagement) ── */}
       <TrendingThisWeek />
 
-      {/* ── From your courses — single course-anchored rail ── */}
-      <CourseAnchoredRail />
+      {/* ── Latest videos — full-width YouTube-style stack ── */}
+      <LatestVideosRail />
 
 
       {/* ── Section 3: Watch grid ──
