@@ -216,6 +216,7 @@ export const FeedOverlayLayer = memo(function FeedOverlayLayer({
           onShare={() => onShare(activePost)}
           onMore={onMore}
           isVisible={overlayVisible}
+          readOnly={readOnly}
         />
       )}
 
