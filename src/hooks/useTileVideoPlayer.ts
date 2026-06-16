@@ -39,16 +39,15 @@ export async function attachHlsToTile({
   // Dynamic import HLS.js
   const { default: Hls } = await import('hls.js');
 
-  // Native HLS path (Safari). NOTE: never call video.play() here —
-  // MediaRuntime/safePlay is the sole authority for play(). We only set
-  // src so the runtime can promote this element on its next evaluation.
+  // Native HLS path (Safari)
   if (!Hls.isSupported()) {
     if (hlsUrl) {
       video.src = hlsUrl;
+      video.play().catch(() => {});
     } else if (mp4Fallback) {
       video.src = mp4Fallback;
+      video.play().catch(() => {});
     }
-    onReady?.();
     return null;
   }
 
@@ -64,6 +63,7 @@ export async function attachHlsToTile({
       }
     });
 
+    video.play().catch(() => {});
     onReady?.();
     return pooledHls;
   }
@@ -84,14 +84,9 @@ export async function attachHlsToTile({
   hls.attachMedia(video);
 
   hls.on(Hls.Events.MANIFEST_PARSED, () => {
-    // Do NOT set hls.currentLevel = 0 — let ABR pick quality.
-    // Do NOT call video.play() — the MediaRuntime spotlight owns play/pause.
+    // Do NOT set hls.currentLevel = 0 — let ABR pick quality
+    video.play().catch(() => {});
     onReady?.();
-    // Register cold-init into the pool so teardown can demote() (keeping the
-    // instance warm) and a future mount can promote() instead of rebuilding.
-    if (hlsUrl && !HLSPoolManager.isPooled(hlsUrl)) {
-      try { HLSPoolManager.register(hlsUrl, hls, video, 'feed'); } catch {}
-    }
   });
 
   hls.on(Hls.Events.FRAG_LOADED, (_: any, data: any) => {
@@ -104,7 +99,7 @@ export async function attachHlsToTile({
     if (data.fatal && mp4Fallback) {
       hls.destroy();
       video.src = mp4Fallback;
-      // No video.play() — runtime will retry on next nudge/evaluation.
+      video.play().catch(() => {});
     }
   });
 

@@ -9,7 +9,7 @@ interface ChipRowSearchFieldProps {
 }
 
 /**
- * Inline search field that lives INSIDE the mood-chip row (Videos + Clips).
+ * Inline search field that lives INSIDE the dark mood-chip row (Videos + Clips).
  * Controlled; grows on the left while the mood pills stay scrollable to its right.
  * Autofocuses on mount. Distinct from the full-screen SearchOverlay.
  */
@@ -24,20 +24,20 @@ function ChipRowSearchFieldInner({ value, onChange, onClose, placeholder = 'Sear
   return (
     <div
       className="flex items-center shrink-0"
-        style={{
-          height: 30,
-          borderRadius: 15,
-          background: '#FFFFFF',
-          border: '1px solid rgba(15,23,42,0.20)',
-          padding: '0 8px 0 10px',
-          gap: 6,
-          minWidth: 140,
-          maxWidth: 220,
-          flex: '0 0 auto',
-          width: 200,
-        }}
+      style={{
+        height: 30,
+        borderRadius: 15,
+        background: 'rgba(255,255,255,0.10)',
+        border: '1px solid rgba(255,255,255,0.55)',
+        padding: '0 8px 0 10px',
+        gap: 6,
+        minWidth: 140,
+        maxWidth: 220,
+        flex: '0 0 auto',
+        width: 200,
+      }}
     >
-      <Search size={14} strokeWidth={2} color="rgba(15,23,42,0.6)" style={{ flexShrink: 0 }} aria-hidden />
+      <Search size={14} strokeWidth={2} color="rgba(255,255,255,0.6)" style={{ flexShrink: 0 }} aria-hidden />
       <input
         ref={inputRef}
         className="chip-row-search-input"
@@ -57,7 +57,7 @@ function ChipRowSearchFieldInner({ value, onChange, onClose, placeholder = 'Sear
           background: 'transparent',
           border: 'none',
           outline: 'none',
-          color: '#0F172A',
+          color: '#FFFFFF',
           fontSize: 12,
           fontWeight: 500,
           letterSpacing: '-0.01em',
@@ -74,8 +74,8 @@ function ChipRowSearchFieldInner({ value, onChange, onClose, placeholder = 'Sear
           width: 22,
           height: 22,
           borderRadius: 11,
-          background: 'rgba(15,23,42,0.08)',
-          color: 'rgba(15,23,42,0.7)',
+          background: 'rgba(255,255,255,0.12)',
+          color: 'rgba(255,255,255,0.7)',
           border: 'none',
           flexShrink: 0,
         }}
@@ -102,8 +102,8 @@ export const ChipRowSearchTrigger = memo(function ChipRowSearchTrigger(
         height: 30,
         borderRadius: 15,
         background: 'transparent',
-        border: '1px solid rgba(15,23,42,0.12)',
-        color: '#64748B',
+        border: '1px solid rgba(255,255,255,0.18)',
+        color: 'rgba(255,255,255,0.65)',
         flex: '0 0 auto',
       }}
     >

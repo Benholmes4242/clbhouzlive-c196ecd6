@@ -1,4 +1,4 @@
-import { memo, useCallback, useEffect, useRef, useState } from 'react';
+import { memo, useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Heart, MessageCircle } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
@@ -12,9 +12,6 @@ import { Pin } from '../proshop/Pin';
 import { haptic } from '@/utils/haptics';
 import { ExpandableCaption } from '@/components/posts/ExpandableCaption';
 import { attachHlsToTile } from '@/hooks/useTileVideoPlayer';
-import { HLSPoolManager } from '@/media/HLSPoolManager';
-import { MediaRuntime } from '@/media/runtime';
-import type { RegisterMediaFn } from '@/media';
 
 function formatHMS(seconds: number | null | undefined): string {
   if (!seconds || seconds <= 0) return '';
@@ -38,39 +35,18 @@ export interface AutoplayVideoCardProps {
   index: number;
   allPosts: FeedPost[];
   userId?: string;
+  /** When true, mount a video and autoplay muted+looped. When false, thumbnail only. */
+  active: boolean;
   /** Card corner radius in px. Defaults to 12. */
   borderRadius?: number;
-  /** Phase WatchSpotlight-C: runtime-managed autoplay. Required for autoplay. */
-  registerMedia: RegisterMediaFn;
-  /** Stable id to register against MediaRuntime. Namespaced (watch-rail-/watch-hero-). */
-  mediaId: string;
-  /** Runtime says this card is the spotlight winner. */
-  isPlaying: boolean;
-  /** Runtime IO says this card is currently a visible candidate (≥ start
-   * threshold). Drives lazy HLS attach BEFORE isPlaying to break the
-   * no_src ↔ isPlaying deadlock. */
-  isVisibleCandidate?: boolean;
-  /** Tie-breaker for runtime selection (lower = higher priority). */
-  sortIndex?: number;
 }
 
-function AutoplayVideoCardInner({
-  post,
-  index,
-  allPosts,
-  userId,
-  borderRadius = 12,
-  registerMedia,
-  mediaId,
-  isPlaying,
-  isVisibleCandidate = false,
-  sortIndex,
-}: AutoplayVideoCardProps) {
+function AutoplayVideoCardInner({ post, index, allPosts, userId, active, borderRadius = 12 }: AutoplayVideoCardProps) {
   const navigate = useNavigate();
   const { openActions } = useWatchActions();
   const longPressTimer = useRef<number | null>(null);
   const tileRef = useRef<HTMLDivElement>(null);
-  const videoElRef = useRef<HTMLVideoElement | null>(null);
+  const videoRef = useRef<HTMLVideoElement | null>(null);
   const hlsRef = useRef<any>(null);
   const [videoVisible, setVideoVisible] = useState(false);
 
@@ -89,85 +65,66 @@ function AutoplayVideoCardInner({
     }
   })();
 
-  // Register the persistent <video> element with MediaRuntime via ref callback.
-  // Mirrors WatchTile (Stage B). The element is always mounted (cheap — preload="none")
-  // so the runtime has a real <video> to call play()/pause() on before HLS is attached.
-  const videoRefCallback = useCallback(
-    (el: HTMLVideoElement | null) => {
-      videoElRef.current = el;
-      if (el && tileRef.current) {
-        registerMedia({
-          id: mediaId,
-          element: el,
-          observeTarget: tileRef.current,
-          sortIndex: sortIndex ?? index,
-          isCandidate: !!(hlsUrl || mp4Url),
-        });
-      } else {
-        registerMedia({ id: mediaId, element: null });
-      }
-    },
-    [registerMedia, mediaId, sortIndex, index, hlsUrl, mp4Url],
-  );
-
-  // Attach HLS when this card is a visible candidate (lazy attach to break
-  // no_src ↔ isPlaying deadlock); demote-to-pool on the way out. Runtime
-  // owns play/pause via safePlay — we only set src and nudge.
+  // Manage autoplay video layer based on `active`
   useEffect(() => {
-    const v = videoElRef.current;
-    if (!v) return;
-    if (!isVisibleCandidate && !isPlaying) return;
-    if (!hlsUrl && !mp4Url) return;
+    const tile = tileRef.current;
+    if (!tile) return;
 
     let cancelled = false;
 
-    const onReady = () => {
-      if (cancelled) return;
-      setVideoVisible(true);
-      MediaRuntime.nudge();
-    };
+    if (active && (hlsUrl || mp4Url)) {
+      const v = document.createElement('video');
+      v.muted = true;
+      v.loop = true;
+      v.playsInline = true;
+      v.setAttribute('webkit-playsinline', '');
+      v.setAttribute('muted', '');
+      v.style.cssText =
+        'position:absolute;inset:0;width:100%;height:100%;object-fit:cover;pointer-events:none;opacity:0;transition:opacity 150ms ease;z-index:1;';
+      tile.appendChild(v);
+      videoRef.current = v;
 
-    if (hlsUrl) {
-      attachHlsToTile({ hlsUrl, mp4Fallback: mp4Url, video: v, onReady })
-        .then((hls) => {
-          if (cancelled) {
-            if (hls && hlsUrl && HLSPoolManager.isPooled(hlsUrl)) {
-              try { HLSPoolManager.demote(hlsUrl, hls); } catch {}
-            } else {
-              try { hls?.destroy?.(); } catch {}
+      const onReady = () => {
+        if (cancelled) return;
+        v.style.opacity = '1';
+        setVideoVisible(true);
+        v.play().catch(() => {});
+      };
+
+      if (hlsUrl) {
+        attachHlsToTile({ hlsUrl, mp4Fallback: mp4Url, video: v, onReady })
+          .then((hls) => {
+            if (cancelled) {
+              hls?.destroy?.();
+              return;
             }
-            return;
-          }
-          hlsRef.current = hls;
-        })
-        .catch(() => {});
-    } else if (mp4Url) {
-      v.src = mp4Url;
-      v.addEventListener('canplay', onReady, { once: true });
+            hlsRef.current = hls;
+          })
+          .catch(() => {});
+      } else if (mp4Url) {
+        v.src = mp4Url;
+        v.addEventListener('canplay', onReady, { once: true });
+        v.play().catch(() => {});
+      }
     }
 
     return () => {
       cancelled = true;
       setVideoVisible(false);
-      const hls = hlsRef.current;
-      if (hls) {
-        if (hlsUrl && HLSPoolManager.isPooled(hlsUrl)) {
-          try { HLSPoolManager.demote(hlsUrl, hls); } catch {}
-        } else {
-          try { hls.stopLoad?.(); } catch {}
-          try { hls.detachMedia?.(); } catch {}
-          try { hls.destroy?.(); } catch {}
-        }
+      const v = videoRef.current;
+      if (v) {
+        try { v.pause(); } catch {}
+        v.removeAttribute('src');
+        try { v.load(); } catch {}
+        if (v.parentElement) v.parentElement.removeChild(v);
+      }
+      videoRef.current = null;
+      if (hlsRef.current) {
+        try { hlsRef.current.destroy(); } catch {}
         hlsRef.current = null;
       }
-      if (v) {
-        if (!hlsUrl) {
-          v.removeAttribute('src');
-          try { v.load(); } catch {}
-        }
-      }
     };
-  }, [isVisibleCandidate, isPlaying, hlsUrl, mp4Url]);
+  }, [active, hlsUrl, mp4Url]);
 
   const handleTap = () => {
     useFullscreenFeedStore.getState().open(allPosts, index);
@@ -239,29 +196,6 @@ function AutoplayVideoCardInner({
                 objectFit: 'cover',
                 opacity: videoVisible ? 0 : 1,
                 transition: 'opacity 200ms ease',
-              }}
-            />
-          ) : null}
-
-          {(hlsUrl || mp4Url) ? (
-            <video
-              ref={videoRefCallback}
-              muted
-              loop
-              playsInline
-              preload="none"
-              // @ts-ignore webkit-only attribute
-              webkit-playsinline=""
-              style={{
-                position: 'absolute',
-                inset: 0,
-                width: '100%',
-                height: '100%',
-                objectFit: 'cover',
-                pointerEvents: 'none',
-                opacity: videoVisible ? 1 : 0,
-                transition: 'opacity 150ms ease',
-                zIndex: 1,
               }}
             />
           ) : null}

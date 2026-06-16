@@ -1,62 +1,233 @@
-/**
- * WatchAutoplay — Phase WatchSpotlight-B
- *
- * The bespoke 2-slot DOM-pool autoplay coordinator that used to live here
- * (~232 lines: videoPoolRef, activeMapRef, slotForTile/isDesignatedTile,
- * private IntersectionObserver, attachToTile/detachSlot) has been removed.
- *
- * Watch grid autoplay is now arbitrated by MediaRuntime via the unified
- * `useMediaAutoplay` hook, on `surface: 'watch'`. Concurrency cap = 1
- * (set in MediaRuntime Phase WatchSpotlight-A) — exactly one centered tile
- * plays at a time; every other tile is a crisp poster.
- *
- * Pattern mirrors DiscoverTrendingVideos / ShortCardWithObserver. The hook
- * is instantiated here once per grid and exposed to descendants
- * (WatchTile) through React context so each tile can:
- *   1. register its own <video> element with the runtime, and
- *   2. read its own `isPlaying` flag from `playingIds`.
- *
- * Composes with the pool (WatchJank-2): pool owns HLS instance lifecycle,
- * runtime owns play/pause arbitration. They are orthogonal.
- */
+import { useEffect, useRef, useCallback } from 'react';
+import type { FeedPost } from '@/components/media-system/types/media';
+import { attachHlsToTile, prefetchTile } from '@/hooks/useTileVideoPlayer';
 
-import React, { createContext, useContext, useMemo } from 'react';
-import { useMediaAutoplay, type RegisterMediaFn } from '@/media';
+const VIDEO_POOL_SIZE = 2;
+const AUTOPLAY_THRESHOLD = 0.5;
 
-interface WatchAutoplayCtx {
-  registerMedia: RegisterMediaFn;
-  playingIds: Set<string>;
-  visibleIds: Set<string>;
-}
-
-const WatchAutoplayContext = createContext<WatchAutoplayCtx | null>(null);
-
-/** Tiles read their isPlaying / isVisibleCandidate flags + register callback from this context. */
-export const useWatchAutoplay = (): WatchAutoplayCtx | null =>
-  useContext(WatchAutoplayContext);
+const isDesignatedTile = (idx: number): boolean => {
+  const blockPos = idx % 8;
+  return blockPos === 0 || blockPos === 5;
+};
+const slotForTile = (idx: number): number => {
+  const blockPos = idx % 8;
+  if (blockPos === 0) return 0;
+  if (blockPos === 5) return 1;
+  return -1;
+};
 
 interface WatchAutoplayProps {
-  children: React.ReactNode;
+  posts: FeedPost[];
+  gridRef: React.RefObject<HTMLDivElement>;
 }
 
-const WatchAutoplay: React.FC<WatchAutoplayProps> = ({ children }) => {
-  const { registerMedia, playingIds, visibleIds } = useMediaAutoplay({
-    mode: 'grid',
-    surface: 'watch',
-    startThreshold: 0.5,
-    stopThreshold: 0.25,
-  });
+const WatchAutoplay: React.FC<WatchAutoplayProps> = ({ posts, gridRef }) => {
+  const videoPoolRef = useRef<HTMLVideoElement[]>([]);
+  const hlsPoolRef = useRef<(any | null)[]>([null, null]);
+  const activeMapRef = useRef<Map<number, number>>(new Map());
+  const autoplayObserverRef = useRef<IntersectionObserver | null>(null);
+  const observedTilesRef = useRef<Set<number>>(new Set());
+  const postsRef = useRef<FeedPost[]>(posts);
+  postsRef.current = posts;
 
-  const value = useMemo(
-    () => ({ registerMedia, playingIds, visibleIds }),
-    [registerMedia, playingIds, visibleIds],
-  );
+  const isSlowNetwork = useCallback(() => {
+    const connection = (navigator as any).connection;
+    const type = connection?.effectiveType || '4g';
+    return type === '2g' || type === 'slow-2g';
+  }, []);
 
-  return (
-    <WatchAutoplayContext.Provider value={value}>
-      {children}
-    </WatchAutoplayContext.Provider>
-  );
+  // Create persistent video pool
+  useEffect(() => {
+    if (isSlowNetwork()) return;
+
+    const pool: HTMLVideoElement[] = [];
+    for (let i = 0; i < VIDEO_POOL_SIZE; i++) {
+      const v = document.createElement('video');
+      v.muted = true;
+      v.playsInline = true;
+      v.loop = true;
+      v.setAttribute('webkit-playsinline', '');
+      v.style.cssText = 'position:absolute;inset:0;width:100%;height:100%;object-fit:cover;pointer-events:none;z-index:1;';
+      pool.push(v);
+    }
+    videoPoolRef.current = pool;
+
+    return () => {
+      pool.forEach((v) => {
+        v.pause();
+        v.remove();
+      });
+      videoPoolRef.current = [];
+    };
+  }, [isSlowNetwork]);
+
+  const attachToTile = useCallback(async (slot: number, tileIdx: number, hlsUrl: string, tileEl: HTMLElement) => {
+    if (isSlowNetwork()) return;
+    const video = videoPoolRef.current[slot];
+    if (!video) return;
+
+    tileEl.style.position = 'relative';
+    tileEl.appendChild(video);
+
+    if (activeMapRef.current.get(slot) !== tileIdx) return;
+
+    try {
+      const hls = await attachHlsToTile({
+        hlsUrl,
+        video,
+      });
+      hlsPoolRef.current[slot] = hls;
+    } catch { /* silent */ }
+
+    if ((video as any)._onPlaying) {
+      video.removeEventListener('playing', (video as any)._onPlaying);
+      (video as any)._onPlaying = null;
+    }
+    const onPlaying = () => {};
+    (video as any)._onPlaying = onPlaying;
+    video.addEventListener('playing', onPlaying, { once: true });
+
+    if ((video as any)._onCanPlay) {
+      video.removeEventListener('canplay', (video as any)._onCanPlay);
+      (video as any)._onCanPlay = null;
+    }
+    const onCanPlay = () => {
+      const poster = tileEl.querySelector('img');
+      if (poster) {
+        poster.style.transition = 'opacity 200ms ease';
+        poster.style.opacity = '0';
+      }
+      if (video.paused) {
+        video.play().catch(() => {});
+      }
+    };
+    (video as any)._onCanPlay = onCanPlay;
+    video.addEventListener('canplay', onCanPlay, { once: true });
+  }, [isSlowNetwork]);
+
+  const detachSlot = useCallback((slot: number, prevTile: number | undefined) => {
+    if (prevTile === undefined) return;
+
+    const video = videoPoolRef.current[slot];
+    if (!video) return;
+
+    const parent = video.parentElement;
+    if (parent) {
+      const poster = parent.querySelector('img');
+      if (poster) {
+        poster.style.transition = 'opacity 150ms ease';
+        poster.style.opacity = '1';
+      }
+    }
+
+    if ((video as any)._onPlaying) {
+      video.removeEventListener('playing', (video as any)._onPlaying);
+      (video as any)._onPlaying = null;
+    }
+    if ((video as any)._onCanPlay) {
+      video.removeEventListener('canplay', (video as any)._onCanPlay);
+      (video as any)._onCanPlay = null;
+    }
+    video.pause();
+    if (video.parentElement) {
+      video.parentElement.removeChild(video);
+    }
+
+    if (hlsPoolRef.current[slot]) {
+      hlsPoolRef.current[slot].destroy();
+      hlsPoolRef.current[slot] = null;
+    }
+  }, []);
+
+  // IntersectionObserver — observe designated tiles only
+  useEffect(() => {
+    if (isSlowNetwork()) return;
+    const grid = gridRef.current;
+    if (!grid || posts.length === 0 || videoPoolRef.current.length === 0) return;
+
+    const activeMap = activeMapRef.current;
+    activeMap.clear();
+    observedTilesRef.current.clear();
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        for (const entry of entries) {
+          const el = entry.target as HTMLElement;
+          const idx = Number(el.dataset.watchIndex);
+          if (isNaN(idx) || !isDesignatedTile(idx)) continue;
+
+          const slot = slotForTile(idx);
+          const post = postsRef.current[idx];
+          const hlsUrl = post?.mediaItems?.[0]?.hlsUrl;
+          if (!hlsUrl) continue;
+
+          if (entry.intersectionRatio >= AUTOPLAY_THRESHOLD) {
+            if (activeMap.get(slot) !== idx) {
+              const prevTile = activeMap.get(slot);
+              activeMap.set(slot, idx);
+              detachSlot(slot, prevTile);
+              attachToTile(slot, idx, hlsUrl, el);
+
+              // Prefetch next tile
+              const nextPost = postsRef.current[idx + 1];
+              const nextHlsUrl = nextPost?.mediaItems?.[0]?.hlsUrl;
+              if (nextHlsUrl) prefetchTile(nextHlsUrl);
+            }
+          } else {
+            if (activeMap.get(slot) === idx) {
+              activeMap.delete(slot);
+              detachSlot(slot, idx);
+            }
+          }
+        }
+      },
+      { threshold: [0, AUTOPLAY_THRESHOLD] }
+    );
+    autoplayObserverRef.current = observer;
+
+    const timer = setTimeout(() => {
+      const tiles = grid.querySelectorAll('[data-watch-index]');
+      tiles.forEach((tile) => {
+        const idx = Number((tile as HTMLElement).dataset.watchIndex);
+        if (!observedTilesRef.current.has(idx)) {
+          observedTilesRef.current.add(idx);
+          observer.observe(tile);
+        }
+      });
+    }, 0);
+
+    return () => {
+      clearTimeout(timer);
+      observer.disconnect();
+      autoplayObserverRef.current = null;
+      observedTilesRef.current.clear();
+      for (let slot = 0; slot < VIDEO_POOL_SIZE; slot++) {
+        detachSlot(slot, activeMap.get(slot));
+        const video = videoPoolRef.current[slot];
+        if (video) {
+          video.remove();
+        }
+      }
+      activeMap.clear();
+    };
+  }, [posts, gridRef, isSlowNetwork, attachToTile, detachSlot]);
+
+  // Re-observe new tiles as infinite scroll loads
+  useEffect(() => {
+    const grid = gridRef.current;
+    if (!grid) return;
+    const tiles = grid.querySelectorAll('[data-watch-index]');
+    tiles.forEach((tile) => {
+      const idx = Number((tile as HTMLElement).dataset.watchIndex);
+      if (isNaN(idx)) return;
+      if (autoplayObserverRef.current && !observedTilesRef.current.has(idx)) {
+        observedTilesRef.current.add(idx);
+        autoplayObserverRef.current.observe(tile);
+      }
+    });
+  }, [posts.length, gridRef]);
+
+  return null;
 };
 
 export default WatchAutoplay;

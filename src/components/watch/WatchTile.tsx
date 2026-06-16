@@ -1,14 +1,10 @@
-import React, { useEffect, useRef, useState, useCallback } from 'react';
+import React, { useEffect, useRef } from 'react';
 import { Film, Heart, MessageCircle } from 'lucide-react';
 import type { FeedPost } from '@/components/media-system/types/media';
 import { useFullscreenFeedStore } from '@/store/fullscreenFeedStore';
 import { haptic } from '@/utils/haptics';
-import { attachHlsToTile } from '@/hooks/useTileVideoPlayer';
-import { HLSPoolManager } from '@/media/HLSPoolManager';
-import { MediaRuntime } from '@/media/runtime';
 import { Pin } from './proshop/Pin';
 import { LONG_PRESS_MS, TOUCHMOVE_CANCEL_PX } from './constants';
-import { useWatchAutoplay } from './WatchAutoplay';
 
 
 function abbreviateCount(n: number): string {
@@ -39,146 +35,33 @@ const WatchTile: React.FC<WatchTileProps> = ({
 }) => {
   const media = post.mediaItems[0];
   const thumbnailUrl = media?.thumbnailUrl;
-
+  
   const likeCount = post.likeCount ?? 0;
   const commentCount = post.commentCount ?? 0;
   const tileRef = useRef<HTMLDivElement>(null);
-  const videoElRef = useRef<HTMLVideoElement | null>(null);
-  const hlsRef = useRef<any>(null);
   const hlsUrl = post.mediaItems?.[0]?.hlsUrl;
-  const mp4Url = (post.mediaItems?.[0] as any)?.videoUrl || (post.mediaItems?.[0] as any)?.mp4Url;
   const { open } = useFullscreenFeedStore();
-
-  // Phase WatchSpotlight-B: runtime arbitrates which tile plays.
-  // Namespaced id avoids collision with rails (Stage C: watch-rail-*).
-  const ctx = useWatchAutoplay();
-  const mediaId = `watch-grid-${post.id}`;
-  const isPlaying = ctx?.playingIds.has(mediaId) ?? false;
-  const isVisibleCandidate = ctx?.visibleIds.has(mediaId) ?? false;
-  const [videoVisible, setVideoVisible] = useState(false);
-
-  // Stable handle to registerMedia — the ctx object identity changes every
-  // time playingIds updates (its memo deps include playingIds). Depending on
-  // ctx inside the ref callback would re-create the callback on every runtime
-  // sync, causing React to unregister+re-register the <video> each tick →
-  // infinite "Maximum update depth" loop. Reading from a ref keeps the ref
-  // callback identity stable across syncs.
-  const registerMediaRef = useRef(ctx?.registerMedia);
-  registerMediaRef.current = ctx?.registerMedia;
+  
 
   // Long-press state
   const longPressTimerRef = useRef<number | null>(null);
   const longPressFiredRef = useRef(false);
   const pressStartRef = useRef<{ x: number; y: number } | null>(null);
 
-  // Wrapper ref OWNS register/unregister lifecycle. React attaches child
-  // refs before parent refs, so an inner-only register/unregister pattern
-  // would demote itself at mount (wrapper null on first video ref pass).
-  const wrapperRefCallback = useCallback(
-    (el: HTMLDivElement | null) => {
-      tileRef.current = el;
-      const register = registerMediaRef.current;
-      if (!register) return;
-      if (el && videoElRef.current) {
-        register({
-          id: mediaId,
-          element: videoElRef.current,
-          observeTarget: el,
-          sortIndex: index,
-          isCandidate: !!(hlsUrl || mp4Url),
-        });
-      } else {
-        register({ id: mediaId, element: null });
-      }
-    },
-    [mediaId, index, hlsUrl, mp4Url],
-  );
-
-  // Inner video ref only REGISTERS (never unregisters) — wrapper owns teardown.
-  const videoRefCallback = useCallback(
-    (el: HTMLVideoElement | null) => {
-      videoElRef.current = el;
-      const register = registerMediaRef.current;
-      if (!register) return;
-      if (el && tileRef.current) {
-        register({
-          id: mediaId,
-          element: el,
-          observeTarget: tileRef.current,
-          sortIndex: index,
-          isCandidate: !!(hlsUrl || mp4Url),
-        });
-      }
-      // NO else/unregister here — wrapper owns teardown.
-    },
-    [mediaId, index, hlsUrl, mp4Url],
-  );
-
-  // Attach HLS when this tile is a visible candidate (not waiting for
-  // isPlaying — that creates a circular deadlock: safePlay needs src,
-  // src is set by attach, attach was gated on isPlaying which only flips
-  // after safePlay succeeds). Attaching for visible candidates means src
-  // exists by the time the runtime calls safePlay. We then nudge the
-  // runtime so it re-evaluates and plays. Decoder budget: at grid 0.5
-  // threshold only ~1 tile is a visible candidate at a time.
   useEffect(() => {
-    const v = videoElRef.current;
-    if (!v) return;
-    if (!isVisibleCandidate && !isPlaying) return;
-    if (!hlsUrl && !mp4Url) return;
-
-    let cancelled = false;
-
-    const onReady = () => {
-      if (cancelled) return;
-      setVideoVisible(true);
-      // Nudge the runtime: re-evaluate now that src exists so safePlay
-      // can succeed (no direct video.play() — runtime owns playback).
-      MediaRuntime.nudge();
-    };
-
-    if (hlsUrl) {
-      attachHlsToTile({ hlsUrl, mp4Fallback: mp4Url, video: v, onReady })
-        .then((hls) => {
-          if (cancelled) {
-            if (hls && hlsUrl && HLSPoolManager.isPooled(hlsUrl)) {
-              try { HLSPoolManager.demote(hlsUrl, hls); } catch {}
-            } else {
-              try { hls?.destroy?.(); } catch {}
-            }
-            return;
-          }
-          hlsRef.current = hls;
-        })
-        .catch(() => {});
-    } else if (mp4Url) {
-      v.src = mp4Url;
-      v.addEventListener('canplay', onReady, { once: true });
-    }
-
-    return () => {
-      cancelled = true;
-      setVideoVisible(false);
-      const hls = hlsRef.current;
-      if (hls) {
-        if (hlsUrl && HLSPoolManager.isPooled(hlsUrl)) {
-          try { HLSPoolManager.demote(hlsUrl, hls); } catch {}
-        } else {
-          try { hls.stopLoad?.(); } catch {}
-          try { hls.detachMedia?.(); } catch {}
-          try { hls.destroy?.(); } catch {}
+    const el = tileRef.current;
+    if (!el) return;
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0].isIntersecting) {
+          // TODO Brief 3: onViewPreload
         }
-        hlsRef.current = null;
-      }
-      if (v) {
-        // Don't call v.pause() — runtime owns play/pause arbitration.
-        if (!hlsUrl) {
-          v.removeAttribute('src');
-          try { v.load(); } catch {}
-        }
-      }
-    };
-  }, [isVisibleCandidate, isPlaying, hlsUrl, mp4Url]);
+      },
+      { threshold: 0.5 }
+    );
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, [hlsUrl]);
 
   const clearLongPress = () => {
     if (longPressTimerRef.current != null) {
@@ -227,7 +110,7 @@ const WatchTile: React.FC<WatchTileProps> = ({
 
   return (
     <div
-      ref={wrapperRefCallback}
+      ref={tileRef}
       data-watch-index={index}
       className={tileClassName}
       onClick={handleClick}
@@ -263,50 +146,18 @@ const WatchTile: React.FC<WatchTileProps> = ({
         </div>
       )}
 
-      {/* Poster or placeholder — fades out when video is ready */}
+      {/* Poster or placeholder */}
       {thumbnailUrl ? (
         <img
           src={thumbnailUrl}
           alt=""
           className="absolute inset-0 w-full h-full object-cover"
           loading="lazy"
-          style={{
-            opacity: videoVisible ? 0 : 1,
-            transition: 'opacity 200ms ease',
-          }}
         />
       ) : (
         <div className="absolute inset-0 flex items-center justify-center bg-muted">
           <Film className="w-8 h-8 text-muted-foreground" />
         </div>
-      )}
-
-      {/* Runtime-arbitrated autoplay layer. The <video> element is always
-          mounted (cheap, no src until isPlaying) so MediaRuntime has a
-          real element to call play()/pause() on. HLS is attached only when
-          the runtime picks this tile as the spotlight. */}
-      {ctx && (hlsUrl || mp4Url) && (
-        <video
-          ref={videoRefCallback}
-          muted
-          loop
-          playsInline
-          preload="none"
-          // @ts-ignore webkit-only attribute
-          webkit-playsinline=""
-
-          style={{
-            position: 'absolute',
-            inset: 0,
-            width: '100%',
-            height: '100%',
-            objectFit: 'cover',
-            pointerEvents: 'none',
-            zIndex: 1,
-            opacity: videoVisible ? 1 : 0,
-            transition: 'opacity 150ms ease',
-          }}
-        />
       )}
 
       {/* Bottom gradient for legibility */}
@@ -315,7 +166,6 @@ const WatchTile: React.FC<WatchTileProps> = ({
         style={{
           height: '45%',
           background: 'linear-gradient(to top, rgba(0,0,0,0.65) 0%, transparent 100%)',
-          zIndex: 2,
         }}
       />
 

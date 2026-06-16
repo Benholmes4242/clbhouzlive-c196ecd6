@@ -102,7 +102,7 @@ const MAX_CONCURRENT_PER_SURFACE: Record<MediaSurface, number> = {
   'fullscreen': 1,     // Only 1 fullscreen
   'clubhouse': 1,      // Only 1 clubhouse (fullscreen feed)
   'videos': 1,         // Only 1 videos page video (YouTube-style long-form)
-  'watch': 1,          // Single spotlight — one Watch video plays at a time (was 4)
+  'watch': 4,          // Allow 4 visible watch grid videos to play
   
   'profile': 4,        // Allow 4 visible profile activity videos to play
   'explore-grid': 1,   // Explore discover grid - 1 video at a time in dense 2-column layout
@@ -1171,16 +1171,6 @@ class MediaRuntimeCore {
   
   isPlaying(id: string): boolean {
     return this.state.activeMediaIds.has(id);
-  }
-
-  /**
-   * Re-trigger candidate evaluation without changing any visibility state.
-   * Used by lazy-attach surfaces (e.g. Watch tiles) after HLS src arrives
-   * so the runtime can re-run safePlay (which previously bailed at the
-   * no_src gate).
-   */
-  nudge(): void {
-    this.queuePlaybackUpdate();
   }
   
   // ============ Telemetry ============

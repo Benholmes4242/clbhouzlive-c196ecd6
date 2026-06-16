@@ -12,7 +12,8 @@ import LongPressTipBanner from './LongPressTipBanner';
 import { WatchActionsProvider } from './context/WatchActionsContext';
 import { useWatchFeed } from './hooks/useWatchFeed';
 import ScrollToTopGlass from '@/components/common/ScrollToTopGlass';
-
+import { WatchOfTheWeekHero } from './proshop/WatchOfTheWeekHero';
+import { CourseAnchoredRail } from './proshop/CourseAnchoredRail';
 import { WatchMoodChips } from './proshop/WatchMoodChips';
 import { useWatchMood } from './proshop/hooks/useWatchMood';
 
@@ -50,11 +51,17 @@ export default function UnifiedWatchFeed({ embedded = false }: UnifiedWatchFeedP
     <div className="min-h-screen" style={{ background: 'hsl(var(--background))' }}>
       <LongPressTipBanner />
 
-      {/* ── Quick clips — portrait shelf (first section now that hero is removed) ── */}
-      <TrendingThisWeek />
+      {/* ── Pro Shop: Watch of the Week editorial hero ── */}
+      <WatchOfTheWeekHero />
 
       {/* ── Latest videos — full-width YouTube-style stack ── */}
       <LatestVideosRail />
+
+      {/* ── Quick clips — portrait shelf ── */}
+      <TrendingThisWeek />
+
+      {/* ── From your courses — single course-anchored rail ── */}
+      <CourseAnchoredRail />
 
 
       {/* ── Section 3: Watch grid ──
@@ -70,35 +77,36 @@ export default function UnifiedWatchFeed({ embedded = false }: UnifiedWatchFeedP
         <div style={{ paddingTop: 4, paddingBottom: 8 }}>
           <WatchMoodChips active={mood} onChange={setMood} />
         </div>
-        <WatchAutoplay>
-          <WatchGrid
-            posts={posts}
-            isLoading={isLoading}
-            isError={isError}
-            hasNextPage={hasNextPage}
-            isFetchingNextPage={isFetchingNextPage}
-            fetchNextPage={fetchNextPage}
-            refetch={refetch}
-            gridRef={gridRef as React.RefObject<HTMLDivElement>}
-            userId={userId}
-            emptyEmoji={
-              mood === 'follows' ? '👥'
-              : mood === 'played_courses' ? '⛳'
-              : '⛳'
-            }
-            emptyTitle={
-              mood === 'follows' ? 'No videos from your follows yet'
-              : mood === 'played_courses' ? 'No videos from courses you\u2019ve played'
-              : 'No shorts yet'
-            }
-            emptyMessage={
-              mood === 'follows' ? 'Follow more creators to see their clips here'
-              : mood === 'played_courses' ? 'Log a round to start seeing clips from those courses'
-              : 'Check back soon for new content'
-            }
-          />
-        </WatchAutoplay>
-
+        <WatchAutoplay
+          posts={posts}
+          gridRef={gridRef as React.RefObject<HTMLDivElement>}
+        />
+        <WatchGrid
+          posts={posts}
+          isLoading={isLoading}
+          isError={isError}
+          hasNextPage={hasNextPage}
+          isFetchingNextPage={isFetchingNextPage}
+          fetchNextPage={fetchNextPage}
+          refetch={refetch}
+          gridRef={gridRef as React.RefObject<HTMLDivElement>}
+          userId={userId}
+          emptyEmoji={
+            mood === 'follows' ? '👥'
+            : mood === 'played_courses' ? '⛳'
+            : '⛳'
+          }
+          emptyTitle={
+            mood === 'follows' ? 'No videos from your follows yet'
+            : mood === 'played_courses' ? 'No videos from courses you\u2019ve played'
+            : 'No shorts yet'
+          }
+          emptyMessage={
+            mood === 'follows' ? 'Follow more creators to see their clips here'
+            : mood === 'played_courses' ? 'Log a round to start seeing clips from those courses'
+            : 'Check back soon for new content'
+          }
+        />
       </div>
 
       <ScrollToTopGlass />

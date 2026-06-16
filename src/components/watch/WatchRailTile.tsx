@@ -6,10 +6,6 @@ import type { FeedPost } from '@/components/media-system/types/media';
 import { useWatchActions } from './context/WatchActionsContext';
 import { Pin } from './proshop/Pin';
 import { haptic } from '@/utils/haptics';
-import { attachHlsToTile } from '@/hooks/useTileVideoPlayer';
-import { HLSPoolManager } from '@/media/HLSPoolManager';
-import { MediaRuntime } from '@/media/runtime';
-import type { RegisterMediaFn } from '@/media';
 
 interface WatchRailTileProps {
   post: FeedPost;
@@ -25,19 +21,12 @@ interface WatchRailTileProps {
    * Optional → falls back to global time-only behavior.
    */
   viewedPostIds?: Set<string>;
-  /**
-   * Phase WatchSpotlight-C: when provided, the tile is runtime-arbitrated
-   * (single global 'watch' spotlight, loops while it's the winner).
-   * When omitted, falls back to the legacy "plays once on 40% visible"
-   * per-card IO (used by LightningRoundRail at /watch/clips).
-   */
-  registerMedia?: RegisterMediaFn;
-  playingIds?: Set<string>;
-  /** Visible-candidate set from useMediaAutoplay; drives lazy HLS attach. */
-  visibleIds?: Set<string>;
 }
 
 // Hybrid "why" labels — Session 2 of 3.
+// Server-side reasons (TRENDING / NEAR YOU / FROM A COURSE YOU'VE PLAYED)
+// are deferred until we add the joins to get_watch_shorts. For now we derive
+// the two cheap reasons from data already on FeedPost.
 const NEW_THRESHOLD_MS = 24 * 60 * 60 * 1000; // 24h
 const POPULAR_REVIEW_LIKES = 25;
 
@@ -55,8 +44,10 @@ function deriveSurfacingReason(
 
 /**
  * Canonical horizontal-rail tile for the Watch surface.
- * Used by `TrendingThisWeek` (runtime-arbitrated spotlight, with rank) and
- * `LightningRoundRail` (legacy per-card autoplay, no rank).
+ * Used by `TrendingThisWeek` (with rank) and `LatestVideosRail` (no rank).
+ *
+ * Per-card autoplay: plays once when 40% visible, freezes on last frame,
+ * shows a glass play affordance afterwards.
  */
 export default function WatchRailTile({
   post,
@@ -65,130 +56,36 @@ export default function WatchRailTile({
   rank,
   width = 200,
   viewedPostIds,
-  registerMedia,
-  playingIds,
-  visibleIds,
 }: WatchRailTileProps) {
   const cardRef = useRef<HTMLDivElement>(null);
-  const videoRef = useRef<HTMLVideoElement | null>(null);
-  const hlsRef = useRef<any>(null);
-
-  // Legacy mode (no registerMedia): plays once on 40% visible.
+  const videoRef = useRef<HTMLVideoElement>(null);
+  const hlsRef = useRef<Hls | null>(null);
   const [hasPlayed, setHasPlayed] = useState(false);
-  const [legacyVisible, setLegacyVisible] = useState(false);
+  const [isPlaying, setIsPlaying] = useState(false);
 
   const media = post.mediaItems[0];
   const thumb = media?.thumbnailUrl || media?.imageUrl || '';
   const hlsUrl = media?.hlsUrl || '';
-  const mp4Url = (media as any)?.videoUrl || (media as any)?.mp4Url || '';
 
-  const runtimeMode = !!registerMedia;
-  const mediaId = `watch-rail-${post.id}`;
-  const isRuntimePlaying = runtimeMode ? (playingIds?.has(mediaId) ?? false) : false;
-  const isVisibleCandidate = runtimeMode ? (visibleIds?.has(mediaId) ?? false) : false;
-
-  // ── Wrapper ref OWNS register/unregister lifecycle (runtime mode). ──
-  // React attaches child refs before parent refs; an inner-only
-  // register/unregister pattern would demote itself at mount.
-  const wrapperRefCallback = useCallback(
-    (el: HTMLDivElement | null) => {
-      cardRef.current = el;
-      if (!runtimeMode || !registerMedia) return;
-      if (el && videoRef.current) {
-        registerMedia({
-          id: mediaId,
-          element: videoRef.current,
-          observeTarget: el,
-          sortIndex: index,
-          isCandidate: !!(hlsUrl || mp4Url),
-        });
-      } else {
-        registerMedia({ id: mediaId, element: null });
-      }
-    },
-    [runtimeMode, registerMedia, mediaId, index, hlsUrl, mp4Url],
-  );
-
-  // Inner video ref only REGISTERS (never unregisters) — wrapper owns teardown.
-  const videoRefCallback = useCallback(
-    (el: HTMLVideoElement | null) => {
-      videoRef.current = el;
-      if (!runtimeMode || !registerMedia) return;
-      if (el && cardRef.current) {
-        registerMedia({
-          id: mediaId,
-          element: el,
-          observeTarget: cardRef.current,
-          sortIndex: index,
-          isCandidate: !!(hlsUrl || mp4Url),
-        });
-      }
-      // NO else/unregister here — wrapper owns teardown.
-    },
-    [runtimeMode, registerMedia, mediaId, index, hlsUrl, mp4Url],
-  );
-
-  // ── Runtime mode: attach HLS when this tile is a visible candidate
-  //    (lazy attach breaks no_src ↔ isPlaying deadlock). Runtime owns play.
-  const [videoVisible, setVideoVisible] = useState(false);
+  // Per-card IntersectionObserver — autoplay once when 40% visible
   useEffect(() => {
-    if (!runtimeMode) return;
-    const v = videoRef.current;
-    if (!v) return;
-    if (!isVisibleCandidate && !isRuntimePlaying) return;
-    if (!hlsUrl && !mp4Url) return;
+    const el = cardRef.current;
+    if (!el || !hlsUrl || hasPlayed) return;
 
-    let cancelled = false;
-    const onReady = () => {
-      if (cancelled) return;
-      setVideoVisible(true);
-      MediaRuntime.nudge();
-    };
-
-    if (hlsUrl) {
-      attachHlsToTile({ hlsUrl, mp4Fallback: mp4Url, video: v, onReady })
-        .then((hls) => {
-          if (cancelled) {
-            if (hls && hlsUrl && HLSPoolManager.isPooled(hlsUrl)) {
-              try { HLSPoolManager.demote(hlsUrl, hls); } catch {}
-            } else {
-              try { hls?.destroy?.(); } catch {}
-            }
-            return;
-          }
-          hlsRef.current = hls;
-        })
-        .catch(() => {});
-    } else if (mp4Url) {
-      v.src = mp4Url;
-      v.addEventListener('canplay', onReady, { once: true });
-    }
-
-    return () => {
-      cancelled = true;
-      setVideoVisible(false);
-      const hls = hlsRef.current;
-      if (hls) {
-        if (hlsUrl && HLSPoolManager.isPooled(hlsUrl)) {
-          try { HLSPoolManager.demote(hlsUrl, hls); } catch {}
-        } else {
-          try { hls.stopLoad?.(); } catch {}
-          try { hls.detachMedia?.(); } catch {}
-          try { hls.destroy?.(); } catch {}
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting && !hasPlayed) {
+          startAutoplay();
+          observer.disconnect();
         }
-        hlsRef.current = null;
-      }
-      if (v) {
-        if (!hlsUrl) {
-          v.removeAttribute('src');
-          try { v.load(); } catch {}
-        }
-      }
-    };
-  }, [runtimeMode, isVisibleCandidate, isRuntimePlaying, hlsUrl, mp4Url]);
+      },
+      { threshold: 0.4 },
+    );
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, [hlsUrl, hasPlayed]);
 
-  // ── Legacy mode: per-card IO, plays once when 40% visible ──
-  const startLegacyAutoplay = useCallback(() => {
+  const startAutoplay = useCallback(() => {
     const video = videoRef.current;
     if (!video || !hlsUrl) return;
 
@@ -208,43 +105,23 @@ export default function WatchRailTile({
       video.play().catch(() => {});
     }
 
-    setLegacyVisible(true);
+    setIsPlaying(true);
 
     video.onended = () => {
-      setLegacyVisible(false);
+      setIsPlaying(false);
       setHasPlayed(true);
-      hlsRef.current?.destroy?.();
+      hlsRef.current?.destroy();
       hlsRef.current = null;
     };
   }, [hlsUrl]);
 
-  useEffect(() => {
-    if (runtimeMode) return; // skip legacy path
-    const el = cardRef.current;
-    if (!el || !hlsUrl || hasPlayed) return;
-
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting && !hasPlayed) {
-          startLegacyAutoplay();
-          observer.disconnect();
-        }
-      },
-      { threshold: 0.4 },
-    );
-    observer.observe(el);
-    return () => observer.disconnect();
-  }, [runtimeMode, hlsUrl, hasPlayed, startLegacyAutoplay]);
-
-  // Unmount cleanup (legacy path; runtime path handled by its effect)
+  // Cleanup on unmount
   useEffect(() => {
     return () => {
-      if (!runtimeMode) {
-        hlsRef.current?.destroy?.();
-        hlsRef.current = null;
-      }
+      hlsRef.current?.destroy();
+      hlsRef.current = null;
     };
-  }, [runtimeMode]);
+  }, []);
 
   const { openActions } = useWatchActions();
 
@@ -274,6 +151,7 @@ export default function WatchRailTile({
 
   const handleClick = useCallback(() => {
     if (longPressFiredRef.current) {
+      // Long-press already fired → suppress the implicit tap.
       longPressFiredRef.current = false;
       return;
     }
@@ -285,11 +163,9 @@ export default function WatchRailTile({
     [post, viewedPostIds],
   );
 
-  const showVideo = runtimeMode ? videoVisible : legacyVisible;
-
   return (
     <div
-      ref={wrapperRefCallback}
+      ref={cardRef}
       style={{
         flexShrink: 0,
         position: 'relative',
@@ -305,6 +181,7 @@ export default function WatchRailTile({
       onPointerLeave={cancelLongPress}
       onPointerCancel={cancelLongPress}
       onContextMenu={(e) => {
+        // Suppress native long-press context menu so the action sheet wins.
         e.preventDefault();
       }}
     >
@@ -322,25 +199,19 @@ export default function WatchRailTile({
         }}
       />
 
-      {/* Autoplay video layer — persistent in runtime mode (registered with
-          MediaRuntime; loops while winner of the global 'watch' spotlight).
-          Legacy mode: plays once on 40% visible (LightningRoundRail). */}
+      {/* Autoplay video layer */}
       {hlsUrl && (
         <video
-          ref={videoRefCallback}
+          ref={videoRef}
           muted
-          loop={runtimeMode}
           playsInline
-          preload="none"
-          // @ts-ignore webkit-only attribute
-          webkit-playsinline=""
           style={{
             position: 'absolute',
             inset: 0,
             width: '100%',
             height: '100%',
             objectFit: 'cover',
-            opacity: showVideo ? 1 : 0,
+            opacity: isPlaying ? 1 : 0,
             transition: 'opacity 0.3s',
           }}
         />

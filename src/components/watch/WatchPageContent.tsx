@@ -77,20 +77,19 @@ const WatchPageContent: React.FC<WatchPageContentProps> = ({ embedded = false, s
 
       <TrendingThisWeek enabled={!!userId && activeTag === 'all'} />
 
-      <WatchAutoplay>
-        <WatchGrid
-          posts={posts}
-          isLoading={isLoading}
-          isError={isError}
-          hasNextPage={hasNextPage}
-          isFetchingNextPage={isFetchingNextPage}
-          fetchNextPage={fetchNextPage}
-          refetch={refetch}
-          gridRef={gridRef as React.RefObject<HTMLDivElement>}
-          userId={userId}
-        />
-      </WatchAutoplay>
+      <WatchAutoplay posts={posts} gridRef={gridRef as React.RefObject<HTMLDivElement>} />
 
+      <WatchGrid
+        posts={posts}
+        isLoading={isLoading}
+        isError={isError}
+        hasNextPage={hasNextPage}
+        isFetchingNextPage={isFetchingNextPage}
+        fetchNextPage={fetchNextPage}
+        refetch={refetch}
+        gridRef={gridRef as React.RefObject<HTMLDivElement>}
+        userId={userId}
+      />
       
       <WatchSearchOverlay
         isOpen={isSearchOpen}
