@@ -35,6 +35,87 @@ function WatchOfTheWeekHeroInner() {
     staleTime: 60_000,
   });
 
+  // ── Phase WatchSpotlight-D: register hero as a 'watch' spotlight candidate.
+  // sortIndex: 0 so it wins at the top of the page when equally visible.
+  const { registerMedia, playingIds } = useMediaAutoplay({
+    mode: 'grid',
+    surface: 'watch',
+    startThreshold: 0.5,
+    stopThreshold: 0.25,
+  });
+  const mediaId = pick ? `watch-hero-${pick.post_id}` : '';
+  const hlsUrl = pick?.hls_url ?? undefined;
+  const isPlaying = !!mediaId && playingIds.has(mediaId);
+  const [videoVisible, setVideoVisible] = useState(false);
+
+  // Stable ref-callback pattern (same loop-fix as WatchTile).
+  const registerRef = useRef(registerMedia);
+  registerRef.current = registerMedia;
+  const heroWrapperRef = useRef<HTMLButtonElement | null>(null);
+  const videoElRef = useRef<HTMLVideoElement | null>(null);
+  const hlsRef = useRef<any>(null);
+
+  const videoRefCallback = useCallback(
+    (el: HTMLVideoElement | null) => {
+      videoElRef.current = el;
+      const register = registerRef.current;
+      if (!register || !mediaId) return;
+      if (el && heroWrapperRef.current) {
+        register({
+          id: mediaId,
+          element: el,
+          observeTarget: heroWrapperRef.current,
+          sortIndex: 0,
+          isCandidate: !!hlsUrl,
+        });
+      } else {
+        register({ id: mediaId, element: null });
+      }
+    },
+    [mediaId, hlsUrl],
+  );
+
+  // Attach HLS when runtime picks us; demote-to-pool on the way out.
+  useEffect(() => {
+    const v = videoElRef.current;
+    if (!v || !isPlaying || !hlsUrl) return;
+    let cancelled = false;
+    const onReady = () => {
+      if (cancelled) return;
+      setVideoVisible(true);
+      v.play().catch(() => {});
+    };
+    attachHlsToTile({ hlsUrl, video: v, onReady })
+      .then((hls) => {
+        if (cancelled) {
+          if (hls && HLSPoolManager.isPooled(hlsUrl)) {
+            try { HLSPoolManager.demote(hlsUrl, hls); } catch {}
+          } else {
+            try { hls?.destroy?.(); } catch {}
+          }
+          return;
+        }
+        hlsRef.current = hls;
+      })
+      .catch(() => {});
+    return () => {
+      cancelled = true;
+      setVideoVisible(false);
+      const hls = hlsRef.current;
+      if (hls) {
+        if (HLSPoolManager.isPooled(hlsUrl)) {
+          try { HLSPoolManager.demote(hlsUrl, hls); } catch {}
+        } else {
+          try { hls.stopLoad?.(); } catch {}
+          try { hls.detachMedia?.(); } catch {}
+          try { hls.destroy?.(); } catch {}
+        }
+        hlsRef.current = null;
+      }
+      try { v.pause(); } catch {}
+    };
+  }, [isPlaying, hlsUrl]);
+
   if (isLoading || !pick) return null;
 
   const handleTap = () => {
