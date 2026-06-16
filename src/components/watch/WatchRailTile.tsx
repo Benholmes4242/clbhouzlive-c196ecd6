@@ -8,6 +8,7 @@ import { Pin } from './proshop/Pin';
 import { haptic } from '@/utils/haptics';
 import { attachHlsToTile } from '@/hooks/useTileVideoPlayer';
 import { HLSPoolManager } from '@/media/HLSPoolManager';
+import { MediaRuntime } from '@/media/runtime';
 import type { RegisterMediaFn } from '@/media';
 
 interface WatchRailTileProps {
