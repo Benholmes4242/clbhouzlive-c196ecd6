@@ -164,6 +164,7 @@ function WatchOfTheWeekHeroInner() {
       <Kicker color="amber">Watch of the Week</Kicker>
 
       <button
+        ref={heroWrapperRef}
         type="button"
         onClick={handleTap}
         className="block w-full text-left active:scale-[0.99] transition-transform"
@@ -188,15 +189,42 @@ function WatchOfTheWeekHeroInner() {
           />
         ) : null}
 
+        {/* Runtime-arbitrated autoplay layer — fades in above the poster
+            when MediaRuntime picks the hero as the 'watch' spotlight. */}
+        {hlsUrl ? (
+          <video
+            ref={videoRefCallback}
+            muted
+            loop
+            playsInline
+            preload="none"
+            // @ts-ignore webkit-only attribute
+            webkit-playsinline=""
+            style={{
+              position: 'absolute',
+              inset: 0,
+              width: '100%',
+              height: '100%',
+              objectFit: 'cover',
+              pointerEvents: 'none',
+              zIndex: 1,
+              opacity: videoVisible ? 1 : 0,
+              transition: 'opacity 200ms ease',
+            }}
+          />
+        ) : null}
+
         {/* Bottom gradient */}
         <div
           aria-hidden
           style={{
             position: 'absolute',
             inset: 0,
+            zIndex: 2,
             background: 'linear-gradient(to top, rgba(0,0,0,0.78) 0%, rgba(0,0,0,0.05) 55%, transparent 100%)',
           }}
         />
+
 
         {/* Top-left badges */}
         <div style={{ position: 'absolute', top: 10, left: 10, display: 'flex', gap: 6, maxWidth: 'calc(100% - 80px)' }}>
