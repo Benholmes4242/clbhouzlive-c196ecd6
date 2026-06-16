@@ -23,6 +23,7 @@ export default function CarouselRow({
   userId,
   registerMedia,
   playingIds,
+  visibleIds,
 }: CarouselRowProps) {
   const scrollerRef = useRef<HTMLDivElement>(null);
   const cardRefs = useRef<Array<HTMLDivElement | null>>([]);
