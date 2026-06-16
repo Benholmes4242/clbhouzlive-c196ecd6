@@ -1,8 +1,9 @@
-import { memo, useCallback, useEffect, useRef, useState } from 'react';
+import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 
-import { useWatchOfTheWeek } from './hooks/useWatchOfTheWeek';
+import { useWatchOfTheWeek, type WatchOfTheWeek } from './hooks/useWatchOfTheWeek';
 import { useWatchMood } from './hooks/useWatchMood';
+import { useWatchFeed } from '../hooks/useWatchFeed';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useFullscreenFeedStore } from '@/store/fullscreenFeedStore';
 import { Kicker } from './Kicker';
@@ -28,10 +29,47 @@ function WatchOfTheWeekHeroInner() {
   const { activeActor } = useActiveActor();
   const actor = activeActor ? { id: activeActor.id, type: activeActor.type } : null;
 
+  // Fallback feed — only actually needed when pick is null, but hooks must be unconditional.
+  const { posts } = useWatchFeed({
+    userId: session?.user?.id,
+    filter: 'top',
+  });
+
+  // Build a fallback "pick" from the top-liked VIDEO post (mirrors TrendingThisWeek.topPosts).
+  const fallbackPick = useMemo<WatchOfTheWeek | null>(() => {
+    if (pick) return null; // editorial pick wins
+    const topVideo = [...(posts ?? [])]
+      .filter(p => p.mediaItems?.[0]?.type === 'video' && p.mediaItems[0]?.hlsUrl)
+      .sort((a, b) => b.likeCount - a.likeCount)[0];
+    if (!topVideo) return null;
+    const m = topVideo.mediaItems[0];
+    return {
+      post_id: topVideo.id,
+      user_id: topVideo.userId,
+      course_id: null,
+      course_name: topVideo.courseName ?? null,
+      caption: topVideo.caption ?? null,
+      thumbnail_url: m.thumbnailUrl ?? null,
+      hls_url: m.hlsUrl ?? null,
+      duration_seconds: null,
+      format: 'video',
+      username: topVideo.username ?? null,
+      display_name: topVideo.displayName ?? null,
+      avatar_url: topVideo.avatarUrl ?? null,
+      is_verified: false,
+      like_count: topVideo.likeCount ?? 0,
+      comment_count: topVideo.commentCount ?? 0,
+      created_at: topVideo.createdAt ?? new Date().toISOString(),
+      why_ai: null,
+    };
+  }, [pick, posts]);
+
+  const effectivePick = pick ?? fallbackPick;
+
   const { data: isLiked = false } = useQuery({
-    queryKey: ['post-liked-by-me', pick?.post_id, actor?.id, actor?.type],
-    queryFn: () => isPostLikedByMe(pick!.post_id, actor),
-    enabled: !!pick?.post_id,
+    queryKey: ['post-liked-by-me', effectivePick?.post_id, actor?.id, actor?.type],
+    queryFn: () => isPostLikedByMe(effectivePick!.post_id, actor),
+    enabled: !!effectivePick?.post_id,
     staleTime: 60_000,
   });
 
@@ -43,8 +81,8 @@ function WatchOfTheWeekHeroInner() {
     startThreshold: 0.5,
     stopThreshold: 0.25,
   });
-  const mediaId = pick ? `watch-hero-${pick.post_id}` : '';
-  const hlsUrl = pick?.hls_url ?? undefined;
+  const mediaId = effectivePick ? `watch-hero-${effectivePick.post_id}` : '';
+  const hlsUrl = effectivePick?.hls_url ?? undefined;
   const isPlaying = !!mediaId && playingIds.has(mediaId);
   const [videoVisible, setVideoVisible] = useState(false);
 
@@ -116,44 +154,44 @@ function WatchOfTheWeekHeroInner() {
     };
   }, [isPlaying, hlsUrl]);
 
-  if (isLoading || !pick) return null;
+  if (isLoading || !effectivePick) return null;
 
   const handleTap = () => {
     // Open fullscreen viewer with a synthetic single-post array. The viewer
     // accepts the FeedPost shape; we provide the minimum fields it needs.
     useFullscreenFeedStore.getState().open(
       [{
-        id: pick.post_id,
-        userId: pick.user_id,
+        id: effectivePick.post_id,
+        userId: effectivePick.user_id,
         actorType: 'personal',
-        actorId: pick.user_id,
-        username: pick.username ?? '',
-        displayName: pick.display_name ?? '',
-        avatarUrl: pick.avatar_url ?? '',
-        isVerified: pick.is_verified,
+        actorId: effectivePick.user_id,
+        username: effectivePick.username ?? '',
+        displayName: effectivePick.display_name ?? '',
+        avatarUrl: effectivePick.avatar_url ?? '',
+        isVerified: effectivePick.is_verified,
         creatorRelation: 'none',
-        caption: pick.caption ?? '',
+        caption: effectivePick.caption ?? '',
         mediaItems: [{
-          id: pick.post_id,
+          id: effectivePick.post_id,
           type: 'video',
-          hlsUrl: pick.hls_url ?? undefined,
-          imageUrl: pick.thumbnail_url ?? undefined,
-          thumbnailUrl: pick.thumbnail_url ?? undefined,
+          hlsUrl: effectivePick.hls_url ?? undefined,
+          imageUrl: effectivePick.thumbnail_url ?? undefined,
+          thumbnailUrl: effectivePick.thumbnail_url ?? undefined,
           width: 0,
           height: 0,
-          duration: pick.duration_seconds ?? undefined,
+          duration: effectivePick.duration_seconds ?? undefined,
         }],
-        createdAt: pick.created_at,
-        likeCount: pick.like_count,
-        commentCount: pick.comment_count,
+        createdAt: effectivePick.created_at,
+        likeCount: effectivePick.like_count,
+        commentCount: effectivePick.comment_count,
         shareCount: 0,
         review: null,
         isReview: false,
         isLikedByMe: isLiked,
         isFollowedByMe: false,
-        courseName: pick.course_name ?? undefined,
-        courseId: pick.course_id ?? undefined,
-        tags: (pick as any).post_tags ?? [],
+        courseName: effectivePick.course_name ?? undefined,
+        courseId: effectivePick.course_id ?? undefined,
+        tags: (effectivePick as any).post_tags ?? [],
       } as any],
       0,
     );
@@ -180,10 +218,10 @@ function WatchOfTheWeekHeroInner() {
           marginTop: 6,
         }}
       >
-        {pick.thumbnail_url ? (
+        {effectivePick.thumbnail_url ? (
           <img
-            src={pick.thumbnail_url}
-            alt={pick.caption ?? ''}
+            src={effectivePick.thumbnail_url}
+            alt={effectivePick.caption ?? ''}
             loading="lazy"
             style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover' }}
           />
@@ -228,10 +266,10 @@ function WatchOfTheWeekHeroInner() {
 
         {/* Top-left badges */}
         <div style={{ position: 'absolute', top: 10, left: 10, zIndex: 3, display: 'flex', gap: 6, maxWidth: 'calc(100% - 80px)' }}>
-          <Pin variant="dark">{pick.format === 'clip' ? 'CLIP' : 'VIDEO'}</Pin>
-          {pick.course_name ? (
+          <Pin variant="dark">{effectivePick.format === 'clip' ? 'CLIP' : 'VIDEO'}</Pin>
+          {effectivePick.course_name ? (
             <Pin variant="dark" icon={<span style={{ fontSize: 10 }}>📍</span>}>
-              {pick.course_name}
+              {effectivePick.course_name}
             </Pin>
           ) : null}
         </div>
@@ -251,19 +289,19 @@ function WatchOfTheWeekHeroInner() {
               textShadow: '0 1px 4px rgba(0,0,0,0.5)',
             }}
           >
-            {pick.caption || (pick.display_name ? `${pick.display_name} on Clbhouz` : 'Featured')}
+            {effectivePick.caption || (effectivePick.display_name ? `${effectivePick.display_name} on Clbhouz` : 'Featured')}
           </div>
           <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginTop: 6, fontSize: 11, fontWeight: 600, opacity: 0.9 }}>
             <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-              {pick.display_name || pick.username || 'Clbhouz'}
+              {effectivePick.display_name || effectivePick.username || 'Clbhouz'}
             </span>
-            {pick.duration_seconds ? <span aria-hidden>·</span> : null}
-            {pick.duration_seconds ? <span>{formatDuration(pick.duration_seconds)}</span> : null}
+            {effectivePick.duration_seconds ? <span aria-hidden>·</span> : null}
+            {effectivePick.duration_seconds ? <span>{formatDuration(effectivePick.duration_seconds)}</span> : null}
           </div>
         </div>
       </button>
 
-      {pick.why_ai ? (
+      {effectivePick.why_ai ? (
         <p
           style={{
             marginTop: 12,
@@ -273,7 +311,7 @@ function WatchOfTheWeekHeroInner() {
           }}
         >
           <span style={{ fontWeight: 700, color: '#0F172A' }}>Why we're featuring this: </span>
-          {pick.why_ai}
+          {effectivePick.why_ai}
         </p>
       ) : null}
     </section>
