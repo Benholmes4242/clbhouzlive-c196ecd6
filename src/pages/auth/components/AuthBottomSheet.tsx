@@ -59,7 +59,7 @@ const AuthBottomSheet: React.FC<AuthBottomSheetProps> = ({
       {/* Sheet - light surface */}
       <div 
         className={cn(
-          "fixed bottom-0 inset-x-0 mx-auto z-50 w-full max-w-[480px]",
+          "fixed bottom-0 inset-x-0 mx-auto z-50 w-full max-w-[480px] md:max-w-[560px]",
           "rounded-t-[32px]",
           "transition-all duration-[380ms] ease-out",
           "pb-safe",
