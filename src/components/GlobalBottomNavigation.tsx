@@ -164,11 +164,12 @@ const GlobalBottomNavigation: React.FC<GlobalBottomNavigationProps> = ({ chromeS
           <div className="fixed bottom-0 left-0 right-0 z-[100] flex justify-center pointer-events-none">
             <motion.div
               className={cn(
-                "global-bottom-nav bottom-nav-fixed",
+                "global-bottom-nav",
                 "w-full max-w-[480px]",
                 "pointer-events-auto",
                 "m-0!"
               )}
+              style={{ backfaceVisibility: 'hidden' }}
               initial={{ y: '100%', opacity: 0 }}
               animate={{ y: 0, opacity: 1 }}
               exit={{ y: '100%', opacity: 0 }}
