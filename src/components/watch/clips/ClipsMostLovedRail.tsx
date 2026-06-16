@@ -7,6 +7,7 @@ import type { MostLovedRow } from '../proshop/hooks/useMostLovedThisWeek';
 import { SectionHeader } from '../proshop/SectionHeader';
 import { HRail } from '../proshop/HRail';
 import type { ClipsMoodId } from './hooks/useClipsMood';
+import { useActiveActor } from '@/context/ActiveActorContext';
 import { fetchLikedPostIds } from '@/lib/likedPostIds';
 
 interface ClipsMostLovedRailProps {
