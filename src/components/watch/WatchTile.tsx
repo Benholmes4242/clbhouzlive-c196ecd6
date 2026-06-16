@@ -54,6 +54,7 @@ const WatchTile: React.FC<WatchTileProps> = ({
   const ctx = useWatchAutoplay();
   const mediaId = `watch-grid-${post.id}`;
   const isPlaying = ctx?.playingIds.has(mediaId) ?? false;
+  const isVisibleCandidate = ctx?.visibleIds.has(mediaId) ?? false;
   const [videoVisible, setVideoVisible] = useState(false);
 
   // Stable handle to registerMedia — the ctx object identity changes every
