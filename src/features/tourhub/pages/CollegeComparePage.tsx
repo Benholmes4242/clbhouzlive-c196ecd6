@@ -100,7 +100,7 @@ export function CollegeComparePage() {
           onClick={() => navigate('/tourhub/college-golf')}
           aria-label="Head-to-Head — open College Franchise"
           style={{
-            background: SHELL_BG,
+            background: SLATE_50,
             border: 'none',
             padding: '14px 16px 12px',
             cursor: 'pointer',
@@ -111,14 +111,14 @@ export function CollegeComparePage() {
         >
           <div style={{ display: 'inline-flex', alignItems: 'center', gap: 6, marginBottom: 4 }}>
             <ArrowLeftRight size={11} strokeWidth={2.5} color={AMBER} style={{ marginTop: -4 }} />
-            <Kicker color="light">Head-to-head</Kicker>
+            <Kicker color="slate">Head-to-head</Kicker>
             <ChevronRight size={11} strokeWidth={2.5} color={AMBER} style={{ marginTop: -4 }} />
           </div>
           <h1
             style={{
               fontSize: 22,
               fontWeight: 800,
-              color: SURFACE,
+              color: INK,
               letterSpacing: '-0.025em',
               lineHeight: 1.15,
               margin: 0,
@@ -134,7 +134,7 @@ export function CollegeComparePage() {
               style={{
                 fontSize: 13,
                 fontWeight: 500,
-                color: WHITE_ALPHA_55,
+                color: INK_FAINT,
                 lineHeight: 1.4,
                 marginTop: 4,
                 overflow: 'hidden',
