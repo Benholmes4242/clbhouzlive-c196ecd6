@@ -59,7 +59,7 @@ const HandicapDemoExperience: React.FC = () => {
   const data = BEN_HANDICAP_MOCK;
 
   return (
-    <div className="max-w-[480px] mx-auto pb-24 space-y-6">
+    <div className="max-w-[480px] md:max-w-[600px] lg:max-w-[680px] mx-auto pb-24 space-y-6">
       {/* A. Hero Strip - white card on grey background */}
       <div className="bg-background border border-border rounded-sq-lg shadow-sm p-5">
         <HandicapHeroStrip
