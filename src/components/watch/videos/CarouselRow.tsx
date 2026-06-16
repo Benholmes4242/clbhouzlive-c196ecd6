@@ -13,6 +13,7 @@ interface CarouselRowProps {
   /** Phase WatchSpotlight-C: runtime-managed spotlight. */
   registerMedia: RegisterMediaFn;
   playingIds: Set<string>;
+  visibleIds: Set<string>;
 }
 
 export default function CarouselRow({
