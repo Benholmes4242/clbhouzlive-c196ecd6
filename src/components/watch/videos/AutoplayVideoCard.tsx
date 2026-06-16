@@ -39,9 +39,11 @@ export interface AutoplayVideoCardProps {
   active: boolean;
   /** Card corner radius in px. Defaults to 12. */
   borderRadius?: number;
+  /** Horizontal padding (px) for the meta row under the thumbnail. Defaults to 16. */
+  metaPadX?: number;
 }
 
-function AutoplayVideoCardInner({ post, index, allPosts, userId, active, borderRadius = 12 }: AutoplayVideoCardProps) {
+function AutoplayVideoCardInner({ post, index, allPosts, userId, active, borderRadius = 12, metaPadX = 16 }: AutoplayVideoCardProps) {
   const navigate = useNavigate();
   const { openActions } = useWatchActions();
   const longPressTimer = useRef<number | null>(null);
@@ -216,7 +218,7 @@ function AutoplayVideoCardInner({ post, index, allPosts, userId, active, borderR
         ) : null}
       </button>
 
-      <div style={{ display: 'flex', gap: 10, marginTop: 8, alignItems: 'flex-start', padding: '0 16px' }}>
+      <div style={{ display: 'flex', gap: 10, marginTop: 8, alignItems: 'flex-start', padding: `0 ${metaPadX}px` }}>
         <button
           type="button"
           onClick={(e) => { e.stopPropagation(); navigate(`/profile/${post.userId}`); }}
