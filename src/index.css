@@ -1881,9 +1881,11 @@ html, body, #root, .app-shell { touch-action: auto; }
 .global-bottom-nav-shell {
   position: fixed;
   bottom: 0;
-  left: 50%;
-  width: min(100vw, 480px);
-  transform: translate3d(-50%, 0, 0);
+  left: 0;
+  right: 0;
+  width: 100%;
+  max-width: 480px;
+  margin-inline: auto;
   z-index: 100 !important;
 }
 
@@ -1909,7 +1911,7 @@ html, body, #root, .app-shell { touch-action: auto; }
    never disturb horizontal alignment. */
 @media (min-width: 768px) {
   .global-bottom-nav-shell {
-    width: min(100vw, 620px);
+    max-width: 620px;
   }
 }
 
