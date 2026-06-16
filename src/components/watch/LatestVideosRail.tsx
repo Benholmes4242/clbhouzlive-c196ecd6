@@ -74,6 +74,7 @@ export default function LatestVideosRail() {
             mediaId={heroMediaId}
             registerMedia={registerMedia}
             isPlaying={playingIds.has(heroMediaId)}
+            isVisibleCandidate={visibleIds.has(heroMediaId)}
             sortIndex={0}
           />
         </div>
@@ -86,6 +87,7 @@ export default function LatestVideosRail() {
             userId={userId}
             registerMedia={registerMedia}
             playingIds={playingIds}
+            visibleIds={visibleIds}
           />
         ) : null}
       </div>
