@@ -6,10 +6,7 @@ import { useFullscreenFeedStore } from '@/store/fullscreenFeedStore';
 import type { MostLovedRow } from '../proshop/hooks/useMostLovedThisWeek';
 import { SectionHeader } from '../proshop/SectionHeader';
 import { HRail } from '../proshop/HRail';
-import { Pin } from '../proshop/Pin';
 import type { ClipsMoodId } from './hooks/useClipsMood';
-import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
-import { useActiveActor } from '@/context/ActiveActorContext';
 import { fetchLikedPostIds } from '@/lib/likedPostIds';
 
 interface ClipsMostLovedRailProps {
