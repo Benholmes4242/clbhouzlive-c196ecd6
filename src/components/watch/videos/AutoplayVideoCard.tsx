@@ -12,6 +12,7 @@ import { Pin } from '../proshop/Pin';
 import { haptic } from '@/utils/haptics';
 import { ExpandableCaption } from '@/components/posts/ExpandableCaption';
 import { attachHlsToTile } from '@/hooks/useTileVideoPlayer';
+import { HLSPoolManager } from '@/media/HLSPoolManager';
 
 function formatHMS(seconds: number | null | undefined): string {
   if (!seconds || seconds <= 0) return '';
@@ -112,6 +113,21 @@ function AutoplayVideoCardInner({ post, index, allPosts, userId, active, borderR
       cancelled = true;
       setVideoVisible(false);
       const v = videoRef.current;
+      const hls = hlsRef.current;
+      // Demote-to-pool when this URL is pool-managed — keeps the HLS instance
+      // warm for instant swipe-back. Otherwise destroy. Mirrors useHlsPool.teardown.
+      if (hls) {
+        if (hlsUrl && HLSPoolManager.isPooled(hlsUrl)) {
+          try { HLSPoolManager.demote(hlsUrl, hls); } catch {}
+        } else {
+          try { hls.stopLoad?.(); } catch {}
+          try { hls.detachMedia?.(); } catch {}
+          try { hls.destroy?.(); } catch {}
+        }
+        hlsRef.current = null;
+      }
+      // Always tear down the dynamically-created <video> element — HLS no
+      // longer references it (demote called detachMedia internally).
       if (v) {
         try { v.pause(); } catch {}
         v.removeAttribute('src');
@@ -119,10 +135,6 @@ function AutoplayVideoCardInner({ post, index, allPosts, userId, active, borderR
         if (v.parentElement) v.parentElement.removeChild(v);
       }
       videoRef.current = null;
-      if (hlsRef.current) {
-        try { hlsRef.current.destroy(); } catch {}
-        hlsRef.current = null;
-      }
     };
   }, [active, hlsUrl, mp4Url]);
 
