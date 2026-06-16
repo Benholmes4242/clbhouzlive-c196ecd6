@@ -60,9 +60,9 @@ function ClipsMoodChipsInner({
                   fontSize: 12,
                   fontWeight: 600,
                   borderRadius: 15,
-                  background: isActive ? 'rgba(255,255,255,0.10)' : 'transparent',
-                  border: isActive ? '1px solid rgba(255,255,255,0.55)' : '1px solid rgba(255,255,255,0.18)',
-                  color: isActive ? '#FFFFFF' : 'rgba(255,255,255,0.65)',
+                  background: isActive ? 'rgba(15,23,42,0.06)' : 'transparent',
+                  border: isActive ? '1px solid rgba(15,23,42,0.20)' : '1px solid rgba(15,23,42,0.07)',
+                  color: isActive ? '#0F172A' : '#64748B',
                   letterSpacing: '-0.01em',
                   gap: 5,
                   whiteSpace: 'nowrap',
@@ -81,7 +81,7 @@ function ClipsMoodChipsInner({
         className="pointer-events-none absolute top-0 right-0 h-full"
         style={{
           width: 28,
-          background: 'linear-gradient(to right, rgba(10,14,20,0) 0%, #0A0E14 100%)',
+          background: 'linear-gradient(to right, rgba(248,250,252,0) 0%, #F8FAFC 100%)',
         }}
       />
     </div>
