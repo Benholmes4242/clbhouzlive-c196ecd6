@@ -82,7 +82,29 @@ export default function WatchRailTile({
   const mediaId = `watch-rail-${post.id}`;
   const isRuntimePlaying = runtimeMode ? (playingIds?.has(mediaId) ?? false) : false;
 
-  // ── Runtime mode: register persistent <video> with MediaRuntime ──
+  // ── Wrapper ref OWNS register/unregister lifecycle (runtime mode). ──
+  // React attaches child refs before parent refs; an inner-only
+  // register/unregister pattern would demote itself at mount.
+  const wrapperRefCallback = useCallback(
+    (el: HTMLDivElement | null) => {
+      cardRef.current = el;
+      if (!runtimeMode || !registerMedia) return;
+      if (el && videoRef.current) {
+        registerMedia({
+          id: mediaId,
+          element: videoRef.current,
+          observeTarget: el,
+          sortIndex: index,
+          isCandidate: !!(hlsUrl || mp4Url),
+        });
+      } else {
+        registerMedia({ id: mediaId, element: null });
+      }
+    },
+    [runtimeMode, registerMedia, mediaId, index, hlsUrl, mp4Url],
+  );
+
+  // Inner video ref only REGISTERS (never unregisters) — wrapper owns teardown.
   const videoRefCallback = useCallback(
     (el: HTMLVideoElement | null) => {
       videoRef.current = el;
@@ -95,9 +117,8 @@ export default function WatchRailTile({
           sortIndex: index,
           isCandidate: !!(hlsUrl || mp4Url),
         });
-      } else {
-        registerMedia({ id: mediaId, element: null });
       }
+      // NO else/unregister here — wrapper owns teardown.
     },
     [runtimeMode, registerMedia, mediaId, index, hlsUrl, mp4Url],
   );
