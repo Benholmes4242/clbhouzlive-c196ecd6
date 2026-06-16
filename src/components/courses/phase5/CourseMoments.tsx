@@ -5,6 +5,7 @@ import React, { useMemo, useCallback } from 'react';
 import { Play } from 'lucide-react';
 import { useUserCourseMoments } from '@/hooks/useUserCourseMoments';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
+import { useProfileData } from '@/hooks/useProfileData';
 import { useFullscreenFeedStore } from '@/store/fullscreenFeedStore';
 import type { FeedPost } from '@/components/media-system/types/media';
 
