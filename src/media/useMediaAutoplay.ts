@@ -94,7 +94,7 @@ export function useMediaAutoplay(options: UseMediaAutoplayOptions = {}) {
   
   // Registry
   const registry = useRef<Map<string, MediaAutoplayRegistration>>(new Map());
-  const visibleIds = useRef<Set<string>>(new Set());
+  const visibleIdsRef = useRef<Set<string>>(new Set());
   
   // Observers
   const playObserver = useRef<IntersectionObserver | null>(null);
@@ -185,7 +185,7 @@ export function useMediaAutoplay(options: UseMediaAutoplayOptions = {}) {
       }
 
       registry.current.delete(id);
-      visibleIds.current.delete(id);
+      visibleIdsRef.current.delete(id);
       syncPlayingFromRuntime();
       return;
     }
@@ -345,7 +345,7 @@ export function useMediaAutoplay(options: UseMediaAutoplayOptions = {}) {
           } else {
             // Debounced detach
             if (prewarmedIds.current.has(id) && !detachTimeouts.current.has(id)) {
-              const isVisible = visibleIds.current.has(id);
+              const isVisible = visibleIdsRef.current.has(id);
               if (!isVisible) {
                 const timeout = setTimeout(() => {
                   const playerRef = (target as any).__hlsPlayerRef;
@@ -400,7 +400,7 @@ export function useMediaAutoplay(options: UseMediaAutoplayOptions = {}) {
           if (!id) return;
           
           const ratio = entry.intersectionRatio;
-          const wasVisible = visibleIds.current.has(id);
+          const wasVisible = visibleIdsRef.current.has(id);
           
           // MOBILE VIDEO DEBUG: Log intersection changes
           if (MOBILE_VIDEO_DEBUG) {
@@ -411,10 +411,10 @@ export function useMediaAutoplay(options: UseMediaAutoplayOptions = {}) {
           let nextVisible = wasVisible;
           
           if (ratio >= effectiveStartThreshold) {
-            visibleIds.current.add(id);
+            visibleIdsRef.current.add(id);
             nextVisible = true;
           } else if (ratio <= effectiveStopThreshold) {
-            visibleIds.current.delete(id);
+            visibleIdsRef.current.delete(id);
             nextVisible = false;
           }
           
@@ -444,7 +444,7 @@ export function useMediaAutoplay(options: UseMediaAutoplayOptions = {}) {
       clearTimeout(initialCheck);
       playObserver.current?.disconnect();
       playObserver.current = null;
-      visibleIds.current.clear();
+      visibleIdsRef.current.clear();
     };
   }, [effectiveStartThreshold, effectiveStopThreshold]);
   
