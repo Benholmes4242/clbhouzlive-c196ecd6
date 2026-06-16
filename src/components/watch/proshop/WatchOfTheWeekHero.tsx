@@ -227,7 +227,7 @@ function WatchOfTheWeekHeroInner() {
       <Kicker color="amber">Watch of the Week</Kicker>
 
       <button
-        ref={heroWrapperRef}
+        ref={wrapperRefCallback}
         type="button"
         onClick={handleTap}
         className="block w-full text-left active:scale-[0.99] transition-transform"
