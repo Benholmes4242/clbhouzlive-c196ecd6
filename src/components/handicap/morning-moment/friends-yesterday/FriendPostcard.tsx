@@ -1,13 +1,11 @@
 /**
  * FriendPostcard — uniform 168px compact card for the Friends Yesterday row.
- * Single status line driven by deriveHeroState: enriched stats, invite, nudge, or syncing.
+ * Status line driven by deriveHeroState. Invite/nudge are passive labels: the
+ * card tap opens the unified FriendSheet, which owns the actual invite action.
  */
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import { ChevronRight, Star } from 'lucide-react';
-import { toast } from 'sonner';
 import type { FriendYesterday } from '@/lib/handicap/useFriendsYesterday';
-import { callCreateInvite } from '@/lib/whs/api';
-import { sendWhsConnectionNudge, hasRecentlyNudged } from '@/lib/whs/nudge';
 import FlagSilhouetteOverlay from '@/components/whs/FlagSilhouetteOverlay';
 import { splitCourseName } from '@/components/profile/handicap/whs/sections/last-round-card/splitCourseName';
 import { deriveHeroState, firstNameOf } from './deriveHeroState';
@@ -91,116 +89,24 @@ const EnrichedStatus: React.FC<{ friend: FriendYesterday }> = ({ friend }) => {
 const SummaryStatus: React.FC = () => <div style={{ ...STATUS_BASE }} />;
 
 
-const ActionLine: React.FC<{
-  label: string;
-  busy: boolean;
-  done: boolean;
-  doneLabel: string;
-  onClick: (e: React.MouseEvent) => void;
-}> = ({ label, busy, done, doneLabel, onClick }) => (
-  <button
-    type="button"
-    onClick={onClick}
-    disabled={busy || done}
+// Passive label — the card tap opens FriendSheet which owns the action.
+const PassiveActionLabel: React.FC<{ label: string }> = ({ label }) => (
+  <div
+    aria-hidden
     style={{
       ...STATUS_BASE,
-      background: 'transparent',
-      border: 'none',
-      padding: 0,
-      cursor: busy || done ? 'default' : 'pointer',
       fontWeight: 700,
-      color: done ? 'rgba(255,255,255,0.55)' : AMBER,
-      opacity: busy ? 0.7 : 1,
+      color: AMBER,
       gap: 2,
     }}
   >
-    <span>{done ? doneLabel : label}</span>
-    {!done && <ChevronRight size={10} strokeWidth={2.5} color={AMBER} />}
-  </button>
+    <span>{label}</span>
+    <ChevronRight size={10} strokeWidth={2.5} color={AMBER} />
+  </div>
 );
 
-const InviteStatus: React.FC<{ friend: FriendYesterday }> = ({ friend }) => {
-  const [busy, setBusy] = useState(false);
-  const [done, setDone] = useState(false);
-  const fname = firstNameOf(friend.name);
-
-  const handle = async (e: React.MouseEvent) => {
-    e.stopPropagation();
-    if (busy || done) return;
-    if (friend.friend_passport_id === null) {
-      toast.error("Can't invite without an England Golf member ID");
-      return;
-    }
-    setBusy(true);
-    const res = await callCreateInvite(friend.friend_passport_id, 'best_of_group_card');
-    setBusy(false);
-    if (res.ok) {
-      setDone(true);
-      toast.success(`Invite sent to ${fname}`);
-    } else {
-      toast.error(res.message || 'Could not send invite');
-    }
-  };
-
-  return (
-    <ActionLine
-      label="Invite to see more"
-      doneLabel="Invited ✓"
-      busy={busy}
-      done={done}
-      onClick={handle}
-    />
-  );
-};
-
-const NudgeStatus: React.FC<{ friend: FriendYesterday }> = ({ friend }) => {
-  const [busy, setBusy] = useState(false);
-  const [done, setDone] = useState(false);
-  const fname = firstNameOf(friend.name);
-
-  useEffect(() => {
-    let cancelled = false;
-    (async () => {
-      if (!friend.user_id) return;
-      const recent = await hasRecentlyNudged(friend.user_id);
-      if (!cancelled && recent) setDone(true);
-    })();
-    return () => {
-      cancelled = true;
-    };
-  }, [friend.user_id]);
-
-  const handle = async (e: React.MouseEvent) => {
-    e.stopPropagation();
-    if (busy || done) return;
-    if (!friend.user_id) {
-      toast.error("Can't send a nudge without a clbhouz user ID");
-      return;
-    }
-    setBusy(true);
-    const res = await sendWhsConnectionNudge(friend.user_id);
-    setBusy(false);
-    if (res.ok) {
-      setDone(true);
-      toast.success(`Nudge sent to ${fname}`);
-    } else if (res.reason === 'rate_limited') {
-      setDone(true);
-      toast.message('Already nudged in the last 7 days');
-    } else {
-      toast.error('Could not send nudge');
-    }
-  };
-
-  return (
-    <ActionLine
-      label="Ask to sync"
-      doneLabel="Nudged ✓"
-      busy={busy}
-      done={done}
-      onClick={handle}
-    />
-  );
-};
+const InviteStatus: React.FC = () => <PassiveActionLabel label="Invite to see more" />;
+const NudgeStatus: React.FC = () => <PassiveActionLabel label="Ask to sync" />;
 
 // ── Postcard ────────────────────────────────────────────────────────────────
 
@@ -346,8 +252,8 @@ export const FriendPostcard: React.FC<Props> = ({ friend, showLowest, onClick })
 
         {state === 'enriched' && <EnrichedStatus friend={friend} />}
         {state === 'summary' && <SummaryStatus />}
-        {state === 'invite' && <InviteStatus friend={friend} />}
-        {state === 'nudge' && <NudgeStatus friend={friend} />}
+        {state === 'invite' && <InviteStatus />}
+        {state === 'nudge' && <NudgeStatus />}
 
       </div>
     </div>

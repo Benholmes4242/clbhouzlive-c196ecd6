@@ -5,15 +5,9 @@ import FriendRoundCardV2 from './FriendRoundCardV2';
 interface Props {
   activity: WhsFriendActivityWithImage;
   onClick: () => void;
-  /** Triggered when the INVITE / ASK TO SYNC pill is tapped. Stop-propagated from `onClick`. */
-  onInviteClick?: () => void;
 }
 
-export const FriendRoundCard: React.FC<Props> = ({
-  activity,
-  onClick,
-  onInviteClick,
-}) => {
+export const FriendRoundCard: React.FC<Props> = ({ activity, onClick }) => {
   const variant: 'clbhouz-synced' | 'clbhouz-not-synced' | 'eg-only' =
     activity.is_clbhouz_user && activity.friend_connection_id
       ? 'clbhouz-synced'
@@ -21,14 +15,7 @@ export const FriendRoundCard: React.FC<Props> = ({
         ? 'clbhouz-not-synced'
         : 'eg-only';
 
-  return (
-    <FriendRoundCardV2
-      activity={activity}
-      variant={variant}
-      onClick={onClick}
-      onInviteClick={onInviteClick}
-    />
-  );
+  return <FriendRoundCardV2 activity={activity} variant={variant} onClick={onClick} />;
 };
 
 export default FriendRoundCard;

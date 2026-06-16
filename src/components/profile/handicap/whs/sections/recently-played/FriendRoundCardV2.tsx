@@ -12,7 +12,6 @@ interface Props {
   activity: WhsFriendActivityWithImage;
   variant: Variant;
   onClick: () => void;
-  onInviteClick?: () => void;
 }
 
 const FONT = 'Geist, system-ui, -apple-system, BlinkMacSystemFont, sans-serif';
@@ -23,7 +22,6 @@ export const FriendRoundCardV2: React.FC<Props> = ({
   activity,
   variant,
   onClick,
-  onInviteClick,
 }) => {
   const isSynced = variant === 'clbhouz-synced';
   // State B: synced friend whose round summary exists but has no detailed
@@ -406,12 +404,8 @@ export const FriendRoundCardV2: React.FC<Props> = ({
                 {gross ?? '—'}
               </span>
             </div>
-            <button
-              type="button"
-              onClick={(e) => {
-                e.stopPropagation();
-                onInviteClick?.();
-              }}
+            <div
+              aria-hidden
               style={{
                 display: 'inline-flex',
                 alignItems: 'center',
@@ -424,15 +418,15 @@ export const FriendRoundCardV2: React.FC<Props> = ({
                 fontSize: 10,
                 fontWeight: 800,
                 letterSpacing: '0.06em',
-                cursor: 'pointer',
                 fontFamily: FONT,
                 textTransform: 'uppercase',
                 lineHeight: 1,
+                pointerEvents: 'none',
               }}
             >
               {variant === 'clbhouz-not-synced' ? 'Ask to sync' : 'Invite'}
               <ChevronRight size={11} strokeWidth={2.2} color="rgba(255,255,255,0.92)" />
-            </button>
+            </div>
           </div>
         )}
       </div>
