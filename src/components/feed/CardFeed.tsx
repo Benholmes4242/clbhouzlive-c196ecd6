@@ -255,7 +255,6 @@ export const CardFeed: React.FC<CardFeedProps> = ({
       const mountVideo = isNear;
       return (
         <div
-          className="md:max-w-[620px] md:mx-auto"
           style={{ paddingBottom: 12 }}
           data-card-index={index}
           ref={(el) => {
