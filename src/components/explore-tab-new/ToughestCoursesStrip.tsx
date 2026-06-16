@@ -69,7 +69,8 @@ export function ToughestCoursesStrip(_: Props = {}) {
     <section style={{ padding: '0 0 0', fontFamily: FONT }}>
       <ExploreSectionHeader
         icon={TrendingUp}
-        title="Toughest courses in the network"
+        iconTone="ink"
+        title="Toughest courses"
         sub="Official WHS handicap data"
       />
       <div className="flex gap-3 px-4 overflow-x-auto scrollbar-hide" style={{ paddingBottom: 4 }}>
