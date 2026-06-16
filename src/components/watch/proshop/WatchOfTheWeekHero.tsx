@@ -93,6 +93,32 @@ function WatchOfTheWeekHeroInner() {
   const videoElRef = useRef<HTMLVideoElement | null>(null);
   const hlsRef = useRef<any>(null);
 
+  // Wrapper ref OWNS register/unregister lifecycle. React attaches child
+  // refs before parent refs, so an inner-only register/unregister pattern
+  // would demote itself at mount (wrapper null on first video ref pass).
+  // The wrapper ref runs LAST → safe to converge registration here.
+  const wrapperRefCallback = useCallback(
+    (el: HTMLButtonElement | null) => {
+      heroWrapperRef.current = el;
+      const register = registerRef.current;
+      if (!register || !mediaId) return;
+      if (el && videoElRef.current) {
+        register({
+          id: mediaId,
+          element: videoElRef.current,
+          observeTarget: el,
+          sortIndex: 0,
+          isCandidate: !!hlsUrl,
+        });
+      } else {
+        register({ id: mediaId, element: null });
+      }
+    },
+    [mediaId, hlsUrl],
+  );
+
+  // Inner video ref only REGISTERS (never unregisters) — so child-first
+  // ref ordering can't demote the registration. Wrapper owns teardown.
   const videoRefCallback = useCallback(
     (el: HTMLVideoElement | null) => {
       videoElRef.current = el;
@@ -106,9 +132,8 @@ function WatchOfTheWeekHeroInner() {
           sortIndex: 0,
           isCandidate: !!hlsUrl,
         });
-      } else {
-        register({ id: mediaId, element: null });
       }
+      // NO else/unregister here — wrapper owns teardown.
     },
     [mediaId, hlsUrl],
   );
@@ -202,7 +227,7 @@ function WatchOfTheWeekHeroInner() {
       <Kicker color="amber">Watch of the Week</Kicker>
 
       <button
-        ref={heroWrapperRef}
+        ref={wrapperRefCallback}
         type="button"
         onClick={handleTap}
         className="block w-full text-left active:scale-[0.99] transition-transform"
