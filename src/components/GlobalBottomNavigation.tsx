@@ -161,7 +161,7 @@ const GlobalBottomNavigation: React.FC<GlobalBottomNavigationProps> = ({ chromeS
       {/* Global Fixed Bottom Navigation */}
       <AnimatePresence>
         {showNavigation && (
-          <div className="fixed bottom-0 left-0 right-0 z-[100] flex justify-center pointer-events-none">
+          <div className="global-bottom-nav-shell z-[100] pointer-events-none">
             <motion.div
               className={cn(
                 "global-bottom-nav",
