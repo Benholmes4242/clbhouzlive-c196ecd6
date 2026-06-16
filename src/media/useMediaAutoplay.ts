@@ -185,7 +185,9 @@ export function useMediaAutoplay(options: UseMediaAutoplayOptions = {}) {
       }
 
       registry.current.delete(id);
-      visibleIdsRef.current.delete(id);
+      if (visibleIdsRef.current.delete(id)) {
+        setVisibleIdsState(new Set(visibleIdsRef.current));
+      }
       syncPlayingFromRuntime();
       return;
     }
