@@ -236,7 +236,7 @@ function AutoplayVideoCardInner({ post, index, allPosts, userId, active, borderR
           <ExpandableCaption
             lines={2}
             style={{
-              fontSize: 14,
+              fontSize: 15,
               fontWeight: 700,
               lineHeight: 1.3,
               color: '#0F172A',
@@ -245,12 +245,13 @@ function AutoplayVideoCardInner({ post, index, allPosts, userId, active, borderR
           >
             {post.caption || `${post.displayName} on Clbhouz`}
           </ExpandableCaption>
+
           <div
             style={{
-              fontSize: 11,
+              fontSize: 12.5,
               fontWeight: 500,
               color: 'rgba(15,23,42,0.55)',
-              marginTop: 2,
+              marginTop: 3,
               overflow: 'hidden',
               textOverflow: 'ellipsis',
               whiteSpace: 'nowrap',
@@ -259,28 +260,28 @@ function AutoplayVideoCardInner({ post, index, allPosts, userId, active, borderR
             {post.displayName || post.username || 'Clbhouz'}
             {timeAgo ? <> · {timeAgo}</> : null}
           </div>
-        </div>
 
-        <div
-          style={{
-            display: 'flex',
-            alignItems: 'center',
-            gap: 12,
-            flexShrink: 0,
-            color: 'rgba(15,23,42,0.55)',
-          }}
-        >
-          <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
-            <Heart size={14} />
-            <span style={{ fontSize: 11, fontWeight: 500, fontVariantNumeric: 'tabular-nums' }}>
-              {formatCompact(post.likeCount)}
-            </span>
-          </div>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
-            <MessageCircle size={14} />
-            <span style={{ fontSize: 11, fontWeight: 500, fontVariantNumeric: 'tabular-nums' }}>
-              {formatCompact(post.commentCount)}
-            </span>
+          <div
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: 14,
+              marginTop: 6,
+              color: 'rgba(15,23,42,0.40)',
+            }}
+          >
+            <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
+              <Heart size={13} />
+              <span style={{ fontSize: 12, fontWeight: 500, fontVariantNumeric: 'tabular-nums' }}>
+                {formatCompact(post.likeCount)}
+              </span>
+            </div>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
+              <MessageCircle size={13} />
+              <span style={{ fontSize: 12, fontWeight: 500, fontVariantNumeric: 'tabular-nums' }}>
+                {formatCompact(post.commentCount)}
+              </span>
+            </div>
           </div>
         </div>
 
