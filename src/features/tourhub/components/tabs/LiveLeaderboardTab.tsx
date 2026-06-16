@@ -4,7 +4,7 @@ import { useLiveTournaments } from '../../hooks/useLiveTournaments';
 import { useTourLeaderboard } from '../../hooks/useTourHubData';
 import { FullLeaderboard } from '../tournament-detail/FullLeaderboard';
 import { EditorialEmpty } from '../tournament-detail/EditorialEmpty';
-import { INK, INK_MUTE, INK_FAINT, INK_TINT_07, SURFACE, SHELL_BG, STATUS_LIVE, WHITE_ALPHA_06, WHITE_ALPHA_18, WHITE_ALPHA_55, WHITE_ALPHA_65 } from '../../_shared/tokens';
+import { INK, INK_MUTE, INK_FAINT, INK_TINT_06, INK_TINT_07, SLATE_50, SURFACE, STATUS_LIVE } from '../../_shared/tokens';
 import { tourPriorityIndex, TOUR_LABEL, shortTournamentToken } from '../../_shared/tourOrder';
 import { TOUR_CONFIG } from '../../hooks/useOverviewData';
 import type { LiveTournamentLite } from '../../hooks/useLiveTournaments';
@@ -116,8 +116,8 @@ export function LiveLeaderboardTab() {
             overflowY: 'hidden',
             WebkitOverflowScrolling: 'touch',
             scrollbarWidth: 'none',
-            background: SHELL_BG,
-            borderBottom: `0.5px solid ${WHITE_ALPHA_06}`,
+            background: SLATE_50,
+            borderBottom: `0.5px solid ${INK_TINT_07}`,
           }}
         >
           {liveTournaments.map((t) => {
@@ -133,9 +133,9 @@ export function LiveLeaderboardTab() {
                   height: 30,
                   padding: '0 11px',
                   borderRadius: 15,
-                  background: isActive ? WHITE_ALPHA_18 : 'transparent',
-                  border: `1px solid ${isActive ? WHITE_ALPHA_55 : WHITE_ALPHA_18}`,
-                  color: isActive ? SURFACE : WHITE_ALPHA_65,
+                  background: isActive ? INK_TINT_06 : 'transparent',
+                  border: `1px solid ${isActive ? 'rgba(15,23,42,0.20)' : INK_TINT_07}`,
+                  color: isActive ? INK : INK_MUTE,
                   fontFamily: 'Geist, system-ui, -apple-system, BlinkMacSystemFont, sans-serif',
                   fontSize: 12,
                   fontWeight: isActive ? 700 : 600,
