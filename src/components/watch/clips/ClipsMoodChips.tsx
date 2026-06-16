@@ -81,7 +81,7 @@ function ClipsMoodChipsInner({
         className="pointer-events-none absolute top-0 right-0 h-full"
         style={{
           width: 28,
-          background: 'linear-gradient(to right, rgba(10,14,20,0) 0%, #0A0E14 100%)',
+          background: 'linear-gradient(to right, rgba(248,250,252,0) 0%, #F8FAFC 100%)',
         }}
       />
     </div>
