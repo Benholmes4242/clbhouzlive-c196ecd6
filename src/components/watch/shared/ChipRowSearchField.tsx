@@ -24,18 +24,18 @@ function ChipRowSearchFieldInner({ value, onChange, onClose, placeholder = 'Sear
   return (
     <div
       className="flex items-center shrink-0"
-      style={{
-        height: 30,
-        borderRadius: 15,
-        background: 'rgba(255,255,255,0.10)',
-        border: '1px solid rgba(255,255,255,0.55)',
-        padding: '0 8px 0 10px',
-        gap: 6,
-        minWidth: 140,
-        maxWidth: 220,
-        flex: '0 0 auto',
-        width: 200,
-      }}
+        style={{
+          height: 30,
+          borderRadius: 15,
+          background: '#FFFFFF',
+          border: '1px solid rgba(15,23,42,0.20)',
+          padding: '0 8px 0 10px',
+          gap: 6,
+          minWidth: 140,
+          maxWidth: 220,
+          flex: '0 0 auto',
+          width: 200,
+        }}
     >
       <Search size={14} strokeWidth={2} color="rgba(255,255,255,0.6)" style={{ flexShrink: 0 }} aria-hidden />
       <input
