@@ -116,8 +116,8 @@ export function LiveLeaderboardTab() {
             overflowY: 'hidden',
             WebkitOverflowScrolling: 'touch',
             scrollbarWidth: 'none',
-            background: SHELL_BG,
-            borderBottom: `0.5px solid ${WHITE_ALPHA_06}`,
+            background: SLATE_50,
+            borderBottom: `0.5px solid ${INK_TINT_07}`,
           }}
         >
           {liveTournaments.map((t) => {
