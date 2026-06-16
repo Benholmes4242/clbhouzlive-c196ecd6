@@ -69,9 +69,30 @@ const WatchTile: React.FC<WatchTileProps> = ({
   const longPressFiredRef = useRef(false);
   const pressStartRef = useRef<{ x: number; y: number } | null>(null);
 
-  // Video element ref callback — registers/unregisters with MediaRuntime.
-  // Deps are STABLE (no ctx, no playingIds) so React doesn't re-run it on
-  // every spotlight sync.
+  // Wrapper ref OWNS register/unregister lifecycle. React attaches child
+  // refs before parent refs, so an inner-only register/unregister pattern
+  // would demote itself at mount (wrapper null on first video ref pass).
+  const wrapperRefCallback = useCallback(
+    (el: HTMLDivElement | null) => {
+      tileRef.current = el;
+      const register = registerMediaRef.current;
+      if (!register) return;
+      if (el && videoElRef.current) {
+        register({
+          id: mediaId,
+          element: videoElRef.current,
+          observeTarget: el,
+          sortIndex: index,
+          isCandidate: !!(hlsUrl || mp4Url),
+        });
+      } else {
+        register({ id: mediaId, element: null });
+      }
+    },
+    [mediaId, index, hlsUrl, mp4Url],
+  );
+
+  // Inner video ref only REGISTERS (never unregisters) — wrapper owns teardown.
   const videoRefCallback = useCallback(
     (el: HTMLVideoElement | null) => {
       videoElRef.current = el;
@@ -85,9 +106,8 @@ const WatchTile: React.FC<WatchTileProps> = ({
           sortIndex: index,
           isCandidate: !!(hlsUrl || mp4Url),
         });
-      } else {
-        register({ id: mediaId, element: null });
       }
+      // NO else/unregister here — wrapper owns teardown.
     },
     [mediaId, index, hlsUrl, mp4Url],
   );
