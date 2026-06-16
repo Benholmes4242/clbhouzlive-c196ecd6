@@ -18,11 +18,15 @@ export default function CarouselRow({ items, allPosts, baseIndex, userId }: Caro
   const containerRef = useRef<HTMLDivElement>(null);
 
   // Detect which card is most-centred within the scroller
+  // Gated to scroll-settle: activeIndex only commits once scrolling pauses
+  // (native scrollend where available, else 150ms trailing-idle fallback).
   useEffect(() => {
     const scroller = scrollerRef.current;
     if (!scroller) return;
 
     let raf = 0;
+    let settleTimer: ReturnType<typeof setTimeout> | null = null;
+
     const compute = () => {
       const rect = scroller.getBoundingClientRect();
       const centerX = rect.left + rect.width / 2;
@@ -41,19 +45,25 @@ export default function CarouselRow({ items, allPosts, baseIndex, userId }: Caro
       setActiveIndex((prev) => (prev !== bestIdx ? bestIdx : prev));
     };
 
-    const onScroll = () => {
-      if (raf) return;
-      raf = window.requestAnimationFrame(() => {
-        raf = 0;
-        compute();
-      });
+    const scheduleSettle = () => {
+      if (settleTimer) clearTimeout(settleTimer);
+      settleTimer = setTimeout(compute, 150);
     };
 
-    compute();
+    const onScroll = () => {
+      scheduleSettle();
+    };
+
+    compute(); // initial commit on mount
     scroller.addEventListener('scroll', onScroll, { passive: true });
+    const onScrollEnd = () => compute();
+    scroller.addEventListener('scrollend', onScrollEnd, { passive: true });
+
     return () => {
       scroller.removeEventListener('scroll', onScroll);
+      scroller.removeEventListener('scrollend', onScrollEnd);
       if (raf) cancelAnimationFrame(raf);
+      if (settleTimer) clearTimeout(settleTimer);
     };
   }, [items.length]);
 
