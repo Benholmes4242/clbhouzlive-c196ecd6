@@ -1,4 +1,4 @@
-import { memo } from 'react';
+import { memo, type ReactNode } from 'react';
 import { Kicker } from './Kicker';
 import { ChevronRight } from 'lucide-react';
 
@@ -9,15 +9,17 @@ interface SectionHeaderProps {
   sub?: string;
   action?: { label: string; onClick: () => void };
   paddingTop?: number;
+  /** Optional left-aligned section mark (icon/glyph), e.g. ClipsMark, VideosMark. */
+  mark?: ReactNode;
 }
 
 /**
  * Pro Shop primitive — editorial section header with kicker, title, optional
  * subhead and action CTA. Used at the top of every rail in the Watch tab.
  *
- * Canonical alignment phase: tokens now match Tour Hub section headers (slate
- * kicker default, 18/800 title, slate-500 sub, ink-bold action). API is
- * unchanged; consumers inherit the new look automatically.
+ * Phase 1 warmth pass: larger title (22/800), tighter tracking, more
+ * vertical rhythm (default paddingTop 34), and an optional `mark` slot
+ * for bespoke section identity glyphs.
  */
 function SectionHeaderInner({
   kicker,
@@ -25,8 +27,40 @@ function SectionHeaderInner({
   title,
   sub,
   action,
-  paddingTop = 24,
+  paddingTop = 34,
+  mark,
 }: SectionHeaderProps) {
+  const textColumn = (
+    <div style={{ minWidth: 0, flex: 1 }}>
+      {kicker ? <Kicker color={kickerColor}>{kicker}</Kicker> : null}
+      <h2
+        style={{
+          fontSize: 22,
+          fontWeight: 800,
+          lineHeight: 1.15,
+          letterSpacing: '-0.02em',
+          color: '#0F172A',
+          margin: 0,
+        }}
+      >
+        {title}
+      </h2>
+      {sub ? (
+        <p
+          style={{
+            fontSize: 13.5,
+            fontWeight: 500,
+            color: '#64748B',
+            margin: '4px 0 0',
+            lineHeight: 1.4,
+          }}
+        >
+          {sub}
+        </p>
+      ) : null}
+    </div>
+  );
+
   return (
     <div
       style={{
@@ -37,34 +71,22 @@ function SectionHeaderInner({
         padding: `${paddingTop}px 16px 12px`,
       }}
     >
-      <div style={{ minWidth: 0, flex: 1 }}>
-        {kicker ? <Kicker color={kickerColor}>{kicker}</Kicker> : null}
-        <h2
+      {mark ? (
+        <div
           style={{
-            fontSize: 18,
-            fontWeight: 800,
-            lineHeight: 1.2,
-            letterSpacing: '-0.015em',
-            color: '#0F172A',
-            margin: 0,
+            display: 'flex',
+            alignItems: 'flex-start',
+            gap: 11,
+            minWidth: 0,
+            flex: 1,
           }}
         >
-          {title}
-        </h2>
-        {sub ? (
-          <p
-            style={{
-              fontSize: 13,
-              fontWeight: 500,
-              color: '#64748B',
-              margin: '3px 0 0',
-              lineHeight: 1.35,
-            }}
-          >
-            {sub}
-          </p>
-        ) : null}
-      </div>
+          <div style={{ marginTop: kicker ? 0 : 2, flexShrink: 0 }}>{mark}</div>
+          {textColumn}
+        </div>
+      ) : (
+        textColumn
+      )}
 
       {action ? (
         <button
@@ -72,19 +94,12 @@ function SectionHeaderInner({
           onClick={action.onClick}
           className="active:scale-[0.97] transition-transform"
           style={{
-            // Phase 5b: 44px iOS-minimum touch target via invisible padding
-            // (negative margin keeps the visual baseline aligned with the
-            // header text above). Visual size unchanged — only hit area grows.
             display: 'inline-flex',
             alignItems: 'center',
             gap: 2,
             fontSize: 11,
             fontWeight: 800,
             letterSpacing: '-0.005em',
-            // Canonical action affordance: ink-bold + chevron. Matches the
-            // pattern used across handicap, Tour Hub, Profile, Search, etc.
-            // The chevron carries the "click me" affordance; the ink colour
-            // ensures AA contrast on white without needing accent text.
             color: '#0F172A',
             background: 'transparent',
             border: 'none',
