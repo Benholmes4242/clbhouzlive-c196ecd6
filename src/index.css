@@ -1904,12 +1904,18 @@ html, body, #root, .app-shell { touch-action: auto; }
    aligns with the content column on tablets.
    iPhone (<768px) is byte-identical — this media query cannot match. */
 @media (min-width: 768px) {
+  /* Let the parent wrapper (`flex justify-center`) center the nav. We undo
+     the base `position: fixed; left:0; right:0` so the motion.div sits as a
+     normal flex child whose width comes from `w-full max-w-[620px]`. This
+     matches the Clubhouse feed column (also centered in 100vw) exactly,
+     because both children are centered by the same viewport midpoint. */
   .global-bottom-nav {
-    left: calc(50% - 310px) !important;
+    position: static !important;
+    left: auto !important;
     right: auto !important;
-    width: 620px;
   }
 }
+
 
 
 /* Ensure pages have bottom padding for the nav when needed */
