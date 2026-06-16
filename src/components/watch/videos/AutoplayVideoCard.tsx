@@ -110,11 +110,13 @@ function AutoplayVideoCardInner({
     [registerMedia, mediaId, sortIndex, index, hlsUrl, mp4Url],
   );
 
-  // Attach HLS when runtime says we won the spotlight; demote-to-pool on the way out.
+  // Attach HLS when this card is a visible candidate (lazy attach to break
+  // no_src ↔ isPlaying deadlock); demote-to-pool on the way out. Runtime
+  // owns play/pause via safePlay — we only set src and nudge.
   useEffect(() => {
     const v = videoElRef.current;
     if (!v) return;
-    if (!isPlaying) return;
+    if (!isVisibleCandidate && !isPlaying) return;
     if (!hlsUrl && !mp4Url) return;
 
     let cancelled = false;
@@ -122,7 +124,7 @@ function AutoplayVideoCardInner({
     const onReady = () => {
       if (cancelled) return;
       setVideoVisible(true);
-      v.play().catch(() => {});
+      MediaRuntime.nudge();
     };
 
     if (hlsUrl) {
@@ -142,7 +144,6 @@ function AutoplayVideoCardInner({
     } else if (mp4Url) {
       v.src = mp4Url;
       v.addEventListener('canplay', onReady, { once: true });
-      v.play().catch(() => {});
     }
 
     return () => {
@@ -160,14 +161,13 @@ function AutoplayVideoCardInner({
         hlsRef.current = null;
       }
       if (v) {
-        try { v.pause(); } catch {}
         if (!hlsUrl) {
           v.removeAttribute('src');
           try { v.load(); } catch {}
         }
       }
     };
-  }, [isPlaying, hlsUrl, mp4Url]);
+  }, [isVisibleCandidate, isPlaying, hlsUrl, mp4Url]);
 
   const handleTap = () => {
     useFullscreenFeedStore.getState().open(allPosts, index);
