@@ -26,7 +26,7 @@ export default function LatestVideosRail() {
 
   const { posts, isLoading } = useVideosFeed({ userId, filter: 'latest' });
 
-  const { registerMedia, playingIds } = useMediaAutoplay({
+  const { registerMedia, playingIds, visibleIds } = useMediaAutoplay({
     mode: 'grid',
     surface: 'watch',
     startThreshold: 0.5,
