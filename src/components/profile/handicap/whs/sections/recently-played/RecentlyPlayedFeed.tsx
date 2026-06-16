@@ -105,15 +105,7 @@ export const RecentlyPlayedFeed: React.FC<Props> = ({ ownerUserId }) => {
           items={items}
           ariaLabel="Friends' recent rounds"
           renderItem={(item) => (
-            <FriendRoundCard
-              activity={item}
-              onClick={() => handleOpen(item)}
-              onInviteClick={() => {
-                document
-                  .getElementById('invite-to-clbhouz-section')
-                  ?.scrollIntoView({ behavior: 'smooth' });
-              }}
-            />
+            <FriendRoundCard activity={item} onClick={() => handleOpen(item)} />
           )}
         />
       )}
