@@ -65,6 +65,7 @@ function VideosCourseAnchoredRailInner({ userId }: VideosCourseAnchoredRailProps
   return (
     <section>
       <SectionHeader
+        paddingTop={20}
         kicker="From your courses"
         title={topCourse.course_name}
         sub={`${topCourse.content_count} long-form video${
@@ -75,7 +76,7 @@ function VideosCourseAnchoredRailInner({ userId }: VideosCourseAnchoredRailProps
           onClick: () => navigate(`/courses/${topCourse.course_id}#video`),
         }}
       />
-      <HRail>
+      <HRail paddingBottom={10}>
         {posts.map((post, i) => (
           <VideoRailTile key={post.id} post={post} index={i} allPosts={posts} width={280} />
         ))}
