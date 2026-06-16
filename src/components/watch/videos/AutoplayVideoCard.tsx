@@ -13,6 +13,7 @@ import { haptic } from '@/utils/haptics';
 import { ExpandableCaption } from '@/components/posts/ExpandableCaption';
 import { attachHlsToTile } from '@/hooks/useTileVideoPlayer';
 import { HLSPoolManager } from '@/media/HLSPoolManager';
+import { MediaRuntime } from '@/media/runtime';
 import type { RegisterMediaFn } from '@/media';
 
 function formatHMS(seconds: number | null | undefined): string {
@@ -45,6 +46,10 @@ export interface AutoplayVideoCardProps {
   mediaId: string;
   /** Runtime says this card is the spotlight winner. */
   isPlaying: boolean;
+  /** Runtime IO says this card is currently a visible candidate (≥ start
+   * threshold). Drives lazy HLS attach BEFORE isPlaying to break the
+   * no_src ↔ isPlaying deadlock. */
+  isVisibleCandidate?: boolean;
   /** Tie-breaker for runtime selection (lower = higher priority). */
   sortIndex?: number;
 }
@@ -58,6 +63,7 @@ function AutoplayVideoCardInner({
   registerMedia,
   mediaId,
   isPlaying,
+  isVisibleCandidate = false,
   sortIndex,
 }: AutoplayVideoCardProps) {
   const navigate = useNavigate();
@@ -104,11 +110,13 @@ function AutoplayVideoCardInner({
     [registerMedia, mediaId, sortIndex, index, hlsUrl, mp4Url],
   );
 
-  // Attach HLS when runtime says we won the spotlight; demote-to-pool on the way out.
+  // Attach HLS when this card is a visible candidate (lazy attach to break
+  // no_src ↔ isPlaying deadlock); demote-to-pool on the way out. Runtime
+  // owns play/pause via safePlay — we only set src and nudge.
   useEffect(() => {
     const v = videoElRef.current;
     if (!v) return;
-    if (!isPlaying) return;
+    if (!isVisibleCandidate && !isPlaying) return;
     if (!hlsUrl && !mp4Url) return;
 
     let cancelled = false;
@@ -116,7 +124,7 @@ function AutoplayVideoCardInner({
     const onReady = () => {
       if (cancelled) return;
       setVideoVisible(true);
-      v.play().catch(() => {});
+      MediaRuntime.nudge();
     };
 
     if (hlsUrl) {
@@ -136,7 +144,6 @@ function AutoplayVideoCardInner({
     } else if (mp4Url) {
       v.src = mp4Url;
       v.addEventListener('canplay', onReady, { once: true });
-      v.play().catch(() => {});
     }
 
     return () => {
@@ -154,14 +161,13 @@ function AutoplayVideoCardInner({
         hlsRef.current = null;
       }
       if (v) {
-        try { v.pause(); } catch {}
         if (!hlsUrl) {
           v.removeAttribute('src');
           try { v.load(); } catch {}
         }
       }
     };
-  }, [isPlaying, hlsUrl, mp4Url]);
+  }, [isVisibleCandidate, isPlaying, hlsUrl, mp4Url]);
 
   const handleTap = () => {
     useFullscreenFeedStore.getState().open(allPosts, index);

@@ -26,7 +26,7 @@ export default function TrendingThisWeek({ enabled = true }: TrendingThisWeekPro
   // Phase WatchSpotlight-C: Quick Clips registers tiles against the global
   // 'watch' surface (cap=1). The runtime's IO ratio picks the most-visible
   // (i.e. centered) card in the horizontal shelf; it loops while the winner.
-  const { registerMedia, playingIds } = useMediaAutoplay({
+  const { registerMedia, playingIds, visibleIds } = useMediaAutoplay({
     mode: 'grid',
     surface: 'watch',
     startThreshold: 0.5,
@@ -127,6 +127,7 @@ export default function TrendingThisWeek({ enabled = true }: TrendingThisWeekPro
               viewedPostIds={viewedPostIds}
               registerMedia={registerMedia}
               playingIds={playingIds}
+              visibleIds={visibleIds}
             />
           </div>
         ))}

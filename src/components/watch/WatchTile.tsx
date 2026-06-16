@@ -5,6 +5,7 @@ import { useFullscreenFeedStore } from '@/store/fullscreenFeedStore';
 import { haptic } from '@/utils/haptics';
 import { attachHlsToTile } from '@/hooks/useTileVideoPlayer';
 import { HLSPoolManager } from '@/media/HLSPoolManager';
+import { MediaRuntime } from '@/media/runtime';
 import { Pin } from './proshop/Pin';
 import { LONG_PRESS_MS, TOUCHMOVE_CANCEL_PX } from './constants';
 import { useWatchAutoplay } from './WatchAutoplay';
@@ -53,6 +54,7 @@ const WatchTile: React.FC<WatchTileProps> = ({
   const ctx = useWatchAutoplay();
   const mediaId = `watch-grid-${post.id}`;
   const isPlaying = ctx?.playingIds.has(mediaId) ?? false;
+  const isVisibleCandidate = ctx?.visibleIds.has(mediaId) ?? false;
   const [videoVisible, setVideoVisible] = useState(false);
 
   // Stable handle to registerMedia — the ctx object identity changes every
@@ -112,13 +114,17 @@ const WatchTile: React.FC<WatchTileProps> = ({
     [mediaId, index, hlsUrl, mp4Url],
   );
 
-  // Attach HLS when runtime says we're the spotlight; demote-to-pool on the
-  // way out (mirrors AutoplayVideoCard's WatchJank-2 teardown — orthogonal to
-  // runtime arbitration: runtime owns play/pause, pool owns instance lifecycle).
+  // Attach HLS when this tile is a visible candidate (not waiting for
+  // isPlaying — that creates a circular deadlock: safePlay needs src,
+  // src is set by attach, attach was gated on isPlaying which only flips
+  // after safePlay succeeds). Attaching for visible candidates means src
+  // exists by the time the runtime calls safePlay. We then nudge the
+  // runtime so it re-evaluates and plays. Decoder budget: at grid 0.5
+  // threshold only ~1 tile is a visible candidate at a time.
   useEffect(() => {
     const v = videoElRef.current;
     if (!v) return;
-    if (!isPlaying) return;
+    if (!isVisibleCandidate && !isPlaying) return;
     if (!hlsUrl && !mp4Url) return;
 
     let cancelled = false;
@@ -126,14 +132,15 @@ const WatchTile: React.FC<WatchTileProps> = ({
     const onReady = () => {
       if (cancelled) return;
       setVideoVisible(true);
-      v.play().catch(() => {});
+      // Nudge the runtime: re-evaluate now that src exists so safePlay
+      // can succeed (no direct video.play() — runtime owns playback).
+      MediaRuntime.nudge();
     };
 
     if (hlsUrl) {
       attachHlsToTile({ hlsUrl, mp4Fallback: mp4Url, video: v, onReady })
         .then((hls) => {
           if (cancelled) {
-            // demote if pool-managed, else destroy
             if (hls && hlsUrl && HLSPoolManager.isPooled(hlsUrl)) {
               try { HLSPoolManager.demote(hlsUrl, hls); } catch {}
             } else {
@@ -147,7 +154,6 @@ const WatchTile: React.FC<WatchTileProps> = ({
     } else if (mp4Url) {
       v.src = mp4Url;
       v.addEventListener('canplay', onReady, { once: true });
-      v.play().catch(() => {});
     }
 
     return () => {
@@ -165,15 +171,14 @@ const WatchTile: React.FC<WatchTileProps> = ({
         hlsRef.current = null;
       }
       if (v) {
-        try { v.pause(); } catch {}
-        // For mp4 path, clear src so the next promotion can start fresh.
+        // Don't call v.pause() — runtime owns play/pause arbitration.
         if (!hlsUrl) {
           v.removeAttribute('src');
           try { v.load(); } catch {}
         }
       }
     };
-  }, [isPlaying, hlsUrl, mp4Url]);
+  }, [isVisibleCandidate, isPlaying, hlsUrl, mp4Url]);
 
   const clearLongPress = () => {
     if (longPressTimerRef.current != null) {

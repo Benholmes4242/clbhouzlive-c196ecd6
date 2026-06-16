@@ -8,6 +8,7 @@ import { Pin } from './proshop/Pin';
 import { haptic } from '@/utils/haptics';
 import { attachHlsToTile } from '@/hooks/useTileVideoPlayer';
 import { HLSPoolManager } from '@/media/HLSPoolManager';
+import { MediaRuntime } from '@/media/runtime';
 import type { RegisterMediaFn } from '@/media';
 
 interface WatchRailTileProps {
@@ -32,6 +33,8 @@ interface WatchRailTileProps {
    */
   registerMedia?: RegisterMediaFn;
   playingIds?: Set<string>;
+  /** Visible-candidate set from useMediaAutoplay; drives lazy HLS attach. */
+  visibleIds?: Set<string>;
 }
 
 // Hybrid "why" labels — Session 2 of 3.
@@ -64,6 +67,7 @@ export default function WatchRailTile({
   viewedPostIds,
   registerMedia,
   playingIds,
+  visibleIds,
 }: WatchRailTileProps) {
   const cardRef = useRef<HTMLDivElement>(null);
   const videoRef = useRef<HTMLVideoElement | null>(null);
@@ -81,6 +85,7 @@ export default function WatchRailTile({
   const runtimeMode = !!registerMedia;
   const mediaId = `watch-rail-${post.id}`;
   const isRuntimePlaying = runtimeMode ? (playingIds?.has(mediaId) ?? false) : false;
+  const isVisibleCandidate = runtimeMode ? (visibleIds?.has(mediaId) ?? false) : false;
 
   // ── Wrapper ref OWNS register/unregister lifecycle (runtime mode). ──
   // React attaches child refs before parent refs; an inner-only
@@ -123,20 +128,21 @@ export default function WatchRailTile({
     [runtimeMode, registerMedia, mediaId, index, hlsUrl, mp4Url],
   );
 
-  // ── Runtime mode: attach HLS when we win the spotlight, demote on exit ──
+  // ── Runtime mode: attach HLS when this tile is a visible candidate
+  //    (lazy attach breaks no_src ↔ isPlaying deadlock). Runtime owns play.
   const [videoVisible, setVideoVisible] = useState(false);
   useEffect(() => {
     if (!runtimeMode) return;
     const v = videoRef.current;
     if (!v) return;
-    if (!isRuntimePlaying) return;
+    if (!isVisibleCandidate && !isRuntimePlaying) return;
     if (!hlsUrl && !mp4Url) return;
 
     let cancelled = false;
     const onReady = () => {
       if (cancelled) return;
       setVideoVisible(true);
-      v.play().catch(() => {});
+      MediaRuntime.nudge();
     };
 
     if (hlsUrl) {
@@ -156,7 +162,6 @@ export default function WatchRailTile({
     } else if (mp4Url) {
       v.src = mp4Url;
       v.addEventListener('canplay', onReady, { once: true });
-      v.play().catch(() => {});
     }
 
     return () => {
@@ -174,14 +179,13 @@ export default function WatchRailTile({
         hlsRef.current = null;
       }
       if (v) {
-        try { v.pause(); } catch {}
         if (!hlsUrl) {
           v.removeAttribute('src');
           try { v.load(); } catch {}
         }
       }
     };
-  }, [runtimeMode, isRuntimePlaying, hlsUrl, mp4Url]);
+  }, [runtimeMode, isVisibleCandidate, isRuntimePlaying, hlsUrl, mp4Url]);
 
   // ── Legacy mode: per-card IO, plays once when 40% visible ──
   const startLegacyAutoplay = useCallback(() => {

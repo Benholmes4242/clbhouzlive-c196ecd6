@@ -1172,6 +1172,16 @@ class MediaRuntimeCore {
   isPlaying(id: string): boolean {
     return this.state.activeMediaIds.has(id);
   }
+
+  /**
+   * Re-trigger candidate evaluation without changing any visibility state.
+   * Used by lazy-attach surfaces (e.g. Watch tiles) after HLS src arrives
+   * so the runtime can re-run safePlay (which previously bailed at the
+   * no_src gate).
+   */
+  nudge(): void {
+    this.queuePlaybackUpdate();
+  }
   
   // ============ Telemetry ============
   

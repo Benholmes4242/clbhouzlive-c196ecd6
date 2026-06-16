@@ -94,7 +94,7 @@ export function useMediaAutoplay(options: UseMediaAutoplayOptions = {}) {
   
   // Registry
   const registry = useRef<Map<string, MediaAutoplayRegistration>>(new Map());
-  const visibleIds = useRef<Set<string>>(new Set());
+  const visibleIdsRef = useRef<Set<string>>(new Set());
   
   // Observers
   const playObserver = useRef<IntersectionObserver | null>(null);
@@ -102,6 +102,10 @@ export function useMediaAutoplay(options: UseMediaAutoplayOptions = {}) {
   
   // State - reflects what MediaRuntime says is playing
   const [playingIds, setPlayingIds] = useState<Set<string>>(new Set());
+  // Visible candidates set — mirrors the IO hysteresis (start/stop thresholds).
+  // Surfaces like Watch use this to lazy-attach HLS (set <video>.src) BEFORE
+  // the runtime calls safePlay, breaking the no_src ↔ isPlaying deadlock.
+  const [visibleIds, setVisibleIdsState] = useState<Set<string>>(new Set());
   
   // Scroll protection
   const isScrolling = useRef(false);
@@ -181,7 +185,9 @@ export function useMediaAutoplay(options: UseMediaAutoplayOptions = {}) {
       }
 
       registry.current.delete(id);
-      visibleIds.current.delete(id);
+      if (visibleIdsRef.current.delete(id)) {
+        setVisibleIdsState(new Set(visibleIdsRef.current));
+      }
       syncPlayingFromRuntime();
       return;
     }
@@ -341,7 +347,7 @@ export function useMediaAutoplay(options: UseMediaAutoplayOptions = {}) {
           } else {
             // Debounced detach
             if (prewarmedIds.current.has(id) && !detachTimeouts.current.has(id)) {
-              const isVisible = visibleIds.current.has(id);
+              const isVisible = visibleIdsRef.current.has(id);
               if (!isVisible) {
                 const timeout = setTimeout(() => {
                   const playerRef = (target as any).__hlsPlayerRef;
@@ -390,13 +396,14 @@ export function useMediaAutoplay(options: UseMediaAutoplayOptions = {}) {
       (entries) => {
         if (isPanelAnimatingRef.current) return;
         
+        let visibleSetChanged = false;
         entries.forEach((entry) => {
           const target = entry.target as HTMLElement;
           const id = target.dataset.mediaAutoplayId;
           if (!id) return;
           
           const ratio = entry.intersectionRatio;
-          const wasVisible = visibleIds.current.has(id);
+          const wasVisible = visibleIdsRef.current.has(id);
           
           // MOBILE VIDEO DEBUG: Log intersection changes
           if (MOBILE_VIDEO_DEBUG) {
@@ -407,10 +414,16 @@ export function useMediaAutoplay(options: UseMediaAutoplayOptions = {}) {
           let nextVisible = wasVisible;
           
           if (ratio >= effectiveStartThreshold) {
-            visibleIds.current.add(id);
+            if (!wasVisible) {
+              visibleIdsRef.current.add(id);
+              visibleSetChanged = true;
+            }
             nextVisible = true;
           } else if (ratio <= effectiveStopThreshold) {
-            visibleIds.current.delete(id);
+            if (wasVisible) {
+              visibleIdsRef.current.delete(id);
+              visibleSetChanged = true;
+            }
             nextVisible = false;
           }
           
@@ -421,6 +434,9 @@ export function useMediaAutoplay(options: UseMediaAutoplayOptions = {}) {
           });
         });
         
+        if (visibleSetChanged) {
+          setVisibleIdsState(new Set(visibleIdsRef.current));
+        }
         syncPlayingRef.current();
       },
       {
@@ -440,12 +456,14 @@ export function useMediaAutoplay(options: UseMediaAutoplayOptions = {}) {
       clearTimeout(initialCheck);
       playObserver.current?.disconnect();
       playObserver.current = null;
-      visibleIds.current.clear();
+      visibleIdsRef.current.clear();
+      setVisibleIdsState(new Set());
     };
   }, [effectiveStartThreshold, effectiveStopThreshold]);
   
   return {
     registerMedia,
     playingIds,
+    visibleIds,
   };
 }

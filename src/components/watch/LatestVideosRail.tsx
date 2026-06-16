@@ -26,7 +26,7 @@ export default function LatestVideosRail() {
 
   const { posts, isLoading } = useVideosFeed({ userId, filter: 'latest' });
 
-  const { registerMedia, playingIds } = useMediaAutoplay({
+  const { registerMedia, playingIds, visibleIds } = useMediaAutoplay({
     mode: 'grid',
     surface: 'watch',
     startThreshold: 0.5,
@@ -74,6 +74,7 @@ export default function LatestVideosRail() {
             mediaId={heroMediaId}
             registerMedia={registerMedia}
             isPlaying={playingIds.has(heroMediaId)}
+            isVisibleCandidate={visibleIds.has(heroMediaId)}
             sortIndex={0}
           />
         </div>
@@ -86,6 +87,7 @@ export default function LatestVideosRail() {
             userId={userId}
             registerMedia={registerMedia}
             playingIds={playingIds}
+            visibleIds={visibleIds}
           />
         ) : null}
       </div>

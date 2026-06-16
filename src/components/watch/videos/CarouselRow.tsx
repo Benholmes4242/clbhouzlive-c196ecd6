@@ -13,6 +13,7 @@ interface CarouselRowProps {
   /** Phase WatchSpotlight-C: runtime-managed spotlight. */
   registerMedia: RegisterMediaFn;
   playingIds: Set<string>;
+  visibleIds: Set<string>;
 }
 
 export default function CarouselRow({
@@ -22,6 +23,7 @@ export default function CarouselRow({
   userId,
   registerMedia,
   playingIds,
+  visibleIds,
 }: CarouselRowProps) {
   const scrollerRef = useRef<HTMLDivElement>(null);
   const cardRefs = useRef<Array<HTMLDivElement | null>>([]);
@@ -150,6 +152,7 @@ export default function CarouselRow({
                 mediaId={mediaId}
                 registerMedia={registerMedia}
                 isPlaying={playingIds.has(mediaId)}
+                isVisibleCandidate={visibleIds.has(mediaId)}
                 sortIndex={baseIndex + i}
               />
             </div>

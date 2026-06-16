@@ -13,6 +13,7 @@ import { isPostLikedByMe } from '@/lib/likedPostIds';
 import { useMediaAutoplay } from '@/media';
 import { attachHlsToTile } from '@/hooks/useTileVideoPlayer';
 import { HLSPoolManager } from '@/media/HLSPoolManager';
+import { MediaRuntime } from '@/media/runtime';
 // Note: useNavigate import previously here was unused.
 
 function formatDuration(seconds: number | null): string {
@@ -75,7 +76,7 @@ function WatchOfTheWeekHeroInner() {
 
   // ── Phase WatchSpotlight-D: register hero as a 'watch' spotlight candidate.
   // sortIndex: 0 so it wins at the top of the page when equally visible.
-  const { registerMedia, playingIds } = useMediaAutoplay({
+  const { registerMedia, playingIds, visibleIds } = useMediaAutoplay({
     mode: 'grid',
     surface: 'watch',
     startThreshold: 0.5,
@@ -84,6 +85,7 @@ function WatchOfTheWeekHeroInner() {
   const mediaId = effectivePick ? `watch-hero-${effectivePick.post_id}` : '';
   const hlsUrl = effectivePick?.hls_url ?? undefined;
   const isPlaying = !!mediaId && playingIds.has(mediaId);
+  const isVisibleCandidate = !!mediaId && visibleIds.has(mediaId);
   const [videoVisible, setVideoVisible] = useState(false);
 
   // Stable ref-callback pattern (same loop-fix as WatchTile).
@@ -138,15 +140,17 @@ function WatchOfTheWeekHeroInner() {
     [mediaId, hlsUrl],
   );
 
-  // Attach HLS when runtime picks us; demote-to-pool on the way out.
+  // Attach HLS when this tile is a visible candidate (lazy attach breaks
+  // the no_src ↔ isPlaying deadlock). Runtime owns play via safePlay.
   useEffect(() => {
     const v = videoElRef.current;
-    if (!v || !isPlaying || !hlsUrl) return;
+    if (!v || !hlsUrl) return;
+    if (!isVisibleCandidate && !isPlaying) return;
     let cancelled = false;
     const onReady = () => {
       if (cancelled) return;
       setVideoVisible(true);
-      v.play().catch(() => {});
+      MediaRuntime.nudge();
     };
     attachHlsToTile({ hlsUrl, video: v, onReady })
       .then((hls) => {
@@ -175,9 +179,8 @@ function WatchOfTheWeekHeroInner() {
         }
         hlsRef.current = null;
       }
-      try { v.pause(); } catch {}
     };
-  }, [isPlaying, hlsUrl]);
+  }, [isVisibleCandidate, isPlaying, hlsUrl]);
 
   if (isLoading || !effectivePick) return null;
 
