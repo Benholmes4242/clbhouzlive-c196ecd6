@@ -1,6 +1,7 @@
 import React, { forwardRef, useCallback, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useCourseMediaViewerStore } from '@/components/course-media-tab/CourseMediaViewer';
+import { useFullscreenFeedStore } from '@/store/fullscreenFeedStore';
+import { flattenPostsToMedia, flatIndexFor } from '@/components/fullscreen-feed/flattenPostsToMedia';
 import { AlertCircle, Camera, Loader2, Film, ListChecks, Flag, Sunrise, Building2 } from 'lucide-react';
 import type { FeedPost } from '@/components/media-system/types/media';
 import { CourseMediaTile } from './CourseMediaTile';
@@ -59,11 +60,11 @@ export const CourseMediaGrid = forwardRef<HTMLDivElement, CourseMediaGridProps>(
     return () => observer.disconnect();
   }, [hasNextPage, isFetchingNextPage, fetchNextPage]);
 
-  // Mirror the hook's pagination state into the dedicated viewer store so
+  // Mirror the hook's pagination state into the fullscreen store so
   // SnapFeed sees fresh hasNextPage / isFetchingNextPage values reactively
   // (not just the snapshot taken at .open() time).
-  const isViewerOpen = useCourseMediaViewerStore(s => s.isOpen);
-  const setPaginationState = useCourseMediaViewerStore(s => s.setPaginationState);
+  const isViewerOpen = useFullscreenFeedStore(s => s.isOpen);
+  const setPaginationState = useFullscreenFeedStore(s => s.setPaginationState);
 
   useEffect(() => {
     if (!isViewerOpen) return;
@@ -73,15 +74,27 @@ export const CourseMediaGrid = forwardRef<HTMLDivElement, CourseMediaGridProps>(
     });
   }, [isViewerOpen, hasNextPage, isFetchingNextPage, setPaginationState]);
 
-  // Single open-fullscreen entrypoint — wraps the store call with the current
-  // pagination callbacks so the overlay can drive `fetchNextPage` itself.
+  // Append flattened pages into the open viewer (store dedupes by flat id),
+  // so infinite scroll keeps loading more without index drift.
+  useEffect(() => {
+    if (!isViewerOpen) return;
+    const { flat } = flattenPostsToMedia(posts);
+    useFullscreenFeedStore.getState().appendPosts(flat);
+  }, [isViewerOpen, posts]);
+
+  // Single open-fullscreen entrypoint — flattens to one-media-per-slide
+  // and opens the fullscreen viewer in read-only (gallery) mode with the
+  // current pagination callbacks.
   const handleOpenFullscreen = useCallback((postsToOpen: FeedPost[], index: number) => {
-    useCourseMediaViewerStore.getState().open(postsToOpen, index, {
+    const { flat, offsetsByParent } = flattenPostsToMedia(postsToOpen);
+    useFullscreenFeedStore.getState().open(flat, flatIndexFor(offsetsByParent, index, 0), {
+      readOnly: true,
       hasNextPage: hasNextPage ?? false,
       fetchNextPage: hasNextPage ? () => fetchNextPage() : undefined,
       isFetchingNextPage: isFetchingNextPage ?? false,
     });
   }, [hasNextPage, fetchNextPage, isFetchingNextPage]);
+
 
 
   if (isLoading) return <CourseMediaGridSkeleton />;

@@ -16,6 +16,10 @@ interface OpenOptions {
   hasNextPage?: boolean;
   fetchNextPage?: () => void;
   isFetchingNextPage?: boolean;
+  /** Read-only / gallery mode: hides like/comment/share/follow chrome.
+   *  Used by course-detail media entry points. Defaults false so Clubhouse
+   *  and deep-link openers keep social actions. */
+  readOnly?: boolean;
 }
 
 interface FullscreenFeedState {
@@ -30,6 +34,7 @@ interface FullscreenFeedState {
   hasNextPage: boolean;
   fetchNextPage: (() => void) | null;
   isFetchingNextPage: boolean;
+  readOnly: boolean;
   open: (posts: FeedPost[], startIndex?: number, options?: OpenOptions) => void;
   close: () => void;
   appendPosts: (newPosts: FeedPost[]) => void;
@@ -51,6 +56,7 @@ export const useFullscreenFeedStore = create<FullscreenFeedState>((set, get) => 
   hasNextPage: false,
   fetchNextPage: null,
   isFetchingNextPage: false,
+  readOnly: false,
   open: (posts, startIndex = 0, options) =>
     set({
       isOpen: true,
@@ -62,6 +68,7 @@ export const useFullscreenFeedStore = create<FullscreenFeedState>((set, get) => 
       hasNextPage: options?.hasNextPage ?? false,
       fetchNextPage: options?.fetchNextPage ?? null,
       isFetchingNextPage: options?.isFetchingNextPage ?? false,
+      readOnly: !!options?.readOnly,
     }),
   close: () => {
     const cb = get().onCloseCallback;
@@ -74,6 +81,7 @@ export const useFullscreenFeedStore = create<FullscreenFeedState>((set, get) => 
       hasNextPage: false,
       fetchNextPage: null,
       isFetchingNextPage: false,
+      readOnly: false,
     });
     if (cb) {
       try { cb(); } catch {}

@@ -43,7 +43,7 @@ import GlobalBottomNavigation from '@/components/GlobalBottomNavigation';
 import { GlobalPostComposer } from '@/components/post-composer/GlobalPostComposer';
 import { FullscreenFeedOverlay } from '@/components/fullscreen-feed/FullscreenFeedOverlay';
 import { ReviewBottomSheetPortal } from '@/components/posts/ReviewBottomSheetPortal';
-import { CourseMediaViewer } from '@/components/course-media-tab/CourseMediaViewer';
+
 import { MediaViewerOverlay } from '@/components/shared/MediaViewerOverlay';
 import { UploadResilienceProvider } from '@/contexts/UploadResilienceContext';
 import { FriendSheetProvider } from '@/components/friend-sheet/FriendSheetProvider';
@@ -701,7 +701,7 @@ const AppInner: React.FC = () => {
                                             </Suspense>
                                             {/* Fullscreen Feed Overlay - portal-based, renders above everything */}
                                             <FullscreenFeedOverlay />
-                                            <CourseMediaViewer />
+                                            
                                             <MediaViewerOverlay />
                                             {/* Unified ReviewBottomSheet portal — single mount, store-driven */}
                                             <ReviewBottomSheetPortal />

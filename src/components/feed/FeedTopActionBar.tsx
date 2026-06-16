@@ -36,6 +36,8 @@ interface FeedTopActionBarProps {
   onShare: () => void;
   onMore: () => void;
   isVisible: boolean;
+  /** Read-only mode: render only the left cluster (back chevron + mute). */
+  readOnly?: boolean;
 }
 
 const formatCount = (count: number | null | undefined): string | null => {
@@ -87,6 +89,7 @@ export const FeedTopActionBar: React.FC<FeedTopActionBarProps> = ({
   onShare,
   onMore,
   isVisible,
+  readOnly = false,
 }) => {
   const likeStr = formatCount(likesCount);
   const commentStr = formatCount(commentsCount);
@@ -158,76 +161,78 @@ export const FeedTopActionBar: React.FC<FeedTopActionBarProps> = ({
           )}
         </div>
 
-        {/* RIGHT cluster — gap tightens on the smallest phones so the row never wraps. */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: 'clamp(5px, 2vw, 8px)' }}>
-          <button
-            type="button"
-            onClick={(e) => {
-              e.stopPropagation();
-              onLike();
-            }}
-            aria-label={hasLiked ? 'Unlike' : 'Like'}
-            style={likeStr ? chipWithCount : chipBase}
-          >
-            <Heart
-              size={24}
-              fill={hasLiked ? '#F7931E' : 'transparent'}
-              stroke={hasLiked ? '#F7931E' : '#fff'}
-              strokeWidth={2}
-            />
-            {likeStr && (
-              <span
-                style={{
-                  color: hasLiked ? '#F7931E' : '#fff',
-                  fontVariantNumeric: 'tabular-nums',
-                }}
-              >
-                {likeStr}
-              </span>
-            )}
-          </button>
+        {/* RIGHT cluster — hidden in read-only (gallery) mode. */}
+        {!readOnly && (
+          <div style={{ display: 'flex', alignItems: 'center', gap: 'clamp(5px, 2vw, 8px)' }}>
+            <button
+              type="button"
+              onClick={(e) => {
+                e.stopPropagation();
+                onLike();
+              }}
+              aria-label={hasLiked ? 'Unlike' : 'Like'}
+              style={likeStr ? chipWithCount : chipBase}
+            >
+              <Heart
+                size={24}
+                fill={hasLiked ? '#F7931E' : 'transparent'}
+                stroke={hasLiked ? '#F7931E' : '#fff'}
+                strokeWidth={2}
+              />
+              {likeStr && (
+                <span
+                  style={{
+                    color: hasLiked ? '#F7931E' : '#fff',
+                    fontVariantNumeric: 'tabular-nums',
+                  }}
+                >
+                  {likeStr}
+                </span>
+              )}
+            </button>
 
-          <button
-            type="button"
-            onClick={(e) => {
-              e.stopPropagation();
-              onComment();
-            }}
-            aria-label="Comments"
-            style={commentStr ? chipWithCount : chipBase}
-          >
-            <MessageCircle size={24} stroke="#fff" strokeWidth={2} />
-            {commentStr && (
-              <span style={{ color: '#fff', fontVariantNumeric: 'tabular-nums' }}>
-                {commentStr}
-              </span>
-            )}
-          </button>
+            <button
+              type="button"
+              onClick={(e) => {
+                e.stopPropagation();
+                onComment();
+              }}
+              aria-label="Comments"
+              style={commentStr ? chipWithCount : chipBase}
+            >
+              <MessageCircle size={24} stroke="#fff" strokeWidth={2} />
+              {commentStr && (
+                <span style={{ color: '#fff', fontVariantNumeric: 'tabular-nums' }}>
+                  {commentStr}
+                </span>
+              )}
+            </button>
 
-          <button
-            type="button"
-            onClick={(e) => {
-              e.stopPropagation();
-              onShare();
-            }}
-            aria-label="Share"
-            style={chipBase}
-          >
-            <Send size={24} stroke="#fff" strokeWidth={2} />
-          </button>
+            <button
+              type="button"
+              onClick={(e) => {
+                e.stopPropagation();
+                onShare();
+              }}
+              aria-label="Share"
+              style={chipBase}
+            >
+              <Send size={24} stroke="#fff" strokeWidth={2} />
+            </button>
 
-          <button
-            type="button"
-            onClick={(e) => {
-              e.stopPropagation();
-              onMore();
-            }}
-            aria-label="More options"
-            style={chipBase}
-          >
-            <MoreHorizontal size={24} stroke="#fff" strokeWidth={2} />
-          </button>
-        </div>
+            <button
+              type="button"
+              onClick={(e) => {
+                e.stopPropagation();
+                onMore();
+              }}
+              aria-label="More options"
+              style={chipBase}
+            >
+              <MoreHorizontal size={24} stroke="#fff" strokeWidth={2} />
+            </button>
+          </div>
+        )}
       </div>
     </motion.div>
   );

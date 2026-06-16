@@ -40,7 +40,7 @@ interface ClubhouseTopBarProps {
   } | null;
   /** @deprecated Author tap handled inside BreathingRoomBottomBar now. */
   onAuthorTap?: () => void;
-  /** Suppress subsections for read-only contexts (e.g. CourseMediaViewer) */
+  /** Suppress subsections for read-only contexts (e.g. fullscreen viewer gallery mode) */
   hideTabs?: boolean;
   hideSearch?: boolean;
   hideProfilePill?: boolean;

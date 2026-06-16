@@ -1,7 +1,7 @@
 /**
  * FullscreenCarouselOverlay — segments dots + tap-edge zones for fullscreen viewers.
  *
- * Used by FullscreenFeedOverlay and CourseMediaViewer. Reads the active post's
+ * Used by the fullscreen viewer (gallery mode included). Reads the active post's
  * media count and current carousel slide from the global Clubhouse store
  * (FeedImageCarousel writes to setCarouselPosition). Tap-edge dispatches the
  * existing `carousel-goto` window event that FeedImageCarousel already listens
