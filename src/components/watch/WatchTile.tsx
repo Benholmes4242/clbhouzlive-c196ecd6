@@ -222,7 +222,7 @@ const WatchTile: React.FC<WatchTileProps> = ({
 
   return (
     <div
-      ref={tileRef}
+      ref={wrapperRefCallback}
       data-watch-index={index}
       className={tileClassName}
       onClick={handleClick}
