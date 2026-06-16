@@ -186,22 +186,6 @@ function ClipsMostLovedRailInner({ userId, mood }: ClipsMostLovedRailProps) {
               {idx + 1}
             </span>
 
-            {row.course_name ? (
-              <div
-                style={{
-                  position: 'absolute',
-                  top: 8,
-                  left: '50%',
-                  transform: 'translateX(-50%)',
-                  maxWidth: 'calc(100% - 24px)',
-                  zIndex: 3,
-                }}
-              >
-                <Pin variant="dark" icon={<span style={{ fontSize: 10, lineHeight: 1 }}>📍</span>}>
-                  {row.course_name}
-                </Pin>
-              </div>
-            ) : null}
 
             <div
               aria-hidden
