@@ -1,4 +1,4 @@
-import { memo } from 'react';
+import { memo, useCallback, useEffect, useRef, useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 
 import { useWatchOfTheWeek } from './hooks/useWatchOfTheWeek';
@@ -9,6 +9,9 @@ import { Kicker } from './Kicker';
 import { Pin } from './Pin';
 import { useActiveActor } from '@/context/ActiveActorContext';
 import { isPostLikedByMe } from '@/lib/likedPostIds';
+import { useMediaAutoplay } from '@/media';
+import { attachHlsToTile } from '@/hooks/useTileVideoPlayer';
+import { HLSPoolManager } from '@/media/HLSPoolManager';
 // Note: useNavigate import previously here was unused.
 
 function formatDuration(seconds: number | null): string {
@@ -31,6 +34,87 @@ function WatchOfTheWeekHeroInner() {
     enabled: !!pick?.post_id,
     staleTime: 60_000,
   });
+
+  // ── Phase WatchSpotlight-D: register hero as a 'watch' spotlight candidate.
+  // sortIndex: 0 so it wins at the top of the page when equally visible.
+  const { registerMedia, playingIds } = useMediaAutoplay({
+    mode: 'grid',
+    surface: 'watch',
+    startThreshold: 0.5,
+    stopThreshold: 0.25,
+  });
+  const mediaId = pick ? `watch-hero-${pick.post_id}` : '';
+  const hlsUrl = pick?.hls_url ?? undefined;
+  const isPlaying = !!mediaId && playingIds.has(mediaId);
+  const [videoVisible, setVideoVisible] = useState(false);
+
+  // Stable ref-callback pattern (same loop-fix as WatchTile).
+  const registerRef = useRef(registerMedia);
+  registerRef.current = registerMedia;
+  const heroWrapperRef = useRef<HTMLButtonElement | null>(null);
+  const videoElRef = useRef<HTMLVideoElement | null>(null);
+  const hlsRef = useRef<any>(null);
+
+  const videoRefCallback = useCallback(
+    (el: HTMLVideoElement | null) => {
+      videoElRef.current = el;
+      const register = registerRef.current;
+      if (!register || !mediaId) return;
+      if (el && heroWrapperRef.current) {
+        register({
+          id: mediaId,
+          element: el,
+          observeTarget: heroWrapperRef.current,
+          sortIndex: 0,
+          isCandidate: !!hlsUrl,
+        });
+      } else {
+        register({ id: mediaId, element: null });
+      }
+    },
+    [mediaId, hlsUrl],
+  );
+
+  // Attach HLS when runtime picks us; demote-to-pool on the way out.
+  useEffect(() => {
+    const v = videoElRef.current;
+    if (!v || !isPlaying || !hlsUrl) return;
+    let cancelled = false;
+    const onReady = () => {
+      if (cancelled) return;
+      setVideoVisible(true);
+      v.play().catch(() => {});
+    };
+    attachHlsToTile({ hlsUrl, video: v, onReady })
+      .then((hls) => {
+        if (cancelled) {
+          if (hls && HLSPoolManager.isPooled(hlsUrl)) {
+            try { HLSPoolManager.demote(hlsUrl, hls); } catch {}
+          } else {
+            try { hls?.destroy?.(); } catch {}
+          }
+          return;
+        }
+        hlsRef.current = hls;
+      })
+      .catch(() => {});
+    return () => {
+      cancelled = true;
+      setVideoVisible(false);
+      const hls = hlsRef.current;
+      if (hls) {
+        if (HLSPoolManager.isPooled(hlsUrl)) {
+          try { HLSPoolManager.demote(hlsUrl, hls); } catch {}
+        } else {
+          try { hls.stopLoad?.(); } catch {}
+          try { hls.detachMedia?.(); } catch {}
+          try { hls.destroy?.(); } catch {}
+        }
+        hlsRef.current = null;
+      }
+      try { v.pause(); } catch {}
+    };
+  }, [isPlaying, hlsUrl]);
 
   if (isLoading || !pick) return null;
 
@@ -80,6 +164,7 @@ function WatchOfTheWeekHeroInner() {
       <Kicker color="amber">Watch of the Week</Kicker>
 
       <button
+        ref={heroWrapperRef}
         type="button"
         onClick={handleTap}
         className="block w-full text-left active:scale-[0.99] transition-transform"
@@ -104,18 +189,45 @@ function WatchOfTheWeekHeroInner() {
           />
         ) : null}
 
+        {/* Runtime-arbitrated autoplay layer — fades in above the poster
+            when MediaRuntime picks the hero as the 'watch' spotlight. */}
+        {hlsUrl ? (
+          <video
+            ref={videoRefCallback}
+            muted
+            loop
+            playsInline
+            preload="none"
+            // @ts-ignore webkit-only attribute
+            webkit-playsinline=""
+            style={{
+              position: 'absolute',
+              inset: 0,
+              width: '100%',
+              height: '100%',
+              objectFit: 'cover',
+              pointerEvents: 'none',
+              zIndex: 1,
+              opacity: videoVisible ? 1 : 0,
+              transition: 'opacity 200ms ease',
+            }}
+          />
+        ) : null}
+
         {/* Bottom gradient */}
         <div
           aria-hidden
           style={{
             position: 'absolute',
             inset: 0,
+            zIndex: 2,
             background: 'linear-gradient(to top, rgba(0,0,0,0.78) 0%, rgba(0,0,0,0.05) 55%, transparent 100%)',
           }}
         />
 
+
         {/* Top-left badges */}
-        <div style={{ position: 'absolute', top: 10, left: 10, display: 'flex', gap: 6, maxWidth: 'calc(100% - 80px)' }}>
+        <div style={{ position: 'absolute', top: 10, left: 10, zIndex: 3, display: 'flex', gap: 6, maxWidth: 'calc(100% - 80px)' }}>
           <Pin variant="dark">{pick.format === 'clip' ? 'CLIP' : 'VIDEO'}</Pin>
           {pick.course_name ? (
             <Pin variant="dark" icon={<span style={{ fontSize: 10 }}>📍</span>}>
@@ -125,7 +237,7 @@ function WatchOfTheWeekHeroInner() {
         </div>
 
         {/* Bottom: title + creator + duration */}
-        <div style={{ position: 'absolute', left: 14, right: 14, bottom: 12, color: 'white' }}>
+        <div style={{ position: 'absolute', left: 14, right: 14, bottom: 12, zIndex: 3, color: 'white' }}>
           <div
             style={{
               fontSize: 17,
