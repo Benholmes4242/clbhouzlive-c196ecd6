@@ -258,8 +258,9 @@ const WatchTile: React.FC<WatchTileProps> = ({
           loop
           playsInline
           preload="none"
-          // @ts-expect-error webkit-only attribute
+          // @ts-ignore webkit-only attribute
           webkit-playsinline=""
+
           style={{
             position: 'absolute',
             inset: 0,
