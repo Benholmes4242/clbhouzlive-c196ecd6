@@ -87,17 +87,9 @@ const EnrichedStatus: React.FC<{ friend: FriendYesterday }> = ({ friend }) => {
   );
 };
 
-const SyncingStatus: React.FC = () => (
-  <div
-    style={{
-      ...STATUS_BASE,
-      fontWeight: 600,
-      color: 'rgba(255,255,255,0.45)',
-    }}
-  >
-    Syncing…
-  </div>
-);
+// State B (synced, summary-only): no status line — the big GROSS already speaks.
+const SummaryStatus: React.FC = () => <div style={{ ...STATUS_BASE }} />;
+
 
 const ActionLine: React.FC<{
   label: string;
@@ -353,9 +345,10 @@ export const FriendPostcard: React.FC<Props> = ({ friend, showLowest, onClick })
         </div>
 
         {state === 'enriched' && <EnrichedStatus friend={friend} />}
+        {state === 'summary' && <SummaryStatus />}
         {state === 'invite' && <InviteStatus friend={friend} />}
         {state === 'nudge' && <NudgeStatus friend={friend} />}
-        {state === 'syncing' && <SyncingStatus />}
+
       </div>
     </div>
   );
