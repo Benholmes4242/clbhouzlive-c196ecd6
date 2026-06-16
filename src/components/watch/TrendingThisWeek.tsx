@@ -103,7 +103,7 @@ export default function TrendingThisWeek({ enabled = true }: TrendingThisWeekPro
         eyebrow="Short & sweet"
         kickerColor="amber"
         title="Quick clips"
-        sub="Under 90 seconds, straight from the green"
+        sub="Straight from the course"
         onSeeAll={() => navigate('/watch/clips')}
         seeAllLabel="More clips"
       />
