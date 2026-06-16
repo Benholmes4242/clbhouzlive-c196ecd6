@@ -107,6 +107,7 @@ export default function CarouselRow({ items, allPosts, baseIndex, userId }: Caro
               allPosts={allPosts}
               userId={userId}
               active={inView && i === activeIndex}
+              metaPadX={0}
             />
           </div>
         ))}
