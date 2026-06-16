@@ -152,6 +152,7 @@ export default function CarouselRow({
                 mediaId={mediaId}
                 registerMedia={registerMedia}
                 isPlaying={playingIds.has(mediaId)}
+                isVisibleCandidate={visibleIds.has(mediaId)}
                 sortIndex={baseIndex + i}
               />
             </div>
