@@ -1,4 +1,4 @@
-import { memo } from 'react';
+import { memo, useCallback, useEffect, useRef, useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 
 import { useWatchOfTheWeek } from './hooks/useWatchOfTheWeek';
@@ -9,6 +9,9 @@ import { Kicker } from './Kicker';
 import { Pin } from './Pin';
 import { useActiveActor } from '@/context/ActiveActorContext';
 import { isPostLikedByMe } from '@/lib/likedPostIds';
+import { useMediaAutoplay } from '@/media';
+import { attachHlsToTile } from '@/hooks/useTileVideoPlayer';
+import { HLSPoolManager } from '@/media/HLSPoolManager';
 // Note: useNavigate import previously here was unused.
 
 function formatDuration(seconds: number | null): string {
