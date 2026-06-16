@@ -68,12 +68,17 @@ export const CardFeed: React.FC<CardFeedProps> = ({
 }) => {
   const virtuosoRef = useRef<VirtuosoHandle | null>(null);
 
-  // Explore tab retap → scroll Clubhouse feed to top
+  // Explore tab retap → scroll Clubhouse feed to top.
+  // Scroll the data-card-feed scroller (NOT virtuoso scrollToIndex) so the
+  // Header spacer (topPadding) is fully revealed and the first card rests at
+  // the exact same position as initial load — just below the Suggested/Friends
+  // tab divider, not tucked under the fixed header.
   useEffect(() => {
     const onRetap = (e: Event) => {
       const detail = (e as CustomEvent).detail;
       if (detail?.tabId !== 'clubhouse') return;
-      virtuosoRef.current?.scrollToIndex({ index: 0, align: 'start', behavior: 'smooth' });
+      const scroller = document.querySelector('[data-card-feed]') as HTMLElement | null;
+      scroller?.scrollTo({ top: 0, behavior: 'smooth' });
     };
     window.addEventListener('clbhouz-active-tab-retap', onRetap);
     return () => window.removeEventListener('clbhouz-active-tab-retap', onRetap);
