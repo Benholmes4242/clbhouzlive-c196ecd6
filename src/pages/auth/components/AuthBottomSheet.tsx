@@ -60,13 +60,12 @@ const AuthBottomSheet: React.FC<AuthBottomSheetProps> = ({
       <div 
         className={cn(
           "fixed bottom-0 inset-x-0 mx-auto z-50 w-full max-w-[480px]",
-          "md:bottom-auto md:top-1/2 md:-translate-y-1/2 md:max-w-[440px]",
-          "rounded-t-[32px] md:rounded-[32px]",
+          "rounded-t-[32px]",
           "transition-all duration-[380ms] ease-out",
           "pb-safe",
           isAnimating 
-            ? "translate-y-0 opacity-100 md:translate-y-[-50%] md:scale-100" 
-            : "translate-y-full opacity-0 md:translate-y-[-50%] md:scale-95"
+            ? "translate-y-0 opacity-100" 
+            : "translate-y-full opacity-0"
         )}
         style={{
           background: '#FFFFFF',

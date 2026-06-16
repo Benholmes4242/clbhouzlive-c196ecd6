@@ -161,53 +161,51 @@ const GlobalBottomNavigation: React.FC<GlobalBottomNavigationProps> = ({ chromeS
       {/* Global Fixed Bottom Navigation */}
       <AnimatePresence>
         {showNavigation && (
-          <div className="global-bottom-nav-shell z-[100] pointer-events-none">
-            <motion.div
-              className={cn(
-                "global-bottom-nav",
-                "w-full max-w-[480px] md:max-w-[620px]",
-                "pointer-events-auto",
-                "m-0!"
-              )}
-              style={{ backfaceVisibility: 'hidden' }}
-              initial={{ y: '100%', opacity: 0 }}
-              animate={{ y: 0, opacity: 1 }}
-              exit={{ y: '100%', opacity: 0 }}
-              transition={{ duration: 0.24, ease: [0.22, 0.61, 0.36, 1] }}
+          <motion.div
+            className={cn(
+              "global-bottom-nav bottom-nav-fixed",
+              "fixed! bottom-0! w-full max-w-[480px]",
+              "left-1/2! -translate-x-1/2!",
+              "z-[100]!",
+              "m-0!"
+            )}
+            initial={{ y: '100%', opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            exit={{ y: '100%', opacity: 0 }}
+            transition={{ duration: 0.24, ease: [0.22, 0.61, 0.36, 1] }}
+          >
+            <div
+              ref={(el) => {
+                navRef.current = el;
+                setNavRef(el);
+              }}
+              className="chrome-bottom-nav clubhouse-footer"
+              data-chrome="bottom-nav"
+              style={{
+                // Route-aware: dark on Clubhouse/Handicap, light everywhere else.
+                background: isDarkChromeRoute ? '#0A0E14' : '#F8FAFC',
+                borderTop: isDarkChromeRoute
+                  ? '0.5px solid rgba(255,255,255,0.06)'
+                  : '0.5px solid rgba(15,23,42,0.08)',
+                paddingBottom: 'max(env(safe-area-inset-bottom, 0px), 20px)',
+                transition: 'all var(--motion-slow) cubic-bezier(0.22, 1, 0.36, 1)',
+              }}
             >
-              <div
-                ref={(el) => {
-                  navRef.current = el;
-                  setNavRef(el);
-                }}
-                className="chrome-bottom-nav clubhouse-footer"
-                data-chrome="bottom-nav"
-                style={{
-                  // Route-aware: dark on Clubhouse/Handicap, light everywhere else.
-                  background: isDarkChromeRoute ? '#0A0E14' : '#F8FAFC',
-                  borderTop: isDarkChromeRoute
-                    ? '0.5px solid rgba(255,255,255,0.06)'
-                    : '0.5px solid rgba(15,23,42,0.08)',
-                  paddingBottom: 'max(env(safe-area-inset-bottom, 0px), 20px)',
-                  transition: 'all var(--motion-slow) cubic-bezier(0.22, 1, 0.36, 1)',
-                }}
-              >
-                <NavigationBar
-                  activeTab={activeTab}
-                  onTabClick={handleTabClickWithCamera}
-                  onPrefetch={handleNavPrefetch}
-                  variant={isDarkChromeRoute ? 'clubhouse' : 'default'}
-                  isDimmed={false}
-                  useAmberActive={false}
-                  showBorder={false}
-                  tabBadges={{ courses: unseenFriendReviews }}
-                  liveTabs={liveTabs}
-                  isTourHubActive={isTourHubRoute}
-                />
+              <NavigationBar
+                activeTab={activeTab}
+                onTabClick={handleTabClickWithCamera}
+                onPrefetch={handleNavPrefetch}
+                variant={isDarkChromeRoute ? 'clubhouse' : 'default'}
+                isDimmed={false}
+                useAmberActive={false}
+                showBorder={false}
+                tabBadges={{ courses: unseenFriendReviews }}
+                liveTabs={liveTabs}
+                isTourHubActive={isTourHubRoute}
+              />
 
-              </div>
-            </motion.div>
-          </div>
+            </div>
+          </motion.div>
         )}
       </AnimatePresence>
     </>

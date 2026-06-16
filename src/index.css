@@ -735,16 +735,6 @@ html.lightbox-open {
   margin-right: auto;
 }
 
-/* iPad portrait and up — release the phone-width cap entirely so the app
-   fills the canvas edge-to-edge (native iPad feel). Individual surfaces
-   (Clubhouse card column, Auth panel) keep their own inner max-widths and
-   centering. iPhone (<768px) keeps the 480px column untouched. */
-@media (min-width: 768px) {
-  .app-shell {
-    max-width: none;
-  }
-}
-
 /* ── BOOT FLASH PREVENTION ─────────────────────────────────────────────────
    The app shell defaults to --bg-page (#F8FAFC) which causes a white flash
    between the splash screen and Clubhouse skeleton. Force the shell to black
@@ -1734,18 +1724,9 @@ body.route-clubhouse .global-header {
   position: fixed;
   inset: 0;
   height: 100svh;
-  width: 100%;
+  width: 100vw;
   background: var(--bg-page);
   overflow: hidden;
-}
-
-/* iPad: center the immersive feed column on the black canvas.
-   Pure CSS, scoped to Clubhouse, rotation-safe. iPhone (<768px) untouched. */
-@media (min-width: 768px) {
-  .clubhouse-root [data-card-feed] [data-card-index] {
-    max-width: 620px;
-    margin-inline: auto;
-  }
 }
 
 /* Hide Clubhouse progress bar when any overlay is active */
@@ -1878,44 +1859,20 @@ html, body, #root, .app-shell { touch-action: auto; }
 }
 
 /* Global bottom navigation styling */
-.global-bottom-nav-shell {
-  position: fixed;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  width: 100%;
-  max-width: 480px;
-  margin-inline: auto;
-  z-index: 100 !important;
-}
-
 .global-bottom-nav {
   /* Ensure it's above all content but below toasts/modals */
   z-index: 100 !important;
-
-  /* Hardware acceleration for smooth performance.
-     NOTE: transform/will-change intentionally NOT set here — framer-motion
-     animates `transform` inline on this element. Setting it in CSS creates a
-     fight with the inline style and (more importantly) establishes a
-     containing block that breaks the centering shell on iPad. */
-
-  width: 100%;
-  position: static !important;
-  left: auto !important;
-  right: auto !important;
+  
+  /* Hardware acceleration for smooth performance */
+  transform: translate3d(0, 0, 0);
+  will-change: transform;
+  
+  /* Ensure it never breaks from transforms in parent elements */
+  position: fixed !important;
+  bottom: 0;
+  left: 0;
+  right: 0;
 }
-
-/* iPad (≥768px): center the fixed shell itself on the viewport and give it
-   the same 620px width as the Clubhouse feed card column. The animated
-   motion element stays static inside this shell, so Framer's Y transform can
-   never disturb horizontal alignment. */
-@media (min-width: 768px) {
-  .global-bottom-nav-shell {
-    max-width: 620px;
-  }
-}
-
-
 
 /* Ensure pages have bottom padding for the nav when needed */
 .page-with-bottom-nav {
@@ -1925,7 +1882,7 @@ html, body, #root, .app-shell { touch-action: auto; }
 /* Support for keyboard visibility on mobile - removed conflicting bottom positioning */
 
 /* Prevent nav from being affected by page transforms */
-.no-transform-context .global-bottom-nav-shell {
+.no-transform-context .global-bottom-nav {
   position: fixed !important;
 }
 
