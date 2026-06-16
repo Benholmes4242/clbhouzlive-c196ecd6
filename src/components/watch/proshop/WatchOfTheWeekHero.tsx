@@ -227,7 +227,7 @@ function WatchOfTheWeekHeroInner() {
 
 
         {/* Top-left badges */}
-        <div style={{ position: 'absolute', top: 10, left: 10, display: 'flex', gap: 6, maxWidth: 'calc(100% - 80px)' }}>
+        <div style={{ position: 'absolute', top: 10, left: 10, zIndex: 3, display: 'flex', gap: 6, maxWidth: 'calc(100% - 80px)' }}>
           <Pin variant="dark">{pick.format === 'clip' ? 'CLIP' : 'VIDEO'}</Pin>
           {pick.course_name ? (
             <Pin variant="dark" icon={<span style={{ fontSize: 10 }}>📍</span>}>
