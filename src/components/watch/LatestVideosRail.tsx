@@ -77,7 +77,6 @@ export default function LatestVideosRail() {
             userId={userId}
             active={heroActive}
             borderRadius={0}
-            metaPadX={0}
           />
         </div>
 
