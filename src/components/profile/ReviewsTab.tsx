@@ -44,6 +44,7 @@ export default function ReviewsTab({
   sentimentLabel = sentimentFromAvg(averageRating10),
   reviews,
   courseId,
+  courseName,
 }: ReviewsTabProps) {
   return (
     <div className="space-y-4 md:space-y-6">
@@ -63,7 +64,7 @@ export default function ReviewsTab({
         {reviews
           .sort((a, b) => +new Date(b.dateISO) - +new Date(a.dateISO))
           .map((r) => (
-            <ReviewCard key={r.id} review={r} courseId={courseId} />
+            <ReviewCard key={r.id} review={r} courseId={courseId} courseName={courseName} />
           ))}
       </div>
     </div>
