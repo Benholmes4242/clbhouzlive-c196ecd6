@@ -1729,6 +1729,15 @@ body.route-clubhouse .global-header {
   overflow: hidden;
 }
 
+/* iPad: center the immersive feed column on the black canvas.
+   Pure CSS, scoped to Clubhouse, rotation-safe. iPhone (<768px) untouched. */
+@media (min-width: 768px) {
+  .clubhouse-root [data-card-feed] [data-card-index] {
+    max-width: 620px;
+    margin-inline: auto;
+  }
+}
+
 /* Hide Clubhouse progress bar when any overlay is active */
 html.overlay-open .clubhouse-progress {
   display: none !important;
