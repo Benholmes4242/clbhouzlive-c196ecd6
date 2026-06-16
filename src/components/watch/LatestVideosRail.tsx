@@ -37,9 +37,12 @@ export default function LatestVideosRail() {
     return (
       <div>
         <WatchSectionHeader
-          paddingTop={16}
+          paddingTop={34}
+          mark={<VideosMark />}
+          eyebrow="Fresh from the tour"
+          kickerColor="amber"
           title="Latest videos"
-          sub="Tournament recaps, coaching, vlogs"
+          sub="Tournament recaps, coaching and vlogs"
           onSeeAll={() => navigate('/watch/videos')}
           seeAllLabel="More videos"
         />
