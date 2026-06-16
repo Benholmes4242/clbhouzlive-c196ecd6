@@ -237,7 +237,7 @@ function WatchOfTheWeekHeroInner() {
         </div>
 
         {/* Bottom: title + creator + duration */}
-        <div style={{ position: 'absolute', left: 14, right: 14, bottom: 12, color: 'white' }}>
+        <div style={{ position: 'absolute', left: 14, right: 14, bottom: 12, zIndex: 3, color: 'white' }}>
           <div
             style={{
               fontSize: 17,
