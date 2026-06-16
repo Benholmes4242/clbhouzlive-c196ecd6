@@ -5,6 +5,7 @@ import React, { useMemo, useCallback } from 'react';
 import { Play } from 'lucide-react';
 import { useUserCourseMoments } from '@/hooks/useUserCourseMoments';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
+import { useProfileData } from '@/hooks/useProfileData';
 import { useFullscreenFeedStore } from '@/store/fullscreenFeedStore';
 import type { FeedPost } from '@/components/media-system/types/media';
 
@@ -20,6 +21,7 @@ export const CourseMoments: React.FC<CourseMomentsProps> = ({
 }) => {
   const { data: moments, isLoading } = useUserCourseMoments(courseId);
   const { user } = useSupabaseSession();
+  const { profile } = useProfileData();
 
   const fullscreenPosts = useMemo<FeedPost[]>(() => {
     if (!moments?.length) return [];
@@ -28,10 +30,10 @@ export const CourseMoments: React.FC<CourseMomentsProps> = ({
       userId: user?.id ?? '',
       actorType: 'personal',
       actorId: user?.id ?? '',
-      username: '',
-      displayName: '',
-      avatarUrl: '',
-      isVerified: false,
+      username: profile?.username ?? '',
+      displayName: profile?.display_name ?? profile?.username ?? '',
+      avatarUrl: profile?.profile_photo_url ?? '',
+      isVerified: profile?.is_verified ?? false,
       creatorRelation: 'none',
       caption: m.caption ?? '',
       mediaItems: [{
@@ -54,7 +56,7 @@ export const CourseMoments: React.FC<CourseMomentsProps> = ({
       courseName,
       courseId,
     }) as FeedPost);
-  }, [moments, user?.id, courseName, courseId]);
+  }, [moments, user?.id, courseName, courseId, profile]);
 
   const handleMomentTap = useCallback((index: number) => {
     if (fullscreenPosts.length > 0) {
