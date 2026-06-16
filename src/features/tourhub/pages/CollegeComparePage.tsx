@@ -14,7 +14,7 @@ import { useDebouncedValue } from '@/hooks/useDebouncedValue';
 import { getCollegeLogoUrl } from '@/utils/collegeLogo';
 import { formatCurrency } from '@/lib/utils/formatCurrency';
 import { PlayerInitialAvatar } from '../components/shared/PlayerInitialAvatar';
-import { AMBER, HAIRLINE_INK_8, INK, INK_ALPHA_45, INK_FAINT, INK_TINT_05, INK_TINT_06, INK_TINT_07, SHELL_BG, SLATE_50, SURFACE, WHITE_ALPHA_55 } from '../_shared/tokens';
+import { AMBER, HAIRLINE_INK_8, INK, INK_ALPHA_45, INK_FAINT, INK_TINT_05, INK_TINT_06, INK_TINT_07, SLATE_50, SURFACE } from '../_shared/tokens';
 
 /**
  * Convert "northwestern" or "wake-forest" → "Northwestern" / "Wake Forest"
