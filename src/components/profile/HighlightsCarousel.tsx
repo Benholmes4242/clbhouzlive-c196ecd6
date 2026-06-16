@@ -1,18 +1,21 @@
 /**
  * HighlightsCarousel - Top 100 highlights carousel
- * 
+ *
  * Uses UnifiedVideoPlayer with MediaRuntime for playback control.
  * Mount gating: only active + adjacent slides mount players.
  */
 
 import React, { useRef, useCallback, useState, useEffect, useMemo } from 'react';
 import { VolumeX, Volume2 } from 'lucide-react';
+import { useQuery } from '@tanstack/react-query';
+import { supabase } from '@/integrations/supabase/client';
 import { useTop100Highlights } from '@/hooks/useTop100Highlights';
 import { warmHls, getHlsUrl } from '@/utils/videoPreload';
 import HighlightVideo from './HighlightVideo';
 import HighlightOverlays from './HighlightOverlays';
 import { useClubhouseStore } from '@/store/clubhouseStore';
-import { useMediaViewer } from '@/hooks/useMediaViewer';
+import { useFullscreenFeedStore } from '@/store/fullscreenFeedStore';
+import type { FeedPost } from '@/components/media-system/types/media';
 
 interface HighlightsCarouselProps {
   userId: string;
@@ -28,7 +31,20 @@ const HighlightsCarousel: React.FC<HighlightsCarouselProps> = ({ userId, classNa
   const toggleMute = useClubhouseStore(s => s.toggleMute);
   const markUserGestureUnmute = useClubhouseStore(s => s.markUserGestureUnmute);
   const [activeIndex, setActiveIndex] = useState(0);
-  const { openViewer } = useMediaViewer();
+
+  // Fetch the profile owner's author fields
+  const { data: author } = useQuery({
+    queryKey: ['highlights-author', userId],
+    enabled: !!userId,
+    queryFn: async () => {
+      const { data } = await supabase
+        .from('user_profiles')
+        .select('display_name, username, profile_photo_url')
+        .eq('id', userId)
+        .maybeSingle();
+      return data;
+    },
+  });
 
   // Track active index via scroll position
   useEffect(() => {
@@ -57,7 +73,7 @@ const HighlightsCarousel: React.FC<HighlightsCarouselProps> = ({ userId, classNa
   // Helper: prefetch current + neighbors
   const prefetchAround = useCallback((currentIndex: number) => {
     if (!highlights) return;
-    
+
     [currentIndex - 1, currentIndex, currentIndex + 1].forEach(idx => {
       if (idx >= 0 && idx < highlights.length) {
         const media = highlights[idx]?.post_media[0];
@@ -92,7 +108,7 @@ const HighlightsCarousel: React.FC<HighlightsCarouselProps> = ({ userId, classNa
       /\/([a-z0-9-]{16,})\//,
       /stream\/([^\/]+)/,
     ];
-    
+
     for (const pattern of patterns) {
       const match = mediaUrl.match(pattern);
       if (match) return match[1];
@@ -100,29 +116,46 @@ const HighlightsCarousel: React.FC<HighlightsCarouselProps> = ({ userId, classNa
     return null;
   };
 
-  // Open fullscreen viewer with highlights as playlist
+  // Open fullscreen viewer with highlights as read-only gallery
   const handleHighlightTap = useCallback((index: number) => {
     if (!highlights) return;
-    // Convert highlights to ExploreContentItem-compatible format for fullscreen
-    const items = highlights.map(h => ({
-      id: h.id,
-      src: h.post_media[0]?.media_url || '',
-      type: h.post_media[0]?.media_type === 'video' ? 'video' as const : 'image' as const,
-      thumbnailSrc: h.post_media[0]?.media_url || '',
-      title: h.content || '',
-      user: {
-        id: userId,
-        name: 'Golfer',
-        avatar: '',
-      },
-      golfCourse: h.golf_course ? {
-        id: h.golf_course.id,
-        name: h.golf_course.name,
-        country: h.golf_course.country,
-      } : undefined,
-    }));
-    openViewer(items, index);
-  }, [highlights, userId, openViewer]);
+    const posts: FeedPost[] = highlights.map((h) => {
+      const m = h.post_media?.[0];
+      const isVideo = m?.media_type === 'video';
+      return {
+        id: h.id,
+        userId,
+        actorType: 'personal',
+        actorId: userId,
+        username: author?.username ?? '',
+        displayName: author?.display_name ?? author?.username ?? '',
+        avatarUrl: author?.profile_photo_url ?? '',
+        isVerified: false,
+        creatorRelation: 'none',
+        caption: h.content ?? '',
+        mediaItems: [{
+          id: m?.id ?? h.id,
+          type: isVideo ? 'video' : 'image',
+          hlsUrl: isVideo ? (m?.media_url ?? undefined) : undefined,
+          imageUrl: !isVideo ? (m?.media_url ?? undefined) : undefined,
+          thumbnailUrl: m?.media_url ?? undefined,
+          width: 0,
+          height: 0,
+        }],
+        createdAt: h.created_at,
+        likeCount: 0,
+        commentCount: 0,
+        shareCount: 0,
+        review: null,
+        isReview: false,
+        isLikedByMe: false,
+        isFollowedByMe: false,
+        courseName: h.golf_course?.name,
+        courseId: h.golf_course?.id,
+      } as FeedPost;
+    });
+    useFullscreenFeedStore.getState().open(posts, index, { readOnly: true });
+  }, [highlights, userId, author]);
 
   if (isLoading) {
     return (
