@@ -26,11 +26,12 @@ import { useMediaAutoplay, type RegisterMediaFn } from '@/media';
 interface WatchAutoplayCtx {
   registerMedia: RegisterMediaFn;
   playingIds: Set<string>;
+  visibleIds: Set<string>;
 }
 
 const WatchAutoplayContext = createContext<WatchAutoplayCtx | null>(null);
 
-/** Tiles read their isPlaying flag + register callback from this context. */
+/** Tiles read their isPlaying / isVisibleCandidate flags + register callback from this context. */
 export const useWatchAutoplay = (): WatchAutoplayCtx | null =>
   useContext(WatchAutoplayContext);
 
@@ -39,7 +40,7 @@ interface WatchAutoplayProps {
 }
 
 const WatchAutoplay: React.FC<WatchAutoplayProps> = ({ children }) => {
-  const { registerMedia, playingIds } = useMediaAutoplay({
+  const { registerMedia, playingIds, visibleIds } = useMediaAutoplay({
     mode: 'grid',
     surface: 'watch',
     startThreshold: 0.5,
@@ -47,8 +48,8 @@ const WatchAutoplay: React.FC<WatchAutoplayProps> = ({ children }) => {
   });
 
   const value = useMemo(
-    () => ({ registerMedia, playingIds }),
-    [registerMedia, playingIds],
+    () => ({ registerMedia, playingIds, visibleIds }),
+    [registerMedia, playingIds, visibleIds],
   );
 
   return (
