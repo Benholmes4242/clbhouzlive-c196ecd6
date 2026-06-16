@@ -6,6 +6,7 @@ import { VideosFeedSkeleton } from '@/components/videos-tab/VideosFeedSkeleton';
 import WatchSectionHeader from './WatchSectionHeader';
 import AutoplayVideoCard from './videos/AutoplayVideoCard';
 import CarouselRow from './videos/CarouselRow';
+import { VideosMark } from './proshop/SectionMarks';
 
 /**
  * "Latest videos" — 1 full-width hero (autoplays when in view) +
