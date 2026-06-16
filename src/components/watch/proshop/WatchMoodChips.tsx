@@ -8,15 +8,17 @@ interface WatchMoodChipsProps {
 
 /**
  * Pro Shop primitive — the row of mood chips above the "Clips to explore" grid.
- * Light-surface styling: transparent background so the page #F8FAFC shows through,
- * ink-filled active pill, white inactive pills with subtle slate borders,
- * right-edge fade blending to #F8FAFC.
+ * Light-surface styling: #F8FAFC background, subtle outlined pills matching
+ * ClipsMoodChips / VideosMoodChips treatment, right-edge fade blending to #F8FAFC.
  */
 function WatchMoodChipsInner({ active, onChange }: WatchMoodChipsProps) {
   return (
     <div
       className="relative"
-      style={{ background: 'transparent' }}
+      style={{
+        background: '#F8FAFC',
+        borderBottom: '0.5px solid rgba(15,23,42,0.07)',
+      }}
     >
       <div
         role="tablist"
@@ -40,9 +42,9 @@ function WatchMoodChipsInner({ active, onChange }: WatchMoodChipsProps) {
                 fontSize: 12,
                 fontWeight: 600,
                 borderRadius: 15,
-                background: isActive ? '#0F172A' : '#FFFFFF',
-                border: isActive ? '1px solid #0F172A' : '1px solid rgba(15,23,42,0.12)',
-                color: isActive ? '#FFFFFF' : '#475569',
+                background: isActive ? 'rgba(15,23,42,0.06)' : 'transparent',
+                border: isActive ? '1px solid rgba(15,23,42,0.20)' : '1px solid rgba(15,23,42,0.07)',
+                color: isActive ? '#0F172A' : '#64748B',
                 letterSpacing: '-0.01em',
                 gap: 5,
               }}
