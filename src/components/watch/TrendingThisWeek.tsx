@@ -5,6 +5,7 @@ import { useViewedPostIds } from './hooks/useViewedPostIds';
 import WatchRailTile from './WatchRailTile';
 import WatchSectionHeader from './WatchSectionHeader';
 import { HRail } from './proshop/HRail';
+import { ClipsMark } from './proshop/SectionMarks';
 
 interface TrendingThisWeekProps {
   enabled?: boolean;
@@ -97,9 +98,12 @@ export default function TrendingThisWeek({ enabled = true }: TrendingThisWeekPro
   return (
     <div style={{ background: 'hsl(var(--background))' }}>
       <WatchSectionHeader
-        paddingTop={0}
+        paddingTop={34}
+        mark={<ClipsMark />}
+        eyebrow="Short & sweet"
+        kickerColor="amber"
         title="Quick clips"
-        sub="Under 90 seconds, on the green"
+        sub="Under 90 seconds, straight from the green"
         onSeeAll={() => navigate('/watch/clips')}
         seeAllLabel="More clips"
       />

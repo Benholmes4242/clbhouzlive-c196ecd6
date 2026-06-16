@@ -10,7 +10,7 @@ interface KickerProps {
 // curated content). amber kept available for explicit one-off editorial
 // moments — should be rare. light is for dark mastheads.
 const COLOR_MAP: Record<NonNullable<KickerProps['color']>, string> = {
-  amber: 'hsl(var(--primary))',  // available but no longer default
+  amber: '#c97a10',              // AA-compliant amber on white surfaces
   emerald: '#006747',
   slate: '#64748B',              // canonical neutral kicker
   light: 'rgba(255,255,255,0.55)', // light-on-dark eyebrow for dark mastheads

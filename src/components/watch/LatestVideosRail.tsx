@@ -6,6 +6,7 @@ import { VideosFeedSkeleton } from '@/components/videos-tab/VideosFeedSkeleton';
 import WatchSectionHeader from './WatchSectionHeader';
 import AutoplayVideoCard from './videos/AutoplayVideoCard';
 import CarouselRow from './videos/CarouselRow';
+import { VideosMark } from './proshop/SectionMarks';
 
 /**
  * "Latest videos" — 1 full-width hero (autoplays when in view) +
@@ -36,9 +37,12 @@ export default function LatestVideosRail() {
     return (
       <div>
         <WatchSectionHeader
-          paddingTop={16}
+          paddingTop={34}
+          mark={<VideosMark />}
+          eyebrow="Fresh from the tour"
+          kickerColor="amber"
           title="Latest videos"
-          sub="Tournament recaps, coaching, vlogs"
+          sub="Tournament recaps, coaching and vlogs"
           onSeeAll={() => navigate('/watch/videos')}
           seeAllLabel="More videos"
         />
@@ -54,9 +58,12 @@ export default function LatestVideosRail() {
     <div>
 
       <WatchSectionHeader
-        paddingTop={16}
+        paddingTop={34}
+        mark={<VideosMark />}
+        eyebrow="Fresh from the tour"
+        kickerColor="amber"
         title="Latest videos"
-        sub="Tournament recaps, coaching, vlogs"
+        sub="Tournament recaps, coaching and vlogs"
         onSeeAll={() => navigate('/watch/videos')}
         seeAllLabel="More videos"
       />
