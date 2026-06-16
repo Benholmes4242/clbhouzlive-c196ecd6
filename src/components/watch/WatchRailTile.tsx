@@ -285,7 +285,7 @@ export default function WatchRailTile({
 
   return (
     <div
-      ref={cardRef}
+      ref={wrapperRefCallback}
       style={{
         flexShrink: 0,
         position: 'relative',
