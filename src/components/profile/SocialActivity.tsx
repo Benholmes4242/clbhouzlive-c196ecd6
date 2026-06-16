@@ -70,7 +70,7 @@ const SocialActivity: React.FC<SocialActivityProps> = ({
       />
 
       {/* Grid layout for square posts - straight edge corners with thin border gutter */}
-      <div className="w-[100vw] relative left-[50%] right-[50%] ml-[-50vw] mr-[-50vw] md:w-full md:left-auto md:right-auto md:ml-0 md:mr-0 px-1 mt-4">
+      <div className="w-[100vw] relative left-[50%] right-[50%] ml-[-50vw] mr-[-50vw] px-1 mt-4">
         <div className="grid grid-cols-3 gap-[2px]">
           {posts.map((post, index) => {
             const isFirstVideo = index === 0 && post.post_media?.[0]?.media_type === 'video';

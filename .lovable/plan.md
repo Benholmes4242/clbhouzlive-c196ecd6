@@ -1,89 +1,54 @@
-# iPad Responsive Audit — Staged Plan
+# Hybrid Post Composer — replace Post Studio
 
-**Goal:** Make every surface render correctly on iPad Mini / Air / Pro (portrait + landscape) for App Store review, without touching a single byte of the existing phone layout.
+Per `hybrid-post-composer-build-brief.md`. One simple composer that forks Post vs Review at the top. POST path publishes via existing `usePostSubmission`. REVIEW path routes into the existing ReviewWizard (`/courses/:id/rate`) — no review-model changes.
 
-## Non-negotiable rules
+## Locked decisions (from brief)
+- No @mentions, no drafts, no scheduling, no success screen, no trim/poster.
+- Single course tag on a post (not multi).
+- Video allowed (existing Cloudflare Stream path), no editing UI.
+- Business actor: read-only "Posting as {name}" in header; Review toggle disabled for business.
+- Keep `usePostStudioStore` (open/close + entry params) and `usePostSubmission` (publish primitive).
 
-1. **Mobile is frozen.** Every change is gated on a tablet-only media query (`@media (min-width: 768px)`) or a Tailwind `md:` / `lg:` prefix. No edits to default classes, default styles, default props, or any rule that fires below 768px.
-2. **No redesigns.** Same components, same tokens, same flows — only scale, max-width, and layout-mode shifts at tablet sizes.
-3. **One shared breakpoint contract** (added once, used everywhere):
-   - `md` = 768px → iPad Mini portrait + iPad portrait
-   - `lg` = 1024px → iPad Air/Pro portrait, iPad Mini landscape
-   - `xl` = 1280px → iPad Pro 11/12.9 landscape
-4. **Letterbox bg:** `#F8FAFC` (light routes) / `#0d0d0d` (dark routes) — already the page tokens, so the column blends edge-to-edge.
-5. **Landscape:** wider centered column (per your answer) — single column, capped at ~720–820px.
+## Part 1 — Build new composer
+Create `src/components/post-composer/PostComposer.tsx` (~200 lines, sheet on mobile / modal on desktop). Local state only: `{ mode: 'post'|'review', caption, mediaFiles, taggedCourse, isPublishing }`.
 
-## Architecture: how "tablet-only" is enforced
+Layout:
+1. Header: X (left) · segmented `[ Post | Review ]` (center) · Post button (right, POST mode only, disabled until caption or media). Subline "Posting as {displayName}" with business name/avatar when business.
+2. POST body: autofocus caption textarea (max 2000, counter shown within 100 of cap); `＋ Tag a course` chip that opens a single-select course-search sheet (lift `golf_courses` query out of `CourseTagPanel`); `＋ Add photos` tile with horizontal thumbnails (× to remove); Post button calls `usePostSubmission.submitPost({...})` → toast → close → return to `returnPath`.
+3. REVIEW body: heading + sub copy + prominent course search; selecting a course → `navigate('/courses/${id}/rate')` + close composer.
 
-Rather than rewrite every component, we add **three primitives** + a CSS layer, then audit per surface:
+Create `src/components/post-composer/CourseSearchSheet.tsx` — reuses the existing `golf_courses` Supabase search from `CourseTagPanel` (lifted, single-select, no numbered pills). Shared by Post-mode tag chip and Review-mode search.
 
-1. **`PageRoot` tablet cap.** Already has `max-w-[480px] mx-auto`. We extend to:
-   - `md:max-w-[600px]` (portrait tablet)
-   - `lg:max-w-[680px]`
-   - `xl:max-w-[760px]` (landscape iPad Pro)
-   - Letterbox bg painted by a new outer wrapper using the route's resolved light/dark token.
-2. **Sheet/Modal tablet mode.** Bottom-sheet primitives (`AdminSheet` already does this; comments sheet, profile hub sheet, review wizard, post studio, etc.) get a shared `@media (min-width: 768px)` rule: centered modal, `max-width: 560px`, `max-height: 85dvh`, rounded all corners, no edge-snap. We add a single utility class `.tablet-modal` and apply it to every sheet root.
-3. **Fullscreen media viewers** (feed fullscreen, course media viewer, post studio preview): stay full-bleed but constrain controls/rails to `max-width: 720px md:` so buttons don't fly to screen edges.
+Extend `usePostSubmission.submitPost` to accept `actorType` / `actorId` (currently hardcodes `personal`/`user.id`) and to associate `courseInfo` with the inserted post. Keep media-upload pipeline intact.
 
-## Stages (each ships independently, each verified before next)
+## Part 2 — Switch entry points
+- `src/components/post-studio/GlobalPostStudio.tsx` → render `<PostComposer/>` instead of `<PostStudio/>` (keep same store wiring + `returnPath` close behavior).
+- Verify `GlobalBottomNavigation` (Share), `BusinessProfilePosts` (business actor), `CreatePostDialog` all open the new composer.
 
-### Stage T-0 — Foundations (this PR)
-- Extend `PageRoot` with tablet max-widths + letterbox wrapper (route-token aware).
-- Add `.tablet-modal` utility in `src/styles/theme-tokens.css`.
-- Add `useIsTablet()` hook (≥768px and pointer:coarse OR ≥768 width regardless) for components that need JS-level branching.
-- Update `tailwind.config` only if needed to confirm `md`/`lg`/`xl` breakpoints (they're standard Tailwind defaults — likely no change).
-- **Risk:** very low. All changes are additive at `md:+`.
+## Part 3 — Delete old studio (after Part 2 verified)
+Delete:
+- `src/components/post-studio/{PostStudio.tsx, usePostStudio.tsx, constants.ts, tokens.ts, types.ts, index.ts}`
+- `src/components/post-studio/screens/` (ComposeScreen, TrimScreen, PosterScreen, SuccessScreen)
+- `src/components/post-studio/panels/` (CourseTagPanel after lifting search, AudiencePanel, SchedulePanel, MentionPanel, DraftsPanel)
+- `src/components/post-studio/components/` (ActorSelector, VideoTrimmer, PosterPicker, MediaReel, MediaPreview, CharacterRing, MentionPill, PostTypeChip, ManageMediaSheet, ConfirmRemoveSheet, CinematicHero, StudioHeader)
+- `src/components/post-studio/hooks/useSaveDraft.ts`
+- `src/hooks/useDrafts.ts` only if no remaining callers (verify first; if `services/drafts/*` consumers exist, leave alone).
 
-### Stage T-1 — Global chrome
-- `GlobalHeader` + `TourHubShellTabs` + `CoursesShellTabs` + `BottomNavigation`: cap inner content to the same tablet widths; keep bar full-bleed.
-- Bottom nav: center the 5-tab cluster at `md:` with `max-width: 600px`.
-- Verify safe-area-top still works on iPad (no notch but status bar still 20px).
+Keep: `usePostStudioStore`, `usePostSubmission` + `PostSubmissionHandler`, entire review-wizard tree, `RateCoursePage`, `/rate` route, `GlobalPostStudio` mount (now rendering `PostComposer`).
 
-### Stage T-2 — Feed surfaces
-- Clubhouse feed (`FullscreenFeed` + tiles): tablet column at 600/680/760 — virtualization already supports a constrained width, just cap the rail.
-- Discover (Watch / Friends / Explore): tablet column.
-- Course Media tab grid: shift from 3-col to 4-col at `md`, 5-col at `lg` (already responsive via `getResponsiveCols`; verify breakpoints align).
+Move `GlobalPostStudio.tsx` into `post-composer/` (rename file but keep store name to avoid churn at the 3 call sites).
 
-### Stage T-3 — Tour Hub
-- Overview, Schedule, Players, Leaderboards, Live, Player Profile, Tournament Detail, College: each shell already routes through `TourHubShell` → `PageRoot`, so T-0 cap covers them. Per-tab verification + fixes for any hard-coded `w-screen` / `100vw` rules.
+## Part 4 — Drafts/schedule data (separate)
+Composer never writes `drafts` or `scheduled_at`. Do not delete any `post_drafts` rows or scheduled-post cron. Audit for active crons that publish scheduled posts and flag them in a follow-up — no schema changes required for this work.
 
-### Stage T-4 — Courses
-- Courses index, course detail (all tabs: Overview, Holes, Reviews, Media, History, Top 100 Journey), course hub map modal (uses full-bleed override — verify still works on iPad).
+## Verification
+- `tsc --noEmit` clean.
+- `rg "post-studio"` after Part 3: zero hits (composer folder only).
+- `rg "useSaveDraft|SchedulePanel|TrimScreen|PosterScreen|MentionPanel"`: zero.
+- Device walk: Share → Post mode → caption + media + course tag → publish → toast + feed. Toggle Review → search course → routes to `/courses/:id/rate` → wizard owns the rest. Business profile → "Posting as {biz}", Review toggle disabled.
 
-### Stage T-5 — Profile & social
-- Profile pages (own + viewing), Edit Profile wizard, Top Ten curation, Profile Hub Sheet, Caddie Bag, Course History, follower/following lists, Suggested Creators.
-
-### Stage T-6 — Modals, sheets, overlays
-- Apply `.tablet-modal` to every sheet root: Comments Sheet, Profile Hub Sheet, Review Wizard, Post Studio, Echo, Messaging (DMs), Media Viewer overlays, Notifications, Settings sheets, Auth login sheet, Dispatch bottom sheets.
-
-### Stage T-7 — Forms, onboarding, auth, account
-- Auth (login/signup), Profile Onboarding Wizard (100-pt), Settings index + sub-pages, Account, Admin v2 (already tablet-aware per AdminSheet), Business Profile edit wizard, Review Wizard.
-
-### Stage T-8 — Specialized fullscreen
-- Fullscreen feed / fullscreen media viewer / post studio media preview: keep full-bleed, cap controls + engagement rail to `md:max-w-[720px] mx-auto`.
-- Pinch-to-zoom: verify still works (no regression to Pinch authority memory).
-
-### Stage T-9 — Landscape pass
-- Verify every page at 1024×768, 1180×820, 1366×1024 landscape: single column at ~760–820px, balanced negative space, header/nav not stretched, no tile clipping.
-
-### Stage T-10 — App Store review checklist
-- Tap target audit (≥44×44) at tablet sizes.
-- No horizontal scroll bleed.
-- No `100vw` usage that breaks at tablet widths (grep + fix on a per-case basis with `md:max-w-*`).
-- iPad-specific screenshots at every required size for App Store.
-
-## Per-stage verification
-
-Each stage ends with: `npm run build` clean + screenshot at 768×1024, 1024×1366, 1366×1024 of every changed surface. No mobile (≤480w) screenshot should diff.
-
-## What I'll NOT do without further sign-off
-
-- Will not convert any single-column surface into a multi-pane "iPad split view" layout (e.g. messaging master/detail) — that's a redesign, not a port.
-- Will not adjust font sizes globally — text scales are already legible; only spacing/widths shift.
-- Will not touch any mobile breakpoint, mobile prop default, or anything below `md:`.
-
-## Deliverable cadence
-
-I'll ship **Stage T-0 + T-1 in the next message** (foundations + global chrome — the highest-leverage, lowest-risk slice that immediately makes the app look correct on iPad). Then we review screenshots together and you green-light T-2 onward stage-by-stage.
-
-Tell me to proceed and I'll start T-0/T-1.
+## Technical notes
+- `usePostSubmission` will gain optional `actorType` (default `'personal'`) and `actorId` (default `user.id`) and write them on the `posts` insert. `courseInfo.id` will be written as `posts.course_id` (matches existing schema used by `createPost`).
+- Course search lifted out of `CourseTagPanel` is the only piece preserved from the old `panels/`. Lift before deleting the file.
+- The composer renders as a `Sheet` (bottom on mobile) / centered `Dialog` (desktop) using existing shadcn primitives + design tokens (no custom color classes).
+- No new dependencies.

@@ -64,16 +64,12 @@ export const PageRoot = React.forwardRef<HTMLDivElement, PageRootProps>(
       <div
         ref={ref}
         className={cn(
-          // Mobile: w-full + max-w-[480px] (UNCHANGED).
-          // Tablet+: widen the centered column so iPad/landscape don't render a stretched phone.
-          // md = iPad portrait, lg = iPad Air/Pro portrait, xl = iPad Pro landscape.
-          `page-root w-full max-w-[480px] md:max-w-[600px] lg:max-w-[680px] xl:max-w-[760px] mx-auto flex flex-col ${immersiveStatusBar ? 'bg-black' : 'bg-[var(--bg-page)]'}`,
+          `page-root w-full max-w-[480px] mx-auto flex flex-col ${immersiveStatusBar ? 'bg-black' : 'bg-[var(--bg-page)]'}`,
           dark === true && 'hcp-dark',
           !fixedHeight && "min-h-[100vh]",
           fixedHeight && "h-[100dvh] overflow-hidden",
           className
         )}
-
         style={{
           ...style,
           ...(bottomPadding ? { paddingBottom: bottomPadding } : {}),

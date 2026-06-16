@@ -44,12 +44,9 @@ const DrawerContent = React.forwardRef<
     <DrawerPrimitive.Content
       ref={ref}
       className={cn(
-        // Mobile: full-width bottom drawer (UNCHANGED).
-        // Tablet (md+): cap width and round all corners so iPad gets a centered panel feel.
-        "fixed inset-x-0 bottom-0 z-[10002] mt-24 flex h-auto flex-col rounded-t-2xl data-[state=closed]:pointer-events-none md:inset-x-auto md:left-1/2 md:-translate-x-1/2 md:w-full md:max-w-[600px] md:rounded-2xl",
+        "fixed inset-x-0 bottom-0 z-[10002] mt-24 flex h-auto flex-col rounded-t-2xl data-[state=closed]:pointer-events-none",
         className
       )}
-
       style={{
         background: 'var(--cm-surface-card)',
         paddingBottom: 'env(safe-area-inset-bottom, 16px)',
