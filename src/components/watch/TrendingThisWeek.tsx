@@ -5,6 +5,7 @@ import { useViewedPostIds } from './hooks/useViewedPostIds';
 import WatchRailTile from './WatchRailTile';
 import WatchSectionHeader from './WatchSectionHeader';
 import { HRail } from './proshop/HRail';
+import { ClipsMark } from './proshop/SectionMarks';
 
 interface TrendingThisWeekProps {
   enabled?: boolean;
