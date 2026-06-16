@@ -735,11 +735,13 @@ html.lightbox-open {
   margin-right: auto;
 }
 
-/* iPad portrait and up — release the phone-width cap so the app
-   fills the canvas. iPhone (<768px) keeps the 480px column untouched. */
+/* iPad portrait and up — release the phone-width cap entirely so the app
+   fills the canvas edge-to-edge (native iPad feel). Individual surfaces
+   (Clubhouse card column, Auth panel) keep their own inner max-widths and
+   centering. iPhone (<768px) keeps the 480px column untouched. */
 @media (min-width: 768px) {
   .app-shell {
-    max-width: 820px;
+    max-width: none;
   }
 }
 
