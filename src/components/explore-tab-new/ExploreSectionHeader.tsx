@@ -1,4 +1,4 @@
-import { memo } from 'react';
+import { memo, type ReactNode } from 'react';
 import { ChevronRight, type LucideIcon } from 'lucide-react';
 import { AMBER, INK, INK_MUTE } from '@/features/courses/_shared/tokens';
 
@@ -13,6 +13,8 @@ interface ExploreSectionHeaderProps {
   icon?: LucideIcon;
   /** Mark tile tone — defaults to amber. Use 'ink' for "serious data / browse-everything" sections. */
   iconTone?: 'amber' | 'ink';
+  /** Optional bespoke mark node — overrides the generic icon tile when provided. */
+  mark?: ReactNode;
   /** Optional second-line subhead. */
   sub?: string;
   /** Optional right-side action affordance ("See all", etc.). */
@@ -44,6 +46,7 @@ function ExploreSectionHeaderInner({
   title,
   icon: Icon,
   iconTone = 'amber',
+  mark,
   sub,
   action,
   paddingTop = 32,
