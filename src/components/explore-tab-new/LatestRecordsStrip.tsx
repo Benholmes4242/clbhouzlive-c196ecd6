@@ -73,7 +73,7 @@ export function LatestRecordsStrip(_: Props = {}) {
       <section style={{ padding: '0 0 0', fontFamily: FONT }}>
         <ExploreSectionHeader
           icon={Crown}
-          title="Latest course records"
+          title="Latest records"
           sub="Champions · official WHS data"
         />
         <div className="flex gap-3 px-4 overflow-x-auto scrollbar-hide" style={{ paddingBottom: 4 }}>
@@ -102,7 +102,7 @@ export function LatestRecordsStrip(_: Props = {}) {
     <section style={{ padding: '0 0 0', fontFamily: FONT }}>
       <ExploreSectionHeader
         icon={Crown}
-        title="Latest course records"
+        title="Latest records"
         sub="Champions · official WHS data"
       />
       <div className="flex gap-3 px-4 overflow-x-auto scrollbar-hide" style={{ paddingBottom: 4 }}>

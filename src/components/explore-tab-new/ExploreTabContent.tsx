@@ -67,7 +67,7 @@ export default function ExploreTabContent({ embedded: _embedded = false }: Explo
       <ExploreEchoCTA mood={mood} />
       <ExploreDestinations activeRegion={activeRegion} onRegionSelect={handleRegionChange} />
 
-      <ExploreSectionHeader title="More to explore" icon={LayoutGrid} sub="The full course feed" />
+      <ExploreSectionHeader title="More to explore" icon={LayoutGrid} iconTone="ink" sub="The full course feed" />
 
       <ExploreGrid
         posts={posts}
