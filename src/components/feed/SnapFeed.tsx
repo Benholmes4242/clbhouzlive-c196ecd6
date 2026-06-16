@@ -139,7 +139,7 @@ export function SnapFeed({
   const trackerUserId = session?.user?.id;
   const getTrackerContainer = useCallback(() => containerRef.current, []);
   useWatchProgressTracker({
-    userId: trackerUserId,
+    userId: readOnly ? undefined : trackerUserId,
     activeIndex,
     posts,
     getContainer: getTrackerContainer,

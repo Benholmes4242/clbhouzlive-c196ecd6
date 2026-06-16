@@ -177,6 +177,7 @@ export function FullscreenFeedOverlay() {
                   activeIndexOverride={activeIndex}
                   isFullscreen
                   surface="fullscreen"
+                  readOnly={readOnly}
                 />
 
                 <FeedOverlayLayer
@@ -216,20 +217,22 @@ export function FullscreenFeedOverlay() {
         )}
       </AnimatePresence>
 
-      <CommentsSheet
-        isOpen={commentsOpen}
-        onClose={closeComments}
-        postId={activePost?.id ?? ""}
-        currentUserId={userId}
-        creatorUserId={activePost?.userId}
-        creatorActorType={activePost?.actorType === 'business' ? 'business' : 'personal'}
-        creatorActorId={activePost?.actorId}
-        creatorName={activePost?.displayName}
-        creatorAvatar={activePost?.avatarUrl}
-        caption={activePost?.caption}
-        theme="dark"
-        likesCount={getActiveLikeState(activePost!)?.count ?? null}
-      />
+      {!readOnly && (
+        <CommentsSheet
+          isOpen={commentsOpen}
+          onClose={closeComments}
+          postId={activePost?.id ?? ""}
+          currentUserId={userId}
+          creatorUserId={activePost?.userId}
+          creatorActorType={activePost?.actorType === 'business' ? 'business' : 'personal'}
+          creatorActorId={activePost?.actorId}
+          creatorName={activePost?.displayName}
+          creatorAvatar={activePost?.avatarUrl}
+          caption={activePost?.caption}
+          theme="dark"
+          likesCount={getActiveLikeState(activePost!)?.count ?? null}
+        />
+      )}
 
       {/* ReviewBottomSheet now renders via root-level ReviewBottomSheetPortal */}
     </>
