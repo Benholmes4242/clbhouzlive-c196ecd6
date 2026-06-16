@@ -102,7 +102,7 @@ const MAX_CONCURRENT_PER_SURFACE: Record<MediaSurface, number> = {
   'fullscreen': 1,     // Only 1 fullscreen
   'clubhouse': 1,      // Only 1 clubhouse (fullscreen feed)
   'videos': 1,         // Only 1 videos page video (YouTube-style long-form)
-  'watch': 4,          // Allow 4 visible watch grid videos to play
+  'watch': 1,          // Single spotlight — one Watch video plays at a time (was 4)
   
   'profile': 4,        // Allow 4 visible profile activity videos to play
   'explore-grid': 1,   // Explore discover grid - 1 video at a time in dense 2-column layout
