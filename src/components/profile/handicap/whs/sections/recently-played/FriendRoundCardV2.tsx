@@ -378,11 +378,13 @@ export const FriendRoundCardV2: React.FC<Props> = ({
                   : '—'}
               </span>
             </div>
-            <ChevronRight
-              size={16}
-              strokeWidth={2.2}
-              style={{ color: 'var(--hcp-t-40)', marginLeft: 'auto', flexShrink: 0 }}
-            />
+            {hasScorecard && (
+              <ChevronRight
+                size={16}
+                strokeWidth={2.2}
+                style={{ color: 'var(--hcp-t-40)', marginLeft: 'auto', flexShrink: 0 }}
+              />
+            )}
           </div>
         ) : (
           <div
