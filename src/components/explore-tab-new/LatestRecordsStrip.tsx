@@ -1,5 +1,6 @@
 import { useNavigate } from 'react-router-dom';
 import { Crown } from 'lucide-react';
+import { RecordsMark } from './DiscoverMarks';
 import {
   useRecentCourseRecords,
   type RecentCourseRecord,
@@ -72,7 +73,7 @@ export function LatestRecordsStrip(_: Props = {}) {
     return (
       <section style={{ padding: '0 0 0', fontFamily: FONT }}>
         <ExploreSectionHeader
-          icon={Crown}
+          mark={<RecordsMark />}
           title="Latest records"
           sub="Champions · official WHS data"
         />
@@ -101,7 +102,7 @@ export function LatestRecordsStrip(_: Props = {}) {
   return (
     <section style={{ padding: '0 0 0', fontFamily: FONT }}>
       <ExploreSectionHeader
-        icon={Crown}
+        mark={<RecordsMark />}
         title="Latest records"
         sub="Champions · official WHS data"
       />
