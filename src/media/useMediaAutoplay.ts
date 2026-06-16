@@ -396,6 +396,7 @@ export function useMediaAutoplay(options: UseMediaAutoplayOptions = {}) {
       (entries) => {
         if (isPanelAnimatingRef.current) return;
         
+        let visibleSetChanged = false;
         entries.forEach((entry) => {
           const target = entry.target as HTMLElement;
           const id = target.dataset.mediaAutoplayId;
@@ -413,10 +414,16 @@ export function useMediaAutoplay(options: UseMediaAutoplayOptions = {}) {
           let nextVisible = wasVisible;
           
           if (ratio >= effectiveStartThreshold) {
-            visibleIdsRef.current.add(id);
+            if (!wasVisible) {
+              visibleIdsRef.current.add(id);
+              visibleSetChanged = true;
+            }
             nextVisible = true;
           } else if (ratio <= effectiveStopThreshold) {
-            visibleIdsRef.current.delete(id);
+            if (wasVisible) {
+              visibleIdsRef.current.delete(id);
+              visibleSetChanged = true;
+            }
             nextVisible = false;
           }
           
@@ -427,6 +434,9 @@ export function useMediaAutoplay(options: UseMediaAutoplayOptions = {}) {
           });
         });
         
+        if (visibleSetChanged) {
+          setVisibleIdsState(new Set(visibleIdsRef.current));
+        }
         syncPlayingRef.current();
       },
       {
@@ -447,11 +457,13 @@ export function useMediaAutoplay(options: UseMediaAutoplayOptions = {}) {
       playObserver.current?.disconnect();
       playObserver.current = null;
       visibleIdsRef.current.clear();
+      setVisibleIdsState(new Set());
     };
   }, [effectiveStartThreshold, effectiveStopThreshold]);
   
   return {
     registerMedia,
     playingIds,
+    visibleIds,
   };
 }
