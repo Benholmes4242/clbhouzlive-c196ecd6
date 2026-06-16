@@ -306,7 +306,7 @@ const ClubhouseContent = () => {
     <PageRoot 
       immersiveStatusBar
       ref={clubhouseRootRef} 
-      className="clubhouse-root" 
+      className="clubhouse-root md:!max-w-none" 
       fixedHeight
       hasBottomNav={false}
       style={{ 
