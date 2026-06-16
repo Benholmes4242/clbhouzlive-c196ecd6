@@ -67,6 +67,7 @@ export default function WatchRailTile({
   viewedPostIds,
   registerMedia,
   playingIds,
+  visibleIds,
 }: WatchRailTileProps) {
   const cardRef = useRef<HTMLDivElement>(null);
   const videoRef = useRef<HTMLVideoElement | null>(null);
@@ -84,6 +85,7 @@ export default function WatchRailTile({
   const runtimeMode = !!registerMedia;
   const mediaId = `watch-rail-${post.id}`;
   const isRuntimePlaying = runtimeMode ? (playingIds?.has(mediaId) ?? false) : false;
+  const isVisibleCandidate = runtimeMode ? (visibleIds?.has(mediaId) ?? false) : false;
 
   // ── Wrapper ref OWNS register/unregister lifecycle (runtime mode). ──
   // React attaches child refs before parent refs; an inner-only
