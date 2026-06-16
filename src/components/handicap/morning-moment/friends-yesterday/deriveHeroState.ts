@@ -1,17 +1,19 @@
 import type { FriendYesterday } from '@/lib/handicap/useFriendsYesterday';
 
-export type HeroState = 'enriched' | 'syncing' | 'invite' | 'nudge';
+export type HeroState = 'enriched' | 'summary' | 'invite' | 'nudge';
 
-const hasBreakdown = (f: FriendYesterday): boolean =>
-  f.eagle_plus !== null || f.birdie !== null || f.par_count !== null;
-
+/**
+ * Mirrors the Friends' Rounds card State A/B/C/D logic:
+ * - D: not a Clbhouz user → invite
+ * - C: Clbhouz user, not synced → nudge (ask to sync)
+ * - A: synced + has stableford & differential → enriched stats
+ * - B: synced summary-only → clean gross only (no "Syncing…")
+ */
 export function deriveHeroState(data: FriendYesterday): HeroState {
-  const enriched =
-    data.stableford !== null && data.differential !== null && hasBreakdown(data);
-  if (enriched) return 'enriched';
   if (!data.is_clbhouz_user) return 'invite';
-  if (data.user_id && data.friend_connection_id) return 'syncing';
-  return 'nudge';
+  if (!data.friend_connection_id) return 'nudge';
+  if (data.stableford !== null && data.differential !== null) return 'enriched';
+  return 'summary';
 }
 
 export const firstNameOf = (name: string): string =>
