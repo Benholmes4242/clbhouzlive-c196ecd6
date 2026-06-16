@@ -140,15 +140,15 @@ const GlobalBottomNavigation: React.FC<GlobalBottomNavigationProps> = ({ chromeS
       const current = localStorage.getItem('CLBHOUZ_VIDEO_DEBUG') === 'true';
       localStorage.setItem('CLBHOUZ_VIDEO_DEBUG', current ? 'false' : 'true');
       window.dispatchEvent(new CustomEvent('clbhouz-debug-toggle'));
+    } else if (
+      tab.id === 'clubhouse' &&
+      (location.pathname === '/' || location.pathname === '/clubhouse')
+    ) {
+      // Already on Clubhouse — CardFeed listens for this event and scrolls Virtuoso to top.
+      window.dispatchEvent(new CustomEvent('clbhouz-active-tab-retap', { detail: { tabId: 'clubhouse' } }));
     } else if (tab.path && location.pathname === tab.path) {
       // Already on this tab's route — return to top.
-      if (tab.id === 'clubhouse') {
-        // Clubhouse scrolls an inner snap container, not the window.
-        document.querySelector('[data-snap-feed]')
-          ?.scrollTo({ top: 0, behavior: 'smooth' });
-      } else {
-        window.scrollTo({ top: 0, behavior: 'smooth' });
-      }
+      window.scrollTo({ top: 0, behavior: 'smooth' });
       // Let pages with sub-tabs also reset themselves.
       window.dispatchEvent(new CustomEvent('clbhouz-active-tab-retap', { detail: { tabId: tab.id } }));
     } else {
