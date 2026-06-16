@@ -1,5 +1,6 @@
 import { useNavigate } from 'react-router-dom';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
+import { useMediaAutoplay } from '@/media';
 import { useWatchFeed } from './hooks/useWatchFeed';
 import { useViewedPostIds } from './hooks/useViewedPostIds';
 import WatchRailTile from './WatchRailTile';
@@ -21,6 +22,16 @@ export default function TrendingThisWeek({ enabled = true }: TrendingThisWeekPro
     enabled: !!userId && enabled,
   });
   const { data: viewedPostIds } = useViewedPostIds();
+
+  // Phase WatchSpotlight-C: Quick Clips registers tiles against the global
+  // 'watch' surface (cap=1). The runtime's IO ratio picks the most-visible
+  // (i.e. centered) card in the horizontal shelf; it loops while the winner.
+  const { registerMedia, playingIds } = useMediaAutoplay({
+    mode: 'grid',
+    surface: 'watch',
+    startThreshold: 0.5,
+    stopThreshold: 0.25,
+  });
 
   const topPosts = [...posts].sort((a, b) => b.likeCount - a.likeCount).slice(0, 5);
 
@@ -108,7 +119,15 @@ export default function TrendingThisWeek({ enabled = true }: TrendingThisWeekPro
       <HRail paddingBottom={4}>
         {topPosts.map((post, i) => (
           <div key={post.id} style={{ scrollSnapAlign: 'start' }}>
-            <WatchRailTile post={post} index={i} allPosts={topPosts} rank={i + 1} viewedPostIds={viewedPostIds} />
+            <WatchRailTile
+              post={post}
+              index={i}
+              allPosts={topPosts}
+              rank={i + 1}
+              viewedPostIds={viewedPostIds}
+              registerMedia={registerMedia}
+              playingIds={playingIds}
+            />
           </div>
         ))}
       </HRail>

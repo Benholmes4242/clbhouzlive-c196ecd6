@@ -2,15 +2,27 @@ import { useEffect, useRef, useState } from 'react';
 import type { FeedPost } from '@/components/media-system/types/media';
 import AutoplayVideoCard from './AutoplayVideoCard';
 import { prefetchTile } from '@/hooks/useTileVideoPlayer';
+import { MediaRuntime } from '@/media/runtime';
+import type { RegisterMediaFn } from '@/media';
 
 interface CarouselRowProps {
   items: FeedPost[];
   allPosts: FeedPost[];
   baseIndex: number; // index offset into allPosts for tap → fullscreen
   userId?: string;
+  /** Phase WatchSpotlight-C: runtime-managed spotlight. */
+  registerMedia: RegisterMediaFn;
+  playingIds: Set<string>;
 }
 
-export default function CarouselRow({ items, allPosts, baseIndex, userId }: CarouselRowProps) {
+export default function CarouselRow({
+  items,
+  allPosts,
+  baseIndex,
+  userId,
+  registerMedia,
+  playingIds,
+}: CarouselRowProps) {
   const scrollerRef = useRef<HTMLDivElement>(null);
   const cardRefs = useRef<Array<HTMLDivElement | null>>([]);
   const [activeIndex, setActiveIndex] = useState(0);
@@ -86,6 +98,23 @@ export default function CarouselRow({ items, allPosts, baseIndex, userId }: Caro
     if (url) prefetchTile(url);
   }, [activeIndex, items]);
 
+  // Phase WatchSpotlight-C: drive runtime candidacy from the debounced
+  // centered index + row inView. All tiles in the row have ~equal vertical
+  // visibility, so ratio-based IO would tie; we override with explicit
+  // setCandidateState so the centered card always wins the spotlight.
+  // The runtime's global 'watch' cap of 1 then enforces single playback
+  // across the entire page (grid + rails compete).
+  useEffect(() => {
+    items.forEach((post, i) => {
+      const id = `watch-rail-${post.id}`;
+      const isCentered = inView && i === activeIndex;
+      MediaRuntime.setCandidateState(id, {
+        visible: isCentered,
+        ratio: isCentered ? 1 : 0,
+      });
+    });
+  }, [activeIndex, inView, items]);
+
   if (items.length === 0) return null;
 
   return (
@@ -105,21 +134,27 @@ export default function CarouselRow({ items, allPosts, baseIndex, userId }: Caro
         }}
         className="hide-scrollbar"
       >
-        {items.map((post, i) => (
-          <div
-            key={post.id}
-            ref={(el) => { cardRefs.current[i] = el; }}
-            style={{ flex: '0 0 72%', scrollSnapAlign: 'center' }}
-          >
-            <AutoplayVideoCard
-              post={post}
-              index={baseIndex + i}
-              allPosts={allPosts}
-              userId={userId}
-              active={inView && i === activeIndex}
-            />
-          </div>
-        ))}
+        {items.map((post, i) => {
+          const mediaId = `watch-rail-${post.id}`;
+          return (
+            <div
+              key={post.id}
+              ref={(el) => { cardRefs.current[i] = el; }}
+              style={{ flex: '0 0 72%', scrollSnapAlign: 'center' }}
+            >
+              <AutoplayVideoCard
+                post={post}
+                index={baseIndex + i}
+                allPosts={allPosts}
+                userId={userId}
+                mediaId={mediaId}
+                registerMedia={registerMedia}
+                isPlaying={playingIds.has(mediaId)}
+                sortIndex={baseIndex + i}
+              />
+            </div>
+          );
+        })}
       </div>
     </div>
   );
