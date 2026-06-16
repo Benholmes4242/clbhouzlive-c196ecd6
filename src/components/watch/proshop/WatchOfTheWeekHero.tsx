@@ -140,15 +140,17 @@ function WatchOfTheWeekHeroInner() {
     [mediaId, hlsUrl],
   );
 
-  // Attach HLS when runtime picks us; demote-to-pool on the way out.
+  // Attach HLS when this tile is a visible candidate (lazy attach breaks
+  // the no_src ↔ isPlaying deadlock). Runtime owns play via safePlay.
   useEffect(() => {
     const v = videoElRef.current;
-    if (!v || !isPlaying || !hlsUrl) return;
+    if (!v || !hlsUrl) return;
+    if (!isVisibleCandidate && !isPlaying) return;
     let cancelled = false;
     const onReady = () => {
       if (cancelled) return;
       setVideoVisible(true);
-      v.play().catch(() => {});
+      MediaRuntime.nudge();
     };
     attachHlsToTile({ hlsUrl, video: v, onReady })
       .then((hls) => {
@@ -177,9 +179,8 @@ function WatchOfTheWeekHeroInner() {
         }
         hlsRef.current = null;
       }
-      try { v.pause(); } catch {}
     };
-  }, [isPlaying, hlsUrl]);
+  }, [isVisibleCandidate, isPlaying, hlsUrl]);
 
   if (isLoading || !effectivePick) return null;
 
