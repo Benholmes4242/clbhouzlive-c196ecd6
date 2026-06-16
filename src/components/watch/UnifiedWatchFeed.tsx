@@ -54,11 +54,11 @@ export default function UnifiedWatchFeed({ embedded = false }: UnifiedWatchFeedP
       {/* ── Pro Shop: Watch of the Week editorial hero ── */}
       <WatchOfTheWeekHero />
 
-      {/* ── Latest videos — full-width YouTube-style stack ── */}
-      <LatestVideosRail />
-
       {/* ── Quick clips — portrait shelf ── */}
       <TrendingThisWeek />
+
+      {/* ── Latest videos — full-width YouTube-style stack ── */}
+      <LatestVideosRail />
 
       {/* ── From your courses — single course-anchored rail ── */}
       <CourseAnchoredRail />
