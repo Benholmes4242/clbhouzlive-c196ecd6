@@ -5,6 +5,7 @@ import { useFullscreenFeedStore } from '@/store/fullscreenFeedStore';
 import { haptic } from '@/utils/haptics';
 import { attachHlsToTile } from '@/hooks/useTileVideoPlayer';
 import { HLSPoolManager } from '@/media/HLSPoolManager';
+import { MediaRuntime } from '@/media/runtime';
 import { Pin } from './proshop/Pin';
 import { LONG_PRESS_MS, TOUCHMOVE_CANCEL_PX } from './constants';
 import { useWatchAutoplay } from './WatchAutoplay';
