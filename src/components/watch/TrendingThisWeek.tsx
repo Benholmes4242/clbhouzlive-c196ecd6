@@ -127,6 +127,7 @@ export default function TrendingThisWeek({ enabled = true }: TrendingThisWeekPro
               viewedPostIds={viewedPostIds}
               registerMedia={registerMedia}
               playingIds={playingIds}
+              visibleIds={visibleIds}
             />
           </div>
         ))}
