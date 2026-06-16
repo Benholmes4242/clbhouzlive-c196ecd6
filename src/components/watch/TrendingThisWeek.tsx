@@ -23,6 +23,16 @@ export default function TrendingThisWeek({ enabled = true }: TrendingThisWeekPro
   });
   const { data: viewedPostIds } = useViewedPostIds();
 
+  // Phase WatchSpotlight-C: Quick Clips registers tiles against the global
+  // 'watch' surface (cap=1). The runtime's IO ratio picks the most-visible
+  // (i.e. centered) card in the horizontal shelf; it loops while the winner.
+  const { registerMedia, playingIds } = useMediaAutoplay({
+    mode: 'grid',
+    surface: 'watch',
+    startThreshold: 0.5,
+    stopThreshold: 0.25,
+  });
+
   const topPosts = [...posts].sort((a, b) => b.likeCount - a.likeCount).slice(0, 5);
 
   // ── Loading skeleton ──
