@@ -1,5 +1,5 @@
 import { useCallback, useRef, useMemo } from 'react';
-import { LayoutGrid } from 'lucide-react';
+
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useExploreFeed } from './hooks/useExploreFeed';
 import { useExploreMood } from './hooks/useExploreMood';
@@ -15,7 +15,7 @@ import { LatestRecordsStrip } from './LatestRecordsStrip';
 
 import ExploreGrid from './ExploreGrid';
 import ExploreAutoplay from './ExploreAutoplay';
-import { ExploreSectionHeader } from './ExploreSectionHeader';
+
 import { SLATE_50 } from '@/features/courses/_shared/tokens';
 
 interface ExploreTabContentProps {
@@ -67,7 +67,7 @@ export default function ExploreTabContent({ embedded: _embedded = false }: Explo
       <ExploreEchoCTA mood={mood} />
       <ExploreDestinations activeRegion={activeRegion} onRegionSelect={handleRegionChange} />
 
-      <ExploreSectionHeader title="More to explore" icon={LayoutGrid} iconTone="ink" sub="The full course feed" />
+      
 
       <ExploreGrid
         posts={posts}
