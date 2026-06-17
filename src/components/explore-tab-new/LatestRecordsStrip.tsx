@@ -1,5 +1,5 @@
 import { useNavigate } from 'react-router-dom';
-import { Crown } from 'lucide-react';
+import { Trophy } from 'lucide-react';
 import { RecordsMark } from './DiscoverMarks';
 import {
   useRecentCourseRecords,

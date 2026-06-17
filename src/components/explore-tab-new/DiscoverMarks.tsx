@@ -1,4 +1,5 @@
 import { memo } from 'react';
+import { Trophy } from 'lucide-react';
 
 const AMBER = '#F7931E';
 const AMBER_SHADOW = '0 4px 10px -2px rgba(247,147,30,0.40)';
