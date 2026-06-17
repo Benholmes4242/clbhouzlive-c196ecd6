@@ -12,6 +12,7 @@ import { ExploreDestinations } from './ExploreDestinations';
 import { WhereYoudRank } from './WhereYoudRank';
 import { ToughestCoursesStrip } from './ToughestCoursesStrip';
 import { LatestRecordsStrip } from './LatestRecordsStrip';
+import { CircleActivityStrip } from './CircleActivityStrip';
 
 import ExploreGrid from './ExploreGrid';
 import ExploreAutoplay from './ExploreAutoplay';
