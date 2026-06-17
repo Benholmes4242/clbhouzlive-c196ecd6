@@ -201,9 +201,9 @@ export const RoundDetailSheet: React.FC<Props> = ({
         />
         <DrawerPrimitive.Content
           aria-labelledby="round-detail-sheet-title"
-          className="hcp-dark fixed inset-x-0 bottom-0 z-[10002] flex flex-col rounded-t-[20px] outline-none"
+          className={`${isLight ? 'hcp-light' : 'hcp-dark'} fixed inset-x-0 bottom-0 z-[10002] flex flex-col rounded-t-[20px] outline-none`}
           style={{
-            background: PAGE_BG,
+            background: pageBg,
             height: '75dvh',
             minHeight: 0,
             overflow: 'hidden',
@@ -218,7 +218,7 @@ export const RoundDetailSheet: React.FC<Props> = ({
               minHeight: 0,
               overflowY: 'auto',
               WebkitOverflowScrolling: 'touch',
-              background: PAGE_BG,
+              background: pageBg,
             }}
           >
             <div
