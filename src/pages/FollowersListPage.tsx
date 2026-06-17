@@ -59,7 +59,7 @@ const FollowersListPage = () => {
 
   if (profileLoading) {
     return (
-      <div className="min-h-screen bg-background">
+      <div className="min-h-screen bg-background md:max-w-[620px] md:mx-auto">
         <div
           className="sticky top-0 bg-background border-b border-border px-4 pb-3 pt-2"
           style={{ paddingTop: 'max(env(safe-area-inset-top, 0px), 47px)' }}

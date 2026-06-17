@@ -13,7 +13,7 @@ const MapPage: React.FC = () => {
   const [scope, setScope] = useState<Top100MapScope>('global');
 
   return (
-    <div className="h-[100dvh] w-full overflow-hidden">
+    <div className="h-[100dvh] w-full overflow-hidden md:max-w-[620px] md:mx-auto">
       <Top100MapView
         scope={scope}
         onScopeChange={setScope}
