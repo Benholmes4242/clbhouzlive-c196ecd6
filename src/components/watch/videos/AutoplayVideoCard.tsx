@@ -7,9 +7,7 @@ import { useFullscreenFeedStore } from '@/store/fullscreenFeedStore';
 import type { FeedPost } from '@/components/media-system/types/media';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { VideoCardMenu } from '@/components/videos-tab/VideoCardMenu';
-import { useWatchActions } from '../context/WatchActionsContext';
 import { Pin } from '../proshop/Pin';
-import { haptic } from '@/utils/haptics';
 import { ExpandableCaption } from '@/components/posts/ExpandableCaption';
 import { attachHlsToTile } from '@/hooks/useTileVideoPlayer';
 
@@ -45,8 +43,6 @@ export interface AutoplayVideoCardProps {
 
 function AutoplayVideoCardInner({ post, index, allPosts, userId, active, borderRadius = 12, metaPadX = 16 }: AutoplayVideoCardProps) {
   const navigate = useNavigate();
-  const { openActions } = useWatchActions();
-  const longPressTimer = useRef<number | null>(null);
   const tileRef = useRef<HTMLDivElement>(null);
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const hlsRef = useRef<any>(null);
@@ -132,21 +128,6 @@ function AutoplayVideoCardInner({ post, index, allPosts, userId, active, borderR
     useFullscreenFeedStore.getState().open(allPosts, index);
   };
 
-  const startPress = () => {
-    if (longPressTimer.current) window.clearTimeout(longPressTimer.current);
-    longPressTimer.current = window.setTimeout(() => {
-      haptic('medium');
-      openActions(post);
-      longPressTimer.current = null;
-    }, 450);
-  };
-  const cancelPress = () => {
-    if (longPressTimer.current) {
-      window.clearTimeout(longPressTimer.current);
-      longPressTimer.current = null;
-    }
-  };
-
   const handleShare = async () => {
     const shareUrl = `${window.location.origin}/video/${post.id}`;
     if (navigator.share) {
@@ -167,10 +148,6 @@ function AutoplayVideoCardInner({ post, index, allPosts, userId, active, borderR
       <button
         type="button"
         onClick={handleTap}
-        onPointerDown={startPress}
-        onPointerUp={cancelPress}
-        onPointerLeave={cancelPress}
-        onPointerCancel={cancelPress}
         className="block w-full text-left active:scale-[0.99] transition-transform"
         style={{
           position: 'relative',

@@ -1,4 +1,4 @@
-import { memo, useRef } from 'react';
+import { memo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Heart, MessageCircle } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
@@ -7,9 +7,7 @@ import { useFullscreenFeedStore } from '@/store/fullscreenFeedStore';
 import type { FeedPost } from '@/components/media-system/types/media';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { VideoCardMenu } from '@/components/videos-tab/VideoCardMenu';
-import { useWatchActions } from '../context/WatchActionsContext';
 import { Pin } from '../proshop/Pin';
-import { haptic } from '@/utils/haptics';
 import { ExpandableCaption } from '@/components/posts/ExpandableCaption';
 
 function formatHMS(seconds: number | null | undefined): string {
@@ -38,8 +36,6 @@ export interface VideoFeedCardProps {
 
 function VideoFeedCardInner({ post, index, allPosts, userId }: VideoFeedCardProps) {
   const navigate = useNavigate();
-  const { openActions } = useWatchActions();
-  const longPressTimer = useRef<number | null>(null);
 
   const firstVideo = post.mediaItems.find((m) => m.type === 'video');
   const thumbnail = firstVideo?.thumbnailUrl || firstVideo?.imageUrl || '';
@@ -56,21 +52,6 @@ function VideoFeedCardInner({ post, index, allPosts, userId }: VideoFeedCardProp
 
   const handleTap = () => {
     useFullscreenFeedStore.getState().open(allPosts, index);
-  };
-
-  const startPress = () => {
-    if (longPressTimer.current) window.clearTimeout(longPressTimer.current);
-    longPressTimer.current = window.setTimeout(() => {
-      haptic('medium');
-      openActions(post);
-      longPressTimer.current = null;
-    }, 450);
-  };
-  const cancelPress = () => {
-    if (longPressTimer.current) {
-      window.clearTimeout(longPressTimer.current);
-      longPressTimer.current = null;
-    }
   };
 
   const handleShare = async () => {
@@ -96,10 +77,6 @@ function VideoFeedCardInner({ post, index, allPosts, userId }: VideoFeedCardProp
       <button
         type="button"
         onClick={handleTap}
-        onPointerDown={startPress}
-        onPointerUp={cancelPress}
-        onPointerLeave={cancelPress}
-        onPointerCancel={cancelPress}
         className="block w-full text-left active:scale-[0.99] transition-transform"
         style={{
           position: 'relative',

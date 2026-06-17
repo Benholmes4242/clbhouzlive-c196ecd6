@@ -1,10 +1,8 @@
-import { memo, useCallback, useMemo, useRef, useState } from 'react';
+import { memo, useCallback, useMemo, useState } from 'react';
 
 import { useFullscreenFeedStore } from '@/store/fullscreenFeedStore';
 import type { FeedPost } from '@/components/media-system/types/media';
-import { useWatchActions } from '../context/WatchActionsContext';
 import { Pin } from '../proshop/Pin';
-import { haptic } from '@/utils/haptics';
 
 interface VideoRailTileProps {
   post: FeedPost;
@@ -53,15 +51,7 @@ function formatAge(iso: string | null | undefined): string {
 /**
  * Unified rail tile for Watch / Videos surfaces.
  *
- * Shares the visual language of the hero `VideoFeedCard` (course/duration
- * pins on a 16:9 thumb, avatar + bold title + muted meta below) but scaled
- * down for horizontal-rail context. Replaces both `LatestVideoTile` and
- * `VideoLandscapeTile`.
- *
- * Behaviour:
- *  • Tap → opens fullscreen player
- *  • Long-press (400ms) → opens WatchActions sheet (haptic)
- *  • No visible three-dot menu — long-press is the sole action surface
+ * Tap → opens fullscreen player.
  */
 function VideoRailTileInner({
   post,
@@ -70,8 +60,6 @@ function VideoRailTileInner({
   width = 200,
   progress,
 }: VideoRailTileProps) {
-  const { openActions } = useWatchActions();
-
   const media = post.mediaItems.find((m) => m.type === 'video') ?? post.mediaItems[0];
   const thumb = media?.thumbnailUrl || media?.imageUrl || '';
   const duration = media?.duration ?? 0;
@@ -81,38 +69,9 @@ function VideoRailTileInner({
   const ageLabel = useMemo(() => formatAge(post.createdAt), [post.createdAt]);
   const metaLine = ageLabel;
 
-  // --- Tap vs long-press handling ---------------------------------------
-  const longPressTimerRef = useRef<number | null>(null);
-  const longPressFiredRef = useRef(false);
-
-  const handleTap = useCallback(() => {
+  const handleClick = useCallback(() => {
     useFullscreenFeedStore.getState().open(allPosts, index);
   }, [allPosts, index]);
-
-  const startLongPress = useCallback(() => {
-    longPressFiredRef.current = false;
-    if (longPressTimerRef.current) window.clearTimeout(longPressTimerRef.current);
-    longPressTimerRef.current = window.setTimeout(() => {
-      longPressFiredRef.current = true;
-      haptic('medium');
-      openActions(post);
-    }, 400);
-  }, [openActions, post]);
-
-  const cancelLongPress = useCallback(() => {
-    if (longPressTimerRef.current) {
-      window.clearTimeout(longPressTimerRef.current);
-      longPressTimerRef.current = null;
-    }
-  }, []);
-
-  const handleClick = useCallback(() => {
-    if (longPressFiredRef.current) {
-      longPressFiredRef.current = false;
-      return;
-    }
-    handleTap();
-  }, [handleTap]);
 
   const showProgress = typeof progress === 'number' && progress > 0 && progress < 1;
 
@@ -126,12 +85,8 @@ function VideoRailTileInner({
         flexDirection: 'column',
       }}
       onClick={handleClick}
-      onPointerDown={startLongPress}
-      onPointerUp={cancelLongPress}
-      onPointerLeave={cancelLongPress}
-      onPointerCancel={cancelLongPress}
-      onContextMenu={(e) => e.preventDefault()}
     >
+
       {/* Thumb — 16:9 */}
       <div
         style={{
