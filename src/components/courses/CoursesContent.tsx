@@ -317,8 +317,10 @@ const CoursesContent: React.FC<CoursesContentProps> = ({ username, displayName }
           </ShellSlot>
 
           {activeTab === 'discover' ? (
-            /* Flush hero like Tour Overview — no chrome-offset padding, hero is first child */
-            <ExploreTabContent embedded />
+            /* Compact rank-led hero — needs chrome offset so it clears the sticky tab row */
+            <div style={{ paddingTop: 'var(--chrome-total-h, 0px)' }}>
+              <ExploreTabContent embedded />
+            </div>
           ) : (
             <div className="px-4" style={{ paddingTop: 'var(--chrome-total-h, 0px)' }}>
               {/* Rate a Course nudge — data-driven (played-but-unrated) */}
