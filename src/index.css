@@ -813,6 +813,12 @@ html[data-immersive-route='true'] .app-shell {
   body.route-light .app-shell {
     background-color: transparent !important;
   }
+  /* #root paints --bg-page (#F8FAFC) with !important further down the
+     stylesheet — override it on iPad so the dark body backdrop shows through
+     the gutters either side of the capped page column. */
+  #root {
+    background-color: #0A0A0A !important;
+  }
 }
 
 /* Fade mask utility for horizontal scroll rails */
