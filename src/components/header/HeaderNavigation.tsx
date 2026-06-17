@@ -190,7 +190,7 @@ const HeaderNavigation: React.FC<HeaderNavigationProps> = ({ onInteraction, useL
 
       {/* Identity Selector - only shown when user has multiple identities */}
       <div className="hidden sm:block">
-        <IdentitySelector />
+        <IdentitySelector variant={useLightTheme ? 'light' : 'dark'} />
       </div>
 
       <DropdownMenu>
