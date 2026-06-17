@@ -120,7 +120,7 @@ export const RoundDetailSheet: React.FC<Props> = ({
           />
 
           {hasHoles ? (
-            <RoundScorecard holes={holes!} isNineHole={userData.is_nine_hole} />
+            <RoundScorecard holes={holes!} isNineHole={userData.is_nine_hole} isLight={isLight} />
           ) : (
             <ScorecardEmpty
               message={
@@ -135,7 +135,44 @@ export const RoundDetailSheet: React.FC<Props> = ({
           )}
         </>
       ),
-      footer: (
+      footer: isLight ? (
+        <SheetFooterInk
+          label={
+            handicapDelta != null && Math.abs(handicapDelta) >= 0.05 && previousIndex != null
+              ? 'Index after this round'
+              : 'Current index'
+          }
+          currentIndex={userData.handicap_index_at_time ?? null}
+          previousIndex={previousIndex}
+          delta={handicapDelta ?? null}
+          action={
+            userData.permalink_url ? (
+              <a
+                href={userData.permalink_url}
+                target="_blank"
+                rel="noopener noreferrer"
+                style={{
+                  padding: '9px 16px',
+                  borderRadius: 999,
+                  background: PAGE_BG_LIGHT,
+                  color: '#0F172A',
+                  fontWeight: 800,
+                  fontSize: 12,
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: 6,
+                  textDecoration: 'none',
+                  fontFamily: FONT_GEIST,
+                  flexShrink: 0,
+                }}
+              >
+                Open in MyEG
+                <ExternalLink size={13} strokeWidth={2.4} />
+              </a>
+            ) : null
+          }
+        />
+      ) : (
         <SheetFooterDark
           currentIndex={userData.handicap_index_at_time ?? null}
           previousIndex={previousIndex}
