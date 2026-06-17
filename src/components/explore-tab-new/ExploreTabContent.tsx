@@ -15,7 +15,7 @@ import { LatestRecordsStrip } from './LatestRecordsStrip';
 
 import ExploreGrid from './ExploreGrid';
 import ExploreAutoplay from './ExploreAutoplay';
-import { ExploreSectionHeader } from './ExploreSectionHeader';
+
 import { SLATE_50 } from '@/features/courses/_shared/tokens';
 
 interface ExploreTabContentProps {
