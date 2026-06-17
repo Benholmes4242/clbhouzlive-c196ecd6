@@ -49,7 +49,6 @@ export default function UnifiedWatchFeed({ embedded = false }: UnifiedWatchFeedP
   return (
     <WatchActionsProvider>
     <div className="min-h-screen" style={{ background: 'hsl(var(--background))' }}>
-      <LongPressTipBanner />
 
       {/* ── Pro Shop: Watch of the Week editorial hero ── */}
       <WatchOfTheWeekHero />
