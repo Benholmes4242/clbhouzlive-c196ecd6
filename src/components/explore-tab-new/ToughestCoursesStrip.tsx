@@ -279,21 +279,9 @@ function ToughCourseCard({ course, onTap }: CardProps) {
           >
             +{numFmt(course.hardest_avg_to_par, 1)} over par
             {course.hardest_hole_si != null ? ` · SI ${course.hardest_hole_si}` : ''}
-            {' · '}{course.total_rounds.toLocaleString()} rounds
           </p>
         </div>
-        <span
-          style={{
-            fontSize: 18,
-            fontWeight: 300,
-            color: INK,
-            fontVariantNumeric: 'tabular-nums',
-            letterSpacing: '-0.01em',
-            lineHeight: 1,
-          }}
-        >
-          +{numFmt(course.hardest_avg_to_par, 1)}
-        </span>
+
       </div>
     </button>
   );
