@@ -60,10 +60,10 @@ export default function ExploreTabContent({ embedded: _embedded = false }: Explo
         <ConnectHandicapCue variant="discover" />
       </div>
 
-      {activeRegion === null && <WhereYoudRank userId={userId} />}
-      {activeRegion === null && <LatestRecordsStrip userId={userId} />}
-      {activeRegion === null && <ToughestCoursesStrip userId={userId} />}
       {activeRegion === null && <CircleActivityStrip userId={userId} />}
+      {activeRegion === null && <LatestRecordsStrip userId={userId} />}
+      {activeRegion === null && <WhereYoudRank userId={userId} />}
+      {activeRegion === null && <ToughestCoursesStrip userId={userId} />}
       <ExploreEchoCTA mood={mood} />
       <ExploreDestinations activeRegion={activeRegion} onRegionSelect={handleRegionChange} />
 
