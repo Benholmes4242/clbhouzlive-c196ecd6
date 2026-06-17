@@ -186,7 +186,7 @@ const JourneyListPage: React.FC = () => {
 
   if (!user) {
     return (
-      <div className="min-h-screen bg-slate-50 compact-header-offset">
+      <div className="min-h-screen bg-slate-50 compact-header-offset md:max-w-[620px] md:mx-auto">
         <div className="p-4 text-center">
           <p className="text-slate-600">Sign in to view your journey</p>
           <Button className="mt-4" onClick={() => navigate('/auth')}>
@@ -198,7 +198,7 @@ const JourneyListPage: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen bg-slate-50 compact-header-offset">
+    <div className="min-h-screen bg-slate-50 compact-header-offset md:max-w-[620px] md:mx-auto">
       {/* Header */}
       <div className="sticky top-[calc(40px+var(--sat))] z-30 bg-white border-b border-slate-100">
         <div className="flex items-center gap-3 px-4 py-3">
