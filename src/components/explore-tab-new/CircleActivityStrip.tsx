@@ -279,7 +279,7 @@ function CircleActivityCard({ row, onTap }: CardProps) {
           style={{
             width: 34,
             height: 34,
-            borderRadius: '50%',
+            borderRadius: '34%',
             overflow: 'hidden',
             background: INK_TINT_06,
             flexShrink: 0,
