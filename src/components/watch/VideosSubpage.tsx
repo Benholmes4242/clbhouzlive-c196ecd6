@@ -3,7 +3,7 @@ import { useEffect, useState } from 'react';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import PageRoot from '@/components/layout/PageRoot';
 import ScrollToTopGlass from '@/components/common/ScrollToTopGlass';
-import { WatchActionsProvider } from '@/components/watch/context/WatchActionsContext';
+
 import { useDebouncedValue } from '@/hooks/useDebouncedValue';
 
 import ShellSlot from '@/components/header/ShellSlot';
@@ -50,7 +50,6 @@ export default function VideosSubpage() {
   }, []);
 
   return (
-    <WatchActionsProvider>
       <PageRoot className="min-h-screen" hasBottomNav={true} style={{ background: CREAM }}>
         <ShellSlot>
           <VideosMoodChips
@@ -83,6 +82,5 @@ export default function VideosSubpage() {
 
         <ScrollToTopGlass />
       </PageRoot>
-    </WatchActionsProvider>
   );
 }
