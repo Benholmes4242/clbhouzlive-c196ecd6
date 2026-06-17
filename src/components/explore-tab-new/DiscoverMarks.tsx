@@ -1,4 +1,5 @@
 import { memo } from 'react';
+import { Trophy } from 'lucide-react';
 
 const AMBER = '#F7931E';
 const AMBER_SHADOW = '0 4px 10px -2px rgba(247,147,30,0.40)';
@@ -49,9 +50,7 @@ export const RecordsMark = memo(function RecordsMark() {
           justifyContent: 'center',
         }}
       >
-        <svg width="10" height="10" viewBox="0 0 24 24" fill="#FFFFFF">
-          <path d="M12 2l2.9 6.9L22 9.6l-5.4 4.7L18.2 22 12 18.3 5.8 22l1.6-7.7L2 9.6l7.1-.7L12 2z" />
-        </svg>
+        <Trophy size={11} color="#FFFFFF" strokeWidth={2.2} aria-hidden />
       </div>
     </div>
   );
