@@ -243,7 +243,7 @@ export default function EditProfile() {
     : (!isValid || !isDirty || isSaving);
 
   return (
-    <PageRoot hasBottomNav={!isNewUser.current} className="bg-[#F8FAFC]">
+    <PageRoot hasBottomNav={!isNewUser.current} className="bg-[#F8FAFC] md:!max-w-[440px]">
       <div className="min-h-screen bg-[#F8FAFC] flex flex-col w-full">
 
       {/* Header — Activity layout. Onboarding swaps the back chevron for a
