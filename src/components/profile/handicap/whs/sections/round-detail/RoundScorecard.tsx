@@ -6,6 +6,7 @@ import { nineSeverityTint } from './_shared/nineSeverityTint';
 interface Props {
   holes: WhsScoreHole[];
   isNineHole: boolean;
+  isLight?: boolean;
 }
 
 const FONT_GEIST = 'Geist, system-ui, -apple-system, BlinkMacSystemFont, sans-serif';
