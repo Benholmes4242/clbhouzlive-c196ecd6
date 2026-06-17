@@ -154,6 +154,7 @@ export function CircleActivityStrip({ userId }: Props) {
         onClose={() => setSheet(null)}
         scoreId={sheet?.scoreId ?? null}
         connectionId={sheet?.connectionId ?? null}
+        variant="light"
       />
     </section>
   );
