@@ -11,7 +11,7 @@
  * in the leaderboard / a legacy ?tab=stats redirect (friend).
  */
 
-import React, { useCallback, useEffect, useMemo } from 'react';
+import React, { useCallback, useEffect, useLayoutEffect, useMemo } from 'react';
 import { useNavigate, Navigate, useSearchParams, useParams } from 'react-router-dom';
 import { ChevronRight, Trophy, Activity, Bell } from 'lucide-react';
 import GamMount from '@/components/profile/handicap/whs/gam/GamMount';
@@ -321,6 +321,11 @@ const HandicapPage: React.FC = () => {
   const { user, loading } = useSupabaseSession();
   const params = useParams<{ userId?: string }>();
   const [searchParams, setSearchParams] = useSearchParams();
+
+  useLayoutEffect(() => {
+    document.body.classList.add('route-handicap');
+    return () => { document.body.classList.remove('route-handicap'); };
+  }, []);
 
   // Determine mode + the user whose handicap we're showing.
   const friendId = params.userId ?? null;

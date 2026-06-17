@@ -774,7 +774,8 @@ html.lightbox-open {
    on first render; individual light pages apply their own background via
    body class or component-level styles once they mount.
    ──────────────────────────────────────────────────────────────────────── */
-body.route-clubhouse .app-shell {
+body.route-clubhouse .app-shell,
+body.route-handicap .app-shell {
   background-color: #0d0d0d !important;
 }
 
@@ -823,10 +824,13 @@ html[data-immersive-route='true'] .app-shell {
   }
   /* Clubhouse stays dark edge-to-edge */
   body.route-clubhouse,
-  body.route-clubhouse #root {
+  body.route-clubhouse #root,
+  body.route-handicap,
+  body.route-handicap #root {
     background-color: #0d0d0d !important;
   }
-  body.route-clubhouse .app-shell {
+  body.route-clubhouse .app-shell,
+  body.route-handicap .app-shell {
     background-color: #0d0d0d !important;
   }
 }
