@@ -1,6 +1,6 @@
 import { memo, useMemo, useRef } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { MessageSquare } from 'lucide-react';
+
 import { analyticsEvents } from '@/utils/analyticsEvents';
 import { ExploreSectionHeader } from './ExploreSectionHeader';
 import type { ExploreMoodId } from './hooks/useExploreMood';
@@ -247,7 +247,6 @@ function ExploreEchoCTAInner({ mood }: ExploreEchoCTAProps) {
     <section>
       <ExploreSectionHeader
         title="Echo, your course concierge"
-        icon={MessageSquare}
         sub="Describe what you want. She'll find it."
         paddingTop={24}
       />
