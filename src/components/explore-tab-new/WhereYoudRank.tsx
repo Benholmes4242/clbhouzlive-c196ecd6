@@ -23,6 +23,7 @@ const CATEGORY_META: Record<string, { label: string; unit: string; style: 'off' 
   best_stableford: { label: 'Stableford', unit: 'points', style: 'back' },
   most_eagles: { label: 'Eagles', unit: 'eagles', style: 'back' },
   most_aces: { label: 'Hole-in-one', unit: 'aces', style: 'back' },
+  most_rounds: { label: 'Most rounds', unit: 'rounds', style: 'back' },
 };
 
 function stripWindow(category: string): string {
@@ -41,7 +42,7 @@ function gapCopy(category: string, gap: number): string {
 
 function categoryLabel(category: string): string {
   const base = stripWindow(category);
-  return (CATEGORY_META[base]?.label ?? base).toUpperCase();
+  return (CATEGORY_META[base]?.label ?? base.replace(/_/g, ' ')).toUpperCase();
 }
 
 function RankCard({ row, onTap }: { row: TitleInReach; onTap: () => void }) {
