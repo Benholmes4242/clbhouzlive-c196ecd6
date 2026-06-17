@@ -133,7 +133,7 @@ export default function BusinessTeamPage() {
   };
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-background md:max-w-[620px] md:mx-auto">
       {/* Header */}
       <div className="sticky top-0 z-10 backdrop-blur-xl" style={{ background: 'rgba(248,250,252,0.97)', borderBottom: '0.5px solid rgba(15,23,42,0.07)' }}>
         <div className="flex items-center px-4 h-14">

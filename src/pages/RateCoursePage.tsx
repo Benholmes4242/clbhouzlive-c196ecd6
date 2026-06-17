@@ -89,14 +89,16 @@ const RateCoursePage = () => {
 
   return (
     <AccessControl requireAuth={true} noBlockingLoader={true}>
-      <ReviewWizard
-        course={course}
-        isOpen={true}
-        onClose={handleClose}
-        isEditMode={!!existingRating}
-        alreadyShared={alreadyShared}
-        existingRating={existingRating}
-      />
+      <div className="w-full md:max-w-[440px] md:mx-auto">
+        <ReviewWizard
+          course={course}
+          isOpen={true}
+          onClose={handleClose}
+          isEditMode={!!existingRating}
+          alreadyShared={alreadyShared}
+          existingRating={existingRating}
+        />
+      </div>
     </AccessControl>
   );
 };

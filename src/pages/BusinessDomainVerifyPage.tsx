@@ -74,7 +74,7 @@ export default function BusinessDomainVerifyPage() {
   const domain = request?.domain;
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-background md:max-w-[620px] md:mx-auto">
       {/* Header */}
       <div className="sticky top-0 z-10 bg-background/95 backdrop-blur-xl border-b border-border">
         <div className="flex items-center gap-3 px-4 py-3">

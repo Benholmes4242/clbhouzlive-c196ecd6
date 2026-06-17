@@ -137,7 +137,7 @@ const RecentlyPlayedSection: React.FC<RecentlyPlayedSectionProps> = ({
                   key={`recently-played-${userCourse.course_id || userCourse.golf_courses?.id}-${index}`}
                   className="
                     shrink-0
-                    basis-[calc(100vw/2.6)]
+                    basis-[calc(100vw/2.6)] md:basis-[200px]
                     md:basis-[calc((100%-((var(--g,1rem)*(var(--cards,4)-1))))/var(--cards,4))]
                   "
                 >

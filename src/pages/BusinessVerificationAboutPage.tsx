@@ -19,7 +19,7 @@ const BusinessVerificationAboutPage = () => {
   };
 
   return (
-    <PageRoot className="min-h-screen bg-background">
+    <PageRoot className="min-h-screen bg-background md:!max-w-[440px]">
       {/* Header */}
       <header
         className="sticky top-0 z-10 bg-background/95 backdrop-blur-xl border-b border-border/40"

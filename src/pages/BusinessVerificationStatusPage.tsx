@@ -78,7 +78,7 @@ const BusinessVerificationStatusPage = () => {
 
   if (isLoading) {
     return (
-      <PageRoot className="min-h-screen bg-background">
+      <PageRoot className="min-h-screen bg-background md:!max-w-[440px]">
         <div className="space-y-4 px-4 pt-4">
           <div className="h-40 bg-muted animate-pulse rounded-2xl" />
           <div className="h-24 bg-muted animate-pulse rounded-2xl" />
@@ -89,7 +89,7 @@ const BusinessVerificationStatusPage = () => {
 
   if (businessError || requestError) {
     return (
-      <PageRoot className="min-h-screen bg-background">
+      <PageRoot className="min-h-screen bg-background md:!max-w-[440px]">
         <div className="flex-1 flex items-center justify-center px-4 min-h-[60vh]">
           <p className="text-sm text-muted-foreground text-center">
             Failed to load verification status.
@@ -106,7 +106,7 @@ const BusinessVerificationStatusPage = () => {
   const adminNotes = request?.admin_note;
 
   return (
-    <PageRoot className="min-h-screen bg-background">
+    <PageRoot className="min-h-screen bg-background md:!max-w-[440px]">
       {/* Header */}
       <header
         className="sticky top-0 z-10 bg-background/95 backdrop-blur-xl border-b border-border/40"
