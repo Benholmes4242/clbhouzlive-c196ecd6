@@ -5,7 +5,6 @@ import { useExploreFeed } from './hooks/useExploreFeed';
 import { useExploreMood } from './hooks/useExploreMood';
 import { useExploreRegion } from './hooks/useExploreRegion';
 import { ExploreHero } from './ExploreHero';
-import { ExploreRecommendations } from './ExploreRecommendations';
 import ConnectHandicapCue from '@/components/courses/course-detail/ConnectHandicapCue';
 import { ExploreEchoCTA } from './ExploreEchoCTA';
 import { ExploreDestinations } from './ExploreDestinations';
