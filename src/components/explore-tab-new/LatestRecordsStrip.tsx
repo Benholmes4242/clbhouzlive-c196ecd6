@@ -262,7 +262,7 @@ function RecordHeroCard({ record, onTap }: CardProps) {
               initials(holder)
             )}
           </div>
-          {/* Crown badge */}
+          {/* Trophy badge */}
           <div
             style={{
               position: 'absolute',
@@ -281,9 +281,7 @@ function RecordHeroCard({ record, onTap }: CardProps) {
             }}
             aria-hidden
           >
-            <svg width="9" height="9" viewBox="0 0 24 24" fill="#FFFFFF">
-              <path d="M5 19h14l1-9-5 3-3-6-3 6-5-3 1 9z" />
-            </svg>
+            <Trophy size={9} color="#FFFFFF" strokeWidth={2.4} aria-hidden />
           </div>
         </div>
         <div style={{ flex: 1, minWidth: 0 }}>
