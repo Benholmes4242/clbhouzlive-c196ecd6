@@ -270,7 +270,7 @@ function RecordHeroCard({ record, onTap }: CardProps) {
               right: -5,
               width: 16,
               height: 16,
-              borderRadius: '50%',
+              borderRadius: 6,
               background: `linear-gradient(135deg, ${GOLD} 0%, ${DEEP_GOLD} 100%)`,
               border: '1.5px solid #FFFFFF',
               display: 'flex',
