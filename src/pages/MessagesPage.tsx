@@ -148,7 +148,7 @@ function MessagesPageInner() {
 
   if (!user) {
     return (
-      <div className="min-h-screen flex items-center justify-center" style={{ background: '#F8FAFC' }}>
+      <div className="min-h-screen flex items-center justify-center md:max-w-[620px] md:mx-auto" style={{ background: '#F8FAFC' }}>
         <div className="text-center">
           <div className="w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4" style={{ background: 'rgba(0,0,0,0.05)' }}>
             <MessageCircle className="h-8 w-8" style={{ color: '#94a3b8' }} />
@@ -185,7 +185,7 @@ function MessagesPageInner() {
     const totalUnread = conversations?.reduce((sum, conv) => sum + (conv.unread_count || 0), 0) ?? 0;
     
     return (
-      <div className="min-h-screen flex flex-col" style={{ background: '#F8FAFC' }}>
+      <div className="min-h-screen flex flex-col md:max-w-[620px] md:mx-auto" style={{ background: '#F8FAFC' }}>
         <OfflineBanner />
         
         {/* Header */}
