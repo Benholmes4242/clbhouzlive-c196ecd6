@@ -802,6 +802,19 @@ html[data-immersive-route='true'] .app-shell {
   }
 }
 
+/* iPad+ : let the dark body backdrop show through the gutters either side of
+   the capped page column (PageRoot caps to 620 / 440 at md:). Without this the
+   .app-shell paints #F8FAFC edge-to-edge and the immersive feel is broken.
+   iPhone (<768) keeps the existing light shell. */
+@media (min-width: 768px) {
+  .app-shell,
+  body.route-clubhouse .app-shell,
+  body.route-auth .app-shell,
+  body.route-light .app-shell {
+    background-color: transparent !important;
+  }
+}
+
 /* Fade mask utility for horizontal scroll rails */
 .mask-fade-right {
   -webkit-mask-image: linear-gradient(to right, black 85%, transparent 100%);
