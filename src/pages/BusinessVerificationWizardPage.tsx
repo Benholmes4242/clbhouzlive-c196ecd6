@@ -296,7 +296,7 @@ export default function BusinessVerificationWizardPage() {
 
   if (isLoadingBusiness) {
     return (
-      <PageRoot className="min-h-screen bg-background">
+      <PageRoot className="min-h-screen bg-background md:!max-w-[440px]">
         <div className="space-y-4 px-4 pt-4">
           <div className="h-12 animate-pulse rounded-xl" style={{ background: 'rgba(15,23,42,0.08)' }} />
           <div className="h-24 animate-pulse rounded-xl" style={{ background: 'rgba(15,23,42,0.08)' }} />
@@ -321,7 +321,7 @@ export default function BusinessVerificationWizardPage() {
   );
 
   return (
-    <PageRoot className="min-h-screen bg-background">
+    <PageRoot className="min-h-screen bg-background md:!max-w-[440px]">
       {/* Header */}
       <header
         className="sticky top-0 z-10 backdrop-blur-xl"
