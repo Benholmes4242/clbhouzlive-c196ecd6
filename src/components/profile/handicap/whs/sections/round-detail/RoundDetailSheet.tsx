@@ -1,4 +1,5 @@
 import React, { useMemo } from 'react';
+import { ExternalLink } from 'lucide-react';
 import { Drawer as DrawerPrimitive } from 'vaul';
 import { useRoundDetail } from '@/lib/whs/hooks';
 import RoundScorecard from './RoundScorecard';
@@ -7,6 +8,7 @@ import {
   SheetHeroGlass,
   UserEyebrow,
   SheetFooterDark,
+  SheetFooterInk,
   ScorecardEmpty,
 } from './cinema-sheet';
 
@@ -16,9 +18,11 @@ interface Props {
   scoreId?: string | null;
   handicapDelta?: number | null;
   connectionId?: string | null;
+  variant?: 'dark' | 'light';
 }
 
 const PAGE_BG = '#0A0E14';
+const PAGE_BG_LIGHT = '#F8FAFC';
 const INK_MUTE = 'var(--hcp-t-60)';
 const FONT_GEIST = 'Geist, system-ui, -apple-system, BlinkMacSystemFont, sans-serif';
 const AMBER = '#F7931E';
@@ -60,7 +64,10 @@ export const RoundDetailSheet: React.FC<Props> = ({
   onClose,
   scoreId,
   handicapDelta,
+  variant = 'dark',
 }) => {
+  const isLight = variant === 'light';
+  const pageBg = isLight ? PAGE_BG_LIGHT : PAGE_BG;
   const userQuery = useRoundDetail(scoreId, open);
   const userData = userQuery.data;
   const userLoading = userQuery.isLoading;
@@ -113,7 +120,7 @@ export const RoundDetailSheet: React.FC<Props> = ({
           />
 
           {hasHoles ? (
-            <RoundScorecard holes={holes!} isNineHole={userData.is_nine_hole} />
+            <RoundScorecard holes={holes!} isNineHole={userData.is_nine_hole} isLight={isLight} />
           ) : (
             <ScorecardEmpty
               message={
@@ -128,7 +135,44 @@ export const RoundDetailSheet: React.FC<Props> = ({
           )}
         </>
       ),
-      footer: (
+      footer: isLight ? (
+        <SheetFooterInk
+          label={
+            handicapDelta != null && Math.abs(handicapDelta) >= 0.05 && previousIndex != null
+              ? 'Index after this round'
+              : 'Current index'
+          }
+          currentIndex={userData.handicap_index_at_time ?? null}
+          previousIndex={previousIndex}
+          delta={handicapDelta ?? null}
+          action={
+            userData.permalink_url ? (
+              <a
+                href={userData.permalink_url}
+                target="_blank"
+                rel="noopener noreferrer"
+                style={{
+                  padding: '9px 16px',
+                  borderRadius: 999,
+                  background: PAGE_BG_LIGHT,
+                  color: '#0F172A',
+                  fontWeight: 800,
+                  fontSize: 12,
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: 6,
+                  textDecoration: 'none',
+                  fontFamily: FONT_GEIST,
+                  flexShrink: 0,
+                }}
+              >
+                Open in MyEG
+                <ExternalLink size={13} strokeWidth={2.4} />
+              </a>
+            ) : null
+          }
+        />
+      ) : (
         <SheetFooterDark
           currentIndex={userData.handicap_index_at_time ?? null}
           previousIndex={previousIndex}
@@ -157,9 +201,9 @@ export const RoundDetailSheet: React.FC<Props> = ({
         />
         <DrawerPrimitive.Content
           aria-labelledby="round-detail-sheet-title"
-          className="hcp-dark fixed inset-x-0 bottom-0 z-[10002] flex flex-col rounded-t-[20px] outline-none"
+          className={`${isLight ? 'hcp-light' : 'hcp-dark'} fixed inset-x-0 bottom-0 z-[10002] flex flex-col rounded-t-[20px] outline-none`}
           style={{
-            background: PAGE_BG,
+            background: pageBg,
             height: '75dvh',
             minHeight: 0,
             overflow: 'hidden',
@@ -174,7 +218,7 @@ export const RoundDetailSheet: React.FC<Props> = ({
               minHeight: 0,
               overflowY: 'auto',
               WebkitOverflowScrolling: 'touch',
-              background: PAGE_BG,
+              background: pageBg,
             }}
           >
             <div

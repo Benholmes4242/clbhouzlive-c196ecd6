@@ -6,6 +6,7 @@ import { nineSeverityTint } from './_shared/nineSeverityTint';
 interface Props {
   holes: WhsScoreHole[];
   isNineHole: boolean;
+  isLight?: boolean;
 }
 
 const FONT_GEIST = 'Geist, system-ui, -apple-system, BlinkMacSystemFont, sans-serif';
@@ -85,7 +86,7 @@ const NineGrid: React.FC<{ label: string; holes: WhsScoreHole[]; isLast?: boolea
   );
 };
 
-export const RoundScorecard: React.FC<Props> = ({ holes, isNineHole }) => {
+export const RoundScorecard: React.FC<Props> = ({ holes, isNineHole, isLight = false }) => {
   const sorted = useMemo(
     () => [...holes].sort((a, b) => a.hole_no - b.hole_no),
     [holes],
@@ -101,7 +102,7 @@ export const RoundScorecard: React.FC<Props> = ({ holes, isNineHole }) => {
             fontSize: 10,
             fontWeight: 700,
             letterSpacing: '0.18em',
-            color: '#FFFFFF',
+            color: isLight ? '#0F172A' : '#FFFFFF',
             textTransform: 'uppercase',
           }}
         >
