@@ -1754,7 +1754,7 @@ body.route-clubhouse .global-header {
   inset: 0;
   height: 100svh;
   width: 100%;
-  background: var(--bg-page);
+  background: #0A0E14; /* match feed CANVAS so iPad gutters read as one immersive surface */
   overflow: hidden;
 }
 
