@@ -14,7 +14,7 @@ const ChallengesPage: React.FC = () => {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-background py-8 px-4">
+      <div className="min-h-screen bg-background py-8 px-4 md:max-w-[620px] md:mx-auto">
         <div className="max-w-6xl mx-auto">
           <div className="mb-8">
             <Skeleton className="h-10 w-48 rounded mb-2" />
@@ -38,7 +38,7 @@ const ChallengesPage: React.FC = () => {
   const globalChallenges = challenges?.filter(c => c.type === 'global') || [];
 
   return (
-    <div className="min-h-screen bg-background py-8 px-4">
+    <div className="min-h-screen bg-background py-8 px-4 md:max-w-[620px] md:mx-auto">
       <div className="max-w-6xl mx-auto">
         <div className="mb-8">
           <h1 className="text-4xl font-bold mb-2">Challenges</h1>

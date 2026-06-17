@@ -85,7 +85,7 @@ const AchievementsHubPage: React.FC = () => {
   }) : null;
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-background md:max-w-[620px] md:mx-auto">
       {/* Page header */}
       <header className="px-4 pt-4 pb-2 md:px-8 md:pt-6 md:pb-3 flex items-center justify-between">
         <button 

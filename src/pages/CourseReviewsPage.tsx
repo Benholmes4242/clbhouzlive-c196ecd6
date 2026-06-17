@@ -92,7 +92,7 @@ const CourseReviewsPage: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-[var(--bg-page)] text-foreground">
+    <div className="min-h-screen bg-[var(--bg-page)] text-foreground md:max-w-[620px] md:mx-auto">
       {/* Hero image with overlay */}
       <div className="relative h-[200px] w-full">
         <img
