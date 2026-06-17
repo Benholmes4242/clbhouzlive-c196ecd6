@@ -1,4 +1,5 @@
 import React, { useMemo } from 'react';
+import { ExternalLink } from 'lucide-react';
 import { Drawer as DrawerPrimitive } from 'vaul';
 import { useRoundDetail } from '@/lib/whs/hooks';
 import RoundScorecard from './RoundScorecard';
@@ -7,6 +8,7 @@ import {
   SheetHeroGlass,
   UserEyebrow,
   SheetFooterDark,
+  SheetFooterInk,
   ScorecardEmpty,
 } from './cinema-sheet';
 
@@ -16,9 +18,11 @@ interface Props {
   scoreId?: string | null;
   handicapDelta?: number | null;
   connectionId?: string | null;
+  variant?: 'dark' | 'light';
 }
 
 const PAGE_BG = '#0A0E14';
+const PAGE_BG_LIGHT = '#F8FAFC';
 const INK_MUTE = 'var(--hcp-t-60)';
 const FONT_GEIST = 'Geist, system-ui, -apple-system, BlinkMacSystemFont, sans-serif';
 const AMBER = '#F7931E';
