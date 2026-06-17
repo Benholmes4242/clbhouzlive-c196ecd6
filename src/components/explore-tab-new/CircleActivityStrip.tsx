@@ -32,11 +32,6 @@ const FEAT_META: Record<CircleFeatType, { emoji: string; label: string }> = {
   stableford: { emoji: '🔥', label: 'STABLEFORD' },
 };
 
-function toneStyle(tone: CircleFeatTone): { bg: string; fg: string } {
-  if (tone === 'gold') return { bg: AMBER, fg: '#FFFFFF' };
-  if (tone === 'amber') return { bg: 'rgba(247,147,30,0.92)', fg: '#FFFFFF' };
-  return { bg: 'rgba(15,23,42,0.72)', fg: '#FFFFFF' };
-}
 
 function valueColor(tone: CircleFeatTone): string {
   return tone === 'plain' ? INK_MUTE : AMBER_TEXT;
@@ -171,7 +166,6 @@ interface CardProps {
 
 function CircleActivityCard({ row, onTap }: CardProps) {
   const meta = FEAT_META[row.feat_type] ?? { emoji: '⛳', label: 'HIGHLIGHT' };
-  const tone = toneStyle(row.feat_tone);
   const friend = formatFriendName(row.friend_name);
 
   return (
@@ -221,7 +215,7 @@ function CircleActivityCard({ row, onTap }: CardProps) {
             pointerEvents: 'none',
           }}
         />
-        {/* Feat badge */}
+        {/* Feat badge — glass */}
         <div
           style={{
             position: 'absolute',
@@ -230,13 +224,15 @@ function CircleActivityCard({ row, onTap }: CardProps) {
             display: 'inline-flex',
             alignItems: 'center',
             gap: 4,
-            padding: '3px 8px',
+            padding: '4px 8px',
             borderRadius: 999,
-            background: tone.bg,
-            color: tone.fg,
-            fontSize: 9.5,
+            background: 'rgba(15,23,42,0.55)',
+            backdropFilter: 'blur(6px)',
+            WebkitBackdropFilter: 'blur(6px)',
+            color: '#FFFFFF',
+            fontSize: 10,
             fontWeight: 800,
-            letterSpacing: '0.1em',
+            letterSpacing: '0.08em',
             lineHeight: 1.2,
             textTransform: 'uppercase',
           }}
