@@ -15,7 +15,7 @@ import {
 } from '@/features/courses/_shared/tokens';
 
 const FONT = 'Geist, -apple-system, BlinkMacSystemFont, system-ui, sans-serif';
-const CARD_W = 220;
+const CARD_W = 240;
 const GOLD = '#FBBC2E';
 const DEEP_GOLD = '#E07F0E';
 
@@ -85,7 +85,7 @@ export function LatestRecordsStrip(_: Props = {}) {
               style={{
                 flexShrink: 0,
                 width: CARD_W,
-                height: 268,
+                height: 238,
                 borderRadius: 16,
                 background: INK_TINT_06,
               }}
@@ -226,20 +226,21 @@ function RecordHeroCard({ record, onTap }: CardProps) {
         </div>
       </div>
 
-      {/* Holder row */}
+      {/* Holder row — fixed 58px meta band */}
       <div
         style={{
+          height: 58,
           display: 'flex',
           alignItems: 'center',
-          gap: 10,
-          padding: '12px 12px 14px',
+          gap: 9,
+          padding: '0 12px',
         }}
       >
         <div style={{ position: 'relative', flexShrink: 0 }}>
           <div
             style={{
-              width: 36,
-              height: 36,
+              width: 34,
+              height: 34,
               borderRadius: 12, // ~34% squircle
               overflow: 'hidden',
               background: INK_TINT_06,
@@ -288,10 +289,10 @@ function RecordHeroCard({ record, onTap }: CardProps) {
           <p
             style={{
               margin: 0,
-              fontSize: 12,
+              fontSize: 13.5,
               fontWeight: 700,
               color: INK,
-              lineHeight: 1.2,
+              lineHeight: 1.15,
               overflow: 'hidden',
               textOverflow: 'ellipsis',
               whiteSpace: 'nowrap',
@@ -301,8 +302,8 @@ function RecordHeroCard({ record, onTap }: CardProps) {
           </p>
           <p
             style={{
-              margin: '2px 0 0',
-              fontSize: 10,
+              margin: '1px 0 0',
+              fontSize: 11.5,
               fontWeight: 600,
               color: INK_FAINT,
               letterSpacing: '0.02em',

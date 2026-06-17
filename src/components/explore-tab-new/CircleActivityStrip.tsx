@@ -18,7 +18,7 @@ import {
 import { RoundDetailSheet } from '@/components/profile/handicap/whs/sections/round-detail/RoundDetailSheet';
 
 const FONT = 'Geist, -apple-system, BlinkMacSystemFont, system-ui, sans-serif';
-const CARD_W = 240;
+const CARD_W = 244;
 const AMBER_TEXT = '#c97a10';
 
 const FEAT_META: Record<CircleFeatType, { emoji: string; label: string }> = {
@@ -47,7 +47,7 @@ function formatFriendName(raw: string): string {
   if (!s) return 'A friend';
   if (s.includes(',')) {
     const [last, first] = s.split(',').map((x) => x.trim());
-    if (first && last) return `${first.split(/\s+/)[0]} ${last[0].toUpperCase()}.`;
+    if (first && last) return `${first} ${last}`;
     return s;
   }
   return s;
@@ -198,7 +198,7 @@ function CircleActivityCard({ row, onTap }: CardProps) {
         style={{
           position: 'relative',
           width: '100%',
-          height: 96,
+          height: 116,
           background: row.course_image
             ? INK_TINT_06
             : 'linear-gradient(135deg, #0F172A 0%, #1e293b 100%)',
@@ -266,20 +266,21 @@ function CircleActivityCard({ row, onTap }: CardProps) {
         </div>
       </div>
 
-      {/* Body row */}
+      {/* Body row — fixed 56px meta band */}
       <div
         style={{
+          height: 56,
           display: 'flex',
           alignItems: 'center',
           gap: 10,
-          padding: '11px 13px',
+          padding: '0 12px',
         }}
       >
         <div
           style={{
-            width: 34,
-            height: 34,
-            borderRadius: '34%',
+            width: 32,
+            height: 32,
+            borderRadius: '50%',
             overflow: 'hidden',
             background: INK_TINT_06,
             flexShrink: 0,
@@ -306,10 +307,10 @@ function CircleActivityCard({ row, onTap }: CardProps) {
           <p
             style={{
               margin: 0,
-              fontSize: 13.5,
+              fontSize: 14,
               fontWeight: 700,
               color: INK,
-              lineHeight: 1.2,
+              lineHeight: 1.15,
               overflow: 'hidden',
               textOverflow: 'ellipsis',
               whiteSpace: 'nowrap',
@@ -320,24 +321,17 @@ function CircleActivityCard({ row, onTap }: CardProps) {
           <p
             style={{
               margin: '2px 0 0',
-              fontSize: 12,
-              lineHeight: 1.25,
+              fontSize: 14,
+              fontWeight: 800,
+              color: valueColor(row.feat_tone),
+              lineHeight: 1.15,
+              letterSpacing: '-0.005em',
               overflow: 'hidden',
               textOverflow: 'ellipsis',
               whiteSpace: 'nowrap',
             }}
           >
-            <span
-              style={{
-                fontSize: 13,
-                fontWeight: 800,
-                color: valueColor(row.feat_tone),
-                letterSpacing: '-0.005em',
-              }}
-            >
-              {row.feat_value}
-            </span>
-            <span style={{ color: INK_FAINT, fontWeight: 600 }}> · {relDate(row.play_date)}</span>
+            {row.feat_value}
           </p>
         </div>
       </div>
