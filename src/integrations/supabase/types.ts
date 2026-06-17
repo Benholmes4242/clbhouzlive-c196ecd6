@@ -18419,6 +18419,8 @@ export type Database = {
           filter_tier: string
           global_rank: number
           hero_image_url: string
+          list_label: string
+          list_rank: number
           location_primary: string
           location_secondary: string
           rating_avg: number

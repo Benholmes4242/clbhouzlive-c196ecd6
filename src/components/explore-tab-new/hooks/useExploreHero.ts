@@ -14,6 +14,8 @@ export interface ExploreHeroRow {
   why_ai: string | null;
   context_stats: Record<string, any> | null;
   filter_tier: string | null;
+  list_rank: number | null;
+  list_label: string | null;
 }
 
 export function useExploreHero(userId: string | undefined, mood: ExploreMoodId) {
