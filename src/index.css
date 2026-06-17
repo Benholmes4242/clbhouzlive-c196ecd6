@@ -169,6 +169,10 @@ html.lightbox-open {
 
 /* Glass panel utilities for Clubhouse overlays */
 :root {
+  /* iPad content-width system — single source of truth for all pages.
+     Form = focused single-task screens; Read = feeds/content/lists. */
+  --ipad-form: 440px;
+  --ipad-read: 620px;
   /* ========================================
      PAGE BACKGROUND VARIABLES
      ======================================== */
@@ -733,6 +737,31 @@ html.lightbox-open {
   max-width: 480px;
   margin-left: auto;
   margin-right: auto;
+}
+
+/* iPad (≥768px): release the phone-width cap so the app fills the canvas.
+   Content pages re-cap their own inner column via .ipad-read / .ipad-form.
+   iPhone (<768px) keeps the 480px column above — untouched. */
+@media (min-width: 768px) {
+  .app-shell {
+    max-width: none;
+  }
+}
+
+/* iPad content-column caps. Apply to a page's inner content wrapper so the
+   shell can be full-bleed while text/forms stay a readable width.
+   Below 768px these do nothing — mobile is full-width as today. */
+@media (min-width: 768px) {
+  .ipad-read {
+    max-width: var(--ipad-read);
+    margin-inline: auto;
+    width: 100%;
+  }
+  .ipad-form {
+    max-width: var(--ipad-form);
+    margin-inline: auto;
+    width: 100%;
+  }
 }
 
 /* ── BOOT FLASH PREVENTION ─────────────────────────────────────────────────
