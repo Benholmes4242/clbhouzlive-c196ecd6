@@ -8,7 +8,7 @@ import { useDebouncedValue } from '@/hooks/useDebouncedValue';
 import { useWatchFeed } from './hooks/useWatchFeed';
 import WatchAutoplay from './WatchAutoplay';
 import WatchGrid from './WatchGrid';
-import { WatchActionsProvider } from './context/WatchActionsContext';
+
 
 
 import { ClipsMoodChips } from './clips/ClipsMoodChips';
@@ -65,7 +65,6 @@ export default function ClipsSubpage() {
   const isFiltered = mood !== 'for_you';
 
   return (
-    <WatchActionsProvider>
       <PageRoot className="min-h-screen" hasBottomNav={true} style={{ background: CREAM }}>
         <ShellSlot>
           <ClipsMoodChips
@@ -130,6 +129,5 @@ export default function ClipsSubpage() {
 
         <ScrollToTopGlass />
       </PageRoot>
-    </WatchActionsProvider>
   );
 }

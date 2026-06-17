@@ -3,9 +3,7 @@ import { useRef, useEffect, useState, useCallback, useMemo } from 'react';
 import { Heart } from 'lucide-react';
 import Hls from 'hls.js';
 import type { FeedPost } from '@/components/media-system/types/media';
-import { useWatchActions } from './context/WatchActionsContext';
 import { Pin } from './proshop/Pin';
-import { haptic } from '@/utils/haptics';
 
 interface WatchRailTileProps {
   post: FeedPost;
@@ -23,10 +21,6 @@ interface WatchRailTileProps {
   viewedPostIds?: Set<string>;
 }
 
-// Hybrid "why" labels — Session 2 of 3.
-// Server-side reasons (TRENDING / NEAR YOU / FROM A COURSE YOU'VE PLAYED)
-// are deferred until we add the joins to get_watch_shorts. For now we derive
-// the two cheap reasons from data already on FeedPost.
 const NEW_THRESHOLD_MS = 24 * 60 * 60 * 1000; // 24h
 const POPULAR_REVIEW_LIKES = 25;
 
@@ -67,7 +61,6 @@ export default function WatchRailTile({
   const thumb = media?.thumbnailUrl || media?.imageUrl || '';
   const hlsUrl = media?.hlsUrl || '';
 
-  // Per-card IntersectionObserver — autoplay once when 40% visible
   useEffect(() => {
     const el = cardRef.current;
     if (!el || !hlsUrl || hasPlayed) return;
@@ -115,7 +108,6 @@ export default function WatchRailTile({
     };
   }, [hlsUrl]);
 
-  // Cleanup on unmount
   useEffect(() => {
     return () => {
       hlsRef.current?.destroy();
@@ -123,40 +115,9 @@ export default function WatchRailTile({
     };
   }, []);
 
-  const { openActions } = useWatchActions();
-
-  const handleTap = () => {
-    useFullscreenFeedStore.getState().open(allPosts, index);
-  };
-
-  // Long-press → show action sheet (Save / Share / Not interested / Report)
-  const longPressTimerRef = useRef<number | null>(null);
-  const longPressFiredRef = useRef(false);
-
-  const startLongPress = useCallback(() => {
-    longPressFiredRef.current = false;
-    longPressTimerRef.current = window.setTimeout(() => {
-      longPressFiredRef.current = true;
-      haptic('medium');
-      openActions(post);
-    }, 400);
-  }, [openActions, post]);
-
-  const cancelLongPress = useCallback(() => {
-    if (longPressTimerRef.current) {
-      window.clearTimeout(longPressTimerRef.current);
-      longPressTimerRef.current = null;
-    }
-  }, []);
-
   const handleClick = useCallback(() => {
-    if (longPressFiredRef.current) {
-      // Long-press already fired → suppress the implicit tap.
-      longPressFiredRef.current = false;
-      return;
-    }
-    handleTap();
-  }, []);
+    useFullscreenFeedStore.getState().open(allPosts, index);
+  }, [allPosts, index]);
 
   const surfacingReason = useMemo(
     () => deriveSurfacingReason(post, viewedPostIds),
@@ -176,14 +137,6 @@ export default function WatchRailTile({
         aspectRatio: '3/4',
       }}
       onClick={handleClick}
-      onPointerDown={startLongPress}
-      onPointerUp={cancelLongPress}
-      onPointerLeave={cancelLongPress}
-      onPointerCancel={cancelLongPress}
-      onContextMenu={(e) => {
-        // Suppress native long-press context menu so the action sheet wins.
-        e.preventDefault();
-      }}
     >
       {/* Thumbnail */}
       <img

@@ -9,7 +9,7 @@ import WatchSectionHeader from './WatchSectionHeader';
 // WatchSectionDivider removed in Phase 4 — kicker + h1 already separate
 // sections clearly; dividers fragmented the surface visually.
 
-import { WatchActionsProvider } from './context/WatchActionsContext';
+
 import { useWatchFeed } from './hooks/useWatchFeed';
 import ScrollToTopGlass from '@/components/common/ScrollToTopGlass';
 import { WatchOfTheWeekHero } from './proshop/WatchOfTheWeekHero';
@@ -47,7 +47,6 @@ export default function UnifiedWatchFeed({ embedded = false }: UnifiedWatchFeedP
   });
 
   return (
-    <WatchActionsProvider>
     <div className="min-h-screen" style={{ background: 'hsl(var(--background))' }}>
 
       {/* ── Pro Shop: Watch of the Week editorial hero ── */}
@@ -112,6 +111,5 @@ export default function UnifiedWatchFeed({ embedded = false }: UnifiedWatchFeedP
 
       <ScrollToTopGlass />
     </div>
-    </WatchActionsProvider>
   );
 }

@@ -2,9 +2,7 @@ import React, { useEffect, useRef } from 'react';
 import { Film, Heart, MessageCircle } from 'lucide-react';
 import type { FeedPost } from '@/components/media-system/types/media';
 import { useFullscreenFeedStore } from '@/store/fullscreenFeedStore';
-import { haptic } from '@/utils/haptics';
 import { Pin } from './proshop/Pin';
-import { LONG_PRESS_MS, TOUCHMOVE_CANCEL_PX } from './constants';
 
 
 function abbreviateCount(n: number): string {
@@ -20,7 +18,6 @@ interface WatchTileProps {
   fetchNextPage?: () => void;
   hasNextPage?: boolean;
   isFetchingNextPage?: boolean;
-  onLongPress?: (post: FeedPost) => void;
   /** When rendered inside the mosaic grid: parent controls aspect, tile is flush. */
   variant?: 'hero' | 'tile';
   feature?: boolean;
@@ -30,23 +27,16 @@ const WatchTile: React.FC<WatchTileProps> = ({
   post,
   index,
   allPosts,
-  onLongPress,
   variant,
 }) => {
   const media = post.mediaItems[0];
   const thumbnailUrl = media?.thumbnailUrl;
-  
+
   const likeCount = post.likeCount ?? 0;
   const commentCount = post.commentCount ?? 0;
   const tileRef = useRef<HTMLDivElement>(null);
   const hlsUrl = post.mediaItems?.[0]?.hlsUrl;
   const { open } = useFullscreenFeedStore();
-  
-
-  // Long-press state
-  const longPressTimerRef = useRef<number | null>(null);
-  const longPressFiredRef = useRef(false);
-  const pressStartRef = useRef<{ x: number; y: number } | null>(null);
 
   useEffect(() => {
     const el = tileRef.current;
@@ -63,45 +53,9 @@ const WatchTile: React.FC<WatchTileProps> = ({
     return () => observer.disconnect();
   }, [hlsUrl]);
 
-  const clearLongPress = () => {
-    if (longPressTimerRef.current != null) {
-      window.clearTimeout(longPressTimerRef.current);
-      longPressTimerRef.current = null;
-    }
-    pressStartRef.current = null;
-  };
-
-  const handlePointerDown = (e: React.PointerEvent) => {
-    if (!onLongPress) return;
-    longPressFiredRef.current = false;
-    pressStartRef.current = { x: e.clientX, y: e.clientY };
-    longPressTimerRef.current = window.setTimeout(() => {
-      longPressFiredRef.current = true;
-      haptic('medium');
-      onLongPress(post);
-      longPressTimerRef.current = null;
-    }, LONG_PRESS_MS);
-  };
-
-  const handlePointerMove = (e: React.PointerEvent) => {
-    const start = pressStartRef.current;
-    if (!start) return;
-    const dx = Math.abs(e.clientX - start.x);
-    const dy = Math.abs(e.clientY - start.y);
-    if (dx > TOUCHMOVE_CANCEL_PX || dy > TOUCHMOVE_CANCEL_PX) {
-      clearLongPress();
-    }
-  };
-
   const handleClick = () => {
-    // Suppress click if a long-press just fired
-    if (longPressFiredRef.current) {
-      longPressFiredRef.current = false;
-      return;
-    }
     open(allPosts ?? [post], index);
   };
-
 
   const mosaic = variant === 'hero' || variant === 'tile';
   const tileClassName = mosaic
@@ -114,21 +68,6 @@ const WatchTile: React.FC<WatchTileProps> = ({
       data-watch-index={index}
       className={tileClassName}
       onClick={handleClick}
-      onPointerDown={handlePointerDown}
-      onPointerMove={handlePointerMove}
-      onPointerUp={clearLongPress}
-      onPointerLeave={clearLongPress}
-      onPointerCancel={clearLongPress}
-      onContextMenu={(e) => {
-        if (onLongPress) {
-          e.preventDefault();
-          if (!longPressFiredRef.current) {
-            longPressFiredRef.current = true;
-            haptic('medium');
-            onLongPress(post);
-          }
-        }
-      }}
     >
       {/* Course name badge — top centre */}
       {post.courseName && (
@@ -169,12 +108,6 @@ const WatchTile: React.FC<WatchTileProps> = ({
         }}
       />
 
-
-
-      {/* Engagement stats — bottom-right (likes always, comments if > 0).
-          Canonical: Lucide Heart + MessageCircle in brand amber, no pill,
-          text-shadow handles legibility on busy thumbnails. Mirrors
-          WatchRailTile so portrait tiles read identically across surfaces. */}
       <div
         className="absolute z-10 flex flex-col items-end gap-1"
         style={{
