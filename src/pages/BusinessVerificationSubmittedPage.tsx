@@ -19,7 +19,7 @@ const BusinessVerificationSubmittedPage = () => {
   };
 
   return (
-    <PageRoot className="min-h-screen bg-background flex flex-col">
+    <PageRoot className="min-h-screen bg-background flex flex-col md:!max-w-[440px]">
       <main className="flex-1 flex flex-col items-center justify-center px-6 py-12">
         {/* Success icon */}
         <motion.div

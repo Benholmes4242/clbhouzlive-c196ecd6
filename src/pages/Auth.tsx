@@ -133,21 +133,23 @@ const Auth: React.FC<AuthProps> = ({ defaultSignUp = false }) => {
   };
 
   return (
-    <AuthForm
-      isSignUp={isSignUp}
-      setIsSignUp={setIsSignUp}
-      setErrorMsg={setErrorMsg}
-      setSubmitting={setSubmitting}
-      setResendMsg={setResendMsg}
-      lastResendEmail={lastResendEmail}
-      setEmail={setEmail}
-      setPassword={setPassword}
-      email={email}
-      password={password}
-      submitting={submitting}
-      authNotice={authNotice}
-      setAuthNotice={setAuthNotice}
-    />
+    <div className="w-full md:max-w-[440px] md:mx-auto">
+      <AuthForm
+        isSignUp={isSignUp}
+        setIsSignUp={setIsSignUp}
+        setErrorMsg={setErrorMsg}
+        setSubmitting={setSubmitting}
+        setResendMsg={setResendMsg}
+        lastResendEmail={lastResendEmail}
+        setEmail={setEmail}
+        setPassword={setPassword}
+        email={email}
+        password={password}
+        submitting={submitting}
+        authNotice={authNotice}
+        setAuthNotice={setAuthNotice}
+      />
+    </div>
   );
 };
 export default Auth;

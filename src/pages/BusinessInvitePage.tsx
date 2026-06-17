@@ -36,7 +36,7 @@ export default function BusinessInvitePage() {
   if (!businessId) return null;
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-background md:max-w-[620px] md:mx-auto">
       {/* Header */}
       <div className="sticky top-0 z-10 bg-background/95 backdrop-blur-xl border-b border-border" style={{ paddingTop: 'max(env(safe-area-inset-top, 0px), 8px)' }}>
         <div className="flex items-center px-4 h-14">
