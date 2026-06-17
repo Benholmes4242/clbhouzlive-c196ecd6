@@ -7,7 +7,7 @@ const SettingsWrapped = () => {
   useHideHeader();
 
   return (
-    <PageRoot className="min-h-screen bg-[#F8FAFC]" hasBottomNav={true}>
+    <PageRoot className="min-h-screen bg-[#F8FAFC] md:!max-w-[440px]" hasBottomNav={true}>
       <SettingsPageV2 />
     </PageRoot>
   );
