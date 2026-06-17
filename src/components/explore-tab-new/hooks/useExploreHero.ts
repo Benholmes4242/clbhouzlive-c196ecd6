@@ -22,7 +22,8 @@ export function useExploreHero(userId: string | undefined, mood: ExploreMoodId) 
   return useQuery({
     queryKey: ['explore-hero', userId, mood],
     enabled: !!userId,
-    staleTime: 5 * 60 * 1000,
+    staleTime: 0,
+    refetchOnMount: 'always',
     gcTime: 15 * 60 * 1000,
     queryFn: async (): Promise<ExploreHeroRow | null> => {
       const { data, error } = await supabase.rpc('get_explore_hero', {
