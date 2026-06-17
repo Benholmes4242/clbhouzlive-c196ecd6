@@ -63,7 +63,7 @@ export default function ExploreTabContent({ embedded: _embedded = false }: Explo
       {activeRegion === null && <WhereYoudRank userId={userId} />}
       {activeRegion === null && <LatestRecordsStrip userId={userId} />}
       {activeRegion === null && <ToughestCoursesStrip userId={userId} />}
-      <ExploreRecommendations userId={userId} mood={mood} />
+      {activeRegion === null && <CircleActivityStrip userId={userId} />}
       <ExploreEchoCTA mood={mood} />
       <ExploreDestinations activeRegion={activeRegion} onRegionSelect={handleRegionChange} />
 
