@@ -111,7 +111,7 @@ const AuthHeroScreen: React.FC<AuthHeroScreenProps> = ({
 
 
   return (
-    <div className="fixed inset-0 flex flex-col">
+    <div className="fixed inset-y-0 left-1/2 flex w-full max-w-[480px] -translate-x-1/2 flex-col md:max-w-[440px]">
       {/* Background */}
       <div
         className="absolute inset-0"
