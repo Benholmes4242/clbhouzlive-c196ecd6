@@ -1753,9 +1753,18 @@ body.route-clubhouse .global-header {
   position: fixed;
   inset: 0;
   height: 100svh;
-  width: 100vw;
+  width: 100%;
   background: var(--bg-page);
   overflow: hidden;
+}
+
+/* iPad: cap the immersive feed card to reading width and center it on the
+   black canvas. Below 768px the card is full-bleed as today. */
+@media (min-width: 768px) {
+  .clubhouse-root [data-card-feed] [data-card-index] {
+    max-width: var(--ipad-read);
+    margin-inline: auto;
+  }
 }
 
 /* Hide Clubhouse progress bar when any overlay is active */
@@ -1887,20 +1896,34 @@ html, body, #root, .app-shell { touch-action: auto; }
   --nav-height: 56px;
 }
 
-/* Global bottom navigation styling */
-.global-bottom-nav {
-  /* Ensure it's above all content but below toasts/modals */
-  z-index: 100 !important;
-  
-  /* Hardware acceleration for smooth performance */
-  transform: translate3d(0, 0, 0);
-  will-change: transform;
-  
-  /* Ensure it never breaks from transforms in parent elements */
-  position: fixed !important;
+/* The shell owns ALL positioning + centering. One mechanism, content-box
+   based (matches the feed card axis exactly). */
+.global-bottom-nav-shell {
+  position: fixed;
   bottom: 0;
   left: 0;
   right: 0;
+  width: 100%;
+  max-width: 480px;
+  margin-inline: auto;
+  z-index: 100;
+}
+
+/* iPad: nav matches the feed card reading width, same axis → perfect align. */
+@media (min-width: 768px) {
+  .global-bottom-nav-shell {
+    max-width: var(--ipad-read);
+  }
+}
+
+/* Global bottom navigation styling */
+.global-bottom-nav {
+  /* Positioning now owned by .global-bottom-nav-shell. This element only
+     handles its own box + stacking. NO position/left/right/transform here —
+     framer-motion animates transform inline; CSS transform here creates a
+     containing block that breaks the shell. */
+  width: 100%;
+  z-index: 100;
 }
 
 /* Ensure pages have bottom padding for the nav when needed */
