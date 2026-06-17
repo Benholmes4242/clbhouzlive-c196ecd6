@@ -739,11 +739,15 @@ html.lightbox-open {
   margin-right: auto;
 }
 
-/* iPad (≥768px): release the phone-width cap so the app fills the canvas.
-   Content pages re-cap their own inner column via .ipad-read / .ipad-form.
-   iPhone (<768px) keeps the 480px column above — untouched. */
+/* iPad (≥768px): center the shared app column at the same reading width as
+   Clubhouse. iPhone (<768px) keeps the 480px column above — untouched. */
 @media (min-width: 768px) {
   .app-shell {
+    max-width: var(--ipad-read);
+  }
+
+  body.route-clubhouse .app-shell,
+  body.route-fullscreen-overlay .app-shell {
     max-width: none;
   }
 }
