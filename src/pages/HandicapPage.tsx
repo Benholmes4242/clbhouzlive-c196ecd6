@@ -322,6 +322,11 @@ const HandicapPage: React.FC = () => {
   const params = useParams<{ userId?: string }>();
   const [searchParams, setSearchParams] = useSearchParams();
 
+  useLayoutEffect(() => {
+    document.body.classList.add('route-handicap');
+    return () => { document.body.classList.remove('route-handicap'); };
+  }, []);
+
   // Determine mode + the user whose handicap we're showing.
   const friendId = params.userId ?? null;
   const isFriendView = !!friendId && !!user?.id && friendId !== user.id;
