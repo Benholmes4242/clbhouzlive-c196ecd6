@@ -219,9 +219,9 @@ function WhereYoudRankInner({ userId }: WhereYoudRankProps) {
   return (
     <section style={{ padding: '0 0 0' }}>
       <ExploreSectionHeader
-        title="Titles within reach"
+        title="Titles within your reach"
         mark={<ReachMark />}
-        sub="Courses you've played — and how close you are"
+        sub="Courses you've played, where your close to the lead"
       />
       <div className="flex gap-3 px-4 overflow-x-auto scrollbar-hide" style={{ paddingBottom: 4 }}>
         {picks.map(row => (
