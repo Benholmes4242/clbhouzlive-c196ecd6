@@ -75,7 +75,7 @@ export function LatestRecordsStrip(_: Props = {}) {
         <ExploreSectionHeader
           mark={<RecordsMark />}
           title="Latest records"
-          sub="Champions · official WHS data"
+          sub="Recent course records from official WHS data"
         />
         <div className="flex gap-3 px-4 overflow-x-auto scrollbar-hide" style={{ paddingBottom: 4 }}>
           {Array.from({ length: 2 }).map((_v, i) => (
@@ -104,7 +104,7 @@ export function LatestRecordsStrip(_: Props = {}) {
       <ExploreSectionHeader
         mark={<RecordsMark />}
         title="Latest records"
-        sub="Champions · official WHS data"
+        sub="Recent course records from official WHS data"
       />
       <div className="flex gap-3 px-4 overflow-x-auto scrollbar-hide" style={{ paddingBottom: 4 }}>
         {records.map((r, i) => (
