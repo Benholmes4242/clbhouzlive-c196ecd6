@@ -52,14 +52,14 @@ function RankCard({ row, onTap }: { row: TitleInReach; onTap: () => void }) {
       onClick={onTap}
       className="block text-left active:scale-[0.99] transition-transform"
       style={{
-        width: 250,
+        width: 244,
         flexShrink: 0,
         background: SURFACE,
         borderRadius: 14,
         overflow: 'hidden',
       }}
     >
-      <div style={{ position: 'relative', width: '100%', height: 130, background: SLATE_50 }}>
+      <div style={{ position: 'relative', width: '100%', height: 116, background: SLATE_50 }}>
         {row.hero_image_url ? (
           <img
             src={row.hero_image_url}
@@ -89,7 +89,7 @@ function RankCard({ row, onTap }: { row: TitleInReach; onTap: () => void }) {
             position: 'absolute',
             inset: 0,
             background:
-              'linear-gradient(180deg, rgba(0,0,0,0.05) 0%, rgba(0,0,0,0.10) 45%, rgba(0,0,0,0.75) 100%)',
+              'linear-gradient(180deg, rgba(0,0,0,0.05) 0%, rgba(0,0,0,0.10) 45%, rgba(0,0,0,0.65) 100%)',
           }}
         />
         {/* category pill */}
@@ -115,26 +115,6 @@ function RankCard({ row, onTap }: { row: TitleInReach; onTap: () => void }) {
           <Crown size={11} color={GOLD} fill={GOLD} strokeWidth={1.5} />
           {categoryLabel(row.category)}
         </span>
-        {/* course name */}
-        <h3
-          style={{
-            position: 'absolute',
-            bottom: 10,
-            left: 12,
-            right: 60,
-            fontSize: 15,
-            fontWeight: 800,
-            letterSpacing: '-0.01em',
-            color: '#FFFFFF',
-            margin: 0,
-            display: '-webkit-box',
-            WebkitLineClamp: 1,
-            WebkitBoxOrient: 'vertical',
-            overflow: 'hidden',
-          }}
-        >
-          {row.course_name}
-        </h3>
         {/* rank */}
         <div
           style={{
@@ -151,17 +131,40 @@ function RankCard({ row, onTap }: { row: TitleInReach; onTap: () => void }) {
           #{row.user_rank}
         </div>
       </div>
-      <div style={{ padding: '10px 12px 12px' }}>
+      <div
+        style={{
+          height: 56,
+          padding: '0 13px',
+          display: 'flex',
+          flexDirection: 'column',
+          justifyContent: 'center',
+        }}
+      >
         <p
           style={{
-            fontSize: 14,
-            fontWeight: 700,
-            color: DEEP_AMBER,
             margin: 0,
-            display: '-webkit-box',
-            WebkitLineClamp: 1,
-            WebkitBoxOrient: 'vertical',
+            fontSize: 14.5,
+            fontWeight: 800,
+            color: '#0F172A',
+            lineHeight: 1.15,
+            letterSpacing: '-0.01em',
             overflow: 'hidden',
+            textOverflow: 'ellipsis',
+            whiteSpace: 'nowrap',
+          }}
+        >
+          {row.course_name}
+        </p>
+        <p
+          style={{
+            margin: '2px 0 0',
+            fontSize: 12,
+            fontWeight: 500,
+            color: DEEP_AMBER,
+            lineHeight: 1.2,
+            overflow: 'hidden',
+            textOverflow: 'ellipsis',
+            whiteSpace: 'nowrap',
           }}
         >
           {gapCopy(row.category, row.gap)}

@@ -13,7 +13,7 @@ import {
 
 const MAROON = '#9F1D1D';
 const FONT = 'Geist, -apple-system, BlinkMacSystemFont, system-ui, sans-serif';
-const CARD_W = 248;
+const CARD_W = 240;
 
 const numFmt = (n: number | null | undefined, digits = 1) =>
   n == null || Number.isNaN(Number(n)) ? '–' : Number(n).toFixed(digits);
@@ -51,7 +51,7 @@ export function ToughestCoursesStrip(_: Props = {}) {
               style={{
                 flexShrink: 0,
                 width: CARD_W,
-                height: 268,
+                height: 238,
                 borderRadius: 14,
                 background: INK_TINT_06,
               }}
@@ -115,7 +115,7 @@ function ToughCourseCard({ course, onTap }: CardProps) {
       }}
     >
       {/* Hero */}
-      <div style={{ position: 'relative', width: '100%', height: 132, background: INK_TINT_06 }}>
+      <div style={{ position: 'relative', width: '100%', height: 180, background: INK_TINT_06 }}>
         {course.thumbnail_image ? (
           <img
             src={course.thumbnail_image}
@@ -218,27 +218,27 @@ function ToughCourseCard({ course, onTap }: CardProps) {
         </div>
       </div>
 
-      {/* Hardest hole row */}
+      {/* Hardest hole — fixed 58px meta band */}
       <div
         style={{
+          height: 58,
           display: 'flex',
           alignItems: 'center',
-          gap: 10,
-          padding: '12px 12px 10px',
+          gap: 9,
+          padding: '0 12px',
         }}
       >
-        {/* squircle tile */}
         <div
           style={{
-            width: 40,
-            height: 40,
-            borderRadius: 14, // ~34% radius
+            width: 34,
+            height: 34,
+            borderRadius: 12,
             background: INK,
             color: '#FFFFFF',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
-            fontSize: 16,
+            fontSize: 14,
             fontWeight: 700,
             fontVariantNumeric: 'tabular-nums',
             flexShrink: 0,
@@ -246,63 +246,42 @@ function ToughCourseCard({ course, onTap }: CardProps) {
         >
           {course.hardest_hole_no ?? '–'}
         </div>
-
         <div style={{ flex: 1, minWidth: 0 }}>
           <p
             style={{
               margin: 0,
-              fontSize: 9,
-              fontWeight: 800,
-              letterSpacing: '0.14em',
-              textTransform: 'uppercase',
-              color: MAROON,
-              lineHeight: 1,
+              fontSize: 13.5,
+              fontWeight: 700,
+              color: INK,
+              lineHeight: 1.15,
+              overflow: 'hidden',
+              textOverflow: 'ellipsis',
+              whiteSpace: 'nowrap',
             }}
           >
-            Hardest hole
+            <span style={{ color: MAROON, fontWeight: 800, letterSpacing: '0.04em', fontSize: 11 }}>
+              HARDEST
+            </span>
+            <span> · Par {course.hardest_hole_par ?? '–'}</span>
           </p>
           <p
             style={{
-              margin: '4px 0 0',
-              fontSize: 12,
+              margin: '1px 0 0',
+              fontSize: 11.5,
               fontWeight: 600,
-              color: INK_MUTE,
+              color: INK_FAINT,
               lineHeight: 1.2,
               fontVariantNumeric: 'tabular-nums',
+              overflow: 'hidden',
+              textOverflow: 'ellipsis',
+              whiteSpace: 'nowrap',
             }}
           >
-            Par {course.hardest_hole_par ?? '–'}
+            +{numFmt(course.hardest_avg_to_par, 1)} over par
             {course.hardest_hole_si != null ? ` · SI ${course.hardest_hole_si}` : ''}
           </p>
         </div>
 
-        <span
-          style={{
-            fontSize: 20,
-            fontWeight: 300,
-            color: INK,
-            fontVariantNumeric: 'tabular-nums',
-            letterSpacing: '-0.01em',
-            lineHeight: 1,
-          }}
-        >
-          +{numFmt(course.hardest_avg_to_par, 1)}
-        </span>
-      </div>
-
-      {/* Footer */}
-      <div
-        style={{
-          padding: '8px 12px 12px',
-          borderTop: `1px solid ${HAIRLINE_INK_8}`,
-          fontSize: 10,
-          fontWeight: 600,
-          color: INK_FAINT,
-          letterSpacing: '0.02em',
-          fontVariantNumeric: 'tabular-nums',
-        }}
-      >
-        {course.total_rounds.toLocaleString()} rounds analysed
       </div>
     </button>
   );
