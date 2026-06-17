@@ -8,7 +8,7 @@ import WatchGrid from './WatchGrid';
 import WatchSectionHeader from './WatchSectionHeader';
 // WatchSectionDivider removed in Phase 4 — kicker + h1 already separate
 // sections clearly; dividers fragmented the surface visually.
-import LongPressTipBanner from './LongPressTipBanner';
+
 import { WatchActionsProvider } from './context/WatchActionsContext';
 import { useWatchFeed } from './hooks/useWatchFeed';
 import ScrollToTopGlass from '@/components/common/ScrollToTopGlass';
