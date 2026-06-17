@@ -802,22 +802,28 @@ html[data-immersive-route='true'] .app-shell {
   }
 }
 
-/* iPad+ : let the dark body backdrop show through the gutters either side of
-   the capped page column (PageRoot caps to 620 / 440 at md:). Without this the
-   .app-shell paints #F8FAFC edge-to-edge and the immersive feel is broken.
-   iPhone (<768) keeps the existing light shell. */
+/* iPad+ : paint the gutters in the page background (#F8FAFC) so the capped
+   content column reads as one continuous centered page. Clubhouse keeps its
+   dark gutters; every other route uses the light page bg. */
 @media (min-width: 768px) {
+  body {
+    background-color: var(--bg-page);
+  }
+  #root {
+    background-color: var(--bg-page) !important;
+  }
   .app-shell,
-  body.route-clubhouse .app-shell,
   body.route-auth .app-shell,
   body.route-light .app-shell {
-    background-color: transparent !important;
+    background-color: var(--bg-page) !important;
   }
-  /* #root paints --bg-page (#F8FAFC) with !important further down the
-     stylesheet — override it on iPad so the dark body backdrop shows through
-     the gutters either side of the capped page column. */
-  #root {
-    background-color: #0A0A0A !important;
+  /* Clubhouse stays dark edge-to-edge */
+  body.route-clubhouse,
+  body.route-clubhouse #root {
+    background-color: #0d0d0d !important;
+  }
+  body.route-clubhouse .app-shell {
+    background-color: #0d0d0d !important;
   }
 }
 
