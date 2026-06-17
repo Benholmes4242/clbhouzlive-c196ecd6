@@ -18008,6 +18008,22 @@ export type Database = {
           username: string
         }[]
       }
+      get_circle_activity: {
+        Args: { p_user_id: string }
+        Returns: {
+          connection_id: string
+          course_image: string
+          course_name: string
+          feat_tone: string
+          feat_type: string
+          feat_value: string
+          friend_avatar: string
+          friend_name: string
+          friend_user_id: string
+          play_date: string
+          score_id: string
+        }[]
+      }
       get_clip_of_the_week: {
         Args: never
         Returns: {

@@ -5,13 +5,13 @@ import { useExploreFeed } from './hooks/useExploreFeed';
 import { useExploreMood } from './hooks/useExploreMood';
 import { useExploreRegion } from './hooks/useExploreRegion';
 import { ExploreHero } from './ExploreHero';
-import { ExploreRecommendations } from './ExploreRecommendations';
 import ConnectHandicapCue from '@/components/courses/course-detail/ConnectHandicapCue';
 import { ExploreEchoCTA } from './ExploreEchoCTA';
 import { ExploreDestinations } from './ExploreDestinations';
 import { WhereYoudRank } from './WhereYoudRank';
 import { ToughestCoursesStrip } from './ToughestCoursesStrip';
 import { LatestRecordsStrip } from './LatestRecordsStrip';
+import { CircleActivityStrip } from './CircleActivityStrip';
 
 import ExploreGrid from './ExploreGrid';
 import ExploreAutoplay from './ExploreAutoplay';
@@ -63,7 +63,7 @@ export default function ExploreTabContent({ embedded: _embedded = false }: Explo
       {activeRegion === null && <WhereYoudRank userId={userId} />}
       {activeRegion === null && <LatestRecordsStrip userId={userId} />}
       {activeRegion === null && <ToughestCoursesStrip userId={userId} />}
-      <ExploreRecommendations userId={userId} mood={mood} />
+      {activeRegion === null && <CircleActivityStrip userId={userId} />}
       <ExploreEchoCTA mood={mood} />
       <ExploreDestinations activeRegion={activeRegion} onRegionSelect={handleRegionChange} />
 
