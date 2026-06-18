@@ -149,6 +149,19 @@ export default function VerificationFlowSheet({ open, onOpenChange, businessId, 
     },
     onSuccess: () => {
       toast.success('Verification request submitted.');
+      // Fire-and-forget admin notification (best-effort; never block success).
+      supabase.functions
+        .invoke('send-business-verification-email', {
+          body: {
+            profileId: user?.id ?? null,
+            businessName: business?.name ?? null,
+            businessCategory: business?.category ?? null,
+            businessLocation: business?.location ?? null,
+            businessWebsite: business?.website ?? null,
+            businessContactEmail: contactEmail || business?.email || null,
+          },
+        })
+        .catch((e) => console.warn('[verification] admin notify failed', e));
       queryClient.invalidateQueries({ queryKey: ['business-verification-request'] });
       queryClient.invalidateQueries({ queryKey: ['business-verification-request-status'] });
       queryClient.invalidateQueries({ queryKey: ['business-account'] });

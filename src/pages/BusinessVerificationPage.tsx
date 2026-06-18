@@ -2,7 +2,7 @@ import { useMemo, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { motion } from 'framer-motion';
-import { ChevronLeft, Shield, Users, Star, Clock, XCircle, BadgeCheck, Mail } from 'lucide-react';
+import { ChevronLeft, Shield, Users, Star, Clock, XCircle, BadgeCheck, Mail, AlertCircle } from 'lucide-react';
 import { format } from 'date-fns';
 import { Button } from '@/components/ui/button';
 import { PageRoot } from '@/components/layout/PageRoot';
@@ -89,7 +89,7 @@ export default function BusinessVerificationPage() {
           <div className="flex-1 px-2">
             <SectionEyebrow label="VERIFICATION" color="amber" />
             <h1 className="text-[18px] mt-0.5" style={{ color: BIZ.ink, fontWeight: 800, letterSpacing: '-0.01em' }}>
-              {state === 'verified' ? 'Verified business' : state === 'pending' ? 'Under review' : state === 'rejected' ? 'Not approved' : 'Get verified'}
+              {state === 'verified' ? 'Verified business' : state === 'pending' ? 'Under review' : state === 'needs_more_info' ? 'More info needed' : state === 'rejected' ? 'Not approved' : 'Get verified'}
             </h1>
           </div>
           <div className="w-11" />
@@ -118,6 +118,12 @@ export default function BusinessVerificationPage() {
               if (business?.slug) navigate(`/business/${business.slug}`);
               else navigate('/businesses/manage');
             }}
+          />
+        ) : state === 'needs_more_info' ? (
+          <NeedsMoreInfoState
+            adminNote={request?.admin_note}
+            reviewedAt={request?.reviewed_at}
+            onAmend={() => openFlow('submit')}
           />
         ) : (
           <RejectedState
@@ -318,6 +324,47 @@ function RejectedState({
           Update business details
         </Button>
       </div>
+    </motion.div>
+  );
+}
+
+function NeedsMoreInfoState({
+  adminNote,
+  reviewedAt,
+  onAmend,
+}: {
+  adminNote?: string | null;
+  reviewedAt?: string | null;
+  onAmend: () => void;
+}) {
+  return (
+    <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} className="space-y-6">
+      <div className="text-center">
+        <div className="h-16 w-16 rounded-full flex items-center justify-center mx-auto mb-4" style={{ background: BIZ.amberTint, border: `1px solid ${BIZ.amberHair}` }}>
+          <AlertCircle className="h-8 w-8" style={{ color: BIZ.amber }} />
+        </div>
+        <h2 className="text-xl font-bold mb-2" style={{ color: BIZ.ink }}>More information needed</h2>
+        <p className="text-sm text-muted-foreground">
+          Our team has reviewed your request and needs a bit more before approving.
+        </p>
+      </div>
+
+      {adminNote && (
+        <div className="rounded-2xl p-4 text-left" style={{ background: '#FFFFFF', border: `1px solid ${BIZ.amberHair}` }}>
+          <p className="text-xs font-medium mb-1" style={{ color: BIZ.amber }}>What we need</p>
+          <p className="text-sm" style={{ color: BIZ.ink }}>{adminNote}</p>
+        </div>
+      )}
+
+      {reviewedAt && (
+        <p className="text-xs text-muted-foreground/70 text-center">
+          Updated {format(new Date(reviewedAt), 'MMM d, yyyy')}
+        </p>
+      )}
+
+      <Button onClick={onAmend} className="w-full h-11 text-white border-0" style={{ background: BIZ.ink, borderRadius: BIZ.rInner }}>
+        Amend and resubmit
+      </Button>
     </motion.div>
   );
 }
