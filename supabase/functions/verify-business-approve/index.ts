@@ -13,7 +13,6 @@ const supabaseAdmin = createClient(
 );
 
 async function isSuperAdmin(userId: string): Promise<boolean> {
-  // Check admin_memberships table for admin role
   const { data, error } = await supabaseAdmin
     .from("admin_memberships")
     .select("role")
@@ -29,7 +28,6 @@ async function isSuperAdmin(userId: string): Promise<boolean> {
 }
 
 serve(async (req) => {
-  // Handle CORS preflight
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
   }
@@ -42,7 +40,6 @@ serve(async (req) => {
       });
     }
 
-    // 1) Identify caller
     const authHeader = req.headers.get("Authorization") ?? "";
     const jwt = authHeader.replace("Bearer ", "");
     const { data: userData, error: userErr } = await supabaseAdmin.auth.getUser(jwt);
@@ -55,7 +52,7 @@ serve(async (req) => {
     }
 
     const adminUserId = userData.user.id;
-    
+
     if (!(await isSuperAdmin(adminUserId))) {
       return new Response(JSON.stringify({ ok: false, error: "Forbidden" }), {
         status: 403,
@@ -63,9 +60,8 @@ serve(async (req) => {
       });
     }
 
-    // 2) Parse payload
     const { request_id, admin_notes } = await req.json();
-    
+
     if (!request_id) {
       return new Response(JSON.stringify({ ok: false, error: "Missing request_id" }), {
         status: 400,
@@ -73,10 +69,10 @@ serve(async (req) => {
       });
     }
 
-    // 3) Load request
+    // Load request to get business_id (for the result email) and gate on pending status
     const { data: request, error: reqErr } = await supabaseAdmin
       .from("business_verification_requests")
-      .select("*")
+      .select("id, business_id, status")
       .eq("id", request_id)
       .single();
 
@@ -94,47 +90,29 @@ serve(async (req) => {
       });
     }
 
-    const businessId = request.business_id;
-    const now = new Date().toISOString();
+    // User-scoped client so auth.uid() resolves inside the SECURITY DEFINER RPC
+    const supabaseUser = createClient(
+      Deno.env.get("SUPABASE_URL")!,
+      Deno.env.get("SUPABASE_ANON_KEY")!,
+      { global: { headers: { Authorization: authHeader } }, auth: { persistSession: false } }
+    );
 
-    // 4) Update request to approved
-    const { error: updReqErr } = await supabaseAdmin
-      .from("business_verification_requests")
-      .update({
-        status: "approved",
-        admin_note: admin_notes ?? null,
-        reviewed_by: adminUserId,
-        reviewed_at: now,
-        updated_at: now,
-      })
-      .eq("id", request_id);
+    // RPC atomically updates business_verification_requests AND business_accounts.is_verified
+    const { error: rpcErr } = await supabaseUser.rpc("approve_business_verification", {
+      _request_id: request_id,
+    });
 
-    if (updReqErr) {
-      console.error("Failed to update request:", updReqErr);
-      throw new Error("Failed to update request");
+    if (rpcErr) {
+      console.error("approve_business_verification RPC failed:", rpcErr);
+      throw new Error(rpcErr.message || "Failed to approve request");
     }
 
-    // 5) Update business to verified
-    const { error: updBizErr } = await supabaseAdmin
-      .from("business_accounts")
-      .update({
-        is_verified: true,
-        verified_by: adminUserId,
-        verified_at: now,
-      })
-      .eq("id", businessId);
-
-    if (updBizErr) {
-      console.error("Failed to verify business:", updBizErr);
-      throw new Error("Failed to verify business");
-    }
-
-    console.log(`Business ${businessId} verified by admin ${adminUserId}`);
+    console.log(`Business ${request.business_id} verified by admin ${adminUserId}`);
 
     // Fire-and-forget result email (best-effort; never block approval)
     supabaseAdmin.functions
       .invoke("send-business-verification-result-email", {
-        body: { business_id: businessId, outcome: "approved", admin_note: admin_notes ?? null },
+        body: { business_id: request.business_id, outcome: "approved", admin_note: admin_notes ?? null },
       })
       .catch((e) => console.error("[approve] result-email failed", e));
 
