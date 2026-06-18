@@ -103,6 +103,21 @@ const CompactHeader: React.FC<CompactHeaderProps> = ({ className }) => {
     && location.pathname !== '/tourhub/college-golf/compare';
   const isTourDeepRoute = isTourPlayerRoute || isTourTournamentRoute
     || isTourCollegeCompareRoute || isTourCollegeProfileRoute;
+  // These pages have no ShellSlot beneath the header to carry the scroll-shadow,
+  // so CompactHeader applies it directly. (Routes WITH ShellSlot are excluded to
+  // avoid a double shadow.)
+  const isWatchMainRoute = location.pathname === '/watch';
+  const headerOwnsScrollShadow = isWatchMainRoute || isTourPlayerRoute || isTourCollegeProfileRoute;
+  React.useEffect(() => {
+    if (!headerOwnsScrollShadow) {
+      setScrolled(false);
+      return;
+    }
+    const onScroll = () => setScrolled(window.scrollY > 4);
+    onScroll();
+    window.addEventListener('scroll', onScroll, { passive: true });
+    return () => window.removeEventListener('scroll', onScroll);
+  }, [headerOwnsScrollShadow]);
   // Editorial-geometry chrome (52px / 30px logo / 38px search) applies to
   // tab-landing surfaces. Tour-specific behaviors (compact avatar pill,
   // back-arrow) stay gated on isTourRoute.
