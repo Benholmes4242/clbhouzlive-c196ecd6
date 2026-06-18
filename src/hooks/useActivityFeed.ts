@@ -211,6 +211,11 @@ function getContextUrl(notification: any): string {
     const targetId = data?.target_user_id ?? notification.user_id;
     return `/profile/${targetId}?tab=courses`;
   }
+  // Business verification outcome — deep-link to the verification hub
+  if (type === 'business_verification_update') {
+    const bizId = (typeof data === 'object' && data !== null && !Array.isArray(data) && (data as any).business_id) || entity_id;
+    if (bizId) return `/business/${bizId}/verification`;
+  }
   // Business member/access navigation
   if (type === 'business_member_added' || type === 'business_access_approved') {
     const dataObj = (typeof data === 'object' && data !== null && !Array.isArray(data)) 
@@ -219,6 +224,7 @@ function getContextUrl(notification: any): string {
     const businessSlug = dataObj.business_slug || dataObj.business_id || entity_id;
     if (businessSlug) return `/business/${businessSlug}`;
   }
+
   
   // Tag and mention notifications — post_id lives in the data JSONB, fallback to entity_id
   if (type === 'tag' || type === 'mention' || type === 'mention_post' || type === 'comment_mention') {
