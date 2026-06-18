@@ -2,7 +2,7 @@ import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 
-export type BusinessRole = 'owner' | 'admin' | 'editor' | 'analyst' | 'member';
+export type BusinessRole = 'owner' | 'admin' | 'editor' | 'analyst';
 
 export interface BusinessMembership {
   role: BusinessRole;
