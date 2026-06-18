@@ -36,10 +36,18 @@ const eyebrowDateStyle: React.CSSProperties = {
   textShadow: '0 1px 2px rgba(0,0,0,0.4)',
 };
 
+const promotedDateStyle: React.CSSProperties = {
+  fontSize: 11,
+  fontWeight: 700,
+  color: '#FFFFFF',
+  letterSpacing: '0.18em',
+  textTransform: 'uppercase',
+  textShadow: '0 1px 2px rgba(0,0,0,0.4)',
+};
+
 export const UserEyebrow: React.FC<{ playDate: string }> = ({ playDate }) => (
   <div style={{ fontFamily: FONT_GEIST }}>
-    <div style={eyebrowLabelStyle}>ROUND DETAIL</div>
-    <div style={eyebrowDateStyle}>{formatRoundDate(playDate)}</div>
+    <div style={promotedDateStyle}>{formatRoundDate(playDate)}</div>
   </div>
 );
 
