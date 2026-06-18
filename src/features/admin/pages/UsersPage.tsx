@@ -448,6 +448,15 @@ const PROOF_LABELS: Record<string, string> = {
   golf_course: 'Golf course / facility',
 };
 
+const PROOF_NOUNS: Record<string, string> = {
+  official_website: 'website',
+  business_email: 'email address',
+  registered_business: 'company registration',
+  creator_business: 'contact',
+  golf_course: 'golf course website',
+};
+
+
 function VerificationsTab({
   data, loading, review,
 }: {
