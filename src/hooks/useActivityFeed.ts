@@ -212,7 +212,11 @@ function getContextUrl(notification: any): string {
     return `/profile/${targetId}?tab=courses`;
   }
   // Business verification outcome — deep-link to the verification hub
-  if (type === 'business_verification_update') {
+  if (
+    type === 'business_verification_approved' ||
+    type === 'business_verification_rejected' ||
+    type === 'business_verification_needs_info'
+  ) {
     const bizId = (typeof data === 'object' && data !== null && !Array.isArray(data) && (data as any).business_id) || entity_id;
     if (bizId) return `/business/${bizId}/verification`;
   }
