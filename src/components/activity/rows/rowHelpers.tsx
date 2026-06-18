@@ -82,6 +82,9 @@ export function getActorAvatarUrl(notification: ActivityNotification): string | 
       notification.data?.business_logo_url ||
       notification.data?.entity_avatar_url;
     if (businessAvatar) return businessAvatar;
+    // Course-claim notifications: fall back to Clbhouz logomark so we never
+    // render a blank person silhouette for an entity-style notification.
+    if (notification.type.startsWith('course_claim_')) return CLBHOUZ_LOGOMARK_URL;
     return null;
   }
   if (isClbhouzSystemNotification(notification.type)) {
