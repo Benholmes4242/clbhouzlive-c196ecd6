@@ -133,7 +133,7 @@ export const ClubhouseTopBar: React.FC<ClubhouseTopBarProps> = ({
               </button>
             )}
 
-            {!hideProfilePill && user && <HandicapChip />}
+            {!hideProfilePill && user && <HandicapChip light />}
 
             {!hideProfilePill && user && (
               <PostingAsPill
