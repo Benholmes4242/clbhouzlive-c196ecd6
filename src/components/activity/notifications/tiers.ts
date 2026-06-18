@@ -42,6 +42,7 @@ export function getNotificationTier(n: ActivityNotification): NotificationTier {
     t.startsWith('business_verification_') ||
     t.startsWith('golfer_verification_') ||
     t.startsWith('business_access_') ||
+    t.startsWith('course_claim_') ||
     t === 'business_member_added'
   ) {
     return 'status';
