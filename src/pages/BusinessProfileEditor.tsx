@@ -98,6 +98,8 @@ export default function BusinessProfileEditor() {
   const [businessName, setBusinessName] = useState('');
   const [description, setDescription] = useState('');
   const [foundedYear, setFoundedYear] = useState('');
+  /** Optional proof note included with a course-claim request (create-mode, golf-club only). */
+  const [claimProofNote, setClaimProofNote] = useState('');
 
   /* ── contact / location ───────────────────────────── */
   const [address, setAddress] = useState<AddressValue | null>(null);
@@ -426,8 +428,10 @@ export default function BusinessProfileEditor() {
 
 
         if (isGolfClub && selectedClub) {
-          insertData.club_id = selectedClub.id;
-          insertData.club_key = selectedClub.club_key || null;
+          // NOTE: club_id / club_key are intentionally NOT written here.
+          // Ownership of the course is granted only when an admin approves a
+          // course_claim_request (filed below after the business is created).
+          // Display fields (lat/lng/country) are safe to populate up-front.
           insertData.lat = selectedClub.latitude || null;
           insertData.lng = selectedClub.longitude || null;
           insertData.country = selectedClub.country || null;
@@ -483,6 +487,32 @@ export default function BusinessProfileEditor() {
         });
         if (memberErr) throw memberErr;
 
+        // For golf-club businesses: file a course-claim request for admin review.
+        // The business is already created; the claim links club ownership only on approval.
+        // Do NOT hard-fail the save if the claim submit errors — surface softly.
+        let claimFiled = false;
+        if (isGolfClub && selectedClub) {
+          const { error: claimErr } = await supabase.functions.invoke('request-course-claim', {
+            body: {
+              business_id: newId,
+              club_id: selectedClub.id,
+              club_key: selectedClub.club_key || null,
+              // Editor path is a whole-club claim. The course-page "Claim this course"
+              // CTA (Phase 6) will pass a specific source_course_id via URL param.
+              source_course_id: null,
+              proof_note: claimProofNote.trim() || null,
+            },
+          });
+          if (claimErr) {
+            toast.error(
+              claimErr.message ||
+                'Your business was created, but the club claim could not be submitted (it may already be claimed or under review).',
+            );
+          } else {
+            claimFiled = true;
+          }
+        }
+
         await queryClient.invalidateQueries({
           predicate: (query) => {
             const k = query.queryKey;
@@ -497,7 +527,11 @@ export default function BusinessProfileEditor() {
             );
           },
         });
-        toast.success('Business created');
+        toast.success(
+          claimFiled
+            ? 'Business created — your club claim has been submitted for review.'
+            : 'Business created',
+        );
         navigate(`/business/${row.slug || newId}`);
         return;
       }
