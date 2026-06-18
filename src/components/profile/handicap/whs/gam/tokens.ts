@@ -41,13 +41,13 @@ export const RARITY_DARK: Record<
   common: {
     iconBg: 'rgba(148,163,184,0.14)',
     iconRing: 'rgba(148,163,184,0.40)',
-    labelFg: 'rgba(203,213,225,1)',
+    labelFg: 'var(--hcp-t-60)',
     labelBg: 'rgba(148,163,184,0.14)',
     pillBorder: 'rgba(148,163,184,0.30)',
     cardBorder: 'rgba(148,163,184,0.22)',
     cardBg: 'var(--hcp-bg-1)',
     cardSweep:
-      'linear-gradient(135deg, var(--hcp-bg-1) 0%, #151B23 50%, rgba(148,163,184,0.10) 100%)',
+      'linear-gradient(135deg, #FFFFFF 0%, var(--hcp-bg-2) 55%, rgba(148,163,184,0.16) 100%)',
     topStripe: null,
     glow: null,
     outerGlow: null,
