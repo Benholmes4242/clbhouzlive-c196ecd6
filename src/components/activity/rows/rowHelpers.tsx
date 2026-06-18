@@ -128,17 +128,20 @@ export function getNotificationBadgeIcon(type: string): React.ReactElement {
       return <MapPin {...p} />;
     case 'business_verification_approved':
     case 'golfer_verification_approved':
+    case 'course_claim_approved':
       return <CheckCircle2 {...p} />;
     case 'business_verification_submitted':
     case 'golfer_verification_submitted':
     case 'golfer_verification_invite':
     case 'business_verification_more_proof_requested':
+    case 'course_claim_needs_info':
       return <Clock {...p} />;
     case 'business_verification_rejected':
     case 'golfer_verification_rejected':
     case 'business_verification_removed':
     case 'golfer_verification_removed':
     case 'business_verification_revoked':
+    case 'course_claim_rejected':
       return <Ban {...p} />;
     case 'business_member_added':
     case 'business_access_approved':
