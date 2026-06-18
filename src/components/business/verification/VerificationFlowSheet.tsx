@@ -19,6 +19,15 @@ import {
   type Step,
 } from './steps/verificationTypes';
 
+const PROOF_CONFLICT_MESSAGE: Record<ProofMethod, string> = {
+  official_website:    'This website is already linked to a verified business.',
+  business_email:      'This email address is already linked to a verified business.',
+  registered_business: 'This company registration is already linked to a verified business.',
+  creator_business:    'This contact is already linked to a verified business.',
+  golf_course:         'This golf course website is already linked to a verified business.',
+};
+
+
 interface Props {
   open: boolean;
   onOpenChange: (open: boolean) => void;
@@ -130,8 +139,9 @@ export default function VerificationFlowSheet({ open, onOpenChange, businessId, 
         .limit(1);
       if (checkError) throw checkError;
       if (existingApproved && existingApproved.length > 0) {
-        throw new Error('This proof is already associated with a verified business.');
+        throw new Error(PROOF_CONFLICT_MESSAGE[selectedProof] ?? 'This proof is already linked to a verified business.');
       }
+
 
       const { error } = await supabase
         .from('business_verification_requests')
@@ -170,8 +180,9 @@ export default function VerificationFlowSheet({ open, onOpenChange, businessId, 
     },
     onError: (error: unknown) => {
       const message = (error as Error).message || 'Failed to submit verification request';
-      if (message.includes('already associated')) setExclusivityError(message);
+      if (message.includes('already linked')) setExclusivityError(message);
       toast.error(message);
+
     },
   });
 

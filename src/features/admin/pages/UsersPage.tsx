@@ -15,7 +15,7 @@ import DetailDrawer from '../components/DetailDrawer';
 import ConfirmDialog from '../components/ConfirmDialog';
 import StatTile from '../components/StatTile';
 import { useUsers, type AdminUserRow, type UserFilterStatus } from '../hooks/useUsers';
-import { useVerifications, type VerificationRow } from '../hooks/useVerifications';
+import { useVerifications, useProofConflict, type VerificationRow } from '../hooks/useVerifications';
 import { useTeam, type TeamMember } from '../hooks/useTeam';
 import { useInvites, type InviteRow } from '../hooks/useInvites';
 import { useDebouncedValue } from '@/hooks/useDebouncedValue';
@@ -448,6 +448,15 @@ const PROOF_LABELS: Record<string, string> = {
   golf_course: 'Golf course / facility',
 };
 
+const PROOF_NOUNS: Record<string, string> = {
+  official_website: 'website',
+  business_email: 'email address',
+  registered_business: 'company registration',
+  creator_business: 'contact',
+  golf_course: 'golf course website',
+};
+
+
 function VerificationsTab({
   data, loading, review,
 }: {
@@ -460,6 +469,9 @@ function VerificationsTab({
   const [note, setNote] = useState('');
   const [decision, setDecision] = useState<'approved' | 'rejected' | 'needs_more_info' | null>(null);
   const [bizDetail, setBizDetail] = useState<{ name?: string; category?: string; location?: string; website?: string; email?: string } | null>(null);
+  const [confirmApprove, setConfirmApprove] = useState(false);
+  const { data: proofConflict } = useProofConflict(active);
+
 
   // Fetch business profile when opening a business request
   useEffect(() => {
@@ -485,7 +497,15 @@ function VerificationsTab({
     return data.filter(r => r.status === 'pending');
   }, [data, statusFilter]);
 
-  const close = () => { setActive(null); setNote(''); setDecision(null); setBizDetail(null); };
+  const close = () => { setActive(null); setNote(''); setDecision(null); setBizDetail(null); setConfirmApprove(false); };
+
+  const doApprove = () => {
+    if (!active) return;
+    review.mutate(
+      { id: active.id, type: active.type, decision: 'approved', adminNote: note },
+      { onSuccess: close },
+    );
+  };
 
   const submit = (d: 'approved' | 'rejected' | 'needs_more_info') => {
     if (!active) return;
@@ -494,11 +514,16 @@ function VerificationsTab({
       return;
     }
     if (active.type === 'golfer' && d === 'needs_more_info') return;
+    if (d === 'approved' && proofConflict) {
+      setConfirmApprove(true);
+      return;
+    }
     review.mutate(
       { id: active.id, type: active.type, decision: d as any, adminNote: note },
       { onSuccess: close },
     );
   };
+
 
   const proofMetaEntries = active?.proofMetadata
     ? Object.entries(active.proofMetadata).filter(([, v]) => v !== null && v !== undefined && v !== '')
@@ -596,6 +621,29 @@ function VerificationsTab({
                 )}
               </Field>
             )}
+            {proofConflict && active.type === 'business' && (
+              <div
+                role="alert"
+                style={{
+                  background: t.dangerSoft,
+                  border: `1px solid ${t.danger}`,
+                  borderRadius: t.radius.md,
+                  padding: 12,
+                  display: 'flex',
+                  gap: 10,
+                  alignItems: 'flex-start',
+                }}
+              >
+                <span style={{ fontSize: 16, lineHeight: 1 }} aria-hidden>⚠️</span>
+                <div style={{ fontSize: 13, color: t.dangerText, lineHeight: 1.45 }}>
+                  <strong style={{ fontWeight: 700 }}>Duplicate proof</strong> — this{' '}
+                  {PROOF_NOUNS[active.proofMethod ?? ''] ?? 'proof'} is already verified for{' '}
+                  <strong style={{ fontWeight: 700 }}>{proofConflict.businessName}</strong>.
+                  Approving will verify a second business with the same proof.
+                </div>
+              </div>
+            )}
+
             {proofMetaEntries.length > 0 && (
               <Field label="Proof metadata">
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
@@ -645,9 +693,26 @@ function VerificationsTab({
           </div>
         )}
       </DetailDrawer>
+
+      <ConfirmDialog
+        open={confirmApprove}
+        onClose={() => setConfirmApprove(false)}
+        onConfirm={() => { setConfirmApprove(false); doApprove(); }}
+        title="Approve duplicate proof?"
+        description={
+          proofConflict && active?.proofMethod
+            ? `This ${PROOF_NOUNS[active.proofMethod] ?? 'proof'} is already verified for ${proofConflict.businessName}. Approving will verify a second business with the same proof.`
+            : 'This proof is already verified for another business. Approve anyway?'
+        }
+        confirmLabel="Approve anyway"
+        cancelLabel="Cancel"
+        tone="danger"
+        busy={review.isPending}
+      />
     </div>
   );
 }
+
 
 function VerificationCard({
   row, onOpen, onQuick, disabled,
