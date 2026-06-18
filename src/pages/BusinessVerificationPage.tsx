@@ -2,7 +2,7 @@ import { useMemo, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { motion } from 'framer-motion';
-import { ChevronLeft, Shield, Users, Star, Clock, XCircle, BadgeCheck, Mail } from 'lucide-react';
+import { ChevronLeft, Shield, Users, Star, Clock, XCircle, BadgeCheck, Mail, AlertCircle } from 'lucide-react';
 import { format } from 'date-fns';
 import { Button } from '@/components/ui/button';
 import { PageRoot } from '@/components/layout/PageRoot';
