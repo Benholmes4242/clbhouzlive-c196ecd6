@@ -100,45 +100,7 @@ serve(async (req) => {
       })
       .catch((e) => console.error("[request-info] result-email failed", e));
 
-    // Best-effort in-app notification for the business owner
-    try {
-      const { data: ownerRow } = await supabaseAdmin
-        .from("business_members")
-        .select("user_profile_id")
-        .eq("business_id", request.business_id)
-        .eq("role", "owner")
-        .limit(1)
-        .maybeSingle();
-      const ownerId = ownerRow?.user_profile_id;
-      if (ownerId) {
-        const { data: biz } = await supabaseAdmin
-          .from("business_accounts")
-          .select("name, logo_url")
-          .eq("id", request.business_id)
-          .single();
-        const businessName = biz?.name ?? "your business";
-        await supabaseAdmin.from("notifications").insert({
-          user_id: ownerId,
-          recipient_actor_type: "personal",
-          recipient_actor_id: ownerId,
-          actor_id: adminUserId,
-          type: "business_verification_update",
-          title: "More info needed",
-          message: `We need a bit more to verify ${businessName}. Tap to see what's required and resubmit.`,
-          entity_type: "business",
-          entity_id: request.business_id,
-          data: {
-            business_id: request.business_id,
-            business_name: biz?.name ?? null,
-            business_avatar_url: biz?.logo_url ?? null,
-            outcome: "needs_more_info",
-            admin_note: admin_notes ?? null,
-          },
-        });
-      }
-    } catch (e) {
-      console.error("[request-info] in-app notification failed", e);
-    }
+
 
 
     return new Response(JSON.stringify({ ok: true }), {
