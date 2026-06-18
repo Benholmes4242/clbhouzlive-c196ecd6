@@ -8,7 +8,8 @@ export const CourseEyebrow: React.FC<{
   type?: string | null;
   region?: string | null;
   country?: string | null;
-}> = ({ type, region, country }) => {
+  onPhoto?: boolean;
+}> = ({ type, region, country, onPhoto = false }) => {
   const label = buildEyebrow(type, region, country);
   if (!label) return null;
   return (
@@ -18,10 +19,11 @@ export const CourseEyebrow: React.FC<{
         fontSize: 9.5,
         fontWeight: 700,
         letterSpacing: '0.16em',
-        color: 'var(--hcp-t-100)',
+        color: onPhoto ? '#FFFFFF' : 'var(--hcp-t-100)',
         textTransform: 'uppercase',
         lineHeight: 1.2,
         marginBottom: 4,
+        ...(onPhoto && { textShadow: '0 1px 3px rgba(0,0,0,0.55)' }),
       }}
     >
       {label}
