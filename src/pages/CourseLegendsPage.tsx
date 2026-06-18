@@ -9,11 +9,10 @@ import type { CourseSelection } from '@/components/profile/handicap/whs/sections
 /**
  * Standalone page for a single course's legends (Compete-tab drilldown).
  *
- * DARK page — sits inside the dark handicap surface. The drilldown's
- * components resolve all `var(--hcp-*)` tokens against the dark palette
- * defined on `.hcp-dark` (PageRoot dark applies it). The course-detail
- * embedding of the same drilldown wraps it in `.hcp-light` to flip the
- * same tokens to the light palette — no component forking.
+ * Both the Compete route and the course-detail embedding render the
+ * drilldown light (hcp-light). Tokens resolve to light values.
+ * No component forking needed — the same fully-tokenized drilldown
+ * works in both contexts via the hcp-light / hcp-dark class flip.
  */
 export const CourseLegendsPage: React.FC = () => {
   const { courseId } = useParams<{ courseId: string }>();
@@ -27,7 +26,7 @@ export const CourseLegendsPage: React.FC = () => {
 
   if (metaLoading || !meta) {
     return (
-      <PageRoot dark style={{ background: 'var(--hcp-bg-0)' }}>
+      <PageRoot dark={false} style={{ background: 'var(--hcp-bg-0)' }}>
         <main
           style={{ paddingTop: 'var(--chrome-total-h, 0px)', background: 'var(--hcp-bg-0)', minHeight: '100vh' }}
         >
@@ -46,7 +45,7 @@ export const CourseLegendsPage: React.FC = () => {
   };
 
   return (
-    <PageRoot dark style={{ background: 'var(--hcp-bg-0)' }}>
+    <PageRoot dark={false} style={{ background: 'var(--hcp-bg-0)' }}>
       <main
         style={{ paddingTop: 'var(--chrome-total-h, 0px)', background: 'var(--hcp-bg-0)', minHeight: '100vh' }}
       >
