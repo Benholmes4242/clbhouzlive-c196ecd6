@@ -523,7 +523,8 @@ function VerificationsTab({
       ) : (
         <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
           {rows.map(r => (
-            <VerificationCard key={r.id} row={r} onOpen={() => setActive(r)} onQuick={(d) => {
+            <VerificationCard key={r.id} row={r} disabled={review.isPending} onOpen={() => setActive(r)} onQuick={(d) => {
+              if (review.isPending) return;
               setActive(r);
               if (d === 'approved' && r.type === 'business') {
                 review.mutate({ id: r.id, type: r.type, decision: 'approved', adminNote: '' }, { onSuccess: close });
