@@ -576,8 +576,9 @@ export default function BusinessProfileEditor() {
         email: email || null,
         phone: phone?.fullNumber || null,
         booking_url: bookingUrl || null,
-        opening_hours: openingHours,
-        social_links: hasSocial ? socialLinks : null,
+        opening_hours: openingHours as any,
+        social_links: hasSocial ? (socialLinks as any) : null,
+
         updated_at: new Date().toISOString(),
       };
       if (!isClubLinked) {
