@@ -25,7 +25,7 @@ async function isSuperAdmin(userId: string): Promise<boolean> {
     return false;
   }
 
-  return !!data && ["super_admin", "admin", "moderator"].includes(data.role);
+  return !!data && data.role === "full";
 }
 
 serve(async (req) => {

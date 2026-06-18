@@ -22,7 +22,7 @@ async function isSuperAdmin(userId: string): Promise<boolean> {
     console.error("Error checking admin status:", error);
     return false;
   }
-  return !!data && ["super_admin", "admin", "moderator"].includes(data.role);
+  return !!data && data.role === "full";
 }
 
 serve(async (req) => {
