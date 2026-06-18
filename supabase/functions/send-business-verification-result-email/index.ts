@@ -172,7 +172,7 @@ serve(async (req) => {
       method: "POST",
       headers: { Authorization: `Bearer ${resendApiKey}`, "Content-Type": "application/json" },
       body: JSON.stringify({
-        from: "Clbhouz <notifications@clbhouz.com>",
+        from: "Clbhouz <noreply@clbhouz.co.uk>",
         to: recipient,
         subject, text, html,
       }),
