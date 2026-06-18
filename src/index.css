@@ -778,7 +778,7 @@ body.route-clubhouse .app-shell {
   background-color: #F8FAFC !important;
 }
 body.route-handicap .app-shell {
-  background-color: #0d0d0d !important;
+  background-color: #F8FAFC !important;
 }
 
 body.route-auth .app-shell {
@@ -832,13 +832,13 @@ html[data-immersive-route='true'] .app-shell {
   body.route-clubhouse .app-shell {
     background-color: #F8FAFC !important;
   }
-  /* Handicap stays dark edge-to-edge */
+  /* Handicap light edge-to-edge */
   body.route-handicap,
   body.route-handicap #root {
-    background-color: #0d0d0d !important;
+    background-color: #F8FAFC !important;
   }
   body.route-handicap .app-shell {
-    background-color: #0d0d0d !important;
+    background-color: #F8FAFC !important;
   }
 }
 

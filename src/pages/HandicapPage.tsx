@@ -401,8 +401,9 @@ const HandicapPage: React.FC = () => {
     isFriendView ? undefined : (ownerUserId ?? undefined)
   );
   const hasConnection = isFriendView ? true : !!ownConnection;
-  // Connect flow = own view, query settled, no connection. While loading we stay
-  // dark (current behaviour) so connected users never flash light.
+  // Connect flow = own view, query settled, no connection. The whole page is
+  // light now (matches Clubhouse/Watch/Tours) — connect flow no longer needs
+  // a special-case background.
   const isConnectFlow = !isFriendView && !connLoading && !ownConnection;
 
   if (loading) {
@@ -423,7 +424,7 @@ const HandicapPage: React.FC = () => {
   }
 
   return (
-    <PageRoot dark={!isConnectFlow} style={{ background: isConnectFlow ? '#F8FAFC' : 'var(--hcp-bg-0)' }}>
+    <PageRoot dark={false} style={{ background: 'var(--hcp-bg-0)' }}>
       <HandicapPageHeader
         ownerUserId={ownerUserId}
         displayName={displayName}

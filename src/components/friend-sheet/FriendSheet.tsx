@@ -223,7 +223,7 @@ export const FriendSheet: React.FC<FriendSheetProps> = ({
           }}
         />
         <DrawerPrimitive.Content
-          className="hcp-dark"
+          className="hcp-light"
           style={{
             position: 'fixed',
             left: 0,

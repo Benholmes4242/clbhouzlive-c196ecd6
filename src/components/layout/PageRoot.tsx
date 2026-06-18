@@ -5,10 +5,10 @@ import { useMedianStatusBar } from "@/hooks/useMedianStatusBar";
 
 /**
  * Routes that keep the dark chrome (notch/status bar stays dark).
- * Only Handicap stays dark; Clubhouse and every other route are light.
+ * Currently empty — Clubhouse and Handicap are both light. Kept as a hook for
+ * future dark-chrome routes.
  */
-function isDarkChromeRoute(pathname: string): boolean {
-  if (pathname === '/handicap' || pathname.startsWith('/handicap/')) return true;
+function isDarkChromeRoute(_pathname: string): boolean {
   return false;
 }
 
@@ -65,6 +65,7 @@ export const PageRoot = React.forwardRef<HTMLDivElement, PageRootProps>(
         className={cn(
           `page-root w-full max-w-[480px] md:max-w-[620px] mx-auto flex flex-col ${immersiveStatusBar ? (resolvedDark ? 'bg-black' : 'bg-[var(--bg-page)]') : 'bg-[var(--bg-page)]'}`,
           dark === true && 'hcp-dark',
+          dark === false && 'hcp-light',
           !fixedHeight && "min-h-[100vh]",
           fixedHeight && "h-[100dvh] overflow-hidden",
           className

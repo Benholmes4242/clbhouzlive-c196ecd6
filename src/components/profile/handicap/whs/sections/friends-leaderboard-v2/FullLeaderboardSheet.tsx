@@ -45,7 +45,7 @@ export const FullLeaderboardSheet: React.FC<FullLeaderboardSheetProps> = ({
       open={open}
       onClose={onClose}
       ariaLabelledBy="full-leaderboard-title"
-      className="hcp-dark"
+      className="hcp-light"
       style={{
         background: 'var(--hcp-bg-0)',
         maxHeight: '90vh',
