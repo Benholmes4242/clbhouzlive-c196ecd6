@@ -218,6 +218,25 @@ export function BusinessCommandCard({ membership, userId, index = 0, isActive = 
                 {needsDomainVerification ? 'Action required: verify your domain' : 'Pending verification'}
               </p>
             )}
+
+            {(verificationState === 'needs_more_info' || verificationState === 'rejected') && (
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  navigate(`/business/${business.id}/verification`);
+                }}
+                className="inline-flex items-center gap-1 mt-1.5 px-2 py-0.5 rounded-full text-[11px] font-semibold active:opacity-70 transition-opacity"
+                style={
+                  verificationState === 'needs_more_info'
+                    ? { background: BIZ.amberTint, color: BIZ.amber, border: `1px solid ${BIZ.amberHair}` }
+                    : { background: 'hsl(var(--destructive) / 0.1)', color: 'hsl(var(--destructive))', border: '1px solid hsl(var(--destructive) / 0.3)' }
+                }
+              >
+                <ShieldCheck className="w-3 h-3" />
+                {verificationState === 'needs_more_info' ? 'Action needed: more info' : 'Action needed: reapply'}
+              </button>
+            )}
+
           </div>
 
           {/* Three-dot menu */}
