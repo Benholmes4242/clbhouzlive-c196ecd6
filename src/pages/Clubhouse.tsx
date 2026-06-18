@@ -122,8 +122,8 @@ const ClubhouseContent = () => {
     logRouteClubhouse();
   }, []);
 
-  useHeaderVariant('glass-dark');
-  useMedianStatusBar("dark", "transparent", true, false, true, pathname);
+  useHeaderVariant('solid-light');
+  useMedianStatusBar("dark", "#F8FAFC", false, false, true, pathname);
   
   // route-clubhouse class is now applied by ClubhouseWrapped (eagerly loaded)
   // to prevent white flash during lazy chunk loading
@@ -310,7 +310,7 @@ const ClubhouseContent = () => {
       fixedHeight
       hasBottomNav={false}
       style={{ 
-        "--bg-page": "var(--color-black, #000000)", 
+        "--bg-page": "#F8FAFC", 
         position: 'relative', 
         isolation: 'isolate', 
         zIndex: 0
@@ -378,19 +378,19 @@ const ClubhouseContent = () => {
             style={{ paddingTop: 'calc(max(env(safe-area-inset-top, 0px), 47px) + 84px)' }}
           >
             <div className="flex flex-col items-center px-8 text-center pb-6">
-              <div className="w-14 h-14 rounded-full bg-white/5 flex items-center justify-center mb-4">
-                <Users className="w-7 h-7 text-white/30" />
+              <div className="w-14 h-14 rounded-full flex items-center justify-center mb-4" style={{ background: 'rgba(15,23,42,0.05)' }}>
+                <Users className="w-7 h-7" style={{ color: '#94A3B8' }} />
               </div>
-              <p className="text-[17px] font-semibold text-white mb-1">
+              <p className="text-[17px] font-semibold mb-1" style={{ color: '#0F172A' }}>
                 No posts from friends yet
               </p>
-              <p className="text-[13px] text-white/50 leading-relaxed">
+              <p className="text-[13px] leading-relaxed" style={{ color: '#64748B' }}>
                 Follow golfers below to start building your feed
               </p>
             </div>
             <SuggestedCreatorsShelf
               userId={user?.id}
-              variant="dark"
+              variant="light"
               title="Golfers to follow"
               showViewAll={true}
               onViewAll={() => navigate('/golfers')}
@@ -401,11 +401,11 @@ const ClubhouseContent = () => {
             className="flex flex-col items-center justify-center min-h-screen px-8 text-center"
             style={{ paddingTop: 'calc(max(env(safe-area-inset-top, 0px), 47px) + 84px)' }}
           >
-            <div className="w-16 h-16 rounded-full bg-white/5 flex items-center justify-center mb-4">
-              <Compass className="w-8 h-8 text-white/30" />
+            <div className="w-16 h-16 rounded-full flex items-center justify-center mb-4" style={{ background: 'rgba(15,23,42,0.05)' }}>
+              <Compass className="w-8 h-8" style={{ color: '#94A3B8' }} />
             </div>
-            <p className="text-lg font-semibold text-white">No posts to show</p>
-            <p className="text-sm text-white/50 mt-2">Check back soon for new content</p>
+            <p className="text-lg font-semibold" style={{ color: '#0F172A' }}>No posts to show</p>
+            <p className="text-sm mt-2" style={{ color: '#64748B' }}>Check back soon for new content</p>
           </div>
         )
       ) : posts.length > 0 ? (
