@@ -31,27 +31,30 @@ import {
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
 import { PageRoot } from '@/components/layout/PageRoot';
-import { SectionEyebrow } from '@/components/ui/SectionEyebrow';
 import { SectionCard } from '@/components/profile/edit-v2/SectionCard';
-import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 
 import { BIZ } from '@/components/business/businessTokens';
-import { BUSINESS_CATEGORIES_WITH_ICONS } from '@/constants/businessCategories';
-import { ClubSearchDropdown, SelectedClub } from '@/components/business/ClubSearchDropdown';
-import { CollegeSearchDropdown, SelectedCollege } from '@/components/business/CollegeSearchDropdown';
-import { AddressAutocomplete, AddressValue } from '@/components/business/AddressAutocomplete';
+import { SelectedClub } from '@/components/business/ClubSearchDropdown';
+import { SelectedCollege } from '@/components/business/CollegeSearchDropdown';
+import { AddressValue } from '@/components/business/AddressAutocomplete';
 import { PinDropModal } from '@/components/business/PinDropModal';
-import { PhoneInputWithDialCode, PhoneValue } from '@/components/business/PhoneInputWithDialCode';
-import {
-  CountrySelector,
-  getCountryCode,
-  getCountryDisplayName,
-} from '@/components/business/CountrySelector';
-import { MapPreview } from '@/components/map/MapPreview';
+import { PhoneValue } from '@/components/business/PhoneInputWithDialCode';
 import { ImageCropModal } from '@/components/business/ImageCropModal';
 import { RequestAccessModal } from '@/components/business/RequestAccessModal';
 import { RequestClubModal } from '@/components/business/RequestClubModal';
 import { getCountryCodeFromClub } from '@/utils/countryCodeMapping';
+
+import { IdentitySection } from '@/components/business/editor/IdentitySection';
+import { LocationContactSection } from '@/components/business/editor/LocationContactSection';
+import { BrandingSection } from '@/components/business/editor/BrandingSection';
+import { SocialSection } from '@/components/business/editor/SocialSection';
+import {
+  DEFAULT_OPENING_HOURS,
+  OpeningHours,
+  SocialFields,
+  ImageState,
+  emptyImage,
+} from '@/components/business/editor/editorTypes';
 
 import { useHideBottomNav } from '@/hooks/useBottomNavVisibility';
 import { useHideHeader } from '@/hooks/useHeaderVisibility';
