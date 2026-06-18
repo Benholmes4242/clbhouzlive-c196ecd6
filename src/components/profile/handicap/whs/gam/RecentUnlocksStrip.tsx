@@ -210,7 +210,7 @@ const UnlockHeroCard: React.FC<{
         style={{
           marginTop: 14,
           paddingTop: 12,
-          borderTop: '1px solid rgba(255,255,255,0.06)',
+          borderTop: '1px solid var(--hcp-line)',
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'space-between',
