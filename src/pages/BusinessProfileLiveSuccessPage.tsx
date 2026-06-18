@@ -129,7 +129,7 @@ const BusinessProfileLiveSuccessPage = () => {
             </button>
             
             <button
-              onClick={() => navigate(`/business/${slug || businessId}/verification/about`)}
+              onClick={() => navigate(`/business/${slug || businessId}/verification`)}
               className="w-full flex items-center gap-3 p-3 rounded-xl transition-all text-left"
               style={{ background: '#ffffff', border: '1px solid rgba(15,23,42,0.07)' }}
             >

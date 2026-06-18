@@ -198,12 +198,7 @@ const BusinessProfileEditor = lazy(() => import("./pages/BusinessProfileEditor")
 
 
 const BusinessProfileLiveSuccessPage = lazy(() => import("./pages/BusinessProfileLiveSuccessPage"));
-const BusinessVerificationAboutPage = lazy(() => import("./pages/BusinessVerificationAboutPage"));
-const BusinessVerificationWizardPage = lazy(() => import("./pages/BusinessVerificationWizardPage"));
-const BusinessVerificationRequestPage = lazy(() => import("./pages/BusinessVerificationRequestPage"));
-const BusinessVerificationSubmittedPage = lazy(() => import("./pages/BusinessVerificationSubmittedPage"));
-const BusinessVerificationStatusPage = lazy(() => import("./pages/BusinessVerificationStatusPage"));
-const BusinessDomainVerifyPage = lazy(() => import("./pages/BusinessDomainVerifyPage"));
+const BusinessVerificationPage = lazy(() => import("./pages/BusinessVerificationPage"));
 const BusinessTeamPage = lazy(() => import("./pages/BusinessTeamPage"));
 const BusinessInvitePage = lazy(() => import("./pages/BusinessInvitePage"));
 const BusinessActivityPage = lazy(() => import("./pages/BusinessActivityPage"));
@@ -381,12 +376,7 @@ function AppRoutes() {
         <Route path="/business/:id/edit" element={<Suspense fallback={<GenericPageSkeleton />}><BusinessProfileEditor /></Suspense>} />
 
         <Route path="/business/success" element={<Suspense fallback={<GenericPageSkeleton />}><BusinessProfileLiveSuccessPage /></Suspense>} />
-        <Route path="/business/:id/verification/about" element={<Suspense fallback={<GenericPageSkeleton />}><BusinessVerificationAboutPage /></Suspense>} />
-        <Route path="/business/:id/verification/wizard" element={<Suspense fallback={<GenericPageSkeleton />}><BusinessVerificationWizardPage /></Suspense>} />
-        <Route path="/business/:id/verification/request" element={<Suspense fallback={<GenericPageSkeleton />}><BusinessVerificationRequestPage /></Suspense>} />
-        <Route path="/business/:id/verification/submitted" element={<Suspense fallback={<GenericPageSkeleton />}><BusinessVerificationSubmittedPage /></Suspense>} />
-        <Route path="/business/:id/verification/status" element={<Suspense fallback={<GenericPageSkeleton />}><BusinessVerificationStatusPage /></Suspense>} />
-        <Route path="/business/:businessId/verification/domain" element={<Suspense fallback={<GenericPageSkeleton />}><BusinessDomainVerifyPage /></Suspense>} />
+        <Route path="/business/:id/verification" element={<Suspense fallback={<GenericPageSkeleton />}><BusinessVerificationPage /></Suspense>} />
         <Route path="/business/:businessId/team" element={<Suspense fallback={<GenericPageSkeleton />}><BusinessTeamPage /></Suspense>} />
         <Route path="/business/:businessId/team/invite" element={<Suspense fallback={<GenericPageSkeleton />}><BusinessInvitePage /></Suspense>} />
         <Route path="/business/:businessId/activity" element={<Suspense fallback={<GenericPageSkeleton />}><BusinessActivityPage /></Suspense>} />

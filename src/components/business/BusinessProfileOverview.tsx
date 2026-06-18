@@ -117,7 +117,7 @@ export function BusinessProfileOverview({ business, membership }: BusinessProfil
 
             {/* Verification CTA */}
             <button
-              onClick={() => !verificationCTA.disabled && navigate(`/business/${business.id}/verification/about`)}
+              onClick={() => !verificationCTA.disabled && navigate(`/business/${business.id}/verification`)}
               className={`flex flex-col items-center gap-1.5 p-3 rounded-sq-md transition-colors ${
                 verificationCTA.disabled ? 'cursor-default' : 'hover:bg-[#F4F5F7]'
               }`}

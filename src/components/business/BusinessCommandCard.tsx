@@ -282,8 +282,7 @@ export function BusinessCommandCard({ membership, userId, index = 0, isActive = 
                     <DropdownMenuItem
                       onClick={(e) => {
                         e.stopPropagation();
-                        // NOTE: verification wizard route stays as-is for now; Phase 5 reconciles verification routes.
-                        navigate(`/business/${business.id}/verification/wizard`);
+                        navigate(`/business/${business.id}/verification`);
                       }}
                       className="gap-2.5 cursor-pointer min-h-[44px] active:bg-muted"
                     >
@@ -389,8 +388,7 @@ export function BusinessCommandCard({ membership, userId, index = 0, isActive = 
               size="sm"
               onClick={(e) => {
                 e.stopPropagation();
-                // FIX: previous route /business/:id/verify-domain 404s. Correct path is /verification/domain.
-                navigate(`/business/${business.id}/verification/domain`);
+                navigate(`/business/${business.id}/verification`);
               }}
               className="gap-1.5 min-h-[44px] flex-1 active:scale-[0.97] transition-all text-white border-0"
               style={{ background: BIZ.amber, borderRadius: BIZ.rInner }}
