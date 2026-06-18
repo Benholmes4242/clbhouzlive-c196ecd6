@@ -71,19 +71,6 @@ const CompactHeader: React.FC<CompactHeaderProps> = ({ className }) => {
   const [scrolled, setScrolled] = useState(false);
   const pillRef = useRef<HTMLButtonElement>(null);
 
-  // Watch main page has no ShellSlot beneath the header to carry the
-  // scroll-shadow, so we apply it directly on CompactHeader when on /watch.
-  const isWatchMainRoute = location.pathname === '/watch';
-  React.useEffect(() => {
-    if (!isWatchMainRoute) {
-      setScrolled(false);
-      return;
-    }
-    const onScroll = () => setScrolled(window.scrollY > 4);
-    onScroll();
-    window.addEventListener('scroll', onScroll, { passive: true });
-    return () => window.removeEventListener('scroll', onScroll);
-  }, [isWatchMainRoute]);
   
   // Tour routes are treated identically across all sub-tabs.
   // The clbhouz logo renders on the left; tour menu access lives in the bottom-nav 'Tour Nav' button.
