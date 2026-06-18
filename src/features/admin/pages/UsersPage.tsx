@@ -514,6 +514,7 @@ function VerificationsTab({
       return;
     }
     if (active.type === 'golfer' && d === 'needs_more_info') return;
+    // Course claims: allow needs_more_info (note required, handled above)
     if (d === 'approved' && proofConflict) {
       setConfirmApprove(true);
       return;
@@ -564,12 +565,19 @@ function VerificationsTab({
       <DetailDrawer
         open={!!active}
         onClose={close}
-        title={active ? (bizDetail?.name ?? active.displayName ?? active.username ?? 'Verification request') : ''}
-        subtitle={active ? `${active.type === 'business' ? 'Business' : 'Golfer'} · ${relTime(active.createdAt)}` : undefined}
+        title={active ? (
+          active.type === 'course_claim'
+            ? (active.claimBusinessName ?? 'Course claim')
+            : (bizDetail?.name ?? active.displayName ?? active.username ?? 'Verification request')
+        ) : ''}
+        subtitle={active ? `${
+          active.type === 'business' ? 'Business' :
+          active.type === 'course_claim' ? 'Course claim' : 'Golfer'
+        } · ${relTime(active.createdAt)}` : undefined}
         footer={active && active.status === 'pending' ? (
           <div style={{ display: 'flex', gap: 8, justifyContent: 'flex-end', flexWrap: 'wrap' }}>
             <DrawerBtn icon={<X size={14} />} tone="danger" disabled={review.isPending} onClick={() => submit('rejected')}>Reject</DrawerBtn>
-            {active.type === 'business' && (
+            {(active.type === 'business' || active.type === 'course_claim') && (
               <DrawerBtn icon={<Mail size={14} />} tone="warn" disabled={review.isPending} onClick={() => submit('needs_more_info')}>Needs info</DrawerBtn>
             )}
             <DrawerBtn icon={<CheckCircle2 size={14} />} disabled={review.isPending} onClick={() => submit('approved')}>Approve</DrawerBtn>
@@ -579,8 +587,12 @@ function VerificationsTab({
         {active && (
           <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
             <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
-              <StatusPill tone={active.type === 'business' ? 'warn' : 'neutral'}>
-                {active.type === 'business' ? 'Business' : 'Golfer'}
+              <StatusPill tone={
+                active.type === 'business' ? 'warn' :
+                active.type === 'course_claim' ? 'warn' : 'neutral'
+              }>
+                {active.type === 'business' ? 'Business' :
+                 active.type === 'course_claim' ? 'Course claim' : 'Golfer'}
               </StatusPill>
               <StatusPill tone={
                 active.status === 'pending' ? 'warn' :
@@ -591,6 +603,14 @@ function VerificationsTab({
                 {active.status}
               </StatusPill>
             </div>
+
+            {active.type === 'course_claim' && (
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+                {active.claimBusinessName && <Field label="Business" value={active.claimBusinessName} />}
+                {active.claimCourseName && <Field label="Course / Club" value={active.claimCourseName} />}
+                {active.claimProofNote && <Field label="Proof note" value={active.claimProofNote} />}
+              </div>
+            )}
 
             {active.type === 'business' && bizDetail && (
               <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
@@ -740,7 +760,8 @@ function VerificationCard({
             {row.displayName ?? row.username ?? row.requestedBy?.slice(0, 8) ?? '—'}
           </div>
           <div style={{ fontSize: 12, color: t.inkMuted }}>
-            {row.type === 'business' ? 'Business' : 'Golfer'} · {relTime(row.createdAt)}
+            {row.type === 'business' ? 'Business' :
+             row.type === 'course_claim' ? 'Course claim' : 'Golfer'} · {relTime(row.createdAt)}
           </div>
         </div>
         <StatusPill tone={tone}>{row.status}</StatusPill>
@@ -748,7 +769,7 @@ function VerificationCard({
       {row.status === 'pending' && (
         <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
           <DrawerBtn icon={<X size={14} />} tone="danger" disabled={disabled} onClick={() => onQuick('rejected')}>Reject</DrawerBtn>
-          {row.type === 'business' && (
+          {(row.type === 'business' || row.type === 'course_claim') && (
             <DrawerBtn icon={<Mail size={14} />} tone="warn" disabled={disabled} onClick={() => onQuick('needs_more_info')}>Needs info</DrawerBtn>
           )}
           <DrawerBtn icon={<CheckCircle2 size={14} />} disabled={disabled} onClick={() => onQuick('approved')}>Approve</DrawerBtn>
