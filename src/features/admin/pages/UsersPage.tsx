@@ -414,20 +414,23 @@ function UserDetailPanel({
 }
 
 function DrawerBtn({
-  children, onClick, tone, icon,
-}: { children: React.ReactNode; onClick: () => void; tone?: 'warn' | 'danger'; icon?: React.ReactNode }) {
+  children, onClick, tone, icon, disabled,
+}: { children: React.ReactNode; onClick: () => void; tone?: 'warn' | 'danger'; icon?: React.ReactNode; disabled?: boolean }) {
   const bg = tone === 'danger' ? t.dangerSoft : tone === 'warn' ? t.warnSoft : t.surface;
   const fg = tone === 'danger' ? t.dangerText : tone === 'warn' ? t.warnText : t.ink;
   const border = tone ? 'transparent' : t.line;
   return (
     <button
       onClick={onClick}
+      disabled={disabled}
       style={{
         display: 'inline-flex', alignItems: 'center', gap: 6,
         padding: '8px 12px', borderRadius: t.radius.md,
         background: bg, color: fg,
         border: `1px solid ${border}`,
-        fontSize: 13, fontWeight: 600, cursor: 'pointer',
+        fontSize: 13, fontWeight: 600,
+        cursor: disabled ? 'not-allowed' : 'pointer',
+        opacity: disabled ? 0.5 : 1,
       }}
     >
       {icon}{children}
@@ -520,7 +523,8 @@ function VerificationsTab({
       ) : (
         <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
           {rows.map(r => (
-            <VerificationCard key={r.id} row={r} onOpen={() => setActive(r)} onQuick={(d) => {
+            <VerificationCard key={r.id} row={r} disabled={review.isPending} onOpen={() => setActive(r)} onQuick={(d) => {
+              if (review.isPending) return;
               setActive(r);
               if (d === 'approved' && r.type === 'business') {
                 review.mutate({ id: r.id, type: r.type, decision: 'approved', adminNote: '' }, { onSuccess: close });
@@ -539,11 +543,11 @@ function VerificationsTab({
         subtitle={active ? `${active.type === 'business' ? 'Business' : 'Golfer'} · ${relTime(active.createdAt)}` : undefined}
         footer={active && active.status === 'pending' ? (
           <div style={{ display: 'flex', gap: 8, justifyContent: 'flex-end', flexWrap: 'wrap' }}>
-            <DrawerBtn icon={<X size={14} />} tone="danger" onClick={() => submit('rejected')}>Reject</DrawerBtn>
+            <DrawerBtn icon={<X size={14} />} tone="danger" disabled={review.isPending} onClick={() => submit('rejected')}>Reject</DrawerBtn>
             {active.type === 'business' && (
-              <DrawerBtn icon={<Mail size={14} />} tone="warn" onClick={() => submit('needs_more_info')}>Needs info</DrawerBtn>
+              <DrawerBtn icon={<Mail size={14} />} tone="warn" disabled={review.isPending} onClick={() => submit('needs_more_info')}>Needs info</DrawerBtn>
             )}
-            <DrawerBtn icon={<CheckCircle2 size={14} />} onClick={() => submit('approved')}>Approve</DrawerBtn>
+            <DrawerBtn icon={<CheckCircle2 size={14} />} disabled={review.isPending} onClick={() => submit('approved')}>Approve</DrawerBtn>
           </div>
         ) : undefined}
       >
@@ -646,8 +650,8 @@ function VerificationsTab({
 }
 
 function VerificationCard({
-  row, onOpen, onQuick,
-}: { row: VerificationRow; onOpen: () => void; onQuick: (d: 'approved' | 'rejected' | 'needs_more_info') => void }) {
+  row, onOpen, onQuick, disabled,
+}: { row: VerificationRow; onOpen: () => void; onQuick: (d: 'approved' | 'rejected' | 'needs_more_info') => void; disabled?: boolean }) {
   const tone =
     row.status === 'pending' || row.status === 'needs_more_info' ? 'warn' :
     row.status === 'approved' || row.status === 'accepted' ? 'ok' :
@@ -678,11 +682,11 @@ function VerificationCard({
       </button>
       {row.status === 'pending' && (
         <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
-          <DrawerBtn icon={<X size={14} />} tone="danger" onClick={() => onQuick('rejected')}>Reject</DrawerBtn>
+          <DrawerBtn icon={<X size={14} />} tone="danger" disabled={disabled} onClick={() => onQuick('rejected')}>Reject</DrawerBtn>
           {row.type === 'business' && (
-            <DrawerBtn icon={<Mail size={14} />} tone="warn" onClick={() => onQuick('needs_more_info')}>Needs info</DrawerBtn>
+            <DrawerBtn icon={<Mail size={14} />} tone="warn" disabled={disabled} onClick={() => onQuick('needs_more_info')}>Needs info</DrawerBtn>
           )}
-          <DrawerBtn icon={<CheckCircle2 size={14} />} onClick={() => onQuick('approved')}>Approve</DrawerBtn>
+          <DrawerBtn icon={<CheckCircle2 size={14} />} disabled={disabled} onClick={() => onQuick('approved')}>Approve</DrawerBtn>
         </div>
       )}
     </div>

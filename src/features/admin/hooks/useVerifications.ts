@@ -99,8 +99,29 @@ export function useVerifications() {
         const { data, error } = await supabase.functions.invoke(fn, {
           body: { request_id: id, admin_notes: adminNote || null },
         });
-        if (error) throw new Error(error.message || 'Edge function error');
-        if (!data?.ok) throw new Error(data?.error || 'Failed to update verification');
+        if (error) {
+          // Inspect FunctionsHttpError context if present
+          const ctx = (error as any)?.context;
+          const status = ctx?.status ?? (error as any)?.status;
+          let bodyText = '';
+          try { bodyText = typeof ctx?.text === 'function' ? await ctx.text() : ''; } catch { /* ignore */ }
+          const combined = `${error.message || ''} ${bodyText}`.toLowerCase();
+          if (status === 409 || combined.includes('not pending') || combined.includes('already')) {
+            const e: any = new Error('already_actioned');
+            e.alreadyActioned = true;
+            throw e;
+          }
+          throw new Error(error.message || 'Edge function error');
+        }
+        if (!data?.ok) {
+          const msg = String(data?.error || '').toLowerCase();
+          if (msg.includes('not pending') || msg.includes('already')) {
+            const e: any = new Error('already_actioned');
+            e.alreadyActioned = true;
+            throw e;
+          }
+          throw new Error(data?.error || 'Failed to update verification');
+        }
         return;
       }
 
@@ -127,12 +148,20 @@ export function useVerifications() {
         decision === 'rejected' ? 'rejected' :
         'sent back for more info';
       toast.success(`Request ${label}`);
+    },
+    onError: (e: any) => {
+      if (e?.alreadyActioned) {
+        toast.info('Request was already actioned — refreshing.');
+        return;
+      }
+      toast.error(e?.message || 'Failed to update verification');
+    },
+    onSettled: () => {
       qc.invalidateQueries({ queryKey: ['admin-v2', 'verifications'] });
       qc.invalidateQueries({ queryKey: ['admin-v2', 'dashboard', 'queue'] });
       qc.invalidateQueries({ queryKey: ['business-verification-request'] });
       qc.invalidateQueries({ queryKey: ['business-account-verification-status'] });
     },
-    onError: (e: Error) => toast.error(e.message || 'Failed to update verification'),
   });
 
   const counts = {
