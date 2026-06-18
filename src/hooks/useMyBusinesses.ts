@@ -44,7 +44,6 @@ export function useMyBusinesses(userProfileId?: string) {
             country,
             logo_url,
             is_verified,
-            is_verified,
             is_deleted
           )
         `)
