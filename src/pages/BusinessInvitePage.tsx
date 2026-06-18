@@ -1,16 +1,17 @@
 import { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { ChevronLeft, Mail, Shield, User, Check } from 'lucide-react';
+import { ChevronLeft, Mail, Shield, Edit3, BarChart3, Check } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { useCreateInvite } from '@/hooks/useBusinessTeam';
+import { useCreateInvite, AssignableBusinessRole } from '@/hooks/useBusinessTeam';
 import { toast } from 'sonner';
 
-const roles = [
-  { value: 'admin', label: 'Admin', icon: Shield, description: 'Can manage the business profile and post on its behalf' },
-  { value: 'member', label: 'Member', icon: User, description: 'Can post on behalf of the business' },
-] as const;
+const roles: ReadonlyArray<{ value: AssignableBusinessRole; label: string; icon: typeof Shield; description: string }> = [
+  { value: 'admin', label: 'Admin', icon: Shield, description: 'Manage the business profile, posts, and team.' },
+  { value: 'editor', label: 'Editor', icon: Edit3, description: 'Create and publish posts as the business.' },
+  { value: 'analyst', label: 'Analyst', icon: BarChart3, description: 'View insights and analytics only.' },
+];
 
 export default function BusinessInvitePage() {
   const { businessId } = useParams<{ businessId: string }>();
@@ -18,7 +19,7 @@ export default function BusinessInvitePage() {
   const createInvite = useCreateInvite(businessId || '');
 
   const [email, setEmail] = useState('');
-  const [role, setRole] = useState<'admin' | 'member'>('member');
+  const [role, setRole] = useState<AssignableBusinessRole>('editor');
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
