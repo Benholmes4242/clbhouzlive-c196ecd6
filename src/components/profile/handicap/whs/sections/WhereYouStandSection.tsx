@@ -210,8 +210,8 @@ const DistributionChart: React.FC<{
                       background: isUser
                         ? `linear-gradient(180deg, ${AMBER} 0%, rgba(247, 147, 30, 0.6) 100%)`
                         : isMedian
-                          ? `linear-gradient(180deg, rgba(255,255,255,0.20), rgba(255,255,255,0.08))`
-                          : `linear-gradient(180deg, rgba(255,255,255,0.10), rgba(255,255,255,0.04))`,
+                          ? `linear-gradient(180deg, var(--hcp-t-40), var(--hcp-t-20))`
+                          : `linear-gradient(180deg, var(--hcp-t-20), var(--hcp-t-20))`,
                       borderRadius: '4px 4px 0 0',
                       boxShadow: isUser ? '0 0 16px rgba(247,147,30,0.30)' : 'none',
                     }}

@@ -235,7 +235,7 @@ const CounterStrip: React.FC<{
         const fill = isLowerHalf ? T.goodFill : T.neutralFill;
         const isSelected = selectedCellId === cell.score.id;
         const shadow = isSelected
-          ? `0 0 0 2px rgba(255,255,255,0.95)`
+          ? `0 0 0 2px var(--hcp-amber)`
           : 'none';
         return (
           <button
@@ -340,7 +340,7 @@ const CounterDetailPanel: React.FC<{ cell: CounterCell }> = ({ cell }) => {
         padding: '10px 12px',
         border: `1px solid ${T.divider}`,
         borderRadius: 10,
-        background: 'rgba(255,255,255,0.03)',
+        background: 'var(--hcp-bg-2)',
         display: 'grid',
         gridTemplateColumns: 'auto 1fr auto auto',
         gap: 14,
@@ -565,8 +565,8 @@ const NormalCard: React.FC<{ f: Forecast; tone: 'good' | 'amber' | 'neutral'; ct
       action = (
         <ActionFooter
           pillText={pillText}
-          pillBg="rgba(255,255,255,0.06)"
-          pillBorder="rgba(255,255,255,0.14)"
+          pillBg="var(--hcp-pill-rank-bg)"
+          pillBorder="var(--hcp-pill-border)"
           pillColor={T.textHi}
           prose={
             <>
@@ -701,7 +701,7 @@ const BuildingCard: React.FC<{ f: Forecast; ctx: CopyCtx }> = ({ f, ctx }) => {
                 flex: 1,
                 height: 4,
                 borderRadius: 999,
-                background: i < have ? T.amber : 'rgba(255,255,255,0.08)',
+                background: i < have ? T.amber : 'var(--hcp-bg-3)',
               }}
             />
           ))}
