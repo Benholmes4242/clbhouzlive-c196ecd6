@@ -15,6 +15,7 @@ export interface ActionQueue {
   pendingVerifications: number;
   pendingInvites:       number;
   expiringAccess:       number;
+  pendingCourseClaims:  number;
 }
 
 export interface ActivityTrendDay {
