@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { useCourseClaim } from '@/hooks/useCourseClaim';
+import { useCourseClaim, useCourseClaimStatus } from '@/hooks/useCourseClaim';
 import { supabase } from '@/integrations/supabase/client';
 import { ExternalLink, Pencil, BookOpen, BarChart3, MapPin } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -28,6 +28,8 @@ import { ExternalLinkSheet } from '@/components/shared/ExternalLinkSheet';
 import { useBusinessClaimForCourse } from '@/hooks/useBusinessClaimForCourse';
 import SuggestEditModal from './SuggestEditModal';
 import ClaimCourseCTA from './ClaimCourseCTA';
+import ClaimUnderReviewNotice from './ClaimUnderReviewNotice';
+import ClaimedCourseProfileLink from './ClaimedCourseProfileLink';
 import { SectionLabel } from './SectionLabel';
 import { AMBER, HAIRLINE_INK_7, HAIRLINE_INK_8, INK_FAINT, SLATE_50, SLATE_600 } from '@/features/courses/_shared/tokens';
 
@@ -80,6 +82,7 @@ const CourseAboutTab = ({ course, onTabChange }: CourseAboutTabProps) => {
   const navigate = useNavigate();
   const { data: businessClaim } = useBusinessClaimForCourse(course.id);
   const { data: courseClaim } = useCourseClaim(course.id);
+  const { data: claimStatus } = useCourseClaimStatus(course.id);
 
   const { coords, loading: coordsLoading } = useCourseCoordinates({
     courseId: course.id,
