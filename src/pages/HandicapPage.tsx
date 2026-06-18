@@ -407,7 +407,7 @@ const HandicapPage: React.FC = () => {
   const isConnectFlow = !isFriendView && !connLoading && !ownConnection;
 
   if (loading) {
-    return <PageRoot><div /></PageRoot>;
+    return <PageRoot dark={false}><div /></PageRoot>;
   }
 
   if (!user?.id) {
