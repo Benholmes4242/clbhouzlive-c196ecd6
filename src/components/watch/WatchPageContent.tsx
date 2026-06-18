@@ -1,9 +1,3 @@
-/**
- * @deprecated Phase 1 — use the Watch tab inside `/discover` instead. The
- * standalone `/watch` route already redirects to the Discover surface
- * (see App.tsx). This file is kept temporarily for reference and will be
- * removed once we confirm no callers reach it.
- */
 import React, { useState, useRef, useEffect } from 'react';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import WatchHeader from '@/components/watch/WatchHeader';
@@ -27,10 +21,18 @@ const WatchPageContent: React.FC<WatchPageContentProps> = ({ embedded = false, s
   const userId = session?.user?.id;
   const activeFilter: WatchFilter = activeTag === 'near' ? 'near' : 'trending';
   const [isSearchOpen, setIsSearchOpen] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
   const gridRef = useRef<HTMLDivElement>(null);
 
   const [userLat, setUserLat] = useState<number | null>(null);
   const [userLng, setUserLng] = useState<number | null>(null);
+
+  useEffect(() => {
+    const onScroll = () => setScrolled(window.scrollY > 4);
+    window.addEventListener('scroll', onScroll, { passive: true });
+    onScroll();
+    return () => window.removeEventListener('scroll', onScroll);
+  }, []);
 
   useEffect(() => {
     if (activeFilter !== 'near') return;
@@ -72,6 +74,7 @@ const WatchPageContent: React.FC<WatchPageContentProps> = ({ embedded = false, s
           onFilterChange={() => {}}
           onOpenSearch={() => setIsSearchOpen(true)}
           embedded={embedded}
+          scrolled={scrolled}
         />
       )}
 

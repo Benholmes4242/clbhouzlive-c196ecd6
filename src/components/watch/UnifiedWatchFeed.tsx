@@ -1,4 +1,4 @@
-import { useRef, useState, useEffect } from 'react';
+import { useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import TrendingThisWeek from './TrendingThisWeek';
@@ -26,14 +26,6 @@ export default function UnifiedWatchFeed({ embedded = false }: UnifiedWatchFeedP
   const navigate = useNavigate();
   const userId = session?.user?.id;
   const gridRef = useRef<HTMLDivElement>(null);
-
-  const [scrolled, setScrolled] = useState(false);
-  useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 4);
-    window.addEventListener('scroll', onScroll, { passive: true });
-    onScroll();
-    return () => window.removeEventListener('scroll', onScroll);
-  }, []);
 
   const { mood, setMood } = useWatchMood();
 
