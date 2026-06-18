@@ -231,6 +231,8 @@ const HandicapPageHeader: React.FC<HeaderProps> = ({
         <div
           style={{
             overflowX: 'auto',
+            overflowY: 'hidden',
+            WebkitOverflowScrolling: 'touch',
             scrollbarWidth: 'none',
             msOverflowStyle: 'none',
             fontFamily: FONT_GEIST,
@@ -238,12 +240,12 @@ const HandicapPageHeader: React.FC<HeaderProps> = ({
           className="hcp-tab-row"
         >
           <div
+            role="tablist"
             style={{
               display: 'flex',
+              justifyContent: 'flex-start',
               gap: 8,
-              padding: '8px 16px 8px',
-              margin: '0 auto',
-              width: 'fit-content',
+              padding: '0 16px',
               minWidth: 'min-content',
             }}
           >
@@ -257,27 +259,37 @@ const HandicapPageHeader: React.FC<HeaderProps> = ({
                   aria-selected={active}
                   style={{
                     flex: '0 0 auto',
-                    height: 32,
-                    padding: '0 10px',
-                    borderRadius: 8,
-                    border: active ? '1px solid var(--hcp-line-3)' : '1px solid transparent',
-                    background: active ? 'var(--hcp-bg-3)' : 'transparent',
-                    color: active ? 'var(--hcp-t-100)' : 'var(--hcp-t-60)',
+                    height: 44,
+                    padding: '0 4px',
+                    borderRadius: 0,
+                    border: 'none',
+                    background: 'transparent',
+                    color: active ? '#0A0E14' : '#64748B',
                     fontFamily: 'inherit',
                     fontSize: 14,
-                    fontWeight: active ? 700 : 500,
-                    letterSpacing: '-0.01em',
+                    fontWeight: active ? 700 : 600,
+                    letterSpacing: '-0.005em',
                     whiteSpace: 'nowrap',
                     cursor: 'pointer',
                     display: 'inline-flex',
                     alignItems: 'center',
-                    transition: 'all 0.15s',
+                    position: 'relative',
+                    transition: 'color 0.15s',
                   }}
                 >
-                  {tab.label}
+                  <span
+                    style={{
+                      display: 'inline-block',
+                      paddingBottom: 4,
+                      borderBottom: active ? '1.5px solid #0A0E14' : '1.5px solid transparent',
+                    }}
+                  >
+                    {tab.label}
+                  </span>
                 </button>
               );
             })}
+
           </div>
           <style>{`.hcp-tab-row::-webkit-scrollbar { display: none; }`}</style>
         </div>
