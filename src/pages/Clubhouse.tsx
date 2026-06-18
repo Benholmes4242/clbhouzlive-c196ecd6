@@ -347,7 +347,7 @@ const ClubhouseContent = () => {
       {!isOnline && !isTournamentCardActive && (
         <div style={{
           position: 'fixed',
-          top: 'calc(max(env(safe-area-inset-top, 0px), 47px) + 56px)',
+          top: 'calc(env(safe-area-inset-top, 0px) + 50px)',
           left: 16,
           right: 16,
           zIndex: 200,
@@ -375,7 +375,7 @@ const ClubhouseContent = () => {
         activeTab === 'friends' ? (
           <div
             className="flex flex-col w-full"
-            style={{ paddingTop: 'calc(max(env(safe-area-inset-top, 0px), 47px) + 84px)' }}
+            style={{ paddingTop: 'calc(env(safe-area-inset-top, 0px) + 78px)' }}
           >
             <div className="flex flex-col items-center px-8 text-center pb-6">
               <div className="w-14 h-14 rounded-full flex items-center justify-center mb-4" style={{ background: 'rgba(15,23,42,0.05)' }}>
@@ -399,7 +399,7 @@ const ClubhouseContent = () => {
         ) : (
           <div
             className="flex flex-col items-center justify-center min-h-screen px-8 text-center"
-            style={{ paddingTop: 'calc(max(env(safe-area-inset-top, 0px), 47px) + 84px)' }}
+            style={{ paddingTop: 'calc(env(safe-area-inset-top, 0px) + 78px)' }}
           >
             <div className="w-16 h-16 rounded-full flex items-center justify-center mb-4" style={{ background: 'rgba(15,23,42,0.05)' }}>
               <Compass className="w-8 h-8" style={{ color: '#94A3B8' }} />
@@ -412,7 +412,7 @@ const ClubhouseContent = () => {
         <>
           <CardFeed
             posts={posts}
-            topPadding={'calc(max(env(safe-area-inset-top, 0px), 47px) + 72px - 7px)'}
+            topPadding={'calc(env(safe-area-inset-top, 0px) + 59px)'}
             onNearEnd={handleNearEnd}
             hasNextPage={hasNextPage}
             onLike={(post) => handleLike(post)}
