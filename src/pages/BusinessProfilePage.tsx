@@ -59,7 +59,7 @@ import { GenericPageSkeleton } from '@/components/skeletons/GenericPageSkeleton'
 import { AvatarLightbox } from '@/components/shared/AvatarLightbox';
 
 
-type BusinessTab = 'content' | 'golfers' | 'info';
+type BusinessTab = 'content' | 'info';
 
 const BusinessProfilePage: React.FC = () => {
   const navigate = useNavigate();
