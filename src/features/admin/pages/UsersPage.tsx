@@ -542,11 +542,11 @@ function VerificationsTab({
         subtitle={active ? `${active.type === 'business' ? 'Business' : 'Golfer'} · ${relTime(active.createdAt)}` : undefined}
         footer={active && active.status === 'pending' ? (
           <div style={{ display: 'flex', gap: 8, justifyContent: 'flex-end', flexWrap: 'wrap' }}>
-            <DrawerBtn icon={<X size={14} />} tone="danger" onClick={() => submit('rejected')}>Reject</DrawerBtn>
+            <DrawerBtn icon={<X size={14} />} tone="danger" disabled={review.isPending} onClick={() => submit('rejected')}>Reject</DrawerBtn>
             {active.type === 'business' && (
-              <DrawerBtn icon={<Mail size={14} />} tone="warn" onClick={() => submit('needs_more_info')}>Needs info</DrawerBtn>
+              <DrawerBtn icon={<Mail size={14} />} tone="warn" disabled={review.isPending} onClick={() => submit('needs_more_info')}>Needs info</DrawerBtn>
             )}
-            <DrawerBtn icon={<CheckCircle2 size={14} />} onClick={() => submit('approved')}>Approve</DrawerBtn>
+            <DrawerBtn icon={<CheckCircle2 size={14} />} disabled={review.isPending} onClick={() => submit('approved')}>Approve</DrawerBtn>
           </div>
         ) : undefined}
       >
