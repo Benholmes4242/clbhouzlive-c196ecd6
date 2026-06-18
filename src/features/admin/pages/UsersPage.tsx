@@ -469,6 +469,9 @@ function VerificationsTab({
   const [note, setNote] = useState('');
   const [decision, setDecision] = useState<'approved' | 'rejected' | 'needs_more_info' | null>(null);
   const [bizDetail, setBizDetail] = useState<{ name?: string; category?: string; location?: string; website?: string; email?: string } | null>(null);
+  const [confirmApprove, setConfirmApprove] = useState(false);
+  const { data: proofConflict } = useProofConflict(active);
+
 
   // Fetch business profile when opening a business request
   useEffect(() => {
