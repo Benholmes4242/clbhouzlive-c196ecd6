@@ -85,9 +85,9 @@ const MyBusinessesPage = () => {
   if (!authLoading && !user) return null;
 
   const handleCreateBusiness = () => {
-    // TODO(phase-3): repoint to unified business editor.
     navigate('/business/create');
   };
+
 
   if (error) {
     return (
