@@ -225,7 +225,7 @@ export const PersonalBests: React.FC<Props> = ({ connectionId, currentHandicap, 
                       style={{
                         fontSize: 22,
                         fontWeight: 300,
-                        color: (t as Tile).value === '—' ? 'rgba(255,255,255,0.25)' : D_T100,
+                        color: (t as Tile).value === '—' ? 'var(--hcp-t-30)' : D_T100,
                         fontVariantNumeric: 'tabular-nums',
                         letterSpacing: '-0.04em',
                         lineHeight: 0.9,

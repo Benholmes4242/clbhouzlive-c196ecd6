@@ -77,17 +77,16 @@ const PbTag: React.FC<{ state: PbState }> = ({ state }) => {
         borderRadius: 999,
         background: isNew
           ? 'linear-gradient(180deg, rgba(247,147,30,0.22), rgba(247,147,30,0.08))'
-          : 'rgba(255,255,255,0.04)',
+          : 'var(--hcp-bg-2)',
         border: isNew
           ? '1px solid rgba(247,147,30,0.42)'
-          : '1px solid rgba(255,255,255,0.08)',
+          : '1px solid var(--hcp-line)',
         fontSize: 9,
         fontWeight: 800,
         color: isNew ? GOLD : 'var(--hcp-t-80)',
         letterSpacing: '0.10em',
         textTransform: 'uppercase',
         fontFamily: FONT,
-        boxShadow: isNew ? 'inset 0 1px 0 rgba(255,255,255,0.08)' : undefined,
       }}
       aria-label={isNew ? 'New personal best' : 'At personal best'}
     >
@@ -137,7 +136,7 @@ const StreakRowView: React.FC<{ type: StreakType; row: StreakRow | null }> = ({
           borderRadius: 12,
           background: isActive
             ? 'linear-gradient(180deg, rgba(247,147,30,0.18) 0%, rgba(247,147,30,0.06) 100%)'
-            : 'linear-gradient(180deg, rgba(255,255,255,0.04), rgba(255,255,255,0.01))',
+            : 'linear-gradient(180deg, var(--hcp-bg-2), var(--hcp-bg-1))',
           border: isActive
             ? '1px solid rgba(247,147,30,0.32)'
             : '1px solid var(--hcp-line)',
