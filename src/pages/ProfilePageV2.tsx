@@ -6,7 +6,7 @@
 import React, { useState, useEffect, useMemo, useRef } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { motion } from 'framer-motion';
-import { AnimatedNumber } from '@/components/ui/AnimatedNumber';
+import { AnimatedNumber } from '@/components/ui/motion';
 import { cn } from '@/lib/utils';
 import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import { useEditProfileRoute } from '@/hooks/useEditProfileRoute';
