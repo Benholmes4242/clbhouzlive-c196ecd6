@@ -497,7 +497,15 @@ function VerificationsTab({
     return data.filter(r => r.status === 'pending');
   }, [data, statusFilter]);
 
-  const close = () => { setActive(null); setNote(''); setDecision(null); setBizDetail(null); };
+  const close = () => { setActive(null); setNote(''); setDecision(null); setBizDetail(null); setConfirmApprove(false); };
+
+  const doApprove = () => {
+    if (!active) return;
+    review.mutate(
+      { id: active.id, type: active.type, decision: 'approved', adminNote: note },
+      { onSuccess: close },
+    );
+  };
 
   const submit = (d: 'approved' | 'rejected' | 'needs_more_info') => {
     if (!active) return;
@@ -506,11 +514,16 @@ function VerificationsTab({
       return;
     }
     if (active.type === 'golfer' && d === 'needs_more_info') return;
+    if (d === 'approved' && proofConflict) {
+      setConfirmApprove(true);
+      return;
+    }
     review.mutate(
       { id: active.id, type: active.type, decision: d as any, adminNote: note },
       { onSuccess: close },
     );
   };
+
 
   const proofMetaEntries = active?.proofMetadata
     ? Object.entries(active.proofMetadata).filter(([, v]) => v !== null && v !== undefined && v !== '')
