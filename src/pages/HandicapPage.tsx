@@ -243,8 +243,7 @@ const HandicapPageHeader: React.FC<HeaderProps> = ({
             role="tablist"
             style={{
               display: 'flex',
-              justifyContent: 'flex-start',
-              gap: 8,
+              justifyContent: 'space-evenly',
               padding: '0 16px',
               minWidth: 'min-content',
             }}
