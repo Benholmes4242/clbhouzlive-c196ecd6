@@ -64,7 +64,7 @@ export const RoundDetailSheet: React.FC<Props> = ({
   onClose,
   scoreId,
   handicapDelta,
-  variant = 'dark',
+  variant = 'light',
 }) => {
   const isLight = variant === 'light';
   const pageBg = isLight ? PAGE_BG_LIGHT : PAGE_BG;
