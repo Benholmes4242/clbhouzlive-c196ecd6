@@ -2946,6 +2946,69 @@ export type Database = {
           },
         ]
       }
+      course_claim_requests: {
+        Row: {
+          admin_note: string | null
+          business_id: string
+          club_id: string
+          club_key: string | null
+          created_at: string
+          id: string
+          proof_note: string | null
+          requested_by: string
+          reviewed_at: string | null
+          reviewed_by: string | null
+          source_course_id: string | null
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          admin_note?: string | null
+          business_id: string
+          club_id: string
+          club_key?: string | null
+          created_at?: string
+          id?: string
+          proof_note?: string | null
+          requested_by: string
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          source_course_id?: string | null
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          admin_note?: string | null
+          business_id?: string
+          club_id?: string
+          club_key?: string | null
+          created_at?: string
+          id?: string
+          proof_note?: string | null
+          requested_by?: string
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          source_course_id?: string | null
+          status?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "course_claim_requests_business_id_fkey"
+            columns: ["business_id"]
+            isOneToOne: false
+            referencedRelation: "business_accounts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "course_claim_requests_source_course_id_fkey"
+            columns: ["source_course_id"]
+            isOneToOne: false
+            referencedRelation: "golf_courses"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       course_dna_profiles: {
         Row: {
           avg_cut_line: number | null
@@ -17171,6 +17234,10 @@ export type Database = {
         Args: { _request_id: string }
         Returns: undefined
       }
+      approve_course_claim: {
+        Args: { _request_id: string }
+        Returns: undefined
+      }
       archive_season_podium: {
         Args: { p_season_id: string }
         Returns: undefined
@@ -20358,6 +20425,10 @@ export type Database = {
         Args: { _admin_note: string; _request_id: string }
         Returns: undefined
       }
+      reject_course_claim: {
+        Args: { _admin_note: string; _request_id: string }
+        Returns: undefined
+      }
       release_orchestrator_lock: {
         Args: { lock_name: string }
         Returns: boolean
@@ -20398,11 +20469,25 @@ export type Database = {
         Args: { p_club_name: string; p_manager_email?: string }
         Returns: string
       }
+      request_course_claim: {
+        Args: {
+          _business_id: string
+          _club_id: string
+          _club_key: string
+          _proof_note: string
+          _source_course_id: string
+        }
+        Returns: string
+      }
       request_domain_verification: {
         Args: { p_domain: string; p_request_id: string }
         Returns: Json
       }
       request_info_business_verification: {
+        Args: { _admin_note: string; _request_id: string }
+        Returns: undefined
+      }
+      request_info_course_claim: {
         Args: { _admin_note: string; _request_id: string }
         Returns: undefined
       }
