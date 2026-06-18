@@ -101,7 +101,7 @@ const Auth = lazy(() => import("./pages/Auth"));
 const AuthCallback = lazy(() => import("./pages/auth/AuthCallback"));
 const Signup = lazy(() => import("./pages/Signup"));
 const Clubhouse = lazy(() => import("./pages/Clubhouse"));
-const WatchPage = lazy(() => import("./pages/WatchPage"));
+
 const HomeLanding = lazy(() => import("./pages/HomeLanding"));
 const WatchHub = lazy(() => import("./pages/WatchHub"));
 const ClipsSubpageWrapped = lazy(() => import("./components/watch/ClipsSubpage"));

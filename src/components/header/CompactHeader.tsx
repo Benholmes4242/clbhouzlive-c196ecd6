@@ -260,7 +260,7 @@ const CompactHeader: React.FC<CompactHeaderProps> = ({ className }) => {
           paddingTop: 'var(--sat, 0px)',
           borderBottom: useDarkChrome
             ? '1px solid rgba(255,255,255,0.06)'
-            : `0.5px solid hsl(var(--border) / 0.5)`,
+            : '0.5px solid rgba(15,23,42,0.07)',
           boxShadow: !useDarkChrome && scrolled
             ? '0 6px 16px -6px rgba(15,23,42,0.18)'
             : 'none',

@@ -76,11 +76,11 @@ export const ShellSlot: React.FC<ShellSlotProps & { dark?: boolean }> = ({ child
         background: dark ? '#0A0E14' : 'hsl(var(--background))',
         borderBottom: dark
           ? '1px solid rgba(255,255,255,0.06)'
-          : '0.5px solid hsl(var(--border) / 0.5)',
+          : '0.5px solid rgba(15,23,42,0.07)',
         boxShadow: scrolled
           ? (dark
               ? '0 6px 18px -10px rgba(0,0,0,0.4)'
-              : '0 6px 18px -10px rgba(15,23,42,0.18)')
+              : '0 6px 16px -6px rgba(15,23,42,0.18)')
           : 'none',
         transition: 'box-shadow 200ms ease',
       }}
