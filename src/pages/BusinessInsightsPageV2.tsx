@@ -1,10 +1,11 @@
 import { useState, useEffect } from 'react';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useParams, useNavigate } from 'react-router-dom';
-import { ChevronLeft, BarChart3, Star, MessageCircle } from 'lucide-react';
+import { ChevronLeft, Star, MessageCircle } from 'lucide-react';
 import { useBusinessProfile } from '@/hooks/useBusinessProfile';
 import { useBusinessMembership } from '@/hooks/useBusinessMembership';
 import { useBusinessReviewStats } from '@/hooks/useBusinessReviewStats';
+import { useBusinessAnalytics } from '@/hooks/useBusinessAnalytics';
 import { PageRoot } from '@/components/layout/PageRoot';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
@@ -13,17 +14,27 @@ import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { AppLog } from '@/lib/logger';
 import { useHideBottomNav } from '@/hooks/useBottomNavVisibility';
 import { useHideHeader } from '@/hooks/useHeaderVisibility';
+import { BIZ } from '@/components/business/businessTokens';
+import SectionEyebrow from '@/components/ui/SectionEyebrow';
+import HeadlineGrid from '@/components/business/insights/HeadlineGrid';
+import ProfileVisitsChart from '@/components/business/insights/ProfileVisitsChart';
+import DiscoveryChart from '@/components/business/insights/DiscoveryChart';
+import ActionsChart from '@/components/business/insights/ActionsChart';
+import ContentPerformanceChart from '@/components/business/insights/ContentPerformanceChart';
 
-type DateRange = '7d' | '28d' | '90d';
+type DateRange = '7d' | '30d' | '90d';
 
-/** Placeholder empty state for sections not yet wired to real data */
-const ComingSoonEmpty = ({ title }: { title: string }) => (
-  <section className="rounded-[18px] p-4 md:p-5" style={{ background: '#ffffff', border: '1px solid rgba(15,23,42,0.07)' }}>
-    <h3 className="text-[0.9rem] font-medium text-foreground mb-1">{title}</h3>
-    <div className="flex flex-col items-center justify-center py-8 gap-2">
-      <BarChart3 className="h-8 w-8 text-muted-foreground/40" />
-      <p className="text-sm text-muted-foreground text-center">Coming soon — We're building this feature</p>
-    </div>
+const cardStyle: React.CSSProperties = {
+  background: BIZ.card,
+  border: `1px solid ${BIZ.hair}`,
+};
+
+const InsightCard = ({ title, children }: { title: string; children: React.ReactNode }) => (
+  <section className="rounded-[18px] p-4 md:p-5" style={cardStyle}>
+    <h3 className="text-[0.9rem] font-medium mb-3" style={{ color: BIZ.ink }}>
+      {title}
+    </h3>
+    {children}
   </section>
 );
 
@@ -180,13 +191,15 @@ const ReviewsSection = ({ businessId, navigate }: { businessId: string; navigate
 const BusinessInsightsPageV2 = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  const [dateRange, setDateRange] = useState<DateRange>('28d');
+  const [dateRange, setDateRange] = useState<DateRange>('30d');
   const { user } = useSupabaseSession();
 
   useHideBottomNav();
   useHideHeader();
   const { data: business, isLoading: businessLoading } = useBusinessProfile(id);
   const { data: membership, isLoading: membershipLoading, isFetched: membershipFetched } = useBusinessMembership(id);
+
+  const { daily, headline, isLoading: analyticsLoading } = useBusinessAnalytics(business?.id, dateRange);
 
   const isLoading = businessLoading || membershipLoading;
 
@@ -225,7 +238,7 @@ const BusinessInsightsPageV2 = () => {
       <PageRoot className="min-h-screen bg-background">
         <div className="max-w-xl mx-auto mt-10 text-center px-4">
           <p className="text-muted-foreground">Business not found</p>
-          <Button onClick={() => navigate('/')} className="mt-4 text-white border-0" style={{ background: '#F7931E' }}>Go home</Button>
+          <Button onClick={() => navigate('/')} className="mt-4 text-white border-0" style={{ background: BIZ.amber }}>Go home</Button>
         </div>
       </PageRoot>
     );
@@ -245,71 +258,121 @@ const BusinessInsightsPageV2 = () => {
 
   const rangeLabels: Record<DateRange, string> = {
     '7d': '7 days',
-    '28d': '28 days',
+    '30d': '30 days',
     '90d': '90 days',
   };
 
   return (
-    <PageRoot className="min-h-screen bg-background pb-20">
+    <PageRoot className="min-h-screen pb-20" style={{ background: BIZ.pageBg }}>
       {/* Header */}
-      <div className="sticky top-0 z-10 backdrop-blur-xl" style={{ background: 'rgba(248,250,252,0.97)', borderBottom: '0.5px solid rgba(15,23,42,0.07)' }}>
-        <div className="flex items-center px-4 h-14">
+      <div
+        className="sticky top-0 z-10 backdrop-blur-xl"
+        style={{ background: 'rgba(248,250,252,0.97)', borderBottom: `0.5px solid ${BIZ.hair}` }}
+      >
+        <div className="flex items-center px-4 h-14 gap-2">
           <button
             onClick={() => navigate(-1)}
-            className="min-h-[44px] min-w-[44px] flex items-center justify-center -ml-2 text-foreground active:scale-[0.97] transition-transform"
+            className="min-h-[44px] min-w-[44px] flex items-center justify-center -ml-2 active:scale-[0.97] transition-transform"
+            style={{ color: BIZ.ink }}
+            aria-label="Back"
           >
             <ChevronLeft className="w-5 h-5" />
           </button>
-          <div className="flex-1 text-center">
-            <h1 className="text-[16px] text-foreground" style={{ fontWeight: 900, letterSpacing: '-0.01em' }}>Insights</h1>
+          <div className="flex-1 min-w-0">
+            <SectionEyebrow label="INSIGHTS" color="amber" />
+            <h1
+              className="text-[18px] leading-tight mt-0.5"
+              style={{ color: BIZ.ink, fontWeight: 700, letterSpacing: '-0.01em' }}
+            >
+              Insights
+            </h1>
           </div>
-          <div className="w-11" />
         </div>
         {/* Date range selector */}
         <div className="flex justify-center pb-3">
-          <div className="inline-flex rounded-full p-1" style={{ border: '1px solid rgba(15,23,42,0.07)', background: 'rgba(15,23,42,0.05)' }}>
-            {(['7d', '28d', '90d'] as DateRange[]).map((range) => (
-              <button
-                key={range}
-                onClick={() => setDateRange(range)}
-                className={cn(
-                  "px-3 md:px-4 py-1.5 text-[0.8rem] rounded-full transition-colors",
-                  dateRange === range 
-                    ? "text-white font-medium" 
-                    : "text-muted-foreground hover:text-foreground"
-                )}
-                style={dateRange === range ? { background: '#F7931E' } : undefined}
-              >
-                {rangeLabels[range]}
-              </button>
-            ))}
+          <div
+            className="inline-flex rounded-full p-1"
+            style={{ border: `1px solid ${BIZ.hair}`, background: BIZ.fill }}
+          >
+            {(['7d', '30d', '90d'] as DateRange[]).map((range) => {
+              const active = dateRange === range;
+              return (
+                <button
+                  key={range}
+                  onClick={() => setDateRange(range)}
+                  className={cn(
+                    'px-3 md:px-4 py-1.5 text-[0.8rem] rounded-full transition-colors',
+                    active ? 'font-medium' : '',
+                  )}
+                  style={
+                    active
+                      ? { background: BIZ.amber, color: '#ffffff' }
+                      : { color: BIZ.inkMute }
+                  }
+                >
+                  {rangeLabels[range]}
+                </button>
+              );
+            })}
           </div>
         </div>
       </div>
 
       <div className="max-w-[1024px] mx-auto px-4 md:px-6 py-6 space-y-5 md:space-y-6">
-        {/* Key Metrics Strip — Coming Soon */}
+        {/* Overview — headline metric tiles */}
         <section>
-          <h2 className="text-[0.75rem] font-medium text-muted-foreground uppercase tracking-wider mb-3">Overview</h2>
-          <div className="rounded-[18px] p-4 md:p-5" style={{ background: '#ffffff', border: '1px solid rgba(15,23,42,0.07)' }}>
-            <div className="flex flex-col items-center justify-center py-6 gap-2">
-              <BarChart3 className="h-8 w-8 text-muted-foreground/40" />
-              <p className="text-sm text-muted-foreground text-center">Coming soon — We're building this feature</p>
-            </div>
+          <h2
+            className="text-[0.75rem] font-medium uppercase tracking-wider mb-3"
+            style={{ color: BIZ.inkMute }}
+          >
+            Overview
+          </h2>
+          <div className="rounded-[18px] p-4 md:p-5" style={cardStyle}>
+            <HeadlineGrid headline={headline} isLoading={analyticsLoading} />
           </div>
         </section>
 
-        {/* Traffic Over Time — Coming Soon */}
-        <ComingSoonEmpty title="Profile visits over time" />
+        {/* Traffic over time */}
+        <InsightCard title="Profile visits over time">
+          {analyticsLoading ? (
+            <Skeleton className="h-[200px] w-full rounded-md" />
+          ) : (
+            <ProfileVisitsChart daily={daily} />
+          )}
+        </InsightCard>
 
-        {/* How Golfers Discover You — Coming Soon */}
-        <ComingSoonEmpty title="How golfers discover you" />
+        {/* How golfers discover you */}
+        <InsightCard title="How golfers discover you">
+          {analyticsLoading ? (
+            <div className="space-y-3">
+              <Skeleton className="h-8 w-full" />
+              <Skeleton className="h-8 w-full" />
+            </div>
+          ) : (
+            <DiscoveryChart headline={headline} />
+          )}
+        </InsightCard>
 
-        {/* What Golfers Do Next — Coming Soon */}
-        <ComingSoonEmpty title="What golfers do next" />
+        {/* What golfers do next */}
+        <InsightCard title="What golfers do next">
+          {analyticsLoading ? (
+            <div className="space-y-3">
+              <Skeleton className="h-8 w-full" />
+              <Skeleton className="h-8 w-full" />
+            </div>
+          ) : (
+            <ActionsChart headline={headline} />
+          )}
+        </InsightCard>
 
-        {/* Content Performance — Coming Soon */}
-        <ComingSoonEmpty title="Content performance" />
+        {/* Content performance */}
+        <InsightCard title="Content performance">
+          {analyticsLoading ? (
+            <Skeleton className="h-[220px] w-full rounded-md" />
+          ) : (
+            <ContentPerformanceChart daily={daily} />
+          )}
+        </InsightCard>
 
         {/* Reviews & Reputation — Real Data */}
         <ReviewsSection businessId={business.id} navigate={navigate} />
