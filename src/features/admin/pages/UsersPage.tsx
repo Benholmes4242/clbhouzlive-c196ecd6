@@ -620,13 +620,14 @@ function VerificationsTab({
         onClose={close}
         title={active ? (
           active.type === 'course_claim'
-            ? (active.claimBusinessName ?? 'Course claim')
+            ? (active.claimCourseName ?? active.claimBusinessName ?? 'Course claim')
             : (bizDetail?.name ?? active.displayName ?? active.username ?? 'Verification request')
         ) : ''}
-        subtitle={active ? `${
-          active.type === 'business' ? 'Business' :
-          active.type === 'course_claim' ? 'Course claim' : 'Golfer'
-        } · ${relTime(active.createdAt)}` : undefined}
+        subtitle={active ? (
+          active.type === 'course_claim'
+            ? `Course claim · requested by ${active.displayName ?? active.username ?? '—'} · ${relTime(active.createdAt)}`
+            : `${active.type === 'business' ? 'Business' : 'Golfer'} · ${relTime(active.createdAt)}`
+        ) : undefined}
         footer={active && active.status === 'pending' ? (
           <div style={{ display: 'flex', gap: 8, justifyContent: 'flex-end', flexWrap: 'wrap' }}>
             <DrawerBtn icon={<X size={14} />} tone="danger" disabled={review.isPending} onClick={() => submit('rejected')}>Reject</DrawerBtn>
