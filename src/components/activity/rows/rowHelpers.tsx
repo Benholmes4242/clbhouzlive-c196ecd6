@@ -172,11 +172,13 @@ export function getBadgeColor(type: string): string {
     type === 'business_verification_removed' ||
     type === 'golfer_verification_removed' ||
     type === 'business_verification_revoked' ||
-    type === 'business_access_declined'
+    type === 'business_access_declined' ||
+    type === 'course_claim_rejected'
   ) return '#DC2626';
   if (
     type === 'business_verification_approved' ||
-    type === 'golfer_verification_approved'
+    type === 'golfer_verification_approved' ||
+    type === 'course_claim_approved'
   ) return '#16A34A';
   return '#1E293B';
 }
