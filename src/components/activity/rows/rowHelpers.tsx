@@ -28,6 +28,7 @@ export function isClbhouzSystemNotification(type: string): boolean {
 export function isBusinessEntityNotification(type: string): boolean {
   return (
     type.startsWith('business_verification_') ||
+    type.startsWith('course_claim_') ||
     type === 'business_member_added' ||
     type === 'business_access_request' ||
     type === 'business_access_approved' ||
