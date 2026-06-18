@@ -35,7 +35,7 @@ export const RecentlyActiveItem: React.FC<Props> = ({ entry, isActive: _isActive
           : 'var(--hcp-bg-2)',
         border: isOnApp
           ? '1px solid rgba(247,147,30,0.18)'
-          : '1px solid rgba(255,255,255,0.06)',
+          : '1px solid var(--hcp-line)',
         borderRadius: 14,
         padding: '9px 8px',
         cursor: onClick ? 'pointer' : 'default',
@@ -93,7 +93,7 @@ export const RecentlyActiveItem: React.FC<Props> = ({ entry, isActive: _isActive
             fontWeight: 700,
             letterSpacing: '0.04em',
             textTransform: 'uppercase',
-            color: 'var(--hcp-t-40, rgba(255,255,255,0.4))',
+            color: 'var(--hcp-t-40)',
             fontVariantNumeric: 'tabular-nums',
             lineHeight: 1,
           }}
