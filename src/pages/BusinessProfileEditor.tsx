@@ -98,6 +98,8 @@ export default function BusinessProfileEditor() {
   const [businessName, setBusinessName] = useState('');
   const [description, setDescription] = useState('');
   const [foundedYear, setFoundedYear] = useState('');
+  /** Optional proof note included with a course-claim request (create-mode, golf-club only). */
+  const [claimProofNote, setClaimProofNote] = useState('');
 
   /* ── contact / location ───────────────────────────── */
   const [address, setAddress] = useState<AddressValue | null>(null);
@@ -426,8 +428,10 @@ export default function BusinessProfileEditor() {
 
 
         if (isGolfClub && selectedClub) {
-          insertData.club_id = selectedClub.id;
-          insertData.club_key = selectedClub.club_key || null;
+          // NOTE: club_id / club_key are intentionally NOT written here.
+          // Ownership of the course is granted only when an admin approves a
+          // course_claim_request (filed below after the business is created).
+          // Display fields (lat/lng/country) are safe to populate up-front.
           insertData.lat = selectedClub.latitude || null;
           insertData.lng = selectedClub.longitude || null;
           insertData.country = selectedClub.country || null;
@@ -483,6 +487,32 @@ export default function BusinessProfileEditor() {
         });
         if (memberErr) throw memberErr;
 
+        // For golf-club businesses: file a course-claim request for admin review.
+        // The business is already created; the claim links club ownership only on approval.
+        // Do NOT hard-fail the save if the claim submit errors — surface softly.
+        let claimFiled = false;
+        if (isGolfClub && selectedClub) {
+          const { error: claimErr } = await supabase.functions.invoke('request-course-claim', {
+            body: {
+              business_id: newId,
+              club_id: selectedClub.id,
+              club_key: selectedClub.club_key || null,
+              // Editor path is a whole-club claim. The course-page "Claim this course"
+              // CTA (Phase 6) will pass a specific source_course_id via URL param.
+              source_course_id: null,
+              proof_note: claimProofNote.trim() || null,
+            },
+          });
+          if (claimErr) {
+            toast.error(
+              claimErr.message ||
+                'Your business was created, but the club claim could not be submitted (it may already be claimed or under review).',
+            );
+          } else {
+            claimFiled = true;
+          }
+        }
+
         await queryClient.invalidateQueries({
           predicate: (query) => {
             const k = query.queryKey;
@@ -497,7 +527,11 @@ export default function BusinessProfileEditor() {
             );
           },
         });
-        toast.success('Business created');
+        toast.success(
+          claimFiled
+            ? 'Business created — your club claim has been submitted for review.'
+            : 'Business created',
+        );
         navigate(`/business/${row.slug || newId}`);
         return;
       }
@@ -579,7 +613,7 @@ export default function BusinessProfileEditor() {
   }, [
     mode, user?.id, id, isValid, resolvedName, category, description, foundedYear, website, email,
     phone, bookingUrl, openingHours, social, address, businessName, isClubLinked, isGolfClub,
-    selectedClub, logo, cover, queryClient, navigate, uploadLogo, removeLogo, uploadCover, removeCover,
+    selectedClub, claimProofNote, logo, cover, queryClient, navigate, uploadLogo, removeLogo, uploadCover, removeCover,
   ]);
 
   /* ── loading / error states (edit) ──────────────── */
@@ -680,6 +714,49 @@ export default function BusinessProfileEditor() {
             foundedYear={foundedYear}
             setFoundedYear={setFoundedYear}
           />
+
+          {/* Proof note — create-mode golf-club claim only.
+              Helps the admin verify your connection to the club. Optional. */}
+          {mode === 'create' && isGolfClub && selectedClub && !existingBusinessForClub && (
+            <div style={{ padding: '0 16px', marginTop: 8, marginBottom: 16 }}>
+              <label
+                htmlFor="claim-proof-note"
+                style={{
+                  display: 'block',
+                  fontSize: 13,
+                  fontWeight: 600,
+                  color: BIZ.ink ?? '#0F172A',
+                  marginBottom: 6,
+                }}
+              >
+                Tell us your connection to this club{' '}
+                <span style={{ color: '#64748B', fontWeight: 400 }}>(optional)</span>
+              </label>
+              <textarea
+                id="claim-proof-note"
+                value={claimProofNote}
+                onChange={(e) => setClaimProofNote(e.target.value.slice(0, 500))}
+                placeholder="e.g. I'm the General Manager — work email on the club domain, happy to send a verification email."
+                rows={3}
+                maxLength={500}
+                style={{
+                  width: '100%',
+                  padding: '10px 12px',
+                  borderRadius: 8,
+                  border: '1px solid rgba(15,23,42,0.12)',
+                  fontSize: 14,
+                  fontFamily: 'inherit',
+                  color: '#0F172A',
+                  background: '#FFFFFF',
+                  resize: 'vertical',
+                  outline: 'none',
+                }}
+              />
+              <p style={{ marginTop: 6, fontSize: 11, color: '#64748B', lineHeight: 1.4 }}>
+                Helps admins verify your claim faster. Your club link is pending until approval.
+              </p>
+            </div>
+          )}
 
           <LocationContactSection
             mode={mode}
