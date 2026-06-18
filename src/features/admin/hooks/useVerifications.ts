@@ -46,7 +46,7 @@ async function fetchVerifications(): Promise<VerificationRow[]> {
       .order('created_at', { ascending: false }),
     supabase
       .from('course_claim_requests')
-      .select('id, status, business_id, club_id, source_course_id, proof_note, admin_notes, created_at, reviewed_at, requested_by')
+      .select('id, status, business_id, club_id, source_course_id, proof_note, admin_note, created_at, reviewed_at, requested_by')
       .order('created_at', { ascending: false }),
   ]);
 
@@ -94,7 +94,7 @@ async function fetchVerifications(): Promise<VerificationRow[]> {
     ...claimRows.map((r: any) => ({
       id: r.id, type: 'course_claim' as const, status: r.status,
       requestedBy: r.requested_by, createdAt: r.created_at, reviewedAt: r.reviewed_at,
-      note: r.proof_note ?? null, adminNote: r.admin_notes ?? null,
+      note: r.proof_note ?? null, adminNote: r.admin_note ?? null,
       businessId: r.business_id,
       claimBusinessName: bizNameById.get(r.business_id) ?? null,
       claimCourseName:
