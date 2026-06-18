@@ -809,13 +809,26 @@ function VerificationCard({
       >
         <SquircleAvatar size={36} src={row.avatarUrl ?? null} alt={row.displayName ?? ''} userId={row.requestedBy} hairlineRing />
         <div style={{ flex: 1, minWidth: 0 }}>
-          <div style={{ fontSize: 14, fontWeight: 600, color: t.ink }}>
-            {row.displayName ?? row.username ?? row.requestedBy?.slice(0, 8) ?? '—'}
-          </div>
-          <div style={{ fontSize: 12, color: t.inkMuted }}>
-            {row.type === 'business' ? 'Business' :
-             row.type === 'course_claim' ? 'Course claim' : 'Golfer'} · {relTime(row.createdAt)}
-          </div>
+          {row.type === 'course_claim' ? (
+            <>
+              <div style={{ fontSize: 14, fontWeight: 600, color: t.ink, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                {row.claimCourseName ?? row.claimBusinessName ?? 'Course claim'}
+              </div>
+              <div style={{ fontSize: 12, color: t.inkMuted, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                Course claim · requested by {row.displayName ?? row.username ?? '—'} · {relTime(row.createdAt)}
+                {row.claimBusinessName && row.claimBusinessName !== row.claimCourseName ? ` · ${row.claimBusinessName}` : ''}
+              </div>
+            </>
+          ) : (
+            <>
+              <div style={{ fontSize: 14, fontWeight: 600, color: t.ink }}>
+                {row.displayName ?? row.username ?? row.requestedBy?.slice(0, 8) ?? '—'}
+              </div>
+              <div style={{ fontSize: 12, color: t.inkMuted }}>
+                {row.type === 'business' ? 'Business' : 'Golfer'} · {relTime(row.createdAt)}
+              </div>
+            </>
+          )}
         </div>
         <StatusPill tone={tone}>{row.status}</StatusPill>
       </button>
