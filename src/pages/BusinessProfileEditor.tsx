@@ -613,7 +613,7 @@ export default function BusinessProfileEditor() {
   }, [
     mode, user?.id, id, isValid, resolvedName, category, description, foundedYear, website, email,
     phone, bookingUrl, openingHours, social, address, businessName, isClubLinked, isGolfClub,
-    selectedClub, logo, cover, queryClient, navigate, uploadLogo, removeLogo, uploadCover, removeCover,
+    selectedClub, claimProofNote, logo, cover, queryClient, navigate, uploadLogo, removeLogo, uploadCover, removeCover,
   ]);
 
   /* ── loading / error states (edit) ──────────────── */
@@ -714,6 +714,49 @@ export default function BusinessProfileEditor() {
             foundedYear={foundedYear}
             setFoundedYear={setFoundedYear}
           />
+
+          {/* Proof note — create-mode golf-club claim only.
+              Helps the admin verify your connection to the club. Optional. */}
+          {mode === 'create' && isGolfClub && selectedClub && !existingBusinessForClub && (
+            <div style={{ padding: '0 16px', marginTop: 8, marginBottom: 16 }}>
+              <label
+                htmlFor="claim-proof-note"
+                style={{
+                  display: 'block',
+                  fontSize: 13,
+                  fontWeight: 600,
+                  color: BIZ.ink ?? '#0F172A',
+                  marginBottom: 6,
+                }}
+              >
+                Tell us your connection to this club{' '}
+                <span style={{ color: '#64748B', fontWeight: 400 }}>(optional)</span>
+              </label>
+              <textarea
+                id="claim-proof-note"
+                value={claimProofNote}
+                onChange={(e) => setClaimProofNote(e.target.value.slice(0, 500))}
+                placeholder="e.g. I'm the General Manager — work email on the club domain, happy to send a verification email."
+                rows={3}
+                maxLength={500}
+                style={{
+                  width: '100%',
+                  padding: '10px 12px',
+                  borderRadius: 8,
+                  border: '1px solid rgba(15,23,42,0.12)',
+                  fontSize: 14,
+                  fontFamily: 'inherit',
+                  color: '#0F172A',
+                  background: '#FFFFFF',
+                  resize: 'vertical',
+                  outline: 'none',
+                }}
+              />
+              <p style={{ marginTop: 6, fontSize: 11, color: '#64748B', lineHeight: 1.4 }}>
+                Helps admins verify your claim faster. Your club link is pending until approval.
+              </p>
+            </div>
+          )}
 
           <LocationContactSection
             mode={mode}
