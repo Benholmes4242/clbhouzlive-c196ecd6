@@ -518,9 +518,8 @@ export default function BusinessProfileEditor() {
               business_id: newId,
               club_id: selectedClub.id,
               club_key: selectedClub.club_key || null,
-              // Editor path is a whole-club claim. The course-page "Claim this course"
-              // CTA (Phase 6) will pass a specific source_course_id via URL param.
-              source_course_id: null,
+              // Editor path may be a whole-club claim or originate from a course page.
+              source_course_id: searchParams.get('sourceCourseId') || null,
               proof_note: claimProofNote.trim() || null,
             },
           });
