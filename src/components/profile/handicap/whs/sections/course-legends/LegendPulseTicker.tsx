@@ -78,7 +78,7 @@ const PulseCard: React.FC<{
         borderRadius: 14,
         border: `1px solid ${tokens.cardBorder}`,
         background: tokens.cardSweep,
-        boxShadow: tokens.outerGlow ?? 'none',
+        boxShadow: tokens.outerGlow ?? '0 1px 2px rgba(15,23,42,0.04), 0 4px 12px rgba(15,23,42,0.06)',
         padding: '8px 14px',
 
         textAlign: 'left',
