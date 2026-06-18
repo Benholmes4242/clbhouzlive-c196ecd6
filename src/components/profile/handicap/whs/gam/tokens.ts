@@ -44,7 +44,7 @@ export const RARITY_DARK: Record<
     labelFg: 'var(--hcp-t-60)',
     labelBg: 'rgba(148,163,184,0.14)',
     pillBorder: 'rgba(148,163,184,0.30)',
-    cardBorder: 'rgba(148,163,184,0.22)',
+    cardBorder: 'rgba(148,163,184,0.30)',
     cardBg: 'var(--hcp-bg-1)',
     cardSweep:
       'linear-gradient(150deg, rgba(148,163,184,0.16) 0%, #FFFFFF 60%)',
