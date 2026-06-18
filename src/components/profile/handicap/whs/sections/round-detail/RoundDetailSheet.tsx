@@ -154,8 +154,8 @@ export const RoundDetailSheet: React.FC<Props> = ({
                 style={{
                   padding: '9px 16px',
                   borderRadius: 999,
-                  background: PAGE_BG_LIGHT,
-                  color: '#0F172A',
+                  background: '#0F172A',
+                  color: '#FFFFFF',
                   fontWeight: 800,
                   fontSize: 12,
                   display: 'inline-flex',
