@@ -245,7 +245,6 @@ const BusinessProfilePage: React.FC = () => {
   
   const tabs = [
     { id: 'content', label: 'Posts' },
-    { id: 'golfers', label: 'People' },
     { id: 'info', label: 'About' },
   ];
 
@@ -257,16 +256,6 @@ const BusinessProfilePage: React.FC = () => {
             actorType="business"
             actorId={business?.id || ''}
             isOwnProfile={isOwner || false}
-          />
-        );
-      case 'golfers':
-        return (
-          <PeopleTab 
-            businessId={business?.id || ''}
-            businessName={business?.name || ''}
-            category={business?.category}
-            canManage={membership?.canManage}
-            isOwner={membership?.role === 'owner'}
           />
         );
       case 'info':
