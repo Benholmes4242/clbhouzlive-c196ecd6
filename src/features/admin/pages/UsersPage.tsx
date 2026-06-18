@@ -437,6 +437,14 @@ function DrawerBtn({
 
 /* ─────────────────────── Verifications ─────────────────────── */
 
+const PROOF_LABELS: Record<string, string> = {
+  official_website: 'Official website',
+  business_email: 'Business email',
+  registered_business: 'Registered business',
+  creator_business: 'Creator / brand',
+  golf_course: 'Golf course / facility',
+};
+
 function VerificationsTab({
   data, loading, review,
 }: {
@@ -444,33 +452,64 @@ function VerificationsTab({
   loading: boolean;
   review: ReturnType<typeof useVerifications>['reviewMutation'];
 }) {
-  const [statusFilter, setStatusFilter] = useState<'pending' | 'all'>('pending');
+  const [statusFilter, setStatusFilter] = useState<'pending' | 'needs_info' | 'approved' | 'rejected' | 'all'>('pending');
   const [active, setActive] = useState<VerificationRow | null>(null);
   const [note, setNote] = useState('');
-  const [decision, setDecision] = useState<'approved' | 'rejected' | null>(null);
+  const [decision, setDecision] = useState<'approved' | 'rejected' | 'needs_more_info' | null>(null);
+  const [bizDetail, setBizDetail] = useState<{ name?: string; category?: string; location?: string; website?: string; email?: string } | null>(null);
+
+  // Fetch business profile when opening a business request
+  useEffect(() => {
+    let cancelled = false;
+    setBizDetail(null);
+    if (active?.type === 'business' && active.businessId) {
+      import('@/integrations/supabase/client').then(({ supabase }) =>
+        supabase.from('business_accounts')
+          .select('name, category, location, website, email')
+          .eq('id', active.businessId!)
+          .maybeSingle()
+          .then(({ data }) => { if (!cancelled && data) setBizDetail(data as any); })
+      );
+    }
+    return () => { cancelled = true; };
+  }, [active?.id, active?.businessId, active?.type]);
 
   const rows = useMemo(() => {
-    if (statusFilter === 'pending') return data.filter(r => r.status === 'pending');
-    return data;
+    if (statusFilter === 'all') return data;
+    if (statusFilter === 'needs_info') return data.filter(r => r.status === 'needs_more_info');
+    if (statusFilter === 'approved') return data.filter(r => r.status === 'approved' || r.status === 'accepted');
+    if (statusFilter === 'rejected') return data.filter(r => r.status === 'rejected' || r.status === 'declined');
+    return data.filter(r => r.status === 'pending');
   }, [data, statusFilter]);
 
-  const close = () => { setActive(null); setNote(''); setDecision(null); };
+  const close = () => { setActive(null); setNote(''); setDecision(null); setBizDetail(null); };
 
-  const submit = (d: 'approved' | 'rejected') => {
+  const submit = (d: 'approved' | 'rejected' | 'needs_more_info') => {
     if (!active) return;
-    if (d === 'rejected' && !note.trim()) return;
+    if ((d === 'rejected' || d === 'needs_more_info') && note.trim().length < 3) {
+      setDecision(d);
+      return;
+    }
+    if (active.type === 'golfer' && d === 'needs_more_info') return;
     review.mutate(
-      { id: active.id, type: active.type, decision: d, adminNote: note },
+      { id: active.id, type: active.type, decision: d as any, adminNote: note },
       { onSuccess: close },
     );
   };
+
+  const proofMetaEntries = active?.proofMetadata
+    ? Object.entries(active.proofMetadata).filter(([, v]) => v !== null && v !== undefined && v !== '')
+    : [];
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
       <SectionTabs
         tabs={[
-          { id: 'pending', label: 'Pending', count: data.filter(r => r.status === 'pending').length },
-          { id: 'all',     label: 'All',     count: data.length },
+          { id: 'pending',   label: 'Pending',    count: data.filter(r => r.status === 'pending').length },
+          { id: 'needs_info', label: 'Needs info', count: data.filter(r => r.status === 'needs_more_info').length },
+          { id: 'approved',  label: 'Approved' },
+          { id: 'rejected',  label: 'Rejected' },
+          { id: 'all',       label: 'All',        count: data.length },
         ]}
         activeId={statusFilter}
         onChange={(id) => setStatusFilter(id as any)}
@@ -483,10 +522,10 @@ function VerificationsTab({
           {rows.map(r => (
             <VerificationCard key={r.id} row={r} onOpen={() => setActive(r)} onQuick={(d) => {
               setActive(r);
-              if (d === 'approved') {
+              if (d === 'approved' && r.type === 'business') {
                 review.mutate({ id: r.id, type: r.type, decision: 'approved', adminNote: '' }, { onSuccess: close });
               } else {
-                setDecision('rejected');
+                setDecision(d);
               }
             }} />
           ))}
@@ -496,11 +535,14 @@ function VerificationsTab({
       <DetailDrawer
         open={!!active}
         onClose={close}
-        title={active ? (active.displayName ?? active.username ?? 'Verification request') : ''}
+        title={active ? (bizDetail?.name ?? active.displayName ?? active.username ?? 'Verification request') : ''}
         subtitle={active ? `${active.type === 'business' ? 'Business' : 'Golfer'} · ${relTime(active.createdAt)}` : undefined}
         footer={active && active.status === 'pending' ? (
-          <div style={{ display: 'flex', gap: 8, justifyContent: 'flex-end' }}>
+          <div style={{ display: 'flex', gap: 8, justifyContent: 'flex-end', flexWrap: 'wrap' }}>
             <DrawerBtn icon={<X size={14} />} tone="danger" onClick={() => submit('rejected')}>Reject</DrawerBtn>
+            {active.type === 'business' && (
+              <DrawerBtn icon={<Mail size={14} />} tone="warn" onClick={() => submit('needs_more_info')}>Needs info</DrawerBtn>
+            )}
             <DrawerBtn icon={<CheckCircle2 size={14} />} onClick={() => submit('approved')}>Approve</DrawerBtn>
           </div>
         ) : undefined}
@@ -513,6 +555,7 @@ function VerificationsTab({
               </StatusPill>
               <StatusPill tone={
                 active.status === 'pending' ? 'warn' :
+                active.status === 'needs_more_info' ? 'warn' :
                 active.status === 'approved' || active.status === 'accepted' ? 'ok' :
                 active.status === 'rejected' || active.status === 'declined' ? 'danger' : 'neutral'
               }>
@@ -520,10 +563,51 @@ function VerificationsTab({
               </StatusPill>
             </div>
 
-            {active.note && (
-              <Field label="Request note" value={active.note} />
+            {active.type === 'business' && bizDetail && (
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+                {bizDetail.category && <Field label="Category" value={bizDetail.category} />}
+                {bizDetail.location && <Field label="Location" value={bizDetail.location} />}
+                {bizDetail.website && (
+                  <Field label="Website">
+                    <a href={bizDetail.website} target="_blank" rel="noreferrer" style={{ color: t.brandText, fontSize: 13, wordBreak: 'break-all' }}>
+                      {bizDetail.website}
+                    </a>
+                  </Field>
+                )}
+                {bizDetail.email && <Field label="Business email" value={bizDetail.email} />}
+              </div>
             )}
-            {active.domain && <Field label="Domain" value={active.domain} />}
+
+            {active.type === 'business' && active.proofMethod && (
+              <Field label="Proof method" value={PROOF_LABELS[active.proofMethod] ?? active.proofMethod} />
+            )}
+            {active.type === 'business' && active.proofValue && (
+              <Field label="Proof value">
+                {/^https?:\/\//i.test(active.proofValue) ? (
+                  <a href={active.proofValue} target="_blank" rel="noreferrer" style={{ color: t.brandText, fontSize: 13, wordBreak: 'break-all' }}>
+                    {active.proofValue}
+                  </a>
+                ) : (
+                  <span style={{ fontSize: 13, color: t.ink, wordBreak: 'break-all' }}>{active.proofValue}</span>
+                )}
+              </Field>
+            )}
+            {proofMetaEntries.length > 0 && (
+              <Field label="Proof metadata">
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+                  {proofMetaEntries.map(([k, v]) => (
+                    <div key={k} style={{ fontSize: 12, color: t.ink }}>
+                      <span style={{ color: t.inkMuted }}>{k}:</span> {String(v)}
+                    </div>
+                  ))}
+                </div>
+              </Field>
+            )}
+            {active.domain && (
+              <Field label="Domain" value={`${active.domain}${active.domainConfirmed ? ' (confirmed)' : ' (unconfirmed)'}`} />
+            )}
+
+            {active.note && <Field label="Request note" value={active.note} />}
             {active.evidenceUrl && (
               <Field label="Evidence">
                 <a href={active.evidenceUrl} target="_blank" rel="noreferrer" style={{ color: t.brandText, fontSize: 13 }}>
@@ -537,17 +621,17 @@ function VerificationsTab({
             {active.status === 'pending' && (
               <div>
                 <label style={{ fontSize: 11, color: t.inkFaint, fontWeight: 600, textTransform: 'uppercase' }}>
-                  Admin note {decision === 'rejected' && <span style={{ color: t.danger }}>(required to reject)</span>}
+                  Admin note {(decision === 'rejected' || decision === 'needs_more_info') && <span style={{ color: t.danger }}>(required, min 3 chars)</span>}
                 </label>
                 <textarea
                   value={note}
                   onChange={e => setNote(e.target.value)}
-                  placeholder="Optional for approval, required for rejection…"
+                  placeholder="Optional for approval, required for rejection or 'needs info'…"
                   rows={3}
                   style={{
                     marginTop: 6, width: '100%',
                     padding: 10, borderRadius: t.radius.md,
-                    border: `1px solid ${decision === 'rejected' && !note.trim() ? t.danger : t.line}`,
+                    border: `1px solid ${(decision === 'rejected' || decision === 'needs_more_info') && note.trim().length < 3 ? t.danger : t.line}`,
                     background: t.canvas, color: t.ink, fontSize: 13,
                     outline: 'none', resize: 'vertical',
                   }}
@@ -563,9 +647,9 @@ function VerificationsTab({
 
 function VerificationCard({
   row, onOpen, onQuick,
-}: { row: VerificationRow; onOpen: () => void; onQuick: (d: 'approved' | 'rejected') => void }) {
+}: { row: VerificationRow; onOpen: () => void; onQuick: (d: 'approved' | 'rejected' | 'needs_more_info') => void }) {
   const tone =
-    row.status === 'pending' ? 'warn' :
+    row.status === 'pending' || row.status === 'needs_more_info' ? 'warn' :
     row.status === 'approved' || row.status === 'accepted' ? 'ok' :
     row.status === 'rejected' || row.status === 'declined' ? 'danger' : 'neutral';
   return (
@@ -593,8 +677,11 @@ function VerificationCard({
         <StatusPill tone={tone}>{row.status}</StatusPill>
       </button>
       {row.status === 'pending' && (
-        <div style={{ display: 'flex', gap: 8 }}>
+        <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
           <DrawerBtn icon={<X size={14} />} tone="danger" onClick={() => onQuick('rejected')}>Reject</DrawerBtn>
+          {row.type === 'business' && (
+            <DrawerBtn icon={<Mail size={14} />} tone="warn" onClick={() => onQuick('needs_more_info')}>Needs info</DrawerBtn>
+          )}
           <DrawerBtn icon={<CheckCircle2 size={14} />} onClick={() => onQuick('approved')}>Approve</DrawerBtn>
         </div>
       )}
