@@ -21,7 +21,7 @@ const FONT_GEIST =
   'Geist, system-ui, -apple-system, BlinkMacSystemFont, sans-serif';
 const GOLD  = '#FBBC2E';
 const AMBER = '#F7931E';
-const MUTED = 'rgba(255,255,255,0.5)';
+const MUTED = 'var(--hcp-t-60)';
 
 interface Props {
   rivalry: FriendRivalryHydrated;
@@ -95,7 +95,7 @@ export const RivalFightCard: React.FC<Props> = ({
         width: '100%',
         textAlign: 'left',
         padding: 0,
-        border: '1px solid rgba(255,255,255,0.08)',
+        border: '1px solid var(--hcp-line)',
         borderRadius: 18,
         overflow: 'hidden',
         background: '#06080C',
@@ -266,7 +266,7 @@ export const RivalFightCard: React.FC<Props> = ({
           <div
             style={{
               fontSize: 11,
-              color: 'rgba(255,255,255,0.55)',
+              color: 'var(--hcp-t-60)',
               marginTop: 2,
             }}
           >
@@ -284,8 +284,8 @@ export const RivalFightCard: React.FC<Props> = ({
               display: 'inline-flex',
               padding: 2,
               borderRadius: 999,
-              background: 'rgba(255,255,255,0.06)',
-              border: '1px solid rgba(255,255,255,0.08)',
+              background: 'var(--hcp-bg-2)',
+              border: '1px solid var(--hcp-line)',
             }}
           >
             {(['gross', 'stableford'] as const).map((opt) => {
@@ -308,7 +308,7 @@ export const RivalFightCard: React.FC<Props> = ({
                     letterSpacing: '0.08em',
                     textTransform: 'uppercase',
                     background: active ? '#FFFFFF' : 'transparent',
-                    color: active ? '#0F172A' : 'rgba(255,255,255,0.6)',
+                    color: active ? '#0F172A' : 'var(--hcp-t-60)',
                   }}
                 >
                   {opt === 'gross' ? 'Gross' : 'Stbl'}
@@ -355,7 +355,7 @@ export const RivalFightCard: React.FC<Props> = ({
 
             <span
               style={{
-                color: 'rgba(255,255,255,0.3)',
+                color: 'var(--hcp-t-30)',
                 fontSize: 18,
                 fontWeight: 800,
                 alignSelf: 'flex-start',

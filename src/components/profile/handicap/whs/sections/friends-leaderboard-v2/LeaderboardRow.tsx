@@ -20,7 +20,7 @@ const T = {
   inkMute: 'var(--hcp-t-60)',
   inkSoft: 'var(--hcp-t-80)',
   inkFaded: 'var(--hcp-t-40)',
-  ink25: 'rgba(255,255,255,0.18)',
+  ink25: 'var(--hcp-t-30)',
   hairline: 'var(--hcp-line-2)',
   hairlineSoft: 'var(--hcp-bg-3)',
   bg3: 'var(--hcp-bg-3)',

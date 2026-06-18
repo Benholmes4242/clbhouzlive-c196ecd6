@@ -65,7 +65,7 @@ export const FriendRoundCardV2: React.FC<Props> = ({
 
   const ringColor = isCounter
     ? 'rgba(5,150,105,0.55)'
-    : 'rgba(255,255,255,0.18)';
+    : 'var(--hcp-line-2)';
 
   return (
     <div
@@ -215,9 +215,9 @@ export const FriendRoundCardV2: React.FC<Props> = ({
                 fontWeight: 800,
                 letterSpacing: '0.12em',
                 textTransform: 'uppercase',
-                color: 'rgba(255,255,255,0.92)',
-                background: 'rgba(255,255,255,0.08)',
-                border: '0.5px solid rgba(255,255,255,0.22)',
+                color: 'var(--hcp-t-100)',
+                background: 'var(--hcp-bg-2)',
+                border: '0.5px solid var(--hcp-line-2)',
                 flexShrink: 0,
                 lineHeight: 1,
               }}
@@ -231,7 +231,7 @@ export const FriendRoundCardV2: React.FC<Props> = ({
           style={{
             fontSize: 11.5,
             fontWeight: 700,
-            color: 'var(--hcp-t-80, rgba(255,255,255,0.85))',
+            color: 'var(--hcp-t-80)',
             letterSpacing: '-0.005em',
             lineHeight: 1.2,
             whiteSpace: 'nowrap',
@@ -402,9 +402,9 @@ export const FriendRoundCardV2: React.FC<Props> = ({
                 gap: 3,
                 padding: '5px 11px',
                 borderRadius: 999,
-                background: 'rgba(255,255,255,0.10)',
-                border: '0.5px solid rgba(255,255,255,0.25)',
-                color: 'rgba(255,255,255,0.92)',
+                background: 'var(--hcp-bg-3)',
+                border: '0.5px solid var(--hcp-line-2)',
+                color: 'var(--hcp-t-100)',
                 fontSize: 10,
                 fontWeight: 800,
                 letterSpacing: '0.06em',
@@ -415,7 +415,7 @@ export const FriendRoundCardV2: React.FC<Props> = ({
               }}
             >
               {variant === 'clbhouz-not-synced' ? 'Ask to sync' : 'Invite'}
-              <ChevronRight size={11} strokeWidth={2.2} color="rgba(255,255,255,0.92)" />
+              <ChevronRight size={11} strokeWidth={2.2} color="var(--hcp-t-100)" />
             </div>
           </div>
         )}
