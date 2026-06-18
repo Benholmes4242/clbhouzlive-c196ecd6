@@ -97,8 +97,8 @@ const STREAK_STATE_TOKENS: Record<StreakState, StreakStateToken> = {
     iconRing: 'rgba(148,163,184,0.25)',
     iconOpacity: 0.7,
     iconFilter: 'grayscale(80%)',
-    chipBg: 'rgba(255,255,255,0.04)',
-    chipBorder: 'rgba(255,255,255,0.08)',
+    chipBg: 'var(--hcp-bg-2)',
+    chipBorder: 'var(--hcp-line)',
     chipColor: 'var(--hcp-t-40)',
     chipPulse: false,
     chipLabel: 'DORMANT',
@@ -151,7 +151,7 @@ const DotPager: React.FC<{
             width: i === current ? 18 : 6,
             height: 6,
             borderRadius: 999,
-            background: i === current ? '#FFFFFF' : 'rgba(255, 255, 255, 0.25)',
+            background: i === current ? 'var(--hcp-t-100)' : 'var(--hcp-t-30)',
             border: 'none',
             padding: 0,
             cursor: i === current ? 'default' : 'pointer',
@@ -389,7 +389,7 @@ const StreakHeroCard: React.FC<StreakHeroCardProps> = ({ entry, row }) => {
         <div
           style={{
             height: 4,
-            background: 'rgba(255,255,255,0.08)',
+            background: 'var(--hcp-bg-3)',
             borderRadius: 999,
             overflow: 'hidden',
             marginBottom: 6,
@@ -425,7 +425,7 @@ const StreakHeroCard: React.FC<StreakHeroCardProps> = ({ entry, row }) => {
         style={{
           marginTop: 12,
           paddingTop: 10,
-          borderTop: '1px solid rgba(255,255,255,0.06)',
+          borderTop: '1px solid var(--hcp-line)',
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'space-between',
