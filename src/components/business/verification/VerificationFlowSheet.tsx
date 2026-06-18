@@ -180,8 +180,9 @@ export default function VerificationFlowSheet({ open, onOpenChange, businessId, 
     },
     onError: (error: unknown) => {
       const message = (error as Error).message || 'Failed to submit verification request';
-      if (message.includes('already associated')) setExclusivityError(message);
+      if (message.includes('already linked')) setExclusivityError(message);
       toast.error(message);
+
     },
   });
 
