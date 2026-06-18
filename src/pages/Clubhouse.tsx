@@ -455,7 +455,7 @@ const ClubhouseContent = () => {
             }
             creatorAvatar={activePost.avatarUrl}
             caption={activePost.caption}
-            theme="dark"
+            theme="light"
             likesCount={
               activePost.postType === 'course_of_week_card'
                 ? (editorialLikeCount ?? 0)

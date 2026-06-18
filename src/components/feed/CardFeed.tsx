@@ -26,7 +26,7 @@ import { useClubhouseStore } from '@/store/clubhouseStore';
 import { prefetchTile } from '@/hooks/useTileVideoPlayer';
 import { FeedCard } from './FeedCard';
 
-const CANVAS = '#0A0E14';
+const CANVAS = '#F8FAFC';
 
 /** How many neighbours on each side of the active card may mount a <video>. */
 const VIDEO_NEIGHBOUR_RADIUS = 1; // matches iOS ~3-decoder cap (active ±1 = 3)

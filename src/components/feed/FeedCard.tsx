@@ -23,13 +23,13 @@ import { InlineVideo } from './InlineVideo';
 import { MediaCarousel } from './MediaCarousel';
 import { FeedFollowPill } from './FeedFollowPill';
 
-const T100 = 'rgba(255,255,255,0.96)';
-const T60 = 'rgba(255,255,255,0.55)';
-const T40 = 'rgba(255,255,255,0.38)';
-const CARD = '#0F1419';
-const LINE = 'rgba(255,255,255,0.07)';
+const T100 = '#0F172A';
+const T60 = '#64748B';
+const T40 = '#94A3B8';
+const CARD = '#FFFFFF';
+const LINE = 'rgba(15,23,42,0.07)';
 const AMBER = '#F7931E';
-const GREEN = '#4ADE80';
+const GREEN = '#16A34A';
 
 const RATIO_MIN = 0.8;   // tallest allowed = 4:5 (portrait capped)
 const RATIO_MAX = 1.91;  // widest = ~cinematic landscape
@@ -143,7 +143,10 @@ const FeedCardImpl: React.FC<FeedCardProps> = ({
       style={{
         background: CARD,
         overflow: 'hidden',
-        marginInline: 0,
+        marginInline: 12,
+        borderRadius: 16,
+        border: '0.5px solid rgba(15,23,42,0.07)',
+        boxShadow: '0 1px 2px rgba(15,23,42,0.04), 0 4px 12px rgba(15,23,42,0.06)',
       }}
     >
       {/* Header */}
@@ -215,8 +218,8 @@ const FeedCardImpl: React.FC<FeedCardProps> = ({
                 fontWeight: 700,
                 letterSpacing: 0.5,
                 color: T100,
-                background: 'rgba(255,255,255,0.12)',
-                border: `1px solid rgba(255,255,255,0.28)`,
+                background: 'rgba(15,23,42,0.06)',
+                border: `1px solid rgba(15,23,42,0.10)`,
                 padding: '3px 7px',
                 borderRadius: 999,
                 cursor: 'pointer',
@@ -325,11 +328,11 @@ const FeedCardImpl: React.FC<FeedCardProps> = ({
               alignItems: 'center',
               gap: 5,
               flexShrink: 0,
-              background: 'rgba(255,255,255,0.08)',
+              background: 'rgba(15,23,42,0.06)',
               padding: '3px 8px',
               borderRadius: 999,
               border: 'none',
-              color: '#fff',
+              color: '#0F172A',
               fontSize: 11,
               fontWeight: 700,
               fontVariantNumeric: 'tabular-nums',
