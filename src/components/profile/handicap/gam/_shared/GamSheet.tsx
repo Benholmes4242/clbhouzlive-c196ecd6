@@ -25,7 +25,7 @@ export const GamSheet: React.FC<GamSheetProps> = ({ open, onClose, children }) =
   <BottomSheet
     open={open}
     onClose={onClose}
-    className="hcp-dark [&>div:first-child]:absolute [&>div:first-child]:top-0 [&>div:first-child]:left-0 [&>div:first-child]:right-0 [&>div:first-child]:z-20 [&>div:first-child>div]:!bg-white/40"
+    className="hcp-light [&>div:first-child]:absolute [&>div:first-child]:top-0 [&>div:first-child]:left-0 [&>div:first-child]:right-0 [&>div:first-child]:z-20 [&>div:first-child>div]:!bg-slate-900/20"
     style={{
       display: 'flex',
       flexDirection: 'column',
