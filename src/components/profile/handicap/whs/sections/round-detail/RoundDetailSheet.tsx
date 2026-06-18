@@ -21,12 +21,6 @@ interface Props {
   variant?: 'dark' | 'light';
 }
 
-// (Default variant changed to 'light' so the handicap page sheet matches the
-// courses discover sheet 1:1. Callers that want the dark variant must opt in.)
-declare const _DEFAULT_VARIANT_LIGHT: true;
-type _Unused = {
-}
-
 const PAGE_BG = '#0A0E14';
 const PAGE_BG_LIGHT = '#F8FAFC';
 const INK_MUTE = 'var(--hcp-t-60)';
