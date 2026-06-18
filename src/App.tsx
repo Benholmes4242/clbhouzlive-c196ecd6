@@ -373,12 +373,9 @@ function AppRoutes() {
         <Route path="/profile/:username/friends" element={<Suspense fallback={<GenericPageSkeleton />}><FriendsRedirectToFollowing /></Suspense>} />
         
         {/* Business routes */}
-        <Route path="/business-profiles" element={<Navigate to="/businesses/manage" replace />} />
         <Route path="/businesses/manage" element={<Suspense fallback={<GenericPageSkeleton />}><MyBusinessesPage /></Suspense>} />
         
         <Route path="/business/create" element={<Suspense fallback={<GenericPageSkeleton />}><BusinessCreatePage /></Suspense>} />
-        <Route path="/business/manage" element={<Navigate to="/businesses/manage" replace />} />
-        <Route path="/business/insights" element={<Navigate to="/businesses/manage" replace />} />
         <Route path="/business/:id/insights" element={<Suspense fallback={<GenericPageSkeleton />}><BusinessInsightsPageV2 /></Suspense>} />
         <Route path="/business/:id/edit" element={<Suspense fallback={<GenericPageSkeleton />}><BusinessEditWizard /></Suspense>} />
         <Route path="/business/success" element={<Suspense fallback={<GenericPageSkeleton />}><BusinessProfileLiveSuccessPage /></Suspense>} />

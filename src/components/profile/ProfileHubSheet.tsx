@@ -33,6 +33,7 @@ import HandicapMasthead from '@/components/profile/HandicapMasthead';
 
 import { ProfileSwitcherPopover } from '@/components/profile/ProfileSwitcherPopover';
 import { useProfileSheetStats } from '@/hooks/useProfileSheetStats';
+import { useHasBusinesses } from '@/hooks/useMyBusinesses';
 import { analyticsEvents } from '@/utils/analyticsEvents';
 
 // ── Tokens ──
@@ -347,6 +348,13 @@ function ProfileHubSheet({
   const { data: whsConnection } = useWhsConnection(localActiveId);
   const { data: trend } = useHandicapTrend(whsConnection?.id);
   const stats = useProfileSheetStats(localActiveId);
+
+  // ── Business ownership (always resolved against the personal account,
+  // regardless of which actor is currently selected) ──
+  const personalOwnerId =
+    profiles.find(p => p.type === 'personal')?.id ??
+    (currentActor.type === 'personal' ? currentActor.id : undefined);
+  const { hasBusinesses } = useHasBusinesses(personalOwnerId);
 
   // Sub-copy & variant inference
   const hasHandicapRecord =
@@ -683,16 +691,18 @@ function ProfileHubSheet({
                     />
                   </SheetGroup>
 
-                  {/* ── 5b. Businesses group ── */}
-                  <SheetGroup label="Businesses" style={{ marginTop: 18 }}>
-                    <GroupedRow
-                      Icon={Shield}
-                      label="Manage businesses"
-                      onClick={() => handleNav('/businesses/manage')}
-                      isFirst
-                      isLast
-                    />
-                  </SheetGroup>
+                  {/* ── 5b. Businesses group (only for existing owners) ── */}
+                  {hasBusinesses && (
+                    <SheetGroup label="Businesses" style={{ marginTop: 18 }}>
+                      <GroupedRow
+                        Icon={Shield}
+                        label="Manage businesses"
+                        onClick={() => handleNav('/businesses/manage')}
+                        isFirst
+                        isLast
+                      />
+                    </SheetGroup>
+                  )}
 
                   {/* ── 6. Admin / Command Center ── */}
                   {isAdmin && (
