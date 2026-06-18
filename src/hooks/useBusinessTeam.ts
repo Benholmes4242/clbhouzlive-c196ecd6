@@ -2,10 +2,20 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 
+export type BusinessRole = 'owner' | 'admin' | 'editor' | 'analyst';
+export type AssignableBusinessRole = Exclude<BusinessRole, 'owner'>;
+
+export const BUSINESS_ROLE_LABELS: Record<BusinessRole, string> = {
+  owner: 'Owner',
+  admin: 'Admin',
+  editor: 'Editor',
+  analyst: 'Analyst',
+};
+
 export interface BusinessMember {
   id: string;
   user_profile_id: string;
-  role: 'owner' | 'admin' | 'editor' | 'analyst' | 'member';
+  role: BusinessRole;
   created_at: string;
   user_profile?: {
     id: string;
@@ -20,7 +30,7 @@ export interface BusinessInvite {
   business_id: string;
   invited_by: string;
   invitee_email: string;
-  role: 'admin' | 'editor' | 'analyst' | 'member';
+  role: AssignableBusinessRole;
   status: 'pending' | 'accepted' | 'revoked' | 'expired';
   created_at: string;
   expires_at: string;
@@ -75,7 +85,7 @@ export function useCreateInvite(businessId: string) {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async ({ email, role }: { email: string; role: BusinessInvite['role'] }) => {
+    mutationFn: async ({ email, role }: { email: string; role: AssignableBusinessRole }) => {
       const { data: session } = await supabase.auth.getSession();
       if (!session.session?.user) throw new Error('Not authenticated');
 
@@ -91,7 +101,6 @@ export function useCreateInvite(businessId: string) {
         .single();
 
       if (error) throw error;
-
       return data;
     },
     onSuccess: () => {
@@ -175,7 +184,7 @@ export function useUpdateMemberRole(businessId: string) {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async ({ memberUserId, newRole }: { memberUserId: string; newRole: string }) => {
+    mutationFn: async ({ memberUserId, newRole }: { memberUserId: string; newRole: AssignableBusinessRole }) => {
       const { data, error } = await supabase.rpc('update_business_member_role', {
         p_business_id: businessId,
         p_member_user_id: memberUserId,
