@@ -60,7 +60,7 @@ export function AddBusinessCard({ onClick, isFirst = false }: AddBusinessCardPro
         className="w-full flex items-center gap-3.5 p-4 transition-colors min-h-[44px]"
         style={{
           background: BIZ.card,
-          border: `2px dashed rgba(15,23,42,0.12)`,
+          border: `2px dashed ${BIZ.hairDashed}`,
           borderRadius: BIZ.rCard,
         }}
       >
