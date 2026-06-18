@@ -14,13 +14,19 @@ interface WatchHeaderProps {
   onFilterChange: (f: WatchFilter) => void;
   onOpenSearch: () => void;
   embedded?: boolean;
+  scrolled?: boolean;
 }
 
-const WatchHeader: React.FC<WatchHeaderProps> = ({ activeFilter, onFilterChange }) => {
+const WatchHeader: React.FC<WatchHeaderProps> = ({ activeFilter, onFilterChange, scrolled }) => {
   return (
     <div
       className="sticky z-[28] bg-background pb-0 pt-0 px-0"
-      style={{ top: '58px', borderBottom: '1px solid hsl(var(--border) / 0.12)' }}
+      style={{
+        top: '58px',
+        borderBottom: '1px solid rgba(15,23,42,0.07)',
+        boxShadow: scrolled ? '0 6px 16px -6px rgba(15,23,42,0.18)' : 'none',
+        transition: 'box-shadow 0.2s ease',
+      }}
     >
       <div
         role="tablist"
