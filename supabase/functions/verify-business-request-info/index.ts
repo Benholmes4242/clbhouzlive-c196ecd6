@@ -64,7 +64,7 @@ serve(async (req) => {
 
     const { data: request, error: reqErr } = await supabaseAdmin
       .from("business_verification_requests")
-      .select("*")
+      .select("id, business_id, status")
       .eq("id", request_id)
       .single();
     if (reqErr || !request) {
@@ -78,23 +78,22 @@ serve(async (req) => {
       });
     }
 
-    const now = new Date().toISOString();
-    const { error: updErr } = await supabaseAdmin
-      .from("business_verification_requests")
-      .update({
-        status: "needs_more_info",
-        admin_note: admin_notes,
-        reviewed_by: adminUserId,
-        reviewed_at: now,
-        updated_at: now,
-      })
-      .eq("id", request_id);
-    if (updErr) {
-      console.error("Failed to update request:", updErr);
-      throw new Error("Failed to update request");
+    // User-scoped client so auth.uid() resolves inside the SECURITY DEFINER RPC
+    const supabaseUser = createClient(
+      Deno.env.get("SUPABASE_URL")!,
+      Deno.env.get("SUPABASE_ANON_KEY")!,
+      { global: { headers: { Authorization: authHeader } }, auth: { persistSession: false } },
+    );
+
+    const { error: rpcErr } = await supabaseUser.rpc("request_info_business_verification", {
+      _request_id: request_id,
+      _admin_note: admin_notes,
+    });
+    if (rpcErr) {
+      console.error("request_info_business_verification RPC failed:", rpcErr);
+      throw new Error(rpcErr.message || "Failed to update request");
     }
 
-    // Fire-and-forget result email
     supabaseAdmin.functions
       .invoke("send-business-verification-result-email", {
         body: { business_id: request.business_id, outcome: "needs_more_info", admin_note: admin_notes },

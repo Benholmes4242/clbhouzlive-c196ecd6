@@ -28,7 +28,6 @@ async function isSuperAdmin(userId: string): Promise<boolean> {
 }
 
 serve(async (req) => {
-  // Handle CORS preflight
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
   }
@@ -41,7 +40,6 @@ serve(async (req) => {
       });
     }
 
-    // 1) Identify caller
     const authHeader = req.headers.get("Authorization") ?? "";
     const jwt = authHeader.replace("Bearer ", "");
     const { data: userData, error: userErr } = await supabaseAdmin.auth.getUser(jwt);
@@ -62,7 +60,6 @@ serve(async (req) => {
       });
     }
 
-    // 2) Parse payload
     const { request_id, admin_notes } = await req.json();
 
     if (!request_id) {
@@ -79,10 +76,9 @@ serve(async (req) => {
       });
     }
 
-    // 3) Load request
     const { data: request, error: reqErr } = await supabaseAdmin
       .from("business_verification_requests")
-      .select("*")
+      .select("id, business_id, status")
       .eq("id", request_id)
       .single();
 
@@ -100,28 +96,25 @@ serve(async (req) => {
       });
     }
 
-    const now = new Date().toISOString();
+    // User-scoped client so auth.uid() resolves inside the SECURITY DEFINER RPC
+    const supabaseUser = createClient(
+      Deno.env.get("SUPABASE_URL")!,
+      Deno.env.get("SUPABASE_ANON_KEY")!,
+      { global: { headers: { Authorization: authHeader } }, auth: { persistSession: false } }
+    );
 
-    // 4) Update request to rejected
-    const { error: updReqErr } = await supabaseAdmin
-      .from("business_verification_requests")
-      .update({
-        status: "rejected",
-        admin_note: admin_notes,
-        reviewed_by: adminUserId,
-        reviewed_at: now,
-        updated_at: now,
-      })
-      .eq("id", request_id);
+    const { error: rpcErr } = await supabaseUser.rpc("reject_business_verification", {
+      _request_id: request_id,
+      _admin_note: admin_notes,
+    });
 
-    if (updReqErr) {
-      console.error("Failed to reject request:", updReqErr);
-      throw new Error("Failed to reject request");
+    if (rpcErr) {
+      console.error("reject_business_verification RPC failed:", rpcErr);
+      throw new Error(rpcErr.message || "Failed to reject request");
     }
 
     console.log(`Request ${request_id} rejected by admin ${adminUserId}`);
 
-    // Fire-and-forget result email (best-effort; never block rejection)
     supabaseAdmin.functions
       .invoke("send-business-verification-result-email", {
         body: { business_id: request.business_id, outcome: "rejected", admin_note: admin_notes },

@@ -20402,6 +20402,10 @@ export type Database = {
         Args: { p_domain: string; p_request_id: string }
         Returns: Json
       }
+      request_info_business_verification: {
+        Args: { _admin_note: string; _request_id: string }
+        Returns: undefined
+      }
       reset_golfer_verification_test_user: {
         Args: { p_user_id: string }
         Returns: undefined
