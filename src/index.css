@@ -774,7 +774,9 @@ html.lightbox-open {
    on first render; individual light pages apply their own background via
    body class or component-level styles once they mount.
    ──────────────────────────────────────────────────────────────────────── */
-body.route-clubhouse .app-shell,
+body.route-clubhouse .app-shell {
+  background-color: #F8FAFC !important;
+}
 body.route-handicap .app-shell {
   background-color: #0d0d0d !important;
 }
@@ -822,14 +824,19 @@ html[data-immersive-route='true'] .app-shell {
   body.route-light .app-shell {
     background-color: var(--bg-page) !important;
   }
-  /* Clubhouse stays dark edge-to-edge */
+  /* Clubhouse light edge-to-edge */
   body.route-clubhouse,
-  body.route-clubhouse #root,
+  body.route-clubhouse #root {
+    background-color: #F8FAFC !important;
+  }
+  body.route-clubhouse .app-shell {
+    background-color: #F8FAFC !important;
+  }
+  /* Handicap stays dark edge-to-edge */
   body.route-handicap,
   body.route-handicap #root {
     background-color: #0d0d0d !important;
   }
-  body.route-clubhouse .app-shell,
   body.route-handicap .app-shell {
     background-color: #0d0d0d !important;
   }
@@ -1787,7 +1794,7 @@ body.route-clubhouse .global-header {
   inset: 0;
   height: 100svh;
   width: 100%;
-  background: #0A0E14; /* match feed CANVAS so iPad gutters read as one immersive surface */
+  background: #F8FAFC; /* match feed CANVAS so iPad gutters read as one continuous light surface */
   overflow: hidden;
 }
 
@@ -2490,25 +2497,7 @@ html[data-immersive="true"] .app-shell--topSpacer {
     }
   }
 
-  /* Phase 2 & 3: Clubhouse & Hub overrides - keep dark theme */
-  body.route-clubhouse,
-  .clubhouse-root {
-    --foreground: 0 0% 98%;
-    --card: 0 0% 6.3%;               /* #101010 */
-    --card-foreground: 0 0% 98%;
-    --muted-foreground: 0 0% 64%;
-    --border: 0 0% 14.9%;            /* #262626 */
-
-    --text-primary: rgba(255, 255, 255, 0.88);
-    --text-secondary: rgba(255, 255, 255, 0.64);
-    --text-tertiary: rgba(255, 255, 255, 0.44);
-
-    --text-tab-active: #ffffff;
-    --text-tab-inactive: rgba(255, 255, 255, 0.55);
-    
-    --surface-header: rgba(10, 10, 10, 0.9);
-    --surface-nav: rgba(10, 10, 10, 0.95);
-  }
+  /* Clubhouse now inherits the global light tokens — no dark overrides. */
 
   /* Light theme reset - forces light mode for components that need it regardless of page theme */
   /* Used by Post Wizard, Review Wizard, and other modals that should always be light */
