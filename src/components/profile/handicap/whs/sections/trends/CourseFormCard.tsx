@@ -264,7 +264,7 @@ const CourseRow: React.FC<{
           style={{
             width: 32,
             height: 4,
-            background: 'rgba(255,255,255,0.06)',
+            background: 'var(--hcp-bg-3)',
             borderRadius: 2,
             position: 'relative',
             overflow: 'hidden',
@@ -279,7 +279,7 @@ const CourseRow: React.FC<{
               top: 0,
               bottom: 0,
               width: `${Math.max(8, (course.rounds_played / Math.max(maxRounds, 1)) * 100)}%`,
-              background: 'rgba(255,255,255,0.40)',
+              background: 'var(--hcp-t-60)',
               borderRadius: 2,
             }}
           />
@@ -572,7 +572,7 @@ const CourseList: React.FC<{ courses: CourseForm[]; view: ViewKey; emptyCopy?: s
     <div
       style={{
         marginTop: 12,
-        background: 'rgba(255,255,255,0.012)',
+        background: 'var(--hcp-bg-2)',
         border: `1px solid ${T.ink08}`,
         borderRadius: 14,
         overflow: 'hidden',
