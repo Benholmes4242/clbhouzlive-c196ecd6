@@ -693,9 +693,26 @@ function VerificationsTab({
           </div>
         )}
       </DetailDrawer>
+
+      <ConfirmDialog
+        open={confirmApprove}
+        onClose={() => setConfirmApprove(false)}
+        onConfirm={() => { setConfirmApprove(false); doApprove(); }}
+        title="Approve duplicate proof?"
+        description={
+          proofConflict && active?.proofMethod
+            ? `This ${PROOF_NOUNS[active.proofMethod] ?? 'proof'} is already verified for ${proofConflict.businessName}. Approving will verify a second business with the same proof.`
+            : 'This proof is already verified for another business. Approve anyway?'
+        }
+        confirmLabel="Approve anyway"
+        cancelLabel="Cancel"
+        tone="danger"
+        busy={review.isPending}
+      />
     </div>
   );
 }
+
 
 function VerificationCard({
   row, onOpen, onQuick, disabled,
