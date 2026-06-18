@@ -52,10 +52,11 @@ export function useBusinessVerificationRequest(businessId: string | undefined) {
 export function deriveVerificationState(
   isVerified: boolean | null | undefined,
   request: BusinessVerificationRequest | null | undefined
-): 'verified' | 'pending' | 'rejected' | 'none' {
+): 'verified' | 'pending' | 'needs_more_info' | 'rejected' | 'none' {
   if (isVerified) return 'verified';
   if (!request) return 'none';
   if (request.status === 'pending') return 'pending';
+  if (request.status === 'needs_more_info') return 'needs_more_info';
   if (request.status === 'rejected') return 'rejected';
   // Revoked status means unverified - show as 'none' to allow re-request
   if (request.status === 'revoked') return 'none';
