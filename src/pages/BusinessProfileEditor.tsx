@@ -9,9 +9,8 @@
  */
 import React, { useState, useEffect, useMemo, useRef, useCallback } from 'react';
 import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
-import { createPortal } from 'react-dom';
 import { useQueryClient } from '@tanstack/react-query';
-import { ChevronLeft, Loader2, AlertCircle, MapPin, Lock, Camera, Plus } from 'lucide-react';
+import { ChevronLeft, Loader2, AlertCircle } from 'lucide-react';
 import { toast } from 'sonner';
 
 import { supabase } from '@/integrations/supabase/client';
@@ -32,27 +31,30 @@ import {
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
 import { PageRoot } from '@/components/layout/PageRoot';
-import { SectionEyebrow } from '@/components/ui/SectionEyebrow';
 import { SectionCard } from '@/components/profile/edit-v2/SectionCard';
-import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 
 import { BIZ } from '@/components/business/businessTokens';
-import { BUSINESS_CATEGORIES_WITH_ICONS } from '@/constants/businessCategories';
-import { ClubSearchDropdown, SelectedClub } from '@/components/business/ClubSearchDropdown';
-import { CollegeSearchDropdown, SelectedCollege } from '@/components/business/CollegeSearchDropdown';
-import { AddressAutocomplete, AddressValue } from '@/components/business/AddressAutocomplete';
+import { SelectedClub } from '@/components/business/ClubSearchDropdown';
+import { SelectedCollege } from '@/components/business/CollegeSearchDropdown';
+import { AddressValue } from '@/components/business/AddressAutocomplete';
 import { PinDropModal } from '@/components/business/PinDropModal';
-import { PhoneInputWithDialCode, PhoneValue } from '@/components/business/PhoneInputWithDialCode';
-import {
-  CountrySelector,
-  getCountryCode,
-  getCountryDisplayName,
-} from '@/components/business/CountrySelector';
-import { MapPreview } from '@/components/map/MapPreview';
+import { PhoneValue } from '@/components/business/PhoneInputWithDialCode';
 import { ImageCropModal } from '@/components/business/ImageCropModal';
 import { RequestAccessModal } from '@/components/business/RequestAccessModal';
 import { RequestClubModal } from '@/components/business/RequestClubModal';
 import { getCountryCodeFromClub } from '@/utils/countryCodeMapping';
+
+import { IdentitySection } from '@/components/business/editor/IdentitySection';
+import { LocationContactSection } from '@/components/business/editor/LocationContactSection';
+import { BrandingSection } from '@/components/business/editor/BrandingSection';
+import { SocialSection } from '@/components/business/editor/SocialSection';
+import {
+  DEFAULT_OPENING_HOURS,
+  OpeningHours,
+  SocialFields,
+  ImageState,
+  emptyImage,
+} from '@/components/business/editor/editorTypes';
 
 import { useHideBottomNav } from '@/hooks/useBottomNavVisibility';
 import { useHideHeader } from '@/hooks/useHeaderVisibility';
@@ -63,69 +65,8 @@ import type { Database } from '@/integrations/supabase/types';
 
 const COVER_ASPECT_RATIO = 3.2;
 
-const DAYS_ORDER = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'] as const;
-type Day = typeof DAYS_ORDER[number];
-
-interface OpeningHoursEntry {
-  open: string;
-  close: string;
-  closed: boolean;
-}
-type OpeningHours = Record<string, OpeningHoursEntry>;
-
-const DEFAULT_OPENING_HOURS: OpeningHours = {
-  Mon: { open: '08:00', close: '18:00', closed: false },
-  Tue: { open: '08:00', close: '18:00', closed: false },
-  Wed: { open: '08:00', close: '18:00', closed: false },
-  Thu: { open: '08:00', close: '18:00', closed: false },
-  Fri: { open: '08:00', close: '18:00', closed: false },
-  Sat: { open: '08:00', close: '18:00', closed: false },
-  Sun: { open: '08:00', close: '18:00', closed: true },
-};
-
-const SOCIAL_PLATFORMS = [
-  { field: 'instagram', label: 'Instagram', placeholder: '@yourhandle', icon: '📸' },
-  { field: 'twitter', label: 'X / Twitter', placeholder: '@yourhandle', icon: '𝕏' },
-  { field: 'facebook', label: 'Facebook', placeholder: 'facebook.com/…', icon: 'ƒ' },
-  { field: 'youtube', label: 'YouTube', placeholder: 'youtube.com/c/…', icon: '▶' },
-] as const;
-
-const INPUT_CLASS =
-  'w-full rounded-xl px-4 py-3 text-[15px] text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-[#F7931E]/40 transition-colors';
-const INPUT_STYLE = { background: '#ffffff', border: `1px solid ${BIZ.hair}` };
-const LOCKED_CLASS =
-  'flex items-center gap-2 rounded-xl px-4 py-3 text-[15px] text-muted-foreground';
-const LOCKED_STYLE = {
-  background: 'rgba(15,23,42,0.03)',
-  border: `0.5px solid ${BIZ.hair}`,
-};
-const LABEL_CLASS = 'text-[13px] font-medium text-muted-foreground';
-const HINT_CLASS = 'text-[12px] text-muted-foreground mt-1';
-
-/* ─────────────────────── types ─────────────────────── */
-
 type Mode = 'create' | 'edit';
 
-interface SocialFields {
-  instagram: string;
-  twitter: string;
-  facebook: string;
-  youtube: string;
-}
-
-interface ImageState {
-  url: string | null;
-  pendingFile: File | null;
-  pendingRemove: boolean;
-  localPreview: string | null;
-}
-
-const emptyImage: ImageState = {
-  url: null,
-  pendingFile: null,
-  pendingRemove: false,
-  localPreview: null,
-};
 
 /* ─────────────────────── component ─────────────────────── */
 
@@ -172,8 +113,6 @@ export default function BusinessProfileEditor() {
   /* ── branding ─────────────────────────────────────── */
   const [logo, setLogo] = useState<ImageState>(emptyImage);
   const [cover, setCover] = useState<ImageState>(emptyImage);
-  const logoInputRef = useRef<HTMLInputElement>(null);
-  const coverInputRef = useRef<HTMLInputElement>(null);
   const [logoCropOpen, setLogoCropOpen] = useState(false);
   const [coverCropOpen, setCoverCropOpen] = useState(false);
   const [logoCropSrc, setLogoCropSrc] = useState<string | null>(null);
@@ -436,18 +375,8 @@ export default function BusinessProfileEditor() {
   const effectiveLogoUrl = logo.pendingRemove ? null : logo.localPreview || logo.url;
   const effectiveCoverUrl = cover.pendingRemove ? null : cover.localPreview || cover.url;
 
-  /* ── opening hours helpers ───────────────────────── */
-  const updateDay = (day: Day, patch: Partial<OpeningHoursEntry>) => {
-    setOpeningHours({ ...openingHours, [day]: { ...openingHours[day], ...patch } });
-  };
-  const setAllDays = (entry: OpeningHoursEntry) => {
-    const updated = {} as OpeningHours;
-    DAYS_ORDER.forEach((d) => {
-      updated[d] = { ...entry };
-    });
-    setOpeningHours(updated);
-  };
-  const firstOpenDay = DAYS_ORDER.find((d) => !openingHours[d]?.closed);
+
+
 
   /* ── close handling ──────────────────────────────── */
   const exitTo = mode === 'edit' && id ? `/business/${id}` : -1;
@@ -705,542 +634,68 @@ export default function BusinessProfileEditor() {
         </div>
 
         <div className="flex-1 overflow-y-auto pt-3 pb-12">
-          {/* ── Section 1: Identity ─────────────────────── */}
-          <div className="px-4 mb-2">
-            <SectionEyebrow label="IDENTITY" color="amber" />
-          </div>
-          <div className="space-y-4 px-4 pb-4">
-            {/* Category */}
-            <SectionCard>
-              <div className="space-y-1.5">
-                <label className={LABEL_CLASS}>
-                  Category {mode === 'create' && <span className="text-destructive">*</span>}
-                </label>
-                {mode === 'edit' ? (
-                  <>
-                    <div className={LOCKED_CLASS} style={LOCKED_STYLE}>
-                      <Lock className="w-4 h-4 flex-shrink-0" />
-                      {category || 'Not set'}
-                    </div>
-                    <p className={HINT_CLASS}>Category cannot be changed after creation.</p>
-                  </>
-                ) : (
-                  <>
-                    <select
-                      value={category}
-                      onChange={(e) => {
-                        setCategory(e.target.value);
-                        setBusinessName('');
-                        setSelectedClub(null);
-                        setSelectedCollege(null);
-                      }}
-                      className={`${INPUT_CLASS} appearance-none cursor-pointer`}
-                      style={{
-                        ...INPUT_STYLE,
-                        backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E")`,
-                        backgroundRepeat: 'no-repeat',
-                        backgroundPosition: 'right 16px center',
-                      }}
-                    >
-                      <option value="">Select a category</option>
-                      {BUSINESS_CATEGORIES_WITH_ICONS.map(({ value, label, subtitle }) => (
-                        <option key={value} value={value}>
-                          {label}
-                          {subtitle ? ` — ${subtitle}` : ''}
-                        </option>
-                      ))}
-                    </select>
-                    <p className={HINT_CLASS}>Category cannot be changed after creation.</p>
-                  </>
-                )}
-              </div>
-            </SectionCard>
+          <IdentitySection
+            mode={mode}
+            category={category}
+            setCategory={setCategory}
+            isGolfClub={isGolfClub}
+            isUniversity={isUniversity}
+            selectedClub={selectedClub}
+            setSelectedClub={setSelectedClub}
+            selectedCollege={selectedCollege}
+            setSelectedCollege={setSelectedCollege}
+            businessName={businessName}
+            setBusinessName={setBusinessName}
+            isClubLinked={isClubLinked}
+            existingBusinessForClub={existingBusinessForClub}
+            onRequestAccess={() => setShowRequestAccessModal(true)}
+            onRequestClub={() => setShowRequestClubModal(true)}
+            description={description}
+            setDescription={setDescription}
+            foundedYear={foundedYear}
+            setFoundedYear={setFoundedYear}
+          />
 
-            {/* Already-claimed warning */}
-            {mode === 'create' && existingBusinessForClub && (
-              <SectionCard className="border-destructive/30 bg-destructive/5">
-                <div className="flex items-start gap-3">
-                  <AlertCircle className="w-5 h-5 text-destructive flex-shrink-0 mt-0.5" />
-                  <div className="flex-1">
-                    <p className="text-[13px] font-semibold text-foreground">
-                      This club already has a business profile
-                    </p>
-                    <p className="text-[12px] text-muted-foreground mt-1">
-                      "{existingBusinessForClub.name}" is managed by someone else.
-                    </p>
-                    <button
-                      type="button"
-                      onClick={() => setShowRequestAccessModal(true)}
-                      className="text-[13px] font-semibold mt-2"
-                      style={{ color: BIZ.amber }}
-                    >
-                      Request access to manage this profile
-                    </button>
-                  </div>
-                </div>
-              </SectionCard>
-            )}
+          <LocationContactSection
+            mode={mode}
+            isClubLinked={isClubLinked}
+            isGolfClub={isGolfClub}
+            selectedClub={selectedClub}
+            address={address}
+            setAddress={setAddress}
+            addressError={addressError}
+            setAddressError={setAddressError}
+            countrySelection={countrySelection}
+            setCountrySelection={setCountrySelection}
+            phone={phone}
+            setPhone={setPhone}
+            email={email}
+            setEmail={setEmail}
+            website={website}
+            setWebsite={setWebsite}
+            bookingUrl={bookingUrl}
+            setBookingUrl={setBookingUrl}
+            openingHours={openingHours}
+            setOpeningHours={setOpeningHours}
+            resolvedName={resolvedName}
+            onOpenPinDrop={() => setShowPinDropModal(true)}
+            businessLocationFallback={business?.location ?? null}
+          />
 
-            {/* Name / search */}
-            <SectionCard>
-              <div className="space-y-1.5">
-                <label className={LABEL_CLASS}>
-                  Business Name <span className="text-destructive">*</span>
-                </label>
-                {isGolfClub && (mode === 'create' || !isClubLinked) ? (
-                  <>
-                    <ClubSearchDropdown
-                      value={selectedClub}
-                      onChange={setSelectedClub}
-                      placeholder="Search for your golf club..."
-                      disabled={!category}
-                    />
-                    <button
-                      type="button"
-                      onClick={() => setShowRequestClubModal(true)}
-                      className="text-[12px] font-medium mt-1"
-                      style={{ color: BIZ.amber }}
-                    >
-                      Can't find your course? Request we add it
-                    </button>
-                  </>
-                ) : isClubLinked ? (
-                  <>
-                    <div className={LOCKED_CLASS} style={LOCKED_STYLE}>
-                      <MapPin className="w-4 h-4 flex-shrink-0" />
-                      {businessName}
-                    </div>
-                    <p className={HINT_CLASS}>
-                      Linked to a club record. Contact support to update.
-                    </p>
-                  </>
-                ) : isUniversity ? (
-                  <CollegeSearchDropdown
-                    value={selectedCollege}
-                    onChange={setSelectedCollege}
-                    placeholder="Search for your college or university..."
-                    disabled={!category}
-                  />
-                ) : (
-                  <input
-                    type="text"
-                    value={businessName}
-                    onChange={(e) => setBusinessName(e.target.value)}
-                    placeholder={
-                      mode === 'create' && !category
-                        ? 'Select a category first'
-                        : 'e.g., Royal Golf Club'
-                    }
-                    disabled={mode === 'create' && !category}
-                    className={`${INPUT_CLASS} disabled:opacity-50`}
-                    style={INPUT_STYLE}
-                  />
-                )}
-                <p className={HINT_CLASS}>Shown publicly on your profile and in search.</p>
-              </div>
-            </SectionCard>
+          <BrandingSection
+            effectiveLogoUrl={effectiveLogoUrl}
+            effectiveCoverUrl={effectiveCoverUrl}
+            resolvedName={resolvedName}
+            onLogoFile={onLogoFile}
+            onLogoRemove={onLogoRemove}
+            onCoverFile={onCoverFile}
+            onCoverRemove={onCoverRemove}
+          />
 
-            {/* About */}
-            <SectionCard>
-              <div className="space-y-1.5">
-                <div className="flex items-center justify-between">
-                  <label className={LABEL_CLASS}>About</label>
-                  <span className="text-[11px] font-semibold text-muted-foreground">
-                    {description.length}/2500
-                  </span>
-                </div>
-                <textarea
-                  value={description}
-                  onChange={(e) => setDescription(e.target.value.slice(0, 2500))}
-                  placeholder="Tell golfers about your business…"
-                  rows={5}
-                  className={`${INPUT_CLASS} resize-none`}
-                  style={INPUT_STYLE}
-                />
-                <p className={HINT_CLASS}>
-                  Mention facilities, coaching style, atmosphere, events, or what makes you different.
-                </p>
-              </div>
-            </SectionCard>
-
-            {/* Founded year */}
-            <SectionCard>
-              <div className="space-y-1.5">
-                <label className={LABEL_CLASS}>Year Established</label>
-                <input
-                  type="number"
-                  value={foundedYear}
-                  onChange={(e) => setFoundedYear(e.target.value)}
-                  placeholder="e.g., 1985"
-                  min={1800}
-                  max={new Date().getFullYear()}
-                  className={INPUT_CLASS}
-                  style={INPUT_STYLE}
-                />
-                <p className={HINT_CLASS}>Shown on your About tab.</p>
-              </div>
-            </SectionCard>
-          </div>
-
-          {/* ── Section 2: Location & contact ───────────── */}
-          <div className="px-4 mt-2 mb-2">
-            <SectionEyebrow label="LOCATION & CONTACT" />
-          </div>
-          <div className="space-y-4 px-4 pb-4">
-            <SectionCard>
-              <div className="space-y-3">
-                {isClubLinked ? (
-                  <div className="space-y-1.5">
-                    <label className={LABEL_CLASS}>Location</label>
-                    <div className={LOCKED_CLASS} style={LOCKED_STYLE}>
-                      <Lock className="w-4 h-4 flex-shrink-0" />
-                      <span className="flex-1 truncate">
-                        {address?.label || business?.location || 'Location unavailable'}
-                      </span>
-                      <span className="text-[11px] text-muted-foreground/70">From club data</span>
-                    </div>
-                    <p className={HINT_CLASS}>
-                      Contact support to update the location for this linked club.
-                    </p>
-                  </div>
-                ) : isGolfClub && mode === 'create' && selectedClub ? (
-                  <div className="space-y-1.5">
-                    <label className={LABEL_CLASS}>Location</label>
-                    <div className={LOCKED_CLASS} style={LOCKED_STYLE}>
-                      <Lock className="w-4 h-4 flex-shrink-0" />
-                      <span className="flex-1 truncate">{address?.label || 'From club data'}</span>
-                    </div>
-                  </div>
-                ) : (
-                  <>
-                    <div className="space-y-1.5">
-                      <label className={LABEL_CLASS}>Country</label>
-                      <CountrySelector
-                        value={countrySelection}
-                        onChange={(name) => {
-                          setCountrySelection(name);
-                          if (address) setAddress(null);
-                        }}
-                      />
-                    </div>
-                    <div className="space-y-1.5">
-                      <label className={LABEL_CLASS}>Business address</label>
-                      <AddressAutocomplete
-                        value={address}
-                        onChange={(val) => {
-                          setAddress(val);
-                          setAddressError(null);
-                        }}
-                        onDropPinClick={() => setShowPinDropModal(true)}
-                        countryCode={getCountryCode(countrySelection)}
-                        countryDisplayName={getCountryDisplayName(countrySelection)}
-                        placeholder="Start typing street, postcode/ZIP, or area…"
-                        error={addressError || undefined}
-                      />
-                    </div>
-                    {address?.lat != null &&
-                    address?.lng != null &&
-                    Number.isFinite(address.lat) &&
-                    Number.isFinite(address.lng) ? (
-                      <div className="rounded-xl overflow-hidden" style={{ border: `1px solid ${BIZ.hair}` }}>
-                        <MapPreview
-                          lat={address.lat}
-                          lng={address.lng}
-                          name={resolvedName || 'Business location'}
-                          height={160}
-                          zoom={14}
-                          markerColor={BIZ.amber}
-                          showExpandButton={false}
-                        />
-                        <div
-                          className="px-3 py-2.5 flex items-center justify-between"
-                          style={{ background: '#ffffff', borderTop: `0.5px solid ${BIZ.hair}` }}
-                        >
-                          <div className="flex items-center gap-2 text-[13px] min-w-0">
-                            <MapPin className="h-4 w-4 flex-shrink-0" style={{ color: BIZ.amber }} />
-                            <span className="truncate text-foreground">
-                              {address.city && address.country
-                                ? `${address.city}, ${address.country}`
-                                : address.label}
-                            </span>
-                          </div>
-                          <button
-                            type="button"
-                            onClick={() => setShowPinDropModal(true)}
-                            className="text-[13px] font-medium flex-shrink-0 ml-2"
-                            style={{ color: BIZ.amber }}
-                          >
-                            Adjust pin
-                          </button>
-                        </div>
-                      </div>
-                    ) : null}
-                  </>
-                )}
-              </div>
-            </SectionCard>
-
-            {/* Contact */}
-            <SectionCard>
-              <div className="space-y-3">
-                <p className="text-[14px] font-semibold text-foreground">Contact Details</p>
-                <div className="space-y-1.5">
-                  <label className={LABEL_CLASS}>Phone</label>
-                  <PhoneInputWithDialCode value={phone} onChange={setPhone} />
-                </div>
-                <div style={{ height: '0.5px', background: BIZ.hair, margin: '12px 0' }} />
-                <div className="space-y-1.5">
-                  <label className={LABEL_CLASS}>Email</label>
-                  <input
-                    type="email"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    placeholder="contact@business.com"
-                    className={INPUT_CLASS}
-                    style={INPUT_STYLE}
-                  />
-                </div>
-                <div style={{ height: '0.5px', background: BIZ.hair, margin: '12px 0' }} />
-                <div className="space-y-1.5">
-                  <label className={LABEL_CLASS}>Website</label>
-                  <input
-                    type="url"
-                    value={website}
-                    onChange={(e) => setWebsite(e.target.value)}
-                    placeholder="https://yourwebsite.com"
-                    className={INPUT_CLASS}
-                    style={INPUT_STYLE}
-                  />
-                </div>
-                <div style={{ height: '0.5px', background: BIZ.hair, margin: '12px 0' }} />
-                <div className="space-y-1.5">
-                  <label className={LABEL_CLASS}>Booking link</label>
-                  <input
-                    type="url"
-                    value={bookingUrl}
-                    onChange={(e) => setBookingUrl(e.target.value)}
-                    placeholder="https://bookings.yourgolfclub.com"
-                    className={INPUT_CLASS}
-                    style={INPUT_STYLE}
-                  />
-                  <p className={HINT_CLASS}>
-                    If you use an online tee sheet, paste the booking URL here.
-                  </p>
-                </div>
-              </div>
-            </SectionCard>
-
-            {/* Opening hours */}
-            <SectionCard>
-              <div className="space-y-3">
-                <div>
-                  <p className="text-[14px] font-semibold text-foreground">Opening Hours</p>
-                  <p className={HINT_CLASS} style={{ marginTop: 2 }}>
-                    Displayed on your profile so golfers know when to visit.
-                  </p>
-                </div>
-                <div className="space-y-1">
-                  {DAYS_ORDER.map((day) => {
-                    const entry =
-                      openingHours[day] ?? { open: '08:00', close: '18:00', closed: false };
-                    return (
-                      <div key={day} className="flex items-center gap-2 min-h-[44px]">
-                        <span className="w-10 text-[13px] font-medium text-foreground flex-shrink-0">
-                          {day}
-                        </span>
-                        {entry.closed ? (
-                          <span className="flex-1 text-[13px] text-muted-foreground">Closed</span>
-                        ) : (
-                          <div className="flex-1 flex items-center gap-2">
-                            <input
-                              type="time"
-                              value={entry.open}
-                              onChange={(e) => updateDay(day, { open: e.target.value })}
-                              className="flex-1 h-9 rounded-lg px-2 text-[13px] text-foreground focus:outline-none focus:ring-1 focus:ring-[#F7931E]/40"
-                              style={{ background: 'rgba(15,23,42,0.03)', border: `0.5px solid ${BIZ.hair}` }}
-                            />
-                            <span className="text-muted-foreground text-xs">–</span>
-                            <input
-                              type="time"
-                              value={entry.close}
-                              onChange={(e) => updateDay(day, { close: e.target.value })}
-                              className="flex-1 h-9 rounded-lg px-2 text-[13px] text-foreground focus:outline-none focus:ring-1 focus:ring-[#F7931E]/40"
-                              style={{ background: 'rgba(15,23,42,0.03)', border: `0.5px solid ${BIZ.hair}` }}
-                            />
-                          </div>
-                        )}
-                        <button
-                          type="button"
-                          onClick={() => updateDay(day, { closed: !entry.closed })}
-                          className="text-[12px] font-semibold flex-shrink-0 min-w-[44px] min-h-[44px] flex items-center justify-end"
-                          style={{ color: entry.closed ? BIZ.amber : '#94A3B8' }}
-                        >
-                          {entry.closed ? 'Open' : 'Close'}
-                        </button>
-                      </div>
-                    );
-                  })}
-                </div>
-                {firstOpenDay && (
-                  <button
-                    type="button"
-                    onClick={() => setAllDays(openingHours[firstOpenDay])}
-                    className="text-[13px] font-semibold"
-                    style={{ color: BIZ.amber }}
-                  >
-                    + Apply first day to all days
-                  </button>
-                )}
-              </div>
-            </SectionCard>
-          </div>
-
-          {/* ── Section 3: Branding ──────────────────── */}
-          <div className="px-4 mt-2 mb-2">
-            <SectionEyebrow label="BRANDING" />
-          </div>
-          <div className="space-y-4 px-4 pb-4">
-            <SectionCard>
-              <div className="space-y-3">
-                <label className={LABEL_CLASS}>Logo</label>
-                <div className="flex items-center gap-4">
-                  <div className="relative flex-shrink-0">
-                    <SquircleAvatar
-                      key={effectiveLogoUrl || 'empty'}
-                      src={effectiveLogoUrl || undefined}
-                      fallback={resolvedName?.[0] || 'B'}
-                      size={96}
-                    />
-                    <label
-                      className="absolute -bottom-1 -right-1 w-8 h-8 rounded-full text-white flex items-center justify-center cursor-pointer shadow-sm"
-                      style={{ backgroundColor: BIZ.amber }}
-                    >
-                      <input
-                        ref={logoInputRef}
-                        type="file"
-                        accept="image/*"
-                        onChange={(e) => {
-                          const f = e.target.files?.[0];
-                          if (f) onLogoFile(f);
-                          if (logoInputRef.current) logoInputRef.current.value = '';
-                        }}
-                        className="hidden"
-                      />
-                      <Plus className="w-4 h-4" />
-                    </label>
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <p className="text-[13px] font-medium text-foreground">
-                      {effectiveLogoUrl ? 'Change Logo' : 'Upload Logo'}
-                    </p>
-                    <p className="text-[12px] text-muted-foreground mt-0.5">
-                      Square image recommended. PNG or JPG.
-                    </p>
-                    {effectiveLogoUrl && (
-                      <button
-                        type="button"
-                        onClick={onLogoRemove}
-                        className="text-[12px] font-medium text-destructive mt-1"
-                      >
-                        Remove
-                      </button>
-                    )}
-                  </div>
-                </div>
-              </div>
-            </SectionCard>
-
-            <SectionCard>
-              <div className="space-y-3">
-                <label className={LABEL_CLASS}>Cover Photo</label>
-                <label className="block cursor-pointer">
-                  <input
-                    ref={coverInputRef}
-                    type="file"
-                    accept="image/jpeg,image/png,image/webp"
-                    onChange={(e) => {
-                      const f = e.target.files?.[0];
-                      if (f) onCoverFile(f);
-                      if (coverInputRef.current) coverInputRef.current.value = '';
-                    }}
-                    className="hidden"
-                  />
-                  {effectiveCoverUrl ? (
-                    <div className="relative aspect-[3.2/1] rounded-xl overflow-hidden group">
-                      <img
-                        src={effectiveCoverUrl}
-                        alt="Cover preview"
-                        className="w-full h-full object-cover object-center"
-                      />
-                      <div className="absolute inset-0 bg-foreground/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-                        <Camera className="w-6 h-6 text-background" />
-                      </div>
-                    </div>
-                  ) : (
-                    <div
-                      className="aspect-[3.2/1] rounded-xl border-2 border-dashed flex flex-col items-center justify-center"
-                      style={{ borderColor: BIZ.hairDashed, background: 'rgba(15,23,42,0.03)' }}
-                    >
-                      <div
-                        className="w-12 h-12 rounded-full flex items-center justify-center mb-2"
-                        style={{ background: 'rgba(15,23,42,0.05)', border: `1px solid ${BIZ.hair}` }}
-                      >
-                        <Camera className="w-5 h-5 text-muted-foreground" />
-                      </div>
-                      <p className="text-[13px] font-medium text-foreground">Upload cover photo</p>
-                      <p className="text-[12px] text-muted-foreground">
-                        Recommended: 1600×500px • JPG, PNG, WebP
-                      </p>
-                    </div>
-                  )}
-                </label>
-                {effectiveCoverUrl && (
-                  <button
-                    type="button"
-                    onClick={onCoverRemove}
-                    className="text-[12px] font-medium text-destructive"
-                  >
-                    Remove
-                  </button>
-                )}
-              </div>
-            </SectionCard>
-          </div>
-
-          {/* ── Section 4: Social ────────────────────── */}
-          <div className="px-4 mt-2 mb-2">
-            <SectionEyebrow label="SOCIAL" />
-          </div>
-          <div className="space-y-4 px-4 pb-4">
-            <SectionCard>
-              <div className="space-y-3">
-                <p className={HINT_CLASS} style={{ marginTop: 0 }}>
-                  Link your social media so golfers can follow you off the course.
-                </p>
-                {SOCIAL_PLATFORMS.map(({ field, label, placeholder, icon }) => (
-                  <div key={field} className="flex items-center gap-3">
-                    <div
-                      className="w-9 h-9 rounded-[10px] flex items-center justify-center flex-shrink-0 text-lg"
-                      style={{ background: 'rgba(15,23,42,0.04)', border: `1px solid ${BIZ.hair}` }}
-                    >
-                      {icon}
-                    </div>
-                    <input
-                      type="text"
-                      value={social[field as keyof SocialFields]}
-                      onChange={(e) => setSocial({ ...social, [field]: e.target.value })}
-                      placeholder={placeholder}
-                      aria-label={label}
-                      className="flex-1 h-10 rounded-[10px] px-3 text-[14px] text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-[#F7931E]/40"
-                      style={{ background: '#ffffff', border: `1px solid ${BIZ.hair}` }}
-                    />
-                  </div>
-                ))}
-              </div>
-            </SectionCard>
-          </div>
+          <SocialSection social={social} setSocial={setSocial} />
         </div>
       </div>
+
 
       {/* Close confirm */}
       <AlertDialog open={showCloseConfirm} onOpenChange={setShowCloseConfirm}>
