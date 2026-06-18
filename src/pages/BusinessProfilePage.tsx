@@ -54,7 +54,7 @@ import {
 // Tab content components
 import PostsTabContent from '@/components/posts-tab/PostsTabContent';
 import { BusinessProfileInfo } from '@/components/business/BusinessProfileInfo';
-import { PeopleTab } from '@/components/business/PeopleTab';
+
 import { GenericPageSkeleton } from '@/components/skeletons/GenericPageSkeleton';
 import { AvatarLightbox } from '@/components/shared/AvatarLightbox';
 
