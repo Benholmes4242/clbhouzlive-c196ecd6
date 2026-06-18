@@ -15,7 +15,7 @@ import DetailDrawer from '../components/DetailDrawer';
 import ConfirmDialog from '../components/ConfirmDialog';
 import StatTile from '../components/StatTile';
 import { useUsers, type AdminUserRow, type UserFilterStatus } from '../hooks/useUsers';
-import { useVerifications, type VerificationRow } from '../hooks/useVerifications';
+import { useVerifications, useProofConflict, type VerificationRow } from '../hooks/useVerifications';
 import { useTeam, type TeamMember } from '../hooks/useTeam';
 import { useInvites, type InviteRow } from '../hooks/useInvites';
 import { useDebouncedValue } from '@/hooks/useDebouncedValue';
