@@ -3,8 +3,9 @@ import { useNavigate } from 'react-router-dom';
 import { formatDistanceToNow } from 'date-fns';
 import {
   ChevronLeft, ChevronRight, User, Mail, Bell, Shield, UserX,
-  HelpCircle, MessageSquare, FileText, Trash2, LogOut, Eye, BarChart2, Map, Link2, Users,
+  HelpCircle, MessageSquare, FileText, Trash2, LogOut, Eye, BarChart2, Map, Link2, Users, Briefcase,
 } from 'lucide-react';
+import { useHasBusinesses } from '@/hooks/useMyBusinesses';
 import { useWhsConnection } from '@/lib/whs/hooks';
 import HandicapConnectSheet from '@/components/profile/handicap/HandicapConnectSheet';
 import { formatHcp } from '@/lib/formatHcp';
@@ -54,6 +55,7 @@ export function SettingsPageV2() {
   const navigate = useNavigate();
   const { user, loading: sessionLoading } = useSupabaseSession();
   const { profile, loading } = useProfileData();
+  const { hasBusinesses, count } = useHasBusinesses(user?.id);
 
   // Sync email RPC on mount
   useEffect(() => {
@@ -164,6 +166,19 @@ export function SettingsPageV2() {
             onClick={() => open('email')}
           />
         </SettingsSection>
+
+        {/* Business */}
+        <SettingsSection title="Business">
+          <SettingsChevronRow
+            icon={<Briefcase size={18} />}
+            title={hasBusinesses ? 'Manage businesses' : 'Set up a business profile'}
+            value={hasBusinesses ? String(count) : undefined}
+            iconTheme="account"
+            onClick={() => navigate('/businesses/manage')}
+          />
+        </SettingsSection>
+
+
 
         {/* Privacy */}
         <SettingsSection title="Privacy">
