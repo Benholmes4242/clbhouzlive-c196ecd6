@@ -42,7 +42,6 @@ function TournamentTabsShellRowInner({ activeTab, onChange }: Props) {
           gap: 8,
           padding: '0 16px',
           background: '#F8FAFC',
-          borderBottom: `0.5px solid rgba(15,23,42,0.08)`,
           overflowX: 'auto',
           overflowY: 'hidden',
           WebkitOverflowScrolling: 'touch',
