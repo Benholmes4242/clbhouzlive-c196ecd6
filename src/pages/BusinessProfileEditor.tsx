@@ -113,8 +113,6 @@ export default function BusinessProfileEditor() {
   /* ── branding ─────────────────────────────────────── */
   const [logo, setLogo] = useState<ImageState>(emptyImage);
   const [cover, setCover] = useState<ImageState>(emptyImage);
-  const logoInputRef = useRef<HTMLInputElement>(null);
-  const coverInputRef = useRef<HTMLInputElement>(null);
   const [logoCropOpen, setLogoCropOpen] = useState(false);
   const [coverCropOpen, setCoverCropOpen] = useState(false);
   const [logoCropSrc, setLogoCropSrc] = useState<string | null>(null);
