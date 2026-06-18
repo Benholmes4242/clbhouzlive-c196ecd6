@@ -60,7 +60,6 @@ export const CoursesShellTabs: React.FC<CoursesShellTabsProps> = ({
           display: 'flex',
           justifyContent: 'space-evenly',
           background: '#F8FAFC',
-          borderBottom: '0.5px solid rgba(15,23,42,0.08)',
           overflowY: 'hidden',
           fontFamily: 'Geist, system-ui, -apple-system, BlinkMacSystemFont, sans-serif',
         }}
