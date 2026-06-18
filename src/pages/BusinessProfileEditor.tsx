@@ -483,7 +483,20 @@ export default function BusinessProfileEditor() {
         });
         if (memberErr) throw memberErr;
 
-        await queryClient.invalidateQueries({ queryKey: ['my-businesses'] });
+        await queryClient.invalidateQueries({
+          predicate: (query) => {
+            const k = query.queryKey;
+            if (!Array.isArray(k) || typeof k[0] !== 'string') return false;
+            const key = k[0];
+            return (
+              key === 'my-businesses' ||
+              key === 'business-profile' ||
+              key === 'business-directory' ||
+              key === 'suggestedBusinesses' ||
+              key.startsWith('business-')
+            );
+          },
+        });
         toast.success('Business created');
         navigate(`/business/${row.slug || newId}`);
         return;
@@ -537,8 +550,20 @@ export default function BusinessProfileEditor() {
         .eq('id', id);
       if (updateErr) throw updateErr;
 
-      await queryClient.invalidateQueries({ queryKey: ['my-businesses'] });
-      await queryClient.invalidateQueries({ queryKey: ['business-profile'] });
+      await queryClient.invalidateQueries({
+        predicate: (query) => {
+          const k = query.queryKey;
+          if (!Array.isArray(k) || typeof k[0] !== 'string') return false;
+          const key = k[0];
+          return (
+            key === 'my-businesses' ||
+            key === 'business-profile' ||
+            key === 'business-directory' ||
+            key === 'suggestedBusinesses' ||
+            key.startsWith('business-')
+          );
+        },
+      });
 
       if (logo.localPreview) URL.revokeObjectURL(logo.localPreview);
       if (cover.localPreview) URL.revokeObjectURL(cover.localPreview);
