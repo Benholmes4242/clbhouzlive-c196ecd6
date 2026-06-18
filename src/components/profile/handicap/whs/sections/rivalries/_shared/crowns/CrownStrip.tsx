@@ -3,8 +3,8 @@ import { CrownIcon } from './CrownIcon';
 import type { CrownInfo } from '../headlineEngine';
 
 const GOLD = '#FBBC2E';
-const DIM  = 'rgba(255,255,255,0.32)';
-const EVEN = 'rgba(255,255,255,0.50)';
+const DIM  = 'var(--hcp-t-40)';
+const EVEN = 'var(--hcp-t-60)';
 
 const FONT_GEIST =
   'Geist, system-ui, -apple-system, BlinkMacSystemFont, sans-serif';
@@ -20,8 +20,8 @@ export const CrownStrip: React.FC<Props> = ({ crowns }) => (
       gridTemplateColumns: `repeat(${crowns.length}, 1fr)`,
       gap: 1,
       padding: '10px 14px',
-      background: 'rgba(255,255,255,0.04)',
-      borderTop: '1px solid rgba(255,255,255,0.06)',
+      background: 'var(--hcp-bg-2)',
+      borderTop: '1px solid var(--hcp-line)',
       fontFamily: FONT_GEIST,
     }}
   >
