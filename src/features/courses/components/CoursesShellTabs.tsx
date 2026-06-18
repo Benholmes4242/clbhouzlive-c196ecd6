@@ -9,9 +9,9 @@ interface TabDef {
 }
 
 const TABS: TabDef[] = [
-  { id: 'explore', label: 'Explore' },
-  { id: 'top100', label: 'Top 100' },
   { id: 'discover', label: 'Discover' },
+  { id: 'explore', label: 'Courses' },
+  { id: 'top100', label: 'Top 100' },
 ];
 
 interface CoursesShellTabsProps {
