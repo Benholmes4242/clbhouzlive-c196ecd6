@@ -234,9 +234,10 @@ function Card({ title, action, children }: { title: string; action?: React.React
 
 // ─── Action queue ─────────────────────────────────────────────────────────────
 
-function ActionQueueCard({ queue, loading }: { queue?: { pendingVerifications: number; pendingInvites: number; expiringAccess: number }; loading: boolean }) {
+function ActionQueueCard({ queue, loading }: { queue?: { pendingVerifications: number; pendingInvites: number; expiringAccess: number; pendingCourseClaims: number }; loading: boolean }) {
   const items = [
     { label: 'Pending Verifications', count: queue?.pendingVerifications ?? 0, to: '/admin-v2/users?tab=verifications', Icon: ShieldCheck },
+    { label: 'Pending Course Claims', count: queue?.pendingCourseClaims ?? 0, to: '/admin-v2/users?tab=verifications&entity=course_claim', Icon: ShieldCheck },
     { label: 'Pending Invites',       count: queue?.pendingInvites ?? 0,       to: '/admin-v2/users?tab=invites',       Icon: Mail },
     { label: 'Expiring Access',       count: queue?.expiringAccess ?? 0,       to: '/admin-v2/users?tab=team',          Icon: Clock },
   ];
