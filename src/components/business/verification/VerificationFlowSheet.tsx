@@ -67,6 +67,8 @@ export default function VerificationFlowSheet({ open, onOpenChange, businessId, 
   const { data: business, isLoading: isLoadingBusiness } = useQuery({
     queryKey: ['business-verification-wizard', businessId],
     enabled: !!businessId && open,
+    staleTime: 0,
+    refetchOnMount: 'always',
     queryFn: async () => {
       const { data, error } = await supabase
         .from('business_accounts')
