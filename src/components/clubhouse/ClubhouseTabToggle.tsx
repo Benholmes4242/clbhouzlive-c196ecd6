@@ -22,7 +22,7 @@ export const ClubhouseTabToggle = ({
   if (isBusinessActor) {
     return (
       <div className={cn("flex items-center gap-3 relative z-[45]", className)} role="tablist" aria-label="Feed filter">
-        <span className="text-sm font-semibold text-white opacity-100 whitespace-nowrap py-3 px-1">
+        <span className="text-sm font-semibold opacity-100 whitespace-nowrap py-3 px-1" style={{ color: '#0F172A' }}>
           Suggested
         </span>
       </div>
@@ -55,7 +55,7 @@ export const ClubhouseTabToggle = ({
               padding: '10px 4px 4px',
               fontSize: 'clamp(14px, 4vw, 17px)',
               fontWeight: isActive ? 700 : 500,
-              color: isActive ? 'rgba(255,255,255,0.92)' : 'rgba(255,255,255,0.40)',
+              color: isActive ? '#0F172A' : '#94A3B8',
               letterSpacing: '-0.01em',
               position: 'relative' as const,
               minHeight: 44,
@@ -74,7 +74,7 @@ export const ClubhouseTabToggle = ({
                   right: 4,
                   bottom: 0,
                   height: 2,
-                  background: '#FFFFFF',
+                  background: '#0F172A',
                   borderRadius: 1,
                 }}
               />

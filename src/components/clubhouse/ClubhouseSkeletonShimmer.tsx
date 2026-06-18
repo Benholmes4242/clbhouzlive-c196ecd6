@@ -33,8 +33,8 @@ const SkeletonBlock: React.FC<{
   style?: React.CSSProperties;
 }> = ({ className, isStatic = false, style }) => (
   <div
-    className={cn('relative overflow-hidden bg-white/[0.06]', !isStatic && 'clb-shimmer-dark', className)}
-    style={style}
+    className={cn('relative overflow-hidden', !isStatic && 'clb-shimmer-light', className)}
+    style={{ background: 'rgba(15,23,42,0.05)', ...style }}
   />
 );
 
@@ -242,16 +242,16 @@ const ReviewBottomSkeleton: React.FC<{ isStatic?: boolean }> = ({ isStatic }) =>
   </div>
 );
 
-const CARD_BG = '#0F1419';
-const HAIRLINE = 'rgba(255,255,255,0.07)';
-const CANVAS = '#0A0E14';
+const CARD_BG = '#FFFFFF';
+const HAIRLINE = 'rgba(15,23,42,0.07)';
+const CANVAS = '#F8FAFC';
 
 const CardSkeleton: React.FC<{
   isStatic?: boolean;
   variant?: 'regular' | 'review';
   mediaRatio?: string;
 }> = ({ isStatic = false, variant = 'regular', mediaRatio = '4/5' }) => (
-  <div style={{ background: CARD_BG, overflow: 'hidden' }}>
+  <div style={{ background: CARD_BG, overflow: 'hidden', marginInline: 12, borderRadius: 16, border: '0.5px solid rgba(15,23,42,0.07)', boxShadow: '0 1px 2px rgba(15,23,42,0.04), 0 4px 12px rgba(15,23,42,0.06)' }}>
     {/* Header */}
     <div style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '10px 12px' }}>
       <SkeletonBlock
@@ -345,7 +345,7 @@ export const ClubhouseSkeletonShimmer: React.FC<ClubhouseSkeletonShimmerProps> =
     <AnimatePresence>
       {isVisible && (
         <motion.div
-          className={cn('absolute inset-0 z-50 pointer-events-none', 'bg-[#0F0F0F]', className)}
+          className={cn('absolute inset-0 z-50 pointer-events-none', 'bg-[#F8FAFC]', className)}
           initial={{ opacity: 1 }}
           exit={{ opacity: 0 }}
           transition={{ duration: 0.2, ease: 'easeOut' }}

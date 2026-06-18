@@ -50,8 +50,8 @@ interface ClubhouseTopBarProps {
 
 const TOP_STRIP_TOP = 'calc(max(env(safe-area-inset-top, 0px), 47px) + 6px)';
 
-// Unified lift for every floating glyph in the immersive feed chrome.
-const FLOAT_SHADOW = 'drop-shadow(0 1px 4px rgba(0,0,0,0.55))';
+// Light page — no shadow needed; glyphs render on solid surface.
+const FLOAT_SHADOW = 'none';
 const FLOAT_STROKE = 2;
 
 export const ClubhouseTopBar: React.FC<ClubhouseTopBarProps> = ({
@@ -103,7 +103,7 @@ export const ClubhouseTopBar: React.FC<ClubhouseTopBarProps> = ({
                 style={{
                   width: 1,
                   height: 18,
-                  background: 'rgba(255,255,255,0.18)',
+                  background: 'rgba(15,23,42,0.10)',
                   flexShrink: 0,
                   margin: 0,
                 }}
@@ -125,8 +125,8 @@ export const ClubhouseTopBar: React.FC<ClubhouseTopBarProps> = ({
                   border: 'none',
                   padding: 0,
                   cursor: 'pointer',
-                  color: '#fff',
-                  filter: FLOAT_SHADOW,
+                  color: '#0F172A',
+                  filter: 'none',
                 }}
               >
                 <Search size={20} strokeWidth={FLOAT_STROKE} />

@@ -97,7 +97,7 @@ export default function AuthCallback() {
           alignItems: 'center',
           justifyContent: 'center',
           padding: '40px 24px',
-          background: 'radial-gradient(ellipse 70% 50% at 50% -10%, rgba(245,166,35,0.18) 0%, transparent 60%), radial-gradient(ellipse 100% 80% at 50% 110%, rgba(245,166,35,0.06) 0%, transparent 60%), #080808',
+          background: 'radial-gradient(ellipse 70% 50% at 50% -10%, rgba(247,147,30,0.10) 0%, transparent 60%), radial-gradient(ellipse 100% 80% at 50% 110%, rgba(247,147,30,0.04) 0%, transparent 60%), #F8FAFC',
         }}
       >
         <div style={{ position: 'relative', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 24, textAlign: 'center', maxWidth: 380, width: '100%' }}>
@@ -107,17 +107,17 @@ export default function AuthCallback() {
             className="h-16 w-auto opacity-90"
             onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }}
           />
-          <h1 style={{ fontSize: 28, fontWeight: 700, color: '#fff', lineHeight: 1.2, letterSpacing: '-0.3px', margin: 0 }}>
+          <h1 style={{ fontSize: 28, fontWeight: 700, color: '#0F172A', lineHeight: 1.2, letterSpacing: '-0.3px', margin: 0 }}>
             Almost there
           </h1>
-          <p style={{ fontSize: 15, fontWeight: 300, color: 'rgba(255,255,255,0.6)', lineHeight: 1.6, maxWidth: 280, margin: 0 }}>
+          <p style={{ fontSize: 15, fontWeight: 300, color: '#64748B', lineHeight: 1.6, maxWidth: 280, margin: 0 }}>
             Your email has been verified. Please close your clbhouz app and reopen to sign in and start your journey.
           </p>
-          <p style={{ fontSize: 12, color: 'rgba(255,255,255,0.2)', lineHeight: 1.5, maxWidth: 260, margin: 0 }}>
+          <p style={{ fontSize: 12, color: '#94A3B8', lineHeight: 1.5, maxWidth: 260, margin: 0 }}>
             You can now close this page.
           </p>
         </div>
-        <div style={{ position: 'fixed', bottom: 28, left: 0, right: 0, textAlign: 'center', fontSize: 11, color: 'rgba(255,255,255,0.12)', letterSpacing: '0.08em', textTransform: 'uppercase' }}>
+        <div style={{ position: 'fixed', bottom: 28, left: 0, right: 0, textAlign: 'center', fontSize: 11, color: '#94A3B8', letterSpacing: '0.08em', textTransform: 'uppercase' }}>
           clbhouz · stay in play
         </div>
       </div>
@@ -128,16 +128,15 @@ export default function AuthCallback() {
     <div
       className="fixed inset-0 flex flex-col items-center justify-center"
       style={{
-        background: 'radial-gradient(ellipse 120% 80% at 50% 20%, rgba(20, 20, 22, 1) 0%, #0a0a0a 100%)',
+        background: 'radial-gradient(ellipse 120% 80% at 50% 20%, #FFFFFF 0%, #F8FAFC 100%)',
       }}
     >
       <div
         className="flex flex-col items-center gap-4 p-8 rounded-3xl"
         style={{
-          background: 'rgba(10, 10, 10, 0.78)',
-          backdropFilter: 'blur(22px)',
-          border: '1px solid rgba(255, 255, 255, 0.05)',
-          boxShadow: '0 10px 30px rgba(0, 0, 0, 0.55)',
+          background: '#FFFFFF',
+          border: '0.5px solid rgba(15,23,42,0.07)',
+          boxShadow: '0 10px 30px rgba(15,23,42,0.08)',
         }}
       >
         <img
@@ -145,8 +144,8 @@ export default function AuthCallback() {
           alt="clbhouz"
           className="h-10 w-auto opacity-80"
         />
-        <div className="w-6 h-6 border-2 border-white/20 border-t-white/70 rounded-full animate-spin" aria-label="Loading" />
-        <p className="text-white/50 text-sm" aria-live="polite">{message}</p>
+        <div className="w-6 h-6 border-2 rounded-full animate-spin" style={{ borderColor: 'rgba(15,23,42,0.10)', borderTopColor: '#0F172A' }} aria-label="Loading" />
+        <p className="text-sm" style={{ color: '#64748B' }} aria-live="polite">{message}</p>
       </div>
     </div>
   );
