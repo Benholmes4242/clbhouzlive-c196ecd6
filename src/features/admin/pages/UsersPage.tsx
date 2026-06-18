@@ -621,6 +621,29 @@ function VerificationsTab({
                 )}
               </Field>
             )}
+            {proofConflict && active.type === 'business' && (
+              <div
+                role="alert"
+                style={{
+                  background: t.dangerSoft,
+                  border: `1px solid ${t.danger}`,
+                  borderRadius: t.radius.md,
+                  padding: 12,
+                  display: 'flex',
+                  gap: 10,
+                  alignItems: 'flex-start',
+                }}
+              >
+                <span style={{ fontSize: 16, lineHeight: 1 }} aria-hidden>⚠️</span>
+                <div style={{ fontSize: 13, color: t.dangerText, lineHeight: 1.45 }}>
+                  <strong style={{ fontWeight: 700 }}>Duplicate proof</strong> — this{' '}
+                  {PROOF_NOUNS[active.proofMethod ?? ''] ?? 'proof'} is already verified for{' '}
+                  <strong style={{ fontWeight: 700 }}>{proofConflict.businessName}</strong>.
+                  Approving will verify a second business with the same proof.
+                </div>
+              </div>
+            )}
+
             {proofMetaEntries.length > 0 && (
               <Field label="Proof metadata">
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
