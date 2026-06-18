@@ -5,10 +5,9 @@ import { useMedianStatusBar } from "@/hooks/useMedianStatusBar";
 
 /**
  * Routes that keep the dark chrome (notch/status bar stays dark).
- * Only Clubhouse feed and Handicap stay dark; every other route is light.
+ * Only Handicap stays dark; Clubhouse and every other route are light.
  */
 function isDarkChromeRoute(pathname: string): boolean {
-  if (pathname === '/' || pathname === '/clubhouse') return true;
   if (pathname === '/handicap' || pathname.startsWith('/handicap/')) return true;
   return false;
 }
