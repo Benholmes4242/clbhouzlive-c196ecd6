@@ -48,7 +48,7 @@ interface ClubhouseTopBarProps {
   leftInset?: number;
 }
 
-const TOP_STRIP_TOP = 'calc(max(env(safe-area-inset-top, 0px), 47px) + 6px)';
+const TOP_STRIP_TOP = 'env(safe-area-inset-top, 0px)';
 
 // Light page — no shadow needed; glyphs render on solid surface.
 const FLOAT_SHADOW = 'none';
