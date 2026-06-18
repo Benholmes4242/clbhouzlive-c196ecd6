@@ -134,7 +134,7 @@ const HeroHandicapCardDark: React.FC<Props> = ({ connection }) => {
                 width: 96,
                 height: 48,
                 borderRadius: 8,
-                background: 'rgba(255,255,255,0.05)',
+                background: 'var(--hcp-bg-3)',
               }}
             />
           ) : (
