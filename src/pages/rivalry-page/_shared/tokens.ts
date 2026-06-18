@@ -16,9 +16,9 @@ export const GREEN = '#059669';
 export const RED = '#9F1D1D';
 export const GREEN_DIM = 'rgba(16,185,129,0.16)';
 export const RED_DIM = 'rgba(248,113,113,0.14)';
-export const T35 = 'rgba(248,250,252,0.35)';
-export const T50 = 'rgba(248,250,252,0.50)';
-export const T70 = 'rgba(248,250,252,0.70)';
+export const T35 = 'var(--hcp-t-40)';
+export const T50 = 'var(--hcp-t-60)';
+export const T70 = 'var(--hcp-t-80)';
 
 export const FONT =
   'Geist, -apple-system, BlinkMacSystemFont, system-ui, sans-serif';
