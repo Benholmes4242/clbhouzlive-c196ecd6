@@ -85,10 +85,12 @@ export const PulseCard: React.FC<Props> = ({ friend }) => {
         background: friend.hot
           ? 'linear-gradient(160deg, rgba(247,147,30,0.10) 0%, rgba(247,147,30,0.02) 50%, var(--hcp-bg-1) 100%)'
           : 'var(--hcp-bg-1)',
-        border: friend.hot ? '1px solid rgba(247,147,30,0.32)' : '1px solid rgba(255,255,255,0.04)',
+        border: friend.hot ? '1px solid rgba(247,147,30,0.32)' : '1px solid var(--hcp-line)',
         borderRadius: 13,
         cursor: 'pointer',
-        boxShadow: friend.hot ? '0 0 24px -10px rgba(247,147,30,0.45)' : 'none',
+        boxShadow: friend.hot
+          ? '0 0 24px -10px rgba(247,147,30,0.45)'
+          : '0 1px 2px rgba(15,23,42,0.04), 0 4px 12px rgba(15,23,42,0.06)',
         fontFamily: FONT,
         display: 'flex',
         flexDirection: 'column',
