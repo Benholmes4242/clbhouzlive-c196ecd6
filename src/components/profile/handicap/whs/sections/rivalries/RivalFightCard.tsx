@@ -98,19 +98,20 @@ export const RivalFightCard: React.FC<Props> = ({
         border: '1px solid var(--hcp-line)',
         borderRadius: 18,
         overflow: 'hidden',
-        background: '#06080C',
+        background: '#FFFFFF',
         fontFamily: FONT_GEIST,
         cursor: tappable ? 'pointer' : 'default',
-        color: '#FFFFFF',
-        boxShadow: '0 12px 28px -16px rgba(0,0,0,0.5)',
+        color: 'var(--hcp-t-100)',
+        boxShadow:
+          '0 1px 2px rgba(15,23,42,0.04), 0 6px 16px rgba(15,23,42,0.08)',
       }}
     >
-      {/* HERO */}
+      {/* HERO — slim contained banner */}
       <div
         style={{
           position: 'relative',
           width: '100%',
-          aspectRatio: '16 / 6',
+          aspectRatio: '16 / 5',
           ...(heroPhoto
             ? {
                 backgroundImage: `url(${heroPhoto})`,
@@ -118,7 +119,8 @@ export const RivalFightCard: React.FC<Props> = ({
                 backgroundPosition: 'center',
               }
             : {
-                background: 'var(--hcp-bg-2)',
+                background:
+                  'linear-gradient(135deg, rgba(247,147,30,0.10), var(--hcp-bg-1))',
               }),
         }}
       >
@@ -134,14 +136,14 @@ export const RivalFightCard: React.FC<Props> = ({
             pointerEvents: 'none',
           }}
         />
-        {/* Bottom scrim for legibility */}
+        {/* Bottom scrim — lighter, just enough for text legibility */}
         <div
           aria-hidden
           style={{
             position: 'absolute',
             inset: 0,
             background:
-              'linear-gradient(180deg, rgba(0,0,0,0) 35%, rgba(0,0,0,0.55) 75%, rgba(0,0,0,0.85) 100%)',
+              'linear-gradient(180deg, rgba(0,0,0,0) 30%, rgba(0,0,0,0.35) 100%)',
             pointerEvents: 'none',
           }}
         />
@@ -242,20 +244,31 @@ export const RivalFightCard: React.FC<Props> = ({
           padding: '14px 14px 12px',
         }}
       >
-        <SquircleAvatar
-          size={44}
-          hideRing
-          src={pickAvatarSrc(rivalry.rival_thumbnail_url, rivalry.rival_profile_photo_url)}
-          alt={rivalDisplayName}
-          fallback={initials(rivalDisplayName)}
-        />
+        <div
+          style={{
+            marginTop: -28,
+            borderRadius: 14,
+            border: '3px solid #FFFFFF',
+            boxShadow: '0 2px 6px rgba(15,23,42,0.12)',
+            flexShrink: 0,
+            lineHeight: 0,
+          }}
+        >
+          <SquircleAvatar
+            size={44}
+            hideRing
+            src={pickAvatarSrc(rivalry.rival_thumbnail_url, rivalry.rival_profile_photo_url)}
+            alt={rivalDisplayName}
+            fallback={initials(rivalDisplayName)}
+          />
+        </div>
 
         <div style={{ minWidth: 0, flex: 1 }}>
           <div
             style={{
               fontSize: 15,
               fontWeight: 700,
-              color: '#FFFFFF',
+              color: 'var(--hcp-t-100)',
               whiteSpace: 'nowrap',
               overflow: 'hidden',
               textOverflow: 'ellipsis',
