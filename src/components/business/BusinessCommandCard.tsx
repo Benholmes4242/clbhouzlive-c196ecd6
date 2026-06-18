@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import {
-  MoreHorizontal, Eye, Pencil, BarChart3, Trash2, MapPin, ShieldCheck, Clock, CheckCircle, Mail, Users, Zap
+  MoreHorizontal, Eye, Pencil, BarChart3, Trash2, MapPin, ShieldCheck, Clock, CheckCircle, Mail, Users, Zap,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
@@ -22,6 +22,7 @@ import { VerifiedBadge } from '@/components/ui/VerifiedBadge';
 import { useBusinessVerificationRequest, deriveVerificationState } from '@/hooks/useBusinessVerificationRequest';
 import { getCityCountry } from '@/lib/locationDisplay';
 import type { BusinessMembership } from '@/hooks/useMyBusinesses';
+import { BIZ } from './businessTokens';
 
 interface BusinessCommandCardProps {
   membership: BusinessMembership;
@@ -44,6 +45,8 @@ function getCategoryDisplay(category: string | null | undefined): string {
   if (category.toLowerCase().includes('brand')) return 'Brand';
   return category;
 }
+
+const HAIRLINE: React.CSSProperties = { height: '0.5px', background: BIZ.hair };
 
 export function BusinessCommandCard({ membership, userId, index = 0, isActive = false }: BusinessCommandCardProps) {
   const navigate = useNavigate();
@@ -94,7 +97,6 @@ export function BusinessCommandCard({ membership, userId, index = 0, isActive = 
     return value >= 0 ? `+${value.toLocaleString()}` : value.toLocaleString();
   };
 
-  // Navigate to business profile (People tab) for team management
   const handleManageTeam = (e: React.MouseEvent) => {
     e.stopPropagation();
     setDropdownOpen(false);
@@ -108,7 +110,7 @@ export function BusinessCommandCard({ membership, userId, index = 0, isActive = 
     navigate(`/business/${business.id}`);
   };
 
-  // Stat tap handlers
+  // Stat tap handlers — followers has its own list; visits/impressions go to insights.
   const handleStatTap = (target: 'followers' | 'insights') => {
     if (target === 'followers') {
       navigate(`/business/${business.id}/followers`);
@@ -125,78 +127,94 @@ export function BusinessCommandCard({ membership, userId, index = 0, isActive = 
     location: business.location,
   });
 
+  const hasPendingRequests = (pendingRequestsCount ?? 0) > 0;
+
+  const outlineBtnStyle: React.CSSProperties = {
+    background: BIZ.card,
+    border: `1px solid ${BIZ.hair}`,
+    borderRadius: BIZ.rInner,
+    color: BIZ.ink,
+  };
+
   return (
     <>
       <motion.div
         initial={{ opacity: 0, y: 8 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: index * 0.05, duration: 0.2, ease: 'easeOut' }}
-        className="rounded-2xl overflow-hidden"
-        style={{ background: '#ffffff', border: '1px solid rgba(15,23,42,0.07)' }}
+        transition={{ delay: index * 0.05, duration: 0.2, ease: BIZ.ease }}
+        className="overflow-hidden"
+        style={{
+          background: BIZ.card,
+          border: `1px solid ${BIZ.hair}`,
+          borderRadius: BIZ.rCard,
+        }}
       >
-        {/* Business Identity Row */}
+        {/* Identity row */}
         <div
           onClick={handleRowClick}
           className="flex items-start gap-3 p-4 cursor-pointer"
         >
           {/* Logo — 48px squircle */}
-          <div className="w-12 h-12 rounded-xl overflow-hidden shrink-0 flex items-center justify-center" style={{ background: 'rgba(15,23,42,0.06)', border: '1px solid rgba(15,23,42,0.07)' }}>
+          <div
+            className="w-12 h-12 overflow-hidden shrink-0 flex items-center justify-center"
+            style={{
+              background: BIZ.fillStrong,
+              border: `1px solid ${BIZ.hair}`,
+              borderRadius: BIZ.rInner,
+            }}
+          >
             {business.logo_url ? (
-              <img
-                src={business.logo_url}
-                alt={business.name}
-                className="w-full h-full object-cover"
-              />
+              <img src={business.logo_url} alt={business.name} className="w-full h-full object-cover" />
             ) : (
-              <span className="text-[18px] font-bold text-muted-foreground">
+              <span className="text-[18px] font-bold" style={{ color: BIZ.inkMute }}>
                 {business.name.charAt(0).toUpperCase()}
               </span>
             )}
           </div>
 
-          {/* Name & Meta */}
+          {/* Name & meta */}
           <div className="flex-1 min-w-0">
-            {/* Business name row */}
             <div className="flex items-center gap-1.5">
-              <span className="font-semibold text-[16px] text-foreground truncate leading-tight">
+              <span className="font-semibold text-[16px] truncate leading-tight" style={{ color: BIZ.ink }}>
                 {business.name}
               </span>
               {business.is_verified && <VerifiedBadge size="sm" />}
             </div>
 
-            {/* Role */}
-            <p className="text-[12px] text-muted-foreground mt-0.5">
+            <p className="text-[12px] mt-0.5" style={{ color: BIZ.inkMute }}>
               {ACCESS_LABELS[role] || role}
             </p>
 
-            {/* "Posting as" badge */}
             {isActive && (
-              <span className="inline-flex items-center gap-1 mt-1.5 px-2 py-0.5 rounded-full text-[11px] font-semibold" style={{ background: 'rgba(247,147,30,0.10)', color: '#F7931E', border: '1px solid rgba(247,147,30,0.20)' }}>
+              <span
+                className="inline-flex items-center gap-1 mt-1.5 px-2 py-0.5 rounded-full text-[11px] font-semibold"
+                style={{ background: BIZ.amberTint, color: BIZ.amber, border: `1px solid ${BIZ.amberHair}` }}
+              >
                 <Zap className="w-3 h-3" />
                 Posting as this business
               </span>
             )}
 
-            {/* Category badge */}
             {categoryDisplay && (
-              <span className="inline-flex mt-1.5 px-2 py-0.5 rounded-full text-[11px]" style={{ background: 'rgba(15,23,42,0.05)', border: '1px solid rgba(15,23,42,0.07)', color: '#64748B' }}>
+              <span
+                className="inline-flex mt-1.5 px-2 py-0.5 rounded-full text-[11px]"
+                style={{ background: BIZ.hairSoft, border: `1px solid ${BIZ.hair}`, color: BIZ.inkMute }}
+              >
                 {categoryDisplay}
               </span>
             )}
 
-            {/* Location */}
             {locationDisplay && (
               <div className="flex items-center gap-1 mt-1">
-                <MapPin className="w-3 h-3 text-muted-foreground shrink-0" />
-                <span className="text-[12px] text-muted-foreground truncate">
+                <MapPin className="w-3 h-3 shrink-0" style={{ color: BIZ.inkMute }} />
+                <span className="text-[12px] truncate" style={{ color: BIZ.inkMute }}>
                   {locationDisplay}
                 </span>
               </div>
             )}
 
-            {/* Pending verification subtext */}
             {verificationState === 'pending' && (
-              <p className="text-[12px] mt-1" style={{ color: 'rgba(247,147,30,0.70)' }}>
+              <p className="text-[12px] mt-1" style={{ color: BIZ.amberSoft }}>
                 {needsDomainVerification ? 'Action required: verify your domain' : 'Pending verification'}
               </p>
             )}
@@ -206,44 +224,33 @@ export function BusinessCommandCard({ membership, userId, index = 0, isActive = 
           <DropdownMenu open={dropdownOpen} onOpenChange={setDropdownOpen}>
             <DropdownMenuTrigger asChild>
               <button
-                className="min-h-[44px] min-w-[44px] flex items-center justify-center -mr-2 -mt-1 active:opacity-60 rounded-xl transition-opacity"
+                className="min-h-[44px] min-w-[44px] flex items-center justify-center -mr-2 -mt-1 active:opacity-60 transition-opacity"
+                style={{ borderRadius: BIZ.rInner }}
                 onClick={(e) => e.stopPropagation()}
               >
-                <MoreHorizontal className="h-5 w-5 text-muted-foreground" />
+                <MoreHorizontal className="h-5 w-5" style={{ color: BIZ.inkMute }} />
               </button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent
-              align="end"
-              className="w-52 rounded-xl shadow-lg border-border"
-            >
+            <DropdownMenuContent align="end" className="w-52 rounded-xl shadow-lg border-border">
               <DropdownMenuItem
-                onClick={(e) => {
-                  e.stopPropagation();
-                  navigate(`/business/${business.id}`);
-                }}
+                onClick={(e) => { e.stopPropagation(); navigate(`/business/${business.id}`); }}
                 className="gap-2.5 cursor-pointer min-h-[44px] active:bg-muted"
               >
-                <Eye className="h-4 w-4 text-muted-foreground" />
+                <Eye className="h-4 w-4" style={{ color: BIZ.inkMute }} />
                 View profile
               </DropdownMenuItem>
               <DropdownMenuItem
-                onClick={(e) => {
-                  e.stopPropagation();
-                  navigate(`/business/${business.id}/edit`);
-                }}
+                onClick={(e) => { e.stopPropagation(); navigate(`/business/${business.id}/edit`); }}
                 className="gap-2.5 cursor-pointer min-h-[44px] active:bg-muted"
               >
-                <Pencil className="h-4 w-4 text-muted-foreground" />
+                <Pencil className="h-4 w-4" style={{ color: BIZ.inkMute }} />
                 Edit profile
               </DropdownMenuItem>
               <DropdownMenuItem
-                onClick={(e) => {
-                  e.stopPropagation();
-                  navigate(`/business/${business.id}/insights`);
-                }}
+                onClick={(e) => { e.stopPropagation(); navigate(`/business/${business.id}/insights`); }}
                 className="gap-2.5 cursor-pointer min-h-[44px] active:bg-muted"
               >
-                <BarChart3 className="h-4 w-4 text-muted-foreground" />
+                <BarChart3 className="h-4 w-4" style={{ color: BIZ.inkMute }} />
                 Insights
               </DropdownMenuItem>
 
@@ -254,21 +261,20 @@ export function BusinessCommandCard({ membership, userId, index = 0, isActive = 
                     onClick={handleManageTeam}
                     className="gap-2.5 cursor-pointer min-h-[44px] active:bg-muted"
                   >
-                    <Users className="h-4 w-4 text-muted-foreground" />
+                    <Users className="h-4 w-4" style={{ color: BIZ.inkMute }} />
                     Manage team
-                    {(pendingRequestsCount ?? 0) > 0 && (
-                      <span className="ml-auto h-2 w-2 rounded-full" style={{ background: '#F7931E' }} />
+                    {hasPendingRequests && (
+                      <span className="ml-auto h-2 w-2 rounded-full" style={{ background: BIZ.amber }} />
                     )}
                   </DropdownMenuItem>
 
-                  {/* Verification menu item - state-based */}
                   {verificationState === 'verified' ? (
-                    <DropdownMenuItem disabled className="gap-2.5 min-h-[44px] opacity-50 cursor-default" style={{ color: '#F7931E' }}>
+                    <DropdownMenuItem disabled className="gap-2.5 min-h-[44px] opacity-50 cursor-default" style={{ color: BIZ.amber }}>
                       <CheckCircle className="h-4 w-4" />
                       Verified
                     </DropdownMenuItem>
                   ) : verificationState === 'pending' ? (
-                    <DropdownMenuItem disabled className="gap-2.5 min-h-[44px] opacity-50 cursor-default" style={{ color: 'rgba(247,147,30,0.70)' }}>
+                    <DropdownMenuItem disabled className="gap-2.5 min-h-[44px] opacity-50 cursor-default" style={{ color: BIZ.amberSoft }}>
                       <Clock className="h-4 w-4" />
                       Verification pending
                     </DropdownMenuItem>
@@ -276,11 +282,12 @@ export function BusinessCommandCard({ membership, userId, index = 0, isActive = 
                     <DropdownMenuItem
                       onClick={(e) => {
                         e.stopPropagation();
+                        // NOTE: verification wizard route stays as-is for now; Phase 5 reconciles verification routes.
                         navigate(`/business/${business.id}/verification/wizard`);
                       }}
                       className="gap-2.5 cursor-pointer min-h-[44px] active:bg-muted"
                     >
-                      <ShieldCheck className="h-4 w-4 text-muted-foreground" />
+                      <ShieldCheck className="h-4 w-4" style={{ color: BIZ.inkMute }} />
                       {verificationState === 'rejected' ? 'Request verification (reapply)' : 'Request verification'}
                     </DropdownMenuItem>
                   )}
@@ -291,10 +298,7 @@ export function BusinessCommandCard({ membership, userId, index = 0, isActive = 
                 <>
                   <DropdownMenuSeparator className="my-1" />
                   <DropdownMenuItem
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      setShowDeleteDialog(true);
-                    }}
+                    onClick={(e) => { e.stopPropagation(); setShowDeleteDialog(true); }}
                     className="gap-2.5 cursor-pointer min-h-[44px] text-destructive focus:text-destructive focus:bg-destructive/10"
                   >
                     <Trash2 className="h-4 w-4" />
@@ -307,75 +311,89 @@ export function BusinessCommandCard({ membership, userId, index = 0, isActive = 
         </div>
 
         {/* Divider */}
-        <div style={{ height: '0.5px', background: 'rgba(15,23,42,0.07)' }} />
+        <div style={HAIRLINE} />
 
-        {/* Stats Strip */}
+        {/* Stats strip */}
         <div className="mx-4 my-3">
-          <div className="rounded-xl p-3 grid grid-cols-3" style={{ background: 'rgba(15,23,42,0.03)', border: '1px solid rgba(15,23,42,0.07)' }}>
-            {/* Visits */}
+          <div
+            className="p-3 grid grid-cols-3"
+            style={{ background: BIZ.fill, border: `1px solid ${BIZ.hair}`, borderRadius: BIZ.rInner }}
+          >
             <button
               onClick={() => handleStatTap('insights')}
               className="flex flex-col items-center justify-center cursor-pointer active:opacity-70 transition-opacity"
             >
-              <p className={cn(
-                "text-[16px] font-bold tabular-nums min-w-[2ch]",
-                statsLoading ? "opacity-0" : (stats?.visits ? "text-foreground" : "text-muted-foreground")
-              )}>
+              <p
+                className={cn(
+                  'text-[16px] font-bold tabular-nums min-w-[2ch]',
+                  statsLoading ? 'opacity-0' : '',
+                )}
+                style={{ color: stats?.visits ? BIZ.ink : BIZ.inkMute }}
+              >
                 {statsLoading ? '-' : formatStat(stats?.visits)}
               </p>
-              <p className="text-[11px] text-muted-foreground uppercase tracking-wide mt-0.5">Visits (7d)</p>
+              <p className="text-[11px] uppercase tracking-wide mt-0.5" style={{ color: BIZ.inkMute }}>
+                Visits (7d)
+              </p>
             </button>
 
-            {/* Followers */}
             <button
               onClick={() => handleStatTap('followers')}
               className="flex flex-col items-center justify-center cursor-pointer active:opacity-70 transition-opacity"
-              style={{ borderLeft: '0.5px solid rgba(15,23,42,0.07)', borderRight: '0.5px solid rgba(15,23,42,0.07)' }}
+              style={{ borderLeft: `0.5px solid ${BIZ.hair}`, borderRight: `0.5px solid ${BIZ.hair}` }}
             >
-              <p className={cn(
-                "text-[16px] font-bold tabular-nums min-w-[2ch]",
-                followersLoading ? "opacity-0" : (totalFollowers ? "text-foreground" : "text-muted-foreground")
-              )}>
+              <p
+                className={cn(
+                  'text-[16px] font-bold tabular-nums min-w-[2ch]',
+                  followersLoading ? 'opacity-0' : '',
+                )}
+                style={{ color: totalFollowers ? BIZ.ink : BIZ.inkMute }}
+              >
                 {followersLoading ? '-' : formatStat(totalFollowers)}
               </p>
-              <p className="text-[11px] text-muted-foreground uppercase tracking-wide mt-0.5">
+              <p className="text-[11px] uppercase tracking-wide mt-0.5" style={{ color: BIZ.inkMute }}>
                 Followers
                 {!statsLoading && stats?.followersGained !== undefined && stats.followersGained !== 0 && (
-                  <span className="ml-1 text-muted-foreground/50">({formatDelta(stats.followersGained)})</span>
+                  <span className="ml-1 opacity-60">({formatDelta(stats.followersGained)})</span>
                 )}
               </p>
             </button>
 
-            {/* Impressions */}
             <button
               onClick={() => handleStatTap('insights')}
               className="flex flex-col items-center justify-center cursor-pointer active:opacity-70 transition-opacity"
             >
-              <p className={cn(
-                "text-[16px] font-bold tabular-nums min-w-[2ch]",
-                statsLoading ? "opacity-0" : (stats?.impressions ? "text-foreground" : "text-muted-foreground")
-              )}>
+              <p
+                className={cn(
+                  'text-[16px] font-bold tabular-nums min-w-[2ch]',
+                  statsLoading ? 'opacity-0' : '',
+                )}
+                style={{ color: stats?.impressions ? BIZ.ink : BIZ.inkMute }}
+              >
                 {statsLoading ? '-' : formatStat(stats?.impressions)}
               </p>
-              <p className="text-[11px] text-muted-foreground uppercase tracking-wide mt-0.5">Impressions (7d)</p>
+              <p className="text-[11px] uppercase tracking-wide mt-0.5" style={{ color: BIZ.inkMute }}>
+                Impressions (7d)
+              </p>
             </button>
           </div>
         </div>
 
         {/* Divider */}
-        <div style={{ height: '0.5px', background: 'rgba(15,23,42,0.07)' }} />
+        <div style={HAIRLINE} />
 
-        {/* Actions Row */}
+        {/* Actions row */}
         <div className="flex items-center gap-2 p-4 pt-3">
           {needsDomainVerification ? (
             <Button
               size="sm"
               onClick={(e) => {
                 e.stopPropagation();
-                navigate(`/business/${business.id}/verify-domain`);
+                // FIX: previous route /business/:id/verify-domain 404s. Correct path is /verification/domain.
+                navigate(`/business/${business.id}/verification/domain`);
               }}
-              className="gap-1.5 min-h-[44px] flex-1 active:scale-[0.97] transition-all rounded-xl text-white border-0"
-              style={{ background: '#F7931E' }}
+              className="gap-1.5 min-h-[44px] flex-1 active:scale-[0.97] transition-all text-white border-0"
+              style={{ background: BIZ.amber, borderRadius: BIZ.rInner }}
             >
               <Mail className="h-3.5 w-3.5" />
               Verify domain now
@@ -385,12 +403,9 @@ export function BusinessCommandCard({ membership, userId, index = 0, isActive = 
               <Button
                 variant="outline"
                 size="sm"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  navigate(`/business/${business.id}/edit`);
-                }}
-                className="min-h-[44px] flex-1 text-[13px] font-medium text-foreground active:scale-[0.97] transition-transform rounded-xl flex items-center justify-center gap-1.5"
-                style={{ background: '#ffffff', border: '1px solid rgba(15,23,42,0.07)' }}
+                onClick={(e) => { e.stopPropagation(); navigate(`/business/${business.id}/edit`); }}
+                className="min-h-[44px] flex-1 text-[13px] font-medium active:scale-[0.97] transition-transform flex items-center justify-center gap-1.5"
+                style={outlineBtnStyle}
               >
                 <Pencil className="h-3.5 w-3.5" />
                 Edit profile
@@ -399,12 +414,9 @@ export function BusinessCommandCard({ membership, userId, index = 0, isActive = 
               <Button
                 variant="outline"
                 size="sm"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  navigate(`/business/${business.id}/insights`);
-                }}
-                className="min-h-[44px] flex-1 text-[13px] font-medium text-foreground active:scale-[0.97] transition-transform rounded-xl flex items-center justify-center gap-1.5"
-                style={{ background: '#ffffff', border: '1px solid rgba(15,23,42,0.07)' }}
+                onClick={(e) => { e.stopPropagation(); navigate(`/business/${business.id}/insights`); }}
+                className="min-h-[44px] flex-1 text-[13px] font-medium active:scale-[0.97] transition-transform flex items-center justify-center gap-1.5"
+                style={outlineBtnStyle}
               >
                 <BarChart3 className="h-3.5 w-3.5" />
                 Insights
@@ -415,13 +427,16 @@ export function BusinessCommandCard({ membership, userId, index = 0, isActive = 
                   variant="outline"
                   size="sm"
                   onClick={handleManageTeam}
-                  className="min-h-[44px] flex-1 text-[13px] font-medium text-foreground active:scale-[0.97] transition-transform rounded-xl flex items-center justify-center gap-1.5 relative"
-                  style={{ background: '#ffffff', border: '1px solid rgba(15,23,42,0.07)' }}
+                  className="min-h-[44px] flex-1 text-[13px] font-medium active:scale-[0.97] transition-transform flex items-center justify-center gap-1.5 relative"
+                  style={outlineBtnStyle}
                 >
                   <Users className="h-3.5 w-3.5" />
                   Manage team
-                  {(pendingRequestsCount ?? 0) > 0 && (
-                    <span className="absolute -top-1 -right-1 h-2.5 w-2.5 rounded-full ring-2 ring-white" style={{ background: '#F7931E' }} />
+                  {hasPendingRequests && (
+                    <span
+                      className="absolute -top-1 -right-1 h-2.5 w-2.5 rounded-full ring-2 ring-white"
+                      style={{ background: BIZ.amber }}
+                    />
                   )}
                 </Button>
               )}
@@ -437,7 +452,6 @@ export function BusinessCommandCard({ membership, userId, index = 0, isActive = 
         businessName={business.name}
         userId={userId}
       />
-
     </>
   );
 }
