@@ -20,7 +20,7 @@ export interface BusinessCategoryOption {
 
 /**
  * Single source of truth for business categories.
- * Used in both BusinessCreatePage and BusinessInfoForm (edit).
+ * Used by BusinessProfileEditor (create + edit modes).
  * 
  * IMPORTANT: When adding new categories, add them here so they
  * appear consistently in create and edit flows.

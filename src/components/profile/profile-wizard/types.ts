@@ -55,11 +55,5 @@ export const BIO_MAX = 300;
 export const DISPLAY_NAME_MAX = 50;
 export const USERNAME_MAX = 30;
 
-// Business wizard types (backward compat)
-export type BusinessWizardStep = 1 | 2 | 3;
+// Business wizard types removed in Phase 3 — see BusinessProfileEditor.tsx.
 
-export const BUSINESS_STEP_CONFIG: Record<BusinessWizardStep, { title: string; description: string }> = {
-  1: { title: 'Identity', description: 'Tell golfers who you are' },
-  2: { title: 'Find Us', description: 'Location, contact & opening hours' },
-  3: { title: 'Branding', description: 'Logo, cover photo & preview' },
-};
