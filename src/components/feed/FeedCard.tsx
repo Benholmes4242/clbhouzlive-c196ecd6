@@ -143,10 +143,7 @@ const FeedCardImpl: React.FC<FeedCardProps> = ({
       style={{
         background: CARD,
         overflow: 'hidden',
-        marginInline: 12,
-        borderRadius: 16,
-        border: '0.5px solid rgba(15,23,42,0.07)',
-        boxShadow: '0 1px 2px rgba(15,23,42,0.04), 0 4px 12px rgba(15,23,42,0.06)',
+        marginInline: 0,
       }}
     >
       {/* Header */}
