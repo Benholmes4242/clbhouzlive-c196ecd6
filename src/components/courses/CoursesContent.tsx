@@ -222,7 +222,7 @@ const CoursesContent: React.FC<CoursesContentProps> = ({ username, displayName }
       const params = new URLSearchParams(searchParams);
       params.delete('tab');
       setSearchParams(params, { replace: true });
-      setActiveTab('explore');
+      setActiveTab('discover');
       window.scrollTo({ top: 0, behavior: 'smooth' });
     };
     window.addEventListener('clbhouz-active-tab-retap', onRetap);
