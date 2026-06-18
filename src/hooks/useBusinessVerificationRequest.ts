@@ -5,7 +5,7 @@ import { AppLog } from '@/lib/logger';
 export interface BusinessVerificationRequest {
   id: string;
   business_id: string;
-  status: 'pending' | 'approved' | 'rejected' | 'revoked';
+  status: 'pending' | 'approved' | 'rejected' | 'revoked' | 'needs_more_info';
   requested_by: string;
   created_at: string;
   reviewed_at: string | null;
