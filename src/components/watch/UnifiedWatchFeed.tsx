@@ -27,6 +27,14 @@ export default function UnifiedWatchFeed({ embedded = false }: UnifiedWatchFeedP
   const userId = session?.user?.id;
   const gridRef = useRef<HTMLDivElement>(null);
 
+  const [scrolled, setScrolled] = useState(false);
+  useEffect(() => {
+    const onScroll = () => setScrolled(window.scrollY > 4);
+    window.addEventListener('scroll', onScroll, { passive: true });
+    onScroll();
+    return () => window.removeEventListener('scroll', onScroll);
+  }, []);
+
   const { mood, setMood } = useWatchMood();
 
   // Mood pills (in ShellSlot) drive both rails and the grid. useWatchFeed
