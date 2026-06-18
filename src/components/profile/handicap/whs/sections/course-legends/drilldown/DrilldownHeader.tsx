@@ -53,31 +53,6 @@ export const DrilldownHeader: React.FC<Props> = ({
       />
     )}
 
-    <div
-      aria-hidden
-      style={{
-        position: 'absolute',
-        top: 0,
-        left: 0,
-        right: 0,
-        height: '50%',
-        background:
-          'linear-gradient(180deg, rgba(5,8,16,0.55) 0%, rgba(5,8,16,0) 100%)',
-      }}
-    />
-
-    <div
-      aria-hidden
-      style={{
-        position: 'absolute',
-        bottom: 0,
-        left: 0,
-        right: 0,
-        height: '60%',
-        background:
-          'linear-gradient(180deg, rgba(5,8,16,0) 0%, rgba(5,8,16,0.92) 90%)',
-      }}
-    />
 
     <div
       style={{
