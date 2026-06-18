@@ -21,10 +21,18 @@ const WatchPageContent: React.FC<WatchPageContentProps> = ({ embedded = false, s
   const userId = session?.user?.id;
   const activeFilter: WatchFilter = activeTag === 'near' ? 'near' : 'trending';
   const [isSearchOpen, setIsSearchOpen] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
   const gridRef = useRef<HTMLDivElement>(null);
 
   const [userLat, setUserLat] = useState<number | null>(null);
   const [userLng, setUserLng] = useState<number | null>(null);
+
+  useEffect(() => {
+    const onScroll = () => setScrolled(window.scrollY > 4);
+    window.addEventListener('scroll', onScroll, { passive: true });
+    onScroll();
+    return () => window.removeEventListener('scroll', onScroll);
+  }, []);
 
   useEffect(() => {
     if (activeFilter !== 'near') return;
@@ -66,6 +74,7 @@ const WatchPageContent: React.FC<WatchPageContentProps> = ({ embedded = false, s
           onFilterChange={() => {}}
           onOpenSearch={() => setIsSearchOpen(true)}
           embedded={embedded}
+          scrolled={scrolled}
         />
       )}
 
