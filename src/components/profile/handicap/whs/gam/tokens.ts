@@ -104,7 +104,7 @@ export const RARITY_DARK: Record<
     cardBorder: 'rgba(247,147,30,0.42)',
     cardBg: 'var(--hcp-bg-1)',
     cardSweep:
-      'linear-gradient(135deg, #FFFFFF 0%, #FFF8EA 55%, rgba(247,147,30,0.22) 100%)',
+      'linear-gradient(150deg, rgba(247,147,30,0.24) 0%, #FFF8EA 50%, #FFFFFF 100%)',
     topStripe: 'linear-gradient(90deg, #F7931E 0%, #FBBC2E 50%, #F7931E 100%)',
     glow: 'inset 0 0 0 1px rgba(251,188,46,0.15)',
     outerGlow: '0 0 28px -10px rgba(247,147,30,0.32)',
