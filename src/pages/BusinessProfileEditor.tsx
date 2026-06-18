@@ -65,69 +65,8 @@ import type { Database } from '@/integrations/supabase/types';
 
 const COVER_ASPECT_RATIO = 3.2;
 
-const DAYS_ORDER = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'] as const;
-type Day = typeof DAYS_ORDER[number];
-
-interface OpeningHoursEntry {
-  open: string;
-  close: string;
-  closed: boolean;
-}
-type OpeningHours = Record<string, OpeningHoursEntry>;
-
-const DEFAULT_OPENING_HOURS: OpeningHours = {
-  Mon: { open: '08:00', close: '18:00', closed: false },
-  Tue: { open: '08:00', close: '18:00', closed: false },
-  Wed: { open: '08:00', close: '18:00', closed: false },
-  Thu: { open: '08:00', close: '18:00', closed: false },
-  Fri: { open: '08:00', close: '18:00', closed: false },
-  Sat: { open: '08:00', close: '18:00', closed: false },
-  Sun: { open: '08:00', close: '18:00', closed: true },
-};
-
-const SOCIAL_PLATFORMS = [
-  { field: 'instagram', label: 'Instagram', placeholder: '@yourhandle', icon: '📸' },
-  { field: 'twitter', label: 'X / Twitter', placeholder: '@yourhandle', icon: '𝕏' },
-  { field: 'facebook', label: 'Facebook', placeholder: 'facebook.com/…', icon: 'ƒ' },
-  { field: 'youtube', label: 'YouTube', placeholder: 'youtube.com/c/…', icon: '▶' },
-] as const;
-
-const INPUT_CLASS =
-  'w-full rounded-xl px-4 py-3 text-[15px] text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-[#F7931E]/40 transition-colors';
-const INPUT_STYLE = { background: '#ffffff', border: `1px solid ${BIZ.hair}` };
-const LOCKED_CLASS =
-  'flex items-center gap-2 rounded-xl px-4 py-3 text-[15px] text-muted-foreground';
-const LOCKED_STYLE = {
-  background: 'rgba(15,23,42,0.03)',
-  border: `0.5px solid ${BIZ.hair}`,
-};
-const LABEL_CLASS = 'text-[13px] font-medium text-muted-foreground';
-const HINT_CLASS = 'text-[12px] text-muted-foreground mt-1';
-
-/* ─────────────────────── types ─────────────────────── */
-
 type Mode = 'create' | 'edit';
 
-interface SocialFields {
-  instagram: string;
-  twitter: string;
-  facebook: string;
-  youtube: string;
-}
-
-interface ImageState {
-  url: string | null;
-  pendingFile: File | null;
-  pendingRemove: boolean;
-  localPreview: string | null;
-}
-
-const emptyImage: ImageState = {
-  url: null,
-  pendingFile: null,
-  pendingRemove: false,
-  localPreview: null,
-};
 
 /* ─────────────────────── component ─────────────────────── */
 
