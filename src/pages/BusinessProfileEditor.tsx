@@ -14,6 +14,7 @@ import { ChevronLeft, Loader2, AlertCircle } from 'lucide-react';
 import { toast } from 'sonner';
 
 import { supabase } from '@/integrations/supabase/client';
+import { FunctionsHttpError } from '@supabase/supabase-js';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useBusinessProfile } from '@/hooks/useBusinessProfile';
 import { useBusinessMembership } from '@/hooks/useBusinessMembership';
@@ -134,6 +135,7 @@ export default function BusinessProfileEditor() {
   const [existingBusinessForClub, setExistingBusinessForClub] = useState<
     { id: string; name: string } | null
   >(null);
+  const [clubClaimPending, setClubClaimPending] = useState(false);
   const [showRequestAccessModal, setShowRequestAccessModal] = useState(false);
   const [showRequestClubModal, setShowRequestClubModal] = useState(false);
   const [clubSearchQuery] = useState('');
@@ -255,6 +257,7 @@ export default function BusinessProfileEditor() {
   useEffect(() => {
     if (mode !== 'create' || !selectedClub?.id) {
       setExistingBusinessForClub(null);
+      setClubClaimPending(false);
       return;
     }
     let cancelled = false;
@@ -269,6 +272,23 @@ export default function BusinessProfileEditor() {
           .maybeSingle();
         if (cancelled) return;
         setExistingBusinessForClub(data);
+
+        // Also detect an in-flight claim on this club (no owner yet, but
+        // someone has filed and it's pending admin review).
+        if (!data) {
+          const { data: pendingClaim } = await supabase
+            .from('course_claim_requests')
+            .select('id')
+            .eq('club_id', selectedClub.id)
+            .in('status', ['pending', 'needs_more_info'])
+            .limit(1)
+            .maybeSingle();
+          if (cancelled) return;
+          setClubClaimPending(!!pendingClaim);
+        } else {
+          setClubClaimPending(false);
+        }
+
         if (!data && selectedClub) {
           const locationLabel = [selectedClub.sub_country, selectedClub.region, selectedClub.country]
             .filter(Boolean)
@@ -303,13 +323,13 @@ export default function BusinessProfileEditor() {
   const isValid = useMemo(() => {
     if (mode === 'create') {
       if (!category) return false;
-      if (isGolfClub) return !!selectedClub && !existingBusinessForClub;
+      if (isGolfClub) return !!selectedClub && !existingBusinessForClub && !clubClaimPending;
       if (isUniversity) return !!selectedCollege;
       return resolvedName.length > 0;
     }
     // edit: always require a name (club-linked is always set)
     return resolvedName.length > 0 || isClubLinked;
-  }, [mode, category, isGolfClub, isUniversity, selectedClub, selectedCollege, existingBusinessForClub, resolvedName, isClubLinked]);
+  }, [mode, category, isGolfClub, isUniversity, selectedClub, selectedCollege, existingBusinessForClub, clubClaimPending, resolvedName, isClubLinked]);
 
   /* ── dirty (edit mode) ────────────────────────────── */
   const currentSnapshot = useMemo(() => {
@@ -491,6 +511,7 @@ export default function BusinessProfileEditor() {
         // The business is already created; the claim links club ownership only on approval.
         // Do NOT hard-fail the save if the claim submit errors — surface softly.
         let claimFiled = false;
+        let claimError: string | null = null;
         if (isGolfClub && selectedClub) {
           const { error: claimErr } = await supabase.functions.invoke('request-course-claim', {
             body: {
@@ -504,10 +525,21 @@ export default function BusinessProfileEditor() {
             },
           });
           if (claimErr) {
-            toast.error(
-              claimErr.message ||
-                'Your business was created, but the club claim could not be submitted (it may already be claimed or under review).',
-            );
+            // FunctionsHttpError's `.message` is generic ("non-2xx status code").
+            // The real message lives in the JSON response body.
+            let msg = 'This club may already be claimed or under review.';
+            if (claimErr instanceof FunctionsHttpError) {
+              try {
+                const body = await claimErr.context.json();
+                if (body?.error) msg = body.error;
+                else if (body?.message) msg = body.message;
+              } catch {
+                /* keep fallback */
+              }
+            } else if (claimErr.message) {
+              msg = claimErr.message;
+            }
+            claimError = msg;
           } else {
             claimFiled = true;
           }
@@ -527,11 +559,15 @@ export default function BusinessProfileEditor() {
             );
           },
         });
-        toast.success(
-          claimFiled
-            ? 'Business created — your club claim has been submitted for review.'
-            : 'Business created',
-        );
+        if (claimError) {
+          toast.error(`Business created, but the claim couldn't be submitted: ${claimError}`);
+        } else {
+          toast.success(
+            claimFiled
+              ? 'Business created — your club claim has been submitted for review.'
+              : 'Business created',
+          );
+        }
         navigate(`/business/${row.slug || newId}`);
         return;
       }
@@ -715,9 +751,29 @@ export default function BusinessProfileEditor() {
             setFoundedYear={setFoundedYear}
           />
 
+          {/* Inline notice — a claim for this club is already under review. */}
+          {mode === 'create' && isGolfClub && selectedClub && !existingBusinessForClub && clubClaimPending && (
+            <div
+              role="status"
+              style={{
+                margin: '8px 16px 16px',
+                padding: '12px 14px',
+                borderRadius: 10,
+                background: '#FFF7ED',
+                border: '1px solid #FED7AA',
+                color: '#9A3412',
+                fontSize: 13,
+                lineHeight: 1.45,
+              }}
+            >
+              <strong style={{ fontWeight: 700 }}>A claim for this club is already under review.</strong>{' '}
+              You can't submit another claim right now. We'll let you know once it's been processed.
+            </div>
+          )}
+
           {/* Proof note — create-mode golf-club claim only.
               Helps the admin verify your connection to the club. Optional. */}
-          {mode === 'create' && isGolfClub && selectedClub && !existingBusinessForClub && (
+          {mode === 'create' && isGolfClub && selectedClub && !existingBusinessForClub && !clubClaimPending && (
             <div style={{ padding: '0 16px', marginTop: 8, marginBottom: 16 }}>
               <label
                 htmlFor="claim-proof-note"
