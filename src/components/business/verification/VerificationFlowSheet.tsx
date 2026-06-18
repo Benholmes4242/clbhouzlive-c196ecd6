@@ -139,8 +139,9 @@ export default function VerificationFlowSheet({ open, onOpenChange, businessId, 
         .limit(1);
       if (checkError) throw checkError;
       if (existingApproved && existingApproved.length > 0) {
-        throw new Error('This proof is already associated with a verified business.');
+        throw new Error(PROOF_CONFLICT_MESSAGE[selectedProof] ?? 'This proof is already linked to a verified business.');
       }
+
 
       const { error } = await supabase
         .from('business_verification_requests')
