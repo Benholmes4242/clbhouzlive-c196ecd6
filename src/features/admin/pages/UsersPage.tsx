@@ -457,6 +457,8 @@ const PROOF_NOUNS: Record<string, string> = {
 };
 
 
+type EntityFilter = 'business' | 'golfer' | 'course_claim';
+
 function VerificationsTab({
   data, loading, review,
 }: {
@@ -464,6 +466,40 @@ function VerificationsTab({
   loading: boolean;
   review: ReturnType<typeof useVerifications>['reviewMutation'];
 }) {
+  const [params, setParams] = useSearchParams();
+  const entityFromUrl = (params.get('entity') as EntityFilter | null) ?? null;
+
+  // Default to whichever entity has pending items (Businesses → Courses → Users),
+  // unless the URL explicitly requested one.
+  const pendingByEntity = useMemo(() => ({
+    business: data.filter(r => r.type === 'business' && r.status === 'pending').length,
+    course_claim: data.filter(r => r.type === 'course_claim' && r.status === 'pending').length,
+    golfer: data.filter(r => r.type === 'golfer' && r.status === 'pending').length,
+  }), [data]);
+
+  const defaultEntity: EntityFilter =
+    entityFromUrl ??
+    (pendingByEntity.business > 0 ? 'business'
+      : pendingByEntity.course_claim > 0 ? 'course_claim'
+      : pendingByEntity.golfer > 0 ? 'golfer'
+      : 'business');
+
+  const [entityFilter, setEntityFilterState] = useState<EntityFilter>(defaultEntity);
+  const setEntityFilter = (id: EntityFilter) => {
+    setEntityFilterState(id);
+    const next = new URLSearchParams(params);
+    next.set('entity', id);
+    setParams(next, { replace: true });
+  };
+
+  // Honour URL changes (e.g. dashboard deep-link with ?entity=course_claim).
+  useEffect(() => {
+    if (entityFromUrl && entityFromUrl !== entityFilter) {
+      setEntityFilterState(entityFromUrl);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [entityFromUrl]);
+
   const [statusFilter, setStatusFilter] = useState<'pending' | 'needs_info' | 'approved' | 'rejected' | 'all'>('pending');
   const [active, setActive] = useState<VerificationRow | null>(null);
   const [note, setNote] = useState('');
@@ -489,13 +525,18 @@ function VerificationsTab({
     return () => { cancelled = true; };
   }, [active?.id, active?.businessId, active?.type]);
 
+  const entityFiltered = useMemo(
+    () => data.filter(r => r.type === entityFilter),
+    [data, entityFilter],
+  );
+
   const rows = useMemo(() => {
-    if (statusFilter === 'all') return data;
-    if (statusFilter === 'needs_info') return data.filter(r => r.status === 'needs_more_info');
-    if (statusFilter === 'approved') return data.filter(r => r.status === 'approved' || r.status === 'accepted');
-    if (statusFilter === 'rejected') return data.filter(r => r.status === 'rejected' || r.status === 'declined');
-    return data.filter(r => r.status === 'pending');
-  }, [data, statusFilter]);
+    if (statusFilter === 'all') return entityFiltered;
+    if (statusFilter === 'needs_info') return entityFiltered.filter(r => r.status === 'needs_more_info');
+    if (statusFilter === 'approved') return entityFiltered.filter(r => r.status === 'approved' || r.status === 'accepted');
+    if (statusFilter === 'rejected') return entityFiltered.filter(r => r.status === 'rejected' || r.status === 'declined');
+    return entityFiltered.filter(r => r.status === 'pending');
+  }, [entityFiltered, statusFilter]);
 
   const close = () => { setActive(null); setNote(''); setDecision(null); setBizDetail(null); setConfirmApprove(false); };
 
@@ -532,17 +573,29 @@ function VerificationsTab({
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+      {/* Entity segmentation — Businesses / Users / Courses */}
       <SectionTabs
         tabs={[
-          { id: 'pending',   label: 'Pending',    count: data.filter(r => r.status === 'pending').length },
-          { id: 'needs_info', label: 'Needs info', count: data.filter(r => r.status === 'needs_more_info').length },
+          { id: 'business',     label: 'Businesses', count: pendingByEntity.business || undefined },
+          { id: 'golfer',       label: 'Users',      count: pendingByEntity.golfer || undefined },
+          { id: 'course_claim', label: 'Courses',    count: pendingByEntity.course_claim || undefined },
+        ]}
+        activeId={entityFilter}
+        onChange={(id) => setEntityFilter(id as EntityFilter)}
+      />
+
+      <SectionTabs
+        tabs={[
+          { id: 'pending',   label: 'Pending',    count: entityFiltered.filter(r => r.status === 'pending').length },
+          { id: 'needs_info', label: 'Needs info', count: entityFiltered.filter(r => r.status === 'needs_more_info').length },
           { id: 'approved',  label: 'Approved' },
           { id: 'rejected',  label: 'Rejected' },
-          { id: 'all',       label: 'All',        count: data.length },
+          { id: 'all',       label: 'All',        count: entityFiltered.length },
         ]}
         activeId={statusFilter}
         onChange={(id) => setStatusFilter(id as any)}
       />
+
 
       {loading ? <SkeletonCards /> : rows.length === 0 ? (
         <EmptyState title="No verification requests" subtitle="You're all caught up." />
@@ -567,13 +620,14 @@ function VerificationsTab({
         onClose={close}
         title={active ? (
           active.type === 'course_claim'
-            ? (active.claimBusinessName ?? 'Course claim')
+            ? (active.claimCourseName ?? active.claimBusinessName ?? 'Course claim')
             : (bizDetail?.name ?? active.displayName ?? active.username ?? 'Verification request')
         ) : ''}
-        subtitle={active ? `${
-          active.type === 'business' ? 'Business' :
-          active.type === 'course_claim' ? 'Course claim' : 'Golfer'
-        } · ${relTime(active.createdAt)}` : undefined}
+        subtitle={active ? (
+          active.type === 'course_claim'
+            ? `Course claim · requested by ${active.displayName ?? active.username ?? '—'} · ${relTime(active.createdAt)}`
+            : `${active.type === 'business' ? 'Business' : 'Golfer'} · ${relTime(active.createdAt)}`
+        ) : undefined}
         footer={active && active.status === 'pending' ? (
           <div style={{ display: 'flex', gap: 8, justifyContent: 'flex-end', flexWrap: 'wrap' }}>
             <DrawerBtn icon={<X size={14} />} tone="danger" disabled={review.isPending} onClick={() => submit('rejected')}>Reject</DrawerBtn>
@@ -756,13 +810,26 @@ function VerificationCard({
       >
         <SquircleAvatar size={36} src={row.avatarUrl ?? null} alt={row.displayName ?? ''} userId={row.requestedBy} hairlineRing />
         <div style={{ flex: 1, minWidth: 0 }}>
-          <div style={{ fontSize: 14, fontWeight: 600, color: t.ink }}>
-            {row.displayName ?? row.username ?? row.requestedBy?.slice(0, 8) ?? '—'}
-          </div>
-          <div style={{ fontSize: 12, color: t.inkMuted }}>
-            {row.type === 'business' ? 'Business' :
-             row.type === 'course_claim' ? 'Course claim' : 'Golfer'} · {relTime(row.createdAt)}
-          </div>
+          {row.type === 'course_claim' ? (
+            <>
+              <div style={{ fontSize: 14, fontWeight: 600, color: t.ink, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                {row.claimCourseName ?? row.claimBusinessName ?? 'Course claim'}
+              </div>
+              <div style={{ fontSize: 12, color: t.inkMuted, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                Course claim · requested by {row.displayName ?? row.username ?? '—'} · {relTime(row.createdAt)}
+                {row.claimBusinessName && row.claimBusinessName !== row.claimCourseName ? ` · ${row.claimBusinessName}` : ''}
+              </div>
+            </>
+          ) : (
+            <>
+              <div style={{ fontSize: 14, fontWeight: 600, color: t.ink }}>
+                {row.displayName ?? row.username ?? row.requestedBy?.slice(0, 8) ?? '—'}
+              </div>
+              <div style={{ fontSize: 12, color: t.inkMuted }}>
+                {row.type === 'business' ? 'Business' : 'Golfer'} · {relTime(row.createdAt)}
+              </div>
+            </>
+          )}
         </div>
         <StatusPill tone={tone}>{row.status}</StatusPill>
       </button>

@@ -28,6 +28,7 @@ export function isClbhouzSystemNotification(type: string): boolean {
 export function isBusinessEntityNotification(type: string): boolean {
   return (
     type.startsWith('business_verification_') ||
+    type.startsWith('course_claim_') ||
     type === 'business_member_added' ||
     type === 'business_access_request' ||
     type === 'business_access_approved' ||
@@ -81,6 +82,9 @@ export function getActorAvatarUrl(notification: ActivityNotification): string | 
       notification.data?.business_logo_url ||
       notification.data?.entity_avatar_url;
     if (businessAvatar) return businessAvatar;
+    // Course-claim notifications: fall back to Clbhouz logomark so we never
+    // render a blank person silhouette for an entity-style notification.
+    if (notification.type.startsWith('course_claim_')) return CLBHOUZ_LOGOMARK_URL;
     return null;
   }
   if (isClbhouzSystemNotification(notification.type)) {
@@ -124,17 +128,20 @@ export function getNotificationBadgeIcon(type: string): React.ReactElement {
       return <MapPin {...p} />;
     case 'business_verification_approved':
     case 'golfer_verification_approved':
+    case 'course_claim_approved':
       return <CheckCircle2 {...p} />;
     case 'business_verification_submitted':
     case 'golfer_verification_submitted':
     case 'golfer_verification_invite':
     case 'business_verification_more_proof_requested':
+    case 'course_claim_needs_info':
       return <Clock {...p} />;
     case 'business_verification_rejected':
     case 'golfer_verification_rejected':
     case 'business_verification_removed':
     case 'golfer_verification_removed':
     case 'business_verification_revoked':
+    case 'course_claim_rejected':
       return <Ban {...p} />;
     case 'business_member_added':
     case 'business_access_approved':
@@ -165,11 +172,13 @@ export function getBadgeColor(type: string): string {
     type === 'business_verification_removed' ||
     type === 'golfer_verification_removed' ||
     type === 'business_verification_revoked' ||
-    type === 'business_access_declined'
+    type === 'business_access_declined' ||
+    type === 'course_claim_rejected'
   ) return '#DC2626';
   if (
     type === 'business_verification_approved' ||
-    type === 'golfer_verification_approved'
+    type === 'golfer_verification_approved' ||
+    type === 'course_claim_approved'
   ) return '#16A34A';
   return '#1E293B';
 }

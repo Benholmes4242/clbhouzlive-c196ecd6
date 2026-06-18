@@ -15,6 +15,7 @@ export interface ActionQueue {
   pendingVerifications: number;
   pendingInvites:       number;
   expiringAccess:       number;
+  pendingCourseClaims:  number;
 }
 
 export interface ActivityTrendDay {
@@ -132,17 +133,19 @@ async function fetchActionQueue(): Promise<ActionQueue> {
   const now = new Date();
   const in7d = new Date(now.getTime() + 7 * 24 * 3600_000);
 
-  const [bizVerif, golferVerif, invites, expiring] = await Promise.all([
+  const [bizVerif, golferVerif, invites, expiring, courseClaims] = await Promise.all([
     supabase.from('business_verification_requests').select('id', { count: 'exact', head: true }).eq('status', 'pending'),
     supabase.from('golfer_verification_requests').select('id', { count: 'exact', head: true }).eq('status', 'pending'),
     supabase.from('admin_invitations').select('id', { count: 'exact', head: true }).is('accepted_at', null).gte('expires_at', now.toISOString()),
     supabase.from('admin_memberships').select('user_id', { count: 'exact', head: true }).not('expires_at', 'is', null).lte('expires_at', in7d.toISOString()).gte('expires_at', now.toISOString()),
+    supabase.from('course_claim_requests').select('id', { count: 'exact', head: true }).eq('status', 'pending'),
   ]);
 
   return {
     pendingVerifications: (bizVerif.count ?? 0) + (golferVerif.count ?? 0),
     pendingInvites:       invites.count ?? 0,
     expiringAccess:       expiring.count ?? 0,
+    pendingCourseClaims:  courseClaims.count ?? 0,
   };
 }
 

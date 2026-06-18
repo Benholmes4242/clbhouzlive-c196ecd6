@@ -220,6 +220,21 @@ function getContextUrl(notification: any): string {
     const bizId = (typeof data === 'object' && data !== null && !Array.isArray(data) && (data as any).business_id) || entity_id;
     if (bizId) return `/business/${bizId}/verification`;
   }
+  // Course claim outcomes — deep-link to the course page (now shows the
+  // claim state), falling back to the claimant's business profile so the
+  // tap is never a dead end.
+  if (
+    type === 'course_claim_approved' ||
+    type === 'course_claim_rejected' ||
+    type === 'course_claim_needs_info'
+  ) {
+    const d = (typeof data === 'object' && data !== null && !Array.isArray(data)) ? (data as any) : {};
+    const courseId = d.source_course_id;
+    if (courseId) return `/courses/${courseId}`;
+    const bizId = d.business_id;
+    if (bizId) return `/business/${bizId}`;
+    return '/';
+  }
   // Business member/access navigation
   if (type === 'business_member_added' || type === 'business_access_approved') {
     const dataObj = (typeof data === 'object' && data !== null && !Array.isArray(data)) 
@@ -619,14 +634,16 @@ export const useActivityFeed = (tab: ActivityTabId, chipFilter: ChipFilterKind =
             : {};
           
           const isBusinessVerification = n.type.startsWith('business_verification_');
+          const isCourseClaim = n.type.startsWith('course_claim_');
+          const isEntityNotification = isBusinessVerification || isCourseClaim;
           
           const legacyFollowerId = dataObj.follower_id;
           const effectiveActorId = n.actor_id || legacyFollowerId;
           const actor = effectiveActorId ? actorProfiles[effectiveActorId] : null;
           const isFromFollowing = effectiveActorId ? followingUserIds.has(effectiveActorId) : false;
           
-          const actorDisplayName = isBusinessVerification 
-            ? (dataObj.entity_name || 'Your business')
+          const actorDisplayName = isEntityNotification 
+            ? (dataObj.entity_name || (isCourseClaim ? 'Course claim' : 'Your business'))
             : (actor?.display_name 
                 || actor?.username 
                 || dataObj.follower_name 
@@ -637,7 +654,7 @@ export const useActivityFeed = (tab: ActivityTabId, chipFilter: ChipFilterKind =
           
           const actorUsername = actor?.username || '';
           
-          const actorAvatarUrl = isBusinessVerification
+          const actorAvatarUrl = isEntityNotification
             ? (dataObj.entity_avatar_url || null)
             : (actor?.profile_photo_url 
                 || dataObj.follower_photo 
