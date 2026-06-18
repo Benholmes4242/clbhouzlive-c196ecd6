@@ -92,9 +92,9 @@ const StandardCard: React.FC<Props> = ({ item, onTap }) => {
         flexDirection: 'column',
         justifyContent: 'space-between',
         color: 'var(--hcp-t-100)',
-        boxShadow: palette.outerGlow
-          ? `inset 0 1px 0 rgba(255,255,255,0.05), ${palette.outerGlow}`
-          : 'inset 0 1px 0 rgba(255,255,255,0.04)',
+        boxShadow: [palette.outerGlow, '0 1px 2px rgba(15,23,42,0.04)', '0 4px 12px rgba(15,23,42,0.06)']
+          .filter(Boolean)
+          .join(', '),
       }}
     >
       {palette.topStripe && (
