@@ -377,18 +377,8 @@ export default function BusinessProfileEditor() {
   const effectiveLogoUrl = logo.pendingRemove ? null : logo.localPreview || logo.url;
   const effectiveCoverUrl = cover.pendingRemove ? null : cover.localPreview || cover.url;
 
-  /* ── opening hours helpers ───────────────────────── */
-  const updateDay = (day: Day, patch: Partial<OpeningHoursEntry>) => {
-    setOpeningHours({ ...openingHours, [day]: { ...openingHours[day], ...patch } });
-  };
-  const setAllDays = (entry: OpeningHoursEntry) => {
-    const updated = {} as OpeningHours;
-    DAYS_ORDER.forEach((d) => {
-      updated[d] = { ...entry };
-    });
-    setOpeningHours(updated);
-  };
-  const firstOpenDay = DAYS_ORDER.find((d) => !openingHours[d]?.closed);
+
+
 
   /* ── close handling ──────────────────────────────── */
   const exitTo = mode === 'edit' && id ? `/business/${id}` : -1;
