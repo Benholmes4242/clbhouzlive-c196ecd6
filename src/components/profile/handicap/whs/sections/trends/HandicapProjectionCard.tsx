@@ -134,7 +134,7 @@ export const HandicapProjectionCard: React.FC<Props> = ({ scores }) => {
           >
             <line
               x1="160" x2="160" y1="14" y2="84"
-              stroke="rgba(255, 255, 255, 0.18)"
+              stroke="var(--hcp-t-20)"
               strokeWidth={1}
               strokeDasharray="2 4"
               vectorEffect="non-scaling-stroke"

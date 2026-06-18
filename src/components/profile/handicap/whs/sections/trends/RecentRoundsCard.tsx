@@ -210,8 +210,8 @@ export const RecentRoundsCard: React.FC<Props> = ({ connectionId, viewMode = 'ow
                 style={{
                   marginTop: 8,
                   background:
-                    'linear-gradient(180deg, rgba(255,255,255,0.025) 0%, rgba(255,255,255,0.01) 100%)',
-                  border: '1px solid rgba(255,255,255,0.05)',
+                    'linear-gradient(180deg, var(--hcp-bg-2) 0%, var(--hcp-bg-1) 100%)',
+                  border: '1px solid var(--hcp-line)',
                   borderRadius: 14,
                   overflow: 'hidden',
                 }}
@@ -554,7 +554,7 @@ const FeedCard: React.FC<FeedCardProps> = ({ round, onTap }) => {
                   width: 2.5,
                   height: 2.5,
                   borderRadius: '50%',
-                  background: 'rgba(255,255,255,0.25)',
+                  background: 'var(--hcp-t-30)',
                 }}
               />
               <span

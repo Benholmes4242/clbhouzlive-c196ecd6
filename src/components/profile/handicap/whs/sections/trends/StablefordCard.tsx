@@ -743,13 +743,13 @@ const ShotsBody: React.FC<ShotsBodyProps> = ({ trophyAgg, shotsLoading, scope })
       key: 'par',
       count: pars,
       background: 'var(--hcp-bg-3)',
-      textColor: 'rgba(255,255,255,0.65)',
+      textColor: 'var(--hcp-t-80)',
     },
     {
       key: 'bogey',
       count: bogey,
       background: 'var(--hcp-bg-3)',
-      textColor: 'rgba(255,255,255,0.65)',
+      textColor: 'var(--hcp-t-80)',
     },
     {
       key: 'double',
@@ -891,7 +891,7 @@ const ShotsBody: React.FC<ShotsBodyProps> = ({ trophyAgg, shotsLoading, scope })
                   style={{
                     fontSize: 20,
                     fontWeight: isZero ? 400 : 800,
-                    color: isZero ? 'rgba(255,255,255,0.3)' : T.ink,
+                    color: isZero ? 'var(--hcp-t-40)' : T.ink,
                     fontVariantNumeric: 'tabular-nums',
                     letterSpacing: '-0.02em',
                     lineHeight: 1,
@@ -904,7 +904,7 @@ const ShotsBody: React.FC<ShotsBodyProps> = ({ trophyAgg, shotsLoading, scope })
                   style={{
                     fontSize: 10,
                     fontWeight: 700,
-                    color: 'rgba(255,255,255,0.4)',
+                    color: 'var(--hcp-t-40)',
                     fontVariantNumeric: 'tabular-nums',
                     letterSpacing: '0.04em',
                     marginTop: 4,
@@ -1030,7 +1030,7 @@ const MilestonesStrip: React.FC<MilestonesStripProps> = ({
           style={{
             fontSize: 10,
             fontWeight: 700,
-            color: 'rgba(255,255,255,0.4)',
+            color: 'var(--hcp-t-40)',
             fontFamily: FONT,
             fontVariantNumeric: 'tabular-nums',
             letterSpacing: '0.04em',
@@ -1045,8 +1045,8 @@ const MilestonesStrip: React.FC<MilestonesStripProps> = ({
         style={{
           borderRadius: 14,
           background:
-            'linear-gradient(180deg, rgba(255,255,255,0.025) 0%, rgba(255,255,255,0.01) 100%)',
-          border: '1px solid rgba(255,255,255,0.06)',
+            'linear-gradient(180deg, var(--hcp-bg-2) 0%, var(--hcp-bg-1) 100%)',
+          border: '1px solid var(--hcp-line)',
           overflow: 'hidden',
         }}
       >
@@ -1075,7 +1075,7 @@ const MilestoneRow: React.FC<{
   isLast: boolean;
 }> = ({ name, count, rarity, rings, meta, isLast }) => {
   const achieved = count > 0;
-  const rarityColor = rarity === 'FREQUENT' ? 'rgba(255,255,255,0.4)' : T.amber;
+  const rarityColor = rarity === 'FREQUENT' ? 'var(--hcp-t-40)' : T.amber;
 
   // Stacked box-shadow rings — gaps painted in card bg so geometry stays clean
   // at small sizes (per brief: don't approximate with border/outline).
@@ -1106,7 +1106,7 @@ const MilestoneRow: React.FC<{
         fontWeight: 800,
         fontFamily: FONT,
         fontVariantNumeric: 'tabular-nums',
-        textShadow: '0 1px 0 rgba(255,255,255,0.18)',
+        textShadow: 'none',
         boxShadow: medalBoxShadow,
         margin: medalMargin,
         flexShrink: 0,
@@ -1115,9 +1115,9 @@ const MilestoneRow: React.FC<{
         width: medalSize,
         height: medalSize,
         borderRadius: '50%',
-        background: 'rgba(255,255,255,0.025)',
-        border: '1px dashed rgba(255,255,255,0.12)',
-        color: 'rgba(255,255,255,0.25)',
+        background: 'var(--hcp-bg-2)',
+        border: '1px dashed var(--hcp-line-2)',
+        color: 'var(--hcp-t-30)',
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
@@ -1135,7 +1135,7 @@ const MilestoneRow: React.FC<{
         alignItems: 'center',
         gap: 12,
         padding: '12px 14px',
-        borderBottom: isLast ? 'none' : '1px solid rgba(255,255,255,0.04)',
+        borderBottom: isLast ? 'none' : '1px solid var(--hcp-line)',
         position: 'relative',
       }}
     >
@@ -1176,7 +1176,7 @@ const MilestoneRow: React.FC<{
           style={{
             fontSize: 10.5,
             fontWeight: 600,
-            color: 'rgba(255,255,255,0.4)',
+            color: 'var(--hcp-t-40)',
             marginTop: 2,
             fontFamily: FONT,
           }}
@@ -1197,7 +1197,7 @@ const MilestoneRow: React.FC<{
           style={{
             fontSize: 22,
             fontWeight: 200,
-            color: count > 0 ? T.amber : 'rgba(255,255,255,0.25)',
+            color: count > 0 ? T.amber : 'var(--hcp-t-30)',
             fontVariantNumeric: 'tabular-nums',
             letterSpacing: '-0.04em',
             lineHeight: 0.9,
