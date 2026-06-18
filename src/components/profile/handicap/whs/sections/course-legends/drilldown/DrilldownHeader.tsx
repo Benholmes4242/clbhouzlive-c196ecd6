@@ -99,6 +99,7 @@ export const DrilldownHeader: React.FC<Props> = ({
         type={state.courseType}
         region={state.courseRegion}
         country={state.courseCountry}
+        onPhoto
       />
       <div
         style={{
@@ -120,7 +121,7 @@ export const DrilldownHeader: React.FC<Props> = ({
             fontSize: 11,
             fontWeight: 700,
             letterSpacing: '0.08em',
-            color: 'var(--hcp-t-40)',
+            color: '#FFFFFF',
             fontVariantNumeric: 'tabular-nums',
             textShadow: '0 1px 3px rgba(0,0,0,0.45)',
           }}
