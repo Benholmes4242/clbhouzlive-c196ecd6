@@ -1,5 +1,4 @@
 import React from 'react';
-import { X } from 'lucide-react';
 import FlagSilhouetteOverlay from '@/components/whs/FlagSilhouetteOverlay';
 
 interface Props {
