@@ -167,33 +167,30 @@ const CoursesContent: React.FC<CoursesContentProps> = ({ username, displayName }
   const location = useLocation();
   
   
-  // Default to 'explore' since we're removing my-courses tab
+  // Default to 'discover' for the main courses page
   const [activeTab, setActiveTab] = useState(() => {
     if (username) return 'my-courses'; // Keep for user profile pages
     const tabParam = new URLSearchParams(window.location.search).get('tab');
     if (tabParam && ['explore', 'top100', 'discover'].includes(tabParam)) {
       return tabParam;
     }
-    return 'explore'; // Default to explore for main courses page
+    return 'discover';
   });
 
   // Check if we're on a user courses page
   const isUserCoursesPage = location.pathname.includes('/user/') && location.pathname.includes('/courses');
   const isOwnProfile = !username;
 
-  // Check for tab parameter in URL - allow explore, top100, and leaderboards for main page
-  // Also check for 'view' param which indicates we're on leaderboards sub-tab
+  // Check for tab parameter in URL - allow explore, top100, and discover for main page
   useEffect(() => {
     const tabParam = searchParams.get('tab');
 
     if (tabParam && (tabParam === 'explore' || tabParam === 'top100' || tabParam === 'discover')) {
       setActiveTab(tabParam);
     } else if (username) {
-      // Default to my-courses for user profile pages
       setActiveTab('my-courses');
     } else {
-      // Default to explore for main courses page
-      setActiveTab('explore');
+      setActiveTab('discover');
     }
   }, [searchParams, username]);
 
@@ -209,13 +206,14 @@ const CoursesContent: React.FC<CoursesContentProps> = ({ username, displayName }
     setActiveTab(value);
     // Persist tab to URL so it survives remount on back navigation
     const params = new URLSearchParams(searchParams);
-    if (value === 'explore') {
-      params.delete('tab'); // 'explore' is the default, keep URL clean
+    if (value === 'discover') {
+      params.delete('tab'); // 'discover' is the default, keep URL clean
     } else {
       params.set('tab', value);
     }
-    setSearchParams(params, { replace: true }); // replace to avoid polluting history
+    setSearchParams(params, { replace: true });
   };
+
 
   // Reset to default sub-tab when bottom-nav icon is re-tapped on this route
   useEffect(() => {
