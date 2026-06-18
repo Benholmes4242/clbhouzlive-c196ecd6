@@ -25,6 +25,7 @@ export interface ClubResult {
   city?: string | null;
   country: string;
   region?: string | null;
+  sub_country?: string | null;
   global_rank?: number | null;
   user_has_rated?: boolean;
   type: 'course';
@@ -144,6 +145,7 @@ const searchClubs = async (query: string, limit: number = 6, userId?: string): P
       name,
       country,
       region,
+      sub_country,
       thumbnail_image,
       global_rank
     `)
@@ -162,6 +164,7 @@ const searchClubs = async (query: string, limit: number = 6, userId?: string): P
     logo_url: course.thumbnail_image,
     country: course.country,
     region: course.region,
+    sub_country: course.sub_country,
     global_rank: course.global_rank,
     user_has_rated: false,
     type: 'course' as const
@@ -330,7 +333,7 @@ const getTrendingItems = async (): Promise<TrendingItem[]> => {
     // Fetch a larger pool of courses to enable meaningful daily rotation
     const { data, error } = await supabase
       .from('golf_courses')
-      .select('id, name, global_rank, thumbnail_image, country, region')
+      .select('id, name, global_rank, thumbnail_image, country, region, sub_country')
       .not('global_rank', 'is', null)
       .lte('global_rank', 200) // Top 200 courses for a good pool
       .order('global_rank', { ascending: true })
@@ -338,13 +341,16 @@ const getTrendingItems = async (): Promise<TrendingItem[]> => {
 
     if (error) throw error;
 
-    const allCourses = (data || []).map(course => ({
-      label: course.name,
-      type: 'clubs' as const,
-      id: course.id,
-      image: course.thumbnail_image,
-      subtitle: `${course.region ? `${course.region}, ` : ''}${course.country}${course.global_rank ? ` • #${course.global_rank}` : ''}`
-    }));
+    const allCourses = (data || []).map(course => {
+      const location = [course.country, course.sub_country || course.region].filter(Boolean).join(', ');
+      return {
+        label: course.name,
+        type: 'clubs' as const,
+        id: course.id,
+        image: course.thumbnail_image,
+        subtitle: `${location}${course.global_rank ? ` • #${course.global_rank}` : ''}`
+      };
+    });
 
     // Apply daily shuffle and take top picks for the day
     return dailyShuffle(allCourses).slice(0, 8);
