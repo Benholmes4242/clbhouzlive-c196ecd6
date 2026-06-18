@@ -117,7 +117,7 @@ export const RARITY_DARK: Record<
     pillBorder: 'rgba(205,127,50,0.42)',
     cardBorder: 'rgba(205,127,50,0.42)',
     cardBg: 'var(--hcp-bg-1)',
-    cardSweep: 'linear-gradient(135deg, #FFFFFF 0%, var(--hcp-bg-2) 55%, rgba(205,127,50,0.20) 100%)',
+    cardSweep: 'linear-gradient(150deg, rgba(205,127,50,0.20) 0%, #FFFFFF 60%)',
     topStripe: 'linear-gradient(90deg, #8B5A2B 0%, #CD7F32 50%, #8B5A2B 100%)',
     glow: 'inset 0 0 0 1px rgba(205,127,50,0.14)',
     outerGlow: '0 0 28px -10px rgba(205,127,50,0.30)',
