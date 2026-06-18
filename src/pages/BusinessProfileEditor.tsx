@@ -751,9 +751,29 @@ export default function BusinessProfileEditor() {
             setFoundedYear={setFoundedYear}
           />
 
+          {/* Inline notice — a claim for this club is already under review. */}
+          {mode === 'create' && isGolfClub && selectedClub && !existingBusinessForClub && clubClaimPending && (
+            <div
+              role="status"
+              style={{
+                margin: '8px 16px 16px',
+                padding: '12px 14px',
+                borderRadius: 10,
+                background: '#FFF7ED',
+                border: '1px solid #FED7AA',
+                color: '#9A3412',
+                fontSize: 13,
+                lineHeight: 1.45,
+              }}
+            >
+              <strong style={{ fontWeight: 700 }}>A claim for this club is already under review.</strong>{' '}
+              You can't submit another claim right now. We'll let you know once it's been processed.
+            </div>
+          )}
+
           {/* Proof note — create-mode golf-club claim only.
               Helps the admin verify your connection to the club. Optional. */}
-          {mode === 'create' && isGolfClub && selectedClub && !existingBusinessForClub && (
+          {mode === 'create' && isGolfClub && selectedClub && !existingBusinessForClub && !clubClaimPending && (
             <div style={{ padding: '0 16px', marginTop: 8, marginBottom: 16 }}>
               <label
                 htmlFor="claim-proof-note"
