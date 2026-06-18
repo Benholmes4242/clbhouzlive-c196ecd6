@@ -6,9 +6,10 @@ import { AMBER, INK, INK_FAINT } from '@/features/courses/_shared/tokens';
 interface ClaimCourseCTAProps {
   clubId: string;
   clubName: string;
+  sourceCourseId?: string;
 }
 
-const ClaimCourseCTA: React.FC<ClaimCourseCTAProps> = ({ clubId, clubName }) => {
+const ClaimCourseCTA: React.FC<ClaimCourseCTAProps> = ({ clubId, clubName, sourceCourseId }) => {
   const navigate = useNavigate();
 
   const handleClaim = () => {
@@ -17,6 +18,7 @@ const ClaimCourseCTA: React.FC<ClaimCourseCTAProps> = ({ clubId, clubName }) => 
       clubId,
       clubName,
     });
+    if (sourceCourseId) params.set('sourceCourseId', sourceCourseId);
     navigate(`/business/create?${params.toString()}`);
   };
 

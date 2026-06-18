@@ -288,10 +288,20 @@ const CourseAboutTab = ({ course, onTabChange }: CourseAboutTabProps) => {
 
       <div style={{ margin: '24px 0' }}><Divider /></div>
 
-      {/* 9. Claim Course — single instance, minimal design, no card */}
-      {!courseClaim && course.club_id && (
+      {/* 9. Claim Course — tri-state: unclaimed / pending / claimed */}
+      {course.club_id && claimStatus && (
         <>
-          <ClaimCourseCTA clubId={course.club_id} clubName={course.name} />
+          {claimStatus.state === 'unclaimed' && (
+            <ClaimCourseCTA
+              clubId={course.club_id}
+              clubName={course.name}
+              sourceCourseId={course.id}
+            />
+          )}
+          {claimStatus.state === 'pending' && <ClaimUnderReviewNotice />}
+          {claimStatus.state === 'claimed' && claimStatus.business && (
+            <ClaimedCourseProfileLink business={claimStatus.business} />
+          )}
           <div style={{ margin: '24px 0' }}><Divider /></div>
         </>
       )}
