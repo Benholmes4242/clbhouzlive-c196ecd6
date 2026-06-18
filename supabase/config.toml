@@ -223,3 +223,18 @@ verify_jwt = false
 
 [functions.gam-backdate-replay]
 verify_jwt = false
+
+[functions.request-course-claim]
+verify_jwt = true
+
+[functions.approve-course-claim]
+verify_jwt = true
+
+[functions.reject-course-claim]
+verify_jwt = true
+
+[functions.request-info-course-claim]
+verify_jwt = true
+
+[functions.send-course-claim-result-email]
+verify_jwt = false
