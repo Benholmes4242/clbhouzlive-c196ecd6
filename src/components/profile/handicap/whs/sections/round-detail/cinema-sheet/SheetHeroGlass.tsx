@@ -196,15 +196,15 @@ export const SheetHeroGlass: React.FC<Props> = ({
                 display: 'grid',
                 gridTemplateColumns: 'repeat(4, 1fr)',
                 columnGap: 8,
-                alignItems: 'baseline',
+                alignItems: 'start',
               }
-            : { display: 'flex', justifyContent: 'space-between', alignItems: 'baseline' }
+            : { display: 'flex', justifyContent: 'space-between', alignItems: 'start' }
         }
       >
-        <div style={{ textAlign: 'center' }}>
+        <div style={{ textAlign: 'center', flex: hasImpact ? undefined : 1 }}>
           <div style={labelStyle}>GROSS</div>
           <div
-            style={{ marginTop: 4 }}
+            style={{ marginTop: 4, height: 44, display: 'flex', alignItems: 'center', justifyContent: 'center' }}
             aria-label={`Gross score ${gross ?? ''}${isCounter ? ', counts toward index' : ''}`}
           >
             <GlassGrossRing
@@ -215,20 +215,28 @@ export const SheetHeroGlass: React.FC<Props> = ({
           </div>
         </div>
         {lockMissingStats ? (
-          <LockedTile label="STABLEFORD" align="center" />
+          <div style={{ flex: hasImpact ? undefined : 1, textAlign: 'center' }}>
+            <LockedTile label="STABLEFORD" align="center" />
+          </div>
         ) : (
-          <div style={{ textAlign: 'center' }}>
+          <div style={{ textAlign: 'center', flex: hasImpact ? undefined : 1 }}>
             <div style={labelStyle}>STABLEFORD</div>
-            <div style={valueStyle('#FFFFFF', valSize)}>{stableford != null ? stableford : EM_DASH}</div>
+            <div style={{ marginTop: 4, height: 44, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+              <div style={{ ...valueStyle('#FFFFFF', valSize), marginTop: 0 }}>{stableford != null ? stableford : EM_DASH}</div>
+            </div>
           </div>
         )}
         {lockMissingStats ? (
-          <LockedTile label="SCORE DIFF" align="center" />
+          <div style={{ flex: hasImpact ? undefined : 1, textAlign: 'center' }}>
+            <LockedTile label="SCORE DIFF" align="center" />
+          </div>
         ) : (
-          <div style={{ textAlign: 'center' }}>
+          <div style={{ textAlign: 'center', flex: hasImpact ? undefined : 1 }}>
             <div style={labelStyle}>SCORE DIFF</div>
-            <div style={valueStyle('#FFFFFF', valSize)}>
-              {fmtDiffLocal(differential)}
+            <div style={{ marginTop: 4, height: 44, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+              <div style={{ ...valueStyle('#FFFFFF', valSize), marginTop: 0 }}>
+                {fmtDiffLocal(differential)}
+              </div>
             </div>
           </div>
         )}
@@ -236,7 +244,9 @@ export const SheetHeroGlass: React.FC<Props> = ({
         {hasImpact && (
           <div style={{ textAlign: 'center' }}>
             <div style={labelStyle}>HCP IMPACT</div>
-            <div style={valueStyle(impactColor, valSize)}>{fmtImpact(handicapDelta!)}</div>
+            <div style={{ marginTop: 4, height: 44, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+              <div style={{ ...valueStyle(impactColor, valSize), marginTop: 0 }}>{fmtImpact(handicapDelta!)}</div>
+            </div>
           </div>
         )}
       </div>

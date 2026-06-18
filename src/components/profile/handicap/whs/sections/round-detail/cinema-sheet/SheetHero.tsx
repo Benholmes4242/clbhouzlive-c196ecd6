@@ -1,5 +1,4 @@
 import React from 'react';
-import { X } from 'lucide-react';
 import FlagSilhouetteOverlay from '@/components/whs/FlagSilhouetteOverlay';
 
 interface Props {
@@ -92,26 +91,6 @@ export const SheetHero: React.FC<Props> = ({ imageUrl, onClose, topEyebrow, topR
       }}
     >
       <div style={{ flex: 1, minWidth: 0 }}>{topEyebrow}</div>
-      <button
-        onClick={onClose}
-        aria-label="Close"
-        style={{
-          width: 30,
-          height: 30,
-          borderRadius: '50%',
-          background: 'rgba(255,255,255,0.12)',
-          border: '0.5px solid rgba(255,255,255,0.25)',
-          backdropFilter: 'blur(20px)',
-          WebkitBackdropFilter: 'blur(20px)',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          cursor: 'pointer',
-          flexShrink: 0,
-        }}
-      >
-        <X size={13} color="#fff" strokeWidth={2} />
-      </button>
     </div>
     {topRightPill}
     {glass}
