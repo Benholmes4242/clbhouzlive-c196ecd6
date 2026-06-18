@@ -9,9 +9,8 @@
  */
 import React, { useState, useEffect, useMemo, useRef, useCallback } from 'react';
 import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
-import { createPortal } from 'react-dom';
 import { useQueryClient } from '@tanstack/react-query';
-import { ChevronLeft, Loader2, AlertCircle, MapPin, Lock, Camera, Plus } from 'lucide-react';
+import { ChevronLeft, Loader2, AlertCircle } from 'lucide-react';
 import { toast } from 'sonner';
 
 import { supabase } from '@/integrations/supabase/client';
