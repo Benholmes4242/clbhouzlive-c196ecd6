@@ -36,8 +36,8 @@ export const WindowToggle: React.FC<{
       display: 'inline-flex',
       flexShrink: 0,
       gap: 2,
-      background: 'rgba(255,255,255,0.06)',
-      border: '1px solid rgba(255,255,255,0.08)',
+      background: 'var(--hcp-bg-2)',
+      border: '1px solid var(--hcp-line)',
       borderRadius: 999,
       padding: 2,
     }}
@@ -56,7 +56,7 @@ export const WindowToggle: React.FC<{
             padding: '3px 9px',
             borderRadius: 999,
             background: active ? '#FFFFFF' : 'transparent',
-            color: active ? '#0F172A' : 'rgba(255,255,255,0.6)',
+            color: active ? '#0F172A' : 'var(--hcp-t-60)',
             border: 'none',
             fontFamily: FONT,
             fontSize: 9.5,
@@ -155,7 +155,7 @@ const SectionHero: React.FC<{
       aria-hidden
       style={{
         height: 1,
-        background: 'rgba(255,255,255,0.07)',
+        background: 'var(--hcp-bg-2)',
         margin: '0 18px',
       }}
     />
@@ -178,13 +178,13 @@ const SectionHero: React.FC<{
           display: 'flex',
           alignItems: 'center',
           gap: 10,
-          background: 'rgba(255,255,255,0.05)',
-          border: '1px solid rgba(255,255,255,0.10)',
+          background: 'var(--hcp-bg-2)',
+          border: '1px solid var(--hcp-line-2)',
           borderRadius: 12,
           padding: '12px 14px',
         }}
       >
-        <Search size={16} color="rgba(255,255,255,0.55)" />
+        <Search size={16} color="var(--hcp-t-60)" />
         <input
           ref={searchInputRef}
           type="text"

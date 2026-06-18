@@ -57,7 +57,7 @@ const SquircleAvatar: React.FC<{ photoUrl: string | null; size?: number; muted?:
   const bg = photoUrl
     ? `url(${photoUrl}) center/cover`
     : muted
-      ? 'rgba(255,255,255,0.05)'
+      ? 'var(--hcp-bg-2)'
       : 'linear-gradient(135deg, rgba(148,163,184,0.45) 0%, rgba(100,116,139,0.65) 100%)';
   return (
     <div
@@ -68,8 +68,8 @@ const SquircleAvatar: React.FC<{ photoUrl: string | null; size?: number; muted?:
         borderRadius: '34%',
         background: bg,
         boxShadow: muted
-          ? 'inset 0 0 0 1px rgba(255,255,255,0.06)'
-          : 'inset 0 0 0 1px rgba(255,255,255,0.10)',
+          ? 'inset 0 0 0 1px var(--hcp-line)'
+          : 'inset 0 0 0 1px var(--hcp-line-2)',
         flexShrink: 0,
       }}
     />

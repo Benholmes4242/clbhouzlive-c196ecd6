@@ -43,7 +43,7 @@ export const Top100CourseRow: React.FC<Props> = ({ row, isFriendView, onNavigate
           borderRadius: 8,
           background: played
             ? 'linear-gradient(180deg, rgba(247,147,30,0.18), rgba(247,147,30,0.04))'
-            : 'rgba(255,255,255,0.04)',
+            : 'var(--hcp-bg-2)',
           border: played
             ? '1px solid rgba(247,147,30,0.32)'
             : '1px solid var(--hcp-line)',

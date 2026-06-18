@@ -204,7 +204,7 @@ const TierKey: React.FC = () => {
                   flex: 1,
                   height: 4,
                   borderRadius: 2,
-                  background: 'rgba(255,255,255,0.06)',
+                  background: 'var(--hcp-bg-2)',
                   overflow: 'hidden',
                 }}
               >
