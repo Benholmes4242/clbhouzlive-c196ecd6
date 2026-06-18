@@ -148,29 +148,26 @@ const CompactHeader: React.FC<CompactHeaderProps> = ({ className }) => {
   // Routes that should show back arrow instead of logo
   const isBackArrowRoute = isDiscoverSubPage || isTop100Route || isCourseDetailRoute || isEditProfileRoute || isFriendsActivityRoute || isAchievementsRoute || isMessagesRoute || isHandicapRoute || isWatchSubpageRoute || isTourDeepRoute;
   
-  // Light chrome is now the default across the app. Only Handicap keeps the
-  // dark terminal header. (Clubhouse feed uses its own ClubhouseHeaderNew.)
-  const { data: whsConnection, isLoading: whsConnLoading } = useWhsConnection(user?.id);
-  // The WHS connect flow is a light surface — only the connected dashboard keeps dark chrome.
-  const isHandicapConnectFlow = isHandicapRoute && !whsConnLoading && !whsConnection;
-  const isDarkChrome = isHandicapRoute && !isHandicapConnectFlow;
-  const useDarkChrome = isDarkChrome && !searchOpen;
-  const useLightTheme = !useDarkChrome;
+  // Light chrome is now the default across the app, including Handicap (which
+  // converted dark → light alongside Clubhouse/Watch/Tours). ClubhouseHeaderNew
+  // still handles the clubhouse feed independently.
+  useWhsConnection(user?.id);
+  const isHandicapConnectFlow = false;
+  const isDarkChrome = false;
+  const useDarkChrome = false;
+  const useLightTheme = true;
 
-  // While the search overlay is open on a dark-chrome route (handicap), flip the
-  // NATIVE status bar + safe-area shield to the overlay's light surface, and
-  // restore the dark terminal chrome on close. The reapplyKey changing in both
-  // directions is what forces useMedianStatusBar to re-fire on close — the hook
-  // deliberately never restores in its cleanup (grey-flash fix), and PageRoot's
-  // own hook won't re-run.
+  // Keep the native status bar on the light surface for handicap (was previously
+  // toggled dark↔light around the search overlay; now uniformly light).
   useMedianStatusBar(
-    searchOpen ? 'light' : 'dark',
-    searchOpen ? '#F8FAFC' : '#0A0E14',
+    'light',
+    '#F8FAFC',
     false,
     false,
-    isDarkChrome,
-    searchOpen ? 'search-open' : 'search-closed',
+    false,
+    'static-light',
   );
+
 
   const handleLogoClick = () => {
     if (isBackArrowRoute) {
