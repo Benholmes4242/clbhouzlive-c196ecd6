@@ -3,7 +3,9 @@ import { ExternalLink } from 'lucide-react';
 
 const FONT_GEIST = 'Geist, system-ui, -apple-system, BlinkMacSystemFont, sans-serif';
 const FONT_MONO = "Geist, system-ui, -apple-system, BlinkMacSystemFont, sans-serif";
-const INK = 'var(--hcp-t-100)';
+const INK = '#0F172A';
+const INK_MUTE = '#64748B';
+const SURFACE = '#F8FAFC';
 interface Props {
   label: string;
   currentIndex: number | null;
@@ -17,7 +19,7 @@ interface Props {
 const labelStyle: React.CSSProperties = {
   fontSize: 10,
   fontWeight: 700,
-  color: 'rgba(255,255,255,0.50)',
+  color: INK_MUTE,
   letterSpacing: '0.16em',
   textTransform: 'uppercase',
   marginBottom: 3,
@@ -40,8 +42,8 @@ export const SheetFooterInk: React.FC<Props> = ({
   return (
     <div
       style={{
-        background: INK,
-        color: 'var(--hcp-bg-1)',
+        background: SURFACE,
+        color: INK,
         padding: '14px 18px 18px',
         paddingBottom: 'calc(18px + env(safe-area-inset-bottom, 0px))',
         display: 'flex',
@@ -51,6 +53,7 @@ export const SheetFooterInk: React.FC<Props> = ({
         marginTop: 'auto',
         flexShrink: 0,
         fontFamily: FONT_GEIST,
+        borderTop: '0.5px solid rgba(15,23,42,0.08)',
       }}
     >
       {hasLeft && (
@@ -68,7 +71,7 @@ export const SheetFooterInk: React.FC<Props> = ({
               style={{
                 fontSize: 22,
                 fontWeight: 400,
-                color: 'var(--hcp-bg-1)',
+                color: INK,
                 fontFamily: FONT_MONO,
                 letterSpacing: '-0.02em',
                 lineHeight: 1,
@@ -81,10 +84,10 @@ export const SheetFooterInk: React.FC<Props> = ({
                 style={{
                   fontSize: 11,
                   fontWeight: 500,
-                  color: 'rgba(255,255,255,0.45)',
+                  color: 'rgba(15,23,42,0.45)',
                   fontFamily: FONT_MONO,
                   textDecoration: 'line-through',
-                  textDecorationColor: 'rgba(255,255,255,0.30)',
+                  textDecorationColor: 'rgba(15,23,42,0.30)',
                 }}
               >
                 {previousIndex!.toFixed(1)}
@@ -95,7 +98,7 @@ export const SheetFooterInk: React.FC<Props> = ({
                 style={{
                   fontSize: 11,
                   fontWeight: 700,
-                  color: delta! < 0 ? '#86EFAC' : '#FCA5A5',
+                  color: delta! < 0 ? '#16A34A' : '#DC2626',
                 }}
               >
                 {delta! < 0 ? '\u2193' : '\u2191'} {Math.abs(delta!).toFixed(1)}
