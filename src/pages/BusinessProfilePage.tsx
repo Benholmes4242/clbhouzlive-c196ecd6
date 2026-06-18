@@ -54,12 +54,12 @@ import {
 // Tab content components
 import PostsTabContent from '@/components/posts-tab/PostsTabContent';
 import { BusinessProfileInfo } from '@/components/business/BusinessProfileInfo';
-import { PeopleTab } from '@/components/business/PeopleTab';
+
 import { GenericPageSkeleton } from '@/components/skeletons/GenericPageSkeleton';
 import { AvatarLightbox } from '@/components/shared/AvatarLightbox';
 
 
-type BusinessTab = 'content' | 'golfers' | 'info';
+type BusinessTab = 'content' | 'info';
 
 const BusinessProfilePage: React.FC = () => {
   const navigate = useNavigate();
@@ -245,7 +245,6 @@ const BusinessProfilePage: React.FC = () => {
   
   const tabs = [
     { id: 'content', label: 'Posts' },
-    { id: 'golfers', label: 'People' },
     { id: 'info', label: 'About' },
   ];
 
@@ -257,16 +256,6 @@ const BusinessProfilePage: React.FC = () => {
             actorType="business"
             actorId={business?.id || ''}
             isOwnProfile={isOwner || false}
-          />
-        );
-      case 'golfers':
-        return (
-          <PeopleTab 
-            businessId={business?.id || ''}
-            businessName={business?.name || ''}
-            category={business?.category}
-            canManage={membership?.canManage}
-            isOwner={membership?.role === 'owner'}
           />
         );
       case 'info':
