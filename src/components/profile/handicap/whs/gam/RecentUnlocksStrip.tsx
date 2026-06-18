@@ -124,9 +124,9 @@ const UnlockHeroCard: React.FC<{
             borderRadius: 999,
             background: eyebrow.pulse
               ? 'rgba(247,147,30,0.16)'
-              : 'rgba(255,255,255,0.06)',
+              : 'var(--hcp-bg-2)',
             border: `1px solid ${
-              eyebrow.pulse ? 'rgba(247,147,30,0.40)' : 'rgba(255,255,255,0.10)'
+              eyebrow.pulse ? 'rgba(247,147,30,0.40)' : 'var(--hcp-line-2)'
             }`,
             marginBottom: 14,
             position: 'relative',
