@@ -10,6 +10,7 @@ export const BIZ = {
   // Hairlines
   hair:        'rgba(15,23,42,0.07)',
   hairSoft:    'rgba(15,23,42,0.05)',
+  hairDashed:  'rgba(15,23,42,0.12)',   // dashed "add another" border
   // Ink
   ink:         '#0F172A',
   inkMute:     '#64748B',
