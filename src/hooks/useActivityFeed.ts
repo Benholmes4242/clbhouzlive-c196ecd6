@@ -220,6 +220,21 @@ function getContextUrl(notification: any): string {
     const bizId = (typeof data === 'object' && data !== null && !Array.isArray(data) && (data as any).business_id) || entity_id;
     if (bizId) return `/business/${bizId}/verification`;
   }
+  // Course claim outcomes — deep-link to the course page (now shows the
+  // claim state), falling back to the claimant's business profile so the
+  // tap is never a dead end.
+  if (
+    type === 'course_claim_approved' ||
+    type === 'course_claim_rejected' ||
+    type === 'course_claim_needs_info'
+  ) {
+    const d = (typeof data === 'object' && data !== null && !Array.isArray(data)) ? (data as any) : {};
+    const courseId = d.source_course_id;
+    if (courseId) return `/courses/${courseId}`;
+    const bizId = d.business_id;
+    if (bizId) return `/business/${bizId}`;
+    return '/';
+  }
   // Business member/access navigation
   if (type === 'business_member_added' || type === 'business_access_approved') {
     const dataObj = (typeof data === 'object' && data !== null && !Array.isArray(data)) 
