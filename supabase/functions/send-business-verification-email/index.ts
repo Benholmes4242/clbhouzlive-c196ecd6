@@ -138,7 +138,7 @@ Review in admin panel: ${adminPanelUrl}
               "Content-Type": "application/json",
             },
             body: JSON.stringify({
-              from: "Clbhouz <notifications@clbhouz.com>",
+              from: "Clbhouz <noreply@clbhouz.co.uk>",
               to: adminEmail,
               subject: emailSubject,
               text: emailBody,
