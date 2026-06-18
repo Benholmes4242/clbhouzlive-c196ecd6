@@ -490,10 +490,11 @@ export default function BusinessProfileEditor() {
           email: email.trim() || null,
           phone: phone?.fullNumber || null,
           booking_url: bookingUrl.trim() || null,
-          opening_hours: openingHours,
-          social_links: hasSocial ? socialLinks : null,
+          opening_hours: openingHours as any,
+          social_links: hasSocial ? (socialLinks as any) : null,
           is_verified: false,
         };
+
 
         if (isGolfClub && selectedClub) {
           insertData.club_id = selectedClub.id;
