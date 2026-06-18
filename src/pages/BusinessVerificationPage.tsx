@@ -119,6 +119,12 @@ export default function BusinessVerificationPage() {
               else navigate('/businesses/manage');
             }}
           />
+        ) : state === 'needs_more_info' ? (
+          <NeedsMoreInfoState
+            adminNote={request?.admin_note}
+            reviewedAt={request?.reviewed_at}
+            onAmend={() => openFlow('submit')}
+          />
         ) : (
           <RejectedState
             reviewedAt={request?.reviewed_at}
