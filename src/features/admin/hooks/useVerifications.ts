@@ -173,3 +173,51 @@ export function useVerifications() {
 
   return { data, isLoading, refetch, counts, reviewMutation };
 }
+
+/**
+ * Detects when a business verification request's proof matches an already-approved
+ * request on a *different* business. Returns the conflicting business id + name when
+ * a duplicate exists, otherwise null.
+ */
+export function useProofConflict(active: VerificationRow | null) {
+  return useQuery({
+    queryKey: [
+      'verification-proof-conflict',
+      active?.id,
+      active?.proofMethod,
+      active?.proofValue,
+      active?.businessId,
+    ],
+    enabled:
+      !!active &&
+      active.type === 'business' &&
+      !!active.proofMethod &&
+      !!active.proofValue &&
+      !!active.businessId,
+    queryFn: async () => {
+      if (!active?.proofMethod || !active.proofValue || !active.businessId) return null;
+      const { data, error } = await supabase
+        .from('business_verification_requests')
+        .select('business_id')
+        .eq('proof_method', active.proofMethod)
+        .eq('proof_value', active.proofValue)
+        .eq('status', 'approved')
+        .neq('business_id', active.businessId)
+        .limit(1);
+      if (error) throw error;
+      if (!data?.length) return null;
+      const conflictBusinessId = data[0].business_id as string;
+      const { data: biz } = await supabase
+        .from('business_accounts')
+        .select('name')
+        .eq('id', conflictBusinessId)
+        .maybeSingle();
+      return {
+        businessId: conflictBusinessId,
+        businessName: biz?.name ?? 'another business',
+      };
+    },
+    staleTime: 30_000,
+  });
+}
+
