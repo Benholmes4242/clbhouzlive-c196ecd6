@@ -121,6 +121,13 @@ serve(async (req) => {
 
     console.log(`Request ${request_id} rejected by admin ${adminUserId}`);
 
+    // Fire-and-forget result email (best-effort; never block rejection)
+    supabaseAdmin.functions
+      .invoke("send-business-verification-result-email", {
+        body: { business_id: request.business_id, outcome: "rejected", admin_note: admin_notes },
+      })
+      .catch((e) => console.error("[reject] result-email failed", e));
+
     return new Response(JSON.stringify({ ok: true }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
       status: 200,
