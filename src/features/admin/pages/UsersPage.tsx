@@ -414,20 +414,23 @@ function UserDetailPanel({
 }
 
 function DrawerBtn({
-  children, onClick, tone, icon,
-}: { children: React.ReactNode; onClick: () => void; tone?: 'warn' | 'danger'; icon?: React.ReactNode }) {
+  children, onClick, tone, icon, disabled,
+}: { children: React.ReactNode; onClick: () => void; tone?: 'warn' | 'danger'; icon?: React.ReactNode; disabled?: boolean }) {
   const bg = tone === 'danger' ? t.dangerSoft : tone === 'warn' ? t.warnSoft : t.surface;
   const fg = tone === 'danger' ? t.dangerText : tone === 'warn' ? t.warnText : t.ink;
   const border = tone ? 'transparent' : t.line;
   return (
     <button
       onClick={onClick}
+      disabled={disabled}
       style={{
         display: 'inline-flex', alignItems: 'center', gap: 6,
         padding: '8px 12px', borderRadius: t.radius.md,
         background: bg, color: fg,
         border: `1px solid ${border}`,
-        fontSize: 13, fontWeight: 600, cursor: 'pointer',
+        fontSize: 13, fontWeight: 600,
+        cursor: disabled ? 'not-allowed' : 'pointer',
+        opacity: disabled ? 0.5 : 1,
       }}
     >
       {icon}{children}
