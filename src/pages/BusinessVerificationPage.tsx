@@ -327,3 +327,44 @@ function RejectedState({
     </motion.div>
   );
 }
+
+function NeedsMoreInfoState({
+  adminNote,
+  reviewedAt,
+  onAmend,
+}: {
+  adminNote?: string | null;
+  reviewedAt?: string | null;
+  onAmend: () => void;
+}) {
+  return (
+    <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} className="space-y-6">
+      <div className="text-center">
+        <div className="h-16 w-16 rounded-full flex items-center justify-center mx-auto mb-4" style={{ background: BIZ.amberTint, border: `1px solid ${BIZ.amberHair}` }}>
+          <AlertCircle className="h-8 w-8" style={{ color: BIZ.amber }} />
+        </div>
+        <h2 className="text-xl font-bold mb-2" style={{ color: BIZ.ink }}>More information needed</h2>
+        <p className="text-sm text-muted-foreground">
+          Our team has reviewed your request and needs a bit more before approving.
+        </p>
+      </div>
+
+      {adminNote && (
+        <div className="rounded-2xl p-4 text-left" style={{ background: '#FFFFFF', border: `1px solid ${BIZ.amberHair}` }}>
+          <p className="text-xs font-medium mb-1" style={{ color: BIZ.amber }}>What we need</p>
+          <p className="text-sm" style={{ color: BIZ.ink }}>{adminNote}</p>
+        </div>
+      )}
+
+      {reviewedAt && (
+        <p className="text-xs text-muted-foreground/70 text-center">
+          Updated {format(new Date(reviewedAt), 'MMM d, yyyy')}
+        </p>
+      )}
+
+      <Button onClick={onAmend} className="w-full h-11 text-white border-0" style={{ background: BIZ.ink, borderRadius: BIZ.rInner }}>
+        Amend and resubmit
+      </Button>
+    </motion.div>
+  );
+}
