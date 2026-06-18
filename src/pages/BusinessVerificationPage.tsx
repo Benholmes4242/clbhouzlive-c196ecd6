@@ -89,7 +89,7 @@ export default function BusinessVerificationPage() {
           <div className="flex-1 px-2">
             <SectionEyebrow label="VERIFICATION" color="amber" />
             <h1 className="text-[18px] mt-0.5" style={{ color: BIZ.ink, fontWeight: 800, letterSpacing: '-0.01em' }}>
-              {state === 'verified' ? 'Verified business' : state === 'pending' ? 'Under review' : state === 'rejected' ? 'Not approved' : 'Get verified'}
+              {state === 'verified' ? 'Verified business' : state === 'pending' ? 'Under review' : state === 'needs_more_info' ? 'More info needed' : state === 'rejected' ? 'Not approved' : 'Get verified'}
             </h1>
           </div>
           <div className="w-11" />
