@@ -207,7 +207,8 @@ const BusinessDomainVerifyPage = lazy(() => import("./pages/BusinessDomainVerify
 const BusinessTeamPage = lazy(() => import("./pages/BusinessTeamPage"));
 const BusinessInvitePage = lazy(() => import("./pages/BusinessInvitePage"));
 const BusinessActivityPage = lazy(() => import("./pages/BusinessActivityPage"));
-// ManageTeamPage removed — now handled via ManageTeamModal bottom sheet
+
+
 
 const NotFound = lazy(() => import("./pages/NotFound"));
 const PrivacyPolicyPage = lazy(() => import("./pages/legal/PrivacyPolicyPage"));
