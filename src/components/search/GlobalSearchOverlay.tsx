@@ -608,7 +608,7 @@ function GlobalSearchOverlay({ isOpen, onClose }: GlobalSearchOverlayProps) {
                             <div className="flex-1 min-w-0 text-left">
                               <p className="text-[14px] font-medium truncate" style={{ color: INK }}>{course.name}</p>
                               <p className="text-[12px] truncate" style={{ color: INK_SOFT }}>
-                                {[course.region, course.country].filter(Boolean).join(', ')}
+                                {[course.country, course.sub_country || course.region].filter(Boolean).join(', ')}
                                 {course.global_rank && ` · #${course.global_rank} World`}
                               </p>
                             </div>
@@ -772,7 +772,7 @@ function GlobalSearchOverlay({ isOpen, onClose }: GlobalSearchOverlayProps) {
                               {business.verified && <BadgeCheck className="w-3.5 h-3.5 shrink-0" style={{ color: AMBER }} />}
                             </div>
                             <p className="text-[12px] truncate" style={{ color: INK_SOFT }}>
-                              {[business.city, business.country].filter(Boolean).join(', ')}
+                              {[business.country, business.city].filter(Boolean).join(', ')}
                             </p>
                           </div>
                         </button>
