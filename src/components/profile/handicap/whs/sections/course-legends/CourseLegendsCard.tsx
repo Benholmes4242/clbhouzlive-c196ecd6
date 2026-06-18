@@ -273,16 +273,8 @@ export const CourseLegendsCard: React.FC<Props> = ({
         <div
           style={{
             position: 'absolute',
-            top: 0, left: 0, right: 0, height: '40%',
-            background: 'linear-gradient(180deg, rgba(5,8,16,0.55) 0%, rgba(5,8,16,0) 100%)',
-            pointerEvents: 'none',
-          }}
-        />
-        <div
-          style={{
-            position: 'absolute',
-            bottom: 0, left: 0, right: 0, height: '55%',
-            background: 'linear-gradient(180deg, rgba(5,8,16,0) 0%, rgba(5,8,16,0.92) 100%)',
+            top: 0, left: 0, right: 0, height: '30%',
+            background: 'linear-gradient(180deg, rgba(0,0,0,0.25) 0%, rgba(0,0,0,0) 100%)',
             pointerEvents: 'none',
           }}
         />
@@ -301,7 +293,7 @@ export const CourseLegendsCard: React.FC<Props> = ({
               borderRadius: 999,
               background: 'rgba(0,0,0,0.45)',
               border: '1px solid rgba(255,255,255,0.30)',
-              color: 'var(--hcp-t-100)',
+              color: '#FFFFFF',
               fontSize: 10,
               fontWeight: 800,
               letterSpacing: '0.04em',
@@ -327,6 +319,7 @@ export const CourseLegendsCard: React.FC<Props> = ({
             type={courseType}
             region={courseRegion}
             country={courseCountry}
+            onPhoto
           />
           <div
             style={{
