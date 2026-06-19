@@ -123,7 +123,7 @@ const ClubhouseContent = () => {
   }, []);
 
   useHeaderVariant('solid-light');
-  useMedianStatusBar("light", "#F8FAFC", false, false, true, pathname);
+  useMedianStatusBar("auto", "transparent", true, false, true, pathname);
   
   // route-clubhouse class is now applied by ClubhouseWrapped (eagerly loaded)
   // to prevent white flash during lazy chunk loading
