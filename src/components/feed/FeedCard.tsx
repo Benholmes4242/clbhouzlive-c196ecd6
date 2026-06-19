@@ -16,7 +16,7 @@
  * whole feed; tapping any media opens the immersive `FullscreenFeedOverlay`.
  */
 import React, { useMemo } from 'react';
-import { Heart, MessageCircle, Share } from 'lucide-react';
+import { Heart, MapPin, MessageCircle, Share } from 'lucide-react';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { getRatingTier, getRatingTierLabel } from '@/lib/ratingTier';
 import type { FeedPost } from '@/components/media-system/types/media';
@@ -154,7 +154,7 @@ const FeedCardImpl: React.FC<FeedCardProps> = ({
           onClick={() => onProfile(post)}
           style={{ background: 'transparent', border: 'none', padding: 0, cursor: 'pointer' }}
         >
-          <SquircleAvatar src={post.avatarUrl} alt={post.displayName} size={34} hideRing />
+          <SquircleAvatar src={post.avatarUrl} alt={post.displayName} size={34} hairlineRing />
         </button>
         <div style={{ minWidth: 0, flex: 1 }}>
           <button
@@ -178,7 +178,7 @@ const FeedCardImpl: React.FC<FeedCardProps> = ({
           >
             {post.displayName}
           </button>
-          <div style={{ fontSize: 11, color: T40, marginTop: 1 }}>{subLine}</div>
+          <div style={{ fontSize: 11, color: T60, marginTop: 1 }}>{subLine}</div>
         </div>
 
         {/* Right chips */}
@@ -347,37 +347,32 @@ const FeedCardImpl: React.FC<FeedCardProps> = ({
           e.stopPropagation();
           onCourse?.(post);
         };
-        const pill = post.courseRating != null ? (
-          <button
-            type="button"
-            onClick={handleCourseTap}
-            style={{
-              display: 'inline-flex',
-              alignItems: 'center',
-              gap: 5,
-              flexShrink: 0,
-              background: 'rgba(15,23,42,0.06)',
-              padding: '3px 8px',
-              borderRadius: 999,
-              border: 'none',
-              color: '#0F172A',
-              fontSize: 11,
-              fontWeight: 700,
-              fontVariantNumeric: 'tabular-nums',
-              lineHeight: 1,
-              cursor: post.courseId ? 'pointer' : 'default',
-              marginLeft: 8,
-            }}
-          >
-            <img
-              src="/lovable-uploads/2b0e2d79-6b26-4b6b-a27b-8dd5f8cc5aad.png"
-              alt=""
-              aria-hidden="true"
-              style={{ width: 12, height: 12, objectFit: 'contain' }}
-            />
-            {post.courseRating.toFixed(1)}
-          </button>
-        ) : null;
+        const pill = post.courseRating != null ? (() => {
+          const pct = (post.courseRating / 10) * 360;
+          return (
+            <button
+              type="button"
+              onClick={handleCourseTap}
+              style={{
+                display: 'inline-flex', alignItems: 'center', gap: 5, flexShrink: 0,
+                background: 'rgba(247,147,30,0.10)',
+                padding: '3px 9px 3px 4px', borderRadius: 999, border: 'none',
+                cursor: post.courseId ? 'pointer' : 'default', marginLeft: 8,
+              }}
+            >
+              <span style={{
+                width: 16, height: 16, borderRadius: 999, flexShrink: 0,
+                background: `conic-gradient(#fbbf24 ${pct}deg, rgba(247,147,30,0.18) ${pct}deg)`,
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+              }}>
+                <span style={{ width: 11, height: 11, borderRadius: 999, background: '#FFFFFF' }} />
+              </span>
+              <span style={{ fontSize: 11, fontWeight: 800, color: '#C97211', fontVariantNumeric: 'tabular-nums', lineHeight: 1 }}>
+                {post.courseRating.toFixed(1)}
+              </span>
+            </button>
+          );
+        })() : null;
         const nameEl = post.courseId ? (
           <button
             type="button"
@@ -387,8 +382,9 @@ const FeedCardImpl: React.FC<FeedCardProps> = ({
               border: 'none',
               padding: 0,
               textAlign: 'left',
-              fontSize: 12,
-              color: T60,
+              fontSize: 13,
+              fontWeight: 700,
+              color: T100,
               cursor: 'pointer',
               minWidth: 0,
               overflow: 'hidden',
@@ -401,8 +397,9 @@ const FeedCardImpl: React.FC<FeedCardProps> = ({
         ) : (
           <div
             style={{
-              fontSize: 12,
-              color: T60,
+              fontSize: 13,
+              fontWeight: 700,
+              color: T100,
               minWidth: 0,
               overflow: 'hidden',
               textOverflow: 'ellipsis',
@@ -421,6 +418,8 @@ const FeedCardImpl: React.FC<FeedCardProps> = ({
             {courseLocation && (
               <div
                 style={{
+                  display: 'flex',
+                  alignItems: 'center',
                   fontSize: 11,
                   color: T60,
                   marginTop: 2,
@@ -429,6 +428,7 @@ const FeedCardImpl: React.FC<FeedCardProps> = ({
                   whiteSpace: 'nowrap',
                 }}
               >
+                <MapPin size={10} color={T40} style={{ marginRight: 3, flexShrink: 0 }} />
                 {courseLocation}
               </div>
             )}
