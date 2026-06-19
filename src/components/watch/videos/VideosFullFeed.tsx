@@ -3,7 +3,7 @@ import { useInView } from 'react-intersection-observer';
 import { Loader2 } from 'lucide-react';
 import { useVideosFeed, type VideosFilter } from '@/components/videos-tab/hooks/useVideosFeed';
 import { moodToCategory, type VideosMoodId } from './hooks/useVideosMood';
-import VideoFeedCard from './VideoFeedCard';
+import CompactVideoRow from './CompactVideoRow';
 
 interface VideosFullFeedProps {
   userId: string | undefined;
