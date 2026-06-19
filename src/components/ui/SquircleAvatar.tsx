@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
+import { User } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { getDirectImageUrl } from '@/utils/r2ImageUtils';
-import { getInitialsFromName } from '@/lib/avatarFallback';
+import { getInitialsFromName, getAvatarFallbackColor } from '@/lib/avatarFallback';
 import { 
   getRingColorForTotalPlayed,
   THEME_COLORS,
