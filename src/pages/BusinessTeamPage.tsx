@@ -20,6 +20,7 @@ import {
   useRemoveMember,
   useUpdateMemberRole,
   useRevokeInvite,
+  useSetMemberVisibility,
   BUSINESS_ROLE_LABELS,
   BusinessMember,
   BusinessRole,
@@ -28,6 +29,8 @@ import {
 import { AccessRequestsSection } from '@/components/business/AccessRequestsSection';
 import { useHideBottomNav } from '@/hooks/useBottomNavVisibility';
 import { useHideHeader } from '@/hooks/useHeaderVisibility';
+import { useSupabaseSession } from '@/hooks/useSupabaseSession';
+import { Switch } from '@/components/ui/switch';
 import { toast } from 'sonner';
 
 const ROLE_DESCRIPTIONS: Record<BusinessRole, string> = {
@@ -65,6 +68,9 @@ export default function BusinessTeamPage() {
   const removeMember = useRemoveMember(businessId || '');
   const updateRole = useUpdateMemberRole(businessId || '');
   const revokeInvite = useRevokeInvite(businessId || '');
+  const setVisibility = useSetMemberVisibility(businessId || '');
+  const { user } = useSupabaseSession();
+  const currentUserId = user?.id;
 
   const [removeConfirm, setRemoveConfirm] = useState<{ open: boolean; member: BusinessMember | null }>({
     open: false,
@@ -107,6 +113,9 @@ export default function BusinessTeamPage() {
 
   const MemberRow = ({ member, manageable }: { member: BusinessMember; manageable: boolean }) => {
     const profile = member.user_profile;
+    const isSelf = !!currentUserId && member.user_profile_id === currentUserId;
+    const canToggleVisibility = canManage || isSelf;
+    const isPublic = member.is_public === true;
     return (
       <div className="flex items-center gap-3 py-3">
         <SquircleAvatar
@@ -121,6 +130,28 @@ export default function BusinessTeamPage() {
           <p className="text-xs text-muted-foreground truncate">
             {profile?.username ? `@${profile.username}` : BUSINESS_ROLE_LABELS[member.role]}
           </p>
+          {canToggleVisibility && (
+            <div className="flex items-center gap-2 mt-2">
+              <Switch
+                checked={isPublic}
+                disabled={setVisibility.isPending}
+                onCheckedChange={async (next) => {
+                  try {
+                    await setVisibility.mutateAsync({
+                      memberUserId: member.user_profile_id,
+                      isPublic: next,
+                    });
+                  } catch {
+                    // toast handled in hook
+                  }
+                }}
+                aria-label="Show on public profile"
+              />
+              <span className="text-[11px] text-muted-foreground">
+                {isPublic ? 'Shown on public profile' : 'Hidden from public profile'}
+              </span>
+            </div>
+          )}
         </div>
         {manageable && (
           <DropdownMenu>
@@ -239,10 +270,15 @@ export default function BusinessTeamPage() {
           canManage={canManage}
         />
 
+        <p className="text-xs text-muted-foreground -mt-2">
+          Public members appear on your business profile's Team tab.
+        </p>
+
         <RoleGroup role="owner" members={grouped.owner} />
         <RoleGroup role="admin" members={grouped.admin} />
         <RoleGroup role="editor" members={grouped.editor} />
         <RoleGroup role="analyst" members={grouped.analyst} />
+
 
         {canManage && pendingInvites.length > 0 && (
           <section>

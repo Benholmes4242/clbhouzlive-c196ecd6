@@ -206,3 +206,24 @@ export function useUpdateMemberRole(businessId: string) {
     },
   });
 }
+
+export function useSetMemberVisibility(businessId: string) {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async ({ memberUserId, isPublic }: { memberUserId: string; isPublic: boolean }) => {
+      const { error } = await (supabase.rpc as any)('set_member_public_visibility', {
+        _business_id: businessId,
+        _member_user_id: memberUserId,
+        _is_public: isPublic,
+      });
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['business-team', businessId] });
+    },
+    onError: (error: Error) => {
+      toast.error('Failed to update visibility', { description: error.message });
+    },
+  });
+}
