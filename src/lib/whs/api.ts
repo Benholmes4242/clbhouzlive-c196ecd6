@@ -417,8 +417,7 @@ export async function fetchFriendsActivity(
     .select('*')
     .eq('owner_user_id', ownerUserId)
     .not('last_round_played_at', 'is', null)
-    .order('last_round_played_at', { ascending: false })
-    .limit(limit);
+    .order('last_round_played_at', { ascending: false });
   if (error) throw error;
   const friends = ((rows as any[]) ?? []);
 
@@ -439,20 +438,22 @@ export async function fetchFriendsActivity(
     }
   }
 
-  const friendConnIds = friends
-    .map((f) => f.friend_connection_id)
-    .filter(Boolean);
-  // Key by `connection_id::play_date` so we can match the EXACT round the
-  // friend record describes (not "most recent score for this connection",
-  // which silently splices wrong-round data when the friend's own sync is
-  // stale).
-  const scoresByKey: Record<string, any> = {};
-  // Also keep the "most recent per connection" map so we can still surface
-  // a course thumbnail when the friend record happens not to match.
-  const latestScoreByConn: Record<string, any> = {};
+  // Identity for synced friends, keyed by connection_id (join key to whs_scores).
+  const friendByConn: Record<string, any> = {};
+  for (const f of friends) {
+    if (f.friend_connection_id) friendByConn[f.friend_connection_id] = f;
+  }
+  const syncedConnIds = Object.keys(friendByConn);
 
-  if (friendConnIds.length > 0) {
-    const { data: scoreRows } = await supabase
+  // Fetch ALL scores in the last 14 days for synced friends — row-source.
+  const FORTNIGHT_DAYS = 14;
+  const cutoff = new Date();
+  cutoff.setUTCDate(cutoff.getUTCDate() - FORTNIGHT_DAYS);
+  const cutoffStr = cutoff.toISOString().slice(0, 10);
+
+  let scoreRows: any[] = [];
+  if (syncedConnIds.length > 0) {
+    const { data: sRows, error: sErr } = await supabase
       .from('whs_scores' as any)
       .select(`
         id,
@@ -466,27 +467,19 @@ export async function fetchFriendsActivity(
         course_id,
         course:whs_courses(name)
       `)
-      .in('connection_id', friendConnIds)
+      .in('connection_id', syncedConnIds)
+      .gte('play_date', cutoffStr)
       .order('play_date', { ascending: false });
-    for (const s of ((scoreRows as any[]) ?? [])) {
-      const key = `${s.connection_id}::${s.play_date}`;
-      if (!scoresByKey[key]) scoresByKey[key] = s;
-      if (!latestScoreByConn[s.connection_id]) latestScoreByConn[s.connection_id] = s;
-    }
+    if (sErr) throw sErr;
+    scoreRows = (sRows as any[]) ?? [];
   }
 
+  // Course thumbnails — collect names from both score rows and match rows.
   const courseNames = new Set<string>();
-  Object.values(latestScoreByConn).forEach((s: any) => {
-    if (s.course?.name) courseNames.add(s.course.name);
-  });
-  // Also include course names from friend match rows so non-Clbhouz friends
-  // (no joined score) still get a course thumbnail.
-  friends.forEach((f: any) => {
-    if (f.last_round_course_name) courseNames.add(f.last_round_course_name);
-  });
+  scoreRows.forEach((s) => { if (s.course?.name) courseNames.add(s.course.name); });
+  friends.forEach((f) => { if (f.last_round_course_name) courseNames.add(f.last_round_course_name); });
+
   const thumbsByName: Record<string, string | null> = {};
-  // Use the same lookup as the Overview's LastRoundCard, which handles WHS
-  // name variants (e.g. "Sundridge Park-East Course" → "Sundridge Park (East Course)").
   await Promise.all(
     Array.from(courseNames).map(async (name) => {
       thumbsByName[name.toLowerCase()] = await lookupCourseThumbnail(name);
@@ -498,29 +491,14 @@ export async function fetchFriendsActivity(
     bests.map((b) => `${b.friend_connection_id}:${b.best_score_id}`),
   );
 
-  // Reaction enrichment — only for the matched score per friend that will
-  // actually render. Avoids blowing past PostgREST's URL length limit.
-  const matchedScoresByFriend = new Map<string, any>();
-  for (const f of friends) {
-    if (!f.last_round_played_at) continue;
-    const key = `${f.friend_connection_id}::${f.last_round_played_at}`;
-    const matched = scoresByKey[key];
-    if (matched) {
-      matchedScoresByFriend.set(f.friend_row_id, matched);
-    }
-  }
-
-  const scoreIdsForReactions = Array.from(matchedScoresByFriend.values())
-    .map((s) => s?.id)
-    .filter((id): id is string => !!id);
+  // Reactions over every in-window score row (capped).
+  const allScoreIds = scoreRows.map((s) => s.id).filter((id): id is string => !!id);
 
   let viewerReactedSet = new Set<string>();
   const reactionCounts: Record<string, number> = {};
 
-  // Defensive cap: even if matched-score logic somehow returns too many,
-  // don't exceed PostgREST's URL parameter limit.
   const REACTION_LOOKUP_CAP = 100;
-  const boundedScoreIds = scoreIdsForReactions.slice(0, REACTION_LOOKUP_CAP);
+  const boundedScoreIds = allScoreIds.slice(0, REACTION_LOOKUP_CAP);
 
   if (boundedScoreIds.length > 0) {
     try {
@@ -560,23 +538,14 @@ export async function fetchFriendsActivity(
     }
   }
 
-  return friends.map((f): WhsFriendActivityWithImage => {
-    // ONLY use a score row if it matches the exact round the friend record
-    // describes. If the friend's connection sync is stale and the most-recent
-    // score is for a different round, treat score-derived fields as null so
-    // the UI falls back to friend-only data.
-    const scoreKey = f.last_round_played_at
-      ? `${f.friend_connection_id}::${f.last_round_played_at}`
-      : null;
-    const matchedScore = scoreKey ? scoresByKey[scoreKey] : null;
+  const items: WhsFriendActivityWithImage[] = [];
 
-    const latestScore = latestScoreByConn[f.friend_connection_id];
-    const courseNameKey = (f.last_round_course_name ?? '').toLowerCase();
-    const fallbackCourseKey = (latestScore?.course?.name ?? '').toLowerCase();
-
-    const matchedScoreId: string | null = matchedScore?.id ?? null;
-
-    return {
+  // (A) Synced friends — one card PER score row.
+  for (const s of scoreRows) {
+    const f = friendByConn[s.connection_id];
+    if (!f) continue;
+    const courseNameKey = (s.course?.name ?? '').toLowerCase();
+    items.push({
       friend_row_id: f.friend_row_id,
       friend_passport_id: f.friend_passport_id,
       friend_name: f.friend_name,
@@ -585,24 +554,61 @@ export async function fetchFriendsActivity(
       friend_user_id: f.friend_user_id,
       friend_connection_id: f.friend_connection_id,
       is_clbhouz_user: !!f.is_clbhouz_user,
+      last_round_played_at: s.play_date,
+      last_round_course_name: s.course?.name ?? f.last_round_course_name,
+      last_round_adjusted_gross: s.adjusted_gross,
+      last_round_stableford: s.stableford_points ?? null,
+      last_round_differential: s.handicap_differential ?? null,
+      last_round_score_id: s.id,
+      course_thumbnail_image:
+        thumbsByName[courseNameKey] ??
+        thumbsByName[(f.last_round_course_name ?? '').toLowerCase()] ??
+        null,
+      is_course_best: bestKeyed.has(`${f.friend_connection_id}:${s.id}`),
+      friend_handicap_index: f.friend_handicap_index ?? null,
+      is_counter: !!s.is_counter,
+      handicap_index_at_time: s.handicap_index_at_time ?? null,
+      viewer_has_reacted: viewerReactedSet.has(s.id),
+      reaction_count: reactionCounts[s.id] ?? 0,
+    });
+  }
+
+  // (B) Non-Clbhouz friends — one card from the match row.
+  for (const f of friends) {
+    if (f.friend_connection_id) continue;
+    const courseNameKey = (f.last_round_course_name ?? '').toLowerCase();
+    items.push({
+      friend_row_id: f.friend_row_id,
+      friend_passport_id: f.friend_passport_id,
+      friend_name: f.friend_name,
+      friend_thumbnail_url: f.friend_thumbnail_url,
+      friend_profile_photo_url: null,
+      friend_user_id: null,
+      friend_connection_id: null,
+      is_clbhouz_user: false,
       last_round_played_at: f.last_round_played_at,
       last_round_course_name: f.last_round_course_name,
       last_round_adjusted_gross: f.last_round_adjusted_gross,
-      last_round_stableford: matchedScore?.stableford_points ?? null,
-      last_round_differential: matchedScore?.handicap_differential ?? null,
-      last_round_score_id: matchedScoreId,
-      course_thumbnail_image:
-        thumbsByName[courseNameKey] ?? thumbsByName[fallbackCourseKey] ?? null,
-      is_course_best: matchedScore
-        ? bestKeyed.has(`${f.friend_connection_id}:${matchedScore.id}`)
-        : false,
+      last_round_stableford: null,
+      last_round_differential: null,
+      last_round_score_id: null,
+      course_thumbnail_image: thumbsByName[courseNameKey] ?? null,
+      is_course_best: false,
       friend_handicap_index: f.friend_handicap_index ?? null,
-      is_counter: !!matchedScore?.is_counter,
-      handicap_index_at_time: matchedScore?.handicap_index_at_time ?? null,
-      viewer_has_reacted: matchedScoreId ? viewerReactedSet.has(matchedScoreId) : false,
-      reaction_count: matchedScoreId ? reactionCounts[matchedScoreId] ?? 0 : 0,
-    };
+      is_counter: false,
+      handicap_index_at_time: null,
+      viewer_has_reacted: false,
+      reaction_count: 0,
+    });
+  }
+
+  items.sort((a, b) => {
+    const da = a.last_round_played_at ?? '';
+    const db = b.last_round_played_at ?? '';
+    return db.localeCompare(da);
   });
+
+  return items.slice(0, limit);
 }
 
 export async function fetchSentInvites(): Promise<WhsInviteStatus[]> {
