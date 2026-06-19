@@ -185,6 +185,56 @@ export function BusinessProfileInfo({ business, canManage }: BusinessProfileInfo
         </>
       )}
 
+      {/* Manages course (claimed-course link) */}
+      {business.club_id && business.club_name && (
+        <>
+          <SectionDivider />
+          <section className="px-6 py-5">
+            <SectionHeading>Manages</SectionHeading>
+            <button
+              type="button"
+              onClick={() => navigate(`/courses/${business.club_id}`)}
+              className="flex items-start gap-3 w-full text-left min-h-[44px] py-1 active:opacity-70 transition-opacity"
+            >
+              <Flag className="h-4 w-4 text-muted-foreground mt-0.5 shrink-0" />
+              <div className="min-w-0 flex-1">
+                <p className="text-sm font-semibold truncate" style={{ color: '#F7931E' }}>
+                  {business.club_name}
+                  <ArrowUpRight className="inline h-3 w-3 ml-0.5 opacity-70" />
+                </p>
+                <p className="text-xs text-muted-foreground">Course</p>
+              </div>
+            </button>
+          </section>
+        </>
+      )}
+
+      {/* Opening hours */}
+      {business.opening_hours && Object.keys(business.opening_hours).length > 0 && (
+        <>
+          <SectionDivider />
+          <section className="px-6 py-5">
+            <SectionHeading>Opening Hours</SectionHeading>
+            <div className="flex flex-col gap-1.5">
+              {(['mon','tue','wed','thu','fri','sat','sun'] as const).map((dayKey) => {
+                const labels: Record<string,string> = { mon:'Monday', tue:'Tuesday', wed:'Wednesday', thu:'Thursday', fri:'Friday', sat:'Saturday', sun:'Sunday' };
+                const h = business.opening_hours?.[dayKey];
+                if (!h) return null;
+                return (
+                  <div key={dayKey} className="flex items-center gap-3 py-1">
+                    <Clock className="h-4 w-4 text-muted-foreground shrink-0" />
+                    <span className="text-sm font-medium text-foreground w-24">{labels[dayKey]}</span>
+                    <span className="text-sm text-muted-foreground">
+                      {h.closed ? 'Closed' : `${h.open} – ${h.close}`}
+                    </span>
+                  </div>
+                );
+              })}
+            </div>
+          </section>
+        </>
+      )}
+
       {/* Location */}
       {shortLocation && (
         <>
