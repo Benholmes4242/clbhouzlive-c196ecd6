@@ -89,6 +89,16 @@ import { KeepAliveOutlet } from '@/components/keep-alive/KeepAliveOutlet';
 
 // Import wrapped components with explicit variants
 import ClubhouseWrapped from "./pages/ClubhouseWrapped";
+import BetaGatePage from "./pages/BetaGatePage";
+import { detectMedianBridge } from "./uploads/medianBridge";
+
+const ROOT_GATE_LAUNCH = new Date(2026, 5, 22, 0, 0, 0); // 22 Jun 2026 local — must match BetaGatePage
+const RootGate: React.FC = () => {
+  const { isMedianApp } = detectMedianBridge();
+  const launched = Date.now() >= ROOT_GATE_LAUNCH.getTime();
+  if (!isMedianApp && !launched) return <BetaGatePage />;
+  return <ClubhouseWrapped />;
+};
 import DiscoverWrapped from "./pages/DiscoverWrapped";
 import CoursesWrapped from "./pages/CoursesWrapped";
 import ProfileWrapped from "./pages/ProfileWrapped";
@@ -281,7 +291,7 @@ function AppRoutes() {
 
   // Keep-alive routes configuration - these routes stay mounted when navigating away
   const keepAliveRoutes = useMemo(() => [
-    { path: '/', element: <ClubhouseWrapped /> },
+    { path: '/', element: <RootGate /> },
     { path: '/clubhouse', element: <Navigate to="/" replace /> },
   ], []);
 
