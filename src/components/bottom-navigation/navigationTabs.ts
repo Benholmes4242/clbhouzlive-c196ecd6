@@ -1,8 +1,8 @@
 import {
   CameraIcon,
+  HomeIcon,
   MapPinIcon,
   PlayCircleIcon,
-  SparklesIcon,
   TrophyIcon,
 } from '@heroicons/react/24/outline';
 
