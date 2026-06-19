@@ -18,6 +18,7 @@
 import React, { useMemo } from 'react';
 import { Heart, MessageCircle, Share } from 'lucide-react';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
+import { getRatingTier, getRatingTierLabel } from '@/lib/ratingTier';
 import type { FeedPost } from '@/components/media-system/types/media';
 import { InlineVideo } from './InlineVideo';
 import { MediaCarousel } from './MediaCarousel';
@@ -203,29 +204,59 @@ const FeedCardImpl: React.FC<FeedCardProps> = ({
               DEAL
             </span>
           )}
-          {reviewRating != null && (
-            <button
-              type="button"
-              onClick={(e) => {
-                e.stopPropagation();
-                onReviewTap?.(post);
-              }}
-              style={{
-                fontSize: 10,
-                fontWeight: 700,
-                letterSpacing: 0.5,
-                color: T100,
-                background: 'rgba(15,23,42,0.06)',
-                border: `1px solid rgba(15,23,42,0.10)`,
-                padding: '3px 7px',
-                borderRadius: 999,
-                cursor: 'pointer',
-                fontVariantNumeric: 'tabular-nums',
-              }}
-            >
-              REVIEW {reviewRating.toFixed(1)}
-            </button>
-          )}
+          {reviewRating != null && (() => {
+            const tierKey = getRatingTier(reviewRating);
+            const tierLabel = getRatingTierLabel(reviewRating);
+            const isExceptional = tierKey === 'EXCEPTIONAL';
+            return (
+              <button
+                type="button"
+                onClick={(e) => { e.stopPropagation(); onReviewTap?.(post); }}
+                style={{
+                  display: 'flex',
+                  flexDirection: 'column',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  gap: 1,
+                  lineHeight: 1.1,
+                  background: 'transparent',
+                  border: 'none',
+                  padding: 0,
+                  cursor: 'pointer',
+                  minWidth: 64,
+                  flexShrink: 0,
+                }}
+              >
+                <span style={{
+                  fontSize: 22,
+                  fontWeight: 800,
+                  color: T100,
+                  fontVariantNumeric: 'tabular-nums',
+                  letterSpacing: '-0.03em',
+                }}>
+                  {reviewRating.toFixed(1)}
+                </span>
+                <span style={{
+                  fontSize: 8,
+                  fontWeight: 800,
+                  letterSpacing: '0.14em',
+                  textTransform: 'uppercase',
+                  whiteSpace: 'nowrap',
+                  ...(isExceptional
+                    ? {
+                        background: 'linear-gradient(to right, #f59e0b, #fbbf24)',
+                        WebkitBackgroundClip: 'text',
+                        backgroundClip: 'text',
+                        WebkitTextFillColor: 'transparent',
+                        color: 'transparent',
+                      }
+                    : { color: T100 }),
+                }}>
+                  {tierLabel.toUpperCase()}
+                </span>
+              </button>
+            );
+          })()}
         </div>
       </div>
 
