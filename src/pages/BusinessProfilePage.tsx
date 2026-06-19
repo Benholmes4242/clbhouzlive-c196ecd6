@@ -430,7 +430,7 @@ const BusinessProfilePage: React.FC = () => {
               border: '1px solid rgba(247,147,30,0.20)',
             }}
           >
-            <FlagIcon className="w-3 h-3" />
+            <Flag className="w-3 h-3" />
             Manages {business.club_name}
           </button>
         )}
