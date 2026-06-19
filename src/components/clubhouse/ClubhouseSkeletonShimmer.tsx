@@ -251,7 +251,7 @@ const CardSkeleton: React.FC<{
   variant?: 'regular' | 'review';
   mediaRatio?: string;
 }> = ({ isStatic = false, variant = 'regular', mediaRatio = '4/5' }) => (
-  <div style={{ background: CARD_BG, overflow: 'hidden', marginInline: 12, borderRadius: 16, border: '0.5px solid rgba(15,23,42,0.07)', boxShadow: '0 1px 2px rgba(15,23,42,0.04), 0 4px 12px rgba(15,23,42,0.06)' }}>
+  <div style={{ background: CARD_BG, overflow: 'hidden', marginInline: 0 }}>
     {/* Header */}
     <div style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '10px 12px' }}>
       <SkeletonBlock
@@ -307,26 +307,57 @@ const CardFeedSkeleton: React.FC<{
   isStatic?: boolean;
   variant?: 'regular' | 'review';
 }> = ({ isStatic = false, variant = 'regular' }) => {
-  const topPad = 'calc(max(env(safe-area-inset-top, 0px), 47px) + 72px + 12px)';
+  const topPad = 'calc(env(safe-area-inset-top, 0px) + 59px)';
   return (
-    <div
-      style={{
-        background: CANVAS,
-        minHeight: '100dvh',
-        width: '100%',
-        overflowY: 'auto',
-        WebkitOverflowScrolling: 'touch',
-        paddingTop: topPad,
-        paddingBottom: 'calc(var(--bottom-nav-height, 88px) + 12px)',
-      }}
-    >
-      <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
-        <CardSkeleton isStatic={isStatic} variant={variant} mediaRatio="4/5" />
-        <CardSkeleton isStatic={isStatic} variant={variant} mediaRatio="3/4" />
-        <CardSkeleton isStatic={isStatic} variant={variant} mediaRatio="4/5" />
-        <CardSkeleton isStatic={isStatic} variant={variant} mediaRatio="1/1" />
+    <>
+      {/* Header strip skeleton — matches ClubhouseTopBar (top: sat, height 44) */}
+      <div
+        style={{
+          position: 'fixed',
+          top: 'env(safe-area-inset-top, 0px)',
+          left: 0,
+          right: 0,
+          height: 44,
+          zIndex: 40,
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          padding: '0 16px',
+          background: CANVAS,
+        }}
+      >
+        {/* left: tab labels */}
+        <div style={{ display: 'flex', gap: 14, alignItems: 'center' }}>
+          <SkeletonBlock isStatic={isStatic} className="rounded-sm" style={{ width: 78, height: 16 }} />
+          <SkeletonBlock isStatic={isStatic} className="rounded-sm" style={{ width: 52, height: 16 }} />
+        </div>
+        {/* right: search + pill + avatar */}
+        <div style={{ display: 'flex', gap: 10, alignItems: 'center' }}>
+          <SkeletonBlock isStatic={isStatic} className="rounded-full" style={{ width: 22, height: 22 }} />
+          <SkeletonBlock isStatic={isStatic} className="rounded-full" style={{ width: 52, height: 26 }} />
+          <SkeletonBlock isStatic={isStatic} style={{ width: 34, height: 34, borderRadius: '34%' }} />
+        </div>
       </div>
-    </div>
+
+      <div
+        style={{
+          background: CANVAS,
+          minHeight: '100dvh',
+          width: '100%',
+          overflowY: 'auto',
+          WebkitOverflowScrolling: 'touch',
+          paddingTop: topPad,
+          paddingBottom: 'calc(var(--bottom-nav-height, 88px) + 12px)',
+        }}
+      >
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+          <CardSkeleton isStatic={isStatic} variant={variant} mediaRatio="4/5" />
+          <CardSkeleton isStatic={isStatic} variant={variant} mediaRatio="3/4" />
+          <CardSkeleton isStatic={isStatic} variant={variant} mediaRatio="4/5" />
+          <CardSkeleton isStatic={isStatic} variant={variant} mediaRatio="1/1" />
+        </div>
+      </div>
+    </>
   );
 };
 
