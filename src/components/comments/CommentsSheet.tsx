@@ -8,7 +8,7 @@ import { useQuery } from '@tanstack/react-query';
 import { removeGolfCourseFromContent } from '@/utils/golfCourseExtractor';
 import { createPortal } from 'react-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, Heart, MoreHorizontal, Send, ChevronRight, MapPin, Smile, Image as ImageIcon } from 'lucide-react';
+import { X, Heart, MoreHorizontal, Send, ChevronRight, MapPin } from 'lucide-react';
 
 // ── Local design tokens ──
 const INK = '#0F172A';
@@ -699,7 +699,7 @@ function CommentsSheet({
                           fontSize: 17,
                           fontWeight: 700,
                           letterSpacing: '-0.01em',
-                          color: isActive ? INK : INK_SUBTLE,
+                          color: isActive ? INK : '#64748B',
                           lineHeight: 1.2,
                           paddingBottom: 4,
                           borderBottom: isActive ? '1.5px solid #0A0E14' : '1.5px solid transparent',
@@ -1137,38 +1137,6 @@ function CommentsSheet({
                           fontFamily: 'inherit',
                         }}
                       />
-                      <div className="flex items-center shrink-0">
-                        <button
-                          type="button"
-                          onClick={() => {
-                            const cursor = textareaRef.current?.selectionStart ?? inputText.length;
-                            setInputText(prev => prev.slice(0, cursor) + '😀' + prev.slice(cursor));
-                            requestAnimationFrame(() => textareaRef.current?.focus());
-                          }}
-                          style={{
-                            width: 30, height: 30,
-                            display: 'flex', alignItems: 'center', justifyContent: 'center',
-                            background: 'transparent', border: 0, cursor: 'pointer',
-                            color: INK_SUBTLE, padding: 0,
-                          }}
-                          aria-label="Emoji picker"
-                        >
-                          <Smile size={18} strokeWidth={2} />
-                        </button>
-                        <button
-                          type="button"
-                          onClick={() => toast.info('Image attachments coming soon')}
-                          style={{
-                            width: 30, height: 30,
-                            display: 'flex', alignItems: 'center', justifyContent: 'center',
-                            background: 'transparent', border: 0, cursor: 'pointer',
-                            color: INK_SUBTLE, padding: 0,
-                          }}
-                          aria-label="Attach image"
-                        >
-                          <ImageIcon size={18} strokeWidth={2} />
-                        </button>
-                      </div>
                     </div>
                   </div>
                   <button
