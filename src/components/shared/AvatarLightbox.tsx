@@ -144,14 +144,20 @@ export const AvatarLightbox: React.FC<AvatarLightboxProps> = ({
           >
             {showFallback ? (
               fallbackInitial ? (
-                <div className="w-full h-full bg-slate-200 flex items-center justify-center">
-                  <span className="text-6xl sm:text-7xl md:text-8xl font-bold text-slate-600">
+                <div
+                  className="w-full h-full flex items-center justify-center"
+                  style={{ background: getAvatarFallbackColor(altText || fallbackInitial) }}
+                >
+                  <span className="text-6xl sm:text-7xl md:text-8xl font-bold text-white">
                     {fallbackInitial}
                   </span>
                 </div>
               ) : (
-                <div className="w-full h-full bg-slate-200 flex items-center justify-center">
-                  <span className="text-slate-400 text-sm">No image</span>
+                <div
+                  className="w-full h-full flex items-center justify-center"
+                  style={{ background: getAvatarFallbackColor(altText) }}
+                >
+                  <span className="text-white/70 text-sm">No image</span>
                 </div>
               )
             ) : (
