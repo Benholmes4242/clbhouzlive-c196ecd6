@@ -393,7 +393,7 @@ const ClubhouseContent = () => {
               variant="light"
               title="Golfers to follow"
               showViewAll={true}
-              onViewAll={() => navigate('/golfers')}
+              onViewAll={() => navigate('/golferstofollow')}
             />
           </div>
         ) : (
