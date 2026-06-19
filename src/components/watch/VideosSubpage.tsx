@@ -66,13 +66,11 @@ export default function VideosSubpage() {
           ) : (
             <>
               <VideoOfTheWeekHero />
-              <VideosContinueWatchingRail userId={userId} />
-              <VideosCourseAnchoredRail userId={userId} />
-              <VideosCategoryRail userId={userId} mood={mood} />
               <VideosFollowingRail userId={userId} />
 
               <MoreToWatchDivider mood={mood} />
               <VideosFullFeed userId={userId} mood={mood} />
+            </>
             </>
           )}
         </div>
