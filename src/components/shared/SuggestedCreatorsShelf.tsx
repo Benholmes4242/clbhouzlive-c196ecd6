@@ -77,6 +77,28 @@ export const SuggestedCreatorsShelf: React.FC<SuggestedCreatorsShelfProps> = ({
         <span style={labelStyle}>
           {title}
         </span>
+        {showViewAll && onViewAll && (
+          <button
+            type="button"
+            onClick={onViewAll}
+            style={{
+              fontSize: 11,
+              fontWeight: 800,
+              color: INK,
+              letterSpacing: '-0.005em',
+              background: 'none',
+              border: 'none',
+              cursor: 'pointer',
+              padding: 0,
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: 2,
+            }}
+          >
+            See all
+            <ChevronRight size={12} strokeWidth={2.4} />
+          </button>
+        )}
       </div>
 
       {/* Scroll row */}
