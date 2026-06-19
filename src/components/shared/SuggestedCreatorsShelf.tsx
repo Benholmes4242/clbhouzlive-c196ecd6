@@ -1,7 +1,10 @@
 import React from 'react';
+import { ChevronRight } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useSuggestedCreators } from '@/components/watch/hooks/useSuggestedCreators';
 import { SuggestedCreatorCard, SuggestedCreatorCardShimmer } from './SuggestedCreatorCard';
+
+const INK = '#0F172A';
 
 interface SuggestedCreatorsShelfProps {
   userId: string | undefined;
@@ -34,14 +37,15 @@ export const SuggestedCreatorsShelf: React.FC<SuggestedCreatorsShelfProps> = ({
   if (!isLoading && (!creators || creators.length < 1)) return null;
 
   const isSearchScale = headerScale === 'search';
-  const headerPadding = isSearchScale ? '18px 16px 10px' : '0 16px';
-  const headerMarginBottom = isSearchScale ? 0 : 14;
+  const headerPadding = isSearchScale ? '16px 16px 8px' : '0 16px';
+  const headerMarginBottom = isSearchScale ? 4 : 14;
   const labelStyle: React.CSSProperties = isSearchScale
     ? {
-        fontSize: 13,
-        fontWeight: 600,
-        letterSpacing: '-0.01em',
-        color: isDark ? 'rgba(255,255,255,0.7)' : 'hsl(var(--foreground))',
+        fontSize: 9,
+        fontWeight: 800,
+        letterSpacing: '0.16em',
+        textTransform: 'uppercase',
+        color: isDark ? 'rgba(255,255,255,0.7)' : '#64748B',
       }
     : {
         fontSize: 15,
@@ -73,6 +77,28 @@ export const SuggestedCreatorsShelf: React.FC<SuggestedCreatorsShelfProps> = ({
         <span style={labelStyle}>
           {title}
         </span>
+        {showViewAll && onViewAll && (
+          <button
+            type="button"
+            onClick={onViewAll}
+            style={{
+              fontSize: 11,
+              fontWeight: 800,
+              color: INK,
+              letterSpacing: '-0.005em',
+              background: 'none',
+              border: 'none',
+              cursor: 'pointer',
+              padding: 0,
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: 2,
+            }}
+          >
+            See all
+            <ChevronRight size={12} strokeWidth={2.4} />
+          </button>
+        )}
       </div>
 
       {/* Scroll row */}
