@@ -93,13 +93,6 @@ export default function ClipsSubpage() {
             </>
           ) : (
             <>
-              <ClipOfTheWeekHero />
-              <LightningRoundRail userId={userId} mood={mood} />
-              <ClipsCourseAnchoredRail userId={userId} mood={mood} />
-              <ClipsMostLovedRail userId={userId} mood={mood} />
-
-              <MoreToExploreDivider mood={mood} />
-
               <WatchAutoplay posts={posts} gridRef={gridRef as React.RefObject<HTMLDivElement>} />
               <WatchGrid
                 posts={posts}
