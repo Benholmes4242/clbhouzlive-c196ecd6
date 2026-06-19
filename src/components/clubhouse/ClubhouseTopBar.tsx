@@ -103,7 +103,7 @@ export const ClubhouseTopBar: React.FC<ClubhouseTopBarProps> = ({
                 style={{
                   width: 1,
                   height: 18,
-                  background: 'rgba(15,23,42,0.10)',
+                  background: 'rgba(15,23,42,0.08)',
                   flexShrink: 0,
                   margin: 0,
                 }}
