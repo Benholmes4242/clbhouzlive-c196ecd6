@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
+import { User } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { getDirectImageUrl } from '@/utils/r2ImageUtils';
-import { getInitialsFromName } from '@/lib/avatarFallback';
+import { getInitialsFromName, getAvatarFallbackColor } from '@/lib/avatarFallback';
 import { 
   getRingColorForTotalPlayed,
   THEME_COLORS,
@@ -159,33 +160,37 @@ export const SquircleAvatar: React.FC<SquircleAvatarProps> = ({
     setImageLoaded(false);
   };
 
-  // Initials kept for aria-label accessibility only.
+  // Initials kept for aria-label accessibility and fallback rendering.
   const fallbackInitials = fallback || getInitialsFromName(alt) || '?';
+  const hasInitials = fallbackInitials && fallbackInitials !== '?';
+  const fallbackBg = getAvatarFallbackColor(userId || alt);
+  const initialsFontSize = Math.max(10, Math.round(pixelSize * 0.38));
 
-  // Inner avatar content (image or fallback). Fallback: white bust silhouette
-  // at 56% opacity over the same dark-green gradient as CourseImageFallback
-  // — missing-photo and missing-course-image states read as one family.
+  // Inner avatar content: image when available, otherwise initials (or User glyph)
+  // on a deterministic per-user color from the slate/graphite palette.
   const avatarContent = (
     <>
       {(!imageLoaded || showFallback) && (
         <div
-          className="absolute inset-0 flex items-end justify-center overflow-hidden"
-          style={{ background: 'linear-gradient(135deg, #1a3c2a 0%, #0f172a 100%)' }}
+          className="absolute inset-0 flex items-center justify-center overflow-hidden text-white"
+          style={{ background: fallbackBg }}
           aria-label={alt || fallbackInitials}
         >
-          <svg
-            viewBox="0 0 64 64"
-            width="100%"
-            height="100%"
-            preserveAspectRatio="xMidYMax meet"
-            style={{ opacity: 0.56, display: 'block' }}
-            aria-hidden="true"
-          >
-            {/* Head */}
-            <circle cx="32" cy="25" r="11" fill="#ffffff" />
-            {/* Shoulders / bust — extends past viewBox bottom to bleed */}
-            <path d="M11 64 C 11 48, 21 40, 32 40 C 43 40, 53 48, 53 64 Z" fill="#ffffff" />
-          </svg>
+          {hasInitials ? (
+            <span
+              style={{
+                fontSize: `${initialsFontSize}px`,
+                fontWeight: 600,
+                letterSpacing: '0.01em',
+                lineHeight: 1,
+                userSelect: 'none',
+              }}
+            >
+              {fallbackInitials}
+            </span>
+          ) : (
+            <User size="60%" strokeWidth={1.75} aria-hidden="true" />
+          )}
         </div>
       )}
       {imageSrc && !showFallback && (

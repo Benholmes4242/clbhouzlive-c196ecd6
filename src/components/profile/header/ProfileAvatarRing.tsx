@@ -2,6 +2,7 @@ import React, { useMemo, useRef, useEffect, useState } from 'react';
 import { cn } from '@/lib/utils';
 import { getTop100Club } from '@/lib/top100Club';
 import { getRingColorForTotalPlayed } from '@/lib/globalAchievementMilestoneSystem';
+import { getAvatarFallbackColor } from '@/lib/avatarFallback';
 import {
   Tooltip,
   TooltipContent,
@@ -118,8 +119,8 @@ const ProfileAvatarRing: React.FC<ProfileAvatarRingProps> = ({
     />
   ) : (
     <div 
-      className="w-full h-full flex items-center justify-center bg-muted text-muted-foreground font-semibold"
-      style={{ fontSize: `${fallbackFontSize}px` }}
+      className="w-full h-full flex items-center justify-center font-semibold text-white"
+      style={{ fontSize: `${fallbackFontSize}px`, background: getAvatarFallbackColor(displayName) }}
     >
       {initials}
     </div>
