@@ -270,10 +270,15 @@ export default function BusinessTeamPage() {
           canManage={canManage}
         />
 
+        <p className="text-xs text-muted-foreground -mt-2">
+          Public members appear on your business profile's Team tab.
+        </p>
+
         <RoleGroup role="owner" members={grouped.owner} />
         <RoleGroup role="admin" members={grouped.admin} />
         <RoleGroup role="editor" members={grouped.editor} />
         <RoleGroup role="analyst" members={grouped.analyst} />
+
 
         {canManage && pendingInvites.length > 0 && (
           <section>
