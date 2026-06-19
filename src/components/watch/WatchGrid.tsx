@@ -1,4 +1,4 @@
-import React, { useRef, useEffect } from 'react';
+import React, { useMemo, useRef, useEffect } from 'react';
 import { useFullscreenFeedStore } from '@/store/fullscreenFeedStore';
 import type { FeedPost } from '@/components/media-system/types/media';
 import WatchTile from './WatchTile';
@@ -19,6 +19,16 @@ interface WatchGridProps {
   emptyMessage?: string;
 }
 
+const GAP = 8;
+const COLS = 2;
+const FALLBACK_RATIO = 9 / 16; // width / height for default 9:16 tile
+
+interface PlacedTile {
+  post: FeedPost;
+  index: number;
+  ratio: number; // width / height
+}
+
 const WatchGrid: React.FC<WatchGridProps> = ({
   posts,
   isLoading,
@@ -28,13 +38,11 @@ const WatchGrid: React.FC<WatchGridProps> = ({
   fetchNextPage,
   refetch,
   gridRef,
-  userId,
   emptyEmoji = '⛳',
   emptyTitle = 'No shorts yet',
   emptyMessage = 'Check back soon for new content',
 }) => {
   const sentinelRef = useRef<HTMLDivElement>(null);
-
 
   // Infinite scroll via IntersectionObserver
   useEffect(() => {
@@ -43,7 +51,7 @@ const WatchGrid: React.FC<WatchGridProps> = ({
 
     const observer = new IntersectionObserver(
       (entries) => {
-      if (entries[0].isIntersecting && hasNextPage && !isFetchingNextPage) {
+        if (entries[0].isIntersecting && hasNextPage && !isFetchingNextPage) {
           fetchNextPage();
         }
       },
@@ -63,6 +71,29 @@ const WatchGrid: React.FC<WatchGridProps> = ({
       appendPosts(posts);
     }
   }, [posts.length, isFullscreenOpen, appendPosts]);
+
+  // Distribute tiles across COLS by shortest-column algorithm.
+  // Each column holds normalised heights (height ÷ columnWidth), so columns
+  // compare like-for-like regardless of actual column pixel width.
+  const columns = useMemo<PlacedTile[][]>(() => {
+    const cols: PlacedTile[][] = Array.from({ length: COLS }, () => []);
+    const heights = new Array(COLS).fill(0);
+    posts.forEach((post, i) => {
+      const w = post.mediaItems?.[0]?.width;
+      const h = post.mediaItems?.[0]?.height;
+      const ratio = w && h && w > 0 && h > 0 ? w / h : FALLBACK_RATIO;
+      // normalised tile height when column width = 1
+      const tileH = 1 / ratio;
+      // Find the shortest column
+      let target = 0;
+      for (let c = 1; c < COLS; c++) {
+        if (heights[c] < heights[target]) target = c;
+      }
+      cols[target].push({ post, index: i, ratio });
+      heights[target] += tileH;
+    });
+    return cols;
+  }, [posts]);
 
   if (isLoading && posts.length === 0) {
     return <WatchGridSkeleton />;
@@ -98,65 +129,59 @@ const WatchGrid: React.FC<WatchGridProps> = ({
 
   return (
     <>
-      <div ref={gridRef} style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-        {posts[0] && (
-          <div style={{ position: 'relative', width: '100%', aspectRatio: '16 / 9', overflow: 'hidden' }}>
-            <WatchTile
-              post={posts[0]}
-              index={0}
-              allPosts={posts}
-              variant="hero"
-              fetchNextPage={fetchNextPage}
-              hasNextPage={hasNextPage}
-              isFetchingNextPage={isFetchingNextPage}
-            />
-          </div>
-        )}
-        <div
-          style={{
-            display: 'grid',
-            gridTemplateColumns: 'repeat(3, 1fr)',
-            gap: 2,
-            gridAutoFlow: 'dense',
-          }}
-        >
-          {posts.slice(1).map((post, i) => {
-            const isFeature = i > 2 && i % 7 === 0;
-            return (
+      <div
+        ref={gridRef}
+        style={{
+          display: 'flex',
+          gap: GAP,
+          alignItems: 'flex-start',
+          paddingInline: 0,
+        }}
+      >
+        {columns.map((col, ci) => (
+          <div
+            key={ci}
+            style={{
+              flex: 1,
+              minWidth: 0,
+              display: 'flex',
+              flexDirection: 'column',
+              gap: GAP,
+            }}
+          >
+            {col.map(({ post, index, ratio }) => (
               <div
                 key={post.id}
-                style={
-                  isFeature
-                    ? { gridColumn: 'span 2', gridRow: 'span 2', position: 'relative', aspectRatio: '1 / 1' }
-                    : { position: 'relative', aspectRatio: '1 / 1' }
-                }
+                style={{
+                  position: 'relative',
+                  width: '100%',
+                  aspectRatio: `${ratio}`,
+                  borderRadius: 10,
+                  overflow: 'hidden',
+                }}
               >
-                <WatchTile
-                  post={post}
-                  index={i + 1}
-                  allPosts={posts}
-                  variant="tile"
-                  feature={isFeature}
-                  fetchNextPage={fetchNextPage}
-                  hasNextPage={hasNextPage}
-                  isFetchingNextPage={isFetchingNextPage}
-                />
+                <WatchTile post={post} index={index} allPosts={posts} />
               </div>
-            );
-          })}
-          <div ref={sentinelRef} style={{ gridColumn: '1 / -1', height: 1 }} />
-        </div>
+            ))}
+          </div>
+        ))}
       </div>
 
+      <div ref={sentinelRef} style={{ height: 1, width: '100%' }} />
+
       {isFetchingNextPage && (
-        <div className="grid grid-cols-3 gap-[2px] mt-[2px]">
-          {[0, 1, 2].map((i) => (
+        <div style={{ display: 'flex', gap: GAP, marginTop: GAP }}>
+          {[0, 1].map((i) => (
             <div
               key={i}
-              className="aspect-square animate-[shimmer_1.5s_infinite]"
               style={{
-                background: 'linear-gradient(90deg, hsl(var(--muted)) 25%, hsl(var(--muted)/0.5) 50%, hsl(var(--muted)) 75%)',
+                flex: 1,
+                aspectRatio: '9 / 16',
+                borderRadius: 10,
+                background:
+                  'linear-gradient(90deg, hsl(var(--muted)) 25%, hsl(var(--muted)/0.5) 50%, hsl(var(--muted)) 75%)',
                 backgroundSize: '200% 100%',
+                animation: 'shimmer 1.5s infinite',
               }}
             />
           ))}
