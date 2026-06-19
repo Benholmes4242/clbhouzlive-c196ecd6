@@ -17,6 +17,7 @@ export interface BusinessMember {
   user_profile_id: string;
   role: BusinessRole;
   created_at: string;
+  is_public: boolean | null;
   user_profile?: {
     id: string;
     display_name: string | null;
@@ -48,6 +49,7 @@ export function useBusinessTeam(businessId?: string) {
           user_profile_id,
           role,
           created_at,
+          is_public,
           user_profile:user_profiles!business_members_user_profile_id_fkey (
             id,
             display_name,
