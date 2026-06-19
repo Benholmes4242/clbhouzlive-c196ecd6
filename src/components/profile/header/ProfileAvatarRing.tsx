@@ -119,8 +119,8 @@ const ProfileAvatarRing: React.FC<ProfileAvatarRingProps> = ({
     />
   ) : (
     <div 
-      className="w-full h-full flex items-center justify-center bg-muted text-muted-foreground font-semibold"
-      style={{ fontSize: `${fallbackFontSize}px` }}
+      className="w-full h-full flex items-center justify-center font-semibold text-white"
+      style={{ fontSize: `${fallbackFontSize}px`, background: getAvatarFallbackColor(displayName) }}
     >
       {initials}
     </div>
