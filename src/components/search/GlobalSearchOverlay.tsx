@@ -225,6 +225,10 @@ function GlobalSearchOverlay({ isOpen, onClose }: GlobalSearchOverlayProps) {
     return () => { document.body.style.overflow = ''; };
   }, [isOpen]);
 
+  // Belt-and-braces: guarantee the body lock releases on unmount, even if a
+  // future caller forgets to flip `isOpen` before unmounting the overlay.
+  useEffect(() => () => { document.body.style.overflow = ''; }, []);
+
   const handleInputChange = useCallback((value: string) => {
     setInputValue(value);
   }, []);
