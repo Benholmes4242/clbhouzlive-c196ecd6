@@ -6,7 +6,7 @@ interface Props {
   onChange: (next: number) => void;
 }
 
-const INK_FAINT = 'rgba(255,255,255,0.30)';
+const INK_FAINT = 'rgba(0,0,0,0.30)';
 
 export const Pager: React.FC<Props> = ({ page, totalPages, onChange }) => {
   const dots = useMemo(() => {
@@ -60,7 +60,7 @@ export const Pager: React.FC<Props> = ({ page, totalPages, onChange }) => {
               width: d.i === page ? 18 : 6,
               height: 6,
               borderRadius: 999,
-              background: d.i === page ? '#FFFFFF' : 'rgba(255,255,255,0.25)',
+              background: d.i === page ? '#F7931E' : 'rgba(0,0,0,0.22)',
               border: 'none',
               padding: 0,
               cursor: d.i === page ? 'default' : 'pointer',
