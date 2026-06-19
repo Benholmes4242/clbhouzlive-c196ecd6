@@ -11,9 +11,6 @@ import ShellSlot from '@/components/header/ShellSlot';
 import { useVideosMood } from '@/components/watch/videos/hooks/useVideosMood';
 import { VideosMoodChips } from '@/components/watch/videos/VideosMoodChips';
 import { VideoOfTheWeekHero } from '@/components/watch/videos/VideoOfTheWeekHero';
-import { VideosContinueWatchingRail } from '@/components/watch/videos/VideosContinueWatchingRail';
-import { VideosCourseAnchoredRail } from '@/components/watch/videos/VideosCourseAnchoredRail';
-import { VideosCategoryRail } from '@/components/watch/videos/VideosCategoryRail';
 import { VideosFollowingRail } from '@/components/watch/videos/VideosFollowingRail';
 import { MoreToWatchDivider } from '@/components/watch/videos/MoreToWatchDivider';
 import { VideosFullFeed } from '@/components/watch/videos/VideosFullFeed';
@@ -69,9 +66,6 @@ export default function VideosSubpage() {
           ) : (
             <>
               <VideoOfTheWeekHero />
-              <VideosContinueWatchingRail userId={userId} />
-              <VideosCourseAnchoredRail userId={userId} />
-              <VideosCategoryRail userId={userId} mood={mood} />
               <VideosFollowingRail userId={userId} />
 
               <MoreToWatchDivider mood={mood} />
