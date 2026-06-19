@@ -410,7 +410,7 @@ export async function fetchFriendCourseBests(
 
 export async function fetchFriendsActivity(
   ownerUserId: string,
-  limit: number = 20,
+  limit: number = 200,
 ): Promise<WhsFriendActivityWithImage[]> {
   const { data: rows, error } = await supabase
     .from('whs_friend_matches' as any)
