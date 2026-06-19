@@ -18,6 +18,11 @@ const FALLBACK_BG =
   'linear-gradient(180deg, var(--hcp-bg-2) 0%, var(--hcp-bg-3) 100%)';
 const SCRIM =
   'linear-gradient(180deg, rgba(0,0,0,0.45) 0%, rgba(0,0,0,0.10) 40%, rgba(0,0,0,0) 100%)';
+const T = {
+  ink: 'var(--hcp-t-100)',
+  ink60: 'var(--hcp-t-60)',
+};
+
 
 const LowestChip: React.FC = () => (
   <div
@@ -130,14 +135,15 @@ export const FriendPostcard: React.FC<Props> = ({ friend, showLowest, onClick })
         width: 168,
         borderRadius: 18,
         overflow: 'hidden',
-        background: '#11161d',
-        border: '0.5px solid rgba(255,255,255,0.07)',
+        background: 'var(--hcp-bg-1)',
+        border: '0.5px solid var(--hcp-line-2)',
         scrollSnapAlign: 'start',
         cursor: 'pointer',
         fontFamily: FONT,
         display: 'flex',
         flexDirection: 'column',
       }}
+
     >
       {/* Photo header */}
       <div
@@ -190,7 +196,7 @@ export const FriendPostcard: React.FC<Props> = ({ friend, showLowest, onClick })
           style={{
             fontSize: 12.5,
             fontWeight: 800,
-            color: '#FFFFFF',
+            color: T.ink,
             whiteSpace: 'nowrap',
             overflow: 'hidden',
             textOverflow: 'ellipsis',
@@ -203,7 +209,7 @@ export const FriendPostcard: React.FC<Props> = ({ friend, showLowest, onClick })
           style={{
             marginTop: 2,
             fontSize: 10,
-            color: 'rgba(255,255,255,0.50)',
+            color: T.ink60,
             whiteSpace: 'nowrap',
             overflow: 'hidden',
             textOverflow: 'ellipsis',
@@ -224,7 +230,7 @@ export const FriendPostcard: React.FC<Props> = ({ friend, showLowest, onClick })
             style={{
               fontSize: 26,
               fontWeight: 800,
-              color: '#FFFFFF',
+              color: T.ink,
               lineHeight: 1,
               letterSpacing: '-0.03em',
               fontVariantNumeric: 'tabular-nums',
@@ -236,7 +242,7 @@ export const FriendPostcard: React.FC<Props> = ({ friend, showLowest, onClick })
             style={{
               fontSize: 9,
               fontWeight: 700,
-              color: 'rgba(255,255,255,0.40)',
+              color: T.ink60,
               letterSpacing: '0.12em',
             }}
           >
