@@ -152,7 +152,7 @@ const FriendsYesterdayCard: React.FC<Props> = ({ data, userId }) => {
           style={{
             fontSize: 11,
             fontWeight: 700,
-            color: 'rgba(248,250,252,0.65)',
+            color: T.ink55,
             letterSpacing: '0.18em',
             textTransform: 'uppercase',
           }}
