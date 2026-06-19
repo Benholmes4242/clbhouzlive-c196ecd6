@@ -212,7 +212,7 @@ export function useSetMemberVisibility(businessId: string) {
 
   return useMutation({
     mutationFn: async ({ memberUserId, isPublic }: { memberUserId: string; isPublic: boolean }) => {
-      const { error } = await supabase.rpc('set_member_public_visibility', {
+      const { error } = await (supabase.rpc as any)('set_member_public_visibility', {
         _business_id: businessId,
         _member_user_id: memberUserId,
         _is_public: isPublic,
