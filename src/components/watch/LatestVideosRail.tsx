@@ -5,13 +5,12 @@ import { useVideosFeed } from '@/components/videos-tab/hooks/useVideosFeed';
 import { VideosFeedSkeleton } from '@/components/videos-tab/VideosFeedSkeleton';
 import WatchSectionHeader from './WatchSectionHeader';
 import AutoplayVideoCard from './videos/AutoplayVideoCard';
-import CarouselRow from './videos/CarouselRow';
+import CompactVideoRow from './videos/CompactVideoRow';
 import { VideosMark } from './proshop/SectionMarks';
 
 /**
  * "Latest videos" — 1 full-width hero (autoplays when in view) +
- * a horizontal peek carousel (active/centred card autoplays).
- * Max 2 concurrent videos (hero + 1 carousel).
+ * a vertical compact list of subsequent videos.
  */
 export default function LatestVideosRail() {
   const navigate = useNavigate();
@@ -52,11 +51,10 @@ export default function LatestVideosRail() {
   }
 
   const hero = posts[0];
-  const carousel = posts.slice(1, 6);
+  const rest = posts.slice(1, 6);
 
   return (
     <div>
-
       <WatchSectionHeader
         paddingTop={34}
         mark={<VideosMark />}
@@ -80,15 +78,20 @@ export default function LatestVideosRail() {
           />
         </div>
 
-        {carousel.length > 0 ? (
-          <CarouselRow
-            items={carousel}
-            allPosts={posts}
-            baseIndex={1}
-            userId={userId}
-          />
-        ) : null}
+        {rest.length > 0 && (
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 12, padding: '4px 16px 0' }}>
+            {rest.map((post, i) => (
+              <CompactVideoRow
+                key={post.id}
+                post={post}
+                index={i + 1}
+                allPosts={posts}
+              />
+            ))}
+          </div>
+        )}
       </div>
     </div>
   );
 }
+
