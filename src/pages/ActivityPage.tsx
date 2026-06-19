@@ -338,7 +338,7 @@ const ActivityPage: React.FC = () => {
                   userId={user?.id}
                   title="Golfers you might know"
                   showViewAll={true}
-                  onViewAll={() => navigate('/golfers')}
+                  onViewAll={() => navigate('/golferstofollow')}
                   containerStyle={{ marginTop: 8 }}
                 />
                 <div className="px-4 pt-2"><ActivityEmptyState tab="all" /></div>

@@ -1466,7 +1466,7 @@ export function ChampionshipLeaderboardView({ className }: ChampionshipLeaderboa
             </p>
             {arenaMode === 'friends' && (
               <button
-                onClick={() => navigate('/golfers-to-follow')}
+                onClick={() => navigate('/golferstofollow')}
                 style={{
                   background: 'none', border: 'none', cursor: 'pointer',
                   fontSize: 12, fontWeight: 800, color: '#9F1D1D',
