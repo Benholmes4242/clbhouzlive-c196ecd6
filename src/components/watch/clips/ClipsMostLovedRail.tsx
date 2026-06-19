@@ -147,9 +147,9 @@ function ClipsMostLovedRailInner({ userId, mood }: ClipsMostLovedRailProps) {
             style={{
               flexShrink: 0,
               position: 'relative',
-              width: 200,
-              aspectRatio: '4/5',
-              borderRadius: 12,
+              width: 128,
+              aspectRatio: '9/16',
+              borderRadius: 14,
               overflow: 'hidden',
               background: 'transparent',
               border: 'none',
@@ -167,61 +167,70 @@ function ClipsMostLovedRailInner({ userId, mood }: ClipsMostLovedRailProps) {
               />
             ) : null}
 
-            {/* Rank ghost number — matches Quick clips (Phase 2) */}
-            <span
-              aria-hidden
-              style={{
-                position: 'absolute',
-                top: 2,
-                left: 10,
-                fontSize: 76,
-                fontWeight: 900,
-                lineHeight: 1,
-                letterSpacing: '-0.04em',
-                color: 'rgba(255,255,255,0.32)',
-                textShadow: '0 2px 12px rgba(0,0,0,0.18)',
-                pointerEvents: 'none',
-                zIndex: 2,
-                userSelect: 'none',
-              }}
-            >
-              {idx + 1}
-            </span>
-
-
+            {/* Top scrim */}
             <div
               aria-hidden
               style={{
                 position: 'absolute',
-                bottom: 0, left: 0, right: 0,
-                height: '50%',
-                background: 'linear-gradient(to top, rgba(0,0,0,0.7) 0%, transparent 100%)',
+                top: 0, left: 0, right: 0,
+                height: '44%',
+                background: 'linear-gradient(to top, transparent 0%, rgba(0,0,0,0.55) 100%)',
                 pointerEvents: 'none',
               }}
             />
 
-
-            {/* Likes — amber heart, bottom-right (mirrors MostLovedRail) */}
+            {/* Likes — top-right */}
             <div
               style={{
                 position: 'absolute',
-                bottom: 10,
-                right: 10,
+                top: 8,
+                right: 8,
                 display: 'flex',
                 alignItems: 'center',
-                gap: 4,
-                fontSize: 11,
-                fontWeight: 600,
-                color: 'rgba(255,255,255,0.95)',
+                gap: 3,
+                fontSize: 10.5,
+                fontWeight: 700,
+                color: '#fff',
                 textShadow: '0 1px 3px rgba(0,0,0,0.6)',
                 pointerEvents: 'none',
               }}
             >
-              <Heart size={13} strokeWidth={1.8} style={{ color: '#F7931E', fill: '#F7931E' }} />
+              <Heart size={12} strokeWidth={0} style={{ color: '#fff', fill: '#fff' }} />
               {row.like_count}
+            </div>
+
+            {/* Creator — bottom-left squircle + name */}
+            <div
+              style={{
+                position: 'absolute',
+                bottom: 8,
+                left: 8,
+                right: 8,
+                display: 'flex',
+                alignItems: 'center',
+                gap: 6,
+                pointerEvents: 'none',
+              }}
+            >
+              <SquircleAvatar size={18} src={row.avatar_url ?? undefined} alt={row.display_name ?? ''} hideRing />
+              <span
+                style={{
+                  fontSize: 10,
+                  fontWeight: 600,
+                  color: '#fff',
+                  whiteSpace: 'nowrap',
+                  overflow: 'hidden',
+                  textOverflow: 'ellipsis',
+                  textShadow: '0 1px 3px rgba(0,0,0,0.6)',
+                  minWidth: 0,
+                }}
+              >
+                {row.display_name ?? row.username ?? ''}
+              </span>
             </div>
           </button>
         ))}
+
       </HRail>
     </section>
   );
