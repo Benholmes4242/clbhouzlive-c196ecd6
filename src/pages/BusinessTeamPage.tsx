@@ -113,6 +113,9 @@ export default function BusinessTeamPage() {
 
   const MemberRow = ({ member, manageable }: { member: BusinessMember; manageable: boolean }) => {
     const profile = member.user_profile;
+    const isSelf = !!currentUserId && member.user_profile_id === currentUserId;
+    const canToggleVisibility = canManage || isSelf;
+    const isPublic = member.is_public === true;
     return (
       <div className="flex items-center gap-3 py-3">
         <SquircleAvatar
@@ -127,6 +130,28 @@ export default function BusinessTeamPage() {
           <p className="text-xs text-muted-foreground truncate">
             {profile?.username ? `@${profile.username}` : BUSINESS_ROLE_LABELS[member.role]}
           </p>
+          {canToggleVisibility && (
+            <div className="flex items-center gap-2 mt-2">
+              <Switch
+                checked={isPublic}
+                disabled={setVisibility.isPending}
+                onCheckedChange={async (next) => {
+                  try {
+                    await setVisibility.mutateAsync({
+                      memberUserId: member.user_profile_id,
+                      isPublic: next,
+                    });
+                  } catch {
+                    // toast handled in hook
+                  }
+                }}
+                aria-label="Show on public profile"
+              />
+              <span className="text-[11px] text-muted-foreground">
+                {isPublic ? 'Shown on public profile' : 'Hidden from public profile'}
+              </span>
+            </div>
+          )}
         </div>
         {manageable && (
           <DropdownMenu>
