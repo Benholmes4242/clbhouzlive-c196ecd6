@@ -13,11 +13,6 @@ import WatchGrid from './WatchGrid';
 
 import { ClipsMoodChips } from './clips/ClipsMoodChips';
 import { useClipsMood, clipsMoodToWatchMood, clipsMoodLabel } from './clips/hooks/useClipsMood';
-import { ClipOfTheWeekHero } from './clips/ClipOfTheWeekHero';
-import { LightningRoundRail } from './clips/LightningRoundRail';
-import { ClipsCourseAnchoredRail } from './clips/ClipsCourseAnchoredRail';
-import { ClipsMostLovedRail } from './clips/ClipsMostLovedRail';
-import { MoreToExploreDivider } from './clips/MoreToExploreDivider';
 
 const CREAM = '#F8FAFC';
 
