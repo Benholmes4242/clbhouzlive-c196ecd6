@@ -1,12 +1,23 @@
 /**
- * BusinessProfilePage - Mirrors PersonalProfile layout exactly
- * Only content substitutions, not layout changes
+ * BusinessProfilePage — Phase 1 rebuild
+ * Immersive header (mirrors personal profile, business-appropriate),
+ * 3 tabs: Posts · About · Team (Team is conditional on ≥1 public member).
  */
 
-import React, { useState, useEffect, useRef } from 'react';
-import ScrollToTopGlass from '@/components/common/ScrollToTopGlass';
-import { cn } from '@/lib/utils';
+import React, { useState, useEffect, useRef, useMemo } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
+import { cn } from '@/lib/utils';
+import {
+  Phone, Globe, MapPin, MoreHorizontal, Check, Loader2, ChevronLeft,
+  Share2, Link2, AlertCircle, Camera, Flag, Pencil, Mail,
+  Instagram, Facebook, Youtube, Linkedin, Twitter, Music2, Flag as FlagIcon,
+} from 'lucide-react';
+import { toast } from 'sonner';
+
+import ScrollToTopGlass from '@/components/common/ScrollToTopGlass';
+import { PageRoot } from '@/components/layout/PageRoot';
+import { useMedianStatusBar } from '@/hooks/useMedianStatusBar';
+import { useHideHeader } from '@/hooks/useHeaderVisibility';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useBusinessProfile } from '@/hooks/useBusinessProfile';
 import { useBusinessMembership } from '@/hooks/useBusinessMembership';
@@ -16,67 +27,80 @@ import { useBusinessFollowingCount } from '@/hooks/useBusinessSocialLists';
 import { useFollowState } from '@/hooks/useFollowState';
 import { useToggleFollow } from '@/hooks/useToggleFollow';
 import { useBusinessImageUpload } from '@/hooks/useBusinessImageUpload';
-import { supabase } from '@/integrations/supabase/client';
-import { 
-  Phone, Globe, MapPin, MoreHorizontal, Check, ExternalLink, Loader2, 
-  ChevronRight, ChevronLeft, Share2, Link2, AlertCircle, ArrowLeft, Camera, Flag, Pencil
-} from 'lucide-react';
-import { PageRoot } from '@/components/layout/PageRoot';
-import { useMedianStatusBar } from '@/hooks/useMedianStatusBar';
-import { useHideHeader } from '@/hooks/useHeaderVisibility';
+import { useBusinessTeam } from '@/hooks/useBusinessTeam';
 
 import { Button } from '@/components/ui/button';
-import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { VerifiedBadge } from '@/components/ui/VerifiedBadge';
-import { BusinessLocationCard } from '@/components/business/BusinessLocationCard';
+import { CoverPhotoFallback } from '@/components/ui/CoverPhotoFallback';
+import { AvatarLightbox } from '@/components/shared/AvatarLightbox';
 import { ImageCropModal } from '@/components/business/ImageCropModal';
-import { trackBusinessProfileVisit, trackBusinessAction } from '@/lib/businessAnalyticsTracking';
-import { getCityOnly, getCityCountry } from '@/lib/locationDisplay';
-import { toast } from 'sonner';
+import { BusinessProfileInfo } from '@/components/business/BusinessProfileInfo';
+import { BusinessTeamTab } from '@/components/business/BusinessTeamTab';
+import { GenericPageSkeleton } from '@/components/skeletons/GenericPageSkeleton';
+
+import PostsTabContent from '@/components/posts-tab/PostsTabContent';
+
 import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
+  DropdownMenu, DropdownMenuContent, DropdownMenuItem,
+  DropdownMenuSeparator, DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
+  AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent,
+  AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
 
-// Tab content components
-import PostsTabContent from '@/components/posts-tab/PostsTabContent';
-import { BusinessProfileInfo } from '@/components/business/BusinessProfileInfo';
+import { trackBusinessProfileVisit, trackBusinessAction } from '@/lib/businessAnalyticsTracking';
 
-import { GenericPageSkeleton } from '@/components/skeletons/GenericPageSkeleton';
-import { AvatarLightbox } from '@/components/shared/AvatarLightbox';
+type BusinessTab = 'posts' | 'about' | 'team';
 
+// Country-first subtitle helper: "England, Surrey" (country, region)
+function buildCategoryLocation(category: string | null, country: string | null, region: string | null, city: string | null): string | null {
+  const parts: string[] = [];
+  if (category) parts.push(category);
+  const locBits: string[] = [];
+  if (country) locBits.push(country);
+  if (region) locBits.push(region);
+  else if (city) locBits.push(city);
+  if (locBits.length) parts.push(locBits.join(', '));
+  return parts.length ? parts.join(' · ') : null;
+}
 
-type BusinessTab = 'content' | 'info';
+// Normalize URL with protocol
+function ensureProtocol(url: string): string {
+  if (!url) return '';
+  return /^https?:\/\//i.test(url) ? url : `https://${url}`;
+}
+
+interface SocialIconConfig {
+  key: string;
+  Icon: React.ElementType;
+  label: string;
+}
+const SOCIAL_CONFIG: SocialIconConfig[] = [
+  { key: 'instagram', Icon: Instagram, label: 'Instagram' },
+  { key: 'twitter',   Icon: Twitter,   label: 'X / Twitter' },
+  { key: 'x',         Icon: Twitter,   label: 'X / Twitter' },
+  { key: 'facebook',  Icon: Facebook,  label: 'Facebook' },
+  { key: 'tiktok',    Icon: Music2,    label: 'TikTok' },
+  { key: 'youtube',   Icon: Youtube,   label: 'YouTube' },
+  { key: 'linkedin',  Icon: Linkedin,  label: 'LinkedIn' },
+];
 
 const BusinessProfilePage: React.FC = () => {
   const navigate = useNavigate();
   const { idOrSlug } = useParams<{ idOrSlug: string }>();
   const { user, loading: authLoading } = useSupabaseSession();
 
-  // Hide global header for full-bleed immersive profile
   useHideHeader();
-  // Safe area bleed: transparent status bar with white icons for hero image
-  useMedianStatusBar("dark", "transparent", true, false);
+  useMedianStatusBar('dark', 'transparent', true, false);
 
   const { data: business, isLoading, error } = useBusinessProfile(idOrSlug);
   const { data: membership } = useBusinessMembership(business?.id);
   const { data: postsCount = 0 } = useBusinessPostsCount(business?.id);
   const { data: followersCount = 0 } = useBusinessFollowersCount(business?.id);
   const { data: followingCount = 0 } = useBusinessFollowingCount(business?.id);
-  // Slice 3: canonical follow state + mutation (5-element key)
+  const { data: teamMembers } = useBusinessTeam(business?.id);
+
   const { isFollowing: cachedFollowing } = useFollowState({
     targetActorType: 'business',
     targetActorId: business?.id,
@@ -85,22 +109,54 @@ const BusinessProfilePage: React.FC = () => {
   });
   const toggleFollow = useToggleFollow();
 
-  // Image upload hooks (P7: owner affordances)
-  const { uploadLogo, removeLogo, uploadCover, removeCover, uploadingLogo, uploadingCover } = useBusinessImageUpload(business?.id);
+  const { uploadLogo, uploadCover, uploadingLogo, uploadingCover } =
+    useBusinessImageUpload(business?.id);
   const logoFileInputRef = useRef<HTMLInputElement>(null);
   const heroFileInputRef = useRef<HTMLInputElement>(null);
   const [cropImageSrc, setCropImageSrc] = useState<string | null>(null);
   const [cropMode, setCropMode] = useState<'logo' | 'cover' | null>(null);
   const [isCropModalOpen, setIsCropModalOpen] = useState(false);
 
-  const [activeTab, setActiveTab] = useState<BusinessTab>('content');
+  const [activeTab, setActiveTab] = useState<BusinessTab>('posts');
   const [bioExpanded, setBioExpanded] = useState(false);
   const [isBioClamped, setIsBioClamped] = useState(false);
   const [isAvatarLightboxOpen, setIsAvatarLightboxOpen] = useState(false);
   const [showReportDialog, setShowReportDialog] = useState(false);
   const bioRef = useRef<HTMLParagraphElement>(null);
 
-  // File selected handlers — open crop modal
+  const isOwner = membership?.canManage;
+  const isFollowing = cachedFollowing ?? false;
+
+  // Conditional Team tab — only when ≥1 public member exists
+  const publicTeamCount = useMemo(
+    () => (teamMembers ?? []).filter(m => m.is_public === true).length,
+    [teamMembers]
+  );
+  const showTeamTab = publicTeamCount > 0;
+
+  // If user lands on `team` but it gets hidden later, fall back to posts
+  useEffect(() => {
+    if (activeTab === 'team' && !showTeamTab) setActiveTab('posts');
+  }, [activeTab, showTeamTab]);
+
+  // Track profile visit
+  useEffect(() => {
+    if (business?.id) trackBusinessProfileVisit(business.id, user?.id, 'direct');
+  }, [business?.id, user?.id]);
+
+  // Clamp detection for bio
+  useEffect(() => {
+    const checkClamped = () => {
+      if (bioRef.current) {
+        setIsBioClamped(bioRef.current.scrollHeight > bioRef.current.clientHeight);
+      }
+    };
+    checkClamped();
+    window.addEventListener('resize', checkClamped);
+    return () => window.removeEventListener('resize', checkClamped);
+  }, [business?.description]);
+
+  // ───── image upload ─────
   const handleLogoFileSelected = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
@@ -109,7 +165,6 @@ const BusinessProfilePage: React.FC = () => {
     setIsCropModalOpen(true);
     if (logoFileInputRef.current) logoFileInputRef.current.value = '';
   };
-
   const handleCoverFileSelected = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
@@ -118,36 +173,22 @@ const BusinessProfilePage: React.FC = () => {
     setIsCropModalOpen(true);
     if (heroFileInputRef.current) heroFileInputRef.current.value = '';
   };
-
   const handleCropComplete = (croppedFile: File) => {
     setIsCropModalOpen(false);
-    if (cropImageSrc) {
-      URL.revokeObjectURL(cropImageSrc);
-      setCropImageSrc(null);
-    }
+    if (cropImageSrc) { URL.revokeObjectURL(cropImageSrc); setCropImageSrc(null); }
     if (cropMode === 'logo') uploadLogo(croppedFile);
     if (cropMode === 'cover') uploadCover(croppedFile);
     setCropMode(null);
   };
-
   const handleCropCancel = (open: boolean) => {
     if (!open) {
-      if (cropImageSrc) {
-        URL.revokeObjectURL(cropImageSrc);
-        setCropImageSrc(null);
-      }
+      if (cropImageSrc) { URL.revokeObjectURL(cropImageSrc); setCropImageSrc(null); }
       setIsCropModalOpen(false);
       setCropMode(null);
     }
   };
 
-  // Check ownership
-  const isOwner = membership?.canManage;
-
-  // Compute follow state (canonical cache; no spinner during mutations)
-  const isFollowing = cachedFollowing ?? false;
-  const followBusy = false;
-
+  // ───── actions ─────
   const handleFollowToggle = () => {
     if (!user?.id || !business?.id) return;
     toggleFollow.mutate({
@@ -160,116 +201,22 @@ const BusinessProfilePage: React.FC = () => {
       isFollowing,
     });
   };
-
-  // Track profile visit
-  useEffect(() => {
-    if (business?.id) {
-      trackBusinessProfileVisit(business.id, user?.id, 'direct');
-    }
-  }, [business?.id, user?.id]);
-
-  // Check if bio text is clamped (overflows 4 lines)
-  useEffect(() => {
-    const checkClamped = () => {
-      if (bioRef.current) {
-        setIsBioClamped(bioRef.current.scrollHeight > bioRef.current.clientHeight);
-      }
-    };
-    checkClamped();
-    window.addEventListener('resize', checkClamped);
-    return () => window.removeEventListener('resize', checkClamped);
-  }, [business?.description]);
-
-  const handleCall = () => {
-    if (business?.phone) {
-      trackBusinessAction(business.id, 'call', user?.id);
-      window.location.href = `tel:${business.phone}`;
-    }
-  };
-
-  const handleWebsite = () => {
-    if (business?.website) {
-      trackBusinessAction(business.id, 'website', user?.id);
-      const url = business.website.startsWith('http') 
-        ? business.website 
-        : `https://${business.website}`;
-      window.open(url, '_blank', 'noopener,noreferrer');
-    }
-  };
-
   const handleShare = async () => {
     const url = window.location.href;
     if (navigator.share) {
-      try {
-        await navigator.share({ title: business?.name, url });
-      } catch {}
+      try { await navigator.share({ title: business?.name, url }); } catch {}
     } else {
       await navigator.clipboard.writeText(url);
       toast.success('Copied to clipboard');
     }
   };
-
   const handleCopyLink = async () => {
     await navigator.clipboard.writeText(window.location.href);
     toast.success('Copied to clipboard');
   };
 
-  // Format URL for display
-  const formatUrlForDisplay = (url: string): string => {
-    if (!url) return '';
-    try {
-      const urlObj = new URL(url.startsWith('http') ? url : `https://${url}`);
-      return urlObj.hostname.replace('www.', '');
-    } catch {
-      return url.replace(/^https?:\/\//, '').replace(/^www\./, '').replace(/\/$/, '');
-    }
-  };
-
-  const ensureProtocol = (url: string): string => {
-    if (!url) return '';
-    return url.startsWith('http') ? url : `https://${url}`;
-  };
-
-  // Bio text
-  const bioText = business?.description || '';
-
-  // Generate initials
-  const initials = business?.name
-    ?.split(' ')
-    .slice(0, 2)
-    .map(word => word[0])
-    .join('')
-    .toUpperCase() || 'B';
-
-  const isGolfClub = business?.category === 'Golf Club';
-  
-  const tabs = [
-    { id: 'content', label: 'Posts' },
-    { id: 'info', label: 'About' },
-  ];
-
-  const getCurrentContent = () => {
-    switch (activeTab) {
-      case 'content':
-        return (
-          <PostsTabContent
-            actorType="business"
-            actorId={business?.id || ''}
-            isOwnProfile={isOwner || false}
-          />
-        );
-      case 'info':
-        return (
-          <BusinessProfileInfo business={business!} canManage={membership?.canManage} />
-        );
-      default:
-        return null;
-    }
-  };
-
-  if (authLoading || isLoading) {
-    return <GenericPageSkeleton />;
-  }
+  // ───── early returns ─────
+  if (authLoading || isLoading) return <GenericPageSkeleton />;
 
   if (error || !business) {
     return (
@@ -287,202 +234,292 @@ const BusinessProfilePage: React.FC = () => {
   }
 
   const heroUrl = business.cover_image_url || '';
+  const bioText = business.description || '';
+  const initials = business.name
+    ?.split(' ').slice(0, 2).map(w => w[0]).join('').toUpperCase() || 'B';
+
+  const subtitleText = buildCategoryLocation(
+    business.category, business.country, business.region, business.city
+  );
+
+  // Build contact/social rows (omit nulls)
+  const socialLinks = (business.social_links || {}) as Record<string, string | null | undefined>;
+  const socialRow = SOCIAL_CONFIG
+    .filter(s => socialLinks[s.key] && socialLinks[s.key]!.trim().length > 0)
+    // Dedup so `twitter` and `x` don't both render
+    .filter((s, i, arr) => arr.findIndex(o => o.Icon === s.Icon) === i);
+
+  const hasAnyContact =
+    !!business.website || !!business.phone || !!business.email || socialRow.length > 0;
+
+  const tabs: Array<{ id: BusinessTab; label: string }> = [
+    { id: 'posts', label: 'Posts' },
+    { id: 'about', label: 'About' },
+    ...(showTeamTab ? [{ id: 'team' as const, label: 'Team' }] : []),
+  ];
+
+  const renderTab = () => {
+    switch (activeTab) {
+      case 'posts':
+        return (
+          <PostsTabContent
+            actorType="business"
+            actorId={business.id}
+            isOwnProfile={isOwner || false}
+          />
+        );
+      case 'about':
+        return <BusinessProfileInfo business={business} canManage={isOwner} />;
+      case 'team':
+        return <BusinessTeamTab businessId={business.id} />;
+      default:
+        return null;
+    }
+  };
 
   return (
     <PageRoot className="min-h-screen" style={{ background: 'var(--bg-page)' }} immersiveStatusBar immersive>
-      {/* Hero Section - full-bleed immersive, extends behind notch */}
+      {/* ───── Hero (full-bleed) ───── */}
       <div className="relative pointer-events-none" style={{ zIndex: 1 }}>
-        {/* Hero Image Container - full-bleed behind notch */}
         <div className="relative w-full overflow-hidden" style={{ height: '35dvh' }}>
           {heroUrl ? (
-            <img 
-              src={heroUrl} 
-              alt="Business cover" 
-              className="w-full h-full object-cover object-center"
-            />
+            <img src={heroUrl} alt="Business cover" className="w-full h-full object-cover object-center" />
           ) : (
-            <div className="w-full h-full" style={{ background: '#1a2040' }} />
+            <CoverPhotoFallback className="w-full h-full" />
           )}
 
-          {/* P7: Cover photo edit button for owners */}
           {isOwner && (
             <button
               onClick={() => heroFileInputRef.current?.click()}
               className="absolute bottom-3 right-3 h-11 w-11 flex items-center justify-center rounded-full active:scale-[0.97] transition-transform z-10 pointer-events-auto"
               style={{
-                background: 'rgba(0, 0, 0, 0.45)',
+                background: 'rgba(0,0,0,0.45)',
                 backdropFilter: 'blur(24px) saturate(180%)',
                 WebkitBackdropFilter: 'blur(24px) saturate(180%)',
-                border: '1px solid rgba(255, 255, 255, 0.1)',
-                boxShadow: '0 8px 32px rgba(0, 0, 0, 0.35)',
+                border: '1px solid rgba(255,255,255,0.1)',
+                boxShadow: '0 8px 32px rgba(0,0,0,0.35)',
               }}
+              aria-label="Change cover photo"
             >
-              {uploadingCover ? (
-                <Loader2 className="w-4 h-4 text-white animate-spin" />
-              ) : (
-                <Camera className="w-4 h-4 text-white" />
-              )}
+              {uploadingCover ? <Loader2 className="w-4 h-4 text-white animate-spin" /> : <Camera className="w-4 h-4 text-white" />}
             </button>
           )}
         </div>
 
-        {/* Back button — matches course detail hero style */}
+        {/* Back button */}
         <button
           type="button"
           onClick={() => navigate(-1)}
           className="absolute left-4 flex h-[34px] w-[34px] items-center justify-center active:scale-95 transition-all z-10 pointer-events-auto"
           style={{
             top: 'calc(max(var(--sat, env(safe-area-inset-top, 0px)), 47px) + 12px)',
-            borderRadius: '12px',
-            background: 'rgba(0, 0, 0, 0.28)',
+            borderRadius: 12,
+            background: 'rgba(0,0,0,0.28)',
             backdropFilter: 'blur(22px) saturate(180%)',
             WebkitBackdropFilter: 'blur(22px) saturate(180%)',
-            border: '1px solid rgba(255, 255, 255, 0.12)',
-            boxShadow: '0 2px 8px rgba(0, 0, 0, 0.25)',
+            border: '1px solid rgba(255,255,255,0.12)',
+            boxShadow: '0 2px 8px rgba(0,0,0,0.25)',
           }}
           aria-label="Back"
         >
           <ChevronLeft className="h-[18px] w-[18px] text-white" strokeWidth={2.5} />
         </button>
 
-        {/* Avatar - unified button, left-aligned */}
+        {/* Avatar (squircle) — owner: tap to upload; visitor: tap to lightbox */}
         <div className="absolute left-5 z-20 pointer-events-auto" style={{ bottom: '-62px' }}>
           <button
             className="relative w-[124px] h-[124px] block cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-[#F7931E] focus-visible:ring-offset-2 rounded-[34%] transition-transform hover:scale-[1.02] active:scale-[0.98]"
             onClick={() => {
-              if (isOwner) {
-                logoFileInputRef.current?.click();
-              } else {
-                if (uploadingLogo) return;
-                setIsAvatarLightboxOpen(true);
-              }
+              if (isOwner) logoFileInputRef.current?.click();
+              else if (!uploadingLogo) setIsAvatarLightboxOpen(true);
             }}
-            aria-label={isOwner ? "Change business logo" : "View business logo"}
+            aria-label={isOwner ? 'Change business logo' : 'View business logo'}
           >
-            {/* 2px background ring */}
             <div className="clbhouz-squircle absolute inset-0 bg-background" />
-
-            {/* Logo image */}
             <div
               className="clbhouz-squircle absolute overflow-hidden"
-              style={{
-                inset: '2px',
-                boxShadow: '0 12px 30px rgba(15,15,15,0.22)',
-              }}
+              style={{ inset: 2, boxShadow: '0 12px 30px rgba(15,15,15,0.22)' }}
             >
               {business.logo_url ? (
-                <img
-                  src={business.logo_url}
-                  alt={business.name}
-                  className="w-full h-full object-cover"
-                />
+                <img src={business.logo_url} alt={business.name} className="w-full h-full object-cover" />
               ) : (
-                <div className="w-full h-full flex items-center justify-center text-3xl font-bold text-muted-foreground" style={{ background: 'rgba(15,23,42,0.06)' }}>
+                <div
+                  className="w-full h-full flex items-center justify-center text-3xl font-bold text-muted-foreground"
+                  style={{ background: 'rgba(15,23,42,0.06)' }}
+                >
                   {initials}
                 </div>
               )}
             </div>
-
-            {/* Camera badge — owner only, visual hint */}
-            {isOwner && !uploadingLogo && (
+            {isOwner && (
               <div
                 className="absolute bottom-0 right-0 w-7 h-7 rounded-full flex items-center justify-center z-10"
-                style={{
-                  background: 'rgba(0,0,0,0.55)',
-                  backdropFilter: 'blur(8px)',
-                  WebkitBackdropFilter: 'blur(8px)',
-                  border: '2px solid white',
-                }}
+                style={{ background: 'rgba(0,0,0,0.55)', backdropFilter: 'blur(8px)', WebkitBackdropFilter: 'blur(8px)', border: '2px solid white' }}
               >
-                <Camera className="w-3.5 h-3.5 text-white" />
-              </div>
-            )}
-
-            {/* Spinner — during upload */}
-            {isOwner && uploadingLogo && (
-              <div
-                className="absolute bottom-0 right-0 w-7 h-7 rounded-full flex items-center justify-center z-10"
-                style={{ background: 'rgba(0,0,0,0.55)', border: '2px solid white' }}
-              >
-                <div className="w-3 h-3 border-2 border-white/40 border-t-white rounded-full animate-spin" />
+                {uploadingLogo ? (
+                  <div className="w-3 h-3 border-2 border-white/40 border-t-white rounded-full animate-spin" />
+                ) : (
+                  <Camera className="w-3.5 h-3.5 text-white" />
+                )}
               </div>
             )}
           </button>
         </div>
 
-        {/* Pills row - right side, just below header photo */}
-        <div className="absolute right-5 z-20 flex items-center gap-2 pointer-events-auto" style={{ top: 'calc(35dvh + 12px)' }}>
-          {/* Location pill - city only */}
-          {(() => {
-            const cityDisplay = getCityOnly({ city: business.city, region: business.region, country: business.country, location: business.location });
-            return cityDisplay ? (
-              <span 
-                className="px-4 py-1.5 text-sm font-semibold rounded-full text-foreground flex items-center gap-1.5"
-                style={{ background: '#ffffff', border: '1px solid rgba(15,23,42,0.07)' }}
-              >
-                <MapPin className="w-3.5 h-3.5" />
-                {cityDisplay}
-              </span>
-            ) : null;
-          })()}
-          
-          {/* Verified pill - only shows if verified */}
-          {business.is_verified && (
-            <span 
-              className="px-4 py-1.5 text-sm font-semibold rounded-full flex items-center gap-1.5"
-              style={{ 
-                color: '#F7931E',
-                background: 'rgba(247, 147, 30, 0.12)',
-                backdropFilter: 'blur(8px)',
-                WebkitBackdropFilter: 'blur(8px)',
-                border: '1px solid rgba(247, 147, 30, 0.30)'
-              }}
+        {/* City pill (right of hero) */}
+        {business.city && (
+          <div className="absolute right-5 z-20 pointer-events-auto" style={{ top: 'calc(35dvh + 12px)' }}>
+            <span
+              className="px-4 py-1.5 text-sm font-semibold rounded-full text-foreground flex items-center gap-1.5"
+              style={{ background: '#ffffff', border: '1px solid rgba(15,23,42,0.07)' }}
             >
-              <VerifiedBadge size="sm" />
-              Verified
+              <MapPin className="w-3.5 h-3.5" />
+              {business.city}
             </span>
-          )}
-        </div>
+          </div>
+        )}
       </div>
 
-      {/* Identity Stack */}
+      {/* ───── Identity ───── */}
       <div className="pt-[68px] px-5 text-left relative z-10 pointer-events-auto">
-        {/* Name + Verified */}
-        <div className="flex items-center gap-1.5">
+        <div className="flex items-center gap-1.5 flex-wrap">
           <h1 className="text-[28px] text-foreground" style={{ fontWeight: 900, letterSpacing: '-0.03em' }}>
             {business.name}
           </h1>
           {business.is_verified && <VerifiedBadge size="lg" />}
         </div>
-        
-        {/* P6: Location below name REMOVED — kept in pill and map only */}
+
+        {subtitleText && (
+          <p className="mt-1 text-sm text-muted-foreground">{subtitleText}</p>
+        )}
+
+        {/* Bio (expandable) */}
+        {bioText && (
+          <div className="mt-3">
+            <p
+              ref={bioRef}
+              className={cn(
+                'text-[15px] text-foreground leading-relaxed whitespace-pre-wrap',
+                !bioExpanded && 'line-clamp-3'
+              )}
+              style={{ overflowWrap: 'anywhere' }}
+            >
+              {bioText}
+            </p>
+            {(isBioClamped || bioExpanded) && (
+              <button
+                onClick={() => setBioExpanded(v => !v)}
+                className="text-[0.8125rem] font-semibold mt-1 min-h-[36px] flex items-center gap-0.5 active:scale-[0.97] transition-transform"
+                style={{ color: '#F7931E' }}
+              >
+                {bioExpanded ? 'Show less' : 'Show more'}
+              </button>
+            )}
+          </div>
+        )}
+
+        {/* Manages [course] chip */}
+        {business.club_id && business.club_name && (
+          <button
+            type="button"
+            onClick={() => navigate(`/courses/${business.club_id}`)}
+            className="mt-3 inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-semibold active:scale-[0.97] transition-transform"
+            style={{
+              color: '#F7931E',
+              background: 'rgba(247,147,30,0.10)',
+              border: '1px solid rgba(247,147,30,0.20)',
+            }}
+          >
+            <FlagIcon className="w-3 h-3" />
+            Manages {business.club_name}
+          </button>
+        )}
+
+        {/* Contact / social row */}
+        {hasAnyContact && (
+          <div className="mt-3 flex items-center gap-2 flex-wrap">
+            {business.website && (
+              <a
+                href={ensureProtocol(business.website)}
+                target="_blank"
+                rel="noopener noreferrer"
+                onClick={() => trackBusinessAction(business.id, 'website', user?.id)}
+                aria-label="Website"
+                className="h-10 w-10 inline-flex items-center justify-center rounded-full active:scale-[0.97] transition-transform"
+                style={{ background: 'rgba(15,23,42,0.05)', border: '1px solid rgba(15,23,42,0.07)' }}
+              >
+                <Globe className="w-4 h-4 text-foreground" />
+              </a>
+            )}
+            {business.phone && (
+              <a
+                href={`tel:${business.phone}`}
+                onClick={() => trackBusinessAction(business.id, 'call', user?.id)}
+                aria-label="Call"
+                className="h-10 w-10 inline-flex items-center justify-center rounded-full active:scale-[0.97] transition-transform"
+                style={{ background: 'rgba(15,23,42,0.05)', border: '1px solid rgba(15,23,42,0.07)' }}
+              >
+                <Phone className="w-4 h-4 text-foreground" />
+              </a>
+            )}
+            {business.email && (
+              <a
+                href={`mailto:${business.email}`}
+                aria-label="Email"
+                className="h-10 w-10 inline-flex items-center justify-center rounded-full active:scale-[0.97] transition-transform"
+                style={{ background: 'rgba(15,23,42,0.05)', border: '1px solid rgba(15,23,42,0.07)' }}
+              >
+                <Mail className="w-4 h-4 text-foreground" />
+              </a>
+            )}
+            {socialRow.map(({ key, Icon, label }) => (
+              <a
+                key={key}
+                href={ensureProtocol(socialLinks[key] as string)}
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label={label}
+                className="h-10 w-10 inline-flex items-center justify-center rounded-full active:scale-[0.97] transition-transform"
+                style={{ background: 'rgba(15,23,42,0.05)', border: '1px solid rgba(15,23,42,0.07)' }}
+              >
+                <Icon className="w-4 h-4 text-foreground" />
+              </a>
+            ))}
+          </div>
+        )}
       </div>
 
-      {/* Action Buttons */}
+      {/* ───── Primary actions ───── */}
       <div className="mt-4 px-5 flex items-center gap-2 relative z-10 pointer-events-auto">
-        {/* P1+P3: Follow button — h-11, matching personal profile gradient variant */}
-        <button 
-          className="h-11 flex-1 rounded-full text-sm font-semibold flex items-center justify-center gap-1.5 transition-transform active:scale-[0.98] disabled:opacity-60"
-          style={{ background: '#ffffff', border: '1px solid rgba(15,23,42,0.07)', color: '#0F172A' }}
-          onClick={handleFollowToggle}
-          disabled={followBusy}
-        >
-          {isFollowing ? (
-            <>
-              <Check className="w-3.5 h-3.5" />
-              Following
-            </>
-          ) : (
-            'Follow'
-          )}
-        </button>
-        
-        {/* P0: Three-dot menu — renders for ALL users with role-based menu */}
+        {isOwner ? (
+          <button
+            className="h-11 flex-1 rounded-full text-sm font-semibold flex items-center justify-center gap-1.5 transition-transform active:scale-[0.98]"
+            style={{ background: '#0F172A', color: '#ffffff' }}
+            onClick={() => navigate(`/business/${business.id}/edit`)}
+          >
+            <Pencil className="w-3.5 h-3.5" />
+            Edit profile
+          </button>
+        ) : (
+          <button
+            className="h-11 flex-1 rounded-full text-sm font-semibold flex items-center justify-center gap-1.5 transition-transform active:scale-[0.98]"
+            style={
+              isFollowing
+                ? { background: '#ffffff', border: '1px solid rgba(15,23,42,0.07)', color: '#0F172A' }
+                : { background: '#0F172A', color: '#ffffff' }
+            }
+            onClick={handleFollowToggle}
+          >
+            {isFollowing ? (<><Check className="w-3.5 h-3.5" />Following</>) : 'Follow'}
+          </button>
+        )}
+
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <button 
+            <button
               className="min-h-[44px] min-w-[44px] flex-shrink-0 rounded-full flex items-center justify-center active:scale-[0.97] transition-transform"
               style={{ background: 'rgba(15,23,42,0.05)', border: '1px solid rgba(15,23,42,0.07)' }}
+              aria-label="More options"
             >
               <MoreHorizontal className="w-5 h-5 text-foreground" />
             </button>
@@ -515,10 +552,7 @@ const BusinessProfilePage: React.FC = () => {
                   Copy link
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
-                <DropdownMenuItem 
-                  onClick={() => setShowReportDialog(true)}
-                  className="text-destructive"
-                >
+                <DropdownMenuItem onClick={() => setShowReportDialog(true)} className="text-destructive">
                   <Flag className="h-4 w-4 mr-2" />
                   Report
                 </DropdownMenuItem>
@@ -528,22 +562,18 @@ const BusinessProfilePage: React.FC = () => {
         </DropdownMenu>
       </div>
 
-      {/* Stats row — tappable */}
-      <div className="mt-6 px-5 mb-6">
+      {/* ───── Stats row ───── */}
+      <div className="mt-6 px-5 mb-4">
         <div className="flex items-center">
-          {/* Posts — taps scroll to Activity tab */}
           <button
             type="button"
-            onClick={() => setActiveTab('content')}
+            onClick={() => setActiveTab('posts')}
             className="flex items-center gap-1.5 min-h-[44px] cursor-pointer active:opacity-70 transition-opacity pr-6"
           >
             <span className="text-sm text-muted-foreground">Posts</span>
             <span className="text-base font-semibold text-foreground">{postsCount}</span>
           </button>
-
           <div className="w-px h-6 self-center" style={{ background: 'rgba(15,23,42,0.08)' }} />
-          
-          {/* Followers — taps navigate to business followers list */}
           <button
             type="button"
             onClick={() => navigate(`/business/${business.slug || business.id}/followers`)}
@@ -552,10 +582,7 @@ const BusinessProfilePage: React.FC = () => {
             <span className="text-sm text-muted-foreground">Followers</span>
             <span className="text-base font-semibold text-foreground">{followersCount}</span>
           </button>
-
           <div className="w-px h-6 self-center" style={{ background: 'rgba(15,23,42,0.08)' }} />
-
-          {/* Following — opens combined list defaulting to Following tab */}
           <button
             type="button"
             onClick={() => navigate(`/business/${business.slug || business.id}/followers?tab=following`)}
@@ -567,142 +594,71 @@ const BusinessProfilePage: React.FC = () => {
         </div>
       </div>
 
-      {/* White content sheet */}
-      <div className="pb-2 min-h-[60vh]">
-        {/* About section */}
-        <section className="px-5 mb-6">
-          <div className="mb-2">
-            <h3 className="text-[17px] text-foreground" style={{ fontWeight: 900 }}>About</h3>
-          </div>
-          {bioText ? (
-            <div>
-              <p 
-                ref={bioRef}
-                className={cn(
-                  "text-base text-foreground leading-relaxed whitespace-pre-wrap",
-                  !bioExpanded && "line-clamp-4"
-                )}
-                style={{ overflowWrap: 'anywhere' }}
+      {/* ───── Tabs ───── */}
+      <section className="px-4 bg-background" style={{ borderBottom: '1px solid hsl(var(--border))' }}>
+        <div style={{ display: 'flex', gap: 20, justifyContent: 'center' }}>
+          {tabs.map(tab => {
+            const isActive = activeTab === tab.id;
+            return (
+              <button
+                key={tab.id}
+                role="tab"
+                aria-selected={isActive}
+                onClick={() => setActiveTab(tab.id)}
+                style={{
+                  background: 'none',
+                  border: 'none',
+                  cursor: 'pointer',
+                  padding: '11px 2px 9px',
+                  fontSize: 16,
+                  fontWeight: isActive ? 700 : 500,
+                  color: isActive ? 'hsl(var(--foreground))' : 'hsl(var(--muted-foreground))',
+                  letterSpacing: isActive ? '-0.025em' : '0',
+                  position: 'relative',
+                  minHeight: 44,
+                  display: 'flex',
+                  alignItems: 'center',
+                  transition: 'color 0.18s',
+                }}
               >
-                {bioText}
-              </p>
-              {(isBioClamped || bioExpanded) && (
-                 <button
-                   onClick={() => setBioExpanded(!bioExpanded)}
-                   className="text-[0.8125rem] font-semibold mt-1 min-h-[44px] flex items-center gap-0.5 active:scale-[0.97] transition-transform"
-                   style={{ color: '#F7931E' }}
-                 >
-                  {bioExpanded ? 'Show less' : 'Show more'}
-                </button>
-              )}
-            </div>
-          ) : (
-            <p className="text-base text-muted-foreground italic">No description provided</p>
-          )}
-        </section>
-
-        {/* Business-specific section: Website, Call, Location */}
-        <section className="px-5 mb-6">
-          {/* Website pill */}
-          {business.website && (
-            <a
-              href={ensureProtocol(business.website)}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center gap-1.5 rounded-full px-3 min-h-[44px] text-sm font-semibold text-foreground active:scale-[0.98] transition-transform mr-2 mb-2"
-              style={{ background: 'rgba(15,23,42,0.05)', border: '1px solid rgba(15,23,42,0.07)' }}
-              onClick={() => trackBusinessAction(business.id, 'website', user?.id)}
-            >
-              <ExternalLink className="w-3.5 h-3.5" />
-              {formatUrlForDisplay(business.website)}
-            </a>
-          )}
-          
-          {/* Call pill */}
-          {business.phone && (
-            <button
-              onClick={handleCall}
-              className="inline-flex items-center gap-1.5 rounded-full px-3 min-h-[44px] text-sm font-semibold text-foreground active:scale-[0.98] transition-transform mr-2 mb-2"
-              style={{ background: 'rgba(15,23,42,0.05)', border: '1px solid rgba(15,23,42,0.07)' }}
-            >
-              <Phone className="w-3.5 h-3.5" />
-              Call
-            </button>
-          )}
-          
-          {/* Location Card - shows when location exists OR for linked golf clubs */}
-          {(business.location || business.club_id) && (
-            <BusinessLocationCard
-              location={business.location || ''}
-              lat={business.lat}
-              lng={business.lng}
-              businessName={business.name}
-              city={business.city}
-              country={business.country}
-              region={business.region}
-              isOwner={isOwner}
-              isLinkedClub={!!business.club_id}
-            />
-          )}
-        </section>
-
-
-        {/* Segmented control tabs */}
-        <section className="px-4 py-2 pointer-events-auto">
-          <div className="flex items-center justify-center gap-1 w-full">
-            {tabs.map((tab) => {
-              const isActive = activeTab === tab.id;
-              return (
-                <button
-                  key={tab.id}
-                  onClick={() => setActiveTab(tab.id as BusinessTab)}
-                  className={cn(
-                    "relative flex-1 min-h-[44px] transition-colors duration-200 whitespace-nowrap active:scale-[0.98] px-4 py-1.5 text-sm",
-                    isActive
-                      ? "font-extrabold"
-                      : "font-medium hover:text-foreground"
-                  )}
-                  style={{
-                    background: 'transparent',
-                    border: 'none',
-                    color: isActive ? '#0F172A' : '#94A3B8',
-                    letterSpacing: isActive ? '-0.01em' : 0,
-                  }}
-                >
-                  {tab.label}
-                </button>
-              );
-            })}
-          </div>
-        </section>
-
-        {/* Tab Content */}
-        <div className="pt-4 px-5">
-          {getCurrentContent()}
+                {tab.label}
+                {isActive && (
+                  <div style={{
+                    position: 'absolute', bottom: 0, left: 0, right: 0, height: 2.5,
+                    borderRadius: 2, background: 'linear-gradient(90deg, #F59E0B, #F7931E)',
+                  }} />
+                )}
+              </button>
+            );
+          })}
         </div>
+      </section>
+
+      {/* ───── Tab content ───── */}
+      <div className="pt-3 px-5 min-h-[60vh]">
+        {renderTab()}
       </div>
 
-      {/* Bottom Navigation Spacer */}
-      <div style={{ height: 'max(env(safe-area-inset-bottom, 0px), 20px)', paddingBottom: '80px' }} />
+      {/* Bottom spacer */}
+      <div style={{ height: 'max(env(safe-area-inset-bottom, 0px), 20px)', paddingBottom: 80 }} />
 
-      {/* Scroll to top FAB */}
       <ScrollToTopGlass />
 
-      {/* Avatar Lightbox */}
+      {/* Avatar lightbox */}
       <AvatarLightbox
         isOpen={isAvatarLightboxOpen}
         onClose={() => setIsAvatarLightboxOpen(false)}
-        imageUrl={business?.logo_url || ''}
-        altText={`${business?.name} logo`}
+        imageUrl={business.logo_url || ''}
+        altText={`${business.name} logo`}
         shape="squircle"
         fallbackInitial={initials}
       />
 
-      {/* Report Dialog */}
+      {/* Report dialog */}
       <AlertDialog open={showReportDialog} onOpenChange={setShowReportDialog}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Report {business?.name}?</AlertDialogTitle>
+            <AlertDialogTitle>Report {business.name}?</AlertDialogTitle>
             <AlertDialogDescription>
               We'll review this profile and take action if it violates our Community Guidelines.
             </AlertDialogDescription>
@@ -723,7 +679,7 @@ const BusinessProfilePage: React.FC = () => {
       <input ref={logoFileInputRef} type="file" accept="image/*" onChange={handleLogoFileSelected} className="hidden" />
       <input ref={heroFileInputRef} type="file" accept="image/*" onChange={handleCoverFileSelected} className="hidden" />
 
-      {/* Crop Modal */}
+      {/* Crop modal */}
       {isCropModalOpen && cropImageSrc && (
         <ImageCropModal
           open={isCropModalOpen}
@@ -734,7 +690,6 @@ const BusinessProfilePage: React.FC = () => {
           title={cropMode === 'cover' ? 'Crop Cover Photo' : 'Crop Logo'}
         />
       )}
-      <ScrollToTopGlass />
     </PageRoot>
   );
 };
