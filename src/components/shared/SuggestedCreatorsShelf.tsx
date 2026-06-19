@@ -1,7 +1,10 @@
 import React from 'react';
+import { ChevronRight } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useSuggestedCreators } from '@/components/watch/hooks/useSuggestedCreators';
 import { SuggestedCreatorCard, SuggestedCreatorCardShimmer } from './SuggestedCreatorCard';
+
+const INK = '#0F172A';
 
 interface SuggestedCreatorsShelfProps {
   userId: string | undefined;
