@@ -64,7 +64,7 @@ export const RecentlyPlayedFeed: React.FC<Props> = ({ ownerUserId }) => {
   // Each item must satisfy { id: string } for Paged8
   const items = (data ?? []).map((d) => ({
     ...d,
-    id: d.friend_row_id,
+    id: d.last_round_score_id ?? `${d.friend_passport_id}-${d.last_round_played_at}`,
   }));
 
   return (
