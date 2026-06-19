@@ -307,7 +307,7 @@ const CardFeedSkeleton: React.FC<{
   isStatic?: boolean;
   variant?: 'regular' | 'review';
 }> = ({ isStatic = false, variant = 'regular' }) => {
-  const topPad = 'calc(max(env(safe-area-inset-top, 0px), 47px) + 72px + 12px)';
+  const topPad = 'calc(env(safe-area-inset-top, 0px) + 59px)';
   return (
     <div
       style={{
