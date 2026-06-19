@@ -71,7 +71,6 @@ export default function VideosSubpage() {
               <MoreToWatchDivider mood={mood} />
               <VideosFullFeed userId={userId} mood={mood} />
             </>
-            </>
           )}
         </div>
 
