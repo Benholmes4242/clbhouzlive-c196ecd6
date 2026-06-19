@@ -348,6 +348,11 @@ export const FriendRoundCardV2: React.FC<Props> = ({
                   }}
                 >
                   {`${diff > 0 ? '+' : ''}${diff.toFixed(1)}`}
+                  {diff < 0 && (
+                    <span style={{ marginLeft: 4, fontSize: 12 }} aria-label="sub-par round">
+                      🔥
+                    </span>
+                  )}
                 </span>
               </div>
             )}
