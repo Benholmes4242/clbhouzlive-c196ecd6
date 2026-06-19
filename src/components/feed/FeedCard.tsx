@@ -16,7 +16,7 @@
  * whole feed; tapping any media opens the immersive `FullscreenFeedOverlay`.
  */
 import React, { useMemo } from 'react';
-import { Heart, MessageCircle, Share } from 'lucide-react';
+import { Heart, MapPin, MessageCircle, Share } from 'lucide-react';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { getRatingTier, getRatingTierLabel } from '@/lib/ratingTier';
 import type { FeedPost } from '@/components/media-system/types/media';
@@ -154,7 +154,7 @@ const FeedCardImpl: React.FC<FeedCardProps> = ({
           onClick={() => onProfile(post)}
           style={{ background: 'transparent', border: 'none', padding: 0, cursor: 'pointer' }}
         >
-          <SquircleAvatar src={post.avatarUrl} alt={post.displayName} size={34} hideRing />
+          <SquircleAvatar src={post.avatarUrl} alt={post.displayName} size={34} hairlineRing />
         </button>
         <div style={{ minWidth: 0, flex: 1 }}>
           <button
@@ -178,7 +178,7 @@ const FeedCardImpl: React.FC<FeedCardProps> = ({
           >
             {post.displayName}
           </button>
-          <div style={{ fontSize: 11, color: T40, marginTop: 1 }}>{subLine}</div>
+          <div style={{ fontSize: 11, color: T60, marginTop: 1 }}>{subLine}</div>
         </div>
 
         {/* Right chips */}
