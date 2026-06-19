@@ -18,6 +18,11 @@ const FALLBACK_BG =
   'linear-gradient(180deg, var(--hcp-bg-2) 0%, var(--hcp-bg-3) 100%)';
 const SCRIM =
   'linear-gradient(180deg, rgba(0,0,0,0.45) 0%, rgba(0,0,0,0.10) 40%, rgba(0,0,0,0) 100%)';
+const T = {
+  ink: 'var(--hcp-t-100)',
+  ink60: 'var(--hcp-t-60)',
+};
+
 
 const LowestChip: React.FC = () => (
   <div
