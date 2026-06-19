@@ -225,6 +225,10 @@ function GlobalSearchOverlay({ isOpen, onClose }: GlobalSearchOverlayProps) {
     return () => { document.body.style.overflow = ''; };
   }, [isOpen]);
 
+  // Belt-and-braces: guarantee the body lock releases on unmount, even if a
+  // future caller forgets to flip `isOpen` before unmounting the overlay.
+  useEffect(() => () => { document.body.style.overflow = ''; }, []);
+
   const handleInputChange = useCallback((value: string) => {
     setInputValue(value);
   }, []);
@@ -304,7 +308,7 @@ function GlobalSearchOverlay({ isOpen, onClose }: GlobalSearchOverlayProps) {
           <div
             className="w-full md:max-w-[560px] flex items-center gap-3 px-4 pb-3"
             style={{
-              paddingTop: 'max(env(safe-area-inset-top, 0px), 47px)',
+              paddingTop: 'max(var(--safe-top, env(safe-area-inset-top, 0px)), 8px)',
               borderBottom: '1px solid rgba(0,0,0,0.06)',
             }}
           >

@@ -8,8 +8,8 @@
  * Author identity has moved into BreathingRoomBottomBar.
  */
 
-import React, { useState, useRef } from 'react';
-import { useNavigate } from 'react-router-dom';
+import React, { useState, useRef, useEffect } from 'react';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { Search } from 'lucide-react';
 import { PostingAsPill } from '@/components/header/PostingAsPill';
 import { PostingAsMenu } from '@/components/header/PostingAsMenu';
@@ -65,10 +65,20 @@ export const ClubhouseTopBar: React.FC<ClubhouseTopBarProps> = ({
   hideProfilePill = false,
 }) => {
   const navigate = useNavigate();
+  const { pathname } = useLocation();
   const [searchOpen, setSearchOpen] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const pillRef = useRef<HTMLButtonElement>(null);
   const { hasUnread, unreadCount } = useUnreadNotifications();
+
+  // Close transient overlays on route change — ClubhouseTopBar lives in a
+  // keep-alive portal and never unmounts, so without this `searchOpen` /
+  // `menuOpen` persist across bottom-nav navigation (and the search overlay's
+  // body-scroll-lock cleanup never runs).
+  useEffect(() => {
+    setSearchOpen(false);
+    setMenuOpen(false);
+  }, [pathname]);
 
   const showCluster = !hideTabs || !hideSearch || (!hideProfilePill && !!user);
 
