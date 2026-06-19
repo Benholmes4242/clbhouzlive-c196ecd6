@@ -55,7 +55,7 @@ export const ClubhouseTabToggle = ({
               padding: '10px 4px 4px',
               fontSize: 'clamp(14px, 4vw, 17px)',
               fontWeight: isActive ? 700 : 500,
-              color: isActive ? '#0F172A' : '#94A3B8',
+              color: isActive ? '#0F172A' : '#64748B',
               letterSpacing: '-0.01em',
               position: 'relative' as const,
               minHeight: 44,
