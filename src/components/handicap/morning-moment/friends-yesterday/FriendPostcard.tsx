@@ -135,14 +135,15 @@ export const FriendPostcard: React.FC<Props> = ({ friend, showLowest, onClick })
         width: 168,
         borderRadius: 18,
         overflow: 'hidden',
-        background: '#11161d',
-        border: '0.5px solid rgba(255,255,255,0.07)',
+        background: 'var(--hcp-bg-1)',
+        border: '0.5px solid var(--hcp-line-2)',
         scrollSnapAlign: 'start',
         cursor: 'pointer',
         fontFamily: FONT,
         display: 'flex',
         flexDirection: 'column',
       }}
+
     >
       {/* Photo header */}
       <div
