@@ -68,6 +68,9 @@ export default function BusinessTeamPage() {
   const removeMember = useRemoveMember(businessId || '');
   const updateRole = useUpdateMemberRole(businessId || '');
   const revokeInvite = useRevokeInvite(businessId || '');
+  const setVisibility = useSetMemberVisibility(businessId || '');
+  const { user } = useSupabaseSession();
+  const currentUserId = user?.id;
 
   const [removeConfirm, setRemoveConfirm] = useState<{ open: boolean; member: BusinessMember | null }>({
     open: false,
