@@ -1142,6 +1142,7 @@ export type Database = {
           business_id: string
           created_at: string | null
           id: string
+          is_public: boolean
           role: string
           user_profile_id: string
         }
@@ -1149,6 +1150,7 @@ export type Database = {
           business_id: string
           created_at?: string | null
           id?: string
+          is_public?: boolean
           role: string
           user_profile_id: string
         }
@@ -1156,6 +1158,7 @@ export type Database = {
           business_id?: string
           created_at?: string | null
           id?: string
+          is_public?: boolean
           role?: string
           user_profile_id?: string
         }
