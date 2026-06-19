@@ -78,6 +78,7 @@ const EnrichedStatus: React.FC<{ friend: FriendYesterday }> = ({ friend }) => {
         <div style={{ display: 'flex', alignItems: 'baseline', gap: 5 }}>
           <span style={{ fontSize: 9, fontWeight: 800, letterSpacing: '0.12em', color: 'var(--hcp-t-60)', textTransform: 'uppercase' }}>DIFF</span>
           <span style={{ fontSize: 14, fontWeight: 800, fontVariantNumeric: 'tabular-nums', color: 'var(--hcp-t-100)', letterSpacing: '-0.02em', lineHeight: 1 }}>{`${diff > 0 ? '+' : ''}${diff.toFixed(1)}`}</span>
+          {diff < 0 && <span style={{ fontSize: 12, marginLeft: 2 }}>🔥</span>}
         </div>
       )}
     </div>
