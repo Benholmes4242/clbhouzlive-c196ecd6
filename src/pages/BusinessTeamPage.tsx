@@ -20,6 +20,7 @@ import {
   useRemoveMember,
   useUpdateMemberRole,
   useRevokeInvite,
+  useSetMemberVisibility,
   BUSINESS_ROLE_LABELS,
   BusinessMember,
   BusinessRole,
@@ -28,6 +29,8 @@ import {
 import { AccessRequestsSection } from '@/components/business/AccessRequestsSection';
 import { useHideBottomNav } from '@/hooks/useBottomNavVisibility';
 import { useHideHeader } from '@/hooks/useHeaderVisibility';
+import { useSupabaseSession } from '@/hooks/useSupabaseSession';
+import { Switch } from '@/components/ui/switch';
 import { toast } from 'sonner';
 
 const ROLE_DESCRIPTIONS: Record<BusinessRole, string> = {
