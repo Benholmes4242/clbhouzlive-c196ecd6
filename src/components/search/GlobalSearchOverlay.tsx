@@ -57,7 +57,7 @@ function SectionHeader({
         style={{
           fontSize: 9,
           fontWeight: 800,
-          color: INK_SUBTLE,
+          color: '#64748B',
           letterSpacing: '0.16em',
           textTransform: 'uppercase',
         }}
