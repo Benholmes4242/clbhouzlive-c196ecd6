@@ -1,20 +1,61 @@
 /**
- * CarouselDots — unified segment-bar multi-media indicator.
+ * CarouselDots — Instagram-style sliding-window dot indicator.
  *
- * Stories-style filled progress bars. White-only, non-interactive
- * (parent owns gesture/index). Returns null when count <= 1.
- *
- * The `variant` prop is deprecated and ignored — all surfaces render
- * the same segment-bar style now.
+ * ≤7 dots: all shown. >7: a 7-dot window with edge dots shrinking/fading
+ * to imply "more beyond". No "+N" overflow (the n/total chip handles count).
+ * Plain white. Non-interactive (parent owns gesture/index). Returns null when count <= 1.
  */
 import React, { useEffect, useState } from 'react';
 
-const MAX_VISIBLE = 6;
+const WINDOW = 7; // max dots rendered at once
+const DOT = 6;    // dot diameter (px)
+const GAP = 5;
+
+function computeWindow(count: number, active: number) {
+  if (count <= WINDOW) {
+    return Array.from({ length: count }, (_, i) => ({ index: i, scale: 1, opacity: 1 }));
+  }
+
+  const half = Math.floor(WINDOW / 2);
+  let start = active - half;
+  let end = active + half;
+
+  if (start < 0) {
+    end -= start;
+    start = 0;
+  }
+  if (end > count - 1) {
+    start -= (end - (count - 1));
+    end = count - 1;
+  }
+  start = Math.max(0, start);
+
+  const dots: { index: number; scale: number; opacity: number }[] = [];
+  for (let i = start; i <= end; i++) {
+    const atLeftEdge = i === start && start > 0;
+    const atRightEdge = i === end && end < count - 1;
+    const secondLeft = i === start + 1 && start > 0;
+    const secondRight = i === end - 1 && end < count - 1;
+
+    let scale = 1, opacity = 1;
+    if (atLeftEdge || atRightEdge) {
+      scale = 0.5;
+      opacity = 0.5;
+    } else if (secondLeft || secondRight) {
+      scale = 0.75;
+      opacity = 0.75;
+    }
+
+    dots.push({ index: i, scale, opacity });
+  }
+
+  return dots;
+}
 
 export interface CarouselDotsProps {
   count: number;
   active: number;
-  /** @deprecated All variants render as segment bars now. Prop ignored. Will be removed next release. */
+  /** @deprecated Ignored. All surfaces render as dot indicators now. */
   variant?: 'segments' | 'elongated' | 'windowed';
   /** Controls opacity for fade behaviour. Default true. */
   isVisible?: boolean;
@@ -30,16 +71,16 @@ export const CarouselDots: React.FC<CarouselDotsProps> = ({
   if (count <= 1) return null;
 
   const safeActive = Math.max(0, Math.min(active, count - 1));
-  const visibleCount = Math.min(count, MAX_VISIBLE);
-  const overflow = count - visibleCount;
+  const dots = computeWindow(count, safeActive);
 
   return (
     <div
       role="group"
       aria-label="Media carousel position"
-      className={`flex items-center ${className}`}
+      className={`flex items-center justify-center ${className}`}
       style={{
-        width: 124,
+        gap: GAP,
+        height: DOT + 4,
         opacity: isVisible ? 1 : 0,
         transition: 'opacity 300ms ease',
         pointerEvents: 'none',
@@ -48,50 +89,25 @@ export const CarouselDots: React.FC<CarouselDotsProps> = ({
       <span className="sr-only" aria-live="polite">
         Image {safeActive + 1} of {count}
       </span>
-      <div style={{ display: 'flex', flex: 1, gap: 4 }}>
-        {Array.from({ length: visibleCount }).map((_, i) => {
-          const isCurrent = i === safeActive;
-          const isComplete = i < safeActive;
-          const fillWidth = isCurrent || isComplete ? '100%' : '0%';
-          return (
-            <div
-              key={i}
-              style={{
-                flex: 1,
-                height: 2,
-                borderRadius: 1,
-                overflow: 'hidden',
-                background: 'rgba(255, 255, 255, 0.22)',
-              }}
-            >
-              <div
-                style={{
-                  height: '100%',
-                  width: fillWidth,
-                  borderRadius: 1,
-                  background: isCurrent
-                    ? '#ffffff'
-                    : 'rgba(255, 255, 255, 0.7)',
-                  transition: 'width 320ms cubic-bezier(0.22,0.61,0.36,1)',
-                }}
-              />
-            </div>
-          );
-        })}
-      </div>
-      {overflow > 0 && (
-        <span
-          style={{
-            color: 'rgba(255,255,255,0.7)',
-            fontSize: 9,
-            fontWeight: 600,
-            letterSpacing: '0.3px',
-            marginLeft: 6,
-          }}
-        >
-          +{overflow}
-        </span>
-      )}
+      {dots.map(({ index, scale, opacity }) => {
+        const isActive = index === safeActive;
+        const size = DOT * scale;
+        return (
+          <div
+            key={index}
+            style={{
+              width: size,
+              height: size,
+              borderRadius: 999,
+              flexShrink: 0,
+              background: isActive
+                ? '#FFFFFF'
+                : `rgba(255,255,255,${0.45 * opacity})`,
+              transition: 'all 260ms cubic-bezier(0.22,0.61,0.36,1)',
+            }}
+          />
+        );
+      })}
     </div>
   );
 };
