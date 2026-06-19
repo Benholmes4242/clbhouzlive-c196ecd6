@@ -573,6 +573,40 @@ export async function fetchFriendsActivity(
     });
   }
 
+  // (A2) Synced friends with NO score rows in window — fallback summary card so they don't vanish.
+  const connIdsWithScores = new Set(
+    scoreRows.map((s) => s.connection_id).filter((id): id is string => !!id),
+  );
+  for (const f of friends) {
+    if (!f.friend_connection_id) continue;
+    if (connIdsWithScores.has(f.friend_connection_id)) continue;
+    if (!f.last_round_played_at) continue;
+    const courseNameKey = (f.last_round_course_name ?? '').toLowerCase();
+    items.push({
+      friend_row_id: f.friend_row_id,
+      friend_passport_id: f.friend_passport_id,
+      friend_name: f.friend_name,
+      friend_thumbnail_url: f.friend_thumbnail_url,
+      friend_profile_photo_url: f.friend_user_id ? photoByUserId[f.friend_user_id] ?? null : null,
+      friend_user_id: f.friend_user_id,
+      friend_connection_id: f.friend_connection_id,
+      is_clbhouz_user: !!f.is_clbhouz_user,
+      last_round_played_at: f.last_round_played_at,
+      last_round_course_name: f.last_round_course_name,
+      last_round_adjusted_gross: f.last_round_adjusted_gross,
+      last_round_stableford: null,
+      last_round_differential: null,
+      last_round_score_id: null,
+      course_thumbnail_image: thumbsByName[courseNameKey] ?? null,
+      is_course_best: false,
+      friend_handicap_index: f.friend_handicap_index ?? null,
+      is_counter: false,
+      handicap_index_at_time: null,
+      viewer_has_reacted: false,
+      reaction_count: 0,
+    });
+  }
+
   // (B) Non-Clbhouz friends — one card from the match row.
   for (const f of friends) {
     if (f.friend_connection_id) continue;
