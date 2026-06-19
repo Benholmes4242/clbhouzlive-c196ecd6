@@ -94,9 +94,9 @@ function VideosFullFeedInner({ userId, mood, searchQuery }: VideosFullFeedProps)
   }
 
   return (
-    <div style={{ paddingTop: 8, paddingBottom: 24 }}>
+    <div style={{ padding: '12px 16px 24px', display: 'flex', flexDirection: 'column', gap: 13 }}>
       {posts.map((post, i) => (
-        <VideoFeedCard key={post.id} post={post} index={i} allPosts={posts} userId={userId} />
+        <CompactVideoRow key={post.id} post={post} index={i} allPosts={posts} />
       ))}
 
       <div ref={sentinelRef} style={{ height: 1 }} />
