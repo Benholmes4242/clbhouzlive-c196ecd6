@@ -196,7 +196,7 @@ export const FriendPostcard: React.FC<Props> = ({ friend, showLowest, onClick })
           style={{
             fontSize: 12.5,
             fontWeight: 800,
-            color: '#FFFFFF',
+            color: T.ink,
             whiteSpace: 'nowrap',
             overflow: 'hidden',
             textOverflow: 'ellipsis',
@@ -209,7 +209,7 @@ export const FriendPostcard: React.FC<Props> = ({ friend, showLowest, onClick })
           style={{
             marginTop: 2,
             fontSize: 10,
-            color: 'rgba(255,255,255,0.50)',
+            color: T.ink60,
             whiteSpace: 'nowrap',
             overflow: 'hidden',
             textOverflow: 'ellipsis',
@@ -230,7 +230,7 @@ export const FriendPostcard: React.FC<Props> = ({ friend, showLowest, onClick })
             style={{
               fontSize: 26,
               fontWeight: 800,
-              color: '#FFFFFF',
+              color: T.ink,
               lineHeight: 1,
               letterSpacing: '-0.03em',
               fontVariantNumeric: 'tabular-nums',
@@ -242,7 +242,7 @@ export const FriendPostcard: React.FC<Props> = ({ friend, showLowest, onClick })
             style={{
               fontSize: 9,
               fontWeight: 700,
-              color: 'rgba(255,255,255,0.40)',
+              color: T.ink60,
               letterSpacing: '0.12em',
             }}
           >
