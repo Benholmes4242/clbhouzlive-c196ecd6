@@ -125,7 +125,7 @@ const IndexHistoryCard: React.FC<Props> = ({ connectionId }) => {
 
   const isImproving = netDelta < -0.05;
   const isWorsening = netDelta > 0.05;
-  const lineColorHex = isImproving ? '#059669' : isWorsening ? '#9F1D1D' : '#F7931E';
+  const lineColorHex = isImproving ? '#059669' : isWorsening ? '#DC2626' : '#F7931E';
 
   const gradientId = `idx-fade-${connectionId.slice(0, 8)}`;
 
