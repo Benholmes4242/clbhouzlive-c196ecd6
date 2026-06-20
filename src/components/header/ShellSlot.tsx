@@ -65,7 +65,7 @@ export const ShellSlot: React.FC<ShellSlotProps & { dark?: boolean }> = ({ child
       data-chrome="shell-slot"
       style={{
         position: 'fixed',
-        top: 'calc(var(--header-h, 55px) + var(--sat, 0px))',
+        top: 'calc(var(--header-h, 55px) + var(--sat, 0px) - 1px)',
         left: 0,
         right: 0,
         marginLeft: 'auto',
