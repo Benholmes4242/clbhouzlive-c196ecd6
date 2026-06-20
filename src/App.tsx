@@ -93,10 +93,28 @@ import BetaGatePage from "./pages/BetaGatePage";
 import { detectMedianBridge } from "./uploads/medianBridge";
 
 const ROOT_GATE_LAUNCH = new Date(2026, 5, 22, 0, 0, 0); // 22 Jun 2026 local — must match BetaGatePage
+const PREVIEW_BYPASS_KEY = 'clbhouz_preview_bypass';
+const PREVIEW_BYPASS_TOKEN = 'clbhouz'; // the secret value: ?preview=clbhouz
+
+function usePreviewBypass(): boolean {
+  try {
+    const params = new URLSearchParams(window.location.search);
+    const param = params.get('preview');
+    if (param === PREVIEW_BYPASS_TOKEN) {
+      localStorage.setItem(PREVIEW_BYPASS_KEY, '1');
+      return true;
+    }
+    return localStorage.getItem(PREVIEW_BYPASS_KEY) === '1';
+  } catch {
+    return false;
+  }
+}
+
 const RootGate: React.FC = () => {
   const { isMedianApp } = detectMedianBridge();
   const launched = Date.now() >= ROOT_GATE_LAUNCH.getTime();
-  if (!isMedianApp && !launched) return <BetaGatePage />;
+  const previewBypass = usePreviewBypass();
+  if (!isMedianApp && !launched && !previewBypass) return <BetaGatePage />;
   return <ClubhouseWrapped />;
 };
 import DiscoverWrapped from "./pages/DiscoverWrapped";
