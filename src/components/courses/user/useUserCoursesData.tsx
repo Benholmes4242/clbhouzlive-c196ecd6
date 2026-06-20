@@ -1,5 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
+import { formatRatingValue } from '@/utils/formatters';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useNavigate } from 'react-router-dom';
 
@@ -143,7 +144,7 @@ export const useUserCoursesData = (username?: string) => {
       if (!data || data.length === 0) return null;
       
       const total = data.reduce((sum, rating) => sum + rating.rating, 0);
-      return (total / data.length).toFixed(1);
+      return formatRatingValue(total / data.length);
     },
     enabled: !!targetUserId,
   });

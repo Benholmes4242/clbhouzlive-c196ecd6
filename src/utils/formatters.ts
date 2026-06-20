@@ -4,15 +4,23 @@
  */
 
 /**
+ * Format a rating: whole numbers drop the decimal (10 → "10"),
+ * otherwise one decimal (9.5 → "9.5").
+ */
+export function formatRatingValue(rating: number): string {
+  return Number.isInteger(rating) ? String(rating) : rating.toFixed(1);
+}
+
+/**
  * Formats a community rating score for display.
- * Always returns one decimal place for consistency across all surfaces.
- * 
+ * Whole numbers drop the decimal; otherwise one decimal place.
+ *
  * @param score - The rating score (0-10 scale)
  * @returns Formatted string like "8.3" or "—" if null/undefined
  */
 export function formatCommunityRating(score: number | null | undefined): string {
   if (score == null) return '—';
-  return score.toFixed(1);
+  return formatRatingValue(score);
 }
 
 /**

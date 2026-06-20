@@ -9,6 +9,7 @@ import { ArrowLeft, Trophy, MapPin, Share2, Calendar } from 'lucide-react';
 import { PageRoot } from '@/components/layout/PageRoot';
 import { Button } from '@/components/ui/button';
 import { useQuestCourses } from '@/hooks/useQuestCourses';
+import { formatRatingValue } from '@/utils/formatters';
 
 // Milestone chip
 const MilestoneChip: React.FC<{ name: string; unlocked: boolean }> = ({ name, unlocked }) => (
@@ -63,7 +64,7 @@ const MomentCard: React.FC<{
       <div className="mt-3 flex items-center gap-1">
         <span className="text-xs" style={{ color: 'var(--dgp-text-muted)' }}>Rating:</span>
         <span className="text-xs font-medium" style={{ color: 'var(--dgp-accent-gold)' }}>
-          {rating.toFixed(1)}
+          {formatRatingValue(rating)}
         </span>
       </div>
     )}

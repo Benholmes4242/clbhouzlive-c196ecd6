@@ -8,6 +8,7 @@ import { ChevronLeft, Check, Bookmark, Trash2, Flag, Loader2 } from 'lucide-reac
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { cn } from '@/lib/utils';
+import { formatRatingValue } from '@/utils/formatters';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useUserJourneyCourses, JourneyCourse, JourneyTab } from '@/hooks/useUserJourneyCourses';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
@@ -88,7 +89,7 @@ const JourneyCourseCard: React.FC<JourneyCourseCardProps> = ({
           {/* Rating (for played) */}
           {course.rating && (
             <span className="text-xs text-amber-600 font-medium">
-              {course.rating.toFixed(1)} ★
+              {formatRatingValue(course.rating)} ★
             </span>
           )}
         </div>

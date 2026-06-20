@@ -5,6 +5,7 @@ import { useExploreHero } from './hooks/useExploreHero';
 import type { ExploreMoodId } from './hooks/useExploreMood';
 import clbhouzLogo from '@/assets/clbhouz-logo.png';
 import { AMBER, INK_TINT_06 } from '@/features/courses/_shared/tokens';
+import { formatRatingValue } from '@/utils/formatters';
 
 interface ExploreHeroProps {
   userId: string | undefined;
@@ -242,7 +243,7 @@ function ExploreHeroInner({ userId, mood }: ExploreHeroProps) {
                 style={{ width: 14, height: 14, objectFit: 'contain' }}
               />
               <span style={{ fontSize: 14, fontWeight: 800, color: AMBER }}>
-                {Number(hero.rating_avg).toFixed(1)}
+                {formatRatingValue(Number(hero.rating_avg))}
               </span>
               <span style={{ fontSize: 12, color: '#94A3B8' }}>
                 · {hero.review_count} review{hero.review_count === 1 ? '' : 's'}

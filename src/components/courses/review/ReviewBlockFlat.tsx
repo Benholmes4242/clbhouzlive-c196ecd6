@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Pencil, ThumbsUp, ThumbsDown } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
+import { formatRatingValue } from '@/utils/formatters';
 import { ReviewMediaStrip, ReviewMediaItem } from './ReviewMediaStrip';
 
 interface Review {
@@ -88,7 +89,7 @@ const ScoreRing: React.FC<{ score: number; size?: number }> = ({ score, size = 4
           fontVariantNumeric: 'tabular-nums',
         }}
       >
-        {score.toFixed(1)}
+        {formatRatingValue(score)}
       </div>
     </div>
   );
@@ -243,7 +244,7 @@ export const ReviewBlockFlat: React.FC<ReviewBlockFlatProps> = ({
                 {s.label}
               </span>
               <span style={{ fontSize: 11, fontWeight: 800, color: '#0F172A', fontVariantNumeric: 'tabular-nums' }}>
-                {Number(s.value).toFixed(1)}
+                {formatRatingValue(Number(s.value))}
               </span>
             </div>
           ))}
