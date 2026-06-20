@@ -5,7 +5,7 @@ import HeroHandicapCardDark from '../sections/HeroHandicapCardDark';
 import TodayGreeting from '../sections/TodayGreeting';
 import TrophyRoomEntryRow from '../sections/TrophyRoomEntryRow';
 import LastRoundCard from '../sections/LastRoundCard';
-import NextRoundWatch from '../sections/NextRoundWatch';
+
 import Pattern14Card from '../sections/Pattern14Card';
 
 
@@ -75,11 +75,6 @@ export const TodayView: React.FC<Props> = ({
 
       {/* 3. Recent Unlocks */}
       <RecentUnlocksStrip userId={userId} readOnly={readOnly} />
-
-      {/* 3. Next Round Watch — owner only */}
-      {!readOnly && (
-        <NextRoundWatch connectionId={connectionId} currentHandicap={currentHandicap} />
-      )}
 
       {/* 4. Last Round */}
       <LastRoundCard

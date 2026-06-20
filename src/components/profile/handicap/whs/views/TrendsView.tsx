@@ -1,6 +1,5 @@
 import React from 'react';
 import ForecastCard from '../sections/ForecastCard';
-import WhereYouStandSection from '../sections/WhereYouStandSection';
 import RoundsThatCountCard from '../sections/RoundsThatCountCard';
 import IndexHistoryCard from '../sections/IndexHistoryCard';
 import CourseFormCard from '../sections/trends/CourseFormCard';
@@ -44,8 +43,7 @@ export const TrendsView: React.FC<Props> = ({
       />
 
 
-      {/* 2. Where You Stand — owner only */}
-      {!readOnly && <WhereYouStandSection userId={userId} />}
+
 
       {/* 3. Rounds That Count */}
       <RoundsThatCountCard

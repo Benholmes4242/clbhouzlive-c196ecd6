@@ -32,8 +32,8 @@ const T = {
   green: 'var(--hcp-good-deep)',
   greenInk: '#15803D',
   greenSoft: 'rgba(5,150,105,0.14)',
-  red: 'var(--hcp-bad-deep)',
-  redInk: '#991B1B',
+  red: 'var(--hcp-bad)',
+  redInk: '#DC2626',
   redSoft: 'rgba(159,29,29,0.12)',
   ringTrack: 'var(--hcp-bg-3)',
 };
@@ -341,7 +341,7 @@ const PointsBody: React.FC<PointsBodyProps> = ({ dist, scope, scoringRange }) =>
 
   const GREEN_GRAD = 'var(--hcp-good-deep)';
   const AMBER_GRAD = 'var(--hcp-bg-3)';
-  const RED_GRAD = 'var(--hcp-bad-deep)';
+  const RED_GRAD = 'var(--hcp-bad)';
 
   const segs = [
     { count: dist.inZoneCount, gradient: GREEN_GRAD },
@@ -754,7 +754,7 @@ const ShotsBody: React.FC<ShotsBodyProps> = ({ trophyAgg, shotsLoading, scope })
     {
       key: 'double',
       count: doublePlus,
-      background: 'var(--hcp-bad-deep)',
+      background: 'var(--hcp-bad)',
       textColor: '#FFFFFF',
     },
   ];
