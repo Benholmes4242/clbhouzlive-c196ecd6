@@ -18,7 +18,7 @@
 import React, { useMemo } from 'react';
 import { Heart, MapPin, MessageCircle, Share } from 'lucide-react';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
-import { getRatingTier, getRatingTierLabel } from '@/lib/ratingTier';
+
 import type { FeedPost } from '@/components/media-system/types/media';
 import { InlineVideo } from './InlineVideo';
 import { MediaCarousel } from './MediaCarousel';
@@ -205,9 +205,6 @@ const FeedCardImpl: React.FC<FeedCardProps> = ({
             </span>
           )}
           {reviewRating != null && (() => {
-            const tierKey = getRatingTier(reviewRating);
-            const tierLabel = getRatingTierLabel(reviewRating);
-            const isExceptional = tierKey === 'EXCEPTIONAL';
             return (
               <button
                 type="button"
@@ -217,8 +214,8 @@ const FeedCardImpl: React.FC<FeedCardProps> = ({
                   flexDirection: 'column',
                   alignItems: 'center',
                   justifyContent: 'center',
-                  gap: 1,
-                  lineHeight: 1.1,
+                  gap: 3,
+                  lineHeight: 1,
                   background: 'transparent',
                   border: 'none',
                   padding: 0,
@@ -238,21 +235,16 @@ const FeedCardImpl: React.FC<FeedCardProps> = ({
                 </span>
                 <span style={{
                   fontSize: 8,
-                  fontWeight: 800,
-                  letterSpacing: '0.14em',
+                  fontWeight: 700,
+                  letterSpacing: '0.08em',
                   textTransform: 'uppercase',
+                  color: '#64748B',
+                  background: 'rgba(15,23,42,0.05)',
+                  padding: '2px 7px',
+                  borderRadius: 999,
                   whiteSpace: 'nowrap',
-                  ...(isExceptional
-                    ? {
-                        background: 'linear-gradient(to right, #f59e0b, #fbbf24)',
-                        WebkitBackgroundClip: 'text',
-                        backgroundClip: 'text',
-                        WebkitTextFillColor: 'transparent',
-                        color: 'transparent',
-                      }
-                    : { color: T100 }),
                 }}>
-                  {tierLabel.toUpperCase()}
+                  Review
                 </span>
               </button>
             );
@@ -354,9 +346,12 @@ const FeedCardImpl: React.FC<FeedCardProps> = ({
               onClick={handleCourseTap}
               style={{
                 display: 'inline-flex', alignItems: 'center', gap: 5, flexShrink: 0,
-                background: 'rgba(247,147,30,0.10)',
-                padding: '3px 9px 3px 4px', borderRadius: 999, border: 'none',
+                background: 'rgba(15,23,42,0.05)',
+                border: '1px solid rgba(15,23,42,0.08)',
+                padding: '3px 9px 3px 4px', borderRadius: 999,
                 cursor: post.courseId ? 'pointer' : 'default', marginLeft: 8,
+                backdropFilter: 'blur(8px)',
+                WebkitBackdropFilter: 'blur(8px)',
               }}
             >
               <img
@@ -367,7 +362,7 @@ const FeedCardImpl: React.FC<FeedCardProps> = ({
                 }}
                 aria-hidden="true"
               />
-              <span style={{ fontSize: 11, fontWeight: 800, color: '#C97211', fontVariantNumeric: 'tabular-nums', lineHeight: 1 }}>
+              <span style={{ fontSize: 11, fontWeight: 800, color: '#475569', fontVariantNumeric: 'tabular-nums', lineHeight: 1 }}>
                 {post.courseRating.toFixed(1)}
               </span>
             </button>
