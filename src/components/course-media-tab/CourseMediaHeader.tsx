@@ -60,7 +60,8 @@ export const CourseMediaHeader: React.FC<CourseMediaHeaderProps> = ({
         style={{
           display: 'flex',
           gap: 8,
-          justifyContent: 'center',
+          justifyContent: 'flex-start',
+          paddingLeft: 12,
           fontFamily: 'Geist, system-ui, -apple-system, BlinkMacSystemFont, sans-serif',
         }}
       >
