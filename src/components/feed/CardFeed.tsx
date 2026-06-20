@@ -342,6 +342,25 @@ export const CardFeed: React.FC<CardFeedProps> = ({
     if (hasNextPage && onNearEnd) onNearEnd();
   }, [hasNextPage, onNearEnd]);
 
+  if (useWindowScroll) {
+    return (
+      <div style={{ width: '100%' }} data-card-feed>
+        <Virtuoso
+          ref={virtuosoRef}
+          useWindowScroll
+          data={posts}
+          itemContent={itemContent}
+          computeItemKey={(_, post) => post.id}
+          rangeChanged={handleRangeChanged}
+          endReached={handleEndReached}
+          increaseViewportBy={{ top: 400, bottom: 800 }}
+          overscan={{ main: 400, reverse: 400 }}
+          components={components}
+        />
+      </div>
+    );
+  }
+
   return (
     <div
       style={{
