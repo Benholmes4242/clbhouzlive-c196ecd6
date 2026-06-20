@@ -77,6 +77,7 @@ export default function BusinessFollowersPage() {
         onLoadMore={() => fetchNextPage()}
         onRefetch={() => refetch()}
         backPath={backPath}
+        hideBackButton
         isOwnProfile={false}
         profileUsername={displayName}
         // Following tab data
