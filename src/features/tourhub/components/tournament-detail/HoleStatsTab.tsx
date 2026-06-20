@@ -15,8 +15,8 @@ import { ConnectHandicapCue } from '@/components/courses/course-detail/ConnectHa
 // Duplicated intentionally to keep tourhub self-contained — no cross-feature import.
 const C_BIRDIE = '#9F1D1D';  // red — birdie or better (good = red)
 const C_PAR    = '#94A3B8';  // slate — par
-const C_BOGEY  = '#0F172A';  // ink — bogey (over par = dark)
-const C_DOUBLE = '#475569';  // slate-600 — double or worse (muted dark)
+const C_BOGEY  = '#2563EB';  // blue — bogey (broadcast convention)
+const C_DOUBLE = '#1E3A5F';  // deep navy — double or worse
 const INK_HOLE = '#0F172A';
 
 interface HoleStatsTabProps {
