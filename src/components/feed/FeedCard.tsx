@@ -224,7 +224,8 @@ const FeedCardImpl: React.FC<FeedCardProps> = ({
                   position: 'relative',
                   display: 'flex', alignItems: 'center', justifyContent: 'flex-end',
                   background: 'transparent', border: 'none', padding: 0, cursor: 'pointer',
-                  minWidth: 92, flexShrink: 0, overflow: 'hidden', alignSelf: 'stretch',
+                  minWidth: 96, height: 44, flexShrink: 0,
+                  overflow: 'visible',
                 }}
                 aria-label={`Your review: ${reviewRating.toFixed(1)} ${tierLabel}`}
               >
@@ -232,8 +233,8 @@ const FeedCardImpl: React.FC<FeedCardProps> = ({
                 <span
                   aria-hidden
                   style={{
-                    position: 'absolute', right: -4, top: '50%', transform: 'translateY(-50%)',
-                    fontSize: 60, fontWeight: 800, letterSpacing: '-0.05em', lineHeight: 1,
+                    position: 'absolute', right: 0, top: '50%', transform: 'translateY(-50%)',
+                    fontSize: 46, fontWeight: 800, letterSpacing: '-0.04em', lineHeight: 1,
                     color: g.fill, pointerEvents: 'none', whiteSpace: 'nowrap', zIndex: 0,
                     fontVariantNumeric: 'tabular-nums',
                   }}
