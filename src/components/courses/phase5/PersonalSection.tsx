@@ -5,6 +5,7 @@ import React from 'react';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useUserCourseRating } from '@/hooks/useUserCourseRating';
 import { useCoursePersonalStatus } from '@/hooks/useCoursePersonalStatus';
+import { useCourseRatingAggregates } from '@/hooks/useCourseRatingAggregates';
 import CourseStatusToggle from './CourseStatusToggle';
 import PersonalReviewCard from './PersonalReviewCard';
 import CourseMoments from './CourseMoments';
@@ -25,6 +26,9 @@ export const PersonalSection: React.FC<PersonalSectionProps> = ({
   const { user } = useSupabaseSession();
   const { data: userRating, isLoading: ratingLoading } = useUserCourseRating(courseId, user?.id);
   const { status, isLoading: statusLoading } = useCoursePersonalStatus(courseId);
+  const { data: aggregates } = useCourseRatingAggregates(courseId);
+  const communityAverage = aggregates?.avg_overall_score ?? null;
+
 
   if (!user) return null;
 
@@ -55,7 +59,7 @@ export const PersonalSection: React.FC<PersonalSectionProps> = ({
       {/* Personal review card — only if played */}
       {hasPlayed && userRating && (
         <div style={{ padding: '0 16px' }}>
-          <PersonalReviewCard courseId={courseId} rating={userRating} />
+          <PersonalReviewCard courseId={courseId} rating={userRating} communityAverage={communityAverage} />
         </div>
       )}
 

@@ -1,5 +1,4 @@
 import React from 'react';
-import { CheckCircle2, ArrowUp as ArrowUpIcon, ArrowDown as ArrowDownIcon } from 'lucide-react';
 import { CourseRatingAggregate } from '@/hooks/useCourseRatingAggregates';
 import { UserCourseRating } from '@/hooks/useUserCourseRating';
 import { RatingTierDistributionData } from '@/components/courses/review/RatingTierDistribution';
@@ -137,43 +136,6 @@ const CommunityScoreCard: React.FC<CommunityScoreCardProps> = ({
 
   const onlyUserHasRated = totalRatings === 1 && userRating;
 
-  // Comparison message — soft pill, one line
-  let comparisonMessage: React.ReactNode = null;
-  if (!onlyUserHasRated && userRating && communityAverage) {
-    const diffRaw = userRating.rating - communityAverage;
-    const diff = Number(diffRaw.toFixed(1));
-    const absDiff = Math.abs(diff);
-
-    const pillBase: React.CSSProperties = {
-      display: 'inline-flex',
-      alignItems: 'center',
-      gap: 5,
-      padding: '5px 11px',
-      borderRadius: 999,
-      fontSize: 11,
-      fontWeight: 600,
-    };
-
-    if (absDiff < 0.2) {
-      comparisonMessage = (
-        <span style={{ ...pillBase, background: 'rgba(15,23,42,0.05)', color: INK_MUTE }}>
-          <CheckCircle2 className="h-3 w-3" /> Matches community consensus
-        </span>
-      );
-    } else if (diff > 0) {
-      comparisonMessage = (
-        <span style={{ ...pillBase, background: 'rgba(22,163,74,0.08)', color: '#16A34A' }}>
-          <ArrowUpIcon className="h-3 w-3" /> {absDiff.toFixed(1)} above community avg
-        </span>
-      );
-    } else {
-      comparisonMessage = (
-        <span style={{ ...pillBase, background: 'rgba(239,68,68,0.08)', color: '#EF4444' }}>
-          <ArrowDownIcon className="h-3 w-3" /> {absDiff.toFixed(1)} below community avg
-        </span>
-      );
-    }
-  }
 
   const categories = [
     { id: 'design', label: 'Design', score: ratingAggregates?.avg_design_score },
@@ -231,8 +193,8 @@ const CommunityScoreCard: React.FC<CommunityScoreCardProps> = ({
               {onlyUserHasRated ? ' · Only you' : ''}
             </div>
           </div>
-          {comparisonMessage}
         </div>
+
       </div>
 
 
