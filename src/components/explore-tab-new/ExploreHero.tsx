@@ -13,7 +13,6 @@ interface ExploreHeroProps {
   mood: ExploreMoodId;
 }
 
-const KICKER_COLOR = '#c97a10';
 const IMAGE_PANEL_SIZE = 124;
 
 function FallbackImage({ name }: { name: string }) {
