@@ -683,13 +683,12 @@ export default function BusinessProfileEditor() {
   return (
     <PageRoot className="md:!max-w-[440px]">
       <div className="min-h-screen flex flex-col w-full" style={{ background: BIZ.pageBg }}>
-        {/* Sticky save header */}
+        {/* Top bar — Close + title only (Save moved to bottom) */}
         <div
-          className="sticky top-0 z-10 backdrop-blur-xl"
           style={{
             background: 'rgba(248,250,252,0.97)',
             borderBottom: `0.5px solid ${BIZ.hair}`,
-            paddingTop: 'max(env(safe-area-inset-top, 0px), 12px)',
+            paddingTop: 'max(var(--safe-top, env(safe-area-inset-top, 0px)), 8px)',
           }}
         >
           <div className="flex items-center gap-2 px-3 py-2.5">
@@ -701,7 +700,7 @@ export default function BusinessProfileEditor() {
             >
               <ChevronLeft className="w-5 h-5" />
             </button>
-            <div className="flex-1 min-w-0 text-center">
+            <div className="flex-1 min-w-0 text-center" style={{ paddingRight: 44 }}>
               <p
                 style={{
                   fontSize: 15,
@@ -713,17 +712,6 @@ export default function BusinessProfileEditor() {
                 {mode === 'create' ? 'Create business' : 'Edit business'}
               </p>
             </div>
-            <button
-              onClick={handleSave}
-              disabled={!saveEnabled}
-              className="min-h-[36px] px-4 rounded-full text-[13px] font-bold transition-opacity active:opacity-90"
-              style={{
-                background: saveEnabled ? BIZ.amber : 'rgba(15,23,42,0.06)',
-                color: saveEnabled ? '#fff' : 'rgba(15,23,42,0.45)',
-              }}
-            >
-              {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : 'Save'}
-            </button>
           </div>
         </div>
 
@@ -850,6 +838,30 @@ export default function BusinessProfileEditor() {
           />
 
           <SocialSection social={social} setSocial={setSocial} />
+
+          {/* Inline Save — bottom, matches personal Edit Profile */}
+          <div className="px-4 pt-6 pb-2">
+            <button
+              onClick={handleSave}
+              disabled={!saveEnabled}
+              className="w-full min-h-[52px] rounded-[14px] text-[15px] font-bold border-0 active:opacity-90 transition-opacity flex items-center justify-center"
+              style={{
+                background: saveEnabled ? BIZ.amber : 'rgba(15,23,42,0.06)',
+                color: saveEnabled ? '#fff' : 'rgba(15,23,42,0.45)',
+                boxShadow: saveEnabled ? '0 4px 16px rgba(247,147,30,0.28)' : 'none',
+              }}
+            >
+              {saving ? (
+                <>
+                  <Loader2 size={18} className="animate-spin mr-2" /> Saving…
+                </>
+              ) : mode === 'create' ? (
+                'Create business'
+              ) : (
+                'Save changes'
+              )}
+            </button>
+          </div>
         </div>
       </div>
 

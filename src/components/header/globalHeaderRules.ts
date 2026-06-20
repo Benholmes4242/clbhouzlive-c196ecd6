@@ -80,6 +80,14 @@ function isBusinessProfilePage(pathname: string): boolean {
   return segments.length === 3;
 }
 
+/**
+ * Business sub-pages with their own chrome — no GlobalHeader.
+ * /business/:id/edit, /business/:id/insights
+ */
+function isBusinessSubPageExcluded(pathname: string): boolean {
+  return /^\/business\/[^/]+\/(edit|insights)$/.test(pathname);
+}
+
 export function isGlobalHeaderExcluded(pathname: string) {
   const isExcludedExact = (GLOBAL_HEADER_EXCLUDED_ROUTES as readonly string[]).some(
     (route) => pathname === route
@@ -89,7 +97,12 @@ export function isGlobalHeaderExcluded(pathname: string) {
     (prefix) => pathname.startsWith(prefix)
   );
 
-  return isExcludedExact || isExcludedPrefix || isBusinessProfilePage(pathname);
+  return (
+    isExcludedExact ||
+    isExcludedPrefix ||
+    isBusinessProfilePage(pathname) ||
+    isBusinessSubPageExcluded(pathname)
+  );
 }
 
 /**
