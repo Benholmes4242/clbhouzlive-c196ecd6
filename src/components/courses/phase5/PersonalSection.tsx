@@ -26,6 +26,9 @@ export const PersonalSection: React.FC<PersonalSectionProps> = ({
   const { user } = useSupabaseSession();
   const { data: userRating, isLoading: ratingLoading } = useUserCourseRating(courseId, user?.id);
   const { status, isLoading: statusLoading } = useCoursePersonalStatus(courseId);
+  const { data: aggregates } = useCourseRatingAggregates(courseId);
+  const communityAverage = aggregates?.avg_overall_score ?? null;
+
 
   if (!user) return null;
 
