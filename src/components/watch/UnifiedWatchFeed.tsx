@@ -72,8 +72,8 @@ export default function UnifiedWatchFeed({ embedded = false }: UnifiedWatchFeedP
           kickerColor="amber"
           title="Clips to explore"
         />
-        {/* ── Mood pills — directly above the grid they control, below the section subhead ── */}
-        <div style={{ paddingTop: 4, paddingBottom: 8 }}>
+        {/* ── Mood pills — pulled up tight under the title, sitting close to the grid ── */}
+        <div style={{ paddingTop: 0, paddingBottom: 2, marginTop: -6 }}>
           <WatchMoodChips active={mood} onChange={setMood} />
         </div>
         <WatchAutoplay
