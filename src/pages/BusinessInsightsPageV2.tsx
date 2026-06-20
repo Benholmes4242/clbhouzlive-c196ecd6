@@ -264,30 +264,28 @@ const BusinessInsightsPageV2 = () => {
 
   return (
     <PageRoot className="min-h-screen pb-20" style={{ background: BIZ.pageBg }}>
-      {/* Header */}
+      {/* Title block — CompactHeader provides the back arrow */}
       <div
-        className="sticky top-0 z-10 backdrop-blur-xl"
-        style={{ background: 'rgba(248,250,252,0.97)', borderBottom: `0.5px solid ${BIZ.hair}` }}
+        className="px-4 pt-3 pb-3"
+        style={{ paddingTop: 'calc(var(--chrome-total-h, 0px) + 12px)' }}
       >
-        <div className="flex items-center px-4 h-14 gap-2">
-          <button
-            onClick={() => navigate(-1)}
-            className="min-h-[44px] min-w-[44px] flex items-center justify-center -ml-2 active:scale-[0.97] transition-transform"
-            style={{ color: BIZ.ink }}
-            aria-label="Back"
-          >
-            <ChevronLeft className="w-5 h-5" />
-          </button>
-          <div className="flex-1 min-w-0">
-            <SectionEyebrow label="INSIGHTS" color="amber" />
-            <h1
-              className="text-[18px] leading-tight mt-0.5"
-              style={{ color: BIZ.ink, fontWeight: 700, letterSpacing: '-0.01em' }}
-            >
-              Insights
-            </h1>
-          </div>
-        </div>
+        <SectionEyebrow label="INSIGHTS" color="amber" />
+        <h1
+          className="text-[18px] leading-tight mt-0.5"
+          style={{ color: BIZ.ink, fontWeight: 700, letterSpacing: '-0.01em' }}
+        >
+          Insights
+        </h1>
+      </div>
+      <div
+        className="sticky z-10 backdrop-blur-xl"
+        style={{
+          top: 'var(--chrome-total-h, 0px)',
+          background: 'rgba(248,250,252,0.97)',
+          borderBottom: `0.5px solid ${BIZ.hair}`,
+        }}
+      >
+
         {/* Date range selector */}
         <div className="flex justify-center pb-3">
           <div

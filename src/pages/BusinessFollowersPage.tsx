@@ -42,8 +42,8 @@ export default function BusinessFollowersPage() {
     return (
       <div className="min-h-screen bg-background md:max-w-[620px] md:mx-auto">
         <div
-          className="sticky top-0 bg-background border-b border-border px-4 pb-3 pt-2"
-          style={{ paddingTop: 'max(env(safe-area-inset-top, 0px), 47px)' }}
+          className="bg-background border-b border-border px-4 pb-3 pt-2"
+          style={{ paddingTop: 'calc(var(--chrome-total-h, 0px) + 8px)' }}
         >
           <div className="flex items-center gap-3 mb-3">
             <Skeleton className="w-9 h-9 rounded-full" />
@@ -77,6 +77,7 @@ export default function BusinessFollowersPage() {
         onLoadMore={() => fetchNextPage()}
         onRefetch={() => refetch()}
         backPath={backPath}
+        hideBackButton
         isOwnProfile={false}
         profileUsername={displayName}
         // Following tab data

@@ -41,19 +41,16 @@ export default function BusinessActivityPage() {
   const groupedActivities = activities ? groupByDate(activities) : [];
 
   return (
-    <div className="min-h-screen bg-background md:max-w-[620px] md:mx-auto">
-      {/* Header */}
-      <div className="sticky top-0 z-10 bg-background/95 backdrop-blur-xl border-b border-border">
-        <div className="flex items-center gap-3 px-4 py-3">
-          <Button variant="ghost" size="icon" onClick={() => navigate(-1)}>
-            <ArrowLeft className="h-5 w-5" />
-          </Button>
-          <div className="flex-1">
-            <h1 className="text-lg font-semibold">Activity</h1>
-            <p className="text-sm text-muted-foreground">Audit log</p>
-          </div>
-        </div>
+    <div
+      className="min-h-screen bg-background md:max-w-[620px] md:mx-auto"
+      style={{ paddingTop: 'var(--chrome-total-h, 0px)' }}
+    >
+      {/* Title block — CompactHeader provides the back arrow */}
+      <div className="px-4 pt-3 pb-3">
+        <h1 className="text-lg font-semibold">Activity</h1>
+        <p className="text-sm text-muted-foreground">Audit log</p>
       </div>
+
 
       <div className="max-w-2xl mx-auto px-4 py-6">
         {isLoading ? (

@@ -11,8 +11,6 @@ export const GLOBAL_HEADER_EXCLUDED_ROUTES = [
   '/onboarding',
   '/create-moment',
   '/business/intro',
-  '/business/create',
-  '/business/success',
   '/messages',
   '/profile',
   '/achievements',
@@ -80,14 +78,6 @@ function isBusinessProfilePage(pathname: string): boolean {
   return segments.length === 3;
 }
 
-/**
- * Business sub-pages with their own chrome — no GlobalHeader.
- * /business/:id/edit, /insights, /verification, /team, /activity, /followers
- */
-function isBusinessSubPageExcluded(pathname: string): boolean {
-  return /^\/business\/[^/]+\/(edit|insights|verification|team|activity|followers)(\/.*)?$/.test(pathname);
-}
-
 export function isGlobalHeaderExcluded(pathname: string) {
   const isExcludedExact = (GLOBAL_HEADER_EXCLUDED_ROUTES as readonly string[]).some(
     (route) => pathname === route
@@ -100,8 +90,7 @@ export function isGlobalHeaderExcluded(pathname: string) {
   return (
     isExcludedExact ||
     isExcludedPrefix ||
-    isBusinessProfilePage(pathname) ||
-    isBusinessSubPageExcluded(pathname)
+    isBusinessProfilePage(pathname)
   );
 }
 

@@ -74,6 +74,8 @@ interface UserListPageProps {
   onLoadMore?: () => void;
   onRefetch?: () => void;
   backPath?: string;
+  /** Hide the in-page back chevron + safe-area top pad (e.g. when CompactHeader provides the back arrow). */
+  hideBackButton?: boolean;
   isOwnProfile?: boolean;
   // Following tab support (only for followers mode)
   followingUsers?: SocialUser[];
@@ -280,6 +282,7 @@ export const UserListPage: React.FC<UserListPageProps> = ({
   onLoadMore,
   onRefetch,
   backPath,
+  hideBackButton = false,
   isOwnProfile = true,
   followingUsers,
   followingTotalCount,
@@ -435,24 +438,29 @@ export const UserListPage: React.FC<UserListPageProps> = ({
       <div className="w-full">
         {/* Sticky editorial header */}
         <div
-          className="sticky top-0 z-40 backdrop-blur-xl"
+          className="sticky z-40 backdrop-blur-xl"
           style={{
-            paddingTop: 'max(var(--safe-top, env(safe-area-inset-top, 0px)), 8px)',
+            top: hideBackButton ? 'var(--chrome-total-h, 0px)' : 0,
+            paddingTop: hideBackButton
+              ? 0
+              : 'max(var(--safe-top, env(safe-area-inset-top, 0px)), 8px)',
             background: 'rgba(248,250,252,0.97)',
             borderBottom: `0.5px solid ${BORDER}`,
           }}
         >
           {/* Back row */}
-          <div className="flex items-center px-2 pt-1 pb-1">
-            <button
-              onClick={handleBack}
-              className="flex items-center justify-center min-h-[44px] min-w-[44px]"
-              style={{ color: INK }}
-              aria-label="Back"
-            >
-              <ChevronLeft className="w-5 h-5" />
-            </button>
-          </div>
+          {!hideBackButton && (
+            <div className="flex items-center px-2 pt-1 pb-1">
+              <button
+                onClick={handleBack}
+                className="flex items-center justify-center min-h-[44px] min-w-[44px]"
+                style={{ color: INK }}
+                aria-label="Back"
+              >
+                <ChevronLeft className="w-5 h-5" />
+              </button>
+            </div>
+          )}
 
           {/* Eyebrow + title */}
           <div className="px-5 pb-3">

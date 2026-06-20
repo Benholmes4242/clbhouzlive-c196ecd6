@@ -223,44 +223,30 @@ export default function BusinessTeamPage() {
   };
 
   return (
-    <div className="min-h-screen bg-background md:max-w-[620px] md:mx-auto">
-      {/* Header */}
-      <div
-        className="sticky top-0 z-10 backdrop-blur-xl"
-        style={{
-          background: 'rgba(248,250,252,0.97)',
-          borderBottom: '0.5px solid rgba(15,23,42,0.07)',
-          paddingTop: 'max(env(safe-area-inset-top, 0px), 8px)',
-        }}
-      >
-        <div className="flex items-center px-4 h-14">
-          <button
-            onClick={() => navigate(-1)}
-            className="min-h-[44px] min-w-[44px] flex items-center justify-center -ml-2 text-foreground active:scale-[0.97] transition-transform"
-            aria-label="Back"
-          >
-            <ChevronLeft className="w-5 h-5" />
-          </button>
-          <div className="flex-1">
-            <SectionEyebrow label="TEAM" />
-            <h1 className="text-[18px] text-foreground leading-none" style={{ fontWeight: 900, letterSpacing: '-0.01em' }}>
-              Manage team
-            </h1>
-          </div>
-          {canManage ? (
-            <button
-              onClick={() => navigate(`/business/${businessId}/team/invite`)}
-              className="min-h-[44px] min-w-[44px] flex items-center justify-center rounded-xl text-white active:scale-[0.97] transition-transform"
-              style={{ background: '#F7931E' }}
-              aria-label="Invite teammate"
-            >
-              <Plus className="w-5 h-5" />
-            </button>
-          ) : (
-            <div className="w-11" />
-          )}
+    <div
+      className="min-h-screen bg-background md:max-w-[620px] md:mx-auto"
+      style={{ paddingTop: 'var(--chrome-total-h, 0px)' }}
+    >
+      {/* Title block — CompactHeader provides the back arrow */}
+      <div className="px-4 pt-3 pb-3 flex items-end justify-between">
+        <div>
+          <SectionEyebrow label="TEAM" />
+          <h1 className="text-[18px] text-foreground leading-none mt-0.5" style={{ fontWeight: 900, letterSpacing: '-0.01em' }}>
+            Manage team
+          </h1>
         </div>
+        {canManage && (
+          <button
+            onClick={() => navigate(`/business/${businessId}/team/invite`)}
+            className="min-h-[44px] min-w-[44px] flex items-center justify-center rounded-xl text-white active:scale-[0.97] transition-transform"
+            style={{ background: '#F7931E' }}
+            aria-label="Invite teammate"
+          >
+            <Plus className="w-5 h-5" />
+          </button>
+        )}
       </div>
+
 
       <div className="max-w-lg mx-auto px-4 py-6 space-y-8">
         <AccessRequestsSection
