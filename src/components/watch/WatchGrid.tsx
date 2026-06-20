@@ -22,7 +22,7 @@ interface WatchGridProps {
 const GAP = 2;
 const COLS = 2;
 const FALLBACK_RATIO = 9 / 16; // width / height for default 9:16 tile
-const RADIUS = 6;
+const RADIUS = 0;
 
 function cornerRadius(ci: number) {
   const left = ci === 0;
