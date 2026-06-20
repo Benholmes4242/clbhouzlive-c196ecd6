@@ -3,6 +3,7 @@ import { useNavigate, useLocation } from 'react-router-dom';
 
 import { analyticsEvents } from '@/utils/analyticsEvents';
 import { ExploreSectionHeader } from './ExploreSectionHeader';
+import { WaveformMark } from './DiscoverMarks';
 import type { ExploreMoodId } from './hooks/useExploreMood';
 
 /** Single source of truth for the Echo concierge amber ink colour. */
@@ -246,6 +247,7 @@ function ExploreEchoCTAInner({ mood }: ExploreEchoCTAProps) {
   return (
     <section>
       <ExploreSectionHeader
+        mark={<WaveformMark />}
         title="Echo, your course concierge"
         sub="Describe what you want. She'll find it."
         paddingTop={24}
