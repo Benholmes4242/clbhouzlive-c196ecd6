@@ -156,7 +156,7 @@ export default function EchoPage() {
   return (
     <motion.div 
       className="fixed inset-0 flex flex-col"
-      style={{ background: '#F8FAFC', paddingTop: 'max(env(safe-area-inset-top, 0px), 44px)', paddingBottom: 'max(env(safe-area-inset-bottom, 0px), 0px)' }}
+      style={{ background: '#F8FAFC', paddingTop: 'max(env(safe-area-inset-top, 0px), 44px)', paddingBottom: 0 }}
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       transition={{ duration: 0.2, ease: 'easeOut' }}

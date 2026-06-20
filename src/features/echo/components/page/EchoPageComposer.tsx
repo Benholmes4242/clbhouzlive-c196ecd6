@@ -97,7 +97,7 @@ export const EchoPageComposer = forwardRef<HTMLTextAreaElement, EchoPageComposer
         style={{
           background: '#F8FAFC',
           borderTop: '0.5px solid rgba(15,23,42,0.07)',
-          paddingBottom: 'calc(var(--sab, env(safe-area-inset-bottom, 0px)) + 12px)',
+          paddingBottom: 12,
         }}
       >
         {/* Character count */}
