@@ -116,28 +116,29 @@ function VideoLargeCardInner({ post, index, allPosts }: VideoLargeCardProps) {
           </div>
         ) : null}
 
-        <div style={{ position: 'absolute', left: 14, right: 14, bottom: 12, color: 'white' }}>
-          <div
-            style={{
-              fontSize: 19,
-              fontWeight: 800,
-              lineHeight: 1.2,
-              letterSpacing: '-0.015em',
-              display: '-webkit-box',
-              WebkitLineClamp: 2,
-              WebkitBoxOrient: 'vertical',
-              overflow: 'hidden',
-              textShadow: '0 1px 4px rgba(0,0,0,0.5)',
-            }}
-          >
-            {post.caption || `${channel} on Clbhouz`}
-          </div>
-        </div>
       </button>
 
       <div
         style={{
           marginTop: 10,
+          padding: '0 2px',
+          fontSize: 15.5,
+          fontWeight: 700,
+          lineHeight: 1.3,
+          letterSpacing: '-0.01em',
+          color: '#0F172A',
+          display: '-webkit-box',
+          WebkitLineClamp: 2,
+          WebkitBoxOrient: 'vertical',
+          overflow: 'hidden',
+        }}
+      >
+        {post.caption || `${channel} on Clbhouz`}
+      </div>
+
+      <div
+        style={{
+          marginTop: 8,
           display: 'flex',
           alignItems: 'center',
           gap: 8,
@@ -160,6 +161,7 @@ function VideoLargeCardInner({ post, index, allPosts }: VideoLargeCardProps) {
           {channel} · {ageLabel}
         </span>
       </div>
+
 
       <div
         style={{
