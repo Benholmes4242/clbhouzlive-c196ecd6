@@ -57,8 +57,10 @@ export const CourseMediaTile: React.FC<CourseMediaTileProps> = ({ post, index, f
         onOpenFullscreen?.(perMediaPosts, index);
       }}
       style={{
-        position: 'relative',
-        aspectRatio: '1',
+        position: 'absolute',
+        inset: 0,
+        width: '100%',
+        height: '100%',
         overflow: 'hidden',
         cursor: 'pointer',
         transition: 'transform 100ms ease',

@@ -1,16 +1,36 @@
-import React, { forwardRef, useCallback, useEffect, useRef } from 'react';
+import React, { forwardRef, useCallback, useEffect, useMemo, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useFullscreenFeedStore } from '@/store/fullscreenFeedStore';
 import { flattenPostsToMedia, flatIndexFor } from '@/components/fullscreen-feed/flattenPostsToMedia';
 import { AlertCircle, Camera, Loader2, Film, ListChecks, Flag, Sunrise, Building2 } from 'lucide-react';
 import type { FeedPost } from '@/components/media-system/types/media';
 import { CourseMediaTile } from './CourseMediaTile';
-import { CourseMediaLandscapeCard } from './CourseMediaLandscapeCard';
 import { CourseMediaGridSkeleton } from './CourseMediaGridSkeleton';
 import { SectionLabel } from '@/components/courses/course-detail/SectionLabel';
 import { PrimaryAmberCTA } from '@/components/ui/PrimaryAmberCTA';
 import { EmptyStateGuide } from '@/components/ui/EmptyStateGuide';
 import { AMBER, HAIRLINE_INK_7, HAIRLINE_INK_10, INK, INK_FAINT, INK_TINT_02, INK_TINT_06, SURFACE } from '@/features/courses/_shared/tokens';
+
+const GAP = 1;
+const COLS = 2;
+const RADIUS = 0;
+const FALLBACK_RATIO = 1;
+
+function cornerRadius(ci: number) {
+  const left = ci === 0;
+  return {
+    borderTopLeftRadius: left ? 0 : RADIUS,
+    borderBottomLeftRadius: left ? 0 : RADIUS,
+    borderTopRightRadius: left ? RADIUS : 0,
+    borderBottomRightRadius: left ? RADIUS : 0,
+  };
+}
+
+interface PlacedTile {
+  post: FeedPost;
+  index: number;
+  ratio: number;
+}
 
 interface CourseMediaGridProps {
   posts: FeedPost[];
@@ -162,67 +182,75 @@ export const CourseMediaGrid = forwardRef<HTMLDivElement, CourseMediaGridProps>(
     );
   }
 
-  let tileIndex = 0;
-  const [firstPost, ...restPosts] = posts;
-  const firstMediaKey = firstPost?.mediaItems[0]?.id || firstPost?.id;
+  // Shortest-column masonry distribution (mirrors WatchGrid)
+  const columns: PlacedTile[][] = (() => {
+    const cols: PlacedTile[][] = Array.from({ length: COLS }, () => []);
+    const heights = new Array(COLS).fill(0);
+    posts.forEach((post, i) => {
+      const w = post.mediaItems?.[0]?.width;
+      const h = post.mediaItems?.[0]?.height;
+      const ratio = w && h && w > 0 && h > 0 ? w / h : FALLBACK_RATIO;
+      const tileH = 1 / ratio;
+      let target = 0;
+      for (let c = 1; c < COLS; c++) {
+        if (heights[c] < heights[target]) target = c;
+      }
+      cols[target].push({ post, index: i, ratio });
+      heights[target] += tileH;
+    });
+    return cols;
+  })();
 
   return (
-    <div ref={ref} style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-      {/* Hero tile — first post always renders as 16:9 landscape card.
-          Portrait sources are cropped via objectFit: cover for a consistent hero shape across courses.
-          This sidesteps legacy media rows with NULL width/height that would otherwise mis-route to a broken portrait wrapper. */}
-      {firstPost && (
-        <div style={{ position: 'relative' }}>
-          <CourseMediaLandscapeCard
-            key={firstMediaKey}
-            post={firstPost}
-            index={tileIndex++}
-            allPosts={posts}
-            fetchNextPage={fetchNextPage}
-            hasNextPage={hasNextPage}
-            isFetchingNextPage={isFetchingNextPage}
-            onOpenFullscreen={handleOpenFullscreen}
-          />
-        </div>
-      )}
-
-      {/* Square mosaic — uniform 3-col, periodic 2×2 feature */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 2, gridAutoFlow: 'dense' }}>
-        {restPosts.map((post, i) => {
-          const mediaKey = post.mediaItems[0]?.id || post.id;
-          const idx = tileIndex++;
-          // Every 7th tile (starting after the first row) becomes a 2×2 feature for rhythm.
-          const isFeature = i > 2 && i % 7 === 0;
-          return (
-            <div
-              key={mediaKey}
-              style={isFeature ? { gridColumn: 'span 2', gridRow: 'span 2' } : undefined}
-            >
-              <CourseMediaTile
-                post={post}
-                index={idx}
-                feature={isFeature}
-                allPosts={posts}
-                fetchNextPage={fetchNextPage}
-                hasNextPage={hasNextPage}
-                isFetchingNextPage={isFetchingNextPage}
-                onOpenFullscreen={handleOpenFullscreen}
-              />
-            </div>
-          );
-        })}
-
-        {/* Infinite scroll sentinel */}
-        <div ref={sentinelRef} style={{ gridColumn: '1 / -1', height: 1 }} />
-
-        {/* Loading indicator */}
-        {isFetchingNextPage && (
-          <div style={{ gridColumn: '1 / -1', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '16px 0' }}>
-            <Loader2 className="w-5 h-5 animate-spin text-[#f59e0b]" />
+    <div ref={ref} style={{ display: 'flex', flexDirection: 'column', gap: GAP }}>
+      <div style={{ display: 'flex', gap: GAP, alignItems: 'flex-start', paddingInline: 0 }}>
+        {columns.map((col, ci) => (
+          <div
+            key={ci}
+            style={{
+              flex: 1,
+              minWidth: 0,
+              display: 'flex',
+              flexDirection: 'column',
+              gap: GAP,
+            }}
+          >
+            {col.map(({ post, index, ratio }) => {
+              const mediaKey = post.mediaItems[0]?.id || post.id;
+              return (
+                <div
+                  key={mediaKey}
+                  style={{
+                    position: 'relative',
+                    width: '100%',
+                    aspectRatio: `${ratio}`,
+                    ...cornerRadius(ci),
+                    overflow: 'hidden',
+                  }}
+                >
+                  <CourseMediaTile
+                    post={post}
+                    index={index}
+                    allPosts={posts}
+                    fetchNextPage={fetchNextPage}
+                    hasNextPage={hasNextPage}
+                    isFetchingNextPage={isFetchingNextPage}
+                    onOpenFullscreen={handleOpenFullscreen}
+                  />
+                </div>
+              );
+            })}
           </div>
-        )}
+        ))}
       </div>
 
+      <div ref={sentinelRef} style={{ height: 1, width: '100%' }} />
+
+      {isFetchingNextPage && (
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '16px 0' }}>
+          <Loader2 className="w-5 h-5 animate-spin text-[#f59e0b]" />
+        </div>
+      )}
     </div>
   );
 });
