@@ -168,7 +168,7 @@ const WatchGrid: React.FC<WatchGridProps> = ({
                   position: 'relative',
                   width: '100%',
                   aspectRatio: `${ratio}`,
-                  borderRadius: 10,
+                  ...cornerRadius(ci),
                   overflow: 'hidden',
                 }}
               >
@@ -189,7 +189,7 @@ const WatchGrid: React.FC<WatchGridProps> = ({
               style={{
                 flex: 1,
                 aspectRatio: '9 / 16',
-                borderRadius: 10,
+                borderRadius: RADIUS,
                 background:
                   'linear-gradient(90deg, hsl(var(--muted)) 25%, hsl(var(--muted)/0.5) 50%, hsl(var(--muted)) 75%)',
                 backgroundSize: '200% 100%',
