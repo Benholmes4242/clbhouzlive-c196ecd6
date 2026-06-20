@@ -19,6 +19,7 @@ import React, { useMemo } from 'react';
 import { Heart, MapPin, MessageCircle, Share } from 'lucide-react';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { getRatingTier, getRatingTierLabel } from '@/lib/ratingTier';
+import { formatRatingValue } from '@/utils/formatters';
 
 import type { FeedPost } from '@/components/media-system/types/media';
 import { InlineVideo } from './InlineVideo';
@@ -227,7 +228,7 @@ const FeedCardImpl: React.FC<FeedCardProps> = ({
                   minWidth: 96, height: 44, flexShrink: 0,
                   overflow: 'visible',
                 }}
-                aria-label={`Your review: ${reviewRating.toFixed(1)} ${tierLabel}`}
+                aria-label={`Your review: ${formatRatingValue(reviewRating)} ${tierLabel}`}
               >
                 {/* Oversized ghost numeral — bleeds behind, right-anchored */}
                 <span
@@ -239,7 +240,7 @@ const FeedCardImpl: React.FC<FeedCardProps> = ({
                     fontVariantNumeric: 'tabular-nums',
                   }}
                 >
-                  {reviewRating.toFixed(1)}
+                  {formatRatingValue(reviewRating)}
                 </span>
                 {/* Sharp verdict label on top */}
                 <span
@@ -368,7 +369,7 @@ const FeedCardImpl: React.FC<FeedCardProps> = ({
                 aria-hidden="true"
               />
               <span style={{ fontSize: 11, fontWeight: 800, color: '#475569', fontVariantNumeric: 'tabular-nums', lineHeight: 1 }}>
-                {post.courseRating.toFixed(1)}
+                {formatRatingValue(post.courseRating)}
               </span>
             </button>
           );

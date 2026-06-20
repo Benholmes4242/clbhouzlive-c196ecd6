@@ -1,5 +1,6 @@
 import React from 'react';
 import { cn } from '@/lib/utils';
+import { formatRatingValue } from '@/utils/formatters';
 
 interface CourseCommunityRatingProps {
   rating: number;
@@ -53,7 +54,7 @@ export const CourseCommunityRating: React.FC<CourseCommunityRatingProps> = ({
         'font-semibold tabular-nums',
         forceNeutral ? 'text-foreground' : 'text-amber-500'
       )}>
-        {rating.toFixed(1)}
+        {formatRatingValue(rating)}
       </span>
     </div>
   );
