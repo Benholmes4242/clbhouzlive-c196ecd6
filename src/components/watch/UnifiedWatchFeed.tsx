@@ -71,7 +71,6 @@ export default function UnifiedWatchFeed({ embedded = false }: UnifiedWatchFeedP
           eyebrow="From the community"
           kickerColor="amber"
           title="Clips to explore"
-          sub="Every round, every course, every angle"
         />
         {/* ── Mood pills — directly above the grid they control, below the section subhead ── */}
         <div style={{ paddingTop: 4, paddingBottom: 8 }}>
