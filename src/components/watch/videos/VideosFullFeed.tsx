@@ -8,6 +8,7 @@ import VideoLargeCard from './VideoLargeCard';
 import { useVideosFollowingRail } from './hooks/useVideosFollowingRail';
 import { VideosFollowingRail } from './VideosFollowingRail';
 import { VideosSuggestedCreatorsRail } from './VideosSuggestedCreatorsRail';
+import { VideosQuickClipsRail } from './VideosQuickClipsRail';
 import type { FeedPost } from '@/components/media-system/types/media';
 
 interface VideosFullFeedProps {
@@ -19,7 +20,8 @@ interface VideosFullFeedProps {
 type Segment =
   | { kind: 'large'; posts: FeedPost[]; startIndex: number }
   | { kind: 'list'; posts: FeedPost[]; startIndex: number }
-  | { kind: 'rail' };
+  | { kind: 'rail' }
+  | { kind: 'clips' };
 
 /**
  * Rhythm: A=3 large, rail, 5 list, 4 large, 5 list, 5 large, 5 list, then ALL
@@ -44,6 +46,7 @@ function buildRhythm(posts: FeedPost[]): Segment[] {
     const { slice, start } = take(5);
     seg.push({ kind: 'list', posts: slice, startIndex: start });
   }
+  seg.push({ kind: 'clips' });
   if (i < posts.length) {
     const { slice, start } = take(4);
     seg.push({ kind: 'large', posts: slice, startIndex: start });
@@ -165,6 +168,9 @@ function VideosFullFeedInner({ userId, mood, searchQuery }: VideosFullFeedProps)
         {segments.map((seg, sIdx) => {
           if (seg.kind === 'rail') {
             return <VideosTopRail key={`rail-${sIdx}`} userId={userId} />;
+          }
+          if (seg.kind === 'clips') {
+            return <VideosQuickClipsRail key={`clips-${sIdx}`} userId={userId} />;
           }
           if (seg.kind === 'large') {
             return (

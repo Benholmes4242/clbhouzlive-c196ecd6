@@ -1,5 +1,5 @@
 import { memo, useCallback, useMemo, useState } from 'react';
-import { Clock } from 'lucide-react';
+import { Clock, Heart } from 'lucide-react';
 import { useFullscreenFeedStore } from '@/store/fullscreenFeedStore';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { Pin } from '../proshop/Pin';
@@ -41,6 +41,13 @@ function formatAge(iso: string | null | undefined): string {
   if (months < 12) return `${months} ${months === 1 ? 'month' : 'months'} ago`;
   const years = Math.floor(days / 365);
   return `${years} ${years === 1 ? 'year' : 'years'} ago`;
+}
+
+function abbreviateCount(n: number): string {
+  if (!n || n <= 0) return '0';
+  if (n >= 1_000_000) return `${(n / 1_000_000).toFixed(1)}M`;
+  if (n >= 1_000) return `${(n / 1_000).toFixed(1)}k`;
+  return String(n);
 }
 
 function VideoLargeCardInner({ post, index, allPosts }: VideoLargeCardProps) {
@@ -152,6 +159,30 @@ function VideoLargeCardInner({ post, index, allPosts }: VideoLargeCardProps) {
         >
           {channel} · {ageLabel}
         </span>
+      </div>
+
+      <div
+        style={{
+          marginTop: 4,
+          marginLeft: 36,
+          display: 'flex',
+          alignItems: 'center',
+          gap: 6,
+          minWidth: 0,
+        }}
+      >
+        <Heart size={13} strokeWidth={0} style={{ color: '#64748B', fill: '#64748B' }} />
+        <span style={{ fontSize: 12.5, color: '#64748B', fontVariantNumeric: 'tabular-nums' }}>
+          {abbreviateCount(post.likeCount ?? 0)}
+        </span>
+        {(post.commentCount ?? 0) > 0 ? (
+          <>
+            <span style={{ fontSize: 12.5, color: '#94A3B8' }}>·</span>
+            <span style={{ fontSize: 12.5, color: '#64748B', fontVariantNumeric: 'tabular-nums' }}>
+              {abbreviateCount(post.commentCount ?? 0)} {post.commentCount === 1 ? 'comment' : 'comments'}
+            </span>
+          </>
+        ) : null}
       </div>
     </section>
   );
