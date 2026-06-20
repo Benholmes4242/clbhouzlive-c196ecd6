@@ -250,7 +250,7 @@ export default function EditProfile() {
           quiet "Skip for now" and changes the eyebrow / title copy. */}
       <div
         className="flex items-end justify-between px-4 pb-4"
-        style={{ paddingTop: 'max(env(safe-area-inset-top, 0px), 47px)' }}
+        style={{ paddingTop: 'max(var(--safe-top, env(safe-area-inset-top, 0px)), 8px)' }}
       >
         <div className="flex items-center gap-3">
           {!isNewUser.current && (
