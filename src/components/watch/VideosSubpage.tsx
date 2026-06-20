@@ -10,9 +10,6 @@ import ShellSlot from '@/components/header/ShellSlot';
 
 import { useVideosMood } from '@/components/watch/videos/hooks/useVideosMood';
 import { VideosMoodChips } from '@/components/watch/videos/VideosMoodChips';
-import { VideoOfTheWeekHero } from '@/components/watch/videos/VideoOfTheWeekHero';
-import { VideosFollowingRail } from '@/components/watch/videos/VideosFollowingRail';
-import { MoreToWatchDivider } from '@/components/watch/videos/MoreToWatchDivider';
 import { VideosFullFeed } from '@/components/watch/videos/VideosFullFeed';
 
 const CREAM = '#F8FAFC';
@@ -64,13 +61,7 @@ export default function VideosSubpage() {
           {isSearching ? (
             <VideosFullFeed userId={userId} mood="for_you" searchQuery={searchQuery} />
           ) : (
-            <>
-              <VideoOfTheWeekHero />
-              <VideosFollowingRail userId={userId} />
-
-              <MoreToWatchDivider mood={mood} />
-              <VideosFullFeed userId={userId} mood={mood} />
-            </>
+            <VideosFullFeed userId={userId} mood={mood} />
           )}
         </div>
 
