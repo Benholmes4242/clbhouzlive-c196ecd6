@@ -171,7 +171,7 @@ const FeedCardImpl: React.FC<FeedCardProps> = ({
               fontSize: 80,
               fontWeight: 800, letterSpacing: '-0.05em', lineHeight: 1,
               color: GHOST[tierKey],
-              pointerEvents: 'none', whiteSpace: 'nowrap', zIndex: 0,
+              pointerEvents: 'none', whiteSpace: 'nowrap', zIndex: 1,
               fontVariantNumeric: 'tabular-nums',
             }}
           >
@@ -181,7 +181,7 @@ const FeedCardImpl: React.FC<FeedCardProps> = ({
       })()}
 
       {/* Header */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '10px 12px', position: 'relative', zIndex: 1 }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '10px 12px', position: 'relative', zIndex: 2 }}>
         <button
           type="button"
           onClick={() => onProfile(post)}
@@ -252,7 +252,7 @@ const FeedCardImpl: React.FC<FeedCardProps> = ({
                 type="button"
                 onClick={(e) => { e.stopPropagation(); onReviewTap?.(post); }}
                 style={{
-                  position: 'relative', zIndex: 2,
+                  position: 'relative', zIndex: 3,
                   background: 'transparent', border: 'none', padding: 0, cursor: 'pointer',
                   flexShrink: 0,
                 }}
@@ -271,50 +271,67 @@ const FeedCardImpl: React.FC<FeedCardProps> = ({
       </div>
 
       {/* Media */}
-      {isMulti ? (
-        <MediaCarousel
-          items={items}
-          isCardActive={isActive}
-          initialIndex={initialMediaIndex}
-          mountVideo={mountVideo}
-          onIndexChange={(idx) => onCarouselIndexChange?.(post, idx)}
-          onOpen={(idx) => onOpenMedia(post, idx)}
-        />
-      ) : media ? (
-        <button
-          type="button"
-          onClick={() => onOpenMedia(post, 0)}
-          style={{
-            display: 'block',
-            width: '100%',
-            background: 'transparent',
-            border: 'none',
-            padding: 0,
-            cursor: 'pointer',
-          }}
-        >
-          <div
+      <div style={{ position: 'relative', zIndex: 0 }}>
+        {isMulti ? (
+          <MediaCarousel
+            items={items}
+            isCardActive={isActive}
+            initialIndex={initialMediaIndex}
+            mountVideo={mountVideo}
+            onIndexChange={(idx) => onCarouselIndexChange?.(post, idx)}
+            onOpen={(idx) => onOpenMedia(post, idx)}
+          />
+        ) : media ? (
+          <button
+            type="button"
+            onClick={() => onOpenMedia(post, 0)}
             style={{
-              position: 'relative',
+              display: 'block',
               width: '100%',
-              aspectRatio: String(ratio),
-              overflow: 'hidden',
-              background: '#05080F',
+              background: 'transparent',
+              border: 'none',
+              padding: 0,
+              cursor: 'pointer',
             }}
           >
-            {media.type === 'video' ? (
-              mountVideo ? (
-                <InlineVideo
-                  item={media}
-                  isActive={isActive}
-                  isNear={mountVideo}
-                  feedIndex={feedIndex}
-                  objectFit="cover"
-                />
+            <div
+              style={{
+                position: 'relative',
+                width: '100%',
+                aspectRatio: String(ratio),
+                overflow: 'hidden',
+                background: '#05080F',
+              }}
+            >
+              {media.type === 'video' ? (
+                mountVideo ? (
+                  <InlineVideo
+                    item={media}
+                    isActive={isActive}
+                    isNear={mountVideo}
+                    feedIndex={feedIndex}
+                    objectFit="cover"
+                  />
 
-              ) : media.thumbnailUrl ? (
+                ) : media.thumbnailUrl ? (
+                  <img
+                    src={media.thumbnailUrl}
+                    alt={post.caption || post.displayName}
+                    loading="lazy"
+                    style={{
+                      position: 'absolute',
+                      inset: 0,
+                      width: '100%',
+                      height: '100%',
+                      objectFit: 'cover',
+                      objectPosition: 'center',
+                      display: 'block',
+                    }}
+                  />
+                ) : null
+              ) : mediaUrl ? (
                 <img
-                  src={media.thumbnailUrl}
+                  src={mediaUrl}
                   alt={post.caption || post.displayName}
                   loading="lazy"
                   style={{
@@ -327,26 +344,11 @@ const FeedCardImpl: React.FC<FeedCardProps> = ({
                     display: 'block',
                   }}
                 />
-              ) : null
-            ) : mediaUrl ? (
-              <img
-                src={mediaUrl}
-                alt={post.caption || post.displayName}
-                loading="lazy"
-                style={{
-                  position: 'absolute',
-                  inset: 0,
-                  width: '100%',
-                  height: '100%',
-                  objectFit: 'cover',
-                  objectPosition: 'center',
-                  display: 'block',
-                }}
-              />
-            ) : null}
-          </div>
-        </button>
-      ) : null}
+              ) : null}
+            </div>
+          </button>
+        ) : null}
+      </div>
 
       {/* Course eyebrow + location (above caption) */}
       {post.courseName && (() => {
