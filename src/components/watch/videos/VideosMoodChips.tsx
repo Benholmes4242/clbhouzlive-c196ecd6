@@ -20,7 +20,7 @@ function VideosMoodChipsInner({
       className="relative"
       style={{
         background: '#F8FAFC',
-        borderBottom: '1px solid rgba(15,23,42,0.07)',
+        borderBottom: '0.5px solid rgba(15,23,42,0.07)',
       }}
 
     >
