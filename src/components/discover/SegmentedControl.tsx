@@ -58,7 +58,7 @@ const SegmentedControl: React.FC<SegmentedControlProps> = ({
         background: isDark ? '#0A0E14' : undefined,
         borderBottom: isDark
           ? '0.5px solid rgba(255,255,255,0.06)'
-          : '0.5px solid #0F172A',
+          : '1px solid rgba(15,23,42,0.08)',
       }}
     >
       <div
