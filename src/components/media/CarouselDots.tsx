@@ -94,6 +94,8 @@ export const CarouselDots: React.FC<CarouselDotsProps> = ({
       {dots.map(({ index, scale, opacity }) => {
         const isActive = index === safeActive;
         const size = DOT * scale;
+        const activeColor = tone === 'dark' ? '#0F172A' : '#FFFFFF';
+        const baseColor = tone === 'dark' ? '15,23,42' : '255,255,255';
         return (
           <div
             key={index}
@@ -103,8 +105,8 @@ export const CarouselDots: React.FC<CarouselDotsProps> = ({
               borderRadius: 999,
               flexShrink: 0,
               background: isActive
-                ? '#FFFFFF'
-                : `rgba(255,255,255,${0.45 * opacity})`,
+                ? activeColor
+                : `rgba(${baseColor},${0.45 * opacity})`,
               transition: 'all 260ms cubic-bezier(0.22,0.61,0.36,1)',
             }}
           />
