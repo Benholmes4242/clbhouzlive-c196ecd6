@@ -250,7 +250,7 @@ function ExploreEchoCTAInner({ mood }: ExploreEchoCTAProps) {
         mark={<WaveformMark />}
         title="Echo, your course concierge"
         sub="Describe what you want. She'll find it."
-        paddingTop={24}
+        paddingTop={32}
       />
 
       <div style={{ padding: '0 16px' }}>

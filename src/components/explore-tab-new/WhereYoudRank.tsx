@@ -222,7 +222,7 @@ function WhereYoudRankInner({ userId }: WhereYoudRankProps) {
       <ExploreSectionHeader
         title="Titles within your reach"
         mark={<TrophyMark />}
-        sub="Courses you've played, where your close to the lead"
+        sub="Courses you've played, where you're close to the lead"
       />
       <div className="flex gap-3 px-4 overflow-x-auto scrollbar-hide" style={{ paddingBottom: 4 }}>
         {picks.map(row => (
