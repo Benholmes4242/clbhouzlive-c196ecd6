@@ -43,8 +43,7 @@ export const TrendsView: React.FC<Props> = ({
       />
 
 
-      {/* 2. Where You Stand — owner only */}
-      {!readOnly && <WhereYouStandSection userId={userId} />}
+
 
       {/* 3. Rounds That Count */}
       <RoundsThatCountCard
