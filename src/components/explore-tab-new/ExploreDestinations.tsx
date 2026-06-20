@@ -49,7 +49,11 @@ function ExploreDestinationsInner({ activeRegion, onRegionSelect }: ExploreDesti
             overflow: 'hidden',
             padding: 0,
             border: activeRegion === null ? '1px solid #F7931E' : '1px solid transparent',
-            background: 'linear-gradient(135deg, #0F172A 0%, #1e293b 100%)',
+            background: `
+              radial-gradient(120% 80% at 20% 15%, rgba(247,147,30,0.28) 0%, transparent 45%),
+              radial-gradient(120% 90% at 85% 90%, rgba(16,185,129,0.25) 0%, transparent 50%),
+              linear-gradient(135deg, #0F172A 0%, #1e293b 100%)
+            `,
           }}
         >
           <div style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
