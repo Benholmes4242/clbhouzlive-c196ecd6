@@ -103,7 +103,7 @@ export function SettingsPageV2() {
       {/* Header */}
       <div
         className="flex items-center gap-3 px-4 pb-4"
-        style={{ paddingTop: 'max(env(safe-area-inset-top, 0px), 47px)' }}
+        style={{ paddingTop: 'max(var(--safe-top, env(safe-area-inset-top, 0px)), 8px)' }}
       >
         <button
           onClick={() => navigate(-1)}
