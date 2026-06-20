@@ -1,4 +1,4 @@
-import { useRef, useEffect, useCallback, type RefObject } from 'react';
+import { useRef, useEffect, useCallback, useMemo, type RefObject } from 'react';
 import { useFullscreenFeedStore } from '@/store/fullscreenFeedStore';
 import { useInView } from 'react-intersection-observer';
 import { Loader2 } from 'lucide-react';
@@ -20,6 +20,28 @@ interface ExploreGridProps {
   onRegionChange: (slug: string | null) => void;
 }
 
+const GAP = 2;
+const COLS = 3;
+const RADIUS = 6;
+const FALLBACK_RATIO = 1; // square fallback for courses grid
+
+function cornerRadius(ci: number) {
+  const isLeft = ci === 0;
+  const isRight = ci === COLS - 1;
+  return {
+    borderTopLeftRadius: isLeft ? 0 : RADIUS,
+    borderBottomLeftRadius: isLeft ? 0 : RADIUS,
+    borderTopRightRadius: isRight ? 0 : RADIUS,
+    borderBottomRightRadius: isRight ? 0 : RADIUS,
+  };
+}
+
+interface PlacedTile {
+  post: FeedPost;
+  index: number;
+  ratio: number;
+}
+
 export default function ExploreGrid({
   posts,
   coursePosts,
@@ -30,7 +52,6 @@ export default function ExploreGrid({
   fetchNextPage,
   refetch,
   gridRef,
-  activeRegion,
 }: ExploreGridProps) {
   const fetchGuard = useRef(false);
 
@@ -59,6 +80,28 @@ export default function ExploreGrid({
       appendPosts(coursePosts);
     }
   }, [coursePosts.length, isFullscreenOpen, appendPosts]);
+
+  const [heroPost, ...restPosts] = coursePosts;
+
+  // Shortest-column masonry distribution for the rest (hero is rendered separately).
+  const columns = useMemo<PlacedTile[][]>(() => {
+    const cols: PlacedTile[][] = Array.from({ length: COLS }, () => []);
+    const heights = new Array(COLS).fill(0);
+    restPosts.forEach((post, i) => {
+      const w = post.mediaItems?.[0]?.width;
+      const h = post.mediaItems?.[0]?.height;
+      const ratio = w && h && w > 0 && h > 0 ? w / h : FALLBACK_RATIO;
+      const tileH = 1 / ratio;
+      let target = 0;
+      for (let c = 1; c < COLS; c++) {
+        if (heights[c] < heights[target]) target = c;
+      }
+      // heroPost takes index 0; rest are 1..n
+      cols[target].push({ post, index: i + 1, ratio });
+      heights[target] += tileH;
+    });
+    return cols;
+  }, [restPosts]);
 
   if (isLoading) {
     return <ExploreGridSkeleton />;
@@ -92,16 +135,13 @@ export default function ExploreGrid({
     );
   }
 
-  const [heroPost, ...restPosts] = coursePosts;
-  let tileIndex = 0;
-
   return (
-    <div ref={gridRef} style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+    <div ref={gridRef} style={{ display: 'flex', flexDirection: 'column', gap: GAP }}>
       {heroPost && (
         <div style={{ position: 'relative', width: '100%', aspectRatio: '16 / 9', overflow: 'hidden' }}>
           <ExploreTile
             post={heroPost}
-            index={tileIndex++}
+            index={0}
             variant="hero"
             allPosts={coursePosts}
             fetchNextPage={fetchNextPage}
@@ -111,40 +151,58 @@ export default function ExploreGrid({
         </div>
       )}
 
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 2, gridAutoFlow: 'dense' }}>
-        {restPosts.map((post, i) => {
-          const idx = tileIndex++;
-          const isFeature = i > 2 && i % 7 === 0;
-          return (
-            <div
-              key={post.mediaItems[0]?.id || post.id}
-              style={
-                isFeature
-                  ? { gridColumn: 'span 2', gridRow: 'span 2', position: 'relative', aspectRatio: '1 / 1' }
-                  : { position: 'relative', aspectRatio: '1 / 1' }
-              }
-            >
-              <ExploreTile
-                post={post}
-                index={idx}
-                feature={isFeature}
-                allPosts={coursePosts}
-                fetchNextPage={fetchNextPage}
-                hasNextPage={hasNextPage}
-                isFetchingNextPage={isFetchingNextPage}
-              />
-            </div>
-          );
-        })}
-
-        <div ref={sentinelRef} style={{ gridColumn: '1 / -1', height: 1 }} />
-
-        {isFetchingNextPage && (
-          <div style={{ gridColumn: '1 / -1', display: 'flex', justifyContent: 'center', padding: '16px 0' }}>
-            <Loader2 className="w-5 h-5 animate-spin text-[#f59e0b]" />
+      <div
+        style={{
+          display: 'flex',
+          gap: GAP,
+          alignItems: 'flex-start',
+          paddingInline: 0,
+          marginTop: heroPost ? 0 : 8,
+        }}
+      >
+        {columns.map((col, ci) => (
+          <div
+            key={ci}
+            style={{
+              flex: 1,
+              minWidth: 0,
+              display: 'flex',
+              flexDirection: 'column',
+              gap: GAP,
+            }}
+          >
+            {col.map(({ post, index, ratio }) => (
+              <div
+                key={post.mediaItems[0]?.id || post.id}
+                style={{
+                  position: 'relative',
+                  width: '100%',
+                  aspectRatio: `${ratio}`,
+                  ...cornerRadius(ci),
+                  overflow: 'hidden',
+                }}
+              >
+                <ExploreTile
+                  post={post}
+                  index={index}
+                  allPosts={coursePosts}
+                  fetchNextPage={fetchNextPage}
+                  hasNextPage={hasNextPage}
+                  isFetchingNextPage={isFetchingNextPage}
+                />
+              </div>
+            ))}
           </div>
-        )}
+        ))}
       </div>
+
+      <div ref={sentinelRef} style={{ height: 1, width: '100%' }} />
+
+      {isFetchingNextPage && (
+        <div style={{ display: 'flex', justifyContent: 'center', padding: '16px 0' }}>
+          <Loader2 className="w-5 h-5 animate-spin text-[#f59e0b]" />
+        </div>
+      )}
     </div>
   );
 }
