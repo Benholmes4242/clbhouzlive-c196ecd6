@@ -20,7 +20,9 @@ function ClipsMoodChipsInner({
       className="relative"
       style={{
         background: '#F8FAFC',
+        borderBottom: '1px solid rgba(15,23,42,0.07)',
       }}
+
     >
       <div
         className="flex items-center gap-1.5"

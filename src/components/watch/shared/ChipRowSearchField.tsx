@@ -25,19 +25,20 @@ function ChipRowSearchFieldInner({ value, onChange, onClose, placeholder = 'Sear
     <div
       className="flex items-center shrink-0"
       style={{
-        height: 30,
-        borderRadius: 15,
-        background: 'rgba(15,23,42,0.06)',
-        border: '1px solid rgba(15,23,42,0.20)',
-        padding: '0 8px 0 10px',
-        gap: 6,
-        minWidth: 140,
-        maxWidth: 220,
+        height: 34,
+        borderRadius: 17,
+        background: '#FFFFFF',
+        border: '1px solid rgba(15,23,42,0.12)',
+        boxShadow: '0 1px 2px rgba(15,23,42,0.04)',
+        padding: '0 10px 0 12px',
+        gap: 7,
+        minWidth: 150,
+        maxWidth: 240,
         flex: '0 0 auto',
-        width: 200,
+        width: 210,
       }}
     >
-      <Search size={14} strokeWidth={2} color="#64748B" style={{ flexShrink: 0 }} aria-hidden />
+      <Search size={15} strokeWidth={2} color="#94A3B8" style={{ flexShrink: 0 }} aria-hidden />
       <input
         ref={inputRef}
         className="chip-row-search-input"
@@ -58,7 +59,7 @@ function ChipRowSearchFieldInner({ value, onChange, onClose, placeholder = 'Sear
           border: 'none',
           outline: 'none',
           color: '#0F172A',
-          fontSize: 12,
+          fontSize: 13,
           fontWeight: 500,
           letterSpacing: '-0.01em',
           caretColor: '#F7931E',
@@ -74,10 +75,11 @@ function ChipRowSearchFieldInner({ value, onChange, onClose, placeholder = 'Sear
           width: 22,
           height: 22,
           borderRadius: 11,
-          background: 'rgba(15,23,42,0.06)',
+          background: 'transparent',
           color: '#64748B',
           border: 'none',
           flexShrink: 0,
+          padding: 4,
         }}
       >
         <X size={13} strokeWidth={2} aria-hidden />
@@ -98,18 +100,20 @@ export const ChipRowSearchTrigger = memo(function ChipRowSearchTrigger(
       aria-label="Open search"
       className="shrink-0 flex items-center justify-center active:scale-[0.97]"
       style={{
-        width: 30,
-        height: 30,
-        borderRadius: 15,
-        background: 'transparent',
-        border: '1px solid rgba(15,23,42,0.07)',
+        width: 34,
+        height: 34,
+        borderRadius: 17,
+        background: '#FFFFFF',
+        border: '1px solid rgba(15,23,42,0.12)',
+        boxShadow: '0 1px 2px rgba(15,23,42,0.04)',
         color: '#64748B',
         flex: '0 0 auto',
       }}
     >
-      <Search size={15} strokeWidth={2} aria-hidden />
+      <Search size={16} strokeWidth={2} aria-hidden />
     </button>
   );
 });
+
 
 export default ChipRowSearchField;

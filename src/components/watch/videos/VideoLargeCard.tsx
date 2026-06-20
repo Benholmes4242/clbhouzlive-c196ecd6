@@ -136,20 +136,15 @@ function VideoLargeCardInner({ post, index, allPosts }: VideoLargeCardProps) {
         {post.caption || `${channel} on Clbhouz`}
       </div>
 
-      <div
-        style={{
-          marginTop: 8,
-          display: 'flex',
-          alignItems: 'center',
-          gap: 8,
-          minWidth: 0,
-        }}
-      >
+      <div style={{ marginTop: 8, display: 'flex', alignItems: 'center', gap: 8, minWidth: 0 }}>
         <SquircleAvatar size={28} src={post.avatarUrl} alt={channel} hideRing />
-        <span
+        <div
           style={{
             flex: 1,
             minWidth: 0,
+            display: 'flex',
+            alignItems: 'center',
+            gap: 5,
             fontSize: 12.5,
             fontWeight: 500,
             color: '#64748B',
@@ -158,34 +153,17 @@ function VideoLargeCardInner({ post, index, allPosts }: VideoLargeCardProps) {
             textOverflow: 'ellipsis',
           }}
         >
-          {channel} · {ageLabel}
-        </span>
+          <span style={{ overflow: 'hidden', textOverflow: 'ellipsis' }}>
+            {channel} · {ageLabel}
+          </span>
+          <span style={{ flexShrink: 0 }}>·</span>
+          <Heart size={12} strokeWidth={0} style={{ color: '#64748B', fill: '#64748B', flexShrink: 0 }} />
+          <span style={{ flexShrink: 0, fontVariantNumeric: 'tabular-nums' }}>
+            {abbreviateCount(post.likeCount ?? 0)}
+          </span>
+        </div>
       </div>
 
-
-      <div
-        style={{
-          marginTop: 4,
-          marginLeft: 36,
-          display: 'flex',
-          alignItems: 'center',
-          gap: 6,
-          minWidth: 0,
-        }}
-      >
-        <Heart size={13} strokeWidth={0} style={{ color: '#64748B', fill: '#64748B' }} />
-        <span style={{ fontSize: 12.5, color: '#64748B', fontVariantNumeric: 'tabular-nums' }}>
-          {abbreviateCount(post.likeCount ?? 0)}
-        </span>
-        {(post.commentCount ?? 0) > 0 ? (
-          <>
-            <span style={{ fontSize: 12.5, color: '#94A3B8' }}>·</span>
-            <span style={{ fontSize: 12.5, color: '#64748B', fontVariantNumeric: 'tabular-nums' }}>
-              {abbreviateCount(post.commentCount ?? 0)} {post.commentCount === 1 ? 'comment' : 'comments'}
-            </span>
-          </>
-        ) : null}
-      </div>
     </section>
   );
 }
