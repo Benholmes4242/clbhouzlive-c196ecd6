@@ -19,9 +19,20 @@ interface WatchGridProps {
   emptyMessage?: string;
 }
 
-const GAP = 8;
+const GAP = 2;
 const COLS = 2;
 const FALLBACK_RATIO = 9 / 16; // width / height for default 9:16 tile
+const RADIUS = 6;
+
+function cornerRadius(ci: number) {
+  const left = ci === 0;
+  return {
+    borderTopLeftRadius: left ? 0 : RADIUS,
+    borderBottomLeftRadius: left ? 0 : RADIUS,
+    borderTopRightRadius: left ? RADIUS : 0,
+    borderBottomRightRadius: left ? RADIUS : 0,
+  };
+}
 
 interface PlacedTile {
   post: FeedPost;
