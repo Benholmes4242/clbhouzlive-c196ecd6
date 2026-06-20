@@ -103,7 +103,6 @@ export default function TrendingThisWeek({ enabled = true }: TrendingThisWeekPro
         eyebrow="Short & sweet"
         kickerColor="amber"
         title="Quick clips"
-        sub="Straight from the course"
         onSeeAll={() => navigate('/watch/clips')}
         seeAllLabel="More clips"
       />
@@ -112,7 +111,7 @@ export default function TrendingThisWeek({ enabled = true }: TrendingThisWeekPro
       <HRail paddingBottom={4}>
         {topPosts.map((post, i) => (
           <div key={post.id} style={{ scrollSnapAlign: 'start' }}>
-            <WatchRailTile post={post} index={i} allPosts={topPosts} rank={i + 1} viewedPostIds={viewedPostIds} />
+            <WatchRailTile post={post} index={i} allPosts={topPosts} viewedPostIds={viewedPostIds} />
           </div>
         ))}
       </HRail>

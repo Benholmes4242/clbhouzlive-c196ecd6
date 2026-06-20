@@ -75,13 +75,13 @@ function SectionHeaderInner({
         <div
           style={{
             display: 'flex',
-            alignItems: 'flex-start',
+            alignItems: 'center',
             gap: 11,
             minWidth: 0,
             flex: 1,
           }}
         >
-          <div style={{ marginTop: kicker ? 0 : 2, flexShrink: 0 }}>{mark}</div>
+          <div style={{ flexShrink: 0 }}>{mark}</div>
           {textColumn}
         </div>
       ) : (
