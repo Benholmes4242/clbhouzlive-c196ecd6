@@ -259,7 +259,7 @@ const FeedCardImpl: React.FC<FeedCardProps> = ({
                 aria-label={`Your review: ${formatRatingValue(reviewRating)} ${tierLabel}`}
               >
                 <span style={{
-                  fontSize: 9, fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase',
+                  fontSize: 12.5, fontWeight: 800, letterSpacing: '0.14em', textTransform: 'uppercase',
                   color: LABEL_COLOR[tierKey], whiteSpace: 'nowrap',
                 }}>
                   {tierLabel}
