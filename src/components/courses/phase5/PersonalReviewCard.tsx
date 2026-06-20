@@ -2,7 +2,7 @@
  * PersonalReviewCard - User's own review display, flat white card
  */
 import React, { useState } from 'react';
-import { Pencil, Calendar } from 'lucide-react';
+import { Pencil, Calendar, ArrowUp, ArrowDown, CheckCircle2 } from 'lucide-react';
 import { UserCourseRating } from '@/hooks/useUserCourseRating';
 import { useNavigate } from 'react-router-dom';
 import { format } from 'date-fns';
