@@ -213,7 +213,7 @@ const ActivityPage: React.FC = () => {
           <div
             className="sticky top-0 z-40 backdrop-blur-xl px-5 pb-0 flex flex-col"
             style={{
-              paddingTop: 'max(env(safe-area-inset-top, 0px), 47px)',
+              paddingTop: 'max(var(--safe-top, env(safe-area-inset-top, 0px)), 8px)',
               background: 'rgba(248,250,252,0.97)',
             }}
           >
