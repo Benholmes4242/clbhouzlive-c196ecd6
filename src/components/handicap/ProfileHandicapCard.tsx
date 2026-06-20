@@ -216,14 +216,6 @@ const ProfileHandicapCard: React.FC<Props> = ({
         >
           <span
             style={{
-              width: 6,
-              height: 6,
-              borderRadius: '50%',
-              background: AMBER,
-            }}
-          />
-          <span
-            style={{
               fontSize: 10,
               fontWeight: 800,
               letterSpacing: '0.22em',
@@ -411,7 +403,7 @@ const ProfileHandicapCard: React.FC<Props> = ({
           >
             See full handicap — trends, records, rounds
           </span>
-          <ChevronRight size={14} color={AMBER} />
+          <ChevronRight size={14} color="var(--hcp-t-60)" />
         </div>
       </div>
     </div>
