@@ -341,7 +341,7 @@ const PointsBody: React.FC<PointsBodyProps> = ({ dist, scope, scoringRange }) =>
 
   const GREEN_GRAD = 'var(--hcp-good-deep)';
   const AMBER_GRAD = 'var(--hcp-bg-3)';
-  const RED_GRAD = 'var(--hcp-bad-deep)';
+  const RED_GRAD = 'var(--hcp-bad)';
 
   const segs = [
     { count: dist.inZoneCount, gradient: GREEN_GRAD },
