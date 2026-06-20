@@ -93,7 +93,7 @@ function VideoRailTileInner({
           position: 'relative',
           width: '100%',
           aspectRatio: '16 / 9',
-          borderRadius: 12,
+          borderRadius: 6,
           overflow: 'hidden',
           background:
             thumb && !thumbFailed
