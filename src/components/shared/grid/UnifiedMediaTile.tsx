@@ -8,6 +8,7 @@
  */
 import React, { useCallback, useRef, useEffect, useState, memo, useMemo } from 'react';
 import { cn } from '@/lib/utils';
+import { formatRatingValue } from '@/utils/formatters';
 import { UnifiedMediaItem, UnifiedGridConfig, GridSurface } from './types';
 import { OverlayCorners } from '@/components/shared/overlay';
 import { UnifiedVideoPlayer, UnifiedVideoPlayerRef } from '@/media/components/UnifiedVideoPlayer';
@@ -354,7 +355,7 @@ const UnifiedMediaTile: React.FC<UnifiedMediaTileProps> = ({
           className="absolute top-2 left-2 z-10 flex items-center justify-center rounded-full min-w-[28px] h-[28px] px-1.5 text-[10px] font-bold text-white"
           style={{ backgroundColor: 'rgba(217, 119, 6, 0.9)' }}
         >
-          {item.reviewRating.toFixed(1)}
+          {formatRatingValue(item.reviewRating)}
         </div>
       )}
 

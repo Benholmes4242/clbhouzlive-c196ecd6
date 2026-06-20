@@ -5,6 +5,7 @@ import { useUserCourseReviews } from '@/hooks/useUserCourseReviews';
 import { ArrowLeft, Star, ThumbsUp } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
 import { AppSelect, AppSelectOption } from '@/components/ui/AppSelect';
+import { formatRatingValue } from '@/utils/formatters';
 
 const SORT_OPTIONS: AppSelectOption<'recent' | 'highest' | 'lowest' | 'helpful'>[] = [
   { value: 'recent', label: 'Most recent' },
@@ -125,7 +126,7 @@ const UserReviewsPage: React.FC = () => {
                 <div className="flex flex-col items-end gap-1">
                   <div className="inline-flex items-center gap-1 rounded-full bg-background/60 px-2 py-0.5 text-[11px] text-foreground">
                     <Star className="h-3 w-3 fill-current" />
-                    <span>{rating.toFixed(1)}</span>
+                    <span>{formatRatingValue(rating)}</span>
                   </div>
                   {r.helpful_count && r.helpful_count > 0 && (
                     <div className="inline-flex items-center gap-1 text-[10px] text-muted-foreground">

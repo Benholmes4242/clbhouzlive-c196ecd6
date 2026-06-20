@@ -9,6 +9,7 @@ import { toast } from 'sonner';
 import { ArrowLeft, Search, MapPin, CheckCircle, Star, ChevronDown, Bookmark, BookmarkCheck } from 'lucide-react';
 import { PageRoot } from '@/components/layout/PageRoot';
 import { Input } from '@/components/ui/input';
+import { formatRatingValue } from '@/utils/formatters';
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sheet';
 import { Button } from '@/components/ui/button';
 import {
@@ -86,7 +87,7 @@ const CourseRow: React.FC<{
           <div className="flex items-center gap-0.5 flex-shrink-0">
             <Star className="w-3 h-3 fill-current" style={{ color: 'var(--dgp-accent-gold)' }} />
             <span className="text-xs" style={{ color: 'var(--dgp-accent-gold)' }}>
-              {course.rating.toFixed(1)}
+              {formatRatingValue(course.rating)}
             </span>
           </div>
         )}
