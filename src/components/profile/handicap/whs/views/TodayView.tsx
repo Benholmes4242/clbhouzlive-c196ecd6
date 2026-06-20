@@ -76,11 +76,6 @@ export const TodayView: React.FC<Props> = ({
       {/* 3. Recent Unlocks */}
       <RecentUnlocksStrip userId={userId} readOnly={readOnly} />
 
-      {/* 3. Next Round Watch — owner only */}
-      {!readOnly && (
-        <NextRoundWatch connectionId={connectionId} currentHandicap={currentHandicap} />
-      )}
-
       {/* 4. Last Round */}
       <LastRoundCard
         connectionId={connectionId}
