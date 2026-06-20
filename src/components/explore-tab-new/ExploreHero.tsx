@@ -1,9 +1,10 @@
 import { memo } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ChevronRight, Flame } from 'lucide-react';
+import { ChevronRight } from 'lucide-react';
 import { useExploreHero } from './hooks/useExploreHero';
 import type { ExploreMoodId } from './hooks/useExploreMood';
 import { ExploreSectionHeader } from './ExploreSectionHeader';
+import { FlameMark } from './DiscoverMarks';
 import clbhouzLogo from '@/assets/clbhouz-logo.png';
 import { AMBER, INK_TINT_06 } from '@/features/courses/_shared/tokens';
 import { formatRatingValue } from '@/utils/formatters';

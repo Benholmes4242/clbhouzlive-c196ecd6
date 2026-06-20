@@ -1,7 +1,7 @@
 import { memo, useMemo, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Crown } from 'lucide-react';
-import { ReachMark } from './DiscoverMarks';
+import { TrophyMark } from './DiscoverMarks';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useWhsConnection } from '@/lib/whs/hooks';
 import { useTitlesInReach, type TitleInReach } from '@/hooks/gam/useTitlesInReach';
@@ -221,7 +221,7 @@ function WhereYoudRankInner({ userId }: WhereYoudRankProps) {
     <section style={{ padding: '0 0 0' }}>
       <ExploreSectionHeader
         title="Titles within your reach"
-        mark={<ReachMark />}
+        mark={<TrophyMark />}
         sub="Courses you've played, where your close to the lead"
       />
       <div className="flex gap-3 px-4 overflow-x-auto scrollbar-hide" style={{ paddingBottom: 4 }}>

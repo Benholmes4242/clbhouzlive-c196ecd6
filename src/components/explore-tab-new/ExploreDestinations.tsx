@@ -1,5 +1,6 @@
 import { memo } from 'react';
-import { MapPin, Globe } from 'lucide-react';
+import { Globe } from 'lucide-react';
+import { PinMark } from './DiscoverMarks';
 import { useExploreRegionsWithImages } from './hooks/useExploreRegionsWithImages';
 import { ExploreSectionHeader } from './ExploreSectionHeader';
 

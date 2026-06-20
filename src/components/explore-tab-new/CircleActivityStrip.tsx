@@ -1,6 +1,6 @@
 import { useState, useMemo } from 'react';
-import { Activity } from 'lucide-react';
 import { ExploreSectionHeader } from './ExploreSectionHeader';
+import { LinkedRingsMark } from './DiscoverMarks';
 import {
   useCircleActivity,
   type CircleActivityRow,
@@ -83,8 +83,7 @@ export function CircleActivityStrip({ userId }: Props) {
       kickerColor="amber"
       title="Your friends"
       sub="What your circle's been pulling off"
-      icon={Activity}
-      iconTone="amber"
+      mark={<LinkedRingsMark />}
     />
   );
 
