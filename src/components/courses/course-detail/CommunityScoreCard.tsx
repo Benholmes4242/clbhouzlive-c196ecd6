@@ -1,5 +1,4 @@
 import React from 'react';
-import { CheckCircle2, ArrowUp as ArrowUpIcon, ArrowDown as ArrowDownIcon } from 'lucide-react';
 import { CourseRatingAggregate } from '@/hooks/useCourseRatingAggregates';
 import { UserCourseRating } from '@/hooks/useUserCourseRating';
 import { RatingTierDistributionData } from '@/components/courses/review/RatingTierDistribution';
