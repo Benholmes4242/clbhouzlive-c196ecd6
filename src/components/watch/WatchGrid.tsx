@@ -147,6 +147,7 @@ const WatchGrid: React.FC<WatchGridProps> = ({
           gap: GAP,
           alignItems: 'flex-start',
           paddingInline: 0,
+          marginTop: 8,
         }}
       >
         {columns.map((col, ci) => (
