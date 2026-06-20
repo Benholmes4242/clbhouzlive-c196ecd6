@@ -572,15 +572,15 @@ const CourseExplorer = () => {
       {!isLoading && totalCount > 0 && (
         <div className="flex items-center justify-between gap-3 pt-2 px-4">
           <span style={{
-            fontSize: 11, color: INK_MUTE, flex: 1,
-            fontWeight: 600, letterSpacing: '0.16em', textTransform: 'uppercase',
+            fontSize: 13, color: INK_MUTE, flex: 1, lineHeight: 1.35,
+            fontWeight: 500,
           }}>
             {hasSearch ? (
-              <>RESULTS · {totalCount.toLocaleString()} {totalCount === 1 ? 'COURSE' : 'COURSES'}</>
+              <><strong style={{ color: '#0F172A', fontWeight: 700 }}>{totalCount.toLocaleString()}</strong> {totalCount === 1 ? 'result' : 'results'}</>
             ) : selectedRegion === PRIMARY_REGIONS.ALL ? (
-              <>WORLDWIDE · {totalCount.toLocaleString()} COURSES</>
+              <><strong style={{ color: '#0F172A', fontWeight: 700 }}>{totalCount.toLocaleString()}</strong> courses worldwide</>
             ) : (
-              <>{getRegionLabel().toUpperCase()} · {totalCount.toLocaleString()} COURSES</>
+              <><strong style={{ color: '#0F172A', fontWeight: 700 }}>{totalCount.toLocaleString()}</strong> courses in {getRegionLabel()}</>
             )}
           </span>
           <AppSelect
