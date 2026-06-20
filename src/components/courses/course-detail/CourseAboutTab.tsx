@@ -127,7 +127,7 @@ const CourseAboutTab = ({ course, onTabChange }: CourseAboutTabProps) => {
   return (
     <div
       className="animate-in fade-in duration-200"
-      style={{ paddingBottom: 'calc(env(safe-area-inset-bottom, 0px) + 12px)', background: SLATE_50 }}
+      style={{ paddingBottom: 34, background: SLATE_50 }}
     >
       {/* 1. Location breadcrumb pills */}
       <CourseLocationPills course={course} />
@@ -321,7 +321,7 @@ const CourseAboutTab = ({ course, onTabChange }: CourseAboutTabProps) => {
 
       {/* 12. Official Website — amber ghost button, part of the explore section */}
       {course.website_url && (
-        <div style={{ padding: '12px 16px 8px' }}>
+        <div style={{ padding: '12px 16px 0' }}>
           <button
             onClick={handleWebsiteClick}
             style={{ width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6, padding: '12px 0', borderRadius: 12, background: 'rgba(247,147,30,0.06)', border: '1.5px solid rgba(247,147,30,0.2)', fontSize: 13, fontWeight: 700, color: AMBER, cursor: 'pointer' }}
