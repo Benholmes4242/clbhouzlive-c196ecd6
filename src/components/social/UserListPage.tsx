@@ -234,22 +234,9 @@ function getPrimaryActionConfig(
       };
     case 'following':
     case 'friends':
-      return {
-        label: 'Message',
-        icon: <MessageCircle className="w-3.5 h-3.5" />,
-        isAmber: false,
-        ariaLabel: `Message ${user.displayName}`,
-        onClick: handlers.onMessage,
-      };
+      return null;
     case 'friend_request_sent':
-      return {
-        label: 'Cancel',
-        icon: <X className="w-3.5 h-3.5" />,
-        isAmber: false,
-        ariaLabel: `Cancel friend request to ${user.displayName}`,
-        onClick: handlers.onCancelRequest,
-        disabled: loading,
-      };
+      return null;
     case 'friend_request_received':
       return {
         label: 'Accept',
