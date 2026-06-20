@@ -348,7 +348,6 @@ const FeedCardImpl: React.FC<FeedCardProps> = ({
           onCourse?.(post);
         };
         const pill = post.courseRating != null ? (() => {
-          const pct = (post.courseRating / 10) * 360;
           return (
             <button
               type="button"
@@ -360,13 +359,14 @@ const FeedCardImpl: React.FC<FeedCardProps> = ({
                 cursor: post.courseId ? 'pointer' : 'default', marginLeft: 8,
               }}
             >
-              <span style={{
-                width: 16, height: 16, borderRadius: 999, flexShrink: 0,
-                background: `conic-gradient(#fbbf24 ${pct}deg, rgba(247,147,30,0.18) ${pct}deg)`,
-                display: 'flex', alignItems: 'center', justifyContent: 'center',
-              }}>
-                <span style={{ width: 11, height: 11, borderRadius: 999, background: '#FFFFFF' }} />
-              </span>
+              <img
+                src="/lovable-uploads/2b0e2d79-6b26-4b6b-a27b-8dd5f8cc5aad.png"
+                alt=""
+                style={{
+                  width: 16, height: 16, flexShrink: 0, objectFit: 'contain',
+                }}
+                aria-hidden="true"
+              />
               <span style={{ fontSize: 11, fontWeight: 800, color: '#C97211', fontVariantNumeric: 'tabular-nums', lineHeight: 1 }}>
                 {post.courseRating.toFixed(1)}
               </span>
