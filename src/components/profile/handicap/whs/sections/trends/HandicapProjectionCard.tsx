@@ -18,7 +18,7 @@ const T = {
   green: '#059669',
   greenInk: '#065F46',
   greenTint: 'rgba(5,150,105,0.10)',
-  red: '#9F1D1D',
+  red: '#DC2626',
   redInk: '#7F1D1D',
   redTint: 'rgba(159,29,29,0.10)',
   slate: 'var(--hcp-t-80)',
