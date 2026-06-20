@@ -1,5 +1,4 @@
 import { memo } from 'react';
-import { Trophy } from 'lucide-react';
 
 const AMBER = '#F7931E';
 const AMBER_SHADOW = '0 4px 10px -2px rgba(247,147,30,0.40)';
@@ -15,60 +14,115 @@ const TILE: React.CSSProperties = {
   justifyContent: 'center',
 };
 
-/** Titles within reach — three ascending bars (podium/climb). */
-export const ReachMark = memo(function ReachMark() {
-  return (
-    <div style={{ ...TILE, background: AMBER, boxShadow: AMBER_SHADOW }}>
-      <div
-        style={{
-          display: 'flex',
-          alignItems: 'flex-end',
-          gap: 2,
-          height: 16,
-        }}
-      >
-        <div style={{ width: 4, height: 8, background: 'rgba(255,255,255,0.55)', borderRadius: 1 }} />
-        <div style={{ width: 4, height: 16, background: 'rgba(255,255,255,1)', borderRadius: 1 }} />
-        <div style={{ width: 4, height: 12, background: 'rgba(255,255,255,0.75)', borderRadius: 1 }} />
-      </div>
-    </div>
-  );
-});
+const amberTile: React.CSSProperties = { ...TILE, background: AMBER, boxShadow: AMBER_SHADOW };
+const inkTile: React.CSSProperties = { ...TILE, background: INK_GRADIENT, boxShadow: INK_SHADOW };
 
-/** Latest records — ringed disc with a star (medal). */
-export const RecordsMark = memo(function RecordsMark() {
+/** Best of the best — flame. */
+export const FlameMark = memo(function FlameMark() {
   return (
-    <div style={{ ...TILE, background: AMBER, boxShadow: AMBER_SHADOW }}>
-      <div
-        style={{
-          width: 18,
-          height: 18,
-          borderRadius: '50%',
-          border: '1.5px solid rgba(255,255,255,1)',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-        }}
-      >
-        <Trophy size={11} color="#FFFFFF" strokeWidth={2.2} aria-hidden />
-      </div>
-    </div>
-  );
-});
-
-/** Toughest courses — dark tile with amber summit peak. */
-export const ToughestMark = memo(function ToughestMark() {
-  return (
-    <div style={{ ...TILE, background: INK_GRADIENT, boxShadow: INK_SHADOW }}>
-      <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+    <div style={amberTile}>
+      <svg width="18" height="18" viewBox="0 0 30 30" fill="none" aria-hidden>
         <path
-          d="M3 20 L9 9 L13 15 L16 11 L21 20 Z"
-          fill={AMBER}
-          stroke={AMBER}
-          strokeWidth="1"
+          d="M15 3 C12 8 9 9 9 15 a6 6 0 0 0 12 0 c0-4-3-6-3-9 -2 2-3 4-3 6 -1-2-1-4 0-9 Z"
+          fill="#fff"
+        />
+      </svg>
+    </div>
+  );
+});
+
+/** Your friends — two interlocking rings. */
+export const LinkedRingsMark = memo(function LinkedRingsMark() {
+  return (
+    <div style={amberTile}>
+      <svg width="20" height="20" viewBox="0 0 30 30" fill="none" aria-hidden>
+        <circle cx="12" cy="15" r="6" fill="none" stroke="#fff" strokeWidth="2.2" />
+        <circle cx="18" cy="15" r="6" fill="none" stroke="#fff" strokeWidth="2.2" opacity="0.85" />
+      </svg>
+    </div>
+  );
+});
+
+/** Latest records — ribbon seal (medal disc + tails). */
+export const RibbonSealMark = memo(function RibbonSealMark() {
+  return (
+    <div style={amberTile}>
+      <svg width="20" height="20" viewBox="0 0 30 30" fill="none" aria-hidden>
+        <path d="M11 16 l-1 10 5-3 5 3 -1-10" fill="#fff" opacity="0.85" />
+        <circle cx="15" cy="12" r="7" fill="#fff" />
+      </svg>
+    </div>
+  );
+});
+
+/** Titles within your reach — tall, elegant trophy outline. */
+export const TrophyMark = memo(function TrophyMark() {
+  return (
+    <div style={amberTile}>
+      <svg width="20" height="20" viewBox="0 0 48 48" fill="none" aria-hidden>
+        <path
+          d="M17 7 h14 v8 a7 7 0 0 1 -14 0 Z"
+          fill="none"
+          stroke="#fff"
+          strokeWidth="2.6"
           strokeLinejoin="round"
         />
-        <circle cx="9" cy="6" r="1.6" fill={AMBER} />
+        <path
+          d="M17 9 h-4.5 a4.5 4.5 0 0 0 5 9 M31 9 h4.5 a4.5 4.5 0 0 1 -5 9"
+          fill="none"
+          stroke="#fff"
+          strokeWidth="2.4"
+        />
+        <path
+          d="M24 22 v8 M18 38 h12 M20 38 l1-6 h6 l1 6"
+          fill="none"
+          stroke="#fff"
+          strokeWidth="2.6"
+          strokeLinejoin="round"
+          strokeLinecap="round"
+        />
+      </svg>
+    </div>
+  );
+});
+
+/** Toughest courses — ink tile, white mountain peak. */
+export const MountainMark = memo(function MountainMark() {
+  return (
+    <div style={inkTile}>
+      <svg width="20" height="20" viewBox="0 0 30 30" fill="none" aria-hidden>
+        <path d="M3 24 L11 9 L16 18 L20 12 L27 24 Z" fill="#fff" />
+      </svg>
+    </div>
+  );
+});
+
+/** Echo concierge — waveform bars. */
+export const WaveformMark = memo(function WaveformMark() {
+  return (
+    <div style={amberTile}>
+      <svg width="20" height="20" viewBox="0 0 30 30" fill="none" aria-hidden>
+        <g stroke="#fff" strokeWidth="2.4" strokeLinecap="round">
+          <path d="M8 12 v6" />
+          <path d="M13 8 v14" />
+          <path d="M17 5 v20" />
+          <path d="M22 10 v10" />
+        </g>
+      </svg>
+    </div>
+  );
+});
+
+/** Destinations — pin teardrop with hole punched to amber. */
+export const PinMark = memo(function PinMark() {
+  return (
+    <div style={amberTile}>
+      <svg width="20" height="20" viewBox="0 0 30 30" fill="none" aria-hidden>
+        <path
+          d="M15 3 a8 8 0 0 1 8 8 c0 6-8 16-8 16 S7 17 7 11 a8 8 0 0 1 8-8 Z"
+          fill="#fff"
+        />
+        <circle cx="15" cy="11" r="3" fill={AMBER} />
       </svg>
     </div>
   );
