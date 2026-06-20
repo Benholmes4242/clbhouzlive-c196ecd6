@@ -193,8 +193,8 @@ const CommunityScoreCard: React.FC<CommunityScoreCardProps> = ({
               {onlyUserHasRated ? ' · Only you' : ''}
             </div>
           </div>
-          {comparisonMessage}
         </div>
+
       </div>
 
 
