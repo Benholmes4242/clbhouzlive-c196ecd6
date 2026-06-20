@@ -88,12 +88,14 @@ const ScoreRing: React.FC<{ score: number; size?: number }> = ({ score, size = 8
 interface PersonalReviewCardProps {
   courseId: string;
   rating: UserCourseRating;
+  communityAverage?: number | null;
   className?: string;
 }
 
 export const PersonalReviewCard: React.FC<PersonalReviewCardProps> = ({
   courseId,
   rating,
+  communityAverage,
 }) => {
   const navigate = useNavigate();
 
