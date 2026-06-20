@@ -81,13 +81,11 @@ export default function ExploreGrid({
     }
   }, [coursePosts.length, isFullscreenOpen, appendPosts]);
 
-  const [heroPost, ...restPosts] = coursePosts;
-
-  // Shortest-column masonry distribution for the rest (hero is rendered separately).
+  // Shortest-column masonry distribution.
   const columns = useMemo<PlacedTile[][]>(() => {
     const cols: PlacedTile[][] = Array.from({ length: COLS }, () => []);
     const heights = new Array(COLS).fill(0);
-    restPosts.forEach((post, i) => {
+    coursePosts.forEach((post, i) => {
       const w = post.mediaItems?.[0]?.width;
       const h = post.mediaItems?.[0]?.height;
       const ratio = w && h && w > 0 && h > 0 ? w / h : FALLBACK_RATIO;
@@ -96,12 +94,11 @@ export default function ExploreGrid({
       for (let c = 1; c < COLS; c++) {
         if (heights[c] < heights[target]) target = c;
       }
-      // heroPost takes index 0; rest are 1..n
-      cols[target].push({ post, index: i + 1, ratio });
+      cols[target].push({ post, index: i, ratio });
       heights[target] += tileH;
     });
     return cols;
-  }, [restPosts]);
+  }, [coursePosts]);
 
   if (isLoading) {
     return <ExploreGridSkeleton />;
@@ -137,19 +134,6 @@ export default function ExploreGrid({
 
   return (
     <div ref={gridRef} style={{ display: 'flex', flexDirection: 'column', gap: GAP }}>
-      {heroPost && (
-        <div style={{ position: 'relative', width: '100%', aspectRatio: '16 / 9', overflow: 'hidden' }}>
-          <ExploreTile
-            post={heroPost}
-            index={0}
-            variant="hero"
-            allPosts={coursePosts}
-            fetchNextPage={fetchNextPage}
-            hasNextPage={hasNextPage}
-            isFetchingNextPage={isFetchingNextPage}
-          />
-        </div>
-      )}
 
       <div
         style={{
@@ -157,7 +141,7 @@ export default function ExploreGrid({
           gap: GAP,
           alignItems: 'flex-start',
           paddingInline: 0,
-          marginTop: heroPost ? 0 : 8,
+          marginTop: 0,
         }}
       >
         {columns.map((col, ci) => (
