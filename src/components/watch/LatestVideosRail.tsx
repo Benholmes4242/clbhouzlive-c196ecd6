@@ -65,7 +65,7 @@ export default function LatestVideosRail() {
       />
 
       <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
-        <div ref={heroRef}>
+        <div ref={heroRef} style={{ padding: '0 16px' }}>
           <AutoplayVideoCard
             post={hero}
             index={0}
