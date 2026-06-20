@@ -1,4 +1,5 @@
 import { memo } from 'react';
+import { Trophy, Crown } from 'lucide-react';
 
 const AMBER = '#F7931E';
 const AMBER_SHADOW = '0 4px 10px -2px rgba(247,147,30,0.40)';
@@ -17,13 +18,13 @@ const TILE: React.CSSProperties = {
 const amberTile: React.CSSProperties = { ...TILE, background: AMBER, boxShadow: AMBER_SHADOW };
 const inkTile: React.CSSProperties = { ...TILE, background: INK_GRADIENT, boxShadow: INK_SHADOW };
 
-/** Best of the best — flame. */
+/** Best of the best — clean teardrop flame with inner curl. */
 export const FlameMark = memo(function FlameMark() {
   return (
     <div style={amberTile}>
-      <svg width="18" height="18" viewBox="0 0 30 30" fill="none" aria-hidden>
+      <svg width="20" height="20" viewBox="0 0 24 24" aria-hidden>
         <path
-          d="M15 3 C12 8 9 9 9 15 a6 6 0 0 0 12 0 c0-4-3-6-3-9 -2 2-3 4-3 6 -1-2-1-4 0-9 Z"
+          d="M12 2 C12 5 9.5 6.5 8.5 9 C7.5 11.3 8 13.5 9.2 15 C9 13.5 9.8 12.2 11 11.5 C10.7 13 11.3 14 12.2 14.8 C13.4 13.9 14 12.4 14 11 C15 12 15.6 13.4 15.5 15 C16.8 13.4 17.2 11 16.3 8.8 C15.2 6 13 5 12 2 Z"
           fill="#fff"
         />
       </svg>
@@ -43,45 +44,20 @@ export const LinkedRingsMark = memo(function LinkedRingsMark() {
   );
 });
 
-/** Latest records — ribbon seal (medal disc + tails). */
-export const RibbonSealMark = memo(function RibbonSealMark() {
+/** Latest records — lucide Trophy (matches card badge). */
+export const TrophyMark = memo(function TrophyMark() {
   return (
     <div style={amberTile}>
-      <svg width="20" height="20" viewBox="0 0 30 30" fill="none" aria-hidden>
-        <path d="M11 16 l-1 10 5-3 5 3 -1-10" fill="#fff" opacity="0.85" />
-        <circle cx="15" cy="12" r="7" fill="#fff" />
-      </svg>
+      <Trophy size={18} color="#fff" strokeWidth={2.2} aria-hidden />
     </div>
   );
 });
 
-/** Titles within your reach — tall, elegant trophy outline. */
-export const TrophyMark = memo(function TrophyMark() {
+/** Titles within reach — lucide Crown (matches card badge). */
+export const CrownMark = memo(function CrownMark() {
   return (
     <div style={amberTile}>
-      <svg width="20" height="20" viewBox="0 0 48 48" fill="none" aria-hidden>
-        <path
-          d="M17 7 h14 v8 a7 7 0 0 1 -14 0 Z"
-          fill="none"
-          stroke="#fff"
-          strokeWidth="2.6"
-          strokeLinejoin="round"
-        />
-        <path
-          d="M17 9 h-4.5 a4.5 4.5 0 0 0 5 9 M31 9 h4.5 a4.5 4.5 0 0 1 -5 9"
-          fill="none"
-          stroke="#fff"
-          strokeWidth="2.4"
-        />
-        <path
-          d="M24 22 v8 M18 38 h12 M20 38 l1-6 h6 l1 6"
-          fill="none"
-          stroke="#fff"
-          strokeWidth="2.6"
-          strokeLinejoin="round"
-          strokeLinecap="round"
-        />
-      </svg>
+      <Crown size={18} color="#fff" strokeWidth={2.2} aria-hidden />
     </div>
   );
 });
