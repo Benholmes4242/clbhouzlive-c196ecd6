@@ -91,14 +91,6 @@ function VideoLargeCardInner({ post, index, allPosts }: VideoLargeCardProps) {
           />
         ) : null}
 
-        <div
-          aria-hidden
-          style={{
-            position: 'absolute',
-            inset: 0,
-            background: 'linear-gradient(to top, rgba(0,0,0,0.78) 0%, rgba(0,0,0,0.05) 55%, transparent 100%)',
-          }}
-        />
 
         {courseName ? (
           <div style={{ position: 'absolute', top: 10, left: 10, display: 'flex', gap: 6, maxWidth: 'calc(100% - 110px)', flexWrap: 'wrap' }}>
