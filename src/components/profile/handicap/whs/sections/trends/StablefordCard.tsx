@@ -32,8 +32,8 @@ const T = {
   green: 'var(--hcp-good-deep)',
   greenInk: '#15803D',
   greenSoft: 'rgba(5,150,105,0.14)',
-  red: 'var(--hcp-bad-deep)',
-  redInk: '#991B1B',
+  red: 'var(--hcp-bad)',
+  redInk: '#DC2626',
   redSoft: 'rgba(159,29,29,0.12)',
   ringTrack: 'var(--hcp-bg-3)',
 };
