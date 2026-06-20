@@ -22,7 +22,7 @@ interface ExploreGridProps {
 
 const GAP = 2;
 const COLS = 3;
-const RADIUS = 6;
+const RADIUS = 0;
 const FALLBACK_RATIO = 1; // square fallback for courses grid
 
 function cornerRadius(ci: number) {
