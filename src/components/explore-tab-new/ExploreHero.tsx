@@ -82,8 +82,7 @@ function ExploreHeroInner({ userId, mood }: ExploreHeroProps) {
         kickerColor="amber"
         title="Today's standout"
         sub="The course worth your attention right now"
-        icon={Flame}
-        iconTone="amber"
+        mark={<FlameMark />}
         paddingTop={20}
       />
       <div style={{ padding: '0 16px' }}>
