@@ -41,7 +41,6 @@ export default function LatestVideosRail() {
           eyebrow="Fresh from the tour"
           kickerColor="amber"
           title="Latest videos"
-          sub="Tournament recaps, coaching and vlogs"
           onSeeAll={() => navigate('/watch/videos')}
           seeAllLabel="More videos"
         />
@@ -61,7 +60,6 @@ export default function LatestVideosRail() {
         eyebrow="Fresh from the tour"
         kickerColor="amber"
         title="Latest videos"
-        sub="Tournament recaps, coaching and vlogs"
         onSeeAll={() => navigate('/watch/videos')}
         seeAllLabel="More videos"
       />
