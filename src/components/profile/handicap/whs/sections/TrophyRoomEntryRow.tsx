@@ -57,55 +57,49 @@ const TrophyRoomEntryRow: React.FC<Props> = ({ userId, viewMode = 'owner', owner
             : `Open trophies — ${lifetimeCount} earned`
         }
         style={{
-          padding: '12px 14px',
-          borderRadius: 12,
           display: 'flex',
           alignItems: 'center',
-          gap: 12,
-          cursor: 'pointer',
+          gap: 13,
           width: '100%',
-          fontFamily: FONT,
           textAlign: 'left',
-          background: 'var(--hcp-bg-1)',
-          border: '1px solid var(--hcp-line)',
+          cursor: 'pointer',
+          padding: '16px 16px',
+          borderRadius: 16,
+          background: 'linear-gradient(180deg, rgba(247,147,30,0.10), rgba(247,147,30,0.04))',
+          border: '1px solid rgba(247,147,30,0.22)',
         }}
       >
         <div
           style={{
-            width: 44,
-            height: 44,
-            borderRadius: 11,
-            background:
-              weeklyCount > 0 ? 'rgba(247,147,30,0.18)' : 'rgba(247,147,30,0.12)',
-            border:
-              weeklyCount > 0
-                ? '1px solid rgba(247,147,30,0.40)'
-                : '1px solid rgba(247,147,30,0.28)',
+            width: 46,
+            height: 46,
+            borderRadius: 14,
+            flexShrink: 0,
+            background: '#ffffff',
+            boxShadow: '0 2px 8px rgba(247,147,30,0.18)',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
-            flexShrink: 0,
-            color: '#FBBC2E',
           }}
         >
-          <Trophy size={22} strokeWidth={2} />
+          <Trophy size={22} strokeWidth={2} color="#F7931E" />
         </div>
 
         <div style={{ flex: 1, minWidth: 0 }}>
           {weeklyCount > 0 ? (
             <>
-              <div
-                style={{
-                  fontSize: 13,
-                  fontWeight: 700,
-                  color: 'var(--hcp-t-100)',
-                  letterSpacing: '-0.01em',
-                  lineHeight: 1.2,
-                }}
-              >
+                <div
+                  style={{
+                    fontSize: 15,
+                    fontWeight: 800,
+                    color: 'var(--hcp-t-100)',
+                    letterSpacing: '-0.01em',
+                    lineHeight: 1.2,
+                  }}
+                >
                 {weeklyTitle}
               </div>
-              <div style={{ fontSize: 11.5, color: 'var(--hcp-t-100)', marginTop: 2 }}>
+              <div style={{ fontSize: 12, color: 'var(--hcp-t-60)', marginTop: 2 }}>
                 {weeklySub}
               </div>
             </>
@@ -113,20 +107,20 @@ const TrophyRoomEntryRow: React.FC<Props> = ({ userId, viewMode = 'owner', owner
             <>
               <div
                 style={{
-                  fontSize: 13,
-                  fontWeight: 700,
+                  fontSize: 15,
+                  fontWeight: 800,
                   color: 'var(--hcp-t-100)',
                   letterSpacing: '-0.01em',
                   lineHeight: 1.2,
                 }}
               >
-                <span style={{ color: '#FBBC2E', fontVariantNumeric: 'tabular-nums' }}>
+                <span style={{ color: '#F7931E', fontVariantNumeric: 'tabular-nums' }}>
                   {lifetimeCount}
                 </span>{' '}
                 {lifetimeCount === 1 ? 'trophy' : 'trophies'}{' '}
                 {isFriend ? `in ${possessive.toLowerCase()} case` : 'in your case'}
               </div>
-              <div style={{ fontSize: 11.5, color: 'var(--hcp-t-60)', marginTop: 2 }}>
+              <div style={{ fontSize: 12, color: 'var(--hcp-t-60)', marginTop: 2 }}>
                 {lifetimeSub}
               </div>
             </>
@@ -134,9 +128,9 @@ const TrophyRoomEntryRow: React.FC<Props> = ({ userId, viewMode = 'owner', owner
         </div>
 
         <ChevronRight
-          size={16}
+          size={18}
           strokeWidth={2.4}
-          color={weeklyCount > 0 ? 'var(--hcp-t-40)' : 'rgba(251,188,46,0.6)'}
+          color="#F7931E"
           style={{ flexShrink: 0 }}
         />
       </button>
