@@ -4,6 +4,7 @@ import { MapPin, Star, Clock, Users, Play, ExternalLink, ChevronLeft, ChevronRig
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
+import { formatRatingValue } from '@/utils/formatters';
 import type { MessageType, SharedCourse, SharedTeeTime, SharedMoment } from '@/types/messaging';
 
 interface SharedContentCardProps {
@@ -115,7 +116,7 @@ function CourseShareCard({
               />
             ))}
             <span className={cn("text-sm font-bold ml-1", primaryTextColor)}>
-              {communityRating.toFixed(1)}
+              {formatRatingValue(communityRating)}
             </span>
           </div>
         </div>

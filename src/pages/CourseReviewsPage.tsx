@@ -8,6 +8,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
+import { formatRatingValue } from '@/utils/formatters';
 import ScrollToTopGlass from '@/components/common/ScrollToTopGlass';
 
 const CourseReviewsPage: React.FC = () => {
@@ -138,7 +139,7 @@ const CourseReviewsPage: React.FC = () => {
             </div>
             <div>
               <div className="text-sm font-semibold">
-                {avg !== null ? avg.toFixed(1) : '—'}
+                {avg !== null ? formatRatingValue(avg) : '—'}
               </div>
               <div className="text-xs text-muted-foreground">
                 Based on {count} rating{count === 1 ? '' : 's'}
@@ -255,7 +256,7 @@ const CourseReviewsPage: React.FC = () => {
                     {r.rating !== null && (
                       <div className="text-right">
                         <div className="text-sm font-semibold">
-                          {r.rating.toFixed(1)}
+                          {formatRatingValue(r.rating)}
                         </div>
                         <div className="h-1.5 w-16 rounded-full bg-muted">
                           <div
@@ -277,16 +278,16 @@ const CourseReviewsPage: React.FC = () => {
                   {/* Breakdown row */}
                   <div className="flex flex-wrap gap-2 text-[11px] text-muted-foreground">
                     {r.design_score !== null && (
-                      <span>Design {r.design_score.toFixed(1)}</span>
+                      <span>Design {formatRatingValue(r.design_score)}</span>
                     )}
                     {r.condition_score !== null && (
-                      <span>Condition {r.condition_score.toFixed(1)}</span>
+                      <span>Condition {formatRatingValue(r.condition_score)}</span>
                     )}
                     {r.clubhouse_score !== null && (
-                      <span>Clubhouse {r.clubhouse_score.toFixed(1)}</span>
+                      <span>Clubhouse {formatRatingValue(r.clubhouse_score)}</span>
                     )}
                     {r.facilities_score !== null && (
-                      <span>Facilities {r.facilities_score.toFixed(1)}</span>
+                      <span>Facilities {formatRatingValue(r.facilities_score)}</span>
                     )}
                   </div>
 

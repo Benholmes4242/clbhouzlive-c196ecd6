@@ -8,6 +8,7 @@ import { ChevronLeft, ChevronRight, Image, Link, MapPin, Loader2, ExternalLink, 
 import { supabase } from '@/integrations/supabase/client';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
+import { formatRatingValue } from '@/utils/formatters';
 import { AMBER, AMBER_TINT_10, AMBER_TINT_25, HAIRLINE_INK_10, HAIRLINE_INK_7, INK, INK_FAINT, INK_MUTE, INK_TINT_05, SHELL_BG, SURFACE } from './_shared/tokens';
 
 interface SharedMediaGalleryProps {
@@ -281,7 +282,7 @@ export function SharedMediaGallery({ conversationId, onClose }: SharedMediaGalle
                       )}
                     </div>
                     {course.rating && course.rating > 0 && (
-                      <span style={{ fontSize: 13, fontWeight: 700, color: AMBER }}>⭐ {course.rating.toFixed(1)}</span>
+                      <span style={{ fontSize: 13, fontWeight: 700, color: AMBER }}>⭐ {formatRatingValue(course.rating)}</span>
                     )}
                     <ChevronRight size={14} style={{ color: '#d1d5db', flexShrink: 0 }} />
                   </button>
