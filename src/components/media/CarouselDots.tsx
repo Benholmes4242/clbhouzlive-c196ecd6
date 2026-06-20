@@ -60,6 +60,7 @@ export interface CarouselDotsProps {
   /** Controls opacity for fade behaviour. Default true. */
   isVisible?: boolean;
   className?: string;
+  tone?: 'light' | 'dark';
 }
 
 export const CarouselDots: React.FC<CarouselDotsProps> = ({
@@ -67,6 +68,7 @@ export const CarouselDots: React.FC<CarouselDotsProps> = ({
   active,
   isVisible = true,
   className = '',
+  tone = 'light',
 }) => {
   if (count <= 1) return null;
 
