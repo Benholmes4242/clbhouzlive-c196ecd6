@@ -171,7 +171,7 @@ const FeedCardImpl: React.FC<FeedCardProps> = ({
               fontSize: 120,
               fontWeight: 800, letterSpacing: '-0.05em', lineHeight: 1,
               color: GHOST[tierKey],
-              pointerEvents: 'none', whiteSpace: 'nowrap', zIndex: 1,
+              pointerEvents: 'none', whiteSpace: 'nowrap', zIndex: 0,
               fontVariantNumeric: 'tabular-nums',
             }}
           >
@@ -271,7 +271,7 @@ const FeedCardImpl: React.FC<FeedCardProps> = ({
       </div>
 
       {/* Media */}
-      <div style={{ position: 'relative', zIndex: 0 }}>
+      <div style={{ position: 'relative', zIndex: 1 }}>
         {isMulti ? (
           <MediaCarousel
             items={items}
