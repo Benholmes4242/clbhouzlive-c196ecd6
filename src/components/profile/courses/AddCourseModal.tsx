@@ -675,7 +675,7 @@ export const AddCourseModal: React.FC<AddCourseModalProps> = ({
       onClose={onClose}
       zIndexBase={1400}
       ariaLabelledBy="add-course-title"
-      className="max-h-[85vh]"
+      className="max-h-[80dvh]"
     >
       {/* Flex column shell — header/status/tabs/search are natural height; scroll fills rest */}
       <div style={{

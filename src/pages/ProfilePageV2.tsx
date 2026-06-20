@@ -1024,14 +1024,14 @@ const ProfilePageV2Content: React.FC = () => {
             >
               {profile.bio}
             </div>
-            {(profile.bio.length > 200 || profile.bio.split('\n').length > 4) && !bioExpanded && (
-              <button 
-                onClick={() => setBioExpanded(true)}
+            {(profile.bio.length > 200 || profile.bio.split('\n').length > 4) && (
+              <button
+                onClick={() => setBioExpanded(v => !v)}
                 className="text-[0.8125rem] font-semibold mt-1 min-h-[44px] flex items-center gap-0.5 active:scale-[0.97] transition-transform"
                 style={{ color: '#F7931E' }}
               >
-                Read more
-                <ChevronDown className="w-4 h-4 ml-1" />
+                {bioExpanded ? 'Read less' : 'Read more'}
+                <ChevronDown className={cn("w-4 h-4 ml-1 transition-transform", bioExpanded && "rotate-180")} />
               </button>
             )}
             
