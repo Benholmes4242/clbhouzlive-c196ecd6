@@ -333,13 +333,13 @@ const Top100CoursesHubPanel = () => {
       {!isLoading && allCourses.length > 0 && (
         <div className="flex items-center justify-between gap-3 pt-2 px-4">
           <span style={{
-            fontSize: 11, color: INK_MUTE, flex: 1,
-            fontWeight: 600, letterSpacing: '0.16em', textTransform: 'uppercase',
+            fontSize: 13, color: INK_MUTE, flex: 1, lineHeight: 1.35,
+            fontWeight: 500,
           }}>
             {searchTerm ? (
-              <>RESULTS · {allCourses.length} {allCourses.length === 1 ? 'COURSE' : 'COURSES'}</>
+              <><strong style={{ color: INK, fontWeight: 700 }}>{allCourses.length}</strong> {allCourses.length === 1 ? 'result' : 'results'}</>
             ) : (
-              <>{activeListShortLabel.toUpperCase()} · {totalCoursesInActiveList} COURSES</>
+              <><strong style={{ color: INK, fontWeight: 700 }}>{totalCoursesInActiveList}</strong> courses · {activeListShortLabel}</>
             )}
           </span>
           <AppSelect
