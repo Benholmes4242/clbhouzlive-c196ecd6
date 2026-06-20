@@ -235,15 +235,15 @@ export const ReviewBlockFlat: React.FC<ReviewBlockFlatProps> = ({
                 alignItems: 'center',
                 gap: 5,
                 padding: '4px 9px',
-                borderRadius: 7,
-                background: 'rgba(15,23,42,0.025)',
-                border: '0.5px solid rgba(15,23,42,0.07)',
+                borderRadius: 999,
+                background: 'rgba(247,147,30,0.08)',
+                border: '1px solid rgba(247,147,30,0.2)',
               }}
             >
-              <span style={{ fontSize: 9, fontWeight: 700, color: '#64748B', textTransform: 'uppercase', letterSpacing: '0.06em' }}>
+              <span style={{ fontSize: 9, fontWeight: 700, color: '#F7931E', textTransform: 'uppercase', letterSpacing: '0.06em' }}>
                 {s.label}
               </span>
-              <span style={{ fontSize: 11, fontWeight: 800, color: '#0F172A', fontVariantNumeric: 'tabular-nums' }}>
+              <span style={{ fontSize: 11, fontWeight: 800, color: '#F7931E', fontVariantNumeric: 'tabular-nums' }}>
                 {formatRatingValue(Number(s.value))}
               </span>
             </div>
