@@ -224,7 +224,8 @@ const FeedCardImpl: React.FC<FeedCardProps> = ({
                   position: 'relative',
                   display: 'flex', alignItems: 'center', justifyContent: 'flex-end',
                   background: 'transparent', border: 'none', padding: 0, cursor: 'pointer',
-                  minWidth: 92, flexShrink: 0, overflow: 'hidden', alignSelf: 'stretch',
+                  minWidth: 96, height: 44, flexShrink: 0,
+                  overflow: 'visible',
                 }}
                 aria-label={`Your review: ${reviewRating.toFixed(1)} ${tierLabel}`}
               >
