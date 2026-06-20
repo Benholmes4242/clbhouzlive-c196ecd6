@@ -168,7 +168,7 @@ const FeedCardImpl: React.FC<FeedCardProps> = ({
               right: -7,
               top: 28,
               transform: 'translateY(-50%)',
-              fontSize: 100,
+              fontSize: 80,
               fontWeight: 800, letterSpacing: '-0.05em', lineHeight: 1,
               color: GHOST[tierKey],
               pointerEvents: 'none', whiteSpace: 'nowrap', zIndex: 0,
