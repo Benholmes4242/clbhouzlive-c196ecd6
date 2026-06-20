@@ -2,28 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 
-const LAUNCH = new Date(2026, 5, 22, 0, 0, 0); // 22 June 2026, LOCAL midnight
-const APP_STORE_URL = '';   // TODO: fill before 21 June
-const PLAY_STORE_URL = '';  // TODO: fill before 21 June
-
 const GEIST = '"Geist", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif';
-
-function pad2(n: number) {
-  return n < 10 ? `0${n}` : `${n}`;
-}
-
-function getRemaining(target: Date) {
-  const ms = target.getTime() - Date.now();
-  if (ms <= 0) return { ms: 0, d: 0, h: 0, m: 0, s: 0 };
-  const totalSec = Math.floor(ms / 1000);
-  return {
-    ms,
-    d: Math.floor(totalSec / 86400),
-    h: Math.floor((totalSec % 86400) / 3600),
-    m: Math.floor((totalSec % 3600) / 60),
-    s: totalSec % 60,
-  };
-}
 
 const BetaGatePage: React.FC = () => {
   const [logoError, setLogoError] = useState(false);
