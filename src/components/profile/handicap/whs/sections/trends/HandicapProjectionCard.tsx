@@ -26,7 +26,7 @@ const T = {
   slateTint: 'var(--hcp-bg-2)',
   neutralTint: 'var(--hcp-bg-2)',
   hotRed: '#DC2626',
-  hotRedInk: '#991B1B',
+  hotRedInk: '#DC2626',
   hotRedTint: 'rgba(220,38,38,0.10)',
   coldBlue: '#0EA5E9',
   coldBlueInk: '#0369A1',
