@@ -131,7 +131,7 @@ export default function WatchRailTile({
         flexShrink: 0,
         position: 'relative',
         width,
-        borderRadius: 12,
+        borderRadius: 6,
         overflow: 'hidden',
         cursor: 'pointer',
         aspectRatio: '3/4',

@@ -38,7 +38,7 @@ function VideosQuickClipsRailInner({ userId }: VideosQuickClipsRailProps) {
               style={{
                 width: 132,
                 aspectRatio: '9 / 16',
-                borderRadius: 12,
+                borderRadius: 6,
                 overflow: 'hidden',
                 position: 'relative',
                 background: 'hsl(var(--muted))',

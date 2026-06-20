@@ -77,7 +77,7 @@ function CompactVideoRowInner({ post, index, allPosts }: CompactVideoRowProps) {
           width: 132,
           flexShrink: 0,
           aspectRatio: '16 / 9',
-          borderRadius: 9,
+          borderRadius: 6,
           overflow: 'hidden',
           background: 'hsl(var(--muted))',
         }}
