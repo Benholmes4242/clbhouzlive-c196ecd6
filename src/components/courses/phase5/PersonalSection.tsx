@@ -5,6 +5,7 @@ import React from 'react';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useUserCourseRating } from '@/hooks/useUserCourseRating';
 import { useCoursePersonalStatus } from '@/hooks/useCoursePersonalStatus';
+import { useCourseRatingAggregates } from '@/hooks/useCourseRatingAggregates';
 import CourseStatusToggle from './CourseStatusToggle';
 import PersonalReviewCard from './PersonalReviewCard';
 import CourseMoments from './CourseMoments';
