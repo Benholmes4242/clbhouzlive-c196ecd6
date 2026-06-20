@@ -153,11 +153,11 @@ const FeedCardImpl: React.FC<FeedCardProps> = ({
       {/* Card-level ghost numeral — overflows the header, clipped by card edges */}
       {reviewRating != null && (() => {
         const GHOST = {
-          EXCEPTIONAL: 'rgba(247,147,30,0.16)',
-          EXCELLENT:   'rgba(15,23,42,0.09)',
-          GOOD:        'rgba(15,23,42,0.07)',
-          FAIR:        'rgba(15,23,42,0.055)',
-          POOR:        'rgba(15,23,42,0.055)',
+          EXCEPTIONAL: 'rgba(247,147,30,0.09)',
+          EXCELLENT:   'rgba(15,23,42,0.06)',
+          GOOD:        'rgba(15,23,42,0.05)',
+          FAIR:        'rgba(15,23,42,0.04)',
+          POOR:        'rgba(15,23,42,0.04)',
         } as const;
         const tierKey = getRatingTier(reviewRating);
         return (
@@ -259,7 +259,7 @@ const FeedCardImpl: React.FC<FeedCardProps> = ({
                 aria-label={`Your review: ${formatRatingValue(reviewRating)} ${tierLabel}`}
               >
                 <span style={{
-                  fontSize: 9, fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase',
+                  fontSize: 12.5, fontWeight: 800, letterSpacing: '0.14em', textTransform: 'uppercase',
                   color: LABEL_COLOR[tierKey], whiteSpace: 'nowrap',
                 }}>
                   {tierLabel}
