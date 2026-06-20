@@ -1146,7 +1146,7 @@ const UserRowFlat: React.FC<UserRowFlatProps> = ({
                 label="Message"
                 onClick={async () => {
                   setShowKebabSheet(false);
-                  handlers.onMessage({ stopPropagation: () => {} } as React.MouseEvent);
+                  handleMessage({ stopPropagation: () => {} } as React.MouseEvent);
                 }}
               />
             )}
