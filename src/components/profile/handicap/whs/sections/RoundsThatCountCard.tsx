@@ -261,6 +261,70 @@ export const RoundsThatCountCard: React.FC<Props> = ({
 
       <div style={{ padding: '0 20px' }}>
 
+      {/* ── NEXT-ROUND HERO BAND (merged from former NextRoundWatch) ───────── */}
+      {projection && projection.hasData && (
+        <div style={{
+          background: 'linear-gradient(135deg, rgba(247,147,30,0.10), rgba(247,147,30,0.03))',
+          border: `1px solid ${AMBER_BORDER}`,
+          borderRadius: 16,
+          padding: '16px 18px',
+          marginBottom: 18,
+          fontFamily: FONT_GEIST,
+        }}>
+          <div style={{
+            fontSize: 10, fontWeight: 800, letterSpacing: '0.16em',
+            textTransform: 'uppercase', color: 'var(--hcp-amber-d)',
+          }}>
+            Next round · Target to cut
+          </div>
+
+          <div style={{ display: 'flex', alignItems: 'baseline', gap: 10, marginTop: 8 }}>
+            <div style={{
+              fontSize: 52, fontWeight: 800, color: GREEN,
+              letterSpacing: '-0.03em', lineHeight: 0.9,
+              fontVariantNumeric: 'tabular-nums',
+            }}>
+              {fmtDiff(projection.cutTarget)}
+            </div>
+            <div style={{ fontSize: 14, fontWeight: 700, color: INK, lineHeight: 1.3 }}>
+              or better
+              <br />
+              <span style={{ fontWeight: 500, color: INK_70, fontSize: 12 }}>
+                drops your index
+              </span>
+            </div>
+          </div>
+
+          <div style={{
+            display: 'flex', marginTop: 14,
+            borderTop: `1px solid ${AMBER_BORDER}`, paddingTop: 12,
+          }}>
+            <div style={{ flex: 1, borderRight: `1px solid ${AMBER_BORDER}` }}>
+              <div style={{ fontSize: 10, fontWeight: 700, color: INK_70 }}>Last 5 avg</div>
+              <div style={{
+                fontSize: 20, fontWeight: 800, color: AMBER,
+                fontVariantNumeric: 'tabular-nums', marginTop: 2,
+              }}>
+                {last5Avg != null ? fmtDiff(last5Avg) : '—'}
+              </div>
+            </div>
+            <div style={{ flex: 1, paddingLeft: 14 }}>
+              <div style={{ fontSize: 10, fontWeight: 700, color: INK_70 }}>If you don't</div>
+              <div style={{
+                fontSize: 20, fontWeight: 800,
+                color: projection.isAtRisk ? RED : INK,
+                fontVariantNumeric: 'tabular-nums', marginTop: 2,
+              }}>
+                {projection.isAtRisk
+                  ? `rises ${projection.settleAt.toFixed(1)}`
+                  : `stays ${projection.settleAt.toFixed(1)}`}
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+      {/* ── END HERO BAND ─────────────────────────────────────────────────── */}
+
       {/* Chart — full-bleed on page background, no card wrapper */}
       <div style={{ padding: '0 0 8px' }}>
         <style>{`
