@@ -754,7 +754,7 @@ const ShotsBody: React.FC<ShotsBodyProps> = ({ trophyAgg, shotsLoading, scope })
     {
       key: 'double',
       count: doublePlus,
-      background: 'var(--hcp-bad-deep)',
+      background: 'var(--hcp-bad)',
       textColor: '#FFFFFF',
     },
   ];
