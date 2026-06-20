@@ -26,7 +26,7 @@ const T = {
   amberInk: '#854F0B',
   green: '#059669',
   greenInk: '#065F46',
-  red: '#9F1D1D',
+  red: '#DC2626',
   redInk: '#7F1D1D',
   neutralTint: 'var(--hcp-bg-2)',
 };
