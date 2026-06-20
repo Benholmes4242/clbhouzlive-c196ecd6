@@ -4,6 +4,7 @@
 import React, { useState, useCallback, useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Plus, ChevronRight, Trophy } from 'lucide-react';
+import { CarouselDots } from '@/components/media/CarouselDots';
 import { cn } from '@/lib/utils';
 import { useUserTopTenCourses, TopTenCourse } from '@/hooks/useUserTopTenCourses';
 import { useQuery } from '@tanstack/react-query';
@@ -275,20 +276,8 @@ export const FavouritesCarousel: React.FC<FavouritesCarouselProps> = ({
 
       {/* Minimal scroll indicator */}
       {courseCount > 1 && (
-        <div className="flex justify-center items-center gap-1 mt-4">
-          {Array.from({ length: courseCount }).map((_, i) => {
-            const isActive = i === activeIndex;
-            return (
-              <div
-                key={i}
-                className={cn(
-                  "rounded-full transition-all duration-300",
-                  isActive ? "w-5 h-1.5" : "w-1.5 h-1.5"
-                )}
-                style={{ backgroundColor: isActive ? '#0F172A' : 'rgba(15,23,42,0.20)' }}
-              />
-            );
-          })}
+        <div className="flex justify-center items-center mt-4">
+          <CarouselDots count={courseCount} active={activeIndex} tone="dark" />
         </div>
       )}
       
