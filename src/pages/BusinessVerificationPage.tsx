@@ -76,7 +76,6 @@ export default function BusinessVerificationPage() {
         className="sticky top-0 z-10 backdrop-blur-xl"
         style={{
           background: 'rgba(248,250,252,0.97)',
-          borderBottom: `0.5px solid ${BIZ.hair}`,
           paddingTop: 'max(env(safe-area-inset-top, 0px), 8px)',
         }}
       >

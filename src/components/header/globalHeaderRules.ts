@@ -82,10 +82,10 @@ function isBusinessProfilePage(pathname: string): boolean {
 
 /**
  * Business sub-pages with their own chrome — no GlobalHeader.
- * /business/:id/edit, /business/:id/insights
+ * /business/:id/edit, /insights, /verification, /team, /activity, /followers
  */
 function isBusinessSubPageExcluded(pathname: string): boolean {
-  return /^\/business\/[^/]+\/(edit|insights)$/.test(pathname);
+  return /^\/business\/[^/]+\/(edit|insights|verification|team|activity|followers)(\/.*)?$/.test(pathname);
 }
 
 export function isGlobalHeaderExcluded(pathname: string) {

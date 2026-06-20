@@ -437,7 +437,7 @@ export const UserListPage: React.FC<UserListPageProps> = ({
         <div
           className="sticky top-0 z-40 backdrop-blur-xl"
           style={{
-            paddingTop: 'max(env(safe-area-inset-top, 0px), 47px)',
+            paddingTop: 'max(var(--safe-top, env(safe-area-inset-top, 0px)), 8px)',
             background: 'rgba(248,250,252,0.97)',
             borderBottom: `0.5px solid ${BORDER}`,
           }}
