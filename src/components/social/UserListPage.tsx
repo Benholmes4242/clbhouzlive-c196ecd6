@@ -1126,7 +1126,12 @@ const UserRowFlat: React.FC<UserRowFlatProps> = ({
             </div>
           </div>
 
-          <div style={{ borderTop: `0.5px solid ${BORDER}` }}>
+          <div
+            style={{
+              borderTop: `0.5px solid ${BORDER}`,
+              paddingBottom: 'max(env(safe-area-inset-bottom, 0px), 12px)',
+            }}
+          >
             <KebabAction
               icon={<UserIcon className="w-4 h-4" />}
               label="View profile"
@@ -1135,6 +1140,16 @@ const UserRowFlat: React.FC<UserRowFlatProps> = ({
                 handleRowClick();
               }}
             />
+            {(uiState === 'following' || uiState === 'friends') && (
+              <KebabAction
+                icon={<MessageCircle className="w-4 h-4" />}
+                label="Message"
+                onClick={async () => {
+                  setShowKebabSheet(false);
+                  handlers.onMessage({ stopPropagation: () => {} } as React.MouseEvent);
+                }}
+              />
+            )}
             <KebabAction
               icon={<BellOff className="w-4 h-4" />}
               label="Mute notifications"
