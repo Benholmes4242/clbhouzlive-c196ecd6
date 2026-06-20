@@ -144,9 +144,16 @@ const CompactHeader: React.FC<CompactHeaderProps> = ({ className }) => {
   const isTop100SubPage = location.pathname.startsWith('/top100/') &&
     location.pathname.split('/').length > 2;
   const isTop100Route = isTop100SubPage;
-  
+
+  // Business management sub-pages: back arrow → Manage Businesses
+  // (NOT the public /business/:idOrSlug profile, which stays immersive)
+  const isBusinessManageRoute =
+    location.pathname === '/business/create' ||
+    location.pathname === '/business/success' ||
+    /^\/business\/[^/]+\/(edit|insights|verification|team|activity|followers)(\/.*)?$/.test(location.pathname);
+
   // Routes that should show back arrow instead of logo
-  const isBackArrowRoute = isDiscoverSubPage || isTop100Route || isCourseDetailRoute || isEditProfileRoute || isFriendsActivityRoute || isAchievementsRoute || isMessagesRoute || isHandicapRoute || isWatchSubpageRoute || isTourDeepRoute;
+  const isBackArrowRoute = isDiscoverSubPage || isTop100Route || isCourseDetailRoute || isEditProfileRoute || isFriendsActivityRoute || isAchievementsRoute || isMessagesRoute || isHandicapRoute || isWatchSubpageRoute || isTourDeepRoute || isBusinessManageRoute;
   
   // Light chrome is now the default across the app, including Handicap (which
   // converted dark → light alongside Clubhouse/Watch/Tours). ClubhouseHeaderNew
@@ -200,6 +207,8 @@ const CompactHeader: React.FC<CompactHeaderProps> = ({ className }) => {
         navigate(-1);
       } else if (isTourDeepRoute) {
         navigate(-1);
+      } else if (isBusinessManageRoute) {
+        navigate('/businesses/manage');
       }
     } else {
       navigate('/clubhouse');
