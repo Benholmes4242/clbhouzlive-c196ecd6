@@ -135,6 +135,34 @@ export const PersonalReviewCard: React.FC<PersonalReviewCardProps> = ({
             <Calendar style={{ width: 12, height: 12 }} />
             Played on {dateLabel}
           </p>
+          {communityAverage != null && communityAverage > 0 && (() => {
+            const diff = Number((rating.rating - communityAverage).toFixed(1));
+            const absDiff = Math.abs(diff);
+            const pill: React.CSSProperties = {
+              display: 'inline-flex', alignItems: 'center', gap: 5,
+              padding: '5px 11px', borderRadius: 999, fontSize: 11, fontWeight: 600,
+              marginTop: 8,
+            };
+            if (absDiff < 0.2) {
+              return (
+                <span style={{ ...pill, background: 'rgba(15,23,42,0.05)', color: '#64748B' }}>
+                  <CheckCircle2 style={{ width: 12, height: 12 }} /> Matches community consensus
+                </span>
+              );
+            }
+            if (diff > 0) {
+              return (
+                <span style={{ ...pill, background: 'rgba(22,163,74,0.08)', color: '#16A34A' }}>
+                  <ArrowUp style={{ width: 12, height: 12 }} /> {absDiff.toFixed(1)} above community avg
+                </span>
+              );
+            }
+            return (
+              <span style={{ ...pill, background: 'rgba(239,68,68,0.08)', color: '#EF4444' }}>
+                <ArrowDown style={{ width: 12, height: 12 }} /> {absDiff.toFixed(1)} below community avg
+              </span>
+            );
+          })()}
         </div>
         <button
           onClick={handleEditClick}
