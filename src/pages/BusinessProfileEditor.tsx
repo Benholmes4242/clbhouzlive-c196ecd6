@@ -682,38 +682,24 @@ export default function BusinessProfileEditor() {
   /* ── render ──────────────────────────────────────── */
   return (
     <PageRoot className="md:!max-w-[440px]">
-      <div className="min-h-screen flex flex-col w-full" style={{ background: BIZ.pageBg }}>
-        {/* Top bar — Close + title only (Save moved to bottom) */}
-        <div
-          style={{
-            background: 'rgba(248,250,252,0.97)',
-            borderBottom: `0.5px solid ${BIZ.hair}`,
-            paddingTop: 'max(var(--safe-top, env(safe-area-inset-top, 0px)), 8px)',
-          }}
-        >
-          <div className="flex items-center gap-2 px-3 py-2.5">
-            <button
-              onClick={handleClose}
-              aria-label="Close"
-              className="min-h-[44px] min-w-[44px] flex items-center justify-center active:scale-[0.97] transition-transform"
-              style={{ color: BIZ.ink }}
-            >
-              <ChevronLeft className="w-5 h-5" />
-            </button>
-            <div className="flex-1 min-w-0 text-center" style={{ paddingRight: 44 }}>
-              <p
-                style={{
-                  fontSize: 15,
-                  fontWeight: 700,
-                  color: BIZ.ink,
-                  letterSpacing: '-0.01em',
-                }}
-              >
-                {mode === 'create' ? 'Create business' : 'Edit business'}
-              </p>
-            </div>
-          </div>
+      <div
+        className="min-h-screen flex flex-col w-full"
+        style={{ background: BIZ.pageBg, paddingTop: 'var(--chrome-total-h, 0px)' }}
+      >
+        {/* Title block — CompactHeader provides the back arrow */}
+        <div className="px-4 pt-3 pb-2">
+          <p
+            style={{
+              fontSize: 15,
+              fontWeight: 700,
+              color: BIZ.ink,
+              letterSpacing: '-0.01em',
+            }}
+          >
+            {mode === 'create' ? 'Create business' : 'Edit business'}
+          </p>
         </div>
+
 
         <div className="flex-1 overflow-y-auto pt-3 pb-12">
           <IdentitySection

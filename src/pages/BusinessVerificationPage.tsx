@@ -71,31 +71,17 @@ export default function BusinessVerificationPage() {
 
   return (
     <PageRoot className="min-h-screen md:!max-w-[440px]" style={{ background: BIZ.pageBg }}>
-      {/* Sticky header */}
-      <header
-        className="sticky top-0 z-10 backdrop-blur-xl"
-        style={{
-          background: 'rgba(248,250,252,0.97)',
-          paddingTop: 'max(env(safe-area-inset-top, 0px), 8px)',
-        }}
+      {/* Title block — CompactHeader provides the back arrow */}
+      <div
+        className="px-4 pt-3 pb-3"
+        style={{ paddingTop: 'calc(var(--chrome-total-h, 0px) + 12px)' }}
       >
-        <div className="flex items-center px-4 h-14">
-          <button
-            onClick={() => navigate(-1)}
-            className="min-h-[44px] min-w-[44px] flex items-center justify-center -ml-2 text-foreground active:scale-[0.97] transition-transform"
-            aria-label="Back"
-          >
-            <ChevronLeft className="w-5 h-5" />
-          </button>
-          <div className="flex-1 px-2">
-            <SectionEyebrow label="VERIFICATION" color="amber" />
-            <h1 className="text-[18px] mt-0.5" style={{ color: BIZ.ink, fontWeight: 800, letterSpacing: '-0.01em' }}>
-              {state === 'verified' ? 'Verified business' : state === 'pending' ? 'Under review' : state === 'needs_more_info' ? 'More info needed' : state === 'rejected' ? 'Not approved' : 'Get verified'}
-            </h1>
-          </div>
-          <div className="w-11" />
-        </div>
-      </header>
+        <SectionEyebrow label="VERIFICATION" color="amber" />
+        <h1 className="text-[18px] mt-0.5" style={{ color: BIZ.ink, fontWeight: 800, letterSpacing: '-0.01em' }}>
+          {state === 'verified' ? 'Verified business' : state === 'pending' ? 'Under review' : state === 'needs_more_info' ? 'More info needed' : state === 'rejected' ? 'Not approved' : 'Get verified'}
+        </h1>
+      </div>
+
 
       <main className="px-4 py-6 max-w-lg mx-auto pb-20">
         {isLoading ? (
