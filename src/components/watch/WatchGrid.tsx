@@ -19,9 +19,20 @@ interface WatchGridProps {
   emptyMessage?: string;
 }
 
-const GAP = 8;
+const GAP = 2;
 const COLS = 2;
 const FALLBACK_RATIO = 9 / 16; // width / height for default 9:16 tile
+const RADIUS = 6;
+
+function cornerRadius(ci: number) {
+  const left = ci === 0;
+  return {
+    borderTopLeftRadius: left ? 0 : RADIUS,
+    borderBottomLeftRadius: left ? 0 : RADIUS,
+    borderTopRightRadius: left ? RADIUS : 0,
+    borderBottomRightRadius: left ? RADIUS : 0,
+  };
+}
 
 interface PlacedTile {
   post: FeedPost;
@@ -136,6 +147,7 @@ const WatchGrid: React.FC<WatchGridProps> = ({
           gap: GAP,
           alignItems: 'flex-start',
           paddingInline: 0,
+          marginTop: 8,
         }}
       >
         {columns.map((col, ci) => (
@@ -156,7 +168,7 @@ const WatchGrid: React.FC<WatchGridProps> = ({
                   position: 'relative',
                   width: '100%',
                   aspectRatio: `${ratio}`,
-                  borderRadius: 10,
+                  ...cornerRadius(ci),
                   overflow: 'hidden',
                 }}
               >
@@ -177,7 +189,7 @@ const WatchGrid: React.FC<WatchGridProps> = ({
               style={{
                 flex: 1,
                 aspectRatio: '9 / 16',
-                borderRadius: 10,
+                borderRadius: RADIUS,
                 background:
                   'linear-gradient(90deg, hsl(var(--muted)) 25%, hsl(var(--muted)/0.5) 50%, hsl(var(--muted)) 75%)',
                 backgroundSize: '200% 100%',
