@@ -1,6 +1,6 @@
 import { useNavigate } from 'react-router-dom';
 import { Trophy } from 'lucide-react';
-import { RecordsMark } from './DiscoverMarks';
+import { RibbonSealMark } from './DiscoverMarks';
 import {
   useRecentCourseRecords,
   type RecentCourseRecord,
