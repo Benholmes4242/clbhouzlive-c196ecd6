@@ -5,7 +5,7 @@ import HeroHandicapCardDark from '../sections/HeroHandicapCardDark';
 import TodayGreeting from '../sections/TodayGreeting';
 import TrophyRoomEntryRow from '../sections/TrophyRoomEntryRow';
 import LastRoundCard from '../sections/LastRoundCard';
-import NextRoundWatch from '../sections/NextRoundWatch';
+
 import Pattern14Card from '../sections/Pattern14Card';
 
 
