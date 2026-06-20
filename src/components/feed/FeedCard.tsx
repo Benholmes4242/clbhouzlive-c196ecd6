@@ -150,7 +150,34 @@ const FeedCardImpl: React.FC<FeedCardProps> = ({
       }}
     >
       {/* Header */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '10px 12px' }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '10px 12px', position: 'relative', overflow: 'hidden' }}>
+        {reviewRating != null && (() => {
+          const GHOST = {
+            EXCEPTIONAL: 'rgba(247,147,30,0.16)',
+            EXCELLENT:   'rgba(15,23,42,0.09)',
+            GOOD:        'rgba(15,23,42,0.07)',
+            FAIR:        'rgba(15,23,42,0.055)',
+            POOR:        'rgba(15,23,42,0.055)',
+          } as const;
+          const tierKey = getRatingTier(reviewRating);
+          return (
+            <span
+              aria-hidden
+              style={{
+                position: 'absolute',
+                right: -7,
+                top: '50%', transform: 'translateY(-50%)',
+                fontSize: 80,
+                fontWeight: 800, letterSpacing: '-0.05em', lineHeight: 1,
+                color: GHOST[tierKey],
+                pointerEvents: 'none', whiteSpace: 'nowrap', zIndex: 0,
+                fontVariantNumeric: 'tabular-nums',
+              }}
+            >
+              {formatRatingValue(reviewRating)}
+            </span>
+          );
+        })()}
         <button
           type="button"
           onClick={() => onProfile(post)}
@@ -207,49 +234,30 @@ const FeedCardImpl: React.FC<FeedCardProps> = ({
             </span>
           )}
           {reviewRating != null && (() => {
-            const GHOST = {
-              EXCEPTIONAL: { fill: 'rgba(247,147,30,0.14)', label: '#F7931E' },
-              EXCELLENT:   { fill: 'rgba(15,23,42,0.09)',   label: T100 },
-              GOOD:        { fill: 'rgba(15,23,42,0.07)',   label: T60 },
-              FAIR:        { fill: 'rgba(15,23,42,0.05)',   label: T40 },
-              POOR:        { fill: 'rgba(15,23,42,0.05)',   label: T40 },
+            const LABEL_COLOR = {
+              EXCEPTIONAL: '#F7931E',
+              EXCELLENT:   T100,
+              GOOD:        T60,
+              FAIR:        T40,
+              POOR:        T40,
             } as const;
             const tierKey = getRatingTier(reviewRating);
             const tierLabel = getRatingTierLabel(reviewRating);
-            const g = GHOST[tierKey];
             return (
               <button
                 type="button"
                 onClick={(e) => { e.stopPropagation(); onReviewTap?.(post); }}
                 style={{
-                  position: 'relative',
-                  display: 'flex', alignItems: 'center', justifyContent: 'flex-end',
+                  position: 'relative', zIndex: 2,
                   background: 'transparent', border: 'none', padding: 0, cursor: 'pointer',
-                  minWidth: 96, height: 44, flexShrink: 0,
-                  overflow: 'visible',
+                  flexShrink: 0,
                 }}
                 aria-label={`Your review: ${formatRatingValue(reviewRating)} ${tierLabel}`}
               >
-                {/* Oversized ghost numeral — bleeds behind, right-anchored */}
-                <span
-                  aria-hidden
-                  style={{
-                    position: 'absolute', right: 0, top: '50%', transform: 'translateY(-50%)',
-                    fontSize: 46, fontWeight: 800, letterSpacing: '-0.04em', lineHeight: 1,
-                    color: g.fill, pointerEvents: 'none', whiteSpace: 'nowrap', zIndex: 0,
-                    fontVariantNumeric: 'tabular-nums',
-                  }}
-                >
-                  {formatRatingValue(reviewRating)}
-                </span>
-                {/* Sharp verdict label on top */}
-                <span
-                  style={{
-                    position: 'relative', zIndex: 2,
-                    fontSize: 9, fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase',
-                    color: g.label, whiteSpace: 'nowrap',
-                  }}
-                >
+                <span style={{
+                  fontSize: 9, fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase',
+                  color: LABEL_COLOR[tierKey], whiteSpace: 'nowrap',
+                }}>
                   {tierLabel}
                 </span>
               </button>
