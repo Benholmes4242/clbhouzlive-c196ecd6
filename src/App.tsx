@@ -96,8 +96,27 @@ const ROOT_GATE_LAUNCH = new Date(2026, 5, 22, 0, 0, 0); // 22 Jun 2026 local â€
 const PREVIEW_BYPASS_KEY = 'clbhouz_preview_bypass';
 const PREVIEW_BYPASS_TOKEN = 'clbhouz'; // the secret value: ?preview=clbhouz
 
+function isLovablePreviewHost(): boolean {
+  try {
+    const h = window.location.hostname;
+    return (
+      h.endsWith('.lovableproject.com') ||
+      h.endsWith('.lovable.app') ||
+      h.endsWith('.lovable.dev') ||
+      h === 'localhost' ||
+      h === '127.0.0.1'
+    );
+  } catch {
+    return false;
+  }
+}
+
 function usePreviewBypass(): boolean {
   try {
+    // 1) Always unlock inside the Lovable editor/preview (and local dev).
+    if (isLovablePreviewHost()) return true;
+
+    // 2) Secret token bypass for any other browser (persisted).
     const params = new URLSearchParams(window.location.search);
     const param = params.get('preview');
     if (param === PREVIEW_BYPASS_TOKEN) {
