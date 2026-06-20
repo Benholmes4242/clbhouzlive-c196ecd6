@@ -18,6 +18,7 @@
 import React, { useMemo } from 'react';
 import { Heart, MapPin, MessageCircle, Share } from 'lucide-react';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
+import { getRatingTier, getRatingTierLabel } from '@/lib/ratingTier';
 
 import type { FeedPost } from '@/components/media-system/types/media';
 import { InlineVideo } from './InlineVideo';
@@ -205,46 +206,49 @@ const FeedCardImpl: React.FC<FeedCardProps> = ({
             </span>
           )}
           {reviewRating != null && (() => {
+            const GHOST = {
+              EXCEPTIONAL: { fill: 'rgba(247,147,30,0.14)', label: '#F7931E' },
+              EXCELLENT:   { fill: 'rgba(15,23,42,0.09)',   label: T100 },
+              GOOD:        { fill: 'rgba(15,23,42,0.07)',   label: T60 },
+              FAIR:        { fill: 'rgba(15,23,42,0.05)',   label: T40 },
+              POOR:        { fill: 'rgba(15,23,42,0.05)',   label: T40 },
+            } as const;
+            const tierKey = getRatingTier(reviewRating);
+            const tierLabel = getRatingTierLabel(reviewRating);
+            const g = GHOST[tierKey];
             return (
               <button
                 type="button"
                 onClick={(e) => { e.stopPropagation(); onReviewTap?.(post); }}
                 style={{
-                  display: 'flex',
-                  flexDirection: 'column',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  gap: 3,
-                  lineHeight: 1,
-                  background: 'transparent',
-                  border: 'none',
-                  padding: 0,
-                  cursor: 'pointer',
-                  minWidth: 64,
-                  flexShrink: 0,
+                  position: 'relative',
+                  display: 'flex', alignItems: 'center', justifyContent: 'flex-end',
+                  background: 'transparent', border: 'none', padding: 0, cursor: 'pointer',
+                  minWidth: 92, flexShrink: 0, overflow: 'hidden', alignSelf: 'stretch',
                 }}
+                aria-label={`Your review: ${reviewRating.toFixed(1)} ${tierLabel}`}
               >
-                <span style={{
-                  fontSize: 22,
-                  fontWeight: 800,
-                  color: T100,
-                  fontVariantNumeric: 'tabular-nums',
-                  letterSpacing: '-0.03em',
-                }}>
+                {/* Oversized ghost numeral — bleeds behind, right-anchored */}
+                <span
+                  aria-hidden
+                  style={{
+                    position: 'absolute', right: -4, top: '50%', transform: 'translateY(-50%)',
+                    fontSize: 60, fontWeight: 800, letterSpacing: '-0.05em', lineHeight: 1,
+                    color: g.fill, pointerEvents: 'none', whiteSpace: 'nowrap', zIndex: 0,
+                    fontVariantNumeric: 'tabular-nums',
+                  }}
+                >
                   {reviewRating.toFixed(1)}
                 </span>
-                <span style={{
-                  fontSize: 8,
-                  fontWeight: 700,
-                  letterSpacing: '0.08em',
-                  textTransform: 'uppercase',
-                  color: '#64748B',
-                  background: 'rgba(15,23,42,0.05)',
-                  padding: '2px 7px',
-                  borderRadius: 999,
-                  whiteSpace: 'nowrap',
-                }}>
-                  Review
+                {/* Sharp verdict label on top */}
+                <span
+                  style={{
+                    position: 'relative', zIndex: 2,
+                    fontSize: 9, fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase',
+                    color: g.label, whiteSpace: 'nowrap',
+                  }}
+                >
+                  {tierLabel}
                 </span>
               </button>
             );
