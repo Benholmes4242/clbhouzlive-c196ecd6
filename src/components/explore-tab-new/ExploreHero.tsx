@@ -75,23 +75,18 @@ function ExploreHeroInner({ userId, mood }: ExploreHeroProps) {
   const hasRating = hero.rating_avg != null && (hero.review_count ?? 0) > 0;
 
   return (
-    <div style={{ padding: '16px 16px 0' }}>
-      <div
-        style={{
-          display: 'inline-flex',
-          alignItems: 'center',
-          gap: 5,
-          color: KICKER_COLOR,
-          fontSize: 9.5,
-          fontWeight: 800,
-          letterSpacing: '0.16em',
-          textTransform: 'uppercase',
-          marginBottom: 10,
-        }}
-      >
-        <Flame size={11} strokeWidth={2.5} />
-        Best of the best
-      </div>
+    <>
+      <ExploreSectionHeader
+        kicker="BEST OF THE BEST"
+        kickerColor="amber"
+        title="Today's standout"
+        sub="The course worth your attention right now"
+        icon={Flame}
+        iconTone="amber"
+        paddingTop={20}
+      />
+      <div style={{ padding: '0 16px' }}>
+
 
       <button
         type="button"
