@@ -20,8 +20,8 @@ interface ExploreGridProps {
   onRegionChange: (slug: string | null) => void;
 }
 
-const GAP = 2;
-const COLS = 3;
+const GAP = 1;
+const COLS = 2;
 const RADIUS = 0;
 const FALLBACK_RATIO = 1; // square fallback for courses grid
 

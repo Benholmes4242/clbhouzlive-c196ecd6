@@ -19,7 +19,7 @@ interface WatchGridProps {
   emptyMessage?: string;
 }
 
-const GAP = 2;
+const GAP = 1;
 const COLS = 2;
 const FALLBACK_RATIO = 9 / 16; // width / height for default 9:16 tile
 const RADIUS = 0;
