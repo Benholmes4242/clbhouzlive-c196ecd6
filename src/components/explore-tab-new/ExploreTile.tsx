@@ -54,7 +54,7 @@ function ExploreTileInner({ post, index, allPosts, variant = 'tile', feature = f
       onClick={handleTap}
       aria-label={courseName ? `View ${courseName}` : 'View post'}
       className="absolute inset-0 w-full h-full overflow-hidden bg-muted focus:outline-none"
-      style={{ borderRadius: variant === 'hero' ? 0 : 6 }}
+      style={{ borderRadius: 'inherit' }}
       data-explore-index={index}
     >
       {posterSrc && (
