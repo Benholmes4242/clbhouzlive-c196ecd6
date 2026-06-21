@@ -30,7 +30,7 @@ function normaliseName(name: string): string {
 
 export function useTournamentDefendingChamp(tournamentId: string | null | undefined) {
   return useQuery<DefendingChampData | null>({
-    queryKey: ['hybrid-hero', 'defending-champ', tournamentId],
+    queryKey: ['hybrid-hero', 'defending-champ', 'v2', tournamentId],
     enabled: !!tournamentId,
     staleTime: 1000 * 60 * 60 * 24, // 24h — prior winner doesn't change mid-week
     queryFn: async () => {
