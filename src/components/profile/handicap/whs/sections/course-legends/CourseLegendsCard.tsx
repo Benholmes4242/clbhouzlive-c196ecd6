@@ -222,9 +222,11 @@ export const CourseLegendsCard: React.FC<Props> = ({
   const cueStyle = FOOTER_INTENT_STYLE[cue.intent];
   const selfLabel = friendName ? friendName : 'YOU';
 
-  // Row-major split into 2-column grid
-  const left = resolved.filter((_, i) => i % 2 === 0);
-  const right = resolved.filter((_, i) => i % 2 === 1);
+  // Row-major split into 2-column grid (claimed only)
+  const claimed = resolved.filter(({ row }) => !!row);
+  const hasAnyClaimed = claimed.length > 0;
+  const left = claimed.filter((_, i) => i % 2 === 0);
+  const right = claimed.filter((_, i) => i % 2 === 1);
 
   return (
     <div
@@ -339,33 +341,39 @@ export const CourseLegendsCard: React.FC<Props> = ({
         </div>
       </div>
 
-      {/* 2-col row-major grid of champion cells */}
-      <div style={{ padding: '12px 14px 0' }}>
-        <div style={{ display: 'flex', gap: 6, alignItems: 'flex-start' }}>
-          <div style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', gap: 6 }}>
-            {left.map(({ slot, row, cat }) => (
-              <HolderCell
-                key={slot.key}
-                short={slot.short}
-                holder={row}
-                category={cat}
-                selfLabel={selfLabel}
-              />
-            ))}
-          </div>
-          <div style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', gap: 6 }}>
-            {right.map(({ slot, row, cat }) => (
-              <HolderCell
-                key={slot.key}
-                short={slot.short}
-                holder={row}
-                category={cat}
-                selfLabel={selfLabel}
-              />
-            ))}
+      {/* 2-col row-major grid of champion cells (claimed only) */}
+      {hasAnyClaimed ? (
+        <div style={{ padding: '12px 14px 0' }}>
+          <div style={{ display: 'flex', gap: 6, alignItems: 'flex-start' }}>
+            <div style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', gap: 6 }}>
+              {left.map(({ slot, row, cat }) => (
+                <HolderCell
+                  key={slot.key}
+                  short={slot.short}
+                  holder={row}
+                  category={cat}
+                  selfLabel={selfLabel}
+                />
+              ))}
+            </div>
+            <div style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', gap: 6 }}>
+              {right.map(({ slot, row, cat }) => (
+                <HolderCell
+                  key={slot.key}
+                  short={slot.short}
+                  holder={row}
+                  category={cat}
+                  selfLabel={selfLabel}
+                />
+              ))}
+            </div>
           </div>
         </div>
-      </div>
+      ) : (
+        <div style={{ padding: '14px 16px', fontSize: 12, color: 'var(--hcp-t-60)', fontFamily: FONT }}>
+          No champions yet — be the first to claim a title here.
+        </div>
+      )}
 
       {/* Footer */}
       <div
@@ -378,15 +386,6 @@ export const CourseLegendsCard: React.FC<Props> = ({
           gap: 8,
         }}
       >
-        <span
-          style={{
-            width: 5,
-            height: 5,
-            borderRadius: '50%',
-            background: cueStyle.dotColor,
-            flexShrink: 0,
-          }}
-        />
         <span
           style={{
             fontSize: 11.5,

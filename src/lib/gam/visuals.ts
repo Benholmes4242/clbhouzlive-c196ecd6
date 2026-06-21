@@ -112,7 +112,7 @@ export function formatLegendValue(category: LegendCategory, value: number): stri
   switch (category) {
     case 'best_score_diff_90d':
     case 'best_score_diff_all_time':
-      return value < 0 ? `${value.toFixed(1)} vs hcp` : `+${value.toFixed(1)} vs hcp`;
+      return value < 0 ? `${value.toFixed(1)} vs HCP` : `+${value.toFixed(1)} vs HCP`;
     case 'most_birdies_90d':
     case 'most_birdies_all_time':
       return `${value} birdies`;
@@ -184,14 +184,14 @@ export function formatLegendValueCompact(
 
 /**
  * Format a gap-to-first value for pulse "chase" cards.
- * Returns e.g. "2 strokes", "1 birdie", "0.4 vs hcp".
+ * Returns e.g. "2 strokes", "1 birdie", "0.4 vs HCP".
  */
 export function formatLegendGap(category: LegendCategory, gap: number): string {
   const abs = Math.abs(gap);
   switch (category) {
     case 'best_score_diff_90d':
     case 'best_score_diff_all_time':
-      return `${abs.toFixed(1)} vs hcp`;
+      return `${abs.toFixed(1)} vs HCP`;
     case 'lowest_gross_90d':
     case 'lowest_gross_all_time': {
       const n = Math.round(abs);
