@@ -204,7 +204,7 @@ export const SheetHeroGlass: React.FC<Props> = ({
         <div style={{ textAlign: 'center', flex: hasImpact ? undefined : 1 }}>
           <div style={labelStyle}>GROSS</div>
           <div
-            style={{ marginTop: 4, height: 44, display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+            style={{ marginTop: 2, height: 38, display: 'flex', alignItems: 'center', justifyContent: 'center' }}
             aria-label={`Gross score ${gross ?? ''}${isCounter ? ', counts toward index' : ''}`}
           >
             <GlassGrossRing
@@ -221,7 +221,7 @@ export const SheetHeroGlass: React.FC<Props> = ({
         ) : (
           <div style={{ textAlign: 'center', flex: hasImpact ? undefined : 1 }}>
             <div style={labelStyle}>STABLEFORD</div>
-            <div style={{ marginTop: 4, height: 44, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            <div style={{ marginTop: 2, height: 38, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
               <div style={{ ...valueStyle('#FFFFFF', valSize), marginTop: 0 }}>{stableford != null ? stableford : EM_DASH}</div>
             </div>
           </div>
@@ -233,7 +233,7 @@ export const SheetHeroGlass: React.FC<Props> = ({
         ) : (
           <div style={{ textAlign: 'center', flex: hasImpact ? undefined : 1 }}>
             <div style={labelStyle}>SCORE DIFF</div>
-            <div style={{ marginTop: 4, height: 44, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            <div style={{ marginTop: 2, height: 38, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
               <div style={{ ...valueStyle('#FFFFFF', valSize), marginTop: 0 }}>
                 {fmtDiffLocal(differential)}
               </div>
@@ -244,7 +244,7 @@ export const SheetHeroGlass: React.FC<Props> = ({
         {hasImpact && (
           <div style={{ textAlign: 'center' }}>
             <div style={labelStyle}>HCP IMPACT</div>
-            <div style={{ marginTop: 4, height: 44, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            <div style={{ marginTop: 2, height: 38, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
               <div style={{ ...valueStyle(impactColor, valSize), marginTop: 0 }}>{fmtImpact(handicapDelta!)}</div>
             </div>
           </div>
