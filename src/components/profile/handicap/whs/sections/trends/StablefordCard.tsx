@@ -750,11 +750,6 @@ const ShotsBody: React.FC<ShotsBodyProps> = ({ trophyAgg, shotsLoading, scope })
   const segTotal = segments.reduce((acc, s) => acc + s.count, 0) || 1;
 
 
-  // Footnote
-  const footnoteHtml =
-    roundsWithHoles === totalRounds
-      ? `<strong>${pctBirdiesOrBetter}%</strong> of holes are birdie or better.`
-      : `Hole-by-hole data from <strong>${roundsWithHoles} of ${totalRounds} rounds</strong>. <strong>${pctBirdiesOrBetter}%</strong> of holes are birdie or better.`;
 
   return (
     <>
@@ -905,17 +900,6 @@ const ShotsBody: React.FC<ShotsBodyProps> = ({ trophyAgg, shotsLoading, scope })
         </div>
 
 
-        {/* Footnote */}
-        <p
-          style={{
-            margin: '14px 0 0',
-            fontSize: 11.5,
-            lineHeight: 1.55,
-            color: T.inkMute,
-            fontFamily: FONT,
-          }}
-          dangerouslySetInnerHTML={{ __html: footnoteHtml }}
-        />
       </div>
 
       {/* Career milestones */}
@@ -1023,7 +1007,7 @@ const MilestonesStrip: React.FC<MilestonesStripProps> = ({
             letterSpacing: '0.04em',
           }}
         >
-          <span style={{ color: T.amber, fontWeight: 800 }}>{unlockedCount}</span> of 4 unlocked
+          <span style={{ color: HOLE_C.birdie, fontWeight: 800 }}>{unlockedCount}</span> of 4 unlocked
         </span>
       </div>
 
@@ -1058,24 +1042,24 @@ const MilestoneCard: React.FC<{
   meta: string;
 }> = ({ name, count, rarity, rings, meta }) => {
   const achieved = count > 0;
-  const rarityColor = rarity === 'FREQUENT' ? 'var(--hcp-t-40)' : T.amber;
+  const rarityColor = rarity === 'FREQUENT' ? 'var(--hcp-t-40)' : HOLE_C.birdie;
 
   const medalSize = 32;
   let medalBoxShadow = 'none';
   let medalMargin = 0;
   if (achieved && rings === 1) {
-    medalBoxShadow = '0 0 0 2px var(--hcp-bg-1), 0 0 0 3.5px rgba(247,147,30,0.8)';
+    medalBoxShadow = '0 0 0 2px var(--hcp-bg-1), 0 0 0 3.5px rgba(159,29,29,0.8)';
     medalMargin = 2;
   } else if (achieved && rings === 2) {
     medalBoxShadow =
-      '0 0 0 2px var(--hcp-bg-1), 0 0 0 3.5px rgba(247,147,30,0.9), 0 0 0 5px var(--hcp-bg-1), 0 0 0 6.5px rgba(247,147,30,0.6)';
+      '0 0 0 2px var(--hcp-bg-1), 0 0 0 3.5px rgba(159,29,29,0.9), 0 0 0 5px var(--hcp-bg-1), 0 0 0 6.5px rgba(159,29,29,0.6)';
     medalMargin = 4;
   }
 
   const medalStyle: React.CSSProperties = achieved
     ? {
         width: medalSize, height: medalSize, borderRadius: '50%',
-        background: 'linear-gradient(135deg, #F7931E 0%, #BA6E12 100%)',
+        background: 'linear-gradient(135deg, #9F1D1D 0%, #6E1414 100%)',
         color: '#1A0F02', display: 'flex', alignItems: 'center', justifyContent: 'center',
         fontSize: 12, fontWeight: 800, fontFamily: FONT, fontVariantNumeric: 'tabular-nums',
         boxShadow: medalBoxShadow, margin: medalMargin, flexShrink: 0,
@@ -1104,7 +1088,7 @@ const MilestoneCard: React.FC<{
         <div
           style={{
             position: 'absolute', top: 0, left: 0, bottom: 0, width: 2,
-            background: 'linear-gradient(180deg, #F7931E 0%, #BA6E12 100%)', opacity: 0.8,
+            background: 'linear-gradient(180deg, #9F1D1D 0%, #6E1414 100%)', opacity: 0.8,
           }}
         />
       )}
@@ -1115,7 +1099,7 @@ const MilestoneCard: React.FC<{
         <span
           style={{
             fontSize: 24, fontWeight: 200,
-            color: count > 0 ? T.amber : 'var(--hcp-t-30)',
+            color: count > 0 ? HOLE_C.birdie : 'var(--hcp-t-30)',
             fontVariantNumeric: 'tabular-nums', letterSpacing: '-0.04em', lineHeight: 0.9,
           }}
         >
