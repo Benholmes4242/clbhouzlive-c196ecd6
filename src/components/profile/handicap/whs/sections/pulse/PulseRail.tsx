@@ -37,7 +37,7 @@ export const PulseRail: React.FC<Props> = ({ userId, onOpenSearch }) => {
 
   if (isLoading) {
     return (
-      <div style={{ marginTop: 20 }}>
+      <div style={{ marginTop: 18 }}>
         <SectionHeader count={null} />
         <div
           style={{
@@ -71,7 +71,7 @@ export const PulseRail: React.FC<Props> = ({ userId, onOpenSearch }) => {
   }
 
   return (
-    <div style={{ marginTop: 20 }}>
+    <div style={{ marginTop: 18 }}>
       <SectionHeader count={friends.length} />
       <div
         style={{

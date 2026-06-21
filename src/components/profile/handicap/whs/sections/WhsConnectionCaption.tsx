@@ -17,7 +17,6 @@ export const WhsConnectionCaption: React.FC<Props> = ({ membershipNumber }) => {
         display: 'flex',
         flexDirection: 'column',
         alignItems: 'center',
-        gap: 6,
         fontFamily: FONT_GEIST,
       }}
     >
@@ -37,15 +36,6 @@ export const WhsConnectionCaption: React.FC<Props> = ({ membershipNumber }) => {
         >
           Member {membershipNumber}
         </span>
-      </div>
-      <div
-        style={{
-          fontSize: 11,
-          fontWeight: 400,
-          color: 'var(--hcp-t-40)',
-        }}
-      >
-        Synced twice daily
       </div>
     </div>
   );

@@ -8,7 +8,7 @@ interface Props {
 }
 
 export const FindPlayerRow: React.FC<Props> = ({ onOpen }) => (
-  <div style={{ padding: '14px 20px 0', fontFamily: FONT }}>
+  <div style={{ padding: '10px 20px 0', fontFamily: FONT }}>
     <button
       onClick={onOpen}
       style={{
