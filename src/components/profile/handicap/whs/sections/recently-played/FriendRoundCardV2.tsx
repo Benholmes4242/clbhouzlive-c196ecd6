@@ -16,7 +16,7 @@ interface Props {
 
 const FONT = 'Geist, system-ui, -apple-system, BlinkMacSystemFont, sans-serif';
 
-const FALLBACK_BG = 'var(--hcp-bg-3)';
+const FALLBACK_BG = 'linear-gradient(135deg, #1a3c2a 0%, #0f172a 100%)';
 
 export const FriendRoundCardV2: React.FC<Props> = ({
   activity,
