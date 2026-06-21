@@ -974,8 +974,8 @@ export function CinematicFrame({
           )}
         </div>
 
-        {/* Floating glass capsule */}
-        {hasCapsule && (
+        {/* Floating glass capsule — upcoming only (defending champ / field strength) */}
+        {isUpcoming && hasCapsule && (
         <div
           className="cinematic-capsule"
           style={{
@@ -988,23 +988,7 @@ export function CinematicFrame({
             boxShadow: '0 8px 40px rgba(0,0,0,0.4)',
           }}
         >
-          {isUpcoming ? (
-            upcomingCapsule
-          ) : slotNodes.length > 0 ? (
-            <>{slotNodes}</>
-          ) : (
-            <div
-              style={{
-                padding: '14px 12px',
-                fontSize: 13,
-                fontWeight: 600,
-                color: 'rgba(255,255,255,0.7)',
-                textAlign: 'center',
-              }}
-            >
-              Leaderboard updating…
-            </div>
-          )}
+          {upcomingCapsule}
 
           {/* Footer CTA */}
           <button
@@ -1036,6 +1020,22 @@ export function CinematicFrame({
         </div>
         )}
       </div>
+
+      {/* Broadcast bar — auto-scrolling top-10 ticker pinned to the bottom edge */}
+      {showTicker && (
+        <button
+          type="button"
+          onClick={onCtaTap}
+          aria-label="Open full leaderboard"
+          style={{
+            position: 'absolute', left: 0, right: 0, bottom: 0, zIndex: 4,
+            border: 'none', padding: 0, margin: 0, cursor: 'pointer',
+            display: 'block', width: '100%', textAlign: 'left',
+          }}
+        >
+          <Ticker rows={top10} />
+        </button>
+      )}
     </div>
   );
 }
