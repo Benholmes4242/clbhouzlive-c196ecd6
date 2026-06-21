@@ -971,6 +971,7 @@ export function CinematicFrame({
               {venueLine}
             </div>
           )}
+          {(purse != null || venuePar != null || venueYardage != null) && <GlassPills />}
           {/* over-photo countdown chip removed — countdown lives in base band */}
         </div>
 
