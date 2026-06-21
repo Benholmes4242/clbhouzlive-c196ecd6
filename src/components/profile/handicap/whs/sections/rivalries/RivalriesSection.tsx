@@ -33,7 +33,14 @@ export default RivalriesSection;
 // ─── Owner view ───────────────────────────────────────────────────────────
 const OwnerViewRivalries: React.FC<{ userId: string }> = ({ userId }) => {
   const { data, isLoading } = useFriendRivalries(userId);
-  useFriendLeaderboard(userId); // kept for caching parity with prior behavior
+  const { data: ownerLeaderboard } = useFriendLeaderboard(userId);
+  const ownerSelf = useMemo(
+    () => ownerLeaderboard?.find((e) => e.is_self) ?? null,
+    [ownerLeaderboard],
+  );
+  const youAvatar = ownerSelf
+    ? pickAvatarSrc(ownerSelf.friend_thumbnail_url, ownerSelf.friend_profile_photo_url)
+    : null;
   const { data: crownsByKey } = useRivalCrowns(userId);
   const [manageOpen, setManageOpen] = useState(false);
 
