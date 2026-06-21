@@ -4,8 +4,7 @@ import {
   TAB,
   BG_1,
   T50,
-  GREEN,
-  RED,
+  AMBER,
   LINE,
 } from './_shared/tokens';
 import type { Insight } from './_shared/insights';
@@ -15,8 +14,8 @@ interface Props {
 }
 
 const toneColor: Record<Insight['tone'], string> = {
-  positive: GREEN,
-  negative: RED,
+  positive: AMBER,
+  negative: 'var(--hcp-t-60)',
   amber: '#FFFFFF',
   neutral: 'rgba(248,250,252,0.80)',
 };
