@@ -15,6 +15,12 @@ const SEVEN_DAYS_MS = 7 * 24 * 60 * 60 * 1000;
 const VISIBLE_LIMIT = 10;
 const FONT = '"Geist", system-ui, sans-serif';
 
+const ordinal = (n: number): string => {
+  const s = ['th', 'st', 'nd', 'rd'];
+  const v = n % 100;
+  return n + (s[(v - 20) % 10] || s[v] || s[0]);
+};
+
 export const YourCircleSection: React.FC<Props> = ({ userId }) => {
   const { data, isLoading } = useFriendLeaderboard(userId);
   const { open: openSheet } = useOpenFriendSheet();
