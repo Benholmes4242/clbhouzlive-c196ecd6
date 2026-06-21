@@ -24,6 +24,8 @@ export const FriendRoundCardV2: React.FC<Props> = ({
   onClick,
 }) => {
   const isSynced = variant === 'clbhouz-synced';
+  const [imgFailed, setImgFailed] = useState(false);
+  const hasImage = !!activity.course_thumbnail_image && !imgFailed;
   // State B: synced friend whose round summary exists but has no detailed
   // scorecard (e.g. EG published summary only). Card still renders the synced
   // summary row, but we suppress the chevron / "tap for card" affordance.
