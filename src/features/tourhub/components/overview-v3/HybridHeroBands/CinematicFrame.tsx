@@ -781,7 +781,9 @@ export function CinematicFrame({
       {/* Layer 2: cinematic scrim */}
       <div
         aria-hidden="true"
-        style={{ position: 'absolute', inset: 0, background: CINEMATIC_SCRIM, zIndex: 2 }}
+        style={{ position: 'absolute', inset: 0, background: isResults
+          ? 'linear-gradient(180deg, rgba(10,14,20,0.55) 0%, rgba(10,14,20,0.2) 28%, rgba(10,14,20,0.5) 58%, rgba(10,14,20,0.97) 100%)'
+          : CINEMATIC_SCRIM, zIndex: 2 }}
       />
 
       {/* Flex content column — top meta, spacer, title, capsule */}
