@@ -792,12 +792,20 @@ export function CinematicFrame({
     { k: 'Purse', v: purseStr },
     { k: 'Field', v: fieldStr },
   ];
-  const resultsStripItems = [
-    { k: 'Winner', v: winShareStr, gold: true },
-    { k: 'Purse', v: purseStr },
-    { k: 'Par', v: parStr },
-    { k: 'Yards', v: yardageStr },
-  ];
+  const hasWinShare = winningShare != null;
+  const resultsStripItems = hasWinShare
+    ? [
+        { k: 'Winner', v: winShareStr, gold: true },
+        { k: 'Purse', v: purseStr },
+        { k: 'Par', v: parStr },
+        { k: 'Yards', v: yardageStr },
+      ]
+    : [
+        { k: 'Purse', v: purseStr, gold: true },
+        { k: 'Par', v: parStr },
+        { k: 'Yards', v: yardageStr },
+        { k: 'Field', v: String(fieldSize || '—') },
+      ];
 
   const PlayerCarousel = ({ rows }: { rows: any[] }) => (
     <div style={{ background: '#0A0E14', padding: '12px 0 13px', borderTop: '0.5px solid rgba(255,255,255,0.06)' }}>
