@@ -186,8 +186,7 @@ const REGION_PALETTE: Record<string, RarityPalette> = {
     border: 'rgba(251,188,46,0.32)',
     label: 'WORLD',
     heroGradient: 'linear-gradient(160deg, rgba(251,188,46,0.24) 0%, var(--hcp-bg-1) 70%)',
-    cardSweep:
-      'linear-gradient(135deg, rgba(251,188,46,0.16) 0%, rgba(251,188,46,0.04) 50%, var(--hcp-bg-1) 100%)',
+    cardSweep: 'linear-gradient(160deg, rgba(251,188,46,0.18) 0%, rgba(251,188,46,0.05) 100%)',
     topStripe: null,
     outerGlow: 'rgba(251,188,46,0.20)',
     metaColor: '#FBBC2E',
