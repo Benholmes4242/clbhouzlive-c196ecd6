@@ -87,42 +87,41 @@ Deno.serve(async (req) => {
       }), { headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
     }
 
-    const results: any[] = [];
-    let ok = 0, fail = 0;
-
-    for (const t of candidates) {
-      try {
-        const res = await fetch(`${SUPABASE_URL}/functions/v1/sportradar-sync`, {
-          method: 'POST',
-          headers: {
-            'Authorization': `Bearer ${SERVICE_ROLE_KEY}`,
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            action: 'leaderboard',
-            tour: t.slug,
-            year,
-            tournamentId: t.sr_id,
-          }),
-        });
-        const json = await res.json().catch(() => ({}));
-        const success = res.ok && (json?.success ?? json?.records !== undefined);
-        if (success) ok++; else fail++;
-        results.push({
-          name: t.name, tour: t.slug, sr_id: t.sr_id,
-          status: res.status, ok: success,
-          records: json?.records ?? json?.recordsSynced ?? null,
-          error: success ? null : (json?.error ?? json?.message ?? null),
-        });
-      } catch (e: any) {
-        fail++;
-        results.push({ name: t.name, tour: t.slug, sr_id: t.sr_id, ok: false, error: String(e?.message ?? e) });
+    // Background worker — does the actual backfill without blocking the HTTP response.
+    const runBackfill = async () => {
+      let ok = 0, fail = 0;
+      for (const t of candidates) {
+        try {
+          const res = await fetch(`${SUPABASE_URL}/functions/v1/sportradar-sync`, {
+            method: 'POST',
+            headers: {
+              'Authorization': `Bearer ${SERVICE_ROLE_KEY}`,
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ action: 'leaderboard', tour: t.slug, year, tournamentId: t.sr_id }),
+          });
+          const json = await res.json().catch(() => ({}));
+          const success = res.ok && (json?.success ?? json?.records !== undefined);
+          if (success) ok++; else fail++;
+          console.log(`[backfill] ${success ? 'OK ' : 'FAIL'} ${t.tour} ${t.name} (records=${json?.records ?? '?'})`);
+        } catch (e: any) {
+          fail++;
+          console.error(`[backfill] ERROR ${t.tour} ${t.name}: ${String(e?.message ?? e)}`);
+        }
+        await new Promise(r => setTimeout(r, delayMs));
       }
-      await new Promise(r => setTimeout(r, delayMs));
-    }
+      console.log(`[backfill] DONE: attempted=${candidates.length} ok=${ok} fail=${fail}`);
+    };
+
+    // Kick off in background; respond immediately so the HTTP call never times out.
+    // @ts-ignore - EdgeRuntime is provided by the Supabase Edge runtime
+    EdgeRuntime.waitUntil(runBackfill());
 
     return new Response(JSON.stringify({
-      year, attempted: candidates.length, ok, fail, results,
+      year,
+      started: true,
+      queued: candidates.length,
+      message: `Backfill started for ${candidates.length} tournaments. Watch the function logs for progress; re-run the count diagnostic in ~${Math.ceil(candidates.length * (delayMs + 1500) / 1000)}s.`,
     }), { headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
   } catch (e: any) {
     console.error('[backfill-2025-leaderboards] fatal:', e);
