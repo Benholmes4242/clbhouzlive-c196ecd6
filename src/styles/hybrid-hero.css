@@ -49,10 +49,3 @@
 /* Pass 5: TourSwitcherOverlay scroll rail. */
 .tour-switcher-rail::-webkit-scrollbar { display: none; }
 
-/* CinematicFrame — solid-fill fallback when backdrop-filter is unsupported
-   (older Android WebViews). Default uses translucent + blur via inline styles. */
-@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
-  .cinematic-capsule {
-    background: rgba(20, 28, 40, 0.92) !important;
-  }
-}
