@@ -16,6 +16,7 @@ import { format } from 'date-fns';
 import { ChevronRight, Crown, Trophy } from 'lucide-react';
 import {
   CINEMATIC_FRAME_HEIGHT,
+  CINEMATIC_FRAME_HEIGHT_RESULTS,
   CINEMATIC_SCRIM,
   COURSE_GRADIENT,
   COURSE_GRADIENT_DUSK,
