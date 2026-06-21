@@ -1,5 +1,5 @@
 import React, { useMemo, useState } from 'react';
-import { Check, ChevronDown } from 'lucide-react';
+import { ChevronDown } from 'lucide-react';
 import {
   useFriendLeaderboard,
   useSentInvites,
@@ -19,38 +19,9 @@ const T = {
   inkMute: 'var(--hcp-t-60)',
   hairline: 'var(--hcp-line-2)',
   amber: '#F7931E',
-  greenSoft: 'rgba(5,150,105,0.16)',
-  greenText: '#34D399',
   cardBg: 'var(--hcp-bg-1)',
 };
 const FONT = '"Geist", system-ui, sans-serif';
-
-const SentBadge: React.FC<{ count: number; onClick: () => void }> = ({ count, onClick }) => (
-  <button
-    onClick={onClick}
-    aria-label="View sent invites"
-    style={{
-      display: 'inline-flex',
-      alignItems: 'center',
-      gap: 5,
-      padding: '4px 10px',
-      borderRadius: 999,
-      background: T.greenSoft,
-      border: '1px solid rgba(5,150,105,0.30)',
-      color: T.greenText,
-      fontFamily: FONT,
-      fontSize: 10.5,
-      fontWeight: 800,
-      letterSpacing: '0.04em',
-      textTransform: 'uppercase',
-      cursor: 'pointer',
-    }}
-  >
-    <Check size={11} strokeWidth={3} />
-    {count} Sent
-  </button>
-);
-
 
 export const InviteToClbhouzV2: React.FC<Props> = ({ ownerUserId }) => {
   const { data: friends, isLoading: friendsLoading } = useFriendLeaderboard(ownerUserId);
@@ -63,12 +34,9 @@ export const InviteToClbhouzV2: React.FC<Props> = ({ ownerUserId }) => {
       (friends ?? [])
         .filter((f) => !f.is_clbhouz_user && f.friend_passport_id != null)
         .sort((a, b) => {
-          // Primary: most recently played first.
-          // Friends without a known last_round_played_at sink to the bottom.
           const aT = a.last_round_played_at ? new Date(a.last_round_played_at).getTime() : -Infinity;
           const bT = b.last_round_played_at ? new Date(b.last_round_played_at).getTime() : -Infinity;
           if (aT !== bT) return bT - aT;
-          // Tiebreaker: handicap ascending (stronger players first).
           return (a.friend_handicap_index ?? 99) - (b.friend_handicap_index ?? 99);
         }),
     [friends],
@@ -76,15 +44,14 @@ export const InviteToClbhouzV2: React.FC<Props> = ({ ownerUserId }) => {
 
   const sentCount = invites?.length ?? 0;
 
-
   // Empty / no-invitable state
   if (!friendsLoading && invitable.length === 0) {
     return (
       <section id="invite-to-clbhouz-section" style={{ marginTop: 32 }}>
-        <DarkSectionHeader
-          eyebrow="INVITE FRIENDS"
-          right={<SentBadge count={sentCount} onClick={() => setSheetOpen(true)} />}
-        />
+        <DarkSectionHeader eyebrow="INVITE FRIENDS" />
+        <div style={{ padding: '0 16px' }}>
+          <InviteQuestCard sentCount={sentCount} onClick={() => setSheetOpen(true)} />
+        </div>
         <SentInvitesSheet open={sheetOpen} onClose={() => setSheetOpen(false)} />
       </section>
     );
@@ -92,13 +59,10 @@ export const InviteToClbhouzV2: React.FC<Props> = ({ ownerUserId }) => {
 
   return (
     <section id="invite-to-clbhouz-section" style={{ marginTop: 32 }}>
-      <DarkSectionHeader
-        eyebrow="INVITE FRIENDS"
-        right={<SentBadge count={sentCount} onClick={() => setSheetOpen(true)} />}
-      />
+      <DarkSectionHeader eyebrow="INVITE FRIENDS" />
 
       <div style={{ padding: '0 16px' }}>
-        <InviteQuestCard sentCount={sentCount} />
+        <InviteQuestCard sentCount={sentCount} onClick={() => setSheetOpen(true)} />
       </div>
 
       {!friendsLoading && invitable.length > 0 && (
