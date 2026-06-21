@@ -6,9 +6,7 @@ import {
   T100,
   T50,
   T35,
-  
-  GREEN,
-  RED,
+  AMBER,
   LINE,
 } from './_shared/tokens';
 import type { FriendRivalryHydrated } from '@/lib/whs/types';
@@ -155,7 +153,7 @@ export const CoursesPlayedSection: React.FC<Props> = ({
                     style={{
                       width: `${fill * 100}%`,
                       height: '100%',
-                      background: GREEN,
+                      background: AMBER,
                     }}
                   />
                 </div>
@@ -168,9 +166,9 @@ export const CoursesPlayedSection: React.FC<Props> = ({
                     ...TAB,
                   }}
                 >
-                  <span style={{ color: GREEN }}>{c.ownerWins}</span>
+                  <span style={{ color: c.ownerWins > c.rivalWins ? AMBER : T50 }}>{c.ownerWins}</span>
                   <span style={{ color: T35, margin: '0 4px' }}>–</span>
-                  <span style={{ color: c.rivalWins > 0 ? RED : T50 }}>
+                  <span style={{ color: c.rivalWins > c.ownerWins ? T100 : T50 }}>
                     {c.rivalWins}
                   </span>
                 </div>

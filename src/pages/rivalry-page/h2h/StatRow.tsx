@@ -8,8 +8,7 @@ import {
   T100,
   T50,
   T70,
-  GREEN,
-  RED,
+  AMBER,
   LINE,
 } from '@/pages/rivalry-page/_shared/tokens';
 import type { H2HStatDef } from './_shared/h2hStats';
@@ -79,8 +78,10 @@ export const StatRow: React.FC<Props> = ({
           color: isHotFlag
             ? T70
             : winner === 'me'
-              ? T100
-              : T50,
+              ? AMBER
+              : winner === 'them'
+                ? T50
+                : T100,
           fontSize: isHotFlag ? 13 : 16,
           fontWeight: 800,
           letterSpacing: isHotFlag ? '0.10em' : undefined,
@@ -161,11 +162,11 @@ const DominanceBar: React.FC<{ share: number; winner: 'me' | 'them' | 'tie' }> =
           overflow: 'hidden',
         }}
       >
-        <div style={{ width: `${share * 100}%`, height: '100%', background: GREEN }} />
+        <div style={{ width: `${share * 100}%`, height: '100%', background: AMBER }} />
       </div>
     );
   }
-  // them leads — show my share as neutral, gap, rest as red
+  // them leads — neutral share + muted grey remainder (no red)
   return (
     <div
       style={{
@@ -179,7 +180,7 @@ const DominanceBar: React.FC<{ share: number; winner: 'me' | 'them' | 'tie' }> =
       }}
     >
       <div style={{ width: `${share * 100}%`, background: NEUTRAL_SEG }} />
-      <div style={{ flex: 1, background: RED }} />
+      <div style={{ flex: 1, background: 'rgba(148,163,184,0.55)' }} />
     </div>
   );
 };

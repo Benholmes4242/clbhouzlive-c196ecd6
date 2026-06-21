@@ -3,16 +3,8 @@ import { Flame } from 'lucide-react';
 import {
   FONT,
   TAB,
-  BG_1,
-  T100,
-  T70,
-  T50,
-  T35,
   GOLD,
-  GREEN,
-  RED,
-  
-  LINE_2,
+  AMBER,
 } from './_shared/tokens';
 import { firstName } from './_shared/helpers';
 import { reformatFriendName } from '@/lib/whs/utils/nameFormat';
@@ -33,11 +25,12 @@ interface Props {
   ownerView: boolean;
 }
 
+const DARK_BAND = 'linear-gradient(135deg, #1a3c2a, #0f172a)';
+
 export const HeroScoreboard: React.FC<Props> = ({
   rivalry,
   dim,
   yourAvatarUrl,
-  yourFirstName,
   yourFullName,
   yourHandicap,
   currentStreak,
@@ -58,17 +51,8 @@ export const HeroScoreboard: React.FC<Props> = ({
 
   const youLead = wins > losses;
   const themLead = losses > wins;
-  const gradient = youLead
-    ? 'linear-gradient(160deg, rgba(5,150,105,0.12) 0%, #FFFFFF 65%)'
-    : themLead
-      ? 'linear-gradient(160deg, rgba(159,29,29,0.10) 0%, #FFFFFF 65%)'
-      : 'linear-gradient(160deg, var(--hcp-bg-2) 0%, #FFFFFF 70%)';
 
-  const streakColor = currentStreak.side === 'you' ? GREEN : RED;
-  const streakTint =
-    currentStreak.side === 'you'
-      ? 'rgba(5,150,105,0.18)'
-      : 'rgba(159,29,29,0.18)';
+  const streakColor = AMBER;
 
   const rivalAvatar = pickAvatarSrc(
     rivalry.rival_thumbnail_url,
@@ -85,190 +69,69 @@ export const HeroScoreboard: React.FC<Props> = ({
       <div
         style={{
           position: 'relative',
-          background: BG_1,
-          backgroundImage: gradient,
-          border: `1px solid var(--hcp-line)`,
           borderRadius: 16,
           overflow: 'hidden',
+          border: '1px solid var(--hcp-line)',
+          fontFamily: FONT,
         }}
       >
-        <div
-          style={{
-            position: 'relative',
-            padding: '18px 18px 0',
-            display: 'grid',
-            gridTemplateColumns: '1fr auto 1fr',
-            alignItems: 'center',
-            gap: 12,
-          }}
-        >
-          {/* LEFT */}
-          <SideBlock
-            avatarUrl={yourAvatarUrl}
-            fallbackChar={(leftLabel[0] ?? '?').toUpperCase()}
-            label={leftLabel.toUpperCase()}
-            labelColor={T100}
-            handicap={yourHandicap}
-            winPct={yourPct}
-            isSelf
-            alignRight={false}
-          />
+        <div style={{ background: DARK_BAND, padding: '16px 16px 14px', color: '#fff' }}>
+          <div style={{ textAlign: 'center', fontSize: 10, fontWeight: 800, letterSpacing: '0.16em', color: GOLD }}>
+            HEAD TO HEAD
+          </div>
 
-          {/* CENTRE — record */}
-          <div
-            style={{
-              display: 'flex',
-              flexDirection: 'column',
-              alignItems: 'center',
-              minWidth: 120,
-            }}
-          >
-            <div
-              style={{
-                display: 'inline-flex',
-                alignItems: 'baseline',
-                gap: 6,
-                lineHeight: 1,
-                letterSpacing: '-0.03em',
-                fontFamily: FONT,
-                ...TAB,
-              }}
-            >
-              <span style={{ color: GOLD, fontSize: winsSize, fontWeight: 800 }}>
-                {wins}
-              </span>
-              <span style={{ color: T35, fontSize: 24, fontWeight: 700 }}>
-                –
-              </span>
-              <span style={{ color: T70, fontSize: lossesSize, fontWeight: 800 }}>
-                {losses}
-              </span>
-            </div>
-            {ties > 0 && (
-              <div
-                style={{
-                  marginTop: 6,
-                  color: T50,
-                  fontSize: 9.5,
-                  fontWeight: 800,
-                  letterSpacing: '0.14em',
-                  fontFamily: FONT,
-                  ...TAB,
-                }}
-              >
-                {ties} {ties === 1 ? 'TIE' : 'TIES'}
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginTop: 12 }}>
+            {/* YOU */}
+            <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 6 }}>
+              <div style={{ borderRadius: 14, border: `2px solid ${AMBER}`, lineHeight: 0 }}>
+                <SquircleAvatar size={48} hideRing src={yourAvatarUrl} alt="" fallback={(leftLabel[0] ?? '?').toUpperCase()} />
               </div>
-            )}
+              <div style={{ fontSize: 11, fontWeight: 800, letterSpacing: '0.1em', color: youLead ? GOLD : 'rgba(255,255,255,0.85)', textTransform: 'uppercase' }}>
+                {leftLabel.toUpperCase()}
+              </div>
+              <div style={{ fontSize: 10, color: 'rgba(255,255,255,0.6)', ...TAB }}>
+                {yourHandicap != null && <span>HCP {Number(yourHandicap).toFixed(1)}</span>}
+                {yourHandicap != null && yourPct != null && <span style={{ margin: '0 4px' }}>·</span>}
+                {yourPct != null && <span>{yourPct}%</span>}
+              </div>
+            </div>
+
+            {/* SCORE */}
+            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', minWidth: 110 }}>
+              <div style={{ display: 'inline-flex', alignItems: 'baseline', gap: 6, lineHeight: 1, ...TAB }}>
+                <span style={{ color: GOLD, fontSize: winsSize, fontWeight: 800, letterSpacing: '-0.02em' }}>{wins}</span>
+                <span style={{ color: 'rgba(255,255,255,0.45)', fontSize: 22, fontWeight: 300 }}>–</span>
+                <span style={{ color: 'rgba(255,255,255,0.78)', fontSize: lossesSize, fontWeight: 800, letterSpacing: '-0.02em' }}>{losses}</span>
+              </div>
+              <div style={{ marginTop: 6, fontSize: 8.5, fontWeight: 800, letterSpacing: '0.12em', color: 'rgba(255,255,255,0.55)', ...TAB }}>
+                {ties > 0 ? `${ties} ${ties === 1 ? 'TIE' : 'TIES'}` : 'HEAD TO HEAD'}
+              </div>
+            </div>
+
+            {/* THEM */}
+            <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 6 }}>
+              <div style={{ borderRadius: 14, border: '2px solid rgba(255,255,255,0.3)', lineHeight: 0 }}>
+                <SquircleAvatar size={48} hideRing src={rivalAvatar} alt="" fallback={(rivalFirst[0] ?? '?').toUpperCase()} />
+              </div>
+              <div style={{ fontSize: 11, fontWeight: 800, letterSpacing: '0.1em', color: themLead ? GOLD : 'rgba(255,255,255,0.85)', textTransform: 'uppercase', maxWidth: 90, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                {rivalFirst.toUpperCase()}
+              </div>
+              <div style={{ fontSize: 10, color: 'rgba(255,255,255,0.6)', ...TAB }}>
+                {rivalry.rival_handicap != null && <span>HCP {Number(rivalry.rival_handicap).toFixed(1)}</span>}
+                {rivalry.rival_handicap != null && theirPct != null && <span style={{ margin: '0 4px' }}>·</span>}
+                {theirPct != null && <span>{theirPct}%</span>}
+              </div>
+            </div>
           </div>
 
-          {/* RIGHT */}
-          <SideBlock
-            avatarUrl={rivalAvatar}
-            fallbackChar={(rivalFirst[0] ?? '?').toUpperCase()}
-            label={rivalFirst.toUpperCase()}
-            labelColor={T70}
-            handicap={rivalry.rival_handicap}
-            winPct={theirPct}
-            isSelf={false}
-            alignRight
-          />
+          {currentStreak.side && currentStreak.count > 0 && (
+            <div style={{ marginTop: 12, paddingTop: 12, borderTop: '1px solid rgba(255,255,255,0.12)', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, color: streakColor, fontSize: 11, fontWeight: 800, letterSpacing: '0.1em', textTransform: 'uppercase', ...TAB }}>
+              <Flame size={13} strokeWidth={2.4} />
+              {currentStreak.side === 'you' ? 'You' : rivalFirst} · {currentStreak.count} round win streak
+            </div>
+          )}
         </div>
-
-        {/* Streak ribbon — full bleed */}
-        {currentStreak.side && currentStreak.count > 0 ? (
-          <div
-            style={{
-              marginTop: 16,
-              padding: '10px 18px',
-              background: streakTint,
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              gap: 8,
-              color: streakColor,
-              fontSize: 11.5,
-              fontWeight: 800,
-              letterSpacing: '0.12em',
-              textTransform: 'uppercase',
-              fontFamily: FONT,
-              ...TAB,
-            }}
-          >
-            <Flame size={13} strokeWidth={2.4} />
-            {currentStreak.side === 'you' ? 'You' : rivalFirst} ·{' '}
-            {currentStreak.count} round win streak
-          </div>
-        ) : (
-          <div style={{ height: 18 }} />
-        )}
       </div>
     </div>
   );
 };
-
-interface SideBlockProps {
-  avatarUrl: string | null;
-  fallbackChar: string;
-  label: string;
-  labelColor: string;
-  handicap: number | null;
-  winPct: number | null;
-  isSelf: boolean;
-  alignRight: boolean;
-}
-
-const SideBlock: React.FC<SideBlockProps> = ({
-  avatarUrl,
-  fallbackChar,
-  label,
-  labelColor,
-  handicap,
-  winPct,
-  isSelf,
-  alignRight,
-}) => (
-  <div
-    style={{
-      display: 'flex',
-      flexDirection: 'column',
-      alignItems: 'center',
-      gap: 8,
-    }}
-  >
-    <SquircleAvatar
-      size={52}
-      src={avatarUrl}
-      alt=""
-      fallback={fallbackChar}
-    />
-    <div
-      style={{
-        color: labelColor,
-        fontSize: 11,
-        fontWeight: 800,
-        letterSpacing: '0.12em',
-        textTransform: 'uppercase',
-        fontFamily: FONT,
-      }}
-    >
-      {label}
-    </div>
-    {(handicap != null || winPct != null) && (
-      <div
-        style={{
-          color: T50,
-          fontSize: 11,
-          fontWeight: 600,
-          fontFamily: FONT,
-          ...TAB,
-        }}
-      >
-        {handicap != null && <span>HCP {Number(handicap).toFixed(1)}</span>}
-        {handicap != null && winPct != null && (
-          <span style={{ color: T35, margin: '0 4px' }}>·</span>
-        )}
-        {winPct != null && <span>{winPct}%</span>}
-      </div>
-    )}
-  </div>
-);

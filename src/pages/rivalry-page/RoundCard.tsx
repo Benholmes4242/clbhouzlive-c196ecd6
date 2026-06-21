@@ -7,11 +7,7 @@ import {
   T50,
   T35,
   T70,
-  GOLD,
-  GREEN,
-  RED,
-  GREEN_DIM,
-  RED_DIM,
+  AMBER,
   LINE,
 } from './_shared/tokens';
 import { formatDate } from './_shared/helpers';
@@ -46,8 +42,8 @@ export const RoundCard: React.FC<Props> = ({
   const themWon = outcome === 'L';
   const tied = outcome === 'T';
 
-  const chipBg = youWon ? GREEN_DIM : themWon ? RED_DIM : 'rgba(255,255,255,0.06)';
-  const chipColor = youWon ? GREEN : themWon ? RED : T50;
+  const chipBg = youWon ? 'rgba(247,147,30,0.14)' : themWon ? 'var(--hcp-bg-2)' : 'rgba(255,255,255,0.06)';
+  const chipColor = youWon ? '#C97211' : themWon ? T50 : T50;
   const chipLabel = tied ? '0' : `${youWon ? '+' : '−'}${delta}${unit}`;
 
   return (
@@ -110,7 +106,7 @@ export const RoundCard: React.FC<Props> = ({
           ...TAB,
         }}
       >
-        <span style={{ color: youWon ? GOLD : tied ? T70 : T70 }}>
+        <span style={{ color: youWon ? AMBER : T70 }}>
           {youVal ?? '—'}
         </span>
         <span
@@ -123,7 +119,7 @@ export const RoundCard: React.FC<Props> = ({
         >
           vs
         </span>
-        <span style={{ color: themWon ? GOLD : T70 }}>{themVal ?? '—'}</span>
+        <span style={{ color: themWon ? T100 : T50 }}>{themVal ?? '—'}</span>
       </div>
 
       <div
