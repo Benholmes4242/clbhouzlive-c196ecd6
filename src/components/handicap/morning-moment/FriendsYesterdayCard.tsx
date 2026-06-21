@@ -35,7 +35,6 @@ const T = {
   ink55: 'rgba(15,23,42,0.55)',
   ink40: 'rgba(15,23,42,0.40)',
   ink10: 'rgba(15,23,42,0.10)',
-  green: '#059669',
 };
 const FONT = 'Geist, system-ui, -apple-system, BlinkMacSystemFont, sans-serif';
 
@@ -138,16 +137,7 @@ const FriendsYesterdayCard: React.FC<Props> = ({ data, userId }) => {
   return (
     <div style={{ display: 'flex', flexDirection: 'column', fontFamily: FONT }}>
       {/* Section eyebrow */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: 7, marginBottom: 12 }}>
-        <span
-          style={{
-            width: 6,
-            height: 6,
-            borderRadius: '50%',
-            background: T.green,
-            display: 'inline-block',
-          }}
-        />
+      <div style={{ marginBottom: 12 }}>
         <span
           style={{
             fontSize: 11,

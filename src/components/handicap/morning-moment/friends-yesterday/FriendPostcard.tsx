@@ -15,7 +15,7 @@ const AMBER = '#F7931E';
 const GOLD = '#FBBC2E';
 
 const FALLBACK_BG =
-  'linear-gradient(180deg, var(--hcp-bg-2) 0%, var(--hcp-bg-3) 100%)';
+  'linear-gradient(135deg, #1a3c2a 0%, #0f172a 100%)';
 const SCRIM =
   'linear-gradient(180deg, rgba(0,0,0,0.45) 0%, rgba(0,0,0,0.10) 40%, rgba(0,0,0,0) 100%)';
 const T = {
@@ -118,6 +118,8 @@ interface Props {
 
 export const FriendPostcard: React.FC<Props> = ({ friend, showLowest, onClick }) => {
   const state = deriveHeroState(friend);
+  const [imgFailed, setImgFailed] = React.useState(false);
+  const hasImage = !!friend.course_thumbnail_image && !imgFailed;
   const { title: courseTitle, suffix: courseSub } = splitCourseName(friend.course_name || '');
 
   return (
@@ -133,8 +135,8 @@ export const FriendPostcard: React.FC<Props> = ({ friend, showLowest, onClick })
       }}
       style={{
         flex: '0 0 auto',
-        width: 168,
-        borderRadius: 18,
+        width: 250,
+        borderRadius: 16,
         overflow: 'hidden',
         background: 'var(--hcp-bg-1)',
         border: '0.5px solid var(--hcp-line-2)',
@@ -142,32 +144,24 @@ export const FriendPostcard: React.FC<Props> = ({ friend, showLowest, onClick })
         cursor: 'pointer',
         fontFamily: FONT,
         display: 'flex',
-        flexDirection: 'column',
+        flexDirection: 'row',
       }}
-
     >
-      {/* Photo header */}
+      {/* Image panel (left) */}
       <div
         style={{
           position: 'relative',
-          height: 78,
-          width: '100%',
-          overflow: 'hidden',
+          width: 84,
           flexShrink: 0,
+          overflow: 'hidden',
         }}
       >
-        {friend.course_thumbnail_image ? (
+        {hasImage ? (
           <img
-            src={friend.course_thumbnail_image}
+            src={friend.course_thumbnail_image!}
             alt={friend.course_name ?? ''}
-            style={{
-              position: 'absolute',
-              inset: 0,
-              width: '100%',
-              height: '100%',
-              objectFit: 'cover',
-              display: 'block',
-            }}
+            onError={() => setImgFailed(true)}
+            style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
           />
         ) : (
           <>
@@ -176,26 +170,18 @@ export const FriendPostcard: React.FC<Props> = ({ friend, showLowest, onClick })
           </>
         )}
         <div style={{ position: 'absolute', inset: 0, background: SCRIM, pointerEvents: 'none' }} />
-        <div
-          style={{
-            position: 'absolute',
-            inset: 0,
-            padding: 10,
-            display: 'flex',
-            justifyContent: 'space-between',
-            alignItems: 'flex-start',
-            zIndex: 2,
-          }}
-        >
-          {showLowest && <LowestChip />}
-        </div>
+        {showLowest && (
+          <div style={{ position: 'absolute', top: 6, left: 6, zIndex: 2 }}>
+            <LowestChip />
+          </div>
+        )}
       </div>
 
-      {/* Body */}
-      <div style={{ padding: '10px 12px 12px' }}>
+      {/* Content (right) */}
+      <div style={{ flex: 1, minWidth: 0, padding: '11px 13px' }}>
         <div
           style={{
-            fontSize: 12.5,
+            fontSize: 13,
             fontWeight: 800,
             color: T.ink,
             whiteSpace: 'nowrap',
@@ -208,7 +194,7 @@ export const FriendPostcard: React.FC<Props> = ({ friend, showLowest, onClick })
         </div>
         <div
           style={{
-            marginTop: 2,
+            marginTop: 1,
             fontSize: 10,
             color: T.ink60,
             whiteSpace: 'nowrap',
@@ -219,17 +205,10 @@ export const FriendPostcard: React.FC<Props> = ({ friend, showLowest, onClick })
           {courseSub ? `${courseTitle} · ${courseSub}` : courseTitle}
         </div>
 
-        <div
-          style={{
-            marginTop: 9,
-            display: 'flex',
-            alignItems: 'baseline',
-            gap: 6,
-          }}
-        >
+        <div style={{ marginTop: 8, display: 'flex', alignItems: 'baseline', gap: 5 }}>
           <span
             style={{
-              fontSize: 26,
+              fontSize: 24,
               fontWeight: 800,
               color: T.ink,
               lineHeight: 1,
@@ -239,14 +218,7 @@ export const FriendPostcard: React.FC<Props> = ({ friend, showLowest, onClick })
           >
             {friend.score}
           </span>
-          <span
-            style={{
-              fontSize: 9,
-              fontWeight: 700,
-              color: T.ink60,
-              letterSpacing: '0.12em',
-            }}
-          >
+          <span style={{ fontSize: 8, fontWeight: 700, color: T.ink60, letterSpacing: '0.1em' }}>
             GROSS
           </span>
         </div>
@@ -255,7 +227,6 @@ export const FriendPostcard: React.FC<Props> = ({ friend, showLowest, onClick })
         {state === 'summary' && <SummaryStatus />}
         {state === 'invite' && <InviteStatus />}
         {state === 'nudge' && <NudgeStatus />}
-
       </div>
     </div>
   );
