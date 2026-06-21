@@ -11,9 +11,8 @@ const INK = 'var(--hcp-t-100)';
 const INK_55 = 'var(--hcp-t-60)';
 const INK_40 = 'var(--hcp-t-40)';
 const HAIRLINE = 'var(--hcp-line-2)';
-const UNDER = 'var(--hcp-gold-text)';
-const OVER = '#f87171';
-const PAR_RING = 'var(--hcp-line-3)';
+// Monochrome — shape encodes the score, not colour.
+const SHAPE_STROKE = 'var(--hcp-t-60)';
 
 const FONT_GEIST =
   'Geist, system-ui, -apple-system, BlinkMacSystemFont, sans-serif';
