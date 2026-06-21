@@ -961,6 +961,38 @@ export function CinematicFrame({
           )}
         </div>
 
+        {/* Results — champion poster (centred trophy + winner) */}
+        {isResults && safe[0] && (() => {
+          const winner = safe[0];
+          const runnerUp = safe[1];
+          const margin = runnerUp ? Math.abs((runnerUp.score ?? 0) - (winner.score ?? 0)) : null;
+          const winnerAvatar = resolveAvatar(winner, tourSlug);
+          return (
+            <>
+              <div style={{ flex: 1 }} />
+              <div style={{ textAlign: 'center', paddingBottom: 26 }}>
+                <div style={{ fontSize: 42, lineHeight: 1, marginBottom: 10 }} aria-hidden>🏆</div>
+                <div style={{ ...NUMERIC_STYLE, fontSize: 9, fontWeight: 800, letterSpacing: '0.24em', color: GOLD }}>CHAMPION</div>
+                {winnerAvatar
+                  ? <img src={winnerAvatar} alt="" loading="lazy" style={{ width: 90, height: 90, borderRadius: '34%', objectFit: 'cover', border: `3px solid ${GOLD}`, margin: '12px auto 8px', display: 'block', boxShadow: '0 0 38px rgba(251,188,46,0.5)' }} />
+                  : <div style={{ width: 90, height: 90, borderRadius: '34%', background: 'rgba(255,255,255,0.08)', border: `3px solid ${GOLD}`, margin: '12px auto 8px', boxShadow: '0 0 38px rgba(251,188,46,0.5)' }} />}
+                <div style={{ fontSize: 30, fontWeight: 900, color: '#fff', letterSpacing: '-0.02em', padding: '0 16px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{entryName(winner)}</div>
+                <div style={{ display: 'inline-flex', alignItems: 'center', gap: 10, marginTop: 8 }}>
+                  <span style={{ ...NUMERIC_STYLE, fontSize: 18, fontWeight: 900, color: scoreColor(winner.score) }}>{fmtScore(winner.score)}</span>
+                  {margin != null && (
+                    <>
+                      <span style={{ width: 4, height: 4, borderRadius: '50%', background: 'rgba(255,255,255,0.4)' }} />
+                      <span style={{ fontSize: 13, fontWeight: 700, color: 'rgba(255,255,255,0.75)' }}>
+                        {margin === 0 ? 'won in a playoff' : `won by ${margin}`}
+                      </span>
+                    </>
+                  )}
+                </div>
+              </div>
+            </>
+          );
+        })()}
+
         {/* Upcoming — defending champion band, pinned to base (flat ink) */}
         {isUpcoming && defendingChamp && (
           <button
