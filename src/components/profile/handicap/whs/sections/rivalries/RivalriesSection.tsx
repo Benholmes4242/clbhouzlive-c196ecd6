@@ -9,6 +9,7 @@ import { useFriendViewRivalriesForProfile } from '@/lib/whs/friendViewRivalries'
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useRivalCrowns, useRivalCrownsForOwner } from '@/lib/whs/hooks/useRivalCrowns';
 import { reformatFriendName } from '@/lib/whs/utils/nameFormat';
+import { pickAvatarSrc } from '@/lib/whs/utils/avatarSrc';
 import type { FriendRivalryHydrated } from '@/lib/whs/types';
 import { rivalKey, rivalryScore } from '@/lib/whs/utils/rivalryTiering';
 
@@ -32,7 +33,14 @@ export default RivalriesSection;
 // ─── Owner view ───────────────────────────────────────────────────────────
 const OwnerViewRivalries: React.FC<{ userId: string }> = ({ userId }) => {
   const { data, isLoading } = useFriendRivalries(userId);
-  useFriendLeaderboard(userId); // kept for caching parity with prior behavior
+  const { data: ownerLeaderboard } = useFriendLeaderboard(userId);
+  const ownerSelf = useMemo(
+    () => ownerLeaderboard?.find((e) => e.is_self) ?? null,
+    [ownerLeaderboard],
+  );
+  const youAvatar = ownerSelf
+    ? pickAvatarSrc(ownerSelf.friend_thumbnail_url, ownerSelf.friend_profile_photo_url)
+    : null;
   const { data: crownsByKey } = useRivalCrowns(userId);
   const [manageOpen, setManageOpen] = useState(false);
 
@@ -91,7 +99,7 @@ const OwnerViewRivalries: React.FC<{ userId: string }> = ({ userId }) => {
           {Array.from({ length: 2 }).map((_, i) => <RivalrySkeleton key={i} />)}
         </div>
       ) : !hasFilled ? null : (
-        <RivalCarousel rivalries={filledRivalries} crownsByKey={crownsByKey} />
+        <RivalCarousel rivalries={filledRivalries} crownsByKey={crownsByKey} youAvatar={youAvatar} />
       )}
 
       <ManageRivalsSheet
@@ -117,6 +125,9 @@ const FriendViewRivalries: React.FC<{
     () => ownerLeaderboard?.find((e) => e.is_self) ?? null,
     [ownerLeaderboard],
   );
+  const ownerAvatar = ownerRow
+    ? pickAvatarSrc(ownerRow.friend_thumbnail_url, ownerRow.friend_profile_photo_url)
+    : null;
 
   const secondary = data?.secondary ?? [];
 
@@ -177,7 +188,9 @@ const FriendViewRivalries: React.FC<{
           friendViewOwnerId={ownerUserId}
           isTapDisabled={isTapDisabled}
           youLabel={ownerFirst ? ownerFirst.toUpperCase() : undefined}
+          youAvatar={ownerAvatar}
         />
+
       )}
     </section>
   );
@@ -190,7 +203,8 @@ const RivalCarousel: React.FC<{
   friendViewOwnerId?: string;
   isTapDisabled?: (r: FriendRivalryHydrated) => boolean;
   youLabel?: string;
-}> = ({ rivalries, crownsByKey, friendViewOwnerId, isTapDisabled, youLabel }) => {
+  youAvatar?: string | null;
+}> = ({ rivalries, crownsByKey, friendViewOwnerId, isTapDisabled, youLabel, youAvatar }) => {
   const navigate = useNavigate();
   const railRef = useRef<HTMLDivElement | null>(null);
   const [page, setPage] = useState(0);
@@ -241,7 +255,9 @@ const RivalCarousel: React.FC<{
                 total={total}
                 onTap={onTap}
                 youLabel={youLabel}
+                youAvatar={youAvatar}
               />
+
             </div>
           );
         })}

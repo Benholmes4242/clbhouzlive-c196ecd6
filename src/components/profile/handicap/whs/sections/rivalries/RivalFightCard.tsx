@@ -1,5 +1,5 @@
 import React, { useMemo } from 'react';
-import { Star } from 'lucide-react';
+import { Star, Crown } from 'lucide-react';
 import { reformatFriendName } from '@/lib/whs/utils/nameFormat';
 import { initials, firstName } from '@/lib/whs/utils/initials';
 import { pickAvatarSrc } from '@/lib/whs/utils/avatarSrc';
@@ -30,6 +30,7 @@ interface Props {
   total: number;
   onTap?: () => void;
   youLabel?: string;
+  youAvatar?: string | null;
 }
 
 export const RivalFightCard: React.FC<Props> = ({
@@ -39,6 +40,7 @@ export const RivalFightCard: React.FC<Props> = ({
   total,
   onTap,
   youLabel = 'YOU',
+  youAvatar = null,
 }) => {
   const key = rivalKey(rivalry);
   const [dimension, setDimension] = useRivalryDimension(key);
@@ -154,7 +156,7 @@ export const RivalFightCard: React.FC<Props> = ({
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginTop: 12 }}>
           {/* YOU */}
           <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 6 }}>
-            <SquircleAvatar size={46} hideRing src={null} alt={youLabel} fallback={youLabel.slice(0, 2)} />
+            <SquircleAvatar size={46} hideRing src={youAvatar} alt={youLabel} fallback={youLabel.slice(0, 2)} />
             <span style={{ fontSize: 11, fontWeight: 800, letterSpacing: '0.1em', color: youColor === GOLD ? GOLD : 'rgba(255,255,255,0.85)', textTransform: 'uppercase' }}>{youLabel}</span>
           </div>
 
@@ -240,7 +242,8 @@ export const RivalFightCard: React.FC<Props> = ({
               {/* label + dominance bar */}
               <div style={{ flex: 1, textAlign: 'center' }}>
                 <div style={{ fontSize: 10, fontWeight: 800, letterSpacing: '0.08em', color: 'var(--hcp-t-60)' }}>
-                  {youLeads ? '♛ ' : ''}{c.label}
+                  {youLeads ? <Crown size={10} color={AMBER} fill={AMBER} strokeWidth={1.5} style={{ display: 'inline', verticalAlign: '-1px', marginRight: 3 }} /> : null}
+                  {c.key === 'gross' ? 'GROSS SCORE' : c.label}
                 </div>
                 <div style={{ position: 'relative', height: 3, background: 'var(--hcp-bg-2)', borderRadius: 2, marginTop: 5, overflow: 'hidden' }}>
                   <div style={{ position: 'absolute', left: 0, top: 0, bottom: 0, width: `${youPct}%`, background: c.holder === 'even' ? 'var(--hcp-t-40)' : AMBER, borderRadius: 2 }} />
