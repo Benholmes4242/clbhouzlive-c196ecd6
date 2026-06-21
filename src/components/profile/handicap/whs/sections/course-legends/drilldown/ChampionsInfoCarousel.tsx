@@ -145,7 +145,7 @@ export const ChampionsInfoCarousel: React.FC<Props> = ({ window }) => {
       background="linear-gradient(180deg, rgba(251,188,46,0.09), rgba(251,188,46,0.03))"
       border="0.5px solid rgba(251,188,46,0.35)"
     >
-      <ProvenanceContent onSync={() => navigate('/handicap')} />
+      <ProvenanceContent onSync={() => navigate('/handicap')} isSynced={isSynced} />
     </CardShell>
   );
 
