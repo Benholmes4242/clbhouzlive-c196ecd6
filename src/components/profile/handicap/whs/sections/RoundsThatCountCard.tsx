@@ -137,8 +137,56 @@ export const RoundsThatCountCard: React.FC<Props> = ({
   const projection = useMemo(() => {
     if (!allScores || allScores.length < 8 || currentHandicap == null) return null;
     const last20 = allScores.slice(0, 20);
-    return projectNextRound(last20, currentHandicap);
-  }, [allScores, currentHandicap]);
+    const result = projectNextRound(last20, currentHandicap);
+
+    // ── TEMP DEBUG — remove after diagnosis ──────────────────────────────
+    try {
+      const byDateAsc = [...last20].sort(
+        (a, b) => new Date(a.play_date).getTime() - new Date(b.play_date).getTime(),
+      );
+      const oldest = byDateAsc[0];
+      const counterSet = new Set((counters ?? []).map(c => c.id));
+
+      // Live top-8 (what the projection's math actually uses): 8 lowest diffs of last 20
+      const liveTop8Ids = new Set(
+        [...last20]
+          .filter(r => r.handicap_differential != null)
+          .sort((a, b) => (a.handicap_differential as number) - (b.handicap_differential as number))
+          .slice(0, 8)
+          .map(r => r.id),
+      );
+
+      console.log('🟡 RTC DEBUG', {
+        currentHandicap,
+        cutTarget: result.cutTarget,
+        settleAt: result.settleAt,
+        isAtRisk: result.isAtRisk,
+        oldest: {
+          date: oldest?.play_date,
+          diff: oldest?.handicap_differential,
+          storedIsCounter: oldest ? counterSet.has(oldest.id) : null,
+          inLiveTop8: oldest ? liveTop8Ids.has(oldest.id) : null,
+        },
+        storedCounterCount: counterSet.size,
+        liveTop8Count: liveTop8Ids.size,
+        // Are the stored counters and the live top-8 the same set?
+        storedVsLiveMatch:
+          counterSet.size === liveTop8Ids.size &&
+          [...counterSet].every(id => liveTop8Ids.has(id)),
+        last20: byDateAsc.map(r => ({
+          date: r.play_date,
+          diff: r.handicap_differential,
+          stored: counterSet.has(r.id),
+          live: liveTop8Ids.has(r.id),
+        })),
+      });
+    } catch (e) {
+      console.log('🟡 RTC DEBUG error', e);
+    }
+    // ── END TEMP DEBUG ───────────────────────────────────────────────────
+
+    return result;
+  }, [allScores, currentHandicap, counters]);
 
 
   const enriched = useMemo(() => {
