@@ -519,7 +519,7 @@ const PageEyebrow: React.FC<{
       >
         <div
           style={{
-            color: '#FFFFFF',
+            color: T100,
             fontSize: 11,
             fontWeight: 800,
             letterSpacing: '0.14em',
@@ -531,7 +531,7 @@ const PageEyebrow: React.FC<{
         </div>
         <div
           style={{
-            color: 'rgba(248,250,252,0.50)',
+            color: T60,
             fontSize: 10,
             fontWeight: 800,
             letterSpacing: '0.10em',
