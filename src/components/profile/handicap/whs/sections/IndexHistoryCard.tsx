@@ -244,7 +244,7 @@ const IndexHistoryCard: React.FC<Props> = ({ connectionId }) => {
           {/* Footer */}
           <div
             style={{
-              marginTop: 12,
+              marginTop: 6,
               padding: '12px 0 0',
               borderTop: '1px solid var(--hcp-line)',
               display: 'flex',
@@ -328,15 +328,6 @@ const RangePills: React.FC<{
 
 // ── Helpers ─────────────────────────────────────────────────
 
-function fmtMonth(ts: number): string {
-  return new Date(ts).toLocaleDateString('en-GB', { month: 'short' }).toUpperCase();
-}
-
-function fmtMonthDay(ts: number): string {
-  return new Date(ts)
-    .toLocaleDateString('en-GB', { day: 'numeric', month: 'short' })
-    .toUpperCase();
-}
 
 
 function formatMinDate(iso: string): string {
