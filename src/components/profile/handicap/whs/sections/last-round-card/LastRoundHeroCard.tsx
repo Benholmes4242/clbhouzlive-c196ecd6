@@ -56,7 +56,9 @@ const Col: React.FC<{
 );
 
 const Thumb: React.FC<{ src: string | null }> = ({ src }) => {
-  if (!src) {
+  const [failed, setFailed] = React.useState(false);
+  const ok = !!src && !failed;
+  if (!ok) {
     return (
       <div
         style={{
@@ -64,14 +66,14 @@ const Thumb: React.FC<{ src: string | null }> = ({ src }) => {
           height: 56,
           borderRadius: 12,
           flexShrink: 0,
-          background: 'linear-gradient(135deg,#1f2a24,#2c3a2f)',
+          background: 'linear-gradient(135deg, #1a3c2a 0%, #0f172a 100%)',
           border: '1px solid var(--hcp-line)',
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
         }}
       >
-        <Flag size={20} color="var(--hcp-amber)" strokeWidth={2.2} />
+        <Flag size={20} color="#FFFFFF" strokeWidth={2.2} style={{ opacity: 0.5 }} />
       </div>
     );
   }
@@ -84,12 +86,16 @@ const Thumb: React.FC<{ src: string | null }> = ({ src }) => {
         flexShrink: 0,
         overflow: 'hidden',
         border: '1px solid var(--hcp-line)',
-        backgroundImage: `url(${src})`,
-        backgroundSize: 'cover',
-        backgroundPosition: 'center',
-        backgroundRepeat: 'no-repeat',
+        position: 'relative',
       }}
-    />
+    >
+      <img
+        src={src!}
+        alt=""
+        onError={() => setFailed(true)}
+        style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
+      />
+    </div>
   );
 };
 

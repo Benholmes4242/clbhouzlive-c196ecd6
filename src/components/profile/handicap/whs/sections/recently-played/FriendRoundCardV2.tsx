@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react';
+import React, { useMemo, useState } from 'react';
 import { Flame, ChevronRight } from 'lucide-react';
 import { displayName } from '@/lib/whs/utils/initials';
 import { fmtAbsoluteDate } from '@/lib/whs/utils/nameFormat';
@@ -16,7 +16,7 @@ interface Props {
 
 const FONT = 'Geist, system-ui, -apple-system, BlinkMacSystemFont, sans-serif';
 
-const FALLBACK_BG = 'var(--hcp-bg-3)';
+const FALLBACK_BG = 'linear-gradient(135deg, #1a3c2a 0%, #0f172a 100%)';
 
 export const FriendRoundCardV2: React.FC<Props> = ({
   activity,
@@ -24,6 +24,8 @@ export const FriendRoundCardV2: React.FC<Props> = ({
   onClick,
 }) => {
   const isSynced = variant === 'clbhouz-synced';
+  const [imgFailed, setImgFailed] = useState(false);
+  const hasImage = !!activity.course_thumbnail_image && !imgFailed;
   // State B: synced friend whose round summary exists but has no detailed
   // scorecard (e.g. EG published summary only). Card still renders the synced
   // summary row, but we suppress the chevron / "tap for card" affordance.
@@ -102,10 +104,11 @@ export const FriendRoundCardV2: React.FC<Props> = ({
           background: FALLBACK_BG,
         }}
       >
-        {activity.course_thumbnail_image ? (
+        {hasImage ? (
           <img
-            src={activity.course_thumbnail_image}
+            src={activity.course_thumbnail_image!}
             alt=""
+            onError={() => setImgFailed(true)}
             style={{
               position: 'absolute',
               inset: 0,

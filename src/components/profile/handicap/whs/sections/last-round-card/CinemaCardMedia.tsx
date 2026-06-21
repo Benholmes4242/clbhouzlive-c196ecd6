@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { format } from 'date-fns';
 import FlagSilhouetteOverlay from '@/components/whs/FlagSilhouetteOverlay';
 
@@ -13,8 +13,7 @@ interface Props {
   children?: React.ReactNode; // glass tile
 }
 
-const FALLBACK_GRADIENT =
-  'linear-gradient(140deg, #2d3a2d 0%, #4a5d4a 25%, #6b7a5a 50%, #8a9670 72%, #c4a574 88%, #d4956b 100%)';
+const FALLBACK_GRADIENT = 'linear-gradient(135deg, #1a3c2a 0%, #0f172a 100%)';
 
 const ATMOSPHERIC =
   'radial-gradient(ellipse 80% 60% at 50% 90%, rgba(0,0,0,0.55) 0%, transparent 70%), radial-gradient(ellipse 60% 40% at 70% 25%, rgba(255,200,140,0.18) 0%, transparent 60%)';
@@ -29,6 +28,9 @@ export const CinemaCardMedia: React.FC<Props> = ({
   counterRank,
   children,
 }) => {
+  const [imgFailed, setImgFailed] = useState(false);
+  const hasImage = !!imageUrl && !imgFailed;
+
   const dateLabel = (() => {
     try {
       return format(new Date(playDate), 'EEEE, d MMMM');
@@ -46,12 +48,22 @@ export const CinemaCardMedia: React.FC<Props> = ({
         style={{
           position: 'absolute',
           inset: 0,
-          background: imageUrl
+          background: hasImage
             ? `url(${imageUrl}) center/cover no-repeat`
             : FALLBACK_GRADIENT,
         }}
       />
-      {!imageUrl && <FlagSilhouetteOverlay opacity={0.12} />}
+      {/* Invisible probe to detect broken urls (browser dedupes with the bg request) */}
+      {imageUrl && !imgFailed && (
+        <img
+          src={imageUrl}
+          alt=""
+          aria-hidden
+          onError={() => setImgFailed(true)}
+          style={{ display: 'none' }}
+        />
+      )}
+      {!hasImage && <FlagSilhouetteOverlay opacity={0.12} />}
       {/* z=1 atmospheric */}
       <div style={{ position: 'absolute', inset: 0, background: ATMOSPHERIC, pointerEvents: 'none' }} />
       {/* z=2 legibility */}
