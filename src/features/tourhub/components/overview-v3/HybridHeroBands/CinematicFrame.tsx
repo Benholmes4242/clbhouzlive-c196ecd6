@@ -768,7 +768,7 @@ export function CinematicFrame({
       { label: 'YDS', value: venueYardage != null ? venueYardage.toLocaleString() : '—' },
     ];
     return (
-      <div style={{ display: 'flex', gap: 7, flexWrap: 'wrap', marginTop: 12 }}>
+      <div style={{ display: 'flex', gap: 7, flexWrap: 'wrap', marginTop: 6 }}>
         {pills.map((p) => (
           <div key={p.label} style={{
             display: 'flex', alignItems: 'baseline', gap: 5,
@@ -930,9 +930,9 @@ export function CinematicFrame({
           style={{
             display: 'flex',
             flexDirection: 'column',
-            gap: 10,
+            gap: 6,
             padding: '0 6px',
-            marginBottom: 16,
+            marginBottom: 4,
           }}
         >
           <h1
