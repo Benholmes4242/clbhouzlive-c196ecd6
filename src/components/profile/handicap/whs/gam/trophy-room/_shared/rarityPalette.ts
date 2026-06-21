@@ -153,8 +153,7 @@ const REGION_PALETTE: Record<string, RarityPalette> = {
     border: 'rgba(52,211,153,0.30)',
     label: 'GB&I',
     heroGradient: 'linear-gradient(160deg, rgba(52,211,153,0.22) 0%, var(--hcp-bg-1) 70%)',
-    cardSweep:
-      'linear-gradient(135deg, rgba(52,211,153,0.14) 0%, rgba(52,211,153,0.04) 50%, var(--hcp-bg-1) 100%)',
+    cardSweep: 'linear-gradient(160deg, rgba(52,211,153,0.16) 0%, rgba(52,211,153,0.05) 100%)',
     topStripe: null,
     outerGlow: 'rgba(52,211,153,0.18)',
     metaColor: '#34D399',
