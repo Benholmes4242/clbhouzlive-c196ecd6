@@ -139,51 +139,48 @@ export const RoundsThatCountCard: React.FC<Props> = ({
     const last20 = allScores.slice(0, 20);
     const result = projectNextRound(last20, currentHandicap);
 
-    // ── TEMP DEBUG — remove after diagnosis ──────────────────────────────
+    // ── TEMP DEBUG v2 — remove after diagnosis ───────────────────────────
     try {
-      const byDateAsc = [...last20].sort(
+      const last20local = [...last20];
+      const curTop8 = [...last20local]
+        .filter(r => r.handicap_differential != null)
+        .sort((a, b) => (a.handicap_differential as number) - (b.handicap_differential as number))
+        .slice(0, 8);
+      const curTop8Diffs = curTop8.map(r => r.handicap_differential as number);
+      const curTop8Sum = curTop8Diffs.reduce((s, d) => s + d, 0);
+
+      const byDateAsc = [...last20local].sort(
         (a, b) => new Date(a.play_date).getTime() - new Date(b.play_date).getTime(),
       );
       const oldest = byDateAsc[0];
-      const counterSet = new Set((counters ?? []).map(c => c.id));
+      const remaining19 = byDateAsc.slice(1);
+      const newTop8 = [...remaining19]
+        .filter(r => r.handicap_differential != null)
+        .sort((a, b) => (a.handicap_differential as number) - (b.handicap_differential as number))
+        .slice(0, 8);
+      const newTop8Diffs = newTop8.map(r => r.handicap_differential as number);
+      const newTop8Sum = newTop8Diffs.reduce((s, d) => s + d, 0);
 
-      // Live top-8 (what the projection's math actually uses): 8 lowest diffs of last 20
-      const liveTop8Ids = new Set(
-        [...last20]
-          .filter(r => r.handicap_differential != null)
-          .sort((a, b) => (a.handicap_differential as number) - (b.handicap_differential as number))
-          .slice(0, 8)
-          .map(r => r.id),
-      );
-
-      console.log('🟡 RTC DEBUG', {
+      console.log('🟢 RTC DEBUG v2', {
         currentHandicap,
-        cutTarget: result.cutTarget,
-        settleAt: result.settleAt,
-        isAtRisk: result.isAtRisk,
-        oldest: {
-          date: oldest?.play_date,
-          diff: oldest?.handicap_differential,
-          storedIsCounter: oldest ? counterSet.has(oldest.id) : null,
-          inLiveTop8: oldest ? liveTop8Ids.has(oldest.id) : null,
-        },
-        storedCounterCount: counterSet.size,
-        liveTop8Count: liveTop8Ids.size,
-        // Are the stored counters and the live top-8 the same set?
-        storedVsLiveMatch:
-          counterSet.size === liveTop8Ids.size &&
-          [...counterSet].every(id => liveTop8Ids.has(id)),
-        last20: byDateAsc.map(r => ({
-          date: r.play_date,
-          diff: r.handicap_differential,
-          stored: counterSet.has(r.id),
-          live: liveTop8Ids.has(r.id),
-        })),
+        curTop8Diffs,
+        curTop8Sum: Number(curTop8Sum.toFixed(3)),
+        curTop8Avg: Number((curTop8Sum / 8).toFixed(3)),
+        oldestDiff: oldest?.handicap_differential,
+        oldestInCurTop8: oldest
+          ? curTop8.some(r => r.id === oldest.id)
+          : null,
+        newTop8Diffs,
+        newTop8Sum: Number(newTop8Sum.toFixed(3)),
+        newTop8Avg: Number((newTop8Sum / 8).toFixed(3)),
+        promotedDiff:
+          newTop8Diffs.find(d => !curTop8Diffs.includes(d)) ?? 'none (sets identical)',
+        deltaAvg: Number(((newTop8Sum - curTop8Sum) / 8).toFixed(3)),
       });
     } catch (e) {
-      console.log('🟡 RTC DEBUG error', e);
+      console.log('🟢 RTC DEBUG v2 error', e);
     }
-    // ── END TEMP DEBUG ───────────────────────────────────────────────────
+    // ── END TEMP DEBUG v2 ────────────────────────────────────────────────
 
     return result;
   }, [allScores, currentHandicap, counters]);
