@@ -1,7 +1,6 @@
 import React from 'react';
 
 const FONT = 'Geist, -apple-system, BlinkMacSystemFont, system-ui, sans-serif';
-const AMBER = '#F7931E';
 
 export const SubsectionEyebrow: React.FC<{ label: string }> = ({ label }) => (
   <div
@@ -17,7 +16,6 @@ export const SubsectionEyebrow: React.FC<{ label: string }> = ({ label }) => (
       marginBottom: 10,
     }}
   >
-    <span style={{ color: AMBER, marginRight: 6 }}>•</span>
     {label}
   </div>
 );

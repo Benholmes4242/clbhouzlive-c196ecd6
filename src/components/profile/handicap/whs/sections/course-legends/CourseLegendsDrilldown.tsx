@@ -54,8 +54,8 @@ const SHORT_LABELS: Record<LegendCategory, string> = {
 };
 
 const UNITS: Record<LegendCategory, string> = {
-  best_score_diff_90d:      'vs hcp',
-  best_score_diff_all_time: 'vs hcp',
+  best_score_diff_90d:      'vs HCP',
+  best_score_diff_all_time: 'vs HCP',
   lowest_gross_90d:         '',
   lowest_gross_all_time:    '',
   most_birdies_90d:         '',
