@@ -102,7 +102,7 @@ export const MATERIAL_PALETTES: Record<1 | 2 | 3 | 4 | 5, RarityPalette> = {
     border: 'rgba(192,192,200,0.45)',
     label: 'SILVER',
     heroGradient: 'linear-gradient(160deg, rgba(192,192,200,0.30) 0%, rgba(148,163,184,0.14) 40%, var(--hcp-bg-1) 80%)',
-    cardSweep: RARITY_DARK.silver.cardSweep,
+    cardSweep: 'linear-gradient(160deg, rgba(192,192,200,0.18) 0%, rgba(192,192,200,0.05) 100%)',
     topStripe: RARITY_DARK.silver.topStripe,
     outerGlow: RARITY_DARK.silver.outerGlow,
     metaColor: RARITY_DARK.silver.labelFg,
