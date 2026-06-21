@@ -27,43 +27,37 @@ export const DrilldownHeader: React.FC<Props> = ({
 }) => (
 
   <div
-    className="h-40 md:h-48 lg:h-56"
+    className="relative overflow-hidden"
     style={{
-      position: 'relative',
-      background: courseHeaderImage
-        ? 'transparent'
-        : 'linear-gradient(180deg, rgba(247,147,30,0.18) 0%, var(--hcp-bg-2) 100%)',
-      overflow: 'hidden',
+      height: '306px',
       fontFamily: GAM.FONT_GEIST,
     }}
   >
+    {/* Gradient fallback behind image — matches GolfClubView */}
+    <div className="absolute inset-0 h-full w-full bg-gradient-to-br from-green-400 to-blue-500" />
+
     {courseHeaderImage && (
       <img
         src={courseHeaderImage}
         alt=""
         aria-hidden
         loading="eager"
-        style={{
-          position: 'absolute',
-          inset: 0,
-          width: '100%',
-          height: '100%',
-          objectFit: 'cover',
-        }}
+        className="absolute inset-0 h-full w-full object-cover"
+        onError={(e) => { (e.currentTarget as HTMLImageElement).style.display = 'none'; }}
       />
     )}
 
-
+    {/* Dark gradient scrim — matches GolfClubView */}
     <div
+      className="absolute inset-0 pointer-events-none"
       style={{
-        position: 'absolute',
-        top: 16,
-        right: 16,
-        display: 'flex',
-        justifyContent: 'flex-end',
-        alignItems: 'center',
+        background:
+          'linear-gradient(to top, rgba(0,0,0,0.65) 0%, rgba(0,0,0,0.3) 40%, rgba(0,0,0,0.05) 70%, transparent 100%)',
       }}
-    >
+    />
+
+    {/* Titles badge — drilldown-specific, top-right */}
+    <div style={{ position: 'absolute', top: 16, right: 16, display: 'flex', justifyContent: 'flex-end', alignItems: 'center' }}>
       <div
         style={{
           display: 'inline-flex',
@@ -72,7 +66,7 @@ export const DrilldownHeader: React.FC<Props> = ({
           padding: '5px 11px',
           borderRadius: 999,
           background: 'rgba(0,0,0,0.45)',
-          border: '1px solid var(--hcp-line-2)',
+          border: '1px solid rgba(255,255,255,0.12)',
           backdropFilter: 'blur(8px)',
           WebkitBackdropFilter: 'blur(8px)',
           fontSize: 11,
@@ -87,47 +81,34 @@ export const DrilldownHeader: React.FC<Props> = ({
       </div>
     </div>
 
-    <div
-      style={{
-        position: 'absolute',
-        left: 16,
-        right: 16,
-        bottom: 14,
-      }}
-    >
+    {/* Bottom-left overlay — matches GolfClubView layout */}
+    <div className="absolute inset-x-0 bottom-4 px-4">
       <CourseEyebrow
         type={state.courseType}
         region={state.courseRegion}
         country={state.courseCountry}
         onPhoto
       />
-      <div
-        style={{
-          marginTop: 5,
-          fontSize: 22,
-          fontWeight: 700,
-          color: '#FFFFFF',
-          letterSpacing: '-0.022em',
-          lineHeight: 1.15,
-          textShadow: '0 1px 3px rgba(0,0,0,0.55)',
-        }}
+      <h1
+        className="text-[22px] md:text-[28px] font-extrabold tracking-[-0.3px] text-white drop-shadow-2xl"
+        style={{ lineHeight: 1.15, marginTop: 5, marginBottom: 4 }}
       >
         {state.courseName}
-      </div>
+      </h1>
       {(cr != null || slope != null) && (
-        <div
+        <p
+          className="drop-shadow-lg"
           style={{
-            marginTop: 4,
             fontSize: 11,
             fontWeight: 700,
             letterSpacing: '0.08em',
-            color: '#FFFFFF',
+            color: 'rgba(255,255,255,0.65)',
             fontVariantNumeric: 'tabular-nums',
-            textShadow: '0 1px 3px rgba(0,0,0,0.45)',
+            margin: 0,
           }}
         >
           {[cr != null ? `CR ${cr}` : null, slope != null ? `SLOPE ${slope}` : null].filter(Boolean).join(' · ')}
-        </div>
+        </p>
       )}
     </div>
   </div>
