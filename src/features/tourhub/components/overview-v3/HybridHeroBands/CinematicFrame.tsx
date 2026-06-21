@@ -31,7 +31,7 @@ import { Ticker } from './Ticker';
 
 const TICKER_BAR_H = 40;
 const CHAMPION_BAND_H = 62;
-const UPCOMING_BAND_H = 64;
+const UPCOMING_BAND_H = 104;
 const BOTTOM_STACK_H = TICKER_BAR_H + CHAMPION_BAND_H;
 import { getPlayerHeadshotUrl } from '@/utils/playerHeadshot';
 import type { DefendingChampData } from '../../../hooks/useTournamentDefendingChamp';
