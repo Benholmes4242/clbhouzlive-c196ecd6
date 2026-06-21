@@ -54,7 +54,7 @@ export const StatsGroup: React.FC<Props> = ({ title, stats }) => {
       >
         <div
           style={{
-            color: '#FFFFFF',
+            color: T100,
             fontSize: 11,
             fontWeight: 800,
             letterSpacing: '0.16em',
@@ -71,7 +71,7 @@ export const StatsGroup: React.FC<Props> = ({ title, stats }) => {
               alignItems: 'center',
               gap: 6,
               padding: '3px 9px',
-              background: 'rgba(255,255,255,0.06)',
+              background: 'rgba(15,23,42,0.05)',
               borderRadius: 999,
               fontFamily: FONT,
               fontSize: 11,
