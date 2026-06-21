@@ -39,7 +39,7 @@ export function useTournamentDefendingChamp(tournamentId: string | null | undefi
       // 1. Resolve current tournament to get tour + name + year
       const { data: current, error: currentErr } = await supabase
         .from('sr_tournaments')
-        .select('id, name, start_date, season:sr_seasons!sr_tournaments_season_id_fkey(tour_name, year)')
+        .select('id, name, start_date, defending_champion, season:sr_seasons!sr_tournaments_season_id_fkey(tour_name, year)')
         .eq('id', tournamentId)
         .maybeSingle();
 
@@ -47,9 +47,15 @@ export function useTournamentDefendingChamp(tournamentId: string | null | undefi
 
       const currentYear = new Date(current.start_date).getFullYear();
       const tourName = (current as any).season?.tour_name;
-      if (!tourName) return null;
       const baseName = normaliseName(current.name);
-      if (!baseName) return null;
+
+      // Fallback band built from the tournament's own defending_champion string.
+      const fallbackName = (current as any).defending_champion as string | null;
+      const fallbackBand: DefendingChampData | null = fallbackName
+        ? { name: fallbackName, country: '', score: '', year: String(currentYear - 1) }
+        : null;
+
+      if (!tourName || !baseName) return fallbackBand;
 
       // 2. Find prior-year tournament on same tour with similar name
       const { data: candidates, error: candErr } = await supabase
@@ -60,15 +66,15 @@ export function useTournamentDefendingChamp(tournamentId: string | null | undefi
         .order('start_date', { ascending: false })
         .limit(50);
 
-      if (candErr || !candidates) return null;
+      if (candErr || !candidates) return fallbackBand;
 
       const prior = candidates.find((c: any) => {
         if (c?.season?.tour_name !== tourName) return false;
         return normaliseName(c.name) === baseName;
       });
-      if (!prior) return null;
+      if (!prior) return fallbackBand;
 
-      // 3. Fetch position-1 finisher
+      // 3. Fetch position-1 finisher (for score + country enrichment)
       const { data: winnerRow } = await supabase
         .from('sr_leaderboards')
         .select('score, player:sr_players!sr_leaderboards_player_id_fkey(first_name, last_name, full_name, country, country_code)')
@@ -79,11 +85,12 @@ export function useTournamentDefendingChamp(tournamentId: string | null | undefi
         .maybeSingle();
 
       const player: any = (winnerRow as any)?.player;
-      if (!player) return null;
+      if (!player) return fallbackBand;
       const name =
         player.full_name ||
-        `${player.first_name ?? ''} ${player.last_name ?? ''}`.trim();
-      if (!name) return null;
+        `${player.first_name ?? ''} ${player.last_name ?? ''}`.trim()
+        || fallbackName || '';
+      if (!name) return fallbackBand;
 
       const priorYear = (prior as any)?.season?.year ?? new Date(prior.end_date).getFullYear();
 
