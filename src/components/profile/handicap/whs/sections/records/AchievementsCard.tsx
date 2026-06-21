@@ -18,13 +18,6 @@ const D_LINE = 'var(--hcp-line)';
 const D_T100 = 'var(--hcp-t-100)';
 const D_T60 = 'var(--hcp-t-60)';
 
-const RARITY_POINTS: Record<string, number> = {
-  common: 5,
-  uncommon: 10,
-  rare: 25,
-  epic: 50,
-  legendary: 100,
-};
 
 export const AchievementsCard: React.FC<Props> = ({ userId, viewMode = 'owner', ownerFirstName = null }) => {
   const { data: achievements, isLoading } = useUserAchievements(userId);
