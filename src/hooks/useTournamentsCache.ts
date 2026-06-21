@@ -19,7 +19,7 @@ import {
 
 // Union of all fields needed by any consumer hook
 const CACHE_SELECT = `
-  id, name, status, start_date, end_date, purse, currency,
+  id, name, status, start_date, end_date, purse, currency, winning_share,
   venue_id, venue_name, venue_city, venue_country, venue_par, venue_yardage,
   winner_id, defending_champion, champion_narrative, season_id,
   current_round,
@@ -33,6 +33,7 @@ export interface CachedTournament {
   start_date: string;
   end_date: string;
   purse: number | null;
+  winning_share: number | null;
   currency: string | null;
   venue_id: string | null;
   venue_name: string | null;
