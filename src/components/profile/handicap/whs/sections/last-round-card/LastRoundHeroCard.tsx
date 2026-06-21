@@ -1,5 +1,5 @@
 import React from 'react';
-import { ChevronRight, Flag } from 'lucide-react';
+import { ChevronRight } from 'lucide-react';
 import { useFriendRoundDetail } from '@/lib/whs/hooks';
 import type { WhsLastRound } from '@/lib/whs/types';
 
