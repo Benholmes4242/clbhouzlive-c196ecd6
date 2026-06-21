@@ -57,21 +57,19 @@ export function useTournamentDefendingChamp(tournamentId: string | null | undefi
 
       if (!tourName || !baseName) return fallbackBand;
 
-      // 2. Find prior-year tournament on same tour with similar name
+      // 2. Find prior-year tournament on the SAME tour (filter by tour + prior year in DB).
+      // Inner-join filter on season keeps the result small and guarantees the match is
+      // reachable regardless of date (the old .limit(50) cut off mid-season events).
       const { data: candidates, error: candErr } = await supabase
         .from('sr_tournaments')
-        .select('id, name, end_date, season:sr_seasons!sr_tournaments_season_id_fkey(tour_name, year)')
-        .lt('start_date', `${currentYear}-01-01`)
-        .gte('start_date', `${currentYear - 2}-01-01`)
-        .order('start_date', { ascending: false })
-        .limit(50);
+        .select('id, name, end_date, season:sr_seasons!inner(tour_name, year)')
+        .eq('sr_seasons.tour_name', tourName)
+        .eq('sr_seasons.year', currentYear - 1)
+        .limit(200);
 
       if (candErr || !candidates) return fallbackBand;
 
-      const prior = candidates.find((c: any) => {
-        if (c?.season?.tour_name !== tourName) return false;
-        return normaliseName(c.name) === baseName;
-      });
+      const prior = candidates.find((c: any) => normaliseName(c.name) === baseName);
       if (!prior) return fallbackBand;
 
       // 3. Fetch position-1 finisher (for score + country enrichment)
