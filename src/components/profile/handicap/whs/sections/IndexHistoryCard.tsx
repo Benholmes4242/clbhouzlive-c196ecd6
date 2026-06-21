@@ -112,8 +112,10 @@ const IndexHistoryCard: React.FC<Props> = ({ connectionId }) => {
       const months = uniqueMonthsBetween(firstT, lastT);
       const target = range === '3M' ? 3 : 4;
       const step = Math.max(1, Math.floor(months.length / target));
+      const clampX = (x: number) =>
+        Math.min(Math.max(x, PADDING_X), W - PADDING_X);
       for (let i = 0; i < months.length; i += step) {
-        labels.push({ x: px(months[i]), text: fmtMonth(months[i]) });
+        labels.push({ x: clampX(px(months[i])), text: fmtMonth(months[i]) });
       }
     }
     return labels;
