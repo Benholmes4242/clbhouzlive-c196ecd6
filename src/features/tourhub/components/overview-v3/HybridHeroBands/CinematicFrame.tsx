@@ -24,8 +24,11 @@ import {
   NUMERIC_STYLE,
 } from '../HybridHero.constants';
 import { AMBER_INK, AMBER_TINT_12, GOLD_DEEP } from '../../../_shared/tokens';
-import type { HeroState, TopTie } from '../HybridHero.utils';
+import type { HeroState, TopTie, TickerRow } from '../HybridHero.utils';
 import { fmtScore, formatRank, buildLeaderboardSlots, roundLabel } from '../HybridHero.utils';
+import { Ticker } from './Ticker';
+
+const TICKER_BAR_H = 40;
 import { getPlayerHeadshotUrl } from '@/utils/playerHeadshot';
 import type { DefendingChampData } from '../../../hooks/useTournamentDefendingChamp';
 import type { FieldStrength } from '../../../hooks/useTournamentFieldStrength';
@@ -523,6 +526,7 @@ export interface CinematicFrameProps {
   leaderboard: any[];
   tiedLeaders: TopTie | null;
   fieldSize: number;
+  top10: TickerRow[];
   tourSlug?: string | null;
   defendingChamp?: DefendingChampData | null;
   fieldStrength?: FieldStrength | null;
@@ -545,6 +549,7 @@ export function CinematicFrame({
   leaderboard,
   tiedLeaders,
   fieldSize,
+  top10,
   tourSlug,
   defendingChamp = null,
   fieldStrength = null,
@@ -575,6 +580,7 @@ export function CinematicFrame({
   const isLive = state.kind === 'live';
   const isResults = state.kind === 'results';
   const isUpcoming = state.kind === 'upcoming';
+  const showTicker = !isUpcoming && Array.isArray(top10) && top10.length > 0;
   const roundLabel_ =
     state.kind === 'live'
       ? `LIVE · ${roundLabel(state.round, state.totalRounds).toUpperCase()}`
@@ -784,7 +790,7 @@ export function CinematicFrame({
           zIndex: 3,
           display: 'flex',
           flexDirection: 'column',
-          padding: '18px 14px 16px',
+          padding: `18px 14px ${showTicker ? 16 + TICKER_BAR_H : 16}px`,
         }}
       >
         {/* Top meta row */}
@@ -924,6 +930,10 @@ export function CinematicFrame({
               textShadow: '0 2px 30px rgba(0,0,0,0.40)',
               textWrap: 'balance' as any,
               wordBreak: 'break-word',
+              display: '-webkit-box',
+              WebkitLineClamp: 3,
+              WebkitBoxOrient: 'vertical' as any,
+              overflow: 'hidden',
             }}
           >
             {title}
@@ -964,8 +974,8 @@ export function CinematicFrame({
           )}
         </div>
 
-        {/* Floating glass capsule */}
-        {hasCapsule && (
+        {/* Floating glass capsule — upcoming only (defending champ / field strength) */}
+        {isUpcoming && hasCapsule && (
         <div
           className="cinematic-capsule"
           style={{
@@ -978,23 +988,7 @@ export function CinematicFrame({
             boxShadow: '0 8px 40px rgba(0,0,0,0.4)',
           }}
         >
-          {isUpcoming ? (
-            upcomingCapsule
-          ) : slotNodes.length > 0 ? (
-            <>{slotNodes}</>
-          ) : (
-            <div
-              style={{
-                padding: '14px 12px',
-                fontSize: 13,
-                fontWeight: 600,
-                color: 'rgba(255,255,255,0.7)',
-                textAlign: 'center',
-              }}
-            >
-              Leaderboard updating…
-            </div>
-          )}
+          {upcomingCapsule}
 
           {/* Footer CTA */}
           <button
@@ -1026,6 +1020,22 @@ export function CinematicFrame({
         </div>
         )}
       </div>
+
+      {/* Broadcast bar — auto-scrolling top-10 ticker pinned to the bottom edge */}
+      {showTicker && (
+        <button
+          type="button"
+          onClick={onCtaTap}
+          aria-label="Open full leaderboard"
+          style={{
+            position: 'absolute', left: 0, right: 0, bottom: 0, zIndex: 4,
+            border: 'none', padding: 0, margin: 0, cursor: 'pointer',
+            display: 'block', width: '100%', textAlign: 'left',
+          }}
+        >
+          <Ticker rows={top10} />
+        </button>
+      )}
     </div>
   );
 }
