@@ -399,16 +399,6 @@ function fmtMonthDay(ts: number): string {
     .toUpperCase();
 }
 
-function uniqueMonthsBetween(start: number, end: number): number[] {
-  const result: number[] = [];
-  const cursor = new Date(start);
-  cursor.setUTCDate(1);
-  while (cursor.getTime() <= end) {
-    result.push(cursor.getTime());
-    cursor.setUTCMonth(cursor.getUTCMonth() + 1);
-  }
-  return result;
-}
 
 function formatMinDate(iso: string): string {
   const d = new Date(iso);
