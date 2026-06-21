@@ -15,7 +15,7 @@ import {
   emptyCrowns,
   type RivalCrowns,
 } from './_shared/headlineEngine';
-import { CrownStrip } from './_shared/crowns/CrownStrip';
+
 
 const FONT_GEIST =
   'Geist, system-ui, -apple-system, BlinkMacSystemFont, sans-serif';
