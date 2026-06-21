@@ -242,7 +242,8 @@ export const RivalFightCard: React.FC<Props> = ({
               {/* label + dominance bar */}
               <div style={{ flex: 1, textAlign: 'center' }}>
                 <div style={{ fontSize: 10, fontWeight: 800, letterSpacing: '0.08em', color: 'var(--hcp-t-60)' }}>
-                  {youLeads ? '♛ ' : ''}{c.label}
+                  {youLeads ? <Crown size={10} color={AMBER} fill={AMBER} strokeWidth={1.5} style={{ display: 'inline', verticalAlign: '-1px', marginRight: 3 }} /> : null}
+                  {c.key === 'gross' ? 'GROSS SCORE' : c.label}
                 </div>
                 <div style={{ position: 'relative', height: 3, background: 'var(--hcp-bg-2)', borderRadius: 2, marginTop: 5, overflow: 'hidden' }}>
                   <div style={{ position: 'absolute', left: 0, top: 0, bottom: 0, width: `${youPct}%`, background: c.holder === 'even' ? 'var(--hcp-t-40)' : AMBER, borderRadius: 2 }} />
