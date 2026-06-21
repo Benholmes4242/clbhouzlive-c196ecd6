@@ -22,8 +22,8 @@ interface Props {
   showDivider?: boolean;
 }
 
-const TRACK = 'rgba(255,255,255,0.07)';
-const NEUTRAL_SEG = 'rgba(255,255,255,0.18)';
+const TRACK = 'rgba(15,23,42,0.08)';
+const NEUTRAL_SEG = 'rgba(148,163,184,0.55)';
 
 function clamp(n: number, lo: number, hi: number) {
   return Math.max(lo, Math.min(hi, n));

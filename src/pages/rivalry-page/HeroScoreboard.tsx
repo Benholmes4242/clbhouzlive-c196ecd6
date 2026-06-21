@@ -83,7 +83,7 @@ export const HeroScoreboard: React.FC<Props> = ({
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginTop: 12 }}>
             {/* YOU */}
             <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 6 }}>
-              <div style={{ borderRadius: 14, border: `2px solid ${AMBER}`, lineHeight: 0 }}>
+              <div style={{ borderRadius: '36%', border: `2px solid ${AMBER}`, padding: 2, lineHeight: 0 }}>
                 <SquircleAvatar size={48} hideRing src={yourAvatarUrl} alt="" fallback={(leftLabel[0] ?? '?').toUpperCase()} />
               </div>
               <div style={{ fontSize: 11, fontWeight: 800, letterSpacing: '0.1em', color: youLead ? GOLD : 'rgba(255,255,255,0.85)', textTransform: 'uppercase' }}>
@@ -110,7 +110,7 @@ export const HeroScoreboard: React.FC<Props> = ({
 
             {/* THEM */}
             <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 6 }}>
-              <div style={{ borderRadius: 14, border: '2px solid rgba(255,255,255,0.3)', lineHeight: 0 }}>
+              <div style={{ borderRadius: '36%', border: '2px solid rgba(255,255,255,0.3)', padding: 2, lineHeight: 0 }}>
                 <SquircleAvatar size={48} hideRing src={rivalAvatar} alt="" fallback={(rivalFirst[0] ?? '?').toUpperCase()} />
               </div>
               <div style={{ fontSize: 11, fontWeight: 800, letterSpacing: '0.1em', color: themLead ? GOLD : 'rgba(255,255,255,0.85)', textTransform: 'uppercase', maxWidth: 90, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>

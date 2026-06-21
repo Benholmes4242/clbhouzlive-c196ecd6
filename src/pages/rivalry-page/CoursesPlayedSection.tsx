@@ -66,7 +66,7 @@ interface Props {
   onCoursePick: (courseId: string) => void;
 }
 
-const TRACK = 'rgba(255,255,255,0.07)';
+const TRACK = 'rgba(15,23,42,0.08)';
 
 export const CoursesPlayedSection: React.FC<Props> = ({
   row,
@@ -81,7 +81,7 @@ export const CoursesPlayedSection: React.FC<Props> = ({
       <div
         style={{
           margin: '26px 2px 10px',
-          color: '#FFFFFF',
+          color: T100,
           fontSize: 11,
           fontWeight: 800,
           letterSpacing: '0.16em',
