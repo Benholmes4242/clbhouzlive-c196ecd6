@@ -841,10 +841,10 @@ export function CinematicFrame({
           flexDirection: 'column',
           padding: `18px 14px ${
             showTicker ? 16 + LIVE_BOTTOM_H
-            : isResults ? 16 + DATA_STRIP_H + RESULTS_FOOTER_H
-            : (isUpcoming && defendingChamp) ? 16 + UPCOMING_BAND_H + DATA_STRIP_H
-            : (isUpcoming && countdownText) ? 16 + 68 + DATA_STRIP_H
-            : isUpcoming ? 16 + DATA_STRIP_H
+            : isResults ? 16 + RESULTS_FOOTER_H
+            : (isUpcoming && defendingChamp) ? 16 + UPCOMING_BAND_H
+            : (isUpcoming && countdownText) ? 16 + 68
+            : isUpcoming ? 16
             : 16
           }px`,
         }}
