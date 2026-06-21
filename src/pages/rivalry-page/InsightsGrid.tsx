@@ -4,6 +4,7 @@ import {
   TAB,
   BG_1,
   T50,
+  T100,
   AMBER,
   LINE,
 } from './_shared/tokens';
@@ -16,8 +17,8 @@ interface Props {
 const toneColor: Record<Insight['tone'], string> = {
   positive: AMBER,
   negative: 'var(--hcp-t-60)',
-  amber: '#FFFFFF',
-  neutral: 'rgba(248,250,252,0.80)',
+  amber: AMBER,
+  neutral: 'var(--hcp-t-60)',
 };
 
 export const InsightsGrid: React.FC<Props> = ({ insights }) => {
