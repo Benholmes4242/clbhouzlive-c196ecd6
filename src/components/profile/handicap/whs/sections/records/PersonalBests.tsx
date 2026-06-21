@@ -4,6 +4,7 @@ import { fmtDiff } from '@/lib/whs/format';
 import { isReasonableGross, isReasonableDiff } from '@/lib/whs/handicapMath';
 import { SectionHeader } from '../_shared/atoms';
 import type { WhsScore } from '@/lib/whs/types';
+import { TrendingDown, Flag, Target, Award, CalendarDays, type LucideIcon } from 'lucide-react';
 
 interface Props {
   connectionId: string;
@@ -18,6 +19,14 @@ const D_LINE = 'var(--hcp-line)';
 const D_T100 = 'var(--hcp-t-100)';
 const D_T60 = 'var(--hcp-t-60)';
 const D_BG3 = 'var(--hcp-bg-3)';
+
+const RECORD_ICON: Record<string, LucideIcon> = {
+  'Best Diff': TrendingDown,
+  'Best Gross': Flag,
+  'Best Stableford Score': Target,
+  'Best vs HCP': Award,
+  'Most Rounds in a Month': CalendarDays,
+};
 
 interface Tile {
   eyebrow: string;
@@ -159,85 +168,105 @@ export const PersonalBests: React.FC<Props> = ({ connectionId, currentHandicap, 
       <div style={{ padding: '0 16px 8px' }}>
         <div
           style={{
-          background: D_BG,
-            border: `1px solid ${D_LINE}`,
-            borderRadius: 14,
-            overflow: 'hidden',
+            display: 'grid',
+            gridTemplateColumns: '1fr 1fr',
+            gap: 10,
           }}
         >
-          {(isLoading ? Array.from({ length: 5 }) : tiles).map((t, i) => (
-            <div
-              key={i}
-              style={{
-                display: 'flex',
-                alignItems: 'center',
-                gap: 12,
-                padding: '9px 14px',
-                borderBottom: i < 4 ? `1px solid ${D_LINE}` : 'none',
-                position: 'relative',
-                overflow: 'hidden',
-              }}
-            >
-              <div style={{ flex: 1, minWidth: 0 }}>
+          {(isLoading ? Array.from({ length: 5 }) : tiles).map((t, i) => {
+            const tile = t as Tile;
+            const Icon = !isLoading ? RECORD_ICON[tile.eyebrow] : null;
+            const isEmpty = !isLoading && tile.value === '—';
+            // Last card spans full width when there's an odd count (5 → last is full-width)
+            const isOddLast =
+              !isLoading && i === tiles.length - 1 && tiles.length % 2 === 1;
+
+            return (
+              <div
+                key={i}
+                style={{
+                  gridColumn: isOddLast ? '1 / -1' : 'auto',
+                  background: D_BG,
+                  border: `1px solid ${D_LINE}`,
+                  borderRadius: 16,
+                  padding: 14,
+                  position: 'relative',
+                  overflow: 'hidden',
+                  minWidth: 0,
+                }}
+              >
                 {isLoading ? (
                   <>
-                    <div style={{ height: 13, width: '50%', background: D_BG3, borderRadius: 2, marginBottom: 4 }} />
-                    <div style={{ height: 10.5, width: '75%', background: D_BG3, borderRadius: 2 }} />
+                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                      <div style={{ width: 30, height: 30, borderRadius: 9, background: D_BG3 }} />
+                      <div style={{ width: 44, height: 26, background: D_BG3, borderRadius: 4 }} />
+                    </div>
+                    <div style={{ height: 13, width: '70%', background: D_BG3, borderRadius: 2, marginTop: 12 }} />
+                    <div style={{ height: 10.5, width: '85%', background: D_BG3, borderRadius: 2, marginTop: 6 }} />
                   </>
                 ) : (
                   <>
+                    {/* top row: icon chip + value */}
+                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                      <div
+                        style={{
+                          width: 30, height: 30, borderRadius: 9,
+                          background: 'rgba(247,147,30,0.10)',
+                          display: 'flex', alignItems: 'center', justifyContent: 'center',
+                          flexShrink: 0,
+                        }}
+                      >
+                        {Icon && <Icon size={15} color="#F7931E" strokeWidth={2.2} />}
+                      </div>
+                      <span
+                        style={{
+                          fontSize: 30,
+                          fontWeight: 300,
+                          color: isEmpty ? 'var(--hcp-t-30)' : D_T100,
+                          fontVariantNumeric: 'tabular-nums',
+                          letterSpacing: '-0.04em',
+                          lineHeight: 0.85,
+                        }}
+                      >
+                        {tile.value}
+                      </span>
+                    </div>
+
+                    {/* label */}
                     <div
                       style={{
                         fontSize: 13,
                         fontWeight: 800,
-                        letterSpacing: '-0.005em',
                         color: D_T100,
+                        letterSpacing: '-0.005em',
+                        marginTop: 12,
                       }}
                     >
-                      {(t as Tile).eyebrow}
+                      {tile.eyebrow}
                     </div>
-                    {(t as Tile).caption && (
+
+                    {/* context (course · date) */}
+                    {tile.caption && (
                       <div
                         style={{
                           fontSize: 10.5,
                           color: D_T60,
                           marginTop: 2,
                           fontWeight: 600,
-                          lineHeight: 1.15,
+                          lineHeight: 1.2,
                           whiteSpace: 'nowrap',
                           overflow: 'hidden',
                           textOverflow: 'ellipsis',
                         }}
                       >
-                        {(t as Tile).caption}
+                        {tile.caption}
                       </div>
                     )}
                   </>
                 )}
               </div>
-
-              <div style={{ display: 'flex', alignItems: 'baseline', gap: 4, flexShrink: 0 }}>
-                {isLoading ? (
-                  <div style={{ height: 22, width: 48, background: D_BG3, borderRadius: 4 }} />
-                ) : (
-                  <>
-                    <span
-                      style={{
-                        fontSize: 22,
-                        fontWeight: 300,
-                        color: (t as Tile).value === '—' ? 'var(--hcp-t-30)' : D_T100,
-                        fontVariantNumeric: 'tabular-nums',
-                        letterSpacing: '-0.04em',
-                        lineHeight: 0.9,
-                      }}
-                    >
-                      {(t as Tile).value}
-                    </span>
-                  </>
-                )}
-              </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
       </div>
     </section>
