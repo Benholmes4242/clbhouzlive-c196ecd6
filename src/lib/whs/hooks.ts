@@ -135,6 +135,7 @@ export function useHandicapHistory(
     queryFn: () => fetchHandicapHistory(connectionId as string, daysBack),
     enabled: !!connectionId,
     staleTime: 60_000,
+    placeholderData: keepPreviousData,
   });
 }
 
