@@ -1048,19 +1048,19 @@ const MilestoneCard: React.FC<{
   let medalBoxShadow = 'none';
   let medalMargin = 0;
   if (achieved && rings === 1) {
-    medalBoxShadow = '0 0 0 2px var(--hcp-bg-1), 0 0 0 3.5px rgba(159,29,29,0.8)';
+    medalBoxShadow = '0 0 0 2px var(--hcp-bg-1), 0 0 0 3.5px rgba(220,38,38,0.8)';
     medalMargin = 2;
   } else if (achieved && rings === 2) {
     medalBoxShadow =
-      '0 0 0 2px var(--hcp-bg-1), 0 0 0 3.5px rgba(159,29,29,0.9), 0 0 0 5px var(--hcp-bg-1), 0 0 0 6.5px rgba(159,29,29,0.6)';
+      '0 0 0 2px var(--hcp-bg-1), 0 0 0 3.5px rgba(220,38,38,0.9), 0 0 0 5px var(--hcp-bg-1), 0 0 0 6.5px rgba(220,38,38,0.6)';
     medalMargin = 4;
   }
 
   const medalStyle: React.CSSProperties = achieved
     ? {
         width: medalSize, height: medalSize, borderRadius: '50%',
-        background: 'linear-gradient(135deg, #9F1D1D 0%, #6E1414 100%)',
-        color: '#1A0F02', display: 'flex', alignItems: 'center', justifyContent: 'center',
+        background: 'linear-gradient(135deg, #DC2626 0%, #991B1B 100%)',
+        color: '#FFFFFF', display: 'flex', alignItems: 'center', justifyContent: 'center',
         fontSize: 12, fontWeight: 800, fontFamily: FONT, fontVariantNumeric: 'tabular-nums',
         boxShadow: medalBoxShadow, margin: medalMargin, flexShrink: 0,
       }
@@ -1088,7 +1088,7 @@ const MilestoneCard: React.FC<{
         <div
           style={{
             position: 'absolute', top: 0, left: 0, bottom: 0, width: 2,
-            background: 'linear-gradient(180deg, #9F1D1D 0%, #6E1414 100%)', opacity: 0.8,
+            background: 'linear-gradient(180deg, #DC2626 0%, #991B1B 100%)', opacity: 0.8,
           }}
         />
       )}
