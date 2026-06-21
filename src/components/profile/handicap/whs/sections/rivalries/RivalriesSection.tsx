@@ -9,6 +9,7 @@ import { useFriendViewRivalriesForProfile } from '@/lib/whs/friendViewRivalries'
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useRivalCrowns, useRivalCrownsForOwner } from '@/lib/whs/hooks/useRivalCrowns';
 import { reformatFriendName } from '@/lib/whs/utils/nameFormat';
+import { pickAvatarSrc } from '@/lib/whs/utils/avatarSrc';
 import type { FriendRivalryHydrated } from '@/lib/whs/types';
 import { rivalKey, rivalryScore } from '@/lib/whs/utils/rivalryTiering';
 
