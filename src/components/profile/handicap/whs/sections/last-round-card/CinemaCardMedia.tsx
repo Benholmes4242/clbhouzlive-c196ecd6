@@ -13,7 +13,7 @@ interface Props {
   children?: React.ReactNode; // glass tile
 }
 
-const FALLBACK_GRADIENT = 'linear-gradient(135deg, #1a3c2a 0%, #0f172a 100%)';
+const FALLBACK_GRADIENT = 'linear-gradient(135deg, #46665a 0%, #2f4a40 100%)';
 
 const ATMOSPHERIC =
   'radial-gradient(ellipse 80% 60% at 50% 90%, rgba(0,0,0,0.55) 0%, transparent 70%), radial-gradient(ellipse 60% 40% at 70% 25%, rgba(255,200,140,0.18) 0%, transparent 60%)';
