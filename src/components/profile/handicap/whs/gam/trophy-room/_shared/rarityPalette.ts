@@ -113,7 +113,7 @@ export const MATERIAL_PALETTES: Record<1 | 2 | 3 | 4 | 5, RarityPalette> = {
     border: 'rgba(16,185,129,0.48)',
     label: 'EMERALD',
     heroGradient: 'linear-gradient(160deg, rgba(16,185,129,0.34) 0%, rgba(4,120,87,0.16) 40%, var(--hcp-bg-1) 80%)',
-    cardSweep: RARITY_DARK.emerald.cardSweep,
+    cardSweep: 'linear-gradient(160deg, rgba(16,185,129,0.16) 0%, rgba(16,185,129,0.05) 100%)',
     topStripe: RARITY_DARK.emerald.topStripe,
     outerGlow: RARITY_DARK.emerald.outerGlow,
     metaColor: RARITY_DARK.emerald.labelFg,
