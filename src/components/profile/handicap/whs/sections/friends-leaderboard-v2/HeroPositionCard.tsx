@@ -22,6 +22,8 @@ interface Props {
   onToggleExpand?: () => void;
   viewMode?: 'owner' | 'friend';
   ownerFirstName?: string | null;
+  /** When true, render flush (no outer card chrome) — used inside the merged leaderboard card. */
+  embedded?: boolean;
 }
 
 const T = {
@@ -52,6 +54,7 @@ export const HeroPositionCard: React.FC<Props> = ({
   onToggleExpand,
   viewMode = 'owner',
   ownerFirstName = null,
+  embedded = false,
 }) => {
   // Always called — never short-circuit a hook with `if (!selfRow) return null`.
   const userId = selfRow?.friend_user_id ?? undefined;
