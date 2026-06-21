@@ -80,7 +80,7 @@ const STROKE_VB = 1.5 * (100 / 44); // ≈ 3.41 viewBox units
 const STROKE_HALF = STROKE_VB / 2;
 
 const Shape: React.FC<{
-  kind: 'circle' | 'square';
+  kind: 'circle' | 'square' | 'triangle';
   inset: number;
   stroke: string;
 }> = ({ kind, inset, stroke }) => {
