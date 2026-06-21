@@ -813,26 +813,25 @@ export function CinematicFrame({
           }}
         >
           {isUpcoming ? (
-            <span
-              style={{
-                ...NUMERIC_STYLE,
-                display: 'inline-flex',
-                alignItems: 'center',
-                gap: 6,
-                padding: '4px 9px',
-                borderRadius: 999,
-                background: AMBER_TINT_12,
-                border: `1px solid ${AMBER}`,
-                color: AMBER,
-                fontSize: 10.5,
-                fontWeight: 800,
-                letterSpacing: '0.16em',
-                textTransform: 'uppercase',
-                whiteSpace: 'nowrap',
-              }}
-            >
-              Upcoming
-            </span>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+              <span
+                aria-hidden
+                style={{ width: 7, height: 7, borderRadius: '50%', background: AMBER, flexShrink: 0 }}
+              />
+              <span
+                style={{
+                  ...NUMERIC_STYLE,
+                  fontSize: 11,
+                  fontWeight: 700,
+                  letterSpacing: '0.14em',
+                  color: AMBER,
+                  textShadow: '0 1px 3px rgba(0,0,0,0.45)',
+                  textTransform: 'uppercase',
+                }}
+              >
+                Upcoming
+              </span>
+            </div>
           ) : roundLabel_ ? (
             <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
               {isResults && (
