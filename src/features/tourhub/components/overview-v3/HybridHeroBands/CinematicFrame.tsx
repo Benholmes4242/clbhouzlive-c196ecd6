@@ -1026,7 +1026,6 @@ export function CinematicFrame({
               display: 'block', width: '100%', textAlign: 'left',
             }}
           >
-            <DataStrip items={upcomingStripItems} />
             <div style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '13px 16px', background: '#0A0E14', borderTop: '0.5px solid rgba(255,255,255,0.06)' }}>
               {(() => {
                 const headshot = (tourSlug && defendingChamp.name)
@@ -1065,7 +1064,6 @@ export function CinematicFrame({
               display: 'block', width: '100%', textAlign: 'left',
             }}
           >
-            <DataStrip items={upcomingStripItems} />
             <div style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '14px 16px', background: '#0A0E14', borderTop: '0.5px solid rgba(255,255,255,0.06)' }}>
               <div style={{ flex: 1, minWidth: 0 }}>
                 <div style={{ ...NUMERIC_STYLE, fontSize: 8.5, fontWeight: 800, letterSpacing: '0.18em', color: AMBER }}>TEES OFF IN</div>
@@ -1079,7 +1077,6 @@ export function CinematicFrame({
         {/* Upcoming, no defending champ, no countdown — strip-only base */}
         {isUpcoming && !defendingChamp && !countdownText && (
           <div style={{ position: 'absolute', left: 0, right: 0, bottom: 0, zIndex: 4 }}>
-            <DataStrip items={upcomingStripItems} />
           </div>
         )}
       </div>
@@ -1098,7 +1095,6 @@ export function CinematicFrame({
               display: 'block', width: '100%', textAlign: 'left',
             }}
           >
-            <DataStrip items={liveStripItems} />
             {/* Champion band — flat ink, trophy emoji, tie-aware */}
             {(leader || tiedLeaders) && (
               <div
@@ -1138,7 +1134,6 @@ export function CinematicFrame({
       {/* Results — data strip + final leaderboard footer CTA */}
       {isResults && (
         <div style={{ position: 'absolute', left: 0, right: 0, bottom: 0, zIndex: 4 }}>
-          <DataStrip items={resultsStripItems} />
           <button
             type="button"
             onClick={onCtaTap}
