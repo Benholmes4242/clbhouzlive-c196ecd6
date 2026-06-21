@@ -302,6 +302,7 @@ export function HybridHero({ slide, activeTournamentId, onSelectTour }: HybridHe
           leaderboard={safeLeaderboard}
           tiedLeaders={tiedLeaders}
           fieldSize={safeLeaderboard.length}
+          top10={top10}
           tourSlug={tournament.tourSlug}
           defendingChamp={defendingChamp ?? null}
           fieldStrength={fieldStrength ?? null}

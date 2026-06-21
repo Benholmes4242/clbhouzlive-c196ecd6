@@ -24,8 +24,11 @@ import {
   NUMERIC_STYLE,
 } from '../HybridHero.constants';
 import { AMBER_INK, AMBER_TINT_12, GOLD_DEEP } from '../../../_shared/tokens';
-import type { HeroState, TopTie } from '../HybridHero.utils';
+import type { HeroState, TopTie, TickerRow } from '../HybridHero.utils';
 import { fmtScore, formatRank, buildLeaderboardSlots, roundLabel } from '../HybridHero.utils';
+import { Ticker } from './Ticker';
+
+const TICKER_BAR_H = 40;
 import { getPlayerHeadshotUrl } from '@/utils/playerHeadshot';
 import type { DefendingChampData } from '../../../hooks/useTournamentDefendingChamp';
 import type { FieldStrength } from '../../../hooks/useTournamentFieldStrength';
@@ -523,6 +526,7 @@ export interface CinematicFrameProps {
   leaderboard: any[];
   tiedLeaders: TopTie | null;
   fieldSize: number;
+  top10: TickerRow[];
   tourSlug?: string | null;
   defendingChamp?: DefendingChampData | null;
   fieldStrength?: FieldStrength | null;
@@ -545,6 +549,7 @@ export function CinematicFrame({
   leaderboard,
   tiedLeaders,
   fieldSize,
+  top10,
   tourSlug,
   defendingChamp = null,
   fieldStrength = null,
