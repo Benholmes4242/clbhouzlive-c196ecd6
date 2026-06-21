@@ -930,9 +930,9 @@ export function CinematicFrame({
           style={{
             display: 'flex',
             flexDirection: 'column',
-            gap: 10,
+            gap: 6,
             padding: '0 6px',
-            marginBottom: 16,
+            marginBottom: 4,
           }}
         >
           <h1
