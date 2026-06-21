@@ -1027,25 +1027,22 @@ const MilestonesStrip: React.FC<MilestonesStripProps> = ({
         </span>
       </div>
 
-      {/* Container */}
+      {/* Container — 2×2 grid */}
       <div
         style={{
-          borderRadius: 14,
-          background:
-            'linear-gradient(180deg, var(--hcp-bg-2) 0%, var(--hcp-bg-1) 100%)',
-          border: '1px solid var(--hcp-line)',
-          overflow: 'hidden',
+          display: 'grid',
+          gridTemplateColumns: '1fr 1fr',
+          gap: 10,
         }}
       >
-        {rows.map((row, i) => (
-          <MilestoneRow
+        {rows.map((row) => (
+          <MilestoneCard
             key={row.key}
             name={row.name}
             count={row.count}
             rarity={row.rarity}
             rings={row.rings}
             meta={row.meta}
-            isLast={i === rows.length - 1}
           />
         ))}
       </div>
