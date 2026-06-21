@@ -124,7 +124,7 @@ export const MATERIAL_PALETTES: Record<1 | 2 | 3 | 4 | 5, RarityPalette> = {
     border: 'rgba(125,211,252,0.50)',
     label: 'DIAMOND',
     heroGradient: 'linear-gradient(160deg, rgba(125,211,252,0.36) 0%, rgba(59,130,246,0.18) 40%, var(--hcp-bg-1) 80%)',
-    cardSweep: RARITY_DARK.diamond.cardSweep,
+    cardSweep: 'linear-gradient(160deg, rgba(125,211,252,0.18) 0%, rgba(125,211,252,0.05) 100%)',
     topStripe: RARITY_DARK.diamond.topStripe,
     outerGlow: RARITY_DARK.diamond.outerGlow,
     metaColor: RARITY_DARK.diamond.labelFg,
