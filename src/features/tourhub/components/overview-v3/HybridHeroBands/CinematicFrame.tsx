@@ -580,6 +580,7 @@ export function CinematicFrame({
   const isLive = state.kind === 'live';
   const isResults = state.kind === 'results';
   const isUpcoming = state.kind === 'upcoming';
+  const showTicker = !isUpcoming && Array.isArray(top10) && top10.length > 0;
   const roundLabel_ =
     state.kind === 'live'
       ? `LIVE · ${roundLabel(state.round, state.totalRounds).toUpperCase()}`
@@ -789,7 +790,7 @@ export function CinematicFrame({
           zIndex: 3,
           display: 'flex',
           flexDirection: 'column',
-          padding: '18px 14px 16px',
+          padding: `18px 14px ${showTicker ? 16 + TICKER_BAR_H : 16}px`,
         }}
       >
         {/* Top meta row */}
@@ -929,6 +930,10 @@ export function CinematicFrame({
               textShadow: '0 2px 30px rgba(0,0,0,0.40)',
               textWrap: 'balance' as any,
               wordBreak: 'break-word',
+              display: '-webkit-box',
+              WebkitLineClamp: 3,
+              WebkitBoxOrient: 'vertical' as any,
+              overflow: 'hidden',
             }}
           >
             {title}
