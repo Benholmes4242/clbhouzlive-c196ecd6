@@ -777,7 +777,7 @@ const ShotsBody: React.FC<ShotsBodyProps> = ({ trophyAgg, shotsLoading, scope })
             style={{
               fontSize: 56,
               fontWeight: 200,
-              color: T.amber,
+              color: HOLE_C.birdie,
               letterSpacing: '-0.04em',
               lineHeight: 1,
               fontFamily: FONT,
