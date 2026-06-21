@@ -66,10 +66,6 @@ export const YourCircleSection: React.FC<Props> = ({ userId }) => {
   }
 
   const title = `${stats.playedThisWeek} ${stats.playedThisWeek === 1 ? 'friend played' : 'friends played'} this week`;
-  const sub =
-    stats.yourRank > 0 && stats.total > 0
-      ? `You're ranked ${stats.yourRank} of ${stats.total} among friends with active handicaps.`
-      : undefined;
 
   const visible = showAll ? rail : rail.slice(0, VISIBLE_LIMIT);
   const overflow = rail.length - Math.min(VISIBLE_LIMIT, rail.length);
@@ -77,174 +73,176 @@ export const YourCircleSection: React.FC<Props> = ({ userId }) => {
 
   return (
     <section style={{ marginTop: 32, fontFamily: FONT }}>
-      <SectionHeader eyebrow="YOUR CIRCLE" title={title} sub={sub} />
-
-      {stats.self && stats.yourRank > 0 && stats.total > 0 && (
-        <div style={{ padding: '0 16px' }}>
+      {/* Compact merged header */}
+      <div
+        style={{
+          display: 'flex',
+          alignItems: 'flex-end',
+          justifyContent: 'space-between',
+          padding: '0 16px',
+          gap: 12,
+        }}
+      >
+        <div style={{ minWidth: 0 }}>
           <div
             style={{
-              background: 'var(--hcp-bg-2)',
-              border: '1px solid var(--hcp-hairline)',
-              borderRadius: 12,
-              padding: 12,
-              display: 'flex',
-              alignItems: 'center',
-              gap: 12,
+              fontSize: 11,
+              fontWeight: 800,
+              letterSpacing: '0.14em',
+              color: 'var(--hcp-t-60)',
+              textTransform: 'uppercase',
             }}
           >
-            <SquircleAvatar
-              src={pickAvatarSrc(stats.self.friend_thumbnail_url, stats.self.friend_profile_photo_url)}
-              alt={stats.self.friend_name}
-              size={40}
-              userId={stats.self.friend_user_id ?? undefined}
-              hideRing
-            />
-            <div style={{ flex: 1, minWidth: 0 }}>
-              <div
-                style={{
-                  fontSize: 10,
-                  fontWeight: 800,
-                  letterSpacing: '0.14em',
-                  color: 'var(--hcp-t-60)',
-                  textTransform: 'uppercase',
-                }}
-              >
-                Your Position
-              </div>
-              <div
-                style={{
-                  marginTop: 2,
-                  fontSize: 13,
-                  fontWeight: 700,
-                  color: 'var(--hcp-t-100)',
-                  overflow: 'hidden',
-                  textOverflow: 'ellipsis',
-                  whiteSpace: 'nowrap',
-                }}
-              >
-                {stats.self.friend_name} · {fmtHcp(stats.self.friend_handicap_index)}
-              </div>
+            Your Circle
+          </div>
+          <div
+            style={{
+              marginTop: 4,
+              fontSize: 23,
+              fontWeight: 800,
+              color: 'var(--hcp-t-100)',
+              letterSpacing: '-0.02em',
+              lineHeight: 1.1,
+            }}
+          >
+            {title}
+          </div>
+          {stats.yourRank > 0 && stats.total > 0 && (
+            <div style={{ marginTop: 3, fontSize: 13, color: 'var(--hcp-t-60)' }}>
+              You're{' '}
+              <span style={{ fontWeight: 800, color: 'var(--hcp-t-100)' }}>
+                {ordinal(stats.yourRank)}
+              </span>{' '}
+              of {stats.total}
             </div>
-            <div
+          )}
+        </div>
+
+        {overflow > 0 && (
+          <button
+            type="button"
+            onClick={() => setShowAll((v) => !v)}
+            style={{
+              flexShrink: 0,
+              background: 'transparent',
+              border: 'none',
+              padding: '0 0 4px',
+              fontSize: 10,
+              fontWeight: 800,
+              letterSpacing: '0.14em',
+              color: 'var(--hcp-t-60)',
+              textTransform: 'uppercase',
+              cursor: 'pointer',
+              whiteSpace: 'nowrap',
+            }}
+          >
+            {showAll ? 'Show less' : `See all · ${rail.length}`}
+          </button>
+        )}
+      </div>
+
+      {/* Rail — you lead, then recently-active friends */}
+      <div
+        style={{
+          display: 'flex',
+          gap: 8,
+          padding: '12px 16px 6px',
+          scrollPaddingLeft: 16,
+          scrollPaddingRight: 16,
+          overflowX: 'auto',
+          scrollSnapType: 'x proximity',
+          WebkitOverflowScrolling: 'touch',
+          willChange: 'transform',
+          scrollbarWidth: 'none',
+          boxSizing: 'border-box',
+        }}
+        className="hide-scrollbar"
+      >
+        {/* Self chip */}
+        {stats.self && stats.yourRank > 0 && stats.total > 0 && (
+          <div style={{ scrollSnapAlign: 'start' }}>
+            <button
+              type="button"
+              onClick={() => {
+                if (stats.self?.friend_user_id) {
+                  openSheet({ targetUserId: stats.self.friend_user_id, source: 'recently_active_rail' });
+                }
+              }}
               style={{
+                flex: '0 0 auto',
+                width: 92,
+                background: 'var(--hcp-bg-1)',
+                border: '1.5px solid rgba(247,147,30,0.55)',
+                borderRadius: 14,
+                padding: '9px 8px',
+                cursor: 'pointer',
                 display: 'flex',
-                alignItems: 'baseline',
-                gap: 4,
-                fontVariantNumeric: 'tabular-nums',
+                flexDirection: 'column',
+                alignItems: 'center',
+                textAlign: 'center',
+                fontFamily: FONT,
               }}
             >
-              <span
+              <SquircleAvatar
+                src={pickAvatarSrc(stats.self.friend_thumbnail_url, stats.self.friend_profile_photo_url)}
+                alt={stats.self.friend_name}
+                size={56}
+                userId={stats.self.friend_user_id ?? undefined}
+                hideRing
+              />
+              <p
                 style={{
-                  fontSize: 22,
-                  fontWeight: 800,
-                  color: 'var(--hcp-amber, #F59E0B)',
-                  letterSpacing: '-0.02em',
+                  marginTop: 6, marginBottom: 0, fontSize: 11.5, fontWeight: 800,
+                  color: 'var(--hcp-t-100)', letterSpacing: '-0.005em', lineHeight: 1,
                 }}
               >
-                {stats.yourRank}
-              </span>
-              <span
+                You
+              </p>
+              <p
                 style={{
-                  fontSize: 13,
-                  fontWeight: 700,
-                  color: 'var(--hcp-t-60)',
+                  marginTop: 3, marginBottom: 0, fontSize: 13, fontWeight: 800,
+                  color: 'var(--hcp-t-100)', fontVariantNumeric: 'tabular-nums',
+                  letterSpacing: '-0.02em', lineHeight: 1,
                 }}
               >
-                / {stats.total}
-              </span>
-            </div>
+                {fmtHcp(stats.self.friend_handicap_index)}
+              </p>
+              <p
+                style={{
+                  marginTop: 3, marginBottom: 0, fontSize: 9, fontWeight: 800,
+                  letterSpacing: '0.04em', textTransform: 'uppercase',
+                  color: 'var(--hcp-amber, #F59E0B)', fontVariantNumeric: 'tabular-nums', lineHeight: 1,
+                }}
+              >
+                #{stats.yourRank} of {stats.total}
+              </p>
+            </button>
           </div>
-        </div>
-      )}
+        )}
 
-      {rail.length > 0 && (
-        <div style={{ marginTop: 18 }}>
+        {/* Recently-active friends */}
+        {visible.map((entry) => (
           <div
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'space-between',
-              padding: '0 20px 8px',
-            }}
+            key={entry.friend_user_id ?? entry.friend_connection_id ?? entry.friend_name}
+            style={{ scrollSnapAlign: 'start' }}
           >
-            <div
-              style={{
-                fontSize: 11,
-                fontWeight: 800,
-                letterSpacing: '0.14em',
-                color: 'var(--hcp-t-60)',
-                textTransform: 'uppercase',
+            <RecentlyActiveItem
+              entry={entry}
+              isActive={
+                !!entry.last_round_played_at &&
+                Date.parse(entry.last_round_played_at) >= cutoff
+              }
+              onClick={() => {
+                if (entry.friend_user_id) {
+                  openSheet({ targetUserId: entry.friend_user_id, source: 'recently_active_rail' });
+                } else {
+                  openSheet({ whsOnlyEntry: entry, source: 'recently_active_rail' });
+                }
               }}
-            >
-              Recently Active
-            </div>
-            {overflow > 0 && (
-              <button
-                type="button"
-                onClick={() => setShowAll((v) => !v)}
-                style={{
-                  background: 'transparent',
-                  border: 'none',
-                  padding: '4px 0',
-                  fontSize: 10,
-                  fontWeight: 800,
-                  letterSpacing: '0.14em',
-                  color: 'var(--hcp-t-60)',
-                  textTransform: 'uppercase',
-                  cursor: 'pointer',
-                }}
-              >
-                {showAll ? 'Show less' : `See all · ${rail.length}`}
-              </button>
-            )}
+            />
           </div>
-
-          <div
-            style={{
-              display: 'flex',
-              gap: 8,
-              padding: '4px 16px 6px',
-              scrollPaddingLeft: 16,
-              scrollPaddingRight: 16,
-              overflowX: 'auto',
-              scrollSnapType: 'x proximity',
-              WebkitOverflowScrolling: 'touch',
-              willChange: 'transform',
-              scrollbarWidth: 'none',
-              boxSizing: 'border-box',
-            }}
-            className="hide-scrollbar"
-          >
-            {visible.map((entry) => (
-              <div
-                key={entry.friend_user_id ?? entry.friend_connection_id ?? entry.friend_name}
-                style={{ scrollSnapAlign: 'start' }}
-              >
-                <RecentlyActiveItem
-                  entry={entry}
-                  isActive={
-                    !!entry.last_round_played_at &&
-                    Date.parse(entry.last_round_played_at) >= cutoff
-                  }
-                  onClick={() => {
-                    if (entry.friend_user_id) {
-                      openSheet({
-                        targetUserId: entry.friend_user_id,
-                        source: 'recently_active_rail',
-                      });
-                    } else {
-                      openSheet({
-                        whsOnlyEntry: entry,
-                        source: 'recently_active_rail',
-                      });
-                    }
-                  }}
-                />
-              </div>
-            ))}
-          </div>
-        </div>
-      )}
+        ))}
+      </div>
     </section>
   );
 };
