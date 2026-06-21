@@ -36,6 +36,7 @@ export const AchievementsCard: React.FC<Props> = ({ userId, viewMode = 'owner', 
     })
     .slice(0, 4);
   const overflow = Math.max(0, unlockedCount - recent.length);
+  const pct = totalCount > 0 ? Math.round((unlockedCount / totalCount) * 100) : 0;
 
   const handleOpen = () => openGamAchievements();
   const handleKeyDown = (e: React.KeyboardEvent) => {
