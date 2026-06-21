@@ -109,13 +109,20 @@ const IndexHistoryCard: React.FC<Props> = ({ connectionId }) => {
         { x: px(lastT), text: fmtMonthDay(lastT) },
       );
     } else {
-      const months = uniqueMonthsBetween(firstT, lastT);
-      const target = range === '3M' ? 3 : 4;
-      const step = Math.max(1, Math.floor(months.length / target));
-      const clampX = (x: number) =>
-        Math.min(Math.max(x, PADDING_X), W - PADDING_X);
-      for (let i = 0; i < months.length; i += step) {
-        labels.push({ x: clampX(px(months[i])), text: fmtMonth(months[i]) });
+      // Evenly distribute N labels across the actual data span (firstT → lastT),
+      // labelling each tick by its month. This anchors the first label to the
+      // left edge and the last to the right edge with even gaps — no calendar-
+      // boundary overflow, no overlap, no right-side short-fall.
+      const count = range === '3M' ? 3 : 5; // 3M → 3 ticks, 1Y → 5 ticks
+      const seen = new Set<string>();
+      for (let i = 0; i < count; i++) {
+        const ts = firstT + ((lastT - firstT) * i) / (count - 1);
+        const text = fmtMonth(ts);
+        // De-dupe: if two evenly-spaced ticks land in the same month (very short
+        // spans), skip the duplicate so we never render the same month twice.
+        if (seen.has(text)) continue;
+        seen.add(text);
+        labels.push({ x: px(ts), text });
       }
     }
     return labels;
