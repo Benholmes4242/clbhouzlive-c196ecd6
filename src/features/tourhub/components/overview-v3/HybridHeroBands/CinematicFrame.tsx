@@ -894,7 +894,7 @@ export function CinematicFrame({
               margin: 0,
               color: 'white',
               fontFamily: "'Geist', -apple-system, BlinkMacSystemFont, sans-serif",
-              fontSize: 44,
+              fontSize: isResults ? 30 : 44,
               fontWeight: 800,
               letterSpacing: '-0.03em',
               lineHeight: 0.98,
