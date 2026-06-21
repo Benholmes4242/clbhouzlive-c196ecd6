@@ -16,6 +16,7 @@ import { format } from 'date-fns';
 import { ChevronRight, Crown, Trophy } from 'lucide-react';
 import {
   CINEMATIC_FRAME_HEIGHT,
+  CINEMATIC_FRAME_HEIGHT_RESULTS,
   CINEMATIC_SCRIM,
   COURSE_GRADIENT,
   COURSE_GRADIENT_DUSK,
@@ -581,7 +582,7 @@ export function CinematicFrame({
   const isLive = state.kind === 'live';
   const isResults = state.kind === 'results';
   const isUpcoming = state.kind === 'upcoming';
-  const showTicker = !isUpcoming && Array.isArray(top10) && top10.length > 0;
+  const showTicker = isLive && Array.isArray(top10) && top10.length > 0;
   const roundLabel_ =
     state.kind === 'live'
       ? `LIVE · ${roundLabel(state.round, state.totalRounds).toUpperCase()}`
@@ -753,7 +754,7 @@ export function CinematicFrame({
       style={{
         position: 'relative',
         width: '100%',
-        height: CINEMATIC_FRAME_HEIGHT,
+        height: isResults ? CINEMATIC_FRAME_HEIGHT_RESULTS : CINEMATIC_FRAME_HEIGHT,
         overflow: 'hidden',
         background: useDusk ? COURSE_GRADIENT_DUSK : COURSE_GRADIENT,
         flexShrink: 0,
@@ -780,7 +781,9 @@ export function CinematicFrame({
       {/* Layer 2: cinematic scrim */}
       <div
         aria-hidden="true"
-        style={{ position: 'absolute', inset: 0, background: CINEMATIC_SCRIM, zIndex: 2 }}
+        style={{ position: 'absolute', inset: 0, background: isResults
+          ? 'linear-gradient(180deg, rgba(10,14,20,0.55) 0%, rgba(10,14,20,0.2) 28%, rgba(10,14,20,0.5) 58%, rgba(10,14,20,0.97) 100%)'
+          : CINEMATIC_SCRIM, zIndex: 2 }}
       />
 
       {/* Flex content column — top meta, spacer, title, capsule */}
@@ -793,6 +796,7 @@ export function CinematicFrame({
           flexDirection: 'column',
           padding: `18px 14px ${
             showTicker ? 16 + BOTTOM_STACK_H
+            : isResults ? 16 + 40
             : (isUpcoming && defendingChamp) ? 16 + UPCOMING_BAND_H
             : 16
           }px`,
@@ -871,8 +875,9 @@ export function CinematicFrame({
           )}
         </div>
 
-        {/* Spacer absorbs slack so title+capsule sit at the base */}
-        <div style={{ flex: 1, minHeight: 16 }} />
+        {/* Spacer absorbs slack so title+capsule sit at the base (live/upcoming).
+            For results, title hugs the top and the poster centres below. */}
+        {!isResults && <div style={{ flex: 1, minHeight: 16 }} />}
 
         {/* Title block */}
         <div
@@ -889,7 +894,7 @@ export function CinematicFrame({
               margin: 0,
               color: 'white',
               fontFamily: "'Geist', -apple-system, BlinkMacSystemFont, sans-serif",
-              fontSize: 44,
+              fontSize: isResults ? 30 : 44,
               fontWeight: 800,
               letterSpacing: '-0.03em',
               lineHeight: 0.98,
@@ -955,6 +960,38 @@ export function CinematicFrame({
             </div>
           )}
         </div>
+
+        {/* Results — champion poster (centred trophy + winner) */}
+        {isResults && safe[0] && (() => {
+          const winner = safe[0];
+          const runnerUp = safe[1];
+          const margin = runnerUp ? Math.abs((runnerUp.score ?? 0) - (winner.score ?? 0)) : null;
+          const winnerAvatar = resolveAvatar(winner, tourSlug);
+          return (
+            <>
+              <div style={{ flex: 1 }} />
+              <div style={{ textAlign: 'center', paddingBottom: 26 }}>
+                <div style={{ fontSize: 42, lineHeight: 1, marginBottom: 10 }} aria-hidden>🏆</div>
+                <div style={{ ...NUMERIC_STYLE, fontSize: 9, fontWeight: 800, letterSpacing: '0.24em', color: GOLD }}>CHAMPION</div>
+                {winnerAvatar
+                  ? <img src={winnerAvatar} alt="" loading="lazy" style={{ width: 90, height: 90, borderRadius: '34%', objectFit: 'cover', border: `3px solid ${GOLD}`, margin: '12px auto 8px', display: 'block', boxShadow: '0 0 38px rgba(251,188,46,0.5)' }} />
+                  : <div style={{ width: 90, height: 90, borderRadius: '34%', background: 'rgba(255,255,255,0.08)', border: `3px solid ${GOLD}`, margin: '12px auto 8px', boxShadow: '0 0 38px rgba(251,188,46,0.5)' }} />}
+                <div style={{ fontSize: 30, fontWeight: 900, color: '#fff', letterSpacing: '-0.02em', padding: '0 16px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{entryName(winner)}</div>
+                <div style={{ display: 'inline-flex', alignItems: 'center', gap: 10, marginTop: 8 }}>
+                  <span style={{ ...NUMERIC_STYLE, fontSize: 18, fontWeight: 900, color: scoreColor(winner.score) }}>{fmtScore(winner.score)}</span>
+                  {margin != null && (
+                    <>
+                      <span style={{ width: 4, height: 4, borderRadius: '50%', background: 'rgba(255,255,255,0.4)' }} />
+                      <span style={{ fontSize: 13, fontWeight: 700, color: 'rgba(255,255,255,0.75)' }}>
+                        {margin === 0 ? 'won in a playoff' : `won by ${margin}`}
+                      </span>
+                    </>
+                  )}
+                </div>
+              </div>
+            </>
+          );
+        })()}
 
         {/* Upcoming — defending champion band, pinned to base (flat ink) */}
         {isUpcoming && defendingChamp && (
@@ -1048,6 +1085,25 @@ export function CinematicFrame({
           </button>
         );
       })()}
+
+      {/* Results — final leaderboard footer CTA */}
+      {isResults && (
+        <button
+          type="button"
+          onClick={onCtaTap}
+          aria-label="Final leaderboard"
+          style={{
+            position: 'absolute', left: 0, right: 0, bottom: 0, zIndex: 4,
+            border: 'none', cursor: 'pointer', background: '#0A0E14',
+            padding: '13px 16px', textAlign: 'center', width: '100%',
+            borderTop: '0.5px solid rgba(255,255,255,0.06)',
+          }}
+        >
+          <span style={{ ...NUMERIC_STYLE, fontSize: 12, fontWeight: 800, letterSpacing: '0.06em', color: GOLD }}>
+            FINAL LEADERBOARD · {safe.length} ›
+          </span>
+        </button>
+      )}
     </div>
   );
 }
