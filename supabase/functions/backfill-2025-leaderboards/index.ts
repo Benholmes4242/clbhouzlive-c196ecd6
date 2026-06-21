@@ -101,7 +101,7 @@ Deno.serve(async (req) => {
           const json = await res.json().catch(() => ({}));
           const success = res.ok && (json?.success ?? json?.records !== undefined);
           if (success) ok++; else fail++;
-          console.log(`[backfill] ${success ? 'OK ' : 'FAIL'} ${t.tour} ${t.name} (records=${json?.records ?? '?'})`);
+          console.log(`[backfill] ${success ? 'OK ' : 'FAIL'} ${t.slug} ${t.name} (records=${json?.records ?? '?'})`);
         } catch (e: any) {
           fail++;
           console.error(`[backfill] ERROR ${t.tour} ${t.name}: ${String(e?.message ?? e)}`);
