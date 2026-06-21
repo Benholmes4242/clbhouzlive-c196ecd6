@@ -4,7 +4,8 @@ import { useQueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
 import { callCreateInvite } from '@/lib/whs/api';
 import { shareInvite } from '@/lib/whs/share';
-import { firstName } from '@/lib/whs/utils/initials';
+import { firstName, displayName } from '@/lib/whs/utils/initials';
+import { getInitialsFromName, getAvatarFallbackColor } from '@/lib/avatarFallback';
 import { pickAvatarSrc } from '@/lib/whs/utils/avatarSrc';
 import { fmtRelative } from '@/lib/whs/utils/nameFormat';
 import { whsKeys } from '@/lib/whs/hooks';
@@ -21,25 +22,6 @@ const HAIRLINE = 'var(--hcp-line-2)';
 
 const FONT_GEIST = '"Geist", system-ui, -apple-system, BlinkMacSystemFont, sans-serif';
 
-const MONO_COLORS = [
-  '#5C7F4A',
-  '#7A4A5C',
-  '#4A6F8A',
-  '#A87A4A',
-  '#6F4A8A',
-  '#4A8A5C',
-  '#8A6F4A',
-  '#5C4A8A',
-];
-
-function monogramColor(seed: number): string {
-  return MONO_COLORS[Math.abs(seed) % MONO_COLORS.length];
-}
-
-function monogramLetter(name: string): string {
-  const first = firstName(name);
-  return first.charAt(0).toUpperCase() || '?';
-}
 
 export const InviteCard: React.FC<Props> = ({ friend }) => {
   const queryClient = useQueryClient();
@@ -97,19 +79,19 @@ export const InviteCard: React.FC<Props> = ({ friend }) => {
           <div
             style={{
               width: 42, height: 42, borderRadius: 12, flexShrink: 0,
-              background: monogramColor(monogramLetter(friend.friend_name).charCodeAt(0)),
+              background: getAvatarFallbackColor(friend.friend_user_id ?? friend.friend_row_id ?? friend.friend_name),
               display: 'flex', alignItems: 'center', justifyContent: 'center',
-              color: '#fff', fontSize: 17, fontWeight: 800,
+              color: '#fff', fontSize: 15, fontWeight: 800,
             }}
           >
-            {monogramLetter(friend.friend_name)}
+            {getInitialsFromName(friend.friend_name) || '?'}
           </div>
         );
       })()}
 
       <div style={{ flex: 1, minWidth: 0 }}>
         <div style={{ fontSize: 14, fontWeight: 800, color: INK, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-          {firstName(friend.friend_name)}{' '}
+          {displayName(friend.friend_name)}{' '}
           <span style={{ fontSize: 12, fontWeight: 700, color: INK_MUTE, fontVariantNumeric: 'tabular-nums' }}>
             {fmtHcp(hcp)}
           </span>
