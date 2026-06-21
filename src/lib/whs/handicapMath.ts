@@ -9,6 +9,10 @@ export interface NextRoundProjection {
   isAtRisk: boolean;
   /** Whether projection is reliable (need at least 8 rounds with diffs). */
   hasData: boolean;
+  /** Raw (unrounded) settle value — lets the UI decide visibility on the displayed delta. */
+  settleAtRaw: number;
+  /** True if the round rolling off (oldest of last 20) is currently in the counting top 8. */
+  counterDropping: boolean;
 }
 
 /**
@@ -33,7 +37,10 @@ export function projectNextRound(
     .filter((d): d is number => d != null);
 
   if (validDiffs.length < 8) {
-    return { cutTarget: 0, settleAt: currentHandicap, isAtRisk: false, hasData: false };
+    return {
+      cutTarget: 0, settleAt: currentHandicap, isAtRisk: false, hasData: false,
+      settleAtRaw: currentHandicap, counterDropping: false,
+    };
   }
 
   // Sort last20 by play_date ascending to identify the OLDEST (which rolls out)
@@ -59,11 +66,27 @@ export function projectNextRound(
 
   const isAtRisk = settleAt > currentHandicap + 0.05;
 
+  // Is the oldest round (the one rolling off) currently in the counting top 8?
+  const currentTop8Ids = new Set(
+    [...last20]
+      .filter((r) => r.handicap_differential != null)
+      .sort(
+        (a, b) =>
+          (a.handicap_differential as number) - (b.handicap_differential as number),
+      )
+      .slice(0, 8)
+      .map((r) => r.id),
+  );
+  const oldestRound = sortedByDate[0];
+  const counterDropping = oldestRound ? currentTop8Ids.has(oldestRound.id) : false;
+
   return {
     cutTarget: Number(cutTarget.toFixed(1)),
     settleAt: Number(settleAt.toFixed(1)),
     isAtRisk,
     hasData: true,
+    settleAtRaw: settleAt,
+    counterDropping,
   };
 }
 
