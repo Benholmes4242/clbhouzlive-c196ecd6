@@ -11,9 +11,8 @@ const INK = 'var(--hcp-t-100)';
 const INK_55 = 'var(--hcp-t-60)';
 const INK_40 = 'var(--hcp-t-40)';
 const HAIRLINE = 'var(--hcp-line-2)';
-const UNDER = 'var(--hcp-gold-text)';
-const OVER = '#f87171';
-const PAR_RING = 'var(--hcp-line-3)';
+// Monochrome — shape encodes the score, not colour.
+const SHAPE_STROKE = 'var(--hcp-t-60)';
 
 const FONT_GEIST =
   'Geist, system-ui, -apple-system, BlinkMacSystemFont, sans-serif';
@@ -52,21 +51,21 @@ const variantFor = (strokes: number | null, par: number): Variant => {
 };
 
 interface VariantSpec {
-  shape: 'circle' | 'square' | null;
+  shape: 'circle' | 'square' | 'triangle' | null;
   depth: 0 | 1 | 2 | 3;
   stroke: string;
 }
 
 const SPECS: Record<Variant, VariantSpec> = {
-  empty:  { shape: null,     depth: 0, stroke: HAIRLINE },
-  par:    { shape: null,     depth: 0, stroke: PAR_RING },
-  birdie: { shape: 'circle', depth: 1, stroke: UNDER },
-  eagle:  { shape: 'circle', depth: 2, stroke: UNDER },
-  alba:   { shape: 'circle', depth: 3, stroke: UNDER },
-  hio:    { shape: 'circle', depth: 3, stroke: UNDER },
-  bogey:  { shape: 'square', depth: 1, stroke: OVER },
-  doub:   { shape: 'square', depth: 2, stroke: OVER },
-  triple: { shape: 'square', depth: 3, stroke: OVER },
+  empty:  { shape: null,       depth: 0, stroke: HAIRLINE },
+  par:    { shape: null,       depth: 0, stroke: HAIRLINE },
+  birdie: { shape: 'circle',   depth: 1, stroke: SHAPE_STROKE },
+  eagle:  { shape: 'circle',   depth: 2, stroke: SHAPE_STROKE },
+  alba:   { shape: 'circle',   depth: 3, stroke: SHAPE_STROKE },
+  hio:    { shape: 'triangle', depth: 1, stroke: SHAPE_STROKE },
+  bogey:  { shape: 'square',   depth: 1, stroke: SHAPE_STROKE },
+  doub:   { shape: 'square',   depth: 2, stroke: SHAPE_STROKE },
+  triple: { shape: 'square',   depth: 3, stroke: SHAPE_STROKE },
 };
 
 /**
@@ -81,7 +80,7 @@ const STROKE_VB = 1.5 * (100 / 44); // ≈ 3.41 viewBox units
 const STROKE_HALF = STROKE_VB / 2;
 
 const Shape: React.FC<{
-  kind: 'circle' | 'square';
+  kind: 'circle' | 'square' | 'triangle';
   inset: number;
   stroke: string;
 }> = ({ kind, inset, stroke }) => {
@@ -108,6 +107,34 @@ const Shape: React.FC<{
           fill="none"
           stroke={stroke}
           strokeWidth={STROKE_VB}
+        />
+      </svg>
+    );
+  }
+
+  if (kind === 'triangle') {
+    const m = insetVB + STROKE_HALF;
+    const top = `50,${m}`;
+    const left = `${m},${100 - m}`;
+    const right = `${100 - m},${100 - m}`;
+    return (
+      <svg
+        viewBox="0 0 100 100"
+        preserveAspectRatio="xMidYMid meet"
+        style={{
+          position: 'absolute', inset: 0,
+          width: '100%', height: '100%',
+          pointerEvents: 'none',
+          overflow: 'visible',
+        }}
+        aria-hidden
+      >
+        <polygon
+          points={`${top} ${left} ${right}`}
+          fill="none"
+          stroke={stroke}
+          strokeWidth={STROKE_VB}
+          strokeLinejoin="round"
         />
       </svg>
     );
@@ -198,18 +225,6 @@ export const RoundHoleCell: React.FC<Props> = ({ hole, showPar = true }) => {
           />
         )}
 
-        {/* Par placeholder — solid hairline square */}
-        {variant === 'par' && (
-          <div
-            style={{
-              position: 'absolute',
-              inset: 0,
-              border: `${STROKE_W}px solid ${HAIRLINE}`,
-              borderRadius: 3,
-            }}
-          />
-        )}
-
         {/* Shape(s) for non-par variants */}
         {spec.shape && (
           <>
@@ -229,14 +244,7 @@ export const RoundHoleCell: React.FC<Props> = ({ hole, showPar = true }) => {
             position: 'relative',
             fontSize: 'clamp(12px, 3.4vw, 15px)',
             fontWeight: 700,
-            color:
-              strokes == null
-                ? INK_40
-                : variant === 'par'
-                ? INK_55
-                : spec.shape === 'square'
-                ? OVER
-                : UNDER,
+            color: strokes == null ? INK_40 : variant === 'par' ? INK_55 : INK,
             lineHeight: 1,
             letterSpacing: '-0.02em',
             fontVariantNumeric: 'tabular-nums',

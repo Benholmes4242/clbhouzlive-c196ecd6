@@ -76,7 +76,7 @@ const labelStyle: React.CSSProperties = {
   letterSpacing: '0.16em',
   textTransform: 'uppercase',
   fontFamily: FONT_GEIST,
-  marginBottom: 3,
+  marginBottom: 2,
 };
 
 const valueStyle = (color: string, size: number = 22): React.CSSProperties => ({
@@ -149,7 +149,7 @@ export const SheetHeroGlass: React.FC<Props> = ({
         right: 14,
         bottom: 14,
         zIndex: 3,
-        padding: '11px 13px',
+        padding: '10px 13px',
         borderRadius: 13,
         background: 'rgba(255,255,255,0.08)',
         border: '0.5px solid rgba(255,255,255,0.18)',
@@ -187,7 +187,7 @@ export const SheetHeroGlass: React.FC<Props> = ({
         )}
       </div>
 
-      <div style={{ ...HAIR, margin: '10px 0' }} />
+      <div style={{ ...HAIR, margin: '8px 0' }} />
 
       <div
         style={
@@ -204,7 +204,7 @@ export const SheetHeroGlass: React.FC<Props> = ({
         <div style={{ textAlign: 'center', flex: hasImpact ? undefined : 1 }}>
           <div style={labelStyle}>GROSS</div>
           <div
-            style={{ marginTop: 4, height: 44, display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+            style={{ marginTop: 2, height: 38, display: 'flex', alignItems: 'center', justifyContent: 'center' }}
             aria-label={`Gross score ${gross ?? ''}${isCounter ? ', counts toward index' : ''}`}
           >
             <GlassGrossRing
@@ -221,7 +221,7 @@ export const SheetHeroGlass: React.FC<Props> = ({
         ) : (
           <div style={{ textAlign: 'center', flex: hasImpact ? undefined : 1 }}>
             <div style={labelStyle}>STABLEFORD</div>
-            <div style={{ marginTop: 4, height: 44, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            <div style={{ marginTop: 2, height: 38, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
               <div style={{ ...valueStyle('#FFFFFF', valSize), marginTop: 0 }}>{stableford != null ? stableford : EM_DASH}</div>
             </div>
           </div>
@@ -233,7 +233,7 @@ export const SheetHeroGlass: React.FC<Props> = ({
         ) : (
           <div style={{ textAlign: 'center', flex: hasImpact ? undefined : 1 }}>
             <div style={labelStyle}>SCORE DIFF</div>
-            <div style={{ marginTop: 4, height: 44, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            <div style={{ marginTop: 2, height: 38, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
               <div style={{ ...valueStyle('#FFFFFF', valSize), marginTop: 0 }}>
                 {fmtDiffLocal(differential)}
               </div>
@@ -244,7 +244,7 @@ export const SheetHeroGlass: React.FC<Props> = ({
         {hasImpact && (
           <div style={{ textAlign: 'center' }}>
             <div style={labelStyle}>HCP IMPACT</div>
-            <div style={{ marginTop: 4, height: 44, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            <div style={{ marginTop: 2, height: 38, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
               <div style={{ ...valueStyle(impactColor, valSize), marginTop: 0 }}>{fmtImpact(handicapDelta!)}</div>
             </div>
           </div>
