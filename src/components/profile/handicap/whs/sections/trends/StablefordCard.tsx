@@ -740,30 +740,10 @@ const ShotsBody: React.FC<ShotsBodyProps> = ({ trophyAgg, shotsLoading, scope })
     textColor: string;
   };
   const allSegments: Segment[] = [
-    {
-      key: 'birdiePlus',
-      count: birdiesOrBetter,
-      background: 'var(--hcp-good-deep)',
-      textColor: '#FFFFFF',
-    },
-    {
-      key: 'par',
-      count: pars,
-      background: 'var(--hcp-bg-3)',
-      textColor: 'var(--hcp-t-80)',
-    },
-    {
-      key: 'bogey',
-      count: bogey,
-      background: 'var(--hcp-bg-3)',
-      textColor: 'var(--hcp-t-80)',
-    },
-    {
-      key: 'double',
-      count: doublePlus,
-      background: 'var(--hcp-bad)',
-      textColor: '#FFFFFF',
-    },
+    { key: 'birdiePlus', count: birdiesOrBetter, background: HOLE_C.birdie, textColor: '#FFFFFF' },
+    { key: 'par',        count: pars,            background: HOLE_C.par,    textColor: '#FFFFFF' },
+    { key: 'bogey',      count: bogey,           background: HOLE_C.bogey,  textColor: '#FFFFFF' },
+    { key: 'double',     count: doublePlus,      background: HOLE_C.double, textColor: '#FFFFFF' },
   ];
 
   const segments = allSegments.filter((s) => s.count > 0);
