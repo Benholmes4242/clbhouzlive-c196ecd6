@@ -97,36 +97,6 @@ const IndexHistoryCard: React.FC<Props> = ({ connectionId }) => {
     };
   }, [points, plotW, plotH]);
 
-  const xLabels = useMemo(() => {
-    if (!chart) return [] as { x: number; text: string }[];
-    const { firstT, lastT, px } = chart;
-    const labels: { x: number; text: string }[] = [];
-    if (range === '1M') {
-      const mid = (firstT + lastT) / 2;
-      labels.push(
-        { x: px(firstT), text: fmtMonthDay(firstT) },
-        { x: px(mid), text: fmtMonthDay(mid) },
-        { x: px(lastT), text: fmtMonthDay(lastT) },
-      );
-    } else {
-      // Evenly distribute N labels across the actual data span (firstT → lastT),
-      // labelling each tick by its month. This anchors the first label to the
-      // left edge and the last to the right edge with even gaps — no calendar-
-      // boundary overflow, no overlap, no right-side short-fall.
-      const count = range === '3M' ? 3 : 5; // 3M → 3 ticks, 1Y → 5 ticks
-      const seen = new Set<string>();
-      for (let i = 0; i < count; i++) {
-        const ts = firstT + ((lastT - firstT) * i) / (count - 1);
-        const text = fmtMonth(ts);
-        // De-dupe: if two evenly-spaced ticks land in the same month (very short
-        // spans), skip the duplicate so we never render the same month twice.
-        if (seen.has(text)) continue;
-        seen.add(text);
-        labels.push({ x: px(ts), text });
-      }
-    }
-    return labels;
-  }, [chart, range]);
 
   if (isLoading || !chart) return null;
 
