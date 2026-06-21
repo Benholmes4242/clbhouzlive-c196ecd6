@@ -33,12 +33,13 @@ const HcpSparkline: React.FC<{ series: number[]; color: string }> = ({ series, c
     return <div style={{ height: h }} />;
   }
   const w = 110;
+  const PAD = 3; // vertical inset so stroke + end-dot never clip at top/bottom
   const min = Math.min(...series);
   const max = Math.max(...series);
   const range = Math.max(0.1, max - min);
   const points = series.map((v, i) => [
     (i / (series.length - 1)) * w,
-    h - ((v - min) / range) * h,
+    h - PAD - ((v - min) / range) * (h - PAD * 2),
   ]);
   const path = points
     .map(([x, y], i) => `${i === 0 ? 'M' : 'L'} ${x.toFixed(1)} ${y.toFixed(1)}`)

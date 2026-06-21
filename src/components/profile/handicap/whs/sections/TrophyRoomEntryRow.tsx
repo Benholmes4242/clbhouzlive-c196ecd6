@@ -47,7 +47,7 @@ const TrophyRoomEntryRow: React.FC<Props> = ({ userId, viewMode = 'owner', owner
   const lifetimeSub = isFriend ? 'See them all' : 'See them all';
 
   return (
-    <div style={{ padding: '0 20px 16px', fontFamily: FONT }}>
+    <div style={{ padding: '0 20px 4px', fontFamily: FONT }}>
       <button
         type="button"
         onClick={() => openGamAchievements()}
