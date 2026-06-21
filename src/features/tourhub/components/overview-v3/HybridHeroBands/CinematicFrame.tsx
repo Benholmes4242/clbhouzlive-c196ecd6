@@ -798,6 +798,7 @@ export function CinematicFrame({
             showTicker ? 16 + BOTTOM_STACK_H
             : isResults ? 16 + 40
             : (isUpcoming && defendingChamp) ? 16 + UPCOMING_BAND_H
+            : (isUpcoming && countdownText) ? 16 + 68
             : 16
           }px`,
         }}
