@@ -206,15 +206,21 @@ const LastRoundHeroCard: React.FC<Props> = ({
 
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginTop: 14 }}>
         {handicapDelta != null ? (
-          <div
-            style={{
-              fontSize: 12,
-              fontWeight: 700,
-              color: handicapDelta > 0 ? 'var(--hcp-bad)' : 'var(--hcp-good-2)',
-            }}
-          >
-            {handicapDelta > 0 ? '↑' : '↓'} {Math.abs(handicapDelta).toFixed(1)} to your index
-          </div>
+          handicapDelta === 0 ? (
+            <div style={{ fontSize: 12, fontWeight: 700, color: 'var(--hcp-t-60)' }}>
+              No change to your index
+            </div>
+          ) : (
+            <div
+              style={{
+                fontSize: 12,
+                fontWeight: 700,
+                color: handicapDelta > 0 ? 'var(--hcp-bad)' : 'var(--hcp-good-2)',
+              }}
+            >
+              {handicapDelta > 0 ? '↑' : '↓'} {Math.abs(handicapDelta).toFixed(1)} to your index
+            </div>
+          )
         ) : <span />}
         <ChevronRight size={20} color="var(--hcp-t-60)" strokeWidth={2.4} style={{ flexShrink: 0 }} />
       </div>
