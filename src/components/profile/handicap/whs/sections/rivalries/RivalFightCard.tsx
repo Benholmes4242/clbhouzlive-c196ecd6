@@ -156,7 +156,7 @@ export const RivalFightCard: React.FC<Props> = ({
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginTop: 12 }}>
           {/* YOU */}
           <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 6 }}>
-            <SquircleAvatar size={46} hideRing src={null} alt={youLabel} fallback={youLabel.slice(0, 2)} />
+            <SquircleAvatar size={46} hideRing src={youAvatar} alt={youLabel} fallback={youLabel.slice(0, 2)} />
             <span style={{ fontSize: 11, fontWeight: 800, letterSpacing: '0.1em', color: youColor === GOLD ? GOLD : 'rgba(255,255,255,0.85)', textTransform: 'uppercase' }}>{youLabel}</span>
           </div>
 
