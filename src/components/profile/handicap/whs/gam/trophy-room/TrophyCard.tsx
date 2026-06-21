@@ -331,7 +331,7 @@ const ShowpieceCard: React.FC<Props> = ({ item, onTap }) => {
         padding: 9,
         cursor: 'pointer',
         textAlign: 'left',
-        opacity: locked ? 0.62 : 1,
+        opacity: 1,
         transform: pressed ? 'scale(0.985)' : 'scale(1)',
         transition: 'transform 120ms ease, opacity 160ms ease',
         fontFamily: GAM.FONT_GEIST,
@@ -357,6 +357,24 @@ const ShowpieceCard: React.FC<Props> = ({ item, onTap }) => {
           }}
         />
       )}
+
+      {/* Watermark icon — every card gets one. Lit when locked, subtle when active. */}
+      <div
+        aria-hidden
+        style={{
+          position: 'absolute',
+          right: -8,
+          bottom: 4,
+          transform: 'rotate(-12deg)',
+          opacity: locked ? 0.16 : 0.14,
+          color: locked ? 'rgba(100,116,139,0.85)' : palette.color,
+          pointerEvents: 'none',
+          zIndex: 0,
+        }}
+      >
+        {renderBadgeIcon(item.iconKey, 84, 'currentColor')}
+      </div>
+
 
       {/* Top row: icon tile + pill */}
       <div
