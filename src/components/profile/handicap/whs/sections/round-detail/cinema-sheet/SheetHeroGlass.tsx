@@ -149,7 +149,7 @@ export const SheetHeroGlass: React.FC<Props> = ({
         right: 14,
         bottom: 14,
         zIndex: 3,
-        padding: '11px 13px',
+        padding: '10px 13px',
         borderRadius: 13,
         background: 'rgba(255,255,255,0.08)',
         border: '0.5px solid rgba(255,255,255,0.18)',
