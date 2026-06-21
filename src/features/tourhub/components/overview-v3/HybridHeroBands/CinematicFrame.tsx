@@ -762,13 +762,90 @@ export function CinematicFrame({
     ? upcomingFooter
     : `Full leaderboard${fieldSize > 0 ? ` · ${fieldSize} players` : ''}`;
 
+  // ---- DataStrip / PlayerCarousel helpers ------------------------------------
+  const parStr = venuePar != null ? String(venuePar) : '—';
+  const yardageStr = venueYardage != null ? venueYardage.toLocaleString() : '—';
+  const purseStr = purse != null ? formatPurse(purse) || '—' : '—';
+  const winShareStr = winningShare != null ? formatPurse(winningShare) || '—' : '—';
+  const fieldStr = fieldSize > 0 ? String(fieldSize) : '—';
+
+  const DataStrip = ({ items }: { items: { k: string; v: string; gold?: boolean }[] }) => (
+    <div style={{ display: 'flex', alignItems: 'stretch', background: '#0A0E14', borderTop: '0.5px solid rgba(255,255,255,0.06)' }}>
+      {items.map((it, i) => (
+        <div key={it.k} style={{ flex: 1, padding: '11px 6px 10px', textAlign: 'center', borderLeft: i ? '1px solid rgba(255,255,255,0.08)' : 'none' }}>
+          <div style={{ ...NUMERIC_STYLE, fontSize: 15, fontWeight: 900, color: it.gold ? GOLD : '#fff', letterSpacing: '-0.01em' }}>{it.v}</div>
+          <div style={{ fontSize: 8, fontWeight: 800, letterSpacing: '0.1em', color: 'rgba(255,255,255,0.45)', textTransform: 'uppercase', marginTop: 3 }}>{it.k}</div>
+        </div>
+      ))}
+    </div>
+  );
+
+  const liveStripItems = [
+    { k: 'Par', v: parStr },
+    { k: 'Yards', v: yardageStr },
+    { k: 'Purse', v: purseStr },
+    { k: 'To Win', v: winShareStr },
+  ];
+  const upcomingStripItems = [
+    { k: 'Par', v: parStr },
+    { k: 'Yards', v: yardageStr },
+    { k: 'Purse', v: purseStr },
+    { k: 'Field', v: fieldStr },
+  ];
+  const resultsStripItems = [
+    { k: 'Winner', v: winShareStr, gold: true },
+    { k: 'Purse', v: purseStr },
+    { k: 'Par', v: parStr },
+    { k: 'Yards', v: yardageStr },
+  ];
+
+  const PlayerCarousel = ({ rows }: { rows: any[] }) => (
+    <div style={{ background: '#0A0E14', padding: '12px 0 13px', borderTop: '0.5px solid rgba(255,255,255,0.06)' }}>
+      <div
+        style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%', padding: '0 16px 10px' }}
+      >
+        <span style={{ fontSize: 8.5, fontWeight: 800, letterSpacing: '0.16em', color: 'rgba(255,255,255,0.5)' }}>LEADERBOARD</span>
+        <span style={{ fontSize: 11, fontWeight: 800, color: GOLD }}>FULL · {fieldSize} ›</span>
+      </div>
+      <div
+        style={{ display: 'flex', gap: 10, overflowX: 'auto', scrollSnapType: 'x mandatory', padding: '0 16px 2px', WebkitOverflowScrolling: 'touch', scrollbarWidth: 'none' as any }}
+        onClick={(e) => e.stopPropagation()}
+      >
+        {rows.map((r, i) => {
+          const sc = r?.score ?? r?.total;
+          const rounds = [r?.round_1, r?.round_2, r?.round_3, r?.round_4].filter((v: any) => typeof v === 'number' && v > 0);
+          const av = resolveAvatar(r, tourSlug);
+          return (
+            <div key={i} style={{ flex: '0 0 132px', scrollSnapAlign: 'start', background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.08)', borderRadius: 14, padding: 12, boxShadow: i === 0 ? `inset 0 0 0 1.5px ${GOLD}` : 'none' }}>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                <span style={{ ...NUMERIC_STYLE, fontSize: 11, fontWeight: 800, color: i === 0 ? GOLD : 'rgba(255,255,255,0.5)' }}>{formatRank(r)}</span>
+                <span style={{ ...NUMERIC_STYLE, fontSize: 16, fontWeight: 900, color: scoreColor(sc) }}>{fmtScore(sc)}</span>
+              </div>
+              {av
+                ? <img src={av} alt="" loading="lazy" style={{ width: 40, height: 40, borderRadius: '34%', objectFit: 'cover', margin: '9px 0 7px', border: i === 0 ? `2px solid ${GOLD}` : 'none' }} />
+                : <div style={{ width: 40, height: 40, borderRadius: '34%', background: 'rgba(255,255,255,0.08)', margin: '9px 0 7px', border: i === 0 ? `2px solid ${GOLD}` : 'none' }} />}
+              <div style={{ fontSize: 12.5, fontWeight: 700, color: '#fff', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{entryName(r)}</div>
+              <div style={{ ...NUMERIC_STYLE, fontSize: 9.5, color: 'rgba(255,255,255,0.45)', marginTop: 1 }}>{rounds.length ? rounds.join(' ') : `THRU ${entryThru(r)}`}</div>
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  );
+
+  const frameHeight = isResults
+    ? CINEMATIC_FRAME_HEIGHT_RESULTS
+    : isUpcoming
+      ? CINEMATIC_FRAME_HEIGHT_UPCOMING
+      : CINEMATIC_FRAME_HEIGHT;
+
 
   return (
     <div
       style={{
         position: 'relative',
         width: '100%',
-        height: isResults ? CINEMATIC_FRAME_HEIGHT_RESULTS : CINEMATIC_FRAME_HEIGHT,
+        height: frameHeight,
         overflow: 'hidden',
         background: useDusk ? COURSE_GRADIENT_DUSK : COURSE_GRADIENT,
         flexShrink: 0,
