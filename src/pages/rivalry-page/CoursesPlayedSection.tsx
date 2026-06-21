@@ -66,7 +66,7 @@ interface Props {
   onCoursePick: (courseId: string) => void;
 }
 
-const TRACK = 'rgba(255,255,255,0.07)';
+const TRACK = 'rgba(15,23,42,0.08)';
 
 export const CoursesPlayedSection: React.FC<Props> = ({
   row,
