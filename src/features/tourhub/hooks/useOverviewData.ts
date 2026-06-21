@@ -42,6 +42,7 @@ export interface TourTournament {
   venuePar: number | null;
   venueYardage: number | null;
   purse: number | null;
+  winningShare: number | null;
   currency: string | null;
   defendingChampion: string | null;
   tourId: string;
@@ -147,6 +148,7 @@ export function useLiveTournaments() {
           venue_country,
           venue_par,
           venue_yardage,
+          winning_share,
           purse,
           currency,
           defending_champion,
@@ -171,6 +173,7 @@ export function useLiveTournaments() {
         venueCountry: row.venue_country,
         venuePar: row.venue_par,
         venueYardage: row.venue_yardage,
+        winningShare: row.winning_share,
         purse: row.purse,
         currency: row.currency,
         defendingChampion: row.defending_champion,
@@ -210,6 +213,7 @@ export function useUpcomingTournaments(days: number = 14) {
           venue_country,
           venue_par,
           venue_yardage,
+          winning_share,
           purse,
           currency,
           defending_champion,
@@ -236,6 +240,7 @@ export function useUpcomingTournaments(days: number = 14) {
         venueCountry: row.venue_country,
         venuePar: row.venue_par,
         venueYardage: row.venue_yardage,
+        winningShare: row.winning_share,
         purse: row.purse,
         currency: row.currency,
         defendingChampion: row.defending_champion,
@@ -283,6 +288,7 @@ export function useRecentlyCompletedTournaments() {
           venue_country,
           venue_par,
           venue_yardage,
+          winning_share,
           purse,
           currency,
           defending_champion,
@@ -419,6 +425,7 @@ export function useRecentlyCompletedTournaments() {
           venueCountry: row.venue_country,
           venuePar: row.venue_par,
           venueYardage: row.venue_yardage,
+          winningShare: row.winning_share,
           purse: row.purse,
           currency: row.currency,
           defendingChampion: row.defending_champion,
@@ -476,6 +483,7 @@ export function useTournamentsByTour() {
           venue_country,
           venue_par,
           venue_yardage,
+          winning_share,
           purse,
           currency,
           defending_champion,
@@ -535,6 +543,7 @@ export function useTournamentsByTour() {
             venueCountry: row.venue_country,
             venuePar: row.venue_par,
             venueYardage: row.venue_yardage,
+            winningShare: row.winning_share,
             purse: row.purse,
             currency: row.currency,
             defendingChampion: row.defending_champion,

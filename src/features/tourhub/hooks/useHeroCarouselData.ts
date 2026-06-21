@@ -35,6 +35,7 @@ export interface HeroTournament {
   venuePar: number | null;
   venueYardage: number | null;
   purse: number | null;
+  winningShare: number | null;
   currency: string | null;
   tourSlug: TourId;
   tourName: string;
@@ -236,6 +237,7 @@ export function useHeroCarouselData() {
           venuePar: row.venue_par,
           venueYardage: row.venue_yardage,
           purse: row.purse,
+          winningShare: row.winning_share,
           currency: row.currency,
           tourSlug,
           tourName: tourConfig?.name || 'PGA Tour',
