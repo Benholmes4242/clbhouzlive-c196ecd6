@@ -41,7 +41,7 @@ export const SheetHero: React.FC<Props> = ({ imageUrl, onClose, topEyebrow, topR
           }}
         />
       ) : (
-        <FlagSilhouetteOverlay opacity={0.12} />
+        <FlagSilhouetteOverlay opacity={0.26} />
       )}
       {/* atmospheric */}
       <div
