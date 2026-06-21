@@ -1,6 +1,6 @@
 import React from 'react';
 import { Send, Trophy, Check } from 'lucide-react';
-import { INVITE_TIERS, INVITE_MILESTONES, tierForSent } from './inviteTiers';
+import { INVITE_MILESTONES, tierForSent } from './inviteTiers';
 
 const FONT = '"Geist", system-ui, -apple-system, BlinkMacSystemFont, sans-serif';
 const AMBER = '#F7931E';
@@ -8,15 +8,38 @@ const GOLD = '#FBBC2E';
 
 interface Props {
   sentCount: number;
+  onClick?: () => void;
 }
 
-export const InviteQuestCard: React.FC<Props> = ({ sentCount }) => {
+export const InviteQuestCard: React.FC<Props> = ({ sentCount, onClick }) => {
   const tier = tierForSent(sentCount);
+
+  const tappableProps = onClick
+    ? {
+        onClick,
+        role: 'button' as const,
+        tabIndex: 0,
+        onKeyDown: (e: React.KeyboardEvent) => {
+          if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault();
+            onClick();
+          }
+        },
+      }
+    : {};
+  const cursor = onClick ? 'pointer' : 'default';
 
   // ── All tiers complete → celebratory rolling state ──
   if (!tier) {
+    // Rolling beyond the last fixed tier: next round number every +5.
+    const nextMark = Math.ceil((sentCount + 1) / 5) * 5;
+    const prevMark = nextMark - 5;
+    const within = sentCount - prevMark;
+    const pct = Math.max(0, Math.min(100, Math.round((within / 5) * 100)));
+
     return (
       <div
+        {...tappableProps}
         style={{
           marginTop: 10,
           borderRadius: 20,
@@ -25,6 +48,7 @@ export const InviteQuestCard: React.FC<Props> = ({ sentCount }) => {
           padding: 18,
           position: 'relative',
           fontFamily: FONT,
+          cursor,
         }}
       >
         <div style={{ position: 'absolute', right: -14, top: -14, opacity: 0.12 }}>
@@ -47,11 +71,28 @@ export const InviteQuestCard: React.FC<Props> = ({ sentCount }) => {
             </div>
           </div>
         </div>
-        <div style={{ position: 'relative', display: 'flex', alignItems: 'center', gap: 8, marginTop: 14 }}>
-          <span style={{ fontSize: 11, fontWeight: 700, color: 'rgba(255,255,255,0.7)' }}>Lifetime invites</span>
-          <span style={{ marginLeft: 'auto', fontSize: 15, fontWeight: 800, color: GOLD, fontVariantNumeric: 'tabular-nums' }}>
-            {sentCount}
-          </span>
+
+        {/* Rolling progress to the next milestone */}
+        <div style={{ position: 'relative', marginTop: 14 }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 6 }}>
+            <span style={{ fontSize: 11, fontWeight: 700, color: 'rgba(255,255,255,0.7)' }}>
+              {sentCount} invited · next at {nextMark}
+            </span>
+            <span style={{ marginLeft: 'auto', fontSize: 13, fontWeight: 800, color: GOLD, fontVariantNumeric: 'tabular-nums' }}>
+              {sentCount}
+            </span>
+          </div>
+          <div style={{ height: 8, background: 'rgba(255,255,255,0.12)', borderRadius: 5, overflow: 'hidden' }}>
+            <div
+              style={{
+                width: `${pct}%`,
+                height: '100%',
+                borderRadius: 5,
+                background: `linear-gradient(90deg, ${AMBER}, ${GOLD})`,
+                transition: 'width 0.5s',
+              }}
+            />
+          </div>
         </div>
       </div>
     );
@@ -64,6 +105,7 @@ export const InviteQuestCard: React.FC<Props> = ({ sentCount }) => {
 
   return (
     <div
+      {...tappableProps}
       style={{
         marginTop: 10,
         borderRadius: 20,
@@ -72,6 +114,7 @@ export const InviteQuestCard: React.FC<Props> = ({ sentCount }) => {
         border: '1px solid var(--hcp-line-2)',
         padding: 18,
         fontFamily: FONT,
+        cursor,
       }}
     >
       <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
