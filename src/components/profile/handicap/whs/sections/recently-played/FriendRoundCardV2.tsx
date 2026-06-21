@@ -104,10 +104,11 @@ export const FriendRoundCardV2: React.FC<Props> = ({
           background: FALLBACK_BG,
         }}
       >
-        {activity.course_thumbnail_image ? (
+        {hasImage ? (
           <img
-            src={activity.course_thumbnail_image}
+            src={activity.course_thumbnail_image!}
             alt=""
+            onError={() => setImgFailed(true)}
             style={{
               position: 'absolute',
               inset: 0,
