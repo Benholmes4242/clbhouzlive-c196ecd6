@@ -306,6 +306,10 @@ export function HybridHero({ slide, activeTournamentId, onSelectTour }: HybridHe
           tourSlug={tournament.tourSlug}
           defendingChamp={defendingChamp ?? null}
           fieldStrength={fieldStrength ?? null}
+          venuePar={tournament.venuePar}
+          venueYardage={tournament.venueYardage}
+          purse={tournament.purse}
+          winningShare={tournament.winningShare}
           onCtaTap={onCtaTap}
         />
       </div>
