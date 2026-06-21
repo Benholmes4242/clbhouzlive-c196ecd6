@@ -240,37 +240,6 @@ const IndexHistoryCard: React.FC<Props> = ({ connectionId }) => {
             </span>
           </div>
 
-          {/* X-axis labels */}
-          <div
-            style={{
-              position: 'relative',
-              height: 14,
-              marginTop: 4,
-            }}
-          >
-            {xLabels.map((l, i) => (
-              <span
-                key={i}
-                style={{
-                  position: 'absolute',
-                  left: `${(l.x / W) * 100}%`,
-                  transform:
-                    i === 0
-                      ? 'translateX(0)'
-                      : i === xLabels.length - 1
-                        ? 'translateX(-100%)'
-                        : 'translateX(-50%)',
-                  fontSize: 9.5,
-                  letterSpacing: '0.14em',
-                  fontWeight: 700,
-                  color: 'var(--hcp-t-40)',
-                  fontVariantNumeric: 'tabular-nums',
-                }}
-              >
-                {l.text}
-              </span>
-            ))}
-          </div>
 
           {/* Footer */}
           <div
