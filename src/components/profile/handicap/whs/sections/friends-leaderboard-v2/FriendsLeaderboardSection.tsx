@@ -151,7 +151,7 @@ export const FriendsLeaderboardSection: React.FC<Props> = ({ userId, viewMode = 
               borderTop: '1px solid var(--hcp-line-2)',
             }}
           >
-            <p style={{ ...LABEL_STYLE, flex: 1, margin: 0 }}>TOP 5</p>
+            <p style={{ ...LABEL_STYLE, flex: 1, margin: 0 }}>Top of your circle</p>
             <p style={{ ...LABEL_STYLE, width: 32, textAlign: 'center', margin: 0 }}>7D</p>
             <div style={{ width: 56 }} />
           </div>
