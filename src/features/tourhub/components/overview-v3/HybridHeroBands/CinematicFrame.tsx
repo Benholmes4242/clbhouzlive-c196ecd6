@@ -1074,11 +1074,7 @@ export function CinematicFrame({
           </button>
         )}
 
-        {/* Upcoming, no defending champ, no countdown — strip-only base */}
-        {isUpcoming && !defendingChamp && !countdownText && (
-          <div style={{ position: 'absolute', left: 0, right: 0, bottom: 0, zIndex: 4 }}>
-          </div>
-        )}
+        {/* Upcoming, no defending champ, no countdown — no base band */}
       </div>
 
       {/* Live — data strip + champion band + player carousel pinned to bottom */}
