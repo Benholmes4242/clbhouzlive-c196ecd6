@@ -101,6 +101,9 @@ const ProvenanceContent: React.FC<{ onSync: () => void; isSynced: boolean }> = (
 
 export const ChampionsInfoCarousel: React.FC<Props> = ({ window }) => {
   const navigate = useNavigate();
+  const { user } = useSupabaseSession();
+  const { data: whsConnection } = useWhsConnection(user?.id);
+  const isSynced = !!whsConnection;
   const [gone1, setGone1] = useState(() => read(KEY_EXPLAINER));
   const [gone2, setGone2] = useState(() => read(KEY_PROVENANCE));
   const scrollerRef = useRef<HTMLDivElement>(null);
