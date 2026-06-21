@@ -557,11 +557,9 @@ const CourseList: React.FC<{ courses: CourseForm[]; view: ViewKey; emptyCopy?: s
     <div
       style={{
         marginTop: 12,
-        background: 'var(--hcp-bg-2)',
-        border: `1px solid ${T.ink08}`,
-        borderRadius: 14,
-        overflow: 'hidden',
-        padding: '4px 0',
+        display: 'flex',
+        flexDirection: 'column',
+        gap: 8,
       }}
     >
       {courses.map((c, i) => (
