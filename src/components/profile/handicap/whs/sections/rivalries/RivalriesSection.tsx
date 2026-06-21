@@ -125,6 +125,9 @@ const FriendViewRivalries: React.FC<{
     () => ownerLeaderboard?.find((e) => e.is_self) ?? null,
     [ownerLeaderboard],
   );
+  const ownerAvatar = ownerRow
+    ? pickAvatarSrc(ownerRow.friend_thumbnail_url, ownerRow.friend_profile_photo_url)
+    : null;
 
   const secondary = data?.secondary ?? [];
 
