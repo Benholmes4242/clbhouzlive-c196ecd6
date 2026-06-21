@@ -754,7 +754,7 @@ export function CinematicFrame({
       style={{
         position: 'relative',
         width: '100%',
-        height: CINEMATIC_FRAME_HEIGHT,
+        height: isResults ? CINEMATIC_FRAME_HEIGHT_RESULTS : CINEMATIC_FRAME_HEIGHT,
         overflow: 'hidden',
         background: useDusk ? COURSE_GRADIENT_DUSK : COURSE_GRADIENT,
         flexShrink: 0,
