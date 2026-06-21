@@ -120,7 +120,7 @@ export const HeroPositionCard: React.FC<Props> = ({
           <span style={{ fontSize: 13, fontWeight: 500, color: T.inkMute, fontVariantNumeric: 'tabular-nums' }}>
             of {totalActive}
           </span>
-          {percentileTop != null && (
+          {percentileTop != null && percentileTop <= 50 && (
             <span style={{ marginLeft: 2, background: T.amberSoft, color: T.amber, padding: '2px 7px', borderRadius: 6, fontSize: 10, fontWeight: 800, letterSpacing: '0.08em' }}>
               TOP {percentileTop}%
             </span>
