@@ -118,7 +118,7 @@ export const FriendRoundCardV2: React.FC<Props> = ({
             }}
           />
         ) : (
-          <FlagSilhouetteOverlay opacity={0.18} />
+          <FlagSilhouetteOverlay opacity={0.30} />
         )}
 
 
