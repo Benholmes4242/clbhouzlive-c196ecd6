@@ -42,6 +42,7 @@ export interface TourTournament {
   venuePar: number | null;
   venueYardage: number | null;
   purse: number | null;
+  winningShare: number | null;
   currency: string | null;
   defendingChampion: string | null;
   tourId: string;
