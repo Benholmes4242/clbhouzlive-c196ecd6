@@ -796,6 +796,7 @@ export function CinematicFrame({
           flexDirection: 'column',
           padding: `18px 14px ${
             showTicker ? 16 + BOTTOM_STACK_H
+            : isResults ? 16 + 40
             : (isUpcoming && defendingChamp) ? 16 + UPCOMING_BAND_H
             : 16
           }px`,
