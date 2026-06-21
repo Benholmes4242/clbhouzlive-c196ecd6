@@ -1071,6 +1071,7 @@ export function CinematicFrame({
               display: 'block', width: '100%', textAlign: 'left',
             }}
           >
+            <DataStrip items={upcomingStripItems} />
             <div style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '13px 16px', background: '#0A0E14', borderTop: '0.5px solid rgba(255,255,255,0.06)' }}>
               {(() => {
                 const headshot = (tourSlug && defendingChamp.name)
@@ -1109,6 +1110,7 @@ export function CinematicFrame({
               display: 'block', width: '100%', textAlign: 'left',
             }}
           >
+            <DataStrip items={upcomingStripItems} />
             <div style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '14px 16px', background: '#0A0E14', borderTop: '0.5px solid rgba(255,255,255,0.06)' }}>
               <div style={{ flex: 1, minWidth: 0 }}>
                 <div style={{ ...NUMERIC_STYLE, fontSize: 8.5, fontWeight: 800, letterSpacing: '0.18em', color: AMBER }}>TEES OFF IN</div>
@@ -1118,9 +1120,16 @@ export function CinematicFrame({
             </div>
           </button>
         )}
+
+        {/* Upcoming, no defending champ, no countdown — strip-only base */}
+        {isUpcoming && !defendingChamp && !countdownText && (
+          <div style={{ position: 'absolute', left: 0, right: 0, bottom: 0, zIndex: 4 }}>
+            <DataStrip items={upcomingStripItems} />
+          </div>
+        )}
       </div>
 
-      {/* Champion band + ticker — pinned to the bottom edge, whole thing opens full board */}
+      {/* Live — data strip + champion band + player carousel pinned to bottom */}
       {showTicker && (() => {
         const leader = safe[0];
         return (
@@ -1134,6 +1143,7 @@ export function CinematicFrame({
               display: 'block', width: '100%', textAlign: 'left',
             }}
           >
+            <DataStrip items={liveStripItems} />
             {/* Champion band — flat ink, trophy emoji, tie-aware */}
             {(leader || tiedLeaders) && (
               <div
@@ -1146,14 +1156,7 @@ export function CinematicFrame({
                   borderTop: '0.5px solid rgba(255,255,255,0.06)',
                 }}
               >
-                {/* Trophy emoji */}
-                <span
-                  aria-hidden
-                  style={{ fontSize: 26, lineHeight: 1, flexShrink: 0 }}
-                >
-                  🏆
-                </span>
-                {/* Eyebrow + name (tie-aware) */}
+                <span aria-hidden style={{ fontSize: 26, lineHeight: 1, flexShrink: 0 }}>🏆</span>
                 <div style={{ flex: 1, minWidth: 0 }}>
                   <div style={{ ...NUMERIC_STYLE, fontSize: 8.5, fontWeight: 800, letterSpacing: '0.16em', color: GOLD, textTransform: 'uppercase' }}>
                     {tiedLeaders ? 'Tied for the lead' : 'Tournament Leader'}
@@ -1162,7 +1165,6 @@ export function CinematicFrame({
                     {tiedLeaders ? `${tiedLeaders.count} players tied` : entryName(leader)}
                   </div>
                 </div>
-                {/* Score + thru */}
                 <div style={{ textAlign: 'right', flexShrink: 0 }}>
                   <div style={{ ...NUMERIC_STYLE, fontSize: 24, fontWeight: 900, letterSpacing: '-0.02em', lineHeight: 1, color: tiedLeaders ? (tiedLeaders.score.startsWith('-') ? '#F87171' : '#fff') : scoreColor(leader.score) }}>
                     {tiedLeaders ? tiedLeaders.score : fmtScore(leader.score)}
@@ -1173,29 +1175,30 @@ export function CinematicFrame({
                 </div>
               </div>
             )}
-            {/* Ticker */}
-            <Ticker rows={top10} />
+            <PlayerCarousel rows={safe.slice(0, 12)} />
           </button>
         );
       })()}
 
-      {/* Results — final leaderboard footer CTA */}
+      {/* Results — data strip + final leaderboard footer CTA */}
       {isResults && (
-        <button
-          type="button"
-          onClick={onCtaTap}
-          aria-label="Final leaderboard"
-          style={{
-            position: 'absolute', left: 0, right: 0, bottom: 0, zIndex: 4,
-            border: 'none', cursor: 'pointer', background: '#0A0E14',
-            padding: '13px 16px', textAlign: 'center', width: '100%',
-            borderTop: '0.5px solid rgba(255,255,255,0.06)',
-          }}
-        >
-          <span style={{ ...NUMERIC_STYLE, fontSize: 12, fontWeight: 800, letterSpacing: '0.06em', color: GOLD }}>
-            FINAL LEADERBOARD · {safe.length} ›
-          </span>
-        </button>
+        <div style={{ position: 'absolute', left: 0, right: 0, bottom: 0, zIndex: 4 }}>
+          <DataStrip items={resultsStripItems} />
+          <button
+            type="button"
+            onClick={onCtaTap}
+            aria-label="Final leaderboard"
+            style={{
+              border: 'none', cursor: 'pointer', background: '#0A0E14',
+              padding: '13px 16px', textAlign: 'center', width: '100%',
+              borderTop: '0.5px solid rgba(255,255,255,0.06)',
+            }}
+          >
+            <span style={{ ...NUMERIC_STYLE, fontSize: 12, fontWeight: 800, letterSpacing: '0.06em', color: GOLD }}>
+              FINAL LEADERBOARD · {safe.length} ›
+            </span>
+          </button>
+        </div>
       )}
     </div>
   );
