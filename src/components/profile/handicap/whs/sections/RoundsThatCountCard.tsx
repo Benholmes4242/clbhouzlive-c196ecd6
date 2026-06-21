@@ -261,69 +261,59 @@ export const RoundsThatCountCard: React.FC<Props> = ({
 
       <div style={{ padding: '0 20px' }}>
 
-      {/* ── NEXT-ROUND HERO BAND (merged from former NextRoundWatch) ───────── */}
+      {/* ── NEXT-ROUND BRIEFING (stacked line) ────────────────────────────── */}
       {projection && projection.hasData && (
         <div style={{
-          background: 'linear-gradient(135deg, rgba(247,147,30,0.10), rgba(247,147,30,0.03))',
-          border: `1px solid ${AMBER_BORDER}`,
-          borderRadius: 16,
-          padding: '16px 18px',
           marginBottom: 18,
           fontFamily: FONT_GEIST,
         }}>
-          <div style={{
-            fontSize: 10, fontWeight: 800, letterSpacing: '0.16em',
-            textTransform: 'uppercase', color: 'var(--hcp-amber-d)',
-          }}>
-            Next round · Target to cut
-          </div>
-
-          <div style={{ display: 'flex', alignItems: 'baseline', gap: 10, marginTop: 8 }}>
+          {/* Primary: what to shoot to be cut */}
+          <div style={{ display: 'flex', alignItems: 'baseline', gap: 12 }}>
             <div style={{
-              fontSize: 52, fontWeight: 800, color: GREEN,
-              letterSpacing: '-0.03em', lineHeight: 0.9,
+              fontSize: 50,
+              fontWeight: 800,
+              color: GREEN,
+              letterSpacing: '-0.03em',
+              lineHeight: 0.85,
               fontVariantNumeric: 'tabular-nums',
             }}>
               {fmtDiff(projection.cutTarget)}
             </div>
-            <div style={{ fontSize: 14, fontWeight: 700, color: INK, lineHeight: 1.3 }}>
+            <div style={{ fontSize: 17, fontWeight: 700, color: INK, lineHeight: 1.25 }}>
               or better
               <br />
-              <span style={{ fontWeight: 500, color: INK_70, fontSize: 12 }}>
-                drops your index
+              <span style={{ fontWeight: 500, color: INK_70, fontSize: 15 }}>
+                to be cut next round
               </span>
             </div>
           </div>
 
-          <div style={{
-            display: 'flex', marginTop: 14,
-            borderTop: `1px solid ${AMBER_BORDER}`, paddingTop: 12,
-          }}>
-            <div style={{ flex: 1, borderRight: `1px solid ${AMBER_BORDER}` }}>
-              <div style={{ fontSize: 10, fontWeight: 700, color: INK_70 }}>Last 5 avg</div>
-              <div style={{
-                fontSize: 20, fontWeight: 800, color: AMBER,
-                fontVariantNumeric: 'tabular-nums', marginTop: 2,
-              }}>
-                {last5Avg != null ? fmtDiff(last5Avg) : '—'}
-              </div>
+          {/* Secondary: risk line — ONLY when a counter is dropping out */}
+          {projection.isAtRisk && (
+            <div style={{
+              display: 'flex',
+              alignItems: 'flex-start',
+              gap: 7,
+              marginTop: 12,
+              paddingTop: 12,
+              borderTop: '1px solid var(--hcp-line)',
+            }}>
+              <span style={{
+                width: 6, height: 6, borderRadius: '50%',
+                background: RED, flexShrink: 0, marginTop: 6,
+              }} />
+              <span style={{ fontSize: 13, color: INK_70, lineHeight: 1.35 }}>
+                Miss it and your index{' '}
+                <strong style={{ color: RED, fontWeight: 800 }}>
+                  rises to {fmtDiff(projection.settleAt)}
+                </strong>
+                {' '}— a good round is dropping off.
+              </span>
             </div>
-            <div style={{ flex: 1, paddingLeft: 14 }}>
-              <div style={{ fontSize: 10, fontWeight: 700, color: INK_70 }}>If you don't</div>
-              <div style={{
-                fontSize: 20, fontWeight: 800,
-                color: projection.isAtRisk ? RED : INK,
-                fontVariantNumeric: 'tabular-nums', marginTop: 2,
-              }}>
-                {projection.isAtRisk
-                  ? `rises ${projection.settleAt.toFixed(1)}`
-                  : `stays ${projection.settleAt.toFixed(1)}`}
-              </div>
-            </div>
-          </div>
+          )}
         </div>
       )}
-      {/* ── END HERO BAND ─────────────────────────────────────────────────── */}
+      {/* ── END BRIEFING ──────────────────────────────────────────────────── */}
 
       {/* Chart — full-bleed on page background, no card wrapper */}
       <div style={{ padding: '0 0 8px' }}>
