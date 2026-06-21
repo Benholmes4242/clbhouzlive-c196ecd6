@@ -55,17 +55,15 @@ Deno.serve(async (req) => {
     }
 
     const ids = (tournaments ?? []).map((t: any) => t.id);
-    const { data: lbCounts } = await supabase
+    const { data: filledRows } = await supabase
       .from('sr_leaderboards')
       .select('tournament_id')
-      .in('tournament_id', ids);
-    const counts = new Map<string, number>();
-    for (const r of lbCounts ?? []) {
-      counts.set((r as any).tournament_id, (counts.get((r as any).tournament_id) ?? 0) + 1);
-    }
+      .in('tournament_id', ids)
+      .limit(100000);
+    const filled = new Set<string>((filledRows ?? []).map((r: any) => r.tournament_id));
 
     const candidates = (tournaments ?? [])
-      .filter((t: any) => (counts.get(t.id) ?? 0) === 0)
+      .filter((t: any) => !filled.has(t.id))
       .map((t: any) => ({
         id: t.id,
         sr_id: t.sr_id,
