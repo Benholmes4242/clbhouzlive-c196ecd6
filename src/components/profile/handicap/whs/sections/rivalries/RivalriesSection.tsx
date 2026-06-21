@@ -188,7 +188,9 @@ const FriendViewRivalries: React.FC<{
           friendViewOwnerId={ownerUserId}
           isTapDisabled={isTapDisabled}
           youLabel={ownerFirst ? ownerFirst.toUpperCase() : undefined}
+          youAvatar={ownerAvatar}
         />
+
       )}
     </section>
   );
