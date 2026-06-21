@@ -859,25 +859,23 @@ export function CinematicFrame({
           }}
         >
           {isUpcoming ? (
-            <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-              <span
-                aria-hidden
-                style={{ width: 7, height: 7, borderRadius: '50%', background: AMBER, flexShrink: 0 }}
-              />
-              <span
-                style={{
-                  ...NUMERIC_STYLE,
-                  fontSize: 11,
-                  fontWeight: 700,
-                  letterSpacing: '0.14em',
-                  color: AMBER,
-                  textShadow: '0 1px 3px rgba(0,0,0,0.45)',
-                  textTransform: 'uppercase',
-                }}
-              >
-                Upcoming
-              </span>
-            </div>
+            countdownText ? (
+              <div style={{
+                display: 'inline-flex', alignItems: 'center', gap: 7,
+                background: 'rgba(10,14,20,0.50)',
+                backdropFilter: 'blur(10px)', WebkitBackdropFilter: 'blur(10px)',
+                border: '0.5px solid rgba(255,255,255,0.18)',
+                borderRadius: 999, padding: '5px 11px', alignSelf: 'flex-start',
+              }}>
+                <span style={{ ...NUMERIC_STYLE, fontSize: 8.5, fontWeight: 800, letterSpacing: '0.16em', color: AMBER, textTransform: 'uppercase' }}>TEES OFF IN</span>
+                <span style={{ ...NUMERIC_STYLE, fontSize: 12, fontWeight: 900, color: '#fff', letterSpacing: '-0.01em' }}>{countdownText}</span>
+              </div>
+            ) : (
+              <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                <span aria-hidden style={{ width: 7, height: 7, borderRadius: '50%', background: AMBER, flexShrink: 0 }} />
+                <span style={{ ...NUMERIC_STYLE, fontSize: 11, fontWeight: 700, letterSpacing: '0.14em', color: AMBER, textShadow: '0 1px 3px rgba(0,0,0,0.45)', textTransform: 'uppercase' }}>Upcoming</span>
+              </div>
+            )
           ) : roundLabel_ ? (
             <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
               {isResults && (
@@ -1053,27 +1051,7 @@ export function CinematicFrame({
           );
         })()}
 
-        {/* Upcoming, no defending champ — flat-ink countdown band (always has data) */}
-        {isUpcoming && !defendingChamp && countdownText && (
-          <button
-            type="button"
-            onClick={onCtaTap}
-            aria-label="View tournament"
-            style={{
-              position: 'absolute', left: 0, right: 0, bottom: 0, zIndex: 4,
-              border: 'none', padding: 0, margin: 0, cursor: 'pointer',
-              display: 'block', width: '100%', textAlign: 'left',
-            }}
-          >
-            <div style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '14px 16px', background: '#0A0E14', borderTop: '0.5px solid rgba(255,255,255,0.06)' }}>
-              <div style={{ flex: 1, minWidth: 0 }}>
-                <div style={{ ...NUMERIC_STYLE, fontSize: 8.5, fontWeight: 800, letterSpacing: '0.18em', color: AMBER }}>TEES OFF IN</div>
-                <div style={{ ...NUMERIC_STYLE, fontSize: 20, fontWeight: 900, color: '#fff', marginTop: 3, letterSpacing: '-0.01em', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{countdownText}</div>
-              </div>
-              <ChevronRight size={18} strokeWidth={2.5} style={{ color: AMBER, flexShrink: 0 }} />
-            </div>
-          </button>
-        )}
+        {/* Countdown now lives top-left as a pill; base is reserved for defending-champ band / footer */}
 
         {/* Upcoming, no defending champ, no countdown — no base band */}
       </div>
