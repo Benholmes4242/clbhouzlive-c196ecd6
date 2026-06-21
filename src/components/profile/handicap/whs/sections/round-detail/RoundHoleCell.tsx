@@ -225,18 +225,6 @@ export const RoundHoleCell: React.FC<Props> = ({ hole, showPar = true }) => {
           />
         )}
 
-        {/* Par placeholder — solid hairline square */}
-        {variant === 'par' && (
-          <div
-            style={{
-              position: 'absolute',
-              inset: 0,
-              border: `${STROKE_W}px solid ${HAIRLINE}`,
-              borderRadius: 3,
-            }}
-          />
-        )}
-
         {/* Shape(s) for non-par variants */}
         {spec.shape && (
           <>
@@ -256,14 +244,7 @@ export const RoundHoleCell: React.FC<Props> = ({ hole, showPar = true }) => {
             position: 'relative',
             fontSize: 'clamp(12px, 3.4vw, 15px)',
             fontWeight: 700,
-            color:
-              strokes == null
-                ? INK_40
-                : variant === 'par'
-                ? INK_55
-                : spec.shape === 'square'
-                ? OVER
-                : UNDER,
+            color: strokes == null ? INK_40 : variant === 'par' ? INK_55 : INK,
             lineHeight: 1,
             letterSpacing: '-0.02em',
             fontVariantNumeric: 'tabular-nums',
