@@ -760,50 +760,31 @@ export function CinematicFrame({
     ? upcomingFooter
     : `Full leaderboard${fieldSize > 0 ? ` · ${fieldSize} players` : ''}`;
 
-  // ---- DataStrip / PlayerCarousel helpers ------------------------------------
-  const parStr = venuePar != null ? String(venuePar) : '—';
-  const yardageStr = venueYardage != null ? venueYardage.toLocaleString() : '—';
-  const purseStr = purse != null ? formatPurse(purse) || '—' : '—';
-  const winShareStr = winningShare != null ? formatPurse(winningShare) || '—' : '—';
-  const fieldStr = fieldSize > 0 ? String(fieldSize) : '—';
+  // ---- GlassPills (floating over photo, under venue) ------------------------
+  const GlassPills = () => {
+    const pills = [
+      { label: 'PURSE', value: purse != null ? (formatPurse(purse) || '—') : '—' },
+      { label: 'PAR', value: venuePar != null ? String(venuePar) : '—' },
+      { label: 'YDS', value: venueYardage != null ? venueYardage.toLocaleString() : '—' },
+    ];
+    return (
+      <div style={{ display: 'flex', gap: 7, flexWrap: 'wrap', marginTop: 12 }}>
+        {pills.map((p) => (
+          <div key={p.label} style={{
+            display: 'flex', alignItems: 'baseline', gap: 5,
+            background: 'rgba(10,14,20,0.50)',
+            backdropFilter: 'blur(10px)', WebkitBackdropFilter: 'blur(10px)',
+            border: '0.5px solid rgba(255,255,255,0.18)',
+            borderRadius: 8, padding: '5px 9px',
+          }}>
+            <span style={{ fontSize: 9, fontWeight: 800, letterSpacing: '0.10em', color: 'rgba(255,255,255,0.60)' }}>{p.label}</span>
+            <span style={{ ...NUMERIC_STYLE, fontSize: 12, fontWeight: 800, color: '#fff', letterSpacing: '-0.01em' }}>{p.value}</span>
+          </div>
+        ))}
+      </div>
+    );
+  };
 
-  const DataStrip = ({ items }: { items: { k: string; v: string; gold?: boolean }[] }) => (
-    <div style={{ display: 'flex', alignItems: 'stretch', background: '#0A0E14', borderTop: '0.5px solid rgba(255,255,255,0.06)' }}>
-      {items.map((it, i) => (
-        <div key={it.k} style={{ flex: 1, padding: '11px 6px 10px', textAlign: 'center', borderLeft: i ? '1px solid rgba(255,255,255,0.08)' : 'none' }}>
-          <div style={{ ...NUMERIC_STYLE, fontSize: 15, fontWeight: 900, color: it.gold ? GOLD : '#fff', letterSpacing: '-0.01em' }}>{it.v}</div>
-          <div style={{ fontSize: 8, fontWeight: 800, letterSpacing: '0.1em', color: 'rgba(255,255,255,0.45)', textTransform: 'uppercase', marginTop: 3 }}>{it.k}</div>
-        </div>
-      ))}
-    </div>
-  );
-
-  const liveStripItems = [
-    { k: 'Par', v: parStr },
-    { k: 'Yards', v: yardageStr },
-    { k: 'Purse', v: purseStr },
-    { k: 'To Win', v: winShareStr },
-  ];
-  const upcomingStripItems = [
-    { k: 'Par', v: parStr },
-    { k: 'Yards', v: yardageStr },
-    { k: 'Purse', v: purseStr },
-    { k: 'Field', v: fieldStr },
-  ];
-  const hasWinShare = winningShare != null;
-  const resultsStripItems = hasWinShare
-    ? [
-        { k: 'Winner', v: winShareStr, gold: true },
-        { k: 'Purse', v: purseStr },
-        { k: 'Par', v: parStr },
-        { k: 'Yards', v: yardageStr },
-      ]
-    : [
-        { k: 'Purse', v: purseStr, gold: true },
-        { k: 'Par', v: parStr },
-        { k: 'Yards', v: yardageStr },
-        { k: 'Field', v: String(fieldSize || '—') },
-      ];
 
 
   const frameHeight = isResults
