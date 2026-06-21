@@ -7,7 +7,7 @@ import { Link } from 'react-router-dom';
 import { Search, X } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { cn } from '@/lib/utils';
-import { BatchPlayerAvatar } from '../PlayerAvatar';
+import CountryFlag from '@/components/ui/country-flag';
 import { formatThruDisplay } from '../../utils/formatThruDisplay';
 import { playerRoute } from '../../routes';
 import { AMBER, HAIRLINE_INK_12, INK, INK_FAINT, INK_LIGHT, INK_MUTE, INK_TINT_02, INK_TINT_05, INK_TINT_07, LEADER_GOLD_TINT_10, SCORE_OVER_PAR_LIGHT, SURFACE } from '../../_shared/tokens';
@@ -187,7 +187,7 @@ export function FullLeaderboard({
               aria-pressed={active}
               aria-label={`Sort by round ${r}`}
               style={{
-                width: '19px', textAlign: 'center', fontSize: '9px', fontWeight: 800,
+                width: '21px', textAlign: 'center', fontSize: '9px', fontWeight: 800,
                 color: INK, letterSpacing: '0.14em', flexShrink: 0,
                 background: 'none', border: 'none', padding: 0, cursor: 'pointer',
                 fontVariantNumeric: 'tabular-nums',
@@ -202,7 +202,7 @@ export function FullLeaderboard({
           aria-pressed={sortRound == null}
           aria-label="Sort by total"
           style={{
-            width: '34px', textAlign: 'center', fontSize: '9px', fontWeight: 800,
+            width: '40px', textAlign: 'center', fontSize: '9px', fontWeight: 800,
             color: INK, letterSpacing: '0.14em', flexShrink: 0,
             background: 'none', border: 'none', padding: 0, cursor: 'pointer',
           }}
@@ -228,7 +228,7 @@ export function FullLeaderboard({
                 aria-label={`Position ${entry.position_tied ? `T${entry.position}` : entry.position}, ${entry.player?.full_name || 'Unknown'}`}
                 style={{
                   display: 'flex', alignItems: 'center', gap: '3px',
-                  padding: '9px 16px',
+                  padding: '13px 16px',
                   borderBottom: `0.5px solid ${INK_TINT_07}`,
                   borderLeft: entry.position === 1 && !isMissedCut && !isWD ? `3px solid ${AMBER}` : '3px solid transparent',
                   background: entry.position === 1 && !isMissedCut && !isWD ? LEADER_GOLD_TINT_10 : 'transparent',
@@ -242,28 +242,28 @@ export function FullLeaderboard({
                   {isMissedCut ? 'MC' : isWD ? 'WD' : entry.position_tied ? `T${entry.position}` : String(entry.position)}
                 </span>
 
-                <div className="shrink-0" style={{ marginRight: '7px' }}>
-                  <BatchPlayerAvatar playerId={entry.player?.id || ''} playerName={entry.player?.full_name || 'Unknown'} size="xs" />
+                <div className="shrink-0 flex items-center justify-center" style={{ marginRight: '7px', width: '20px' }}>
+                  <CountryFlag country={entry.player?.country} size="sm" />
                 </div>
 
                 <div style={{ flex: 1, minWidth: 0 }}>
-                  <p style={{ fontSize: '13px', fontWeight: 600, color: INK, margin: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' as const, letterSpacing: '-0.015em' }}>
+                  <p style={{ fontSize: '14px', fontWeight: 700, color: INK, margin: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' as const, letterSpacing: '-0.015em' }}>
                     {abbrevName(entry.player?.full_name || 'Unknown')}
                   </p>
                 </div>
 
                 {roundScores.map((score, ri) => {
                   const isActive = sortRound === ri + 1;
-                  const cellColor = score != null && score < 0 ? SCORE_OVER_PAR_LIGHT : INK;
+                  const display = score == null ? '–' : score === 0 ? 'E' : String(score);
                   return (
-                    <span key={ri} style={{ width: '19px', textAlign: 'center' as const, fontSize: '11px', fontWeight: isActive && score != null ? 600 : 500, color: cellColor, flexShrink: 0, fontVariantNumeric: 'tabular-nums' }}>
-                      {score != null ? score : '-'}
+                    <span key={ri} style={{ width: '21px', textAlign: 'center' as const, fontSize: '11px', fontWeight: isActive && score != null ? 700 : 400, color: isActive && score != null ? INK : INK_MUTE, flexShrink: 0, fontVariantNumeric: 'tabular-nums' }}>
+                      {display}
                     </span>
                   );
                 })}
 
-                <div style={{ width: '34px', textAlign: 'center' as const, flexShrink: 0 }}>
-                  <ScoreToPar score={entry.score} size={11} />
+                <div style={{ width: '40px', textAlign: 'center' as const, flexShrink: 0 }}>
+                  <ScoreToPar score={entry.score} emphasis size={15} />
                 </div>
 
                 <div style={{ width: '48px', textAlign: 'center' as const, flexShrink: 0 }}>
