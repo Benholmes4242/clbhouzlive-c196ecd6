@@ -203,7 +203,8 @@ const RivalCarousel: React.FC<{
   friendViewOwnerId?: string;
   isTapDisabled?: (r: FriendRivalryHydrated) => boolean;
   youLabel?: string;
-}> = ({ rivalries, crownsByKey, friendViewOwnerId, isTapDisabled, youLabel }) => {
+  youAvatar?: string | null;
+}> = ({ rivalries, crownsByKey, friendViewOwnerId, isTapDisabled, youLabel, youAvatar }) => {
   const navigate = useNavigate();
   const railRef = useRef<HTMLDivElement | null>(null);
   const [page, setPage] = useState(0);
