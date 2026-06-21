@@ -39,6 +39,13 @@ const T = {
 };
 const FONT = 'Geist, -apple-system, BlinkMacSystemFont, system-ui, sans-serif';
 
+const HOLE_C = {
+  birdie: '#9F1D1D',
+  par: '#94A3B8',
+  bogey: '#2563EB',
+  double: '#1E3A5F',
+};
+
 const SECTION_STYLE: React.CSSProperties = {
   marginBottom: 14,
   fontFamily: FONT,
