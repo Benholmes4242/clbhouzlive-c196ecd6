@@ -255,7 +255,9 @@ const RivalCarousel: React.FC<{
                 total={total}
                 onTap={onTap}
                 youLabel={youLabel}
+                youAvatar={youAvatar}
               />
+
             </div>
           );
         })}
