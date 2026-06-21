@@ -1037,45 +1037,41 @@ export function CinematicFrame({
               display: 'block', width: '100%', textAlign: 'left',
             }}
           >
-            {/* Champion band */}
-            {leader && (
+            {/* Champion band — flat ink, trophy emoji, tie-aware */}
+            {(leader || tiedLeaders) && (
               <div
                 style={{
                   display: 'flex',
                   alignItems: 'center',
-                  gap: 11,
-                  padding: '14px 16px 11px',
-                  background: 'linear-gradient(180deg, rgba(10,14,20,0) 0%, #0A0E14 42%)',
+                  gap: 10,
+                  padding: '13px 16px 11px',
+                  background: '#0A0E14',
+                  borderTop: '0.5px solid rgba(255,255,255,0.06)',
                 }}
               >
-                {/* Trophy tile — matches Latest Records TrophyMark */}
-                <div
+                {/* Trophy emoji */}
+                <span
                   aria-hidden
-                  style={{
-                    width: 30, height: 30, borderRadius: 8, flexShrink: 0,
-                    background: '#F7931E',
-                    boxShadow: '0 4px 10px -2px rgba(247,147,30,0.40)',
-                    display: 'flex', alignItems: 'center', justifyContent: 'center',
-                  }}
+                  style={{ fontSize: 26, lineHeight: 1, flexShrink: 0 }}
                 >
-                  <Trophy size={18} color="#fff" strokeWidth={2.2} />
-                </div>
-                {/* Eyebrow + name */}
+                  🏆
+                </span>
+                {/* Eyebrow + name (tie-aware) */}
                 <div style={{ flex: 1, minWidth: 0 }}>
                   <div style={{ ...NUMERIC_STYLE, fontSize: 8.5, fontWeight: 800, letterSpacing: '0.16em', color: GOLD, textTransform: 'uppercase' }}>
-                    Tournament Leader
+                    {tiedLeaders ? 'Tied for the lead' : 'Tournament Leader'}
                   </div>
                   <div style={{ fontSize: 18, fontWeight: 800, color: '#fff', letterSpacing: '-0.01em', marginTop: 1, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-                    {entryName(leader)}
+                    {tiedLeaders ? `${tiedLeaders.count} players tied` : entryName(leader)}
                   </div>
                 </div>
                 {/* Score + thru */}
                 <div style={{ textAlign: 'right', flexShrink: 0 }}>
-                  <div style={{ ...NUMERIC_STYLE, fontSize: 24, fontWeight: 900, letterSpacing: '-0.02em', lineHeight: 1, color: scoreColor(leader.score) }}>
-                    {fmtScore(leader.score)}
+                  <div style={{ ...NUMERIC_STYLE, fontSize: 24, fontWeight: 900, letterSpacing: '-0.02em', lineHeight: 1, color: tiedLeaders ? (tiedLeaders.score.startsWith('-') ? '#F87171' : '#fff') : scoreColor(leader.score) }}>
+                    {tiedLeaders ? tiedLeaders.score : fmtScore(leader.score)}
                   </div>
                   <div style={{ ...NUMERIC_STYLE, fontSize: 9, fontWeight: 600, letterSpacing: '0.1em', color: 'rgba(255,255,255,0.5)', marginTop: 3 }}>
-                    THRU {entryThru(leader)}
+                    {tiedLeaders ? 'SHARED LEAD' : `THRU ${entryThru(leader)}`}
                   </div>
                 </div>
               </div>
