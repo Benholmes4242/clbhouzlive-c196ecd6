@@ -85,35 +85,28 @@ export const AchievementsCard: React.FC<Props> = ({ userId, viewMode = 'owner', 
             </div>
           ) : (
             <>
-              {/* Count + percent */}
-              <div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between' }}>
-                <div style={{ display: 'flex', alignItems: 'baseline', gap: 4 }}>
-                  <span
-                    style={{
-                      fontSize: 40, fontWeight: 800, color: D_T100,
-                      letterSpacing: '-0.03em', lineHeight: 0.9,
-                      fontVariantNumeric: 'tabular-nums',
-                    }}
-                  >
-                    {isLoading ? '—' : unlockedCount}
-                  </span>
-                  <span
-                    style={{
-                      fontSize: 20, fontWeight: 600, color: 'var(--hcp-t-40)',
-                      fontVariantNumeric: 'tabular-nums',
-                    }}
-                  >
-                    / {isLoading ? '—' : totalCount}
-                  </span>
-                  <span style={{ fontSize: 13, fontWeight: 700, color: D_T60, marginLeft: 6 }}>
-                    unlocked
-                  </span>
-                </div>
-                {!isLoading && (
-                  <span style={{ fontSize: 13, fontWeight: 800, color: '#F7931E' }}>
-                    {pct}%
-                  </span>
-                )}
+              {/* Count */}
+              <div style={{ display: 'flex', alignItems: 'baseline', gap: 4 }}>
+                <span
+                  style={{
+                    fontSize: 40, fontWeight: 800, color: D_T100,
+                    letterSpacing: '-0.03em', lineHeight: 0.9,
+                    fontVariantNumeric: 'tabular-nums',
+                  }}
+                >
+                  {isLoading ? '—' : unlockedCount}
+                </span>
+                <span
+                  style={{
+                    fontSize: 20, fontWeight: 600, color: 'var(--hcp-t-40)',
+                    fontVariantNumeric: 'tabular-nums',
+                  }}
+                >
+                  / {isLoading ? '—' : totalCount}
+                </span>
+                <span style={{ fontSize: 13, fontWeight: 700, color: D_T60, marginLeft: 6 }}>
+                  unlocked
+                </span>
               </div>
 
               {/* Completion bar */}
