@@ -30,6 +30,7 @@ import { Ticker } from './Ticker';
 
 const TICKER_BAR_H = 40;
 const CHAMPION_BAND_H = 62;
+const UPCOMING_BAND_H = 64;
 const BOTTOM_STACK_H = TICKER_BAR_H + CHAMPION_BAND_H;
 import { getPlayerHeadshotUrl } from '@/utils/playerHeadshot';
 import type { DefendingChampData } from '../../../hooks/useTournamentDefendingChamp';
@@ -790,7 +791,11 @@ export function CinematicFrame({
           zIndex: 3,
           display: 'flex',
           flexDirection: 'column',
-          padding: `18px 14px ${showTicker ? 16 + BOTTOM_STACK_H : 16}px`,
+          padding: `18px 14px ${
+            showTicker ? 16 + BOTTOM_STACK_H
+            : (isUpcoming && defendingChamp) ? 16 + UPCOMING_BAND_H
+            : 16
+          }px`,
         }}
       >
         {/* Top meta row */}
@@ -951,50 +956,37 @@ export function CinematicFrame({
           )}
         </div>
 
-        {/* Floating glass capsule — upcoming only (defending champ / field strength) */}
-        {isUpcoming && hasCapsule && (
-        <div
-          className="cinematic-capsule"
-          style={{
-            borderRadius: 22,
-            padding: 6,
-            background: 'rgba(20,28,40,0.55)',
-            WebkitBackdropFilter: 'blur(20px)',
-            backdropFilter: 'blur(20px)',
-            border: '1px solid rgba(255,255,255,0.12)',
-            boxShadow: '0 8px 40px rgba(0,0,0,0.4)',
-          }}
-        >
-          {upcomingCapsule}
-
-          {/* Footer CTA */}
+        {/* Upcoming — defending champion band, pinned to base (flat ink) */}
+        {isUpcoming && defendingChamp && (
           <button
             type="button"
             onClick={onCtaTap}
+            aria-label="View tournament"
             style={{
-              width: '100%',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              gap: 4,
-              padding: '11px 10px 9px',
-              marginTop: 2,
-              background: 'transparent',
-              border: 'none',
-              borderTop: '0.5px solid rgba(255,255,255,0.08)',
-              color: AMBER,
-              fontSize: 12.5,
-              fontWeight: 700,
-              letterSpacing: '0.04em',
-              textTransform: 'uppercase',
-              cursor: 'pointer',
-              fontFamily: "'Geist', -apple-system, BlinkMacSystemFont, sans-serif",
+              position: 'absolute', left: 0, right: 0, bottom: 0, zIndex: 4,
+              border: 'none', padding: 0, margin: 0, cursor: 'pointer',
+              display: 'block', width: '100%', textAlign: 'left',
             }}
           >
-            <span>{capsuleFooter}</span>
-            <ChevronRight size={14} strokeWidth={2.5} />
+            <div style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '13px 16px', background: '#0A0E14', borderTop: '0.5px solid rgba(255,255,255,0.06)' }}>
+              {(() => {
+                const headshot = (tourSlug && defendingChamp.name)
+                  ? (() => { try { return getPlayerHeadshotUrl(defendingChamp.name, tourSlug); } catch { return null; } })()
+                  : null;
+                return headshot
+                  ? <img src={headshot} alt="" loading="lazy" style={{ width: 42, height: 42, borderRadius: '34%', objectFit: 'cover', border: `2px solid ${GOLD}`, flexShrink: 0 }} />
+                  : <div style={{ width: 42, height: 42, borderRadius: '34%', background: 'rgba(255,255,255,0.08)', border: `2px solid ${GOLD}`, flexShrink: 0 }} />;
+              })()}
+              <div style={{ flex: 1, minWidth: 0 }}>
+                <div style={{ ...NUMERIC_STYLE, fontSize: 8.5, fontWeight: 800, letterSpacing: '0.16em', color: GOLD, textTransform: 'uppercase' }}>Defending Champion</div>
+                <div style={{ fontSize: 17, fontWeight: 800, color: '#fff', marginTop: 1, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{defendingChamp.name}</div>
+              </div>
+              <div style={{ textAlign: 'right', flexShrink: 0 }}>
+                <div style={{ ...NUMERIC_STYLE, fontSize: 13, fontWeight: 800, color: '#fff' }}>{defendingChamp.score}</div>
+                <div style={{ ...NUMERIC_STYLE, fontSize: 9, color: 'rgba(255,255,255,0.5)', marginTop: 2 }}>{defendingChamp.year}</div>
+              </div>
+            </div>
           </button>
-        </div>
         )}
       </div>
 
