@@ -238,3 +238,6 @@ verify_jwt = true
 
 [functions.send-course-claim-result-email]
 verify_jwt = false
+
+[functions.backfill-2025-leaderboards]
+verify_jwt = false
