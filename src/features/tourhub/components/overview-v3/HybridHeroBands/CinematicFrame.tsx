@@ -960,8 +960,15 @@ export function CinematicFrame({
           );
         })()}
 
-        {/* Upcoming — defending champion band, pinned to base (flat ink) */}
-        {isUpcoming && defendingChamp && (
+        {/* Upcoming — defending champion band + footer, pinned to base (flat ink) */}
+        {isUpcoming && defendingChamp && (() => {
+          const fieldCount = fieldStrength?.totalPlayers && fieldStrength.totalPlayers > 0
+            ? fieldStrength.totalPlayers
+            : null;
+          const viewTournamentLabel = fieldCount
+            ? `View tournament · ${fieldCount} in the field`
+            : 'View tournament';
+          return (
           <button
             type="button"
             onClick={onCtaTap}
@@ -989,6 +996,33 @@ export function CinematicFrame({
                 <div style={{ ...NUMERIC_STYLE, fontSize: 13, fontWeight: 800, color: '#fff' }}>{defendingChamp.score}</div>
                 <div style={{ ...NUMERIC_STYLE, fontSize: 9, color: 'rgba(255,255,255,0.5)', marginTop: 2 }}>{defendingChamp.year}</div>
               </div>
+            </div>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 4, padding: '9px 16px', background: '#0A0E14', borderTop: '0.5px solid rgba(255,255,255,0.06)', color: AMBER, fontSize: 12, fontWeight: 800, letterSpacing: '0.06em', textTransform: 'uppercase' }}>
+              {viewTournamentLabel}
+              <ChevronRight size={14} strokeWidth={2.5} />
+            </div>
+          </button>
+          );
+        })()}
+
+        {/* Upcoming, no defending champ — flat-ink countdown band (always has data) */}
+        {isUpcoming && !defendingChamp && countdownText && (
+          <button
+            type="button"
+            onClick={onCtaTap}
+            aria-label="View tournament"
+            style={{
+              position: 'absolute', left: 0, right: 0, bottom: 0, zIndex: 4,
+              border: 'none', padding: 0, margin: 0, cursor: 'pointer',
+              display: 'block', width: '100%', textAlign: 'left',
+            }}
+          >
+            <div style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '14px 16px', background: '#0A0E14', borderTop: '0.5px solid rgba(255,255,255,0.06)' }}>
+              <div style={{ flex: 1, minWidth: 0 }}>
+                <div style={{ ...NUMERIC_STYLE, fontSize: 8.5, fontWeight: 800, letterSpacing: '0.18em', color: AMBER }}>TEES OFF IN</div>
+                <div style={{ ...NUMERIC_STYLE, fontSize: 20, fontWeight: 900, color: '#fff', marginTop: 3, letterSpacing: '-0.01em', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{countdownText}</div>
+              </div>
+              <ChevronRight size={18} strokeWidth={2.5} style={{ color: AMBER, flexShrink: 0 }} />
             </div>
           </button>
         )}
