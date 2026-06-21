@@ -137,53 +137,8 @@ export const RoundsThatCountCard: React.FC<Props> = ({
   const projection = useMemo(() => {
     if (!allScores || allScores.length < 8 || currentHandicap == null) return null;
     const last20 = allScores.slice(0, 20);
-    const result = projectNextRound(last20, currentHandicap);
-
-    // ── TEMP DEBUG v2 — remove after diagnosis ───────────────────────────
-    try {
-      const last20local = [...last20];
-      const curTop8 = [...last20local]
-        .filter(r => r.handicap_differential != null)
-        .sort((a, b) => (a.handicap_differential as number) - (b.handicap_differential as number))
-        .slice(0, 8);
-      const curTop8Diffs = curTop8.map(r => r.handicap_differential as number);
-      const curTop8Sum = curTop8Diffs.reduce((s, d) => s + d, 0);
-
-      const byDateAsc = [...last20local].sort(
-        (a, b) => new Date(a.play_date).getTime() - new Date(b.play_date).getTime(),
-      );
-      const oldest = byDateAsc[0];
-      const remaining19 = byDateAsc.slice(1);
-      const newTop8 = [...remaining19]
-        .filter(r => r.handicap_differential != null)
-        .sort((a, b) => (a.handicap_differential as number) - (b.handicap_differential as number))
-        .slice(0, 8);
-      const newTop8Diffs = newTop8.map(r => r.handicap_differential as number);
-      const newTop8Sum = newTop8Diffs.reduce((s, d) => s + d, 0);
-
-      console.log('🟢 RTC DEBUG v2', {
-        currentHandicap,
-        curTop8Diffs,
-        curTop8Sum: Number(curTop8Sum.toFixed(3)),
-        curTop8Avg: Number((curTop8Sum / 8).toFixed(3)),
-        oldestDiff: oldest?.handicap_differential,
-        oldestInCurTop8: oldest
-          ? curTop8.some(r => r.id === oldest.id)
-          : null,
-        newTop8Diffs,
-        newTop8Sum: Number(newTop8Sum.toFixed(3)),
-        newTop8Avg: Number((newTop8Sum / 8).toFixed(3)),
-        promotedDiff:
-          newTop8Diffs.find(d => !curTop8Diffs.includes(d)) ?? 'none (sets identical)',
-        deltaAvg: Number(((newTop8Sum - curTop8Sum) / 8).toFixed(3)),
-      });
-    } catch (e) {
-      console.log('🟢 RTC DEBUG v2 error', e);
-    }
-    // ── END TEMP DEBUG v2 ────────────────────────────────────────────────
-
-    return result;
-  }, [allScores, currentHandicap, counters]);
+    return projectNextRound(last20, currentHandicap);
+  }, [allScores, currentHandicap]);
 
 
   const enriched = useMemo(() => {
@@ -320,29 +275,58 @@ export const RoundsThatCountCard: React.FC<Props> = ({
             </div>
           </div>
 
-          {/* Secondary: risk line — ONLY when a counter is dropping out */}
-          {projection.isAtRisk && (
-            <div style={{
-              display: 'flex',
-              alignItems: 'flex-start',
-              gap: 7,
-              marginTop: 12,
-              paddingTop: 12,
-              borderTop: '1px solid var(--hcp-line)',
-            }}>
-              <span style={{
-                width: 6, height: 6, borderRadius: '50%',
-                background: RED, flexShrink: 0, marginTop: 6,
-              }} />
-              <span style={{ fontSize: 13, color: INK_70, lineHeight: 1.35 }}>
-                Miss it and your index{' '}
-                <strong style={{ color: RED, fontWeight: 800 }}>
-                  rises to {fmtDiff(projection.settleAt)}
-                </strong>
-                {' '}— a good round is dropping off.
-              </span>
-            </div>
-          )}
+          {/* Secondary line — three states:
+              1) visible rise  → red "rises to X"
+              2) counter dropping, tiny move → quiet grey note
+              3) nothing → render nothing */}
+          {(() => {
+            const current = currentHandicap ?? null;
+            const settleShown = fmtDiff(projection.settleAt);
+            const visibleRise =
+              current != null &&
+              projection.settleAt > current + 0.049;
+
+            if (visibleRise) {
+              return (
+                <div style={{
+                  display: 'flex', alignItems: 'flex-start', gap: 7,
+                  marginTop: 12, paddingTop: 12, borderTop: '1px solid var(--hcp-line)',
+                }}>
+                  <span style={{
+                    width: 6, height: 6, borderRadius: '50%',
+                    background: RED, flexShrink: 0, marginTop: 6,
+                  }} />
+                  <span style={{ fontSize: 13, color: INK_70, lineHeight: 1.35 }}>
+                    Miss it and your index{' '}
+                    <strong style={{ color: RED, fontWeight: 800 }}>
+                      rises to {settleShown}
+                    </strong>
+                    {' '}— a good round is dropping off.
+                  </span>
+                </div>
+              );
+            }
+
+            if (projection.counterDropping) {
+              return (
+                <div style={{
+                  display: 'flex', alignItems: 'flex-start', gap: 7,
+                  marginTop: 12, paddingTop: 12, borderTop: '1px solid var(--hcp-line)',
+                }}>
+                  <span style={{
+                    width: 6, height: 6, borderRadius: '50%',
+                    background: 'var(--hcp-t-40)', flexShrink: 0, marginTop: 6,
+                  }} />
+                  <span style={{ fontSize: 13, color: INK_70, lineHeight: 1.35 }}>
+                    A counting round rolls off next round — your index holds
+                    {' '}unless you beat the cut.
+                  </span>
+                </div>
+              );
+            }
+
+            return null;
+          })()}
         </div>
       )}
       {/* ── END BRIEFING ──────────────────────────────────────────────────── */}
