@@ -364,8 +364,8 @@ export const RoundsThatCountCard: React.FC<Props> = ({
               }}
             >
 
-              {/* Selected highlight column */}
-              {selectedIdx >= 0 && (
+              {/* Selected highlight column — only while actively scrubbing */}
+              {scrubIdx !== null && selectedIdx >= 0 && (
                 <div style={{
                   position: 'absolute',
                   top: 0, bottom: 0,
@@ -439,17 +439,17 @@ export const RoundsThatCountCard: React.FC<Props> = ({
                 let background: string;
                 let borderStyle: string;
                 if (r.is_best) {
-                  dotSize = 12;
+                  dotSize = 8;
                   background = 'var(--hcp-bg-0)';
-                  borderStyle = `2.5px solid ${GREEN}`;
+                  borderStyle = `1.5px solid ${GREEN}`;
                 } else if (r.is_worst) {
-                  dotSize = 12;
+                  dotSize = 8;
                   background = 'var(--hcp-bg-0)';
-                  borderStyle = `2.5px solid ${RED}`;
+                  borderStyle = `1.5px solid ${RED}`;
                 } else if (isLatest) {
-                  dotSize = 12;
+                  dotSize = 8;
                   background = 'var(--hcp-bg-0)';
-                  borderStyle = `2.5px solid ${AMBER}`;
+                  borderStyle = `1.5px solid ${AMBER}`;
                 } else if (r.is_counter) {
                   dotSize = 9;
                   background = AMBER_GOLD_GRAD;
