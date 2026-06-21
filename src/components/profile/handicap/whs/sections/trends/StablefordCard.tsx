@@ -1050,25 +1050,21 @@ const MilestonesStrip: React.FC<MilestonesStripProps> = ({
   );
 };
 
-const MilestoneRow: React.FC<{
+const MilestoneCard: React.FC<{
   name: string;
   count: number;
   rarity: string;
   rings: number;
   meta: string;
-  isLast: boolean;
-}> = ({ name, count, rarity, rings, meta, isLast }) => {
+}> = ({ name, count, rarity, rings, meta }) => {
   const achieved = count > 0;
   const rarityColor = rarity === 'FREQUENT' ? 'var(--hcp-t-40)' : T.amber;
 
-  // Stacked box-shadow rings — gaps painted in card bg so geometry stays clean
-  // at small sizes (per brief: don't approximate with border/outline).
-  const medalSize = 34;
+  const medalSize = 32;
   let medalBoxShadow = 'none';
   let medalMargin = 0;
   if (achieved && rings === 1) {
-    medalBoxShadow =
-      '0 0 0 2px var(--hcp-bg-1), 0 0 0 3.5px rgba(247,147,30,0.8)';
+    medalBoxShadow = '0 0 0 2px var(--hcp-bg-1), 0 0 0 3.5px rgba(247,147,30,0.8)';
     medalMargin = 2;
   } else if (achieved && rings === 2) {
     medalBoxShadow =
@@ -1078,117 +1074,68 @@ const MilestoneRow: React.FC<{
 
   const medalStyle: React.CSSProperties = achieved
     ? {
-        width: medalSize,
-        height: medalSize,
-        borderRadius: '50%',
+        width: medalSize, height: medalSize, borderRadius: '50%',
         background: 'linear-gradient(135deg, #F7931E 0%, #BA6E12 100%)',
-        color: '#1A0F02',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        fontSize: 13,
-        fontWeight: 800,
-        fontFamily: FONT,
-        fontVariantNumeric: 'tabular-nums',
-        textShadow: 'none',
-        boxShadow: medalBoxShadow,
-        margin: medalMargin,
-        flexShrink: 0,
+        color: '#1A0F02', display: 'flex', alignItems: 'center', justifyContent: 'center',
+        fontSize: 12, fontWeight: 800, fontFamily: FONT, fontVariantNumeric: 'tabular-nums',
+        boxShadow: medalBoxShadow, margin: medalMargin, flexShrink: 0,
       }
     : {
-        width: medalSize,
-        height: medalSize,
-        borderRadius: '50%',
-        background: 'var(--hcp-bg-2)',
-        border: '1px dashed var(--hcp-line-2)',
-        color: 'var(--hcp-t-30)',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        fontSize: 13,
-        fontWeight: 800,
-        fontFamily: FONT,
-        fontVariantNumeric: 'tabular-nums',
+        width: medalSize, height: medalSize, borderRadius: '50%',
+        background: 'var(--hcp-bg-2)', border: '1px dashed var(--hcp-line-2)',
+        color: 'var(--hcp-t-30)', display: 'flex', alignItems: 'center', justifyContent: 'center',
+        fontSize: 12, fontWeight: 800, fontFamily: FONT, fontVariantNumeric: 'tabular-nums',
         flexShrink: 0,
       };
 
   return (
     <div
       style={{
-        display: 'flex',
-        alignItems: 'center',
-        gap: 12,
-        padding: '12px 14px',
-        borderBottom: isLast ? 'none' : '1px solid var(--hcp-line)',
         position: 'relative',
+        borderRadius: 14,
+        background: 'linear-gradient(180deg, var(--hcp-bg-2) 0%, var(--hcp-bg-1) 100%)',
+        border: '1px solid var(--hcp-line)',
+        padding: '13px 13px 12px',
+        overflow: 'hidden',
+        fontFamily: FONT,
       }}
     >
       {achieved && (
         <div
           style={{
-            position: 'absolute',
-            top: 0,
-            left: 0,
-            bottom: 0,
-            width: 2,
-            background: 'linear-gradient(180deg, #F7931E 0%, #BA6E12 100%)',
-            opacity: 0.8,
+            position: 'absolute', top: 0, left: 0, bottom: 0, width: 2,
+            background: 'linear-gradient(180deg, #F7931E 0%, #BA6E12 100%)', opacity: 0.8,
           }}
         />
       )}
 
-      <div style={medalStyle}>{count}</div>
-
-      <div style={{ flex: 1, minWidth: 0 }}>
-        <div style={{ display: 'flex', gap: 8, alignItems: 'baseline', flexWrap: 'wrap' }}>
-          <span style={{ fontSize: 13, fontWeight: 800, color: '#F8FAFC', fontFamily: FONT }}>
-            {name}
-          </span>
-          <span
-            style={{
-              fontSize: 8.5,
-              fontWeight: 800,
-              letterSpacing: '0.10em',
-              color: rarityColor,
-              fontFamily: FONT,
-            }}
-          >
-            {rarity}
-          </span>
-        </div>
-        <div
-          style={{
-            fontSize: 10.5,
-            fontWeight: 600,
-            color: 'var(--hcp-t-40)',
-            marginTop: 2,
-            fontFamily: FONT,
-          }}
-        >
-          {meta}
-        </div>
-      </div>
-
-      <div
-        style={{
-          display: 'flex',
-          flexDirection: 'column',
-          alignItems: 'flex-end',
-          flexShrink: 0,
-        }}
-      >
+      {/* top row: medal + big count */}
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+        <div style={medalStyle}>{count}</div>
         <span
           style={{
-            fontSize: 22,
-            fontWeight: 200,
+            fontSize: 24, fontWeight: 200,
             color: count > 0 ? T.amber : 'var(--hcp-t-30)',
-            fontVariantNumeric: 'tabular-nums',
-            letterSpacing: '-0.04em',
-            lineHeight: 0.9,
-            fontFamily: FONT,
+            fontVariantNumeric: 'tabular-nums', letterSpacing: '-0.04em', lineHeight: 0.9,
           }}
         >
           {count}
+        </span>
+      </div>
+
+      {/* name */}
+      <div style={{ fontSize: 13, fontWeight: 800, color: 'var(--hcp-t-100)', marginTop: 10 }}>
+        {name}
+      </div>
+
+      {/* rarity · meta */}
+      <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginTop: 3, flexWrap: 'wrap' }}>
+        <span style={{ fontSize: 8, fontWeight: 800, letterSpacing: '0.08em', color: rarityColor }}>
+          {rarity}
+        </span>
+        <span style={{ fontSize: 10, color: 'var(--hcp-t-40)' }}>·</span>
+        <span style={{ fontSize: 10, fontWeight: 600, color: 'var(--hcp-t-40)' }}>
+          {meta}
         </span>
       </div>
     </div>
