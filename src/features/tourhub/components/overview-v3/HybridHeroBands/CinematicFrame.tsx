@@ -582,7 +582,7 @@ export function CinematicFrame({
   const isLive = state.kind === 'live';
   const isResults = state.kind === 'results';
   const isUpcoming = state.kind === 'upcoming';
-  const showTicker = !isUpcoming && Array.isArray(top10) && top10.length > 0;
+  const showTicker = isLive && Array.isArray(top10) && top10.length > 0;
   const roundLabel_ =
     state.kind === 'live'
       ? `LIVE · ${roundLabel(state.round, state.totalRounds).toUpperCase()}`
