@@ -3,7 +3,7 @@ import { useFriendLeaderboard } from '@/lib/whs/hooks';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { pickAvatarSrc } from '@/lib/whs/utils/avatarSrc';
 import { fmtHcp } from '@/lib/whs/format';
-import SectionHeader from '../SectionHeader';
+
 import RecentlyActiveItem from './RecentlyActiveItem';
 import { useOpenFriendSheet } from '@/components/friend-sheet/FriendSheetProvider';
 
