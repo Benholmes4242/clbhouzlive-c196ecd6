@@ -24,14 +24,14 @@ import {
   GOLD,
   NUMERIC_STYLE,
 } from '../HybridHero.constants';
-import { AMBER_INK, AMBER_TINT_12, GOLD_DEEP } from '../../../_shared/tokens';
+import { AMBER_INK, GOLD_DEEP } from '../../../_shared/tokens';
 import type { HeroState, TopTie, TickerRow } from '../HybridHero.utils';
 import { fmtScore, formatRank, buildLeaderboardSlots, roundLabel } from '../HybridHero.utils';
 import { Ticker } from './Ticker';
 
 const TICKER_BAR_H = 40;
 const CHAMPION_BAND_H = 62;
-const UPCOMING_BAND_H = 64;
+const UPCOMING_BAND_H = 104;
 const BOTTOM_STACK_H = TICKER_BAR_H + CHAMPION_BAND_H;
 import { getPlayerHeadshotUrl } from '@/utils/playerHeadshot';
 import type { DefendingChampData } from '../../../hooks/useTournamentDefendingChamp';
@@ -798,6 +798,7 @@ export function CinematicFrame({
             showTicker ? 16 + BOTTOM_STACK_H
             : isResults ? 16 + 40
             : (isUpcoming && defendingChamp) ? 16 + UPCOMING_BAND_H
+            : (isUpcoming && countdownText) ? 16 + 68
             : 16
           }px`,
         }}
@@ -813,26 +814,25 @@ export function CinematicFrame({
           }}
         >
           {isUpcoming ? (
-            <span
-              style={{
-                ...NUMERIC_STYLE,
-                display: 'inline-flex',
-                alignItems: 'center',
-                gap: 6,
-                padding: '4px 9px',
-                borderRadius: 999,
-                background: AMBER_TINT_12,
-                border: `1px solid ${AMBER}`,
-                color: AMBER,
-                fontSize: 10.5,
-                fontWeight: 800,
-                letterSpacing: '0.16em',
-                textTransform: 'uppercase',
-                whiteSpace: 'nowrap',
-              }}
-            >
-              Upcoming
-            </span>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+              <span
+                aria-hidden
+                style={{ width: 7, height: 7, borderRadius: '50%', background: AMBER, flexShrink: 0 }}
+              />
+              <span
+                style={{
+                  ...NUMERIC_STYLE,
+                  fontSize: 11,
+                  fontWeight: 700,
+                  letterSpacing: '0.14em',
+                  color: AMBER,
+                  textShadow: '0 1px 3px rgba(0,0,0,0.45)',
+                  textTransform: 'uppercase',
+                }}
+              >
+                Upcoming
+              </span>
+            </div>
           ) : roundLabel_ ? (
             <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
               {isResults && (
@@ -925,40 +925,7 @@ export function CinematicFrame({
               {venueLine}
             </div>
           )}
-          {countdownText && (
-            <div
-              style={{
-                marginTop: 4,
-                display: 'inline-flex',
-                alignSelf: 'flex-start',
-                alignItems: 'center',
-                gap: 8,
-                padding: '7px 12px',
-                borderRadius: 999,
-                background: 'rgba(255,255,255,0.12)',
-                WebkitBackdropFilter: 'blur(12px)',
-                backdropFilter: 'blur(12px)',
-                border: '1px solid rgba(255,255,255,0.18)',
-              }}
-            >
-              <span
-                aria-hidden="true"
-                style={{
-                  width: 6, height: 6, borderRadius: '50%',
-                  background: AMBER, flexShrink: 0,
-                }}
-              />
-              <span
-                style={{
-                  ...NUMERIC_STYLE,
-                  fontSize: 12, fontWeight: 700, color: 'white',
-                  letterSpacing: '0.04em', textTransform: 'uppercase',
-                }}
-              >
-                {countdownText}
-              </span>
-            </div>
-          )}
+          {/* over-photo countdown chip removed — countdown lives in base band */}
         </div>
 
         {/* Results — champion poster (centred trophy + winner) */}
@@ -993,8 +960,15 @@ export function CinematicFrame({
           );
         })()}
 
-        {/* Upcoming — defending champion band, pinned to base (flat ink) */}
-        {isUpcoming && defendingChamp && (
+        {/* Upcoming — defending champion band + footer, pinned to base (flat ink) */}
+        {isUpcoming && defendingChamp && (() => {
+          const fieldCount = fieldStrength?.totalPlayers && fieldStrength.totalPlayers > 0
+            ? fieldStrength.totalPlayers
+            : null;
+          const viewTournamentLabel = fieldCount
+            ? `View tournament · ${fieldCount} in the field`
+            : 'View tournament';
+          return (
           <button
             type="button"
             onClick={onCtaTap}
@@ -1022,6 +996,33 @@ export function CinematicFrame({
                 <div style={{ ...NUMERIC_STYLE, fontSize: 13, fontWeight: 800, color: '#fff' }}>{defendingChamp.score}</div>
                 <div style={{ ...NUMERIC_STYLE, fontSize: 9, color: 'rgba(255,255,255,0.5)', marginTop: 2 }}>{defendingChamp.year}</div>
               </div>
+            </div>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 4, padding: '9px 16px', background: '#0A0E14', borderTop: '0.5px solid rgba(255,255,255,0.06)', color: AMBER, fontSize: 12, fontWeight: 800, letterSpacing: '0.06em', textTransform: 'uppercase' }}>
+              {viewTournamentLabel}
+              <ChevronRight size={14} strokeWidth={2.5} />
+            </div>
+          </button>
+          );
+        })()}
+
+        {/* Upcoming, no defending champ — flat-ink countdown band (always has data) */}
+        {isUpcoming && !defendingChamp && countdownText && (
+          <button
+            type="button"
+            onClick={onCtaTap}
+            aria-label="View tournament"
+            style={{
+              position: 'absolute', left: 0, right: 0, bottom: 0, zIndex: 4,
+              border: 'none', padding: 0, margin: 0, cursor: 'pointer',
+              display: 'block', width: '100%', textAlign: 'left',
+            }}
+          >
+            <div style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '14px 16px', background: '#0A0E14', borderTop: '0.5px solid rgba(255,255,255,0.06)' }}>
+              <div style={{ flex: 1, minWidth: 0 }}>
+                <div style={{ ...NUMERIC_STYLE, fontSize: 8.5, fontWeight: 800, letterSpacing: '0.18em', color: AMBER }}>TEES OFF IN</div>
+                <div style={{ ...NUMERIC_STYLE, fontSize: 20, fontWeight: 900, color: '#fff', marginTop: 3, letterSpacing: '-0.01em', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{countdownText}</div>
+              </div>
+              <ChevronRight size={18} strokeWidth={2.5} style={{ color: AMBER, flexShrink: 0 }} />
             </div>
           </button>
         )}
