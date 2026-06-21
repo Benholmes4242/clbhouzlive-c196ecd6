@@ -15,7 +15,7 @@ const AMBER = '#F7931E';
 const GOLD = '#FBBC2E';
 
 const FALLBACK_BG =
-  'linear-gradient(135deg, #1a3c2a 0%, #0f172a 100%)';
+  'linear-gradient(135deg, #46665a 0%, #2f4a40 100%)';
 const SCRIM =
   'linear-gradient(180deg, rgba(0,0,0,0.45) 0%, rgba(0,0,0,0.10) 40%, rgba(0,0,0,0) 100%)';
 const T = {
