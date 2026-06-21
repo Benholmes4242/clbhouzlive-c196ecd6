@@ -26,7 +26,6 @@ export const AchievementsCard: React.FC<Props> = ({ userId, viewMode = 'owner', 
   const unlocked = list.filter((b) => b.is_earned);
   const unlockedCount = unlocked.length;
   const totalCount = list.length;
-  const points = unlocked.reduce((acc, b) => acc + (RARITY_POINTS[b.rarity] ?? 0), 0);
 
   // Most recent 4 unlocked badges by earned_at desc
   const recent = [...unlocked]
