@@ -1,6 +1,8 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Crown, ShieldCheck, X } from 'lucide-react';
+import { useSupabaseSession } from '@/hooks/useSupabaseSession';
+import { useWhsConnection } from '@/lib/whs/hooks';
 
 const FONT = 'Geist, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
 const KEY_EXPLAINER = 'champions_explainer_dismissed_v1';
@@ -70,7 +72,7 @@ const ExplainerContent: React.FC<{ window: 'all_time' | '90d' }> = ({ window }) 
   </>
 );
 
-const ProvenanceContent: React.FC<{ onSync: () => void }> = ({ onSync }) => (
+const ProvenanceContent: React.FC<{ onSync: () => void; isSynced: boolean }> = ({ onSync, isSynced }) => (
   <>
     <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 5 }}>
       <ShieldCheck size={12} color="var(--hcp-gold-text)" strokeWidth={2.6} />
@@ -81,20 +83,27 @@ const ProvenanceContent: React.FC<{ onSync: () => void }> = ({ onSync }) => (
     <p style={{ fontSize: 12, fontWeight: 500, color: 'var(--hcp-t-60)', lineHeight: 1.55, margin: 0 }}>
       That ace only counts if it's on your{' '}
       <b style={{ color: 'var(--hcp-t-100)', fontWeight: 700 }}>official handicap record</b>.
-      Log every round with your club or golf union to register it on your WHS record — no logged rounds, no crowns.{' '}
-      <b
-        role="button"
-        onClick={onSync}
-        style={{ color: 'var(--hcp-gold-text)', fontWeight: 700, whiteSpace: 'nowrap', cursor: 'pointer' }}
-      >
-        Sync your handicap ›
-      </b>
+      Log every round with your club or golf union to register it on your WHS record — no logged rounds, no crowns.
+      {!isSynced && (
+        <>{' '}
+          <b
+            role="button"
+            onClick={onSync}
+            style={{ color: 'var(--hcp-gold-text)', fontWeight: 700, whiteSpace: 'nowrap', cursor: 'pointer' }}
+          >
+            Sync your handicap ›
+          </b>
+        </>
+      )}
     </p>
   </>
 );
 
 export const ChampionsInfoCarousel: React.FC<Props> = ({ window }) => {
   const navigate = useNavigate();
+  const { user } = useSupabaseSession();
+  const { data: whsConnection } = useWhsConnection(user?.id);
+  const isSynced = !!whsConnection;
   const [gone1, setGone1] = useState(() => read(KEY_EXPLAINER));
   const [gone2, setGone2] = useState(() => read(KEY_PROVENANCE));
   const scrollerRef = useRef<HTMLDivElement>(null);
@@ -136,7 +145,7 @@ export const ChampionsInfoCarousel: React.FC<Props> = ({ window }) => {
       background="linear-gradient(180deg, rgba(251,188,46,0.09), rgba(251,188,46,0.03))"
       border="0.5px solid rgba(251,188,46,0.35)"
     >
-      <ProvenanceContent onSync={() => navigate('/handicap')} />
+      <ProvenanceContent onSync={() => navigate('/handicap')} isSynced={isSynced} />
     </CardShell>
   );
 
