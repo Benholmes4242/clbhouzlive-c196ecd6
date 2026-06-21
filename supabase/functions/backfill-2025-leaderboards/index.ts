@@ -104,7 +104,7 @@ Deno.serve(async (req) => {
           console.log(`[backfill] ${success ? 'OK ' : 'FAIL'} ${t.slug} ${t.name} (records=${json?.records ?? '?'})`);
         } catch (e: any) {
           fail++;
-          console.error(`[backfill] ERROR ${t.tour} ${t.name}: ${String(e?.message ?? e)}`);
+          console.error(`[backfill] ERROR ${t.slug} ${t.name}: ${String(e?.message ?? e)}`);
         }
         await new Promise(r => setTimeout(r, delayMs));
       }
