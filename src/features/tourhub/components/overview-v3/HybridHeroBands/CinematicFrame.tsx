@@ -792,7 +792,7 @@ export function CinematicFrame({
           zIndex: 3,
           display: 'flex',
           flexDirection: 'column',
-          padding: `18px 14px ${showTicker ? 16 + TICKER_BAR_H : 16}px`,
+          padding: `18px 14px ${showTicker ? 16 + BOTTOM_STACK_H : 16}px`,
         }}
       >
         {/* Top meta row */}
@@ -1023,21 +1023,68 @@ export function CinematicFrame({
         )}
       </div>
 
-      {/* Broadcast bar — auto-scrolling top-10 ticker pinned to the bottom edge */}
-      {showTicker && (
-        <button
-          type="button"
-          onClick={onCtaTap}
-          aria-label="Open full leaderboard"
-          style={{
-            position: 'absolute', left: 0, right: 0, bottom: 0, zIndex: 4,
-            border: 'none', padding: 0, margin: 0, cursor: 'pointer',
-            display: 'block', width: '100%', textAlign: 'left',
-          }}
-        >
-          <Ticker rows={top10} />
-        </button>
-      )}
+      {/* Champion band + ticker — pinned to the bottom edge, whole thing opens full board */}
+      {showTicker && (() => {
+        const leader = safe[0];
+        return (
+          <button
+            type="button"
+            onClick={onCtaTap}
+            aria-label="Open full leaderboard"
+            style={{
+              position: 'absolute', left: 0, right: 0, bottom: 0, zIndex: 4,
+              border: 'none', padding: 0, margin: 0, cursor: 'pointer',
+              display: 'block', width: '100%', textAlign: 'left',
+            }}
+          >
+            {/* Champion band */}
+            {leader && (
+              <div
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 11,
+                  padding: '14px 16px 11px',
+                  background: 'linear-gradient(180deg, rgba(10,14,20,0) 0%, #0A0E14 42%)',
+                }}
+              >
+                {/* Trophy tile — matches Latest Records TrophyMark */}
+                <div
+                  aria-hidden
+                  style={{
+                    width: 30, height: 30, borderRadius: 8, flexShrink: 0,
+                    background: '#F7931E',
+                    boxShadow: '0 4px 10px -2px rgba(247,147,30,0.40)',
+                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  }}
+                >
+                  <Trophy size={18} color="#fff" strokeWidth={2.2} />
+                </div>
+                {/* Eyebrow + name */}
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <div style={{ ...NUMERIC_STYLE, fontSize: 8.5, fontWeight: 800, letterSpacing: '0.16em', color: GOLD, textTransform: 'uppercase' }}>
+                    Tournament Leader
+                  </div>
+                  <div style={{ fontSize: 18, fontWeight: 800, color: '#fff', letterSpacing: '-0.01em', marginTop: 1, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                    {entryName(leader)}
+                  </div>
+                </div>
+                {/* Score + thru */}
+                <div style={{ textAlign: 'right', flexShrink: 0 }}>
+                  <div style={{ ...NUMERIC_STYLE, fontSize: 24, fontWeight: 900, letterSpacing: '-0.02em', lineHeight: 1, color: scoreColor(leader.score) }}>
+                    {fmtScore(leader.score)}
+                  </div>
+                  <div style={{ ...NUMERIC_STYLE, fontSize: 9, fontWeight: 600, letterSpacing: '0.1em', color: 'rgba(255,255,255,0.5)', marginTop: 3 }}>
+                    THRU {entryThru(leader)}
+                  </div>
+                </div>
+              </div>
+            )}
+            {/* Ticker */}
+            <Ticker rows={top10} />
+          </button>
+        );
+      })()}
     </div>
   );
 }
