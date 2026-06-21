@@ -1085,6 +1085,25 @@ export function CinematicFrame({
           </button>
         );
       })()}
+
+      {/* Results — final leaderboard footer CTA */}
+      {isResults && (
+        <button
+          type="button"
+          onClick={onCtaTap}
+          aria-label="Final leaderboard"
+          style={{
+            position: 'absolute', left: 0, right: 0, bottom: 0, zIndex: 4,
+            border: 'none', cursor: 'pointer', background: '#0A0E14',
+            padding: '13px 16px', textAlign: 'center', width: '100%',
+            borderTop: '0.5px solid rgba(255,255,255,0.06)',
+          }}
+        >
+          <span style={{ ...NUMERIC_STYLE, fontSize: 12, fontWeight: 800, letterSpacing: '0.06em', color: GOLD }}>
+            FINAL LEADERBOARD · {safe.length} ›
+          </span>
+        </button>
+      )}
     </div>
   );
 }
