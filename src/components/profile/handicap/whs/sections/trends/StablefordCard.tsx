@@ -853,10 +853,10 @@ const ShotsBody: React.FC<ShotsBodyProps> = ({ trophyAgg, shotsLoading, scope })
           }}
         >
           {[
-            { label: 'BIRDIE+', count: birdiesOrBetter },
-            { label: 'PAR', count: pars },
-            { label: 'BOGEY', count: bogey },
-            { label: 'DOUBLE+', count: doublePlus },
+            { label: 'BIRDIE+', count: birdiesOrBetter, color: HOLE_C.birdie },
+            { label: 'PAR', count: pars, color: HOLE_C.par },
+            { label: 'BOGEY', count: bogey, color: HOLE_C.bogey },
+            { label: 'DOUBLE+', count: doublePlus, color: HOLE_C.double },
           ].map((cell) => {
             const pctRaw = segTotal > 0 ? (cell.count / segTotal) * 100 : 0;
             const pct = pctRaw < 10 ? pctRaw.toFixed(1) : Math.round(pctRaw).toString();
@@ -867,7 +867,7 @@ const ShotsBody: React.FC<ShotsBodyProps> = ({ trophyAgg, shotsLoading, scope })
                   style={{
                     fontSize: 10,
                     fontWeight: 800,
-                    color: T.ink,
+                    color: cell.color,
                     letterSpacing: '0.08em',
                     whiteSpace: 'nowrap',
                   }}
@@ -878,7 +878,7 @@ const ShotsBody: React.FC<ShotsBodyProps> = ({ trophyAgg, shotsLoading, scope })
                   style={{
                     fontSize: 20,
                     fontWeight: isZero ? 400 : 800,
-                    color: isZero ? 'var(--hcp-t-40)' : T.ink,
+                    color: isZero ? 'var(--hcp-t-40)' : cell.color,
                     fontVariantNumeric: 'tabular-nums',
                     letterSpacing: '-0.02em',
                     lineHeight: 1,
