@@ -843,7 +843,6 @@ export function CinematicFrame({
             showTicker ? 16 + LIVE_BOTTOM_H
             : isResults ? 16 + RESULTS_FOOTER_H
             : (isUpcoming && defendingChamp) ? 16 + UPCOMING_BAND_H
-            : (isUpcoming && countdownText) ? 16 + 68
             : isUpcoming ? 16
             : 16
           }px`,
