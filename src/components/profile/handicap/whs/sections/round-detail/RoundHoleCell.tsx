@@ -112,6 +112,34 @@ const Shape: React.FC<{
     );
   }
 
+  if (kind === 'triangle') {
+    const m = insetVB + STROKE_HALF;
+    const top = `50,${m}`;
+    const left = `${m},${100 - m}`;
+    const right = `${100 - m},${100 - m}`;
+    return (
+      <svg
+        viewBox="0 0 100 100"
+        preserveAspectRatio="xMidYMid meet"
+        style={{
+          position: 'absolute', inset: 0,
+          width: '100%', height: '100%',
+          pointerEvents: 'none',
+          overflow: 'visible',
+        }}
+        aria-hidden
+      >
+        <polygon
+          points={`${top} ${left} ${right}`}
+          fill="none"
+          stroke={stroke}
+          strokeWidth={STROKE_VB}
+          strokeLinejoin="round"
+        />
+      </svg>
+    );
+  }
+
   const origin = insetVB + STROKE_HALF;
   const dim = 100 - 2 * insetVB - STROKE_VB;
   return (
