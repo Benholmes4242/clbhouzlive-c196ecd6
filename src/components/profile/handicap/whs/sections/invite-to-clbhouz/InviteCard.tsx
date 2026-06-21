@@ -72,133 +72,67 @@ export const InviteCard: React.FC<Props> = ({ friend }) => {
   return (
     <div
       style={{
-        padding: 12,
+        display: 'flex',
+        alignItems: 'center',
+        gap: 12,
         background: 'var(--hcp-bg-1)',
         border: `1px solid ${HAIRLINE}`,
-        borderRadius: 12,
-        display: 'flex',
-        flexDirection: 'column',
-        gap: 10,
+        borderRadius: 14,
+        padding: '10px 12px',
+        fontFamily: FONT_GEIST,
       }}
     >
-      {/* Top row: avatar + name + HCP */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: 10, minWidth: 0 }}>
-        {(() => {
-          const avatarSrc = pickAvatarSrc(friend.friend_thumbnail_url, friend.friend_profile_photo_url);
-          return avatarSrc ? (
-            <div
-              style={{
-                width: 36,
-                height: 36,
-                borderRadius: 12,
-                overflow: 'hidden',
-                flexShrink: 0,
-                background: 'var(--hcp-bg-2)',
-              }}
-            >
-              <img
-                src={avatarSrc}
-                alt=""
-                style={{ width: '100%', height: '100%', objectFit: 'cover' }}
-              />
-            </div>
-          ) : null;
-        })()}
-        {!pickAvatarSrc(friend.friend_thumbnail_url, friend.friend_profile_photo_url) && (
+      {(() => {
+        const avatarSrc = pickAvatarSrc(friend.friend_thumbnail_url, friend.friend_profile_photo_url);
+        return avatarSrc ? (
           <div
             style={{
-              width: 36,
-              height: 36,
-              borderRadius: 12,
-              flexShrink: 0,
-              background: monogramColor(friend.friend_passport_id ?? 0),
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              color: '#FFFFFF',
-              fontFamily: FONT_GEIST,
-              fontSize: 15,
-              fontWeight: 800,
-              lineHeight: 1,
+              width: 42, height: 42, borderRadius: 12, overflow: 'hidden',
+              background: 'var(--hcp-bg-2)', flexShrink: 0,
+            }}
+          >
+            <img src={avatarSrc} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
+          </div>
+        ) : (
+          <div
+            style={{
+              width: 42, height: 42, borderRadius: 12, flexShrink: 0,
+              background: monogramColor(monogramLetter(friend.friend_name).charCodeAt(0)),
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+              color: '#fff', fontSize: 17, fontWeight: 800,
             }}
           >
             {monogramLetter(friend.friend_name)}
           </div>
-        )}
+        );
+      })()}
 
-        <div style={{ flex: 1, minWidth: 0 }}>
-          <div style={{ display: 'flex', alignItems: 'baseline', gap: 6, minWidth: 0 }}>
-            <div
-              style={{
-                fontFamily: FONT_GEIST,
-                fontSize: 13.5,
-                fontWeight: 800,
-                color: INK,
-                letterSpacing: '-0.01em',
-                overflow: 'hidden',
-                textOverflow: 'ellipsis',
-                whiteSpace: 'nowrap',
-                minWidth: 0,
-              }}
-            >
-              {firstName(friend.friend_name)}
-            </div>
-            <div
-              style={{
-                fontFamily: FONT_GEIST,
-                fontSize: 12,
-                fontWeight: 800,
-                color: INK,
-                fontVariantNumeric: 'tabular-nums',
-                flexShrink: 0,
-              }}
-            >
-              {fmtHcp(hcp)}
-            </div>
-          </div>
-          {courseHint && (
-            <div
-              style={{
-                marginTop: 2,
-                fontFamily: FONT_GEIST,
-                fontSize: 10,
-                fontWeight: 600,
-                color: INK_MUTE,
-                overflow: 'hidden',
-                textOverflow: 'ellipsis',
-                whiteSpace: 'nowrap',
-              }}
-            >
-              {courseHint}
-            </div>
-          )}
+      <div style={{ flex: 1, minWidth: 0 }}>
+        <div style={{ fontSize: 14, fontWeight: 800, color: INK, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+          {firstName(friend.friend_name)}{' '}
+          <span style={{ fontSize: 12, fontWeight: 700, color: INK_MUTE, fontVariantNumeric: 'tabular-nums' }}>
+            {fmtHcp(hcp)}
+          </span>
         </div>
+        {courseHint && (
+          <div style={{ fontSize: 11, color: INK_MUTE, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', marginTop: 1 }}>
+            {courseHint}
+          </div>
+        )}
       </div>
 
-      {/* Invite button — tightened */}
       <button
         onClick={handleInvite}
+        aria-label={`Invite ${firstName(friend.friend_name)} to clbhouz`}
         style={{
-          width: '100%',
-          padding: '8px 12px',
-          borderRadius: 10,
-          border: `1px solid ${HAIRLINE}`,
-          background: 'transparent',
-          color: INK,
-          fontFamily: FONT_GEIST,
-          fontSize: 11,
-          fontWeight: 800,
-          letterSpacing: '0.04em',
-          textTransform: 'uppercase',
+          flexShrink: 0,
+          width: 40, height: 40, borderRadius: 11, border: 'none',
+          background: 'linear-gradient(135deg, #F7931E, #FBBC2E)',
+          display: 'flex', alignItems: 'center', justifyContent: 'center',
           cursor: 'pointer',
-          display: 'inline-flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          gap: 5,
         }}
       >
-        <Send size={11} strokeWidth={2.2} color={INK_MUTE} />
-        Invite
+        <Send size={16} color="#1A0F02" strokeWidth={2.2} />
       </button>
     </div>
   );

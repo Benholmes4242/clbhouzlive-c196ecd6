@@ -6,6 +6,7 @@ import {
 } from '@/lib/whs/hooks';
 import { DarkSectionHeader } from '../_shared/darkAtoms';
 import InviteCard from './InviteCard';
+import InviteQuestCard from './InviteQuestCard';
 import SentInvitesSheet from './SentInvitesSheet';
 
 interface Props {
@@ -81,9 +82,7 @@ export const InviteToClbhouzV2: React.FC<Props> = ({ ownerUserId }) => {
     return (
       <section id="invite-to-clbhouz-section" style={{ marginTop: 32 }}>
         <DarkSectionHeader
-          eyebrow="YOUR INVITES"
-          title="Everyone's here"
-          sub="All your England Golf friends are already on Clbhouz 🎉"
+          eyebrow="INVITE FRIENDS"
           right={<SentBadge count={sentCount} onClick={() => setSheetOpen(true)} />}
         />
         <SentInvitesSheet open={sheetOpen} onClose={() => setSheetOpen(false)} />
@@ -94,64 +93,71 @@ export const InviteToClbhouzV2: React.FC<Props> = ({ ownerUserId }) => {
   return (
     <section id="invite-to-clbhouz-section" style={{ marginTop: 32 }}>
       <DarkSectionHeader
-        eyebrow="YOUR INVITES"
-        title="Friends on England Golf"
-        sub="Not on Clbhouz yet — invite them to share rounds."
+        eyebrow="INVITE FRIENDS"
         right={<SentBadge count={sentCount} onClick={() => setSheetOpen(true)} />}
       />
 
+      <div style={{ padding: '0 16px' }}>
+        <InviteQuestCard sentCount={sentCount} />
+      </div>
+
       {!friendsLoading && invitable.length > 0 && (
-        <div style={{ margin: '0 16px' }}>
+        <>
           <div
             style={{
-              display: 'grid',
-              gridTemplateColumns: 'minmax(0, 1fr) minmax(0, 1fr)',
-              gap: 8,
+              padding: '18px 16px 10px',
+              fontFamily: FONT,
+              fontSize: 11,
+              fontWeight: 800,
+              letterSpacing: '0.14em',
+              textTransform: 'uppercase',
+              color: 'var(--hcp-t-60)',
             }}
           >
+            Ready to invite · {invitable.length}
+          </div>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 8, padding: '0 16px' }}>
             {(showAll ? invitable : invitable.slice(0, 4)).map((f) => (
-              <InviteCard
-                key={String(f.friend_passport_id)}
-                friend={f}
-              />
+              <InviteCard key={String(f.friend_passport_id)} friend={f} />
             ))}
-
           </div>
           {invitable.length > 4 && (
-            <button
-              onClick={() => setShowAll(!showAll)}
-              style={{
-                width: '100%',
-                padding: '10px 14px',
-                marginTop: 12,
-                background: T.cardBg,
-                border: `1px solid ${T.hairline}`,
-                borderRadius: 12,
-                cursor: 'pointer',
-                fontFamily: FONT,
-                fontSize: 11,
-                fontWeight: 700,
-                color: T.inkSoft,
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                gap: 4,
-              }}
-            >
-              {showAll ? (
-                <>
-                  Show less
-                  <ChevronDown size={14} style={{ transform: 'rotate(180deg)' }} />
-                </>
-              ) : (
-                <>
-                  See all {invitable.length} invitable
-                  <ChevronDown size={14} />
-                </>
-              )}
-            </button>
+            <div style={{ padding: '0 16px' }}>
+              <button
+                onClick={() => setShowAll(!showAll)}
+                style={{
+                  width: '100%',
+                  padding: '10px 14px',
+                  marginTop: 12,
+                  background: T.cardBg,
+                  border: `1px solid ${T.hairline}`,
+                  borderRadius: 12,
+                  cursor: 'pointer',
+                  fontFamily: FONT,
+                  fontSize: 11,
+                  fontWeight: 700,
+                  color: T.inkSoft,
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  gap: 4,
+                }}
+              >
+                {showAll ? (
+                  <>
+                    Show less
+                    <ChevronDown size={14} style={{ transform: 'rotate(180deg)' }} />
+                  </>
+                ) : (
+                  <>
+                    See all {invitable.length} invitable
+                    <ChevronDown size={14} />
+                  </>
+                )}
+              </button>
+            </div>
           )}
-        </div>
+        </>
       )}
 
       <SentInvitesSheet open={sheetOpen} onClose={() => setSheetOpen(false)} />
