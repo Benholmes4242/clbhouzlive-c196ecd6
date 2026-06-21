@@ -140,28 +140,6 @@ export const RoundsThatCountCard: React.FC<Props> = ({
     return projectNextRound(last20, currentHandicap);
   }, [allScores, currentHandicap]);
 
-  const last5Avg = useMemo(() => {
-    if (!allScores) return null;
-    const diffs = allScores
-      .slice(0, 5)
-      .map((r) => r.handicap_differential)
-      .filter((d): d is number => typeof d === 'number');
-    if (diffs.length === 0) return null;
-    return diffs.reduce((a, b) => a + b, 0) / diffs.length;
-  }, [allScores]);
-
-  const oldest = useMemo(() => {
-    if (!allScores || allScores.length < 20) return null;
-    const sorted = [...allScores].sort(
-      (a, b) => new Date(a.play_date).getTime() - new Date(b.play_date).getTime(),
-    );
-    const o = sorted[0];
-    if (!o || typeof o.handicap_differential !== 'number') return null;
-    return {
-      diff: o.handicap_differential,
-      date: new Date(o.play_date).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' }),
-    };
-  }, [allScores]);
 
   const enriched = useMemo(() => {
     if (!allScores || allScores.length < 8) return null;
