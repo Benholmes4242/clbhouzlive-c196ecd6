@@ -181,143 +181,128 @@ const CourseRow: React.FC<{
   // Compact list row — replaces the old large featured row for the
   // multi-course case. Expanded mode (single course) keeps the old layout.
   if (!expanded) {
+    const isMostPlayed = view === 'most_played';
+    // Bar fraction: magnitude vs the largest in view. Most-played scales by rounds.
+    const frac = isMostPlayed
+      ? Math.max(0.14, course.rounds_played / Math.max(maxRounds, 1))
+      : Math.max(0.14, Math.abs(course.delta) / maxMag);
+    // Bar colour: green (improving / under hcp), red (over), neutral for most-played.
+    const barGradient = isMostPlayed
+      ? 'linear-gradient(90deg, #94A3B8, #64748B)'
+      : course.delta < 0
+        ? 'linear-gradient(90deg, #22C55E, var(--hcp-good-deep))'
+        : course.delta > 0
+          ? 'linear-gradient(90deg, #F87171, var(--hcp-bad))'
+          : 'linear-gradient(90deg, #CBD5E1, #94A3B8)';
+
     return (
       <div
         style={{
-          display: 'flex',
-          alignItems: 'center',
-          gap: 10,
-          padding: '10px 12px',
-          borderBottom: isLast ? 'none' : `1px solid ${T.ink08}`,
+          background: T.cardBg,
+          border: `1px solid ${T.ink08}`,
+          borderRadius: 14,
+          padding: '12px 14px',
           fontFamily: FONT,
         }}
       >
-        {/* Rank number */}
-        <span
-          style={{
-            fontSize: 13,
-            fontWeight: 800,
-            color: T.ink40,
-            width: 18,
-            fontVariantNumeric: 'tabular-nums',
-            textAlign: 'left',
-            flexShrink: 0,
-          }}
-        >
-          {rank}
-        </span>
-
-        {/* Mini thumbnail */}
-        <div
-          style={{
-            width: 28,
-            height: 28,
-            borderRadius: 6,
-            overflow: 'hidden',
-            flexShrink: 0,
-            background: course.course_thumbnail_image
-              ? `url(${course.course_thumbnail_image}) center/cover no-repeat`
-              : T.ink04,
-            position: 'relative',
-          }}
-          aria-hidden
-        >
-          {!course.course_thumbnail_image && (
-            <CourseImageFallback flagOpacity={0.22} />
-          )}
-        </div>
-
-        {/* Name + meta */}
-        <div style={{ flex: 1, minWidth: 0 }}>
-          <div
+        {/* Header row: rank + thumb + name/meta + value */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: 11 }}>
+          <span
             style={{
-              fontSize: 13,
-              fontWeight: 700,
-              color: T.ink,
-              whiteSpace: 'nowrap',
-              overflow: 'hidden',
-              textOverflow: 'ellipsis',
-              letterSpacing: '-0.005em',
+              fontSize: 13, fontWeight: 800, color: T.ink40,
+              width: 16, fontVariantNumeric: 'tabular-nums', flexShrink: 0,
             }}
           >
-            {course.course_name}
-          </div>
+            {rank}
+          </span>
+
+          {/* Thumbnail */}
           <div
             style={{
-              fontSize: 10.5,
-              color: T.ink40,
-              marginTop: 1,
-              fontWeight: 500,
-              whiteSpace: 'nowrap',
-              overflow: 'hidden',
-              textOverflow: 'ellipsis',
+              width: 34, height: 34, borderRadius: 9, overflow: 'hidden',
+              flexShrink: 0,
+              background: course.course_thumbnail_image
+                ? `url(${course.course_thumbnail_image}) center/cover no-repeat`
+                : T.ink04,
+              position: 'relative',
+            }}
+            aria-hidden
+          >
+            {!course.course_thumbnail_image && (
+              <CourseImageFallback flagOpacity={0.22} />
+            )}
+          </div>
+
+          {/* Name + meta */}
+          <div style={{ flex: 1, minWidth: 0 }}>
+            <div
+              style={{
+                fontSize: 14, fontWeight: 800, color: T.ink,
+                whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis',
+                letterSpacing: '-0.01em',
+              }}
+            >
+              {course.course_name}
+            </div>
+            <div
+              style={{
+                fontSize: 11, color: T.ink40, marginTop: 1, fontWeight: 500,
+                whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis',
+                fontVariantNumeric: 'tabular-nums',
+              }}
+            >
+              {course.course_region ? `${course.course_region} · ` : ''}
+              {course.rounds_played} {course.rounds_played === 1 ? 'round' : 'rounds'}
+            </div>
+          </div>
+
+          {/* Value (delta or rounds) */}
+          <span
+            style={{
+              fontSize: 17, fontWeight: 800,
+              color: isMostPlayed ? T.ink : valueColor,
               fontVariantNumeric: 'tabular-nums',
+              flexShrink: 0, letterSpacing: '-0.02em',
             }}
           >
-            {course.course_region ? `${course.course_region} · ` : ''}
-            {course.rounds_played} {course.rounds_played === 1 ? 'round' : 'rounds'}
-          </div>
+            {!isMostPlayed && course.delta !== 0 && (
+              <span aria-hidden style={{ fontSize: 12, verticalAlign: 1, marginRight: 1, fontWeight: 700 }}>
+                {course.delta < 0 ? '\u2193' : '\u2191'}
+              </span>
+            )}
+            {isMostPlayed
+              ? course.rounds_played
+              : course.delta !== 0
+                ? Math.abs(course.delta).toFixed(1)
+                : '0.0'}
+          </span>
         </div>
 
-        {/* Mini rounds-played bar */}
+        {/* Form bar */}
         <div
           style={{
-            width: 32,
-            height: 4,
-            background: 'var(--hcp-bg-3)',
-            borderRadius: 2,
-            position: 'relative',
+            height: 8,
+            background: 'var(--hcp-bg-2)',
+            borderRadius: 5,
             overflow: 'hidden',
-            flexShrink: 0,
+            marginTop: 10,
           }}
-          aria-label={`${course.rounds_played} of max ${maxRounds} rounds played`}
+          aria-label={
+            isMostPlayed
+              ? `${course.rounds_played} of max ${maxRounds} rounds`
+              : `Form magnitude ${Math.abs(course.delta).toFixed(1)}`
+          }
         >
           <div
             style={{
-              position: 'absolute',
-              left: 0,
-              top: 0,
-              bottom: 0,
-              width: `${Math.max(8, (course.rounds_played / Math.max(maxRounds, 1)) * 100)}%`,
-              background: 'var(--hcp-t-60)',
-              borderRadius: 2,
+              width: `${frac * 100}%`,
+              height: '100%',
+              borderRadius: 5,
+              background: barGradient,
+              transition: 'width 0.4s cubic-bezier(0.4, 0, 0.2, 1)',
             }}
           />
         </div>
-
-        {/* Delta */}
-        <span
-          style={{
-            fontSize: 15,
-            fontWeight: 800,
-            color: view === 'most_played' ? T.ink : valueColor,
-            fontVariantNumeric: 'tabular-nums',
-            minWidth: 52,
-            textAlign: 'right',
-            textShadow: 'none',
-            flexShrink: 0,
-            letterSpacing: '-0.02em',
-          }}
-        >
-          {view !== 'most_played' && course.delta !== 0 && (
-            <span
-              aria-hidden
-              style={{
-                fontSize: 11,
-                verticalAlign: 1,
-                marginRight: 1,
-                fontWeight: 700,
-              }}
-            >
-              {course.delta < 0 ? '\u2193' : '\u2191'}
-            </span>
-          )}
-          {view === 'most_played'
-            ? course.rounds_played
-            : course.delta !== 0
-              ? Math.abs(course.delta).toFixed(1)
-              : '0.0'}
-        </span>
       </div>
     );
   }
@@ -572,11 +557,9 @@ const CourseList: React.FC<{ courses: CourseForm[]; view: ViewKey; emptyCopy?: s
     <div
       style={{
         marginTop: 12,
-        background: 'var(--hcp-bg-2)',
-        border: `1px solid ${T.ink08}`,
-        borderRadius: 14,
-        overflow: 'hidden',
-        padding: '4px 0',
+        display: 'flex',
+        flexDirection: 'column',
+        gap: 8,
       }}
     >
       {courses.map((c, i) => (
