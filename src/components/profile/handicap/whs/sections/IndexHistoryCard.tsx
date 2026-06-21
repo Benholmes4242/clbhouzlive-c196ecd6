@@ -97,36 +97,6 @@ const IndexHistoryCard: React.FC<Props> = ({ connectionId }) => {
     };
   }, [points, plotW, plotH]);
 
-  const xLabels = useMemo(() => {
-    if (!chart) return [] as { x: number; text: string }[];
-    const { firstT, lastT, px } = chart;
-    const labels: { x: number; text: string }[] = [];
-    if (range === '1M') {
-      const mid = (firstT + lastT) / 2;
-      labels.push(
-        { x: px(firstT), text: fmtMonthDay(firstT) },
-        { x: px(mid), text: fmtMonthDay(mid) },
-        { x: px(lastT), text: fmtMonthDay(lastT) },
-      );
-    } else {
-      // Evenly distribute N labels across the actual data span (firstT → lastT),
-      // labelling each tick by its month. This anchors the first label to the
-      // left edge and the last to the right edge with even gaps — no calendar-
-      // boundary overflow, no overlap, no right-side short-fall.
-      const count = range === '3M' ? 3 : 5; // 3M → 3 ticks, 1Y → 5 ticks
-      const seen = new Set<string>();
-      for (let i = 0; i < count; i++) {
-        const ts = firstT + ((lastT - firstT) * i) / (count - 1);
-        const text = fmtMonth(ts);
-        // De-dupe: if two evenly-spaced ticks land in the same month (very short
-        // spans), skip the duplicate so we never render the same month twice.
-        if (seen.has(text)) continue;
-        seen.add(text);
-        labels.push({ x: px(ts), text });
-      }
-    }
-    return labels;
-  }, [chart, range]);
 
   if (isLoading || !chart) return null;
 
@@ -270,42 +240,11 @@ const IndexHistoryCard: React.FC<Props> = ({ connectionId }) => {
             </span>
           </div>
 
-          {/* X-axis labels */}
-          <div
-            style={{
-              position: 'relative',
-              height: 14,
-              marginTop: 4,
-            }}
-          >
-            {xLabels.map((l, i) => (
-              <span
-                key={i}
-                style={{
-                  position: 'absolute',
-                  left: `${(l.x / W) * 100}%`,
-                  transform:
-                    i === 0
-                      ? 'translateX(0)'
-                      : i === xLabels.length - 1
-                        ? 'translateX(-100%)'
-                        : 'translateX(-50%)',
-                  fontSize: 9.5,
-                  letterSpacing: '0.14em',
-                  fontWeight: 700,
-                  color: 'var(--hcp-t-40)',
-                  fontVariantNumeric: 'tabular-nums',
-                }}
-              >
-                {l.text}
-              </span>
-            ))}
-          </div>
 
           {/* Footer */}
           <div
             style={{
-              marginTop: 12,
+              marginTop: 6,
               padding: '12px 0 0',
               borderTop: '1px solid var(--hcp-line)',
               display: 'flex',
@@ -389,15 +328,6 @@ const RangePills: React.FC<{
 
 // ── Helpers ─────────────────────────────────────────────────
 
-function fmtMonth(ts: number): string {
-  return new Date(ts).toLocaleDateString('en-GB', { month: 'short' }).toUpperCase();
-}
-
-function fmtMonthDay(ts: number): string {
-  return new Date(ts)
-    .toLocaleDateString('en-GB', { day: 'numeric', month: 'short' })
-    .toUpperCase();
-}
 
 
 function formatMinDate(iso: string): string {
