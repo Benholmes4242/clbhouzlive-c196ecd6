@@ -30,6 +30,7 @@ interface Props {
   total: number;
   onTap?: () => void;
   youLabel?: string;
+  youAvatar?: string | null;
 }
 
 export const RivalFightCard: React.FC<Props> = ({
@@ -39,6 +40,7 @@ export const RivalFightCard: React.FC<Props> = ({
   total,
   onTap,
   youLabel = 'YOU',
+  youAvatar = null,
 }) => {
   const key = rivalKey(rivalry);
   const [dimension, setDimension] = useRivalryDimension(key);
