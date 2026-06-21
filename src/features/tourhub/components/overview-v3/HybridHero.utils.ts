@@ -116,13 +116,14 @@ export function detectTopTie(leaderboard: any[]): TopTie | null {
 // ---------- Countdown -------------------------------------------------------
 
 export function formatCountdown(start: Date, now: Date = new Date()): string {
-  const ms = start.getTime() - now.getTime();
-  const hours = ms / 3_600_000;
-  if (hours <= 48) {
-    return `STARTS ${format(start, 'EEE').toUpperCase()} ${format(start, 'h:mm a')}`;
-  }
-  const days = Math.max(1, Math.ceil(hours / 24));
-  return `STARTS ${format(start, 'MMM d').toUpperCase()} · ${days} DAYS`;
+  const ms = Math.max(0, start.getTime() - now.getTime());
+  const totalMin = Math.floor(ms / 60000);
+  const d = Math.floor(totalMin / 1440);
+  const h = Math.floor((totalMin % 1440) / 60);
+  const m = totalMin % 60;
+  if (d > 0) return `${d}d ${h}h ${m}m`;
+  if (h > 0) return `${h}h ${m}m`;
+  return `${m}m`;
 }
 
 // ---------- State derivation ------------------------------------------------
