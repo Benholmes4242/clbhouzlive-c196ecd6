@@ -1,18 +1,16 @@
 import React from 'react';
 
 interface Props {
-  /** Opacity of the white flag glyph. Default 0.12. */
+  /** Opacity of the white motif. Default 0.12. */
   opacity?: number;
 }
 
 /**
- * White flag-pin silhouette overlay sized to its parent. Renders ABOVE
- * the gradient/photo and BELOW the atmospheric/legibility scrims so the
- * scrims darken the flag along with everything else.
+ * Concentric putting-green rings overlay sized to its parent. Renders
+ * ABOVE the gradient/photo and BELOW the atmospheric/legibility scrims.
  *
- * Use as a sibling layer when no real course thumbnail is available
- * — keeps the Cinema golden-hour gradient feeling intentional rather
- * than empty.
+ * (Component name retained for import stability — it now draws rings,
+ * not a flag.)
  */
 export const FlagSilhouetteOverlay: React.FC<Props> = ({ opacity = 0.12 }) => (
   <svg
@@ -29,10 +27,11 @@ export const FlagSilhouetteOverlay: React.FC<Props> = ({ opacity = 0.12 }) => (
     }}
     aria-hidden="true"
   >
-    <g fill="currentColor" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round">
-      <line x1="32" y1="20" x2="32" y2="82" />
-      <path d="M32 22 L70 32 L32 42 Z" />
-      <circle cx="34" cy="84" r="3" />
+    <g fill="none" stroke="currentColor" strokeWidth="1.4">
+      <circle cx="50" cy="50" r="40" />
+      <circle cx="50" cy="50" r="28" />
+      <circle cx="50" cy="50" r="16" />
+      <circle cx="50" cy="50" r="5" fill="currentColor" />
     </g>
   </svg>
 );

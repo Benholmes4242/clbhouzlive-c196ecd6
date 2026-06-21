@@ -2,31 +2,27 @@ import React from 'react';
 
 /**
  * Fallback visual for when a course thumbnail can't be resolved.
- * Dark green gradient with a white outlined flag at low opacity.
+ * Sage green gradient with concentric putting-green rings at low opacity.
  *
- * Mirrors the pattern from FriendRoundCard (recently-played section)
- * so missing-thumbnail states across the app feel like one family.
- *
- * `flagOpacity` defaults to 0.08 (matches FriendRoundCard) but should
- * be raised to ~0.18 at small tile sizes (56–88px) where 8% is too
- * faint to read.
+ * `flagOpacity` (motif opacity — name retained for call-site stability)
+ * defaults to 0.3, which reads well for the rings at most tile sizes.
  */
 interface Props {
-  /** Opacity of the white flag glyph. Default 0.08. */
+  /** Opacity of the white motif. Default 0.3. */
   flagOpacity?: number;
   /** Optional override for the gradient direction. Default 135deg. */
   gradientAngle?: number;
 }
 
 export const CourseImageFallback: React.FC<Props> = ({
-  flagOpacity = 0.08,
+  flagOpacity = 0.3,
   gradientAngle = 135,
 }) => (
   <div
     style={{
       position: 'absolute',
       inset: 0,
-      background: `linear-gradient(${gradientAngle}deg, #1a3c2a 0%, #0f172a 100%)`,
+      background: `linear-gradient(${gradientAngle}deg, #46665a 0%, #2f4a40 100%)`,
     }}
     aria-hidden="true"
   >
@@ -43,10 +39,11 @@ export const CourseImageFallback: React.FC<Props> = ({
       }}
       aria-hidden="true"
     >
-      <g fill="currentColor" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round">
-        <line x1="32" y1="20" x2="32" y2="82" />
-        <path d="M32 22 L70 32 L32 42 Z" />
-        <circle cx="34" cy="84" r="3" />
+      <g fill="none" stroke="currentColor" strokeWidth="1.4">
+        <circle cx="50" cy="50" r="40" />
+        <circle cx="50" cy="50" r="28" />
+        <circle cx="50" cy="50" r="16" />
+        <circle cx="50" cy="50" r="5" fill="currentColor" />
       </g>
     </svg>
   </div>

@@ -1,5 +1,5 @@
 import React from 'react';
-import { ChevronRight, Flag } from 'lucide-react';
+import { ChevronRight } from 'lucide-react';
 import { useFriendRoundDetail } from '@/lib/whs/hooks';
 import type { WhsLastRound } from '@/lib/whs/types';
 
@@ -66,14 +66,25 @@ const Thumb: React.FC<{ src: string | null }> = ({ src }) => {
           height: 56,
           borderRadius: 12,
           flexShrink: 0,
-          background: 'linear-gradient(135deg, #1a3c2a 0%, #0f172a 100%)',
+          position: 'relative',
+          overflow: 'hidden',
+          background: 'linear-gradient(135deg, #46665a 0%, #2f4a40 100%)',
           border: '1px solid var(--hcp-line)',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
         }}
       >
-        <Flag size={20} color="#FFFFFF" strokeWidth={2.2} style={{ opacity: 0.5 }} />
+        <svg
+          viewBox="0 0 100 100"
+          preserveAspectRatio="xMidYMid meet"
+          style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', opacity: 0.3, color: '#fff' }}
+          aria-hidden
+        >
+          <g fill="none" stroke="currentColor" strokeWidth="1.4">
+            <circle cx="50" cy="50" r="40" />
+            <circle cx="50" cy="50" r="28" />
+            <circle cx="50" cy="50" r="16" />
+            <circle cx="50" cy="50" r="5" fill="currentColor" />
+          </g>
+        </svg>
       </div>
     );
   }

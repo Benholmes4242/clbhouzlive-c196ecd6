@@ -9,7 +9,7 @@ interface Props {
   glass: React.ReactNode;
 }
 
-const FALLBACK = 'linear-gradient(135deg, #1a3c2a 0%, #0f172a 100%)';
+const FALLBACK = 'linear-gradient(135deg, #46665a 0%, #2f4a40 100%)';
 
 /** 340px Cinema hero — gradient/photo, atmospheric scrims, drag handle, close X, eyebrow, optional pill, glass tile. */
 export const SheetHero: React.FC<Props> = ({ imageUrl, onClose, topEyebrow, topRightPill, glass }) => {
@@ -41,7 +41,7 @@ export const SheetHero: React.FC<Props> = ({ imageUrl, onClose, topEyebrow, topR
           }}
         />
       ) : (
-        <FlagSilhouetteOverlay opacity={0.12} />
+        <FlagSilhouetteOverlay opacity={0.26} />
       )}
       {/* atmospheric */}
       <div
