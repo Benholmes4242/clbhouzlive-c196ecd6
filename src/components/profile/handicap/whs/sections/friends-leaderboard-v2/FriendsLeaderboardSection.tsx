@@ -113,104 +113,107 @@ export const FriendsLeaderboardSection: React.FC<Props> = ({ userId, viewMode = 
         />
       )}
 
-      {/* HERO */}
-      {isLoading ? (
-        <div
-          style={{
-            margin: '0 20px 16px',
-            height: 168,
-            background: 'var(--hcp-bg-2)',
-            border: '1px solid var(--hcp-line-2)',
-            borderRadius: 16,
-          }}
-          className="animate-pulse"
-        />
-      ) : (
-        <HeroPositionCard
-          selfRow={selfRow}
-          rowAbove={cohorts.rowAbove}
-          selfRank={cohorts.selfActiveRank}
-          totalActive={cohorts.totalActive}
-          expanded={heroExpanded}
-          onToggleExpand={() => setHeroExpanded((v) => !v)}
-          viewMode={viewMode}
-          ownerFirstName={ownerFirstName}
-        />
-      )}
-
-      {/* TOP 5 + column label */}
+      {/* ===== MERGED LEADERBOARD CARD ===== */}
       <div
         style={{
-          display: 'flex',
-          alignItems: 'center',
-          padding: '0 20px 8px',
+          margin: '0 16px',
+          background: 'var(--hcp-bg-1)',
+          border: '1px solid var(--hcp-line-2)',
+          borderRadius: 18,
+          overflow: 'hidden',
         }}
       >
-        <p style={{ ...LABEL_STYLE, flex: 1 }}>TOP 5</p>
-        <p style={{ ...LABEL_STYLE, width: 32, textAlign: 'center' }}>7D</p>
-        <div style={{ width: 56 }} />
-      </div>
-
-      {isLoading ? (
-        Array.from({ length: 5 }).map((_, i) => (
-          <div
-            key={i}
-            className="animate-pulse"
-            style={{
-              margin: '0 0 1px',
-              height: 54,
-              background: 'var(--hcp-bg-2)',
-              borderRadius: 6,
-            }}
+        {/* Hero as header strip */}
+        {isLoading ? (
+          <div className="animate-pulse" style={{ height: 120, background: 'var(--hcp-bg-2)' }} />
+        ) : (
+          <HeroPositionCard
+            selfRow={selfRow}
+            rowAbove={cohorts.rowAbove}
+            selfRank={cohorts.selfActiveRank}
+            totalActive={cohorts.totalActive}
+            expanded={heroExpanded}
+            onToggleExpand={() => setHeroExpanded((v) => !v)}
+            viewMode={viewMode}
+            ownerFirstName={ownerFirstName}
+            embedded
           />
-        ))
-      ) : (
-        cohorts.topFive.map((entry) => {
-          const activeIdx = cohorts.active.findIndex((e) => e === entry);
-          const rank = activeIdx >= 0 ? activeIdx + 1 : null;
-          const delta = entry.friend_row_id
-            ? deltasData?.byFriendRowId.get(entry.friend_row_id)
-            : undefined;
-          return (
-            <LeaderboardRow
-              key={entry.is_self ? 'self' : `${entry.friend_user_id ?? ''}-${entry.friend_name}`}
-              entry={entry}
-              rank={rank}
-              isStaleRow={false}
-              rankDelta={delta}
-              onClick={entry.is_self ? undefined : () => handleRowClick(entry)}
-            />
-          );
-        })
-      )}
+        )}
 
-      {/* See full leaderboard CTA */}
-      {!isLoading && cohorts.totalActive > 0 && (
-        <button
-          type="button"
-          onClick={() => setFullLeaderboardOpen(true)}
-          style={{
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            gap: 6,
-            width: 'calc(100% - 40px)',
-            margin: '14px 20px 8px',
-            padding: '12px 16px',
-            background: 'var(--hcp-bg-1)',
-            border: '1px solid var(--hcp-line-2)',
-            borderRadius: 12,
-            color: 'var(--hcp-t-80)',
-            fontSize: 13,
-            fontWeight: 700,
-            cursor: 'pointer',
-            fontFamily: FONT,
-          }}
-        >
-          See all {cohorts.totalActive} active
-          <span style={{ fontSize: 14, color: 'var(--hcp-t-60)' }}>›</span>
-        </button>
-      )}
+        {/* Divider + TOP 5 / 7D label row (tinted strip) */}
+        {!isLoading && (
+          <div
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              padding: '10px 16px 8px',
+              background: 'var(--hcp-bg-2)',
+              borderTop: '1px solid var(--hcp-line-2)',
+            }}
+          >
+            <p style={{ ...LABEL_STYLE, flex: 1, margin: 0 }}>TOP 5</p>
+            <p style={{ ...LABEL_STYLE, width: 32, textAlign: 'center', margin: 0 }}>7D</p>
+            <div style={{ width: 56 }} />
+          </div>
+        )}
+
+        {/* Rows */}
+        {isLoading ? (
+          Array.from({ length: 5 }).map((_, i) => (
+            <div
+              key={i}
+              className="animate-pulse"
+              style={{ margin: '0 0 1px', height: 54, background: 'var(--hcp-bg-2)' }}
+            />
+          ))
+        ) : (
+          cohorts.topFive.map((entry) => {
+            const activeIdx = cohorts.active.findIndex((e) => e === entry);
+            const rank = activeIdx >= 0 ? activeIdx + 1 : null;
+            const delta = entry.friend_row_id
+              ? deltasData?.byFriendRowId.get(entry.friend_row_id)
+              : undefined;
+            return (
+              <LeaderboardRow
+                key={entry.is_self ? 'self' : `${entry.friend_user_id ?? ''}-${entry.friend_name}`}
+                entry={entry}
+                rank={rank}
+                isStaleRow={false}
+                rankDelta={delta}
+                onClick={entry.is_self ? undefined : () => handleRowClick(entry)}
+              />
+            );
+          })
+        )}
+
+        {/* See all — now the card's footer */}
+        {!isLoading && cohorts.totalActive > 0 && (
+          <button
+            type="button"
+            onClick={() => setFullLeaderboardOpen(true)}
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              gap: 6,
+              width: '100%',
+              padding: '13px 16px',
+              background: 'var(--hcp-bg-1)',
+              border: 'none',
+              borderTop: '1px solid var(--hcp-line-2)',
+              color: 'var(--hcp-t-80)',
+              fontSize: 13,
+              fontWeight: 700,
+              cursor: 'pointer',
+              fontFamily: FONT,
+            }}
+          >
+            See all {cohorts.totalActive} active
+            <span style={{ fontSize: 14, color: 'var(--hcp-t-60)' }}>›</span>
+          </button>
+        )}
+      </div>
+      {/* ===== END CARD ===== */}
 
       {/* Inactive section */}
       {!isLoading && cohorts.totalInactive > 0 && (
