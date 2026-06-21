@@ -6,6 +6,7 @@ import {
 } from '@/lib/whs/hooks';
 import { DarkSectionHeader } from '../_shared/darkAtoms';
 import InviteCard from './InviteCard';
+import InviteQuestCard from './InviteQuestCard';
 import SentInvitesSheet from './SentInvitesSheet';
 
 interface Props {
