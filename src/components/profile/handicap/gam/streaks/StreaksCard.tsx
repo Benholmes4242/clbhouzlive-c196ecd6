@@ -13,6 +13,7 @@ import { relativeTime } from '@/lib/gam/visuals';
 
 const FONT = 'Geist, -apple-system, BlinkMacSystemFont, system-ui, sans-serif';
 const AMBER = '#F7931E';
+const AMBER_DEEP = '#C97211';
 const GOLD = '#FBBC2E';
 
 interface Props {
@@ -33,6 +34,7 @@ interface StreakStateToken {
   outerGlow: string | null;
   iconBg: string;
   iconRing: string;
+  iconColor: string;
   iconOpacity: number;
   iconFilter: string | null;
   chipBg: string;
@@ -55,17 +57,18 @@ const STREAK_STATE_TOKENS: Record<StreakState, StreakStateToken> = {
     outerGlow: null,
     iconBg: 'rgba(247,147,30,0.22)',
     iconRing: 'rgba(247,147,30,0.65)',
+    iconColor: AMBER,
     iconOpacity: 1,
     iconFilter: null,
     chipBg: 'rgba(247,147,30,0.20)',
     chipBorder: AMBER,
-    chipColor: GOLD,
+    chipColor: AMBER_DEEP,
     chipPulse: true,
     chipLabel: 'AT YOUR PB',
     heroNumColor: 'var(--hcp-t-100)',
     heroNumShadow: null,
     progressFill: `linear-gradient(90deg, ${AMBER} 0%, ${GOLD} 100%)`,
-    hintColor: GOLD,
+    hintColor: AMBER_DEEP,
     hintFontWeight: 700,
   },
   active: {
@@ -75,14 +78,15 @@ const STREAK_STATE_TOKENS: Record<StreakState, StreakStateToken> = {
     outerGlow: null,
     iconBg: 'rgba(247,147,30,0.14)',
     iconRing: 'rgba(247,147,30,0.42)',
+    iconColor: AMBER,
     iconOpacity: 1,
     iconFilter: null,
     chipBg: 'rgba(247,147,30,0.16)',
     chipBorder: 'rgba(247,147,30,0.40)',
-    chipColor: GOLD,
+    chipColor: AMBER_DEEP,
     chipPulse: true,
     chipLabel: 'ACTIVE',
-    heroNumColor: GOLD,
+    heroNumColor: AMBER,
     heroNumShadow: null,
     progressFill: `linear-gradient(90deg, ${AMBER}, ${GOLD})`,
     hintColor: 'var(--hcp-t-60)',
@@ -95,6 +99,7 @@ const STREAK_STATE_TOKENS: Record<StreakState, StreakStateToken> = {
     outerGlow: null,
     iconBg: 'rgba(148,163,184,0.10)',
     iconRing: 'rgba(148,163,184,0.25)',
+    iconColor: 'var(--hcp-t-40)',
     iconOpacity: 0.7,
     iconFilter: 'grayscale(80%)',
     chipBg: 'var(--hcp-bg-2)',
@@ -323,7 +328,7 @@ const StreakHeroCard: React.FC<StreakHeroCardProps> = ({ entry, row }) => {
             flexShrink: 1,
             opacity: tokens.iconOpacity,
             filter: tokens.iconFilter ?? 'none',
-            color: GOLD,
+            color: tokens.iconColor,
           }}
         >
           <entry.Icon size={28} strokeWidth={2} />
