@@ -91,7 +91,7 @@ export const MATERIAL_PALETTES: Record<1 | 2 | 3 | 4 | 5, RarityPalette> = {
     border: 'rgba(205,127,50,0.42)',
     label: 'BRONZE',
     heroGradient: 'linear-gradient(160deg, rgba(205,127,50,0.32) 0%, rgba(139,90,43,0.16) 40%, var(--hcp-bg-1) 80%)',
-    cardSweep: RARITY_DARK.bronze.cardSweep,
+    cardSweep: 'linear-gradient(160deg, rgba(205,127,50,0.16) 0%, rgba(205,127,50,0.05) 100%)',
     topStripe: RARITY_DARK.bronze.topStripe,
     outerGlow: RARITY_DARK.bronze.outerGlow,
     metaColor: RARITY_DARK.bronze.labelFg,
