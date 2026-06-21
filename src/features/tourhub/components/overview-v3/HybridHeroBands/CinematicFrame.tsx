@@ -17,6 +17,7 @@ import { ChevronRight, Crown, Trophy } from 'lucide-react';
 import {
   CINEMATIC_FRAME_HEIGHT,
   CINEMATIC_FRAME_HEIGHT_RESULTS,
+  CINEMATIC_FRAME_HEIGHT_UPCOMING,
   CINEMATIC_SCRIM,
   COURSE_GRADIENT,
   COURSE_GRADIENT_DUSK,
@@ -28,10 +29,15 @@ import { AMBER_INK, GOLD_DEEP } from '../../../_shared/tokens';
 import type { HeroState, TopTie, TickerRow } from '../HybridHero.utils';
 import { fmtScore, formatRank, buildLeaderboardSlots, roundLabel } from '../HybridHero.utils';
 import { Ticker } from './Ticker';
+import { formatPurse } from '../../shared/TourHeroHelpers';
 
 const TICKER_BAR_H = 40;
 const CHAMPION_BAND_H = 62;
 const UPCOMING_BAND_H = 104;
+const DATA_STRIP_H = 52;
+const LIVE_CAROUSEL_H = 168;
+const LIVE_BOTTOM_H = DATA_STRIP_H + CHAMPION_BAND_H + LIVE_CAROUSEL_H;
+const RESULTS_FOOTER_H = 40;
 const BOTTOM_STACK_H = TICKER_BAR_H + CHAMPION_BAND_H;
 import { getPlayerHeadshotUrl } from '@/utils/playerHeadshot';
 import type { DefendingChampData } from '../../../hooks/useTournamentDefendingChamp';
@@ -534,6 +540,10 @@ export interface CinematicFrameProps {
   tourSlug?: string | null;
   defendingChamp?: DefendingChampData | null;
   fieldStrength?: FieldStrength | null;
+  venuePar?: number | null;
+  venueYardage?: number | null;
+  purse?: number | null;
+  winningShare?: number | null;
   onCtaTap?: () => void;
 }
 
@@ -557,6 +567,10 @@ export function CinematicFrame({
   tourSlug,
   defendingChamp = null,
   fieldStrength = null,
+  venuePar = null,
+  venueYardage = null,
+  purse = null,
+  winningShare = null,
   onCtaTap,
 }: CinematicFrameProps) {
   const useDusk =
