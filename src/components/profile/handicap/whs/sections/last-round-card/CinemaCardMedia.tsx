@@ -28,6 +28,9 @@ export const CinemaCardMedia: React.FC<Props> = ({
   counterRank,
   children,
 }) => {
+  const [imgFailed, setImgFailed] = useState(false);
+  const hasImage = !!imageUrl && !imgFailed;
+
   const dateLabel = (() => {
     try {
       return format(new Date(playDate), 'EEEE, d MMMM');
@@ -45,12 +48,22 @@ export const CinemaCardMedia: React.FC<Props> = ({
         style={{
           position: 'absolute',
           inset: 0,
-          background: imageUrl
+          background: hasImage
             ? `url(${imageUrl}) center/cover no-repeat`
             : FALLBACK_GRADIENT,
         }}
       />
-      {!imageUrl && <FlagSilhouetteOverlay opacity={0.12} />}
+      {/* Invisible probe to detect broken urls (browser dedupes with the bg request) */}
+      {imageUrl && !imgFailed && (
+        <img
+          src={imageUrl}
+          alt=""
+          aria-hidden
+          onError={() => setImgFailed(true)}
+          style={{ display: 'none' }}
+        />
+      )}
+      {!hasImage && <FlagSilhouetteOverlay opacity={0.12} />}
       {/* z=1 atmospheric */}
       <div style={{ position: 'absolute', inset: 0, background: ATMOSPHERIC, pointerEvents: 'none' }} />
       {/* z=2 legibility */}
