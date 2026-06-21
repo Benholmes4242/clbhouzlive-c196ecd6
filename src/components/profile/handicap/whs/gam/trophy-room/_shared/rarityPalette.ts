@@ -212,14 +212,13 @@ export function paletteForShowpiece(reachedTier: number, badgeId?: string): Rari
 
 /** Palette used when a card is locked. */
 export const LOCKED_PALETTE: RarityPalette = {
-  color: 'rgba(148,163,184,0.55)',
-  tint: 'rgba(148,163,184,0.06)',
-  border: 'rgba(148,163,184,0.18)',
+  color: 'rgba(100,116,139,0.85)',
+  tint: 'rgba(148,163,184,0.10)',
+  border: 'rgba(148,163,184,0.35)',
   label: 'LOCKED',
   heroGradient: 'linear-gradient(160deg, rgba(148,163,184,0.14) 0%, var(--hcp-bg-1) 70%)',
-  cardSweep:
-    'linear-gradient(150deg, var(--hcp-bg-2) 0%, #FFFFFF 70%)',
+  cardSweep: 'linear-gradient(160deg, #EEF1F5 0%, #F8FAFC 100%)',
   topStripe: null,
   outerGlow: null,
-  metaColor: 'rgba(148,163,184,0.55)',
+  metaColor: 'rgba(100,116,139,0.85)',
 };
