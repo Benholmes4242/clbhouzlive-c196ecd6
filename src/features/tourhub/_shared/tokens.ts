@@ -24,6 +24,7 @@
 // INK (text on light surface)
 // ============================================================================
 export const INK = '#0F172A';
+export const INK_DEEP = '#0A0E14';   // app dark-chrome / active-tab underline ink
 export const INK_SOFT = '#475569';
 export const INK_MUTE = '#64748B';
 export const INK_FAINT = '#94A3B8';
