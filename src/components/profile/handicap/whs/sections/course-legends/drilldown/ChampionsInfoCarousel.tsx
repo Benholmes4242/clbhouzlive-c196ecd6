@@ -1,6 +1,8 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Crown, ShieldCheck, X } from 'lucide-react';
+import { useSupabaseSession } from '@/hooks/useSupabaseSession';
+import { useWhsConnection } from '@/lib/whs/hooks';
 
 const FONT = 'Geist, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
 const KEY_EXPLAINER = 'champions_explainer_dismissed_v1';
