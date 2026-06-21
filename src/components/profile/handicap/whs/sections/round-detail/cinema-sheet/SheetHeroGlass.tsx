@@ -187,7 +187,7 @@ export const SheetHeroGlass: React.FC<Props> = ({
         )}
       </div>
 
-      <div style={{ ...HAIR, margin: '10px 0' }} />
+      <div style={{ ...HAIR, margin: '8px 0' }} />
 
       <div
         style={
