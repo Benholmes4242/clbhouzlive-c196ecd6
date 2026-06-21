@@ -8,7 +8,7 @@ import React from 'react';
 import {
   NUMERIC_STYLE,
 } from '../HybridHero.constants';
-import { INK_DEEP, SCORE_OVER_PAR_DARK_PALE } from '../../../_shared/tokens';
+import { INK_DEEP } from '../../../_shared/tokens';
 import type { TickerRow } from '../HybridHero.utils';
 import { fmtScore } from '../HybridHero.utils';
 
@@ -21,7 +21,7 @@ interface TickerProps {
 }
 
 function entryScoreColour(score: number): string {
-  if (score < 0) return SCORE_OVER_PAR_DARK_PALE; // under par -> red
+  if (score < 0) return '#DC2626'; // under par -> red (matches handicap pages)
   if (score > 0) return 'rgba(255,255,255,0.55)'; // over par -> muted white
   return 'white';
 }

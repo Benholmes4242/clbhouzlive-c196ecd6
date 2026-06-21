@@ -61,7 +61,7 @@ function resolveAvatar(e: any, tourSlug?: string | null): string | null {
 }
 function scoreColor(score: number | null | undefined): string {
   if (score == null || Number.isNaN(score)) return 'rgba(255,255,255,0.85)';
-  if (score < 0) return '#F87171';   // under par -> red
+  if (score < 0) return '#DC2626';   // under par -> red (matches handicap pages)
   if (score > 0) return 'rgba(255,255,255,0.55)'; // over par -> muted white
   return 'rgba(255,255,255,0.85)';   // even
 }
@@ -249,7 +249,7 @@ function TiedLeadersRowDark({
         style={{
           ...NUMERIC_STYLE,
           fontSize: 16, fontWeight: 800, letterSpacing: '-0.02em',
-          color: '#F87171', flexShrink: 0,
+          color: '#DC2626', flexShrink: 0,
         }}
       >
         {score}
@@ -1113,7 +1113,7 @@ export function CinematicFrame({
                   </div>
                 </div>
                 <div style={{ textAlign: 'right', flexShrink: 0 }}>
-                  <div style={{ ...NUMERIC_STYLE, fontSize: 24, fontWeight: 900, letterSpacing: '-0.02em', lineHeight: 1, color: tiedLeaders ? (tiedLeaders.score.startsWith('-') ? '#F87171' : '#fff') : scoreColor(leader.score) }}>
+                  <div style={{ ...NUMERIC_STYLE, fontSize: 24, fontWeight: 900, letterSpacing: '-0.02em', lineHeight: 1, color: tiedLeaders ? (tiedLeaders.score.startsWith('-') ? '#DC2626' : '#fff') : scoreColor(leader.score) }}>
                     {tiedLeaders ? tiedLeaders.score : fmtScore(leader.score)}
                   </div>
                   <div style={{ ...NUMERIC_STYLE, fontSize: 9, fontWeight: 600, letterSpacing: '0.1em', color: 'rgba(255,255,255,0.5)', marginTop: 3 }}>
