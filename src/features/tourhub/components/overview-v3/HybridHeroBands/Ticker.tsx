@@ -6,10 +6,9 @@
 import React from 'react';
 
 import {
-  INK,
   NUMERIC_STYLE,
 } from '../HybridHero.constants';
-import { SCORE_OVER_PAR_DARK_PALE } from '../../../_shared/tokens';
+import { INK_DEEP, SCORE_OVER_PAR_DARK_PALE } from '../../../_shared/tokens';
 import type { TickerRow } from '../HybridHero.utils';
 import { fmtScore } from '../HybridHero.utils';
 

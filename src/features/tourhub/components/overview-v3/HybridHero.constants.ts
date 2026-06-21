@@ -56,7 +56,7 @@ export const LEGIBILITY_SCRIM =
 export const CINEMATIC_SCRIM =
   'linear-gradient(to top, rgba(7,12,20,0.94) 0%, rgba(7,12,20,0.55) 32%, rgba(7,12,20,0.12) 56%, rgba(7,12,20,0.22) 100%)';
 
-export const CINEMATIC_FRAME_HEIGHT = 560;
+export const CINEMATIC_FRAME_HEIGHT = 420;
 
 // Animation
 export const MARQUEE_DURATION_SECONDS = 40;
