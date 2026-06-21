@@ -166,7 +166,7 @@ export const FriendPostcard: React.FC<Props> = ({ friend, showLowest, onClick })
         ) : (
           <>
             <div style={{ position: 'absolute', inset: 0, background: FALLBACK_BG }} />
-            <FlagSilhouetteOverlay opacity={0.18} />
+            <FlagSilhouetteOverlay opacity={0.30} />
           </>
         )}
         <div style={{ position: 'absolute', inset: 0, background: SCRIM, pointerEvents: 'none' }} />
