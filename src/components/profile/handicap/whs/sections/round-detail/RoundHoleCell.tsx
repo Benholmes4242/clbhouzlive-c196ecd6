@@ -51,21 +51,21 @@ const variantFor = (strokes: number | null, par: number): Variant => {
 };
 
 interface VariantSpec {
-  shape: 'circle' | 'square' | null;
+  shape: 'circle' | 'square' | 'triangle' | null;
   depth: 0 | 1 | 2 | 3;
   stroke: string;
 }
 
 const SPECS: Record<Variant, VariantSpec> = {
-  empty:  { shape: null,     depth: 0, stroke: HAIRLINE },
-  par:    { shape: null,     depth: 0, stroke: PAR_RING },
-  birdie: { shape: 'circle', depth: 1, stroke: UNDER },
-  eagle:  { shape: 'circle', depth: 2, stroke: UNDER },
-  alba:   { shape: 'circle', depth: 3, stroke: UNDER },
-  hio:    { shape: 'circle', depth: 3, stroke: UNDER },
-  bogey:  { shape: 'square', depth: 1, stroke: OVER },
-  doub:   { shape: 'square', depth: 2, stroke: OVER },
-  triple: { shape: 'square', depth: 3, stroke: OVER },
+  empty:  { shape: null,       depth: 0, stroke: HAIRLINE },
+  par:    { shape: null,       depth: 0, stroke: HAIRLINE },
+  birdie: { shape: 'circle',   depth: 1, stroke: SHAPE_STROKE },
+  eagle:  { shape: 'circle',   depth: 2, stroke: SHAPE_STROKE },
+  alba:   { shape: 'circle',   depth: 3, stroke: SHAPE_STROKE },
+  hio:    { shape: 'triangle', depth: 1, stroke: SHAPE_STROKE },
+  bogey:  { shape: 'square',   depth: 1, stroke: SHAPE_STROKE },
+  doub:   { shape: 'square',   depth: 2, stroke: SHAPE_STROKE },
+  triple: { shape: 'square',   depth: 3, stroke: SHAPE_STROKE },
 };
 
 /**
