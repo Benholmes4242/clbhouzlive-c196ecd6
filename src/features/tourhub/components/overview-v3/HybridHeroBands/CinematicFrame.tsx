@@ -768,7 +768,7 @@ export function CinematicFrame({
       { label: 'YDS', value: venueYardage != null ? venueYardage.toLocaleString() : '—' },
     ];
     return (
-      <div style={{ display: 'flex', gap: 7, flexWrap: 'wrap', marginTop: 12 }}>
+      <div style={{ display: 'flex', gap: 7, flexWrap: 'wrap', marginTop: 6 }}>
         {pills.map((p) => (
           <div key={p.label} style={{
             display: 'flex', alignItems: 'baseline', gap: 5,
