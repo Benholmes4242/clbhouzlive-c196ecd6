@@ -875,8 +875,9 @@ export function CinematicFrame({
           )}
         </div>
 
-        {/* Spacer absorbs slack so title+capsule sit at the base */}
-        <div style={{ flex: 1, minHeight: 16 }} />
+        {/* Spacer absorbs slack so title+capsule sit at the base (live/upcoming).
+            For results, title hugs the top and the poster centres below. */}
+        {!isResults && <div style={{ flex: 1, minHeight: 16 }} />}
 
         {/* Title block */}
         <div
