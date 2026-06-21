@@ -63,7 +63,7 @@ export const CinemaCardMedia: React.FC<Props> = ({
           style={{ display: 'none' }}
         />
       )}
-      {!hasImage && <FlagSilhouetteOverlay opacity={0.12} />}
+      {!hasImage && <FlagSilhouetteOverlay opacity={0.26} />}
       {/* z=1 atmospheric */}
       <div style={{ position: 'absolute', inset: 0, background: ATMOSPHERIC, pointerEvents: 'none' }} />
       {/* z=2 legibility */}
