@@ -6,7 +6,6 @@ import { useAllScores, useHandicapTrend } from '@/lib/whs/hooks';
 import { computeRoundDeltas, type RoundWithDelta } from './computeRoundDeltas';
 import RoundDetailSheet from '../round-detail/RoundDetailSheet';
 import SectionHeader from '../SectionHeader';
-import { fmtAbsoluteDate } from '@/lib/whs/utils/nameFormat';
 
 
 interface Props {
@@ -209,23 +208,17 @@ export const RecentRoundsCard: React.FC<Props> = ({ connectionId, viewMode = 'ow
               <div
                 style={{
                   marginTop: 8,
-                  background:
-                    'linear-gradient(180deg, var(--hcp-bg-2) 0%, var(--hcp-bg-1) 100%)',
-                  border: '1px solid var(--hcp-line)',
-                  borderRadius: 14,
-                  overflow: 'hidden',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  gap: 8,
                 }}
               >
-                {monthRounds.map((round, i) => (
-                  <div
+                {monthRounds.map((round) => (
+                  <FeedCard
                     key={round.id}
-                    className={i === monthRounds.length - 1 ? 'rr-last-row' : undefined}
-                  >
-                    <FeedCard
-                      round={round}
-                      onTap={() => setOpenScoreId(round.id)}
-                    />
-                  </div>
+                    round={round}
+                    onTap={() => setOpenScoreId(round.id)}
+                  />
                 ))}
               </div>
             </div>
@@ -462,6 +455,7 @@ interface FeedCardProps {
 const FeedCard: React.FC<FeedCardProps> = ({ round, onTap }) => {
   const courseName = round.course?.name ?? 'Unknown course';
   const deltaInfo = fmtHcpDelta(round.handicap_delta);
+  const isCounter = round.is_counter;
 
   const d = new Date(round.play_date);
   const dayOfMonth = d.getDate();
@@ -475,57 +469,68 @@ const FeedCard: React.FC<FeedCardProps> = ({ round, onTap }) => {
       style={{
         display: 'flex',
         alignItems: 'center',
+        gap: 13,
         width: '100%',
-        padding: '9px 14px',
-        gap: 12,
-        background: 'transparent',
-        border: 'none',
-        borderBottom: `1px solid ${T.hairline}`,
+        padding: '11px 13px',
+        background: T.cardBg,
+        border: '1px solid var(--hcp-line)',
+        borderRadius: 14,
         textAlign: 'left',
         fontFamily: FONT,
         cursor: 'pointer',
       }}
     >
-      {/* Date column */}
-      <div style={{ flexShrink: 0, width: 42, textAlign: 'center', lineHeight: 1 }}>
-        <div
+      {/* Score-first hero tile */}
+      <div
+        style={{
+          width: 50,
+          height: 50,
+          borderRadius: 12,
+          flexShrink: 0,
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          justifyContent: 'center',
+          background: isCounter ? 'rgba(5,150,105,0.10)' : 'var(--hcp-bg-2)',
+          border: isCounter ? '1px solid rgba(5,150,105,0.30)' : '1px solid transparent',
+        }}
+      >
+        <span
           style={{
-            fontSize: 9,
+            fontSize: 21,
             fontWeight: 800,
-            letterSpacing: '0.10em',
-            color: T.inkMute,
-            textTransform: 'uppercase',
-            lineHeight: 1,
-          }}
-        >
-          {weekday}
-        </div>
-        <div
-          style={{
-            fontSize: 19,
-            fontWeight: 800,
-            color: T.ink,
-            lineHeight: 1,
-            letterSpacing: '-0.02em',
+            color: isCounter ? 'var(--hcp-good-deep)' : T.ink,
             fontVariantNumeric: 'tabular-nums',
-            marginTop: 3,
+            letterSpacing: '-0.03em',
+            lineHeight: 1,
           }}
         >
-          {dayOfMonth}
-        </div>
+          {round.adjusted_gross ?? '\u2014'}
+        </span>
+        <span
+          style={{
+            fontSize: 8,
+            fontWeight: 800,
+            letterSpacing: '0.06em',
+            color: isCounter ? 'var(--hcp-good-deep)' : T.inkFaded,
+            marginTop: 2,
+          }}
+        >
+          GROSS
+        </span>
       </div>
 
-      {/* Body */}
+      {/* Course + meta */}
       <div style={{ flex: 1, minWidth: 0 }}>
         <div
           style={{
-            fontSize: 13,
+            fontSize: 14,
             fontWeight: 800,
             color: T.ink,
             letterSpacing: '-0.005em',
+            whiteSpace: 'nowrap',
             overflow: 'hidden',
             textOverflow: 'ellipsis',
-            whiteSpace: 'nowrap',
             lineHeight: 1.15,
           }}
         >
@@ -533,38 +538,28 @@ const FeedCard: React.FC<FeedCardProps> = ({ round, onTap }) => {
         </div>
         <div
           style={{
-            fontSize: 10.5,
+            fontSize: 11,
             fontWeight: 600,
             color: T.inkMute,
             display: 'inline-flex',
             alignItems: 'center',
             gap: 5,
             flexWrap: 'wrap',
-            lineHeight: 1.15,
+            lineHeight: 1.2,
             marginTop: 2,
           }}
         >
-          <span>{fmtAbsoluteDate(round.play_date)}</span>
+          <span>{weekday} {dayOfMonth}</span>
+          {isCounter && (
+            <>
+              <span aria-hidden style={{ width: 2.5, height: 2.5, borderRadius: '50%', background: 'var(--hcp-t-30)' }} />
+              <span style={{ color: 'var(--hcp-good-deep)', fontWeight: 700 }}>counts</span>
+            </>
+          )}
           {deltaInfo && (
             <>
-              <span
-                aria-hidden
-                style={{
-                  display: 'inline-block',
-                  width: 2.5,
-                  height: 2.5,
-                  borderRadius: '50%',
-                  background: 'var(--hcp-t-30)',
-                }}
-              />
-              <span
-                style={{
-                  color: deltaInfo.color,
-                  fontWeight: 700,
-                  letterSpacing: '0.02em',
-                  textShadow: deltaInfo.glow,
-                }}
-              >
+              <span aria-hidden style={{ width: 2.5, height: 2.5, borderRadius: '50%', background: 'var(--hcp-t-30)' }} />
+              <span style={{ color: deltaInfo.color, fontWeight: 700, letterSpacing: '0.02em', textShadow: deltaInfo.glow }}>
                 HCP {deltaInfo.sign} {deltaInfo.value}
               </span>
             </>
@@ -572,53 +567,25 @@ const FeedCard: React.FC<FeedCardProps> = ({ round, onTap }) => {
         </div>
       </div>
 
-      {/* Right: gross + diff */}
-      <div style={{ flexShrink: 0, display: 'flex', alignItems: 'center', gap: 10 }}>
-        <span
-          aria-label={`Gross score ${round.adjusted_gross ?? ''}${round.is_counter ? ', counts toward index' : ''}`}
-        >
-          <span
-            style={{
-              display: 'inline-flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              padding: '6px 12px',
-              borderRadius: 999,
-              border: round.is_counter
-                ? '1.5px solid var(--hcp-good-deep)'
-                : '1.5px solid transparent',
-              boxSizing: 'border-box',
-              minWidth: 56,
-            }}
-          >
-            <span
-              style={{
-                fontSize: round.is_counter ? 17 : 22,
-                fontWeight: round.is_counter ? 800 : 200,
-                color: T.ink,
-                fontVariantNumeric: 'tabular-nums',
-                letterSpacing: '-0.03em',
-                lineHeight: 0.9,
-              }}
-            >
-              {round.adjusted_gross ?? '\u2014'}
-            </span>
-          </span>
-        </span>
-        <div
-          style={{
-            fontSize: 12,
-            fontWeight: 700,
-            color: diffColor(round.handicap_differential),
-            fontVariantNumeric: 'tabular-nums',
-            textShadow: 'none',
-            minWidth: 36,
-            textAlign: 'right',
-          }}
-        >
-          {fmtDiff(round.handicap_differential)}
-        </div>
-      </div>
+      {/* Differential pill */}
+      <span
+        style={{
+          flexShrink: 0,
+          fontSize: 13,
+          fontWeight: 800,
+          color: diffColor(round.handicap_differential),
+          background:
+            round.handicap_differential != null && round.handicap_differential < 0
+              ? 'rgba(5,150,105,0.10)'
+              : 'rgba(220,38,38,0.10)',
+          fontVariantNumeric: 'tabular-nums',
+          padding: '6px 10px',
+          borderRadius: 999,
+          letterSpacing: '-0.01em',
+        }}
+      >
+        {fmtDiff(round.handicap_differential)}
+      </span>
     </button>
   );
 };
