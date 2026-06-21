@@ -575,8 +575,6 @@ export function CinematicFrame({
     dateRange = format(endD, 'MMM d');
   }
   const venueLine = [venueName, venueCity].filter(Boolean).join(', ');
-  const metaParts = [dateRange, venueLine].filter(Boolean);
-  const metaLine = metaParts.length ? metaParts.join(' · ') : null;
 
   // Top meta: LIVE · ROUND N (live), FINAL RESULT (results), UPCOMING pill (upcoming)
   const isLive = state.kind === 'live';
@@ -828,21 +826,6 @@ export function CinematicFrame({
             </span>
           ) : roundLabel_ ? (
             <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-              {isLive && (
-                <span
-                  aria-hidden="true"
-                  className="hybrid-live-pulse"
-                  style={{
-                    width: 7,
-                    height: 7,
-                    borderRadius: '50%',
-                    background: '#22C55E',
-                    boxShadow: '0 0 0 3px rgba(34,197,94,0.25)',
-                    display: 'inline-block',
-                    flexShrink: 0,
-                  }}
-                />
-              )}
               {isResults && (
                 <Trophy
                   size={12}
@@ -865,20 +848,20 @@ export function CinematicFrame({
               </span>
             </div>
           ) : <span />}
-          {tourLabel && (
+          {dateRange && (
             <span
               style={{
                 ...NUMERIC_STYLE,
                 fontSize: 11,
                 fontWeight: 700,
                 letterSpacing: '0.14em',
-                color: 'rgba(255,255,255,0.65)',
+                color: 'white',
                 textShadow: '0 1px 3px rgba(0,0,0,0.45)',
                 textTransform: 'uppercase',
                 whiteSpace: 'nowrap',
               }}
             >
-              {tourLabel.toUpperCase()}
+              {dateRange}
             </span>
           )}
         </div>
@@ -896,30 +879,6 @@ export function CinematicFrame({
             marginBottom: 16,
           }}
         >
-          {metaLine && (
-            <div
-              style={{
-                display: 'flex',
-                alignItems: 'center',
-                gap: 8,
-                fontSize: 13,
-                fontWeight: 600,
-                color: 'rgba(255,255,255,0.72)',
-                textShadow: '0 1px 3px rgba(0,0,0,0.5)',
-              }}
-            >
-              <span
-                style={{
-                  overflow: 'hidden',
-                  textOverflow: 'ellipsis',
-                  whiteSpace: 'nowrap',
-                  minWidth: 0,
-                }}
-              >
-              {metaLine}
-              </span>
-            </div>
-          )}
           <h1
             style={{
               margin: 0,
@@ -940,6 +899,22 @@ export function CinematicFrame({
           >
             {title}
           </h1>
+          {venueLine && (
+            <div
+              style={{
+                fontSize: 13,
+                fontWeight: 600,
+                color: 'white',
+                textShadow: '0 1px 3px rgba(0,0,0,0.5)',
+                overflow: 'hidden',
+                textOverflow: 'ellipsis',
+                whiteSpace: 'nowrap',
+                minWidth: 0,
+              }}
+            >
+              {venueLine}
+            </div>
+          )}
           {countdownText && (
             <div
               style={{
