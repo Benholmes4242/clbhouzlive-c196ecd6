@@ -6,10 +6,10 @@ import {
   FONT,
   TAB,
   BG_1,
-  
   GREEN,
   RED,
   T35,
+  T100,
   LINE,
 } from '@/pages/rivalry-page/_shared/tokens';
 import { StatRow } from './StatRow';
