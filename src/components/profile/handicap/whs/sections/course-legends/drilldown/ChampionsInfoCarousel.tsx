@@ -72,7 +72,7 @@ const ExplainerContent: React.FC<{ window: 'all_time' | '90d' }> = ({ window }) 
   </>
 );
 
-const ProvenanceContent: React.FC<{ onSync: () => void }> = ({ onSync }) => (
+const ProvenanceContent: React.FC<{ onSync: () => void; isSynced: boolean }> = ({ onSync, isSynced }) => (
   <>
     <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 5 }}>
       <ShieldCheck size={12} color="var(--hcp-gold-text)" strokeWidth={2.6} />
@@ -83,14 +83,18 @@ const ProvenanceContent: React.FC<{ onSync: () => void }> = ({ onSync }) => (
     <p style={{ fontSize: 12, fontWeight: 500, color: 'var(--hcp-t-60)', lineHeight: 1.55, margin: 0 }}>
       That ace only counts if it's on your{' '}
       <b style={{ color: 'var(--hcp-t-100)', fontWeight: 700 }}>official handicap record</b>.
-      Log every round with your club or golf union to register it on your WHS record — no logged rounds, no crowns.{' '}
-      <b
-        role="button"
-        onClick={onSync}
-        style={{ color: 'var(--hcp-gold-text)', fontWeight: 700, whiteSpace: 'nowrap', cursor: 'pointer' }}
-      >
-        Sync your handicap ›
-      </b>
+      Log every round with your club or golf union to register it on your WHS record — no logged rounds, no crowns.
+      {!isSynced && (
+        <>{' '}
+          <b
+            role="button"
+            onClick={onSync}
+            style={{ color: 'var(--hcp-gold-text)', fontWeight: 700, whiteSpace: 'nowrap', cursor: 'pointer' }}
+          >
+            Sync your handicap ›
+          </b>
+        </>
+      )}
     </p>
   </>
 );
