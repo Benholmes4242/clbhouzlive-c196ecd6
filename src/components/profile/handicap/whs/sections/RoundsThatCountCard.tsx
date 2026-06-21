@@ -46,7 +46,7 @@ const WEEKDAY = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 
 
 // Chart geometry
-const CHART_H = 150;
+const CHART_H = 96;
 const Y_AXIS_W = 30;
 const CHART_TOP = 14;
 const CHART_BOTTOM = 14;
@@ -234,10 +234,19 @@ export const RoundsThatCountCard: React.FC<Props> = ({
     <section style={{ marginTop: 32 }}>
       <SectionHeader
         eyebrow="ROUNDS THAT COUNT"
-        title={headerTitle}
+        title=""
       />
 
       <div style={{ padding: '0 20px' }}>
+
+      {/* ── CARD WRAPPER ─────────────────────────────────────────────────── */}
+      <div style={{
+        background: 'var(--hcp-bg-1)',
+        border: '1px solid var(--hcp-line)',
+        borderRadius: 20,
+        padding: 18,
+        fontFamily: FONT_GEIST,
+      }}>
 
       {/* ── NEXT-ROUND BRIEFING (stacked line) ────────────────────────────── */}
       {projection && projection.hasData && (
@@ -303,79 +312,11 @@ export const RoundsThatCountCard: React.FC<Props> = ({
           .latestHalo { animation: pulseHeartbeat 2.4s ease-in-out infinite; transform-origin: center; }
         `}</style>
         <div style={{ padding: '0 4px' }}>
-          {/* Y-axis unit label + LATEST legend */}
-          <div style={{
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'space-between',
-            marginBottom: 4,
-            paddingLeft: 4,
-            gap: 8,
-          }}>
-            <span style={{
-              fontSize: 9,
-              fontWeight: 800,
-              color: D_T60,
-              letterSpacing: '0.16em',
-              textTransform: 'uppercase',
-            }}>
-              SCORE DIFF · LAST{' '}
-              <span style={{ color: D_T100, fontVariantNumeric: 'tabular-nums' }}>
-                {colCount}
-              </span>{' '}
-              ROUNDS
-            </span>
-            <div style={{
-              display: 'flex', alignItems: 'center', gap: 10,
-              fontSize: 9, fontWeight: 700, color: D_T60,
-              letterSpacing: '0.04em',
-            }}>
-              <span style={{ display: 'inline-flex', alignItems: 'center', gap: 4 }}>
-                <span style={{
-                  width: 8, height: 8, borderRadius: '50%',
-                  background: AMBER_GOLD_GRAD, border: 'none',
-                }} />
-                COUNTER
-              </span>
-              <span style={{ display: 'inline-flex', alignItems: 'center', gap: 4 }}>
-                <span style={{
-                  width: 8, height: 8, borderRadius: '50%',
-                  background: 'var(--hcp-bg-0)', border: `1.5px solid ${AMBER}`,
-                }} />
-                NON
-              </span>
-              <span style={{
-                display: 'inline-flex', alignItems: 'center', gap: 4,
-                color: GREEN, fontWeight: 800,
-                fontVariantNumeric: 'tabular-nums',
-              }}>
-                <span style={{
-                  width: 10, height: 2, background: GREEN, borderRadius: 1,
-                }} />
-                CUT {projection && projection.hasData ? `<${fmtDiff(projection.cutTarget)}` : ''}
-              </span>
-            </div>
-          </div>
+
 
           <div style={{
             position: 'relative', display: 'flex', height: CHART_H,
           }}>
-            {/* Y-axis ticks */}
-            <div style={{
-              width: Y_AXIS_W, position: 'relative', flexShrink: 0,
-            }}>
-              {ticks.map(t => (
-                <div key={t} style={{
-                  position: 'absolute', top: yFor(t) - 7,
-                  right: 6, fontSize: 11.5, fontWeight: 700,
-                  color: D_T60, fontFamily: FONT_GEIST,
-                  fontVariantNumeric: 'tabular-nums',
-                  textAlign: 'right', width: '100%',
-                }}>
-                  {fmtAxis(t)}
-                </div>
-              ))}
-            </div>
 
             {/* Plot area */}
             <div
@@ -422,28 +363,6 @@ export const RoundsThatCountCard: React.FC<Props> = ({
                 userSelect: 'none',
               }}
             >
-              {/* Permanent latest emphasis band — centered on the last dot */}
-              {(() => {
-                const latestIdx = enriched.rounds.length - 1;
-                if (latestIdx < 0) return null;
-                const colWidth = 100 / enriched.rounds.length;
-                const bandWidth = colWidth * 0.9;
-                const centerPct = xFor(latestIdx);
-                return (
-                  <div style={{
-                    position: 'absolute',
-                    top: 0,
-                    bottom: 0,
-                    left: `${centerPct - bandWidth / 2}%`,
-                    width: `${bandWidth}%`,
-                    background: 'rgba(247,147,30,0.08)',
-                    opacity: 1,
-                    borderRadius: 6,
-                    pointerEvents: 'none',
-                    zIndex: 0,
-                  }} />
-                );
-              })()}
 
               {/* Selected highlight column */}
               {selectedIdx >= 0 && (
@@ -461,19 +380,6 @@ export const RoundsThatCountCard: React.FC<Props> = ({
               )}
 
               {/* Gridlines */}
-              <svg width="100%" height={CHART_H} style={{
-                position: 'absolute', inset: 0, pointerEvents: 'none',
-              }}>
-                {ticks.map(t => (
-                  <line key={t}
-                    x1="0" y1={yFor(t)} x2="100%" y2={yFor(t)}
-                    stroke="var(--hcp-line)" strokeWidth={1}
-                    strokeDasharray="2 4"
-                    opacity={0.6}
-                    vectorEffect="non-scaling-stroke"
-                  />
-                ))}
-              </svg>
 
               {/* Line + dots */}
               <svg width="100%" height={CHART_H}
@@ -679,101 +585,50 @@ export const RoundsThatCountCard: React.FC<Props> = ({
             </div>
           </div>
 
-          {/* Date labels — thinned. Every column keeps its slot for click-targets,
-              but only N labels render text to prevent rotated overlap. */}
+          {/* Chromeless chart labels */}
           <div style={{
-            display: 'flex', marginTop: 6, marginLeft: Y_AXIS_W,
-            paddingBottom: 2,
+            display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+            marginTop: 8,
           }}>
-            {(() => {
-              const total = enriched.rounds.length;
-              const targetCount = 5;
-              const stride = Math.max(1, Math.floor(total / targetCount));
-              const visibleIdx = new Set<number>();
-              for (let i = 0; i < total; i += stride) visibleIdx.add(i);
-              visibleIdx.add(total - 1);
-              return enriched.rounds.map((r, i) => {
-                const d = new Date(r.play_date);
-                const isLatest = i === total - 1;
-                const showLabel = visibleIdx.has(i);
-                return (
-                  <button
-                    key={r.id}
-                    onClick={() => {
-                      setSelectedId(r.id);
-                      setSheetScoreId(r.id);
-                    }}
-                    aria-label={`Round on ${d.toLocaleDateString()}, tap to see details`}
-                    style={{
-                      flex: 1, textAlign: 'center',
-                      background: 'transparent', border: 'none',
-                      padding: '4px 0', cursor: 'pointer',
-                      visibility: showLabel ? 'visible' : 'hidden',
-                    }}
-                  >
-                    <div style={{
-                      fontSize: 9, fontWeight: isLatest ? 700 : 600,
-                      color: isLatest ? D_T100 : D_T40,
-                      letterSpacing: '0.04em',
-                    }}>
-                      {WEEKDAY[d.getDay()]}
-                    </div>
-                    <div style={{
-                      fontSize: 9, fontWeight: isLatest ? 700 : 600,
-                      color: isLatest ? D_T100 : D_T40,
-                      fontFamily: FONT_GEIST,
-                      fontVariantNumeric: 'tabular-nums',
-                      letterSpacing: '0.04em',
-                      marginTop: 1,
-                    }}>
-                      {d.getDate()}
-                    </div>
-                  </button>
-                );
-              });
-            })()}
+            <span style={{
+              fontSize: 9.5, fontWeight: 800, color: D_T40,
+              letterSpacing: '0.12em', textTransform: 'uppercase',
+            }}>
+              Score diff · last <span style={{ color: D_T60 }}>{colCount}</span>
+            </span>
+            {projection && projection.hasData && (
+              <span style={{
+                display: 'inline-flex', alignItems: 'center', gap: 5,
+                fontSize: 9.5, fontWeight: 800, color: GREEN,
+                letterSpacing: '0.04em',
+              }}>
+                <span style={{ width: 12, height: 2, background: GREEN, borderRadius: 1 }} />
+                CUT {fmtDiff(projection.cutTarget)}
+              </span>
+            )}
           </div>
+
         </div>
       </div>
 
-      {/* Tick connectors — slim, anchor stat row to chart */}
-      <div style={{
-        display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)',
-        padding: '0 1px', marginTop: 2,
-      }}>
-        <div style={{ display: 'flex', justifyContent: 'center' }}>
-          <div style={{ width: 1, height: 8, background: GREEN, opacity: 0.55 }} />
-        </div>
-        <div style={{ display: 'flex', justifyContent: 'center' }}>
-          <div style={{ width: 1, height: 8, background: INK_40 }} />
-        </div>
-        <div style={{ display: 'flex', justifyContent: 'center' }}>
-          <div style={{ width: 1, height: 8, background: RED, opacity: 0.55 }} />
-        </div>
-      </div>
-
-      {/* 3-up stat row — chromeless, hairline-divided */}
-      <div style={{
-        display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)',
-        borderTop: `0.5px solid ${INK_10}`,
-        borderBottom: `1px solid ${D_LINE}`,
-      }}>
-        <StatCell
-          label="BEST" value={enriched.minDiff} dotColor={GREEN} valueColor={GREEN}
-          active={selectedRound.id === bestRound.id}
+      {/* BEST / AVG / WORST — contained chips */}
+      <div style={{ display: 'flex', gap: 8, marginTop: 16 }}>
+        <Chip
+          label="BEST" value={enriched.minDiff} color={GREEN}
           onClick={() => setSelectedId(bestRound.id)}
-          withRightBorder
         />
-        <StatCell
-          label="AVG" value={enriched.avgDiff} dotColor="var(--hcp-t-60)" valueColor="var(--hcp-t-100)"
-          disabled withRightBorder
+        <Chip
+          label="AVG" value={enriched.avgDiff} color={INK}
         />
-        <StatCell
-          label="WORST" value={enriched.maxDiff} dotColor={RED} valueColor={RED}
-          active={selectedRound.id === worstRound.id}
+        <Chip
+          label="WORST" value={enriched.maxDiff} color={RED}
           onClick={() => setSelectedId(worstRound.id)}
         />
       </div>
+
+      {/* ── CLOSE CARD WRAPPER ───────────────────────────────────────────── */}
+      </div>
+
 
 
       {/* NOTE: Next-round target pair + oldest-round caption moved to NextRoundWatch.
@@ -882,6 +737,42 @@ const StatCell: React.FC<{
     </button>
   );
 };
+
+// ── Chip ──────────────────────────────────────────────────────────────────
+const Chip: React.FC<{
+  label: string;
+  value: number | null;
+  color: string;
+  onClick?: () => void;
+}> = ({ label, value, color, onClick }) => (
+  <button
+    onClick={onClick}
+    disabled={!onClick}
+    style={{
+      flex: 1,
+      display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+      background: 'var(--hcp-bg-2, #F8FAFC)',
+      border: '1px solid var(--hcp-line)',
+      borderRadius: 12,
+      padding: '10px 12px',
+      cursor: onClick ? 'pointer' : 'default',
+      fontFamily: FONT_GEIST,
+    }}
+  >
+    <span style={{
+      fontSize: 9.5, fontWeight: 800, color: 'var(--hcp-t-60)',
+      letterSpacing: '0.12em', textTransform: 'uppercase',
+    }}>
+      {label}
+    </span>
+    <span style={{
+      fontSize: 18, fontWeight: 800, color,
+      fontVariantNumeric: 'tabular-nums', letterSpacing: '-0.02em',
+    }}>
+      {value == null ? '—' : fmtDiff(value)}
+    </span>
+  </button>
+);
 
 
 
