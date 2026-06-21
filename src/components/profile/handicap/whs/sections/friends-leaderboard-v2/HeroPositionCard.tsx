@@ -1,11 +1,9 @@
 import React from 'react';
 import { firstName, initials } from '@/lib/whs/utils/initials';
 import { pickAvatarSrc } from '@/lib/whs/utils/avatarSrc';
-import { reformatFriendName } from '@/lib/whs/utils/nameFormat';
 import { fmtHcp } from '@/lib/whs/format';
 import { useHandicapPercentile } from '@/lib/whs/usePercentile';
-import { useFriendRecentRounds } from '@/lib/whs/hooks';
-import type { FriendLeaderboardEntry, FriendRecentRound } from '@/lib/whs/types';
+import type { FriendLeaderboardEntry } from '@/lib/whs/types';
 
 interface Props {
   /** The self row from the leaderboard cohort. */
