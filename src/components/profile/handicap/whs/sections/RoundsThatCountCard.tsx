@@ -251,7 +251,7 @@ export const RoundsThatCountCard: React.FC<Props> = ({
       {/* ── NEXT-ROUND BRIEFING (stacked line) ────────────────────────────── */}
       {projection && projection.hasData && (
         <div style={{
-          marginBottom: 10,
+          marginBottom: 8,
           fontFamily: FONT_GEIST,
         }}>
           {/* Primary: what to shoot to be cut */}
