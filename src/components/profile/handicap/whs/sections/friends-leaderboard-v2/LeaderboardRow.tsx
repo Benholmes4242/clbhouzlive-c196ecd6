@@ -1,6 +1,6 @@
 import React from 'react';
-import { initials } from '@/lib/whs/utils/initials';
 import { pickAvatarSrc } from '@/lib/whs/utils/avatarSrc';
+import { getInitialsFromName, getAvatarFallbackColor } from '@/lib/avatarFallback';
 import { reformatFriendName } from '@/lib/whs/utils/nameFormat';
 import { fmtHcp } from '@/lib/whs/format';
 import type { FriendLeaderboardEntry, FriendLeaderboardRankDelta } from '@/lib/whs/types';
@@ -181,36 +181,41 @@ export const LeaderboardRow: React.FC<Props> = ({ entry, rank, isStaleRow, onCli
           paddingLeft: 6,
         }}
       >
-        <div
-          style={{
-            width: 33,
-            height: 33,
-            borderRadius: '34%',
-            overflow: 'hidden',
-            background: T.bg3,
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            color: T.inkSoft,
-            flexShrink: 0,
-            fontSize: 12,
-            fontWeight: 800,
-            letterSpacing: '-0.01em',
-          }}
-        >
-          {(() => {
-            const avatarSrc = pickAvatarSrc(entry.friend_thumbnail_url, entry.friend_profile_photo_url);
-            return avatarSrc ? (
-              <img
-                src={avatarSrc}
-                alt=""
-                style={{ width: '100%', height: '100%', objectFit: 'cover' }}
-              />
-            ) : (
-              <span>{initials(entry.friend_name)}</span>
-            );
-          })()}
-        </div>
+        {(() => {
+          const avatarSrc = pickAvatarSrc(entry.friend_thumbnail_url, entry.friend_profile_photo_url);
+          const fbBg = getAvatarFallbackColor(
+            entry.friend_user_id ?? (entry as any).friend_row_id ?? entry.friend_name
+          );
+          return (
+            <div
+              style={{
+                width: 33,
+                height: 33,
+                borderRadius: '34%',
+                overflow: 'hidden',
+                background: avatarSrc ? T.bg3 : fbBg,
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                color: '#fff',
+                flexShrink: 0,
+                fontSize: 12,
+                fontWeight: 800,
+                letterSpacing: '-0.01em',
+              }}
+            >
+              {avatarSrc ? (
+                <img
+                  src={avatarSrc}
+                  alt=""
+                  style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                />
+              ) : (
+                <span>{getInitialsFromName(entry.friend_name) || '?'}</span>
+              )}
+            </div>
+          );
+        })()}
 
         <div style={{ minWidth: 0, flex: 1 }}>
           <div

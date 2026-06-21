@@ -1,6 +1,7 @@
 import React from 'react';
-import { firstName, initials } from '@/lib/whs/utils/initials';
+import { firstName } from '@/lib/whs/utils/initials';
 import { pickAvatarSrc } from '@/lib/whs/utils/avatarSrc';
+import { getInitialsFromName, getAvatarFallbackColor } from '@/lib/avatarFallback';
 import { fmtHcp } from '@/lib/whs/format';
 import { useHandicapPercentile } from '@/lib/whs/usePercentile';
 import type { FriendLeaderboardEntry } from '@/lib/whs/types';
@@ -61,8 +62,11 @@ export const HeroPositionCard: React.FC<Props> = ({
   if (!selfRow) return null;
 
   const yourHcp = selfRow.friend_handicap_index;
-  const yourIsPlus = yourHcp != null && yourHcp < 0;
   const yourClub = selfRow.friend_home_club ?? null;
+  const selfPhoto = pickAvatarSrc(selfRow.friend_thumbnail_url, selfRow.friend_profile_photo_url);
+  const selfFbBg = getAvatarFallbackColor(
+    selfRow.friend_user_id ?? (selfRow as any).friend_row_id ?? selfRow.friend_name
+  );
 
   const percentileTop =
     percentileQuery.data?.available === true ? percentileQuery.data.percentile_top : null;
@@ -91,23 +95,20 @@ export const HeroPositionCard: React.FC<Props> = ({
           borderRadius: 14,
           overflow: 'hidden',
           flexShrink: 0,
-          background: T.bg3,
+          background: selfPhoto ? T.bg3 : selfFbBg,
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
-          color: T.inkSoft,
+          color: '#fff',
           fontSize: 16,
           fontWeight: 800,
         }}
       >
-        {(() => {
-          const src = pickAvatarSrc(selfRow.friend_thumbnail_url, selfRow.friend_profile_photo_url);
-          return src ? (
-            <img src={src} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-          ) : (
-            <span>{initials(selfRow.friend_name)}</span>
-          );
-        })()}
+        {selfPhoto ? (
+          <img src={selfPhoto} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+        ) : (
+          <span>{getInitialsFromName(selfRow.friend_name) || '?'}</span>
+        )}
       </div>
 
       {/* Rank + percentile + hcp/club */}
@@ -126,8 +127,8 @@ export const HeroPositionCard: React.FC<Props> = ({
           )}
         </div>
         <p style={{ margin: '3px 0 0', fontSize: 11, fontWeight: 500, color: T.inkMute, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-          HCP <span style={{ fontWeight: 700, color: yourIsPlus ? T.amber : T.ink, fontVariantNumeric: 'tabular-nums' }}>{fmtHcp(yourHcp)}</span>
-          {yourClub && <span style={{ color: T.inkFaded }}> · {yourClub}</span>}
+          HCP <span style={{ fontVariantNumeric: 'tabular-nums' }}>{fmtHcp(yourHcp)}</span>
+          {yourClub && <span> · {yourClub}</span>}
         </p>
       </div>
 
