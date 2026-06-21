@@ -76,7 +76,7 @@ const labelStyle: React.CSSProperties = {
   letterSpacing: '0.16em',
   textTransform: 'uppercase',
   fontFamily: FONT_GEIST,
-  marginBottom: 3,
+  marginBottom: 2,
 };
 
 const valueStyle = (color: string, size: number = 22): React.CSSProperties => ({
