@@ -3,7 +3,7 @@ import type { PlayedCourseRow } from '@/hooks/gam/useUserPlayedCourses';
 import type { LegendCategory } from '@/lib/gam/types';
 import type { CourseLegendHolderRow } from '@/hooks/gam/useCourseLegendHolders';
 import { Skeleton, EmptyStub } from '../../../../gam/_shared/GamAtoms';
-import SubsectionEyebrow from '../_shared/SubsectionEyebrow';
+import CollapsibleSubsection from '../_shared/CollapsibleSubsection';
 import CourseLegendsCard from '../CourseLegendsCard';
 import type { CourseSelection } from '../types';
 
