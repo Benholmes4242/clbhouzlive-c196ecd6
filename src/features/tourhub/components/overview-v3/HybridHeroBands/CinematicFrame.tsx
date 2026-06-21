@@ -34,8 +34,7 @@ import { formatPurse } from '../../shared/TourHeroHelpers';
 const TICKER_BAR_H = 40;
 const CHAMPION_BAND_H = 62;
 const UPCOMING_BAND_H = 104;
-const DATA_STRIP_H = 52;
-const LIVE_BOTTOM_H = DATA_STRIP_H + CHAMPION_BAND_H + TICKER_BAR_H;
+const LIVE_BOTTOM_H = CHAMPION_BAND_H + TICKER_BAR_H;
 const RESULTS_FOOTER_H = 40;
 const BOTTOM_STACK_H = TICKER_BAR_H + CHAMPION_BAND_H;
 import { getPlayerHeadshotUrl } from '@/utils/playerHeadshot';
@@ -761,50 +760,31 @@ export function CinematicFrame({
     ? upcomingFooter
     : `Full leaderboard${fieldSize > 0 ? ` · ${fieldSize} players` : ''}`;
 
-  // ---- DataStrip / PlayerCarousel helpers ------------------------------------
-  const parStr = venuePar != null ? String(venuePar) : '—';
-  const yardageStr = venueYardage != null ? venueYardage.toLocaleString() : '—';
-  const purseStr = purse != null ? formatPurse(purse) || '—' : '—';
-  const winShareStr = winningShare != null ? formatPurse(winningShare) || '—' : '—';
-  const fieldStr = fieldSize > 0 ? String(fieldSize) : '—';
+  // ---- GlassPills (floating over photo, under venue) ------------------------
+  const GlassPills = () => {
+    const pills = [
+      { label: 'PURSE', value: purse != null ? (formatPurse(purse) || '—') : '—' },
+      { label: 'PAR', value: venuePar != null ? String(venuePar) : '—' },
+      { label: 'YDS', value: venueYardage != null ? venueYardage.toLocaleString() : '—' },
+    ];
+    return (
+      <div style={{ display: 'flex', gap: 7, flexWrap: 'wrap', marginTop: 12 }}>
+        {pills.map((p) => (
+          <div key={p.label} style={{
+            display: 'flex', alignItems: 'baseline', gap: 5,
+            background: 'rgba(10,14,20,0.50)',
+            backdropFilter: 'blur(10px)', WebkitBackdropFilter: 'blur(10px)',
+            border: '0.5px solid rgba(255,255,255,0.18)',
+            borderRadius: 8, padding: '5px 9px',
+          }}>
+            <span style={{ fontSize: 9, fontWeight: 800, letterSpacing: '0.10em', color: 'rgba(255,255,255,0.60)' }}>{p.label}</span>
+            <span style={{ ...NUMERIC_STYLE, fontSize: 12, fontWeight: 800, color: '#fff', letterSpacing: '-0.01em' }}>{p.value}</span>
+          </div>
+        ))}
+      </div>
+    );
+  };
 
-  const DataStrip = ({ items }: { items: { k: string; v: string; gold?: boolean }[] }) => (
-    <div style={{ display: 'flex', alignItems: 'stretch', background: '#0A0E14', borderTop: '0.5px solid rgba(255,255,255,0.06)' }}>
-      {items.map((it, i) => (
-        <div key={it.k} style={{ flex: 1, padding: '11px 6px 10px', textAlign: 'center', borderLeft: i ? '1px solid rgba(255,255,255,0.08)' : 'none' }}>
-          <div style={{ ...NUMERIC_STYLE, fontSize: 15, fontWeight: 900, color: it.gold ? GOLD : '#fff', letterSpacing: '-0.01em' }}>{it.v}</div>
-          <div style={{ fontSize: 8, fontWeight: 800, letterSpacing: '0.1em', color: 'rgba(255,255,255,0.45)', textTransform: 'uppercase', marginTop: 3 }}>{it.k}</div>
-        </div>
-      ))}
-    </div>
-  );
-
-  const liveStripItems = [
-    { k: 'Par', v: parStr },
-    { k: 'Yards', v: yardageStr },
-    { k: 'Purse', v: purseStr },
-    { k: 'To Win', v: winShareStr },
-  ];
-  const upcomingStripItems = [
-    { k: 'Par', v: parStr },
-    { k: 'Yards', v: yardageStr },
-    { k: 'Purse', v: purseStr },
-    { k: 'Field', v: fieldStr },
-  ];
-  const hasWinShare = winningShare != null;
-  const resultsStripItems = hasWinShare
-    ? [
-        { k: 'Winner', v: winShareStr, gold: true },
-        { k: 'Purse', v: purseStr },
-        { k: 'Par', v: parStr },
-        { k: 'Yards', v: yardageStr },
-      ]
-    : [
-        { k: 'Purse', v: purseStr, gold: true },
-        { k: 'Par', v: parStr },
-        { k: 'Yards', v: yardageStr },
-        { k: 'Field', v: String(fieldSize || '—') },
-      ];
 
 
   const frameHeight = isResults
@@ -861,10 +841,10 @@ export function CinematicFrame({
           flexDirection: 'column',
           padding: `18px 14px ${
             showTicker ? 16 + LIVE_BOTTOM_H
-            : isResults ? 16 + DATA_STRIP_H + RESULTS_FOOTER_H
-            : (isUpcoming && defendingChamp) ? 16 + UPCOMING_BAND_H + DATA_STRIP_H
-            : (isUpcoming && countdownText) ? 16 + 68 + DATA_STRIP_H
-            : isUpcoming ? 16 + DATA_STRIP_H
+            : isResults ? 16 + RESULTS_FOOTER_H
+            : (isUpcoming && defendingChamp) ? 16 + UPCOMING_BAND_H
+            : (isUpcoming && countdownText) ? 16 + 68
+            : isUpcoming ? 16
             : 16
           }px`,
         }}
@@ -991,6 +971,7 @@ export function CinematicFrame({
               {venueLine}
             </div>
           )}
+          {(purse != null || venuePar != null || venueYardage != null) && <GlassPills />}
           {/* over-photo countdown chip removed — countdown lives in base band */}
         </div>
 
@@ -1045,7 +1026,6 @@ export function CinematicFrame({
               display: 'block', width: '100%', textAlign: 'left',
             }}
           >
-            <DataStrip items={upcomingStripItems} />
             <div style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '13px 16px', background: '#0A0E14', borderTop: '0.5px solid rgba(255,255,255,0.06)' }}>
               {(() => {
                 const headshot = (tourSlug && defendingChamp.name)
@@ -1084,7 +1064,6 @@ export function CinematicFrame({
               display: 'block', width: '100%', textAlign: 'left',
             }}
           >
-            <DataStrip items={upcomingStripItems} />
             <div style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '14px 16px', background: '#0A0E14', borderTop: '0.5px solid rgba(255,255,255,0.06)' }}>
               <div style={{ flex: 1, minWidth: 0 }}>
                 <div style={{ ...NUMERIC_STYLE, fontSize: 8.5, fontWeight: 800, letterSpacing: '0.18em', color: AMBER }}>TEES OFF IN</div>
@@ -1095,12 +1074,7 @@ export function CinematicFrame({
           </button>
         )}
 
-        {/* Upcoming, no defending champ, no countdown — strip-only base */}
-        {isUpcoming && !defendingChamp && !countdownText && (
-          <div style={{ position: 'absolute', left: 0, right: 0, bottom: 0, zIndex: 4 }}>
-            <DataStrip items={upcomingStripItems} />
-          </div>
-        )}
+        {/* Upcoming, no defending champ, no countdown — no base band */}
       </div>
 
       {/* Live — data strip + champion band + player carousel pinned to bottom */}
@@ -1117,7 +1091,6 @@ export function CinematicFrame({
               display: 'block', width: '100%', textAlign: 'left',
             }}
           >
-            <DataStrip items={liveStripItems} />
             {/* Champion band — flat ink, trophy emoji, tie-aware */}
             {(leader || tiedLeaders) && (
               <div
@@ -1157,7 +1130,6 @@ export function CinematicFrame({
       {/* Results — data strip + final leaderboard footer CTA */}
       {isResults && (
         <div style={{ position: 'absolute', left: 0, right: 0, bottom: 0, zIndex: 4 }}>
-          <DataStrip items={resultsStripItems} />
           <button
             type="button"
             onClick={onCtaTap}
