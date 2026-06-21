@@ -3,7 +3,7 @@ import type { DiscoverCourseRow } from '@/hooks/gam/useDiscoverCoursesThisWeek';
 import type { LegendCategory } from '@/lib/gam/types';
 import type { CourseLegendHolderRow } from '@/hooks/gam/useCourseLegendHolders';
 import { Skeleton, EmptyStub } from '../../../../gam/_shared/GamAtoms';
-import SubsectionEyebrow from '../_shared/SubsectionEyebrow';
+import CollapsibleSubsection from '../_shared/CollapsibleSubsection';
 import CourseLegendsCard from '../CourseLegendsCard';
 import type { CourseSelection } from '../types';
 
@@ -22,17 +22,14 @@ export const DiscoverSubsection: React.FC<Props> = ({
   onSelectCourse,
   friendName,
 }) => {
+  const countLabel =
+    courses.length > 0
+      ? `${courses.length} new course${courses.length === 1 ? '' : 's'} to claim`
+      : undefined;
+
   return (
-    <>
-      <SubsectionEyebrow label="DISCOVER THIS WEEK" />
-      <div
-        style={{
-          padding: '0 16px 24px',
-          display: 'flex',
-          flexDirection: 'column',
-          gap: 10,
-        }}
-      >
+    <CollapsibleSubsection title="Discover this week" subtitle={countLabel} icon="🔍">
+      <div style={{ padding: '0 16px 12px', display: 'flex', flexDirection: 'column', gap: 10 }}>
         {isLoading && <Skeleton height={220} radius={14} />}
         {!isLoading && courses.length === 0 && (
           <EmptyStub
@@ -63,7 +60,7 @@ export const DiscoverSubsection: React.FC<Props> = ({
           />
         ))}
       </div>
-    </>
+    </CollapsibleSubsection>
   );
 };
 

@@ -3,7 +3,7 @@ import type { PlayedCourseRow } from '@/hooks/gam/useUserPlayedCourses';
 import type { LegendCategory } from '@/lib/gam/types';
 import type { CourseLegendHolderRow } from '@/hooks/gam/useCourseLegendHolders';
 import { Skeleton, EmptyStub } from '../../../../gam/_shared/GamAtoms';
-import SubsectionEyebrow from '../_shared/SubsectionEyebrow';
+import CollapsibleSubsection from '../_shared/CollapsibleSubsection';
 import CourseLegendsCard from '../CourseLegendsCard';
 import type { CourseSelection } from '../types';
 
@@ -32,9 +32,19 @@ export const YourCoursesSubsection: React.FC<Props> = ({
     return null;
   }
 
+  const titlesHeld = populatedCourses.reduce((sum, c) => {
+    const holders = holdersByCourse.get(c.course_id);
+    if (!holders) return sum;
+    let n = 0;
+    holders.forEach((h) => { if (h.is_self) n += 1; });
+    return sum + n;
+  }, 0);
+  const countLabel =
+    `${populatedCourses.length} played` +
+    (titlesHeld > 0 ? ` · ${titlesHeld} title${titlesHeld === 1 ? '' : 's'} held` : '');
+
   return (
-    <>
-      <SubsectionEyebrow label="YOUR COURSES" />
+    <CollapsibleSubsection title="Your courses" subtitle={countLabel} icon="⛳">
       <div style={{ padding: '0 16px', display: 'flex', flexDirection: 'column', gap: 10 }}>
         {isLoading && <Skeleton height={220} radius={14} />}
         {!isLoading && courses.length === 0 && (
@@ -66,7 +76,7 @@ export const YourCoursesSubsection: React.FC<Props> = ({
           />
         ))}
       </div>
-    </>
+    </CollapsibleSubsection>
   );
 };
 
