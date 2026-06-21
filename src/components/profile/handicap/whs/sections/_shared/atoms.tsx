@@ -49,19 +49,21 @@ export const SectionHeader: React.FC<SectionHeaderProps> = ({
           {eyebrow}
         </span>
       </div>
-      <h2
-        style={{
-          fontSize: 18,
-          fontWeight: 800,
-          fontFamily: FONT,
-          letterSpacing: '-0.015em',
-          lineHeight: 1.2,
-          color: 'var(--hcp-t-100)',
-          margin: 0,
-        }}
-      >
-        {title}
-      </h2>
+      {title !== '' && title != null && (
+        <h2
+          style={{
+            fontSize: 18,
+            fontWeight: 800,
+            fontFamily: FONT,
+            letterSpacing: '-0.015em',
+            lineHeight: 1.2,
+            color: 'var(--hcp-t-100)',
+            margin: 0,
+          }}
+        >
+          {title}
+        </h2>
+      )}
       {sub && (
         <p
           style={{

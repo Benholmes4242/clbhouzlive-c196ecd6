@@ -738,6 +738,42 @@ const StatCell: React.FC<{
   );
 };
 
+// ── Chip ──────────────────────────────────────────────────────────────────
+const Chip: React.FC<{
+  label: string;
+  value: number | null;
+  color: string;
+  onClick?: () => void;
+}> = ({ label, value, color, onClick }) => (
+  <button
+    onClick={onClick}
+    disabled={!onClick}
+    style={{
+      flex: 1,
+      display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+      background: 'var(--hcp-bg-2, #F8FAFC)',
+      border: '1px solid var(--hcp-line)',
+      borderRadius: 12,
+      padding: '10px 12px',
+      cursor: onClick ? 'pointer' : 'default',
+      fontFamily: FONT_GEIST,
+    }}
+  >
+    <span style={{
+      fontSize: 9.5, fontWeight: 800, color: 'var(--hcp-t-60)',
+      letterSpacing: '0.12em', textTransform: 'uppercase',
+    }}>
+      {label}
+    </span>
+    <span style={{
+      fontSize: 18, fontWeight: 800, color,
+      fontVariantNumeric: 'tabular-nums', letterSpacing: '-0.02em',
+    }}>
+      {value == null ? '—' : fmtDiff(value)}
+    </span>
+  </button>
+);
+
 
 
 // ── Next-round state cards ────────────────────────────────────────────────
