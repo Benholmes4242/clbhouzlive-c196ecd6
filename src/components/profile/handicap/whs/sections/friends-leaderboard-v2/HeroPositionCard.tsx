@@ -87,12 +87,10 @@ export const HeroPositionCard: React.FC<Props> = ({
       style={{
         position: 'relative',
         overflow: 'hidden',
-        margin: '0 20px 16px',
-        padding: 16,
-        background: T.bg1,
-        border: `1px solid ${T.line2}`,
-        borderRadius: 16,
         fontFamily: FONT,
+        ...(embedded
+          ? { margin: 0, padding: '14px 16px', background: 'transparent', border: 'none', borderRadius: 0 }
+          : { margin: '0 20px 16px', padding: 16, background: T.bg1, border: `1px solid ${T.line2}`, borderRadius: 16 }),
       }}
     >
       {/* Calm: amber radial glow removed for legibility */}
