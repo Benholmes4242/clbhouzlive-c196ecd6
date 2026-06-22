@@ -153,6 +153,16 @@ export function CollegeMasthead({
               }}>
                 SEASON LEADER
               </span>
+              <span style={{ fontSize: 10.5, fontWeight: 800, color: INK_MUTE }}>·</span>
+              <span style={{
+                fontSize: 10.5,
+                fontWeight: 800,
+                letterSpacing: '0.14em',
+                color: INK_MUTE,
+                textTransform: 'uppercase' as const,
+              }}>
+                2025–26
+              </span>
             </div>
 
             {/* Body row */}
