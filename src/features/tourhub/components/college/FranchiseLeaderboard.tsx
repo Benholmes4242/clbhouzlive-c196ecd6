@@ -18,7 +18,7 @@ import { useFranchiseCaptains } from '../../hooks/useFranchiseCaptains';
 
 import { FranchiseCard } from './FranchiseCard';
 import { FranchiseMovers } from './FranchiseMovers';
-import { INK, INK_FAINT, INK_TINT_02, INK_TINT_06, INK_TINT_07, SURFACE } from '../../_shared/tokens';
+import { INK, INK_MUTE, INK_TINT_06, INK_TINT_07, SURFACE } from '../../_shared/tokens';
 
 type MetricTab = 'earnings' | 'wins' | 'top10s' | 'movers';
 
