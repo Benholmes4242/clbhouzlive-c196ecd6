@@ -1044,7 +1044,7 @@ export function CinematicFrame({
               display: 'block', width: '100%', textAlign: 'left',
             }}
           >
-            <div style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '13px 16px', background: '#0A0E14', borderTop: '0.5px solid rgba(255,255,255,0.06)' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '13px 16px', background: 'rgba(10,14,20,0.50)', backdropFilter: 'blur(10px)', WebkitBackdropFilter: 'blur(10px)', borderTop: '0.5px solid rgba(255,255,255,0.18)' }}>
               {(() => {
                 const headshot = (tourSlug && defendingChamp.name)
                   ? (() => { try { return getPlayerHeadshotUrl(defendingChamp.name, tourSlug); } catch { return null; } })()
