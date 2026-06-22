@@ -1,12 +1,10 @@
 /**
  * PlayerHero — canonical light-surface masthead (Tour Hub Overview alignment).
  *
- * Pattern mirror: Players HeroChampion / Leaders champion card / College Franchise.
- *   1. §2 section header (UserCircle eyebrow + h1 + subhead)
- *   2. Player champion card: caption row + body row (squircle photo + name/flag + hero stat)
- *
- * State-aware via usePlayerState; hero stat label and caption metadata derive
- * from the same state machine.
+ * Identity wrapped in the gold champion CARD (same vocabulary as CollegeMasthead /
+ * Players HeroChampion). Section eyebrow above; caption row + body row inside the
+ * gold gradient card. Right-aligned headline stat (Season Earnings → FedEx pts →
+ * World Rank fallback).
  */
 
 import { Fragment } from 'react';
@@ -23,7 +21,10 @@ import { usePlayerState } from '../../hooks/usePlayerState';
 import {
   AMBER,
   GOLD,
+  GOLD_BORDER,
   GOLD_DEEP,
+  GOLD_TINT,
+  GOLD_TINT_10,
   INK,
   INK_MUTE,
   SLATE_50,
@@ -33,6 +34,20 @@ import {
 interface PlayerHeroProps {
   player: TourPlayer;
   playerStats: TourPlayerStatistics | null;
+}
+
+function formatEarningsHeadline(value: number): { main: string; decimal: string | null; suffix: string | null } {
+  if (value >= 1_000_000) {
+    const millions = value / 1_000_000;
+    const [whole, dec] = millions.toFixed(2).split('.');
+    return { main: `$${whole}`, decimal: dec ? `.${dec}` : null, suffix: 'M' };
+  }
+  if (value >= 1_000) {
+    const thousands = value / 1_000;
+    const [whole, dec] = thousands.toFixed(1).split('.');
+    return { main: `$${whole}`, decimal: dec ? `.${dec}` : null, suffix: 'K' };
+  }
+  return { main: `$${value.toLocaleString()}`, decimal: null, suffix: null };
 }
 
 
@@ -67,6 +82,38 @@ export function PlayerHero({ player, playerStats }: PlayerHeroProps) {
     return items;
   })();
 
+  // Headline stat: Season Earnings → FedEx points → World Rank
+  const headlineStat: { value: React.ReactNode; label: string } | null = (() => {
+    const earnings = playerStats?.earnings;
+    if (typeof earnings === 'number' && earnings > 0) {
+      const { main, decimal, suffix } = formatEarningsHeadline(earnings);
+      return {
+        value: (
+          <span style={{ fontVariantNumeric: 'tabular-nums' }}>
+            {main}
+            {decimal && <span style={{ color: INK }}>{decimal}</span>}
+            {suffix && <span style={{ fontSize: 14, fontWeight: 800, color: INK_MUTE, marginLeft: 1 }}>{suffix}</span>}
+          </span>
+        ),
+        label: 'EARNINGS',
+      };
+    }
+    const fedex = playerStats?.fedex_points;
+    if (typeof fedex === 'number' && fedex > 0) {
+      return {
+        value: <span style={{ fontVariantNumeric: 'tabular-nums' }}>{fedex.toLocaleString()}</span>,
+        label: 'FEDEX PTS',
+      };
+    }
+    if (worldRank) {
+      return {
+        value: <span style={{ fontVariantNumeric: 'tabular-nums' }}>#{worldRank}</span>,
+        label: 'WORLD RANK',
+      };
+    }
+    return null;
+  })();
+
   return (
     <div
       style={{
@@ -75,7 +122,7 @@ export function PlayerHero({ player, playerStats }: PlayerHeroProps) {
         padding: '10px 0 14px',
       }}
     >
-      {/* Section header (canonical §2) — eyebrow only */}
+      {/* Section eyebrow — above the card */}
       <div style={{ padding: '0 16px 8px' }}>
         <button
           type="button"
@@ -107,8 +154,16 @@ export function PlayerHero({ player, playerStats }: PlayerHeroProps) {
         </button>
       </div>
 
-      {/* Player champion card */}
-      <div style={{ padding: '0 16px' }}>
+      {/* Gold champion card */}
+      <div
+        style={{
+          margin: '0 16px',
+          background: `linear-gradient(180deg, ${GOLD_TINT_10} 0%, ${GOLD_TINT} 100%)`,
+          border: `1px solid ${GOLD_BORDER}`,
+          borderRadius: 14,
+          padding: 14,
+        }}
+      >
         {/* Caption row */}
         <div
           style={{
@@ -116,7 +171,7 @@ export function PlayerHero({ player, playerStats }: PlayerHeroProps) {
             alignItems: 'center',
             justifyContent: 'space-between',
             gap: 8,
-            marginBottom: 10,
+            marginBottom: 12,
             flexWrap: 'wrap',
           }}
         >
@@ -153,7 +208,7 @@ export function PlayerHero({ player, playerStats }: PlayerHeroProps) {
         </div>
 
         {/* Body row */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
           {/* Photo + position badge */}
           <div
             style={{
@@ -164,29 +219,29 @@ export function PlayerHero({ player, playerStats }: PlayerHeroProps) {
             }}
           >
             <SquircleAvatar
-              size={84}
+              size={72}
               srcCandidates={avatarCandidates}
               alt={player.full_name}
               userId={player.id ?? player.full_name}
               ringColor={GOLD}
             />
 
-            {/* Position badge — gated: worldRank && worldRank <= 99 (Q2 decision) */}
+            {/* Position badge — gated: worldRank && worldRank <= 99 */}
             {worldRank && worldRank <= 99 && (
               <div
                 style={{
                   position: 'absolute',
                   bottom: -4,
                   right: -4,
-                  width: 24,
-                  height: 24,
+                  width: 22,
+                  height: 22,
                   borderRadius: '50%',
                   background: GOLD,
                   border: `2.5px solid ${SURFACE}`,
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
-                  fontSize: 11,
+                  fontSize: 10,
                   fontWeight: 800,
                   color: INK,
                   fontVariantNumeric: 'tabular-nums',
@@ -197,11 +252,11 @@ export function PlayerHero({ player, playerStats }: PlayerHeroProps) {
             )}
           </div>
 
-          {/* Info: name + flag — full width now */}
+          {/* Name + flag */}
           <div style={{ flex: 1, minWidth: 0 }}>
             <div
               style={{
-                fontSize: 25,
+                fontSize: 21,
                 fontWeight: 800,
                 color: INK,
                 letterSpacing: '-0.03em',
@@ -220,6 +275,35 @@ export function PlayerHero({ player, playerStats }: PlayerHeroProps) {
               )}
             </div>
           </div>
+
+          {/* Headline stat — right aligned */}
+          {headlineStat && (
+            <div style={{ flexShrink: 0, textAlign: 'right' as const, marginLeft: 4 }}>
+              <div
+                style={{
+                  fontSize: 22,
+                  fontWeight: 800,
+                  color: INK,
+                  letterSpacing: '-0.02em',
+                  lineHeight: 1,
+                }}
+              >
+                {headlineStat.value}
+              </div>
+              <div
+                style={{
+                  fontSize: 9,
+                  fontWeight: 800,
+                  color: INK_MUTE,
+                  letterSpacing: '0.16em',
+                  textTransform: 'uppercase' as const,
+                  marginTop: 4,
+                }}
+              >
+                {headlineStat.label}
+              </div>
+            </div>
+          )}
         </div>
       </div>
     </div>

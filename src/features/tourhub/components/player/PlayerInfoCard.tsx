@@ -105,7 +105,7 @@ export function PlayerInfoCard({ player }: PlayerInfoCardProps) {
   }
 
   return (
-    <div style={{ background: SURFACE, borderBottom: `1px solid ${INK_TINT_07}`, marginTop: '8px', padding: '14px 16px 16px' }}>
+    <div style={{ background: SURFACE, borderTop: `0.5px solid ${INK_TINT_07}`, padding: '14px 16px 16px' }}>
       {/* Section eyebrow — canonical §6 slate-caps */}
       <div style={{ marginBottom: '16px' }}>
         <span style={{ fontSize: '9px', fontWeight: 800, color: INK_MUTE, letterSpacing: '0.16em', textTransform: 'uppercase' as const }}>

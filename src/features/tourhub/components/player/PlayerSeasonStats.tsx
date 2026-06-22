@@ -147,7 +147,7 @@ export function PlayerSeasonStats({ playerStats }: PlayerSeasonStatsProps) {
     ? (playerStats.top_25s / playerStats.events_played) * 100 : undefined;
 
   return (
-    <div style={{ background: SURFACE, borderBottom: `1px solid ${INK_TINT_07}` }}>
+    <div style={{ background: SURFACE, borderTop: `0.5px solid ${INK_TINT_07}` }}>
       {/* Dispatch section header */}
       <div style={{ padding: '14px 16px 0' }}>
         <div style={{ marginBottom: '12px' }}>
