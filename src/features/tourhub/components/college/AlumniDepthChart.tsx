@@ -28,7 +28,7 @@ import { motion } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import { useCollegeAlumni, type CollegeAlumnus } from '../../hooks/useCollegeAlumni';
 import { useLegacyAlumni } from '../../hooks/useLegacyAlumni';
-import { getPlayerHeadshotUrl } from '@/utils/playerHeadshot';
+import { getPlayerHeadshotCandidates } from '@/utils/playerHeadshot';
 import { formatCurrency } from '@/lib/utils/formatCurrency';
 import { PlayerInitialAvatar } from '../shared/PlayerInitialAvatar';
 import { getPlayerTourTag } from '../../utils/playerTourTag';
