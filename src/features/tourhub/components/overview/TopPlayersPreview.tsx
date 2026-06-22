@@ -3,7 +3,8 @@ import { ArrowRight, TrendingUp } from 'lucide-react';
 import { useTourSeason, useTourPlayerStatistics } from '../../hooks/useTourHubData';
 import { useMemo, useState } from 'react';
 import { cn } from '@/lib/utils';
-import { getPlayerHeadshotUrl, PLAYER_SILHOUETTE_URL } from '@/utils/playerHeadshot';
+import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
+import { resolvePlayerAvatarCandidates } from '../../_shared/resolvePlayerAvatar';
 
 type SortOption = 'events' | 'cuts' | 'world_rank';
 
@@ -136,18 +137,18 @@ export function TopPlayersPreview() {
                 <span className="w-6 h-6 rounded-full bg-muted flex items-center justify-center text-xs font-semibold text-muted-foreground">
                   {index + 1}
                 </span>
-                <div className="w-9 h-9 rounded-full bg-muted flex items-center justify-center overflow-hidden">
-                  {(() => {
-                    const headshot = getPlayerHeadshotUrl(stat.player?.full_name ?? '', (stat.player as any)?.tour_codes?.[0] ?? 'pga');
-                    return (
-                      <img 
-                        src={headshot}
-                        alt={stat.player?.full_name ?? ''}
-                        className="w-9 h-9 object-cover"
-                        onError={(e) => { (e.target as HTMLImageElement).src = PLAYER_SILHOUETTE_URL; }}
-                      />
-                    );
-                  })()}
+                <div className="flex-shrink-0">
+                  <SquircleAvatar
+                    size={36}
+                    srcCandidates={resolvePlayerAvatarCandidates({
+                      name: stat.player?.full_name ?? '',
+                      photoUrl: (stat.player as any)?.photo_url ?? null,
+                      tourSlug: (stat.player as any)?.tour_codes?.[0] ?? 'pga',
+                    })}
+                    alt={stat.player?.full_name ?? ''}
+                    userId={stat.player?.id ?? stat.player?.full_name ?? ''}
+                    hideRing
+                  />
                 </div>
                 <div>
                   <p className="font-medium text-foreground group-hover:text-primary transition-colors text-sm">

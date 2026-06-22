@@ -10,7 +10,8 @@ import { useState, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import { toTitleCase } from '@/lib/formatters';
-import { getPlayerHeadshotUrl, PLAYER_SILHOUETTE_URL } from '@/utils/playerHeadshot';
+import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
+import { resolvePlayerAvatarCandidates } from '../../_shared/resolvePlayerAvatar';
 import type { TourPlayerStatistics } from '../../hooks/useTourHubData';
 
 type SortOption = 'world_rank' | 'cuts' | 'events';
@@ -140,13 +141,18 @@ export function PlayersFeed({ players, maxEvents, maxCuts }: PlayersFeedProps) {
                 to={`/tourhub/player/${stat.player_id}`}
                 className="flex items-center gap-3 py-3.5 group transition-colors hover:bg-muted/30 -mx-2 px-2 rounded-lg"
               >
-                {/* Player photo */}
-                <div className="relative w-11 h-11 rounded-full overflow-hidden flex-shrink-0 bg-muted">
-                  <img 
-                    src={getPlayerHeadshotUrl(stat.player?.full_name ?? '', stat.player?.tour_codes?.[0] ?? 'pga')}
+                {/* Player photo — canonical multi-folder walk + initials fallback */}
+                <div className="flex-shrink-0">
+                  <SquircleAvatar
+                    size={44}
+                    srcCandidates={resolvePlayerAvatarCandidates({
+                      name: stat.player?.full_name ?? '',
+                      photoUrl: (stat.player as any)?.photo_url ?? null,
+                      tourSlug: stat.player?.tour_codes?.[0] ?? 'pga',
+                    })}
                     alt={stat.player?.full_name ?? ''}
-                    className="w-full h-full object-cover object-top"
-                    onError={(e) => { (e.target as HTMLImageElement).src = PLAYER_SILHOUETTE_URL; }}
+                    userId={stat.player?.id ?? stat.player?.full_name ?? ''}
+                    hideRing
                   />
                 </div>
 

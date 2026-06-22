@@ -6,7 +6,8 @@
 import React from 'react';
 import { ChevronRight } from 'lucide-react';
 import CountryFlag from '@/components/ui/country-flag';
-import { PLAYER_SILHOUETTE_URL } from '@/utils/playerHeadshot';
+import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
+
 import {
   INK,
   INK_15,
@@ -17,29 +18,6 @@ import {
 import { getScoreColor } from '../../../_shared/scoreColor';
 import { AMBER_TINT_04, LEADER_GOLD_TINT_10, LEADER_GOLD_TINT_7 } from '../../../_shared/tokens';
 import { TrajectorySparkline } from './TrajectorySparkline';
-
-function PlayerHead({ size = 36, src, ring }: { size?: number; src?: string | null; ring?: boolean }) {
-  return (
-    <img
-      src={src || PLAYER_SILHOUETTE_URL}
-      alt=""
-      onError={(e) => {
-        const t = e.target as HTMLImageElement;
-        if (t.src !== PLAYER_SILHOUETTE_URL) t.src = PLAYER_SILHOUETTE_URL;
-      }}
-      style={{
-        width: size,
-        height: size,
-        borderRadius: '34%',
-        objectFit: 'cover',
-        objectPosition: 'center 18%',
-        flexShrink: 0,
-        background: 'linear-gradient(135deg, #CBD5E1 0%, #94A3B8 100%)',
-        border: ring ? '1.5px solid white' : '0.5px solid rgba(15,23,42,0.10)',
-      }}
-    />
-  );
-}
 
 function liveScoreColour(s: string): string {
   if (s.startsWith('\u2212') || s.startsWith('-')) return getScoreColor(-1, 'dark', 'standard');
@@ -53,7 +31,10 @@ interface SoloLeaderRowProps {
   country?: string | null;
   score: string;
   thru: string;
-  avatarUrl?: string | null;
+  /** Ordered multi-folder candidate URLs (resolvePlayerAvatarCandidates output). */
+  avatarCandidates?: (string | null | undefined)[];
+  /** Stable id used to derive the deterministic initials colour. */
+  playerId?: string | null;
   isResults?: boolean;
   isLast?: boolean;
 }
@@ -64,7 +45,8 @@ export function SoloLeaderRow({
   country,
   score,
   thru,
-  avatarUrl,
+  avatarCandidates,
+  playerId,
   isResults = false,
   isLast = false,
 }: SoloLeaderRowProps) {
@@ -93,7 +75,13 @@ export function SoloLeaderRow({
         {rank}
       </span>
       <div style={{ display: 'flex', gap: 12, alignItems: 'center', minWidth: 0 }}>
-        <PlayerHead size={36} src={avatarUrl} />
+        <SquircleAvatar
+          size={36}
+          srcCandidates={avatarCandidates}
+          alt={name}
+          userId={playerId ?? name}
+          hideRing
+        />
         <div style={{ display: 'flex', alignItems: 'center', gap: 6, minWidth: 0 }}>
           <span
             style={{
@@ -140,12 +128,22 @@ export function SoloLeaderRow({
   );
 }
 
+export interface StackedAvatarPlayer {
+  /** Ordered multi-folder candidate URLs (resolvePlayerAvatarCandidates output). */
+  avatarCandidates?: (string | null | undefined)[];
+  /** Optional stable id for deterministic initials colour. */
+  playerId?: string | null;
+  /** Optional player name for alt + initials fallback. */
+  name?: string | null;
+  rounds?: number[];
+}
+
 export function StackedAvatars({
   players,
   size = 34,
   variant = 'leader',
 }: {
-  players: { avatarUrl?: string | null }[];
+  players: StackedAvatarPlayer[];
   size?: number;
   variant?: 'leader' | 'chaser';
 }) {
@@ -155,27 +153,22 @@ export function StackedAvatars({
   return (
     <div style={{ display: 'flex', alignItems: 'center' }}>
       {visible.map((p, i) => (
-        <img
+        <div
           key={i}
-          src={p.avatarUrl || PLAYER_SILHOUETTE_URL}
-          alt=""
-          onError={(e) => {
-            const t = e.target as HTMLImageElement;
-            if (t.src !== PLAYER_SILHOUETTE_URL) t.src = PLAYER_SILHOUETTE_URL;
-          }}
           style={{
             marginLeft: i === 0 ? 0 : -8,
             zIndex: visible.length - i,
             opacity: total > maxVisible && i === visible.length - 1 ? 0.85 : 1,
-            width: size,
-            height: size,
-            borderRadius: '34%',
-            objectFit: 'cover',
-            objectPosition: 'center 18%',
-            background: 'linear-gradient(135deg, #CBD5E1 0%, #94A3B8 100%)',
-            border: 'none',
           }}
-        />
+        >
+          <SquircleAvatar
+            size={size}
+            srcCandidates={p.avatarCandidates}
+            alt={p.name ?? ''}
+            userId={p.playerId ?? p.name ?? ''}
+            hideRing
+          />
+        </div>
       ))}
     </div>
   );
@@ -186,7 +179,7 @@ interface TiedChasersRowProps {
   count: number;
   score: string;
   thru: string;
-  players: { avatarUrl?: string | null; rounds?: number[] }[];
+  players: StackedAvatarPlayer[];
   par?: number;
   isLast?: boolean;
   isResults?: boolean;
@@ -281,12 +274,14 @@ export function TiedChasersRow({
 interface TiedLeadersRowProps {
   count: number;
   score: string;
-  players?: { avatarUrl?: string | null }[];
+  players?: StackedAvatarPlayer[];
   isLast?: boolean;
 }
 
 export function TiedLeadersRow({ count, score, players, isLast = false }: TiedLeadersRowProps) {
-  const stack = players && players.length > 0 ? players : Array.from({ length: count }, () => ({ avatarUrl: null }));
+  const stack: StackedAvatarPlayer[] = players && players.length > 0
+    ? players
+    : Array.from({ length: count }, () => ({}));
   return (
     <div
       style={{
@@ -382,7 +377,13 @@ export function ChampionRow({
         </svg>
       </span>
       <div style={{ display: 'flex', gap: 12, alignItems: 'center', minWidth: 0 }}>
-        <PlayerHead size={36} src={avatarUrl} />
+        <SquircleAvatar
+          size={36}
+          src={avatarUrl ?? undefined}
+          alt={name}
+          userId={name}
+          hideRing
+        />
         <div style={{ display: 'flex', alignItems: 'center', gap: 6, minWidth: 0 }}>
           <span
             style={{

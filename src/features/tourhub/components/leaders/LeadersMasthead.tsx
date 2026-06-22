@@ -7,7 +7,8 @@
 import { Link } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Activity, ChevronRight, Crown, Flame, Trophy } from 'lucide-react';
-import { getPlayerHeadshotUrl, PLAYER_SILHOUETTE_URL } from '@/utils/playerHeadshot';
+import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
+import { resolvePlayerAvatarCandidates } from '../../_shared/resolvePlayerAvatar';
 import { titleCaseCountry } from '../../utils/countryFlags';
 import CountryFlag from '@/components/ui/country-flag';
 import { playerRoute } from '../../routes';
@@ -144,10 +145,11 @@ export function LeadersMasthead({
   const formattedValue = `${fmt(leader.value)}${unit ? ` ${unit}` : ''}`;
   const { integer, decimal, suffix } = splitStatValue(formattedValue);
   const countryName = titleCaseCountry(leader.player.country);
-  const photoUrl = getPlayerHeadshotUrl(
-    leader.player.full_name,
-    leader.player.tour_codes?.[0] ?? 'pga'
-  );
+  const avatarCandidates = resolvePlayerAvatarCandidates({
+    name: leader.player.full_name,
+    photoUrl: (leader.player as any).photo_url ?? null,
+    tourSlug: leader.player.tour_codes?.[0] ?? 'pga',
+  });
   const year = seasonYear ?? new Date().getFullYear();
   const showTourAvg = !!category.tourAverage && category.tourAverage !== '—';
 
@@ -316,13 +318,12 @@ export function LeadersMasthead({
                     border: `2.5px solid ${GOLD}`,
                   }}
                 >
-                  <img
-                    src={photoUrl}
+                  <SquircleAvatar
+                    size={75}
+                    srcCandidates={avatarCandidates}
                     alt={leader.player.full_name}
-                    style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center 5%' }}
-                    onError={(e) => {
-                      (e.target as HTMLImageElement).src = PLAYER_SILHOUETTE_URL;
-                    }}
+                    userId={leader.player.id}
+                    hideRing
                   />
                 </div>
                 <div

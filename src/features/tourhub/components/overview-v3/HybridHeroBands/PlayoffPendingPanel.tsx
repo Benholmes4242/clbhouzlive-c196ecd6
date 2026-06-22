@@ -14,7 +14,8 @@ export interface PlayoffPlayer {
   country?: string;
   score: string;
   thru?: string;
-  avatarUrl?: string | null;
+  avatarCandidates?: (string | null | undefined)[];
+  playerId?: string | null;
 }
 
 interface PlayoffPendingPanelProps {
@@ -44,7 +45,8 @@ export function PlayoffPendingPanel({ tied, chasers }: PlayoffPendingPanelProps)
               country={item.p.country}
               score={item.p.score}
               thru={item.p.thru ?? 'F'}
-              avatarUrl={item.p.avatarUrl}
+              avatarCandidates={item.p.avatarCandidates}
+              playerId={item.p.playerId}
               isResults
               isLast={isLast}
             />
@@ -57,7 +59,8 @@ export function PlayoffPendingPanel({ tied, chasers }: PlayoffPendingPanelProps)
             name={item.p.name}
             score={item.p.score}
             thru={item.p.thru ?? 'F'}
-            avatarUrl={item.p.avatarUrl}
+            avatarCandidates={item.p.avatarCandidates}
+            playerId={item.p.playerId}
             isResults
             isLast={isLast}
           />

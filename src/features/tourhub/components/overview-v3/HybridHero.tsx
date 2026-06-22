@@ -20,7 +20,7 @@ import { useTournamentFieldStrength } from '../../hooks/useTournamentFieldStreng
 
 import { useTournamentCourseStats } from '../../hooks/useTournamentCourseStats';
 import { tournamentRoute } from '../../routes';
-import { getPlayerHeadshotUrl } from '@/utils/playerHeadshot';
+import { resolvePlayerAvatarCandidates } from '../../_shared/resolvePlayerAvatar';
 
 import { PhotoBand } from './HybridHeroBands/PhotoBand';
 import { MiddleBand } from './HybridHeroBands/MiddleBand';
@@ -176,23 +176,20 @@ export function HybridHero({ slide, activeTournamentId, onSelectTour }: HybridHe
     const top: any = safeLeaderboard[0];
     const winnerName = tournament.winnerName;
 
-    const resolveWinnerAvatar = (name?: string | null): string | null => {
-      if (tournament.winnerPhotoUrl) return tournament.winnerPhotoUrl;
-      if (top?.player?.photo_url) return top.player.photo_url;
-      if (name && tournament.tourSlug) {
-        try {
-          return getPlayerHeadshotUrl(name, tournament.tourSlug);
-        } catch { return null; }
-      }
-      return null;
-    };
+    const resolveWinnerAvatarCandidates = (name?: string | null): string[] =>
+      resolvePlayerAvatarCandidates({
+        name: name ?? '',
+        photoUrl: tournament.winnerPhotoUrl ?? top?.player?.photo_url ?? null,
+        tourSlug: tournament.tourSlug ?? 'pga',
+      });
 
     if (winnerName) {
       return {
         name: winnerName,
         country: (top?.player?.country_code as string | undefined) ?? undefined,
         score: tournament.winnerScore || (top ? fmtScore(top.score) : '—'),
-        avatarUrl: resolveWinnerAvatar(winnerName),
+        avatarUrl: resolveWinnerAvatarCandidates(winnerName)[0] ?? null,
+        avatarCandidates: resolveWinnerAvatarCandidates(winnerName),
         playoffWin: wasPlayoff,
       };
     }
@@ -204,7 +201,8 @@ export function HybridHero({ slide, activeTournamentId, onSelectTour }: HybridHe
       name: topName,
       country: top.player?.country_code,
       score: fmtScore(top.score),
-      avatarUrl: resolveWinnerAvatar(topName),
+      avatarUrl: resolveWinnerAvatarCandidates(topName)[0] ?? null,
+      avatarCandidates: resolveWinnerAvatarCandidates(topName),
       playoffWin: wasPlayoff,
     };
   }, [state, tournament, safeLeaderboard, wasPlayoff]);
@@ -242,8 +240,13 @@ export function HybridHero({ slide, activeTournamentId, onSelectTour }: HybridHe
       score: f.score,
       year: f.year,
       avatarUrl: f.photoUrl,
+      avatarCandidates: resolvePlayerAvatarCandidates({
+        name: f.name,
+        photoUrl: f.photoUrl ?? null,
+        tourSlug: tournament.tourSlug ?? 'pga',
+      }),
     }));
-  }, [state, lastYearTop4]);
+  }, [state, lastYearTop4, tournament.tourSlug]);
 
   const showFirstYearPlaceholder =
     state.kind === 'upcoming' &&

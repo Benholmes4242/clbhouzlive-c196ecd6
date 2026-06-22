@@ -27,7 +27,7 @@ export interface LeaderboardBandProps {
   cutLine?: number | null;
   champion?: { name: string; country?: string; score: string; playoffWin?: boolean; avatarUrl?: string | null };
   teeTimes?: TeeTimeGroup[];
-  lastYearFinishers?: { rank: string; name: string; country?: string | null; score: string; year: string; avatarUrl?: string | null }[];
+  lastYearFinishers?: { rank: string; name: string; country?: string | null; score: string; year: string; avatarUrl?: string | null; avatarCandidates?: (string | null | undefined)[]; playerId?: string | null }[];
   /** When true and lastYearFinishers is empty, render the inaugural-event placeholder. */
   firstYearEvent?: boolean;
   cancelReason?: string;
@@ -70,13 +70,16 @@ function entryThru(entry: any): string {
   return String(entry.thru);
 }
 
-function resolveAvatar(entry: any, tourSlug?: string): string | null {
-  const name = entry?.player?.full_name || `${entry?.player?.first_name ?? ''} ${entry?.player?.last_name ?? ''}`.trim();
+function entryPlayerId(entry: any): string | undefined {
+  return entry?.player?.id ?? entry?.player_id ?? undefined;
+}
+
+function entryAvatarCandidates(entry: any, tourSlug?: string): string[] {
   return resolvePlayerAvatarCandidates({
-    name,
+    name: entryName(entry),
     photoUrl: entry?.player?.photo_url ?? null,
     tourSlug: tourSlug ?? null,
-  })[0] ?? null;
+  });
 }
 
 export function LeaderboardBand({
@@ -96,7 +99,7 @@ export function LeaderboardBand({
 }: LeaderboardBandProps) {
   const showFooterStrip =
     state.kind === 'live' && (!!defendingChampion || (fieldSize ?? 0) > 0);
-  const entryAvatar = (entry: any) => resolveAvatar(entry, tourSlug);
+  const entryAvatars = (entry: any) => entryAvatarCandidates(entry, tourSlug);
   const sparklinePar = par ?? 0;
 
 
@@ -111,7 +114,7 @@ export function LeaderboardBand({
       const tiedPlayers = leaderboard
         .filter(e => (e?.score ?? e?.total) === tiedScore)
         .slice(0, tiedLeaders.count)
-        .map(e => ({ avatarUrl: entryAvatar(e) }));
+        .map(e => ({ avatarCandidates: entryAvatars(e), playerId: entryPlayerId(e), name: entryName(e) }));
       body = (
         <>
           <TiedLeadersRow count={tiedLeaders.count} score={tiedLeaders.score} players={tiedPlayers} />
@@ -123,7 +126,8 @@ export function LeaderboardBand({
               country={entryCountry(e)}
               score={fmtScore(e.score)}
               thru={entryThru(e)}
-              avatarUrl={entryAvatar(e)}
+              avatarCandidates={entryAvatars(e)}
+              playerId={entryPlayerId(e)}
               isLast={i === chasers.length - 1}
             />
           ))}
@@ -142,7 +146,8 @@ export function LeaderboardBand({
               country={entryCountry(leader)}
               score={fmtScore(leader.score)}
               thru={entryThru(leader)}
-              avatarUrl={entryAvatar(leader)}
+              avatarCandidates={entryAvatars(leader)}
+              playerId={entryPlayerId(leader)}
             />
           )}
           {slots.map((slot, i) => {
@@ -155,7 +160,7 @@ export function LeaderboardBand({
                   count={slot.count}
                   score={fmtScore(slot.score)}
                   thru="—"
-                  players={slot.members.map((m: any) => ({ avatarUrl: entryAvatar(m) }))}
+                  players={slot.members.map((m: any) => ({ avatarCandidates: entryAvatars(m), playerId: entryPlayerId(m), name: entryName(m) }))}
                   isLast={isLast}
                   onTap={onCtaTap}
                 />
@@ -169,7 +174,8 @@ export function LeaderboardBand({
                 country={entryCountry(slot.entry)}
                 score={fmtScore(slot.entry.score)}
                 thru={entryThru(slot.entry)}
-                avatarUrl={entryAvatar(slot.entry)}
+                avatarCandidates={entryAvatars(slot.entry)}
+                playerId={entryPlayerId(slot.entry)}
                 isLast={isLast}
               />
             );
@@ -189,7 +195,8 @@ export function LeaderboardBand({
           name: entryName(e),
           country: e.player?.country_code,
           score: fmtScore(e.score),
-          avatarUrl: entryAvatar(e),
+          avatarCandidates: entryAvatars(e),
+          playerId: entryPlayerId(e),
         }));
       const chasers = leaderboard
         .filter(e => (e?.score ?? 0) !== tiedScore)
@@ -198,7 +205,8 @@ export function LeaderboardBand({
           rank: formatRank(e),
           name: entryName(e),
           score: fmtScore(e.score),
-          avatarUrl: entryAvatar(e),
+          avatarCandidates: entryAvatars(e),
+          playerId: entryPlayerId(e),
         }));
       body = <PlayoffPendingPanel tied={tied} chasers={chasers} />;
     } else if (state.variant === 'team') {
@@ -254,7 +262,9 @@ export function LeaderboardBand({
                   score={fmtScore(slot.score)}
                   thru="F"
                   players={slot.members.map((m: any) => ({
-                    avatarUrl: entryAvatar(m),
+                    avatarCandidates: entryAvatars(m),
+                    playerId: entryPlayerId(m),
+                    name: entryName(m),
                     rounds: extractRounds(m),
                   }))}
                   par={sparklinePar}
@@ -273,7 +283,8 @@ export function LeaderboardBand({
                 country={entryCountry(slot.entry)}
                 score={fmtScore(slot.entry.score)}
                 thru="F"
-                avatarUrl={entryAvatar(slot.entry)}
+                avatarCandidates={entryAvatars(slot.entry)}
+                playerId={entryPlayerId(slot.entry)}
                 rounds={extractRounds(slot.entry)}
                 par={sparklinePar}
                 isResults
@@ -316,7 +327,8 @@ export function LeaderboardBand({
               score={r.score}
               year={r.year}
               isWinner={i === 0}
-              avatarUrl={r.avatarUrl}
+              avatarCandidates={r.avatarCandidates}
+              playerId={r.playerId}
               isLast={i === four.length - 1}
             />
           ))}
