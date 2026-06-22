@@ -55,7 +55,7 @@ export function FranchiseMovers({ limit = 8, className }: FranchiseMoversProps) 
 
 
       {/* Rising / Falling toggle */}
-      <div style={{ padding: '0 16px 10px', background: '#ffffff' }}>
+      <div style={{ padding: '10px 16px', background: '#F8FAFC' }}>
         <div style={{ display: 'flex', gap: 6 }}>
           {[
             { value: 'up' as Direction, label: 'Rising', Icon: TrendingUp },
