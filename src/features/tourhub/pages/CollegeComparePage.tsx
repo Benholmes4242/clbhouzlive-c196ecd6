@@ -68,7 +68,6 @@ export function CollegeComparePage() {
   const seasonYear = season?.year || new Date().getFullYear();
 
   const seasonLabel = `Season ${seasonYear === 2026 ? '2025–26' : `${seasonYear - 1}–${String(seasonYear).slice(-2)}`}`;
-  const seasonCaps = `SEASON ${seasonYear === 2026 ? '2025–26' : `${seasonYear - 1}–${String(seasonYear).slice(-2)}`}`;
 
   const h1Text = (() => {
     if (isLoading) return 'Head-to-Head';
@@ -152,12 +151,7 @@ export function CollegeComparePage() {
         className="relative min-h-screen"
         style={{ paddingTop: 'var(--chrome-total-h, 0px)', background: SLATE_50 }}
       >
-        {/* Season caps row — stays in body, no longer cropped under chrome */}
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end', padding: '16px 16px 9px' }}>
-          <span style={{ fontSize: 9, color: INK_FAINT, fontWeight: 800, letterSpacing: '0.14em', textTransform: 'uppercase' }}>
-            {seasonCaps}
-          </span>
-        </div>
+        {/* Season caps row removed — season appears in hero subhead + verdict eyebrow */}
 
         {/* ── CONTENT ── */}
         <div style={{ paddingBottom: 'calc(env(safe-area-inset-bottom, 0px) + 80px)' }}>
@@ -289,8 +283,8 @@ export function CollegeComparePage() {
               )}
             </div>
           ) : isLoading ? (
-            <div style={{ marginTop: '8px' }}>
-              <div style={{ background: SURFACE, borderTop: `1px solid ${INK_TINT_07}`, borderBottom: `1px solid ${INK_TINT_07}`, marginTop: '8px' }}>
+            <div>
+              <div style={{ background: SURFACE, borderTop: `0.5px solid ${INK_TINT_07}` }}>
                 {Array.from({ length: 6 }).map((_, i) => (
                   <div key={i} className="animate-pulse" style={{ display: 'flex', alignItems: 'center', padding: '10px 20px', borderBottom: `0.5px solid ${INK_TINT_07}`, height: '48px' }}>
                     <div style={{ flex: 1, height: '13px', borderRadius: '4px', background: INK_TINT_06 }} />
