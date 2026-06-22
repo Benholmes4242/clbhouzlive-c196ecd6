@@ -19,9 +19,7 @@ import { useCollegeMediaMap } from '../../hooks/useCollegeMedia';
 import { useCollegeSeasonStats } from '../../hooks/useCollegeStats';
 import { useBatchCollegeAlumni } from '../../hooks/useBatchCollegeAlumni';
 import { useFranchiseDrivers } from '../../hooks/useFranchiseDrivers';
-import { SectionHeader } from '../shared/SectionHeader';
 import { FranchiseCard } from './FranchiseCard';
-import { format } from 'date-fns';
 
 type Direction = 'up' | 'down';
 
