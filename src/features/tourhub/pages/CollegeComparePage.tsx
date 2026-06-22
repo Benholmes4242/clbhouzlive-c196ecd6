@@ -152,12 +152,7 @@ export function CollegeComparePage() {
         className="relative min-h-screen"
         style={{ paddingTop: 'var(--chrome-total-h, 0px)', background: SLATE_50 }}
       >
-        {/* Season caps row — stays in body, no longer cropped under chrome */}
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end', padding: '16px 16px 9px' }}>
-          <span style={{ fontSize: 9, color: INK_FAINT, fontWeight: 800, letterSpacing: '0.14em', textTransform: 'uppercase' }}>
-            {seasonCaps}
-          </span>
-        </div>
+        {/* Season caps row removed — season appears in hero subhead + verdict eyebrow */}
 
         {/* ── CONTENT ── */}
         <div style={{ paddingBottom: 'calc(env(safe-area-inset-bottom, 0px) + 80px)' }}>
