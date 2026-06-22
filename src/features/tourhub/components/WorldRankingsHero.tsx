@@ -317,10 +317,12 @@ function NumberOneCard({
                 <PlayerAvatar
                   playerId={entry.player.id}
                   playerName={playerName}
+                  photoUrl={entry.player.photo_url}
                   tourCode={tourCode}
                   size="xl"
                   className="!w-full !h-full !rounded-[34%]"
                 />
+
               </div>
             </div>
             <div
@@ -462,9 +464,11 @@ function ChaserRow({
       <PlayerAvatar
         playerId={entry.player.id}
         playerName={playerName}
+        photoUrl={entry.player.photo_url}
         tourCode={tourCode}
         size="md"
       />
+
 
       <div style={{ flex: 1, minWidth: 0 }}>
         <div

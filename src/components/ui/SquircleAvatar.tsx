@@ -120,12 +120,15 @@ export const SquircleAvatar: React.FC<SquircleAvatarProps> = ({
   const [candidateIdx, setCandidateIdx] = useState(0);
 
   // Normalised candidate list — drives both single-src and multi-candidate modes.
+  // Keyed by URL contents (not array reference) so unrelated parent re-renders
+  // don't reset the walk mid-error and trap the avatar on a broken first URL.
   const candidates = React.useMemo<string[]>(() => {
     if (srcCandidates && srcCandidates.length > 0) {
       return srcCandidates.filter((u): u is string => Boolean(u));
     }
     return src ? [src] : [];
-  }, [srcCandidates, src]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [srcCandidates?.join('|'), src]);
 
   // Convert size variant to pixel value
   const pixelSize = typeof size === 'string' ? SIZE_MAP[size] : size;
@@ -141,7 +144,8 @@ export const SquircleAvatar: React.FC<SquircleAvatarProps> = ({
   const isAchievementTier = top100Count !== undefined && top100Count >= 5;
   const hasAchievementRing = Boolean(effectiveRingColor) && (ringColor || isAchievementTier);
 
-  // Reset to first candidate when the list changes.
+  // Reset to first candidate ONLY when the candidate URL set actually changes
+  // (keyed by stringified contents inside the memo above).
   useEffect(() => {
     setCandidateIdx(0);
     setImageLoaded(false);
