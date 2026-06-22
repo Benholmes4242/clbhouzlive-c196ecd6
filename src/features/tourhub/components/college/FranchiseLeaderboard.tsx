@@ -18,7 +18,7 @@ import { useFranchiseCaptains } from '../../hooks/useFranchiseCaptains';
 
 import { FranchiseCard } from './FranchiseCard';
 import { FranchiseMovers } from './FranchiseMovers';
-import { INK, INK_FAINT, INK_TINT_02, INK_TINT_06, INK_TINT_07, SURFACE } from '../../_shared/tokens';
+import { INK, INK_FAINT, INK_MUTE, INK_TINT_06, INK_TINT_07, SURFACE } from '../../_shared/tokens';
 
 type MetricTab = 'earnings' | 'wins' | 'top10s' | 'movers';
 
@@ -77,16 +77,16 @@ export function FranchiseLeaderboard({
   return (
     <div className={className}>
       {activeMetric !== 'movers' && (
-        <div style={{ background: SURFACE, borderTop: `1px solid ${INK_TINT_07}`, borderBottom: `1px solid ${INK_TINT_07}`, marginTop: 8 }}>
+        <div style={{ background: SURFACE, borderTop: `0.5px solid ${INK_TINT_07}`, marginTop: 8 }}>
 
 
           {/* Column headers */}
-          <div style={{ display: 'flex', alignItems: 'center', padding: '5px 16px', background: INK_TINT_02, borderTop: `0.5px solid ${INK_TINT_07}`, borderBottom: `0.5px solid ${INK_TINT_07}` }}>
-            <span style={{ width: 32, fontSize: 10, fontWeight: 900, color: INK_FAINT, letterSpacing: '0.1em', flexShrink: 0, textAlign: 'center' as const }}>RK</span>
-            <span style={{ flex: 1, fontSize: 10, fontWeight: 900, color: INK_FAINT, letterSpacing: '0.1em' }}>FRANCHISE</span>
-            <span style={{ width: 28, textAlign: 'center' as const, fontSize: 10, fontWeight: 900, color: INK_FAINT, letterSpacing: '0.1em', flexShrink: 0 }}>WIN</span>
-            <span style={{ width: 28, textAlign: 'center' as const, fontSize: 10, fontWeight: 900, color: INK_FAINT, letterSpacing: '0.1em', flexShrink: 0 }}>T10</span>
-            <span style={{ width: 72, textAlign: 'right' as const, fontSize: 10, fontWeight: 900, color: INK_FAINT, letterSpacing: '0.1em', flexShrink: 0 }}>
+          <div style={{ display: 'flex', alignItems: 'center', padding: '6px 16px', borderBottom: `0.5px solid ${INK_TINT_07}` }}>
+            <span style={{ width: 32, fontSize: 10, fontWeight: 700, color: INK_MUTE, letterSpacing: '0.08em', textTransform: 'uppercase' as const, flexShrink: 0, textAlign: 'center' as const }}>RK</span>
+            <span style={{ flex: 1, fontSize: 10, fontWeight: 700, color: INK_MUTE, letterSpacing: '0.08em', textTransform: 'uppercase' as const }}>FRANCHISE</span>
+            <span style={{ width: 28, textAlign: 'center' as const, fontSize: 10, fontWeight: 700, color: INK_MUTE, letterSpacing: '0.08em', textTransform: 'uppercase' as const, flexShrink: 0 }}>WIN</span>
+            <span style={{ width: 28, textAlign: 'center' as const, fontSize: 10, fontWeight: 700, color: INK_MUTE, letterSpacing: '0.08em', textTransform: 'uppercase' as const, flexShrink: 0 }}>T10</span>
+            <span style={{ width: 72, textAlign: 'right' as const, fontSize: 10, fontWeight: 700, color: INK_MUTE, letterSpacing: '0.08em', textTransform: 'uppercase' as const, flexShrink: 0 }}>
               {activeMetric === 'wins' ? 'WINS' : activeMetric === 'top10s' ? 'TOP 10s' : 'EARNINGS'}
             </span>
           </div>
