@@ -92,13 +92,6 @@ export function CollegeProfilePage() {
     return items.slice(0, 2);
   }, [collegeRank]);
 
-  // Body subline inside the card: "13 alumni · PGA, LPGA, DPWT"
-  const cardSubline = useMemo(() => {
-    if (!stats) return null;
-    const tourList = buildCompactTourList(alumni);
-    const count = `${stats.player_count} alumni`;
-    return tourList ? `${count} · ${tourList}` : count;
-  }, [stats, alumni]);
 
   return (
     <TourHubShell>
