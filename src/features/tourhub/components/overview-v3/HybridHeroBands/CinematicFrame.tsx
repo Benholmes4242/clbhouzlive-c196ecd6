@@ -157,24 +157,14 @@ function SoloRowDark({
       >
         {rank}
       </span>
-      {avatarUrl ? (
-        <img
-          src={avatarUrl}
-          alt=""
-          loading="lazy"
-          style={{
-            width: 26, height: 26, borderRadius: '34%', objectFit: 'cover',
-            flexShrink: 0, background: 'rgba(255,255,255,0.08)',
-          }}
-        />
-      ) : (
-        <div
-          style={{
-            width: 26, height: 26, borderRadius: '34%',
-            background: 'rgba(255,255,255,0.08)', flexShrink: 0,
-          }}
-        />
-      )}
+      <SquircleAvatar
+        src={avatarUrl}
+        alt={name}
+        userId={entry?.player?.id ?? null}
+        size={26}
+        hideRing
+      />
+
       <span
         style={{
           flex: 1, minWidth: 0, fontSize: 15, fontWeight: 600, color: 'white',
