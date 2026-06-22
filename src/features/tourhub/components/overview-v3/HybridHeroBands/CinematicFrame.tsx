@@ -38,6 +38,7 @@ const LIVE_BOTTOM_H = CHAMPION_BAND_H + TICKER_BAR_H;
 const RESULTS_FOOTER_H = 34;
 const BOTTOM_STACK_H = TICKER_BAR_H + CHAMPION_BAND_H;
 import { getPlayerHeadshotUrl, getPlayerHeadshotCandidates } from '@/utils/playerHeadshot';
+import { resolvePlayerAvatarCandidates } from '../../../_shared/resolvePlayerAvatar';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 
 import type { DefendingChampData } from '../../../hooks/useTournamentDefendingChamp';
