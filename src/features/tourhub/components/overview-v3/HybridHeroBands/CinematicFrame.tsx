@@ -607,7 +607,7 @@ export function CinematicFrame({
 
   // ---- Capsule slot construction (mirrors LeaderboardBand live-state) ----
   const safe = Array.isArray(leaderboard) ? leaderboard : [];
-  const avatar = (e: any) => resolveAvatar(e, tourSlug);
+  const avatar = (e: any) => resolveAvatarCandidates(e, tourSlug);
 
   type SlotNode = React.ReactNode;
   const slotNodes: SlotNode[] = [];
