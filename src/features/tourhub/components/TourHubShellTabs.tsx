@@ -83,6 +83,7 @@ export const TourHubShellTabs: React.FC = () => {
         background: '#F8FAFC',
         display: 'flex',
         alignItems: 'stretch',
+        borderBottom: '0.5px solid rgba(15,23,42,0.08)',
       }}
     >
       <div style={{ position: 'relative', minWidth: 0, flex: '1 1 auto' }}>
