@@ -354,7 +354,6 @@ function ColumnHeader() {
       display: 'flex',
       alignItems: 'center',
       padding: '8px 16px',
-      borderTop: `0.5px solid ${INK_TINT_07}`,
       borderBottom: `0.5px solid ${INK_TINT_07}`,
     }}>
       <span style={{ flex: 1, fontSize: 10, fontWeight: 700, color: INK_MUTE, letterSpacing: '0.08em', textTransform: 'uppercase' as const }}>
