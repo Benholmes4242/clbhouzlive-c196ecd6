@@ -401,7 +401,7 @@ export function LeadersMasthead({
                     }}
                   >
                     {integer}
-                    {decimal && <span style={{ color: AMBER }}>{decimal}</span>}
+                    {decimal && <span style={{ color: INK }}>{decimal}</span>}
                     {suffix && <span style={{ color: INK }}>{suffix}</span>}
                   </span>
                 </div>
