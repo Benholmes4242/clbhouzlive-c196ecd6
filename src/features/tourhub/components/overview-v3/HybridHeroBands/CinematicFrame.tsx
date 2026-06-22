@@ -944,7 +944,7 @@ export function CinematicFrame({
               fontWeight: 800,
               letterSpacing: '-0.03em',
               lineHeight: 0.98,
-              textShadow: '0 2px 30px rgba(0,0,0,0.40)',
+              textShadow: isResults ? 'none' : '0 2px 30px rgba(0,0,0,0.40)',
               textWrap: 'balance' as any,
               wordBreak: 'break-word',
               display: '-webkit-box',
