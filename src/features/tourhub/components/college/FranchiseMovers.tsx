@@ -50,27 +50,9 @@ export function FranchiseMovers({ limit = 8, className }: FranchiseMoversProps) 
   // Single batched query for driver lines — one per Movers tab render.
   const { data: driverMap } = useFranchiseDrivers(slugs, movers?.[0]?.week_start);
 
-  const weekStart = movers?.[0]?.week_start;
-  const weekLabel = weekStart
-    ? (() => {
-        const start = new Date(weekStart);
-        const end = new Date(start);
-        end.setDate(end.getDate() + 6);
-        return `Week of ${format(start, 'MMM d')} – ${format(end, 'MMM d, yyyy')}`;
-      })()
-    : null;
-
   return (
     <div className={className}>
-      {/* Section header */}
-      <div style={{ background: '#ffffff', borderTop: `1px solid ${INK_TINT_07}`, padding: '14px 16px 6px' }}>
-        <SectionHeader eyebrow="Weekly Franchise Movers" />
-        {weekLabel && (
-          <p style={{ fontSize: 11, fontWeight: 500, color: '#94A3B8', margin: '-10px 0 6px 13px' }}>
-            {weekLabel}
-          </p>
-        )}
-      </div>
+
 
       {/* Rising / Falling toggle */}
       <div style={{ padding: '0 16px 10px', background: '#ffffff' }}>
