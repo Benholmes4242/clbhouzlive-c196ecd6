@@ -17,7 +17,7 @@ import { PlayoffPendingPanel } from './PlayoffPendingPanel';
 import { INK, INK_15, AMBER } from '../HybridHero.constants';
 import { INK_ALPHA_45, FONT, GOLD, GOLD_DEEP } from '../../../_shared/tokens';
 import type { TeeTimeGroup } from '../../../hooks/useTournamentTeeTimes';
-import { getPlayerHeadshotUrl } from '@/utils/playerHeadshot';
+import { resolvePlayerAvatarCandidates } from '../../../_shared/resolvePlayerAvatar';
 
 
 export interface LeaderboardBandProps {
@@ -71,11 +71,12 @@ function entryThru(entry: any): string {
 }
 
 function resolveAvatar(entry: any, tourSlug?: string): string | null {
-  const direct = entry?.player?.photo_url ?? null;
-  if (direct) return direct;
   const name = entry?.player?.full_name || `${entry?.player?.first_name ?? ''} ${entry?.player?.last_name ?? ''}`.trim();
-  if (!name || !tourSlug) return null;
-  return getPlayerHeadshotUrl(name, tourSlug);
+  return resolvePlayerAvatarCandidates({
+    name,
+    photoUrl: entry?.player?.photo_url ?? null,
+    tourSlug: tourSlug ?? null,
+  })[0] ?? null;
 }
 
 export function LeaderboardBand({

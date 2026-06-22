@@ -19,7 +19,8 @@ import { type PlayerTourCode } from '../players/PlayersTourFilterSheet';
 import { type PlayerSortType, getDefaultSortForTour } from '../players/PlayerSortControl';
 import { PlayerCardV2 } from '../players/PlayerCardV2';
 import { PlayersEmptyState } from '../players/PlayersEmptyState';
-import { getPlayerHeadshotUrl, PLAYER_SILHOUETTE_URL } from '@/utils/playerHeadshot';
+import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
+import { resolvePlayerAvatarCandidates } from '../../_shared/resolvePlayerAvatar';
 import { titleCaseCountry } from '../../utils/countryFlags';
 import CountryFlag from '@/components/ui/country-flag';
 import {
@@ -84,7 +85,7 @@ interface HeroChampionProps {
   champion: ElitePlayer;
   runnerUp: ElitePlayer | null;
   champStats: { earnings: number | null; wins: number | null; tourRank: number | null; points: number | null; tournamentsPlayed: number | null } | undefined;
-  champPhotoUrl: string;
+  champAvatarCandidates: string[];
   sort: PlayerSortType;
   activeTour: string;
   onClick: () => void;
@@ -96,7 +97,7 @@ function formatEarningsCompact(amount: number): string {
   return `$${amount}`;
 }
 
-function HeroChampion({ champion, champStats, champPhotoUrl, sort, activeTour, onClick }: HeroChampionProps) {
+function HeroChampion({ champion, champStats, champAvatarCandidates, sort, activeTour, onClick }: HeroChampionProps) {
   const primary = (() => {
     if (sort === 'fedex-points') {
       if (!champStats?.points || champStats.points <= 0) return null;
@@ -159,11 +160,13 @@ function HeroChampion({ champion, champStats, champPhotoUrl, sort, activeTour, o
         {/* Photo + "1" badge */}
         <div style={{ position: 'relative', flexShrink: 0 }}>
           <div style={{ width: 80, height: 80, borderRadius: '34%', overflow: 'hidden', background: INK_TINT_06, border: `2.5px solid ${GOLD}`, boxShadow: '0 4px 12px rgba(255,184,0,0.20)' }}>
-            <img
-              src={champPhotoUrl}
+            <SquircleAvatar
+              size={75}
+              srcCandidates={champAvatarCandidates}
               alt={champion.playerName}
-              style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center 8%' }}
-              onError={e => { (e.target as HTMLImageElement).src = PLAYER_SILHOUETTE_URL; }}
+              userId={champion.playerId}
+              hideRing
+              priority
             />
           </div>
           <div
@@ -699,7 +702,11 @@ export function PlayersTab() {
         const runners = top5.slice(1, 5);
         if (!champion) return null;
         const champStats = statsMap.get(champion.playerId);
-        const champPhotoUrl = getPlayerHeadshotUrl(champion.playerName, champion.tourCode ?? 'pga');
+        const champAvatarCandidates = resolvePlayerAvatarCandidates({
+          name: champion.playerName,
+          photoUrl: champion.photoUrl,
+          tourSlug: champion.tourCode ?? 'pga',
+        });
 
         return (
           <div style={{ padding: '16px 16px 0', background: SLATE_50 }}>
@@ -753,7 +760,7 @@ export function PlayersTab() {
               champion={champion}
               runnerUp={top5[1] ?? null}
               champStats={champStats}
-              champPhotoUrl={champPhotoUrl}
+              champAvatarCandidates={champAvatarCandidates}
               sort={sort}
               activeTour={activeTour}
               onClick={() => navigate(`/tourhub/player/${champion.playerId}`)}
