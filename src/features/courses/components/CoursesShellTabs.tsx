@@ -60,6 +60,7 @@ export const CoursesShellTabs: React.FC<CoursesShellTabsProps> = ({
           display: 'flex',
           justifyContent: 'space-evenly',
           background: '#F8FAFC',
+          borderBottom: '0.5px solid rgba(15,23,42,0.08)',
           overflowY: 'hidden',
           fontFamily: 'Geist, system-ui, -apple-system, BlinkMacSystemFont, sans-serif',
         }}
@@ -89,13 +90,7 @@ export const CoursesShellTabs: React.FC<CoursesShellTabsProps> = ({
                 alignItems: 'center',
               }}
             >
-              <span
-                style={{
-                  display: 'inline-block',
-                  paddingBottom: 4,
-                  borderBottom: isActive ? '1.5px solid #0A0E14' : '1.5px solid transparent',
-                }}
-              >
+              <span style={{ display: 'inline-block' }}>
                 {tab.label}
               </span>
             </button>
