@@ -389,14 +389,7 @@ export function LeadersMasthead({
                     </span>
                   )}
                 </div>
-                <div
-                  style={{
-                    display: 'flex',
-                    alignItems: 'baseline',
-                    gap: 8,
-                    marginTop: 10,
-                  }}
-                >
+                <div style={{ marginTop: 10 }}>
                   <span
                     style={{
                       fontSize: 22,
@@ -410,17 +403,6 @@ export function LeadersMasthead({
                     {integer}
                     {decimal && <span style={{ color: AMBER }}>{decimal}</span>}
                     {suffix && <span style={{ color: INK }}>{suffix}</span>}
-                  </span>
-                  <span
-                    style={{
-                      fontSize: 9,
-                      fontWeight: 800,
-                      color: INK_MUTE,
-                      letterSpacing: '0.16em',
-                      textTransform: 'uppercase',
-                    }}
-                  >
-                    {category.label}
                   </span>
                 </div>
               </div>
