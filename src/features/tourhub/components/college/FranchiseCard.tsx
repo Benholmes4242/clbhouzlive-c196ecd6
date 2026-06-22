@@ -52,6 +52,7 @@ interface FranchiseCardProps {
   className?: string;
   animationDelay?: number;
   isDelta?: boolean;
+  direction?: 'up' | 'down';
   deltas?: {
     earnings_delta: number;
     wins_delta: number;
