@@ -736,14 +736,11 @@ export function CinematicFrame({
   let upcomingFooter: string | null = null;
   if (isUpcoming) {
     if (defendingChamp) {
-      const headshot = (() => {
-        if (!tourSlug || !defendingChamp.name) return null;
-        try { return getPlayerHeadshotUrl(defendingChamp.name, tourSlug); }
-        catch { return null; }
-      })();
+      const headshotCandidates = nameCandidates(defendingChamp.name, tourSlug);
       upcomingCapsule = (
-        <DefendingChampionRowDark data={defendingChamp} avatarUrl={headshot} />
+        <DefendingChampionRowDark data={defendingChamp} avatarUrl={headshotCandidates} />
       );
+
       upcomingFooter = 'View tournament';
     } else if (fieldStrength && fieldStrength.totalPlayers > 0) {
       upcomingCapsule = <FieldStrengthRowDark data={fieldStrength} />;
