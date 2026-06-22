@@ -91,7 +91,11 @@ export function PlayerCardV2({
   directoryMode = false,
 }: PlayerCardV2Props) {
   const tourCode = activeTour === 'all' ? (player.tourCodes?.[0] ?? 'pga') : activeTour;
-  const photoUrl = getPlayerHeadshotUrl(player.fullName, tourCode);
+  const avatarCandidates = resolvePlayerAvatarCandidates({
+    name: player.fullName,
+    photoUrl: player.photoUrl,
+    tourSlug: tourCode,
+  });
   const countryName = titleCaseCountry(player.country);
 
   const staggerDelay = Math.min(index, 20) * 0.015;
