@@ -8,7 +8,7 @@ import { getPlayerHeadshotUrl, PLAYER_SILHOUETTE_URL } from '@/utils/playerHeads
 import { titleCaseCountry } from '../../utils/countryFlags';
 import CountryFlag from '@/components/ui/country-flag';
 import { MovementIndicator } from '../shared/MovementIndicator';
-import { RecentResultPill } from '../shared/RecentResultPill';
+
 import type { PlayerSortType } from './PlayerSortControl';
 import type { RecentResult } from '../../hooks/useRecentPlayerResults';
 import { AMBER, AMBER_SOFT_BG, INK, INK_FAINT, INK_MUTE, INK_TINT_06, INK_TINT_07, LIVE_INK } from '../../_shared/tokens';
@@ -207,9 +207,6 @@ export function PlayerCardV2({
             }}>
               {player.fullName}
             </span>
-            {recentResult && (
-              <RecentResultPill position={recentResult.position} tied={recentResult.tied} />
-            )}
           </div>
           <div style={{ display: 'flex', alignItems: 'center', gap: '4px', marginTop: '2px' }}>
             <CountryFlag country={player.country} size="sm" />

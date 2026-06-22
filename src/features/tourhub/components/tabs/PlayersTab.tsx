@@ -14,7 +14,7 @@ import { useTourPlayers, useTourSeason, useTourPlayerStatistics, type TourPlayer
 import { useElitePlayers, type ElitePlayer } from '../../hooks/useElitePlayers';
 import { useRecentPlayerResults } from '../../hooks/useRecentPlayerResults';
 import { useTourSeasonRankings } from '../../hooks/useTourSeasonRankings';
-import { useChampionStreak } from '../../hooks/useChampionStreak';
+
 import { type PlayerTourCode } from '../players/PlayersTourFilterSheet';
 import { type PlayerSortType, getDefaultSortForTour } from '../players/PlayerSortControl';
 import { PlayerCardV2 } from '../players/PlayerCardV2';
@@ -31,6 +31,7 @@ import {
   GOLD_TINT_10,
   HAIRLINE_INK_10,
   INK,
+  INK_DEEP,
   INK_FAINT,
   INK_MUTE,
   INK_TINT_06,
@@ -95,9 +96,7 @@ function formatEarningsCompact(amount: number): string {
   return `$${amount}`;
 }
 
-function HeroChampion({ champion, runnerUp, champStats, champPhotoUrl, sort, activeTour, onClick }: HeroChampionProps) {
-  const { data: streakWeeks } = useChampionStreak(champion.playerId);
-
+function HeroChampion({ champion, champStats, champPhotoUrl, sort, activeTour, onClick }: HeroChampionProps) {
   const primary = (() => {
     if (sort === 'fedex-points') {
       if (!champStats?.points || champStats.points <= 0) return null;
@@ -127,23 +126,13 @@ function HeroChampion({ champion, runnerUp, champStats, champPhotoUrl, sort, act
     };
   })();
 
-  const rankLabel = sort === 'world-rank-desc' ? 'WORLD #1'
-    : sort === 'fedex-points' ? 'FEDEX LEADER'
-    : sort === 'highest-earnings' ? 'MONEY LEADER'
-    : sort === 'most-wins' ? 'WINS LEADER'
+  const isWorldRankTour = activeTour === 'pga' || activeTour === 'LPGA';
+  const rankLabel =
+      sort === 'fedex-points'      ? 'FEDEX LEADER'
+    : sort === 'highest-earnings'  ? 'MONEY LEADER'
+    : sort === 'most-wins'         ? 'WINS LEADER'
+    : sort === 'world-rank-desc'   ? (isWorldRankTour ? 'WORLD #1' : 'TOUR LEADER')
     : 'TOUR LEADER';
-
-  const showStreak = (streakWeeks ?? 0) >= 2;
-
-  const marginPts = (() => {
-    if (sort !== 'world-rank-desc') return null;
-    const a = champion.totalPoints ?? champion.avgPoints;
-    const b = runnerUp?.totalPoints ?? runnerUp?.avgPoints;
-    if (a == null || b == null) return null;
-    const diff = a - b;
-    if (diff <= 0) return null;
-    return diff;
-  })();
 
   return (
     <div
@@ -163,22 +152,6 @@ function HeroChampion({ champion, runnerUp, champStats, champPhotoUrl, sort, act
         <span style={{ fontSize: 10.5, fontWeight: 800, letterSpacing: '0.14em', color: INK }}>
           {rankLabel}
         </span>
-        {showStreak && (
-          <>
-            <span style={{ color: INK_MUTE, fontSize: 10.5, fontWeight: 800 }}>·</span>
-            <span style={{ fontSize: 10.5, fontWeight: 800, letterSpacing: '0.14em', color: INK_MUTE }}>
-              {streakWeeks} CONSECUTIVE WEEKS
-            </span>
-          </>
-        )}
-        {marginPts != null && (
-          <>
-            <span style={{ color: INK_MUTE, fontSize: 10.5, fontWeight: 800 }}>·</span>
-            <span style={{ fontSize: 10.5, fontWeight: 800, letterSpacing: '0.14em', color: INK_MUTE }}>
-              MARGIN +{marginPts.toFixed(0)} PTS
-            </span>
-          </>
-        )}
       </div>
 
       {/* Body row */}
@@ -745,57 +718,52 @@ export function PlayersTab() {
           )}
         </div>
 
-        {/* Underline tour-specific tabs (A-Z removed Phase 1 fix.1.6) */}
-        <div style={{ display: 'flex', borderBottom: `1px solid ${HAIRLINE_INK_10}`, marginTop: '6px' }}>
-          {(() => {
-            // Per-tour tab config — single source of truth.
-            const tabs: { value: PlayerSortType; label: string }[] =
-              activeTour === 'pga'
-                ? [
-                    { value: 'world-rank-desc', label: 'World Ranking' },
-                    { value: 'fedex-points', label: 'FedEx Cup' },
-                    { value: 'highest-earnings', label: 'Earnings' },
-                  ]
-              : activeTour === 'EURO' ? [{ value: 'race-to-dubai', label: 'Race to Dubai' }]
-              : activeTour === 'LPGA' ? [{ value: 'race-to-cme', label: 'Race to CME Globe' }]
-              : activeTour === 'PGAD' ? [{ value: 'points-list', label: 'Korn Ferry Points' }]
-              : activeTour === 'LIV' ? [{ value: 'liv-standings', label: 'Individual Standings' }]
-              : activeTour === 'CHAMP' ? [{ value: 'highest-earnings', label: 'Earnings' }]
-              : [{ value: getDefaultSortForTour(activeTour) as PlayerSortType, label: getSortShortLabel(getDefaultSortForTour(activeTour), activeTour) }];
+        {/* Underline tour-specific tabs — only render when >1 tab */}
+        {(() => {
+          // Per-tour tab config — single source of truth.
+          const tabs: { value: PlayerSortType; label: string }[] =
+            activeTour === 'pga'
+              ? [
+                  { value: 'world-rank-desc', label: 'World Ranking' },
+                  { value: 'fedex-points', label: 'FedEx Cup' },
+                  { value: 'highest-earnings', label: 'Earnings' },
+                ]
+            : activeTour === 'EURO' ? [{ value: 'race-to-dubai', label: 'Race to Dubai' }]
+            : activeTour === 'LPGA' ? [{ value: 'race-to-cme', label: 'Race to CME Globe' }]
+            : activeTour === 'PGAD' ? [{ value: 'points-list', label: 'Korn Ferry Points' }]
+            : activeTour === 'LIV' ? [{ value: 'liv-standings', label: 'Individual Standings' }]
+            : activeTour === 'CHAMP' ? [{ value: 'highest-earnings', label: 'Earnings' }]
+            : [{ value: getDefaultSortForTour(activeTour) as PlayerSortType, label: getSortShortLabel(getDefaultSortForTour(activeTour), activeTour) }];
 
-            return tabs.map(tab => {
-              const isActive = sort === tab.value;
-              return (
-                <button
-                  key={tab.value}
-                  onClick={() => { setSort(tab.value); setVisibleCount(PAGE_SIZE); }}
-                  style={{
-                    flex: 1, padding: '12px 0',
-                    fontSize: '12px', fontWeight: isActive ? 800 : 600,
-                    color: isActive ? INK : INK_FAINT,
-                    background: 'transparent', border: 'none',
-                    borderBottom: `2px solid ${isActive ? AMBER : 'transparent'}`,
-                    cursor: 'pointer', transition: 'all 0.15s',
-                  }}
-                >
-                  {tab.label}
-                </button>
-              );
-            });
-          })()}
-        </div>
+          if (tabs.length <= 1) return null;
 
-        {/* Count+sort bar OR search input — mutually exclusive (Phase 1 fix.1.7) */}
-        {!searchExpanded ? (
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '8px 16px', gap: 8 }}>
-            <span style={{ fontSize: 9, fontWeight: 800, color: INK, letterSpacing: '0.16em', fontVariantNumeric: 'tabular-nums' }}>
-              {totalCount.toLocaleString()} {totalCount === 1 ? 'PLAYER' : 'PLAYERS'}
-            </span>
-            <span style={{ fontSize: 9, fontWeight: 800, color: INK_MUTE, letterSpacing: '0.14em' }}>
-              SORTED BY {getSortShortLabel(sort, activeTour).toUpperCase()}
-            </span>
-          </div>
-        ) : (
+          return (
+            <div style={{ display: 'flex', borderBottom: `1px solid ${HAIRLINE_INK_10}`, marginTop: '6px' }}>
+              {tabs.map(tab => {
+                const isActive = sort === tab.value;
+                return (
+                  <button
+                    key={tab.value}
+                    onClick={() => { setSort(tab.value); setVisibleCount(PAGE_SIZE); }}
+                    style={{
+                      flex: 1, padding: '12px 0',
+                      fontSize: '12px', fontWeight: isActive ? 800 : 600,
+                      color: isActive ? INK : INK_FAINT,
+                      background: 'transparent', border: 'none',
+                      borderBottom: `2px solid ${isActive ? INK_DEEP : 'transparent'}`,
+                      cursor: 'pointer', transition: 'all 0.15s',
+                    }}
+                  >
+                    {tab.label}
+                  </button>
+                );
+              })}
+            </div>
+          );
+        })()}
+
+        {/* Search input — appears only when expanded */}
+        {searchExpanded && (
           <div style={{ padding: '6px 16px 8px' }}>
             <div style={{ position: 'relative' }}>
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 z-10 w-4 h-4" style={{ color: AMBER }} strokeWidth={2.5} />
@@ -838,13 +806,6 @@ export function PlayersTab() {
           >
             {displayRows.length > 0 ? (
               <>
-                {!debouncedSearch && sort === 'world-rank-desc' && (
-                  <div style={{ padding: '12px 16px 6px', background: SURFACE }}>
-                    <span style={{ fontSize: 9, fontWeight: 800, color: INK_MUTE, letterSpacing: '0.16em' }}>
-                      CHASING
-                    </span>
-                  </div>
-                )}
                 {displayRows.map((player, index) => {
                   const rank = rankMap.get(player.id);
                   const pStats = statsMap.get(player.id);
