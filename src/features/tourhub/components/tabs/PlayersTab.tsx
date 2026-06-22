@@ -247,7 +247,12 @@ export function PlayersTab() {
     const now = new Date();
     return now.getMonth() >= 9 ? now.getFullYear() + 1 : now.getFullYear();
   }, []);
-  const { data: tourRankings } = useTourSeasonRankings(tourRankingsCode, seasonYear);
+  const { data: tourRankings, isPending: tourRankingsPending } = useTourSeasonRankings(tourRankingsCode, seasonYear);
+
+  // Non-PGA tours depend on tour_season_rankings for sort + display. Block paint
+  // until it resolves so we never flash an OWGR-ordered interim (race fix).
+  const isNonPgaTour = activeTour === 'EURO' || activeTour === 'LPGA' || activeTour === 'PGAD' || activeTour === 'LIV' || activeTour === 'CHAMP';
+  const tourRanksLoading = isNonPgaTour && (tourRankingsPending || !tourRankings);
 
   // Reset pagination on search/sort change
   useEffect(() => {
@@ -336,6 +341,55 @@ export function PlayersTab() {
 
   // Hero players — sorted to match the active sort selection
   const heroPlayers = useMemo<ElitePlayer[]>(() => {
+    // Non-PGA tours: derive hero directly from tour_season_rankings so the
+    // champion is authoritative and never depends on the OWGR elite-pool race.
+    const heroIsNonPga = activeTour === 'EURO' || activeTour === 'LPGA' || activeTour === 'PGAD' || activeTour === 'LIV' || activeTour === 'CHAMP';
+    if (heroIsNonPga && tourRankings && tourRankings.length > 0) {
+      const playerById = new Map((allPlayers ?? []).map(p => [p.id, p]));
+      return tourRankings.slice(0, 5).map(r => {
+        const pid = r.player_id || r.manual_player_id || '';
+        const p = pid ? playerById.get(pid) : undefined;
+        if (p) {
+          return {
+            id: p.id,
+            playerId: p.id,
+            playerName: p.full_name,
+            firstName: p.first_name || '',
+            lastName: p.last_name || '',
+            country: p.country,
+            countryCode: p.country_code,
+            photoUrl: p.photo_url,
+            pgaTourId: p.pga_tour_id,
+            tourCode: p.tour_codes?.[0] ?? null,
+            worldRank: rankMap.get(p.id)?.worldRank ?? 0,
+            avgPoints: rankMap.get(p.id)?.avgPoints ?? null,
+            totalPoints: null,
+            priorRank: null,
+            rankChange: null,
+          } as ElitePlayer;
+        }
+        // Synthetic ElitePlayer for unjoinable rows so the top-5 position is preserved.
+        const parts = (r.player_name || '').split(/\s+/);
+        return {
+          id: pid || `rank-${r.id}`,
+          playerId: pid || `rank-${r.id}`,
+          playerName: r.player_name || '',
+          firstName: parts[0] || '',
+          lastName: parts.slice(1).join(' ') || '',
+          country: r.country ?? null,
+          countryCode: null,
+          photoUrl: null,
+          pgaTourId: null,
+          tourCode: r.tour_code ?? null,
+          worldRank: 0,
+          avgPoints: null,
+          totalPoints: null,
+          priorRank: null,
+          rankChange: null,
+        } as ElitePlayer;
+      });
+    }
+
     const sortCandidates = (candidates: ElitePlayer[]) => {
       return [...candidates].sort((a, b) => {
         const aStats = statsMap.get(a.playerId);
@@ -448,7 +502,7 @@ export function PlayersTab() {
     if (!tourFilteredPlayers || tourFilteredPlayers.length === 0) return [];
     
     return tourFilteredPlayers.slice(0, 5).map(toEliteShape);
-  }, [elitePlayers, activeTour, allPlayers, statsMap, tourFilteredPlayers, rankMap, sort]);
+  }, [elitePlayers, activeTour, allPlayers, statsMap, tourFilteredPlayers, rankMap, sort, tourRankings]);
 
   // Search filter
   const matchesSearch = useCallback((name: string, country: string | null) => {
@@ -503,12 +557,17 @@ export function PlayersTab() {
       filtered = filtered.filter(p => (statsMap.get(p.id)?.points ?? 0) > 0);
     }
 
+    // Tour-standing sorts: only include players with a tour rank, so unjoinable
+    // rows can't appear with phantom (OWGR) positions.
+    if (sort === 'race-to-dubai' || sort === 'race-to-cme' || sort === 'points-list' || sort === 'liv-standings') {
+      filtered = filtered.filter(p => statsMap.get(p.id)?.tourRank != null);
+    }
+
     filtered = [...filtered].sort((a, b) => {
-      const aWorldRank = rankMap.get(a.id)?.worldRank ?? Infinity;
-      const bWorldRank = rankMap.get(b.id)?.worldRank ?? Infinity;
-      
-      const aRank = statsMap.get(a.id)?.tourRank ?? aWorldRank;
-      const bRank = statsMap.get(b.id)?.tourRank ?? bWorldRank;
+      // Never fall back to OWGR for the tour-points sorts — players without a
+      // tour rank sort to the bottom rather than being slotted by world ranking.
+      const aRank = statsMap.get(a.id)?.tourRank ?? Infinity;
+      const bRank = statsMap.get(b.id)?.tourRank ?? Infinity;
 
       switch (sort) {
         case 'world-rank-desc': {
@@ -570,7 +629,7 @@ export function PlayersTab() {
     return { rows: filtered, totalCount: filtered.length };
   }, [tourFilteredPlayers, matchesSearch, sort, rankMap, statsMap, activeTour, heroPlayerIds, debouncedSearch]);
 
-  const isLoading = allLoading && (!allPlayers || (allPlayers as TourPlayer[]).length === 0);
+  const isLoading = (allLoading && (!allPlayers || (allPlayers as TourPlayer[]).length === 0)) || tourRanksLoading;
 
   const displayRows = rows.slice(0, visibleCount);
   const hasMore = visibleCount < totalCount;
@@ -828,7 +887,7 @@ export function PlayersTab() {
                           return index + 2;
                         }
                         if (sort === 'race-to-dubai' || sort === 'race-to-cme' || sort === 'points-list' || sort === 'liv-standings') {
-                          return pStats?.tourRank || rank?.worldRank;
+                          return pStats?.tourRank ?? null;
                         }
                         if (sort === 'alpha-az' || sort === 'alpha-za') {
                           return null;
