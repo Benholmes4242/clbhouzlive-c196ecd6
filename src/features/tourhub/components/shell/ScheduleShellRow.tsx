@@ -1,4 +1,4 @@
-import { memo, useMemo, useState } from 'react';
+import { memo, useEffect, useMemo, useRef, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { ChevronDown, Globe } from 'lucide-react';
 import { BottomSheet } from '@/components/ui/BottomSheet';
@@ -43,6 +43,7 @@ function ScheduleShellRowInner() {
   const activeFilter = (searchParams.get('filter') as ScheduleFilterType) || 'all';
   const activeTour = (searchParams.get('tour') as TourFilterCode) || 'all';
   const [tourSheetOpen, setTourSheetOpen] = useState(false);
+  const filterRowRef = useRef<HTMLDivElement | null>(null);
 
   const { data: season } = useTourSeason();
   const { data: tournaments } = useTourTournaments(season?.id);
@@ -76,6 +77,18 @@ function ScheduleShellRowInner() {
     ? 'All Tours'
     : (getTourMeta(activeTour)?.short ?? activeTour);
 
+  useEffect(() => {
+    const row = filterRowRef.current;
+    if (!row) return;
+
+    row.scrollLeft = 0;
+    const frame = window.requestAnimationFrame(() => {
+      row.scrollLeft = 0;
+    });
+
+    return () => window.cancelAnimationFrame(frame);
+  }, [activeTour]);
+
   return (
     <>
       <div
@@ -86,6 +99,7 @@ function ScheduleShellRowInner() {
         }}
       >
         <div
+          ref={filterRowRef}
           role="tablist"
           aria-label="Filter Schedule"
           className="flex items-center gap-1.5 overflow-x-auto no-scrollbar"
