@@ -31,30 +31,6 @@ import {
   SURFACE,
 } from '../_shared/tokens';
 
-/* ─── Hero subtitle: cross-tour roll-up ────────────────────────────────── */
-
-const TOUR_LABELS: Record<string, string> = {
-  pga: 'PGA',
-  lpga: 'LPGA',
-  euro: 'DPWT',
-  dpwt: 'DPWT',
-  champ: 'Champions',
-  korn: 'Korn Ferry',
-};
-
-function buildCompactTourList(
-  alumni: { tour_codes: string[] | null }[] | undefined,
-): string | null {
-  if (!alumni || alumni.length === 0) return null;
-  const tours = new Set<string>();
-  for (const a of alumni) {
-    const code = a.tour_codes?.[0]?.toLowerCase();
-    if (code && TOUR_LABELS[code]) tours.add(TOUR_LABELS[code]);
-  }
-  if (tours.size === 0) return null;
-  const ordered = ['PGA', 'LPGA', 'DPWT', 'Champions', 'Korn Ferry'].filter(t => tours.has(t));
-  return ordered.join(', ');
-}
 
 /* ─── Page ─────────────────────────────────────────────────────────────── */
 
