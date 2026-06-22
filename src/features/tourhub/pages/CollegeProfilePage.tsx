@@ -1,4 +1,4 @@
-import { useState, useMemo, Fragment } from 'react';
+import { useMemo, Fragment } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { RefreshCw, AlertCircle, ChevronRight, Crown } from 'lucide-react';
 import { getCollegeLogoUrl } from '@/utils/collegeLogo';
@@ -10,7 +10,9 @@ import {
   AlumniDepthChart,
   H2HRivalStrip,
 } from '../components/college';
+import { PlayerInitialAvatar } from '../components/shared/PlayerInitialAvatar';
 import { splitStatValue } from '../utils/splitStatValue';
+
 
 import { useCollegeStats, useCollegeSeasonStats } from '../hooks/useCollegeStats';
 import { useCollegeMediaMap } from '../hooks/useCollegeMedia';
@@ -19,10 +21,11 @@ import { useCollegeWeeklyMovers } from '../hooks/useCollegeMovers';
 import { useFranchiseCaptains } from '../hooks/useFranchiseCaptains';
 import {
   captainDominates,
-  captainShortName,
+  captainShortName as _captainShortName,
 } from '../utils/captainAnchor';
 import { collegeHubRoute } from '../routes';
 import { AMBER, GOLD, GOLD_DEEP, GOLD_GLOW_DROP, GOLD_TINT_10, INK, INK_MUTE, INK_FAINT, INK_TINT_06, INK_TINT_07, SLATE_50, SURFACE } from '../_shared/tokens';
+
 
 /* ─── Hero subtitle: cross-tour roll-up ────────────────────────────────── */
 
@@ -68,7 +71,8 @@ export function CollegeProfilePage() {
   const captainMap = useFranchiseCaptains(collegeSlug ? [collegeSlug] : []);
   const seasonYear = new Date().getFullYear();
 
-  const [heroImgError, setHeroImgError] = useState(false);
+
+
 
 
   const college = collegeSlug ? collegeMap?.get(collegeSlug) || null : null;
@@ -87,17 +91,19 @@ export function CollegeProfilePage() {
   // Captain (top-earning alumnus) — pulled from useFranchiseCaptains for the
   // dominance gate. Mirror of College Franchise hub-level wiring.
   const captain = collegeSlug ? captainMap.data?.get(collegeSlug) : undefined;
-  const showCaptainPill = captainDominates(captain);
+  const _showCaptainPill = captainDominates(captain);
 
+  void _captainShortName;
 
-
-  // Captain OWGR (PGA-biased; null when no live ranking available)
-  const captainOwgr = useMemo(() => {
+  // Captain OWGR retained for future surfacing; currently unused after
+  // caption condense (COLLEGE_FRANCHISE_PAGE_NEATEN).
+  const _captainOwgr = useMemo(() => {
     if (!captain || !alumni) return null;
     const a = alumni.find(x => x.id === captain.playerId);
     const r = a?.world_ranking;
     return r && r > 0 ? r : null;
   }, [captain, alumni]);
+
 
   const subtitleText = stats ? buildAlumniSubtitle(stats.player_count, alumni) : null;
 
@@ -105,22 +111,14 @@ export function CollegeProfilePage() {
   const primaryValueText = stats ? formatCurrency(stats.earnings_total) : '—';
   const { integer: primaryInteger, decimal: primaryDecimal, suffix: primarySuffix } = splitStatValue(primaryValueText);
 
-  // Caption metadata composition (Q3 decision).
-  // Priority order: #N EARNINGS → CAPTAIN → SEASON NARRATIVE. Cap at 3 items.
+  // Caption metadata — condensed to ≤2 items: rank + season performance.
+  // Captain/OWGR dropped here; captain already surfaces in Dispatch's
+  // "Top Performer" cell (COLLEGE_FRANCHISE_PAGE_NEATEN).
   const captionMetadata: string[] = useMemo(() => {
     const items: string[] = [];
 
     if (collegeRank) {
       items.push(`#${collegeRank} EARNINGS`);
-    }
-
-    if (captain && showCaptainPill) {
-      const captainName = captainShortName(captain.fullName).toUpperCase();
-      items.push(
-        captainOwgr
-          ? `${captainName} · #${captainOwgr} OWGR`
-          : captainName
-      );
     }
 
     if (stats?.wins_total && stats.wins_total > 0) {
@@ -129,8 +127,9 @@ export function CollegeProfilePage() {
       items.push(`${stats.top10_total} TOP 10S THIS SEASON`);
     }
 
-    return items.slice(0, 3);
-  }, [collegeRank, captain, showCaptainPill, captainOwgr, stats]);
+    return items.slice(0, 2);
+  }, [collegeRank, stats]);
+
 
 
   const sectionMetaSubtitle = [subtitleText, `Season ${seasonYear}`].filter(Boolean).join(' · ');
@@ -213,18 +212,16 @@ export function CollegeProfilePage() {
                   boxShadow: GOLD_GLOW_DROP,
                   overflow: 'hidden',
                 }}>
-                  {logoUrl && !heroImgError ? (
-                    <img
-                      src={logoUrl}
-                      alt={displayName}
-                      style={{ width: '100%', height: '100%', objectFit: 'contain' }}
-                      onError={() => setHeroImgError(true)}
-                    />
-                  ) : (
-                    <span style={{ fontSize: 28, fontWeight: 900, color: INK }}>
-                      {displayName?.charAt(0)?.toUpperCase() ?? '?'}
-                    </span>
-                  )}
+                  <PlayerInitialAvatar
+                    name={displayName}
+                    src={logoUrl ?? undefined}
+                    size={60}
+                    radius={20}
+                    imageScale={1}
+                    imageBg="#FFFFFF"
+                    paletteSeed={collegeSlug}
+                  />
+
                 </div>
 
                 {/* Position badge — gated to collegeRank ≤ 99 */}
@@ -262,7 +259,7 @@ export function CollegeProfilePage() {
                   fontVariantNumeric: 'tabular-nums',
                 }}>
                   {primaryInteger}
-                  {primaryDecimal && <span style={{ color: AMBER }}>{primaryDecimal}</span>}
+                  {primaryDecimal && <span style={{ color: INK }}>{primaryDecimal}</span>}
                   {primarySuffix}
                 </div>
                 <div style={{
@@ -307,7 +304,7 @@ export function CollegeProfilePage() {
 
         {/* Alumni on Tour header */}
         {stats && (
-          <div style={{ background: SURFACE, borderTop: `1px solid ${INK_TINT_07}`, borderBottom: `1px solid ${INK_TINT_07}`, marginTop: 16, padding: '14px 16px 10px' }}>
+          <div style={{ background: SURFACE, borderTop: `0.5px solid ${INK_TINT_07}`, padding: '14px 16px 10px' }}>
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8, marginBottom: 4 }}>
               <span style={{ fontSize: 9, fontWeight: 800, color: INK_MUTE, letterSpacing: '0.16em', textTransform: 'uppercase' as const }}>
                 Alumni on Tour

@@ -95,9 +95,9 @@ function AlumniRow({ alumnus, index, tier, legacyContextLabel }: AlumniRowProps)
           display: 'flex', alignItems: 'center',
           padding: '10px 16px',
           borderBottom: `0.5px solid ${INK_TINT_07}`,
-          borderLeft: `3px solid ${TIER_COLORS[tier]}`,
           textDecoration: 'none',
         }}
+
         className="active:bg-black/[0.02] transition-colors"
       >
         <div style={{ flex: 1, display: 'flex', alignItems: 'center', gap: '9px', minWidth: 0 }}>
@@ -139,9 +139,8 @@ function AlumniRow({ alumnus, index, tier, legacyContextLabel }: AlumniRowProps)
           </div>
         </div>
 
-        {/* EARNINGS */}
+        {/* EARNINGS (label dropped — value reads as earnings by context) */}
         <div style={{ width: 72, textAlign: 'right' as const, flexShrink: 0 }}>
-          <div style={{ fontSize: 10, fontWeight: 500, color: INK_FAINT, letterSpacing: '0.04em' }}>EARNINGS</div>
           <div style={{
             fontSize: 13, fontWeight: 800, color: hasEarnings ? AMBER : INK_FAINT,
             fontVariantNumeric: 'tabular-nums',
@@ -150,9 +149,8 @@ function AlumniRow({ alumnus, index, tier, legacyContextLabel }: AlumniRowProps)
           </div>
         </div>
 
-        {/* W */}
+        {/* W (label dropped) */}
         <div style={{ width: 36, textAlign: 'right' as const, flexShrink: 0, marginLeft: 8 }}>
-          <div style={{ fontSize: 10, fontWeight: 500, color: INK_FAINT, letterSpacing: '0.04em' }}>W</div>
           <div style={{
             fontSize: 13, fontWeight: 800,
             color: hasWins ? INK : INK_FAINT,
@@ -161,6 +159,7 @@ function AlumniRow({ alumnus, index, tier, legacyContextLabel }: AlumniRowProps)
             {hasWins ? alumnus.wins : '—'}
           </div>
         </div>
+
       </Link>
     </motion.div>
   );
@@ -196,10 +195,10 @@ function Section({ tier, alumni, defaultExpanded = true, legacyMap }: SectionPro
           borderTop: `0.5px solid ${INK_TINT_07}`,
         }}
       >
-        <div style={{ width: 3, height: 12, background: tierColor, borderRadius: 1, flexShrink: 0, alignSelf: 'center' }} />
         <span style={{ fontSize: 12, fontWeight: 800, color: tierColor, letterSpacing: '1.2px', textTransform: 'uppercase' as const }}>
           {TIER_LABELS[tier].toUpperCase()}
         </span>
+
         <span style={{ fontSize: 10, fontWeight: 500, color: INK_FAINT, letterSpacing: '0.2px', flex: 1 }}>
           {TIER_SUBTITLES[tier]}
         </span>
@@ -315,9 +314,9 @@ export function AlumniDepthChart({ normalizedName, className }: AlumniDepthChart
         background: SURFACE,
         borderTop: `0.5px solid ${INK_TINT_07}`,
         borderBottom: `0.5px solid ${INK_TINT_07}`,
-        marginTop: '8px',
       }}
     >
+
       <Section tier="stars"    alumni={tiers.stars}    defaultExpanded />
       <Section tier="regulars" alumni={tiers.regulars} defaultExpanded={tiers.regulars.length <= 5} />
       <Section tier="rising"   alumni={tiers.rising}   defaultExpanded={false} />
