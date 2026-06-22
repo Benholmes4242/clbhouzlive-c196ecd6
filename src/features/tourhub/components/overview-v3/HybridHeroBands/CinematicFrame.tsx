@@ -1005,7 +1005,7 @@ export function CinematicFrame({
                       { label: 'Pars', value: s.pars, color: '#fff' },
                       { label: 'Bogeys+', value: s.bogeysPlus, color: '#fff' },
                     ].map((cell) => (
-                      <div key={cell.label} style={{ background: 'rgba(10,14,20,0.55)', backdropFilter: 'blur(10px)', WebkitBackdropFilter: 'blur(10px)', borderRadius: 10, border: '0.5px solid rgba(255,255,255,0.18)', padding: '8px 6px', display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center' }}>
+                      <div key={cell.label} style={{ background: 'rgba(10,14,20,0.55)', backdropFilter: 'blur(10px)', WebkitBackdropFilter: 'blur(10px)', borderRadius: 10, border: '0.5px solid rgba(255,255,255,0.18)', padding: '5px 6px', display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center' }}>
                         <div style={{ ...NUMERIC_STYLE, fontSize: 18, fontWeight: 900, color: cell.color }}>{cell.value.toLocaleString()}</div>
                         <div style={{ fontSize: 7.5, fontWeight: 800, letterSpacing: '0.10em', color: 'rgba(255,255,255,0.45)', textTransform: 'uppercase', marginTop: 2 }}>{cell.label}</div>
                       </div>
