@@ -15,7 +15,7 @@ import {
 
 type PlayerTourCode = 'pga' | 'EURO' | 'LPGA' | 'CHAMP' | 'PGAD' | 'LIV';
 
-const TOUR_CODES: PlayerTourCode[] = ['pga', 'EURO', 'LPGA', 'CHAMP', 'PGAD', 'LIV'];
+const TOUR_CODES: PlayerTourCode[] = ['pga', 'EURO', 'LPGA', 'PGAD', 'LIV'];
 
 const TOUR_LABELS: Record<PlayerTourCode, string> = {
   pga: 'PGA Tour',
@@ -42,7 +42,8 @@ const TOUR_DESCRIPTIONS: Record<PlayerTourCode, string> = {
  */
 function PlayersShellRowInner() {
   const [searchParams, setSearchParams] = useSearchParams();
-  const activeTour = (searchParams.get('tour') as PlayerTourCode) || 'pga';
+  const rawTour = (searchParams.get('tour') as PlayerTourCode) || 'pga';
+  const activeTour: PlayerTourCode = rawTour === 'CHAMP' ? 'pga' : rawTour;
   const [tourSheetOpen, setTourSheetOpen] = useState(false);
 
   const setActiveTour = (tour: PlayerTourCode) => {
