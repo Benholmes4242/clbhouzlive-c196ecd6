@@ -246,7 +246,7 @@ export function HybridHero({ slide, activeTournamentId, onSelectTour }: HybridHe
         tourSlug: tournament.tourSlug ?? 'pga',
       }),
     }));
-  }, [state, lastYearTop4]);
+  }, [state, lastYearTop4, tournament.tourSlug]);
 
   const showFirstYearPlaceholder =
     state.kind === 'upcoming' &&
