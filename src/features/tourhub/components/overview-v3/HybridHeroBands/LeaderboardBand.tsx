@@ -281,7 +281,8 @@ export function LeaderboardBand({
                 country={entryCountry(slot.entry)}
                 score={fmtScore(slot.entry.score)}
                 thru="F"
-                avatarUrl={entryAvatar(slot.entry)}
+                avatarCandidates={entryAvatars(slot.entry)}
+                playerId={entryPlayerId(slot.entry)}
                 rounds={extractRounds(slot.entry)}
                 par={sparklinePar}
                 isResults
