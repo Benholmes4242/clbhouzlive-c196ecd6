@@ -286,7 +286,7 @@ function classifyTier(a: CollegeAlumnus, legacyMap: ReadonlyMap<string, string>)
 
 const EMPTY_LEGACY_MAP: ReadonlyMap<string, string> = new Map();
 
-export function AlumniDepthChart({ normalizedName, alumniCount, className }: AlumniDepthChartProps) {
+export function AlumniDepthChart({ normalizedName, alumniCount: _alumniCount, className }: AlumniDepthChartProps) {
   const { data: alumni, isLoading, error } = useCollegeAlumni(normalizedName, {
     orderBy: 'earnings',
     limit: 50,
