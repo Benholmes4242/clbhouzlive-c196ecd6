@@ -1033,14 +1033,15 @@ export function CinematicFrame({
                   : <div style={{ width: 42, height: 42, borderRadius: '34%', background: 'rgba(255,255,255,0.08)', border: `2px solid ${GOLD}`, flexShrink: 0 }} />;
               })()}
               <div style={{ flex: 1, minWidth: 0 }}>
-                <div style={{ ...NUMERIC_STYLE, fontSize: 8.5, fontWeight: 800, letterSpacing: '0.16em', color: GOLD, textTransform: 'uppercase' }}>Defending Champion</div>
-                <div style={{ fontSize: 17, fontWeight: 800, color: '#fff', marginTop: 1, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{defendingChamp.name}</div>
-              </div>
-              <div style={{ textAlign: 'right', flexShrink: 0 }}>
-                {defendingChamp.score
-                  ? <div style={{ ...NUMERIC_STYLE, fontSize: 13, fontWeight: 800, color: '#fff' }}>{defendingChamp.score}</div>
-                  : null}
-                <div style={{ ...NUMERIC_STYLE, fontSize: 9, color: 'rgba(255,255,255,0.5)', marginTop: 2 }}>{defendingChamp.year}</div>
+                <div style={{ ...NUMERIC_STYLE, fontSize: 8.5, fontWeight: 800, letterSpacing: '0.16em', color: GOLD, textTransform: 'uppercase' }}>
+                  {defendingChamp.year ? `${defendingChamp.year} Defending Champion` : 'Defending Champion'}
+                </div>
+                <div style={{ display: 'flex', alignItems: 'baseline', gap: 8, marginTop: 1, minWidth: 0 }}>
+                  <span style={{ fontSize: 17, fontWeight: 800, color: '#fff', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', minWidth: 0 }}>{defendingChamp.name}</span>
+                  {defendingChamp.score
+                    ? <span style={{ fontSize: 17, fontWeight: 800, color: '#fff', flexShrink: 0 }}>{defendingChamp.score}</span>
+                    : null}
+                </div>
               </div>
             </div>
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 4, padding: '9px 16px', background: '#0A0E14', borderTop: '0.5px solid rgba(255,255,255,0.06)', color: AMBER, fontSize: 12, fontWeight: 800, letterSpacing: '0.06em', textTransform: 'uppercase' }}>
