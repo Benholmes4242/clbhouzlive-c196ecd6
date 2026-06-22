@@ -26,7 +26,6 @@ import {
   GOLD_DEEP,
   INK,
   INK_MUTE,
-  SLATE_100,
   SLATE_50,
   SURFACE,
 } from '../../_shared/tokens';
