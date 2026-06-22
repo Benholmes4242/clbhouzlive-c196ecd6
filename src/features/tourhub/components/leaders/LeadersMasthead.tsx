@@ -318,13 +318,12 @@ export function LeadersMasthead({
                     border: `2.5px solid ${GOLD}`,
                   }}
                 >
-                  <img
-                    src={photoUrl}
+                  <SquircleAvatar
+                    size={75}
+                    srcCandidates={avatarCandidates}
                     alt={leader.player.full_name}
-                    style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center 5%' }}
-                    onError={(e) => {
-                      (e.target as HTMLImageElement).src = PLAYER_SILHOUETTE_URL;
-                    }}
+                    userId={leader.player.id}
+                    hideRing
                   />
                 </div>
                 <div
