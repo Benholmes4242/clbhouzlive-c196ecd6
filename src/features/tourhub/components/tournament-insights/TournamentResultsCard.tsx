@@ -12,7 +12,8 @@ import { useWinnerScorecardStats } from '../../hooks/useWinnerScorecardStats';
 import { useWinnerSeasonStats } from '../../hooks/useWinnerSeasonStats';
 import { useTop5Leaderboard } from '../../hooks/useTop5Leaderboard';
 import { useVenueImage } from '../../hooks/useVenueImage';
-import { getPlayerHeadshotUrl, PLAYER_SILHOUETTE_URL } from '@/utils/playerHeadshot';
+import { PLAYER_SILHOUETTE_URL } from '@/utils/playerHeadshot';
+import { resolvePlayerAvatarCandidates } from '../../_shared/resolvePlayerAvatar';
 import { ClubhouzCalledItSection } from './ClubhouzCalledItSection';
 import type { TrackedPrediction } from './types';
 
