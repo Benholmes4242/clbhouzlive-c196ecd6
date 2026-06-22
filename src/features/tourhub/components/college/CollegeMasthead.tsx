@@ -34,20 +34,6 @@ import {
 
 type ActiveMetric = 'earnings' | 'wins' | 'top10s' | 'movers';
 
-const METRIC_SUBLINE: Record<ActiveMetric, string> = {
-  earnings: 'Most decorated by season earnings',
-  wins: 'Most wins this season',
-  top10s: 'Most consistent across the field',
-  movers: 'Biggest weekly mover',
-};
-
-const METRIC_SUBLINE_TIED: Record<ActiveMetric, string> = {
-  earnings: 'Tied for season earnings lead',
-  wins: 'Tied for most wins this season',
-  top10s: 'Tied for most top 10s this season',
-  movers: 'Biggest weekly mover',
-};
-
 interface CollegeMastheadProps {
   stats: CollegeSeasonStats;
   college: CollegeMedia | null;
@@ -71,7 +57,7 @@ export function CollegeMasthead({
   heroAlumni: _heroAlumni,
   captain: _captain,
   runnerUp: _runnerUp,
-  isTiedAtOne = false,
+  isTiedAtOne: _isTiedAtOne = false,
   moversContext: _moversContext,
 }: CollegeMastheadProps) {
   const navigate = useNavigate();
