@@ -126,6 +126,9 @@ export function ScheduleTournamentCard({
   const winnerDisplay = hasSeasonWinner
     ? `${winnerFirstName?.charAt(0)}. ${winnerLastName}`
     : hasLeaderWinnerData ? leaderWinner!.displayName : null;
+  const winnerFullName = hasSeasonWinner && winnerFirstName && winnerLastName
+    ? `${winnerFirstName} ${winnerLastName}`
+    : (leaderWinner?.displayName ?? null);
   const winnerPhotoUrl = hasLeaderWinnerData ? leaderWinner!.photoUrl : null;
   const winnerDisplayScore = leaderWinner?.displayScore ?? null;
 
