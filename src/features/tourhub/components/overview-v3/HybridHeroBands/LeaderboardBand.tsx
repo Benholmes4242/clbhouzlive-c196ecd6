@@ -198,7 +198,8 @@ export function LeaderboardBand({
           name: entryName(e),
           country: e.player?.country_code,
           score: fmtScore(e.score),
-          avatarUrl: entryAvatar(e),
+          avatarCandidates: entryAvatars(e),
+          playerId: entryPlayerId(e),
         }));
       const chasers = leaderboard
         .filter(e => (e?.score ?? 0) !== tiedScore)
@@ -207,7 +208,8 @@ export function LeaderboardBand({
           rank: formatRank(e),
           name: entryName(e),
           score: fmtScore(e.score),
-          avatarUrl: entryAvatar(e),
+          avatarCandidates: entryAvatars(e),
+          playerId: entryPlayerId(e),
         }));
       body = <PlayoffPendingPanel tied={tied} chasers={chasers} />;
     } else if (state.variant === 'team') {
