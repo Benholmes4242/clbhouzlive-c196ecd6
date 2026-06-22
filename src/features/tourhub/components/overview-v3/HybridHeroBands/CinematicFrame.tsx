@@ -89,7 +89,12 @@ function scoreColor(score: number | null | undefined): string {
 
 const ROW_BORDER = '0.5px solid rgba(255,255,255,0.08)';
 
-type StackedAvatarItem = { url: string | null; name?: string; userId?: string | null };
+type StackedAvatarItem = {
+  url?: string | null;
+  candidates?: string[];
+  name?: string;
+  userId?: string | null;
+};
 
 function StackedAvatarsDark({
   urls,
@@ -121,7 +126,8 @@ function StackedAvatarsDark({
           }}
         >
           <SquircleAvatar
-            src={it.url}
+            src={it.candidates && it.candidates.length > 0 ? undefined : it.url}
+            srcCandidates={it.candidates}
             alt={it.name || ''}
             userId={it.userId ?? null}
             size={size - 3}
@@ -132,6 +138,7 @@ function StackedAvatarsDark({
     </div>
   );
 }
+
 
 function SoloRowDark({
   entry,
