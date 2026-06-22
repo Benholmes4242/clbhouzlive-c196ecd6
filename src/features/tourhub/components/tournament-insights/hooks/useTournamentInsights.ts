@@ -8,7 +8,7 @@ import { useAIPredictions } from '../../../hooks/useAIPredictions';
 import { usePredictionTracker } from '../../../hooks/usePredictionTracker';
 import { format, parseISO } from 'date-fns';
 import { getFallbackCourseImage } from '../../../hooks/useVenueImage';
-import { getPlayerHeadshotUrl } from '@/utils/playerHeadshot';
+import { resolvePlayerAvatarCandidates } from '../../../_shared/resolvePlayerAvatar';
 import type { AIPredictionData } from '../../../hooks/useAIPredictions';
 import type { 
   TournamentInsightsData, 
@@ -126,7 +126,7 @@ function transformPredictions(aiData: AIPredictionData): TournamentInsightsData 
       id: p.playerId,
       name: p.playerName,
       countryCode: p.country,
-      avatarUrl: getPlayerHeadshotUrl(p.playerName, 'pga'),
+      avatarUrl: resolvePlayerAvatarCandidates({ name: p.playerName, photoUrl: null, tourSlug: 'pga' })[0] ?? '',
       confidenceTier: getConfidenceTier(i),
       fitBullets: p.reasons?.slice(0, 3) || [],
       keyTag: extractKeyTag(p.reasons?.[0]),
@@ -186,7 +186,7 @@ function buildContenderCards(
     id: p.playerId,
     name: p.playerName,
     countryCode: p.country,
-    avatarUrl: getPlayerHeadshotUrl(p.playerName, 'pga'),
+    avatarUrl: resolvePlayerAvatarCandidates({ name: p.playerName, photoUrl: null, tourSlug: 'pga' })[0] ?? '',
     description: limitText(p.reasons?.[0] || '', 50),
     fitBullets: p.reasons?.slice(0, 3) || [],
     worldRank: p.worldRanking ?? undefined,

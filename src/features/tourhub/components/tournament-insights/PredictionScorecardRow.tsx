@@ -8,7 +8,8 @@
 import React, { useState } from 'react';
 import { INK_SOFT, INK_TINT_07 } from '../../_shared/tokens';
 import { motion } from 'framer-motion';
-import { getPlayerHeadshotUrl, PLAYER_SILHOUETTE_URL } from '@/utils/playerHeadshot';
+import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
+import { resolvePlayerAvatarCandidates } from '../../_shared/resolvePlayerAvatar';
 
 import ActualPositionBadge from './components/ActualPositionBadge';
 import LivePositionDisplay from './components/LivePositionDisplay';
@@ -44,7 +45,11 @@ export const PredictionScorecardRow: React.FC<PredictionScorecardRowProps> = ({
   const isWD = prediction.performanceStatus === 'withdrawn';
   const isWinner = prediction.actualPosition === 1;
   const isLeader = !isCompleted && prediction.actualPosition === 1;
-  const avatarUrl = getPlayerHeadshotUrl(prediction.playerName, tourSlug ?? 'pga');
+  const avatarCandidates = resolvePlayerAvatarCandidates({
+    name: prediction.playerName,
+    photoUrl: null,
+    tourSlug: tourSlug ?? 'pga',
+  });
 
   const offLead = (prediction.score !== null && leaderScore !== null && leaderScore !== undefined)
     ? prediction.score - leaderScore
@@ -130,30 +135,15 @@ export const PredictionScorecardRow: React.FC<PredictionScorecardRowProps> = ({
           />
         )}
 
-        {/* Avatar — squircle */}
+        {/* Avatar — canonical SquircleAvatar with multi-folder walk + initials fallback */}
         <div className="relative flex-shrink-0">
-          <div
-            className="overflow-hidden bg-muted"
-            style={{
-              width: 40,
-              height: 42,
-              borderRadius: '34%',
-              border: `2px solid ${INK_TINT_07}`,
-            }}
-          >
-            {avatarUrl ? (
-              <img
-                src={avatarUrl}
-                alt={prediction.playerName}
-                className="w-full h-full object-cover"
-                style={{ objectPosition: 'center 20%' }}
-                loading="lazy"
-                onError={(e) => { e.currentTarget.style.display = 'none'; }}
-              />
-            ) : (
-              <div className="w-full h-full bg-muted" />
-            )}
-          </div>
+          <SquircleAvatar
+            size={40}
+            srcCandidates={avatarCandidates}
+            alt={prediction.playerName}
+            userId={prediction.playerId}
+            hideRing
+          />
            {/* Best call green star */}
           {isBestCall && (
             <div

@@ -12,7 +12,8 @@ import { useWinnerScorecardStats } from '../../hooks/useWinnerScorecardStats';
 import { useWinnerSeasonStats } from '../../hooks/useWinnerSeasonStats';
 import { useTop5Leaderboard } from '../../hooks/useTop5Leaderboard';
 import { useVenueImage } from '../../hooks/useVenueImage';
-import { getPlayerHeadshotUrl, PLAYER_SILHOUETTE_URL } from '@/utils/playerHeadshot';
+import { PLAYER_SILHOUETTE_URL } from '@/utils/playerHeadshot';
+import { resolvePlayerAvatarCandidates } from '../../_shared/resolvePlayerAvatar';
 import { ClubhouzCalledItSection } from './ClubhouzCalledItSection';
 import type { TrackedPrediction } from './types';
 
@@ -59,6 +60,43 @@ function generateFallbackNarrative(
     return `${last} fired ${birdies} birdies en route to ${scoreDisplay}. The rest of the field never found an answer.`;
   return `${last} wins at ${scoreDisplay}. The conversation starts now.`;
 }
+
+/**
+ * Walks an ordered list of player-photo candidates with `onError`. When
+ * every candidate misses, swaps to `fallback` (typically the venue image,
+ * then silhouette). Used by the results hero — this surface is venue-backed
+ * by design and must NOT show canonical initials.
+ */
+function WinnerHeroPhoto({
+  candidates,
+  fallback,
+  alt,
+}: {
+  candidates: string[];
+  fallback: string;
+  alt: string;
+}) {
+  const list = React.useMemo(
+    () => [...candidates, fallback].filter(Boolean),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [candidates.join('|'), fallback],
+  );
+  const [idx, setIdx] = React.useState(0);
+  React.useEffect(() => { setIdx(0); }, [list]);
+  const src = list[Math.min(idx, list.length - 1)] ?? fallback;
+  return (
+    <img
+      src={src}
+      alt={alt}
+      onError={() => {
+        if (idx + 1 < list.length) setIdx(idx + 1);
+      }}
+      style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: '50% 8%' }}
+    />
+  );
+}
+
+
 
 // ─── Component ───────────────────────────────────────────────────────────────
 
@@ -110,8 +148,16 @@ export function TournamentResultsCard({
     : effectiveWinner?.margin ? `Won by ${effectiveWinner.margin} strokes`
     : '';
 
-  const winnerPhoto = (winnerName ? getPlayerHeadshotUrl(winnerName, 'pga') : null)
-    ?? PLAYER_SILHOUETTE_URL;
+  // Multi-folder candidate walk for the winner photo. When ALL miss,
+  // the hero intentionally falls back to the venue image (then silhouette) —
+  // this surface is venue-backed, NOT a canonical-initials surface.
+  const winnerCandidates = winnerName
+    ? resolvePlayerAvatarCandidates({
+        name: winnerName,
+        photoUrl: effectiveWinner?.player?.photo_url ?? null,
+        tourSlug: tourSlug ?? 'pga',
+      })
+    : [];
   const heroFallback = venueImageUrl ?? PLAYER_SILHOUETTE_URL;
 
   const narrative = useMemo(() => {
@@ -179,13 +225,14 @@ export function TournamentResultsCard({
               </div>
             </div>
 
-            {/* Headshot — contained squircle */}
+            {/* Headshot — contained squircle. Walks multi-folder player
+                candidates, then falls back to the venue image (hero is
+                venue-backed by design — NOT canonical initials). */}
             <div style={{ width: 72, height: 72, borderRadius: '34%', overflow: 'hidden', flexShrink: 0, background: INK_TINT_06 }}>
-              <img
-                src={winnerPhoto}
+              <WinnerHeroPhoto
+                candidates={winnerCandidates}
+                fallback={heroFallback}
                 alt={winnerName}
-                onError={e => { (e.target as HTMLImageElement).src = heroFallback; }}
-                style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: '50% 8%' }}
               />
             </div>
           </div>

@@ -18,7 +18,7 @@ import { TournamentResultsCard } from './TournamentResultsCard';
 import { NextUpPickCard } from './NextUpPickCard';
 import { useIntelligenceHistoricalPicks, type IntelligenceHistoricalTournament } from '../../hooks/useIntelligenceHistoricalPicks';
 import { createPortal } from 'react-dom';
-import { getPlayerHeadshotUrl, PLAYER_SILHOUETTE_URL } from '@/utils/playerHeadshot';
+
 import { useNavigate } from 'react-router-dom';
 import { AMBER_TINT_08, INK_TINT_06, INK_TINT_07 } from '../../_shared/tokens';
 

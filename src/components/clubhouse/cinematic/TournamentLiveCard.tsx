@@ -5,7 +5,7 @@ import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import type { TournamentLiveFeedPost, LiveLeaderboardEntry } from '@/components/media-system/types/media';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
-import { getPlayerHeadshotUrl } from '@/utils/playerHeadshot';
+import { resolvePlayerAvatarCandidates } from '@/features/tourhub/_shared/resolvePlayerAvatar';
 
 /* ── Colour tokens ── */
 const AMBER        = '#f59e0b';
@@ -96,10 +96,11 @@ function LiveBadge() {
 function PlayerAvatar({ name, photoUrl, tourSlug, size }: {
   name: string; photoUrl: string | null; tourSlug: string; size: number;
 }) {
-  const src = photoUrl || getPlayerHeadshotUrl(name, tourSlug) || null;
+  // Canonical multi-folder candidate walk + initials fallback (no silhouettes).
+  const candidates = resolvePlayerAvatarCandidates({ name, photoUrl, tourSlug });
   // TODO(avatar-userid): userId not surfaced at this layer (pro player, no app user) —
   // colour hashes from alt. See src/lib/avatarFallback.ts.
-  return <SquircleAvatar src={src} alt={name} size={size} hideRing />;
+  return <SquircleAvatar srcCandidates={candidates} alt={name} size={size} hideRing />;
 }
 
 function HeartIcon({ filled }: { filled: boolean }) {
