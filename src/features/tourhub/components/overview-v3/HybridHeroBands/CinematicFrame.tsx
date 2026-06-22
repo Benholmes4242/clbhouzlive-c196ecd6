@@ -1027,9 +1027,14 @@ export function CinematicFrame({
                 const headshot = (tourSlug && defendingChamp.name)
                   ? (() => { try { return getPlayerHeadshotUrl(defendingChamp.name, tourSlug); } catch { return null; } })()
                   : null;
-                return headshot
-                  ? <img src={headshot} alt="" loading="lazy" style={{ width: 42, height: 42, borderRadius: '34%', objectFit: 'cover', border: `2px solid ${GOLD}`, flexShrink: 0 }} />
-                  : <div style={{ width: 42, height: 42, borderRadius: '34%', background: 'rgba(255,255,255,0.08)', border: `2px solid ${GOLD}`, flexShrink: 0 }} />;
+                return (
+                  <SquircleAvatar
+                    src={headshot}
+                    alt={defendingChamp.name}
+                    size={42}
+                    ringColor={GOLD}
+                  />
+                );
               })()}
               <div style={{ flex: 1, minWidth: 0 }}>
                 <div style={{ ...NUMERIC_STYLE, fontSize: 8.5, fontWeight: 800, letterSpacing: '0.16em', color: GOLD, textTransform: 'uppercase' }}>
