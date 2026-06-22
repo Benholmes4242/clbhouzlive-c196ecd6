@@ -68,7 +68,6 @@ export function CollegeComparePage() {
   const seasonYear = season?.year || new Date().getFullYear();
 
   const seasonLabel = `Season ${seasonYear === 2026 ? '2025–26' : `${seasonYear - 1}–${String(seasonYear).slice(-2)}`}`;
-  const seasonCaps = `SEASON ${seasonYear === 2026 ? '2025–26' : `${seasonYear - 1}–${String(seasonYear).slice(-2)}`}`;
 
   const h1Text = (() => {
     if (isLoading) return 'Head-to-Head';
