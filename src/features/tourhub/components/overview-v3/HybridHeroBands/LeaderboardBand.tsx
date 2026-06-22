@@ -99,9 +99,6 @@ export function LeaderboardBand({
 }: LeaderboardBandProps) {
   const showFooterStrip =
     state.kind === 'live' && (!!defendingChampion || (fieldSize ?? 0) > 0);
-  // Single-URL avatar for the stacked-avatar rows (TiedLeaders/TiedChasers) —
-  // first candidate from the canonical multi-folder list.
-  const entryAvatar = (entry: any) => entryAvatarCandidates(entry, tourSlug)[0] ?? null;
   const entryAvatars = (entry: any) => entryAvatarCandidates(entry, tourSlug);
   const sparklinePar = par ?? 0;
 
