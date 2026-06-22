@@ -339,27 +339,16 @@ function ChampionRowDark({
       <span style={{ width: 22, display: 'flex', justifyContent: 'center', flexShrink: 0 }}>
         <Crown size={14} strokeWidth={2.5} fill={GOLD} style={{ color: GOLD_DEEP }} />
       </span>
-      {avatarUrl ? (
-        <img
+      <span style={{ flexShrink: 0, display: 'inline-flex', boxShadow: '0 0 0 1px rgba(0,0,0,0.4)', borderRadius: '34%' }}>
+        <SquircleAvatar
           src={avatarUrl}
-          alt=""
-          loading="lazy"
-          style={{
-            width: 38, height: 38, borderRadius: '34%', objectFit: 'cover',
-            flexShrink: 0, background: 'rgba(255,255,255,0.08)',
-            border: `1.5px solid ${GOLD}`,
-            boxShadow: `0 0 0 1px rgba(0,0,0,0.4)`,
-          }}
+          alt={name}
+          userId={entry?.player?.id ?? null}
+          size={38}
+          ringColor={GOLD}
+          thinRing
         />
-      ) : (
-        <div
-          style={{
-            width: 38, height: 38, borderRadius: '34%',
-            background: 'rgba(255,255,255,0.08)', flexShrink: 0,
-            border: `1.5px solid ${GOLD}`,
-          }}
-        />
-      )}
+      </span>
       <div style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', gap: 2 }}>
         <span
           style={{
