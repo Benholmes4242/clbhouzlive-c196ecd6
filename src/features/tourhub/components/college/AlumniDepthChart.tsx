@@ -103,7 +103,8 @@ function AlumniRow({ alumnus, index, tier, legacyContextLabel }: AlumniRowProps)
         <div style={{ flex: 1, display: 'flex', alignItems: 'center', gap: '9px', minWidth: 0 }}>
           <PlayerInitialAvatar
             name={fullName}
-            src={photoUrl}
+            srcCandidates={photoCandidates}
+            paletteSeed={alumnus.id}
             size={32}
             radius={11}
             color={tier === 'legacy'
