@@ -85,7 +85,7 @@ interface HeroChampionProps {
   champion: ElitePlayer;
   runnerUp: ElitePlayer | null;
   champStats: { earnings: number | null; wins: number | null; tourRank: number | null; points: number | null; tournamentsPlayed: number | null } | undefined;
-  champPhotoUrl: string;
+  champAvatarCandidates: string[];
   sort: PlayerSortType;
   activeTour: string;
   onClick: () => void;
