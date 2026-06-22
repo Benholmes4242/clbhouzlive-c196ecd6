@@ -39,7 +39,11 @@ interface PlayerHeroProps {
 
 export function PlayerHero({ player, playerStats }: PlayerHeroProps) {
   const navigate = useNavigate();
-  const heroPhotoUrl = getPlayerHeadshotUrl(player.full_name, player.tour_codes?.[0] ?? 'pga');
+  const avatarCandidates = resolvePlayerAvatarCandidates({
+    name: player.full_name,
+    photoUrl: player.photo_url ?? null,
+    tourSlug: player.tour_codes?.[0] ?? 'pga',
+  });
 
   const age = player.birth_date
     ? Math.floor((Date.now() - new Date(player.birth_date).getTime()) / (365.25 * 24 * 60 * 60 * 1000))
