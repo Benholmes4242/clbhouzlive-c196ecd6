@@ -65,17 +65,7 @@ export function CollegeMasthead({
   const slug = stats.normalized_name;
   const logoUrl = getCollegeLogoUrl(college?.college_name || stats.normalized_name);
 
-  const subline = isTiedAtOne ? METRIC_SUBLINE_TIED[activeMetric] : METRIC_SUBLINE[activeMetric];
 
-
-  // Primary value split (Stat Watch decimal-tail pattern).
-  const primaryValueText = activeMetric === 'wins'
-    ? String(stats.wins_total)
-    : activeMetric === 'top10s'
-    ? String(stats.top10_total)
-    : formatCurrency(stats.earnings_total);
-  const { integer: primaryInteger, decimal: primaryDecimal, suffix: primarySuffix } = splitStatValue(primaryValueText);
-  const primaryLabel = activeMetric === 'wins'
     ? 'WINS'
     : activeMetric === 'top10s'
     ? 'TOP 10s'
