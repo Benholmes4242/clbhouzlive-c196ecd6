@@ -539,7 +539,7 @@ export interface CinematicFrameProps {
   tourSlug?: string | null;
   defendingChamp?: DefendingChampData | null;
   fieldStrength?: FieldStrength | null;
-  tournamentScoring?: { eagles: number; birdies: number; pars: number; bogeysPlus: number } | null;
+  
   venuePar?: number | null;
   venueYardage?: number | null;
   purse?: number | null;
