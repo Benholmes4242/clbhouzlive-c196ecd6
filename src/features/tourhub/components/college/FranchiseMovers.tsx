@@ -125,6 +125,7 @@ export function FranchiseMovers({ limit = 8, className }: FranchiseMoversProps) 
                     driverText={driver?.displayText ?? null}
                     animationDelay={idx * 0.03}
                     isDelta
+                    direction={direction}
                     deltas={{
                       earnings_delta: mover.earnings_delta,
                       wins_delta: mover.wins_delta,
