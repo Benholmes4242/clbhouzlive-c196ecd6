@@ -932,6 +932,7 @@ export function CinematicFrame({
             gap: 6,
             padding: '0 6px',
             marginBottom: 4,
+            marginTop: isResults ? 10 : 0,
           }}
         >
           <h1
