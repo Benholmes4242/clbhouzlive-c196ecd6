@@ -285,6 +285,7 @@ export function ScheduleTournamentCard({
             name={winnerDisplay}
             photoUrl={winnerPhotoUrl}
             score={winnerDisplayScore}
+            tourSlug={tourSlug}
             onPlayerTap={leaderWinner?.playerId ? handlePlayerTap : undefined}
           />
         )}
