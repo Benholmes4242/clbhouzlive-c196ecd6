@@ -88,56 +88,61 @@ function ScheduleShellRowInner() {
         <div
           role="tablist"
           aria-label="Filter Schedule"
-          className="flex items-center justify-between gap-1.5"
-          style={{ padding: '8.5px 16px' }}
+          className="flex items-center gap-1.5 overflow-x-auto no-scrollbar"
+          style={{
+            padding: '8.5px 16px',
+            scrollSnapType: 'x proximity',
+            WebkitOverflowScrolling: 'touch',
+            overscrollBehaviorX: 'contain',
+          }}
         >
-          <div className="flex items-center gap-1.5">
-            {FILTERS.map((f) => {
-              const isActive = activeFilter === f.id;
-              return (
-                <button
-                  key={f.id}
-                  type="button"
-                  role="tab"
-                  aria-selected={isActive}
-                  onClick={() => setFilter(f.id)}
-                  className="shrink-0 transition-colors active:scale-[0.97] flex items-center"
-                  style={{
-                    height: 30,
-                    padding: '0 11px',
-                    fontSize: 12,
-                    fontWeight: 600,
-                    borderRadius: 15,
-                    background: isActive ? INK_TINT_06 : 'transparent',
-                    border: `1px solid ${isActive ? 'rgba(15,23,42,0.20)' : INK_TINT_07}`,
-                    color: isActive ? '#0A0E14' : '#64748B',
-                    letterSpacing: '-0.01em',
-                    whiteSpace: 'nowrap',
-                  }}
-                >
-                  {f.label}
-                </button>
-              );
-            })}
-          </div>
+          {FILTERS.map((f) => {
+            const isActive = activeFilter === f.id;
+            return (
+              <button
+                key={f.id}
+                type="button"
+                role="tab"
+                aria-selected={isActive}
+                onClick={() => setFilter(f.id)}
+                className="shrink-0 transition-colors active:scale-[0.97] flex items-center"
+                style={{
+                  height: 30,
+                  padding: '0 11px',
+                  fontSize: 12,
+                  fontWeight: 600,
+                  borderRadius: 15,
+                  background: isActive ? INK_TINT_06 : 'transparent',
+                  border: `1px solid ${isActive ? 'rgba(15,23,42,0.20)' : INK_TINT_07}`,
+                  color: isActive ? '#0A0E14' : '#64748B',
+                  letterSpacing: '-0.01em',
+                  whiteSpace: 'nowrap',
+                  scrollSnapAlign: 'start',
+                }}
+              >
+                {f.label}
+              </button>
+            );
+          })}
 
           <button
             type="button"
             onClick={() => setTourSheetOpen(true)}
             className="shrink-0 active:scale-[0.97] flex items-center"
             aria-label="Filter by tour"
-              style={{
-                height: 30,
-                padding: '0 11px',
-                fontSize: 12,
-                fontWeight: 600,
-                borderRadius: 15,
-                background: activeTour !== 'all' ? INK_TINT_06 : 'transparent',
-                border: `1px solid ${activeTour !== 'all' ? 'rgba(15,23,42,0.20)' : INK_TINT_07}`,
-                color: activeTour !== 'all' ? '#0A0E14' : '#64748B',
-                gap: 5,
-                whiteSpace: 'nowrap',
-              }}
+            style={{
+              height: 30,
+              padding: '0 11px',
+              fontSize: 12,
+              fontWeight: 600,
+              borderRadius: 15,
+              background: activeTour !== 'all' ? INK_TINT_06 : 'transparent',
+              border: `1px solid ${activeTour !== 'all' ? 'rgba(15,23,42,0.20)' : INK_TINT_07}`,
+              color: activeTour !== 'all' ? '#0A0E14' : '#64748B',
+              gap: 5,
+              whiteSpace: 'nowrap',
+              scrollSnapAlign: 'start',
+            }}
           >
             {activeTour !== 'all' && hasTourLogo(activeTour.toLowerCase())
               ? <img src={getTourLogo(activeTour.toLowerCase())} alt="" className="shrink-0" style={{ width: 14, height: 14, objectFit: 'contain' }} />
@@ -147,6 +152,20 @@ function ScheduleShellRowInner() {
             <ChevronDown size={11} strokeWidth={2.5} style={{ opacity: 0.6 }} />
           </button>
         </div>
+
+        {/* right-edge fade hint */}
+        <div
+          aria-hidden="true"
+          style={{
+            position: 'absolute',
+            top: 0,
+            right: 0,
+            bottom: 0,
+            width: 24,
+            pointerEvents: 'none',
+            background: 'linear-gradient(90deg, rgba(248,250,252,0), #F8FAFC)',
+          }}
+        />
       </div>
 
       <BottomSheet
