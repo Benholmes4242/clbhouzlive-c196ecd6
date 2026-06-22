@@ -264,7 +264,7 @@ export function FranchiseCard({
                 letterSpacing: '-0.005em',
               }}>
                 {rowInteger}
-                {rowDecimal && <span style={{ color: AMBER }}>{rowDecimal}</span>}
+                {rowDecimal && <span style={{ color: primaryValueColor }}>{rowDecimal}</span>}
                 {rowSuffix}
               </span>
             );
