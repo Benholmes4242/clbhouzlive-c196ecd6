@@ -183,7 +183,7 @@ function SoloRowDark({
         {rank}
       </span>
       <SquircleAvatar
-        src={avatarUrl}
+        src={Array.isArray(avatarUrl) ? undefined : avatarUrl} srcCandidates={Array.isArray(avatarUrl) ? avatarUrl : undefined}
         alt={name}
         userId={entry?.player?.id ?? null}
         size={26}
@@ -370,7 +370,7 @@ function ChampionRowDark({
       </span>
       <span style={{ flexShrink: 0, display: 'inline-flex', boxShadow: '0 0 0 1px rgba(0,0,0,0.4)', borderRadius: '34%' }}>
         <SquircleAvatar
-          src={avatarUrl}
+          src={Array.isArray(avatarUrl) ? undefined : avatarUrl} srcCandidates={Array.isArray(avatarUrl) ? avatarUrl : undefined}
           alt={name}
           userId={entry?.player?.id ?? null}
           size={38}
@@ -434,7 +434,7 @@ function DefendingChampionRowDark({
     >
       <span style={{ flexShrink: 0, display: 'inline-flex', boxShadow: '0 0 0 1px rgba(0,0,0,0.4)', borderRadius: '34%' }}>
         <SquircleAvatar
-          src={avatarUrl}
+          src={Array.isArray(avatarUrl) ? undefined : avatarUrl} srcCandidates={Array.isArray(avatarUrl) ? avatarUrl : undefined}
           alt={data.name}
           size={40}
           ringColor={GOLD}
