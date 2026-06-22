@@ -198,43 +198,7 @@ export function LeadersTab() {
   );
   const { data: recentResultsMap } = useRecentPlayerResults(sortedPlayerIds);
 
-  // ─── Champion streak for caption metadata (World Rankings only) ───
-  const { data: streakWeeks } = useChampionStreak(
-    isWorldCategory ? leader?.playerId : null,
-  );
-
-  // Streak label — World Rankings only, ≥2 weeks.
-  const streakLabel = useMemo<string | null>(() => {
-    if (!isWorldCategory || !streakWeeks || streakWeeks < 2) return null;
-    return `${streakWeeks} CONSECUTIVE WEEKS`;
-  }, [isWorldCategory, streakWeeks]);
-
-  // Margin label — only when there's a meaningful gap to the runner-up.
-  const marginLabel = useMemo<string | null>(() => {
-    if (!leader || !runnerUp) return null;
-    const a = leader.value;
-    const b = runnerUp.value;
-    if (a == null || b == null) return null;
-    if (isWorldCategory) {
-      const diff = a - b;
-      if (diff <= 0) return null;
-      return `MARGIN +${Math.round(diff)} PTS`;
-    }
-    const higher = category.higherIsBetter !== false;
-    const diff = higher ? a - b : b - a;
-    if (diff <= 0) return null;
-    // For currency-like categories (earnings), use the category's own format
-    // so the margin renders as "$278,300" or "$1.20M" — consistent with how
-    // the headline leader value is displayed. Apple-finish: numbers always formatted.
-    const sampleFormatted = category.format(diff);
-    const isCurrencyLike = sampleFormatted.startsWith('$');
-    if (isCurrencyLike) {
-      return `MARGIN +${sampleFormatted}`;
-    }
-    const rounded = Math.abs(diff) >= 10 ? Math.round(diff) : Math.round(diff * 10) / 10;
-    const unit = category.unit ? ` ${category.unit.toUpperCase()}` : '';
-    return `MARGIN +${rounded}${unit}`;
-  }, [leader, runnerUp, isWorldCategory, category]);
+  // ─── (streak / margin labels removed in condense pass) ───
 
   // ─── Loading skeleton ───
   if (isLoading) {
@@ -280,8 +244,6 @@ export function LeadersTab() {
         category={category}
         formatOverride={worldFormatOverride}
         unitOverride={worldUnitOverride}
-        streakLabel={streakLabel}
-        marginLabel={marginLabel}
         seasonYear={season?.year ?? null}
         tourLabel="PGA"
         onEyebrowTap={() => navigate('/tourhub?tab=overview', { replace: true })}
