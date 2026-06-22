@@ -38,6 +38,7 @@ const LIVE_BOTTOM_H = CHAMPION_BAND_H + TICKER_BAR_H;
 const RESULTS_FOOTER_H = 34;
 const BOTTOM_STACK_H = TICKER_BAR_H + CHAMPION_BAND_H;
 import { getPlayerHeadshotUrl } from '@/utils/playerHeadshot';
+import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import type { DefendingChampData } from '../../../hooks/useTournamentDefendingChamp';
 import type { FieldStrength } from '../../../hooks/useTournamentFieldStrength';
 
@@ -70,17 +71,23 @@ function scoreColor(score: number | null | undefined): string {
 
 const ROW_BORDER = '0.5px solid rgba(255,255,255,0.08)';
 
+type StackedAvatarItem = { url: string | null; name?: string; userId?: string | null };
+
 function StackedAvatarsDark({
   urls,
+  items,
   size = 22,
 }: {
-  urls: (string | null)[];
+  urls?: (string | null)[];
+  items?: StackedAvatarItem[];
   size?: number;
 }) {
-  const visible = urls.slice(0, 4);
+  const resolved: StackedAvatarItem[] =
+    items ?? (urls ?? []).map((u) => ({ url: u }));
+  const visible = resolved.slice(0, 4);
   return (
     <div style={{ display: 'flex', alignItems: 'center', flexShrink: 0 }}>
-      {visible.map((url, i) => (
+      {visible.map((it, i) => (
         <div
           key={i}
           style={{
@@ -89,21 +96,19 @@ function StackedAvatarsDark({
             borderRadius: '34%',
             marginLeft: i === 0 ? 0 : -8,
             border: '1.5px solid #141C28',
-            background: 'rgba(255,255,255,0.08)',
             overflow: 'hidden',
             flexShrink: 0,
             zIndex: visible.length - i,
             position: 'relative',
           }}
         >
-          {url && (
-            <img
-              src={url}
-              alt=""
-              loading="lazy"
-              style={{ width: '100%', height: '100%', objectFit: 'cover' }}
-            />
-          )}
+          <SquircleAvatar
+            src={it.url}
+            alt={it.name || ''}
+            userId={it.userId ?? null}
+            size={size - 3}
+            hideRing
+          />
         </div>
       ))}
     </div>
@@ -152,24 +157,14 @@ function SoloRowDark({
       >
         {rank}
       </span>
-      {avatarUrl ? (
-        <img
-          src={avatarUrl}
-          alt=""
-          loading="lazy"
-          style={{
-            width: 26, height: 26, borderRadius: '34%', objectFit: 'cover',
-            flexShrink: 0, background: 'rgba(255,255,255,0.08)',
-          }}
-        />
-      ) : (
-        <div
-          style={{
-            width: 26, height: 26, borderRadius: '34%',
-            background: 'rgba(255,255,255,0.08)', flexShrink: 0,
-          }}
-        />
-      )}
+      <SquircleAvatar
+        src={avatarUrl}
+        alt={name}
+        userId={entry?.player?.id ?? null}
+        size={26}
+        hideRing
+      />
+
       <span
         style={{
           flex: 1, minWidth: 0, fontSize: 15, fontWeight: 600, color: 'white',
@@ -210,12 +205,14 @@ function TiedLeadersRowDark({
   count,
   score,
   avatars,
+  items,
   isLast,
   isResults = false,
 }: {
   count: number;
   score: string;
-  avatars: (string | null)[];
+  avatars?: (string | null)[];
+  items?: StackedAvatarItem[];
   isLast: boolean;
   isResults?: boolean;
 }) {
@@ -236,7 +233,7 @@ function TiedLeadersRowDark({
       >
         T1
       </span>
-      <StackedAvatarsDark urls={avatars} size={26} />
+      <StackedAvatarsDark urls={avatars} items={items} size={26} />
       <span
         style={{
           flex: 1, minWidth: 0, fontSize: 14, fontWeight: 700, color: 'white',
@@ -264,6 +261,7 @@ function TiedChasersRowDark({
   count,
   score,
   avatars,
+  items,
   isLast,
   onTap,
   isResults = false,
@@ -271,7 +269,8 @@ function TiedChasersRowDark({
   rank: string;
   count: number;
   score: number;
-  avatars: (string | null)[];
+  avatars?: (string | null)[];
+  items?: StackedAvatarItem[];
   isLast: boolean;
   onTap?: () => void;
   isResults?: boolean;
@@ -295,7 +294,7 @@ function TiedChasersRowDark({
       >
         {rank}
       </span>
-      <StackedAvatarsDark urls={avatars} size={26} />
+      <StackedAvatarsDark urls={avatars} items={items} size={26} />
       <span
         style={{
           flex: 1, minWidth: 0, fontSize: 14, fontWeight: 600, color: 'white',
@@ -344,27 +343,16 @@ function ChampionRowDark({
       <span style={{ width: 22, display: 'flex', justifyContent: 'center', flexShrink: 0 }}>
         <Crown size={14} strokeWidth={2.5} fill={GOLD} style={{ color: GOLD_DEEP }} />
       </span>
-      {avatarUrl ? (
-        <img
+      <span style={{ flexShrink: 0, display: 'inline-flex', boxShadow: '0 0 0 1px rgba(0,0,0,0.4)', borderRadius: '34%' }}>
+        <SquircleAvatar
           src={avatarUrl}
-          alt=""
-          loading="lazy"
-          style={{
-            width: 38, height: 38, borderRadius: '34%', objectFit: 'cover',
-            flexShrink: 0, background: 'rgba(255,255,255,0.08)',
-            border: `1.5px solid ${GOLD}`,
-            boxShadow: `0 0 0 1px rgba(0,0,0,0.4)`,
-          }}
+          alt={name}
+          userId={entry?.player?.id ?? null}
+          size={38}
+          ringColor={GOLD}
+          thinRing
         />
-      ) : (
-        <div
-          style={{
-            width: 38, height: 38, borderRadius: '34%',
-            background: 'rgba(255,255,255,0.08)', flexShrink: 0,
-            border: `1.5px solid ${GOLD}`,
-          }}
-        />
-      )}
+      </span>
       <div style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', gap: 2 }}>
         <span
           style={{
@@ -419,27 +407,15 @@ function DefendingChampionRowDark({
         padding: '14px 10px',
       }}
     >
-      {avatarUrl ? (
-        <img
+      <span style={{ flexShrink: 0, display: 'inline-flex', boxShadow: '0 0 0 1px rgba(0,0,0,0.4)', borderRadius: '34%' }}>
+        <SquircleAvatar
           src={avatarUrl}
-          alt=""
-          loading="lazy"
-          style={{
-            width: 40, height: 40, borderRadius: '34%', objectFit: 'cover',
-            flexShrink: 0, background: 'rgba(255,255,255,0.08)',
-            border: `1.5px solid ${GOLD}`,
-            boxShadow: `0 0 0 1px rgba(0,0,0,0.4)`,
-          }}
+          alt={data.name}
+          size={40}
+          ringColor={GOLD}
+          thinRing
         />
-      ) : (
-        <div
-          style={{
-            width: 40, height: 40, borderRadius: '34%',
-            background: 'rgba(255,255,255,0.08)', flexShrink: 0,
-            border: `1.5px solid ${GOLD}`,
-          }}
-        />
-      )}
+      </span>
       <div style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', gap: 3 }}>
         <span
           style={{
@@ -621,17 +597,17 @@ export function CinematicFrame({
           ? safe.slice(firstChaser)
           : safe.slice(tiedLeaders.count);
 
-      const tiedAvatars = safe
+      const tiedItems: StackedAvatarItem[] = safe
         .filter(e => (e?.score ?? e?.total) === topScore)
         .slice(0, Math.min(tiedLeaders.count, 4))
-        .map(e => avatar(e));
+        .map(e => ({ url: avatar(e), name: entryName(e), userId: e?.player?.id ?? null }));
 
       slotNodes.push(
         <TiedLeadersRowDark
           key="tied-leaders"
           count={tiedLeaders.count}
           score={tiedLeaders.score}
-          avatars={tiedAvatars}
+          items={tiedItems}
           isLast={false}
           isResults={isResults}
         />
@@ -647,7 +623,7 @@ export function CinematicFrame({
               rank={slot.rank}
               count={slot.count}
               score={slot.score}
-              avatars={slot.members.map((m: any) => avatar(m))}
+              items={slot.members.map((m: any) => ({ url: avatar(m), name: entryName(m), userId: m?.player?.id ?? null }))}
               isLast={isLast}
               onTap={onCtaTap}
               isResults={isResults}
@@ -706,7 +682,7 @@ export function CinematicFrame({
               rank={slot.rank}
               count={slot.count}
               score={slot.score}
-              avatars={slot.members.map((m: any) => avatar(m))}
+              items={slot.members.map((m: any) => ({ url: avatar(m), name: entryName(m), userId: m?.player?.id ?? null }))}
               isLast={isLast}
               onTap={onCtaTap}
               isResults={isResults}
@@ -988,9 +964,15 @@ export function CinematicFrame({
               <div style={{ display: 'flex', gap: 14, alignItems: 'center', padding: '0 16px 64px' }}>
                 {/* Champion card (left) — no trophy icon on the avatar */}
                 <div style={{ flex: '0 0 42%', display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', textAlign: 'center', background: 'rgba(10,14,20,0.55)', backdropFilter: 'blur(10px)', WebkitBackdropFilter: 'blur(10px)', borderRadius: 12, border: '0.5px solid rgba(255,255,255,0.18)', padding: '14px 12px' }}>
-                  {winnerAvatar
-                    ? <img src={winnerAvatar} alt="" loading="lazy" style={{ width: 50, height: 50, borderRadius: '34%', objectFit: 'cover', border: `2px solid ${GOLD}`, boxShadow: '0 0 22px rgba(251,188,46,0.35)', marginBottom: 9 }} />
-                    : <div style={{ width: 50, height: 50, borderRadius: '34%', background: 'rgba(255,255,255,0.08)', border: `2px solid ${GOLD}`, boxShadow: '0 0 22px rgba(251,188,46,0.35)', marginBottom: 9 }} />}
+                  <span style={{ display: 'inline-flex', boxShadow: '0 0 22px rgba(251,188,46,0.35)', borderRadius: '34%', marginBottom: 9 }}>
+                    <SquircleAvatar
+                      src={winnerAvatar}
+                      alt={entryName(winner)}
+                      userId={(winner as any)?.player?.id ?? null}
+                      size={50}
+                      ringColor={GOLD}
+                    />
+                  </span>
                   <div style={{ ...NUMERIC_STYLE, fontSize: 8, fontWeight: 800, letterSpacing: '0.16em', color: GOLD, textTransform: 'uppercase' }}>Champion</div>
                   <div style={{ fontSize: 16, fontWeight: 800, color: '#fff', marginTop: 3, lineHeight: 1.15, display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>{entryName(winner)}</div>
                   <div style={{ ...NUMERIC_STYLE, fontSize: 20, fontWeight: 900, color: scoreColor(winner.score), marginTop: 6 }}>{fmtScore(winner.score)}</div>
@@ -1049,9 +1031,14 @@ export function CinematicFrame({
                 const headshot = (tourSlug && defendingChamp.name)
                   ? (() => { try { return getPlayerHeadshotUrl(defendingChamp.name, tourSlug); } catch { return null; } })()
                   : null;
-                return headshot
-                  ? <img src={headshot} alt="" loading="lazy" style={{ width: 42, height: 42, borderRadius: '34%', objectFit: 'cover', border: `2px solid ${GOLD}`, flexShrink: 0 }} />
-                  : <div style={{ width: 42, height: 42, borderRadius: '34%', background: 'rgba(255,255,255,0.08)', border: `2px solid ${GOLD}`, flexShrink: 0 }} />;
+                return (
+                  <SquircleAvatar
+                    src={headshot}
+                    alt={defendingChamp.name}
+                    size={42}
+                    ringColor={GOLD}
+                  />
+                );
               })()}
               <div style={{ flex: 1, minWidth: 0 }}>
                 <div style={{ ...NUMERIC_STYLE, fontSize: 8.5, fontWeight: 800, letterSpacing: '0.16em', color: GOLD, textTransform: 'uppercase' }}>
