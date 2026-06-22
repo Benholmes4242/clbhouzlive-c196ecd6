@@ -806,13 +806,6 @@ export function PlayersTab() {
           >
             {displayRows.length > 0 ? (
               <>
-                {!debouncedSearch && sort === 'world-rank-desc' && (
-                  <div style={{ padding: '12px 16px 6px', background: SURFACE }}>
-                    <span style={{ fontSize: 9, fontWeight: 800, color: INK_MUTE, letterSpacing: '0.16em' }}>
-                      CHASING
-                    </span>
-                  </div>
-                )}
                 {displayRows.map((player, index) => {
                   const rank = rankMap.get(player.id);
                   const pStats = statsMap.get(player.id);
