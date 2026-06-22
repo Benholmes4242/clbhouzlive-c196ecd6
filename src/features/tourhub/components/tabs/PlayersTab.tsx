@@ -31,6 +31,7 @@ import {
   GOLD_TINT_10,
   HAIRLINE_INK_10,
   INK,
+  INK_DEEP,
   INK_FAINT,
   INK_MUTE,
   INK_TINT_06,
