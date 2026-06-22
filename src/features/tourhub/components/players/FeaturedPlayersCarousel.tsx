@@ -7,7 +7,8 @@ import { useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import { ChevronRight } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { getPlayerHeadshotUrl, PLAYER_SILHOUETTE_URL } from '@/utils/playerHeadshot';
+import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
+import { resolvePlayerAvatarCandidates } from '../../_shared/resolvePlayerAvatar';
 import type { TourPlayer, TourPlayerStatistics } from '../../hooks/useTourHubData';
 
 interface FeaturedPlayerCardProps {
