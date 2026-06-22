@@ -63,7 +63,6 @@ export function ScheduleMonthHeader({
           {eventCount} event{eventCount !== 1 ? 's' : ''}
         </span>
       </div>
-      </div>
     </div>
   );
 }
