@@ -286,6 +286,7 @@ export function ScheduleTournamentCard({
         {isFinal && winnerDisplay && (
           <WinnerPill
             name={winnerDisplay}
+            fullName={winnerFullName}
             photoUrl={winnerPhotoUrl}
             score={winnerDisplayScore}
             tourSlug={tourSlug}
