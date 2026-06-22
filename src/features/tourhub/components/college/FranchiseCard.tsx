@@ -145,9 +145,9 @@ export function FranchiseCard({
           borderBottom: `0.5px solid ${INK_TINT_07}`,
           textDecoration: 'none',
           ...(isDelta && deltas ? {
-            background: deltas.earnings_delta >= 0
-              ? 'rgba(16,185,129,0.04)'
-              : 'rgba(220,38,38,0.02)',
+            background: direction === 'down'
+              ? 'rgba(220,38,38,0.04)'
+              : 'rgba(16,185,129,0.04)',
           } : isTopThree ? {
             background: AMBER_SOFT_BG,
           } : {
