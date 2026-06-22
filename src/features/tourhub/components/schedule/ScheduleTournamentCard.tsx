@@ -42,6 +42,15 @@ const SLUG_TO_DB_CODE: Record<string, string> = {
   lpga: 'LPGA',
 };
 
+const DB_CODE_TO_SLUG: Record<string, string> = {
+  pga: 'pga',
+  LIV: 'liv',
+  EURO: 'euro',
+  PGAD: 'pgad',
+  CHAMP: 'champ',
+  LPGA: 'lpga',
+};
+
 interface ScheduleTournamentCardProps {
   tournament: TourTournament | SeasonTournament;
   className?: string;
