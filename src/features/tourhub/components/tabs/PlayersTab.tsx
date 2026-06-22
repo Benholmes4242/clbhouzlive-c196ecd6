@@ -718,57 +718,52 @@ export function PlayersTab() {
           )}
         </div>
 
-        {/* Underline tour-specific tabs (A-Z removed Phase 1 fix.1.6) */}
-        <div style={{ display: 'flex', borderBottom: `1px solid ${HAIRLINE_INK_10}`, marginTop: '6px' }}>
-          {(() => {
-            // Per-tour tab config — single source of truth.
-            const tabs: { value: PlayerSortType; label: string }[] =
-              activeTour === 'pga'
-                ? [
-                    { value: 'world-rank-desc', label: 'World Ranking' },
-                    { value: 'fedex-points', label: 'FedEx Cup' },
-                    { value: 'highest-earnings', label: 'Earnings' },
-                  ]
-              : activeTour === 'EURO' ? [{ value: 'race-to-dubai', label: 'Race to Dubai' }]
-              : activeTour === 'LPGA' ? [{ value: 'race-to-cme', label: 'Race to CME Globe' }]
-              : activeTour === 'PGAD' ? [{ value: 'points-list', label: 'Korn Ferry Points' }]
-              : activeTour === 'LIV' ? [{ value: 'liv-standings', label: 'Individual Standings' }]
-              : activeTour === 'CHAMP' ? [{ value: 'highest-earnings', label: 'Earnings' }]
-              : [{ value: getDefaultSortForTour(activeTour) as PlayerSortType, label: getSortShortLabel(getDefaultSortForTour(activeTour), activeTour) }];
+        {/* Underline tour-specific tabs — only render when >1 tab */}
+        {(() => {
+          // Per-tour tab config — single source of truth.
+          const tabs: { value: PlayerSortType; label: string }[] =
+            activeTour === 'pga'
+              ? [
+                  { value: 'world-rank-desc', label: 'World Ranking' },
+                  { value: 'fedex-points', label: 'FedEx Cup' },
+                  { value: 'highest-earnings', label: 'Earnings' },
+                ]
+            : activeTour === 'EURO' ? [{ value: 'race-to-dubai', label: 'Race to Dubai' }]
+            : activeTour === 'LPGA' ? [{ value: 'race-to-cme', label: 'Race to CME Globe' }]
+            : activeTour === 'PGAD' ? [{ value: 'points-list', label: 'Korn Ferry Points' }]
+            : activeTour === 'LIV' ? [{ value: 'liv-standings', label: 'Individual Standings' }]
+            : activeTour === 'CHAMP' ? [{ value: 'highest-earnings', label: 'Earnings' }]
+            : [{ value: getDefaultSortForTour(activeTour) as PlayerSortType, label: getSortShortLabel(getDefaultSortForTour(activeTour), activeTour) }];
 
-            return tabs.map(tab => {
-              const isActive = sort === tab.value;
-              return (
-                <button
-                  key={tab.value}
-                  onClick={() => { setSort(tab.value); setVisibleCount(PAGE_SIZE); }}
-                  style={{
-                    flex: 1, padding: '12px 0',
-                    fontSize: '12px', fontWeight: isActive ? 800 : 600,
-                    color: isActive ? INK : INK_FAINT,
-                    background: 'transparent', border: 'none',
-                    borderBottom: `2px solid ${isActive ? AMBER : 'transparent'}`,
-                    cursor: 'pointer', transition: 'all 0.15s',
-                  }}
-                >
-                  {tab.label}
-                </button>
-              );
-            });
-          })()}
-        </div>
+          if (tabs.length <= 1) return null;
 
-        {/* Count+sort bar OR search input — mutually exclusive (Phase 1 fix.1.7) */}
-        {!searchExpanded ? (
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '8px 16px', gap: 8 }}>
-            <span style={{ fontSize: 9, fontWeight: 800, color: INK, letterSpacing: '0.16em', fontVariantNumeric: 'tabular-nums' }}>
-              {totalCount.toLocaleString()} {totalCount === 1 ? 'PLAYER' : 'PLAYERS'}
-            </span>
-            <span style={{ fontSize: 9, fontWeight: 800, color: INK_MUTE, letterSpacing: '0.14em' }}>
-              SORTED BY {getSortShortLabel(sort, activeTour).toUpperCase()}
-            </span>
-          </div>
-        ) : (
+          return (
+            <div style={{ display: 'flex', borderBottom: `1px solid ${HAIRLINE_INK_10}`, marginTop: '6px' }}>
+              {tabs.map(tab => {
+                const isActive = sort === tab.value;
+                return (
+                  <button
+                    key={tab.value}
+                    onClick={() => { setSort(tab.value); setVisibleCount(PAGE_SIZE); }}
+                    style={{
+                      flex: 1, padding: '12px 0',
+                      fontSize: '12px', fontWeight: isActive ? 800 : 600,
+                      color: isActive ? INK : INK_FAINT,
+                      background: 'transparent', border: 'none',
+                      borderBottom: `2px solid ${isActive ? INK_DEEP : 'transparent'}`,
+                      cursor: 'pointer', transition: 'all 0.15s',
+                    }}
+                  >
+                    {tab.label}
+                  </button>
+                );
+              })}
+            </div>
+          );
+        })()}
+
+        {/* Search input — appears only when expanded */}
+        {searchExpanded && (
           <div style={{ padding: '6px 16px 8px' }}>
             <div style={{ position: 'relative' }}>
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 z-10 w-4 h-4" style={{ color: AMBER }} strokeWidth={2.5} />
