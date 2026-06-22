@@ -538,6 +538,7 @@ export interface CinematicFrameProps {
   tourSlug?: string | null;
   defendingChamp?: DefendingChampData | null;
   fieldStrength?: FieldStrength | null;
+  tournamentScoring?: { eagles: number; birdies: number; pars: number; bogeysPlus: number } | null;
   venuePar?: number | null;
   venueYardage?: number | null;
   purse?: number | null;
@@ -565,6 +566,7 @@ export function CinematicFrame({
   tourSlug,
   defendingChamp = null,
   fieldStrength = null,
+  tournamentScoring = null,
   venuePar = null,
   venueYardage = null,
   purse = null,
@@ -972,33 +974,54 @@ export function CinematicFrame({
           {/* over-photo countdown chip removed — countdown lives in base band */}
         </div>
 
-        {/* Results — champion poster (centred trophy + winner) */}
+        {/* Results — champion card (left) + tournament scoring grid (right) */}
         {isResults && safe[0] && (() => {
           const winner = safe[0];
           const runnerUp = safe[1];
           const margin = runnerUp ? Math.abs((runnerUp.score ?? 0) - (winner.score ?? 0)) : null;
+          const marginLabel = margin == null ? null : (margin === 0 ? 'won in a playoff' : `won by ${margin}`);
           const winnerAvatar = resolveAvatar(winner, tourSlug);
+          const s = tournamentScoring;
+
           return (
             <>
               <div style={{ flex: 1 }} />
-              <div style={{ textAlign: 'center', paddingBottom: 26 }}>
-                <div style={{ fontSize: 42, lineHeight: 1, marginBottom: 10 }} aria-hidden>🏆</div>
-                <div style={{ ...NUMERIC_STYLE, fontSize: 9, fontWeight: 800, letterSpacing: '0.24em', color: GOLD }}>CHAMPION</div>
-                {winnerAvatar
-                  ? <img src={winnerAvatar} alt="" loading="lazy" style={{ width: 90, height: 90, borderRadius: '34%', objectFit: 'cover', border: `3px solid ${GOLD}`, margin: '12px auto 8px', display: 'block', boxShadow: '0 0 38px rgba(251,188,46,0.5)' }} />
-                  : <div style={{ width: 90, height: 90, borderRadius: '34%', background: 'rgba(255,255,255,0.08)', border: `3px solid ${GOLD}`, margin: '12px auto 8px', boxShadow: '0 0 38px rgba(251,188,46,0.5)' }} />}
-                <div style={{ fontSize: 30, fontWeight: 900, color: '#fff', letterSpacing: '-0.02em', padding: '0 16px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{entryName(winner)}</div>
-                <div style={{ display: 'inline-flex', alignItems: 'center', gap: 10, marginTop: 8 }}>
-                  <span style={{ ...NUMERIC_STYLE, fontSize: 18, fontWeight: 900, color: scoreColor(winner.score) }}>{fmtScore(winner.score)}</span>
-                  {margin != null && (
-                    <>
-                      <span style={{ width: 4, height: 4, borderRadius: '50%', background: 'rgba(255,255,255,0.4)' }} />
-                      <span style={{ fontSize: 13, fontWeight: 700, color: 'rgba(255,255,255,0.75)' }}>
-                        {margin === 0 ? 'won in a playoff' : `won by ${margin}`}
-                      </span>
-                    </>
-                  )}
+              <div style={{ display: 'flex', gap: 14, alignItems: 'stretch', padding: '0 16px 22px' }}>
+                {/* Champion card (left) — no trophy icon on the avatar */}
+                <div style={{ flex: '0 0 42%', display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', textAlign: 'center', background: 'rgba(255,255,255,0.04)', borderRadius: 12, border: '0.5px solid rgba(255,255,255,0.08)', padding: '14px 8px', minWidth: 0 }}>
+                  {winnerAvatar
+                    ? <img src={winnerAvatar} alt="" loading="lazy" style={{ width: 56, height: 56, borderRadius: '34%', objectFit: 'cover', border: `2px solid ${GOLD}`, boxShadow: '0 0 22px rgba(251,188,46,0.35)', marginBottom: 8 }} />
+                    : <div style={{ width: 56, height: 56, borderRadius: '34%', background: 'rgba(255,255,255,0.08)', border: `2px solid ${GOLD}`, boxShadow: '0 0 22px rgba(251,188,46,0.35)', marginBottom: 8 }} />}
+                  <div style={{ ...NUMERIC_STYLE, fontSize: 8, fontWeight: 800, letterSpacing: '0.16em', color: GOLD, textTransform: 'uppercase' }}>Champion</div>
+                  <div style={{ fontSize: 15, fontWeight: 800, color: '#fff', marginTop: 3, lineHeight: 1.1, padding: '0 2px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', maxWidth: '100%' }}>{entryName(winner)}</div>
+                  <div style={{ ...NUMERIC_STYLE, fontSize: 18, fontWeight: 900, color: scoreColor(winner.score), marginTop: 3 }}>{fmtScore(winner.score)}</div>
+                  {marginLabel && <div style={{ fontSize: 9.5, fontWeight: 600, color: 'rgba(255,255,255,0.5)', marginTop: 2 }}>{marginLabel}</div>}
                 </div>
+
+                {/* Scoring grid (right) — only when scorecard data exists */}
+                {s ? (
+                  <div style={{ flex: 1, display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
+                    {[
+                      { label: 'Birdies', value: s.birdies, color: '#DC2626' },
+                      { label: 'Eagles', value: s.eagles, color: GOLD },
+                      { label: 'Pars', value: s.pars, color: '#fff' },
+                      { label: 'Bogeys+', value: s.bogeysPlus, color: '#fff' },
+                    ].map((cell) => (
+                      <div key={cell.label} style={{ background: 'rgba(255,255,255,0.04)', borderRadius: 10, border: '0.5px solid rgba(255,255,255,0.08)', padding: '8px 6px', display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center' }}>
+                        <div style={{ ...NUMERIC_STYLE, fontSize: 18, fontWeight: 900, color: cell.color }}>{cell.value.toLocaleString()}</div>
+                        <div style={{ fontSize: 7.5, fontWeight: 800, letterSpacing: '0.10em', color: 'rgba(255,255,255,0.45)', textTransform: 'uppercase', marginTop: 2 }}>{cell.label}</div>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  runnerUp ? (
+                    <div style={{ flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'center', background: 'rgba(255,255,255,0.04)', borderRadius: 12, border: '0.5px solid rgba(255,255,255,0.08)', padding: '14px 12px', minWidth: 0 }}>
+                      <div style={{ ...NUMERIC_STYLE, fontSize: 8, fontWeight: 800, letterSpacing: '0.16em', color: 'rgba(255,255,255,0.5)', textTransform: 'uppercase' }}>Runner-up</div>
+                      <div style={{ fontSize: 15, fontWeight: 800, color: '#fff', marginTop: 3, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{entryName(runnerUp)}</div>
+                      <div style={{ ...NUMERIC_STYLE, fontSize: 16, fontWeight: 900, color: scoreColor(runnerUp.score), marginTop: 2 }}>{fmtScore(runnerUp.score)}</div>
+                    </div>
+                  ) : null
+                )}
               </div>
             </>
           );
