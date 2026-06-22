@@ -156,25 +156,22 @@ export function PlayerHero({ player, playerStats }: PlayerHeroProps) {
         {/* Body row */}
         <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
           {/* Photo + position badge */}
-          <div style={{ position: 'relative', flexShrink: 0 }}>
-            <div
-              style={{
-                width: 84,
-                height: 84,
-                borderRadius: '34%',
-                overflow: 'hidden',
-                background: SLATE_100,
-                border: `2.5px solid ${GOLD}`,
-                boxShadow: '0 4px 12px rgba(255,184,0,0.20)',
-              }}
-            >
-              <img
-                src={heroPhotoUrl}
-                alt={player.full_name}
-                style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center 5%' }}
-                onError={e => { (e.target as HTMLImageElement).src = PLAYER_SILHOUETTE_URL; }}
-              />
-            </div>
+          <div
+            style={{
+              position: 'relative',
+              flexShrink: 0,
+              borderRadius: '34%',
+              boxShadow: '0 4px 12px rgba(255,184,0,0.20)',
+            }}
+          >
+            <SquircleAvatar
+              size={84}
+              srcCandidates={avatarCandidates}
+              alt={player.full_name}
+              userId={player.id ?? player.full_name}
+              ringColor={GOLD}
+            />
+          </div>
 
             {/* Position badge — gated: worldRank && worldRank <= 99 (Q2 decision) */}
             {worldRank && worldRank <= 99 && (
