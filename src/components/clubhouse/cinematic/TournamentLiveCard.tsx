@@ -96,10 +96,11 @@ function LiveBadge() {
 function PlayerAvatar({ name, photoUrl, tourSlug, size }: {
   name: string; photoUrl: string | null; tourSlug: string; size: number;
 }) {
-  const src = photoUrl || getPlayerHeadshotUrl(name, tourSlug) || null;
+  // Canonical multi-folder candidate walk + initials fallback (no silhouettes).
+  const candidates = resolvePlayerAvatarCandidates({ name, photoUrl, tourSlug });
   // TODO(avatar-userid): userId not surfaced at this layer (pro player, no app user) —
   // colour hashes from alt. See src/lib/avatarFallback.ts.
-  return <SquircleAvatar src={src} alt={name} size={size} hideRing />;
+  return <SquircleAvatar srcCandidates={candidates} alt={name} size={size} hideRing />;
 }
 
 function HeartIcon({ filled }: { filled: boolean }) {
