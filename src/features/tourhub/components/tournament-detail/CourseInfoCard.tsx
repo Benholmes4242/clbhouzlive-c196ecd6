@@ -1,11 +1,14 @@
 /**
- * CourseInfoCard - Flat ruled key-value grid (no full-bleed image)
+ * CourseInfoCard — Flush section: "COURSE" eyebrow, venue name, PAR/YARDS/PURSE
+ * stat trio. Optional link to the courses detail page.
  */
 
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import type { TourTournament } from '../../hooks/useTourHubData';
-import { AMBER, INK, INK_FAINT, INK_MUTE, INK_TINT_07, SURFACE } from '../../_shared/tokens';
+import {
+  AMBER, INK, INK_FAINT, INK_MUTE, INK_TINT_07, SURFACE,
+} from '../../_shared/tokens';
 import { ConnectHandicapCue } from '@/components/courses/course-detail/ConnectHandicapCue';
 
 interface CourseInfoCardProps {
@@ -14,63 +17,84 @@ interface CourseInfoCardProps {
   courseId?: string | null;
 }
 
-export function CourseInfoCard({ tournament, courseImage, courseId }: CourseInfoCardProps) {
-  const hasLocation = tournament.venue_city || tournament.venue_state || tournament.venue_country;
-  
-  const courseLink = courseId 
+export function CourseInfoCard({ tournament, courseId }: CourseInfoCardProps) {
+  const venueName = tournament.venue_course_name || tournament.venue_name;
+  if (!venueName) return null;
+
+  const cityLine = [tournament.venue_city, tournament.venue_state, tournament.venue_country]
+    .filter(Boolean).join(', ');
+
+  const courseLink = courseId
     ? `/courses/${courseId}`
-    : tournament.venue_course_name 
+    : tournament.venue_course_name
       ? `/courses?search=${encodeURIComponent(tournament.venue_course_name)}`
       : null;
 
-  const items = [
-    tournament.venue_course_name && { label: 'Course', value: tournament.venue_course_name, link: courseLink },
-    tournament.venue_name && tournament.venue_name !== tournament.venue_course_name && { label: 'Venue', value: tournament.venue_name },
-    hasLocation && { label: 'Location', value: [tournament.venue_city, tournament.venue_state, tournament.venue_country].filter(Boolean).join(', ') },
-    tournament.venue_par && { label: 'Par', value: `Par ${tournament.venue_par}` },
-    tournament.venue_yardage && { label: 'Yardage', value: `${tournament.venue_yardage.toLocaleString()} yds` },
-  ].filter(Boolean) as Array<{ label: string; value: string; link?: string | null }>;
+  const purse = tournament.purse
+    ? tournament.purse >= 1_000_000
+      ? `$${(tournament.purse / 1_000_000).toFixed(1)}M`
+      : `$${(tournament.purse / 1_000).toFixed(0)}K`
+    : null;
 
-  if (items.length === 0) return null;
+  const stats: Array<[string, string]> = [];
+  if (tournament.venue_par) stats.push(['PAR', String(tournament.venue_par)]);
+  if (tournament.venue_yardage) stats.push(['YARDS', tournament.venue_yardage.toLocaleString()]);
+  if (purse) stats.push(['PURSE', purse]);
+
+  const NameTag: React.ElementType = courseLink ? Link : 'span';
+  const nameProps = courseLink ? { to: courseLink } : {};
 
   return (
     <motion.div
-      style={{ background: SURFACE, borderTop: `1px solid ${INK_TINT_07}`, borderBottom: `1px solid ${INK_TINT_07}`, marginTop: '8px' }}
-      initial={{ opacity: 0, y: 20 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true, margin: '-40px' }}
-      transition={{ duration: 0.35 }}
+      style={{ background: SURFACE, borderTop: `0.5px solid ${INK_TINT_07}`, padding: '14px 16px 16px' }}
+      initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.3 }}
     >
-      {/* Section eyebrow — canonical §6 slate-caps */}
-      <div style={{ padding: '14px 16px 6px' }}>
+      <div style={{ marginBottom: 12 }}>
         <span style={{
-          fontSize: 9,
-          fontWeight: 800,
-          color: INK_MUTE,
-          letterSpacing: '0.16em',
-          textTransform: 'uppercase' as const,
-        }}>
-          Course Info
-        </span>
+          fontSize: 9, fontWeight: 800, color: INK_MUTE,
+          letterSpacing: '0.16em', textTransform: 'uppercase',
+        }}>Course</span>
       </div>
 
-      {/* Flat ruled rows */}
-      {items.map((item) => (
-        <div key={item.label} style={{ display: 'flex', alignItems: 'center', padding: '10px 16px', borderTop: `0.5px solid ${INK_TINT_07}` }}>
-          <span style={{ fontSize: 9, fontWeight: 800, color: INK_FAINT, letterSpacing: '0.14em', textTransform: 'uppercase' as const, width: '88px', flexShrink: 0 }}>{item.label}</span>
-          {item.link ? (
-            <Link to={item.link} style={{ fontSize: 14, fontWeight: 700, color: AMBER, textDecoration: 'none', flex: 1 }} className="active:opacity-70 transition-opacity">
-              {item.value}
-            </Link>
-          ) : (
-            <span style={{ fontSize: 14, fontWeight: 600, color: INK, flex: 1 }}>{item.value}</span>
-          )}
+      <NameTag
+        {...(nameProps as any)}
+        style={{
+          fontSize: 16, fontWeight: 800,
+          color: courseLink ? AMBER : INK,
+          textDecoration: 'none', display: 'block',
+        }}
+        className={courseLink ? 'active:opacity-70 transition-opacity' : undefined}
+      >
+        {venueName}
+      </NameTag>
+
+      {cityLine && (
+        <div style={{ fontSize: 12, fontWeight: 600, color: INK_MUTE, marginTop: 2 }}>
+          {cityLine}
         </div>
-      ))}
-      {courseId && tournament.venue_course_name && (
-        <ConnectHandicapCue variant="tour-venue" courseName={tournament.venue_course_name} />
       )}
-      <div style={{ height: '6px' }} />
+
+      {stats.length > 0 && (
+        <div style={{ display: 'flex', gap: 28, marginTop: 14 }}>
+          {stats.map(([label, value]) => (
+            <div key={label}>
+              <span style={{
+                fontSize: 9, fontWeight: 800, color: INK_FAINT,
+                letterSpacing: '0.16em', textTransform: 'uppercase',
+              }}>{label}</span>
+              <div style={{ fontSize: 16, fontWeight: 800, color: INK, marginTop: 3, fontVariantNumeric: 'tabular-nums' }}>
+                {value}
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+
+      {courseId && tournament.venue_course_name && (
+        <div style={{ marginTop: 14 }}>
+          <ConnectHandicapCue variant="tour-venue" courseName={tournament.venue_course_name} />
+        </div>
+      )}
     </motion.div>
   );
 }

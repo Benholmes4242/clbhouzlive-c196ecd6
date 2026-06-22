@@ -301,7 +301,10 @@ export function TournamentDetailPage() {
       <div style={{ paddingTop: 'var(--chrome-total-h, 0px)', minHeight: '100dvh', background: SLATE_50 }}>
         <TournamentHero
           tournament={tournament}
-          imageUrl={heroImageUrl}
+          leaderboard={leaderboard}
+          isLive={isLive}
+          isCompleted={isCompleted}
+          isUpcoming={isUpcoming}
         />
 
         <div style={{ paddingBottom: 'calc(var(--sab, env(safe-area-inset-bottom, 0px)) + 80px)' }}>

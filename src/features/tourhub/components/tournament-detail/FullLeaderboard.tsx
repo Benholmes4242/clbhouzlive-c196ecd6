@@ -10,7 +10,7 @@ import { cn } from '@/lib/utils';
 import CountryFlag from '@/components/ui/country-flag';
 import { formatThruDisplay } from '../../utils/formatThruDisplay';
 import { playerRoute } from '../../routes';
-import { AMBER, HAIRLINE_INK_12, INK, INK_FAINT, INK_LIGHT, INK_MUTE, INK_TINT_02, INK_TINT_05, INK_TINT_07, LEADER_GOLD_TINT_10, SCORE_OVER_PAR_LIGHT, SURFACE } from '../../_shared/tokens';
+import { AMBER, AMBER_SOFT_BG, GOLD_DEEP, HAIRLINE_INK_12, INK, INK_FAINT, INK_LIGHT, INK_MUTE, INK_TINT_02, INK_TINT_05, INK_TINT_07, LEADER_GOLD_TINT_10, SCORE_OVER_PAR_LIGHT, SURFACE } from '../../_shared/tokens';
 
 interface RawRoundData {
   thru?: number;
@@ -174,10 +174,10 @@ export function FullLeaderboard({
         </AnimatePresence>
       </div>
 
-      {/* Column headers */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: '3px', padding: '5px 16px', background: INK_TINT_02, borderTop: `0.5px solid ${INK_TINT_07}`, borderBottom: `0.5px solid ${INK_TINT_07}` }}>
-        <span style={{ width: '24px', fontSize: '9px', fontWeight: 800, color: INK, letterSpacing: '0.14em', flexShrink: 0 }}>POS</span>
-        <span style={{ flex: 1, fontSize: '9px', fontWeight: 800, color: INK, letterSpacing: '0.14em' }}>PLAYER</span>
+      {/* De-boxed column header — single bottom hairline, no INK_TINT_02 strip */}
+      <div style={{ display: 'flex', alignItems: 'center', gap: '3px', padding: '8px 16px', borderTop: `0.5px solid ${INK_TINT_07}`, borderBottom: `0.5px solid ${INK_TINT_07}` }}>
+        <span style={{ width: '24px', fontSize: '10px', fontWeight: 700, color: INK_MUTE, letterSpacing: '0.08em', flexShrink: 0, textTransform: 'uppercase' }}>POS</span>
+        <span style={{ flex: 1, fontSize: '10px', fontWeight: 700, color: INK_MUTE, letterSpacing: '0.08em', textTransform: 'uppercase' }}>Player</span>
         {[1, 2, 3, 4].map((r) => {
           const active = sortRound === r;
           return (
@@ -187,10 +187,10 @@ export function FullLeaderboard({
               aria-pressed={active}
               aria-label={`Sort by round ${r}`}
               style={{
-                width: '21px', textAlign: 'center', fontSize: '9px', fontWeight: 800,
-                color: INK, letterSpacing: '0.14em', flexShrink: 0,
+                width: '21px', textAlign: 'center', fontSize: '10px', fontWeight: 700,
+                color: active ? INK : INK_MUTE, letterSpacing: '0.08em', flexShrink: 0,
                 background: 'none', border: 'none', padding: 0, cursor: 'pointer',
-                fontVariantNumeric: 'tabular-nums',
+                fontVariantNumeric: 'tabular-nums', textTransform: 'uppercase',
               }}
             >
               R{r}{active ? '▾' : ''}
@@ -202,14 +202,15 @@ export function FullLeaderboard({
           aria-pressed={sortRound == null}
           aria-label="Sort by total"
           style={{
-            width: '40px', textAlign: 'center', fontSize: '9px', fontWeight: 800,
-            color: INK, letterSpacing: '0.14em', flexShrink: 0,
+            width: '40px', textAlign: 'center', fontSize: '10px', fontWeight: 700,
+            color: sortRound == null ? INK : INK_MUTE, letterSpacing: '0.08em', flexShrink: 0,
             background: 'none', border: 'none', padding: 0, cursor: 'pointer',
+            textTransform: 'uppercase',
           }}
         >
           TOT{sortRound == null ? '▾' : ''}
         </button>
-        <span style={{ width: '48px', textAlign: 'center' as const, fontSize: '9px', fontWeight: 800, color: INK, letterSpacing: '0.14em', flexShrink: 0 }}>THRU</span>
+        <span style={{ width: '48px', textAlign: 'center' as const, fontSize: '10px', fontWeight: 700, color: INK_MUTE, letterSpacing: '0.08em', flexShrink: 0, textTransform: 'uppercase' }}>Thru</span>
       </div>
 
       {/* Player rows */}
@@ -231,14 +232,14 @@ export function FullLeaderboard({
                   padding: '13px 16px',
                   borderBottom: `0.5px solid ${INK_TINT_07}`,
                   borderLeft: entry.position === 1 && !isMissedCut && !isWD ? `3px solid ${AMBER}` : '3px solid transparent',
-                  background: entry.position === 1 && !isMissedCut && !isWD ? LEADER_GOLD_TINT_10 : 'transparent',
+                  background: entry.position === 1 && !isMissedCut && !isWD ? AMBER_SOFT_BG : 'transparent',
                   opacity: isWD ? 0.4 : isMissedCut ? 0.55 : 1,
                   textDecoration: 'none',
                 }}
                 className="active:bg-black/[0.02] transition-colors"
               >
                 {/* Position */}
-                <span style={{ width: '24px', fontSize: '11px', fontWeight: 800, color: entry.position === 1 ? AMBER : INK, flexShrink: 0, fontVariantNumeric: 'tabular-nums' }}>
+                <span style={{ width: '24px', fontSize: '11px', fontWeight: 800, color: entry.position === 1 ? GOLD_DEEP : INK, flexShrink: 0, fontVariantNumeric: 'tabular-nums' }}>
                   {isMissedCut ? 'MC' : isWD ? 'WD' : entry.position_tied ? `T${entry.position}` : String(entry.position)}
                 </span>
 

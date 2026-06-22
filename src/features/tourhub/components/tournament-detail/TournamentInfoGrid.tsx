@@ -1,101 +1,84 @@
 /**
- * TournamentInfoGrid - Flat ruled key-value grid
+ * TournamentInfoGrid — "TOURNAMENT INFO" eyebrow + 2-col label/value grid,
+ * flush on SURFACE, single top hairline.
  */
 
-import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { format, isSameMonth } from 'date-fns';
 import type { TourTournament } from '../../hooks/useTourHubData';
-import { AMBER, INK, INK_FAINT, INK_MUTE, INK_TINT_07, SURFACE } from '../../_shared/tokens';
+import { INK, INK_FAINT, INK_MUTE, INK_TINT_07, SURFACE } from '../../_shared/tokens';
 
 interface TournamentInfoGridProps {
   tournament: TourTournament;
   fieldSize?: number;
 }
 
-interface InfoItem {
-  label: string;
-  value: string;
-  link?: string;
-}
-
 function formatDateRange(startDate: string, endDate: string): string {
   const start = new Date(startDate);
   const end = new Date(endDate);
-  if (isSameMonth(start, end)) {
-    return `${format(start, 'MMM d')} – ${format(end, 'd, yyyy')}`;
-  }
+  if (isSameMonth(start, end)) return `${format(start, 'MMM d')} – ${format(end, 'd, yyyy')}`;
   return `${format(start, 'MMM d')} – ${format(end, 'MMM d, yyyy')}`;
 }
 
+function abbrevChamp(name: string): string {
+  const parts = name.trim().split(/\s+/);
+  if (parts.length === 1) return parts[0];
+  return `${parts[0][0].toUpperCase()}. ${parts[parts.length - 1]}`;
+}
+
 export function TournamentInfoGrid({ tournament, fieldSize }: TournamentInfoGridProps) {
-  const items: InfoItem[] = [];
-  
-  if (tournament.purse) {
-    items.push({
-      label: 'Purse',
-      value: tournament.purse >= 1_000_000
-        ? `$${(tournament.purse / 1_000_000).toFixed(1)}M`
-        : `$${(tournament.purse / 1_000).toFixed(0)}K`,
-    });
+  const items: Array<[string, string]> = [];
+
+  if (tournament.start_date && tournament.end_date) {
+    items.push(['Dates', formatDateRange(tournament.start_date, tournament.end_date)]);
   }
-  
-  if (tournament.defending_champion) {
-    items.push({ label: 'Defending Champion', value: tournament.defending_champion });
+
+  const scoring = (tournament as any).scoring_system as string | undefined;
+  if (scoring) {
+    items.push(['Format', scoring.charAt(0).toUpperCase() + scoring.slice(1)]);
   }
-  
+
   if (fieldSize && fieldSize > 0) {
-    items.push({ label: 'Field Size', value: `${fieldSize} players` });
-  }
-  
-  items.push({ label: 'Dates', value: formatDateRange(tournament.start_date, tournament.end_date) });
-
-  const rawData = (tournament as any).scoring_system;
-  if (rawData) {
-    items.push({ label: 'Format', value: rawData.charAt(0).toUpperCase() + rawData.slice(1) });
+    items.push(['Field', `${fieldSize} players`]);
   }
 
-  const points = (tournament as any).points;
-  const pointsType = (tournament as any).points_type;
+  if (tournament.defending_champion) {
+    items.push(['Defending Champ', abbrevChamp(tournament.defending_champion)]);
+  }
+
+  const points = (tournament as any).points as number | undefined;
+  const pointsType = (tournament as any).points_type as string | undefined;
   if (points) {
-    items.push({ label: 'Points', value: `${points} ${pointsType || 'FedEx Cup'} pts` });
+    items.push(['Points', `${points} ${pointsType || 'FedEx Cup'} pts`]);
   }
-  
+
   if (items.length === 0) return null;
-  
+
   return (
     <motion.div
-      style={{ background: SURFACE, borderTop: `1px solid ${INK_TINT_07}`, borderBottom: `1px solid ${INK_TINT_07}`, marginTop: '8px' }}
-      initial={{ opacity: 0, y: 20 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true, margin: '-40px' }}
-      transition={{ duration: 0.35 }}
+      style={{ background: SURFACE, borderTop: `0.5px solid ${INK_TINT_07}`, padding: '14px 16px 18px' }}
+      initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.3 }}
     >
-      <div style={{ padding: '14px 16px 6px' }}>
+      <div style={{ marginBottom: 12 }}>
         <span style={{
-          fontSize: 9,
-          fontWeight: 800,
-          color: INK_MUTE,
-          letterSpacing: '0.16em',
-          textTransform: 'uppercase' as const,
-        }}>
-          Tournament Details
-        </span>
+          fontSize: 9, fontWeight: 800, color: INK_MUTE,
+          letterSpacing: '0.16em', textTransform: 'uppercase',
+        }}>Tournament Info</span>
       </div>
 
-      {items.map((item) => (
-        <div key={item.label} style={{ display: 'flex', alignItems: 'center', padding: '10px 16px', borderTop: `0.5px solid ${INK_TINT_07}` }}>
-          <span style={{ fontSize: 9, fontWeight: 800, color: INK_FAINT, letterSpacing: '0.14em', textTransform: 'uppercase' as const, width: '88px', flexShrink: 0 }}>{item.label}</span>
-          {item.link ? (
-            <Link to={item.link} style={{ fontSize: 14, fontWeight: 700, color: AMBER, textDecoration: 'none', flex: 1 }}>
-              {item.value}
-            </Link>
-          ) : (
-            <span style={{ fontSize: 14, fontWeight: 600, color: INK, flex: 1 }}>{item.value}</span>
-          )}
-        </div>
-      ))}
-      <div style={{ height: '6px' }} />
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px 16px' }}>
+        {items.map(([label, value]) => (
+          <div key={label}>
+            <span style={{
+              fontSize: 9, fontWeight: 800, color: INK_FAINT,
+              letterSpacing: '0.16em', textTransform: 'uppercase',
+            }}>{label}</span>
+            <div style={{ fontSize: 14, fontWeight: 700, color: INK, marginTop: 3 }}>
+              {value}
+            </div>
+          </div>
+        ))}
+      </div>
     </motion.div>
   );
 }

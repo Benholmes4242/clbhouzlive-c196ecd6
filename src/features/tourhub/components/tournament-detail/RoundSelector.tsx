@@ -1,10 +1,9 @@
 /**
- * RoundSelector - Tier 2 sub-tab pills
- * Uses the canonical secondary tab style: bg-[#475569] active, bg-muted inactive
+ * RoundSelector — flat pill row, centered. Active = filled INK, inactive = muted.
  */
 
 import { cn } from '@/lib/utils';
-import { SLATE_600 } from '../../_shared/tokens';
+import { INK, INK_MUTE, INK_TINT_07, SURFACE } from '../../_shared/tokens';
 
 interface RoundSelectorProps {
   rounds: string[];
@@ -16,7 +15,7 @@ interface RoundSelectorProps {
 export function RoundSelector({ rounds, activeRound, onRoundChange, className }: RoundSelectorProps) {
   return (
     <div
-      className={cn("flex items-center justify-center gap-1.5 mb-4", className)}
+      className={cn('flex items-center justify-center gap-1.5', className)}
       role="tablist"
       aria-label="Round Selection"
     >
@@ -28,15 +27,18 @@ export function RoundSelector({ rounds, activeRound, onRoundChange, className }:
             role="tab"
             aria-selected={isActive}
             onClick={() => onRoundChange(round)}
-            className={cn(
-              "px-3 py-1.5 text-[13px] whitespace-nowrap transition-all active:scale-[0.95] font-semibold",
-              isActive
-                ? "text-white"
-                : "text-muted-foreground"
-            )}
+            className="active:scale-[0.96] transition-transform"
             style={{
-              borderRadius: 20,
-              backgroundColor: isActive ? SLATE_600 : 'transparent',
+              padding: '6px 12px',
+              borderRadius: 999,
+              fontSize: 12,
+              fontWeight: 800,
+              letterSpacing: '-0.005em',
+              whiteSpace: 'nowrap',
+              background: isActive ? INK : 'transparent',
+              color: isActive ? SURFACE : INK_MUTE,
+              border: `1px solid ${isActive ? INK : INK_TINT_07}`,
+              cursor: 'pointer',
             }}
           >
             {round}
