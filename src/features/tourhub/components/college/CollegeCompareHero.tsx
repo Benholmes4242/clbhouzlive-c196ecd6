@@ -204,14 +204,13 @@ function AlumniCompareBlock({ title, alumni1, alumni2, statKey, name1, name2, em
                   style={{ display: 'flex', alignItems: 'center', gap: '7px', minWidth: 0, textDecoration: 'none', flex: 1 }}
                   className="active:opacity-70 transition-opacity"
                 >
-                  <div style={{ width: '26px', height: '26px', borderRadius: '34%', overflow: 'hidden', flexShrink: 0, background: INK_TINT_06 }}>
-                    <img
-                      src={getPlayerHeadshotUrl(`${a2.first_name} ${a2.last_name}`, a2.tour_codes?.[0] ?? 'pga')}
-                      alt={`${a2.first_name} ${a2.last_name}`}
-                      style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center 5%' }}
-                      onError={e => { (e.target as HTMLImageElement).src = PLAYER_SILHOUETTE_URL; }}
-                    />
-                  </div>
+                  <PlayerInitialAvatar
+                    name={`${a2.first_name} ${a2.last_name}`}
+                    srcCandidates={getPlayerHeadshotCandidates(`${a2.first_name} ${a2.last_name}`, a2.tour_codes?.[0] ?? 'pga')}
+                    paletteSeed={a2.id}
+                    size={26}
+                    radius={'34%'}
+                  />
                   <div style={{ minWidth: 0 }}>
                     <div style={{ fontSize: '13px', fontWeight: 700, color: INK, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' as const }}>
                       {a2.last_name}
