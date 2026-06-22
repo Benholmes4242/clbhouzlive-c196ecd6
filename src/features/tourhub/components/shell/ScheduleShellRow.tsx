@@ -90,7 +90,7 @@ function ScheduleShellRowInner() {
           aria-label="Filter Schedule"
           className="flex items-center gap-1.5 overflow-x-auto no-scrollbar"
           style={{
-            padding: '8.5px 16px',
+            padding: '6px 16px',
             WebkitOverflowScrolling: 'touch',
             overscrollBehaviorX: 'contain',
           }}
