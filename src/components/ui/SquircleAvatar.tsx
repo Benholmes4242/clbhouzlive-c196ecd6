@@ -98,6 +98,7 @@ function hexToRgba(hex: string, alpha: number): string {
 export const SquircleAvatar: React.FC<SquircleAvatarProps> = ({
   size = 'md',
   src,
+  srcCandidates,
   alt = '',
   ringColor,
   top100Count,
@@ -116,6 +117,15 @@ export const SquircleAvatar: React.FC<SquircleAvatarProps> = ({
   const [imageSrc, setImageSrc] = useState<string | null>(null);
   const [showFallback, setShowFallback] = useState(false);
   const [imageLoaded, setImageLoaded] = useState(false);
+  const [candidateIdx, setCandidateIdx] = useState(0);
+
+  // Normalised candidate list — drives both single-src and multi-candidate modes.
+  const candidates = React.useMemo<string[]>(() => {
+    if (srcCandidates && srcCandidates.length > 0) {
+      return srcCandidates.filter((u): u is string => Boolean(u));
+    }
+    return src ? [src] : [];
+  }, [srcCandidates, src]);
 
   // Convert size variant to pixel value
   const pixelSize = typeof size === 'string' ? SIZE_MAP[size] : size;
@@ -131,26 +141,41 @@ export const SquircleAvatar: React.FC<SquircleAvatarProps> = ({
   const isAchievementTier = top100Count !== undefined && top100Count >= 5;
   const hasAchievementRing = Boolean(effectiveRingColor) && (ringColor || isAchievementTier);
 
-  // Optimize image URL
+  // Reset to first candidate when the list changes.
   useEffect(() => {
-    if (!src) {
+    setCandidateIdx(0);
+    setImageLoaded(false);
+    if (candidates.length === 0) {
       setImageSrc(null);
       setShowFallback(true);
-      return;
+    } else {
+      setShowFallback(false);
     }
+  }, [candidates]);
 
-    const directUrl = getDirectImageUrl(src);
-    
-    if (directUrl === '/placeholder.svg') {
+  // Compute the active candidate URL (optimised via getDirectImageUrl).
+  useEffect(() => {
+    if (candidates.length === 0 || candidateIdx >= candidates.length) {
       setImageSrc(null);
       setShowFallback(true);
       return;
     }
-    
+    const raw = candidates[candidateIdx];
+    const directUrl = getDirectImageUrl(raw);
+    if (directUrl === '/placeholder.svg') {
+      // Treat unknown placeholder as a miss — advance or fallback.
+      if (candidateIdx + 1 < candidates.length) {
+        setCandidateIdx(candidateIdx + 1);
+      } else {
+        setImageSrc(null);
+        setShowFallback(true);
+      }
+      return;
+    }
     setImageSrc(directUrl);
     setShowFallback(false);
     setImageLoaded(false);
-  }, [src]);
+  }, [candidates, candidateIdx]);
 
   const handleImageLoad = () => {
     setImageLoaded(true);
@@ -159,6 +184,10 @@ export const SquircleAvatar: React.FC<SquircleAvatarProps> = ({
   };
 
   const handleImageError = () => {
+    if (candidateIdx + 1 < candidates.length) {
+      setCandidateIdx(candidateIdx + 1);
+      return;
+    }
     setShowFallback(true);
     setImageLoaded(false);
   };
