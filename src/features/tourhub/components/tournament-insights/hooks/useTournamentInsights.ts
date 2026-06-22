@@ -186,7 +186,7 @@ function buildContenderCards(
     id: p.playerId,
     name: p.playerName,
     countryCode: p.country,
-    avatarUrl: getPlayerHeadshotUrl(p.playerName, 'pga'),
+    avatarUrl: resolvePlayerAvatarCandidates({ name: p.playerName, photoUrl: null, tourSlug: 'pga' })[0] ?? '',
     description: limitText(p.reasons?.[0] || '', 50),
     fitBullets: p.reasons?.slice(0, 3) || [],
     worldRank: p.worldRanking ?? undefined,
