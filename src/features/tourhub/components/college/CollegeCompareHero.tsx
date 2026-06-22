@@ -444,7 +444,7 @@ export function CollegeCompareHero({ data, className }: CollegeCompareHeroProps)
           </div>
         </div>
 
-        <div style={{ borderTop: `0.5px solid ${INK_TINT_07}`, marginTop: '6px' }}>
+        <div style={{ marginTop: '6px' }}>
           <MetricCompareRow label="Earnings" value1={s1?.earnings_total || 0} value2={s2?.earnings_total || 0} format={formatCurrency} />
           <MetricCompareRow label="Wins" value1={s1?.wins_total || 0} value2={s2?.wins_total || 0} />
           <MetricCompareRow label="Top 10s" value1={s1?.top10_total || 0} value2={s2?.top10_total || 0} />
