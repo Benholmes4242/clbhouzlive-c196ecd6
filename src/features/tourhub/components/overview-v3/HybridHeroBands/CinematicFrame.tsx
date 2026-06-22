@@ -403,27 +403,15 @@ function DefendingChampionRowDark({
         padding: '14px 10px',
       }}
     >
-      {avatarUrl ? (
-        <img
+      <span style={{ flexShrink: 0, display: 'inline-flex', boxShadow: '0 0 0 1px rgba(0,0,0,0.4)', borderRadius: '34%' }}>
+        <SquircleAvatar
           src={avatarUrl}
-          alt=""
-          loading="lazy"
-          style={{
-            width: 40, height: 40, borderRadius: '34%', objectFit: 'cover',
-            flexShrink: 0, background: 'rgba(255,255,255,0.08)',
-            border: `1.5px solid ${GOLD}`,
-            boxShadow: `0 0 0 1px rgba(0,0,0,0.4)`,
-          }}
+          alt={data.name}
+          size={40}
+          ringColor={GOLD}
+          thinRing
         />
-      ) : (
-        <div
-          style={{
-            width: 40, height: 40, borderRadius: '34%',
-            background: 'rgba(255,255,255,0.08)', flexShrink: 0,
-            border: `1.5px solid ${GOLD}`,
-          }}
-        />
-      )}
+      </span>
       <div style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', gap: 3 }}>
         <span
           style={{
