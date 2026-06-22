@@ -334,7 +334,7 @@ export function CollegeCompareHero({ data, className }: CollegeCompareHeroProps)
   return (
     <div className={className}>
       {/* ── SEASON VERDICT ── */}
-      <div style={{ background: SURFACE, borderTop: `1px solid ${INK_TINT_07}`, borderBottom: `1px solid ${INK_TINT_07}`, marginTop: '8px' }}>
+      <div style={{ background: SURFACE, borderTop: `0.5px solid ${INK_TINT_07}` }}>
         {/* Section eyebrow — canonical §6 slate-caps */}
         <div style={{ padding: '14px 16px 10px' }}>
           <span style={{ fontSize: '9px', fontWeight: 800, color: INK_MUTE, letterSpacing: '0.16em', textTransform: 'uppercase' as const }}>
@@ -343,7 +343,7 @@ export function CollegeCompareHero({ data, className }: CollegeCompareHeroProps)
         </div>
 
         {/* Three-column verdict — Path B: absorbs earnings + alumni count from old VS band */}
-        <div style={{ display: 'flex', alignItems: 'flex-start', padding: '12px 16px 18px', borderTop: `0.5px solid ${INK_TINT_07}` }}>
+        <div style={{ display: 'flex', alignItems: 'flex-start', padding: '12px 16px 18px' }}>
           {/* College 1 */}
           <div style={{ flex: 1, display: 'flex', flexDirection: 'column' as const, alignItems: 'center', gap: '4px' }}>
             <div style={{ width: 44, height: 44, borderRadius: 11, overflow: 'hidden', background: INK_TINT_04, border: `1px solid ${HAIRLINE_INK_8}`, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
