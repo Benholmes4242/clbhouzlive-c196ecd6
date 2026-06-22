@@ -1039,7 +1039,7 @@ export function CinematicFrame({
                 <div style={{ display: 'flex', alignItems: 'baseline', gap: 8, marginTop: 1, minWidth: 0 }}>
                   <span style={{ fontSize: 17, fontWeight: 800, color: '#fff', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', minWidth: 0 }}>{defendingChamp.name}</span>
                   {defendingChamp.score
-                    ? <span style={{ fontSize: 17, fontWeight: 800, color: '#fff', flexShrink: 0 }}>{defendingChamp.score}</span>
+                    ? <span style={{ ...NUMERIC_STYLE, fontSize: 14, fontWeight: 800, color: '#fff', flexShrink: 0 }}>{defendingChamp.score}</span>
                     : null}
                 </div>
               </div>
