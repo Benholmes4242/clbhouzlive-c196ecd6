@@ -7,7 +7,7 @@ import React from 'react';
 import { ChevronRight } from 'lucide-react';
 import CountryFlag from '@/components/ui/country-flag';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
-import { PLAYER_SILHOUETTE_URL } from '@/utils/playerHeadshot';
+
 import {
   INK,
   INK_15,
