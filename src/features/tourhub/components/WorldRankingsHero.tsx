@@ -317,10 +317,12 @@ function NumberOneCard({
                 <PlayerAvatar
                   playerId={entry.player.id}
                   playerName={playerName}
+                  photoUrl={entry.player.photo_url}
                   tourCode={tourCode}
                   size="xl"
                   className="!w-full !h-full !rounded-[34%]"
                 />
+
               </div>
             </div>
             <div
