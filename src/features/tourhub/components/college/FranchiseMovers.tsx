@@ -88,7 +88,7 @@ export function FranchiseMovers({ limit = 8, className }: FranchiseMoversProps) 
       </div>
 
       {/* Movers table */}
-      <div style={{ background: '#ffffff', borderBottom: `1px solid ${INK_TINT_07}` }}>
+      <div style={{ background: '#F8FAFC', borderBottom: `1px solid ${INK_TINT_07}` }}>
         {/* Column headers */}
         <div style={{ display: 'flex', alignItems: 'center', padding: '5px 16px', background: 'rgba(15,23,42,0.02)', borderTop: `0.5px solid ${INK_TINT_07}`, borderBottom: `0.5px solid ${INK_TINT_07}` }}>
           <span style={{ flex: 1, fontSize: 8.5, fontWeight: 900, color: '#CBD5E1', letterSpacing: '0.1em' }}>FRANCHISE</span>
