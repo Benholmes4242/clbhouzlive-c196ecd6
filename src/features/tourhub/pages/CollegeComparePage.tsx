@@ -283,8 +283,8 @@ export function CollegeComparePage() {
               )}
             </div>
           ) : isLoading ? (
-            <div style={{ marginTop: '8px' }}>
-              <div style={{ background: SURFACE, borderTop: `1px solid ${INK_TINT_07}`, borderBottom: `1px solid ${INK_TINT_07}`, marginTop: '8px' }}>
+            <div>
+              <div style={{ background: SURFACE, borderTop: `0.5px solid ${INK_TINT_07}` }}>
                 {Array.from({ length: 6 }).map((_, i) => (
                   <div key={i} className="animate-pulse" style={{ display: 'flex', alignItems: 'center', padding: '10px 20px', borderBottom: `0.5px solid ${INK_TINT_07}`, height: '48px' }}>
                     <div style={{ flex: 1, height: '13px', borderRadius: '4px', background: INK_TINT_06 }} />
