@@ -96,9 +96,7 @@ function formatEarningsCompact(amount: number): string {
   return `$${amount}`;
 }
 
-function HeroChampion({ champion, runnerUp, champStats, champPhotoUrl, sort, activeTour, onClick }: HeroChampionProps) {
-  const { data: streakWeeks } = useChampionStreak(champion.playerId);
-
+function HeroChampion({ champion, champStats, champPhotoUrl, sort, activeTour, onClick }: HeroChampionProps) {
   const primary = (() => {
     if (sort === 'fedex-points') {
       if (!champStats?.points || champStats.points <= 0) return null;
@@ -128,23 +126,13 @@ function HeroChampion({ champion, runnerUp, champStats, champPhotoUrl, sort, act
     };
   })();
 
-  const rankLabel = sort === 'world-rank-desc' ? 'WORLD #1'
-    : sort === 'fedex-points' ? 'FEDEX LEADER'
-    : sort === 'highest-earnings' ? 'MONEY LEADER'
-    : sort === 'most-wins' ? 'WINS LEADER'
+  const isWorldRankTour = activeTour === 'pga' || activeTour === 'LPGA';
+  const rankLabel =
+      sort === 'fedex-points'      ? 'FEDEX LEADER'
+    : sort === 'highest-earnings'  ? 'MONEY LEADER'
+    : sort === 'most-wins'         ? 'WINS LEADER'
+    : sort === 'world-rank-desc'   ? (isWorldRankTour ? 'WORLD #1' : 'TOUR LEADER')
     : 'TOUR LEADER';
-
-  const showStreak = (streakWeeks ?? 0) >= 2;
-
-  const marginPts = (() => {
-    if (sort !== 'world-rank-desc') return null;
-    const a = champion.totalPoints ?? champion.avgPoints;
-    const b = runnerUp?.totalPoints ?? runnerUp?.avgPoints;
-    if (a == null || b == null) return null;
-    const diff = a - b;
-    if (diff <= 0) return null;
-    return diff;
-  })();
 
   return (
     <div
@@ -164,22 +152,6 @@ function HeroChampion({ champion, runnerUp, champStats, champPhotoUrl, sort, act
         <span style={{ fontSize: 10.5, fontWeight: 800, letterSpacing: '0.14em', color: INK }}>
           {rankLabel}
         </span>
-        {showStreak && (
-          <>
-            <span style={{ color: INK_MUTE, fontSize: 10.5, fontWeight: 800 }}>·</span>
-            <span style={{ fontSize: 10.5, fontWeight: 800, letterSpacing: '0.14em', color: INK_MUTE }}>
-              {streakWeeks} CONSECUTIVE WEEKS
-            </span>
-          </>
-        )}
-        {marginPts != null && (
-          <>
-            <span style={{ color: INK_MUTE, fontSize: 10.5, fontWeight: 800 }}>·</span>
-            <span style={{ fontSize: 10.5, fontWeight: 800, letterSpacing: '0.14em', color: INK_MUTE }}>
-              MARGIN +{marginPts.toFixed(0)} PTS
-            </span>
-          </>
-        )}
       </div>
 
       {/* Body row */}
