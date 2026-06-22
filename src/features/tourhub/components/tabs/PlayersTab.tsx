@@ -702,7 +702,11 @@ export function PlayersTab() {
         const runners = top5.slice(1, 5);
         if (!champion) return null;
         const champStats = statsMap.get(champion.playerId);
-        const champPhotoUrl = getPlayerHeadshotUrl(champion.playerName, champion.tourCode ?? 'pga');
+        const champAvatarCandidates = resolvePlayerAvatarCandidates({
+          name: champion.playerName,
+          photoUrl: champion.photoUrl,
+          tourSlug: champion.tourCode ?? 'pga',
+        });
 
         return (
           <div style={{ padding: '16px 16px 0', background: SLATE_50 }}>
