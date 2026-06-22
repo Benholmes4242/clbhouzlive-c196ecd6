@@ -363,8 +363,7 @@ export function FormSection({ playerId }: FormSectionProps) {
       <div
         style={{
           background: SURFACE,
-          borderBottom: `1px solid ${INK_TINT_07}`,
-          marginTop: 8,
+          borderTop: `0.5px solid ${INK_TINT_07}`,
           padding: '14px 16px 16px',
         }}
       >
@@ -402,8 +401,7 @@ export function FormSection({ playerId }: FormSectionProps) {
     <div
       style={{
         background: SURFACE,
-        borderBottom: `1px solid ${INK_TINT_07}`,
-        marginTop: 8,
+        borderTop: `0.5px solid ${INK_TINT_07}`,
         padding: '14px 16px 16px',
       }}
     >

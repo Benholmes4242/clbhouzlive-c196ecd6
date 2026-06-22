@@ -121,7 +121,6 @@ export function PlayerProfilePage() {
         {/* Content sections */}
         <div style={{ paddingBottom: 'calc(var(--sab, env(safe-area-inset-bottom, 0px)) + 80px)' }}>
           <motion.div
-            style={{ marginTop: 8 }}
             variants={sectionVariants}
             initial="hidden"
             whileInView="visible"
@@ -145,7 +144,6 @@ export function PlayerProfilePage() {
 
           {playerId && (
             <motion.div
-              style={{ marginTop: 8 }}
               variants={sectionVariants}
               initial="hidden"
               whileInView="visible"
@@ -157,7 +155,6 @@ export function PlayerProfilePage() {
           )}
 
           <motion.div
-            style={{ marginTop: 8 }}
             variants={sectionVariants}
             initial="hidden"
             whileInView="visible"
@@ -166,8 +163,6 @@ export function PlayerProfilePage() {
           >
             <PlayerInfoCard player={player} />
           </motion.div>
-
-          <div style={{ marginTop: 8 }} />
         </div>
       </div>
     </TourHubShell>
