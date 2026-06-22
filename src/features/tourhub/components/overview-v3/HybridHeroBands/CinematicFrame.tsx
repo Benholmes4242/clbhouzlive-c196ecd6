@@ -1065,7 +1065,7 @@ export function CinematicFrame({
                 </div>
               </div>
             </div>
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 4, padding: '9px 16px', background: '#0A0E14', borderTop: '0.5px solid rgba(255,255,255,0.06)', color: AMBER, fontSize: 12, fontWeight: 800, letterSpacing: '0.06em', textTransform: 'uppercase' }}>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 4, padding: '9px 16px', background: 'rgba(10,14,20,0.50)', backdropFilter: 'blur(10px)', WebkitBackdropFilter: 'blur(10px)', borderTop: '0.5px solid rgba(255,255,255,0.18)', color: AMBER, fontSize: 12, fontWeight: 800, letterSpacing: '0.06em', textTransform: 'uppercase' }}>
               {viewTournamentLabel}
               <ChevronRight size={14} strokeWidth={2.5} />
             </div>
