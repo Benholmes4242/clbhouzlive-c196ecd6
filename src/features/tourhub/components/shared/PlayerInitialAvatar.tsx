@@ -1,75 +1,74 @@
 /**
- * PlayerInitialAvatar — single shared avatar primitive for College Franchise
- * surfaces. Replaces three rolled-their-own implementations:
- *   - hero logo fallback (CollegeProfilePage)
- *   - rival row logo (rival strip)
- *   - alumni row headshot fallback (AlumniDepthChart)
+ * PlayerInitialAvatar — shared avatar primitive for College Franchise
+ * surfaces (player headshots AND college logos).
  *
- * Renders the player headshot if available; on error or when no URL is
- * provided, falls back to a colored initial circle (no gray silhouette).
+ * Renders an image when available, then walks any `srcCandidates` fallback
+ * chain on error, and finally shows initials on a deterministic colour
+ * background — using the CANONICAL helpers from `@/lib/avatarFallback`
+ * so the fallback matches Clubhouse, Handicap and the tour hero.
  *
- * The colored circle pulls from a deterministic palette based on the seed
- * string so the same player always gets the same color. This is the
- * "tour-honest UI" replacement for PLAYER_SILHOUETTE_URL.
- *
- * Phase 2 may extend to the multiple avatar sites in CollegeCompareHero.
+ * For LOGO usage (college badges), callers pass an explicit `color` prop
+ * + `imageScale<1` to keep the existing tinted-logo look.
  */
 
-import { useState } from 'react';
-import { INK_TINT_06, SLATE_700 } from '../../_shared/tokens';
-
-const FALLBACK_PALETTE = [
-  { bg: '#FEF3C7', fg: '#92400E' }, // amber
-  { bg: '#DBEAFE', fg: '#1D4ED8' }, // blue
-  { bg: '#DCFCE7', fg: '#166534' }, // green
-  { bg: '#FCE7F3', fg: '#BE185D' }, // pink
-  { bg: '#EDE9FE', fg: '#6D28D9' }, // purple
-  { bg: '#FEE2E2', fg: '#B91C1C' }, // red
-  { bg: '#CFFAFE', fg: '#155E75' }, // cyan
-  { bg: '#F1F5F9', fg: SLATE_700 }, // slate
-] as const;
-
-function pickPalette(seed: string) {
-  let hash = 0;
-  for (let i = 0; i < seed.length; i++) hash = (hash * 31 + seed.charCodeAt(i)) | 0;
-  return FALLBACK_PALETTE[Math.abs(hash) % FALLBACK_PALETTE.length];
-}
-
-function getInitial(name: string): string {
-  const trimmed = name.trim();
-  if (!trimmed) return '?';
-  return trimmed.charAt(0).toUpperCase();
-}
+import { useState, useEffect } from 'react';
+import { INK_TINT_06 } from '../../_shared/tokens';
+import { getInitialsFromName, getAvatarFallbackColor } from '@/lib/avatarFallback';
 
 export interface PlayerInitialAvatarProps {
-  /** Player display name — used for initial fallback + alt text + palette seed. */
+  /** Player display name — used for initials, alt text and palette seed. */
   name: string;
-  /** Optional photo/logo URL. Falls back to initial circle on error or absence. */
+  /** Optional photo/logo URL. Falls back to initials on error or absence. */
   src?: string | null;
+  /** Ordered candidate URLs (event tour first, cross-tour folders after).
+   *  Takes precedence over `src` when provided. Walked on error. */
+  srcCandidates?: (string | null | undefined)[];
   /** Square size in px. Default 34. */
   size?: number;
   /** Border radius. Default 'squircle' (~34%). */
   radius?: number | string;
-  /** Override palette seed (e.g. team slug to share color across cards). */
+  /** Override palette seed (e.g. team slug to share colour across cards). */
   paletteSeed?: string;
-  /** Optional explicit color override (skips palette). */
+  /** Optional explicit colour override (skips canonical palette). Used by
+   *  college LOGO callers that want their tinted look preserved. */
   color?: { bg: string; fg: string };
-  /** Inner image render scale (0–1). Default 1 (fills). Used for logo padding. */
+  /** Inner image render scale (0–1). Default 1 (fills). For logo padding. */
   imageScale?: number;
 }
 
 export function PlayerInitialAvatar({
   name,
   src,
+  srcCandidates,
   size = 34,
   radius = '34%',
   paletteSeed,
   color,
   imageScale = 1,
 }: PlayerInitialAvatarProps) {
-  const [errored, setErrored] = useState(false);
-  const showImage = !!src && !errored;
-  const palette = color ?? pickPalette(paletteSeed ?? name);
+  const candidates: string[] = (() => {
+    if (srcCandidates && srcCandidates.length > 0) {
+      return srcCandidates.filter((u): u is string => Boolean(u));
+    }
+    return src ? [src] : [];
+  })();
+
+  const [idx, setIdx] = useState(0);
+  // Reset to first candidate whenever the list identity changes.
+  useEffect(() => {
+    setIdx(0);
+  }, [candidates.join('|')]);
+
+  const exhausted = candidates.length === 0 || idx >= candidates.length;
+  const currentSrc = exhausted ? null : candidates[idx];
+  const showImage = !!currentSrc;
+
+  // Use the canonical fallback when no explicit `color` override is passed.
+  // Logo callers still pass `color` to keep their tinted-badge look.
+  const fallbackBg = color?.bg ?? getAvatarFallbackColor(paletteSeed ?? name);
+  const fallbackFg = color?.fg ?? '#FFFFFF';
+  const initials = getInitialsFromName(name) || '?';
+
   const innerSize = Math.round(size * imageScale);
 
   return (
@@ -80,7 +79,7 @@ export function PlayerInitialAvatar({
         borderRadius: radius,
         overflow: 'hidden',
         flexShrink: 0,
-        background: showImage ? INK_TINT_06 : palette.bg,
+        background: showImage ? INK_TINT_06 : fallbackBg,
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
@@ -89,10 +88,10 @@ export function PlayerInitialAvatar({
     >
       {showImage ? (
         <img
-          src={src!}
+          src={currentSrc!}
           alt={name}
           loading="lazy"
-          onError={() => setErrored(true)}
+          onError={() => setIdx((i) => i + 1)}
           style={{
             width: innerSize,
             height: innerSize,
@@ -103,14 +102,14 @@ export function PlayerInitialAvatar({
       ) : (
         <span
           style={{
-            fontSize: Math.round(size * 0.42),
-            fontWeight: 800,
-            color: palette.fg,
-            letterSpacing: '-0.02em',
+            fontSize: Math.round(size * 0.38),
+            fontWeight: 700,
+            color: fallbackFg,
+            letterSpacing: '0.01em',
             lineHeight: 1,
           }}
         >
-          {getInitial(name)}
+          {initials}
         </span>
       )}
     </div>

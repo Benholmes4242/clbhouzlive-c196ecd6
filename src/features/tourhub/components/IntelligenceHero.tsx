@@ -44,8 +44,7 @@ import type {
 import type { TrackedPrediction } from './tournament-insights/types';
 import { IntelligenceSheet } from './IntelligenceSheet';
 import {
-  getPlayerHeadshotUrl,
-  PLAYER_SILHOUETTE_URL,
+  getPlayerHeadshotCandidates,
 } from '@/utils/playerHeadshot';
 
 // ─── Tokens (mirrors the mock) ──────────────────────────────────────────────
@@ -123,8 +122,12 @@ function PlayerHeadshot({
   name: string;
   desaturate?: boolean;
 }) {
-  const src = getPlayerHeadshotUrl(name, 'pga');
-  const [failed, setFailed] = useState(false);
+  // Multi-folder candidate chain: event tour first (pga), then cross-tour
+  // fallbacks. On exhaustion show canonical initials over the dark gradient.
+  const candidates = getPlayerHeadshotCandidates(name, 'pga');
+  const [idx, setIdx] = useState(0);
+  const exhausted = idx >= candidates.length;
+  const currentSrc = exhausted ? null : candidates[idx];
   return (
     <div
       style={{
@@ -136,7 +139,7 @@ function PlayerHeadshot({
         justifyContent: 'center',
       }}
     >
-      {failed ? (
+      {exhausted ? (
         <span
           style={{
             fontFamily: FONT,
@@ -149,14 +152,10 @@ function PlayerHeadshot({
         </span>
       ) : (
         <img
-          src={src}
+          src={currentSrc!}
           alt={name}
           loading="lazy"
-          onError={(e) => {
-            const el = e.currentTarget;
-            if (el.src.endsWith(PLAYER_SILHOUETTE_URL)) setFailed(true);
-            else el.src = PLAYER_SILHOUETTE_URL;
-          }}
+          onError={() => setIdx((i) => i + 1)}
           style={{
             width: '100%',
             height: '100%',

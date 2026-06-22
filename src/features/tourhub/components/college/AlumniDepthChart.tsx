@@ -28,7 +28,7 @@ import { motion } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import { useCollegeAlumni, type CollegeAlumnus } from '../../hooks/useCollegeAlumni';
 import { useLegacyAlumni } from '../../hooks/useLegacyAlumni';
-import { getPlayerHeadshotUrl } from '@/utils/playerHeadshot';
+import { getPlayerHeadshotCandidates } from '@/utils/playerHeadshot';
 import { formatCurrency } from '@/lib/utils/formatCurrency';
 import { PlayerInitialAvatar } from '../shared/PlayerInitialAvatar';
 import { getPlayerTourTag } from '../../utils/playerTourTag';
@@ -73,7 +73,7 @@ function AlumniRow({ alumnus, index, tier, legacyContextLabel }: AlumniRowProps)
   const liveRank = alumnus.world_ranking && alumnus.world_ranking > 0 && alumnus.world_ranking < 500
     ? alumnus.world_ranking
     : null;
-  const photoUrl = getPlayerHeadshotUrl(fullName, alumnus.tour_codes?.[0] ?? 'pga');
+  const photoCandidates = getPlayerHeadshotCandidates(fullName, alumnus.tour_codes?.[0] ?? 'pga');
   const tourTag = getPlayerTourTag(alumnus.tour_codes);
 
   // Legacy rows show editorial context line (from legacy_alumni table);
@@ -103,7 +103,8 @@ function AlumniRow({ alumnus, index, tier, legacyContextLabel }: AlumniRowProps)
         <div style={{ flex: 1, display: 'flex', alignItems: 'center', gap: '9px', minWidth: 0 }}>
           <PlayerInitialAvatar
             name={fullName}
-            src={photoUrl}
+            srcCandidates={photoCandidates}
+            paletteSeed={alumnus.id}
             size={32}
             radius={11}
             color={tier === 'legacy'

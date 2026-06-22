@@ -27,7 +27,7 @@ import { useFranchiseCaptains } from '../hooks/useFranchiseCaptains';
 import { useDailyEditorial } from '@/hooks/championship/useDailyEditorial';
 import { formatCurrency } from '@/lib/utils/formatCurrency';
 import { getCollegeLogoUrl } from '@/utils/collegeLogo';
-import { getPlayerHeadshotUrl, PLAYER_SILHOUETTE_URL } from '@/utils/playerHeadshot';
+import { getPlayerHeadshotCandidates } from '@/utils/playerHeadshot';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { COLLEGE_RIVALRY_FALLBACK } from '../utils/editorialFallbacks';
 import { Shimmer } from './shared/Shimmer';
@@ -447,10 +447,10 @@ export function CollegeRivalry() {
               >
                 <SquircleAvatar
                   size={38}
-                  src={leaderCaptain ? getPlayerHeadshotUrl(leaderCaptain.fullName, leaderCaptain.tourCode) : PLAYER_SILHOUETTE_URL}
+                  srcCandidates={leaderCaptain ? getPlayerHeadshotCandidates(leaderCaptain.fullName, leaderCaptain.tourCode) : []}
                   alt={leaderCaptain?.fullName ?? '—'}
+                  userId={leaderCaptain?.playerId ?? leaderCaptain?.fullName ?? null}
                   hideRing
-                  fallback={leaderCaptain?.fullName.split(' ').map(n => n[0]).join('').slice(0, 2) ?? '—'}
                 />
                 <div style={{ minWidth: 0 }}>
                   <div style={{
@@ -493,10 +493,10 @@ export function CollegeRivalry() {
               >
                 <SquircleAvatar
                   size={38}
-                  src={chaserCaptain ? getPlayerHeadshotUrl(chaserCaptain.fullName, chaserCaptain.tourCode) : PLAYER_SILHOUETTE_URL}
+                  srcCandidates={chaserCaptain ? getPlayerHeadshotCandidates(chaserCaptain.fullName, chaserCaptain.tourCode) : []}
                   alt={chaserCaptain?.fullName ?? '—'}
+                  userId={chaserCaptain?.playerId ?? chaserCaptain?.fullName ?? null}
                   hideRing
-                  fallback={chaserCaptain?.fullName.split(' ').map(n => n[0]).join('').slice(0, 2) ?? '—'}
                 />
                 <div style={{ minWidth: 0, textAlign: 'right' }}>
                   <div style={{
