@@ -17,7 +17,7 @@ import { useTournamentDefendingChamp } from '../../hooks/useTournamentDefendingC
 import { useTournamentLastYearTop4 } from '../../hooks/useTournamentLastYearTop4';
 import { useTournamentTeeTimes } from '../../hooks/useTournamentTeeTimes';
 import { useTournamentFieldStrength } from '../../hooks/useTournamentFieldStrength';
-import { useTournamentScoring } from '../../hooks/useTournamentScoring';
+
 import { useTournamentCourseStats } from '../../hooks/useTournamentCourseStats';
 import { tournamentRoute } from '../../routes';
 import { getPlayerHeadshotUrl } from '@/utils/playerHeadshot';
