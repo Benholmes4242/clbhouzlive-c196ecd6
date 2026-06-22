@@ -10,7 +10,8 @@ import { useState, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import { toTitleCase } from '@/lib/formatters';
-import { getPlayerHeadshotUrl, PLAYER_SILHOUETTE_URL } from '@/utils/playerHeadshot';
+import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
+import { resolvePlayerAvatarCandidates } from '../../_shared/resolvePlayerAvatar';
 import type { TourPlayerStatistics } from '../../hooks/useTourHubData';
 
 type SortOption = 'world_rank' | 'cuts' | 'events';
