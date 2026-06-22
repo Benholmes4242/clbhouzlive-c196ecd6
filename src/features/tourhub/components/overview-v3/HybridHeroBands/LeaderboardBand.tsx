@@ -117,7 +117,7 @@ export function LeaderboardBand({
       const tiedPlayers = leaderboard
         .filter(e => (e?.score ?? e?.total) === tiedScore)
         .slice(0, tiedLeaders.count)
-        .map(e => ({ avatarUrl: entryAvatar(e) }));
+        .map(e => ({ avatarCandidates: entryAvatars(e), playerId: entryPlayerId(e), name: entryName(e) }));
       body = (
         <>
           <TiedLeadersRow count={tiedLeaders.count} score={tiedLeaders.score} players={tiedPlayers} />
