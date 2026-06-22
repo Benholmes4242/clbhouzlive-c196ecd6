@@ -49,7 +49,7 @@ import {
 } from '@/utils/playerHeadshot';
 
 // ─── Tokens (mirrors the mock) ──────────────────────────────────────────────
-import { AMBER, AMBER_INK, AMBER_SOFT_BG, AMBER_TINT_08, AMBER_TINT_10, DANGER, FONT, GOLD, GOLD_DEEP, INK, INK_FAINT, INK_SOFT, PGA_GREEN, SLATE_150, SLATE_200, SLATE_800, STATUS_LIVE, SURFACE, WHITE_ALPHA_55, WHITE_ALPHA_65 } from '../_shared/tokens';
+import { AMBER, AMBER_INK, AMBER_SOFT_BG, AMBER_TINT_08, AMBER_TINT_10, DANGER, FONT, GOLD, GOLD_DEEP, INK, INK_DEEP, INK_FAINT, INK_SOFT, PGA_GREEN, SLATE_150, SLATE_200, SLATE_800, STATUS_LIVE, SURFACE, WHITE_ALPHA_55, WHITE_ALPHA_65 } from '../_shared/tokens';
 import { getScoreColor } from '../_shared/scoreColor';
 
 // ─── Helpers ────────────────────────────────────────────────────────────────
