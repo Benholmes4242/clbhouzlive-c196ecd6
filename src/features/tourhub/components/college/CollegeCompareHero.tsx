@@ -7,7 +7,7 @@ import { useTourSeason } from '../../hooks/useTourHubData';
 import { playerRoute } from '../../routes';
 import type { CollegeCompareData } from '../../hooks/useCollegeCompare';
 import type { CollegeAlumnus } from '../../hooks/useCollegeAlumni';
-import { AMBER, AMBER_TINT_08, HAIRLINE_INK_8, HAIRLINE_INK_12, HAIRLINE_INK_18, INK, INK_FAINT, INK_MUTE, INK_TINT_02, INK_TINT_04, INK_TINT_05, INK_TINT_06, INK_TINT_07, SURFACE } from '../../_shared/tokens';
+import { AMBER, AMBER_TINT_08, HAIRLINE_INK_8, HAIRLINE_INK_12, HAIRLINE_INK_18, INK, INK_FAINT, INK_MUTE, INK_TINT_04, INK_TINT_05, INK_TINT_06, INK_TINT_07, SURFACE } from '../../_shared/tokens';
 
 interface CollegeCompareHeroProps {
   data: CollegeCompareData;
