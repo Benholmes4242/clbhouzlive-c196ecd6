@@ -67,16 +67,19 @@ function FeaturedPlayerCard({ player, stats, highlight, className }: FeaturedPla
       {/* Dark gradient for text readability */}
       <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
 
-      {/* Avatar */}
+      {/* Avatar — canonical SquircleAvatar with multi-folder walk + initials fallback */}
       <div className="absolute top-4 left-1/2 -translate-x-1/2">
-        <div className="w-14 h-14 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center overflow-hidden border-2 border-white/30">
-          <img 
-            src={getPlayerHeadshotUrl(player.full_name, player.tour_codes?.[0] ?? 'pga')}
-            alt={player.full_name}
-            className="w-full h-full object-cover"
-            onError={(e) => { (e.target as HTMLImageElement).src = PLAYER_SILHOUETTE_URL; }}
-          />
-        </div>
+        <SquircleAvatar
+          size={56}
+          srcCandidates={resolvePlayerAvatarCandidates({
+            name: player.full_name,
+            photoUrl: player.photo_url ?? null,
+            tourSlug: player.tour_codes?.[0] ?? 'pga',
+          })}
+          alt={player.full_name}
+          userId={player.id}
+          hideRing
+        />
       </div>
 
       {/* Content */}
