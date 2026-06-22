@@ -22,13 +22,13 @@ export function FranchiseStoryStrip({ normalizedName, className }: FranchiseStor
 
   if (isLoading) {
     return (
-      <div style={{ background: SURFACE, borderTop: `1px solid ${INK_TINT_07}`, borderBottom: `1px solid ${INK_TINT_07}`, marginTop: '8px' }}>
-        <div style={{ padding: '12px 20px 0' }}>
+      <div style={{ background: SURFACE, borderTop: `0.5px solid ${INK_TINT_07}` }}>
+        <div style={{ padding: '10px 16px 0' }}>
           <div className="animate-pulse" style={{ width: '140px', height: '9px', borderRadius: '4px', background: INK_TINT_06, marginBottom: '10px' }} />
         </div>
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr' }}>
           {[1, 2].map(i => (
-            <div key={i} className="animate-pulse" style={{ padding: '10px 20px 14px', borderRight: i === 1 ? `0.5px solid ${INK_TINT_07}` : 'none' }}>
+            <div key={i} className="animate-pulse" style={{ padding: '8px 16px 12px', borderRight: i === 1 ? `0.5px solid ${INK_TINT_07}` : 'none' }}>
               <div style={{ height: '8px', width: '60px', borderRadius: '4px', background: INK_TINT_06, marginBottom: '8px' }} />
               <div style={{ height: '18px', width: '80px', borderRadius: '4px', background: INK_TINT_06, marginBottom: '6px' }} />
               <div style={{ height: '10px', width: '100px', borderRadius: '4px', background: INK_TINT_06 }} />
@@ -54,9 +54,10 @@ export function FranchiseStoryStrip({ normalizedName, className }: FranchiseStor
   ].filter(Boolean).join(' · ');
 
   return (
-    <div className={className} style={{ background: SURFACE, borderTop: `1px solid ${INK_TINT_07}`, borderBottom: `1px solid ${INK_TINT_07}`, marginTop: '8px' }}>
+    <div className={className} style={{ background: SURFACE, borderTop: `0.5px solid ${INK_TINT_07}` }}>
       {/* Section eyebrow — canonical §6 slate-caps */}
-      <div style={{ padding: '12px 16px 0' }}>
+      <div style={{ padding: '10px 16px 0' }}>
+
         <div style={{ marginBottom: '10px' }}>
           <span style={{ fontSize: '9px', fontWeight: 800, color: INK_MUTE, letterSpacing: '0.16em', textTransform: 'uppercase' as const }}>
             Franchise Dispatch
@@ -67,7 +68,7 @@ export function FranchiseStoryStrip({ normalizedName, className }: FranchiseStor
       {/* Two flat cells */}
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr' }}>
         {/* This Week */}
-        <div style={{ padding: '10px 16px 14px', borderRight: `0.5px solid ${INK_TINT_07}` }}>
+        <div style={{ padding: '8px 16px 12px', borderRight: `0.5px solid ${INK_TINT_07}` }}>
           <div style={{ fontSize: '9px', fontWeight: 800, color: INK_FAINT, letterSpacing: '0.14em', textTransform: 'uppercase' as const, marginBottom: '6px' }}>
             This Week
           </div>
@@ -90,7 +91,7 @@ export function FranchiseStoryStrip({ normalizedName, className }: FranchiseStor
         </div>
 
         {/* Top Performer */}
-        <div style={{ padding: '10px 16px 14px' }}>
+        <div style={{ padding: '8px 16px 12px' }}>
           <div style={{ fontSize: '9px', fontWeight: 800, color: INK_FAINT, letterSpacing: '0.14em', textTransform: 'uppercase' as const, marginBottom: '6px' }}>
             {alumni && alumni.length === 1 ? 'Alumni' : 'Top Performer'}
           </div>
