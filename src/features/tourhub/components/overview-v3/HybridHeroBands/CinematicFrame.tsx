@@ -61,6 +61,23 @@ function resolveAvatar(e: any, tourSlug?: string | null): string | null {
   if (!name || name === '—' || !tourSlug) return null;
   try { return getPlayerHeadshotUrl(name, tourSlug); } catch { return null; }
 }
+/**
+ * Ordered headshot candidates for a leaderboard entry. Tries event-tour
+ * folder first, then PGA Tour, then the rest — covers cross-tour players
+ * (e.g. PGA player at a co-sanctioned/euro major). DB photo_url short-circuits.
+ */
+function resolveAvatarCandidates(e: any, tourSlug?: string | null): string[] {
+  const direct = e?.player?.photo_url ?? null;
+  if (direct) return [direct];
+  const name = entryName(e);
+  if (!name || name === '—' || !tourSlug) return [];
+  try { return getPlayerHeadshotCandidates(name, tourSlug); } catch { return []; }
+}
+function nameCandidates(name: string | null | undefined, tourSlug?: string | null): string[] {
+  if (!name || !tourSlug) return [];
+  try { return getPlayerHeadshotCandidates(name, tourSlug); } catch { return []; }
+}
+
 function scoreColor(score: number | null | undefined): string {
   if (score == null || Number.isNaN(score)) return 'rgba(255,255,255,0.85)';
   if (score < 0) return '#DC2626';   // under par -> red (matches handicap pages)
