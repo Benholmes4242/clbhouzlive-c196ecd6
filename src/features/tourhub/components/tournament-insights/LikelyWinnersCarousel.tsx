@@ -11,7 +11,7 @@ import CountryFlag from '@/components/ui/country-flag';
 import type { WinnerProfile, ContenderCard } from './types';
 import { useVenueImage, getFallbackCourseImage } from '../../hooks/useVenueImage';
 
-import { PLAYER_SILHOUETTE_URL } from '@/utils/playerHeadshot';
+import { resolvePlayerAvatarCandidates } from '../../_shared/resolvePlayerAvatar';
 
 import { WHITE_ALPHA_04 } from '../../_shared/tokens';
 
