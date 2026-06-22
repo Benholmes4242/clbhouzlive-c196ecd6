@@ -1130,26 +1130,25 @@ export function CinematicFrame({
 
       {/* Results — data strip + final leaderboard footer CTA */}
       {isResults && (
-        <div style={{ position: 'absolute', left: 0, right: 0, bottom: 16, zIndex: 4, display: 'flex', justifyContent: 'center', padding: '0 16px' }}>
-          <button
-            type="button"
-            onClick={onCtaTap}
-            aria-label="Final leaderboard"
-            style={{
-              display: 'inline-flex', alignItems: 'center', gap: 6,
-              border: '0.5px solid rgba(255,255,255,0.18)', cursor: 'pointer',
-              background: 'rgba(10,14,20,0.50)',
-              backdropFilter: 'blur(10px)', WebkitBackdropFilter: 'blur(10px)',
-              borderRadius: 999, padding: '10px 18px',
-              boxShadow: '0 4px 16px rgba(0,0,0,0.25)',
-            }}
-          >
-            <span style={{ ...NUMERIC_STYLE, fontSize: 12, fontWeight: 800, letterSpacing: '0.06em', color: GOLD }}>
-              FINAL LEADERBOARD · {safe.length}
-            </span>
-            <ChevronRight size={14} strokeWidth={2.5} color={GOLD} style={{ flexShrink: 0 }} />
-          </button>
-        </div>
+        <button
+          type="button"
+          onClick={onCtaTap}
+          aria-label="Final leaderboard"
+          style={{
+            position: 'absolute', left: 0, right: 0, bottom: 0, zIndex: 4,
+            display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6,
+            border: 'none', borderTop: '0.5px solid rgba(255,255,255,0.18)', cursor: 'pointer',
+            background: 'rgba(10,14,20,0.50)',
+            backdropFilter: 'blur(10px)', WebkitBackdropFilter: 'blur(10px)',
+            padding: '14px 18px calc(14px + env(safe-area-inset-bottom, 0px))',
+            width: '100%',
+          }}
+        >
+          <span style={{ ...NUMERIC_STYLE, fontSize: 12, fontWeight: 800, letterSpacing: '0.06em', color: GOLD }}>
+            FINAL LEADERBOARD · {safe.length}
+          </span>
+          <ChevronRight size={14} strokeWidth={2.5} color={GOLD} style={{ flexShrink: 0 }} />
+        </button>
       )}
     </div>
   );
