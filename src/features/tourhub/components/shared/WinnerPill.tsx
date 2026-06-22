@@ -12,13 +12,14 @@ import { resolvePlayerAvatarCandidates } from '@/features/tourhub/_shared/resolv
 
 interface WinnerPillProps {
   name: string;
+  fullName?: string | null;
   photoUrl?: string | null;
   score?: string | null;
   tourSlug?: string | null;
   onPlayerTap?: (e: React.MouseEvent) => void;
 }
 
-export function WinnerPill({ name, photoUrl, score, tourSlug, onPlayerTap }: WinnerPillProps) {
+export function WinnerPill({ name, fullName, photoUrl, score, tourSlug, onPlayerTap }: WinnerPillProps) {
   return (
     <div
       style={{
@@ -45,7 +46,7 @@ export function WinnerPill({ name, photoUrl, score, tourSlug, onPlayerTap }: Win
       <PlayerInitialAvatar
         name={name}
         src={photoUrl ?? undefined}
-        srcCandidates={resolvePlayerAvatarCandidates({ name, photoUrl, tourSlug: tourSlug ?? 'pga' })}
+        srcCandidates={resolvePlayerAvatarCandidates({ name: fullName || name, photoUrl, tourSlug: tourSlug ?? 'pga' })}
         size={20}
         radius="34%"
       />
