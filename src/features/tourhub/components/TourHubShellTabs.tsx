@@ -159,7 +159,7 @@ export const TourHubShellTabs: React.FC = () => {
           />
         )}
       </div>
-      <TourSwitcherAffordance />
+      {active === 'overview' && <TourSwitcherAffordance />}
     </section>
   );
 };
