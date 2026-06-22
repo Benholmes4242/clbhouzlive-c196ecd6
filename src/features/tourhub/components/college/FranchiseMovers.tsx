@@ -74,7 +74,7 @@ export function FranchiseMovers({ limit = 8, className }: FranchiseMoversProps) 
                   fontWeight: isSelected ? 800 : 600,
                   letterSpacing: '-0.1px',
                   color: isSelected ? SURFACE : INK_SOFT,
-                  background: isSelected ? '#0F172A' : '#ffffff',
+                  background: isSelected ? '#0F172A' : '#F8FAFC',
                   border: isSelected ? 'none' : '1px solid rgba(15,23,42,0.12)',
                   cursor: 'pointer', transition: 'all 0.15s',
                 }}
