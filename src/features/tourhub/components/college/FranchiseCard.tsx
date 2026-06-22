@@ -180,6 +180,7 @@ export function FranchiseCard({
             size={logoSize}
             radius={8}
             imageScale={0.78}
+            imageBg="#FFFFFF"
             paletteSeed={slug}
           />
 

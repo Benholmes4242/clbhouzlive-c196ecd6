@@ -34,6 +34,10 @@ export interface PlayerInitialAvatarProps {
   color?: { bg: string; fg: string };
   /** Inner image render scale (0–1). Default 1 (fills). For logo padding. */
   imageScale?: number;
+  /** Background shown BEHIND a loaded image. Defaults to the slate placeholder
+   *  (INK_TINT_06) for player headshots; logo callers pass white/near-white so
+   *  the badge fills the avatar like before. */
+  imageBg?: string;
 }
 
 export function PlayerInitialAvatar({
@@ -45,6 +49,7 @@ export function PlayerInitialAvatar({
   paletteSeed,
   color,
   imageScale = 1,
+  imageBg = INK_TINT_06,
 }: PlayerInitialAvatarProps) {
   const candidates: string[] = (() => {
     if (srcCandidates && srcCandidates.length > 0) {
@@ -79,7 +84,7 @@ export function PlayerInitialAvatar({
         borderRadius: radius,
         overflow: 'hidden',
         flexShrink: 0,
-        background: showImage ? INK_TINT_06 : fallbackBg,
+        background: showImage ? imageBg : fallbackBg,
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
