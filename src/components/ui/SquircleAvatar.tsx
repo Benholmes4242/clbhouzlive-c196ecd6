@@ -40,6 +40,9 @@ export interface SquircleAvatarProps {
   size?: SquircleAvatarSize;
   /** Image source URL */
   src?: string | null;
+  /** Ordered list of candidate URLs to try in sequence. Walks on error;
+   *  shows fallback only when all candidates miss. Takes precedence over `src`. */
+  srcCandidates?: (string | null | undefined)[];
   /** Alt text for image */
   alt?: string;
   /** Achievement ring color (hex). If provided, overrides top100Count-derived color */
