@@ -1,8 +1,10 @@
 import React, { useRef, useEffect, useMemo, useState } from 'react';
 import { useLocation, useNavigate, useSearchParams } from 'react-router-dom';
+import { AnimatePresence, motion } from 'framer-motion';
 import type { TourHubTab } from './types';
 import { TourSwitcherAffordance } from './TourSwitcherAffordance';
 import { useLiveTournaments } from '../hooks/useLiveTournaments';
+import { useTourSelection } from '../context/TourSelectionContext';
 
 type TabId = TourHubTab | 'college';
 
@@ -43,6 +45,12 @@ export const TourHubShellTabs: React.FC = () => {
   }, []);
 
   const active = computeActiveTab(location.pathname, searchParams);
+
+  const { viewingTourSlug, selectedTourSlug } = useTourSelection();
+  const tourSettled = (viewingTourSlug ?? selectedTourSlug) != null;
+  // Show the switcher only on Overview, and only once the hero has reported a
+  // real tour — so it fades in already correct, never flashing PGA then jumping.
+  const showSwitcher = active === 'overview' && tourSettled;
 
   const { data: liveTournaments } = useLiveTournaments();
   const showLive = (liveTournaments?.length ?? 0) > 0;
@@ -159,7 +167,23 @@ export const TourHubShellTabs: React.FC = () => {
           />
         )}
       </div>
-      {active === 'overview' && <TourSwitcherAffordance />}
+      <AnimatePresence initial={false} mode="wait">
+        {showSwitcher && (
+          <motion.div
+            key="tour-switcher"
+            initial={{ opacity: 0, width: 0 }}
+            animate={{ opacity: 1, width: 'auto' }}
+            exit={{ opacity: 0, width: 0 }}
+            transition={{
+              opacity: { duration: 0.28, ease: [0.4, 0, 0.2, 1] },
+              width: { duration: 0.32, ease: [0.4, 0, 0.2, 1] },
+            }}
+            style={{ overflow: 'hidden', flex: '0 0 auto', display: 'flex' }}
+          >
+            <TourSwitcherAffordance />
+          </motion.div>
+        )}
+      </AnimatePresence>
     </section>
   );
 };
