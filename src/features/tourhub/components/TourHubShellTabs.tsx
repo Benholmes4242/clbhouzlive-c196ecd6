@@ -1,8 +1,10 @@
 import React, { useRef, useEffect, useMemo, useState } from 'react';
 import { useLocation, useNavigate, useSearchParams } from 'react-router-dom';
+import { AnimatePresence, motion } from 'framer-motion';
 import type { TourHubTab } from './types';
 import { TourSwitcherAffordance } from './TourSwitcherAffordance';
 import { useLiveTournaments } from '../hooks/useLiveTournaments';
+import { useTourSelection } from '../context/TourSelectionContext';
 
 type TabId = TourHubTab | 'college';
 
