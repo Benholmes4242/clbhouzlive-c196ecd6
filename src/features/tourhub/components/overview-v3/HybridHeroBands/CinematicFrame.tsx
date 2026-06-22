@@ -985,7 +985,7 @@ export function CinematicFrame({
           return (
             <>
               <div style={{ flex: 1 }} />
-              <div style={{ display: 'flex', gap: 14, alignItems: 'center', padding: '0 16px 22px' }}>
+              <div style={{ display: 'flex', gap: 14, alignItems: 'center', padding: '0 16px 64px' }}>
                 {/* Champion card (left) — no trophy icon on the avatar */}
                 <div style={{ flex: '0 0 42%', display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', textAlign: 'center', background: 'rgba(10,14,20,0.55)', backdropFilter: 'blur(10px)', WebkitBackdropFilter: 'blur(10px)', borderRadius: 12, border: '0.5px solid rgba(255,255,255,0.18)', padding: '14px 12px' }}>
                   {winnerAvatar
