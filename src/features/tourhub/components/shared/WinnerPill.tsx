@@ -7,15 +7,18 @@
 import { Trophy } from 'lucide-react';
 
 import { AMBER_TINT_12 } from '../../_shared/tokens';
+import { PlayerInitialAvatar } from './PlayerInitialAvatar';
+import { resolvePlayerAvatarCandidates } from '@/features/tourhub/_shared/resolvePlayerAvatar';
 
 interface WinnerPillProps {
   name: string;
   photoUrl?: string | null;
   score?: string | null;
+  tourSlug?: string | null;
   onPlayerTap?: (e: React.MouseEvent) => void;
 }
 
-export function WinnerPill({ name, photoUrl, score, onPlayerTap }: WinnerPillProps) {
+export function WinnerPill({ name, photoUrl, score, tourSlug, onPlayerTap }: WinnerPillProps) {
   return (
     <div
       style={{
@@ -39,30 +42,13 @@ export function WinnerPill({ name, photoUrl, score, onPlayerTap }: WinnerPillPro
           flexShrink: 0,
         }}
       />
-      {photoUrl ? (
-        <img
-          src={photoUrl}
-          alt=""
-          style={{
-            width: 20,
-            height: 20,
-            borderRadius: '34%',
-            objectFit: 'cover',
-            background: '#F1F5F9',
-            flexShrink: 0,
-          }}
-        />
-      ) : (
-        <div
-          style={{
-            width: 20,
-            height: 20,
-            borderRadius: '34%',
-            background: '#F1F5F9',
-            flexShrink: 0,
-          }}
-        />
-      )}
+      <PlayerInitialAvatar
+        name={name}
+        src={photoUrl ?? undefined}
+        srcCandidates={resolvePlayerAvatarCandidates({ name, photoUrl, tourSlug: tourSlug ?? 'pga' })}
+        size={20}
+        radius="34%"
+      />
       <button
         type="button"
         onClick={onPlayerTap}

@@ -42,6 +42,15 @@ const SLUG_TO_DB_CODE: Record<string, string> = {
   lpga: 'LPGA',
 };
 
+const DB_CODE_TO_SLUG: Record<string, string> = {
+  pga: 'pga',
+  LIV: 'liv',
+  EURO: 'euro',
+  PGAD: 'pgad',
+  CHAMP: 'champ',
+  LPGA: 'lpga',
+};
+
 interface ScheduleTournamentCardProps {
   tournament: TourTournament | SeasonTournament;
   className?: string;
@@ -90,6 +99,9 @@ export function ScheduleTournamentCard({
   const venueCity = isSeasonTournament(tournament) ? tournament.venueCity : tournament.venue_city;
   const startDate = isSeasonTournament(tournament) ? tournament.startDate : tournament.start_date;
   const tourName = isSeasonTournament(tournament) ? tournament.tourName : tournament.tour_full_name;
+  const tourSlug = isSeasonTournament(tournament)
+    ? (TOUR_NAME_TO_SLUG[tournament.tourName] ?? 'pga')
+    : (DB_CODE_TO_SLUG[(tournament as TourTournament).tour_code ?? ''] ?? 'pga');
   const tourCode = isSeasonTournament(tournament)
     ? (SLUG_TO_DB_CODE[TOUR_NAME_TO_SLUG[tournament.tourName] ?? ''] ?? null)
     : (tournament as TourTournament).tour_code ?? null;
@@ -273,6 +285,7 @@ export function ScheduleTournamentCard({
             name={winnerDisplay}
             photoUrl={winnerPhotoUrl}
             score={winnerDisplayScore}
+            tourSlug={tourSlug}
             onPlayerTap={leaderWinner?.playerId ? handlePlayerTap : undefined}
           />
         )}
