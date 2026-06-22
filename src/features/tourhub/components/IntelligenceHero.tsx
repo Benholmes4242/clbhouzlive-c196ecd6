@@ -130,7 +130,7 @@ function PlayerHeadshot({
       style={{
         width: '100%',
         height: '100%',
-        background: `linear-gradient(135deg, ${SLATE_800}, ${INK})`,
+        background: `linear-gradient(135deg, ${SLATE_800}, ${INK_DEEP})`,
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
