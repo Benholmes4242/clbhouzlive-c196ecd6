@@ -977,7 +977,7 @@ export function CinematicFrame({
         {isResults && safe[0] && (() => {
           const winner = safe[0];
           const runnerUp = safe[1];
-          const winnerAvatar = resolveAvatar(winner, tourSlug);
+          const winnerAvatarCandidates = resolveAvatarCandidates(winner, tourSlug);
           const s = tournamentScoring;
 
           return (
@@ -988,13 +988,14 @@ export function CinematicFrame({
                 <div style={{ flex: '0 0 42%', display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', textAlign: 'center', background: 'rgba(10,14,20,0.55)', backdropFilter: 'blur(10px)', WebkitBackdropFilter: 'blur(10px)', borderRadius: 12, border: '0.5px solid rgba(255,255,255,0.18)', padding: '14px 12px' }}>
                   <span style={{ display: 'inline-flex', boxShadow: '0 0 22px rgba(251,188,46,0.35)', borderRadius: '34%', marginBottom: 9 }}>
                     <SquircleAvatar
-                      src={winnerAvatar}
+                      srcCandidates={winnerAvatarCandidates}
                       alt={entryName(winner)}
                       userId={(winner as any)?.player?.id ?? null}
                       size={50}
                       ringColor={GOLD}
                     />
                   </span>
+
                   <div style={{ ...NUMERIC_STYLE, fontSize: 8, fontWeight: 800, letterSpacing: '0.16em', color: GOLD, textTransform: 'uppercase' }}>Champion</div>
                   <div style={{ fontSize: 16, fontWeight: 800, color: '#fff', marginTop: 3, lineHeight: 1.15, display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>{entryName(winner)}</div>
                   <div style={{ ...NUMERIC_STYLE, fontSize: 20, fontWeight: 900, color: scoreColor(winner.score), marginTop: 6 }}>{fmtScore(winner.score)}</div>
