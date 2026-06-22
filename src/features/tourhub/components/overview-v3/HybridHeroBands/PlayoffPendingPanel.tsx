@@ -14,7 +14,8 @@ export interface PlayoffPlayer {
   country?: string;
   score: string;
   thru?: string;
-  avatarUrl?: string | null;
+  avatarCandidates?: (string | null | undefined)[];
+  playerId?: string | null;
 }
 
 interface PlayoffPendingPanelProps {
