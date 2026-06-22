@@ -174,26 +174,15 @@ export function FranchiseCard({
 
         {/* College logo + name + subline */}
         <div style={{ flex: 1, display: 'flex', alignItems: 'center', gap: '10px', minWidth: 0 }}>
-          <div style={{
-            width: logoSize, height: logoSize, borderRadius: 8, flexShrink: 0,
-            background: 'rgba(15,23,42,0.04)',
-            display: 'flex', alignItems: 'center', justifyContent: 'center',
-            overflow: 'hidden',
-          }}>
-            {logoUrl ? (
-              <img
-                src={logoUrl}
-                alt={displayName}
-                style={{ width: logoSize - 8, height: logoSize - 8, objectFit: 'contain' }}
-                loading="lazy"
-                onError={(e) => { e.currentTarget.style.display = 'none'; }}
-              />
-            ) : (
-              <span style={{ fontSize: 13, fontWeight: 800, color: INK_FAINT }}>
-                {displayName.charAt(0)}
-              </span>
-            )}
-          </div>
+          <PlayerInitialAvatar
+            name={displayName}
+            src={logoUrl}
+            size={logoSize}
+            radius={8}
+            imageScale={0.78}
+            paletteSeed={slug}
+          />
+
 
           <div style={{ minWidth: 0, flex: 1 }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: 6, minWidth: 0 }}>
