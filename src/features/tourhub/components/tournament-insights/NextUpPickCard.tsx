@@ -5,7 +5,8 @@
 
 import React, { useState } from 'react';
 import { INK_SOFT, INK_TINT_07 } from '../../_shared/tokens';
-import { getPlayerHeadshotUrl, PLAYER_SILHOUETTE_URL } from '@/utils/playerHeadshot';
+import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
+import { resolvePlayerAvatarCandidates } from '../../_shared/resolvePlayerAvatar';
 import type { WinnerProfile, ContenderCard, ConfidenceTier } from './types';
 
 interface NextUpPickCardProps {
