@@ -61,6 +61,40 @@ function generateFallbackNarrative(
   return `${last} wins at ${scoreDisplay}. The conversation starts now.`;
 }
 
+/**
+ * Walks an ordered list of player-photo candidates with `onError`. When
+ * every candidate misses, swaps to `fallback` (typically the venue image,
+ * then silhouette). Used by the results hero — this surface is venue-backed
+ * by design and must NOT show canonical initials.
+ */
+function WinnerHeroPhoto({
+  candidates,
+  fallback,
+  alt,
+}: {
+  candidates: string[];
+  fallback: string;
+  alt: string;
+}) {
+  const list = React.useMemo(
+    () => [...candidates, fallback].filter(Boolean),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [candidates.join('|'), fallback],
+  );
+  const [idx, setIdx] = React.useState(0);
+  React.useEffect(() => { setIdx(0); }, [list]);
+  const src = list[Math.min(idx, list.length - 1)] ?? fallback;
+  return (
+    <img
+      src={src}
+      alt={alt}
+      onError={() => {
+        if (idx + 1 < list.length) setIdx(idx + 1);
+      }}
+      style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: '50% 8%' }}
+    />
+  );
+
 // ─── Component ───────────────────────────────────────────────────────────────
 
 export function TournamentResultsCard({
