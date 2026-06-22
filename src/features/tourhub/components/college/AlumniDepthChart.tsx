@@ -109,7 +109,7 @@ function AlumniRow({ alumnus, index, tier, legacyContextLabel }: AlumniRowProps)
               : undefined}
           />
           <div style={{ minWidth: 0, flex: 1 }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 6, minWidth: 0 }}>
+            <div style={{ display: 'flex', alignItems: 'center', minWidth: 0 }}>
               <p style={{
                 fontSize: 14,
                 fontWeight: nameWeight,
@@ -122,20 +122,6 @@ function AlumniRow({ alumnus, index, tier, legacyContextLabel }: AlumniRowProps)
               }}>
                 {fullName}
               </p>
-              {tourTag && (
-                <span style={{
-                  fontSize: 8,
-                  fontWeight: 800,
-                  letterSpacing: '0.5px',
-                  padding: '1px 4px',
-                  borderRadius: 3,
-                  background: tourTag.bg,
-                  color: tourTag.fg,
-                  flexShrink: 0,
-                }}>
-                  {tourTag.label}
-                </span>
-              )}
             </div>
             {subline && (
               <div style={{ fontSize: 10, fontWeight: 500, color: INK_FAINT, marginTop: 1 }}>
