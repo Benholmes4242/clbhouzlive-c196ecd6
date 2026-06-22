@@ -121,16 +121,6 @@ export function CollegeMasthead({
             </span>
             <ChevronRight size={11} strokeWidth={2.5} style={{ color: AMBER, marginTop: 1 }} />
           </button>
-          <div style={{
-            fontSize: 13,
-            fontWeight: 700,
-            color: INK,
-            letterSpacing: '-0.005em',
-            lineHeight: 1.25,
-            margin: '8px 0 0',
-          }}>
-            Season 2025–26 · {subline}
-          </div>
         </div>
 
         {/* Franchise champion card */}
