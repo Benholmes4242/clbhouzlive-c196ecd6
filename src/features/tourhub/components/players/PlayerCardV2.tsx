@@ -207,9 +207,6 @@ export function PlayerCardV2({
             }}>
               {player.fullName}
             </span>
-            {recentResult && (
-              <RecentResultPill position={recentResult.position} tied={recentResult.tied} />
-            )}
           </div>
           <div style={{ display: 'flex', alignItems: 'center', gap: '4px', marginTop: '2px' }}>
             <CountryFlag country={player.country} size="sm" />
