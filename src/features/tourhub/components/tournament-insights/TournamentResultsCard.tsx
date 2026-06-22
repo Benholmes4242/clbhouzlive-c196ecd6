@@ -188,13 +188,14 @@ export function TournamentResultsCard({
               </div>
             </div>
 
-            {/* Headshot — contained squircle */}
+            {/* Headshot — contained squircle. Walks multi-folder player
+                candidates, then falls back to the venue image (hero is
+                venue-backed by design — NOT canonical initials). */}
             <div style={{ width: 72, height: 72, borderRadius: '34%', overflow: 'hidden', flexShrink: 0, background: INK_TINT_06 }}>
-              <img
-                src={winnerPhoto}
+              <WinnerHeroPhoto
+                candidates={winnerCandidates}
+                fallback={heroFallback}
                 alt={winnerName}
-                onError={e => { (e.target as HTMLImageElement).src = heroFallback; }}
-                style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: '50% 8%' }}
               />
             </div>
           </div>
