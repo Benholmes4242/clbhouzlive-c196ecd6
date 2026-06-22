@@ -979,26 +979,21 @@ export function CinematicFrame({
         {isResults && safe[0] && (() => {
           const winner = safe[0];
           const runnerUp = safe[1];
-          const margin = runnerUp ? Math.abs((runnerUp.score ?? 0) - (winner.score ?? 0)) : null;
-          const marginLabel = margin == null ? null : (margin === 0 ? 'won in a playoff' : `won by ${margin}`);
           const winnerAvatar = resolveAvatar(winner, tourSlug);
           const s = tournamentScoring;
 
           return (
             <>
               <div style={{ flex: 1 }} />
-              <div style={{ display: 'flex', gap: 14, alignItems: 'stretch', padding: '0 16px 22px' }}>
+              <div style={{ display: 'flex', gap: 14, alignItems: 'center', padding: '0 16px 22px' }}>
                 {/* Champion card (left) — no trophy icon on the avatar */}
-                <div style={{ flex: '0 0 42%', display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'flex-start', textAlign: 'left', background: 'rgba(10,14,20,0.55)', backdropFilter: 'blur(10px)', WebkitBackdropFilter: 'blur(10px)', borderRadius: 12, border: '0.5px solid rgba(255,255,255,0.18)', padding: '14px 13px', minWidth: 0 }}>
+                <div style={{ flex: '0 0 42%', display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', textAlign: 'center', background: 'rgba(10,14,20,0.55)', backdropFilter: 'blur(10px)', WebkitBackdropFilter: 'blur(10px)', borderRadius: 12, border: '0.5px solid rgba(255,255,255,0.18)', padding: '14px 12px' }}>
                   {winnerAvatar
                     ? <img src={winnerAvatar} alt="" loading="lazy" style={{ width: 50, height: 50, borderRadius: '34%', objectFit: 'cover', border: `2px solid ${GOLD}`, boxShadow: '0 0 22px rgba(251,188,46,0.35)', marginBottom: 9 }} />
                     : <div style={{ width: 50, height: 50, borderRadius: '34%', background: 'rgba(255,255,255,0.08)', border: `2px solid ${GOLD}`, boxShadow: '0 0 22px rgba(251,188,46,0.35)', marginBottom: 9 }} />}
                   <div style={{ ...NUMERIC_STYLE, fontSize: 8, fontWeight: 800, letterSpacing: '0.16em', color: GOLD, textTransform: 'uppercase' }}>Champion</div>
                   <div style={{ fontSize: 16, fontWeight: 800, color: '#fff', marginTop: 3, lineHeight: 1.15, display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>{entryName(winner)}</div>
-                  <div style={{ display: 'flex', alignItems: 'baseline', gap: 8, marginTop: 6 }}>
-                    <span style={{ ...NUMERIC_STYLE, fontSize: 19, fontWeight: 900, color: scoreColor(winner.score) }}>{fmtScore(winner.score)}</span>
-                    {marginLabel && <span style={{ fontSize: 10, fontWeight: 600, color: 'rgba(255,255,255,0.55)' }}>{marginLabel}</span>}
-                  </div>
+                  <div style={{ ...NUMERIC_STYLE, fontSize: 20, fontWeight: 900, color: scoreColor(winner.score), marginTop: 6 }}>{fmtScore(winner.score)}</div>
                 </div>
 
                 {/* Scoring grid (right) — only when scorecard data exists */}
