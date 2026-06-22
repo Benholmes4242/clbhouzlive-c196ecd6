@@ -46,7 +46,7 @@ export function WinnerPill({ name, fullName, photoUrl, score, tourSlug, onPlayer
       <PlayerInitialAvatar
         name={name}
         src={photoUrl ?? undefined}
-        srcCandidates={resolvePlayerAvatarCandidates({ name, photoUrl, tourSlug: tourSlug ?? 'pga' })}
+        srcCandidates={resolvePlayerAvatarCandidates({ name: fullName || name, photoUrl, tourSlug: tourSlug ?? 'pga' })}
         size={20}
         radius="34%"
       />
