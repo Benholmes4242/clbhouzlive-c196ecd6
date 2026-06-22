@@ -188,6 +188,7 @@ export function CollegeMasthead({
                     size={60}
                     radius={8}
                     imageScale={1}
+                    imageBg="#FFFFFF"
                     paletteSeed={slug}
                   />
                 </div>

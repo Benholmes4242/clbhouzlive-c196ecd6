@@ -264,6 +264,7 @@ export function CollegeComparePage() {
                             radius={9}
                             paletteSeed={stats.normalized_name}
                             imageScale={0.78}
+                            imageBg="#FFFFFF"
                           />
                           <div style={{ minWidth: 0, flex: 1 }}>
                             <div style={{ fontSize: 15, fontWeight: 700, color: INK, letterSpacing: '-0.01em', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' as const }}>
