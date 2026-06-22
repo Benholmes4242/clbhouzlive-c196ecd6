@@ -269,17 +269,8 @@ export function LeadersTab() {
           )}
         </div>
 
-        {/* Count bar OR search input — mutually exclusive */}
-        {!searchExpanded ? (
-          <div style={{ display: 'flex', alignItems: 'baseline', gap: 8, padding: '6px 16px 8px' }}>
-            <span style={{ fontSize: 9, fontWeight: 800, color: INK, letterSpacing: '0.14em', textTransform: 'uppercase' as const, fontVariantNumeric: 'tabular-nums' }}>
-              {listPlayers.length.toLocaleString()} {listPlayers.length === 1 ? 'PLAYER' : 'PLAYERS'}
-            </span>
-            <span style={{ fontSize: 9, fontWeight: 800, color: INK_MUTE, letterSpacing: '0.14em', textTransform: 'uppercase' as const }}>
-              RANKED BY <span style={{ color: INK }}>{category.shortLabel.toUpperCase()}</span>
-            </span>
-          </div>
-        ) : (
+        {/* Search input — appears when expanded */}
+        {searchExpanded && (
           <div style={{ padding: '6px 16px 8px' }}>
             <div style={{ position: 'relative' }}>
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 z-10 w-4 h-4" style={{ color: AMBER }} strokeWidth={2.5} />
@@ -319,13 +310,7 @@ export function LeadersTab() {
             >
               {listPlayers.length > 0 ? (
                 <>
-                  {!search && (
-                    <div style={{ padding: '12px 16px 6px' }}>
-                      <span style={{ fontSize: 9, fontWeight: 800, color: INK_MUTE, letterSpacing: '0.14em', textTransform: 'uppercase' as const }}>
-                        CHASING
-                      </span>
-                    </div>
-                  )}
+                  {/* (CHASING header removed in condense pass) */}
                   {listPlayers.map((item, idx) => {
                     const fmt = worldFormatOverride ?? category.format;
                     const unit = worldUnitOverride ?? category.unit;
@@ -357,10 +342,10 @@ export function LeadersTab() {
                       />
                     );
                   })}
-                  {/* Footer */}
-                  <div style={{ padding: '12px 16px', textAlign: 'center', borderTop: `0.5px solid ${INK_TINT_07}` }}>
-                    <span style={{ fontSize: 9, fontWeight: 800, color: INK_FAINT, letterSpacing: '0.14em', textTransform: 'uppercase' as const }}>
-                      SEASON LEADERS · AVAILABLE TOURNAMENT DATA
+                  {/* End of list */}
+                  <div style={{ padding: '20px 16px 28px', textAlign: 'center' }}>
+                    <span style={{ fontSize: 11, fontWeight: 600, color: INK_FAINT, letterSpacing: '0.01em' }}>
+                      You've reached the end of the list
                     </span>
                   </div>
                 </>
