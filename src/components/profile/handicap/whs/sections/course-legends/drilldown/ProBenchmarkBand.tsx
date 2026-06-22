@@ -1,18 +1,9 @@
 import React, { useState } from 'react';
 import { Info } from 'lucide-react';
-import { getPlayerHeadshotUrl } from '@/utils/playerHeadshot';
+import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
+import { resolvePlayerAvatarCandidates } from '@/features/tourhub/_shared/resolvePlayerAvatar';
 import type { ProProfile, ProBandBase } from './_shared/proBenchmark';
 
-const SQUIRCLE_MASK_URL =
-  "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cpath d='M40 0h20c22.091 0 40 17.909 40 40v20c0 22.091-17.909 40-40 40H40C17.909 100 0 82.091 0 60V40C0 17.909 17.909 0 40 0z'/%3E%3C/svg%3E\")";
-const squircleMaskStyle: React.CSSProperties = {
-  WebkitMaskImage: SQUIRCLE_MASK_URL,
-  maskImage: SQUIRCLE_MASK_URL,
-  WebkitMaskSize: '100% 100%',
-  maskSize: '100% 100%',
-  WebkitMaskRepeat: 'no-repeat',
-  maskRepeat: 'no-repeat',
-};
 
 const EXPLAINER: Record<ProBandBase, string> = {
   lowest_gross:
