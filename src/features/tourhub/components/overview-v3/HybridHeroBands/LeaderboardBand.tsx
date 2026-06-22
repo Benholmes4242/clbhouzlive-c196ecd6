@@ -328,7 +328,8 @@ export function LeaderboardBand({
               score={r.score}
               year={r.year}
               isWinner={i === 0}
-              avatarUrl={r.avatarUrl}
+              avatarCandidates={r.avatarCandidates}
+              playerId={r.playerId}
               isLast={i === four.length - 1}
             />
           ))}
