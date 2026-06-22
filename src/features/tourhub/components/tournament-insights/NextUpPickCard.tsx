@@ -73,13 +73,14 @@ function PickRow({
 
           {/* Player row — avatar + name/bar + world rank */}
           <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-            {/* Avatar */}
-            <div style={{ width: isTop ? 36 : 30, height: isTop ? 36 : 30, borderRadius: '34%', background: INK_TINT_07, flexShrink: 0, overflow: 'hidden' }}>
-              <img
-                src={getPlayerHeadshotUrl(item.name, 'pga') || PLAYER_SILHOUETTE_URL}
+            {/* Avatar — canonical SquircleAvatar with multi-folder walk + initials fallback */}
+            <div style={{ flexShrink: 0 }}>
+              <SquircleAvatar
+                size={isTop ? 36 : 30}
+                srcCandidates={resolvePlayerAvatarCandidates({ name: item.name, photoUrl: null, tourSlug: 'pga' })}
                 alt={item.name}
-                style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center 20%' }}
-                onError={e => { (e.target as HTMLImageElement).src = PLAYER_SILHOUETTE_URL; }}
+                userId={item.id}
+                hideRing
               />
             </div>
 
