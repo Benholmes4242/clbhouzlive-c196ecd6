@@ -14,7 +14,7 @@ import { fmtScore } from '../HybridHero.utils';
 
 // Pass 5.7: localized — was a shared constant with only this consumer.
 // Height of the live-state top-10 ticker band rendered inside MiddleBand.
-const TICKER_HEIGHT = 40;
+const TICKER_HEIGHT = 34;
 
 interface TickerProps {
   rows: TickerRow[];
