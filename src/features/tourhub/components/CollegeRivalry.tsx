@@ -447,10 +447,10 @@ export function CollegeRivalry() {
               >
                 <SquircleAvatar
                   size={38}
-                  src={leaderCaptain ? getPlayerHeadshotUrl(leaderCaptain.fullName, leaderCaptain.tourCode) : PLAYER_SILHOUETTE_URL}
+                  srcCandidates={leaderCaptain ? getPlayerHeadshotCandidates(leaderCaptain.fullName, leaderCaptain.tourCode) : []}
                   alt={leaderCaptain?.fullName ?? '—'}
+                  userId={leaderCaptain?.playerId ?? leaderCaptain?.fullName ?? null}
                   hideRing
-                  fallback={leaderCaptain?.fullName.split(' ').map(n => n[0]).join('').slice(0, 2) ?? '—'}
                 />
                 <div style={{ minWidth: 0 }}>
                   <div style={{
