@@ -8,7 +8,7 @@
  * users explore the same dataset through different sorts.
  */
 
-import { Fragment } from 'react';
+
 import { Link, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { GraduationCap, ChevronRight, Crown } from 'lucide-react';
@@ -19,11 +19,6 @@ import type { CollegeMedia } from '../../hooks/useCollegeMedia';
 import type { AlumniFace } from '../../hooks/useBatchCollegeAlumni';
 import type { FranchiseCaptain } from '../../hooks/useFranchiseCaptains';
 import { splitStatValue } from '../../utils/splitStatValue';
-import {
-  captainDominates,
-  captainShortName,
-  formatCaptainEarnings,
-} from '../../utils/captainAnchor';
 import {
   AMBER,
   GOLD,
@@ -68,25 +63,16 @@ interface CollegeMastheadProps {
   } | null;
 }
 
-function formatCompactUSD(n: number): string {
-  if (Math.abs(n) >= 1_000_000) return `$${(n / 1_000_000).toFixed(1)}M`;
-  if (Math.abs(n) >= 1_000) return `$${(n / 1_000).toFixed(0)}K`;
-  return `$${n.toLocaleString()}`;
-}
-
-function pluralize(n: number, singular: string, plural?: string): string {
-  return Math.abs(n) === 1 ? singular : (plural || singular + 's');
-}
 
 export function CollegeMasthead({
   stats,
   college,
   activeMetric,
   heroAlumni: _heroAlumni,
-  captain,
-  runnerUp,
+  captain: _captain,
+  runnerUp: _runnerUp,
   isTiedAtOne = false,
-  moversContext,
+  moversContext: _moversContext,
 }: CollegeMastheadProps) {
   const navigate = useNavigate();
   const displayName = college?.short_name || college?.college_name || stats.normalized_name;
@@ -95,55 +81,6 @@ export function CollegeMasthead({
 
   const subline = isTiedAtOne ? METRIC_SUBLINE_TIED[activeMetric] : METRIC_SUBLINE[activeMetric];
 
-  // Caption metadata composition (Q3 decision — see brief).
-  // Priority order: MARGIN / TIED → CAPTAIN → ALUMNI fallback.
-  // Cap at 3 items max (SEASON LEADER + 2 metadata).
-  const captionMetadata: string[] = (() => {
-    if (activeMetric === 'movers' && moversContext) {
-      const moverItems: string[] = [];
-      if (moversContext.climberCount > 0) {
-        moverItems.push(`${moversContext.climberCount} ${pluralize(moversContext.climberCount, 'CLIMBER').toUpperCase()} THIS WEEK`);
-      }
-      if (moversContext.biggestJump) {
-        moverItems.push(`${moversContext.biggestJump.displayName.toUpperCase()} +${formatCompactUSD(moversContext.biggestJump.earningsDelta).toUpperCase()}`);
-      }
-      return moverItems.slice(0, 2);
-    }
-
-    const items: string[] = [];
-
-    if (runnerUp) {
-      const getValue = (s: CollegeSeasonStats) => {
-        switch (activeMetric) {
-          case 'wins': return s.wins_total;
-          case 'top10s': return s.top10_total;
-          default: return s.earnings_total;
-        }
-      };
-      const gap = getValue(stats) - getValue(runnerUp);
-      if (isTiedAtOne) {
-        items.push(activeMetric === 'earnings'
-          ? `TIED #1 · ${formatCompactUSD(stats.earnings_total).toUpperCase()}`
-          : activeMetric === 'wins'
-          ? `TIED #1 · ${stats.wins_total} WINS`
-          : `TIED #1 · ${stats.top10_total} TOP 10S`);
-      } else if (gap > 0) {
-        if (activeMetric === 'earnings') {
-          items.push(`+${formatCompactUSD(gap).toUpperCase()} AHEAD OF #2`);
-        } else {
-          items.push(`+${gap} AHEAD OF #2`);
-        }
-      }
-    }
-
-    if (captain && captainDominates(captain)) {
-      items.push(`${captainShortName(captain.fullName).toUpperCase()} · ${formatCaptainEarnings(captain.earnings).toUpperCase()} SEASON`);
-    } else {
-      items.push(`${stats.player_count} ALUMNI`);
-    }
-
-    return items.slice(0, 2);
-  })();
 
   // Primary value split (Stat Watch decimal-tail pattern).
   const primaryValueText = activeMetric === 'wins'
@@ -242,20 +179,6 @@ export function CollegeMasthead({
               }}>
                 SEASON LEADER
               </span>
-              {captionMetadata.map((part, i) => (
-                <Fragment key={`${part}-${i}`}>
-                  <span style={{ color: INK_MUTE, fontSize: 10.5, fontWeight: 800 }}>·</span>
-                  <span style={{
-                    fontSize: 10.5,
-                    fontWeight: 800,
-                    letterSpacing: '0.14em',
-                    color: INK_MUTE,
-                    textTransform: 'uppercase' as const,
-                  }}>
-                    {part}
-                  </span>
-                </Fragment>
-              ))}
             </div>
 
             {/* Body row */}
@@ -341,7 +264,7 @@ export function CollegeMasthead({
                     fontVariantNumeric: 'tabular-nums',
                   }}>
                     {primaryInteger}
-                    {primaryDecimal && <span style={{ color: AMBER }}>{primaryDecimal}</span>}
+                    {primaryDecimal && <span style={{ color: INK }}>{primaryDecimal}</span>}
                     {primarySuffix && <span style={{ color: INK }}>{primarySuffix}</span>}
                   </div>
                   <div style={{

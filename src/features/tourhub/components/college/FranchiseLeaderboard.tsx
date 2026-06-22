@@ -18,7 +18,7 @@ import { useFranchiseCaptains } from '../../hooks/useFranchiseCaptains';
 
 import { FranchiseCard } from './FranchiseCard';
 import { FranchiseMovers } from './FranchiseMovers';
-import { INK, INK_FAINT, INK_MUTE, INK_TINT_02, INK_TINT_06, INK_TINT_07, SURFACE } from '../../_shared/tokens';
+import { INK, INK_FAINT, INK_TINT_02, INK_TINT_06, INK_TINT_07, SURFACE } from '../../_shared/tokens';
 
 type MetricTab = 'earnings' | 'wins' | 'top10s' | 'movers';
 
@@ -32,11 +32,6 @@ interface FranchiseLeaderboardProps {
   hideHeader?: boolean;
 }
 
-const SECTION_EYEBROW: Record<Exclude<MetricTab, 'movers'>, string> = {
-  earnings: 'Season Earnings Leaderboard',
-  wins: 'Season Wins Leaderboard',
-  top10s: 'Top 10s Leaderboard',
-};
 
 export function FranchiseLeaderboard({
   limit = 25,
@@ -54,8 +49,8 @@ export function FranchiseLeaderboard({
   const { data: collegeMap } = useCollegeMediaMap();
   const { data: moverInfo } = useTopMovers();
 
-  const { sortedStats, isTiedAtOne } = useMemo(() => {
-    if (!allStats) return { sortedStats: [] as CollegeSeasonStats[], isTiedAtOne: false };
+  const sortedStats = useMemo(() => {
+    if (!allStats) return [] as CollegeSeasonStats[];
     const getValue = (s: CollegeSeasonStats) => {
       switch (activeMetric) {
         case 'wins': return s.wins_total;
@@ -63,7 +58,7 @@ export function FranchiseLeaderboard({
         default: return s.earnings_total;
       }
     };
-    const sorted = [...allStats]
+    return [...allStats]
       .sort((a, b) => {
         const diff = getValue(b) - getValue(a);
         if (diff !== 0) return diff;
@@ -72,43 +67,18 @@ export function FranchiseLeaderboard({
       })
       .filter(s => (activeMetric === 'wins' || activeMetric === 'top10s') ? getValue(s) > 0 : true)
       .slice(0, limit);
-    const tied = sorted.length >= 2 && getValue(sorted[0]) === getValue(sorted[1]);
-    return { sortedStats: sorted, isTiedAtOne: tied };
   }, [allStats, activeMetric, limit]);
 
   const collegeSlugs = useMemo(() => sortedStats.map(s => s.normalized_name), [sortedStats]);
   const { data: alumniMap } = useBatchCollegeAlumni(collegeSlugs, 3);
   const { data: captainMap } = useFranchiseCaptains(collegeSlugs);
 
-  // Tie-breaker copy. Surfaced in audit decision #2: order is metric-secondary,
-  // then earnings, then wins (mirrors the sort comparator above).
-  const tiebreakerNote = activeMetric === 'wins' || activeMetric === 'top10s'
-    ? 'Ties broken by season earnings, then wins'
-    : 'Ties broken by season wins';
 
   return (
     <div className={className}>
       {activeMetric !== 'movers' && (
         <div style={{ background: SURFACE, borderTop: `1px solid ${INK_TINT_07}`, borderBottom: `1px solid ${INK_TINT_07}`, marginTop: 8 }}>
-          {/* Section eyebrow — canonical §6 slate-caps */}
-          <div style={{ padding: '14px 16px 6px' }}>
-            <div style={{
-              fontSize: 9,
-              fontWeight: 800,
-              color: INK_MUTE,
-              letterSpacing: '0.16em',
-              textTransform: 'uppercase' as const,
-            }}>
-              {SECTION_EYEBROW[activeMetric].toUpperCase()}
-            </div>
-            {isTiedAtOne && (
-              <div style={{
-                fontSize: 11, fontWeight: 500, color: INK_FAINT, marginTop: 4,
-              }}>
-                {tiebreakerNote}
-              </div>
-            )}
-          </div>
+
 
           {/* Column headers */}
           <div style={{ display: 'flex', alignItems: 'center', padding: '5px 16px', background: INK_TINT_02, borderTop: `0.5px solid ${INK_TINT_07}`, borderBottom: `0.5px solid ${INK_TINT_07}` }}>
@@ -175,10 +145,11 @@ export function FranchiseLeaderboard({
                       />
                     );
                   })}
-                  <div style={{ padding: '12px 16px', borderTop: `0.5px solid ${INK_TINT_07}` }}>
-                    <p style={{ fontSize: 9, fontWeight: 800, color: INK_FAINT, letterSpacing: '0.14em', textTransform: 'uppercase' as const, textAlign: 'center' as const, margin: 0 }}>
-                      COLLEGE FRANCHISE RANKINGS · 2025–26 SEASON
-                    </p>
+                  {/* End of list */}
+                  <div style={{ padding: '20px 16px 28px', textAlign: 'center' as const }}>
+                    <span style={{ fontSize: 11, fontWeight: 600, color: INK_FAINT, letterSpacing: '0.01em' }}>
+                      You've reached the end of the list
+                    </span>
                   </div>
                 </>
               ) : activeMetric === 'wins' ? (
