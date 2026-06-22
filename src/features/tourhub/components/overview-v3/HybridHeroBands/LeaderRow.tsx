@@ -6,6 +6,7 @@
 import React from 'react';
 import { ChevronRight } from 'lucide-react';
 import CountryFlag from '@/components/ui/country-flag';
+import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { PLAYER_SILHOUETTE_URL } from '@/utils/playerHeadshot';
 import {
   INK,
@@ -17,29 +18,6 @@ import {
 import { getScoreColor } from '../../../_shared/scoreColor';
 import { AMBER_TINT_04, LEADER_GOLD_TINT_10, LEADER_GOLD_TINT_7 } from '../../../_shared/tokens';
 import { TrajectorySparkline } from './TrajectorySparkline';
-
-function PlayerHead({ size = 36, src, ring }: { size?: number; src?: string | null; ring?: boolean }) {
-  return (
-    <img
-      src={src || PLAYER_SILHOUETTE_URL}
-      alt=""
-      onError={(e) => {
-        const t = e.target as HTMLImageElement;
-        if (t.src !== PLAYER_SILHOUETTE_URL) t.src = PLAYER_SILHOUETTE_URL;
-      }}
-      style={{
-        width: size,
-        height: size,
-        borderRadius: '34%',
-        objectFit: 'cover',
-        objectPosition: 'center 18%',
-        flexShrink: 0,
-        background: 'linear-gradient(135deg, #CBD5E1 0%, #94A3B8 100%)',
-        border: ring ? '1.5px solid white' : '0.5px solid rgba(15,23,42,0.10)',
-      }}
-    />
-  );
-}
 
 function liveScoreColour(s: string): string {
   if (s.startsWith('\u2212') || s.startsWith('-')) return getScoreColor(-1, 'dark', 'standard');
@@ -53,7 +31,10 @@ interface SoloLeaderRowProps {
   country?: string | null;
   score: string;
   thru: string;
-  avatarUrl?: string | null;
+  /** Ordered multi-folder candidate URLs (resolvePlayerAvatarCandidates output). */
+  avatarCandidates?: (string | null | undefined)[];
+  /** Stable id used to derive the deterministic initials colour. */
+  playerId?: string | null;
   isResults?: boolean;
   isLast?: boolean;
 }
@@ -64,7 +45,8 @@ export function SoloLeaderRow({
   country,
   score,
   thru,
-  avatarUrl,
+  avatarCandidates,
+  playerId,
   isResults = false,
   isLast = false,
 }: SoloLeaderRowProps) {
