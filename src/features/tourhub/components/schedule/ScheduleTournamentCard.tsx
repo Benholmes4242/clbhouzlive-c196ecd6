@@ -128,7 +128,7 @@ export function ScheduleTournamentCard({
     : hasLeaderWinnerData ? leaderWinner!.displayName : null;
   const winnerFullName = hasSeasonWinner && winnerFirstName && winnerLastName
     ? `${winnerFirstName} ${winnerLastName}`
-    : (leaderWinner?.displayName ?? null);
+    : (leaderWinner?.fullName ?? leaderWinner?.displayName ?? null);
   const winnerPhotoUrl = hasLeaderWinnerData ? leaderWinner!.photoUrl : null;
   const winnerDisplayScore = leaderWinner?.displayScore ?? null;
 
@@ -288,6 +288,7 @@ export function ScheduleTournamentCard({
             name={winnerDisplay}
             fullName={winnerFullName}
             photoUrl={winnerPhotoUrl}
+            headshotOverride={leaderWinner?.headshotOverride ?? null}
             score={winnerDisplayScore}
             tourSlug={tourSlug}
             onPlayerTap={leaderWinner?.playerId ? handlePlayerTap : undefined}

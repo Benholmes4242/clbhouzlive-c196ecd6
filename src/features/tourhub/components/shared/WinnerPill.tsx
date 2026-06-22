@@ -14,12 +14,13 @@ interface WinnerPillProps {
   name: string;
   fullName?: string | null;
   photoUrl?: string | null;
+  headshotOverride?: string | null;
   score?: string | null;
   tourSlug?: string | null;
   onPlayerTap?: (e: React.MouseEvent) => void;
 }
 
-export function WinnerPill({ name, fullName, photoUrl, score, tourSlug, onPlayerTap }: WinnerPillProps) {
+export function WinnerPill({ name, fullName, photoUrl, headshotOverride, score, tourSlug, onPlayerTap }: WinnerPillProps) {
   return (
     <div
       style={{
@@ -46,7 +47,12 @@ export function WinnerPill({ name, fullName, photoUrl, score, tourSlug, onPlayer
       <PlayerInitialAvatar
         name={name}
         src={photoUrl ?? undefined}
-        srcCandidates={resolvePlayerAvatarCandidates({ name: fullName || name, photoUrl, tourSlug: tourSlug ?? 'pga' })}
+        srcCandidates={resolvePlayerAvatarCandidates({
+          name: fullName || name,
+          photoUrl,
+          tourSlug: tourSlug ?? 'pga',
+          headshotOverride,
+        })}
         size={20}
         radius="34%"
       />
