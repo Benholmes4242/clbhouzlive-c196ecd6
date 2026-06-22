@@ -44,8 +44,7 @@ import type {
 import type { TrackedPrediction } from './tournament-insights/types';
 import { IntelligenceSheet } from './IntelligenceSheet';
 import {
-  getPlayerHeadshotUrl,
-  PLAYER_SILHOUETTE_URL,
+  getPlayerHeadshotCandidates,
 } from '@/utils/playerHeadshot';
 
 // ─── Tokens (mirrors the mock) ──────────────────────────────────────────────
