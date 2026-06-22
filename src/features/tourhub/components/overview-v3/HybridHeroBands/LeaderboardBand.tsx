@@ -149,7 +149,8 @@ export function LeaderboardBand({
               country={entryCountry(leader)}
               score={fmtScore(leader.score)}
               thru={entryThru(leader)}
-              avatarUrl={entryAvatar(leader)}
+              avatarCandidates={entryAvatars(leader)}
+              playerId={entryPlayerId(leader)}
             />
           )}
           {slots.map((slot, i) => {
