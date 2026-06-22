@@ -15,7 +15,7 @@ import { splitStatValue } from '../utils/splitStatValue';
 
 import { useCollegeStats, useCollegeSeasonStats } from '../hooks/useCollegeStats';
 import { useCollegeMediaMap } from '../hooks/useCollegeMedia';
-import { useCollegeAlumni } from '../hooks/useCollegeAlumni';
+
 import { collegeHubRoute } from '../routes';
 import {
   AMBER,
