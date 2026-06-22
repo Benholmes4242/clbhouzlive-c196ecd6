@@ -838,7 +838,7 @@ export function PlayersTab() {
                           return index + 2;
                         }
                         if (sort === 'race-to-dubai' || sort === 'race-to-cme' || sort === 'points-list' || sort === 'liv-standings') {
-                          return pStats?.tourRank || rank?.worldRank;
+                          return pStats?.tourRank ?? null;
                         }
                         if (sort === 'alpha-az' || sort === 'alpha-za') {
                           return null;
