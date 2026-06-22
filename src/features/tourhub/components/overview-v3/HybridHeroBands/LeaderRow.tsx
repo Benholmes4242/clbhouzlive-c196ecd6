@@ -128,12 +128,22 @@ export function SoloLeaderRow({
   );
 }
 
+export interface StackedAvatarPlayer {
+  /** Ordered multi-folder candidate URLs (resolvePlayerAvatarCandidates output). */
+  avatarCandidates?: (string | null | undefined)[];
+  /** Optional stable id for deterministic initials colour. */
+  playerId?: string | null;
+  /** Optional player name for alt + initials fallback. */
+  name?: string | null;
+  rounds?: number[];
+}
+
 export function StackedAvatars({
   players,
   size = 34,
   variant = 'leader',
 }: {
-  players: { avatarUrl?: string | null }[];
+  players: StackedAvatarPlayer[];
   size?: number;
   variant?: 'leader' | 'chaser';
 }) {
@@ -143,27 +153,22 @@ export function StackedAvatars({
   return (
     <div style={{ display: 'flex', alignItems: 'center' }}>
       {visible.map((p, i) => (
-        <img
+        <div
           key={i}
-          src={p.avatarUrl || PLAYER_SILHOUETTE_URL}
-          alt=""
-          onError={(e) => {
-            const t = e.target as HTMLImageElement;
-            if (t.src !== PLAYER_SILHOUETTE_URL) t.src = PLAYER_SILHOUETTE_URL;
-          }}
           style={{
             marginLeft: i === 0 ? 0 : -8,
             zIndex: visible.length - i,
             opacity: total > maxVisible && i === visible.length - 1 ? 0.85 : 1,
-            width: size,
-            height: size,
-            borderRadius: '34%',
-            objectFit: 'cover',
-            objectPosition: 'center 18%',
-            background: 'linear-gradient(135deg, #CBD5E1 0%, #94A3B8 100%)',
-            border: 'none',
           }}
-        />
+        >
+          <SquircleAvatar
+            size={size}
+            srcCandidates={p.avatarCandidates}
+            alt={p.name ?? ''}
+            userId={p.playerId ?? p.name ?? ''}
+            hideRing
+          />
+        </div>
       ))}
     </div>
   );
