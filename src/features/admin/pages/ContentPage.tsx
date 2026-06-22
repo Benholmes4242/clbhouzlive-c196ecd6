@@ -11,6 +11,7 @@ import {
 import { supabase } from '@/integrations/supabase/client';
 import { useDebouncedValue } from '@/hooks/useDebouncedValue';
 import { getPlayerHeadshotUrl, PLAYER_SILHOUETTE_URL } from '@/utils/playerHeadshot';
+import { resolvePlayerAvatarCandidates } from '@/features/tourhub/_shared/resolvePlayerAvatar';
 import { usePanelRole } from '@/hooks/usePanelRole';
 import { panelCan } from '@/lib/panelCan';
 
@@ -1086,15 +1087,29 @@ function TourPlayersTab() {
 }
 
 function PlayerAvatar({ player, cacheBust, size = 40 }: { player: PlayerRow; cacheBust?: number; size?: number }) {
-  const codes = player.tourCodes?.length ? player.tourCodes.map(normalizeTourCode) : ['pga'];
+  const name = player.fullName || `${player.firstName || ''} ${player.lastName || ''}`.trim();
+  const primaryTour = player.tourCodes?.[0] ? normalizeTourCode(player.tourCodes[0]) : 'pga';
+  const candidates = useMemo(
+    () => resolvePlayerAvatarCandidates({
+      name,
+      tourSlug: primaryTour,
+      headshotOverride: player.headshotOverride ?? null,
+    }),
+    [name, primaryTour, player.headshotOverride],
+  );
+
   const [idx, setIdx] = useState(0);
   const [done, setDone] = useState(false);
-  const name = player.fullName || `${player.firstName || ''} ${player.lastName || ''}`.trim();
+
+  // Reset walk when the candidate list changes
+  const candidatesKey = candidates.join('|');
+  useEffect(() => { setIdx(0); setDone(false); }, [candidatesKey]);
+
   const src = useMemo(() => {
-    if (done || !name) return PLAYER_SILHOUETTE_URL;
-    const base = getPlayerHeadshotUrl(name, codes[idx] || 'pga', player.headshotOverride);
+    if (done || candidates.length === 0) return PLAYER_SILHOUETTE_URL;
+    const base = candidates[Math.min(idx, candidates.length - 1)];
     return cacheBust ? `${base}${base.includes('?') ? '&' : '?'}cb=${cacheBust}` : base;
-  }, [name, codes, idx, done, player.headshotOverride, cacheBust]);
+  }, [candidates, idx, done, cacheBust]);
 
   return (
     <div style={{
@@ -1106,13 +1121,14 @@ function PlayerAvatar({ player, cacheBust, size = 40 }: { player: PlayerRow; cac
         alt=""
         style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'top' }}
         onError={() => {
-          if (idx < codes.length - 1) setIdx(i => i + 1);
+          if (idx < candidates.length - 1) setIdx(i => i + 1);
           else setDone(true);
         }}
       />
     </div>
   );
 }
+
 
 function PlayerRowCard({ player, cacheBust, onPhoto }: { player: PlayerRow; cacheBust: number; onPhoto: () => void }) {
   const name = player.fullName || `${player.firstName || ''} ${player.lastName || ''}`.trim() || 'Unknown';

@@ -8,15 +8,22 @@ import { getPlayerHeadshotCandidates } from '@/utils/playerHeadshot';
  * list and falls back to canonical initials when all miss.
  */
 export function resolvePlayerAvatarCandidates(
-  opts: { name?: string | null; photoUrl?: string | null; tourSlug?: string | null },
+  opts: {
+    name?: string | null;
+    photoUrl?: string | null;
+    tourSlug?: string | null;
+    /** Optional name-key override threaded to getPlayerHeadshotCandidates (admin uploads). */
+    headshotOverride?: string | null;
+  },
 ): string[] {
   const direct = opts.photoUrl ?? null;
   const name = (opts.name ?? '').trim();
   const tour = opts.tourSlug ?? 'pga';
-  const list = name
+  const override = opts.headshotOverride ?? null;
+  const list = (name || override)
     ? (() => {
         try {
-          return getPlayerHeadshotCandidates(name, tour);
+          return getPlayerHeadshotCandidates(name, tour, override);
         } catch {
           return [];
         }
