@@ -8,7 +8,8 @@
 import React, { useState } from 'react';
 import { INK_SOFT, INK_TINT_07 } from '../../_shared/tokens';
 import { motion } from 'framer-motion';
-import { getPlayerHeadshotUrl, PLAYER_SILHOUETTE_URL } from '@/utils/playerHeadshot';
+import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
+import { resolvePlayerAvatarCandidates } from '../../_shared/resolvePlayerAvatar';
 
 import ActualPositionBadge from './components/ActualPositionBadge';
 import LivePositionDisplay from './components/LivePositionDisplay';
