@@ -508,12 +508,20 @@ export function PlayersTab() {
       filtered = filtered.filter(p => (statsMap.get(p.id)?.points ?? 0) > 0);
     }
 
+    // Tour-standing sorts: only include players with a tour rank, so unjoinable
+    // rows can't appear with phantom (OWGR) positions.
+    if (sort === 'race-to-dubai' || sort === 'race-to-cme' || sort === 'points-list' || sort === 'liv-standings') {
+      filtered = filtered.filter(p => statsMap.get(p.id)?.tourRank != null);
+    }
+
     filtered = [...filtered].sort((a, b) => {
       const aWorldRank = rankMap.get(a.id)?.worldRank ?? Infinity;
       const bWorldRank = rankMap.get(b.id)?.worldRank ?? Infinity;
-      
-      const aRank = statsMap.get(a.id)?.tourRank ?? aWorldRank;
-      const bRank = statsMap.get(b.id)?.tourRank ?? bWorldRank;
+
+      // Never fall back to OWGR for the tour-points sorts — players without a
+      // tour rank sort to the bottom rather than being slotted by world ranking.
+      const aRank = statsMap.get(a.id)?.tourRank ?? Infinity;
+      const bRank = statsMap.get(b.id)?.tourRank ?? Infinity;
 
       switch (sort) {
         case 'world-rank-desc': {
