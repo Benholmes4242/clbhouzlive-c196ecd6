@@ -154,7 +154,7 @@ export function FranchiseMovers({ limit = 8, className }: FranchiseMoversProps) 
         {/* Footer */}
         <div style={{ padding: '10px 16px', borderTop: `0.5px solid ${INK_TINT_07}` }}>
           <p style={{ fontSize: 8.5, fontWeight: 900, color: '#CBD5E1', letterSpacing: '0.12em', textTransform: 'uppercase' as const, textAlign: 'center' as const, margin: 0 }}>
-            WEEKLY EARNINGS CHANGE · {weekLabel?.toUpperCase() ?? 'CURRENT WEEK'}
+            WEEKLY EARNINGS CHANGE
           </p>
         </div>
       </div>
