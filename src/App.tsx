@@ -92,7 +92,7 @@ import ClubhouseWrapped from "./pages/ClubhouseWrapped";
 import BetaGatePage from "./pages/BetaGatePage";
 import { detectMedianBridge } from "./uploads/medianBridge";
 
-const ROOT_GATE_LAUNCH = new Date(2026, 5, 22, 0, 0, 0); // 22 Jun 2026 local — must match BetaGatePage
+// Gate is platform-based: native app or approved preview only. Desktop/mobile web → coming-soon.
 const PREVIEW_BYPASS_KEY = 'clbhouz_preview_bypass';
 const PREVIEW_BYPASS_TOKEN = 'clbhouz'; // the secret value: ?preview=clbhouz
 
