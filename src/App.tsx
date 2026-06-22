@@ -131,9 +131,9 @@ function usePreviewBypass(): boolean {
 
 const RootGate: React.FC = () => {
   const { isMedianApp } = detectMedianBridge();
-  const launched = Date.now() >= ROOT_GATE_LAUNCH.getTime();
   const previewBypass = usePreviewBypass();
-  if (!isMedianApp && !launched && !previewBypass) return <BetaGatePage />;
+  // App-only product: only the native app or an approved preview sees the app; everyone else → coming-soon.
+  if (!isMedianApp && !previewBypass) return <BetaGatePage />;
   return <ClubhouseWrapped />;
 };
 import DiscoverWrapped from "./pages/DiscoverWrapped";
