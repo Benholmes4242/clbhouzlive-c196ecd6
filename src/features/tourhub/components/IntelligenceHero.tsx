@@ -472,7 +472,7 @@ function CardHero({
   children: React.ReactNode;
 }) {
   return (
-    <div style={{ position: 'relative', height: 220, background: INK }}>
+    <div style={{ position: 'relative', height: 220, background: INK_DEEP }}>
       <PlayerHeadshot name={name} desaturate={desaturate} />
       <div
         style={{
