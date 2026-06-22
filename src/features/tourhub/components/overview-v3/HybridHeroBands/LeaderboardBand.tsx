@@ -70,13 +70,16 @@ function entryThru(entry: any): string {
   return String(entry.thru);
 }
 
-function resolveAvatar(entry: any, tourSlug?: string): string | null {
-  const name = entry?.player?.full_name || `${entry?.player?.first_name ?? ''} ${entry?.player?.last_name ?? ''}`.trim();
+function entryPlayerId(entry: any): string | undefined {
+  return entry?.player?.id ?? entry?.player_id ?? undefined;
+}
+
+function entryAvatarCandidates(entry: any, tourSlug?: string): string[] {
   return resolvePlayerAvatarCandidates({
-    name,
+    name: entryName(entry),
     photoUrl: entry?.player?.photo_url ?? null,
     tourSlug: tourSlug ?? null,
-  })[0] ?? null;
+  });
 }
 
 export function LeaderboardBand({
