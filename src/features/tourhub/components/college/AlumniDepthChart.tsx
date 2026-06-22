@@ -65,7 +65,6 @@ function AlumniRow({ alumnus, index, tier, legacyContextLabel }: AlumniRowProps)
     ? alumnus.world_ranking
     : null;
   const photoCandidates = getPlayerHeadshotCandidates(fullName, alumnus.tour_codes?.[0] ?? 'pga');
-  const tourTag = getPlayerTourTag(alumnus.tour_codes);
 
   const subline = tier === 'legacy'
     ? (legacyContextLabel ?? 'Major champion · Program history')
