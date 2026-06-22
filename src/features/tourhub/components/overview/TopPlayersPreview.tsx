@@ -3,7 +3,8 @@ import { ArrowRight, TrendingUp } from 'lucide-react';
 import { useTourSeason, useTourPlayerStatistics } from '../../hooks/useTourHubData';
 import { useMemo, useState } from 'react';
 import { cn } from '@/lib/utils';
-import { getPlayerHeadshotUrl, PLAYER_SILHOUETTE_URL } from '@/utils/playerHeadshot';
+import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
+import { resolvePlayerAvatarCandidates } from '../../_shared/resolvePlayerAvatar';
 
 type SortOption = 'events' | 'cuts' | 'world_rank';
 
