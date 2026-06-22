@@ -163,7 +163,7 @@ export function LeaderboardBand({
                   count={slot.count}
                   score={fmtScore(slot.score)}
                   thru="—"
-                  players={slot.members.map((m: any) => ({ avatarUrl: entryAvatar(m) }))}
+                  players={slot.members.map((m: any) => ({ avatarCandidates: entryAvatars(m), playerId: entryPlayerId(m), name: entryName(m) }))}
                   isLast={isLast}
                   onTap={onCtaTap}
                 />
