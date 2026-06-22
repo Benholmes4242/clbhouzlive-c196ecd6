@@ -575,7 +575,7 @@ export function PlayersTab() {
     return { rows: filtered, totalCount: filtered.length };
   }, [tourFilteredPlayers, matchesSearch, sort, rankMap, statsMap, activeTour, heroPlayerIds, debouncedSearch]);
 
-  const isLoading = allLoading && (!allPlayers || (allPlayers as TourPlayer[]).length === 0);
+  const isLoading = (allLoading && (!allPlayers || (allPlayers as TourPlayer[]).length === 0)) || tourRanksLoading;
 
   const displayRows = rows.slice(0, visibleCount);
   const hasMore = visibleCount < totalCount;
