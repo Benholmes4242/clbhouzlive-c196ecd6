@@ -40,6 +40,16 @@ import { AMBER, INK, INK_MUTE, INK_FAINT, INK_TINT_07, HAIRLINE_INK_10, SLATE_50
 // B45 FIX 1: Helper for completed status check
 const isCompleted = (t: TourTournament) => t.status === 'closed' || t.status === 'complete';
 
+// Noon-anchor today for timezone-safe date comparisons (matches T12:00:00Z pattern in this file)
+const todayNoonMs = () => {
+  const d = new Date();
+  return new Date(`${d.toISOString().split('T')[0]}T12:00:00Z`).getTime();
+};
+const notStarted = (t: TourTournament) => {
+  if (!t.start_date) return false;
+  return new Date(`${t.start_date}T12:00:00Z`).getTime() > todayNoonMs();
+};
+
 // B42 FIX 4: tourBreakdown in interface directly
 interface MonthGroup {
   monthKey: string;
@@ -169,7 +179,7 @@ export function ScheduleTab() {
   const upcomingForMeta = useMemo(() => {
     if (!tournaments) return [] as { id: string; defending_champion: string | null }[];
     return tournaments
-      .filter((t) => (t.status === 'scheduled' || t.status === 'created') && !!t.defending_champion)
+      .filter((t) => (t.status === 'scheduled' || t.status === 'created') && notStarted(t) && !!t.defending_champion)
       .filter((t) =>
         deriveFieldStrength({
           name: t.name,
@@ -186,8 +196,8 @@ export function ScheduleTab() {
     return {
       all: tourFiltered.length,
       live: tourFiltered.filter(t => t.status === 'inprogress').length,
-      // B43 FIX 1: remove isAfter
-      upcoming: tourFiltered.filter(t => t.status === 'scheduled' || t.status === 'created').length,
+      // Defensive: past events with stale 'scheduled' status don't count as upcoming
+      upcoming: tourFiltered.filter(t => (t.status === 'scheduled' || t.status === 'created') && notStarted(t)).length,
       // B45 FIX 1: include 'complete'
       completed: tourFiltered.filter(isCompleted).length,
     };
@@ -196,7 +206,7 @@ export function ScheduleTab() {
   const nextUpTournament = useMemo(() => {
     if (!tournaments) return null;
     return [...tournaments]
-      .filter(t => t.status === 'scheduled' || t.status === 'created')
+      .filter(t => (t.status === 'scheduled' || t.status === 'created') && notStarted(t))
       .sort((a, b) => {
         const dateDiff = new Date(a.start_date).getTime() - new Date(b.start_date).getTime();
         if (dateDiff !== 0) return dateDiff;
@@ -214,8 +224,8 @@ export function ScheduleTab() {
     if (!tournaments) return {} as Record<string, number>;
     let statusFiltered = [...tournaments];
     switch (filter) {
-      // B43 FIX 1: remove isAfter
-      case 'upcoming': statusFiltered = statusFiltered.filter(t => t.status === 'scheduled' || t.status === 'created'); break;
+      // Defensive: filter out past events with stale 'scheduled' status
+      case 'upcoming': statusFiltered = statusFiltered.filter(t => (t.status === 'scheduled' || t.status === 'created') && notStarted(t)); break;
       // B45 FIX 1: include 'complete'
       case 'completed': statusFiltered = statusFiltered.filter(isCompleted); break;
       case 'live': statusFiltered = statusFiltered.filter(t => t.status === 'inprogress'); break;
@@ -228,7 +238,7 @@ export function ScheduleTab() {
   const nextUpcoming = useMemo(() => {
     if (!tournaments) return undefined;
     return tournaments
-      .filter(t => t.status === 'scheduled' || t.status === 'created')
+      .filter(t => (t.status === 'scheduled' || t.status === 'created') && notStarted(t))
       .sort((a, b) => new Date(a.start_date).getTime() - new Date(b.start_date).getTime())[0];
   }, [tournaments]);
 
@@ -237,8 +247,8 @@ export function ScheduleTab() {
     let filtered = [...tournaments];
     if (activeTour !== 'all') filtered = filtered.filter(t => t.tour_code === activeTour);
     switch (filter) {
-      // B43 FIX 1: remove isAfter
-      case 'upcoming': filtered = filtered.filter(t => t.status === 'scheduled' || t.status === 'created'); break;
+      // Defensive: filter out past events with stale 'scheduled' status
+      case 'upcoming': filtered = filtered.filter(t => (t.status === 'scheduled' || t.status === 'created') && notStarted(t)); break;
       // B45 FIX 1: include 'complete'
       case 'completed': filtered = filtered.filter(isCompleted); break;
       case 'live': filtered = filtered.filter(t => t.status === 'inprogress'); break;
