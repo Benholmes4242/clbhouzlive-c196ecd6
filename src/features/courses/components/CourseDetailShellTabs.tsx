@@ -57,7 +57,6 @@ export const CourseDetailShellTabs: React.FC<CourseDetailShellTabsProps> = ({
           gap: overflowing ? 8 : 0,
           padding: overflowing ? '0 16px' : 0,
           background: '#F8FAFC',
-          borderBottom: '0.5px solid rgba(15,23,42,0.08)',
           overflowX: 'auto',
           overflowY: 'hidden',
           WebkitOverflowScrolling: 'touch',

@@ -277,7 +277,7 @@ const GolfClubView: React.FC<GolfClubViewProps> = ({ courseId, isInModal = false
           onTabChange={handleTabChange as any}
         />
       </ShellSlot>
-      <div style={{ paddingTop: 'var(--chrome-total-h, 0px)' }}>
+      <div style={{ paddingTop: 'calc(var(--chrome-total-h, 0px) - 1px)' }}>
         {heroBlock}
         {tabContent}
       </div>
