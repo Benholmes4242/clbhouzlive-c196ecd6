@@ -40,6 +40,48 @@ function getInitials(name: string): string {
   return name.split(' ').map(w => w[0]).filter(Boolean).slice(0, 2).join('').toUpperCase();
 }
 
+/**
+ * Multi-folder photo walker for the carousel banner image. Tries player
+ * candidates in order (event-tour folder first, then PGA/LIV/DPWT/KFT/
+ * Champions/LPGA). When all candidates miss, calls onExhausted so the
+ * caller can render the initials fallback.
+ */
+function PickBannerPhoto({
+  candidates,
+  alt,
+  withdrawn,
+  onExhausted,
+}: {
+  candidates: string[];
+  alt: string;
+  withdrawn: boolean;
+  onExhausted: () => void;
+}) {
+  const [idx, setIdx] = useState(0);
+  // Reset walker if the candidate set changes.
+  useEffect(() => { setIdx(0); /* eslint-disable-next-line react-hooks/exhaustive-deps */ }, [candidates.join('|')]);
+  const src = candidates[idx];
+  if (!src) return null;
+  return (
+    <img
+      src={src}
+      alt={alt}
+      className="w-full h-full object-cover"
+      style={{
+        objectPosition: 'center 20%',
+        borderRadius: '16px 16px 0 0',
+        opacity: withdrawn ? 0.4 : 1,
+      }}
+      loading="lazy"
+      decoding="async"
+      onError={() => {
+        if (idx + 1 < candidates.length) setIdx(idx + 1);
+        else onExhausted();
+      }}
+    />
+  );
+}
+
 export const LikelyWinnersCarousel = memo(function LikelyWinnersCarousel({
   featured,
   cards,
