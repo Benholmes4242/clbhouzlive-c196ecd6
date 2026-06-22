@@ -15,7 +15,7 @@ import { useCollegeMediaMap } from '../hooks/useCollegeMedia';
 import { useHeroAlumni } from '../hooks/useBatchCollegeAlumni';
 import { useFranchiseCaptains } from '../hooks/useFranchiseCaptains';
 import { useCollegeWeeklyMovers } from '../hooks/useCollegeMovers';
-import { AMBER, AMBER_SOFT_BG, INK, INK_FAINT, INK_TINT_06, INK_TINT_07, SLATE_50, SLATE_150, SURFACE } from '../_shared/tokens';
+import { AMBER, INK, INK_FAINT, INK_TINT_06, INK_TINT_07, HAIRLINE_INK_10, SLATE_50, SLATE_150, SURFACE } from '../_shared/tokens';
 
 type MetricTab = 'earnings' | 'wins' | 'top10s' | 'movers';
 const VALID_METRICS = new Set<string>(['earnings', 'wins', 'top10s', 'movers']);
