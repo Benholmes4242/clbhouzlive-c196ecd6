@@ -18,7 +18,7 @@ import { useFranchiseCaptains } from '../../hooks/useFranchiseCaptains';
 
 import { FranchiseCard } from './FranchiseCard';
 import { FranchiseMovers } from './FranchiseMovers';
-import { INK, INK_FAINT, INK_MUTE, INK_TINT_02, INK_TINT_06, INK_TINT_07, SURFACE } from '../../_shared/tokens';
+import { INK, INK_FAINT, INK_TINT_02, INK_TINT_06, INK_TINT_07, SURFACE } from '../../_shared/tokens';
 
 type MetricTab = 'earnings' | 'wins' | 'top10s' | 'movers';
 
@@ -49,8 +49,8 @@ export function FranchiseLeaderboard({
   const { data: collegeMap } = useCollegeMediaMap();
   const { data: moverInfo } = useTopMovers();
 
-  const { sortedStats, isTiedAtOne } = useMemo(() => {
-    if (!allStats) return { sortedStats: [] as CollegeSeasonStats[], isTiedAtOne: false };
+  const sortedStats = useMemo(() => {
+    if (!allStats) return [] as CollegeSeasonStats[];
     const getValue = (s: CollegeSeasonStats) => {
       switch (activeMetric) {
         case 'wins': return s.wins_total;
@@ -58,7 +58,7 @@ export function FranchiseLeaderboard({
         default: return s.earnings_total;
       }
     };
-    const sorted = [...allStats]
+    return [...allStats]
       .sort((a, b) => {
         const diff = getValue(b) - getValue(a);
         if (diff !== 0) return diff;
@@ -67,8 +67,6 @@ export function FranchiseLeaderboard({
       })
       .filter(s => (activeMetric === 'wins' || activeMetric === 'top10s') ? getValue(s) > 0 : true)
       .slice(0, limit);
-    const tied = sorted.length >= 2 && getValue(sorted[0]) === getValue(sorted[1]);
-    return { sortedStats: sorted, isTiedAtOne: tied };
   }, [allStats, activeMetric, limit]);
 
   const collegeSlugs = useMemo(() => sortedStats.map(s => s.normalized_name), [sortedStats]);
