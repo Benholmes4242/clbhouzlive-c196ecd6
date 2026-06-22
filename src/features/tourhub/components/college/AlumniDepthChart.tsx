@@ -73,7 +73,7 @@ function AlumniRow({ alumnus, index, tier, legacyContextLabel }: AlumniRowProps)
   const liveRank = alumnus.world_ranking && alumnus.world_ranking > 0 && alumnus.world_ranking < 500
     ? alumnus.world_ranking
     : null;
-  const photoUrl = getPlayerHeadshotUrl(fullName, alumnus.tour_codes?.[0] ?? 'pga');
+  const photoCandidates = getPlayerHeadshotCandidates(fullName, alumnus.tour_codes?.[0] ?? 'pga');
   const tourTag = getPlayerTourTag(alumnus.tour_codes);
 
   // Legacy rows show editorial context line (from legacy_alumni table);
