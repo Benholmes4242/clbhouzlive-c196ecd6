@@ -265,7 +265,9 @@ export function LeaderboardBand({
                   score={fmtScore(slot.score)}
                   thru="F"
                   players={slot.members.map((m: any) => ({
-                    avatarUrl: entryAvatar(m),
+                    avatarCandidates: entryAvatars(m),
+                    playerId: entryPlayerId(m),
+                    name: entryName(m),
                     rounds: extractRounds(m),
                   }))}
                   par={sparklinePar}
