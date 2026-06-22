@@ -760,7 +760,7 @@ export function PlayersTab() {
               champion={champion}
               runnerUp={top5[1] ?? null}
               champStats={champStats}
-              champPhotoUrl={champPhotoUrl}
+              champAvatarCandidates={champAvatarCandidates}
               sort={sort}
               activeTour={activeTour}
               onClick={() => navigate(`/tourhub/player/${champion.playerId}`)}
