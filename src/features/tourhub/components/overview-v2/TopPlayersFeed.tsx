@@ -138,25 +138,25 @@ export function TopPlayersFeed({ players, maxEvents, maxCuts }: TopPlayersFeedPr
               to={`/tourhub/player/${stat.player_id}`}
               className="flex items-center gap-3 p-3 rounded-xl bg-muted/30 hover:bg-muted/50 transition-colors group"
             >
-              {/* Avatar with halo - now the left-most element */}
-              <div 
-                className="relative w-10 h-10 rounded-full flex items-center justify-center overflow-hidden shrink-0"
+              {/* Avatar — canonical multi-folder walk + initials fallback */}
+              <div
+                className="relative flex items-center justify-center shrink-0"
                 style={{
-                  background: 'hsl(var(--muted))',
                   boxShadow: rankIntensity > 0 ? `0 0 8px hsl(var(--primary) / ${rankIntensity})` : 'none',
+                  borderRadius: '34%',
                 }}
               >
-                {(() => {
-                  const headshot = getPlayerHeadshotUrl(stat.player?.full_name ?? '', stat.player?.tour_codes?.[0] ?? 'pga');
-                  return (
-                    <img 
-                      src={headshot}
-                      alt={stat.player?.full_name ?? ''}
-                      className="w-10 h-10 object-cover"
-                      onError={(e) => { (e.target as HTMLImageElement).src = PLAYER_SILHOUETTE_URL; }}
-                    />
-                  );
-                })()}
+                <SquircleAvatar
+                  size={40}
+                  srcCandidates={resolvePlayerAvatarCandidates({
+                    name: stat.player?.full_name ?? '',
+                    photoUrl: (stat.player as any)?.photo_url ?? null,
+                    tourSlug: stat.player?.tour_codes?.[0] ?? 'pga',
+                  })}
+                  alt={stat.player?.full_name ?? ''}
+                  userId={stat.player?.id ?? stat.player?.full_name ?? ''}
+                  hideRing
+                />
               </div>
 
               {/* Player Info */}
