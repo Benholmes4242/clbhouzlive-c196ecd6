@@ -71,17 +71,23 @@ function scoreColor(score: number | null | undefined): string {
 
 const ROW_BORDER = '0.5px solid rgba(255,255,255,0.08)';
 
+type StackedAvatarItem = { url: string | null; name?: string; userId?: string | null };
+
 function StackedAvatarsDark({
   urls,
+  items,
   size = 22,
 }: {
-  urls: (string | null)[];
+  urls?: (string | null)[];
+  items?: StackedAvatarItem[];
   size?: number;
 }) {
-  const visible = urls.slice(0, 4);
+  const resolved: StackedAvatarItem[] =
+    items ?? (urls ?? []).map((u) => ({ url: u }));
+  const visible = resolved.slice(0, 4);
   return (
     <div style={{ display: 'flex', alignItems: 'center', flexShrink: 0 }}>
-      {visible.map((url, i) => (
+      {visible.map((it, i) => (
         <div
           key={i}
           style={{
@@ -90,21 +96,19 @@ function StackedAvatarsDark({
             borderRadius: '34%',
             marginLeft: i === 0 ? 0 : -8,
             border: '1.5px solid #141C28',
-            background: 'rgba(255,255,255,0.08)',
             overflow: 'hidden',
             flexShrink: 0,
             zIndex: visible.length - i,
             position: 'relative',
           }}
         >
-          {url && (
-            <img
-              src={url}
-              alt=""
-              loading="lazy"
-              style={{ width: '100%', height: '100%', objectFit: 'cover' }}
-            />
-          )}
+          <SquircleAvatar
+            src={it.url}
+            alt={it.name || ''}
+            userId={it.userId ?? null}
+            size={size - 3}
+            hideRing
+          />
         </div>
       ))}
     </div>
