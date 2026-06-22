@@ -239,7 +239,7 @@ export function FranchiseCard({
               {deltas.earnings_rank_change !== null && deltas.earnings_rank_change !== 0 && (
                 <div style={{
                   fontSize: 12, fontWeight: 800, fontVariantNumeric: 'tabular-nums',
-                  color: deltas.earnings_rank_change > 0 ? LIVE_INK : TREND_DOWN,
+                  color: deltaColor,
                   marginBottom: 2,
                 }}>
                   {deltas.earnings_rank_change > 0 ? `+${deltas.earnings_rank_change}` : String(deltas.earnings_rank_change)}
@@ -247,7 +247,7 @@ export function FranchiseCard({
               )}
               <div style={{
                 fontSize: 15, fontWeight: 800, fontVariantNumeric: 'tabular-nums',
-                color: deltas.earnings_delta >= 0 ? LIVE_INK : TREND_DOWN,
+                color: deltaColor,
               }}>
                 {formatDeltaValue(deltas.earnings_delta)}
               </div>
