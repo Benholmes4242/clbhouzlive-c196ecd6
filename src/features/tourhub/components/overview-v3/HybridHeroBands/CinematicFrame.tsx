@@ -31,11 +31,11 @@ import { fmtScore, formatRank, buildLeaderboardSlots, roundLabel } from '../Hybr
 import { Ticker } from './Ticker';
 import { formatPurse } from '../../shared/TourHeroHelpers';
 
-const TICKER_BAR_H = 40;
+const TICKER_BAR_H = 34;
 const CHAMPION_BAND_H = 62;
 const UPCOMING_BAND_H = 104;
 const LIVE_BOTTOM_H = CHAMPION_BAND_H + TICKER_BAR_H;
-const RESULTS_FOOTER_H = 40;
+const RESULTS_FOOTER_H = 34;
 const BOTTOM_STACK_H = TICKER_BAR_H + CHAMPION_BAND_H;
 import { getPlayerHeadshotUrl } from '@/utils/playerHeadshot';
 import type { DefendingChampData } from '../../../hooks/useTournamentDefendingChamp';
@@ -1044,7 +1044,7 @@ export function CinematicFrame({
               display: 'block', width: '100%', textAlign: 'left',
             }}
           >
-            <div style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '13px 16px', background: 'rgba(10,14,20,0.50)', backdropFilter: 'blur(10px)', WebkitBackdropFilter: 'blur(10px)', borderTop: '0.5px solid rgba(255,255,255,0.18)' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '13px 20px', background: 'rgba(10,14,20,0.50)', backdropFilter: 'blur(10px)', WebkitBackdropFilter: 'blur(10px)', borderTop: '0.5px solid rgba(255,255,255,0.18)' }}>
               {(() => {
                 const headshot = (tourSlug && defendingChamp.name)
                   ? (() => { try { return getPlayerHeadshotUrl(defendingChamp.name, tourSlug); } catch { return null; } })()
@@ -1099,7 +1099,7 @@ export function CinematicFrame({
                   display: 'flex',
                   alignItems: 'center',
                   gap: 10,
-                  padding: '13px 16px 11px',
+                  padding: '13px 20px',
                   background: 'rgba(10,14,20,0.50)',
                   backdropFilter: 'blur(10px)',
                   WebkitBackdropFilter: 'blur(10px)',
@@ -1142,7 +1142,7 @@ export function CinematicFrame({
             border: 'none', borderTop: '0.5px solid rgba(255,255,255,0.18)', cursor: 'pointer',
             background: 'rgba(10,14,20,0.50)',
             backdropFilter: 'blur(10px)', WebkitBackdropFilter: 'blur(10px)',
-            padding: '14px 18px calc(14px + env(safe-area-inset-bottom, 0px))',
+            padding: '9px 18px calc(9px + env(safe-area-inset-bottom, 0px))',
             width: '100%',
           }}
         >
