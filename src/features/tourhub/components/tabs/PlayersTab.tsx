@@ -515,9 +515,6 @@ export function PlayersTab() {
     }
 
     filtered = [...filtered].sort((a, b) => {
-      const aWorldRank = rankMap.get(a.id)?.worldRank ?? Infinity;
-      const bWorldRank = rankMap.get(b.id)?.worldRank ?? Infinity;
-
       // Never fall back to OWGR for the tour-points sorts — players without a
       // tour rank sort to the bottom rather than being slotted by world ranking.
       const aRank = statsMap.get(a.id)?.tourRank ?? Infinity;
