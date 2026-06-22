@@ -261,6 +261,7 @@ function TiedChasersRowDark({
   count,
   score,
   avatars,
+  items,
   isLast,
   onTap,
   isResults = false,
@@ -268,7 +269,8 @@ function TiedChasersRowDark({
   rank: string;
   count: number;
   score: number;
-  avatars: (string | null)[];
+  avatars?: (string | null)[];
+  items?: StackedAvatarItem[];
   isLast: boolean;
   onTap?: () => void;
   isResults?: boolean;
@@ -292,7 +294,7 @@ function TiedChasersRowDark({
       >
         {rank}
       </span>
-      <StackedAvatarsDark urls={avatars} size={26} />
+      <StackedAvatarsDark urls={avatars} items={items} size={26} />
       <span
         style={{
           flex: 1, minWidth: 0, fontSize: 14, fontWeight: 600, color: 'white',
