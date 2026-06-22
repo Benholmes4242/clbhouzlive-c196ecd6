@@ -179,7 +179,7 @@ interface TiedChasersRowProps {
   count: number;
   score: string;
   thru: string;
-  players: { avatarUrl?: string | null; rounds?: number[] }[];
+  players: StackedAvatarPlayer[];
   par?: number;
   isLast?: boolean;
   isResults?: boolean;
