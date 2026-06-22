@@ -160,11 +160,13 @@ function HeroChampion({ champion, champStats, champAvatarCandidates, sort, activ
         {/* Photo + "1" badge */}
         <div style={{ position: 'relative', flexShrink: 0 }}>
           <div style={{ width: 80, height: 80, borderRadius: '34%', overflow: 'hidden', background: INK_TINT_06, border: `2.5px solid ${GOLD}`, boxShadow: '0 4px 12px rgba(255,184,0,0.20)' }}>
-            <img
-              src={champPhotoUrl}
+            <SquircleAvatar
+              size={75}
+              srcCandidates={champAvatarCandidates}
               alt={champion.playerName}
-              style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center 8%' }}
-              onError={e => { (e.target as HTMLImageElement).src = PLAYER_SILHOUETTE_URL; }}
+              userId={champion.playerId}
+              hideRing
+              priority
             />
           </div>
           <div
