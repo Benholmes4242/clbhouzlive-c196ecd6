@@ -714,6 +714,7 @@ function PickMiniRow({
         playerId={pick.playerId}
         playerName={pick.playerName}
         tourCode={pick.tourCode}
+        photoUrl={(pick as any).photoUrl ?? (pick as any).photo_url ?? null}
         size="sm"
       />
       <div style={{ flex: 1, minWidth: 0, display: 'flex', alignItems: 'center', gap: 6 }}>
