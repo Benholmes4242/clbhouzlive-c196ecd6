@@ -247,7 +247,12 @@ export function PlayersTab() {
     const now = new Date();
     return now.getMonth() >= 9 ? now.getFullYear() + 1 : now.getFullYear();
   }, []);
-  const { data: tourRankings } = useTourSeasonRankings(tourRankingsCode, seasonYear);
+  const { data: tourRankings, isPending: tourRankingsPending } = useTourSeasonRankings(tourRankingsCode, seasonYear);
+
+  // Non-PGA tours depend on tour_season_rankings for sort + display. Block paint
+  // until it resolves so we never flash an OWGR-ordered interim (race fix).
+  const isNonPgaTour = activeTour === 'EURO' || activeTour === 'LPGA' || activeTour === 'PGAD' || activeTour === 'LIV' || activeTour === 'CHAMP';
+  const tourRanksLoading = isNonPgaTour && (tourRankingsPending || !tourRankings);
 
   // Reset pagination on search/sort change
   useEffect(() => {
