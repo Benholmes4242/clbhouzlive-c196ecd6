@@ -23,6 +23,7 @@ import type { CollegeMomentum } from '../../hooks/useCollegeStatus';
 import type { AlumniFace } from '../../hooks/useBatchCollegeAlumni';
 import type { FranchiseCaptain } from '../../hooks/useFranchiseCaptains';
 import { MovementIndicator } from '../shared/MovementIndicator';
+import { PlayerInitialAvatar } from '../shared/PlayerInitialAvatar';
 import { splitStatValue } from '../../utils/splitStatValue';
 import {
   captainDominates,
