@@ -83,6 +83,7 @@ export const TourHubShellTabs: React.FC = () => {
         background: '#F8FAFC',
         display: 'flex',
         alignItems: 'stretch',
+        borderBottom: '0.5px solid rgba(15,23,42,0.08)',
       }}
     >
       <div style={{ position: 'relative', minWidth: 0, flex: '1 1 auto' }}>
@@ -134,8 +135,6 @@ export const TourHubShellTabs: React.FC = () => {
                 <span
                   style={{
                     display: 'inline-block',
-                    paddingBottom: 4,
-                    borderBottom: isActive ? '1.5px solid #0A0E14' : '1.5px solid transparent',
                   }}
                 >
                   {tab.label}
