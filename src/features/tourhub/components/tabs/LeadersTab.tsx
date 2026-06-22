@@ -172,13 +172,12 @@ export function LeadersTab() {
     return map;
   }, [playerStats, worldRankings]);
 
-  // ─── Hero leader (#1) + runner for margin ───
+  // ─── Hero leader (#1) ───
   // Lifted above the loading early return so hook order stays stable across
   // renders (was: React error #310 when isLoading flipped). All downstream
   // react-query hooks have `enabled` guards (verified in audit Q3) so they
   // sit idle until rankedPlayers materialises.
   const leader = rankedPlayers[0] ?? null;
-  const runnerUp = rankedPlayers[1] ?? null;
 
   // ─── Search-filtered list (hero #1 stays in list) ───
   const filteredPlayers = useMemo(() => {
