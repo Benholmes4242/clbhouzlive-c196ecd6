@@ -240,6 +240,11 @@ export function HybridHero({ slide, activeTournamentId, onSelectTour }: HybridHe
       score: f.score,
       year: f.year,
       avatarUrl: f.photoUrl,
+      avatarCandidates: resolvePlayerAvatarCandidates({
+        name: f.name,
+        photoUrl: f.photoUrl ?? null,
+        tourSlug: tournament.tourSlug ?? 'pga',
+      }),
     }));
   }, [state, lastYearTop4]);
 
