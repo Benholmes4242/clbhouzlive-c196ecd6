@@ -1,187 +1,191 @@
 /**
- * TournamentHero - Full-bleed course photo with editorial narrative pills.
- *
- * Hero pill matrix (state-driven, computed inside this component):
- *   - Upcoming  (2 pills): days-to-start, defending champion
- *                          [Field-size pill DROPPED in Phase 1 — see audit D1.
- *                          No source for upcoming-tournament field count.]
- *   - Live      (3 pills): Round N (with LivePulse), leader+score (accent),
- *                          cut-or-red-figures
- *   - Completed (2 pills): Won by {margin} (accent), {underPar} finished under par
- *
- * Pill placement: rendered ABOVE the title in the upper-mid overlay region.
- * The bottom of the gradient is too dark for the 'normal' pill variant to read
- * (see audit D6 / placement clarification).
+ * TournamentHero — Gold champion card on SLATE_50 (no full-bleed image).
+ * Pills row (tour + optional MAJOR), name/venue/date column, purse stat,
+ * and a champion strip (winner) / live indicator / upcoming caption.
  */
 
+import { Link } from 'react-router-dom';
 import { format, isSameMonth } from 'date-fns';
+import { Trophy, Calendar, ChevronRight } from 'lucide-react';
+import CountryFlag from '@/components/ui/country-flag';
 import type { TourTournament } from '../../hooks/useTourHubData';
-import { SHELL_BG, SURFACE } from '../../_shared/tokens';
+import { isAnyMajor } from '../../utils/majorScope';
+import {
+  AMBER, GOLD_BORDER, GOLD_DEEP, GOLD_TINT, GOLD_TINT_10,
+  INK, INK_FAINT, INK_MUTE, SCORE_OVER_PAR_LIGHT, SLATE_50, STATUS_LIVE,
+} from '../../_shared/tokens';
 
-const COUNTRY_NAMES: Record<string, string> = {
-  USA: 'United States', ENG: 'England', SCO: 'Scotland', WAL: 'Wales', IRL: 'Ireland',
-  MEX: 'Mexico', CAN: 'Canada', AUS: 'Australia', RSA: 'South Africa', ESP: 'Spain',
-  GER: 'Germany', FRA: 'France', JPN: 'Japan', KOR: 'South Korea', CHN: 'China',
-  NZL: 'New Zealand', SWE: 'Sweden', DEN: 'Denmark', NOR: 'Norway', FIN: 'Finland',
-  ITA: 'Italy', ARG: 'Argentina', COL: 'Colombia', VEN: 'Venezuela', BRA: 'Brazil',
-  ZIM: 'Zimbabwe', FIJ: 'Fiji', THA: 'Thailand', PHI: 'Philippines', IND: 'India',
-  TPE: 'Chinese Taipei', CHI: 'Chile', PAR: 'Paraguay', URU: 'Uruguay', PAN: 'Panama',
-  BAH: 'Bahamas', BER: 'Bermuda', PUR: 'Puerto Rico', GRN: 'Grenada', TTO: 'Trinidad',
-  AUT: 'Austria', BEL: 'Belgium', NED: 'Netherlands', POR: 'Portugal', CZE: 'Czech Republic',
-  POL: 'Poland', SVK: 'Slovakia', HUN: 'Hungary', SUI: 'Switzerland', GBR: 'Great Britain',
-  NIR: 'Northern Ireland',
-};
-
-function expandCountry(code: string | null | undefined): string | null {
-  if (!code) return null;
-  return COUNTRY_NAMES[code.toUpperCase()] ?? code;
+interface LbWinner {
+  position: number;
+  score: number | null;
+  player?: { id: string; full_name: string; country?: string | null; country_code?: string | null };
 }
 
 interface TournamentHeroProps {
   tournament: TourTournament;
-  imageUrl: string | null;
+  leaderboard?: LbWinner[] | null | undefined;
+  isLive?: boolean;
+  isCompleted?: boolean;
+  isUpcoming?: boolean;
 }
 
 function formatDateRange(startDate: string, endDate: string): string {
   const start = new Date(startDate);
   const end = new Date(endDate);
-  if (isSameMonth(start, end)) {
-    return `${format(start, 'MMM d')} – ${format(end, 'd, yyyy')}`;
-  }
+  if (isSameMonth(start, end)) return `${format(start, 'MMM d')} – ${format(end, 'd, yyyy')}`;
   return `${format(start, 'MMM d')} – ${format(end, 'MMM d, yyyy')}`;
 }
 
-export function TournamentHero({ tournament, imageUrl }: TournamentHeroProps) {
-  const formattedPurse = tournament.purse
-    ? `$${(tournament.purse / 1_000_000).toFixed(1)}M`
-    : null;
+function formatScore(score: number | null | undefined): string {
+  if (score === null || score === undefined) return '—';
+  if (score === 0) return 'E';
+  return score > 0 ? `+${score}` : String(score);
+}
 
+export function TournamentHero({ tournament, leaderboard, isLive, isCompleted, isUpcoming }: TournamentHeroProps) {
+  const formattedPurse = tournament.purse ? `$${(tournament.purse / 1_000_000).toFixed(1)}M` : null;
   const dateRange = tournament.start_date && tournament.end_date
     ? formatDateRange(tournament.start_date, tournament.end_date)
     : null;
+  const tourLabel = tournament.tour_full_name ?? tournament.tour_code ?? '';
+  const major = isAnyMajor(tournament.name);
+
+  const venueLine = [tournament.venue_name, tournament.venue_city].filter(Boolean).join(' · ');
+
+  const winner = isCompleted
+    ? (leaderboard ?? []).find((e) => e.position === 1) ?? (leaderboard ?? [])[0] ?? null
+    : null;
+
+  const currentRound = (tournament as any).current_round as number | null | undefined;
 
   return (
-    <div style={{ background: SHELL_BG }}>
-      {/* Full-bleed hero image with gradient */}
-      <div
-        style={{
-          position: 'relative',
-          height: '240px',
-          overflow: 'hidden',
-        }}
-      >
-        {imageUrl ? (
-          <img
-            src={imageUrl}
-            alt={tournament.venue_name || tournament.name}
-            style={{
-              position: 'absolute',
-              inset: 0,
-              width: '100%',
-              height: '100%',
-              objectFit: 'cover',
-              objectPosition: 'center 40%',
-            }}
-            loading="eager"
-            fetchPriority="high"
-            onError={e => {
-              e.currentTarget.style.display = 'none';
-            }}
-          />
-        ) : (
-          <div
-            style={{
-              position: 'absolute',
-              inset: 0,
-              background: 'linear-gradient(160deg, rgba(255,255,255,0.03) 0%, rgba(255,255,255,0.07) 100%)',
-            }}
-          />
-        )}
+    <div style={{ background: SLATE_50, padding: '10px 0 14px' }}>
+      {/* Section eyebrow → back to Schedule */}
+      <div style={{ padding: '0 16px 8px' }}>
+        <Link
+          to="/tourhub?tab=schedule"
+          style={{
+            display: 'inline-flex', alignItems: 'center', gap: 5,
+            color: AMBER, fontSize: 10, fontWeight: 800,
+            letterSpacing: '0.16em', textTransform: 'uppercase',
+            textDecoration: 'none',
+          }}
+          className="active:opacity-70 transition-opacity"
+        >
+          <Calendar size={11} strokeWidth={2.5} />
+          <span>Tournament</span>
+          <ChevronRight size={12} strokeWidth={2.5} />
+        </Link>
+      </div>
 
-        {/* Dark gradient overlay — top and bottom */}
+      <div style={{ margin: '0 16px' }}>
         <div
           style={{
-            position: 'absolute',
-            inset: 0,
-            background:
-            'linear-gradient(to bottom, rgba(15,23,42,0.50) 0%, rgba(15,23,42,0.0) 32%, rgba(15,23,42,0.55) 100%)',
+            background: `linear-gradient(180deg, ${GOLD_TINT_10} 0%, ${GOLD_TINT} 100%)`,
+            border: `1px solid ${GOLD_BORDER}`,
+            borderRadius: 14,
+            padding: 14,
           }}
-        />
-
-        {/* Top — date range only (pills removed) */}
-        {dateRange && (
-          <div
-            style={{
-              position: 'absolute',
-              top: '14px',
-              left: 16,
-              right: 16,
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'flex-end',
-              gap: 12,
-            }}
-          >
-            <span
-              style={{
-                fontSize: 10,
-                fontWeight: 700,
-                letterSpacing: '0.16em',
-                color: 'rgba(255,255,255,0.75)',
-                textShadow: '0 1px 3px rgba(0,0,0,0.45)',
+        >
+          {/* Pills row */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 12, flexWrap: 'wrap' }}>
+            {tourLabel && (
+              <span style={{
+                padding: '3px 7px', background: '#1E3A8A', color: '#fff',
+                fontSize: 9, fontWeight: 800, borderRadius: 3, letterSpacing: '0.04em',
                 textTransform: 'uppercase',
-                whiteSpace: 'nowrap',
-                fontVariantNumeric: 'tabular-nums',
-              }}
-            >
-              {dateRange}
-            </span>
+              }}>{tourLabel}</span>
+            )}
+            {major && (
+              <span style={{
+                padding: '3px 7px', background: '#FFF', border: `1px solid ${GOLD_BORDER}`,
+                color: GOLD_DEEP, fontSize: 9, fontWeight: 800, borderRadius: 3, letterSpacing: '0.04em',
+              }}>★ MAJOR</span>
+            )}
           </div>
-        )}
 
-        {/* Bottom — location + tournament name */}
-        <div style={{ position: 'absolute', bottom: 50, left: 16, right: 16 }}>
-          <h1 style={{ fontSize: 22, fontWeight: 800, color: SURFACE, letterSpacing: '-0.025em', lineHeight: 1.15, margin: '0 0 6px', textShadow: '0 1px 6px rgba(0,0,0,0.6)' }}>
-            {tournament.name}
-          </h1>
-          {(tournament.venue_city || tournament.venue_country) && (
+          {/* Body row */}
+          <div style={{ display: 'flex', alignItems: 'flex-start', gap: 14 }}>
+            <div style={{ flex: 1, minWidth: 0 }}>
+              <h1 style={{
+                fontSize: 22, fontWeight: 800, color: INK, lineHeight: 1.05,
+                letterSpacing: '-0.01em', margin: 0,
+              }}>
+                {tournament.name}
+              </h1>
+              {venueLine && (
+                <div style={{ fontSize: 12, fontWeight: 600, color: INK_MUTE, marginTop: 5 }}>
+                  {venueLine}
+                </div>
+              )}
+              {dateRange && (
+                <div style={{ fontSize: 11, fontWeight: 600, color: INK_FAINT, marginTop: 2, fontVariantNumeric: 'tabular-nums' }}>
+                  {dateRange}
+                </div>
+              )}
+            </div>
+            {formattedPurse && (
+              <div style={{ textAlign: 'right', flexShrink: 0 }}>
+                <div style={{
+                  fontSize: 22, fontWeight: 800, color: INK, lineHeight: 1,
+                  fontVariantNumeric: 'tabular-nums', letterSpacing: '-0.01em',
+                }}>{formattedPurse}</div>
+                <div style={{
+                  fontSize: 9, fontWeight: 800, color: INK_MUTE,
+                  letterSpacing: '0.12em', marginTop: 3,
+                }}>PURSE</div>
+              </div>
+            )}
+          </div>
+
+          {/* Champion / live / upcoming strip */}
+          {isCompleted && winner && (
             <div style={{
-              fontSize: 13,
-              fontWeight: 500,
-              color: 'rgba(255,255,255,0.85)',
-              letterSpacing: '-0.005em',
-              textShadow: '0 1px 4px rgba(0,0,0,0.6)',
+              display: 'flex', alignItems: 'center', gap: 8,
+              marginTop: 12, paddingTop: 12, borderTop: `0.5px solid ${GOLD_BORDER}`,
             }}>
-              {[tournament.venue_city, expandCountry(tournament.venue_country)].filter(Boolean).join(', ')}
+              <Trophy size={14} color={GOLD_DEEP} strokeWidth={2.2} />
+              <CountryFlag country={winner.player?.country ?? winner.player?.country_code} size="sm" />
+              <span style={{ fontSize: 13, fontWeight: 800, color: INK, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                {winner.player?.full_name ?? 'Champion'}
+              </span>
+              <span style={{
+                fontSize: 13, fontWeight: 800,
+                color: (winner.score ?? 0) < 0 ? SCORE_OVER_PAR_LIGHT : INK,
+                marginLeft: 'auto', fontVariantNumeric: 'tabular-nums',
+              }}>
+                {formatScore(winner.score)}
+              </span>
             </div>
           )}
-        </div>
 
-        {/* PURSE/PAR/YARDS — floating glass pills */}
-        <div style={{ position: 'absolute', left: 16, right: 16, bottom: 12, display: 'flex', gap: 7, flexWrap: 'wrap' as const }}>
-          {[
-            { label: 'PURSE', value: formattedPurse ?? '—' },
-            { label: 'PAR', value: tournament.venue_par ? String(tournament.venue_par) : '—' },
-            { label: 'YDS', value: tournament.venue_yardage ? tournament.venue_yardage.toLocaleString() : '—' },
-          ].map((s) => (
-            <div
-              key={s.label}
-              style={{
-                display: 'flex',
-                alignItems: 'baseline',
-                gap: 5,
-                background: 'rgba(10,14,20,0.50)',
-                backdropFilter: 'blur(10px)',
-                WebkitBackdropFilter: 'blur(10px)',
-                border: '0.5px solid rgba(255,255,255,0.18)',
-                borderRadius: 8,
-                padding: '5px 9px',
-              }}
-            >
-              <span style={{ fontSize: 9, fontWeight: 800, letterSpacing: '0.10em', color: 'rgba(255,255,255,0.60)' }}>{s.label}</span>
-              <span style={{ fontSize: 12, fontWeight: 800, color: SURFACE, fontVariantNumeric: 'tabular-nums', letterSpacing: '-0.01em' }}>{s.value}</span>
+          {isLive && (
+            <div style={{
+              display: 'flex', alignItems: 'center', gap: 8,
+              marginTop: 12, paddingTop: 12, borderTop: `0.5px solid ${GOLD_BORDER}`,
+            }}>
+              <span style={{
+                width: 7, height: 7, borderRadius: '50%', background: STATUS_LIVE,
+                boxShadow: `0 0 0 3px rgba(16,185,129,0.18)`,
+              }} />
+              <span style={{
+                fontSize: 11, fontWeight: 800, color: STATUS_LIVE,
+                letterSpacing: '0.14em', textTransform: 'uppercase',
+              }}>
+                Live{currentRound ? ` · R${currentRound}` : ''}
+              </span>
             </div>
-          ))}
+          )}
+
+          {isUpcoming && tournament.start_date && (
+            <div style={{
+              marginTop: 12, paddingTop: 12, borderTop: `0.5px solid ${GOLD_BORDER}`,
+              fontSize: 11, fontWeight: 700, color: INK_MUTE,
+              letterSpacing: '0.10em', textTransform: 'uppercase',
+            }}>
+              Starts {format(new Date(tournament.start_date), 'MMM d')}
+            </div>
+          )}
         </div>
       </div>
     </div>
