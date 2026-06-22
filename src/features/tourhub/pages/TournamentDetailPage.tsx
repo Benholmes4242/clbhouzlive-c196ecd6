@@ -89,24 +89,24 @@ export function TournamentDetailPage() {
 
   if (isLoading) {
     return (
-      <TourHubShell immersive={true}>
-        {/* Slate masthead skeleton */}
-        <div style={{ background: SHELL_BG, padding: '16px 16px 0' }} className="animate-pulse">
+      <TourHubShell>
+        {/* Light masthead skeleton */}
+        <div style={{ background: SLATE_50, padding: '16px 16px 0' }} className="animate-pulse">
           {/* Pills row */}
           <div style={{ display: 'flex', gap: 6, marginBottom: 60 }}>
-            <div style={{ height: 22, width: 88, background: WHITE_ALPHA_10, borderRadius: 6 }} />
-            <div style={{ height: 22, width: 140, background: WHITE_ALPHA_10, borderRadius: 6 }} />
+            <div style={{ height: 22, width: 88, background: INK_TINT_06, borderRadius: 6 }} />
+            <div style={{ height: 22, width: 140, background: INK_TINT_06, borderRadius: 6 }} />
           </div>
           {/* h1 */}
-          <div style={{ height: 22, width: '65%', background: WHITE_ALPHA_10, borderRadius: 4, marginBottom: 8 }} />
+          <div style={{ height: 22, width: '65%', background: INK_TINT_06, borderRadius: 4, marginBottom: 8 }} />
           {/* Subhead */}
-          <div style={{ height: 13, width: '55%', background: WHITE_ALPHA_10, borderRadius: 4, marginBottom: 16 }} />
+          <div style={{ height: 13, width: '55%', background: INK_TINT_06, borderRadius: 4, marginBottom: 16 }} />
           {/* 3-col stat strip */}
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', borderTop: `0.5px solid ${WHITE_ALPHA_08}` }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', borderTop: `0.5px solid ${INK_TINT_06}` }}>
             {[0, 1, 2].map(i => (
               <div key={i} style={{ padding: '9px 0 11px', textAlign: 'center', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4 }}>
-                <div style={{ height: 8, width: 40, background: WHITE_ALPHA_10, borderRadius: 4 }} />
-                <div style={{ height: 13, width: 50, background: WHITE_ALPHA_10, borderRadius: 4 }} />
+                <div style={{ height: 8, width: 40, background: INK_TINT_06, borderRadius: 4 }} />
+                <div style={{ height: 13, width: 50, background: INK_TINT_06, borderRadius: 4 }} />
               </div>
             ))}
           </div>
@@ -134,7 +134,7 @@ export function TournamentDetailPage() {
   
   if (!tournament) {
     return (
-      <TourHubShell immersive={true}>
+      <TourHubShell>
         <div className="pt-6 px-5">
           <div className="flex items-center justify-center py-20">
             <div className="text-center space-y-4">
@@ -290,7 +290,7 @@ export function TournamentDetailPage() {
   };
   
   return (
-    <TourHubShell immersive={true}>
+    <TourHubShell>
       <ShellSlot>
         <TournamentTabsShellRow
           activeTab={activeTab}
