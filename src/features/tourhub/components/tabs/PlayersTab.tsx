@@ -805,7 +805,7 @@ export function PlayersTab() {
           if (tabs.length <= 1) return null;
 
           return (
-            <div style={{ display: 'flex', borderBottom: `1px solid ${HAIRLINE_INK_10}`, marginTop: '6px' }}>
+            <div style={{ display: 'flex', borderBottom: `1px solid ${HAIRLINE_INK_10}` }}>
               {tabs.map(tab => {
                 const isActive = sort === tab.value;
                 return (
