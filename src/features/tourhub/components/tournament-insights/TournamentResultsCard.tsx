@@ -94,6 +94,9 @@ function WinnerHeroPhoto({
       style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: '50% 8%' }}
     />
   );
+}
+
+
 
 // ─── Component ───────────────────────────────────────────────────────────────
 
