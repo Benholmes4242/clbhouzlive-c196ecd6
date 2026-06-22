@@ -56,23 +56,22 @@ function entryThru(e: any): string {
   return String(e.thru);
 }
 function resolveAvatar(e: any, tourSlug?: string | null): string | null {
-  const direct = e?.player?.photo_url ?? null;
-  if (direct) return direct;
-  const name = entryName(e);
-  if (!name || name === '—' || !tourSlug) return null;
-  try { return getPlayerHeadshotUrl(name, tourSlug); } catch { return null; }
+  return resolveAvatarCandidates(e, tourSlug)[0] ?? null;
 }
 /**
  * Ordered headshot candidates for a leaderboard entry. Tries event-tour
  * folder first, then PGA Tour, then the rest — covers cross-tour players
  * (e.g. PGA player at a co-sanctioned/euro major). DB photo_url short-circuits.
+ *
+ * Thin wrapper around the canonical {@link resolvePlayerAvatarCandidates}
+ * so the hero and every Players surface share one implementation.
  */
 function resolveAvatarCandidates(e: any, tourSlug?: string | null): string[] {
-  const direct = e?.player?.photo_url ?? null;
-  if (direct) return [direct];
-  const name = entryName(e);
-  if (!name || name === '—' || !tourSlug) return [];
-  try { return getPlayerHeadshotCandidates(name, tourSlug); } catch { return []; }
+  return resolvePlayerAvatarCandidates({
+    name: entryName(e),
+    photoUrl: e?.player?.photo_url ?? null,
+    tourSlug: tourSlug ?? null,
+  });
 }
 function nameCandidates(name: string | null | undefined, tourSlug?: string | null): string[] {
   if (!name || !tourSlug) return [];
