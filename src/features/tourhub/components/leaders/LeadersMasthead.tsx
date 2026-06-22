@@ -145,10 +145,11 @@ export function LeadersMasthead({
   const formattedValue = `${fmt(leader.value)}${unit ? ` ${unit}` : ''}`;
   const { integer, decimal, suffix } = splitStatValue(formattedValue);
   const countryName = titleCaseCountry(leader.player.country);
-  const photoUrl = getPlayerHeadshotUrl(
-    leader.player.full_name,
-    leader.player.tour_codes?.[0] ?? 'pga'
-  );
+  const avatarCandidates = resolvePlayerAvatarCandidates({
+    name: leader.player.full_name,
+    photoUrl: (leader.player as any).photo_url ?? null,
+    tourSlug: leader.player.tour_codes?.[0] ?? 'pga',
+  });
   const year = seasonYear ?? new Date().getFullYear();
   const showTourAvg = !!category.tourAverage && category.tourAverage !== '—';
 
