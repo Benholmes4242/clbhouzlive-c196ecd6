@@ -71,11 +71,12 @@ function entryThru(entry: any): string {
 }
 
 function resolveAvatar(entry: any, tourSlug?: string): string | null {
-  const direct = entry?.player?.photo_url ?? null;
-  if (direct) return direct;
   const name = entry?.player?.full_name || `${entry?.player?.first_name ?? ''} ${entry?.player?.last_name ?? ''}`.trim();
-  if (!name || !tourSlug) return null;
-  return getPlayerHeadshotUrl(name, tourSlug);
+  return resolvePlayerAvatarCandidates({
+    name,
+    photoUrl: entry?.player?.photo_url ?? null,
+    tourSlug: tourSlug ?? null,
+  })[0] ?? null;
 }
 
 export function LeaderboardBand({
