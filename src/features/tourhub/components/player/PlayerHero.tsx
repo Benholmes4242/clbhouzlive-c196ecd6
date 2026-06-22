@@ -171,7 +171,6 @@ export function PlayerHero({ player, playerStats }: PlayerHeroProps) {
               userId={player.id ?? player.full_name}
               ringColor={GOLD}
             />
-          </div>
 
             {/* Position badge — gated: worldRank && worldRank <= 99 (Q2 decision) */}
             {worldRank && worldRank <= 99 && (
