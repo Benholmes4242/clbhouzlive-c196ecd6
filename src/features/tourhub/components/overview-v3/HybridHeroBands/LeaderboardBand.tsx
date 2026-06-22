@@ -17,7 +17,7 @@ import { PlayoffPendingPanel } from './PlayoffPendingPanel';
 import { INK, INK_15, AMBER } from '../HybridHero.constants';
 import { INK_ALPHA_45, FONT, GOLD, GOLD_DEEP } from '../../../_shared/tokens';
 import type { TeeTimeGroup } from '../../../hooks/useTournamentTeeTimes';
-import { getPlayerHeadshotUrl } from '@/utils/playerHeadshot';
+import { resolvePlayerAvatarCandidates } from '../../../_shared/resolvePlayerAvatar';
 
 
 export interface LeaderboardBandProps {
