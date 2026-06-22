@@ -8,7 +8,7 @@ import { useAIPredictions } from '../../../hooks/useAIPredictions';
 import { usePredictionTracker } from '../../../hooks/usePredictionTracker';
 import { format, parseISO } from 'date-fns';
 import { getFallbackCourseImage } from '../../../hooks/useVenueImage';
-import { getPlayerHeadshotUrl } from '@/utils/playerHeadshot';
+import { resolvePlayerAvatarCandidates } from '../../../_shared/resolvePlayerAvatar';
 import type { AIPredictionData } from '../../../hooks/useAIPredictions';
 import type { 
   TournamentInsightsData, 
