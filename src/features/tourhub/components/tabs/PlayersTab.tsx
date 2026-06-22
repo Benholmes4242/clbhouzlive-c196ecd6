@@ -97,7 +97,7 @@ function formatEarningsCompact(amount: number): string {
   return `$${amount}`;
 }
 
-function HeroChampion({ champion, champStats, champPhotoUrl, sort, activeTour, onClick }: HeroChampionProps) {
+function HeroChampion({ champion, champStats, champAvatarCandidates, sort, activeTour, onClick }: HeroChampionProps) {
   const primary = (() => {
     if (sort === 'fedex-points') {
       if (!champStats?.points || champStats.points <= 0) return null;
