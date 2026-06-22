@@ -224,7 +224,8 @@ export function PlayersTab() {
   const isFetchingRef = useRef(false);
 
   // Tour filter from URL
-  const activeTour = (searchParams.get('tour') as PlayerTourCode) || 'pga';
+  const rawTour = (searchParams.get('tour') as PlayerTourCode) || 'pga';
+  const activeTour = (rawTour === 'CHAMP' ? 'pga' : rawTour) as PlayerTourCode;
   const setActiveTour = useCallback((tour: PlayerTourCode) => {
     const params = new URLSearchParams(searchParams);
     params.set('tour', tour);
