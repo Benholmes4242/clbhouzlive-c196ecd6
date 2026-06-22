@@ -14,7 +14,7 @@ import { useTourPlayers, useTourSeason, useTourPlayerStatistics, type TourPlayer
 import { useElitePlayers, type ElitePlayer } from '../../hooks/useElitePlayers';
 import { useRecentPlayerResults } from '../../hooks/useRecentPlayerResults';
 import { useTourSeasonRankings } from '../../hooks/useTourSeasonRankings';
-import { useChampionStreak } from '../../hooks/useChampionStreak';
+
 import { type PlayerTourCode } from '../players/PlayersTourFilterSheet';
 import { type PlayerSortType, getDefaultSortForTour } from '../players/PlayerSortControl';
 import { PlayerCardV2 } from '../players/PlayerCardV2';
