@@ -243,21 +243,6 @@ export function CollegeProfilePage() {
                     }}>
                       {displayName}
                     </h1>
-                    {cardSubline && (
-                      <div style={{
-                        fontSize: 11,
-                        fontWeight: 600,
-                        color: INK_MUTE,
-                        marginTop: 4,
-                        lineHeight: 1.3,
-                        display: '-webkit-box',
-                        WebkitLineClamp: 2,
-                        WebkitBoxOrient: 'vertical' as const,
-                        overflow: 'hidden',
-                      }}>
-                        {cardSubline}
-                      </div>
-                    )}
                   </div>
                   <div style={{ flexShrink: 0, textAlign: 'right' as const }}>
                     <div style={{
