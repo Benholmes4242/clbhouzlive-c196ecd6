@@ -341,6 +341,55 @@ export function PlayersTab() {
 
   // Hero players — sorted to match the active sort selection
   const heroPlayers = useMemo<ElitePlayer[]>(() => {
+    // Non-PGA tours: derive hero directly from tour_season_rankings so the
+    // champion is authoritative and never depends on the OWGR elite-pool race.
+    const heroIsNonPga = activeTour === 'EURO' || activeTour === 'LPGA' || activeTour === 'PGAD' || activeTour === 'LIV' || activeTour === 'CHAMP';
+    if (heroIsNonPga && tourRankings && tourRankings.length > 0) {
+      const playerById = new Map((allPlayers ?? []).map(p => [p.id, p]));
+      return tourRankings.slice(0, 5).map(r => {
+        const pid = r.player_id || r.manual_player_id || '';
+        const p = pid ? playerById.get(pid) : undefined;
+        if (p) {
+          return {
+            id: p.id,
+            playerId: p.id,
+            playerName: p.full_name,
+            firstName: p.first_name || '',
+            lastName: p.last_name || '',
+            country: p.country,
+            countryCode: p.country_code,
+            photoUrl: p.photo_url,
+            pgaTourId: p.pga_tour_id,
+            tourCode: p.tour_codes?.[0] ?? null,
+            worldRank: rankMap.get(p.id)?.worldRank ?? 0,
+            avgPoints: rankMap.get(p.id)?.avgPoints ?? null,
+            totalPoints: null,
+            priorRank: null,
+            rankChange: null,
+          } as ElitePlayer;
+        }
+        // Synthetic ElitePlayer for unjoinable rows so the top-5 position is preserved.
+        const parts = (r.player_name || '').split(/\s+/);
+        return {
+          id: pid || `rank-${r.id}`,
+          playerId: pid || `rank-${r.id}`,
+          playerName: r.player_name || '',
+          firstName: parts[0] || '',
+          lastName: parts.slice(1).join(' ') || '',
+          country: r.country ?? null,
+          countryCode: null,
+          photoUrl: null,
+          pgaTourId: null,
+          tourCode: r.tour_code ?? null,
+          worldRank: 0,
+          avgPoints: null,
+          totalPoints: null,
+          priorRank: null,
+          rankChange: null,
+        } as ElitePlayer;
+      });
+    }
+
     const sortCandidates = (candidates: ElitePlayer[]) => {
       return [...candidates].sort((a, b) => {
         const aStats = statsMap.get(a.playerId);
