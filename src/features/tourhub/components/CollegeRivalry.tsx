@@ -625,23 +625,6 @@ export function CollegeRivalry() {
                   >
                     {name}
                   </span>
-                  {isRival && (
-                    <span style={{
-                      padding: '2px 6px',
-                      background: AMBER_TINT_08,
-                      border: `1px solid ${AMBER_BORDER}`,
-                      borderRadius: 4,
-                      fontSize: 8,
-                      fontWeight: 900,
-                      color: AMBER_INK,
-                      letterSpacing: '0.08em',
-                      textTransform: 'uppercase',
-                      flexShrink: 0,
-                      lineHeight: 1.2,
-                    }}>
-                      Rival
-                    </span>
-                  )}
                 </div>
                 <span
                   style={{
