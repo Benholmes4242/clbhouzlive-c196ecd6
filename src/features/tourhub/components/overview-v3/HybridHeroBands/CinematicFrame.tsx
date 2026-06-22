@@ -1051,16 +1051,15 @@ export function CinematicFrame({
           >
             <div style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '13px 20px', background: 'rgba(10,14,20,0.50)', backdropFilter: 'blur(10px)', WebkitBackdropFilter: 'blur(10px)', borderTop: '0.5px solid rgba(255,255,255,0.18)' }}>
               {(() => {
-                const headshot = (tourSlug && defendingChamp.name)
-                  ? (() => { try { return getPlayerHeadshotUrl(defendingChamp.name, tourSlug); } catch { return null; } })()
-                  : null;
+                const headshotCandidates = nameCandidates(defendingChamp.name, tourSlug);
                 return (
                   <SquircleAvatar
-                    src={headshot}
+                    srcCandidates={headshotCandidates}
                     alt={defendingChamp.name}
                     size={42}
                     ringColor={GOLD}
                   />
+
                 );
               })()}
               <div style={{ flex: 1, minWidth: 0 }}>
