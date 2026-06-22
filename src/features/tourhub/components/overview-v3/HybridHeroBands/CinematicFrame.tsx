@@ -151,7 +151,7 @@ function SoloRowDark({
 }: {
   entry: any;
   rank: string;
-  avatarUrl: string | null;
+  avatarUrl: string | string[] | null;
   isLeader: boolean;
   isLast: boolean;
   isResultsLeader: boolean;
@@ -350,7 +350,7 @@ function ChampionRowDark({
   isLast,
 }: {
   entry: any;
-  avatarUrl: string | null;
+  avatarUrl: string | string[] | null;
   isLast: boolean;
 }) {
   const name = entryName(entry);
@@ -421,7 +421,7 @@ function DefendingChampionRowDark({
   avatarUrl,
 }: {
   data: DefendingChampData;
-  avatarUrl: string | null;
+  avatarUrl: string | string[] | null;
 }) {
   return (
     <div
