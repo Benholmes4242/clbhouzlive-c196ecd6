@@ -1128,20 +1128,20 @@ export function CinematicFrame({
         );
       })()}
 
-      {/* Results — data strip + final leaderboard footer CTA */}
+      {/* Results — full-bleed glass leaderboard bar pinned to bottom */}
       {isResults && (
-        <div style={{ position: 'absolute', left: 0, right: 0, bottom: 16, zIndex: 4, display: 'flex', justifyContent: 'center', padding: '0 16px' }}>
+        <div style={{ position: 'absolute', left: 0, right: 0, bottom: 0, zIndex: 4 }}>
           <button
             type="button"
             onClick={onCtaTap}
             aria-label="Final leaderboard"
             style={{
-              display: 'inline-flex', alignItems: 'center', gap: 6,
-              border: '0.5px solid rgba(255,255,255,0.18)', cursor: 'pointer',
+              display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6,
+              border: 'none', cursor: 'pointer', width: '100%',
               background: 'rgba(10,14,20,0.50)',
               backdropFilter: 'blur(10px)', WebkitBackdropFilter: 'blur(10px)',
-              borderRadius: 999, padding: '10px 18px',
-              boxShadow: '0 4px 16px rgba(0,0,0,0.25)',
+              borderTop: '0.5px solid rgba(255,255,255,0.18)',
+              padding: '14px 16px', textAlign: 'center',
             }}
           >
             <span style={{ ...NUMERIC_STYLE, fontSize: 12, fontWeight: 800, letterSpacing: '0.06em', color: GOLD }}>
