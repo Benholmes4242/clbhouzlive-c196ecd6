@@ -884,7 +884,7 @@ export function CinematicFrame({
                 <Trophy
                   size={12}
                   strokeWidth={2.5}
-                  style={{ color: GOLD_DEEP, flexShrink: 0 }}
+                  style={{ color: GOLD, flexShrink: 0 }}
                   aria-hidden
                 />
               )}
@@ -988,14 +988,16 @@ export function CinematicFrame({
               <div style={{ flex: 1 }} />
               <div style={{ display: 'flex', gap: 14, alignItems: 'stretch', padding: '0 16px 22px' }}>
                 {/* Champion card (left) — no trophy icon on the avatar */}
-                <div style={{ flex: '0 0 42%', display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', textAlign: 'center', background: 'rgba(255,255,255,0.04)', borderRadius: 12, border: '0.5px solid rgba(255,255,255,0.08)', padding: '14px 8px', minWidth: 0 }}>
+                <div style={{ flex: '0 0 42%', display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'flex-start', textAlign: 'left', background: 'rgba(10,14,20,0.55)', backdropFilter: 'blur(10px)', WebkitBackdropFilter: 'blur(10px)', borderRadius: 12, border: '0.5px solid rgba(255,255,255,0.18)', padding: '14px 13px', minWidth: 0 }}>
                   {winnerAvatar
-                    ? <img src={winnerAvatar} alt="" loading="lazy" style={{ width: 56, height: 56, borderRadius: '34%', objectFit: 'cover', border: `2px solid ${GOLD}`, boxShadow: '0 0 22px rgba(251,188,46,0.35)', marginBottom: 8 }} />
-                    : <div style={{ width: 56, height: 56, borderRadius: '34%', background: 'rgba(255,255,255,0.08)', border: `2px solid ${GOLD}`, boxShadow: '0 0 22px rgba(251,188,46,0.35)', marginBottom: 8 }} />}
+                    ? <img src={winnerAvatar} alt="" loading="lazy" style={{ width: 50, height: 50, borderRadius: '34%', objectFit: 'cover', border: `2px solid ${GOLD}`, boxShadow: '0 0 22px rgba(251,188,46,0.35)', marginBottom: 9 }} />
+                    : <div style={{ width: 50, height: 50, borderRadius: '34%', background: 'rgba(255,255,255,0.08)', border: `2px solid ${GOLD}`, boxShadow: '0 0 22px rgba(251,188,46,0.35)', marginBottom: 9 }} />}
                   <div style={{ ...NUMERIC_STYLE, fontSize: 8, fontWeight: 800, letterSpacing: '0.16em', color: GOLD, textTransform: 'uppercase' }}>Champion</div>
-                  <div style={{ fontSize: 15, fontWeight: 800, color: '#fff', marginTop: 3, lineHeight: 1.1, padding: '0 2px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', maxWidth: '100%' }}>{entryName(winner)}</div>
-                  <div style={{ ...NUMERIC_STYLE, fontSize: 18, fontWeight: 900, color: scoreColor(winner.score), marginTop: 3 }}>{fmtScore(winner.score)}</div>
-                  {marginLabel && <div style={{ fontSize: 9.5, fontWeight: 600, color: 'rgba(255,255,255,0.5)', marginTop: 2 }}>{marginLabel}</div>}
+                  <div style={{ fontSize: 16, fontWeight: 800, color: '#fff', marginTop: 3, lineHeight: 1.15, display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>{entryName(winner)}</div>
+                  <div style={{ display: 'flex', alignItems: 'baseline', gap: 8, marginTop: 6 }}>
+                    <span style={{ ...NUMERIC_STYLE, fontSize: 19, fontWeight: 900, color: scoreColor(winner.score) }}>{fmtScore(winner.score)}</span>
+                    {marginLabel && <span style={{ fontSize: 10, fontWeight: 600, color: 'rgba(255,255,255,0.55)' }}>{marginLabel}</span>}
+                  </div>
                 </div>
 
                 {/* Scoring grid (right) — only when scorecard data exists */}
@@ -1007,7 +1009,7 @@ export function CinematicFrame({
                       { label: 'Pars', value: s.pars, color: '#fff' },
                       { label: 'Bogeys+', value: s.bogeysPlus, color: '#fff' },
                     ].map((cell) => (
-                      <div key={cell.label} style={{ background: 'rgba(255,255,255,0.04)', borderRadius: 10, border: '0.5px solid rgba(255,255,255,0.08)', padding: '8px 6px', display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center' }}>
+                      <div key={cell.label} style={{ background: 'rgba(10,14,20,0.55)', backdropFilter: 'blur(10px)', WebkitBackdropFilter: 'blur(10px)', borderRadius: 10, border: '0.5px solid rgba(255,255,255,0.18)', padding: '8px 6px', display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center' }}>
                         <div style={{ ...NUMERIC_STYLE, fontSize: 18, fontWeight: 900, color: cell.color }}>{cell.value.toLocaleString()}</div>
                         <div style={{ fontSize: 7.5, fontWeight: 800, letterSpacing: '0.10em', color: 'rgba(255,255,255,0.45)', textTransform: 'uppercase', marginTop: 2 }}>{cell.label}</div>
                       </div>
@@ -1015,7 +1017,7 @@ export function CinematicFrame({
                   </div>
                 ) : (
                   runnerUp ? (
-                    <div style={{ flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'center', background: 'rgba(255,255,255,0.04)', borderRadius: 12, border: '0.5px solid rgba(255,255,255,0.08)', padding: '14px 12px', minWidth: 0 }}>
+                    <div style={{ flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'center', background: 'rgba(10,14,20,0.55)', backdropFilter: 'blur(10px)', WebkitBackdropFilter: 'blur(10px)', borderRadius: 12, border: '0.5px solid rgba(255,255,255,0.18)', padding: '14px 12px', minWidth: 0 }}>
                       <div style={{ ...NUMERIC_STYLE, fontSize: 8, fontWeight: 800, letterSpacing: '0.16em', color: 'rgba(255,255,255,0.5)', textTransform: 'uppercase' }}>Runner-up</div>
                       <div style={{ fontSize: 15, fontWeight: 800, color: '#fff', marginTop: 3, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{entryName(runnerUp)}</div>
                       <div style={{ ...NUMERIC_STYLE, fontSize: 16, fontWeight: 900, color: scoreColor(runnerUp.score), marginTop: 2 }}>{fmtScore(runnerUp.score)}</div>
