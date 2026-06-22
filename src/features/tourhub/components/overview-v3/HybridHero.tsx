@@ -133,9 +133,10 @@ export function HybridHero({ slide, activeTournamentId, onSelectTour }: HybridHe
   const { data: fieldStrength } = useTournamentFieldStrength(fallbackEnabled ? tournament.id : null);
   const { data: courseStats } = useTournamentCourseStats(fallbackEnabled ? tournament.id : null);
 
-  // Completed-state tournament scoring grid (eagles / birdies / pars / bogeys+)
+  // Completed-state tournament scoring grid (champion's eagles / birdies / pars / bogeys+)
   const isResultsKind = kind === 'results';
-  const { data: tournamentScoring } = useTournamentScoring(tournament.id, isResultsKind);
+  const winnerPlayerId = (safeLeaderboard?.[0] as any)?.player_id ?? null;
+  const { data: tournamentScoring } = useTournamentScoring(tournament.id, winnerPlayerId, isResultsKind);
 
   // Refined state (now we know whether teeTimes are available)
   const baseState = useMemo(

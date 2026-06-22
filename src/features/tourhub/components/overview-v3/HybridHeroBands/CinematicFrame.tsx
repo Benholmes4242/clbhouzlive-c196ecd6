@@ -843,7 +843,7 @@ export function CinematicFrame({
           flexDirection: 'column',
           padding: `18px 14px ${
             showTicker ? 16 + LIVE_BOTTOM_H
-            : isResults ? 16 + RESULTS_FOOTER_H
+            : isResults ? 16
             : (isUpcoming && defendingChamp) ? 16 + UPCOMING_BAND_H
             : isUpcoming ? 16
             : 16
@@ -985,7 +985,7 @@ export function CinematicFrame({
           return (
             <>
               <div style={{ flex: 1 }} />
-              <div style={{ display: 'flex', gap: 14, alignItems: 'center', padding: '0 16px 22px' }}>
+              <div style={{ display: 'flex', gap: 14, alignItems: 'center', padding: '0 16px 64px' }}>
                 {/* Champion card (left) — no trophy icon on the avatar */}
                 <div style={{ flex: '0 0 42%', display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', textAlign: 'center', background: 'rgba(10,14,20,0.55)', backdropFilter: 'blur(10px)', WebkitBackdropFilter: 'blur(10px)', borderRadius: 12, border: '0.5px solid rgba(255,255,255,0.18)', padding: '14px 12px' }}>
                   {winnerAvatar
@@ -1130,20 +1130,24 @@ export function CinematicFrame({
 
       {/* Results — data strip + final leaderboard footer CTA */}
       {isResults && (
-        <div style={{ position: 'absolute', left: 0, right: 0, bottom: 0, zIndex: 4 }}>
+        <div style={{ position: 'absolute', left: 0, right: 0, bottom: 16, zIndex: 4, display: 'flex', justifyContent: 'center', padding: '0 16px' }}>
           <button
             type="button"
             onClick={onCtaTap}
             aria-label="Final leaderboard"
             style={{
-              border: 'none', cursor: 'pointer', background: '#0A0E14',
-              padding: '13px 16px', textAlign: 'center', width: '100%',
-              borderTop: '0.5px solid rgba(255,255,255,0.06)',
+              display: 'inline-flex', alignItems: 'center', gap: 6,
+              border: '0.5px solid rgba(255,255,255,0.18)', cursor: 'pointer',
+              background: 'rgba(10,14,20,0.50)',
+              backdropFilter: 'blur(10px)', WebkitBackdropFilter: 'blur(10px)',
+              borderRadius: 999, padding: '10px 18px',
+              boxShadow: '0 4px 16px rgba(0,0,0,0.25)',
             }}
           >
             <span style={{ ...NUMERIC_STYLE, fontSize: 12, fontWeight: 800, letterSpacing: '0.06em', color: GOLD }}>
-              FINAL LEADERBOARD · {safe.length} ›
+              FINAL LEADERBOARD · {safe.length}
             </span>
+            <ChevronRight size={14} strokeWidth={2.5} color={GOLD} style={{ flexShrink: 0 }} />
           </button>
         </div>
       )}

@@ -21321,16 +21321,27 @@ export type Database = {
           total: number
         }[]
       }
-      tournament_scoring_totals: {
-        Args: { t_id: string }
-        Returns: {
-          birdies: number
-          bogeys_plus: number
-          eagles_or_better: number
-          holes_played: number
-          pars: number
-        }[]
-      }
+      tournament_scoring_totals:
+        | {
+            Args: { t_id: string }
+            Returns: {
+              birdies: number
+              bogeys_plus: number
+              eagles_or_better: number
+              holes_played: number
+              pars: number
+            }[]
+          }
+        | {
+            Args: { p_id: string; t_id: string }
+            Returns: {
+              birdies: number
+              bogeys_plus: number
+              eagles_or_better: number
+              holes_played: number
+              pars: number
+            }[]
+          }
       track_profile_analytics_event: {
         Args: {
           p_action_type?: string
