@@ -50,12 +50,10 @@ const notStarted = (t: TourTournament) => {
   return new Date(`${t.start_date}T12:00:00Z`).getTime() > todayNoonMs();
 };
 
-// B42 FIX 4: tourBreakdown in interface directly
 interface MonthGroup {
   monthKey: string;
   monthLabel: string;
   tournaments: TourTournament[];
-  tourBreakdown: Record<string, number>;
 }
 
 function useDebouncedValue<T>(value: T, delay: number): T {
@@ -295,17 +293,12 @@ export function ScheduleTab() {
     } else {
       entries.sort(([a], [b]) => a.localeCompare(b));
     }
-    return entries.map(([monthKey, tournaments]) => {
-      const tourBreakdown: Record<string, number> = {};
-      for (const t of tournaments) { if (t.tour_code) tourBreakdown[t.tour_code] = (tourBreakdown[t.tour_code] || 0) + 1; }
-      return {
-        monthKey,
-        // B42 FIX 3: title case from source, no toUpperCase
-        monthLabel: format(new Date(tournaments[0].start_date + 'T12:00:00Z'), 'MMMM yyyy'),
-        tournaments,
-        tourBreakdown,
-      };
-    });
+    return entries.map(([monthKey, tournaments]) => ({
+      monthKey,
+      // B42 FIX 3: title case from source, no toUpperCase
+      monthLabel: format(new Date(tournaments[0].start_date + 'T12:00:00Z'), 'MMMM yyyy'),
+      tournaments,
+    }));
   }, [filteredResults, filter]);
 
   // Loading state
@@ -471,7 +464,6 @@ export function ScheduleTab() {
                     <ScheduleMonthHeader
                       monthLabel={group.monthLabel}
                       eventCount={group.tournaments.length}
-                      tourBreakdown={group.tourBreakdown}
                       isCurrentMonth={isCurrentMonth}
                     />
                   )}

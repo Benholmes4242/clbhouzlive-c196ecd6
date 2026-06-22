@@ -5,13 +5,12 @@
  * No vertical rules, no bg tint.
  */
 
-import { getTourMeta } from '../../constants/tourMap';
+
 import { AMBER, AMBER_BORDER, AMBER_SOFT_BG, INK, INK_MUTE, INK_TINT_07 } from '../../_shared/tokens';
 
 interface ScheduleMonthHeaderProps {
   monthLabel: string;
   eventCount: number;
-  tourBreakdown?: Record<string, number>;
   isCurrentMonth?: boolean;
   className?: string;
 }
@@ -19,16 +18,8 @@ interface ScheduleMonthHeaderProps {
 export function ScheduleMonthHeader({
   monthLabel,
   eventCount,
-  tourBreakdown,
   isCurrentMonth = false,
 }: ScheduleMonthHeaderProps) {
-  const breakdownParts = tourBreakdown
-    ? Object.entries(tourBreakdown)
-        .filter(([, count]) => count > 0)
-        .sort((a, b) => b[1] - a[1])
-        .map(([code, count]) => `${count} ${getTourMeta(code)?.short ?? code}`)
-    : [];
-
   return (
     <div
       style={{
@@ -72,17 +63,6 @@ export function ScheduleMonthHeader({
           {eventCount} event{eventCount !== 1 ? 's' : ''}
         </span>
       </div>
-      {breakdownParts.length > 0 && (
-        <p style={{
-          fontSize: 12,
-          fontWeight: 500,
-          color: INK_MUTE,
-          margin: '4px 0 0',
-          lineHeight: 1.4,
-        }}>
-          {breakdownParts.join(' · ')}
-        </p>
-      )}
     </div>
   );
 }
