@@ -129,7 +129,8 @@ export function LeaderboardBand({
               country={entryCountry(e)}
               score={fmtScore(e.score)}
               thru={entryThru(e)}
-              avatarUrl={entryAvatar(e)}
+              avatarCandidates={entryAvatars(e)}
+              playerId={entryPlayerId(e)}
               isLast={i === chasers.length - 1}
             />
           ))}
