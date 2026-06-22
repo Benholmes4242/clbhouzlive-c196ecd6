@@ -192,14 +192,14 @@ export function PlayerCardV2({
           </div>
         )}
 
-        {/* Avatar */}
-        <div style={{ width: `${photoSize}px`, height: `${photoSize}px`, borderRadius: '34%', overflow: 'hidden', flexShrink: 0, background: INK_TINT_06, marginLeft: isAlpha ? '14px' : '0', marginRight: '10px' }}>
-          <img
-            src={photoUrl}
+        {/* Avatar — canonical SquircleAvatar with multi-folder candidate walk + initials fallback */}
+        <div style={{ marginLeft: isAlpha ? '14px' : '0', marginRight: '10px', flexShrink: 0 }}>
+          <SquircleAvatar
+            size={photoSize}
+            srcCandidates={avatarCandidates}
             alt={player.fullName}
-            style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center 8%' }}
-            loading="lazy"
-            onError={e => { (e.target as HTMLImageElement).src = PLAYER_SILHOUETTE_URL; }}
+            userId={player.id}
+            hideRing
           />
         </div>
 
