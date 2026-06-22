@@ -37,8 +37,9 @@ const UPCOMING_BAND_H = 104;
 const LIVE_BOTTOM_H = CHAMPION_BAND_H + TICKER_BAR_H;
 const RESULTS_FOOTER_H = 34;
 const BOTTOM_STACK_H = TICKER_BAR_H + CHAMPION_BAND_H;
-import { getPlayerHeadshotUrl } from '@/utils/playerHeadshot';
+import { getPlayerHeadshotUrl, getPlayerHeadshotCandidates } from '@/utils/playerHeadshot';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
+
 import type { DefendingChampData } from '../../../hooks/useTournamentDefendingChamp';
 import type { FieldStrength } from '../../../hooks/useTournamentFieldStrength';
 
@@ -60,6 +61,23 @@ function resolveAvatar(e: any, tourSlug?: string | null): string | null {
   if (!name || name === '—' || !tourSlug) return null;
   try { return getPlayerHeadshotUrl(name, tourSlug); } catch { return null; }
 }
+/**
+ * Ordered headshot candidates for a leaderboard entry. Tries event-tour
+ * folder first, then PGA Tour, then the rest — covers cross-tour players
+ * (e.g. PGA player at a co-sanctioned/euro major). DB photo_url short-circuits.
+ */
+function resolveAvatarCandidates(e: any, tourSlug?: string | null): string[] {
+  const direct = e?.player?.photo_url ?? null;
+  if (direct) return [direct];
+  const name = entryName(e);
+  if (!name || name === '—' || !tourSlug) return [];
+  try { return getPlayerHeadshotCandidates(name, tourSlug); } catch { return []; }
+}
+function nameCandidates(name: string | null | undefined, tourSlug?: string | null): string[] {
+  if (!name || !tourSlug) return [];
+  try { return getPlayerHeadshotCandidates(name, tourSlug); } catch { return []; }
+}
+
 function scoreColor(score: number | null | undefined): string {
   if (score == null || Number.isNaN(score)) return 'rgba(255,255,255,0.85)';
   if (score < 0) return '#DC2626';   // under par -> red (matches handicap pages)
@@ -71,7 +89,12 @@ function scoreColor(score: number | null | undefined): string {
 
 const ROW_BORDER = '0.5px solid rgba(255,255,255,0.08)';
 
-type StackedAvatarItem = { url: string | null; name?: string; userId?: string | null };
+type StackedAvatarItem = {
+  url?: string | null;
+  candidates?: string[];
+  name?: string;
+  userId?: string | null;
+};
 
 function StackedAvatarsDark({
   urls,
@@ -103,7 +126,8 @@ function StackedAvatarsDark({
           }}
         >
           <SquircleAvatar
-            src={it.url}
+            src={it.candidates && it.candidates.length > 0 ? undefined : it.url}
+            srcCandidates={it.candidates}
             alt={it.name || ''}
             userId={it.userId ?? null}
             size={size - 3}
@@ -114,6 +138,7 @@ function StackedAvatarsDark({
     </div>
   );
 }
+
 
 function SoloRowDark({
   entry,
@@ -126,7 +151,7 @@ function SoloRowDark({
 }: {
   entry: any;
   rank: string;
-  avatarUrl: string | null;
+  avatarUrl: string | string[] | null;
   isLeader: boolean;
   isLast: boolean;
   isResultsLeader: boolean;
@@ -158,7 +183,7 @@ function SoloRowDark({
         {rank}
       </span>
       <SquircleAvatar
-        src={avatarUrl}
+        src={Array.isArray(avatarUrl) ? undefined : avatarUrl} srcCandidates={Array.isArray(avatarUrl) ? avatarUrl : undefined}
         alt={name}
         userId={entry?.player?.id ?? null}
         size={26}
@@ -325,7 +350,7 @@ function ChampionRowDark({
   isLast,
 }: {
   entry: any;
-  avatarUrl: string | null;
+  avatarUrl: string | string[] | null;
   isLast: boolean;
 }) {
   const name = entryName(entry);
@@ -345,7 +370,7 @@ function ChampionRowDark({
       </span>
       <span style={{ flexShrink: 0, display: 'inline-flex', boxShadow: '0 0 0 1px rgba(0,0,0,0.4)', borderRadius: '34%' }}>
         <SquircleAvatar
-          src={avatarUrl}
+          src={Array.isArray(avatarUrl) ? undefined : avatarUrl} srcCandidates={Array.isArray(avatarUrl) ? avatarUrl : undefined}
           alt={name}
           userId={entry?.player?.id ?? null}
           size={38}
@@ -396,7 +421,7 @@ function DefendingChampionRowDark({
   avatarUrl,
 }: {
   data: DefendingChampData;
-  avatarUrl: string | null;
+  avatarUrl: string | string[] | null;
 }) {
   return (
     <div
@@ -409,7 +434,7 @@ function DefendingChampionRowDark({
     >
       <span style={{ flexShrink: 0, display: 'inline-flex', boxShadow: '0 0 0 1px rgba(0,0,0,0.4)', borderRadius: '34%' }}>
         <SquircleAvatar
-          src={avatarUrl}
+          src={Array.isArray(avatarUrl) ? undefined : avatarUrl} srcCandidates={Array.isArray(avatarUrl) ? avatarUrl : undefined}
           alt={data.name}
           size={40}
           ringColor={GOLD}
@@ -582,7 +607,7 @@ export function CinematicFrame({
 
   // ---- Capsule slot construction (mirrors LeaderboardBand live-state) ----
   const safe = Array.isArray(leaderboard) ? leaderboard : [];
-  const avatar = (e: any) => resolveAvatar(e, tourSlug);
+  const avatar = (e: any) => resolveAvatarCandidates(e, tourSlug);
 
   type SlotNode = React.ReactNode;
   const slotNodes: SlotNode[] = [];
@@ -600,7 +625,7 @@ export function CinematicFrame({
       const tiedItems: StackedAvatarItem[] = safe
         .filter(e => (e?.score ?? e?.total) === topScore)
         .slice(0, Math.min(tiedLeaders.count, 4))
-        .map(e => ({ url: avatar(e), name: entryName(e), userId: e?.player?.id ?? null }));
+        .map(e => ({ candidates: avatar(e), name: entryName(e), userId: e?.player?.id ?? null }));
 
       slotNodes.push(
         <TiedLeadersRowDark
@@ -623,7 +648,7 @@ export function CinematicFrame({
               rank={slot.rank}
               count={slot.count}
               score={slot.score}
-              items={slot.members.map((m: any) => ({ url: avatar(m), name: entryName(m), userId: m?.player?.id ?? null }))}
+              items={slot.members.map((m: any) => ({ candidates: avatar(m), name: entryName(m), userId: m?.player?.id ?? null }))}
               isLast={isLast}
               onTap={onCtaTap}
               isResults={isResults}
@@ -682,7 +707,7 @@ export function CinematicFrame({
               rank={slot.rank}
               count={slot.count}
               score={slot.score}
-              items={slot.members.map((m: any) => ({ url: avatar(m), name: entryName(m), userId: m?.player?.id ?? null }))}
+              items={slot.members.map((m: any) => ({ candidates: avatar(m), name: entryName(m), userId: m?.player?.id ?? null }))}
               isLast={isLast}
               onTap={onCtaTap}
               isResults={isResults}
@@ -711,14 +736,11 @@ export function CinematicFrame({
   let upcomingFooter: string | null = null;
   if (isUpcoming) {
     if (defendingChamp) {
-      const headshot = (() => {
-        if (!tourSlug || !defendingChamp.name) return null;
-        try { return getPlayerHeadshotUrl(defendingChamp.name, tourSlug); }
-        catch { return null; }
-      })();
+      const headshotCandidates = nameCandidates(defendingChamp.name, tourSlug);
       upcomingCapsule = (
-        <DefendingChampionRowDark data={defendingChamp} avatarUrl={headshot} />
+        <DefendingChampionRowDark data={defendingChamp} avatarUrl={headshotCandidates} />
       );
+
       upcomingFooter = 'View tournament';
     } else if (fieldStrength && fieldStrength.totalPlayers > 0) {
       upcomingCapsule = <FieldStrengthRowDark data={fieldStrength} />;
@@ -955,7 +977,7 @@ export function CinematicFrame({
         {isResults && safe[0] && (() => {
           const winner = safe[0];
           const runnerUp = safe[1];
-          const winnerAvatar = resolveAvatar(winner, tourSlug);
+          const winnerAvatarCandidates = resolveAvatarCandidates(winner, tourSlug);
           const s = tournamentScoring;
 
           return (
@@ -966,13 +988,14 @@ export function CinematicFrame({
                 <div style={{ flex: '0 0 42%', display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', textAlign: 'center', background: 'rgba(10,14,20,0.55)', backdropFilter: 'blur(10px)', WebkitBackdropFilter: 'blur(10px)', borderRadius: 12, border: '0.5px solid rgba(255,255,255,0.18)', padding: '14px 12px' }}>
                   <span style={{ display: 'inline-flex', boxShadow: '0 0 22px rgba(251,188,46,0.35)', borderRadius: '34%', marginBottom: 9 }}>
                     <SquircleAvatar
-                      src={winnerAvatar}
+                      srcCandidates={winnerAvatarCandidates}
                       alt={entryName(winner)}
                       userId={(winner as any)?.player?.id ?? null}
                       size={50}
                       ringColor={GOLD}
                     />
                   </span>
+
                   <div style={{ ...NUMERIC_STYLE, fontSize: 8, fontWeight: 800, letterSpacing: '0.16em', color: GOLD, textTransform: 'uppercase' }}>Champion</div>
                   <div style={{ fontSize: 16, fontWeight: 800, color: '#fff', marginTop: 3, lineHeight: 1.15, display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>{entryName(winner)}</div>
                   <div style={{ ...NUMERIC_STYLE, fontSize: 20, fontWeight: 900, color: scoreColor(winner.score), marginTop: 6 }}>{fmtScore(winner.score)}</div>
@@ -1028,16 +1051,15 @@ export function CinematicFrame({
           >
             <div style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '13px 20px', background: 'rgba(10,14,20,0.50)', backdropFilter: 'blur(10px)', WebkitBackdropFilter: 'blur(10px)', borderTop: '0.5px solid rgba(255,255,255,0.18)' }}>
               {(() => {
-                const headshot = (tourSlug && defendingChamp.name)
-                  ? (() => { try { return getPlayerHeadshotUrl(defendingChamp.name, tourSlug); } catch { return null; } })()
-                  : null;
+                const headshotCandidates = nameCandidates(defendingChamp.name, tourSlug);
                 return (
                   <SquircleAvatar
-                    src={headshot}
+                    srcCandidates={headshotCandidates}
                     alt={defendingChamp.name}
                     size={42}
                     ringColor={GOLD}
                   />
+
                 );
               })()}
               <div style={{ flex: 1, minWidth: 0 }}>
