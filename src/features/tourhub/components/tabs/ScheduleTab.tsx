@@ -50,12 +50,10 @@ const notStarted = (t: TourTournament) => {
   return new Date(`${t.start_date}T12:00:00Z`).getTime() > todayNoonMs();
 };
 
-// B42 FIX 4: tourBreakdown in interface directly
 interface MonthGroup {
   monthKey: string;
   monthLabel: string;
   tournaments: TourTournament[];
-  tourBreakdown: Record<string, number>;
 }
 
 function useDebouncedValue<T>(value: T, delay: number): T {
