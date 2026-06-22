@@ -41,7 +41,7 @@ export function CollegeProfilePage() {
   const { data: stats, isLoading: statsLoading, error: _statsError, refetch: refetchStats } = useCollegeStats(collegeSlug);
   const { data: collegeMap, isLoading: mediaLoading } = useCollegeMediaMap();
   const { data: allSeasonStats } = useCollegeSeasonStats();
-  const { data: alumni } = useCollegeAlumni(collegeSlug, { orderBy: 'earnings', limit: 50 });
+  
 
   const college = collegeSlug ? collegeMap?.get(collegeSlug) || null : null;
   const displayName = college?.short_name || college?.college_name || collegeSlug || 'College';
