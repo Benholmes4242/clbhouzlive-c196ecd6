@@ -17,6 +17,7 @@ import { useTournamentDefendingChamp } from '../../hooks/useTournamentDefendingC
 import { useTournamentLastYearTop4 } from '../../hooks/useTournamentLastYearTop4';
 import { useTournamentTeeTimes } from '../../hooks/useTournamentTeeTimes';
 import { useTournamentFieldStrength } from '../../hooks/useTournamentFieldStrength';
+import { useTournamentScoring } from '../../hooks/useTournamentScoring';
 import { useTournamentCourseStats } from '../../hooks/useTournamentCourseStats';
 import { tournamentRoute } from '../../routes';
 import { getPlayerHeadshotUrl } from '@/utils/playerHeadshot';
@@ -131,6 +132,10 @@ export function HybridHero({ slide, activeTournamentId, onSelectTour }: HybridHe
   const fallbackEnabled = isUpcoming && !defendingChamp;
   const { data: fieldStrength } = useTournamentFieldStrength(fallbackEnabled ? tournament.id : null);
   const { data: courseStats } = useTournamentCourseStats(fallbackEnabled ? tournament.id : null);
+
+  // Completed-state tournament scoring grid (eagles / birdies / pars / bogeys+)
+  const isResultsKind = kind === 'results';
+  const { data: tournamentScoring } = useTournamentScoring(tournament.id, isResultsKind);
 
   // Refined state (now we know whether teeTimes are available)
   const baseState = useMemo(
@@ -306,6 +311,7 @@ export function HybridHero({ slide, activeTournamentId, onSelectTour }: HybridHe
           tourSlug={tournament.tourSlug}
           defendingChamp={defendingChamp ?? null}
           fieldStrength={fieldStrength ?? null}
+          tournamentScoring={tournamentScoring ?? null}
           venuePar={tournament.venuePar}
           venueYardage={tournament.venueYardage}
           purse={tournament.purse}
