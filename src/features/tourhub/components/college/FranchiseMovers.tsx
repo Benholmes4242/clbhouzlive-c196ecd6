@@ -11,7 +11,7 @@
  */
 
 import { useState, useMemo } from 'react';
-import { SURFACE, INK_SOFT, INK_TINT_07 } from '../../_shared/tokens';
+import { SURFACE, INK_SOFT, INK_MUTE, INK_TINT_07 } from '../../_shared/tokens';
 import { motion, AnimatePresence } from 'framer-motion';
 import { TrendingUp, TrendingDown } from 'lucide-react';
 import { useCollegeWeeklyMovers } from '../../hooks/useCollegeMovers';
@@ -90,11 +90,11 @@ export function FranchiseMovers({ limit = 8, className }: FranchiseMoversProps) 
       {/* Movers table */}
       <div style={{ background: '#F8FAFC', borderBottom: `1px solid ${INK_TINT_07}` }}>
         {/* Column headers */}
-        <div style={{ display: 'flex', alignItems: 'center', padding: '5px 16px', background: 'rgba(15,23,42,0.02)', borderTop: `0.5px solid ${INK_TINT_07}`, borderBottom: `0.5px solid ${INK_TINT_07}` }}>
-          <span style={{ flex: 1, fontSize: 8.5, fontWeight: 900, color: '#CBD5E1', letterSpacing: '0.1em' }}>FRANCHISE</span>
-          <span style={{ width: 40, textAlign: 'center' as const, fontSize: 8.5, fontWeight: 900, color: '#CBD5E1', letterSpacing: '0.1em', flexShrink: 0 }}>MOVE</span>
-          <span style={{ width: 72, textAlign: 'right' as const, fontSize: 8.5, fontWeight: 900, color: '#CBD5E1', letterSpacing: '0.1em', flexShrink: 0 }}>
-            {direction === 'down' ? 'RANK Δ' : 'EARNINGS Δ'}
+        <div style={{ display: 'flex', alignItems: 'center', padding: '5px 16px', borderBottom: `0.5px solid ${INK_TINT_07}` }}>
+          <span style={{ flex: 1, fontSize: 10, fontWeight: 700, color: INK_MUTE, letterSpacing: '0.08em' }}>FRANCHISE</span>
+          <span style={{ width: 40, textAlign: 'center' as const, fontSize: 10, fontWeight: 700, color: INK_MUTE, letterSpacing: '0.08em', flexShrink: 0 }}>MOVE</span>
+          <span style={{ width: 72, textAlign: 'right' as const, fontSize: 10, fontWeight: 700, color: INK_MUTE, letterSpacing: '0.08em', flexShrink: 0 }}>
+            {direction === 'down' ? 'RANK' : 'EARNINGS'}
           </span>
         </div>
 
