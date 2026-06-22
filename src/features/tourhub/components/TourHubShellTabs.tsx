@@ -46,6 +46,12 @@ export const TourHubShellTabs: React.FC = () => {
 
   const active = computeActiveTab(location.pathname, searchParams);
 
+  const { viewingTourSlug, selectedTourSlug } = useTourSelection();
+  const tourSettled = (viewingTourSlug ?? selectedTourSlug) != null;
+  // Show the switcher only on Overview, and only once the hero has reported a
+  // real tour — so it fades in already correct, never flashing PGA then jumping.
+  const showSwitcher = active === 'overview' && tourSettled;
+
   const { data: liveTournaments } = useLiveTournaments();
   const showLive = (liveTournaments?.length ?? 0) > 0;
 
