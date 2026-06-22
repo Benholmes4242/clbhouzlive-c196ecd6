@@ -368,9 +368,11 @@ export const StatOfTheWeek = memo(function StatOfTheWeek() {
                 <PlayerAvatar
                   playerId={leader.playerId}
                   playerName={leader.fullName}
+                  photoUrl={leader.photoUrl}
                   tourCode="pga"
                   size="xl"
                 />
+
               </div>
               <div
                 style={{
@@ -559,9 +561,11 @@ export const StatOfTheWeek = memo(function StatOfTheWeek() {
                     <PlayerAvatar
                       playerId={p.playerId}
                       playerName={p.fullName ?? p.lastName}
+                      photoUrl={p.photoUrl}
                       tourCode="pga"
                       size="md"
                     />
+
                     <div
                       style={{
                         fontSize: 13,

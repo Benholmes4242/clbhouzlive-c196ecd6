@@ -22,6 +22,8 @@ interface PlayerAvatarProps {
   playerId: string;
   playerName: string;
   tourCode?: string;
+  /** Optional DB photo_url — tried FIRST before the name-based candidate chain. */
+  photoUrl?: string | null;
   size?: 'xs' | 'sm' | 'md' | 'lg' | 'xl' | '2xl';
   className?: string;
 }
@@ -32,10 +34,13 @@ export function PlayerAvatar({
   playerId,
   playerName,
   tourCode = 'pga',
+  photoUrl,
   size = 'md',
   className,
 }: PlayerAvatarProps) {
-  const candidates = getPlayerHeadshotCandidates(playerName, tourCode);
+  const nameCandidates = getPlayerHeadshotCandidates(playerName, tourCode);
+  // DB photo_url wins (matches the hero's resolveAvatar priority); then name-based chain.
+  const candidates = photoUrl ? [photoUrl, ...nameCandidates] : nameCandidates;
   return (
     <SquircleAvatar
       size={SIZE_PX[size]}
