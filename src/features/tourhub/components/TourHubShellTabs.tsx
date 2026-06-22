@@ -167,7 +167,23 @@ export const TourHubShellTabs: React.FC = () => {
           />
         )}
       </div>
-      {active === 'overview' && <TourSwitcherAffordance />}
+      <AnimatePresence initial={false} mode="wait">
+        {showSwitcher && (
+          <motion.div
+            key="tour-switcher"
+            initial={{ opacity: 0, width: 0 }}
+            animate={{ opacity: 1, width: 'auto' }}
+            exit={{ opacity: 0, width: 0 }}
+            transition={{
+              opacity: { duration: 0.28, ease: [0.4, 0, 0.2, 1] },
+              width: { duration: 0.32, ease: [0.4, 0, 0.2, 1] },
+            }}
+            style={{ overflow: 'hidden', flex: '0 0 auto', display: 'flex' }}
+          >
+            <TourSwitcherAffordance />
+          </motion.div>
+        )}
+      </AnimatePresence>
     </section>
   );
 };
