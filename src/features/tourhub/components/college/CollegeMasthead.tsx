@@ -13,6 +13,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { GraduationCap, ChevronRight, Crown } from 'lucide-react';
 import { getCollegeLogoUrl } from '@/utils/collegeLogo';
+import { PlayerInitialAvatar } from '../shared/PlayerInitialAvatar';
 import { formatCurrency } from '@/lib/utils/formatCurrency';
 import type { CollegeSeasonStats } from '../../hooks/useCollegeStats';
 import type { CollegeMedia } from '../../hooks/useCollegeMedia';
@@ -181,18 +182,14 @@ export function CollegeMasthead({
                   justifyContent: 'center',
                   padding: 10,
                 }}>
-                  {logoUrl ? (
-                    <img
-                      src={logoUrl}
-                      alt={displayName}
-                      style={{ width: '100%', height: '100%', objectFit: 'contain' }}
-                      onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }}
-                    />
-                  ) : (
-                    <span style={{ fontSize: 28, fontWeight: 900, color: 'rgba(15,23,42,0.20)' }}>
-                      {displayName.charAt(0)}
-                    </span>
-                  )}
+                  <PlayerInitialAvatar
+                    name={displayName}
+                    src={logoUrl}
+                    size={60}
+                    radius={8}
+                    imageScale={1}
+                    paletteSeed={slug}
+                  />
                 </div>
                 <div style={{
                   position: 'absolute',
