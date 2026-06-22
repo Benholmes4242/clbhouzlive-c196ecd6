@@ -625,7 +625,7 @@ export function CinematicFrame({
       const tiedItems: StackedAvatarItem[] = safe
         .filter(e => (e?.score ?? e?.total) === topScore)
         .slice(0, Math.min(tiedLeaders.count, 4))
-        .map(e => ({ url: avatar(e), name: entryName(e), userId: e?.player?.id ?? null }));
+        .map(e => ({ candidates: avatar(e), name: entryName(e), userId: e?.player?.id ?? null }));
 
       slotNodes.push(
         <TiedLeadersRowDark
@@ -648,7 +648,7 @@ export function CinematicFrame({
               rank={slot.rank}
               count={slot.count}
               score={slot.score}
-              items={slot.members.map((m: any) => ({ url: avatar(m), name: entryName(m), userId: m?.player?.id ?? null }))}
+              items={slot.members.map((m: any) => ({ candidates: avatar(m), name: entryName(m), userId: m?.player?.id ?? null }))}
               isLast={isLast}
               onTap={onCtaTap}
               isResults={isResults}
@@ -707,7 +707,7 @@ export function CinematicFrame({
               rank={slot.rank}
               count={slot.count}
               score={slot.score}
-              items={slot.members.map((m: any) => ({ url: avatar(m), name: entryName(m), userId: m?.player?.id ?? null }))}
+              items={slot.members.map((m: any) => ({ candidates: avatar(m), name: entryName(m), userId: m?.player?.id ?? null }))}
               isLast={isLast}
               onTap={onCtaTap}
               isResults={isResults}
