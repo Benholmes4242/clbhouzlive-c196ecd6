@@ -11,7 +11,7 @@
  */
 
 import { useState, useMemo } from 'react';
-import { SURFACE, INK_SOFT, INK_TINT_07 } from '../../_shared/tokens';
+import { SURFACE, INK_SOFT, INK_MUTE, INK_TINT_07 } from '../../_shared/tokens';
 import { motion, AnimatePresence } from 'framer-motion';
 import { TrendingUp, TrendingDown } from 'lucide-react';
 import { useCollegeWeeklyMovers } from '../../hooks/useCollegeMovers';
