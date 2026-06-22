@@ -135,30 +135,15 @@ export const PredictionScorecardRow: React.FC<PredictionScorecardRowProps> = ({
           />
         )}
 
-        {/* Avatar — squircle */}
+        {/* Avatar — canonical SquircleAvatar with multi-folder walk + initials fallback */}
         <div className="relative flex-shrink-0">
-          <div
-            className="overflow-hidden bg-muted"
-            style={{
-              width: 40,
-              height: 42,
-              borderRadius: '34%',
-              border: `2px solid ${INK_TINT_07}`,
-            }}
-          >
-            {avatarUrl ? (
-              <img
-                src={avatarUrl}
-                alt={prediction.playerName}
-                className="w-full h-full object-cover"
-                style={{ objectPosition: 'center 20%' }}
-                loading="lazy"
-                onError={(e) => { e.currentTarget.style.display = 'none'; }}
-              />
-            ) : (
-              <div className="w-full h-full bg-muted" />
-            )}
-          </div>
+          <SquircleAvatar
+            size={40}
+            srcCandidates={avatarCandidates}
+            alt={prediction.playerName}
+            userId={prediction.playerId}
+            hideRing
+          />
            {/* Best call green star */}
           {isBestCall && (
             <div
