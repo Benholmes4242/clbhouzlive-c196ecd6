@@ -52,6 +52,7 @@ interface FranchiseCardProps {
   className?: string;
   animationDelay?: number;
   isDelta?: boolean;
+  direction?: 'up' | 'down';
   deltas?: {
     earnings_delta: number;
     wins_delta: number;
@@ -81,8 +82,9 @@ export function FranchiseCard({
   stats, college, rank, activeMetric = 'earnings',
   alumni: _alumni, captain, earningsRankChange, driverText,
   className, animationDelay = 0,
-  isDelta = false, deltas,
+  isDelta = false, direction, deltas,
 }: FranchiseCardProps) {
+  const deltaColor = direction === 'down' ? TREND_DOWN : LIVE_INK;
   const displayName = college?.short_name || college?.college_name || stats.normalized_name;
   const slug = stats.normalized_name;
   const logoUrl = getCollegeLogoUrl(college?.college_name || stats.normalized_name);
@@ -143,9 +145,9 @@ export function FranchiseCard({
           borderBottom: `0.5px solid ${INK_TINT_07}`,
           textDecoration: 'none',
           ...(isDelta && deltas ? {
-            background: deltas.earnings_delta >= 0
-              ? 'rgba(16,185,129,0.04)'
-              : 'rgba(220,38,38,0.02)',
+            background: direction === 'down'
+              ? 'rgba(220,38,38,0.04)'
+              : 'rgba(16,185,129,0.04)',
           } : isTopThree ? {
             background: AMBER_SOFT_BG,
           } : {
@@ -237,7 +239,7 @@ export function FranchiseCard({
               {deltas.earnings_rank_change !== null && deltas.earnings_rank_change !== 0 && (
                 <div style={{
                   fontSize: 12, fontWeight: 800, fontVariantNumeric: 'tabular-nums',
-                  color: deltas.earnings_rank_change > 0 ? LIVE_INK : TREND_DOWN,
+                  color: deltaColor,
                   marginBottom: 2,
                 }}>
                   {deltas.earnings_rank_change > 0 ? `+${deltas.earnings_rank_change}` : String(deltas.earnings_rank_change)}
@@ -245,7 +247,7 @@ export function FranchiseCard({
               )}
               <div style={{
                 fontSize: 15, fontWeight: 800, fontVariantNumeric: 'tabular-nums',
-                color: deltas.earnings_delta >= 0 ? LIVE_INK : TREND_DOWN,
+                color: deltaColor,
               }}>
                 {formatDeltaValue(deltas.earnings_delta)}
               </div>
@@ -262,7 +264,7 @@ export function FranchiseCard({
                 letterSpacing: '-0.005em',
               }}>
                 {rowInteger}
-                {rowDecimal && <span style={{ color: AMBER }}>{rowDecimal}</span>}
+                {rowDecimal && <span style={{ color: primaryValueColor }}>{rowDecimal}</span>}
                 {rowSuffix}
               </span>
             );

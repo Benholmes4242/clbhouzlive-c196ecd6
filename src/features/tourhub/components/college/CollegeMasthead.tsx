@@ -34,20 +34,6 @@ import {
 
 type ActiveMetric = 'earnings' | 'wins' | 'top10s' | 'movers';
 
-const METRIC_SUBLINE: Record<ActiveMetric, string> = {
-  earnings: 'Most decorated by season earnings',
-  wins: 'Most wins this season',
-  top10s: 'Most consistent across the field',
-  movers: 'Biggest weekly mover',
-};
-
-const METRIC_SUBLINE_TIED: Record<ActiveMetric, string> = {
-  earnings: 'Tied for season earnings lead',
-  wins: 'Tied for most wins this season',
-  top10s: 'Tied for most top 10s this season',
-  movers: 'Biggest weekly mover',
-};
-
 interface CollegeMastheadProps {
   stats: CollegeSeasonStats;
   college: CollegeMedia | null;
@@ -71,16 +57,13 @@ export function CollegeMasthead({
   heroAlumni: _heroAlumni,
   captain: _captain,
   runnerUp: _runnerUp,
-  isTiedAtOne = false,
+  isTiedAtOne: _isTiedAtOne = false,
   moversContext: _moversContext,
 }: CollegeMastheadProps) {
   const navigate = useNavigate();
   const displayName = college?.short_name || college?.college_name || stats.normalized_name;
   const slug = stats.normalized_name;
   const logoUrl = getCollegeLogoUrl(college?.college_name || stats.normalized_name);
-
-  const subline = isTiedAtOne ? METRIC_SUBLINE_TIED[activeMetric] : METRIC_SUBLINE[activeMetric];
-
 
   // Primary value split (Stat Watch decimal-tail pattern).
   const primaryValueText = activeMetric === 'wins'
@@ -94,6 +77,7 @@ export function CollegeMasthead({
     : activeMetric === 'top10s'
     ? 'TOP 10s'
     : 'EARNINGS';
+
 
   return (
     <AnimatePresence mode="wait">
@@ -137,16 +121,6 @@ export function CollegeMasthead({
             </span>
             <ChevronRight size={11} strokeWidth={2.5} style={{ color: AMBER, marginTop: 1 }} />
           </button>
-          <div style={{
-            fontSize: 13,
-            fontWeight: 700,
-            color: INK,
-            letterSpacing: '-0.005em',
-            lineHeight: 1.25,
-            margin: '8px 0 0',
-          }}>
-            Season 2025–26 · {subline}
-          </div>
         </div>
 
         {/* Franchise champion card */}
@@ -178,6 +152,16 @@ export function CollegeMasthead({
                 textTransform: 'uppercase' as const,
               }}>
                 SEASON LEADER
+              </span>
+              <span style={{ fontSize: 10.5, fontWeight: 800, color: INK_MUTE }}>·</span>
+              <span style={{
+                fontSize: 10.5,
+                fontWeight: 800,
+                letterSpacing: '0.14em',
+                color: INK_MUTE,
+                textTransform: 'uppercase' as const,
+              }}>
+                2025–26
               </span>
             </div>
 

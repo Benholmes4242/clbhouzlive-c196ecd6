@@ -19,9 +19,7 @@ import { useCollegeMediaMap } from '../../hooks/useCollegeMedia';
 import { useCollegeSeasonStats } from '../../hooks/useCollegeStats';
 import { useBatchCollegeAlumni } from '../../hooks/useBatchCollegeAlumni';
 import { useFranchiseDrivers } from '../../hooks/useFranchiseDrivers';
-import { SectionHeader } from '../shared/SectionHeader';
 import { FranchiseCard } from './FranchiseCard';
-import { format } from 'date-fns';
 
 type Direction = 'up' | 'down';
 
@@ -52,30 +50,12 @@ export function FranchiseMovers({ limit = 8, className }: FranchiseMoversProps) 
   // Single batched query for driver lines — one per Movers tab render.
   const { data: driverMap } = useFranchiseDrivers(slugs, movers?.[0]?.week_start);
 
-  const weekStart = movers?.[0]?.week_start;
-  const weekLabel = weekStart
-    ? (() => {
-        const start = new Date(weekStart);
-        const end = new Date(start);
-        end.setDate(end.getDate() + 6);
-        return `Week of ${format(start, 'MMM d')} – ${format(end, 'MMM d, yyyy')}`;
-      })()
-    : null;
-
   return (
     <div className={className}>
-      {/* Section header */}
-      <div style={{ background: '#ffffff', borderTop: `1px solid ${INK_TINT_07}`, padding: '14px 16px 6px' }}>
-        <SectionHeader eyebrow="Weekly Franchise Movers" />
-        {weekLabel && (
-          <p style={{ fontSize: 11, fontWeight: 500, color: '#94A3B8', margin: '-10px 0 6px 13px' }}>
-            {weekLabel}
-          </p>
-        )}
-      </div>
+
 
       {/* Rising / Falling toggle */}
-      <div style={{ padding: '0 16px 10px', background: '#ffffff' }}>
+      <div style={{ padding: '10px 16px', background: '#F8FAFC' }}>
         <div style={{ display: 'flex', gap: 6 }}>
           {[
             { value: 'up' as Direction, label: 'Rising', Icon: TrendingUp },
@@ -94,7 +74,7 @@ export function FranchiseMovers({ limit = 8, className }: FranchiseMoversProps) 
                   fontWeight: isSelected ? 800 : 600,
                   letterSpacing: '-0.1px',
                   color: isSelected ? SURFACE : INK_SOFT,
-                  background: isSelected ? '#0F172A' : '#ffffff',
+                  background: isSelected ? '#0F172A' : '#F8FAFC',
                   border: isSelected ? 'none' : '1px solid rgba(15,23,42,0.12)',
                   cursor: 'pointer', transition: 'all 0.15s',
                 }}
@@ -108,7 +88,7 @@ export function FranchiseMovers({ limit = 8, className }: FranchiseMoversProps) 
       </div>
 
       {/* Movers table */}
-      <div style={{ background: '#ffffff', borderBottom: `1px solid ${INK_TINT_07}` }}>
+      <div style={{ background: '#F8FAFC', borderBottom: `1px solid ${INK_TINT_07}` }}>
         {/* Column headers */}
         <div style={{ display: 'flex', alignItems: 'center', padding: '5px 16px', background: 'rgba(15,23,42,0.02)', borderTop: `0.5px solid ${INK_TINT_07}`, borderBottom: `0.5px solid ${INK_TINT_07}` }}>
           <span style={{ flex: 1, fontSize: 8.5, fontWeight: 900, color: '#CBD5E1', letterSpacing: '0.1em' }}>FRANCHISE</span>
@@ -145,6 +125,7 @@ export function FranchiseMovers({ limit = 8, className }: FranchiseMoversProps) 
                     driverText={driver?.displayText ?? null}
                     animationDelay={idx * 0.03}
                     isDelta
+                    direction={direction}
                     deltas={{
                       earnings_delta: mover.earnings_delta,
                       wins_delta: mover.wins_delta,
@@ -174,7 +155,7 @@ export function FranchiseMovers({ limit = 8, className }: FranchiseMoversProps) 
         {/* Footer */}
         <div style={{ padding: '10px 16px', borderTop: `0.5px solid ${INK_TINT_07}` }}>
           <p style={{ fontSize: 8.5, fontWeight: 900, color: '#CBD5E1', letterSpacing: '0.12em', textTransform: 'uppercase' as const, textAlign: 'center' as const, margin: 0 }}>
-            WEEKLY EARNINGS CHANGE · {weekLabel?.toUpperCase() ?? 'CURRENT WEEK'}
+            WEEKLY EARNINGS CHANGE
           </p>
         </div>
       </div>
