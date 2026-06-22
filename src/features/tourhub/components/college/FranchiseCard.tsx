@@ -82,8 +82,9 @@ export function FranchiseCard({
   stats, college, rank, activeMetric = 'earnings',
   alumni: _alumni, captain, earningsRankChange, driverText,
   className, animationDelay = 0,
-  isDelta = false, deltas,
+  isDelta = false, direction, deltas,
 }: FranchiseCardProps) {
+  const deltaColor = direction === 'down' ? TREND_DOWN : LIVE_INK;
   const displayName = college?.short_name || college?.college_name || stats.normalized_name;
   const slug = stats.normalized_name;
   const logoUrl = getCollegeLogoUrl(college?.college_name || stats.normalized_name);
