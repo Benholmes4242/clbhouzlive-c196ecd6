@@ -597,17 +597,17 @@ export function CinematicFrame({
           ? safe.slice(firstChaser)
           : safe.slice(tiedLeaders.count);
 
-      const tiedAvatars = safe
+      const tiedItems: StackedAvatarItem[] = safe
         .filter(e => (e?.score ?? e?.total) === topScore)
         .slice(0, Math.min(tiedLeaders.count, 4))
-        .map(e => avatar(e));
+        .map(e => ({ url: avatar(e), name: entryName(e), userId: e?.player?.id ?? null }));
 
       slotNodes.push(
         <TiedLeadersRowDark
           key="tied-leaders"
           count={tiedLeaders.count}
           score={tiedLeaders.score}
-          avatars={tiedAvatars}
+          items={tiedItems}
           isLast={false}
           isResults={isResults}
         />
