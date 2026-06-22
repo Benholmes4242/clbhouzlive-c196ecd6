@@ -27,7 +27,7 @@ export interface LeaderboardBandProps {
   cutLine?: number | null;
   champion?: { name: string; country?: string; score: string; playoffWin?: boolean; avatarUrl?: string | null };
   teeTimes?: TeeTimeGroup[];
-  lastYearFinishers?: { rank: string; name: string; country?: string | null; score: string; year: string; avatarUrl?: string | null }[];
+  lastYearFinishers?: { rank: string; name: string; country?: string | null; score: string; year: string; avatarUrl?: string | null; avatarCandidates?: (string | null | undefined)[]; playerId?: string | null }[];
   /** When true and lastYearFinishers is empty, render the inaugural-event placeholder. */
   firstYearEvent?: boolean;
   cancelReason?: string;
