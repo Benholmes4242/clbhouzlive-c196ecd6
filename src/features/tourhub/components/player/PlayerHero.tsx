@@ -12,7 +12,8 @@
 import { Fragment } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { UserCircle, ChevronRight, Crown } from 'lucide-react';
-import { getPlayerHeadshotUrl, PLAYER_SILHOUETTE_URL } from '@/utils/playerHeadshot';
+import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
+import { resolvePlayerAvatarCandidates } from '@/features/tourhub/_shared/resolvePlayerAvatar';
 import { titleCaseCountry } from '../../utils/countryFlags';
 import CountryFlag from '@/components/ui/country-flag';
 import type { TourPlayer, TourPlayerStatistics } from '../../hooks/useTourHubData';
@@ -25,7 +26,6 @@ import {
   GOLD_DEEP,
   INK,
   INK_MUTE,
-  SLATE_100,
   SLATE_50,
   SURFACE,
 } from '../../_shared/tokens';
@@ -38,7 +38,11 @@ interface PlayerHeroProps {
 
 export function PlayerHero({ player, playerStats }: PlayerHeroProps) {
   const navigate = useNavigate();
-  const heroPhotoUrl = getPlayerHeadshotUrl(player.full_name, player.tour_codes?.[0] ?? 'pga');
+  const avatarCandidates = resolvePlayerAvatarCandidates({
+    name: player.full_name,
+    photoUrl: player.photo_url ?? null,
+    tourSlug: player.tour_codes?.[0] ?? 'pga',
+  });
 
   const age = player.birth_date
     ? Math.floor((Date.now() - new Date(player.birth_date).getTime()) / (365.25 * 24 * 60 * 60 * 1000))
@@ -151,25 +155,21 @@ export function PlayerHero({ player, playerStats }: PlayerHeroProps) {
         {/* Body row */}
         <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
           {/* Photo + position badge */}
-          <div style={{ position: 'relative', flexShrink: 0 }}>
-            <div
-              style={{
-                width: 84,
-                height: 84,
-                borderRadius: '34%',
-                overflow: 'hidden',
-                background: SLATE_100,
-                border: `2.5px solid ${GOLD}`,
-                boxShadow: '0 4px 12px rgba(255,184,0,0.20)',
-              }}
-            >
-              <img
-                src={heroPhotoUrl}
-                alt={player.full_name}
-                style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center 5%' }}
-                onError={e => { (e.target as HTMLImageElement).src = PLAYER_SILHOUETTE_URL; }}
-              />
-            </div>
+          <div
+            style={{
+              position: 'relative',
+              flexShrink: 0,
+              borderRadius: '34%',
+              boxShadow: '0 4px 12px rgba(255,184,0,0.20)',
+            }}
+          >
+            <SquircleAvatar
+              size={84}
+              srcCandidates={avatarCandidates}
+              alt={player.full_name}
+              userId={player.id ?? player.full_name}
+              ringColor={GOLD}
+            />
 
             {/* Position badge — gated: worldRank && worldRank <= 99 (Q2 decision) */}
             {worldRank && worldRank <= 99 && (

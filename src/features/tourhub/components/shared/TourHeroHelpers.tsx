@@ -8,8 +8,7 @@ import type { WinnerStats } from '../../hooks/useWinnerScorecardStats';
 import type { WinnerSeasonStats } from '../../hooks/useWinnerSeasonStats';
 import { SCORE_COLORS } from '../../utils/scoreColors';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
-import { getPlayerHeadshotUrl, PLAYER_SILHOUETTE_URL } from '@/utils/playerHeadshot';
-import { PlayerSilhouette } from '@/components/ui/PlayerSilhouette';
+import { resolvePlayerAvatarCandidates } from '../../_shared/resolvePlayerAvatar';
 import type { TournamentFinisher } from '../../hooks/useTournamentLeadersWinners';
 import { useCountdown } from '@/hooks/useCountdown';
 import { getScoreColor as getScoreColorCanonical } from '../../_shared/scoreColor';
@@ -111,58 +110,10 @@ export function UpcomingCountdown({ startDate }: { startDate: string }) {
   );
 }
 
-/** Frosted glass avatar — for use inside dark/photo glass cards */
-function FrostedAvatar({ src, fallbackSrc, displayName, size }: { src: string | null; fallbackSrc?: string | null; displayName: string; size: number }) {
-  const [currentSrc, setCurrentSrc] = React.useState(src);
-  const [imgError, setImgError] = React.useState(false);
-  const [loaded, setLoaded] = React.useState(false);
-  const [triedFallback, setTriedFallback] = React.useState(false);
-  const initials = displayName.split(/[\s.]/).filter(Boolean).map(w => w[0]?.toUpperCase() || '').slice(0, 2).join('') || '?';
-
-  // Reset state when src prop changes
-  React.useEffect(() => {
-    setCurrentSrc(src);
-    setImgError(false);
-    setLoaded(false);
-    setTriedFallback(false);
-  }, [src]);
-
-  const handleLoad = () => {
-    setLoaded(true); // Lock in success — ignore subsequent onError
-  };
-
-  const handleError = () => {
-    if (loaded) return; // Image already loaded successfully — ignore false error
-    // Try PGA R2 fallback before giving up (many non-PGA players have PGA headshots)
-    if (!triedFallback && fallbackSrc) {
-      setTriedFallback(true);
-      setCurrentSrc(fallbackSrc);
-      return;
-    }
-    // Image failed — show inline PlayerSilhouette immediately
-    setImgError(true);
-  };
-
-  return (
-    <div style={{
-      width: size, height: size, borderRadius: '34%', overflow: 'hidden', flexShrink: 0,
-      border: '1.5px solid rgba(255,255,255,0.18)',
-      background: 'rgba(255,255,255,0.06)',
-      display: 'flex', alignItems: 'center', justifyContent: 'center',
-    }}>
-      {currentSrc && !imgError ? (
-        <img src={currentSrc} alt={displayName} onLoad={handleLoad} onError={handleError} style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'top' }} />
-      ) : (
-        <PlayerSilhouette size={Math.round(size * 0.75)} />
-      )}
-    </div>
-  );
-}
-
 /** Squircle avatar matching the global SDS spec (34% radius, 1:1.05 aspect) */
 export function PlayerAvatar({
   photoUrl,
-  pgaTourId,
+  pgaTourId: _pgaTourId,
   displayName,
   fullName,
   headshotOverride,
@@ -183,31 +134,44 @@ export function PlayerAvatar({
   /** Use frosted glass styling (translucent bg + border) — for glass card contexts */
   frosted?: boolean;
 }) {
-  // PRIMARY: R2 headshot by full name + tour. FALLBACK: silhouette.
-  const nameForLookup = fullName || displayName;
-  // Use photoUrl directly if provided (Sportradar CDN) — covers non-PGA tours
-  // where R2 headshots may not exist. Fall back to R2 lookup by tour, then PGA folder, then silhouette.
-  const tourR2 = getPlayerHeadshotUrl(nameForLookup, tourCode || 'pga', headshotOverride);
-  // For non-PGA tours, also build a PGA fallback URL (many players have PGA headshots)
-  const pgaFallbackR2 = tourCode && tourCode !== 'pga' ? getPlayerHeadshotUrl(nameForLookup, 'pga', headshotOverride) : null;
-  const resolved = photoUrl || tourR2 || PLAYER_SILHOUETTE_URL;
-  const initials = displayName
-    .split(/[\s.]/)
-    .filter(Boolean)
-    .map(w => w[0]?.toUpperCase() || '')
-    .slice(0, 2)
-    .join('') || '?';
+  const nameForLookup = headshotOverride || fullName || displayName;
+  const candidates = resolvePlayerAvatarCandidates({
+    name: nameForLookup,
+    photoUrl: photoUrl ?? null,
+    tourSlug: tourCode || 'pga',
+  });
 
   if (frosted) {
-    return <FrostedAvatar src={resolved} fallbackSrc={pgaFallbackR2} displayName={displayName} size={size} />;
+    // Frosted glass shell — translucent ring/background for dark photo cards.
+    return (
+      <div
+        style={{
+          width: size,
+          height: size,
+          borderRadius: '34%',
+          overflow: 'hidden',
+          flexShrink: 0,
+          border: '1.5px solid rgba(255,255,255,0.18)',
+          background: 'rgba(255,255,255,0.06)',
+        }}
+      >
+        <SquircleAvatar
+          size={size}
+          srcCandidates={candidates}
+          alt={displayName}
+          userId={nameForLookup}
+          hideRing
+        />
+      </div>
+    );
   }
 
   return (
     <SquircleAvatar
       size={size}
-      src={resolved}
+      srcCandidates={candidates}
       alt={displayName}
-      fallback={initials}
+      userId={nameForLookup}
       hideRing
     />
   );
