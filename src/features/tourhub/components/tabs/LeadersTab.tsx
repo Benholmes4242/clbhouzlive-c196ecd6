@@ -14,7 +14,7 @@ import { Search, X } from 'lucide-react';
 import { useTourSeason, useTourPlayerStatistics } from '../../hooks/useTourHubData';
 import { useWorldRankingsLeaders } from '../../hooks/useWorldRankingsLeaders';
 import { useElitePlayers } from '../../hooks/useElitePlayers';
-import { useChampionStreak } from '../../hooks/useChampionStreak';
+
 import { useRecentPlayerResults } from '../../hooks/useRecentPlayerResults';
 import { useDebouncedValue } from '@/hooks/useDebouncedValue';
 import { LEADER_CATEGORIES, getCategoryByKey } from '../leaders/constants';
