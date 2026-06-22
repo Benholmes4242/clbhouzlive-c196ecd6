@@ -75,7 +75,13 @@ export function SoloLeaderRow({
         {rank}
       </span>
       <div style={{ display: 'flex', gap: 12, alignItems: 'center', minWidth: 0 }}>
-        <PlayerHead size={36} src={avatarUrl} />
+        <SquircleAvatar
+          size={36}
+          srcCandidates={avatarCandidates}
+          alt={name}
+          userId={playerId ?? name}
+          hideRing
+        />
         <div style={{ display: 'flex', alignItems: 'center', gap: 6, minWidth: 0 }}>
           <span
             style={{
