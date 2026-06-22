@@ -111,8 +111,16 @@ export function TournamentResultsCard({
     : effectiveWinner?.margin ? `Won by ${effectiveWinner.margin} strokes`
     : '';
 
-  const winnerPhoto = (winnerName ? getPlayerHeadshotUrl(winnerName, 'pga') : null)
-    ?? PLAYER_SILHOUETTE_URL;
+  // Multi-folder candidate walk for the winner photo. When ALL miss,
+  // the hero intentionally falls back to the venue image (then silhouette) —
+  // this surface is venue-backed, NOT a canonical-initials surface.
+  const winnerCandidates = winnerName
+    ? resolvePlayerAvatarCandidates({
+        name: winnerName,
+        photoUrl: effectiveWinner?.player?.photo_url ?? null,
+        tourSlug: tourSlug ?? 'pga',
+      })
+    : [];
   const heroFallback = venueImageUrl ?? PLAYER_SILHOUETTE_URL;
 
   const narrative = useMemo(() => {
