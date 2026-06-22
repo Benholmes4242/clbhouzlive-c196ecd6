@@ -14,7 +14,7 @@ import { Search, X } from 'lucide-react';
 import { useTourSeason, useTourPlayerStatistics } from '../../hooks/useTourHubData';
 import { useWorldRankingsLeaders } from '../../hooks/useWorldRankingsLeaders';
 import { useElitePlayers } from '../../hooks/useElitePlayers';
-import { useChampionStreak } from '../../hooks/useChampionStreak';
+
 import { useRecentPlayerResults } from '../../hooks/useRecentPlayerResults';
 import { useDebouncedValue } from '@/hooks/useDebouncedValue';
 import { LEADER_CATEGORIES, getCategoryByKey } from '../leaders/constants';
@@ -172,13 +172,12 @@ export function LeadersTab() {
     return map;
   }, [playerStats, worldRankings]);
 
-  // ─── Hero leader (#1) + runner for margin ───
+  // ─── Hero leader (#1) ───
   // Lifted above the loading early return so hook order stays stable across
   // renders (was: React error #310 when isLoading flipped). All downstream
   // react-query hooks have `enabled` guards (verified in audit Q3) so they
   // sit idle until rankedPlayers materialises.
   const leader = rankedPlayers[0] ?? null;
-  const runnerUp = rankedPlayers[1] ?? null;
 
   // ─── Search-filtered list (hero #1 stays in list) ───
   const filteredPlayers = useMemo(() => {
@@ -199,43 +198,7 @@ export function LeadersTab() {
   );
   const { data: recentResultsMap } = useRecentPlayerResults(sortedPlayerIds);
 
-  // ─── Champion streak for caption metadata (World Rankings only) ───
-  const { data: streakWeeks } = useChampionStreak(
-    isWorldCategory ? leader?.playerId : null,
-  );
-
-  // Streak label — World Rankings only, ≥2 weeks.
-  const streakLabel = useMemo<string | null>(() => {
-    if (!isWorldCategory || !streakWeeks || streakWeeks < 2) return null;
-    return `${streakWeeks} CONSECUTIVE WEEKS`;
-  }, [isWorldCategory, streakWeeks]);
-
-  // Margin label — only when there's a meaningful gap to the runner-up.
-  const marginLabel = useMemo<string | null>(() => {
-    if (!leader || !runnerUp) return null;
-    const a = leader.value;
-    const b = runnerUp.value;
-    if (a == null || b == null) return null;
-    if (isWorldCategory) {
-      const diff = a - b;
-      if (diff <= 0) return null;
-      return `MARGIN +${Math.round(diff)} PTS`;
-    }
-    const higher = category.higherIsBetter !== false;
-    const diff = higher ? a - b : b - a;
-    if (diff <= 0) return null;
-    // For currency-like categories (earnings), use the category's own format
-    // so the margin renders as "$278,300" or "$1.20M" — consistent with how
-    // the headline leader value is displayed. Apple-finish: numbers always formatted.
-    const sampleFormatted = category.format(diff);
-    const isCurrencyLike = sampleFormatted.startsWith('$');
-    if (isCurrencyLike) {
-      return `MARGIN +${sampleFormatted}`;
-    }
-    const rounded = Math.abs(diff) >= 10 ? Math.round(diff) : Math.round(diff * 10) / 10;
-    const unit = category.unit ? ` ${category.unit.toUpperCase()}` : '';
-    return `MARGIN +${rounded}${unit}`;
-  }, [leader, runnerUp, isWorldCategory, category]);
+  // ─── (streak / margin labels removed in condense pass) ───
 
   // ─── Loading skeleton ───
   if (isLoading) {
@@ -281,8 +244,6 @@ export function LeadersTab() {
         category={category}
         formatOverride={worldFormatOverride}
         unitOverride={worldUnitOverride}
-        streakLabel={streakLabel}
-        marginLabel={marginLabel}
         seasonYear={season?.year ?? null}
         tourLabel="PGA"
         onEyebrowTap={() => navigate('/tourhub?tab=overview', { replace: true })}
@@ -308,17 +269,8 @@ export function LeadersTab() {
           )}
         </div>
 
-        {/* Count bar OR search input — mutually exclusive */}
-        {!searchExpanded ? (
-          <div style={{ display: 'flex', alignItems: 'baseline', gap: 8, padding: '6px 16px 8px' }}>
-            <span style={{ fontSize: 9, fontWeight: 800, color: INK, letterSpacing: '0.14em', textTransform: 'uppercase' as const, fontVariantNumeric: 'tabular-nums' }}>
-              {listPlayers.length.toLocaleString()} {listPlayers.length === 1 ? 'PLAYER' : 'PLAYERS'}
-            </span>
-            <span style={{ fontSize: 9, fontWeight: 800, color: INK_MUTE, letterSpacing: '0.14em', textTransform: 'uppercase' as const }}>
-              RANKED BY <span style={{ color: INK }}>{category.shortLabel.toUpperCase()}</span>
-            </span>
-          </div>
-        ) : (
+        {/* Search input — appears when expanded */}
+        {searchExpanded && (
           <div style={{ padding: '6px 16px 8px' }}>
             <div style={{ position: 'relative' }}>
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 z-10 w-4 h-4" style={{ color: AMBER }} strokeWidth={2.5} />
@@ -358,13 +310,7 @@ export function LeadersTab() {
             >
               {listPlayers.length > 0 ? (
                 <>
-                  {!search && (
-                    <div style={{ padding: '12px 16px 6px' }}>
-                      <span style={{ fontSize: 9, fontWeight: 800, color: INK_MUTE, letterSpacing: '0.14em', textTransform: 'uppercase' as const }}>
-                        CHASING
-                      </span>
-                    </div>
-                  )}
+                  {/* (CHASING header removed in condense pass) */}
                   {listPlayers.map((item, idx) => {
                     const fmt = worldFormatOverride ?? category.format;
                     const unit = worldUnitOverride ?? category.unit;
@@ -396,10 +342,10 @@ export function LeadersTab() {
                       />
                     );
                   })}
-                  {/* Footer */}
-                  <div style={{ padding: '12px 16px', textAlign: 'center', borderTop: `0.5px solid ${INK_TINT_07}` }}>
-                    <span style={{ fontSize: 9, fontWeight: 800, color: INK_FAINT, letterSpacing: '0.14em', textTransform: 'uppercase' as const }}>
-                      SEASON LEADERS · AVAILABLE TOURNAMENT DATA
+                  {/* End of list */}
+                  <div style={{ padding: '20px 16px 28px', textAlign: 'center' }}>
+                    <span style={{ fontSize: 11, fontWeight: 600, color: INK_FAINT, letterSpacing: '0.01em' }}>
+                      You've reached the end of the list
                     </span>
                   </div>
                 </>
