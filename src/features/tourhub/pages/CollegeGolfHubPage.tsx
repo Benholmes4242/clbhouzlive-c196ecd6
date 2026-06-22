@@ -15,7 +15,7 @@ import { useCollegeMediaMap } from '../hooks/useCollegeMedia';
 import { useHeroAlumni } from '../hooks/useBatchCollegeAlumni';
 import { useFranchiseCaptains } from '../hooks/useFranchiseCaptains';
 import { useCollegeWeeklyMovers } from '../hooks/useCollegeMovers';
-import { AMBER, INK, INK_FAINT, INK_TINT_06, INK_TINT_07, HAIRLINE_INK_10, SLATE_50, SLATE_150, SURFACE } from '../_shared/tokens';
+import { AMBER, AMBER_SOFT_BG, INK, INK_FAINT, INK_TINT_06, INK_TINT_07, SLATE_50, SLATE_150, SURFACE } from '../_shared/tokens';
 
 type MetricTab = 'earnings' | 'wins' | 'top10s' | 'movers';
 const VALID_METRICS = new Set<string>(['earnings', 'wins', 'top10s', 'movers']);
@@ -178,51 +178,47 @@ export function CollegeGolfHubPage() {
             <button
               onClick={() => setSearchExpanded(v => !v)}
               style={{
-                display: 'flex', alignItems: 'center', gap: 5,
-                padding: '6px 10px', borderRadius: 8,
-                background: SLATE_150, border: 'none', cursor: 'pointer',
+                width: '32px', height: '32px', borderRadius: '8px',
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                background: searchExpanded ? AMBER_SOFT_BG : SLATE_150,
+                border: 'none', cursor: 'pointer',
               }}
-              aria-label="Search colleges"
+              aria-label="Search franchises"
             >
-              <Search className="w-3 h-3" style={{ color: INK }} strokeWidth={2.5} />
-              <span style={{ fontSize: 12, fontWeight: 700, color: INK }}>Search</span>
+              <Search className="w-4 h-4" style={{ color: searchExpanded ? AMBER : INK }} strokeWidth={2.5} />
             </button>
           </div>
 
           {/* Collapsible search input */}
           <div
-            className="overflow-hidden transition-all duration-250 ease-in-out"
+            className="overflow-hidden transition-all duration-250 ease-in-out px-4"
             style={{
               maxHeight: searchExpanded ? 60 : 0,
               opacity: searchExpanded ? 1 : 0,
             }}
           >
-            <div style={{ padding: '6px 16px 8px' }}>
-              <div style={{ position: 'relative' }}>
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 z-10 w-4 h-4" style={{ color: AMBER }} strokeWidth={2.5} />
-                <input
-                  type="text"
-                  autoFocus
-                  placeholder="Search colleges..."
-                  value={searchValue}
-                  onChange={(e) => setSearchValue(e.target.value)}
-                  className="w-full h-9 pl-9 pr-9 rounded-lg text-[13px] font-semibold text-foreground placeholder:text-muted-foreground/70 focus:outline-none"
-                  style={{ background: SURFACE, border: `1px solid ${HAIRLINE_INK_10}` }}
-                />
-                <AnimatePresence>
-                  {searchValue && (
-                    <motion.button
-                      onClick={() => setSearchValue('')}
-                      className="absolute right-3 top-1/2 -translate-y-1/2 p-1 rounded-full bg-muted active:scale-90"
-                      initial={{ opacity: 0, scale: 0.8 }}
-                      animate={{ opacity: 1, scale: 1 }}
-                      exit={{ opacity: 0, scale: 0.8 }}
-                    >
-                      <X className="w-3 h-3 text-muted-foreground" />
-                    </motion.button>
-                  )}
-                </AnimatePresence>
-              </div>
+            <div className="relative pt-2.5">
+              <Search className="absolute left-4 top-1/2 -translate-y-1/2 z-10 text-muted-foreground w-[17px] h-[17px] mt-[5px]" strokeWidth={2.5} />
+              <input
+                type="text"
+                placeholder="Search colleges..."
+                value={searchValue}
+                onChange={(e) => setSearchValue(e.target.value)}
+                className="w-full h-10 pl-9 pr-9 rounded-xl text-[13px] bg-card border border-border/50 text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-amber-500/20 focus:border-amber-400/60 transition-all"
+              />
+              <AnimatePresence>
+                {searchValue && (
+                  <motion.button
+                    onClick={() => setSearchValue('')}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 mt-[5px] p-1 rounded-full bg-muted active:scale-90"
+                    initial={{ opacity: 0, scale: 0.8 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    exit={{ opacity: 0, scale: 0.8 }}
+                  >
+                    <X className="w-3 h-3 text-muted-foreground" />
+                  </motion.button>
+                )}
+              </AnimatePresence>
             </div>
           </div>
         </div>

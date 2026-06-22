@@ -23,7 +23,6 @@ import type { CollegeMomentum } from '../../hooks/useCollegeStatus';
 import type { AlumniFace } from '../../hooks/useBatchCollegeAlumni';
 import type { FranchiseCaptain } from '../../hooks/useFranchiseCaptains';
 import { MovementIndicator } from '../shared/MovementIndicator';
-import { PlayerInitialAvatar } from '../shared/PlayerInitialAvatar';
 import { splitStatValue } from '../../utils/splitStatValue';
 import {
   captainDominates,
@@ -174,15 +173,26 @@ export function FranchiseCard({
 
         {/* College logo + name + subline */}
         <div style={{ flex: 1, display: 'flex', alignItems: 'center', gap: '10px', minWidth: 0 }}>
-          <PlayerInitialAvatar
-            name={displayName}
-            src={logoUrl}
-            size={logoSize}
-            radius={8}
-            imageScale={0.78}
-            paletteSeed={slug}
-          />
-
+          <div style={{
+            width: logoSize, height: logoSize, borderRadius: 8, flexShrink: 0,
+            background: 'rgba(15,23,42,0.04)',
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            overflow: 'hidden',
+          }}>
+            {logoUrl ? (
+              <img
+                src={logoUrl}
+                alt={displayName}
+                style={{ width: logoSize - 8, height: logoSize - 8, objectFit: 'contain' }}
+                loading="lazy"
+                onError={(e) => { e.currentTarget.style.display = 'none'; }}
+              />
+            ) : (
+              <span style={{ fontSize: 13, fontWeight: 800, color: INK_FAINT }}>
+                {displayName.charAt(0)}
+              </span>
+            )}
+          </div>
 
           <div style={{ minWidth: 0, flex: 1 }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: 6, minWidth: 0 }}>
@@ -222,46 +232,44 @@ export function FranchiseCard({
           </>
         )}
 
-        {/* Primary value (or Movers MOVE + EARNINGS cells) */}
-        {isDelta && deltas ? (
-          <>
-            <span style={{
-              width: 40, textAlign: 'center' as const, flexShrink: 0,
-              fontSize: 13, fontWeight: 800, fontVariantNumeric: 'tabular-nums',
-              color: deltaColor,
-            }}>
-              {deltas.earnings_rank_change != null && deltas.earnings_rank_change !== 0
-                ? (deltas.earnings_rank_change > 0 ? `+${deltas.earnings_rank_change}` : String(deltas.earnings_rank_change))
-                : '—'}
-            </span>
-            <span style={{
-              width: 72, textAlign: 'right' as const, flexShrink: 0,
-              fontSize: 15, fontWeight: 800, fontVariantNumeric: 'tabular-nums',
-              color: deltaColor,
-            }}>
-              {formatDeltaValue(deltas.earnings_delta)}
-            </span>
-          </>
-        ) : (
-          <div style={{ textAlign: 'right' as const, flexShrink: 0, minWidth: 72 }}>
-            {(() => {
-              const { integer: rowInteger, decimal: rowDecimal, suffix: rowSuffix } = splitStatValue(primaryValueText);
-              return (
-                <span style={{
-                  fontSize: 14,
-                  fontWeight: 800,
-                  color: primaryValueColor,
-                  fontVariantNumeric: 'tabular-nums',
-                  letterSpacing: '-0.005em',
+        {/* Primary value */}
+        <div style={{ textAlign: 'right' as const, flexShrink: 0, minWidth: 72 }}>
+          {isDelta && deltas ? (
+            <>
+              {deltas.earnings_rank_change !== null && deltas.earnings_rank_change !== 0 && (
+                <div style={{
+                  fontSize: 12, fontWeight: 800, fontVariantNumeric: 'tabular-nums',
+                  color: deltaColor,
+                  marginBottom: 2,
                 }}>
-                  {rowInteger}
-                  {rowDecimal && <span style={{ color: primaryValueColor }}>{rowDecimal}</span>}
-                  {rowSuffix}
-                </span>
-              );
-            })()}
-          </div>
-        )}
+                  {deltas.earnings_rank_change > 0 ? `+${deltas.earnings_rank_change}` : String(deltas.earnings_rank_change)}
+                </div>
+              )}
+              <div style={{
+                fontSize: 15, fontWeight: 800, fontVariantNumeric: 'tabular-nums',
+                color: deltaColor,
+              }}>
+                {formatDeltaValue(deltas.earnings_delta)}
+              </div>
+            </>
+          ) : (() => {
+            // Primary value with amber decimal tail (Stat Watch pattern).
+            const { integer: rowInteger, decimal: rowDecimal, suffix: rowSuffix } = splitStatValue(primaryValueText);
+            return (
+              <span style={{
+                fontSize: 14,
+                fontWeight: 800,
+                color: primaryValueColor,
+                fontVariantNumeric: 'tabular-nums',
+                letterSpacing: '-0.005em',
+              }}>
+                {rowInteger}
+                {rowDecimal && <span style={{ color: primaryValueColor }}>{rowDecimal}</span>}
+                {rowSuffix}
+              </span>
+            );
+          })()}
+        </div>
       </Link>
     </motion.div>
   );
