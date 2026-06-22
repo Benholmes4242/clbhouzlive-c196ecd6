@@ -205,12 +205,14 @@ function TiedLeadersRowDark({
   count,
   score,
   avatars,
+  items,
   isLast,
   isResults = false,
 }: {
   count: number;
   score: string;
-  avatars: (string | null)[];
+  avatars?: (string | null)[];
+  items?: StackedAvatarItem[];
   isLast: boolean;
   isResults?: boolean;
 }) {
@@ -231,7 +233,7 @@ function TiedLeadersRowDark({
       >
         T1
       </span>
-      <StackedAvatarsDark urls={avatars} size={26} />
+      <StackedAvatarsDark urls={avatars} items={items} size={26} />
       <span
         style={{
           flex: 1, minWidth: 0, fontSize: 14, fontWeight: 700, color: 'white',
