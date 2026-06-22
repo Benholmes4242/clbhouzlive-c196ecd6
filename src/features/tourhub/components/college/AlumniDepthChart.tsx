@@ -385,7 +385,6 @@ function ColumnHeader() {
     <div style={{
       display: 'flex',
       alignItems: 'center',
-      gap: 10,
       padding: '8px 16px',
       borderTop: `0.5px solid ${INK_TINT_07}`,
       borderBottom: `0.5px solid ${INK_TINT_07}`,
