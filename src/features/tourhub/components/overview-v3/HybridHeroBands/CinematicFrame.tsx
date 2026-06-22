@@ -1100,8 +1100,10 @@ export function CinematicFrame({
                   alignItems: 'center',
                   gap: 10,
                   padding: '13px 16px 11px',
-                  background: '#0A0E14',
-                  borderTop: '0.5px solid rgba(255,255,255,0.06)',
+                  background: 'rgba(10,14,20,0.50)',
+                  backdropFilter: 'blur(10px)',
+                  WebkitBackdropFilter: 'blur(10px)',
+                  borderTop: '0.5px solid rgba(255,255,255,0.18)',
                 }}
               >
                 <span aria-hidden style={{ fontSize: 26, lineHeight: 1, flexShrink: 0 }}>🏆</span>
