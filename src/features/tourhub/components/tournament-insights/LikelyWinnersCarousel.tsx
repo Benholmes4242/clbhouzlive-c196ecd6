@@ -230,18 +230,11 @@ export const LikelyWinnersCarousel = memo(function LikelyWinnersCarousel({
                     </span>
                   </div>
                 ) : (
-                  <img
-                    src={pick.avatarUrl}
+                  <PickBannerPhoto
+                    candidates={candidates}
                     alt={pick.name}
-                    className="w-full h-full object-cover"
-                    style={{
-                      objectPosition: 'center 20%',
-                      borderRadius: '16px 16px 0 0',
-                      opacity: pick.isWithdrawn ? 0.4 : 1,
-                    }}
-                    loading="lazy"
-                    decoding="async"
-                    onError={() => handleImageError(pick.id)}
+                    withdrawn={!!pick.isWithdrawn}
+                    onExhausted={() => handleImageError(pick.id)}
                   />
                 )}
 
