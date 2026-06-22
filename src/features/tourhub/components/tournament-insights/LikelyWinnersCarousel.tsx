@@ -156,7 +156,8 @@ export const LikelyWinnersCarousel = memo(function LikelyWinnersCarousel({
         }}
       >
         {allPicks.map((pick, i) => {
-          const imgFailed = failedImages.has(pick.id) || !pick.avatarUrl;
+          const candidates = resolvePlayerAvatarCandidates({ name: pick.name, photoUrl: pick.avatarUrl || null, tourSlug: 'pga' });
+          const imgFailed = failedImages.has(pick.id) || candidates.length === 0;
 
           return (
             <div
