@@ -1,6 +1,7 @@
 import { Link } from 'react-router-dom';
 import { getCollegeLogoUrl } from '@/utils/collegeLogo';
-import { getPlayerHeadshotUrl, PLAYER_SILHOUETTE_URL } from '@/utils/playerHeadshot';
+import { getPlayerHeadshotCandidates } from '@/utils/playerHeadshot';
+import { PlayerInitialAvatar } from '../shared/PlayerInitialAvatar';
 import { formatCurrency } from '@/lib/utils/formatCurrency';
 import { useTourSeason } from '../../hooks/useTourHubData';
 import { playerRoute } from '../../routes';
