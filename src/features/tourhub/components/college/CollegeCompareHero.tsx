@@ -132,7 +132,7 @@ function AlumniCompareBlock({ title, alumni1, alumni2, statKey, name1, name2, em
   if (rowCount === 0) return null;
 
   return (
-    <div style={{ background: SURFACE, borderTop: `1px solid ${INK_TINT_07}`, borderBottom: `1px solid ${INK_TINT_07}`, marginTop: '8px' }}>
+    <div style={{ background: SURFACE, borderTop: `0.5px solid ${INK_TINT_07}` }}>
       {/* Section eyebrow — canonical §6 slate-caps */}
       <div style={{ padding: '14px 16px 10px' }}>
         <span style={{ fontSize: '9px', fontWeight: 800, color: INK_MUTE, letterSpacing: '0.16em', textTransform: 'uppercase' as const }}>
@@ -140,14 +140,14 @@ function AlumniCompareBlock({ title, alumni1, alumni2, statKey, name1, name2, em
         </span>
       </div>
 
-      {/* Column headers */}
-      <div style={{ display: 'flex', alignItems: 'center', padding: '4px 16px', background: INK_TINT_02, borderTop: `0.5px solid ${INK_TINT_07}`, borderBottom: `0.5px solid ${INK_TINT_07}` }}>
+      {/* Column headers — de-boxed, single bottom hairline */}
+      <div style={{ display: 'flex', alignItems: 'center', padding: '4px 16px 6px', borderBottom: `0.5px solid ${INK_TINT_07}` }}>
         <span style={{ width: '18px', flexShrink: 0 }} />
-        <span style={{ flex: 1, fontSize: '9px', fontWeight: 800, color: INK_FAINT, letterSpacing: '0.14em', paddingRight: '8px' }}>
+        <span style={{ flex: 1, fontSize: '10px', fontWeight: 700, color: INK_MUTE, letterSpacing: '0.08em', paddingRight: '8px' }}>
           {name1.toUpperCase()}
         </span>
         <div style={{ width: '1px', height: '12px', background: INK_TINT_07, flexShrink: 0 }} />
-        <span style={{ flex: 1, fontSize: '9px', fontWeight: 800, color: INK_FAINT, letterSpacing: '0.14em', paddingLeft: '8px' }}>
+        <span style={{ flex: 1, fontSize: '10px', fontWeight: 700, color: INK_MUTE, letterSpacing: '0.08em', paddingLeft: '8px' }}>
           {name2.toUpperCase()}
         </span>
       </div>
