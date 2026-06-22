@@ -21,7 +21,7 @@ import { useLegacyAlumni } from '../../hooks/useLegacyAlumni';
 import { getPlayerHeadshotCandidates } from '@/utils/playerHeadshot';
 import { formatCurrency } from '@/lib/utils/formatCurrency';
 import { PlayerInitialAvatar } from '../shared/PlayerInitialAvatar';
-import { getPlayerTourTag } from '../../utils/playerTourTag';
+
 import { TIER_SUBTITLES } from '../../constants/legacyAlumni';
 import { playerRoute } from '../../routes';
 
@@ -65,7 +65,6 @@ function AlumniRow({ alumnus, index, tier, legacyContextLabel }: AlumniRowProps)
     ? alumnus.world_ranking
     : null;
   const photoCandidates = getPlayerHeadshotCandidates(fullName, alumnus.tour_codes?.[0] ?? 'pga');
-  const tourTag = getPlayerTourTag(alumnus.tour_codes);
 
   const subline = tier === 'legacy'
     ? (legacyContextLabel ?? 'Major champion · Program history')
@@ -109,7 +108,7 @@ function AlumniRow({ alumnus, index, tier, legacyContextLabel }: AlumniRowProps)
               : undefined}
           />
           <div style={{ minWidth: 0, flex: 1 }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 6, minWidth: 0 }}>
+            <div style={{ display: 'flex', alignItems: 'center', minWidth: 0 }}>
               <p style={{
                 fontSize: 14,
                 fontWeight: nameWeight,
@@ -122,20 +121,6 @@ function AlumniRow({ alumnus, index, tier, legacyContextLabel }: AlumniRowProps)
               }}>
                 {fullName}
               </p>
-              {tourTag && (
-                <span style={{
-                  fontSize: 8,
-                  fontWeight: 800,
-                  letterSpacing: '0.5px',
-                  padding: '1px 4px',
-                  borderRadius: 3,
-                  background: tourTag.bg,
-                  color: tourTag.fg,
-                  flexShrink: 0,
-                }}>
-                  {tourTag.label}
-                </span>
-              )}
             </div>
             {subline && (
               <div style={{ fontSize: 10, fontWeight: 500, color: INK_FAINT, marginTop: 1 }}>
@@ -385,7 +370,6 @@ function ColumnHeader() {
     <div style={{
       display: 'flex',
       alignItems: 'center',
-      gap: 10,
       padding: '8px 16px',
       borderTop: `0.5px solid ${INK_TINT_07}`,
       borderBottom: `0.5px solid ${INK_TINT_07}`,
