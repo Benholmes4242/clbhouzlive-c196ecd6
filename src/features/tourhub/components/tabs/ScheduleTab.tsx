@@ -469,7 +469,6 @@ export function ScheduleTab() {
                     <ScheduleMonthHeader
                       monthLabel={group.monthLabel}
                       eventCount={group.tournaments.length}
-                      tourBreakdown={group.tourBreakdown}
                       isCurrentMonth={isCurrentMonth}
                     />
                   )}
