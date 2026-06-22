@@ -426,7 +426,7 @@ export function CollegeCompareHero({ data, className }: CollegeCompareHeroProps)
       </div>
 
       {/* ── SEASON OVERVIEW ── */}
-      <div style={{ background: SURFACE, borderTop: `1px solid ${INK_TINT_07}`, borderBottom: `1px solid ${INK_TINT_07}`, marginTop: '8px' }}>
+      <div style={{ background: SURFACE, borderTop: `0.5px solid ${INK_TINT_07}` }}>
         {/* Mini logo column headers */}
         <div style={{ display: 'flex', alignItems: 'center', padding: '12px 16px 0' }}>
           <div style={{ flex: 1, display: 'flex', alignItems: 'center', gap: '5px' }}>
