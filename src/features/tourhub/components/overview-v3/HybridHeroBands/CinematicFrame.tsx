@@ -567,7 +567,7 @@ export function CinematicFrame({
   tourSlug,
   defendingChamp = null,
   fieldStrength = null,
-  tournamentScoring = null,
+  
   venuePar = null,
   venueYardage = null,
   purse = null,
