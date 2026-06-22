@@ -502,7 +502,7 @@ export function PlayersTab() {
     if (!tourFilteredPlayers || tourFilteredPlayers.length === 0) return [];
     
     return tourFilteredPlayers.slice(0, 5).map(toEliteShape);
-  }, [elitePlayers, activeTour, allPlayers, statsMap, tourFilteredPlayers, rankMap, sort]);
+  }, [elitePlayers, activeTour, allPlayers, statsMap, tourFilteredPlayers, rankMap, sort, tourRankings]);
 
   // Search filter
   const matchesSearch = useCallback((name: string, country: string | null) => {
