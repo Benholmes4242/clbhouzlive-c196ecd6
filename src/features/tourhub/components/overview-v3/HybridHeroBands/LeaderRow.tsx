@@ -274,12 +274,14 @@ export function TiedChasersRow({
 interface TiedLeadersRowProps {
   count: number;
   score: string;
-  players?: { avatarUrl?: string | null }[];
+  players?: StackedAvatarPlayer[];
   isLast?: boolean;
 }
 
 export function TiedLeadersRow({ count, score, players, isLast = false }: TiedLeadersRowProps) {
-  const stack = players && players.length > 0 ? players : Array.from({ length: count }, () => ({ avatarUrl: null }));
+  const stack: StackedAvatarPlayer[] = players && players.length > 0
+    ? players
+    : Array.from({ length: count }, () => ({}));
   return (
     <div
       style={{
