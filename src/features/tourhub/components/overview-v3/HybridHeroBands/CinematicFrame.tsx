@@ -998,7 +998,7 @@ export function CinematicFrame({
 
                 {/* Scoring grid (right) — only when scorecard data exists */}
                 {s ? (
-                  <div style={{ flex: 1, display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
+                  <div style={{ flex: 1, display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 7 }}>
                     {[
                       { label: 'Birdies', value: s.birdies, color: '#DC2626' },
                       { label: 'Eagles', value: s.eagles, color: GOLD },
