@@ -623,7 +623,7 @@ export function CinematicFrame({
               rank={slot.rank}
               count={slot.count}
               score={slot.score}
-              avatars={slot.members.map((m: any) => avatar(m))}
+              items={slot.members.map((m: any) => ({ url: avatar(m), name: entryName(m), userId: m?.player?.id ?? null }))}
               isLast={isLast}
               onTap={onCtaTap}
               isResults={isResults}
