@@ -93,13 +93,7 @@ export const CourseDetailShellTabs: React.FC<CourseDetailShellTabsProps> = ({
                 alignItems: 'center',
               }}
             >
-              <span
-                style={{
-                  display: 'inline-block',
-                  paddingBottom: 4,
-                  borderBottom: isActive ? '1.5px solid #0A0E14' : '1.5px solid transparent',
-                }}
-              >
+              <span style={{ display: 'inline-block' }}>
                 {tab.label}
               </span>
             </button>
