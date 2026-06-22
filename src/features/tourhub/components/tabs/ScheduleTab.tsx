@@ -293,17 +293,12 @@ export function ScheduleTab() {
     } else {
       entries.sort(([a], [b]) => a.localeCompare(b));
     }
-    return entries.map(([monthKey, tournaments]) => {
-      const tourBreakdown: Record<string, number> = {};
-      for (const t of tournaments) { if (t.tour_code) tourBreakdown[t.tour_code] = (tourBreakdown[t.tour_code] || 0) + 1; }
-      return {
-        monthKey,
-        // B42 FIX 3: title case from source, no toUpperCase
-        monthLabel: format(new Date(tournaments[0].start_date + 'T12:00:00Z'), 'MMMM yyyy'),
-        tournaments,
-        tourBreakdown,
-      };
-    });
+    return entries.map(([monthKey, tournaments]) => ({
+      monthKey,
+      // B42 FIX 3: title case from source, no toUpperCase
+      monthLabel: format(new Date(tournaments[0].start_date + 'T12:00:00Z'), 'MMMM yyyy'),
+      tournaments,
+    }));
   }, [filteredResults, filter]);
 
   // Loading state
