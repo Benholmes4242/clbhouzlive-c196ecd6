@@ -286,7 +286,7 @@ function classifyTier(a: CollegeAlumnus, legacyMap: ReadonlyMap<string, string>)
 
 const EMPTY_LEGACY_MAP: ReadonlyMap<string, string> = new Map();
 
-export function AlumniDepthChart({ normalizedName, alumniCount, className }: AlumniDepthChartProps) {
+export function AlumniDepthChart({ normalizedName, alumniCount: _alumniCount, className }: AlumniDepthChartProps) {
   const { data: alumni, isLoading, error } = useCollegeAlumni(normalizedName, {
     orderBy: 'earnings',
     limit: 50,
@@ -306,8 +306,7 @@ export function AlumniDepthChart({ normalizedName, alumniCount, className }: Alu
 
   if (isLoading) {
     return (
-      <div className={cn('', className)} style={{ background: SURFACE, borderTop: `0.5px solid ${INK_TINT_07}` }}>
-        <SectionHeader count={null} />
+      <div className={cn('', className)} style={{ background: SURFACE }}>
         <ColumnHeader />
         {Array.from({ length: 5 }).map((_, i) => (
           <div key={i} className="animate-pulse" style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '11px 16px', borderBottom: `0.5px solid ${INK_TINT_07}` }}>
@@ -323,7 +322,7 @@ export function AlumniDepthChart({ normalizedName, alumniCount, className }: Alu
 
   if (error || !alumni?.length) {
     return (
-      <div className={cn('text-center py-12 text-sm text-muted-foreground', className)} style={{ background: SURFACE, borderTop: `0.5px solid ${INK_TINT_07}` }}>
+      <div className={cn('text-center py-12 text-sm text-muted-foreground', className)} style={{ background: SURFACE }}>
         No alumni found for this college
       </div>
     );
@@ -334,11 +333,9 @@ export function AlumniDepthChart({ normalizedName, alumniCount, className }: Alu
       className={cn('', className)}
       style={{
         background: SURFACE,
-        borderTop: `0.5px solid ${INK_TINT_07}`,
         borderBottom: `0.5px solid ${INK_TINT_07}`,
       }}
     >
-      <SectionHeader count={alumniCount ?? alumni.length} />
       <ColumnHeader />
       <Section tier="stars"    alumni={tiers.stars}    defaultExpanded />
       <Section tier="regulars" alumni={tiers.regulars} defaultExpanded={tiers.regulars.length <= 5} />
@@ -348,22 +345,8 @@ export function AlumniDepthChart({ normalizedName, alumniCount, className }: Alu
   );
 }
 
-/* ─── Section eyebrow + column header ───────────────────────────────────── */
+/* ─── Column header ──────────────────────────────────────────────────────── */
 
-function SectionHeader({ count }: { count: number | null }) {
-  return (
-    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8, padding: '12px 16px 8px' }}>
-      <span style={{ fontSize: 10, fontWeight: 700, color: INK_MUTE, letterSpacing: '0.16em', textTransform: 'uppercase' as const }}>
-        Alumni on Tour
-      </span>
-      {count != null && (
-        <span style={{ fontSize: 9, fontWeight: 800, color: INK_FAINT, letterSpacing: '0.14em', textTransform: 'uppercase' as const }}>
-          <span style={{ color: INK }}>{count}</span> PLAYERS
-        </span>
-      )}
-    </div>
-  );
-}
 
 function ColumnHeader() {
   return (
@@ -371,7 +354,6 @@ function ColumnHeader() {
       display: 'flex',
       alignItems: 'center',
       padding: '8px 16px',
-      borderTop: `0.5px solid ${INK_TINT_07}`,
       borderBottom: `0.5px solid ${INK_TINT_07}`,
     }}>
       <span style={{ flex: 1, fontSize: 10, fontWeight: 700, color: INK_MUTE, letterSpacing: '0.08em', textTransform: 'uppercase' as const }}>

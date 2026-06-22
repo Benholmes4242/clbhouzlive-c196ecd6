@@ -15,7 +15,7 @@ import { splitStatValue } from '../utils/splitStatValue';
 
 import { useCollegeStats, useCollegeSeasonStats } from '../hooks/useCollegeStats';
 import { useCollegeMediaMap } from '../hooks/useCollegeMedia';
-import { useCollegeAlumni } from '../hooks/useCollegeAlumni';
+
 import { collegeHubRoute } from '../routes';
 import {
   AMBER,
@@ -31,30 +31,6 @@ import {
   SURFACE,
 } from '../_shared/tokens';
 
-/* ─── Hero subtitle: cross-tour roll-up ────────────────────────────────── */
-
-const TOUR_LABELS: Record<string, string> = {
-  pga: 'PGA',
-  lpga: 'LPGA',
-  euro: 'DPWT',
-  dpwt: 'DPWT',
-  champ: 'Champions',
-  korn: 'Korn Ferry',
-};
-
-function buildCompactTourList(
-  alumni: { tour_codes: string[] | null }[] | undefined,
-): string | null {
-  if (!alumni || alumni.length === 0) return null;
-  const tours = new Set<string>();
-  for (const a of alumni) {
-    const code = a.tour_codes?.[0]?.toLowerCase();
-    if (code && TOUR_LABELS[code]) tours.add(TOUR_LABELS[code]);
-  }
-  if (tours.size === 0) return null;
-  const ordered = ['PGA', 'LPGA', 'DPWT', 'Champions', 'Korn Ferry'].filter(t => tours.has(t));
-  return ordered.join(', ');
-}
 
 /* ─── Page ─────────────────────────────────────────────────────────────── */
 
@@ -65,7 +41,7 @@ export function CollegeProfilePage() {
   const { data: stats, isLoading: statsLoading, error: _statsError, refetch: refetchStats } = useCollegeStats(collegeSlug);
   const { data: collegeMap, isLoading: mediaLoading } = useCollegeMediaMap();
   const { data: allSeasonStats } = useCollegeSeasonStats();
-  const { data: alumni } = useCollegeAlumni(collegeSlug, { orderBy: 'earnings', limit: 50 });
+  
 
   const college = collegeSlug ? collegeMap?.get(collegeSlug) || null : null;
   const displayName = college?.short_name || college?.college_name || collegeSlug || 'College';
@@ -92,13 +68,6 @@ export function CollegeProfilePage() {
     return items.slice(0, 2);
   }, [collegeRank]);
 
-  // Body subline inside the card: "13 alumni · PGA, LPGA, DPWT"
-  const cardSubline = useMemo(() => {
-    if (!stats) return null;
-    const tourList = buildCompactTourList(alumni);
-    const count = `${stats.player_count} alumni`;
-    return tourList ? `${count} · ${tourList}` : count;
-  }, [stats, alumni]);
 
   return (
     <TourHubShell>
@@ -243,21 +212,6 @@ export function CollegeProfilePage() {
                     }}>
                       {displayName}
                     </h1>
-                    {cardSubline && (
-                      <div style={{
-                        fontSize: 11,
-                        fontWeight: 600,
-                        color: INK_MUTE,
-                        marginTop: 4,
-                        lineHeight: 1.3,
-                        display: '-webkit-box',
-                        WebkitLineClamp: 2,
-                        WebkitBoxOrient: 'vertical' as const,
-                        overflow: 'hidden',
-                      }}>
-                        {cardSubline}
-                      </div>
-                    )}
                   </div>
                   <div style={{ flexShrink: 0, textAlign: 'right' as const }}>
                     <div style={{
