@@ -222,44 +222,46 @@ export function FranchiseCard({
           </>
         )}
 
-        {/* Primary value */}
-        <div style={{ textAlign: 'right' as const, flexShrink: 0, minWidth: 72 }}>
-          {isDelta && deltas ? (
-            <>
-              {deltas.earnings_rank_change !== null && deltas.earnings_rank_change !== 0 && (
-                <div style={{
-                  fontSize: 12, fontWeight: 800, fontVariantNumeric: 'tabular-nums',
-                  color: deltaColor,
-                  marginBottom: 2,
+        {/* Primary value (or Movers MOVE + EARNINGS cells) */}
+        {isDelta && deltas ? (
+          <>
+            <span style={{
+              width: 40, textAlign: 'center' as const, flexShrink: 0,
+              fontSize: 13, fontWeight: 800, fontVariantNumeric: 'tabular-nums',
+              color: deltaColor,
+            }}>
+              {deltas.earnings_rank_change != null && deltas.earnings_rank_change !== 0
+                ? (deltas.earnings_rank_change > 0 ? `+${deltas.earnings_rank_change}` : String(deltas.earnings_rank_change))
+                : '—'}
+            </span>
+            <span style={{
+              width: 72, textAlign: 'right' as const, flexShrink: 0,
+              fontSize: 15, fontWeight: 800, fontVariantNumeric: 'tabular-nums',
+              color: deltaColor,
+            }}>
+              {formatDeltaValue(deltas.earnings_delta)}
+            </span>
+          </>
+        ) : (
+          <div style={{ textAlign: 'right' as const, flexShrink: 0, minWidth: 72 }}>
+            {(() => {
+              const { integer: rowInteger, decimal: rowDecimal, suffix: rowSuffix } = splitStatValue(primaryValueText);
+              return (
+                <span style={{
+                  fontSize: 14,
+                  fontWeight: 800,
+                  color: primaryValueColor,
+                  fontVariantNumeric: 'tabular-nums',
+                  letterSpacing: '-0.005em',
                 }}>
-                  {deltas.earnings_rank_change > 0 ? `+${deltas.earnings_rank_change}` : String(deltas.earnings_rank_change)}
-                </div>
-              )}
-              <div style={{
-                fontSize: 15, fontWeight: 800, fontVariantNumeric: 'tabular-nums',
-                color: deltaColor,
-              }}>
-                {formatDeltaValue(deltas.earnings_delta)}
-              </div>
-            </>
-          ) : (() => {
-            // Primary value with amber decimal tail (Stat Watch pattern).
-            const { integer: rowInteger, decimal: rowDecimal, suffix: rowSuffix } = splitStatValue(primaryValueText);
-            return (
-              <span style={{
-                fontSize: 14,
-                fontWeight: 800,
-                color: primaryValueColor,
-                fontVariantNumeric: 'tabular-nums',
-                letterSpacing: '-0.005em',
-              }}>
-                {rowInteger}
-                {rowDecimal && <span style={{ color: primaryValueColor }}>{rowDecimal}</span>}
-                {rowSuffix}
-              </span>
-            );
-          })()}
-        </div>
+                  {rowInteger}
+                  {rowDecimal && <span style={{ color: primaryValueColor }}>{rowDecimal}</span>}
+                  {rowSuffix}
+                </span>
+              );
+            })()}
+          </div>
+        )}
       </Link>
     </motion.div>
   );
