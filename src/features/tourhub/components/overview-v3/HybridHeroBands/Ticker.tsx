@@ -8,7 +8,7 @@ import React from 'react';
 import {
   NUMERIC_STYLE,
 } from '../HybridHero.constants';
-import { INK_DEEP } from '../../../_shared/tokens';
+
 import type { TickerRow } from '../HybridHero.utils';
 import { fmtScore } from '../HybridHero.utils';
 
@@ -41,7 +41,7 @@ function TickerEntry({ row }: { row: TickerRow }) {
 
 export function Ticker({ rows }: TickerProps) {
   if (!rows || rows.length === 0) {
-    return <div style={{ height: TICKER_HEIGHT, background: INK_DEEP }} aria-hidden="true" />;
+    return <div style={{ height: TICKER_HEIGHT, background: 'rgba(10,14,20,0.50)', backdropFilter: 'blur(10px)', WebkitBackdropFilter: 'blur(10px)' }} aria-hidden="true" />;
   }
   const doubled = [...rows, ...rows];
   return (
@@ -49,12 +49,14 @@ export function Ticker({ rows }: TickerProps) {
       aria-hidden="true"
       style={{
         height: TICKER_HEIGHT,
-        background: INK_DEEP,
+        background: 'rgba(10,14,20,0.50)',
+        backdropFilter: 'blur(10px)',
+        WebkitBackdropFilter: 'blur(10px)',
         position: 'relative',
         display: 'flex',
         alignItems: 'center',
         overflow: 'hidden',
-        borderTop: '0.5px solid rgba(255,255,255,0.06)',
+        borderTop: '0.5px solid rgba(255,255,255,0.18)',
       }}
     >
       {/* Fixed left label */}
@@ -67,7 +69,9 @@ export function Ticker({ rows }: TickerProps) {
           color: 'rgba(255,255,255,0.50)',
           flexShrink: 0,
           zIndex: 2,
-          background: INK_DEEP,
+          background: 'rgba(10,14,20,0.50)',
+          backdropFilter: 'blur(10px)',
+          WebkitBackdropFilter: 'blur(10px)',
           height: '100%',
           display: 'flex',
           alignItems: 'center',
@@ -102,7 +106,7 @@ export function Ticker({ rows }: TickerProps) {
             right: 0,
             width: 40,
             height: '100%',
-            background: `linear-gradient(90deg, transparent 0%, ${INK_DEEP} 100%)`,
+            background: 'linear-gradient(90deg, rgba(10,14,20,0) 0%, rgba(10,14,20,0.50) 100%)',
             pointerEvents: 'none',
           }}
         />
