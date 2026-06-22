@@ -198,11 +198,14 @@ export const SquircleAvatar: React.FC<SquircleAvatarProps> = ({
   const fallbackBg = getAvatarFallbackColor(userId || alt);
   const initialsFontSize = Math.max(10, Math.round(pixelSize * 0.38));
 
-  // Inner avatar content: image when available, otherwise initials (or User glyph)
-  // on a deterministic per-user color from the slate/graphite palette.
+  // Three render states:
+  //  - LOADING (image in flight, candidates not exhausted) → neutral skeleton, NEVER initials
+  //  - LOADED → photo (fade in)
+  //  - FAILED (showFallback, all candidates exhausted) → canonical initials on deterministic colour
+  const isLoading = !imageLoaded && !showFallback && candidates.length > 0;
   const avatarContent = (
     <>
-      {(!imageLoaded || showFallback) && (
+      {showFallback && (
         <div
           className="absolute inset-0 flex items-center justify-center overflow-hidden text-white"
           style={{ background: fallbackBg }}
@@ -224,6 +227,13 @@ export const SquircleAvatar: React.FC<SquircleAvatarProps> = ({
             <User size="60%" strokeWidth={1.75} aria-hidden="true" />
           )}
         </div>
+      )}
+      {isLoading && (
+        <div
+          className="absolute inset-0"
+          style={{ background: 'rgba(15,23,42,0.08)' }}
+          aria-hidden="true"
+        />
       )}
       {imageSrc && !showFallback && (
         <img
