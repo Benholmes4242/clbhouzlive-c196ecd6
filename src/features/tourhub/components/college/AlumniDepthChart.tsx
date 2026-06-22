@@ -21,7 +21,7 @@ import { useLegacyAlumni } from '../../hooks/useLegacyAlumni';
 import { getPlayerHeadshotCandidates } from '@/utils/playerHeadshot';
 import { formatCurrency } from '@/lib/utils/formatCurrency';
 import { PlayerInitialAvatar } from '../shared/PlayerInitialAvatar';
-import { getPlayerTourTag } from '../../utils/playerTourTag';
+
 import { TIER_SUBTITLES } from '../../constants/legacyAlumni';
 import { playerRoute } from '../../routes';
 
