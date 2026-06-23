@@ -39,9 +39,12 @@ import { MediaEditor } from './MediaEditor';
 import { bakeFrameCrop } from './bakeFrameCrop';
 import {
   filesToComposerMedia,
+  measureImage,
+  nextMediaId,
   remoteMediaToComposerItems,
   type ComposerMediaItem,
 } from './composerMedia';
+
 import type { TaggedCourse, StudioActorType } from './types';
 
 const MAX_CAPTION = 2000;
