@@ -281,25 +281,63 @@ export function Composer({
     [setMediaItems]
   );
 
-  // Recrop is unavailable in 2A. Track C's PostOwnerMenu will already gate
-  // the entry point, but if the user somehow taps an existing tile's edit
-  // affordance, surface the same message the gate will eventually show.
+  // Recrop entry point. For an existing post_media row we fetch the immutable
+  // original (post_media.original_media_url), wrap it in a File, swap the tile
+  // in-place so MediaStage/MediaEditor work against the pre-bake source, and
+  // then open the editor. The new derivative is baked + swapped at submit time.
   const handleEditItem = useCallback(
-    (idx: number) => {
+    async (idx: number) => {
       const item = mediaItems[idx];
-      if (item?.existing) {
-        toast('Recrop unavailable in this update', {
-          description:
-            item.existing.originalMediaUrl
-              ? 'Coming in the next pass.'
-              : 'No original is stored for this image.',
-        });
+      if (!item) return;
+      // Existing tile that hasn't yet been hydrated with its original file.
+      if (item.existing && !item.file) {
+        if (item.type !== 'image') {
+          toast('Recrop unavailable for videos');
+          return;
+        }
+        if (!item.existing.originalMediaUrl) {
+          toast('Original unavailable', {
+            description: 'No pre-crop source is stored for this image.',
+          });
+          return;
+        }
+        try {
+          const resp = await fetch(item.existing.originalMediaUrl);
+          if (!resp.ok) throw new Error(`fetch ${resp.status}`);
+          const blob = await resp.blob();
+          const ext = (blob.type.split('/')[1] || 'jpg').split('+')[0];
+          const file = new File([blob], `original-${item.existing.mediaId}.${ext}`, {
+            type: blob.type || 'image/jpeg',
+            lastModified: Date.now(),
+          });
+          const m = await measureImage(file);
+          const hydrated: ComposerMediaItem = {
+            ...item,
+            id: nextMediaId(),
+            file,
+            previewUrl: m.previewUrl,
+            width: m.width,
+            height: m.height,
+            aspectRatio: m.width / Math.max(1, m.height),
+            pos: { x: 50, y: 50 },
+            frame: 'original',
+          };
+          setMediaItems((prev) => prev.map((it, i) => (i === idx ? hydrated : it)));
+          // Defer one tick so the new item is in state before the editor reads it.
+          setTimeout(() => onOpenEditor(mediaItems, idx), 0);
+        } catch (err) {
+          console.error('[Composer] recrop bootstrap failed:', err);
+          toast.error("Couldn't load original", {
+            description: 'Try again in a moment.',
+          });
+        }
         return;
       }
       onOpenEditor(mediaItems, idx);
     },
-    [mediaItems, onOpenEditor],
+    [mediaItems, onOpenEditor, setMediaItems],
   );
+
 
 
   const hasMedia = mediaItems.length > 0;
