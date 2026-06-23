@@ -230,11 +230,8 @@ export function Composer({
   const addFiles = useCallback(
     async (files: File[]) => {
       if (!files.length) return;
-      if (isEditMode) {
-        // Brief 2A: edit mode locks the media set (no net-new uploads).
-        toast.error('Adding new media on edit is coming soon');
-        return;
-      }
+      // mediaItems already counts existing + net-new in edit mode (existing
+      // items are prefilled into the same list), so the cap math is uniform.
       const remaining = MAX_POST_MEDIA - mediaItems.length;
       if (remaining <= 0) {
         toast.error(`You can add up to ${MAX_POST_MEDIA} photos or videos`);
@@ -247,7 +244,7 @@ export function Composer({
       const items = await filesToComposerMedia(slice);
       if (items.length) setMediaItems((prev) => [...prev, ...items]);
     },
-    [isEditMode, setMediaItems, mediaItems.length]
+    [setMediaItems, mediaItems.length]
   );
 
   const handlePickFiles = useCallback(
