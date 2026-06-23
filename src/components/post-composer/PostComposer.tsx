@@ -153,6 +153,7 @@ export function PostComposer({
                 actorInfo={actorInfo}
                 mediaItems={mediaItems}
                 setMediaItems={setMediaItems}
+                editPostId={editPostId}
               />
             )}
 
