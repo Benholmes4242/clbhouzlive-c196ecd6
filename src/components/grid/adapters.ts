@@ -216,7 +216,12 @@ export function activityPostToUniversal(post: ActivityPost, index: number): Univ
       username: post.user.username || undefined,
       avatar: post.user.profile_photo_url || undefined,
     } : undefined,
-    
+
+    // Owner-menu identity — ActivityPost is personal-actor only today;
+    // business posts on profile grids would need an upstream actor surface.
+    actorType: 'personal',
+    actorId: post.user?.id,
+
     sortIndex: index,
     tileVariant: 'portrait',
   };
