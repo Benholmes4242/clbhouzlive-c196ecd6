@@ -573,6 +573,8 @@ export function CanvasComposer({
                 fontSize: 20,
                 fontWeight: 600,
                 lineHeight: 1.25,
+                maxHeight: 'calc(1.25em * 3 + 8px)',
+                overflowY: 'auto',
                 textShadow: '0 1px 10px rgba(0,0,0,0.6)',
                 caretColor: AMBER,
                 fontFamily: 'inherit',
