@@ -839,74 +839,66 @@ function MediaPreview({
     );
   }
 
-  // Grid: show up to 4 tiles, +N overlay on the 4th when more.
-  const visible = items.slice(0, 4);
-  const overflow = Math.max(0, items.length - 4);
+  // Carousel: horizontal snap row of fixed tiles. Tap to edit, ✕ to remove.
+  const TILE = 200;
+  const TILE_RADIUS = 12;
 
   return (
     <div
       style={{
-        display: 'grid',
-        gridTemplateColumns: 'repeat(2, 1fr)',
-        gap: 6,
-        borderRadius: 14,
-        overflow: 'hidden',
+        display: 'flex',
+        gap: 8,
+        overflowX: 'auto',
+        overflowY: 'hidden',
+        scrollSnapType: 'x mandatory',
+        WebkitOverflowScrolling: 'touch',
+        scrollbarWidth: 'none',
+        paddingBottom: 2,
+        margin: '0 -16px',
+        paddingLeft: 16,
+        paddingRight: 16,
       }}
     >
-      {visible.map((item, i) => {
-        const isLast = i === visible.length - 1;
-        const showOverflow = isLast && overflow > 0;
-        return (
-          <div key={item.id} style={{ position: 'relative', aspectRatio: '1 / 1' }}>
-            <button
-              onClick={() => onEditItem(i)}
-              style={{
-                display: 'block',
-                width: '100%',
-                height: '100%',
-                padding: 0,
-                border: 'none',
-                background: 'transparent',
-                cursor: 'pointer',
-              }}
-            >
-              <MediaStage
-                item={item}
-                frame={item.frame}
-                height={170}
-                borderRadius={8}
-                showPlayGlyph={item.type === 'video'}
-              />
-            </button>
-            {showOverflow && (
-              <div
-                aria-hidden
-                style={{
-                  position: 'absolute',
-                  inset: 0,
-                  background: 'rgba(0,0,0,0.55)',
-                  borderRadius: 8,
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  color: '#fff',
-                  fontSize: 26,
-                  fontWeight: 800,
-                  pointerEvents: 'none',
-                }}
-              >
-                +{overflow}
-              </div>
-            )}
-            <CornerButton top right onClick={() => onRemoveItem(i)} ariaLabel="Remove" small>
-              <X size={12} strokeWidth={2.5} />
-            </CornerButton>
-          </div>
-        );
-      })}
+      {items.map((item, i) => (
+        <div
+          key={item.id}
+          style={{
+            position: 'relative',
+            flex: `0 0 ${TILE}px`,
+            width: TILE,
+            height: TILE,
+            scrollSnapAlign: 'start',
+          }}
+        >
+          <button
+            onClick={() => onEditItem(i)}
+            style={{
+              display: 'block',
+              width: '100%',
+              height: '100%',
+              padding: 0,
+              border: 'none',
+              background: 'transparent',
+              cursor: 'pointer',
+            }}
+          >
+            <MediaStage
+              item={item}
+              frame={item.frame}
+              height={TILE}
+              borderRadius={TILE_RADIUS}
+              showPlayGlyph={item.type === 'video'}
+            />
+          </button>
+          <CornerButton top right onClick={() => onRemoveItem(i)} ariaLabel="Remove" small>
+            <X size={12} strokeWidth={2.5} />
+          </CornerButton>
+        </div>
+      ))}
     </div>
   );
 }
+
 
 function CornerButton({
   children,
