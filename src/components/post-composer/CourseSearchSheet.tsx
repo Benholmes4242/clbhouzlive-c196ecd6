@@ -136,8 +136,17 @@ useEffect(() => {
       <div
         className="fixed inset-x-0 z-[10001] flex flex-col"
         style={{
+          // Bottom rides the keyboard (0 when closed). Always defined, no notch dependency.
           bottom: keyboardHeight,
-          maxHeight: `calc(100dvh - env(safe-area-inset-top, 0px) - 8px - ${keyboardHeight}px)`,
+          // TOP is pinned by a fixed inset that does NOT depend on keyboardHeight.
+          // This is what keeps the header on-screen on the very first open, before the
+          // keyboard's visualViewport event has fired. When the keyboard is closed we
+          // drop the sheet to its resting height instead of pinning the top.
+          top: keyboardHeight > 0 ? 'calc(env(safe-area-inset-top, 0px) + 8px)' : 'auto',
+          maxHeight:
+            keyboardHeight > 0
+              ? undefined
+              : '72vh', // resting height when no keyboard (e.g. opened then keyboard dismissed)
           background: '#ffffff',
           borderRadius: '20px 20px 0 0',
           borderTop: '0.5px solid rgba(15,23,42,0.07)',
@@ -146,7 +155,7 @@ useEffect(() => {
             keyboardHeight > 0
               ? 8
               : 'calc(var(--sab, env(safe-area-inset-bottom, 0px)) + 12px)',
-          transition: 'bottom 0.22s ease, max-height 0.22s ease',
+          transition: 'bottom 0.22s ease, top 0.22s ease',
         }}
       >
 
