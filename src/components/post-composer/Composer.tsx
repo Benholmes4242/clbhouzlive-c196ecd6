@@ -323,8 +323,8 @@ export function Composer({
             frame: 'original',
           };
           setMediaItems((prev) => prev.map((it, i) => (i === idx ? hydrated : it)));
-          // Defer one tick so the new item is in state before the editor reads it.
-          setTimeout(() => onOpenEditor(mediaItems, idx), 0);
+          onOpenEditor(mediaItems, idx);
+
         } catch (err) {
           console.error('[Composer] recrop bootstrap failed:', err);
           toast.error("Couldn't load original", {
