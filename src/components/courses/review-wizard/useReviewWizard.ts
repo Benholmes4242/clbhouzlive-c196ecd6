@@ -108,6 +108,7 @@ const INITIAL_STATE: WizardState = {
   selectedTags: [],
 };
 
+const MAX_REVIEW_MEDIA = 10;
 
 /**
  * D33: A legacy ratings-only review has an overall rating but no category breakdowns.
