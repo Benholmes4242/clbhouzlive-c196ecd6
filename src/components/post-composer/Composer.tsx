@@ -42,6 +42,7 @@ import {
 import type { TaggedCourse, StudioActorType } from './types';
 
 const MAX_CAPTION = 2000;
+const MAX_POST_MEDIA = 10;
 const COUNTER_THRESHOLD = 100;
 
 const INK_2 = '#0F172A';
