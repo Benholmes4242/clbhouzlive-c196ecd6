@@ -268,6 +268,18 @@ const FeedCardImpl: React.FC<FeedCardProps> = ({
               </button>
             );
           })()}
+          {/* Owner menu — self-wired Edit / Delete / Manage review */}
+          {currentUserId && post.userId === currentUserId && (
+            <PostOwnerMenu
+              postId={post.id}
+              isOwnPost
+              actorType={post.actorType === 'business' ? 'business' : 'personal'}
+              actorId={post.actorId}
+              sourceReviewId={post.review?.reviewId ?? null}
+              reviewCourseId={post.review?.courseId ?? null}
+              variant="inline"
+            />
+          )}
         </div>
       </div>
 
