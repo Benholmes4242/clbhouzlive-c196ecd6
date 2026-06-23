@@ -127,17 +127,19 @@ export function CourseSearchSheet({
         onClick={onClose}
       />
       <div
-        className="fixed inset-x-0 bottom-0 z-[10001] flex flex-col"
+        className="fixed inset-x-0 z-[10001] flex flex-col"
         style={{
-          maxHeight: 'calc(100dvh - (env(safe-area-inset-top, 0px) + 12px) - var(--kb, 0px))',
+          bottom: keyboardHeight,
+          maxHeight: `calc(100dvh - env(safe-area-inset-top, 0px) - 8px - ${keyboardHeight}px)`,
           background: '#ffffff',
           borderRadius: '20px 20px 0 0',
           borderTop: '0.5px solid rgba(15,23,42,0.07)',
           boxShadow: '0 -4px 24px rgba(15,23,42,0.10)',
-          ['--kb' as any]: `${keyboardHeight}px`,
-          bottom: 'var(--kb, 0px)',
-          paddingBottom: 'calc(var(--sab, env(safe-area-inset-bottom, 0px)) + 12px)',
-          transition: 'bottom 0.2s ease, max-height 0.2s ease',
+          paddingBottom:
+            keyboardHeight > 0
+              ? 8
+              : 'calc(var(--sab, env(safe-area-inset-bottom, 0px)) + 12px)',
+          transition: 'bottom 0.22s ease, max-height 0.22s ease',
         }}
       >
 
