@@ -8282,7 +8282,7 @@ export type Database = {
           aspect_ratio: number | null
           created_at: string
           derived_format: string | null
-          display_order: number | null
+          display_order: number
           duration_ms: number | null
           duration_seconds: number | null
           exif: Json | null
@@ -8315,7 +8315,7 @@ export type Database = {
           aspect_ratio?: number | null
           created_at?: string
           derived_format?: string | null
-          display_order?: number | null
+          display_order?: number
           duration_ms?: number | null
           duration_seconds?: number | null
           exif?: Json | null
@@ -8348,7 +8348,7 @@ export type Database = {
           aspect_ratio?: number | null
           created_at?: string
           derived_format?: string | null
-          display_order?: number | null
+          display_order?: number
           duration_ms?: number | null
           duration_seconds?: number | null
           exif?: Json | null
