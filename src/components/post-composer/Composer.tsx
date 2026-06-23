@@ -156,10 +156,15 @@ export function Composer({
   });
 
 
-  // Seed initial media once
+  // Seed initial media once (net-new compose only — edit mode prefills below).
   const seededRef = useRef(false);
   useEffect(() => {
     if (seededRef.current) return;
+    if (isEditMode) {
+      // Edit mode owns its own seeding effect.
+      seededRef.current = true;
+      return;
+    }
     if (initialMedia && initialMedia.length > 0) {
       seededRef.current = true;
       filesToComposerMedia(initialMedia).then((items) => {
@@ -171,10 +176,50 @@ export function Composer({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // Revoke previews on unmount
+  // Edit-mode prefill: caption / visibility / courses / existing media,
+  // plus an explicit guard against editing posts the viewer can't manage
+  // and against review-derived posts (those route through the review wizard).
+  const editPrefilledRef = useRef(false);
+  const [removedMediaIds, setRemovedMediaIds] = useState<string[]>([]);
+  useEffect(() => {
+    if (!isEditMode) return;
+    if (editPrefilledRef.current) return;
+    const editable = editablePostQuery.data;
+    if (!editable) return;
+    editPrefilledRef.current = true;
+
+    if (editable.blockedReason === 'review-derived') {
+      toast.error('Manage from your review', {
+        description: 'Posts created from a review are edited via the review.',
+      });
+      onClose();
+      return;
+    }
+    if (!editable.canManage) {
+      toast.error("You can't edit this post");
+      onClose();
+      return;
+    }
+
+    setCaption(editable.caption ?? '');
+    setVisibility(editable.visibility);
+    setTaggedCourses(
+      editable.courses.map((c) => ({
+        courseId: c.courseId,
+        courseName: c.courseName,
+        country: c.country ?? '',
+      })),
+    );
+    setMediaItems(remoteMediaToComposerItems(editable.media));
+  }, [isEditMode, editablePostQuery.data, onClose, setMediaItems]);
+
+  // Revoke previews on unmount. Remote URLs (existing edit-mode items) are
+  // not blob: URLs, so revokeObjectURL is a no-op for them — safe to call.
   useEffect(() => {
     return () => {
-      mediaItems.forEach((m) => URL.revokeObjectURL(m.previewUrl));
+      mediaItems.forEach((m) => {
+        if (m.previewUrl?.startsWith('blob:')) URL.revokeObjectURL(m.previewUrl);
+      });
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -182,6 +227,11 @@ export function Composer({
   const addFiles = useCallback(
     async (files: File[]) => {
       if (!files.length) return;
+      if (isEditMode) {
+        // Brief 2A: edit mode locks the media set (no net-new uploads).
+        toast.error('Adding new media on edit is coming soon');
+        return;
+      }
       const remaining = MAX_POST_MEDIA - mediaItems.length;
       if (remaining <= 0) {
         toast.error(`You can add up to ${MAX_POST_MEDIA} photos or videos`);
@@ -194,7 +244,7 @@ export function Composer({
       const items = await filesToComposerMedia(slice);
       if (items.length) setMediaItems((prev) => [...prev, ...items]);
     },
-    [setMediaItems, mediaItems.length]
+    [isEditMode, setMediaItems, mediaItems.length]
   );
 
   const handlePickFiles = useCallback(
@@ -210,12 +260,44 @@ export function Composer({
     (idx: number) => {
       setMediaItems((prev) => {
         const removed = prev[idx];
-        if (removed) URL.revokeObjectURL(removed.previewUrl);
+        if (removed) {
+          if (removed.previewUrl?.startsWith('blob:')) {
+            URL.revokeObjectURL(removed.previewUrl);
+          }
+          if (removed.existing?.mediaId) {
+            setRemovedMediaIds((ids) =>
+              ids.includes(removed.existing!.mediaId)
+                ? ids
+                : [...ids, removed.existing!.mediaId],
+            );
+          }
+        }
         return prev.filter((_, i) => i !== idx);
       });
     },
     [setMediaItems]
   );
+
+  // Recrop is unavailable in 2A. Track C's PostOwnerMenu will already gate
+  // the entry point, but if the user somehow taps an existing tile's edit
+  // affordance, surface the same message the gate will eventually show.
+  const handleEditItem = useCallback(
+    (idx: number) => {
+      const item = mediaItems[idx];
+      if (item?.existing) {
+        toast('Recrop unavailable in this update', {
+          description:
+            item.existing.originalMediaUrl
+              ? 'Coming in the next pass.'
+              : 'No original is stored for this image.',
+        });
+        return;
+      }
+      onOpenEditor(mediaItems, idx);
+    },
+    [mediaItems, onOpenEditor],
+  );
+
 
   const hasMedia = mediaItems.length > 0;
   const hasDraft =
