@@ -650,10 +650,10 @@ export function CanvasComposer({
               icon={<Trash2 size={18} />}
             />
             <DockAction
-              label={taggedCourse ? 'Tagged' : 'Course'}
-              onClick={() => setCourseSheetOpen(true)}
+              label={taggedCourses.length > 0 ? 'Tagged' : 'Course'}
+              onClick={handleCoursePillTap}
               icon={<MapPin size={18} />}
-              highlighted={!!taggedCourse}
+              highlighted={taggedCourses.length > 0}
             />
           </div>
         </>
