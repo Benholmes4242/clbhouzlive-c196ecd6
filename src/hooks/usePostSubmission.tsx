@@ -19,6 +19,8 @@ interface PostSubmissionData {
   actorType?: 'personal' | 'business';
   /** Actor id (business id for business posts; defaults to user.id for personal). */
   actorId?: string | null;
+  /** Post visibility. Defaults to 'anyone'. */
+  visibility?: 'anyone' | 'followers' | 'private';
   onSuccess?: () => void;
   onError?: () => void;
 }
@@ -34,6 +36,7 @@ export const usePostSubmission = () => {
     courseInfo,
     actorType = 'personal',
     actorId,
+    visibility = 'anyone',
     onSuccess,
     onError
   }: PostSubmissionData) => {
