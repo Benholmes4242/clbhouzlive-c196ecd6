@@ -88,22 +88,22 @@ export function UniversalMediaGrid({
   }), [config]);
 
   // Owner-menu visibility — single deduped membership fetch covers every tile.
-  // Authoritative permission re-check still happens server-side.
+  // Per-item check (vs. blanket isOwnProfile) so a business admin sees the
+  // menu on their business's posts wherever they appear. Authoritative
+  // permission re-check still happens server-side.
   const manageableBusinessIds = useManageableBusinessIds(currentUserId);
   const canManageTile = useCallback(
     (item: UniversalMediaItem) =>
-      isOwnProfile
-        ? canManagePost(
-            {
-              userId: item.creator?.id,
-              actorType: item.actorType,
-              actorId: item.actorId,
-            },
-            currentUserId,
-            manageableBusinessIds,
-          )
-        : false,
-    [isOwnProfile, currentUserId, manageableBusinessIds],
+      canManagePost(
+        {
+          userId: item.creator?.id,
+          actorType: item.actorType,
+          actorId: item.actorId,
+        },
+        currentUserId,
+        manageableBusinessIds,
+      ),
+    [currentUserId, manageableBusinessIds],
   );
 
   // Video ready queue for prefetching
