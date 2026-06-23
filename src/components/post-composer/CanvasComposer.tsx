@@ -762,8 +762,9 @@ export function CanvasComposer({
             </div>
           )}
 
-          {taggedCourse && (
-            <div
+          {coursePillLabel && (
+            <button
+              onClick={handleCoursePillTap}
               style={{
                 margin: '0 16px 12px',
                 display: 'inline-flex',
@@ -774,27 +775,14 @@ export function CanvasComposer({
                 borderRadius: 20,
                 background: AMBER_SOFT,
                 border: `1px solid ${GOLD_BORDER}`,
+                cursor: 'pointer',
               }}
             >
               <MapPin size={12} color={GOLD_DEEP} strokeWidth={2.5} />
               <span style={{ fontSize: 12, fontWeight: 700, color: GOLD_DEEP }}>
-                {taggedCourse.courseName}
+                {coursePillLabel}
               </span>
-              <button
-                onClick={() => setTaggedCourse(null)}
-                aria-label="Untag"
-                style={{
-                  background: 'transparent',
-                  border: 'none',
-                  padding: 0,
-                  cursor: 'pointer',
-                  color: GOLD_DEEP,
-                  display: 'inline-flex',
-                }}
-              >
-                <X size={12} strokeWidth={2.5} />
-              </button>
-            </div>
+            </button>
           )}
 
           {/* Keyboard-docked action bar */}
