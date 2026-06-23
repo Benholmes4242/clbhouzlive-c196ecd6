@@ -1,22 +1,45 @@
-// MediaStage — renders the active media item (image or video) inside a fixed dark stage.
-// Images obey the chosen frame (original/4:5/1:1) with drag-to-reposition when cropped.
-// Videos always render at natural aspect (object-fit: contain), letterboxed by the dark stage.
+// MediaStage — renders a single media item with a blur-fill background extension
+// when the sharp media doesn't fully fill the frame box. Used by both the embedded
+// Composer card and the focused MediaEditor stage. Charcoal #15171F surface.
 
 import React, { useLayoutEffect, useRef, useState } from 'react';
-import { Volume2, VolumeX } from 'lucide-react';
+import { Volume2, VolumeX, Play } from 'lucide-react';
 import type { FrameId } from './FrameChooser';
 import { FRAMES } from './FrameChooser';
-import type { StageMediaItem } from './CanvasComposer';
 
-const STAGE_H = 520;
+export const CHARCOAL = '#15171F';
 
-interface MediaStageProps {
-  item: StageMediaItem;
-  frame: FrameId;
-  onPos: (pos: { x: number; y: number }) => void;
+export interface MediaStageItem {
+  id: string;
+  type: 'image' | 'video';
+  previewUrl: string;
+  posterUrl?: string;
+  width: number;
+  height: number;
+  pos: { x: number; y: number };
 }
 
-export function MediaStage({ item, frame, onPos }: MediaStageProps) {
+interface MediaStageProps {
+  item: MediaStageItem;
+  frame: FrameId;
+  height: number;
+  borderRadius?: number;
+  interactive?: boolean;            // drag-to-reposition when cropped
+  onPos?: (pos: { x: number; y: number }) => void;
+  showMuteToggle?: boolean;
+  showPlayGlyph?: boolean;
+}
+
+export function MediaStage({
+  item,
+  frame,
+  height,
+  borderRadius = 0,
+  interactive = false,
+  onPos,
+  showMuteToggle = false,
+  showPlayGlyph = false,
+}: MediaStageProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const dragRef = useRef<{ x: number; y: number; px: number; py: number } | null>(null);
   const [stageW, setStageW] = useState(390);
@@ -35,36 +58,44 @@ export function MediaStage({ item, frame, onPos }: MediaStageProps) {
   const isVideo = item.type === 'video';
   const natRatio = item.width && item.height ? item.width / item.height : 1;
   const frameDef = FRAMES.find((f) => f.id === frame)!;
+  // videos always render natural ratio (no crop); images obey the chosen frame
   const useNatural = isVideo || frame === 'original';
 
+  // Compute the visible media box inside the stage
   let boxW = stageW;
-  let boxH = STAGE_H;
+  let boxH = height;
   if (!useNatural && frameDef.ratio) {
     boxW = stageW;
     boxH = stageW / frameDef.ratio;
-    if (boxH > STAGE_H) {
-      boxH = STAGE_H;
-      boxW = STAGE_H * frameDef.ratio;
+    if (boxH > height) {
+      boxH = height;
+      boxW = height * frameDef.ratio;
     }
   } else {
-    if (natRatio >= stageW / STAGE_H) {
+    // contain
+    if (natRatio >= stageW / height) {
       boxW = stageW;
       boxH = stageW / natRatio;
     } else {
-      boxH = STAGE_H;
-      boxW = STAGE_H * natRatio;
+      boxH = height;
+      boxW = height * natRatio;
     }
   }
 
+  // Blur-fill is needed whenever the sharp layer doesn't fully fill the stage
+  const fillsStage = Math.round(boxW) >= Math.round(stageW) && Math.round(boxH) >= Math.round(height);
+  const showBlurFill = !fillsStage;
+
   const pos = item.pos || { x: 50, y: 50 };
+  const canDrag = interactive && !useNatural;
 
   const onDown = (e: React.MouseEvent | React.TouchEvent) => {
-    if (useNatural) return;
+    if (!canDrag) return;
     const pt = 'touches' in e ? e.touches[0] : (e as React.MouseEvent);
     dragRef.current = { x: pt.clientX, y: pt.clientY, px: pos.x, py: pos.y };
   };
   const onMove = (e: React.MouseEvent | React.TouchEvent) => {
-    if (!dragRef.current) return;
+    if (!dragRef.current || !onPos) return;
     const pt = 'touches' in e ? e.touches[0] : (e as React.MouseEvent);
     const dx = ((pt.clientX - dragRef.current.x) / boxW) * 100;
     const dy = ((pt.clientY - dragRef.current.y) / boxH) * 100;
@@ -73,24 +104,43 @@ export function MediaStage({ item, frame, onPos }: MediaStageProps) {
       y: Math.max(0, Math.min(100, dragRef.current.py - dy)),
     });
   };
-  const onUp = () => {
-    dragRef.current = null;
-  };
+  const onUp = () => { dragRef.current = null; };
+
+  const blurSrc = isVideo ? (item.posterUrl ?? '') : item.previewUrl;
 
   return (
     <div
       ref={containerRef}
       style={{
         width: '100%',
-        height: STAGE_H,
+        height,
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
-        background: '#000',
+        background: CHARCOAL,
         overflow: 'hidden',
         position: 'relative',
+        borderRadius,
       }}
     >
+      {showBlurFill && blurSrc && (
+        <img
+          src={blurSrc}
+          aria-hidden
+          alt=""
+          style={{
+            position: 'absolute',
+            inset: 0,
+            width: '100%',
+            height: '100%',
+            objectFit: 'cover',
+            filter: 'blur(28px) brightness(0.6)',
+            transform: 'scale(1.15)',
+            pointerEvents: 'none',
+          }}
+        />
+      )}
+
       <div
         onMouseDown={onDown}
         onMouseMove={onMove}
@@ -100,19 +150,19 @@ export function MediaStage({ item, frame, onPos }: MediaStageProps) {
         onTouchMove={onMove}
         onTouchEnd={onUp}
         style={{
+          position: 'relative',
+          zIndex: 1,
           width: boxW,
           height: boxH,
           overflow: 'hidden',
-          position: 'relative',
-          cursor: useNatural ? 'default' : 'grab',
-          borderRadius: 2,
-          touchAction: useNatural ? 'auto' : 'none',
+          cursor: canDrag ? 'grab' : 'default',
+          touchAction: canDrag ? 'none' : 'auto',
         }}
       >
         {isVideo ? (
           <video
             src={item.previewUrl}
-            poster={(item as { posterUrl?: string }).posterUrl}
+            poster={item.posterUrl}
             autoPlay
             loop
             playsInline
@@ -123,7 +173,7 @@ export function MediaStage({ item, frame, onPos }: MediaStageProps) {
               height: '100%',
               objectFit: 'contain',
               userSelect: 'none',
-              background: '#000',
+              background: CHARCOAL,
             }}
           />
         ) : (
@@ -143,7 +193,38 @@ export function MediaStage({ item, frame, onPos }: MediaStageProps) {
         )}
       </div>
 
-      {isVideo && (
+      {isVideo && showPlayGlyph && (
+        <div
+          aria-hidden
+          style={{
+            position: 'absolute',
+            inset: 0,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            pointerEvents: 'none',
+            zIndex: 2,
+          }}
+        >
+          <div
+            style={{
+              width: 44,
+              height: 44,
+              borderRadius: '50%',
+              background: 'rgba(0,0,0,0.45)',
+              border: '1px solid rgba(255,255,255,0.4)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              color: '#fff',
+            }}
+          >
+            <Play size={18} strokeWidth={2.5} />
+          </div>
+        </div>
+      )}
+
+      {isVideo && showMuteToggle && (
         <button
           onClick={() => setMuted((m) => !m)}
           aria-label={muted ? 'Unmute' : 'Mute'}
@@ -161,6 +242,7 @@ export function MediaStage({ item, frame, onPos }: MediaStageProps) {
             justifyContent: 'center',
             cursor: 'pointer',
             color: '#fff',
+            zIndex: 3,
           }}
         >
           {muted ? <VolumeX size={16} /> : <Volume2 size={16} />}

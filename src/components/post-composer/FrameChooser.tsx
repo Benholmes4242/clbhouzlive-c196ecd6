@@ -1,4 +1,4 @@
-// FrameChooser — Original / 4:5 / 1:1 pill row (shown only for photos).
+// FrameChooser — Original / 4:5 / 1:1 pill row. Charcoal-friendly styling.
 import React from 'react';
 
 export type FrameId = 'original' | '4:5' | '1:1';
@@ -11,9 +11,10 @@ export const FRAMES: { id: FrameId; label: string; ratio?: number }[] = [
 interface FrameChooserProps {
   frame: FrameId;
   onChange: (f: FrameId) => void;
+  hint?: string;
 }
 
-export function FrameChooser({ frame, onChange }: FrameChooserProps) {
+export function FrameChooser({ frame, onChange, hint }: FrameChooserProps) {
   return (
     <>
       <div style={{ display: 'flex', justifyContent: 'center', gap: 8, padding: '12px 0 4px' }}>
@@ -48,7 +49,7 @@ export function FrameChooser({ frame, onChange }: FrameChooserProps) {
             paddingBottom: 4,
           }}
         >
-          Drag the photo to reposition
+          {hint ?? 'Drag the photo to reposition'}
         </div>
       )}
     </>
