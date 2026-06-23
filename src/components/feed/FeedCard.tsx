@@ -122,7 +122,7 @@ const FeedCardImpl: React.FC<FeedCardProps> = ({
     post.userId !== currentUserId;
   const manageableBusinessIds = useManageableBusinessIds(currentUserId);
   const canManage = canManagePost(
-    { userId: post.userId, actorType: post.actorType, actorId: post.actorId },
+    { userId: post.userId, actorType: post.actorType === 'business' ? 'business' : 'personal', actorId: post.actorId },
     currentUserId,
     manageableBusinessIds,
   );
