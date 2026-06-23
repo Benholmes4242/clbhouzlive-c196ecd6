@@ -825,16 +825,16 @@ export function CanvasComposer({
               Add photo / video
             </button>
             <button
-              onClick={() => setCourseSheetOpen(true)}
+              onClick={handleCoursePillTap}
               style={{
                 flex: 1,
                 padding: '13px 0',
                 borderRadius: 10,
-                border: `1px solid ${taggedCourse ? GOLD_BORDER : HAIR}`,
-                background: taggedCourse ? AMBER_SOFT : SURFACE,
+                border: `1px solid ${taggedCourses.length > 0 ? GOLD_BORDER : HAIR}`,
+                background: taggedCourses.length > 0 ? AMBER_SOFT : SURFACE,
                 fontSize: 13,
                 fontWeight: 700,
-                color: taggedCourse ? GOLD_DEEP : INK_2,
+                color: taggedCourses.length > 0 ? GOLD_DEEP : INK_2,
                 cursor: 'pointer',
                 display: 'inline-flex',
                 alignItems: 'center',
@@ -843,7 +843,7 @@ export function CanvasComposer({
               }}
             >
               <MapPin size={16} strokeWidth={2} />
-              {taggedCourse ? 'Tagged' : 'Course'}
+              {taggedCourses.length > 0 ? `Tagged${courseExtraCount > 0 ? ` +${courseExtraCount}` : ''}` : 'Course'}
             </button>
           </div>
         </div>
@@ -853,8 +853,23 @@ export function CanvasComposer({
         open={courseSheetOpen}
         onClose={() => setCourseSheetOpen(false)}
         onSelect={(c) => {
-          setTaggedCourse(c);
-          setCourseSheetOpen(false);
+          handleAddCourse(c);
+          if (courseSearchMode === 'single') {
+            setCourseSheetOpen(false);
+          }
+        }}
+        multi={courseSearchMode === 'add'}
+        excludedIds={taggedCourses.map((c) => c.courseId)}
+      />
+
+      <TaggedCoursesSheet
+        open={taggedSheetOpen}
+        courses={taggedCourses}
+        onClose={() => setTaggedSheetOpen(false)}
+        onRemove={handleRemoveCourse}
+        onAdd={() => {
+          setTaggedSheetOpen(false);
+          openCourseSearchAdd();
         }}
       />
 
