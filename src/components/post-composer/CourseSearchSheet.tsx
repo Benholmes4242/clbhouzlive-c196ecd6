@@ -4,6 +4,8 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { Search, X, MapPin, Flag, Check } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
+import { useRateSuggestions } from '@/hooks/useRateSuggestions';
+import type { NudgeCourse } from '@/hooks/useRateNudgeCourse';
 import type { TaggedCourse } from './types';
 
 interface CourseResult {
