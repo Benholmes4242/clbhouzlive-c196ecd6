@@ -207,7 +207,9 @@ export const usePostSubmission = () => {
                 media_type: 'image',
                 media_url: publicUrl,
                 display_order: index,
+                original_media_url: originalMediaUrls?.[index] ?? null,
               });
+
 
             if (mediaError) {
               console.error(`Media record error for file ${file.name}:`, mediaError);
