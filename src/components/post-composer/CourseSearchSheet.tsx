@@ -211,7 +211,7 @@ export function CourseSearchSheet({
         </div>
 
         {/* Results */}
-        <div className="flex-1 overflow-y-auto px-5" style={{ scrollbarWidth: 'none' }}>
+        <div className="flex-1 overflow-y-auto px-5" style={{ scrollbarWidth: 'none', WebkitOverflowScrolling: 'touch' }}>
           {!isSearching && query.length < 2 && (
             <div className="flex flex-col items-center text-center py-10">
               <Flag className="w-6 h-6 mb-2" style={{ color: 'rgba(15,23,42,0.25)' }} strokeWidth={1.5} />
