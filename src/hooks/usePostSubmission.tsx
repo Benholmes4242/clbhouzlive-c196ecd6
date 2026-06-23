@@ -42,6 +42,7 @@ export const usePostSubmission = () => {
     user,
     content,
     mediaFiles,
+    originalMediaUrls,
     selectedTags,
     courseInfo,
     courses,
@@ -56,6 +57,7 @@ export const usePostSubmission = () => {
     try {
       // Validate files first
       const validation = validateFiles(mediaFiles);
+
       if (!validation.isValid) {
         toast.error("Upload Error", { description: validation.error });
         onError?.();
