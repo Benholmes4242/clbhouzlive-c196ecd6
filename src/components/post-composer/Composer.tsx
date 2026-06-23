@@ -39,9 +39,12 @@ import { MediaEditor } from './MediaEditor';
 import { bakeFrameCrop } from './bakeFrameCrop';
 import {
   filesToComposerMedia,
+  measureImage,
+  nextMediaId,
   remoteMediaToComposerItems,
   type ComposerMediaItem,
 } from './composerMedia';
+
 import type { TaggedCourse, StudioActorType } from './types';
 
 const MAX_CAPTION = 2000;
@@ -278,25 +281,63 @@ export function Composer({
     [setMediaItems]
   );
 
-  // Recrop is unavailable in 2A. Track C's PostOwnerMenu will already gate
-  // the entry point, but if the user somehow taps an existing tile's edit
-  // affordance, surface the same message the gate will eventually show.
+  // Recrop entry point. For an existing post_media row we fetch the immutable
+  // original (post_media.original_media_url), wrap it in a File, swap the tile
+  // in-place so MediaStage/MediaEditor work against the pre-bake source, and
+  // then open the editor. The new derivative is baked + swapped at submit time.
   const handleEditItem = useCallback(
-    (idx: number) => {
+    async (idx: number) => {
       const item = mediaItems[idx];
-      if (item?.existing) {
-        toast('Recrop unavailable in this update', {
-          description:
-            item.existing.originalMediaUrl
-              ? 'Coming in the next pass.'
-              : 'No original is stored for this image.',
-        });
+      if (!item) return;
+      // Existing tile that hasn't yet been hydrated with its original file.
+      if (item.existing && !item.file) {
+        if (item.type !== 'image') {
+          toast('Recrop unavailable for videos');
+          return;
+        }
+        if (!item.existing.originalMediaUrl) {
+          toast('Original unavailable', {
+            description: 'No pre-crop source is stored for this image.',
+          });
+          return;
+        }
+        try {
+          const resp = await fetch(item.existing.originalMediaUrl);
+          if (!resp.ok) throw new Error(`fetch ${resp.status}`);
+          const blob = await resp.blob();
+          const ext = (blob.type.split('/')[1] || 'jpg').split('+')[0];
+          const file = new File([blob], `original-${item.existing.mediaId}.${ext}`, {
+            type: blob.type || 'image/jpeg',
+            lastModified: Date.now(),
+          });
+          const m = await measureImage(file);
+          const hydrated: ComposerMediaItem = {
+            ...item,
+            id: nextMediaId(),
+            file,
+            previewUrl: m.previewUrl,
+            width: m.width,
+            height: m.height,
+            aspectRatio: m.width / Math.max(1, m.height),
+            pos: { x: 50, y: 50 },
+            frame: 'original',
+          };
+          setMediaItems((prev) => prev.map((it, i) => (i === idx ? hydrated : it)));
+          onOpenEditor(mediaItems, idx);
+
+        } catch (err) {
+          console.error('[Composer] recrop bootstrap failed:', err);
+          toast.error("Couldn't load original", {
+            description: 'Try again in a moment.',
+          });
+        }
         return;
       }
       onOpenEditor(mediaItems, idx);
     },
-    [mediaItems, onOpenEditor],
+    [mediaItems, onOpenEditor, setMediaItems],
   );
+
 
 
   const hasMedia = mediaItems.length > 0;
@@ -353,8 +394,38 @@ export function Composer({
       return;
     }
 
-    // ── Edit mode (Brief 2A): caption / visibility / courses / remove / reorder
+    // ── Edit mode: caption / visibility / courses / remove / reorder / recrop.
     if (isEditMode && editPostId) {
+      // Recrop: existing image tiles that have been re-opened in the editor
+      // carry a hydrated File. Any non-original frame OR non-centered position
+      // counts as a real change worth re-baking + swapping.
+      const recropMedia: Array<{
+        id: string;
+        bakedFile: File;
+        previousMediaUrl: string;
+      }> = [];
+      for (const m of mediaItems) {
+        if (!m.existing?.mediaId || !m.file || m.type !== 'image') continue;
+        const dirty =
+          m.frame !== 'original' || m.pos.x !== 50 || m.pos.y !== 50;
+        if (!dirty) continue;
+        try {
+          const baked =
+            m.frame !== 'original'
+              ? await bakeFrameCrop(m.file, m.frame, m.pos)
+              : m.file;
+          recropMedia.push({
+            id: m.existing.mediaId,
+            bakedFile: baked,
+            previousMediaUrl: m.existing.mediaUrl,
+          });
+        } catch (err) {
+          console.error('[Composer] bake on edit failed:', err);
+          toast.error("Couldn't apply your crop");
+          return;
+        }
+      }
+
       const keptMedia = mediaItems
         .filter((m) => m.existing?.mediaId)
         .map((m, idx) => ({ id: m.existing!.mediaId, displayOrder: idx }));
@@ -365,6 +436,7 @@ export function Composer({
         courseIds: taggedCourses.map((c) => c.courseId),
         keptMedia,
         removedMediaIds,
+        recropMedia,
       });
       if (res.success) {
         toast.success('Post updated');
@@ -374,20 +446,41 @@ export function Composer({
     }
 
     // Bake crops per item (only images with non-original frame).
-    // Edit-mode items don't carry a File and never reach this branch — they
-    // exit via the isEditMode return above.
+    // When a crop is baked, upload the original separately so post_media can
+    // store original_media_url and recrop can later re-bake from it.
+    const { uploadToCloudflareR2 } = await import('@/utils/cloudflareUpload');
     const filesOut: File[] = [];
+    const originalMediaUrls: Array<string | null> = [];
     for (const item of mediaItems) {
       if (!item.file) continue;
       if (item.type === 'image' && item.frame !== 'original') {
+        let baked: File;
         try {
-          const baked = await bakeFrameCrop(item.file, item.frame, item.pos);
-          filesOut.push(baked);
+          baked = await bakeFrameCrop(item.file, item.frame, item.pos);
         } catch {
-          filesOut.push(item.file);
+          baked = item.file;
         }
+        // Upload the genuine pre-bake source (parallel-safe; one fetch per crop).
+        let originalUrl: string | null = null;
+        try {
+          const ext = (item.file.name.split('.').pop() || 'jpg').toLowerCase();
+          const origName = `original-${Date.now()}-${Math.random()
+            .toString(36)
+            .slice(2, 10)}.${ext}`;
+          const up = await uploadToCloudflareR2(
+            item.file,
+            'clbhouz-post-images',
+            origName,
+          );
+          if (up.success && up.publicUrl) originalUrl = up.publicUrl;
+        } catch (err) {
+          console.warn('[Composer] original upload failed (recrop disabled for this item):', err);
+        }
+        filesOut.push(baked);
+        originalMediaUrls.push(originalUrl);
       } else {
         filesOut.push(item.file);
+        originalMediaUrls.push(null);
       }
     }
 
@@ -400,6 +493,7 @@ export function Composer({
       user,
       content: caption,
       mediaFiles: filesOut,
+      originalMediaUrls,
       selectedTags: [],
       courses: taggedCourses.map((c) => ({
         id: c.courseId,
@@ -415,6 +509,7 @@ export function Composer({
       },
       onError: () => {},
     });
+
   }, [
     canPost,
     isEditMode,

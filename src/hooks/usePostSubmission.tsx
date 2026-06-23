@@ -9,6 +9,13 @@ interface PostSubmissionData {
   user: any;
   content: string;
   mediaFiles: File[];
+  /**
+   * Parallel array to mediaFiles. When set for an image, persists as
+   * post_media.original_media_url so recrop can re-bake from the genuine
+   * pre-bake source. null for items without a baked crop (originals as-is).
+   */
+  originalMediaUrls?: Array<string | null>;
+
   selectedTags: any[];
   /** Single primary course (legacy / back-compat). Use `courses` for multi-course. */
   courseInfo?: {
@@ -35,6 +42,7 @@ export const usePostSubmission = () => {
     user,
     content,
     mediaFiles,
+    originalMediaUrls,
     selectedTags,
     courseInfo,
     courses,
@@ -49,6 +57,7 @@ export const usePostSubmission = () => {
     try {
       // Validate files first
       const validation = validateFiles(mediaFiles);
+
       if (!validation.isValid) {
         toast.error("Upload Error", { description: validation.error });
         onError?.();
@@ -198,7 +207,9 @@ export const usePostSubmission = () => {
                 media_type: 'image',
                 media_url: publicUrl,
                 display_order: index,
+                original_media_url: originalMediaUrls?.[index] ?? null,
               });
+
 
             if (mediaError) {
               console.error(`Media record error for file ${file.name}:`, mediaError);
