@@ -507,10 +507,10 @@ export function CanvasComposer({
             <ChevronDown size={12} strokeWidth={2.5} style={{ opacity: 0.8 }} />
           </button>
 
-          {/* Course pill */}
-          {taggedCourse && (
+          {/* Course pill (frosted) — tap opens tagged sheet */}
+          {coursePillLabel && (
             <button
-              onClick={() => setTaggedCourse(null)}
+              onClick={handleCoursePillTap}
               style={{
                 position: 'absolute',
                 top: 'calc(max(env(safe-area-inset-top, 0px), 14px) + 66px)',
@@ -530,8 +530,7 @@ export function CanvasComposer({
               }}
             >
               <MapPin size={12} strokeWidth={2.5} />
-              <span style={{ fontSize: 12, fontWeight: 700 }}>{taggedCourse.courseName}</span>
-              <X size={12} strokeWidth={2.5} style={{ opacity: 0.7 }} />
+              <span style={{ fontSize: 12, fontWeight: 700 }}>{coursePillLabel}</span>
             </button>
           )}
 
