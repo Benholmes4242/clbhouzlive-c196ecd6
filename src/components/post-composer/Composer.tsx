@@ -42,6 +42,7 @@ import {
 import type { TaggedCourse, StudioActorType } from './types';
 
 const MAX_CAPTION = 2000;
+const MAX_POST_MEDIA = 10;
 const COUNTER_THRESHOLD = 100;
 
 const INK_2 = '#0F172A';
@@ -172,10 +173,19 @@ export function Composer({
   const addFiles = useCallback(
     async (files: File[]) => {
       if (!files.length) return;
-      const items = await filesToComposerMedia(files);
+      const remaining = MAX_POST_MEDIA - mediaItems.length;
+      if (remaining <= 0) {
+        toast.error(`You can add up to ${MAX_POST_MEDIA} photos or videos`);
+        return;
+      }
+      const slice = files.slice(0, remaining);
+      if (files.length > slice.length) {
+        toast.error(`Only ${MAX_POST_MEDIA} items allowed — added the first ${slice.length}`);
+      }
+      const items = await filesToComposerMedia(slice);
       if (items.length) setMediaItems((prev) => [...prev, ...items]);
     },
-    [setMediaItems]
+    [setMediaItems, mediaItems.length]
   );
 
   const handlePickFiles = useCallback(

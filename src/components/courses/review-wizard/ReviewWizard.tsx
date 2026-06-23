@@ -652,7 +652,9 @@ export function ReviewWizard({
                         boxShadow: canPost ? '0 2px 10px rgba(15,23,42,0.18)' : 'none',
                       }}
                     >
-                      {wizard.isSubmitting ? 'Posting…' : 'Post'}
+                      {wizard.isSubmitting
+                        ? (isEditMode ? 'Updating…' : 'Publishing…')
+                        : (isEditMode ? 'Update' : 'Publish')}
                     </button>
                   </div>
 
