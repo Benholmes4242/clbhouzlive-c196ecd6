@@ -1,7 +1,9 @@
-// useUpdatePost — Brief 2A reconcile for an existing post.
-// Covers: caption, visibility, courses (replace junction), remove media,
-// reorder media (display_order). Recrop / net-new media are out of scope here
-// and land in Brief 2B.
+// useUpdatePost — reconcile an existing post.
+// 2A covered: caption, visibility, courses (replace junction), remove media,
+// reorder media (display_order).
+// 2B adds: recrop existing image media (bake → re-upload R2 → swap media_url
+// → fire-and-forget cleanup of the prior derivative). original_media_url
+// stays intact across recrops — it is the immutable source.
 
 import { useState } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
@@ -17,6 +19,15 @@ export interface UpdatePostMediaOrder {
   displayOrder: number;
 }
 
+export interface UpdatePostRecrop {
+  /** post_media.id whose derivative is being replaced. */
+  id: string;
+  /** Newly baked image File ready for R2 upload. */
+  bakedFile: File;
+  /** The prior post_media.media_url — queued for R2 cleanup after swap. */
+  previousMediaUrl: string;
+}
+
 export interface UpdatePostInput {
   postId: string;
   caption: string;
@@ -27,6 +38,8 @@ export interface UpdatePostInput {
   keptMedia: UpdatePostMediaOrder[];
   /** Media ids the user removed. */
   removedMediaIds: string[];
+  /** Recropped image media to re-upload and swap in place. */
+  recropMedia?: UpdatePostRecrop[];
 }
 
 export function useUpdatePost() {
@@ -45,6 +58,7 @@ export function useUpdatePost() {
         courseIds,
         keptMedia,
         removedMediaIds,
+        recropMedia = [],
       } = input;
 
       // Dedupe + preserve order on courses.
@@ -113,8 +127,7 @@ export function useUpdatePost() {
         if (insPcErr) throw insPcErr;
       }
 
-      // 4. Delete removed media rows (FK cascades from posts handle siblings;
-      //    here we DELETE only the chosen media subset).
+      // 4. Delete removed media rows.
       if (removedMediaIds.length > 0) {
         const { error: delMediaErr } = await supabase
           .from('post_media')
@@ -123,8 +136,47 @@ export function useUpdatePost() {
         if (delMediaErr) throw delMediaErr;
       }
 
-      // 5. Reorder kept media — one UPDATE per row. Lists are <=10, so this is
-      //    a handful of round-trips, not a hot loop.
+      // 5. Recrop: upload each new derivative, then swap media_url. The prior
+      //    derivative URLs are queued for cleanup alongside removed media so
+      //    the storage teardown happens in a single edge-function invocation.
+      const recropCleanup: Array<{
+        id: string;
+        media_url: string;
+        media_type: 'image' | 'video';
+        stream_id: string | null;
+      }> = [];
+      if (recropMedia.length > 0) {
+        const { uploadToCloudflareR2 } = await import('@/utils/cloudflareUpload');
+        for (const item of recropMedia) {
+          const ext = item.bakedFile.name.split('.').pop() || 'jpg';
+          const fileName = `${Date.now()}-recrop-${item.id}-${Math.random()
+            .toString(36)
+            .slice(2, 10)}.${ext}`;
+          const up = await uploadToCloudflareR2(
+            item.bakedFile,
+            'clbhouz-post-images',
+            fileName,
+          );
+          if (!up.success || !up.publicUrl) {
+            throw new Error(up.error || 'Recrop upload failed');
+          }
+          const { error: swapErr } = await supabase
+            .from('post_media')
+            .update({ media_url: up.publicUrl })
+            .eq('id', item.id);
+          if (swapErr) throw swapErr;
+          // Queue prior derivative for R2 cleanup. id is informational only —
+          // the cleanup function deletes by media_url / stream_id.
+          recropCleanup.push({
+            id: `recrop_${item.id}`,
+            media_url: item.previousMediaUrl,
+            media_type: 'image',
+            stream_id: null,
+          });
+        }
+      }
+
+      // 6. Reorder kept media — one UPDATE per row. Lists are <=10.
       for (const item of keptMedia) {
         const { error: orderErr } = await supabase
           .from('post_media')
@@ -133,19 +185,19 @@ export function useUpdatePost() {
         if (orderErr) throw orderErr;
       }
 
-      // 6. Fire-and-forget external cleanup for removed media. Reuses the same
-      //    media-agnostic edge function the delete path uses.
-      if (removedMediaSnapshot.length > 0) {
+      // 7. Fire-and-forget external cleanup for removed + recropped derivatives.
+      const cleanupItems = [...removedMediaSnapshot, ...recropCleanup];
+      if (cleanupItems.length > 0) {
         supabase.functions
           .invoke('cleanup-review-media', {
-            body: { mediaItems: removedMediaSnapshot },
+            body: { mediaItems: cleanupItems },
           })
           .catch((err) => {
             console.warn('[useUpdatePost] media cleanup failed:', err);
           });
       }
 
-      // 7. Cache + listeners.
+      // 8. Cache + listeners.
       queryClient.invalidateQueries({ queryKey: ['editable-post', postId] });
       queryClient.invalidateQueries({ queryKey: ['posts'] });
       queryClient.invalidateQueries({ queryKey: ['feed'] });
