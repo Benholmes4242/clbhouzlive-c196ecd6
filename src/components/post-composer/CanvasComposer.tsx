@@ -27,6 +27,7 @@ import { useActiveActor } from '@/context/ActiveActorContext';
 import type { ActiveActor } from '@/types/actor';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { CourseSearchSheet } from './CourseSearchSheet';
+import { TaggedCoursesSheet } from './TaggedCoursesSheet';
 import { MediaStage } from './MediaStage';
 import { FrameChooser, type FrameId } from './FrameChooser';
 import { bakeFrameCrop } from './bakeFrameCrop';
@@ -166,8 +167,10 @@ export function CanvasComposer({
   const [activeIndex, setActiveIndex] = useState(0);
   const [frame, setFrame] = useState<FrameId>('original');
   const [caption, setCaption] = useState('');
-  const [taggedCourse, setTaggedCourse] = useState<TaggedCourse | null>(null);
+  const [taggedCourses, setTaggedCourses] = useState<TaggedCourse[]>([]);
   const [courseSheetOpen, setCourseSheetOpen] = useState(false);
+  const [taggedSheetOpen, setTaggedSheetOpen] = useState(false);
+  const [courseSearchMode, setCourseSearchMode] = useState<'single' | 'add'>('single');
 
   const [visibility, setVisibility] = useState<Visibility>('anyone');
   const [actorSheetOpen, setActorSheetOpen] = useState(false);
@@ -288,7 +291,38 @@ export function CanvasComposer({
   const dark = hasMedia;
   const activeItem = hasMedia ? mediaItems[Math.min(activeIndex, mediaItems.length - 1)] : null;
   const canPost = (hasMedia || caption.trim().length > 0) && !isSubmitting;
-  const hasDraft = caption.trim().length > 0 || hasMedia || !!taggedCourse;
+  const hasDraft = caption.trim().length > 0 || hasMedia || taggedCourses.length > 0;
+  const primaryCourse = taggedCourses[0] ?? null;
+  const courseExtraCount = Math.max(0, taggedCourses.length - 1);
+  const coursePillLabel = primaryCourse
+    ? `${primaryCourse.courseName}${courseExtraCount > 0 ? ` +${courseExtraCount}` : ''}`
+    : null;
+
+  const openCourseSearchSingle = useCallback(() => {
+    setCourseSearchMode('single');
+    setCourseSheetOpen(true);
+  }, []);
+  const openCourseSearchAdd = useCallback(() => {
+    setCourseSearchMode('add');
+    setCourseSheetOpen(true);
+  }, []);
+  const handleCoursePillTap = useCallback(() => {
+    if (taggedCourses.length === 0) openCourseSearchSingle();
+    else setTaggedSheetOpen(true);
+  }, [taggedCourses.length, openCourseSearchSingle]);
+  const handleAddCourse = useCallback((c: TaggedCourse) => {
+    setTaggedCourses((prev) => {
+      if (prev.some((x) => x.courseId === c.courseId)) return prev;
+      return [...prev, c];
+    });
+  }, []);
+  const handleRemoveCourse = useCallback((courseId: string) => {
+    setTaggedCourses((prev) => {
+      const next = prev.filter((c) => c.courseId !== courseId);
+      if (next.length === 0) setTaggedSheetOpen(false);
+      return next;
+    });
+  }, []);
 
   const remaining = MAX_CAPTION - caption.length;
   const showCounter = remaining <= COUNTER_THRESHOLD;
@@ -335,13 +369,11 @@ export function CanvasComposer({
       content: caption,
       mediaFiles: filesOut,
       selectedTags: [],
-      courseInfo: taggedCourse
-        ? {
-            id: taggedCourse.courseId,
-            name: taggedCourse.courseName,
-            country: taggedCourse.country ?? '',
-          }
-        : null,
+      courses: taggedCourses.map((c) => ({
+        id: c.courseId,
+        name: c.courseName,
+        country: c.country ?? '',
+      })),
       actorType,
       actorId,
       visibility,
@@ -351,7 +383,7 @@ export function CanvasComposer({
       },
       onError: () => {},
     });
-  }, [canPost, mediaItems, frame, caption, taggedCourse, displayActor, visibility, submitPost, onClose]);
+  }, [canPost, mediaItems, frame, caption, taggedCourses, displayActor, visibility, submitPost, onClose]);
 
   const safeTop = useMemo<React.CSSProperties>(
     () => ({ paddingTop: 'max(env(safe-area-inset-top, 0px), 14px)' }),
@@ -476,10 +508,10 @@ export function CanvasComposer({
             <ChevronDown size={12} strokeWidth={2.5} style={{ opacity: 0.8 }} />
           </button>
 
-          {/* Course pill */}
-          {taggedCourse && (
+          {/* Course pill (frosted) — tap opens tagged sheet */}
+          {coursePillLabel && (
             <button
-              onClick={() => setTaggedCourse(null)}
+              onClick={handleCoursePillTap}
               style={{
                 position: 'absolute',
                 top: 'calc(max(env(safe-area-inset-top, 0px), 14px) + 66px)',
@@ -499,8 +531,7 @@ export function CanvasComposer({
               }}
             >
               <MapPin size={12} strokeWidth={2.5} />
-              <span style={{ fontSize: 12, fontWeight: 700 }}>{taggedCourse.courseName}</span>
-              <X size={12} strokeWidth={2.5} style={{ opacity: 0.7 }} />
+              <span style={{ fontSize: 12, fontWeight: 700 }}>{coursePillLabel}</span>
             </button>
           )}
 
@@ -620,10 +651,10 @@ export function CanvasComposer({
               icon={<Trash2 size={18} />}
             />
             <DockAction
-              label={taggedCourse ? 'Tagged' : 'Course'}
-              onClick={() => setCourseSheetOpen(true)}
+              label={taggedCourses.length > 0 ? 'Tagged' : 'Course'}
+              onClick={handleCoursePillTap}
               icon={<MapPin size={18} />}
-              highlighted={!!taggedCourse}
+              highlighted={taggedCourses.length > 0}
             />
           </div>
         </>
@@ -732,8 +763,9 @@ export function CanvasComposer({
             </div>
           )}
 
-          {taggedCourse && (
-            <div
+          {coursePillLabel && (
+            <button
+              onClick={handleCoursePillTap}
               style={{
                 margin: '0 16px 12px',
                 display: 'inline-flex',
@@ -744,27 +776,14 @@ export function CanvasComposer({
                 borderRadius: 20,
                 background: AMBER_SOFT,
                 border: `1px solid ${GOLD_BORDER}`,
+                cursor: 'pointer',
               }}
             >
               <MapPin size={12} color={GOLD_DEEP} strokeWidth={2.5} />
               <span style={{ fontSize: 12, fontWeight: 700, color: GOLD_DEEP }}>
-                {taggedCourse.courseName}
+                {coursePillLabel}
               </span>
-              <button
-                onClick={() => setTaggedCourse(null)}
-                aria-label="Untag"
-                style={{
-                  background: 'transparent',
-                  border: 'none',
-                  padding: 0,
-                  cursor: 'pointer',
-                  color: GOLD_DEEP,
-                  display: 'inline-flex',
-                }}
-              >
-                <X size={12} strokeWidth={2.5} />
-              </button>
-            </div>
+            </button>
           )}
 
           {/* Keyboard-docked action bar */}
@@ -807,16 +826,16 @@ export function CanvasComposer({
               Add photo / video
             </button>
             <button
-              onClick={() => setCourseSheetOpen(true)}
+              onClick={handleCoursePillTap}
               style={{
                 flex: 1,
                 padding: '13px 0',
                 borderRadius: 10,
-                border: `1px solid ${taggedCourse ? GOLD_BORDER : HAIR}`,
-                background: taggedCourse ? AMBER_SOFT : SURFACE,
+                border: `1px solid ${taggedCourses.length > 0 ? GOLD_BORDER : HAIR}`,
+                background: taggedCourses.length > 0 ? AMBER_SOFT : SURFACE,
                 fontSize: 13,
                 fontWeight: 700,
-                color: taggedCourse ? GOLD_DEEP : INK_2,
+                color: taggedCourses.length > 0 ? GOLD_DEEP : INK_2,
                 cursor: 'pointer',
                 display: 'inline-flex',
                 alignItems: 'center',
@@ -825,7 +844,7 @@ export function CanvasComposer({
               }}
             >
               <MapPin size={16} strokeWidth={2} />
-              {taggedCourse ? 'Tagged' : 'Course'}
+              {taggedCourses.length > 0 ? `Tagged${courseExtraCount > 0 ? ` +${courseExtraCount}` : ''}` : 'Course'}
             </button>
           </div>
         </div>
@@ -835,8 +854,23 @@ export function CanvasComposer({
         open={courseSheetOpen}
         onClose={() => setCourseSheetOpen(false)}
         onSelect={(c) => {
-          setTaggedCourse(c);
-          setCourseSheetOpen(false);
+          handleAddCourse(c);
+          if (courseSearchMode === 'single') {
+            setCourseSheetOpen(false);
+          }
+        }}
+        multi={courseSearchMode === 'add'}
+        excludedIds={taggedCourses.map((c) => c.courseId)}
+      />
+
+      <TaggedCoursesSheet
+        open={taggedSheetOpen}
+        courses={taggedCourses}
+        onClose={() => setTaggedSheetOpen(false)}
+        onRemove={handleRemoveCourse}
+        onAdd={() => {
+          setTaggedSheetOpen(false);
+          openCourseSearchAdd();
         }}
       />
 

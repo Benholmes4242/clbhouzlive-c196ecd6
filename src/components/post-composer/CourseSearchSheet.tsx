@@ -2,7 +2,7 @@
 // Shared by Post-mode "Tag a course" chip and Review-mode course picker.
 
 import React, { useCallback, useEffect, useRef, useState } from 'react';
-import { Search, X, MapPin, Flag } from 'lucide-react';
+import { Search, X, MapPin, Flag, Check } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import type { TaggedCourse } from './types';
 
@@ -20,6 +20,13 @@ interface CourseSearchSheetProps {
   onSelect: (course: TaggedCourse) => void;
   title?: string;
   subtitle?: string;
+  /**
+   * Multi-select mode: stay open after select, show checks on already-tagged courses,
+   * and render a "Done" button. Selecting a tagged course is a no-op.
+   */
+  multi?: boolean;
+  /** Course IDs already tagged (shown as checked + non-selectable in multi mode). */
+  excludedIds?: string[];
 }
 
 export function CourseSearchSheet({
@@ -28,12 +35,16 @@ export function CourseSearchSheet({
   onSelect,
   title = 'Tag a course',
   subtitle = 'Where did you play?',
+  multi = false,
+  excludedIds,
 }: CourseSearchSheetProps) {
   const [query, setQuery] = useState('');
   const [results, setResults] = useState<CourseResult[]>([]);
   const [isSearching, setIsSearching] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
   const debounceRef = useRef<ReturnType<typeof setTimeout>>();
+
+  const excludedSet = React.useMemo(() => new Set(excludedIds ?? []), [excludedIds]);
 
   useEffect(() => {
     if (!open) return;
@@ -68,6 +79,7 @@ export function CourseSearchSheet({
 
   const handleSelect = useCallback(
     (course: CourseResult) => {
+      if (excludedSet.has(course.id)) return;
       onSelect({
         courseId: course.id,
         courseName: course.name,
@@ -75,12 +87,15 @@ export function CourseSearchSheet({
         region: course.region ?? undefined,
         globalRank: course.global_rank,
       });
-      setQuery('');
-      setResults([]);
-      onClose();
+      if (!multi) {
+        setQuery('');
+        setResults([]);
+        onClose();
+      }
     },
-    [onSelect, onClose]
+    [onSelect, onClose, multi, excludedSet]
   );
+
 
   if (!open) return null;
 
@@ -196,87 +211,128 @@ export function CourseSearchSheet({
             </p>
           )}
 
-          {results.map((course, i) => (
-            <button
-              key={course.id}
-              onClick={() => handleSelect(course)}
-              className="w-full flex items-center gap-3"
-              style={{
-                padding: '11px 0',
-                minHeight: 56,
-                borderBottom: i < results.length - 1 ? '0.5px solid rgba(15,23,42,0.07)' : 'none',
-                background: 'transparent',
-                border: 'none',
-                textAlign: 'left',
-                cursor: 'pointer',
-              }}
-            >
-              <div
-                className="shrink-0 flex items-center justify-center"
+          {results.map((course, i) => {
+            const alreadyTagged = excludedSet.has(course.id);
+            return (
+              <button
+                key={course.id}
+                onClick={() => handleSelect(course)}
+                disabled={alreadyTagged}
+                className="w-full flex items-center gap-3"
                 style={{
-                  width: 42,
-                  height: 42,
-                  borderRadius: 12,
-                  background: 'rgba(34,197,94,0.08)',
-                  border: '1px solid rgba(34,197,94,0.18)',
+                  padding: '11px 0',
+                  minHeight: 56,
+                  borderBottom: i < results.length - 1 ? '0.5px solid rgba(15,23,42,0.07)' : 'none',
+                  background: 'transparent',
+                  border: 'none',
+                  textAlign: 'left',
+                  cursor: alreadyTagged ? 'default' : 'pointer',
+                  opacity: alreadyTagged ? 0.55 : 1,
                 }}
               >
-                <span style={{ fontSize: 16 }}>⛳</span>
-              </div>
-              <div className="flex-1 min-w-0">
-                <p
+                <div
+                  className="shrink-0 flex items-center justify-center"
                   style={{
-                    fontSize: 14,
-                    fontWeight: 600,
-                    color: '#0F172A',
-                    overflow: 'hidden',
-                    textOverflow: 'ellipsis',
-                    whiteSpace: 'nowrap',
+                    width: 42,
+                    height: 42,
+                    borderRadius: 12,
+                    background: 'rgba(34,197,94,0.08)',
+                    border: '1px solid rgba(34,197,94,0.18)',
                   }}
                 >
-                  {course.name}
-                </p>
-                <div className="flex items-center gap-1 mt-0.5 min-w-0">
-                  <MapPin
-                    className="w-3 h-3 shrink-0"
-                    style={{ color: 'rgba(15,23,42,0.45)' }}
-                    strokeWidth={1.5}
-                  />
+                  <span style={{ fontSize: 16 }}>⛳</span>
+                </div>
+                <div className="flex-1 min-w-0">
                   <p
                     style={{
-                      fontSize: 12,
-                      color: 'rgba(15,23,42,0.45)',
+                      fontSize: 14,
+                      fontWeight: 600,
+                      color: '#0F172A',
                       overflow: 'hidden',
                       textOverflow: 'ellipsis',
                       whiteSpace: 'nowrap',
                     }}
                   >
-                    {[course.region, course.country].filter(Boolean).join(', ')}
+                    {course.name}
                   </p>
+                  <div className="flex items-center gap-1 mt-0.5 min-w-0">
+                    <MapPin
+                      className="w-3 h-3 shrink-0"
+                      style={{ color: 'rgba(15,23,42,0.45)' }}
+                      strokeWidth={1.5}
+                    />
+                    <p
+                      style={{
+                        fontSize: 12,
+                        color: 'rgba(15,23,42,0.45)',
+                        overflow: 'hidden',
+                        textOverflow: 'ellipsis',
+                        whiteSpace: 'nowrap',
+                      }}
+                    >
+                      {[course.region, course.country].filter(Boolean).join(', ')}
+                    </p>
+                  </div>
                 </div>
-              </div>
-              {course.global_rank != null && (
-                <span
-                  style={{
-                    fontSize: 9,
-                    fontWeight: 700,
-                    letterSpacing: '0.06em',
-                    textTransform: 'uppercase',
-                    padding: '3px 7px',
-                    borderRadius: 20,
-                    flexShrink: 0,
-                    background: 'rgba(15,23,42,0.06)',
-                    border: '1px solid rgba(15,23,42,0.10)',
-                    color: 'rgba(15,23,42,0.70)',
-                    whiteSpace: 'nowrap',
-                  }}
-                >
-                  Top 100
-                </span>
-              )}
-            </button>
-          ))}
+                {alreadyTagged ? (
+                  <span
+                    style={{
+                      width: 22,
+                      height: 22,
+                      borderRadius: '50%',
+                      background: '#16A34A',
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      flexShrink: 0,
+                    }}
+                  >
+                    <Check size={13} strokeWidth={3} color="#fff" />
+                  </span>
+                ) : course.global_rank != null ? (
+                  <span
+                    style={{
+                      fontSize: 9,
+                      fontWeight: 700,
+                      letterSpacing: '0.06em',
+                      textTransform: 'uppercase',
+                      padding: '3px 7px',
+                      borderRadius: 20,
+                      flexShrink: 0,
+                      background: 'rgba(15,23,42,0.06)',
+                      border: '1px solid rgba(15,23,42,0.10)',
+                      color: 'rgba(15,23,42,0.70)',
+                      whiteSpace: 'nowrap',
+                    }}
+                  >
+                    Top 100
+                  </span>
+                ) : null}
+              </button>
+            );
+          })}
         </div>
+
+        {multi && (
+          <div style={{ padding: '10px 16px 0', borderTop: '0.5px solid rgba(15,23,42,0.07)' }}>
+            <button
+              onClick={onClose}
+              style={{
+                width: '100%',
+                height: 46,
+                borderRadius: 12,
+                background: '#0F172A',
+                color: '#fff',
+                border: 'none',
+                fontSize: 14,
+                fontWeight: 700,
+                cursor: 'pointer',
+              }}
+            >
+              Done
+            </button>
+          </div>
+        )}
       </div>
     </>
   );
