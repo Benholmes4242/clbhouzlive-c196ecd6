@@ -1038,13 +1038,6 @@ export function useReviewWizard({
     retryMedia,
     reorderMedia,
     setMediaOrder,
-    /**
-     * Replace the entire pendingFiles list (used by the canvas to swap in
-     * crop-baked Files just before submit). Does not touch the data layer,
-     * payload, or DB — only swaps the local File[] state.
-     */
-    replacePendingFiles: (files: File[]) => setPendingFiles(files),
-
     // Actions
     submit: handleSubmit,
     deleteReview: deleteMutation.mutateAsync,
