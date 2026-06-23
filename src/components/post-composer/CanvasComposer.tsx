@@ -507,38 +507,51 @@ export function CanvasComposer({
           {/* Thumbnails strip */}
           {mediaItems.length > 1 && (
             <div style={{ display: 'flex', justifyContent: 'center', gap: 8, padding: '8px 0' }}>
-              {mediaItems.map((m, i) => (
-                <button
-                  key={m.id}
-                  onClick={() => setActiveIndex(i)}
-                  style={{
-                    width: 40,
-                    height: 40,
-                    borderRadius: 8,
-                    overflow: 'hidden',
-                    border: i === activeIndex ? `2px solid ${AMBER}` : '2px solid transparent',
-                    opacity: i === activeIndex ? 1 : 0.6,
-                    padding: 0,
-                    cursor: 'pointer',
-                    background: '#000',
-                  }}
-                >
-                  {m.type === 'video' ? (
-                    <video
-                      src={m.previewUrl}
-                      muted
-                      playsInline
-                      style={{ width: '100%', height: '100%', objectFit: 'cover' }}
-                    />
-                  ) : (
-                    <img
-                      src={m.previewUrl}
-                      alt=""
-                      style={{ width: '100%', height: '100%', objectFit: 'cover' }}
-                    />
-                  )}
-                </button>
-              ))}
+              {mediaItems.map((m, i) => {
+                const selected = i === activeIndex;
+                return (
+                  <button
+                    key={m.id}
+                    onClick={() => setActiveIndex(i)}
+                    style={{
+                      width: 40,
+                      height: 40,
+                      borderRadius: 8,
+                      overflow: 'hidden',
+                      border: selected ? '2px solid #FFFFFF' : '2px solid transparent',
+                      boxShadow: selected ? '0 0 0 1px rgba(0,0,0,0.4)' : 'none',
+                      opacity: selected ? 1 : 0.6,
+                      padding: 0,
+                      cursor: 'pointer',
+                      background: '#000',
+                    }}
+                  >
+                    {m.type === 'video' ? (
+                      m.posterUrl ? (
+                        <img
+                          src={m.posterUrl}
+                          alt=""
+                          style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                        />
+                      ) : (
+                        <video
+                          src={m.previewUrl}
+                          muted
+                          playsInline
+                          preload="metadata"
+                          style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                        />
+                      )
+                    ) : (
+                      <img
+                        src={m.previewUrl}
+                        alt=""
+                        style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                      />
+                    )}
+                  </button>
+                );
+              })}
             </div>
           )}
 
