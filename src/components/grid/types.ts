@@ -116,13 +116,24 @@ export interface UniversalMediaItem {
   
   // Multi-media
   additionalMediaCount?: number;
-  
+
+  // ── Owner-menu identity (consumed by PostOwnerMenu) ──
+  /** Post actor type — drives delete-cache invalidation targeting. */
+  actorType?: 'personal' | 'business';
+  /** Post actor id — same. */
+  actorId?: string;
+  /** Non-null = review-derived post; menu shows "Manage review" instead of Edit/Delete. */
+  sourceReviewId?: string | null;
+  /** Course id for the linked review — used to route "Manage review" → /courses/:id/rate. */
+  reviewCourseId?: string | null;
+
   // Computed at runtime
   isAutoplayCandidate?: boolean;
   sortIndex?: number;
   orientation?: 'portrait' | 'landscape' | 'square';
   tileVariant?: 'portrait' | 'landscape';
 }
+
 
 // ============ Grid Props ============
 
