@@ -137,6 +137,15 @@ export function Composer({
     };
   }, []);
 
+  // Auto-grow caption textarea
+  useEffect(() => {
+    const el = captionRef.current;
+    if (!el) return;
+    el.style.height = 'auto';
+    el.style.height = `${el.scrollHeight}px`;
+  });
+
+
   // Seed initial media once
   const seededRef = useRef(false);
   useEffect(() => {
