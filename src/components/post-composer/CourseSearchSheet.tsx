@@ -150,26 +150,16 @@ export function CourseSearchSheet({
       <div
         className="fixed inset-x-0 z-[10001] flex flex-col"
         style={{
-          // Bottom rides the keyboard (0 when closed). Always defined, no notch dependency.
-          bottom: keyboardHeight,
-          // TOP is pinned by a fixed inset that does NOT depend on keyboardHeight.
-          // This is what keeps the header on-screen on the very first open, before the
-          // keyboard's visualViewport event has fired. When the keyboard is closed we
-          // drop the sheet to its resting height instead of pinning the top.
-          top: keyboardHeight > 0 ? 'calc(env(safe-area-inset-top, 0px) + 8px)' : 'auto',
-          maxHeight:
-            keyboardHeight > 0
-              ? undefined
-              : '72vh', // resting height when no keyboard (e.g. opened then keyboard dismissed)
+          // Anchor the sheet to the visualViewport so it sits in the same
+          // compact band on first open AND on reopen. No keyboard timing race.
+          top: vvBox.top + Math.max(vvBox.height * 0.22, 96),
+          height: vvBox.height - Math.max(vvBox.height * 0.22, 96) - 8,
           background: '#ffffff',
           borderRadius: '20px 20px 0 0',
           borderTop: '0.5px solid rgba(15,23,42,0.07)',
           boxShadow: '0 -4px 24px rgba(15,23,42,0.10)',
-          paddingBottom:
-            keyboardHeight > 0
-              ? 8
-              : 'calc(var(--sab, env(safe-area-inset-bottom, 0px)) + 12px)',
-          transition: 'bottom 0.22s ease, top 0.22s ease',
+          paddingBottom: 8,
+          transition: 'top 0.22s ease, height 0.22s ease',
         }}
       >
 
