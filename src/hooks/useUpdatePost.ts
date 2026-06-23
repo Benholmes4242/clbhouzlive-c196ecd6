@@ -28,6 +28,17 @@ export interface UpdatePostRecrop {
   previousMediaUrl: string;
 }
 
+export interface UpdatePostNewMedia {
+  /** Final intended display_order (position in the combined list). */
+  displayOrder: number;
+  /** 'image' | 'video' */
+  mediaType: 'image' | 'video';
+  /** Image: the baked derivative to upload. Video: the raw file for Stream. */
+  file: File;
+  /** Image only: pre-bake original to upload for original_media_url (null if uncropped). */
+  originalFile?: File | null;
+}
+
 export interface UpdatePostInput {
   postId: string;
   caption: string;
@@ -40,6 +51,8 @@ export interface UpdatePostInput {
   removedMediaIds: string[];
   /** Recropped image media to re-upload and swap in place. */
   recropMedia?: UpdatePostRecrop[];
+  /** Net-new media to upload (R2 for images, Stream for videos) and insert. */
+  newMedia?: UpdatePostNewMedia[];
 }
 
 export function useUpdatePost() {
