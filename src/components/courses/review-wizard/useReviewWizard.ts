@@ -789,7 +789,7 @@ export function useReviewWizard({
     }
 
     // Overall rating is independent of breakdowns and must be set by the user.
-    supabase    if (state.rating === null) {
+    if (state.rating === null) {
       toast.error('Set an overall rating to continue');
       return;
     }
