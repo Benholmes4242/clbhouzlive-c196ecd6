@@ -53,7 +53,7 @@ export function CourseSearchSheet({
   }, [open]);
 
   // Keyboard-aware: lift the sheet above the on-screen keyboard.
-useEffect(() => {
+  useEffect(() => {
     if (!open) return;
     const vv = window.visualViewport;
     if (!vv) return;
