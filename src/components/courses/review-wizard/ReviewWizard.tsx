@@ -1074,27 +1074,29 @@ export function ReviewWizard({
                       zIndex: 40,
                     }}
                   >
-                    <button
-                      onClick={() => fileRef.current?.click()}
-                      style={{
-                        flex: 1,
-                        padding: '13px 0',
-                        borderRadius: 10,
-                        border: `1px solid ${HAIR}`,
-                        background: SURFACE,
-                        fontSize: 13,
-                        fontWeight: 700,
-                        color: INK,
-                        cursor: 'pointer',
-                        display: 'inline-flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        gap: 8,
-                      }}
-                    >
-                      <ImagePlus size={16} strokeWidth={2} />
-                      {hasMedia ? 'Add more' : 'Add photo / video'}
-                    </button>
+                    {wizard.allMedia.length < 10 && (
+                      <button
+                        onClick={() => fileRef.current?.click()}
+                        style={{
+                          flex: 1,
+                          padding: '13px 0',
+                          borderRadius: 10,
+                          border: `1px solid ${HAIR}`,
+                          background: SURFACE,
+                          fontSize: 13,
+                          fontWeight: 700,
+                          color: INK,
+                          cursor: 'pointer',
+                          display: 'inline-flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          gap: 8,
+                        }}
+                      >
+                        <ImagePlus size={16} strokeWidth={2} />
+                        {hasMedia ? 'Add more' : 'Add photo / video'}
+                      </button>
+                    )}
                   </div>
 
                   {/* Media editor overlay */}
