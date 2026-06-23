@@ -1031,24 +1031,26 @@ export function ReviewWizard({
                             />
                           ))}
                         </div>
-                        <div style={{ padding: '10px 16px 0' }}>
-                          <button
-                            onClick={() => fileRef.current?.click()}
-                            style={{
-                              width: '100%',
-                              padding: '11px 0',
-                              borderRadius: 12,
-                              border: '1px dashed rgba(15,23,42,0.18)',
-                              background: 'transparent',
-                              fontSize: 13,
-                              fontWeight: 700,
-                              color: INK,
-                              cursor: 'pointer',
-                            }}
-                          >
-                            ＋ Add more
-                          </button>
-                        </div>
+                        {wizard.allMedia.length < 10 && (
+                          <div style={{ padding: '10px 16px 0' }}>
+                            <button
+                              onClick={() => fileRef.current?.click()}
+                              style={{
+                                width: '100%',
+                                padding: '11px 0',
+                                borderRadius: 12,
+                                border: '1px dashed rgba(15,23,42,0.18)',
+                                background: 'transparent',
+                                fontSize: 13,
+                                fontWeight: 700,
+                                color: INK,
+                                cursor: 'pointer',
+                              }}
+                            >
+                              ＋ Add more
+                            </button>
+                          </div>
+                        )}
                       </div>
                     )}
                   </div>
@@ -1072,27 +1074,29 @@ export function ReviewWizard({
                       zIndex: 40,
                     }}
                   >
-                    <button
-                      onClick={() => fileRef.current?.click()}
-                      style={{
-                        flex: 1,
-                        padding: '13px 0',
-                        borderRadius: 10,
-                        border: `1px solid ${HAIR}`,
-                        background: SURFACE,
-                        fontSize: 13,
-                        fontWeight: 700,
-                        color: INK,
-                        cursor: 'pointer',
-                        display: 'inline-flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        gap: 8,
-                      }}
-                    >
-                      <ImagePlus size={16} strokeWidth={2} />
-                      {hasMedia ? 'Add more' : 'Add photo / video'}
-                    </button>
+                    {wizard.allMedia.length < 10 && (
+                      <button
+                        onClick={() => fileRef.current?.click()}
+                        style={{
+                          flex: 1,
+                          padding: '13px 0',
+                          borderRadius: 10,
+                          border: `1px solid ${HAIR}`,
+                          background: SURFACE,
+                          fontSize: 13,
+                          fontWeight: 700,
+                          color: INK,
+                          cursor: 'pointer',
+                          display: 'inline-flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          gap: 8,
+                        }}
+                      >
+                        <ImagePlus size={16} strokeWidth={2} />
+                        {hasMedia ? 'Add more' : 'Add photo / video'}
+                      </button>
+                    )}
                   </div>
 
                   {/* Media editor overlay */}
