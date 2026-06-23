@@ -41,7 +41,13 @@ export function CourseSearchSheet({
   const [query, setQuery] = useState('');
   const [results, setResults] = useState<CourseResult[]>([]);
   const [isSearching, setIsSearching] = useState(false);
-  const [keyboardHeight, setKeyboardHeight] = useState(0);
+  // Anchor the sheet directly to the visualViewport so it sits in the same
+  // compact band on first open AND on reopen. We compute a `top` (offset from
+  // layout viewport top) and a `height` from visualViewport on every change.
+  const [vvBox, setVvBox] = useState<{ top: number; height: number }>(() => ({
+    top: 0,
+    height: typeof window !== 'undefined' ? window.innerHeight : 800,
+  }));
   const inputRef = useRef<HTMLInputElement>(null);
   const debounceRef = useRef<ReturnType<typeof setTimeout>>();
 
@@ -52,27 +58,35 @@ export function CourseSearchSheet({
     setTimeout(() => inputRef.current?.focus(), 50);
   }, [open]);
 
-  // Keyboard-aware: lift the sheet above the on-screen keyboard.
+  // Track the visual viewport (keyboard + iOS layout-scroll). The sheet's top
+  // and height are derived from this on every change.
   useEffect(() => {
     if (!open) return;
     const vv = window.visualViewport;
-    if (!vv) return;
     const update = () => {
-      const h = window.innerHeight - vv.height - vv.offsetTop;
-      setKeyboardHeight(Math.max(0, Math.round(h)));
+      if (vv) {
+        setVvBox({ top: vv.offsetTop, height: vv.height });
+      } else {
+        setVvBox({ top: 0, height: window.innerHeight });
+      }
     };
     update();
-    vv.addEventListener('resize', update);
-    vv.addEventListener('scroll', update);
+    if (vv) {
+      vv.addEventListener('resize', update);
+      vv.addEventListener('scroll', update);
+    }
+    window.addEventListener('resize', update);
 
     // First-open safety net: some iOS/Median WebViews don't emit the initial
-    // 'resize' when the keyboard animates in on first focus. Poll briefly so the
-    // sheet snaps to the correct band on the first open (not just on reopen).
-    const polls = [120, 280, 450, 650].map((t) => setTimeout(update, t));
+    // 'resize' when the keyboard animates in on first focus.
+    const polls = [80, 180, 320, 500, 750].map((t) => setTimeout(update, t));
 
     return () => {
-      vv.removeEventListener('resize', update);
-      vv.removeEventListener('scroll', update);
+      if (vv) {
+        vv.removeEventListener('resize', update);
+        vv.removeEventListener('scroll', update);
+      }
+      window.removeEventListener('resize', update);
       polls.forEach(clearTimeout);
     };
   }, [open]);
