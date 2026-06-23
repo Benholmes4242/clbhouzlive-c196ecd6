@@ -290,7 +290,38 @@ export function CanvasComposer({
   const dark = hasMedia;
   const activeItem = hasMedia ? mediaItems[Math.min(activeIndex, mediaItems.length - 1)] : null;
   const canPost = (hasMedia || caption.trim().length > 0) && !isSubmitting;
-  const hasDraft = caption.trim().length > 0 || hasMedia || !!taggedCourse;
+  const hasDraft = caption.trim().length > 0 || hasMedia || taggedCourses.length > 0;
+  const primaryCourse = taggedCourses[0] ?? null;
+  const courseExtraCount = Math.max(0, taggedCourses.length - 1);
+  const coursePillLabel = primaryCourse
+    ? `${primaryCourse.courseName}${courseExtraCount > 0 ? ` +${courseExtraCount}` : ''}`
+    : null;
+
+  const openCourseSearchSingle = useCallback(() => {
+    setCourseSearchMode('single');
+    setCourseSheetOpen(true);
+  }, []);
+  const openCourseSearchAdd = useCallback(() => {
+    setCourseSearchMode('add');
+    setCourseSheetOpen(true);
+  }, []);
+  const handleCoursePillTap = useCallback(() => {
+    if (taggedCourses.length === 0) openCourseSearchSingle();
+    else setTaggedSheetOpen(true);
+  }, [taggedCourses.length, openCourseSearchSingle]);
+  const handleAddCourse = useCallback((c: TaggedCourse) => {
+    setTaggedCourses((prev) => {
+      if (prev.some((x) => x.courseId === c.courseId)) return prev;
+      return [...prev, c];
+    });
+  }, []);
+  const handleRemoveCourse = useCallback((courseId: string) => {
+    setTaggedCourses((prev) => {
+      const next = prev.filter((c) => c.courseId !== courseId);
+      if (next.length === 0) setTaggedSheetOpen(false);
+      return next;
+    });
+  }, []);
 
   const remaining = MAX_CAPTION - caption.length;
   const showCounter = remaining <= COUNTER_THRESHOLD;
