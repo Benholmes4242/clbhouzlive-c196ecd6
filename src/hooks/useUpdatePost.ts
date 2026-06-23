@@ -189,44 +189,29 @@ export function useUpdatePost() {
         if (delMediaErr) throw delMediaErr;
       }
 
-      // 5. Recrop: upload each new derivative, then swap media_url. The prior
-      //    derivative URLs are queued for cleanup alongside removed media so
-      //    the storage teardown happens in a single edge-function invocation.
+      // 5. Recrop swap: uploads already succeeded in Phase 1. Just swap the
+      //    media_url for each pre-uploaded result, and queue the prior
+      //    derivative URLs for cleanup alongside removed media.
       const recropCleanup: Array<{
         id: string;
         media_url: string;
         media_type: 'image' | 'video';
         stream_id: string | null;
       }> = [];
-      if (recropMedia.length > 0) {
-        const { uploadToCloudflareR2 } = await import('@/utils/cloudflareUpload');
-        for (const item of recropMedia) {
-          const ext = item.bakedFile.name.split('.').pop() || 'jpg';
-          const fileName = `${Date.now()}-recrop-${item.id}-${Math.random()
-            .toString(36)
-            .slice(2, 10)}.${ext}`;
-          const up = await uploadToCloudflareR2(
-            item.bakedFile,
-            'clbhouz-post-images',
-            fileName,
-          );
-          if (!up.success || !up.publicUrl) {
-            throw new Error(up.error || 'Recrop upload failed');
-          }
-          const { error: swapErr } = await supabase
-            .from('post_media')
-            .update({ media_url: up.publicUrl })
-            .eq('id', item.id);
-          if (swapErr) throw swapErr;
-          // Queue prior derivative for R2 cleanup. id is informational only —
-          // the cleanup function deletes by media_url / stream_id.
-          recropCleanup.push({
-            id: `recrop_${item.id}`,
-            media_url: item.previousMediaUrl,
-            media_type: 'image',
-            stream_id: null,
-          });
-        }
+      for (const result of recropResults) {
+        const { error: swapErr } = await supabase
+          .from('post_media')
+          .update({ media_url: result.newUrl })
+          .eq('id', result.id);
+        if (swapErr) throw swapErr;
+        // Queue prior derivative for R2 cleanup. id is informational only —
+        // the cleanup function deletes by media_url / stream_id.
+        recropCleanup.push({
+          id: `recrop_${result.id}`,
+          media_url: result.previousMediaUrl,
+          media_type: 'image',
+          stream_id: null,
+        });
       }
 
       // 6. Reorder kept media — one UPDATE per row. Lists are <=10.
