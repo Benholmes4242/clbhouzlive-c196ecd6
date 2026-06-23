@@ -158,6 +158,32 @@ export const FeedOverlayLayer = memo(function FeedOverlayLayer({
 
   const reviewRightInset = topActionBar ? 16 : 80;
 
+  // Owner menu — self-wired Edit/Delete/Manage-review for own posts. Replaces
+  // the default ⋯ on both the vertical rail and the fullscreen top bar.
+  // canManage v1 = personal ownership only; business-admin gating is a follow-up.
+  const ownerMenu = useMemo(() => {
+    if (!isOwnPost) return null;
+    return (
+      <PostOwnerMenu
+        postId={activePost.id}
+        isOwnPost
+        actorType={activePost.actorType === 'business' ? 'business' : 'personal'}
+        actorId={activePost.actorId}
+        sourceReviewId={activePost.review?.reviewId ?? null}
+        reviewCourseId={activePost.review?.courseId ?? null}
+        variant="overlay"
+      />
+    );
+  }, [
+    isOwnPost,
+    activePost.id,
+    activePost.actorType,
+    activePost.actorId,
+    activePost.review?.reviewId,
+    activePost.review?.courseId,
+  ]);
+
+
   return (
     <div
       className="fixed inset-0"
