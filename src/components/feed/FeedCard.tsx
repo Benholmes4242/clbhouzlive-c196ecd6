@@ -223,8 +223,6 @@ const FeedCardImpl: React.FC<FeedCardProps> = ({
               onFollow={() => onFollow!(post)}
             />
           )}
-            />
-          )}
           {isDeal && (
             <span
               style={{
