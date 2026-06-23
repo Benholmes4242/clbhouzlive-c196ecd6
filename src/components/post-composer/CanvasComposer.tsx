@@ -166,8 +166,10 @@ export function CanvasComposer({
   const [activeIndex, setActiveIndex] = useState(0);
   const [frame, setFrame] = useState<FrameId>('original');
   const [caption, setCaption] = useState('');
-  const [taggedCourse, setTaggedCourse] = useState<TaggedCourse | null>(null);
+  const [taggedCourses, setTaggedCourses] = useState<TaggedCourse[]>([]);
   const [courseSheetOpen, setCourseSheetOpen] = useState(false);
+  const [taggedSheetOpen, setTaggedSheetOpen] = useState(false);
+  const [courseSearchMode, setCourseSearchMode] = useState<'single' | 'add'>('single');
 
   const [visibility, setVisibility] = useState<Visibility>('anyone');
   const [actorSheetOpen, setActorSheetOpen] = useState(false);
