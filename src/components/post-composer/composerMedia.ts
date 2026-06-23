@@ -53,11 +53,13 @@ export function remoteMediaToComposerItems(
       frame: 'original' as FrameId,
       existing: {
         mediaId: row.id,
+        mediaUrl: row.mediaUrl,
         originalMediaUrl: row.originalMediaUrl,
       },
     };
   });
 }
+
 
 let __idCounter = 0;
 export const nextMediaId = () => `m_${Date.now()}_${++__idCounter}`;
