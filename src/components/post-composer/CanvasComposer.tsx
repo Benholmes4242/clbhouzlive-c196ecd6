@@ -397,8 +397,8 @@ export function CanvasComposer({
         }}
       >
         <button
-          onClick={handleCloseRequest}
-          aria-label="Close"
+          onClick={hasMedia ? handleBackToComposer : handleCloseRequest}
+          aria-label={hasMedia ? 'Back' : 'Close'}
           style={{
             width: 36,
             height: 36,
@@ -414,7 +414,11 @@ export function CanvasComposer({
             color: dark ? '#fff' : INK_MUTE,
           }}
         >
-          <X size={18} strokeWidth={2} />
+          {hasMedia ? (
+            <ChevronLeft size={20} strokeWidth={2.25} />
+          ) : (
+            <X size={18} strokeWidth={2} />
+          )}
         </button>
         <div style={{ flex: 1 }} />
         <button
@@ -427,10 +431,10 @@ export function CanvasComposer({
             borderRadius: 20,
             border: 'none',
             cursor: canPost ? 'pointer' : 'default',
-            background: canPost ? AMBER : dark ? 'rgba(255,255,255,0.18)' : CHIP,
+            background: canPost ? INK_2 : dark ? 'rgba(255,255,255,0.18)' : CHIP,
             color: canPost ? '#fff' : dark ? 'rgba(255,255,255,0.6)' : '#94A3B8',
             opacity: canPost ? 1 : 0.85,
-            boxShadow: canPost ? '0 2px 12px rgba(247,147,30,0.22)' : 'none',
+            boxShadow: canPost ? '0 2px 10px rgba(15,23,42,0.25)' : 'none',
           }}
         >
           {isSubmitting ? 'Posting…' : 'Share'}
