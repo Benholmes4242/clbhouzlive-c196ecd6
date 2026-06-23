@@ -72,6 +72,7 @@ export function useUpdatePost() {
         keptMedia,
         removedMediaIds,
         recropMedia = [],
+        newMedia = [],
       } = input;
 
       // Dedupe + preserve order on courses.
