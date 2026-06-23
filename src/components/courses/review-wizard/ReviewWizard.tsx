@@ -43,7 +43,7 @@ import {
 import { DiscardActionSheet } from './DiscardActionSheet';
 import { RemoveReviewActionSheet } from './RemoveReviewActionSheet';
 import { SuccessScreen } from './SuccessScreen';
-import { TickScrubber, tierFor } from './TickScrubber';
+import { LuminousCellRating as TickScrubber, tierFor } from './LuminousCellRating';
 import { useReviewWizard } from './useReviewWizard';
 import type {
   ReviewWizardProps,
