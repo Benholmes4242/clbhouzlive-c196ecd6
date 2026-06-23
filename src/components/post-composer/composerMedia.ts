@@ -16,11 +16,14 @@ export interface ComposerMediaItem {
   frame: FrameId;
   /** Set on items hydrated from an existing post; absent on net-new uploads. */
   existing?: {
-    /** post_media.id — needed for reorder / remove reconciliation. */
+    /** post_media.id — needed for reorder / remove / recrop reconciliation. */
     mediaId: string;
+    /** Current post_media.media_url — kept so recrop can cleanup the prior derivative. */
+    mediaUrl: string;
     /** post_media.original_media_url — null means recrop is unavailable. */
     originalMediaUrl: string | null;
   };
+
 }
 
 /** Build composer items from existing post_media rows (edit mode). */
