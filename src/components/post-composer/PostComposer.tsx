@@ -1,4 +1,4 @@
-// PostComposer — portal shell that hosts the redesigned Chooser → Canvas flow.
+// PostComposer — portal shell hosting Chooser → Composer → MediaEditor flow.
 // Open/close contract (usePostStudioStore → GlobalPostComposer → PostComposer) is unchanged.
 
 import React, { useCallback, useEffect, useLayoutEffect, useMemo, useState } from 'react';
@@ -7,11 +7,13 @@ import { AnimatePresence, motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import { useActiveActor } from '@/context/ActiveActorContext';
 import { ComposerChooser } from './ComposerChooser';
-import { CanvasComposer } from './CanvasComposer';
+import { Composer } from './Composer';
+import { MediaEditor } from './MediaEditor';
 import { CourseSearchSheet } from './CourseSearchSheet';
+import type { ComposerMediaItem } from './composerMedia';
 import type { StudioActorType, TaggedCourse } from './types';
 
-type Screen = 'choose' | 'post';
+type Screen = 'choose' | 'post' | 'editor';
 
 interface PostComposerProps {
   open: boolean;
@@ -34,11 +36,17 @@ export function PostComposer({
   const [screen, setScreen] = useState<Screen>('choose');
   const [reviewCourseSheetOpen, setReviewCourseSheetOpen] = useState(false);
 
+  // Shared media state — lives on the shell so the Editor can read/update it.
+  const [mediaItems, setMediaItems] = useState<ComposerMediaItem[]>([]);
+  const [editIndex, setEditIndex] = useState(0);
+
   const isBusiness = initialActorType === 'business';
 
   const actorInfo = useMemo(() => {
     if (isBusiness && initialActorId) {
-      const biz = availableActors.find((a) => a.type === 'business' && a.id === initialActorId);
+      const biz = availableActors.find(
+        (a) => a.type === 'business' && a.id === initialActorId
+      );
       return biz
         ? { name: biz.name, avatarUrl: biz.avatarUrl }
         : { name: 'Business', avatarUrl: null };
@@ -49,11 +57,13 @@ export function PostComposer({
       : { name: 'You', avatarUrl: null };
   }, [availableActors, isBusiness, initialActorId]);
 
-  // Reset on open. If we were opened with initial media, jump straight to canvas.
+  // Reset on open
   useEffect(() => {
     if (!open) return;
     setScreen(initialMedia.length > 0 ? 'post' : 'choose');
     setReviewCourseSheetOpen(false);
+    setMediaItems([]);
+    setEditIndex(0);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [open]);
 
@@ -85,6 +95,20 @@ export function PostComposer({
     [navigate, onClose]
   );
 
+  const openEditor = useCallback((_items: ComposerMediaItem[], idx: number) => {
+    setEditIndex(idx);
+    setScreen('editor');
+  }, []);
+
+  const handleEditorDone = useCallback((updated: ComposerMediaItem[]) => {
+    setMediaItems(updated);
+    setScreen('post');
+  }, []);
+
+  const handleEditorCancel = useCallback(() => {
+    setScreen('post');
+  }, []);
+
   return createPortal(
     <AnimatePresence>
       {open && (
@@ -98,7 +122,16 @@ export function PostComposer({
           role="dialog"
           aria-modal="true"
         >
-          <div style={{ flex: 1, display: 'flex', flexDirection: 'column', minHeight: 0, overflow: 'auto' }}>
+          <div
+            style={{
+              flex: 1,
+              display: 'flex',
+              flexDirection: 'column',
+              minHeight: 0,
+              position: 'relative',
+              overflow: 'hidden',
+            }}
+          >
             {screen === 'choose' ? (
               <ComposerChooser
                 onClose={onClose}
@@ -107,17 +140,28 @@ export function PostComposer({
                 isBusiness={isBusiness}
               />
             ) : (
-              <CanvasComposer
+              <Composer
                 onClose={onClose}
+                onOpenEditor={openEditor}
                 initialMedia={initialMedia}
                 initialActorType={initialActorType}
                 initialActorId={initialActorId}
                 actorInfo={actorInfo}
+                mediaItems={mediaItems}
+                setMediaItems={setMediaItems}
               />
             )}
+
+            {/* Editor overlays the Composer */}
+            <MediaEditor
+              open={screen === 'editor'}
+              items={mediaItems}
+              startIndex={editIndex}
+              onCancel={handleEditorCancel}
+              onDone={handleEditorDone}
+            />
           </div>
 
-          {/* Review flow uses the existing course sheet → navigate to rate */}
           <CourseSearchSheet
             open={reviewCourseSheetOpen}
             onClose={() => setReviewCourseSheetOpen(false)}
