@@ -20,29 +20,45 @@ export const usePostDeletion = () => {
     userId?: string
   ) => {
     try {
-      // First delete associated media
-      const { error: mediaError } = await supabase
+      // 0. Look up the post to enforce review-derived routing rule.
+      //    Posts with source_review_id are owned by the underlying review —
+      //    deletion must go through the review wizard so both stay coherent.
+      const { data: postRow, error: postLookupError } = await supabase
+        .from('posts')
+        .select('id, source_review_id')
+        .eq('id', postId)
+        .maybeSingle();
+
+      if (postLookupError) {
+        console.error('Error loading post for delete:', postLookupError);
+        throw new Error(`Failed to load post: ${postLookupError.message}`);
+      }
+      if (!postRow) {
+        // Already gone — treat as success (idempotent).
+        return { success: true };
+      }
+      if (postRow.source_review_id) {
+        toast.error('Manage this from your review', {
+          description: 'This post is part of a course review. Open the review to edit or delete it.',
+          duration: 5000,
+        });
+        return { success: false, error: new Error('Review-derived post — route to review') };
+      }
+
+      // 1. Snapshot media rows BEFORE the cascade fires so we can clean up
+      //    Cloudflare Stream + R2 assets afterwards. URLs/stream_ids are
+      //    unrecoverable once the rows are gone.
+      const { data: mediaRows, error: mediaFetchError } = await supabase
         .from('post_media')
-        .delete()
+        .select('id, media_url, media_type, stream_id')
         .eq('post_id', postId);
 
-      if (mediaError) {
-        console.error('Error deleting post media:', mediaError);
-        throw new Error(`Failed to delete post media: ${mediaError.message}`);
+      if (mediaFetchError) {
+        console.warn('Could not snapshot post media for cleanup:', mediaFetchError);
       }
 
-      // Then delete associated tags
-      const { error: tagsError } = await supabase
-        .from('post_tags')
-        .delete()
-        .eq('post_id', postId);
-
-      if (tagsError) {
-        console.error('Error deleting post tags:', tagsError);
-        throw new Error(`Failed to delete post tags: ${tagsError.message}`);
-      }
-
-      // Finally delete the post
+      // 2. Delete the post. FK cascades handle post_media, post_tags,
+      //    post_courses, post_likes, post_comments, post_shares, etc.
       const { error: postError } = await supabase
         .from('posts')
         .delete()
@@ -52,8 +68,26 @@ export const usePostDeletion = () => {
         console.error('Error deleting post:', postError);
         throw new Error(`Failed to delete post: ${postError.message}`);
       }
+
+      // 3. Fire-and-forget external storage cleanup (Cloudflare Stream + R2).
+      //    Reuses cleanup-review-media — it's media-type-agnostic.
+      if (mediaRows && mediaRows.length > 0) {
+        const mediaItems = mediaRows.map((m: any) => ({
+          id: m.id,
+          media_url: m.media_url,
+          media_type: m.media_type as 'image' | 'video',
+          stream_id: m.stream_id,
+        }));
+        supabase.functions.invoke('cleanup-review-media', {
+          body: { mediaItems },
+        }).catch((err) => {
+          console.warn('[usePostDeletion] Failed to cleanup media:', err);
+        });
+      }
+
       // Show delete toast
       showToast("Post deleted");
+
 
       // Helper: strip deleted post from any infinite-query or array cache
       const stripPost = (old: any) => {
