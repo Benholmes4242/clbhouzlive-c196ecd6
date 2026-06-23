@@ -302,7 +302,8 @@ export function Composer({
   const hasMedia = mediaItems.length > 0;
   const hasDraft =
     caption.trim().length > 0 || hasMedia || taggedCourses.length > 0;
-  const canPost = (hasMedia || caption.trim().length > 0) && !isSubmitting;
+  const busy = isSubmitting || isUpdating;
+  const canPost = (hasMedia || caption.trim().length > 0) && !busy;
   const remaining = MAX_CAPTION - caption.length;
   const showCounter = remaining <= COUNTER_THRESHOLD;
   const visibilityMeta = VISIBILITY_OPTIONS.find((v) => v.value === visibility)!;
@@ -352,9 +353,32 @@ export function Composer({
       return;
     }
 
-    // Bake crops per item (only images with non-original frame)
+    // ── Edit mode (Brief 2A): caption / visibility / courses / remove / reorder
+    if (isEditMode && editPostId) {
+      const keptMedia = mediaItems
+        .filter((m) => m.existing?.mediaId)
+        .map((m, idx) => ({ id: m.existing!.mediaId, displayOrder: idx }));
+      const res = await updatePost({
+        postId: editPostId,
+        caption,
+        visibility,
+        courseIds: taggedCourses.map((c) => c.courseId),
+        keptMedia,
+        removedMediaIds,
+      });
+      if (res.success) {
+        toast.success('Post updated');
+        onClose();
+      }
+      return;
+    }
+
+    // Bake crops per item (only images with non-original frame).
+    // Edit-mode items don't carry a File and never reach this branch — they
+    // exit via the isEditMode return above.
     const filesOut: File[] = [];
     for (const item of mediaItems) {
+      if (!item.file) continue;
       if (item.type === 'image' && item.frame !== 'original') {
         try {
           const baked = await bakeFrameCrop(item.file, item.frame, item.pos);
@@ -391,7 +415,20 @@ export function Composer({
       },
       onError: () => {},
     });
-  }, [canPost, mediaItems, caption, taggedCourses, displayActor, visibility, submitPost, onClose]);
+  }, [
+    canPost,
+    isEditMode,
+    editPostId,
+    mediaItems,
+    caption,
+    taggedCourses,
+    displayActor,
+    visibility,
+    removedMediaIds,
+    updatePost,
+    submitPost,
+    onClose,
+  ]);
 
   return (
     <div
