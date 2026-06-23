@@ -327,6 +327,23 @@ export function useUpdatePost() {
         if (orderErr) throw orderErr;
       }
 
+      // 6b. Insert net-new media rows (uploads already succeeded in Phase 1).
+      if (newMediaResults.length > 0) {
+        const rows = newMediaResults.map((r) => ({
+          post_id: postId,
+          media_type: r.media_type,
+          media_url: r.media_url,
+          stream_id: r.stream_id,
+          original_media_url: r.original_media_url,
+          display_order: r.displayOrder,
+        }));
+        const { error: insNewErr } = await supabase
+          .from('post_media')
+          .insert(rows);
+        if (insNewErr) throw insNewErr;
+      }
+
+
       // 7. Fire-and-forget external cleanup for removed + recropped derivatives.
       const cleanupItems = [...removedMediaSnapshot, ...recropCleanup];
       if (cleanupItems.length > 0) {
