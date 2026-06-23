@@ -21,6 +21,8 @@ interface PostComposerProps {
   initialMedia?: File[];
   initialActorType?: StudioActorType;
   initialActorId?: string | null;
+  /** When set, opens the Composer in edit mode against this existing post id. */
+  editPostId?: string | null;
 }
 
 export function PostComposer({
@@ -29,6 +31,7 @@ export function PostComposer({
   initialMedia = [],
   initialActorType = 'personal',
   initialActorId = null,
+  editPostId = null,
 }: PostComposerProps) {
   const navigate = useNavigate();
   const { availableActors } = useActiveActor();
@@ -41,6 +44,7 @@ export function PostComposer({
   const [editIndex, setEditIndex] = useState(0);
 
   const isBusiness = initialActorType === 'business';
+  const isEditMode = !!editPostId;
 
   const actorInfo = useMemo(() => {
     if (isBusiness && initialActorId) {
@@ -57,10 +61,10 @@ export function PostComposer({
       : { name: 'You', avatarUrl: null };
   }, [availableActors, isBusiness, initialActorId]);
 
-  // Reset on open
+  // Reset on open. Edit mode skips the chooser and lands straight on the form.
   useEffect(() => {
     if (!open) return;
-    setScreen(initialMedia.length > 0 ? 'post' : 'choose');
+    setScreen(isEditMode || initialMedia.length > 0 ? 'post' : 'choose');
     setReviewCourseSheetOpen(false);
     setMediaItems([]);
     setEditIndex(0);
@@ -149,6 +153,7 @@ export function PostComposer({
                 actorInfo={actorInfo}
                 mediaItems={mediaItems}
                 setMediaItems={setMediaItems}
+                editPostId={editPostId}
               />
             )}
 

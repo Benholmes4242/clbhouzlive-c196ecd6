@@ -27,6 +27,8 @@ import { AnimatePresence, motion } from 'framer-motion';
 import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
 import { usePostSubmission } from '@/hooks/usePostSubmission';
+import { useEditablePost } from '@/hooks/useEditablePost';
+import { useUpdatePost } from '@/hooks/useUpdatePost';
 import { useActiveActor } from '@/context/ActiveActorContext';
 import type { ActiveActor } from '@/types/actor';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
@@ -37,6 +39,7 @@ import { MediaEditor } from './MediaEditor';
 import { bakeFrameCrop } from './bakeFrameCrop';
 import {
   filesToComposerMedia,
+  remoteMediaToComposerItems,
   type ComposerMediaItem,
 } from './composerMedia';
 import type { TaggedCourse, StudioActorType } from './types';
@@ -79,6 +82,8 @@ interface ComposerProps {
   // Two-way binding with parent so editor results survive routing
   mediaItems: ComposerMediaItem[];
   setMediaItems: React.Dispatch<React.SetStateAction<ComposerMediaItem[]>>;
+  /** When set, the composer runs in edit mode against this existing post. */
+  editPostId?: string | null;
 }
 
 export function Composer({
@@ -90,8 +95,12 @@ export function Composer({
   actorInfo,
   mediaItems,
   setMediaItems,
+  editPostId = null,
 }: ComposerProps) {
   const { submitPost, isSubmitting } = usePostSubmission();
+  const { updatePost, isUpdating } = useUpdatePost();
+  const editablePostQuery = useEditablePost(editPostId);
+  const isEditMode = !!editPostId;
   const { activeActor, availableActors, setActiveActor } = useActiveActor();
   const fileRef = useRef<HTMLInputElement>(null);
 
@@ -147,10 +156,15 @@ export function Composer({
   });
 
 
-  // Seed initial media once
+  // Seed initial media once (net-new compose only — edit mode prefills below).
   const seededRef = useRef(false);
   useEffect(() => {
     if (seededRef.current) return;
+    if (isEditMode) {
+      // Edit mode owns its own seeding effect.
+      seededRef.current = true;
+      return;
+    }
     if (initialMedia && initialMedia.length > 0) {
       seededRef.current = true;
       filesToComposerMedia(initialMedia).then((items) => {
@@ -162,10 +176,50 @@ export function Composer({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // Revoke previews on unmount
+  // Edit-mode prefill: caption / visibility / courses / existing media,
+  // plus an explicit guard against editing posts the viewer can't manage
+  // and against review-derived posts (those route through the review wizard).
+  const editPrefilledRef = useRef(false);
+  const [removedMediaIds, setRemovedMediaIds] = useState<string[]>([]);
+  useEffect(() => {
+    if (!isEditMode) return;
+    if (editPrefilledRef.current) return;
+    const editable = editablePostQuery.data;
+    if (!editable) return;
+    editPrefilledRef.current = true;
+
+    if (editable.blockedReason === 'review-derived') {
+      toast.error('Manage from your review', {
+        description: 'Posts created from a review are edited via the review.',
+      });
+      onClose();
+      return;
+    }
+    if (!editable.canManage) {
+      toast.error("You can't edit this post");
+      onClose();
+      return;
+    }
+
+    setCaption(editable.caption ?? '');
+    setVisibility(editable.visibility);
+    setTaggedCourses(
+      editable.courses.map((c) => ({
+        courseId: c.courseId,
+        courseName: c.courseName,
+        country: c.country ?? '',
+      })),
+    );
+    setMediaItems(remoteMediaToComposerItems(editable.media));
+  }, [isEditMode, editablePostQuery.data, onClose, setMediaItems]);
+
+  // Revoke previews on unmount. Remote URLs (existing edit-mode items) are
+  // not blob: URLs, so revokeObjectURL is a no-op for them — safe to call.
   useEffect(() => {
     return () => {
-      mediaItems.forEach((m) => URL.revokeObjectURL(m.previewUrl));
+      mediaItems.forEach((m) => {
+        if (m.previewUrl?.startsWith('blob:')) URL.revokeObjectURL(m.previewUrl);
+      });
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -173,6 +227,11 @@ export function Composer({
   const addFiles = useCallback(
     async (files: File[]) => {
       if (!files.length) return;
+      if (isEditMode) {
+        // Brief 2A: edit mode locks the media set (no net-new uploads).
+        toast.error('Adding new media on edit is coming soon');
+        return;
+      }
       const remaining = MAX_POST_MEDIA - mediaItems.length;
       if (remaining <= 0) {
         toast.error(`You can add up to ${MAX_POST_MEDIA} photos or videos`);
@@ -185,7 +244,7 @@ export function Composer({
       const items = await filesToComposerMedia(slice);
       if (items.length) setMediaItems((prev) => [...prev, ...items]);
     },
-    [setMediaItems, mediaItems.length]
+    [isEditMode, setMediaItems, mediaItems.length]
   );
 
   const handlePickFiles = useCallback(
@@ -201,17 +260,50 @@ export function Composer({
     (idx: number) => {
       setMediaItems((prev) => {
         const removed = prev[idx];
-        if (removed) URL.revokeObjectURL(removed.previewUrl);
+        if (removed) {
+          if (removed.previewUrl?.startsWith('blob:')) {
+            URL.revokeObjectURL(removed.previewUrl);
+          }
+          if (removed.existing?.mediaId) {
+            setRemovedMediaIds((ids) =>
+              ids.includes(removed.existing!.mediaId)
+                ? ids
+                : [...ids, removed.existing!.mediaId],
+            );
+          }
+        }
         return prev.filter((_, i) => i !== idx);
       });
     },
     [setMediaItems]
   );
 
+  // Recrop is unavailable in 2A. Track C's PostOwnerMenu will already gate
+  // the entry point, but if the user somehow taps an existing tile's edit
+  // affordance, surface the same message the gate will eventually show.
+  const handleEditItem = useCallback(
+    (idx: number) => {
+      const item = mediaItems[idx];
+      if (item?.existing) {
+        toast('Recrop unavailable in this update', {
+          description:
+            item.existing.originalMediaUrl
+              ? 'Coming in the next pass.'
+              : 'No original is stored for this image.',
+        });
+        return;
+      }
+      onOpenEditor(mediaItems, idx);
+    },
+    [mediaItems, onOpenEditor],
+  );
+
+
   const hasMedia = mediaItems.length > 0;
   const hasDraft =
     caption.trim().length > 0 || hasMedia || taggedCourses.length > 0;
-  const canPost = (hasMedia || caption.trim().length > 0) && !isSubmitting;
+  const busy = isSubmitting || isUpdating;
+  const canPost = (hasMedia || caption.trim().length > 0) && !busy;
   const remaining = MAX_CAPTION - caption.length;
   const showCounter = remaining <= COUNTER_THRESHOLD;
   const visibilityMeta = VISIBILITY_OPTIONS.find((v) => v.value === visibility)!;
@@ -261,9 +353,32 @@ export function Composer({
       return;
     }
 
-    // Bake crops per item (only images with non-original frame)
+    // ── Edit mode (Brief 2A): caption / visibility / courses / remove / reorder
+    if (isEditMode && editPostId) {
+      const keptMedia = mediaItems
+        .filter((m) => m.existing?.mediaId)
+        .map((m, idx) => ({ id: m.existing!.mediaId, displayOrder: idx }));
+      const res = await updatePost({
+        postId: editPostId,
+        caption,
+        visibility,
+        courseIds: taggedCourses.map((c) => c.courseId),
+        keptMedia,
+        removedMediaIds,
+      });
+      if (res.success) {
+        toast.success('Post updated');
+        onClose();
+      }
+      return;
+    }
+
+    // Bake crops per item (only images with non-original frame).
+    // Edit-mode items don't carry a File and never reach this branch — they
+    // exit via the isEditMode return above.
     const filesOut: File[] = [];
     for (const item of mediaItems) {
+      if (!item.file) continue;
       if (item.type === 'image' && item.frame !== 'original') {
         try {
           const baked = await bakeFrameCrop(item.file, item.frame, item.pos);
@@ -300,7 +415,20 @@ export function Composer({
       },
       onError: () => {},
     });
-  }, [canPost, mediaItems, caption, taggedCourses, displayActor, visibility, submitPost, onClose]);
+  }, [
+    canPost,
+    isEditMode,
+    editPostId,
+    mediaItems,
+    caption,
+    taggedCourses,
+    displayActor,
+    visibility,
+    removedMediaIds,
+    updatePost,
+    submitPost,
+    onClose,
+  ]);
 
   return (
     <div
@@ -369,7 +497,9 @@ export function Composer({
             boxShadow: canPost ? '0 2px 10px rgba(15,23,42,0.18)' : 'none',
           }}
         >
-          {isSubmitting ? 'Posting…' : 'Post'}
+          {isEditMode
+            ? (isUpdating ? 'Updating…' : 'Update')
+            : (isSubmitting ? 'Posting…' : 'Post')}
         </button>
       </div>
 
@@ -498,31 +628,33 @@ export function Composer({
           <div style={{ padding: '8px 16px 12px' }}>
             <MediaPreview
               items={mediaItems}
-              onEditItem={(idx) => onOpenEditor(mediaItems, idx)}
+              onEditItem={handleEditItem}
               onRemoveItem={removeAt}
             />
-            <button
-              onClick={() => fileRef.current?.click()}
-              style={{
-                marginTop: 10,
-                width: '100%',
-                padding: '11px 0',
-                borderRadius: 12,
-                border: `1px dashed rgba(15,23,42,0.18)`,
-                background: 'transparent',
-                fontSize: 13,
-                fontWeight: 700,
-                color: INK_2,
-                cursor: 'pointer',
-                display: 'inline-flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                gap: 8,
-              }}
-            >
-              <ImagePlus size={16} strokeWidth={2} />
-              Add more
-            </button>
+            {!isEditMode && (
+              <button
+                onClick={() => fileRef.current?.click()}
+                style={{
+                  marginTop: 10,
+                  width: '100%',
+                  padding: '11px 0',
+                  borderRadius: 12,
+                  border: `1px dashed rgba(15,23,42,0.18)`,
+                  background: 'transparent',
+                  fontSize: 13,
+                  fontWeight: 700,
+                  color: INK_2,
+                  cursor: 'pointer',
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  gap: 8,
+                }}
+              >
+                <ImagePlus size={16} strokeWidth={2} />
+                Add more
+              </button>
+            )}
           </div>
         )}
 
@@ -570,27 +702,29 @@ export function Composer({
           zIndex: 40,
         }}
       >
-        <button
-          onClick={() => fileRef.current?.click()}
-          style={{
-            flex: 1,
-            padding: '13px 0',
-            borderRadius: 10,
-            border: `1px solid ${HAIR}`,
-            background: SURFACE,
-            fontSize: 13,
-            fontWeight: 700,
-            color: INK_2,
-            cursor: 'pointer',
-            display: 'inline-flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            gap: 8,
-          }}
-        >
-          <ImagePlus size={16} strokeWidth={2} />
-          {hasMedia ? 'Add more' : 'Add photo / video'}
-        </button>
+        {!isEditMode && (
+          <button
+            onClick={() => fileRef.current?.click()}
+            style={{
+              flex: 1,
+              padding: '13px 0',
+              borderRadius: 10,
+              border: `1px solid ${HAIR}`,
+              background: SURFACE,
+              fontSize: 13,
+              fontWeight: 700,
+              color: INK_2,
+              cursor: 'pointer',
+              display: 'inline-flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              gap: 8,
+            }}
+          >
+            <ImagePlus size={16} strokeWidth={2} />
+            {hasMedia ? 'Add more' : 'Add photo / video'}
+          </button>
+        )}
         <button
           onClick={handleCoursePillTap}
           style={{

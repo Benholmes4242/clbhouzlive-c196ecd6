@@ -10,12 +10,20 @@ interface PostStudioStoreState {
   initialActorType: StudioActorType;
   initialActorId: string | null;
   returnPath: string;
+  /** When set, the composer opens in edit mode against this existing post id. */
+  editPostId: string | null;
 
   /** Open the studio (optionally with pre-selected media or actor) */
   openPostStudio: (opts?: {
     media?: File[];
     actorType?: StudioActorType;
     actorId?: string | null;
+    returnPath?: string;
+  }) => void;
+
+  /** Open the studio in edit mode for an existing post. */
+  openPostStudioForEdit: (opts: {
+    postId: string;
     returnPath?: string;
   }) => void;
 
@@ -29,6 +37,7 @@ export const usePostStudioStore = create<PostStudioStoreState>((set) => ({
   initialActorType: 'personal',
   initialActorId: null,
   returnPath: '/',
+  editPostId: null,
 
   openPostStudio: (opts) =>
     set({
@@ -37,6 +46,17 @@ export const usePostStudioStore = create<PostStudioStoreState>((set) => ({
       initialActorType: opts?.actorType ?? 'personal',
       initialActorId: opts?.actorId ?? null,
       returnPath: opts?.returnPath ?? window.location.pathname,
+      editPostId: null,
+    }),
+
+  openPostStudioForEdit: (opts) =>
+    set({
+      isOpen: true,
+      initialMedia: [],
+      initialActorType: 'personal',
+      initialActorId: null,
+      returnPath: opts.returnPath ?? window.location.pathname,
+      editPostId: opts.postId,
     }),
 
   closePostStudio: () =>
@@ -46,5 +66,15 @@ export const usePostStudioStore = create<PostStudioStoreState>((set) => ({
       initialActorType: 'personal',
       initialActorId: null,
       returnPath: '/',
+      editPostId: null,
     }),
 }));
+
+// Dev-only console hook so Brief 2A can be exercised end-to-end before the
+// PostOwnerMenu (Track C) wires up a real entry point.
+// Usage in DevTools: window.__openPostStudioForEdit('<postId>')
+if (import.meta.env.DEV && typeof window !== 'undefined') {
+  (window as unknown as Record<string, unknown>).__openPostStudioForEdit = (
+    postId: string,
+  ) => usePostStudioStore.getState().openPostStudioForEdit({ postId });
+}

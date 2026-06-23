@@ -7,8 +7,15 @@ import { PostComposer } from './PostComposer';
 import { usePostStudioStore } from '@/stores/usePostStudioStore';
 
 export function GlobalPostComposer() {
-  const { isOpen, initialMedia, initialActorType, initialActorId, returnPath, closePostStudio } =
-    usePostStudioStore();
+  const {
+    isOpen,
+    initialMedia,
+    initialActorType,
+    initialActorId,
+    returnPath,
+    editPostId,
+    closePostStudio,
+  } = usePostStudioStore();
   const navigate = useNavigate();
 
   const handleClose = useCallback(() => {
@@ -25,6 +32,7 @@ export function GlobalPostComposer() {
       initialMedia={initialMedia}
       initialActorType={initialActorType}
       initialActorId={initialActorId}
+      editPostId={editPostId}
     />
   );
 }
