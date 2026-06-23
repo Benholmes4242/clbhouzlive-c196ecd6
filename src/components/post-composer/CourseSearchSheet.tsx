@@ -55,6 +55,22 @@ export function CourseSearchSheet({
 
   const excludedSet = React.useMemo(() => new Set(excludedIds ?? []), [excludedIds]);
 
+  // Resolve viewer id once on open so we can preload suggestions (played-unrated,
+  // falling back to "try next" courses) in the empty state.
+  const [userId, setUserId] = useState<string | undefined>(undefined);
+  useEffect(() => {
+    if (!open) return;
+    let cancelled = false;
+    supabase.auth.getUser().then(({ data }) => {
+      if (!cancelled) setUserId(data.user?.id);
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, [open]);
+  const { courses: suggestions, tier: suggestionsTier, loading: suggestionsLoading } =
+    useRateSuggestions(userId, 8);
+
   useEffect(() => {
     if (!open) return;
     setTimeout(() => inputRef.current?.focus(), 50);
