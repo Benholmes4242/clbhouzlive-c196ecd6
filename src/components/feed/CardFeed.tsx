@@ -26,10 +26,7 @@ import { useClubhouseStore } from '@/store/clubhouseStore';
 import { prefetchTile } from '@/hooks/useTileVideoPlayer';
 import { FeedCard } from './FeedCard';
 
-// Dark charcoal canvas — matches FeedCard chrome (post-wizard surface) so
-// overscroll/bounce never flashes the old light page colour.
-const CANVAS = '#15171F';
-const FEED_SEPARATOR = 'rgba(255,255,255,0.08)';
+const CANVAS = '#F8FAFC';
 
 /** How many neighbours on each side of the active card may mount a <video>. */
 const VIDEO_NEIGHBOUR_RADIUS = 1; // matches iOS ~3-decoder cap (active ±1 = 3)
@@ -277,7 +274,7 @@ export const CardFeed: React.FC<CardFeedProps> = ({
       const mountVideo = isNear;
       return (
         <div
-          style={{ borderBottom: `1px solid ${FEED_SEPARATOR}` }}
+          style={{ paddingBottom: 12 }}
           data-card-index={index}
           ref={(el) => {
             const obs = observerRef.current;
@@ -347,7 +344,7 @@ export const CardFeed: React.FC<CardFeedProps> = ({
 
   if (useWindowScroll) {
     return (
-      <div style={{ width: '100%', background: CANVAS }} data-card-feed>
+      <div style={{ width: '100%' }} data-card-feed>
         <Virtuoso
           ref={virtuosoRef}
           useWindowScroll

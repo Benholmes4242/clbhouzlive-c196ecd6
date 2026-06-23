@@ -29,15 +29,13 @@ import { InlineVideo } from './InlineVideo';
 import { MediaCarousel } from './MediaCarousel';
 import { FeedFollowPill } from './FeedFollowPill';
 
-// Dark charcoal feed chrome — shares the post-wizard canvas (#15171F)
-// so feed cards and the create flow read as one surface.
-const T100 = '#FFFFFF';
-const T60 = 'rgba(255,255,255,0.60)';
-const T40 = 'rgba(255,255,255,0.40)';
-const CARD = '#15171F';
-const LINE = 'rgba(255,255,255,0.08)';
+const T100 = '#0F172A';
+const T60 = '#64748B';
+const T40 = '#94A3B8';
+const CARD = '#FFFFFF';
+const LINE = 'rgba(15,23,42,0.07)';
 const AMBER = '#F7931E';
-const GREEN = '#22C55E';
+const GREEN = '#16A34A';
 
 const RATIO_MIN = 0.8;   // tallest allowed = 4:5 (portrait capped)
 const RATIO_MAX = 1.91;  // widest = ~cinematic landscape
@@ -163,14 +161,12 @@ const FeedCardImpl: React.FC<FeedCardProps> = ({
     >
       {/* Card-level ghost numeral — overflows the header, clipped by card edges */}
       {reviewRating != null && (() => {
-        // Ghost numeral on charcoal — alphas bumped from the white-card values
-        // so the faint tier tint stays visible on #15171F.
         const GHOST = {
-          EXCEPTIONAL: 'rgba(247,147,30,0.16)',
-          EXCELLENT:   'rgba(255,255,255,0.10)',
-          GOOD:        'rgba(255,255,255,0.08)',
-          FAIR:        'rgba(255,255,255,0.07)',
-          POOR:        'rgba(255,255,255,0.07)',
+          EXCEPTIONAL: 'rgba(247,147,30,0.09)',
+          EXCELLENT:   'rgba(15,23,42,0.06)',
+          GOOD:        'rgba(15,23,42,0.05)',
+          FAIR:        'rgba(15,23,42,0.04)',
+          POOR:        'rgba(15,23,42,0.04)',
         } as const;
         const tierKey = getRatingTier(reviewRating);
         return (
@@ -253,10 +249,10 @@ const FeedCardImpl: React.FC<FeedCardProps> = ({
           {reviewRating != null && (() => {
             const LABEL_COLOR = {
               EXCEPTIONAL: '#F7931E',
-              EXCELLENT:   '#FFFFFF',
-              GOOD:        'rgba(255,255,255,0.78)',
-              FAIR:        'rgba(255,255,255,0.58)',
-              POOR:        'rgba(255,255,255,0.58)',
+              EXCELLENT:   T100,
+              GOOD:        T60,
+              FAIR:        T40,
+              POOR:        T40,
             } as const;
             const tierKey = getRatingTier(reviewRating);
             const tierLabel = getRatingTierLabel(reviewRating);
@@ -392,8 +388,8 @@ const FeedCardImpl: React.FC<FeedCardProps> = ({
               onClick={handleCourseTap}
               style={{
                 display: 'inline-flex', alignItems: 'center', gap: 5, flexShrink: 0,
-                background: 'rgba(255,255,255,0.10)',
-                border: '1px solid rgba(255,255,255,0.16)',
+                background: 'rgba(15,23,42,0.05)',
+                border: '1px solid rgba(15,23,42,0.08)',
                 padding: '3px 9px 3px 4px', borderRadius: 999,
                 cursor: post.courseId ? 'pointer' : 'default', marginLeft: 8,
                 backdropFilter: 'blur(8px)',
@@ -408,7 +404,7 @@ const FeedCardImpl: React.FC<FeedCardProps> = ({
                 }}
                 aria-hidden="true"
               />
-              <span style={{ fontSize: 11, fontWeight: 800, color: 'rgba(255,255,255,0.92)', fontVariantNumeric: 'tabular-nums', lineHeight: 1 }}>
+              <span style={{ fontSize: 11, fontWeight: 800, color: '#475569', fontVariantNumeric: 'tabular-nums', lineHeight: 1 }}>
                 {formatRatingValue(post.courseRating)}
               </span>
             </button>
