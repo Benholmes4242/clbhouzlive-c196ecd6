@@ -27,6 +27,8 @@ import { AnimatePresence, motion } from 'framer-motion';
 import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
 import { usePostSubmission } from '@/hooks/usePostSubmission';
+import { useEditablePost } from '@/hooks/useEditablePost';
+import { useUpdatePost } from '@/hooks/useUpdatePost';
 import { useActiveActor } from '@/context/ActiveActorContext';
 import type { ActiveActor } from '@/types/actor';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
@@ -37,6 +39,7 @@ import { MediaEditor } from './MediaEditor';
 import { bakeFrameCrop } from './bakeFrameCrop';
 import {
   filesToComposerMedia,
+  remoteMediaToComposerItems,
   type ComposerMediaItem,
 } from './composerMedia';
 import type { TaggedCourse, StudioActorType } from './types';
@@ -79,6 +82,8 @@ interface ComposerProps {
   // Two-way binding with parent so editor results survive routing
   mediaItems: ComposerMediaItem[];
   setMediaItems: React.Dispatch<React.SetStateAction<ComposerMediaItem[]>>;
+  /** When set, the composer runs in edit mode against this existing post. */
+  editPostId?: string | null;
 }
 
 export function Composer({
@@ -90,8 +95,12 @@ export function Composer({
   actorInfo,
   mediaItems,
   setMediaItems,
+  editPostId = null,
 }: ComposerProps) {
   const { submitPost, isSubmitting } = usePostSubmission();
+  const { updatePost, isUpdating } = useUpdatePost();
+  const editablePostQuery = useEditablePost(editPostId);
+  const isEditMode = !!editPostId;
   const { activeActor, availableActors, setActiveActor } = useActiveActor();
   const fileRef = useRef<HTMLInputElement>(null);
 
