@@ -230,11 +230,8 @@ export function Composer({
   const addFiles = useCallback(
     async (files: File[]) => {
       if (!files.length) return;
-      if (isEditMode) {
-        // Brief 2A: edit mode locks the media set (no net-new uploads).
-        toast.error('Adding new media on edit is coming soon');
-        return;
-      }
+      // mediaItems already counts existing + net-new in edit mode (existing
+      // items are prefilled into the same list), so the cap math is uniform.
       const remaining = MAX_POST_MEDIA - mediaItems.length;
       if (remaining <= 0) {
         toast.error(`You can add up to ${MAX_POST_MEDIA} photos or videos`);
@@ -247,7 +244,7 @@ export function Composer({
       const items = await filesToComposerMedia(slice);
       if (items.length) setMediaItems((prev) => [...prev, ...items]);
     },
-    [isEditMode, setMediaItems, mediaItems.length]
+    [setMediaItems, mediaItems.length]
   );
 
   const handlePickFiles = useCallback(
@@ -426,9 +423,53 @@ export function Composer({
         }
       }
 
-      const keptMedia = mediaItems
-        .filter((m) => m.existing?.mediaId)
-        .map((m, idx) => ({ id: m.existing!.mediaId, displayOrder: idx }));
+      // Walk the full list once. Each item becomes either a keptMedia entry
+      // (existing) or a newMedia entry (net-new), assigning displayOrder by
+      // its final position — so existing + new together form a clean 0..n.
+      const keptMedia: Array<{ id: string; displayOrder: number }> = [];
+      const newMedia: Array<{
+        displayOrder: number;
+        mediaType: 'image' | 'video';
+        file: File;
+        originalFile?: File | null;
+      }> = [];
+      let bakeFailed = false;
+      for (let idx = 0; idx < mediaItems.length; idx++) {
+        const m = mediaItems[idx];
+        if (m.existing?.mediaId) {
+          keptMedia.push({ id: m.existing.mediaId, displayOrder: idx });
+          continue;
+        }
+        if (!m.file) continue;
+        if (m.type === 'image' && m.frame !== 'original') {
+          try {
+            const baked = await bakeFrameCrop(m.file, m.frame, m.pos);
+            newMedia.push({
+              displayOrder: idx,
+              mediaType: 'image',
+              file: baked,
+              // Pre-bake original — uploaded so the new item is recrop-capable.
+              originalFile: m.file,
+            });
+          } catch (err) {
+            console.error('[Composer] bake of net-new image failed:', err);
+            bakeFailed = true;
+            break;
+          }
+        } else {
+          newMedia.push({
+            displayOrder: idx,
+            mediaType: m.type,
+            file: m.file,
+            originalFile: null,
+          });
+        }
+      }
+      if (bakeFailed) {
+        toast.error("Couldn't apply your crop");
+        return;
+      }
+
       const res = await updatePost({
         postId: editPostId,
         caption,
@@ -437,6 +478,7 @@ export function Composer({
         keptMedia,
         removedMediaIds,
         recropMedia,
+        newMedia,
       });
       if (res.success) {
         toast.success('Post updated');
