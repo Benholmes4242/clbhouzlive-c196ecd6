@@ -20,6 +20,13 @@ interface CourseSearchSheetProps {
   onSelect: (course: TaggedCourse) => void;
   title?: string;
   subtitle?: string;
+  /**
+   * Multi-select mode: stay open after select, show checks on already-tagged courses,
+   * and render a "Done" button. Selecting a tagged course is a no-op.
+   */
+  multi?: boolean;
+  /** Course IDs already tagged (shown as checked + non-selectable in multi mode). */
+  excludedIds?: string[];
 }
 
 export function CourseSearchSheet({
@@ -28,12 +35,16 @@ export function CourseSearchSheet({
   onSelect,
   title = 'Tag a course',
   subtitle = 'Where did you play?',
+  multi = false,
+  excludedIds,
 }: CourseSearchSheetProps) {
   const [query, setQuery] = useState('');
   const [results, setResults] = useState<CourseResult[]>([]);
   const [isSearching, setIsSearching] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
   const debounceRef = useRef<ReturnType<typeof setTimeout>>();
+
+  const excludedSet = React.useMemo(() => new Set(excludedIds ?? []), [excludedIds]);
 
   useEffect(() => {
     if (!open) return;
@@ -68,6 +79,7 @@ export function CourseSearchSheet({
 
   const handleSelect = useCallback(
     (course: CourseResult) => {
+      if (excludedSet.has(course.id)) return;
       onSelect({
         courseId: course.id,
         courseName: course.name,
@@ -75,12 +87,15 @@ export function CourseSearchSheet({
         region: course.region ?? undefined,
         globalRank: course.global_rank,
       });
-      setQuery('');
-      setResults([]);
-      onClose();
+      if (!multi) {
+        setQuery('');
+        setResults([]);
+        onClose();
+      }
     },
-    [onSelect, onClose]
+    [onSelect, onClose, multi, excludedSet]
   );
+
 
   if (!open) return null;
 
