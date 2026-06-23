@@ -138,10 +138,11 @@ export function exploreItemToUniversal(item: ExploreContentItem, index: number):
     // Multi-media
     additionalMediaCount: item.media && item.media.length > 1 ? item.media.length - 1 : undefined,
 
-    // Owner-menu identity (sourceReviewId not surfaced on ExploreContentItem;
-    // Brief 1's usePostDeletion guard catches review-derived deletes regardless).
+    // Owner-menu identity
     actorType: (item.actorType ?? 'personal') as 'personal' | 'business',
     actorId: item.actorId ?? item.user?.id ?? item.creator?.id,
+    sourceReviewId: item.sourceReviewId ?? null,
+    reviewCourseId: item.reviewCourseId ?? null,
 
     // Computed
     sortIndex: index,
