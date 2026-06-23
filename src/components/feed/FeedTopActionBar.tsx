@@ -90,6 +90,7 @@ export const FeedTopActionBar: React.FC<FeedTopActionBarProps> = ({
   onComment,
   onShare,
   onMore,
+  moreSlot,
   isVisible,
   readOnly = false,
 }) => {
