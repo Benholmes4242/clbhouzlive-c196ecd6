@@ -37,6 +37,7 @@ export const usePostSubmission = () => {
     mediaFiles,
     selectedTags,
     courseInfo,
+    courses,
     actorType = 'personal',
     actorId,
     visibility = 'anyone',
@@ -54,12 +55,33 @@ export const usePostSubmission = () => {
         return;
       }
 
+      // Resolve the ordered list of course ids (dedupe, preserve order).
+      // `courses` (new multi) takes precedence; `courseInfo` is the legacy single fallback.
+      const orderedCourseIds: string[] = (() => {
+        const list = courses && courses.length > 0
+          ? courses.map((c) => c.id)
+          : courseInfo
+            ? [courseInfo.id]
+            : [];
+        const seen = new Set<string>();
+        const out: string[] = [];
+        for (const id of list) {
+          if (id && !seen.has(id)) {
+            seen.add(id);
+            out.push(id);
+          }
+        }
+        return out;
+      })();
+      const primaryCourseId = orderedCourseIds[0] ?? null;
+
       console.log('Creating post with data:', {
         userId: user.id,
         content,
         mediaFilesCount: mediaFiles.length,
         tagsCount: selectedTags.length,
-        courseInfo,
+        courseCount: orderedCourseIds.length,
+        primaryCourseId,
         fileDetails: mediaFiles.map(f => ({ name: f.name, size: f.size, type: f.type }))
       });
 
@@ -76,7 +98,7 @@ export const usePostSubmission = () => {
           content: content || null,
           actor_type: actorType,
           actor_id: actorId ?? user.id,
-          course_id: courseInfo?.id ?? null,
+          course_id: primaryCourseId,
           visibility,
         })
         .select()
@@ -85,6 +107,24 @@ export const usePostSubmission = () => {
       if (postError) throw postError;
 
       console.log('Post created:', postData);
+
+      // Populate the post_courses junction for the full set (including primary).
+      if (orderedCourseIds.length > 0) {
+        const rows = orderedCourseIds.map((course_id, i) => ({
+          post_id: postData.id,
+          course_id,
+          display_order: i,
+        }));
+        const { error: pcError } = await supabase.from('post_courses').insert(rows);
+        if (pcError) {
+          console.error('[usePostSubmission] post_courses insert failed:', pcError);
+          // Don't hard-fail — the post exists with its primary course_id.
+          toast.error("Couldn't tag every course", {
+            description: 'Some additional courses were not saved.',
+          });
+        }
+      }
+
 
       // Upload media files with error handling for each file
       let uploadErrors: string[] = [];
