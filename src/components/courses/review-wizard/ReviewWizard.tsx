@@ -1031,24 +1031,26 @@ export function ReviewWizard({
                             />
                           ))}
                         </div>
-                        <div style={{ padding: '10px 16px 0' }}>
-                          <button
-                            onClick={() => fileRef.current?.click()}
-                            style={{
-                              width: '100%',
-                              padding: '11px 0',
-                              borderRadius: 12,
-                              border: '1px dashed rgba(15,23,42,0.18)',
-                              background: 'transparent',
-                              fontSize: 13,
-                              fontWeight: 700,
-                              color: INK,
-                              cursor: 'pointer',
-                            }}
-                          >
-                            ＋ Add more
-                          </button>
-                        </div>
+                        {wizard.allMedia.length < 10 && (
+                          <div style={{ padding: '10px 16px 0' }}>
+                            <button
+                              onClick={() => fileRef.current?.click()}
+                              style={{
+                                width: '100%',
+                                padding: '11px 0',
+                                borderRadius: 12,
+                                border: '1px dashed rgba(15,23,42,0.18)',
+                                background: 'transparent',
+                                fontSize: 13,
+                                fontWeight: 700,
+                                color: INK,
+                                cursor: 'pointer',
+                              }}
+                            >
+                              ＋ Add more
+                            </button>
+                          </div>
+                        )}
                       </div>
                     )}
                   </div>
