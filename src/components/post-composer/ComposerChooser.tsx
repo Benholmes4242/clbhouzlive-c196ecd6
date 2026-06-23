@@ -29,7 +29,7 @@ export function ComposerChooser({ onClose, onPost, onReview, isBusiness }: Compo
           alignItems: 'center',
           padding: '12px 16px',
           borderBottom: `0.5px solid ${HAIR}`,
-          background: SURFACE,
+          background: PAGE,
           paddingTop: 'max(env(safe-area-inset-top, 0px), 47px)',
         }}
       >
