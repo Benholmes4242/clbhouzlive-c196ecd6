@@ -5,7 +5,8 @@ import type { FrameId } from './FrameChooser';
 export interface ComposerMediaItem {
   id: string;
   type: 'image' | 'video';
-  file: File;
+  /** Local upload for new items; absent for items prefilled from an existing post. */
+  file?: File;
   previewUrl: string;
   posterUrl?: string;
   width: number;
@@ -13,6 +14,46 @@ export interface ComposerMediaItem {
   aspectRatio: number;
   pos: { x: number; y: number };
   frame: FrameId;
+  /** Set on items hydrated from an existing post; absent on net-new uploads. */
+  existing?: {
+    /** post_media.id — needed for reorder / remove reconciliation. */
+    mediaId: string;
+    /** post_media.original_media_url — null means recrop is unavailable. */
+    originalMediaUrl: string | null;
+  };
+}
+
+/** Build composer items from existing post_media rows (edit mode). */
+export function remoteMediaToComposerItems(
+  rows: Array<{
+    id: string;
+    mediaUrl: string;
+    mediaType: 'image' | 'video';
+    posterUrl: string | null;
+    width: number | null;
+    height: number | null;
+    originalMediaUrl: string | null;
+  }>,
+): ComposerMediaItem[] {
+  return rows.map((row) => {
+    const w = row.width && row.width > 0 ? row.width : 16;
+    const h = row.height && row.height > 0 ? row.height : 9;
+    return {
+      id: `existing_${row.id}`,
+      type: row.mediaType,
+      previewUrl: row.mediaUrl,
+      posterUrl: row.posterUrl ?? undefined,
+      width: w,
+      height: h,
+      aspectRatio: w / Math.max(1, h),
+      pos: { x: 50, y: 50 },
+      frame: 'original' as FrameId,
+      existing: {
+        mediaId: row.id,
+        originalMediaUrl: row.originalMediaUrl,
+      },
+    };
+  });
 }
 
 let __idCounter = 0;

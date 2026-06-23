@@ -171,6 +171,7 @@ export const usePostSubmission = () => {
                   media_type: 'video',
                   media_url: hlsUrl,
                   stream_id: initData.uid,
+                  display_order: index,
                 });
 
               if (mediaError) throw mediaError;
@@ -195,7 +196,8 @@ export const usePostSubmission = () => {
               .insert({
                 post_id: postData.id,
                 media_type: 'image',
-                media_url: publicUrl
+                media_url: publicUrl,
+                display_order: index,
               });
 
             if (mediaError) {
