@@ -7,10 +7,23 @@ import React, {
   useRef,
   useState,
 } from 'react';
-import { X, ImagePlus, Trash2, MapPin, ChevronLeft } from 'lucide-react';
+import {
+  X,
+  ImagePlus,
+  Trash2,
+  MapPin,
+  ChevronDown,
+  Globe,
+  Users,
+  Lock,
+  Check,
+} from 'lucide-react';
+import { AnimatePresence, motion } from 'framer-motion';
 import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
 import { usePostSubmission } from '@/hooks/usePostSubmission';
+import { useActiveActor } from '@/context/ActiveActorContext';
+import type { ActiveActor } from '@/types/actor';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { CourseSearchSheet } from './CourseSearchSheet';
 import { MediaStage } from './MediaStage';
@@ -32,6 +45,19 @@ const AMBER_SOFT = '#FEF3E7';
 const GOLD_DEEP = '#D97706';
 const GOLD_BORDER = 'rgba(255,184,0,0.32)';
 
+type Visibility = 'anyone' | 'followers' | 'private';
+
+const VISIBILITY_OPTIONS: Array<{
+  value: Visibility;
+  label: string;
+  sub: string;
+  Icon: React.ComponentType<any>;
+}> = [
+  { value: 'anyone', label: 'Anyone', sub: 'Visible to everyone on clbhouz', Icon: Globe },
+  { value: 'followers', label: 'Followers', sub: 'People who follow you', Icon: Users },
+  { value: 'private', label: 'Only me', sub: 'Visible only to you', Icon: Lock },
+];
+
 export interface StageMediaItem {
   id: string;
   type: 'image' | 'video';
@@ -45,7 +71,6 @@ export interface StageMediaItem {
 
 interface CanvasComposerProps {
   onClose: () => void;
-  onBack: () => void;
   initialMedia: File[];
   initialActorType: StudioActorType;
   initialActorId: string | null;
@@ -86,13 +111,13 @@ function measureVideo(file: File): Promise<{ width: number; height: number; prev
 
 export function CanvasComposer({
   onClose,
-  onBack,
   initialMedia,
   initialActorType,
   initialActorId,
   actorInfo,
 }: CanvasComposerProps) {
   const { submitPost, isSubmitting } = usePostSubmission();
+  const { activeActor, availableActors, setActiveActor } = useActiveActor();
   const fileRef = useRef<HTMLInputElement>(null);
   const captionRef = useRef<HTMLTextAreaElement>(null);
 
@@ -102,6 +127,42 @@ export function CanvasComposer({
   const [caption, setCaption] = useState('');
   const [taggedCourse, setTaggedCourse] = useState<TaggedCourse | null>(null);
   const [courseSheetOpen, setCourseSheetOpen] = useState(false);
+
+  const [visibility, setVisibility] = useState<Visibility>('anyone');
+  const [actorSheetOpen, setActorSheetOpen] = useState(false);
+  const [visibilitySheetOpen, setVisibilitySheetOpen] = useState(false);
+  const [discardConfirmOpen, setDiscardConfirmOpen] = useState(false);
+  const [keyboardHeight, setKeyboardHeight] = useState(0);
+
+  // Resolve display actor — prefer live activeActor, fall back to initial props
+  const displayActor = useMemo(() => {
+    if (activeActor) return activeActor;
+    return {
+      type: initialActorType,
+      id: initialActorId ?? '',
+      name: actorInfo.name,
+      avatarUrl: actorInfo.avatarUrl,
+    } as ActiveActor;
+  }, [activeActor, initialActorType, initialActorId, actorInfo]);
+
+  const canSwitchActor = availableActors.length > 1;
+
+  // Keyboard height tracking via visualViewport
+  useEffect(() => {
+    const vv = window.visualViewport;
+    if (!vv) return;
+    const update = () => {
+      const h = window.innerHeight - vv.height - vv.offsetTop;
+      setKeyboardHeight(Math.max(0, Math.round(h)));
+    };
+    update();
+    vv.addEventListener('resize', update);
+    vv.addEventListener('scroll', update);
+    return () => {
+      vv.removeEventListener('resize', update);
+      vv.removeEventListener('scroll', update);
+    };
+  }, []);
 
   // Add files (measure + append)
   const addFiles = useCallback(async (files: File[]) => {
@@ -175,9 +236,20 @@ export function CanvasComposer({
   const dark = hasMedia;
   const activeItem = hasMedia ? mediaItems[Math.min(activeIndex, mediaItems.length - 1)] : null;
   const canPost = (hasMedia || caption.trim().length > 0) && !isSubmitting;
+  const hasDraft = caption.trim().length > 0 || hasMedia || !!taggedCourse;
 
   const remaining = MAX_CAPTION - caption.length;
   const showCounter = remaining <= COUNTER_THRESHOLD;
+
+  const visibilityMeta = VISIBILITY_OPTIONS.find((v) => v.value === visibility)!;
+
+  const handleCloseRequest = useCallback(() => {
+    if (hasDraft) {
+      setDiscardConfirmOpen(true);
+    } else {
+      onClose();
+    }
+  }, [hasDraft, onClose]);
 
   const handleShare = useCallback(async () => {
     if (!canPost) return;
@@ -202,6 +274,10 @@ export function CanvasComposer({
       }
     }
 
+    const actorType: StudioActorType = displayActor.type === 'business' ? 'business' : 'personal';
+    const actorId =
+      actorType === 'business' ? displayActor.id : (displayActor.id || user.id);
+
     await submitPost({
       user,
       content: caption,
@@ -214,30 +290,23 @@ export function CanvasComposer({
             country: taggedCourse.country ?? '',
           }
         : null,
-      actorType: initialActorType,
-      actorId: initialActorId ?? user.id,
+      actorType,
+      actorId,
+      visibility,
       onSuccess: () => {
         toast.success('Posted');
         onClose();
       },
       onError: () => {},
     });
-  }, [
-    canPost,
-    mediaItems,
-    frame,
-    caption,
-    taggedCourse,
-    initialActorType,
-    initialActorId,
-    submitPost,
-    onClose,
-  ]);
+  }, [canPost, mediaItems, frame, caption, taggedCourse, displayActor, visibility, submitPost, onClose]);
 
   const safeTop = useMemo<React.CSSProperties>(
     () => ({ paddingTop: 'max(env(safe-area-inset-top, 0px), 14px)' }),
     []
   );
+
+  const VisIcon = visibilityMeta.Icon;
 
   return (
     <div
@@ -276,7 +345,7 @@ export function CanvasComposer({
         }}
       >
         <button
-          onClick={onClose}
+          onClick={handleCloseRequest}
           aria-label="Close"
           style={{
             width: 36,
@@ -294,25 +363,6 @@ export function CanvasComposer({
           }}
         >
           <X size={18} strokeWidth={2} />
-        </button>
-        <button
-          onClick={onBack}
-          style={{
-            background: 'transparent',
-            border: 'none',
-            color: dark ? '#fff' : INK_MUTE,
-            fontSize: 12,
-            fontWeight: 700,
-            display: 'inline-flex',
-            alignItems: 'center',
-            gap: 2,
-            cursor: 'pointer',
-            mixBlendMode: dark ? 'difference' : 'normal',
-          }}
-          aria-label="Back to chooser"
-        >
-          <ChevronLeft size={14} strokeWidth={2.5} />
-          Back
         </button>
         <div style={{ flex: 1 }} />
         <button
@@ -343,6 +393,32 @@ export function CanvasComposer({
 
           {/* Frame chooser only for photo slides */}
           {activeItem.type === 'image' && <FrameChooser frame={frame} onChange={setFrame} />}
+
+          {/* Visibility pill (frosted) — top-right under header */}
+          <button
+            onClick={() => setVisibilitySheetOpen(true)}
+            style={{
+              position: 'absolute',
+              top: 'calc(max(env(safe-area-inset-top, 0px), 14px) + 66px)',
+              right: 16,
+              zIndex: 20,
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: 6,
+              padding: '7px 12px',
+              borderRadius: 20,
+              background: 'rgba(255,255,255,0.18)',
+              WebkitBackdropFilter: 'blur(10px)',
+              backdropFilter: 'blur(10px)',
+              border: '1px solid rgba(255,255,255,0.28)',
+              cursor: 'pointer',
+              color: '#fff',
+            }}
+          >
+            <VisIcon size={12} strokeWidth={2.5} />
+            <span style={{ fontSize: 12, fontWeight: 700 }}>{visibilityMeta.label}</span>
+            <ChevronDown size={12} strokeWidth={2.5} style={{ opacity: 0.8 }} />
+          </button>
 
           {/* Course pill */}
           {taggedCourse && (
@@ -486,29 +562,69 @@ export function CanvasComposer({
           style={{
             minHeight: '100%',
             paddingTop: 'calc(max(env(safe-area-inset-top, 0px), 14px) + 64px)',
+            paddingBottom: `${keyboardHeight + 72}px`,
             display: 'flex',
             flexDirection: 'column',
             flex: 1,
           }}
         >
+          {/* Actor + visibility row */}
           <div
             style={{
               padding: '8px 16px 0',
               display: 'flex',
               alignItems: 'center',
-              gap: 8,
+              gap: 10,
+              flexWrap: 'wrap',
             }}
           >
-            <SquircleAvatar
-              src={actorInfo.avatarUrl ?? undefined}
-              alt={actorInfo.name}
-              size={32}
-              hideRing
-            />
-            <span style={{ fontSize: 13, color: INK_MUTE }}>
-              Posting as{' '}
-              <b style={{ color: INK_2, fontWeight: 700 }}>{actorInfo.name}</b>
-            </span>
+            <button
+              onClick={() => canSwitchActor && setActorSheetOpen(true)}
+              disabled={!canSwitchActor}
+              style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: 8,
+                background: 'transparent',
+                border: 'none',
+                padding: 0,
+                cursor: canSwitchActor ? 'pointer' : 'default',
+              }}
+              aria-label={canSwitchActor ? 'Change posting identity' : undefined}
+            >
+              <SquircleAvatar
+                src={displayActor.avatarUrl ?? undefined}
+                alt={displayActor.name}
+                size={32}
+                hideRing
+              />
+              <span style={{ fontSize: 13, color: INK_MUTE, display: 'inline-flex', alignItems: 'center', gap: 4 }}>
+                Posting as{' '}
+                <b style={{ color: INK_2, fontWeight: 700 }}>{displayActor.name}</b>
+                {canSwitchActor && <ChevronDown size={14} strokeWidth={2.5} color={INK_2} />}
+              </span>
+            </button>
+
+            <button
+              onClick={() => setVisibilitySheetOpen(true)}
+              style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: 6,
+                padding: '5px 10px',
+                borderRadius: 999,
+                background: CHIP,
+                border: `1px solid ${HAIR}`,
+                cursor: 'pointer',
+                color: INK_2,
+                fontSize: 12,
+                fontWeight: 700,
+              }}
+            >
+              <VisIcon size={13} strokeWidth={2.5} />
+              {visibilityMeta.label}
+              <ChevronDown size={12} strokeWidth={2.5} />
+            </button>
           </div>
 
           <textarea
@@ -580,13 +696,22 @@ export function CanvasComposer({
             </div>
           )}
 
+          {/* Keyboard-docked action bar */}
           <div
             style={{
+              position: 'fixed',
+              left: 0,
+              right: 0,
+              bottom: keyboardHeight,
               display: 'flex',
               gap: 10,
-              padding: '12px 16px calc(env(safe-area-inset-bottom, 0px) + 18px)',
+              padding: keyboardHeight > 0
+                ? '10px 16px'
+                : '12px 16px calc(env(safe-area-inset-bottom, 0px) + 18px)',
               borderTop: `0.5px solid ${HAIR}`,
               background: SURFACE,
+              transition: 'bottom 0.2s ease',
+              zIndex: 40,
             }}
           >
             <button
@@ -643,7 +768,266 @@ export function CanvasComposer({
           setCourseSheetOpen(false);
         }}
       />
+
+      {/* Actor sheet */}
+      <BottomSheet
+        open={actorSheetOpen}
+        onClose={() => setActorSheetOpen(false)}
+        title="Post as"
+      >
+        {availableActors.map((actor) => {
+          const isSelected =
+            displayActor.type === actor.type && displayActor.id === actor.id;
+          const sub =
+            actor.type === 'personal'
+              ? 'Personal'
+              : `Business${actor.meta?.category ? ` · ${String(actor.meta.category)}` : ''}`;
+          return (
+            <button
+              key={`${actor.type}-${actor.id}`}
+              onClick={() => {
+                setActiveActor(actor);
+                setActorSheetOpen(false);
+              }}
+              style={sheetRowStyle(isSelected)}
+            >
+              <SquircleAvatar
+                src={actor.avatarUrl ?? undefined}
+                alt={actor.name}
+                size={40}
+                hideRing
+              />
+              <div style={{ flex: 1, minWidth: 0, textAlign: 'left' }}>
+                <div style={{ fontSize: 14, fontWeight: isSelected ? 800 : 600, color: INK_2 }}>
+                  {actor.name}
+                </div>
+                <div style={{ fontSize: 11, color: '#94A3B8', marginTop: 2 }}>{sub}</div>
+              </div>
+              {isSelected && <Check size={18} strokeWidth={2.5} color={AMBER} />}
+            </button>
+          );
+        })}
+      </BottomSheet>
+
+      {/* Visibility sheet */}
+      <BottomSheet
+        open={visibilitySheetOpen}
+        onClose={() => setVisibilitySheetOpen(false)}
+        title="Who can see this?"
+      >
+        {VISIBILITY_OPTIONS.map(({ value, label, sub, Icon }) => {
+          const isSelected = visibility === value;
+          return (
+            <button
+              key={value}
+              onClick={() => {
+                setVisibility(value);
+                setVisibilitySheetOpen(false);
+              }}
+              style={sheetRowStyle(isSelected)}
+            >
+              <div
+                style={{
+                  width: 40,
+                  height: 40,
+                  borderRadius: '50%',
+                  background: isSelected ? AMBER_SOFT : '#F1F5F9',
+                  color: isSelected ? GOLD_DEEP : INK_MUTE,
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  flexShrink: 0,
+                }}
+              >
+                <Icon size={18} strokeWidth={2} />
+              </div>
+              <div style={{ flex: 1, minWidth: 0, textAlign: 'left' }}>
+                <div style={{ fontSize: 14, fontWeight: isSelected ? 800 : 600, color: INK_2 }}>
+                  {label}
+                </div>
+                <div style={{ fontSize: 11, color: '#94A3B8', marginTop: 2 }}>{sub}</div>
+              </div>
+              <div
+                style={{
+                  width: 20,
+                  height: 20,
+                  borderRadius: '50%',
+                  border: `2px solid ${isSelected ? '#16A34A' : 'rgba(15,23,42,0.18)'}`,
+                  background: isSelected ? '#16A34A' : 'transparent',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  flexShrink: 0,
+                }}
+              >
+                {isSelected && (
+                  <div style={{ width: 8, height: 8, borderRadius: '50%', background: '#fff' }} />
+                )}
+              </div>
+            </button>
+          );
+        })}
+      </BottomSheet>
+
+      {/* Discard confirm */}
+      <AnimatePresence>
+        {discardConfirmOpen && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            style={{
+              position: 'fixed',
+              inset: 0,
+              background: 'rgba(0,0,0,0.45)',
+              zIndex: 10001,
+              display: 'flex',
+              alignItems: 'flex-end',
+            }}
+            onClick={() => setDiscardConfirmOpen(false)}
+          >
+            <motion.div
+              initial={{ y: 40, opacity: 0 }}
+              animate={{ y: 0, opacity: 1 }}
+              exit={{ y: 40, opacity: 0 }}
+              transition={{ type: 'spring', damping: 28, stiffness: 320 }}
+              onClick={(e) => e.stopPropagation()}
+              style={{
+                width: '100%',
+                padding: '12px 12px calc(env(safe-area-inset-bottom, 0px) + 12px)',
+              }}
+            >
+              <div
+                style={{
+                  background: SURFACE,
+                  borderRadius: 14,
+                  overflow: 'hidden',
+                  marginBottom: 8,
+                }}
+              >
+                <div style={{ padding: '16px 16px 12px', textAlign: 'center' }}>
+                  <div style={{ fontSize: 15, fontWeight: 800, color: INK_2 }}>Discard post?</div>
+                  <div style={{ fontSize: 12, color: INK_MUTE, marginTop: 4 }}>
+                    Your draft won't be saved.
+                  </div>
+                </div>
+                <button
+                  onClick={() => {
+                    setDiscardConfirmOpen(false);
+                    onClose();
+                  }}
+                  style={{
+                    width: '100%',
+                    padding: '14px 0',
+                    background: SURFACE,
+                    border: 'none',
+                    borderTop: `0.5px solid ${HAIR}`,
+                    color: '#DC2626',
+                    fontSize: 15,
+                    fontWeight: 700,
+                    cursor: 'pointer',
+                  }}
+                >
+                  Discard
+                </button>
+              </div>
+              <button
+                onClick={() => setDiscardConfirmOpen(false)}
+                style={{
+                  width: '100%',
+                  padding: '14px 0',
+                  background: SURFACE,
+                  border: 'none',
+                  borderRadius: 14,
+                  color: INK_2,
+                  fontSize: 15,
+                  fontWeight: 800,
+                  cursor: 'pointer',
+                }}
+              >
+                Keep editing
+              </button>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
+  );
+}
+
+function sheetRowStyle(selected: boolean): React.CSSProperties {
+  return {
+    width: '100%',
+    display: 'flex',
+    alignItems: 'center',
+    gap: 12,
+    padding: '12px 20px',
+    background: selected ? 'rgba(247,147,30,0.04)' : 'transparent',
+    border: 'none',
+    borderLeft: selected ? `3px solid ${AMBER}` : '3px solid transparent',
+    borderBottom: `0.5px solid ${HAIR}`,
+    cursor: 'pointer',
+    textAlign: 'left',
+  };
+}
+
+function BottomSheet({
+  open,
+  onClose,
+  title,
+  children,
+}: {
+  open: boolean;
+  onClose: () => void;
+  title: string;
+  children: React.ReactNode;
+}) {
+  return (
+    <AnimatePresence>
+      {open && (
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          style={{
+            position: 'fixed',
+            inset: 0,
+            background: 'rgba(0,0,0,0.4)',
+            zIndex: 10000,
+          }}
+          onClick={onClose}
+        >
+          <motion.div
+            initial={{ y: '100%' }}
+            animate={{ y: 0 }}
+            exit={{ y: '100%' }}
+            transition={{ type: 'spring', damping: 28, stiffness: 300 }}
+            onClick={(e) => e.stopPropagation()}
+            style={{
+              position: 'absolute',
+              left: 0,
+              right: 0,
+              bottom: 0,
+              background: SURFACE,
+              borderRadius: '20px 20px 0 0',
+              paddingBottom: 'env(safe-area-inset-bottom, 16px)',
+              maxHeight: '80vh',
+              overflow: 'hidden',
+            }}
+          >
+            <div style={{ display: 'flex', justifyContent: 'center', padding: '10px 0 4px' }}>
+              <div style={{ width: 36, height: 4, borderRadius: 2, background: 'rgba(15,23,42,0.12)' }} />
+            </div>
+            <div style={{ padding: '8px 20px 12px' }}>
+              <div style={{ fontSize: 11, fontWeight: 900, color: '#CBD5E1', letterSpacing: '0.14em', textTransform: 'uppercase' }}>
+                {title}
+              </div>
+            </div>
+            <div style={{ overflowY: 'auto', maxHeight: 'calc(80vh - 60px)' }}>{children}</div>
+          </motion.div>
+        </motion.div>
+      )}
+    </AnimatePresence>
   );
 }
 
