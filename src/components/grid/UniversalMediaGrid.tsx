@@ -87,6 +87,25 @@ export function UniversalMediaGrid({
     ...config,
   }), [config]);
 
+  // Owner-menu visibility — single deduped membership fetch covers every tile.
+  // Authoritative permission re-check still happens server-side.
+  const manageableBusinessIds = useManageableBusinessIds(currentUserId);
+  const canManageTile = useCallback(
+    (item: UniversalMediaItem) =>
+      isOwnProfile
+        ? canManagePost(
+            {
+              userId: item.creator?.id,
+              actorType: item.actorType,
+              actorId: item.actorId,
+            },
+            currentUserId,
+            manageableBusinessIds,
+          )
+        : false,
+    [isOwnProfile, currentUserId, manageableBusinessIds],
+  );
+
   // Video ready queue for prefetching
   const prefetchConfig = useMemo(() => {
     const columns = mergedConfig.columns ?? 2;
