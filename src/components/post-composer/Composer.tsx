@@ -437,6 +437,7 @@ export function Composer({
 
         {/* Caption */}
         <textarea
+          ref={captionRef}
           autoFocus
           value={caption}
           onChange={(e) => setCaption(e.target.value.slice(0, MAX_CAPTION))}
@@ -447,15 +448,18 @@ export function Composer({
             border: 'none',
             outline: 'none',
             resize: 'none',
-            padding: '8px 16px 4px',
+            padding: '8px 16px 10px',
             fontSize: 18,
+            lineHeight: 1.4,
             color: INK_2,
             caretColor: AMBER,
             fontFamily: 'inherit',
             background: 'transparent',
-            minHeight: hasMedia ? 80 : 180,
+            minHeight: hasMedia ? 56 : 180,
+            overflow: 'hidden',
           }}
         />
+
         {showCounter && (
           <div
             style={{
