@@ -51,7 +51,7 @@ const VISIBILITY_OPTIONS: Array<{
   value: Visibility;
   label: string;
   sub: string;
-  Icon: React.ComponentType<{ size?: number; strokeWidth?: number }>;
+  Icon: React.ComponentType<any>;
 }> = [
   { value: 'anyone', label: 'Anyone', sub: 'Visible to everyone on clbhouz', Icon: Globe },
   { value: 'followers', label: 'Followers', sub: 'People who follow you', Icon: Users },
