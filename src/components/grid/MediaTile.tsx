@@ -15,7 +15,7 @@ import { Images, Trophy, Heart } from 'lucide-react';
 import { VideoScrubber } from '@/components/video/VideoScrubber';
 import { UniversalMediaItem, UniversalGridConfig, PORTRAIT_ASPECT, LANDSCAPE_ASPECT } from './types';
 import { uidFromNode } from '@/utils/cloudflareStreamTransform';
-import { TileOptionsMenu } from './TileOptionsMenu';
+import { PostOwnerMenu } from '@/components/posts/PostOwnerMenu';
 
 // Format counts for display (1K, 1.5M, etc.)
 function formatCount(count: number): string {
