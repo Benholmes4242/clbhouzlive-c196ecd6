@@ -95,6 +95,7 @@ export interface ExploreContentItem {
   // Review post fields
   isReview?: boolean; // True if this is a shared review post
   sourceReviewId?: string | null; // ID of the source course_rating
+  reviewCourseId?: string | null; // Course ID for owner-menu "Manage review" routing
   reviewRating?: number | null; // Rating from the review (1-10)
   reviewText?: string | null; // Written review caption from course_ratings
 }
