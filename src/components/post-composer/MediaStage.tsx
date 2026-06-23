@@ -112,15 +112,18 @@ export function MediaStage({ item, frame, onPos }: MediaStageProps) {
         {isVideo ? (
           <video
             src={item.previewUrl}
+            poster={(item as { posterUrl?: string }).posterUrl}
             autoPlay
             loop
             playsInline
+            preload="metadata"
             muted={muted}
             style={{
               width: '100%',
               height: '100%',
               objectFit: 'contain',
               userSelect: 'none',
+              background: '#000',
             }}
           />
         ) : (
