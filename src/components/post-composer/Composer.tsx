@@ -105,6 +105,8 @@ export function Composer({
   const [visibilitySheetOpen, setVisibilitySheetOpen] = useState(false);
   const [discardConfirmOpen, setDiscardConfirmOpen] = useState(false);
   const [keyboardHeight, setKeyboardHeight] = useState(0);
+  const captionRef = useRef<HTMLTextAreaElement>(null);
+
 
   const displayActor = useMemo(() => {
     if (activeActor) return activeActor;
