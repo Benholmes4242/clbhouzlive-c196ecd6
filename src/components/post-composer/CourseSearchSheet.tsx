@@ -155,6 +155,24 @@ export function CourseSearchSheet({
     [onSelect, onClose, multi, excludedSet]
   );
 
+  const handleSelectSuggestion = useCallback(
+    (s: NudgeCourse) => {
+      if (excludedSet.has(s.courseId)) return;
+      onSelect({
+        courseId: s.courseId,
+        courseName: s.name,
+        region: s.region ?? undefined,
+        globalRank: null,
+      });
+      if (!multi) {
+        setQuery('');
+        setResults([]);
+        onClose();
+      }
+    },
+    [onSelect, onClose, multi, excludedSet]
+  );
+
 
   if (!open) return null;
 
