@@ -223,17 +223,23 @@ export const FeedTopActionBar: React.FC<FeedTopActionBarProps> = ({
               <Send size={24} stroke="#fff" strokeWidth={2} />
             </button>
 
-            <button
-              type="button"
-              onClick={(e) => {
-                e.stopPropagation();
-                onMore();
-              }}
-              aria-label="More options"
-              style={chipBase}
-            >
-              <MoreHorizontal size={24} stroke="#fff" strokeWidth={2} />
-            </button>
+            {moreSlot ? (
+              <div style={{ ...chipBase, cursor: 'auto' }}>
+                {moreSlot}
+              </div>
+            ) : (
+              <button
+                type="button"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onMore();
+                }}
+                aria-label="More options"
+                style={chipBase}
+              >
+                <MoreHorizontal size={24} stroke="#fff" strokeWidth={2} />
+              </button>
+            )}
           </div>
         )}
       </div>
