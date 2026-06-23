@@ -53,7 +53,7 @@ export function CourseSearchSheet({
   }, [open]);
 
   // Keyboard-aware: lift the sheet above the on-screen keyboard.
-  useEffect(() => {
+){useEffect(() => {
     if (!open) return;
     const vv = window.visualViewport;
     if (!vv) return;
@@ -64,9 +64,16 @@ export function CourseSearchSheet({
     update();
     vv.addEventListener('resize', update);
     vv.addEventListener('scroll', update);
+
+    // First-open safety net: some iOS/Median WebViews don't emit the initial
+    // 'resize' when the keyboard animates in on first focus. Poll briefly so the
+    // sheet snaps to the correct band on the first open (not just on reopen).
+    const polls = [120, 280, 450, 650].map((t) => setTimeout(update, t));
+
     return () => {
       vv.removeEventListener('resize', update);
       vv.removeEventListener('scroll', update);
+      polls.forEach(clearTimeout);
     };
   }, [open]);
 
