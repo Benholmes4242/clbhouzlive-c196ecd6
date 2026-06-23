@@ -35,6 +35,8 @@ interface FeedTopActionBarProps {
   onComment: () => void;
   onShare: () => void;
   onMore: () => void;
+  /** Replaces the default ⋯ button when provided (own posts → PostOwnerMenu). */
+  moreSlot?: React.ReactNode;
   isVisible: boolean;
   /** Read-only mode: render only the left cluster (back chevron + mute). */
   readOnly?: boolean;
