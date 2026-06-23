@@ -97,11 +97,19 @@ export function useUpdatePost() {
         newUrl: string;
         previousMediaUrl: string;
       }> = [];
-      if (recropMedia.length > 0) {
+      const newMediaResults: Array<{
+        displayOrder: number;
+        media_type: 'image' | 'video';
+        media_url: string;
+        stream_id: string | null;
+        original_media_url: string | null;
+      }> = [];
+      if (recropMedia.length > 0 || newMedia.length > 0) {
         try {
           const { uploadToCloudflareR2 } = await import(
             '@/utils/cloudflareUpload'
           );
+
           for (const item of recropMedia) {
             const ext = item.bakedFile.name.split('.').pop() || 'jpg';
             const fileName = `${Date.now()}-recrop-${item.id}-${Math.random()
@@ -121,14 +129,96 @@ export function useUpdatePost() {
               previousMediaUrl: item.previousMediaUrl,
             });
           }
+
+          // Net-new media uploads — images to R2, videos to Cloudflare Stream.
+          // Any throw here aborts before a single DB write, preserving the
+          // 2B all-or-nothing guarantee.
+          if (newMedia.length > 0) {
+            const { edgePost } = await import('@/utils/callEdge');
+            const { generateStreamHlsUrl } = await import(
+              '@/config/cloudflareStream'
+            );
+
+            for (const item of newMedia) {
+              if (item.mediaType === 'video') {
+                const initData = await edgePost('cloudflare-stream-upload', {
+                  fileName: item.file.name,
+                  fileSize: item.file.size,
+                });
+                if (!initData?.uploadURL || !initData?.uid) {
+                  throw new Error(
+                    'Failed to initialize Cloudflare Stream upload',
+                  );
+                }
+                const uploadForm = new FormData();
+                uploadForm.append('file', item.file);
+                const cfResp = await fetch(initData.uploadURL, {
+                  method: 'POST',
+                  body: uploadForm,
+                });
+                if (!cfResp.ok) {
+                  throw new Error(
+                    `Cloudflare direct upload failed (${cfResp.status})`,
+                  );
+                }
+                newMediaResults.push({
+                  displayOrder: item.displayOrder,
+                  media_type: 'video',
+                  media_url: generateStreamHlsUrl(initData.uid),
+                  stream_id: initData.uid,
+                  original_media_url: null,
+                });
+              } else {
+                const ext =
+                  (item.file.name.split('.').pop() || 'jpg').toLowerCase();
+                const fileName = `${Date.now()}-new-${Math.random()
+                  .toString(36)
+                  .slice(2, 10)}.${ext}`;
+                const up = await uploadToCloudflareR2(
+                  item.file,
+                  'clbhouz-post-images',
+                  fileName,
+                );
+                if (!up.success || !up.publicUrl) {
+                  throw new Error(up.error || 'New media upload failed');
+                }
+                let originalUrl: string | null = null;
+                if (item.originalFile) {
+                  const oext =
+                    (item.originalFile.name.split('.').pop() || 'jpg').toLowerCase();
+                  const origName = `${Date.now()}-new-original-${Math.random()
+                    .toString(36)
+                    .slice(2, 10)}.${oext}`;
+                  const upOrig = await uploadToCloudflareR2(
+                    item.originalFile,
+                    'clbhouz-post-images',
+                    origName,
+                  );
+                  if (!upOrig.success || !upOrig.publicUrl) {
+                    throw new Error(
+                      upOrig.error || 'New media original upload failed',
+                    );
+                  }
+                  originalUrl = upOrig.publicUrl;
+                }
+                newMediaResults.push({
+                  displayOrder: item.displayOrder,
+                  media_type: 'image',
+                  media_url: up.publicUrl,
+                  stream_id: null,
+                  original_media_url: originalUrl,
+                });
+              }
+            }
+          }
         } catch (uploadErr) {
           // Zero DB writes have happened — post is untouched. Bail cleanly.
-          console.error('[useUpdatePost] recrop upload phase failed:', uploadErr);
+          console.error('[useUpdatePost] upload phase failed:', uploadErr);
           toast.error("Couldn't update post", {
             description:
               uploadErr instanceof Error
                 ? uploadErr.message
-                : 'Recrop upload failed. Please try again.',
+                : 'Upload failed. Please try again.',
           });
           return { success: false };
         }
