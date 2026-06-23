@@ -365,7 +365,7 @@ export function UniversalMediaGrid({
                   onPress={handleItemClick}
                   onAuthorClick={handleAuthorClick}
                   onFirstFrameReady={markReady}
-                  isOwnPost={isOwnProfile}
+                  isOwnPost={canManageTile(item)}
                   onEdit={onEditPost}
                   onDelete={onDeletePost}
                 />
@@ -391,7 +391,7 @@ export function UniversalMediaGrid({
                   onPress={handleItemClick}
                   onAuthorClick={handleAuthorClick}
                   onFirstFrameReady={markReady}
-                  isOwnPost={isOwnProfile}
+                  isOwnPost={canManageTile(item)}
                   onEdit={onEditPost}
                   onDelete={onDeletePost}
                 />
@@ -425,7 +425,7 @@ export function UniversalMediaGrid({
                   onPress={handleItemClick}
                   onAuthorClick={handleAuthorClick}
                   onFirstFrameReady={markReady}
-                  isOwnPost={isOwnProfile}
+                  isOwnPost={canManageTile(item)}
                   onEdit={onEditPost}
                   onDelete={onDeletePost}
                 />
