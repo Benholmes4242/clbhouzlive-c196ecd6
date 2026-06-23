@@ -41,6 +41,7 @@ export function CourseSearchSheet({
   const [query, setQuery] = useState('');
   const [results, setResults] = useState<CourseResult[]>([]);
   const [isSearching, setIsSearching] = useState(false);
+  const [keyboardHeight, setKeyboardHeight] = useState(0);
   const inputRef = useRef<HTMLInputElement>(null);
   const debounceRef = useRef<ReturnType<typeof setTimeout>>();
 
@@ -50,6 +51,25 @@ export function CourseSearchSheet({
     if (!open) return;
     setTimeout(() => inputRef.current?.focus(), 50);
   }, [open]);
+
+  // Keyboard-aware: lift the sheet above the on-screen keyboard.
+  useEffect(() => {
+    if (!open) return;
+    const vv = window.visualViewport;
+    if (!vv) return;
+    const update = () => {
+      const h = window.innerHeight - vv.height - vv.offsetTop;
+      setKeyboardHeight(Math.max(0, Math.round(h)));
+    };
+    update();
+    vv.addEventListener('resize', update);
+    vv.addEventListener('scroll', update);
+    return () => {
+      vv.removeEventListener('resize', update);
+      vv.removeEventListener('scroll', update);
+    };
+  }, [open]);
+
 
   useEffect(() => {
     if (debounceRef.current) clearTimeout(debounceRef.current);
