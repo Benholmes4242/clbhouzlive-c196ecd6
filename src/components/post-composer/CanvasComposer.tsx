@@ -27,6 +27,7 @@ import { useActiveActor } from '@/context/ActiveActorContext';
 import type { ActiveActor } from '@/types/actor';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { CourseSearchSheet } from './CourseSearchSheet';
+import { TaggedCoursesSheet } from './TaggedCoursesSheet';
 import { MediaStage } from './MediaStage';
 import { FrameChooser, type FrameId } from './FrameChooser';
 import { bakeFrameCrop } from './bakeFrameCrop';
