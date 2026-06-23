@@ -267,6 +267,16 @@ export function CanvasComposer({
     setActiveIndex(0);
   }, [activeIndex]);
 
+  const handleBackToComposer = useCallback(() => {
+    // Drop media and return to the text-only composer state (caption preserved).
+    setMediaItems((prev) => {
+      prev.forEach((m) => URL.revokeObjectURL(m.previewUrl));
+      return [];
+    });
+    setActiveIndex(0);
+    setFrame('original');
+  }, []);
+
   const setActivePos = useCallback(
     (pos: { x: number; y: number }) => {
       setMediaItems((prev) => prev.map((it, i) => (i === activeIndex ? { ...it, pos } : it)));
