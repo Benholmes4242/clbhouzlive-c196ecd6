@@ -152,14 +152,19 @@ export function CourseSearchSheet({
         style={{
           // Anchor the sheet to the visualViewport so it sits in the same
           // compact band on first open AND on reopen. No keyboard timing race.
+          // Bottom edge is flush with the visualViewport bottom (no gap).
           top: vvBox.top + Math.max(vvBox.height * 0.22, 96),
-          height: vvBox.height - Math.max(vvBox.height * 0.22, 96) - 8,
+          bottom: Math.max(
+            (typeof window !== 'undefined' ? window.innerHeight : 0) -
+              (vvBox.top + vvBox.height),
+            0
+          ),
           background: '#ffffff',
           borderRadius: '20px 20px 0 0',
           borderTop: '0.5px solid rgba(15,23,42,0.07)',
           boxShadow: '0 -4px 24px rgba(15,23,42,0.10)',
-          paddingBottom: 8,
-          transition: 'top 0.22s ease, height 0.22s ease',
+          paddingBottom: 'max(env(safe-area-inset-bottom, 0px), 8px)',
+          transition: 'top 0.22s ease, bottom 0.22s ease',
         }}
       >
 
