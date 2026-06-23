@@ -107,6 +107,13 @@ export interface UnifiedMediaItem {
   reviewRating?: number;
   courseLocation?: string; // e.g. "Scotland, UK"
   sourceReviewId?: string | null;
+  /** Course id for the linked review — used by PostOwnerMenu "Manage review" routing. */
+  reviewCourseId?: string | null;
+
+  // Owner-menu identity
+  actorType?: 'personal' | 'business';
+  actorId?: string;
+
   
   // Computed tile display (set by layout utils)
   tileDisplay?: TileDisplayInfo;

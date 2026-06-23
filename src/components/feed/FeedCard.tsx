@@ -17,6 +17,7 @@
  */
 import React, { useMemo } from 'react';
 import { Heart, MapPin, MessageCircle, Share } from 'lucide-react';
+import { PostOwnerMenu } from '@/components/posts/PostOwnerMenu';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { getRatingTier, getRatingTierLabel } from '@/lib/ratingTier';
 import { formatRatingValue } from '@/utils/formatters';
@@ -267,6 +268,18 @@ const FeedCardImpl: React.FC<FeedCardProps> = ({
               </button>
             );
           })()}
+          {/* Owner menu — self-wired Edit / Delete / Manage review */}
+          {currentUserId && post.userId === currentUserId && (
+            <PostOwnerMenu
+              postId={post.id}
+              isOwnPost
+              actorType={post.actorType === 'business' ? 'business' : 'personal'}
+              actorId={post.actorId}
+              sourceReviewId={post.review?.reviewId ?? null}
+              reviewCourseId={post.review?.courseId ?? null}
+              variant="inline"
+            />
+          )}
         </div>
       </div>
 

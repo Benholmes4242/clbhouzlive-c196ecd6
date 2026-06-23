@@ -15,7 +15,7 @@ import { Images, Trophy, Heart } from 'lucide-react';
 import { VideoScrubber } from '@/components/video/VideoScrubber';
 import { UniversalMediaItem, UniversalGridConfig, PORTRAIT_ASPECT, LANDSCAPE_ASPECT } from './types';
 import { uidFromNode } from '@/utils/cloudflareStreamTransform';
-import { TileOptionsMenu } from './TileOptionsMenu';
+import { PostOwnerMenu } from '@/components/posts/PostOwnerMenu';
 
 // Format counts for display (1K, 1.5M, etc.)
 function formatCount(count: number): string {
@@ -275,11 +275,17 @@ const MediaTile = memo<MediaTileProps>(({
         </div>
       )}
 
-      {/* Options menu for own posts - top right */}
-      {isOwnPost && (onEdit || onDelete) && (
-        <TileOptionsMenu 
-          onEdit={onEdit ? () => onEdit(item.postId) : undefined}
-          onDelete={onDelete ? () => onDelete(item.postId) : undefined}
+      {/* Owner menu for own posts — self-wires Edit / Delete / Manage review */}
+      {isOwnPost && (
+        <PostOwnerMenu
+          postId={item.postId}
+          isOwnPost={isOwnPost}
+          actorType={item.actorType}
+          actorId={item.actorId}
+          sourceReviewId={item.sourceReviewId}
+          reviewCourseId={item.reviewCourseId}
+          variant="overlay"
+          floating
         />
       )}
     </motion.button>

@@ -21,7 +21,7 @@ import TextOverlayRenderer from '@/components/studio/TextOverlayRenderer';
 import { getFilterClass } from '@/utils/studioFilters';
 import { getCropWrapperClass, getPixelLayerStyle } from '@/utils/studioEdit';
 
-import { TileOptionsMenu } from '@/components/grid/TileOptionsMenu';
+import { PostOwnerMenu } from '@/components/posts/PostOwnerMenu';
 import { extractCloudflareUid } from '@/utils/videoIdUtils';
 
 /**
@@ -377,11 +377,17 @@ const UnifiedMediaTile: React.FC<UnifiedMediaTileProps> = ({
         hideRankingIfOverride={true}
       />
 
-      {/* Options menu for own posts - top right (not for achievement posts) */}
-      {isOwnPost && (onEdit || onDelete) && (
-        <TileOptionsMenu 
-          onEdit={!item.achievementId && onEdit ? () => onEdit(item.postId) : undefined}
-          onDelete={onDelete ? () => onDelete(item.postId) : undefined}
+      {/* Owner menu for own posts — skipped on achievement posts (non-editable) */}
+      {isOwnPost && !item.achievementId && (
+        <PostOwnerMenu
+          postId={item.postId}
+          isOwnPost={isOwnPost}
+          actorType={item.actorType}
+          actorId={item.actorId}
+          sourceReviewId={item.sourceReviewId}
+          reviewCourseId={item.reviewCourseId}
+          variant="overlay"
+          floating
         />
       )}
     </motion.button>

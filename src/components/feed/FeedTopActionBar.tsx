@@ -35,6 +35,8 @@ interface FeedTopActionBarProps {
   onComment: () => void;
   onShare: () => void;
   onMore: () => void;
+  /** Replaces the default ⋯ button when provided (own posts → PostOwnerMenu). */
+  moreSlot?: React.ReactNode;
   isVisible: boolean;
   /** Read-only mode: render only the left cluster (back chevron + mute). */
   readOnly?: boolean;
@@ -88,6 +90,7 @@ export const FeedTopActionBar: React.FC<FeedTopActionBarProps> = ({
   onComment,
   onShare,
   onMore,
+  moreSlot,
   isVisible,
   readOnly = false,
 }) => {
@@ -220,17 +223,23 @@ export const FeedTopActionBar: React.FC<FeedTopActionBarProps> = ({
               <Send size={24} stroke="#fff" strokeWidth={2} />
             </button>
 
-            <button
-              type="button"
-              onClick={(e) => {
-                e.stopPropagation();
-                onMore();
-              }}
-              aria-label="More options"
-              style={chipBase}
-            >
-              <MoreHorizontal size={24} stroke="#fff" strokeWidth={2} />
-            </button>
+            {moreSlot ? (
+              <div style={{ ...chipBase, cursor: 'auto' }}>
+                {moreSlot}
+              </div>
+            ) : (
+              <button
+                type="button"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onMore();
+                }}
+                aria-label="More options"
+                style={chipBase}
+              >
+                <MoreHorizontal size={24} stroke="#fff" strokeWidth={2} />
+              </button>
+            )}
           </div>
         )}
       </div>

@@ -41,6 +41,12 @@ interface FeedActionRailProps {
   onComment: () => void;
   onShare: () => void;
   onMore: () => void;
+  /**
+   * Optional override for the "More" affordance. When provided, replaces the
+   * default ⋯ button (used by FeedOverlayLayer to drop in PostOwnerMenu for
+   * own posts). `onMore` is ignored when this is set.
+   */
+  moreSlot?: React.ReactNode;
   isVisible: boolean;
   /** Base offset from screen bottom in px. Omit for Clubhouse (respects bottom nav); pass 0 for fullscreen overlay (no nav). */
   bottomOffset?: number;
@@ -147,6 +153,7 @@ export const FeedActionRail: React.FC<FeedActionRailProps> = ({
   onComment,
   onShare,
   onMore,
+  moreSlot,
   isVisible,
   bottomOffset,
   readOnly = false,
@@ -381,10 +388,16 @@ export const FeedActionRail: React.FC<FeedActionRailProps> = ({
             <Send size={28} stroke="#fff" strokeWidth={FLOAT_STROKE} />
           </ActionButton>
 
-          {/* More */}
-          <ActionButton onClick={onMore} ariaLabel="More options">
-            <MoreHorizontal size={28} stroke="#fff" strokeWidth={FLOAT_STROKE} />
-          </ActionButton>
+          {/* More — owner menu (PostOwnerMenu) for own posts; default ⋯ otherwise */}
+          {moreSlot ? (
+            <div style={{ filter: FLOAT_SHADOW, pointerEvents: 'auto' }}>
+              {moreSlot}
+            </div>
+          ) : (
+            <ActionButton onClick={onMore} ariaLabel="More options">
+              <MoreHorizontal size={28} stroke="#fff" strokeWidth={FLOAT_STROKE} />
+            </ActionButton>
+          )}
         </>
       )}
     </motion.div>

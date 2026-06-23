@@ -1,4 +1,4 @@
-import React, { memo, useState, useEffect, useCallback } from 'react';
+import React, { memo, useState, useEffect, useCallback, useMemo } from 'react';
 import { Volume2, VolumeX } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useClubhouseStore } from '@/store/clubhouseStore';
@@ -9,6 +9,7 @@ import { Z } from '@/config/zIndex';
 import { ReviewOverlaySlot } from './ReviewOverlaySlot';
 import { VideoScrubber } from '@/components/video/VideoScrubber';
 import { formatTimeAgo } from '@/utils/formatTime';
+import { PostOwnerMenu } from '@/components/posts/PostOwnerMenu';
 import type { FeedPost } from '@/components/media-system/types/media';
 
 interface FeedOverlayLayerProps {
@@ -157,6 +158,32 @@ export const FeedOverlayLayer = memo(function FeedOverlayLayer({
 
   const reviewRightInset = topActionBar ? 16 : 80;
 
+  // Owner menu — self-wired Edit/Delete/Manage-review for own posts. Replaces
+  // the default ⋯ on both the vertical rail and the fullscreen top bar.
+  // canManage v1 = personal ownership only; business-admin gating is a follow-up.
+  const ownerMenu = useMemo(() => {
+    if (!isOwnPost) return null;
+    return (
+      <PostOwnerMenu
+        postId={activePost.id}
+        isOwnPost
+        actorType={activePost.actorType === 'business' ? 'business' : 'personal'}
+        actorId={activePost.actorId}
+        sourceReviewId={activePost.review?.reviewId ?? null}
+        reviewCourseId={activePost.review?.courseId ?? null}
+        variant="overlay"
+      />
+    );
+  }, [
+    isOwnPost,
+    activePost.id,
+    activePost.actorType,
+    activePost.actorId,
+    activePost.review?.reviewId,
+    activePost.review?.courseId,
+  ]);
+
+
   return (
     <div
       className="fixed inset-0"
@@ -215,6 +242,7 @@ export const FeedOverlayLayer = memo(function FeedOverlayLayer({
           onComment={onComment}
           onShare={() => onShare(activePost)}
           onMore={onMore}
+          moreSlot={ownerMenu ?? undefined}
           isVisible={overlayVisible}
           readOnly={readOnly}
         />
@@ -278,6 +306,7 @@ export const FeedOverlayLayer = memo(function FeedOverlayLayer({
           onComment={onComment}
           onShare={() => onShare(activePost)}
           onMore={onMore}
+          moreSlot={ownerMenu ?? undefined}
           isVisible={overlayVisible}
           bottomOffset={bottomOffset}
           readOnly={readOnly}
