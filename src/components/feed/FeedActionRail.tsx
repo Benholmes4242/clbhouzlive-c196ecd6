@@ -388,10 +388,16 @@ export const FeedActionRail: React.FC<FeedActionRailProps> = ({
             <Send size={28} stroke="#fff" strokeWidth={FLOAT_STROKE} />
           </ActionButton>
 
-          {/* More */}
-          <ActionButton onClick={onMore} ariaLabel="More options">
-            <MoreHorizontal size={28} stroke="#fff" strokeWidth={FLOAT_STROKE} />
-          </ActionButton>
+          {/* More — owner menu (PostOwnerMenu) for own posts; default ⋯ otherwise */}
+          {moreSlot ? (
+            <div style={{ filter: FLOAT_SHADOW, pointerEvents: 'auto' }}>
+              {moreSlot}
+            </div>
+          ) : (
+            <ActionButton onClick={onMore} ariaLabel="More options">
+              <MoreHorizontal size={28} stroke="#fff" strokeWidth={FLOAT_STROKE} />
+            </ActionButton>
+          )}
         </>
       )}
     </motion.div>
