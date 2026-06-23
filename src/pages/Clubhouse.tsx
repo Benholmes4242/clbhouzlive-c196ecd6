@@ -46,6 +46,8 @@ import { useReviewerStats } from '@/hooks/useReviewerStats';
 
 import { useActiveActor } from '@/context/ActiveActorContext';
 import { getActorRouteByType } from '@/types/actor';
+import { useManageableBusinessIds } from '@/hooks/useManageableBusinessIds';
+import { canManagePost } from '@/lib/canManagePost';
 
 import { useBottomNavigation } from '@/contexts/BottomNavigationContext';
 
@@ -266,7 +268,18 @@ const ClubhouseContent = () => {
     }
   }, [seasonRecap]);
   
-  const isOwnPost = user?.id === activePost?.userId;
+  const manageableBusinessIds = useManageableBusinessIds(user?.id);
+  const isOwnPost = canManagePost(
+    activePost
+      ? {
+          userId: activePost.userId,
+          actorType: activePost.actorType === 'business' ? 'business' : 'personal',
+          actorId: activePost.actorId,
+        }
+      : null,
+    user?.id,
+    manageableBusinessIds,
+  );
 
   // ── Review tap handler ──
   const handleReviewTap = useCallback((post: FeedPost) => {

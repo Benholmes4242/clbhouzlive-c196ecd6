@@ -18,6 +18,8 @@
 import React, { useMemo } from 'react';
 import { Heart, MapPin, MessageCircle, Share } from 'lucide-react';
 import { PostOwnerMenu } from '@/components/posts/PostOwnerMenu';
+import { useManageableBusinessIds } from '@/hooks/useManageableBusinessIds';
+import { canManagePost } from '@/lib/canManagePost';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { getRatingTier, getRatingTierLabel } from '@/lib/ratingTier';
 import { formatRatingValue } from '@/utils/formatters';
@@ -118,6 +120,12 @@ const FeedCardImpl: React.FC<FeedCardProps> = ({
     post.actorType === 'personal' &&
     post.creatorRelation !== 'system' &&
     post.userId !== currentUserId;
+  const manageableBusinessIds = useManageableBusinessIds(currentUserId);
+  const canManage = canManagePost(
+    { userId: post.userId, actorType: post.actorType === 'business' ? 'business' : 'personal', actorId: post.actorId },
+    currentUserId,
+    manageableBusinessIds,
+  );
   const items = post.mediaItems ?? [];
   const isMulti = items.length > 1;
   const media = items[0];
@@ -268,8 +276,9 @@ const FeedCardImpl: React.FC<FeedCardProps> = ({
               </button>
             );
           })()}
-          {/* Owner menu — self-wired Edit / Delete / Manage review */}
-          {currentUserId && post.userId === currentUserId && (
+          {/* Owner menu — self-wired Edit / Delete / Manage review.
+              Visibility = canManagePost (personal author OR business owner/admin). */}
+          {canManage && (
             <PostOwnerMenu
               postId={post.id}
               isOwnPost

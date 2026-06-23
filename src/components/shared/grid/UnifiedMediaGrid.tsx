@@ -15,6 +15,8 @@ import { preloadHlsManifest } from '@/utils/hlsPreload';
 import { logGridMount, logGridDataReady } from '@/utils/gridAuditTimeline';
 import { generateStreamHlsUrl } from '@/config/cloudflareStream';
 import { useLazyTiles } from './useLazyTiles';
+import { useManageableBusinessIds } from '@/hooks/useManageableBusinessIds';
+import { canManagePost } from '@/lib/canManagePost';
 
 // Debug logging for video lifecycle analysis
 const DEBUG_UNIFIED_GRID = true;
@@ -53,6 +55,9 @@ const UnifiedMediaGrid: React.FC<UnifiedMediaGridProps> = ({
   const gridRef = useRef<HTMLDivElement>(null);
   const loadingRef = useRef(false);
   const hasPreloadedFirst = useRef(false);
+
+  // Owner-menu visibility — single deduped membership fetch per viewer.
+  const manageableBusinessIds = useManageableBusinessIds(currentUserId);
 
   // Log mount - with audit timeline
   useEffect(() => {
@@ -226,6 +231,11 @@ const UnifiedMediaGrid: React.FC<UnifiedMediaGridProps> = ({
             }
             
             // Render actual tile for visible items
+            const isOwn = canManagePost(
+              { userId: item.creator?.id, actorType: item.actorType, actorId: item.actorId },
+              currentUserId,
+              manageableBusinessIds,
+            );
             return (
               <UnifiedMediaTile
                 key={`tile-${item.id}-${flatIndex}`}
@@ -235,6 +245,7 @@ const UnifiedMediaGrid: React.FC<UnifiedMediaGridProps> = ({
                 index={flatIndex}
                 onPress={handleItemClick}
                 onAuthorClick={handleAuthorClick}
+                isOwnPost={isOwn}
               />
             );
           })}

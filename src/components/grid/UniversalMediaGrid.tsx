@@ -38,6 +38,8 @@ import { generateStreamHlsUrl } from '@/config/cloudflareStream';
 import MediaTile from './MediaTile';
 import HeroTile from './HeroTile';
 import { TilePlaceholder } from './TilePlaceholder';
+import { useManageableBusinessIds } from '@/hooks/useManageableBusinessIds';
+import { canManagePost } from '@/lib/canManagePost';
 import {
   logObserverSetup,
   logObserverCallback,
@@ -84,6 +86,25 @@ export function UniversalMediaGrid({
     ...DEFAULT_CONFIGS[config.surface],
     ...config,
   }), [config]);
+
+  // Owner-menu visibility — single deduped membership fetch covers every tile.
+  // Per-item check (vs. blanket isOwnProfile) so a business admin sees the
+  // menu on their business's posts wherever they appear. Authoritative
+  // permission re-check still happens server-side.
+  const manageableBusinessIds = useManageableBusinessIds(currentUserId);
+  const canManageTile = useCallback(
+    (item: UniversalMediaItem) =>
+      canManagePost(
+        {
+          userId: item.creator?.id,
+          actorType: item.actorType,
+          actorId: item.actorId,
+        },
+        currentUserId,
+        manageableBusinessIds,
+      ),
+    [currentUserId, manageableBusinessIds],
+  );
 
   // Video ready queue for prefetching
   const prefetchConfig = useMemo(() => {
@@ -344,7 +365,7 @@ export function UniversalMediaGrid({
                   onPress={handleItemClick}
                   onAuthorClick={handleAuthorClick}
                   onFirstFrameReady={markReady}
-                  isOwnPost={isOwnProfile}
+                  isOwnPost={canManageTile(item)}
                   onEdit={onEditPost}
                   onDelete={onDeletePost}
                 />
@@ -370,7 +391,7 @@ export function UniversalMediaGrid({
                   onPress={handleItemClick}
                   onAuthorClick={handleAuthorClick}
                   onFirstFrameReady={markReady}
-                  isOwnPost={isOwnProfile}
+                  isOwnPost={canManageTile(item)}
                   onEdit={onEditPost}
                   onDelete={onDeletePost}
                 />
@@ -404,7 +425,7 @@ export function UniversalMediaGrid({
                   onPress={handleItemClick}
                   onAuthorClick={handleAuthorClick}
                   onFirstFrameReady={markReady}
-                  isOwnPost={isOwnProfile}
+                  isOwnPost={canManageTile(item)}
                   onEdit={onEditPost}
                   onDelete={onDeletePost}
                 />

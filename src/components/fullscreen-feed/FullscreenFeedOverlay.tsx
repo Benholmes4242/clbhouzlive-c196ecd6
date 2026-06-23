@@ -20,6 +20,8 @@ import { useClubhouseShare } from '@/components/clubhouse/hooks/useClubhouseShar
 import { useActivePostDerived } from '@/components/clubhouse/hooks/useActivePostDerived';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useActiveActor } from '@/context/ActiveActorContext';
+import { useManageableBusinessIds } from '@/hooks/useManageableBusinessIds';
+import { canManagePost } from '@/lib/canManagePost';
 import { getActorRouteByType } from '@/types/actor';
 import FullscreenDebugPanel from '@/components/FullscreenDebugPanel';
 import { fsTimeStart, fsTimeEnd, fsEvent } from '@/media/mobileVideoDebug';
@@ -45,7 +47,18 @@ export function FullscreenFeedOverlay() {
   const safeOpenComments = useCallback(() => { if (!readOnly) openComments(); }, [readOnly, openComments]);
   const { handleShare } = useClubhouseShare(userId);
   const { activePost, golfCourse, activeReview, isActiveReview } = useActivePostDerived(posts, activeIndex);
-  const isOwnPost = !!(userId && activePost?.userId === userId);
+  const manageableBusinessIds = useManageableBusinessIds(userId);
+  const isOwnPost = canManagePost(
+    activePost
+      ? {
+          userId: activePost.userId,
+          actorType: activePost.actorType === 'business' ? 'business' : 'personal',
+          actorId: activePost.actorId,
+        }
+      : null,
+    userId,
+    manageableBusinessIds,
+  );
   const openReviewSheet = useReviewSheetStore((s) => s.open);
   const { data: reviewerStats } = useReviewerStats(activePost?.userId);
 
