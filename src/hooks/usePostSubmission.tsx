@@ -74,6 +74,7 @@ export const usePostSubmission = () => {
           actor_type: actorType,
           actor_id: actorId ?? user.id,
           course_id: courseInfo?.id ?? null,
+          visibility,
         })
         .select()
         .single();
