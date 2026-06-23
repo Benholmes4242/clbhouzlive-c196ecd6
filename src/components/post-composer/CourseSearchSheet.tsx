@@ -4,6 +4,8 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { Search, X, MapPin, Flag, Check } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
+import { useRateSuggestions } from '@/hooks/useRateSuggestions';
+import type { NudgeCourse } from '@/hooks/useRateNudgeCourse';
 import type { TaggedCourse } from './types';
 
 interface CourseResult {
@@ -52,6 +54,22 @@ export function CourseSearchSheet({
   const debounceRef = useRef<ReturnType<typeof setTimeout>>();
 
   const excludedSet = React.useMemo(() => new Set(excludedIds ?? []), [excludedIds]);
+
+  // Resolve viewer id once on open so we can preload suggestions (played-unrated,
+  // falling back to "try next" courses) in the empty state.
+  const [userId, setUserId] = useState<string | undefined>(undefined);
+  useEffect(() => {
+    if (!open) return;
+    let cancelled = false;
+    supabase.auth.getUser().then(({ data }) => {
+      if (!cancelled) setUserId(data.user?.id);
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, [open]);
+  const { courses: suggestions, tier: suggestionsTier, loading: suggestionsLoading } =
+    useRateSuggestions(userId, 8);
 
   useEffect(() => {
     if (!open) return;
@@ -127,6 +145,24 @@ export function CourseSearchSheet({
         country: course.country,
         region: course.region ?? undefined,
         globalRank: course.global_rank,
+      });
+      if (!multi) {
+        setQuery('');
+        setResults([]);
+        onClose();
+      }
+    },
+    [onSelect, onClose, multi, excludedSet]
+  );
+
+  const handleSelectSuggestion = useCallback(
+    (s: NudgeCourse) => {
+      if (excludedSet.has(s.courseId)) return;
+      onSelect({
+        courseId: s.courseId,
+        courseName: s.name,
+        region: s.region ?? undefined,
+        globalRank: null,
       });
       if (!multi) {
         setQuery('');
@@ -238,13 +274,196 @@ export function CourseSearchSheet({
         {/* Results */}
         <div className="flex-1 overflow-y-auto px-5" style={{ scrollbarWidth: 'none', WebkitOverflowScrolling: 'touch' }}>
           {!isSearching && query.length < 2 && (
-            <div className="flex flex-col items-center text-center py-10">
-              <Flag className="w-6 h-6 mb-2" style={{ color: 'rgba(15,23,42,0.25)' }} strokeWidth={1.5} />
-              <p style={{ fontSize: 14, fontWeight: 600, color: 'rgba(15,23,42,0.55)' }}>Find your course</p>
-              <p style={{ fontSize: 12, color: 'rgba(15,23,42,0.40)', marginTop: 4 }}>
-                Search by name, region or country
-              </p>
-            </div>
+            <>
+              {suggestionsLoading && (
+                <div className="pt-1">
+                  {[0, 1, 2, 3].map((i) => (
+                    <div
+                      key={i}
+                      className="flex items-center gap-3 animate-pulse"
+                      style={{
+                        padding: '11px 0',
+                        minHeight: 56,
+                        borderBottom: i < 3 ? '0.5px solid rgba(15,23,42,0.07)' : 'none',
+                      }}
+                    >
+                      <div
+                        style={{
+                          width: 42,
+                          height: 42,
+                          borderRadius: 12,
+                          background: 'rgba(15,23,42,0.06)',
+                        }}
+                      />
+                      <div className="flex-1 min-w-0">
+                        <div
+                          style={{
+                            height: 12,
+                            width: '60%',
+                            borderRadius: 4,
+                            background: 'rgba(15,23,42,0.08)',
+                          }}
+                        />
+                        <div
+                          style={{
+                            height: 10,
+                            width: '38%',
+                            borderRadius: 4,
+                            background: 'rgba(15,23,42,0.06)',
+                            marginTop: 8,
+                          }}
+                        />
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+
+              {!suggestionsLoading && suggestions.length > 0 && (
+                <>
+                  <p
+                    style={{
+                      fontSize: 10,
+                      fontWeight: 700,
+                      letterSpacing: '0.10em',
+                      textTransform: 'uppercase',
+                      color: 'rgba(15,23,42,0.40)',
+                      paddingTop: 10,
+                      paddingBottom: 6,
+                    }}
+                  >
+                    {suggestionsTier === 'played' ? 'Played, not rated' : 'Suggested for you'}
+                  </p>
+                  {suggestions.map((s, i) => {
+                    const alreadyTagged = excludedSet.has(s.courseId);
+                    return (
+                      <button
+                        key={s.courseId}
+                        onClick={() => handleSelectSuggestion(s)}
+                        disabled={alreadyTagged}
+                        className="w-full flex items-center gap-3"
+                        style={{
+                          padding: '11px 0',
+                          minHeight: 56,
+                          borderBottom:
+                            i < suggestions.length - 1
+                              ? '0.5px solid rgba(15,23,42,0.07)'
+                              : 'none',
+                          background: 'transparent',
+                          border: 'none',
+                          textAlign: 'left',
+                          cursor: alreadyTagged ? 'default' : 'pointer',
+                          opacity: alreadyTagged ? 0.55 : 1,
+                        }}
+                      >
+                        <div
+                          className="shrink-0 flex items-center justify-center overflow-hidden"
+                          style={{
+                            width: 42,
+                            height: 42,
+                            borderRadius: 12,
+                            background: 'rgba(34,197,94,0.08)',
+                            border: '1px solid rgba(34,197,94,0.18)',
+                          }}
+                        >
+                          {s.thumbnail ? (
+                            <img
+                              src={s.thumbnail}
+                              alt=""
+                              style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                            />
+                          ) : (
+                            <span style={{ fontSize: 16 }}>⛳</span>
+                          )}
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <p
+                            style={{
+                              fontSize: 14,
+                              fontWeight: 600,
+                              color: '#0F172A',
+                              overflow: 'hidden',
+                              textOverflow: 'ellipsis',
+                              whiteSpace: 'nowrap',
+                            }}
+                          >
+                            {s.name}
+                          </p>
+                          <div className="flex items-center gap-1 mt-0.5 min-w-0">
+                            <MapPin
+                              className="w-3 h-3 shrink-0"
+                              style={{ color: 'rgba(15,23,42,0.45)' }}
+                              strokeWidth={1.5}
+                            />
+                            <p
+                              style={{
+                                fontSize: 12,
+                                color: 'rgba(15,23,42,0.45)',
+                                overflow: 'hidden',
+                                textOverflow: 'ellipsis',
+                                whiteSpace: 'nowrap',
+                              }}
+                            >
+                              {s.region ?? '—'}
+                            </p>
+                          </div>
+                        </div>
+                        {alreadyTagged ? (
+                          <span
+                            style={{
+                              width: 22,
+                              height: 22,
+                              borderRadius: '50%',
+                              background: '#16A34A',
+                              display: 'inline-flex',
+                              alignItems: 'center',
+                              justifyContent: 'center',
+                              flexShrink: 0,
+                            }}
+                          >
+                            <Check size={13} strokeWidth={3} color="#fff" />
+                          </span>
+                        ) : s.tier === 'played' ? (
+                          <span
+                            style={{
+                              fontSize: 9,
+                              fontWeight: 700,
+                              letterSpacing: '0.06em',
+                              textTransform: 'uppercase',
+                              padding: '3px 7px',
+                              borderRadius: 20,
+                              flexShrink: 0,
+                              background: 'rgba(34,197,94,0.10)',
+                              border: '1px solid rgba(34,197,94,0.22)',
+                              color: '#15803D',
+                              whiteSpace: 'nowrap',
+                            }}
+                          >
+                            ✓ Played
+                          </span>
+                        ) : null}
+                      </button>
+                    );
+                  })}
+                </>
+              )}
+
+              {!suggestionsLoading && suggestions.length === 0 && (
+                <div className="flex flex-col items-center text-center py-10">
+                  <Flag
+                    className="w-6 h-6 mb-2"
+                    style={{ color: 'rgba(15,23,42,0.25)' }}
+                    strokeWidth={1.5}
+                  />
+                  <p style={{ fontSize: 14, fontWeight: 600, color: 'rgba(15,23,42,0.55)' }}>
+                    Find your course
+                  </p>
+                  <p style={{ fontSize: 12, color: 'rgba(15,23,42,0.40)', marginTop: 4 }}>
+                    Search by name, region or country
+                  </p>
+                </div>
+              )}
+            </>
           )}
 
           {isSearching && (
