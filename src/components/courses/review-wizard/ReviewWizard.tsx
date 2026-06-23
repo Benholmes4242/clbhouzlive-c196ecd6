@@ -516,11 +516,8 @@ export function ReviewWizard({
         baked.push(item.file);
       }
     }
-    wizard.replacePendingFiles(baked);
-    // Allow the setState to flush so submit reads the baked files
-    setTimeout(() => {
-      wizard.submit();
-    }, 0);
+    // Pass baked files straight into submit — no state round-trip, no timer.
+    wizard.submit(baked);
   }, [canPost, pendingItems, wizard]);
 
   if (!isOpen) return null;

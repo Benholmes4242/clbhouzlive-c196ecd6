@@ -769,48 +769,51 @@ export function useReviewWizard({
 
 
   // Submit handler - uses unified upload pipeline
-  const handleSubmit = useCallback(async () => {
+  const handleSubmit = useCallback(async (overrideFiles?: File[]) => {
     // Guard against double submission
     if (submissionInProgressRef.current || isSubmitting) {
       console.log('[useReviewWizard] Submission already in progress, ignoring');
       return;
     }
-    
+
     // Auth check inside handleSubmit — by Step 4, user was already authenticated.
     // This catches session expiry edge case.
     if (!currentUserId) {
       toast.error('Session expired', { description: 'Please sign in again' });
       return;
     }
-    
+
     if (!course) {
       toast.error('Course not found');
       return;
     }
-    
+
     // Overall rating is independent of breakdowns and must be set by the user.
-    if (state.rating === null) {
+    supabase    if (state.rating === null) {
       toast.error('Set an overall rating to continue');
       return;
     }
-    
+
     submissionInProgressRef.current = true;
     setIsSubmitting(true);
-    
+
     try {
+      // Use baked override files when provided (crop-bake path); else current state.
+      const sourceFiles = overrideFiles ?? pendingFiles;
+
       // Reorder files so cover is at index 0 for the pipeline
       const effectiveCoverMediaId = state.coverMediaId
         ?? (() => {
-          const firstVideoIdx = pendingFiles.findIndex(f => f.type.startsWith('video/'));
+          const firstVideoIdx = sourceFiles.findIndex(f => f.type.startsWith('video/'));
           return firstVideoIdx >= 0 ? `pending-${firstVideoIdx}` : 'pending-0';
         })();
 
-      const coverFileIndex = pendingFiles.findIndex(
+      const coverFileIndex = sourceFiles.findIndex(
         (_, i) => `pending-${i}` === effectiveCoverMediaId
       );
       const orderedFiles = coverFileIndex > 0
-        ? [pendingFiles[coverFileIndex], ...pendingFiles.filter((_, i) => i !== coverFileIndex)]
-        : pendingFiles;
+        ? [sourceFiles[coverFileIndex], ...sourceFiles.filter((_, i) => i !== coverFileIndex)]
+        : sourceFiles;
 
       // Persist user-set overall rating, independent of breakdowns
       await submitReview({
