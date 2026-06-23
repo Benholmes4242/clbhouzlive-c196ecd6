@@ -38,6 +38,8 @@ import { generateStreamHlsUrl } from '@/config/cloudflareStream';
 import MediaTile from './MediaTile';
 import HeroTile from './HeroTile';
 import { TilePlaceholder } from './TilePlaceholder';
+import { useManageableBusinessIds } from '@/hooks/useManageableBusinessIds';
+import { canManagePost } from '@/lib/canManagePost';
 import {
   logObserverSetup,
   logObserverCallback,
