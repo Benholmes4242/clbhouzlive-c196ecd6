@@ -95,14 +95,53 @@ function measureImage(file: File): Promise<{ width: number; height: number; prev
   });
 }
 
-function measureVideo(file: File): Promise<{ width: number; height: number; previewUrl: string }> {
+function measureVideo(
+  file: File
+): Promise<{ width: number; height: number; previewUrl: string; posterUrl?: string }> {
   return new Promise((resolve, reject) => {
     const previewUrl = URL.createObjectURL(file);
     const v = document.createElement('video');
     v.preload = 'metadata';
     v.muted = true;
-    v.onloadedmetadata = () =>
-      resolve({ width: v.videoWidth || 16, height: v.videoHeight || 9, previewUrl });
+    (v as HTMLVideoElement).playsInline = true;
+    let done = false;
+    const finish = (posterUrl?: string) => {
+      if (done) return;
+      done = true;
+      resolve({
+        width: v.videoWidth || 16,
+        height: v.videoHeight || 9,
+        previewUrl,
+        posterUrl,
+      });
+    };
+    v.onloadedmetadata = () => {
+      const seekTo = Math.min(0.1, (v.duration || 1) / 2);
+      const onSeeked = () => {
+        try {
+          const canvas = document.createElement('canvas');
+          canvas.width = v.videoWidth || 16;
+          canvas.height = v.videoHeight || 9;
+          const ctx = canvas.getContext('2d');
+          if (ctx) {
+            ctx.drawImage(v, 0, 0, canvas.width, canvas.height);
+            finish(canvas.toDataURL('image/jpeg', 0.8));
+            return;
+          }
+        } catch {
+          // fall through
+        }
+        finish();
+      };
+      v.addEventListener('seeked', onSeeked, { once: true });
+      try {
+        v.currentTime = seekTo;
+      } catch {
+        finish();
+      }
+      // Safety: if seeked never fires (some codecs), resolve after a beat
+      setTimeout(() => finish(), 1500);
+    };
     v.onerror = () => {
       URL.revokeObjectURL(previewUrl);
       reject(new Error('video load failed'));
