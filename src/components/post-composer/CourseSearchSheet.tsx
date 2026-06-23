@@ -2,7 +2,7 @@
 // Shared by Post-mode "Tag a course" chip and Review-mode course picker.
 
 import React, { useCallback, useEffect, useRef, useState } from 'react';
-import { Search, X, MapPin, Flag } from 'lucide-react';
+import { Search, X, MapPin, Flag, Check } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import type { TaggedCourse } from './types';
 
