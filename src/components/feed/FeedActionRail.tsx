@@ -153,6 +153,7 @@ export const FeedActionRail: React.FC<FeedActionRailProps> = ({
   onComment,
   onShare,
   onMore,
+  moreSlot,
   isVisible,
   bottomOffset,
   readOnly = false,
