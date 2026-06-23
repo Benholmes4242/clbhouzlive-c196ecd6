@@ -109,7 +109,6 @@ export function PostComposer({
             ) : (
               <CanvasComposer
                 onClose={onClose}
-                onBack={() => setScreen('choose')}
                 initialMedia={initialMedia}
                 initialActorType={initialActorType}
                 initialActorId={initialActorId}
