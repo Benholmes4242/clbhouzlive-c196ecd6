@@ -10,11 +10,14 @@ interface PostSubmissionData {
   content: string;
   mediaFiles: File[];
   selectedTags: any[];
+  /** Single primary course (legacy / back-compat). Use `courses` for multi-course. */
   courseInfo?: {
     id: string;
     name: string;
     country: string;
   } | null;
+  /** Ordered list of tagged courses. First entry becomes the primary `posts.course_id`. */
+  courses?: Array<{ id: string; name?: string; country?: string }> | null;
   /** Actor type for the post (personal or business). Defaults to 'personal'. */
   actorType?: 'personal' | 'business';
   /** Actor id (business id for business posts; defaults to user.id for personal). */
