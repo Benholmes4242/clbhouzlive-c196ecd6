@@ -218,6 +218,7 @@ export function CanvasComposer({
           type: isVideo ? 'video' : 'image',
           file: f,
           previewUrl: m.previewUrl,
+          posterUrl: isVideo ? (m as { posterUrl?: string }).posterUrl : undefined,
           width: m.width,
           height: m.height,
           aspectRatio: m.width / Math.max(1, m.height),
