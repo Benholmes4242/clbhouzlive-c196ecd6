@@ -368,13 +368,11 @@ export function CanvasComposer({
       content: caption,
       mediaFiles: filesOut,
       selectedTags: [],
-      courseInfo: taggedCourse
-        ? {
-            id: taggedCourse.courseId,
-            name: taggedCourse.courseName,
-            country: taggedCourse.country ?? '',
-          }
-        : null,
+      courses: taggedCourses.map((c) => ({
+        id: c.courseId,
+        name: c.courseName,
+        country: c.country ?? '',
+      })),
       actorType,
       actorId,
       visibility,
@@ -384,7 +382,7 @@ export function CanvasComposer({
       },
       onError: () => {},
     });
-  }, [canPost, mediaItems, frame, caption, taggedCourse, displayActor, visibility, submitPost, onClose]);
+  }, [canPost, mediaItems, frame, caption, taggedCourses, displayActor, visibility, submitPost, onClose]);
 
   const safeTop = useMemo<React.CSSProperties>(
     () => ({ paddingTop: 'max(env(safe-area-inset-top, 0px), 14px)' }),
