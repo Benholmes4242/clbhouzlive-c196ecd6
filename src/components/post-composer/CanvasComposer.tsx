@@ -64,6 +64,7 @@ export interface StageMediaItem {
   type: 'image' | 'video';
   file: File;
   previewUrl: string;
+  posterUrl?: string;
   width: number;
   height: number;
   aspectRatio: number;
