@@ -497,7 +497,9 @@ export function Composer({
             boxShadow: canPost ? '0 2px 10px rgba(15,23,42,0.18)' : 'none',
           }}
         >
-          {isSubmitting ? 'Posting…' : 'Post'}
+          {isEditMode
+            ? (isUpdating ? 'Updating…' : 'Update')
+            : (isSubmitting ? 'Posting…' : 'Post')}
         </button>
       </div>
 
