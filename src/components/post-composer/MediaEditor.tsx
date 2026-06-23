@@ -116,8 +116,17 @@ export function MediaEditor({ open, items, startIndex, onCancel, onDone }: Media
           </button>
         </div>
 
-        {/* Stage */}
-        <div style={{ flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
+        {/* Stage — single uniform charcoal body, stage pinned top */}
+        <div
+          style={{
+            flex: 1,
+            display: 'flex',
+            flexDirection: 'column',
+            justifyContent: 'flex-start',
+            background: CHARCOAL,
+            minHeight: 0,
+          }}
+        >
           <MediaStage
             item={active}
             frame={active.frame}
@@ -127,11 +136,14 @@ export function MediaEditor({ open, items, startIndex, onCancel, onDone }: Media
             showMuteToggle
           />
 
-          {/* Frame chooser — only for photos */}
+          {/* Frame chooser — only for photos; sits on the same charcoal */}
           {active.type === 'image' && (
-            <FrameChooser frame={active.frame} onChange={setFrame} />
+            <div style={{ background: CHARCOAL }}>
+              <FrameChooser frame={active.frame} onChange={setFrame} />
+            </div>
           )}
         </div>
+
 
         {/* Thumbnail strip */}
         {draft.length > 1 && (

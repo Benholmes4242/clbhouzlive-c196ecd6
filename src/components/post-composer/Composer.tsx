@@ -105,6 +105,8 @@ export function Composer({
   const [visibilitySheetOpen, setVisibilitySheetOpen] = useState(false);
   const [discardConfirmOpen, setDiscardConfirmOpen] = useState(false);
   const [keyboardHeight, setKeyboardHeight] = useState(0);
+  const captionRef = useRef<HTMLTextAreaElement>(null);
+
 
   const displayActor = useMemo(() => {
     if (activeActor) return activeActor;
@@ -134,6 +136,15 @@ export function Composer({
       vv.removeEventListener('scroll', update);
     };
   }, []);
+
+  // Auto-grow caption textarea
+  useEffect(() => {
+    const el = captionRef.current;
+    if (!el) return;
+    el.style.height = 'auto';
+    el.style.height = `${el.scrollHeight}px`;
+  });
+
 
   // Seed initial media once
   const seededRef = useRef(false);
@@ -357,9 +368,11 @@ export function Composer({
         style={{
           flex: 1,
           overflowY: 'auto',
-          paddingBottom: `${keyboardHeight + 72}px`,
+          WebkitOverflowScrolling: 'touch',
+          paddingBottom: `calc(${keyboardHeight}px + 64px + env(safe-area-inset-bottom, 0px) + 16px)`,
         }}
       >
+
         {/* Identity + visibility */}
         <div
           style={{
@@ -433,6 +446,7 @@ export function Composer({
 
         {/* Caption */}
         <textarea
+          ref={captionRef}
           autoFocus
           value={caption}
           onChange={(e) => setCaption(e.target.value.slice(0, MAX_CAPTION))}
@@ -443,15 +457,18 @@ export function Composer({
             border: 'none',
             outline: 'none',
             resize: 'none',
-            padding: '8px 16px 4px',
+            padding: '8px 16px 10px',
             fontSize: 18,
+            lineHeight: 1.4,
             color: INK_2,
             caretColor: AMBER,
             fontFamily: 'inherit',
             background: 'transparent',
-            minHeight: hasMedia ? 80 : 180,
+            minHeight: hasMedia ? 56 : 180,
+            overflow: 'hidden',
           }}
         />
+
         {showCounter && (
           <div
             style={{
@@ -822,74 +839,66 @@ function MediaPreview({
     );
   }
 
-  // Grid: show up to 4 tiles, +N overlay on the 4th when more.
-  const visible = items.slice(0, 4);
-  const overflow = Math.max(0, items.length - 4);
+  // Carousel: horizontal snap row of fixed tiles. Tap to edit, ✕ to remove.
+  const TILE = 200;
+  const TILE_RADIUS = 12;
 
   return (
     <div
       style={{
-        display: 'grid',
-        gridTemplateColumns: 'repeat(2, 1fr)',
-        gap: 6,
-        borderRadius: 14,
-        overflow: 'hidden',
+        display: 'flex',
+        gap: 8,
+        overflowX: 'auto',
+        overflowY: 'hidden',
+        scrollSnapType: 'x mandatory',
+        WebkitOverflowScrolling: 'touch',
+        scrollbarWidth: 'none',
+        paddingBottom: 2,
+        margin: '0 -16px',
+        paddingLeft: 16,
+        paddingRight: 16,
       }}
     >
-      {visible.map((item, i) => {
-        const isLast = i === visible.length - 1;
-        const showOverflow = isLast && overflow > 0;
-        return (
-          <div key={item.id} style={{ position: 'relative', aspectRatio: '1 / 1' }}>
-            <button
-              onClick={() => onEditItem(i)}
-              style={{
-                display: 'block',
-                width: '100%',
-                height: '100%',
-                padding: 0,
-                border: 'none',
-                background: 'transparent',
-                cursor: 'pointer',
-              }}
-            >
-              <MediaStage
-                item={item}
-                frame={item.frame}
-                height={170}
-                borderRadius={8}
-                showPlayGlyph={item.type === 'video'}
-              />
-            </button>
-            {showOverflow && (
-              <div
-                aria-hidden
-                style={{
-                  position: 'absolute',
-                  inset: 0,
-                  background: 'rgba(0,0,0,0.55)',
-                  borderRadius: 8,
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  color: '#fff',
-                  fontSize: 26,
-                  fontWeight: 800,
-                  pointerEvents: 'none',
-                }}
-              >
-                +{overflow}
-              </div>
-            )}
-            <CornerButton top right onClick={() => onRemoveItem(i)} ariaLabel="Remove" small>
-              <X size={12} strokeWidth={2.5} />
-            </CornerButton>
-          </div>
-        );
-      })}
+      {items.map((item, i) => (
+        <div
+          key={item.id}
+          style={{
+            position: 'relative',
+            flex: `0 0 ${TILE}px`,
+            width: TILE,
+            height: TILE,
+            scrollSnapAlign: 'start',
+          }}
+        >
+          <button
+            onClick={() => onEditItem(i)}
+            style={{
+              display: 'block',
+              width: '100%',
+              height: '100%',
+              padding: 0,
+              border: 'none',
+              background: 'transparent',
+              cursor: 'pointer',
+            }}
+          >
+            <MediaStage
+              item={item}
+              frame={item.frame}
+              height={TILE}
+              borderRadius={TILE_RADIUS}
+              showPlayGlyph={item.type === 'video'}
+            />
+          </button>
+          <CornerButton top right onClick={() => onRemoveItem(i)} ariaLabel="Remove" small>
+            <X size={12} strokeWidth={2.5} />
+          </CornerButton>
+        </div>
+      ))}
     </div>
   );
 }
+
 
 function CornerButton({
   children,

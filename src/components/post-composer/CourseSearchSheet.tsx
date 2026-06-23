@@ -41,6 +41,7 @@ export function CourseSearchSheet({
   const [query, setQuery] = useState('');
   const [results, setResults] = useState<CourseResult[]>([]);
   const [isSearching, setIsSearching] = useState(false);
+  const [keyboardHeight, setKeyboardHeight] = useState(0);
   const inputRef = useRef<HTMLInputElement>(null);
   const debounceRef = useRef<ReturnType<typeof setTimeout>>();
 
@@ -50,6 +51,25 @@ export function CourseSearchSheet({
     if (!open) return;
     setTimeout(() => inputRef.current?.focus(), 50);
   }, [open]);
+
+  // Keyboard-aware: lift the sheet above the on-screen keyboard.
+  useEffect(() => {
+    if (!open) return;
+    const vv = window.visualViewport;
+    if (!vv) return;
+    const update = () => {
+      const h = window.innerHeight - vv.height - vv.offsetTop;
+      setKeyboardHeight(Math.max(0, Math.round(h)));
+    };
+    update();
+    vv.addEventListener('resize', update);
+    vv.addEventListener('scroll', update);
+    return () => {
+      vv.removeEventListener('resize', update);
+      vv.removeEventListener('scroll', update);
+    };
+  }, [open]);
+
 
   useEffect(() => {
     if (debounceRef.current) clearTimeout(debounceRef.current);
@@ -109,14 +129,18 @@ export function CourseSearchSheet({
       <div
         className="fixed inset-x-0 bottom-0 z-[10001] flex flex-col"
         style={{
-          maxHeight: '78vh',
+          maxHeight: 'calc(100dvh - (env(safe-area-inset-top, 0px) + 12px) - var(--kb, 0px))',
           background: '#ffffff',
           borderRadius: '20px 20px 0 0',
           borderTop: '0.5px solid rgba(15,23,42,0.07)',
           boxShadow: '0 -4px 24px rgba(15,23,42,0.10)',
+          ['--kb' as any]: `${keyboardHeight}px`,
+          bottom: 'var(--kb, 0px)',
           paddingBottom: 'calc(var(--sab, env(safe-area-inset-bottom, 0px)) + 12px)',
+          transition: 'bottom 0.2s ease, max-height 0.2s ease',
         }}
       >
+
         {/* Handle */}
         <div className="flex justify-center pt-2.5 pb-1">
           <div style={{ width: 36, height: 4, borderRadius: 2, background: 'rgba(15,23,42,0.15)' }} />
