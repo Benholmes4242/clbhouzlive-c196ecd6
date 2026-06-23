@@ -625,18 +625,29 @@ export function useReviewWizard({
 
   // Media handlers - store files locally (upload-on-submit pattern)
   const addImages = useCallback(async (files: File[]) => {
-    setPendingFiles(prev => [...prev, ...files]);
-    
-    // Auto-set first media as cover if none set
-    if (!state.coverMediaId && allMedia.length === 0 && files.length > 0) {
+    const remaining = MAX_REVIEW_MEDIA - allMedia.length;
+    if (remaining <= 0) {
+      toast.error(`You can add up to ${MAX_REVIEW_MEDIA} photos or videos`);
+      return;
+    }
+    const accepted = files.slice(0, remaining);
+    if (files.length > accepted.length) {
+      toast.error(`Only ${MAX_REVIEW_MEDIA} items allowed — added the first ${accepted.length}`);
+    }
+    setPendingFiles(prev => [...prev, ...accepted]);
+
+    if (!state.coverMediaId && allMedia.length === 0 && accepted.length > 0) {
       setState(prev => ({ ...prev, coverMediaId: 'pending-0' }));
     }
   }, [state.coverMediaId, allMedia.length]);
 
   const addVideo = useCallback(async (file: File) => {
+    if (allMedia.length >= MAX_REVIEW_MEDIA) {
+      toast.error(`You can add up to ${MAX_REVIEW_MEDIA} photos or videos`);
+      return;
+    }
     setPendingFiles(prev => [...prev, file]);
-    
-    // Auto-set first media as cover if none set
+
     if (!state.coverMediaId && allMedia.length === 0) {
       setState(prev => ({ ...prev, coverMediaId: `pending-${pendingFiles.length}` }));
     }
