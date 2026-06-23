@@ -628,31 +628,33 @@ export function Composer({
           <div style={{ padding: '8px 16px 12px' }}>
             <MediaPreview
               items={mediaItems}
-              onEditItem={(idx) => onOpenEditor(mediaItems, idx)}
+              onEditItem={handleEditItem}
               onRemoveItem={removeAt}
             />
-            <button
-              onClick={() => fileRef.current?.click()}
-              style={{
-                marginTop: 10,
-                width: '100%',
-                padding: '11px 0',
-                borderRadius: 12,
-                border: `1px dashed rgba(15,23,42,0.18)`,
-                background: 'transparent',
-                fontSize: 13,
-                fontWeight: 700,
-                color: INK_2,
-                cursor: 'pointer',
-                display: 'inline-flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                gap: 8,
-              }}
-            >
-              <ImagePlus size={16} strokeWidth={2} />
-              Add more
-            </button>
+            {!isEditMode && (
+              <button
+                onClick={() => fileRef.current?.click()}
+                style={{
+                  marginTop: 10,
+                  width: '100%',
+                  padding: '11px 0',
+                  borderRadius: 12,
+                  border: `1px dashed rgba(15,23,42,0.18)`,
+                  background: 'transparent',
+                  fontSize: 13,
+                  fontWeight: 700,
+                  color: INK_2,
+                  cursor: 'pointer',
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  gap: 8,
+                }}
+              >
+                <ImagePlus size={16} strokeWidth={2} />
+                Add more
+              </button>
+            )}
           </div>
         )}
 
@@ -700,27 +702,29 @@ export function Composer({
           zIndex: 40,
         }}
       >
-        <button
-          onClick={() => fileRef.current?.click()}
-          style={{
-            flex: 1,
-            padding: '13px 0',
-            borderRadius: 10,
-            border: `1px solid ${HAIR}`,
-            background: SURFACE,
-            fontSize: 13,
-            fontWeight: 700,
-            color: INK_2,
-            cursor: 'pointer',
-            display: 'inline-flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            gap: 8,
-          }}
-        >
-          <ImagePlus size={16} strokeWidth={2} />
-          {hasMedia ? 'Add more' : 'Add photo / video'}
-        </button>
+        {!isEditMode && (
+          <button
+            onClick={() => fileRef.current?.click()}
+            style={{
+              flex: 1,
+              padding: '13px 0',
+              borderRadius: 10,
+              border: `1px solid ${HAIR}`,
+              background: SURFACE,
+              fontSize: 13,
+              fontWeight: 700,
+              color: INK_2,
+              cursor: 'pointer',
+              display: 'inline-flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              gap: 8,
+            }}
+          >
+            <ImagePlus size={16} strokeWidth={2} />
+            {hasMedia ? 'Add more' : 'Add photo / video'}
+          </button>
+        )}
         <button
           onClick={handleCoursePillTap}
           style={{
