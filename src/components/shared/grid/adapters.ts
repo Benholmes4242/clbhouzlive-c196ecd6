@@ -93,6 +93,7 @@ export function exploreItemToUnified(item: ExploreContentItem): UnifiedMediaItem
     reviewRating: item.reviewRating ?? undefined,
     courseLocation,
     sourceReviewId: item.sourceReviewId,
+    reviewCourseId: item.reviewCourseId,
   };
 }
 
