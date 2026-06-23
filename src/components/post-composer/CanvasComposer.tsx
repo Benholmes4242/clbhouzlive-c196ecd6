@@ -13,6 +13,7 @@ import {
   Trash2,
   MapPin,
   ChevronDown,
+  ChevronLeft,
   Globe,
   Users,
   Lock,
@@ -63,6 +64,7 @@ export interface StageMediaItem {
   type: 'image' | 'video';
   file: File;
   previewUrl: string;
+  posterUrl?: string;
   width: number;
   height: number;
   aspectRatio: number;
@@ -93,14 +95,53 @@ function measureImage(file: File): Promise<{ width: number; height: number; prev
   });
 }
 
-function measureVideo(file: File): Promise<{ width: number; height: number; previewUrl: string }> {
+function measureVideo(
+  file: File
+): Promise<{ width: number; height: number; previewUrl: string; posterUrl?: string }> {
   return new Promise((resolve, reject) => {
     const previewUrl = URL.createObjectURL(file);
     const v = document.createElement('video');
     v.preload = 'metadata';
     v.muted = true;
-    v.onloadedmetadata = () =>
-      resolve({ width: v.videoWidth || 16, height: v.videoHeight || 9, previewUrl });
+    (v as HTMLVideoElement).playsInline = true;
+    let done = false;
+    const finish = (posterUrl?: string) => {
+      if (done) return;
+      done = true;
+      resolve({
+        width: v.videoWidth || 16,
+        height: v.videoHeight || 9,
+        previewUrl,
+        posterUrl,
+      });
+    };
+    v.onloadedmetadata = () => {
+      const seekTo = Math.min(0.1, (v.duration || 1) / 2);
+      const onSeeked = () => {
+        try {
+          const canvas = document.createElement('canvas');
+          canvas.width = v.videoWidth || 16;
+          canvas.height = v.videoHeight || 9;
+          const ctx = canvas.getContext('2d');
+          if (ctx) {
+            ctx.drawImage(v, 0, 0, canvas.width, canvas.height);
+            finish(canvas.toDataURL('image/jpeg', 0.8));
+            return;
+          }
+        } catch {
+          // fall through
+        }
+        finish();
+      };
+      v.addEventListener('seeked', onSeeked, { once: true });
+      try {
+        v.currentTime = seekTo;
+      } catch {
+        finish();
+      }
+      // Safety: if seeked never fires (some codecs), resolve after a beat
+      setTimeout(() => finish(), 1500);
+    };
     v.onerror = () => {
       URL.revokeObjectURL(previewUrl);
       reject(new Error('video load failed'));
@@ -177,6 +218,7 @@ export function CanvasComposer({
           type: isVideo ? 'video' : 'image',
           file: f,
           previewUrl: m.previewUrl,
+          posterUrl: isVideo ? (m as { posterUrl?: string }).posterUrl : undefined,
           width: m.width,
           height: m.height,
           aspectRatio: m.width / Math.max(1, m.height),
@@ -224,6 +266,16 @@ export function CanvasComposer({
     });
     setActiveIndex(0);
   }, [activeIndex]);
+
+  const handleBackToComposer = useCallback(() => {
+    // Drop media and return to the text-only composer state (caption preserved).
+    setMediaItems((prev) => {
+      prev.forEach((m) => URL.revokeObjectURL(m.previewUrl));
+      return [];
+    });
+    setActiveIndex(0);
+    setFrame('original');
+  }, []);
 
   const setActivePos = useCallback(
     (pos: { x: number; y: number }) => {
@@ -345,8 +397,8 @@ export function CanvasComposer({
         }}
       >
         <button
-          onClick={handleCloseRequest}
-          aria-label="Close"
+          onClick={hasMedia ? handleBackToComposer : handleCloseRequest}
+          aria-label={hasMedia ? 'Back' : 'Close'}
           style={{
             width: 36,
             height: 36,
@@ -362,7 +414,11 @@ export function CanvasComposer({
             color: dark ? '#fff' : INK_MUTE,
           }}
         >
-          <X size={18} strokeWidth={2} />
+          {hasMedia ? (
+            <ChevronLeft size={20} strokeWidth={2.25} />
+          ) : (
+            <X size={18} strokeWidth={2} />
+          )}
         </button>
         <div style={{ flex: 1 }} />
         <button
@@ -375,10 +431,10 @@ export function CanvasComposer({
             borderRadius: 20,
             border: 'none',
             cursor: canPost ? 'pointer' : 'default',
-            background: canPost ? AMBER : dark ? 'rgba(255,255,255,0.18)' : CHIP,
+            background: canPost ? INK_2 : dark ? 'rgba(255,255,255,0.18)' : CHIP,
             color: canPost ? '#fff' : dark ? 'rgba(255,255,255,0.6)' : '#94A3B8',
             opacity: canPost ? 1 : 0.85,
-            boxShadow: canPost ? '0 2px 12px rgba(247,147,30,0.22)' : 'none',
+            boxShadow: canPost ? '0 2px 10px rgba(15,23,42,0.25)' : 'none',
           }}
         >
           {isSubmitting ? 'Posting…' : 'Share'}
@@ -451,38 +507,51 @@ export function CanvasComposer({
           {/* Thumbnails strip */}
           {mediaItems.length > 1 && (
             <div style={{ display: 'flex', justifyContent: 'center', gap: 8, padding: '8px 0' }}>
-              {mediaItems.map((m, i) => (
-                <button
-                  key={m.id}
-                  onClick={() => setActiveIndex(i)}
-                  style={{
-                    width: 40,
-                    height: 40,
-                    borderRadius: 8,
-                    overflow: 'hidden',
-                    border: i === activeIndex ? `2px solid ${AMBER}` : '2px solid transparent',
-                    opacity: i === activeIndex ? 1 : 0.6,
-                    padding: 0,
-                    cursor: 'pointer',
-                    background: '#000',
-                  }}
-                >
-                  {m.type === 'video' ? (
-                    <video
-                      src={m.previewUrl}
-                      muted
-                      playsInline
-                      style={{ width: '100%', height: '100%', objectFit: 'cover' }}
-                    />
-                  ) : (
-                    <img
-                      src={m.previewUrl}
-                      alt=""
-                      style={{ width: '100%', height: '100%', objectFit: 'cover' }}
-                    />
-                  )}
-                </button>
-              ))}
+              {mediaItems.map((m, i) => {
+                const selected = i === activeIndex;
+                return (
+                  <button
+                    key={m.id}
+                    onClick={() => setActiveIndex(i)}
+                    style={{
+                      width: 40,
+                      height: 40,
+                      borderRadius: 8,
+                      overflow: 'hidden',
+                      border: selected ? '2px solid #FFFFFF' : '2px solid transparent',
+                      boxShadow: selected ? '0 0 0 1px rgba(0,0,0,0.4)' : 'none',
+                      opacity: selected ? 1 : 0.6,
+                      padding: 0,
+                      cursor: 'pointer',
+                      background: '#000',
+                    }}
+                  >
+                    {m.type === 'video' ? (
+                      m.posterUrl ? (
+                        <img
+                          src={m.posterUrl}
+                          alt=""
+                          style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                        />
+                      ) : (
+                        <video
+                          src={m.previewUrl}
+                          muted
+                          playsInline
+                          preload="metadata"
+                          style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                        />
+                      )
+                    ) : (
+                      <img
+                        src={m.previewUrl}
+                        alt=""
+                        style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                      />
+                    )}
+                  </button>
+                );
+              })}
             </div>
           )}
 
@@ -504,6 +573,8 @@ export function CanvasComposer({
                 fontSize: 20,
                 fontWeight: 600,
                 lineHeight: 1.25,
+                maxHeight: 'calc(1.25em * 3 + 8px)',
+                overflowY: 'auto',
                 textShadow: '0 1px 10px rgba(0,0,0,0.6)',
                 caretColor: AMBER,
                 fontFamily: 'inherit',
