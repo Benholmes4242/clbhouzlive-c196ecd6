@@ -32,7 +32,7 @@ import { FeedFollowPill } from './FeedFollowPill';
 const T100 = '#0F172A';
 const T60 = '#64748B';
 const T40 = '#94A3B8';
-const CARD = '#15171F';
+const CARD = '#FFFFFF';
 const LINE = 'rgba(15,23,42,0.07)';
 const AMBER = '#F7931E';
 const GREEN = '#16A34A';
