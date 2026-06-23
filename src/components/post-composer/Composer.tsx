@@ -357,9 +357,11 @@ export function Composer({
         style={{
           flex: 1,
           overflowY: 'auto',
-          paddingBottom: `${keyboardHeight + 72}px`,
+          WebkitOverflowScrolling: 'touch',
+          paddingBottom: `calc(${keyboardHeight}px + 64px + env(safe-area-inset-bottom, 0px) + 16px)`,
         }}
       >
+
         {/* Identity + visibility */}
         <div
           style={{
