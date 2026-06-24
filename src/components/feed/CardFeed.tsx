@@ -305,6 +305,8 @@ export const CardFeed: React.FC<CardFeedProps> = ({
             currentUserId={currentUserId}
             feedIndex={index}
           />
+          {/* Subtle inter-card seam — just-perceptible lift above ink chrome */}
+          <div aria-hidden style={{ height: 5, background: '#161E2E' }} />
         </div>
       );
     },
