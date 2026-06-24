@@ -276,16 +276,24 @@ export function LuminousCellRating({
                 flex: 1,
                 height: '100%',
                 borderRadius: radius,
-                background: 'rgba(15,23,42,0.05)',
+                background: 'rgba(15,23,42,0.04)',
                 overflow: 'hidden',
                 zIndex: 1,
-                boxShadow:
+                transform: i === activeCell ? 'scaleY(1.06)' : 'scaleY(1)',
+                boxShadow: [
                   ratio > 0
                     ? `0 0 ${hero ? 14 : 9}px ${
                         tier?.gold ? 'rgba(217,119,6,0.35)' : 'rgba(247,147,30,0.32)'
                       }`
-                    : 'none',
-                transition: active ? 'none' : 'box-shadow 160ms ease',
+                    : null,
+                  `inset 0 1.5px 3px rgba(15,23,42,${ratio > 0 ? 0.1 : 0.16})`,
+                  `inset 0 0 0 0.5px rgba(15,23,42,0.05)`,
+                ]
+                  .filter(Boolean)
+                  .join(', '),
+                transition: active
+                  ? 'transform 140ms cubic-bezier(.22,.61,.36,1)'
+                  : 'box-shadow 160ms ease, transform 140ms cubic-bezier(.22,.61,.36,1)',
               }}
             >
               <div
@@ -295,8 +303,24 @@ export function LuminousCellRating({
                   width: `${ratio * 100}%`,
                   background: ratio > 0 ? fillGradient : 'transparent',
                   transition: fillTransition,
+                  transitionDelay: active ? '0ms' : `${i * 18}ms`,
                 }}
-              />
+              >
+                <div
+                  style={{
+                    position: 'absolute',
+                    left: 3,
+                    right: 3,
+                    top: 2,
+                    height: 3,
+                    borderRadius: 2,
+                    background: 'rgba(255,255,255,0.45)',
+                    opacity: ratio > 0 ? 1 : 0,
+                    transition: 'opacity 160ms ease',
+                    pointerEvents: 'none',
+                  }}
+                />
+              </div>
             </div>
           );
         })}
