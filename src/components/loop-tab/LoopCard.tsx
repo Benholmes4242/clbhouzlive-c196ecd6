@@ -237,7 +237,10 @@ export const LoopCard = React.memo(function LoopCard({
                   <span className="text-[13px] font-bold text-white leading-none" style={{ fontFeatureSettings: '"tnum" 1', textShadow: '0 1px 4px rgba(0,0,0,0.55)' }}>
                     {post.review.rating.toFixed(1)}
                   </span>
-                  <span className="text-[10px] font-semibold uppercase text-white/85 leading-none tracking-wide" style={{ textShadow: '0 1px 4px rgba(0,0,0,0.55)' }}>
+                  <span
+                    className="text-[10px] font-semibold uppercase leading-none tracking-wide"
+                    style={{ color: LOOP_LABEL_COLOR[getRatingTier(post.review.rating)], textShadow: '0 1px 4px rgba(0,0,0,0.55)' }}
+                  >
                     {getRatingTierLabel(post.review.rating)}
                   </span>
                 </div>
