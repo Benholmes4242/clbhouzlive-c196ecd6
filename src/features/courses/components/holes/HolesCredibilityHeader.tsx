@@ -10,7 +10,7 @@ export const HolesCredibilityHeader: React.FC<Props> = ({ totalRounds }) => {
     <div
       style={{
         padding: '20px 18px 18px',
-        boxShadow: `inset 0 -1.5px 0 ${AMBER}`,
+        boxShadow: `inset 0 -1.5px 0 ${SC_ACCENT}`,
         fontFamily: FONT,
       }}
     >
