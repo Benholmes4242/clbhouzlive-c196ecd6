@@ -10,7 +10,7 @@ export const HolesCredibilityHeader: React.FC<Props> = ({ totalRounds }) => {
     <div
       style={{
         padding: '20px 18px 18px',
-        boxShadow: `inset 0 -1.5px 0 ${AMBER}`,
+        boxShadow: `inset 0 -1.5px 0 ${SC_ACCENT}`,
         fontFamily: FONT,
       }}
     >
@@ -27,7 +27,7 @@ export const HolesCredibilityHeader: React.FC<Props> = ({ totalRounds }) => {
             width: 6,
             height: 6,
             borderRadius: 999,
-            background: AMBER,
+            background: SC_ACCENT,
             display: 'inline-block',
           }}
         />
@@ -37,7 +37,7 @@ export const HolesCredibilityHeader: React.FC<Props> = ({ totalRounds }) => {
             fontWeight: 800,
             letterSpacing: '0.16em',
             textTransform: 'uppercase',
-            color: AMBER,
+            color: SC_ACCENT,
           }}
         >
           Official hole data
