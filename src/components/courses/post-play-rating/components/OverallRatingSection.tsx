@@ -85,14 +85,9 @@ const OverallRatingSection = React.memo(function OverallRatingSection({
         <span className="text-[11px] text-slate-500 tracking-[0.04em] uppercase font-medium">
           Your rating summary
         </span>
-        <span 
+        <span
           className="text-lg font-semibold uppercase tracking-wide"
-          style={{
-            ...(rating != null && rating >= 9 
-              ? { color: '#C1A84C' }
-              : { color: '#334E3D' }
-            ),
-          }}
+          style={{ color: rating != null ? ratingTextColor(rating) : '#94a3b8' }}
         >
           {getScoreTier(rating ?? 0).label}
         </span>
