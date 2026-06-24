@@ -1,5 +1,5 @@
 import React from 'react';
-import { AMBER, FONT, INK } from './_constants';
+import { FONT, INK, SC_ACCENT } from './_constants';
 
 interface Props {
   totalRounds: number;
