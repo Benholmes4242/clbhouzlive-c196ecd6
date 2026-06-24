@@ -3,6 +3,7 @@
 
 import React, { useRef, useState, useCallback, useLayoutEffect } from 'react';
 import { triggerHaptic } from '@/lib/ui/haptics';
+import { getRatingTier } from '@/lib/ratingTier';
 
 const INK = '#0F172A';
 const INK_MUTE = '#64748B';
@@ -16,13 +17,17 @@ const GOLD_TOP = '#EF9F27';
 const GOLD_DEEPER = '#854F0B';
 
 type Tier = { label: string; gold: boolean } | null;
+// Delegates to the canonical `getRatingTier` so thresholds live in one place.
 function tierFor(score: number | null): Tier {
   if (score == null) return null;
-  if (score >= 9.0) return { label: 'Exceptional', gold: true };
-  if (score >= 7.5) return { label: 'Excellent', gold: false };
-  if (score >= 6.0) return { label: 'Good', gold: false };
-  if (score >= 4.0) return { label: 'Fair', gold: false };
-  return { label: 'Poor', gold: false };
+  const tier = getRatingTier(score);
+  switch (tier) {
+    case 'EXCEPTIONAL': return { label: 'Exceptional', gold: true };
+    case 'EXCELLENT':   return { label: 'Excellent',   gold: false };
+    case 'GOOD':        return { label: 'Good',        gold: false };
+    case 'FAIR':        return { label: 'Fair',        gold: false };
+    default:            return { label: 'Poor',        gold: false };
+  }
 }
 
 const snap = (v: number) => Math.round(v * 10) / 10;

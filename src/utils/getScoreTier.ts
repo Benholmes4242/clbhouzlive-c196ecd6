@@ -12,6 +12,7 @@
  */
 
 import { getRatingTheme, type RatingTheme } from '@/lib/globalAchievementMilestoneSystem';
+import { getRatingTier } from '@/lib/ratingTier';
 
 export type ScoreTier = 'exceptional' | 'excellent' | 'good' | 'fair' | 'poor';
 
@@ -50,9 +51,12 @@ export const isGoldTier = (tier: ScoreTier | undefined): boolean =>
  */
 export function getScoreTier(score: number): ScoreTierData {
   const theme = getRatingTheme(score);
-  const tier = tierKeyMap[theme.key];
+  // Delegate tier-key derivation to the canonical `getRatingTier` so all
+  // surfaces agree on thresholds. `theme.key` is kept as a safety fallback.
+  const canonicalKey = getRatingTier(score);
+  const tier = tierKeyMap[canonicalKey] ?? tierKeyMap[theme.key];
   // True only for the Exceptional tier (≥9.0) — the sole gold tier.
-  const isExceptional = theme.key === 'EXCEPTIONAL';
+  const isExceptional = canonicalKey === 'EXCEPTIONAL';
   
   return {
     tier,
