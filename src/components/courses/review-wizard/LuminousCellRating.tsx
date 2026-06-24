@@ -51,7 +51,7 @@ export function LuminousCellRating({
   const lastTick = useRef<number>(touched ? v : -1);
 
   // Layout: heights per variant. Gap proportional.
-  const rowHeight = 32;
+  const rowHeight = 16;
   const gap = 6;
 
   // Measure cell box for true 34% squircle radius.
@@ -69,7 +69,7 @@ export function LuminousCellRating({
     return () => ro.disconnect();
   }, [gap, rowHeight]);
 
-  const radius = Math.max(2, Math.min(cellSize.w, cellSize.h) * 0.34);
+  const radius = rowHeight / 2;
 
   const commit = useCallback(
     (nv: number) => {
@@ -310,8 +310,8 @@ export function LuminousCellRating({
                     position: 'absolute',
                     left: 3,
                     right: 3,
-                    top: 2,
-                    height: 3,
+                    top: 1,
+                    height: 2,
                     borderRadius: 2,
                     background: 'rgba(255,255,255,0.45)',
                     opacity: ratio > 0 ? 1 : 0,
