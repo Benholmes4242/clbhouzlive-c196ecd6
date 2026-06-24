@@ -379,17 +379,6 @@ export function ReviewWizard({
     el.style.height = `${el.scrollHeight}px`;
   }, [wizard.state.review]);
 
-  const insertChip = useCallback(
-    (text: string) => {
-      const cur = wizard.state.review;
-      const next = cur
-        ? cur + (cur.endsWith(' ') ? '' : ' ') + text
-        : text;
-      wizard.setReview(next.slice(0, MAX_REVIEW_LENGTH));
-      setTimeout(() => taRef.current?.focus(), 50);
-    },
-    [wizard]
-  );
 
   // Mentions
   const [showMentions, setShowMentions] = useState(false);
