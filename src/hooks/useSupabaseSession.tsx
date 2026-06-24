@@ -23,11 +23,11 @@ export function useSupabaseSession() {
     }
 
     let mounted = true;
-    let initialSessionChecked = false;
-
+    let resolved = false;
 
     const applySession = (nextSession: Session | null) => {
       if (!mounted) return;
+      resolved = true;
 
       setSession(nextSession);
       setUser(nextSession?.user ?? null);
@@ -40,13 +40,13 @@ export function useSupabaseSession() {
         logSessionNone();
       }
     };
-    
+
     // Log session start once
     if (!sessionStartLogged.current) {
       sessionStartLogged.current = true;
       logSessionStart();
     }
-    
+
     // Set up auth state listener
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
       if (!mounted) return;
@@ -56,28 +56,33 @@ export function useSupabaseSession() {
         cleanupOnLogout(queryClient);
       }
 
-      // Supabase can emit an empty INITIAL_SESSION before persisted auth has
-      // been restored. Do not resolve loading from that transient null state.
-      if (event === 'INITIAL_SESSION' && !session && !initialSessionChecked) {
-        return;
-      }
-
+      // Treat every event (including INITIAL_SESSION, even with null) as
+      // authoritative. This guarantees the app never sits in a "resolving
+      // session" state when Supabase has already told us there is no session.
       applySession(session);
     });
 
     // Get initial session
     supabase.auth.getSession()
-      .then(({ data: { session } }) => {
-        initialSessionChecked = true;
-        applySession(session);
-      })
-      .catch(() => {
-        initialSessionChecked = true;
-        applySession(null);
-      });
+      .then(({ data: { session } }) => applySession(session))
+      .catch(() => applySession(null));
+
+    // Hard safety timeout: if Supabase never resolves (mobile webview /
+    // VPN / blocked websocket / corrupted storage), treat as logged-out
+    // after 8s so the app can render an auth screen or public surface
+    // instead of hanging on a skeleton forever. (Apple 2.1 fix.)
+    const SESSION_BOOT_TIMEOUT_MS = 8000;
+    const timeoutId = window.setTimeout(() => {
+      if (!mounted || resolved) return;
+      console.warn(
+        `[useSupabaseSession] session bootstrap timed out after ${SESSION_BOOT_TIMEOUT_MS}ms — proceeding as logged-out`,
+      );
+      applySession(null);
+    }, SESSION_BOOT_TIMEOUT_MS);
 
     return () => {
       mounted = false;
+      window.clearTimeout(timeoutId);
       subscription.unsubscribe();
     };
   }, [queryClient, hasQueryClient]);

@@ -310,7 +310,23 @@ const ClubhouseContent = () => {
 
   const showRehydrationSkeleton = isRehydrating;
 
-  // Guard: wait for auth to resolve before evaluating feed state
+  // Apple 2.1 safety net: never let the skeleton be the terminal state.
+  // If the feed has not produced posts within 12s, stop blocking on
+  // skeletons so the empty/error surface can render and the reviewer
+  // (or any user behind a VPN / restrictive webview) sees a usable screen.
+  const [skeletonTimedOut, setSkeletonTimedOut] = useState(false);
+  useEffect(() => {
+    if (!isLoading && posts.length > 0) {
+      setSkeletonTimedOut(false);
+      return;
+    }
+    const id = window.setTimeout(() => setSkeletonTimedOut(true), 12000);
+    return () => window.clearTimeout(id);
+  }, [isLoading, posts.length, activeTab]);
+
+  // Guard: wait for auth to resolve before evaluating feed state — but
+  // bounded by useSupabaseSession's own 8s safety timeout, so this can
+  // never hang indefinitely.
   if (authLoading) {
     return <ClubhouseSkeletonShimmer isVisible={true} isStatic={false} surface="card" />;
   }
@@ -384,7 +400,7 @@ const ClubhouseContent = () => {
       <ClubhouseSkeletonShimmer isVisible={showRehydrationSkeleton} isStatic={false} variant={posts[0]?.isReview ? 'review' : 'regular'} isVideo={posts[0]?.mediaItems?.[0]?.type === 'video'} surface="card" />
 
       {/* ═══ MAIN FEED AREA ═══ */}
-      {!isLoading && posts.length === 0 ? (
+      {((!isLoading && posts.length === 0) || (skeletonTimedOut && posts.length === 0)) ? (
         activeTab === 'friends' ? (
           <div
             className="flex flex-col w-full"
