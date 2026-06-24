@@ -10,6 +10,8 @@ interface BottomSheetProps {
   className?: string;
   style?: React.CSSProperties;
   ariaLabelledBy?: string;
+  /** 'light' (default, uses `bg-background`) or 'dark' (ink #0F172A surface + light handle). */
+  variant?: 'light' | 'dark';
 }
 
 export function BottomSheet({
@@ -20,6 +22,7 @@ export function BottomSheet({
   className = '',
   style,
   ariaLabelledBy,
+  variant = 'light',
 }: BottomSheetProps) {
   const sheetRef = useRef<HTMLDivElement>(null);
   const dragStartY = useRef<number | null>(null);
