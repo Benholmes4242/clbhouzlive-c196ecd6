@@ -853,7 +853,7 @@ export function ReviewWizard({
                                     {val != null ? val.toFixed(1) : '—'}
                                   </span>
                                 </div>
-                                <div style={{ marginTop: 4 }}>
+                                <div style={{ marginTop: 4, overflow: 'hidden', paddingBlock: 12, marginBlockEnd: -12, marginBlockStart: -8 }}>
                                   <TickScrubber
                                     value={val}
                                     onChange={(v) => wizard.setBreakdown(key, v)}
