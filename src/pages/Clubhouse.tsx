@@ -308,7 +308,10 @@ const ClubhouseContent = () => {
     });
   }, [activePost, openReviewSheet, reviewerStats]);
 
-  const showRehydrationSkeleton = isRehydrating;
+  // Only show rehydration skeleton while content is actually loading or present.
+  // Without this guard it could re-cover the terminal empty-state.
+  const showRehydrationSkeleton = isRehydrating && (isLoading || posts.length > 0);
+
 
   // Apple 2.1 safety net: never let the skeleton be the terminal state.
   // If the feed has not produced posts within 12s, stop blocking on
@@ -345,6 +348,92 @@ const ClubhouseContent = () => {
   if (authLoading) {
     return <ClubhouseSkeletonShimmer isVisible={true} isStatic={false} surface="card" />;
   }
+
+  // ── Terminal early return: feed finished loading with no content ──
+  // Covers logged-out, empty, and error cases. We render the visible
+  // sign-in/empty/error surface directly so no skeleton layer can cover it.
+  // This fixes the Apple 2.1 cold-load symptom where skeletons never
+  // resolved because hasPosts (posts.length > 0) was never true.
+  if (!isLoading && posts.length === 0) {
+    // eslint-disable-next-line no-console
+    console.info('[BootAudit][Clubhouse] terminal empty-state', {
+      t: Date.now(), hasUser: !!user, activeTab, isError: activeFeed.isError,
+    });
+    return activeTab === 'friends' ? (
+      <div
+        className="flex flex-col w-full min-h-screen"
+        style={{ background: '#15171F', paddingTop: 'calc(env(safe-area-inset-top, 0px) + 78px)' }}
+      >
+        <div className="flex flex-col items-center px-8 text-center pb-6">
+          <div className="w-14 h-14 rounded-full flex items-center justify-center mb-4" style={{ background: 'rgba(255,255,255,0.06)' }}>
+            <Users className="w-7 h-7" style={{ color: 'rgba(255,255,255,0.5)' }} />
+          </div>
+          <p className="text-[17px] font-semibold mb-1" style={{ color: '#FFFFFF' }}>
+            {!user ? 'Sign in to see your friends' : (activeFeed.isError ? 'Couldn’t load your feed' : 'No posts from friends yet')}
+          </p>
+          <p className="text-[13px] leading-relaxed mb-4" style={{ color: 'rgba(255,255,255,0.7)' }}>
+            {!user ? 'Create an account or sign in to start following golfers.' : (activeFeed.isError ? 'Tap retry to try again.' : 'Follow golfers below to start building your feed')}
+          </p>
+          {!user ? (
+            <button
+              onClick={() => navigate('/auth')}
+              style={{ background: '#F7931E', color: '#0F172A', fontWeight: 600, fontSize: 15, padding: '12px 24px', borderRadius: 12, border: 'none' }}
+            >
+              Sign in
+            </button>
+          ) : (
+            <button
+              onClick={() => activeFeed.refetch?.()}
+              style={{ background: '#0F172A', color: '#FFFFFF', fontWeight: 600, fontSize: 15, padding: '12px 24px', borderRadius: 12, border: 'none' }}
+            >
+              Retry
+            </button>
+          )}
+        </div>
+        {user && !activeFeed.isError && (
+          <SuggestedCreatorsShelf
+            userId={user?.id}
+            variant="light"
+            title="Golfers to follow"
+            showViewAll={true}
+            onViewAll={() => navigate('/golferstofollow')}
+          />
+        )}
+      </div>
+    ) : (
+      <div
+        className="flex flex-col items-center justify-center min-h-screen px-8 text-center"
+        style={{ background: '#15171F', paddingTop: 'calc(env(safe-area-inset-top, 0px) + 78px)' }}
+      >
+        <div className="w-16 h-16 rounded-full flex items-center justify-center mb-4" style={{ background: 'rgba(255,255,255,0.06)' }}>
+          <Compass className="w-8 h-8" style={{ color: 'rgba(255,255,255,0.5)' }} />
+        </div>
+        <p className="text-lg font-semibold" style={{ color: '#FFFFFF' }}>
+          {!user ? 'Sign in to see your feed' : (activeFeed.isError ? 'Couldn’t load your feed' : 'No posts to show')}
+        </p>
+        <p className="text-sm mt-2 mb-4" style={{ color: 'rgba(255,255,255,0.7)' }}>
+          {!user ? 'Create an account or sign in to get started.' : (activeFeed.isError ? 'Tap retry to try again.' : 'Check back soon for new content')}
+        </p>
+        {!user ? (
+          <button
+            onClick={() => navigate('/auth')}
+            style={{ background: '#F7931E', color: '#0F172A', fontWeight: 600, fontSize: 15, padding: '12px 24px', borderRadius: 12, border: 'none' }}
+          >
+            Sign in
+          </button>
+        ) : (
+          <button
+            onClick={() => activeFeed.refetch?.()}
+            style={{ background: '#0F172A', color: '#FFFFFF', fontWeight: 600, fontSize: 15, padding: '12px 24px', borderRadius: 12, border: 'none' }}
+          >
+            Retry
+          </button>
+        )}
+      </div>
+    );
+  }
+
+
 
 
   return (
@@ -513,8 +602,11 @@ const ClubhouseContent = () => {
           />
         </>
       ) : (
-        <ClubhouseSkeletonShimmer isVisible={true} isStatic={false} surface="card" />
+        // Guard: only render skeleton while feed is actually loading.
+        // The terminal early return above handles !isLoading && posts.length === 0.
+        <ClubhouseSkeletonShimmer isVisible={isLoading} isStatic={false} surface="card" />
       )}
+
 
       {/* ═══ COMMENTS + MORE OPTIONS ═══ */}
       {activePost && posts.length > 0 && (
