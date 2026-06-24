@@ -74,7 +74,7 @@ export const ClubhouseTabToggle = ({
                   right: 4,
                   bottom: 0,
                   height: 2,
-                  background: '#0F172A',
+                  background: '#FFFFFF',
                   borderRadius: 1,
                 }}
               />
