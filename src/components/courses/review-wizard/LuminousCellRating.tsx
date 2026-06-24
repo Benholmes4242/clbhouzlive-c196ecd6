@@ -1,12 +1,11 @@
-// LuminousCellRating — ten luminous squircle cells, tap to jump, drag to fine-tune.
-// Drop-in replacement for TickScrubber: same props, same tierFor export, same haptics.
+// LuminousCellRating — Apple-finish continuous capsule. Drop-in for TickScrubber.
+// Same props, same tierFor export, same haptics/snap/keyboard contract.
 
-import React, { useRef, useState, useCallback, useLayoutEffect } from 'react';
+import React, { useRef, useState, useCallback } from 'react';
 import { triggerHaptic } from '@/lib/ui/haptics';
 import { getRatingTier, HERO_NUMBER_STYLE, TIER_LABEL_STYLE, ratingTextColor, rampForRating } from '@/lib/ratingTier';
 
 const INK = '#0F172A';
-const INK_MUTE = '#64748B';
 const INK_FAINT = '#94A3B8';
 
 type Tier = { label: string; gold: boolean } | null;
@@ -33,8 +32,6 @@ interface LuminousCellRatingProps {
   ariaLabel?: string;
 }
 
-const CELL_COUNT = 10;
-
 export function LuminousCellRating({
   value,
   onChange,
@@ -44,32 +41,14 @@ export function LuminousCellRating({
   const rowRef = useRef<HTMLDivElement>(null);
   const dragging = useRef(false);
   const [active, setActive] = useState(false);
-  const [cellSize, setCellSize] = useState({ w: 0, h: 0 });
   const touched = value != null;
   const v = value ?? 0;
   const tier = tierFor(value);
   const lastTick = useRef<number>(touched ? v : -1);
 
-  // Layout: heights per variant. Gap proportional.
-  const rowHeight = 16;
-  const gap = 6;
-
-  // Measure cell box for true 34% squircle radius.
-  useLayoutEffect(() => {
-    const el = rowRef.current;
-    if (!el) return;
-    const measure = () => {
-      const w = el.clientWidth;
-      const cellW = (w - gap * (CELL_COUNT - 1)) / CELL_COUNT;
-      setCellSize({ w: cellW, h: rowHeight });
-    };
-    measure();
-    const ro = new ResizeObserver(measure);
-    ro.observe(el);
-    return () => ro.disconnect();
-  }, [gap, rowHeight]);
-
+  const rowHeight = 30;
   const radius = rowHeight / 2;
+  const fillPct = touched ? v * 10 : 0;
 
   const commit = useCallback(
     (nv: number) => {
@@ -132,28 +111,20 @@ export function LuminousCellRating({
 
   const ramp = rampForRating(v);
   const tierKey = getRatingTier(v);
-  const fillGradient = `linear-gradient(180deg, ${ramp.hi} 0%, ${ramp.mid} 22%, ${ramp.lo} 100%)`;
-  const glowSeam = tierKey === 'EXCEPTIONAL'
-    ? 'rgba(255,194,61,0.55)'
-    : (tierKey === 'EXCELLENT' || tierKey === 'GOOD')
-    ? 'rgba(247,147,30,0.55)'
-    : 'rgba(138,149,164,0.55)';
-  const glowCell = tierKey === 'EXCEPTIONAL'
-    ? 'rgba(255,194,61,0.32)'
-    : (tierKey === 'EXCELLENT' || tierKey === 'GOOD')
-    ? 'rgba(247,147,30,0.28)'
-    : 'rgba(138,149,164,0.28)';
-  const fillTransition = active ? 'none' : 'width 160ms cubic-bezier(.22,.61,.36,1), background 160ms';
-  const activeCell = active && touched ? Math.ceil(v) - 1 : -1;
-
-  // For each cell: 0..1 fill ratio. value*10 ∈ [0,10]; cell i (0..9) is filled for value > i.
-  const cellFill = (i: number): number => {
-    if (!touched) return 0;
-    const score10 = v; // 0..10
-    if (score10 >= i + 1) return 1;
-    if (score10 <= i) return 0;
-    return score10 - i; // 0..1
-  };
+  const glowColor =
+    tierKey === 'EXCEPTIONAL'
+      ? 'rgba(255,194,61,0.9)'
+      : tierKey === 'EXCELLENT' || tierKey === 'GOOD'
+      ? 'rgba(247,147,30,0.85)'
+      : 'rgba(138,149,164,0.8)';
+  const restGlow = tierKey === 'EXCEPTIONAL' ? 0.22 : 0;
+  const glowOpacity = active ? 0.6 : restGlow;
+  const fillTransition = active
+    ? 'none'
+    : 'width 200ms cubic-bezier(.22,.61,.36,1), background 180ms ease';
+  const glowTransition = active
+    ? 'none'
+    : 'opacity 220ms ease, width 200ms cubic-bezier(.22,.61,.36,1)';
 
   return (
     <div>
@@ -166,14 +137,14 @@ export function LuminousCellRating({
                 fontSize: 66,
                 lineHeight: 1,
                 color: touched ? ratingTextColor(v) : 'rgba(15,23,42,0.16)',
-                transform: active ? 'scale(1.04)' : 'scale(1)',
+                transform: active ? 'scale(1.03)' : 'scale(1)',
                 transition: 'transform 140ms ease, color 160ms ease',
                 display: 'inline-block',
               }}
             >
               {touched ? v.toFixed(1) : '0.0'}
             </span>
-            <span style={{ fontSize: 17, fontWeight: 700, color: INK_FAINT }}>/10</span>
+            <span style={{ fontSize: 15, fontWeight: 500, color: 'rgba(148,163,184,0.7)' }}>/10</span>
           </div>
           <div style={{ height: 18, marginTop: 5 }}>
             {tier ? (
@@ -219,110 +190,111 @@ export function LuminousCellRating({
         onKeyDown={onKeyDown}
         style={{
           position: 'relative',
-          display: 'flex',
-          gap,
           height: rowHeight,
           marginTop: hero ? 8 : 0,
+          borderRadius: radius,
+          background: 'rgba(118,118,128,0.12)',
+          boxShadow: 'inset 0 0 0 0.5px rgba(15,23,42,0.05)',
+          overflow: 'hidden',
           touchAction: 'none',
           userSelect: 'none',
           cursor: active ? 'grabbing' : 'pointer',
           outline: 'none',
         }}
       >
-        {/* Seam-glow underlay: between consecutive filled cells, render a soft radial. */}
-        {touched && cellSize.w > 0 && (
+        {/* Bloom glow behind fill */}
+        <div
+          aria-hidden
+          style={{
+            position: 'absolute',
+            top: 0,
+            bottom: 0,
+            left: 0,
+            width: `${fillPct}%`,
+            filter: 'blur(12px)',
+            opacity: glowOpacity,
+            background: `linear-gradient(90deg, transparent 0%, ${glowColor} 100%)`,
+            transition: glowTransition,
+            pointerEvents: 'none',
+            zIndex: 0,
+          }}
+        />
+
+        {/* Continuous fill */}
+        <div
+          style={{
+            position: 'absolute',
+            left: 0,
+            top: 0,
+            bottom: 0,
+            width: `${fillPct}%`,
+            background: `linear-gradient(90deg, ${ramp.lo} 0%, ${ramp.mid} 70%, ${ramp.hi} 100%)`,
+            transition: fillTransition,
+            zIndex: 1,
+            overflow: 'hidden',
+          }}
+        >
+          {/* Top sheen */}
           <div
             aria-hidden
             style={{
               position: 'absolute',
-              inset: `-${Math.round(rowHeight * 0.25)}px 0`,
+              inset: 0,
+              background:
+                'linear-gradient(180deg, rgba(255,255,255,0.22) 0%, rgba(255,255,255,0) 45%)',
               pointerEvents: 'none',
-              zIndex: 0,
-              filter: 'blur(10px)',
-              opacity: 0.7,
-              transition: active ? 'none' : 'opacity 160ms ease',
             }}
-          >
-            {Array.from({ length: CELL_COUNT - 1 }).map((_, i) => {
-              const leftFilled = cellFill(i) >= 1;
-              const rightFilled = cellFill(i + 1) > 0;
-              if (!leftFilled || !rightFilled) return null;
-              const seamX =
-                (i + 1) * cellSize.w + i * gap + gap / 2;
-              return (
-                <div
-                  key={i}
-                  style={{
-                    position: 'absolute',
-                    left: seamX - rowHeight * 0.6,
-                    top: 0,
-                    bottom: 0,
-                    width: rowHeight * 1.2,
-                    background: `radial-gradient(ellipse at center, ${glowSeam} 0%, transparent 65%)`,
-                  }}
-                />
-              );
-            })}
-          </div>
-        )}
-
-        {Array.from({ length: CELL_COUNT }).map((_, i) => {
-          const ratio = cellFill(i);
-          return (
+          />
+          {/* Leading edge highlight */}
+          {fillPct > 1 && (
             <div
-              key={i}
+              aria-hidden
               style={{
-                position: 'relative',
-                flex: 1,
-                height: '100%',
-                borderRadius: radius,
-                background: 'rgba(15,23,42,0.04)',
-                overflow: 'hidden',
-                zIndex: 1,
-                transform: i === activeCell ? 'scaleY(1.06)' : 'scaleY(1)',
-                boxShadow: [
-                  ratio > 0
-                    ? `0 0 ${hero ? 14 : 6}px ${glowCell}`
-                    : null,
-                  `inset 0 1.5px 3px rgba(15,23,42,${ratio > 0 ? 0.1 : 0.16})`,
-                  `inset 0 0 0 0.5px rgba(15,23,42,0.05)`,
-                ]
-                  .filter(Boolean)
-                  .join(', '),
-                transition: active
-                  ? 'transform 140ms cubic-bezier(.22,.61,.36,1)'
-                  : 'box-shadow 160ms ease, transform 140ms cubic-bezier(.22,.61,.36,1)',
+                position: 'absolute',
+                top: '18%',
+                bottom: '18%',
+                right: 0,
+                width: 2,
+                borderRadius: 2,
+                background: 'rgba(255,255,255,0.5)',
+                filter: active ? 'blur(0.5px)' : 'none',
+                pointerEvents: 'none',
               }}
-            >
+            />
+          )}
+        </div>
+
+        {/* Whole-number notch overlay */}
+        <div
+          aria-hidden
+          style={{
+            position: 'absolute',
+            inset: 0,
+            borderRadius: radius,
+            overflow: 'hidden',
+            pointerEvents: 'none',
+            zIndex: 2,
+          }}
+        >
+          {Array.from({ length: 9 }).map((_, i) => {
+            const x = ((i + 1) / 10) * 100;
+            const filled = fillPct >= x;
+            return (
               <div
+                key={i}
                 style={{
                   position: 'absolute',
-                  inset: 0,
-                  width: `${ratio * 100}%`,
-                  background: ratio > 0 ? fillGradient : 'transparent',
-                  transition: active
-                    ? 'none'
-                    : `width 160ms cubic-bezier(.22,.61,.36,1) ${i * 18}ms, background 160ms ${i * 18}ms`,
+                  top: '26%',
+                  bottom: '26%',
+                  left: `${x}%`,
+                  width: 1,
+                  background: filled ? 'rgba(255,255,255,0.30)' : 'rgba(15,23,42,0.07)',
+                  transition: 'background 180ms ease',
                 }}
-              >
-                <div
-                  style={{
-                    position: 'absolute',
-                    left: 3,
-                    right: 3,
-                    top: 1,
-                    height: 2,
-                    borderRadius: 2,
-                    background: 'rgba(255,255,255,0.45)',
-                    opacity: ratio > 0 ? 1 : 0,
-                    transition: 'opacity 160ms ease',
-                    pointerEvents: 'none',
-                  }}
-                />
-              </div>
-            </div>
-          );
-        })}
+              />
+            );
+          })}
+        </div>
       </div>
     </div>
   );
