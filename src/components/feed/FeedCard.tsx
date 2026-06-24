@@ -393,7 +393,7 @@ const FeedCardImpl: React.FC<FeedCardProps> = ({
             return (
               <button
                 type="button"
-                onClick={(e) => { e.stopPropagation(); onReviewTap?.(post); }}
+                onClick={handleReadReview}
                 style={{
                   position: 'relative', zIndex: 3,
                   background: 'transparent', border: 'none', padding: 0, cursor: 'pointer',
