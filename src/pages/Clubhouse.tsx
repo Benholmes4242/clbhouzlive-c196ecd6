@@ -355,7 +355,7 @@ const ClubhouseContent = () => {
       fixedHeight
       hasBottomNav={false}
       style={{ 
-        "--bg-page": "#F8FAFC", 
+        "--bg-page": "#15171F", 
         position: 'relative', 
         isolation: 'isolate', 
         zIndex: 0
