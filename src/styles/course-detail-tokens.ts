@@ -108,13 +108,13 @@ export const courseDetailTokens = {
   },
 } as const;
 
-// Tier gradient mapping for distribution bars - AMBER FOR EXCEPTIONAL ONLY (visual stays unified amber)
+// Tier gradient mapping for distribution bars — graduated grey → amber → gold ramp
 export const tierGradients: Record<string, string> = {
-  Exceptional: 'bg-gradient-to-r from-[#f59e0b] to-[#fbbf24]',
-  Excellent: 'bg-gradient-to-r from-[#f59e0b] to-[#fbbf24]',
-  Good: 'bg-gradient-to-r from-[#f59e0b] to-[#fbbf24]',
-  Fair: 'bg-gradient-to-r from-[#f59e0b] to-[#fbbf24]',
-  Poor: 'bg-gradient-to-r from-[#f59e0b] to-[#fbbf24]',
+  Exceptional: 'bg-gradient-to-r from-[#FFC23D] to-[#FFE08A]',
+  Excellent: 'bg-gradient-to-r from-[#F7931E] to-[#FAC775]',
+  Good: 'bg-gradient-to-r from-[#F7931E] to-[#FAC775]',
+  Fair: 'bg-gradient-to-r from-[#8A95A4] to-[#AEB6C2]',
+  Poor: 'bg-gradient-to-r from-[#8A95A4] to-[#AEB6C2]',
 };
 
 export type TierKey = keyof typeof courseDetailTokens.tiers;
