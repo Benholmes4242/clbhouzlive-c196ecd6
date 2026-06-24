@@ -2,8 +2,23 @@ import React from 'react';
 import { CourseRatingAggregate } from '@/hooks/useCourseRatingAggregates';
 import { UserCourseRating } from '@/hooks/useUserCourseRating';
 import { RatingTierDistributionData } from '@/components/courses/review/RatingTierDistribution';
-import { getRatingTier } from '@/lib/ratingTier';
+import {
+  getRatingTier,
+  HERO_NUMBER_STYLE,
+  TIER_LABEL_STYLE,
+  ratingTextColor,
+  rampForRating,
+} from '@/lib/ratingTier';
 import { AMBER, HAIRLINE_INK_7, INK, INK_FAINT, INK_MUTE, SURFACE } from '@/features/courses/_shared/tokens';
+
+// Representative score per distribution tier — drives bar colour via rampForRating
+const TIER_REP_SCORE: Record<string, number> = {
+  exceptional: 9.5,
+  excellent: 8.0,
+  good: 6.5,
+  fair: 5.0,
+  poor: 2.0,
+};
 
 interface CommunityScoreCardProps {
   courseId: string;
@@ -65,10 +80,8 @@ const ScoreRing: React.FC<{ score: number; size?: number }> = ({ score, size = 5
           alignItems: 'center',
           justifyContent: 'center',
           fontSize: 13,
-          fontWeight: 900,
-          color: '#0F172A',
-          letterSpacing: '-0.02em',
-          fontVariantNumeric: 'tabular-nums',
+          ...HERO_NUMBER_STYLE,
+          color: ratingTextColor(score),
         }}
       >
         {score.toFixed(1)}
@@ -170,11 +183,9 @@ const CommunityScoreCard: React.FC<CommunityScoreCardProps> = ({
           <span
             style={{
               fontSize: 58,
-              fontWeight: 900,
-              color: INK,
-              letterSpacing: '-0.05em',
+              ...HERO_NUMBER_STYLE,
+              color: ratingTextColor(communityAverage),
               lineHeight: 1,
-              fontVariantNumeric: 'tabular-nums',
             }}
           >
             {formatScore(communityAverage)}
@@ -185,7 +196,7 @@ const CommunityScoreCard: React.FC<CommunityScoreCardProps> = ({
         </div>
         <div style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', alignItems: 'flex-start', gap: 7 }}>
           <div>
-            <div style={{ fontSize: 12, fontWeight: 800, color: AMBER, letterSpacing: '0.14em', textTransform: 'uppercase' as const }}>
+            <div style={{ fontSize: 12, ...TIER_LABEL_STYLE, color: ratingTextColor(communityAverage) }}>
               {tierLabel}
             </div>
             <div style={{ fontSize: 11.5, color: INK_FAINT, marginTop: 2 }}>
@@ -230,7 +241,12 @@ const CommunityScoreCard: React.FC<CommunityScoreCardProps> = ({
                   style={{
                     height: '100%',
                     width: `${pct}%`,
-                    background: has ? 'linear-gradient(90deg, #F7931E, #FFB347)' : 'transparent',
+                    background: has
+                      ? (() => {
+                          const ramp = rampForRating(TIER_REP_SCORE[key as string] ?? 0);
+                          return `linear-gradient(90deg, ${ramp.lo}, ${ramp.hi})`;
+                        })()
+                      : 'transparent',
                     borderRadius: 4,
                     transition: 'width 0.5s ease',
                   }}
