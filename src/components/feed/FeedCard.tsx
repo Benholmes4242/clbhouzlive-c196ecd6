@@ -15,7 +15,7 @@
  * (most-in-view card). Only one inline video plays at a time across the
  * whole feed; tapping any media opens the immersive `FullscreenFeedOverlay`.
  */
-import React, { useMemo } from 'react';
+import React, { useMemo, useState } from 'react';
 import { Heart, MapPin, MessageCircle, Share } from 'lucide-react';
 import { PostOwnerMenu } from '@/components/posts/PostOwnerMenu';
 import { useManageableBusinessIds } from '@/hooks/useManageableBusinessIds';
@@ -118,6 +118,7 @@ const FeedCardImpl: React.FC<FeedCardProps> = ({
   currentUserId,
   feedIndex,
 }) => {
+  const [captionExpanded, setCaptionExpanded] = useState(false);
   const mountFollowPill =
     !!onFollow &&
     post.actorType === 'personal' &&
@@ -301,21 +302,49 @@ const FeedCardImpl: React.FC<FeedCardProps> = ({
         const body = post.caption || (post.isReview ? post.review?.reviewText ?? '' : '');
         if (!body) return null;
         return (
-          <div style={{ padding: '6px 14px 10px', position: 'relative', zIndex: 2 }}>
+          <div style={{ padding: '0px 14px 10px', position: 'relative', zIndex: 2 }}>
             <div
               style={{
                 fontSize: 14,
                 lineHeight: 1.4,
                 color: T100,
-                display: '-webkit-box',
-                WebkitLineClamp: 3,
-                WebkitBoxOrient: 'vertical',
-                overflow: 'hidden',
-                textOverflow: 'ellipsis',
+                ...(captionExpanded
+                  ? {}
+                  : {
+                      display: '-webkit-box',
+                      WebkitLineClamp: 3,
+                      WebkitBoxOrient: 'vertical',
+                      overflow: 'hidden',
+                      textOverflow: 'ellipsis',
+                    }),
               }}
             >
               {body}
+              {captionExpanded && (
+                <button
+                  type="button"
+                  onClick={(e) => { e.stopPropagation(); setCaptionExpanded(false); }}
+                  style={{
+                    background: 'transparent', border: 'none', padding: 0, marginLeft: 6,
+                    color: T60, fontSize: 14, fontWeight: 600, cursor: 'pointer',
+                  }}
+                >
+                  less
+                </button>
+              )}
             </div>
+            {!captionExpanded && (
+              <button
+                type="button"
+                onClick={(e) => { e.stopPropagation(); setCaptionExpanded(true); }}
+                style={{
+                  background: 'transparent', border: 'none', padding: 0, marginTop: 2,
+                  color: T60, fontSize: 14, fontWeight: 600, cursor: 'pointer',
+                }}
+              >
+                more
+              </button>
+            )}
           </div>
         );
       })()}
