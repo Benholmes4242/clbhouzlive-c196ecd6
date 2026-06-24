@@ -15,7 +15,7 @@
  * (most-in-view card). Only one inline video plays at a time across the
  * whole feed; tapping any media opens the immersive `FullscreenFeedOverlay`.
  */
-import React, { useMemo } from 'react';
+import React, { useMemo, useState } from 'react';
 import { Heart, MapPin, MessageCircle, Share } from 'lucide-react';
 import { PostOwnerMenu } from '@/components/posts/PostOwnerMenu';
 import { useManageableBusinessIds } from '@/hooks/useManageableBusinessIds';

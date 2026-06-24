@@ -1,13 +1,13 @@
 // MediaStage — renders a single media item with a blur-fill background extension
 // when the sharp media doesn't fully fill the frame box. Used by both the embedded
-// Composer card and the focused MediaEditor stage. Charcoal #15171F surface.
+// Composer card and the focused MediaEditor stage. Charcoal #0F172A surface.
 
 import React, { useLayoutEffect, useRef, useState } from 'react';
 import { Volume2, VolumeX, Play } from 'lucide-react';
 import type { FrameId } from './FrameChooser';
 import { FRAMES } from './FrameChooser';
 
-export const CHARCOAL = '#15171F';
+export const CHARCOAL = '#0F172A';
 
 export interface MediaStageItem {
   id: string;
