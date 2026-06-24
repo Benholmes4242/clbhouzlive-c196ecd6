@@ -1,4 +1,4 @@
-import React, { Suspense, lazy, useEffect, useLayoutEffect, useMemo, useState } from "react";
+import React, { Suspense, lazy, useEffect, useLayoutEffect, useMemo } from "react";
 import { usePageTracking } from '@/hooks/usePageTracking';
 import { MessagingProvider } from '@/contexts/MessagingContext';
 
@@ -90,7 +90,7 @@ import { KeepAliveOutlet } from '@/components/keep-alive/KeepAliveOutlet';
 // Import wrapped components with explicit variants
 import ClubhouseWrapped from "./pages/ClubhouseWrapped";
 import BetaGatePage from "./pages/BetaGatePage";
-import { detectMedianBridge } from "./uploads/medianBridge";
+
 import { useSupabaseSession } from "@/hooks/useSupabaseSession";
 
 // Gate is platform-based: native app or approved preview only. Desktop/mobile web → coming-soon.
