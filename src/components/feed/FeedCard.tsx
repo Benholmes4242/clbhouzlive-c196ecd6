@@ -33,10 +33,10 @@ import { FeedFollowPill } from './FeedFollowPill';
 import { FeedActorPicker, type FeedActorPickerValue } from './FeedActorPicker';
 import type { ActiveActor } from '@/types/actor';
 
-// Full-bleed ink chrome — one ink (#0F172A) across the app: tab underline,
-// primary text base, and the feed card surface all share this token. Text
-// constants flip to light-on-dark; LINE becomes a white hairline.
-const CARD = '#0F172A';
+// Full-bleed charcoal chrome — one charcoal (#15171F) across the app: tab
+// underline, primary text base, and the feed card surface all share this token.
+// Text constants flip to light-on-dark; LINE becomes a white hairline.
+const CARD = '#15171F';
 const T100 = '#F8FAFC';
 const T60 = 'rgba(248,250,252,0.65)';
 const T40 = 'rgba(248,250,252,0.45)';
