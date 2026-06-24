@@ -41,3 +41,66 @@ export function getRatingTierLabel(rating: number | null | undefined): string {
     .map((w) => w.charAt(0) + w.slice(1).toLowerCase())
     .join(' ');
 }
+
+// ═══════════════════════════════════════════════════════════════════════════
+// Unified rating design tokens (Phase 1 — shared foundation)
+// Use these across the review wizard, course detail, fullscreen media,
+// and feed so every rating expression speaks the same visual language.
+// ═══════════════════════════════════════════════════════════════════════════
+
+/**
+ * Graduated tier ramps (hi → mid → lo) used for cell fills, bars, and
+ * gradient surfaces tied to a rating value.
+ *  - grey:  Poor / Fair (< 6.0)
+ *  - amber: Good / Excellent (6.0 – 8.9)
+ *  - gold:  Exceptional (≥ 9.0) — the reward state, visibly brighter
+ */
+export const RATING_RAMPS = {
+  grey: { hi: '#AEB6C2', mid: '#8A95A4', lo: '#677280' },
+  amber: { hi: '#FAC775', mid: '#F7931E', lo: '#D97706' },
+  gold: { hi: '#FFE08A', mid: '#FFC23D', lo: '#F7931E' },
+} as const;
+
+export type RatingRamp = (typeof RATING_RAMPS)[keyof typeof RATING_RAMPS];
+
+/** Pick the ramp for a rating value via the canonical tier function. */
+export function rampForRating(rating: number | null | undefined): RatingRamp {
+  const tier = getRatingTier(rating);
+  if (tier === 'EXCEPTIONAL') return RATING_RAMPS.gold;
+  if (tier === 'EXCELLENT' || tier === 'GOOD') return RATING_RAMPS.amber;
+  return RATING_RAMPS.grey;
+}
+
+/**
+ * Hero / tier-label text colour. Single rule applied everywhere a rating
+ * number or tier label is shown.
+ */
+export function ratingTextColor(rating: number | null | undefined): string {
+  const tier = getRatingTier(rating);
+  if (tier === 'EXCEPTIONAL') return '#F7931E';
+  if (tier === 'EXCELLENT' || tier === 'GOOD') return '#D97706';
+  return '#64748B';
+}
+
+/**
+ * Shared hero-number typography. Spread onto the style prop of any score
+ * number ≥ ~40px so weight, spacing, and font feel identical across surfaces.
+ * Size stays per-surface. Notably: NO `tabular-nums` — it cramps the decimal.
+ */
+export const HERO_NUMBER_STYLE = {
+  fontWeight: 800,
+  letterSpacing: '-0.01em',
+  fontVariantNumeric: 'normal',
+  fontFamily: 'inherit',
+} as const;
+
+/**
+ * Tier-label typography (e.g. "EXCEPTIONAL"). Pair with `ratingTextColor`
+ * for colour. Uppercase rendering is the caller's responsibility.
+ */
+export const TIER_LABEL_STYLE = {
+  fontWeight: 800,
+  letterSpacing: '0.14em',
+  textTransform: 'uppercase',
+  fontFamily: 'inherit',
+} as const;
