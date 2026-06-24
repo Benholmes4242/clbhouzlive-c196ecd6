@@ -24,6 +24,7 @@ import { canManagePost } from '@/lib/canManagePost';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { getRatingTier, getRatingTierLabel } from '@/lib/ratingTier';
 import { formatRatingValue } from '@/utils/formatters';
+import { useActiveActor } from '@/context/ActiveActorContext';
 
 import type { FeedPost } from '@/components/media-system/types/media';
 import { InlineVideo } from './InlineVideo';
