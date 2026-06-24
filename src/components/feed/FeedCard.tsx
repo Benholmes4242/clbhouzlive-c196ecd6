@@ -340,7 +340,7 @@ const FeedCardImpl: React.FC<FeedCardProps> = ({
           onClick={() => onProfile(post)}
           style={{ background: 'transparent', border: 'none', padding: 0, cursor: 'pointer' }}
         >
-          <SquircleAvatar src={post.avatarUrl} alt={post.displayName} size={34} hairlineRing />
+          <SquircleAvatar src={post.avatarUrl} alt={post.displayName} size={34} hideRing />
         </button>
         <div style={{ minWidth: 0, flex: 1 }}>
           <button
@@ -435,6 +435,11 @@ const FeedCardImpl: React.FC<FeedCardProps> = ({
           )}
         </div>
       </div>
+
+      {/* Empty-caption spacer: give the header breathing room when no caption block renders */}
+      {!(post.caption || (post.isReview && post.review?.reviewText)) && (
+        <div aria-hidden style={{ height: 8 }} />
+      )}
 
       {/* Caption — review text above media, overlapping the ghost numeral's lower edge */}
       <CaptionBlock
@@ -603,7 +608,7 @@ const FeedCardImpl: React.FC<FeedCardProps> = ({
           </div>
         );
         return (
-          <div style={{ padding: '10px 14px 0' }}>
+          <div style={{ padding: '10px 14px 10px' }}>
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8 }}>
               {nameEl}
               {pill}
