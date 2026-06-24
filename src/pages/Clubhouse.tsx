@@ -308,7 +308,10 @@ const ClubhouseContent = () => {
     });
   }, [activePost, openReviewSheet, reviewerStats]);
 
-  const showRehydrationSkeleton = isRehydrating;
+  // Only show rehydration skeleton while content is actually loading or present.
+  // Without this guard it could re-cover the terminal empty-state.
+  const showRehydrationSkeleton = isRehydrating && (isLoading || posts.length > 0);
+
 
   // Apple 2.1 safety net: never let the skeleton be the terminal state.
   // If the feed has not produced posts within 12s, stop blocking on
