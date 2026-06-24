@@ -102,6 +102,7 @@ export function ReviewWizard({
   const [showCourseSearch, setShowCourseSearch] = useState(false);
   const [activeCourse, setActiveCourse] = useState<ReviewWizardCourse | null>(course);
   const [sharedPostId, setSharedPostId] = useState<string | null>(null);
+  const [verdictFocused, setVerdictFocused] = useState(false);
   const autoShareAttempted = useRef(false);
   const previousRatingRef = useRef<number | null>(existingRating?.rating ?? null);
   const stablePreviousRating = previousRatingRef.current;
