@@ -72,14 +72,6 @@ const BREAKDOWNS: Array<{ key: keyof ReviewBreakdowns; label: string; desc: stri
   { key: 'facilities', label: 'Practice Facilities', desc: 'Range, putting and short game' },
 ];
 
-const CHIPS: Array<{ label: string; text: string }> = [
-  { label: 'Best holes', text: 'The standout holes were ' },
-  { label: 'Conditions', text: 'The course condition was ' },
-  { label: 'Value', text: 'For value, ' },
-  { label: 'The views', text: 'The views were ' },
-  { label: 'Pace of play', text: 'Pace of play was ' },
-  { label: 'A tip', text: 'A tip for visitors: ' },
-];
 
 /* ── Component ────────────────────────────────────────────────────────────── */
 
@@ -102,6 +94,7 @@ export function ReviewWizard({
   const [showCourseSearch, setShowCourseSearch] = useState(false);
   const [activeCourse, setActiveCourse] = useState<ReviewWizardCourse | null>(course);
   const [sharedPostId, setSharedPostId] = useState<string | null>(null);
+  const [verdictFocused, setVerdictFocused] = useState(false);
   const autoShareAttempted = useRef(false);
   const previousRatingRef = useRef<number | null>(existingRating?.rating ?? null);
   const stablePreviousRating = previousRatingRef.current;
@@ -386,17 +379,6 @@ export function ReviewWizard({
     el.style.height = `${el.scrollHeight}px`;
   }, [wizard.state.review]);
 
-  const insertChip = useCallback(
-    (text: string) => {
-      const cur = wizard.state.review;
-      const next = cur
-        ? cur + (cur.endsWith(' ') ? '' : ' ') + text
-        : text;
-      wizard.setReview(next.slice(0, MAX_REVIEW_LENGTH));
-      setTimeout(() => taRef.current?.focus(), 50);
-    },
-    [wizard]
-  );
 
   // Mentions
   const [showMentions, setShowMentions] = useState(false);
@@ -773,17 +755,7 @@ export function ReviewWizard({
                             textTransform: 'uppercase',
                           }}
                         >
-                          Add category detail{' '}
-                          <span
-                            style={{
-                              textTransform: 'none',
-                              letterSpacing: 0,
-                              fontWeight: 700,
-                              color: INK_FAINT,
-                            }}
-                          >
-                            · optional
-                          </span>
+                          Add category detail
                         </span>
                         <span style={{ display: 'inline-flex', alignItems: 'center', gap: 7 }}>
                           {setCount > 0 && (
@@ -879,126 +851,109 @@ export function ReviewWizard({
                           textTransform: 'uppercase',
                         }}
                       >
-                        Your verdict{' '}
-                        <span
-                          style={{
-                            textTransform: 'none',
-                            letterSpacing: 0,
-                            fontWeight: 700,
-                          }}
-                        >
-                          · optional
-                        </span>
+                        Your verdict
                       </span>
                     </div>
-                    <textarea
-                      ref={taRef}
-                      value={wizard.state.review}
-                      onChange={handleReviewChange}
-                      placeholder="What stood out? Best holes, conditions, the welcome…"
-                      style={{
-                        width: '100%',
-                        boxSizing: 'border-box',
-                        border: 'none',
-                        outline: 'none',
-                        resize: 'none',
-                        padding: '4px 16px 8px',
-                        fontSize: 16,
-                        lineHeight: 1.45,
-                        color: INK,
-                        background: 'transparent',
-                        minHeight: 64,
-                        fontFamily: 'inherit',
-                        overflow: 'hidden',
-                        caretColor: AMBER,
-                      }}
-                    />
-
-                    {/* Prompt chips */}
                     <div
+                      onClick={() => taRef.current?.focus()}
                       style={{
-                        display: 'flex',
-                        gap: 8,
-                        overflowX: 'auto',
-                        padding: '2px 16px 10px',
-                        scrollbarWidth: 'none',
+                        margin: '0 16px',
+                        border: `1px solid ${
+                          verdictFocused ? 'rgba(247,147,30,0.55)' : HAIR
+                        }`,
+                        borderRadius: 16,
+                        background: SURFACE,
+                        padding: 12,
+                        minHeight: 96,
+                        cursor: 'text',
+                        transition: 'border-color 140ms ease, box-shadow 140ms ease',
+                        boxShadow: verdictFocused
+                          ? '0 0 0 3px rgba(247,147,30,0.10)'
+                          : 'none',
                       }}
                     >
-                      {CHIPS.map((c) => (
-                        <button
-                          key={c.label}
-                          onClick={() => insertChip(c.text)}
-                          style={{
-                            flexShrink: 0,
-                            padding: '7px 13px',
-                            borderRadius: 18,
-                            border: `1px solid ${HAIR}`,
-                            background: SURFACE,
-                            fontSize: 12.5,
-                            fontWeight: 700,
-                            color: INK_MUTE,
-                            cursor: 'pointer',
-                          }}
-                        >
-                          {c.label}
-                        </button>
-                      ))}
-                    </div>
-
-                    {/* Voice mic */}
-                    {SpeechRecognitionClass && (
-                      <div
+                      <textarea
+                        ref={taRef}
+                        value={wizard.state.review}
+                        onChange={handleReviewChange}
+                        onFocus={() => setVerdictFocused(true)}
+                        onBlur={() => setVerdictFocused(false)}
+                        placeholder="What stood out? Best holes, conditions, the welcome…"
                         style={{
-                          display: 'flex',
-                          alignItems: 'center',
-                          gap: 10,
-                          padding: '0 16px 10px',
+                          width: '100%',
+                          boxSizing: 'border-box',
+                          border: 'none',
+                          outline: 'none',
+                          resize: 'none',
+                          padding: 0,
+                          fontSize: 16,
+                          lineHeight: 1.45,
+                          color: INK,
+                          background: 'transparent',
+                          minHeight: 64,
+                          fontFamily: 'inherit',
+                          overflow: 'hidden',
+                          caretColor: AMBER,
                         }}
-                      >
-                        <button
-                          type="button"
-                          onClick={() =>
-                            voiceState === 'listening' ? stopListening() : startListening()
-                          }
-                          aria-label={voiceState === 'listening' ? 'Stop voice input' : 'Voice input'}
+                      />
+
+                      {/* Voice mic */}
+                      {SpeechRecognitionClass && (
+                        <div
                           style={{
-                            width: 38,
-                            height: 38,
-                            borderRadius: '50%',
                             display: 'flex',
                             alignItems: 'center',
-                            justifyContent: 'center',
-                            border: 'none',
-                            cursor: 'pointer',
-                            background:
-                              voiceState === 'listening'
-                                ? 'rgba(239,68,68,0.12)'
-                                : voiceState === 'processing'
-                                ? 'rgba(247,147,30,0.10)'
-                                : CHIP,
-                            color:
-                              voiceState === 'listening'
-                                ? '#EF4444'
-                                : voiceState === 'processing'
-                                ? AMBER
-                                : INK_MUTE,
+                            gap: 10,
+                            marginTop: 8,
                           }}
                         >
-                          {voiceState === 'listening' ? (
-                            <Square size={14} fill="#EF4444" color="#EF4444" />
-                          ) : voiceState === 'processing' ? (
-                            <RotateCw size={16} className="animate-spin" />
-                          ) : (
-                            <Mic size={16} />
-                          )}
-                        </button>
-                        <span style={{ fontSize: 12, color: INK_MUTE }}>
-                          {voiceState === 'listening'
-                            ? 'Listening… tap to stop'
-                            : 'Tap mic to speak'}
-                        </span>
-                      </div>
-                    )}
+                          <button
+                            type="button"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              voiceState === 'listening' ? stopListening() : startListening();
+                            }}
+                            aria-label={voiceState === 'listening' ? 'Stop voice input' : 'Voice input'}
+                            style={{
+                              width: 38,
+                              height: 38,
+                              borderRadius: '50%',
+                              display: 'flex',
+                              alignItems: 'center',
+                              justifyContent: 'center',
+                              border: 'none',
+                              cursor: 'pointer',
+                              background:
+                                voiceState === 'listening'
+                                  ? 'rgba(239,68,68,0.12)'
+                                  : voiceState === 'processing'
+                                  ? 'rgba(247,147,30,0.10)'
+                                  : CHIP,
+                              color:
+                                voiceState === 'listening'
+                                  ? '#EF4444'
+                                  : voiceState === 'processing'
+                                  ? AMBER
+                                  : INK_MUTE,
+                            }}
+                          >
+                            {voiceState === 'listening' ? (
+                              <Square size={14} fill="#EF4444" color="#EF4444" />
+                            ) : voiceState === 'processing' ? (
+                              <RotateCw size={16} className="animate-spin" />
+                            ) : (
+                              <Mic size={16} />
+                            )}
+                          </button>
+                          <span style={{ fontSize: 12, color: INK_MUTE }}>
+                            {voiceState === 'listening'
+                              ? 'Listening… tap to stop'
+                              : 'Tap mic to speak'}
+                          </span>
+                        </div>
+                      )}
+                    </div>
+
 
                     {/* Media carousel */}
                     {hasMedia && (
