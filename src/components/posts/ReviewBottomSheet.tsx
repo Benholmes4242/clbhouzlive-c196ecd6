@@ -18,10 +18,10 @@ import { toast } from 'sonner';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import {
   FROST,
-  FROST_SCORE_GRADIENT,
   formatFrostRating,
   splitCourseName,
 } from '@/lib/frostPanel';
+import { HERO_NUMBER_STYLE, ratingTextColor } from '@/lib/ratingTier';
 import { useViewportWidth, COMPACT_VIEWPORT_MAX } from '@/hooks/useViewportWidth';
 import { useReviewerStats } from '@/hooks/useReviewerStats';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
@@ -409,17 +409,14 @@ export const ReviewBottomSheet: React.FC<ReviewBottomSheetProps> = ({
                       display: 'flex',
                       alignItems: 'flex-end',
                       flexShrink: 0,
-                      fontVariantNumeric: 'lining-nums tabular-nums',
                     }}
                   >
                     <span
                       style={{
-                        ...FROST_SCORE_GRADIENT,
+                        ...HERO_NUMBER_STYLE,
+                        color: ratingTextColor(rating),
                         fontSize: 50,
-                        fontWeight: 800,
                         lineHeight: 1,
-                        letterSpacing: '-2px',
-                        fontVariantNumeric: 'lining-nums tabular-nums',
                       }}
                     >
                       {formattedRating}
@@ -480,10 +477,8 @@ export const ReviewBottomSheet: React.FC<ReviewBottomSheetProps> = ({
                           <span
                             style={{
                               fontSize: 13,
-                              fontWeight: 700,
-                              color: FROST.ink,
-                              fontVariantNumeric: 'tabular-nums',
-                              letterSpacing: '-0.2px',
+                              ...HERO_NUMBER_STYLE,
+                              color: ratingTextColor(value),
                               flexShrink: 0,
                             }}
                           >
