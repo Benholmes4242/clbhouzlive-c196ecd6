@@ -3,18 +3,11 @@
 
 import React, { useRef, useState, useCallback, useLayoutEffect } from 'react';
 import { triggerHaptic } from '@/lib/ui/haptics';
-import { getRatingTier, HERO_NUMBER_STYLE, TIER_LABEL_STYLE, ratingTextColor } from '@/lib/ratingTier';
+import { getRatingTier, HERO_NUMBER_STYLE, TIER_LABEL_STYLE, ratingTextColor, rampForRating } from '@/lib/ratingTier';
 
 const INK = '#0F172A';
 const INK_MUTE = '#64748B';
 const INK_FAINT = '#94A3B8';
-const AMBER = '#F7931E';
-const AMBER_TOP = '#FAC775';
-const AMBER_DEEP = '#BA7517';
-const GOLD = '#FFB800';
-const GOLD_DEEP = '#D97706';
-const GOLD_TOP = '#EF9F27';
-const GOLD_DEEPER = '#854F0B';
 
 type Tier = { label: string; gold: boolean } | null;
 // Delegates to the canonical `getRatingTier` so thresholds live in one place.
@@ -55,7 +48,6 @@ export function LuminousCellRating({
   const touched = value != null;
   const v = value ?? 0;
   const tier = tierFor(value);
-  const accent = tier?.gold ? GOLD_DEEP : AMBER;
   const lastTick = useRef<number>(touched ? v : -1);
 
   // Layout: heights per variant. Gap proportional.
@@ -138,10 +130,19 @@ export function LuminousCellRating({
     commit(nv);
   };
 
-  const fillTop = tier?.gold ? GOLD_TOP : AMBER_TOP;
-  const fillBottom = tier?.gold ? GOLD_DEEP : AMBER;
-  const fillBottomDeep = tier?.gold ? GOLD_DEEPER : AMBER_DEEP;
-  const fillGradient = `linear-gradient(180deg, ${fillTop} 0%, ${fillBottom} 22%, ${fillBottomDeep} 100%)`;
+  const ramp = rampForRating(v);
+  const tierKey = getRatingTier(v);
+  const fillGradient = `linear-gradient(180deg, ${ramp.hi} 0%, ${ramp.mid} 22%, ${ramp.lo} 100%)`;
+  const glowSeam = tierKey === 'EXCEPTIONAL'
+    ? 'rgba(255,194,61,0.55)'
+    : (tierKey === 'EXCELLENT' || tierKey === 'GOOD')
+    ? 'rgba(247,147,30,0.55)'
+    : 'rgba(138,149,164,0.55)';
+  const glowCell = tierKey === 'EXCEPTIONAL'
+    ? 'rgba(255,194,61,0.32)'
+    : (tierKey === 'EXCELLENT' || tierKey === 'GOOD')
+    ? 'rgba(247,147,30,0.28)'
+    : 'rgba(138,149,164,0.28)';
   const fillTransition = active ? 'none' : 'width 160ms cubic-bezier(.22,.61,.36,1), background 160ms';
   const activeCell = active && touched ? Math.ceil(v) - 1 : -1;
 
@@ -228,7 +229,7 @@ export function LuminousCellRating({
           outline: 'none',
         }}
       >
-        {/* Seam-glow underlay: between consecutive filled cells, render a soft amber radial. */}
+        {/* Seam-glow underlay: between consecutive filled cells, render a soft radial. */}
         {touched && cellSize.w > 0 && (
           <div
             aria-hidden
@@ -248,7 +249,6 @@ export function LuminousCellRating({
               if (!leftFilled || !rightFilled) return null;
               const seamX =
                 (i + 1) * cellSize.w + i * gap + gap / 2;
-              const glow = tier?.gold ? 'rgba(217,119,6,0.55)' : 'rgba(247,147,30,0.55)';
               return (
                 <div
                   key={i}
@@ -258,7 +258,7 @@ export function LuminousCellRating({
                     top: 0,
                     bottom: 0,
                     width: rowHeight * 1.2,
-                    background: `radial-gradient(ellipse at center, ${glow} 0%, transparent 65%)`,
+                    background: `radial-gradient(ellipse at center, ${glowSeam} 0%, transparent 65%)`,
                   }}
                 />
               );
@@ -282,9 +282,7 @@ export function LuminousCellRating({
                 transform: i === activeCell ? 'scaleY(1.06)' : 'scaleY(1)',
                 boxShadow: [
                   ratio > 0
-                    ? `0 0 ${hero ? 14 : 6}px ${
-                        tier?.gold ? 'rgba(217,119,6,0.32)' : 'rgba(247,147,30,0.28)'
-                      }`
+                    ? `0 0 ${hero ? 14 : 6}px ${glowCell}`
                     : null,
                   `inset 0 1.5px 3px rgba(15,23,42,${ratio > 0 ? 0.1 : 0.16})`,
                   `inset 0 0 0 0.5px rgba(15,23,42,0.05)`,
