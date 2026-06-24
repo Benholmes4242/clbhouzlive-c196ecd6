@@ -460,13 +460,13 @@ const CourseReviewsTab: React.FC<CourseReviewsTabProps> = ({
       {/* Community score header — horizontal (matches About Option B) */}
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 16, padding: '18px 16px 14px' }}>
         <div style={{ display: 'flex', alignItems: 'baseline', gap: 2, flexShrink: 0 }}>
-          <span style={{ fontSize: 58, fontWeight: 900, color: INK, letterSpacing: '-0.05em', lineHeight: 1, fontVariantNumeric: 'tabular-nums' }}>
+          <span style={{ fontSize: 58, ...HERO_NUMBER_STYLE, color: ratingTextColor(communityScore), lineHeight: 1 }}>
             {communityScore.toFixed(1)}
           </span>
           <span style={{ fontSize: 19, fontWeight: 800, color: 'rgba(15,23,42,0.25)', letterSpacing: '-0.02em' }}>/10</span>
         </div>
         <div style={{ minWidth: 0 }}>
-          <div style={{ fontSize: 12, fontWeight: 800, color: AMBER, letterSpacing: '0.14em', textTransform: 'uppercase' as const }}>
+          <div style={{ fontSize: 12, ...TIER_LABEL_STYLE, color: ratingTextColor(communityScore) }}>
             {getScoreTier(communityScore).label}
           </div>
           <div style={{ fontSize: 11.5, color: INK_FAINT, marginTop: 3, display: 'flex', alignItems: 'center', gap: 6, flexWrap: 'wrap' }}>
