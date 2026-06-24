@@ -119,6 +119,8 @@ const FeedCardImpl: React.FC<FeedCardProps> = ({
   feedIndex,
 }) => {
   const [captionExpanded, setCaptionExpanded] = useState(false);
+  const [isCaptionClamped, setIsCaptionClamped] = useState(false);
+  const captionTextRef = useRef<HTMLDivElement | null>(null);
   const mountFollowPill =
     !!onFollow &&
     post.actorType === 'personal' &&
