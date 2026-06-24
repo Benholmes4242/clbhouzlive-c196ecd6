@@ -12,6 +12,7 @@
  */
 
 import { getRatingTheme, type RatingTheme } from '@/lib/globalAchievementMilestoneSystem';
+import { getRatingTier } from '@/lib/ratingTier';
 
 export type ScoreTier = 'exceptional' | 'excellent' | 'good' | 'fair' | 'poor';
 
