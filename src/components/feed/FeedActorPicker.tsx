@@ -1,13 +1,8 @@
-import React from 'react';
-import { ChevronDown } from 'lucide-react';
+import React, { useState } from 'react';
+import { ChevronDown, Check } from 'lucide-react';
 import { useActiveActor } from '@/context/ActiveActorContext';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
-import {
-  DropdownMenu,
-  DropdownMenuTrigger,
-  DropdownMenuContent,
-  DropdownMenuItem,
-} from '@/components/ui/dropdown-menu';
+import { BottomSheet } from '@/components/ui/BottomSheet';
 import type { ActiveActor } from '@/types/actor';
 
 const T2 = 'rgba(255,255,255,0.52)';
@@ -25,6 +20,8 @@ interface FeedActorPickerProps {
 
 export const FeedActorPicker: React.FC<FeedActorPickerProps> = ({ value, onChange }) => {
   const { activeActor, availableActors } = useActiveActor();
+  const [sheetOpen, setSheetOpen] = useState(false);
+
   const current =
     (value ? availableActors.find((a) => a.id === value.id && a.type === value.type) : null) ??
     activeActor;
@@ -56,70 +53,90 @@ export const FeedActorPicker: React.FC<FeedActorPickerProps> = ({ value, onChang
   }
 
   return (
-    <DropdownMenu>
-      <DropdownMenuTrigger asChild>
-        <button
-          type="button"
-          onClick={(e) => e.stopPropagation()}
-          aria-label={`Acting as ${current.name} — tap to switch`}
-          style={{
-            display: 'inline-flex',
-            alignItems: 'center',
-            gap: 4,
-            background: 'transparent',
-            border: 'none',
-            padding: 0,
-            cursor: 'pointer',
-          }}
-        >
-          {avatar}
-          <ChevronDown size={14} color={T2} strokeWidth={1.75} />
-        </button>
-      </DropdownMenuTrigger>
-      <DropdownMenuContent
-        align="start"
-        sideOffset={6}
-        onClick={(e) => e.stopPropagation()}
+    <>
+      <button
+        type="button"
+        onClick={(e) => {
+          e.stopPropagation();
+          setSheetOpen(true);
+        }}
+        aria-label={`Acting as ${current.name} — tap to switch`}
         style={{
-          background: '#0F172A',
-          border: '1px solid rgba(255,255,255,0.08)',
-          color: 'rgba(255,255,255,0.92)',
-          minWidth: 200,
+          display: 'inline-flex',
+          alignItems: 'center',
+          gap: 4,
+          background: 'transparent',
+          border: 'none',
+          padding: 0,
+          cursor: 'pointer',
         }}
       >
-        {availableActors.map((a) => {
-          const isCurrent = a.id === current.id && a.type === current.type;
-          return (
-            <DropdownMenuItem
-              key={`${a.type}:${a.id}`}
-              onClick={(e) => {
-                e.stopPropagation();
-                onChange?.(a);
-              }}
-              className="focus:!bg-white/[0.06] data-[highlighted]:!bg-white/[0.06] focus:!text-white"
-              style={{
-                display: 'flex',
-                alignItems: 'center',
-                gap: 8,
-                background: isCurrent ? 'rgba(255,255,255,0.06)' : 'transparent',
-                color: isCurrent ? '#ffffff' : 'rgba(255,255,255,0.9)',
-                cursor: 'pointer',
-              }}
-            >
-              <SquircleAvatar
-                size={24}
-                src={a.avatarUrl ?? undefined}
-                alt={a.name}
-                userId={a.type === 'personal' ? a.id : null}
-                hairlineRing
-                hideRing={a.type === 'business'}
-              />
-              <span style={{ fontSize: 13, fontWeight: 500 }}>{a.name}</span>
-            </DropdownMenuItem>
-          );
-        })}
-      </DropdownMenuContent>
-    </DropdownMenu>
+        {avatar}
+        <ChevronDown size={14} color={T2} strokeWidth={1.75} />
+      </button>
+
+      <BottomSheet
+        open={sheetOpen}
+        onClose={() => setSheetOpen(false)}
+        variant="dark"
+      >
+        <div
+          onClick={(e) => e.stopPropagation()}
+          style={{ padding: '4px 8px 8px' }}
+        >
+          <div
+            style={{
+              fontSize: 12,
+              fontWeight: 700,
+              letterSpacing: '0.08em',
+              textTransform: 'uppercase',
+              color: T2,
+              padding: '4px 12px 10px',
+            }}
+          >
+            Post as
+          </div>
+          {availableActors.map((a) => {
+            const isActive = a.id === current.id && a.type === current.type;
+            return (
+              <button
+                key={`${a.type}:${a.id}`}
+                type="button"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onChange?.(a);
+                  setSheetOpen(false);
+                }}
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 12,
+                  width: '100%',
+                  background: isActive ? 'rgba(255,255,255,0.06)' : 'transparent',
+                  border: 'none',
+                  padding: 12,
+                  borderRadius: 12,
+                  cursor: 'pointer',
+                  color: '#fff',
+                  textAlign: 'left',
+                }}
+              >
+                <SquircleAvatar
+                  size={36}
+                  src={a.avatarUrl ?? undefined}
+                  alt={a.name}
+                  userId={a.type === 'personal' ? a.id : null}
+                  hairlineRing
+                  hideRing={a.type === 'business'}
+                />
+                <span style={{ fontSize: 15, fontWeight: 600, flex: 1 }}>{a.name}</span>
+                {isActive && <Check size={18} color="#F7931E" />}
+              </button>
+            );
+          })}
+        </div>
+      </BottomSheet>
+    </>
   );
 };
 
