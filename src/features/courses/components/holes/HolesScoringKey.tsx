@@ -1,11 +1,25 @@
 import React from 'react';
-import { AMBER, C_BIRDIE, C_BOGEY, C_DOUBLE, C_PAR, FONT, INK } from './_constants';
+import {
+  FONT,
+  INK,
+  SC_ACCENT,
+  SC_ACE,
+  SC_ALBATROSS,
+  SC_EAGLE,
+  SC_BIRDIE,
+  SC_PAR,
+  SC_BOGEY,
+  SC_DOUBLE,
+} from './_constants';
 
 const items: Array<{ c: string; label: string }> = [
-  { c: C_BIRDIE, label: 'Birdie or better' },
-  { c: C_PAR, label: 'Par' },
-  { c: C_BOGEY, label: 'Bogey' },
-  { c: C_DOUBLE, label: 'Double or worse' },
+  { c: SC_ACE,       label: 'Ace' },
+  { c: SC_ALBATROSS, label: 'Albatross −3' },
+  { c: SC_EAGLE,     label: 'Eagle −2' },
+  { c: SC_BIRDIE,    label: 'Birdie −1' },
+  { c: SC_PAR,       label: 'Par' },
+  { c: SC_BOGEY,     label: 'Bogey +1' },
+  { c: SC_DOUBLE,    label: 'Double or worse' },
 ];
 
 export const HolesScoringKey: React.FC = () => (
@@ -22,7 +36,7 @@ export const HolesScoringKey: React.FC = () => (
         fontWeight: 800,
         letterSpacing: '0.16em',
         textTransform: 'uppercase',
-        color: AMBER,
+        color: SC_ACCENT,
         marginBottom: 10,
       }}
     >
