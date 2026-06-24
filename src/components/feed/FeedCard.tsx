@@ -29,13 +29,16 @@ import { InlineVideo } from './InlineVideo';
 import { MediaCarousel } from './MediaCarousel';
 import { FeedFollowPill } from './FeedFollowPill';
 
-const T100 = '#0F172A';
-const T60 = '#64748B';
-const T40 = '#94A3B8';
-const CARD = '#FFFFFF';
-const LINE = 'rgba(15,23,42,0.07)';
+// Full-bleed ink chrome — one ink (#0F172A) across the app: tab underline,
+// primary text base, and the feed card surface all share this token. Text
+// constants flip to light-on-dark; LINE becomes a white hairline.
+const CARD = '#0F172A';
+const T100 = '#F8FAFC';
+const T60 = 'rgba(248,250,252,0.65)';
+const T40 = 'rgba(248,250,252,0.45)';
+const LINE = 'rgba(255,255,255,0.08)';
 const AMBER = '#F7931E';
-const GREEN = '#16A34A';
+const GREEN = '#22C55E';
 
 const RATIO_MIN = 0.8;   // tallest allowed = 4:5 (portrait capped)
 const RATIO_MAX = 1.91;  // widest = ~cinematic landscape
@@ -157,16 +160,17 @@ const FeedCardImpl: React.FC<FeedCardProps> = ({
         overflow: 'hidden',
         marginInline: 0,
         position: 'relative',
+        borderTop: `1px solid ${LINE}`,
       }}
     >
       {/* Card-level ghost numeral — overflows the header, clipped by card edges */}
       {reviewRating != null && (() => {
         const GHOST = {
-          EXCEPTIONAL: 'rgba(247,147,30,0.09)',
-          EXCELLENT:   'rgba(15,23,42,0.06)',
-          GOOD:        'rgba(15,23,42,0.05)',
-          FAIR:        'rgba(15,23,42,0.04)',
-          POOR:        'rgba(15,23,42,0.04)',
+          EXCEPTIONAL: 'rgba(247,147,30,0.14)',
+          EXCELLENT:   'rgba(255,255,255,0.08)',
+          GOOD:        'rgba(255,255,255,0.06)',
+          FAIR:        'rgba(255,255,255,0.05)',
+          POOR:        'rgba(255,255,255,0.05)',
         } as const;
         const tierKey = getRatingTier(reviewRating);
         return (
@@ -388,8 +392,8 @@ const FeedCardImpl: React.FC<FeedCardProps> = ({
               onClick={handleCourseTap}
               style={{
                 display: 'inline-flex', alignItems: 'center', gap: 5, flexShrink: 0,
-                background: 'rgba(15,23,42,0.05)',
-                border: '1px solid rgba(15,23,42,0.08)',
+                background: 'rgba(255,255,255,0.08)',
+                border: '1px solid rgba(255,255,255,0.12)',
                 padding: '3px 9px 3px 4px', borderRadius: 999,
                 cursor: post.courseId ? 'pointer' : 'default', marginLeft: 8,
                 backdropFilter: 'blur(8px)',
@@ -404,7 +408,7 @@ const FeedCardImpl: React.FC<FeedCardProps> = ({
                 }}
                 aria-hidden="true"
               />
-              <span style={{ fontSize: 11, fontWeight: 800, color: '#475569', fontVariantNumeric: 'tabular-nums', lineHeight: 1 }}>
+              <span style={{ fontSize: 11, fontWeight: 800, color: T100, fontVariantNumeric: 'tabular-nums', lineHeight: 1 }}>
                 {formatRatingValue(post.courseRating)}
               </span>
             </button>

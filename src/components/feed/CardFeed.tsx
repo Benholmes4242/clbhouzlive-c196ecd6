@@ -26,7 +26,7 @@ import { useClubhouseStore } from '@/store/clubhouseStore';
 import { prefetchTile } from '@/hooks/useTileVideoPlayer';
 import { FeedCard } from './FeedCard';
 
-const CANVAS = '#F8FAFC';
+const CANVAS = '#0F172A';
 
 /** How many neighbours on each side of the active card may mount a <video>. */
 const VIDEO_NEIGHBOUR_RADIUS = 1; // matches iOS ~3-decoder cap (active ±1 = 3)
@@ -274,7 +274,6 @@ export const CardFeed: React.FC<CardFeedProps> = ({
       const mountVideo = isNear;
       return (
         <div
-          style={{ paddingBottom: 12 }}
           data-card-index={index}
           ref={(el) => {
             const obs = observerRef.current;
@@ -344,7 +343,7 @@ export const CardFeed: React.FC<CardFeedProps> = ({
 
   if (useWindowScroll) {
     return (
-      <div style={{ width: '100%' }} data-card-feed>
+      <div style={{ width: '100%', background: CANVAS }} data-card-feed>
         <Virtuoso
           ref={virtuosoRef}
           useWindowScroll
