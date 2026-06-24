@@ -296,6 +296,30 @@ const FeedCardImpl: React.FC<FeedCardProps> = ({
         </div>
       </div>
 
+      {/* Caption — review text above media */}
+      {(() => {
+        const body = post.caption || (post.isReview ? post.review?.reviewText ?? '' : '');
+        if (!body) return null;
+        return (
+          <div style={{ padding: '6px 14px 10px', position: 'relative', zIndex: 2 }}>
+            <div
+              style={{
+                fontSize: 14,
+                lineHeight: 1.4,
+                color: T100,
+                display: '-webkit-box',
+                WebkitLineClamp: 3,
+                WebkitBoxOrient: 'vertical',
+                overflow: 'hidden',
+                textOverflow: 'ellipsis',
+              }}
+            >
+              {body}
+            </div>
+          </div>
+        );
+      })()}
+
       {/* Media */}
       <div style={{ position: 'relative', zIndex: 1 }}>
         {isMulti ? (
@@ -477,29 +501,6 @@ const FeedCardImpl: React.FC<FeedCardProps> = ({
         );
       })()}
 
-      {/* Body — caption (falls back to review text for review posts) */}
-      {(() => {
-        const body = post.caption || (post.isReview ? post.review?.reviewText ?? '' : '');
-        if (!body) return null;
-        return (
-          <div style={{ padding: '8px 14px 4px' }}>
-            <div
-              style={{
-                fontSize: 14,
-                lineHeight: 1.4,
-                color: T100,
-                display: '-webkit-box',
-                WebkitLineClamp: 3,
-                WebkitBoxOrient: 'vertical',
-                overflow: 'hidden',
-                textOverflow: 'ellipsis',
-              }}
-            >
-              {body}
-            </div>
-          </div>
-        );
-      })()}
 
       {/* Footer */}
       <div
