@@ -9,6 +9,7 @@ import {
   ratingTextColor,
   rampForRating,
 } from '@/lib/ratingTier';
+import { getScoreRingColors } from '@/hooks/useTierStyles';
 import { AMBER, HAIRLINE_INK_7, INK, INK_FAINT, INK_MUTE, SURFACE } from '@/features/courses/_shared/tokens';
 
 // Representative score per distribution tier — drives bar colour via rampForRating
