@@ -197,7 +197,7 @@ const FeedCardImpl: React.FC<FeedCardProps> = ({
       })()}
 
       {/* Header */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '10px 12px', position: 'relative', zIndex: 2 }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '10px 12px 2px', position: 'relative', zIndex: 2 }}>
         <button
           type="button"
           onClick={() => onProfile(post)}
