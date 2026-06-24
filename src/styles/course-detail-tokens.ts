@@ -98,13 +98,13 @@ export const courseDetailTokens = {
     chipActive: 'ring-2 ring-offset-2',
   },
 
-  // Score ring gradient colors - all amber per unified rating system
+  // Score ring gradient colors — graduated grey → amber → gold ramp
   scoreRing: {
-    exceptional: { from: '#f59e0b', to: '#fbbf24' },
-    excellent: { from: '#f59e0b', to: '#fbbf24' },
-    good: { from: '#f59e0b', to: '#fbbf24' },
-    fair: { from: '#f59e0b', to: '#fbbf24' },
-    poor: { from: '#f59e0b', to: '#fbbf24' },
+    exceptional: { from: '#FFC23D', to: '#FFE08A' },
+    excellent: { from: '#F7931E', to: '#FAC775' },
+    good: { from: '#F7931E', to: '#FAC775' },
+    fair: { from: '#8A95A4', to: '#AEB6C2' },
+    poor: { from: '#8A95A4', to: '#AEB6C2' },
   },
 } as const;
 
