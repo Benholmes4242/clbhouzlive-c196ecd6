@@ -29,13 +29,16 @@ import { InlineVideo } from './InlineVideo';
 import { MediaCarousel } from './MediaCarousel';
 import { FeedFollowPill } from './FeedFollowPill';
 
-const T100 = '#0F172A';
-const T60 = '#64748B';
-const T40 = '#94A3B8';
-const CARD = '#FFFFFF';
-const LINE = 'rgba(15,23,42,0.07)';
+// Full-bleed ink chrome — one ink (#0F172A) across the app: tab underline,
+// primary text base, and the feed card surface all share this token. Text
+// constants flip to light-on-dark; LINE becomes a white hairline.
+const CARD = '#0F172A';
+const T100 = '#F8FAFC';
+const T60 = 'rgba(248,250,252,0.65)';
+const T40 = 'rgba(248,250,252,0.45)';
+const LINE = 'rgba(255,255,255,0.08)';
 const AMBER = '#F7931E';
-const GREEN = '#16A34A';
+const GREEN = '#22C55E';
 
 const RATIO_MIN = 0.8;   // tallest allowed = 4:5 (portrait capped)
 const RATIO_MAX = 1.91;  // widest = ~cinematic landscape
