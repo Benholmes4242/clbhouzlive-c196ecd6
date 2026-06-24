@@ -409,17 +409,14 @@ export const ReviewBottomSheet: React.FC<ReviewBottomSheetProps> = ({
                       display: 'flex',
                       alignItems: 'flex-end',
                       flexShrink: 0,
-                      fontVariantNumeric: 'lining-nums tabular-nums',
                     }}
                   >
                     <span
                       style={{
-                        ...FROST_SCORE_GRADIENT,
+                        ...HERO_NUMBER_STYLE,
+                        color: ratingTextColor(rating),
                         fontSize: 50,
-                        fontWeight: 800,
                         lineHeight: 1,
-                        letterSpacing: '-2px',
-                        fontVariantNumeric: 'lining-nums tabular-nums',
                       }}
                     >
                       {formattedRating}
