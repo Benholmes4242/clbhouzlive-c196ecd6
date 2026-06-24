@@ -238,6 +238,8 @@ const FeedCardImpl: React.FC<FeedCardProps> = ({
   const navigate = useNavigate();
   const [captionExpanded, setCaptionExpanded] = useState(false);
   const [isCaptionClamped, setIsCaptionClamped] = useState(false);
+  const [actingAs, setActingAs] = useState<FeedActorPickerValue | null>(null);
+  const handleActorChange = (a: ActiveActor) => setActingAs({ id: a.id, type: a.type });
   const captionTextRef = useRef<HTMLDivElement | null>(null);
 
   const reviewCourseId = post.review?.courseId ?? post.courseId;
