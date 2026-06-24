@@ -91,6 +91,7 @@ import { KeepAliveOutlet } from '@/components/keep-alive/KeepAliveOutlet';
 import ClubhouseWrapped from "./pages/ClubhouseWrapped";
 import BetaGatePage from "./pages/BetaGatePage";
 import { detectMedianBridge } from "./uploads/medianBridge";
+import { useSupabaseSession } from "@/hooks/useSupabaseSession";
 
 // Gate is platform-based: native app or approved preview only. Desktop/mobile web → coming-soon.
 const PREVIEW_BYPASS_KEY = 'clbhouz_preview_bypass';
