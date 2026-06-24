@@ -33,10 +33,10 @@ import { FeedFollowPill } from './FeedFollowPill';
 import { FeedActorPicker, type FeedActorPickerValue } from './FeedActorPicker';
 import type { ActiveActor } from '@/types/actor';
 
-// Full-bleed charcoal chrome — one charcoal (#15171F) across the app: tab
-// underline, primary text base, and the feed card surface all share this token.
-// Text constants flip to light-on-dark; LINE becomes a white hairline.
-const CARD = '#15171F';
+// Full-bleed ink chrome — one ink (#0F172A) across the app: tab underline,
+// primary text base, and the feed card surface all share this token. Text
+// constants flip to light-on-dark; LINE becomes a white hairline.
+const CARD = '#0F172A';
 const T100 = '#F8FAFC';
 const T60 = 'rgba(248,250,252,0.65)';
 const T40 = 'rgba(248,250,252,0.45)';
@@ -175,7 +175,7 @@ const CaptionBlock: React.FC<CaptionBlockProps> = ({ body, expanded, setExpanded
               right: 0,
               bottom: 0,
               paddingLeft: 28,
-              background: 'linear-gradient(90deg, rgba(21,23,31,0) 0%, #15171F 40%)',
+              background: 'linear-gradient(90deg, rgba(15,23,42,0) 0%, #0F172A 40%)',
               border: 'none',
               color: T60,
               fontSize: 14,
@@ -196,7 +196,7 @@ const CaptionBlock: React.FC<CaptionBlockProps> = ({ body, expanded, setExpanded
               right: 0,
               bottom: 0,
               paddingLeft: 64,
-              background: 'linear-gradient(90deg, rgba(21,23,31,0) 0%, #15171F 38%)',
+              background: 'linear-gradient(90deg, rgba(15,23,42,0) 0%, #0F172A 38%)',
               border: 'none',
               color: T60,
               fontSize: 14,

@@ -27,7 +27,7 @@ import { useClubhouseStore } from '@/store/clubhouseStore';
 import { prefetchTile } from '@/hooks/useTileVideoPlayer';
 import { FeedCard } from './FeedCard';
 
-const CANVAS = '#15171F';
+const CANVAS = '#0F172A';
 
 /** How many neighbours on each side of the active card may mount a <video>. */
 const VIDEO_NEIGHBOUR_RADIUS = 1; // matches iOS ~3-decoder cap (active ±1 = 3)
@@ -306,8 +306,8 @@ export const CardFeed: React.FC<CardFeedProps> = ({
             currentUserId={currentUserId}
             feedIndex={index}
           />
-          {/* Subtle inter-card seam — just-perceptible lift above charcoal chrome */}
-          <div aria-hidden style={{ height: 5, background: '#1A1D26' }} />
+          {/* Subtle inter-card seam — just-perceptible lift above ink chrome */}
+          <div aria-hidden style={{ height: 5, background: '#161E2E' }} />
         </div>
       );
     },
