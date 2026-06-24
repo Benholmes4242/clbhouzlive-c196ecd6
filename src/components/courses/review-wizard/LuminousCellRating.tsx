@@ -161,11 +161,10 @@ export function LuminousCellRating({
           <div style={{ display: 'inline-flex', alignItems: 'baseline', gap: 6 }}>
             <span
               style={{
+                ...HERO_NUMBER_STYLE,
                 fontSize: 66,
-                fontWeight: 800,
-                letterSpacing: '-0.01em',
                 lineHeight: 1,
-                color: touched ? (tier?.gold ? GOLD_DEEP : INK) : 'rgba(15,23,42,0.16)',
+                color: touched ? ratingTextColor(v) : 'rgba(15,23,42,0.16)',
                 transform: active ? 'scale(1.04)' : 'scale(1)',
                 transition: 'transform 140ms ease, color 160ms ease',
                 display: 'inline-block',
@@ -179,11 +178,9 @@ export function LuminousCellRating({
             {tier ? (
               <span
                 style={{
+                  ...TIER_LABEL_STYLE,
                   fontSize: 11,
-                  fontWeight: 800,
-                  letterSpacing: '0.14em',
-                  textTransform: 'uppercase',
-                  color: tier.gold ? GOLD_DEEP : INK_MUTE,
+                  color: ratingTextColor(v),
                   transition: 'color 160ms ease',
                 }}
               >
@@ -192,10 +189,9 @@ export function LuminousCellRating({
             ) : (
               <span
                 style={{
+                  ...TIER_LABEL_STYLE,
                   fontSize: 11,
                   fontWeight: 700,
-                  letterSpacing: '0.14em',
-                  textTransform: 'uppercase',
                   color: INK_FAINT,
                 }}
               >
