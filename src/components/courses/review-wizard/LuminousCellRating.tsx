@@ -157,10 +157,9 @@ export function LuminousCellRating({
             <span
               style={{
                 fontSize: 66,
-                fontWeight: 900,
-                letterSpacing: '-0.03em',
+                fontWeight: 800,
+                letterSpacing: '-0.01em',
                 lineHeight: 1,
-                fontVariantNumeric: 'tabular-nums',
                 color: touched ? (tier?.gold ? GOLD_DEEP : INK) : 'rgba(15,23,42,0.16)',
                 transform: active ? 'scale(1.04)' : 'scale(1)',
                 transition: 'transform 140ms ease, color 160ms ease',
