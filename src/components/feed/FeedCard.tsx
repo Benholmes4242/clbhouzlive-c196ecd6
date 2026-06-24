@@ -645,13 +645,13 @@ const FeedCardImpl: React.FC<FeedCardProps> = ({
           icon={Heart}
           label={formatCount(likeCount)}
           active={liked}
-          onClick={() => onLike(post)}
+          onClick={() => onLike(post, effectiveActor)}
           activeColor={AMBER}
         />
         <FooterButton
           icon={MessageCircle}
           label={formatCount(commentCount)}
-          onClick={() => onComment(post)}
+          onClick={() => onComment(post, effectiveActor)}
         />
         <FooterButton icon={Share} onClick={() => onShare(post)} />
       </div>
