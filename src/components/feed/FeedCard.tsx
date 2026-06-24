@@ -29,6 +29,8 @@ import type { FeedPost } from '@/components/media-system/types/media';
 import { InlineVideo } from './InlineVideo';
 import { MediaCarousel } from './MediaCarousel';
 import { FeedFollowPill } from './FeedFollowPill';
+import { FeedActorPicker, type FeedActorPickerValue } from './FeedActorPicker';
+import type { ActiveActor } from '@/types/actor';
 
 // Full-bleed ink chrome — one ink (#0F172A) across the app: tab underline,
 // primary text base, and the feed card surface all share this token. Text
@@ -236,6 +238,8 @@ const FeedCardImpl: React.FC<FeedCardProps> = ({
   const navigate = useNavigate();
   const [captionExpanded, setCaptionExpanded] = useState(false);
   const [isCaptionClamped, setIsCaptionClamped] = useState(false);
+  const [actingAs, setActingAs] = useState<FeedActorPickerValue | null>(null);
+  const handleActorChange = (a: ActiveActor) => setActingAs({ id: a.id, type: a.type });
   const captionTextRef = useRef<HTMLDivElement | null>(null);
 
   const reviewCourseId = post.review?.courseId ?? post.courseId;
@@ -620,32 +624,30 @@ const FeedCardImpl: React.FC<FeedCardProps> = ({
       })()}
 
 
-      {/* Footer */}
+      {/* Footer action bar — 4 evenly spaced items */}
       <div
         style={{
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'space-between',
           padding: '10px 14px 12px',
+          borderTop: `0.5px solid ${LINE}`,
         }}
       >
-        <div />
-
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '50%', flexShrink: 0 }}>
-          <FooterButton
-            icon={Heart}
-            label={formatCount(likeCount)}
-            active={liked}
-            onClick={() => onLike(post)}
-            activeColor={AMBER}
-          />
-          <FooterButton
-            icon={MessageCircle}
-            label={formatCount(commentCount)}
-            onClick={() => onComment(post)}
-          />
-          <FooterButton icon={Share} onClick={() => onShare(post)} />
-        </div>
+        <FeedActorPicker value={actingAs} onChange={handleActorChange} />
+        <FooterButton
+          icon={Heart}
+          label={formatCount(likeCount)}
+          active={liked}
+          onClick={() => onLike(post)}
+          activeColor={AMBER}
+        />
+        <FooterButton
+          icon={MessageCircle}
+          label={formatCount(commentCount)}
+          onClick={() => onComment(post)}
+        />
+        <FooterButton icon={Share} onClick={() => onShare(post)} />
       </div>
     </article>
   );
