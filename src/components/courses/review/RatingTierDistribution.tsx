@@ -49,6 +49,7 @@ export const RatingTierDistribution: React.FC<RatingTierDistributionProps> = ({
       {distributionItems.map((item) => {
         const percentage = (item.count / maxCount) * 100;
         const hasCount = item.count > 0;
+        const ramp = RATING_RAMPS[TIER_RAMP_KEY[item.key]];
 
         return (
           <div key={item.key} className="flex items-center gap-2">
@@ -56,17 +57,18 @@ export const RatingTierDistribution: React.FC<RatingTierDistributionProps> = ({
               {item.label}
             </span>
 
-            <div className="flex-1 h-[6px] rounded-full overflow-hidden" style={{ background: 'rgba(245,158,11,0.06)' }}>
+            <div className="flex-1 h-[6px] rounded-full overflow-hidden" style={{ background: 'rgba(15,23,42,0.05)' }}>
               <div
                 className="h-full rounded-full transition-all duration-300"
                 style={{
                   width: `${percentage}%`,
                   background: hasCount
-                    ? 'linear-gradient(to right, #f59e0b, #fbbf24)'
+                    ? `linear-gradient(to right, ${ramp.lo}, ${ramp.mid}, ${ramp.hi})`
                     : '#f3f4f6',
                 }}
               />
             </div>
+
 
             <span className="w-6 text-right text-xs text-muted-foreground/60 tabular-nums shrink-0">
               {item.count}
