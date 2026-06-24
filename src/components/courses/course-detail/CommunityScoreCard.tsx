@@ -183,11 +183,9 @@ const CommunityScoreCard: React.FC<CommunityScoreCardProps> = ({
           <span
             style={{
               fontSize: 58,
-              fontWeight: 900,
-              color: INK,
-              letterSpacing: '-0.05em',
+              ...HERO_NUMBER_STYLE,
+              color: ratingTextColor(communityAverage),
               lineHeight: 1,
-              fontVariantNumeric: 'tabular-nums',
             }}
           >
             {formatScore(communityAverage)}
@@ -198,7 +196,7 @@ const CommunityScoreCard: React.FC<CommunityScoreCardProps> = ({
         </div>
         <div style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', alignItems: 'flex-start', gap: 7 }}>
           <div>
-            <div style={{ fontSize: 12, fontWeight: 800, color: AMBER, letterSpacing: '0.14em', textTransform: 'uppercase' as const }}>
+            <div style={{ fontSize: 12, ...TIER_LABEL_STYLE, color: ratingTextColor(communityAverage) }}>
               {tierLabel}
             </div>
             <div style={{ fontSize: 11.5, color: INK_FAINT, marginTop: 2 }}>
