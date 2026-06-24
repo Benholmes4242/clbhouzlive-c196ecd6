@@ -135,8 +135,10 @@ export function LuminousCellRating({
 
   const fillTop = tier?.gold ? GOLD_TOP : AMBER_TOP;
   const fillBottom = tier?.gold ? GOLD_DEEP : AMBER;
-  const fillGradient = `linear-gradient(180deg, ${fillTop} 0%, ${fillBottom} 100%)`;
+  const fillBottomDeep = tier?.gold ? GOLD_DEEPER : AMBER_DEEP;
+  const fillGradient = `linear-gradient(180deg, ${fillTop} 0%, ${fillBottom} 22%, ${fillBottomDeep} 100%)`;
   const fillTransition = active ? 'none' : 'width 160ms cubic-bezier(.22,.61,.36,1), background 160ms';
+  const activeCell = active && touched ? Math.ceil(v) - 1 : -1;
 
   // For each cell: 0..1 fill ratio. value*10 ∈ [0,10]; cell i (0..9) is filled for value > i.
   const cellFill = (i: number): number => {
