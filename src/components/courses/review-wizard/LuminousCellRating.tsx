@@ -3,7 +3,7 @@
 
 import React, { useRef, useState, useCallback, useLayoutEffect } from 'react';
 import { triggerHaptic } from '@/lib/ui/haptics';
-import { getRatingTier } from '@/lib/ratingTier';
+import { getRatingTier, HERO_NUMBER_STYLE, TIER_LABEL_STYLE, ratingTextColor } from '@/lib/ratingTier';
 
 const INK = '#0F172A';
 const INK_MUTE = '#64748B';
