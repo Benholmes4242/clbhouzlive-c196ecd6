@@ -302,8 +302,9 @@ export function LuminousCellRating({
                   inset: 0,
                   width: `${ratio * 100}%`,
                   background: ratio > 0 ? fillGradient : 'transparent',
-                  transition: fillTransition,
-                  transitionDelay: active ? '0ms' : `${i * 18}ms`,
+                  transition: active
+                    ? 'none'
+                    : `width 160ms cubic-bezier(.22,.61,.36,1) ${i * 18}ms, background 160ms ${i * 18}ms`,
                 }}
               >
                 <div
