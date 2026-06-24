@@ -774,17 +774,7 @@ export function ReviewWizard({
                             textTransform: 'uppercase',
                           }}
                         >
-                          Add category detail{' '}
-                          <span
-                            style={{
-                              textTransform: 'none',
-                              letterSpacing: 0,
-                              fontWeight: 700,
-                              color: INK_FAINT,
-                            }}
-                          >
-                            · optional
-                          </span>
+                          Add category detail
                         </span>
                         <span style={{ display: 'inline-flex', alignItems: 'center', gap: 7 }}>
                           {setCount > 0 && (
