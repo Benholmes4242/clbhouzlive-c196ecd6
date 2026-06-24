@@ -3,6 +3,7 @@ import { Pencil, ThumbsUp, ThumbsDown } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { formatRatingValue } from '@/utils/formatters';
+import { getScoreRingColors } from '@/hooks/useTierStyles';
 import { ReviewMediaStrip, ReviewMediaItem } from './ReviewMediaStrip';
 
 interface Review {
