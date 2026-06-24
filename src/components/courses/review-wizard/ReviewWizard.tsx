@@ -24,6 +24,7 @@ import { useQueryClient } from '@tanstack/react-query';
 import { useNavigationGuard } from '@/hooks/useNavigationGuard';
 import { CourseSearchSheet } from '@/components/courses/CourseSearchSheet';
 import { cn } from '@/lib/utils';
+import { ratingTextColor } from '@/lib/ratingTier';
 import { OverlayPortalProvider } from '@/context/OverlayPortalContext';
 import { toast } from 'sonner';
 import { useShareReview } from '@/hooks/useShareReview';
@@ -812,13 +813,7 @@ export function ReviewWizard({
                                     style={{
                                       fontSize: 17,
                                       fontWeight: 800,
-                                      fontVariantNumeric: 'tabular-nums',
-                                      color:
-                                        val != null
-                                          ? t?.gold
-                                            ? GOLD_DEEP
-                                            : INK
-                                          : 'rgba(15,23,42,0.14)',
+                                      color: val != null ? ratingTextColor(val) : 'rgba(15,23,42,0.14)',
                                       marginLeft: 8,
                                     }}
                                   >
