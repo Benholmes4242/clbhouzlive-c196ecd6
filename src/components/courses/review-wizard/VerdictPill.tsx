@@ -6,6 +6,7 @@
 import React from 'react';
 import { Star } from 'lucide-react';
 import { getScoreTier } from '@/utils/getScoreTier';
+import { ratingTextColor } from '@/lib/ratingTier';
 
 interface VerdictPillProps {
   rating: number;
@@ -16,6 +17,7 @@ interface VerdictPillProps {
 export function VerdictPill({ rating, compact = false, className = '' }: VerdictPillProps) {
   const tier = getScoreTier(rating);
   const formatted = rating === 10 ? '10' : rating.toFixed(1);
+  const tint = ratingTextColor(rating);
 
   const scoreSize = compact ? 16 : 22;
   const slashSize = compact ? 11 : 13;
@@ -31,8 +33,8 @@ export function VerdictPill({ rating, compact = false, className = '' }: Verdict
         style={{
           width: starSize,
           height: starSize,
-          color: '#F7931E',
-          fill: '#F7931E',
+          color: tint,
+          fill: tint,
           marginRight: 2,
           position: 'relative',
           top: 1,
@@ -43,7 +45,7 @@ export function VerdictPill({ rating, compact = false, className = '' }: Verdict
         style={{
           fontSize: scoreSize,
           fontWeight: 900,
-          color: '#0F172A',
+          color: tint,
           fontVariantNumeric: 'tabular-nums',
         }}
       >
@@ -54,7 +56,7 @@ export function VerdictPill({ rating, compact = false, className = '' }: Verdict
         style={{
           fontSize: tierSize,
           fontWeight: 700,
-          color: '#0F172A',
+          color: tint,
           marginLeft: 4,
           textTransform: 'uppercase',
           letterSpacing: '0.04em',

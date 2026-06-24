@@ -3,7 +3,16 @@ import { useFullscreenFeedStore } from '@/store/fullscreenFeedStore';
 import { useNavigate } from 'react-router-dom';
 import { formatDistanceToNow } from 'date-fns';
 import { Heart, MessageCircle, Share2, MapPin, X } from 'lucide-react';
-import { getRatingTierLabel } from '@/lib/ratingTier';
+import { getRatingTier, getRatingTierLabel } from '@/lib/ratingTier';
+
+// Dark-surface tier label colour (mirrors FeedCard LABEL_COLOR map).
+const LOOP_LABEL_COLOR: Record<ReturnType<typeof getRatingTier>, string> = {
+  EXCEPTIONAL: '#FFC23D',
+  EXCELLENT: '#F7931E',
+  GOOD: '#F7931E',
+  FAIR: 'rgba(255,255,255,0.55)',
+  POOR: 'rgba(255,255,255,0.45)',
+};
 import clbhouzLogo from '@/assets/clbhouz-logo.png';
 import type { FeedPost } from '@/components/media-system/types/media';
 import PostFeedCarousel from '@/components/feed/PostFeedCarousel';
@@ -228,7 +237,10 @@ export const LoopCard = React.memo(function LoopCard({
                   <span className="text-[13px] font-bold text-white leading-none" style={{ fontFeatureSettings: '"tnum" 1', textShadow: '0 1px 4px rgba(0,0,0,0.55)' }}>
                     {post.review.rating.toFixed(1)}
                   </span>
-                  <span className="text-[10px] font-semibold uppercase text-white/85 leading-none tracking-wide" style={{ textShadow: '0 1px 4px rgba(0,0,0,0.55)' }}>
+                  <span
+                    className="text-[10px] font-semibold uppercase leading-none tracking-wide"
+                    style={{ color: LOOP_LABEL_COLOR[getRatingTier(post.review.rating)], textShadow: '0 1px 4px rgba(0,0,0,0.55)' }}
+                  >
                     {getRatingTierLabel(post.review.rating)}
                   </span>
                 </div>
@@ -295,7 +307,10 @@ export const LoopCard = React.memo(function LoopCard({
                 <span className="text-[13px] font-bold text-white leading-none" style={{ fontFeatureSettings: '"tnum" 1', textShadow: '0 1px 4px rgba(0,0,0,0.55)' }}>
                   {post.review.rating.toFixed(1)}
                 </span>
-                <span className="text-[10px] font-semibold uppercase text-white/85 leading-none tracking-wide" style={{ textShadow: '0 1px 4px rgba(0,0,0,0.55)' }}>
+                <span
+                  className="text-[10px] font-semibold uppercase leading-none tracking-wide"
+                  style={{ color: LOOP_LABEL_COLOR[getRatingTier(post.review.rating)], textShadow: '0 1px 4px rgba(0,0,0,0.55)' }}
+                >
                   {getRatingTierLabel(post.review.rating)}
                 </span>
               </div>

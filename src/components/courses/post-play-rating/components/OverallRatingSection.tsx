@@ -1,6 +1,7 @@
 import React from 'react';
 import { Slider } from '@/components/ui/slider';
 import { getScoreTier, isGoldTier, type ScoreTier } from '@/utils/getScoreTier';
+import { ratingTextColor } from '@/lib/ratingTier';
 import { analyticsEvents } from '@/utils/analyticsEvents';
 import { RATING_SLIDER_CONFIG, ANIMATION_TIMINGS } from '../constants';
 
@@ -55,20 +56,16 @@ const OverallRatingSection = React.memo(function OverallRatingSection({
         <span className="text-lg font-semibold text-slate-900">
           {isEditMode ? 'Edit your overall rating' : 'Submit your overall rating'}
         </span>
-        <span 
+        <span
           className={`text-base font-semibold tabular-nums transition-opacity duration-200 ${
             rating != null ? 'opacity-100' : 'opacity-0'
           }`}
-          style={{
-            ...(rating != null && rating >= 9 
-              ? { color: '#C1A84C' }
-              : { color: '#334E3D' }
-            ),
-          }}
+          style={{ color: rating != null ? ratingTextColor(rating) : '#94a3b8' }}
         >
           {rating != null ? rating.toFixed(1) : ''}
         </span>
       </div>
+
 
       <div className="mt-3">
         <Slider
@@ -88,14 +85,9 @@ const OverallRatingSection = React.memo(function OverallRatingSection({
         <span className="text-[11px] text-slate-500 tracking-[0.04em] uppercase font-medium">
           Your rating summary
         </span>
-        <span 
+        <span
           className="text-lg font-semibold uppercase tracking-wide"
-          style={{
-            ...(rating != null && rating >= 9 
-              ? { color: '#C1A84C' }
-              : { color: '#334E3D' }
-            ),
-          }}
+          style={{ color: rating != null ? ratingTextColor(rating) : '#94a3b8' }}
         >
           {getScoreTier(rating ?? 0).label}
         </span>

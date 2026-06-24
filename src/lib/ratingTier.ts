@@ -77,7 +77,7 @@ export function rampForRating(rating: number | null | undefined): RatingRamp {
  */
 export function ratingTextColor(rating: number | null | undefined): string {
   const tier = getRatingTier(rating);
-  if (tier === 'EXCEPTIONAL') return '#F7931E';
+  if (tier === 'EXCEPTIONAL') return '#F0A500'; // deeper gold, legible on light surfaces
   if (tier === 'EXCELLENT' || tier === 'GOOD') return '#D97706';
   return '#64748B';
 }

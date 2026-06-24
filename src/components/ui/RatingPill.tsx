@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { cn } from '@/lib/utils';
 import { getRatingTheme } from '@/lib/globalAchievementMilestoneSystem';
-import type { RatingTier } from '@/lib/ratingTier';
+import { getRatingTier, getRatingTierLabel, ratingTextColor, type RatingTier } from '@/lib/ratingTier';
 
 interface RatingPillProps {
   /** Rating score (0-10) OR a RatingTier key */
@@ -17,44 +17,46 @@ interface RatingPillProps {
 
 /**
  * Unified Rating Pill Component
- * 
- * Uses slate scale for Excellent→Poor, amber for Exceptional (≥9.0).
- * Includes smooth tier change transitions.
+ *
+ * Colour follows the canonical graduated tier system
+ * (grey poor/fair → amber good/excellent → gold exceptional)
+ * via `ratingTextColor` so every surface stays consistent.
  */
 export function RatingPill({ score, tier, label, showRatingInPill = false, className }: RatingPillProps) {
   // Midpoint per canonical 5-tier banding (see src/lib/ratingTier.ts).
-  // Record<RatingTier, number> gives compile-time exhaustiveness — future
-  // RatingTier additions will fail here until a midpoint is provided.
   const TIER_TO_MIDPOINT: Record<RatingTier, number> = {
-    EXCEPTIONAL: 9.5, // midpoint of ≥9.0
-    EXCELLENT: 8.2,   // midpoint of 7.5-8.9
-    GOOD: 6.7,        // midpoint of 6.0-7.4
-    FAIR: 5.0,        // midpoint of 4.0-5.9
-    POOR: 2.0,        // midpoint of 0-3.9
+    EXCEPTIONAL: 9.5,
+    EXCELLENT: 8.2,
+    GOOD: 6.7,
+    FAIR: 5.0,
+    POOR: 2.0,
   };
-  const theme = tier
-    ? getRatingTheme(TIER_TO_MIDPOINT[tier])
-    : getRatingTheme(score ?? 0);
+  const resolvedScore = tier ? TIER_TO_MIDPOINT[tier] : (score ?? 0);
+  const resolvedTier = tier ?? getRatingTier(resolvedScore);
+  const displayLabel = label ?? getRatingTierLabel(resolvedScore);
+  const fill = ratingTextColor(resolvedScore);
 
-  const displayLabel = label ?? theme.label;
   // Track tier changes for transition animation
   const [isTransitioning, setIsTransitioning] = useState(false);
   const [displayedLabel, setDisplayedLabel] = useState(displayLabel);
-  const prevTierRef = useRef(theme.key);
-  
+  const prevTierRef = useRef(resolvedTier);
+
   useEffect(() => {
-    if (prevTierRef.current !== theme.key) {
+    if (prevTierRef.current !== resolvedTier) {
       setIsTransitioning(true);
       const timer = setTimeout(() => {
         setDisplayedLabel(displayLabel);
         setIsTransitioning(false);
       }, 120);
-      prevTierRef.current = theme.key;
+      prevTierRef.current = resolvedTier;
       return () => clearTimeout(timer);
     } else {
       setDisplayedLabel(displayLabel);
     }
-  }, [theme.key, displayLabel]);
+  }, [resolvedTier, displayLabel]);
+
+  // Keep getRatingTheme import alive for any future theme needs; reference once.
+  void getRatingTheme;
 
   return (
     <span
@@ -62,9 +64,9 @@ export function RatingPill({ score, tier, label, showRatingInPill = false, class
         'inline-flex items-center justify-center',
         'rounded-sq-sm px-3 py-[6px] text-xs font-semibold uppercase tracking-[0.08em]',
         'border rating-label-transition text-white',
-        'bg-[#f59e0b] border-[#f59e0b]',
         className
       )}
+      style={{ backgroundColor: fill, borderColor: fill }}
       data-transitioning={isTransitioning}
     >
       {displayedLabel.toUpperCase()}

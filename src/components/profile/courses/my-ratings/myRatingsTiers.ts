@@ -4,7 +4,12 @@
  * Provides the shared `RatedCourseData` shape, the byline tier name,
  * and the coarse bucket grouping (Exceptional vs Excellent-and-below)
  * used by section dividers in the Course History list.
+ *
+ * Thresholds are delegated to `getRatingTier` (src/lib/ratingTier.ts) so
+ * the 5-tier taxonomy lives in exactly one place.
  */
+
+import { getRatingTier } from '@/lib/ratingTier';
 
 export interface RatedCourseData {
   id: string;
@@ -31,11 +36,7 @@ export interface RatedCourseData {
  */
 export function getTierName(rating: number | null | undefined): string {
   if (rating == null) return 'UNRATED';
-  if (rating >= 9.0) return 'EXCEPTIONAL';
-  if (rating >= 7.5) return 'EXCELLENT';
-  if (rating >= 6.0) return 'GOOD';
-  if (rating >= 4.0) return 'FAIR';
-  return 'POOR';
+  return getRatingTier(rating);
 }
 
 /**
@@ -46,8 +47,7 @@ export function getTierName(rating: number | null | undefined): string {
 export type MyRatingsBucket = 'top' | 'rest';
 
 export function getBucket(rating: number): MyRatingsBucket {
-  if (rating >= 9.0) return 'top';
-  return 'rest';
+  return getRatingTier(rating) === 'EXCEPTIONAL' ? 'top' : 'rest';
 }
 
 export function getBucketLabel(bucket: MyRatingsBucket): string {

@@ -1,6 +1,7 @@
 import React from 'react';
 import { Slider } from '@/components/ui/slider';
 import { getScoreTier, isGoldTier, type ScoreTier } from '@/utils/getScoreTier';
+import { ratingTextColor } from '@/lib/ratingTier';
 import { BREAKDOWN_CATEGORIES, RATING_SLIDER_CONFIG, ANIMATION_TIMINGS } from '../constants';
 
 interface BreakdownSlidersSectionProps {
@@ -63,12 +64,7 @@ const BreakdownSlidersSection = React.memo(function BreakdownSlidersSection({
               <span className="text-base font-semibold text-slate-900">{label}</span>
               <span 
                 className="text-sm font-medium tabular-nums min-w-[3ch] text-right"
-                style={{
-                  ...(score != null && score >= 9 
-                    ? { color: '#C1A84C' }
-                    : { color: score != null ? '#334E3D' : '#94a3b8' }
-                  ),
-                }}
+                style={{ color: score != null ? ratingTextColor(score) : '#94a3b8' }}
               >
                 {score != null ? score.toFixed(1) : '--'}
               </span>
