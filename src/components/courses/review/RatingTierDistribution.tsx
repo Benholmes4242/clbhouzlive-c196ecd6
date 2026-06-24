@@ -1,4 +1,13 @@
 import React from 'react';
+import { RATING_RAMPS } from '@/lib/ratingTier';
+
+const TIER_RAMP_KEY: Record<'EXCEPTIONAL' | 'EXCELLENT' | 'GOOD' | 'FAIR' | 'POOR', keyof typeof RATING_RAMPS> = {
+  EXCEPTIONAL: 'gold',
+  EXCELLENT: 'amber',
+  GOOD: 'amber',
+  FAIR: 'grey',
+  POOR: 'grey',
+};
 
 export type RatingTierKey = 'EXCEPTIONAL' | 'EXCELLENT' | 'GOOD' | 'FAIR' | 'POOR';
 
