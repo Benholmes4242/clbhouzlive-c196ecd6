@@ -3,7 +3,16 @@ import { useFullscreenFeedStore } from '@/store/fullscreenFeedStore';
 import { useNavigate } from 'react-router-dom';
 import { formatDistanceToNow } from 'date-fns';
 import { Heart, MessageCircle, Share2, MapPin, X } from 'lucide-react';
-import { getRatingTierLabel } from '@/lib/ratingTier';
+import { getRatingTier, getRatingTierLabel } from '@/lib/ratingTier';
+
+// Dark-surface tier label colour (mirrors FeedCard LABEL_COLOR map).
+const LOOP_LABEL_COLOR: Record<ReturnType<typeof getRatingTier>, string> = {
+  EXCEPTIONAL: '#FFC23D',
+  EXCELLENT: '#F7931E',
+  GOOD: '#F7931E',
+  FAIR: 'rgba(255,255,255,0.55)',
+  POOR: 'rgba(255,255,255,0.45)',
+};
 import clbhouzLogo from '@/assets/clbhouz-logo.png';
 import type { FeedPost } from '@/components/media-system/types/media';
 import PostFeedCarousel from '@/components/feed/PostFeedCarousel';
