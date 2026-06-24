@@ -15,7 +15,7 @@
  * (most-in-view card). Only one inline video plays at a time across the
  * whole feed; tapping any media opens the immersive `FullscreenFeedOverlay`.
  */
-import React, { useMemo, useState } from 'react';
+import React, { useLayoutEffect, useMemo, useRef, useState } from 'react';
 import { Heart, MapPin, MessageCircle, Share } from 'lucide-react';
 import { PostOwnerMenu } from '@/components/posts/PostOwnerMenu';
 import { useManageableBusinessIds } from '@/hooks/useManageableBusinessIds';
@@ -98,6 +98,89 @@ export interface FeedCardProps {
   feedIndex?: number;
 }
 
+interface CaptionBlockProps {
+  body: string;
+  expanded: boolean;
+  setExpanded: (v: boolean) => void;
+  isClamped: boolean;
+  setIsClamped: (v: boolean) => void;
+  textRef: React.MutableRefObject<HTMLDivElement | null>;
+}
+
+const CaptionBlock: React.FC<CaptionBlockProps> = ({ body, expanded, setExpanded, isClamped, setIsClamped, textRef }) => {
+  useLayoutEffect(() => {
+    const el = textRef.current;
+    if (!el) return;
+    // Measure against clamped state: when expanded the element has no clamp,
+    // so we rely on the previously-measured value to keep "less" available.
+    if (!expanded) {
+      const clamped = el.scrollHeight > el.clientHeight + 1;
+      setIsClamped(clamped);
+    }
+  }, [body, expanded, setIsClamped, textRef]);
+
+  if (!body) return null;
+
+  return (
+    <div style={{ padding: '0px 14px 10px', position: 'relative', zIndex: 2, marginTop: -6 }}>
+      <div style={{ position: 'relative' }}>
+        <div
+          ref={textRef}
+          style={{
+            fontSize: 14,
+            lineHeight: 1.4,
+            color: T100,
+            ...(expanded
+              ? {}
+              : {
+                  display: '-webkit-box',
+                  WebkitLineClamp: 3,
+                  WebkitBoxOrient: 'vertical',
+                  overflow: 'hidden',
+                }),
+          }}
+        >
+          {body}
+          {expanded && isClamped && (
+            <button
+              type="button"
+              onClick={(e) => { e.stopPropagation(); setExpanded(false); }}
+              style={{
+                background: 'transparent', border: 'none', padding: 0, marginLeft: 6,
+                color: T60, fontSize: 14, fontWeight: 600, cursor: 'pointer',
+              }}
+            >
+              less
+            </button>
+          )}
+        </div>
+        {!expanded && isClamped && (
+          <button
+            type="button"
+            onClick={(e) => { e.stopPropagation(); setExpanded(true); }}
+            style={{
+              position: 'absolute',
+              right: 0,
+              bottom: 0,
+              paddingLeft: 28,
+              background: 'linear-gradient(90deg, rgba(15,23,42,0) 0%, #0F172A 40%)',
+              border: 'none',
+              color: T60,
+              fontSize: 14,
+              fontWeight: 600,
+              cursor: 'pointer',
+              lineHeight: 1.4,
+            }}
+          >
+            more
+          </button>
+        )}
+      </div>
+    </div>
+  );
+};
+
+
 const FeedCardImpl: React.FC<FeedCardProps> = ({
   post,
   liked,
@@ -119,6 +202,8 @@ const FeedCardImpl: React.FC<FeedCardProps> = ({
   feedIndex,
 }) => {
   const [captionExpanded, setCaptionExpanded] = useState(false);
+  const [isCaptionClamped, setIsCaptionClamped] = useState(false);
+  const captionTextRef = useRef<HTMLDivElement | null>(null);
   const mountFollowPill =
     !!onFollow &&
     post.actorType === 'personal' &&
@@ -195,7 +280,7 @@ const FeedCardImpl: React.FC<FeedCardProps> = ({
       })()}
 
       {/* Header */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '10px 12px', position: 'relative', zIndex: 2 }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '10px 12px 2px', position: 'relative', zIndex: 2 }}>
         <button
           type="button"
           onClick={() => onProfile(post)}
@@ -297,57 +382,16 @@ const FeedCardImpl: React.FC<FeedCardProps> = ({
         </div>
       </div>
 
-      {/* Caption — review text above media */}
-      {(() => {
-        const body = post.caption || (post.isReview ? post.review?.reviewText ?? '' : '');
-        if (!body) return null;
-        return (
-          <div style={{ padding: '0px 14px 10px', position: 'relative', zIndex: 2 }}>
-            <div
-              style={{
-                fontSize: 14,
-                lineHeight: 1.4,
-                color: T100,
-                ...(captionExpanded
-                  ? {}
-                  : {
-                      display: '-webkit-box',
-                      WebkitLineClamp: 3,
-                      WebkitBoxOrient: 'vertical',
-                      overflow: 'hidden',
-                      textOverflow: 'ellipsis',
-                    }),
-              }}
-            >
-              {body}
-              {captionExpanded && (
-                <button
-                  type="button"
-                  onClick={(e) => { e.stopPropagation(); setCaptionExpanded(false); }}
-                  style={{
-                    background: 'transparent', border: 'none', padding: 0, marginLeft: 6,
-                    color: T60, fontSize: 14, fontWeight: 600, cursor: 'pointer',
-                  }}
-                >
-                  less
-                </button>
-              )}
-            </div>
-            {!captionExpanded && (
-              <button
-                type="button"
-                onClick={(e) => { e.stopPropagation(); setCaptionExpanded(true); }}
-                style={{
-                  background: 'transparent', border: 'none', padding: 0, marginTop: 2,
-                  color: T60, fontSize: 14, fontWeight: 600, cursor: 'pointer',
-                }}
-              >
-                more
-              </button>
-            )}
-          </div>
-        );
-      })()}
+      {/* Caption — review text above media, overlapping the ghost numeral's lower edge */}
+      <CaptionBlock
+        body={post.caption || (post.isReview ? post.review?.reviewText ?? '' : '')}
+        expanded={captionExpanded}
+        setExpanded={setCaptionExpanded}
+        isClamped={isCaptionClamped}
+        setIsClamped={setIsCaptionClamped}
+        textRef={captionTextRef}
+      />
+
 
       {/* Media */}
       <div style={{ position: 'relative', zIndex: 1 }}>

@@ -98,10 +98,42 @@ const GlobalBottomNavigation: React.FC<GlobalBottomNavigationProps> = ({ chromeS
   const isWarmGradientRoute = WARM_GRADIENT_ROUTES.some(r => location.pathname.startsWith(r));
   const isTourHubRoute = location.pathname.startsWith('/tourhub');
   const isHandicapRoute = location.pathname.startsWith('/handicap');
-  /** Routes that use dark chrome on the bottom nav (currently none — Clubhouse and Handicap are both light). */
-  const isDarkChromeRoute = false;
+  /** App-wide ink chrome — matches the feed surface (#0F172A). */
+  const isDarkChromeRoute = true;
   
   const showNavigation = isVisible && !shouldHideForRoute;
+
+  // Scroll-direction hide/show — only on the feed (Clubhouse).
+  // Down past ~80px hides the nav; up shows it; near top always shows.
+  const [navHidden, setNavHidden] = useState(false);
+  useEffect(() => {
+    if (!isClubhouseRoute) { setNavHidden(false); return; }
+    const lastTopByEl = new WeakMap<EventTarget, number>();
+    let raf = 0;
+    const onScroll = (e: Event) => {
+      const target = e.target as (HTMLElement | Document | null);
+      if (!target) return;
+      const top = target === document
+        ? window.scrollY
+        : (target as HTMLElement).scrollTop ?? 0;
+      const key: EventTarget = target === document ? window : target;
+      if (raf) return;
+      raf = requestAnimationFrame(() => {
+        raf = 0;
+        const prev = lastTopByEl.get(key) ?? 0;
+        const delta = top - prev;
+        lastTopByEl.set(key, top);
+        if (top < 80) { setNavHidden(false); return; }
+        if (delta > 8) setNavHidden(true);
+        else if (delta < -4) setNavHidden(false);
+      });
+    };
+    window.addEventListener('scroll', onScroll, { passive: true, capture: true });
+    return () => {
+      window.removeEventListener('scroll', onScroll, { capture: true } as any);
+      if (raf) cancelAnimationFrame(raf);
+    };
+  }, [isClubhouseRoute]);
 
   // Audit on mount
   useEffect(() => {
@@ -165,7 +197,7 @@ const GlobalBottomNavigation: React.FC<GlobalBottomNavigationProps> = ({ chromeS
             <motion.div
               className="global-bottom-nav"
               initial={{ y: '100%', opacity: 0 }}
-              animate={{ y: 0, opacity: 1 }}
+              animate={{ y: navHidden ? '100%' : 0, opacity: navHidden ? 0 : 1 }}
               exit={{ y: '100%', opacity: 0 }}
               transition={{ duration: 0.24, ease: [0.22, 0.61, 0.36, 1] }}
             >
@@ -177,8 +209,8 @@ const GlobalBottomNavigation: React.FC<GlobalBottomNavigationProps> = ({ chromeS
                 className="chrome-bottom-nav clubhouse-footer"
                 data-chrome="bottom-nav"
                 style={{
-                  // Route-aware: dark on Clubhouse/Handicap, light everywhere else.
-                  background: isDarkChromeRoute ? '#0A0E14' : '#F8FAFC',
+                  // App-wide ink chrome — matches feed surface (#0F172A).
+                  background: isDarkChromeRoute ? '#0F172A' : '#F8FAFC',
                   borderTop: isDarkChromeRoute
                     ? '0.5px solid rgba(255,255,255,0.06)'
                     : '0.5px solid rgba(15,23,42,0.08)',
