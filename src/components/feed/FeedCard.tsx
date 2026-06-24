@@ -16,6 +16,7 @@
  * whole feed; tapping any media opens the immersive `FullscreenFeedOverlay`.
  */
 import React, { useLayoutEffect, useMemo, useRef, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Heart, MapPin, MessageCircle, Share } from 'lucide-react';
 import { PostOwnerMenu } from '@/components/posts/PostOwnerMenu';
 import { useManageableBusinessIds } from '@/hooks/useManageableBusinessIds';
@@ -105,9 +106,11 @@ interface CaptionBlockProps {
   isClamped: boolean;
   setIsClamped: (v: boolean) => void;
   textRef: React.MutableRefObject<HTMLDivElement | null>;
+  /** When set, renders an inline "Read review ›" affordance (review posts) instead of more/less. */
+  onReadReview?: (e: React.MouseEvent) => void;
 }
 
-const CaptionBlock: React.FC<CaptionBlockProps> = ({ body, expanded, setExpanded, isClamped, setIsClamped, textRef }) => {
+const CaptionBlock: React.FC<CaptionBlockProps> = ({ body, expanded, setExpanded, isClamped, setIsClamped, textRef, onReadReview }) => {
   useLayoutEffect(() => {
     const el = textRef.current;
     if (!el) return;
@@ -119,7 +122,13 @@ const CaptionBlock: React.FC<CaptionBlockProps> = ({ body, expanded, setExpanded
     }
   }, [body, expanded, setIsClamped, textRef]);
 
-  if (!body) return null;
+  // Review posts: always clamp to 3 lines and show "Read review ›" affordance
+  // that navigates straight to the course review page (no inline expand).
+  const isReviewMode = !!onReadReview;
+  const showMore = !isReviewMode && !expanded && isClamped;
+  const showReadReview = isReviewMode && !!body;
+
+  if (!body && !showReadReview) return null;
 
   return (
     <div style={{ padding: '0px 14px 10px', position: 'relative', zIndex: 2, marginTop: -1 }}>
@@ -130,18 +139,18 @@ const CaptionBlock: React.FC<CaptionBlockProps> = ({ body, expanded, setExpanded
             fontSize: 14,
             lineHeight: 1.4,
             color: T100,
-            ...(expanded
-              ? {}
-              : {
+            ...((isReviewMode || !expanded)
+              ? {
                   display: '-webkit-box',
                   WebkitLineClamp: 3,
                   WebkitBoxOrient: 'vertical',
                   overflow: 'hidden',
-                }),
+                }
+              : {}),
           }}
         >
           {body}
-          {expanded && isClamped && (
+          {!isReviewMode && expanded && isClamped && (
             <button
               type="button"
               onClick={(e) => { e.stopPropagation(); setExpanded(false); }}
@@ -154,7 +163,7 @@ const CaptionBlock: React.FC<CaptionBlockProps> = ({ body, expanded, setExpanded
             </button>
           )}
         </div>
-        {!expanded && isClamped && (
+        {showMore && (
           <button
             type="button"
             onClick={(e) => { e.stopPropagation(); setExpanded(true); }}
@@ -175,10 +184,33 @@ const CaptionBlock: React.FC<CaptionBlockProps> = ({ body, expanded, setExpanded
             more
           </button>
         )}
+        {showReadReview && (
+          <button
+            type="button"
+            onClick={(e) => { e.stopPropagation(); onReadReview!(e); }}
+            style={{
+              position: 'absolute',
+              right: 0,
+              bottom: 0,
+              paddingLeft: 32,
+              background: 'linear-gradient(90deg, rgba(15,23,42,0) 0%, #0F172A 40%)',
+              border: 'none',
+              color: AMBER,
+              fontSize: 14,
+              fontWeight: 700,
+              cursor: 'pointer',
+              lineHeight: 1.4,
+              whiteSpace: 'nowrap',
+            }}
+          >
+            Read review ›
+          </button>
+        )}
       </div>
     </div>
   );
 };
+
 
 
 const FeedCardImpl: React.FC<FeedCardProps> = ({
@@ -201,9 +233,21 @@ const FeedCardImpl: React.FC<FeedCardProps> = ({
   currentUserId,
   feedIndex,
 }) => {
+  const navigate = useNavigate();
   const [captionExpanded, setCaptionExpanded] = useState(false);
   const [isCaptionClamped, setIsCaptionClamped] = useState(false);
   const captionTextRef = useRef<HTMLDivElement | null>(null);
+
+  const reviewCourseId = post.review?.courseId ?? post.courseId;
+  const reviewId = post.review?.reviewId;
+  const handleReadReview = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (!reviewCourseId) return;
+    const url = reviewId
+      ? `/courses/${reviewCourseId}?tab=reviews&review=${reviewId}`
+      : `/courses/${reviewCourseId}?tab=reviews`;
+    navigate(url);
+  };
   const mountFollowPill =
     !!onFollow &&
     post.actorType === 'personal' &&
@@ -349,7 +393,7 @@ const FeedCardImpl: React.FC<FeedCardProps> = ({
             return (
               <button
                 type="button"
-                onClick={(e) => { e.stopPropagation(); onReviewTap?.(post); }}
+                onClick={handleReadReview}
                 style={{
                   position: 'relative', zIndex: 3,
                   background: 'transparent', border: 'none', padding: 0, cursor: 'pointer',
@@ -390,6 +434,7 @@ const FeedCardImpl: React.FC<FeedCardProps> = ({
         isClamped={isCaptionClamped}
         setIsClamped={setIsCaptionClamped}
         textRef={captionTextRef}
+        onReadReview={post.isReview && reviewCourseId ? handleReadReview : undefined}
       />
 
 
@@ -584,28 +629,8 @@ const FeedCardImpl: React.FC<FeedCardProps> = ({
           padding: '10px 14px 12px',
         }}
       >
-        <div>
-          {post.isReview && (
-            <button
-              type="button"
-              onClick={(e) => {
-                e.stopPropagation();
-                onReviewTap?.(post);
-              }}
-              style={{
-                background: 'transparent',
-                border: 'none',
-                padding: 0,
-                color: T100,
-                fontSize: 14,
-                fontWeight: 700,
-                cursor: 'pointer',
-              }}
-            >
-              Read review ›
-            </button>
-          )}
-        </div>
+        <div />
+
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '50%', flexShrink: 0 }}>
           <FooterButton
             icon={Heart}
