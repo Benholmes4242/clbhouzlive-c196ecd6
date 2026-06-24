@@ -77,8 +77,8 @@ export interface FeedCardProps {
   liked: boolean;
   likeCount: number;
   commentCount: number;
-  onLike: (post: FeedPost) => void;
-  onComment: (post: FeedPost) => void;
+  onLike: (post: FeedPost, actor?: ActiveActor | null) => void;
+  onComment: (post: FeedPost, actor?: ActiveActor | null) => void;
   onShare: (post: FeedPost) => void;
   onOpenMedia: (post: FeedPost, mediaIndex: number) => void;
   onProfile: (post: FeedPost) => void;
