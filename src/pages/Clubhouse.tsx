@@ -420,16 +420,16 @@ const ClubhouseContent = () => {
         activeTab === 'friends' ? (
           <div
             className="flex flex-col w-full min-h-screen"
-            style={{ background: '#F8FAFC', paddingTop: 'calc(env(safe-area-inset-top, 0px) + 78px)' }}
+            style={{ background: '#15171F', paddingTop: 'calc(env(safe-area-inset-top, 0px) + 78px)' }}
           >
             <div className="flex flex-col items-center px-8 text-center pb-6">
-              <div className="w-14 h-14 rounded-full flex items-center justify-center mb-4" style={{ background: 'rgba(15,23,42,0.05)' }}>
-                <Users className="w-7 h-7" style={{ color: '#8E8E93' }} />
+              <div className="w-14 h-14 rounded-full flex items-center justify-center mb-4" style={{ background: 'rgba(255,255,255,0.06)' }}>
+                <Users className="w-7 h-7" style={{ color: 'rgba(255,255,255,0.5)' }} />
               </div>
-              <p className="text-[17px] font-semibold mb-1" style={{ color: '#1C1C1E' }}>
+              <p className="text-[17px] font-semibold mb-1" style={{ color: '#FFFFFF' }}>
                 {!user ? 'Sign in to see your friends' : (activeFeed.isError ? 'Couldn’t load your feed' : 'No posts from friends yet')}
               </p>
-              <p className="text-[13px] leading-relaxed mb-4" style={{ color: '#8E8E93' }}>
+              <p className="text-[13px] leading-relaxed mb-4" style={{ color: 'rgba(255,255,255,0.7)' }}>
                 {!user ? 'Create an account or sign in to start following golfers.' : (activeFeed.isError ? 'Tap retry to try again.' : 'Follow golfers below to start building your feed')}
               </p>
               {!user ? (
