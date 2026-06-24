@@ -86,6 +86,7 @@ export function useSuggestedFeed(userId: string | undefined) {
   return {
     posts: allPosts,
     isLoading: query.isLoading,
+    isError: query.isError,
     hasNextPage: query.hasNextPage,
     isFetchingNextPage: query.isFetchingNextPage,
     fetchNextPage: query.fetchNextPage,
