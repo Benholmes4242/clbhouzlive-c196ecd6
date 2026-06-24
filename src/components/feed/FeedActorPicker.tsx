@@ -36,7 +36,7 @@ export const FeedActorPicker: React.FC<FeedActorPickerProps> = ({ value, onChang
       src={current.avatarUrl ?? undefined}
       alt={current.name}
       userId={current.type === 'personal' ? current.id : null}
-      hideRing={current.type === 'business'}
+      hideRing
     />
   );
 
