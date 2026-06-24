@@ -56,20 +56,16 @@ const OverallRatingSection = React.memo(function OverallRatingSection({
         <span className="text-lg font-semibold text-slate-900">
           {isEditMode ? 'Edit your overall rating' : 'Submit your overall rating'}
         </span>
-        <span 
+        <span
           className={`text-base font-semibold tabular-nums transition-opacity duration-200 ${
             rating != null ? 'opacity-100' : 'opacity-0'
           }`}
-          style={{
-            ...(rating != null && rating >= 9 
-              ? { color: '#C1A84C' }
-              : { color: '#334E3D' }
-            ),
-          }}
+          style={{ color: rating != null ? ratingTextColor(rating) : '#94a3b8' }}
         >
           {rating != null ? rating.toFixed(1) : ''}
         </span>
       </div>
+
 
       <div className="mt-3">
         <Slider
