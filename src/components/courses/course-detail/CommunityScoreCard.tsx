@@ -241,7 +241,12 @@ const CommunityScoreCard: React.FC<CommunityScoreCardProps> = ({
                   style={{
                     height: '100%',
                     width: `${pct}%`,
-                    background: has ? 'linear-gradient(90deg, #F7931E, #FFB347)' : 'transparent',
+                    background: has
+                      ? (() => {
+                          const ramp = rampForRating(TIER_REP_SCORE[key as string] ?? 0);
+                          return `linear-gradient(90deg, ${ramp.lo}, ${ramp.hi})`;
+                        })()
+                      : 'transparent',
                     borderRadius: 4,
                     transition: 'width 0.5s ease',
                   }}
