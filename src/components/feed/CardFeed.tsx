@@ -274,7 +274,6 @@ export const CardFeed: React.FC<CardFeedProps> = ({
       const mountVideo = isNear;
       return (
         <div
-          style={{ paddingBottom: 12 }}
           data-card-index={index}
           ref={(el) => {
             const obs = observerRef.current;
