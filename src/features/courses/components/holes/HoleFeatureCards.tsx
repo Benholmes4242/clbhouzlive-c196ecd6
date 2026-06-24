@@ -1,7 +1,7 @@
 import React from 'react';
 import type { CourseHole } from '@/hooks/gam/useCourseHoleAnalysis';
 import { HoleDistributionBar } from './HoleDistributionBar';
-import { FONT, INK } from './_constants';
+import { FONT, INK, MONO, SC_BIRDIE, SC_DOUBLE } from './_constants';
 import { INK_MUTE } from '@/features/courses/_shared/tokens';
 
 interface Props {
@@ -14,10 +14,10 @@ const Card: React.FC<{
   label: string;
   hole: CourseHole;
 }> = ({ tone, label, hole }) => {
-  // Hardest → maroon; Easiest → amber (birdie chance, on-brand celebrate color)
-  const tint = tone === 'hard' ? 'rgba(15,23,42,0.05)' : 'rgba(159,29,29,0.06)';
-  const border = tone === 'hard' ? 'rgba(15,23,42,0.16)' : 'rgba(159,29,29,0.20)';
-  const eyebrow = tone === 'hard' ? '#0F172A' : '#9F1D1D';
+  // Diverging palette: Hardest → red/navy accent, Easiest → teal accent
+  const tint = tone === 'hard' ? 'rgba(220,38,38,0.05)' : 'rgba(45,212,191,0.07)';
+  const border = tone === 'hard' ? 'rgba(220,38,38,0.20)' : 'rgba(14,124,123,0.22)';
+  const eyebrow = tone === 'hard' ? SC_DOUBLE : SC_BIRDIE;
   const playsTo = (hole.par + hole.avg_to_par).toFixed(1);
   return (
     <div
@@ -52,13 +52,21 @@ const Card: React.FC<{
             color: INK,
             letterSpacing: '-0.02em',
             lineHeight: 1,
-            fontFeatureSettings: '"kern" 1, "liga" 1',
+            fontFamily: MONO,
             fontVariantNumeric: 'tabular-nums',
           }}
         >
           {hole.hole_no}
         </div>
-        <div style={{ fontSize: 11.5, fontWeight: 600, color: INK_MUTE }}>
+        <div
+          style={{
+            fontSize: 11.5,
+            fontWeight: 600,
+            color: INK_MUTE,
+            fontFamily: MONO,
+            fontVariantNumeric: 'tabular-nums',
+          }}
+        >
           Plays to {playsTo}
         </div>
       </div>

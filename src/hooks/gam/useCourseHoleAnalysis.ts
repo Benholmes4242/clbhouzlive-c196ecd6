@@ -1,10 +1,13 @@
 import { useGamRpc } from './_useGamRpc';
 
 export interface HoleDistribution {
-  birdie_better: number;
+  ace: number;
+  albatross: number;
+  eagle: number;
+  birdie: number;
   par: number;
   bogey: number;
-  double_worse: number;
+  double: number;
 }
 
 export interface CourseHole {

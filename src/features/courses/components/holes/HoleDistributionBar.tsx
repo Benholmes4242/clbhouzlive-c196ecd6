@@ -1,6 +1,14 @@
 import React from 'react';
 import type { HoleDistribution } from '@/hooks/gam/useCourseHoleAnalysis';
-import { C_BIRDIE, C_PAR, C_BOGEY, C_DOUBLE } from './_constants';
+import {
+  SC_ACE,
+  SC_ALBATROSS,
+  SC_EAGLE,
+  SC_BIRDIE,
+  SC_PAR,
+  SC_BOGEY,
+  SC_DOUBLE,
+} from './_constants';
 
 interface Props {
   dist: HoleDistribution;
@@ -9,10 +17,13 @@ interface Props {
 
 export const HoleDistributionBar: React.FC<Props> = ({ dist, height = 6 }) => {
   const segs: Array<{ v: number; c: string }> = [
-    { v: dist.birdie_better, c: C_BIRDIE },
-    { v: dist.par, c: C_PAR },
-    { v: dist.bogey, c: C_BOGEY },
-    { v: dist.double_worse, c: C_DOUBLE },
+    { v: dist.ace,       c: SC_ACE },
+    { v: dist.albatross, c: SC_ALBATROSS },
+    { v: dist.eagle,     c: SC_EAGLE },
+    { v: dist.birdie,    c: SC_BIRDIE },
+    { v: dist.par,       c: SC_PAR },
+    { v: dist.bogey,     c: SC_BOGEY },
+    { v: dist.double,    c: SC_DOUBLE },
   ];
   return (
     <div
