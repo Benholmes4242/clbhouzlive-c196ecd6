@@ -60,8 +60,8 @@ img[src*="Silhouette"] {
  * Now using standard body scroll with overscroll prevention.
  */
 html {
-  background-color: #0d0d0d;
-  color-scheme: dark; /* prevents browser-injected white backgrounds on first paint */
+  background-color: #F8FAFC;
+  color-scheme: light; /* app is light theme; Clubhouse feed paints its own dark bg at the component level */
   height: 100%;
   overflow-x: hidden;
   overflow-y: auto;
@@ -71,8 +71,8 @@ html {
 
 body {
   @apply font-sans;
-  background-color: #0d0d0d;
-  color-scheme: dark; /* prevents browser-injected white backgrounds on first paint */
+  background-color: #F8FAFC;
+  color-scheme: light;
   height: 100%;
   overflow-x: hidden;
   overflow-y: auto;

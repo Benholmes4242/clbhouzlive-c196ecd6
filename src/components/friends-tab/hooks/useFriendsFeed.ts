@@ -61,7 +61,7 @@ export function useFriendsFeed({
 
       if (error) {
         if (import.meta.env.DEV) console.error('[FriendsFeed] RPC error:', error);
-        return { posts: [] as FeedPost[], nextCursor: undefined as string | undefined };
+        throw error;
       }
 
       if (!data || data.length === 0) {

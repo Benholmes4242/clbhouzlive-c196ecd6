@@ -419,38 +419,74 @@ const ClubhouseContent = () => {
       {((!isLoading && posts.length === 0) || (skeletonTimedOut && posts.length === 0)) ? (
         activeTab === 'friends' ? (
           <div
-            className="flex flex-col w-full"
-            style={{ paddingTop: 'calc(env(safe-area-inset-top, 0px) + 78px)' }}
+            className="flex flex-col w-full min-h-screen"
+            style={{ background: '#F8FAFC', paddingTop: 'calc(env(safe-area-inset-top, 0px) + 78px)' }}
           >
             <div className="flex flex-col items-center px-8 text-center pb-6">
               <div className="w-14 h-14 rounded-full flex items-center justify-center mb-4" style={{ background: 'rgba(15,23,42,0.05)' }}>
-                <Users className="w-7 h-7" style={{ color: '#94A3B8' }} />
+                <Users className="w-7 h-7" style={{ color: '#8E8E93' }} />
               </div>
-              <p className="text-[17px] font-semibold mb-1" style={{ color: '#0F172A' }}>
-                No posts from friends yet
+              <p className="text-[17px] font-semibold mb-1" style={{ color: '#1C1C1E' }}>
+                {!user ? 'Sign in to see your friends' : (activeFeed.isError ? 'Couldn’t load your feed' : 'No posts from friends yet')}
               </p>
-              <p className="text-[13px] leading-relaxed" style={{ color: '#64748B' }}>
-                Follow golfers below to start building your feed
+              <p className="text-[13px] leading-relaxed mb-4" style={{ color: '#8E8E93' }}>
+                {!user ? 'Create an account or sign in to start following golfers.' : (activeFeed.isError ? 'Tap retry to try again.' : 'Follow golfers below to start building your feed')}
               </p>
+              {!user ? (
+                <button
+                  onClick={() => navigate('/auth')}
+                  style={{ background: '#F7931E', color: '#0F172A', fontWeight: 600, fontSize: 15, padding: '12px 24px', borderRadius: 12, border: 'none' }}
+                >
+                  Sign in
+                </button>
+              ) : (
+                <button
+                  onClick={() => activeFeed.refetch?.()}
+                  style={{ background: '#0F172A', color: '#FFFFFF', fontWeight: 600, fontSize: 15, padding: '12px 24px', borderRadius: 12, border: 'none' }}
+                >
+                  Retry
+                </button>
+              )}
             </div>
-            <SuggestedCreatorsShelf
-              userId={user?.id}
-              variant="light"
-              title="Golfers to follow"
-              showViewAll={true}
-              onViewAll={() => navigate('/golferstofollow')}
-            />
+            {user && !activeFeed.isError && (
+              <SuggestedCreatorsShelf
+                userId={user?.id}
+                variant="light"
+                title="Golfers to follow"
+                showViewAll={true}
+                onViewAll={() => navigate('/golferstofollow')}
+              />
+            )}
           </div>
         ) : (
           <div
             className="flex flex-col items-center justify-center min-h-screen px-8 text-center"
-            style={{ paddingTop: 'calc(env(safe-area-inset-top, 0px) + 78px)' }}
+            style={{ background: '#F8FAFC', paddingTop: 'calc(env(safe-area-inset-top, 0px) + 78px)' }}
           >
             <div className="w-16 h-16 rounded-full flex items-center justify-center mb-4" style={{ background: 'rgba(15,23,42,0.05)' }}>
-              <Compass className="w-8 h-8" style={{ color: '#94A3B8' }} />
+              <Compass className="w-8 h-8" style={{ color: '#8E8E93' }} />
             </div>
-            <p className="text-lg font-semibold" style={{ color: '#0F172A' }}>No posts to show</p>
-            <p className="text-sm mt-2" style={{ color: '#64748B' }}>Check back soon for new content</p>
+            <p className="text-lg font-semibold" style={{ color: '#1C1C1E' }}>
+              {!user ? 'Sign in to see your feed' : (activeFeed.isError ? 'Couldn’t load your feed' : 'No posts to show')}
+            </p>
+            <p className="text-sm mt-2 mb-4" style={{ color: '#8E8E93' }}>
+              {!user ? 'Create an account or sign in to get started.' : (activeFeed.isError ? 'Tap retry to try again.' : 'Check back soon for new content')}
+            </p>
+            {!user ? (
+              <button
+                onClick={() => navigate('/auth')}
+                style={{ background: '#F7931E', color: '#0F172A', fontWeight: 600, fontSize: 15, padding: '12px 24px', borderRadius: 12, border: 'none' }}
+              >
+                Sign in
+              </button>
+            ) : (
+              <button
+                onClick={() => activeFeed.refetch?.()}
+                style={{ background: '#0F172A', color: '#FFFFFF', fontWeight: 600, fontSize: 15, padding: '12px 24px', borderRadius: 12, border: 'none' }}
+              >
+                Retry
+              </button>
+            )}
           </div>
         )
       ) : posts.length > 0 ? (

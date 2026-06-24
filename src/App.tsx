@@ -357,9 +357,10 @@ function AppRoutes() {
     // Reset shield
     const shield = document.getElementById('safe-area-shield');
     if (shield) shield.style.backgroundColor = 'transparent';
-    // Reset html/body to prevent stale grey bleeding through WebView compositing
-    document.documentElement.style.backgroundColor = '#0d0d0d';
-    document.body.style.backgroundColor = '#0d0d0d';
+    // Reset html/body to the app's light surface to prevent stale dark bleeding
+    // through WebView compositing. Clubhouse feed paints its own dark bg.
+    document.documentElement.style.backgroundColor = '#F8FAFC';
+    document.body.style.backgroundColor = '#F8FAFC';
 
     // FIX: Mark immersive routes so CSS can suppress .app-shell's
     // #F8FAFC background-color before the hero page mounts.
