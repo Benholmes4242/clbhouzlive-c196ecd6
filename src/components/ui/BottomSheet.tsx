@@ -114,15 +114,17 @@ export function BottomSheet({
       <div
         ref={sheetRef}
         className={cn(
-          "fixed bottom-0 left-0 right-0 bg-background rounded-t-[20px] transition-transform duration-300 ease-out",
+          "fixed bottom-0 left-0 right-0 rounded-t-[20px] transition-transform duration-300 ease-out",
+          variant === 'light' && 'bg-background',
           isAnimating ? "translate-y-0" : "translate-y-full",
           className
         )}
-        style={{ 
+        style={{
           zIndex: zIndexBase + 1,
           maxHeight: '90vh',
           minHeight: 0,
           paddingBottom: 'max(env(safe-area-inset-bottom, 0px), 16px)',
+          ...(variant === 'dark' ? { background: '#0F172A' } : null),
           ...style,
         }}
         role="dialog"
@@ -130,13 +132,21 @@ export function BottomSheet({
         aria-labelledby={ariaLabelledBy}
       >
         {/* Draggable grabber area - larger and more visible */}
-        <div 
+        <div
           className="w-full pt-2.5 pb-1 cursor-grab active:cursor-grabbing touch-none"
           onTouchStart={handleTouchStart}
           onTouchMove={handleTouchMove}
           onTouchEnd={handleTouchEnd}
         >
-          <div style={{ width: 36, height: 4, borderRadius: 2, background: 'rgba(15,23,42,0.12)', margin: '0 auto' }} />
+          <div
+            style={{
+              width: 36,
+              height: 4,
+              borderRadius: 2,
+              background: variant === 'dark' ? 'rgba(255,255,255,0.18)' : 'rgba(15,23,42,0.12)',
+              margin: '0 auto',
+            }}
+          />
         </div>
         {children}
       </div>
