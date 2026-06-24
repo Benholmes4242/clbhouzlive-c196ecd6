@@ -98,8 +98,8 @@ const GlobalBottomNavigation: React.FC<GlobalBottomNavigationProps> = ({ chromeS
   const isWarmGradientRoute = WARM_GRADIENT_ROUTES.some(r => location.pathname.startsWith(r));
   const isTourHubRoute = location.pathname.startsWith('/tourhub');
   const isHandicapRoute = location.pathname.startsWith('/handicap');
-  /** App-wide ink chrome — matches the feed surface (#0F172A). */
-  const isDarkChromeRoute = true;
+  /** Charcoal nav chrome on the Clubhouse page only; light everywhere else. */
+  const isDarkChromeRoute = isClubhouseRoute;
   
   const showNavigation = isVisible && !shouldHideForRoute;
 
@@ -209,8 +209,8 @@ const GlobalBottomNavigation: React.FC<GlobalBottomNavigationProps> = ({ chromeS
                 className="chrome-bottom-nav clubhouse-footer"
                 data-chrome="bottom-nav"
                 style={{
-                  // App-wide ink chrome — matches feed surface (#0F172A).
-                  background: isDarkChromeRoute ? '#0F172A' : '#F8FAFC',
+                  // Charcoal nav chrome on Clubhouse; matches feed surface (#15171F).
+                  background: isDarkChromeRoute ? '#15171F' : '#F8FAFC',
                   borderTop: isDarkChromeRoute
                     ? '0.5px solid rgba(255,255,255,0.06)'
                     : '0.5px solid rgba(15,23,42,0.08)',
