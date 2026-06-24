@@ -72,14 +72,6 @@ const BREAKDOWNS: Array<{ key: keyof ReviewBreakdowns; label: string; desc: stri
   { key: 'facilities', label: 'Practice Facilities', desc: 'Range, putting and short game' },
 ];
 
-const CHIPS: Array<{ label: string; text: string }> = [
-  { label: 'Best holes', text: 'The standout holes were ' },
-  { label: 'Conditions', text: 'The course condition was ' },
-  { label: 'Value', text: 'For value, ' },
-  { label: 'The views', text: 'The views were ' },
-  { label: 'Pace of play', text: 'Pace of play was ' },
-  { label: 'A tip', text: 'A tip for visitors: ' },
-];
 
 /* ── Component ────────────────────────────────────────────────────────────── */
 
