@@ -602,8 +602,11 @@ const ClubhouseContent = () => {
           />
         </>
       ) : (
-        <ClubhouseSkeletonShimmer isVisible={true} isStatic={false} surface="card" />
+        // Guard: only render skeleton while feed is actually loading.
+        // The terminal early return above handles !isLoading && posts.length === 0.
+        <ClubhouseSkeletonShimmer isVisible={isLoading} isStatic={false} surface="card" />
       )}
+
 
       {/* ═══ COMMENTS + MORE OPTIONS ═══ */}
       {activePost && posts.length > 0 && (
