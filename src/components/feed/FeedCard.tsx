@@ -306,11 +306,11 @@ const FeedCardImpl: React.FC<FeedCardProps> = ({
       {/* Card-level ghost numeral — overflows the header, clipped by card edges */}
       {reviewRating != null && (() => {
         const GHOST = {
-          EXCEPTIONAL: 'rgba(247,147,30,0.14)',
-          EXCELLENT:   'rgba(255,255,255,0.08)',
-          GOOD:        'rgba(255,255,255,0.06)',
-          FAIR:        'rgba(255,255,255,0.05)',
-          POOR:        'rgba(255,255,255,0.05)',
+          EXCEPTIONAL: 'rgba(255,194,61,0.16)',
+          EXCELLENT:   'rgba(247,147,30,0.14)',
+          GOOD:        'rgba(247,147,30,0.12)',
+          FAIR:        'rgba(138,149,164,0.14)',
+          POOR:        'rgba(138,149,164,0.12)',
         } as const;
         const tierKey = getRatingTier(reviewRating);
         return (
@@ -392,11 +392,11 @@ const FeedCardImpl: React.FC<FeedCardProps> = ({
           )}
           {reviewRating != null && (() => {
             const LABEL_COLOR = {
-              EXCEPTIONAL: '#F7931E',
-              EXCELLENT:   T100,
-              GOOD:        T60,
-              FAIR:        T40,
-              POOR:        T40,
+              EXCEPTIONAL: '#FFC23D',
+              EXCELLENT:   '#F7931E',
+              GOOD:        '#F7931E',
+              FAIR:        'rgba(255,255,255,0.55)',
+              POOR:        'rgba(255,255,255,0.45)',
             } as const;
             const tierKey = getRatingTier(reviewRating);
             const tierLabel = getRatingTierLabel(reviewRating);
