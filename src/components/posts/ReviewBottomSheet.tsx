@@ -477,10 +477,8 @@ export const ReviewBottomSheet: React.FC<ReviewBottomSheetProps> = ({
                           <span
                             style={{
                               fontSize: 13,
-                              fontWeight: 700,
-                              color: FROST.ink,
-                              fontVariantNumeric: 'tabular-nums',
-                              letterSpacing: '-0.2px',
+                              ...HERO_NUMBER_STYLE,
+                              color: ratingTextColor(value),
                               flexShrink: 0,
                             }}
                           >
