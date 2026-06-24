@@ -629,28 +629,8 @@ const FeedCardImpl: React.FC<FeedCardProps> = ({
           padding: '10px 14px 12px',
         }}
       >
-        <div>
-          {post.isReview && (
-            <button
-              type="button"
-              onClick={(e) => {
-                e.stopPropagation();
-                onReviewTap?.(post);
-              }}
-              style={{
-                background: 'transparent',
-                border: 'none',
-                padding: 0,
-                color: T100,
-                fontSize: 14,
-                fontWeight: 700,
-                cursor: 'pointer',
-              }}
-            >
-              Read review ›
-            </button>
-          )}
-        </div>
+        <div />
+
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '50%', flexShrink: 0 }}>
           <FooterButton
             icon={Heart}
