@@ -166,11 +166,11 @@ const FeedCardImpl: React.FC<FeedCardProps> = ({
       {/* Card-level ghost numeral — overflows the header, clipped by card edges */}
       {reviewRating != null && (() => {
         const GHOST = {
-          EXCEPTIONAL: 'rgba(247,147,30,0.09)',
-          EXCELLENT:   'rgba(15,23,42,0.06)',
-          GOOD:        'rgba(15,23,42,0.05)',
-          FAIR:        'rgba(15,23,42,0.04)',
-          POOR:        'rgba(15,23,42,0.04)',
+          EXCEPTIONAL: 'rgba(247,147,30,0.14)',
+          EXCELLENT:   'rgba(255,255,255,0.08)',
+          GOOD:        'rgba(255,255,255,0.06)',
+          FAIR:        'rgba(255,255,255,0.05)',
+          POOR:        'rgba(255,255,255,0.05)',
         } as const;
         const tierKey = getRatingTier(reviewRating);
         return (
