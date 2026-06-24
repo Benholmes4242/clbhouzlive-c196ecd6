@@ -157,10 +157,9 @@ export function LuminousCellRating({
             <span
               style={{
                 fontSize: 66,
-                fontWeight: 900,
-                letterSpacing: '-0.03em',
+                fontWeight: 800,
+                letterSpacing: '-0.01em',
                 lineHeight: 1,
-                fontVariantNumeric: 'tabular-nums',
                 color: touched ? (tier?.gold ? GOLD_DEEP : INK) : 'rgba(15,23,42,0.16)',
                 transform: active ? 'scale(1.04)' : 'scale(1)',
                 transition: 'transform 140ms ease, color 160ms ease',
@@ -282,8 +281,8 @@ export function LuminousCellRating({
                 transform: i === activeCell ? 'scaleY(1.06)' : 'scaleY(1)',
                 boxShadow: [
                   ratio > 0
-                    ? `0 0 ${hero ? 14 : 9}px ${
-                        tier?.gold ? 'rgba(217,119,6,0.35)' : 'rgba(247,147,30,0.32)'
+                    ? `0 0 ${hero ? 14 : 6}px ${
+                        tier?.gold ? 'rgba(217,119,6,0.32)' : 'rgba(247,147,30,0.28)'
                       }`
                     : null,
                   `inset 0 1.5px 3px rgba(15,23,42,${ratio > 0 ? 0.1 : 0.16})`,
