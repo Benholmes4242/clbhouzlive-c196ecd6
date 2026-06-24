@@ -135,7 +135,7 @@ export const ClubhouseTopBar: React.FC<ClubhouseTopBarProps> = ({
                   border: 'none',
                   padding: 0,
                   cursor: 'pointer',
-                  color: '#0F172A',
+                  color: '#FFFFFF',
                   filter: 'none',
                 }}
               >
