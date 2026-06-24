@@ -237,10 +237,15 @@ const FeedCardImpl: React.FC<FeedCardProps> = ({
   feedIndex,
 }) => {
   const navigate = useNavigate();
+  const { activeActor, availableActors } = useActiveActor();
   const [captionExpanded, setCaptionExpanded] = useState(false);
   const [isCaptionClamped, setIsCaptionClamped] = useState(false);
   const [actingAs, setActingAs] = useState<FeedActorPickerValue | null>(null);
   const handleActorChange = (a: ActiveActor) => setActingAs({ id: a.id, type: a.type });
+  // Resolve per-card "effective" actor: the picked one, or fall back to global.
+  const effectiveActor: ActiveActor | null =
+    (actingAs ? availableActors.find((a) => a.id === actingAs.id && a.type === actingAs.type) : null) ??
+    activeActor;
   const captionTextRef = useRef<HTMLDivElement | null>(null);
 
   const reviewCourseId = post.review?.courseId ?? post.courseId;
