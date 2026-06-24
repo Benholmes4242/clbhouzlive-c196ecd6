@@ -22,7 +22,7 @@ export const ClubhouseTabToggle = ({
   if (isBusinessActor) {
     return (
       <div className={cn("flex items-center gap-3 relative z-[45]", className)} role="tablist" aria-label="Feed filter">
-        <span className="text-sm font-semibold opacity-100 whitespace-nowrap py-3 px-1" style={{ color: '#0F172A' }}>
+        <span className="text-sm font-semibold opacity-100 whitespace-nowrap py-3 px-1" style={{ color: '#FFFFFF' }}>
           Suggested
         </span>
       </div>
