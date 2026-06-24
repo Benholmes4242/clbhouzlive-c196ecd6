@@ -606,7 +606,7 @@ const FeedCardImpl: React.FC<FeedCardProps> = ({
             </button>
           )}
         </div>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 18 }}>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '50%', flexShrink: 0 }}>
           <FooterButton
             icon={Heart}
             label={formatCount(likeCount)}
@@ -653,7 +653,7 @@ const FooterButton: React.FC<{
     }}
   >
     <Icon
-      size={20}
+      size={24}
       strokeWidth={1.75}
       color={active ? activeColor ?? T100 : T60}
       fill={active ? activeColor ?? 'none' : 'none'}
