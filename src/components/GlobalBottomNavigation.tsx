@@ -14,6 +14,7 @@ import NavigationBar from './bottom-navigation/NavigationBar';
 import { useNavigationHandlers } from './bottom-navigation/useNavigationHandlers';
 import { useUnseenFriendReviews } from '@/hooks/useUnseenFriendReviews';
 import { useTournamentsCache } from '@/hooks/useTournamentsCache';
+import { isMedianApp } from '@/utils/median/isMedianApp';
 
 import { cn } from '@/lib/utils';
 import { auditComponentMount, markPerformance } from '@/utils/clubhouseAudit';
@@ -91,9 +92,13 @@ const GlobalBottomNavigation: React.FC<GlobalBottomNavigationProps> = ({ chromeS
   const isOnboardingEditProfile =
     location.pathname === '/edit-profile' &&
     new URLSearchParams(location.search).get('onboarding') === '1';
+  // On plain web, '/' renders BetaGatePage (coming-soon), not Clubhouse —
+  // never paint the bottom nav over it.
+  const isBetaGateRoute = location.pathname === '/' && !isMedianApp();
   const shouldHideForRoute = HIDDEN_ROUTES.includes(location.pathname) ||
     HIDDEN_ROUTE_PREFIXES.some(prefix => location.pathname.startsWith(prefix)) ||
-    isOnboardingEditProfile;
+    isOnboardingEditProfile ||
+    isBetaGateRoute;
   const isClubhouseRoute = CLUBHOUSE_ROUTES.includes(location.pathname);
   const isWarmGradientRoute = WARM_GRADIENT_ROUTES.some(r => location.pathname.startsWith(r));
   const isTourHubRoute = location.pathname.startsWith('/tourhub');

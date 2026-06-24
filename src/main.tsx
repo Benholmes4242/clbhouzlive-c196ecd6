@@ -33,12 +33,20 @@ import './styles/theme-tokens.css'
 // with that logic.
 // ============================================================================
 import { isImmersiveRoute } from '@/components/header/globalHeaderRules';
+import { isMedianApp } from '@/utils/median/isMedianApp';
 
 const initialPath = window.location.pathname;
 if (isImmersiveRoute(initialPath)) {
   document.documentElement.setAttribute('data-immersive-route', 'true');
 }
-if (initialPath === '/' || initialPath === '/clubhouse') {
+// Only apply decision-dependent chrome when we KNOW the app shell will render
+// (native/preview). On plain web the synchronous gate renders BetaGate, so
+// applying route-clubhouse would cause a charcoal flash before BetaGate paints.
+const __isPreviewHost = /(^|\.)lovableproject\.com$|(^|\.)lovable\.app$|(^|\.)lovable\.dev$|^localhost$|^127\.0\.0\.1$/.test(
+  window.location.hostname
+);
+const __willRenderApp = isMedianApp() || __isPreviewHost;
+if (__willRenderApp && (initialPath === '/' || initialPath === '/clubhouse')) {
   document.body.classList.add('route-clubhouse');
 } else if (initialPath.startsWith('/auth')) {
   document.body.classList.add('route-auth');

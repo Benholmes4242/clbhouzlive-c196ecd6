@@ -131,49 +131,26 @@ function usePreviewBypass(): boolean {
 }
 
 /**
- * useMedianBridgeReady — Median's window.median bridge may not be injected
- * on the first React paint of a cold native launch. Poll briefly so we don't
- * mis-route the user to BetaGate. After the poll window we commit to the
- * current detection (web).
+ * Synchronous Median detection — Median injects window.median and UA markers
+ * (MedianApp / GoNativeApp / median) at webview creation, so they're available
+ * on the very first React render. No poll required: web resolves to BetaGate
+ * on first commit; native resolves to the app shell on first commit.
  */
-function useMedianBridgeReady(maxWaitMs = 2000, intervalMs = 150): { ready: boolean; isMedianApp: boolean } {
-  const initial = detectMedianBridge().isMedianApp;
-  const [state, setState] = useState({ ready: initial, isMedianApp: initial });
-  useEffect(() => {
-    if (state.isMedianApp) return; // already native — no need to poll
-    let cancelled = false;
-    const start = Date.now();
-    const tick = () => {
-      if (cancelled) return;
-      const { isMedianApp } = detectMedianBridge();
-      if (isMedianApp) {
-        setState({ ready: true, isMedianApp: true });
-        return;
-      }
-      if (Date.now() - start >= maxWaitMs) {
-        setState({ ready: true, isMedianApp: false });
-        return;
-      }
-      window.setTimeout(tick, intervalMs);
-    };
-    window.setTimeout(tick, intervalMs);
-    return () => { cancelled = true; };
-  }, []);
-  return state;
+function detectIsMedianAppSync(): boolean {
+  try {
+    const w = window as any;
+    if (w.median || w.gonern) return true;
+    const ua = (navigator.userAgent || '').toLowerCase();
+    return /medianapp|gonativeapp|median|gonative/.test(ua);
+  } catch {
+    return false;
+  }
 }
 
 const RootGate: React.FC = () => {
-
-  const { ready: bridgeReady, isMedianApp } = useMedianBridgeReady();
+  const isMedianApp = detectIsMedianAppSync();
   const previewBypass = usePreviewBypass();
   const { user, loading: authLoading } = useSupabaseSession();
-
-
-  // Wait briefly for the native bridge to inject so we don't misroute on
-  // a cold iPad launch. (Bridge detection commits after ~2s.)
-  if (!bridgeReady) {
-    return <div className="min-h-screen" style={{ background: '#0F172A' }} />;
-  }
 
   // App-only product: only the native app or an approved preview sees the app; everyone else → coming-soon.
   if (!isMedianApp && !previewBypass) return <BetaGatePage />;
