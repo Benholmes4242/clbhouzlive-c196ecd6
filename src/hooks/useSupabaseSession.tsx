@@ -45,11 +45,15 @@ export function useSupabaseSession() {
     if (!sessionStartLogged.current) {
       sessionStartLogged.current = true;
       logSessionStart();
+      // eslint-disable-next-line no-console
+      console.info('[BootAudit][Session] start', { t: Date.now() });
     }
 
     // Set up auth state listener
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
       if (!mounted) return;
+      // eslint-disable-next-line no-console
+      console.info('[BootAudit][Session] onAuthStateChange', { t: Date.now(), event, hasSession: !!session });
 
       // Phase 3: Clean up on sign out
       if (event === 'SIGNED_OUT' && queryClient) {
@@ -64,8 +68,16 @@ export function useSupabaseSession() {
 
     // Get initial session
     supabase.auth.getSession()
-      .then(({ data: { session } }) => applySession(session))
-      .catch(() => applySession(null));
+      .then(({ data: { session } }) => {
+        // eslint-disable-next-line no-console
+        console.info('[BootAudit][Session] getSession resolved', { t: Date.now(), hasSession: !!session });
+        applySession(session);
+      })
+      .catch((err) => {
+        // eslint-disable-next-line no-console
+        console.warn('[BootAudit][Session] getSession rejected', { t: Date.now(), err: String(err) });
+        applySession(null);
+      });
 
     // Hard safety timeout: if Supabase never resolves (mobile webview /
     // VPN / blocked websocket / corrupted storage), treat as logged-out
@@ -77,6 +89,8 @@ export function useSupabaseSession() {
       console.warn(
         `[useSupabaseSession] session bootstrap timed out after ${SESSION_BOOT_TIMEOUT_MS}ms — proceeding as logged-out`,
       );
+      // eslint-disable-next-line no-console
+      console.info('[BootAudit][Session] timeout -> null', { t: Date.now() });
       applySession(null);
     }, SESSION_BOOT_TIMEOUT_MS);
 

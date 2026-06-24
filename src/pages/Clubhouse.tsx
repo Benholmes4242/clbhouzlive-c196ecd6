@@ -320,9 +320,24 @@ const ClubhouseContent = () => {
       setSkeletonTimedOut(false);
       return;
     }
-    const id = window.setTimeout(() => setSkeletonTimedOut(true), 12000);
+    const id = window.setTimeout(() => {
+      // eslint-disable-next-line no-console
+      console.warn('[BootAudit][Clubhouse] skeleton 12s timeout fired', {
+        t: Date.now(), isLoading, postsLen: posts.length, activeTab, hasUser: !!user, authLoading,
+      });
+      setSkeletonTimedOut(true);
+    }, 12000);
     return () => window.clearTimeout(id);
-  }, [isLoading, posts.length, activeTab]);
+  }, [isLoading, posts.length, activeTab, user, authLoading]);
+
+  // [BootAudit] Trace feed/auth state transitions
+  useEffect(() => {
+    // eslint-disable-next-line no-console
+    console.info('[BootAudit][Clubhouse] state', {
+      t: Date.now(), authLoading, hasUser: !!user, activeTab,
+      isLoading, postsLen: posts.length, skeletonTimedOut,
+    });
+  }, [authLoading, user, activeTab, isLoading, posts.length, skeletonTimedOut]);
 
   // Guard: wait for auth to resolve before evaluating feed state — but
   // bounded by useSupabaseSession's own 8s safety timeout, so this can
@@ -330,6 +345,7 @@ const ClubhouseContent = () => {
   if (authLoading) {
     return <ClubhouseSkeletonShimmer isVisible={true} isStatic={false} surface="card" />;
   }
+
 
   return (
     <PageRoot 
