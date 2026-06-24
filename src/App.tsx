@@ -129,11 +129,59 @@ function usePreviewBypass(): boolean {
   }
 }
 
+/**
+ * useMedianBridgeReady — Median's window.median bridge may not be injected
+ * on the first React paint of a cold native launch. Poll briefly so we don't
+ * mis-route the user to BetaGate. After the poll window we commit to the
+ * current detection (web).
+ */
+function useMedianBridgeReady(maxWaitMs = 2000, intervalMs = 150): { ready: boolean; isMedianApp: boolean } {
+  const initial = detectMedianBridge().isMedianApp;
+  const [state, setState] = useState({ ready: initial, isMedianApp: initial });
+  useEffect(() => {
+    if (state.isMedianApp) return; // already native — no need to poll
+    let cancelled = false;
+    const start = Date.now();
+    const tick = () => {
+      if (cancelled) return;
+      const { isMedianApp } = detectMedianBridge();
+      if (isMedianApp) {
+        setState({ ready: true, isMedianApp: true });
+        return;
+      }
+      if (Date.now() - start >= maxWaitMs) {
+        setState({ ready: true, isMedianApp: false });
+        return;
+      }
+      window.setTimeout(tick, intervalMs);
+    };
+    window.setTimeout(tick, intervalMs);
+    return () => { cancelled = true; };
+  }, []);
+  return state;
+}
+
 const RootGate: React.FC = () => {
-  const { isMedianApp } = detectMedianBridge();
+  const { ready: bridgeReady, isMedianApp } = useMedianBridgeReady();
   const previewBypass = usePreviewBypass();
+  const { user, loading: authLoading } = useSupabaseSession();
+
+  // Wait briefly for the native bridge to inject so we don't misroute on
+  // a cold iPad launch. (Bridge detection commits after ~2s.)
+  if (!bridgeReady) {
+    return <div className="min-h-screen" style={{ background: '#0F172A' }} />;
+  }
+
   // App-only product: only the native app or an approved preview sees the app; everyone else → coming-soon.
   if (!isMedianApp && !previewBypass) return <BetaGatePage />;
+
+  // Logged-out native/preview launch: route straight to auth instead of
+  // letting the Clubhouse feed sit on skeletons forever waiting for a user.
+  // (Apple 2.1 fix — reviewers hit infinite skeletons on a fresh device.)
+  if (!authLoading && !user) {
+    return <Navigate to="/auth" replace />;
+  }
+
   return <ClubhouseWrapped />;
 };
 import DiscoverWrapped from "./pages/DiscoverWrapped";
