@@ -775,7 +775,7 @@ html.lightbox-open {
    body class or component-level styles once they mount.
    ──────────────────────────────────────────────────────────────────────── */
 body.route-clubhouse .app-shell {
-  background-color: #F8FAFC !important;
+  background-color: #15171F !important;
 }
 body.route-handicap .app-shell {
   background-color: #F8FAFC !important;
@@ -4522,7 +4522,7 @@ em-emoji-picker input:focus {
      Still above most page content (z-base:1, z-overlay:50) to catch transition gaps. */
   z-index: 55;
   pointer-events: none;
-  background-color: transparent;
+  background-color: #0A0E14;
   transition: none !important;
 }
 

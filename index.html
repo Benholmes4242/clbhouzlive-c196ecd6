@@ -22,7 +22,7 @@
     <!-- PWA meta tags for full-screen edge-to-edge support -->
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="theme-color" content="#F8FAFC" id="theme-color-meta">
+    <meta name="theme-color" content="#0A0E14" id="theme-color-meta">
 
     <!-- Font CDN preconnects -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -60,9 +60,16 @@
     <link rel="apple-touch-icon" href="https://iiil.io/FRnqBFp.png" />
   </head>
 
-  <body style="background-color:#F8FAFC;margin:0;">
+  <body style="background-color:#0A0E14;margin:0;">
+    <noscript>
+      <div style="font-family:sans-serif;background:#0A0E14;color:#fff;padding:40px;text-align:center">
+        <h1>clbhouz</h1>
+        <p>clbhouz is a social platform for golfers: share your rounds, rate and discover courses, track your handicap, and compete with friends. Launching on the App Store and Google Play on 22 June 2026.</p>
+        <p><a href="/privacy" style="color:#F7931E">Privacy Policy</a> &middot; <a href="/terms" style="color:#F7931E">Terms of Service</a></p>
+      </div>
+    </noscript>
     <div id="safe-area-shield" aria-hidden="true"></div>
-    <div id="root"><div style="font-family:sans-serif;background:#F8FAFC;color:#0F172A;padding:40px;text-align:center"><h1>clbhouz</h1><p>clbhouz is a social platform for golfers: share your rounds, rate and discover courses, track your handicap, and compete with friends. Launching on the App Store and Google Play on 22 June 2026.</p><p><a href="/privacy" style="color:#F7931E">Privacy Policy</a> &middot; <a href="/terms" style="color:#F7931E">Terms of Service</a></p></div></div>
+    <div id="root"><div style="background:#0A0E14;min-height:100vh;display:flex;align-items:center;justify-content:center"><img src="https://iiil.io/FRnqBFp.png" alt="" width="64" height="64" style="opacity:0.85" /></div></div>
     <div id="portal-root"></div>
     <script>
       // Chunk recovery - Must be before main script to catch early errors
@@ -80,7 +87,7 @@
 
       function showFatalRecoveryUI() {
         sessionStorage.removeItem('chunkRecoveryAttempts');
-        document.body.innerHTML = '<div style="display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:100vh;padding:2rem;text-align:center;font-family:system-ui,-apple-system,sans-serif;background:#F8FAFC;color:#0F172A;"><h1 style="font-size:1.5rem;font-weight:600;margin-bottom:1rem;">App couldn\'t start</h1><p style="margin-bottom:2rem;color:#64748B;">Try clearing the app and reopening, or check your connection.</p><button id="__lov_reset_btn" style="background:#0F172A;color:#fff;border:none;padding:0.75rem 2rem;border-radius:0.5rem;font-size:1rem;font-weight:500;cursor:pointer;">Reset & Reload</button></div>';
+        document.body.innerHTML = '<div style="display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:100vh;padding:2rem;text-align:center;font-family:system-ui,-apple-system,sans-serif;background:#0A0E14;color:#fff;"><h1 style="font-size:1.5rem;font-weight:600;margin-bottom:1rem;">App couldn\'t start</h1><p style="margin-bottom:2rem;color:#94A3B8;">Try clearing the app and reopening, or check your connection.</p><button id="__lov_reset_btn" style="background:#F7931E;color:#0F172A;border:none;padding:0.75rem 2rem;border-radius:0.5rem;font-size:1rem;font-weight:500;cursor:pointer;">Reset & Reload</button></div>';
         var btn = document.getElementById('__lov_reset_btn');
         if (btn) {
           btn.onclick = function () {
