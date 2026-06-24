@@ -747,10 +747,10 @@ export function ReviewWizard({
                       />
                     </div>
 
-                    <div style={{ height: 0.5, background: HAIR, margin: '6px 16px 0' }} />
+                    <div style={{ height: 0.5, background: HAIR, margin: '8px 16px 0' }} />
 
                     {/* Collapsible categories */}
-                    <div style={{ padding: '12px 16px 0' }}>
+                    <div style={{ padding: '12px 16px 12px' }}>
                       <button
                         onClick={() => setCatOpen((o) => !o)}
                         style={{
