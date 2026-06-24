@@ -233,9 +233,21 @@ const FeedCardImpl: React.FC<FeedCardProps> = ({
   currentUserId,
   feedIndex,
 }) => {
+  const navigate = useNavigate();
   const [captionExpanded, setCaptionExpanded] = useState(false);
   const [isCaptionClamped, setIsCaptionClamped] = useState(false);
   const captionTextRef = useRef<HTMLDivElement | null>(null);
+
+  const reviewCourseId = post.review?.courseId ?? post.courseId;
+  const reviewId = post.review?.reviewId;
+  const handleReadReview = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (!reviewCourseId) return;
+    const url = reviewId
+      ? `/courses/${reviewCourseId}?tab=reviews&review=${reviewId}`
+      : `/courses/${reviewCourseId}?tab=reviews`;
+    navigate(url);
+  };
   const mountFollowPill =
     !!onFollow &&
     post.actorType === 'personal' &&
