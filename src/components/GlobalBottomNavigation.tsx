@@ -103,6 +103,38 @@ const GlobalBottomNavigation: React.FC<GlobalBottomNavigationProps> = ({ chromeS
   
   const showNavigation = isVisible && !shouldHideForRoute;
 
+  // Scroll-direction hide/show — only on the feed (Clubhouse).
+  // Down past ~80px hides the nav; up shows it; near top always shows.
+  const [navHidden, setNavHidden] = useState(false);
+  useEffect(() => {
+    if (!isClubhouseRoute) { setNavHidden(false); return; }
+    const lastTopByEl = new WeakMap<EventTarget, number>();
+    let raf = 0;
+    const onScroll = (e: Event) => {
+      const target = e.target as (HTMLElement | Document | null);
+      if (!target) return;
+      const top = target === document
+        ? window.scrollY
+        : (target as HTMLElement).scrollTop ?? 0;
+      const key: EventTarget = target === document ? window : target;
+      if (raf) return;
+      raf = requestAnimationFrame(() => {
+        raf = 0;
+        const prev = lastTopByEl.get(key) ?? 0;
+        const delta = top - prev;
+        lastTopByEl.set(key, top);
+        if (top < 80) { setNavHidden(false); return; }
+        if (delta > 8) setNavHidden(true);
+        else if (delta < -4) setNavHidden(false);
+      });
+    };
+    window.addEventListener('scroll', onScroll, { passive: true, capture: true });
+    return () => {
+      window.removeEventListener('scroll', onScroll, { capture: true } as any);
+      if (raf) cancelAnimationFrame(raf);
+    };
+  }, [isClubhouseRoute]);
+
   // Audit on mount
   useEffect(() => {
     if (isClubhouseRoute) {
