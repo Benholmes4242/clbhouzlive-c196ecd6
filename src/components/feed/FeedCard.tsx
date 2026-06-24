@@ -122,7 +122,7 @@ const CaptionBlock: React.FC<CaptionBlockProps> = ({ body, expanded, setExpanded
   if (!body) return null;
 
   return (
-    <div style={{ padding: '0px 14px 10px', position: 'relative', zIndex: 2, marginTop: -6 }}>
+    <div style={{ padding: '0px 14px 10px', position: 'relative', zIndex: 2, marginTop: -1 }}>
       <div style={{ position: 'relative' }}>
         <div
           ref={textRef}
