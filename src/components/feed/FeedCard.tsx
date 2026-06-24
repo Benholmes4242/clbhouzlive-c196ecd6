@@ -434,6 +434,7 @@ const FeedCardImpl: React.FC<FeedCardProps> = ({
         isClamped={isCaptionClamped}
         setIsClamped={setIsCaptionClamped}
         textRef={captionTextRef}
+        onReadReview={post.isReview && reviewCourseId ? handleReadReview : undefined}
       />
 
 
