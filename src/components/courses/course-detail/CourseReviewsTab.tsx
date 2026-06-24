@@ -31,6 +31,7 @@ import {
   MOCK_CYPRESS_POINT_REVIEWS 
 } from '@/features/courses/config';
 import { getScoreTier } from '@/utils/getScoreTier';
+import { HERO_NUMBER_STYLE, TIER_LABEL_STYLE, ratingTextColor } from '@/lib/ratingTier';
 import type { FeedPost, MediaItem as MediaItemType } from '@/components/media-system/types/media';
 import ScrollToTopGlass from '@/components/common/ScrollToTopGlass';
 import { PullToRefreshContainer } from '@/components/ui/pull-to-refresh';
