@@ -343,7 +343,7 @@ export const CardFeed: React.FC<CardFeedProps> = ({
 
   if (useWindowScroll) {
     return (
-      <div style={{ width: '100%' }} data-card-feed>
+      <div style={{ width: '100%', background: CANVAS }} data-card-feed>
         <Virtuoso
           ref={virtuosoRef}
           useWindowScroll
