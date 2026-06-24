@@ -106,9 +106,11 @@ interface CaptionBlockProps {
   isClamped: boolean;
   setIsClamped: (v: boolean) => void;
   textRef: React.MutableRefObject<HTMLDivElement | null>;
+  /** When set, renders an inline "Read review ›" affordance (review posts) instead of more/less. */
+  onReadReview?: (e: React.MouseEvent) => void;
 }
 
-const CaptionBlock: React.FC<CaptionBlockProps> = ({ body, expanded, setExpanded, isClamped, setIsClamped, textRef }) => {
+const CaptionBlock: React.FC<CaptionBlockProps> = ({ body, expanded, setExpanded, isClamped, setIsClamped, textRef, onReadReview }) => {
   useLayoutEffect(() => {
     const el = textRef.current;
     if (!el) return;
@@ -120,7 +122,13 @@ const CaptionBlock: React.FC<CaptionBlockProps> = ({ body, expanded, setExpanded
     }
   }, [body, expanded, setIsClamped, textRef]);
 
-  if (!body) return null;
+  // Review posts: always clamp to 3 lines and show "Read review ›" affordance
+  // that navigates straight to the course review page (no inline expand).
+  const isReviewMode = !!onReadReview;
+  const showMore = !isReviewMode && !expanded && isClamped;
+  const showReadReview = isReviewMode && !!body;
+
+  if (!body && !showReadReview) return null;
 
   return (
     <div style={{ padding: '0px 14px 10px', position: 'relative', zIndex: 2, marginTop: -1 }}>
@@ -131,18 +139,18 @@ const CaptionBlock: React.FC<CaptionBlockProps> = ({ body, expanded, setExpanded
             fontSize: 14,
             lineHeight: 1.4,
             color: T100,
-            ...(expanded
-              ? {}
-              : {
+            ...((isReviewMode || !expanded)
+              ? {
                   display: '-webkit-box',
                   WebkitLineClamp: 3,
                   WebkitBoxOrient: 'vertical',
                   overflow: 'hidden',
-                }),
+                }
+              : {}),
           }}
         >
           {body}
-          {expanded && isClamped && (
+          {!isReviewMode && expanded && isClamped && (
             <button
               type="button"
               onClick={(e) => { e.stopPropagation(); setExpanded(false); }}
@@ -155,7 +163,7 @@ const CaptionBlock: React.FC<CaptionBlockProps> = ({ body, expanded, setExpanded
             </button>
           )}
         </div>
-        {!expanded && isClamped && (
+        {showMore && (
           <button
             type="button"
             onClick={(e) => { e.stopPropagation(); setExpanded(true); }}
@@ -176,10 +184,33 @@ const CaptionBlock: React.FC<CaptionBlockProps> = ({ body, expanded, setExpanded
             more
           </button>
         )}
+        {showReadReview && (
+          <button
+            type="button"
+            onClick={(e) => { e.stopPropagation(); onReadReview!(e); }}
+            style={{
+              position: 'absolute',
+              right: 0,
+              bottom: 0,
+              paddingLeft: 32,
+              background: 'linear-gradient(90deg, rgba(15,23,42,0) 0%, #0F172A 40%)',
+              border: 'none',
+              color: AMBER,
+              fontSize: 14,
+              fontWeight: 700,
+              cursor: 'pointer',
+              lineHeight: 1.4,
+              whiteSpace: 'nowrap',
+            }}
+          >
+            Read review ›
+          </button>
+        )}
       </div>
     </div>
   );
 };
+
 
 
 const FeedCardImpl: React.FC<FeedCardProps> = ({
