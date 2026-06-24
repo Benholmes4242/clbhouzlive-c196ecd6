@@ -9,6 +9,7 @@ import {
   ratingTextColor,
   rampForRating,
 } from '@/lib/ratingTier';
+import { getScoreRingColors } from '@/hooks/useTierStyles';
 import { AMBER, HAIRLINE_INK_7, INK, INK_FAINT, INK_MUTE, SURFACE } from '@/features/courses/_shared/tokens';
 
 // Representative score per distribution tier — drives bar colour via rampForRating
@@ -41,9 +42,11 @@ const TIERS: { key: keyof RatingTierDistributionData; label: string }[] = [
 ];
 
 const ScoreRing: React.FC<{ score: number; size?: number }> = ({ score, size = 50 }) => {
+  const { from, to } = getScoreRingColors(score);
   const r = (size / 2) - 4;
   const circ = 2 * Math.PI * r;
   const fill = circ * (Math.max(0, Math.min(10, score)) / 10);
+  const gradientId = `scoreGradient-${Math.random().toString(36).slice(2)}`;
   return (
     <div style={{ position: 'relative', width: size, height: size, margin: '0 auto' }}>
       <svg
@@ -52,6 +55,12 @@ const ScoreRing: React.FC<{ score: number; size?: number }> = ({ score, size = 5
         viewBox={`0 0 ${size} ${size}`}
         style={{ transform: 'rotate(-90deg)' }}
       >
+        <defs>
+          <linearGradient id={gradientId} x1="0%" y1="0%" x2="100%" y2="0%">
+            <stop offset="0%" stopColor={from} />
+            <stop offset="100%" stopColor={to} />
+          </linearGradient>
+        </defs>
         <circle
           cx={size / 2}
           cy={size / 2}
@@ -65,7 +74,7 @@ const ScoreRing: React.FC<{ score: number; size?: number }> = ({ score, size = 5
           cy={size / 2}
           r={r}
           fill="none"
-          stroke="#F7931E"
+          stroke={`url(#${gradientId})`}
           strokeWidth={3.5}
           strokeLinecap="round"
           strokeDasharray={`${fill} ${circ}`}
