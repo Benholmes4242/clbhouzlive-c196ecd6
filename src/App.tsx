@@ -163,6 +163,14 @@ function useMedianBridgeReady(maxWaitMs = 2000, intervalMs = 150): { ready: bool
 }
 
 const RootGate: React.FC = () => {
+  // ===== TEMP DIAGNOSTIC BYPASS - REMOVE AFTER TESTING =====
+  // Skips all gating to isolate whether the gate causes the cold-load failure.
+  const DIAGNOSTIC_BYPASS_GATE = true;
+  if (DIAGNOSTIC_BYPASS_GATE) {
+    return <ClubhouseWrapped />;
+  }
+  // ===== END TEMP DIAGNOSTIC BYPASS =====
+
   const { ready: bridgeReady, isMedianApp } = useMedianBridgeReady();
   const previewBypass = usePreviewBypass();
   const { user, loading: authLoading } = useSupabaseSession();
