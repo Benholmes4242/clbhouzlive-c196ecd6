@@ -392,8 +392,8 @@ const FeedCardImpl: React.FC<FeedCardProps> = ({
               onClick={handleCourseTap}
               style={{
                 display: 'inline-flex', alignItems: 'center', gap: 5, flexShrink: 0,
-                background: 'rgba(15,23,42,0.05)',
-                border: '1px solid rgba(15,23,42,0.08)',
+                background: 'rgba(255,255,255,0.08)',
+                border: '1px solid rgba(255,255,255,0.12)',
                 padding: '3px 9px 3px 4px', borderRadius: 999,
                 cursor: post.courseId ? 'pointer' : 'default', marginLeft: 8,
                 backdropFilter: 'blur(8px)',
@@ -408,7 +408,7 @@ const FeedCardImpl: React.FC<FeedCardProps> = ({
                 }}
                 aria-hidden="true"
               />
-              <span style={{ fontSize: 11, fontWeight: 800, color: '#475569', fontVariantNumeric: 'tabular-nums', lineHeight: 1 }}>
+              <span style={{ fontSize: 11, fontWeight: 800, color: T100, fontVariantNumeric: 'tabular-nums', lineHeight: 1 }}>
                 {formatRatingValue(post.courseRating)}
               </span>
             </button>
