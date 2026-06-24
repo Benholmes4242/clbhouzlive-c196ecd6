@@ -54,8 +54,8 @@ export function LuminousCellRating({
   const lastTick = useRef<number>(touched ? v : -1);
 
   // Layout: heights per variant. Gap proportional.
-  const rowHeight = hero ? 64 : 44;
-  const gap = hero ? 9 : 6;
+  const rowHeight = 44;
+  const gap = 6;
 
   // Measure cell box for true 34% squircle radius.
   useLayoutEffect(() => {
