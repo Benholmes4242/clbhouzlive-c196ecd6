@@ -324,23 +324,11 @@ const ClubhouseContent = () => {
       return;
     }
     const id = window.setTimeout(() => {
-      // eslint-disable-next-line no-console
-      console.warn('[BootAudit][Clubhouse] skeleton 12s timeout fired', {
-        t: Date.now(), isLoading, postsLen: posts.length, activeTab, hasUser: !!user, authLoading,
-      });
       setSkeletonTimedOut(true);
     }, 12000);
     return () => window.clearTimeout(id);
   }, [isLoading, posts.length, activeTab, user, authLoading]);
 
-  // [BootAudit] Trace feed/auth state transitions
-  useEffect(() => {
-    // eslint-disable-next-line no-console
-    console.info('[BootAudit][Clubhouse] state', {
-      t: Date.now(), authLoading, hasUser: !!user, activeTab,
-      isLoading, postsLen: posts.length, skeletonTimedOut,
-    });
-  }, [authLoading, user, activeTab, isLoading, posts.length, skeletonTimedOut]);
 
   // Guard: wait for auth to resolve before evaluating feed state — but
   // bounded by useSupabaseSession's own 8s safety timeout, so this can
@@ -355,10 +343,6 @@ const ClubhouseContent = () => {
   // This fixes the Apple 2.1 cold-load symptom where skeletons never
   // resolved because hasPosts (posts.length > 0) was never true.
   if (!isLoading && posts.length === 0) {
-    // eslint-disable-next-line no-console
-    console.info('[BootAudit][Clubhouse] terminal empty-state', {
-      t: Date.now(), hasUser: !!user, activeTab, isError: activeFeed.isError,
-    });
     return activeTab === 'friends' ? (
       <div
         className="flex flex-col w-full min-h-screen"
