@@ -59,13 +59,18 @@ interface PageData {
   nextCursor: string | null;
 }
 
-export function useCommentsWithReplies(postId: string | null, onCommentDeleted?: () => void) {
+export function useCommentsWithReplies(
+  postId: string | null,
+  onCommentDeleted?: () => void,
+  actorOverride?: { id: string; type: string } | null,
+) {
   const queryClient = useQueryClient();
   const { user } = useSupabaseSession();
   const { activeActor } = useActiveActor();
 
-  const actorType = activeActor?.type || 'personal';
-  const actorId = activeActor?.id || user?.id || '';
+  const effectiveActor = actorOverride ?? activeActor;
+  const actorType = effectiveActor?.type || 'personal';
+  const actorId = effectiveActor?.id || user?.id || '';
 
   // Helper to enrich raw comments with profiles, likes, and replies
   const enrichComments = useCallback(async (

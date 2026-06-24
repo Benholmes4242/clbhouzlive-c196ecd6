@@ -29,8 +29,9 @@ export function useClubhouseLikes({ userId, activeActor }: UseClubhouseLikesOpti
     });
   }, []);
 
-  const handleLike = useCallback((post: FeedPost | null) => {
-    if (!userId || !post || !activeActor) return;
+  const handleLike = useCallback((post: FeedPost | null, actorOverride?: { id: string; type: string } | null) => {
+    const actor = actorOverride ?? activeActor;
+    if (!userId || !post || !actor) return;
 
     const wasLiked = post.isLikedByMe;
 
@@ -47,8 +48,8 @@ export function useClubhouseLikes({ userId, activeActor }: UseClubhouseLikesOpti
       {
         postId: post.id,
         userId,
-        actorId: activeActor.id ?? userId,
-        actorType: activeActor.type === 'business' ? 'business' : 'personal',
+        actorId: actor.id ?? userId,
+        actorType: actor.type === 'business' ? 'business' : 'personal',
         isLiked: wasLiked,
       },
       {

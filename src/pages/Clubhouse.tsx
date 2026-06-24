@@ -234,7 +234,7 @@ const ClubhouseContent = () => {
   const isActivePostFollowed = getFollowState(activePost);
   
   // ── Comments state ──
-  const { commentsOpen, overlayVisible, openComments, closeComments, handleCommentPosted, handleCommentDeleted, getCommentCount, resetComments } = useClubhouseComments();
+  const { commentsOpen, overlayVisible, openComments, closeComments, handleCommentPosted, handleCommentDeleted, getCommentCount, resetComments, commentActorOverride } = useClubhouseComments();
   const activeCommentCount = getCommentCount(activePost);
   
   // ── Share / Report / Not Interested ──
@@ -496,8 +496,8 @@ const ClubhouseContent = () => {
             topPadding={'calc(env(safe-area-inset-top, 0px) + 59px)'}
             onNearEnd={handleNearEnd}
             hasNextPage={hasNextPage}
-            onLike={(post) => handleLike(post)}
-            onComment={openComments}
+            onLike={(post, actor) => handleLike(post, actor)}
+            onComment={(post, actor) => openComments(post, actor)}
             onShare={(post) => handleShare(post)}
             onProfile={(post) => navigate(getActorRouteByType(post.actorType, post.actorId))}
             onCourse={(post) => post.courseId && navigate(`/courses/${post.courseId}`)}
@@ -554,6 +554,7 @@ const ClubhouseContent = () => {
             }
             onCommentPosted={() => handleCommentPosted(activePost)}
             onCommentDeleted={() => activePost && handleCommentDeleted(activePost.id, activePost.commentCount)}
+            actorOverride={commentActorOverride}
           />
           <MoreOptionsDrawer
             open={moreOptionsOpen}

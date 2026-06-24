@@ -76,6 +76,8 @@ interface CommentsSheetProps {
   editorialCardId?: string;
   onCommentPosted?: () => void;
   onCommentDeleted?: () => void;
+  /** Per-card actor override (from FeedActorPicker) — overrides global activeActor for this sheet. */
+  actorOverride?: { id: string; type: string } | null;
 }
 
 interface ReplyTarget {
@@ -104,6 +106,7 @@ function CommentsSheet({
   editorialCardId,
   onCommentPosted,
   onCommentDeleted,
+  actorOverride,
 }: CommentsSheetProps) {
   const navigate = useNavigate();
   const { user } = useSupabaseSession();
@@ -111,7 +114,7 @@ function CommentsSheet({
   const currentUserId = currentUserIdProp ?? user?.id ?? null;
 
   // ── Hook — use editorial comments hook when editorialCardId is provided ──
-  const standardHook = useCommentsWithReplies(editorialCardId ? '' : postId, onCommentDeleted);
+  const standardHook = useCommentsWithReplies(editorialCardId ? '' : postId, onCommentDeleted, actorOverride);
   const editorialHook = useEditorialComments(editorialCardId ?? '', onCommentDeleted);
   const activeHook = editorialCardId ? editorialHook : standardHook;
 

@@ -24,6 +24,7 @@ import { canManagePost } from '@/lib/canManagePost';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { getRatingTier, getRatingTierLabel } from '@/lib/ratingTier';
 import { formatRatingValue } from '@/utils/formatters';
+import { useActiveActor } from '@/context/ActiveActorContext';
 
 import type { FeedPost } from '@/components/media-system/types/media';
 import { InlineVideo } from './InlineVideo';
@@ -76,8 +77,8 @@ export interface FeedCardProps {
   liked: boolean;
   likeCount: number;
   commentCount: number;
-  onLike: (post: FeedPost) => void;
-  onComment: (post: FeedPost) => void;
+  onLike: (post: FeedPost, actor?: ActiveActor | null) => void;
+  onComment: (post: FeedPost, actor?: ActiveActor | null) => void;
   onShare: (post: FeedPost) => void;
   onOpenMedia: (post: FeedPost, mediaIndex: number) => void;
   onProfile: (post: FeedPost) => void;
@@ -236,10 +237,15 @@ const FeedCardImpl: React.FC<FeedCardProps> = ({
   feedIndex,
 }) => {
   const navigate = useNavigate();
+  const { activeActor, availableActors } = useActiveActor();
   const [captionExpanded, setCaptionExpanded] = useState(false);
   const [isCaptionClamped, setIsCaptionClamped] = useState(false);
   const [actingAs, setActingAs] = useState<FeedActorPickerValue | null>(null);
   const handleActorChange = (a: ActiveActor) => setActingAs({ id: a.id, type: a.type });
+  // Resolve per-card "effective" actor: the picked one, or fall back to global.
+  const effectiveActor: ActiveActor | null =
+    (actingAs ? availableActors.find((a) => a.id === actingAs.id && a.type === actingAs.type) : null) ??
+    activeActor;
   const captionTextRef = useRef<HTMLDivElement | null>(null);
 
   const reviewCourseId = post.review?.courseId ?? post.courseId;
@@ -639,13 +645,13 @@ const FeedCardImpl: React.FC<FeedCardProps> = ({
           icon={Heart}
           label={formatCount(likeCount)}
           active={liked}
-          onClick={() => onLike(post)}
+          onClick={() => onLike(post, effectiveActor)}
           activeColor={AMBER}
         />
         <FooterButton
           icon={MessageCircle}
           label={formatCount(commentCount)}
-          onClick={() => onComment(post)}
+          onClick={() => onComment(post, effectiveActor)}
         />
         <FooterButton icon={Share} onClick={() => onShare(post)} />
       </div>

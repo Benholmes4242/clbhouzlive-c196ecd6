@@ -21,6 +21,7 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Virtuoso, type VirtuosoHandle } from 'react-virtuoso';
 import type { FeedPost } from '@/components/media-system/types/media';
+import type { ActiveActor } from '@/types/actor';
 import { useFullscreenFeedStore } from '@/store/fullscreenFeedStore';
 import { useClubhouseStore } from '@/store/clubhouseStore';
 import { prefetchTile } from '@/hooks/useTileVideoPlayer';
@@ -33,8 +34,8 @@ const VIDEO_NEIGHBOUR_RADIUS = 1; // matches iOS ~3-decoder cap (active ±1 = 3)
 
 export interface CardFeedProps {
   posts: FeedPost[];
-  onLike: (post: FeedPost) => void;
-  onComment: (post: FeedPost) => void;
+  onLike: (post: FeedPost, actor?: ActiveActor | null) => void;
+  onComment: (post: FeedPost, actor?: ActiveActor | null) => void;
   onShare: (post: FeedPost) => void;
   onProfile: (post: FeedPost) => void;
   onReviewTap?: (post: FeedPost) => void;

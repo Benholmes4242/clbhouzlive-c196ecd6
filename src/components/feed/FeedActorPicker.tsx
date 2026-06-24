@@ -81,41 +81,43 @@ export const FeedActorPicker: React.FC<FeedActorPickerProps> = ({ value, onChang
         sideOffset={6}
         onClick={(e) => e.stopPropagation()}
         style={{
-          background: '#1a1a1a',
-          border: '0.5px solid rgba(255,255,255,0.12)',
+          background: '#0F172A',
+          border: '1px solid rgba(255,255,255,0.08)',
           color: 'rgba(255,255,255,0.92)',
           minWidth: 200,
         }}
       >
-        {availableActors.map((a) => (
-          <DropdownMenuItem
-            key={`${a.type}:${a.id}`}
-            onClick={(e) => {
-              e.stopPropagation();
-              onChange?.(a);
-            }}
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: 8,
-              color:
-                a.id === current.id && a.type === current.type
-                  ? '#ffffff'
-                  : 'rgba(255,255,255,0.78)',
-              cursor: 'pointer',
-            }}
-          >
-            <SquircleAvatar
-              size={24}
-              src={a.avatarUrl ?? undefined}
-              alt={a.name}
-              userId={a.type === 'personal' ? a.id : null}
-              hairlineRing
-              hideRing={a.type === 'business'}
-            />
-            <span style={{ fontSize: 13, fontWeight: 500 }}>{a.name}</span>
-          </DropdownMenuItem>
-        ))}
+        {availableActors.map((a) => {
+          const isCurrent = a.id === current.id && a.type === current.type;
+          return (
+            <DropdownMenuItem
+              key={`${a.type}:${a.id}`}
+              onClick={(e) => {
+                e.stopPropagation();
+                onChange?.(a);
+              }}
+              className="focus:!bg-white/[0.06] data-[highlighted]:!bg-white/[0.06] focus:!text-white"
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: 8,
+                background: isCurrent ? 'rgba(255,255,255,0.06)' : 'transparent',
+                color: isCurrent ? '#ffffff' : 'rgba(255,255,255,0.9)',
+                cursor: 'pointer',
+              }}
+            >
+              <SquircleAvatar
+                size={24}
+                src={a.avatarUrl ?? undefined}
+                alt={a.name}
+                userId={a.type === 'personal' ? a.id : null}
+                hairlineRing
+                hideRing={a.type === 'business'}
+              />
+              <span style={{ fontSize: 13, fontWeight: 500 }}>{a.name}</span>
+            </DropdownMenuItem>
+          );
+        })}
       </DropdownMenuContent>
     </DropdownMenu>
   );
