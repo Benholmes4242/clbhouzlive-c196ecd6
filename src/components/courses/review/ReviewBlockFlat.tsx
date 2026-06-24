@@ -56,21 +56,29 @@ const formatDate = (dateString: string) => {
   return `${years} ${years === 1 ? 'year' : 'years'} ago`;
 };
 
-/** Circular SVG score ring — matches PDF spec */
+/** Circular SVG score ring — graduated grey → amber → gold ramp */
 const ScoreRing: React.FC<{ score: number; size?: number }> = ({ score, size = 46 }) => {
+  const { from, to } = getScoreRingColors(score);
   const r = (size / 2) - 4;
   const circ = 2 * Math.PI * r;
   const fill = circ * (Math.max(0, Math.min(10, score)) / 10);
+  const gradientId = `scoreGradient-${Math.random().toString(36).slice(2)}`;
   return (
     <div style={{ position: 'relative', width: size, height: size, flexShrink: 0 }}>
       <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`} style={{ transform: 'rotate(-90deg)' }}>
+        <defs>
+          <linearGradient id={gradientId} x1="0%" y1="0%" x2="100%" y2="0%">
+            <stop offset="0%" stopColor={from} />
+            <stop offset="100%" stopColor={to} />
+          </linearGradient>
+        </defs>
         <circle cx={size / 2} cy={size / 2} r={r} fill="none" stroke="rgba(15,23,42,0.08)" strokeWidth={3} />
         <circle
           cx={size / 2}
           cy={size / 2}
           r={r}
           fill="none"
-          stroke="#F7931E"
+          stroke={`url(#${gradientId})`}
           strokeWidth={3}
           strokeLinecap="round"
           strokeDasharray={`${fill} ${circ}`}
