@@ -624,32 +624,30 @@ const FeedCardImpl: React.FC<FeedCardProps> = ({
       })()}
 
 
-      {/* Footer */}
+      {/* Footer action bar — 4 evenly spaced items */}
       <div
         style={{
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'space-between',
           padding: '10px 14px 12px',
+          borderTop: `0.5px solid ${LINE}`,
         }}
       >
-        <div />
-
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '50%', flexShrink: 0 }}>
-          <FooterButton
-            icon={Heart}
-            label={formatCount(likeCount)}
-            active={liked}
-            onClick={() => onLike(post)}
-            activeColor={AMBER}
-          />
-          <FooterButton
-            icon={MessageCircle}
-            label={formatCount(commentCount)}
-            onClick={() => onComment(post)}
-          />
-          <FooterButton icon={Share} onClick={() => onShare(post)} />
-        </div>
+        <FeedActorPicker value={actingAs} onChange={handleActorChange} />
+        <FooterButton
+          icon={Heart}
+          label={formatCount(likeCount)}
+          active={liked}
+          onClick={() => onLike(post)}
+          activeColor={AMBER}
+        />
+        <FooterButton
+          icon={MessageCircle}
+          label={formatCount(commentCount)}
+          onClick={() => onComment(post)}
+        />
+        <FooterButton icon={Share} onClick={() => onShare(post)} />
       </div>
     </article>
   );
