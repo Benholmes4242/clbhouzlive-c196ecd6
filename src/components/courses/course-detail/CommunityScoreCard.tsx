@@ -2,8 +2,23 @@ import React from 'react';
 import { CourseRatingAggregate } from '@/hooks/useCourseRatingAggregates';
 import { UserCourseRating } from '@/hooks/useUserCourseRating';
 import { RatingTierDistributionData } from '@/components/courses/review/RatingTierDistribution';
-import { getRatingTier } from '@/lib/ratingTier';
+import {
+  getRatingTier,
+  HERO_NUMBER_STYLE,
+  TIER_LABEL_STYLE,
+  ratingTextColor,
+  rampForRating,
+} from '@/lib/ratingTier';
 import { AMBER, HAIRLINE_INK_7, INK, INK_FAINT, INK_MUTE, SURFACE } from '@/features/courses/_shared/tokens';
+
+// Representative score per distribution tier — drives bar colour via rampForRating
+const TIER_REP_SCORE: Record<string, number> = {
+  exceptional: 9.5,
+  excellent: 8.0,
+  good: 6.5,
+  fair: 5.0,
+  poor: 2.0,
+};
 
 interface CommunityScoreCardProps {
   courseId: string;
