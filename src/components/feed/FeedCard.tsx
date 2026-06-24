@@ -160,6 +160,7 @@ const FeedCardImpl: React.FC<FeedCardProps> = ({
         overflow: 'hidden',
         marginInline: 0,
         position: 'relative',
+        borderTop: `1px solid ${LINE}`,
       }}
     >
       {/* Card-level ghost numeral — overflows the header, clipped by card edges */}
