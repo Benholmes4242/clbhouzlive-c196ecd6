@@ -80,10 +80,8 @@ const ScoreRing: React.FC<{ score: number; size?: number }> = ({ score, size = 5
           alignItems: 'center',
           justifyContent: 'center',
           fontSize: 13,
-          fontWeight: 900,
-          color: '#0F172A',
-          letterSpacing: '-0.02em',
-          fontVariantNumeric: 'tabular-nums',
+          ...HERO_NUMBER_STYLE,
+          color: ratingTextColor(score),
         }}
       >
         {score.toFixed(1)}
