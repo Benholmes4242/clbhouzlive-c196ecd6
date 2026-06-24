@@ -400,7 +400,7 @@ const ClubhouseContent = () => {
       <ClubhouseSkeletonShimmer isVisible={showRehydrationSkeleton} isStatic={false} variant={posts[0]?.isReview ? 'review' : 'regular'} isVideo={posts[0]?.mediaItems?.[0]?.type === 'video'} surface="card" />
 
       {/* ═══ MAIN FEED AREA ═══ */}
-      {!isLoading && posts.length === 0 ? (
+      {((!isLoading && posts.length === 0) || (skeletonTimedOut && posts.length === 0)) ? (
         activeTab === 'friends' ? (
           <div
             className="flex flex-col w-full"
