@@ -177,8 +177,8 @@ const GlobalBottomNavigation: React.FC<GlobalBottomNavigationProps> = ({ chromeS
                 className="chrome-bottom-nav clubhouse-footer"
                 data-chrome="bottom-nav"
                 style={{
-                  // Route-aware: dark on Clubhouse/Handicap, light everywhere else.
-                  background: isDarkChromeRoute ? '#0A0E14' : '#F8FAFC',
+                  // App-wide ink chrome — matches feed surface (#0F172A).
+                  background: isDarkChromeRoute ? '#0F172A' : '#F8FAFC',
                   borderTop: isDarkChromeRoute
                     ? '0.5px solid rgba(255,255,255,0.06)'
                     : '0.5px solid rgba(15,23,42,0.08)',
