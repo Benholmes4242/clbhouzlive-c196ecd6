@@ -163,30 +163,11 @@ function useMedianBridgeReady(maxWaitMs = 2000, intervalMs = 150): { ready: bool
 }
 
 const RootGate: React.FC = () => {
-  // ===== TEMP DIAGNOSTIC BYPASS - REMOVE AFTER TESTING =====
-  // Skips all gating to isolate whether the gate causes the cold-load failure.
-  const DIAGNOSTIC_BYPASS_GATE = true;
-  if (DIAGNOSTIC_BYPASS_GATE) {
-    return <ClubhouseWrapped />;
-  }
-  // ===== END TEMP DIAGNOSTIC BYPASS =====
 
   const { ready: bridgeReady, isMedianApp } = useMedianBridgeReady();
   const previewBypass = usePreviewBypass();
   const { user, loading: authLoading } = useSupabaseSession();
 
-  // [BootAudit] Log the gate decision on every render to prove the boot path
-  // on a cold device (Apple 2.1 audit). Cheap; safe to leave on.
-  // eslint-disable-next-line no-console
-  console.info('[BootAudit][RootGate]', {
-    t: Date.now(),
-    bridgeReady,
-    isMedianApp,
-    previewBypass,
-    authLoading,
-    hasUser: !!user,
-    path: typeof window !== 'undefined' ? window.location.pathname : '',
-  });
 
   // Wait briefly for the native bridge to inject so we don't misroute on
   // a cold iPad launch. (Bridge detection commits after ~2s.)
@@ -201,8 +182,6 @@ const RootGate: React.FC = () => {
   // letting the Clubhouse feed sit on skeletons forever waiting for a user.
   // (Apple 2.1 fix — reviewers hit infinite skeletons on a fresh device.)
   if (!authLoading && !user) {
-    // eslint-disable-next-line no-console
-    console.info('[BootAudit][RootGate] -> Navigate /auth (no user)');
     return <Navigate to="/auth" replace />;
   }
 
