@@ -197,7 +197,7 @@ const GlobalBottomNavigation: React.FC<GlobalBottomNavigationProps> = ({ chromeS
             <motion.div
               className="global-bottom-nav"
               initial={{ y: '100%', opacity: 0 }}
-              animate={{ y: 0, opacity: 1 }}
+              animate={{ y: navHidden ? '100%' : 0, opacity: navHidden ? 0 : 1 }}
               exit={{ y: '100%', opacity: 0 }}
               transition={{ duration: 0.24, ease: [0.22, 0.61, 0.36, 1] }}
             >
