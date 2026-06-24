@@ -113,7 +113,7 @@ export const ClubhouseTopBar: React.FC<ClubhouseTopBarProps> = ({
                 style={{
                   width: 1,
                   height: 18,
-                  background: 'rgba(15,23,42,0.08)',
+                  background: 'rgba(255,255,255,0.10)',
                   flexShrink: 0,
                   margin: 0,
                 }}
@@ -135,7 +135,7 @@ export const ClubhouseTopBar: React.FC<ClubhouseTopBarProps> = ({
                   border: 'none',
                   padding: 0,
                   cursor: 'pointer',
-                  color: '#0F172A',
+                  color: '#FFFFFF',
                   filter: 'none',
                 }}
               >
@@ -143,7 +143,7 @@ export const ClubhouseTopBar: React.FC<ClubhouseTopBarProps> = ({
               </button>
             )}
 
-            {!hideProfilePill && user && <HandicapChip light />}
+            {!hideProfilePill && user && <HandicapChip />}
 
             {!hideProfilePill && user && (
               <PostingAsPill
