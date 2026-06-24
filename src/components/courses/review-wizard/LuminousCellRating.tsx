@@ -8,10 +8,12 @@ const INK = '#0F172A';
 const INK_MUTE = '#64748B';
 const INK_FAINT = '#94A3B8';
 const AMBER = '#F7931E';
-const AMBER_TOP = 'rgba(247,147,30,0.88)';
+const AMBER_TOP = '#FAC775';
+const AMBER_DEEP = '#BA7517';
 const GOLD = '#FFB800';
 const GOLD_DEEP = '#D97706';
-const GOLD_TOP = 'rgba(217,119,6,0.88)';
+const GOLD_TOP = '#EF9F27';
+const GOLD_DEEPER = '#854F0B';
 
 type Tier = { label: string; gold: boolean } | null;
 function tierFor(score: number | null): Tier {
