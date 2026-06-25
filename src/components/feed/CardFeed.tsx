@@ -48,7 +48,12 @@ export interface CardFeedProps {
   bottomPadding?: number;
   onFollow?: (post: FeedPost) => void;
   currentUserId?: string;
+  onRefresh?: () => void | Promise<void>;
+  isRefreshing?: boolean;
 }
+
+const PTR_THRESHOLD = 64;
+const PTR_MAX_PULL = 96;
 
 export const CardFeed: React.FC<CardFeedProps> = ({
   posts,
@@ -66,6 +71,8 @@ export const CardFeed: React.FC<CardFeedProps> = ({
   bottomPadding = 96,
   onFollow,
   currentUserId,
+  onRefresh,
+  isRefreshing = false,
 }) => {
 
   const virtuosoRef = useRef<VirtuosoHandle | null>(null);
@@ -341,15 +348,151 @@ export const CardFeed: React.FC<CardFeedProps> = ({
 
 
 
+  // ── Pull-to-refresh ───────────────────────────────────────────────
+  // Engages only when the real scroller (#root) is at top. Damped 0.5x,
+  // capped at PTR_MAX_PULL. Releasing past PTR_THRESHOLD fires onRefresh.
+  const containerRef = useRef<HTMLDivElement | null>(null);
+  const [pull, setPull] = useState(0);
+  const pullRef = useRef(0);
+  const startYRef = useRef<number | null>(null);
+  const armedRef = useRef(false);
+  const activelyPullingRef = useRef(false);
+
+  useEffect(() => {
+    const el = containerRef.current;
+    if (!el || !onRefresh) return;
+
+    const getScrollTop = () => document.getElementById('root')?.scrollTop ?? 0;
+
+    const onTouchStart = (e: TouchEvent) => {
+      if (isRefreshing) return;
+      if (e.touches.length !== 1) return;
+      startYRef.current = e.touches[0].clientY;
+      armedRef.current = getScrollTop() <= 0;
+      activelyPullingRef.current = false;
+    };
+
+    const onTouchMove = (e: TouchEvent) => {
+      if (!armedRef.current || startYRef.current == null) return;
+      const dy = e.touches[0].clientY - startYRef.current;
+      if (dy <= 0) {
+        if (activelyPullingRef.current) {
+          activelyPullingRef.current = false;
+          pullRef.current = 0;
+          setPull(0);
+        }
+        return;
+      }
+      // Confirm still at top before engaging
+      if (getScrollTop() > 0) {
+        armedRef.current = false;
+        activelyPullingRef.current = false;
+        pullRef.current = 0;
+        setPull(0);
+        return;
+      }
+      activelyPullingRef.current = true;
+      const next = Math.min(dy * 0.5, PTR_MAX_PULL);
+      pullRef.current = next;
+      setPull(next);
+      if (e.cancelable) e.preventDefault();
+    };
+
+    const onTouchEnd = () => {
+      if (activelyPullingRef.current && pullRef.current >= PTR_THRESHOLD && onRefresh) {
+        // Snap to resting position and fire
+        pullRef.current = PTR_THRESHOLD;
+        setPull(PTR_THRESHOLD);
+        Promise.resolve(onRefresh()).catch(() => {});
+      } else {
+        pullRef.current = 0;
+        setPull(0);
+      }
+      activelyPullingRef.current = false;
+      armedRef.current = false;
+      startYRef.current = null;
+    };
+
+    el.addEventListener('touchstart', onTouchStart, { passive: true });
+    el.addEventListener('touchmove', onTouchMove, { passive: false });
+    el.addEventListener('touchend', onTouchEnd, { passive: true });
+    el.addEventListener('touchcancel', onTouchEnd, { passive: true });
+    return () => {
+      el.removeEventListener('touchstart', onTouchStart as any);
+      el.removeEventListener('touchmove', onTouchMove as any);
+      el.removeEventListener('touchend', onTouchEnd as any);
+      el.removeEventListener('touchcancel', onTouchEnd as any);
+    };
+  }, [onRefresh, isRefreshing]);
+
+  // When a refresh completes, retract the spinner.
+  useEffect(() => {
+    if (!isRefreshing && !activelyPullingRef.current) {
+      pullRef.current = 0;
+      setPull(0);
+    }
+  }, [isRefreshing]);
+
+  const spinnerOffset = isRefreshing ? PTR_THRESHOLD : pull;
+  const spinnerProgress = Math.min(pull / PTR_THRESHOLD, 1);
+  const spinnerRotation = isRefreshing ? 0 : pull * 3;
+
   return (
     <div
+      ref={containerRef}
       style={{
         background: CANVAS,
         height: '100dvh',
         width: '100%',
+        position: 'relative',
+        overscrollBehaviorY: 'contain',
       }}
       data-card-feed
     >
+      {/* Pull-to-refresh spinner */}
+      {onRefresh && (spinnerOffset > 0 || isRefreshing) && (
+        <div
+          aria-hidden={!isRefreshing}
+          style={{
+            position: 'absolute',
+            top: `calc(env(safe-area-inset-top, 0px) + 59px)`,
+            left: '50%',
+            transform: `translate(-50%, ${spinnerOffset - 36}px)`,
+            zIndex: 30,
+            pointerEvents: 'none',
+            transition: activelyPullingRef.current ? 'none' : 'transform 220ms cubic-bezier(0.22, 1, 0.36, 1)',
+            opacity: isRefreshing ? 1 : Math.min(0.4 + spinnerProgress * 0.6, 1),
+          }}
+        >
+          <div
+            style={{
+              width: 36,
+              height: 36,
+              borderRadius: 999,
+              background: 'rgba(21,23,31,0.6)',
+              backdropFilter: 'blur(8px)',
+              WebkitBackdropFilter: 'blur(8px)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              boxShadow: '0 4px 12px rgba(0,0,0,0.25)',
+            }}
+          >
+            <div
+              style={{
+                width: 22,
+                height: 22,
+                borderRadius: '50%',
+                border: '2px solid rgba(255,255,255,0.18)',
+                borderTopColor: 'rgba(255,255,255,0.92)',
+                transform: `rotate(${spinnerRotation}deg)`,
+                animation: isRefreshing ? 'ptrSpin 0.8s linear infinite' : undefined,
+              }}
+            />
+          </div>
+          <style>{`@keyframes ptrSpin { to { transform: rotate(360deg); } }`}</style>
+        </div>
+      )}
       <Virtuoso
         ref={virtuosoRef}
         data={posts}
