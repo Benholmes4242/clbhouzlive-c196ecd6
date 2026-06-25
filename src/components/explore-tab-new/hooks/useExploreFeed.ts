@@ -87,12 +87,19 @@ export function useExploreFeed({ userId, region, searchQuery, enabled: externalE
   const allPosts = useMemo(() => {
     const posts = query.data?.pages.flatMap((page) => page.posts) ?? [];
     const seen = new Set<string>();
-    return posts.filter(p => {
+    const deduped = posts.filter(p => {
       if (seen.has(p.id)) return false;
       seen.add(p.id);
       return true;
     });
-  }, [query.data]);
+    console.log('[ActorDebug] useExploreFeed result', {
+      actor: { type: activeActor?.type, id: activeActor?.id },
+      totalHeld: posts.length,
+      willRender: deduped.length,
+      pages: query.data?.pages.length ?? 0,
+    });
+    return deduped;
+  }, [query.data, activeActor?.type, activeActor?.id]);
 
   const resetSeen = useCallback(() => {
     seenPostIds.current = [];
