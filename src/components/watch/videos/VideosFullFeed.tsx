@@ -242,12 +242,7 @@ function VideosFullFeedInner({ userId, mood, searchQuery }: VideosFullFeedProps)
     );
   };
 
-  return (
-    <>
-      {!searchQuery && <BucketListRail />}
-      {renderVideoFeedBody()}
-    </>
-  );
+  return renderVideoFeedBody();
 }
 
 export const VideosFullFeed = memo(VideosFullFeedInner);
