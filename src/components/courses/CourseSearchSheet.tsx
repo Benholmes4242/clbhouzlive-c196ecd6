@@ -317,6 +317,11 @@ export function CourseSearchSheet({
                     <p style={{ fontSize: '13px', fontWeight: 400, color: '#AEAEB2', marginTop: '4px' }}>
                       {query ? "Try a different search term" : "Start typing to find courses"}
                     </p>
+                    {query ? (
+                      <div className="mt-4 flex justify-center">
+                        <RequestCourseCTA variant="button" prefillName={query} />
+                      </div>
+                    ) : null}
                   </div>
                 )}
               </div>

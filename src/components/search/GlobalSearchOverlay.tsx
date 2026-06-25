@@ -801,6 +801,9 @@ function GlobalSearchOverlay({ isOpen, onClose }: GlobalSearchOverlayProps) {
                     <p className="text-[12px] text-center max-w-[280px]" style={{ color: INK_SUBTLE }}>
                       Try a different spelling, or search for a nearby course
                     </p>
+                    <div className="mt-2">
+                      <RequestCourseCTA variant="row" prefillName={debouncedQuery} />
+                    </div>
                   </div>
                 </motion.div>
               ) : null}
