@@ -27,6 +27,8 @@ export function useExploreFeed({ userId, region, searchQuery, enabled: externalE
 
       const params: Record<string, any> = {
         p_user_id: userId,
+        p_viewer_actor_type: activeActor?.type ?? 'personal',
+        p_viewer_actor_id: activeActor?.id ?? userId,
         p_page_size: PAGE_SIZE,
         p_seen_post_ids: seenPostIds.current,
       };
