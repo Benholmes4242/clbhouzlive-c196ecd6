@@ -910,10 +910,20 @@ export function useReviewWizard({
       }
 
       // 3. Delete the rating - cascade will handle course_review_media and votes
-      const { error } = await supabase
+      const { data: deletedRatings, error } = await supabase
         .from('course_ratings')
         .delete()
-        .eq('id', reviewId);
+        .eq('id', reviewId)
+        .select('id, course_id, user_id');
+
+      console.log('[ReviewWizard] deleted course_ratings rows:', deletedRatings?.length ?? 0, {
+        reviewId,
+        deletedRatings,
+        error,
+        existingRatingId: existingRating.id,
+        courseId: course?.id,
+        currentUserId,
+      });
 
       if (error) throw error;
 
@@ -945,7 +955,10 @@ export function useReviewWizard({
         });
       }
 
-      return reviewId;
+      return {
+        reviewId,
+        deletedRatings: deletedRatings || [],
+      };
     },
     onMutate: async () => {
       // Optimistically remove the review from all caches before the server call
@@ -955,7 +968,7 @@ export function useReviewWizard({
       }
       return {};
     },
-    onSuccess: () => {
+    onSuccess: async (deleteResult) => {
       // Confirm optimistic update with server truth
       if (course?.id && currentUserId) {
         confirmUpdate(course.id, currentUserId);
@@ -972,6 +985,20 @@ export function useReviewWizard({
       void queryClient.refetchQueries({ queryKey: ['user-top-ten-courses'], exact: false });
       void queryClient.refetchQueries({ queryKey: ['course-personal-status'], exact: false });
       void queryClient.refetchQueries({ queryKey: ['user-course-moments'], exact: false });
+
+      if (currentUserId && course?.id) {
+        void queryClient.refetchQueries({ queryKey: ['user-course-activity', currentUserId], exact: true }).then(() => {
+          const activityCache = queryClient.getQueryData<any[]>(['user-course-activity', currentUserId]) || [];
+          console.log('[ReviewWizard] post-delete user-course-activity contains deleted course:', {
+            reviewId: deleteResult.reviewId,
+            deletedCourseId: course.id,
+            deletedRatingRows: deleteResult.deletedRatings.length,
+            containsDeletedCourse: activityCache.some((row: any) => row?.course_id === course.id),
+            matchingRows: activityCache.filter((row: any) => row?.course_id === course.id),
+            activityCount: activityCache.length,
+          });
+        });
+      }
 
       // Clear exclusion for this course on delete
       if (currentUserId && course?.id) {
