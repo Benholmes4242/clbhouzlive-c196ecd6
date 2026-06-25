@@ -139,14 +139,29 @@ const ProfilePageV2Content: React.FC = () => {
     enabled: !!routeUsername,
     staleTime: 10 * 60 * 1000,
     queryFn: async () => {
+      // Resolve via the base table first (works for self / permitted relationships,
+      // and still distinguishes soft-deleted rows). RLS returns no row for
+      // strangers, so we fall back to public_profiles below.
       const query = supabase.from('user_profiles').select('id, deleted_at');
       const { data, error } = await (isUuid(routeUsername!)
         ? query.eq('id', routeUsername!)
         : query.eq('username', routeUsername!)
       ).maybeSingle();
-      if (error || !data) return { id: null as string | null, deleted: false, notFound: true };
-      if (data.deleted_at != null) return { id: null as string | null, deleted: true, notFound: false };
-      return { id: data.id, deleted: false, notFound: false };
+      if (!error && data) {
+        if (data.deleted_at != null) return { id: null as string | null, deleted: true, notFound: false };
+        return { id: data.id, deleted: false, notFound: false };
+      }
+
+      // Fallback: stranger / logged-out viewer. public_profiles already excludes
+      // deleted + suspended + unconfirmed users, so a hit here is a valid public
+      // profile; a miss is a genuine not-found.
+      const pubQuery = supabase.from('public_profiles').select('id');
+      const { data: pub, error: pubError } = await (isUuid(routeUsername!)
+        ? pubQuery.eq('id', routeUsername!)
+        : pubQuery.eq('username', routeUsername!)
+      ).maybeSingle();
+      if (pubError || !pub) return { id: null as string | null, deleted: false, notFound: true };
+      return { id: pub.id, deleted: false, notFound: false };
     },
   });
 
