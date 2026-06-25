@@ -20,23 +20,11 @@ import { safeGoBack } from '@/utils/navigation';
 const FLOAT_STROKE = 2;
 const GLYPH_COLOR = '#FFFFFF';
 
-export type FloatingMenuItem =
-  | { kind: 'separator' }
-  | {
-      kind?: 'item';
-      icon: LucideIcon;
-      label: string;
-      onClick: () => void;
-      destructive?: boolean;
-    };
-
 export interface ProfileFloatingHeaderProps {
   /** When true, left glyph is a settings gear (own-profile reached via tab). */
   isSelf?: boolean;
   /** Fallback path for safeGoBack when there's no history to pop. */
   backFallback?: string;
-  /** Items rendered inside the ⋯ dropdown. */
-  menuItems: FloatingMenuItem[];
   /** Optional override for the settings tap target (defaults to /settings). */
   onSettingsClick?: () => void;
 }
