@@ -710,7 +710,7 @@ export function ReviewWizard({
                     </button>
 
                     {/* Hero scrubber */}
-                    <div style={{ padding: '16px 16px 8px' }}>
+                    <div style={{ padding: `16px ${PAD_X} 8px` }}>
                       <TickScrubber
                         value={wizard.state.rating}
                         onChange={wizard.setRating}
