@@ -166,10 +166,10 @@ function RequestCard({
 
       {row.adminNotes && (
         <div style={{
-          fontSize: 12, color: t.inkMuted, padding: '6px 10px',
-          background: t.brandSoft, color2: t.brandText as any,
-          borderRadius: t.radius.sm,
-        } as any}>
+          fontSize: 12, padding: '6px 10px',
+          background: t.brandSoft, borderRadius: t.radius.sm,
+          color: t.inkMuted,
+        }}>
           <span style={{ color: t.brandText, fontWeight: 600 }}>Admin note:</span> {row.adminNotes}
         </div>
       )}
