@@ -648,7 +648,7 @@ export function ReviewWizard({
                         display: 'flex',
                         alignItems: 'center',
                         gap: 12,
-                        padding: '12px 16px',
+                        padding: `12px ${PAD_X}`,
                         borderBottom: `0.5px solid ${HAIR}`,
                         background: 'transparent',
                         border: 'none',
