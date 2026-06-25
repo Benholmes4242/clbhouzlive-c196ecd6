@@ -80,7 +80,7 @@ function ExploreHeroInner({ userId, mood }: ExploreHeroProps) {
       <ExploreSectionHeader
         kicker="BEST OF THE BEST"
         kickerColor="amber"
-        title="Today's standout"
+        title="Standout courses"
         sub="The course worth your attention right now"
         mark={<FlameMark />}
         paddingTop={20}
