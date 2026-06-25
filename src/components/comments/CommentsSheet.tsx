@@ -110,8 +110,15 @@ function CommentsSheet({
 }: CommentsSheetProps) {
   const navigate = useNavigate();
   const { user } = useSupabaseSession();
-  const { activeActor } = useActiveActor();
+  const { activeActor, availableActors } = useActiveActor();
   const currentUserId = currentUserIdProp ?? user?.id ?? null;
+
+  const effectiveActor = useMemo(() => {
+    if (actorOverride) {
+      return availableActors.find(a => a.id === actorOverride.id && a.type === actorOverride.type) ?? activeActor;
+    }
+    return activeActor;
+  }, [actorOverride, availableActors, activeActor]);
 
   // ── Hook — use editorial comments hook when editorialCardId is provided ──
   const standardHook = useCommentsWithReplies(editorialCardId ? '' : postId, onCommentDeleted, actorOverride);
@@ -1060,9 +1067,9 @@ function CommentsSheet({
                 <div className="flex items-end gap-2">
                   <SquircleAvatar
                     size={32}
-                    src={activeActor?.avatarUrl}
-                    alt={activeActor?.name || 'You'}
-                    fallback={activeActor?.name?.charAt(0) || '?'}
+                    src={effectiveActor?.avatarUrl}
+                    alt={effectiveActor?.name || 'You'}
+                    fallback={effectiveActor?.name?.charAt(0) || '?'}
                     hideRing
                   />
                   <div className="flex-1 min-w-0 relative">

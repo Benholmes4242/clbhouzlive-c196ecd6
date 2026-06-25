@@ -2542,18 +2542,24 @@ export type Database = {
       }
       comment_likes: {
         Row: {
+          actor_id: string
+          actor_type: string
           comment_id: string
           created_at: string
           id: string
           user_id: string
         }
         Insert: {
+          actor_id: string
+          actor_type: string
           comment_id: string
           created_at?: string
           id?: string
           user_id: string
         }
         Update: {
+          actor_id?: string
+          actor_type?: string
           comment_id?: string
           created_at?: string
           id?: string
