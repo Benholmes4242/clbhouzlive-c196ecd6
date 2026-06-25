@@ -3,9 +3,9 @@
  * profile hero. Mirrors the ClubhouseTopBar pattern: bare white glyphs, no
  * frosted circles, no bar background. A subtle top scrim handles legibility.
  *
- * Layout (Option C):
+ * Layout:
  *   LEFT  : back arrow (or settings gear when nothing to pop)
- *   RIGHT : search · more (⋯)
+ *   RIGHT : search
  *
  * Anchored at top:0 with paddingTop = safe-area-inset-top so glyphs land
  * exactly where ClubhouseTopBar / CompactHeader sit — directly under the notch.
@@ -32,7 +32,6 @@ export interface ProfileFloatingHeaderProps {
 export const ProfileFloatingHeader: React.FC<ProfileFloatingHeaderProps> = ({
   isSelf = false,
   backFallback = '/clubhouse',
-  menuItems,
   onSettingsClick,
 }) => {
   const navigate = useNavigate();
@@ -118,49 +117,6 @@ export const ProfileFloatingHeader: React.FC<ProfileFloatingHeaderProps> = ({
             >
               <Search size={21} strokeWidth={FLOAT_STROKE} />
             </button>
-
-            <DropdownMenu
-              onOpenChange={(open) => {
-                if (!open) (document.activeElement as HTMLElement)?.blur();
-              }}
-            >
-              <DropdownMenuTrigger asChild>
-                <button
-                  type="button"
-                  aria-label="More options"
-                  className="flex items-center justify-center active:scale-95 transition-transform focus:outline-none"
-                  style={{
-                    width: 44,
-                    height: 44,
-                    background: 'transparent',
-                    border: 'none',
-                    padding: 0,
-                    color: GLYPH_COLOR,
-                    cursor: 'pointer',
-                  }}
-                >
-                  <MoreHorizontal size={21} strokeWidth={FLOAT_STROKE} />
-                </button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="w-52">
-                {menuItems.map((item, i) => {
-                  if (item.kind === 'separator') {
-                    return <DropdownMenuSeparator key={`sep-${i}`} />;
-                  }
-                  const Icon = item.icon;
-                  return (
-                    <DropdownMenuItem
-                      key={`${item.label}-${i}`}
-                      onClick={item.onClick}
-                      className={item.destructive ? 'text-destructive focus:text-destructive' : ''}
-                    >
-                      <Icon className="w-4 h-4 mr-2" />
-                      {item.label}
-                    </DropdownMenuItem>
-                  );
-                })}
-              </DropdownMenuContent>
-            </DropdownMenu>
           </div>
         </div>
       </div>
