@@ -58,6 +58,7 @@ export default function ExploreGrid({
   const fetchGuard = useRef(false);
 
   const { ref: sentinelRef, inView } = useInView({
+    root: SCROLL_ROOT ?? undefined,
     rootMargin: '400px',
     threshold: 0,
   });
@@ -72,6 +73,10 @@ export default function ExploreGrid({
   useEffect(() => {
     if (inView) loadMore();
   }, [inView, loadMore]);
+
+  useEffect(() => {
+    if (!isFetchingNextPage) fetchGuard.current = false;
+  }, [isFetchingNextPage]);
 
   // Sync new posts into fullscreen overlay
   const { isOpen: isFullscreenOpen, appendPosts } = useFullscreenFeedStore();
