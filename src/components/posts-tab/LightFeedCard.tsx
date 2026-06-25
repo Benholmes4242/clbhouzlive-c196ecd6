@@ -267,8 +267,7 @@ const LightFeedCardImpl: React.FC<LightFeedCardProps> = ({
 
   const subLine = useMemo(() => {
     const parts: string[] = [];
-    if (post.isReview) parts.push('posted a review');
-    else if (isDeal) parts.push('Sponsored');
+    if (isDeal) parts.push('Sponsored');
     else if (post.creatorRelation === 'system') parts.push('clbhouz');
     parts.push(timeAgo(post.createdAt));
     return parts.filter(Boolean).join(' · ');
