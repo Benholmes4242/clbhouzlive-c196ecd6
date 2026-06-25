@@ -719,7 +719,7 @@ export function ReviewWizard({
                       />
                     </div>
 
-                    <div style={{ height: 0.5, background: HAIR, margin: '8px 16px 0' }} />
+                    <div style={{ height: 0.5, background: HAIR, margin: `8px ${PAD_X} 0` }} />
 
                     {/* Categories — always visible 2×2 grid */}
                     <div style={{ padding: `12px ${PAD_X} 12px` }}>
