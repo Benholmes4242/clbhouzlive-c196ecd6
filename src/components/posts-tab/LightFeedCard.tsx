@@ -16,7 +16,7 @@ import { PostOwnerMenu } from '@/components/posts/PostOwnerMenu';
 import { useManageableBusinessIds } from '@/hooks/useManageableBusinessIds';
 import { canManagePost } from '@/lib/canManagePost';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
-import { getRatingTier, getRatingTierLabel } from '@/lib/ratingTier';
+import { getRatingTier, getRatingTierLabel, ratingTextColor } from '@/lib/ratingTier';
 import { formatRatingValue } from '@/utils/formatters';
 import { useActiveActor } from '@/context/ActiveActorContext';
 
@@ -289,11 +289,11 @@ const LightFeedCardImpl: React.FC<LightFeedCardProps> = ({
       {/* Ghost numeral — drop alpha ~30% for contrast on light bg */}
       {reviewRating != null && (() => {
         const GHOST = {
-          EXCEPTIONAL: 'rgba(247,147,30,0.20)',
-          EXCELLENT:   'rgba(247,147,30,0.18)',
-          GOOD:        'rgba(247,147,30,0.15)',
-          FAIR:        'rgba(100,116,139,0.18)',
-          POOR:        'rgba(100,116,139,0.15)',
+          EXCEPTIONAL: 'rgba(240,165,0,0.20)',    // #F0A500 gold
+          EXCELLENT:   'rgba(217,119,6,0.18)',    // #D97706 amber
+          GOOD:        'rgba(217,119,6,0.15)',    // #D97706 amber
+          FAIR:        'rgba(100,116,139,0.18)',  // #64748B slate
+          POOR:        'rgba(100,116,139,0.15)',  // #64748B slate
         } as const;
         const tierKey = getRatingTier(reviewRating);
         return (
@@ -373,14 +373,6 @@ const LightFeedCardImpl: React.FC<LightFeedCardProps> = ({
             </span>
           )}
           {reviewRating != null && (() => {
-            const LABEL_COLOR = {
-              EXCEPTIONAL: '#E08A00',
-              EXCELLENT:   '#F7931E',
-              GOOD:        '#F7931E',
-              FAIR:        'rgba(15,23,42,0.55)',
-              POOR:        'rgba(15,23,42,0.45)',
-            } as const;
-            const tierKey = getRatingTier(reviewRating);
             const tierLabel = getRatingTierLabel(reviewRating);
             return (
               <button
@@ -395,7 +387,7 @@ const LightFeedCardImpl: React.FC<LightFeedCardProps> = ({
               >
                 <span style={{
                   fontSize: 12.5, fontWeight: 800, letterSpacing: '0.14em', textTransform: 'uppercase',
-                  color: LABEL_COLOR[tierKey], whiteSpace: 'nowrap',
+                  color: ratingTextColor(reviewRating), whiteSpace: 'nowrap',
                 }}>
                   {tierLabel}
                 </span>
