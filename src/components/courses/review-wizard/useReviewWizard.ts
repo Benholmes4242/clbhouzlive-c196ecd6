@@ -916,14 +916,6 @@ export function useReviewWizard({
         .eq('id', reviewId)
         .select('id, course_id, user_id');
 
-      console.log('[ReviewWizard] deleted course_ratings rows:', deletedRatings?.length ?? 0, {
-        reviewId,
-        deletedRatings,
-        error,
-        existingRatingId: existingRating.id,
-        courseId: course?.id,
-        currentUserId,
-      });
 
       if (error) throw error;
 
