@@ -6,7 +6,7 @@
  * (via the optional `interleave` flag, which runs `buildFriendsFeed`).
  */
 import { useInfiniteQuery, keepPreviousData } from '@tanstack/react-query';
-import { useCallback, useMemo, useRef } from 'react';
+import { useCallback, useEffect, useMemo, useRef } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useActiveActor } from '@/context/ActiveActorContext';
 import { mapRowToFeedPost, groupMultiMedia } from '@/components/media-system/utils/feedMapper';
@@ -39,6 +39,12 @@ export function useFriendsFeed({
   const { activeActor } = useActiveActor();
   const seenPostIds = useRef<string[]>([]);
 
+  // Reset page-1 exclusion list when the query identity changes (incl. actor switch).
+  useEffect(() => {
+    seenPostIds.current = [];
+  }, [mode, searchQuery, userId, interleave, pageSize, activeActor?.type, activeActor?.id]);
+
+
   const query = useInfiniteQuery({
     queryKey: ['friends-feed', mode, searchQuery, userId, interleave, pageSize, activeActor?.type, activeActor?.id],
     queryFn: async ({ pageParam }) => {
@@ -46,7 +52,7 @@ export function useFriendsFeed({
 
       const cursor = typeof pageParam === 'string' ? pageParam : undefined;
 
-      if (searchQuery) seenPostIds.current = [];
+
 
       const params: Record<string, unknown> = {
         p_user_id: userId,
@@ -56,7 +62,7 @@ export function useFriendsFeed({
         p_page_size: pageSize,
       };
 
-      if (!searchQuery) params.p_seen_post_ids = seenPostIds.current;
+      params.p_seen_post_ids = seenPostIds.current;
 
       if (cursor) params.p_cursor = cursor;
       if (searchQuery) params.p_search_query = searchQuery;

@@ -1,5 +1,5 @@
 import { useInfiniteQuery, keepPreviousData } from '@tanstack/react-query';
-import { useCallback, useMemo, useRef } from 'react';
+import { useCallback, useEffect, useMemo, useRef } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useActiveActor } from '@/context/ActiveActorContext';
 import { mapRowToFeedPost, groupMultiMedia } from '@/components/media-system/utils/feedMapper';
@@ -17,6 +17,12 @@ interface UseExploreFeedParams {
 export function useExploreFeed({ userId, region, searchQuery, enabled: externalEnabled = true }: UseExploreFeedParams) {
   const seenPostIds = useRef<string[]>([]);
   const { activeActor } = useActiveActor();
+
+  // Reset page-1 exclusion list when the query identity changes.
+  useEffect(() => {
+    seenPostIds.current = [];
+  }, [region, searchQuery, userId, activeActor?.type, activeActor?.id]);
+
 
   const query = useInfiniteQuery({
     queryKey: ['explore-feed', region ?? null, searchQuery ?? null, userId, activeActor?.type, activeActor?.id],
@@ -37,17 +43,7 @@ export function useExploreFeed({ userId, region, searchQuery, enabled: externalE
       if (cursor) params.p_cursor = cursor;
       if (searchQuery) params.p_search_query = searchQuery;
 
-      const seenCountBefore = seenPostIds.current.length;
       const { data, error } = await supabase.rpc('get_explore_feed', params as any);
-
-      const returned = Array.isArray(data) ? data.length : 0;
-      console.log('[ActorDebug] useExploreFeed fetch', {
-        actor: { type: activeActor?.type, id: activeActor?.id },
-        cursor: cursor ?? null,
-        region: region ?? null,
-        seenCount: seenCountBefore,
-        returned,
-      });
 
       if (error) {
         console.error('[ExploreFeed] RPC error:', error);
@@ -92,14 +88,8 @@ export function useExploreFeed({ userId, region, searchQuery, enabled: externalE
       seen.add(p.id);
       return true;
     });
-    console.log('[ActorDebug] useExploreFeed result', {
-      actor: { type: activeActor?.type, id: activeActor?.id },
-      totalHeld: posts.length,
-      willRender: deduped.length,
-      pages: query.data?.pages.length ?? 0,
-    });
     return deduped;
-  }, [query.data, activeActor?.type, activeActor?.id]);
+  }, [query.data]);
 
   const resetSeen = useCallback(() => {
     seenPostIds.current = [];

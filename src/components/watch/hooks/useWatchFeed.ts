@@ -1,5 +1,5 @@
 import { useInfiniteQuery, keepPreviousData } from '@tanstack/react-query';
-import { useCallback, useMemo, useRef } from 'react';
+import { useCallback, useEffect, useMemo, useRef } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { mapRowToFeedPost, groupMultiMedia } from '@/components/media-system/utils/feedMapper';
 import { enforceCreatorDiversity, enforceCourseDiversity } from '@/components/media-system/utils/feedAlgorithm';
@@ -34,6 +34,12 @@ export function useWatchFeed({ userId, filter, mood, category, searchQuery, user
   const seenPostIds = useRef<string[]>([]);
   const { activeActor } = useActiveActor();
 
+  // Reset page-1 exclusion list when the query identity changes (incl. actor switch).
+  useEffect(() => {
+    seenPostIds.current = [];
+  }, [resolvedFilter, mood, category, searchQuery, userId, activeActor?.type, activeActor?.id]);
+
+
   const query = useInfiniteQuery({
     queryKey: ['watch-feed', resolvedFilter, mood ?? null, category ?? null, searchQuery, userId, activeActor?.type, activeActor?.id],
     queryFn: async ({ pageParam }) => {
@@ -41,7 +47,7 @@ export function useWatchFeed({ userId, filter, mood, category, searchQuery, user
 
       const cursor = typeof pageParam === 'string' ? pageParam : undefined;
 
-      if (searchQuery) seenPostIds.current = [];
+
 
       const params: Record<string, any> = {
         p_user_id: userId,
@@ -51,7 +57,7 @@ export function useWatchFeed({ userId, filter, mood, category, searchQuery, user
         p_page_size: PAGE_SIZE,
       };
 
-      if (!searchQuery) params.p_seen_ids = seenPostIds.current;
+      params.p_seen_ids = seenPostIds.current;
 
       if (cursor) params.p_cursor = cursor;
       if (searchQuery) params.p_search_query = searchQuery;

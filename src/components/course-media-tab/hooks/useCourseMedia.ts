@@ -1,6 +1,7 @@
 import { useInfiniteQuery, useQuery, keepPreviousData } from '@tanstack/react-query';
-import { useCallback, useMemo, useRef } from 'react';
+import { useCallback, useEffect, useMemo, useRef } from 'react';
 import { supabase } from '@/integrations/supabase/client';
+import { useActiveActor } from '@/context/ActiveActorContext';
 import { mapRowToFeedPost, groupMultiMedia } from '@/components/media-system/utils/feedMapper';
 import type { FeedPost, FeedRpcRow } from '@/components/media-system/types/media';
 
@@ -21,10 +22,16 @@ export interface MediaCounts {
 }
 
 export function useCourseMedia({ userId, courseId, filter }: UseCourseMediaParams) {
+  const { activeActor } = useActiveActor();
   const seenPostIds = useRef<string[]>([]);
 
+  // Reset page-1 exclusion list when the query identity changes (incl. actor switch).
+  useEffect(() => {
+    seenPostIds.current = [];
+  }, [courseId, filter, activeActor?.type, activeActor?.id]);
+
   const query = useInfiniteQuery({
-    queryKey: ['course-media-feed', courseId, filter, userId],
+    queryKey: ['course-media-feed', courseId, filter, userId, activeActor?.type, activeActor?.id],
     queryFn: async ({ pageParam }) => {
       if (!userId) return { posts: [] as FeedPost[], nextCursor: undefined as string | undefined };
 
@@ -59,6 +66,10 @@ export function useCourseMedia({ userId, courseId, filter }: UseCourseMediaParam
         if (!seenPostIds.current.includes(post.id)) {
           seenPostIds.current.push(post.id);
         }
+      }
+      // Cap to last 500 to prevent unbounded growth
+      if (seenPostIds.current.length > 500) {
+        seenPostIds.current = seenPostIds.current.slice(-500);
       }
 
       const lastRow = rows[rows.length - 1];

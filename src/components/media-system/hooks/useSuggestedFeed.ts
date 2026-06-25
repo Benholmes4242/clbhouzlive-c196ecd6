@@ -1,5 +1,5 @@
 import { useInfiniteQuery } from '@tanstack/react-query';
-import { useRef, useCallback, useMemo } from 'react';
+import { useRef, useCallback, useEffect, useMemo } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useActiveActor } from '@/context/ActiveActorContext';
 import type { FeedPost, FeedRpcRow } from '../types/media';
@@ -11,6 +11,12 @@ const PAGE_SIZE = 60;
 export function useSuggestedFeed(userId: string | undefined) {
   const { activeActor } = useActiveActor();
   const seenPostIds = useRef<Set<string>>(new Set());
+
+  // Reset page-1 exclusion set when the query identity changes (incl. actor switch).
+  useEffect(() => {
+    seenPostIds.current = new Set();
+  }, [userId, activeActor?.type, activeActor?.id]);
+
 
   const query = useInfiniteQuery({
     queryKey: ['media-feed', 'suggested', userId, activeActor?.type, activeActor?.id],
