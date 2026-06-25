@@ -40,6 +40,8 @@ export function useProfilePosts({ userId, actorType, actorId }: UseProfilePostsP
         p_user_id: userId ?? null,
         p_actor_type: actorType,
         p_actor_id: actorId,
+        p_viewer_actor_type: activeActor?.type ?? 'personal',
+        p_viewer_actor_id: activeActor?.id ?? userId,
         p_page_size: PAGE_SIZE,
         p_seen_post_ids: seenPostIds.current,
       };
