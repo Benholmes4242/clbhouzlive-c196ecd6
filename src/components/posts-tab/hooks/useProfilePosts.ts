@@ -28,7 +28,6 @@ export function useProfilePosts({ userId, actorType, actorId }: UseProfilePostsP
     queryKey: ['profile-posts', actorType, actorId],
     queryFn: async ({ pageParam }) => {
 
-      const cursor = typeof pageParam === 'string' ? pageParam : undefined;
 
       const cursor =
         pageParam && typeof pageParam === 'object'
