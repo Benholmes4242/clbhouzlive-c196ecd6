@@ -66,6 +66,7 @@ const AMBER_SOFT = '#FEF3E7';
 const GOLD_DEEP = '#D97706';
 
 const MAX_REVIEW_LENGTH = 4000;
+const PAD_X = 'clamp(12px, 4vw, 16px)';
 
 const BREAKDOWNS: Array<{ key: keyof ReviewBreakdowns; label: string; desc: string }> = [
   { key: 'design', label: 'Course Design', desc: 'Layout, design and landscape' },
@@ -515,7 +516,7 @@ export function ReviewWizard({
               'flex flex-col',
               'overscroll-contain'
             )}
-            style={{ touchAction: 'pan-y', background: PAGE }}
+            style={{ touchAction: 'pan-y', background: PAGE, overflowX: 'hidden' }}
           >
             <div ref={overlayRootRef} className="contents" />
             <OverlayPortalProvider container={overlayRoot}>
@@ -545,10 +546,6 @@ export function ReviewWizard({
                   {/* Header */}
                   <div
                     style={{
-                      display: 'flex',
-                      alignItems: 'center',
-                      padding: '10px 16px',
-                      gap: 8,
                       background: PAGE,
                       borderBottom: `0.5px solid ${HAIR}`,
                       paddingTop: 'max(env(safe-area-inset-top, 0px), 14px)',
@@ -557,6 +554,7 @@ export function ReviewWizard({
                       zIndex: 5,
                     }}
                   >
+                    <div style={{ width: '100%', maxWidth: 480, marginInline: 'auto', display: 'flex', alignItems: 'center', padding: `10px ${PAD_X}`, gap: 8 }}>
                     <button
                       onClick={handleClose}
                       aria-label="Close"
@@ -628,16 +626,19 @@ export function ReviewWizard({
                         : (isEditMode ? 'Update' : 'Publish')}
                     </button>
                   </div>
+                  </div>
 
                   {/* Scroll body */}
                   <div
                     style={{
                       flex: 1,
                       overflowY: 'auto',
+                      overflowX: 'hidden',
                       WebkitOverflowScrolling: 'touch',
                       paddingBottom: `calc(${keyboardHeight}px + 64px + env(safe-area-inset-bottom, 0px) + 16px)`,
                     }}
                   >
+                    <div style={{ width: '100%', maxWidth: 480, marginInline: 'auto' }}>
                     {/* Course row */}
                     <button
                       onClick={() => !course && setShowCourseSearch(true)}
@@ -647,7 +648,7 @@ export function ReviewWizard({
                         display: 'flex',
                         alignItems: 'center',
                         gap: 12,
-                        padding: '12px 16px',
+                        padding: `12px ${PAD_X}`,
                         borderBottom: `0.5px solid ${HAIR}`,
                         background: 'transparent',
                         border: 'none',
@@ -684,9 +685,7 @@ export function ReviewWizard({
                             fontSize: 15,
                             fontWeight: 700,
                             color: INK,
-                            whiteSpace: 'nowrap',
-                            overflow: 'hidden',
-                            textOverflow: 'ellipsis',
+                            overflowWrap: 'anywhere',
                           }}
                         >
                           {activeCourse?.name || 'Pick a course'}
@@ -709,7 +708,7 @@ export function ReviewWizard({
                     </button>
 
                     {/* Hero scrubber */}
-                    <div style={{ padding: '16px 16px 8px' }}>
+                    <div style={{ padding: `16px ${PAD_X} 8px` }}>
                       <TickScrubber
                         value={wizard.state.rating}
                         onChange={wizard.setRating}
@@ -718,10 +717,10 @@ export function ReviewWizard({
                       />
                     </div>
 
-                    <div style={{ height: 0.5, background: HAIR, margin: '8px 16px 0' }} />
+                    <div style={{ height: 0.5, background: HAIR, margin: `8px ${PAD_X} 0` }} />
 
                     {/* Categories — always visible 2×2 grid */}
-                    <div style={{ padding: '12px 16px 12px' }}>
+                    <div style={{ padding: `12px ${PAD_X} 12px` }}>
                       <div
                         style={{
                           display: 'flex',
@@ -760,7 +759,7 @@ export function ReviewWizard({
                       <div
                         style={{
                           display: 'grid',
-                          gridTemplateColumns: '1fr 1fr',
+                          gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))',
                           gap: '18px 14px',
                           alignItems: 'start',
                           paddingTop: 12,
@@ -811,10 +810,10 @@ export function ReviewWizard({
                       </div>
                     </div>
 
-                    <div style={{ height: 0.5, background: HAIR, margin: '8px 16px 0' }} />
+                    <div style={{ height: 0.5, background: HAIR, margin: `8px ${PAD_X} 0` }} />
 
                     {/* Verdict */}
-                    <div style={{ padding: '14px 16px 4px' }}>
+                    <div style={{ padding: `14px ${PAD_X} 4px` }}>
                       <span
                         style={{
                           fontSize: 10.5,
@@ -830,7 +829,7 @@ export function ReviewWizard({
                     <div
                       onClick={() => taRef.current?.focus()}
                       style={{
-                        margin: '0 16px',
+                        margin: `0 ${PAD_X}`,
                         border: `1px solid ${
                           verdictFocused ? 'rgba(247,147,30,0.55)' : HAIR
                         }`,
@@ -939,7 +938,7 @@ export function ReviewWizard({
                             scrollSnapType: 'x mandatory',
                             WebkitOverflowScrolling: 'touch',
                             scrollbarWidth: 'none',
-                            padding: '0 16px',
+                            padding: `0 ${PAD_X}`,
                           }}
                         >
                           {existingTiles.map((tile) => (
@@ -962,7 +961,7 @@ export function ReviewWizard({
                           ))}
                         </div>
                         {wizard.allMedia.length < 10 && (
-                          <div style={{ padding: '10px 16px 0' }}>
+                          <div style={{ padding: `10px ${PAD_X} 0` }}>
                             <button
                               onClick={() => fileRef.current?.click()}
                               style={{
@@ -983,6 +982,7 @@ export function ReviewWizard({
                         )}
                       </div>
                     )}
+                    </div>
                   </div>
 
                   {/* Docked action bar */}
@@ -992,18 +992,13 @@ export function ReviewWizard({
                       left: 0,
                       right: 0,
                       bottom: keyboardHeight,
-                      display: 'flex',
-                      gap: 10,
-                      padding:
-                        keyboardHeight > 0
-                          ? '10px 16px'
-                          : '12px 16px calc(env(safe-area-inset-bottom, 0px) + 18px)',
                       borderTop: `0.5px solid ${HAIR}`,
                       background: SURFACE,
                       transition: 'bottom 0.2s ease',
                       zIndex: 40,
                     }}
                   >
+                    <div style={{ width: '100%', maxWidth: 480, marginInline: 'auto', display: 'flex', gap: 10, padding: keyboardHeight > 0 ? `10px ${PAD_X}` : `12px ${PAD_X} calc(env(safe-area-inset-bottom, 0px) + 18px)` }}>
                     {wizard.allMedia.length < 10 && (
                       <button
                         onClick={() => fileRef.current?.click()}
@@ -1027,6 +1022,7 @@ export function ReviewWizard({
                         {hasMedia ? 'Add more' : 'Add photo / video'}
                       </button>
                     )}
+                    </div>
                   </div>
 
                   {/* Media editor overlay */}
@@ -1098,8 +1094,8 @@ function MediaTile({
     <div
       style={{
         position: 'relative',
-        flex: `0 0 ${TILE}px`,
-        width: TILE,
+        flex: '0 0 min(200px, 42vw)',
+        width: 'min(200px, 42vw)',
         height: TILE,
         scrollSnapAlign: 'start',
       }}

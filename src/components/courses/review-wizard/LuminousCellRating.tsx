@@ -136,7 +136,7 @@ export function LuminousCellRating({
             <span
               style={{
                 ...HERO_NUMBER_STYLE,
-                fontSize: 66,
+                fontSize: 'clamp(44px, 14vw, 66px)',
                 lineHeight: 1,
                 color: touched ? ratingTextColor(v) : 'rgba(15,23,42,0.16)',
                 transform: active ? 'scale(1.03)' : 'scale(1)',
