@@ -33,6 +33,8 @@ import { useActiveActor } from '@/context/ActiveActorContext';
 import { useMedianStatusBar } from '@/hooks/useMedianStatusBar';
 import { formatCourseLocation } from '@/utils/courseLocation';
 import { MentionBottomSheet, type MentionSuggestion } from '@/components/shared/media/MentionBottomSheet';
+import { useVoiceRecorder } from '@/hooks/useVoiceRecorder';
+import { transcribeAudio } from '@/lib/transcribeAudio';
 
 import { MediaStage } from '@/components/post-composer/MediaStage';
 import { MediaEditor } from '@/components/post-composer/MediaEditor';
