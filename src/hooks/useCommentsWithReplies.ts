@@ -162,7 +162,7 @@ export function useCommentsWithReplies(
         voice_duration_seconds: comment.voice_duration_seconds,
       };
     });
-  }, []);
+  }, [actorType, actorId, effectiveActor?.id]);
 
   // Paginated query
   const {
