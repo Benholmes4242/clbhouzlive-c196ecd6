@@ -40,6 +40,7 @@ import { FavouritesCarousel } from '@/components/profile/courses/FavouritesCarou
 import { AddCourseModal } from '@/components/profile/courses/AddCourseModal';
 import { PrivateProfileGate } from '@/components/profile/PrivateProfileGate';
 import { CoverPhotoFallback } from '@/components/ui/CoverPhotoFallback';
+import { ProfileFloatingHeader } from '@/components/profile/ProfileFloatingHeader';
 
 
 import { useProfileAchievements } from '@/hooks/useProfileAchievements';
@@ -554,24 +555,67 @@ const ProfilePageV2Content: React.FC = () => {
           )}
         </div>
 
-        {/* Glass back button - matches course detail hero style */}
-        <button
-          type="button"
-          onClick={() => safeGoBack(navigate, '/clubhouse')}
-          className="absolute left-4 flex h-[34px] w-[34px] items-center justify-center active:scale-95 transition-all z-10 pointer-events-auto"
-          style={{
-            top: 'calc(max(var(--sat, env(safe-area-inset-top, 0px)), 47px) + 12px)',
-            borderRadius: '12px',
-            background: 'rgba(0, 0, 0, 0.28)',
-            backdropFilter: 'blur(22px) saturate(180%)',
-            WebkitBackdropFilter: 'blur(22px) saturate(180%)',
-            border: '1px solid rgba(255, 255, 255, 0.12)',
-            boxShadow: '0 2px 8px rgba(0, 0, 0, 0.25)',
-          }}
-          aria-label="Back"
-        >
-          <ChevronLeft className="h-[18px] w-[18px] text-white" strokeWidth={2.5} />
-        </button>
+        {/* Floating header — transparent control row under the notch */}
+        <ProfileFloatingHeader
+          isSelf={isSelf}
+          backFallback="/clubhouse"
+          onSettingsClick={() => navigate('/settings')}
+          menuItems={
+            isSelf
+              ? [
+                  {
+                    icon: Share2,
+                    label: 'Share profile',
+                    onClick: () => {
+                      if (navigator.share) {
+                        navigator.share({ title: displayName, url: window.location.href }).catch(() => {});
+                      } else {
+                        navigator.clipboard.writeText(window.location.href);
+                        toast.success('Copied to clipboard');
+                      }
+                    },
+                  },
+                  {
+                    icon: Link2,
+                    label: 'Copy link',
+                    onClick: () => {
+                      navigator.clipboard.writeText(window.location.href);
+                      toast.success('Copied to clipboard');
+                    },
+                  },
+                  { kind: 'separator' },
+                  { icon: Pencil, label: 'Edit profile', onClick: () => navigate(editRoute) },
+                  { icon: Settings, label: 'Settings', onClick: () => navigate('/settings') },
+                ]
+              : [
+                  {
+                    icon: Share2,
+                    label: 'Share profile',
+                    onClick: () => {
+                      if (navigator.share) {
+                        navigator.share({ title: displayName, url: window.location.href }).catch(() => {});
+                      } else {
+                        navigator.clipboard.writeText(window.location.href);
+                        toast.success('Copied to clipboard');
+                      }
+                    },
+                  },
+                  {
+                    icon: Link2,
+                    label: 'Copy link',
+                    onClick: () => {
+                      navigator.clipboard.writeText(window.location.href);
+                      toast.success('Copied to clipboard');
+                    },
+                  },
+                  { kind: 'separator' },
+                  // TODO(ben): Report flow — wired to existing dialog
+                  { icon: Flag, label: 'Report', onClick: () => setShowReportDialog(true) },
+                  // TODO(ben): Block flow — wired to existing dialog
+                  { icon: Ban, label: 'Block', onClick: () => setShowBlockDialog(true), destructive: true },
+                ]
+          }
+        />
 
         {/* Avatar - squircle, left-aligned */}
         <div
