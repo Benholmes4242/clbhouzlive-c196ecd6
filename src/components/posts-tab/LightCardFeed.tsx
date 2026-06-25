@@ -75,7 +75,26 @@ export const LightCardFeed: React.FC<LightCardFeedProps> = ({
   const cardEls = useRef<Map<number, HTMLElement>>(new Map());
 
   useEffect(() => {
-    setScrollParent(getDocumentScrollParent());
+    const sp = getDocumentScrollParent();
+    setScrollParent(sp);
+
+    // ── DEBUG: scroll parent identity + whether it actually scrolls ──
+    const doc = document.scrollingElement;
+    console.log('[LightFeed] scrollParent resolved:', {
+      resolvedTag: sp?.tagName,
+      resolvedId: sp?.id || '(none)',
+      resolvedClass: sp?.className || '(none)',
+      scrollingElementTag: (doc as HTMLElement)?.tagName,
+      sameAsScrollingElement: sp === doc,
+      spClientHeight: sp?.clientHeight,
+      spScrollHeight: sp?.scrollHeight,
+      spCanScroll: sp ? sp.scrollHeight > sp.clientHeight : null,
+      windowInnerHeight: window.innerHeight,
+      bodyScrollHeight: document.body.scrollHeight,
+      htmlScrollHeight: document.documentElement.scrollHeight,
+      htmlOverflowY: getComputedStyle(document.documentElement).overflowY,
+      bodyOverflowY: getComputedStyle(document.body).overflowY,
+    });
   }, []);
 
   useEffect(() => {
