@@ -1,4 +1,5 @@
 import { memo, useRef, useState, useEffect, useCallback } from 'react';
+import { RequestCourseCTA } from '@/components/courses/RequestCourseCTA';
 import { createPortal } from 'react-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Search, X, Clock, BadgeCheck, Briefcase, Star, Lock, MessageCircle, Loader2, ChevronRight } from 'lucide-react';

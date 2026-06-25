@@ -1,4 +1,5 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react';
+import { RequestCourseCTA } from '@/components/courses/RequestCourseCTA';
 import { createPortal } from 'react-dom';
 import { X, MapPin, Search, Check } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
