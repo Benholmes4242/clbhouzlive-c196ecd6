@@ -903,7 +903,7 @@ export function ReviewWizard({
                       />
 
                       {/* Voice mic */}
-                      {SpeechRecognitionClass && (
+                      {hasMicSupport && (
                         <div
                           style={{
                             display: 'flex',
