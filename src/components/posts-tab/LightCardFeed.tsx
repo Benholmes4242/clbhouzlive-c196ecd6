@@ -262,6 +262,11 @@ export const LightCardFeed: React.FC<LightCardFeedProps> = ({
             if (el) {
               cardEls.current.set(index, el);
               if (obs) obs.observe(el);
+              // DEBUG: measure after layout settles
+              requestAnimationFrame(() => {
+                const h = el.getBoundingClientRect().height;
+                if (index < 6) console.log(`[LightFeed] card[${index}] measured height:`, Math.round(h), 'px');
+              });
             } else {
               cardEls.current.delete(index);
             }
@@ -332,7 +337,21 @@ export const LightCardFeed: React.FC<LightCardFeedProps> = ({
           data={posts}
           itemContent={itemContent}
           computeItemKey={(_, post) => post.id}
-          endReached={handleEndReached}
+          endReached={() => {
+            console.log('[LightFeed] endReached fired', { hasNextPage });
+            handleEndReached();
+          }}
+          rangeChanged={(range) => {
+            console.log('[LightFeed] Virtuoso rangeChanged:', {
+              startIndex: range.startIndex,
+              endIndex: range.endIndex,
+              renderedCount: range.endIndex - range.startIndex + 1,
+              totalData: posts.length,
+            });
+          }}
+          totalListHeightChanged={(h) => {
+            console.log('[LightFeed] Virtuoso total list height:', Math.round(h), 'px for', posts.length, 'items');
+          }}
           defaultItemHeight={600}
           increaseViewportBy={{ top: 600, bottom: 1200 }}
           overscan={{ main: 600, reverse: 600 }}
