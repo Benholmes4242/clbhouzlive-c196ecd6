@@ -9,7 +9,7 @@ import { useVideosFollowingRail } from './hooks/useVideosFollowingRail';
 import { VideosFollowingRail } from './VideosFollowingRail';
 import { VideosSuggestedCreatorsRail } from './VideosSuggestedCreatorsRail';
 import { VideosQuickClipsRail } from './VideosQuickClipsRail';
-import { BucketListRail } from '../proshop/BucketListRail';
+
 import type { FeedPost } from '@/components/media-system/types/media';
 
 interface VideosFullFeedProps {
