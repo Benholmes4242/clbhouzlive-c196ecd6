@@ -217,7 +217,7 @@ const PostsTabContent: React.FC<PostsTabContentProps> = ({
       {filteredPosts.length === 0 ? (
         emptyState
       ) : (
-        <CardFeed
+        <LightCardFeed
           posts={filteredPosts}
           useWindowScroll
           topPadding={0}
