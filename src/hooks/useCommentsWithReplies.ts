@@ -104,8 +104,13 @@ export function useCommentsWithReplies(
         ? supabase.from('business_accounts').select('id, name, logo_url').in('id', businessIds)
         : { data: [] },
       supabase.from('comment_likes').select('comment_id').in('comment_id', allComments.map(c => c.id)),
-      userId
-        ? supabase.from('comment_likes').select('comment_id').in('comment_id', allComments.map(c => c.id)).eq('user_id', userId)
+      userId && effectiveActor?.id
+        ? supabase
+            .from('comment_likes')
+            .select('comment_id')
+            .in('comment_id', allComments.map(c => c.id))
+            .eq('actor_type', actorType)
+            .eq('actor_id', actorId)
         : { data: [] },
     ]);
 
@@ -157,7 +162,7 @@ export function useCommentsWithReplies(
         voice_duration_seconds: comment.voice_duration_seconds,
       };
     });
-  }, []);
+  }, [actorType, actorId, effectiveActor?.id]);
 
   // Paginated query
   const {
@@ -550,18 +555,30 @@ export function useCommentsWithReplies(
   const toggleLikeMutation = useMutation({
     mutationFn: async (commentId: string) => {
       if (!user?.id) throw new Error('Not authenticated');
+      if (!effectiveActor?.id) throw new Error('No active actor');
 
       const { data: existing } = await supabase
         .from('comment_likes')
         .select('id')
         .eq('comment_id', commentId)
-        .eq('user_id', user.id)
+        .eq('actor_type', actorType)
+        .eq('actor_id', actorId)
         .maybeSingle();
 
       if (existing) {
-        await supabase.from('comment_likes').delete().eq('comment_id', commentId).eq('user_id', user.id);
+        await supabase
+          .from('comment_likes')
+          .delete()
+          .eq('comment_id', commentId)
+          .eq('actor_type', actorType)
+          .eq('actor_id', actorId);
       } else {
-        await supabase.from('comment_likes').insert({ comment_id: commentId, user_id: user.id });
+        await supabase.from('comment_likes').insert({
+          comment_id: commentId,
+          user_id: user.id,
+          actor_type: actorType,
+          actor_id: actorId,
+        });
       }
     },
     onMutate: async (commentId) => {
