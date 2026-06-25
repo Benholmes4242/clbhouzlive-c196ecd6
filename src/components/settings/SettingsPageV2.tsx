@@ -203,7 +203,7 @@ export function SettingsPageV2() {
           <SettingsLevelRow
             icon={<BarChart2 size={18} />}
             title="Who can see you in leaderboards"
-            subtitle="Controls whether you appear in ranked and competitive boards"
+            subtitle="Controls whether you appear in ranked boards, including Course Champions and course records"
             iconTheme="privacy"
             value={privacy.leaderboardVisibility}
             disabled={privacy.isUpdatingLeaderboardVisibility}
