@@ -555,18 +555,30 @@ export function useCommentsWithReplies(
   const toggleLikeMutation = useMutation({
     mutationFn: async (commentId: string) => {
       if (!user?.id) throw new Error('Not authenticated');
+      if (!effectiveActor?.id) throw new Error('No active actor');
 
       const { data: existing } = await supabase
         .from('comment_likes')
         .select('id')
         .eq('comment_id', commentId)
-        .eq('user_id', user.id)
+        .eq('actor_type', actorType)
+        .eq('actor_id', actorId)
         .maybeSingle();
 
       if (existing) {
-        await supabase.from('comment_likes').delete().eq('comment_id', commentId).eq('user_id', user.id);
+        await supabase
+          .from('comment_likes')
+          .delete()
+          .eq('comment_id', commentId)
+          .eq('actor_type', actorType)
+          .eq('actor_id', actorId);
       } else {
-        await supabase.from('comment_likes').insert({ comment_id: commentId, user_id: user.id });
+        await supabase.from('comment_likes').insert({
+          comment_id: commentId,
+          user_id: user.id,
+          actor_type: actorType,
+          actor_id: actorId,
+        });
       }
     },
     onMutate: async (commentId) => {
