@@ -104,8 +104,13 @@ export function useCommentsWithReplies(
         ? supabase.from('business_accounts').select('id, name, logo_url').in('id', businessIds)
         : { data: [] },
       supabase.from('comment_likes').select('comment_id').in('comment_id', allComments.map(c => c.id)),
-      userId
-        ? supabase.from('comment_likes').select('comment_id').in('comment_id', allComments.map(c => c.id)).eq('user_id', userId)
+      userId && effectiveActor?.id
+        ? supabase
+            .from('comment_likes')
+            .select('comment_id')
+            .in('comment_id', allComments.map(c => c.id))
+            .eq('actor_type', actorType)
+            .eq('actor_id', actorId)
         : { data: [] },
     ]);
 
