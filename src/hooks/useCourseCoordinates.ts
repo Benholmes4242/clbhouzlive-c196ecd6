@@ -3,6 +3,7 @@ import { supabase } from '@/integrations/supabase/client';
 
 interface UseCourseCoordinatesArgs {
   courseId: string;
+  clubId?: string | null;
   latitude?: number | null;
   longitude?: number | null;
   name: string;
@@ -13,8 +14,8 @@ interface UseCourseCoordinatesArgs {
 
 export function useCourseCoordinates(args: UseCourseCoordinatesArgs) {
   const [coords, setCoords] = useState<{ lat: number; lng: number } | null>(
-    args.latitude && args.longitude 
-      ? { lat: args.latitude, lng: args.longitude } 
+    args.latitude && args.longitude
+      ? { lat: args.latitude, lng: args.longitude }
       : null
   );
   const [loading, setLoading] = useState(false);
@@ -23,7 +24,7 @@ export function useCourseCoordinates(args: UseCourseCoordinatesArgs) {
   useEffect(() => {
     mountedRef.current = true;
 
-    // Phase 3: Short-circuit if we already have coordinates
+    // Short-circuit if we already have coordinates
     if (args.latitude && args.longitude) {
       if (mountedRef.current) {
         setCoords({ lat: args.latitude, lng: args.longitude });
@@ -31,26 +32,22 @@ export function useCourseCoordinates(args: UseCourseCoordinatesArgs) {
       return;
     }
 
-    // AbortController to prevent execution after unmount
+    // geocode-club requires a club_id; skip fallback if we don't have one
+    if (!args.clubId) {
+      return;
+    }
+
     const abortController = new AbortController();
     let cancelled = false;
 
-    // Fall back to geocode-club edge function only if needed
     const fetchCoords = async () => {
       if (!mountedRef.current) return;
       setLoading(true);
       try {
         const { data, error } = await supabase.functions.invoke('geocode-club', {
-          body: {
-            courseId: args.courseId,
-            clubName: args.name,
-            country: args.country,
-            subCountry: args.subCountry,
-            region: args.region,
-          },
+          body: { club_id: args.clubId },
         });
 
-        // Ignore if component unmounted
         if (cancelled || !mountedRef.current) return;
 
         if (!error && data?.latitude && data?.longitude) {
@@ -69,13 +66,12 @@ export function useCourseCoordinates(args: UseCourseCoordinatesArgs) {
 
     fetchCoords();
 
-    // Cleanup: abort request and mark as cancelled
     return () => {
       mountedRef.current = false;
       cancelled = true;
       abortController.abort();
     };
-  }, [args.courseId, args.latitude, args.longitude, args.name, args.country, args.subCountry, args.region]);
+  }, [args.courseId, args.clubId, args.latitude, args.longitude]);
 
   return { coords, loading };
 }
