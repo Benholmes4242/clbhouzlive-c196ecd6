@@ -113,6 +113,13 @@ function CommentsSheet({
   const { activeActor, availableActors } = useActiveActor();
   const currentUserId = currentUserIdProp ?? user?.id ?? null;
 
+  const effectiveActor = useMemo(() => {
+    if (actorOverride) {
+      return availableActors.find(a => a.id === actorOverride.id && a.type === actorOverride.type) ?? activeActor;
+    }
+    return activeActor;
+  }, [actorOverride, availableActors, activeActor]);
+
   // ── Hook — use editorial comments hook when editorialCardId is provided ──
   const standardHook = useCommentsWithReplies(editorialCardId ? '' : postId, onCommentDeleted, actorOverride);
   const editorialHook = useEditorialComments(editorialCardId ?? '', onCommentDeleted);
