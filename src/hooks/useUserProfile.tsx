@@ -69,6 +69,9 @@ export const useUserProfile = (userId: string | undefined | null) => {
     queryFn: async (): Promise<UserProfile | null> => {
       if (!userId) return null;
 
+      // Primary read: base table. This succeeds for the current user (owner
+      // policy) and for relationships still permitted by base-table policies
+      // (e.g. game participants, admins), returning the FULL profile row.
       const { data, error } = await supabase
         .from('user_profiles')
         .select('*') // Full profile needed for this hook
@@ -79,8 +82,27 @@ export const useUserProfile = (userId: string | undefined | null) => {
         console.error('[useUserProfile] Error fetching profile:', error);
         throw error;
       }
+
+      if (data) return data as UserProfile;
+
+      // Fallback: base table returned no row. Since RLS locks the base table to
+      // anon / unrelated users, a stranger or logged-out viewer gets null above.
+      // Read the safe public subset from public_profiles so other users'
+      // profiles still render (the column set is a subset of UserProfile;
+      // omitted fields are simply undefined, which consumers already tolerate).
+      const { data: publicData, error: publicError } = await supabase
+        .from('public_profiles')
+        .select('*')
+        .eq('id', userId)
+        .maybeSingle();
+
+      if (publicError) {
+        console.error('[useUserProfile] Error fetching public profile:', publicError);
+        throw publicError;
+      }
+
       // maybeSingle returns null (no error) when there's no row — caller handles null.
-      return data as UserProfile | null;
+      return (publicData as UserProfile | null);
     },
     enabled: !!userId,
     staleTime: 0, // Always refetch after invalidation
