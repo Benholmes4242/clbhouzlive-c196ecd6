@@ -36,10 +36,11 @@ export function useFriendsFeed({
   interleave = false,
   pageSize = PAGE_SIZE_DEFAULT,
 }: UseFriendsFeedParams) {
+  const { activeActor } = useActiveActor();
   const seenPostIds = useRef<string[]>([]);
 
   const query = useInfiniteQuery({
-    queryKey: ['friends-feed', mode, searchQuery, userId, interleave, pageSize],
+    queryKey: ['friends-feed', mode, searchQuery, userId, interleave, pageSize, activeActor?.type, activeActor?.id],
     queryFn: async ({ pageParam }) => {
       if (!userId) return { posts: [] as FeedPost[], nextCursor: undefined as string | undefined };
 
