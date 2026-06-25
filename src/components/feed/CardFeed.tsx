@@ -337,33 +337,8 @@ export const CardFeed: React.FC<CardFeedProps> = ({
     if (hasNextPage && onNearEnd) onNearEnd();
   }, [hasNextPage, onNearEnd]);
 
-  useEffect(() => {
-    if (!useWindowScroll || !onNearEnd || !hasNextPage) return;
-    const sentinel = windowFeedEndRef.current;
-    if (!sentinel) return;
 
-    const observer = new IntersectionObserver(
-      (entries) => {
-        if (entries.some((entry) => entry.isIntersecting)) onNearEnd();
-      },
-      { root: null, rootMargin: '1200px 0px', threshold: 0 },
-    );
 
-    observer.observe(sentinel);
-    return () => observer.disconnect();
-  }, [hasNextPage, onNearEnd, useWindowScroll]);
-
-  if (useWindowScroll) {
-    return (
-      <div style={{ width: '100%', background: CANVAS }} data-card-feed>
-        <div style={{ height: 0, paddingTop: topPadding }} />
-        {posts.map((post, index) => (
-          <React.Fragment key={post.id}>{itemContent(index, post)}</React.Fragment>
-        ))}
-        <div ref={windowFeedEndRef} style={{ height: bottomPadding }} />
-      </div>
-    );
-  }
 
 
   return (
