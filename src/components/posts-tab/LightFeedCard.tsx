@@ -283,6 +283,7 @@ const LightFeedCardImpl: React.FC<LightFeedCardProps> = ({
         overflow: 'hidden',
         marginInline: 0,
         position: 'relative',
+        minHeight: 1,
       }}
     >
       {/* Ghost numeral — drop alpha ~30% for contrast on light bg */}
@@ -458,6 +459,7 @@ const LightFeedCardImpl: React.FC<LightFeedCardProps> = ({
                 position: 'relative',
                 width: '100%',
                 aspectRatio: String(ratio),
+                minHeight: 120,
                 overflow: 'hidden',
                 background: MEDIA_LETTERBOX,
               }}
