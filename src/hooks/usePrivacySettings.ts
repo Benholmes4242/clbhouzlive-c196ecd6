@@ -3,32 +3,30 @@ import { useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 
+export type VisibilityLevel = 'public' | 'friends' | 'private';
+
+function coerceLevel(v: unknown, fallback: VisibilityLevel = 'public'): VisibilityLevel {
+  return v === 'public' || v === 'friends' || v === 'private' ? v : fallback;
+}
+
 export function usePrivacySettings(
   userId: string | undefined,
   initialIsPublic: boolean,
-  initialShowHandicap: boolean,
-  initialShowInHandicapLeaderboards: boolean,
-  initialShowInExplorationLeaderboards: boolean,
-  initialPeerComparisonVisible: boolean = true,
+  initialHandicapVisibility: VisibilityLevel = 'public',
+  initialLeaderboardVisibility: VisibilityLevel = 'public',
 ) {
   const queryClient = useQueryClient();
 
   const [isPublic, setIsPublic] = useState(initialIsPublic);
-  const [showHandicap, setShowHandicap] = useState(initialShowHandicap);
-  const [showInHandicapLeaderboards, setShowInHandicapLeaderboards] = useState(initialShowInHandicapLeaderboards);
-  const [showInExplorationLeaderboards, setShowInExplorationLeaderboards] = useState(initialShowInExplorationLeaderboards);
-  const [peerComparisonVisible, setPeerComparisonVisible] = useState(initialPeerComparisonVisible);
+  const [handicapVisibility, setHandicapVisibility] = useState<VisibilityLevel>(initialHandicapVisibility);
+  const [leaderboardVisibility, setLeaderboardVisibility] = useState<VisibilityLevel>(initialLeaderboardVisibility);
   const [isUpdatingPrivacy, setIsUpdatingPrivacy] = useState(false);
-  const [isUpdatingHandicap, setIsUpdatingHandicap] = useState(false);
-  const [isUpdatingHandicapLb, setIsUpdatingHandicapLb] = useState(false);
-  const [isUpdatingExplorationLb, setIsUpdatingExplorationLb] = useState(false);
-  const [isUpdatingPeerComparison, setIsUpdatingPeerComparison] = useState(false);
+  const [isUpdatingHandicapVisibility, setIsUpdatingHandicapVisibility] = useState(false);
+  const [isUpdatingLeaderboardVisibility, setIsUpdatingLeaderboardVisibility] = useState(false);
 
   useEffect(() => { setIsPublic(initialIsPublic); }, [initialIsPublic]);
-  useEffect(() => { setShowHandicap(initialShowHandicap); }, [initialShowHandicap]);
-  useEffect(() => { setShowInHandicapLeaderboards(initialShowInHandicapLeaderboards); }, [initialShowInHandicapLeaderboards]);
-  useEffect(() => { setShowInExplorationLeaderboards(initialShowInExplorationLeaderboards); }, [initialShowInExplorationLeaderboards]);
-  useEffect(() => { setPeerComparisonVisible(initialPeerComparisonVisible); }, [initialPeerComparisonVisible]);
+  useEffect(() => { setHandicapVisibility(initialHandicapVisibility); }, [initialHandicapVisibility]);
+  useEffect(() => { setLeaderboardVisibility(initialLeaderboardVisibility); }, [initialLeaderboardVisibility]);
 
   const invalidate = () => {
     queryClient.invalidateQueries({ queryKey: ['profile'] });
@@ -61,95 +59,57 @@ export function usePrivacySettings(
     }
   };
 
-  const toggleHandicap = async (value: boolean) => {
+  const setHandicapVisibilityLevel = async (value: VisibilityLevel) => {
     if (!userId) return;
-    setIsUpdatingHandicap(true);
-    const prev = showHandicap;
-    setShowHandicap(value);
+    const next = coerceLevel(value);
+    setIsUpdatingHandicapVisibility(true);
+    const prev = handicapVisibility;
+    setHandicapVisibility(next);
     try {
       const { error } = await supabase
         .from('user_profiles')
-        .update({ show_handicap: value })
+        .update({ handicap_visibility: next } as any)
         .eq('id', userId);
       if (error) throw error;
       invalidate();
     } catch {
-      setShowHandicap(prev);
-      toast.error('Could not update handicap setting.');
+      setHandicapVisibility(prev);
+      toast.error('Could not update handicap visibility.');
     } finally {
-      setIsUpdatingHandicap(false);
+      setIsUpdatingHandicapVisibility(false);
     }
   };
 
-  const toggleHandicapLeaderboards = async (value: boolean) => {
+  const setLeaderboardVisibilityLevel = async (value: VisibilityLevel) => {
     if (!userId) return;
-    setIsUpdatingHandicapLb(true);
-    const prev = showInHandicapLeaderboards;
-    setShowInHandicapLeaderboards(value);
+    const next = coerceLevel(value);
+    setIsUpdatingLeaderboardVisibility(true);
+    const prev = leaderboardVisibility;
+    setLeaderboardVisibility(next);
     try {
       const { error } = await supabase
         .from('user_profiles')
-        .update({ show_in_handicap_leaderboards: value })
+        .update({ leaderboard_visibility: next } as any)
         .eq('id', userId);
       if (error) throw error;
       invalidate();
     } catch {
-      setShowInHandicapLeaderboards(prev);
-      toast.error('Could not update leaderboard setting.');
+      setLeaderboardVisibility(prev);
+      toast.error('Could not update leaderboard visibility.');
     } finally {
-      setIsUpdatingHandicapLb(false);
-    }
-  };
-
-  const toggleExplorationLeaderboards = async (value: boolean) => {
-    if (!userId) return;
-    setIsUpdatingExplorationLb(true);
-    const prev = showInExplorationLeaderboards;
-    setShowInExplorationLeaderboards(value);
-    try {
-      const { error } = await supabase
-        .from('user_profiles')
-        .update({ show_in_exploration_leaderboards: value })
-        .eq('id', userId);
-      if (error) throw error;
-      invalidate();
-    } catch {
-      setShowInExplorationLeaderboards(prev);
-      toast.error('Could not update leaderboard setting.');
-    } finally {
-      setIsUpdatingExplorationLb(false);
-    }
-  };
-
-  const togglePeerComparison = async (value: boolean) => {
-    if (!userId) return;
-    setIsUpdatingPeerComparison(true);
-    const prev = peerComparisonVisible;
-    setPeerComparisonVisible(value);
-    try {
-      const { error } = await supabase
-        .from('user_profiles')
-        .update({ peer_comparison_visible: value } as any)
-        .eq('id', userId);
-      if (error) throw error;
-      invalidate();
-    } catch {
-      setPeerComparisonVisible(prev);
-      toast.error('Could not update privacy setting.');
-    } finally {
-      setIsUpdatingPeerComparison(false);
+      setIsUpdatingLeaderboardVisibility(false);
     }
   };
 
   return {
-    isPublic, showHandicap,
-    showInHandicapLeaderboards, showInExplorationLeaderboards,
-    peerComparisonVisible,
-    isUpdatingPrivacy, isUpdatingHandicap,
-    isUpdatingHandicapLb, isUpdatingExplorationLb,
-    isUpdatingPeerComparison,
-    togglePublic, toggleHandicap,
-    toggleHandicapLeaderboards, toggleExplorationLeaderboards,
-    togglePeerComparison,
+    isPublic,
+    handicapVisibility,
+    leaderboardVisibility,
+    isUpdatingPrivacy,
+    isUpdatingHandicapVisibility,
+    isUpdatingLeaderboardVisibility,
+    togglePublic,
+    setHandicapVisibilityLevel,
+    setLeaderboardVisibilityLevel,
   };
 }
