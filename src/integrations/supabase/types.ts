@@ -19393,6 +19393,8 @@ export type Database = {
           p_user_id: string
           p_user_lat?: number
           p_user_lng?: number
+          p_viewer_actor_id?: string
+          p_viewer_actor_type?: string
         }
         Returns: {
           business_is_verified: boolean
