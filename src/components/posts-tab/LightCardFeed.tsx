@@ -107,6 +107,63 @@ export const LightCardFeed: React.FC<LightCardFeedProps> = ({
   }, [posts, hasNextPage]);
 
   useEffect(() => {
+    const dump = (label: string) => {
+      const de = document.documentElement;
+      const b = document.body;
+      const feedEl = document.querySelector('[data-card-feed="light"]') as HTMLElement | null;
+      console.log(`[ScrollProbe] ${label}`, {
+        // who has scrollable overflow
+        windowScrollY: window.scrollY,
+        docScrollTop: document.scrollingElement?.scrollTop,
+        htmlScrollTop: de.scrollTop,
+        bodyScrollTop: b.scrollTop,
+        // real heights at runtime
+        htmlClientH: de.clientHeight,
+        htmlScrollH: de.scrollHeight,
+        bodyScrollH: b.scrollHeight,
+        windowInnerH: window.innerHeight,
+        // is the document actually taller than the viewport? (can it scroll at all?)
+        docCanScroll: de.scrollHeight > de.clientHeight,
+        // the feed container's real rendered height + position
+        feedOffsetTop: feedEl?.offsetTop,
+        feedClientH: feedEl?.clientHeight,
+        feedScrollH: feedEl?.scrollHeight,
+        feedRectTop: feedEl?.getBoundingClientRect().top,
+        feedRectHeight: feedEl?.getBoundingClientRect().height,
+        // walk up from feed: report any ancestor that is a scroll container
+        scrollAncestors: (() => {
+          const out: string[] = [];
+          let n: HTMLElement | null = feedEl?.parentElement ?? null;
+          let guard = 0;
+          while (n && guard++ < 30) {
+            const cs = getComputedStyle(n);
+            const oy = cs.overflowY;
+            const scrollable = (oy === 'auto' || oy === 'scroll') && n.scrollHeight > n.clientHeight;
+            if (scrollable || oy === 'auto' || oy === 'scroll' || cs.position === 'fixed' || cs.transform !== 'none') {
+              out.push(`${n.tagName}.${(n.className || '').toString().slice(0,30)} [oy=${oy} pos=${cs.position} tf=${cs.transform !== 'none' ? 'Y' : 'N'} sH=${n.scrollHeight} cH=${n.clientHeight}]`);
+            }
+            n = n.parentElement;
+          }
+          return out;
+        })(),
+      });
+    };
+
+    dump('mount');
+    const onScroll = () => dump('window-scroll-event');
+    window.addEventListener('scroll', onScroll, { passive: true, capture: true });
+
+    // also probe the app-shell + page-root directly for scrollTop movement
+    let ticks = 0;
+    const iv = setInterval(() => { dump(`tick-${ticks}`); if (++ticks >= 5) clearInterval(iv); }, 1000);
+
+    return () => {
+      window.removeEventListener('scroll', onScroll, { capture: true } as any);
+      clearInterval(iv);
+    };
+  }, []);
+
+  useEffect(() => {
     if (settleTimer.current) clearTimeout(settleTimer.current);
     settleTimer.current = setTimeout(() => {
       setPlayingIdx(activeIdx);
