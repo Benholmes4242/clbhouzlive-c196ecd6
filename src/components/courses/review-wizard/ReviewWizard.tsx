@@ -19,7 +19,7 @@ import React, {
 import { createPortal } from 'react-dom';
 import { lockBodyScroll, unlockBodyScroll } from '@/lib/bodyScrollLock';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, ChevronDown, ImagePlus, Mic, Square, RotateCw, Trash2 } from 'lucide-react';
+import { X, ImagePlus, Mic, Square, RotateCw, Trash2 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useQueryClient } from '@tanstack/react-query';
 import { useNavigationGuard } from '@/hooks/useNavigationGuard';
