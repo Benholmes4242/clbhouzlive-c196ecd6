@@ -30,7 +30,7 @@ import type { FeedPost } from '@/components/media-system/types/media';
 import { InlineVideo } from './InlineVideo';
 import { MediaCarousel } from './MediaCarousel';
 import { FeedFollowPill } from './FeedFollowPill';
-import { FeedActorPicker, type FeedActorPickerValue } from './FeedActorPicker';
+import { FeedActorPicker } from './FeedActorPicker';
 import type { ActiveActor } from '@/types/actor';
 
 // Full-bleed charcoal chrome — one charcoal (#15171F) across the app: tab
