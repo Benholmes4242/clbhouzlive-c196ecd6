@@ -66,11 +66,9 @@ export const CardFeed: React.FC<CardFeedProps> = ({
   bottomPadding = 96,
   onFollow,
   currentUserId,
-  useWindowScroll = false,
 }) => {
 
   const virtuosoRef = useRef<VirtuosoHandle | null>(null);
-  const windowFeedEndRef = useRef<HTMLDivElement | null>(null);
 
   // Explore tab retap → scroll Clubhouse feed to top
   useEffect(() => {
