@@ -219,7 +219,7 @@ const PostsTabContent: React.FC<PostsTabContentProps> = ({
       ) : (
         <LightCardFeed
           posts={filteredPosts}
-          useWindowScroll
+          
           topPadding={0}
           bottomPadding={32}
           hasNextPage={hasNextPage}
