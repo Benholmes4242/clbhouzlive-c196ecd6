@@ -210,7 +210,7 @@ function WhereYoudRankInner({ userId }: WhereYoudRankProps) {
       const j = Math.floor(rand() * (i + 1));
       [arr[i], arr[j]] = [arr[j], arr[i]];
     }
-    return arr.slice(0, 3);
+    return arr.slice(0, 6);
   }, [data]);
 
   if (!effectiveUserId || connLoading || !connection) return null;

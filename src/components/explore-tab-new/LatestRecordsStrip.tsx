@@ -67,7 +67,7 @@ interface Props {
 
 export function LatestRecordsStrip(_: Props = {}) {
   const navigate = useNavigate();
-  const { data, isLoading } = useRecentCourseRecords(8);
+  const { data, isLoading } = useRecentCourseRecords(12);
 
   if (isLoading) {
     return (

@@ -27,14 +27,7 @@ export function ToughestCoursesStrip(_: Props = {}) {
   const navigate = useNavigate();
   const { data, isLoading } = useNotableDifficultCourses();
 
-  const shown = useMemo<DifficultCourse[]>(() => {
-    const pool = data ?? [];
-    if (pool.length === 0) return [];
-    if (pool.length <= 6) return pool;
-    const weekSeed = Math.floor(Date.now() / (7 * 864e5));
-    const offset = (weekSeed * 6) % pool.length;
-    return Array.from({ length: 6 }, (_unused, i) => pool[(offset + i) % pool.length]);
-  }, [data]);
+  const shown = useMemo<DifficultCourse[]>(() => data ?? [], [data]);
 
   if (isLoading) {
     return (
