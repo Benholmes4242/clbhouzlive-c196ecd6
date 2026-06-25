@@ -1,5 +1,5 @@
 import { useInfiniteQuery, keepPreviousData } from '@tanstack/react-query';
-import { useCallback, useMemo, useRef } from 'react';
+import { useCallback, useEffect, useMemo, useRef } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useActiveActor } from '@/context/ActiveActorContext';
 import { mapRowToFeedPost, groupMultiMedia } from '@/components/media-system/utils/feedMapper';
@@ -26,6 +26,15 @@ export function useProfilePosts({ userId, actorType, actorId }: UseProfilePostsP
   const { activeActor } = useActiveActor();
   const seenPostIds = useRef<string[]>([]);
 
+  // Reset the page-1 exclusion list whenever the query identity changes
+  // (profile being viewed OR active viewing actor). Without this, the ref
+  // survives the React Query refetch and starves new fetches of results.
+  useEffect(() => {
+    seenPostIds.current = [];
+  }, [actorType, actorId, activeActor?.type, activeActor?.id]);
+
+
+
   const query = useInfiniteQuery({
     queryKey: ['profile-posts', actorType, actorId, activeActor?.type, activeActor?.id],
     queryFn: async ({ pageParam }) => {
@@ -51,22 +60,12 @@ export function useProfilePosts({ userId, actorType, actorId }: UseProfilePostsP
         params.p_cursor_id = cursor.id;
       }
 
-      const seenCountBefore = seenPostIds.current.length;
       const { data, error } = await supabase.rpc('get_profile_posts', params as any);
 
       if (error) {
         console.error('[ProfilePosts] RPC error:', error);
         throw error;
       }
-
-      const returned = Array.isArray(data) ? data.length : 0;
-      console.log('[ActorDebug] useProfilePosts fetch', {
-        actor: { type: activeActor?.type, id: activeActor?.id },
-        profileOwner: { type: actorType, id: actorId },
-        cursor: cursor ?? null,
-        seenCount: seenCountBefore,
-        returned,
-      });
 
       if (!data || data.length === 0) {
         return { posts: [] as FeedPost[], nextCursor: undefined as CursorParam };
@@ -79,6 +78,10 @@ export function useProfilePosts({ userId, actorType, actorId }: UseProfilePostsP
         if (!seenPostIds.current.includes(post.id)) {
           seenPostIds.current.push(post.id);
         }
+      }
+      // Cap to last 500 to prevent unbounded growth
+      if (seenPostIds.current.length > 500) {
+        seenPostIds.current = seenPostIds.current.slice(-500);
       }
 
       // Page grain is now POSTS. The cursor is the LAST grouped post's
@@ -108,14 +111,8 @@ export function useProfilePosts({ userId, actorType, actorId }: UseProfilePostsP
       seen.add(p.id);
       return true;
     });
-    console.log('[ActorDebug] useProfilePosts result', {
-      actor: { type: activeActor?.type, id: activeActor?.id },
-      totalHeld: posts.length,
-      willRender: deduped.length,
-      pages: query.data?.pages.length ?? 0,
-    });
     return deduped;
-  }, [query.data, activeActor?.type, activeActor?.id]);
+  }, [query.data]);
 
   // NOTE: postCounts reflects only currently-loaded pages, not the full total.
   // Counts increment as more pages are fetched via infinite scroll.
