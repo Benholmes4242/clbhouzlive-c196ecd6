@@ -37,7 +37,17 @@ export function useExploreFeed({ userId, region, searchQuery, enabled: externalE
       if (cursor) params.p_cursor = cursor;
       if (searchQuery) params.p_search_query = searchQuery;
 
+      const seenCountBefore = seenPostIds.current.length;
       const { data, error } = await supabase.rpc('get_explore_feed', params as any);
+
+      const returned = Array.isArray(data) ? data.length : 0;
+      console.log('[ActorDebug] useExploreFeed fetch', {
+        actor: { type: activeActor?.type, id: activeActor?.id },
+        cursor: cursor ?? null,
+        region: region ?? null,
+        seenCount: seenCountBefore,
+        returned,
+      });
 
       if (error) {
         console.error('[ExploreFeed] RPC error:', error);
@@ -77,12 +87,19 @@ export function useExploreFeed({ userId, region, searchQuery, enabled: externalE
   const allPosts = useMemo(() => {
     const posts = query.data?.pages.flatMap((page) => page.posts) ?? [];
     const seen = new Set<string>();
-    return posts.filter(p => {
+    const deduped = posts.filter(p => {
       if (seen.has(p.id)) return false;
       seen.add(p.id);
       return true;
     });
-  }, [query.data]);
+    console.log('[ActorDebug] useExploreFeed result', {
+      actor: { type: activeActor?.type, id: activeActor?.id },
+      totalHeld: posts.length,
+      willRender: deduped.length,
+      pages: query.data?.pages.length ?? 0,
+    });
+    return deduped;
+  }, [query.data, activeActor?.type, activeActor?.id]);
 
   const resetSeen = useCallback(() => {
     seenPostIds.current = [];

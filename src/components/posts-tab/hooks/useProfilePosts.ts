@@ -51,12 +51,22 @@ export function useProfilePosts({ userId, actorType, actorId }: UseProfilePostsP
         params.p_cursor_id = cursor.id;
       }
 
+      const seenCountBefore = seenPostIds.current.length;
       const { data, error } = await supabase.rpc('get_profile_posts', params as any);
 
       if (error) {
         console.error('[ProfilePosts] RPC error:', error);
         throw error;
       }
+
+      const returned = Array.isArray(data) ? data.length : 0;
+      console.log('[ActorDebug] useProfilePosts fetch', {
+        actor: { type: activeActor?.type, id: activeActor?.id },
+        profileOwner: { type: actorType, id: actorId },
+        cursor: cursor ?? null,
+        seenCount: seenCountBefore,
+        returned,
+      });
 
       if (!data || data.length === 0) {
         return { posts: [] as FeedPost[], nextCursor: undefined as CursorParam };
@@ -93,12 +103,19 @@ export function useProfilePosts({ userId, actorType, actorId }: UseProfilePostsP
   const allPosts = useMemo(() => {
     const posts = query.data?.pages.flatMap((page) => page.posts) ?? [];
     const seen = new Set<string>();
-    return posts.filter(p => {
+    const deduped = posts.filter(p => {
       if (seen.has(p.id)) return false;
       seen.add(p.id);
       return true;
     });
-  }, [query.data]);
+    console.log('[ActorDebug] useProfilePosts result', {
+      actor: { type: activeActor?.type, id: activeActor?.id },
+      totalHeld: posts.length,
+      willRender: deduped.length,
+      pages: query.data?.pages.length ?? 0,
+    });
+    return deduped;
+  }, [query.data, activeActor?.type, activeActor?.id]);
 
   // NOTE: postCounts reflects only currently-loaded pages, not the full total.
   // Counts increment as more pages are fetched via infinite scroll.
