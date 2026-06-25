@@ -1,5 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
+import { useActiveActor } from '@/context/ActiveActorContext';
 import { mapRowToFeedPost, groupMultiMedia } from '@/components/media-system/utils/feedMapper';
 import type { FeedPost, FeedRpcRow } from '@/components/media-system/types/media';
 
@@ -10,8 +11,10 @@ import type { FeedPost, FeedRpcRow } from '@/components/media-system/types/media
  * nobody (or follows produce no recent long-form).
  */
 export function useVideosFollowingRail(userId: string | undefined, limit = 8) {
+  const { activeActor } = useActiveActor();
+
   return useQuery({
-    queryKey: ['videos-following-rail', userId ?? null, limit],
+    queryKey: ['videos-following-rail', userId ?? null, limit, activeActor?.type, activeActor?.id],
     enabled: !!userId,
     queryFn: async (): Promise<FeedPost[]> => {
       if (!userId) return [];
@@ -20,6 +23,8 @@ export function useVideosFollowingRail(userId: string | undefined, limit = 8) {
         p_user_id: userId,
         p_mode: 'following',
         p_page_size: limit,
+        p_viewer_actor_type: activeActor?.type ?? 'personal',
+        p_viewer_actor_id: activeActor?.id ?? userId,
       });
 
       if (error) {

@@ -1,6 +1,7 @@
 import { useInfiniteQuery, keepPreviousData } from '@tanstack/react-query';
 import { useCallback, useMemo, useRef } from 'react';
 import { supabase } from '@/integrations/supabase/client';
+import { useActiveActor } from '@/context/ActiveActorContext';
 import { mapRowToFeedPost, groupMultiMedia } from '@/components/media-system/utils/feedMapper';
 import type { FeedPost, FeedRpcRow } from '@/components/media-system/types/media';
 
