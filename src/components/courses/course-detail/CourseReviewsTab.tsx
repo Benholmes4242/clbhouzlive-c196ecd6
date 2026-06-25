@@ -4,7 +4,7 @@ import { flattenPostsToMedia } from '@/components/fullscreen-feed/flattenPostsTo
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
-import { useNavigate, useLocation } from 'react-router-dom';
+import { useNavigate, useLocation, useSearchParams } from 'react-router-dom';
 import { toast } from 'sonner';
 import { useCourseRatingAggregates } from '@/hooks/useCourseRatingAggregates';
 import { useCourseReviews, type ReviewsSortBy, type CourseReview, type ReviewMediaItem } from '@/hooks/useCourseReviews';
@@ -69,6 +69,7 @@ const CourseReviewsTab: React.FC<CourseReviewsTabProps> = ({
   const { user } = useSupabaseSession();
   const navigate = useNavigate();
   const location = useLocation();
+  const [, setSearchParams] = useSearchParams();
   
   const queryClient = useQueryClient();
 
@@ -104,11 +105,12 @@ const CourseReviewsTab: React.FC<CourseReviewsTabProps> = ({
       setHighlightedReviewId(reviewIdToHighlight);
       
       if (reviewIdFromUrl) {
-        searchParams.delete('review');
-        searchParams.delete('reviewId');
-        const newSearch = searchParams.toString();
-        const newUrl = `${location.pathname}${newSearch ? `?${newSearch}` : ''}`;
-        window.history.replaceState({}, '', newUrl);
+        setSearchParams(prev => {
+          const p = new URLSearchParams(prev);
+          p.delete('review');
+          p.delete('reviewId');
+          return p;
+        }, { replace: true });
       }
       
       const timeout = setTimeout(() => {
