@@ -282,7 +282,7 @@ export function useCommentsWithReplies(
 
     // Update cache — replace ONLY the parent's replies array + counts.
     // Do NOT overwrite the parent's own author/avatar/display_name fields.
-    queryClient.setQueryData(['post-comments-with-replies', postId], (old: any) => {
+    queryClient.setQueryData(['post-comments-with-replies', postId, actorType, actorId], (old: any) => {
       if (!old?.pages) return old;
       return {
         ...old,
@@ -474,8 +474,8 @@ export function useCommentsWithReplies(
     },
     onMutate: async ({ content, parentId, mediaUrl, mediaType, voiceDurationSeconds }) => {
       // Optimistic insert
-      await queryClient.cancelQueries({ queryKey: ['post-comments-with-replies', postId] });
-      const prev = queryClient.getQueryData(['post-comments-with-replies', postId]);
+      await queryClient.cancelQueries({ queryKey: ['post-comments-with-replies', postId, actorType, actorId] });
+      const prev = queryClient.getQueryData(['post-comments-with-replies', postId, actorType, actorId]);
 
       // Resolve real name + avatar for the optimistic comment
       let optimisticName = 'You';
@@ -521,7 +521,7 @@ export function useCommentsWithReplies(
       };
 
       if (!parentId) {
-        queryClient.setQueryData(['post-comments-with-replies', postId], (old: any) => {
+        queryClient.setQueryData(['post-comments-with-replies', postId, actorType, actorId], (old: any) => {
           if (!old?.pages?.length) return { pages: [{ comments: [optimisticComment], nextCursor: null }], pageParams: [null] };
           const pages = [...old.pages];
           const lastPage = { ...pages[pages.length - 1] };
@@ -535,13 +535,13 @@ export function useCommentsWithReplies(
     },
     onError: (_err, _vars, context) => {
       if (context?.prev) {
-        queryClient.setQueryData(['post-comments-with-replies', postId], context.prev);
+        queryClient.setQueryData(['post-comments-with-replies', postId, actorType, actorId], context.prev);
       }
     },
     onSettled: () => {
       // Actively refetch the comments for THIS post — this is the visible change
       // the user just made, the user expects it to appear immediately.
-      queryClient.refetchQueries({ queryKey: ['post-comments-with-replies', postId] });
+      queryClient.refetchQueries({ queryKey: ['post-comments-with-replies', postId, actorType, actorId] });
 
       // Surgical cache patch: bump comment count across every feed surface
       // without triggering a refetch (no scroll-snap reorder).
@@ -582,11 +582,11 @@ export function useCommentsWithReplies(
       }
     },
     onMutate: async (commentId) => {
-      await queryClient.cancelQueries({ queryKey: ['post-comments-with-replies', postId] });
-      const prev = queryClient.getQueryData(['post-comments-with-replies', postId]);
+      await queryClient.cancelQueries({ queryKey: ['post-comments-with-replies', postId, actorType, actorId] });
+      const prev = queryClient.getQueryData(['post-comments-with-replies', postId, actorType, actorId]);
 
       // Optimistically toggle like
-      queryClient.setQueryData(['post-comments-with-replies', postId], (old: any) => {
+      queryClient.setQueryData(['post-comments-with-replies', postId, actorType, actorId], (old: any) => {
         if (!old?.pages) return old;
         return {
           ...old,
@@ -618,11 +618,11 @@ export function useCommentsWithReplies(
     },
     onError: (_err, _vars, context) => {
       if (context?.prev) {
-        queryClient.setQueryData(['post-comments-with-replies', postId], context.prev);
+        queryClient.setQueryData(['post-comments-with-replies', postId, actorType, actorId], context.prev);
       }
     },
     onSettled: () => {
-      queryClient.invalidateQueries({ queryKey: ['post-comments-with-replies', postId] });
+      queryClient.invalidateQueries({ queryKey: ['post-comments-with-replies', postId, actorType, actorId] });
     },
   });
 
@@ -657,7 +657,7 @@ export function useCommentsWithReplies(
       }
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['post-comments-with-replies', postId] });
+      queryClient.invalidateQueries({ queryKey: ['post-comments-with-replies', postId, actorType, actorId] });
       // Surgical cache patch: decrement comment count across every feed surface.
       if (postId) {
         patchEngagement(queryClient, postId, { commentCountDelta: -1 });
@@ -684,7 +684,7 @@ export function useCommentsWithReplies(
       await supabase.from('comment_mentions').delete().eq('comment_id', commentId);
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['post-comments-with-replies', postId] });
+      queryClient.invalidateQueries({ queryKey: ['post-comments-with-replies', postId, actorType, actorId] });
     },
   });
 
