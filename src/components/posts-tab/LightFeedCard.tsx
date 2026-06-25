@@ -267,8 +267,7 @@ const LightFeedCardImpl: React.FC<LightFeedCardProps> = ({
 
   const subLine = useMemo(() => {
     const parts: string[] = [];
-    if (post.isReview) parts.push('posted a review');
-    else if (isDeal) parts.push('Sponsored');
+    if (isDeal) parts.push('Sponsored');
     else if (post.creatorRelation === 'system') parts.push('clbhouz');
     parts.push(timeAgo(post.createdAt));
     return parts.filter(Boolean).join(' · ');
@@ -347,16 +346,18 @@ const LightFeedCardImpl: React.FC<LightFeedCardProps> = ({
           >
             {post.displayName}
           </button>
-          <div style={{ fontSize: 11, color: T60, marginTop: 1 }}>{subLine}</div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginTop: 1 }}>
+            <span style={{ fontSize: 11, color: T60 }}>{subLine}</span>
+            {mountFollowPill && (
+              <FeedFollowPill
+                isFollowed={!!post.isFollowedByMe}
+                onFollow={() => onFollow!(post)}
+              />
+            )}
+          </div>
         </div>
 
         <div style={{ display: 'flex', alignItems: 'center', gap: 6, flexShrink: 0 }}>
-          {mountFollowPill && (
-            <FeedFollowPill
-              isFollowed={!!post.isFollowedByMe}
-              onFollow={() => onFollow!(post)}
-            />
-          )}
           {isDeal && (
             <span
               style={{

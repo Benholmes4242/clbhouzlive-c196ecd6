@@ -58,8 +58,8 @@ export const FeedFollowPill: React.FC<FeedFollowPillProps> = ({ onFollow, isFoll
       <span
         style={{
           ...BASE_STYLE,
-          color: INK,
-          background: AMBER,
+          color: AMBER,
+          background: 'transparent',
           border: `1px solid ${AMBER}`,
         }}
       >
