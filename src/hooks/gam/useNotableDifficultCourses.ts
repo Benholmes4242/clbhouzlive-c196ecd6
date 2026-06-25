@@ -18,34 +18,20 @@ export interface DifficultCourse {
 /**
  * Editorial / global shelf: courses ranked by how far over par they actually play,
  * gated on a credible round sample. No personalisation.
+ * Reads from the precomputed discover_rail_cache table.
  */
 export function useNotableDifficultCourses() {
   return useQuery<DifficultCourse[]>({
-    queryKey: ['gam_rpc', 'get_notable_difficult_courses', { p_min_rounds: 30, p_limit: 50 }],
-    staleTime: 0,
+    queryKey: ['gam', 'toughest-courses-cache'],
+    staleTime: 5 * 60 * 1000,
     queryFn: async () => {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const { data, error } = await (supabase.rpc as any)(
-        'get_notable_difficult_courses',
-        { p_min_rounds: 30, p_limit: 50 },
-      );
+      const { data, error } = await supabase
+        .from('discover_rail_cache')
+        .select('payload')
+        .eq('rail_key', 'toughest_courses')
+        .maybeSingle();
       if (error) throw error;
-      const rows = (data ?? []) as Omit<DifficultCourse, 'thumbnail_image'>[];
-      if (rows.length === 0) return [];
-
-      // Batch-fetch thumbnails for the returned course ids.
-      const ids = rows.map(r => r.course_id);
-      const { data: imgs } = await supabase
-        .from('golf_courses')
-        .select('id, thumbnail_image')
-        .in('id', ids);
-      const thumbMap = new Map<string, string | null>(
-        (imgs ?? []).map((r: { id: string; thumbnail_image: string | null }) => [
-          r.id,
-          r.thumbnail_image,
-        ]),
-      );
-      return rows.map(r => ({ ...r, thumbnail_image: thumbMap.get(r.course_id) ?? null }));
+      return (data?.payload ?? []) as DifficultCourse[];
     },
   });
 }
