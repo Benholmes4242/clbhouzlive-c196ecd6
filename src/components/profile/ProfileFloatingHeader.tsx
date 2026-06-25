@@ -11,10 +11,14 @@
  * exactly where ClubhouseTopBar / CompactHeader sit — directly under the notch.
  */
 
-import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import React, { useState, useRef, useEffect } from 'react';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { ArrowLeft, Search, Settings } from 'lucide-react';
 import GlobalSearchOverlay from '@/components/search/GlobalSearchOverlay';
+import { PostingAsPill } from '@/components/header/PostingAsPill';
+import { PostingAsMenu } from '@/components/header/PostingAsMenu';
+import { useSupabaseSession } from '@/hooks/useSupabaseSession';
+import { useUnreadNotifications } from '@/hooks/useUnreadNotifications';
 import { safeGoBack } from '@/utils/navigation';
 
 const FLOAT_STROKE = 2;
