@@ -6,6 +6,8 @@ import type { FeedPost, FeedRpcRow } from '@/components/media-system/types/media
 
 const PAGE_SIZE = 24;
 
+type CursorParam = { createdAt: string; id: string } | undefined;
+
 interface UseProfilePostsParams {
   userId: string | undefined;
   actorType: 'personal' | 'business';
