@@ -307,24 +307,48 @@ const BusinessProfilePage: React.FC = () => {
           )}
         </div>
 
-        {/* Back button */}
-        <button
-          type="button"
-          onClick={() => navigate(-1)}
-          className="absolute left-4 flex h-[34px] w-[34px] items-center justify-center active:scale-95 transition-all z-10 pointer-events-auto"
-          style={{
-            top: 'calc(max(var(--sat, env(safe-area-inset-top, 0px)), 47px) + 12px)',
-            borderRadius: 12,
-            background: 'rgba(0,0,0,0.28)',
-            backdropFilter: 'blur(22px) saturate(180%)',
-            WebkitBackdropFilter: 'blur(22px) saturate(180%)',
-            border: '1px solid rgba(255,255,255,0.12)',
-            boxShadow: '0 2px 8px rgba(0,0,0,0.25)',
-          }}
-          aria-label="Back"
-        >
-          <ChevronLeft className="h-[18px] w-[18px] text-white" strokeWidth={2.5} />
-        </button>
+        {/* Floating header — transparent control row under the notch */}
+        <ProfileFloatingHeader
+          isSelf={false}
+          backFallback="/clubhouse"
+          menuItems={(() => {
+            const shareItem = {
+              icon: Share2,
+              label: 'Share profile',
+              onClick: () => {
+                if (navigator.share) {
+                  navigator.share({ title: business.name, url: window.location.href }).catch(() => {});
+                } else {
+                  navigator.clipboard.writeText(window.location.href);
+                  toast.success('Copied to clipboard');
+                }
+              },
+            } as const;
+            const copyItem = {
+              icon: Link2,
+              label: 'Copy link',
+              onClick: () => {
+                navigator.clipboard.writeText(window.location.href);
+                toast.success('Copied to clipboard');
+              },
+            } as const;
+            if (isOwner) {
+              return [
+                shareItem,
+                copyItem,
+                { kind: 'separator' as const },
+                { icon: Pencil, label: 'Edit business', onClick: () => navigate(`/business/${business.id}/edit`) },
+              ];
+            }
+            return [
+              shareItem,
+              copyItem,
+              { kind: 'separator' as const },
+              // TODO(ben): Report flow for businesses not yet wired
+              { icon: Flag, label: 'Report', onClick: () => toast.info('Report coming soon') },
+            ];
+          })()}
+        />
 
         {/* Avatar (squircle) — owner: tap to upload; visitor: tap to lightbox */}
         <div className="absolute left-5 z-20 pointer-events-auto" style={{ bottom: '-62px' }}>
