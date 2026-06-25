@@ -18703,6 +18703,8 @@ export type Database = {
           p_review_bonus?: number
           p_seen_post_ids?: string[]
           p_user_id: string
+          p_viewer_actor_id?: string
+          p_viewer_actor_type?: string
         }
         Returns: {
           business_is_verified: boolean
