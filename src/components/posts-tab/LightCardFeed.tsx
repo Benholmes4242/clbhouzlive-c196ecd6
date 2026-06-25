@@ -254,7 +254,7 @@ export const LightCardFeed: React.FC<LightCardFeedProps> = ({
             feedIndex={index}
           />
           {/* Inter-card divider — a touch darker than the page bg */}
-          <div aria-hidden style={{ height: 1, background: DIVIDER }} />
+          <div aria-hidden style={{ height: 5, background: DIVIDER }} />
         </div>
       );
     },
