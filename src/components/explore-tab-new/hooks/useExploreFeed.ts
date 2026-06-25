@@ -1,6 +1,7 @@
 import { useInfiniteQuery, keepPreviousData } from '@tanstack/react-query';
 import { useCallback, useMemo, useRef } from 'react';
 import { supabase } from '@/integrations/supabase/client';
+import { useActiveActor } from '@/context/ActiveActorContext';
 import { mapRowToFeedPost, groupMultiMedia } from '@/components/media-system/utils/feedMapper';
 import type { FeedPost, FeedRpcRow } from '@/components/media-system/types/media';
 
@@ -15,9 +16,10 @@ interface UseExploreFeedParams {
 
 export function useExploreFeed({ userId, region, searchQuery, enabled: externalEnabled = true }: UseExploreFeedParams) {
   const seenPostIds = useRef<string[]>([]);
+  const { activeActor } = useActiveActor();
 
   const query = useInfiniteQuery({
-    queryKey: ['explore-feed', region ?? null, searchQuery ?? null, userId],
+    queryKey: ['explore-feed', region ?? null, searchQuery ?? null, userId, activeActor?.type, activeActor?.id],
     queryFn: async ({ pageParam }) => {
       if (!userId) return { posts: [] as FeedPost[], nextCursor: undefined as string | undefined };
 
@@ -25,6 +27,8 @@ export function useExploreFeed({ userId, region, searchQuery, enabled: externalE
 
       const params: Record<string, any> = {
         p_user_id: userId,
+        p_viewer_actor_type: activeActor?.type ?? 'personal',
+        p_viewer_actor_id: activeActor?.id ?? userId,
         p_page_size: PAGE_SIZE,
         p_seen_post_ids: seenPostIds.current,
       };
