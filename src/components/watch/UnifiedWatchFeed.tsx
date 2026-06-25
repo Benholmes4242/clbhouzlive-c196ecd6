@@ -14,6 +14,7 @@ import { useWatchFeed } from './hooks/useWatchFeed';
 import ScrollToTopGlass from '@/components/common/ScrollToTopGlass';
 import { WatchOfTheWeekHero } from './proshop/WatchOfTheWeekHero';
 import { CourseAnchoredRail } from './proshop/CourseAnchoredRail';
+import { BucketListRail } from './proshop/BucketListRail';
 import { WatchMoodChips } from './proshop/WatchMoodChips';
 import { useWatchMood } from './proshop/hooks/useWatchMood';
 
