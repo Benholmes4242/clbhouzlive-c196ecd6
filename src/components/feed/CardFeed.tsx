@@ -48,12 +48,6 @@ export interface CardFeedProps {
   bottomPadding?: number;
   onFollow?: (post: FeedPost) => void;
   currentUserId?: string;
-  /**
-   * When true, the feed uses the window/parent scroller instead of its
-   * own 100dvh container. Use this when embedding CardFeed inside a page
-   * that already owns the scroll (e.g. the profile Posts tab).
-   */
-  useWindowScroll?: boolean;
 }
 
 export const CardFeed: React.FC<CardFeedProps> = ({
