@@ -6,6 +6,7 @@ import { Input } from '@/components/ui/input';
 
 import { Search, MapPin, X, ChevronDown, RefreshCw, AlertCircle } from 'lucide-react';
 import VirtualizedCourseList from './VirtualizedCourseList';
+import { RequestCourseCTA } from './RequestCourseCTA';
 import { YourNetworkSection } from './network';
 import { UnseenReviewsBanner } from './network/UnseenReviewsBanner';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -619,6 +620,9 @@ const CourseExplorer = () => {
               Reset filters
             </button>
           )}
+          <div className="mt-3">
+            <RequestCourseCTA variant="button" prefillName={debouncedSearch || searchTerm} />
+          </div>
         </div>
       ) : (
         <>
@@ -642,6 +646,13 @@ const CourseExplorer = () => {
           {/* Loading indicator during retry */}
           {isError && isFetchingNextPage && allCourses.length > 0 && (
             <InlineLoadingSkeleton />
+          )}
+
+          {/* "Request a course" row — always present when a search is active */}
+          {(debouncedSearch || searchTerm).trim().length > 0 && !hasNextPage && (
+            <div className="mt-2 -mx-4 border-t border-slate-100">
+              <RequestCourseCTA variant="row" prefillName={debouncedSearch || searchTerm} />
+            </div>
           )}
         </>
       )}
