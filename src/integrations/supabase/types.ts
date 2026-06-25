@@ -3478,6 +3478,48 @@ export type Database = {
           },
         ]
       }
+      course_requests: {
+        Row: {
+          admin_notes: string | null
+          country: string | null
+          course_name: string
+          created_at: string
+          id: string
+          location: string
+          note: string | null
+          requested_by: string
+          resolved_at: string | null
+          resolved_by: string | null
+          status: string
+        }
+        Insert: {
+          admin_notes?: string | null
+          country?: string | null
+          course_name: string
+          created_at?: string
+          id?: string
+          location: string
+          note?: string | null
+          requested_by: string
+          resolved_at?: string | null
+          resolved_by?: string | null
+          status?: string
+        }
+        Update: {
+          admin_notes?: string | null
+          country?: string | null
+          course_name?: string
+          created_at?: string
+          id?: string
+          location?: string
+          note?: string | null
+          requested_by?: string
+          resolved_at?: string | null
+          resolved_by?: string | null
+          status?: string
+        }
+        Relationships: []
+      }
       course_review_media: {
         Row: {
           aspect_ratio: number | null
