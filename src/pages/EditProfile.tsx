@@ -512,9 +512,7 @@ export default function EditProfile() {
 
           <SectionCard>
             <HandicapVisibilityControl
-              championsVisibility={(form.championsVisibility as HandicapVisibility) || 'everyone'}
               handicapPageVisibility={(form.handicapPageVisibility as HandicapVisibility) || 'everyone'}
-              onChampionsChange={(v) => setField('championsVisibility', v)}
               onHandicapPageChange={(v) => setField('handicapPageVisibility', v)}
             />
           </SectionCard>
