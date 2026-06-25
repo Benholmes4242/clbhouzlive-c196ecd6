@@ -917,6 +917,18 @@ export function useReviewWizard({
 
       if (error) throw error;
 
+      // 3b. Remove course from user's "played" history (matches Remove from Played behaviour)
+      if (currentUserId && course?.id) {
+        const { error: courseError } = await supabase
+          .from('user_courses')
+          .delete()
+          .eq('user_id', currentUserId)
+          .eq('course_id', course.id);
+        if (courseError && courseError.code !== 'PGRST116') {
+          console.error('[ReviewWizard] user_courses deletion error:', courseError);
+        }
+      }
+
       // 4. Cleanup external storage (Cloudflare Stream + R2) - fire and forget
       if (allMediaData && allMediaData.length > 0) {
         const mediaItems = allMediaData.map(m => ({
@@ -949,48 +961,31 @@ export function useReviewWizard({
         confirmUpdate(course.id, currentUserId);
       }
 
-      // Force refetch critical queries for immediate UI update
-      if (course?.id) {
-        void queryClient.refetchQueries({ queryKey: ['course-reviews-full', course.id], exact: false, type: 'all' });
-        void queryClient.refetchQueries({ queryKey: ['course-rating-aggregates', course.id], type: 'all' });
-        void queryClient.refetchQueries({ queryKey: ['course-rating-distribution', course.id], type: 'all' });
-        void queryClient.refetchQueries({ queryKey: ['course-detail', course.id], type: 'all' });
+      // Shared invalidation helper - identical to Remove from Played path
+      invalidateCourseRatingCaches(queryClient);
+
+      // Refetch inactive profile/detail queries so profile reflects deletion
+      // even when not currently mounted (key for "updates without a new session")
+      void queryClient.refetchQueries({ queryKey: ['userProfile'], exact: false });
+      void queryClient.refetchQueries({ queryKey: ['userTop100Courses'], exact: false });
+      void queryClient.refetchQueries({ queryKey: ['user-played-courses-full'], exact: false });
+      void queryClient.refetchQueries({ queryKey: ['user-top-ten-courses'], exact: false });
+      void queryClient.refetchQueries({ queryKey: ['course-personal-status'], exact: false });
+      void queryClient.refetchQueries({ queryKey: ['user-course-moments'], exact: false });
+
+      // Clear exclusion for this course on delete
+      if (currentUserId && course?.id) {
+        supabase
+          .from('user_top10_exclusions')
+          .delete()
+          .eq('user_id', currentUserId)
+          .eq('course_id', course.id)
+          .then(() => {});
       }
 
-      // Global queries
-      queryClient.invalidateQueries({ queryKey: ['course-ratings'] });
-      queryClient.invalidateQueries({ queryKey: ['user-course-rating'] });
-      queryClient.invalidateQueries({ queryKey: ['course-reviews-full'] });
-      if (currentUserId) {
-        queryClient.invalidateQueries({ queryKey: ['user-top-ten-courses', currentUserId], refetchType: 'all' });
-        
-        // Clear exclusion for this course on delete too
-        if (course?.id) {
-          supabase
-            .from('user_top10_exclusions')
-            .delete()
-            .eq('user_id', currentUserId)
-            .eq('course_id', course.id)
-            .then(() => {});
-        }
-      }
-      queryClient.invalidateQueries({ queryKey: ['review-media'] });
-      queryClient.invalidateQueries({ queryKey: ['club-media-paginated'] });
-      if (course?.id && currentUserId) {
-        void queryClient.refetchQueries({ queryKey: ['user-played-course', course.id, currentUserId], type: 'all' });
-      }
-      // Feed/post keys (posts, user-posts, profile-feed, clubhouse-posts,
-      // explore-feed, activity-feed, profile-posts, actor-posts, etc.) are
-      // now invalidated by invalidateCourseRatingCaches() — see helper.
-      queryClient.invalidateQueries({ queryKey: ['user-exploration-status'] });
-      queryClient.invalidateQueries({ queryKey: ['exploration-leaderboard'] });
-      // Profile page queries
-      queryClient.invalidateQueries({ queryKey: ['user-course-ratings-breakdown'] });
-      queryClient.invalidateQueries({ queryKey: ['user-played-courses-full'] });
-      queryClient.invalidateQueries({ queryKey: ['user-course-activity'] });
-      // Previously missing
-      queryClient.invalidateQueries({ queryKey: ['user-course-reviews'] });
-      queryClient.invalidateQueries({ queryKey: ['reviews-of-the-week'] });
+      // Delete-specific extras the helper doesn't cover
+      queryClient.invalidateQueries({ queryKey: ['notifications'] });
+      queryClient.invalidateQueries({ queryKey: ['unseen-friend-reviews'] });
     },
     onError: (error, _variables, context) => {
       console.error('[ReviewWizard] Delete error:', error);
