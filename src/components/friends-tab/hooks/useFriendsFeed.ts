@@ -50,6 +50,8 @@ export function useFriendsFeed({
 
       const params: Record<string, unknown> = {
         p_user_id: userId,
+        p_viewer_actor_type: activeActor?.type ?? 'personal',
+        p_viewer_actor_id: activeActor?.id ?? userId,
         p_mode: mode,
         p_page_size: pageSize,
       };
