@@ -237,9 +237,11 @@ export const LightCardFeed: React.FC<LightCardFeedProps> = ({
         recheckActive();
       });
     };
-    window.addEventListener('scroll', onScroll, { passive: true, capture: true });
+    const scroller: HTMLElement | Window = document.getElementById('root') ?? window;
+    scroller.addEventListener('scroll', onScroll, { passive: true, capture: true } as any);
     return () => {
-      window.removeEventListener('scroll', onScroll, { capture: true } as any);
+      scroller.removeEventListener('scroll', onScroll, { capture: true } as any);
+
       if (raf) cancelAnimationFrame(raf);
     };
   }, [recheckActive]);
