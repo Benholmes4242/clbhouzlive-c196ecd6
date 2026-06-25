@@ -356,8 +356,7 @@ export function ReviewWizard({
     [pendingItems, wizard]
   );
 
-  /* ── Categories collapsible ──────────────────────────────────────────── */
-  const [catOpen, setCatOpen] = useState(false);
+  /* ── Category set count ──────────────────────────────────────────────── */
   const setCount = Object.values(wizard.state.breakdowns).filter((x) => x != null).length;
 
   /* ── Verdict textarea ───────────────────────────────────────────────── */
