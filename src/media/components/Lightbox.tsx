@@ -98,21 +98,10 @@ export const Lightbox: React.FC<LightboxProps> = ({
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [onClose, goNext, goPrev]);
 
-  // Lock body scroll
+  // Lock body scroll — shared, reference-counted util
   useEffect(() => {
-    const scrollY = window.scrollY;
-    document.body.style.overflow = 'hidden';
-    document.body.style.position = 'fixed';
-    document.body.style.top = `-${scrollY}px`;
-    document.body.style.width = '100%';
-
-    return () => {
-      document.body.style.overflow = '';
-      document.body.style.position = '';
-      document.body.style.top = '';
-      document.body.style.width = '';
-      window.scrollTo(0, scrollY);
-    };
+    lockBodyScroll();
+    return () => unlockBodyScroll();
   }, []);
 
   // Touch swipe handlers — skip when zoomed

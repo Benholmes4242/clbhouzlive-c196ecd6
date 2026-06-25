@@ -42,30 +42,15 @@ export const AvatarLightbox: React.FC<AvatarLightboxProps> = ({
   }, [onClose]);
 
   useEffect(() => {
-    const originalOverflow = document.body.style.overflow;
-    const originalPosition = document.body.style.position;
-    const originalTop = document.body.style.top;
-    const originalWidth = document.body.style.width;
-    const scrollY = window.scrollY;
-
-    if (isOpen) {
-      document.addEventListener('keydown', handleEscape);
-      document.body.style.overflow = 'hidden';
-      document.body.style.position = 'fixed';
-      document.body.style.top = `-${scrollY}px`;
-      document.body.style.width = '100%';
-      requestAnimationFrame(() => {
-        closeBtnRef.current?.focus();
-      });
-    }
-
+    if (!isOpen) return;
+    document.addEventListener('keydown', handleEscape);
+    lockBodyScroll();
+    requestAnimationFrame(() => {
+      closeBtnRef.current?.focus();
+    });
     return () => {
       document.removeEventListener('keydown', handleEscape);
-      document.body.style.overflow = originalOverflow;
-      document.body.style.position = originalPosition;
-      document.body.style.top = originalTop;
-      document.body.style.width = originalWidth;
-      if (isOpen) window.scrollTo(0, scrollY);
+      unlockBodyScroll();
     };
   }, [isOpen, handleEscape]);
 
