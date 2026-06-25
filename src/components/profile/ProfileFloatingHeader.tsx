@@ -114,7 +114,7 @@ export const ProfileFloatingHeader: React.FC<ProfileFloatingHeaderProps> = ({
           </button>
 
           {/* RIGHT cluster */}
-          <div className="flex items-center" style={{ gap: 8 }}>
+          <div className="flex items-center" style={{ gap: 12 }}>
             <button
               type="button"
               onClick={() => setSearchOpen(true)}
@@ -132,9 +132,29 @@ export const ProfileFloatingHeader: React.FC<ProfileFloatingHeaderProps> = ({
             >
               <Search size={21} strokeWidth={FLOAT_STROKE} />
             </button>
+
+            {user && (
+              <PostingAsPill
+                ref={pillRef}
+                onClick={() => setMenuOpen((v) => !v)}
+                isOpen={menuOpen}
+                hasUnreadNotifications={hasUnread}
+                notificationCount={unreadCount}
+                useBareTheme={true}
+              />
+            )}
           </div>
         </div>
       </div>
+
+      {user && (
+        <PostingAsMenu
+          isOpen={menuOpen}
+          onClose={() => setMenuOpen(false)}
+          useLightTheme={true}
+          anchorRef={pillRef}
+        />
+      )}
 
       <GlobalSearchOverlay isOpen={searchOpen} onClose={() => setSearchOpen(false)} />
     </>
