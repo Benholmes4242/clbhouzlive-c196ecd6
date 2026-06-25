@@ -1,4 +1,6 @@
 import { useRef, useEffect, useCallback, useMemo, type RefObject } from 'react';
+// App-wide scroll container (#root, not window) — used by all infinite lists
+const SCROLL_ROOT = typeof document !== 'undefined' ? document.getElementById('root') : null;
 import { useFullscreenFeedStore } from '@/store/fullscreenFeedStore';
 import { useInView } from 'react-intersection-observer';
 import { Loader2 } from 'lucide-react';
@@ -56,6 +58,7 @@ export default function ExploreGrid({
   const fetchGuard = useRef(false);
 
   const { ref: sentinelRef, inView } = useInView({
+    root: SCROLL_ROOT ?? undefined,
     rootMargin: '400px',
     threshold: 0,
   });
@@ -70,6 +73,10 @@ export default function ExploreGrid({
   useEffect(() => {
     if (inView) loadMore();
   }, [inView, loadMore]);
+
+  useEffect(() => {
+    if (!isFetchingNextPage) fetchGuard.current = false;
+  }, [isFetchingNextPage]);
 
   // Sync new posts into fullscreen overlay
   const { isOpen: isFullscreenOpen, appendPosts } = useFullscreenFeedStore();
