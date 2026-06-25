@@ -5,7 +5,22 @@ import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { BottomSheet } from '@/components/ui/BottomSheet';
 import type { ActiveActor } from '@/types/actor';
 
-const T2 = 'rgba(255,255,255,0.52)';
+const PALETTE = {
+  dark: {
+    chevron: 'rgba(255,255,255,0.52)',
+    label: 'rgba(255,255,255,0.52)',
+    rowText: '#fff',
+    activeRowBg: 'rgba(255,255,255,0.06)',
+    sheetVariant: 'dark' as const,
+  },
+  light: {
+    chevron: 'rgba(15,23,42,0.52)',
+    label: 'rgba(15,23,42,0.52)',
+    rowText: '#0F172A',
+    activeRowBg: 'rgba(15,23,42,0.05)',
+    sheetVariant: 'light' as const,
+  },
+};
 
 export interface FeedActorPickerValue {
   id: string;
@@ -16,9 +31,12 @@ interface FeedActorPickerProps {
   /** Local "acting as" actor for this card. Falls back to the global activeActor. */
   value?: FeedActorPickerValue | null;
   onChange?: (actor: ActiveActor) => void;
+  /** Visual theme. Defaults to 'dark' (Clubhouse). LightFeedCard passes 'light'. */
+  theme?: 'light' | 'dark';
 }
 
-export const FeedActorPicker: React.FC<FeedActorPickerProps> = ({ value, onChange }) => {
+export const FeedActorPicker: React.FC<FeedActorPickerProps> = ({ value, onChange, theme = 'dark' }) => {
+  const c = PALETTE[theme];
   const { activeActor, availableActors } = useActiveActor();
   const [sheetOpen, setSheetOpen] = useState(false);
 
@@ -71,13 +89,13 @@ export const FeedActorPicker: React.FC<FeedActorPickerProps> = ({ value, onChang
         }}
       >
         {avatar}
-        <ChevronDown size={14} color={T2} strokeWidth={1.75} />
+        <ChevronDown size={14} color={c.chevron} strokeWidth={1.75} />
       </button>
 
       <BottomSheet
         open={sheetOpen}
         onClose={() => setSheetOpen(false)}
-        variant="dark"
+        variant={c.sheetVariant}
       >
         <div
           onClick={(e) => e.stopPropagation()}
@@ -89,7 +107,7 @@ export const FeedActorPicker: React.FC<FeedActorPickerProps> = ({ value, onChang
               fontWeight: 700,
               letterSpacing: '0.08em',
               textTransform: 'uppercase',
-              color: T2,
+              color: c.label,
               padding: '4px 12px 10px',
             }}
           >
@@ -111,12 +129,12 @@ export const FeedActorPicker: React.FC<FeedActorPickerProps> = ({ value, onChang
                   alignItems: 'center',
                   gap: 12,
                   width: '100%',
-                  background: isActive ? 'rgba(255,255,255,0.06)' : 'transparent',
+                  background: isActive ? c.activeRowBg : 'transparent',
                   border: 'none',
                   padding: 12,
                   borderRadius: 12,
                   cursor: 'pointer',
-                  color: '#fff',
+                  color: c.rowText,
                   textAlign: 'left',
                 }}
               >
