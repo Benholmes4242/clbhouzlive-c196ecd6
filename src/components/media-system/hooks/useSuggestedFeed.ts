@@ -1,6 +1,7 @@
 import { useInfiniteQuery } from '@tanstack/react-query';
 import { useRef, useCallback, useMemo } from 'react';
 import { supabase } from '@/integrations/supabase/client';
+import { useActiveActor } from '@/context/ActiveActorContext';
 import type { FeedPost, FeedRpcRow } from '../types/media';
 import { deduplicatePosts } from '../utils/feedAlgorithm';
 import { mapRowToFeedPost, groupMultiMedia } from '../utils/feedMapper';
@@ -8,10 +9,11 @@ import { mapRowToFeedPost, groupMultiMedia } from '../utils/feedMapper';
 const PAGE_SIZE = 60;
 
 export function useSuggestedFeed(userId: string | undefined) {
+  const { activeActor } = useActiveActor();
   const seenPostIds = useRef<Set<string>>(new Set());
 
   const query = useInfiniteQuery({
-    queryKey: ['media-feed', 'suggested', userId],
+    queryKey: ['media-feed', 'suggested', userId, activeActor?.type, activeActor?.id],
     queryFn: async ({ pageParam }) => {
       if (!userId) return { posts: [] as FeedPost[], nextCursor: undefined as string | undefined, rawRowCount: 0 };
 
@@ -20,9 +22,12 @@ export function useSuggestedFeed(userId: string | undefined) {
       const { data, error } = await supabase.rpc('get_suggested_feed_v2' as any, {
         p_user_id: userId,
         p_page_size: PAGE_SIZE,
+        p_viewer_actor_type: activeActor?.type ?? 'personal',
+        p_viewer_actor_id: activeActor?.id ?? userId,
         ...(cursor ? { p_cursor: cursor } : {}),
         ...(cursor ? { p_seen_post_ids: Array.from(seenPostIds.current) } : {}),
       } as any);
+
 
       if (error) {
         console.error('[SuggestedFeed] RPC error:', error);
