@@ -111,81 +111,97 @@ function VideosFullFeedInner({ userId, mood, searchQuery }: VideosFullFeedProps)
   const useRhythm = !searchQuery && mood === 'for_you';
   const segments = useMemo(() => (useRhythm ? buildRhythm(posts) : []), [useRhythm, posts]);
 
-  if (isLoading && posts.length === 0) {
-    return (
-      <div style={{ padding: '24px 16px', display: 'flex', justifyContent: 'center' }}>
-        <Loader2 className="h-5 w-5 animate-spin" style={{ color: 'rgba(15,23,42,0.45)' }} />
-      </div>
-    );
-  }
+  const renderVideoFeedBody = () => {
+    if (isLoading && posts.length === 0) {
+      return (
+        <div style={{ padding: '24px 16px', display: 'flex', justifyContent: 'center' }}>
+          <Loader2 className="h-5 w-5 animate-spin" style={{ color: 'rgba(15,23,42,0.45)' }} />
+        </div>
+      );
+    }
 
-  if (isError && posts.length === 0) {
-    return (
-      <div style={{ padding: '32px 16px', textAlign: 'center' }}>
-        <p style={{ fontSize: 13, color: 'rgba(15,23,42,0.6)', marginBottom: 12 }}>
-          Couldn't load videos right now.
-        </p>
-        <button
-          onClick={() => refetch()}
-          style={{
-            padding: '8px 16px',
-            borderRadius: 999,
-            background: '#0F172A',
-            color: 'white',
-            fontSize: 13,
-            fontWeight: 600,
-            border: 'none',
-          }}
-        >
-          Try again
-        </button>
-      </div>
-    );
-  }
+    if (isError && posts.length === 0) {
+      return (
+        <div style={{ padding: '32px 16px', textAlign: 'center' }}>
+          <p style={{ fontSize: 13, color: 'rgba(15,23,42,0.6)', marginBottom: 12 }}>
+            Couldn't load videos right now.
+          </p>
+          <button
+            onClick={() => refetch()}
+            style={{
+              padding: '8px 16px',
+              borderRadius: 999,
+              background: '#0F172A',
+              color: 'white',
+              fontSize: 13,
+              fontWeight: 600,
+              border: 'none',
+            }}
+          >
+            Try again
+          </button>
+        </div>
+      );
+    }
 
-  if (!isLoading && posts.length === 0) {
-    if (searchQuery) {
+    if (!isLoading && posts.length === 0) {
+      if (searchQuery) {
+        return (
+          <div style={{ padding: '32px 16px', textAlign: 'center' }}>
+            <p style={{ fontSize: 14, fontWeight: 600, color: '#0F172A', marginBottom: 4 }}>
+              No videos match "{searchQuery}".
+            </p>
+          </div>
+        );
+      }
+      if (mood === 'for_you') return null;
       return (
         <div style={{ padding: '32px 16px', textAlign: 'center' }}>
           <p style={{ fontSize: 14, fontWeight: 600, color: '#0F172A', marginBottom: 4 }}>
-            No videos match "{searchQuery}".
+            No videos here yet.
           </p>
         </div>
       );
     }
-    if (mood === 'for_you') return null;
-    return (
-      <div style={{ padding: '32px 16px', textAlign: 'center' }}>
-        <p style={{ fontSize: 14, fontWeight: 600, color: '#0F172A', marginBottom: 4 }}>
-          No videos here yet.
-        </p>
-      </div>
-    );
-  }
 
-  if (useRhythm) {
-    return (
-      <div style={{ padding: '12px 0 24px', display: 'flex', flexDirection: 'column', gap: 16 }}>
-        {!searchQuery && <BucketListRail />}
-        {segments.map((seg, sIdx) => {
-          if (seg.kind === 'rail') {
-            return <VideosTopRail key={`rail-${sIdx}`} userId={userId} />;
-          }
-          if (seg.kind === 'clips') {
-            return (
-              <div key={`clips-${sIdx}`} style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
-                <VideosQuickClipsRail userId={userId} />
-              </div>
-            );
-          }
-          if (seg.kind === 'large') {
+    if (useRhythm) {
+      return (
+        <div style={{ padding: '12px 0 24px', display: 'flex', flexDirection: 'column', gap: 16 }}>
+          {segments.map((seg, sIdx) => {
+            if (seg.kind === 'rail') {
+              return <VideosTopRail key={`rail-${sIdx}`} userId={userId} />;
+            }
+            if (seg.kind === 'clips') {
+              return (
+                <div key={`clips-${sIdx}`} style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+                  <VideosQuickClipsRail userId={userId} />
+                </div>
+              );
+            }
+            if (seg.kind === 'large') {
+              return (
+                <div
+                  key={`large-${seg.startIndex}`}
+                  style={{ display: 'flex', flexDirection: 'column', gap: 16 }}
+                >
+                  {seg.posts.map((post, i) => (
+                    <VideoLargeCard
+                      key={post.id}
+                      post={post}
+                      index={seg.startIndex + i}
+                      allPosts={posts}
+                    />
+                  ))}
+                </div>
+              );
+            }
             return (
               <div
-                key={`large-${seg.startIndex}`}
-                style={{ display: 'flex', flexDirection: 'column', gap: 16 }}
+                key={`list-${seg.startIndex}`}
+                style={{ padding: '0 16px', display: 'flex', flexDirection: 'column', gap: 13 }}
               >
                 {seg.posts.map((post, i) => (
-                  <VideoLargeCard
+                  <CompactVideoRow
                     key={post.id}
                     post={post}
                     index={seg.startIndex + i}
@@ -194,23 +210,26 @@ function VideosFullFeedInner({ userId, mood, searchQuery }: VideosFullFeedProps)
                 ))}
               </div>
             );
-          }
-          return (
-            <div
-              key={`list-${seg.startIndex}`}
-              style={{ padding: '0 16px', display: 'flex', flexDirection: 'column', gap: 13 }}
-            >
-              {seg.posts.map((post, i) => (
-                <CompactVideoRow
-                  key={post.id}
-                  post={post}
-                  index={seg.startIndex + i}
-                  allPosts={posts}
-                />
-              ))}
+          })}
+
+          <div ref={sentinelRef} style={{ height: 1 }} />
+
+          {isFetchingNextPage && (
+            <div style={{ display: 'flex', justifyContent: 'center', padding: '12px 0' }}>
+              <Loader2 className="h-5 w-5 animate-spin" style={{ color: 'rgba(15,23,42,0.45)' }} />
             </div>
-          );
-        })}
+          )}
+        </div>
+      );
+    }
+
+    return (
+      <div style={{ padding: '12px 0 24px', display: 'flex', flexDirection: 'column', gap: 13 }}>
+        <div style={{ padding: '0 16px', display: 'flex', flexDirection: 'column', gap: 13 }}>
+          {posts.map((post, i) => (
+            <CompactVideoRow key={post.id} post={post} index={i} allPosts={posts} />
+          ))}
+        </div>
 
         <div ref={sentinelRef} style={{ height: 1 }} />
 
@@ -221,25 +240,13 @@ function VideosFullFeedInner({ userId, mood, searchQuery }: VideosFullFeedProps)
         )}
       </div>
     );
-  }
+  };
 
   return (
-    <div style={{ padding: '12px 0 24px', display: 'flex', flexDirection: 'column', gap: 13 }}>
+    <>
       {!searchQuery && <BucketListRail />}
-      <div style={{ padding: '0 16px', display: 'flex', flexDirection: 'column', gap: 13 }}>
-        {posts.map((post, i) => (
-          <CompactVideoRow key={post.id} post={post} index={i} allPosts={posts} />
-        ))}
-      </div>
-
-      <div ref={sentinelRef} style={{ height: 1 }} />
-
-      {isFetchingNextPage && (
-        <div style={{ display: 'flex', justifyContent: 'center', padding: '12px 0' }}>
-          <Loader2 className="h-5 w-5 animate-spin" style={{ color: 'rgba(15,23,42,0.45)' }} />
-        </div>
-      )}
-    </div>
+      {renderVideoFeedBody()}
+    </>
   );
 }
 
