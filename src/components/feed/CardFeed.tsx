@@ -78,6 +78,14 @@ export const CardFeed: React.FC<CardFeedProps> = ({
 
   const virtuosoRef = useRef<VirtuosoHandle | null>(null);
 
+  // Resolve the real document scroller once mounted. Only needed for the
+  // window-scroll branch; harmless otherwise.
+  const [scrollParent, setScrollParent] = useState<HTMLElement | undefined>(undefined);
+  useEffect(() => {
+    if (useWindowScroll) setScrollParent(getDocumentScrollParent());
+  }, [useWindowScroll]);
+
+
   // Explore tab retap → scroll Clubhouse feed to top
   useEffect(() => {
     const onRetap = (e: Event) => {
