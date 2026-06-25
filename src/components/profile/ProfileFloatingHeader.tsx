@@ -39,7 +39,18 @@ export const ProfileFloatingHeader: React.FC<ProfileFloatingHeaderProps> = ({
   onSettingsClick,
 }) => {
   const navigate = useNavigate();
+  const { pathname } = useLocation();
+  const { user } = useSupabaseSession();
+  const { hasUnread, unreadCount } = useUnreadNotifications();
   const [searchOpen, setSearchOpen] = useState(false);
+  const [menuOpen, setMenuOpen] = useState(false);
+  const pillRef = useRef<HTMLButtonElement>(null);
+
+  // Close transient overlays on route change.
+  useEffect(() => {
+    setSearchOpen(false);
+    setMenuOpen(false);
+  }, [pathname]);
 
   // When viewing own profile via the bottom-nav tab there's no history to pop —
   // show a settings gear instead. Otherwise show a back arrow.
