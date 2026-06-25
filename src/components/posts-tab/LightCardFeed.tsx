@@ -67,11 +67,16 @@ export const LightCardFeed: React.FC<LightCardFeedProps> = ({
   // ── Active-card tracking (ported from CardFeed) ──
   const [activeIdx, setActiveIdx] = useState(0);
   const [playingIdx, setPlayingIdx] = useState(0);
+  const [scrollParent, setScrollParent] = useState<HTMLElement | undefined>(undefined);
   const settleTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const SETTLE_MS = 150;
   const visibilityRef = useRef<Map<number, number>>(new Map());
   const observerRef = useRef<IntersectionObserver | null>(null);
   const cardEls = useRef<Map<number, HTMLElement>>(new Map());
+
+  useEffect(() => {
+    setScrollParent(getDocumentScrollParent());
+  }, []);
 
   useEffect(() => {
     if (settleTimer.current) clearTimeout(settleTimer.current);
