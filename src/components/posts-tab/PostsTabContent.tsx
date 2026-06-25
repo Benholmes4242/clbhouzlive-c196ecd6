@@ -182,7 +182,7 @@ const PostsTabContent: React.FC<PostsTabContentProps> = ({
   );
 
   return (
-    <div className="flex flex-col min-h-0">
+    <div>
       {/* Filter dropdown */}
       {posts.length > 0 && (
         <div className="flex justify-end px-4 pt-1 pb-2">
