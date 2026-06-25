@@ -2,17 +2,15 @@ import { useState, useCallback, useEffect } from 'react';
 import type { FeedPost } from '@/components/media-system/types/media';
 import { useClubhouseStore } from '@/store/clubhouseStore';
 import { analyticsEvents } from '@/utils/analyticsEvents';
-import type { ActiveActor } from '@/types/actor';
 
 /**
  * Manages comments sheet state and optimistic comment counts.
- * Re-wired for Brief 3: pauses/resumes video via ClubhouseStore.
+ * Actor selection is GLOBAL (session-wide) — comments always post as the
+ * current activeActor, no per-card override.
  */
 export function useClubhouseComments() {
   const [commentsOpen, setCommentsOpen] = useState(false);
   const [commentCountOverrides, setCommentCountOverrides] = useState<Map<string, number>>(new Map());
-  // Per-open actor override — set when a card's FeedActorPicker chose a non-default actor.
-  const [commentActorOverride, setCommentActorOverride] = useState<{ id: string; type: string } | null>(null);
 
   // Pause/resume video when comments open/close
   useEffect(() => {
@@ -25,14 +23,12 @@ export function useClubhouseComments() {
     }
   }, [commentsOpen]);
 
-  const openComments = useCallback((_post?: FeedPost | null, actorOverride?: ActiveActor | null) => {
-    setCommentActorOverride(actorOverride ? { id: actorOverride.id, type: actorOverride.type } : null);
+  const openComments = useCallback((_post?: FeedPost | null) => {
     setCommentsOpen(true);
     analyticsEvents.track('post_comment_open', {});
   }, []);
   const closeComments = useCallback(() => {
     setCommentsOpen(false);
-    setCommentActorOverride(null);
   }, []);
 
   const handleCommentPosted = useCallback((post: FeedPost | null) => {
@@ -62,10 +58,9 @@ export function useClubhouseComments() {
   const resetComments = useCallback(() => {
     setCommentsOpen(false);
     setCommentCountOverrides(new Map());
-    setCommentActorOverride(null);
   }, []);
 
   const overlayVisible = !commentsOpen;
 
-  return { commentsOpen, overlayVisible, openComments, closeComments, handleCommentPosted, handleCommentDeleted, getCommentCount, resetComments, commentActorOverride };
+  return { commentsOpen, overlayVisible, openComments, closeComments, handleCommentPosted, handleCommentDeleted, getCommentCount, resetComments };
 }
