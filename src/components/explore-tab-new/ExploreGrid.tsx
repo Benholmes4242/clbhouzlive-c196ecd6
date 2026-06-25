@@ -1,4 +1,6 @@
 import { useRef, useEffect, useCallback, useMemo, type RefObject } from 'react';
+// App-wide scroll container (#root, not window) — used by all infinite lists
+const SCROLL_ROOT = typeof document !== 'undefined' ? document.getElementById('root') : null;
 import { useFullscreenFeedStore } from '@/store/fullscreenFeedStore';
 import { useInView } from 'react-intersection-observer';
 import { Loader2 } from 'lucide-react';
