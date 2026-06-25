@@ -831,7 +831,7 @@ export function ReviewWizard({
                     <div
                       onClick={() => taRef.current?.focus()}
                       style={{
-                        margin: '0 16px',
+                        margin: `0 ${PAD_X}`,
                         border: `1px solid ${
                           verdictFocused ? 'rgba(247,147,30,0.55)' : HAIR
                         }`,
