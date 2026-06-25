@@ -1,5 +1,6 @@
 import { useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { Mountain } from 'lucide-react';
 import { MountainMark } from './DiscoverMarks';
 import { useNotableDifficultCourses, type DifficultCourse } from '@/hooks/gam/useNotableDifficultCourses';
 import { ExploreSectionHeader } from './ExploreSectionHeader';
