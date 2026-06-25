@@ -76,9 +76,8 @@ interface CommentsSheetProps {
   editorialCardId?: string;
   onCommentPosted?: () => void;
   onCommentDeleted?: () => void;
-  /** Per-card actor override (from FeedActorPicker) — overrides global activeActor for this sheet. */
-  actorOverride?: { id: string; type: string } | null;
 }
+
 
 interface ReplyTarget {
   topLevelId: string;
