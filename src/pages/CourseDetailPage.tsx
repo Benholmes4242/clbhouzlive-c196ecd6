@@ -16,10 +16,14 @@ const CourseDetailPage = () => {
   usePreventOverscroll();
 
   useEffect(() => {
-    window.scrollTo({ top: 0, left: 0, behavior: 'auto' });
-    const rootElement = document.getElementById('root');
-    if (rootElement) {
-      rootElement.scrollTo({ top: 0, left: 0, behavior: 'auto' });
+    const sp = new URLSearchParams(window.location.search);
+    const hasDeepLink = sp.has('review') || sp.has('reviewId') || sp.has('tab');
+    if (!hasDeepLink) {
+      window.scrollTo({ top: 0, left: 0, behavior: 'auto' });
+      const rootElement = document.getElementById('root');
+      if (rootElement) {
+        rootElement.scrollTo({ top: 0, left: 0, behavior: 'auto' });
+      }
     }
 
     // Track course detail view

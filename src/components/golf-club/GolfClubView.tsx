@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useEffect } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useLocation, useSearchParams } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
@@ -40,6 +40,13 @@ const GolfClubView: React.FC<GolfClubViewProps> = ({ courseId, isInModal = false
   const highlightReviewId = searchParams.get('review');
   
   const [visitedTabs, setVisitedTabs] = useState<Set<string>>(new Set([initialTab]));
+
+  // Sync activeTab when URL/state changes (handles deep links when already mounted on this course)
+  useEffect(() => {
+    const next = (location.state as any)?.activeTab || searchParams.get('tab') || 'about';
+    setActiveTab(next);
+    setVisitedTabs(prev => (prev.has(next) ? prev : new Set(prev).add(next)));
+  }, [searchParams, location.state]);
 
   const { data: course, isLoading: courseLoading } = useQuery({
     queryKey: ['course-detail', courseId],
