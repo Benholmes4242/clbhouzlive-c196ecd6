@@ -242,21 +242,27 @@ function SectionHeader({
           </>
         )}
       </div>
-      {meta.cityCountry && (
-        <div
-          style={{
-            marginTop: 6,
-            fontFamily: FONT,
-            fontSize: 13,
-            fontWeight: 700,
-            color: INK,
-            lineHeight: 1.25,
-            letterSpacing: '-0.005em',
-          }}
-        >
-          {meta.cityCountry}
-        </div>
-      )}
+      {(() => {
+        const club = meta.course && meta.course !== '—' ? meta.course : null;
+        const parts = [club, meta.country || null].filter(Boolean);
+        // Fallback: if no club known, keep the old city+country so we never show blank.
+        const text = parts.length ? parts.join(', ') : meta.cityCountry;
+        return text ? (
+          <div
+            style={{
+              marginTop: 6,
+              fontFamily: FONT,
+              fontSize: 13,
+              fontWeight: 700,
+              color: INK,
+              lineHeight: 1.25,
+              letterSpacing: '-0.005em',
+            }}
+          >
+            {text}
+          </div>
+        ) : null;
+      })()}
     </div>
   );
 }
