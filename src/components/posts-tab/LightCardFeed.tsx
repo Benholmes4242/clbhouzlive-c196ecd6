@@ -20,6 +20,7 @@ import type { ActiveActor } from '@/types/actor';
 import { useFullscreenFeedStore } from '@/store/fullscreenFeedStore';
 import { useClubhouseStore } from '@/store/clubhouseStore';
 import { prefetchTile } from '@/hooks/useTileVideoPlayer';
+import { getDocumentScrollParent } from '@/lib/getScrollParent';
 import { LightFeedCard } from './LightFeedCard';
 
 const PAGE_BG = '#F8FAFC';
