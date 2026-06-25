@@ -19750,6 +19750,14 @@ export type Database = {
       refresh_college_weekly_movers: { Args: never; Returns: undefined }
       refresh_expired_course_mood_blurbs: { Args: never; Returns: number }
       refresh_gam_league_standings: { Args: never; Returns: undefined }
+      refresh_latest_records_cache: {
+        Args: { p_limit?: number }
+        Returns: undefined
+      }
+      refresh_toughest_courses_cache: {
+        Args: { p_limit?: number; p_min_rounds?: number }
+        Returns: undefined
+      }
       refresh_whs_handicap_distribution: { Args: never; Returns: undefined }
       register_push_token: {
         Args: { p_platform: string; p_token: string }
