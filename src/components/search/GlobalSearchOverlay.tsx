@@ -289,8 +289,11 @@ function GlobalSearchOverlay({ isOpen, onClose }: GlobalSearchOverlayProps) {
 
   const hasQuery = debouncedQuery.trim().length > 0;
   const allEmpty = clubs.length === 0 && people.length === 0 && businesses.length === 0;
-  const hasResults = hasQuery && !isLoading && !allEmpty;
-  const showNoResults = hasQuery && !isLoading && allEmpty;
+  // The Courses section always renders a "Request a course" row at the bottom
+  // when a query is active, so we never want the empty-results screen to take
+  // over while courses is in scope.
+  const hasResults = hasQuery && !isLoading && (!allEmpty || (typeFilter === 'all' || typeFilter === 'courses'));
+  const showNoResults = hasQuery && !isLoading && allEmpty && !(typeFilter === 'all' || typeFilter === 'courses');
 
   const showCourses = typeFilter === 'all' || typeFilter === 'courses';
   const showPeople = typeFilter === 'all' || typeFilter === 'people';
@@ -596,7 +599,7 @@ function GlobalSearchOverlay({ isOpen, onClose }: GlobalSearchOverlayProps) {
               ) : hasResults ? (
                 <motion.div key="search-results" {...FADE_PROPS}>
                   {/* Courses */}
-                  {showCourses && clubs.length > 0 && (
+                  {showCourses && (clubs.length > 0 || hasQuery) && (
                     <div>
                       <SectionHeader label="Courses" />
                       {clubs.map(course => (
