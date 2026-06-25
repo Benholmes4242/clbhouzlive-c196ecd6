@@ -62,13 +62,13 @@ interface PageData {
 export function useCommentsWithReplies(
   postId: string | null,
   onCommentDeleted?: () => void,
-  actorOverride?: { id: string; type: string } | null,
 ) {
   const queryClient = useQueryClient();
   const { user } = useSupabaseSession();
   const { activeActor } = useActiveActor();
 
-  const effectiveActor = actorOverride ?? activeActor;
+  // Actor selection is GLOBAL — comments always read/write against activeActor.
+  const effectiveActor = activeActor;
   const actorType = effectiveActor?.type || 'personal';
   const actorId = effectiveActor?.id || user?.id || '';
 
