@@ -1,5 +1,6 @@
 import { useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { Mountain } from 'lucide-react';
 import { MountainMark } from './DiscoverMarks';
 import { useNotableDifficultCourses, type DifficultCourse } from '@/hooks/gam/useNotableDifficultCourses';
 import { ExploreSectionHeader } from './ExploreSectionHeader';
@@ -91,9 +92,12 @@ interface CardProps {
   onTap: () => void;
 }
 
+const BAR_MAX = 18;
+
 function ToughCourseCard({ course, onTap }: CardProps) {
   const region =
     course.course_region || course.course_country || '';
+  const pct = Math.max(6, Math.min(100, (course.avg_over_par / BAR_MAX) * 100));
 
   return (
     <button
@@ -105,6 +109,7 @@ function ToughCourseCard({ course, onTap }: CardProps) {
         width: CARD_W,
         background: '#FFFFFF',
         border: `1px solid ${HAIRLINE_INK_8}`,
+        borderTop: `2px solid ${MAROON}`,
         borderRadius: 14,
         overflow: 'hidden',
         display: 'flex',
@@ -114,8 +119,8 @@ function ToughCourseCard({ course, onTap }: CardProps) {
         fontFamily: 'inherit',
       }}
     >
-      {/* Hero */}
-      <div style={{ position: 'relative', width: '100%', height: 180, background: INK_TINT_06 }}>
+      {/* Photo identity band */}
+      <div style={{ position: 'relative', width: '100%', height: 104, background: INK_TINT_06 }}>
         {course.thumbnail_image ? (
           <img
             src={course.thumbnail_image}
@@ -134,46 +139,6 @@ function ToughCourseCard({ course, onTap }: CardProps) {
             pointerEvents: 'none',
           }}
         />
-        {/* avg over par badge */}
-        <div
-          style={{
-            position: 'absolute',
-            top: 8,
-            right: 8,
-            display: 'inline-flex',
-            alignItems: 'baseline',
-            gap: 4,
-            padding: '4px 9px',
-            borderRadius: 999,
-            background: 'rgba(15,23,42,0.55)',
-            backdropFilter: 'blur(8px)',
-            WebkitBackdropFilter: 'blur(8px)',
-            color: '#FFFFFF',
-            fontFeatureSettings: '"tnum" 1, "kern" 1',
-          }}
-        >
-          <span
-            style={{
-              fontSize: 18,
-              fontWeight: 300,
-              lineHeight: 1,
-              fontVariantNumeric: 'tabular-nums',
-              letterSpacing: '-0.01em',
-            }}
-          >
-            +{numFmt(course.avg_over_par, 1)}
-          </span>
-          <span
-            style={{
-              fontSize: 8,
-              fontWeight: 700,
-              letterSpacing: '0.14em',
-              opacity: 0.78,
-            }}
-          >
-            AVG
-          </span>
-        </div>
         {/* Name + region overlay */}
         <div
           style={{
@@ -218,70 +183,115 @@ function ToughCourseCard({ course, onTap }: CardProps) {
         </div>
       </div>
 
-      {/* Hardest hole — fixed 58px meta band */}
-      <div
-        style={{
-          height: 58,
-          display: 'flex',
-          alignItems: 'center',
-          gap: 9,
-          padding: '0 12px',
-        }}
-      >
-        <div
-          style={{
-            width: 34,
-            height: 34,
-            borderRadius: 12,
-            background: INK,
-            color: '#FFFFFF',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            fontSize: 14,
-            fontWeight: 700,
-            fontVariantNumeric: 'tabular-nums',
-            flexShrink: 0,
-          }}
-        >
-          {course.hardest_hole_no ?? '–'}
-        </div>
-        <div style={{ flex: 1, minWidth: 0 }}>
-          <p
+      {/* Data block */}
+      <div style={{ padding: '12px 13px 13px', display: 'flex', flexDirection: 'column' }}>
+        {/* Hero stat row */}
+        <div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between' }}>
+          <div>
+            <p
+              style={{
+                margin: 0,
+                fontSize: 9,
+                fontWeight: 800,
+                letterSpacing: '0.08em',
+                color: INK_FAINT,
+                lineHeight: 1,
+                textTransform: 'uppercase',
+              }}
+            >
+              AVG OVER PAR
+            </p>
+            <p
+              style={{
+                margin: '4px 0 0',
+                fontSize: 26,
+                fontWeight: 800,
+                color: MAROON,
+                fontVariantNumeric: 'tabular-nums',
+                letterSpacing: '-0.02em',
+                lineHeight: 1,
+              }}
+            >
+              +{numFmt(course.avg_over_par, 1)}
+            </p>
+          </div>
+          <div
             style={{
-              margin: 0,
-              fontSize: 13.5,
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: 3,
+              color: INK_MUTE,
+              fontSize: 10.5,
               fontWeight: 700,
-              color: INK,
-              lineHeight: 1.15,
-              overflow: 'hidden',
-              textOverflow: 'ellipsis',
-              whiteSpace: 'nowrap',
+              lineHeight: 1,
             }}
           >
-            <span style={{ color: MAROON, fontWeight: 800, letterSpacing: '0.04em', fontSize: 11 }}>
-              HARDEST
-            </span>
-            <span> · Par {course.hardest_hole_par ?? '–'}</span>
-          </p>
-          <p
-            style={{
-              margin: '1px 0 0',
-              fontSize: 11.5,
-              fontWeight: 600,
-              color: INK_FAINT,
-              lineHeight: 1.2,
-              fontVariantNumeric: 'tabular-nums',
-              overflow: 'hidden',
-              textOverflow: 'ellipsis',
-              whiteSpace: 'nowrap',
-            }}
-          >
-            +{numFmt(course.hardest_avg_to_par, 1)} over par
-            {course.hardest_hole_si != null ? ` · SI ${course.hardest_hole_si}` : ''}
-          </p>
+            <Mountain size={12} />
+          </div>
         </div>
 
+        {/* Difficulty bar */}
+        <div
+          style={{
+            height: 5,
+            background: INK_TINT_06,
+            borderRadius: 3,
+            marginTop: 10,
+            overflow: 'hidden',
+          }}
+        >
+          <div
+            style={{
+              width: `${pct}%`,
+              height: '100%',
+              background: `linear-gradient(90deg, #F7931E, ${MAROON})`,
+              borderRadius: 3,
+            }}
+          />
+        </div>
+
+        {/* Hardest-hole stat row */}
+        <div
+          style={{
+            borderTop: `0.5px solid ${HAIRLINE_INK_8}`,
+            marginTop: 12,
+            paddingTop: 10,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            gap: 8,
+          }}
+        >
+          <span
+            style={{
+              fontSize: 11,
+              fontWeight: 700,
+              color: INK_MUTE,
+              lineHeight: 1.2,
+              flexShrink: 0,
+            }}
+          >
+            Hardest hole
+          </span>
+          <span
+            style={{
+              fontSize: 12,
+              fontWeight: 800,
+              color: INK,
+              fontVariantNumeric: 'tabular-nums',
+              lineHeight: 1.2,
+              overflow: 'hidden',
+              textOverflow: 'ellipsis',
+              whiteSpace: 'nowrap',
+            }}
+          >
+            #{course.hardest_hole_no ?? '–'} · Par {course.hardest_hole_par ?? '–'} ·{' '}
+            <span style={{ color: MAROON }}>
+              +{numFmt(course.hardest_avg_to_par, 1)}
+            </span>
+            {course.hardest_hole_si != null ? ` · SI ${course.hardest_hole_si}` : ''}
+          </span>
+        </div>
       </div>
     </button>
   );
