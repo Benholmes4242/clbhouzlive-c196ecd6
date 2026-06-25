@@ -7,11 +7,12 @@ interface RequestCourseSheetProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   prefillName?: string;
+  zIndexBase?: number;
 }
 
 type Status = 'form' | 'submitting' | 'success';
 
-export function RequestCourseSheet({ open, onOpenChange, prefillName }: RequestCourseSheetProps) {
+export function RequestCourseSheet({ open, onOpenChange, prefillName, zIndexBase = 10300 }: RequestCourseSheetProps) {
   const [status, setStatus] = useState<Status>('form');
   const [name, setName] = useState('');
   const [location, setLocation] = useState('');
@@ -67,7 +68,7 @@ export function RequestCourseSheet({ open, onOpenChange, prefillName }: RequestC
     'w-full h-11 px-3 rounded-[10px] border border-slate-200 bg-white text-[15px] text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-[#F7931E]/40 focus:border-[#F7931E]';
 
   return (
-    <BottomSheet open={open} onClose={close} ariaLabelledBy="request-course-title">
+    <BottomSheet open={open} onClose={close} ariaLabelledBy="request-course-title" zIndexBase={zIndexBase}>
       <div className="px-5 pt-2 pb-5">
         {status === 'success' ? (
           <div className="flex flex-col items-center text-center pt-6 pb-2">
