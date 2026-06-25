@@ -25,6 +25,7 @@ import type { ActiveActor } from '@/types/actor';
 import { useFullscreenFeedStore } from '@/store/fullscreenFeedStore';
 import { useClubhouseStore } from '@/store/clubhouseStore';
 import { prefetchTile } from '@/hooks/useTileVideoPlayer';
+import { getDocumentScrollParent } from '@/lib/getScrollParent';
 import { FeedCard } from './FeedCard';
 
 const CANVAS = '#15171F';
