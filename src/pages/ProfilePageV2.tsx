@@ -560,61 +560,6 @@ const ProfilePageV2Content: React.FC = () => {
           isSelf={isSelf}
           backFallback="/clubhouse"
           onSettingsClick={() => navigate('/settings')}
-          menuItems={
-            isSelf
-              ? [
-                  {
-                    icon: Share2,
-                    label: 'Share profile',
-                    onClick: () => {
-                      if (navigator.share) {
-                        navigator.share({ title: displayName, url: window.location.href }).catch(() => {});
-                      } else {
-                        navigator.clipboard.writeText(window.location.href);
-                        toast.success('Copied to clipboard');
-                      }
-                    },
-                  },
-                  {
-                    icon: Link2,
-                    label: 'Copy link',
-                    onClick: () => {
-                      navigator.clipboard.writeText(window.location.href);
-                      toast.success('Copied to clipboard');
-                    },
-                  },
-                  { kind: 'separator' },
-                  { icon: Pencil, label: 'Edit profile', onClick: () => navigate(editRoute) },
-                  { icon: Settings, label: 'Settings', onClick: () => navigate('/settings') },
-                ]
-              : [
-                  {
-                    icon: Share2,
-                    label: 'Share profile',
-                    onClick: () => {
-                      if (navigator.share) {
-                        navigator.share({ title: displayName, url: window.location.href }).catch(() => {});
-                      } else {
-                        navigator.clipboard.writeText(window.location.href);
-                        toast.success('Copied to clipboard');
-                      }
-                    },
-                  },
-                  {
-                    icon: Link2,
-                    label: 'Copy link',
-                    onClick: () => {
-                      navigator.clipboard.writeText(window.location.href);
-                      toast.success('Copied to clipboard');
-                    },
-                  },
-                  { kind: 'separator' },
-                  // TODO(ben): Report flow — wired to existing dialog
-                  { icon: Flag, label: 'Report', onClick: () => setShowReportDialog(true) },
-                  // TODO(ben): Block flow — wired to existing dialog
-                  { icon: Ban, label: 'Block', onClick: () => setShowBlockDialog(true), destructive: true },
-                ]
-          }
         />
 
         {/* Avatar - squircle, left-aligned */}

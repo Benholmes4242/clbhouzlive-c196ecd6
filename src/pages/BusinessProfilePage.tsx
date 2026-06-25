@@ -311,43 +311,6 @@ const BusinessProfilePage: React.FC = () => {
         <ProfileFloatingHeader
           isSelf={false}
           backFallback="/clubhouse"
-          menuItems={(() => {
-            const shareItem = {
-              icon: Share2,
-              label: 'Share profile',
-              onClick: () => {
-                if (navigator.share) {
-                  navigator.share({ title: business.name, url: window.location.href }).catch(() => {});
-                } else {
-                  navigator.clipboard.writeText(window.location.href);
-                  toast.success('Copied to clipboard');
-                }
-              },
-            } as const;
-            const copyItem = {
-              icon: Link2,
-              label: 'Copy link',
-              onClick: () => {
-                navigator.clipboard.writeText(window.location.href);
-                toast.success('Copied to clipboard');
-              },
-            } as const;
-            if (isOwner) {
-              return [
-                shareItem,
-                copyItem,
-                { kind: 'separator' as const },
-                { icon: Pencil, label: 'Edit business', onClick: () => navigate(`/business/${business.id}/edit`) },
-              ];
-            }
-            return [
-              shareItem,
-              copyItem,
-              { kind: 'separator' as const },
-              // TODO(ben): Report flow for businesses not yet wired
-              { icon: Flag, label: 'Report', onClick: () => toast.info('Report coming soon') },
-            ];
-          })()}
         />
 
         {/* Avatar (squircle) — owner: tap to upload; visitor: tap to lightbox */}
