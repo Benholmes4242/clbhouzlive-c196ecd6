@@ -66,6 +66,7 @@ const AMBER_SOFT = '#FEF3E7';
 const GOLD_DEEP = '#D97706';
 
 const MAX_REVIEW_LENGTH = 4000;
+const PAD_X = 'clamp(12px, 4vw, 16px)';
 
 const BREAKDOWNS: Array<{ key: keyof ReviewBreakdowns; label: string; desc: string }> = [
   { key: 'design', label: 'Course Design', desc: 'Layout, design and landscape' },
@@ -515,7 +516,7 @@ export function ReviewWizard({
               'flex flex-col',
               'overscroll-contain'
             )}
-            style={{ touchAction: 'pan-y', background: PAGE }}
+            style={{ touchAction: 'pan-y', background: PAGE, overflowX: 'hidden' }}
           >
             <div ref={overlayRootRef} className="contents" />
             <OverlayPortalProvider container={overlayRoot}>
@@ -545,10 +546,6 @@ export function ReviewWizard({
                   {/* Header */}
                   <div
                     style={{
-                      display: 'flex',
-                      alignItems: 'center',
-                      padding: '10px 16px',
-                      gap: 8,
                       background: PAGE,
                       borderBottom: `0.5px solid ${HAIR}`,
                       paddingTop: 'max(env(safe-area-inset-top, 0px), 14px)',
@@ -557,6 +554,7 @@ export function ReviewWizard({
                       zIndex: 5,
                     }}
                   >
+                    <div style={{ width: '100%', maxWidth: 480, marginInline: 'auto', display: 'flex', alignItems: 'center', padding: `10px ${PAD_X}`, gap: 8 }}>
                     <button
                       onClick={handleClose}
                       aria-label="Close"
@@ -628,16 +626,19 @@ export function ReviewWizard({
                         : (isEditMode ? 'Update' : 'Publish')}
                     </button>
                   </div>
+                  </div>
 
                   {/* Scroll body */}
                   <div
                     style={{
                       flex: 1,
                       overflowY: 'auto',
+                      overflowX: 'hidden',
                       WebkitOverflowScrolling: 'touch',
                       paddingBottom: `calc(${keyboardHeight}px + 64px + env(safe-area-inset-bottom, 0px) + 16px)`,
                     }}
                   >
+                    <div style={{ width: '100%', maxWidth: 480, marginInline: 'auto' }}>
                     {/* Course row */}
                     <button
                       onClick={() => !course && setShowCourseSearch(true)}
@@ -983,6 +984,7 @@ export function ReviewWizard({
                         )}
                       </div>
                     )}
+                    </div>
                   </div>
 
                   {/* Docked action bar */}
