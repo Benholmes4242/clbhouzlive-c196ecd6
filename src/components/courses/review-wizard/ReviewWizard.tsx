@@ -45,7 +45,7 @@ import {
 import { DiscardActionSheet } from './DiscardActionSheet';
 import { RemoveReviewActionSheet } from './RemoveReviewActionSheet';
 import { SuccessScreen } from './SuccessScreen';
-import { LuminousCellRating as TickScrubber, tierFor } from './LuminousCellRating';
+import { LuminousCellRating as TickScrubber } from './LuminousCellRating';
 import { useReviewWizard } from './useReviewWizard';
 import type {
   ReviewWizardProps,
