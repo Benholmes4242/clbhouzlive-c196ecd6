@@ -1,4 +1,5 @@
 import React, { useEffect } from 'react';
+import { lockBodyScroll, unlockBodyScroll } from '@/lib/bodyScrollLock';
 import SheetHeader from '@/components/ui/SheetHeader';
 import { fmtDiff } from '@/lib/whs/format';
 

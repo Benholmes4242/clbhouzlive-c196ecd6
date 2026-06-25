@@ -7,6 +7,7 @@ import { createPortal } from 'react-dom';
 import { motion, AnimatePresence, PanInfo } from 'framer-motion';
 import { X } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { lockBodyScroll, unlockBodyScroll } from '@/lib/bodyScrollLock';
 import { getAvatarFallbackColor } from '@/lib/avatarFallback';
 import { usePinchZoomPointer } from '@/hooks/usePinchZoomPointer';
 

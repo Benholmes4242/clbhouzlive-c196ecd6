@@ -2,6 +2,7 @@
 // Open/close contract (usePostStudioStore → GlobalPostComposer → PostComposer) is unchanged.
 
 import React, { useCallback, useEffect, useLayoutEffect, useMemo, useState } from 'react';
+import { lockBodyScroll, unlockBodyScroll } from '@/lib/bodyScrollLock';
 import { createPortal } from 'react-dom';
 import { AnimatePresence, motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
