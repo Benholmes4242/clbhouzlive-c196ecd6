@@ -20,6 +20,7 @@ import type { ActiveActor } from '@/types/actor';
 import { useFullscreenFeedStore } from '@/store/fullscreenFeedStore';
 import { useClubhouseStore } from '@/store/clubhouseStore';
 import { prefetchTile } from '@/hooks/useTileVideoPlayer';
+import { getDocumentScrollParent } from '@/lib/getScrollParent';
 import { LightFeedCard } from './LightFeedCard';
 
 const PAGE_BG = '#F8FAFC';
@@ -66,11 +67,16 @@ export const LightCardFeed: React.FC<LightCardFeedProps> = ({
   // ── Active-card tracking (ported from CardFeed) ──
   const [activeIdx, setActiveIdx] = useState(0);
   const [playingIdx, setPlayingIdx] = useState(0);
+  const [scrollParent, setScrollParent] = useState<HTMLElement | undefined>(undefined);
   const settleTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const SETTLE_MS = 150;
   const visibilityRef = useRef<Map<number, number>>(new Map());
   const observerRef = useRef<IntersectionObserver | null>(null);
   const cardEls = useRef<Map<number, HTMLElement>>(new Map());
+
+  useEffect(() => {
+    setScrollParent(getDocumentScrollParent());
+  }, []);
 
   useEffect(() => {
     if (settleTimer.current) clearTimeout(settleTimer.current);
@@ -292,16 +298,19 @@ export const LightCardFeed: React.FC<LightCardFeedProps> = ({
 
   return (
     <div style={{ width: '100%', background: PAGE_BG }} data-card-feed="light">
-      <Virtuoso
-        useWindowScroll
-        data={posts}
-        itemContent={itemContent}
-        computeItemKey={(_, post) => post.id}
-        endReached={handleEndReached}
-        increaseViewportBy={{ top: 400, bottom: 1200 }}
-        overscan={{ main: 600, reverse: 400 }}
-        components={components}
-      />
+      {scrollParent && (
+        <Virtuoso
+          customScrollParent={scrollParent}
+          data={posts}
+          itemContent={itemContent}
+          computeItemKey={(_, post) => post.id}
+          endReached={handleEndReached}
+          defaultItemHeight={600}
+          increaseViewportBy={{ top: 600, bottom: 1200 }}
+          overscan={{ main: 600, reverse: 600 }}
+          components={components}
+        />
+      )}
     </div>
   );
 };
