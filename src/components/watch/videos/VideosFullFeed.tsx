@@ -166,6 +166,7 @@ function VideosFullFeedInner({ userId, mood, searchQuery }: VideosFullFeedProps)
   if (useRhythm) {
     return (
       <div style={{ padding: '12px 0 24px', display: 'flex', flexDirection: 'column', gap: 16 }}>
+        {!searchQuery && <BucketListRail />}
         {segments.map((seg, sIdx) => {
           if (seg.kind === 'rail') {
             return <VideosTopRail key={`rail-${sIdx}`} userId={userId} />;
@@ -174,7 +175,6 @@ function VideosFullFeedInner({ userId, mood, searchQuery }: VideosFullFeedProps)
             return (
               <div key={`clips-${sIdx}`} style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
                 <VideosQuickClipsRail userId={userId} />
-                <BucketListRail />
               </div>
             );
           }
@@ -224,10 +224,13 @@ function VideosFullFeedInner({ userId, mood, searchQuery }: VideosFullFeedProps)
   }
 
   return (
-    <div style={{ padding: '12px 16px 24px', display: 'flex', flexDirection: 'column', gap: 13 }}>
-      {posts.map((post, i) => (
-        <CompactVideoRow key={post.id} post={post} index={i} allPosts={posts} />
-      ))}
+    <div style={{ padding: '12px 0 24px', display: 'flex', flexDirection: 'column', gap: 13 }}>
+      {!searchQuery && <BucketListRail />}
+      <div style={{ padding: '0 16px', display: 'flex', flexDirection: 'column', gap: 13 }}>
+        {posts.map((post, i) => (
+          <CompactVideoRow key={post.id} post={post} index={i} allPosts={posts} />
+        ))}
+      </div>
 
       <div ref={sentinelRef} style={{ height: 1 }} />
 
