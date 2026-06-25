@@ -607,7 +607,7 @@ const LightFeedCardImpl: React.FC<LightFeedCardProps> = ({
           borderTop: `0.5px solid ${LINE}`,
         }}
       >
-        <FeedActorPicker value={actingAs} onChange={handleActorChange} theme="light" />
+        <FeedActorPicker value={activeActor} onChange={(a) => setActiveActor(a)} theme="light" />
         <FooterButton
           icon={Heart}
           label={formatCount(likeCount)}
