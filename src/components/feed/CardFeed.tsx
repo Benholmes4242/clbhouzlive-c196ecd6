@@ -25,6 +25,7 @@ import type { ActiveActor } from '@/types/actor';
 import { useFullscreenFeedStore } from '@/store/fullscreenFeedStore';
 import { useClubhouseStore } from '@/store/clubhouseStore';
 import { prefetchTile } from '@/hooks/useTileVideoPlayer';
+import { getDocumentScrollParent } from '@/lib/getScrollParent';
 import { FeedCard } from './FeedCard';
 
 const CANVAS = '#15171F';
@@ -76,6 +77,14 @@ export const CardFeed: React.FC<CardFeedProps> = ({
 }) => {
 
   const virtuosoRef = useRef<VirtuosoHandle | null>(null);
+
+  // Resolve the real document scroller once mounted. Only needed for the
+  // window-scroll branch; harmless otherwise.
+  const [scrollParent, setScrollParent] = useState<HTMLElement | undefined>(undefined);
+  useEffect(() => {
+    if (useWindowScroll) setScrollParent(getDocumentScrollParent());
+  }, [useWindowScroll]);
+
 
   // Explore tab retap → scroll Clubhouse feed to top
   useEffect(() => {
@@ -347,21 +356,25 @@ export const CardFeed: React.FC<CardFeedProps> = ({
   if (useWindowScroll) {
     return (
       <div style={{ width: '100%', background: CANVAS }} data-card-feed>
-        <Virtuoso
-          ref={virtuosoRef}
-          useWindowScroll
-          data={posts}
-          itemContent={itemContent}
-          computeItemKey={(_, post) => post.id}
-          rangeChanged={handleRangeChanged}
-          endReached={handleEndReached}
-          increaseViewportBy={{ top: 400, bottom: 800 }}
-          overscan={{ main: 400, reverse: 400 }}
-          components={components}
-        />
+        {scrollParent && (
+          <Virtuoso
+            ref={virtuosoRef}
+            customScrollParent={scrollParent}
+            data={posts}
+            itemContent={itemContent}
+            computeItemKey={(_, post) => post.id}
+            rangeChanged={handleRangeChanged}
+            endReached={handleEndReached}
+            defaultItemHeight={600}
+            increaseViewportBy={{ top: 600, bottom: 1200 }}
+            overscan={{ main: 600, reverse: 600 }}
+            components={components}
+          />
+        )}
       </div>
     );
   }
+
 
   return (
     <div
