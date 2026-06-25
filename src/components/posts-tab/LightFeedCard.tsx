@@ -358,12 +358,6 @@ const LightFeedCardImpl: React.FC<LightFeedCardProps> = ({
         </div>
 
         <div style={{ display: 'flex', alignItems: 'center', gap: 6, flexShrink: 0 }}>
-          {mountFollowPill && (
-            <FeedFollowPill
-              isFollowed={!!post.isFollowedByMe}
-              onFollow={() => onFollow!(post)}
-            />
-          )}
           {isDeal && (
             <span
               style={{

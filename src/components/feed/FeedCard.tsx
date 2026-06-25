@@ -376,12 +376,6 @@ const FeedCardImpl: React.FC<FeedCardProps> = ({
 
         {/* Right chips */}
         <div style={{ display: 'flex', alignItems: 'center', gap: 6, flexShrink: 0 }}>
-          {mountFollowPill && (
-            <FeedFollowPill
-              isFollowed={!!post.isFollowedByMe}
-              onFollow={() => onFollow!(post)}
-            />
-          )}
           {isDeal && (
             <span
               style={{
