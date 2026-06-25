@@ -290,13 +290,12 @@ export function ReviewWizard({
   const handleViewReview = useCallback(() => {
     if (wizard.submittedRatingId && activeCourse) {
       wizard.cleanup();
-      onClose();
       navigate(
         `/courses/${activeCourse.id}?tab=reviews&review=${wizard.submittedRatingId}`,
         { replace: true }
       );
     }
-  }, [wizard, activeCourse, onClose, navigate]);
+  }, [wizard, activeCourse, navigate]);
 
   const handleDone = useCallback(() => {
     wizard.cleanup();
