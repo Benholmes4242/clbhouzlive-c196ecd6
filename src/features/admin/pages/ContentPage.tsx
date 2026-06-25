@@ -26,35 +26,44 @@ import AdminSheet from '../components/AdminSheet';
 import AdminAccessDenied from '../components/AdminAccessDenied';
 import { VALID_CONTINENTS, COURSE_TYPES } from '../constants';
 import { useCourses, createCourse, type AdminCourseRow } from '../hooks/useCourses';
+import { useCourseRequests } from '../hooks/useCourseRequests';
+import CourseRequestsTab from '../components/CourseRequestsTab';
 
-type TabId = 'courses' | 'tour' | 'players';
+type TabId = 'courses' | 'course-requests' | 'tour' | 'players';
 
 export default function ContentPage() {
   const { role } = usePanelRole();
   const can = panelCan(role);
   const [params, setParams] = useSearchParams();
   const requested = (params.get('tab') as TabId) || 'courses';
+  const allowedForLimited: TabId[] = ['courses', 'course-requests'];
   // Hide tour tabs from limited admins
-  const tab: TabId = !can.manageAdmins && requested !== 'courses' ? 'courses' : requested;
+  const tab: TabId = !can.manageAdmins && !allowedForLimited.includes(requested) ? 'courses' : requested;
   const setTab = (id: string) => {
     const next = new URLSearchParams(params);
     next.set('tab', id);
     setParams(next, { replace: true });
   };
 
+  const { pendingCount } = useCourseRequests();
+
   const tabs = useMemo(() => {
-    const base: { id: TabId; label: string }[] = [{ id: 'courses', label: 'Courses' }];
+    const base: { id: TabId; label: string; count?: number }[] = [
+      { id: 'courses', label: 'Courses' },
+      { id: 'course-requests', label: 'Course requests', count: pendingCount > 0 ? pendingCount : undefined },
+    ];
     if (can.manageAdmins) {
       base.push({ id: 'tour', label: 'Tour Data' });
       base.push({ id: 'players', label: 'Tour Players' });
     }
     return base;
-  }, [can.manageAdmins]);
+  }, [can.manageAdmins, pendingCount]);
 
   return (
     <div style={{ padding: 16, display: 'flex', flexDirection: 'column', gap: 16, maxWidth: 1180, margin: '0 auto' }}>
       <SectionTabs tabs={tabs} activeId={tab} onChange={setTab} />
       {tab === 'courses' && <CoursesTab />}
+      {tab === 'course-requests' && <CourseRequestsTab />}
       {tab === 'tour' && (can.manageAdmins ? <TourDataTab /> : <AdminAccessDenied />)}
       {tab === 'players' && (can.manageAdmins ? <TourPlayersTab /> : <AdminAccessDenied />)}
     </div>
