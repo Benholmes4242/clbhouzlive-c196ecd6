@@ -56,6 +56,11 @@ export default function UnifiedWatchFeed({ embedded = false }: UnifiedWatchFeedP
       {/* ── Quick clips — portrait shelf ── */}
       <TrendingThisWeek />
 
+      {/* ── From your bucket list — want-to-play anchored rail ── */}
+      <BucketListRail />
+
+
+
       {/* ── Latest videos — full-width YouTube-style stack ── */}
       <LatestVideosRail />
 
