@@ -3760,6 +3760,27 @@ export type Database = {
           },
         ]
       }
+      discover_rail_cache: {
+        Row: {
+          computed_at: string
+          item_count: number
+          payload: Json
+          rail_key: string
+        }
+        Insert: {
+          computed_at?: string
+          item_count?: number
+          payload: Json
+          rail_key: string
+        }
+        Update: {
+          computed_at?: string
+          item_count?: number
+          payload?: Json
+          rail_key?: string
+        }
+        Relationships: []
+      }
       division_config: {
         Row: {
           created_at: string | null
