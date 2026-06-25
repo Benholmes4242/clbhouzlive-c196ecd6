@@ -48,7 +48,12 @@ export interface CardFeedProps {
   bottomPadding?: number;
   onFollow?: (post: FeedPost) => void;
   currentUserId?: string;
+  onRefresh?: () => void | Promise<void>;
+  isRefreshing?: boolean;
 }
+
+const PTR_THRESHOLD = 64;
+const PTR_MAX_PULL = 96;
 
 export const CardFeed: React.FC<CardFeedProps> = ({
   posts,
@@ -66,6 +71,8 @@ export const CardFeed: React.FC<CardFeedProps> = ({
   bottomPadding = 96,
   onFollow,
   currentUserId,
+  onRefresh,
+  isRefreshing = false,
 }) => {
 
   const virtuosoRef = useRef<VirtuosoHandle | null>(null);
