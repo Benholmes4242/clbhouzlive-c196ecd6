@@ -1024,6 +1024,7 @@ export function ReviewWizard({
                         {hasMedia ? 'Add more' : 'Add photo / video'}
                       </button>
                     )}
+                    </div>
                   </div>
 
                   {/* Media editor overlay */}
