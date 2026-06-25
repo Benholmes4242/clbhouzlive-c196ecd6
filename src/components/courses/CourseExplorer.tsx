@@ -603,27 +603,19 @@ const CourseExplorer = () => {
       ) : (isError && allCourses.length === 0) ? (
         <ErrorState onRetry={() => refetch()} />
       ) : allCourses.length === 0 ? (
-        <div className="flex flex-col items-center justify-center py-16 text-center gap-3 animate-in fade-in duration-300">
-          <div className="w-12 h-12 mx-auto mb-3 rounded-full bg-muted flex items-center justify-center">
-            <Search className="w-5 h-5 text-muted-foreground" />
-          </div>
-          <h3 className="text-sm font-semibold">No courses found</h3>
-          <p className="text-sm text-muted-foreground max-w-xs">
-            Try a different search or broaden your filters.
-          </p>
+        <div className="flex flex-col items-center justify-center py-10 text-center gap-3 animate-in fade-in duration-300">
+          <RequestCourseCTA variant="hero" prefillName={debouncedSearch || searchTerm} />
           {hasActiveFilters && (
             <button
               onClick={handleResetFilters}
-              className="mt-2 inline-flex items-center gap-1.5 px-4 py-2 rounded-xl text-sm font-medium active:scale-[0.98] transition-transform"
+              className="mt-1 inline-flex items-center gap-1.5 px-4 py-2 rounded-xl text-sm font-medium active:scale-[0.98] transition-transform"
               style={{ background: SURFACE, border: `1px solid ${HAIRLINE_INK_10}`, color: INK }}
             >
               Reset filters
             </button>
           )}
-          <div className="mt-3">
-            <RequestCourseCTA variant="button" prefillName={debouncedSearch || searchTerm} />
-          </div>
         </div>
+
       ) : (
         <>
           <VirtualizedCourseList 

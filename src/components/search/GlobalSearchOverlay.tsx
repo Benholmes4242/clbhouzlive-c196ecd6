@@ -693,13 +693,23 @@ function GlobalSearchOverlay({ isOpen, onClose }: GlobalSearchOverlayProps) {
                           </div>
                         </div>
                       ))}
-                      {hasQuery && (
+                      {hasQuery && clubs.length === 0 && (
+                        <div className="px-4 py-3">
+                          <RequestCourseCTA
+                            variant="hero"
+                            prefillName={debouncedQuery}
+                            onBeforeOpen={handleClose}
+                          />
+                        </div>
+                      )}
+                      {hasQuery && clubs.length > 0 && (
                         <RequestCourseCTA
                           variant="row"
                           prefillName={debouncedQuery}
                           onBeforeOpen={handleClose}
                         />
                       )}
+
                     </div>
                   )}
 
