@@ -289,11 +289,11 @@ const LightFeedCardImpl: React.FC<LightFeedCardProps> = ({
       {/* Ghost numeral — drop alpha ~30% for contrast on light bg */}
       {reviewRating != null && (() => {
         const GHOST = {
-          EXCEPTIONAL: 'rgba(247,147,30,0.20)',
-          EXCELLENT:   'rgba(247,147,30,0.18)',
-          GOOD:        'rgba(247,147,30,0.15)',
-          FAIR:        'rgba(100,116,139,0.18)',
-          POOR:        'rgba(100,116,139,0.15)',
+          EXCEPTIONAL: 'rgba(240,165,0,0.20)',    // #F0A500 gold
+          EXCELLENT:   'rgba(217,119,6,0.18)',    // #D97706 amber
+          GOOD:        'rgba(217,119,6,0.15)',    // #D97706 amber
+          FAIR:        'rgba(100,116,139,0.18)',  // #64748B slate
+          POOR:        'rgba(100,116,139,0.15)',  // #64748B slate
         } as const;
         const tierKey = getRatingTier(reviewRating);
         return (
