@@ -5,7 +5,6 @@ import { cn } from '@/lib/utils';
 import type { MediaCounts } from './hooks/useCourseMedia';
 import type { CourseMediaFilter } from './hooks/useCourseMedia';
 import { INK, INK_FAINT, INK_MUTE, INK_TINT_05 } from '@/features/courses/_shared/tokens';
-import { SectionLabel } from '@/components/courses/course-detail/SectionLabel';
 
 
 interface CourseMediaHeaderProps {
@@ -31,7 +30,6 @@ export const CourseMediaHeader: React.FC<CourseMediaHeaderProps> = ({
 
   return (
     <div style={{ padding: '14px 0 10px', display: 'flex', flexDirection: 'column', gap: 10 }}>
-      <SectionLabel text="Gallery" icon={Camera} />
       {/* Count row + Add media */}
       {(mediaCounts.photos > 0 || mediaCounts.videos > 0) && (
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '0 16px' }}>

@@ -4,7 +4,7 @@
  */
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import { MapPin, Trophy, X } from 'lucide-react';
+import { MapPin, Trophy, ListChecks, X } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useUserWantToPlay, WantToPlayCourse } from '@/hooks/useUserWantToPlay';
 import { formatDistanceToNow } from 'date-fns';
@@ -55,11 +55,11 @@ export const WantToPlaySection: React.FC<WantToPlaySectionProps> = ({
   }
 
   return (
-    <section className={cn('-mx-2.5', className)}>
+    <section className={cn(className)}>
       {/* Eyebrow */}
       <div className="flex items-center justify-between mb-3 px-4">
         <div className="flex items-center gap-1.5">
-          <Trophy size={11} strokeWidth={2.4} color="#F7931E" />
+          <ListChecks size={11} strokeWidth={2.4} color="#F7931E" />
           <span style={{ fontSize: 10.5, fontWeight: 800, color: '#F7931E', letterSpacing: '0.14em', textTransform: 'uppercase' as const }}>
             On Your List
           </span>
