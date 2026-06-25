@@ -65,6 +65,7 @@ import { RateCoursePageSkeleton } from '@/components/skeletons/RateCoursePageSke
 import { initRecentMediaListener } from '@/hooks/usePostSubmission/recentMediaListener';
 import { longPressHandler } from '@/utils/longPressHandler';
 import AppShell from '@/components/AppShell';
+import { forceUnlockBodyScroll } from '@/lib/bodyScrollLock';
 import { ReviewIslandLoader } from '@/ReviewIslandLoader';
 import { supabase } from '@/integrations/supabase/client';
 import { migrateChatHistory } from '@/utils/chatHistoryMigration';
@@ -318,6 +319,10 @@ function AppRoutes() {
   // Individual page hooks then opt-in to their own color (e.g. PageRoot → #F8FAFC).
   // This prevents stale shield colors when navigating back to immersive/KeepAlive pages.
   useLayoutEffect(() => {
+    // Safety net: release any stranded body scroll-lock from an overlay that
+    // didn't unmount cleanly before route change. Prevents a stuck `position:
+    // fixed` body from freezing the next page.
+    forceUnlockBodyScroll();
     // Reset shield
     const shield = document.getElementById('safe-area-shield');
     if (shield) shield.style.backgroundColor = 'transparent';

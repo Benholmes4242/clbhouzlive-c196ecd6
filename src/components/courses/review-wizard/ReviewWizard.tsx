@@ -17,6 +17,7 @@ import React, {
   useMemo,
 } from 'react';
 import { createPortal } from 'react-dom';
+import { lockBodyScroll, unlockBodyScroll } from '@/lib/bodyScrollLock';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, ChevronDown, ImagePlus, Mic, Square, RotateCw, Trash2 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
@@ -108,23 +109,11 @@ export function ReviewWizard({
     else setOverlayRoot(null);
   }, [isOpen]);
 
-  // Scroll lock
+  // Scroll lock — shared, reference-counted util
   useLayoutEffect(() => {
     if (!isOpen) return;
-    const scrollY = window.scrollY;
-    document.body.style.position = 'fixed';
-    document.body.style.top = `-${scrollY}px`;
-    document.body.style.left = '0';
-    document.body.style.right = '0';
-    document.body.style.overflow = 'hidden';
-    return () => {
-      document.body.style.position = '';
-      document.body.style.top = '';
-      document.body.style.left = '';
-      document.body.style.right = '';
-      document.body.style.overflow = '';
-      window.scrollTo(0, scrollY);
-    };
+    lockBodyScroll();
+    return () => unlockBodyScroll();
   }, [isOpen]);
 
   useEffect(() => {

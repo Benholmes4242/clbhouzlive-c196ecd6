@@ -2,6 +2,7 @@
 // Open/close contract (usePostStudioStore → GlobalPostComposer → PostComposer) is unchanged.
 
 import React, { useCallback, useEffect, useLayoutEffect, useMemo, useState } from 'react';
+import { lockBodyScroll, unlockBodyScroll } from '@/lib/bodyScrollLock';
 import { createPortal } from 'react-dom';
 import { AnimatePresence, motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
@@ -71,23 +72,11 @@ export function PostComposer({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [open]);
 
-  // Body scroll lock
+  // Body scroll lock — shared, reference-counted util
   useLayoutEffect(() => {
     if (!open) return;
-    const scrollY = window.scrollY;
-    document.body.style.position = 'fixed';
-    document.body.style.top = `-${scrollY}px`;
-    document.body.style.left = '0';
-    document.body.style.right = '0';
-    document.body.style.overflow = 'hidden';
-    return () => {
-      document.body.style.position = '';
-      document.body.style.top = '';
-      document.body.style.left = '';
-      document.body.style.right = '';
-      document.body.style.overflow = '';
-      window.scrollTo(0, scrollY);
-    };
+    lockBodyScroll();
+    return () => unlockBodyScroll();
   }, [open]);
 
   const handleReviewPick = useCallback(

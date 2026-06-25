@@ -150,6 +150,15 @@ export const LightCardFeed: React.FC<LightCardFeedProps> = ({
     };
 
     dump('mount');
+    console.log('[BodyLock]', {
+      bodyPosition: getComputedStyle(document.body).position,
+      bodyOverflow: getComputedStyle(document.body).overflow,
+      bodyTop: document.body.style.top,
+      bodyInlinePosition: document.body.style.position,
+      bodyClasses: document.body.className,
+      htmlClasses: document.documentElement.className,
+      htmlOverflow: getComputedStyle(document.documentElement).overflow,
+    });
     const onScroll = () => dump('window-scroll-event');
     window.addEventListener('scroll', onScroll, { passive: true, capture: true });
 
