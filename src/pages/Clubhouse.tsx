@@ -630,7 +630,7 @@ const ClubhouseContent = () => {
             }
             onCommentPosted={() => handleCommentPosted(activePost)}
             onCommentDeleted={() => activePost && handleCommentDeleted(activePost.id, activePost.commentCount)}
-            actorOverride={commentActorOverride}
+          />
           />
           <MoreOptionsDrawer
             open={moreOptionsOpen}
