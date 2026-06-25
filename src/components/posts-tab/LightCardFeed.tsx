@@ -298,16 +298,19 @@ export const LightCardFeed: React.FC<LightCardFeedProps> = ({
 
   return (
     <div style={{ width: '100%', background: PAGE_BG }} data-card-feed="light">
-      <Virtuoso
-        useWindowScroll
-        data={posts}
-        itemContent={itemContent}
-        computeItemKey={(_, post) => post.id}
-        endReached={handleEndReached}
-        increaseViewportBy={{ top: 400, bottom: 1200 }}
-        overscan={{ main: 600, reverse: 400 }}
-        components={components}
-      />
+      {scrollParent && (
+        <Virtuoso
+          customScrollParent={scrollParent}
+          data={posts}
+          itemContent={itemContent}
+          computeItemKey={(_, post) => post.id}
+          endReached={handleEndReached}
+          defaultItemHeight={600}
+          increaseViewportBy={{ top: 600, bottom: 1200 }}
+          overscan={{ main: 600, reverse: 600 }}
+          components={components}
+        />
+      )}
     </div>
   );
 };
