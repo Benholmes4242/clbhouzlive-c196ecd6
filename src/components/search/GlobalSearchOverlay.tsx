@@ -1,4 +1,5 @@
 import { memo, useRef, useState, useEffect, useCallback } from 'react';
+import { RequestCourseCTA } from '@/components/courses/RequestCourseCTA';
 import { createPortal } from 'react-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Search, X, Clock, BadgeCheck, Briefcase, Star, Lock, MessageCircle, Loader2, ChevronRight } from 'lucide-react';
@@ -800,6 +801,9 @@ function GlobalSearchOverlay({ isOpen, onClose }: GlobalSearchOverlayProps) {
                     <p className="text-[12px] text-center max-w-[280px]" style={{ color: INK_SUBTLE }}>
                       Try a different spelling, or search for a nearby course
                     </p>
+                    <div className="mt-2">
+                      <RequestCourseCTA variant="row" prefillName={debouncedQuery} />
+                    </div>
                   </div>
                 </motion.div>
               ) : null}

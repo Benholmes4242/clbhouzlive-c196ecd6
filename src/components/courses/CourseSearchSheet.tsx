@@ -1,4 +1,5 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react';
+import { RequestCourseCTA } from '@/components/courses/RequestCourseCTA';
 import { createPortal } from 'react-dom';
 import { X, MapPin, Search, Check } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -316,6 +317,11 @@ export function CourseSearchSheet({
                     <p style={{ fontSize: '13px', fontWeight: 400, color: '#AEAEB2', marginTop: '4px' }}>
                       {query ? "Try a different search term" : "Start typing to find courses"}
                     </p>
+                    {query ? (
+                      <div className="mt-4 flex justify-center">
+                        <RequestCourseCTA variant="button" prefillName={query} />
+                      </div>
+                    ) : null}
                   </div>
                 )}
               </div>
