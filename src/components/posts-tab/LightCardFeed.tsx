@@ -149,8 +149,10 @@ export const LightCardFeed: React.FC<LightCardFeedProps> = ({
       htmlClasses: document.documentElement.className,
       htmlOverflow: getComputedStyle(document.documentElement).overflow,
     });
-    const onScroll = () => dump('window-scroll-event');
-    window.addEventListener('scroll', onScroll, { passive: true, capture: true });
+    const scroller: HTMLElement | Window = document.getElementById('root') ?? window;
+    const onScroll = () => dump('root-scroll-event');
+    scroller.addEventListener('scroll', onScroll, { passive: true, capture: true } as any);
+
 
     // also probe the app-shell + page-root directly for scrollTop movement
     let ticks = 0;
