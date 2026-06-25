@@ -19,7 +19,7 @@ export function useExploreFeed({ userId, region, searchQuery, enabled: externalE
   const { activeActor } = useActiveActor();
 
   const query = useInfiniteQuery({
-    queryKey: ['explore-feed', region ?? null, searchQuery ?? null, userId],
+    queryKey: ['explore-feed', region ?? null, searchQuery ?? null, userId, activeActor?.type, activeActor?.id],
     queryFn: async ({ pageParam }) => {
       if (!userId) return { posts: [] as FeedPost[], nextCursor: undefined as string | undefined };
 
