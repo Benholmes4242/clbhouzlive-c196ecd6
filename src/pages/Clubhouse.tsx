@@ -583,6 +583,8 @@ const ClubhouseContent = () => {
             getCommentCount={(post) => getCommentCount(post)}
             onFollow={handleFollow}
             currentUserId={user?.id}
+            onRefresh={handleRefresh}
+            isRefreshing={activeFeed.isRefetching}
           />
         </>
       ) : (
