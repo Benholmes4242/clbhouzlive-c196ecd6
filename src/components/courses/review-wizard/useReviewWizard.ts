@@ -979,18 +979,9 @@ export function useReviewWizard({
       void queryClient.refetchQueries({ queryKey: ['user-course-moments'], exact: false });
 
       if (currentUserId && course?.id) {
-        void queryClient.refetchQueries({ queryKey: ['user-course-activity', currentUserId], exact: true }).then(() => {
-          const activityCache = queryClient.getQueryData<any[]>(['user-course-activity', currentUserId]) || [];
-          console.log('[ReviewWizard] post-delete user-course-activity contains deleted course:', {
-            reviewId: deleteResult.reviewId,
-            deletedCourseId: course.id,
-            deletedRatingRows: deleteResult.deletedRatings.length,
-            containsDeletedCourse: activityCache.some((row: any) => row?.course_id === course.id),
-            matchingRows: activityCache.filter((row: any) => row?.course_id === course.id),
-            activityCount: activityCache.length,
-          });
-        });
+        void queryClient.refetchQueries({ queryKey: ['user-course-activity', currentUserId], exact: true });
       }
+
 
       // Clear exclusion for this course on delete
       if (currentUserId && course?.id) {
