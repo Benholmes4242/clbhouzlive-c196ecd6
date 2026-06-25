@@ -276,11 +276,21 @@ export const InlineVideo: React.FC<Props> = ({
         }}
       />
       {isActive && (
-        <button
+        <div
+          role="button"
+          tabIndex={0}
           onClick={(e) => {
             e.stopPropagation();
             if (isMuted) markUserGestureUnmute();
             toggleMute();
+          }}
+          onKeyDown={(e) => {
+            if (e.key === 'Enter' || e.key === ' ') {
+              e.preventDefault();
+              e.stopPropagation();
+              if (isMuted) markUserGestureUnmute();
+              toggleMute();
+            }
           }}
           aria-label={isMuted ? 'Unmute video' : 'Mute video'}
           style={{
@@ -303,7 +313,7 @@ export const InlineVideo: React.FC<Props> = ({
           }}
         >
           {isMuted ? <VolumeX size={18} /> : <Volume2 size={18} />}
-        </button>
+        </div>
       )}
     </div>
   );
