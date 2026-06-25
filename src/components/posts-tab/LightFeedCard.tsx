@@ -346,7 +346,15 @@ const LightFeedCardImpl: React.FC<LightFeedCardProps> = ({
           >
             {post.displayName}
           </button>
-          <div style={{ fontSize: 11, color: T60, marginTop: 1 }}>{subLine}</div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginTop: 1 }}>
+            <span style={{ fontSize: 11, color: T60 }}>{subLine}</span>
+            {mountFollowPill && (
+              <FeedFollowPill
+                isFollowed={!!post.isFollowedByMe}
+                onFollow={() => onFollow!(post)}
+              />
+            )}
+          </div>
         </div>
 
         <div style={{ display: 'flex', alignItems: 'center', gap: 6, flexShrink: 0 }}>
