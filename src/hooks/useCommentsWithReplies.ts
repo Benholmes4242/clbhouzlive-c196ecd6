@@ -173,7 +173,7 @@ export function useCommentsWithReplies(
     isFetchingNextPage,
     refetch,
   } = useInfiniteQuery<PageData>({
-    queryKey: ['post-comments-with-replies', postId],
+    queryKey: ['post-comments-with-replies', postId, actorType, actorId],
     enabled: !!postId,
     staleTime: 30_000,
     initialPageParam: null as string | null,
