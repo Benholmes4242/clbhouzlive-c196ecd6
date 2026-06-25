@@ -13707,6 +13707,7 @@ export type Database = {
           handicap_page_visibility: string
           handicap_sync_interest: boolean | null
           handicap_sync_interest_at: string | null
+          handicap_visibility: string
           has_completed_onboarding: boolean | null
           has_profile_video: boolean | null
           has_seen_creator_welcome: boolean | null
@@ -13733,6 +13734,7 @@ export type Database = {
           last_rating_at: string | null
           last_seen_post_id: string | null
           last_today_view_at: string | null
+          leaderboard_visibility: string
           location: string | null
           logo_url: string | null
           manual_handicap_index: number | null
@@ -13830,6 +13832,7 @@ export type Database = {
           handicap_page_visibility?: string
           handicap_sync_interest?: boolean | null
           handicap_sync_interest_at?: string | null
+          handicap_visibility?: string
           has_completed_onboarding?: boolean | null
           has_profile_video?: boolean | null
           has_seen_creator_welcome?: boolean | null
@@ -13856,6 +13859,7 @@ export type Database = {
           last_rating_at?: string | null
           last_seen_post_id?: string | null
           last_today_view_at?: string | null
+          leaderboard_visibility?: string
           location?: string | null
           logo_url?: string | null
           manual_handicap_index?: number | null
@@ -13953,6 +13957,7 @@ export type Database = {
           handicap_page_visibility?: string
           handicap_sync_interest?: boolean | null
           handicap_sync_interest_at?: string | null
+          handicap_visibility?: string
           has_completed_onboarding?: boolean | null
           has_profile_video?: boolean | null
           has_seen_creator_welcome?: boolean | null
@@ -13979,6 +13984,7 @@ export type Database = {
           last_rating_at?: string | null
           last_seen_post_id?: string | null
           last_today_view_at?: string | null
+          leaderboard_visibility?: string
           location?: string | null
           logo_url?: string | null
           manual_handicap_index?: number | null
@@ -19054,6 +19060,7 @@ export type Database = {
           p_actor_id: string
           p_actor_type: string
           p_cursor?: string
+          p_cursor_id?: string
           p_page_size?: number
           p_seen_post_ids?: string[]
           p_user_id: string
