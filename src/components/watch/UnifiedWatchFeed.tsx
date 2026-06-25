@@ -61,6 +61,9 @@ export default function UnifiedWatchFeed({ embedded = false }: UnifiedWatchFeedP
       {/* ── From your courses — single course-anchored rail ── */}
       <CourseAnchoredRail />
 
+      {/* ── From your bucket list — course-anchored rail, mood-independent ── */}
+      <BucketListRail />
+
 
       {/* ── Section 3: Watch grid ──
           Phase 5g: explicit 24px paddingBottom guarantees clearance from
