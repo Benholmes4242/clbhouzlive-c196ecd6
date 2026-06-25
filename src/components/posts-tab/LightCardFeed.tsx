@@ -98,6 +98,15 @@ export const LightCardFeed: React.FC<LightCardFeedProps> = ({
   }, []);
 
   useEffect(() => {
+    console.log('[LightFeed] posts received:', {
+      count: posts.length,
+      firstId: posts[0]?.id,
+      lastId: posts[posts.length - 1]?.id,
+      hasNextPage,
+    });
+  }, [posts, hasNextPage]);
+
+  useEffect(() => {
     if (settleTimer.current) clearTimeout(settleTimer.current);
     settleTimer.current = setTimeout(() => {
       setPlayingIdx(activeIdx);
