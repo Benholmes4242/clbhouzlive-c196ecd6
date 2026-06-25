@@ -815,7 +815,7 @@ export function ReviewWizard({
                     <div style={{ height: 0.5, background: HAIR, margin: '8px 16px 0' }} />
 
                     {/* Verdict */}
-                    <div style={{ padding: '14px 16px 4px' }}>
+                    <div style={{ padding: `14px ${PAD_X} 4px` }}>
                       <span
                         style={{
                           fontSize: 10.5,
