@@ -110,7 +110,7 @@ function CommentsSheet({
 }: CommentsSheetProps) {
   const navigate = useNavigate();
   const { user } = useSupabaseSession();
-  const { activeActor } = useActiveActor();
+  const { activeActor, availableActors } = useActiveActor();
   const currentUserId = currentUserIdProp ?? user?.id ?? null;
 
   // ── Hook — use editorial comments hook when editorialCardId is provided ──
