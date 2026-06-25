@@ -9,6 +9,7 @@ import { useVideosFollowingRail } from './hooks/useVideosFollowingRail';
 import { VideosFollowingRail } from './VideosFollowingRail';
 import { VideosSuggestedCreatorsRail } from './VideosSuggestedCreatorsRail';
 import { VideosQuickClipsRail } from './VideosQuickClipsRail';
+import { BucketListRail } from '../proshop/BucketListRail';
 import type { FeedPost } from '@/components/media-system/types/media';
 
 interface VideosFullFeedProps {
@@ -170,7 +171,12 @@ function VideosFullFeedInner({ userId, mood, searchQuery }: VideosFullFeedProps)
             return <VideosTopRail key={`rail-${sIdx}`} userId={userId} />;
           }
           if (seg.kind === 'clips') {
-            return <VideosQuickClipsRail key={`clips-${sIdx}`} userId={userId} />;
+            return (
+              <div key={`clips-${sIdx}`} style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+                <VideosQuickClipsRail userId={userId} />
+                <BucketListRail />
+              </div>
+            );
           }
           if (seg.kind === 'large') {
             return (
