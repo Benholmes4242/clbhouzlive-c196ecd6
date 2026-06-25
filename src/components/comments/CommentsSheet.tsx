@@ -105,22 +105,17 @@ function CommentsSheet({
   editorialCardId,
   onCommentPosted,
   onCommentDeleted,
-  actorOverride,
 }: CommentsSheetProps) {
   const navigate = useNavigate();
   const { user } = useSupabaseSession();
-  const { activeActor, availableActors } = useActiveActor();
+  const { activeActor } = useActiveActor();
   const currentUserId = currentUserIdProp ?? user?.id ?? null;
 
-  const effectiveActor = useMemo(() => {
-    if (actorOverride) {
-      return availableActors.find(a => a.id === actorOverride.id && a.type === actorOverride.type) ?? activeActor;
-    }
-    return activeActor;
-  }, [actorOverride, availableActors, activeActor]);
+  // Actor selection is GLOBAL — the composer and like writes always use activeActor.
+  const effectiveActor = activeActor;
 
   // ── Hook — use editorial comments hook when editorialCardId is provided ──
-  const standardHook = useCommentsWithReplies(editorialCardId ? '' : postId, onCommentDeleted, actorOverride);
+  const standardHook = useCommentsWithReplies(editorialCardId ? '' : postId, onCommentDeleted);
   const editorialHook = useEditorialComments(editorialCardId ?? '', onCommentDeleted);
   const activeHook = editorialCardId ? editorialHook : standardHook;
 
