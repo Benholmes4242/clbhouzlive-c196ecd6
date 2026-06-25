@@ -4,6 +4,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { mapRowToFeedPost, groupMultiMedia } from '@/components/media-system/utils/feedMapper';
 import { enforceCreatorDiversity, enforceCourseDiversity } from '@/components/media-system/utils/feedAlgorithm';
 import { useWatchPersonalSignals, computePersonalBoost } from './useWatchPersonalSignals';
+import { useActiveActor } from '@/context/ActiveActorContext';
 import type { FeedPost, FeedRpcRow } from '@/components/media-system/types/media';
 import type { WatchFilter } from '../types';
 import type { WatchMoodId } from '../proshop/hooks/useWatchMood';
