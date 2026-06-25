@@ -1,5 +1,5 @@
 import { useInfiniteQuery, keepPreviousData } from '@tanstack/react-query';
-import { useCallback, useMemo, useRef } from 'react';
+import { useCallback, useEffect, useMemo, useRef } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useActiveActor } from '@/context/ActiveActorContext';
 import { mapRowToFeedPost, groupMultiMedia } from '@/components/media-system/utils/feedMapper';
@@ -21,6 +21,12 @@ export function useVideosFeed({ userId, filter, searchQuery, category = null, en
   const { activeActor } = useActiveActor();
   const seenPostIds = useRef<string[]>([]);
 
+  // Reset page-1 exclusion list when the query identity changes (incl. actor switch).
+  useEffect(() => {
+    seenPostIds.current = [];
+  }, [filter, category, searchQuery, userId, activeActor?.type, activeActor?.id]);
+
+
   const query = useInfiniteQuery({
     queryKey: ['videos-feed', filter, category, searchQuery, userId, activeActor?.type, activeActor?.id],
     queryFn: async ({ pageParam }) => {
@@ -28,7 +34,7 @@ export function useVideosFeed({ userId, filter, searchQuery, category = null, en
 
       const cursor = typeof pageParam === 'string' ? pageParam : undefined;
 
-      if (searchQuery) seenPostIds.current = [];
+
 
       const params: Record<string, unknown> = {
         p_user_id: userId,
@@ -38,7 +44,7 @@ export function useVideosFeed({ userId, filter, searchQuery, category = null, en
         p_viewer_actor_id: activeActor?.id ?? userId,
       };
 
-      if (!searchQuery) params.p_seen_post_ids = seenPostIds.current;
+      params.p_seen_post_ids = seenPostIds.current;
 
       if (cursor) params.p_cursor = cursor;
       if (searchQuery) params.p_search_query = searchQuery;
