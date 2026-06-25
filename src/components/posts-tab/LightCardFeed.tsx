@@ -331,33 +331,31 @@ export const LightCardFeed: React.FC<LightCardFeedProps> = ({
 
   return (
     <div style={{ width: '100%', background: PAGE_BG }} data-card-feed="light">
-      {scrollParent && (
-        <Virtuoso
-          customScrollParent={scrollParent}
-          data={posts}
-          itemContent={itemContent}
-          computeItemKey={(_, post) => post.id}
-          endReached={() => {
-            console.log('[LightFeed] endReached fired', { hasNextPage });
-            handleEndReached();
-          }}
-          rangeChanged={(range) => {
-            console.log('[LightFeed] Virtuoso rangeChanged:', {
-              startIndex: range.startIndex,
-              endIndex: range.endIndex,
-              renderedCount: range.endIndex - range.startIndex + 1,
-              totalData: posts.length,
-            });
-          }}
-          totalListHeightChanged={(h) => {
-            console.log('[LightFeed] Virtuoso total list height:', Math.round(h), 'px for', posts.length, 'items');
-          }}
-          defaultItemHeight={600}
-          increaseViewportBy={{ top: 600, bottom: 1200 }}
-          overscan={{ main: 600, reverse: 600 }}
-          components={components}
-        />
-      )}
+      <Virtuoso
+        useWindowScroll
+        data={posts}
+        itemContent={itemContent}
+        computeItemKey={(_, post) => post.id}
+        endReached={() => {
+          console.log('[LightFeed] endReached fired', { hasNextPage });
+          handleEndReached();
+        }}
+        rangeChanged={(range) => {
+          console.log('[LightFeed] Virtuoso rangeChanged:', {
+            startIndex: range.startIndex,
+            endIndex: range.endIndex,
+            renderedCount: range.endIndex - range.startIndex + 1,
+            totalData: posts.length,
+          });
+        }}
+        totalListHeightChanged={(h) => {
+          console.log('[LightFeed] Virtuoso total list height:', Math.round(h), 'px for', posts.length, 'items');
+        }}
+        defaultItemHeight={600}
+        increaseViewportBy={{ top: 600, bottom: 1200 }}
+        overscan={{ main: 600, reverse: 600 }}
+        components={components}
+      />
     </div>
   );
 };
