@@ -14,7 +14,6 @@ import { useWatchFeed } from './hooks/useWatchFeed';
 import ScrollToTopGlass from '@/components/common/ScrollToTopGlass';
 import { WatchOfTheWeekHero } from './proshop/WatchOfTheWeekHero';
 import { CourseAnchoredRail } from './proshop/CourseAnchoredRail';
-import { BucketListRail } from './proshop/BucketListRail';
 import { WatchMoodChips } from './proshop/WatchMoodChips';
 import { useWatchMood } from './proshop/hooks/useWatchMood';
 
@@ -61,9 +60,6 @@ export default function UnifiedWatchFeed({ embedded = false }: UnifiedWatchFeedP
 
       {/* ── From your courses — single course-anchored rail ── */}
       <CourseAnchoredRail />
-
-      {/* ── From your bucket list — course-anchored rail, mood-independent ── */}
-      <BucketListRail />
 
 
       {/* ── Section 3: Watch grid ──
