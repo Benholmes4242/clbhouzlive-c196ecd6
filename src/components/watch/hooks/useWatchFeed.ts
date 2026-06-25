@@ -32,9 +32,10 @@ interface UseWatchFeedParams {
 export function useWatchFeed({ userId, filter, mood, category, searchQuery, userLat, userLng, enabled = true }: UseWatchFeedParams) {
   const resolvedFilter: WatchFilter = mood ? MOOD_TO_FILTER[mood] : (filter ?? 'trending');
   const seenPostIds = useRef<string[]>([]);
+  const { activeActor } = useActiveActor();
 
   const query = useInfiniteQuery({
-    queryKey: ['watch-feed', resolvedFilter, mood ?? null, category ?? null, searchQuery, userId],
+    queryKey: ['watch-feed', resolvedFilter, mood ?? null, category ?? null, searchQuery, userId, activeActor?.type, activeActor?.id],
     queryFn: async ({ pageParam }) => {
       if (!userId) return { posts: [] as FeedPost[], nextCursor: undefined as string | undefined };
 
@@ -44,6 +45,8 @@ export function useWatchFeed({ userId, filter, mood, category, searchQuery, user
 
       const params: Record<string, any> = {
         p_user_id: userId,
+        p_viewer_actor_type: activeActor?.type ?? 'personal',
+        p_viewer_actor_id: activeActor?.id ?? userId,
         p_mode: resolvedFilter,
         p_page_size: PAGE_SIZE,
       };
