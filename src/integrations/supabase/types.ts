@@ -19172,38 +19172,22 @@ export type Database = {
           tier_name: string
         }[]
       }
-      get_user_course_anchored_content:
-        | {
-            Args: {
-              p_format?: string
-              p_limit_per_course?: number
-              p_mood?: string
-              p_user_id: string
-            }
-            Returns: {
-              content_count: number
-              course_country: string
-              course_id: string
-              course_name: string
-              recent_post_ids: string[]
-            }[]
-          }
-        | {
-            Args: {
-              p_format?: string
-              p_limit_per_course?: number
-              p_mood?: string
-              p_source?: string
-              p_user_id: string
-            }
-            Returns: {
-              content_count: number
-              course_country: string
-              course_id: string
-              course_name: string
-              recent_post_ids: string[]
-            }[]
-          }
+      get_user_course_anchored_content: {
+        Args: {
+          p_format?: string
+          p_limit_per_course?: number
+          p_mood?: string
+          p_source?: string
+          p_user_id: string
+        }
+        Returns: {
+          content_count: number
+          course_country: string
+          course_id: string
+          course_name: string
+          recent_post_ids: string[]
+        }[]
+      }
       get_user_exploration_status: {
         Args: { p_user_id: string }
         Returns: {
