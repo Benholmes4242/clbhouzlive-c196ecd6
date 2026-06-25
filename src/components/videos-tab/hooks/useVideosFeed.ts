@@ -18,10 +18,11 @@ interface UseVideosFeedParams {
 }
 
 export function useVideosFeed({ userId, filter, searchQuery, category = null, enabled: externalEnabled = true }: UseVideosFeedParams) {
+  const { activeActor } = useActiveActor();
   const seenPostIds = useRef<string[]>([]);
 
   const query = useInfiniteQuery({
-    queryKey: ['videos-feed', filter, category, searchQuery, userId],
+    queryKey: ['videos-feed', filter, category, searchQuery, userId, activeActor?.type, activeActor?.id],
     queryFn: async ({ pageParam }) => {
       if (!userId) return { posts: [] as FeedPost[], nextCursor: undefined as string | undefined };
 
@@ -33,6 +34,8 @@ export function useVideosFeed({ userId, filter, searchQuery, category = null, en
         p_user_id: userId,
         p_mode: filter,
         p_page_size: PAGE_SIZE,
+        p_viewer_actor_type: activeActor?.type ?? 'personal',
+        p_viewer_actor_id: activeActor?.id ?? userId,
       };
 
       if (!searchQuery) params.p_seen_post_ids = seenPostIds.current;
