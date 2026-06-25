@@ -1060,9 +1060,9 @@ function CommentsSheet({
                 <div className="flex items-end gap-2">
                   <SquircleAvatar
                     size={32}
-                    src={activeActor?.avatarUrl}
-                    alt={activeActor?.name || 'You'}
-                    fallback={activeActor?.name?.charAt(0) || '?'}
+                    src={effectiveActor?.avatarUrl}
+                    alt={effectiveActor?.name || 'You'}
+                    fallback={effectiveActor?.name?.charAt(0) || '?'}
                     hideRing
                   />
                   <div className="flex-1 min-w-0 relative">
