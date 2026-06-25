@@ -17239,6 +17239,10 @@ export type Database = {
         Args: { p_courses_logged: number }
         Returns: string
       }
+      can_appear_in_leaderboard: {
+        Args: { _scope?: string; _target: string; _viewer: string }
+        Returns: boolean
+      }
       can_change_email: { Args: { user_id_param: string }; Returns: boolean }
       can_manage_business: { Args: { _business_id: string }; Returns: boolean }
       can_view_followers_post: {
@@ -17247,6 +17251,10 @@ export type Database = {
           p_actor_type: string
           p_post_user_id: string
         }
+        Returns: boolean
+      }
+      can_view_handicap: {
+        Args: { _target: string; _viewer: string }
         Returns: boolean
       }
       canonical_club_name_v2: { Args: { p_name: string }; Returns: string }
