@@ -16,6 +16,7 @@ interface UseExploreFeedParams {
 
 export function useExploreFeed({ userId, region, searchQuery, enabled: externalEnabled = true }: UseExploreFeedParams) {
   const seenPostIds = useRef<string[]>([]);
+  const { activeActor } = useActiveActor();
 
   const query = useInfiniteQuery({
     queryKey: ['explore-feed', region ?? null, searchQuery ?? null, userId],
