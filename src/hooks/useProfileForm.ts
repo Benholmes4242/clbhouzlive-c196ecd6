@@ -45,7 +45,6 @@ function makeInitial(profile: any): ProfileFormData {
     city: profile?.city ?? '',
     isPublic: profile?.is_public ?? true,
     gender: profile?.gender ?? '',
-    championsVisibility: profile?.champions_visibility ?? 'everyone',
     handicapPageVisibility: profile?.handicap_page_visibility ?? 'everyone',
   };
 }
