@@ -1,7 +1,13 @@
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import { useQueryClient } from '@tanstack/react-query';
 import { useProfileData } from '@/hooks/useProfileData';
 import { useMyBusinesses } from '@/hooks/useMyBusinesses';
 import { ActorType, ActiveActor, SetActorOptions } from '@/types/actor';
+import {
+  FEED_QUERY_KEYS,
+  PROFILE_QUERY_KEYS,
+  ENGAGEMENT_RECORD_KEYS,
+} from '@/lib/feedQueryKeys';
 
 // Re-export types for backwards compatibility
 export type { ActorType, ActiveActor, SetActorOptions } from '@/types/actor';
