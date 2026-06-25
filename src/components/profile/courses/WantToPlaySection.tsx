@@ -55,9 +55,9 @@ export const WantToPlaySection: React.FC<WantToPlaySectionProps> = ({
   }
 
   return (
-    <section className={cn('', className)}>
+    <section className={cn('-mx-2.5', className)}>
       {/* Eyebrow */}
-      <div className="flex items-center justify-between mb-3 px-2.5">
+      <div className="flex items-center justify-between mb-3 px-4">
         <div className="flex items-center gap-1.5">
           <Trophy size={11} strokeWidth={2.4} color="#F7931E" />
           <span style={{ fontSize: 10.5, fontWeight: 800, color: '#F7931E', letterSpacing: '0.14em', textTransform: 'uppercase' as const }}>
@@ -74,8 +74,6 @@ export const WantToPlaySection: React.FC<WantToPlaySectionProps> = ({
           overflowX: 'auto',
           scrollSnapType: 'x mandatory',
           paddingBottom: 4,
-          marginLeft: -16,
-          marginRight: -16,
           paddingLeft: 16,
           paddingRight: 16,
           scrollbarWidth: 'none',
