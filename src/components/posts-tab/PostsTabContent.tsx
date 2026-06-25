@@ -17,7 +17,7 @@ import { useProfilePosts } from './hooks/useProfilePosts';
 import { PostsFeedSkeleton } from './PostsFeedSkeleton';
 
 import type { FeedPost } from '@/components/media-system/types/media';
-import { CardFeed } from '@/components/feed/CardFeed';
+import { LightCardFeed } from './LightCardFeed';
 import { useClubhouseStore } from '@/store/clubhouseStore';
 
 import { useClubhouseLikes } from '@/components/clubhouse/hooks/useClubhouseLikes';
