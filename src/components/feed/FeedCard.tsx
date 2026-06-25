@@ -642,7 +642,7 @@ const FeedCardImpl: React.FC<FeedCardProps> = ({
           borderTop: `0.5px solid ${LINE}`,
         }}
       >
-        <FeedActorPicker value={actingAs} onChange={handleActorChange} />
+        <FeedActorPicker value={activeActor} onChange={(a) => setActiveActor(a)} />
         <FooterButton
           icon={Heart}
           label={formatCount(likeCount)}
