@@ -24,7 +24,7 @@ import type { FeedPost } from '@/components/media-system/types/media';
 import { InlineVideo } from '@/components/feed/InlineVideo';
 import { MediaCarousel } from '@/components/feed/MediaCarousel';
 import { FeedFollowPill } from '@/components/feed/FeedFollowPill';
-import { FeedActorPicker, type FeedActorPickerValue } from '@/components/feed/FeedActorPicker';
+import { FeedActorPicker } from '@/components/feed/FeedActorPicker';
 import type { ActiveActor } from '@/types/actor';
 
 // Light palette — cards sit on the page background (#F8FAFC); dividers are
