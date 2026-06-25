@@ -37,7 +37,17 @@ export function useExploreFeed({ userId, region, searchQuery, enabled: externalE
       if (cursor) params.p_cursor = cursor;
       if (searchQuery) params.p_search_query = searchQuery;
 
+      const seenCountBefore = seenPostIds.current.length;
       const { data, error } = await supabase.rpc('get_explore_feed', params as any);
+
+      const returned = Array.isArray(data) ? data.length : 0;
+      console.log('[ActorDebug] useExploreFeed fetch', {
+        actor: { type: activeActor?.type, id: activeActor?.id },
+        cursor: cursor ?? null,
+        region: region ?? null,
+        seenCount: seenCountBefore,
+        returned,
+      });
 
       if (error) {
         console.error('[ExploreFeed] RPC error:', error);
