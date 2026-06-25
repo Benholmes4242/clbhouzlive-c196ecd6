@@ -93,12 +93,23 @@ const GlobalBottomNavigation: React.FC<GlobalBottomNavigationProps> = ({ chromeS
     location.pathname === '/edit-profile' &&
     new URLSearchParams(location.search).get('onboarding') === '1';
   // On plain web, '/' renders BetaGatePage (coming-soon), not Clubhouse —
-  // never paint the bottom nav over it.
-  const isBetaGateRoute = location.pathname === '/' && !isMedianApp();
+  // never paint the bottom nav over it. BUT: the Lovable preview host (and
+  // ?preview=clbhouz bypass) renders ClubhouseWrapped at '/', so the nav must
+  // still appear there.
+  const isPreviewBypass = (() => {
+    try {
+      const h = window.location.hostname;
+      const onPreviewHost = h.endsWith('.lovableproject.com') || h.endsWith('.lovable.app') || h.endsWith('.lovable.dev') || h === 'localhost' || h === '127.0.0.1';
+      if (onPreviewHost) return true;
+      return localStorage.getItem('clbhouz_preview_bypass') === '1';
+    } catch { return false; }
+  })();
+  const isBetaGateRoute = location.pathname === '/' && !isMedianApp() && !isPreviewBypass;
   const shouldHideForRoute = HIDDEN_ROUTES.includes(location.pathname) ||
     HIDDEN_ROUTE_PREFIXES.some(prefix => location.pathname.startsWith(prefix)) ||
     isOnboardingEditProfile ||
     isBetaGateRoute;
+
   const isClubhouseRoute = CLUBHOUSE_ROUTES.includes(location.pathname);
   const isWarmGradientRoute = WARM_GRADIENT_ROUTES.some(r => location.pathname.startsWith(r));
   const isTourHubRoute = location.pathname.startsWith('/tourhub');
