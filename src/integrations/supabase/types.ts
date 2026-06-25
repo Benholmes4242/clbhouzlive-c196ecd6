@@ -18939,24 +18939,6 @@ export type Database = {
         }[]
       }
       get_my_handicap_percentile: { Args: never; Returns: Json }
-      get_my_pod_standings: {
-        Args: never
-        Returns: {
-          bracket: string
-          current_points: number
-          eg_handicap_index: number
-          home_club: string
-          is_self: boolean
-          live_rank: number
-          pod_number: number
-          rounds_counted: number
-          season: string
-          season_end: string
-          user_id: string
-          user_photo_url: string
-          zone: string
-        }[]
-      }
       get_my_streaks: {
         Args: never
         Returns: {
