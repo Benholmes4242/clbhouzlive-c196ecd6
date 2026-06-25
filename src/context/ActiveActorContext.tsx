@@ -158,13 +158,8 @@ export function ActiveActorProvider({ children }: { children: ReactNode }) {
       const isSwitch =
         !activeActor || activeActor.type !== actor.type || activeActor.id !== actor.id;
 
-      if (isSwitch) {
-        console.log('[ActorDebug] actor switch', {
-          from: activeActor ? { type: activeActor.type, id: activeActor.id } : null,
-          to: { type: actor.type, id: actor.id },
-          ts: new Date().toISOString(),
-        });
-      }
+
+
 
       setShouldPersist(persist);
       setActiveActorState(actor);
