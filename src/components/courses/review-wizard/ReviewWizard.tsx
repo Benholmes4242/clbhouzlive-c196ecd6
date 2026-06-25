@@ -411,47 +411,78 @@ export function ReviewWizard({
     [wizard, cursorPos]
   );
 
-  /* ── Voice mic (Web Speech API) ──────────────────────────────────────── */
+  /* ── Voice mic (record → Whisper) ────────────────────────────────────── */
   type VoiceState = 'idle' | 'listening' | 'processing';
   const [voiceState, setVoiceState] = useState<VoiceState>('idle');
-  const recognitionRef = useRef<any>(null);
-  const SpeechRecognitionClass: any =
-    typeof window !== 'undefined'
-      ? (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition
-      : null;
+  const recorder = useVoiceRecorder();
+  const MAX_VOICE_MS = 60_000;
+  const voiceTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const hasMicSupport =
+    typeof navigator !== 'undefined' && !!navigator.mediaDevices?.getUserMedia;
 
-  const startListening = useCallback(() => {
-    if (!SpeechRecognitionClass) return;
-    const recognition = new SpeechRecognitionClass();
-    recognition.lang = 'en-GB';
-    recognition.continuous = true;
-    recognition.interimResults = false;
-    recognition.onresult = (event: any) => {
-      const transcript = Array.from(event.results)
-        .map((r: any) => r[0].transcript)
-        .join('');
-      if (transcript.trim()) {
-        setVoiceState('processing');
-        const cur = wizard.state.review;
-        const merged = cur
-          ? cur + (cur.endsWith(' ') ? '' : ' ') + transcript.trim()
-          : transcript.trim().charAt(0).toUpperCase() + transcript.trim().slice(1);
-        wizard.setReview(merged.slice(0, MAX_REVIEW_LENGTH));
-        setTimeout(() => setVoiceState('idle'), 400);
-      }
-    };
-    recognition.onerror = () => setVoiceState('idle');
-    recognition.onend = () => setVoiceState((s) => (s === 'listening' ? 'idle' : s));
-    recognitionRef.current = recognition;
-    recognition.start();
-    setVoiceState('listening');
-  }, [SpeechRecognitionClass, wizard]);
   const stopListening = useCallback(() => {
-    recognitionRef.current?.stop();
-    recognitionRef.current = null;
-    setVoiceState('idle');
+    if (voiceTimeoutRef.current) {
+      clearTimeout(voiceTimeoutRef.current);
+      voiceTimeoutRef.current = null;
+    }
+    recorder.stopRecording();
+    setVoiceState('processing');
+  }, [recorder]);
+
+  const startListening = useCallback(async () => {
+    setVoiceState('listening');
+    await recorder.startRecording();
+    voiceTimeoutRef.current = setTimeout(() => stopListening(), MAX_VOICE_MS);
+  }, [recorder, stopListening]);
+
+  // When the blob is ready, transcribe and merge into the review text.
+  useEffect(() => {
+    if (voiceState !== 'processing' || !recorder.audioBlob) return;
+    let cancelled = false;
+    (async () => {
+      try {
+        const text = await transcribeAudio(recorder.audioBlob!);
+        if (cancelled) return;
+        if (text) {
+          const cur = wizard.state.review;
+          const merged = cur
+            ? cur + (cur.endsWith(' ') ? '' : ' ') + text
+            : text.charAt(0).toUpperCase() + text.slice(1);
+          wizard.setReview(merged.slice(0, MAX_REVIEW_LENGTH));
+        }
+      } catch {
+        toast.error("Couldn't transcribe — try again");
+      } finally {
+        if (!cancelled) {
+          setVoiceState('idle');
+          recorder.resetRecording();
+        }
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, [voiceState, recorder.audioBlob, wizard, recorder]);
+
+  // Surface recorder errors (e.g. permission denied) and reset state.
+  useEffect(() => {
+    if (recorder.error && voiceState !== 'idle') {
+      if (voiceTimeoutRef.current) {
+        clearTimeout(voiceTimeoutRef.current);
+        voiceTimeoutRef.current = null;
+      }
+      setVoiceState('idle');
+    }
+  }, [recorder.error, voiceState]);
+
+  // Cleanup on unmount.
+  useEffect(() => {
+    return () => {
+      if (voiceTimeoutRef.current) clearTimeout(voiceTimeoutRef.current);
+      recorder.cancelRecording();
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
-  useEffect(() => () => recognitionRef.current?.stop(), []);
 
   /* ── Keyboard docking (visualViewport) ───────────────────────────────── */
   const [keyboardHeight, setKeyboardHeight] = useState(0);
