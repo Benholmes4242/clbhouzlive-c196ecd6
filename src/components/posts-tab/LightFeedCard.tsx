@@ -24,7 +24,7 @@ import type { FeedPost } from '@/components/media-system/types/media';
 import { InlineVideo } from '@/components/feed/InlineVideo';
 import { MediaCarousel } from '@/components/feed/MediaCarousel';
 import { FeedFollowPill } from '@/components/feed/FeedFollowPill';
-import { FeedActorPicker, type FeedActorPickerValue } from '@/components/feed/FeedActorPicker';
+import { FeedActorPicker } from '@/components/feed/FeedActorPicker';
 import type { ActiveActor } from '@/types/actor';
 
 // Light palette — cards sit on the page background (#F8FAFC); dividers are
@@ -221,14 +221,11 @@ const LightFeedCardImpl: React.FC<LightFeedCardProps> = ({
   feedIndex,
 }) => {
   const navigate = useNavigate();
-  const { activeActor, availableActors } = useActiveActor();
+  const { activeActor, setActiveActor } = useActiveActor();
   const [captionExpanded, setCaptionExpanded] = useState(false);
   const [isCaptionClamped, setIsCaptionClamped] = useState(false);
-  const [actingAs, setActingAs] = useState<FeedActorPickerValue | null>(null);
-  const handleActorChange = (a: ActiveActor) => setActingAs({ id: a.id, type: a.type });
-  const effectiveActor: ActiveActor | null =
-    (actingAs ? availableActors.find((a) => a.id === actingAs.id && a.type === actingAs.type) : null) ??
-    activeActor;
+  // Actor selection is GLOBAL — picker reads and writes the session-wide activeActor.
+  const effectiveActor: ActiveActor | null = activeActor;
   const captionTextRef = useRef<HTMLDivElement | null>(null);
 
   const reviewCourseId = post.review?.courseId ?? post.courseId;
@@ -610,7 +607,7 @@ const LightFeedCardImpl: React.FC<LightFeedCardProps> = ({
           borderTop: `0.5px solid ${LINE}`,
         }}
       >
-        <FeedActorPicker value={actingAs} onChange={handleActorChange} theme="light" />
+        <FeedActorPicker value={activeActor} onChange={(a) => setActiveActor(a)} theme="light" />
         <FooterButton
           icon={Heart}
           label={formatCount(likeCount)}

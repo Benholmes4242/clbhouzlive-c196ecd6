@@ -29,8 +29,8 @@ export function useClubhouseLikes({ userId, activeActor }: UseClubhouseLikesOpti
     });
   }, []);
 
-  const handleLike = useCallback((post: FeedPost | null, actorOverride?: { id: string; type: string } | null) => {
-    const actor = actorOverride ?? activeActor;
+  const handleLike = useCallback((post: FeedPost | null) => {
+    const actor = activeActor;
     if (!userId || !post || !actor) return;
 
     const wasLiked = post.isLikedByMe;

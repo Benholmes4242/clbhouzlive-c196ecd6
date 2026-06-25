@@ -1,7 +1,13 @@
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import { useQueryClient } from '@tanstack/react-query';
 import { useProfileData } from '@/hooks/useProfileData';
 import { useMyBusinesses } from '@/hooks/useMyBusinesses';
 import { ActorType, ActiveActor, SetActorOptions } from '@/types/actor';
+import {
+  FEED_QUERY_KEYS,
+  PROFILE_QUERY_KEYS,
+  ENGAGEMENT_RECORD_KEYS,
+} from '@/lib/feedQueryKeys';
 
 // Re-export types for backwards compatibility
 export type { ActorType, ActiveActor, SetActorOptions } from '@/types/actor';
@@ -18,6 +24,7 @@ const ActiveActorContext = createContext<ActiveActorContextValue | undefined>(un
 const STORAGE_KEY = 'clbhouz_active_actor';
 
 export function ActiveActorProvider({ children }: { children: ReactNode }) {
+  const queryClient = useQueryClient();
   const profileData = useProfileData();
   const profile = profileData.profile;
   const profileLoading = profileData.loading;
@@ -142,18 +149,32 @@ export function ActiveActorProvider({ children }: { children: ReactNode }) {
 
   const setActiveActor = (actor: ActiveActor, options?: SetActorOptions) => {
     const persist = options?.persist !== false; // Default to true
-    
+
     // Validate actor is in available list
     const isValid = availableActors.some(
       a => a.type === actor.type && a.id === actor.id
     );
     if (isValid) {
+      const isSwitch =
+        !activeActor || activeActor.type !== actor.type || activeActor.id !== actor.id;
+
       setShouldPersist(persist);
       setActiveActorState(actor);
-      
+
       // If persisting, update localStorage immediately
       if (persist) {
         localStorage.setItem(STORAGE_KEY, JSON.stringify(actor));
+      }
+
+      // When the actor truly changes, invalidate feed/profile/engagement queries
+      // so `is_liked_by_me` (and similar viewer-scoped state) is recomputed for
+      // the new actor. Without this, the heart UI would still reflect the old
+      // actor's like state — and tapping it would unlike against the new actor.
+      if (isSwitch) {
+        const keyGroups = [...FEED_QUERY_KEYS, ...PROFILE_QUERY_KEYS, ...ENGAGEMENT_RECORD_KEYS];
+        for (const key of keyGroups) {
+          queryClient.invalidateQueries({ queryKey: key as unknown[], exact: false });
+        }
       }
     }
   };
