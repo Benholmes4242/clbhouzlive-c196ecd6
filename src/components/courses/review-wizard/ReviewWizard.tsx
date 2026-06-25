@@ -685,9 +685,7 @@ export function ReviewWizard({
                             fontSize: 15,
                             fontWeight: 700,
                             color: INK,
-                            whiteSpace: 'nowrap',
-                            overflow: 'hidden',
-                            textOverflow: 'ellipsis',
+                            overflowWrap: 'anywhere',
                           }}
                         >
                           {activeCourse?.name || 'Pick a course'}
