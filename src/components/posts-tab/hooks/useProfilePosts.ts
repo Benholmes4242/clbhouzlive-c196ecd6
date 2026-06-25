@@ -6,6 +6,8 @@ import type { FeedPost, FeedRpcRow } from '@/components/media-system/types/media
 
 const PAGE_SIZE = 24;
 
+type CursorParam = { createdAt: string; id: string } | undefined;
+
 interface UseProfilePostsParams {
   userId: string | undefined;
   actorType: 'personal' | 'business';
@@ -26,7 +28,11 @@ export function useProfilePosts({ userId, actorType, actorId }: UseProfilePostsP
     queryKey: ['profile-posts', actorType, actorId],
     queryFn: async ({ pageParam }) => {
 
-      const cursor = typeof pageParam === 'string' ? pageParam : undefined;
+
+      const cursor =
+        pageParam && typeof pageParam === 'object'
+          ? (pageParam as { createdAt: string; id: string })
+          : undefined;
 
       const params: Record<string, any> = {
         p_user_id: userId ?? null,
@@ -36,7 +42,10 @@ export function useProfilePosts({ userId, actorType, actorId }: UseProfilePostsP
         p_seen_post_ids: seenPostIds.current,
       };
 
-      if (cursor) params.p_cursor = cursor;
+      if (cursor) {
+        params.p_cursor = cursor.createdAt;
+        params.p_cursor_id = cursor.id;
+      }
 
       const { data, error } = await supabase.rpc('get_profile_posts', params as any);
 
@@ -46,7 +55,7 @@ export function useProfilePosts({ userId, actorType, actorId }: UseProfilePostsP
       }
 
       if (!data || data.length === 0) {
-        return { posts: [] as FeedPost[], nextCursor: undefined as string | undefined };
+        return { posts: [] as FeedPost[], nextCursor: undefined as CursorParam };
       }
 
       const rows = data as unknown as FeedRpcRow[];
@@ -58,13 +67,19 @@ export function useProfilePosts({ userId, actorType, actorId }: UseProfilePostsP
         }
       }
 
-      const lastRow = rows[rows.length - 1];
-      const nextCursor = rows.length >= PAGE_SIZE ? lastRow.post_created_at : undefined;
+      // Page grain is now POSTS. The cursor is the LAST grouped post's
+      // (created_at, id) — both halves of the keyset.
+      const lastPost = posts[posts.length - 1];
+      const lastRowForCursor = rows.find((r) => r.post_id === lastPost?.id);
+      const nextCursor: CursorParam =
+        posts.length >= PAGE_SIZE && lastPost && lastRowForCursor
+          ? { createdAt: lastRowForCursor.post_created_at, id: lastPost.id }
+          : undefined;
 
       return { posts, nextCursor };
     },
     getNextPageParam: (lastPage) => lastPage.nextCursor,
-    initialPageParam: undefined as string | undefined,
+    initialPageParam: undefined as CursorParam,
     enabled: !!actorId,
     placeholderData: keepPreviousData,
     staleTime: 30 * 1000,
