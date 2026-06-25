@@ -41,6 +41,13 @@ const GolfClubView: React.FC<GolfClubViewProps> = ({ courseId, isInModal = false
   
   const [visitedTabs, setVisitedTabs] = useState<Set<string>>(new Set([initialTab]));
 
+  // Sync activeTab when URL/state changes (handles deep links when already mounted on this course)
+  useEffect(() => {
+    const next = (location.state as any)?.activeTab || searchParams.get('tab') || 'about';
+    setActiveTab(next);
+    setVisitedTabs(prev => (prev.has(next) ? prev : new Set(prev).add(next)));
+  }, [searchParams, location.state]);
+
   const { data: course, isLoading: courseLoading } = useQuery({
     queryKey: ['course-detail', courseId],
     queryFn: async () => {
