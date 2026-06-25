@@ -75,27 +75,17 @@ export const LightCardFeed: React.FC<LightCardFeedProps> = ({
   const cardEls = useRef<Map<number, HTMLElement>>(new Map());
 
   useEffect(() => {
-    const sp = getDocumentScrollParent();
-    setScrollParent(sp);
-
-    // ── DEBUG: scroll parent identity + whether it actually scrolls ──
-    const doc = document.scrollingElement;
-    console.log('[LightFeed] scrollParent resolved:', {
-      resolvedTag: sp?.tagName,
-      resolvedId: sp?.id || '(none)',
-      resolvedClass: sp?.className || '(none)',
-      scrollingElementTag: (doc as HTMLElement)?.tagName,
-      sameAsScrollingElement: sp === doc,
-      spClientHeight: sp?.clientHeight,
-      spScrollHeight: sp?.scrollHeight,
-      spCanScroll: sp ? sp.scrollHeight > sp.clientHeight : null,
-      windowInnerHeight: window.innerHeight,
-      bodyScrollHeight: document.body.scrollHeight,
-      htmlScrollHeight: document.documentElement.scrollHeight,
-      htmlOverflowY: getComputedStyle(document.documentElement).overflowY,
-      bodyOverflowY: getComputedStyle(document.body).overflowY,
+    // On this app, #root is the actual scroll container (see ScrollToTopGlass).
+    const root = document.getElementById('root');
+    setScrollParent(root ?? undefined);
+    console.log('[LightFeed] scrollParent = #root', {
+      found: !!root,
+      clientH: root?.clientHeight,
+      scrollH: root?.scrollHeight,
+      canScroll: root ? root.scrollHeight > root.clientHeight : null,
     });
   }, []);
+
 
   useEffect(() => {
     console.log('[LightFeed] posts received:', {
@@ -159,15 +149,18 @@ export const LightCardFeed: React.FC<LightCardFeedProps> = ({
       htmlClasses: document.documentElement.className,
       htmlOverflow: getComputedStyle(document.documentElement).overflow,
     });
-    const onScroll = () => dump('window-scroll-event');
-    window.addEventListener('scroll', onScroll, { passive: true, capture: true });
+    const scroller: HTMLElement | Window = document.getElementById('root') ?? window;
+    const onScroll = () => dump('root-scroll-event');
+    scroller.addEventListener('scroll', onScroll, { passive: true, capture: true } as any);
+
 
     // also probe the app-shell + page-root directly for scrollTop movement
     let ticks = 0;
     const iv = setInterval(() => { dump(`tick-${ticks}`); if (++ticks >= 5) clearInterval(iv); }, 1000);
 
     return () => {
-      window.removeEventListener('scroll', onScroll, { capture: true } as any);
+      scroller.removeEventListener('scroll', onScroll, { capture: true } as any);
+
       clearInterval(iv);
     };
   }, []);
@@ -244,9 +237,11 @@ export const LightCardFeed: React.FC<LightCardFeedProps> = ({
         recheckActive();
       });
     };
-    window.addEventListener('scroll', onScroll, { passive: true, capture: true });
+    const scroller: HTMLElement | Window = document.getElementById('root') ?? window;
+    scroller.addEventListener('scroll', onScroll, { passive: true, capture: true } as any);
     return () => {
-      window.removeEventListener('scroll', onScroll, { capture: true } as any);
+      scroller.removeEventListener('scroll', onScroll, { capture: true } as any);
+
       if (raf) cancelAnimationFrame(raf);
     };
   }, [recheckActive]);
@@ -397,33 +392,36 @@ export const LightCardFeed: React.FC<LightCardFeedProps> = ({
 
   return (
     <div style={{ width: '100%', background: PAGE_BG }} data-card-feed="light">
-      <Virtuoso
-        useWindowScroll
-        data={posts}
-        itemContent={itemContent}
-        computeItemKey={(_, post) => post.id}
-        endReached={() => {
-          console.log('[LightFeed] endReached fired', { hasNextPage });
-          handleEndReached();
-        }}
-        rangeChanged={(range) => {
-          console.log('[LightFeed] Virtuoso rangeChanged:', {
-            startIndex: range.startIndex,
-            endIndex: range.endIndex,
-            renderedCount: range.endIndex - range.startIndex + 1,
-            totalData: posts.length,
-          });
-        }}
-        totalListHeightChanged={(h) => {
-          console.log('[LightFeed] Virtuoso total list height:', Math.round(h), 'px for', posts.length, 'items');
-        }}
-        defaultItemHeight={600}
-        increaseViewportBy={{ top: 600, bottom: 1200 }}
-        overscan={{ main: 600, reverse: 600 }}
-        components={components}
-      />
+      {scrollParent && (
+        <Virtuoso
+          customScrollParent={scrollParent}
+          data={posts}
+          itemContent={itemContent}
+          computeItemKey={(_, post) => post.id}
+          endReached={() => {
+            console.log('[LightFeed] endReached fired', { hasNextPage });
+            handleEndReached();
+          }}
+          rangeChanged={(range) => {
+            console.log('[LightFeed] Virtuoso rangeChanged:', {
+              startIndex: range.startIndex,
+              endIndex: range.endIndex,
+              renderedCount: range.endIndex - range.startIndex + 1,
+              totalData: posts.length,
+            });
+          }}
+          totalListHeightChanged={(h) => {
+            console.log('[LightFeed] Virtuoso total list height:', Math.round(h), 'px for', posts.length, 'items');
+          }}
+          defaultItemHeight={950}
+          increaseViewportBy={{ top: 600, bottom: 1200 }}
+          overscan={{ main: 600, reverse: 600 }}
+          components={components}
+        />
+      )}
     </div>
   );
+
 };
 
 LightCardFeed.displayName = 'LightCardFeed';
