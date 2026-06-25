@@ -159,7 +159,8 @@ export const LightCardFeed: React.FC<LightCardFeedProps> = ({
     const iv = setInterval(() => { dump(`tick-${ticks}`); if (++ticks >= 5) clearInterval(iv); }, 1000);
 
     return () => {
-      window.removeEventListener('scroll', onScroll, { capture: true } as any);
+      scroller.removeEventListener('scroll', onScroll, { capture: true } as any);
+
       clearInterval(iv);
     };
   }, []);
