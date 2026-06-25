@@ -940,7 +940,7 @@ export function ReviewWizard({
                             scrollSnapType: 'x mandatory',
                             WebkitOverflowScrolling: 'touch',
                             scrollbarWidth: 'none',
-                            padding: '0 16px',
+                            padding: `0 ${PAD_X}`,
                           }}
                         >
                           {existingTiles.map((tile) => (
