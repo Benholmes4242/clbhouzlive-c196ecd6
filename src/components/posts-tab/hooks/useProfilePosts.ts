@@ -23,10 +23,11 @@ export interface PostCounts {
 }
 
 export function useProfilePosts({ userId, actorType, actorId }: UseProfilePostsParams) {
+  const { activeActor } = useActiveActor();
   const seenPostIds = useRef<string[]>([]);
 
   const query = useInfiniteQuery({
-    queryKey: ['profile-posts', actorType, actorId],
+    queryKey: ['profile-posts', actorType, actorId, activeActor?.type, activeActor?.id],
     queryFn: async ({ pageParam }) => {
 
 
