@@ -16,7 +16,7 @@ import { PostOwnerMenu } from '@/components/posts/PostOwnerMenu';
 import { useManageableBusinessIds } from '@/hooks/useManageableBusinessIds';
 import { canManagePost } from '@/lib/canManagePost';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
-import { getRatingTier, getRatingTierLabel } from '@/lib/ratingTier';
+import { getRatingTier, getRatingTierLabel, ratingTextColor } from '@/lib/ratingTier';
 import { formatRatingValue } from '@/utils/formatters';
 import { useActiveActor } from '@/context/ActiveActorContext';
 
