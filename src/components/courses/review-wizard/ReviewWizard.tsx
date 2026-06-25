@@ -963,7 +963,7 @@ export function ReviewWizard({
                           ))}
                         </div>
                         {wizard.allMedia.length < 10 && (
-                          <div style={{ padding: '10px 16px 0' }}>
+                          <div style={{ padding: `10px ${PAD_X} 0` }}>
                             <button
                               onClick={() => fileRef.current?.click()}
                               style={{
