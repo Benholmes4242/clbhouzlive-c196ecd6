@@ -19,7 +19,7 @@ import React, {
 import { createPortal } from 'react-dom';
 import { lockBodyScroll, unlockBodyScroll } from '@/lib/bodyScrollLock';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, ChevronDown, ImagePlus, Mic, Square, RotateCw, Trash2 } from 'lucide-react';
+import { X, ImagePlus, Mic, Square, RotateCw, Trash2 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useQueryClient } from '@tanstack/react-query';
 import { useNavigationGuard } from '@/hooks/useNavigationGuard';
@@ -45,7 +45,7 @@ import {
 import { DiscardActionSheet } from './DiscardActionSheet';
 import { RemoveReviewActionSheet } from './RemoveReviewActionSheet';
 import { SuccessScreen } from './SuccessScreen';
-import { LuminousCellRating as TickScrubber, tierFor } from './LuminousCellRating';
+import { LuminousCellRating as TickScrubber } from './LuminousCellRating';
 import { useReviewWizard } from './useReviewWizard';
 import type {
   ReviewWizardProps,
@@ -356,8 +356,7 @@ export function ReviewWizard({
     [pendingItems, wizard]
   );
 
-  /* ── Categories collapsible ──────────────────────────────────────────── */
-  const [catOpen, setCatOpen] = useState(false);
+  /* ── Category set count ──────────────────────────────────────────────── */
   const setCount = Object.values(wizard.state.breakdowns).filter((x) => x != null).length;
 
   /* ── Verdict textarea ───────────────────────────────────────────────── */
@@ -710,7 +709,7 @@ export function ReviewWizard({
                     </button>
 
                     {/* Hero scrubber */}
-                    <div style={{ padding: '20px 16px 10px' }}>
+                    <div style={{ padding: '16px 16px 8px' }}>
                       <TickScrubber
                         value={wizard.state.rating}
                         onChange={wizard.setRating}
@@ -721,19 +720,14 @@ export function ReviewWizard({
 
                     <div style={{ height: 0.5, background: HAIR, margin: '8px 16px 0' }} />
 
-                    {/* Collapsible categories */}
+                    {/* Categories — always visible 2×2 grid */}
                     <div style={{ padding: '12px 16px 12px' }}>
-                      <button
-                        onClick={() => setCatOpen((o) => !o)}
+                      <div
                         style={{
-                          width: '100%',
                           display: 'flex',
                           alignItems: 'center',
                           justifyContent: 'space-between',
-                          background: 'transparent',
-                          border: 'none',
-                          padding: '4px 0 10px',
-                          cursor: 'pointer',
+                          padding: '4px 0 2px',
                         }}
                       >
                         <span
@@ -745,81 +739,76 @@ export function ReviewWizard({
                             textTransform: 'uppercase',
                           }}
                         >
-                          Add category detail
+                          Category detail
                         </span>
-                        <span style={{ display: 'inline-flex', alignItems: 'center', gap: 7 }}>
-                          {setCount > 0 && (
-                            <span
-                              style={{
-                                fontSize: 11,
-                                fontWeight: 800,
-                                color: GOLD_DEEP,
-                                background: AMBER_SOFT,
-                                padding: '2px 7px',
-                                borderRadius: 10,
-                              }}
-                            >
-                              {setCount}/4
-                            </span>
-                          )}
-                          <ChevronDown
-                            size={16}
-                            color={INK_MUTE}
+                        {setCount > 0 && (
+                          <span
                             style={{
-                              transform: catOpen ? 'rotate(180deg)' : 'none',
-                              transition: 'transform 0.2s',
+                              fontSize: 11,
+                              fontWeight: 800,
+                              color: GOLD_DEEP,
+                              background: AMBER_SOFT,
+                              padding: '2px 7px',
+                              borderRadius: 10,
                             }}
-                          />
-                        </span>
-                      </button>
+                          >
+                            {setCount}/4
+                          </span>
+                        )}
+                      </div>
 
-                      {catOpen &&
-                        BREAKDOWNS.map(({ key, label, desc }, i) => {
+                      <div
+                        style={{
+                          display: 'grid',
+                          gridTemplateColumns: '1fr 1fr',
+                          gap: '18px 14px',
+                          alignItems: 'start',
+                          paddingTop: 12,
+                        }}
+                      >
+                        {BREAKDOWNS.map(({ key, label, desc }) => {
                           const val = wizard.state.breakdowns[key];
-                          const t = tierFor(val);
                           return (
-                            <div key={key}>
-                              {i > 0 && <div style={{ height: 0.5, background: HAIR }} />}
-                              <div style={{ padding: '12px 0' }}>
-                                <div
-                                  style={{
-                                    display: 'flex',
-                                    alignItems: 'flex-start',
-                                    justifyContent: 'space-between',
-                                  }}
-                                >
-                                  <div style={{ flex: 1, minWidth: 0 }}>
-                                    <div style={{ fontSize: 14.5, fontWeight: 700, color: INK }}>
-                                      {label}
-                                    </div>
-                                    <div
-                                      style={{ fontSize: 12, color: INK_FAINT, marginTop: 1 }}
-                                    >
-                                      {desc}
-                                    </div>
-                                  </div>
-                                  <span
-                                    style={{
-                                      fontSize: 17,
-                                      fontWeight: 800,
-                                      color: val != null ? ratingTextColor(val) : 'rgba(15,23,42,0.14)',
-                                      marginLeft: 8,
-                                    }}
-                                  >
-                                    {val != null ? val.toFixed(1) : '—'}
-                                  </span>
-                                </div>
-                                <div style={{ marginTop: 4, overflow: 'hidden', paddingBlock: 12, marginBlockEnd: -12, marginBlockStart: -8 }}>
+                            <div key={key} style={{ minWidth: 0 }}>
+                              <div style={{ fontSize: 13.5, fontWeight: 700, color: INK, lineHeight: 1.2 }}>
+                                {label}
+                              </div>
+                              <div
+                                style={{
+                                  fontSize: 11,
+                                  color: INK_FAINT,
+                                  marginTop: 2,
+                                  marginBottom: 8,
+                                  lineHeight: 1.25,
+                                }}
+                              >
+                                {desc}
+                              </div>
+                              <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                                <div style={{ flex: 1, minWidth: 0 }}>
                                   <TickScrubber
                                     value={val}
                                     onChange={(v) => wizard.setBreakdown(key, v)}
                                     ariaLabel={label}
+                                    compact
                                   />
                                 </div>
+                                <span
+                                  style={{
+                                    fontSize: 13,
+                                    fontWeight: 800,
+                                    color: val != null ? ratingTextColor(val) : 'rgba(15,23,42,0.20)',
+                                    flexShrink: 0,
+                                    fontVariantNumeric: 'tabular-nums',
+                                  }}
+                                >
+                                  {val != null ? val.toFixed(1) : '—'}
+                                </span>
                               </div>
                             </div>
                           );
                         })}
+                      </div>
                     </div>
 
                     <div style={{ height: 0.5, background: HAIR, margin: '8px 16px 0' }} />
@@ -1021,12 +1010,12 @@ export function ReviewWizard({
                         style={{
                           flex: 1,
                           padding: '13px 0',
-                          borderRadius: 10,
-                          border: `1px solid ${HAIR}`,
-                          background: SURFACE,
-                          fontSize: 13,
-                          fontWeight: 700,
-                          color: INK,
+                          borderRadius: 999,
+                          border: 'none',
+                          background: AMBER_SOFT,
+                          color: GOLD_DEEP,
+                          fontSize: 13.5,
+                          fontWeight: 800,
                           cursor: 'pointer',
                           display: 'inline-flex',
                           alignItems: 'center',

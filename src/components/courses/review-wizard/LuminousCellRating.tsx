@@ -29,6 +29,7 @@ interface LuminousCellRatingProps {
   value: number | null;
   onChange: (v: number) => void;
   hero?: boolean;
+  compact?: boolean;
   ariaLabel?: string;
 }
 
@@ -36,6 +37,7 @@ export function LuminousCellRating({
   value,
   onChange,
   hero = false,
+  compact = false,
   ariaLabel,
 }: LuminousCellRatingProps) {
   const rowRef = useRef<HTMLDivElement>(null);
@@ -46,7 +48,7 @@ export function LuminousCellRating({
   const tier = tierFor(value);
   const lastTick = useRef<number>(touched ? v : -1);
 
-  const rowHeight = 30;
+  const rowHeight = compact ? 20 : hero ? 24 : 26;
   const radius = rowHeight / 2;
   const fillPct = touched ? v * 10 : 0;
 
