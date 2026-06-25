@@ -51,12 +51,22 @@ export function useProfilePosts({ userId, actorType, actorId }: UseProfilePostsP
         params.p_cursor_id = cursor.id;
       }
 
+      const seenCountBefore = seenPostIds.current.length;
       const { data, error } = await supabase.rpc('get_profile_posts', params as any);
 
       if (error) {
         console.error('[ProfilePosts] RPC error:', error);
         throw error;
       }
+
+      const returned = Array.isArray(data) ? data.length : 0;
+      console.log('[ActorDebug] useProfilePosts fetch', {
+        actor: { type: activeActor?.type, id: activeActor?.id },
+        profileOwner: { type: actorType, id: actorId },
+        cursor: cursor ?? null,
+        seenCount: seenCountBefore,
+        returned,
+      });
 
       if (!data || data.length === 0) {
         return { posts: [] as FeedPost[], nextCursor: undefined as CursorParam };
