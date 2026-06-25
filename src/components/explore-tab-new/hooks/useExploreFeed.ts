@@ -90,14 +90,6 @@ export function useExploreFeed({ userId, region, searchQuery, enabled: externalE
     });
     return deduped;
   }, [query.data]);
-  const _unused_actor_log = useMemo(() => ({
-      actor: { type: activeActor?.type, id: activeActor?.id },
-      totalHeld: posts.length,
-      willRender: deduped.length,
-      pages: query.data?.pages.length ?? 0,
-    });
-    return deduped;
-  }, [query.data, activeActor?.type, activeActor?.id]);
 
   const resetSeen = useCallback(() => {
     seenPostIds.current = [];
