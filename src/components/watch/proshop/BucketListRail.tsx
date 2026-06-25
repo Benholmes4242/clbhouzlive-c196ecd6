@@ -3,7 +3,6 @@ import { useNavigate } from 'react-router-dom';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useUserBucketListAnchoredContent } from './hooks/useUserBucketListAnchoredContent';
 import { useFeedPostsByIds } from './hooks/useFeedPostsByIds';
-import { useWatchMood } from './hooks/useWatchMood';
 import { SectionHeader } from './SectionHeader';
 import { HRail } from './HRail';
 import WatchRailTile from '../WatchRailTile';
@@ -49,10 +48,9 @@ function BucketListRailInner() {
   const navigate = useNavigate();
   const { session } = useSupabaseSession();
   const userId = session?.user?.id;
-  const { mood } = useWatchMood();
 
   const { data: courses = [], isLoading: coursesLoading } =
-    useUserBucketListAnchoredContent(userId, mood);
+    useUserBucketListAnchoredContent(userId);
 
   const orderedIds = useMemo(() => interleaveByCourse(courses), [courses]);
 

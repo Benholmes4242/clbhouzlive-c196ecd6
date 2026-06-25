@@ -174,7 +174,6 @@ function VideosFullFeedInner({ userId, mood, searchQuery }: VideosFullFeedProps)
             return (
               <div key={`clips-${sIdx}`} style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
                 <VideosQuickClipsRail userId={userId} />
-                <BucketListRail />
               </div>
             );
           }
