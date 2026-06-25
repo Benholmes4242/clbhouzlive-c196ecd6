@@ -950,11 +950,20 @@ export function ReviewWizard({
                               <Mic size={16} />
                             )}
                           </button>
-                          <span style={{ fontSize: 12, color: INK_MUTE }}>
-                            {voiceState === 'listening'
-                              ? 'Listening… tap to stop'
-                              : 'Tap mic to speak'}
-                          </span>
+                          {voiceState === 'listening' ? (
+                            <span style={{ fontSize: 12, color: INK_MUTE }}>Listening… tap to stop</span>
+                          ) : voiceState === 'processing' ? (
+                            <span style={{ fontSize: 12, color: INK_MUTE }}>Writing it down…</span>
+                          ) : (
+                            <span style={{ display: 'flex', flexDirection: 'column', minWidth: 0 }}>
+                              <span style={{ fontSize: 12.5, fontWeight: 700, color: INK, lineHeight: 1.25 }}>
+                                Tap the mic to speak your review
+                              </span>
+                              <span style={{ fontSize: 11, color: INK_MUTE, lineHeight: 1.25, marginTop: 1 }}>
+                                No typing needed — say it and we'll write it for you
+                              </span>
+                            </span>
+                          )}
                         </div>
                       )}
                     </div>
