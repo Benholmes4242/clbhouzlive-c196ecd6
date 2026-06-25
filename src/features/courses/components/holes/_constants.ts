@@ -4,7 +4,7 @@ export const INK = '#0F172A';
 export const FONT = 'Geist, -apple-system, BlinkMacSystemFont, system-ui, sans-serif';
 
 // Mono numeral stack — analyst-grade tabular alignment on the Holes tab (data-page exception).
-export const MONO = "'SF Mono', 'Geist Mono', ui-monospace, SFMono-Regular, Menlo, Consolas, monospace";
+export const MONO = "'Geist', -apple-system, BlinkMacSystemFont, system-ui, sans-serif";
 
 // ESPN diverging scoring scale — cool = under par (good), neutral slate = par, warm = over par (bad).
 export const SC_ACE       = '#0E7C7B'; // deep teal (rarest good)
