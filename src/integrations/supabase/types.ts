@@ -11594,123 +11594,6 @@ export type Database = {
         }
         Relationships: []
       }
-      swing_coach_outreach: {
-        Row: {
-          city: string | null
-          consented_at: string | null
-          country: string | null
-          created_at: string | null
-          first_name_only: boolean | null
-          focus: string | null
-          id: string
-          lat: number | null
-          lng: number | null
-          mask_precise_location: boolean | null
-          price_max: number | null
-          price_min: number | null
-          radius_km: number | null
-          region: string | null
-          share_analysis_text: boolean | null
-          share_video: boolean | null
-          status: string | null
-          swing_analysis_id: string
-          terms_version: string | null
-          updated_at: string | null
-          user_id: string
-        }
-        Insert: {
-          city?: string | null
-          consented_at?: string | null
-          country?: string | null
-          created_at?: string | null
-          first_name_only?: boolean | null
-          focus?: string | null
-          id?: string
-          lat?: number | null
-          lng?: number | null
-          mask_precise_location?: boolean | null
-          price_max?: number | null
-          price_min?: number | null
-          radius_km?: number | null
-          region?: string | null
-          share_analysis_text?: boolean | null
-          share_video?: boolean | null
-          status?: string | null
-          swing_analysis_id: string
-          terms_version?: string | null
-          updated_at?: string | null
-          user_id: string
-        }
-        Update: {
-          city?: string | null
-          consented_at?: string | null
-          country?: string | null
-          created_at?: string | null
-          first_name_only?: boolean | null
-          focus?: string | null
-          id?: string
-          lat?: number | null
-          lng?: number | null
-          mask_precise_location?: boolean | null
-          price_max?: number | null
-          price_min?: number | null
-          radius_km?: number | null
-          region?: string | null
-          share_analysis_text?: boolean | null
-          share_video?: boolean | null
-          status?: string | null
-          swing_analysis_id?: string
-          terms_version?: string | null
-          updated_at?: string | null
-          user_id?: string
-        }
-        Relationships: []
-      }
-      swing_coach_outreach_targets: {
-        Row: {
-          accepted_at: string | null
-          coach_id: string
-          created_at: string | null
-          declined_at: string | null
-          id: string
-          notified_at: string | null
-          outreach_id: string
-        }
-        Insert: {
-          accepted_at?: string | null
-          coach_id: string
-          created_at?: string | null
-          declined_at?: string | null
-          id?: string
-          notified_at?: string | null
-          outreach_id: string
-        }
-        Update: {
-          accepted_at?: string | null
-          coach_id?: string
-          created_at?: string | null
-          declined_at?: string | null
-          id?: string
-          notified_at?: string | null
-          outreach_id?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "swing_coach_outreach_targets_coach_id_fkey"
-            columns: ["coach_id"]
-            isOneToOne: false
-            referencedRelation: "coaches"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "swing_coach_outreach_targets_outreach_id_fkey"
-            columns: ["outreach_id"]
-            isOneToOne: false
-            referencedRelation: "swing_coach_outreach"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
       swing_phase_results: {
         Row: {
           confidence: number | null
@@ -13814,6 +13697,7 @@ export type Database = {
           email_change_count: number | null
           email_change_requested_at: string | null
           email_change_token: string | null
+          email_confirmed: boolean
           featured_post_id: string | null
           first_name: string | null
           gam_launch_seen_at: string | null
@@ -13936,6 +13820,7 @@ export type Database = {
           email_change_count?: number | null
           email_change_requested_at?: string | null
           email_change_token?: string | null
+          email_confirmed?: boolean
           featured_post_id?: string | null
           first_name?: string | null
           gam_launch_seen_at?: string | null
@@ -14058,6 +13943,7 @@ export type Database = {
           email_change_count?: number | null
           email_change_requested_at?: string | null
           email_change_token?: string | null
+          email_confirmed?: boolean
           featured_post_id?: string | null
           first_name?: string | null
           gam_launch_seen_at?: string | null
@@ -16519,69 +16405,155 @@ export type Database = {
       }
       public_profiles: {
         Row: {
+          actor_type: string | null
           background_image_url: string | null
-          bag_visible: boolean | null
           bio: string | null
-          business_name: string | null
-          business_type: Database["public"]["Enums"]["business_type"] | null
+          city: string | null
+          college_id: string | null
+          country: string | null
           cover_photo_url: string | null
           created_at: string | null
           display_name: string | null
-          eg_visible: boolean | null
+          eg_handicap_index: number | null
+          first_name: string | null
+          header_photo_url: string | null
+          home_club: string | null
+          home_club_business_id: string | null
+          home_club_id: string | null
           id: string | null
+          instagram_handle: string | null
+          is_business_verified: boolean | null
+          is_official_club: boolean | null
           is_public: boolean | null
-          location: string | null
+          is_verified: boolean | null
+          is_verified_business: boolean | null
+          is_verified_golfer: boolean | null
+          last_name: string | null
+          manual_handicap_index: number | null
+          primary_club_id: string | null
           profile_photo_url: string | null
+          profile_type: string | null
+          profile_video_thumbnail_url: string | null
+          profile_video_url: string | null
           social_links: Json | null
-          top100_visible: boolean | null
-          tracker_visible: boolean | null
+          tiktok_handle: string | null
+          twitter_handle: string | null
           user_type: Database["public"]["Enums"]["user_type"] | null
           username: string | null
           website_url: string | null
+          websites: string[] | null
+          youtube_handle: string | null
         }
         Insert: {
+          actor_type?: string | null
           background_image_url?: string | null
-          bag_visible?: boolean | null
           bio?: string | null
-          business_name?: string | null
-          business_type?: Database["public"]["Enums"]["business_type"] | null
+          city?: string | null
+          college_id?: string | null
+          country?: string | null
           cover_photo_url?: string | null
           created_at?: string | null
           display_name?: string | null
-          eg_visible?: boolean | null
+          eg_handicap_index?: never
+          first_name?: string | null
+          header_photo_url?: string | null
+          home_club?: string | null
+          home_club_business_id?: string | null
+          home_club_id?: string | null
           id?: string | null
+          instagram_handle?: string | null
+          is_business_verified?: boolean | null
+          is_official_club?: boolean | null
           is_public?: boolean | null
-          location?: never
+          is_verified?: boolean | null
+          is_verified_business?: boolean | null
+          is_verified_golfer?: boolean | null
+          last_name?: string | null
+          manual_handicap_index?: never
+          primary_club_id?: string | null
           profile_photo_url?: string | null
+          profile_type?: string | null
+          profile_video_thumbnail_url?: string | null
+          profile_video_url?: string | null
           social_links?: Json | null
-          top100_visible?: boolean | null
-          tracker_visible?: boolean | null
+          tiktok_handle?: string | null
+          twitter_handle?: string | null
           user_type?: Database["public"]["Enums"]["user_type"] | null
           username?: string | null
           website_url?: string | null
+          websites?: string[] | null
+          youtube_handle?: string | null
         }
         Update: {
+          actor_type?: string | null
           background_image_url?: string | null
-          bag_visible?: boolean | null
           bio?: string | null
-          business_name?: string | null
-          business_type?: Database["public"]["Enums"]["business_type"] | null
+          city?: string | null
+          college_id?: string | null
+          country?: string | null
           cover_photo_url?: string | null
           created_at?: string | null
           display_name?: string | null
-          eg_visible?: boolean | null
+          eg_handicap_index?: never
+          first_name?: string | null
+          header_photo_url?: string | null
+          home_club?: string | null
+          home_club_business_id?: string | null
+          home_club_id?: string | null
           id?: string | null
+          instagram_handle?: string | null
+          is_business_verified?: boolean | null
+          is_official_club?: boolean | null
           is_public?: boolean | null
-          location?: never
+          is_verified?: boolean | null
+          is_verified_business?: boolean | null
+          is_verified_golfer?: boolean | null
+          last_name?: string | null
+          manual_handicap_index?: never
+          primary_club_id?: string | null
           profile_photo_url?: string | null
+          profile_type?: string | null
+          profile_video_thumbnail_url?: string | null
+          profile_video_url?: string | null
           social_links?: Json | null
-          top100_visible?: boolean | null
-          tracker_visible?: boolean | null
+          tiktok_handle?: string | null
+          twitter_handle?: string | null
           user_type?: Database["public"]["Enums"]["user_type"] | null
           username?: string | null
           website_url?: string | null
+          websites?: string[] | null
+          youtube_handle?: string | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "fk_user_profiles_home_club"
+            columns: ["home_club_id"]
+            isOneToOne: false
+            referencedRelation: "golf_courses"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "user_profiles_college_id_fkey"
+            columns: ["college_id"]
+            isOneToOne: false
+            referencedRelation: "college_media"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "user_profiles_home_club_business_id_fkey"
+            columns: ["home_club_business_id"]
+            isOneToOne: false
+            referencedRelation: "business_accounts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "user_profiles_primary_club_id_fkey"
+            columns: ["primary_club_id"]
+            isOneToOne: false
+            referencedRelation: "golf_clubs"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       season_leaderboard_view: {
         Row: {
@@ -20238,6 +20210,10 @@ export type Database = {
       }
       is_following_user: {
         Args: { followed: string; follower: string }
+        Returns: boolean
+      }
+      is_hub_conversation_member: {
+        Args: { _conversation_id: string; _user_id?: string }
         Returns: boolean
       }
       is_message_saved: { Args: { p_message_id: string }; Returns: boolean }
