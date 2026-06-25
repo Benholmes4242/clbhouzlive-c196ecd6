@@ -76,6 +76,7 @@ export const CardFeed: React.FC<CardFeedProps> = ({
 }) => {
 
   const virtuosoRef = useRef<VirtuosoHandle | null>(null);
+  const windowFeedEndRef = useRef<HTMLDivElement | null>(null);
 
   // Explore tab retap → scroll Clubhouse feed to top
   useEffect(() => {
@@ -344,22 +345,30 @@ export const CardFeed: React.FC<CardFeedProps> = ({
     if (hasNextPage && onNearEnd) onNearEnd();
   }, [hasNextPage, onNearEnd]);
 
+  useEffect(() => {
+    if (!useWindowScroll || !onNearEnd || !hasNextPage) return;
+    const sentinel = windowFeedEndRef.current;
+    if (!sentinel) return;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries.some((entry) => entry.isIntersecting)) onNearEnd();
+      },
+      { root: null, rootMargin: '1200px 0px', threshold: 0 },
+    );
+
+    observer.observe(sentinel);
+    return () => observer.disconnect();
+  }, [hasNextPage, onNearEnd, useWindowScroll]);
+
   if (useWindowScroll) {
     return (
       <div style={{ width: '100%', background: CANVAS }} data-card-feed>
-        <Virtuoso
-          ref={virtuosoRef}
-          useWindowScroll
-          data={posts}
-          itemContent={itemContent}
-          computeItemKey={(_, post) => post.id}
-          rangeChanged={handleRangeChanged}
-          endReached={handleEndReached}
-          defaultItemHeight={600}
-          increaseViewportBy={{ top: 600, bottom: 1200 }}
-          overscan={{ main: 600, reverse: 600 }}
-          components={components}
-        />
+        <div style={{ height: 0, paddingTop: topPadding }} />
+        {posts.map((post, index) => (
+          <React.Fragment key={post.id}>{itemContent(index, post)}</React.Fragment>
+        ))}
+        <div ref={windowFeedEndRef} style={{ height: bottomPadding }} />
       </div>
     );
   }
