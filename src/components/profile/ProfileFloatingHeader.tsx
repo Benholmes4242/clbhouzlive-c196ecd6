@@ -13,15 +13,8 @@
 
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ArrowLeft, Search, MoreHorizontal, Settings, type LucideIcon } from 'lucide-react';
+import { ArrowLeft, Search, Settings } from 'lucide-react';
 import GlobalSearchOverlay from '@/components/search/GlobalSearchOverlay';
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
 import { safeGoBack } from '@/utils/navigation';
 
 const FLOAT_STROKE = 2;
