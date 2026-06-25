@@ -236,6 +236,25 @@ export function useOptimisticReviewUpdate() {
     // Clear user's rating status
     queryClient.setQueryData(['user-course-rating', courseId, userId], null);
 
+    // Optimistically drop the course from profile played lists so the profile
+    // reflects deletion instantly on tab switch (matches "full removal" semantics)
+    queryClient.setQueriesData(
+      { queryKey: ['user-course-activity', userId], exact: false },
+      (old: any) => {
+        if (!old) return old;
+        if (Array.isArray(old)) return old.filter((r: any) => r?.course_id !== courseId);
+        return old;
+      }
+    );
+    queryClient.setQueriesData(
+      { queryKey: ['user-played-courses-full', userId], exact: false },
+      (old: any) => {
+        if (!old) return old;
+        if (Array.isArray(old)) return old.filter((r: any) => r?.course_id !== courseId && r?.id !== courseId);
+        return old;
+      }
+    );
+
     // Update aggregates (decrement count, recalculate average)
     queryClient.setQueryData(
       ['course-rating-aggregates', courseId],
