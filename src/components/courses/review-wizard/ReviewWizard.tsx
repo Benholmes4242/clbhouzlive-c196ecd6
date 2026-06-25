@@ -1094,8 +1094,8 @@ function MediaTile({
     <div
       style={{
         position: 'relative',
-        flex: `0 0 ${TILE}px`,
-        width: TILE,
+        flex: '0 0 min(200px, 42vw)',
+        width: 'min(200px, 42vw)',
         height: TILE,
         scrollSnapAlign: 'start',
       }}
