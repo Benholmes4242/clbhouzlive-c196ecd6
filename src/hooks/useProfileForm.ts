@@ -100,7 +100,6 @@ export function useProfileForm(profile: any, loading?: boolean) {
       form.homeClubVisibility !== initialData.homeClubVisibility ||
       form.additionalClubsVisibility !== initialData.additionalClubsVisibility ||
       form.gender !== initialData.gender ||
-      form.championsVisibility !== initialData.championsVisibility ||
       form.handicapPageVisibility !== initialData.handicapPageVisibility
     );
   }, [form, initialData]);
