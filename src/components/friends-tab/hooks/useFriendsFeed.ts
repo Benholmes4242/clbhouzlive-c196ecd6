@@ -8,6 +8,7 @@
 import { useInfiniteQuery, keepPreviousData } from '@tanstack/react-query';
 import { useCallback, useMemo, useRef } from 'react';
 import { supabase } from '@/integrations/supabase/client';
+import { useActiveActor } from '@/context/ActiveActorContext';
 import { mapRowToFeedPost, groupMultiMedia } from '@/components/media-system/utils/feedMapper';
 import { buildFriendsFeed, deduplicatePosts } from '@/components/media-system/utils/feedAlgorithm';
 import type { FeedPost, FeedRpcRow } from '@/components/media-system/types/media';
@@ -35,10 +36,11 @@ export function useFriendsFeed({
   interleave = false,
   pageSize = PAGE_SIZE_DEFAULT,
 }: UseFriendsFeedParams) {
+  const { activeActor } = useActiveActor();
   const seenPostIds = useRef<string[]>([]);
 
   const query = useInfiniteQuery({
-    queryKey: ['friends-feed', mode, searchQuery, userId, interleave, pageSize],
+    queryKey: ['friends-feed', mode, searchQuery, userId, interleave, pageSize, activeActor?.type, activeActor?.id],
     queryFn: async ({ pageParam }) => {
       if (!userId) return { posts: [] as FeedPost[], nextCursor: undefined as string | undefined };
 
@@ -48,6 +50,8 @@ export function useFriendsFeed({
 
       const params: Record<string, unknown> = {
         p_user_id: userId,
+        p_viewer_actor_type: activeActor?.type ?? 'personal',
+        p_viewer_actor_id: activeActor?.id ?? userId,
         p_mode: mode,
         p_page_size: pageSize,
       };
