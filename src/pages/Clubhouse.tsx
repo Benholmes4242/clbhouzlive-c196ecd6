@@ -631,7 +631,6 @@ const ClubhouseContent = () => {
             onCommentPosted={() => handleCommentPosted(activePost)}
             onCommentDeleted={() => activePost && handleCommentDeleted(activePost.id, activePost.commentCount)}
           />
-          />
           <MoreOptionsDrawer
             open={moreOptionsOpen}
             onOpenChange={setMoreOptionsOpen}
