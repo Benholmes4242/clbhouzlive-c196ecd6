@@ -24,6 +24,7 @@ const ActiveActorContext = createContext<ActiveActorContextValue | undefined>(un
 const STORAGE_KEY = 'clbhouz_active_actor';
 
 export function ActiveActorProvider({ children }: { children: ReactNode }) {
+  const queryClient = useQueryClient();
   const profileData = useProfileData();
   const profile = profileData.profile;
   const profileLoading = profileData.loading;
