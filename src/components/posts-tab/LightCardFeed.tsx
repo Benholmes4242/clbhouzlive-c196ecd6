@@ -1,38 +1,34 @@
 /**
- * CardFeed — Phases 1 & 2 + Phase 3 (virtualization)
+ * LightCardFeed — light-mode, window-scrolled, virtualized profile feed.
  *
- * Vertical scrolling list of `FeedCard`s for the inline Clubhouse Suggested
- * / Friends feeds.
+ * Built ground-up for the profile Activity / Posts tab (personal + business).
+ * Uses `react-virtuoso` with `useWindowScroll` so the page hero scrolls away
+ * naturally while DOM footprint stays bounded — iOS WebView <video> /
+ * compositor budgets stay safe on power-user profiles with hundreds of posts.
  *
- * Phase 3 (perf): switched from a naive `posts.map(...)` to `react-virtuoso`
- * so DOM footprint stays bounded as users scroll. iOS WebViews cap the
- * number of `<video>` elements and compositor layers; the previous
- * unbounded render was exhausting both, causing black/white screens on
- * tab switches back to Clubhouse. See `feed-virtualization-authority`.
+ * Active-card tracking (center-proximity IntersectionObserver + settle-gated
+ * playingIdx) is ported verbatim from the dark Clubhouse `CardFeed`; it's
+ * theme-neutral and must survive so inline video autoplay still promotes the
+ * centred card and respects the neighbour decoder budget.
  *
- * Phase 2 additions preserved:
- *  - Single shared IntersectionObserver tracks the most-in-view card and
- *    passes `isActive` down so only one inline video plays at a time.
- *  - `mountVideo` is true only for the active card + its immediate
- *    neighbours; other cards render the poster image to stay under the
- *    WebView's `<video>` budget.
- *  - Persisted multi-media carousel position via `clubhouseStore`.
+ * Clubhouse `CardFeed`/`FeedCard` are untouched.
  */
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { Virtuoso, type VirtuosoHandle } from 'react-virtuoso';
+import { Virtuoso } from 'react-virtuoso';
 import type { FeedPost } from '@/components/media-system/types/media';
 import type { ActiveActor } from '@/types/actor';
 import { useFullscreenFeedStore } from '@/store/fullscreenFeedStore';
 import { useClubhouseStore } from '@/store/clubhouseStore';
 import { prefetchTile } from '@/hooks/useTileVideoPlayer';
-import { FeedCard } from './FeedCard';
+import { LightFeedCard } from './LightFeedCard';
 
-const CANVAS = '#15171F';
+const PAGE_BG = '#F8FAFC';
+const DIVIDER = '#E5E7EA';
 
 /** How many neighbours on each side of the active card may mount a <video>. */
-const VIDEO_NEIGHBOUR_RADIUS = 1; // matches iOS ~3-decoder cap (active ±1 = 3)
+const VIDEO_NEIGHBOUR_RADIUS = 1;
 
-export interface CardFeedProps {
+export interface LightCardFeedProps {
   posts: FeedPost[];
   onLike: (post: FeedPost, actor?: ActiveActor | null) => void;
   onComment: (post: FeedPost, actor?: ActiveActor | null) => void;
@@ -50,7 +46,7 @@ export interface CardFeedProps {
   currentUserId?: string;
 }
 
-export const CardFeed: React.FC<CardFeedProps> = ({
+export const LightCardFeed: React.FC<LightCardFeedProps> = ({
   posts,
   onLike,
   onComment,
@@ -62,34 +58,13 @@ export const CardFeed: React.FC<CardFeedProps> = ({
   getCommentCount,
   onNearEnd,
   hasNextPage,
-  topPadding = 96,
-  bottomPadding = 96,
+  topPadding = 0,
+  bottomPadding = 32,
   onFollow,
   currentUserId,
 }) => {
-
-  const virtuosoRef = useRef<VirtuosoHandle | null>(null);
-
-  // Explore tab retap → scroll Clubhouse feed to top
-  useEffect(() => {
-    const onRetap = (e: Event) => {
-      const detail = (e as CustomEvent).detail;
-      if (detail?.tabId !== 'clubhouse') return;
-      virtuosoRef.current?.scrollTo({ top: 0, behavior: 'smooth' });
-    };
-    window.addEventListener('clbhouz-active-tab-retap', onRetap);
-    return () => window.removeEventListener('clbhouz-active-tab-retap', onRetap);
-  }, []);
-
-  // ── Active-card tracking (center-proximity) ──
-  // The card whose vertical center is nearest the viewport's vertical center
-  // becomes active. Height-independent + symmetric. IntersectionObserver
-  // maintains the on-screen candidate set; a scroll listener re-evaluates
-  // continuously as the user scrolls within that set.
+  // ── Active-card tracking (ported from CardFeed) ──
   const [activeIdx, setActiveIdx] = useState(0);
-  // playingIdx lags activeIdx until scrolling settles — only the settled
-  // centre tile is promoted to "playing". Prevents load-thrash mid-scroll
-  // (iOS cold HLS attach ~1.3s vs. active-window ~400-800ms during scroll).
   const [playingIdx, setPlayingIdx] = useState(0);
   const settleTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const SETTLE_MS = 150;
@@ -97,10 +72,6 @@ export const CardFeed: React.FC<CardFeedProps> = ({
   const observerRef = useRef<IntersectionObserver | null>(null);
   const cardEls = useRef<Map<number, HTMLElement>>(new Map());
 
-  // Debounce: promote activeIdx → playingIdx only after the centre has
-  // held steady for SETTLE_MS. While scrolling, playingIdx stays put so
-  // no tile is asked to play (frames still paint via the paused-first-frame
-  // primitive on mounted neighbours).
   useEffect(() => {
     if (settleTimer.current) clearTimeout(settleTimer.current);
     settleTimer.current = setTimeout(() => {
@@ -135,7 +106,6 @@ export const CardFeed: React.FC<CardFeedProps> = ({
         if (prevEl) {
           const pr = prevEl.getBoundingClientRect();
           const prevDist = Math.abs((pr.top + pr.height / 2) - viewportCenter);
-          // Hysteresis: require new card to be ≥40px closer to center.
           if (prevDist - bestDist < 40) return prev;
         }
         return bestIdx;
@@ -165,8 +135,6 @@ export const CardFeed: React.FC<CardFeedProps> = ({
     };
   }, [recheckActive]);
 
-  // Re-evaluate on scroll — IntersectionObserver alone doesn't fire
-  // continuously during scroll within the on-screen set.
   useEffect(() => {
     let raf = 0;
     const onScroll = () => {
@@ -183,37 +151,26 @@ export const CardFeed: React.FC<CardFeedProps> = ({
     };
   }, [recheckActive]);
 
-  // Virtuoso's rangeChanged kept as a no-op; center-proximity owns activeIdx.
-  const handleRangeChanged = useCallback(
-    (_: { startIndex: number; endIndex: number }) => {},
-    [],
-  );
-
   const setActiveIndex = useClubhouseStore((s) => s.setActiveIndex);
   const setCarouselPosition = useClubhouseStore((s) => s.setCarouselPosition);
   const carouselPositions = useClubhouseStore((s) => s.carouselPositions);
   const openFullscreen = useFullscreenFeedStore((s) => s.open);
   const fsOpen = useFullscreenFeedStore((s) => s.isOpen);
 
-  // Sync the active card to the global store so other consumers (top-bar
-  // carousel chip, fullscreen handoff, etc.) stay in step.
   useEffect(() => {
     setActiveIndex(activeIdx);
   }, [activeIdx, setActiveIndex]);
 
-  // Warm-start the next 1-2 upcoming videos so they play instantly on arrival.
   useEffect(() => {
-    const PREFETCH_AHEAD = 2; // was 3 — keep concurrent decoders within iOS cap (3)
+    const PREFETCH_AHEAD = 2;
     for (let i = 1; i <= PREFETCH_AHEAD; i++) {
       const next = posts[activeIdx + i];
       if (!next) continue;
-      const media = next.mediaItems?.[0];
-      const hlsUrl = media?.hlsUrl;
+      const hlsUrl = next.mediaItems?.[0]?.hlsUrl;
       if (hlsUrl) prefetchTile(hlsUrl);
     }
   }, [activeIdx, posts]);
 
-  // Warm the first videos on feed mount so even the initial card isn't fully cold.
   useEffect(() => {
     if (!posts?.length) return;
     [0, 1].forEach((i) => {
@@ -233,7 +190,6 @@ export const CardFeed: React.FC<CardFeedProps> = ({
     [posts, setActiveIndex, setCarouselPosition, openFullscreen],
   );
 
-  // Stable per-post carousel-change callback so FeedCard memo holds.
   const carouselChangeCacheRef = useRef(new Map<string, (post: FeedPost, slide: number) => void>());
   const getCarouselChangeHandler = useCallback(
     (postId: string) => {
@@ -241,7 +197,6 @@ export const CardFeed: React.FC<CardFeedProps> = ({
       let fn = cache.get(postId);
       if (!fn) {
         fn = (post: FeedPost, slide: number) => {
-          // Recompute index at call time — `posts` may have grown.
           const idx = posts.findIndex((p) => p.id === post.id);
           if (idx >= 0) setCarouselPosition(idx, slide);
         };
@@ -252,7 +207,6 @@ export const CardFeed: React.FC<CardFeedProps> = ({
     [posts, setCarouselPosition],
   );
 
-  // Garbage-collect carousel-change cache when posts shrink/change.
   useEffect(() => {
     const live = new Set(posts.map((p) => p.id));
     const cache = carouselChangeCacheRef.current;
@@ -263,8 +217,8 @@ export const CardFeed: React.FC<CardFeedProps> = ({
     (index: number, post: FeedPost) => {
       const likeState = getLikeState(post);
       const initialSlide = carouselPositions.get(index) ?? 0;
-      const isActive = !fsOpen && index === playingIdx; // PLAYS — settle-gated; suspended while fullscreen
-      const isNear = !fsOpen && Math.abs(index - activeIdx) <= VIDEO_NEIGHBOUR_RADIUS; // mounts + paints frame — instant; suspended while fullscreen
+      const isActive = !fsOpen && index === playingIdx;
+      const isNear = !fsOpen && Math.abs(index - activeIdx) <= VIDEO_NEIGHBOUR_RADIUS;
       const mountVideo = isNear;
       return (
         <div
@@ -279,7 +233,7 @@ export const CardFeed: React.FC<CardFeedProps> = ({
             }
           }}
         >
-          <FeedCard
+          <LightFeedCard
             post={post}
             liked={!!likeState?.liked}
             likeCount={likeState?.count ?? post.likeCount ?? 0}
@@ -299,16 +253,15 @@ export const CardFeed: React.FC<CardFeedProps> = ({
             currentUserId={currentUserId}
             feedIndex={index}
           />
-          {/* Subtle inter-card seam — just-perceptible lift above ink chrome */}
-          <div aria-hidden style={{ height: 5, background: '#1E212B' }} />
+          {/* Inter-card divider — a touch darker than the page bg */}
+          <div aria-hidden style={{ height: 1, background: DIVIDER }} />
         </div>
       );
     },
     [
       activeIdx,
-      playingIdx,        // isActive keys off playingIdx; without this the
-                         // settle-promoted play index never reaches the tiles
-      fsOpen,            // recompute isActive/isNear when fullscreen opens/closes
+      playingIdx,
+      fsOpen,
       carouselPositions,
       getCarouselChangeHandler,
       getCommentCount,
@@ -337,33 +290,20 @@ export const CardFeed: React.FC<CardFeedProps> = ({
     if (hasNextPage && onNearEnd) onNearEnd();
   }, [hasNextPage, onNearEnd]);
 
-
-
-
-
   return (
-    <div
-      style={{
-        background: CANVAS,
-        height: '100dvh',
-        width: '100%',
-      }}
-      data-card-feed
-    >
+    <div style={{ width: '100%', background: PAGE_BG }} data-card-feed="light">
       <Virtuoso
-        ref={virtuosoRef}
+        useWindowScroll
         data={posts}
         itemContent={itemContent}
         computeItemKey={(_, post) => post.id}
-        rangeChanged={handleRangeChanged}
         endReached={handleEndReached}
-        increaseViewportBy={{ top: 400, bottom: 800 }}
-        overscan={{ main: 400, reverse: 400 }}
+        increaseViewportBy={{ top: 400, bottom: 1200 }}
+        overscan={{ main: 600, reverse: 400 }}
         components={components}
-        style={{ height: '100%', width: '100%' }}
       />
     </div>
   );
 };
 
-CardFeed.displayName = 'CardFeed';
+LightCardFeed.displayName = 'LightCardFeed';
