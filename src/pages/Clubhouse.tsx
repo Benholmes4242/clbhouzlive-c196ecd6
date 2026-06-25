@@ -569,8 +569,8 @@ const ClubhouseContent = () => {
             topPadding={'calc(env(safe-area-inset-top, 0px) + 59px)'}
             onNearEnd={handleNearEnd}
             hasNextPage={hasNextPage}
-            onLike={(post, actor) => handleLike(post, actor)}
-            onComment={(post, actor) => openComments(post, actor)}
+            onLike={(post) => handleLike(post)}
+            onComment={(post) => openComments(post)}
             onShare={(post) => handleShare(post)}
             onProfile={(post) => navigate(getActorRouteByType(post.actorType, post.actorId))}
             onCourse={(post) => post.courseId && navigate(`/courses/${post.courseId}`)}
