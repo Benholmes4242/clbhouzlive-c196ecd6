@@ -31,7 +31,7 @@ export function useNotableDifficultCourses() {
         .eq('rail_key', 'toughest_courses')
         .maybeSingle();
       if (error) throw error;
-      return (data?.payload ?? []) as DifficultCourse[];
+      return (data?.payload ?? []) as unknown as DifficultCourse[];
     },
   });
 }

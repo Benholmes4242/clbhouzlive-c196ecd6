@@ -28,7 +28,7 @@ export function useRecentCourseRecords(limit = 8) {
         .eq('rail_key', 'latest_records')
         .maybeSingle();
       if (error) throw error;
-      const rows = (data?.payload ?? []) as RecentCourseRecord[];
+      const rows = (data?.payload ?? []) as unknown as RecentCourseRecord[];
       return rows.slice(0, limit);
     },
   });
