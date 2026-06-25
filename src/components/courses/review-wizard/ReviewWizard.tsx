@@ -761,7 +761,7 @@ export function ReviewWizard({
                       <div
                         style={{
                           display: 'grid',
-                          gridTemplateColumns: '1fr 1fr',
+                          gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))',
                           gap: '18px 14px',
                           alignItems: 'start',
                           paddingTop: 12,
