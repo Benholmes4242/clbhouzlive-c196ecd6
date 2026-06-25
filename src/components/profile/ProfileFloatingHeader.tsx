@@ -11,10 +11,14 @@
  * exactly where ClubhouseTopBar / CompactHeader sit — directly under the notch.
  */
 
-import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import React, { useState, useRef, useEffect } from 'react';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { ArrowLeft, Search, Settings } from 'lucide-react';
 import GlobalSearchOverlay from '@/components/search/GlobalSearchOverlay';
+import { PostingAsPill } from '@/components/header/PostingAsPill';
+import { PostingAsMenu } from '@/components/header/PostingAsMenu';
+import { useSupabaseSession } from '@/hooks/useSupabaseSession';
+import { useUnreadNotifications } from '@/hooks/useUnreadNotifications';
 import { safeGoBack } from '@/utils/navigation';
 
 const FLOAT_STROKE = 2;
@@ -35,7 +39,18 @@ export const ProfileFloatingHeader: React.FC<ProfileFloatingHeaderProps> = ({
   onSettingsClick,
 }) => {
   const navigate = useNavigate();
+  const { pathname } = useLocation();
+  const { user } = useSupabaseSession();
+  const { hasUnread, unreadCount } = useUnreadNotifications();
   const [searchOpen, setSearchOpen] = useState(false);
+  const [menuOpen, setMenuOpen] = useState(false);
+  const pillRef = useRef<HTMLButtonElement>(null);
+
+  // Close transient overlays on route change.
+  useEffect(() => {
+    setSearchOpen(false);
+    setMenuOpen(false);
+  }, [pathname]);
 
   // When viewing own profile via the bottom-nav tab there's no history to pop —
   // show a settings gear instead. Otherwise show a back arrow.
@@ -99,7 +114,7 @@ export const ProfileFloatingHeader: React.FC<ProfileFloatingHeaderProps> = ({
           </button>
 
           {/* RIGHT cluster */}
-          <div className="flex items-center" style={{ gap: 8 }}>
+          <div className="flex items-center" style={{ gap: 12 }}>
             <button
               type="button"
               onClick={() => setSearchOpen(true)}
@@ -117,9 +132,29 @@ export const ProfileFloatingHeader: React.FC<ProfileFloatingHeaderProps> = ({
             >
               <Search size={21} strokeWidth={FLOAT_STROKE} />
             </button>
+
+            {user && (
+              <PostingAsPill
+                ref={pillRef}
+                onClick={() => setMenuOpen((v) => !v)}
+                isOpen={menuOpen}
+                hasUnreadNotifications={hasUnread}
+                notificationCount={unreadCount}
+                useBareTheme={true}
+              />
+            )}
           </div>
         </div>
       </div>
+
+      {user && (
+        <PostingAsMenu
+          isOpen={menuOpen}
+          onClose={() => setMenuOpen(false)}
+          useLightTheme={true}
+          anchorRef={pillRef}
+        />
+      )}
 
       <GlobalSearchOverlay isOpen={searchOpen} onClose={() => setSearchOpen(false)} />
     </>
