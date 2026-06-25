@@ -74,8 +74,6 @@ export const WantToPlaySection: React.FC<WantToPlaySectionProps> = ({
           overflowX: 'auto',
           scrollSnapType: 'x mandatory',
           paddingBottom: 4,
-          marginLeft: -16,
-          marginRight: -16,
           paddingLeft: 16,
           paddingRight: 16,
           scrollbarWidth: 'none',
