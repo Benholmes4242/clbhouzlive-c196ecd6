@@ -1,12 +1,11 @@
 /**
- * HandicapVisibilityControl — two independent audience controls in Edit Profile.
+ * HandicapVisibilityControl — handicap page audience control in Edit Profile.
  *
- *   Block 1 "Course Champions"           → champions_visibility
- *   Block 2 "Handicap Page & Comparisons" → handicap_page_visibility
+ *   Block: "Handicap Page & Comparisons" → handicap_page_visibility
  *
- * Each is a three-card single-select: Everyone / Friends only / Hidden.
- * Server-side enforcement lives in the RPCs (get_legend_holders_for_courses,
- * get_course_legends, get_friends_who_held_legend, get_my_handicap_percentile).
+ * Course Champions appearance is no longer controlled here; it now follows the
+ * unified `leaderboard_visibility` setting in Settings → Privacy (which also
+ * governs all ranked surfaces). See Brief 3.
  */
 import { Globe2, Users, EyeOff, Check } from 'lucide-react';
 import { SectionEyebrow } from '@/components/ui/SectionEyebrow';
@@ -14,9 +13,7 @@ import { SectionEyebrow } from '@/components/ui/SectionEyebrow';
 export type HandicapVisibility = 'everyone' | 'friends' | 'nobody';
 
 interface Props {
-  championsVisibility: HandicapVisibility;
   handicapPageVisibility: HandicapVisibility;
-  onChampionsChange: (v: HandicapVisibility) => void;
   onHandicapPageChange: (v: HandicapVisibility) => void;
 }
 
@@ -109,9 +106,7 @@ function Block({
 }
 
 export function HandicapVisibilityControl({
-  championsVisibility,
   handicapPageVisibility,
-  onChampionsChange,
   onHandicapPageChange,
 }: Props) {
   return (
@@ -119,13 +114,6 @@ export function HandicapVisibilityControl({
       <div style={{ marginBottom: 4 }}>
         <SectionEyebrow label="Handicap Visibility" />
       </div>
-
-      <Block
-        title="Course Champions"
-        description="Show your name on Champions / Crown Holders rows in course details."
-        value={championsVisibility}
-        onChange={onChampionsChange}
-      />
 
       <Block
         title="Handicap Page & Comparisons"
@@ -140,7 +128,8 @@ export function HandicapVisibilityControl({
           marginTop: 4,
         }}
       >
-        These two controls work independently. Your own data is always visible to you.
+        Your appearance in Course Champions and other ranked boards is controlled by
+        “Who can see you in leaderboards” in Settings → Privacy. Your own data is always visible to you.
       </p>
     </div>
   );
