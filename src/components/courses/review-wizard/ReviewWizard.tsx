@@ -994,18 +994,13 @@ export function ReviewWizard({
                       left: 0,
                       right: 0,
                       bottom: keyboardHeight,
-                      display: 'flex',
-                      gap: 10,
-                      padding:
-                        keyboardHeight > 0
-                          ? '10px 16px'
-                          : '12px 16px calc(env(safe-area-inset-bottom, 0px) + 18px)',
                       borderTop: `0.5px solid ${HAIR}`,
                       background: SURFACE,
                       transition: 'bottom 0.2s ease',
                       zIndex: 40,
                     }}
                   >
+                    <div style={{ width: '100%', maxWidth: 480, marginInline: 'auto', display: 'flex', gap: 10, padding: keyboardHeight > 0 ? `10px ${PAD_X}` : `12px ${PAD_X} calc(env(safe-area-inset-bottom, 0px) + 18px)` }}>
                     {wizard.allMedia.length < 10 && (
                       <button
                         onClick={() => fileRef.current?.click()}
