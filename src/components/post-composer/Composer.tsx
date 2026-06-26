@@ -233,6 +233,8 @@ export function Composer({
       })),
     );
     setMediaItems(remoteMediaToComposerItems(editable.media));
+  }, [isEditMode, editablePostQuery.data, onClose, setMediaItems]);
+
 
   // Draft-mode prefill: load the saved draft and rehydrate caption / visibility
   // / tagged courses / media. Media is fetched back from R2 as Files so the
