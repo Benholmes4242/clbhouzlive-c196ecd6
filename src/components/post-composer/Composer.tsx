@@ -1293,11 +1293,39 @@ export function Composer({
                 }}
               >
                 <div style={{ padding: '16px 16px 12px', textAlign: 'center' }}>
-                  <div style={{ fontSize: 15, fontWeight: 800, color: INK_2 }}>Discard post?</div>
+                  <div style={{ fontSize: 15, fontWeight: 800, color: INK_2 }}>
+                    {isEditMode ? 'Discard changes?' : 'Save this draft?'}
+                  </div>
                   <div style={{ fontSize: 12, color: INK_MUTE, marginTop: 4 }}>
-                    Your draft won't be saved.
+                    {isEditMode
+                      ? "Your changes won't be saved."
+                      : 'Pick it up later from Drafts.'}
                   </div>
                 </div>
+                {!isEditMode && (
+                  <button
+                    onClick={async () => {
+                      const ok = await handleSaveDraft();
+                      setDiscardConfirmOpen(false);
+                      if (ok) onClose();
+                    }}
+                    disabled={isSavingDraft}
+                    style={{
+                      width: '100%',
+                      padding: '14px 0',
+                      background: SURFACE,
+                      border: 'none',
+                      borderTop: `0.5px solid ${HAIR}`,
+                      color: INK_2,
+                      fontSize: 15,
+                      fontWeight: 800,
+                      cursor: isSavingDraft ? 'default' : 'pointer',
+                      opacity: isSavingDraft ? 0.5 : 1,
+                    }}
+                  >
+                    {isSavingDraft ? 'Saving…' : 'Save draft'}
+                  </button>
+                )}
                 <button
                   onClick={() => {
                     setDiscardConfirmOpen(false);
