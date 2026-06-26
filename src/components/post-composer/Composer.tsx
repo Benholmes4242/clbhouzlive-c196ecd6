@@ -901,8 +901,31 @@ export function Composer({
             {isSavingDraft ? 'Saving…' : 'Save draft'}
           </button>
         )}
+        {!isEditMode && (
+          <button
+            onClick={() => canPost && setScheduleSheetOpen(true)}
+            disabled={!canPost}
+            aria-label="Schedule post"
+            title="Schedule for later"
+            style={{
+              width: 36,
+              height: 36,
+              borderRadius: '50%',
+              background: CHIP,
+              border: 'none',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              cursor: canPost ? 'pointer' : 'default',
+              color: canPost ? INK_2 : '#94A3B8',
+              marginRight: 6,
+            }}
+          >
+            <Clock size={16} strokeWidth={2.25} />
+          </button>
+        )}
         <button
-          onClick={handleShare}
+          onClick={() => handleShare(null)}
           disabled={!canPost}
           style={{
             fontSize: 13,
@@ -921,6 +944,7 @@ export function Composer({
             : (isSubmitting ? 'Posting…' : 'Post')}
         </button>
       </div>
+
 
       {/* Scroll body */}
       <div
