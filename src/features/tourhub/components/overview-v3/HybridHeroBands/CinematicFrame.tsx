@@ -24,6 +24,7 @@ import {
   AMBER,
   GOLD,
   NUMERIC_STYLE,
+  SC_BIRDIE,
 } from '../HybridHero.constants';
 import { AMBER_INK, GOLD_DEEP } from '../../../_shared/tokens';
 import type { HeroState, TopTie, TickerRow } from '../HybridHero.utils';
