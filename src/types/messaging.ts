@@ -94,7 +94,9 @@ export interface Conversation {
 export interface ConversationParticipant {
   id: string;
   conversation_id: string;
-  user_id: string;
+  user_id: string | null;
+  actor_type?: 'personal' | 'business';
+  actor_id?: string | null;
   role: ParticipantRole;
   joined_at: string;
   last_read_at: string | null;
@@ -110,6 +112,8 @@ export interface Message {
   id: string;
   conversation_id: string;
   sender_id: string;
+  sender_actor_type?: 'personal' | 'business';
+  sender_actor_id?: string | null;
   content: string;
   message_type: MessageType;
   media_url: string | null;
@@ -122,8 +126,9 @@ export interface Message {
 }
 
 /**
- * Profile info for participants/senders
- * Matches public_profiles view columns
+ * Profile info for participants/senders (unified across personal users + businesses).
+ * For business identities we re-use the same shape: id=business.id, display_name=name,
+ * profile_photo_url=logo_url, and actor_type='business'.
  */
 export interface ParticipantProfile {
   id: string;
@@ -132,6 +137,8 @@ export interface ParticipantProfile {
   profile_photo_url: string | null;
   eg_handicap_index: number | null;
   home_club: string | null;
+  actor_type?: 'personal' | 'business';
+  is_verified?: boolean | null;
 }
 
 /**
