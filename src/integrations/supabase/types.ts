@@ -19975,17 +19975,31 @@ export type Database = {
         Args: { p_user_id: string }
         Returns: undefined
       }
-      send_message: {
-        Args: {
-          p_content: string
-          p_conversation_id: string
-          p_media_metadata?: Json
-          p_media_url?: string
-          p_message_type?: string
-          p_reply_to_id?: string
-        }
-        Returns: string
-      }
+      send_message:
+        | {
+            Args: {
+              p_content: string
+              p_conversation_id: string
+              p_media_metadata?: Json
+              p_media_url?: string
+              p_message_type?: string
+              p_reply_to_id?: string
+            }
+            Returns: string
+          }
+        | {
+            Args: {
+              p_content: string
+              p_conversation_id: string
+              p_media_metadata: Json
+              p_media_url: string
+              p_message_type: string
+              p_reply_to_id: string
+              p_sender_actor_id: string
+              p_sender_actor_type: string
+            }
+            Returns: string
+          }
       send_push_notification: {
         Args: {
           data?: Json
