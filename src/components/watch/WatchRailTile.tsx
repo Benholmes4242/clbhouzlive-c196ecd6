@@ -19,6 +19,10 @@ interface WatchRailTileProps {
    * Optional → falls back to global time-only behavior.
    */
   viewedPostIds?: Set<string>;
+  /** Tile aspect ratio. Defaults to '3/4' (portrait). Pass '1/1' for square. */
+  aspectRatio?: string;
+  /** Border radius in px. Defaults to 6. */
+  radius?: number;
 }
 
 const NEW_THRESHOLD_MS = 24 * 60 * 60 * 1000; // 24h
@@ -50,6 +54,8 @@ export default function WatchRailTile({
   rank,
   width = 200,
   viewedPostIds,
+  aspectRatio = '3/4',
+  radius = 6,
 }: WatchRailTileProps) {
   const cardRef = useRef<HTMLDivElement>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
@@ -131,10 +137,10 @@ export default function WatchRailTile({
         flexShrink: 0,
         position: 'relative',
         width,
-        borderRadius: 6,
+        borderRadius: radius,
         overflow: 'hidden',
         cursor: 'pointer',
-        aspectRatio: '3/4',
+        aspectRatio,
       }}
       onClick={handleClick}
     >

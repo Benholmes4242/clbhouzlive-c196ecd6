@@ -70,6 +70,13 @@ function BucketListRailInner() {
       .filter((p): p is FeedPost => Boolean(p));
   }, [orderedIds, posts]);
 
+  // postId → course name lookup so each interleaved tile captions correctly.
+  const courseNameByPostId = useMemo(() => {
+    const m = new Map<string, string>();
+    for (const c of courses) for (const id of c.recent_post_ids ?? []) m.set(id, c.course_name);
+    return m;
+  }, [courses]);
+
   if (coursesLoading || postsLoading) return null;
   if (courses.length === 0 || orderedPosts.length === 0) return null;
 
@@ -94,8 +101,34 @@ function BucketListRailInner() {
       />
       <HRail>
         {orderedPosts.map((post, i) => (
-          <div key={post.id} style={{ scrollSnapAlign: 'start' }}>
-            <WatchRailTile post={post} index={i} allPosts={orderedPosts} />
+          <div
+            key={post.id}
+            style={{ scrollSnapAlign: 'start', flexShrink: 0, width: 158 }}
+          >
+            <WatchRailTile
+              post={post}
+              index={i}
+              allPosts={orderedPosts}
+              width={158}
+              aspectRatio="1/1"
+              radius={16}
+            />
+            {!singleCourse && (
+              <div
+                style={{
+                  fontSize: 12.5,
+                  fontWeight: 700,
+                  color: '#0F172A',
+                  marginTop: 6,
+                  whiteSpace: 'nowrap',
+                  overflow: 'hidden',
+                  textOverflow: 'ellipsis',
+                  maxWidth: 158,
+                }}
+              >
+                {courseNameByPostId.get(post.id) ?? ''}
+              </div>
+            )}
           </div>
         ))}
       </HRail>
