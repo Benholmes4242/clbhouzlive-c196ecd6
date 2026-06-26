@@ -185,7 +185,10 @@ function getContextUrl(notification: any): string {
     return `/post/${entity_id}`;
   }
   if (entity_type === 'comment' && data?.post_id) {
-    return `/post/${data.post_id}`;
+    const commentId = data?.comment_id;
+    return commentId
+      ? `/post/${data.post_id}/comment/${commentId}`
+      : `/post/${data.post_id}`;
   }
   // Follow notifications
   if (FOLLOW_TYPES.has(type)) {
