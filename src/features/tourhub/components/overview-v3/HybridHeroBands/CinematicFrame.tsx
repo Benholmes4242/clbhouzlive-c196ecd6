@@ -56,6 +56,15 @@ function entryThru(e: any): string {
   if (e?.thru == null) return '—';
   return String(e.thru);
 }
+// Current-round score-to-par + thru, read from the live raw_data.rounds array
+// (same source as FullLeaderboard's getLiveRoundData — the proven live pipeline).
+function liveRoundFor(entry: any, roundNum: number): { today: number | null; thru: number | null } {
+  const rounds = entry?.raw_data?.rounds;
+  if (!Array.isArray(rounds) || rounds.length < roundNum) return { today: null, thru: null };
+  const r = rounds[roundNum - 1];
+  if (!r || (r.thru === 0 && r.strokes === 0)) return { today: null, thru: null };
+  return { today: r.score ?? null, thru: r.thru ?? null };
+}
 function resolveAvatar(e: any, tourSlug?: string | null): string | null {
   return resolveAvatarCandidates(e, tourSlug)[0] ?? null;
 }
@@ -1177,7 +1186,7 @@ export function CinematicFrame({
         }
 
         // Dynamic TODAY column: only render when at least one solo row carries a value.
-        const anyToday = rows.some((r: any) => r?.kind === 'solo' && r?.entry?.today != null);
+        const anyToday = rows.some((r: any) => r?.kind === 'solo' && liveRoundFor(r?.entry, state.round).today != null);
 
         return (
           <button
@@ -1229,7 +1238,8 @@ export function CinematicFrame({
               if (row.kind === 'solo') {
                 const entry = row.entry;
                 const name = entryName(entry);
-                const today = entry?.today;
+                const { today, thru: liveThru } = liveRoundFor(entry, state.round);
+                const thruDisplay = liveThru != null ? (liveThru === 18 ? 'F' : String(liveThru)) : entryThru(entry);
                 return (
                   <div key={`solo-${i}`} style={rowStyle}>
                     <span style={{ ...NUMERIC_STYLE, width: RANK_W, fontSize: 12, fontWeight: 700, color: row.isLeader ? AMBER : 'rgba(255,255,255,0.5)', textAlign: 'left', flexShrink: 0 }}>{row.rank}</span>
@@ -1251,7 +1261,7 @@ export function CinematicFrame({
                       {fmtScore(entry?.score)}
                     </span>
                     <span style={{ ...NUMERIC_STYLE, width: COL_THRU, textAlign: 'right', fontSize: 11, fontWeight: 600, color: 'rgba(255,255,255,0.4)' }}>
-                      {entryThru(entry)}
+                      {thruDisplay}
                     </span>
                   </div>
                 );
