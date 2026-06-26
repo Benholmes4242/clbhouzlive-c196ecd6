@@ -23,8 +23,18 @@ export interface ComposerMediaItem {
     /** post_media.original_media_url — null means recrop is unavailable. */
     originalMediaUrl: string | null;
   };
-
+  /**
+   * Set on video tiles rebuilt from a saved draft. The video is already in
+   * Cloudflare Stream — on submit, attach it to the post by stream_id instead
+   * of re-uploading.
+   */
+  restoredStreamId?: string;
+  restoredMediaUrl?: string;
+  /** Duration (seconds) carried through for restored videos. */
+  durationSeconds?: number;
 }
+
+
 
 /** Build composer items from existing post_media rows (edit mode). */
 export function remoteMediaToComposerItems(
