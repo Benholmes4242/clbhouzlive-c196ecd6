@@ -11,6 +11,8 @@ import { ComposerChooser } from './ComposerChooser';
 import { Composer } from './Composer';
 import { MediaEditor } from './MediaEditor';
 import { CourseSearchSheet } from './CourseSearchSheet';
+import { DraftsListSheet } from './DraftsListSheet';
+import { usePostStudioStore } from '@/stores/usePostStudioStore';
 import type { ComposerMediaItem } from './composerMedia';
 import type { StudioActorType, TaggedCourse } from './types';
 
@@ -24,6 +26,8 @@ interface PostComposerProps {
   initialActorId?: string | null;
   /** When set, opens the Composer in edit mode against this existing post id. */
   editPostId?: string | null;
+  /** When set, opens the Composer resuming this saved draft. */
+  draftId?: string | null;
 }
 
 export function PostComposer({
@@ -33,6 +37,7 @@ export function PostComposer({
   initialActorType = 'personal',
   initialActorId = null,
   editPostId = null,
+  draftId = null,
 }: PostComposerProps) {
   const navigate = useNavigate();
   const { availableActors } = useActiveActor();
