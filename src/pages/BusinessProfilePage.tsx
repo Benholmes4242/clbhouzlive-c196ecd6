@@ -26,6 +26,7 @@ import { useBusinessFollowersCount } from '@/hooks/useBusinessFollow';
 import { useBusinessFollowingCount } from '@/hooks/useBusinessSocialLists';
 import { useFollowState } from '@/hooks/useFollowState';
 import { useToggleFollow } from '@/hooks/useToggleFollow';
+import { useActiveActor } from '@/context/ActiveActorContext';
 import { useBusinessImageUpload } from '@/hooks/useBusinessImageUpload';
 import { useBusinessTeam } from '@/hooks/useBusinessTeam';
 import { useStartDM } from '@/hooks/useStartDM';
