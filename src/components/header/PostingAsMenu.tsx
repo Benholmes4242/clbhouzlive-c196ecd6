@@ -20,6 +20,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useLogout } from '@/hooks/useLogout';
 import ProfileHubSheet from '@/components/profile/ProfileHubSheet';
 import { useEditProfileRoute } from '@/hooks/useEditProfileRoute';
+import { getActorRoute } from '@/types/actor';
 
 interface PostingAsMenuProps {
   isOpen: boolean;
@@ -186,6 +187,20 @@ export function PostingAsMenu({ isOpen, onClose, useLightTheme = false, anchorRe
     }
   };
 
+  // Resolve actor-aware destinations for View/Edit/Settings
+  const isBusinessActor = activeActor?.type === 'business';
+  const viewProfileRoute = isBusinessActor && activeActor
+    ? getActorRoute(activeActor)
+    : '/profile';
+  const editProfileRoute = isBusinessActor && activeActor?.id
+    ? `/business/${activeActor.id}/edit`
+    : editRoute;
+  // D3 minimal: business "Settings" routes to the business editor where
+  // notification toggles live; personal stays on the global settings page.
+  const settingsRoute = isBusinessActor && activeActor?.id
+    ? `/business/${activeActor.id}/edit`
+    : '/settings';
+
   // Handle navigation from ProfileHubSheet
   const handleAccountHubNavigate = (route: string) => {
     if (route === '/upload') {
@@ -195,9 +210,12 @@ export function PostingAsMenu({ isOpen, onClose, useLightTheme = false, anchorRe
     } else if (route === '/settings/business') {
       navigate('/businesses/manage');
     } else if (route === '/settings/profile') {
-      navigate(editRoute);
+      navigate(editProfileRoute);
     } else if (route === `/profile/${currentActorData.id}`) {
-      handleNavigate('/profile');
+      // ProfileHubSheet "View profile" → actor-aware target
+      handleNavigate(viewProfileRoute);
+    } else if (route === '/settings') {
+      handleNavigate(settingsRoute);
     } else {
       navigate(route);
     }
@@ -452,19 +470,19 @@ export function PostingAsMenu({ isOpen, onClose, useLightTheme = false, anchorRe
             )}
           />
           
-          {/* View profile */}
+          {/* View profile — actor-aware */}
           <MenuRow
             icon={<User className="h-[18px] w-[18px]" />}
-            label="View profile"
-            onClick={() => handleNavigate('/profile')}
+            label={isBusinessActor ? `View ${activeActor?.name ?? 'profile'}` : 'View profile'}
+            onClick={() => handleNavigate(viewProfileRoute)}
             useLightTheme={useLightTheme}
           />
           
-          {/* Edit profile */}
+          {/* Edit profile — actor-aware */}
           <MenuRow
             icon={<Pencil className="h-[18px] w-[18px]" />}
-            label="Edit profile"
-            onClick={() => handleNavigate(editRoute)}
+            label={isBusinessActor ? `Edit ${activeActor?.name ?? 'profile'}` : 'Edit profile'}
+            onClick={() => handleNavigate(editProfileRoute)}
             useLightTheme={useLightTheme}
           />
           
@@ -476,11 +494,11 @@ export function PostingAsMenu({ isOpen, onClose, useLightTheme = false, anchorRe
             useLightTheme={useLightTheme}
           />
           
-          {/* Settings */}
+          {/* Settings — actor-aware */}
           <MenuRow
             icon={<Settings className="h-[18px] w-[18px]" />}
             label="Settings"
-            onClick={() => handleNavigate('/settings')}
+            onClick={() => handleNavigate(settingsRoute)}
             useLightTheme={useLightTheme}
           />
 

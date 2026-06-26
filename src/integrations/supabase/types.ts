@@ -702,6 +702,7 @@ export type Database = {
           logo_url: string | null
           mapbox_place_id: string | null
           name: string
+          notification_preferences: Json
           opening_hours: Json | null
           phone: string | null
           postcode: string | null
@@ -744,6 +745,7 @@ export type Database = {
           logo_url?: string | null
           mapbox_place_id?: string | null
           name: string
+          notification_preferences?: Json
           opening_hours?: Json | null
           phone?: string | null
           postcode?: string | null
@@ -786,6 +788,7 @@ export type Database = {
           logo_url?: string | null
           mapbox_place_id?: string | null
           name?: string
+          notification_preferences?: Json
           opening_hours?: Json | null
           phone?: string | null
           postcode?: string | null

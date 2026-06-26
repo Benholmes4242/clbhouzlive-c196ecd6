@@ -49,6 +49,7 @@ import { IdentitySection } from '@/components/business/editor/IdentitySection';
 import { LocationContactSection } from '@/components/business/editor/LocationContactSection';
 import { BrandingSection } from '@/components/business/editor/BrandingSection';
 import { SocialSection } from '@/components/business/editor/SocialSection';
+import { NotificationsSection } from '@/components/business/editor/NotificationsSection';
 import {
   DEFAULT_OPENING_HOURS,
   OpeningHours,
@@ -824,6 +825,11 @@ export default function BusinessProfileEditor() {
           />
 
           <SocialSection social={social} setSocial={setSocial} />
+
+          {mode === 'edit' && business?.id && (
+            <NotificationsSection businessId={business.id} />
+          )}
+
 
           {/* Inline Save — bottom, matches personal Edit Profile */}
           <div className="px-4 pt-6 pb-2">
