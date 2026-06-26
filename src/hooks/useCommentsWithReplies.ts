@@ -463,6 +463,7 @@ export function useCommentsWithReplies(
               entity_type: 'post',
               entity_id: postId,
               is_read: false,
+              data: { post_id: postId, comment_id: newCommentId },
             });
           }
         }
