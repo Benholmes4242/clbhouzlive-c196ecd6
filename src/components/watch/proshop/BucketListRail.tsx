@@ -7,6 +7,7 @@ import { SectionHeader } from './SectionHeader';
 import { HRail } from './HRail';
 import WatchRailTile from '../WatchRailTile';
 import { useActiveActor } from '@/context/ActiveActorContext';
+import { BucketListMark } from './SectionMarks';
 import type { CourseAnchoredRow } from './hooks/useCourseAnchoredContent';
 import type { FeedPost } from '@/components/media-system/types/media';
 
@@ -87,8 +88,10 @@ function BucketListRailInner() {
       <SectionHeader
         paddingTop={16}
         kicker="From your bucket list"
+        kickerColor="amber"
         title={singleCourse ? singleCourse.course_name : 'Courses you want to play'}
         sub={`${courses.length} ${courses.length === 1 ? 'course' : 'courses'}`}
+        mark={<BucketListMark />}
         action={{
           label: 'See all',
           onClick: () =>

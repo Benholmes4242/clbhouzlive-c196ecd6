@@ -29,5 +29,17 @@ function VideosMarkInner() {
   );
 }
 
+/** Bucket list — bespoke amber filled golf pin flag (aspirational/destination identity). */
+function BucketListMarkInner() {
+  return (
+    <svg width={34} height={34} viewBox="0 0 30 30" aria-hidden style={{ flexShrink: 0, filter: 'drop-shadow(0 2px 5px rgba(247,147,30,0.35))' }}>
+      <path d="M9 3 L9 27" fill="none" stroke={AMBER_DARK} strokeWidth={2} strokeLinecap="round" />
+      <path d="M9 3.5 L22 8 L9 12.5 Z" fill={AMBER} stroke={AMBER_DARK} strokeWidth={0.5} strokeLinejoin="round" />
+      <path d="M5.5 27 L12.5 27" fill="none" stroke={AMBER_DARK} strokeWidth={2} strokeLinecap="round" />
+    </svg>
+  );
+}
+
 export const ClipsMark = memo(ClipsMarkInner);
 export const VideosMark = memo(VideosMarkInner);
+export const BucketListMark = memo(BucketListMarkInner);
