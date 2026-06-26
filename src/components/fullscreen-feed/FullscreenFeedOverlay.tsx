@@ -248,6 +248,7 @@ export function FullscreenFeedOverlay() {
           caption={activePost?.caption}
           theme="dark"
           likesCount={getActiveLikeState(activePost!)?.count ?? null}
+          initialCommentId={initialCommentId}
         />
       )}
 
