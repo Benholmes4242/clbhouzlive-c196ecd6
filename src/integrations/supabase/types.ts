@@ -18375,10 +18375,17 @@ export type Database = {
           total_rounds: number
         }[]
       }
-      get_or_create_dm_conversation: {
-        Args: { other_user_id: string }
-        Returns: string
-      }
+      get_or_create_dm_conversation:
+        | { Args: { other_user_id: string }; Returns: string }
+        | {
+            Args: {
+              p_caller_actor_id?: string
+              p_caller_actor_type?: string
+              p_target_actor_id: string
+              p_target_actor_type: string
+            }
+            Returns: string
+          }
       get_played_unrated_courses: {
         Args: { p_user_id: string }
         Returns: {
@@ -19625,10 +19632,16 @@ export type Database = {
         Args: { p_conversation_id: string }
         Returns: undefined
       }
-      mark_conversation_read: {
-        Args: { p_conversation_id: string }
-        Returns: undefined
-      }
+      mark_conversation_read:
+        | { Args: { p_conversation_id: string }; Returns: undefined }
+        | {
+            Args: {
+              p_actor_id?: string
+              p_actor_type?: string
+              p_conversation_id: string
+            }
+            Returns: undefined
+          }
       mark_message_read: { Args: { p_message_id: string }; Returns: undefined }
       mark_messages_read_in_conversation: {
         Args: { p_conversation_id: string }
@@ -20821,12 +20834,20 @@ export type Database = {
         }
         Returns: undefined
       }
+      user_in_conversation: {
+        Args: { p_conversation_id: string }
+        Returns: boolean
+      }
       user_is_conversation_participant: {
         Args: { check_user_id: string; conv_id: string }
         Returns: boolean
       }
       user_is_friend_of_host: {
         Args: { _host_id: string; _viewer_id: string }
+        Returns: boolean
+      }
+      user_manages_business: {
+        Args: { p_business_id: string }
         Returns: boolean
       }
       user_whs_played_golf_course_ids: {
