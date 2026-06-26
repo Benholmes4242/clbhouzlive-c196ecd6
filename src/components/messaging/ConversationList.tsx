@@ -347,7 +347,7 @@ export function ConversationList({
   const groupConversations = filteredConversations.filter(c => c.type !== 'direct');
 
   const renderConversationRow = (conversation: ConversationWithDetails, isArchived: boolean = false, index: number = 0, total: number = 0) => {
-    const { name, avatarUrl, initials } = getConversationDisplay(conversation, user?.id);
+    const { name, avatarUrl, initials, isBusiness } = getConversationDisplay(conversation, activeActorRef);
     const isSelected = selectedConversationId === conversation.id;
     const hasUnread = conversation.unread_count > 0;
     const showDivider = index < total - 1;
