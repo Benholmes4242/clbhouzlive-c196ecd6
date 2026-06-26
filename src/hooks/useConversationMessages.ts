@@ -135,10 +135,6 @@ export function useConversationMessages(conversationId: string | null): UseConve
           actor_type: 'business',
           is_verified: b.is_verified ?? false,
         });
-          actor_type: 'business',
-          isBusiness: true,
-          is_verified: b.is_verified ?? false,
-        } as ParticipantProfile);
       });
 
       // Fetch reply-to messages if any
