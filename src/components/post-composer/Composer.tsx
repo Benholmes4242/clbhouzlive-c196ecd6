@@ -101,11 +101,13 @@ export function Composer({
   mediaItems,
   setMediaItems,
   editPostId = null,
+  draftId = null,
 }: ComposerProps) {
   const { submitPost, isSubmitting } = usePostSubmission();
   const { updatePost, isUpdating } = useUpdatePost();
   const editablePostQuery = useEditablePost(editPostId);
   const isEditMode = !!editPostId;
+  const isDraftMode = !!draftId;
   const { activeActor, availableActors, setActiveActor } = useActiveActor();
   const fileRef = useRef<HTMLInputElement>(null);
 
