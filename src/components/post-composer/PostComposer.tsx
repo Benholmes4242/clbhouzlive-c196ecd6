@@ -44,6 +44,7 @@ export function PostComposer({
 
   const [screen, setScreen] = useState<Screen>('choose');
   const [reviewCourseSheetOpen, setReviewCourseSheetOpen] = useState(false);
+  const [draftsListOpen, setDraftsListOpen] = useState(false);
 
   // Shared media state — lives on the shell so the Editor can read/update it.
   const [mediaItems, setMediaItems] = useState<ComposerMediaItem[]>([]);
@@ -51,6 +52,7 @@ export function PostComposer({
 
   const isBusiness = initialActorType === 'business';
   const isEditMode = !!editPostId;
+  const isDraftMode = !!draftId;
 
   const actorInfo = useMemo(() => {
     if (isBusiness && initialActorId) {
