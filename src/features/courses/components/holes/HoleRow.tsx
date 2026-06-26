@@ -276,7 +276,7 @@ export const HoleRow: React.FC<Props> = ({ h, isHardest, isEasiest }) => {
                     lineHeight: 1,
                   }}
                 >
-                  {isZero ? '·' : `${v.toFixed(0)}`}
+                  {isZero ? '·' : `${v < 1 ? v.toFixed(1) : v.toFixed(0)}%`}
                 </div>
                 <div
                   style={{
