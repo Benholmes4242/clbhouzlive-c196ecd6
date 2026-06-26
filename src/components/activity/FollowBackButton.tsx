@@ -3,6 +3,7 @@ import { Check } from 'lucide-react';
 import { useFollowState } from '@/hooks/useFollowState';
 import { useToggleFollow } from '@/hooks/useToggleFollow';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
+import { useActiveActor } from '@/context/ActiveActorContext';
 import { toast } from 'sonner';
 
 interface FollowBackButtonProps {
@@ -17,27 +18,30 @@ export const FollowBackButton: React.FC<FollowBackButtonProps> = ({
   isMock = false,
 }) => {
   const { user } = useSupabaseSession();
+  const { activeActor } = useActiveActor();
+  const viewerActorType: 'personal' | 'business' = activeActor?.type ?? 'personal';
+  const viewerActorId = activeActor?.id ?? user?.id;
   const toggle = useToggleFollow();
   const { isFollowing: cached } = useFollowState({
     targetActorType: 'personal',
     targetActorId: actorId,
-    viewerActorType: 'personal',
-    viewerActorId: user?.id,
+    viewerActorType,
+    viewerActorId,
   });
   const isFollowing = cached ?? false;
 
   const handleFollowBack = async (e: React.MouseEvent) => {
     e.stopPropagation();
     if (isMock) { toast.info('This is sample data'); return; }
-    if (!user?.id || !actorId) return;
+    if (!user?.id || !actorId || !viewerActorId) return;
     if (isFollowing) return;
     try {
       await toggle.mutateAsync({
         targetActorType: 'personal',
         targetActorId: actorId,
         targetUserId: actorId,
-        viewerActorType: 'personal',
-        viewerActorId: user.id,
+        viewerActorType,
+        viewerActorId,
         viewerUserId: user.id,
         isFollowing: false,
       });
