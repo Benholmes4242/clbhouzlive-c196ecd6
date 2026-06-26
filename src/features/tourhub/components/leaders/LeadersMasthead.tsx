@@ -166,43 +166,8 @@ export function LeadersMasthead({
           padding: '16px 16px 14px',
         }}
       >
-        {/* ── Section header (canonical §2) ── */}
         <div style={{ marginBottom: 14 }}>
-          <button
-            type="button"
-            onClick={onEyebrowTap}
-            disabled={!onEyebrowTap}
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: 6,
-              background: 'transparent',
-              border: 'none',
-              padding: 0,
-              marginBottom: 6,
-              cursor: onEyebrowTap ? 'pointer' : 'default',
-            }}
-          >
-            <Activity size={13} strokeWidth={2.5} style={{ color: AMBER }} />
-            <span
-              style={{
-                fontSize: 10.5,
-                fontWeight: 700,
-                color: AMBER,
-                letterSpacing: '0.14em',
-                textTransform: 'uppercase',
-              }}
-            >
-              STAT WATCH
-            </span>
-            {onEyebrowTap && (
-              <ChevronRight
-                size={11}
-                strokeWidth={2.5}
-                style={{ color: AMBER, marginTop: 1 }}
-              />
-            )}
-          </button>
+
 
 
           <div

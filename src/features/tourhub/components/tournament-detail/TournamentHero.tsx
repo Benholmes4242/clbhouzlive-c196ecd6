@@ -60,23 +60,6 @@ export function TournamentHero({ tournament, leaderboard, isLive, isCompleted, i
 
   return (
     <div style={{ background: SLATE_50, padding: '10px 0 14px' }}>
-      {/* Section eyebrow → back to Schedule */}
-      <div style={{ padding: '0 16px 8px' }}>
-        <Link
-          to="/tourhub?tab=schedule"
-          style={{
-            display: 'inline-flex', alignItems: 'center', gap: 5,
-            color: AMBER, fontSize: 10, fontWeight: 800,
-            letterSpacing: '0.16em', textTransform: 'uppercase',
-            textDecoration: 'none',
-          }}
-          className="active:opacity-70 transition-opacity"
-        >
-          <Calendar size={11} strokeWidth={2.5} />
-          <span>Tournament</span>
-          <ChevronRight size={12} strokeWidth={2.5} />
-        </Link>
-      </div>
 
       <div style={{ margin: '0 16px' }}>
         <div

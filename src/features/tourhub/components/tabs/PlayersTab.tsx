@@ -722,28 +722,8 @@ export function PlayersTab() {
               const seasonLabel = `${season?.year ?? new Date().getFullYear()} ${tourLabel} Season`;
               return (
                 <div style={{ marginBottom: 14 }}>
-                  <button
-                    type="button"
-                    onClick={() => navigate('/tourhub?tab=overview', { replace: true })}
-                    aria-label="Players — open Tour Overview"
-                    style={{
-                      background: 'transparent',
-                      border: 'none',
-                      padding: 0,
-                      cursor: 'pointer',
-                      display: 'inline-flex',
-                      alignItems: 'center',
-                      gap: 6,
-                      marginBottom: 6,
-                    }}
-                  >
-                    <Users size={13} strokeWidth={2.5} style={{ color: AMBER }} />
-                    <span style={{ fontSize: 10.5, fontWeight: 700, letterSpacing: '0.14em', color: AMBER, textTransform: 'uppercase' as const }}>
-                      PLAYERS
-                    </span>
-                    <ChevronRight size={11} strokeWidth={2.5} style={{ color: AMBER, marginTop: 1 }} />
-                  </button>
-                  <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', gap: 8, marginTop: 8 }}>
+                  <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', gap: 8 }}>
+
                     <span style={{ fontSize: 13, fontWeight: 700, color: INK, letterSpacing: '-0.005em' }}>
                       {seasonLabel}
                     </span>

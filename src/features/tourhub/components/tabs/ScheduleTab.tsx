@@ -361,34 +361,6 @@ export function ScheduleTab() {
         const seasonLabel = season?.name ?? (season?.year ? `${season.year} Season` : 'Season');
         return (
           <div style={{ padding: '16px 16px 0', background: SLATE_50 }}>
-            <button
-              onClick={() => navigate('/tourhub?tab=overview', { replace: true })}
-              aria-label="Schedule — open Tour Overview"
-              style={{
-                background: 'transparent',
-                border: 'none',
-                padding: 0,
-                cursor: 'pointer',
-                display: 'inline-flex',
-                alignItems: 'center',
-                gap: 6,
-                marginBottom: 6,
-              }}
-            >
-              <Calendar size={13} color={AMBER} strokeWidth={2.5} />
-              <span style={{
-                fontSize: 10.5,
-                fontWeight: 700,
-                letterSpacing: '0.14em',
-                color: AMBER,
-                textTransform: 'uppercase' as const,
-              }}>
-                SCHEDULE
-              </span>
-              <ChevronRight size={11} color={AMBER} strokeWidth={2.5} style={{ marginTop: 1 }} />
-            </button>
-
-
             <div style={{
               display: 'flex',
               alignItems: 'baseline',
@@ -398,9 +370,10 @@ export function ScheduleTab() {
               color: INK,
               letterSpacing: '-0.005em',
               lineHeight: 1.25,
-              margin: '8px 0 0',
+              margin: 0,
               paddingBottom: 12,
             }}>
+
               <span>{seasonLabel}</span>
               <span style={{ fontWeight: 600, color: INK_FAINT }}>
                 {(tournaments ?? []).length} events across {tourCount} tour{tourCount !== 1 ? 's' : ''}
