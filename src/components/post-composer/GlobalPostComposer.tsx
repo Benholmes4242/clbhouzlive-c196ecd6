@@ -14,6 +14,7 @@ export function GlobalPostComposer() {
     initialActorId,
     returnPath,
     editPostId,
+    draftId,
     closePostStudio,
   } = usePostStudioStore();
   const navigate = useNavigate();
@@ -33,6 +34,7 @@ export function GlobalPostComposer() {
       initialActorType={initialActorType}
       initialActorId={initialActorId}
       editPostId={editPostId}
+      draftId={draftId}
     />
   );
 }
