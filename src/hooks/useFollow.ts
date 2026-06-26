@@ -7,6 +7,7 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToggleFollow } from '@/hooks/useToggleFollow';
 import { useFollowState } from '@/hooks/useFollowState';
+import { useActiveActor } from '@/context/ActiveActorContext';
 import { useSupabaseSession } from './useSupabaseSession';
 
 type FollowState = 'following' | 'not_following' | 'unknown';
