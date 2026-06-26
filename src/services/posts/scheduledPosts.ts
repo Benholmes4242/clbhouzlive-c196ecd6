@@ -64,8 +64,9 @@ export async function fetchScheduledPosts(): Promise<ScheduledPost[]> {
       post_media (id, media_type, media_url, poster_url, width, height, aspect_ratio, duration_seconds, display_order, filter_id, studio_edits, stream_id, trim_start, trim_end, poster_timestamp)
     `)
     .eq('user_id', user.id)
-    .eq('status', 'scheduled')
+    .in('status', ['scheduled', 'failed'])
     .order('scheduled_at', { ascending: true });
+
 
   if (error) {
     console.error('[scheduledPosts] Error fetching:', error);
