@@ -272,12 +272,15 @@ export function PlayersTab() {
     setVisibleCount(PAGE_SIZE);
   }, [debouncedSearch, sort]);
 
-  // Whenever the active tour changes (incl. landing/return), snap sort to that
-  // tour's canonical default. PGA → World Ranking, never a stale FedEx/Earnings tab.
+  // Only reset sort to the tour's canonical default when the tour genuinely
+  // changes — not on mount or back-navigation.
+  const prevTourRef = useRef(activeTour);
   useEffect(() => {
-    setSort(getDefaultSortForTour(activeTour));
-    setVisibleCount(PAGE_SIZE);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    if (prevTourRef.current !== activeTour) {
+      prevTourRef.current = activeTour;
+      setSort(getDefaultSortForTour(activeTour));
+      setVisibleCount(PAGE_SIZE);
+    }
   }, [activeTour]);
 
   // Build world rank & stats lookup from elite players (includes weekly rank change)
