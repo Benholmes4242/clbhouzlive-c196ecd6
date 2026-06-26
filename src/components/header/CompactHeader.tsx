@@ -9,6 +9,7 @@ import { PostingAsPill } from './PostingAsPill';
 import { PostingAsMenu } from './PostingAsMenu';
 import GlobalSearchOverlay from '@/components/search/GlobalSearchOverlay';
 import { ActingAsIndicator } from './ActingAsIndicator';
+import { useActiveActor } from '@/context/ActiveActorContext';
 import { HandicapChip } from './HandicapChip';
 import { cn } from '@/lib/utils';
 import { haptic } from '@/utils/haptics';
@@ -66,6 +67,8 @@ const CompactHeader: React.FC<CompactHeaderProps> = ({ className }) => {
   const [searchParams] = useSearchParams();
   const { user } = useSupabaseSession();
   const { hasUnread, unreadCount } = useUnreadNotifications();
+  const { activeActor } = useActiveActor();
+  const isBusinessMode = activeActor?.type === 'business';
   const [searchOpen, setSearchOpen] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
@@ -390,7 +393,49 @@ const CompactHeader: React.FC<CompactHeaderProps> = ({ className }) => {
             </div>
           </div>
         </div>
+
+        {/* Persistent ambient business-mode marker — additive, respects every theme.
+            Thin amber accent line + micro-label so any screen reads as business mode. */}
+        {isBusinessMode && (
+          <>
+            <div
+              aria-hidden="true"
+              style={{
+                position: 'absolute',
+                left: 0,
+                right: 0,
+                bottom: 0,
+                height: 2,
+                background: '#F7931E',
+                pointerEvents: 'none',
+                opacity: 0.95,
+              }}
+            />
+            <div
+              aria-live="polite"
+              style={{
+                position: 'absolute',
+                bottom: 3,
+                right: 10,
+                fontSize: 9,
+                lineHeight: 1,
+                letterSpacing: '0.14em',
+                textTransform: 'uppercase',
+                fontWeight: 800,
+                color: '#F7931E',
+                pointerEvents: 'none',
+                maxWidth: '60%',
+                overflow: 'hidden',
+                textOverflow: 'ellipsis',
+                whiteSpace: 'nowrap',
+              }}
+            >
+              Acting as {activeActor?.name}
+            </div>
+          </>
+        )}
       </header>
+
 
       {/* Mobile: Posting-as menu */}
       {user && (

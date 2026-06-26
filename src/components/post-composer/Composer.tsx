@@ -674,12 +674,20 @@ export function Composer({
             }}
             aria-label={canSwitchActor ? 'Change posting identity' : undefined}
           >
-            <SquircleAvatar
-              src={displayActor.avatarUrl ?? undefined}
-              alt={displayActor.name}
-              size={36}
-              hideRing
-            />
+            <span
+              style={{
+                display: 'inline-flex',
+                borderRadius: '34%',
+                boxShadow: displayActor.type === 'business' ? '0 0 0 2px #F7931E' : 'none',
+              }}
+            >
+              <SquircleAvatar
+                src={displayActor.avatarUrl ?? undefined}
+                alt={displayActor.name}
+                size={36}
+                hideRing
+              />
+            </span>
             <span
               style={{
                 fontSize: 13,
@@ -690,7 +698,31 @@ export function Composer({
               }}
             >
               Posting as{' '}
-              <b style={{ color: INK_2, fontWeight: 700 }}>{displayActor.name}</b>
+              <b
+                style={{
+                  color: displayActor.type === 'business' ? '#F7931E' : INK_2,
+                  fontWeight: 700,
+                }}
+              >
+                {displayActor.name}
+              </b>
+              {displayActor.type === 'business' && (
+                <span
+                  style={{
+                    marginLeft: 4,
+                    padding: '2px 6px',
+                    borderRadius: 999,
+                    background: 'rgba(247,147,30,0.12)',
+                    color: '#F7931E',
+                    fontSize: 10,
+                    fontWeight: 800,
+                    letterSpacing: '0.04em',
+                    textTransform: 'uppercase',
+                  }}
+                >
+                  Business
+                </span>
+              )}
               {canSwitchActor && (
                 <ChevronDown size={14} strokeWidth={2.5} color={INK_2} />
               )}

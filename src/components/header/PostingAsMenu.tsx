@@ -182,6 +182,7 @@ export function PostingAsMenu({ isOpen, onClose, useLightTheme = false, anchorRe
     const actor = availableActors.find(a => a.id === profileId);
     if (actor && (activeActor?.id !== actor.id)) {
       setActiveActor(actor);
+      toast.success(`Now acting as ${actor.name}`);
     }
   };
 
