@@ -274,7 +274,7 @@ export function DraftsListSheet({ open, onClose, onSelect }: DraftsListSheetProp
                 >
                   <Trash2 size={16} strokeWidth={2} />
                 </button>
-              </button>
+              </div>
             );
           })
         )}
