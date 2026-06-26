@@ -27,6 +27,7 @@ import { useReviewerStats } from '@/hooks/useReviewerStats';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useFollowState } from '@/hooks/useFollowState';
 import { useToggleFollow } from '@/hooks/useToggleFollow';
+import { useActiveActor } from '@/context/ActiveActorContext';
 
 const FONTS = {
   geist: "'Geist', -apple-system, BlinkMacSystemFont, system-ui, sans-serif",
