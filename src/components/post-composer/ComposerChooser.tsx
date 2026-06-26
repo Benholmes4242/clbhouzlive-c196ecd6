@@ -1,9 +1,11 @@
 // ComposerChooser — entry screen: Create a post / Review a course.
-// Shows a "Drafts (N)" tile when the user has saved drafts.
+// Shows a "Drafts (N)" tile when the user has saved drafts and a
+// "Scheduled (N)" tile when scheduled or failed posts exist.
 
 import React, { useEffect, useState } from 'react';
-import { X, Camera, Star, ChevronRight, FileText } from 'lucide-react';
+import { X, Camera, Star, ChevronRight, FileText, CalendarClock, AlertTriangle } from 'lucide-react';
 import { getDraftCount } from '@/services/drafts/draftService';
+import { getScheduledPostCount, getFailedPostCount } from '@/services/posts/scheduledPosts';
 
 const INK = '#1C1C1E';
 const INK_2 = '#0F172A';
@@ -15,12 +17,14 @@ const CHIP = '#F5F5F7';
 const HAIR = 'rgba(15,23,42,0.07)';
 const AMBER_SOFT = '#FEF3E7';
 const GOLD_DEEP = '#D97706';
+const DANGER = '#DC2626';
 
 interface ComposerChooserProps {
   onClose: () => void;
   onPost: () => void;
   onReview: () => void;
   onOpenDrafts?: () => void;
+  onOpenScheduled?: () => void;
   isBusiness: boolean;
 }
 
@@ -29,21 +33,23 @@ export function ComposerChooser({
   onPost,
   onReview,
   onOpenDrafts,
+  onOpenScheduled,
   isBusiness,
 }: ComposerChooserProps) {
   const [draftCount, setDraftCount] = useState(0);
+  const [scheduledCount, setScheduledCount] = useState(0);
+  const [failedCount, setFailedCount] = useState(0);
 
   useEffect(() => {
     let cancelled = false;
-    getDraftCount()
-      .then((n) => {
-        if (!cancelled) setDraftCount(n);
-      })
-      .catch(() => {});
+    getDraftCount().then((n) => !cancelled && setDraftCount(n)).catch(() => {});
+    getScheduledPostCount().then((n) => !cancelled && setScheduledCount(n)).catch(() => {});
+    getFailedPostCount().then((n) => !cancelled && setFailedCount(n)).catch(() => {});
     return () => {
       cancelled = true;
     };
   }, []);
+
 
   return (
     <div style={{ background: PAGE, minHeight: '100%', display: 'flex', flexDirection: 'column' }}>
