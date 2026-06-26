@@ -271,7 +271,8 @@ function TiedLeadersRowDark({
         style={{
           ...NUMERIC_STYLE,
           fontSize: 16, fontWeight: 800, letterSpacing: '-0.02em',
-          color: '#DC2626', flexShrink: 0,
+          color: scoreColor(typeof score === 'string' && score.startsWith('-') ? -1 : typeof score === 'string' && score.startsWith('+') ? 1 : 0),
+          flexShrink: 0,
         }}
       >
         {score}
