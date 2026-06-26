@@ -24,17 +24,18 @@ import {
   AMBER,
   GOLD,
   NUMERIC_STYLE,
+  SC_BIRDIE,
 } from '../HybridHero.constants';
 import { AMBER_INK, GOLD_DEEP } from '../../../_shared/tokens';
 import type { HeroState, TopTie, TickerRow } from '../HybridHero.utils';
 import { fmtScore, formatRank, buildLeaderboardSlots, roundLabel } from '../HybridHero.utils';
-import { Ticker } from './Ticker';
 import { formatPurse } from '../../shared/TourHeroHelpers';
 
 const TICKER_BAR_H = 34;
 const CHAMPION_BAND_H = 62;
 const UPCOMING_BAND_H = 104;
 const LIVE_BOTTOM_H = CHAMPION_BAND_H + TICKER_BAR_H;
+const LIVE_BOARD_H = 210; // header + up to 3 rows + footer
 const RESULTS_FOOTER_H = 34;
 const BOTTOM_STACK_H = TICKER_BAR_H + CHAMPION_BAND_H;
 import { getPlayerHeadshotCandidates } from '@/utils/playerHeadshot';
@@ -80,7 +81,7 @@ function nameCandidates(name: string | null | undefined, tourSlug?: string | nul
 
 function scoreColor(score: number | null | undefined): string {
   if (score == null || Number.isNaN(score)) return 'rgba(255,255,255,0.85)';
-  if (score < 0) return '#DC2626';   // under par -> red (matches handicap pages)
+  if (score < 0) return SC_BIRDIE;   // under par -> teal (GOOD)
   if (score > 0) return 'rgba(255,255,255,0.55)'; // over par -> muted white
   return 'rgba(255,255,255,0.85)';   // even
 }
@@ -271,7 +272,7 @@ function TiedLeadersRowDark({
         style={{
           ...NUMERIC_STYLE,
           fontSize: 16, fontWeight: 800, letterSpacing: '-0.02em',
-          color: '#DC2626', flexShrink: 0,
+          color: scoreColor(scoreStringToNumber(score)), flexShrink: 0,
         }}
       >
         {score}
@@ -279,6 +280,14 @@ function TiedLeadersRowDark({
       {!isResults && <span style={{ width: 18, flexShrink: 0 }} />}
     </div>
   );
+}
+
+function scoreStringToNumber(s: string | number | null | undefined): number | null {
+  if (s == null) return null;
+  if (typeof s === 'number') return s;
+  if (s === 'E' || s === 'EVEN') return 0;
+  const n = parseInt(s, 10);
+  return Number.isFinite(n) ? n : null;
 }
 
 function TiedChasersRowDark({
@@ -597,7 +606,7 @@ export function CinematicFrame({
   const isLive = state.kind === 'live';
   const isResults = state.kind === 'results';
   const isUpcoming = state.kind === 'upcoming';
-  const showTicker = isLive && Array.isArray(top10) && top10.length > 0;
+  
   const roundLabel_ =
     state.kind === 'live'
       ? `LIVE · ${roundLabel(state.round, state.totalRounds).toUpperCase()}`
@@ -840,7 +849,7 @@ export function CinematicFrame({
           display: 'flex',
           flexDirection: 'column',
           padding: `18px 14px ${
-            showTicker ? 16 + LIVE_BOTTOM_H
+            isLive ? 16 + LIVE_BOARD_H
             : isResults ? 16
             : (isUpcoming && defendingChamp) ? 16 + UPCOMING_BAND_H
             : isUpcoming ? 16
@@ -1075,9 +1084,98 @@ export function CinematicFrame({
         {/* Upcoming, no defending champ, no countdown — no base band */}
       </div>
 
-      {/* Live — data strip + champion band + player carousel pinned to bottom */}
-      {showTicker && (() => {
-        const leader = safe[0];
+      {/* Live — broadcast board (TODAY / TOTAL / THRU) pinned to bottom */}
+      {isLive && (() => {
+        const COL_TODAY = 30;
+        const COL_TOTAL = 34;
+        const COL_THRU = 22;
+        const RANK_W = 18;
+
+        // Live pre-play fallback: no leaderboard yet → field-strength preview
+        if (safe.length === 0) {
+          return (
+            <button
+              type="button"
+              onClick={onCtaTap}
+              aria-label="Open leaderboard"
+              style={{
+                position: 'absolute', left: 0, right: 0, bottom: 0, zIndex: 4,
+                border: 'none', padding: 0, margin: 0, cursor: 'pointer',
+                display: 'block', width: '100%', textAlign: 'left',
+                background: 'rgba(10,14,20,0.42)',
+                backdropFilter: 'blur(20px) saturate(1.2)',
+                WebkitBackdropFilter: 'blur(20px) saturate(1.2)',
+                borderTop: '0.5px solid rgba(255,255,255,0.18)',
+              }}
+            >
+              {fieldStrength ? (
+                <FieldStrengthRowDark data={fieldStrength} />
+              ) : (
+                <div style={{ padding: '16px 16px', ...NUMERIC_STYLE, fontSize: 11, fontWeight: 700, letterSpacing: '0.12em', color: 'rgba(255,255,255,0.55)', textTransform: 'uppercase' }}>
+                  Round 1 · Awaiting scores
+                </div>
+              )}
+              <div
+                style={{
+                  display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+                  padding: '9px 16px calc(9px + env(safe-area-inset-bottom, 0px))',
+                  borderTop: '0.5px solid rgba(255,255,255,0.12)',
+                }}
+              >
+                <span style={{ ...NUMERIC_STYLE, fontSize: 10, fontWeight: 600, color: 'rgba(255,255,255,0.5)' }}>
+                  {fieldStrength?.totalPlayers != null ? `n = ${fieldStrength.totalPlayers} in the field` : ''}
+                </span>
+                <span style={{ display: 'inline-flex', alignItems: 'center', gap: 4 }}>
+                  <span style={{ ...NUMERIC_STYLE, fontSize: 11, fontWeight: 800, letterSpacing: '0.06em', color: AMBER }}>LEADERBOARD</span>
+                  <ChevronRight size={13} strokeWidth={2.5} color={AMBER} style={{ flexShrink: 0 }} />
+                </span>
+              </div>
+            </button>
+          );
+        }
+
+        // Build rows: leader (solo or tie) + up to 2 chasers
+        type Row =
+          | { kind: 'solo'; entry: any; rank: string; isLeader: boolean }
+          | { kind: 'tie'; rank: string; count: number; score: string | number; items: StackedAvatarItem[]; isLeader: boolean };
+
+        const rows: Row[] = [];
+        if (tiedLeaders) {
+          const topScore = safe[0]?.score ?? safe[0]?.total;
+          const firstChaser = safe.findIndex(e => (e?.score ?? e?.total) !== topScore);
+          const chasers = firstChaser >= 0 ? safe.slice(firstChaser) : safe.slice(tiedLeaders.count);
+          const tiedItems: StackedAvatarItem[] = safe
+            .filter(e => (e?.score ?? e?.total) === topScore)
+            .slice(0, 4)
+            .map(e => ({ candidates: avatar(e), name: entryName(e), userId: e?.player?.id ?? null }));
+          rows.push({ kind: 'tie', rank: 'T1', count: tiedLeaders.count, score: tiedLeaders.score, items: tiedItems, isLeader: true });
+          const chaserSlots = buildLeaderboardSlots(chasers, 2);
+          chaserSlots.forEach((slot: any) => {
+            if (slot.kind === 'tie') {
+              rows.push({
+                kind: 'tie', rank: slot.rank, count: slot.count, score: slot.score, isLeader: false,
+                items: slot.members.map((m: any) => ({ candidates: avatar(m), name: entryName(m), userId: m?.player?.id ?? null })),
+              });
+            } else {
+              rows.push({ kind: 'solo', entry: slot.entry, rank: formatRank(slot.entry), isLeader: false });
+            }
+          });
+        } else {
+          const leader = safe[0];
+          rows.push({ kind: 'solo', entry: leader, rank: String(leader.position ?? 1), isLeader: true });
+          const chaserSlots = buildLeaderboardSlots(safe.slice(1), 2);
+          chaserSlots.forEach((slot: any) => {
+            if (slot.kind === 'tie') {
+              rows.push({
+                kind: 'tie', rank: slot.rank, count: slot.count, score: slot.score, isLeader: false,
+                items: slot.members.map((m: any) => ({ candidates: avatar(m), name: entryName(m), userId: m?.player?.id ?? null })),
+              });
+            } else {
+              rows.push({ kind: 'solo', entry: slot.entry, rank: formatRank(slot.entry), isLeader: false });
+            }
+          });
+        }
+
         return (
           <button
             type="button"
@@ -1087,42 +1185,96 @@ export function CinematicFrame({
               position: 'absolute', left: 0, right: 0, bottom: 0, zIndex: 4,
               border: 'none', padding: 0, margin: 0, cursor: 'pointer',
               display: 'block', width: '100%', textAlign: 'left',
+              background: 'rgba(10,14,20,0.42)',
+              backdropFilter: 'blur(20px) saturate(1.2)',
+              WebkitBackdropFilter: 'blur(20px) saturate(1.2)',
+              borderTop: '0.5px solid rgba(255,255,255,0.18)',
             }}
           >
-            {/* Champion band — flat ink, trophy emoji, tie-aware */}
-            {(leader || tiedLeaders) && (
-              <div
-                style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: 10,
-                  padding: '13px 20px',
-                  background: 'rgba(10,14,20,0.50)',
-                  backdropFilter: 'blur(10px)',
-                  WebkitBackdropFilter: 'blur(10px)',
-                  borderTop: '0.5px solid rgba(255,255,255,0.18)',
-                }}
-              >
-                <span aria-hidden style={{ fontSize: 26, lineHeight: 1, flexShrink: 0 }}>🏆</span>
-                <div style={{ flex: 1, minWidth: 0 }}>
-                  <div style={{ ...NUMERIC_STYLE, fontSize: 8.5, fontWeight: 800, letterSpacing: '0.16em', color: GOLD, textTransform: 'uppercase' }}>
-                    {tiedLeaders ? 'Tied for the lead' : 'Tournament Leader'}
+            {/* Column header row */}
+            <div
+              style={{
+                display: 'flex', alignItems: 'center', gap: 10,
+                padding: '7px 16px 4px',
+              }}
+            >
+              <span style={{ width: RANK_W, flexShrink: 0 }} />
+              <span style={{ width: 26, flexShrink: 0 }} />
+              <span style={{ flex: 1 }} />
+              <span style={{ ...NUMERIC_STYLE, width: COL_TODAY, textAlign: 'right', fontSize: 8, fontWeight: 800, letterSpacing: '0.1em', color: 'rgba(255,255,255,0.4)' }}>TODAY</span>
+              <span style={{ ...NUMERIC_STYLE, width: COL_TOTAL, textAlign: 'right', fontSize: 8, fontWeight: 800, letterSpacing: '0.1em', color: 'rgba(255,255,255,0.4)' }}>TOTAL</span>
+              <span style={{ ...NUMERIC_STYLE, width: COL_THRU, textAlign: 'right', fontSize: 8, fontWeight: 800, letterSpacing: '0.1em', color: 'rgba(255,255,255,0.4)' }}>THRU</span>
+            </div>
+
+            {/* Score rows */}
+            {rows.map((row, i) => {
+              const rowStyle: React.CSSProperties = {
+                display: 'flex', alignItems: 'center', gap: 10,
+                padding: '8px 16px',
+                borderTop: '0.5px solid rgba(255,255,255,0.08)',
+              };
+              if (row.kind === 'solo') {
+                const entry = row.entry;
+                const name = entryName(entry);
+                const today = entry?.today;
+                return (
+                  <div key={`solo-${i}`} style={rowStyle}>
+                    <span style={{ ...NUMERIC_STYLE, width: RANK_W, fontSize: 12, fontWeight: 700, color: row.isLeader ? AMBER : 'rgba(255,255,255,0.5)', textAlign: 'left', flexShrink: 0 }}>{row.rank}</span>
+                    <SquircleAvatar
+                      src={undefined}
+                      srcCandidates={avatar(entry)}
+                      alt={name}
+                      userId={entry?.player?.id ?? null}
+                      size={26}
+                      hideRing
+                    />
+                    <span style={{ flex: 1, minWidth: 0, fontSize: 14, fontWeight: 600, color: 'white', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{name}</span>
+                    <span style={{ ...NUMERIC_STYLE, width: COL_TODAY, textAlign: 'right', fontSize: 13, fontWeight: 700, color: scoreColor(today) }}>
+                      {today == null ? '—' : fmtScore(today)}
+                    </span>
+                    <span style={{ ...NUMERIC_STYLE, width: COL_TOTAL, textAlign: 'right', fontSize: 16, fontWeight: 800, letterSpacing: '-0.02em', color: scoreColor(entry?.score) }}>
+                      {fmtScore(entry?.score)}
+                    </span>
+                    <span style={{ ...NUMERIC_STYLE, width: COL_THRU, textAlign: 'right', fontSize: 11, fontWeight: 600, color: 'rgba(255,255,255,0.4)' }}>
+                      {entryThru(entry)}
+                    </span>
                   </div>
-                  <div style={{ fontSize: 18, fontWeight: 800, color: '#fff', letterSpacing: '-0.01em', marginTop: 1, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-                    {tiedLeaders ? `${tiedLeaders.count} players tied` : entryName(leader)}
-                  </div>
+                );
+              }
+              // tie row — shared TOTAL only; spacers for TODAY/THRU
+              const label = row.isLeader
+                ? `${row.count} tied for the lead`
+                : `${row.count} players`;
+              return (
+                <div key={`tie-${i}`} style={rowStyle}>
+                  <span style={{ ...NUMERIC_STYLE, width: RANK_W, fontSize: 12, fontWeight: 700, color: row.isLeader ? AMBER : 'rgba(255,255,255,0.5)', textAlign: 'left', flexShrink: 0 }}>{row.rank}</span>
+                  <StackedAvatarsDark items={row.items} size={26} />
+                  <span style={{ flex: 1, minWidth: 0, fontSize: 14, fontWeight: row.isLeader ? 700 : 600, color: 'white', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{label}</span>
+                  <span style={{ width: COL_TODAY, flexShrink: 0 }} />
+                  <span style={{ ...NUMERIC_STYLE, width: COL_TOTAL, textAlign: 'right', fontSize: 16, fontWeight: 800, letterSpacing: '-0.02em', color: scoreColor(scoreStringToNumber(row.score)) }}>
+                    {typeof row.score === 'number' ? fmtScore(row.score) : row.score}
+                  </span>
+                  <span style={{ width: COL_THRU, flexShrink: 0 }} />
                 </div>
-                <div style={{ textAlign: 'right', flexShrink: 0 }}>
-                  <div style={{ ...NUMERIC_STYLE, fontSize: 24, fontWeight: 900, letterSpacing: '-0.02em', lineHeight: 1, color: tiedLeaders ? (tiedLeaders.score.startsWith('-') ? '#DC2626' : '#fff') : scoreColor(leader.score) }}>
-                    {tiedLeaders ? tiedLeaders.score : fmtScore(leader.score)}
-                  </div>
-                  <div style={{ ...NUMERIC_STYLE, fontSize: 9, fontWeight: 600, letterSpacing: '0.1em', color: 'rgba(255,255,255,0.5)', marginTop: 3 }}>
-                    {tiedLeaders ? 'SHARED LEAD' : `THRU ${entryThru(leader)}`}
-                  </div>
-                </div>
-              </div>
-            )}
-            <Ticker rows={top10} />
+              );
+            })}
+
+            {/* Footer */}
+            <div
+              style={{
+                display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+                padding: '9px 16px calc(9px + env(safe-area-inset-bottom, 0px))',
+                borderTop: '0.5px solid rgba(255,255,255,0.12)',
+              }}
+            >
+              <span style={{ ...NUMERIC_STYLE, fontSize: 10, fontWeight: 600, color: 'rgba(255,255,255,0.5)' }}>
+                n = {fieldSize} in the field
+              </span>
+              <span style={{ display: 'inline-flex', alignItems: 'center', gap: 4 }}>
+                <span style={{ ...NUMERIC_STYLE, fontSize: 11, fontWeight: 800, letterSpacing: '0.06em', color: AMBER }}>LEADERBOARD</span>
+                <ChevronRight size={13} strokeWidth={2.5} color={AMBER} style={{ flexShrink: 0 }} />
+              </span>
+            </div>
           </button>
         );
       })()}

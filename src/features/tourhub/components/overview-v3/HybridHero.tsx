@@ -128,10 +128,12 @@ export function HybridHero({ slide, activeTournamentId, onSelectTour }: HybridHe
   const teeTimesEnabled = isUpcoming && hoursUntilStart <= 48;
   const { data: teeTimes = [] } = useTournamentTeeTimes(tournament.id, teeTimesEnabled);
 
-  // Upcoming · far fallback chain
-  const fallbackEnabled = isUpcoming && !defendingChamp;
+  // Upcoming · far fallback chain  +  Live pre-play fallback (empty leaderboard)
+  const isLive = kind === 'live';
+  const isLeaderboardEmpty = !Array.isArray(leaderboard) || leaderboard.length === 0;
+  const fallbackEnabled = (isUpcoming && !defendingChamp) || (isLive && isLeaderboardEmpty);
   const { data: fieldStrength } = useTournamentFieldStrength(fallbackEnabled ? tournament.id : null);
-  const { data: courseStats } = useTournamentCourseStats(fallbackEnabled ? tournament.id : null);
+  const { data: courseStats } = useTournamentCourseStats(isUpcoming && !defendingChamp ? tournament.id : null);
 
 
   // Refined state (now we know whether teeTimes are available)
