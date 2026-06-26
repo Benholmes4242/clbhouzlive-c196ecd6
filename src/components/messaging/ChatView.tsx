@@ -697,6 +697,22 @@ export function ChatView({ conversationId, onBack }: ChatViewProps) {
         </div>
       )}
 
+      {/* Active-business "You're acting as X" cue (Group 8 tie-in) */}
+      {activeType === 'business' && activeActor?.name && (
+        <div
+          className="flex items-center justify-center gap-1.5 text-[11px] font-semibold uppercase tracking-wider"
+          style={{
+            padding: '6px 16px',
+            color: AMBER,
+            background: AMBER_TINT_10,
+            borderTop: `1px solid ${HAIRLINE_INK_7}`,
+            letterSpacing: '0.06em',
+          }}
+        >
+          Replying as {activeActor.name}
+        </div>
+      )}
+
       {/* Input */}
       <MessageInput
         onSend={handleSend}
