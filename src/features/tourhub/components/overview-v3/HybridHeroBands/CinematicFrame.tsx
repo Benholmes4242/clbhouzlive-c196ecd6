@@ -1238,7 +1238,8 @@ export function CinematicFrame({
               if (row.kind === 'solo') {
                 const entry = row.entry;
                 const name = entryName(entry);
-                const today = entry?.today;
+                const { today, thru: liveThru } = liveRoundFor(entry, state.round);
+                const thruDisplay = liveThru != null ? (liveThru === 18 ? 'F' : String(liveThru)) : entryThru(entry);
                 return (
                   <div key={`solo-${i}`} style={rowStyle}>
                     <span style={{ ...NUMERIC_STYLE, width: RANK_W, fontSize: 12, fontWeight: 700, color: row.isLeader ? AMBER : 'rgba(255,255,255,0.5)', textAlign: 'left', flexShrink: 0 }}>{row.rank}</span>
