@@ -212,7 +212,7 @@ function ToughCourseCard({ course, onTap }: CardProps) {
                 lineHeight: 1.3,
               }}
             >
-              average per round across {course.total_rounds ?? '–'} rounds played
+              avg per round · {course.total_rounds ?? '–'} rounds
             </p>
           </div>
           <div
