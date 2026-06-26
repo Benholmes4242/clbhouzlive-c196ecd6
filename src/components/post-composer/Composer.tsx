@@ -129,6 +129,7 @@ export function Composer({
   const [actorSheetOpen, setActorSheetOpen] = useState(false);
   const [visibilitySheetOpen, setVisibilitySheetOpen] = useState(false);
   const [discardConfirmOpen, setDiscardConfirmOpen] = useState(false);
+  const [scheduleSheetOpen, setScheduleSheetOpen] = useState(false);
   const [keyboardHeight, setKeyboardHeight] = useState(0);
   const captionRef = useRef<HTMLTextAreaElement>(null);
 
