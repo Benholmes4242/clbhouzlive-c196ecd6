@@ -35,7 +35,7 @@ export function ToughestCoursesStrip(_: Props = {}) {
         <ExploreSectionHeader
           mark={<MountainMark />}
           title="Toughest courses"
-          sub="Official WHS handicap data"
+          sub="The hardest courses, based on official WHS round data"
         />
         <div className="flex gap-3 px-4 overflow-x-auto scrollbar-hide" style={{ paddingBottom: 4 }}>
           {Array.from({ length: 3 }).map((_v, i) => (
@@ -63,7 +63,7 @@ export function ToughestCoursesStrip(_: Props = {}) {
       <ExploreSectionHeader
         mark={<MountainMark />}
         title="Toughest courses"
-        sub="Official WHS handicap data"
+        sub="The hardest courses, based on official WHS round data"
       />
       <div className="flex gap-3 px-4 overflow-x-auto scrollbar-hide" style={{ paddingBottom: 4 }}>
         {shown.map((c) => (
@@ -181,31 +181,41 @@ function ToughCourseCard({ course, onTap }: CardProps) {
         {/* Hero stat row */}
         <div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between' }}>
           <div>
-            <p
-              style={{
-                margin: 0,
-                fontSize: 9,
-                fontWeight: 800,
-                letterSpacing: '0.08em',
-                color: INK_FAINT,
-                lineHeight: 1,
-                textTransform: 'uppercase',
-              }}
-            >
-              AVG OVER PAR
-            </p>
+            <div style={{ display: 'flex', alignItems: 'baseline', gap: 6 }}>
+              <p
+                style={{
+                  margin: 0,
+                  fontSize: 28,
+                  fontWeight: 800,
+                  color: MAROON,
+                  fontVariantNumeric: 'tabular-nums',
+                  letterSpacing: '-0.02em',
+                  lineHeight: 1,
+                }}
+              >
+                +{numFmt(course.avg_over_par, 1)}
+              </p>
+              <span
+                style={{
+                  fontSize: 13,
+                  fontWeight: 500,
+                  color: INK_FAINT,
+                  lineHeight: 1,
+                }}
+              >
+                strokes over par
+              </span>
+            </div>
             <p
               style={{
                 margin: '4px 0 0',
-                fontSize: 26,
-                fontWeight: 800,
-                color: MAROON,
-                fontVariantNumeric: 'tabular-nums',
-                letterSpacing: '-0.02em',
-                lineHeight: 1,
+                fontSize: 12,
+                fontWeight: 500,
+                color: INK_MUTE,
+                lineHeight: 1.3,
               }}
             >
-              +{numFmt(course.avg_over_par, 1)}
+              average per round across {course.total_rounds ?? '–'} rounds played
             </p>
           </div>
           <div
@@ -250,40 +260,92 @@ function ToughCourseCard({ course, onTap }: CardProps) {
             marginTop: 12,
             paddingTop: 10,
             display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'space-between',
+            flexDirection: 'column',
             gap: 8,
           }}
         >
-          <span
+          <p
             style={{
+              margin: 0,
               fontSize: 11,
               fontWeight: 700,
-              color: INK_MUTE,
-              lineHeight: 1.2,
-              flexShrink: 0,
+              letterSpacing: '0.04em',
+              color: INK_FAINT,
+              lineHeight: 1,
+              textTransform: 'uppercase',
             }}
           >
-            Hardest hole
-          </span>
-          <span
-            style={{
-              fontSize: 12,
-              fontWeight: 800,
-              color: INK,
-              fontVariantNumeric: 'tabular-nums',
-              lineHeight: 1.2,
-              overflow: 'hidden',
-              textOverflow: 'ellipsis',
-              whiteSpace: 'nowrap',
-            }}
-          >
-            #{course.hardest_hole_no ?? '–'} · Par {course.hardest_hole_par ?? '–'} ·{' '}
-            <span style={{ color: MAROON }}>
-              +{numFmt(course.hardest_avg_to_par, 1)}
-            </span>
-            {course.hardest_hole_si != null ? ` · SI ${course.hardest_hole_si}` : ''}
-          </span>
+            HARDEST HOLE
+          </p>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+            {/* Hole badge */}
+            <div
+              style={{
+                width: 38,
+                height: 38,
+                borderRadius: 9,
+                background: INK_TINT_06,
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+                justifyContent: 'center',
+                flexShrink: 0,
+              }}
+            >
+              <span
+                style={{
+                  fontSize: 8,
+                  fontWeight: 700,
+                  letterSpacing: '0.04em',
+                  color: INK_FAINT,
+                  lineHeight: 1,
+                  textTransform: 'uppercase',
+                }}
+              >
+                HOLE
+              </span>
+              <span
+                style={{
+                  fontSize: 16,
+                  fontWeight: 800,
+                  color: INK,
+                  lineHeight: 1,
+                  fontVariantNumeric: 'tabular-nums',
+                }}
+              >
+                {course.hardest_hole_no ?? '–'}
+              </span>
+            </div>
+            {/* Detail lines */}
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 2, minWidth: 0 }}>
+              {course.hardest_hole_no != null ? (
+                <>
+                  <p
+                    style={{
+                      margin: 0,
+                      fontSize: 13,
+                      fontWeight: 500,
+                      color: INK,
+                      lineHeight: 1.2,
+                    }}
+                  >
+                    Par {course.hardest_hole_par ?? '–'} · Stroke index {course.hardest_hole_si ?? '–'}
+                  </p>
+                  <p
+                    style={{
+                      margin: 0,
+                      fontSize: 12,
+                      fontWeight: 600,
+                      color: MAROON,
+                      lineHeight: 1.2,
+                    }}
+                  >
+                    plays +{numFmt(course.hardest_avg_to_par, 1)} over par on average
+                  </p>
+                </>
+              ) : null}
+            </div>
+          </div>
         </div>
       </div>
     </button>
