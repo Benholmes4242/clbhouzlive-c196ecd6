@@ -36,6 +36,7 @@ import { CourseSearchSheet } from './CourseSearchSheet';
 import { TaggedCoursesSheet } from './TaggedCoursesSheet';
 import { MediaStage } from './MediaStage';
 import { MediaEditor } from './MediaEditor';
+import { ScheduleSheet } from './ScheduleSheet';
 import { bakeFrameCrop } from './bakeFrameCrop';
 import {
   filesToComposerMedia,
