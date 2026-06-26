@@ -8,6 +8,7 @@ import { toast } from 'sonner';
 import { useQueryClient } from '@tanstack/react-query';
 import { useRelationshipStatus } from '@/hooks/useRelationshipStatus';
 import { useToggleFollow } from '@/hooks/useToggleFollow';
+import { useActiveActor } from '@/context/ActiveActorContext';
 
 interface UseProfileActionsProps {
   targetUserId: string;
