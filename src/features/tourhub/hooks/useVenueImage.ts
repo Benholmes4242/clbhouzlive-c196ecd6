@@ -19,6 +19,7 @@ import missionHillsHaikou from '@/assets/courses/mission-hills-haikou.jpg';
 import theLandingsClub from '@/assets/courses/the-landings-club.jpg';
 import harbourTownGL from '@/assets/harbour-town-upcoming.webp';
 import asiadCountryClub from '@/assets/courses/asiad-country-club.jpg';
+import hazeltineNational from '@/assets/courses/hazeltine-national-golf-club.jpg.asset.json';
 
 /**
  * Static venue image overrides for courses not yet in the database.
@@ -35,6 +36,7 @@ const VENUE_IMAGE_OVERRIDES: Record<string, string> = {
   'TPC San Antonio': '/images/venues/tpc-san-antonio.webp',
   'Harbour Town Golf Links': harbourTownGL,
   'Asiad Country Club': asiadCountryClub,
+  'Hazeltine National Golf Club': hazeltineNational.url,
 };
 
 interface VenueImageResult {

@@ -12,6 +12,7 @@ import sharonHeightsGCC from '@/assets/courses/sharon-heights-gcc.jpg';
 import brokenSoundClub from '@/assets/courses/broken-sound-club.jpg';
 import princeOfWalesCC from '@/assets/courses/prince-of-wales-cc.jpg';
 import missionHillsHaikou from '@/assets/courses/mission-hills-haikou.jpg';
+import hazeltineNational from '@/assets/courses/hazeltine-national-golf-club.jpg.asset.json';
 
 /**
  * Static venue image overrides for courses not yet in the database.
@@ -23,6 +24,7 @@ const VENUE_IMAGE_OVERRIDES: Record<string, string> = {
   'Broken Sound Club': brokenSoundClub,
   'Prince of Wales Country Club': princeOfWalesCC,
   'Mission Hills Resort Haikou': missionHillsHaikou,
+  'Hazeltine National Golf Club': hazeltineNational.url,
 };
 
 export interface BatchImageMap {
