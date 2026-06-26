@@ -38,6 +38,7 @@ export function CollegeGolfHubPage() {
 
   const [searchExpanded, setSearchExpanded] = useState(false);
   const [searchValue, setSearchValue] = useState('');
+  const searchInputRef = useRef<HTMLInputElement>(null);
   const debouncedSearch = useDebouncedValue(searchValue, 200);
   const { data: searchResults, isLoading: searchLoading } = useCollegeSearch(debouncedSearch);
 
