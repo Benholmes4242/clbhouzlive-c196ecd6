@@ -70,6 +70,13 @@ function BucketListRailInner() {
       .filter((p): p is FeedPost => Boolean(p));
   }, [orderedIds, posts]);
 
+  // postId → course name lookup so each interleaved tile captions correctly.
+  const courseNameByPostId = useMemo(() => {
+    const m = new Map<string, string>();
+    for (const c of courses) for (const id of c.recent_post_ids ?? []) m.set(id, c.course_name);
+    return m;
+  }, [courses]);
+
   if (coursesLoading || postsLoading) return null;
   if (courses.length === 0 || orderedPosts.length === 0) return null;
 
