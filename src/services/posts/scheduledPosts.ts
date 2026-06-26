@@ -64,8 +64,9 @@ export async function fetchScheduledPosts(): Promise<ScheduledPost[]> {
       post_media (id, media_type, media_url, poster_url, width, height, aspect_ratio, duration_seconds, display_order, filter_id, studio_edits, stream_id, trim_start, trim_end, poster_timestamp)
     `)
     .eq('user_id', user.id)
-    .eq('status', 'scheduled')
+    .in('status', ['scheduled', 'failed'])
     .order('scheduled_at', { ascending: true });
+
 
   if (error) {
     console.error('[scheduledPosts] Error fetching:', error);
@@ -125,8 +126,9 @@ export async function fetchScheduledPostForEdit(postId: string): Promise<Schedul
     `)
     .eq('id', postId)
     .eq('user_id', user.id)
-    .eq('status', 'scheduled')
+    .in('status', ['scheduled', 'failed'])
     .single();
+
 
   if (error || !data) {
     console.error('[scheduledPosts] Error fetching for edit:', error);
@@ -203,7 +205,7 @@ export async function updateScheduledPost(
     .from('posts')
     .update(updatePayload)
     .eq('id', postId)
-    .eq('status', 'scheduled');
+    .in('status', ['scheduled', 'failed']);
 
   if (error) {
     console.error('[scheduledPosts] Error updating:', error);
@@ -213,14 +215,18 @@ export async function updateScheduledPost(
 }
 
 /**
- * Update scheduled time for a post
+ * Update scheduled time for a post. Also recovers a failed post back to
+ * 'scheduled' so the publisher will retry it.
  */
 export async function reschedulePost(postId: string, newScheduledAt: Date): Promise<boolean> {
   const { error } = await supabase
     .from('posts')
-    .update({ scheduled_at: newScheduledAt.toISOString() })
+    .update({
+      scheduled_at: newScheduledAt.toISOString(),
+      status: 'scheduled',
+    })
     .eq('id', postId)
-    .eq('status', 'scheduled');
+    .in('status', ['scheduled', 'failed']);
 
   if (error) {
     console.error('[scheduledPosts] Error rescheduling:', error);
@@ -230,18 +236,18 @@ export async function reschedulePost(postId: string, newScheduledAt: Date): Prom
 }
 
 /**
- * Publish a scheduled post immediately
+ * Publish a scheduled (or failed) post immediately.
  */
 export async function publishNow(postId: string): Promise<boolean> {
   const { error } = await supabase
     .from('posts')
-    .update({ 
-      status: 'published', 
+    .update({
+      status: 'published',
       scheduled_at: null,
-      created_at: new Date().toISOString() 
+      created_at: new Date().toISOString(),
     })
     .eq('id', postId)
-    .eq('status', 'scheduled');
+    .in('status', ['scheduled', 'failed']);
 
   if (error) {
     console.error('[scheduledPosts] Error publishing now:', error);
@@ -251,14 +257,14 @@ export async function publishNow(postId: string): Promise<boolean> {
 }
 
 /**
- * Delete a scheduled post
+ * Delete a scheduled or failed post.
  */
 export async function deleteScheduledPost(postId: string): Promise<boolean> {
   const { error } = await supabase
     .from('posts')
     .delete()
     .eq('id', postId)
-    .eq('status', 'scheduled');
+    .in('status', ['scheduled', 'failed']);
 
   if (error) {
     console.error('[scheduledPosts] Error deleting:', error);
@@ -268,7 +274,8 @@ export async function deleteScheduledPost(postId: string): Promise<boolean> {
 }
 
 /**
- * Get count of scheduled posts for the current user
+ * Get count of scheduled + failed posts for the current user (failed posts
+ * surface so the user can retry them — they should never disappear silently).
  */
 export async function getScheduledPostCount(): Promise<number> {
   const { data: { user } } = await supabase.auth.getUser();
@@ -278,7 +285,7 @@ export async function getScheduledPostCount(): Promise<number> {
     .from('posts')
     .select('*', { count: 'exact', head: true })
     .eq('user_id', user.id)
-    .eq('status', 'scheduled');
+    .in('status', ['scheduled', 'failed']);
 
   if (error) {
     console.error('[scheduledPosts] Error getting count:', error);
@@ -286,3 +293,24 @@ export async function getScheduledPostCount(): Promise<number> {
   }
   return count || 0;
 }
+
+/**
+ * Get count of failed posts only — used to surface a separate warning indicator.
+ */
+export async function getFailedPostCount(): Promise<number> {
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) return 0;
+
+  const { count, error } = await supabase
+    .from('posts')
+    .select('*', { count: 'exact', head: true })
+    .eq('user_id', user.id)
+    .eq('status', 'failed');
+
+  if (error) {
+    console.error('[scheduledPosts] Error getting failed count:', error);
+    return 0;
+  }
+  return count || 0;
+}
+

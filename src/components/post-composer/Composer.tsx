@@ -22,6 +22,7 @@ import {
   Pencil,
   Trash2,
   Play,
+  Clock,
 } from 'lucide-react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { toast } from 'sonner';
@@ -36,6 +37,7 @@ import { CourseSearchSheet } from './CourseSearchSheet';
 import { TaggedCoursesSheet } from './TaggedCoursesSheet';
 import { MediaStage } from './MediaStage';
 import { MediaEditor } from './MediaEditor';
+import { ScheduleSheet } from './ScheduleSheet';
 import { bakeFrameCrop } from './bakeFrameCrop';
 import {
   filesToComposerMedia,
@@ -129,6 +131,7 @@ export function Composer({
   const [actorSheetOpen, setActorSheetOpen] = useState(false);
   const [visibilitySheetOpen, setVisibilitySheetOpen] = useState(false);
   const [discardConfirmOpen, setDiscardConfirmOpen] = useState(false);
+  const [scheduleSheetOpen, setScheduleSheetOpen] = useState(false);
   const [keyboardHeight, setKeyboardHeight] = useState(0);
   const captionRef = useRef<HTMLTextAreaElement>(null);
 
@@ -264,13 +267,37 @@ export function Composer({
       }));
       setTaggedCourses(courses);
 
-      // Rehydrate media: fetch each image URL back into a File so the standard
-      // submit/edit pipelines treat them as net-new uploads.
+      // Rehydrate media:
+      //  • Images: re-fetch the URL back into a File so the existing submit
+      //    pipeline uploads them as net-new (kept from Phase 1).
+      //  • Videos: re-build the tile directly from the stored stream_id —
+      //    the asset is already in Cloudflare Stream and is re-attached to
+      //    the post on submit by stream_id (no re-upload, no skip toast).
       const rehydrated: ComposerMediaItem[] = [];
-      let skippedVideos = 0;
       for (const m of d.media ?? []) {
         if (m.mediaType === 'video') {
-          skippedVideos += 1;
+          if (!m.streamId) {
+            console.warn('[Composer] draft video missing stream_id, skipping:', m.id);
+            continue;
+          }
+          const w = m.width && m.width > 0 ? m.width : 16;
+          const h = m.height && m.height > 0 ? m.height : 9;
+          rehydrated.push({
+            id: nextMediaId(),
+            type: 'video',
+            // For desktop fallback we display the poster; preview/media_url is
+            // kept so it round-trips back to post_media on submit.
+            previewUrl: m.posterUrl || m.mediaUrl,
+            posterUrl: m.posterUrl ?? undefined,
+            width: w,
+            height: h,
+            aspectRatio: w / Math.max(1, h),
+            pos: { x: 50, y: 50 },
+            frame: 'original',
+            restoredStreamId: m.streamId,
+            restoredMediaUrl: m.mediaUrl,
+            durationSeconds: m.durationSeconds ?? undefined,
+          });
           continue;
         }
         try {
@@ -302,16 +329,12 @@ export function Composer({
         }
       }
       if (rehydrated.length) setMediaItems(rehydrated);
-      if (skippedVideos > 0) {
-        toast('Some videos were skipped', {
-          description: "Drafted videos can't be resumed in this version.",
-        });
-      }
       // Resumed drafts start clean — only mark dirty when the user changes
       // something below.
       setIsDirty(false);
     })();
   }, [isDraftMode, draftId, onClose, setMediaItems]);
+
 
   // Mark the form dirty whenever meaningful content changes.
   useEffect(() => {
@@ -591,8 +614,10 @@ export function Composer({
 
 
 
-  const handleShare = useCallback(async () => {
+  const handleShare = useCallback(async (scheduledAt: Date | null = null) => {
     if (!canPost) return;
+    // Scheduling is not allowed on an existing published post — that's "update", not "schedule".
+    if (scheduledAt && isEditMode) return;
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) {
       toast.error('You must be signed in to post');
@@ -698,10 +723,24 @@ export function Composer({
     // Bake crops per item (only images with non-original frame).
     // When a crop is baked, upload the original separately so post_media can
     // store original_media_url and recrop can later re-bake from it.
+    // Build a unified MediaInput[] preserving order; restored Stream videos
+    // are passed through as 'restoredVideo' so they're re-attached by stream_id
+    // without re-uploading.
     const { uploadToCloudflareR2 } = await import('@/utils/cloudflareUpload');
-    const filesOut: File[] = [];
-    const originalMediaUrls: Array<string | null> = [];
+    const mediaInputs: import('@/hooks/usePostSubmission').MediaInput[] = [];
     for (const item of mediaItems) {
+      if (item.type === 'video' && item.restoredStreamId && item.restoredMediaUrl) {
+        mediaInputs.push({
+          kind: 'restoredVideo',
+          streamId: item.restoredStreamId,
+          mediaUrl: item.restoredMediaUrl,
+          posterUrl: item.posterUrl ?? null,
+          width: item.width ?? null,
+          height: item.height ?? null,
+          durationSeconds: item.durationSeconds ?? null,
+        });
+        continue;
+      }
       if (!item.file) continue;
       if (item.type === 'image' && item.frame !== 'original') {
         let baked: File;
@@ -726,11 +765,9 @@ export function Composer({
         } catch (err) {
           console.warn('[Composer] original upload failed (recrop disabled for this item):', err);
         }
-        filesOut.push(baked);
-        originalMediaUrls.push(originalUrl);
+        mediaInputs.push({ kind: 'file', file: baked, originalUrl });
       } else {
-        filesOut.push(item.file);
-        originalMediaUrls.push(null);
+        mediaInputs.push({ kind: 'file', file: item.file, originalUrl: null });
       }
     }
 
@@ -742,8 +779,7 @@ export function Composer({
     await submitPost({
       user,
       content: caption,
-      mediaFiles: filesOut,
-      originalMediaUrls,
+      mediaInputs,
       selectedTags: [],
       courses: taggedCourses.map((c) => ({
         id: c.courseId,
@@ -753,9 +789,21 @@ export function Composer({
       actorType,
       actorId,
       visibility,
+      scheduledAt,
       onSuccess: () => {
-        toast.success('Posted');
-        // Delete the draft we resumed from — it's now published.
+        if (scheduledAt) {
+          const when = scheduledAt.toLocaleString(undefined, {
+            weekday: 'short',
+            month: 'short',
+            day: 'numeric',
+            hour: 'numeric',
+            minute: '2-digit',
+          });
+          toast.success(`Scheduled for ${when}`);
+        } else {
+          toast.success('Posted');
+        }
+        // Delete the draft we resumed from — it's now published (or queued).
         if (currentDraftId) {
           void deleteDraft(currentDraftId);
         }
@@ -765,6 +813,7 @@ export function Composer({
     });
 
   }, [
+
     canPost,
     isEditMode,
     editPostId,
@@ -852,8 +901,31 @@ export function Composer({
             {isSavingDraft ? 'Saving…' : 'Save draft'}
           </button>
         )}
+        {!isEditMode && (
+          <button
+            onClick={() => canPost && setScheduleSheetOpen(true)}
+            disabled={!canPost}
+            aria-label="Schedule post"
+            title="Schedule for later"
+            style={{
+              width: 36,
+              height: 36,
+              borderRadius: '50%',
+              background: CHIP,
+              border: 'none',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              cursor: canPost ? 'pointer' : 'default',
+              color: canPost ? INK_2 : '#94A3B8',
+              marginRight: 6,
+            }}
+          >
+            <Clock size={16} strokeWidth={2.25} />
+          </button>
+        )}
         <button
-          onClick={handleShare}
+          onClick={() => handleShare(null)}
           disabled={!canPost}
           style={{
             fontSize: 13,
@@ -872,6 +944,7 @@ export function Composer({
             : (isSubmitting ? 'Posting…' : 'Post')}
         </button>
       </div>
+
 
       {/* Scroll body */}
       <div
@@ -1214,6 +1287,17 @@ export function Composer({
         })}
       </BottomSheet>
 
+      <ScheduleSheet
+        open={scheduleSheetOpen}
+        busy={isSubmitting}
+        onCancel={() => setScheduleSheetOpen(false)}
+        onConfirm={async (when) => {
+          setScheduleSheetOpen(false);
+          await handleShare(when);
+        }}
+      />
+
+
       <BottomSheet
         open={visibilitySheetOpen}
         onClose={() => setVisibilitySheetOpen(false)}
@@ -1396,12 +1480,13 @@ function MediaPreview({
           }}
         >
           <MediaStage
-            item={item}
+            item={{ ...item, restoredFromStream: !!item.restoredStreamId }}
             frame={item.frame}
             height={360}
             borderRadius={14}
             showPlayGlyph={item.type === 'video'}
           />
+
         </button>
         <CornerButton top right onClick={() => onEditItem(0)} ariaLabel="Edit">
           <Pencil size={14} strokeWidth={2.25} />
@@ -1457,12 +1542,13 @@ function MediaPreview({
             }}
           >
             <MediaStage
-              item={item}
+              item={{ ...item, restoredFromStream: !!item.restoredStreamId }}
               frame={item.frame}
               height={TILE}
               borderRadius={TILE_RADIUS}
               showPlayGlyph={item.type === 'video'}
             />
+
           </button>
           <CornerButton top right onClick={() => onRemoveItem(i)} ariaLabel="Remove" small>
             <X size={12} strokeWidth={2.5} />

@@ -17,6 +17,13 @@ export interface MediaStageItem {
   width: number;
   height: number;
   pos: { x: number; y: number };
+  /**
+   * Set when this video was rehydrated from an existing Cloudflare Stream asset
+   * (e.g. resumed-from-draft). The previewUrl is HLS, which most desktop browsers
+   * can't play natively — we render the poster + a play glyph instead. The asset
+   * is re-attached to the post on submit by stream_id (no re-upload).
+   */
+  restoredFromStream?: boolean;
 }
 
 interface MediaStageProps {
@@ -160,22 +167,72 @@ export function MediaStage({
         }}
       >
         {isVideo ? (
-          <video
-            src={item.previewUrl}
-            poster={item.posterUrl}
-            autoPlay
-            loop
-            playsInline
-            preload="metadata"
-            muted={muted}
-            style={{
-              width: '100%',
-              height: '100%',
-              objectFit: 'contain',
-              userSelect: 'none',
-              background: CHARCOAL,
-            }}
-          />
+          item.restoredFromStream ? (
+            <div
+              style={{
+                position: 'relative',
+                width: '100%',
+                height: '100%',
+                background: CHARCOAL,
+              }}
+            >
+              {item.posterUrl ? (
+                <img
+                  src={item.posterUrl}
+                  alt=""
+                  draggable={false}
+                  style={{
+                    width: '100%',
+                    height: '100%',
+                    objectFit: 'contain',
+                    userSelect: 'none',
+                    pointerEvents: 'none',
+                  }}
+                />
+              ) : null}
+              <div
+                style={{
+                  position: 'absolute',
+                  inset: 0,
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  pointerEvents: 'none',
+                }}
+              >
+                <div
+                  style={{
+                    width: 56,
+                    height: 56,
+                    borderRadius: 999,
+                    background: 'rgba(0,0,0,0.55)',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                  }}
+                >
+                  <Play size={22} color="#fff" fill="#fff" />
+                </div>
+              </div>
+            </div>
+          ) : (
+            <video
+              src={item.previewUrl}
+              poster={item.posterUrl}
+              autoPlay
+              loop
+              playsInline
+              preload="metadata"
+              muted={muted}
+              style={{
+                width: '100%',
+                height: '100%',
+                objectFit: 'contain',
+                userSelect: 'none',
+                background: CHARCOAL,
+              }}
+            />
+          )
         ) : (
           <img
             src={item.previewUrl}

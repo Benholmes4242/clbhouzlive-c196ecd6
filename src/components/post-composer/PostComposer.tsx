@@ -12,6 +12,7 @@ import { Composer } from './Composer';
 import { MediaEditor } from './MediaEditor';
 import { CourseSearchSheet } from './CourseSearchSheet';
 import { DraftsListSheet } from './DraftsListSheet';
+import { ScheduledPostsSheet } from './ScheduledPostsSheet';
 import { usePostStudioStore } from '@/stores/usePostStudioStore';
 import type { ComposerMediaItem } from './composerMedia';
 import type { StudioActorType, TaggedCourse } from './types';
@@ -45,6 +46,7 @@ export function PostComposer({
   const [screen, setScreen] = useState<Screen>('choose');
   const [reviewCourseSheetOpen, setReviewCourseSheetOpen] = useState(false);
   const [draftsListOpen, setDraftsListOpen] = useState(false);
+  const [scheduledListOpen, setScheduledListOpen] = useState(false);
 
   // Shared media state — lives on the shell so the Editor can read/update it.
   const [mediaItems, setMediaItems] = useState<ComposerMediaItem[]>([]);
@@ -75,6 +77,7 @@ export function PostComposer({
     setScreen(isEditMode || isDraftMode || initialMedia.length > 0 ? 'post' : 'choose');
     setReviewCourseSheetOpen(false);
     setDraftsListOpen(false);
+    setScheduledListOpen(false);
     setMediaItems([]);
     setEditIndex(0);
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -139,8 +142,10 @@ export function PostComposer({
                 onPost={() => setScreen('post')}
                 onReview={() => setReviewCourseSheetOpen(true)}
                 onOpenDrafts={() => setDraftsListOpen(true)}
+                onOpenScheduled={() => setScheduledListOpen(true)}
                 isBusiness={isBusiness}
               />
+
             ) : (
               <Composer
                 onClose={onClose}
@@ -174,7 +179,14 @@ export function PostComposer({
                 usePostStudioStore.getState().openPostStudioForDraft({ draftId: id });
               }}
             />
+
+            {/* Scheduled posts list overlays the Chooser */}
+            <ScheduledPostsSheet
+              open={screen === 'choose' && scheduledListOpen}
+              onClose={() => setScheduledListOpen(false)}
+            />
           </div>
+
 
           <CourseSearchSheet
             open={reviewCourseSheetOpen}
