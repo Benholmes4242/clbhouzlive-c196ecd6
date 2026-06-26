@@ -30,7 +30,8 @@ export function useActorUnreadCounts() {
     queryFn: async (): Promise<Record<string, number>> => {
       if (!user?.id || availableActors.length === 0) return {};
 
-      const results = await Promise.all(
+      // 1) Per-actor NOTIFICATION unread (excludes message types)
+      const notifResults = await Promise.all(
         availableActors.map(async (actor) => {
           const { count } = await supabase
             .from('notifications')
@@ -45,10 +46,21 @@ export function useActorUnreadCounts() {
         }),
       );
 
-      return results.reduce<Record<string, number>>((acc, r) => {
+      const totals = notifResults.reduce<Record<string, number>>((acc, r) => {
         acc[r.key] = r.count;
         return acc;
       }, {});
+
+      // 2) Per-actor DM unread (conversations w/ unread messages not sent by actor)
+      const { data: dmRows, error: dmErr } = await supabase.rpc('get_actor_dm_unread_counts');
+      if (!dmErr && Array.isArray(dmRows)) {
+        for (const row of dmRows as Array<{ actor_type: string; actor_id: string; unread_count: number }>) {
+          const key = `${row.actor_type}:${row.actor_id}`;
+          if (key in totals) totals[key] += row.unread_count ?? 0;
+        }
+      }
+
+      return totals;
     },
     enabled: !!user?.id && availableActors.length > 0,
     staleTime: 15_000,

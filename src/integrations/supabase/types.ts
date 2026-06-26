@@ -17313,6 +17313,14 @@ export type Database = {
           start_date: string
         }[]
       }
+      get_actor_dm_unread_counts: {
+        Args: never
+        Returns: {
+          actor_id: string
+          actor_type: string
+          unread_count: number
+        }[]
+      }
       get_adhoc_rivalry: {
         Args: { p_rival_user_id: string }
         Returns: {
