@@ -491,18 +491,28 @@ export const CardFeed: React.FC<CardFeedProps> = ({
           <style>{`@keyframes ptrSpin { to { transform: rotate(360deg); } }`}</style>
         </div>
       )}
-      <Virtuoso
-        ref={virtuosoRef}
-        data={posts}
-        itemContent={itemContent}
-        computeItemKey={(_, post) => post.id}
-        rangeChanged={handleRangeChanged}
-        endReached={handleEndReached}
-        increaseViewportBy={{ top: 400, bottom: 800 }}
-        overscan={{ main: 400, reverse: 400 }}
-        components={components}
-        style={{ height: '100%', width: '100%' }}
-      />
+      <div
+        style={{
+          height: '100%',
+          transform: `translateY(${isRefreshing ? PTR_THRESHOLD : pull}px)`,
+          transition: activelyPullingRef.current ? 'none' : 'transform 220ms cubic-bezier(0.22, 1, 0.36, 1)',
+          willChange: 'transform',
+        }}
+      >
+        <Virtuoso
+          ref={virtuosoRef}
+          data={posts}
+          itemContent={itemContent}
+          computeItemKey={(_, post) => post.id}
+          rangeChanged={handleRangeChanged}
+          endReached={handleEndReached}
+          increaseViewportBy={{ top: 400, bottom: 800 }}
+          overscan={{ main: 400, reverse: 400 }}
+          components={components}
+          style={{ height: '100%', width: '100%' }}
+        />
+      </div>
+
     </div>
   );
 };
