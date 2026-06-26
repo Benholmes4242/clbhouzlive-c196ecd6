@@ -317,7 +317,7 @@ function ToughCourseCard({ course, onTap }: CardProps) {
                       lineHeight: 1.2,
                     }}
                   >
-                    plays +{numFmt(course.hardest_avg_to_par, 1)} over par on average
+                    plays +{numFmt(course.hardest_avg_to_par, 1)} avg
                   </p>
                 </>
               ) : null}
