@@ -230,26 +230,6 @@ function ToughCourseCard({ course, onTap }: CardProps) {
           </div>
         </div>
 
-        {/* Difficulty bar */}
-        <div
-          style={{
-            height: 5,
-            background: INK_TINT_06,
-            borderRadius: 3,
-            marginTop: 10,
-            overflow: 'hidden',
-          }}
-        >
-          <div
-            style={{
-              width: `${pct}%`,
-              height: '100%',
-              background: `linear-gradient(90deg, #F7931E, ${MAROON})`,
-              borderRadius: 3,
-            }}
-          />
-        </div>
-
         {/* Hardest-hole stat row */}
         <div
           style={{
