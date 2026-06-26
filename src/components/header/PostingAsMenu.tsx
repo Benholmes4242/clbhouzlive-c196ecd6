@@ -20,6 +20,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useLogout } from '@/hooks/useLogout';
 import ProfileHubSheet from '@/components/profile/ProfileHubSheet';
 import { useEditProfileRoute } from '@/hooks/useEditProfileRoute';
+import { getActorRoute } from '@/types/actor';
 
 interface PostingAsMenuProps {
   isOpen: boolean;
