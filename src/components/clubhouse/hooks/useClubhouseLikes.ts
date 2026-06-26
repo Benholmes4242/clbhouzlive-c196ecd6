@@ -53,12 +53,23 @@ export function useClubhouseLikes({ userId, activeActor }: UseClubhouseLikesOpti
         isLiked: wasLiked,
       },
       {
-        // Clear override on success or error — cache patch (or rollback) now
-        // drives the display via the post prop.
+        // Success: cache has been patched to truth — drop the override.
         onSuccess: () => clearOverride(post.id),
-        onError: () => clearOverride(post.id),
+        // Error: explicitly revert to the PRE-TAP state. The post prop was
+        // never patched (patchEngagement runs only on success now), so a
+        // simple clear is also safe — but pinning the pre-tap value makes
+        // the rollback unambiguous even if upstream caches drift.
+        onError: () => {
+          setLocalLikeState(prev => new Map(prev).set(post.id, {
+            isLiked: wasLiked,
+            count: post.likeCount,
+          }));
+          // Drop the override on the next tick so the post prop (truth) takes over.
+          setTimeout(() => clearOverride(post.id), 0);
+        },
       }
     );
+
   }, [userId, activeActor, likeMutation, clearOverride]);
 
   const getActiveLikeState = useCallback((post: FeedPost | null) => {

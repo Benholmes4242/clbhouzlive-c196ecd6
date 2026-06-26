@@ -4,7 +4,7 @@
  */
 
 import { memo, useRef, useState, useEffect, useCallback, useMemo } from 'react';
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { removeGolfCourseFromContent } from '@/utils/golfCourseExtractor';
 import { createPortal } from 'react-dom';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -185,6 +185,28 @@ function CommentsSheet({
   // ── Likes hook ──
   const { data: likers, isLoading: likersLoading } =
     usePostLikes(postId, isOpen && activeTab === 'likes', likeSource);
+
+  // ── Likes realtime (FIX 5) ──
+  // Subscribe to post_likes changes while the likes tab is open so business
+  // (and personal) likes appear live without waiting for staleTime/invalidation.
+  const queryClient = useQueryClient();
+  useEffect(() => {
+    if (!postId || !isOpen || activeTab !== 'likes' || likeSource !== 'post') return;
+    const channel = supabase
+      .channel(`post-likes:${postId}`)
+      .on(
+        'postgres_changes',
+        { event: '*', schema: 'public', table: 'post_likes', filter: `post_id=eq.${postId}` },
+        () => {
+          queryClient.invalidateQueries({ queryKey: ['post-likes', postId, likeSource] });
+        }
+      )
+      .subscribe();
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [postId, isOpen, activeTab, likeSource, queryClient]);
+
 
   // ── Sorted comments ──
   const sortedComments = useMemo(() => {

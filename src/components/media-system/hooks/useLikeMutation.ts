@@ -24,29 +24,30 @@ export function useLikeMutation() {
           .eq('actor_type', actorType);
         if (error) throw error;
       } else {
+        // Idempotent upsert — guarantees a row exists for this actor after success.
+        // Avoids the 409 unique-violation that previously got swallowed as success
+        // while no row was actually written (likes "lost" on refresh).
         const { error } = await supabase
           .from('post_likes')
-          .insert({
-            post_id: postId,
-            user_id: userId,
-            actor_id: actorId,
-            actor_type: actorType,
-          });
-
-        // `23505` is Postgres' unique_violation. This can happen if the user
-        // double-taps the like button before the optimistic state settles, or if
-        // a stale isLiked=false state tries to re-insert a row that already exists.
-        // Treat it as a no-op rather than an error — the like already exists.
-        if (error && error.code !== '23505') throw error;
+          .upsert(
+            {
+              post_id: postId,
+              user_id: userId,
+              actor_id: actorId,
+              actor_type: actorType,
+            },
+            { onConflict: 'post_id,actor_type,actor_id', ignoreDuplicates: true },
+          );
+        if (error) throw error;
       }
     },
     onError: (error) => {
       console.error('[Like] Mutation failed:', error);
     },
-    onSettled: (_data, _error, variables) => {
-      // Surgical cache patch across every feed key — no refetch, no scroll
-      // jump, every consumer surface stays in sync. See `engagementCache.ts`.
-      // `variables.isLiked` is the state BEFORE toggle; new state is opposite.
+    onSuccess: (_data, variables) => {
+      // Patch cache ONLY after a confirmed successful write. Previously this
+      // ran in onSettled which fires on error too, leaving the cache in a
+      // "liked" state when no DB row existed.
       patchEngagement(queryClient, variables.postId, {
         isLikedByMe: !variables.isLiked,
         likeCountDelta: variables.isLiked ? -1 : +1,
@@ -54,3 +55,4 @@ export function useLikeMutation() {
     },
   });
 }
+
