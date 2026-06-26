@@ -301,26 +301,16 @@ export function Composer({
           continue;
         }
         try {
-          const resp = await fetch(m.mediaUrl);
-          if (!resp.ok) throw new Error(String(resp.status));
-          const blob = await resp.blob();
-          const ext = (m.fileName?.split('.').pop() ||
-            blob.type.split('/')[1] ||
-            'jpg').split('+')[0];
-          const file = new File(
-            [blob],
-            m.fileName || `draft-${m.id}.${ext}`,
-            { type: blob.type || 'image/jpeg', lastModified: Date.now() },
-          );
-          const measured = await measureImage(file);
+          const w = m.width && m.width > 0 ? m.width : 4;
+          const h = m.height && m.height > 0 ? m.height : 3;
           rehydrated.push({
             id: nextMediaId(),
             type: 'image',
-            file,
-            previewUrl: measured.previewUrl,
-            width: measured.width,
-            height: measured.height,
-            aspectRatio: measured.width / Math.max(1, measured.height),
+            previewUrl: m.mediaUrl,
+            restoredMediaUrl: m.mediaUrl,
+            width: w,
+            height: h,
+            aspectRatio: w / Math.max(1, h),
             pos: { x: 50, y: 50 },
             frame: 'original',
           });
@@ -738,6 +728,15 @@ export function Composer({
           width: item.width ?? null,
           height: item.height ?? null,
           durationSeconds: item.durationSeconds ?? null,
+        });
+        continue;
+      }
+      if (item.type === 'image' && item.restoredMediaUrl && !item.file) {
+        mediaInputs.push({
+          kind: 'restoredImage',
+          mediaUrl: item.restoredMediaUrl,
+          width: item.width ?? null,
+          height: item.height ?? null,
         });
         continue;
       }

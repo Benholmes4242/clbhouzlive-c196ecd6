@@ -22,6 +22,12 @@ export type MediaInput =
       width?: number | null;
       height?: number | null;
       durationSeconds?: number | null;
+    }
+  | {
+      kind: 'restoredImage';
+      mediaUrl: string;
+      width?: number | null;
+      height?: number | null;
     };
 
 interface PostSubmissionData {
@@ -205,6 +211,24 @@ export const usePostSubmission = () => {
                 });
               if (mediaError) throw mediaError;
               return { success: true, fileName: `restored-${input.streamId}` };
+            }
+
+            if (input.kind === 'restoredImage') {
+              // Image already on R2 — re-attach by URL, no upload.
+              const { error: mediaError } = await supabase
+                .from('post_media')
+                .insert({
+                  post_id: postData.id,
+                  media_type: 'image',
+                  media_url: input.mediaUrl,
+                  width: input.width ?? null,
+                  height: input.height ?? null,
+                  aspect_ratio:
+                    input.width && input.height ? input.width / input.height : null,
+                  display_order: index,
+                });
+              if (mediaError) throw mediaError;
+              return { success: true, fileName: `restored-image-${index}` };
             }
 
             const file = input.file;
