@@ -198,13 +198,13 @@ const BusinessProfilePage: React.FC = () => {
 
   // ───── actions ─────
   const handleFollowToggle = () => {
-    if (!user?.id || !business?.id) return;
+    if (!user?.id || !business?.id || !viewerActorId || isOwnBusiness) return;
     toggleFollow.mutate({
       targetActorType: 'business',
       targetActorId: business.id,
       targetUserId: undefined,
-      viewerActorType: 'personal',
-      viewerActorId: user.id,
+      viewerActorType,
+      viewerActorId,
       viewerUserId: user.id,
       isFollowing,
     });
