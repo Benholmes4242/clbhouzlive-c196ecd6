@@ -61,6 +61,21 @@ export function CollegeGolfHubPage() {
     }
   }, []);
 
+  // Focus search input only when expanded — prevents keyboard pop on page load
+  useEffect(() => {
+    if (searchExpanded) {
+      searchInputRef.current?.focus();
+    }
+  }, [searchExpanded]);
+
+  // Collapse/clear search when leaving the page
+  useEffect(() => {
+    return () => {
+      setSearchExpanded(false);
+      setSearchValue('');
+    };
+  }, []);
+
   const saveScroll = useCallback(() => {
     sessionStorage.setItem('college-scroll', String(window.scrollY));
   }, []);
