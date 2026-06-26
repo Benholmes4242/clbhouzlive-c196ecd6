@@ -31,6 +31,7 @@ interface FullscreenFeedState {
   startIndex: number;
   activeIndex: number;
   openCommentsInitially: boolean;
+  initialCommentId: string | null;
   onCloseCallback: (() => void) | null;
   // Pagination — owned by the opener, mirrored in this store so the overlay
   // can read them reactively without holding a hook reference.
@@ -43,6 +44,7 @@ interface FullscreenFeedState {
   appendPosts: (newPosts: FeedPost[]) => void;
   setActiveIndex: (idx: number) => void;
   consumeOpenCommentsInitially: () => void;
+  consumeInitialCommentId: () => void;
   /** Allow openers to push updated pagination state into the store as the
    *  underlying query progresses (e.g. hasNextPage flips false on last page,
    *  isFetchingNextPage toggles during a fetch). */
