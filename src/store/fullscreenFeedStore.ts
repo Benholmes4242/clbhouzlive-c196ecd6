@@ -5,6 +5,9 @@ import { applyEngagementDelta } from '@/lib/applyEngagementDelta';
 
 interface OpenOptions {
   openCommentsInitially?: boolean;
+  /** Optional comment id to highlight/scroll-to once the comments sheet opens
+   *  (used by notification deep-links to a specific comment). */
+  initialCommentId?: string | null;
   /** Called when the overlay close button is tapped. Use for deep-link routes
    *  that need to navigate back instead of just hiding the overlay. */
   onClose?: () => void;
