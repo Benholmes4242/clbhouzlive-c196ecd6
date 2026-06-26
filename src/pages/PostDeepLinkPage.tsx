@@ -40,6 +40,7 @@ const PostDeepLinkPage: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const navState = location.state as { openComments?: boolean; initialCommentId?: string } | null;
+  const [searchParams] = useSearchParams();
   const { user, loading: authLoading } = useSupabaseSession();
   const videoRef = useRef<HTMLVideoElement>(null);
 
