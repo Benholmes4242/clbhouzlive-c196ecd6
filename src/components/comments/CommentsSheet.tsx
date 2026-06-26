@@ -1058,6 +1058,9 @@ function CommentsSheet({
                   </div>
                 )}
 
+                {/* Identity cue — only renders when acting as a business */}
+                <CommentingAsIndicator />
+
                 {/* Input row */}
                 <div className="flex items-end gap-2">
                   <SquircleAvatar
