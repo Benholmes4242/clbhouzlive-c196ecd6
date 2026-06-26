@@ -482,10 +482,114 @@ export function Composer({
     });
   }, []);
 
+  // Save the current composer state as a draft. Edit mode does not save drafts
+  // (those edits target a published post). Returns true on success.
+  const handleSaveDraft = useCallback(async (): Promise<boolean> => {
+    if (isEditMode) return false;
+    if (!hasDraft) return false;
+    if (isSavingDraft) return false;
+
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) {
+      toast.error('You must be signed in to save a draft');
+      return false;
+    }
+
+    const actorType: 'personal' | 'business' =
+      displayActor.type === 'business' ? 'business' : 'personal';
+    const actorId =
+      actorType === 'business' ? displayActor.id : displayActor.id || user.id;
+
+    const courseData: DraftCourseData[] = taggedCourses.map((c) => ({
+      id: c.courseId,
+      name: c.courseName,
+      country: c.country ?? '',
+      region: c.region,
+    }));
+
+    setIsSavingDraft(true);
+    try {
+      if (currentDraftId) {
+        // Updating an existing draft — caption / visibility / courses only.
+        // Media reconciliation against an existing draft is out of scope for
+        // Phase 1; media stays as it was when the draft was first created.
+        const ok = await updateDraft(currentDraftId, {
+          actorType,
+          actorId,
+          content: caption,
+          visibility,
+          courseId: courseData[0]?.id ?? null,
+          courseName: courseData[0]?.name ?? null,
+          courseCountry: courseData[0]?.country ?? null,
+          courseData: courseData.length ? courseData : null,
+        });
+        if (!ok) {
+          toast.error("Couldn't save draft");
+          return false;
+        }
+      } else {
+        const created = await createDraft({
+          actorType,
+          actorId,
+          content: caption,
+          visibility,
+          courseId: courseData[0]?.id ?? null,
+          courseName: courseData[0]?.name ?? null,
+          courseCountry: courseData[0]?.country ?? null,
+          courseData: courseData.length ? courseData : null,
+        });
+        if (!created) {
+          toast.error("Couldn't save draft");
+          return false;
+        }
+        setCurrentDraftId(created.id);
+        // Upload any local media and attach to the new draft.
+        const localMedia = mediaItems.filter((m) => m.file);
+        if (localMedia.length) {
+          const { failed } = await uploadAllDraftMedia(created.id, localMedia);
+          if (failed.length) {
+            console.warn('[Composer] some draft media uploads failed:', failed);
+          }
+        }
+      }
+      setIsDirty(false);
+      toast.success('Draft saved');
+      return true;
+    } finally {
+      setIsSavingDraft(false);
+    }
+  }, [
+    isEditMode,
+    hasDraft,
+    isSavingDraft,
+    currentDraftId,
+    displayActor,
+    caption,
+    visibility,
+    taggedCourses,
+    mediaItems,
+  ]);
+
   const handleCloseRequest = useCallback(() => {
-    if (hasDraft) setDiscardConfirmOpen(true);
-    else onClose();
-  }, [hasDraft, onClose]);
+    // Edit mode keeps the legacy single-action discard. Net-new / draft-resume
+    // shows the 3-option sheet (Save / Discard / Keep editing) when dirty.
+    if (!hasDraft) {
+      onClose();
+      return;
+    }
+    if (isEditMode) {
+      setDiscardConfirmOpen(true);
+      return;
+    }
+    // Resumed but untouched draft → just close.
+    if (isDraftMode && !isDirty) {
+      onClose();
+      return;
+    }
+    setDiscardConfirmOpen(true);
+  }, [hasDraft, isEditMode, isDraftMode, isDirty, onClose]);
+
+
 
   const handleShare = useCallback(async () => {
     if (!canPost) return;
