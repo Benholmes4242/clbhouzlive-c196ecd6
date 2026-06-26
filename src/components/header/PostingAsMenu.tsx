@@ -470,19 +470,19 @@ export function PostingAsMenu({ isOpen, onClose, useLightTheme = false, anchorRe
             )}
           />
           
-          {/* View profile */}
+          {/* View profile — actor-aware */}
           <MenuRow
             icon={<User className="h-[18px] w-[18px]" />}
-            label="View profile"
-            onClick={() => handleNavigate('/profile')}
+            label={isBusinessActor ? `View ${activeActor?.name ?? 'profile'}` : 'View profile'}
+            onClick={() => handleNavigate(viewProfileRoute)}
             useLightTheme={useLightTheme}
           />
           
-          {/* Edit profile */}
+          {/* Edit profile — actor-aware */}
           <MenuRow
             icon={<Pencil className="h-[18px] w-[18px]" />}
-            label="Edit profile"
-            onClick={() => handleNavigate(editRoute)}
+            label={isBusinessActor ? `Edit ${activeActor?.name ?? 'profile'}` : 'Edit profile'}
+            onClick={() => handleNavigate(editProfileRoute)}
             useLightTheme={useLightTheme}
           />
           
@@ -494,11 +494,11 @@ export function PostingAsMenu({ isOpen, onClose, useLightTheme = false, anchorRe
             useLightTheme={useLightTheme}
           />
           
-          {/* Settings */}
+          {/* Settings — actor-aware */}
           <MenuRow
             icon={<Settings className="h-[18px] w-[18px]" />}
             label="Settings"
-            onClick={() => handleNavigate('/settings')}
+            onClick={() => handleNavigate(settingsRoute)}
             useLightTheme={useLightTheme}
           />
 
