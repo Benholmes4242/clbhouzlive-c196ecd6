@@ -217,8 +217,8 @@ export function CollegeGolfHubPage() {
               <div style={{ position: 'relative' }}>
                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 z-10 w-4 h-4" style={{ color: AMBER }} strokeWidth={2.5} />
                 <input
+                  ref={searchInputRef}
                   type="text"
-                  autoFocus
                   placeholder="Search colleges..."
                   value={searchValue}
                   onChange={(e) => setSearchValue(e.target.value)}
