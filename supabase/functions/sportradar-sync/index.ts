@@ -600,7 +600,7 @@ async function syncLeaderboard(supabase: any, apiKey: string, tour: string, year
 
   const { data: tournament } = await supabase
     .from('sr_tournaments')
-    .select('id')
+    .select('id, current_round')
     .eq('sr_id', tournamentSrId)
     .maybeSingle();
 
@@ -616,6 +616,62 @@ async function syncLeaderboard(supabase: any, apiKey: string, tour: string, year
       cut_round: data.cut_round,
     }).eq('sr_id', tournamentSrId);
   }
+
+  // ──────────────────────────────────────────────────────────────────────
+  // Live-round backfill: Sportradar's leaderboard payload only includes
+  // COMPLETED rounds in competitor.rounds[]. If the tournament is mid-round,
+  // fetch that round's live scores once and synthesize a round object into
+  // each competitor's rounds[] before upsert, so raw_data.rounds is the
+  // single source of truth for ALL rounds (including in-progress).
+  // ──────────────────────────────────────────────────────────────────────
+  let liveRoundMap: Map<string, { score: number | null; thru: number | null; strokes: number | null }> | null = null;
+  let liveRoundNum: number | null = null;
+
+  const currentRound: number | null = tournament?.current_round ?? null;
+  const completedMax = leaderboard.length > 0
+    ? Math.max(...leaderboard.map((c: any) => (c.rounds || []).length))
+    : 0;
+
+  if (currentRound != null && currentRound > completedMax) {
+    liveRoundNum = currentRound;
+    const roundPadded = String(currentRound).padStart(2, '0');
+    const scoresUrl = `${getTourBaseUrl(tour)}/${year}/tournaments/${tournamentSrId}/rounds/${roundPadded}/scores.json`;
+    try {
+      const scoresData = await fetchSportradar(scoresUrl, apiKey, `Live R${currentRound} scores`);
+      const players = scoresData.players || scoresData.round?.players || [];
+      liveRoundMap = new Map();
+      for (const pe of players) {
+        const srId = (pe.player || pe).id;
+        if (!srId) continue;
+        const stats = pe.statistics || {};
+        liveRoundMap.set(srId, {
+          score:   pe.score   ?? stats.score   ?? null,
+          thru:    pe.thru    ?? stats.thru    ?? null,
+          strokes: pe.strokes ?? stats.strokes ?? null,
+        });
+      }
+    } catch (e) {
+      console.warn(`[syncLeaderboard] live round ${currentRound} scores fetch failed: ${e.message} — proceeding without TODAY`);
+      liveRoundMap = null;
+    }
+  }
+
+  // Helper: merge synthesized live round into a competitor's rounds[]
+  const mergeLiveRound = (entry: any): any[] => {
+    const rounds = [...(entry.rounds || [])];
+    if (!liveRoundMap || liveRoundNum == null) return rounds;
+    const live = liveRoundMap.get(entry.id);
+    if (live && rounds.length < liveRoundNum) {
+      rounds[liveRoundNum - 1] = {
+        sequence: liveRoundNum,
+        score: live.score,
+        thru: live.thru,
+        strokes: live.strokes,
+        synthesized: true,
+      };
+    }
+    return rounds;
+  };
 
   for (const entry of leaderboard) {
     const isTeamEntry = Array.isArray(entry.players) && entry.players.length > 0;
@@ -690,7 +746,7 @@ async function syncLeaderboard(supabase: any, apiKey: string, tour: string, year
       }
 
       // 4. Upsert leaderboard row keyed by team_id (player_id MUST be null — XOR check)
-      const rounds = entry.rounds || [];
+      const rounds = mergeLiveRound(entry);
       const latestRound = rounds.length > 0 ? rounds[rounds.length - 1] : null;
       const derivedThru = latestRound?.thru ?? entry.thru ?? null;
       // today is read client-side from raw_data.rounds (see CinematicFrame liveRoundFor).
@@ -716,7 +772,7 @@ async function syncLeaderboard(supabase: any, apiKey: string, tour: string, year
         today: null,
         wins: entry.wins,
         losses: entry.losses,
-        raw_data: entry,
+        raw_data: { ...entry, rounds },
       }, { onConflict: 'tournament_id,team_id' });
       if (error) {
         console.error(`[syncLeaderboard team] Upsert error for team ${teamSrId}:`, error.message);
@@ -755,7 +811,7 @@ async function syncLeaderboard(supabase: any, apiKey: string, tour: string, year
     }
 
     if (playerId) {
-      const rounds = entry.rounds || [];
+      const rounds = mergeLiveRound(entry);
       const latestRound = rounds.length > 0 ? rounds[rounds.length - 1] : null;
       const derivedThru = latestRound?.thru ?? entry.thru ?? null;
       // today is read client-side from raw_data.rounds (see CinematicFrame liveRoundFor).
@@ -781,7 +837,7 @@ async function syncLeaderboard(supabase: any, apiKey: string, tour: string, year
         today: null,
         wins: entry.wins,
         losses: entry.losses,
-        raw_data: entry,
+        raw_data: { ...entry, rounds },
       }, { onConflict: 'tournament_id,player_id' });
       if (!error) totalRecords++;
     }
