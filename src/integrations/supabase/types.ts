@@ -17627,7 +17627,6 @@ export type Database = {
           post_created_at: string
           post_id: string
           post_status: string
-          post_tags: Json
           post_user_id: string
           poster_url: string
           review_clubhouse_score: number

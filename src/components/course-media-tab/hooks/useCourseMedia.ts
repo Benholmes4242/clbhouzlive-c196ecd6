@@ -43,7 +43,10 @@ export function useCourseMedia({ userId, courseId, filter }: UseCourseMediaParam
         p_filter: filter,
         p_page_size: PAGE_SIZE,
         p_seen_post_ids: seenPostIds.current,
+        p_viewer_actor_type: activeActor?.type ?? 'personal',
+        p_viewer_actor_id: activeActor?.id ?? userId,
       };
+
 
       if (cursor) params.p_cursor = cursor;
 
