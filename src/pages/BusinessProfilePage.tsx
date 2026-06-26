@@ -104,11 +104,15 @@ const BusinessProfilePage: React.FC = () => {
   const { data: followingCount = 0 } = useBusinessFollowingCount(business?.id);
   const { data: teamMembers } = useBusinessTeam(business?.id);
 
+  const { activeActor } = useActiveActor();
+  const viewerActorType: 'personal' | 'business' = activeActor?.type ?? 'personal';
+  const viewerActorId = activeActor?.id ?? user?.id;
+  const isOwnBusiness = viewerActorType === 'business' && viewerActorId === business?.id;
   const { isFollowing: cachedFollowing } = useFollowState({
     targetActorType: 'business',
-    targetActorId: business?.id,
-    viewerActorType: 'personal',
-    viewerActorId: user?.id,
+    targetActorId: isOwnBusiness ? undefined : business?.id,
+    viewerActorType,
+    viewerActorId,
   });
   const toggleFollow = useToggleFollow();
   const { startDM, isStarting: isStartingDM } = useStartDM();
