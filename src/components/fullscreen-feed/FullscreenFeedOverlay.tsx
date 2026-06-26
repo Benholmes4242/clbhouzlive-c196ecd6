@@ -30,7 +30,7 @@ export function FullscreenFeedOverlay() {
   const navigate = useNavigate();
   const { session } = useSupabaseSession();
   const userId = session?.user?.id;
-  const { isOpen, posts, startIndex, activeIndex, close, setActiveIndex, openCommentsInitially, consumeOpenCommentsInitially } = useFullscreenFeedStore();
+  const { isOpen, posts, startIndex, activeIndex, close, setActiveIndex, openCommentsInitially, consumeOpenCommentsInitially, initialCommentId, consumeInitialCommentId } = useFullscreenFeedStore();
   const hasNextPage = useFullscreenFeedStore(s => s.hasNextPage);
   const fetchNextPage = useFullscreenFeedStore(s => s.fetchNextPage);
   const isFetchingNextPage = useFullscreenFeedStore(s => s.isFetchingNextPage);
@@ -116,7 +116,11 @@ export function FullscreenFeedOverlay() {
     if (readOnly) { consumeOpenCommentsInitially(); return; }
     openComments();
     consumeOpenCommentsInitially();
-  }, [isOpen, openCommentsInitially, posts.length, openComments, consumeOpenCommentsInitially, readOnly]);
+    // One-shot clear of the initial comment id so post-swipes don't re-scroll
+    // to the original notification target.
+    const t = setTimeout(() => consumeInitialCommentId(), 1200);
+    return () => clearTimeout(t);
+  }, [isOpen, openCommentsInitially, posts.length, openComments, consumeOpenCommentsInitially, consumeInitialCommentId, readOnly]);
 
   // Body scroll lock
   useEffect(() => {
@@ -244,6 +248,7 @@ export function FullscreenFeedOverlay() {
           caption={activePost?.caption}
           theme="dark"
           likesCount={getActiveLikeState(activePost!)?.count ?? null}
+          initialCommentId={initialCommentId}
         />
       )}
 

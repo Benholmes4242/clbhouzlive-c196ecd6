@@ -39,7 +39,7 @@ const PostDeepLinkPage: React.FC = () => {
   const { postId } = useParams<{ postId: string }>();
   const navigate = useNavigate();
   const location = useLocation();
-  const navState = location.state as { openComments?: boolean } | null;
+  const navState = location.state as { openComments?: boolean; initialCommentId?: string } | null;
   const { user, loading: authLoading } = useSupabaseSession();
   const videoRef = useRef<HTMLVideoElement>(null);
 
@@ -196,6 +196,7 @@ const PostDeepLinkPage: React.FC = () => {
 
     useFullscreenFeedStore.getState().open([feedPost], 0, {
       openCommentsInitially: navState?.openComments === true,
+      initialCommentId: navState?.initialCommentId ?? null,
       onClose: () => {
         // Go back if there's history; otherwise land on Clubhouse.
         if (window.history.length > 1) {

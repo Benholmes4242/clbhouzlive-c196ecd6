@@ -5,6 +5,9 @@ import { applyEngagementDelta } from '@/lib/applyEngagementDelta';
 
 interface OpenOptions {
   openCommentsInitially?: boolean;
+  /** Optional comment id to highlight/scroll-to once the comments sheet opens
+   *  (used by notification deep-links to a specific comment). */
+  initialCommentId?: string | null;
   /** Called when the overlay close button is tapped. Use for deep-link routes
    *  that need to navigate back instead of just hiding the overlay. */
   onClose?: () => void;
@@ -28,6 +31,7 @@ interface FullscreenFeedState {
   startIndex: number;
   activeIndex: number;
   openCommentsInitially: boolean;
+  initialCommentId: string | null;
   onCloseCallback: (() => void) | null;
   // Pagination — owned by the opener, mirrored in this store so the overlay
   // can read them reactively without holding a hook reference.
@@ -40,6 +44,7 @@ interface FullscreenFeedState {
   appendPosts: (newPosts: FeedPost[]) => void;
   setActiveIndex: (idx: number) => void;
   consumeOpenCommentsInitially: () => void;
+  consumeInitialCommentId: () => void;
   /** Allow openers to push updated pagination state into the store as the
    *  underlying query progresses (e.g. hasNextPage flips false on last page,
    *  isFetchingNextPage toggles during a fetch). */
@@ -52,6 +57,7 @@ export const useFullscreenFeedStore = create<FullscreenFeedState>((set, get) => 
   startIndex: 0,
   activeIndex: 0,
   openCommentsInitially: false,
+  initialCommentId: null,
   onCloseCallback: null,
   hasNextPage: false,
   fetchNextPage: null,
@@ -64,6 +70,7 @@ export const useFullscreenFeedStore = create<FullscreenFeedState>((set, get) => 
       startIndex,
       activeIndex: startIndex,
       openCommentsInitially: !!options?.openCommentsInitially,
+      initialCommentId: options?.initialCommentId ?? null,
       onCloseCallback: options?.onClose ?? null,
       hasNextPage: options?.hasNextPage ?? false,
       fetchNextPage: options?.fetchNextPage ?? null,
@@ -77,6 +84,7 @@ export const useFullscreenFeedStore = create<FullscreenFeedState>((set, get) => 
       posts: [],
       activeIndex: 0,
       openCommentsInitially: false,
+      initialCommentId: null,
       onCloseCallback: null,
       hasNextPage: false,
       fetchNextPage: null,
@@ -91,6 +99,7 @@ export const useFullscreenFeedStore = create<FullscreenFeedState>((set, get) => 
     set((s) => ({ posts: [...s.posts, ...newPosts.filter(p => !s.posts.find(e => e.id === p.id))] })),
   setActiveIndex: (idx) => set({ activeIndex: idx }),
   consumeOpenCommentsInitially: () => set({ openCommentsInitially: false }),
+  consumeInitialCommentId: () => set({ initialCommentId: null }),
   setPaginationState: ({ hasNextPage, isFetchingNextPage }) =>
     set({ hasNextPage, isFetchingNextPage }),
 }));
