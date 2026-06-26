@@ -24,7 +24,12 @@ interface PostingAsPillProps {
 export const PostingAsPill = forwardRef<HTMLButtonElement, PostingAsPillProps>(
   ({ onClick, isOpen, hasUnreadNotifications = false, notificationCount = 0, useLightTheme = false, useGlassTheme = false, useBareTheme = false, compact = false }, ref) => {
     const { activeActor, isLoading } = useActiveActor();
-    
+
+    // Per-actor unread (badge hybrid): show a small dot on the pill when ANY
+    // non-active actor has unread activity — tells the owner "another profile
+    // has activity".
+    const { hasOtherUnread } = useActorUnreadCounts();
+
     // Get unread messages count from messaging system
     const { conversations } = useMessagingContext();
     const hasUnreadMessages = conversations?.some(conv => conv.unread_count > 0) || false;
