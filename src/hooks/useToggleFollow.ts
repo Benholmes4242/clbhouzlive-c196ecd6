@@ -1,12 +1,18 @@
 /**
  * useToggleFollow — canonical follow/unfollow mutation hook.
  *
- * Architectural rule: every follow mutation in the app routes through this
- * hook. Optimistic updates flow via `patchFollow` (single source of truth
- * for cache patching). Rollback re-applies the inverse delta.
+ * PHASE 1 (actor-aware follows): writes to the unified `follows` table
+ * with the ACTIVE actor as the follower (not hardcoded personal). The
+ * DB trigger `mirror_follows_to_legacy` keeps `user_follows` and
+ * `business_follows` in sync during the cutover so existing readers
+ * keep working unchanged.
  *
- * Replaces 6 legacy follow hooks (each kept as a deprecated wrapper during
- * PR 3 migration). Mirrors the engagement-state useLikeMutation pattern.
+ * Idempotent: a 23505 unique-violation on the (follower_actor, following_actor)
+ * edge is treated as success (same lesson as likes — never let a duplicate
+ * write turn into a perceived failure that mis-renders the UI).
+ *
+ * Optimistic updates still flow through `patchFollow` (single source of
+ * truth for cache patching). Rollback re-applies the inverse delta.
  */
 
 import { useMutation, useQueryClient } from '@tanstack/react-query';
@@ -25,63 +31,44 @@ export function useToggleFollow() {
     mutationFn: async (params: ToggleFollowParams) => {
       const next = !params.isFollowing;
 
-      if (params.targetActorType === 'business') {
-        if (params.isFollowing) {
-          const { error, count } = await supabase
-            .from('business_follows')
-            .delete({ count: 'exact' })
-            .eq('follower_id', params.viewerUserId ?? '')
-            .eq('business_id', params.targetActorId);
-          if (error) throw error;
-          if ((count ?? 0) === 0) {
-            patchFollow(queryClient, params, { isFollowing: false });
-            return { next: false };
-          }
-        } else {
-          const { error } = await supabase
-            .from('business_follows')
-            .insert({
-              follower_id: params.viewerUserId ?? '',
-              follower_actor_id: params.viewerUserId ?? '',
-              follower_actor_type: 'personal',
-              business_id: params.targetActorId,
-            });
-          if (error) {
-            if ((error as any).code === '23505') {
-              patchFollow(queryClient, params, { isFollowing: true });
-              return { next: true };
-            }
-            throw error;
-          }
+      const followerActorType = params.viewerActorType ?? 'personal';
+      const followerActorId = params.viewerActorId ?? params.viewerUserId ?? '';
+      const followerUserId = params.viewerUserId ?? '';
+
+      if (!followerActorId || !followerUserId) {
+        throw new Error('useToggleFollow: missing viewer identity');
+      }
+
+      if (params.isFollowing) {
+        // Unfollow: delete from unified table; triggers cascade to legacy.
+        const { error, count } = await supabase
+          .from('follows')
+          .delete({ count: 'exact' })
+          .eq('follower_actor_type', followerActorType)
+          .eq('follower_actor_id', followerActorId)
+          .eq('following_actor_type', params.targetActorType)
+          .eq('following_actor_id', params.targetActorId);
+        if (error) throw error;
+        if ((count ?? 0) === 0) {
+          // Row already gone — treat as success.
+          patchFollow(queryClient, params, { isFollowing: false });
+          return { next: false };
         }
       } else {
-        if (params.isFollowing) {
-          const { error, count } = await supabase
-            .from('user_follows')
-            .delete({ count: 'exact' })
-            .eq('follower_id', params.viewerUserId ?? '')
-            .eq('following_id', params.targetUserId);
-          if (error) throw error;
-          if ((count ?? 0) === 0) {
-            patchFollow(queryClient, params, { isFollowing: false });
-            return { next: false };
+        // Follow: idempotent insert. 23505 → already followed, treat as success.
+        const { error } = await supabase.from('follows').insert({
+          follower_actor_type: followerActorType,
+          follower_actor_id: followerActorId,
+          following_actor_type: params.targetActorType,
+          following_actor_id: params.targetActorId,
+          follower_user_id: followerUserId,
+        });
+        if (error) {
+          if ((error as any).code === '23505') {
+            patchFollow(queryClient, params, { isFollowing: true });
+            return { next: true };
           }
-        } else {
-          const { error } = await supabase
-            .from('user_follows')
-            .insert({
-              follower_id: params.viewerUserId ?? '',
-              follower_actor_id: params.viewerUserId ?? '',
-              follower_actor_type: 'personal',
-              following_id: params.targetUserId,
-            });
-          if (error) {
-            if ((error as any).code === '23505') {
-              patchFollow(queryClient, params, { isFollowing: true });
-              return { next: true };
-            }
-            throw error;
-          }
+          throw error;
         }
       }
 
