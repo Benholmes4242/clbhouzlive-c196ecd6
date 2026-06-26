@@ -237,6 +237,10 @@ export function ConversationList({
 }: ConversationListProps) {
   const { conversations, loading, fetchConversations } = useMessagingContext();
   const { user } = useSupabaseSession();
+  const { activeActor } = useActiveActor();
+  const activeActorRef = activeActor
+    ? { type: (activeActor.type === 'business' ? 'business' : 'personal') as 'personal' | 'business', id: activeActor.id }
+    : (user?.id ? { type: 'personal' as const, id: user.id } : null);
   const { archivedConversations, hasArchived, unarchive, refetch: refetchArchived } = useArchivedConversations();
   const [showArchived, setShowArchived] = useState(false);
   const [showSwipeHint, setShowSwipeHint] = useState(() => {
