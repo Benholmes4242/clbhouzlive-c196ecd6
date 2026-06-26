@@ -5075,6 +5075,36 @@ export type Database = {
         }
         Relationships: []
       }
+      follows: {
+        Row: {
+          created_at: string
+          follower_actor_id: string
+          follower_actor_type: string
+          follower_user_id: string
+          following_actor_id: string
+          following_actor_type: string
+          id: string
+        }
+        Insert: {
+          created_at?: string
+          follower_actor_id: string
+          follower_actor_type: string
+          follower_user_id: string
+          following_actor_id: string
+          following_actor_type: string
+          id?: string
+        }
+        Update: {
+          created_at?: string
+          follower_actor_id?: string
+          follower_actor_type?: string
+          follower_user_id?: string
+          following_actor_id?: string
+          following_actor_type?: string
+          id?: string
+        }
+        Relationships: []
+      }
       friend_featured_round: {
         Row: {
           algorithm_version: string
