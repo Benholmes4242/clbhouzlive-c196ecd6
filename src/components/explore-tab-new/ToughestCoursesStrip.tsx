@@ -35,7 +35,7 @@ export function ToughestCoursesStrip(_: Props = {}) {
         <ExploreSectionHeader
           mark={<MountainMark />}
           title="Toughest courses"
-          sub="Official WHS handicap data"
+          sub="The hardest courses, based on official WHS round data"
         />
         <div className="flex gap-3 px-4 overflow-x-auto scrollbar-hide" style={{ paddingBottom: 4 }}>
           {Array.from({ length: 3 }).map((_v, i) => (
