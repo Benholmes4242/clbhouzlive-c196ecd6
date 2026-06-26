@@ -832,6 +832,26 @@ export function Composer({
           <X size={18} strokeWidth={2} />
         </button>
         <div style={{ flex: 1 }} />
+        {!isEditMode && hasDraft && (
+          <button
+            onClick={handleSaveDraft}
+            disabled={isSavingDraft || busy}
+            style={{
+              fontSize: 13,
+              fontWeight: 700,
+              padding: '9px 14px',
+              borderRadius: 20,
+              border: `1px solid ${HAIR}`,
+              cursor: isSavingDraft || busy ? 'default' : 'pointer',
+              background: 'transparent',
+              color: INK_2,
+              marginRight: 8,
+              opacity: isSavingDraft || busy ? 0.5 : 1,
+            }}
+          >
+            {isSavingDraft ? 'Saving…' : 'Save draft'}
+          </button>
+        )}
         <button
           onClick={handleShare}
           disabled={!canPost}
