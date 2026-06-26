@@ -137,6 +137,39 @@ export function ActiveActorProvider({ children }: { children: ReactNode }) {
     }
   }, [availableActors, activeActor, initialized]);
 
+  // 7.1 — If the currently-active actor disappears from availableActors
+  // (user left the business, business was deleted, role was revoked below
+  // editor, business suspended), automatically fall back to personal so the
+  // app doesn't get stuck pointing at an invalid identity.
+  useEffect(() => {
+    if (!activeActor || !initialized) return;
+    // Wait until businesses have actually loaded before judging validity —
+    // an empty availableActors mid-load would otherwise spuriously reset.
+    if (businessesLoading) return;
+
+    const stillValid = availableActors.some(
+      a => a.type === activeActor.type && a.id === activeActor.id,
+    );
+    if (stillValid) return;
+
+    const personal = availableActors.find(a => a.type === 'personal');
+    if (personal) {
+      setShouldPersist(true);
+      setActiveActorState(personal);
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(personal));
+
+      // Mirror setActiveActor's invalidations so per-actor surfaces refresh.
+      const keyGroups = [...FEED_QUERY_KEYS, ...PROFILE_QUERY_KEYS, ...ENGAGEMENT_RECORD_KEYS];
+      for (const key of keyGroups) {
+        queryClient.invalidateQueries({ queryKey: key as unknown[], exact: false });
+      }
+      queryClient.invalidateQueries({ queryKey: ['activity-feed'], exact: false });
+      queryClient.invalidateQueries({ queryKey: ['activity-unread-count'], exact: false });
+      queryClient.invalidateQueries({ queryKey: ['actor-unread-counts'], exact: false });
+    }
+  }, [availableActors, activeActor, initialized, businessesLoading, queryClient]);
+
+
   // Track if current selection should be persisted
   const [shouldPersist, setShouldPersist] = useState(true);
 
