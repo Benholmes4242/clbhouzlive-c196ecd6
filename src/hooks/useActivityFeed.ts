@@ -654,26 +654,37 @@ export const useActivityFeed = (tab: ActivityTabId, chipFilter: ChipFilterKind =
           const actor = effectiveActorId ? actorProfiles[effectiveActorId] : null;
           const isFromFollowing = effectiveActorId ? followingUserIds.has(effectiveActorId) : false;
           
-          const actorDisplayName = isEntityNotification 
+          // Business-actor override: when the notification was performed by a business actor,
+          // prefer the business name/logo carried in data over the personal user_profiles lookup.
+          const isBusinessActor = dataObj.actor_type === 'business';
+
+          const actorDisplayName = isEntityNotification
             ? (dataObj.entity_name || (isCourseClaim ? 'Course claim' : 'Your business'))
-            : (actor?.display_name 
-                || actor?.username 
-                || dataObj.follower_name 
-                || dataObj.tagger_name 
-                || dataObj.commenter_name
-                || dataObj.liker_name
-                || 'Someone');
-          
-          const actorUsername = actor?.username || '';
-          
+            : (isBusinessActor && dataObj.actor_name
+                ? dataObj.actor_name
+                : (actor?.display_name
+                    || actor?.username
+                    || dataObj.actor_name
+                    || dataObj.follower_name
+                    || dataObj.tagger_name
+                    || dataObj.commenter_name
+                    || dataObj.liker_name
+                    || 'Someone'));
+
+          const actorUsername = isBusinessActor ? '' : (actor?.username || '');
+
           const actorAvatarUrl = isEntityNotification
             ? (dataObj.entity_avatar_url || null)
-            : (actor?.profile_photo_url 
-                || dataObj.follower_photo 
-                || dataObj.tagger_photo
-                || dataObj.commenter_photo
-                || dataObj.liker_photo
-                || null);
+            : (isBusinessActor && dataObj.actor_avatar_url
+                ? dataObj.actor_avatar_url
+                : (actor?.profile_photo_url
+                    || dataObj.actor_avatar_url
+                    || dataObj.follower_photo
+                    || dataObj.tagger_photo
+                    || dataObj.commenter_photo
+                    || dataObj.liker_photo
+                    || null));
+
           
           const createdAtTime = new Date(n.created_at).getTime();
           const isUnseen = createdAtTime > lastSeenTime || n.is_read === false;
