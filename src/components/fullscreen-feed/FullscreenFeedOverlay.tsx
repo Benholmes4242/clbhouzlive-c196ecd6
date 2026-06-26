@@ -30,7 +30,7 @@ export function FullscreenFeedOverlay() {
   const navigate = useNavigate();
   const { session } = useSupabaseSession();
   const userId = session?.user?.id;
-  const { isOpen, posts, startIndex, activeIndex, close, setActiveIndex, openCommentsInitially, consumeOpenCommentsInitially } = useFullscreenFeedStore();
+  const { isOpen, posts, startIndex, activeIndex, close, setActiveIndex, openCommentsInitially, consumeOpenCommentsInitially, initialCommentId, consumeInitialCommentId } = useFullscreenFeedStore();
   const hasNextPage = useFullscreenFeedStore(s => s.hasNextPage);
   const fetchNextPage = useFullscreenFeedStore(s => s.fetchNextPage);
   const isFetchingNextPage = useFullscreenFeedStore(s => s.isFetchingNextPage);
