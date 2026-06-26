@@ -1,0 +1,1 @@
+ALTER TABLE public.sr_leaderboards ADD COLUMN IF NOT EXISTS today integer;

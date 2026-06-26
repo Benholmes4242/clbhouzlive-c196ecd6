@@ -54,7 +54,15 @@ export const LEGIBILITY_SCRIM =
  * lets photo breathe in the upper third.
  */
 export const CINEMATIC_SCRIM =
-  'linear-gradient(to top, rgba(7,12,20,0.94) 0%, rgba(7,12,20,0.55) 32%, rgba(7,12,20,0.12) 56%, rgba(7,12,20,0.22) 100%)';
+  'linear-gradient(to top, rgba(7,12,20,0.82) 0%, rgba(7,12,20,0.34) 30%, rgba(7,12,20,0.04) 54%, rgba(7,12,20,0.10) 100%)';
+
+/**
+ * Diverging score colour scale (mirrors Holes tab SC_* tokens).
+ * Under par = good (teal); over par = warm (orange).
+ * NEVER use red for under-par scores — that's the banned good=red antipattern.
+ */
+export const SC_BIRDIE = '#2DD4BF';
+export const SC_BOGEY = '#FB923C';
 
 export const CINEMATIC_FRAME_HEIGHT = 480;
 export const CINEMATIC_FRAME_HEIGHT_RESULTS = 480;
