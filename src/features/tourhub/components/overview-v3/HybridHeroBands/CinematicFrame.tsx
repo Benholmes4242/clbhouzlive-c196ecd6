@@ -271,8 +271,7 @@ function TiedLeadersRowDark({
         style={{
           ...NUMERIC_STYLE,
           fontSize: 16, fontWeight: 800, letterSpacing: '-0.02em',
-          color: scoreColor(typeof score === 'string' && score.startsWith('-') ? -1 : typeof score === 'string' && score.startsWith('+') ? 1 : 0),
-          flexShrink: 0,
+          color: scoreColor(scoreStringToNumber(score)), flexShrink: 0,
         }}
       >
         {score}
@@ -280,6 +279,14 @@ function TiedLeadersRowDark({
       {!isResults && <span style={{ width: 18, flexShrink: 0 }} />}
     </div>
   );
+}
+
+function scoreStringToNumber(s: string | number | null | undefined): number | null {
+  if (s == null) return null;
+  if (typeof s === 'number') return s;
+  if (s === 'E' || s === 'EVEN') return 0;
+  const n = parseInt(s, 10);
+  return Number.isFinite(n) ? n : null;
 }
 
 function TiedChasersRowDark({
