@@ -495,6 +495,10 @@ export function useMessaging(): UseMessagingReturn {
           if (incomingConvId && conversationsRef.current.some(c => c.id === incomingConvId)) {
             fetchConversations(true);
           }
+          // Per-actor DM unread feeds the Profiles switcher badge — refresh on
+          // any incoming message so a DM to a managed (non-active) business
+          // lights the badge.
+          queryClient.invalidateQueries({ queryKey: ['actor-unread-counts'], exact: false });
         }
       )
       .subscribe();
