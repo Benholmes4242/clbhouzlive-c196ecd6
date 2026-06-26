@@ -133,6 +133,9 @@ export function useConversationMessages(conversationId: string | null): UseConve
           eg_handicap_index: null,
           home_club: null,
           actor_type: 'business',
+          is_verified: b.is_verified ?? false,
+        });
+          actor_type: 'business',
           isBusiness: true,
           is_verified: b.is_verified ?? false,
         } as ParticipantProfile);
