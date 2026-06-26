@@ -154,9 +154,10 @@ export const usePostSubmission = () => {
 
       const { data: postData, error: postError } = await supabase
         .from('posts')
-        .insert(postPayload)
+        .insert(postPayload as any)
         .select()
         .single();
+
 
       if (postError) throw postError;
 
