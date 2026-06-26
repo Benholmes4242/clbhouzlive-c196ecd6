@@ -1186,7 +1186,7 @@ export function CinematicFrame({
         }
 
         // Dynamic TODAY column: only render when at least one solo row carries a value.
-        const anyToday = rows.some((r: any) => r?.kind === 'solo' && r?.entry?.today != null);
+        const anyToday = rows.some((r: any) => r?.kind === 'solo' && liveRoundFor(r?.entry, state.round).today != null);
 
         return (
           <button
