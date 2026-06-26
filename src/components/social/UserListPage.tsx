@@ -87,8 +87,10 @@ interface UserListPageProps {
   onFollowingLoadMore?: () => void;
   onFollowingRefetch?: () => void;
   profileUsername?: string;
-  /** Profile owner's userId — used for social counts on filter chips */
+  /** Profile owner's actor id (userId for personal, businessId for business) — used for social counts on filter chips */
   profileUserId?: string;
+  /** Profile owner's actor type — defaults to 'personal' */
+  profileActorType?: 'personal' | 'business';
 }
 
 // ---------------------------------------------------------------------------
