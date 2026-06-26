@@ -389,11 +389,11 @@ const FeedCardImpl: React.FC<FeedCardProps> = ({
           )}
           {reviewRating != null && (() => {
             const LABEL_COLOR = {
-              EXCEPTIONAL: '#FFC23D',
-              EXCELLENT:   '#F7931E',
-              GOOD:        '#F7931E',
-              FAIR:        'rgba(255,255,255,0.55)',
-              POOR:        'rgba(255,255,255,0.45)',
+              EXCEPTIONAL: '#FFCE5C',
+              EXCELLENT:   '#FBA63F',
+              GOOD:        '#FBA63F',
+              FAIR:        'rgba(255,255,255,0.68)',
+              POOR:        'rgba(255,255,255,0.58)',
             } as const;
             const tierKey = getRatingTier(reviewRating);
             const tierLabel = getRatingTierLabel(reviewRating);
