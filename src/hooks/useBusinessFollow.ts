@@ -65,10 +65,13 @@ export function useBusinessFollowMutation(businessId: string, userId: string | u
   }
   const queryClient = useQueryClient();
   const toggle = useToggleFollow();
+  const { activeActor } = useActiveActor();
+  const viewerActorType: 'personal' | 'business' = activeActor?.type ?? 'personal';
+  const viewerActorId = activeActor?.id ?? userId;
   const countKey = ['business-followers-count', businessId];
 
   const run = (isFollowing: boolean) => {
-    if (!userId) {
+    if (!userId || !viewerActorId) {
       toast.error('Please sign in');
       return;
     }
@@ -81,8 +84,8 @@ export function useBusinessFollowMutation(businessId: string, userId: string | u
         targetActorType: 'business',
         targetActorId: businessId,
         targetUserId: businessId,
-        viewerActorType: 'personal',
-        viewerActorId: userId,
+        viewerActorType,
+        viewerActorId,
         viewerUserId: userId,
         isFollowing,
       },
