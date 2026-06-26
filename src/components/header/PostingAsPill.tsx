@@ -91,6 +91,13 @@ export const PostingAsPill = forwardRef<HTMLButtonElement, PostingAsPillProps>(
               aria-label="Unread messages"
             />
           )}
+
+          {hasOtherUnread && !hasUnreadNotifications && (
+            <span
+              className="absolute -top-0.5 -left-0.5 h-2 w-2 rounded-full bg-[#F7931E] ring-[1.5px] ring-black"
+              aria-label="Another profile has unread activity"
+            />
+          )}
         </button>
       );
     }
