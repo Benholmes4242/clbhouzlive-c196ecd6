@@ -61,27 +61,17 @@ export function useFollowState({
   useQuery({
     queryKey,
     queryFn: async (): Promise<boolean> => {
-      if (targetActorType === 'business') {
-        const { data, error } = await supabase
-          .from('business_follows')
-          .select('id')
-          .eq('follower_actor_type', viewerActorType)
-          .eq('follower_actor_id', viewerActorId!)
-          .eq('business_id', targetActorId!)
-          .maybeSingle();
-        if (error) throw error;
-        return !!data;
-      } else {
-        const { data, error } = await supabase
-          .from('user_follows')
-          .select('id')
-          .eq('follower_actor_type', viewerActorType)
-          .eq('follower_actor_id', viewerActorId!)
-          .eq('following_id', targetActorId!)
-          .maybeSingle();
-        if (error) throw error;
-        return !!data;
-      }
+      // Unified `follows` table — one query handles all four directions.
+      const { data, error } = await supabase
+        .from('follows')
+        .select('id')
+        .eq('follower_actor_type', viewerActorType)
+        .eq('follower_actor_id', viewerActorId!)
+        .eq('following_actor_type', targetActorType)
+        .eq('following_actor_id', targetActorId!)
+        .maybeSingle();
+      if (error) throw error;
+      return !!data;
     },
     enabled: !!viewerActorId && !!targetActorId,
     staleTime: 30_000,
