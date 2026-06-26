@@ -10,6 +10,7 @@ import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { useToggleFollow } from '@/hooks/useToggleFollow';
+import { useActiveActor } from '@/context/ActiveActorContext';
 
 export function useIsFollowingBusiness(businessId: string | undefined, userId: string | undefined) {
   if (typeof process !== 'undefined' && process.env?.NODE_ENV === 'development') {
@@ -17,22 +18,26 @@ export function useIsFollowingBusiness(businessId: string | undefined, userId: s
     console.warn('[deprecated] useIsFollowingBusiness → migrate to useFollowState');
   }
   const queryClient = useQueryClient();
+  const { activeActor } = useActiveActor();
+  const viewerActorType: 'personal' | 'business' = activeActor?.type ?? 'personal';
+  const viewerActorId = activeActor?.id ?? userId;
 
   return useQuery({
-    queryKey: ['business-follow-status', businessId, userId],
-    enabled: !!businessId && !!userId,
+    queryKey: ['business-follow-status', businessId, viewerActorType, viewerActorId],
+    enabled: !!businessId && !!viewerActorId,
     queryFn: async () => {
       const { data, error } = await supabase
         .from('business_follows')
         .select('id')
         .eq('business_id', businessId ?? '')
-        .eq('follower_id', userId ?? '')
+        .eq('follower_actor_type', viewerActorType)
+        .eq('follower_actor_id', viewerActorId ?? '')
         .maybeSingle();
       if (error) throw error;
       const result = !!data;
       // Seed canonical 5-element key for useFollowState readers.
       queryClient.setQueryData(
-        ['follow-status', 'personal', userId, 'business', businessId],
+        ['follow-status', viewerActorType, viewerActorId, 'business', businessId],
         { isFollowing: result },
       );
       return result;
@@ -64,10 +69,13 @@ export function useBusinessFollowMutation(businessId: string, userId: string | u
   }
   const queryClient = useQueryClient();
   const toggle = useToggleFollow();
+  const { activeActor } = useActiveActor();
+  const viewerActorType: 'personal' | 'business' = activeActor?.type ?? 'personal';
+  const viewerActorId = activeActor?.id ?? userId;
   const countKey = ['business-followers-count', businessId];
 
   const run = (isFollowing: boolean) => {
-    if (!userId) {
+    if (!userId || !viewerActorId) {
       toast.error('Please sign in');
       return;
     }
@@ -80,8 +88,8 @@ export function useBusinessFollowMutation(businessId: string, userId: string | u
         targetActorType: 'business',
         targetActorId: businessId,
         targetUserId: businessId,
-        viewerActorType: 'personal',
-        viewerActorId: userId,
+        viewerActorType,
+        viewerActorId,
         viewerUserId: userId,
         isFollowing,
       },

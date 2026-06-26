@@ -27,6 +27,7 @@ import { useReviewerStats } from '@/hooks/useReviewerStats';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useFollowState } from '@/hooks/useFollowState';
 import { useToggleFollow } from '@/hooks/useToggleFollow';
+import { useActiveActor } from '@/context/ActiveActorContext';
 
 const FONTS = {
   geist: "'Geist', -apple-system, BlinkMacSystemFont, system-ui, sans-serif",
@@ -111,16 +112,22 @@ export const ReviewBottomSheet: React.FC<ReviewBottomSheetProps> = ({
   const { data: liveStats, isLoading: statsLoading } = useReviewerStats(user?.id);
   const effectiveStats = liveStats ?? reviewerStats ?? null;
 
-  // ─── Follow wiring (Slice 3: canonical hooks) ────────────────
+  // ─── Follow wiring (Phase 2: actor-aware viewer) ────────────────
   const { user: viewer } = useSupabaseSession();
-  const isOwnReview = !!viewer?.id && viewer.id === user.id;
-  const followEnabled = !isOwnReview && user.id !== 'preview' && !!viewer?.id;
+  const { activeActor } = useActiveActor();
+  const viewerActorType: 'personal' | 'business' = activeActor?.type ?? 'personal';
+  const viewerActorId = activeActor?.id ?? viewer?.id;
+  const isOwnReview =
+    !!viewer?.id &&
+    viewerActorType === 'personal' &&
+    viewer.id === user.id;
+  const followEnabled = !isOwnReview && user.id !== 'preview' && !!viewerActorId;
 
   const { isFollowing: cachedFollowing } = useFollowState({
     targetActorType: 'personal',
     targetActorId: followEnabled ? user.id : undefined,
-    viewerActorType: 'personal',
-    viewerActorId: followEnabled ? viewer?.id : undefined,
+    viewerActorType,
+    viewerActorId: followEnabled ? viewerActorId : undefined,
   });
 
   const isFollowing = cachedFollowing ?? false;
@@ -131,7 +138,7 @@ export const ReviewBottomSheet: React.FC<ReviewBottomSheetProps> = ({
     (e: React.MouseEvent) => {
       e.stopPropagation();
       if (isOwnReview || user.id === 'preview') return;
-      if (!viewer?.id) {
+      if (!viewer?.id || !viewerActorId) {
         toast.error('Please sign in to follow users');
         return;
       }
@@ -141,13 +148,13 @@ export const ReviewBottomSheet: React.FC<ReviewBottomSheetProps> = ({
         targetActorType: 'personal',
         targetActorId: user.id,
         targetUserId: user.id,
-        viewerActorType: 'personal',
-        viewerActorId: viewer.id,
+        viewerActorType,
+        viewerActorId,
         viewerUserId: viewer.id,
         isFollowing,
       });
     },
-    [isFollowing, isOwnReview, user.id, viewer?.id, toggleFollow],
+    [isFollowing, isOwnReview, user.id, viewer?.id, toggleFollow, viewerActorType, viewerActorId],
   );
 
   // ─── Drag scoping ─────────────────────────────────────────────

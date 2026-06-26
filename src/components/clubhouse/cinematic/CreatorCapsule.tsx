@@ -17,6 +17,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { cn } from '@/lib/utils';
 import { useFollowState } from '@/hooks/useFollowState';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
+import { useActiveActor } from '@/context/ActiveActorContext';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { ChevronUp, User, Music, ChevronRight, MapPin } from 'lucide-react';
 import { FiMapPin } from 'react-icons/fi';
@@ -172,13 +173,16 @@ export const CreatorCapsule: React.FC<CreatorCapsuleProps> = ({
   // Pattern mirrors LoopCard reading like state from cache.
   // Falls back to prop, then `false`, when cache is empty.
   const { user: viewer } = useSupabaseSession();
+  const { activeActor } = useActiveActor();
   const targetActorType: 'personal' | 'business' = user.actorType ?? 'personal';
   const targetActorId = user.actorId ?? user.id;
+  const viewerActorType: 'personal' | 'business' = activeActor?.type ?? 'personal';
+  const viewerActorId = activeActor?.id ?? viewer?.id;
   const { isFollowing: cachedIsFollowing } = useFollowState({
     targetActorType,
     targetActorId,
-    viewerActorType: 'personal',
-    viewerActorId: viewer?.id,
+    viewerActorType,
+    viewerActorId,
   });
   const isFollowing = cachedIsFollowing ?? isFollowingProp ?? false;
 

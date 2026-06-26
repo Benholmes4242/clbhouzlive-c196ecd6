@@ -8,6 +8,7 @@ import { toast } from 'sonner';
 import { useQueryClient } from '@tanstack/react-query';
 import { useRelationshipStatus } from '@/hooks/useRelationshipStatus';
 import { useToggleFollow } from '@/hooks/useToggleFollow';
+import { useActiveActor } from '@/context/ActiveActorContext';
 
 interface UseProfileActionsProps {
   targetUserId: string;
@@ -18,6 +19,9 @@ export const useProfileActions = ({ targetUserId, currentUserId }: UseProfileAct
   const [loading, setLoading] = useState(false);
   const queryClient = useQueryClient();
   const toggle = useToggleFollow();
+  const { activeActor } = useActiveActor();
+  const viewerActorType: 'personal' | 'business' = activeActor?.type ?? 'personal';
+  const viewerActorId = activeActor?.id ?? currentUserId;
 
   // Check relationship status to respect blocks
   const { data: relationship } = useRelationshipStatus(targetUserId);
@@ -41,6 +45,7 @@ export const useProfileActions = ({ targetUserId, currentUserId }: UseProfileAct
       });
       return;
     }
+    if (!viewerActorId) return;
 
     setLoading(true);
     try {
@@ -48,8 +53,8 @@ export const useProfileActions = ({ targetUserId, currentUserId }: UseProfileAct
         targetActorType: 'personal',
         targetActorId: targetUserId,
         targetUserId: targetUserId,
-        viewerActorType: 'personal',
-        viewerActorId: currentUserId,
+        viewerActorType,
+        viewerActorId,
         viewerUserId: currentUserId,
         isFollowing,
       });

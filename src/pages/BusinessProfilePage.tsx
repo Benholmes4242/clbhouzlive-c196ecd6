@@ -26,6 +26,7 @@ import { useBusinessFollowersCount } from '@/hooks/useBusinessFollow';
 import { useBusinessFollowingCount } from '@/hooks/useBusinessSocialLists';
 import { useFollowState } from '@/hooks/useFollowState';
 import { useToggleFollow } from '@/hooks/useToggleFollow';
+import { useActiveActor } from '@/context/ActiveActorContext';
 import { useBusinessImageUpload } from '@/hooks/useBusinessImageUpload';
 import { useBusinessTeam } from '@/hooks/useBusinessTeam';
 import { useStartDM } from '@/hooks/useStartDM';
@@ -103,11 +104,15 @@ const BusinessProfilePage: React.FC = () => {
   const { data: followingCount = 0 } = useBusinessFollowingCount(business?.id);
   const { data: teamMembers } = useBusinessTeam(business?.id);
 
+  const { activeActor } = useActiveActor();
+  const viewerActorType: 'personal' | 'business' = activeActor?.type ?? 'personal';
+  const viewerActorId = activeActor?.id ?? user?.id;
+  const isOwnBusiness = viewerActorType === 'business' && viewerActorId === business?.id;
   const { isFollowing: cachedFollowing } = useFollowState({
     targetActorType: 'business',
-    targetActorId: business?.id,
-    viewerActorType: 'personal',
-    viewerActorId: user?.id,
+    targetActorId: isOwnBusiness ? undefined : business?.id,
+    viewerActorType,
+    viewerActorId,
   });
   const toggleFollow = useToggleFollow();
   const { startDM, isStarting: isStartingDM } = useStartDM();
@@ -193,13 +198,13 @@ const BusinessProfilePage: React.FC = () => {
 
   // ───── actions ─────
   const handleFollowToggle = () => {
-    if (!user?.id || !business?.id) return;
+    if (!user?.id || !business?.id || !viewerActorId || isOwnBusiness) return;
     toggleFollow.mutate({
       targetActorType: 'business',
       targetActorId: business.id,
       targetUserId: undefined,
-      viewerActorType: 'personal',
-      viewerActorId: user.id,
+      viewerActorType,
+      viewerActorId,
       viewerUserId: user.id,
       isFollowing,
     });

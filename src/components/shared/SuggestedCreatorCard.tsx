@@ -5,6 +5,7 @@ import { Check } from 'lucide-react';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { useFollowState } from '@/hooks/useFollowState';
 import { useToggleFollow } from '@/hooks/useToggleFollow';
+import { useActiveActor } from '@/context/ActiveActorContext';
 import type { SuggestedCreator } from '@/components/watch/hooks/useSuggestedCreators';
 
 function splitName(displayName: string): { first: string; last: string } {
@@ -28,11 +29,14 @@ export const SuggestedCreatorCard: React.FC<SuggestedCreatorCardProps> = ({
 }) => {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
+  const { activeActor } = useActiveActor();
+  const viewerActorType: 'personal' | 'business' = activeActor?.type ?? 'personal';
+  const viewerActorId = activeActor?.id ?? currentUserId;
   const { isFollowing: cached } = useFollowState({
     targetActorType: 'personal',
     targetActorId: creator.userId,
-    viewerActorType: 'personal',
-    viewerActorId: currentUserId,
+    viewerActorType,
+    viewerActorId,
   });
   const following = cached ?? creator.isFollowed ?? false;
   const toggle = useToggleFollow();
@@ -59,8 +63,8 @@ export const SuggestedCreatorCard: React.FC<SuggestedCreatorCardProps> = ({
           targetActorType: 'personal',
           targetActorId: creator.userId,
           targetUserId: creator.userId,
-          viewerActorType: 'personal',
-          viewerActorId: currentUserId,
+          viewerActorType,
+          viewerActorId,
           viewerUserId: currentUserId,
           isFollowing: wasFollowing,
         },
@@ -80,7 +84,7 @@ export const SuggestedCreatorCard: React.FC<SuggestedCreatorCardProps> = ({
         },
       );
     },
-    [busy, following, creator.userId, currentUserId, queryClient, onFollowed, toggle],
+    [busy, following, creator.userId, currentUserId, queryClient, onFollowed, toggle, viewerActorType, viewerActorId],
   );
 
   useEffect(() => {

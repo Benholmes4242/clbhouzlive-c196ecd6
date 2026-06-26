@@ -19,6 +19,7 @@ import { usePersonalReviewsCount } from '@/hooks/usePersonalReviewsCount';
 import { getProfileType, getProfileTabs } from '@/hooks/useProfileType';
 import { useFollowState } from '@/hooks/useFollowState';
 import { useToggleFollow } from '@/hooks/useToggleFollow';
+import { useActiveActor } from '@/context/ActiveActorContext';
 import { useFriendship } from '@/hooks/useFriendship';
 import { useSocialCounts } from '@/hooks/useSocialCounts';
 import { useRealtimeSocialCounts } from '@/hooks/useRealtimeSocialCounts';
@@ -181,22 +182,25 @@ const ProfilePageV2Content: React.FC = () => {
   
 
   const followToggle = useToggleFollow();
+  const { activeActor } = useActiveActor();
+  const viewerActorType: 'personal' | 'business' = activeActor?.type ?? 'personal';
+  const viewerActorId = activeActor?.id ?? user?.id;
   const { isFollowing: cachedFollowing } = useFollowState({
     targetActorType: 'personal',
     targetActorId: isSelf ? undefined : profileUserId,
-    viewerActorType: 'personal',
-    viewerActorId: user?.id,
+    viewerActorType,
+    viewerActorId,
   });
   const isFollowing = cachedFollowing ?? false;
   const followBusy = followToggle.isPending;
   const toggleFollow = () => {
-    if (isSelf || !user?.id || !profileUserId) return;
+    if (isSelf || !user?.id || !profileUserId || !viewerActorId) return;
     followToggle.mutate({
       targetActorType: 'personal',
       targetActorId: profileUserId,
       targetUserId: profileUserId,
-      viewerActorType: 'personal',
-      viewerActorId: user.id,
+      viewerActorType,
+      viewerActorId,
       viewerUserId: user.id,
       isFollowing,
     });
