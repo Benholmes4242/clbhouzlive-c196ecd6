@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useRef } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { Loader2, MapPin } from 'lucide-react';
@@ -38,6 +38,8 @@ const isVideoUrl = (url: string) => {
 const PostDeepLinkPage: React.FC = () => {
   const { postId } = useParams<{ postId: string }>();
   const navigate = useNavigate();
+  const location = useLocation();
+  const navState = location.state as { openComments?: boolean } | null;
   const { user, loading: authLoading } = useSupabaseSession();
   const videoRef = useRef<HTMLVideoElement>(null);
 
@@ -193,7 +195,7 @@ const PostDeepLinkPage: React.FC = () => {
     hasOpenedFullscreen.current = true;
 
     useFullscreenFeedStore.getState().open([feedPost], 0, {
-      openCommentsInitially: true,
+      openCommentsInitially: navState?.openComments === true,
       onClose: () => {
         // Go back if there's history; otherwise land on Clubhouse.
         if (window.history.length > 1) {
@@ -203,7 +205,7 @@ const PostDeepLinkPage: React.FC = () => {
         }
       },
     });
-  }, [authLoading, user, isLoading, feedPost, navigate]);
+  }, [authLoading, user, isLoading, feedPost, navigate, navState]);
 
   // --- Loading ---
   if (isLoading || authLoading) {
