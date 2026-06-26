@@ -56,6 +56,15 @@ function entryThru(e: any): string {
   if (e?.thru == null) return '—';
   return String(e.thru);
 }
+// Current-round score-to-par + thru, read from the live raw_data.rounds array
+// (same source as FullLeaderboard's getLiveRoundData — the proven live pipeline).
+function liveRoundFor(entry: any, roundNum: number): { today: number | null; thru: number | null } {
+  const rounds = entry?.raw_data?.rounds;
+  if (!Array.isArray(rounds) || rounds.length < roundNum) return { today: null, thru: null };
+  const r = rounds[roundNum - 1];
+  if (!r || (r.thru === 0 && r.strokes === 0)) return { today: null, thru: null };
+  return { today: r.score ?? null, thru: r.thru ?? null };
+}
 function resolveAvatar(e: any, tourSlug?: string | null): string | null {
   return resolveAvatarCandidates(e, tourSlug)[0] ?? null;
 }
