@@ -187,6 +187,20 @@ export function PostingAsMenu({ isOpen, onClose, useLightTheme = false, anchorRe
     }
   };
 
+  // Resolve actor-aware destinations for View/Edit/Settings
+  const isBusinessActor = activeActor?.type === 'business';
+  const viewProfileRoute = isBusinessActor && activeActor
+    ? getActorRoute(activeActor)
+    : '/profile';
+  const editProfileRoute = isBusinessActor && activeActor?.id
+    ? `/business/${activeActor.id}/edit`
+    : editRoute;
+  // D3 minimal: business "Settings" routes to the business editor where
+  // notification toggles live; personal stays on the global settings page.
+  const settingsRoute = isBusinessActor && activeActor?.id
+    ? `/business/${activeActor.id}/edit`
+    : '/settings';
+
   // Handle navigation from ProfileHubSheet
   const handleAccountHubNavigate = (route: string) => {
     if (route === '/upload') {
@@ -196,9 +210,12 @@ export function PostingAsMenu({ isOpen, onClose, useLightTheme = false, anchorRe
     } else if (route === '/settings/business') {
       navigate('/businesses/manage');
     } else if (route === '/settings/profile') {
-      navigate(editRoute);
+      navigate(editProfileRoute);
     } else if (route === `/profile/${currentActorData.id}`) {
-      handleNavigate('/profile');
+      // ProfileHubSheet "View profile" → actor-aware target
+      handleNavigate(viewProfileRoute);
+    } else if (route === '/settings') {
+      handleNavigate(settingsRoute);
     } else {
       navigate(route);
     }
