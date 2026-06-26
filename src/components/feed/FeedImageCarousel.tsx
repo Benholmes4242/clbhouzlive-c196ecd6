@@ -183,6 +183,8 @@ export const FeedImageCarousel = memo(function FeedImageCarousel({
       const touch = e.touches[0];
       const dx = touch.clientX - t.startX;
       const dy = touch.clientY - t.startY;
+      t.lastX = touch.clientX;
+      t.lastY = touch.clientY;
 
       if (t.locked === 'none') {
         if (Math.abs(dx) < LOCK_THRESHOLD && Math.abs(dy) < LOCK_THRESHOLD) return;
