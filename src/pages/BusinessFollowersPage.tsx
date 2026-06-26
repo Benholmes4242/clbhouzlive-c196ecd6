@@ -68,6 +68,7 @@ export default function BusinessFollowersPage() {
         subtitle={`People who follow ${business.name}`}
         searchPlaceholder="Search followers by name or club"
         profileUserId={business.id}
+        profileActorType="business"
         users={followers}
         totalCount={totalCount}
         isLoading={followersLoading}
