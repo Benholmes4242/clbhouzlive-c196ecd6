@@ -5,6 +5,7 @@ import type { ConversationParticipant, ParticipantProfile, ParticipantWithProfil
 import { useConversationMessages } from '@/hooks/useConversationMessages';
 import { useMessagingContext } from '@/contexts/MessagingContext';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
+import { useActiveActor } from '@/context/ActiveActorContext';
 import { useTypingIndicator } from '@/hooks/useTypingIndicator';
 import { useMessageReactions } from '@/hooks/useMessageReactions';
 import { usePresence } from '@/hooks/usePresence';
