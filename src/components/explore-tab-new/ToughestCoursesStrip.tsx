@@ -45,7 +45,7 @@ export function ToughestCoursesStrip(_: Props = {}) {
               style={{
                 flexShrink: 0,
                 width: CARD_W,
-                height: 238,
+                height: 220,
                 borderRadius: 14,
                 background: INK_TINT_06,
               }}
@@ -85,12 +85,9 @@ interface CardProps {
   onTap: () => void;
 }
 
-const BAR_MAX = 18;
-
 function ToughCourseCard({ course, onTap }: CardProps) {
   const region =
     course.course_region || course.course_country || '';
-  const pct = Math.max(6, Math.min(100, (course.avg_over_par / BAR_MAX) * 100));
 
   return (
     <button
@@ -215,7 +212,7 @@ function ToughCourseCard({ course, onTap }: CardProps) {
                 lineHeight: 1.3,
               }}
             >
-              average per round across {course.total_rounds ?? '–'} rounds played
+              avg per round · {course.total_rounds ?? '–'} rounds
             </p>
           </div>
           <div
@@ -231,26 +228,6 @@ function ToughCourseCard({ course, onTap }: CardProps) {
           >
             <Mountain size={12} />
           </div>
-        </div>
-
-        {/* Difficulty bar */}
-        <div
-          style={{
-            height: 5,
-            background: INK_TINT_06,
-            borderRadius: 3,
-            marginTop: 10,
-            overflow: 'hidden',
-          }}
-        >
-          <div
-            style={{
-              width: `${pct}%`,
-              height: '100%',
-              background: `linear-gradient(90deg, #F7931E, ${MAROON})`,
-              borderRadius: 3,
-            }}
-          />
         </div>
 
         {/* Hardest-hole stat row */}
@@ -340,7 +317,7 @@ function ToughCourseCard({ course, onTap }: CardProps) {
                       lineHeight: 1.2,
                     }}
                   >
-                    plays +{numFmt(course.hardest_avg_to_par, 1)} over par on average
+                    plays +{numFmt(course.hardest_avg_to_par, 1)} avg
                   </p>
                 </>
               ) : null}

@@ -18354,6 +18354,7 @@ export type Database = {
           hardest_hole_no: number
           hardest_hole_par: number
           hardest_hole_si: number
+          thumbnail_image: string
           total_rounds: number
         }[]
       }
