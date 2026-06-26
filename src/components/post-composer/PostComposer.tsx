@@ -46,6 +46,7 @@ export function PostComposer({
   const [screen, setScreen] = useState<Screen>('choose');
   const [reviewCourseSheetOpen, setReviewCourseSheetOpen] = useState(false);
   const [draftsListOpen, setDraftsListOpen] = useState(false);
+  const [scheduledListOpen, setScheduledListOpen] = useState(false);
 
   // Shared media state — lives on the shell so the Editor can read/update it.
   const [mediaItems, setMediaItems] = useState<ComposerMediaItem[]>([]);
