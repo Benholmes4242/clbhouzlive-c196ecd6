@@ -335,11 +335,24 @@ export const HoleRow: React.FC<Props> = ({ h, isHardest, isEasiest }) => {
       >
         <span
           style={{
-            fontFamily: MONO,
+            display: 'inline-flex',
+            alignItems: 'center',
+            gap: 5,
+            fontSize: 10,
+            fontWeight: 700,
+            letterSpacing: '0.03em',
+            color: INK_MUTE,
+            background: 'rgba(15,23,42,0.05)',
+            padding: '3px 9px',
+            borderRadius: 20,
             fontVariantNumeric: 'tabular-nums',
           }}
         >
-          n = {h.rounds.toLocaleString()}
+          <svg width="11" height="11" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+            <circle cx="9" cy="7" r="3" stroke="currentColor" strokeWidth="2" opacity="0.55" />
+            <path d="M3 19c0-3 2.7-5 6-5s6 2 6 5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" opacity="0.55" />
+          </svg>
+          {h.rounds.toLocaleString()} {h.rounds === 1 ? 'round' : 'rounds'}
         </span>
         <span>
           PLAYS TO{' '}
