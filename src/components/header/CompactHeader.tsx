@@ -9,7 +9,7 @@ import { PostingAsPill } from './PostingAsPill';
 import { PostingAsMenu } from './PostingAsMenu';
 import GlobalSearchOverlay from '@/components/search/GlobalSearchOverlay';
 import { ActingAsIndicator } from './ActingAsIndicator';
-import { useActiveActor } from '@/context/ActiveActorContext';
+
 import { HandicapChip } from './HandicapChip';
 import { cn } from '@/lib/utils';
 import { haptic } from '@/utils/haptics';
