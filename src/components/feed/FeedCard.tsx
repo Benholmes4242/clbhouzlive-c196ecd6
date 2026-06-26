@@ -397,6 +397,7 @@ const FeedCardImpl: React.FC<FeedCardProps> = ({
             } as const;
             const tierKey = getRatingTier(reviewRating);
             const tierLabel = getRatingTierLabel(reviewRating);
+            const isExceptional = tierKey === 'EXCEPTIONAL';
             return (
               <button
                 type="button"
@@ -408,10 +409,16 @@ const FeedCardImpl: React.FC<FeedCardProps> = ({
                 }}
                 aria-label={`Your review: ${formatRatingValue(reviewRating)} ${tierLabel}`}
               >
-                <span style={{
-                  fontSize: 12.5, fontWeight: 800, letterSpacing: '0.14em', textTransform: 'uppercase',
-                  color: LABEL_COLOR[tierKey], whiteSpace: 'nowrap',
-                }}>
+                <span
+                  className={isExceptional ? 'clbhouz-gold-shimmer' : undefined}
+                  style={{
+                    fontSize: 12.5, fontWeight: 800, letterSpacing: '0.14em',
+                    textTransform: 'uppercase', whiteSpace: 'nowrap',
+                    ...(isExceptional
+                      ? {}
+                      : { color: LABEL_COLOR[tierKey] }),
+                  }}
+                >
                   {tierLabel}
                 </span>
               </button>
