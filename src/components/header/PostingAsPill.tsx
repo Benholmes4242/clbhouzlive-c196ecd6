@@ -216,6 +216,17 @@ export const PostingAsPill = forwardRef<HTMLButtonElement, PostingAsPillProps>(
               aria-label="Unread messages"
             />
           )}
+
+          {/* Amber micro-dot — another profile (non-active actor) has unread */}
+          {hasOtherUnread && !hasUnreadNotifications && (
+            <span
+              className={cn(
+                "absolute -top-0.5 -left-0.5 h-2 w-2 rounded-full bg-[#F7931E]",
+                useLightTheme ? "ring-[1.5px] ring-background" : "ring-[1.5px] ring-black"
+              )}
+              aria-label="Another profile has unread activity"
+            />
+          )}
         </div>
         
         {/* Chevron */}
