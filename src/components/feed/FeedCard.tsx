@@ -435,7 +435,6 @@ const FeedCardImpl: React.FC<FeedCardProps> = ({
               </button>
             );
           })()}
-          )}
         </div>
       </div>
 

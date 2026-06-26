@@ -403,7 +403,6 @@ const LightFeedCardImpl: React.FC<LightFeedCardProps> = ({
               </button>
             );
           })()}
-          )}
         </div>
       </div>
 
