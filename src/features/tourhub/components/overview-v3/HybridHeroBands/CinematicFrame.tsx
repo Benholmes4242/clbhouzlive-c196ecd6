@@ -80,7 +80,7 @@ function nameCandidates(name: string | null | undefined, tourSlug?: string | nul
 
 function scoreColor(score: number | null | undefined): string {
   if (score == null || Number.isNaN(score)) return 'rgba(255,255,255,0.85)';
-  if (score < 0) return '#DC2626';   // under par -> red (matches handicap pages)
+  if (score < 0) return SC_BIRDIE;   // under par -> teal (GOOD)
   if (score > 0) return 'rgba(255,255,255,0.55)'; // over par -> muted white
   return 'rgba(255,255,255,0.85)';   // even
 }
