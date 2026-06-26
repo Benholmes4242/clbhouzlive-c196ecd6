@@ -731,6 +731,15 @@ export function Composer({
         });
         continue;
       }
+      if (item.type === 'image' && item.restoredMediaUrl && !item.file) {
+        mediaInputs.push({
+          kind: 'restoredImage',
+          mediaUrl: item.restoredMediaUrl,
+          width: item.width ?? null,
+          height: item.height ?? null,
+        });
+        continue;
+      }
       if (!item.file) continue;
       if (item.type === 'image' && item.frame !== 'original') {
         let baked: File;
