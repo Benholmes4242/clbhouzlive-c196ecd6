@@ -4,6 +4,7 @@ import { useActiveActor } from '@/context/ActiveActorContext';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { cn } from '@/lib/utils';
 import { useMessagingContext } from '@/contexts/MessagingContext';
+import { useActorUnreadCounts } from '@/hooks/useActorUnreadCounts';
 
 interface PostingAsPillProps {
   onClick: () => void;
