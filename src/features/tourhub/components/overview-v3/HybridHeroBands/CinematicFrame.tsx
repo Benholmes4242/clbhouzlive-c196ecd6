@@ -1176,7 +1176,20 @@ export function CinematicFrame({
           });
         }
 
+        // Dynamic TODAY column: only render when at least one solo row carries a value.
+        const anyToday = rows.some((r: any) => r?.kind === 'solo' && r?.entry?.today != null);
+
         return (
+          <>
+            {/* Seam feather: gradient bridge from photo into glass board */}
+            <div
+              aria-hidden
+              style={{
+                position: 'absolute', left: 0, right: 0, bottom: 'var(--cf-board-h, 0px)',
+                height: 24, marginBottom: -1, zIndex: 4, pointerEvents: 'none',
+                background: 'linear-gradient(to bottom, rgba(10,14,20,0) 0%, rgba(10,14,20,0.42) 100%)',
+              }}
+            />
           <button
             type="button"
             onClick={onCtaTap}
@@ -1189,6 +1202,7 @@ export function CinematicFrame({
               backdropFilter: 'blur(20px) saturate(1.2)',
               WebkitBackdropFilter: 'blur(20px) saturate(1.2)',
               borderTop: '0.5px solid rgba(255,255,255,0.18)',
+              boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.12)',
             }}
           >
             {/* Column header row */}
