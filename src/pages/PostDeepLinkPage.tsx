@@ -196,6 +196,7 @@ const PostDeepLinkPage: React.FC = () => {
 
     useFullscreenFeedStore.getState().open([feedPost], 0, {
       openCommentsInitially: navState?.openComments === true,
+      initialCommentId: navState?.initialCommentId ?? null,
       onClose: () => {
         // Go back if there's history; otherwise land on Clubhouse.
         if (window.history.length > 1) {
