@@ -179,7 +179,14 @@ export function PostComposer({
                 usePostStudioStore.getState().openPostStudioForDraft({ draftId: id });
               }}
             />
+
+            {/* Scheduled posts list overlays the Chooser */}
+            <ScheduledPostsSheet
+              open={screen === 'choose' && scheduledListOpen}
+              onClose={() => setScheduledListOpen(false)}
+            />
           </div>
+
 
           <CourseSearchSheet
             open={reviewCourseSheetOpen}
