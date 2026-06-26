@@ -283,6 +283,7 @@ export const UserListPage: React.FC<UserListPageProps> = ({
   onFollowingRefetch,
   profileUsername: _profileUsername,
   profileUserId,
+  profileActorType = 'personal',
 }) => {
   const navigate = useNavigate();
   const { user } = useSupabaseSession();
