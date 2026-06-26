@@ -142,8 +142,10 @@ export function PostComposer({
                 onPost={() => setScreen('post')}
                 onReview={() => setReviewCourseSheetOpen(true)}
                 onOpenDrafts={() => setDraftsListOpen(true)}
+                onOpenScheduled={() => setScheduledListOpen(true)}
                 isBusiness={isBusiness}
               />
+
             ) : (
               <Composer
                 onClose={onClose}
