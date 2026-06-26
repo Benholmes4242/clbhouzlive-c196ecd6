@@ -248,6 +248,21 @@ export const PostingAsPill = forwardRef<HTMLButtonElement, PostingAsPillProps>(
             />
           )}
         </div>
+
+        {/* Business name label — ambient business-mode identity cue */}
+        {isBusinessActor && (
+          <span
+            className={cn(
+              "ml-1.5 mr-0.5 truncate min-w-0 max-w-[88px] text-[12px] font-semibold",
+              (useLightTheme && !useGlassTheme) ? "text-foreground" : "text-white"
+            )}
+            title={activeActor.name}
+          >
+            {activeActor.name}
+          </span>
+        )}
+
+        
         
         {/* Chevron */}
         <ChevronDown 
