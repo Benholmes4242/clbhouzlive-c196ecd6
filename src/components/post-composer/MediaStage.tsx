@@ -167,22 +167,72 @@ export function MediaStage({
         }}
       >
         {isVideo ? (
-          <video
-            src={item.previewUrl}
-            poster={item.posterUrl}
-            autoPlay
-            loop
-            playsInline
-            preload="metadata"
-            muted={muted}
-            style={{
-              width: '100%',
-              height: '100%',
-              objectFit: 'contain',
-              userSelect: 'none',
-              background: CHARCOAL,
-            }}
-          />
+          item.restoredFromStream ? (
+            <div
+              style={{
+                position: 'relative',
+                width: '100%',
+                height: '100%',
+                background: CHARCOAL,
+              }}
+            >
+              {item.posterUrl ? (
+                <img
+                  src={item.posterUrl}
+                  alt=""
+                  draggable={false}
+                  style={{
+                    width: '100%',
+                    height: '100%',
+                    objectFit: 'contain',
+                    userSelect: 'none',
+                    pointerEvents: 'none',
+                  }}
+                />
+              ) : null}
+              <div
+                style={{
+                  position: 'absolute',
+                  inset: 0,
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  pointerEvents: 'none',
+                }}
+              >
+                <div
+                  style={{
+                    width: 56,
+                    height: 56,
+                    borderRadius: 999,
+                    background: 'rgba(0,0,0,0.55)',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                  }}
+                >
+                  <Play size={22} color="#fff" fill="#fff" />
+                </div>
+              </div>
+            </div>
+          ) : (
+            <video
+              src={item.previewUrl}
+              poster={item.posterUrl}
+              autoPlay
+              loop
+              playsInline
+              preload="metadata"
+              muted={muted}
+              style={{
+                width: '100%',
+                height: '100%',
+                objectFit: 'contain',
+                userSelect: 'none',
+                background: CHARCOAL,
+              }}
+            />
+          )
         ) : (
           <img
             src={item.previewUrl}
