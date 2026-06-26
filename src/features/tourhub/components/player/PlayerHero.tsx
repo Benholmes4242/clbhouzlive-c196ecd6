@@ -9,7 +9,7 @@
 
 import { Fragment } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { UserCircle, ChevronRight, Crown } from 'lucide-react';
+import { Crown } from 'lucide-react';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { resolvePlayerAvatarCandidates } from '@/features/tourhub/_shared/resolvePlayerAvatar';
 import { titleCaseCountry } from '../../utils/countryFlags';
@@ -122,37 +122,6 @@ export function PlayerHero({ player, playerStats }: PlayerHeroProps) {
         padding: '10px 0 14px',
       }}
     >
-      {/* Section eyebrow — above the card */}
-      <div style={{ padding: '0 16px 8px' }}>
-        <button
-          type="button"
-          onClick={() => navigate('/tourhub?tab=players', { replace: true })}
-          aria-label="Player Profile — open Players"
-          style={{
-            background: 'transparent',
-            border: 'none',
-            padding: 0,
-            cursor: 'pointer',
-            display: 'inline-flex',
-            alignItems: 'center',
-            gap: 6,
-          }}
-        >
-          <UserCircle size={13} strokeWidth={2.5} color={AMBER} />
-          <span
-            style={{
-              fontSize: 10.5,
-              fontWeight: 700,
-              color: AMBER,
-              letterSpacing: '0.14em',
-              textTransform: 'uppercase',
-            }}
-          >
-            PLAYER
-          </span>
-          <ChevronRight size={11} strokeWidth={2.5} color={AMBER} />
-        </button>
-      </div>
 
       {/* Gold champion card */}
       <div

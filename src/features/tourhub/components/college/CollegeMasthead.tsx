@@ -11,7 +11,7 @@
 
 import { Link, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { GraduationCap, ChevronRight, Crown } from 'lucide-react';
+import { Crown } from 'lucide-react';
 import { getCollegeLogoUrl } from '@/utils/collegeLogo';
 import { PlayerInitialAvatar } from '../shared/PlayerInitialAvatar';
 import { formatCurrency } from '@/lib/utils/formatCurrency';
@@ -93,36 +93,6 @@ export function CollegeMasthead({
           padding: '16px 16px 14px',
         }}
       >
-        {/* Section header (canonical §2) */}
-        <div style={{ marginBottom: 14 }}>
-          <button
-            type="button"
-            onClick={() => navigate('/tourhub?tab=overview', { replace: true })}
-            aria-label="College Franchise — open Tour Overview"
-            style={{
-              background: 'transparent',
-              border: 'none',
-              padding: 0,
-              cursor: 'pointer',
-              display: 'inline-flex',
-              alignItems: 'center',
-              gap: 6,
-              marginBottom: 6,
-            }}
-          >
-            <GraduationCap size={13} strokeWidth={2.5} style={{ color: AMBER }} />
-            <span style={{
-              fontSize: 10.5,
-              fontWeight: 700,
-              letterSpacing: '0.14em',
-              color: AMBER,
-              textTransform: 'uppercase' as const,
-            }}>
-              COLLEGE FRANCHISE
-            </span>
-            <ChevronRight size={11} strokeWidth={2.5} style={{ color: AMBER, marginTop: 1 }} />
-          </button>
-        </div>
 
         {/* Franchise champion card */}
         <Link
