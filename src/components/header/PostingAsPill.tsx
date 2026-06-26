@@ -34,6 +34,10 @@ export const PostingAsPill = forwardRef<HTMLButtonElement, PostingAsPillProps>(
     const { conversations } = useMessagingContext();
     const hasUnreadMessages = conversations?.some(conv => conv.unread_count > 0) || false;
 
+    // Ambient business-mode signal: amber ring + business name where space allows.
+    const isBusinessActor = activeActor?.type === 'business';
+    const BUSINESS_RING = '0 0 0 2px #F7931E';
+
     // Bare theme — no background, no chevron, white-ringed avatar with drop shadow
     if (!isLoading && activeActor && useBareTheme) {
       const initials = activeActor.name.charAt(0).toUpperCase();
