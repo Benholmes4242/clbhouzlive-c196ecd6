@@ -602,8 +602,8 @@ function GlobalSearchOverlay({ isOpen, onClose }: GlobalSearchOverlayProps) {
                 <motion.div key="search-results" {...FADE_PROPS}>
                   {/* Courses */}
                   {showCourses && (clubs.length > 0 || hasQuery) && (
-                    <div>
-                      <SectionHeader label="Courses" />
+                  <div>
+                      {clubs.length > 0 && <SectionHeader label="Courses" />}
                       {clubs.map(course => (
                         <div key={course.id}>
                           <button
