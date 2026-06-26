@@ -76,6 +76,7 @@ export const CardFeed: React.FC<CardFeedProps> = ({
 }) => {
 
   const virtuosoRef = useRef<VirtuosoHandle | null>(null);
+  const scrollerElRef = useRef<HTMLElement | null>(null);
 
   // Explore tab retap → scroll Clubhouse feed to top
   useEffect(() => {
