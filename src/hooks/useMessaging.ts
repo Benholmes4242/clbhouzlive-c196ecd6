@@ -422,17 +422,21 @@ export function useMessaging(): UseMessagingReturn {
     conversationsRef.current = conversations;
   }, [conversations]);
 
-  // Set up realtime subscription for conversation updates
+  // Clear list immediately on actor switch to avoid showing the previous actor's inbox
   useEffect(() => {
-    if (!user) return;
+    setConversations([]);
+    setInitialLoading(true);
+  }, [actorType, actorId]);
 
-    // NOTE: This subscription receives all message INSERT events globally,
-    // then filters client-side to known conversations. This is a known limitation
-    // of Supabase realtime's lack of array-based IN filters. On high-traffic
-    // deployments this should be replaced with a user-scoped message notification
-    // pattern (e.g. a dedicated notification table filtered by user_id).
+  // Set up realtime subscription for conversation updates, scoped to active actor
+  useEffect(() => {
+    if (!user || !actorId) return;
+
+    const channelKey = `${actorType}-${actorId}`;
+
+    // Receives all message INSERT events globally, filters client-side to known conversations
     const messagesChannel = supabase
-      .channel(`conversation-list-messages-${user.id}`)
+      .channel(`conversation-list-messages-${channelKey}`)
       .on(
         'postgres_changes',
         {
@@ -449,17 +453,20 @@ export function useMessaging(): UseMessagingReturn {
       )
       .subscribe();
 
-    // Filter by this user's participation row — avoids a thundering herd where every
-    // connected client re-fetches on any global conversation write.
+    // Filter participant changes to the ACTIVE actor only
+    const participantFilter = actorType === 'business'
+      ? `actor_id=eq.${actorId}`
+      : `user_id=eq.${user.id}`;
+
     const conversationsChannel = supabase
-      .channel(`conversation-list-participants-${user.id}`)
+      .channel(`conversation-list-participants-${channelKey}`)
       .on(
         'postgres_changes',
         {
           event: '*',
           schema: 'public',
           table: 'conversation_participants',
-          filter: `user_id=eq.${user.id}`,
+          filter: participantFilter,
         },
         () => {
           fetchConversations(true);
@@ -471,7 +478,7 @@ export function useMessaging(): UseMessagingReturn {
       supabase.removeChannel(messagesChannel);
       supabase.removeChannel(conversationsChannel);
     };
-  }, [user, fetchConversations]);
+  }, [user, actorType, actorId, fetchConversations]);
 
   return {
     conversations,
