@@ -360,13 +360,6 @@ const FeedCardImpl: React.FC<FeedCardProps> = ({
             {post.displayName}
           </button>
           <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginTop: 1 }}>
-            <span style={{ fontSize: 11, color: T60 }}>{subLine}</span>
-            {mountFollowPill && (
-              <FeedFollowPill
-                isFollowed={!!post.isFollowedByMe}
-                onFollow={() => onFollow!(post)}
-              />
-            )}
             {canManage && (
               <PostOwnerMenu
                 postId={post.id}
@@ -376,6 +369,13 @@ const FeedCardImpl: React.FC<FeedCardProps> = ({
                 sourceReviewId={post.review?.reviewId ?? null}
                 reviewCourseId={post.review?.courseId ?? null}
                 variant="inline"
+              />
+            )}
+            <span style={{ fontSize: 11, color: T60 }}>{subLine}</span>
+            {mountFollowPill && (
+              <FeedFollowPill
+                isFollowed={!!post.isFollowedByMe}
+                onFollow={() => onFollow!(post)}
               />
             )}
           </div>
