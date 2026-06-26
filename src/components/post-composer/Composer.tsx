@@ -755,6 +755,10 @@ export function Composer({
       visibility,
       onSuccess: () => {
         toast.success('Posted');
+        // Delete the draft we resumed from — it's now published.
+        if (currentDraftId) {
+          void deleteDraft(currentDraftId);
+        }
         onClose();
       },
       onError: () => {},
@@ -773,6 +777,7 @@ export function Composer({
     updatePost,
     submitPost,
     onClose,
+    currentDraftId,
   ]);
 
   return (
