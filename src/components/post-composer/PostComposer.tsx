@@ -83,6 +83,16 @@ export function PostComposer({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [open]);
 
+  // When a draft/edit target is selected while already open, flip from chooser into Composer.
+  useEffect(() => {
+    if (!open) return;
+    if (isDraftMode || isEditMode) {
+      setScreen('post');
+      setDraftsListOpen(false);
+      setScheduledListOpen(false);
+    }
+  }, [draftId, editPostId, open]);
+
   // Body scroll lock — shared, reference-counted util
   useLayoutEffect(() => {
     if (!open) return;
