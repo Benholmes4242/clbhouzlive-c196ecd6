@@ -251,8 +251,8 @@ export function ChatView({ conversationId, onBack }: ChatViewProps) {
 
   const otherUser = useMemo(() => {
     if (!conversation || !user || conversation.type !== 'direct') return null;
-    return conversation.participants.find(p => p.user_id !== user.id);
-  }, [conversation, user]);
+    return conversation.participants.find(isOtherParticipant);
+  }, [conversation, user, isOtherParticipant]);
 
   useEffect(() => {
     if (otherUser?.user_id) {
@@ -268,7 +268,7 @@ export function ChatView({ conversationId, onBack }: ChatViewProps) {
     }
 
     if (conversation.type === 'direct') {
-      const other = conversation.participants.find(p => p.user_id !== user.id);
+      const other = conversation.participants.find(isOtherParticipant);
       if (other?.profile) {
         const name = other.profile.display_name || other.profile.username || 'Unknown';
         return {
@@ -286,17 +286,17 @@ export function ChatView({ conversationId, onBack }: ChatViewProps) {
       avatarUrl: conversation.avatar_url,
       initials: name.substring(0, 2).toUpperCase(),
     };
-  }, [conversation, user]);
+  }, [conversation, user, isOtherParticipant]);
 
   const isGroupChat = conversation?.type !== 'direct';
 
   const otherUserName = useMemo(() => {
     if (conversation?.type === 'direct') {
-      const other = conversation.participants.find(p => p.user_id !== user?.id);
+      const other = conversation.participants.find(isOtherParticipant);
       return other?.profile?.display_name || other?.profile?.username || 'User';
     }
     return 'User';
-  }, [conversation, user?.id]);
+  }, [conversation, isOtherParticipant]);
 
   const messagesMap = useMemo(() => {
     const map = new Map<string, MessageWithSender>();
