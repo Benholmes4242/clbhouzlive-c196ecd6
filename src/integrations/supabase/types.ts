@@ -1203,38 +1203,6 @@ export type Database = {
           },
         ]
       }
-      business_outbound_follows: {
-        Row: {
-          created_at: string | null
-          follower_business_id: string
-          following_id: string
-          following_type: string
-          id: string
-        }
-        Insert: {
-          created_at?: string | null
-          follower_business_id: string
-          following_id: string
-          following_type: string
-          id?: string
-        }
-        Update: {
-          created_at?: string | null
-          follower_business_id?: string
-          following_id?: string
-          following_type?: string
-          id?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "business_outbound_follows_follower_business_id_fkey"
-            columns: ["follower_business_id"]
-            isOneToOne: false
-            referencedRelation: "business_accounts"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
       business_profile_events: {
         Row: {
           business_id: string
@@ -17349,6 +17317,14 @@ export type Database = {
           actor_id: string
           actor_type: string
           unread_count: number
+        }[]
+      }
+      get_actor_social_counts: {
+        Args: { p_actor_id: string; p_actor_type: string }
+        Returns: {
+          followers: number
+          following: number
+          friends: number
         }[]
       }
       get_adhoc_rivalry: {
