@@ -85,9 +85,11 @@ export const FeedImageCarousel = memo(function FeedImageCarousel({
   const touchRef = useRef<{
     startX: number;
     startY: number;
+    lastX: number;
+    lastY: number;
     locked: 'none' | 'horizontal' | 'vertical';
     swiping: boolean;
-  }>({ startX: 0, startY: 0, locked: 'none', swiping: false });
+  }>({ startX: 0, startY: 0, lastX: 0, lastY: 0, locked: 'none', swiping: false });
   const [swipeOffset, setSwipeOffset] = useState(0);
   const [isAnimating, setIsAnimating] = useState(false);
   const [isDragging, setIsDragging] = useState(false);
