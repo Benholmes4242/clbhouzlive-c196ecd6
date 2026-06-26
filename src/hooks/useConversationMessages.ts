@@ -77,19 +77,36 @@ export function useConversationMessages(conversationId: string | null): UseConve
         return;
       }
 
-      // Collect all sender IDs
+      // Collect personal sender IDs and business actor IDs
       const senderIds = new Set<string>();
+      const businessActorIds = new Set<string>();
       messagesData.forEach(m => {
-        if (m.sender_id) senderIds.add(m.sender_id);
+        const aType = (m as { sender_actor_type?: string | null }).sender_actor_type ?? 'personal';
+        const aId = (m as { sender_actor_id?: string | null }).sender_actor_id ?? null;
+        if (aType === 'business' && aId) {
+          businessActorIds.add(aId);
+        } else if (m.sender_id) {
+          senderIds.add(m.sender_id);
+        }
       });
 
       // Fetch sender profiles
-      const { data: profilesData, error: profilesError } = await supabase
-        .from('user_profiles')
-        .select('id, username, display_name, profile_photo_url, eg_handicap_index, home_club')
-        .in('id', Array.from(senderIds));
+      const { data: profilesData, error: profilesError } = senderIds.size > 0
+        ? await supabase
+            .from('user_profiles')
+            .select('id, username, display_name, profile_photo_url, eg_handicap_index, home_club')
+            .in('id', Array.from(senderIds))
+        : { data: [], error: null };
 
       if (profilesError) throw profilesError;
+
+      // Fetch business identities for business senders
+      const { data: businessData } = businessActorIds.size > 0
+        ? await supabase
+            .from('business_accounts')
+            .select('id, name, slug, logo_url, is_verified')
+            .in('id', Array.from(businessActorIds))
+        : { data: [] as Array<{ id: string; name: string; slug: string | null; logo_url: string | null; is_verified: boolean | null }> };
 
       // Create profile lookup
       const profilesMap = new Map<string, ParticipantProfile>();
@@ -104,6 +121,21 @@ export function useConversationMessages(conversationId: string | null): UseConve
             home_club: p.home_club ?? null,
           });
         }
+      });
+
+      const businessMap = new Map<string, ParticipantProfile>();
+      businessData?.forEach(b => {
+        businessMap.set(b.id, {
+          id: b.id,
+          username: b.slug ?? null,
+          display_name: b.name ?? null,
+          profile_photo_url: b.logo_url ?? null,
+          eg_handicap_index: null,
+          home_club: null,
+          actor_type: 'business',
+          isBusiness: true,
+          is_verified: b.is_verified ?? false,
+        } as ParticipantProfile);
       });
 
       // Fetch reply-to messages if any
