@@ -105,43 +105,24 @@ export function usePostEngagement(postId: string | null) {
           .eq('actor_type', actorType)
           .eq('actor_id', actorId);
       } else {
-        // Like - insert with actor context
-        await supabase
+        // Idempotent upsert — guarantees a row exists for this actor after success.
+        // Avoids the 409 unique-violation that previously got swallowed as success
+        // while no row was actually written (likes "lost" on refresh).
+        const { error } = await supabase
           .from('post_likes')
-          .insert({
-            post_id: postId,
-            user_id: user.id, // Always the auth user (for audit/RLS)
-            actor_type: actorType,
-            actor_id: actorId,
-          });
+          .upsert(
+            {
+              post_id: postId,
+              user_id: user.id,
+              actor_type: actorType,
+              actor_id: actorId,
+            },
+            { onConflict: 'post_id,actor_type,actor_id', ignoreDuplicates: true },
+          );
+        if (error) throw error;
 
-        // Create notification for post owner (only on like, not unlike)
-        const postOwnerInfo = await getPostOwnerInfo();
-        if (postOwnerInfo) {
-          // Notify the post owner - use their actor context as recipient
-          const recipientActorType = postOwnerInfo.actorType;
-          const recipientActorId = postOwnerInfo.actorId;
-          
-          // Don't notify self (same actor)
-          if (!(recipientActorType === actorType && recipientActorId === actorId)) {
-            await supabase.from('notifications').insert({
-              user_id: postOwnerInfo.userId, // For legacy compatibility
-              recipient_actor_type: recipientActorType,
-              recipient_actor_id: recipientActorId,
-              actor_id: actorId, // Who performed the action
-              type: 'like',
-              title: 'New like',
-              message: 'liked your post',
-              entity_type: 'post',
-              entity_id: postId,
-              data: { 
-                post_id: postId,
-                liker_actor_type: actorType,
-                liker_actor_id: actorId,
-              },
-            });
-          }
-        }
+        // NOTE: Notification is created SOLELY by the DB trigger
+        // create_like_notification_aggregated. No client-side insert here.
       }
     },
     onMutate: async () => {
