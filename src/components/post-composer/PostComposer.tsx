@@ -77,6 +77,7 @@ export function PostComposer({
     setScreen(isEditMode || isDraftMode || initialMedia.length > 0 ? 'post' : 'choose');
     setReviewCourseSheetOpen(false);
     setDraftsListOpen(false);
+    setScheduledListOpen(false);
     setMediaItems([]);
     setEditIndex(0);
     // eslint-disable-next-line react-hooks/exhaustive-deps
