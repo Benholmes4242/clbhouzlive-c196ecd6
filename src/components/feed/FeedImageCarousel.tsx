@@ -157,6 +157,8 @@ export const FeedImageCarousel = memo(function FeedImageCarousel({
     touchRef.current = {
       startX: touch.clientX,
       startY: touch.clientY,
+      lastX: touch.clientX,
+      lastY: touch.clientY,
       locked: 'none',
       swiping: false,
     };
