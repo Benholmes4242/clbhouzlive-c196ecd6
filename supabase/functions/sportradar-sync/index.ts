@@ -693,6 +693,14 @@ async function syncLeaderboard(supabase: any, apiKey: string, tour: string, year
       const rounds = entry.rounds || [];
       const latestRound = rounds.length > 0 ? rounds[rounds.length - 1] : null;
       const derivedThru = latestRound?.thru ?? entry.thru ?? null;
+      // today = current/most-recent round's score-to-par (NOT gross strokes).
+      // Sportradar round objects carry score-to-par as `.score`. Fall back through
+      // known variants, then null. Never use `.strokes` (that's gross).
+      const derivedToday =
+        latestRound?.score ??
+        latestRound?.score_to_par ??
+        latestRound?.par_diff ??
+        null;
       const derivedStatus = entry.status || (entry.position != null ? 'active' : null);
 
       const { error } = await supabase.from('sr_leaderboards').upsert({
