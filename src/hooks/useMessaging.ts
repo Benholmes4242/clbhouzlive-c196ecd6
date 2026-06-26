@@ -289,55 +289,65 @@ export function useMessaging(): UseMessagingReturn {
    * Mark a conversation as read (updates last_read_at)
    */
   const markAsRead = useCallback(async (conversationId: string): Promise<void> => {
-    if (!user) return;
+    if (!user || !actorId) return;
 
     try {
-      // 1. Mark conversation as read in messaging system
+      // 1. Mark conversation as read for the ACTIVE actor's participant row
       const { error } = await supabase.rpc('mark_conversation_read', {
         p_conversation_id: conversationId,
+        p_actor_type: actorType,
+        p_actor_id: actorId,
       });
 
       if (error) throw error;
-      
+
       // 2. Update local state immediately
-      setConversations(prev => 
-        prev.map(conv => 
-          conv.id === conversationId 
+      setConversations(prev =>
+        prev.map(conv =>
+          conv.id === conversationId
             ? { ...conv, unread_count: 0 }
             : conv
         )
       );
-      
-      // 3. Clean up any legacy message notifications for this conversation
-      // (Belt-and-suspenders - the RPC also does this, but we do it client-side too)
-      await supabase
+
+      // 3. Clean up any legacy message notifications for this conversation, scoped to active actor
+      let notifCleanup = supabase
         .from('notifications')
         .update({ is_read: true, read: true })
-        .eq('user_id', user.id)
         .in('type', ['message', 'message_received', 'dm'])
         .eq('is_read', false)
         .contains('data', { conversation_id: conversationId });
-      
+
+      if (actorType === 'business') {
+        notifCleanup = notifCleanup
+          .eq('recipient_actor_type', 'business')
+          .eq('recipient_actor_id', actorId);
+      } else {
+        notifCleanup = notifCleanup.eq('user_id', user.id);
+      }
+      await notifCleanup;
+
       // 4. Invalidate activity/notification queries to update badges
       queryClient.invalidateQueries({ queryKey: ['activity-unread-count'] });
       queryClient.invalidateQueries({ queryKey: ['unread-notifications'] });
+      queryClient.invalidateQueries({ queryKey: ['actor-unread-counts'] });
     } catch (err) {
       AppLog.error('[useMessaging]', 'Error marking as read:', err);
     }
-  }, [user, queryClient]);
+  }, [user, actorType, actorId, queryClient]);
 
   /**
-   * Send a message to a conversation
+   * Send a message to a conversation (stamps active actor as sender)
    */
   const sendMessage = useCallback(async (
-    conversationId: string, 
-    content: string, 
+    conversationId: string,
+    content: string,
     messageType: MessageType = 'text',
     mediaUrl: string | null = null,
     mediaMetadata: Record<string, unknown> | null = null,
     replyToId: string | null = null
   ): Promise<string | null> => {
-    if (!user) return null;
+    if (!user || !actorId) return null;
 
     try {
       const { data, error } = await supabase.rpc('send_message', {
@@ -347,35 +357,39 @@ export function useMessaging(): UseMessagingReturn {
         p_media_url: mediaUrl,
         p_media_metadata: mediaMetadata ? JSON.parse(JSON.stringify(mediaMetadata)) : null,
         p_reply_to_id: replyToId,
+        p_sender_actor_type: actorType,
+        p_sender_actor_id: actorId,
       });
 
       if (error) throw error;
-      
-      // Immediately mark conversation as read since user just sent a message
-      // This ensures their own message doesn't show as unread
+
+      // Immediately mark conversation as read for the active actor since they just sent
       await supabase.rpc('mark_conversation_read', {
         p_conversation_id: conversationId,
+        p_actor_type: actorType,
+        p_actor_id: actorId,
       });
-      
+
       // Update local state immediately to show no unread
-      setConversations(prev => 
-        prev.map(conv => 
-          conv.id === conversationId 
+      setConversations(prev =>
+        prev.map(conv =>
+          conv.id === conversationId
             ? { ...conv, unread_count: 0, last_message_at: new Date().toISOString(), last_message_preview: content }
             : conv
         )
       );
-      
+
       // Invalidate activity/notification queries
       queryClient.invalidateQueries({ queryKey: ['activity-unread-count'] });
-      
+      queryClient.invalidateQueries({ queryKey: ['actor-unread-counts'] });
+
       return data as string;
     } catch (err) {
       AppLog.error('[useMessaging]', 'Error sending message:', err);
       setError(err instanceof Error ? err : new Error('Failed to send message'));
       return null;
     }
-  }, [user, queryClient]);
+  }, [user, actorType, actorId, queryClient]);
 
   /**
    * Get unread count for a specific conversation
