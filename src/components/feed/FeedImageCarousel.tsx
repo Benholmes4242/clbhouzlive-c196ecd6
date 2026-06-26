@@ -85,9 +85,11 @@ export const FeedImageCarousel = memo(function FeedImageCarousel({
   const touchRef = useRef<{
     startX: number;
     startY: number;
+    lastX: number;
+    lastY: number;
     locked: 'none' | 'horizontal' | 'vertical';
     swiping: boolean;
-  }>({ startX: 0, startY: 0, locked: 'none', swiping: false });
+  }>({ startX: 0, startY: 0, lastX: 0, lastY: 0, locked: 'none', swiping: false });
   const [swipeOffset, setSwipeOffset] = useState(0);
   const [isAnimating, setIsAnimating] = useState(false);
   const [isDragging, setIsDragging] = useState(false);
@@ -155,6 +157,8 @@ export const FeedImageCarousel = memo(function FeedImageCarousel({
     touchRef.current = {
       startX: touch.clientX,
       startY: touch.clientY,
+      lastX: touch.clientX,
+      lastY: touch.clientY,
       locked: 'none',
       swiping: false,
     };
@@ -179,6 +183,8 @@ export const FeedImageCarousel = memo(function FeedImageCarousel({
       const touch = e.touches[0];
       const dx = touch.clientX - t.startX;
       const dy = touch.clientY - t.startY;
+      t.lastX = touch.clientX;
+      t.lastY = touch.clientY;
 
       if (t.locked === 'none') {
         if (Math.abs(dx) < LOCK_THRESHOLD && Math.abs(dy) < LOCK_THRESHOLD) return;
@@ -237,11 +243,27 @@ export const FeedImageCarousel = memo(function FeedImageCarousel({
         }, 300);
       }
     } else {
+      // Tap-to-advance (left/right edge zones), only if no swipe lock & negligible movement
+      if (t.locked === 'none') {
+        const movedX = Math.abs(t.lastX - t.startX);
+        const movedY = Math.abs(t.lastY - t.startY);
+        if (movedX <= 8 && movedY <= 8) {
+          const rect = containerRef.current?.getBoundingClientRect();
+          if (rect && rect.width > 0) {
+            const tapX = t.startX - rect.left;
+            if (tapX < rect.width * 0.33) {
+              goTo(currentSlide - 1);
+            } else if (tapX > rect.width * 0.67) {
+              goTo(currentSlide + 1);
+            }
+          }
+        }
+      }
       setIsDragging(false);
       setSwipeOffset(0);
     }
 
-    touchRef.current = { startX: 0, startY: 0, locked: 'none', swiping: false };
+    touchRef.current = { startX: 0, startY: 0, lastX: 0, lastY: 0, locked: 'none', swiping: false };
   }, [swipeOffset, currentSlide, mediaItems.length, goTo, isAnimating, isImageZoomed]);
 
   const getSlideTransform = (idx: number): { translateX: string; opacity: number; pointerEvents: 'auto' | 'none' } => {
