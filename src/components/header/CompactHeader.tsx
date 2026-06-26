@@ -67,6 +67,8 @@ const CompactHeader: React.FC<CompactHeaderProps> = ({ className }) => {
   const [searchParams] = useSearchParams();
   const { user } = useSupabaseSession();
   const { hasUnread, unreadCount } = useUnreadNotifications();
+  const { activeActor } = useActiveActor();
+  const isBusinessMode = activeActor?.type === 'business';
   const [searchOpen, setSearchOpen] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
