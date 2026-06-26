@@ -2,21 +2,24 @@ import { useState, useEffect, useCallback, useRef } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useQueryClient } from '@tanstack/react-query';
+import { useActiveActor } from '@/context/ActiveActorContext';
 import { AppLog } from '@/lib/logger';
-import type { 
-  ConversationWithDetails, 
+import type {
+  ConversationWithDetails,
   ParticipantWithProfile,
   ParticipantProfile,
   ConversationParticipant,
   MessageType
 } from '@/types/messaging';
 
+type TargetActorType = 'personal' | 'business';
+
 export interface UseMessagingReturn {
   conversations: ConversationWithDetails[];
   loading: boolean;
   error: Error | null;
   fetchConversations: (isBackground?: boolean) => Promise<void>;
-  getOrCreateDM: (otherUserId: string) => Promise<string | null>;
+  getOrCreateDM: (targetActorId: string, targetActorType?: TargetActorType) => Promise<string | null>;
   createGroupChat: (name: string, participantIds: string[], avatarUrl?: string) => Promise<string | null>;
   markAsRead: (conversationId: string) => Promise<void>;
   sendMessage: (conversationId: string, content: string, messageType?: MessageType, mediaUrl?: string | null, mediaMetadata?: Record<string, unknown> | null, replyToId?: string | null) => Promise<string | null>;
