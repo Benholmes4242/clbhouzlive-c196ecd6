@@ -19,6 +19,10 @@ interface WatchRailTileProps {
    * Optional → falls back to global time-only behavior.
    */
   viewedPostIds?: Set<string>;
+  /** Tile aspect ratio. Defaults to '3/4' (portrait). Pass '1/1' for square. */
+  aspectRatio?: string;
+  /** Border radius in px. Defaults to 6. */
+  radius?: number;
 }
 
 const NEW_THRESHOLD_MS = 24 * 60 * 60 * 1000; // 24h
