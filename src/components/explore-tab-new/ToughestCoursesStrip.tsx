@@ -85,12 +85,9 @@ interface CardProps {
   onTap: () => void;
 }
 
-const BAR_MAX = 18;
-
 function ToughCourseCard({ course, onTap }: CardProps) {
   const region =
     course.course_region || course.course_country || '';
-  const pct = Math.max(6, Math.min(100, (course.avg_over_par / BAR_MAX) * 100));
 
   return (
     <button
