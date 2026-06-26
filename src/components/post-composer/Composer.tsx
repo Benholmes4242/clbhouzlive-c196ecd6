@@ -264,13 +264,37 @@ export function Composer({
       }));
       setTaggedCourses(courses);
 
-      // Rehydrate media: fetch each image URL back into a File so the standard
-      // submit/edit pipelines treat them as net-new uploads.
+      // Rehydrate media:
+      //  • Images: re-fetch the URL back into a File so the existing submit
+      //    pipeline uploads them as net-new (kept from Phase 1).
+      //  • Videos: re-build the tile directly from the stored stream_id —
+      //    the asset is already in Cloudflare Stream and is re-attached to
+      //    the post on submit by stream_id (no re-upload, no skip toast).
       const rehydrated: ComposerMediaItem[] = [];
-      let skippedVideos = 0;
       for (const m of d.media ?? []) {
         if (m.mediaType === 'video') {
-          skippedVideos += 1;
+          if (!m.streamId) {
+            console.warn('[Composer] draft video missing stream_id, skipping:', m.id);
+            continue;
+          }
+          const w = m.width && m.width > 0 ? m.width : 16;
+          const h = m.height && m.height > 0 ? m.height : 9;
+          rehydrated.push({
+            id: nextMediaId(),
+            type: 'video',
+            // For desktop fallback we display the poster; preview/media_url is
+            // kept so it round-trips back to post_media on submit.
+            previewUrl: m.posterUrl || m.mediaUrl,
+            posterUrl: m.posterUrl ?? undefined,
+            width: w,
+            height: h,
+            aspectRatio: w / Math.max(1, h),
+            pos: { x: 50, y: 50 },
+            frame: 'original',
+            restoredStreamId: m.streamId,
+            restoredMediaUrl: m.mediaUrl,
+            durationSeconds: m.durationSeconds ?? undefined,
+          });
           continue;
         }
         try {
@@ -302,16 +326,12 @@ export function Composer({
         }
       }
       if (rehydrated.length) setMediaItems(rehydrated);
-      if (skippedVideos > 0) {
-        toast('Some videos were skipped', {
-          description: "Drafted videos can't be resumed in this version.",
-        });
-      }
       // Resumed drafts start clean — only mark dirty when the user changes
       // something below.
       setIsDirty(false);
     })();
   }, [isDraftMode, draftId, onClose, setMediaItems]);
+
 
   // Mark the form dirty whenever meaningful content changes.
   useEffect(() => {
