@@ -114,7 +114,7 @@ body.lightbox-open {
   background-clip: text;
   color: transparent;
   -webkit-text-fill-color: transparent;
-  animation: clbhouzGoldShimmer 3.5s linear infinite;
+  animation: clbhouzGoldShimmer 6s linear infinite;
 }
 
 @media (prefers-reduced-motion: reduce) {
