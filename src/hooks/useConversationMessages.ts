@@ -50,7 +50,7 @@ export function useConversationMessages(conversationId: string | null): UseConve
       // Fetch messages for this conversation
       const { data: messagesData, error: messagesError } = await supabase
         .from('messages')
-        .select('id, conversation_id, sender_id, content, message_type, media_url, media_metadata, reply_to_id, is_edited, edited_at, created_at, deleted_at')
+        .select('id, conversation_id, sender_id, sender_actor_type, sender_actor_id, content, message_type, media_url, media_metadata, reply_to_id, is_edited, edited_at, created_at, deleted_at')
         .eq('conversation_id', conversationId)
         .is('deleted_at', null)
         .order('created_at', { ascending: false })
