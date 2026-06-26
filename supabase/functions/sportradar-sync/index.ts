@@ -765,6 +765,16 @@ async function syncLeaderboard(supabase: any, apiKey: string, tour: string, year
       const rounds = entry.rounds || [];
       const latestRound = rounds.length > 0 ? rounds[rounds.length - 1] : null;
       const derivedThru = latestRound?.thru ?? entry.thru ?? null;
+      // One-time diagnostic: confirm score-to-par key name in live payload.
+      // Remove once `derivedToday` is verified populating.
+      if (latestRound && Math.random() < 0.02) {
+        console.log('[syncLeaderboard] latestRound keys:', Object.keys(latestRound).join(', '), '| sample:', JSON.stringify(latestRound).slice(0, 240));
+      }
+      const derivedToday =
+        latestRound?.score ??
+        latestRound?.score_to_par ??
+        latestRound?.par_diff ??
+        null;
       const derivedStatus = entry.status || (entry.position != null ? 'active' : null);
 
       const { error } = await supabase.from('sr_leaderboards').upsert({
