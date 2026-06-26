@@ -315,7 +315,7 @@ export function ConversationList({
     if (!searchQuery.trim()) return true;
     
     const query = searchQuery.toLowerCase();
-    const { name } = getConversationDisplay(conversation, user?.id);
+    const { name } = getConversationDisplay(conversation, activeActorRef);
     const lastMessage = conversation.last_message_preview?.toLowerCase() || '';
     
     return name.toLowerCase().includes(query) || lastMessage.includes(query);
