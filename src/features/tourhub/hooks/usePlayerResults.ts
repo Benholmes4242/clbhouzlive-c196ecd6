@@ -26,8 +26,8 @@ export function usePlayerResults(playerId: string | undefined, limit = 10) {
       if (!playerId) return [];
       
       // Query leaderboards for this player, joined with tournament info.
-      // Order by the joined tournament's end_date (most recently played first)
-      // — D19 fix. Previously ordered by created_at which tracks ingest order.
+      // We fetch generously so the limit doesn't cut off genuinely-recent
+      // tournaments before we sort client-side.
       const { data, error } = await supabase
         .from('sr_leaderboards')
         .select(`
@@ -46,16 +46,14 @@ export function usePlayerResults(playerId: string | undefined, limit = 10) {
           )
         `)
         .eq('player_id', playerId)
-        .order('end_date', { foreignTable: 'sr_tournaments', ascending: false })
-        .limit(limit);
-      
+        .limit(Math.max(limit * 3, 60));
+
       if (error) {
         console.error('Error fetching player results:', error);
         return [];
       }
-      
-      // Transform to flat structure
-      return (data || []).map(row => ({
+
+      const mapped = (data || []).map(row => ({
         id: row.id,
         tournament_id: row.tournament_id,
         tournament_name: (row.tournament as any)?.name || 'Unknown Tournament',
@@ -68,6 +66,15 @@ export function usePlayerResults(playerId: string | undefined, limit = 10) {
         money: row.money,
         status: row.status,
       })) as PlayerTournamentResult[];
+
+      return mapped
+        .filter(r => r.tournament_end_date)
+        .sort(
+          (a, b) =>
+            new Date(b.tournament_end_date).getTime() -
+            new Date(a.tournament_end_date).getTime()
+        )
+        .slice(0, limit);
     },
     enabled: !!playerId,
     staleTime: 5 * 60 * 1000,
