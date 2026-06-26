@@ -35,6 +35,7 @@ const TICKER_BAR_H = 34;
 const CHAMPION_BAND_H = 62;
 const UPCOMING_BAND_H = 104;
 const LIVE_BOTTOM_H = CHAMPION_BAND_H + TICKER_BAR_H;
+const LIVE_BOARD_H = 210; // header + up to 3 rows + footer
 const RESULTS_FOOTER_H = 34;
 const BOTTOM_STACK_H = TICKER_BAR_H + CHAMPION_BAND_H;
 import { getPlayerHeadshotCandidates } from '@/utils/playerHeadshot';
