@@ -1287,6 +1287,17 @@ export function Composer({
         })}
       </BottomSheet>
 
+      <ScheduleSheet
+        open={scheduleSheetOpen}
+        busy={isSubmitting}
+        onCancel={() => setScheduleSheetOpen(false)}
+        onConfirm={async (when) => {
+          setScheduleSheetOpen(false);
+          await handleShare(when);
+        }}
+      />
+
+
       <BottomSheet
         open={visibilitySheetOpen}
         onClose={() => setVisibilitySheetOpen(false)}
