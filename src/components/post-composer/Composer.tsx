@@ -1480,12 +1480,13 @@ function MediaPreview({
           }}
         >
           <MediaStage
-            item={item}
+            item={{ ...item, restoredFromStream: !!item.restoredStreamId }}
             frame={item.frame}
             height={360}
             borderRadius={14}
             showPlayGlyph={item.type === 'video'}
           />
+
         </button>
         <CornerButton top right onClick={() => onEditItem(0)} ariaLabel="Edit">
           <Pencil size={14} strokeWidth={2.25} />
