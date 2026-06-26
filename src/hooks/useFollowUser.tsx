@@ -7,6 +7,7 @@ import { useSupabaseSession } from './useSupabaseSession';
 import { toast } from 'sonner';
 import { AppLog } from '@/lib/logger';
 import { useToggleFollow } from '@/hooks/useToggleFollow';
+import { useActiveActor } from '@/context/ActiveActorContext';
 
 export const useFollowUser = () => {
   if (typeof process !== 'undefined' && process.env?.NODE_ENV === 'development') {
