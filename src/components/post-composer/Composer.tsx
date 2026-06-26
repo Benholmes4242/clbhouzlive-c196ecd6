@@ -132,6 +132,13 @@ export function Composer({
   const [keyboardHeight, setKeyboardHeight] = useState(0);
   const captionRef = useRef<HTMLTextAreaElement>(null);
 
+  // Draft state — currentDraftId is the row we update on save (set after first
+  // save OR when resuming an existing draft). isDirty tracks whether we have
+  // unsaved changes since the last save/resume.
+  const [currentDraftId, setCurrentDraftId] = useState<string | null>(draftId);
+  const [isSavingDraft, setIsSavingDraft] = useState(false);
+  const [isDirty, setIsDirty] = useState(false);
+
 
   const displayActor = useMemo(() => {
     if (activeActor) return activeActor;
