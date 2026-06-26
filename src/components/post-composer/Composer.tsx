@@ -611,8 +611,10 @@ export function Composer({
 
 
 
-  const handleShare = useCallback(async () => {
+  const handleShare = useCallback(async (scheduledAt: Date | null = null) => {
     if (!canPost) return;
+    // Scheduling is not allowed on an existing published post — that's "update", not "schedule".
+    if (scheduledAt && isEditMode) return;
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) {
       toast.error('You must be signed in to post');
