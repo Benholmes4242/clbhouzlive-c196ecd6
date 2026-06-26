@@ -29,12 +29,15 @@ export interface UseMessagingReturn {
 export function useMessaging(): UseMessagingReturn {
   const { user } = useSupabaseSession();
   const queryClient = useQueryClient();
+  const { activeActor } = useActiveActor();
+  const actorType: TargetActorType = (activeActor?.type === 'business' ? 'business' : 'personal');
+  const actorId: string | undefined = activeActor?.id ?? user?.id;
   const [conversations, setConversations] = useState<ConversationWithDetails[]>([]);
   const [initialLoading, setInitialLoading] = useState(true);
   const [error, setError] = useState<Error | null>(null);
 
   const fetchConversations = useCallback(async (isBackground = false) => {
-    if (!user) {
+    if (!user || !actorId) {
       setConversations([]);
       setInitialLoading(false);
       return;
@@ -46,12 +49,23 @@ export function useMessaging(): UseMessagingReturn {
     setError(null);
 
     try {
-      // Step 1: Get all conversation IDs where user is a participant (not archived)
-      const { data: participantData, error: participantError } = await supabase
+      // Step 1: Get all conversation IDs where the ACTIVE actor is a participant (not archived)
+      let participantQuery = supabase
         .from('conversation_participants')
-        .select('conversation_id, last_read_at')
-        .eq('user_id', user.id)
+        .select('conversation_id, last_read_at, actor_type, actor_id')
         .eq('is_archived', false);
+
+      if (actorType === 'business') {
+        participantQuery = participantQuery
+          .eq('actor_type', 'business')
+          .eq('actor_id', actorId);
+      } else {
+        participantQuery = participantQuery
+          .eq('actor_type', 'personal')
+          .eq('user_id', user.id);
+      }
+
+      const { data: participantData, error: participantError } = await participantQuery;
 
       if (participantError) throw participantError;
 
