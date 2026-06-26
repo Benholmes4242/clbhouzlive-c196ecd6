@@ -383,14 +383,12 @@ export const CardFeed: React.FC<CardFeedProps> = ({
         }
         return;
       }
-      // Confirm still at top before engaging
-      if (getScrollTop() > 0) {
+      // Only check scrollTop BEFORE we've engaged; once engaged we own the gesture.
+      if (!activelyPullingRef.current && getScrollTop() > 0) {
         armedRef.current = false;
-        activelyPullingRef.current = false;
-        pullRef.current = 0;
-        setPull(0);
         return;
       }
+
       activelyPullingRef.current = true;
       const next = Math.min(dy * 0.5, PTR_MAX_PULL);
       pullRef.current = next;
