@@ -2,21 +2,24 @@ import { useState, useEffect, useCallback, useRef } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useQueryClient } from '@tanstack/react-query';
+import { useActiveActor } from '@/context/ActiveActorContext';
 import { AppLog } from '@/lib/logger';
-import type { 
-  ConversationWithDetails, 
+import type {
+  ConversationWithDetails,
   ParticipantWithProfile,
   ParticipantProfile,
   ConversationParticipant,
   MessageType
 } from '@/types/messaging';
 
+type TargetActorType = 'personal' | 'business';
+
 export interface UseMessagingReturn {
   conversations: ConversationWithDetails[];
   loading: boolean;
   error: Error | null;
   fetchConversations: (isBackground?: boolean) => Promise<void>;
-  getOrCreateDM: (otherUserId: string) => Promise<string | null>;
+  getOrCreateDM: (targetActorId: string, targetActorType?: TargetActorType) => Promise<string | null>;
   createGroupChat: (name: string, participantIds: string[], avatarUrl?: string) => Promise<string | null>;
   markAsRead: (conversationId: string) => Promise<void>;
   sendMessage: (conversationId: string, content: string, messageType?: MessageType, mediaUrl?: string | null, mediaMetadata?: Record<string, unknown> | null, replyToId?: string | null) => Promise<string | null>;
@@ -26,12 +29,15 @@ export interface UseMessagingReturn {
 export function useMessaging(): UseMessagingReturn {
   const { user } = useSupabaseSession();
   const queryClient = useQueryClient();
+  const { activeActor } = useActiveActor();
+  const actorType: TargetActorType = (activeActor?.type === 'business' ? 'business' : 'personal');
+  const actorId: string | undefined = activeActor?.id ?? user?.id;
   const [conversations, setConversations] = useState<ConversationWithDetails[]>([]);
   const [initialLoading, setInitialLoading] = useState(true);
   const [error, setError] = useState<Error | null>(null);
 
   const fetchConversations = useCallback(async (isBackground = false) => {
-    if (!user) {
+    if (!user || !actorId) {
       setConversations([]);
       setInitialLoading(false);
       return;
@@ -43,12 +49,23 @@ export function useMessaging(): UseMessagingReturn {
     setError(null);
 
     try {
-      // Step 1: Get all conversation IDs where user is a participant (not archived)
-      const { data: participantData, error: participantError } = await supabase
+      // Step 1: Get all conversation IDs where the ACTIVE actor is a participant (not archived)
+      let participantQuery = supabase
         .from('conversation_participants')
-        .select('conversation_id, last_read_at')
-        .eq('user_id', user.id)
+        .select('conversation_id, last_read_at, actor_type, actor_id')
         .eq('is_archived', false);
+
+      if (actorType === 'business') {
+        participantQuery = participantQuery
+          .eq('actor_type', 'business')
+          .eq('actor_id', actorId);
+      } else {
+        participantQuery = participantQuery
+          .eq('actor_type', 'personal')
+          .eq('user_id', user.id);
+      }
+
+      const { data: participantData, error: participantError } = await participantQuery;
 
       if (participantError) throw participantError;
 
@@ -209,31 +226,38 @@ export function useMessaging(): UseMessagingReturn {
     } finally {
       setInitialLoading(false);
     }
-  }, [user]);
+  }, [user, actorType, actorId]);
 
   /**
-   * Get or create a direct message conversation with another user
+   * Get or create a direct message conversation.
+   * Caller is the ACTIVE actor; target may be a personal user or a business.
    */
-  const getOrCreateDM = useCallback(async (otherUserId: string): Promise<string | null> => {
-    if (!user) return null;
+  const getOrCreateDM = useCallback(async (
+    targetActorId: string,
+    targetActorType: TargetActorType = 'personal',
+  ): Promise<string | null> => {
+    if (!user || !actorId) return null;
 
     try {
       const { data, error } = await supabase.rpc('get_or_create_dm_conversation', {
-        other_user_id: otherUserId,
+        p_caller_actor_type: actorType,
+        p_caller_actor_id: actorId,
+        p_target_actor_type: targetActorType,
+        p_target_actor_id: targetActorId,
       });
 
       if (error) throw error;
-      
+
       // Refresh conversations after creating/getting DM
       await fetchConversations(true);
-      
+
       return data as string;
     } catch (err) {
       AppLog.error('[useMessaging]', 'Error getting/creating DM:', err);
       setError(err instanceof Error ? err : new Error('Failed to get or create DM'));
       return null;
     }
-  }, [user, fetchConversations]);
+  }, [user, actorType, actorId, fetchConversations]);
 
   /**
    * Create a new group chat with specified participants
@@ -265,55 +289,65 @@ export function useMessaging(): UseMessagingReturn {
    * Mark a conversation as read (updates last_read_at)
    */
   const markAsRead = useCallback(async (conversationId: string): Promise<void> => {
-    if (!user) return;
+    if (!user || !actorId) return;
 
     try {
-      // 1. Mark conversation as read in messaging system
+      // 1. Mark conversation as read for the ACTIVE actor's participant row
       const { error } = await supabase.rpc('mark_conversation_read', {
         p_conversation_id: conversationId,
+        p_actor_type: actorType,
+        p_actor_id: actorId,
       });
 
       if (error) throw error;
-      
+
       // 2. Update local state immediately
-      setConversations(prev => 
-        prev.map(conv => 
-          conv.id === conversationId 
+      setConversations(prev =>
+        prev.map(conv =>
+          conv.id === conversationId
             ? { ...conv, unread_count: 0 }
             : conv
         )
       );
-      
-      // 3. Clean up any legacy message notifications for this conversation
-      // (Belt-and-suspenders - the RPC also does this, but we do it client-side too)
-      await supabase
+
+      // 3. Clean up any legacy message notifications for this conversation, scoped to active actor
+      let notifCleanup = supabase
         .from('notifications')
         .update({ is_read: true, read: true })
-        .eq('user_id', user.id)
         .in('type', ['message', 'message_received', 'dm'])
         .eq('is_read', false)
         .contains('data', { conversation_id: conversationId });
-      
+
+      if (actorType === 'business') {
+        notifCleanup = notifCleanup
+          .eq('recipient_actor_type', 'business')
+          .eq('recipient_actor_id', actorId);
+      } else {
+        notifCleanup = notifCleanup.eq('user_id', user.id);
+      }
+      await notifCleanup;
+
       // 4. Invalidate activity/notification queries to update badges
       queryClient.invalidateQueries({ queryKey: ['activity-unread-count'] });
       queryClient.invalidateQueries({ queryKey: ['unread-notifications'] });
+      queryClient.invalidateQueries({ queryKey: ['actor-unread-counts'] });
     } catch (err) {
       AppLog.error('[useMessaging]', 'Error marking as read:', err);
     }
-  }, [user, queryClient]);
+  }, [user, actorType, actorId, queryClient]);
 
   /**
-   * Send a message to a conversation
+   * Send a message to a conversation (stamps active actor as sender)
    */
   const sendMessage = useCallback(async (
-    conversationId: string, 
-    content: string, 
+    conversationId: string,
+    content: string,
     messageType: MessageType = 'text',
     mediaUrl: string | null = null,
     mediaMetadata: Record<string, unknown> | null = null,
     replyToId: string | null = null
   ): Promise<string | null> => {
-    if (!user) return null;
+    if (!user || !actorId) return null;
 
     try {
       const { data, error } = await supabase.rpc('send_message', {
@@ -323,35 +357,39 @@ export function useMessaging(): UseMessagingReturn {
         p_media_url: mediaUrl,
         p_media_metadata: mediaMetadata ? JSON.parse(JSON.stringify(mediaMetadata)) : null,
         p_reply_to_id: replyToId,
+        p_sender_actor_type: actorType,
+        p_sender_actor_id: actorId,
       });
 
       if (error) throw error;
-      
-      // Immediately mark conversation as read since user just sent a message
-      // This ensures their own message doesn't show as unread
+
+      // Immediately mark conversation as read for the active actor since they just sent
       await supabase.rpc('mark_conversation_read', {
         p_conversation_id: conversationId,
+        p_actor_type: actorType,
+        p_actor_id: actorId,
       });
-      
+
       // Update local state immediately to show no unread
-      setConversations(prev => 
-        prev.map(conv => 
-          conv.id === conversationId 
+      setConversations(prev =>
+        prev.map(conv =>
+          conv.id === conversationId
             ? { ...conv, unread_count: 0, last_message_at: new Date().toISOString(), last_message_preview: content }
             : conv
         )
       );
-      
+
       // Invalidate activity/notification queries
       queryClient.invalidateQueries({ queryKey: ['activity-unread-count'] });
-      
+      queryClient.invalidateQueries({ queryKey: ['actor-unread-counts'] });
+
       return data as string;
     } catch (err) {
       AppLog.error('[useMessaging]', 'Error sending message:', err);
       setError(err instanceof Error ? err : new Error('Failed to send message'));
       return null;
     }
-  }, [user, queryClient]);
+  }, [user, actorType, actorId, queryClient]);
 
   /**
    * Get unread count for a specific conversation
@@ -384,17 +422,21 @@ export function useMessaging(): UseMessagingReturn {
     conversationsRef.current = conversations;
   }, [conversations]);
 
-  // Set up realtime subscription for conversation updates
+  // Clear list immediately on actor switch to avoid showing the previous actor's inbox
   useEffect(() => {
-    if (!user) return;
+    setConversations([]);
+    setInitialLoading(true);
+  }, [actorType, actorId]);
 
-    // NOTE: This subscription receives all message INSERT events globally,
-    // then filters client-side to known conversations. This is a known limitation
-    // of Supabase realtime's lack of array-based IN filters. On high-traffic
-    // deployments this should be replaced with a user-scoped message notification
-    // pattern (e.g. a dedicated notification table filtered by user_id).
+  // Set up realtime subscription for conversation updates, scoped to active actor
+  useEffect(() => {
+    if (!user || !actorId) return;
+
+    const channelKey = `${actorType}-${actorId}`;
+
+    // Receives all message INSERT events globally, filters client-side to known conversations
     const messagesChannel = supabase
-      .channel(`conversation-list-messages-${user.id}`)
+      .channel(`conversation-list-messages-${channelKey}`)
       .on(
         'postgres_changes',
         {
@@ -411,17 +453,20 @@ export function useMessaging(): UseMessagingReturn {
       )
       .subscribe();
 
-    // Filter by this user's participation row — avoids a thundering herd where every
-    // connected client re-fetches on any global conversation write.
+    // Filter participant changes to the ACTIVE actor only
+    const participantFilter = actorType === 'business'
+      ? `actor_id=eq.${actorId}`
+      : `user_id=eq.${user.id}`;
+
     const conversationsChannel = supabase
-      .channel(`conversation-list-participants-${user.id}`)
+      .channel(`conversation-list-participants-${channelKey}`)
       .on(
         'postgres_changes',
         {
           event: '*',
           schema: 'public',
           table: 'conversation_participants',
-          filter: `user_id=eq.${user.id}`,
+          filter: participantFilter,
         },
         () => {
           fetchConversations(true);
@@ -433,7 +478,7 @@ export function useMessaging(): UseMessagingReturn {
       supabase.removeChannel(messagesChannel);
       supabase.removeChannel(conversationsChannel);
     };
-  }, [user, fetchConversations]);
+  }, [user, actorType, actorId, fetchConversations]);
 
   return {
     conversations,
