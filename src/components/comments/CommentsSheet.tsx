@@ -29,6 +29,7 @@ import { useActiveActor } from '@/context/ActiveActorContext';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { MentionText } from '@/components/comments/MentionText';
+import { CommentingAsIndicator } from '@/components/comments/CommentingAsIndicator';
 import { relativeTime } from '@/utils/relativeTime';
 import { usePostLikes } from '@/hooks/usePostLikes';
 import { supabase } from '@/integrations/supabase/client';
@@ -1056,6 +1057,9 @@ function CommentsSheet({
                     ))}
                   </div>
                 )}
+
+                {/* Identity cue — only renders when acting as a business */}
+                <CommentingAsIndicator />
 
                 {/* Input row */}
                 <div className="flex items-end gap-2">

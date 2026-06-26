@@ -550,7 +550,7 @@ export const useActivityFeed = (tab: ActivityTabId, chipFilter: ChipFilterKind =
   const recipientActorId = activeActor?.id || user?.id || '';
 
   const query = useQuery({
-    queryKey: ['activity-feed', tab, chipFilter, user?.id],
+    queryKey: ['activity-feed', tab, chipFilter, recipientActorType, recipientActorId, user?.id],
     queryFn: async (): Promise<ActivityFeedResult> => {
       if (!user?.id) {
         return {
@@ -575,8 +575,14 @@ export const useActivityFeed = (tab: ActivityTabId, chipFilter: ChipFilterKind =
         friendUserIds = friendIds;
         mutePrefs = fetchedMutePrefs;
 
-        // Fetch notifications (excluding soft-deleted and messages)
-        const { data: notifications, error } = await supabase
+        // Fetch notifications (excluding soft-deleted and messages).
+        // Per-actor routing:
+        // - Personal actor: rows addressed to this user as personal, plus legacy
+        //   rows where recipient_actor_type is null (kept user_id = me filter).
+        // - Business actor: shared inbox — every manager sees the row, so we
+        //   filter ONLY by recipient_actor (RLS gates membership). Dropping
+        //   user_id = me here is what makes the shared inbox work.
+        let queryBuilder = supabase
           .from('notifications')
           .select(`
             id,
@@ -590,12 +596,22 @@ export const useActivityFeed = (tab: ActivityTabId, chipFilter: ChipFilterKind =
             entity_id,
             data
           `)
-          .eq('user_id', user.id)
           .eq('is_deleted', false)
-          .or(`recipient_actor_type.is.null,and(recipient_actor_type.eq.${recipientActorType},recipient_actor_id.eq.${recipientActorId})`)
           .not('type', 'in', '("message","message_received","dm")')
           .order('created_at', { ascending: false })
           .limit(100);
+
+        if (recipientActorType === 'business') {
+          queryBuilder = queryBuilder
+            .eq('recipient_actor_type', 'business')
+            .eq('recipient_actor_id', recipientActorId);
+        } else {
+          queryBuilder = queryBuilder
+            .eq('user_id', user.id)
+            .or(`recipient_actor_type.is.null,and(recipient_actor_type.eq.personal,recipient_actor_id.eq.${recipientActorId})`);
+        }
+
+        const { data: notifications, error } = await queryBuilder;
 
         if (error) {
           console.error('[useActivityFeed] error', error);

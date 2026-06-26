@@ -4,6 +4,7 @@ import { useActiveActor } from '@/context/ActiveActorContext';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { cn } from '@/lib/utils';
 import { useMessagingContext } from '@/contexts/MessagingContext';
+import { useActorUnreadCounts } from '@/hooks/useActorUnreadCounts';
 
 interface PostingAsPillProps {
   onClick: () => void;
@@ -23,7 +24,12 @@ interface PostingAsPillProps {
 export const PostingAsPill = forwardRef<HTMLButtonElement, PostingAsPillProps>(
   ({ onClick, isOpen, hasUnreadNotifications = false, notificationCount = 0, useLightTheme = false, useGlassTheme = false, useBareTheme = false, compact = false }, ref) => {
     const { activeActor, isLoading } = useActiveActor();
-    
+
+    // Per-actor unread (badge hybrid): show a small dot on the pill when ANY
+    // non-active actor has unread activity — tells the owner "another profile
+    // has activity".
+    const { hasOtherUnread } = useActorUnreadCounts();
+
     // Get unread messages count from messaging system
     const { conversations } = useMessagingContext();
     const hasUnreadMessages = conversations?.some(conv => conv.unread_count > 0) || false;
@@ -83,6 +89,13 @@ export const PostingAsPill = forwardRef<HTMLButtonElement, PostingAsPillProps>(
             <span
               className="absolute -bottom-0.5 -right-0.5 h-2.5 w-2.5 rounded-full bg-emerald-500 ring-[1.5px] ring-black"
               aria-label="Unread messages"
+            />
+          )}
+
+          {hasOtherUnread && !hasUnreadNotifications && (
+            <span
+              className="absolute -top-0.5 -left-0.5 h-2 w-2 rounded-full bg-[#F7931E] ring-[1.5px] ring-black"
+              aria-label="Another profile has unread activity"
             />
           )}
         </button>
@@ -201,6 +214,17 @@ export const PostingAsPill = forwardRef<HTMLButtonElement, PostingAsPillProps>(
                 useLightTheme ? "ring-[1.5px] ring-background" : "ring-[1.5px] ring-black"
               )}
               aria-label="Unread messages"
+            />
+          )}
+
+          {/* Amber micro-dot — another profile (non-active actor) has unread */}
+          {hasOtherUnread && !hasUnreadNotifications && (
+            <span
+              className={cn(
+                "absolute -top-0.5 -left-0.5 h-2 w-2 rounded-full bg-[#F7931E]",
+                useLightTheme ? "ring-[1.5px] ring-background" : "ring-[1.5px] ring-black"
+              )}
+              aria-label="Another profile has unread activity"
             />
           )}
         </div>

@@ -1,7 +1,9 @@
 import { useEffect, useRef, useCallback } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
+import { useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useSupabaseSession } from './useSupabaseSession';
+import { useActiveActor } from '@/context/ActiveActorContext';
 import { toast } from 'sonner';
 
 interface NotificationData {
@@ -105,9 +107,23 @@ export function useInAppNotifications() {
     });
   }, [isViewingConversation, playNotificationSound, navigate]);
 
-  // Subscribe to notification queue
+  // Subscribe to notification queue + invalidate per-actor unread on any new
+  // notification routed to the user OR to a business they manage.
+  const queryClient = useQueryClient();
+  const { availableActors } = useActiveActor();
+  const businessActorIds = availableActors
+    .filter(a => a.type === 'business')
+    .map(a => a.id);
+  const businessKey = businessActorIds.join(',');
+
   useEffect(() => {
     if (!user) return;
+
+    const invalidateUnread = () => {
+      queryClient.invalidateQueries({ queryKey: ['actor-unread-counts'], exact: false });
+      queryClient.invalidateQueries({ queryKey: ['activity-unread-count'], exact: false });
+      queryClient.invalidateQueries({ queryKey: ['activity-feed'], exact: false });
+    };
 
     const channel = supabase
       .channel(`inapp_notifications_${user.id}`)
@@ -129,12 +145,37 @@ export function useInAppNotifications() {
           handleNotification(
             notification.title,
             notification.body,
-            notification.data
+            notification.data,
           );
-        }
+        },
       )
-      .subscribe();
+      // Personal-recipient notification inserts → refresh badges
+      .on(
+        'postgres_changes',
+        {
+          event: 'INSERT',
+          schema: 'public',
+          table: 'notifications',
+          filter: `user_id=eq.${user.id}`,
+        },
+        () => invalidateUnread(),
+      );
 
+    // Business-recipient notification inserts (shared inbox) → refresh badges
+    if (businessActorIds.length > 0) {
+      channel.on(
+        'postgres_changes',
+        {
+          event: 'INSERT',
+          schema: 'public',
+          table: 'notifications',
+          filter: `recipient_actor_id=in.(${businessActorIds.join(',')})`,
+        },
+        () => invalidateUnread(),
+      );
+    }
+
+    channel.subscribe();
     subscriptionRef.current = channel;
 
     return () => {
@@ -143,7 +184,7 @@ export function useInAppNotifications() {
         subscriptionRef.current = null;
       }
     };
-  }, [user, handleNotification]);
+  }, [user, handleNotification, queryClient, businessKey]);
 
   return null;
 }

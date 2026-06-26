@@ -10,6 +10,7 @@ import { useQuery } from '@tanstack/react-query';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useUserProfile } from '@/hooks/useUserProfile';
 import { useUnreadNotifications } from '@/hooks/useUnreadNotifications';
+import { useActorUnreadCounts } from '@/hooks/useActorUnreadCounts';
 import { useMessagingContext } from '@/contexts/MessagingContext';
 import { useIsMobile } from '@/hooks/useIsMobile';
 import { cn } from '@/lib/utils';
@@ -35,6 +36,8 @@ export function PostingAsMenu({ isOpen, onClose, useLightTheme = false, anchorRe
   const { user } = useSupabaseSession();
   const { data: userProfile, isLoading: isProfileLoading } = useUserProfile(user?.id);
   const { hasUnread, unreadCount: unreadNotificationCount } = useUnreadNotifications();
+  const { countFor: actorUnreadFor } = useActorUnreadCounts();
+
   
   // Get unread messages from shared messaging context
   const { conversations } = useMessagingContext();
@@ -302,7 +305,8 @@ export function PostingAsMenu({ isOpen, onClose, useLightTheme = false, anchorRe
               
               const renderActorButton = (actor: typeof availableActors[0]) => {
                 const isActive = activeActor?.type === actor.type && activeActor?.id === actor.id;
-                
+                const actorUnread = actorUnreadFor(actor.type, actor.id);
+
                 return (
                   <button
                     key={`${actor.type}-${actor.id}`}
@@ -325,13 +329,26 @@ export function PostingAsMenu({ isOpen, onClose, useLightTheme = false, anchorRe
                           : "hover:bg-white/5 border border-transparent"
                     )}
                   >
-                    <SquircleAvatar
-                      size={28}
-                      src={actor.avatarUrl}
-                      alt={actor.name}
-                      userId={actor.id}
-                      hideRing
-                    />
+                    <div className="relative flex-shrink-0">
+                      <SquircleAvatar
+                        size={28}
+                        src={actor.avatarUrl}
+                        alt={actor.name}
+                        userId={actor.id}
+                        hideRing
+                      />
+                      {!isActive && actorUnread > 0 && (
+                        <span
+                          className={cn(
+                            "absolute -top-0.5 -right-0.5 min-w-[16px] h-[16px] px-1 rounded-full bg-[#F7931E] text-white text-[9px] font-bold flex items-center justify-center",
+                            useLightTheme ? "ring-[1.5px] ring-background" : "ring-[1.5px] ring-[#15171F]"
+                          )}
+                          aria-label={`${actorUnread} unread for ${actor.name}`}
+                        >
+                          {actorUnread > 99 ? '99+' : actorUnread}
+                        </span>
+                      )}
+                    </div>
                     <div className="flex-1 text-left min-w-0">
                       <div className="flex items-center gap-1.5">
                         <span className={cn(

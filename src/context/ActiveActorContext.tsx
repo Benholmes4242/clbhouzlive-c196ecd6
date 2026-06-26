@@ -178,6 +178,10 @@ export function ActiveActorProvider({ children }: { children: ReactNode }) {
         for (const key of keyGroups) {
           queryClient.invalidateQueries({ queryKey: key as unknown[], exact: false });
         }
+        // Per-actor activity inbox + bell + switcher badges must flip with actor
+        queryClient.invalidateQueries({ queryKey: ['activity-feed'], exact: false });
+        queryClient.invalidateQueries({ queryKey: ['activity-unread-count'], exact: false });
+        queryClient.invalidateQueries({ queryKey: ['actor-unread-counts'], exact: false });
       }
     }
   };
