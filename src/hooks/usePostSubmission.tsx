@@ -22,6 +22,12 @@ export type MediaInput =
       width?: number | null;
       height?: number | null;
       durationSeconds?: number | null;
+    }
+  | {
+      kind: 'restoredImage';
+      mediaUrl: string;
+      width?: number | null;
+      height?: number | null;
     };
 
 interface PostSubmissionData {
