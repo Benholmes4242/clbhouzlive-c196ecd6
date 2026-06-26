@@ -695,7 +695,7 @@ function GlobalSearchOverlay({ isOpen, onClose }: GlobalSearchOverlayProps) {
                           </div>
                         </div>
                       ))}
-                      {hasQuery && clubs.length === 0 && (
+                      {hasQuery && clubs.length === 0 && !matchedNonCourse && (
                         <div className="px-4 py-3">
                           <RequestCourseCTA
                             variant="hero"
