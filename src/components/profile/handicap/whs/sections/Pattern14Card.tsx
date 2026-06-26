@@ -354,7 +354,7 @@ const SummaryStat: React.FC<{
   label: string;
   color: string;
 }> = ({ value, label, color }) => (
-  <div style={{ display: 'flex', alignItems: 'baseline', gap: 6 }}>
+  <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 3 }}>
     <span
       style={{
         fontSize: 22,
@@ -374,6 +374,8 @@ const SummaryStat: React.FC<{
         letterSpacing: '0.16em',
         textTransform: 'uppercase',
         color: 'var(--hcp-t-60)',
+        whiteSpace: 'nowrap',
+        textAlign: 'center',
       }}
     >
       {label}
