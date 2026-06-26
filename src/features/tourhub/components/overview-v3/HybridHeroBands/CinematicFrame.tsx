@@ -1243,9 +1243,11 @@ export function CinematicFrame({
                       hideRing
                     />
                     <span style={{ flex: 1, minWidth: 0, fontSize: 14, fontWeight: 600, color: 'white', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{name}</span>
-                    <span style={{ ...NUMERIC_STYLE, width: COL_TODAY, textAlign: 'right', fontSize: 13, fontWeight: 700, color: scoreColor(today) }}>
-                      {today == null ? '—' : fmtScore(today)}
-                    </span>
+                    {anyToday && (
+                      <span style={{ ...NUMERIC_STYLE, width: COL_TODAY, textAlign: 'right', fontSize: 13, fontWeight: 700, color: scoreColor(today) }}>
+                        {today == null ? '—' : fmtScore(today)}
+                      </span>
+                    )}
                     <span style={{ ...NUMERIC_STYLE, width: COL_TOTAL, textAlign: 'right', fontSize: 16, fontWeight: 800, letterSpacing: '-0.02em', color: scoreColor(entry?.score) }}>
                       {fmtScore(entry?.score)}
                     </span>
