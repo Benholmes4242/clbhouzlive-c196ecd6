@@ -213,6 +213,24 @@ export const usePostSubmission = () => {
               return { success: true, fileName: `restored-${input.streamId}` };
             }
 
+            if (input.kind === 'restoredImage') {
+              // Image already on R2 — re-attach by URL, no upload.
+              const { error: mediaError } = await supabase
+                .from('post_media')
+                .insert({
+                  post_id: postData.id,
+                  media_type: 'image',
+                  media_url: input.mediaUrl,
+                  width: input.width ?? null,
+                  height: input.height ?? null,
+                  aspect_ratio:
+                    input.width && input.height ? input.width / input.height : null,
+                  display_order: index,
+                });
+              if (mediaError) throw mediaError;
+              return { success: true, fileName: `restored-image-${index}` };
+            }
+
             const file = input.file;
             const fileName = `${Date.now()}-${index}-${Math.random().toString(36).substring(2, 15)}`;
             const fileExtension = file.name.split('.').pop();
