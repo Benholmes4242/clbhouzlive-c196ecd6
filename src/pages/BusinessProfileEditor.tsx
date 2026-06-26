@@ -826,6 +826,11 @@ export default function BusinessProfileEditor() {
 
           <SocialSection social={social} setSocial={setSocial} />
 
+          {mode === 'edit' && business?.id && (
+            <NotificationsSection businessId={business.id} />
+          )}
+
+
           {/* Inline Save — bottom, matches personal Edit Profile */}
           <div className="px-4 pt-6 pb-2">
             <button
