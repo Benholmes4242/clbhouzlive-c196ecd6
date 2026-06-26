@@ -46,6 +46,14 @@ import {
 } from './composerMedia';
 
 import type { TaggedCourse, StudioActorType } from './types';
+import {
+  createDraft,
+  updateDraft,
+  deleteDraft,
+  getDraft,
+} from '@/services/drafts/draftService';
+import { uploadAllDraftMedia } from '@/services/drafts/draftMediaUpload';
+import type { DraftCourseData } from '@/services/drafts/types';
 
 const MAX_CAPTION = 2000;
 const MAX_POST_MEDIA = 10;
