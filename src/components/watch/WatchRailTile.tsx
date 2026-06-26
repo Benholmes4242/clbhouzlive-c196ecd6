@@ -137,10 +137,10 @@ export default function WatchRailTile({
         flexShrink: 0,
         position: 'relative',
         width,
-        borderRadius: 6,
+        borderRadius: radius,
         overflow: 'hidden',
         cursor: 'pointer',
-        aspectRatio: '3/4',
+        aspectRatio,
       }}
       onClick={handleClick}
     >
