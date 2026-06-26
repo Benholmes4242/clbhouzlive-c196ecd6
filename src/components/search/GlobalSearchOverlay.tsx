@@ -299,6 +299,8 @@ function GlobalSearchOverlay({ isOpen, onClose }: GlobalSearchOverlayProps) {
   const showPeople = typeFilter === 'all' || typeFilter === 'people';
   const showBusinesses = typeFilter === 'all' || typeFilter === 'businesses';
 
+  const matchedNonCourse = people.length > 0 || businesses.length > 0;
+
   return createPortal(
     <AnimatePresence>
       {isOpen && (
@@ -600,8 +602,8 @@ function GlobalSearchOverlay({ isOpen, onClose }: GlobalSearchOverlayProps) {
                 <motion.div key="search-results" {...FADE_PROPS}>
                   {/* Courses */}
                   {showCourses && (clubs.length > 0 || hasQuery) && (
-                    <div>
-                      <SectionHeader label="Courses" />
+                  <div>
+                      {clubs.length > 0 && <SectionHeader label="Courses" />}
                       {clubs.map(course => (
                         <div key={course.id}>
                           <button
@@ -693,7 +695,7 @@ function GlobalSearchOverlay({ isOpen, onClose }: GlobalSearchOverlayProps) {
                           </div>
                         </div>
                       ))}
-                      {hasQuery && clubs.length === 0 && (
+                      {hasQuery && clubs.length === 0 && !matchedNonCourse && (
                         <div className="px-4 py-3">
                           <RequestCourseCTA
                             variant="hero"
@@ -702,7 +704,7 @@ function GlobalSearchOverlay({ isOpen, onClose }: GlobalSearchOverlayProps) {
                           />
                         </div>
                       )}
-                      {hasQuery && clubs.length > 0 && (
+                      {hasQuery && (clubs.length > 0 || matchedNonCourse) && (
                         <RequestCourseCTA
                           variant="row"
                           prefillName={debouncedQuery}
