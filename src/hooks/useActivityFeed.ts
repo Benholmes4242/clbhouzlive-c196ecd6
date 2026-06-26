@@ -178,8 +178,17 @@ function getTimeAgo(dateString: string): string {
   return date.toLocaleDateString('en-GB', { day: 'numeric', month: 'short' });
 }
 
+const COMMENT_CONTEXT_TYPES = new Set(['comment', 'comment_post', 'comment_reply']);
+
 function getContextUrl(notification: any): string {
   const { type, entity_type, entity_id, data, actor_id } = notification;
+
+  if (COMMENT_CONTEXT_TYPES.has(type)) {
+    const postId = data?.post_id ?? (entity_type === 'post' ? entity_id : undefined);
+    const commentId = data?.comment_id;
+    if (postId && commentId) return `/post/${postId}/comment/${commentId}`;
+    if (postId) return `/post/${postId}?openComments=1`;
+  }
 
   if (entity_type === 'post' && entity_id) {
     return `/post/${entity_id}`;
