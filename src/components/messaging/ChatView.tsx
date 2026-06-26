@@ -114,6 +114,15 @@ function DateSeparator({ date }: { date: string }) {
 
 export function ChatView({ conversationId, onBack }: ChatViewProps) {
   const { user } = useSupabaseSession();
+  const { activeActor } = useActiveActor();
+  const activeType: 'personal' | 'business' = activeActor?.type === 'business' ? 'business' : 'personal';
+  const activeId: string | undefined = activeActor?.id ?? user?.id;
+  const isOtherParticipant = useCallback((p: ParticipantWithProfile | ConversationParticipant) => {
+    if (!activeId) return true;
+    const pType = ((p as ParticipantWithProfile).actor_type ?? 'personal') as 'personal' | 'business';
+    const pId = pType === 'business' ? ((p as ParticipantWithProfile).actor_id ?? null) : p.user_id;
+    return !(pType === activeType && pId === activeId);
+  }, [activeType, activeId]);
   const { conversations, markAsRead, fetchConversations } = useMessagingContext();
   const { 
     messages, 
