@@ -1542,12 +1542,13 @@ function MediaPreview({
             }}
           >
             <MediaStage
-              item={item}
+              item={{ ...item, restoredFromStream: !!item.restoredStreamId }}
               frame={item.frame}
               height={TILE}
               borderRadius={TILE_RADIUS}
               showPlayGlyph={item.type === 'video'}
             />
+
           </button>
           <CornerButton top right onClick={() => onRemoveItem(i)} ariaLabel="Remove" small>
             <X size={12} strokeWidth={2.5} />
