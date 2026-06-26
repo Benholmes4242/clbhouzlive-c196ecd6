@@ -302,7 +302,7 @@ export function Composer({
       if (rehydrated.length) setMediaItems(rehydrated);
       if (skippedVideos > 0) {
         toast('Some videos were skipped', {
-          description: 'Drafted videos can\'t be resumed in this version.',
+          description: "Drafted videos can't be resumed in this version.",
         });
       }
       // Resumed drafts start clean — only mark dirty when the user changes
