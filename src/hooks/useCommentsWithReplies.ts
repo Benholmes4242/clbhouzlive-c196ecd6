@@ -591,12 +591,16 @@ export function useCommentsWithReplies(
           .eq('actor_type', actorType)
           .eq('actor_id', actorId);
       } else {
-        await supabase.from('comment_likes').insert({
-          comment_id: commentId,
-          user_id: user.id,
-          actor_type: actorType,
-          actor_id: actorId,
-        });
+        // Idempotent upsert — avoids 409 unique-violation on double-tap.
+        await supabase.from('comment_likes').upsert(
+          {
+            comment_id: commentId,
+            user_id: user.id,
+            actor_type: actorType,
+            actor_id: actorId,
+          },
+          { onConflict: 'comment_id,actor_type,actor_id', ignoreDuplicates: true },
+        );
       }
     },
     onMutate: async (commentId) => {
