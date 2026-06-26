@@ -1180,16 +1180,6 @@ export function CinematicFrame({
         const anyToday = rows.some((r: any) => r?.kind === 'solo' && r?.entry?.today != null);
 
         return (
-          <>
-            {/* Seam feather: gradient bridge from photo into glass board */}
-            <div
-              aria-hidden
-              style={{
-                position: 'absolute', left: 0, right: 0, bottom: 'var(--cf-board-h, 0px)',
-                height: 24, marginBottom: -1, zIndex: 4, pointerEvents: 'none',
-                background: 'linear-gradient(to bottom, rgba(10,14,20,0) 0%, rgba(10,14,20,0.42) 100%)',
-              }}
-            />
           <button
             type="button"
             onClick={onCtaTap}
@@ -1205,6 +1195,15 @@ export function CinematicFrame({
               boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.12)',
             }}
           >
+            {/* Seam feather: gradient bridge from photo into glass board */}
+            <div
+              aria-hidden
+              style={{
+                position: 'absolute', left: 0, right: 0, top: -24,
+                height: 24, pointerEvents: 'none',
+                background: 'linear-gradient(to bottom, rgba(10,14,20,0) 0%, rgba(10,14,20,0.42) 100%)',
+              }}
+            />
             {/* Column header row */}
             <div
               style={{
