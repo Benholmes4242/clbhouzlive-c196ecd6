@@ -243,11 +243,27 @@ export const FeedImageCarousel = memo(function FeedImageCarousel({
         }, 300);
       }
     } else {
+      // Tap-to-advance (left/right edge zones), only if no swipe lock & negligible movement
+      if (t.locked === 'none') {
+        const movedX = Math.abs(t.lastX - t.startX);
+        const movedY = Math.abs(t.lastY - t.startY);
+        if (movedX <= 8 && movedY <= 8) {
+          const rect = containerRef.current?.getBoundingClientRect();
+          if (rect && rect.width > 0) {
+            const tapX = t.startX - rect.left;
+            if (tapX < rect.width * 0.33) {
+              goTo(currentSlide - 1);
+            } else if (tapX > rect.width * 0.67) {
+              goTo(currentSlide + 1);
+            }
+          }
+        }
+      }
       setIsDragging(false);
       setSwipeOffset(0);
     }
 
-    touchRef.current = { startX: 0, startY: 0, locked: 'none', swiping: false };
+    touchRef.current = { startX: 0, startY: 0, lastX: 0, lastY: 0, locked: 'none', swiping: false };
   }, [swipeOffset, currentSlide, mediaItems.length, goTo, isAnimating, isImageZoomed]);
 
   const getSlideTransform = (idx: number): { translateX: string; opacity: number; pointerEvents: 'auto' | 'none' } => {
