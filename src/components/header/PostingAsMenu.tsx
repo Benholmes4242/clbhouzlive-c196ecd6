@@ -36,6 +36,8 @@ export function PostingAsMenu({ isOpen, onClose, useLightTheme = false, anchorRe
   const { user } = useSupabaseSession();
   const { data: userProfile, isLoading: isProfileLoading } = useUserProfile(user?.id);
   const { hasUnread, unreadCount: unreadNotificationCount } = useUnreadNotifications();
+  const { countFor: actorUnreadFor } = useActorUnreadCounts();
+
   
   // Get unread messages from shared messaging context
   const { conversations } = useMessagingContext();
