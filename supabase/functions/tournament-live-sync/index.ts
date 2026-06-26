@@ -289,14 +289,21 @@ async function deriveActiveRound(supabase: any, tournamentId: string): Promise<n
   const recorded = (r: number) =>
     roundCheck.filter((e: any) => e[`round_${r}`] != null).length;
 
-  // Active round = the lowest round that SOME players have started but NOT ALL have completed.
+  // Active round = highest round number with meaningful field participation.
+  // A round counts as "underway" once enough players have a score in it — this
+  // ignores WD/DQ/straggler gaps in earlier rounds and avoids over-advancing on
+  // a single early poster.
+  const MIN_FRACTION = 0.10;
+  const MIN_PLAYERS = 5;
+  const threshold = Math.max(MIN_PLAYERS, Math.ceil(fieldSize * MIN_FRACTION));
+
   let active = 1;
   for (let r = 1; r <= 4; r++) {
-    const n = recorded(r);
-    if (n === 0) break;            // nobody has reached round r → active is the previous round
-    active = r;                    // at least one player has a score for r
-    if (n < fieldSize) break;      // not everyone finished r → r is the active (in-progress) round
-    // n === fieldSize → everyone finished r → look at r+1
+    if (recorded(r) >= threshold) {
+      active = r;
+    } else {
+      break;
+    }
   }
   return active;
 }
