@@ -401,7 +401,9 @@ export const UserListPage: React.FC<UserListPageProps> = ({
     activeMode === 'followers' ? 'followers' : 'following';
 
   // Social counts for filter chips (uses profile owner's userId, not viewer's)
-  const { data: socialCounts } = useSocialCounts(profileUserId);
+  const { data: socialCounts } = useSocialCounts(
+    profileUserId ? { type: profileActorType, id: profileUserId } : undefined,
+  );
   const friendsCount = socialCounts?.friends ?? 0;
 
   // Pending count is approximate — only counts relationships in the currently
