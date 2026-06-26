@@ -156,21 +156,30 @@ export function useConversationMessages(conversationId: string | null): UseConve
       }
 
       // Build messages with sender info
-      const messagesWithSender: MessageWithSender[] = messagesData.map(m => ({
-        id: m.id,
-        conversation_id: m.conversation_id,
-        sender_id: m.sender_id,
-        content: m.content,
-        message_type: m.message_type as MessageWithSender['message_type'],
-        media_url: m.media_url,
-        media_metadata: m.media_metadata as Record<string, unknown> | null,
-        reply_to_id: m.reply_to_id,
-        is_edited: m.is_edited || false,
-        edited_at: m.edited_at,
-        deleted_at: m.deleted_at,
-        created_at: m.created_at,
-        sender: m.sender_id ? profilesMap.get(m.sender_id) || null : null,
-      }));
+      const messagesWithSender: MessageWithSender[] = messagesData.map(m => {
+        const aType = ((m as { sender_actor_type?: string | null }).sender_actor_type ?? 'personal') as 'personal' | 'business';
+        const aId = (m as { sender_actor_id?: string | null }).sender_actor_id ?? null;
+        const sender = aType === 'business' && aId
+          ? businessMap.get(aId) ?? null
+          : (m.sender_id ? profilesMap.get(m.sender_id) || null : null);
+        return {
+          id: m.id,
+          conversation_id: m.conversation_id,
+          sender_id: m.sender_id,
+          sender_actor_type: aType,
+          sender_actor_id: aId,
+          content: m.content,
+          message_type: m.message_type as MessageWithSender['message_type'],
+          media_url: m.media_url,
+          media_metadata: m.media_metadata as Record<string, unknown> | null,
+          reply_to_id: m.reply_to_id,
+          is_edited: m.is_edited || false,
+          edited_at: m.edited_at,
+          deleted_at: m.deleted_at,
+          created_at: m.created_at,
+          sender,
+        };
+      });
 
       // Reverse to show oldest first (chat order)
       const orderedMessages = messagesWithSender.reverse();
