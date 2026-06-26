@@ -144,9 +144,17 @@ export function DraftsListSheet({ open, onClose, onSelect }: DraftsListSheetProp
             const caption = (d.content ?? '').trim();
             const captionPreview = caption || 'No caption';
             return (
-              <button
+              <div
+                role="button"
+                tabIndex={0}
                 key={d.id}
                 onClick={() => onSelect(d.id)}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    onSelect(d.id);
+                  }
+                }}
                 style={{
                   width: '100%',
                   display: 'flex',
