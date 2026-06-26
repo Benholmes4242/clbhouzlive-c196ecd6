@@ -383,14 +383,12 @@ export const CardFeed: React.FC<CardFeedProps> = ({
         }
         return;
       }
-      // Confirm still at top before engaging
-      if (getScrollTop() > 0) {
+      // Only check scrollTop BEFORE we've engaged; once engaged we own the gesture.
+      if (!activelyPullingRef.current && getScrollTop() > 0) {
         armedRef.current = false;
-        activelyPullingRef.current = false;
-        pullRef.current = 0;
-        setPull(0);
         return;
       }
+
       activelyPullingRef.current = true;
       const next = Math.min(dy * 0.5, PTR_MAX_PULL);
       pullRef.current = next;
@@ -493,18 +491,28 @@ export const CardFeed: React.FC<CardFeedProps> = ({
           <style>{`@keyframes ptrSpin { to { transform: rotate(360deg); } }`}</style>
         </div>
       )}
-      <Virtuoso
-        ref={virtuosoRef}
-        data={posts}
-        itemContent={itemContent}
-        computeItemKey={(_, post) => post.id}
-        rangeChanged={handleRangeChanged}
-        endReached={handleEndReached}
-        increaseViewportBy={{ top: 400, bottom: 800 }}
-        overscan={{ main: 400, reverse: 400 }}
-        components={components}
-        style={{ height: '100%', width: '100%' }}
-      />
+      <div
+        style={{
+          height: '100%',
+          transform: `translateY(${isRefreshing ? PTR_THRESHOLD : pull}px)`,
+          transition: activelyPullingRef.current ? 'none' : 'transform 220ms cubic-bezier(0.22, 1, 0.36, 1)',
+          willChange: 'transform',
+        }}
+      >
+        <Virtuoso
+          ref={virtuosoRef}
+          data={posts}
+          itemContent={itemContent}
+          computeItemKey={(_, post) => post.id}
+          rangeChanged={handleRangeChanged}
+          endReached={handleEndReached}
+          increaseViewportBy={{ top: 400, bottom: 800 }}
+          overscan={{ main: 400, reverse: 400 }}
+          components={components}
+          style={{ height: '100%', width: '100%' }}
+        />
+      </div>
+
     </div>
   );
 };
