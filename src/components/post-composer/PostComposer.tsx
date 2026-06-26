@@ -11,6 +11,8 @@ import { ComposerChooser } from './ComposerChooser';
 import { Composer } from './Composer';
 import { MediaEditor } from './MediaEditor';
 import { CourseSearchSheet } from './CourseSearchSheet';
+import { DraftsListSheet } from './DraftsListSheet';
+import { usePostStudioStore } from '@/stores/usePostStudioStore';
 import type { ComposerMediaItem } from './composerMedia';
 import type { StudioActorType, TaggedCourse } from './types';
 
@@ -24,6 +26,8 @@ interface PostComposerProps {
   initialActorId?: string | null;
   /** When set, opens the Composer in edit mode against this existing post id. */
   editPostId?: string | null;
+  /** When set, opens the Composer resuming this saved draft. */
+  draftId?: string | null;
 }
 
 export function PostComposer({
@@ -33,12 +37,14 @@ export function PostComposer({
   initialActorType = 'personal',
   initialActorId = null,
   editPostId = null,
+  draftId = null,
 }: PostComposerProps) {
   const navigate = useNavigate();
   const { availableActors } = useActiveActor();
 
   const [screen, setScreen] = useState<Screen>('choose');
   const [reviewCourseSheetOpen, setReviewCourseSheetOpen] = useState(false);
+  const [draftsListOpen, setDraftsListOpen] = useState(false);
 
   // Shared media state — lives on the shell so the Editor can read/update it.
   const [mediaItems, setMediaItems] = useState<ComposerMediaItem[]>([]);
@@ -46,6 +52,7 @@ export function PostComposer({
 
   const isBusiness = initialActorType === 'business';
   const isEditMode = !!editPostId;
+  const isDraftMode = !!draftId;
 
   const actorInfo = useMemo(() => {
     if (isBusiness && initialActorId) {
@@ -62,11 +69,12 @@ export function PostComposer({
       : { name: 'You', avatarUrl: null };
   }, [availableActors, isBusiness, initialActorId]);
 
-  // Reset on open. Edit mode skips the chooser and lands straight on the form.
+  // Reset on open. Edit/draft mode + pre-seeded media skip the chooser.
   useEffect(() => {
     if (!open) return;
-    setScreen(isEditMode || initialMedia.length > 0 ? 'post' : 'choose');
+    setScreen(isEditMode || isDraftMode || initialMedia.length > 0 ? 'post' : 'choose');
     setReviewCourseSheetOpen(false);
+    setDraftsListOpen(false);
     setMediaItems([]);
     setEditIndex(0);
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -130,6 +138,7 @@ export function PostComposer({
                 onClose={onClose}
                 onPost={() => setScreen('post')}
                 onReview={() => setReviewCourseSheetOpen(true)}
+                onOpenDrafts={() => setDraftsListOpen(true)}
                 isBusiness={isBusiness}
               />
             ) : (
@@ -143,6 +152,7 @@ export function PostComposer({
                 mediaItems={mediaItems}
                 setMediaItems={setMediaItems}
                 editPostId={editPostId}
+                draftId={draftId}
               />
             )}
 
@@ -153,6 +163,16 @@ export function PostComposer({
               startIndex={editIndex}
               onCancel={handleEditorCancel}
               onDone={handleEditorDone}
+            />
+
+            {/* Drafts list overlays the Chooser */}
+            <DraftsListSheet
+              open={screen === 'choose' && draftsListOpen}
+              onClose={() => setDraftsListOpen(false)}
+              onSelect={(id) => {
+                setDraftsListOpen(false);
+                usePostStudioStore.getState().openPostStudioForDraft({ draftId: id });
+              }}
             />
           </div>
 

@@ -1,6 +1,9 @@
 // ComposerChooser — entry screen: Create a post / Review a course.
-import React from 'react';
-import { X, Camera, Star, ChevronRight } from 'lucide-react';
+// Shows a "Drafts (N)" tile when the user has saved drafts.
+
+import React, { useEffect, useState } from 'react';
+import { X, Camera, Star, ChevronRight, FileText } from 'lucide-react';
+import { getDraftCount } from '@/services/drafts/draftService';
 
 const INK = '#1C1C1E';
 const INK_2 = '#0F172A';
@@ -17,10 +20,31 @@ interface ComposerChooserProps {
   onClose: () => void;
   onPost: () => void;
   onReview: () => void;
+  onOpenDrafts?: () => void;
   isBusiness: boolean;
 }
 
-export function ComposerChooser({ onClose, onPost, onReview, isBusiness }: ComposerChooserProps) {
+export function ComposerChooser({
+  onClose,
+  onPost,
+  onReview,
+  onOpenDrafts,
+  isBusiness,
+}: ComposerChooserProps) {
+  const [draftCount, setDraftCount] = useState(0);
+
+  useEffect(() => {
+    let cancelled = false;
+    getDraftCount()
+      .then((n) => {
+        if (!cancelled) setDraftCount(n);
+      })
+      .catch(() => {});
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
   return (
     <div style={{ background: PAGE, minHeight: '100%', display: 'flex', flexDirection: 'column' }}>
       <div
@@ -97,6 +121,23 @@ export function ComposerChooser({ onClose, onPost, onReview, isBusiness }: Compo
           </div>
           {!isBusiness && <ChevronRight size={18} color={INK_FAINT} />}
         </button>
+
+        {draftCount > 0 && onOpenDrafts && (
+          <button onClick={onOpenDrafts} style={cardStyle()}>
+            <div style={iconTileStyle()}>
+              <FileText size={22} color={GOLD_DEEP} strokeWidth={2} />
+            </div>
+            <div style={{ flex: 1, textAlign: 'left' }}>
+              <div style={{ fontSize: 16, fontWeight: 800, color: INK_2 }}>
+                Drafts <span style={{ color: INK_MUTE, fontWeight: 700 }}>({draftCount})</span>
+              </div>
+              <div style={{ fontSize: 12, color: INK_MUTE, marginTop: 1 }}>
+                Pick up where you left off
+              </div>
+            </div>
+            <ChevronRight size={18} color={INK_FAINT} />
+          </button>
+        )}
       </div>
     </div>
   );

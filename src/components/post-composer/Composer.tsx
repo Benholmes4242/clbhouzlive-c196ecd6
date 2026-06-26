@@ -46,6 +46,14 @@ import {
 } from './composerMedia';
 
 import type { TaggedCourse, StudioActorType } from './types';
+import {
+  createDraft,
+  updateDraft,
+  deleteDraft,
+  getDraft,
+} from '@/services/drafts/draftService';
+import { uploadAllDraftMedia } from '@/services/drafts/draftMediaUpload';
+import type { DraftCourseData } from '@/services/drafts/types';
 
 const MAX_CAPTION = 2000;
 const MAX_POST_MEDIA = 10;
@@ -87,6 +95,8 @@ interface ComposerProps {
   setMediaItems: React.Dispatch<React.SetStateAction<ComposerMediaItem[]>>;
   /** When set, the composer runs in edit mode against this existing post. */
   editPostId?: string | null;
+  /** When set, the composer resumes this saved draft. */
+  draftId?: string | null;
 }
 
 export function Composer({
@@ -99,11 +109,13 @@ export function Composer({
   mediaItems,
   setMediaItems,
   editPostId = null,
+  draftId = null,
 }: ComposerProps) {
   const { submitPost, isSubmitting } = usePostSubmission();
   const { updatePost, isUpdating } = useUpdatePost();
   const editablePostQuery = useEditablePost(editPostId);
   const isEditMode = !!editPostId;
+  const isDraftMode = !!draftId;
   const { activeActor, availableActors, setActiveActor } = useActiveActor();
   const fileRef = useRef<HTMLInputElement>(null);
 
@@ -119,6 +131,13 @@ export function Composer({
   const [discardConfirmOpen, setDiscardConfirmOpen] = useState(false);
   const [keyboardHeight, setKeyboardHeight] = useState(0);
   const captionRef = useRef<HTMLTextAreaElement>(null);
+
+  // Draft state — currentDraftId is the row we update on save (set after first
+  // save OR when resuming an existing draft). isDirty tracks whether we have
+  // unsaved changes since the last save/resume.
+  const [currentDraftId, setCurrentDraftId] = useState<string | null>(draftId);
+  const [isSavingDraft, setIsSavingDraft] = useState(false);
+  const [isDirty, setIsDirty] = useState(false);
 
 
   const displayActor = useMemo(() => {
@@ -215,6 +234,91 @@ export function Composer({
     );
     setMediaItems(remoteMediaToComposerItems(editable.media));
   }, [isEditMode, editablePostQuery.data, onClose, setMediaItems]);
+
+
+  // Draft-mode prefill: load the saved draft and rehydrate caption / visibility
+  // / tagged courses / media. Media is fetched back from R2 as Files so the
+  // standard submit pipeline keeps working unchanged. Videos in Cloudflare
+  // Stream cannot be reliably re-sourced from HLS, so we skip them with a
+  // warning rather than ship a half-broken video resume in Phase 1.
+  const draftPrefilledRef = useRef(false);
+  useEffect(() => {
+    if (!isDraftMode || !draftId) return;
+    if (draftPrefilledRef.current) return;
+    draftPrefilledRef.current = true;
+
+    (async () => {
+      const d = await getDraft(draftId);
+      if (!d) {
+        toast.error("Couldn't load draft");
+        onClose();
+        return;
+      }
+      setCaption(d.content ?? '');
+      setVisibility((d.visibility as Visibility) ?? 'anyone');
+      const courses: TaggedCourse[] = (d.courseData ?? []).map((c) => ({
+        courseId: c.id,
+        courseName: c.name,
+        country: c.country ?? '',
+        region: c.region,
+      }));
+      setTaggedCourses(courses);
+
+      // Rehydrate media: fetch each image URL back into a File so the standard
+      // submit/edit pipelines treat them as net-new uploads.
+      const rehydrated: ComposerMediaItem[] = [];
+      let skippedVideos = 0;
+      for (const m of d.media ?? []) {
+        if (m.mediaType === 'video') {
+          skippedVideos += 1;
+          continue;
+        }
+        try {
+          const resp = await fetch(m.mediaUrl);
+          if (!resp.ok) throw new Error(String(resp.status));
+          const blob = await resp.blob();
+          const ext = (m.fileName?.split('.').pop() ||
+            blob.type.split('/')[1] ||
+            'jpg').split('+')[0];
+          const file = new File(
+            [blob],
+            m.fileName || `draft-${m.id}.${ext}`,
+            { type: blob.type || 'image/jpeg', lastModified: Date.now() },
+          );
+          const measured = await measureImage(file);
+          rehydrated.push({
+            id: nextMediaId(),
+            type: 'image',
+            file,
+            previewUrl: measured.previewUrl,
+            width: measured.width,
+            height: measured.height,
+            aspectRatio: measured.width / Math.max(1, measured.height),
+            pos: { x: 50, y: 50 },
+            frame: 'original',
+          });
+        } catch (err) {
+          console.warn('[Composer] failed to rehydrate draft media:', m.id, err);
+        }
+      }
+      if (rehydrated.length) setMediaItems(rehydrated);
+      if (skippedVideos > 0) {
+        toast('Some videos were skipped', {
+          description: "Drafted videos can't be resumed in this version.",
+        });
+      }
+      // Resumed drafts start clean — only mark dirty when the user changes
+      // something below.
+      setIsDirty(false);
+    })();
+  }, [isDraftMode, draftId, onClose, setMediaItems]);
+
+  // Mark the form dirty whenever meaningful content changes.
+  useEffect(() => {
+    setIsDirty(true);
+  }, [caption, visibility, taggedCourses, mediaItems]);
+
+
 
   // Revoke previews on unmount. Remote URLs (existing edit-mode items) are
   // not blob: URLs, so revokeObjectURL is a no-op for them — safe to call.
@@ -378,10 +482,114 @@ export function Composer({
     });
   }, []);
 
+  // Save the current composer state as a draft. Edit mode does not save drafts
+  // (those edits target a published post). Returns true on success.
+  const handleSaveDraft = useCallback(async (): Promise<boolean> => {
+    if (isEditMode) return false;
+    if (!hasDraft) return false;
+    if (isSavingDraft) return false;
+
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) {
+      toast.error('You must be signed in to save a draft');
+      return false;
+    }
+
+    const actorType: 'personal' | 'business' =
+      displayActor.type === 'business' ? 'business' : 'personal';
+    const actorId =
+      actorType === 'business' ? displayActor.id : displayActor.id || user.id;
+
+    const courseData: DraftCourseData[] = taggedCourses.map((c) => ({
+      id: c.courseId,
+      name: c.courseName,
+      country: c.country ?? '',
+      region: c.region,
+    }));
+
+    setIsSavingDraft(true);
+    try {
+      if (currentDraftId) {
+        // Updating an existing draft — caption / visibility / courses only.
+        // Media reconciliation against an existing draft is out of scope for
+        // Phase 1; media stays as it was when the draft was first created.
+        const ok = await updateDraft(currentDraftId, {
+          actorType,
+          actorId,
+          content: caption,
+          visibility,
+          courseId: courseData[0]?.id ?? null,
+          courseName: courseData[0]?.name ?? null,
+          courseCountry: courseData[0]?.country ?? null,
+          courseData: courseData.length ? courseData : null,
+        });
+        if (!ok) {
+          toast.error("Couldn't save draft");
+          return false;
+        }
+      } else {
+        const created = await createDraft({
+          actorType,
+          actorId,
+          content: caption,
+          visibility,
+          courseId: courseData[0]?.id ?? null,
+          courseName: courseData[0]?.name ?? null,
+          courseCountry: courseData[0]?.country ?? null,
+          courseData: courseData.length ? courseData : null,
+        });
+        if (!created) {
+          toast.error("Couldn't save draft");
+          return false;
+        }
+        setCurrentDraftId(created.id);
+        // Upload any local media and attach to the new draft.
+        const localMedia = mediaItems.filter((m) => m.file);
+        if (localMedia.length) {
+          const { failed } = await uploadAllDraftMedia(created.id, localMedia);
+          if (failed.length) {
+            console.warn('[Composer] some draft media uploads failed:', failed);
+          }
+        }
+      }
+      setIsDirty(false);
+      toast.success('Draft saved');
+      return true;
+    } finally {
+      setIsSavingDraft(false);
+    }
+  }, [
+    isEditMode,
+    hasDraft,
+    isSavingDraft,
+    currentDraftId,
+    displayActor,
+    caption,
+    visibility,
+    taggedCourses,
+    mediaItems,
+  ]);
+
   const handleCloseRequest = useCallback(() => {
-    if (hasDraft) setDiscardConfirmOpen(true);
-    else onClose();
-  }, [hasDraft, onClose]);
+    // Edit mode keeps the legacy single-action discard. Net-new / draft-resume
+    // shows the 3-option sheet (Save / Discard / Keep editing) when dirty.
+    if (!hasDraft) {
+      onClose();
+      return;
+    }
+    if (isEditMode) {
+      setDiscardConfirmOpen(true);
+      return;
+    }
+    // Resumed but untouched draft → just close.
+    if (isDraftMode && !isDirty) {
+      onClose();
+      return;
+    }
+    setDiscardConfirmOpen(true);
+  }, [hasDraft, isEditMode, isDraftMode, isDirty, onClose]);
+
+
 
   const handleShare = useCallback(async () => {
     if (!canPost) return;
@@ -547,6 +755,10 @@ export function Composer({
       visibility,
       onSuccess: () => {
         toast.success('Posted');
+        // Delete the draft we resumed from — it's now published.
+        if (currentDraftId) {
+          void deleteDraft(currentDraftId);
+        }
         onClose();
       },
       onError: () => {},
@@ -565,6 +777,7 @@ export function Composer({
     updatePost,
     submitPost,
     onClose,
+    currentDraftId,
   ]);
 
   return (
@@ -619,6 +832,26 @@ export function Composer({
           <X size={18} strokeWidth={2} />
         </button>
         <div style={{ flex: 1 }} />
+        {!isEditMode && hasDraft && (
+          <button
+            onClick={handleSaveDraft}
+            disabled={isSavingDraft || busy}
+            style={{
+              fontSize: 13,
+              fontWeight: 700,
+              padding: '9px 14px',
+              borderRadius: 20,
+              border: `1px solid ${HAIR}`,
+              cursor: isSavingDraft || busy ? 'default' : 'pointer',
+              background: 'transparent',
+              color: INK_2,
+              marginRight: 8,
+              opacity: isSavingDraft || busy ? 0.5 : 1,
+            }}
+          >
+            {isSavingDraft ? 'Saving…' : 'Save draft'}
+          </button>
+        )}
         <button
           onClick={handleShare}
           disabled={!canPost}
@@ -1060,11 +1293,39 @@ export function Composer({
                 }}
               >
                 <div style={{ padding: '16px 16px 12px', textAlign: 'center' }}>
-                  <div style={{ fontSize: 15, fontWeight: 800, color: INK_2 }}>Discard post?</div>
+                  <div style={{ fontSize: 15, fontWeight: 800, color: INK_2 }}>
+                    {isEditMode ? 'Discard changes?' : 'Save this draft?'}
+                  </div>
                   <div style={{ fontSize: 12, color: INK_MUTE, marginTop: 4 }}>
-                    Your draft won't be saved.
+                    {isEditMode
+                      ? "Your changes won't be saved."
+                      : 'Pick it up later from Drafts.'}
                   </div>
                 </div>
+                {!isEditMode && (
+                  <button
+                    onClick={async () => {
+                      const ok = await handleSaveDraft();
+                      setDiscardConfirmOpen(false);
+                      if (ok) onClose();
+                    }}
+                    disabled={isSavingDraft}
+                    style={{
+                      width: '100%',
+                      padding: '14px 0',
+                      background: SURFACE,
+                      border: 'none',
+                      borderTop: `0.5px solid ${HAIR}`,
+                      color: INK_2,
+                      fontSize: 15,
+                      fontWeight: 800,
+                      cursor: isSavingDraft ? 'default' : 'pointer',
+                      opacity: isSavingDraft ? 0.5 : 1,
+                    }}
+                  >
+                    {isSavingDraft ? 'Saving…' : 'Save draft'}
+                  </button>
+                )}
                 <button
                   onClick={() => {
                     setDiscardConfirmOpen(false);
