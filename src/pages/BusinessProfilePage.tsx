@@ -490,17 +490,31 @@ const BusinessProfilePage: React.FC = () => {
             Edit profile
           </button>
         ) : (
-          <button
-            className="h-11 flex-1 rounded-full text-sm font-semibold flex items-center justify-center gap-1.5 transition-transform active:scale-[0.98]"
-            style={
-              isFollowing
-                ? { background: '#ffffff', border: '1px solid rgba(15,23,42,0.07)', color: '#0F172A' }
-                : { background: '#0F172A', color: '#ffffff' }
-            }
-            onClick={handleFollowToggle}
-          >
-            {isFollowing ? (<><Check className="w-3.5 h-3.5" />Following</>) : 'Follow'}
-          </button>
+          <>
+            <button
+              className="h-11 flex-1 rounded-full text-sm font-semibold flex items-center justify-center gap-1.5 transition-transform active:scale-[0.98]"
+              style={
+                isFollowing
+                  ? { background: '#ffffff', border: '1px solid rgba(15,23,42,0.07)', color: '#0F172A' }
+                  : { background: '#0F172A', color: '#ffffff' }
+              }
+              onClick={handleFollowToggle}
+            >
+              {isFollowing ? (<><Check className="w-3.5 h-3.5" />Following</>) : 'Follow'}
+            </button>
+            <button
+              className="h-11 px-4 rounded-full text-sm font-semibold flex items-center justify-center gap-1.5 transition-transform active:scale-[0.98]"
+              style={{ background: '#ffffff', border: '1px solid rgba(15,23,42,0.07)', color: '#0F172A' }}
+              onClick={() => startDM(business.id, 'business')}
+              disabled={isStartingDM === business.id}
+              aria-label={`Message ${business.name}`}
+            >
+              {isStartingDM === business.id
+                ? <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                : <MessageCircle className="w-3.5 h-3.5" />}
+              Message
+            </button>
+          </>
         )}
 
         <DropdownMenu>
