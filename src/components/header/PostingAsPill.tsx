@@ -60,13 +60,21 @@ export const PostingAsPill = forwardRef<HTMLButtonElement, PostingAsPillProps>(
             filter: 'drop-shadow(0 1px 3px rgba(0,0,0,0.6))',
           }}
         >
-          <SquircleAvatar
-            size={30}
-            src={activeActor.avatarUrl}
-            alt={activeActor.name}
-            fallback={initials}
-            hideRing
-          />
+          <span
+            style={{
+              display: 'inline-flex',
+              borderRadius: '34%',
+              boxShadow: isBusinessActor ? BUSINESS_RING : 'none',
+            }}
+          >
+            <SquircleAvatar
+              size={30}
+              src={activeActor.avatarUrl}
+              alt={activeActor.name}
+              fallback={initials}
+              hideRing
+            />
+          </span>
 
           {hasUnreadNotifications && (
             <span
