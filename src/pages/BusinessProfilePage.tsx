@@ -110,6 +110,7 @@ const BusinessProfilePage: React.FC = () => {
     viewerActorId: user?.id,
   });
   const toggleFollow = useToggleFollow();
+  const { startDM, isStarting: isStartingDM } = useStartDM();
 
   const { uploadLogo, uploadCover, uploadingLogo, uploadingCover } =
     useBusinessImageUpload(business?.id);
