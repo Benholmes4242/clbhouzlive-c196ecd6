@@ -126,8 +126,9 @@ export async function fetchScheduledPostForEdit(postId: string): Promise<Schedul
     `)
     .eq('id', postId)
     .eq('user_id', user.id)
-    .eq('status', 'scheduled')
+    .in('status', ['scheduled', 'failed'])
     .single();
+
 
   if (error || !data) {
     console.error('[scheduledPosts] Error fetching for edit:', error);
