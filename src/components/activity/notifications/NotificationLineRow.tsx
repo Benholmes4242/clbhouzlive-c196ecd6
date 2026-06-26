@@ -36,7 +36,7 @@ export const NotificationLineRow: React.FC<Props> = ({ notification, onClick }) 
       {...REVEAL}
       type="button"
       onClick={onClick}
-      className="w-full flex items-center gap-3 text-left active:bg-black/[0.02] transition-colors"
+      className="w-full flex items-start gap-3 text-left active:bg-black/[0.02] transition-colors"
       style={{
         padding: '12px 14px',
         background: notification.is_unread ? 'rgba(247,147,30,0.035)' : 'transparent',
@@ -56,13 +56,13 @@ export const NotificationLineRow: React.FC<Props> = ({ notification, onClick }) 
       </div>
 
       <div className="flex-1 min-w-0">
-        <p className="text-[14px] leading-[1.35] truncate" style={{ color: INK }}>
+        <p className="text-[14px] leading-[1.35] break-words" style={{ color: INK }}>
           <span className="font-semibold">{actorName}</span>{' '}
           <span style={{ color: INK_SOFT }} className="font-normal">{actionText}</span>
         </p>
       </div>
 
-      <span className="shrink-0 text-[11px] font-medium tabular-nums" style={{ color: INK_SUBTLE }}>
+      <span className="shrink-0 text-[11px] font-medium tabular-nums mt-px" style={{ color: INK_SUBTLE }}>
         {notification.time_ago}
       </span>
     </motion.button>
