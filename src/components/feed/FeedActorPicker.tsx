@@ -96,6 +96,7 @@ export const FeedActorPicker: React.FC<FeedActorPickerProps> = ({ value, onChang
         open={sheetOpen}
         onClose={() => setSheetOpen(false)}
         variant={c.sheetVariant}
+        style={c.sheetVariant === 'dark' ? { background: '#15171F' } : undefined}
       >
         <div
           onClick={(e) => e.stopPropagation()}
