@@ -746,7 +746,7 @@ async function syncLeaderboard(supabase: any, apiKey: string, tour: string, year
       }
 
       // 4. Upsert leaderboard row keyed by team_id (player_id MUST be null — XOR check)
-      const rounds = entry.rounds || [];
+      const rounds = mergeLiveRound(entry);
       const latestRound = rounds.length > 0 ? rounds[rounds.length - 1] : null;
       const derivedThru = latestRound?.thru ?? entry.thru ?? null;
       // today is read client-side from raw_data.rounds (see CinematicFrame liveRoundFor).
