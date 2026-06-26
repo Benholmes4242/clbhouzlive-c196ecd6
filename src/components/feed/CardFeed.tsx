@@ -363,7 +363,7 @@ export const CardFeed: React.FC<CardFeedProps> = ({
     const el = containerRef.current;
     if (!el || !onRefresh) return;
 
-    const getScrollTop = () => document.getElementById('root')?.scrollTop ?? 0;
+    const getScrollTop = () => scrollerElRef.current?.scrollTop ?? 0;
 
     const onTouchStart = (e: TouchEvent) => {
       if (isRefreshing) return;
@@ -502,6 +502,7 @@ export const CardFeed: React.FC<CardFeedProps> = ({
       >
         <Virtuoso
           ref={virtuosoRef}
+          scrollerRef={(el) => { scrollerElRef.current = (el as HTMLElement) ?? null; }}
           data={posts}
           itemContent={itemContent}
           computeItemKey={(_, post) => post.id}
