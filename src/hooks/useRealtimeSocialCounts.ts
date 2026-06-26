@@ -33,7 +33,7 @@ export function useRealtimeSocialCounts({
       userId: string,
       updater: (prev: SocialCounts) => SocialCounts
     ) => {
-      const queryKey = ['social-counts', userId];
+      const queryKey = ['social-counts', 'personal', userId];
       const existing = queryClient.getQueryData<SocialCounts>(queryKey);
       if (existing) {
         queryClient.setQueryData<SocialCounts>(queryKey, updater(existing));
