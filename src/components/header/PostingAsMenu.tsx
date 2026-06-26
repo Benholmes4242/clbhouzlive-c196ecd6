@@ -10,6 +10,7 @@ import { useQuery } from '@tanstack/react-query';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useUserProfile } from '@/hooks/useUserProfile';
 import { useUnreadNotifications } from '@/hooks/useUnreadNotifications';
+import { useActorUnreadCounts } from '@/hooks/useActorUnreadCounts';
 import { useMessagingContext } from '@/contexts/MessagingContext';
 import { useIsMobile } from '@/hooks/useIsMobile';
 import { cn } from '@/lib/utils';
