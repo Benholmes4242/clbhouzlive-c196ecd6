@@ -233,7 +233,90 @@ export function Composer({
       })),
     );
     setMediaItems(remoteMediaToComposerItems(editable.media));
-  }, [isEditMode, editablePostQuery.data, onClose, setMediaItems]);
+
+  // Draft-mode prefill: load the saved draft and rehydrate caption / visibility
+  // / tagged courses / media. Media is fetched back from R2 as Files so the
+  // standard submit pipeline keeps working unchanged. Videos in Cloudflare
+  // Stream cannot be reliably re-sourced from HLS, so we skip them with a
+  // warning rather than ship a half-broken video resume in Phase 1.
+  const draftPrefilledRef = useRef(false);
+  useEffect(() => {
+    if (!isDraftMode || !draftId) return;
+    if (draftPrefilledRef.current) return;
+    draftPrefilledRef.current = true;
+
+    (async () => {
+      const d = await getDraft(draftId);
+      if (!d) {
+        toast.error("Couldn't load draft");
+        onClose();
+        return;
+      }
+      setCaption(d.content ?? '');
+      setVisibility((d.visibility as Visibility) ?? 'anyone');
+      const courses: TaggedCourse[] = (d.courseData ?? []).map((c) => ({
+        courseId: c.id,
+        courseName: c.name,
+        country: c.country ?? '',
+        region: c.region,
+      }));
+      setTaggedCourses(courses);
+
+      // Rehydrate media: fetch each image URL back into a File so the standard
+      // submit/edit pipelines treat them as net-new uploads.
+      const rehydrated: ComposerMediaItem[] = [];
+      let skippedVideos = 0;
+      for (const m of d.media ?? []) {
+        if (m.mediaType === 'video') {
+          skippedVideos += 1;
+          continue;
+        }
+        try {
+          const resp = await fetch(m.mediaUrl);
+          if (!resp.ok) throw new Error(String(resp.status));
+          const blob = await resp.blob();
+          const ext = (m.fileName?.split('.').pop() ||
+            blob.type.split('/')[1] ||
+            'jpg').split('+')[0];
+          const file = new File(
+            [blob],
+            m.fileName || `draft-${m.id}.${ext}`,
+            { type: blob.type || 'image/jpeg', lastModified: Date.now() },
+          );
+          const measured = await measureImage(file);
+          rehydrated.push({
+            id: nextMediaId(),
+            type: 'image',
+            file,
+            previewUrl: measured.previewUrl,
+            width: measured.width,
+            height: measured.height,
+            aspectRatio: measured.width / Math.max(1, measured.height),
+            pos: { x: 50, y: 50 },
+            frame: 'original',
+          });
+        } catch (err) {
+          console.warn('[Composer] failed to rehydrate draft media:', m.id, err);
+        }
+      }
+      if (rehydrated.length) setMediaItems(rehydrated);
+      if (skippedVideos > 0) {
+        toast('Some videos were skipped', {
+          description: 'Drafted videos can\'t be resumed in this version.',
+        });
+      }
+      // Resumed drafts start clean — only mark dirty when the user changes
+      // something below.
+      setIsDirty(false);
+    })();
+  }, [isDraftMode, draftId, onClose, setMediaItems]);
+
+  // Mark the form dirty whenever meaningful content changes.
+  useEffect(() => {
+    setIsDirty(true);
+  }, [caption, visibility, taggedCourses, mediaItems]);
+
+
 
   // Revoke previews on unmount. Remote URLs (existing edit-mode items) are
   // not blob: URLs, so revokeObjectURL is a no-op for them — safe to call.
