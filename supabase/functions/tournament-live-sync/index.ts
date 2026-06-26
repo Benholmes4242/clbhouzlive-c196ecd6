@@ -880,12 +880,12 @@ async function syncLeaderboard(
   const leaderboard = data.leaderboard || [];
 
   // Extract current round from Sportradar response
-  // Sportradar's leaderboard endpoint returns `round` as zero-indexed (0=R1, 1=R2, etc.)
+  // Sportradar's leaderboard endpoint returns `round` as one-indexed (1=R1, 2=R2, etc.).
   const rawRound =
     typeof data.round === 'number' ? data.round :
     typeof data.current_round === 'number' ? data.current_round :
     undefined;
-  let currentRound: number | undefined = rawRound !== undefined ? rawRound + 1 : undefined;
+  let currentRound: number | undefined = rawRound;
 
   // Venue-timezone date-math fallback when Sportradar omits the round
   if (currentRound === undefined && tournament.start_date && tournament.timezone) {
