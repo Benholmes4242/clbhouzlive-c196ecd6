@@ -315,7 +315,7 @@ export const ProfileSocialButtons: React.FC<ProfileSocialButtonsProps> = ({
     <>
       <div className="flex gap-2 items-center flex-wrap">
         {followButton}
-        {friendButton}
+        {viewerActorType !== 'business' && friendButton}
         {moreMenu}
       </div>
 
