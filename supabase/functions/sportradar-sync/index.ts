@@ -772,7 +772,7 @@ async function syncLeaderboard(supabase: any, apiKey: string, tour: string, year
         today: null,
         wins: entry.wins,
         losses: entry.losses,
-        raw_data: entry,
+        raw_data: { ...entry, rounds },
       }, { onConflict: 'tournament_id,team_id' });
       if (error) {
         console.error(`[syncLeaderboard team] Upsert error for team ${teamSrId}:`, error.message);
