@@ -34,9 +34,6 @@ export const PostingAsPill = forwardRef<HTMLButtonElement, PostingAsPillProps>(
     const { conversations } = useMessagingContext();
     const hasUnreadMessages = conversations?.some(conv => conv.unread_count > 0) || false;
 
-    // Ambient business-mode signal: amber ring + business name where space allows.
-    const isBusinessActor = activeActor?.type === 'business';
-    const BUSINESS_RING = '0 0 0 2px #F7931E';
 
     // Bare theme — no background, no chevron, white-ringed avatar with drop shadow
     if (!isLoading && activeActor && useBareTheme) {
@@ -64,7 +61,6 @@ export const PostingAsPill = forwardRef<HTMLButtonElement, PostingAsPillProps>(
             style={{
               display: 'inline-flex',
               borderRadius: '34%',
-              boxShadow: isBusinessActor ? BUSINESS_RING : 'none',
             }}
           >
             <SquircleAvatar
@@ -192,7 +188,6 @@ export const PostingAsPill = forwardRef<HTMLButtonElement, PostingAsPillProps>(
             style={{
               display: 'inline-flex',
               borderRadius: '34%',
-              boxShadow: isBusinessActor ? BUSINESS_RING : 'none',
             }}
           >
             <SquircleAvatar
@@ -249,18 +244,6 @@ export const PostingAsPill = forwardRef<HTMLButtonElement, PostingAsPillProps>(
           )}
         </div>
 
-        {/* Business name label — ambient business-mode identity cue */}
-        {isBusinessActor && (
-          <span
-            className={cn(
-              "ml-1.5 mr-0.5 truncate min-w-0 max-w-[88px] text-[12px] font-semibold",
-              (useLightTheme && !useGlassTheme) ? "text-foreground" : "text-white"
-            )}
-            title={activeActor.name}
-          >
-            {activeActor.name}
-          </span>
-        )}
 
         
         
