@@ -720,7 +720,7 @@ async function syncLeaderboard(supabase: any, apiKey: string, tour: string, year
         points: entry.points,
         status: derivedStatus,
         starting_score: entry.starting_score,
-        today: entry.today ?? null,
+        today: derivedToday,
         wins: entry.wins,
         losses: entry.losses,
         raw_data: entry,
