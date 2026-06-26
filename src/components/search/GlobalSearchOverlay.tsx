@@ -299,6 +299,8 @@ function GlobalSearchOverlay({ isOpen, onClose }: GlobalSearchOverlayProps) {
   const showPeople = typeFilter === 'all' || typeFilter === 'people';
   const showBusinesses = typeFilter === 'all' || typeFilter === 'businesses';
 
+  const matchedNonCourse = people.length > 0 || businesses.length > 0;
+
   return createPortal(
     <AnimatePresence>
       {isOpen && (
