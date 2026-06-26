@@ -811,7 +811,7 @@ async function syncLeaderboard(supabase: any, apiKey: string, tour: string, year
     }
 
     if (playerId) {
-      const rounds = entry.rounds || [];
+      const rounds = mergeLiveRound(entry);
       const latestRound = rounds.length > 0 ? rounds[rounds.length - 1] : null;
       const derivedThru = latestRound?.thru ?? entry.thru ?? null;
       // today is read client-side from raw_data.rounds (see CinematicFrame liveRoundFor).
