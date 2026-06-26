@@ -221,7 +221,17 @@ export function PlayersTab() {
   const debouncedSearch = useDebouncedValue(search, 200);
   const [visibleCount, setVisibleCount] = useState(PAGE_SIZE);
   const initialTour = searchParams.get('tour') || 'pga';
-  const [sort, setSort] = useState<PlayerSortType>(getDefaultSortForTour(initialTour));
+  const initialSort = (searchParams.get('sort') as PlayerSortType) || getDefaultSortForTour(initialTour);
+  const [sort, setSortState] = useState<PlayerSortType>(initialSort);
+  const setSort = useCallback((next: PlayerSortType) => {
+    setSortState(next);
+    setSearchParams(prev => {
+      const params = new URLSearchParams(prev);
+      params.set('sort', next);
+      params.set('tab', 'players');
+      return params;
+    }, { replace: true });
+  }, [setSearchParams]);
   const [searchExpanded, setSearchExpanded] = useState(false);
   const sentinelRef = useRef<HTMLDivElement>(null);
   const isFetchingRef = useRef(false);
@@ -262,12 +272,15 @@ export function PlayersTab() {
     setVisibleCount(PAGE_SIZE);
   }, [debouncedSearch, sort]);
 
-  // Whenever the active tour changes (incl. landing/return), snap sort to that
-  // tour's canonical default. PGA → World Ranking, never a stale FedEx/Earnings tab.
+  // Only reset sort to the tour's canonical default when the tour genuinely
+  // changes — not on mount or back-navigation.
+  const prevTourRef = useRef(activeTour);
   useEffect(() => {
-    setSort(getDefaultSortForTour(activeTour));
-    setVisibleCount(PAGE_SIZE);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    if (prevTourRef.current !== activeTour) {
+      prevTourRef.current = activeTour;
+      setSort(getDefaultSortForTour(activeTour));
+      setVisibleCount(PAGE_SIZE);
+    }
   }, [activeTour]);
 
   // Build world rank & stats lookup from elite players (includes weekly rank change)
