@@ -10,6 +10,7 @@ import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { useToggleFollow } from '@/hooks/useToggleFollow';
+import { useActiveActor } from '@/context/ActiveActorContext';
 
 export function useIsFollowingBusiness(businessId: string | undefined, userId: string | undefined) {
   if (typeof process !== 'undefined' && process.env?.NODE_ENV === 'development') {
