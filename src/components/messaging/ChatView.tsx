@@ -623,7 +623,9 @@ export function ChatView({ conversationId, onBack }: ChatViewProps) {
                 
                 {dateMessages.map((message, index) => {
                   const globalIndex = messages.indexOf(message);
-                  const isOwn = message.sender_id === user?.id;
+                  const msgActorType = (message.sender_actor_type ?? 'personal') as 'personal' | 'business';
+                  const msgActorId = msgActorType === 'business' ? message.sender_actor_id : message.sender_id;
+                  const isOwn = msgActorType === activeType && msgActorId === activeId;
                   const showSender = shouldShowSenderInfo(message, globalIndex);
                   const replyTo = message.reply_to_id 
                     ? messagesMap.get(message.reply_to_id) 
