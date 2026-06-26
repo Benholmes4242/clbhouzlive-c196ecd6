@@ -40,19 +40,23 @@ export const ProfileSocialButtons: React.FC<ProfileSocialButtonsProps> = ({
 }) => {
   const { data: relationship, isLoading } = useRelationshipStatus(profileUserId);
 
-  // Slice 3: canonical follow state + mutation
+  // Phase 2: viewer = active actor (personal or business)
+  const { activeActor } = useActiveActor();
+  const viewerActorType: 'personal' | 'business' = activeActor?.type ?? 'personal';
+  const viewerActorId = activeActor?.id ?? currentUserId;
+
   const { isFollowing: cachedFollowing } = useFollowState({
     targetActorType: 'personal',
     targetActorId: profileUserId,
-    viewerActorType: 'personal',
-    viewerActorId: currentUserId,
+    viewerActorType,
+    viewerActorId,
   });
   const isFollowing = cachedFollowing ?? false;
   const toggle = useToggleFollow();
   const isFollowingPending = toggle.isPending;
   const toggleFollow = () => {
     if (!currentUserId || !profileUserId) return;
-    if (currentUserId === profileUserId) {
+    if (viewerActorType === 'personal' && currentUserId === profileUserId) {
       toast.error("You can't follow yourself");
       return;
     }
@@ -60,8 +64,8 @@ export const ProfileSocialButtons: React.FC<ProfileSocialButtonsProps> = ({
       targetActorType: 'personal',
       targetActorId: profileUserId,
       targetUserId: profileUserId,
-      viewerActorType: 'personal',
-      viewerActorId: currentUserId,
+      viewerActorType,
+      viewerActorId,
       viewerUserId: currentUserId,
       isFollowing,
     });
