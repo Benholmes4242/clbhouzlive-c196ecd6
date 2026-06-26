@@ -18,22 +18,26 @@ export function useIsFollowingBusiness(businessId: string | undefined, userId: s
     console.warn('[deprecated] useIsFollowingBusiness → migrate to useFollowState');
   }
   const queryClient = useQueryClient();
+  const { activeActor } = useActiveActor();
+  const viewerActorType: 'personal' | 'business' = activeActor?.type ?? 'personal';
+  const viewerActorId = activeActor?.id ?? userId;
 
   return useQuery({
-    queryKey: ['business-follow-status', businessId, userId],
-    enabled: !!businessId && !!userId,
+    queryKey: ['business-follow-status', businessId, viewerActorType, viewerActorId],
+    enabled: !!businessId && !!viewerActorId,
     queryFn: async () => {
       const { data, error } = await supabase
         .from('business_follows')
         .select('id')
         .eq('business_id', businessId ?? '')
-        .eq('follower_id', userId ?? '')
+        .eq('follower_actor_type', viewerActorType)
+        .eq('follower_actor_id', viewerActorId ?? '')
         .maybeSingle();
       if (error) throw error;
       const result = !!data;
       // Seed canonical 5-element key for useFollowState readers.
       queryClient.setQueryData(
-        ['follow-status', 'personal', userId, 'business', businessId],
+        ['follow-status', viewerActorType, viewerActorId, 'business', businessId],
         { isFollowing: result },
       );
       return result;
