@@ -704,7 +704,7 @@ function GlobalSearchOverlay({ isOpen, onClose }: GlobalSearchOverlayProps) {
                           />
                         </div>
                       )}
-                      {hasQuery && clubs.length > 0 && (
+                      {hasQuery && (clubs.length > 0 || matchedNonCourse) && (
                         <RequestCourseCTA
                           variant="row"
                           prefillName={debouncedQuery}
