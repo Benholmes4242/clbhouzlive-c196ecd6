@@ -49,13 +49,16 @@ function formatRelativeTime(dateString: string | null): string {
 
 function getConversationDisplay(
   conversation: ConversationWithDetails,
-  currentUserId: string | undefined
-): { name: string; avatarUrl: string | null; initials: string } {
+  active: { type: 'personal' | 'business'; id: string } | null,
+): { name: string; avatarUrl: string | null; initials: string; isBusiness: boolean } {
   if (conversation.type === 'direct') {
-    const otherParticipant = conversation.participants.find(
-      p => p.user_id !== currentUserId
-    );
-    
+    const otherParticipant = conversation.participants.find(p => {
+      if (!active) return true;
+      const pType = (p.actor_type ?? 'personal');
+      const pId = pType === 'business' ? (p.actor_id ?? null) : p.user_id;
+      return !(pType === active.type && pId === active.id);
+    });
+
     if (otherParticipant?.profile) {
       const profile = otherParticipant.profile;
       const name = profile.display_name || profile.username || 'Unknown';
@@ -63,10 +66,11 @@ function getConversationDisplay(
         name,
         avatarUrl: profile.profile_photo_url,
         initials: name.substring(0, 2).toUpperCase(),
+        isBusiness: profile.actor_type === 'business',
       };
     }
-    
-    return { name: 'Unknown User', avatarUrl: null, initials: 'U' };
+
+    return { name: 'Unknown User', avatarUrl: null, initials: 'U', isBusiness: false };
   }
 
   const name = conversation.name || 'Group Chat';
@@ -74,6 +78,7 @@ function getConversationDisplay(
     name,
     avatarUrl: conversation.avatar_url,
     initials: name.substring(0, 2).toUpperCase(),
+    isBusiness: false,
   };
 }
 
