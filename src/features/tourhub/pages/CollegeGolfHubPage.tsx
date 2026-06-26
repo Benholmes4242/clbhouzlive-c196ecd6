@@ -1,4 +1,4 @@
-import { useMemo, useEffect, useState, useCallback } from 'react';
+import { useMemo, useEffect, useState, useCallback, useRef } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { Search, X } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -38,6 +38,7 @@ export function CollegeGolfHubPage() {
 
   const [searchExpanded, setSearchExpanded] = useState(false);
   const [searchValue, setSearchValue] = useState('');
+  const searchInputRef = useRef<HTMLInputElement>(null);
   const debouncedSearch = useDebouncedValue(searchValue, 200);
   const { data: searchResults, isLoading: searchLoading } = useCollegeSearch(debouncedSearch);
 
@@ -58,6 +59,21 @@ export function CollegeGolfHubPage() {
     } else {
       window.scrollTo(0, 0);
     }
+  }, []);
+
+  // Focus search input only when expanded — prevents keyboard pop on page load
+  useEffect(() => {
+    if (searchExpanded) {
+      searchInputRef.current?.focus();
+    }
+  }, [searchExpanded]);
+
+  // Collapse/clear search when leaving the page
+  useEffect(() => {
+    return () => {
+      setSearchExpanded(false);
+      setSearchValue('');
+    };
   }, []);
 
   const saveScroll = useCallback(() => {
@@ -201,8 +217,8 @@ export function CollegeGolfHubPage() {
               <div style={{ position: 'relative' }}>
                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 z-10 w-4 h-4" style={{ color: AMBER }} strokeWidth={2.5} />
                 <input
+                  ref={searchInputRef}
                   type="text"
-                  autoFocus
                   placeholder="Search colleges..."
                   value={searchValue}
                   onChange={(e) => setSearchValue(e.target.value)}
