@@ -277,28 +277,30 @@ Deno.serve(async (req) => {
 // FIX 2: Called for ALL tournaments per invocation, not just the stalest.
 
 async function deriveActiveRound(supabase: any, tournamentId: string): Promise<number | undefined> {
+  // Pull round columns for the whole field (not just 5 — we need full-field completeness).
   const { data: roundCheck } = await supabase
     .from('sr_leaderboards')
     .select('round_1, round_2, round_3, round_4')
     .eq('tournament_id', tournamentId)
-    .not('strokes', 'is', null)
-    .limit(5);
+    .not('strokes', 'is', null);
   if (!roundCheck?.length) return undefined;
-  let completedRound = 0;
-  for (let r = 4; r >= 1; r--) {
-    if (roundCheck.some((e: any) => e[`round_${r}`] != null)) { completedRound = r; break; }
+
+  const fieldSize = roundCheck.length;
+  const recorded = (r: number) =>
+    roundCheck.filter((e: any) => e[`round_${r}`] != null).length;
+
+  // Active round = the lowest round that SOME players have started but NOT ALL have completed.
+  let active = 1;
+  for (let r = 1; r <= 4; r++) {
+    const n = recorded(r);
+    if (n === 0) break;            // nobody has reached round r → active is the previous round
+    active = r;                    // at least one player has a score for r
+    if (n < fieldSize) break;      // not everyone finished r → r is the active (in-progress) round
+    // n === fieldSize → everyone finished r → look at r+1
   }
-  const { data: thruCheck } = await supabase
-    .from('sr_leaderboards')
-    .select('thru')
-    .eq('tournament_id', tournamentId)
-    .not('thru', 'is', null)
-    .gt('thru', 0)
-    .lt('thru', 18)
-    .limit(1);
-  const midRound = (thruCheck?.length ?? 0) > 0;
-  return midRound ? Math.min(completedRound + 1, 4) : Math.max(completedRound, 1);
+  return active;
 }
+
 
 async function syncTournament(
   supabase: any,
