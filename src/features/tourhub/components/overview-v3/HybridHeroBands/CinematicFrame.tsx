@@ -1291,7 +1291,6 @@ export function CinematicFrame({
               </span>
             </div>
           </button>
-          </>
         );
       })()}
 
