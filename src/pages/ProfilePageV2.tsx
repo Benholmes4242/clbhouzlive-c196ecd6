@@ -19,6 +19,7 @@ import { usePersonalReviewsCount } from '@/hooks/usePersonalReviewsCount';
 import { getProfileType, getProfileTabs } from '@/hooks/useProfileType';
 import { useFollowState } from '@/hooks/useFollowState';
 import { useToggleFollow } from '@/hooks/useToggleFollow';
+import { useActiveActor } from '@/context/ActiveActorContext';
 import { useFriendship } from '@/hooks/useFriendship';
 import { useSocialCounts } from '@/hooks/useSocialCounts';
 import { useRealtimeSocialCounts } from '@/hooks/useRealtimeSocialCounts';
