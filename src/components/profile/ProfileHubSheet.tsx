@@ -541,7 +541,7 @@ function ProfileHubSheet({
                         aria-expanded={switcherOpen}
                       >
                         <span style={{ fontSize: 11, fontWeight: 700, color: INK_SOFT, letterSpacing: '0.02em' }}>
-                          Switch
+                          Profiles
                         </span>
                         <ChevronDown size={12} color={INK_SOFT} strokeWidth={2} />
                       </button>
