@@ -49,6 +49,7 @@ import { IdentitySection } from '@/components/business/editor/IdentitySection';
 import { LocationContactSection } from '@/components/business/editor/LocationContactSection';
 import { BrandingSection } from '@/components/business/editor/BrandingSection';
 import { SocialSection } from '@/components/business/editor/SocialSection';
+import { NotificationsSection } from '@/components/business/editor/NotificationsSection';
 import {
   DEFAULT_OPENING_HOURS,
   OpeningHours,
