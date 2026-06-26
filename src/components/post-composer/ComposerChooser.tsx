@@ -144,6 +144,42 @@ export function ComposerChooser({
             <ChevronRight size={18} color={INK_FAINT} />
           </button>
         )}
+
+        {scheduledCount > 0 && onOpenScheduled && (
+          <button onClick={onOpenScheduled} style={cardStyle()}>
+            <div
+              style={{
+                ...iconTileStyle(),
+                background: failedCount > 0 ? '#FEF2F2' : AMBER_SOFT,
+              }}
+            >
+              {failedCount > 0 ? (
+                <AlertTriangle size={22} color={DANGER} strokeWidth={2} />
+              ) : (
+                <CalendarClock size={22} color={GOLD_DEEP} strokeWidth={2} />
+              )}
+            </div>
+            <div style={{ flex: 1, textAlign: 'left' }}>
+              <div style={{ fontSize: 16, fontWeight: 800, color: INK_2 }}>
+                Scheduled{' '}
+                <span style={{ color: INK_MUTE, fontWeight: 700 }}>({scheduledCount})</span>
+              </div>
+              <div
+                style={{
+                  fontSize: 12,
+                  color: failedCount > 0 ? DANGER : INK_MUTE,
+                  marginTop: 1,
+                  fontWeight: failedCount > 0 ? 700 : 400,
+                }}
+              >
+                {failedCount > 0
+                  ? `${failedCount} failed — tap to retry`
+                  : 'Queued for later'}
+              </div>
+            </div>
+            <ChevronRight size={18} color={INK_FAINT} />
+          </button>
+        )}
       </div>
     </div>
   );
