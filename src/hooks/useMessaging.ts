@@ -226,31 +226,38 @@ export function useMessaging(): UseMessagingReturn {
     } finally {
       setInitialLoading(false);
     }
-  }, [user]);
+  }, [user, actorType, actorId]);
 
   /**
-   * Get or create a direct message conversation with another user
+   * Get or create a direct message conversation.
+   * Caller is the ACTIVE actor; target may be a personal user or a business.
    */
-  const getOrCreateDM = useCallback(async (otherUserId: string): Promise<string | null> => {
-    if (!user) return null;
+  const getOrCreateDM = useCallback(async (
+    targetActorId: string,
+    targetActorType: TargetActorType = 'personal',
+  ): Promise<string | null> => {
+    if (!user || !actorId) return null;
 
     try {
       const { data, error } = await supabase.rpc('get_or_create_dm_conversation', {
-        other_user_id: otherUserId,
+        p_caller_actor_type: actorType,
+        p_caller_actor_id: actorId,
+        p_target_actor_type: targetActorType,
+        p_target_actor_id: targetActorId,
       });
 
       if (error) throw error;
-      
+
       // Refresh conversations after creating/getting DM
       await fetchConversations(true);
-      
+
       return data as string;
     } catch (err) {
       AppLog.error('[useMessaging]', 'Error getting/creating DM:', err);
       setError(err instanceof Error ? err : new Error('Failed to get or create DM'));
       return null;
     }
-  }, [user, fetchConversations]);
+  }, [user, actorType, actorId, fetchConversations]);
 
   /**
    * Create a new group chat with specified participants
