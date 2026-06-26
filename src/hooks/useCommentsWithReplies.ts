@@ -344,6 +344,34 @@ export function useCommentsWithReplies(
       const newCommentId = data.id;
       const currentUserId = user.id;
 
+      // Resolve acting identity (personal or business) for notification copy/avatar
+      let acterName = 'Someone';
+      let acterAvatar: string | null = null;
+      if (actorType === 'business') {
+        const { data: biz } = await supabase
+          .from('business_accounts')
+          .select('name, logo_url')
+          .eq('id', actorId)
+          .single();
+        acterName = biz?.name ?? 'Business';
+        acterAvatar = biz?.logo_url ?? null;
+      } else {
+        const { data: prof } = await supabase
+          .from('user_profiles')
+          .select('display_name, username, profile_photo_url')
+          .eq('id', currentUserId)
+          .single();
+        acterName = prof?.display_name ?? prof?.username ?? 'Someone';
+        acterAvatar = prof?.profile_photo_url ?? null;
+      }
+
+      const actorDataPayload = {
+        actor_type: actorType,
+        actor_id: actorId,
+        actor_name: acterName,
+        actor_avatar_url: acterAvatar,
+      };
+
       // ── Mention notifications (non-blocking) ─────────────────────
       try {
         const mentionMatches = content.match(/@([\w]+(?:\s[\w]+)*)/g) ?? [];
@@ -357,25 +385,18 @@ export function useCommentsWithReplies(
           if (!mentionedUser) continue;
           if (mentionedUser.id === currentUserId) continue;
 
-          const { data: commenterProfile } = await supabase
-            .from('user_profiles')
-            .select('display_name')
-            .eq('id', currentUserId)
-            .single();
-          const commenterName = commenterProfile?.display_name ?? 'Someone';
-
           await supabase.from('notifications').insert({
             user_id: mentionedUser.id,
             recipient_actor_type: 'personal',
             recipient_actor_id: mentionedUser.id,
             actor_id: currentUserId,
             type: 'mention',
-            title: `${commenterName} mentioned you in a comment`,
+            title: `${acterName} mentioned you in a comment`,
             message: content.length > 60 ? content.slice(0, 60) + '…' : content,
             entity_type: 'comment',
             entity_id: newCommentId,
             is_read: false,
-            data: { post_id: postId },
+            data: { post_id: postId, ...actorDataPayload },
           });
         }
       } catch {
@@ -384,12 +405,6 @@ export function useCommentsWithReplies(
 
       // Handle reply notifications client-side (edge function doesn't do this yet)
       if (parentId) {
-        const { data: replierProfile } = await supabase
-          .from('user_profiles')
-          .select('display_name')
-          .eq('id', currentUserId)
-          .single();
-        const commenterName = replierProfile?.display_name ?? 'Someone';
         const { data: parentComment } = await supabase
           .from('post_comments')
           .select('user_id, actor_type, actor_id')
@@ -417,9 +432,9 @@ export function useCommentsWithReplies(
               user_id: legacyUserId,
               recipient_actor_type: parentActorType,
               recipient_actor_id: parentActorId,
-              actor_id: actorId,
+              actor_id: currentUserId,
               type: 'comment_reply',
-              title: `${commenterName} replied to your comment`,
+              title: `${acterName} replied to your comment`,
               message: content.length > 60 ? content.slice(0, 60) + '…' : content,
               entity_type: 'comment',
               entity_id: newCommentId,
@@ -428,6 +443,7 @@ export function useCommentsWithReplies(
                 parent_comment_id: parentId,
                 replier_actor_type: actorType,
                 replier_actor_id: actorId,
+                ...actorDataPayload,
               },
             });
           }
@@ -439,37 +455,38 @@ export function useCommentsWithReplies(
         if (!parentId && postId) {
           const { data: postData } = await supabase
             .from('posts')
-            .select('user_id')
+            .select('user_id, actor_type, actor_id')
             .eq('id', postId)
             .single();
           const postOwnerId = postData?.user_id;
+          const postActorType = (postData?.actor_type || 'personal') as 'personal' | 'business';
+          const postActorId = postData?.actor_id || postOwnerId;
 
-          if (postOwnerId && postOwnerId !== currentUserId) {
-            const { data: commenterProfile } = await supabase
-              .from('user_profiles')
-              .select('display_name')
-              .eq('id', currentUserId)
-              .single();
-            const commenterName = commenterProfile?.display_name ?? 'Someone';
+          // Self-comment guard — compare ACTOR, not just user
+          const isSelf =
+            (actorType === 'personal' && postActorType === 'personal' && postOwnerId === currentUserId) ||
+            (actorType === 'business' && postActorType === 'business' && postActorId === actorId);
 
+          if (postOwnerId && !isSelf) {
             await supabase.from('notifications').insert({
               user_id: postOwnerId,
-              recipient_actor_type: 'personal',
-              recipient_actor_id: postOwnerId,
+              recipient_actor_type: postActorType,
+              recipient_actor_id: postActorId,
               actor_id: currentUserId,
               type: 'comment',
-              title: `${commenterName} commented on your post`,
+              title: `${acterName} commented on your post`,
               message: content.length > 60 ? content.slice(0, 60) + '…' : content,
               entity_type: 'post',
               entity_id: postId,
               is_read: false,
-              data: { post_id: postId, comment_id: newCommentId },
+              data: { post_id: postId, comment_id: newCommentId, ...actorDataPayload },
             });
           }
         }
       } catch {
         // Non-blocking
       }
+
 
       return newCommentId;
     },
