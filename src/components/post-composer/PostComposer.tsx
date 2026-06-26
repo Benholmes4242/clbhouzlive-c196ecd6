@@ -138,6 +138,7 @@ export function PostComposer({
                 onClose={onClose}
                 onPost={() => setScreen('post')}
                 onReview={() => setReviewCourseSheetOpen(true)}
+                onOpenDrafts={() => setDraftsListOpen(true)}
                 isBusiness={isBusiness}
               />
             ) : (
@@ -151,6 +152,7 @@ export function PostComposer({
                 mediaItems={mediaItems}
                 setMediaItems={setMediaItems}
                 editPostId={editPostId}
+                draftId={draftId}
               />
             )}
 
@@ -161,6 +163,16 @@ export function PostComposer({
               startIndex={editIndex}
               onCancel={handleEditorCancel}
               onDone={handleEditorDone}
+            />
+
+            {/* Drafts list overlays the Chooser */}
+            <DraftsListSheet
+              open={screen === 'choose' && draftsListOpen}
+              onClose={() => setDraftsListOpen(false)}
+              onSelect={(id) => {
+                setDraftsListOpen(false);
+                usePostStudioStore.getState().openPostStudioForDraft({ draftId: id });
+              }}
             />
           </div>
 
