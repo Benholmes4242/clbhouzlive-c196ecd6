@@ -928,6 +928,10 @@ const UserRowFlat: React.FC<UserRowFlatProps> = ({
   const isPersonalProfile = user.profileType === 'personal';
 
   const handleRowClick = () => {
+    if (user.actorType === 'business') {
+      navigate(user.slug ? `/business/${user.slug}` : `/business/${user.id}`);
+      return;
+    }
     const profilePath = getProfilePathById(user.id, user.creatorOnly, user.username);
     navigate(profilePath);
   };
