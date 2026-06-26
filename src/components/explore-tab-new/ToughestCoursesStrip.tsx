@@ -45,7 +45,7 @@ export function ToughestCoursesStrip(_: Props = {}) {
               style={{
                 flexShrink: 0,
                 width: CARD_W,
-                height: 238,
+                height: 220,
                 borderRadius: 14,
                 background: INK_TINT_06,
               }}
