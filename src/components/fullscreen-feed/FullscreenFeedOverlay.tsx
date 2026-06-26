@@ -116,7 +116,11 @@ export function FullscreenFeedOverlay() {
     if (readOnly) { consumeOpenCommentsInitially(); return; }
     openComments();
     consumeOpenCommentsInitially();
-  }, [isOpen, openCommentsInitially, posts.length, openComments, consumeOpenCommentsInitially, readOnly]);
+    // One-shot clear of the initial comment id so post-swipes don't re-scroll
+    // to the original notification target.
+    const t = setTimeout(() => consumeInitialCommentId(), 1200);
+    return () => clearTimeout(t);
+  }, [isOpen, openCommentsInitially, posts.length, openComments, consumeOpenCommentsInitially, consumeInitialCommentId, readOnly]);
 
   // Body scroll lock
   useEffect(() => {
