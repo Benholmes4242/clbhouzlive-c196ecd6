@@ -17,6 +17,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { cn } from '@/lib/utils';
 import { useFollowState } from '@/hooks/useFollowState';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
+import { useActiveActor } from '@/context/ActiveActorContext';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { ChevronUp, User, Music, ChevronRight, MapPin } from 'lucide-react';
 import { FiMapPin } from 'react-icons/fi';
