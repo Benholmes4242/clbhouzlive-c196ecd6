@@ -9,7 +9,7 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { cn } from '@/lib/utils';
 import {
   Phone, Globe, MapPin, MoreHorizontal, Check, Loader2, ChevronLeft,
-  Share2, Link2, AlertCircle, Camera, Flag, Pencil, Mail,
+  Share2, Link2, AlertCircle, Camera, Flag, Pencil, Mail, MessageCircle,
   Instagram, Facebook, Youtube, Linkedin, Twitter, Music2,
 } from 'lucide-react';
 import { toast } from 'sonner';
