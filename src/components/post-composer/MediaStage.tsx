@@ -17,6 +17,13 @@ export interface MediaStageItem {
   width: number;
   height: number;
   pos: { x: number; y: number };
+  /**
+   * Set when this video was rehydrated from an existing Cloudflare Stream asset
+   * (e.g. resumed-from-draft). The previewUrl is HLS, which most desktop browsers
+   * can't play natively — we render the poster + a play glyph instead. The asset
+   * is re-attached to the post on submit by stream_id (no re-upload).
+   */
+  restoredFromStream?: boolean;
 }
 
 interface MediaStageProps {
