@@ -57,6 +57,7 @@ export const useFullscreenFeedStore = create<FullscreenFeedState>((set, get) => 
   startIndex: 0,
   activeIndex: 0,
   openCommentsInitially: false,
+  initialCommentId: null,
   onCloseCallback: null,
   hasNextPage: false,
   fetchNextPage: null,
@@ -69,6 +70,7 @@ export const useFullscreenFeedStore = create<FullscreenFeedState>((set, get) => 
       startIndex,
       activeIndex: startIndex,
       openCommentsInitially: !!options?.openCommentsInitially,
+      initialCommentId: options?.initialCommentId ?? null,
       onCloseCallback: options?.onClose ?? null,
       hasNextPage: options?.hasNextPage ?? false,
       fetchNextPage: options?.fetchNextPage ?? null,
@@ -82,6 +84,7 @@ export const useFullscreenFeedStore = create<FullscreenFeedState>((set, get) => 
       posts: [],
       activeIndex: 0,
       openCommentsInitially: false,
+      initialCommentId: null,
       onCloseCallback: null,
       hasNextPage: false,
       fetchNextPage: null,
@@ -96,6 +99,7 @@ export const useFullscreenFeedStore = create<FullscreenFeedState>((set, get) => 
     set((s) => ({ posts: [...s.posts, ...newPosts.filter(p => !s.posts.find(e => e.id === p.id))] })),
   setActiveIndex: (idx) => set({ activeIndex: idx }),
   consumeOpenCommentsInitially: () => set({ openCommentsInitially: false }),
+  consumeInitialCommentId: () => set({ initialCommentId: null }),
   setPaginationState: ({ hasNextPage, isFetchingNextPage }) =>
     set({ hasNextPage, isFetchingNextPage }),
 }));
