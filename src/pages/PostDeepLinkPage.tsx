@@ -195,8 +195,10 @@ const PostDeepLinkPage: React.FC = () => {
     if (hasOpenedFullscreen.current) return;
     hasOpenedFullscreen.current = true;
 
+    const shouldOpenComments = navState?.openComments === true || searchParams.get('openComments') === '1';
+
     useFullscreenFeedStore.getState().open([feedPost], 0, {
-      openCommentsInitially: navState?.openComments === true,
+      openCommentsInitially: shouldOpenComments,
       initialCommentId: navState?.initialCommentId ?? null,
       onClose: () => {
         // Go back if there's history; otherwise land on Clubhouse.
@@ -207,7 +209,7 @@ const PostDeepLinkPage: React.FC = () => {
         }
       },
     });
-  }, [authLoading, user, isLoading, feedPost, navigate, navState]);
+  }, [authLoading, user, isLoading, feedPost, navigate, navState, searchParams]);
 
   // --- Loading ---
   if (isLoading || authLoading) {
