@@ -837,7 +837,7 @@ async function syncLeaderboard(supabase: any, apiKey: string, tour: string, year
         today: null,
         wins: entry.wins,
         losses: entry.losses,
-        raw_data: entry,
+        raw_data: { ...entry, rounds },
       }, { onConflict: 'tournament_id,player_id' });
       if (!error) totalRecords++;
     }
