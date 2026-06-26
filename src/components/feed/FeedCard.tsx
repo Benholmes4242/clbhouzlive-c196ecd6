@@ -367,6 +367,17 @@ const FeedCardImpl: React.FC<FeedCardProps> = ({
                 onFollow={() => onFollow!(post)}
               />
             )}
+            {canManage && (
+              <PostOwnerMenu
+                postId={post.id}
+                isOwnPost
+                actorType={post.actorType === 'business' ? 'business' : 'personal'}
+                actorId={post.actorId}
+                sourceReviewId={post.review?.reviewId ?? null}
+                reviewCourseId={post.review?.courseId ?? null}
+                variant="inline"
+              />
+            )}
           </div>
         </div>
 
@@ -424,18 +435,6 @@ const FeedCardImpl: React.FC<FeedCardProps> = ({
               </button>
             );
           })()}
-          {/* Owner menu — self-wired Edit / Delete / Manage review.
-              Visibility = canManagePost (personal author OR business owner/admin). */}
-          {canManage && (
-            <PostOwnerMenu
-              postId={post.id}
-              isOwnPost
-              actorType={post.actorType === 'business' ? 'business' : 'personal'}
-              actorId={post.actorId}
-              sourceReviewId={post.review?.reviewId ?? null}
-              reviewCourseId={post.review?.courseId ?? null}
-              variant="inline"
-            />
           )}
         </div>
       </div>

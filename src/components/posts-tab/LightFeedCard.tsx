@@ -351,6 +351,17 @@ const LightFeedCardImpl: React.FC<LightFeedCardProps> = ({
                 onFollow={() => onFollow!(post)}
               />
             )}
+            {canManage && (
+              <PostOwnerMenu
+                postId={post.id}
+                isOwnPost
+                actorType={post.actorType === 'business' ? 'business' : 'personal'}
+                actorId={post.actorId}
+                sourceReviewId={post.review?.reviewId ?? null}
+                reviewCourseId={post.review?.courseId ?? null}
+                variant="inline"
+              />
+            )}
           </div>
         </div>
 
@@ -392,16 +403,6 @@ const LightFeedCardImpl: React.FC<LightFeedCardProps> = ({
               </button>
             );
           })()}
-          {canManage && (
-            <PostOwnerMenu
-              postId={post.id}
-              isOwnPost
-              actorType={post.actorType === 'business' ? 'business' : 'personal'}
-              actorId={post.actorId}
-              sourceReviewId={post.review?.reviewId ?? null}
-              reviewCourseId={post.review?.courseId ?? null}
-              variant="inline"
-            />
           )}
         </div>
       </div>
