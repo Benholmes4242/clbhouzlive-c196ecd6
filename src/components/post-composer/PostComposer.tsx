@@ -69,11 +69,12 @@ export function PostComposer({
       : { name: 'You', avatarUrl: null };
   }, [availableActors, isBusiness, initialActorId]);
 
-  // Reset on open. Edit mode skips the chooser and lands straight on the form.
+  // Reset on open. Edit/draft mode + pre-seeded media skip the chooser.
   useEffect(() => {
     if (!open) return;
-    setScreen(isEditMode || initialMedia.length > 0 ? 'post' : 'choose');
+    setScreen(isEditMode || isDraftMode || initialMedia.length > 0 ? 'post' : 'choose');
     setReviewCourseSheetOpen(false);
+    setDraftsListOpen(false);
     setMediaItems([]);
     setEditIndex(0);
     // eslint-disable-next-line react-hooks/exhaustive-deps
