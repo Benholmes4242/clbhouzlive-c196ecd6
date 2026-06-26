@@ -2683,6 +2683,8 @@ export type Database = {
       }
       conversation_participants: {
         Row: {
+          actor_id: string
+          actor_type: string
           archived_at: string | null
           conversation_id: string | null
           id: string
@@ -2694,6 +2696,8 @@ export type Database = {
           user_id: string | null
         }
         Insert: {
+          actor_id: string
+          actor_type?: string
           archived_at?: string | null
           conversation_id?: string | null
           id?: string
@@ -2705,6 +2709,8 @@ export type Database = {
           user_id?: string | null
         }
         Update: {
+          actor_id?: string
+          actor_type?: string
           archived_at?: string | null
           conversation_id?: string | null
           id?: string
@@ -6736,6 +6742,8 @@ export type Database = {
           message_type: string | null
           read_at: string | null
           reply_to_id: string | null
+          sender_actor_id: string
+          sender_actor_type: string
           sender_id: string | null
         }
         Insert: {
@@ -6753,6 +6761,8 @@ export type Database = {
           message_type?: string | null
           read_at?: string | null
           reply_to_id?: string | null
+          sender_actor_id: string
+          sender_actor_type?: string
           sender_id?: string | null
         }
         Update: {
@@ -6770,6 +6780,8 @@ export type Database = {
           message_type?: string | null
           read_at?: string | null
           reply_to_id?: string | null
+          sender_actor_id?: string
+          sender_actor_type?: string
           sender_id?: string | null
         }
         Relationships: [
