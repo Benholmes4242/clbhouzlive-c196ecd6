@@ -51,10 +51,13 @@ export function useBusinessFollowersCount(businessId: string | undefined) {
     queryKey: ['business-followers-count', businessId],
     enabled: !!businessId,
     queryFn: async () => {
+      // Phase 2b — read followers from the unified `follows` table so the
+      // count includes both personal and business followers of the business.
       const { count, error } = await supabase
-        .from('business_follows')
-        .select('*', { count: 'exact', head: true })
-        .eq('business_id', businessId ?? '');
+        .from('follows')
+        .select('id', { count: 'exact', head: true })
+        .eq('following_actor_type', 'business')
+        .eq('following_actor_id', businessId ?? '');
       if (error) throw error;
       return count ?? 0;
     },

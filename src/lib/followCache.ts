@@ -210,16 +210,29 @@ export function patchFollow(
 
         if (isSocialCountsKey) {
           if (!oldData || typeof oldData !== 'object' || Array.isArray(oldData)) continue;
-          const subjectId = queryKey[1];
+          // Phase 2b key shape: ['social-counts', actorType, actorId].
+          // Legacy shape: ['social-counts', userId]. Support both.
+          const keyActorType = queryKey.length >= 3 ? (queryKey[1] as string) : 'personal';
+          const keyActorId = queryKey.length >= 3 ? (queryKey[2] as string) : (queryKey[1] as string);
           const dir = delta.isFollowing ? 1 : -1;
-          if (subjectId === target.viewerUserId || subjectId === target.viewerActorId) {
+
+          const matchesViewer =
+            (keyActorType === (target.viewerActorType ?? 'personal') &&
+              keyActorId === (target.viewerActorId ?? target.viewerUserId)) ||
+            keyActorId === target.viewerUserId;
+          const matchesTargetActor =
+            (keyActorType === target.targetActorType &&
+              keyActorId === target.targetActorId) ||
+            keyActorId === target.targetUserId;
+
+          if (matchesViewer) {
             const cur = oldData.following ?? oldData.followingCount ?? 0;
             queryClient.setQueryData(queryKey, {
               ...oldData,
               following: Math.max(0, cur + dir),
               followingCount: Math.max(0, cur + dir),
             });
-          } else if (subjectId === target.targetUserId || subjectId === target.targetActorId) {
+          } else if (matchesTargetActor) {
             const cur = oldData.followers ?? oldData.followersCount ?? 0;
             queryClient.setQueryData(queryKey, {
               ...oldData,

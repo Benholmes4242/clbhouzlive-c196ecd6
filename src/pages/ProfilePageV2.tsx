@@ -278,7 +278,9 @@ const ProfilePageV2Content: React.FC = () => {
     }
   }, [activeSection, setSearchParams]);
 
-  const { data: socialCounts, isLoading: socialCountsLoading } = useSocialCounts(profileUserId);
+  const { data: socialCounts, isLoading: socialCountsLoading } = useSocialCounts(
+    profileUserId ? { type: 'personal', id: profileUserId } : undefined,
+  );
   const followersCount = socialCounts?.followers ?? 0;
   const followingCount = socialCounts?.following ?? 0;
   const friendsCount = isPersonal ? (socialCounts?.friends ?? 0) : 0;

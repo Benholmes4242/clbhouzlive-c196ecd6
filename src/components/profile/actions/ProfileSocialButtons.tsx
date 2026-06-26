@@ -149,7 +149,7 @@ export const ProfileSocialButtons: React.FC<ProfileSocialButtonsProps> = ({
   }
 
   // B) Friend pending request FROM them - show Accept/Decline
-  if (relationship.hasPendingFriendRequestFromThem) {
+  if (relationship.hasPendingFriendRequestFromThem && viewerActorType !== 'business') {
     return (
       <div className="flex gap-2">
         <Button
@@ -315,7 +315,7 @@ export const ProfileSocialButtons: React.FC<ProfileSocialButtonsProps> = ({
     <>
       <div className="flex gap-2 items-center flex-wrap">
         {followButton}
-        {friendButton}
+        {viewerActorType !== 'business' && friendButton}
         {moreMenu}
       </div>
 

@@ -87,8 +87,10 @@ interface UserListPageProps {
   onFollowingLoadMore?: () => void;
   onFollowingRefetch?: () => void;
   profileUsername?: string;
-  /** Profile owner's userId — used for social counts on filter chips */
+  /** Profile owner's actor id (userId for personal, businessId for business) — used for social counts on filter chips */
   profileUserId?: string;
+  /** Profile owner's actor type — defaults to 'personal' */
+  profileActorType?: 'personal' | 'business';
 }
 
 // ---------------------------------------------------------------------------
@@ -281,6 +283,7 @@ export const UserListPage: React.FC<UserListPageProps> = ({
   onFollowingRefetch,
   profileUsername: _profileUsername,
   profileUserId,
+  profileActorType = 'personal',
 }) => {
   const navigate = useNavigate();
   const { user } = useSupabaseSession();
@@ -398,7 +401,9 @@ export const UserListPage: React.FC<UserListPageProps> = ({
     activeMode === 'followers' ? 'followers' : 'following';
 
   // Social counts for filter chips (uses profile owner's userId, not viewer's)
-  const { data: socialCounts } = useSocialCounts(profileUserId);
+  const { data: socialCounts } = useSocialCounts(
+    profileUserId ? { type: profileActorType, id: profileUserId } : undefined,
+  );
   const friendsCount = socialCounts?.friends ?? 0;
 
   // Pending count is approximate — only counts relationships in the currently
@@ -923,6 +928,10 @@ const UserRowFlat: React.FC<UserRowFlatProps> = ({
   const isPersonalProfile = user.profileType === 'personal';
 
   const handleRowClick = () => {
+    if (user.actorType === 'business') {
+      navigate(user.slug ? `/business/${user.slug}` : `/business/${user.id}`);
+      return;
+    }
     const profilePath = getProfilePathById(user.id, user.creatorOnly, user.username);
     navigate(profilePath);
   };
