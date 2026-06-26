@@ -5,6 +5,7 @@ import { Check } from 'lucide-react';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { useFollowState } from '@/hooks/useFollowState';
 import { useToggleFollow } from '@/hooks/useToggleFollow';
+import { useActiveActor } from '@/context/ActiveActorContext';
 import type { SuggestedCreator } from '@/components/watch/hooks/useSuggestedCreators';
 
 function splitName(displayName: string): { first: string; last: string } {
