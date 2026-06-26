@@ -29,11 +29,14 @@ export const SuggestedCreatorCard: React.FC<SuggestedCreatorCardProps> = ({
 }) => {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
+  const { activeActor } = useActiveActor();
+  const viewerActorType: 'personal' | 'business' = activeActor?.type ?? 'personal';
+  const viewerActorId = activeActor?.id ?? currentUserId;
   const { isFollowing: cached } = useFollowState({
     targetActorType: 'personal',
     targetActorId: creator.userId,
-    viewerActorType: 'personal',
-    viewerActorId: currentUserId,
+    viewerActorType,
+    viewerActorId,
   });
   const following = cached ?? creator.isFollowed ?? false;
   const toggle = useToggleFollow();
@@ -60,8 +63,8 @@ export const SuggestedCreatorCard: React.FC<SuggestedCreatorCardProps> = ({
           targetActorType: 'personal',
           targetActorId: creator.userId,
           targetUserId: creator.userId,
-          viewerActorType: 'personal',
-          viewerActorId: currentUserId,
+          viewerActorType,
+          viewerActorId,
           viewerUserId: currentUserId,
           isFollowing: wasFollowing,
         },
@@ -81,7 +84,7 @@ export const SuggestedCreatorCard: React.FC<SuggestedCreatorCardProps> = ({
         },
       );
     },
-    [busy, following, creator.userId, currentUserId, queryClient, onFollowed, toggle],
+    [busy, following, creator.userId, currentUserId, queryClient, onFollowed, toggle, viewerActorType, viewerActorId],
   );
 
   useEffect(() => {
