@@ -1176,6 +1176,9 @@ export function CinematicFrame({
           });
         }
 
+        // Dynamic TODAY column: only render when at least one solo row carries a value.
+        const anyToday = rows.some((r: any) => r?.kind === 'solo' && r?.entry?.today != null);
+
         return (
           <button
             type="button"
@@ -1189,8 +1192,18 @@ export function CinematicFrame({
               backdropFilter: 'blur(20px) saturate(1.2)',
               WebkitBackdropFilter: 'blur(20px) saturate(1.2)',
               borderTop: '0.5px solid rgba(255,255,255,0.18)',
+              boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.12)',
             }}
           >
+            {/* Seam feather: gradient bridge from photo into glass board */}
+            <div
+              aria-hidden
+              style={{
+                position: 'absolute', left: 0, right: 0, top: -24,
+                height: 24, pointerEvents: 'none',
+                background: 'linear-gradient(to bottom, rgba(10,14,20,0) 0%, rgba(10,14,20,0.42) 100%)',
+              }}
+            />
             {/* Column header row */}
             <div
               style={{
@@ -1201,7 +1214,7 @@ export function CinematicFrame({
               <span style={{ width: RANK_W, flexShrink: 0 }} />
               <span style={{ width: 26, flexShrink: 0 }} />
               <span style={{ flex: 1 }} />
-              <span style={{ ...NUMERIC_STYLE, width: COL_TODAY, textAlign: 'right', fontSize: 8, fontWeight: 800, letterSpacing: '0.1em', color: 'rgba(255,255,255,0.4)' }}>TODAY</span>
+              {anyToday && <span style={{ ...NUMERIC_STYLE, width: COL_TODAY, textAlign: 'right', fontSize: 8, fontWeight: 800, letterSpacing: '0.1em', color: 'rgba(255,255,255,0.4)' }}>TODAY</span>}
               <span style={{ ...NUMERIC_STYLE, width: COL_TOTAL, textAlign: 'right', fontSize: 8, fontWeight: 800, letterSpacing: '0.1em', color: 'rgba(255,255,255,0.4)' }}>TOTAL</span>
               <span style={{ ...NUMERIC_STYLE, width: COL_THRU, textAlign: 'right', fontSize: 8, fontWeight: 800, letterSpacing: '0.1em', color: 'rgba(255,255,255,0.4)' }}>THRU</span>
             </div>
@@ -1229,9 +1242,11 @@ export function CinematicFrame({
                       hideRing
                     />
                     <span style={{ flex: 1, minWidth: 0, fontSize: 14, fontWeight: 600, color: 'white', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{name}</span>
-                    <span style={{ ...NUMERIC_STYLE, width: COL_TODAY, textAlign: 'right', fontSize: 13, fontWeight: 700, color: scoreColor(today) }}>
-                      {today == null ? '—' : fmtScore(today)}
-                    </span>
+                    {anyToday && (
+                      <span style={{ ...NUMERIC_STYLE, width: COL_TODAY, textAlign: 'right', fontSize: 13, fontWeight: 700, color: scoreColor(today) }}>
+                        {today == null ? '—' : fmtScore(today)}
+                      </span>
+                    )}
                     <span style={{ ...NUMERIC_STYLE, width: COL_TOTAL, textAlign: 'right', fontSize: 16, fontWeight: 800, letterSpacing: '-0.02em', color: scoreColor(entry?.score) }}>
                       {fmtScore(entry?.score)}
                     </span>
@@ -1250,7 +1265,7 @@ export function CinematicFrame({
                   <span style={{ ...NUMERIC_STYLE, width: RANK_W, fontSize: 12, fontWeight: 700, color: row.isLeader ? AMBER : 'rgba(255,255,255,0.5)', textAlign: 'left', flexShrink: 0 }}>{row.rank}</span>
                   <StackedAvatarsDark items={row.items} size={26} />
                   <span style={{ flex: 1, minWidth: 0, fontSize: 14, fontWeight: row.isLeader ? 700 : 600, color: 'white', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{label}</span>
-                  <span style={{ width: COL_TODAY, flexShrink: 0 }} />
+                  {anyToday && <span style={{ width: COL_TODAY, flexShrink: 0 }} />}
                   <span style={{ ...NUMERIC_STYLE, width: COL_TOTAL, textAlign: 'right', fontSize: 16, fontWeight: 800, letterSpacing: '-0.02em', color: scoreColor(scoreStringToNumber(row.score)) }}>
                     {typeof row.score === 'number' ? fmtScore(row.score) : row.score}
                   </span>
