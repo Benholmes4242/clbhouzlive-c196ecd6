@@ -181,31 +181,41 @@ function ToughCourseCard({ course, onTap }: CardProps) {
         {/* Hero stat row */}
         <div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between' }}>
           <div>
-            <p
-              style={{
-                margin: 0,
-                fontSize: 9,
-                fontWeight: 800,
-                letterSpacing: '0.08em',
-                color: INK_FAINT,
-                lineHeight: 1,
-                textTransform: 'uppercase',
-              }}
-            >
-              AVG OVER PAR
-            </p>
+            <div style={{ display: 'flex', alignItems: 'baseline', gap: 6 }}>
+              <p
+                style={{
+                  margin: 0,
+                  fontSize: 28,
+                  fontWeight: 800,
+                  color: MAROON,
+                  fontVariantNumeric: 'tabular-nums',
+                  letterSpacing: '-0.02em',
+                  lineHeight: 1,
+                }}
+              >
+                +{numFmt(course.avg_over_par, 1)}
+              </p>
+              <span
+                style={{
+                  fontSize: 13,
+                  fontWeight: 500,
+                  color: INK_FAINT,
+                  lineHeight: 1,
+                }}
+              >
+                strokes over par
+              </span>
+            </div>
             <p
               style={{
                 margin: '4px 0 0',
-                fontSize: 26,
-                fontWeight: 800,
-                color: MAROON,
-                fontVariantNumeric: 'tabular-nums',
-                letterSpacing: '-0.02em',
-                lineHeight: 1,
+                fontSize: 12,
+                fontWeight: 500,
+                color: INK_MUTE,
+                lineHeight: 1.3,
               }}
             >
-              +{numFmt(course.avg_over_par, 1)}
+              average per round across {course.total_rounds ?? '–'} rounds played
             </p>
           </div>
           <div
