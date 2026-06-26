@@ -12,6 +12,7 @@ import { Composer } from './Composer';
 import { MediaEditor } from './MediaEditor';
 import { CourseSearchSheet } from './CourseSearchSheet';
 import { DraftsListSheet } from './DraftsListSheet';
+import { ScheduledPostsSheet } from './ScheduledPostsSheet';
 import { usePostStudioStore } from '@/stores/usePostStudioStore';
 import type { ComposerMediaItem } from './composerMedia';
 import type { StudioActorType, TaggedCourse } from './types';
