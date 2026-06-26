@@ -87,6 +87,8 @@ interface ComposerProps {
   setMediaItems: React.Dispatch<React.SetStateAction<ComposerMediaItem[]>>;
   /** When set, the composer runs in edit mode against this existing post. */
   editPostId?: string | null;
+  /** When set, the composer resumes this saved draft. */
+  draftId?: string | null;
 }
 
 export function Composer({
