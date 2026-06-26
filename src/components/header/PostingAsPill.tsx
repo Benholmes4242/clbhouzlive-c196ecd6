@@ -188,13 +188,21 @@ export const PostingAsPill = forwardRef<HTMLButtonElement, PostingAsPillProps>(
         >
         {/* Squircle Avatar with notification dot */}
         <div className="relative flex-shrink-0 flex items-center">
-          <SquircleAvatar
-            size={compact ? 26 : 28}
-            src={activeActor.avatarUrl}
-            alt={activeActor.name}
-            userId={activeActor.id}
-            hideRing
-          />
+          <span
+            style={{
+              display: 'inline-flex',
+              borderRadius: '34%',
+              boxShadow: isBusinessActor ? BUSINESS_RING : 'none',
+            }}
+          >
+            <SquircleAvatar
+              size={compact ? 26 : 28}
+              src={activeActor.avatarUrl}
+              alt={activeActor.name}
+              userId={activeActor.id}
+              hideRing
+            />
+          </span>
           
           {/* Orange badge — social notifications (top-right) */}
           {hasUnreadNotifications && (
