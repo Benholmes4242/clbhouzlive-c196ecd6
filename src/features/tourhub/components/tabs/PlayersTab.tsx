@@ -6,7 +6,7 @@
 import { useState, useMemo, useCallback, useEffect, useRef, type RefObject } from 'react';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useSearchParams, useLocation, useNavigate } from 'react-router-dom';
-import { Search, X, ChevronDown, ChevronRight, Users, Crown } from 'lucide-react';
+import { Search, X, ChevronDown, Crown } from 'lucide-react';
 
 import { AnimatePresence, motion } from 'framer-motion';
 import { useQueryClient } from '@tanstack/react-query';

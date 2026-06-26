@@ -6,7 +6,7 @@
 
 import { Link } from 'react-router-dom';
 import { format, isSameMonth } from 'date-fns';
-import { Trophy, Calendar, ChevronRight } from 'lucide-react';
+import { Trophy } from 'lucide-react';
 import CountryFlag from '@/components/ui/country-flag';
 import type { TourTournament } from '../../hooks/useTourHubData';
 import { isAnyMajor } from '../../utils/majorScope';

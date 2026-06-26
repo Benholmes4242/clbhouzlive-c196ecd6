@@ -9,7 +9,7 @@
 
 import { Fragment } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { UserCircle, ChevronRight, Crown } from 'lucide-react';
+import { Crown } from 'lucide-react';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { resolvePlayerAvatarCandidates } from '@/features/tourhub/_shared/resolvePlayerAvatar';
 import { titleCaseCountry } from '../../utils/countryFlags';

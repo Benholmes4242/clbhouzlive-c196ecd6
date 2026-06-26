@@ -6,7 +6,7 @@
 
 import { Link } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Activity, ChevronRight, Crown, Flame, Trophy } from 'lucide-react';
+import { Crown, Flame, Trophy } from 'lucide-react';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { resolvePlayerAvatarCandidates } from '../../_shared/resolvePlayerAvatar';
 import { titleCaseCountry } from '../../utils/countryFlags';
