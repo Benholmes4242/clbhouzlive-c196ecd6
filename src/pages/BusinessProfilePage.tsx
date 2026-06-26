@@ -28,6 +28,7 @@ import { useFollowState } from '@/hooks/useFollowState';
 import { useToggleFollow } from '@/hooks/useToggleFollow';
 import { useBusinessImageUpload } from '@/hooks/useBusinessImageUpload';
 import { useBusinessTeam } from '@/hooks/useBusinessTeam';
+import { useStartDM } from '@/hooks/useStartDM';
 
 import { Button } from '@/components/ui/button';
 import { VerifiedBadge } from '@/components/ui/VerifiedBadge';
