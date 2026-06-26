@@ -104,6 +104,8 @@ export function useMessaging(): UseMessagingReturn {
             id,
             conversation_id,
             user_id,
+            actor_type,
+            actor_id,
             role,
             joined_at,
             last_read_at,
@@ -123,37 +125,70 @@ export function useMessaging(): UseMessagingReturn {
         return;
       }
 
-      // Step 3: Get all unique user IDs from participants
+      // Step 3: Collect unique user IDs (personal) and business actor IDs
       const allUserIds = new Set<string>();
+      const allBusinessIds = new Set<string>();
       conversationsData.forEach(conv => {
         const participants = conv.conversation_participants as ConversationParticipant[] | null;
         participants?.forEach(p => {
-          if (p.user_id) allUserIds.add(p.user_id);
+          if ((p.actor_type ?? 'personal') === 'business') {
+            if (p.actor_id) allBusinessIds.add(p.actor_id);
+          } else if (p.user_id) {
+            allUserIds.add(p.user_id);
+          }
         });
       });
 
-      // Step 4: Fetch profiles for all participants
-      const { data: profilesData, error: profilesError } = await supabase
-        .from('user_profiles')
-        .select('id, username, display_name, profile_photo_url, eg_handicap_index, home_club')
-        .in('id', Array.from(allUserIds));
-
-      if (profilesError) throw profilesError;
-
-      // Create profile lookup map
+      // Step 4a: Fetch personal profiles
       const profilesMap = new Map<string, ParticipantProfile>();
-      profilesData?.forEach(profile => {
-        if (profile.id) {
-          profilesMap.set(profile.id, {
-            id: profile.id,
-            username: profile.username,
-            display_name: profile.display_name,
-            profile_photo_url: profile.profile_photo_url,
-            eg_handicap_index: profile.eg_handicap_index ?? null,
-            home_club: profile.home_club ?? null,
-          });
-        }
-      });
+      if (allUserIds.size > 0) {
+        const { data: profilesData, error: profilesError } = await supabase
+          .from('user_profiles')
+          .select('id, username, display_name, profile_photo_url, eg_handicap_index, home_club')
+          .in('id', Array.from(allUserIds));
+
+        if (profilesError) throw profilesError;
+
+        profilesData?.forEach(profile => {
+          if (profile.id) {
+            profilesMap.set(profile.id, {
+              id: profile.id,
+              username: profile.username,
+              display_name: profile.display_name,
+              profile_photo_url: profile.profile_photo_url,
+              eg_handicap_index: profile.eg_handicap_index ?? null,
+              home_club: profile.home_club ?? null,
+              actor_type: 'personal',
+            });
+          }
+        });
+      }
+
+      // Step 4b: Fetch business identities for business participants
+      const businessMap = new Map<string, ParticipantProfile>();
+      if (allBusinessIds.size > 0) {
+        const { data: businessData, error: businessError } = await supabase
+          .from('business_accounts')
+          .select('id, name, slug, logo_url, is_verified')
+          .in('id', Array.from(allBusinessIds));
+
+        if (businessError) throw businessError;
+
+        businessData?.forEach(b => {
+          if (b.id) {
+            businessMap.set(b.id, {
+              id: b.id,
+              username: b.slug ?? null,
+              display_name: b.name ?? null,
+              profile_photo_url: b.logo_url ?? null,
+              eg_handicap_index: null,
+              home_club: null,
+              actor_type: 'business',
+              is_verified: b.is_verified ?? null,
+            });
+          }
+        });
+      }
 
       // Step 5: Fetch last message sender for each conversation via RPC
       const { data: lastMessagesData } = await supabase
@@ -176,18 +211,29 @@ export function useMessaging(): UseMessagingReturn {
       // Step 6: Build final conversations with details
       const conversationsWithDetails: ConversationWithDetails[] = conversationsData.map(conv => {
         const rawParticipants = conv.conversation_participants as ConversationParticipant[] | null;
-        
-        const participants: ParticipantWithProfile[] = (rawParticipants || []).map(p => ({
-          id: p.id,
-          conversation_id: p.conversation_id,
-          user_id: p.user_id,
-          role: p.role as 'admin' | 'member',
-          joined_at: p.joined_at,
-          last_read_at: p.last_read_at,
-          is_muted: p.is_muted,
-          is_archived: p.is_archived,
-          profile: p.user_id ? profilesMap.get(p.user_id) || null : null,
-        }));
+
+        const participants: ParticipantWithProfile[] = (rawParticipants || []).map(p => {
+          const pActorType = (p.actor_type ?? 'personal') as 'personal' | 'business';
+          let profile: ParticipantProfile | null = null;
+          if (pActorType === 'business' && p.actor_id) {
+            profile = businessMap.get(p.actor_id) ?? null;
+          } else if (p.user_id) {
+            profile = profilesMap.get(p.user_id) ?? null;
+          }
+          return {
+            id: p.id,
+            conversation_id: p.conversation_id,
+            user_id: p.user_id,
+            actor_type: pActorType,
+            actor_id: p.actor_id ?? (pActorType === 'personal' ? p.user_id : null),
+            role: p.role as 'admin' | 'member',
+            joined_at: p.joined_at,
+            last_read_at: p.last_read_at,
+            is_muted: p.is_muted,
+            is_archived: p.is_archived,
+            profile,
+          };
+        });
 
         // Get last message info
         const lastMsgInfo = lastMessageSenderMap.get(conv.id);

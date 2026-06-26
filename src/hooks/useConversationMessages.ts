@@ -50,7 +50,7 @@ export function useConversationMessages(conversationId: string | null): UseConve
       // Fetch messages for this conversation
       const { data: messagesData, error: messagesError } = await supabase
         .from('messages')
-        .select('id, conversation_id, sender_id, content, message_type, media_url, media_metadata, reply_to_id, is_edited, edited_at, created_at, deleted_at')
+        .select('id, conversation_id, sender_id, sender_actor_type, sender_actor_id, content, message_type, media_url, media_metadata, reply_to_id, is_edited, edited_at, created_at, deleted_at')
         .eq('conversation_id', conversationId)
         .is('deleted_at', null)
         .order('created_at', { ascending: false })
@@ -77,19 +77,36 @@ export function useConversationMessages(conversationId: string | null): UseConve
         return;
       }
 
-      // Collect all sender IDs
+      // Collect personal sender IDs and business actor IDs
       const senderIds = new Set<string>();
+      const businessActorIds = new Set<string>();
       messagesData.forEach(m => {
-        if (m.sender_id) senderIds.add(m.sender_id);
+        const aType = (m as { sender_actor_type?: string | null }).sender_actor_type ?? 'personal';
+        const aId = (m as { sender_actor_id?: string | null }).sender_actor_id ?? null;
+        if (aType === 'business' && aId) {
+          businessActorIds.add(aId);
+        } else if (m.sender_id) {
+          senderIds.add(m.sender_id);
+        }
       });
 
       // Fetch sender profiles
-      const { data: profilesData, error: profilesError } = await supabase
-        .from('user_profiles')
-        .select('id, username, display_name, profile_photo_url, eg_handicap_index, home_club')
-        .in('id', Array.from(senderIds));
+      const { data: profilesData, error: profilesError } = senderIds.size > 0
+        ? await supabase
+            .from('user_profiles')
+            .select('id, username, display_name, profile_photo_url, eg_handicap_index, home_club')
+            .in('id', Array.from(senderIds))
+        : { data: [], error: null };
 
       if (profilesError) throw profilesError;
+
+      // Fetch business identities for business senders
+      const { data: businessData } = businessActorIds.size > 0
+        ? await supabase
+            .from('business_accounts')
+            .select('id, name, slug, logo_url, is_verified')
+            .in('id', Array.from(businessActorIds))
+        : { data: [] as Array<{ id: string; name: string; slug: string | null; logo_url: string | null; is_verified: boolean | null }> };
 
       // Create profile lookup
       const profilesMap = new Map<string, ParticipantProfile>();
@@ -104,6 +121,20 @@ export function useConversationMessages(conversationId: string | null): UseConve
             home_club: p.home_club ?? null,
           });
         }
+      });
+
+      const businessMap = new Map<string, ParticipantProfile>();
+      businessData?.forEach(b => {
+        businessMap.set(b.id, {
+          id: b.id,
+          username: b.slug ?? null,
+          display_name: b.name ?? null,
+          profile_photo_url: b.logo_url ?? null,
+          eg_handicap_index: null,
+          home_club: null,
+          actor_type: 'business',
+          is_verified: b.is_verified ?? false,
+        });
       });
 
       // Fetch reply-to messages if any
@@ -124,21 +155,30 @@ export function useConversationMessages(conversationId: string | null): UseConve
       }
 
       // Build messages with sender info
-      const messagesWithSender: MessageWithSender[] = messagesData.map(m => ({
-        id: m.id,
-        conversation_id: m.conversation_id,
-        sender_id: m.sender_id,
-        content: m.content,
-        message_type: m.message_type as MessageWithSender['message_type'],
-        media_url: m.media_url,
-        media_metadata: m.media_metadata as Record<string, unknown> | null,
-        reply_to_id: m.reply_to_id,
-        is_edited: m.is_edited || false,
-        edited_at: m.edited_at,
-        deleted_at: m.deleted_at,
-        created_at: m.created_at,
-        sender: m.sender_id ? profilesMap.get(m.sender_id) || null : null,
-      }));
+      const messagesWithSender: MessageWithSender[] = messagesData.map(m => {
+        const aType = ((m as { sender_actor_type?: string | null }).sender_actor_type ?? 'personal') as 'personal' | 'business';
+        const aId = (m as { sender_actor_id?: string | null }).sender_actor_id ?? null;
+        const sender = aType === 'business' && aId
+          ? businessMap.get(aId) ?? null
+          : (m.sender_id ? profilesMap.get(m.sender_id) || null : null);
+        return {
+          id: m.id,
+          conversation_id: m.conversation_id,
+          sender_id: m.sender_id,
+          sender_actor_type: aType,
+          sender_actor_id: aId,
+          content: m.content,
+          message_type: m.message_type as MessageWithSender['message_type'],
+          media_url: m.media_url,
+          media_metadata: m.media_metadata as Record<string, unknown> | null,
+          reply_to_id: m.reply_to_id,
+          is_edited: m.is_edited || false,
+          edited_at: m.edited_at,
+          deleted_at: m.deleted_at,
+          created_at: m.created_at,
+          sender,
+        };
+      });
 
       // Reverse to show oldest first (chat order)
       const orderedMessages = messagesWithSender.reverse();

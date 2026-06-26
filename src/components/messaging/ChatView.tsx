@@ -5,6 +5,7 @@ import type { ConversationParticipant, ParticipantProfile, ParticipantWithProfil
 import { useConversationMessages } from '@/hooks/useConversationMessages';
 import { useMessagingContext } from '@/contexts/MessagingContext';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
+import { useActiveActor } from '@/context/ActiveActorContext';
 import { useTypingIndicator } from '@/hooks/useTypingIndicator';
 import { useMessageReactions } from '@/hooks/useMessageReactions';
 import { usePresence } from '@/hooks/usePresence';
@@ -113,6 +114,15 @@ function DateSeparator({ date }: { date: string }) {
 
 export function ChatView({ conversationId, onBack }: ChatViewProps) {
   const { user } = useSupabaseSession();
+  const { activeActor } = useActiveActor();
+  const activeType: 'personal' | 'business' = activeActor?.type === 'business' ? 'business' : 'personal';
+  const activeId: string | undefined = activeActor?.id ?? user?.id;
+  const isOtherParticipant = useCallback((p: ParticipantWithProfile | ConversationParticipant) => {
+    if (!activeId) return true;
+    const pType = ((p as ParticipantWithProfile).actor_type ?? 'personal') as 'personal' | 'business';
+    const pId = pType === 'business' ? ((p as ParticipantWithProfile).actor_id ?? null) : p.user_id;
+    return !(pType === activeType && pId === activeId);
+  }, [activeType, activeId]);
   const { conversations, markAsRead, fetchConversations } = useMessagingContext();
   const { 
     messages, 
@@ -241,8 +251,8 @@ export function ChatView({ conversationId, onBack }: ChatViewProps) {
 
   const otherUser = useMemo(() => {
     if (!conversation || !user || conversation.type !== 'direct') return null;
-    return conversation.participants.find(p => p.user_id !== user.id);
-  }, [conversation, user]);
+    return conversation.participants.find(isOtherParticipant);
+  }, [conversation, user, isOtherParticipant]);
 
   useEffect(() => {
     if (otherUser?.user_id) {
@@ -258,7 +268,7 @@ export function ChatView({ conversationId, onBack }: ChatViewProps) {
     }
 
     if (conversation.type === 'direct') {
-      const other = conversation.participants.find(p => p.user_id !== user.id);
+      const other = conversation.participants.find(isOtherParticipant);
       if (other?.profile) {
         const name = other.profile.display_name || other.profile.username || 'Unknown';
         return {
@@ -276,17 +286,17 @@ export function ChatView({ conversationId, onBack }: ChatViewProps) {
       avatarUrl: conversation.avatar_url,
       initials: name.substring(0, 2).toUpperCase(),
     };
-  }, [conversation, user]);
+  }, [conversation, user, isOtherParticipant]);
 
   const isGroupChat = conversation?.type !== 'direct';
 
   const otherUserName = useMemo(() => {
     if (conversation?.type === 'direct') {
-      const other = conversation.participants.find(p => p.user_id !== user?.id);
+      const other = conversation.participants.find(isOtherParticipant);
       return other?.profile?.display_name || other?.profile?.username || 'User';
     }
     return 'User';
-  }, [conversation, user?.id]);
+  }, [conversation, isOtherParticipant]);
 
   const messagesMap = useMemo(() => {
     const map = new Map<string, MessageWithSender>();
@@ -613,7 +623,9 @@ export function ChatView({ conversationId, onBack }: ChatViewProps) {
                 
                 {dateMessages.map((message, index) => {
                   const globalIndex = messages.indexOf(message);
-                  const isOwn = message.sender_id === user?.id;
+                  const msgActorType = (message.sender_actor_type ?? 'personal') as 'personal' | 'business';
+                  const msgActorId = msgActorType === 'business' ? message.sender_actor_id : message.sender_id;
+                  const isOwn = msgActorType === activeType && msgActorId === activeId;
                   const showSender = shouldShowSenderInfo(message, globalIndex);
                   const replyTo = message.reply_to_id 
                     ? messagesMap.get(message.reply_to_id) 
@@ -684,6 +696,22 @@ export function ChatView({ conversationId, onBack }: ChatViewProps) {
               )}
             </button>
           )}
+        </div>
+      )}
+
+      {/* Active-business "You're acting as X" cue (Group 8 tie-in) */}
+      {activeType === 'business' && activeActor?.name && (
+        <div
+          className="flex items-center justify-center gap-1.5 text-[11px] font-semibold uppercase tracking-wider"
+          style={{
+            padding: '6px 16px',
+            color: AMBER,
+            background: AMBER_TINT_10,
+            borderTop: `1px solid ${HAIRLINE_INK_7}`,
+            letterSpacing: '0.06em',
+          }}
+        >
+          Replying as {activeActor.name}
         </div>
       )}
 

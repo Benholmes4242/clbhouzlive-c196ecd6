@@ -22,15 +22,19 @@ export function useStartDM() {
   const [isStarting, setIsStarting] = useState<string | null>(null);
 
   const startDM = useCallback(
-    async (otherUserId: string) => {
-      if (!user || !otherUserId || otherUserId === user.id) return;
+    async (
+      targetId: string,
+      targetActorType: 'personal' | 'business' = 'personal',
+    ) => {
+      if (!user || !targetId) return;
+      if (targetActorType === 'personal' && targetId === user.id) return;
       if (isStarting) return; // prevent double-tap
 
-      setIsStarting(otherUserId);
+      setIsStarting(targetId);
       haptic('light');
 
       try {
-        const conversationId = await getOrCreateDM(otherUserId);
+        const conversationId = await getOrCreateDM(targetId, targetActorType);
         if (conversationId) {
           navigate(`/messages/${conversationId}`);
         } else {

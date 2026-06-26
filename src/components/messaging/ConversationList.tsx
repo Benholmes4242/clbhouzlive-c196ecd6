@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useMessagingContext } from '@/contexts/MessagingContext';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
+import { useActiveActor } from '@/context/ActiveActorContext';
 import { useArchivedConversations } from '@/hooks/useArchivedConversations';
 import { useTypingIndicator } from '@/hooks/useTypingIndicator';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
@@ -49,13 +50,16 @@ function formatRelativeTime(dateString: string | null): string {
 
 function getConversationDisplay(
   conversation: ConversationWithDetails,
-  currentUserId: string | undefined
-): { name: string; avatarUrl: string | null; initials: string } {
+  active: { type: 'personal' | 'business'; id: string } | null,
+): { name: string; avatarUrl: string | null; initials: string; isBusiness: boolean } {
   if (conversation.type === 'direct') {
-    const otherParticipant = conversation.participants.find(
-      p => p.user_id !== currentUserId
-    );
-    
+    const otherParticipant = conversation.participants.find(p => {
+      if (!active) return true;
+      const pType = (p.actor_type ?? 'personal');
+      const pId = pType === 'business' ? (p.actor_id ?? null) : p.user_id;
+      return !(pType === active.type && pId === active.id);
+    });
+
     if (otherParticipant?.profile) {
       const profile = otherParticipant.profile;
       const name = profile.display_name || profile.username || 'Unknown';
@@ -63,10 +67,11 @@ function getConversationDisplay(
         name,
         avatarUrl: profile.profile_photo_url,
         initials: name.substring(0, 2).toUpperCase(),
+        isBusiness: profile.actor_type === 'business',
       };
     }
-    
-    return { name: 'Unknown User', avatarUrl: null, initials: 'U' };
+
+    return { name: 'Unknown User', avatarUrl: null, initials: 'U', isBusiness: false };
   }
 
   const name = conversation.name || 'Group Chat';
@@ -74,6 +79,7 @@ function getConversationDisplay(
     name,
     avatarUrl: conversation.avatar_url,
     initials: name.substring(0, 2).toUpperCase(),
+    isBusiness: false,
   };
 }
 
@@ -232,6 +238,10 @@ export function ConversationList({
 }: ConversationListProps) {
   const { conversations, loading, fetchConversations } = useMessagingContext();
   const { user } = useSupabaseSession();
+  const { activeActor } = useActiveActor();
+  const activeActorRef = activeActor
+    ? { type: (activeActor.type === 'business' ? 'business' : 'personal') as 'personal' | 'business', id: activeActor.id }
+    : (user?.id ? { type: 'personal' as const, id: user.id } : null);
   const { archivedConversations, hasArchived, unarchive, refetch: refetchArchived } = useArchivedConversations();
   const [showArchived, setShowArchived] = useState(false);
   const [showSwipeHint, setShowSwipeHint] = useState(() => {
@@ -305,7 +315,7 @@ export function ConversationList({
     if (!searchQuery.trim()) return true;
     
     const query = searchQuery.toLowerCase();
-    const { name } = getConversationDisplay(conversation, user?.id);
+    const { name } = getConversationDisplay(conversation, activeActorRef);
     const lastMessage = conversation.last_message_preview?.toLowerCase() || '';
     
     return name.toLowerCase().includes(query) || lastMessage.includes(query);
@@ -337,7 +347,7 @@ export function ConversationList({
   const groupConversations = filteredConversations.filter(c => c.type !== 'direct');
 
   const renderConversationRow = (conversation: ConversationWithDetails, isArchived: boolean = false, index: number = 0, total: number = 0) => {
-    const { name, avatarUrl, initials } = getConversationDisplay(conversation, user?.id);
+    const { name, avatarUrl, initials, isBusiness } = getConversationDisplay(conversation, activeActorRef);
     const isSelected = selectedConversationId === conversation.id;
     const hasUnread = conversation.unread_count > 0;
     const showDivider = index < total - 1;
