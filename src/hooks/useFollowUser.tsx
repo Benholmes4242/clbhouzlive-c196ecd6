@@ -16,15 +16,18 @@ export const useFollowUser = () => {
   }
 
   const { user } = useSupabaseSession();
+  const { activeActor } = useActiveActor();
+  const viewerActorType: 'personal' | 'business' = activeActor?.type ?? 'personal';
+  const viewerActorId = activeActor?.id ?? user?.id;
   const [loading, setLoading] = useState(false);
   const toggle = useToggleFollow();
 
   const followUser = async (targetUserId: string) => {
-    if (!user) {
+    if (!user || !viewerActorId) {
       toast.error('Please sign in to follow users');
       return false;
     }
-    if (targetUserId === user.id) {
+    if (viewerActorType === 'personal' && targetUserId === user.id) {
       AppLog.warn('[useFollowUser]', 'Attempted self-follow — blocked at client');
       return false;
     }
@@ -34,8 +37,8 @@ export const useFollowUser = () => {
         targetActorType: 'personal',
         targetActorId: targetUserId,
         targetUserId,
-        viewerActorType: 'personal',
-        viewerActorId: user.id,
+        viewerActorType,
+        viewerActorId,
         viewerUserId: user.id,
         isFollowing: false,
       });
@@ -51,19 +54,19 @@ export const useFollowUser = () => {
   };
 
   const unfollowUser = async (targetUserId: string) => {
-    if (!user) {
+    if (!user || !viewerActorId) {
       toast.error('Please sign in to unfollow users');
       return false;
     }
-    if (targetUserId === user.id) return false;
+    if (viewerActorType === 'personal' && targetUserId === user.id) return false;
     setLoading(true);
     try {
       await toggle.mutateAsync({
         targetActorType: 'personal',
         targetActorId: targetUserId,
         targetUserId,
-        viewerActorType: 'personal',
-        viewerActorId: user.id,
+        viewerActorType,
+        viewerActorId,
         viewerUserId: user.id,
         isFollowing: true,
       });
