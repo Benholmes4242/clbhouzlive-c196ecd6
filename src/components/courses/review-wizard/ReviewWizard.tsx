@@ -980,7 +980,7 @@ export function ReviewWizard({
 
                     {/* Media carousel */}
                     {hasMedia && (
-                      <div style={{ padding: '16px 0 14px' }}>
+                      <div style={{ padding: `16px 0 14px ${PAD_X}` }}>
                         <div
                           style={{
                             display: 'flex',
@@ -989,7 +989,7 @@ export function ReviewWizard({
                             scrollSnapType: 'x mandatory',
                             WebkitOverflowScrolling: 'touch',
                             scrollbarWidth: 'none',
-                            padding: `0 ${PAD_X}`,
+                            paddingRight: PAD_X,
                           }}
                         >
                           {existingTiles.map((tile) => (
