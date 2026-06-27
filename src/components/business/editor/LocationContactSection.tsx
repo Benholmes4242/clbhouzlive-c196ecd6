@@ -1,7 +1,7 @@
 import React from 'react';
 import { Lock, MapPin } from 'lucide-react';
 
-import { SectionEyebrow } from '@/components/ui/SectionEyebrow';
+import { SectionHeader } from '@/components/ui/SectionHeader';
 import { SectionCard } from '@/components/profile/edit-v2/SectionCard';
 import { BIZ } from '@/components/business/businessTokens';
 import { AddressAutocomplete, AddressValue } from '@/components/business/AddressAutocomplete';
@@ -95,7 +95,7 @@ export function LocationContactSection({
   return (
     <>
       <div className="px-4 mt-2 mb-2">
-        <SectionEyebrow label="LOCATION & CONTACT" />
+        <SectionHeader tier="standard" kicker="LOCATION & CONTACT" />
       </div>
       <div className="space-y-4 px-4 pb-4">
         <SectionCard>

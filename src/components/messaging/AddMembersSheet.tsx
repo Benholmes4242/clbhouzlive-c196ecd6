@@ -9,7 +9,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useDebounce } from '@/hooks/useDebounce';
 import { cn } from '@/lib/utils';
 import { AppLog } from '@/lib/logger';
-import { SectionEyebrow } from '@/components/ui/SectionEyebrow';
+import { SectionHeader } from '@/components/ui/SectionHeader';
 import { AMBER } from './_shared/tokens';
 
 interface AddMembersSheetProps {
@@ -117,7 +117,7 @@ export const AddMembersSheet: React.FC<AddMembersSheetProps> = ({
         {/* Drag handle */}
         <div style={{ width: 36, height: 4, borderRadius: 2, background: 'rgba(15,23,42,0.12)', margin: '0 auto 8px', flexShrink: 0 }} />
         <div style={{ marginBottom: 16 }}>
-          <SectionEyebrow label="Add Members" />
+          <SectionHeader tier="standard" kicker="Add Members" />
         </div>
         {/* Search Input */}
         <div className="relative">

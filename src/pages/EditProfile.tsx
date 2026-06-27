@@ -14,7 +14,7 @@ import { resolveDisplayHandicap } from '@/lib/handicap/resolveHandicap';
 import { formatHcp } from '@/lib/formatHcp';
 import { Button } from '@/components/ui/button';
 import { PageRoot } from '@/components/layout/PageRoot';
-import { SectionEyebrow } from '@/components/ui/SectionEyebrow';
+import { SectionHeader } from '@/components/ui/SectionHeader';
 import { SectionCard } from '@/components/profile/edit-v2/SectionCard';
 import { SegToggle } from '@/components/profile/edit-v2/SegToggle';
 import { HeaderPhotoCard } from '@/components/profile/edit-v2/HeaderPhotoCard';
@@ -335,7 +335,7 @@ export default function EditProfile() {
               {/* Name (first + last) — onboarding-relevant */}
               <div className="px-4 pt-4 pb-3" style={{ borderBottom: '0.5px solid rgba(15,23,42,0.07)' }}>
                 <div style={{ marginBottom: 8 }}>
-                  <SectionEyebrow label="Name" />
+                  <SectionHeader tier="standard" kicker="Name" />
                 </div>
                 <div className="flex gap-2">
                   <input
@@ -359,7 +359,7 @@ export default function EditProfile() {
               <div className="px-4 pt-4 pb-3" style={{ borderBottom: '0.5px solid rgba(15,23,42,0.07)' }}>
                 <div className="flex justify-between items-baseline">
                   <div style={{ marginBottom: 8 }}>
-                    <SectionEyebrow label="Display Name" />
+                    <SectionHeader tier="standard" kicker="Display Name" />
                   </div>
                   <span className="text-[11px] text-muted-foreground/60">
                     {form.displayName.length}/{DISPLAY_NAME_MAX}
@@ -382,7 +382,7 @@ export default function EditProfile() {
               <div className="px-4 pt-3 pb-4" style={{ borderBottom: '0.5px solid rgba(15,23,42,0.07)' }}>
                 <div className="flex justify-between items-baseline">
                   <div style={{ marginBottom: 8 }}>
-                    <SectionEyebrow label="Username" />
+                    <SectionHeader tier="standard" kicker="Username" />
                   </div>
                   {usernameIsLocked && (
                     <span className="text-[11px] text-muted-foreground/60">
@@ -436,7 +436,7 @@ export default function EditProfile() {
               {/* Gender */}
               <div className="px-4 pt-3 pb-4">
                 <div style={{ marginBottom: 8 }}>
-                  <SectionEyebrow label="Gender" />
+                  <SectionHeader tier="standard" kicker="Gender" />
                 </div>
                 <SegToggle
                   value={form.gender}
@@ -629,7 +629,7 @@ function HandicapRow({
     return (
       <div style={{ fontFamily: GEIST }}>
         <div style={{ marginBottom: 8 }}>
-          <SectionEyebrow label="Official Handicap" />
+          <SectionHeader tier="standard" kicker="Official Handicap" />
         </div>
         <div style={{ display: 'flex', alignItems: 'baseline', gap: 12, marginBottom: 12 }}>
           <span style={{ fontSize: 34, fontWeight: 800, color: INK, letterSpacing: '-0.02em', fontVariantNumeric: 'tabular-nums' }}>
@@ -703,7 +703,7 @@ function HandicapRow({
   return (
     <div style={{ fontFamily: GEIST }}>
       <div style={{ marginBottom: 8 }}>
-        <SectionEyebrow label="Handicap" />
+        <SectionHeader tier="standard" kicker="Handicap" />
       </div>
       <button
         onClick={onOpenConnect}

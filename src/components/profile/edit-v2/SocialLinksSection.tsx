@@ -1,5 +1,5 @@
 import { Instagram, Youtube } from 'lucide-react';
-import { SectionEyebrow } from '@/components/ui/SectionEyebrow';
+import { SectionHeader } from '@/components/ui/SectionHeader';
 
 function XIcon() {
   return (
@@ -62,7 +62,7 @@ export function SocialLinksSection({
   return (
     <div className="space-y-2">
       <div style={{ marginBottom: 8 }}>
-        <SectionEyebrow label="Social Links" />
+        <SectionHeader tier="standard" kicker="Social Links" />
       </div>
       <SocialRow icon={<Instagram size={16} />} placeholder="instagram username" value={instagram} onChange={onInstagramChange} />
       <SocialRow icon={<XIcon />} placeholder="x username" value={twitter} onChange={onTwitterChange} />

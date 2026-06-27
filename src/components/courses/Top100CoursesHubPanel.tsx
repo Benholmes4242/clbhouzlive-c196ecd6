@@ -11,7 +11,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { cn } from '@/lib/utils';
 import VirtualizedCourseList from './VirtualizedCourseList';
 import { AppSelect, type AppSelectOption } from '@/components/ui/AppSelect';
-import { SectionEyebrow } from '@/components/ui/SectionEyebrow';
+import { SectionHeader } from '@/components/ui/SectionHeader';
 import { AMBER, HAIRLINE_INK_7, HAIRLINE_INK_10, INK, INK_FAINT, INK_MUTE, SLATE_600, SURFACE } from '@/features/courses/_shared/tokens';
 
 type Top100SortOption = 'official' | 'user_rating';
@@ -215,7 +215,7 @@ const Top100CoursesHubPanel = () => {
       {/* Editorial header — eyebrow + title + optional progress sub-line.
           Parent already supplies px-4 — don't double-pad. */}
       <div className="pt-1">
-        <SectionEyebrow label="Official World Ranking" color="amber" className="mb-[3px]" />
+        <SectionHeader tier="standard" kicker="Official World Ranking" tone="amber" className="mb-[3px]" />
         <h2 style={{ fontSize: 22, fontWeight: 800, color: INK, letterSpacing: '-0.025em', margin: 0, lineHeight: 1.15 }}>
           The world's best
         </h2>

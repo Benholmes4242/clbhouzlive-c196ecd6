@@ -2,7 +2,7 @@ import { useState, useRef, useEffect } from 'react';
 import { Search, X, MapPin, Check } from 'lucide-react';
 import { useClubSearch } from '@/hooks/useClubSearch';
 import { VisibilityDropdown } from './VisibilityDropdown';
-import { SectionEyebrow } from '@/components/ui/SectionEyebrow';
+import { SectionHeader } from '@/components/ui/SectionHeader';
 
 interface Props {
   clubName: string;
@@ -64,7 +64,7 @@ export function HomeClubCard({
     return (
       <div className="space-y-3">
         <div style={{ marginBottom: 8 }}>
-          <SectionEyebrow label="Home Club" />
+          <SectionHeader tier="standard" kicker="Home Club" />
         </div>
         <div
           className="w-full flex items-center justify-between bg-[#F8FAFC] border border-border/60 rounded-[11px] px-3.5 py-3 min-h-[48px]"
@@ -99,7 +99,7 @@ export function HomeClubCard({
   return (
     <div className="space-y-3">
       <div style={{ marginBottom: 8 }}>
-        <SectionEyebrow label="Home Club" />
+        <SectionHeader tier="standard" kicker="Home Club" />
       </div>
       <div ref={containerRef} className="relative">
         <div className="relative">

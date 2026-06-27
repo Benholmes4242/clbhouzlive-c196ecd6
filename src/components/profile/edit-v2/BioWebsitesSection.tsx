@@ -1,7 +1,7 @@
 import type React from 'react';
 import { Plus, X } from 'lucide-react';
 import { WebsiteEntry, BIO_MAX } from '@/components/profile/profile-wizard/types';
-import { SectionEyebrow } from '@/components/ui/SectionEyebrow';
+import { SectionHeader } from '@/components/ui/SectionHeader';
 
 interface Props {
   bio: string;
@@ -17,7 +17,7 @@ interface Props {
 function RuleLabel({ text }: { text: string }) {
   return (
     <div style={{ marginBottom: 8 }}>
-      <SectionEyebrow label={text} />
+      <SectionHeader tier="standard" kicker={text} />
     </div>
   );
 }

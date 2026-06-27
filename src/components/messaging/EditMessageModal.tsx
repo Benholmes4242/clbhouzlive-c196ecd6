@@ -11,7 +11,7 @@ import {
   SheetContent,
 } from '@/components/ui/sheet';
 import { haptic } from '@/utils/haptics';
-import { SectionEyebrow } from '@/components/ui/SectionEyebrow';
+import { SectionHeader } from '@/components/ui/SectionHeader';
 import { AMBER, INK_MUTE } from './_shared/tokens';
 
 interface EditMessageModalProps {
@@ -60,7 +60,7 @@ export function EditMessageModal({
         {/* Drag handle */}
         <div style={{ width: 36, height: 4, borderRadius: 2, background: 'rgba(15,23,42,0.12)', margin: '10px auto 0', flexShrink: 0 }} />
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '10px 16px 14px', borderBottom: '0.5px solid rgba(15,23,42,0.07)' }}>
-          <SectionEyebrow label="Edit Message" />
+          <SectionHeader tier="standard" kicker="Edit Message" />
         </div>
 
         <div className="space-y-4">

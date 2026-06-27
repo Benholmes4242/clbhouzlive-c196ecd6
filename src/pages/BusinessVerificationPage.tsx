@@ -6,7 +6,7 @@ import { ChevronLeft, Shield, Users, Star, Clock, XCircle, BadgeCheck, Mail, Ale
 import { format } from 'date-fns';
 import { Button } from '@/components/ui/button';
 import { PageRoot } from '@/components/layout/PageRoot';
-import { SectionEyebrow } from '@/components/ui/SectionEyebrow';
+import { SectionHeader } from '@/components/ui/SectionHeader';
 import { VerifiedBadge } from '@/components/ui/VerifiedBadge';
 import { supabase } from '@/integrations/supabase/client';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
@@ -76,7 +76,7 @@ export default function BusinessVerificationPage() {
         className="px-4 pt-3 pb-3"
         style={{ paddingTop: 'calc(var(--chrome-total-h, 0px) + 12px)' }}
       >
-        <SectionEyebrow label="VERIFICATION" color="amber" />
+        <SectionHeader tier="standard" kicker="VERIFICATION" tone="amber" />
         <h1 className="text-[18px] mt-0.5" style={{ color: BIZ.ink, fontWeight: 800, letterSpacing: '-0.01em' }}>
           {state === 'verified' ? 'Verified business' : state === 'pending' ? 'Under review' : state === 'needs_more_info' ? 'More info needed' : state === 'rejected' ? 'Not approved' : 'Get verified'}
         </h1>
@@ -148,7 +148,7 @@ function NoneState({ onStart }: { onStart: () => void }) {
       </div>
 
       <div className="space-y-4">
-        <SectionEyebrow label="WHY GET VERIFIED" />
+        <SectionHeader tier="standard" kicker="WHY GET VERIFIED" />
         <div className="space-y-3">
           {[
             { icon: Shield, title: 'Build trust', desc: 'A verified badge shows golfers your business is legitimate.' },
@@ -169,7 +169,7 @@ function NoneState({ onStart }: { onStart: () => void }) {
       </div>
 
       <div className="space-y-3">
-        <SectionEyebrow label="HOW IT WORKS" />
+        <SectionHeader tier="standard" kicker="HOW IT WORKS" />
         <ol className="space-y-2 text-sm text-muted-foreground">
           <li className="flex items-start gap-2"><span className="font-medium" style={{ color: BIZ.ink }}>1.</span><span>Submit a verification request with proof of legitimacy</span></li>
           <li className="flex items-start gap-2"><span className="font-medium" style={{ color: BIZ.ink }}>2.</span><span>We review your request (usually within a few days)</span></li>
@@ -240,7 +240,7 @@ function PendingState({
       )}
 
       <div className="space-y-3">
-        <SectionEyebrow label="WHAT HAPPENS NEXT" />
+        <SectionHeader tier="standard" kicker="WHAT HAPPENS NEXT" />
         <ul className="space-y-1.5 text-sm text-muted-foreground">
           <li className="flex items-start gap-2"><span className="text-muted-foreground/60 mt-1">•</span><span>We'll review your business details and proof of legitimacy</span></li>
           <li className="flex items-start gap-2"><span className="text-muted-foreground/60 mt-1">•</span><span>You'll get an in-app notification when the review is complete</span></li>

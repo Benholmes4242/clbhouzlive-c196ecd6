@@ -9,7 +9,7 @@ import { AddBusinessCard } from '@/components/business/AddBusinessCard';
 import { useActiveActor } from '@/context/ActiveActorContext';
 import { useHideBottomNav } from '@/hooks/useBottomNavVisibility';
 import { useHideHeader } from '@/hooks/useHeaderVisibility';
-import { SectionEyebrow } from '@/components/ui/SectionEyebrow';
+import { SectionHeader } from '@/components/ui/SectionHeader';
 import { BIZ } from '@/components/business/businessTokens';
 
 // Inline skeleton used by loading state — kept local since it is private to this page.
@@ -129,7 +129,7 @@ const MyBusinessesPage = () => {
             </button>
 
             <div className="flex-1 min-w-0">
-              <SectionEyebrow label="BUSINESSES" color="amber" />
+              <SectionHeader tier="standard" kicker="BUSINESSES" tone="amber" />
               <h1
                 className="truncate"
                 style={{

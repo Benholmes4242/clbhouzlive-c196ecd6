@@ -8,7 +8,7 @@ import {
   SheetContent,
 } from '@/components/ui/sheet';
 import { haptic } from '@/utils/haptics';
-import { SectionEyebrow } from '@/components/ui/SectionEyebrow';
+import { SectionHeader } from '@/components/ui/SectionHeader';
 import { DESTRUCTIVE, HAIRLINE_INK_7, INK_FAINT, INK_MUTE, INK_TINT_05, SURFACE } from './_shared/tokens';
 
 interface DeleteMessageSheetProps {
@@ -58,7 +58,7 @@ export function DeleteMessageSheet({
 
         {/* Title */}
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '12px 16px', marginBottom: 4, borderBottom: `0.5px solid ${HAIRLINE_INK_7}` }}>
-          <SectionEyebrow label="Delete Message" color="danger" />
+          <SectionHeader tier="standard" kicker="Delete Message" tone="danger" />
         </div>
 
         <div style={{ padding: '0 16px' }}>

@@ -20,7 +20,7 @@ import { Search, X, Star, ChevronRight } from 'lucide-react';
 import CoursesShellTabs from '@/features/courses/components/CoursesShellTabs';
 import { supabase } from '@/integrations/supabase/client';
 import { useQuery } from '@tanstack/react-query';
-import { SectionEyebrow } from '@/components/ui/SectionEyebrow';
+import { SectionHeader } from '@/components/ui/SectionHeader';
 import { AMBER, HAIRLINE_INK_7, HAIRLINE_INK_10, HAIRLINE_INK_12, INK, INK_MUTE, INK_TINT_05, SLATE_50, SURFACE } from '@/features/courses/_shared/tokens';
 
 /* ─── Rate a Course bottom sheet ─── */
@@ -77,7 +77,7 @@ function RateCourseSheet({ open, onClose }: { open: boolean; onClose: () => void
         {/* Header */}
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '6px 16px 10px', borderBottom: `0.5px solid ${HAIRLINE_INK_7}` }}>
           <div>
-            <SectionEyebrow label="Rate a Course" color="amber" className="mb-0.5" />
+            <SectionHeader tier="standard" kicker="Rate a Course" tone="amber" className="mb-0.5" />
             <p style={{ fontSize: 12, color: INK_MUTE, margin: 0 }}>Search any course you've played</p>
           </div>
           <button onClick={onClose} style={{ width: 32, height: 32, borderRadius: '50%', background: INK_TINT_05, border: `0.5px solid ${HAIRLINE_INK_10}`, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>

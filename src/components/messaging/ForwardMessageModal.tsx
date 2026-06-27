@@ -17,7 +17,7 @@ import { haptic } from '@/utils/haptics';
 import { AppLog } from '@/lib/logger';
 import { cn } from '@/lib/utils';
 import type { ConversationWithDetails, MessageType } from '@/types/messaging';
-import { SectionEyebrow } from '@/components/ui/SectionEyebrow';
+import { SectionHeader } from '@/components/ui/SectionHeader';
 import { AMBER, HAIRLINE_INK_7, SURFACE } from './_shared/tokens';
 
 interface ForwardMessageModalProps {
@@ -110,7 +110,7 @@ export function ForwardMessageModal({
         {/* Drag handle */}
         <div style={{ width: 36, height: 4, borderRadius: 2, background: 'rgba(15,23,42,0.12)', margin: '10px auto 0', flexShrink: 0 }} />
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '10px 16px 14px', borderBottom: `0.5px solid ${HAIRLINE_INK_7}` }}>
-          <SectionEyebrow label="Forward Message" />
+          <SectionHeader tier="standard" kicker="Forward Message" />
         </div>
 
         {/* Search */}

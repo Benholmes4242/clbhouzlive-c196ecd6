@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { SectionEyebrow } from '@/components/ui/SectionEyebrow';
+import { SectionHeader } from '@/components/ui/SectionHeader';
 import { SectionCard } from '@/components/profile/edit-v2/SectionCard';
 import { BIZ } from '@/components/business/businessTokens';
 
@@ -16,7 +16,7 @@ export function SocialSection({ social, setSocial }: SocialSectionProps) {
   return (
     <>
       <div className="px-4 mt-2 mb-2">
-        <SectionEyebrow label="SOCIAL" />
+        <SectionHeader tier="standard" kicker="SOCIAL" />
       </div>
       <div className="space-y-4 px-4 pb-4">
         <SectionCard>

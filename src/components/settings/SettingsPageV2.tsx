@@ -43,7 +43,7 @@ import {
 } from '@/components/ui/alert-dialog';
 import { Input } from '@/components/ui/input';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
-import { SectionEyebrow } from '@/components/ui/SectionEyebrow';
+import { SectionHeader } from '@/components/ui/SectionHeader';
 const APP_VERSION = '1.0.0';
 
 function maskEmail(email: string): string {
@@ -114,7 +114,7 @@ export function SettingsPageV2() {
         </button>
         <div>
           <div style={{ marginBottom: 2 }}>
-            <SectionEyebrow label="Profile" />
+            <SectionHeader tier="standard" kicker="Profile" />
           </div>
           <h1 style={{ fontFamily: 'Geist, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif', fontSize: 34, fontWeight: 800, color: '#0F172A', letterSpacing: '-0.025em', lineHeight: 1, margin: 0 }}>
             Settings

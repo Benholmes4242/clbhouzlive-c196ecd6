@@ -15,7 +15,7 @@ import { toast } from 'sonner';
 import { haptic } from '@/utils/haptics';
 import { AppLog } from '@/lib/logger';
 import { cn } from '@/lib/utils';
-import { SectionEyebrow } from '@/components/ui/SectionEyebrow';
+import { SectionHeader } from '@/components/ui/SectionHeader';
 import { HAIRLINE_INK_7 } from './_shared/tokens';
 
 interface ReportSheetProps {
@@ -81,7 +81,7 @@ export function ReportSheet({
       <SheetContent side="bottom" className="rounded-t-3xl px-4 pb-8 max-h-[80vh] overflow-y-auto">
         <div style={{ width: 36, height: 4, borderRadius: 2, background: 'rgba(15,23,42,0.12)', margin: '10px auto 0' }} />
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '12px 16px 14px', borderBottom: `0.5px solid ${HAIRLINE_INK_7}` }}>
-          <SectionEyebrow label={`Report ${reportType === 'group' ? 'Group' : 'User'}`} color="danger" />
+          <SectionHeader tier="standard" kicker={`Report ${reportType === 'group' ? 'Group' : 'User'}`} tone="danger" />
         </div>
 
         <div className="space-y-4">

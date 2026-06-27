@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { cn } from '@/lib/utils';
-import { SectionEyebrow } from '@/components/ui/SectionEyebrow';
+import { SectionHeader } from '@/components/ui/SectionHeader';
 import { SegToggle } from './SegToggle';
 
 interface Props {
@@ -46,7 +46,7 @@ export function HandicapInput({ value, onChange }: Props) {
   return (
     <div>
       <div style={{ marginBottom: 8 }}>
-        <SectionEyebrow label="Handicap Index" />
+        <SectionHeader tier="standard" kicker="Handicap Index" />
       </div>
 
       {/* Standard / Plus toggle */}

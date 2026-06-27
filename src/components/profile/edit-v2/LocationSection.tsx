@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { MapPin, ChevronDown, Search, X } from 'lucide-react';
 import { MAP_CONFIG } from '@/config/maps';
-import { SectionEyebrow } from '@/components/ui/SectionEyebrow';
+import { SectionHeader } from '@/components/ui/SectionHeader';
 
 const GEIST = 'Geist, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif';
 
@@ -252,7 +252,7 @@ export function LocationSection({ country, city, onCountryChange, onCityChange }
   return (
     <div className="space-y-3">
       <div style={{ marginBottom: 8 }}>
-        <SectionEyebrow label="Location" required />
+        <SectionHeader tier="standard" kicker="Location" required />
       </div>
       {/* Country first */}
       <CountryPicker value={country} onChange={handleCountryChange} />

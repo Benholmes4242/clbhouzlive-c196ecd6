@@ -8,7 +8,7 @@ import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { toast } from 'sonner';
 import { useQuery } from '@tanstack/react-query';
 import type { MessageType, SharedCourse } from '@/types/messaging';
-import { SectionEyebrow } from '@/components/ui/SectionEyebrow';
+import { SectionHeader } from '@/components/ui/SectionHeader';
 import { AMBER, AMBER_TINT_10, AMBER_TINT_28, INK, INK_FAINT, INK_MUTE, SHELL_BG, SURFACE } from './_shared/tokens';
 
 interface ShareContentModalProps {
@@ -208,7 +208,7 @@ export function ShareContentModal({
 
               {/* Section label */}
               <div style={{ padding: '6px 0 4px' }}>
-                <SectionEyebrow label="Recently Played" />
+                <SectionHeader tier="standard" kicker="Recently Played" />
               </div>
 
               {coursesLoading ? (
