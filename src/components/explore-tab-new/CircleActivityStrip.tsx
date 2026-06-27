@@ -1,5 +1,5 @@
 import { useState, useMemo } from 'react';
-import { ExploreSectionHeader } from './ExploreSectionHeader';
+import { SectionHeader } from '@/components/ui/SectionHeader';
 import { LinkedRingsMark } from './DiscoverMarks';
 import {
   useCircleActivity,
