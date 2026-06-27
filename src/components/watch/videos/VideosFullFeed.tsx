@@ -182,7 +182,7 @@ function VideosFullFeedInner({ userId, mood, searchQuery }: VideosFullFeedProps)
             return (
               <div
                 key={`grid-${seg.startIndex}`}
-                style={{ display: 'flex', gap: 12, padding: '0 16px' }}
+                style={{ display: 'flex', gap: 12, padding: '0 16px', alignItems: 'stretch' }}
               >
                 {seg.posts.map((post, i) => (
                   <VideoGridCard

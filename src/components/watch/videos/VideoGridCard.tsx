@@ -46,7 +46,7 @@ function VideoGridCardInner({ post, index, allPosts }: VideoGridCardProps) {
       type="button"
       onClick={handleTap}
       className="block text-left active:scale-[0.99] transition-transform"
-      style={{ flex: 1, minWidth: 0, padding: 0, background: 'transparent', border: 'none' }}
+      style={{ flex: 1, minWidth: 0, padding: 0, background: 'transparent', border: 'none', display: 'flex', flexDirection: 'column', height: '100%' }}
     >
       <div
         style={{
@@ -89,15 +89,15 @@ function VideoGridCardInner({ post, index, allPosts }: VideoGridCardProps) {
           WebkitLineClamp: 2,
           WebkitBoxOrient: 'vertical',
           overflow: 'hidden',
-          minHeight: 31,
         }}
       >
         {post.caption || `${channel} on Clbhouz`}
       </div>
 
+      <div style={{ flex: 1, minHeight: 4 }} />
+
       <div
         style={{
-          marginTop: 4,
           display: 'flex',
           alignItems: 'center',
           gap: 5,
