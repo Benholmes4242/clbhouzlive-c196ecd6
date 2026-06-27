@@ -2,6 +2,7 @@ import { useMemo, useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { BottomSheet } from '@/components/ui/BottomSheet';
 import CountryFlag from '@/components/ui/country-flag';
+import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import {
   SC_ACE,
   SC_EAGLE,
