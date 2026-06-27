@@ -31,6 +31,7 @@ import ClaimCourseCTA from './ClaimCourseCTA';
 import ClaimUnderReviewNotice from './ClaimUnderReviewNotice';
 import ClaimedCourseProfileLink from './ClaimedCourseProfileLink';
 import { SectionLabel } from './SectionLabel';
+import { SectionHeader } from '@/components/ui/SectionHeader';
 import { AMBER, HAIRLINE_INK_7, HAIRLINE_INK_8, INK_FAINT, SLATE_50, SLATE_600 } from '@/features/courses/_shared/tokens';
 
 interface Course {
