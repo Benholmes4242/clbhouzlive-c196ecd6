@@ -102,7 +102,7 @@ function BucketListRailInner() {
               allPosts={orderedPosts}
               width={158}
               aspectRatio="1/1"
-              radius={16}
+              radius={6}
             />
             {courseNameByPostId.get(post.id) && (
               <div
