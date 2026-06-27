@@ -8,7 +8,7 @@ import { useLiveTournaments } from '../../hooks/useLiveTournaments';
 import { useTourLeaderboard } from '../../hooks/useTourHubData';
 import { FullLeaderboard } from '../tournament-detail/FullLeaderboard';
 import { EditorialEmpty } from '../tournament-detail/EditorialEmpty';
-import { INK, INK_MUTE, INK_TINT_05, INK_TINT_07, INK_TINT_06, SURFACE, STATUS_LIVE, STATUS_LIVE_TINT_10 } from '../../_shared/tokens';
+import { INK, INK_MUTE, INK_TINT_05, INK_TINT_07, INK_TINT_06, SURFACE, SLATE_50, STATUS_LIVE, STATUS_LIVE_TINT_10 } from '../../_shared/tokens';
 import { tourPriorityIndex, TOUR_LABEL, shortTournamentToken } from '../../_shared/tourOrder';
 import { TOUR_CONFIG } from '../../hooks/useOverviewData';
 import { getTourLogo, hasTourLogo } from '../../utils/tourLogos';
@@ -117,7 +117,7 @@ export function LiveLeaderboardTab() {
   
 
   return (
-    <div style={{ background: SURFACE, minHeight: '60vh' }}>
+    <div style={{ background: SLATE_50, minHeight: '60vh' }}>
       {/* Tour selector + search — single row */}
       <div style={{
         display: 'flex', alignItems: 'center', gap: 10,
@@ -182,7 +182,7 @@ export function LiveLeaderboardTab() {
         const rightMeta = dates;
 
         return (
-          <div style={{ padding: '16px 20px 16px', background: '#FFFFFF', borderBottom: `0.5px solid ${INK_TINT_07}` }}>
+          <div style={{ padding: '16px 20px 16px', background: SLATE_50, borderBottom: `0.5px solid ${INK_TINT_07}` }}>
             {/* Row: tour (+ live dot · round · field) · dates right */}
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 9 }}>
               <span style={{
@@ -317,7 +317,7 @@ export function LiveLeaderboardTab() {
 
 function LiveLeaderboardSkeleton() {
   return (
-    <div style={{ background: SURFACE, padding: '16px 20px' }}>
+    <div style={{ background: SLATE_50, padding: '16px 20px' }}>
       {[...Array(8)].map((_, i) => (
         <div
           key={i}
