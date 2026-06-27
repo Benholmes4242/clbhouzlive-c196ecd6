@@ -273,18 +273,18 @@ export function PlayerScorecardSheet({
         </div>
       )}
 
-      {/* legend */}
+      {/* legend — refined-outline key, shared with Holes + handicap */}
       {hasAnyData && (
-        <div style={{ display: 'flex', justifyContent: 'center', gap: 12, padding: '0 18px 14px', flexWrap: 'wrap' }}>
+        <div style={{ display: 'flex', justifyContent: 'center', gap: 16, padding: '4px 18px 14px', flexWrap: 'wrap' }}>
           {([
-            ['Eagle+', SC_EAGLE],
-            ['Birdie', SC_BIRDIE],
-            ['Par', SC_PAR],
-            ['Bogey', SC_BOGEY],
-            ['Dbl+', SC_DOUBLE],
-          ] as Array<[string, string]>).map(([lbl, c]) => (
-            <div key={lbl} style={{ display: 'flex', alignItems: 'center', gap: 5 }}>
-              <span style={{ width: 9, height: 9, borderRadius: 3, background: c }} />
+            ['Eagle',  2, 4],
+            ['Birdie', 3, 4],
+            ['Par',    4, 4],
+            ['Bogey',  5, 4],
+            ['Dbl+',   6, 4],
+          ] as Array<[string, number, number]>).map(([lbl, strokes, par]) => (
+            <div key={lbl} style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+              <ScoreMark strokes={strokes} par={par} size={22} fontFamily={GEIST} />
               <span style={{ fontSize: 10, fontWeight: 600, color: INK_MUTE }}>{lbl}</span>
             </div>
           ))}
