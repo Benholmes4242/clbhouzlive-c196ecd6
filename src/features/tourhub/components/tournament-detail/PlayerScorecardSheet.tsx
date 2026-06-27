@@ -54,12 +54,6 @@ function HoleCell({ h }: { h: ScorecardHole }) {
     </div>
   );
 }
-      >
-        {filled ? h.strokes : '·'}
-      </div>
-    </div>
-  );
-}
 
 function Nine({ holes, label }: { holes: ScorecardHole[]; label: 'OUT' | 'IN' }) {
   const totalPar = holes.reduce((a, h) => a + (h.par ?? 0), 0);
