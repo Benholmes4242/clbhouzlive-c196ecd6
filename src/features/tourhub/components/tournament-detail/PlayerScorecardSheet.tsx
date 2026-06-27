@@ -198,7 +198,7 @@ export function PlayerScorecardSheet({
             hideRing
           />
           {player.countryCode && (
-            <div style={{ position: 'absolute', bottom: -2, right: -2, borderRadius: '50%', overflow: 'hidden', boxShadow: '0 0 0 2px #fff' }}>
+            <div style={{ position: 'absolute', bottom: -2, right: -2, borderRadius: '50%', overflow: 'hidden' }}>
               <CountryFlag country={player.countryCode} size="sm" />
             </div>
           )}
