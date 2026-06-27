@@ -12,6 +12,7 @@
 
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
 import { isWithinPlayingHoursForTimezone, isTournamentDay } from '../_shared/countryTimezoneMap.ts'
+import { getActiveRound } from '../_shared/roundState.ts'
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -275,38 +276,9 @@ Deno.serve(async (req) => {
 // ── Per-tournament sync (FIX 1 + FIX 2) ──────────────────────────────
 // FIX 1: Gated tournaments stamp last_live_sync so round-robin advances.
 // FIX 2: Called for ALL tournaments per invocation, not just the stalest.
-
-async function deriveActiveRound(supabase: any, tournamentId: string): Promise<number | undefined> {
-  // Pull round columns for the whole field (not just 5 — we need full-field completeness).
-  const { data: roundCheck } = await supabase
-    .from('sr_leaderboards')
-    .select('round_1, round_2, round_3, round_4')
-    .eq('tournament_id', tournamentId)
-    .not('strokes', 'is', null);
-  if (!roundCheck?.length) return undefined;
-
-  const fieldSize = roundCheck.length;
-  const recorded = (r: number) =>
-    roundCheck.filter((e: any) => e[`round_${r}`] != null).length;
-
-  // Active round = highest round number with meaningful field participation.
-  // A round counts as "underway" once enough players have a score in it — this
-  // ignores WD/DQ/straggler gaps in earlier rounds and avoids over-advancing on
-  // a single early poster.
-  const MIN_FRACTION = 0.10;
-  const MIN_PLAYERS = 5;
-  const threshold = Math.max(MIN_PLAYERS, Math.ceil(fieldSize * MIN_FRACTION));
-
-  let active = 1;
-  for (let r = 1; r <= 4; r++) {
-    if (recorded(r) >= threshold) {
-      active = r;
-    } else {
-      break;
-    }
-  }
-  return active;
-}
+//
+// Round detection lives in ../_shared/roundState.ts (getActiveRound) — the
+// single source of truth. Do not re-derive the active round in this file.
 
 
 async function syncTournament(
@@ -355,23 +327,23 @@ async function syncTournament(
   // ── Sync leaderboard ─────────────────────────────────────────────
   let leaderboardRecords = 0;
   let sportradarStatus: string | undefined;
-  let currentRound: number | undefined;
   let syncError: string | undefined;
 
   try {
     const result = await syncLeaderboard(supabase, sportradarApiKey, tour, year, tournament.sr_id, tournament.id, tournament);
     leaderboardRecords = result.records;
     sportradarStatus = result.sportradarStatus;
-    currentRound = result.currentRound;
   } catch (error) {
     syncError = error.message;
     console.error(`[LiveSync] Leaderboard error for ${tournament.name}:`, error.message);
   }
 
-  // Derive accurate active round from leaderboard data (source of truth).
-  // Falls back to Sportradar's round field if no leaderboard data exists yet.
-  const derivedRound = await deriveActiveRound(supabase, tournament.id);
-  const roundToWrite = derivedRound ?? currentRound;
+  // Single source of truth for the active round. Leaderboard-derived when we
+  // have data; venue-local date-math only as a pre-play fallback.
+  const active = await getActiveRound(supabase, tournament.id, tournament);
+  const roundToWrite: number | undefined = active.round;
+  console.log(`[LiveSync] ${tournament.name}: R${active.round} (${active.source}${active.confident ? '' : ', low-confidence'})`);
+
 
 
   // ── Round-completion detection ────────────────────────────────────
@@ -652,20 +624,8 @@ async function checkAndTriggerRoundComplete(
   const ratio = finished.length / entries.length;
   if (ratio < 0.8) return false;
 
-  const { data: roundCheck } = await supabase
-    .from('sr_leaderboards')
-    .select('round_1, round_2, round_3, round_4')
-    .eq('tournament_id', tournamentId)
-    .not('status', 'in', '("cut","wd","dq","dns")')
-    .limit(5);
-
-  let currentRound = 1;
-  if (roundCheck?.length) {
-    const sample = roundCheck[0];
-    if (sample.round_4 != null) currentRound = 4;
-    else if (sample.round_3 != null) currentRound = 3;
-    else if (sample.round_2 != null) currentRound = 2;
-  }
+  // Active round — single source of truth (no per-call ladder, no LIMIT 5 sample).
+  const { round: currentRound } = await getActiveRound(supabase, tournamentId);
 
   const { data: existing } = await supabase
     .from('sr_sync_log')
@@ -861,20 +821,6 @@ async function fetchSportradar(url: string, apiKey: string, description: string)
 interface LeaderboardSyncResult {
   records: number;
   sportradarStatus?: string;
-  currentRound?: number;
-}
-
-function inferMaxRoundFromLeaderboard(leaderboard: any[]): number {
-  let max = 0;
-  for (const entry of leaderboard) {
-    const rounds = entry?.rounds || entry?.player?.rounds || [];
-    for (const r of rounds) {
-      const seq = typeof r?.sequence === 'number' ? r.sequence : 0;
-      const hasScore = r?.score != null || r?.strokes != null;
-      if (hasScore && seq > max) max = seq;
-    }
-  }
-  return max;
 }
 
 async function syncLeaderboard(
@@ -888,34 +834,13 @@ async function syncLeaderboard(
   const sportradarStatus = data.status || data.tournament?.status;
   const leaderboard = data.leaderboard || [];
 
-  // Extract current round from Sportradar response
-  // Sportradar's leaderboard endpoint returns `round` as one-indexed (1=R1, 2=R2, etc.).
-  const rawRound =
-    typeof data.round === 'number' ? data.round :
-    typeof data.current_round === 'number' ? data.current_round :
-    undefined;
-  let currentRound: number | undefined = rawRound;
-
-  // Venue-timezone date-math fallback when Sportradar omits the round
-  if (currentRound === undefined && tournament.start_date && tournament.timezone) {
-    try {
-      const todayAtVenue = new Date().toLocaleDateString('en-CA', { timeZone: tournament.timezone });
-      const start = new Date(tournament.start_date + 'T00:00:00Z');
-      const today = new Date(todayAtVenue + 'T00:00:00Z');
-      const daysSinceStart = Math.floor((today.getTime() - start.getTime()) / 86_400_000);
-
-      if (daysSinceStart >= 0) {
-        const maxObservedRound = inferMaxRoundFromLeaderboard(leaderboard);
-        const cap = maxObservedRound > 0 ? Math.max(maxObservedRound, daysSinceStart + 1) : 4;
-        currentRound = Math.min(daysSinceStart + 1, cap);
-        console.log(`[LiveSync] Fallback round for ${tournament.name}: R${currentRound} (day ${daysSinceStart + 1} venue-local in ${tournament.timezone})`);
-      }
-    } catch (err) {
-      console.warn(`[LiveSync] Round fallback failed for ${tournament.name}:`, err);
-    }
-  }
+  // Active round is computed by getActiveRound() AFTER this upsert finishes —
+  // it reads the freshly-written sr_leaderboards rows. We don't compute or
+  // return a round here anymore; that prevents fallback-overrides-leaderboard
+  // bugs (the Italian Open regression).
 
   let records = 0;
+
 
   for (const entry of leaderboard) {
     const isTeamEntry = Array.isArray(entry.players) && entry.players.length > 0;
@@ -1100,5 +1025,5 @@ async function syncLeaderboard(
     }
   }
 
-  return { records, sportradarStatus, currentRound };
+  return { records, sportradarStatus };
 }

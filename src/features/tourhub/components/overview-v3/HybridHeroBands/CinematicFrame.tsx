@@ -27,6 +27,7 @@ import {
   SC_BIRDIE,
 } from '../HybridHero.constants';
 import { AMBER_INK, GOLD_DEEP } from '../../../_shared/tokens';
+import { roundStarted } from '../../../_shared/roundState';
 import type { HeroState, TopTie, TickerRow } from '../HybridHero.utils';
 import { fmtScore, formatRank, buildLeaderboardSlots, roundLabel } from '../HybridHero.utils';
 import { formatPurse } from '../../shared/TourHeroHelpers';
@@ -62,7 +63,7 @@ function liveRoundFor(entry: any, roundNum: number): { today: number | null; thr
   const rounds = entry?.raw_data?.rounds;
   if (!Array.isArray(rounds) || rounds.length < roundNum) return { today: null, thru: null };
   const r = rounds[roundNum - 1];
-  if (!r || (r.thru === 0 && r.strokes === 0)) return { today: null, thru: null };
+  if (!roundStarted(r)) return { today: null, thru: null };
   return { today: r.score ?? null, thru: r.thru ?? null };
 }
 function resolveAvatar(e: any, tourSlug?: string | null): string | null {
