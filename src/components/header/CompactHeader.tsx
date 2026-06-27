@@ -17,7 +17,6 @@ import { safeGoBack } from '@/utils/navigation';
 import { useMedianStatusBar } from '@/hooks/useMedianStatusBar';
 import { useWhsConnection } from '@/lib/whs/hooks';
 import { useTourHeroOverlay } from '@/hooks/useTourHeroOverlay';
-import { useHeroFullBleed } from '@/features/tourhub/_shared/heroFullBleedSignal';
 
 interface CompactHeaderProps {
   className?: string;
@@ -169,16 +168,11 @@ const CompactHeader: React.FC<CompactHeaderProps> = ({ className }) => {
 
   // Tournament Overview live/results: transparent chrome over the cinematic hero.
   const tourHeroOverlay = useTourHeroOverlay();
-  const heroFullBleed = useHeroFullBleed();
   const isTourOverviewSurface =
     isTourTournamentRoute ||
     location.pathname === '/tourhub' ||
     location.pathname === '/tourhub/';
   const overlayActive = tourHeroOverlay && isTourOverviewSurface;
-  // One-row immersive surface: avatar + tabs + picker live in TourHubShellTabs.
-  // CompactHeader becomes a notch-only spacer for the whole immersive surface
-  // (independent of scroll-to-opaque), so we never sprout a logo/pill row mid-scroll.
-  const immersiveSurface = heroFullBleed && isTourOverviewSurface;
 
   // Keep the native status bar on the light surface for handicap (was previously
   // toggled dark↔light around the search overlay; now uniformly light).
@@ -266,30 +260,6 @@ const CompactHeader: React.FC<CompactHeaderProps> = ({ className }) => {
     };
   }, [contentHeight]);
   
-  // Immersive tour surface: render a notch-only transparent spacer. The single
-  // visible row (avatar · tabs · picker) is provided by TourHubShellTabs.
-  if (immersiveSurface) {
-    return (
-      <header
-        data-chrome="header"
-        className={cn(
-          'compact-header clubhouse-header',
-          'fixed inset-x-0 mx-auto w-full max-w-[480px] md:max-w-[620px] z-header',
-          className,
-        )}
-        style={{
-          top: 0,
-          background: 'transparent',
-          height: 'var(--sat, 0px)',
-          paddingTop: 'var(--sat, 0px)',
-          border: 'none',
-          pointerEvents: 'none',
-        }}
-        aria-hidden
-      />
-    );
-  }
-
   return (
     <>
       <header
