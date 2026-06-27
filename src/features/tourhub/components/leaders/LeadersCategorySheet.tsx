@@ -136,7 +136,6 @@ export function LeadersCategorySheet({
                       padding: '11px 16px',
                       background: isActive ? AMBER_TINT_04 : 'transparent',
                       border: 'none',
-                      borderLeft: isActive ? '3px solid #F7931E' : '3px solid transparent',
                       cursor: 'pointer', textAlign: 'left' as const,
                     }}
                   >

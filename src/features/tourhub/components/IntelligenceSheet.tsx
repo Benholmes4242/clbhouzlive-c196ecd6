@@ -707,7 +707,6 @@ function PickMiniRow({
         padding: '6px 8px 6px 9px',
         borderRadius: 8,
         background: isWinner ? 'rgba(255,184,0,0.08)' : 'transparent',
-        borderLeft: isWinner ? `3px solid ${GOLD}` : '3px solid transparent',
       }}
     >
       <PlayerAvatar

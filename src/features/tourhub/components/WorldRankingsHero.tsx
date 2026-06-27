@@ -854,7 +854,6 @@ export const WorldRankingsHero = memo(function WorldRankingsHero() {
                   padding: '12px 16px',
                   background: isActive ? AMBER_TINT_04 : 'transparent',
                   border: 'none',
-                  borderLeft: isActive ? `3px solid ${AMBER}` : '3px solid transparent',
                   borderBottom: `0.5px solid ${INK_TINT_07}`,
                   cursor: 'pointer',
                   textAlign: 'left' as const,

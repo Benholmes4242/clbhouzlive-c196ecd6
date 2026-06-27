@@ -242,7 +242,6 @@ export function FullLeaderboard({
                   display: 'flex', alignItems: 'center', gap: '3px',
                   padding: '13px 16px',
                   borderBottom: `0.5px solid ${INK_TINT_07}`,
-                  borderLeft: entry.position === 1 && !isMissedCut && !isWD ? `3px solid ${STATUS_LIVE}` : '3px solid transparent',
                   background: entry.position === 1 && !isMissedCut && !isWD ? STATUS_LIVE_TINT_10 : 'transparent',
                   opacity: isWD ? 0.4 : isMissedCut ? 0.55 : 1,
                   textDecoration: 'none',
