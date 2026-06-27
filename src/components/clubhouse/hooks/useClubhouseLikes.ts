@@ -84,7 +84,7 @@ export function useClubhouseLikes({ userId, activeActor }: UseClubhouseLikesOpti
     const pending = localLikeState.get(post.id);
     if (pending) return pending;
     return { isLiked: post.isLikedByMe, count: post.likeCount };
-  }, [localLikeState]);
+  }, [localLikeState, activeActor?.id, activeActor?.type]);
 
   const resetLikes = useCallback(() => {
     setLocalLikeState(new Map());
