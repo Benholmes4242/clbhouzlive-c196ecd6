@@ -327,23 +327,23 @@ async function syncTournament(
   // ── Sync leaderboard ─────────────────────────────────────────────
   let leaderboardRecords = 0;
   let sportradarStatus: string | undefined;
-  let currentRound: number | undefined;
   let syncError: string | undefined;
 
   try {
     const result = await syncLeaderboard(supabase, sportradarApiKey, tour, year, tournament.sr_id, tournament.id, tournament);
     leaderboardRecords = result.records;
     sportradarStatus = result.sportradarStatus;
-    currentRound = result.currentRound;
   } catch (error) {
     syncError = error.message;
     console.error(`[LiveSync] Leaderboard error for ${tournament.name}:`, error.message);
   }
 
-  // Derive accurate active round from leaderboard data (source of truth).
-  // Falls back to Sportradar's round field if no leaderboard data exists yet.
-  const derivedRound = await deriveActiveRound(supabase, tournament.id);
-  const roundToWrite = derivedRound ?? currentRound;
+  // Single source of truth for the active round. Leaderboard-derived when we
+  // have data; venue-local date-math only as a pre-play fallback.
+  const active = await getActiveRound(supabase, tournament.id, tournament);
+  const roundToWrite: number | undefined = active.round;
+  console.log(`[LiveSync] ${tournament.name}: R${active.round} (${active.source}${active.confident ? '' : ', low-confidence'})`);
+
 
 
   // ── Round-completion detection ────────────────────────────────────
