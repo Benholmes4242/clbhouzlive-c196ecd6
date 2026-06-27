@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import { format, isSameMonth } from 'date-fns';
 import { ChevronDown, Search, X, Check } from 'lucide-react';
 import { BottomSheet } from '@/components/ui/BottomSheet';
@@ -44,8 +45,11 @@ function formatDateRange(startDate: string, endDate: string): string {
  * from the tournament detail page.
  */
 export function LiveLeaderboardTab() {
+  const [searchParams] = useSearchParams();
+  const eventParam = searchParams.get('event');
+
   const { data: rawLiveTournaments = [], isLoading } = useLiveTournaments();
-  const [selectedId, setSelectedId] = useState<string | null>(null);
+  const [selectedId, setSelectedId] = useState<string | null>(eventParam);
   const [searchQuery, setSearchQuery] = useState('');
   const [selectorOpen, setSelectorOpen] = useState(false);
 
@@ -60,15 +64,17 @@ export function LiveLeaderboardTab() {
     });
   }, [rawLiveTournaments]);
 
-  // Default-select the first (canonical-order) tournament once data loads.
+  // Default-select: URL event param wins if it's live; otherwise first-in-order.
   useEffect(() => {
-    if (!selectedId && liveTournaments.length > 0) {
-      setSelectedId(liveTournaments[0].id);
-    } else if (selectedId && liveTournaments.length > 0 && !liveTournaments.find(t => t.id === selectedId)) {
-      // selected tournament dropped out of the live list
+    if (liveTournaments.length === 0) return;
+    if (eventParam && liveTournaments.find(t => t.id === eventParam)) {
+      setSelectedId(eventParam);
+      return;
+    }
+    if (!selectedId || !liveTournaments.find(t => t.id === selectedId)) {
       setSelectedId(liveTournaments[0].id);
     }
-  }, [liveTournaments, selectedId]);
+  }, [liveTournaments, eventParam]);
 
   const selected = useMemo(
     () => liveTournaments.find(t => t.id === selectedId) ?? liveTournaments[0] ?? null,
