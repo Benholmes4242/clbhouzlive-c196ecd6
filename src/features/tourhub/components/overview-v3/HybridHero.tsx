@@ -305,11 +305,6 @@ export function HybridHero({ slide, activeTournamentId, onSelectTour }: HybridHe
     // Stage 1: full-bleed cinematic hero for live/results.
     // Upcoming stays on the existing CinematicFrame until Stage 2/3.
     if (state.kind === 'live' || state.kind === 'results') {
-      const leaderEntry: any = safeLeaderboard[0];
-      const leaderPhotoUrl =
-        state.kind === 'results'
-          ? tournament.winnerPhotoUrl ?? leaderEntry?.player?.photo_url ?? null
-          : leaderEntry?.player?.photo_url ?? null;
       return (
         <div
           style={{
@@ -327,7 +322,7 @@ export function HybridHero({ slide, activeTournamentId, onSelectTour }: HybridHe
             leaderboard={safeLeaderboard}
             tiedLeaders={tiedLeaders}
             fieldSize={safeLeaderboard.length}
-            leaderPhotoUrl={leaderPhotoUrl}
+            venueImageUrl={venueImageUrl}
             tourSlug={tournament.tourSlug}
             onCtaTap={onCtaTap}
           />
