@@ -311,9 +311,6 @@ export const LightCardFeed: React.FC<LightCardFeedProps> = ({
           itemContent={itemContent}
           computeItemKey={(_, post) => post.id}
           endReached={handleEndReached}
-          totalListHeightChanged={(h) => {
-            console.log('[LightFeed] Virtuoso total list height:', Math.round(h), 'px for', posts.length, 'items');
-          }}
           defaultItemHeight={950}
           increaseViewportBy={{ top: 600, bottom: 1200 }}
           overscan={{ main: 600, reverse: 600 }}
