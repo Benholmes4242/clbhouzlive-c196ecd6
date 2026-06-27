@@ -303,8 +303,10 @@ export const SquircleAvatar: React.FC<SquircleAvatarProps> = ({
             width: `${pixelSize}px`,
             aspectRatio: '1 / 1.05',
             borderRadius: '34%',
-            border: `${ringThickness}px solid ${effectiveRingColor}`,
-            boxShadow: glowShadow,
+            border: hairlineRing ? 'none' : `${ringThickness}px solid ${effectiveRingColor}`,
+            boxShadow: hairlineRing
+              ? (glowShadow ? `${hairlineShadow}, ${glowShadow}` : hairlineShadow)
+              : glowShadow,
           }}
         >
           {avatarContent}
