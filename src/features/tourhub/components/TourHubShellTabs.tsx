@@ -5,6 +5,8 @@ import type { TourHubTab } from './types';
 import { TourSwitcherAffordance } from './TourSwitcherAffordance';
 import { useLiveTournaments } from '../hooks/useLiveTournaments';
 import { useTourSelection } from '../context/TourSelectionContext';
+import { useHeroFullBleed } from '../_shared/heroFullBleedSignal';
+import { HeaderAvatarButton } from '@/components/header/HeaderAvatarButton';
 
 type TabId = TourHubTab | 'college';
 
