@@ -135,7 +135,9 @@ export const TourHubShellTabs: React.FC<TourHubShellTabsProps> = ({ overlay = fa
                   borderRadius: 0,
                   border: 'none',
                   background: 'transparent',
-                  color: isActive ? '#0A0E14' : '#64748B',
+                  color: overlay
+                    ? (isActive ? '#FFFFFF' : 'rgba(255,255,255,0.7)')
+                    : (isActive ? '#0A0E14' : '#64748B'),
                   fontFamily: 'inherit',
                   fontSize: 14,
                   fontWeight: isActive ? 700 : 600,
