@@ -148,11 +148,15 @@ function VideoLargeCardInner({ post, index, allPosts }: VideoLargeCardProps) {
           <span style={{ overflow: 'hidden', textOverflow: 'ellipsis' }}>
             {channel} · {ageLabel}
           </span>
-          <span style={{ flexShrink: 0 }}>·</span>
-          <Heart size={12} strokeWidth={0} style={{ color: '#64748B', fill: '#64748B', flexShrink: 0 }} />
-          <span style={{ flexShrink: 0, fontVariantNumeric: 'tabular-nums' }}>
-            {abbreviateCount(post.likeCount ?? 0)}
-          </span>
+          {(post.likeCount ?? 0) > 0 && (
+            <>
+              <span style={{ flexShrink: 0 }}>·</span>
+              <Heart size={12} strokeWidth={0} style={{ color: '#F7931E', fill: '#F7931E', flexShrink: 0 }} />
+              <span style={{ flexShrink: 0, fontVariantNumeric: 'tabular-nums' }}>
+                {abbreviateCount(post.likeCount ?? 0)}
+              </span>
+            </>
+          )}
         </div>
       </div>
 
