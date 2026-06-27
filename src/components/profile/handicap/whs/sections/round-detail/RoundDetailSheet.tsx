@@ -3,6 +3,8 @@ import { ExternalLink } from 'lucide-react';
 import { BottomSheet } from '@/components/ui/BottomSheet';
 import { useRoundDetail } from '@/lib/whs/hooks';
 import { ScoreMark } from '@/features/courses/_shared/ScoreMark';
+import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
+import { useProfileData } from '@/hooks/useProfileData';
 import type { WhsScoreHole } from '@/lib/whs/types';
 
 // ─── Tokens (mirror PlayerScorecardSheet) ────────────────────────────────
@@ -154,6 +156,7 @@ export const RoundDetailSheet: React.FC<Props> = ({ open, onClose, scoreId, hand
   const userQuery = useRoundDetail(scoreId, open);
   const userData = userQuery.data;
   const userLoading = userQuery.isLoading;
+  const { profile } = useProfileData();
 
   const parTotal = useMemo<number | null>(() => {
     const holes = userData?.holes;
@@ -214,6 +217,28 @@ export const RoundDetailSheet: React.FC<Props> = ({ open, onClose, scoreId, hand
         <SheetEmpty onClose={onClose} />
       ) : (
         <>
+          {/* Identity row — avatar + viewer name */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '10px 18px 6px' }}>
+            <SquircleAvatar
+              src={profile?.profile_photo_url ?? undefined}
+              alt={profile?.display_name ?? ''}
+              userId={profile?.id ?? null}
+              size={46}
+              hideRing
+            />
+            <div
+              style={{
+                fontFamily: GEIST,
+                fontSize: 19,
+                fontWeight: 800,
+                color: INK,
+                letterSpacing: '-0.01em',
+              }}
+            >
+              {profile?.display_name ?? 'You'}
+            </div>
+          </div>
+
           {/* Header — date eyebrow + course name + GROSS/STABLEFORD/DIFF tiles */}
           <div style={{ padding: '8px 18px 14px', borderBottom: '1px solid #F1F3F5' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: 7, marginBottom: 6 }}>
