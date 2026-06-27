@@ -658,15 +658,29 @@ async function syncLeaderboard(supabase: any, apiKey: string, tour: string, year
 
   // Helper: merge synthesized live round into a competitor's rounds[]
   const mergeLiveRound = (entry: any): any[] => {
-    const rounds = [...(entry.rounds || [])];
+    let rounds = [...(entry.rounds || [])];
+    // Strip any trailing synthesized round that isn't actually started
+    // (stale/empty {score:0,thru:0} from a previous run). Real Sportradar
+    // rounds (no `synthesized` flag) are never touched.
+    while (
+      rounds.length > 0 &&
+      rounds[rounds.length - 1]?.synthesized &&
+      ((rounds[rounds.length - 1]?.thru ?? 0) === 0)
+    ) {
+      rounds = rounds.slice(0, -1);
+    }
     if (!liveRoundMap || liveRoundNum == null) return rounds;
     const live = liveRoundMap.get(entry.id);
-    if (live && rounds.length < liveRoundNum) {
+    // Only synthesize when the live round has ACTUALLY started.
+    // thru>0 = at least one hole played; matches getLiveRoundData's
+    // not-started definition (thru===0 && strokes===0).
+    const started = !!live && (live.thru ?? 0) > 0;
+    if (started && rounds.length < liveRoundNum) {
       rounds[liveRoundNum - 1] = {
         sequence: liveRoundNum,
-        score: live.score,
-        thru: live.thru,
-        strokes: live.strokes,
+        score: live!.score,
+        thru: live!.thru,
+        strokes: live!.strokes,
         synthesized: true,
       };
     }
