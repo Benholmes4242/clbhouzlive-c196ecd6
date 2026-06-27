@@ -1,9 +1,8 @@
 import { useState } from 'react';
 import { useSearchParams, useNavigate, Link } from 'react-router-dom';
-import { ArrowLeftRight, ChevronRight, Search, X } from 'lucide-react';
+import { Search, X } from 'lucide-react';
 import { TourHubShell } from '../components';
 import { ShellSlot } from '@/components/header/ShellSlot';
-import { Kicker } from '@/components/watch/proshop/Kicker';
 
 import { CollegeCompareHero } from '../components/college/CollegeCompareHero';
 import { useCollegeCompare } from '../hooks/useCollegeCompare';
@@ -108,11 +107,6 @@ export function CollegeComparePage() {
             textAlign: 'left' as const,
           }}
         >
-          <div style={{ display: 'inline-flex', alignItems: 'center', gap: 6, marginBottom: 4 }}>
-            <ArrowLeftRight size={11} strokeWidth={2.5} color={AMBER} style={{ marginTop: -4 }} />
-            <Kicker color="slate">Head-to-head</Kicker>
-            <ChevronRight size={11} strokeWidth={2.5} color={AMBER} style={{ marginTop: -4 }} />
-          </div>
           <h1
             style={{
               fontSize: 22,

@@ -1,6 +1,6 @@
 import { useMemo, Fragment } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
-import { RefreshCw, AlertCircle, ChevronRight, Crown, GraduationCap } from 'lucide-react';
+import { RefreshCw, AlertCircle, Crown } from 'lucide-react';
 import { getCollegeLogoUrl } from '@/utils/collegeLogo';
 import { TourHubShell } from '../components/TourHubShell';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -18,7 +18,6 @@ import { useCollegeMediaMap } from '../hooks/useCollegeMedia';
 
 import { collegeHubRoute } from '../routes';
 import {
-  AMBER,
   GOLD,
   GOLD_BORDER,
   GOLD_DEEP,
@@ -75,35 +74,6 @@ export function CollegeProfilePage() {
 
         {/* ── HERO — gold champion card on SLATE_50, mirrors main College hero ── */}
         <div style={{ background: SLATE_50, padding: '16px 16px 14px' }}>
-
-          {/* Section eyebrow (canonical §2) → tap back to College hub */}
-          <button
-            type="button"
-            onClick={() => navigate(collegeHubRoute())}
-            aria-label="College Franchise — back to all colleges"
-            style={{
-              background: 'transparent',
-              border: 'none',
-              padding: 0,
-              cursor: 'pointer',
-              display: 'inline-flex',
-              alignItems: 'center',
-              gap: 6,
-              marginBottom: 14,
-            }}
-          >
-            <GraduationCap size={13} strokeWidth={2.5} style={{ color: AMBER }} />
-            <span style={{
-              fontSize: 10.5,
-              fontWeight: 700,
-              letterSpacing: '0.14em',
-              color: AMBER,
-              textTransform: 'uppercase' as const,
-            }}>
-              COLLEGE FRANCHISE
-            </span>
-            <ChevronRight size={11} strokeWidth={2.5} style={{ color: AMBER, marginTop: 1 }} />
-          </button>
 
           {/* Champion card */}
           {stats && !isLoading && (
