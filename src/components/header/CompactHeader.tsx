@@ -169,11 +169,16 @@ const CompactHeader: React.FC<CompactHeaderProps> = ({ className }) => {
 
   // Tournament Overview live/results: transparent chrome over the cinematic hero.
   const tourHeroOverlay = useTourHeroOverlay();
+  const heroFullBleed = useHeroFullBleed();
   const isTourOverviewSurface =
     isTourTournamentRoute ||
     location.pathname === '/tourhub' ||
     location.pathname === '/tourhub/';
   const overlayActive = tourHeroOverlay && isTourOverviewSurface;
+  // One-row immersive surface: avatar + tabs + picker live in TourHubShellTabs.
+  // CompactHeader becomes a notch-only spacer for the whole immersive surface
+  // (independent of scroll-to-opaque), so we never sprout a logo/pill row mid-scroll.
+  const immersiveSurface = heroFullBleed && isTourOverviewSurface;
 
   // Keep the native status bar on the light surface for handicap (was previously
   // toggled dark↔light around the search overlay; now uniformly light).
