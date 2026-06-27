@@ -42,6 +42,7 @@ export default function LatestVideosRail() {
           title="Latest videos"
           onSeeAll={() => navigate('/watch/videos')}
           seeAllLabel="More videos"
+          paddingTop={6}
         />
         <VideosFeedSkeleton />
       </div>
@@ -60,6 +61,7 @@ export default function LatestVideosRail() {
         title="Latest videos"
         onSeeAll={() => navigate('/watch/videos')}
         seeAllLabel="More videos"
+        paddingTop={6}
       />
 
       <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
