@@ -131,11 +131,11 @@ const WatchGrid: React.FC<WatchGridProps> = ({
 
   if (!isLoading && posts.length === 0) {
     return (
-      <div className="flex flex-col items-center justify-center py-24 px-4 text-center">
-        <span className="text-[48px]">{emptyEmoji}</span>
-        <p className="mt-3 text-base font-semibold text-foreground">{emptyTitle}</p>
-        <p className="mt-1 text-sm text-muted-foreground">{emptyMessage}</p>
-      </div>
+      <WatchEmptyState
+        title={emptyTitle}
+        message={emptyMessage}
+        action={emptyAction}
+      />
     );
   }
 
