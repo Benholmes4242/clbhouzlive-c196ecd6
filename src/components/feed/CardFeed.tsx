@@ -270,8 +270,19 @@ export const CardFeed: React.FC<CardFeedProps> = ({
   const itemContent = useCallback(
     (index: number, post: FeedPost) => {
       const likeState = getLikeState(post);
+      // [DEBUG_ACTOR] audit instrumentation — first card per render
+      const DEBUG_ACTOR = true;
+      if (DEBUG_ACTOR && index === 0) {
+        // eslint-disable-next-line no-console
+        console.log('[card0]', {
+          postId: post.id,
+          liked: likeState?.liked,
+          postLiked: post.isLikedByMe,
+        });
+      }
       const initialSlide = carouselPositions.get(index) ?? 0;
       const isActive = !fsOpen && index === playingIdx; // PLAYS — settle-gated; suspended while fullscreen
+
       const isNear = !fsOpen && Math.abs(index - activeIdx) <= VIDEO_NEIGHBOUR_RADIUS; // mounts + paints frame — instant; suspended while fullscreen
       const mountVideo = isNear;
       return (
