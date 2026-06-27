@@ -117,6 +117,7 @@ export interface PlayerScorecardSheetProps {
     position?: number | null;
     positionTied?: boolean;
     totalScore?: number | null;
+    photoCandidates?: (string | null | undefined)[];
   };
 }
 
