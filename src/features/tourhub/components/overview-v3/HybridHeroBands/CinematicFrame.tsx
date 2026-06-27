@@ -1215,9 +1215,9 @@ export function CinematicFrame({
               <span style={{ width: RANK_W, flexShrink: 0 }} />
               <span style={{ width: 26, flexShrink: 0 }} />
               <span style={{ flex: 1 }} />
-              {anyToday && <span style={{ ...NUMERIC_STYLE, width: COL_TODAY, textAlign: 'right', fontSize: 9, fontWeight: 800, letterSpacing: '0.12em', color: 'rgba(255,255,255,0.6)' }}>TODAY</span>}
-              <span style={{ ...NUMERIC_STYLE, width: COL_TOTAL, textAlign: 'right', fontSize: 9, fontWeight: 800, letterSpacing: '0.12em', color: 'rgba(255,255,255,0.6)' }}>TOTAL</span>
-              <span style={{ ...NUMERIC_STYLE, width: COL_THRU, textAlign: 'right', fontSize: 9, fontWeight: 800, letterSpacing: '0.12em', color: 'rgba(255,255,255,0.6)' }}>THRU</span>
+              {anyToday && <span style={{ ...NUMERIC_STYLE, width: COL_TODAY, textAlign: 'center', fontSize: 9, fontWeight: 800, letterSpacing: '0.12em', color: 'rgba(255,255,255,0.6)' }}>TODAY</span>}
+              <span style={{ ...NUMERIC_STYLE, width: COL_TOTAL, textAlign: 'center', fontSize: 9, fontWeight: 800, letterSpacing: '0.12em', color: 'rgba(255,255,255,0.6)' }}>TOTAL</span>
+              <span style={{ ...NUMERIC_STYLE, width: COL_THRU, textAlign: 'center', fontSize: 9, fontWeight: 800, letterSpacing: '0.12em', color: 'rgba(255,255,255,0.6)' }}>THRU</span>
             </div>
 
             {/* Score rows */}
@@ -1248,14 +1248,14 @@ export function CinematicFrame({
                     />
                     <span style={{ flex: 1, minWidth: 0, fontSize: 14, fontWeight: row.isLeader ? 700 : 600, color: 'white', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{name}</span>
                     {anyToday && (
-                      <span style={{ ...NUMERIC_STYLE, width: COL_TODAY, textAlign: 'right', fontSize: 13, fontWeight: 700, color: scoreColor(today) }}>
+                      <span style={{ ...NUMERIC_STYLE, width: COL_TODAY, textAlign: 'center', fontSize: 13, fontWeight: 700, color: scoreColor(today) }}>
                         {today == null ? '—' : fmtScore(today)}
                       </span>
                     )}
-                    <span style={{ ...NUMERIC_STYLE, width: COL_TOTAL, textAlign: 'right', fontSize: 16, fontWeight: 800, letterSpacing: '-0.02em', color: scoreColor(entry?.score) }}>
+                    <span style={{ ...NUMERIC_STYLE, width: COL_TOTAL, textAlign: 'center', fontSize: 16, fontWeight: 800, letterSpacing: '-0.02em', color: scoreColor(entry?.score) }}>
                       {fmtScore(entry?.score)}
                     </span>
-                    <span style={{ ...NUMERIC_STYLE, width: COL_THRU, textAlign: 'right', fontSize: 11, fontWeight: 600, color: 'rgba(255,255,255,0.4)' }}>
+                    <span style={{ ...NUMERIC_STYLE, width: COL_THRU, textAlign: 'center', fontSize: 11, fontWeight: 600, color: 'rgba(255,255,255,0.4)' }}>
                       {thruDisplay}
                     </span>
                   </div>
@@ -1271,7 +1271,7 @@ export function CinematicFrame({
                   <StackedAvatarsDark items={row.items} size={26} />
                   <span style={{ flex: 1, minWidth: 0, fontSize: 14, fontWeight: row.isLeader ? 700 : 600, color: 'white', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{label}</span>
                   {anyToday && <span style={{ width: COL_TODAY, flexShrink: 0 }} />}
-                  <span style={{ ...NUMERIC_STYLE, width: COL_TOTAL, textAlign: 'right', fontSize: 16, fontWeight: 800, letterSpacing: '-0.02em', color: scoreColor(scoreStringToNumber(row.score)) }}>
+                  <span style={{ ...NUMERIC_STYLE, width: COL_TOTAL, textAlign: 'center', fontSize: 16, fontWeight: 800, letterSpacing: '-0.02em', color: scoreColor(scoreStringToNumber(row.score)) }}>
                     {typeof row.score === 'number' ? fmtScore(row.score) : row.score}
                   </span>
                   <span style={{ width: COL_THRU, flexShrink: 0 }} />
