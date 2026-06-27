@@ -594,8 +594,8 @@ export function Composer({
       setDiscardConfirmOpen(true);
       return;
     }
-    // Resumed but untouched draft → just close.
-    if (isDraftMode && !isDirty) {
+    // Clean state (saved or untouched) → close without prompting.
+    if (!isDirty) {
       onClose();
       return;
     }
