@@ -176,6 +176,18 @@ export function TournamentDetailPage() {
     obs.observe(el);
     return () => obs.disconnect();
   }, [fullBleedHero, activeTab]);
+
+  // Signal global chrome (CompactHeader + ShellSlot) to switch to transparent
+  // overlay styling while the cinematic hero is covering the viewport top.
+  useEffect(() => {
+    const on = fullBleedHero && heroCovering;
+    document.documentElement.style.setProperty('--tour-hero-overlay', on ? '1' : '0');
+    window.dispatchEvent(new CustomEvent('tour-hero-overlay', { detail: on }));
+    return () => {
+      document.documentElement.style.setProperty('--tour-hero-overlay', '0');
+      window.dispatchEvent(new CustomEvent('tour-hero-overlay', { detail: false }));
+    };
+  }, [fullBleedHero, heroCovering]);
   
   const renderTabContent = () => {
     switch (activeTab) {
