@@ -58,7 +58,7 @@ function SectionHeaderInner({
         alignItems: 'center',
         justifyContent: 'space-between',
         gap: 16,
-        padding: `${paddingTop}px 16px 9px`,
+        padding: `${paddingTop}px 16px ${paddingBottom}px`,
       }}
     >
       {/* Mark icon intentionally suppressed for quiet-label layout */}
