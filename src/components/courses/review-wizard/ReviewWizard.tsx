@@ -675,6 +675,9 @@ export function ReviewWizard({
                     <button
                       onClick={() => !course && setShowCourseSearch(true)}
                       disabled={!!course}
+                      onPointerDown={(e) => { if (!course) e.currentTarget.style.transform = 'scale(0.99)'; }}
+                      onPointerUp={(e) => { e.currentTarget.style.transform = 'scale(1)'; }}
+                      onPointerLeave={(e) => { e.currentTarget.style.transform = 'scale(1)'; }}
                       style={{
                         width: '100%',
                         display: 'flex',
@@ -686,6 +689,8 @@ export function ReviewWizard({
                         border: 'none',
                         textAlign: 'left',
                         cursor: course ? 'default' : 'pointer',
+                        transition: 'transform 120ms ease',
+                        WebkitTapHighlightColor: 'transparent',
                       }}
                     >
                       {activeCourse?.thumbnail_image ? (
@@ -917,6 +922,9 @@ export function ReviewWizard({
                               e.stopPropagation();
                               voiceState === 'listening' ? stopListening() : startListening();
                             }}
+                            onPointerDown={(e) => { e.currentTarget.style.transform = 'scale(0.92)'; }}
+                            onPointerUp={(e) => { e.currentTarget.style.transform = 'scale(1)'; }}
+                            onPointerLeave={(e) => { e.currentTarget.style.transform = 'scale(1)'; }}
                             aria-label={voiceState === 'listening' ? 'Stop voice input' : 'Voice input'}
                             style={{
                               width: 38,
@@ -939,6 +947,8 @@ export function ReviewWizard({
                                   : voiceState === 'processing'
                                   ? AMBER
                                   : INK_MUTE,
+                              transition: 'transform 120ms ease, background 120ms ease',
+                              WebkitTapHighlightColor: 'transparent',
                             }}
                           >
                             {voiceState === 'listening' ? (
