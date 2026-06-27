@@ -2,7 +2,7 @@ import { memo, useMemo, useRef } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 
 import { analyticsEvents } from '@/utils/analyticsEvents';
-import { ExploreSectionHeader } from './ExploreSectionHeader';
+import SectionHeader from '@/components/ui/SectionHeader';
 import { WaveformMark } from './DiscoverMarks';
 import type { ExploreMoodId } from './hooks/useExploreMood';
 
@@ -246,7 +246,7 @@ function ExploreEchoCTAInner({ mood }: ExploreEchoCTAProps) {
 
   return (
     <section>
-      <ExploreSectionHeader
+      <SectionHeader tier="editorial"
         mark={<WaveformMark />}
         title="Echo, your course concierge"
         sub="Describe what you want. She'll find it."

@@ -2,7 +2,7 @@ import { memo } from 'react';
 import { Globe } from 'lucide-react';
 import { PinMark } from './DiscoverMarks';
 import { useExploreRegionsWithImages } from './hooks/useExploreRegionsWithImages';
-import { ExploreSectionHeader } from './ExploreSectionHeader';
+import SectionHeader from '@/components/ui/SectionHeader';
 
 interface ExploreDestinationsProps {
   activeRegion: string | null;
@@ -15,7 +15,7 @@ function ExploreDestinationsInner({ activeRegion, onRegionSelect }: ExploreDesti
   if (isLoading) {
     return (
       <section style={{ padding: '0 0 0' }}>
-        <ExploreSectionHeader title="Destinations" mark={<PinMark />} />
+        <SectionHeader tier="editorial" title="Destinations" mark={<PinMark />} />
         <div className="flex gap-3 px-4 overflow-x-auto scrollbar-hide">
           {[0, 1, 2, 3].map(i => (
             <div
@@ -33,7 +33,7 @@ function ExploreDestinationsInner({ activeRegion, onRegionSelect }: ExploreDesti
 
   return (
     <section style={{ padding: '0 0 0' }}>
-      <ExploreSectionHeader title="Destinations" mark={<PinMark />} sub="Pick a region to filter the feed" />
+      <SectionHeader tier="editorial" title="Destinations" mark={<PinMark />} sub="Pick a region to filter the feed" />
       <div className="flex gap-3 px-4 overflow-x-auto scrollbar-hide" style={{ paddingBottom: 4 }}>
         {/* Worldwide — resets to all regions (activeRegion === null) */}
         <button
