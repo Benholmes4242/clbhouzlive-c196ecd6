@@ -96,7 +96,7 @@ export function RequestCourseCTA({
             <div className="flex items-center gap-2.5">
               <Zap size={17} color={HERO_ACCENT} strokeWidth={2.25} />
               <span className="text-[13px] text-muted-foreground">
-                Takes 20 seconds — just name and location
+                Takes 20 seconds – just name and location
               </span>
             </div>
             <div className="flex items-center gap-2.5">

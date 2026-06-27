@@ -11,11 +11,14 @@ import { VideosFollowingRail } from './VideosFollowingRail';
 import { VideosSuggestedCreatorsRail } from './VideosSuggestedCreatorsRail';
 import { VideosQuickClipsRail } from './VideosQuickClipsRail';
 import type { FeedPost } from '@/components/media-system/types/media';
+import WatchEmptyState from '@/components/watch/shared/WatchEmptyState';
 
 interface VideosFullFeedProps {
   userId: string | undefined;
   mood: VideosMoodId;
   searchQuery?: string;
+  onClearSearch?: () => void;
+  onResetMood?: () => void;
 }
 
 type Segment =
@@ -81,7 +84,7 @@ function VideosTopRail({ userId }: { userId: string | undefined }) {
   return <VideosSuggestedCreatorsRail userId={userId} />;
 }
 
-function VideosFullFeedInner({ userId, mood, searchQuery }: VideosFullFeedProps) {
+function VideosFullFeedInner({ userId, mood, searchQuery, onClearSearch, onResetMood }: VideosFullFeedProps) {
   const fetchGuard = useRef(false);
   const { ref: sentinelRef, inView } = useInView({ rootMargin: '400px' });
 
@@ -145,20 +148,20 @@ function VideosFullFeedInner({ userId, mood, searchQuery }: VideosFullFeedProps)
     if (!isLoading && posts.length === 0) {
       if (searchQuery) {
         return (
-          <div style={{ padding: '32px 16px', textAlign: 'center' }}>
-            <p style={{ fontSize: 14, fontWeight: 600, color: '#0F172A', marginBottom: 4 }}>
-              No videos match "{searchQuery}".
-            </p>
-          </div>
+          <WatchEmptyState
+            title={`No videos for “${searchQuery}”`}
+            message="Nothing here matches that search yet. Try different words, or clear it to see everything."
+            action={onClearSearch ? { label: 'Clear search', onClick: onClearSearch, icon: 'clear' } : undefined}
+          />
         );
       }
       if (mood === 'for_you') return null;
       return (
-        <div style={{ padding: '32px 16px', textAlign: 'center' }}>
-          <p style={{ fontSize: 14, fontWeight: 600, color: '#0F172A', marginBottom: 4 }}>
-            No videos here yet.
-          </p>
-        </div>
+        <WatchEmptyState
+          title="Nothing here yet"
+          message="No videos match this filter right now. New ones land here as creators post."
+          action={onResetMood ? { label: 'Back to For You', onClick: onResetMood, icon: 'back' } : undefined}
+        />
       );
     }
 

@@ -94,15 +94,10 @@ export default function UnifiedWatchFeed({ embedded = false }: UnifiedWatchFeedP
           refetch={refetch}
           gridRef={gridRef as React.RefObject<HTMLDivElement>}
           userId={userId}
-          emptyEmoji={
-            mood === 'follows' ? '👥'
-            : mood === 'played_courses' ? '⛳'
-            : '⛳'
-          }
           emptyTitle={
             mood === 'follows' ? 'No videos from your follows yet'
             : mood === 'played_courses' ? 'No videos from courses you\u2019ve played'
-            : 'No shorts yet'
+            : 'No clips yet'
           }
           emptyMessage={
             mood === 'follows' ? 'Follow more creators to see their clips here'

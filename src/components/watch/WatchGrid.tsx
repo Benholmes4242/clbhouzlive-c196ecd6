@@ -3,6 +3,7 @@ import { useFullscreenFeedStore } from '@/store/fullscreenFeedStore';
 import type { FeedPost } from '@/components/media-system/types/media';
 import WatchTile from './WatchTile';
 import WatchGridSkeleton from './WatchGridSkeleton';
+import WatchEmptyState from './shared/WatchEmptyState';
 
 interface WatchGridProps {
   posts: FeedPost[];
@@ -14,9 +15,9 @@ interface WatchGridProps {
   refetch?: () => void;
   gridRef: React.RefObject<HTMLDivElement>;
   userId?: string;
-  emptyEmoji?: string;
   emptyTitle?: string;
   emptyMessage?: string;
+  emptyAction?: { label: string; onClick: () => void; icon?: 'clear' | 'back' };
 }
 
 const GAP = 1;
@@ -49,9 +50,9 @@ const WatchGrid: React.FC<WatchGridProps> = ({
   fetchNextPage,
   refetch,
   gridRef,
-  emptyEmoji = '⛳',
-  emptyTitle = 'No shorts yet',
-  emptyMessage = 'Check back soon for new content',
+  emptyTitle = 'No clips yet',
+  emptyMessage = 'This is where short golf clips will show up. Check back soon — there’s more on the way.',
+  emptyAction,
 }) => {
   const sentinelRef = useRef<HTMLDivElement>(null);
 
@@ -130,11 +131,11 @@ const WatchGrid: React.FC<WatchGridProps> = ({
 
   if (!isLoading && posts.length === 0) {
     return (
-      <div className="flex flex-col items-center justify-center py-24 px-4 text-center">
-        <span className="text-[48px]">{emptyEmoji}</span>
-        <p className="mt-3 text-base font-semibold text-foreground">{emptyTitle}</p>
-        <p className="mt-1 text-sm text-muted-foreground">{emptyMessage}</p>
-      </div>
+      <WatchEmptyState
+        title={emptyTitle}
+        message={emptyMessage}
+        action={emptyAction}
+      />
     );
   }
 
