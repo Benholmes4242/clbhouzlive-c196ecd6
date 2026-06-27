@@ -21,15 +21,6 @@ const NUM: React.CSSProperties = {
   fontFeatureSettings: '"zero" 0',
 };
 
-function holeColor(stp: number | null): string {
-  if (stp == null) return 'transparent';
-  if (stp <= -3) return SC_ACE;
-  if (stp === -2) return SC_EAGLE;
-  if (stp === -1) return SC_BIRDIE;
-  if (stp === 0) return SC_PAR;
-  if (stp === 1) return SC_BOGEY;
-  return SC_DOUBLE;
-}
 
 function fmtRel(n: number | null, played: boolean): string {
   if (!played || n == null) return '—';
@@ -50,21 +41,19 @@ function initialsOf(name: string): string {
 }
 
 function HoleCell({ h }: { h: ScorecardHole }) {
-  const filled = h.strokes != null;
-  const stp = h.scoreToPar;
   return (
     <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4, minWidth: 0 }}>
       <div style={{ ...NUM, fontSize: 9, fontWeight: 700, color: INK_MUTE }}>{h.hole}</div>
       <div style={{ ...NUM, fontSize: 9, fontWeight: 600, color: '#CBD5E1' }}>{h.par ?? '-'}</div>
-      <div
-        style={{
-          width: 26, height: 26, borderRadius: 8,
-          background: filled ? holeColor(stp) : '#F1F5F9',
-          display: 'flex', alignItems: 'center', justifyContent: 'center',
-          ...NUM, fontSize: 13, fontWeight: 800,
-          color: filled ? '#fff' : '#E2E8F0',
-          boxShadow: filled && stp != null && stp <= -2 ? `0 0 0 2px ${holeColor(stp)}40` : 'none',
-        }}
+      <ScoreMark
+        strokes={h.strokes ?? null}
+        par={h.par ?? 4}
+        size={28}
+        fontFamily={GEIST}
+      />
+    </div>
+  );
+}
       >
         {filled ? h.strokes : '·'}
       </div>
