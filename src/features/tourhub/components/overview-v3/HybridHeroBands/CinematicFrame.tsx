@@ -33,6 +33,9 @@ import { fmtScore, formatRank, buildLeaderboardSlots } from '../HybridHero.utils
 import { formatPurse } from '../../shared/TourHeroHelpers';
 
 const TICKER_BAR_H = 34;
+const LEADER_GREEN = '#2F6B4F';
+const LEADER_GREEN_RING = 'rgba(47,107,79,0.55)';
+const LEADER_GREEN_WASH = 'linear-gradient(90deg, rgba(47,107,79,0.18) 0%, rgba(47,107,79,0.06) 100%)';
 const CHAMPION_BAND_H = 62;
 const UPCOMING_BAND_H = 104;
 const LIVE_BOTTOM_H = CHAMPION_BAND_H + TICKER_BAR_H;
@@ -174,7 +177,7 @@ function SoloRowDark({
           width: 22,
           fontSize: 12,
           fontWeight: 700,
-          color: isLeader ? AMBER : 'rgba(255,255,255,0.5)',
+          color: isLeader ? LEADER_GREEN : 'rgba(255,255,255,0.5)',
           textAlign: 'left',
           flexShrink: 0,
         }}
@@ -252,7 +255,7 @@ function TiedLeadersRowDark({
         style={{
           ...NUMERIC_STYLE,
           width: 22, fontSize: 12, fontWeight: 700,
-          color: AMBER, textAlign: 'left', flexShrink: 0,
+          color: LEADER_GREEN, textAlign: 'left', flexShrink: 0,
         }}
       >
         T1
@@ -1223,7 +1226,7 @@ export function CinematicFrame({
                 display: 'flex', alignItems: 'center', gap: 10,
                 padding: '8px 16px',
                 borderTop: '0.5px solid rgba(255,255,255,0.08)',
-                background: row.isLeader ? 'rgba(247,147,30,0.08)' : 'transparent',
+                background: row.isLeader ? LEADER_GREEN_WASH : 'transparent',
               };
               if (row.kind === 'solo') {
                 const entry = row.entry;
@@ -1232,7 +1235,7 @@ export function CinematicFrame({
                 const thruDisplay = liveThru != null ? (liveThru === 18 ? 'F' : String(liveThru)) : entryThru(entry);
                 return (
                   <div key={`solo-${i}`} style={rowStyle}>
-                    <span style={{ ...NUMERIC_STYLE, width: RANK_W, fontSize: 12, fontWeight: 700, color: row.isLeader ? AMBER : 'rgba(255,255,255,0.5)', textAlign: 'left', flexShrink: 0 }}>{row.rank}</span>
+                    <span style={{ ...NUMERIC_STYLE, width: RANK_W, fontSize: 12, fontWeight: 700, color: row.isLeader ? LEADER_GREEN : 'rgba(255,255,255,0.5)', textAlign: 'left', flexShrink: 0 }}>{row.rank}</span>
                     <SquircleAvatar
                       src={undefined}
                       srcCandidates={avatar(entry)}
@@ -1241,7 +1244,7 @@ export function CinematicFrame({
                       size={26}
                       hideRing={!row.isLeader}
                       hairlineRing={row.isLeader}
-                      ringColor={row.isLeader ? 'rgba(247,147,30,0.55)' : undefined}
+                      ringColor={row.isLeader ? LEADER_GREEN_RING : undefined}
                     />
                     <span style={{ flex: 1, minWidth: 0, fontSize: 14, fontWeight: row.isLeader ? 700 : 600, color: 'white', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{name}</span>
                     {anyToday && (
@@ -1264,7 +1267,7 @@ export function CinematicFrame({
                 : `${row.count} players`;
               return (
                 <div key={`tie-${i}`} style={rowStyle}>
-                  <span style={{ ...NUMERIC_STYLE, width: RANK_W, fontSize: 12, fontWeight: 700, color: row.isLeader ? AMBER : 'rgba(255,255,255,0.5)', textAlign: 'left', flexShrink: 0 }}>{row.rank}</span>
+                  <span style={{ ...NUMERIC_STYLE, width: RANK_W, fontSize: 12, fontWeight: 700, color: row.isLeader ? LEADER_GREEN : 'rgba(255,255,255,0.5)', textAlign: 'left', flexShrink: 0 }}>{row.rank}</span>
                   <StackedAvatarsDark items={row.items} size={26} />
                   <span style={{ flex: 1, minWidth: 0, fontSize: 14, fontWeight: row.isLeader ? 700 : 600, color: 'white', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{label}</span>
                   {anyToday && <span style={{ width: COL_TODAY, flexShrink: 0 }} />}
