@@ -12,6 +12,7 @@ import { useTournamentStatusRealtime } from '../hooks/useTournamentStatusRealtim
 import { useLiveTournaments } from '../hooks/useLiveTournaments';
 import { TourSelectionProvider } from '../context/TourSelectionContext';
 import { useHeroFullBleed } from '../_shared/heroFullBleedSignal';
+import { applyShieldColor } from '@/hooks/useMedianStatusBar';
 
 export function TourHubMainPage() {
   const [searchParams, setSearchParams] = useSearchParams();
