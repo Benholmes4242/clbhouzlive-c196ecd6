@@ -7,7 +7,7 @@ import { useTourSeason } from '../../hooks/useTourHubData';
 import { playerRoute } from '../../routes';
 import type { CollegeCompareData } from '../../hooks/useCollegeCompare';
 import type { CollegeAlumnus } from '../../hooks/useCollegeAlumni';
-import { AMBER, AMBER_TINT_08, HAIRLINE_INK_8, HAIRLINE_INK_12, HAIRLINE_INK_18, INK, INK_FAINT, INK_MUTE, INK_TINT_04, INK_TINT_05, INK_TINT_06, INK_TINT_07, SURFACE } from '../../_shared/tokens';
+import { AMBER, AMBER_TINT_08, HAIRLINE_INK_8, HAIRLINE_INK_12, HAIRLINE_INK_18, INK, INK_FAINT, INK_MUTE, INK_TINT_04, INK_TINT_05, INK_TINT_06, INK_TINT_07, SLATE_50, SURFACE } from '../../_shared/tokens';
 
 interface CollegeCompareHeroProps {
   data: CollegeCompareData;
@@ -132,7 +132,7 @@ function AlumniCompareBlock({ title, alumni1, alumni2, statKey, name1, name2, em
   if (rowCount === 0) return null;
 
   return (
-    <div style={{ background: SURFACE, borderTop: `0.5px solid ${INK_TINT_07}` }}>
+    <div style={{ background: SLATE_50, borderTop: `0.5px solid ${INK_TINT_07}` }}>
       {/* Section eyebrow — canonical §6 slate-caps */}
       <div style={{ padding: '14px 16px 10px' }}>
         <span style={{ fontSize: '9px', fontWeight: 800, color: INK_MUTE, letterSpacing: '0.16em', textTransform: 'uppercase' as const }}>
@@ -334,7 +334,7 @@ export function CollegeCompareHero({ data, className }: CollegeCompareHeroProps)
   return (
     <div className={className}>
       {/* ── SEASON VERDICT ── */}
-      <div style={{ background: SURFACE, borderTop: `0.5px solid ${INK_TINT_07}` }}>
+      <div style={{ background: SLATE_50, borderTop: `0.5px solid ${INK_TINT_07}` }}>
         {/* Section eyebrow — canonical §6 slate-caps */}
         <div style={{ padding: '14px 16px 10px' }}>
           <span style={{ fontSize: '9px', fontWeight: 800, color: INK_MUTE, letterSpacing: '0.16em', textTransform: 'uppercase' as const }}>
@@ -426,7 +426,7 @@ export function CollegeCompareHero({ data, className }: CollegeCompareHeroProps)
       </div>
 
       {/* ── SEASON OVERVIEW ── */}
-      <div style={{ background: SURFACE, borderTop: `0.5px solid ${INK_TINT_07}` }}>
+      <div style={{ background: SLATE_50, borderTop: `0.5px solid ${INK_TINT_07}` }}>
         {/* Mini logo column headers */}
         <div style={{ display: 'flex', alignItems: 'center', padding: '12px 16px 0' }}>
           <div style={{ flex: 1, display: 'flex', alignItems: 'center', gap: '5px' }}>
@@ -456,7 +456,7 @@ export function CollegeCompareHero({ data, className }: CollegeCompareHeroProps)
 
       {/* ── PERFORMANCE STATS ── */}
       {hasPerformanceData && (
-        <div style={{ background: SURFACE, borderTop: `0.5px solid ${INK_TINT_07}` }}>
+        <div style={{ background: SLATE_50, borderTop: `0.5px solid ${INK_TINT_07}` }}>
           <div style={{ padding: '14px 16px 10px' }}>
             <span style={{ fontSize: '9px', fontWeight: 800, color: INK_MUTE, letterSpacing: '0.16em', textTransform: 'uppercase' as const }}>Performance Stats</span>
           </div>
@@ -471,7 +471,7 @@ export function CollegeCompareHero({ data, className }: CollegeCompareHeroProps)
 
       {/* ── BALL STRIKING ── */}
       {hasBallStrikingData && (
-        <div style={{ background: SURFACE, borderTop: `0.5px solid ${INK_TINT_07}` }}>
+        <div style={{ background: SLATE_50, borderTop: `0.5px solid ${INK_TINT_07}` }}>
           <div style={{ padding: '14px 16px 10px' }}>
             <span style={{ fontSize: '9px', fontWeight: 800, color: INK_MUTE, letterSpacing: '0.16em', textTransform: 'uppercase' as const }}>Ball Striking</span>
           </div>

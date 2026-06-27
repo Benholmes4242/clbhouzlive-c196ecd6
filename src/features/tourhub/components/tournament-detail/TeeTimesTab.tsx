@@ -30,7 +30,7 @@ interface TeeTimesTabProps {
 
 function TeeTimesSkeleton() {
   return (
-    <div style={{ background: SURFACE, borderTop: `0.5px solid ${INK_TINT_07}` }}>
+    <div style={{ background: SLATE_50, borderTop: `0.5px solid ${INK_TINT_07}` }}>
       <div className="animate-pulse" style={{ padding: '14px 16px 10px' }}>
         <div style={{ height: 9, width: 160, background: INK_TINT_06, borderRadius: 4 }} />
       </div>
@@ -239,7 +239,7 @@ export function TeeTimesTab({ tournamentId, tournamentName, isCompleted }: TeeTi
   return (
     <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.3 }}>
       {/* Section eyebrow */}
-      <div style={{ background: SURFACE, borderTop: `0.5px solid ${INK_TINT_07}`, padding: '14px 16px 10px' }}>
+      <div style={{ background: SLATE_50, borderTop: `0.5px solid ${INK_TINT_07}`, padding: '14px 16px 10px' }}>
         <span style={{
           fontSize: 9, fontWeight: 800, color: INK_MUTE,
           letterSpacing: '0.16em', textTransform: 'uppercase',
@@ -250,13 +250,13 @@ export function TeeTimesTab({ tournamentId, tournamentName, isCompleted }: TeeTi
 
       {/* Round selector */}
       {showRoundTabs && (
-        <div style={{ background: SURFACE, padding: '0 16px 10px' }}>
+        <div style={{ background: SLATE_50, padding: '0 16px 10px' }}>
           <RoundSelector rounds={availableRounds} activeRound={selectedRound} onRoundChange={setSelectedRound} />
         </div>
       )}
 
       {/* Search input */}
-      <div style={{ background: SURFACE, padding: '0 16px 10px', position: 'relative' }}>
+      <div style={{ background: SLATE_50, padding: '0 16px 10px', position: 'relative' }}>
         <Search className="absolute left-[28px] top-1/2 -translate-y-1/2 w-[16px] h-[16px] z-10" style={{ color: INK_FAINT }} strokeWidth={2.5} />
         <input
           type="text"
@@ -276,7 +276,7 @@ export function TeeTimesTab({ tournamentId, tournamentName, isCompleted }: TeeTi
       </div>
 
       {/* Groups */}
-      <div style={{ background: SURFACE }}>
+      <div style={{ background: SLATE_50 }}>
         {filteredGroups.length === 0 && searchQuery && (
           <div style={{ textAlign: 'center', padding: '24px 16px', borderTop: `0.5px solid ${INK_TINT_07}` }}>
             <p style={{ fontSize: 14, color: INK_MUTE }}>No players matching "{searchQuery}"</p>
