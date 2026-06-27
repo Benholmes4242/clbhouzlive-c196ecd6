@@ -259,9 +259,19 @@ export const SquircleAvatar: React.FC<SquircleAvatarProps> = ({
   // Ring thickness: 2px standard, 1px thin, 0.5px hairline
   const ringThickness = hairlineRing ? 0.5 : thinRing ? 1 : 2;
 
-  // Hairline rings render via inset box-shadow (1px crisp) instead of a 0.5px
-  // border, because sub-pixel borders round to invisible on dpr=1 displays.
-  const hairlineShadow = 'inset 0 0 0 1px rgba(255,255,255,0.22)';
+  // Hairline ring is rendered as an overlay with a real border so it traces
+  // the full squircle — inset box-shadow gets clipped by overflow:hidden at
+  // the curved corners, leaving the ring cut off at top/bottom/left/right.
+  const hairlineRingOverlay = hairlineRing ? (
+    <div
+      aria-hidden
+      className="absolute inset-0 pointer-events-none"
+      style={{
+        borderRadius: '34%',
+        border: '1px solid rgba(255,255,255,0.22)',
+      }}
+    />
+  ) : null;
 
   // Determine the border color
   const borderColor = hideRing 
@@ -304,13 +314,12 @@ export const SquircleAvatar: React.FC<SquircleAvatarProps> = ({
             aspectRatio: '1 / 1.05',
             borderRadius: '34%',
             border: hairlineRing ? 'none' : `${ringThickness}px solid ${effectiveRingColor}`,
-            boxShadow: hairlineRing
-              ? (glowShadow ? `${hairlineShadow}, ${glowShadow}` : hairlineShadow)
-              : glowShadow,
+            boxShadow: glowShadow,
           }}
         >
           {avatarContent}
         </div>
+        {hairlineRingOverlay}
         {children}
       </div>
     );
@@ -320,7 +329,7 @@ export const SquircleAvatar: React.FC<SquircleAvatarProps> = ({
   return (
     <div
       className={cn(
-        'inline-flex items-center justify-center flex-shrink-0',
+        'inline-flex items-center justify-center flex-shrink-0 relative',
         onClick && 'cursor-pointer',
         className
       )}
@@ -333,11 +342,11 @@ export const SquircleAvatar: React.FC<SquircleAvatarProps> = ({
           aspectRatio: '1 / 1.05',
           borderRadius: '34%',
           border: hideRing || hairlineRing ? 'none' : `${ringThickness}px solid ${borderColor}`,
-          boxShadow: hairlineRing ? hairlineShadow : undefined,
         }}
       >
         {avatarContent}
       </div>
+      {hairlineRingOverlay}
       {children}
     </div>
   );
