@@ -376,7 +376,7 @@ const CompactHeader: React.FC<CompactHeaderProps> = ({ className }) => {
                 !isDarkChrome && !useLightTheme && "hover:bg-[hsl(var(--clubhouse-active-bg))]"
               )}
               style={{
-                color: useDarkChrome ? '#FFFFFF' : 'hsl(var(--foreground))',
+                color: (useDarkChrome || overlayActive) ? '#FFFFFF' : 'hsl(var(--foreground))',
                 transition: 'all var(--motion-fast) var(--ease-standard)'
               }}
               onClick={handleSearchClick}
