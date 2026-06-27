@@ -104,10 +104,15 @@ export function FullLeaderboard({
   tournamentName,
   venuePar,
   onPlayerTap,
+  searchQuery: searchQueryProp,
+  onSearchChange,
+  hideSearchInput,
 }: FullLeaderboardProps) {
   // null = overall sort; 1-4 = sort by that round's score
   const [sortRound, setSortRound] = useState<number | null>(null);
-  const [searchQuery, setSearchQuery] = useState('');
+  const [localQuery, setLocalQuery] = useState('');
+  const searchQuery = searchQueryProp ?? localQuery;
+  const setSearchQuery = onSearchChange ?? setLocalQuery;
 
   const filteredEntries = useMemo(() => {
     if (!searchQuery.trim()) return entries;
