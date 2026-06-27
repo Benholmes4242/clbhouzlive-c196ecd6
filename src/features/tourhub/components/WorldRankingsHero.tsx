@@ -105,6 +105,18 @@ function formatUpdatedSentence(rankingDate: string | null | undefined): string {
   return `Updated ${Math.floor(diffDays / 7)} weeks ago`;
 }
 
+function yearInWords(y: number): string {
+  const ones = ['','one','two','three','four','five','six','seven','eight','nine','ten','eleven','twelve','thirteen','fourteen','fifteen','sixteen','seventeen','eighteen','nineteen'];
+  const tens = ['','','twenty','thirty','forty','fifty','sixty','seventy','eighty','ninety'];
+  const base = 'Two Thousand';
+  const rem = y - 2000;
+  if (rem === 0) return base;
+  if (rem < 20) return `${base} ${ones[rem]}`;
+  const t = Math.floor(rem / 10);
+  const o = rem % 10;
+  return `${base} ${tens[t]}${o ? ' ' + ones[o] : ''}`;
+}
+
 /**
  * Tolerant weeks-at-#1 count — walks newest → oldest, missing weeks tolerated.
  */
