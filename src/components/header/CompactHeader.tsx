@@ -266,6 +266,30 @@ const CompactHeader: React.FC<CompactHeaderProps> = ({ className }) => {
     };
   }, [contentHeight]);
   
+  // Immersive tour surface: render a notch-only transparent spacer. The single
+  // visible row (avatar · tabs · picker) is provided by TourHubShellTabs.
+  if (immersiveSurface) {
+    return (
+      <header
+        data-chrome="header"
+        className={cn(
+          'compact-header clubhouse-header',
+          'fixed inset-x-0 mx-auto w-full max-w-[480px] md:max-w-[620px] z-header',
+          className,
+        )}
+        style={{
+          top: 0,
+          background: 'transparent',
+          height: 'var(--sat, 0px)',
+          paddingTop: 'var(--sat, 0px)',
+          border: 'none',
+          pointerEvents: 'none',
+        }}
+        aria-hidden
+      />
+    );
+  }
+
   return (
     <>
       <header
