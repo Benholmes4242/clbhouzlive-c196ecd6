@@ -9,7 +9,6 @@ interface SectionHeaderProps {
   sub?: string;
   action?: { label: string; onClick: () => void };
   paddingTop?: number;
-  paddingBottom?: number;
   /** Optional left-aligned section mark (icon/glyph), e.g. ClipsMark, VideosMark. */
   mark?: ReactNode;
 }
@@ -28,7 +27,6 @@ function SectionHeaderInner({
   // sub,
   action,
   paddingTop = 18,
-  paddingBottom = 9,
   // mark suppressed — quiet-label pass. Props retained so callers don't break.
   // mark,
 }: SectionHeaderProps) {
@@ -58,7 +56,7 @@ function SectionHeaderInner({
         alignItems: 'center',
         justifyContent: 'space-between',
         gap: 16,
-        padding: `${paddingTop}px 16px ${paddingBottom}px`,
+        padding: `${paddingTop}px 16px 9px`,
       }}
     >
       {/* Mark icon intentionally suppressed for quiet-label layout */}
