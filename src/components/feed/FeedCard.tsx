@@ -335,7 +335,7 @@ const FeedCardImpl: React.FC<FeedCardProps> = ({
           onClick={() => onProfile(post)}
           style={{ background: 'transparent', border: 'none', padding: 0, cursor: 'pointer' }}
         >
-          <SquircleAvatar src={post.avatarUrl} alt={post.displayName} size={34} hideRing />
+          <SquircleAvatar src={post.avatarUrl} alt={post.displayName} size={34} hairlineRing />
         </button>
         <div style={{ minWidth: 0, flex: 1 }}>
           <button

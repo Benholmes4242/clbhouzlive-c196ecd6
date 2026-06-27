@@ -261,7 +261,7 @@ export const SquircleAvatar: React.FC<SquircleAvatarProps> = ({
 
   // Hairline rings render via inset box-shadow (1px crisp) instead of a 0.5px
   // border, because sub-pixel borders round to invisible on dpr=1 displays.
-  const hairlineShadow = 'inset 0 0 0 5px rgba(255,0,0,0.9)';
+  const hairlineShadow = 'inset 0 0 0 1px rgba(255,255,255,0.22)';
 
   // Determine the border color
   const borderColor = hideRing 
