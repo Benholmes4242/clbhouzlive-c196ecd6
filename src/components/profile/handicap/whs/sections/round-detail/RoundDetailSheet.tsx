@@ -217,6 +217,27 @@ export const RoundDetailSheet: React.FC<Props> = ({ open, onClose, scoreId, hand
         <SheetEmpty onClose={onClose} />
       ) : (
         <>
+          {/* Identity row — avatar + viewer name */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '10px 18px 6px' }}>
+            <SquircleAvatar
+              src={profile?.profile_photo_url ?? undefined}
+              name={profile?.display_name ?? profile?.full_name ?? ''}
+              size={46}
+              hideRing
+            />
+            <div
+              style={{
+                fontFamily: GEIST,
+                fontSize: 19,
+                fontWeight: 800,
+                color: INK,
+                letterSpacing: '-0.01em',
+              }}
+            >
+              {profile?.display_name ?? profile?.full_name ?? 'You'}
+            </div>
+          </div>
+
           {/* Header — date eyebrow + course name + GROSS/STABLEFORD/DIFF tiles */}
           <div style={{ padding: '8px 18px 14px', borderBottom: '1px solid #F1F3F5' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: 7, marginBottom: 6 }}>
