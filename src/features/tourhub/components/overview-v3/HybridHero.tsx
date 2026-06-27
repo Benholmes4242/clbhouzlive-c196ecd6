@@ -289,6 +289,17 @@ export function HybridHero({ slide, activeTournamentId, onSelectTour }: HybridHe
     state.kind === 'results' ||
     state.kind === 'upcoming';
 
+  // Signal the surrounding page when this hero is rendering the full-bleed
+  // cinematic variant (live/results). Used by TourHubMainPage to drop chrome
+  // padding + engage the transparent-chrome overlay.
+  const isFullBleedCinematic =
+    (state.kind === 'live' || state.kind === 'results') &&
+    !(state.kind === 'results' && state.variant === 'cancelled');
+  useEffect(() => {
+    setHeroFullBleed(isFullBleedCinematic);
+    return () => setHeroFullBleed(false);
+  }, [isFullBleedCinematic]);
+
   if (useCinematicFrame && !(state.kind === 'results' && state.variant === 'cancelled')) {
     // Stage 1: full-bleed cinematic hero for live/results.
     // Upcoming stays on the existing CinematicFrame until Stage 2/3.
