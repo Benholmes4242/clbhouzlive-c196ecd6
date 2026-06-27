@@ -10,7 +10,7 @@ import { cn } from '@/lib/utils';
 import CountryFlag from '@/components/ui/country-flag';
 import { formatThruDisplay } from '../../utils/formatThruDisplay';
 import { playerRoute } from '../../routes';
-import { AMBER, AMBER_SOFT_BG, GOLD_DEEP, HAIRLINE_INK_12, INK, INK_FAINT, INK_LIGHT, INK_MUTE, INK_TINT_02, INK_TINT_05, INK_TINT_07, LEADER_GOLD_TINT_10, SCORE_OVER_PAR_LIGHT, SURFACE } from '../../_shared/tokens';
+import { AMBER, AMBER_SOFT_BG, GOLD_DEEP, HAIRLINE_INK_12, INK, INK_FAINT, INK_LIGHT, INK_MUTE, INK_TINT_02, INK_TINT_05, INK_TINT_07, LEADER_GOLD_TINT_10, SCORE_UNDER_PAR_LIGHT, SURFACE } from '../../_shared/tokens';
 import { roundStarted } from '../../_shared/roundState';
 
 interface RawRoundData {
@@ -60,12 +60,15 @@ interface FullLeaderboardProps {
   tournamentName?: string;
   venuePar?: number | null;
   onPlayerTap?: () => void;
+  searchQuery?: string;
+  onSearchChange?: (q: string) => void;
+  hideSearchInput?: boolean;
 }
 
 function ScoreToPar({ score, className, emphasis, size }: { score: number | null; className?: string; emphasis?: boolean; size?: number }) {
   if (score === null) return <span className={cn(className)} style={{ fontVariantNumeric: 'tabular-nums', color: INK }}>-</span>;
   const formatted = score === 0 ? 'E' : score > 0 ? `+${score}` : String(score);
-  const color = score < 0 ? SCORE_OVER_PAR_LIGHT : INK;
+  const color = score < 0 ? SCORE_UNDER_PAR_LIGHT : INK;
   return (
     <span className={cn(className)} style={{
       fontVariantNumeric: 'tabular-nums',
@@ -101,10 +104,15 @@ export function FullLeaderboard({
   tournamentName,
   venuePar,
   onPlayerTap,
+  searchQuery: searchQueryProp,
+  onSearchChange,
+  hideSearchInput,
 }: FullLeaderboardProps) {
   // null = overall sort; 1-4 = sort by that round's score
   const [sortRound, setSortRound] = useState<number | null>(null);
-  const [searchQuery, setSearchQuery] = useState('');
+  const [localQuery, setLocalQuery] = useState('');
+  const searchQuery = searchQueryProp ?? localQuery;
+  const setSearchQuery = onSearchChange ?? setLocalQuery;
 
   const filteredEntries = useMemo(() => {
     if (!searchQuery.trim()) return entries;
@@ -151,29 +159,31 @@ export function FullLeaderboard({
   return (
     <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.3 }}>
       {/* Search input */}
-      <div style={{ padding: '14px 20px 8px', position: 'relative' }}>
-        <Search className="absolute left-[32px] top-1/2 -translate-y-1/2 w-[16px] h-[16px] z-10" style={{ color: INK }} strokeWidth={2.5} />
-        <input
-          type="text"
-          placeholder="Search players..."
-          value={searchQuery}
-          onChange={(e) => setSearchQuery(e.target.value)}
-          className="w-full h-10 pl-9 pr-9 rounded-xl text-[13px] bg-card border border-border/50 text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-amber-500/20 focus:border-amber-400/60 transition-all"
-        />
-        <AnimatePresence>
-          {searchQuery && (
-            <motion.button
-              initial={{ opacity: 0, scale: 0.8 }}
-              animate={{ opacity: 1, scale: 1 }}
-              exit={{ opacity: 0, scale: 0.8 }}
-              onClick={() => setSearchQuery('')}
-              className="absolute right-[32px] top-1/2 -translate-y-1/2 w-6 h-6 rounded-full bg-muted flex items-center justify-center active:scale-90 transition-transform"
-            >
-              <X className="w-3.5 h-3.5 text-muted-foreground" />
-            </motion.button>
-          )}
-        </AnimatePresence>
-      </div>
+      {!hideSearchInput && (
+        <div style={{ padding: '14px 20px 8px', position: 'relative' }}>
+          <Search className="absolute left-[32px] top-1/2 -translate-y-1/2 w-[16px] h-[16px] z-10" style={{ color: INK }} strokeWidth={2.5} />
+          <input
+            type="text"
+            placeholder="Search players..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="w-full h-10 pl-9 pr-9 rounded-xl text-[13px] bg-card border border-border/50 text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-amber-500/20 focus:border-amber-400/60 transition-all"
+          />
+          <AnimatePresence>
+            {searchQuery && (
+              <motion.button
+                initial={{ opacity: 0, scale: 0.8 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0, scale: 0.8 }}
+                onClick={() => setSearchQuery('')}
+                className="absolute right-[32px] top-1/2 -translate-y-1/2 w-6 h-6 rounded-full bg-muted flex items-center justify-center active:scale-90 transition-transform"
+              >
+                <X className="w-3.5 h-3.5 text-muted-foreground" />
+              </motion.button>
+            )}
+          </AnimatePresence>
+        </div>
+      )}
 
       {/* De-boxed column header — single bottom hairline, no INK_TINT_02 strip */}
       <div style={{ display: 'flex', alignItems: 'center', gap: '3px', padding: '8px 16px', borderTop: `0.5px solid ${INK_TINT_07}`, borderBottom: `0.5px solid ${INK_TINT_07}` }}>
