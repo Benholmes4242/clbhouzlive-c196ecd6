@@ -53,6 +53,10 @@ export const TourHubShellTabs: React.FC<TourHubShellTabsProps> = ({ overlay = fa
   }, []);
 
   const active = computeActiveTab(location.pathname, searchParams);
+  // Immersive surface (cinematic hero overview): persist one-row chrome even
+  // after scroll-to-opaque so we never re-sprout the logo/pill row.
+  const heroFullBleed = useHeroFullBleed();
+  const immersiveSurface = active === 'overview' && heroFullBleed;
 
   const { viewingTourSlug, selectedTourSlug } = useTourSelection();
   const tourSettled = (viewingTourSlug ?? selectedTourSlug) != null;
