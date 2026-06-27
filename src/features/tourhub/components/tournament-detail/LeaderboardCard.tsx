@@ -9,7 +9,7 @@ import CountryFlag from '@/components/ui/country-flag';
 import { playerRoute } from '../../routes';
 import {
   AMBER_SOFT_BG, GOLD_DEEP, INK, INK_FAINT, INK_MUTE, INK_TINT_07,
-  SCORE_OVER_PAR_LIGHT, SURFACE,
+  SCORE_OVER_PAR_LIGHT, SLATE_50,
 } from '../../_shared/tokens';
 
 function abbrevName(full: string): string {
@@ -69,7 +69,7 @@ export function LeaderboardCard({
 
   return (
     <motion.div
-      style={{ background: SURFACE, borderTop: `0.5px solid ${INK_TINT_07}` }}
+      style={{ background: SLATE_50, borderTop: `0.5px solid ${INK_TINT_07}` }}
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       transition={{ duration: 0.3 }}

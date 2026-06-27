@@ -7,7 +7,7 @@ import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import type { TourTournament } from '../../hooks/useTourHubData';
 import {
-  AMBER, INK, INK_FAINT, INK_MUTE, INK_TINT_07, SURFACE,
+  AMBER, INK, INK_FAINT, INK_MUTE, INK_TINT_07, SLATE_50,
 } from '../../_shared/tokens';
 import { ConnectHandicapCue } from '@/components/courses/course-detail/ConnectHandicapCue';
 
@@ -46,7 +46,7 @@ export function CourseInfoCard({ tournament, courseId }: CourseInfoCardProps) {
 
   return (
     <motion.div
-      style={{ background: SURFACE, borderTop: `0.5px solid ${INK_TINT_07}`, padding: '14px 16px 16px' }}
+      style={{ background: SLATE_50, borderTop: `0.5px solid ${INK_TINT_07}`, padding: '14px 16px 16px' }}
       initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.3 }}
     >
       <div style={{ marginBottom: 12 }}>
