@@ -9,7 +9,7 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import { cn } from '@/lib/utils';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useSuggestedUsers, type SuggestedUser } from '@/hooks/useSuggestedUsers';
-import { SectionEyebrow } from '@/components/ui/SectionEyebrow';
+import { SectionHeader } from '@/components/ui/SectionHeader';
 import {
   AMBER, AMBER_TINT_06, AMBER_TINT_10, AMBER_TINT_22, AMBER_TINT_25, AMBER_TINT_28,
   INK, INK_MUTE, INK_FAINT, INK_LIGHT, INK_DEEP, INK_MID, SURFACE, SHELL_BG,
@@ -508,7 +508,7 @@ export function NewConversationModal({
         {/* Header */}
         <div className="relative flex items-center justify-center" style={{ padding: '12px 20px 14px', borderBottom: `0.5px solid ${HAIRLINE_INK_7}` }}>
           <div id="new-message-title">
-            <SectionEyebrow label="New Message" />
+            <SectionHeader tier="standard" kicker="New Message" />
           </div>
           <button
             onClick={handleClose}
@@ -579,7 +579,7 @@ export function NewConversationModal({
 
             {/* Section label */}
             <div style={{ padding: '6px 20px 6px' }}>
-              <SectionEyebrow label={dmSearch.trim() ? 'Results' : 'Suggested'} />
+              <SectionHeader tier="standard" kicker={dmSearch.trim() ? 'Results' : 'Suggested'} />
             </div>
 
             <ScrollArea className="flex-1">

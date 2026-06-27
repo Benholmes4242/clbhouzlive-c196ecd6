@@ -4,7 +4,7 @@ import { cn } from '@/lib/utils';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useNetworkActivity } from '@/hooks/useNetworkActivity';
 import { NetworkHighlightCarousel } from './NetworkHighlightCarousel';
-import { SectionEyebrow } from '@/components/ui/SectionEyebrow';
+import { SectionHeader } from '@/components/ui/SectionHeader';
 
 interface YourNetworkSectionProps {
   className?: string;
@@ -36,7 +36,7 @@ export const YourNetworkSection: React.FC<YourNetworkSectionProps> = ({ classNam
       )}
     >
       <div className="mb-2">
-        <SectionEyebrow label="Your network plays" color="amber" className="mb-[3px]" />
+        <SectionHeader tier="standard" kicker="Your network plays" tone="amber" className="mb-[3px]" />
         <h2
           style={{
             fontSize: 22,

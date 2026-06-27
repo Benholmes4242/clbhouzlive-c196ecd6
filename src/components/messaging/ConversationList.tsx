@@ -13,7 +13,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { SwipeableConversationItem } from './SwipeableConversationItem';
 import type { ConversationWithDetails } from '@/types/messaging';
-import { SectionEyebrow } from '@/components/ui/SectionEyebrow';
+import { SectionHeader } from '@/components/ui/SectionHeader';
 import {
   AMBER, AMBER_TINT_06, AMBER_TINT_10, AMBER_TINT_12, AMBER_TINT_25, AMBER_TINT_28,
   INK, INK_MUTE, INK_FAINT, INK_LIGHT, INK_DEEP, INK_MID, SURFACE,
@@ -224,7 +224,7 @@ function ConversationCard({ children }: { children: React.ReactNode }) {
 function SectionLabel({ text }: { text: string }) {
   return (
     <div style={{ padding: '10px 16px 6px' }}>
-      <SectionEyebrow label={text} />
+      <SectionHeader tier="standard" kicker={text} />
     </div>
   );
 }

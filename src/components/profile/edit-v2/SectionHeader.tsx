@@ -1,9 +1,9 @@
 /**
- * SectionHeader — backward-compat shim over the shared SectionEyebrow primitive.
+ * SectionHeader — backward-compat shim over the canonical SectionHeader primitive.
  * Existing edit-v2 consumers (GolfInfoSection) keep working; new code should
- * import SectionEyebrow directly from @/components/ui/SectionEyebrow.
+ * import SectionHeader directly from @/components/ui/SectionHeader.
  */
-import { SectionEyebrow } from '@/components/ui/SectionEyebrow';
+import { SectionHeader as CanonicalSectionHeader } from '@/components/ui/SectionHeader';
 
 interface Props {
   title: string;
@@ -13,9 +13,5 @@ interface Props {
 }
 
 export function SectionHeader({ title }: Props) {
-  return (
-    <div style={{ marginBottom: 12 }}>
-      <SectionEyebrow label={title} />
-    </div>
-  );
+  return <CanonicalSectionHeader tier="standard" kicker={title} />;
 }

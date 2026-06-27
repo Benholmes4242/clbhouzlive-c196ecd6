@@ -13,7 +13,7 @@ import { toast } from 'sonner';
 import { usePrefersReducedMotion } from '@/hooks/usePrefersReducedMotion';
 import { haptic } from '@/utils/haptics';
 import { AnimatedEchoWave } from '@/features/echo/components/ui/AnimatedEchoWave';
-import { SectionEyebrow } from '@/components/ui/SectionEyebrow';
+import { SectionHeader } from '@/components/ui/SectionHeader';
 
 interface EchoHistorySheetProps {
   isOpen: boolean;
@@ -293,7 +293,7 @@ export function EchoHistorySheet({ isOpen, onClose, onSelectConversation }: Echo
               className="px-5 pb-3 flex items-center justify-between"
               style={{ borderBottom: '0.5px solid rgba(15,23,42,0.07)' }}
             >
-              <SectionEyebrow label="Conversations" />
+              <SectionHeader tier="standard" kicker="Conversations" />
               <button
                 onClick={onClose}
                 className="flex items-center justify-center active:scale-[0.95] transition-transform"

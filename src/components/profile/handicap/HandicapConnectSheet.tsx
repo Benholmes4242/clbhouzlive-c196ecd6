@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { X, Link2Off, Trash2, CheckCircle2, AlertTriangle } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
 import { Sheet, SheetContent } from '@/components/ui/sheet';
-import { SectionEyebrow } from '@/components/ui/SectionEyebrow';
+import { SectionHeader } from '@/components/ui/SectionHeader';
 import { toast } from 'sonner';
 import { useQueryClient } from '@tanstack/react-query';
 import { callDisconnectWhs, callDeleteWhsData } from '@/lib/whs/api';
@@ -126,7 +126,7 @@ export default function HandicapConnectSheet({ open, onClose, userId, onConnecte
             <div style={{ flex: 1, minWidth: 0 }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 8 }}>
                 <MiniFlag iso="GB-ENG" />
-                <SectionEyebrow label="England Golf" color="amber" />
+                <SectionHeader tier="standard" kicker="England Golf" tone="amber" />
               </div>
               <h2 style={{ fontSize: 22, fontWeight: 800, letterSpacing: '-0.025em', margin: 0, lineHeight: 1.2 }}>
                 {connection ? 'Connection details' : 'Connect handicap'}
@@ -266,7 +266,7 @@ function FactRow({ label, value, isLast }: { label: string; value: string; isLas
       padding: '12px 0',
       borderBottom: isLast ? 'none' : '0.5px solid rgba(15,23,42,0.08)',
     }}>
-      <SectionEyebrow label={label} />
+      <SectionHeader tier="standard" kicker={label} />
       <span style={{ fontSize: 14, fontWeight: 500, color: INK, fontVariantNumeric: 'tabular-nums' }}>
         {value}
       </span>

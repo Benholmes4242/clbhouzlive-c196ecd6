@@ -22,7 +22,7 @@ import { ConversationWithDetails, ParticipantWithProfile } from '@/types/messagi
 import { AddMembersSheet } from './AddMembersSheet';
 import { ReportSheet } from './ReportSheet';
 import { SharedMediaGallery } from './SharedMediaGallery';
-import { SectionEyebrow } from '@/components/ui/SectionEyebrow';
+import { SectionHeader } from '@/components/ui/SectionHeader';
 import {
   AMBER, AMBER_TINT_06, AMBER_TINT_10, AMBER_TINT_12, AMBER_TINT_22, AMBER_TINT_25, AMBER_TINT_28,
   SUNDRIDGE_GREEN, SUNDRIDGE_GREEN_TINT_07, SUNDRIDGE_GREEN_BORDER_18,
@@ -506,7 +506,7 @@ export const GroupInfoPage: React.FC<GroupInfoPageProps> = ({
         <div style={{ marginBottom: 14 }}>
           {/* Header row */}
           <div className="flex items-center justify-between" style={{ padding: '0 4px', marginBottom: 8 }}>
-            <SectionEyebrow label="Members" count={conversation.participants.length} />
+            <SectionHeader tier="standard" kicker="Members" count={conversation.participants.length} />
             {isAdmin && (
               <button
                 onClick={() => setIsAddMembersOpen(true)}

@@ -97,7 +97,7 @@ interface UserListPageProps {
 // Editorial helpers
 // ---------------------------------------------------------------------------
 
-import { SectionEyebrow } from '@/components/ui/SectionEyebrow';
+import { SectionHeader } from '@/components/ui/SectionHeader';
 
 const FriendBadge: React.FC = () => (
   <span
@@ -456,7 +456,7 @@ export const UserListPage: React.FC<UserListPageProps> = ({
 
           {/* Eyebrow + title */}
           <div className="px-5 pb-3">
-            <SectionEyebrow label="Network" />
+            <SectionHeader tier="standard" kicker="Network" />
             <div style={{ display: 'flex', alignItems: 'baseline', gap: 10, marginTop: 6 }}>
               <h1
                 style={{
@@ -700,8 +700,8 @@ export const UserListPage: React.FC<UserListPageProps> = ({
           {!activeIsLoading && !activeError && filteredUsers.length > 0 && (
             <>
               <div style={{ padding: '20px 20px 10px' }}>
-                <SectionEyebrow
-                  label={activeMode === 'followers' ? 'All Followers' : 'All Following'}
+                <SectionHeader tier="standard"
+                  kicker={activeMode === 'followers' ? 'All Followers' : 'All Following'}
                   count={displayTotal}
                 />
               </div>
@@ -739,7 +739,7 @@ const EmptyState: React.FC<{
 }> = ({ eyebrow, icon, heading, body, ctaLabel, ctaIsAmber, onCta }) => (
   <div className="flex flex-col items-center justify-center py-16 px-6">
     <div style={{ marginBottom: 12 }}>
-      <SectionEyebrow label={eyebrow} />
+      <SectionHeader tier="standard" kicker={eyebrow} />
     </div>
     <div
       className="w-16 h-16 rounded-full flex items-center justify-center mb-4"
@@ -1121,7 +1121,7 @@ const UserRowFlat: React.FC<UserRowFlatProps> = ({
 
           {/* Header */}
           <div className="px-5 pt-3 pb-2">
-            <SectionEyebrow label="Actions" />
+            <SectionHeader tier="standard" kicker="Actions" />
             <div
               style={{
                 fontFamily: FONT_SERIF,

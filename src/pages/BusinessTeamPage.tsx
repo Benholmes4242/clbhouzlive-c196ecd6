@@ -42,7 +42,7 @@ const ROLE_DESCRIPTIONS: Record<BusinessRole, string> = {
 
 const ASSIGNABLE_ROLES: AssignableBusinessRole[] = ['admin', 'editor', 'analyst'];
 
-const SectionEyebrow = ({ label, tone = 'amber' }: { label: string; tone?: 'amber' | 'slate' }) => {
+const LocalSectionEyebrow = ({ label, tone = 'amber' }: { label: string; tone?: 'amber' | 'slate' }) => {
   const color = tone === 'amber' ? '#F7931E' : '#475569';
   return (
     <div className="flex items-center gap-1.5 mb-2">
@@ -195,7 +195,7 @@ export default function BusinessTeamPage() {
       role === 'owner' ? 'OWNER' : `${BUSINESS_ROLE_LABELS[role].toUpperCase()}S`;
     return (
       <section>
-        <SectionEyebrow label={labelPlural} tone="slate" />
+        <LocalSectionEyebrow label={labelPlural} tone="slate" />
         <p className="text-xs text-muted-foreground mb-2">{ROLE_DESCRIPTIONS[role]}</p>
         <div className="[&>*+*]:border-t [&>*+*]:[border-top-color:rgba(15,23,42,0.07)]">
           {role === 'owner' && teamLoading && members.length === 0 ? (
@@ -230,7 +230,7 @@ export default function BusinessTeamPage() {
       {/* Title block — CompactHeader provides the back arrow */}
       <div className="px-4 pt-3 pb-3 flex items-end justify-between">
         <div>
-          <SectionEyebrow label="TEAM" />
+          <LocalSectionEyebrow label="TEAM" />
           <h1 className="text-[18px] text-foreground leading-none mt-0.5" style={{ fontWeight: 900, letterSpacing: '-0.01em' }}>
             Manage team
           </h1>
@@ -268,7 +268,7 @@ export default function BusinessTeamPage() {
 
         {canManage && pendingInvites.length > 0 && (
           <section>
-            <SectionEyebrow label="PENDING" tone="slate" />
+            <LocalSectionEyebrow label="PENDING" tone="slate" />
             <div className="[&>*+*]:border-t [&>*+*]:[border-top-color:rgba(15,23,42,0.07)]">
               {pendingInvites.map((invite) => (
                 <div key={invite.id} className="flex items-center gap-3 py-3">

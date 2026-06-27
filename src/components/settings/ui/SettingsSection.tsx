@@ -1,6 +1,6 @@
 import React from 'react';
 import { cn } from '@/lib/utils';
-import { SectionEyebrow } from '@/components/ui/SectionEyebrow';
+import { SectionHeader } from '@/components/ui/SectionHeader';
 
 interface SettingsSectionProps {
   title: string;
@@ -22,7 +22,7 @@ export function SettingsSection({
     <section className={cn('w-full', className)}>
       {/* Canonical section eyebrow */}
       <div style={{ marginBottom: 8 }}>
-        <SectionEyebrow label={title} color={isDanger ? 'danger' : 'slate'} />
+        <SectionHeader tier="standard" kicker={title} tone={isDanger ? 'danger' : 'slate'} />
       </div>
 
       {/* Content card */}

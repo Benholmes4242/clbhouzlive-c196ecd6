@@ -1,7 +1,7 @@
 import React, { useRef } from 'react';
 import { Camera, Plus } from 'lucide-react';
 
-import { SectionEyebrow } from '@/components/ui/SectionEyebrow';
+import { SectionHeader } from '@/components/ui/SectionHeader';
 import { SectionCard } from '@/components/profile/edit-v2/SectionCard';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { BIZ } from '@/components/business/businessTokens';
@@ -33,7 +33,7 @@ export function BrandingSection({
   return (
     <>
       <div className="px-4 mt-2 mb-2">
-        <SectionEyebrow label="BRANDING" />
+        <SectionHeader tier="standard" kicker="BRANDING" />
       </div>
       <div className="space-y-4 px-4 pb-4">
         <SectionCard>

@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { X } from 'lucide-react';
 import { Sheet, SheetContent } from '@/components/ui/sheet';
-import { SectionEyebrow } from '@/components/ui/SectionEyebrow';
+import { SectionHeader } from '@/components/ui/SectionHeader';
 
 const INK = '#0F172A';
 const INK_55 = '#64748B';
@@ -48,7 +48,7 @@ export default function DeleteAllDataConfirmSheet({ open, onClose, onConfirm, is
         <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', padding: '4px 20px 12px' }}>
           <div style={{ flex: 1, minWidth: 0 }}>
             <div style={{ marginBottom: 6 }}>
-              <SectionEyebrow label="Permanent" color="danger" />
+              <SectionHeader tier="standard" kicker="Permanent" tone="danger" />
             </div>
             <h2 style={{ fontSize: 22, fontWeight: 800, letterSpacing: '-0.025em', margin: 0, lineHeight: 1.2 }}>
               Delete all data?
@@ -77,7 +77,7 @@ export default function DeleteAllDataConfirmSheet({ open, onClose, onConfirm, is
           </p>
 
           <div style={{ marginBottom: 8 }}>
-            <SectionEyebrow label="Type DELETE to confirm" />
+            <SectionHeader tier="standard" kicker="Type DELETE to confirm" />
           </div>
           <input
             type="text"

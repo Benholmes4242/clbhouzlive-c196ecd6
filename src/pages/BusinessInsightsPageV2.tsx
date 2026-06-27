@@ -15,7 +15,7 @@ import { AppLog } from '@/lib/logger';
 import { useHideBottomNav } from '@/hooks/useBottomNavVisibility';
 import { useHideHeader } from '@/hooks/useHeaderVisibility';
 import { BIZ } from '@/components/business/businessTokens';
-import SectionEyebrow from '@/components/ui/SectionEyebrow';
+import { SectionHeader } from '@/components/ui/SectionHeader';
 import HeadlineGrid from '@/components/business/insights/HeadlineGrid';
 import ProfileVisitsChart from '@/components/business/insights/ProfileVisitsChart';
 import DiscoveryChart from '@/components/business/insights/DiscoveryChart';
@@ -269,7 +269,7 @@ const BusinessInsightsPageV2 = () => {
         className="px-4 pt-3 pb-3"
         style={{ paddingTop: 'calc(var(--chrome-total-h, 0px) + 12px)' }}
       >
-        <SectionEyebrow label="INSIGHTS" color="amber" />
+        <SectionHeader tier="standard" kicker="INSIGHTS" tone="amber" />
         <h1
           className="text-[18px] leading-tight mt-0.5"
           style={{ color: BIZ.ink, fontWeight: 700, letterSpacing: '-0.01em' }}

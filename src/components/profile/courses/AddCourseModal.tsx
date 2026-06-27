@@ -485,7 +485,7 @@ const CourseRow: React.FC<CourseRowProps> = ({
 );
 
 // Reusable section eyebrow with optional amber-bar prefix
-const SectionEyebrow: React.FC<{ label: string; noBar?: boolean }> = ({ label, noBar }) => (
+const LocalSectionEyebrow: React.FC<{ label: string; noBar?: boolean }> = ({ label, noBar }) => (
   <div style={{
     padding: '14px 16px 8px',
     display: 'flex',
@@ -992,7 +992,7 @@ export const AddCourseModal: React.FC<AddCourseModalProps> = ({
                 {/* Pre-selected course highlight */}
                 {preSelectedCourse && !isPreSelectedInTop10 && (
                   <>
-                    <SectionEyebrow label="Course You're Reviewing" />
+                    <LocalSectionEyebrow label="Course You're Reviewing" />
                     <CourseRow
                       course={{
                         id: preSelectedCourse.id,
@@ -1013,7 +1013,7 @@ export const AddCourseModal: React.FC<AddCourseModalProps> = ({
 
                 {ratedCourses.length > 0 && (
                   <>
-                    <SectionEyebrow label="Your Rated Courses" noBar />
+                    <LocalSectionEyebrow label="Your Rated Courses" noBar />
                     {ratedCourses
                       .filter(c => c.id !== preSelectedCourseId)
                       .map((course) => (
@@ -1031,7 +1031,7 @@ export const AddCourseModal: React.FC<AddCourseModalProps> = ({
 
                 {unratedCourses.length > 0 && (
                   <>
-                    <SectionEyebrow label="Rate to Add" />
+                    <LocalSectionEyebrow label="Rate to Add" />
                     {unratedCourses.map((course) => (
                       <CourseRow
                         key={course.id}

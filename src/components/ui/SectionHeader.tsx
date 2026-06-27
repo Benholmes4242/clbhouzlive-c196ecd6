@@ -14,6 +14,13 @@ const INK_MUTE = '#64748B';
 
 type Tier = 'editorial' | 'standard' | 'rail';
 type IconTone = 'amber' | 'ink';
+type EyebrowTone = 'slate' | 'amber' | 'danger';
+
+const EYEBROW_TONE: Record<EyebrowTone, string> = {
+  slate: '#64748B',
+  amber: '#c97a10',
+  danger: '#DC2626',
+};
 
 interface SectionHeaderProps {
   tier?: Tier;
@@ -31,6 +38,12 @@ interface SectionHeaderProps {
   mark?: ReactNode;
   /** Right-side action affordance. */
   action?: { label: string; onClick: () => void };
+  /** Tier-2 eyebrow colour. 'slate' default (#64748B) | 'amber' (#c97a10) | 'danger' (#DC2626). */
+  tone?: EyebrowTone;
+  /** Optional inline count rendered after the eyebrow (slate-400, tabular). */
+  count?: number;
+  /** Render an amber required asterisk after the eyebrow label. */
+  required?: boolean;
   paddingTop?: number;
   paddingX?: number;
   className?: string;
@@ -78,6 +91,9 @@ function SectionHeaderInner(props: SectionHeaderProps) {
     iconTone = 'amber',
     mark,
     action,
+    tone,
+    count,
+    required,
     paddingTop = 0,
     paddingX = 0,
     className,
@@ -116,9 +132,10 @@ function SectionHeaderInner(props: SectionHeaderProps) {
     );
   }
 
-  // ── TIER 2 · STANDARD (amber eyebrow, NO icon) ──
+  // ── TIER 2 · STANDARD (tone-able eyebrow, NO icon) ──
   if (tier === 'standard') {
     const eyebrowText = kicker ?? title;
+    const eyebrowColor = EYEBROW_TONE[tone ?? 'slate'];
     return (
       <div className={className} style={{ ...pad, marginBottom: 12 }}>
         <div
@@ -129,18 +146,39 @@ function SectionHeaderInner(props: SectionHeaderProps) {
             gap: 12,
           }}
         >
-          <span
-            style={{
-              fontFamily: GEIST,
-              fontSize: 11,
-              fontWeight: 800,
-              letterSpacing: '0.14em',
-              textTransform: 'uppercase',
-              color: AMBER_AA,
-            }}
-          >
-            {eyebrowText}
-          </span>
+          <div style={{ display: 'flex', alignItems: 'baseline', gap: 8 }}>
+            <span
+              style={{
+                fontFamily: GEIST,
+                fontSize: 11,
+                fontWeight: 800,
+                letterSpacing: '0.14em',
+                textTransform: 'uppercase',
+                color: eyebrowColor,
+                fontFeatureSettings: '"kern" 1, "liga" 1',
+              }}
+            >
+              {eyebrowText}
+              {required && (
+                <span aria-hidden="true" style={{ color: '#F7931E', marginLeft: 3, letterSpacing: 0 }}>
+                  *
+                </span>
+              )}
+            </span>
+            {count != null && (
+              <span
+                style={{
+                  fontFamily: GEIST,
+                  fontSize: 11,
+                  fontWeight: 800,
+                  color: '#94A3B8',
+                  fontVariantNumeric: 'tabular-nums',
+                }}
+              >
+                {count.toLocaleString()}
+              </span>
+            )}
+          </div>
           {action && <ActionAffordance action={action} />}
         </div>
         {kicker && title && (
