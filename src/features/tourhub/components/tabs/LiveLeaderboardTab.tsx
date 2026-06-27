@@ -106,6 +106,7 @@ export function LiveLeaderboardTab() {
     );
   }
 
+  const isLive = selected.status === 'inprogress';
   const fieldCount = Array.isArray(leaderboard) ? (leaderboard as any[]).length : 0;
 
   return (
