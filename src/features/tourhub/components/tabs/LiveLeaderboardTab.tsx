@@ -10,6 +10,7 @@ import { EditorialEmpty } from '../tournament-detail/EditorialEmpty';
 import { INK, INK_MUTE, INK_TINT_05, INK_TINT_07, INK_TINT_06, SURFACE, STATUS_LIVE, STATUS_LIVE_TINT_10 } from '../../_shared/tokens';
 import { tourPriorityIndex, TOUR_LABEL, shortTournamentToken } from '../../_shared/tourOrder';
 import { TOUR_CONFIG } from '../../hooks/useOverviewData';
+import { getTourLogo, hasTourLogo } from '../../utils/tourLogos';
 import type { LiveTournamentLite } from '../../hooks/useLiveTournaments';
 
 const COUNTRY_NAMES: Record<string, string> = {
