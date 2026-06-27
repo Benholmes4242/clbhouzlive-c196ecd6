@@ -831,6 +831,7 @@ export function Composer({
     submitPost,
     onClose,
     currentDraftId,
+    queryClient,
   ]);
 
   const composerPlaceholder = useMemo(() => {
