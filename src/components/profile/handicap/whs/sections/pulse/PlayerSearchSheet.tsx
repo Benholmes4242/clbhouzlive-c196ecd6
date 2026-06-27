@@ -3,7 +3,7 @@ import { Search, ChevronRight, X } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import GamSheet from '@/components/profile/handicap/gam/_shared/GamSheet';
 import { Skeleton, EmptyStub, RetryStub } from '@/components/profile/handicap/gam/_shared/GamAtoms';
-import SubsectionEyebrow from '@/components/profile/handicap/whs/sections/course-legends/_shared/SubsectionEyebrow';
+import SectionHeader from '@/components/ui/SectionHeader';
 import { usePlayerSearch, type PlayerSearchResult } from '@/hooks/gam/usePlayerSearch';
 
 const FONT = 'Geist, -apple-system, BlinkMacSystemFont, system-ui, sans-serif';
@@ -186,7 +186,7 @@ export const PlayerSearchSheet: React.FC<Props> = ({ open, onClose }) => {
 
         {q.length >= 2 && (
           <>
-            <SubsectionEyebrow label="SEARCH RESULTS" />
+            <div style={{ marginTop: 24 }}><SectionHeader tier="standard" kicker="SEARCH RESULTS" paddingX={16} /></div>
             <div style={{ padding: '0 16px', display: 'flex', flexDirection: 'column', gap: 10 }}>
               {isLoading && <Skeleton height={68} radius={12} />}
               {isError && <RetryStub message="Couldn't search players" onRetry={() => refetch()} />}
