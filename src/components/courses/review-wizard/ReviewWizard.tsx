@@ -977,10 +977,12 @@ export function ReviewWizard({
                       )}
                     </div>
 
-
-                    {/* Media carousel */}
+                    {/* Media carousel — embedded inside the verdict card */}
                     {hasMedia && (
-                      <div style={{ marginTop: 12, padding: '16px 0 14px' }}>
+                      <div
+                        onClick={(e) => e.stopPropagation()}
+                        style={{ marginTop: 8, padding: '4px 0 2px' }}
+                      >
                         <div
                           style={{
                             display: 'flex',
