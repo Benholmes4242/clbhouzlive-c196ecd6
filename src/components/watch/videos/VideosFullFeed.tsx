@@ -156,41 +156,34 @@ function VideosFullFeedInner({ userId, mood, searchQuery }: VideosFullFeedProps)
       return (
         <div style={{ padding: '12px 0 24px', display: 'flex', flexDirection: 'column', gap: 16 }}>
           {segments.map((seg, sIdx) => {
-            if (seg.kind === 'rail') {
-              return <VideosTopRail key={`rail-${sIdx}`} userId={userId} />;
-            }
-            if (seg.kind === 'clips') {
-              return (
-                <div key={`clips-${sIdx}`} style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
-                  <VideosQuickClipsRail userId={userId} />
-                </div>
-              );
-            }
-            if (seg.kind === 'hero') {
-              const eyebrow = seg.chunk === 0 ? 'Featured' : null;
+            if (seg.kind === 'spotlight') {
               return (
                 <VideoHeroCard
-                  key={`hero-${seg.index}`}
+                  key={`spot-${seg.index}`}
                   post={seg.post}
                   index={seg.index}
                   allPosts={posts}
-                  eyebrow={eyebrow}
+                  eyebrow={seg.eyebrow}
                 />
               );
             }
+            if (seg.kind === 'clips') {
+              return <VideosQuickClipsRail key={`clips-${sIdx}`} userId={userId} />;
+            }
             return (
               <div
-                key={`list-${seg.startIndex}`}
-                style={{ padding: '0 16px', display: 'flex', flexDirection: 'column', gap: 13 }}
+                key={`grid-${seg.startIndex}`}
+                style={{ display: 'flex', gap: 12, padding: '0 16px' }}
               >
                 {seg.posts.map((post, i) => (
-                  <CompactVideoRow
+                  <VideoGridCard
                     key={post.id}
                     post={post}
                     index={seg.startIndex + i}
                     allPosts={posts}
                   />
                 ))}
+                {seg.posts.length === 1 && <div style={{ flex: 1 }} />}
               </div>
             );
           })}
