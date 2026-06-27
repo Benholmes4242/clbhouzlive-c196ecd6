@@ -5,6 +5,7 @@ import { useVideosFeed, type VideosFilter } from '@/components/videos-tab/hooks/
 import { moodToCategory, type VideosMoodId } from './hooks/useVideosMood';
 import CompactVideoRow from './CompactVideoRow';
 import VideoHeroCard from './VideoHeroCard';
+import VideoGridCard from './VideoGridCard';
 import { useVideosFollowingRail } from './hooks/useVideosFollowingRail';
 import { VideosFollowingRail } from './VideosFollowingRail';
 import { VideosSuggestedCreatorsRail } from './VideosSuggestedCreatorsRail';
@@ -18,38 +19,42 @@ interface VideosFullFeedProps {
 }
 
 type Segment =
-  | { kind: 'hero'; post: FeedPost; index: number; chunk: number }
-  | { kind: 'list'; posts: FeedPost[]; startIndex: number; chunk: number }
-  | { kind: 'rail'; chunk: number }
-  | { kind: 'clips'; chunk: number };
+  | { kind: 'spotlight'; post: FeedPost; index: number; eyebrow?: string | null }
+  | { kind: 'grid'; posts: FeedPost[]; startIndex: number }
+  | { kind: 'clips' };
 
 /**
- * Repeating three-tier rhythm: HERO → RAIL (alternating creators/clips) → LIST.
- * Recurs until posts run out so deep scrolling stays varied.
+ * 2-up magazine grid backbone, broken up by full-width spotlight cards
+ * and the portrait clips rail. Spotlight → 2 grid rows → (spotlight|clips,
+ * alternating) → 2 grid rows → … repeating.
  */
 function buildRhythm(posts: FeedPost[]): Segment[] {
   const seg: Segment[] = [];
   let i = 0;
-  let chunk = 0;
-  const LIST_N = 5;
+  let breakCount = 0;
+  const GRID_ROWS_PER_BLOCK = 2;
+
+  if (i < posts.length) {
+    seg.push({ kind: 'spotlight', post: posts[i], index: i, eyebrow: 'FEATURED' });
+    i += 1;
+  }
 
   while (i < posts.length) {
-    seg.push({ kind: 'hero', post: posts[i], index: i, chunk });
-    i += 1;
+    for (let r = 0; r < GRID_ROWS_PER_BLOCK && i < posts.length; r++) {
+      const start = i;
+      const slice = posts.slice(i, i + 2);
+      i += slice.length;
+      seg.push({ kind: 'grid', posts: slice, startIndex: start });
+    }
     if (i >= posts.length) break;
 
-    if (chunk % 2 === 0) {
-      seg.push({ kind: 'rail', chunk });
+    if (breakCount % 2 === 0) {
+      seg.push({ kind: 'spotlight', post: posts[i], index: i, eyebrow: null });
+      i += 1;
     } else {
-      seg.push({ kind: 'clips', chunk });
+      seg.push({ kind: 'clips' });
     }
-
-    const start = i;
-    const slice = posts.slice(i, i + LIST_N);
-    i += slice.length;
-    if (slice.length) seg.push({ kind: 'list', posts: slice, startIndex: start, chunk });
-
-    chunk += 1;
+    breakCount += 1;
   }
   return seg;
 }
@@ -151,41 +156,34 @@ function VideosFullFeedInner({ userId, mood, searchQuery }: VideosFullFeedProps)
       return (
         <div style={{ padding: '12px 0 24px', display: 'flex', flexDirection: 'column', gap: 16 }}>
           {segments.map((seg, sIdx) => {
-            if (seg.kind === 'rail') {
-              return <VideosTopRail key={`rail-${sIdx}`} userId={userId} />;
-            }
-            if (seg.kind === 'clips') {
-              return (
-                <div key={`clips-${sIdx}`} style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
-                  <VideosQuickClipsRail userId={userId} />
-                </div>
-              );
-            }
-            if (seg.kind === 'hero') {
-              const eyebrow = seg.chunk === 0 ? 'Featured' : null;
+            if (seg.kind === 'spotlight') {
               return (
                 <VideoHeroCard
-                  key={`hero-${seg.index}`}
+                  key={`spot-${seg.index}`}
                   post={seg.post}
                   index={seg.index}
                   allPosts={posts}
-                  eyebrow={eyebrow}
+                  eyebrow={seg.eyebrow}
                 />
               );
             }
+            if (seg.kind === 'clips') {
+              return <VideosQuickClipsRail key={`clips-${sIdx}`} userId={userId} />;
+            }
             return (
               <div
-                key={`list-${seg.startIndex}`}
-                style={{ padding: '0 16px', display: 'flex', flexDirection: 'column', gap: 13 }}
+                key={`grid-${seg.startIndex}`}
+                style={{ display: 'flex', gap: 12, padding: '0 16px' }}
               >
                 {seg.posts.map((post, i) => (
-                  <CompactVideoRow
+                  <VideoGridCard
                     key={post.id}
                     post={post}
                     index={seg.startIndex + i}
                     allPosts={posts}
                   />
                 ))}
+                {seg.posts.length === 1 && <div style={{ flex: 1 }} />}
               </div>
             );
           })}
