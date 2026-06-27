@@ -484,26 +484,7 @@ const CourseRow: React.FC<CourseRowProps> = ({
   </div>
 );
 
-// Reusable section eyebrow with optional amber-bar prefix
-const LocalSectionEyebrow: React.FC<{ label: string; noBar?: boolean }> = ({ label, noBar }) => (
-  <div style={{
-    padding: '14px 16px 8px',
-    display: 'flex',
-    alignItems: 'center',
-    gap: 8,
-  }}>
-    {!noBar && <div style={{ width: 3, height: 9, background: AMBER }} />}
-    <span style={{
-      fontSize: 9,
-      fontWeight: 800,
-      letterSpacing: '0.16em',
-      color: '#64748B',
-      textTransform: 'uppercase',
-    }}>
-      {label}
-    </span>
-  </div>
-);
+import SectionHeader from '@/components/ui/SectionHeader';
 
 // =====================================================================
 export const AddCourseModal: React.FC<AddCourseModalProps> = ({
