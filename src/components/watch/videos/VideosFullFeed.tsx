@@ -26,21 +26,22 @@ type Segment =
 /**
  * 2-up magazine grid backbone, broken up by full-width spotlight cards
  * and the portrait clips rail. Spotlight → 2 grid rows → clips → …
- * The clips rail is guaranteed to appear once, early.
+ * The clips rail appears exactly once, early.
  */
 function buildRhythm(posts: FeedPost[]): Segment[] {
   const seg: Segment[] = [];
   let i = 0;
-  let breakCount = 0;
   let clipsEmitted = false;
   const GRID_ROWS_PER_BLOCK = 2;
 
+  // open on a spotlight
   if (i < posts.length) {
     seg.push({ kind: 'spotlight', post: posts[i], index: i });
     i += 1;
   }
 
   while (i < posts.length) {
+    // grid block
     for (let r = 0; r < GRID_ROWS_PER_BLOCK && i < posts.length; r++) {
       const start = i;
       const slice = posts.slice(i, i + 2);
@@ -48,27 +49,22 @@ function buildRhythm(posts: FeedPost[]): Segment[] {
       seg.push({ kind: 'grid', posts: slice, startIndex: start });
     }
 
+    // clips rail ONCE, after the first grid block
     if (!clipsEmitted) {
       seg.push({ kind: 'clips' });
       clipsEmitted = true;
-      breakCount += 1;
       continue;
     }
 
     if (i >= posts.length) break;
 
-    if (breakCount % 2 === 0) {
-      seg.push({ kind: 'spotlight', post: posts[i], index: i });
-      i += 1;
-    } else {
-      seg.push({ kind: 'clips' });
-    }
-    breakCount += 1;
+    // all subsequent breaks are spotlights (no more clips)
+    seg.push({ kind: 'spotlight', post: posts[i], index: i });
+    i += 1;
   }
 
-  if (!clipsEmitted) {
-    seg.push({ kind: 'clips' });
-  }
+  // safety net: tiny feed where the loop never ran — still show clips once
+  if (!clipsEmitted) seg.push({ kind: 'clips' });
 
   return seg;
 }
