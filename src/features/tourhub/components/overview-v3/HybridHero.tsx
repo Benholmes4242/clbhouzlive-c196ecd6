@@ -259,11 +259,11 @@ export function HybridHero({ slide, activeTournamentId, onSelectTour }: HybridHe
   // CTA navigation
   const onCtaTap = () => {
     if (state.kind === 'results' && state.variant === 'cancelled') {
-      navigate('/tour');
+      navigate('/tourhub');
       return;
     }
     if (state.kind === 'live') {
-      navigate(`/tour?tab=live&event=${tournament.id}`);
+      navigate(`/tourhub?tab=live&event=${tournament.id}`);
       return;
     }
     const target = tournamentRoute(tournament.id);
