@@ -340,6 +340,7 @@ export function FullLeaderboard({
             position: scorecardEntry.position,
             positionTied: scorecardEntry.position_tied,
             totalScore: scorecardEntry.score,
+            photoCandidates: resolveAvatarCandidates(scorecardEntry),
           }}
         />
       )}
