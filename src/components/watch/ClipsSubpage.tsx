@@ -87,8 +87,9 @@ export default function ClipsSubpage() {
                 refetch={refetch}
                 gridRef={gridRef as React.RefObject<HTMLDivElement>}
                 userId={userId}
-                emptyTitle="No clips found"
-                emptyMessage={`Nothing matches "${searchQuery}" — try another search.`}
+                emptyTitle={`No clips for “${searchQuery}”`}
+                emptyMessage="Nothing here matches that search yet. Try different words, or clear it to see everything."
+                emptyAction={{ label: 'Clear search', onClick: handleSearchClose, icon: 'clear' }}
               />
             </>
           ) : (
@@ -104,11 +105,16 @@ export default function ClipsSubpage() {
                 refetch={refetch}
                 gridRef={gridRef as React.RefObject<HTMLDivElement>}
                 userId={userId}
-                emptyTitle={isFiltered ? 'No clips here yet.' : 'No shorts yet'}
+                emptyTitle={isFiltered ? `Nothing in ${activeLabel} yet` : 'No clips yet'}
                 emptyMessage={
-                  isFiltered && activeLabel
-                    ? `Nothing matches "${activeLabel}" right now — try another filter.`
-                    : 'Check back soon for new content'
+                  isFiltered
+                    ? 'No clips match this filter right now. New ones land here as creators post.'
+                    : 'This is where short golf clips will show up. Check back soon — there’s more on the way.'
+                }
+                emptyAction={
+                  isFiltered
+                    ? { label: 'Back to For You', onClick: () => setMood('for_you'), icon: 'back' }
+                    : undefined
                 }
               />
             </>
