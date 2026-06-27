@@ -275,7 +275,7 @@ export function FullLeaderboard({
                 })}
 
                 <div style={{ width: '40px', textAlign: 'center' as const, flexShrink: 0 }}>
-                  <ScoreToPar score={entry.score} emphasis size={15} />
+                  <ScoreToPar score={entry.score} emphasis size={11} />
                 </div>
 
                 <div style={{ width: '48px', textAlign: 'center' as const, flexShrink: 0 }}>
