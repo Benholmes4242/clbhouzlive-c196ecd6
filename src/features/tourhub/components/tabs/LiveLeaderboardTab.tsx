@@ -45,6 +45,9 @@ function formatDateRange(startDate: string, endDate: string): string {
 export function LiveLeaderboardTab() {
   const { data: rawLiveTournaments = [], isLoading } = useLiveTournaments();
   const [selectedId, setSelectedId] = useState<string | null>(null);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [selectorOpen, setSelectorOpen] = useState(false);
+
 
   // Canonical tour-priority order, with purse as the within-tour tiebreaker.
   const liveTournaments = useMemo(() => {
