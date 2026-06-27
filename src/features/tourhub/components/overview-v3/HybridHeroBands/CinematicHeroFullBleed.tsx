@@ -45,7 +45,7 @@ const FALLBACK_GRADIENT = 'linear-gradient(180deg,#1E4D38,#0F172A)';
 // Single dial for hero photo crop. Tuned for typical golf action/headshot
 // framing — keeps faces comfortably in the upper third without cutting heads.
 // One-line knob if we need to nudge later.
-const PHOTO_FOCAL = 'center 24%';
+const IMAGE_FOCAL = 'center 40%';
 
 // ---- helpers --------------------------------------------------------------
 
@@ -101,7 +101,7 @@ export interface CinematicHeroFullBleedProps {
   leaderboard: any[];
   tiedLeaders: TopTie | null;
   fieldSize: number;
-  leaderPhotoUrl?: string | null;
+  venueImageUrl?: string | null;
   tourSlug?: string | null;
   onCtaTap?: () => void;
 }
@@ -115,7 +115,7 @@ export function CinematicHeroFullBleed({
   leaderboard,
   tiedLeaders,
   fieldSize,
-  leaderPhotoUrl,
+  venueImageUrl,
   tourSlug,
   onCtaTap,
 }: CinematicHeroFullBleedProps) {
@@ -212,8 +212,8 @@ export function CinematicHeroFullBleed({
   const gradientScrim =
     'linear-gradient(180deg, rgba(15,23,42,0.12) 0%, rgba(15,23,42,0) 26%, rgba(15,23,42,0.5) 54%, rgba(13,30,22,0.97) 100%)';
 
-  const background = leaderPhotoUrl
-    ? `${gradientScrim}, url(${leaderPhotoUrl}) ${PHOTO_FOCAL} / cover no-repeat`
+  const background = venueImageUrl
+    ? `${gradientScrim}, url(${venueImageUrl}) ${IMAGE_FOCAL} / cover no-repeat`
     : FALLBACK_GRADIENT;
 
   // Eyebrow text
