@@ -60,12 +60,15 @@ interface FullLeaderboardProps {
   tournamentName?: string;
   venuePar?: number | null;
   onPlayerTap?: () => void;
+  searchQuery?: string;
+  onSearchChange?: (q: string) => void;
+  hideSearchInput?: boolean;
 }
 
 function ScoreToPar({ score, className, emphasis, size }: { score: number | null; className?: string; emphasis?: boolean; size?: number }) {
   if (score === null) return <span className={cn(className)} style={{ fontVariantNumeric: 'tabular-nums', color: INK }}>-</span>;
   const formatted = score === 0 ? 'E' : score > 0 ? `+${score}` : String(score);
-  const color = score < 0 ? SCORE_OVER_PAR_LIGHT : INK;
+  const color = score < 0 ? SCORE_UNDER_PAR_LIGHT : INK;
   return (
     <span className={cn(className)} style={{
       fontVariantNumeric: 'tabular-nums',
