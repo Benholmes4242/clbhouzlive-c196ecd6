@@ -371,6 +371,7 @@ export const StatOfTheWeek = memo(function StatOfTheWeek() {
                   photoUrl={leader.photoUrl}
                   tourCode="pga"
                   size="xl"
+                  className="!w-full !h-full !rounded-[34%]"
                 />
 
               </div>
@@ -440,7 +441,7 @@ export const StatOfTheWeek = memo(function StatOfTheWeek() {
                     style={{
                       fontSize: 30,
                       fontWeight: 900,
-                      color: AMBER,
+                      color: INK,
                       letterSpacing: '-0.025em',
                       lineHeight: 1,
                       paddingBottom: 3,

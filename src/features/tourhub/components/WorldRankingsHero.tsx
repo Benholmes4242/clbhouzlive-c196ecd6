@@ -803,26 +803,22 @@ export const WorldRankingsHero = memo(function WorldRankingsHero() {
 
   return (
     <section className="px-4" aria-label="World Golf Rankings">
-      {/* ─── Header ─────────────────────────────────────────────────────── */}
-      <div style={{ marginBottom: 14 }}>
-
-        <div style={{
-          fontSize: 13,
-          fontWeight: 700,
-          color: INK,
-          letterSpacing: '-0.005em',
-          lineHeight: 1.25,
-        }}>
-          {formatUpdatedSentence(rankingDate)}
+      {/* ─── Section title ──────────────────────────────────────────────── */}
+      <div style={{ marginBottom: 10 }}>
+        <div style={{ fontSize: 10, fontWeight: 800, color: INK_MUTE, letterSpacing: '0.16em', textTransform: 'uppercase' }}>
+          World Rankings
         </div>
       </div>
 
-      {/* ─── Tour dropdown ──────────────────────────────────────────────── */}
-      <div style={{ marginBottom: 14 }}>
+      {/* ─── Tour dropdown + updated ────────────────────────────────────── */}
+      <div style={{ marginBottom: 14, display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12 }}>
         <TourDropdownTrigger
           activeTour={activeTour}
           onClick={() => setSheetOpen(true)}
         />
+        <span style={{ fontSize: 12, fontWeight: 600, color: INK_FAINT, whiteSpace: 'nowrap', flexShrink: 0 }}>
+          {formatUpdatedSentence(rankingDate)}
+        </span>
       </div>
 
       <BottomSheet
