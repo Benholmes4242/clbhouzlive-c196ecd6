@@ -45,6 +45,7 @@ function formatDateRange(startDate: string, endDate: string): string {
  * from the tournament detail page.
  */
 export function LiveLeaderboardTab() {
+  const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const eventParam = searchParams.get('event');
 
