@@ -193,12 +193,10 @@ export const CardFeed: React.FC<CardFeedProps> = ({
 
   // Virtuoso's rangeChanged kept as a no-op; center-proximity owns activeIdx.
   const handleRangeChanged = useCallback(
-    (r: { startIndex: number; endIndex: number }) => {
-      // eslint-disable-next-line no-console
-      console.log('[virtuoso-range]', { startIndex: r.startIndex, endIndex: r.endIndex });
-    },
+    (_r: { startIndex: number; endIndex: number }) => {},
     [],
   );
+
 
 
   const setActiveIndex = useClubhouseStore((s) => s.setActiveIndex);
@@ -274,17 +272,8 @@ export const CardFeed: React.FC<CardFeedProps> = ({
   const itemContent = useCallback(
     (index: number, post: FeedPost) => {
       const likeState = getLikeState(post);
-      // [DEBUG_ACTOR] audit instrumentation — log the centered/visible card
-      const DEBUG_ACTOR = true;
-      if (DEBUG_ACTOR && index === activeIdx) {
-        // eslint-disable-next-line no-console
-        console.log('[card-visible]', {
-          index,
-          postId: post.id,
-          liked: likeState?.liked,
-          postLiked: post.isLikedByMe,
-        });
-      }
+
+
 
       const initialSlide = carouselPositions.get(index) ?? 0;
       const isActive = !fsOpen && index === playingIdx; // PLAYS — settle-gated; suspended while fullscreen
@@ -358,15 +347,6 @@ export const CardFeed: React.FC<CardFeedProps> = ({
     [topPadding, bottomPadding],
   );
 
-  // [DEBUG_ACTOR] audit instrumentation — function identity tracking
-  useEffect(() => {
-    // eslint-disable-next-line no-console
-    console.log('[cardfeed] getLikeState identity changed');
-  }, [getLikeState]);
-  useEffect(() => {
-    // eslint-disable-next-line no-console
-    console.log('[cardfeed] itemContent recomputed');
-  }, [itemContent]);
 
   const handleEndReached = useCallback(() => {
     if (hasNextPage && onNearEnd) onNearEnd();

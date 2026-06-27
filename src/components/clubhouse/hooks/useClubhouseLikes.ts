@@ -1,4 +1,4 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import type { FeedPost } from '@/components/media-system/types/media';
 import { useLikeMutation } from '@/components/media-system/hooks/useLikeMutation';
 import { analyticsEvents } from '@/utils/analyticsEvents';
@@ -19,6 +19,13 @@ interface UseClubhouseLikesOptions {
 export function useClubhouseLikes({ userId, activeActor }: UseClubhouseLikesOptions) {
   const likeMutation = useLikeMutation();
   const [localLikeState, setLocalLikeState] = useState<Map<string, { isLiked: boolean; count: number }>>(new Map());
+
+  // Clear any pending optimistic overrides when the active actor changes so
+  // the new actor's fresh post data isn't briefly painted with the previous
+  // actor's liked/count state.
+  useEffect(() => {
+    setLocalLikeState(new Map());
+  }, [activeActor?.id, activeActor?.type]);
 
   const clearOverride = useCallback((postId: string) => {
     setLocalLikeState(prev => {
@@ -77,7 +84,7 @@ export function useClubhouseLikes({ userId, activeActor }: UseClubhouseLikesOpti
     const pending = localLikeState.get(post.id);
     if (pending) return pending;
     return { isLiked: post.isLikedByMe, count: post.likeCount };
-  }, [localLikeState]);
+  }, [localLikeState, activeActor?.id, activeActor?.type]);
 
   const resetLikes = useCallback(() => {
     setLocalLikeState(new Map());
