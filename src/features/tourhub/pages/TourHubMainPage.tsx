@@ -146,7 +146,7 @@ export function TourHubMainPage() {
 
   return (
     <TourSelectionProvider>
-      <TourHubShell showBack={false}>
+      <TourHubShell showBack={false} immersiveStatusBar={overlay}>
         <ShellSlot>
           <TourHubShellTabs overlay={overlay} />
           {renderShellRow()}
