@@ -199,7 +199,7 @@ const CaptionBlock: React.FC<CaptionBlockProps> = ({ body, expanded, setExpanded
               background: 'linear-gradient(90deg, rgba(21,23,31,0) 0%, #15171F 38%)',
               border: 'none',
               color: T60,
-              fontSize: 14,
+              fontSize: 13,
               fontWeight: 600,
               cursor: 'pointer',
               lineHeight: 1.4,
