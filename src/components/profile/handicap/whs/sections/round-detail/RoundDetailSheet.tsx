@@ -156,6 +156,7 @@ export const RoundDetailSheet: React.FC<Props> = ({ open, onClose, scoreId, hand
   const userQuery = useRoundDetail(scoreId, open);
   const userData = userQuery.data;
   const userLoading = userQuery.isLoading;
+  const { profile } = useProfileData();
 
   const parTotal = useMemo<number | null>(() => {
     const holes = userData?.holes;
