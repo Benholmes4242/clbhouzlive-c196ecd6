@@ -193,8 +193,8 @@ export function FullLeaderboard({
 
       {/* De-boxed column header — single bottom hairline, no INK_TINT_02 strip */}
       <div style={{ display: 'flex', alignItems: 'center', gap: '3px', padding: '8px 16px', borderTop: `0.5px solid ${INK_TINT_07}`, borderBottom: `0.5px solid ${INK_TINT_07}` }}>
-        <span style={{ width: '24px', fontSize: '10px', fontWeight: 700, color: INK_MUTE, letterSpacing: '0.08em', flexShrink: 0, textTransform: 'uppercase' }}>POS</span>
-        <span style={{ flex: 1, fontSize: '10px', fontWeight: 700, color: INK_MUTE, letterSpacing: '0.08em', textTransform: 'uppercase' }}>Player</span>
+        <span style={{ width: '24px', flexShrink: 0 }} />
+        <span style={{ flex: 1 }} />
         {[1, 2, 3, 4].map((r) => {
           const active = sortRound === r;
           return (
