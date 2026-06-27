@@ -155,7 +155,7 @@ export function TournamentHero({ tournament, leaderboard, isLive, isCompleted, i
                 fontSize: 11, fontWeight: 800, color: STATUS_LIVE,
                 letterSpacing: '0.14em', textTransform: 'uppercase',
               }}>
-                Live{currentRound ? ` · R${currentRound}` : ''}
+                Live
               </span>
             </div>
           )}
