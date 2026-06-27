@@ -11,11 +11,14 @@ import { VideosFollowingRail } from './VideosFollowingRail';
 import { VideosSuggestedCreatorsRail } from './VideosSuggestedCreatorsRail';
 import { VideosQuickClipsRail } from './VideosQuickClipsRail';
 import type { FeedPost } from '@/components/media-system/types/media';
+import WatchEmptyState from '@/components/watch/shared/WatchEmptyState';
 
 interface VideosFullFeedProps {
   userId: string | undefined;
   mood: VideosMoodId;
   searchQuery?: string;
+  onClearSearch?: () => void;
+  onResetMood?: () => void;
 }
 
 type Segment =
