@@ -815,10 +815,46 @@ export const WorldRankingsHero = memo(function WorldRankingsHero() {
 
   return (
     <section className="px-4" aria-label="World Golf Rankings">
-      {/* ─── Section title ──────────────────────────────────────────────── */}
-      <div style={{ marginBottom: 10 }}>
-        <div style={{ fontSize: 10, fontWeight: 800, color: INK_MUTE, letterSpacing: '0.16em', textTransform: 'uppercase' }}>
-          World Rankings
+      {/* ─── Section header (StatWatch style) ─────────────────────────── */}
+      <div style={{ marginBottom: 14 }}>
+        <button
+          onClick={() => navigate('/tourhub?tab=leaderboards')}
+          aria-label="Open leaderboards"
+          style={{
+            background: 'transparent',
+            border: 'none',
+            padding: 0,
+            cursor: 'pointer',
+            display: 'inline-flex',
+            alignItems: 'center',
+            gap: 6,
+            marginBottom: 6,
+          }}
+        >
+          <Crown size={13} color={AMBER} strokeWidth={2.5} />
+          <span style={{
+            fontSize: 10.5,
+            fontWeight: 700,
+            letterSpacing: '0.14em',
+            color: AMBER,
+          }}>
+            WORLD RANKINGS
+          </span>
+          <ChevronRight
+            size={11}
+            color={AMBER}
+            strokeWidth={2.5}
+            style={{ marginTop: 1 }}
+          />
+        </button>
+        <div style={{
+          fontSize: 13,
+          fontWeight: 700,
+          color: INK,
+          letterSpacing: '-0.005em',
+          lineHeight: 1.25,
+        }}>
+          {yearInWords(new Date().getFullYear())} Season
         </div>
       </div>
 
