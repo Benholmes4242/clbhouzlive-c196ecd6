@@ -3,6 +3,8 @@ import { ExternalLink } from 'lucide-react';
 import { BottomSheet } from '@/components/ui/BottomSheet';
 import { useRoundDetail } from '@/lib/whs/hooks';
 import { ScoreMark } from '@/features/courses/_shared/ScoreMark';
+import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
+import { useProfileData } from '@/hooks/useProfileData';
 import type { WhsScoreHole } from '@/lib/whs/types';
 
 // ─── Tokens (mirror PlayerScorecardSheet) ────────────────────────────────
