@@ -68,7 +68,7 @@ export const PostingAsPill = forwardRef<HTMLButtonElement, PostingAsPillProps>(
               src={activeActor.avatarUrl}
               alt={activeActor.name}
               fallback={initials}
-              hideRing
+              hairlineRing
             />
           </span>
 
