@@ -107,7 +107,7 @@ export function LiveLeaderboardTab() {
   }
 
   const isLive = selected.status === 'inprogress';
-  const fieldCount = Array.isArray(leaderboard) ? (leaderboard as any[]).length : 0;
+  
 
   return (
     <div style={{ background: SURFACE, minHeight: '60vh' }}>
@@ -188,8 +188,6 @@ export function LiveLeaderboardTab() {
                   <span aria-hidden style={{ width: 6, height: 6, borderRadius: '50%', background: STATUS_LIVE, flexShrink: 0 }} />
                 )}
                 {tourFullName}
-                {isLive && selected.currentRound != null && ` · Round ${selected.currentRound}`}
-                {fieldCount > 0 && ` · ${fieldCount} in field`}
               </span>
               {rightMeta && (
                 <span style={{
