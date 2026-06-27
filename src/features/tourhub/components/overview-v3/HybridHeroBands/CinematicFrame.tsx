@@ -33,9 +33,9 @@ import { fmtScore, formatRank, buildLeaderboardSlots } from '../HybridHero.utils
 import { formatPurse } from '../../shared/TourHeroHelpers';
 
 const TICKER_BAR_H = 34;
-const LEADER_GREEN = '#2F6B4F';
-const LEADER_GREEN_RING = 'rgba(47,107,79,0.55)';
-const LEADER_GREEN_WASH = 'linear-gradient(90deg, rgba(47,107,79,0.18) 0%, rgba(47,107,79,0.06) 100%)';
+const LEADER_GREEN = '#22C55E';
+const LEADER_GREEN_RING = 'rgba(34,197,94,0.55)';
+const LEADER_GREEN_WASH = 'linear-gradient(90deg, rgba(34,197,94,0.18) 0%, rgba(34,197,94,0.06) 100%)';
 const CHAMPION_BAND_H = 62;
 const UPCOMING_BAND_H = 104;
 const LIVE_BOTTOM_H = CHAMPION_BAND_H + TICKER_BAR_H;
