@@ -104,7 +104,7 @@ function BucketListRailInner() {
               aspectRatio="1/1"
               radius={16}
             />
-            {!singleCourse && (
+            {courseNameByPostId.get(post.id) && (
               <div
                 style={{
                   fontSize: 12.5,
@@ -117,7 +117,7 @@ function BucketListRailInner() {
                   maxWidth: 158,
                 }}
               >
-                {courseNameByPostId.get(post.id) ?? ''}
+                {courseNameByPostId.get(post.id)}
               </div>
             )}
           </div>
