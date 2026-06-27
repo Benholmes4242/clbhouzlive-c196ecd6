@@ -196,7 +196,6 @@ function ScheduleShellRowInner() {
                   padding: '14px 16px',
                   background: isSelected ? AMBER_TINT_04 : 'transparent',
                   border: 'none',
-                  borderLeft: isSelected ? `3px solid ${AMBER}` : '3px solid transparent',
                   borderBottom: `0.5px solid ${INK_TINT_07}`,
                   cursor: 'pointer',
                   textAlign: 'left',
