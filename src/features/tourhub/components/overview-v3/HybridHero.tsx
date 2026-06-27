@@ -262,6 +262,10 @@ export function HybridHero({ slide, activeTournamentId, onSelectTour }: HybridHe
       navigate('/tour');
       return;
     }
+    if (state.kind === 'live') {
+      navigate(`/tour?tab=live&event=${tournament.id}`);
+      return;
+    }
     const target = tournamentRoute(tournament.id);
     navigate(target.to, { state: target.state });
   };
