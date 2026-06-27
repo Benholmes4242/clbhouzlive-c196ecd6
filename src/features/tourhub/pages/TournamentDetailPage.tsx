@@ -317,30 +317,16 @@ export function TournamentDetailPage() {
         />
       </ShellSlot>
 
-      {fullBleedHero ? (
-        <div style={{ minHeight: '100dvh', background: SLATE_50 }}>
-          <TournamentHero
-            tournament={tournament}
-            leaderboard={leaderboard}
-            isLive={isLive}
-            isCompleted={isCompleted}
-            isUpcoming={isUpcoming}
-          />
-          <div ref={heroSentinelRef} />
-          {tabContent}
-        </div>
-      ) : (
-        <div style={{ paddingTop: 'var(--chrome-total-h, 0px)', minHeight: '100dvh', background: SLATE_50 }}>
-          <TournamentHero
-            tournament={tournament}
-            leaderboard={leaderboard}
-            isLive={isLive}
-            isCompleted={isCompleted}
-            isUpcoming={isUpcoming}
-          />
-          {tabContent}
-        </div>
-      )}
+      <div style={{ paddingTop: 'var(--chrome-total-h, 0px)', minHeight: '100dvh', background: SLATE_50 }}>
+        <TournamentHero
+          tournament={tournament}
+          leaderboard={leaderboard}
+          isLive={isLive}
+          isCompleted={isCompleted}
+          isUpcoming={isUpcoming}
+        />
+        {tabContent}
+      </div>
     </TourHubShell>
   );
 }
