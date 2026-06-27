@@ -1240,6 +1240,7 @@ export function CinematicFrame({
                       userId={entry?.player?.id ?? null}
                       size={26}
                       hideRing={!row.isLeader}
+                      hairlineRing={row.isLeader}
                       ringColor={row.isLeader ? 'rgba(247,147,30,0.55)' : undefined}
                     />
                     <span style={{ flex: 1, minWidth: 0, fontSize: 14, fontWeight: row.isLeader ? 700 : 600, color: 'white', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{name}</span>
