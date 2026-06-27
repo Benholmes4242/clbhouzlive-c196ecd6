@@ -310,18 +310,7 @@ export const LightCardFeed: React.FC<LightCardFeedProps> = ({
           data={posts}
           itemContent={itemContent}
           computeItemKey={(_, post) => post.id}
-          endReached={() => {
-            console.log('[LightFeed] endReached fired', { hasNextPage });
-            handleEndReached();
-          }}
-          rangeChanged={(range) => {
-            console.log('[LightFeed] Virtuoso rangeChanged:', {
-              startIndex: range.startIndex,
-              endIndex: range.endIndex,
-              renderedCount: range.endIndex - range.startIndex + 1,
-              totalData: posts.length,
-            });
-          }}
+          endReached={handleEndReached}
           totalListHeightChanged={(h) => {
             console.log('[LightFeed] Virtuoso total list height:', Math.round(h), 'px for', posts.length, 'items');
           }}
