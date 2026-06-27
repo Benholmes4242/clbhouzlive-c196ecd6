@@ -9,6 +9,7 @@
  */
 import { Globe2, Users, EyeOff, Check } from 'lucide-react';
 import { SectionEyebrow } from '@/components/ui/SectionEyebrow';
+import { SectionHeader } from '@/components/ui/SectionHeader';
 
 export type HandicapVisibility = 'everyone' | 'friends' | 'nobody';
 
