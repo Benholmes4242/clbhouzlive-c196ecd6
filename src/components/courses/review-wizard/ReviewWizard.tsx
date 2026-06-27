@@ -979,7 +979,41 @@ export function ReviewWizard({
                       )}
                     </div>
 
-
+                    {/* Media carousel */}
+                    {hasMedia && (
+                      <div style={{ marginTop: 8, padding: '4px 0 2px' }}>
+                        <div
+                          style={{
+                            display: 'flex',
+                            gap: 8,
+                            overflowX: 'auto',
+                            scrollSnapType: 'x mandatory',
+                            WebkitOverflowScrolling: 'touch',
+                            scrollbarWidth: 'none',
+                            padding: `0 ${PAD_X}`,
+                          }}
+                        >
+                          {existingTiles.map((tile) => (
+                            <MediaTile
+                              key={tile.id}
+                              stageItem={tile.stageItem}
+                              type={tile.type}
+                              onRemove={() => removeMediaTile(tile.id)}
+                            />
+                          ))}
+                          {pendingTiles.map((tile, i) => (
+                            <MediaTile
+                              key={tile.id}
+                              stageItem={tile.item}
+                              frame={tile.item.frame}
+                              type={tile.type}
+                              onTap={() => openEditor(i)}
+                              onRemove={() => removePendingTile(tile.id)}
+                            />
+                          ))}
+                        </div>
+                      </div>
+                    )}
                     </div>
                   </div>
 
