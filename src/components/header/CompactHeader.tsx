@@ -17,6 +17,7 @@ import { safeGoBack } from '@/utils/navigation';
 import { useMedianStatusBar } from '@/hooks/useMedianStatusBar';
 import { useWhsConnection } from '@/lib/whs/hooks';
 import { useTourHeroOverlay } from '@/hooks/useTourHeroOverlay';
+import { useHeroFullBleed } from '@/features/tourhub/_shared/heroFullBleedSignal';
 
 interface CompactHeaderProps {
   className?: string;
