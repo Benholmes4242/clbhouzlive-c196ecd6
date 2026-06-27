@@ -132,9 +132,10 @@ function SectionHeaderInner(props: SectionHeaderProps) {
     );
   }
 
-  // ── TIER 2 · STANDARD (amber eyebrow, NO icon) ──
+  // ── TIER 2 · STANDARD (tone-able eyebrow, NO icon) ──
   if (tier === 'standard') {
     const eyebrowText = kicker ?? title;
+    const eyebrowColor = EYEBROW_TONE[tone ?? 'slate'];
     return (
       <div className={className} style={{ ...pad, marginBottom: 12 }}>
         <div
@@ -145,18 +146,39 @@ function SectionHeaderInner(props: SectionHeaderProps) {
             gap: 12,
           }}
         >
-          <span
-            style={{
-              fontFamily: GEIST,
-              fontSize: 11,
-              fontWeight: 800,
-              letterSpacing: '0.14em',
-              textTransform: 'uppercase',
-              color: AMBER_AA,
-            }}
-          >
-            {eyebrowText}
-          </span>
+          <div style={{ display: 'flex', alignItems: 'baseline', gap: 8 }}>
+            <span
+              style={{
+                fontFamily: GEIST,
+                fontSize: 11,
+                fontWeight: 800,
+                letterSpacing: '0.14em',
+                textTransform: 'uppercase',
+                color: eyebrowColor,
+                fontFeatureSettings: '"kern" 1, "liga" 1',
+              }}
+            >
+              {eyebrowText}
+              {required && (
+                <span aria-hidden="true" style={{ color: '#F7931E', marginLeft: 3, letterSpacing: 0 }}>
+                  *
+                </span>
+              )}
+            </span>
+            {count != null && (
+              <span
+                style={{
+                  fontFamily: GEIST,
+                  fontSize: 11,
+                  fontWeight: 800,
+                  color: '#94A3B8',
+                  fontVariantNumeric: 'tabular-nums',
+                }}
+              >
+                {count.toLocaleString()}
+              </span>
+            )}
+          </div>
           {action && <ActionAffordance action={action} />}
         </div>
         {kicker && title && (
