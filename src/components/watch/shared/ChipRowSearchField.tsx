@@ -25,8 +25,8 @@ function ChipRowSearchFieldInner({ value, onChange, onClose, placeholder = 'Sear
     <div
       className="flex items-center shrink-0"
       style={{
-        height: 34,
-        borderRadius: 17,
+        height: 30,
+        borderRadius: 15,
         background: '#FFFFFF',
         border: '1px solid rgba(15,23,42,0.12)',
         boxShadow: '0 1px 2px rgba(15,23,42,0.04)',
@@ -100,9 +100,9 @@ export const ChipRowSearchTrigger = memo(function ChipRowSearchTrigger(
       aria-label="Open search"
       className="shrink-0 flex items-center justify-center active:scale-[0.97]"
       style={{
-        width: 34,
-        height: 34,
-        borderRadius: 17,
+        width: 30,
+        height: 30,
+        borderRadius: 15,
         background: '#FFFFFF',
         border: '1px solid rgba(15,23,42,0.12)',
         boxShadow: '0 1px 2px rgba(15,23,42,0.04)',

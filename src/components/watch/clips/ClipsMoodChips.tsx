@@ -25,7 +25,7 @@ function ClipsMoodChipsInner({
     >
       <div
         className="flex items-center gap-1.5"
-        style={{ padding: '8.5px 16px 8.5px 16px' }}
+        style={{ padding: '8.5px 16px 8.5px 12px' }}
       >
         {searchOpen ? (
           <ChipRowSearchField
