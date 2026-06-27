@@ -1,5 +1,4 @@
 export { SectionCard } from './SectionCard';
-export { SectionHeader } from './SectionHeader';
 export { ProfilePhotoCard } from './ProfilePhotoCard';
 export { HeaderPhotoCard } from './HeaderPhotoCard';
 export { IdentitySection } from './IdentitySection';

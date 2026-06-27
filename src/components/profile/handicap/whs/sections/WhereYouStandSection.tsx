@@ -1,5 +1,5 @@
 import React, { useEffect, useRef } from 'react';
-import SectionHeader from './SectionHeader';
+import { SectionHeader } from '@/components/ui/SectionHeader';
 import { useHandicapPercentile } from '@/lib/whs/usePercentile';
 import type {
   HandicapPercentileResult,
@@ -487,7 +487,7 @@ export const WhereYouStandSection: React.FC<Props> = ({ userId }) => {
   if (isLoading) {
     return (
       <section style={{ marginTop: 32 }}>
-        <SectionHeader eyebrow="WHERE YOU STAND" title="Among active golfers" />
+        <SectionHeader kicker="WHERE YOU STAND" title="Among active golfers" />
         <div
           style={{
             margin: '0 16px',
@@ -508,7 +508,7 @@ export const WhereYouStandSection: React.FC<Props> = ({ userId }) => {
 
   return (
     <section ref={sectionRef} style={{ marginTop: 32 }}>
-      <SectionHeader eyebrow="WHERE YOU STAND" title="Among active golfers" />
+      <SectionHeader kicker="WHERE YOU STAND" title="Among active golfers" />
       {d.available === true ? (
         <AvailableCard data={d} />
       ) : (

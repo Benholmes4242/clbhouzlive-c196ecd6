@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useUserBucketListAnchoredContent } from './hooks/useUserBucketListAnchoredContent';
 import { useFeedPostsByIds } from './hooks/useFeedPostsByIds';
-import { SectionHeader } from './SectionHeader';
+import { SectionHeader } from '@/components/ui/SectionHeader';
 import { HRail } from './HRail';
 import WatchRailTile from '../WatchRailTile';
 import { useActiveActor } from '@/context/ActiveActorContext';

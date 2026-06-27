@@ -6,7 +6,7 @@ import {
   type StablefordScope,
 } from './computeStablefordDistribution';
 import StablefordDetailSheet from './StablefordDetailSheet';
-import SectionHeader from '../SectionHeader';
+import { SectionHeader } from '@/components/ui/SectionHeader';
 import { useTrophyAggregates } from '@/lib/whs/hooks';
 
 interface Props {
@@ -143,7 +143,7 @@ export const StablefordCard: React.FC<Props> = ({ scores, userId, connectionId }
   return (
     <div style={SECTION_STYLE}>
       <CardHeader
-        eyebrow={headerEyebrow}
+        kicker={headerEyebrow}
         title={headerTitle}
         onOpenSheet={() => setSheetOpen(true)}
       />
@@ -211,7 +211,7 @@ interface CardHeaderProps {
 const CardHeader: React.FC<CardHeaderProps> = ({ eyebrow, title, onOpenSheet }) => (
   <div style={{ paddingBottom: 0 }}>
     <SectionHeader
-      eyebrow={eyebrow}
+      kicker={eyebrow}
       title={title}
       right={
         <button

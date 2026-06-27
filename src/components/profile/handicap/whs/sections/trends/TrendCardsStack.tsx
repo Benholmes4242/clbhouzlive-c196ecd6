@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Info } from 'lucide-react';
 import { useAllScores } from '@/lib/whs/hooks';
-import SectionHeader from '../SectionHeader';
+import { SectionHeader } from '@/components/ui/SectionHeader';
 import HandicapProjectionCard from './HandicapProjectionCard';
 import LastFiveTokens from './LastFiveTokens';
 import StablefordCard from './StablefordCard';
@@ -230,7 +230,7 @@ export const TrendCardsStack: React.FC<Props> = ({ connectionId, userId, current
         </div>
       ) : (
         <SectionHeader
-          eyebrow={`${possessiveCap} Form`}
+          kicker={`${possessiveCap} Form`}
           title={`The numbers behind ${possessiveLower} handicap`}
           sub={`Three signals that explain ${possessiveLower} trajectory`}
         />
