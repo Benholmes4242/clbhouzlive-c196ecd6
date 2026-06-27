@@ -5,7 +5,7 @@ import { format } from 'date-fns';
 import { useAllScores, useHandicapTrend } from '@/lib/whs/hooks';
 import { computeRoundDeltas, type RoundWithDelta } from './computeRoundDeltas';
 import RoundDetailSheet from '../round-detail/RoundDetailSheet';
-import SectionHeader from '../SectionHeader';
+import { SectionHeader } from '@/components/ui/SectionHeader';
 
 
 interface Props {
@@ -172,7 +172,7 @@ export const RecentRoundsCard: React.FC<Props> = ({ connectionId, viewMode = 'ow
         .rr-last-row > button[data-feedrow="true"] { border-bottom: none; }
       `}</style>
       <SectionHeader
-        eyebrow="RECENT ROUNDS"
+        kicker="RECENT ROUNDS"
         title={`${rounds.length} ${rounds.length === 1 ? 'round' : 'rounds'} tracked`}
         sub={
           viewMode === 'friend'

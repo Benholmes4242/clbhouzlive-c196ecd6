@@ -4,7 +4,7 @@ import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useUserCourseAnchoredContent } from './hooks/useCourseAnchoredContent';
 import { useFeedPostsByIds } from './hooks/useFeedPostsByIds';
 import { useWatchMood } from './hooks/useWatchMood';
-import { SectionHeader } from './SectionHeader';
+import { SectionHeader } from '@/components/ui/SectionHeader';
 import { HRail } from './HRail';
 import WatchRailTile from '../WatchRailTile';
 import { useActiveActor } from '@/context/ActiveActorContext';
@@ -45,12 +45,9 @@ function CourseAnchoredRailInner() {
   return (
     <section style={{ background: 'hsl(var(--background))' }}>
       <SectionHeader
-        paddingTop={16}
+        tier="rail"
         kicker="From your courses"
         title={topCourse.course_name}
-        sub={`${topCourse.content_count} recent ${
-          topCourse.content_count === 1 ? 'post' : 'posts'
-        }`}
         action={{
           label: 'See all',
           onClick: () => navigate(`/courses/${topCourse.course_id}#video`),

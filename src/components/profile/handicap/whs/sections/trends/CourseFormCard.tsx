@@ -3,7 +3,7 @@ import { MapPin } from 'lucide-react';
 import { CourseImageFallback } from '@/components/whs/CourseImageFallback';
 import { useCourseForm } from '@/lib/whs/hooks';
 import type { CourseForm } from '@/lib/whs/types';
-import SectionHeader from '../SectionHeader';
+import { SectionHeader } from '@/components/ui/SectionHeader';
 
 interface Props {
   connectionId: string;
@@ -609,7 +609,7 @@ export const CourseFormCard: React.FC<Props> = ({
   if (isLoading) {
     return (
       <section style={sectionStyle}>
-        <SectionHeader eyebrow="COURSE FORM" title={courseTitle} />
+        <SectionHeader kicker="COURSE FORM" title={courseTitle} />
         <div style={{ padding: '0 20px' }}>
           <div
             className="animate-pulse"
@@ -644,7 +644,7 @@ export const CourseFormCard: React.FC<Props> = ({
     return (
       <section style={sectionStyle}>
         <SectionHeader
-          eyebrow="COURSE FORM"
+          kicker="COURSE FORM"
           title={courseTitle}
         />
         <div style={{ padding: '24px 20px 28px', textAlign: 'center' }}>
@@ -661,7 +661,7 @@ export const CourseFormCard: React.FC<Props> = ({
 
   return (
     <section style={sectionStyle}>
-      <SectionHeader eyebrow="COURSE FORM" title={courseTitle} />
+      <SectionHeader kicker="COURSE FORM" title={courseTitle} />
       <div style={{ padding: '0 20px' }}>
         <ViewToggle activeView={activeView} onChange={setActiveView} />
         <CourseList
