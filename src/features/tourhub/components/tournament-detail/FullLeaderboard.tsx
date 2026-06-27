@@ -3,15 +3,14 @@
  */
 
 import { useState, useMemo } from 'react';
-import { Link } from 'react-router-dom';
 import { Search, X } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import CountryFlag from '@/components/ui/country-flag';
 import { formatThruDisplay } from '../../utils/formatThruDisplay';
-import { playerRoute } from '../../routes';
 import { GOLD_DEEP, HAIRLINE_INK_12, INK, INK_FAINT, INK_LIGHT, INK_MUTE, INK_TINT_02, INK_TINT_05, INK_TINT_07, LEADER_GOLD_TINT_10, SCORE_UNDER_PAR_LIGHT, STATUS_LIVE, STATUS_LIVE_TINT_10, SURFACE } from '../../_shared/tokens';
 import { roundStarted } from '../../_shared/roundState';
+import { PlayerScorecardSheet } from './PlayerScorecardSheet';
 
 interface RawRoundData {
   thru?: number;
@@ -55,11 +54,13 @@ function getLiveRoundData(entry: FullLeaderboardEntry, roundNum: number): { scor
 interface FullLeaderboardProps {
   entries: FullLeaderboardEntry[];
   headshotMap?: Map<string, string>;
+  tournamentId?: string;
   tournamentStatus?: string;
   tournamentTimezone?: string | null;
   tournamentName?: string;
   venuePar?: number | null;
-  onPlayerTap?: () => void;
+  currentRound?: number | null;
+  onPlayerTap?: (entry: FullLeaderboardEntry) => void;
   searchQuery?: string;
   onSearchChange?: (q: string) => void;
   hideSearchInput?: boolean;
@@ -99,10 +100,12 @@ const rowVariants = {
 export function FullLeaderboard({
   entries,
   headshotMap,
+  tournamentId,
   tournamentStatus,
   tournamentTimezone,
   tournamentName,
   venuePar,
+  currentRound,
   onPlayerTap,
   searchQuery: searchQueryProp,
   onSearchChange,
@@ -111,8 +114,10 @@ export function FullLeaderboard({
   // null = overall sort; 1-4 = sort by that round's score
   const [sortRound, setSortRound] = useState<number | null>(null);
   const [localQuery, setLocalQuery] = useState('');
+  const [scorecardEntry, setScorecardEntry] = useState<FullLeaderboardEntry | null>(null);
   const searchQuery = searchQueryProp ?? localQuery;
   const setSearchQuery = onSearchChange ?? setLocalQuery;
+  const handlePlayerTap = onPlayerTap ?? ((entry: FullLeaderboardEntry) => setScorecardEntry(entry));
 
   const filteredEntries = useMemo(() => {
     if (!searchQuery.trim()) return entries;
