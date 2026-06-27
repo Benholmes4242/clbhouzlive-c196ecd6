@@ -26,6 +26,7 @@ import {
 } from 'lucide-react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { toast } from 'sonner';
+import { useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { usePostSubmission } from '@/hooks/usePostSubmission';
 import { useEditablePost } from '@/hooks/useEditablePost';
@@ -119,6 +120,7 @@ export function Composer({
   const isEditMode = !!editPostId;
   const isDraftMode = !!draftId;
   const { activeActor, availableActors, setActiveActor } = useActiveActor();
+  const queryClient = useQueryClient();
   const fileRef = useRef<HTMLInputElement>(null);
 
   const [caption, setCaption] = useState('');
@@ -799,6 +801,9 @@ export function Composer({
             minute: '2-digit',
           });
           toast.success(`Scheduled for ${when}`);
+          // Refresh the scheduled list + count so the new post shows immediately
+          queryClient.invalidateQueries({ queryKey: ['scheduled-posts'] });
+          queryClient.invalidateQueries({ queryKey: ['scheduled-posts-count'] });
         } else {
           toast.success('Posted');
         }
@@ -826,6 +831,7 @@ export function Composer({
     submitPost,
     onClose,
     currentDraftId,
+    queryClient,
   ]);
 
   const composerPlaceholder = useMemo(() => {
