@@ -81,25 +81,14 @@ function BucketListRailInner() {
   if (coursesLoading || postsLoading) return null;
   if (courses.length === 0 || orderedPosts.length === 0) return null;
 
-  const singleCourse = courses.length === 1 ? courses[0] : null;
-
   return (
     <section style={{ background: 'hsl(var(--background))' }}>
       <SectionHeader
-        paddingTop={16}
-        kicker="From your bucket list"
-        kickerColor="amber"
-        title={singleCourse ? singleCourse.course_name : 'Courses you want to play'}
-        sub={`${courses.length} ${courses.length === 1 ? 'course' : 'courses'}`}
-        mark={<BucketListMark />}
+        paddingTop={18}
+        title="Bucket list"
         action={{
           label: 'See all',
-          onClick: () =>
-            navigate(
-              singleCourse
-                ? `/courses/${singleCourse.course_id}#video`
-                : '/profile?tab=want-to-play',
-            ),
+          onClick: () => navigate('/profile?tab=want-to-play'),
         }}
       />
       <HRail>
