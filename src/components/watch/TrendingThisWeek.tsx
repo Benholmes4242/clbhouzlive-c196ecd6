@@ -3,7 +3,7 @@ import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useWatchFeed } from './hooks/useWatchFeed';
 import { useViewedPostIds } from './hooks/useViewedPostIds';
 import WatchRailTile from './WatchRailTile';
-import WatchSectionHeader from './WatchSectionHeader';
+import { SectionHeader } from '@/components/ui/SectionHeader';
 import { HRail } from './proshop/HRail';
 import { ClipsMark } from './proshop/SectionMarks';
 
@@ -97,13 +97,11 @@ export default function TrendingThisWeek({ enabled = true }: TrendingThisWeekPro
 
   return (
     <div style={{ background: 'hsl(var(--background))' }}>
-      <WatchSectionHeader
-        mark={<ClipsMark />}
-        eyebrow="Short & sweet"
-        kickerColor="amber"
+      <SectionHeader
+        tier="rail"
         title="Quick clips"
-        onSeeAll={() => navigate('/watch/clips')}
-        seeAllLabel="More clips"
+        action={{ label: 'More clips', onClick: () => navigate('/watch/clips') }}
+        paddingX={16}
       />
 
       {/* Horizontal scroll — ranked cards, with edge padding + snap */}

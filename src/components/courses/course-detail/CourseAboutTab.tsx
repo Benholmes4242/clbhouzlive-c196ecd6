@@ -31,6 +31,7 @@ import ClaimCourseCTA from './ClaimCourseCTA';
 import ClaimUnderReviewNotice from './ClaimUnderReviewNotice';
 import ClaimedCourseProfileLink from './ClaimedCourseProfileLink';
 import { SectionLabel } from './SectionLabel';
+import { SectionHeader } from '@/components/ui/SectionHeader';
 import { AMBER, HAIRLINE_INK_7, HAIRLINE_INK_8, INK_FAINT, SLATE_50, SLATE_600 } from '@/features/courses/_shared/tokens';
 
 interface Course {
@@ -190,7 +191,7 @@ const CourseAboutTab = ({ course, onTabChange }: CourseAboutTabProps) => {
       {course.description && (
         <>
           <div style={{ marginTop: 24 }}>
-            <SectionLabel text="About" icon={BookOpen} />
+            <SectionHeader tier="standard" kicker="ABOUT" paddingX={16} />
             <div style={{ padding: '0 16px' }}>
               <div style={{ fontSize: 14, color: SLATE_600, lineHeight: 1.7, position: 'relative' }}>
                 {formatDescription(displayDescription)}
@@ -255,7 +256,7 @@ const CourseAboutTab = ({ course, onTabChange }: CourseAboutTabProps) => {
         return (
           <>
             <div>
-              <SectionLabel text="Course Details" icon={BarChart3} />
+              <SectionHeader tier="standard" kicker="COURSE DETAILS" paddingX={16} />
               <div style={{ display: 'grid', gridTemplateColumns: `repeat(${Math.min(stats.length, 4)}, 1fr)`, padding: '0 16px' }}>
                 {stats.slice(0, 4).map((s, i, arr) => (
                   <div key={s.label} style={{ textAlign: 'center', padding: '4px 0', borderRight: i < arr.length - 1 ? `0.5px solid ${HAIRLINE_INK_8}` : 'none' }}>
@@ -272,7 +273,7 @@ const CourseAboutTab = ({ course, onTabChange }: CourseAboutTabProps) => {
 
       {/* 8. Location */}
       <section>
-        <SectionLabel text="Location" icon={MapPin} />
+        <SectionHeader tier="standard" kicker="LOCATION" paddingX={16} />
         <div style={{ padding: '0 16px' }}>
           {coordsLoading && <Skeleton className="w-full h-[180px] rounded-xl" />}
           {coords && (

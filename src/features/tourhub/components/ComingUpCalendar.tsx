@@ -18,6 +18,7 @@ import { Shimmer } from './shared/Shimmer';
 import { getContextLabel, TOUR_NAME_TO_SLUG } from '../utils/tournamentClassification';
 import { TOUR_MAP, type TourCode } from '../constants/tourMap';
 import type { SeasonTournament } from '../hooks/useSeasonTournaments';
+import { SectionHeader } from '@/components/ui/SectionHeader';
 
 // ── Tokens ──────────────────────────────────────────────────────────────────
 import {
@@ -522,38 +523,13 @@ export function ComingUpCalendar() {
 
   return (
     <div>
-      {/* Section header — mirrors Tournament Intelligence eyebrow */}
-      <div style={{ padding: '0 16px', marginBottom: 14 }}>
-        <button
-          onClick={() => navigate('/tourhub?tab=schedule')}
-          aria-label="Open full schedule"
-          style={{
-            background: 'transparent',
-            border: 'none',
-            padding: 0,
-            cursor: 'pointer',
-            display: 'inline-flex',
-            alignItems: 'center',
-            gap: 6,
-          }}
-        >
-          <Calendar size={13} color={AMBER} strokeWidth={2.5} />
-          <span style={{
-            fontSize: 10.5,
-            fontWeight: 700,
-            letterSpacing: '0.14em',
-            color: AMBER,
-          }}>
-            UPCOMING EVENTS
-          </span>
-          <ChevronRight
-            size={11}
-            color={AMBER}
-            strokeWidth={2.5}
-            style={{ marginTop: 1 }}
-          />
-        </button>
-      </div>
+      {/* Canonical Tier 2 section header (minimal density — no icon). */}
+      <SectionHeader
+        tier="standard"
+        kicker="UPCOMING EVENTS"
+        action={{ label: 'Full schedule', onClick: () => navigate('/tourhub?tab=schedule') }}
+        paddingX={16}
+      />
 
       {/* Headline + sublabel — matches Intelligence h1 styling */}
       <div style={{ padding: '0 16px', marginBottom: 14 }}>

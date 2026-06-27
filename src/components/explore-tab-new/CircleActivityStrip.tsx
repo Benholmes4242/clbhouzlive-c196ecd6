@@ -1,5 +1,5 @@
 import { useState, useMemo } from 'react';
-import { ExploreSectionHeader } from './ExploreSectionHeader';
+import { SectionHeader } from '@/components/ui/SectionHeader';
 import { LinkedRingsMark } from './DiscoverMarks';
 import {
   useCircleActivity,
@@ -78,12 +78,14 @@ export function CircleActivityStrip({ userId }: Props) {
   const rows = useMemo(() => data ?? [], [data]);
 
   const Header = (
-    <ExploreSectionHeader
+    <SectionHeader
+      tier="editorial"
       kicker="FRIENDS RECENT HIGHLIGHTS"
-      kickerColor="amber"
       title="Your friends"
       sub="What your circle's been pulling off"
       mark={<LinkedRingsMark />}
+      paddingTop={32}
+      paddingX={16}
     />
   );
 

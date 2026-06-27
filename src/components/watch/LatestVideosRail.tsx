@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useVideosFeed } from '@/components/videos-tab/hooks/useVideosFeed';
 import { VideosFeedSkeleton } from '@/components/videos-tab/VideosFeedSkeleton';
-import WatchSectionHeader from './WatchSectionHeader';
+import { SectionHeader } from '@/components/ui/SectionHeader';
 import AutoplayVideoCard from './videos/AutoplayVideoCard';
 import CompactVideoRow from './videos/CompactVideoRow';
 import { VideosMark } from './proshop/SectionMarks';
@@ -35,14 +35,12 @@ export default function LatestVideosRail() {
   if (isLoading || posts.length === 0) {
     return (
       <div>
-        <WatchSectionHeader
-          mark={<VideosMark />}
-          eyebrow="Fresh from the tour"
-          kickerColor="amber"
+        <SectionHeader
+          tier="rail"
           title="Latest videos"
-          onSeeAll={() => navigate('/watch/videos')}
-          seeAllLabel="More videos"
+          action={{ label: 'More videos', onClick: () => navigate('/watch/videos') }}
           paddingTop={6}
+          paddingX={16}
         />
         <VideosFeedSkeleton />
       </div>
@@ -54,14 +52,12 @@ export default function LatestVideosRail() {
 
   return (
     <div>
-      <WatchSectionHeader
-        mark={<VideosMark />}
-        eyebrow="Fresh from the tour"
-        kickerColor="amber"
+      <SectionHeader
+        tier="rail"
         title="Latest videos"
-        onSeeAll={() => navigate('/watch/videos')}
-        seeAllLabel="More videos"
+        action={{ label: 'More videos', onClick: () => navigate('/watch/videos') }}
         paddingTop={6}
+        paddingX={16}
       />
 
       <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>

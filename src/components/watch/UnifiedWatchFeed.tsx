@@ -5,7 +5,7 @@ import TrendingThisWeek from './TrendingThisWeek';
 import LatestVideosRail from './LatestVideosRail';
 import WatchAutoplay from './WatchAutoplay';
 import WatchGrid from './WatchGrid';
-import WatchSectionHeader from './WatchSectionHeader';
+import { SectionHeader } from '@/components/ui/SectionHeader';
 // WatchSectionDivider removed in Phase 4 — kicker + h1 already separate
 // sections clearly; dividers fragmented the surface visually.
 
@@ -72,9 +72,11 @@ export default function UnifiedWatchFeed({ embedded = false }: UnifiedWatchFeedP
           Phase 5g: explicit 24px paddingBottom guarantees clearance from
           the bottom nav even when PageRoot is bypassed. */}
       <div style={{ paddingBottom: 24 }}>
-        <WatchSectionHeader
+        <SectionHeader
+          tier="rail"
           title="Clips to explore"
           paddingTop={28}
+          paddingX={16}
         />
         {/* ── Mood pills — pulled up tight under the title, sitting close to the grid ── */}
         <div style={{ paddingTop: 0, paddingBottom: 2, marginTop: -6 }}>
