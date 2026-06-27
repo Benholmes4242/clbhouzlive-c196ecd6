@@ -52,14 +52,12 @@ export default function LatestVideosRail() {
 
   return (
     <div>
-      <WatchSectionHeader
-        mark={<VideosMark />}
-        eyebrow="Fresh from the tour"
-        kickerColor="amber"
+      <SectionHeader
+        tier="rail"
         title="Latest videos"
-        onSeeAll={() => navigate('/watch/videos')}
-        seeAllLabel="More videos"
+        action={{ label: 'More videos', onClick: () => navigate('/watch/videos') }}
         paddingTop={6}
+        paddingX={16}
       />
 
       <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
