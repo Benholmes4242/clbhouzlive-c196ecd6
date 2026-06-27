@@ -332,7 +332,8 @@ export const SquircleAvatar: React.FC<SquircleAvatarProps> = ({
           width: `${pixelSize}px`,
           aspectRatio: '1 / 1.05',
           borderRadius: '34%',
-          border: hideRing ? 'none' : `${ringThickness}px solid ${borderColor}`,
+          border: hideRing || hairlineRing ? 'none' : `${ringThickness}px solid ${borderColor}`,
+          boxShadow: hairlineRing ? hairlineShadow : undefined,
         }}
       >
         {avatarContent}
