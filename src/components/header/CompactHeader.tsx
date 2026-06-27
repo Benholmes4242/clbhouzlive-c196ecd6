@@ -168,7 +168,11 @@ const CompactHeader: React.FC<CompactHeaderProps> = ({ className }) => {
 
   // Tournament Overview live/results: transparent chrome over the cinematic hero.
   const tourHeroOverlay = useTourHeroOverlay();
-  const overlayActive = tourHeroOverlay && isTourTournamentRoute;
+  const isTourOverviewSurface =
+    isTourTournamentRoute ||
+    location.pathname === '/tourhub' ||
+    location.pathname === '/tourhub/';
+  const overlayActive = tourHeroOverlay && isTourOverviewSurface;
 
   // Keep the native status bar on the light surface for handicap (was previously
   // toggled dark↔light around the search overlay; now uniformly light).

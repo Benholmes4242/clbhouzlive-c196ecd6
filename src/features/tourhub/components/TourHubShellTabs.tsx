@@ -26,7 +26,13 @@ function computeActiveTab(pathname: string, searchParams: URLSearchParams): TabI
 /**
  * TourHubShellTabs — Canonical 5-destination tab strip for the Tour Hub shell.
  */
-export const TourHubShellTabs: React.FC = () => {
+export interface TourHubShellTabsProps {
+  /** When true, paint transparent with white text — for use over the
+   *  cinematic full-bleed hero on the Overview tab. */
+  overlay?: boolean;
+}
+
+export const TourHubShellTabs: React.FC<TourHubShellTabsProps> = ({ overlay = false }) => {
   const location = useLocation();
   const [searchParams, setSearchParams] = useSearchParams();
   const navigate = useNavigate();
@@ -88,10 +94,12 @@ export const TourHubShellTabs: React.FC = () => {
     <section
       className="relative"
       style={{
-        background: '#F8FAFC',
+        background: overlay ? 'transparent' : '#F8FAFC',
         display: 'flex',
         alignItems: 'stretch',
-        borderBottom: '0.5px solid rgba(15,23,42,0.08)',
+        borderBottom: overlay
+          ? '0.5px solid rgba(255,255,255,0.18)'
+          : '0.5px solid rgba(15,23,42,0.08)',
       }}
     >
       <div style={{ position: 'relative', minWidth: 0, flex: '1 1 auto' }}>
@@ -127,7 +135,9 @@ export const TourHubShellTabs: React.FC = () => {
                   borderRadius: 0,
                   border: 'none',
                   background: 'transparent',
-                  color: isActive ? '#0A0E14' : '#64748B',
+                  color: overlay
+                    ? (isActive ? '#FFFFFF' : 'rgba(255,255,255,0.7)')
+                    : (isActive ? '#0A0E14' : '#64748B'),
                   fontFamily: 'inherit',
                   fontSize: 14,
                   fontWeight: isActive ? 700 : 600,
@@ -162,7 +172,9 @@ export const TourHubShellTabs: React.FC = () => {
               bottom: 0,
               width: 34,
               pointerEvents: 'none',
-              background: 'linear-gradient(to right, rgba(248,250,252,0), #F8FAFC)',
+              background: overlay
+                ? 'linear-gradient(to right, rgba(15,23,42,0), rgba(15,23,42,0.001))'
+                : 'linear-gradient(to right, rgba(248,250,252,0), #F8FAFC)',
             }}
           />
         )}
