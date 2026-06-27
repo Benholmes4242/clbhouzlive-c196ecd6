@@ -11,6 +11,7 @@ import { formatThruDisplay } from '../../utils/formatThruDisplay';
 import { GOLD_DEEP, HAIRLINE_INK_12, INK, INK_FAINT, INK_LIGHT, INK_MUTE, INK_TINT_02, INK_TINT_05, INK_TINT_07, LEADER_GOLD_TINT_10, SCORE_UNDER_PAR_LIGHT, STATUS_LIVE, STATUS_LIVE_TINT_10, SURFACE } from '../../_shared/tokens';
 import { roundStarted } from '../../_shared/roundState';
 import { PlayerScorecardSheet } from './PlayerScorecardSheet';
+import { resolveAvatarCandidates } from '../../utils/playerAvatar';
 
 interface RawRoundData {
   thru?: number;
@@ -339,6 +340,7 @@ export function FullLeaderboard({
             position: scorecardEntry.position,
             positionTied: scorecardEntry.position_tied,
             totalScore: scorecardEntry.score,
+            photoCandidates: resolveAvatarCandidates(scorecardEntry),
           }}
         />
       )}

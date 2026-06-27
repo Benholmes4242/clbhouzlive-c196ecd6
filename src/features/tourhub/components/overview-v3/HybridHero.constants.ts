@@ -61,8 +61,8 @@ export const CINEMATIC_SCRIM =
  * Under par = good (teal); over par = warm (orange).
  * NEVER use red for under-par scores — that's the banned good=red antipattern.
  */
-export const SC_BIRDIE = '#2DD4BF';
-export const SC_BOGEY = '#FB923C';
+export const SC_BIRDIE = '#059669'; // anchored to leaderboard under-par green
+export const SC_BOGEY = '#EA8C3A';
 
 export const CINEMATIC_FRAME_HEIGHT = 480;
 export const CINEMATIC_FRAME_HEIGHT_RESULTS = 480;
