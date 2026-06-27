@@ -76,7 +76,7 @@ export const CourseHolesTab: React.FC<Props> = ({ courseId }) => {
   }
 
   return (
-    <div style={{ background: '#ffffff', fontFamily: FONT }}>
+    <div style={{ background: '#F8FAFC', fontFamily: FONT }}>
       <ConnectHandicapCue variant="holes" courseName={meta?.course_name ?? ''} />
       <HolesCredibilityHeader totalRounds={data.total_rounds} />
       {hardest && easiest && hardest.hole_no !== easiest.hole_no && (

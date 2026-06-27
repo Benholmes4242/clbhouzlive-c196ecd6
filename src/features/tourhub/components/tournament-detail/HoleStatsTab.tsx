@@ -1,13 +1,13 @@
 /**
- * HoleStatsTab — Flat hole-by-hole, round-aware.
+ * HoleStatsTab — Tournament Holes tab, rebuilt on the course-details Holes
+ * component family (HoleRow + HolesScoringKey). The only tournament-specific
+ * surface is the round selector (Overall / R1 / R2 …) above the list.
  *
- * Layout (matches signed-off mock):
- *  - Eyebrow "HOLE STATS · {round}" + RoundSelector (Overall + R1–R4)
- *  - Hardest / Easiest summary cards (SLATE_50 bg)
- *  - By Hole / By Difficulty toggle
- *  - De-boxed column header (Hole / Par / Scoring / Avg)
- *  - Per-hole rows: counts centered above stacked distribution bar
- *  - Legend at bottom
+ * Data flow: useTourHoleStats → ProcessedHole → toHoleRowData → CourseHole shape
+ * consumed by the shared HoleRow card. Tournaments lack stroke index, so SI is
+ * passed as null (HoleRow conditionally omits it). Aces/albatrosses aren't
+ * tracked separately at tournament granularity, so those buckets are 0 and
+ * "other" is folded into double+.
  */
 
 import { useState, useMemo } from 'react';
@@ -16,17 +16,14 @@ import { motion } from 'framer-motion';
 import { RoundSelector } from './RoundSelector';
 import { EditorialEmpty } from './EditorialEmpty';
 import { useTourHoleStats } from '../../hooks/useTourHubData';
+import { HoleRow } from '@/features/courses/components/holes/HoleRow';
+import { HolesScoringKey } from '@/features/courses/components/holes/HolesScoringKey';
+import type { CourseHole } from '@/hooks/gam/useCourseHoleAnalysis';
 import {
-  AMBER, AMBER_SOFT_BG, GOLD_DEEP, FONT, INK, INK_FAINT, INK_MUTE,
-  INK_TINT_06, INK_TINT_07, SLATE_50, SURFACE,
+  AMBER, FONT, INK, INK_MUTE, INK_TINT_06, INK_TINT_07, SLATE_50, SURFACE,
 } from '../../_shared/tokens';
+import { HAIRLINE_INK_8 } from '@/features/courses/_shared/tokens';
 import { ConnectHandicapCue } from '@/components/courses/course-detail/ConnectHandicapCue';
-
-// Birdie+ red, par slate, bogey+ blue (mock spec — eagles folded into birdie+,
-// doubles folded into bogey+).
-const C_BIRDIE = '#9F1D1D';
-const C_PAR    = '#94A3B8';
-const C_BOGEY  = '#2563EB';
 
 interface HoleStatsTabProps {
   tournamentId: string;
@@ -57,24 +54,49 @@ interface ProcessedHole {
   _diffCount: number;
 }
 
+function toHoleRowData(p: ProcessedHole): CourseHole {
+  const totalStrokes =
+    p.eagles + p.birdies + p.pars + p.bogeys + p.doubleBogeys + p.other;
+  const total = totalStrokes || p.totalPlayers || 1;
+  const pct = (n: number) => (n / total) * 100;
+  return {
+    hole_no: p.holeNumber,
+    par: p.par,
+    yards: p.yardage,
+    stroke_index: null,
+    rounds: p.totalPlayers || totalStrokes,
+    avg_to_par: p.avgDiff,
+    avg_gross: p.scoringAverage,
+    dist: {
+      ace: 0,
+      albatross: 0,
+      eagle: pct(p.eagles),
+      birdie: pct(p.birdies),
+      par: pct(p.pars),
+      bogey: pct(p.bogeys),
+      double: pct(p.doubleBogeys + p.other),
+    },
+  };
+}
+
 function HoleStatsSkeleton() {
   return (
-    <div style={{ background: SURFACE, borderTop: `0.5px solid ${INK_TINT_07}` }}>
+    <div style={{ background: SLATE_50, borderTop: `0.5px solid ${INK_TINT_07}` }}>
       <div className="animate-pulse" style={{ padding: '14px 16px 10px' }}>
         <div style={{ height: 9, width: 180, background: INK_TINT_06, borderRadius: 4 }} />
       </div>
-      <div style={{ display: 'flex', gap: 10, padding: '0 16px 14px' }}>
-        {[1, 2].map(i => (
-          <div key={i} className="animate-pulse" style={{ flex: 1, height: 70, background: SLATE_50, borderRadius: 10 }} />
-        ))}
-      </div>
-      {Array.from({ length: 9 }).map((_, i) => (
-        <div key={i} className="animate-pulse" style={{ display: 'flex', alignItems: 'center', padding: '11px 16px', borderTop: `0.5px solid ${INK_TINT_07}`, gap: 8 }}>
-          <div style={{ width: 28, height: 13, background: INK_TINT_06, borderRadius: 4 }} />
-          <div style={{ width: 24, height: 11, background: INK_TINT_06, borderRadius: 4 }} />
-          <div style={{ flex: 1, height: 6, background: INK_TINT_06, borderRadius: 3 }} />
-          <div style={{ width: 40, height: 12, background: INK_TINT_06, borderRadius: 4 }} />
-        </div>
+      {Array.from({ length: 6 }).map((_, i) => (
+        <div
+          key={i}
+          className="animate-pulse"
+          style={{
+            margin: '10px 14px 0',
+            height: 220,
+            background: SURFACE,
+            border: `1px solid ${HAIRLINE_INK_8}`,
+            borderRadius: 14,
+          }}
+        />
       ))}
     </div>
   );
@@ -169,15 +191,20 @@ export function HoleStatsTab({ tournamentId, isCompleted, courseId, courseName }
     return holes;
   }, [rawHoleStats, selectedRound]);
 
-  const toughestHoles = useMemo(() => [...processedHoles].sort((a, b) => b.avgDiff - a.avgDiff), [processedHoles]);
-  const easiestHoles = useMemo(() => [...processedHoles].sort((a, b) => a.avgDiff - b.avgDiff), [processedHoles]);
-
   if (isLoading) return <HoleStatsSkeleton />;
   if (!rawHoleStats || rawHoleStats.length === 0) return <HoleStatsEmpty isCompleted={isCompleted} />;
 
-  const hasRoundData = processedHoles.some(h => h.scoringAverage > 0);
-  const hardest = toughestHoles[0];
-  const easiest = easiestHoles[0];
+  const hasRoundData = processedHoles.some(h => h.scoringAverage > 0 || h.avgDiff !== 0);
+
+  const hardest = processedHoles.reduce<ProcessedHole | null>(
+    (m, h) => (!m || h.avgDiff > m.avgDiff ? h : m),
+    null,
+  );
+  const easiest = processedHoles.reduce<ProcessedHole | null>(
+    (m, h) => (!m || h.avgDiff < m.avgDiff ? h : m),
+    null,
+  );
+  const maxAvg = Math.max(0.01, ...processedHoles.map(h => h.avgDiff));
 
   const rows = sort === 'difficulty'
     ? [...processedHoles].sort((a, b) => b.avgDiff - a.avgDiff)
@@ -186,13 +213,18 @@ export function HoleStatsTab({ tournamentId, isCompleted, courseId, courseName }
   const roundLabel = selectedRound === 'Overall' ? 'Overall' : `Round ${selectedRound.replace('R', '')}`;
 
   return (
-    <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.3 }} style={{ fontFamily: FONT }}>
+    <motion.div
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={{ duration: 0.3 }}
+      style={{ fontFamily: FONT, background: SLATE_50 }}
+    >
       {courseId && (
         <ConnectHandicapCue variant="tour-holes" courseName={courseName ?? ''} />
       )}
 
       {/* Section eyebrow */}
-      <div style={{ background: SURFACE, borderTop: `0.5px solid ${INK_TINT_07}`, padding: '14px 16px 10px' }}>
+      <div style={{ background: SLATE_50, borderTop: `0.5px solid ${INK_TINT_07}`, padding: '14px 16px 10px' }}>
         <span style={{
           fontSize: 9, fontWeight: 800, color: INK_MUTE,
           letterSpacing: '0.16em', textTransform: 'uppercase',
@@ -203,7 +235,7 @@ export function HoleStatsTab({ tournamentId, isCompleted, courseId, courseName }
 
       {/* Round selector */}
       {availableRounds.length > 1 && (
-        <div style={{ background: SURFACE, padding: '0 16px 12px' }}>
+        <div style={{ background: SLATE_50, padding: '0 16px 12px' }}>
           <RoundSelector rounds={availableRounds} activeRound={selectedRound} onRoundChange={setSelectedRound} />
         </div>
       )}
@@ -216,139 +248,63 @@ export function HoleStatsTab({ tournamentId, isCompleted, courseId, courseName }
           body="Hole-by-hole stats will appear once play begins in this round."
         />
       ) : (
-        <div style={{ background: SURFACE }}>
-          {/* Hardest / Easiest summary */}
-          {hardest && easiest && (
-            <div style={{ display: 'flex', gap: 10, padding: '0 16px 14px' }}>
-              <SummaryCard label="Hardest" hole={hardest} accent={GOLD_DEEP} />
-              <SummaryCard label="Easiest" hole={easiest} accent={C_BIRDIE} />
-            </div>
-          )}
-
-          {/* Sort toggle */}
-          <div style={{ display: 'flex', gap: 8, padding: '0 16px 12px' }}>
-            {([['hole', 'By Hole'], ['difficulty', 'By Difficulty']] as const).map(([v, label]) => {
-              const active = sort === v;
-              return (
+        <div style={{ background: SLATE_50 }}>
+          {/* Sort toggle — mirrors the course Holes tab */}
+          <div
+            style={{
+              padding: '4px 18px 8px',
+              display: 'flex',
+              justifyContent: 'flex-end',
+              alignItems: 'center',
+            }}
+          >
+            <div
+              style={{
+                display: 'inline-flex',
+                gap: 2,
+                background: '#F1F5F9',
+                border: `1px solid ${HAIRLINE_INK_8}`,
+                borderRadius: 999,
+                padding: 3,
+              }}
+            >
+              {([['hole', 'By hole'], ['difficulty', 'By difficulty']] as const).map(([k, l]) => (
                 <button
-                  key={v}
-                  onClick={() => setSort(v)}
+                  key={k}
+                  onClick={() => setSort(k)}
                   style={{
-                    flex: 1, padding: '8px 0', borderRadius: 8, cursor: 'pointer',
-                    fontSize: 12, fontWeight: 800,
-                    background: active ? INK : SURFACE,
-                    color: active ? SURFACE : INK_MUTE,
-                    border: `1px solid ${active ? INK : INK_TINT_07}`,
-                    letterSpacing: '-0.005em',
+                    padding: '5px 12px',
+                    borderRadius: 999,
+                    border: 'none',
+                    fontSize: 10.5,
+                    fontWeight: 800,
+                    letterSpacing: '0.03em',
+                    textTransform: 'uppercase',
+                    cursor: 'pointer',
+                    background: sort === k ? INK : 'transparent',
+                    color: sort === k ? SURFACE : INK_MUTE,
+                    fontFamily: FONT,
                   }}
                 >
-                  {label}
+                  {l}
                 </button>
-              );
-            })}
+              ))}
+            </div>
           </div>
 
-          {/* De-boxed column header */}
-          <div style={{
-            display: 'flex', alignItems: 'center', padding: '8px 16px',
-            borderTop: `0.5px solid ${INK_TINT_07}`,
-            borderBottom: `0.5px solid ${INK_TINT_07}`,
-          }}>
-            <span style={{ width: 38, fontSize: 10, fontWeight: 700, color: INK_MUTE, letterSpacing: '0.08em', textTransform: 'uppercase', flexShrink: 0 }}>Hole</span>
-            <span style={{ width: 32, fontSize: 10, fontWeight: 700, color: INK_MUTE, letterSpacing: '0.08em', textTransform: 'uppercase', flexShrink: 0 }}>Par</span>
-            <span style={{ flex: 1, fontSize: 10, fontWeight: 700, color: INK_MUTE, letterSpacing: '0.08em', textTransform: 'uppercase', textAlign: 'center' }}>Scoring</span>
-            <span style={{ width: 46, fontSize: 10, fontWeight: 700, color: INK_MUTE, letterSpacing: '0.08em', textTransform: 'uppercase', textAlign: 'right', flexShrink: 0 }}>Avg</span>
-          </div>
-
-          {/* Rows */}
           {rows.map(h => (
-            <HoleRow key={h.holeNumber} hole={h} />
+            <HoleRow
+              key={h.holeNumber}
+              h={toHoleRowData(h)}
+              maxAvg={maxAvg}
+              isHardest={hardest != null && h.holeNumber === hardest.holeNumber}
+              isEasiest={easiest != null && h.holeNumber === easiest.holeNumber}
+            />
           ))}
 
-          {/* Legend */}
-          <div style={{ display: 'flex', gap: 14, padding: '14px 16px 20px', justifyContent: 'center', borderTop: `0.5px solid ${INK_TINT_07}` }}>
-            {([['Birdie+', C_BIRDIE], ['Par', C_PAR], ['Bogey+', C_BOGEY]] as const).map(([l, c]) => (
-              <span key={l} style={{ display: 'inline-flex', alignItems: 'center', gap: 6, fontSize: 10, fontWeight: 700, color: INK_MUTE }}>
-                <span style={{ width: 9, height: 9, borderRadius: 2, background: c }} />{l}
-              </span>
-            ))}
-          </div>
+          <HolesScoringKey />
         </div>
       )}
     </motion.div>
-  );
-}
-
-function SummaryCard({ label, hole, accent }: { label: string; hole: ProcessedHole; accent: string }) {
-  const avgLabel = (hole.par + hole.avgDiff).toFixed(2);
-  return (
-    <div style={{ flex: 1, background: SLATE_50, borderRadius: 10, padding: '10px 12px' }}>
-      <span style={{
-        fontSize: 9, fontWeight: 800, color: INK_FAINT,
-        letterSpacing: '0.16em', textTransform: 'uppercase',
-      }}>{label}</span>
-      <div style={{ display: 'flex', alignItems: 'baseline', gap: 6, marginTop: 6 }}>
-        <span style={{ fontSize: 20, fontWeight: 800, color: INK, fontVariantNumeric: 'tabular-nums' }}>Hole {hole.holeNumber}</span>
-        <span style={{ fontSize: 12, fontWeight: 700, color: INK_MUTE }}>Par {hole.par}</span>
-      </div>
-      <div style={{ fontSize: 12, fontWeight: 800, color: accent, marginTop: 2, fontVariantNumeric: 'tabular-nums' }}>
-        {avgLabel} avg
-      </div>
-    </div>
-  );
-}
-
-function HoleRow({ hole }: { hole: ProcessedHole }) {
-  const birdiePlus = hole.eagles + hole.birdies;
-  const bogeyPlus = hole.bogeys + hole.doubleBogeys + hole.other;
-  const total = birdiePlus + hole.pars + bogeyPlus;
-  const pct = (n: number) => (total > 0 ? (n / total) * 100 : 0);
-
-  const hard = hole.difficultyRank > 0 && hole.difficultyRank <= 5;
-  const avgLabel = hole.avgDiff > 0 ? `+${hole.avgDiff.toFixed(2)}` : hole.avgDiff.toFixed(2);
-
-  return (
-    <div style={{
-      padding: '11px 16px',
-      borderBottom: `0.5px solid ${INK_TINT_07}`,
-      background: hard ? AMBER_SOFT_BG : 'transparent',
-    }}>
-      <div style={{ display: 'flex', alignItems: 'center' }}>
-        <span style={{ width: 38, fontSize: 14, fontWeight: 800, color: INK, fontVariantNumeric: 'tabular-nums', flexShrink: 0 }}>
-          {hole.holeNumber}
-        </span>
-        <span style={{ width: 32, fontSize: 13, fontWeight: 600, color: INK_MUTE, fontVariantNumeric: 'tabular-nums', flexShrink: 0 }}>
-          {hole.par}
-        </span>
-
-        <div style={{ flex: 1, paddingRight: 12 }}>
-          {total > 0 && (
-            <div style={{ display: 'flex', justifyContent: 'center', gap: 10, marginBottom: 5, fontVariantNumeric: 'tabular-nums' }}>
-              <span style={{ fontSize: 10, fontWeight: 700, color: C_BIRDIE }}>
-                {birdiePlus} birdie{birdiePlus === 1 ? '' : 's'}
-              </span>
-              <span style={{ fontSize: 10, fontWeight: 700, color: INK_MUTE }}>
-                {hole.pars} par
-              </span>
-              <span style={{ fontSize: 10, fontWeight: 700, color: C_BOGEY }}>
-                {bogeyPlus} bogey{bogeyPlus === 1 ? '' : 's'}
-              </span>
-            </div>
-          )}
-          <div style={{ display: 'flex', height: 6, borderRadius: 3, overflow: 'hidden', background: '#EEF2F6' }}>
-            {pct(birdiePlus) > 0 && <div style={{ width: `${pct(birdiePlus)}%`, background: C_BIRDIE }} />}
-            {pct(hole.pars) > 0 && <div style={{ width: `${pct(hole.pars)}%`, background: C_PAR }} />}
-            {pct(bogeyPlus) > 0 && <div style={{ width: `${pct(bogeyPlus)}%`, background: C_BOGEY }} />}
-          </div>
-        </div>
-
-        <span style={{
-          width: 46, textAlign: 'right', fontSize: 14, fontWeight: 800,
-          color: hard ? GOLD_DEEP : INK, fontVariantNumeric: 'tabular-nums', flexShrink: 0,
-        }}>
-          {avgLabel}
-        </span>
-      </div>
-    </div>
   );
 }
