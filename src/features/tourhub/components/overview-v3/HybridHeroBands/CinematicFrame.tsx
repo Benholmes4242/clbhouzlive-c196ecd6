@@ -1248,7 +1248,7 @@ export function CinematicFrame({
                     />
                     <span style={{ flex: 1, minWidth: 0, fontSize: 14, fontWeight: row.isLeader ? 700 : 600, color: 'white', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{name}</span>
                     {anyToday && (
-                      <span style={{ ...NUMERIC_STYLE, width: COL_TODAY, textAlign: 'right', fontSize: 13, fontWeight: 700, color: scoreColor(today) }}>
+                      <span style={{ ...NUMERIC_STYLE, width: COL_TODAY, textAlign: 'center', fontSize: 13, fontWeight: 700, color: scoreColor(today) }}>
                         {today == null ? '—' : fmtScore(today)}
                       </span>
                     )}
