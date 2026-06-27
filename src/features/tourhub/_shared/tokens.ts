@@ -137,8 +137,8 @@ export const LEADER_GOLD_TINT_10 = 'rgba(251,188,46,0.10)';  // medium leader ti
 // ============================================================================
 // SCORE (verdict — under/over par; theme-aware)
 // ============================================================================
-export const SCORE_UNDER_PAR_LIGHT = '#059669';
-export const SCORE_UNDER_PAR_LIGHT_TINT = 'rgba(5,150,105,0.14)';
+export const SCORE_UNDER_PAR_LIGHT = '#2F6B4F';            // refined pine (unified scoring palette)
+export const SCORE_UNDER_PAR_LIGHT_TINT = 'rgba(47,107,79,0.14)';
 export const SCORE_OVER_PAR_LIGHT = '#9F1D1D';
 export const SCORE_OVER_PAR_LIGHT_TINT = 'rgba(159,29,29,0.14)';
 export const SCORE_UNDER_PAR_DARK = '#4ADE80';
