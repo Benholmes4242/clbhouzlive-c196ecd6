@@ -240,11 +240,6 @@ export const LightCardFeed: React.FC<LightCardFeedProps> = ({
             if (el) {
               cardEls.current.set(index, el);
               if (obs) obs.observe(el);
-              // DEBUG: measure after layout settles
-              requestAnimationFrame(() => {
-                const h = el.getBoundingClientRect().height;
-                if (index < 6) console.log(`[LightFeed] card[${index}] measured height:`, Math.round(h), 'px');
-              });
             } else {
               cardEls.current.delete(index);
             }
