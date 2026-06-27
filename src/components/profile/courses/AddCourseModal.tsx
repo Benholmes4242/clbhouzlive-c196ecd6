@@ -973,7 +973,7 @@ export const AddCourseModal: React.FC<AddCourseModalProps> = ({
                 {/* Pre-selected course highlight */}
                 {preSelectedCourse && !isPreSelectedInTop10 && (
                   <>
-                    <LocalSectionEyebrow label="Course You're Reviewing" />
+                    <div style={{ padding: '14px 16px 8px' }}><SectionHeader tier="standard" kicker="Course You're Reviewing" /></div>
                     <CourseRow
                       course={{
                         id: preSelectedCourse.id,
@@ -994,7 +994,7 @@ export const AddCourseModal: React.FC<AddCourseModalProps> = ({
 
                 {ratedCourses.length > 0 && (
                   <>
-                    <LocalSectionEyebrow label="Your Rated Courses" noBar />
+                    <div style={{ padding: '14px 16px 8px' }}><SectionHeader tier="standard" kicker="Your Rated Courses" /></div>
                     {ratedCourses
                       .filter(c => c.id !== preSelectedCourseId)
                       .map((course) => (
@@ -1012,7 +1012,7 @@ export const AddCourseModal: React.FC<AddCourseModalProps> = ({
 
                 {unratedCourses.length > 0 && (
                   <>
-                    <LocalSectionEyebrow label="Rate to Add" />
+                    <div style={{ padding: '14px 16px 8px' }}><SectionHeader tier="standard" kicker="Rate to Add" /></div>
                     {unratedCourses.map((course) => (
                       <CourseRow
                         key={course.id}

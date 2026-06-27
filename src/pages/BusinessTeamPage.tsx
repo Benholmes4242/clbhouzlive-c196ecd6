@@ -42,17 +42,7 @@ const ROLE_DESCRIPTIONS: Record<BusinessRole, string> = {
 
 const ASSIGNABLE_ROLES: AssignableBusinessRole[] = ['admin', 'editor', 'analyst'];
 
-const LocalSectionEyebrow = ({ label, tone = 'amber' }: { label: string; tone?: 'amber' | 'slate' }) => {
-  const color = tone === 'amber' ? '#F7931E' : '#475569';
-  return (
-    <div className="flex items-center gap-1.5 mb-2">
-      <div style={{ width: 3, height: 8, background: color, borderRadius: 1, flexShrink: 0 }} />
-      <span style={{ fontSize: 9, fontWeight: 900, color, letterSpacing: '0.16em', textTransform: 'uppercase' }}>
-        {label}
-      </span>
-    </div>
-  );
-};
+import SectionHeader from '@/components/ui/SectionHeader';
 
 export default function BusinessTeamPage() {
   const { businessId } = useParams<{ businessId: string }>();
