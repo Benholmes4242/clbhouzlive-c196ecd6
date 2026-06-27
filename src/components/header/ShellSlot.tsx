@@ -26,6 +26,7 @@ interface ShellSlotProps {
 export const ShellSlot: React.FC<ShellSlotProps & { dark?: boolean }> = ({ children, dark = false }) => {
   const ref = useRef<HTMLDivElement>(null);
   const [scrolled, setScrolled] = useState(false);
+  const overlayActive = useTourHeroOverlay();
 
   // Measure height → write to CSS variable
   useLayoutEffect(() => {
