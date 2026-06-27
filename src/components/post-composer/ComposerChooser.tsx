@@ -17,11 +17,11 @@ const CHIP = '#F5F5F7';
 const HAIR = 'rgba(15,23,42,0.07)';
 const DANGER = '#DC2626';
 
-type TileTone = 'amber' | 'violet' | 'slate' | 'danger';
+type TileTone = 'amber' | 'green' | 'slate' | 'danger';
 
 const TILE_TONES: Record<TileTone, { bg: string; grad: string; icon: string; ring: string }> = {
   amber:  { bg: '#FEF3E7', grad: 'linear-gradient(180deg,#FEF6EC 0%,#FCEAD6 100%)', icon: '#D97706', ring: 'rgba(217,119,6,0.16)' },
-  violet: { bg: '#F1ECFE', grad: 'linear-gradient(180deg,#F4EFFE 0%,#EBE2FC 100%)', icon: '#7C5CE6', ring: 'rgba(124,92,230,0.16)' },
+  green:  { bg: 'rgba(47,107,79,0.14)', grad: 'linear-gradient(180deg,rgba(47,107,79,0.12) 0%,rgba(47,107,79,0.20) 100%)', icon: '#2F6B4F', ring: 'rgba(47,107,79,0.20)' },
   slate:  { bg: '#EEF2F7', grad: 'linear-gradient(180deg,#F2F5F9 0%,#E6ECF3 100%)', icon: '#64748B', ring: 'rgba(100,116,139,0.16)' },
   danger: { bg: '#FEF2F2', grad: 'linear-gradient(180deg,#FEF4F4 0%,#FCE6E6 100%)', icon: '#DC2626', ring: 'rgba(220,38,38,0.18)' },
 };
@@ -219,8 +219,8 @@ export function ComposerChooser({
             style={{ ...cardStyle(), animation: 'chooserRise 460ms cubic-bezier(0.16,1,0.3,1) both', animationDelay: '90ms' }}
             {...pressHandlers}
           >
-            <div style={iconTileStyle('violet')}>
-              <Star size={24} color={TILE_TONES.violet.icon} strokeWidth={2} />
+            <div style={iconTileStyle('green')}>
+              <Star size={24} color={TILE_TONES.green.icon} strokeWidth={2} />
             </div>
             <div style={{ flex: 1, textAlign: 'left' }}>
               <div style={{ fontSize: 16, fontWeight: 650, color: INK_2, letterSpacing: '-0.01em' }}>Review a course</div>
