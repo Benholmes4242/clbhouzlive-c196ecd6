@@ -188,13 +188,15 @@ export function PlayerScorecardSheet({
     <BottomSheet open={open} onClose={onClose} ariaLabelledBy="player-scorecard-title">
       {/* player header */}
       <div style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '8px 18px 14px', borderBottom: '1px solid #F1F3F5' }}>
-        <div style={{
-          width: 44, height: 44, borderRadius: '34%', background: '#E8EDF1',
-          display: 'flex', alignItems: 'center', justifyContent: 'center',
-          fontFamily: GEIST, fontWeight: 800, fontSize: 15, color: '#475569', flexShrink: 0,
-          position: 'relative',
-        }}>
-          {initialsOf(player.name)}
+        <div style={{ position: 'relative', flexShrink: 0 }}>
+          <SquircleAvatar
+            srcCandidates={player.photoCandidates}
+            alt={player.name}
+            fallback={initialsOf(player.name)}
+            userId={player.id}
+            size={44}
+            hideRing
+          />
           {player.countryCode && (
             <div style={{ position: 'absolute', bottom: -2, right: -2, borderRadius: '50%', overflow: 'hidden', boxShadow: '0 0 0 2px #fff' }}>
               <CountryFlag country={player.countryCode} size="sm" />
