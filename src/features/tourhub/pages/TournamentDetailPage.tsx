@@ -2,7 +2,7 @@
  * TournamentDetailPage - Editorial tournament detail experience
  */
 
-import { useState, useMemo, useEffect, useRef } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { useBottomNavigation } from '@/contexts/BottomNavigationContext';
 
 import { useParams, useSearchParams, Link } from 'react-router-dom';
