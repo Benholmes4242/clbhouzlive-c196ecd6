@@ -1,4 +1,4 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import type { FeedPost } from '@/components/media-system/types/media';
 import { useLikeMutation } from '@/components/media-system/hooks/useLikeMutation';
 import { analyticsEvents } from '@/utils/analyticsEvents';
