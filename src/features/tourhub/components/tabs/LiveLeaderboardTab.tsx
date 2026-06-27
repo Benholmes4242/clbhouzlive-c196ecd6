@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
-import { useSearchParams } from 'react-router-dom';
+import { useSearchParams, useNavigate } from 'react-router-dom';
 import { format, isSameMonth } from 'date-fns';
 import { ChevronDown, Search, X, Check } from 'lucide-react';
 import { BottomSheet } from '@/components/ui/BottomSheet';
@@ -8,7 +8,7 @@ import { useLiveTournaments } from '../../hooks/useLiveTournaments';
 import { useTourLeaderboard } from '../../hooks/useTourHubData';
 import { FullLeaderboard } from '../tournament-detail/FullLeaderboard';
 import { EditorialEmpty } from '../tournament-detail/EditorialEmpty';
-import { INK, INK_MUTE, INK_TINT_05, INK_TINT_07, INK_TINT_06, SURFACE, SLATE_50, STATUS_LIVE, STATUS_LIVE_TINT_10 } from '../../_shared/tokens';
+import { INK, INK_MUTE, INK_FAINT, INK_TINT_05, INK_TINT_07, INK_TINT_06, SURFACE, SLATE_50, STATUS_LIVE, STATUS_LIVE_TINT_10 } from '../../_shared/tokens';
 import { tourPriorityIndex, TOUR_LABEL, shortTournamentToken } from '../../_shared/tourOrder';
 import { TOUR_CONFIG } from '../../hooks/useOverviewData';
 import { getTourLogo, hasTourLogo } from '../../utils/tourLogos';
@@ -45,6 +45,7 @@ function formatDateRange(startDate: string, endDate: string): string {
  * from the tournament detail page.
  */
 export function LiveLeaderboardTab() {
+  const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const eventParam = searchParams.get('event');
 
@@ -182,50 +183,59 @@ export function LiveLeaderboardTab() {
         const rightMeta = dates;
 
         return (
-          <div style={{ padding: '16px 20px 16px', background: SLATE_50, borderBottom: `0.5px solid ${INK_TINT_07}` }}>
-            {/* Row: tour (+ live dot · round · field) · dates right */}
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 9 }}>
-              <span style={{
-                display: 'inline-flex', alignItems: 'center', gap: 7,
-                fontFamily: 'Geist, system-ui, sans-serif',
-                fontSize: 10.5, fontWeight: 800, letterSpacing: '0.14em',
-                textTransform: 'uppercase', color: INK,
-              }}>
-                {isLive && (
-                  <span aria-hidden style={{ width: 6, height: 6, borderRadius: '50%', background: STATUS_LIVE, flexShrink: 0 }} />
-                )}
-                {tourFullName}
-              </span>
-              {rightMeta && (
+          <div
+            role="button"
+            tabIndex={0}
+            onClick={() => navigate(`/tourhub/tournament/${selected.id}`)}
+            onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') navigate(`/tourhub/tournament/${selected.id}`); }}
+            style={{ padding: '16px 20px', background: SLATE_50, borderBottom: `0.5px solid ${INK_TINT_07}`, cursor: 'pointer', display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 12 }}
+          >
+            <div style={{ flex: 1, minWidth: 0 }}>
+              {/* Row: tour (+ live dot · round · field) · dates right */}
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 9 }}>
                 <span style={{
+                  display: 'inline-flex', alignItems: 'center', gap: 7,
                   fontFamily: 'Geist, system-ui, sans-serif',
-                  fontSize: 11, fontWeight: 600, color: INK,
-                  fontVariantNumeric: 'tabular-nums', whiteSpace: 'nowrap',
+                  fontSize: 10.5, fontWeight: 800, letterSpacing: '0.14em',
+                  textTransform: 'uppercase', color: INK,
                 }}>
-                  {rightMeta}
+                  {isLive && (
+                    <span aria-hidden style={{ width: 6, height: 6, borderRadius: '50%', background: STATUS_LIVE, flexShrink: 0 }} />
+                  )}
+                  {tourFullName}
                 </span>
+                {rightMeta && (
+                  <span style={{
+                    fontFamily: 'Geist, system-ui, sans-serif',
+                    fontSize: 11, fontWeight: 600, color: INK,
+                    fontVariantNumeric: 'tabular-nums', whiteSpace: 'nowrap',
+                  }}>
+                    {rightMeta}
+                  </span>
+                )}
+              </div>
+
+              {/* Tournament name */}
+              <div style={{
+                fontFamily: 'Geist, system-ui, sans-serif',
+                fontSize: 20, fontWeight: 800, color: INK,
+                letterSpacing: '-0.02em', lineHeight: 1.16,
+              }}>
+                {selected.name}
+              </div>
+
+              {/* Location only */}
+              {location && (
+                <div style={{
+                  marginTop: 8,
+                  fontFamily: 'Geist, system-ui, sans-serif',
+                  fontSize: 12.5, fontWeight: 500, color: INK,
+                }}>
+                  {location}
+                </div>
               )}
             </div>
-
-            {/* Tournament name */}
-            <div style={{
-              fontFamily: 'Geist, system-ui, sans-serif',
-              fontSize: 20, fontWeight: 800, color: INK,
-              letterSpacing: '-0.02em', lineHeight: 1.16,
-            }}>
-              {selected.name}
-            </div>
-
-            {/* Location only */}
-            {location && (
-              <div style={{
-                marginTop: 8,
-                fontFamily: 'Geist, system-ui, sans-serif',
-                fontSize: 12.5, fontWeight: 500, color: INK,
-              }}>
-                {location}
-              </div>
-            )}
+            <span aria-hidden style={{ alignSelf: 'center', color: INK_FAINT, fontSize: 22, lineHeight: 1, flexShrink: 0 }}>›</span>
           </div>
         );
       })()}

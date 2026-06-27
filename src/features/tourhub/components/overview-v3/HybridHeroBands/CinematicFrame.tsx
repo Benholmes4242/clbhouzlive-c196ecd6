@@ -1126,7 +1126,7 @@ export function CinematicFrame({
                   {fieldStrength?.totalPlayers != null ? `${fieldStrength.totalPlayers} in the field` : ''}
                 </span>
                 <span style={{ display: 'inline-flex', alignItems: 'center', gap: 4 }}>
-                  <span style={{ ...NUMERIC_STYLE, fontSize: 11, fontWeight: 800, letterSpacing: '0.06em', color: AMBER }}>LEADERBOARD</span>
+                  <span style={{ ...NUMERIC_STYLE, fontSize: 11, fontWeight: 800, letterSpacing: '0.06em', color: AMBER }}>TOURNAMENT</span>
                   <ChevronRight size={13} strokeWidth={2.5} color={AMBER} style={{ flexShrink: 0 }} />
                 </span>
               </div>
@@ -1290,7 +1290,7 @@ export function CinematicFrame({
                 {fieldSize} in the field
               </span>
               <span style={{ display: 'inline-flex', alignItems: 'center', gap: 4 }}>
-                <span style={{ ...NUMERIC_STYLE, fontSize: 11, fontWeight: 800, letterSpacing: '0.06em', color: AMBER }}>LEADERBOARD</span>
+                <span style={{ ...NUMERIC_STYLE, fontSize: 11, fontWeight: 800, letterSpacing: '0.06em', color: AMBER }}>TOURNAMENT</span>
                 <ChevronRight size={13} strokeWidth={2.5} color={AMBER} style={{ flexShrink: 0 }} />
               </span>
             </div>
