@@ -36,7 +36,6 @@ export default function LatestVideosRail() {
     return (
       <div>
         <WatchSectionHeader
-          paddingTop={34}
           mark={<VideosMark />}
           eyebrow="Fresh from the tour"
           kickerColor="amber"
@@ -55,7 +54,6 @@ export default function LatestVideosRail() {
   return (
     <div>
       <WatchSectionHeader
-        paddingTop={34}
         mark={<VideosMark />}
         eyebrow="Fresh from the tour"
         kickerColor="amber"

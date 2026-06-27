@@ -98,7 +98,6 @@ export default function TrendingThisWeek({ enabled = true }: TrendingThisWeekPro
   return (
     <div style={{ background: 'hsl(var(--background))' }}>
       <WatchSectionHeader
-        paddingTop={34}
         mark={<ClipsMark />}
         eyebrow="Short & sweet"
         kickerColor="amber"

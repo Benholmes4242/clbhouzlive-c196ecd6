@@ -14,50 +14,38 @@ interface SectionHeaderProps {
 }
 
 /**
- * Pro Shop primitive — editorial section header with kicker, title, optional
- * subhead and action CTA. Used at the top of every rail in the Watch tab.
- *
- * Phase 1 warmth pass: larger title (22/800), tighter tracking, more
- * vertical rhythm (default paddingTop 34), and an optional `mark` slot
- * for bespoke section identity glyphs.
+ * Pro Shop primitive — quiet single-line section header (Option A).
+ * Content leads, header recedes. No kicker, mark, or subhead by default.
+ * Used at the top of every rail in the Watch tab.
  */
 function SectionHeaderInner({
-  kicker,
-  kickerColor = 'slate',
+  // kicker suppressed — quiet-label pass (Option A). Props retained so callers don't break.
+  // kicker,
+  // kickerColor = 'slate',
   title,
-  sub,
+  // sub suppressed — quiet-label pass.
+  // sub,
   action,
-  paddingTop = 34,
-  mark,
+  paddingTop = 18,
+  // mark suppressed — quiet-label pass. Props retained so callers don't break.
+  // mark,
 }: SectionHeaderProps) {
   const textColumn = (
     <div style={{ minWidth: 0, flex: 1 }}>
-      {kicker ? <Kicker color={kickerColor}>{kicker}</Kicker> : null}
+      {/* Kicker intentionally suppressed for quiet-label layout */}
       <h2
         style={{
-          fontSize: 22,
-          fontWeight: 800,
-          lineHeight: 1.15,
-          letterSpacing: '-0.02em',
+          fontSize: 15,
+          fontWeight: 700,
+          lineHeight: 1.2,
+          letterSpacing: '-0.01em',
           color: '#0F172A',
           margin: 0,
         }}
       >
         {title}
       </h2>
-      {sub ? (
-        <p
-          style={{
-            fontSize: 13.5,
-            fontWeight: 500,
-            color: '#64748B',
-            margin: '4px 0 0',
-            lineHeight: 1.4,
-          }}
-        >
-          {sub}
-        </p>
-      ) : null}
+      {/* Subhead intentionally suppressed for quiet-label layout */}
     </div>
   );
 
@@ -65,28 +53,14 @@ function SectionHeaderInner({
     <div
       style={{
         display: 'flex',
-        alignItems: 'flex-start',
+        alignItems: 'center',
         justifyContent: 'space-between',
         gap: 16,
-        padding: `${paddingTop}px 16px 12px`,
+        padding: `${paddingTop}px 16px 9px`,
       }}
     >
-      {mark ? (
-        <div
-          style={{
-            display: 'flex',
-            alignItems: 'center',
-            gap: 11,
-            minWidth: 0,
-            flex: 1,
-          }}
-        >
-          <div style={{ flexShrink: 0 }}>{mark}</div>
-          {textColumn}
-        </div>
-      ) : (
-        textColumn
-      )}
+      {/* Mark icon intentionally suppressed for quiet-label layout */}
+      {textColumn}
 
       {action ? (
         <button
@@ -97,15 +71,15 @@ function SectionHeaderInner({
             display: 'inline-flex',
             alignItems: 'center',
             gap: 2,
-            fontSize: 11,
-            fontWeight: 800,
+            fontSize: 12,
+            fontWeight: 600,
             letterSpacing: '-0.005em',
-            color: '#0F172A',
+            color: '#64748B',
             background: 'transparent',
             border: 'none',
             minHeight: 44,
             padding: '12px 0 12px 16px',
-            margin: `${(kicker ? 13 : 2) - 12}px -12px -12px 0`,
+            margin: '-10px -12px -12px 0',
             flexShrink: 0,
           }}
         >
