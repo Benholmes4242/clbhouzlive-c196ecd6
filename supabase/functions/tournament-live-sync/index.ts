@@ -1025,5 +1025,5 @@ async function syncLeaderboard(
     }
   }
 
-  return { records, sportradarStatus, currentRound };
+  return { records, sportradarStatus };
 }
