@@ -654,7 +654,7 @@ export function ReviewWizard({
                       }}
                     >
                       {wizard.isSubmitting
-                        ? (isEditMode ? 'Updating…' : 'Publishing…')
+                        ? (isEditMode ? 'Updating' : 'Publishing')
                         : (isEditMode ? 'Update' : 'Publish')}
                     </button>
                   </div>
