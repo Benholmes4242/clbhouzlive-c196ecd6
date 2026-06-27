@@ -14,12 +14,9 @@ interface SectionHeaderProps {
 }
 
 /**
- * Pro Shop primitive — editorial section header with kicker, title, optional
- * subhead and action CTA. Used at the top of every rail in the Watch tab.
- *
- * Phase 1 warmth pass: larger title (22/800), tighter tracking, more
- * vertical rhythm (default paddingTop 34), and an optional `mark` slot
- * for bespoke section identity glyphs.
+ * Pro Shop primitive — quiet single-line section header (Option A).
+ * Content leads, header recedes. No kicker, mark, or subhead by default.
+ * Used at the top of every rail in the Watch tab.
  */
 function SectionHeaderInner({
   // kicker suppressed — quiet-label pass (Option A). Props retained so callers don't break.
