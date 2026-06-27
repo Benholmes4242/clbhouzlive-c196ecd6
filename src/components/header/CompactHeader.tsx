@@ -395,7 +395,7 @@ const CompactHeader: React.FC<CompactHeaderProps> = ({ className }) => {
                   isOpen={menuOpen}
                   hasUnreadNotifications={hasUnread}
                   notificationCount={unreadCount}
-                  useLightTheme={useLightTheme}
+                  useLightTheme={useLightTheme && !overlayActive}
                   compact={isEditorialChromeRoute}
                 />
               ) : (
