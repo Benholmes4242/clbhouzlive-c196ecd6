@@ -102,12 +102,19 @@ export const TourHubShellTabs: React.FC<TourHubShellTabsProps> = ({ overlay = fa
       style={{
         background: overlay ? 'transparent' : '#F8FAFC',
         display: 'flex',
-        alignItems: 'stretch',
+        alignItems: 'center',
+        gap: immersiveSurface ? 11 : 0,
+        paddingLeft: immersiveSurface ? 12 : 0,
         borderBottom: overlay
           ? '0.5px solid rgba(255,255,255,0.18)'
           : '0.5px solid rgba(15,23,42,0.08)',
       }}
     >
+      {immersiveSurface && (
+        <div style={{ flex: '0 0 auto', display: 'flex', alignItems: 'center' }}>
+          <HeaderAvatarButton variant="bare" />
+        </div>
+      )}
       <div style={{ position: 'relative', minWidth: 0, flex: '1 1 auto' }}>
         <div
           ref={scrollerRef}
