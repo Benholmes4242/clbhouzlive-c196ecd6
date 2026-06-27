@@ -193,12 +193,10 @@ export const CardFeed: React.FC<CardFeedProps> = ({
 
   // Virtuoso's rangeChanged kept as a no-op; center-proximity owns activeIdx.
   const handleRangeChanged = useCallback(
-    (r: { startIndex: number; endIndex: number }) => {
-      // eslint-disable-next-line no-console
-      console.log('[virtuoso-range]', { startIndex: r.startIndex, endIndex: r.endIndex });
-    },
+    (_r: { startIndex: number; endIndex: number }) => {},
     [],
   );
+
 
 
   const setActiveIndex = useClubhouseStore((s) => s.setActiveIndex);
