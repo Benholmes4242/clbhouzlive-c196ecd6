@@ -19,23 +19,24 @@ interface VideosFullFeedProps {
 }
 
 type Segment =
-  | { kind: 'spotlight'; post: FeedPost; index: number; eyebrow?: string | null }
+  | { kind: 'spotlight'; post: FeedPost; index: number }
   | { kind: 'grid'; posts: FeedPost[]; startIndex: number }
   | { kind: 'clips' };
 
 /**
  * 2-up magazine grid backbone, broken up by full-width spotlight cards
- * and the portrait clips rail. Spotlight → 2 grid rows → (spotlight|clips,
- * alternating) → 2 grid rows → … repeating.
+ * and the portrait clips rail. Spotlight → 2 grid rows → clips → …
+ * The clips rail is guaranteed to appear once, early.
  */
 function buildRhythm(posts: FeedPost[]): Segment[] {
   const seg: Segment[] = [];
   let i = 0;
   let breakCount = 0;
+  let clipsEmitted = false;
   const GRID_ROWS_PER_BLOCK = 2;
 
   if (i < posts.length) {
-    seg.push({ kind: 'spotlight', post: posts[i], index: i, eyebrow: 'FEATURED' });
+    seg.push({ kind: 'spotlight', post: posts[i], index: i });
     i += 1;
   }
 
@@ -46,16 +47,29 @@ function buildRhythm(posts: FeedPost[]): Segment[] {
       i += slice.length;
       seg.push({ kind: 'grid', posts: slice, startIndex: start });
     }
+
+    if (!clipsEmitted) {
+      seg.push({ kind: 'clips' });
+      clipsEmitted = true;
+      breakCount += 1;
+      continue;
+    }
+
     if (i >= posts.length) break;
 
     if (breakCount % 2 === 0) {
-      seg.push({ kind: 'spotlight', post: posts[i], index: i, eyebrow: null });
+      seg.push({ kind: 'spotlight', post: posts[i], index: i });
       i += 1;
     } else {
       seg.push({ kind: 'clips' });
     }
     breakCount += 1;
   }
+
+  if (!clipsEmitted) {
+    seg.push({ kind: 'clips' });
+  }
+
   return seg;
 }
 
@@ -163,7 +177,6 @@ function VideosFullFeedInner({ userId, mood, searchQuery }: VideosFullFeedProps)
                   post={seg.post}
                   index={seg.index}
                   allPosts={posts}
-                  eyebrow={seg.eyebrow}
                 />
               );
             }

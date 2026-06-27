@@ -9,7 +9,6 @@ interface VideoHeroCardProps {
   post: FeedPost;
   index: number;
   allPosts: FeedPost[];
-  eyebrow?: string | null;
 }
 
 function formatHMS(seconds: number | null | undefined): string {
@@ -51,7 +50,7 @@ function abbreviateCount(n: number): string {
   return String(n);
 }
 
-function VideoHeroCardInner({ post, index, allPosts, eyebrow }: VideoHeroCardProps) {
+function VideoHeroCardInner({ post, index, allPosts }: VideoHeroCardProps) {
   const media = post.mediaItems.find((m) => m.type === 'video') ?? post.mediaItems[0];
   const thumb = media?.thumbnailUrl || media?.imageUrl || '';
   const duration = media?.duration ?? 0;
@@ -118,59 +117,11 @@ function VideoHeroCardInner({ post, index, allPosts, eyebrow }: VideoHeroCardPro
             </Pin>
           </div>
         ) : null}
-
-        {/* channel chip overlay */}
-        <div
-          style={{
-            position: 'absolute',
-            left: 10,
-            bottom: 10,
-            display: 'inline-flex',
-            alignItems: 'center',
-            gap: 7,
-            padding: '5px 9px 5px 5px',
-            background: 'rgba(0,0,0,0.55)',
-            borderRadius: 999,
-            backdropFilter: 'blur(6px)',
-            maxWidth: 'calc(100% - 20px)',
-          }}
-        >
-          <SquircleAvatar size={22} src={post.avatarUrl} alt={channel} hideRing />
-          <span
-            style={{
-              fontSize: 12,
-              fontWeight: 700,
-              color: '#fff',
-              letterSpacing: '-0.005em',
-              whiteSpace: 'nowrap',
-              overflow: 'hidden',
-              textOverflow: 'ellipsis',
-            }}
-          >
-            {channel}
-          </span>
-        </div>
       </button>
-
-      {eyebrow ? (
-        <div
-          style={{
-            marginTop: 12,
-            padding: '0 2px',
-            fontSize: 10.5,
-            fontWeight: 800,
-            letterSpacing: '0.1em',
-            color: '#F7931E',
-            textTransform: 'uppercase',
-          }}
-        >
-          {eyebrow}
-        </div>
-      ) : null}
 
       <div
         style={{
-          marginTop: eyebrow ? 4 : 12,
+          marginTop: 12,
           padding: '0 2px',
           fontSize: 16.5,
           fontWeight: 800,
@@ -186,28 +137,20 @@ function VideoHeroCardInner({ post, index, allPosts, eyebrow }: VideoHeroCardPro
         {post.caption || `${channel} on Clbhouz`}
       </div>
 
-      <div
-        style={{
-          marginTop: 6,
-          padding: '0 2px',
-          display: 'inline-flex',
-          alignItems: 'center',
-          gap: 6,
-          fontSize: 12.5,
-          fontWeight: 500,
-          color: '#64748B',
-        }}
-      >
-        <span>{ageLabel}</span>
-        {likeCount > 0 && (
-          <>
-            <span style={{ flexShrink: 0 }}>·</span>
-            <Heart size={12} strokeWidth={0} style={{ color: '#F7931E', fill: '#F7931E', flexShrink: 0 }} />
-            <span style={{ flexShrink: 0, fontVariantNumeric: 'tabular-nums' }}>
-              {abbreviateCount(likeCount)}
-            </span>
-          </>
-        )}
+      <div style={{ marginTop: 8, padding: '0 2px', display: 'flex', alignItems: 'center', gap: 8, minWidth: 0 }}>
+        <SquircleAvatar size={22} src={post.avatarUrl} alt={channel} hideRing />
+        <span style={{ display: 'inline-flex', alignItems: 'center', gap: 6, fontSize: 12.5, fontWeight: 500, color: '#64748B', minWidth: 0 }}>
+          <span style={{ fontWeight: 600, color: '#475569', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{channel}</span>
+          <span style={{ flexShrink: 0 }}>·</span>
+          <span style={{ flexShrink: 0 }}>{ageLabel}</span>
+          {likeCount > 0 && (
+            <>
+              <span style={{ flexShrink: 0 }}>·</span>
+              <Heart size={12} strokeWidth={0} style={{ color: '#F7931E', fill: '#F7931E', flexShrink: 0 }} />
+              <span style={{ flexShrink: 0, fontVariantNumeric: 'tabular-nums' }}>{abbreviateCount(likeCount)}</span>
+            </>
+          )}
+        </span>
       </div>
     </section>
   );
