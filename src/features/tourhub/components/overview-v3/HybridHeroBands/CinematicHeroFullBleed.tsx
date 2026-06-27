@@ -213,7 +213,7 @@ export function CinematicHeroFullBleed({
     'linear-gradient(180deg, rgba(15,23,42,0.12) 0%, rgba(15,23,42,0) 26%, rgba(15,23,42,0.5) 54%, rgba(13,30,22,0.97) 100%)';
 
   const background = leaderPhotoUrl
-    ? `${gradientScrim}, url(${leaderPhotoUrl}) center 18% / cover no-repeat`
+    ? `${gradientScrim}, url(${leaderPhotoUrl}) ${PHOTO_FOCAL} / cover no-repeat`
     : FALLBACK_GRADIENT;
 
   // Eyebrow text
