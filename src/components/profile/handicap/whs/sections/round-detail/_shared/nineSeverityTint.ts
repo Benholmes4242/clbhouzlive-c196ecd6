@@ -17,9 +17,9 @@ export interface SeverityPalette {
 export function nineSeverityTint(delta: number): SeverityPalette {
   if (delta < 0) {
     return {
-      bgTint: 'rgba(5,150,105,0.14)',
+      bgTint: 'rgba(47,107,79,0.14)',
       numColor: 'var(--hcp-t-100)',
-      deltaColor: '#059669',
+      deltaColor: '#2F6B4F', // refined pine — under par
     };
   }
   if (delta === 0) {
@@ -30,8 +30,8 @@ export function nineSeverityTint(delta: number): SeverityPalette {
     };
   }
   return {
-    bgTint: 'rgba(220,38,38,0.12)',
+    bgTint: 'rgba(181,112,60,0.14)',
     numColor: 'var(--hcp-t-100)',
-    deltaColor: '#DC2626',
+    deltaColor: '#B5703C', // muted clay — over par
   };
 }
