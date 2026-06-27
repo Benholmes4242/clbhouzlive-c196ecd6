@@ -239,17 +239,20 @@ export function FullLeaderboard({
 
           return (
             <motion.div key={entry.id} custom={index} variants={rowVariants} initial="hidden" animate="visible">
-              <Link
-                {...playerRoute(entry.player?.id ?? '', tournamentName ? { kind: 'tournament', tournamentName } : undefined)}
-                onClick={onPlayerTap}
+              <button
+                type="button"
+                onClick={() => handlePlayerTap(entry)}
                 aria-label={`Position ${entry.position_tied ? `T${entry.position}` : entry.position}, ${entry.player?.full_name || 'Unknown'}`}
                 style={{
+                  width: '100%',
                   display: 'flex', alignItems: 'center', gap: '3px',
                   padding: '13px 16px',
                   borderBottom: `0.5px solid ${INK_TINT_07}`,
                   background: entry.position === 1 && !isMissedCut && !isWD ? STATUS_LIVE_TINT_10 : 'transparent',
                   opacity: isWD ? 0.4 : isMissedCut ? 0.55 : 1,
-                  textDecoration: 'none',
+                  textAlign: 'left' as const,
+                  border: 'none',
+                  cursor: 'pointer',
                 }}
                 className="active:bg-black/[0.02] transition-colors"
               >
@@ -298,7 +301,7 @@ export function FullLeaderboard({
                     return <span style={{ fontSize: '9.5px', color: INK }}>—</span>;
                   })()}
                 </div>
-              </Link>
+              </button>
 
               {showCutLine && (
                 <div style={{ display: 'flex', alignItems: 'center', gap: '12px', padding: '6px 20px', background: INK_TINT_02, borderBottom: `0.5px solid ${INK_TINT_07}` }}>
@@ -319,6 +322,26 @@ export function FullLeaderboard({
           {searchQuery && ` matching "${searchQuery}"`}
         </span>
       </div>
+
+      {/* Default scorecard sheet (only renders when consumer didn't supply onPlayerTap) */}
+      {scorecardEntry && tournamentId && (
+        <PlayerScorecardSheet
+          open={!!scorecardEntry}
+          onClose={() => setScorecardEntry(null)}
+          tournamentId={tournamentId}
+          tournamentStatus={tournamentStatus}
+          tournamentName={tournamentName}
+          currentRound={currentRound ?? null}
+          player={{
+            id: scorecardEntry.player?.id ?? scorecardEntry.id,
+            name: scorecardEntry.player?.full_name ?? 'Player',
+            countryCode: scorecardEntry.player?.country_code ?? scorecardEntry.player?.country ?? null,
+            position: scorecardEntry.position,
+            positionTied: scorecardEntry.position_tied,
+            totalScore: scorecardEntry.score,
+          }}
+        />
+      )}
     </motion.div>
   );
 }
