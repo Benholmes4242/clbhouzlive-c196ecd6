@@ -112,9 +112,7 @@ export function HandicapVisibilityControl({
 }: Props) {
   return (
     <div className="space-y-5">
-      <div style={{ marginBottom: 4 }}>
-        <SectionEyebrow label="Handicap Visibility" />
-      </div>
+      <SectionHeader tier="standard" kicker="HANDICAP VISIBILITY" />
 
       <Block
         title="Handicap Page & Comparisons"
