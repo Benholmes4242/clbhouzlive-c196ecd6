@@ -1674,12 +1674,28 @@ function sheetRowStyle(selected: boolean): React.CSSProperties {
     alignItems: 'center',
     gap: 12,
     padding: '12px 20px',
-    background: selected ? 'rgba(15,23,42,0.04)' : 'transparent',
+    background: selected
+      ? 'linear-gradient(90deg, rgba(247,147,30,0.10) 0%, rgba(247,147,30,0.04) 60%, rgba(247,147,30,0) 100%)'
+      : 'transparent',
     border: 'none',
     borderBottom: `0.5px solid ${HAIR}`,
     cursor: 'pointer',
     textAlign: 'left',
   };
+}
+
+function SelectedDot() {
+  return (
+    <div
+      style={{
+        width: 6,
+        height: 6,
+        borderRadius: '50%',
+        background: '#F7931E',
+        flexShrink: 0,
+      }}
+    />
+  );
 }
 
 function BottomSheet({
