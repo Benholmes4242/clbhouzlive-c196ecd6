@@ -1,21 +1,30 @@
 import React from 'react';
-import { FONT, INK, SC_ACCENT } from './_constants';
-import { ScoreMark } from '@/features/courses/_shared/ScoreMark';
+import {
+  FONT,
+  INK,
+  SC_ACCENT,
+  SC_ACE,
+  SC_ALBATROSS,
+  SC_EAGLE,
+  SC_BIRDIE,
+  SC_PAR,
+  SC_BOGEY,
+  SC_DOUBLE,
+} from './_constants';
 
-interface KeyItem {
-  label: string;
-  strokes: number | null;
-  par: number;
-}
-
-// Each item is rendered as a real ScoreMark so the legend stays in lockstep
-// with the renderer everywhere it appears.
-const items: KeyItem[] = [
-  { label: 'Eagle',  strokes: 2, par: 4 }, // −2 → double-ring circle
-  { label: 'Birdie', strokes: 3, par: 4 }, // −1 → single circle
-  { label: 'Par',    strokes: 4, par: 4 }, // bare numeral
-  { label: 'Bogey',  strokes: 5, par: 4 }, // +1 → single square
-  { label: 'Dbl+',   strokes: 6, par: 4 }, // +2 → double-ring square
+// Holes histogram is a COLOUR-bar distribution (proportion of field per
+// score-type per hole), so its key is a colour swatch legend — one swatch
+// per bucket, matching the bar colours exactly. This is intentionally
+// distinct from the scorecard key (shape marks), because a personal
+// scorecard shows one score per hole while the histogram shows a spectrum.
+const KEY: Array<{ label: string; color: string }> = [
+  { label: 'Ace',       color: SC_ACE },
+  { label: 'Albatross', color: SC_ALBATROSS },
+  { label: 'Eagle',     color: SC_EAGLE },
+  { label: 'Birdie',    color: SC_BIRDIE },
+  { label: 'Par',       color: SC_PAR },
+  { label: 'Bogey',     color: SC_BOGEY },
+  { label: 'Dbl+',      color: SC_DOUBLE },
 ];
 
 export const HolesScoringKey: React.FC = () => (
@@ -42,13 +51,23 @@ export const HolesScoringKey: React.FC = () => (
       style={{
         display: 'flex',
         flexWrap: 'wrap',
-        gap: 18,
+        gap: 16,
         rowGap: 10,
       }}
     >
-      {items.map((it) => (
+      {KEY.map((it) => (
         <div key={it.label} style={{ display: 'flex', alignItems: 'center', gap: 7 }}>
-          <ScoreMark strokes={it.strokes} par={it.par} size={26} />
+          <span
+            aria-hidden
+            style={{
+              width: 12,
+              height: 12,
+              borderRadius: 3,
+              background: it.color,
+              display: 'inline-block',
+              flexShrink: 0,
+            }}
+          />
           <span style={{ fontSize: 12, fontWeight: 600, color: INK }}>{it.label}</span>
         </div>
       ))}

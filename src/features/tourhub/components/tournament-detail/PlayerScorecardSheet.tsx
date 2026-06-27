@@ -246,7 +246,7 @@ export function PlayerScorecardSheet({
           </div>
           <div style={{ display: 'flex', alignItems: 'baseline', gap: 5 }}>
             <span style={{ fontSize: 9, fontWeight: 800, letterSpacing: '0.08em', color: INK_MUTE }}>ROUND</span>
-            <span style={{ ...NUM, fontSize: 18, fontWeight: 800, color: roundRel != null && roundRel < 0 ? '#0F9E75' : INK }}>
+            <span style={{ ...NUM, fontSize: 18, fontWeight: 800, color: roundRel == null ? INK : roundRel < 0 ? '#2F6B4F' : roundRel > 0 ? '#B5703C' : INK }}>
               {fmtRel(roundRel, selected.played)}
             </span>
           </div>
