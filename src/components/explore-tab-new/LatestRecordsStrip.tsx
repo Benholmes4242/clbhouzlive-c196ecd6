@@ -72,10 +72,13 @@ export function LatestRecordsStrip(_: Props = {}) {
   if (isLoading) {
     return (
       <section style={{ padding: '0 0 0', fontFamily: FONT }}>
-        <ExploreSectionHeader
+        <SectionHeader
+          tier="editorial"
           mark={<TrophyMark />}
           title="Latest records"
           sub="Recent course records from official WHS data"
+          paddingTop={32}
+          paddingX={16}
         />
         <div className="flex gap-3 px-4 overflow-x-auto scrollbar-hide" style={{ paddingBottom: 4 }}>
           {Array.from({ length: 2 }).map((_v, i) => (
