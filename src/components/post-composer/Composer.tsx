@@ -801,6 +801,9 @@ export function Composer({
             minute: '2-digit',
           });
           toast.success(`Scheduled for ${when}`);
+          // Refresh the scheduled list + count so the new post shows immediately
+          queryClient.invalidateQueries({ queryKey: ['scheduled-posts'] });
+          queryClient.invalidateQueries({ queryKey: ['scheduled-posts-count'] });
         } else {
           toast.success('Posted');
         }
