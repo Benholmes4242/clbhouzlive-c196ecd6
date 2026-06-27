@@ -2,6 +2,7 @@ import React, { useMemo } from 'react';
 import RoundHoleCell from './RoundHoleCell';
 import type { WhsScoreHole } from '@/lib/whs/types';
 import { nineSeverityTint } from './_shared/nineSeverityTint';
+import { ScoreMark } from '@/features/courses/_shared/ScoreMark';
 
 interface Props {
   holes: WhsScoreHole[];
@@ -113,6 +114,35 @@ export const RoundScorecard: React.FC<Props> = ({ holes, isNineHole, isLight = f
         <NineGrid label="Front 9" holes={front9} isLast={isNineHole || back9.length === 0} />
         {!isNineHole && back9.length > 0 && <NineGrid label="Back 9" holes={back9} isLast />}
       </div>
+
+      {/* legend — refined-outline shape key; Ace/Albatross appear only when present in this round */}
+      {(() => {
+        const strokesOf = (h: WhsScoreHole) => h.adjusted_gross ?? h.actual_gross ?? null;
+        const hasAce = sorted.some((h) => strokesOf(h) === 1);
+        const hasAlbatross = sorted.some((h) => {
+          const s = strokesOf(h);
+          return s != null && h.par != null && (s - h.par) <= -3 && s !== 1;
+        });
+        const keyItems: Array<[string, number, number]> = [
+          ...(hasAce ? [['Ace', 1, 4] as [string, number, number]] : []),
+          ...(hasAlbatross ? [['Albatross', 2, 5] as [string, number, number]] : []),
+          ['Eagle',  2, 4],
+          ['Birdie', 3, 4],
+          ['Par',    4, 4],
+          ['Bogey',  5, 4],
+          ['Dbl+',   6, 4],
+        ];
+        return (
+          <div style={{ display: 'flex', justifyContent: 'center', gap: 14, padding: '14px 18px 0', flexWrap: 'wrap' }}>
+            {keyItems.map(([lbl, strokes, par]) => (
+              <div key={lbl} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4 }}>
+                <ScoreMark strokes={strokes} par={par} size={22} fontFamily={FONT_GEIST} />
+                <span style={{ fontSize: 10, fontWeight: 600, color: 'var(--hcp-t-60)', textAlign: 'center' }}>{lbl}</span>
+              </div>
+            ))}
+          </div>
+        );
+      })()}
     </div>
   );
 };

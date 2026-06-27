@@ -273,23 +273,33 @@ export function PlayerScorecardSheet({
         </div>
       )}
 
-      {/* legend — refined-outline key, shared with Holes + handicap */}
-      {hasAnyData && (
-        <div style={{ display: 'flex', justifyContent: 'center', gap: 16, padding: '4px 18px 14px', flexWrap: 'wrap' }}>
-          {([
-            ['Eagle',  2, 4],
-            ['Birdie', 3, 4],
-            ['Par',    4, 4],
-            ['Bogey',  5, 4],
-            ['Dbl+',   6, 4],
-          ] as Array<[string, number, number]>).map(([lbl, strokes, par]) => (
-            <div key={lbl} style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-              <ScoreMark strokes={strokes} par={par} size={22} fontFamily={GEIST} />
-              <span style={{ fontSize: 10, fontWeight: 600, color: INK_MUTE }}>{lbl}</span>
-            </div>
-          ))}
-        </div>
-      )}
+      {/* legend — refined-outline shape key; Ace/Albatross appear only when the round contains one */}
+      {hasAnyData && (() => {
+        const hasAce = !!selected?.holes.some((h) => h.strokes === 1);
+        const hasAlbatross = !!selected?.holes.some(
+          (h) => h.strokes != null && h.par != null && (h.strokes - h.par) <= -3 && h.strokes !== 1,
+        );
+        const keyItems: Array<[string, number, number]> = [
+          ...(hasAce ? [['Ace', 1, 4] as [string, number, number]] : []),
+          // Albatross sample: 2 on a par-5 = −3, without triggering the hio (strokes===1) tier.
+          ...(hasAlbatross ? [['Albatross', 2, 5] as [string, number, number]] : []),
+          ['Eagle',  2, 4],
+          ['Birdie', 3, 4],
+          ['Par',    4, 4],
+          ['Bogey',  5, 4],
+          ['Dbl+',   6, 4],
+        ];
+        return (
+          <div style={{ display: 'flex', justifyContent: 'center', gap: 14, padding: '4px 18px 14px', flexWrap: 'wrap' }}>
+            {keyItems.map(([lbl, strokes, par]) => (
+              <div key={lbl} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4 }}>
+                <ScoreMark strokes={strokes} par={par} size={22} fontFamily={GEIST} />
+                <span style={{ fontSize: 10, fontWeight: 600, color: INK_MUTE, textAlign: 'center' }}>{lbl}</span>
+              </div>
+            ))}
+          </div>
+        );
+      })()}
 
       {/* visit profile CTA */}
       <div style={{
