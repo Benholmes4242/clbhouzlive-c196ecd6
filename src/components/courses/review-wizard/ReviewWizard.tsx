@@ -980,7 +980,7 @@ export function ReviewWizard({
 
                     {/* Media carousel */}
                     {hasMedia && (
-                      <div style={{ padding: '16px 0 14px' }}>
+                      <div style={{ marginTop: 12, padding: '16px 0 14px' }}>
                         <div
                           style={{
                             display: 'flex',
