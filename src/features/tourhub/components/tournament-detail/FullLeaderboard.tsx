@@ -8,7 +8,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import CountryFlag from '@/components/ui/country-flag';
 import { formatThruDisplay } from '../../utils/formatThruDisplay';
-import { GOLD_DEEP, HAIRLINE_INK_12, INK, INK_FAINT, INK_LIGHT, INK_MUTE, INK_TINT_02, INK_TINT_05, INK_TINT_07, LEADER_GOLD_TINT_10, SCORE_UNDER_PAR_LIGHT, STATUS_LIVE, STATUS_LIVE_TINT_10, SURFACE } from '../../_shared/tokens';
+import { GOLD_DEEP, HAIRLINE_INK_12, INK, INK_FAINT, INK_LIGHT, INK_MUTE, INK_TINT_02, INK_TINT_05, INK_TINT_07, LEADER_GOLD_TINT_10, SCORE_UNDER_PAR_LIGHT, SLATE_50, STATUS_LIVE, STATUS_LIVE_TINT_10, SURFACE } from '../../_shared/tokens';
 import { roundStarted } from '../../_shared/roundState';
 import { PlayerScorecardSheet } from './PlayerScorecardSheet';
 import { resolveAvatarCandidates } from '../../utils/playerAvatar';
@@ -231,7 +231,7 @@ export function FullLeaderboard({
       </div>
 
       {/* Player rows */}
-      <div style={{ background: SURFACE, borderBottom: `1px solid ${INK_TINT_07}` }}>
+      <div style={{ background: SLATE_50, borderBottom: `1px solid ${INK_TINT_07}` }}>
         {sortedEntries.map((entry, index) => {
           const isMissedCut = entry.status === 'MC' || entry.status === 'CUT';
           const isWD = entry.status === 'WD';
