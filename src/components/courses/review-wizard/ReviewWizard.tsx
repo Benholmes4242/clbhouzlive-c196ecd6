@@ -864,7 +864,9 @@ export function ReviewWizard({
                       </span>
                     </div>
                     <div
-                      onClick={() => taRef.current?.focus()}
+                      onClick={(e) => {
+                        if (e.currentTarget === e.target) taRef.current?.focus();
+                      }}
                       style={{
                         margin: `0 ${PAD_X}`,
                         border: `1px solid ${
@@ -977,10 +979,9 @@ export function ReviewWizard({
                       )}
                     </div>
 
-
                     {/* Media carousel */}
                     {hasMedia && (
-                      <div style={{ padding: '16px 0 14px' }}>
+                      <div style={{ marginTop: 8, padding: '4px 0 2px' }}>
                         <div
                           style={{
                             display: 'flex',
