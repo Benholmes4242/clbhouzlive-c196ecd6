@@ -7,7 +7,7 @@ import { useLiveTournaments } from '../../hooks/useLiveTournaments';
 import { useTourLeaderboard } from '../../hooks/useTourHubData';
 import { FullLeaderboard } from '../tournament-detail/FullLeaderboard';
 import { EditorialEmpty } from '../tournament-detail/EditorialEmpty';
-import { INK, INK_MUTE, INK_TINT_05, INK_TINT_07, SURFACE, STATUS_LIVE } from '../../_shared/tokens';
+import { INK, INK_MUTE, INK_TINT_05, INK_TINT_07, INK_TINT_06, SURFACE, STATUS_LIVE, STATUS_LIVE_TINT_10 } from '../../_shared/tokens';
 import { tourPriorityIndex, TOUR_LABEL, shortTournamentToken } from '../../_shared/tourOrder';
 import { TOUR_CONFIG } from '../../hooks/useOverviewData';
 import type { LiveTournamentLite } from '../../hooks/useLiveTournaments';
@@ -254,38 +254,52 @@ export function LiveLeaderboardTab() {
           title={<span id="live-tour-sheet-title">Select tournament</span>}
           onClose={() => setSelectorOpen(false)}
         />
-        <div style={{ paddingBottom: 8 }}>
+        <div>
           {liveTournaments.map((t) => {
             const isActive = t.id === selected.id;
             const loc = [t.venue_city, expandCountry(t.venue_country)].filter(Boolean).join(', ');
+            const isLiveTournament = t.status === 'inprogress';
             return (
               <button
                 key={t.id}
                 onClick={() => { setSelectedId(t.id); setSelectorOpen(false); }}
+                aria-pressed={isActive}
                 style={{
                   width: '100%', display: 'flex', alignItems: 'center', gap: 12,
-                  padding: '14px 20px', background: 'transparent', border: 'none',
-                  borderBottom: `0.5px solid ${INK_TINT_07}`, cursor: 'pointer', textAlign: 'left',
+                  padding: '12px 16px',
+                  background: isActive ? STATUS_LIVE_TINT_10 : 'transparent',
+                  border: 'none',
+                  borderLeft: isLiveTournament ? `3px solid ${STATUS_LIVE}` : '3px solid transparent',
+                  borderBottom: `0.5px solid ${INK_TINT_07}`,
+                  cursor: 'pointer', textAlign: 'left' as const,
                 }}
               >
-                {t.status === 'inprogress' && (
-                  <span aria-hidden style={{ width: 7, height: 7, borderRadius: '50%', background: STATUS_LIVE, flexShrink: 0 }} />
-                )}
+                {/* Live status indicator chip */}
+                <div style={{ width: 28, height: 20, borderRadius: 4, background: isLiveTournament ? STATUS_LIVE_TINT_10 : INK_TINT_06, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                  {isLiveTournament && (
+                    <span aria-hidden style={{ width: 6, height: 6, borderRadius: '50%', background: STATUS_LIVE, flexShrink: 0 }} />
+                  )}
+                </div>
+
+                {/* Label + location */}
                 <div style={{ flex: 1, minWidth: 0 }}>
-                  <div style={{ fontFamily: 'Geist, system-ui, sans-serif', fontSize: 14, fontWeight: 700, color: INK, letterSpacing: '-0.01em' }}>
+                  <div style={{ fontSize: 14, fontWeight: isActive ? 800 : 700, color: INK, letterSpacing: '-0.01em' }}>
                     {pillLabel(t)}
                   </div>
                   {loc && (
-                    <div style={{ fontFamily: 'Geist, system-ui, sans-serif', fontSize: 12, fontWeight: 500, color: INK_MUTE, marginTop: 2 }}>
+                    <div style={{ fontSize: 11, color: INK_MUTE, marginTop: 2 }}>
                       {loc}
                     </div>
                   )}
                 </div>
-                {isActive && <Check size={18} style={{ color: INK, flexShrink: 0 }} strokeWidth={2.5} />}
+
+                {/* Active indicator */}
+                {isActive && <Check size={18} style={{ color: STATUS_LIVE, flexShrink: 0 }} strokeWidth={2.5} />}
               </button>
             );
           })}
         </div>
+        <div style={{ paddingBottom: 'calc(var(--sab, env(safe-area-inset-bottom, 0px)) + 8px)' }} />
       </BottomSheet>
     </div>
   );

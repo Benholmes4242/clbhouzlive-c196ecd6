@@ -10,7 +10,7 @@ import { cn } from '@/lib/utils';
 import CountryFlag from '@/components/ui/country-flag';
 import { formatThruDisplay } from '../../utils/formatThruDisplay';
 import { playerRoute } from '../../routes';
-import { AMBER, AMBER_SOFT_BG, GOLD_DEEP, HAIRLINE_INK_12, INK, INK_FAINT, INK_LIGHT, INK_MUTE, INK_TINT_02, INK_TINT_05, INK_TINT_07, LEADER_GOLD_TINT_10, SCORE_UNDER_PAR_LIGHT, SURFACE } from '../../_shared/tokens';
+import { GOLD_DEEP, HAIRLINE_INK_12, INK, INK_FAINT, INK_LIGHT, INK_MUTE, INK_TINT_02, INK_TINT_05, INK_TINT_07, LEADER_GOLD_TINT_10, SCORE_UNDER_PAR_LIGHT, STATUS_LIVE, STATUS_LIVE_TINT_10, SURFACE } from '../../_shared/tokens';
 import { roundStarted } from '../../_shared/roundState';
 
 interface RawRoundData {
@@ -242,8 +242,8 @@ export function FullLeaderboard({
                   display: 'flex', alignItems: 'center', gap: '3px',
                   padding: '13px 16px',
                   borderBottom: `0.5px solid ${INK_TINT_07}`,
-                  borderLeft: entry.position === 1 && !isMissedCut && !isWD ? `3px solid ${AMBER}` : '3px solid transparent',
-                  background: entry.position === 1 && !isMissedCut && !isWD ? AMBER_SOFT_BG : 'transparent',
+                  borderLeft: entry.position === 1 && !isMissedCut && !isWD ? `3px solid ${STATUS_LIVE}` : '3px solid transparent',
+                  background: entry.position === 1 && !isMissedCut && !isWD ? STATUS_LIVE_TINT_10 : 'transparent',
                   opacity: isWD ? 0.4 : isMissedCut ? 0.55 : 1,
                   textDecoration: 'none',
                 }}
@@ -274,7 +274,7 @@ export function FullLeaderboard({
                   );
                 })}
 
-                <div style={{ width: '40px', textAlign: 'center' as const, flexShrink: 0 }}>
+                <div style={{ width: '40px', display: 'flex', justifyContent: 'center', alignItems: 'center', flexShrink: 0 }}>
                   <ScoreToPar score={entry.score} emphasis size={11} />
                 </div>
 
