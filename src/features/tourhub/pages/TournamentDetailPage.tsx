@@ -160,6 +160,7 @@ export function TournamentDetailPage() {
   }
 
   const hasLeaderboard = leaderboard && leaderboard.length > 0;
+  const fullBleedHero = activeTab === 'overview' && (isLive || isCompleted);
   
   const renderTabContent = () => {
     switch (activeTab) {
@@ -289,6 +290,24 @@ export function TournamentDetailPage() {
         return null;
     }
   };
+
+  const tabContent = (
+    <div style={{ paddingBottom: 'calc(var(--sab, env(safe-area-inset-bottom, 0px)) + 80px)' }}>
+      <AnimatePresence mode="wait">
+        <motion.div
+          key={activeTab}
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          transition={{ duration: 0.2 }}
+          role="tabpanel"
+          aria-label={`${activeTab} content`}
+        >
+          {renderTabContent()}
+        </motion.div>
+      </AnimatePresence>
+    </div>
+  );
   
   return (
     <TourHubShell>
@@ -299,31 +318,29 @@ export function TournamentDetailPage() {
         />
       </ShellSlot>
 
-      <div style={{ paddingTop: 'var(--chrome-total-h, 0px)', minHeight: '100dvh', background: SLATE_50 }}>
-        <TournamentHero
-          tournament={tournament}
-          leaderboard={leaderboard}
-          isLive={isLive}
-          isCompleted={isCompleted}
-          isUpcoming={isUpcoming}
-        />
-
-        <div style={{ paddingBottom: 'calc(var(--sab, env(safe-area-inset-bottom, 0px)) + 80px)' }}>
-          <AnimatePresence mode="wait">
-            <motion.div
-              key={activeTab}
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              transition={{ duration: 0.2 }}
-              role="tabpanel"
-              aria-label={`${activeTab} content`}
-            >
-              {renderTabContent()}
-            </motion.div>
-          </AnimatePresence>
+      {fullBleedHero ? (
+        <div style={{ minHeight: '100dvh', background: SLATE_50 }}>
+          <TournamentHero
+            tournament={tournament}
+            leaderboard={leaderboard}
+            isLive={isLive}
+            isCompleted={isCompleted}
+            isUpcoming={isUpcoming}
+          />
+          {tabContent}
         </div>
-      </div>
+      ) : (
+        <div style={{ paddingTop: 'var(--chrome-total-h, 0px)', minHeight: '100dvh', background: SLATE_50 }}>
+          <TournamentHero
+            tournament={tournament}
+            leaderboard={leaderboard}
+            isLive={isLive}
+            isCompleted={isCompleted}
+            isUpcoming={isUpcoming}
+          />
+          {tabContent}
+        </div>
+      )}
     </TourHubShell>
   );
 }
