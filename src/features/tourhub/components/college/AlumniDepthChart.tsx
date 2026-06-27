@@ -12,7 +12,7 @@
  */
 
 import { useState, useMemo } from 'react';
-import { AMBER, AMBER_SOFT_BG, INK, INK_FAINT, INK_MUTE, INK_TINT_06, INK_TINT_07, SLATE_600, SURFACE, TREND_UP } from '../../_shared/tokens';
+import { AMBER, AMBER_SOFT_BG, INK, INK_FAINT, INK_MUTE, INK_TINT_06, INK_TINT_07, SLATE_50, SLATE_600, SURFACE, TREND_UP } from '../../_shared/tokens';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { cn } from '@/lib/utils';
@@ -306,7 +306,7 @@ export function AlumniDepthChart({ normalizedName, alumniCount: _alumniCount, cl
 
   if (isLoading) {
     return (
-      <div className={cn('', className)} style={{ background: SURFACE }}>
+      <div className={cn('', className)} style={{ background: SLATE_50 }}>
         <ColumnHeader />
         {Array.from({ length: 5 }).map((_, i) => (
           <div key={i} className="animate-pulse" style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '11px 16px', borderBottom: `0.5px solid ${INK_TINT_07}` }}>
@@ -322,7 +322,7 @@ export function AlumniDepthChart({ normalizedName, alumniCount: _alumniCount, cl
 
   if (error || !alumni?.length) {
     return (
-      <div className={cn('text-center py-12 text-sm text-muted-foreground', className)} style={{ background: SURFACE }}>
+      <div className={cn('text-center py-12 text-sm text-muted-foreground', className)} style={{ background: SLATE_50 }}>
         No alumni found for this college
       </div>
     );
@@ -332,7 +332,7 @@ export function AlumniDepthChart({ normalizedName, alumniCount: _alumniCount, cl
     <div
       className={cn('', className)}
       style={{
-        background: SURFACE,
+        background: SLATE_50,
         borderBottom: `0.5px solid ${INK_TINT_07}`,
       }}
     >

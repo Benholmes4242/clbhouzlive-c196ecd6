@@ -34,7 +34,7 @@ export function H2HRivalStrip({ normalizedName, className }: H2HRivalStripProps)
 
   if (isLoading) {
     return (
-      <div className={className} style={{ background: SURFACE, borderTop: `0.5px solid ${INK_TINT_07}` }}>
+      <div className={className} style={{ background: SLATE_50, borderTop: `0.5px solid ${INK_TINT_07}` }}>
 
         <SectionHeader />
         <div style={{ display: 'flex', gap: 10, padding: '4px 16px 16px', overflowX: 'auto' }}>
@@ -50,7 +50,7 @@ export function H2HRivalStrip({ normalizedName, className }: H2HRivalStripProps)
   if (rivals.length === 0) return null;
 
   return (
-    <div className={className} style={{ background: SURFACE, borderTop: `0.5px solid ${INK_TINT_07}` }}>
+    <div className={className} style={{ background: SLATE_50, borderTop: `0.5px solid ${INK_TINT_07}` }}>
       <SectionHeader />
       <div
         style={{

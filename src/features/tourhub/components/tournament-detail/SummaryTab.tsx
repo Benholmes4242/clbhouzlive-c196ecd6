@@ -26,7 +26,7 @@ function SummarySkeleton() {
   return (
     <div>
       {/* Champion block skeleton */}
-      <div style={{ background: SURFACE, borderTop: `1px solid ${INK_TINT_07}`, borderBottom: `1px solid ${INK_TINT_07}`, marginTop: '8px', padding: '14px 20px 14px' }}>
+      <div style={{ background: SLATE_50, borderTop: `1px solid ${INK_TINT_07}`, borderBottom: `1px solid ${INK_TINT_07}`, marginTop: '8px', padding: '14px 20px 14px' }}>
         <div className="animate-pulse" style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between', gap: '12px' }}>
           <div style={{ flex: 1 }}>
             <div style={{ height: '8px', width: '100px', background: INK_TINT_06, borderRadius: '4px', marginBottom: '8px' }} />
@@ -41,7 +41,7 @@ function SummarySkeleton() {
         </div>
       </div>
       {/* Row skeletons */}
-      <div style={{ background: SURFACE, borderTop: `1px solid ${INK_TINT_07}`, borderBottom: `1px solid ${INK_TINT_07}`, marginTop: '8px' }}>
+      <div style={{ background: SLATE_50, borderTop: `1px solid ${INK_TINT_07}`, borderBottom: `1px solid ${INK_TINT_07}`, marginTop: '8px' }}>
         {Array.from({ length: 4 }).map((_, i) => (
           <div key={i} className="animate-pulse" style={{ display: 'flex', alignItems: 'center', padding: '10px 20px', borderBottom: i < 3 ? `0.5px solid ${INK_TINT_07}` : 'none', gap: '12px' }}>
             <div style={{ width: '36px', height: '14px', background: INK_TINT_06, borderRadius: '4px' }} />
@@ -82,7 +82,7 @@ function WinnerCard({ winner, runnerUp, headshotMap, tournamentName }: { winner:
       </div>
 
       {/* Winner hero row */}
-      <div style={{ background: SURFACE, borderBottom: `1px solid ${INK_TINT_07}` }}>
+      <div style={{ background: SLATE_50, borderBottom: `1px solid ${INK_TINT_07}` }}>
         <Link {...playerRoute(winner.player?.id ?? '', tournamentName ? { kind: 'tournament', tournamentName } : undefined)} style={{ display: 'block', textDecoration: 'none' }} className="active:opacity-80 transition-opacity">
           <div style={{ padding: '12px 20px 14px', borderLeft: `3px solid ${AMBER}`, background: 'rgba(247,147,30,0.025)', borderTop: `0.5px solid ${INK_TINT_07}` }}>
             <div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between', gap: '12px' }}>
@@ -170,7 +170,7 @@ export function SummaryTab({
             ))}
           </div>
 
-          <div style={{ background: SURFACE, borderBottom: `1px solid ${INK_TINT_07}` }}>
+          <div style={{ background: SLATE_50, borderBottom: `1px solid ${INK_TINT_07}` }}>
             {scoringStats.rounds.map((round: any) => (
               <div key={round.round} style={{ display: 'flex', alignItems: 'center', padding: '10px 20px', borderBottom: `0.5px solid ${INK_TINT_07}`, fontVariantNumeric: 'tabular-nums' }}>
                 <span style={{ fontSize: '14px', fontWeight: 700, color: INK, flex: '0 0 52px' }}>R{round.round}</span>
@@ -208,7 +208,7 @@ export function SummaryTab({
                 <span style={{ fontSize: '9px', fontWeight: 800, color: INK_MUTE, letterSpacing: '0.16em', textTransform: 'uppercase' as const }}>Field Statistics</span>
               </div>
             </div>
-            <div style={{ background: SURFACE, borderTop: `0.5px solid ${INK_TINT_07}`, borderBottom: `1px solid ${INK_TINT_07}`, padding: '12px 20px 16px' }}>
+            <div style={{ background: SLATE_50, borderTop: `0.5px solid ${INK_TINT_07}`, borderBottom: `1px solid ${INK_TINT_07}`, padding: '12px 20px 16px' }}>
               <div style={{ display: 'flex', height: '6px', borderRadius: '3px', overflow: 'hidden', marginBottom: '10px' }}>
                 {segments.filter(s => s.count > 0).map((seg, i) => (
                   <div key={i} style={{ width: `${(seg.count / total) * 100}%`, background: seg.color }} />
@@ -250,7 +250,7 @@ export function SummaryTab({
             </div>
             <Link
               {...playerRoute(best.playerId, tournamentName ? { kind: 'tournament', tournamentName } : undefined)}
-              style={{ display: 'flex', alignItems: 'center', gap: '10px', padding: '12px 20px 16px', background: SURFACE, borderTop: `0.5px solid ${INK_TINT_07}`, borderBottom: `1px solid ${INK_TINT_07}`, textDecoration: 'none' }}
+              style={{ display: 'flex', alignItems: 'center', gap: '10px', padding: '12px 20px 16px', background: SLATE_50, borderTop: `0.5px solid ${INK_TINT_07}`, borderBottom: `1px solid ${INK_TINT_07}`, textDecoration: 'none' }}
               className="active:bg-black/[0.02] transition-colors"
             >
               <BatchPlayerAvatar playerId={best.playerId} playerName={best.name} size="sm" />
@@ -269,7 +269,7 @@ export function SummaryTab({
         const latestRound = scoringStats.rounds[scoringStats.rounds.length - 1];
         return (
           <motion.div style={{ marginTop: '8px' }} {...sectionEntrance}>
-            <div style={{ background: SURFACE, borderTop: `1px solid ${INK_TINT_07}`, borderBottom: `1px solid ${INK_TINT_07}` }}>
+            <div style={{ background: SLATE_50, borderTop: `1px solid ${INK_TINT_07}`, borderBottom: `1px solid ${INK_TINT_07}` }}>
               <div style={{ padding: '14px 20px 0' }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '10px' }}>
                   <span style={{ width: 6, height: 6, borderRadius: '50%', background: LIVE_DOT, display: 'inline-block', flexShrink: 0 }} />

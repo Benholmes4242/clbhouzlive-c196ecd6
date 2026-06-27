@@ -11,7 +11,7 @@ import { useEffect, useRef, useState } from 'react';
 import { format } from 'date-fns';
 import { ArrowDownRight, ArrowRight, ArrowUpRight } from 'lucide-react';
 import { usePlayerResults, formatPositionShort, formatScore, type PlayerTournamentResult } from '../../hooks/usePlayerResults';
-import { AMBER, INK, INK_FAINT, INK_MUTE, INK_TINT_07, SCORE_UNDER_PAR_LIGHT, SURFACE, TREND_DOWN } from '../../_shared/tokens';
+import { AMBER, INK, INK_FAINT, INK_MUTE, INK_TINT_07, SCORE_UNDER_PAR_LIGHT, SLATE_50, SURFACE, TREND_DOWN } from '../../_shared/tokens';
 
 interface FormSectionProps {
   playerId: string;
@@ -362,7 +362,7 @@ export function FormSection({ playerId }: FormSectionProps) {
     return (
       <div
         style={{
-          background: SURFACE,
+          background: SLATE_50,
           borderTop: `0.5px solid ${INK_TINT_07}`,
           padding: '14px 16px 16px',
         }}
@@ -400,7 +400,7 @@ export function FormSection({ playerId }: FormSectionProps) {
   return (
     <div
       style={{
-        background: SURFACE,
+        background: SLATE_50,
         borderTop: `0.5px solid ${INK_TINT_07}`,
         padding: '14px 16px 16px',
       }}

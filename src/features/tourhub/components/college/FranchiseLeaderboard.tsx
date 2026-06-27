@@ -18,7 +18,7 @@ import { useFranchiseCaptains } from '../../hooks/useFranchiseCaptains';
 
 import { FranchiseCard } from './FranchiseCard';
 import { FranchiseMovers } from './FranchiseMovers';
-import { INK, INK_FAINT, INK_MUTE, INK_TINT_06, INK_TINT_07, SURFACE } from '../../_shared/tokens';
+import { INK, INK_FAINT, INK_MUTE, INK_TINT_06, INK_TINT_07, SLATE_50, SURFACE } from '../../_shared/tokens';
 
 type MetricTab = 'earnings' | 'wins' | 'top10s' | 'movers';
 
@@ -77,7 +77,7 @@ export function FranchiseLeaderboard({
   return (
     <div className={className}>
       {activeMetric !== 'movers' && (
-        <div style={{ background: SURFACE, borderTop: `0.5px solid ${INK_TINT_07}`, marginTop: 8 }}>
+        <div style={{ background: SLATE_50, borderTop: `0.5px solid ${INK_TINT_07}`, marginTop: 8 }}>
 
 
           {/* Column headers */}

@@ -5,7 +5,7 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import type { TourPlayerStatistics } from '../../hooks/useTourHubData';
-import { AMBER, HAIRLINE_INK_8, HAIRLINE_INK_15, INK, INK_FAINT, INK_MUTE, INK_TINT_07, SURFACE } from '../../_shared/tokens';
+import { AMBER, HAIRLINE_INK_8, HAIRLINE_INK_15, INK, INK_FAINT, INK_MUTE, INK_TINT_07, SLATE_50, SURFACE } from '../../_shared/tokens';
 
 const STAT_TABS = ['Overview', 'Ball Striking', 'Short Game', 'Shots Gained'] as const;
 type StatTab = (typeof STAT_TABS)[number];
@@ -147,7 +147,7 @@ export function PlayerSeasonStats({ playerStats }: PlayerSeasonStatsProps) {
     ? (playerStats.top_25s / playerStats.events_played) * 100 : undefined;
 
   return (
-    <div style={{ background: SURFACE, borderTop: `0.5px solid ${INK_TINT_07}` }}>
+    <div style={{ background: SLATE_50, borderTop: `0.5px solid ${INK_TINT_07}` }}>
       {/* Dispatch section header */}
       <div style={{ padding: '14px 16px 0' }}>
         <div style={{ marginBottom: '12px' }}>
