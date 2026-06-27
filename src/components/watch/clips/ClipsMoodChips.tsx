@@ -78,14 +78,6 @@ function ClipsMoodChipsInner({
 
       <div
         aria-hidden
-        className="pointer-events-none absolute top-0 left-0 h-full"
-        style={{
-          width: 36,
-          background: 'linear-gradient(to left, rgba(248,250,252,0) 0%, #F8FAFC 100%)',
-        }}
-      />
-      <div
-        aria-hidden
         className="pointer-events-none absolute top-0 right-0 h-full"
         style={{
           width: 36,
