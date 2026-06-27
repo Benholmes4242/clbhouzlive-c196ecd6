@@ -14,6 +14,13 @@ const INK_MUTE = '#64748B';
 
 type Tier = 'editorial' | 'standard' | 'rail';
 type IconTone = 'amber' | 'ink';
+type EyebrowTone = 'slate' | 'amber' | 'danger';
+
+const EYEBROW_TONE: Record<EyebrowTone, string> = {
+  slate: '#64748B',
+  amber: '#c97a10',
+  danger: '#DC2626',
+};
 
 interface SectionHeaderProps {
   tier?: Tier;
@@ -31,6 +38,12 @@ interface SectionHeaderProps {
   mark?: ReactNode;
   /** Right-side action affordance. */
   action?: { label: string; onClick: () => void };
+  /** Tier-2 eyebrow colour. 'slate' default (#64748B) | 'amber' (#c97a10) | 'danger' (#DC2626). */
+  tone?: EyebrowTone;
+  /** Optional inline count rendered after the eyebrow (slate-400, tabular). */
+  count?: number;
+  /** Render an amber required asterisk after the eyebrow label. */
+  required?: boolean;
   paddingTop?: number;
   paddingX?: number;
   className?: string;
