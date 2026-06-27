@@ -7,7 +7,7 @@ import { useLiveTournaments } from '../../hooks/useLiveTournaments';
 import { useTourLeaderboard } from '../../hooks/useTourHubData';
 import { FullLeaderboard } from '../tournament-detail/FullLeaderboard';
 import { EditorialEmpty } from '../tournament-detail/EditorialEmpty';
-import { INK, INK_MUTE, INK_TINT_05, INK_TINT_07, SURFACE, STATUS_LIVE } from '../../_shared/tokens';
+import { INK, INK_MUTE, INK_TINT_05, INK_TINT_07, INK_TINT_06, SURFACE, STATUS_LIVE, STATUS_LIVE_TINT_10 } from '../../_shared/tokens';
 import { tourPriorityIndex, TOUR_LABEL, shortTournamentToken } from '../../_shared/tourOrder';
 import { TOUR_CONFIG } from '../../hooks/useOverviewData';
 import type { LiveTournamentLite } from '../../hooks/useLiveTournaments';
