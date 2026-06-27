@@ -311,10 +311,9 @@ export function TournamentDetailPage() {
   return (
     <TourHubShell>
       <ShellSlot>
-        <TournamentTabsShellRow
+      <TournamentTabsShellRow
           activeTab={activeTab}
           onChange={handleTabChange}
-          overlay={fullBleedHero && heroCovering}
         />
       </ShellSlot>
 
