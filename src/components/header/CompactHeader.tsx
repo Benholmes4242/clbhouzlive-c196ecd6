@@ -364,7 +364,8 @@ const CompactHeader: React.FC<CompactHeaderProps> = ({ className }) => {
           {/* Right section: Search + Identity pill (fixed width) */}
           <div className="flex items-center gap-1.5 sm:gap-2 flex-shrink-0">
             {/* Handicap chip — left of search, all routes */}
-            <HandicapChip light={useLightTheme} />
+            <HandicapChip light={useLightTheme && !overlayActive} />
+
 
             {/* Search Button — 44px tap target */}
             <Button
