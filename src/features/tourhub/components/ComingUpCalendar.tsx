@@ -18,6 +18,7 @@ import { Shimmer } from './shared/Shimmer';
 import { getContextLabel, TOUR_NAME_TO_SLUG } from '../utils/tournamentClassification';
 import { TOUR_MAP, type TourCode } from '../constants/tourMap';
 import type { SeasonTournament } from '../hooks/useSeasonTournaments';
+import { SectionHeader } from '@/components/ui/SectionHeader';
 
 // ── Tokens ──────────────────────────────────────────────────────────────────
 import {
