@@ -4,7 +4,6 @@ import { BottomSheet } from '@/components/ui/BottomSheet';
 import CountryFlag from '@/components/ui/country-flag';
 import {
   SC_ACE,
-  SC_ALBATROSS,
   SC_EAGLE,
   SC_BIRDIE,
   SC_PAR,
@@ -332,8 +331,6 @@ export function PlayerScorecardSheet({
           </svg>
         </button>
       </div>
-      {/* Reference unused symbols to keep import tree intact */}
-      <span style={{ display: 'none' }} aria-hidden>{SC_ALBATROSS}</span>
     </BottomSheet>
   );
 }
