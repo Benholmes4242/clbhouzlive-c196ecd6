@@ -26,6 +26,7 @@ import { PhotoBand } from './HybridHeroBands/PhotoBand';
 import { MiddleBand } from './HybridHeroBands/MiddleBand';
 import { LeaderboardBand } from './HybridHeroBands/LeaderboardBand';
 import { CinematicFrame } from './HybridHeroBands/CinematicFrame';
+import { CinematicHeroFullBleed } from './HybridHeroBands/CinematicHeroFullBleed';
 import { format } from 'date-fns';
 import {
   deriveHeroState,
