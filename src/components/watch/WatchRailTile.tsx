@@ -227,27 +227,29 @@ export default function WatchRailTile({
 
 
       {/* Likes — amber heart, no pill, text-shadow handles legibility */}
-      <div
-        style={{
-          position: 'absolute',
-          bottom: 10,
-          right: 10,
-          fontSize: 11,
-          fontWeight: 600,
-          color: 'rgba(255,255,255,0.95)',
-          pointerEvents: 'none',
-          display: 'flex',
-          alignItems: 'center',
-          gap: 4,
-          textShadow: '0 1px 3px rgba(0,0,0,0.6)',
-        }}
-      >
-        <Heart
-          style={{ width: 12, height: 12, color: '#F7931E', fill: '#F7931E' }}
-          strokeWidth={1.8}
-        />
-        {post.likeCount}
-      </div>
+      {(post.likeCount ?? 0) > 0 && (
+        <div
+          style={{
+            position: 'absolute',
+            bottom: 10,
+            right: 10,
+            fontSize: 11,
+            fontWeight: 600,
+            color: 'rgba(255,255,255,0.95)',
+            pointerEvents: 'none',
+            display: 'flex',
+            alignItems: 'center',
+            gap: 4,
+            textShadow: '0 1px 3px rgba(0,0,0,0.6)',
+          }}
+        >
+          <Heart
+            style={{ width: 12, height: 12, color: '#F7931E', fill: '#F7931E' }}
+            strokeWidth={1.8}
+          />
+          {post.likeCount}
+        </div>
+      )}
 
     </div>
   );
