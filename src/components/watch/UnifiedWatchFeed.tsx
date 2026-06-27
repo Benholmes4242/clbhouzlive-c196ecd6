@@ -73,9 +73,6 @@ export default function UnifiedWatchFeed({ embedded = false }: UnifiedWatchFeedP
           the bottom nav even when PageRoot is bypassed. */}
       <div style={{ paddingBottom: 24 }}>
         <WatchSectionHeader
-          paddingTop={34}
-          eyebrow="From the community"
-          kickerColor="amber"
           title="Clips to explore"
         />
         {/* ── Mood pills — pulled up tight under the title, sitting close to the grid ── */}
