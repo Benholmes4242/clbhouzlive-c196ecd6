@@ -15,7 +15,7 @@ import CountryFlag from '@/components/ui/country-flag';
 import { playerRoute } from '../../routes';
 import {
   AMBER, INK, INK_FAINT, INK_MUTE, INK_TINT_06, INK_TINT_07,
-  SCORE_OVER_PAR_LIGHT, SURFACE,
+  SCORE_OVER_PAR_LIGHT, SURFACE, SLATE_50,
 } from '../../_shared/tokens';
 
 type ScoreInfo = { score: number | null; position: number | null; tied: boolean; status: string | null };
