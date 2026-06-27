@@ -8,9 +8,13 @@ import { analyticsEvents } from '@/utils/analyticsEvents';
  * Actor selection is GLOBAL (session-wide) — comments always post as the
  * current activeActor, no per-card override.
  */
-export function useClubhouseComments() {
+export function useClubhouseComments(activeActor?: { type: string; id: string } | null) {
   const [commentsOpen, setCommentsOpen] = useState(false);
   const [commentCountOverrides, setCommentCountOverrides] = useState<Map<string, number>>(new Map());
+
+  useEffect(() => {
+    setCommentCountOverrides(new Map());
+  }, [activeActor?.id, activeActor?.type]);
 
   // Pause/resume video when comments open/close
   useEffect(() => {
@@ -53,7 +57,7 @@ export function useClubhouseComments() {
   const getCommentCount = useCallback((post: FeedPost | null): number => {
     if (!post) return 0;
     return commentCountOverrides.get(post.id) ?? post.commentCount;
-  }, [commentCountOverrides]);
+  }, [commentCountOverrides, activeActor?.id, activeActor?.type]);
 
   const resetComments = useCallback(() => {
     setCommentsOpen(false);

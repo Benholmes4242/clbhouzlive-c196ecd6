@@ -106,7 +106,7 @@ const PostsTabContent: React.FC<PostsTabContentProps> = ({
     handleCommentPosted,
     handleCommentDeleted,
     getCommentCount,
-  } = useClubhouseComments();
+  } = useClubhouseComments(activeActor);
   const { moreOptionsOpen, setMoreOptionsOpen, handleShare, handleReport, handleNotInterested } =
     useClubhouseShare(user?.id);
 
