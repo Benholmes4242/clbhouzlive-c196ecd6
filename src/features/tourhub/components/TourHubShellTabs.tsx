@@ -26,7 +26,13 @@ function computeActiveTab(pathname: string, searchParams: URLSearchParams): TabI
 /**
  * TourHubShellTabs — Canonical 5-destination tab strip for the Tour Hub shell.
  */
-export const TourHubShellTabs: React.FC = () => {
+export interface TourHubShellTabsProps {
+  /** When true, paint transparent with white text — for use over the
+   *  cinematic full-bleed hero on the Overview tab. */
+  overlay?: boolean;
+}
+
+export const TourHubShellTabs: React.FC<TourHubShellTabsProps> = ({ overlay = false }) => {
   const location = useLocation();
   const [searchParams, setSearchParams] = useSearchParams();
   const navigate = useNavigate();
