@@ -193,12 +193,6 @@ export const RoundDetailSheet: React.FC<Props> = ({ open, onClose, scoreId, hand
   const isComplete = holesPlayed >= totalHolesExpected;
   const roundRel = hasHoles && holesPlayed > 0 ? totalStrokes - totalPar : null;
 
-  // Legend Ace/Albatross detection
-  const hasAce = sortedHoles.some((h) => strokesOf(h) === 1);
-  const hasAlbatross = sortedHoles.some((h) => {
-    const s = strokesOf(h);
-    return s != null && h.par != null && (s - h.par) <= -3 && s !== 1;
-  });
 
   const dateEyebrow = fmtDateEyebrow(userData?.play_date);
   const courseName = userData?.course?.name ?? 'Unknown course';
