@@ -1,6 +1,6 @@
 import { memo } from 'react';
 import { useSuggestedCreators } from '@/components/watch/hooks/useSuggestedCreators';
-import { SectionHeader } from '../proshop/SectionHeader';
+import SectionHeader from '@/components/ui/SectionHeader';
 import { HRail } from '../proshop/HRail';
 import { SuggestedCreatorCard } from '@/components/shared/SuggestedCreatorCard';
 
@@ -15,7 +15,7 @@ function VideosSuggestedCreatorsRailInner({ userId }: VideosSuggestedCreatorsRai
   if (creators.length === 0) return null;
   return (
     <section>
-      <SectionHeader paddingTop={20} title="Suggested creators" sub="Golfers worth following" />
+      <SectionHeader tier="rail" title="Suggested creators" paddingTop={20} paddingX={16} />
       <HRail paddingBottom={10}>
         {creators.map((c) => (
           <SuggestedCreatorCard key={c.userId} creator={c} currentUserId={userId} />

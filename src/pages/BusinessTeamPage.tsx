@@ -42,17 +42,7 @@ const ROLE_DESCRIPTIONS: Record<BusinessRole, string> = {
 
 const ASSIGNABLE_ROLES: AssignableBusinessRole[] = ['admin', 'editor', 'analyst'];
 
-const LocalSectionEyebrow = ({ label, tone = 'amber' }: { label: string; tone?: 'amber' | 'slate' }) => {
-  const color = tone === 'amber' ? '#F7931E' : '#475569';
-  return (
-    <div className="flex items-center gap-1.5 mb-2">
-      <div style={{ width: 3, height: 8, background: color, borderRadius: 1, flexShrink: 0 }} />
-      <span style={{ fontSize: 9, fontWeight: 900, color, letterSpacing: '0.16em', textTransform: 'uppercase' }}>
-        {label}
-      </span>
-    </div>
-  );
-};
+import SectionHeader from '@/components/ui/SectionHeader';
 
 export default function BusinessTeamPage() {
   const { businessId } = useParams<{ businessId: string }>();
@@ -195,7 +185,7 @@ export default function BusinessTeamPage() {
       role === 'owner' ? 'OWNER' : `${BUSINESS_ROLE_LABELS[role].toUpperCase()}S`;
     return (
       <section>
-        <LocalSectionEyebrow label={labelPlural} tone="slate" />
+        <SectionHeader tier="standard" kicker={labelPlural} tone="slate" />
         <p className="text-xs text-muted-foreground mb-2">{ROLE_DESCRIPTIONS[role]}</p>
         <div className="[&>*+*]:border-t [&>*+*]:[border-top-color:rgba(15,23,42,0.07)]">
           {role === 'owner' && teamLoading && members.length === 0 ? (
@@ -230,7 +220,7 @@ export default function BusinessTeamPage() {
       {/* Title block — CompactHeader provides the back arrow */}
       <div className="px-4 pt-3 pb-3 flex items-end justify-between">
         <div>
-          <LocalSectionEyebrow label="TEAM" />
+          <SectionHeader tier="standard" kicker="TEAM" tone="amber" />
           <h1 className="text-[18px] text-foreground leading-none mt-0.5" style={{ fontWeight: 900, letterSpacing: '-0.01em' }}>
             Manage team
           </h1>
@@ -268,7 +258,7 @@ export default function BusinessTeamPage() {
 
         {canManage && pendingInvites.length > 0 && (
           <section>
-            <LocalSectionEyebrow label="PENDING" tone="slate" />
+            <SectionHeader tier="standard" kicker="PENDING" tone="slate" />
             <div className="[&>*+*]:border-t [&>*+*]:[border-top-color:rgba(15,23,42,0.07)]">
               {pendingInvites.map((invite) => (
                 <div key={invite.id} className="flex items-center gap-3 py-3">

@@ -1,6 +1,6 @@
 import { memo } from 'react';
 import { useVideosFollowingRail } from './hooks/useVideosFollowingRail';
-import { SectionHeader } from '../proshop/SectionHeader';
+import SectionHeader from '@/components/ui/SectionHeader';
 import { HRail } from '../proshop/HRail';
 import { VideoRailTile } from './VideoRailTile';
 
@@ -20,11 +20,7 @@ function VideosFollowingRailInner({ userId }: VideosFollowingRailProps) {
 
   return (
     <section>
-      <SectionHeader
-        paddingTop={20}
-        title="From creators you follow"
-        sub="New from people you've subscribed to"
-      />
+      <SectionHeader tier="rail" title="From creators you follow" paddingTop={20} paddingX={16} />
       <HRail paddingBottom={10}>
         {posts.map((post, i) => (
           <VideoRailTile key={post.id} post={post} index={i} allPosts={posts} width={280} />

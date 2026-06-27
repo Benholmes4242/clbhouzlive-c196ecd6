@@ -2,7 +2,7 @@ import React from 'react';
 import { ChevronRight, MapPin } from 'lucide-react';
 import type { CourseSearchResult } from '@/hooks/gam/useCourseSearch';
 import { Skeleton, EmptyStub, RetryStub } from '../../../../gam/_shared/GamAtoms';
-import SubsectionEyebrow from '../_shared/SubsectionEyebrow';
+import SectionHeader from '@/components/ui/SectionHeader';
 import { CourseEyebrow } from '../_shared/CourseEyebrow';
 import type { CourseSelection } from '../types';
 
@@ -85,7 +85,7 @@ export const SearchResultsSubsection: React.FC<Props> = ({
 }) => {
   return (
     <>
-      <SubsectionEyebrow label="SEARCH RESULTS" />
+      <div style={{ marginTop: 24 }}><SectionHeader tier="standard" kicker="SEARCH RESULTS" paddingX={16} /></div>
       <div style={{ padding: '0 16px', display: 'flex', flexDirection: 'column', gap: 10 }}>
         {isLoading && <Skeleton height={68} radius={12} />}
         {isError && <RetryStub message="Couldn't search courses" onRetry={onRetry} />}
