@@ -243,7 +243,6 @@ function VideosFullFeedInner({ userId, mood, searchQuery }: VideosFullFeedProps)
 
   return (
     <>
-      {!searchQuery && <BucketListRail />}
       {renderVideoFeedBody()}
     </>
   );
