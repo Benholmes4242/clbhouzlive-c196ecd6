@@ -69,21 +69,8 @@ function liveRoundFor(entry: any, roundNum: number): { today: number | null; thr
 function resolveAvatar(e: any, tourSlug?: string | null): string | null {
   return resolveAvatarCandidates(e, tourSlug)[0] ?? null;
 }
-/**
- * Ordered headshot candidates for a leaderboard entry. Tries event-tour
- * folder first, then PGA Tour, then the rest — covers cross-tour players
- * (e.g. PGA player at a co-sanctioned/euro major). DB photo_url short-circuits.
- *
- * Thin wrapper around the canonical {@link resolvePlayerAvatarCandidates}
- * so the hero and every Players surface share one implementation.
- */
-function resolveAvatarCandidates(e: any, tourSlug?: string | null): string[] {
-  return resolvePlayerAvatarCandidates({
-    name: entryName(e),
-    photoUrl: e?.player?.photo_url ?? null,
-    tourSlug: tourSlug ?? null,
-  });
-}
+// resolveAvatarCandidates moved to ../../../utils/playerAvatar so the
+// PlayerScorecardSheet can share the same implementation.
 function nameCandidates(name: string | null | undefined, tourSlug?: string | null): string[] {
   if (!name || !tourSlug) return [];
   try { return getPlayerHeadshotCandidates(name, tourSlug); } catch { return []; }
