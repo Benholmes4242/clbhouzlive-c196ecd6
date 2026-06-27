@@ -311,7 +311,8 @@ const CompactHeader: React.FC<CompactHeaderProps> = ({ className }) => {
               aria-label={isBackArrowRoute ? "Go back" : "Go to home"}
             >
               {isBackArrowRoute ? (
-              <ArrowLeft className={cn("h-6 w-6", useDarkChrome ? "text-white" : "text-foreground")} />
+              <ArrowLeft className={cn("h-6 w-6", (useDarkChrome || overlayActive) ? "text-white" : "text-foreground")} />
+
               ) : (
                 <img
                   src="/lovable-uploads/29e83040-b5c5-48e4-84d7-3f99640e4a80.png"
