@@ -11,6 +11,7 @@ import { LeadersShellRow } from '../components/shell/LeadersShellRow';
 import { useTournamentStatusRealtime } from '../hooks/useTournamentStatusRealtime';
 import { useLiveTournaments } from '../hooks/useLiveTournaments';
 import { TourSelectionProvider } from '../context/TourSelectionContext';
+import { useHeroFullBleed } from '../_shared/heroFullBleedSignal';
 
 export function TourHubMainPage() {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -57,6 +58,47 @@ export function TourHubMainPage() {
     return () => window.removeEventListener('clbhouz-active-tab-retap', onRetap);
   }, [setSearchParams]);
 
+  // ───────── Cinematic full-bleed hero overlay machinery ─────────
+  // HybridHero (inside OverviewTab → OverviewHero) flips the heroFullBleed
+  // signal when it is rendering CinematicHeroFullBleed (live/results).
+  const heroIsCinematic = useHeroFullBleed();
+  const fullBleedHero = activeTab === 'overview' && heroIsCinematic;
+
+  // heroCovering = the hero still covers the top of the viewport.
+  // Scroll-threshold based: true at mount; flips false after scrolling past
+  // the hero. (Hero height ≈ 528px; chrome ≈ 96px.)
+  const [heroCovering, setHeroCovering] = useState(true);
+  useEffect(() => {
+    if (!fullBleedHero) {
+      setHeroCovering(false);
+      return;
+    }
+    setHeroCovering(true);
+    const HERO_HEIGHT = 528;
+    const CHROME = 96;
+    const threshold = HERO_HEIGHT - CHROME;
+    const onScroll = () => {
+      const y = window.scrollY || document.documentElement.scrollTop || 0;
+      setHeroCovering(y < threshold);
+    };
+    onScroll();
+    window.addEventListener('scroll', onScroll, { passive: true });
+    return () => window.removeEventListener('scroll', onScroll);
+  }, [fullBleedHero]);
+
+  // Drive the global chrome flag (CompactHeader + ShellSlot read this).
+  useEffect(() => {
+    const on = fullBleedHero && heroCovering;
+    document.documentElement.style.setProperty('--tour-hero-overlay', on ? '1' : '0');
+    window.dispatchEvent(new CustomEvent('tour-hero-overlay', { detail: on }));
+    return () => {
+      document.documentElement.style.setProperty('--tour-hero-overlay', '0');
+      window.dispatchEvent(new CustomEvent('tour-hero-overlay', { detail: false }));
+    };
+  }, [fullBleedHero, heroCovering]);
+
+  const overlay = fullBleedHero && heroCovering;
+
   const renderTab = () => {
     switch (activeTab) {
       case 'overview':
@@ -87,13 +129,18 @@ export function TourHubMainPage() {
     <TourSelectionProvider>
       <TourHubShell showBack={false}>
         <ShellSlot>
-          <TourHubShellTabs />
+          <TourHubShellTabs overlay={overlay} />
           {renderShellRow()}
         </ShellSlot>
 
-        <div style={{ paddingTop: 'calc(var(--chrome-total-h, 0px) - 1px)' }}>
-          {renderTab()}
-        </div>
+        {fullBleedHero ? (
+          // Hero bleeds into the notch behind the (now-transparent) chrome.
+          <div>{renderTab()}</div>
+        ) : (
+          <div style={{ paddingTop: 'calc(var(--chrome-total-h, 0px) - 1px)' }}>
+            {renderTab()}
+          </div>
+        )}
       </TourHubShell>
     </TourSelectionProvider>
   );
