@@ -258,7 +258,11 @@ export const SquircleAvatar: React.FC<SquircleAvatarProps> = ({
 
   // Ring thickness: 2px standard, 1px thin, 0.5px hairline
   const ringThickness = hairlineRing ? 0.5 : thinRing ? 1 : 2;
-  
+
+  // Hairline rings render via inset box-shadow (1px crisp) instead of a 0.5px
+  // border, because sub-pixel borders round to invisible on dpr=1 displays.
+  const hairlineShadow = 'inset 0 0 0 1px rgba(255,255,255,0.22)';
+
   // Determine the border color
   const borderColor = hideRing 
     ? 'transparent' 
@@ -299,8 +303,10 @@ export const SquircleAvatar: React.FC<SquircleAvatarProps> = ({
             width: `${pixelSize}px`,
             aspectRatio: '1 / 1.05',
             borderRadius: '34%',
-            border: `${ringThickness}px solid ${effectiveRingColor}`,
-            boxShadow: glowShadow,
+            border: hairlineRing ? 'none' : `${ringThickness}px solid ${effectiveRingColor}`,
+            boxShadow: hairlineRing
+              ? (glowShadow ? `${hairlineShadow}, ${glowShadow}` : hairlineShadow)
+              : glowShadow,
           }}
         >
           {avatarContent}
@@ -326,7 +332,8 @@ export const SquircleAvatar: React.FC<SquircleAvatarProps> = ({
           width: `${pixelSize}px`,
           aspectRatio: '1 / 1.05',
           borderRadius: '34%',
-          border: hideRing ? 'none' : `${ringThickness}px solid ${borderColor}`,
+          border: hideRing || hairlineRing ? 'none' : `${ringThickness}px solid ${borderColor}`,
+          boxShadow: hairlineRing ? hairlineShadow : undefined,
         }}
       >
         {avatarContent}
