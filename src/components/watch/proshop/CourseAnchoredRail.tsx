@@ -46,7 +46,7 @@ function CourseAnchoredRailInner() {
     <section style={{ background: 'hsl(var(--background))' }}>
       <SectionHeader
         tier="rail"
-        eyebrow="From your courses"
+        kicker="From your courses"
         title={topCourse.course_name}
         action={{
           label: 'See all',
