@@ -20,6 +20,13 @@ export function useClubhouseLikes({ userId, activeActor }: UseClubhouseLikesOpti
   const likeMutation = useLikeMutation();
   const [localLikeState, setLocalLikeState] = useState<Map<string, { isLiked: boolean; count: number }>>(new Map());
 
+  // Clear any pending optimistic overrides when the active actor changes so
+  // the new actor's fresh post data isn't briefly painted with the previous
+  // actor's liked/count state.
+  useEffect(() => {
+    setLocalLikeState(new Map());
+  }, [activeActor?.id, activeActor?.type]);
+
   const clearOverride = useCallback((postId: string) => {
     setLocalLikeState(prev => {
       if (!prev.has(postId)) return prev;
