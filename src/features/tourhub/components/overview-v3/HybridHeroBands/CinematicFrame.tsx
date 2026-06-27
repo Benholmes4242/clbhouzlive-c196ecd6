@@ -24,7 +24,6 @@ import {
   AMBER,
   GOLD,
   NUMERIC_STYLE,
-  SC_BIRDIE,
 } from '../HybridHero.constants';
 import { AMBER_INK, GOLD_DEEP } from '../../../_shared/tokens';
 import { roundStarted } from '../../../_shared/roundState';
@@ -82,7 +81,7 @@ function nameCandidates(name: string | null | undefined, tourSlug?: string | nul
 
 function scoreColor(score: number | null | undefined): string {
   if (score == null || Number.isNaN(score)) return 'rgba(255,255,255,0.85)';
-  if (score < 0) return SC_BIRDIE;   // under par -> teal (GOOD)
+  if (score < 0) return LEADER_GREEN;   // under par -> bright green
   if (score > 0) return 'rgba(255,255,255,0.55)'; // over par -> muted white
   return 'rgba(255,255,255,0.85)';   // even
 }
