@@ -3,14 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { BottomSheet } from '@/components/ui/BottomSheet';
 import CountryFlag from '@/components/ui/country-flag';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
-import {
-  SC_ACE,
-  SC_EAGLE,
-  SC_BIRDIE,
-  SC_PAR,
-  SC_BOGEY,
-  SC_DOUBLE,
-} from '@/features/courses/components/holes/_constants';
+import { ScoreMark } from '@/features/courses/_shared/ScoreMark';
 import { playerRoute } from '../../routes';
 import {
   useTournamentScorecard,
