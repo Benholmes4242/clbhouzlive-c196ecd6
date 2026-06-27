@@ -1217,7 +1217,7 @@ export function CinematicFrame({
               <span style={{ flex: 1 }} />
               {anyToday && <span style={{ ...NUMERIC_STYLE, width: COL_TODAY, textAlign: 'center', fontSize: 9, fontWeight: 800, letterSpacing: '0.12em', color: 'rgba(255,255,255,0.6)' }}>TODAY</span>}
               <span style={{ ...NUMERIC_STYLE, width: COL_TOTAL, textAlign: 'center', fontSize: 9, fontWeight: 800, letterSpacing: '0.12em', color: 'rgba(255,255,255,0.6)' }}>TOTAL</span>
-              <span style={{ ...NUMERIC_STYLE, width: COL_THRU, textAlign: 'right', fontSize: 9, fontWeight: 800, letterSpacing: '0.12em', color: 'rgba(255,255,255,0.6)' }}>THRU</span>
+              <span style={{ ...NUMERIC_STYLE, width: COL_THRU, textAlign: 'center', fontSize: 9, fontWeight: 800, letterSpacing: '0.12em', color: 'rgba(255,255,255,0.6)' }}>THRU</span>
             </div>
 
             {/* Score rows */}
