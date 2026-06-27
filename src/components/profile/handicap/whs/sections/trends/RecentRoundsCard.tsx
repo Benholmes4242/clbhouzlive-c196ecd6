@@ -179,7 +179,7 @@ export const RecentRoundsCard: React.FC<Props> = ({ connectionId, viewMode = 'ow
             ? `${ownerFirstName ? `${ownerFirstName}'s` : 'Their'} full posted history.`
             : 'Your full posted history.'
         }
-        right={counterCount > 0 ? <CounterBadge count={counterCount} /> : undefined}
+        action={counterCount > 0 ? { label: `${counterCount}`, onClick: () => {} } : undefined}
       />
 
 
