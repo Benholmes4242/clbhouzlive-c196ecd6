@@ -94,10 +94,12 @@ export const TourHubShellTabs: React.FC<TourHubShellTabsProps> = ({ overlay = fa
     <section
       className="relative"
       style={{
-        background: '#F8FAFC',
+        background: overlay ? 'transparent' : '#F8FAFC',
         display: 'flex',
         alignItems: 'stretch',
-        borderBottom: '0.5px solid rgba(15,23,42,0.08)',
+        borderBottom: overlay
+          ? '0.5px solid rgba(255,255,255,0.18)'
+          : '0.5px solid rgba(15,23,42,0.08)',
       }}
     >
       <div style={{ position: 'relative', minWidth: 0, flex: '1 1 auto' }}>
