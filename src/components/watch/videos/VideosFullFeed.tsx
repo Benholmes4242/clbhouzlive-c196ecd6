@@ -84,7 +84,7 @@ function VideosTopRail({ userId }: { userId: string | undefined }) {
   return <VideosSuggestedCreatorsRail userId={userId} />;
 }
 
-function VideosFullFeedInner({ userId, mood, searchQuery }: VideosFullFeedProps) {
+function VideosFullFeedInner({ userId, mood, searchQuery, onClearSearch, onResetMood }: VideosFullFeedProps) {
   const fetchGuard = useRef(false);
   const { ref: sentinelRef, inView } = useInView({ rootMargin: '400px' });
 
