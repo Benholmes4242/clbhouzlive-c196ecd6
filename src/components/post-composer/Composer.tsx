@@ -828,6 +828,14 @@ export function Composer({
     currentDraftId,
   ]);
 
+  const composerPlaceholder = useMemo(() => {
+    if (displayActor.type === 'business') {
+      return "What's on your mind?";
+    }
+    const first = (displayActor.name ?? '').trim().split(/\s+/)[0];
+    return first ? `What's on your mind, ${first}?` : "What's on your mind?";
+  }, [displayActor.type, displayActor.name]);
+
   return (
     <div
       style={{
@@ -864,6 +872,9 @@ export function Composer({
         <button
           onClick={handleCloseRequest}
           aria-label="Close"
+          onPointerDown={(e) => { e.currentTarget.style.transform = 'scale(0.94)'; }}
+          onPointerUp={(e) => { e.currentTarget.style.transform = 'scale(1)'; }}
+          onPointerLeave={(e) => { e.currentTarget.style.transform = 'scale(1)'; }}
           style={{
             width: 36,
             height: 36,
@@ -875,6 +886,8 @@ export function Composer({
             justifyContent: 'center',
             cursor: 'pointer',
             color: INK_MUTE,
+            transition: 'transform 120ms ease, background 120ms ease, box-shadow 120ms ease',
+            WebkitTapHighlightColor: 'transparent',
           }}
         >
           <X size={18} strokeWidth={2} />
@@ -884,6 +897,9 @@ export function Composer({
           <button
             onClick={handleSaveDraft}
             disabled={isSavingDraft || busy}
+            onPointerDown={(e) => { if (!(isSavingDraft || busy)) e.currentTarget.style.transform = 'scale(0.97)'; }}
+            onPointerUp={(e) => { e.currentTarget.style.transform = 'scale(1)'; }}
+            onPointerLeave={(e) => { e.currentTarget.style.transform = 'scale(1)'; }}
             style={{
               fontSize: 13,
               fontWeight: 700,
@@ -895,9 +911,11 @@ export function Composer({
               color: INK_2,
               marginRight: 8,
               opacity: isSavingDraft || busy ? 0.5 : 1,
+              transition: 'transform 120ms ease, background 120ms ease, box-shadow 120ms ease',
+              WebkitTapHighlightColor: 'transparent',
             }}
           >
-            {isSavingDraft ? 'Saving…' : 'Save draft'}
+            {isSavingDraft ? 'Saving' : 'Save draft'}
           </button>
         )}
         {!isEditMode && (
@@ -906,6 +924,9 @@ export function Composer({
             disabled={!canPost}
             aria-label="Schedule post"
             title="Schedule for later"
+            onPointerDown={(e) => { if (canPost) e.currentTarget.style.transform = 'scale(0.94)'; }}
+            onPointerUp={(e) => { e.currentTarget.style.transform = 'scale(1)'; }}
+            onPointerLeave={(e) => { e.currentTarget.style.transform = 'scale(1)'; }}
             style={{
               width: 36,
               height: 36,
@@ -918,6 +939,8 @@ export function Composer({
               cursor: canPost ? 'pointer' : 'default',
               color: canPost ? INK_2 : '#94A3B8',
               marginRight: 6,
+              transition: 'transform 120ms ease, background 120ms ease, box-shadow 120ms ease',
+              WebkitTapHighlightColor: 'transparent',
             }}
           >
             <Clock size={16} strokeWidth={2.25} />
@@ -926,6 +949,9 @@ export function Composer({
         <button
           onClick={() => handleShare(null)}
           disabled={!canPost}
+          onPointerDown={(e) => { if (canPost) e.currentTarget.style.transform = 'scale(0.97)'; }}
+          onPointerUp={(e) => { e.currentTarget.style.transform = 'scale(1)'; }}
+          onPointerLeave={(e) => { e.currentTarget.style.transform = 'scale(1)'; }}
           style={{
             fontSize: 13,
             fontWeight: 800,
@@ -936,11 +962,13 @@ export function Composer({
             background: canPost ? INK_2 : CHIP,
             color: canPost ? '#fff' : '#94A3B8',
             boxShadow: canPost ? '0 2px 10px rgba(15,23,42,0.18)' : 'none',
+            transition: 'transform 120ms ease, background 120ms ease, box-shadow 120ms ease',
+            WebkitTapHighlightColor: 'transparent',
           }}
         >
           {isEditMode
-            ? (isUpdating ? 'Updating…' : 'Update')
-            : (isSubmitting ? 'Posting…' : 'Post')}
+            ? (isUpdating ? 'Updating' : 'Update')
+            : (isSubmitting ? 'Posting' : 'Post')}
         </button>
       </div>
 
@@ -968,6 +996,9 @@ export function Composer({
           <button
             onClick={() => canSwitchActor && setActorSheetOpen(true)}
             disabled={!canSwitchActor}
+            onPointerDown={(e) => { if (canSwitchActor) e.currentTarget.style.transform = 'scale(0.98)'; }}
+            onPointerUp={(e) => { e.currentTarget.style.transform = 'scale(1)'; }}
+            onPointerLeave={(e) => { e.currentTarget.style.transform = 'scale(1)'; }}
             style={{
               display: 'inline-flex',
               alignItems: 'center',
@@ -976,6 +1007,8 @@ export function Composer({
               border: 'none',
               padding: 0,
               cursor: canSwitchActor ? 'pointer' : 'default',
+              transition: 'transform 120ms ease, background 120ms ease, box-shadow 120ms ease',
+              WebkitTapHighlightColor: 'transparent',
             }}
             aria-label={canSwitchActor ? 'Change posting identity' : undefined}
           >
@@ -1038,6 +1071,9 @@ export function Composer({
 
           <button
             onClick={() => setVisibilitySheetOpen(true)}
+            onPointerDown={(e) => { e.currentTarget.style.transform = 'scale(0.97)'; }}
+            onPointerUp={(e) => { e.currentTarget.style.transform = 'scale(1)'; }}
+            onPointerLeave={(e) => { e.currentTarget.style.transform = 'scale(1)'; }}
             style={{
               display: 'inline-flex',
               alignItems: 'center',
@@ -1050,6 +1086,8 @@ export function Composer({
               color: INK_2,
               fontSize: 12,
               fontWeight: 700,
+              transition: 'transform 120ms ease, background 120ms ease, box-shadow 120ms ease',
+              WebkitTapHighlightColor: 'transparent',
             }}
           >
             <VisIcon size={13} strokeWidth={2.5} />
@@ -1064,7 +1102,7 @@ export function Composer({
           autoFocus
           value={caption}
           onChange={(e) => setCaption(e.target.value.slice(0, MAX_CAPTION))}
-          placeholder="Share a thought…"
+          placeholder={composerPlaceholder}
           style={{
             width: '100%',
             boxSizing: 'border-box',
@@ -1179,11 +1217,14 @@ export function Composer({
         {!isEditMode && (
           <button
             onClick={() => fileRef.current?.click()}
+            onPointerDown={(e) => { e.currentTarget.style.transform = 'scale(0.98)'; e.currentTarget.style.background = '#F1F5F9'; }}
+            onPointerUp={(e) => { e.currentTarget.style.transform = 'scale(1)'; e.currentTarget.style.background = SURFACE; }}
+            onPointerLeave={(e) => { e.currentTarget.style.transform = 'scale(1)'; e.currentTarget.style.background = SURFACE; }}
             style={{
               flex: 1,
               padding: '13px 0',
-              borderRadius: 10,
-              border: `1px solid ${HAIR}`,
+              borderRadius: 12,
+              border: `0.5px solid ${HAIR}`,
               background: SURFACE,
               fontSize: 13,
               fontWeight: 700,
@@ -1193,6 +1234,9 @@ export function Composer({
               alignItems: 'center',
               justifyContent: 'center',
               gap: 8,
+              boxShadow: '0 1px 2px rgba(15,23,42,0.04)',
+              transition: 'transform 120ms ease, background 120ms ease, box-shadow 120ms ease',
+              WebkitTapHighlightColor: 'transparent',
             }}
           >
             <ImagePlus size={16} strokeWidth={2} />
@@ -1201,11 +1245,14 @@ export function Composer({
         )}
         <button
           onClick={handleCoursePillTap}
+          onPointerDown={(e) => { e.currentTarget.style.transform = 'scale(0.98)'; if (!taggedCourses.length) e.currentTarget.style.background = '#F1F5F9'; }}
+          onPointerUp={(e) => { e.currentTarget.style.transform = 'scale(1)'; if (!taggedCourses.length) e.currentTarget.style.background = SURFACE; }}
+          onPointerLeave={(e) => { e.currentTarget.style.transform = 'scale(1)'; if (!taggedCourses.length) e.currentTarget.style.background = SURFACE; }}
           style={{
             flex: 1,
             padding: '13px 0',
-            borderRadius: 10,
-            border: `1px solid ${taggedCourses.length > 0 ? GOLD_BORDER : HAIR}`,
+            borderRadius: taggedCourses.length > 0 ? 10 : 12,
+            border: taggedCourses.length > 0 ? `1px solid ${GOLD_BORDER}` : `0.5px solid ${HAIR}`,
             background: taggedCourses.length > 0 ? AMBER_SOFT : SURFACE,
             fontSize: 13,
             fontWeight: 700,
@@ -1215,6 +1262,9 @@ export function Composer({
             alignItems: 'center',
             justifyContent: 'center',
             gap: 8,
+            boxShadow: taggedCourses.length > 0 ? 'none' : '0 1px 2px rgba(15,23,42,0.04)',
+            transition: 'transform 120ms ease, background 120ms ease, box-shadow 120ms ease',
+            WebkitTapHighlightColor: 'transparent',
           }}
         >
           <MapPin size={16} strokeWidth={2} />
@@ -1393,6 +1443,9 @@ export function Composer({
                       if (ok) onClose();
                     }}
                     disabled={isSavingDraft}
+                    onPointerDown={(e) => { if (!isSavingDraft) e.currentTarget.style.transform = 'scale(0.97)'; }}
+                    onPointerUp={(e) => { e.currentTarget.style.transform = 'scale(1)'; }}
+                    onPointerLeave={(e) => { e.currentTarget.style.transform = 'scale(1)'; }}
                     style={{
                       width: '100%',
                       padding: '14px 0',
@@ -1404,9 +1457,11 @@ export function Composer({
                       fontWeight: 800,
                       cursor: isSavingDraft ? 'default' : 'pointer',
                       opacity: isSavingDraft ? 0.5 : 1,
+                      transition: 'transform 120ms ease, background 120ms ease, box-shadow 120ms ease',
+                      WebkitTapHighlightColor: 'transparent',
                     }}
                   >
-                    {isSavingDraft ? 'Saving…' : 'Save draft'}
+                    {isSavingDraft ? 'Saving' : 'Save draft'}
                   </button>
                 )}
                 <button
