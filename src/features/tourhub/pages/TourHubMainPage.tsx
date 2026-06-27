@@ -12,6 +12,7 @@ import { useTournamentStatusRealtime } from '../hooks/useTournamentStatusRealtim
 import { useLiveTournaments } from '../hooks/useLiveTournaments';
 import { TourSelectionProvider } from '../context/TourSelectionContext';
 import { useHeroFullBleed } from '../_shared/heroFullBleedSignal';
+import { applyShieldColor } from '@/hooks/useMedianStatusBar';
 
 export function TourHubMainPage() {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -91,6 +92,24 @@ export function TourHubMainPage() {
     const on = fullBleedHero && heroCovering;
     document.documentElement.style.setProperty('--tour-hero-overlay', on ? '1' : '0');
     window.dispatchEvent(new CustomEvent('tour-hero-overlay', { detail: on }));
+
+    if (on) {
+      // CSS shield → transparent via the source of truth (so useMedianStatusBar
+      // foreground/visibility re-applies pick up 'transparent', not '#F8FAFC').
+      applyShieldColor('transparent');
+      // Native Median status bar → transparent overlay with light glyphs for the
+      // dark cinematic hero. Restoration happens when immersiveStatusBar flips
+      // false and PageRoot's useMedianStatusBar re-fires.
+      try {
+        (window as any).median?.statusbar?.set({
+          style: 'dark',
+          color: '00000000',
+          overlay: true,
+          blur: false,
+        });
+      } catch {}
+    }
+
     return () => {
       document.documentElement.style.setProperty('--tour-hero-overlay', '0');
       window.dispatchEvent(new CustomEvent('tour-hero-overlay', { detail: false }));
@@ -127,7 +146,7 @@ export function TourHubMainPage() {
 
   return (
     <TourSelectionProvider>
-      <TourHubShell showBack={false}>
+      <TourHubShell showBack={false} immersiveStatusBar={overlay}>
         <ShellSlot>
           <TourHubShellTabs overlay={overlay} />
           {renderShellRow()}
