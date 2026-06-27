@@ -120,6 +120,7 @@ export function Composer({
   const isEditMode = !!editPostId;
   const isDraftMode = !!draftId;
   const { activeActor, availableActors, setActiveActor } = useActiveActor();
+  const queryClient = useQueryClient();
   const fileRef = useRef<HTMLInputElement>(null);
 
   const [caption, setCaption] = useState('');
