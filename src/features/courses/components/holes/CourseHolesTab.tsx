@@ -4,7 +4,7 @@ import { useCourseMeta } from '@/hooks/gam/useCourseMeta';
 import { HolesCredibilityHeader } from './HolesCredibilityHeader';
 import { HoleFeatureCards } from './HoleFeatureCards';
 import { HoleRow } from './HoleRow';
-import { HolesScoringKey } from './HolesScoringKey';
+
 import { HolesEmptyState } from './HolesEmptyState';
 import { FONT, INK, SC_ACCENT } from './_constants';
 import { HAIRLINE_INK_8, INK_MUTE, SURFACE } from '@/features/courses/_shared/tokens';
@@ -143,7 +143,7 @@ export const CourseHolesTab: React.FC<Props> = ({ courseId }) => {
           isEasiest={h.hole_no === easiest?.hole_no}
         />
       ))}
-      <HolesScoringKey />
+      
     </div>
   );
 };
