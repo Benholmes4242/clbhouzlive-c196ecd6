@@ -3,15 +3,14 @@
  */
 
 import { useState, useMemo } from 'react';
-import { Link } from 'react-router-dom';
 import { Search, X } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import CountryFlag from '@/components/ui/country-flag';
 import { formatThruDisplay } from '../../utils/formatThruDisplay';
-import { playerRoute } from '../../routes';
 import { GOLD_DEEP, HAIRLINE_INK_12, INK, INK_FAINT, INK_LIGHT, INK_MUTE, INK_TINT_02, INK_TINT_05, INK_TINT_07, LEADER_GOLD_TINT_10, SCORE_UNDER_PAR_LIGHT, STATUS_LIVE, STATUS_LIVE_TINT_10, SURFACE } from '../../_shared/tokens';
 import { roundStarted } from '../../_shared/roundState';
+import { PlayerScorecardSheet } from './PlayerScorecardSheet';
 
 interface RawRoundData {
   thru?: number;
@@ -55,11 +54,13 @@ function getLiveRoundData(entry: FullLeaderboardEntry, roundNum: number): { scor
 interface FullLeaderboardProps {
   entries: FullLeaderboardEntry[];
   headshotMap?: Map<string, string>;
+  tournamentId?: string;
   tournamentStatus?: string;
   tournamentTimezone?: string | null;
   tournamentName?: string;
   venuePar?: number | null;
-  onPlayerTap?: () => void;
+  currentRound?: number | null;
+  onPlayerTap?: (entry: FullLeaderboardEntry) => void;
   searchQuery?: string;
   onSearchChange?: (q: string) => void;
   hideSearchInput?: boolean;
@@ -99,10 +100,12 @@ const rowVariants = {
 export function FullLeaderboard({
   entries,
   headshotMap,
+  tournamentId,
   tournamentStatus,
   tournamentTimezone,
   tournamentName,
   venuePar,
+  currentRound,
   onPlayerTap,
   searchQuery: searchQueryProp,
   onSearchChange,
@@ -111,8 +114,10 @@ export function FullLeaderboard({
   // null = overall sort; 1-4 = sort by that round's score
   const [sortRound, setSortRound] = useState<number | null>(null);
   const [localQuery, setLocalQuery] = useState('');
+  const [scorecardEntry, setScorecardEntry] = useState<FullLeaderboardEntry | null>(null);
   const searchQuery = searchQueryProp ?? localQuery;
   const setSearchQuery = onSearchChange ?? setLocalQuery;
+  const handlePlayerTap = onPlayerTap ?? ((entry: FullLeaderboardEntry) => setScorecardEntry(entry));
 
   const filteredEntries = useMemo(() => {
     if (!searchQuery.trim()) return entries;
@@ -234,17 +239,20 @@ export function FullLeaderboard({
 
           return (
             <motion.div key={entry.id} custom={index} variants={rowVariants} initial="hidden" animate="visible">
-              <Link
-                {...playerRoute(entry.player?.id ?? '', tournamentName ? { kind: 'tournament', tournamentName } : undefined)}
-                onClick={onPlayerTap}
+              <button
+                type="button"
+                onClick={() => handlePlayerTap(entry)}
                 aria-label={`Position ${entry.position_tied ? `T${entry.position}` : entry.position}, ${entry.player?.full_name || 'Unknown'}`}
                 style={{
+                  width: '100%',
                   display: 'flex', alignItems: 'center', gap: '3px',
                   padding: '13px 16px',
                   borderBottom: `0.5px solid ${INK_TINT_07}`,
                   background: entry.position === 1 && !isMissedCut && !isWD ? STATUS_LIVE_TINT_10 : 'transparent',
                   opacity: isWD ? 0.4 : isMissedCut ? 0.55 : 1,
-                  textDecoration: 'none',
+                  textAlign: 'left' as const,
+                  border: 'none',
+                  cursor: 'pointer',
                 }}
                 className="active:bg-black/[0.02] transition-colors"
               >
@@ -293,7 +301,7 @@ export function FullLeaderboard({
                     return <span style={{ fontSize: '9.5px', color: INK }}>—</span>;
                   })()}
                 </div>
-              </Link>
+              </button>
 
               {showCutLine && (
                 <div style={{ display: 'flex', alignItems: 'center', gap: '12px', padding: '6px 20px', background: INK_TINT_02, borderBottom: `0.5px solid ${INK_TINT_07}` }}>
@@ -314,6 +322,26 @@ export function FullLeaderboard({
           {searchQuery && ` matching "${searchQuery}"`}
         </span>
       </div>
+
+      {/* Default scorecard sheet (only renders when consumer didn't supply onPlayerTap) */}
+      {scorecardEntry && tournamentId && (
+        <PlayerScorecardSheet
+          open={!!scorecardEntry}
+          onClose={() => setScorecardEntry(null)}
+          tournamentId={tournamentId}
+          tournamentStatus={tournamentStatus}
+          tournamentName={tournamentName}
+          currentRound={currentRound ?? null}
+          player={{
+            id: scorecardEntry.player?.id ?? scorecardEntry.id,
+            name: scorecardEntry.player?.full_name ?? 'Player',
+            countryCode: scorecardEntry.player?.country_code ?? scorecardEntry.player?.country ?? null,
+            position: scorecardEntry.position,
+            positionTied: scorecardEntry.position_tied,
+            totalScore: scorecardEntry.score,
+          }}
+        />
+      )}
     </motion.div>
   );
 }

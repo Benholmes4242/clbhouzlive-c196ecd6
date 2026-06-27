@@ -226,11 +226,12 @@ export function TournamentDetailPage() {
           <FullLeaderboard
             entries={leaderboard}
             headshotMap={headshotMap}
+            tournamentId={tournamentId}
             tournamentStatus={tournament.status}
             tournamentTimezone={tournament.timezone}
             tournamentName={tournament.name}
             venuePar={tournament.venue_par}
-            onPlayerTap={() => {}}
+            currentRound={(tournament as any).current_round ?? null}
           />
         );
       

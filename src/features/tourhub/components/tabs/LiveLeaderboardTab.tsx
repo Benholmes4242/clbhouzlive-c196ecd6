@@ -241,9 +241,11 @@ export function LiveLeaderboardTab() {
       ) : (
         <FullLeaderboard
           entries={(leaderboard ?? []) as any}
+          tournamentId={selected.id}
           tournamentStatus={selected.status}
           tournamentName={selected.name}
           venuePar={selected.venue_par}
+          currentRound={(selected as any).current_round ?? null}
           searchQuery={searchQuery}
           onSearchChange={setSearchQuery}
           hideSearchInput
