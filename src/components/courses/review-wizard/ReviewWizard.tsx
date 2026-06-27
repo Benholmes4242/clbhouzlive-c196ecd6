@@ -979,7 +979,7 @@ export function ReviewWizard({
                       )}
                     </div>
 
-                    {/* Media carousel — embedded inside the verdict card */}
+                    {/* Media carousel */}
                     {hasMedia && (
                       <div
                         onClick={(e) => e.stopPropagation()}
