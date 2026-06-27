@@ -1,19 +1,25 @@
 /**
- * Success Screen — Two variants: New Review (auto-shared) & Updated Review
- * Light theme #F8FAFC background with amber hero zone
+ * Success Screen — "Delight" redesign.
  *
- * D31: Auto-share runs in the background (setTimeout in ReviewWizard).
- * No skeleton, no opt-out UI — the success screen renders immediately.
- * D34: handleOptOutShare/onOptOutShare/optedOut/onShareToClubhouse all removed.
- * D35: Secondary CTA renamed to "Done" and wired to onDone.
+ * New-review path: floating score chip with breathing glow, score-adaptive
+ * headline, and rating treatment pulled from the canonical @/lib/ratingTier
+ * tokens so the language matches the Clubhouse review cards exactly
+ * (grey → amber → animated gold shimmer).
+ *
+ * Edit-mode path keeps the before/after card, but reuses the same headline
+ * map so wording is consistent across both flows.
  */
 
 import React, { useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { Check, Eye, Home, X, RotateCw, ArrowRight, Star } from 'lucide-react';
+import { Check, Eye, Home, X, ArrowRight } from 'lucide-react';
 import confetti from 'canvas-confetti';
-import { getScoreTier } from '@/utils/getScoreTier';
-import { VerdictPill } from './VerdictPill';
+import {
+  getRatingTier,
+  getRatingTierLabel,
+  ratingTextColor,
+  HERO_NUMBER_STYLE,
+} from '@/lib/ratingTier';
 import type { ReviewWizardCourse, SuccessVariant } from './types';
 
 interface SuccessScreenProps {
@@ -28,31 +34,48 @@ interface SuccessScreenProps {
   onDone: () => void;
 }
 
+function successHeadline(rating: number | null | undefined): string {
+  if (rating == null) return 'Your verdict is live';
+  const tier = getRatingTier(rating);
+  switch (tier) {
+    case 'EXCEPTIONAL': return 'Top marks';
+    case 'EXCELLENT':   return 'High praise';
+    case 'GOOD':        return 'A solid verdict';
+    case 'FAIR':        return 'A fair shout';
+    case 'POOR':        return 'An honest call';
+    default:            return 'Your verdict is live';
+  }
+}
+
+const fmtScore = (r: number) => (r === 10 ? '10' : r.toFixed(1));
+
 export function SuccessScreen({
-  variant,
   course,
-  ratingId,
   rating,
   isEditMode = false,
   previousRating,
-  postId,
   onViewReview,
   onDone,
 }: SuccessScreenProps) {
-  const tierData = rating ? getScoreTier(rating) : null;
-
-  // Confetti on mount
-  useEffect(() => {
-    confetti({
-      particleCount: 60,
-      spread: 60,
-      origin: { y: 0.6 },
-      colors: ['#F7931E', '#FBBC2E', '#ffffff', '#d97706'],
-    });
-  }, []);
-
   const courseName = course?.name || 'the course';
   const isNewReview = !isEditMode;
+
+  const tier = getRatingTier(rating);
+  const isExceptional = tier === 'EXCEPTIONAL';
+  const ratingColor = ratingTextColor(rating);
+  const tierLabel = rating != null ? getRatingTierLabel(rating) : null;
+
+  // Confetti — tinted gold for Exceptional, otherwise amber/white.
+  useEffect(() => {
+    confetti({
+      particleCount: isExceptional ? 90 : 60,
+      spread: isExceptional ? 75 : 60,
+      origin: { y: 0.6 },
+      colors: isExceptional
+        ? ['#FFC23D', '#F0A500', '#FFE08A', '#ffffff']
+        : ['#F7931E', '#FBBC2E', '#ffffff', '#d97706'],
+    });
+  }, [isExceptional]);
 
   return (
     <motion.div
@@ -60,18 +83,8 @@ export function SuccessScreen({
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
       className="fixed inset-0 z-[9999] flex flex-col"
-      style={{ background: '#F8FAFC' }}
+      style={{ background: 'linear-gradient(180deg, #fffaf3 0%, #F8FAFC 40%)' }}
     >
-      {/* Amber gradient that extends into the notch/safe area */}
-      <div
-        className="absolute inset-x-0 top-0"
-        style={{
-          height: 'calc(max(env(safe-area-inset-top, 0px), 47px) + 180px)',
-          background: 'linear-gradient(180deg, rgba(247,147,30,0.07) 0%, rgba(248,250,252,0) 100%)',
-          pointerEvents: 'none',
-        }}
-      />
-
       {/* Safe area spacer */}
       <div style={{ paddingTop: 'max(env(safe-area-inset-top, 0px), 47px)', flexShrink: 0 }} />
 
@@ -94,133 +107,185 @@ export function SuccessScreen({
 
       {/* Scrollable content */}
       <div className="flex-1 flex flex-col items-center overflow-y-auto" style={{ padding: '0 20px' }}>
-        {/* Hero zone */}
+        {/* Hero zone — chip + breathing glow */}
         <div
           className="relative flex items-center justify-center flex-shrink-0"
-          style={{ width: '100%', height: 180 }}
+          style={{ width: '100%', height: 210, marginTop: 12 }}
         >
-          <div className="absolute rounded-full" style={{ width: 160, height: 160, border: '1px solid rgba(247,147,30,0.10)' }} />
-          <div className="absolute rounded-full" style={{ width: 120, height: 120, border: '1px solid rgba(247,147,30,0.14)' }} />
-          <motion.div
-            initial={{ scale: 0, opacity: 0 }}
-            animate={{ scale: 1, opacity: 1 }}
-            transition={{ type: 'spring', stiffness: 200, damping: 15, delay: 0.2 }}
-            className="relative flex items-center justify-center rounded-full"
-            style={{ width: 80, height: 80, background: 'rgba(247,147,30,0.12)', border: '1.5px solid rgba(247,147,30,0.28)' }}
-          >
-            {isEditMode ? (
-              <RotateCw className="w-8 h-8" style={{ color: '#F7931E' }} strokeWidth={2.5} />
-            ) : (
-              <Check className="w-8 h-8" style={{ color: '#F7931E' }} strokeWidth={3} />
-            )}
-          </motion.div>
+          {/* Breathing glow behind the chip */}
+          <div
+            className="success-glow"
+            aria-hidden
+            style={{
+              position: 'absolute',
+              left: '50%',
+              top: '50%',
+              width: 280,
+              height: 280,
+              marginTop: -140,
+              transform: 'translateX(-50%)',
+              background: isExceptional
+                ? 'radial-gradient(circle, rgba(255,184,0,0.20), transparent 60%)'
+                : 'radial-gradient(circle, rgba(247,147,30,0.16), transparent 60%)',
+              filter: 'blur(20px)',
+              animation: 'successGlowBreathe 3.6s ease-in-out infinite',
+              pointerEvents: 'none',
+            }}
+          />
+
+          {isEditMode ? (
+            // Edit mode — keep the before/after card style inside a simple chip frame
+            <motion.div
+              initial={{ scale: 0.85, opacity: 0, rotate: -4 }}
+              animate={{ scale: 1, opacity: 1, rotate: 0 }}
+              transition={{ type: 'spring', stiffness: 220, damping: 18, delay: 0.15 }}
+              className="success-chip relative"
+              style={{
+                background: '#fff',
+                borderRadius: 24,
+                padding: '18px 22px',
+                boxShadow: isExceptional
+                  ? '0 20px 50px -16px rgba(255,184,0,0.45), 0 4px 12px rgba(15,23,42,0.06)'
+                  : '0 20px 50px -16px rgba(247,147,30,0.4), 0 4px 12px rgba(15,23,42,0.06)',
+                animation: 'successChipFloat 4.2s ease-in-out infinite',
+              }}
+            >
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 18 }}>
+                <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+                  <span style={{ fontSize: 9, fontWeight: 800, letterSpacing: '0.14em', textTransform: 'uppercase', color: '#94a3b8', marginBottom: 4 }}>
+                    Before
+                  </span>
+                  <span style={{ fontSize: 28, color: '#cbd5e1', ...HERO_NUMBER_STYLE }}>
+                    {previousRating != null ? fmtScore(previousRating) : '—'}
+                  </span>
+                </div>
+                <ArrowRight className="w-5 h-5 flex-shrink-0" style={{ color: ratingColor }} />
+                <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+                  <span style={{ fontSize: 9, fontWeight: 800, letterSpacing: '0.14em', textTransform: 'uppercase', color: '#94a3b8', marginBottom: 4 }}>
+                    Now
+                  </span>
+                  <span
+                    className={isExceptional ? 'clbhouz-gold-shimmer' : undefined}
+                    style={{ fontSize: 36, color: ratingColor, ...HERO_NUMBER_STYLE }}
+                  >
+                    {rating != null ? fmtScore(rating) : '—'}
+                  </span>
+                </div>
+              </div>
+            </motion.div>
+          ) : (
+            <motion.div
+              initial={{ scale: 0, opacity: 0, rotate: -8 }}
+              animate={{ scale: 1, opacity: 1, rotate: 0 }}
+              transition={{ type: 'spring', stiffness: 210, damping: 16, delay: 0.15 }}
+              className="success-chip relative flex flex-col items-center justify-center"
+              style={{
+                width: 130,
+                height: 130,
+                background: '#fff',
+                borderRadius: 40,
+                boxShadow: isExceptional
+                  ? '0 20px 50px -16px rgba(255,184,0,0.45), 0 4px 12px rgba(15,23,42,0.06)'
+                  : '0 20px 50px -16px rgba(247,147,30,0.4), 0 4px 12px rgba(15,23,42,0.06)',
+                animation: 'successChipFloat 4.2s ease-in-out infinite',
+              }}
+            >
+              {rating != null ? (
+                <>
+                  <span
+                    className={isExceptional ? 'clbhouz-gold-shimmer' : undefined}
+                    style={{
+                      fontSize: 50,
+                      color: ratingColor,
+                      lineHeight: 1,
+                      ...HERO_NUMBER_STYLE,
+                    }}
+                  >
+                    {fmtScore(rating)}
+                  </span>
+                  {tierLabel && (
+                    <span
+                      className={isExceptional ? 'clbhouz-gold-shimmer' : undefined}
+                      style={{
+                        marginTop: 8,
+                        fontSize: 10,
+                        fontWeight: 800,
+                        letterSpacing: '0.16em',
+                        textTransform: 'uppercase',
+                        color: ratingColor,
+                      }}
+                    >
+                      {tierLabel}
+                    </span>
+                  )}
+                </>
+              ) : (
+                <span style={{ fontSize: 50, color: '#94a3b8', ...HERO_NUMBER_STYLE }}>—</span>
+              )}
+
+              {/* Check badge */}
+              <motion.div
+                initial={{ scale: 0, opacity: 0 }}
+                animate={{ scale: 1, opacity: 1 }}
+                transition={{ type: 'spring', stiffness: 260, damping: 14, delay: 0.6 }}
+                aria-hidden
+                style={{
+                  position: 'absolute',
+                  top: -6,
+                  right: -6,
+                  width: 30,
+                  height: 30,
+                  borderRadius: '50%',
+                  background: isExceptional ? '#F0A500' : '#F7931E',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  boxShadow: '0 6px 14px rgba(15,23,42,0.18)',
+                  border: '2px solid #fff',
+                }}
+              >
+                <Check className="w-4 h-4" style={{ color: '#fff' }} strokeWidth={3.5} />
+              </motion.div>
+            </motion.div>
+          )}
         </div>
 
-        {/* Eyebrow — D21: unified neutral copy across new + edit */}
-        <motion.p
-          initial={{ opacity: 0, y: 8 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.3 }}
-          style={{
-            fontSize: 8.5,
-            fontWeight: 900,
-            letterSpacing: '0.16em',
-            textTransform: 'uppercase',
-            color: '#F7931E',
-            marginBottom: 8,
-          }}
-        >
-          REVIEW LIVE
-        </motion.p>
-
-        {/* Headline — D21: unified */}
+        {/* Headline */}
         <motion.h2
           initial={{ opacity: 0, y: 8 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.4 }}
           className="success-headline"
-          style={{ fontSize: 28, fontWeight: 800, color: '#0f172a', letterSpacing: '-0.5px', margin: 0 }}
+          style={{
+            fontSize: 28,
+            fontWeight: 800,
+            color: '#0F172A',
+            letterSpacing: '-0.025em',
+            margin: 0,
+            marginTop: 18,
+            textAlign: 'center',
+          }}
         >
-          Your verdict is live
+          {successHeadline(rating)}
         </motion.h2>
 
-        {/* Sub-copy — D21: unified */}
+        {/* Sub-copy */}
         <motion.p
           initial={{ opacity: 0, y: 8 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.5 }}
-          style={{ fontSize: 13, color: '#94a3b8', textAlign: 'center', marginTop: 6, marginBottom: 20, maxWidth: 280 }}
-        >
-          Your take on {courseName} is now in the feed
-        </motion.p>
-
-        {/* Rating card */}
-        <motion.div
-          initial={{ opacity: 0, scale: 0.95 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ delay: 0.55 }}
           style={{
-            background: '#fff',
-            border: '1px solid #e2e8f0',
-            borderRadius: 16,
-            padding: '14px 16px',
-            boxShadow: '0 1px 4px rgba(0,0,0,0.04)',
-            width: '100%',
-            maxWidth: 340,
+            fontSize: 14,
+            color: '#64748B',
+            textAlign: 'center',
+            marginTop: 8,
+            marginBottom: 20,
+            maxWidth: 270,
+            lineHeight: 1.4,
           }}
         >
-          {isEditMode && previousRating != null ? (
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 20 }}>
-              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-                <span style={{ fontSize: 9, fontWeight: 700, letterSpacing: '0.10em', textTransform: 'uppercase', color: '#94a3b8', marginBottom: 4 }}>
-                  BEFORE
-                </span>
-                <span style={{ fontSize: 22, fontWeight: 700, color: '#cbd5e1' }}>
-                  {previousRating === 10 ? '10' : previousRating.toFixed(1)}
-                </span>
-              </div>
-              <ArrowRight className="w-5 h-5 flex-shrink-0" style={{ color: '#F7931E' }} />
-              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-                <span style={{ fontSize: 9, fontWeight: 700, letterSpacing: '0.10em', textTransform: 'uppercase', color: '#94a3b8', marginBottom: 4 }}>
-                  NOW
-                </span>
-                <span style={{ fontSize: 24, fontWeight: 900, color: '#0F172A', fontVariantNumeric: 'tabular-nums' }}>
-                  {rating != null ? (rating === 10 ? '10' : rating.toFixed(1)) : '—'}
-                </span>
-              </div>
-            </div>
-          ) : (
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 8, alignItems: 'center' }}>
-              {rating != null ? (
-                <VerdictPill rating={rating} />
-              ) : (
-                <div style={{ display: 'flex', alignItems: 'baseline', gap: 4 }}>
-                  <Star className="w-4 h-4" style={{ color: '#F7931E', fill: '#F7931E', marginRight: 2, position: 'relative', top: 1 }} />
-                  <span style={{ fontSize: 22, fontWeight: 900, color: '#0F172A', fontVariantNumeric: 'tabular-nums' }}>—</span>
-                  <span style={{ fontSize: 13, color: '#94a3b8' }}>/10</span>
-                </div>
-              )}
-
-              {isNewReview && (
-                <div style={{ display: 'flex', alignItems: 'center', gap: 4, background: '#f0fdf4', border: '1px solid #bbf7d0', borderRadius: 20, padding: '4px 10px' }}>
-                  <Check className="w-3 h-3" style={{ color: '#16a34a' }} strokeWidth={3} />
-                  <span style={{ fontSize: 10, fontWeight: 700, color: '#16a34a' }}>Review saved</span>
-                </div>
-              )}
-            </div>
-          )}
-        </motion.div>
-
-        {isNewReview && (
-          <motion.p
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.65 }}
-            style={{ fontSize: 11, color: '#cbd5e1', marginTop: 8 }}
-          >
-            Shared to your clbhouz feed
-          </motion.p>
-        )}
+          Your verdict on {courseName} is live in the feed.
+        </motion.p>
 
         <div style={{ flex: 1, minHeight: 24 }} />
       </div>
@@ -247,7 +312,6 @@ export function SuccessScreen({
           View my review →
         </button>
 
-        {/* D35: Secondary CTA — "Done" wired to onDone for both new and edit flows */}
         <button
           onClick={onDone}
           className="active:scale-[0.98] transition-transform"
@@ -263,6 +327,17 @@ export function SuccessScreen({
       </motion.div>
 
       <style>{`
+        @keyframes successGlowBreathe {
+          0%, 100% { opacity: 0.6; transform: translateX(-50%) scale(1); }
+          50%      { opacity: 1;   transform: translateX(-50%) scale(1.12); }
+        }
+        @keyframes successChipFloat {
+          0%, 100% { transform: translateY(0); }
+          50%      { transform: translateY(-6px); }
+        }
+        @media (prefers-reduced-motion: reduce) {
+          .success-glow, .success-chip { animation: none !important; }
+        }
         @media (max-width: 375px) {
           .success-headline { font-size: 24px !important; }
         }
