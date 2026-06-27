@@ -172,7 +172,9 @@ export const TourHubShellTabs: React.FC<TourHubShellTabsProps> = ({ overlay = fa
               bottom: 0,
               width: 34,
               pointerEvents: 'none',
-              background: 'linear-gradient(to right, rgba(248,250,252,0), #F8FAFC)',
+              background: overlay
+                ? 'linear-gradient(to right, rgba(15,23,42,0), rgba(15,23,42,0.001))'
+                : 'linear-gradient(to right, rgba(248,250,252,0), #F8FAFC)',
             }}
           />
         )}
