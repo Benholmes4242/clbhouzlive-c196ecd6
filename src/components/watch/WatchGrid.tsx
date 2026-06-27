@@ -15,9 +15,9 @@ interface WatchGridProps {
   refetch?: () => void;
   gridRef: React.RefObject<HTMLDivElement>;
   userId?: string;
-  emptyEmoji?: string;
   emptyTitle?: string;
   emptyMessage?: string;
+  emptyAction?: { label: string; onClick: () => void; icon?: 'clear' | 'back' };
 }
 
 const GAP = 1;
