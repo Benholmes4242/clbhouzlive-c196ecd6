@@ -624,20 +624,8 @@ async function checkAndTriggerRoundComplete(
   const ratio = finished.length / entries.length;
   if (ratio < 0.8) return false;
 
-  const { data: roundCheck } = await supabase
-    .from('sr_leaderboards')
-    .select('round_1, round_2, round_3, round_4')
-    .eq('tournament_id', tournamentId)
-    .not('status', 'in', '("cut","wd","dq","dns")')
-    .limit(5);
-
-  let currentRound = 1;
-  if (roundCheck?.length) {
-    const sample = roundCheck[0];
-    if (sample.round_4 != null) currentRound = 4;
-    else if (sample.round_3 != null) currentRound = 3;
-    else if (sample.round_2 != null) currentRound = 2;
-  }
+  // Active round — single source of truth (no per-call ladder, no LIMIT 5 sample).
+  const { round: currentRound } = await getActiveRound(supabase, tournamentId);
 
   const { data: existing } = await supabase
     .from('sr_sync_log')
