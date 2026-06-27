@@ -74,7 +74,7 @@ export default function UnifiedWatchFeed({ embedded = false }: UnifiedWatchFeedP
       <div style={{ paddingBottom: 24 }}>
         <WatchSectionHeader
           title="Clips to explore"
-          paddingTop={6}
+          paddingTop={16}
         />
         {/* ── Mood pills — pulled up tight under the title, sitting close to the grid ── */}
         <div style={{ paddingTop: 0, paddingBottom: 2, marginTop: -6 }}>
