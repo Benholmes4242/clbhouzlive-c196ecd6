@@ -358,12 +358,12 @@ function GlobalSearchOverlay({ isOpen, onClose }: GlobalSearchOverlayProps) {
               )}
             </div>
 
-            {/* Cancel button — brand amber */}
+            {/* Cancel button — matches Clear all / See all CTAs (ink, bold) */}
             <button
               type="button"
               onClick={handleClose}
-              className="shrink-0 text-[14px] font-semibold min-h-[44px] px-1"
-              style={{ color: AMBER }}
+              className="shrink-0 text-[14px] font-extrabold min-h-[44px] px-1"
+              style={{ color: INK }}
             >
               Cancel
             </button>
