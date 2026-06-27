@@ -64,22 +64,24 @@ const WatchTile: React.FC<WatchTileProps> = ({ post, index, allPosts }) => {
       />
 
       {/* Like — top-right */}
-      <div
-        className="absolute flex items-center"
-        style={{
-          top: 7,
-          right: 7,
-          gap: 3,
-          color: '#fff',
-          textShadow: '0 1px 3px rgba(0,0,0,0.6)',
-          pointerEvents: 'none',
-        }}
-      >
-        <Heart size={12} strokeWidth={0} style={{ color: '#fff', fill: '#fff' }} />
-        <span style={{ fontSize: 10.5, fontWeight: 700, fontVariantNumeric: 'tabular-nums' }}>
-          {abbreviateCount(likeCount)}
-        </span>
-      </div>
+      {likeCount > 0 && (
+        <div
+          className="absolute flex items-center"
+          style={{
+            top: 7,
+            right: 7,
+            gap: 3,
+            color: '#fff',
+            textShadow: '0 1px 3px rgba(0,0,0,0.6)',
+            pointerEvents: 'none',
+          }}
+        >
+          <Heart size={12} strokeWidth={0} style={{ color: '#F7931E', fill: '#F7931E' }} />
+          <span style={{ fontSize: 10.5, fontWeight: 700, fontVariantNumeric: 'tabular-nums' }}>
+            {abbreviateCount(likeCount)}
+          </span>
+        </div>
+      )}
 
       {/* Creator — bottom-left */}
       <div
