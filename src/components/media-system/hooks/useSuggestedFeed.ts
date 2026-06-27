@@ -54,6 +54,19 @@ export function useSuggestedFeed(userId: string | undefined) {
 
       const posts = groupMultiMedia(rows.map(mapRowToFeedPost), { portraitOnly: false });
 
+      // [DEBUG_ACTOR] audit instrumentation — feed assembled for actor
+      const DEBUG_ACTOR = true;
+      if (DEBUG_ACTOR) {
+        const first = posts[0];
+        // eslint-disable-next-line no-console
+        console.log('[suggested-feed]', {
+          viewer: `${activeActor?.type ?? 'personal'}:${activeActor?.id ?? userId}`,
+          firstPostId: first?.id,
+          firstLiked: first?.isLikedByMe,
+          count: posts.length,
+        });
+      }
+
       // Track ALL fetched post IDs — including ones filtered out —
       // so the RPC doesn't waste candidate slots returning them again
       for (const post of posts) {
@@ -64,6 +77,7 @@ export function useSuggestedFeed(userId: string | undefined) {
         const arr = Array.from(seenPostIds.current);
         seenPostIds.current = new Set(arr.slice(-500));
       }
+
 
       // Cursor advances based on raw rows (not filtered output) so we don't
       // stop prematurely when the client-side filter is aggressive. The RPC
