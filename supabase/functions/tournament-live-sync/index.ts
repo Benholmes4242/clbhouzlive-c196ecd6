@@ -821,20 +821,6 @@ async function fetchSportradar(url: string, apiKey: string, description: string)
 interface LeaderboardSyncResult {
   records: number;
   sportradarStatus?: string;
-  currentRound?: number;
-}
-
-function inferMaxRoundFromLeaderboard(leaderboard: any[]): number {
-  let max = 0;
-  for (const entry of leaderboard) {
-    const rounds = entry?.rounds || entry?.player?.rounds || [];
-    for (const r of rounds) {
-      const seq = typeof r?.sequence === 'number' ? r.sequence : 0;
-      const hasScore = r?.score != null || r?.strokes != null;
-      if (hasScore && seq > max) max = seq;
-    }
-  }
-  return max;
 }
 
 async function syncLeaderboard(
@@ -848,34 +834,13 @@ async function syncLeaderboard(
   const sportradarStatus = data.status || data.tournament?.status;
   const leaderboard = data.leaderboard || [];
 
-  // Extract current round from Sportradar response
-  // Sportradar's leaderboard endpoint returns `round` as one-indexed (1=R1, 2=R2, etc.).
-  const rawRound =
-    typeof data.round === 'number' ? data.round :
-    typeof data.current_round === 'number' ? data.current_round :
-    undefined;
-  let currentRound: number | undefined = rawRound;
-
-  // Venue-timezone date-math fallback when Sportradar omits the round
-  if (currentRound === undefined && tournament.start_date && tournament.timezone) {
-    try {
-      const todayAtVenue = new Date().toLocaleDateString('en-CA', { timeZone: tournament.timezone });
-      const start = new Date(tournament.start_date + 'T00:00:00Z');
-      const today = new Date(todayAtVenue + 'T00:00:00Z');
-      const daysSinceStart = Math.floor((today.getTime() - start.getTime()) / 86_400_000);
-
-      if (daysSinceStart >= 0) {
-        const maxObservedRound = inferMaxRoundFromLeaderboard(leaderboard);
-        const cap = maxObservedRound > 0 ? Math.max(maxObservedRound, daysSinceStart + 1) : 4;
-        currentRound = Math.min(daysSinceStart + 1, cap);
-        console.log(`[LiveSync] Fallback round for ${tournament.name}: R${currentRound} (day ${daysSinceStart + 1} venue-local in ${tournament.timezone})`);
-      }
-    } catch (err) {
-      console.warn(`[LiveSync] Round fallback failed for ${tournament.name}:`, err);
-    }
-  }
+  // Active round is computed by getActiveRound() AFTER this upsert finishes —
+  // it reads the freshly-written sr_leaderboards rows. We don't compute or
+  // return a round here anymore; that prevents fallback-overrides-leaderboard
+  // bugs (the Italian Open regression).
 
   let records = 0;
+
 
   for (const entry of leaderboard) {
     const isTeamEntry = Array.isArray(entry.players) && entry.players.length > 0;
