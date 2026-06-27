@@ -165,7 +165,7 @@ export function SuccessScreen({
                     Now
                   </span>
                   <span
-                    className={isExceptional ? 'clbhouz-gold-shimmer' : undefined}
+                    className={isExceptional ? 'clbhouz-gold-shimmer-light' : undefined}
                     style={{ fontSize: 36, color: ratingColor, ...HERO_NUMBER_STYLE }}
                   >
                     {rating != null ? fmtScore(rating) : '—'}
@@ -193,7 +193,7 @@ export function SuccessScreen({
               {rating != null ? (
                 <>
                   <span
-                    className={isExceptional ? 'clbhouz-gold-shimmer' : undefined}
+                    className={isExceptional ? 'clbhouz-gold-shimmer-light' : undefined}
                     style={{
                       fontSize: 50,
                       color: ratingColor,
@@ -205,7 +205,7 @@ export function SuccessScreen({
                   </span>
                   {tierLabel && (
                     <span
-                      className={isExceptional ? 'clbhouz-gold-shimmer' : undefined}
+                      className={isExceptional ? 'clbhouz-gold-shimmer-light' : undefined}
                       style={{
                         marginTop: 8,
                         fontSize: 10,
