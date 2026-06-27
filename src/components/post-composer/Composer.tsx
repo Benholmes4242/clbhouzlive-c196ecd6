@@ -1384,6 +1384,7 @@ export function Composer({
                 </div>
                 <div style={{ fontSize: 11, color: '#94A3B8', marginTop: 2 }}>{sub}</div>
               </div>
+              {isSelected && <SelectedDot />}
             </button>
           );
         })}
