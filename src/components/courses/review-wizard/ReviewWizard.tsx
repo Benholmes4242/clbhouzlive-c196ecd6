@@ -980,7 +980,7 @@ export function ReviewWizard({
 
                     {/* Media carousel */}
                     {hasMedia && (
-                      <div style={{ padding: '4px 0 14px' }}>
+                      <div style={{ padding: '16px 0 14px' }}>
                         <div
                           style={{
                             display: 'flex',
@@ -1011,26 +1011,6 @@ export function ReviewWizard({
                             />
                           ))}
                         </div>
-                        {wizard.allMedia.length < 10 && (
-                          <div style={{ padding: `10px ${PAD_X} 0` }}>
-                            <button
-                              onClick={() => fileRef.current?.click()}
-                              style={{
-                                width: '100%',
-                                padding: '11px 0',
-                                borderRadius: 12,
-                                border: '1px dashed rgba(15,23,42,0.18)',
-                                background: 'transparent',
-                                fontSize: 13,
-                                fontWeight: 700,
-                                color: INK,
-                                cursor: 'pointer',
-                              }}
-                            >
-                              ＋ Add more
-                            </button>
-                          </div>
-                        )}
                       </div>
                     )}
                     </div>
@@ -1145,8 +1125,8 @@ function MediaTile({
     <div
       style={{
         position: 'relative',
-        flex: '0 0 min(200px, 42vw)',
-        width: 'min(200px, 42vw)',
+        flex: `0 0 ${TILE}px`,
+        width: TILE,
         height: TILE,
         scrollSnapAlign: 'start',
       }}
