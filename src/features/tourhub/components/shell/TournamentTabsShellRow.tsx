@@ -19,8 +19,6 @@ const TABS: TabDef[] = [
 interface Props {
   activeTab: TournamentTab;
   onChange: (tab: TournamentTab) => void;
-  /** Transparent variant for floating over a full-bleed hero. White tabs + subtle scrim. */
-  overlay?: boolean;
 }
 
 function TournamentTabsShellRowInner({ activeTab, onChange, overlay = false }: Props) {
