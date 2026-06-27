@@ -1,5 +1,5 @@
 import { memo } from 'react';
-import { SectionHeader } from '../proshop/SectionHeader';
+import SectionHeader from '@/components/ui/SectionHeader';
 import { HRail } from '../proshop/HRail';
 import WatchTile from '../WatchTile';
 import { useQuickClipsRail } from './hooks/useQuickClipsRail';
@@ -23,7 +23,7 @@ function VideosQuickClipsRailInner({ userId }: VideosQuickClipsRailProps) {
 
   return (
     <section>
-      <SectionHeader paddingTop={8} title="Quick clips" sub="Short and sweet" />
+      <SectionHeader tier="rail" title="Quick clips" paddingTop={8} paddingX={16} />
       <HRail paddingBottom={20}>
         {posts.map((post, i) => (
           <div
