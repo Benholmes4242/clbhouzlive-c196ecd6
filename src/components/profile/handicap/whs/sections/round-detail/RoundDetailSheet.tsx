@@ -193,12 +193,6 @@ export const RoundDetailSheet: React.FC<Props> = ({ open, onClose, scoreId, hand
   const isComplete = holesPlayed >= totalHolesExpected;
   const roundRel = hasHoles && holesPlayed > 0 ? totalStrokes - totalPar : null;
 
-  // Legend Ace/Albatross detection
-  const hasAce = sortedHoles.some((h) => strokesOf(h) === 1);
-  const hasAlbatross = sortedHoles.some((h) => {
-    const s = strokesOf(h);
-    return s != null && h.par != null && (s - h.par) <= -3 && s !== 1;
-  });
 
   const dateEyebrow = fmtDateEyebrow(userData?.play_date);
   const courseName = userData?.course?.name ?? 'Unknown course';
@@ -309,28 +303,6 @@ export const RoundDetailSheet: React.FC<Props> = ({ open, onClose, scoreId, hand
             </div>
           )}
 
-          {/* Legend — conditional Ace/Albatross */}
-          {hasHoles && (() => {
-            const keyItems: Array<[string, number, number]> = [
-              ...(hasAce ? [['Ace', 1, 4] as [string, number, number]] : []),
-              ...(hasAlbatross ? [['Albatross', 2, 5] as [string, number, number]] : []),
-              ['Eagle',  2, 4],
-              ['Birdie', 3, 4],
-              ['Par',    4, 4],
-              ['Bogey',  5, 4],
-              ['Dbl+',   6, 4],
-            ];
-            return (
-              <div style={{ display: 'flex', justifyContent: 'center', gap: 14, padding: '4px 18px 14px', flexWrap: 'wrap' }}>
-                {keyItems.map(([lbl, strokes, par]) => (
-                  <div key={lbl} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4 }}>
-                    <ScoreMark strokes={strokes} par={par} size={22} fontFamily={GEIST} />
-                    <span style={{ fontSize: 10, fontWeight: 600, color: INK_MUTE, textAlign: 'center', fontFamily: GEIST }}>{lbl}</span>
-                  </div>
-                ))}
-              </div>
-            );
-          })()}
 
           {/* Footer — index movement + Open in MyEG */}
           <div style={{
