@@ -123,6 +123,21 @@ body.lightbox-open {
   }
 }
 
+/* ===== Gold shimmer — LIGHT-SURFACE variant (success screen, light cards) ===== */
+.clbhouz-gold-shimmer-light {
+  background-image:
+    linear-gradient(110deg, #C77A0A 18%, #E89A1E 38%, #F5B43C 50%, #E89A1E 62%, #C77A0A 82%);
+  background-size: 200% auto;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  -webkit-text-fill-color: transparent;
+  animation: clbhouzGoldShimmer 6s linear infinite;
+}
+@media (prefers-reduced-motion: reduce) {
+  .clbhouz-gold-shimmer-light { animation: none !important; }
+}
+
 
 html.lightbox-open {
   overflow: hidden;
