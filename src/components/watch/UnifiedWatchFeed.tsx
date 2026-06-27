@@ -5,7 +5,7 @@ import TrendingThisWeek from './TrendingThisWeek';
 import LatestVideosRail from './LatestVideosRail';
 import WatchAutoplay from './WatchAutoplay';
 import WatchGrid from './WatchGrid';
-import WatchSectionHeader from './WatchSectionHeader';
+import { SectionHeader } from '@/components/ui/SectionHeader';
 // WatchSectionDivider removed in Phase 4 — kicker + h1 already separate
 // sections clearly; dividers fragmented the surface visually.
 
