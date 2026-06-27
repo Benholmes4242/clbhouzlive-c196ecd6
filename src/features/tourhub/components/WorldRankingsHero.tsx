@@ -854,7 +854,7 @@ export const WorldRankingsHero = memo(function WorldRankingsHero() {
           letterSpacing: '-0.005em',
           lineHeight: 1.25,
         }}>
-          {yearInWords(new Date().getFullYear())} Season
+          {new Date().getFullYear()} Season
         </div>
       </div>
 
