@@ -300,7 +300,7 @@ const CompactHeader: React.FC<CompactHeaderProps> = ({ className }) => {
         {/* Content wrapper - always 55px, positioned below safe area on Clubhouse */}
         <div 
           className="mx-auto flex items-center justify-between px-3 sm:px-4 max-w-5xl"
-          style={{ height: `${contentHeight}px` }}
+          style={{ height: `${contentHeight}px`, position: 'relative', zIndex: 1 }}
         >
           {/* Left section: Back Button or Logo (fixed width, 44px tap target) */}
           <div className="flex-shrink-0">
