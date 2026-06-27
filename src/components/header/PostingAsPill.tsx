@@ -195,7 +195,7 @@ export const PostingAsPill = forwardRef<HTMLButtonElement, PostingAsPillProps>(
               src={activeActor.avatarUrl}
               alt={activeActor.name}
               userId={activeActor.id}
-              hideRing
+              hairlineRing
             />
           </span>
           
