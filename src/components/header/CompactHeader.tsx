@@ -267,20 +267,36 @@ const CompactHeader: React.FC<CompactHeaderProps> = ({ className }) => {
         )}
         style={{
           top: 0,
-          background: useDarkChrome ? '#0A0E14' : 'hsl(var(--background))',
-          backdropFilter: useDarkChrome ? 'none' : 'blur(20px)',
-          WebkitBackdropFilter: useDarkChrome ? 'none' : 'blur(20px)',
+          background: overlayActive
+            ? 'transparent'
+            : (useDarkChrome ? '#0A0E14' : 'hsl(var(--background))'),
+          backdropFilter: overlayActive ? 'none' : (useDarkChrome ? 'none' : 'blur(20px)'),
+          WebkitBackdropFilter: overlayActive ? 'none' : (useDarkChrome ? 'none' : 'blur(20px)'),
           height: `calc(${contentHeight}px + var(--sat, 0px))`,
           paddingTop: 'var(--sat, 0px)',
-          borderBottom: useDarkChrome
-            ? '1px solid rgba(255,255,255,0.06)'
-            : '0.5px solid rgba(15,23,42,0.07)',
-          boxShadow: !useDarkChrome && scrolled
+          borderBottom: overlayActive
+            ? 'none'
+            : (useDarkChrome
+                ? '1px solid rgba(255,255,255,0.06)'
+                : '0.5px solid rgba(15,23,42,0.07)'),
+          boxShadow: !useDarkChrome && !overlayActive && scrolled
             ? '0 6px 16px -6px rgba(15,23,42,0.18)'
             : 'none',
-          transition: 'box-shadow 200ms ease',
+          transition: 'box-shadow 200ms ease, background 200ms ease',
         }}
       >
+        {/* Scrim for legibility over the cinematic hero photo */}
+        {overlayActive && (
+          <div
+            aria-hidden
+            style={{
+              position: 'absolute',
+              inset: 0,
+              pointerEvents: 'none',
+              background: 'linear-gradient(180deg, rgba(15,23,42,0.45) 0%, rgba(15,23,42,0.18) 60%, rgba(15,23,42,0) 100%)',
+            }}
+          />
+        )}
         {/* Content wrapper - always 55px, positioned below safe area on Clubhouse */}
         <div 
           className="mx-auto flex items-center justify-between px-3 sm:px-4 max-w-5xl"
