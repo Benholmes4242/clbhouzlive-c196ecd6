@@ -1330,7 +1330,7 @@ export function Composer({
                 </div>
                 <div style={{ fontSize: 11, color: '#94A3B8', marginTop: 2 }}>{sub}</div>
               </div>
-              {isSelected && <Check size={18} strokeWidth={2.5} color={AMBER} />}
+              {isSelected && <SelectedDot />}
             </button>
           );
         })}
