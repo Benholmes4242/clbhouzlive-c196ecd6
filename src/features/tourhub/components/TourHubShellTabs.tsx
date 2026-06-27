@@ -5,6 +5,8 @@ import type { TourHubTab } from './types';
 import { TourSwitcherAffordance } from './TourSwitcherAffordance';
 import { useLiveTournaments } from '../hooks/useLiveTournaments';
 import { useTourSelection } from '../context/TourSelectionContext';
+import { useHeroFullBleed } from '../_shared/heroFullBleedSignal';
+import { HeaderAvatarButton } from '@/components/header/HeaderAvatarButton';
 
 type TabId = TourHubTab | 'college';
 
@@ -51,6 +53,10 @@ export const TourHubShellTabs: React.FC<TourHubShellTabsProps> = ({ overlay = fa
   }, []);
 
   const active = computeActiveTab(location.pathname, searchParams);
+  // Immersive surface (cinematic hero overview): persist one-row chrome even
+  // after scroll-to-opaque so we never re-sprout the logo/pill row.
+  const heroFullBleed = useHeroFullBleed();
+  const immersiveSurface = active === 'overview' && heroFullBleed;
 
   const { viewingTourSlug, selectedTourSlug } = useTourSelection();
   const tourSettled = (viewingTourSlug ?? selectedTourSlug) != null;
@@ -96,12 +102,19 @@ export const TourHubShellTabs: React.FC<TourHubShellTabsProps> = ({ overlay = fa
       style={{
         background: overlay ? 'transparent' : '#F8FAFC',
         display: 'flex',
-        alignItems: 'stretch',
+        alignItems: 'center',
+        gap: immersiveSurface ? 11 : 0,
+        paddingLeft: immersiveSurface ? 12 : 0,
         borderBottom: overlay
           ? '0.5px solid rgba(255,255,255,0.18)'
           : '0.5px solid rgba(15,23,42,0.08)',
       }}
     >
+      {immersiveSurface && (
+        <div style={{ flex: '0 0 auto', display: 'flex', alignItems: 'center' }}>
+          <HeaderAvatarButton variant="bare" />
+        </div>
+      )}
       <div style={{ position: 'relative', minWidth: 0, flex: '1 1 auto' }}>
         <div
           ref={scrollerRef}
