@@ -143,7 +143,7 @@ export const StablefordCard: React.FC<Props> = ({ scores, userId, connectionId }
   return (
     <div style={SECTION_STYLE}>
       <CardHeader
-        kicker={headerEyebrow}
+        eyebrow={headerEyebrow}
         title={headerTitle}
         onOpenSheet={() => setSheetOpen(true)}
       />
@@ -213,28 +213,7 @@ const CardHeader: React.FC<CardHeaderProps> = ({ eyebrow, title, onOpenSheet }) 
     <SectionHeader
       kicker={eyebrow}
       title={title}
-      right={
-        <button
-          onClick={onOpenSheet}
-          aria-label="Open Stableford detail sheet"
-          style={{
-            width: 26,
-            height: 26,
-            borderRadius: 999,
-            border: `1px solid ${T.hairline}`,
-            background: 'transparent',
-            color: T.inkMute,
-            cursor: 'pointer',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            padding: 0,
-            flexShrink: 0,
-          }}
-        >
-          <Info size={13} strokeWidth={2.2} />
-        </button>
-      }
+      action={{ label: 'Info', onClick: onOpenSheet }}
     />
   </div>
 );
