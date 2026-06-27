@@ -5,10 +5,11 @@ import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { Pin } from '../proshop/Pin';
 import type { FeedPost } from '@/components/media-system/types/media';
 
-interface VideoLargeCardProps {
+interface VideoHeroCardProps {
   post: FeedPost;
   index: number;
   allPosts: FeedPost[];
+  eyebrow?: string | null;
 }
 
 function formatHMS(seconds: number | null | undefined): string {
@@ -28,19 +29,19 @@ function formatAge(iso: string | null | undefined): string {
   if (!Number.isFinite(then)) return '';
   const diffMs = Date.now() - then;
   const sec = Math.max(1, Math.floor(diffMs / 1000));
-  if (sec < 60) return `${sec} seconds ago`;
+  if (sec < 60) return `${sec}s ago`;
   const min = Math.floor(sec / 60);
-  if (min < 60) return `${min} ${min === 1 ? 'minute' : 'minutes'} ago`;
+  if (min < 60) return `${min}m ago`;
   const hr = Math.floor(min / 60);
-  if (hr < 24) return `${hr} ${hr === 1 ? 'hour' : 'hours'} ago`;
+  if (hr < 24) return `${hr}h ago`;
   const days = Math.floor(hr / 24);
-  if (days < 7) return `${days} ${days === 1 ? 'day' : 'days'} ago`;
+  if (days < 7) return `${days}d ago`;
   const weeks = Math.floor(days / 7);
-  if (weeks < 5) return `${weeks} ${weeks === 1 ? 'week' : 'weeks'} ago`;
+  if (weeks < 5) return `${weeks}w ago`;
   const months = Math.floor(days / 30);
-  if (months < 12) return `${months} ${months === 1 ? 'month' : 'months'} ago`;
+  if (months < 12) return `${months}mo ago`;
   const years = Math.floor(days / 365);
-  return `${years} ${years === 1 ? 'year' : 'years'} ago`;
+  return `${years}y ago`;
 }
 
 function abbreviateCount(n: number): string {
@@ -50,7 +51,7 @@ function abbreviateCount(n: number): string {
   return String(n);
 }
 
-function VideoLargeCardInner({ post, index, allPosts }: VideoLargeCardProps) {
+function VideoHeroCardInner({ post, index, allPosts, eyebrow }: VideoHeroCardProps) {
   const media = post.mediaItems.find((m) => m.type === 'video') ?? post.mediaItems[0];
   const thumb = media?.thumbnailUrl || media?.imageUrl || '';
   const duration = media?.duration ?? 0;
@@ -59,6 +60,7 @@ function VideoLargeCardInner({ post, index, allPosts }: VideoLargeCardProps) {
   const channel = post.displayName || post.username || 'Clbhouz';
   const ageLabel = useMemo(() => formatAge(post.createdAt), [post.createdAt]);
   const courseName = (post as any).courseName as string | undefined;
+  const likeCount = post.likeCount ?? 0;
 
   const handleTap = useCallback(() => {
     useFullscreenFeedStore.getState().open(allPosts, index);
@@ -74,7 +76,7 @@ function VideoLargeCardInner({ post, index, allPosts }: VideoLargeCardProps) {
           position: 'relative',
           width: '100%',
           aspectRatio: '16/9',
-          borderRadius: 6,
+          borderRadius: 8,
           overflow: 'hidden',
           background: 'hsl(var(--muted))',
           border: 'none',
@@ -91,6 +93,15 @@ function VideoLargeCardInner({ post, index, allPosts }: VideoLargeCardProps) {
           />
         ) : null}
 
+        {/* bottom scrim for chip legibility */}
+        <div
+          style={{
+            position: 'absolute',
+            inset: 0,
+            background: 'linear-gradient(to top, rgba(0,0,0,0.55) 0%, rgba(0,0,0,0) 35%)',
+            pointerEvents: 'none',
+          }}
+        />
 
         {courseName ? (
           <div style={{ position: 'absolute', top: 10, left: 10, display: 'flex', gap: 6, maxWidth: 'calc(100% - 110px)', flexWrap: 'wrap' }}>
@@ -108,16 +119,63 @@ function VideoLargeCardInner({ post, index, allPosts }: VideoLargeCardProps) {
           </div>
         ) : null}
 
+        {/* channel chip overlay */}
+        <div
+          style={{
+            position: 'absolute',
+            left: 10,
+            bottom: 10,
+            display: 'inline-flex',
+            alignItems: 'center',
+            gap: 7,
+            padding: '5px 9px 5px 5px',
+            background: 'rgba(0,0,0,0.55)',
+            borderRadius: 999,
+            backdropFilter: 'blur(6px)',
+            maxWidth: 'calc(100% - 20px)',
+          }}
+        >
+          <SquircleAvatar size={22} src={post.avatarUrl} alt={channel} hideRing />
+          <span
+            style={{
+              fontSize: 12,
+              fontWeight: 700,
+              color: '#fff',
+              letterSpacing: '-0.005em',
+              whiteSpace: 'nowrap',
+              overflow: 'hidden',
+              textOverflow: 'ellipsis',
+            }}
+          >
+            {channel}
+          </span>
+        </div>
       </button>
+
+      {eyebrow ? (
+        <div
+          style={{
+            marginTop: 12,
+            padding: '0 2px',
+            fontSize: 10.5,
+            fontWeight: 800,
+            letterSpacing: '0.1em',
+            color: '#F7931E',
+            textTransform: 'uppercase',
+          }}
+        >
+          {eyebrow}
+        </div>
+      ) : null}
 
       <div
         style={{
-          marginTop: 10,
+          marginTop: eyebrow ? 4 : 12,
           padding: '0 2px',
-          fontSize: 15.5,
-          fontWeight: 700,
-          lineHeight: 1.3,
-          letterSpacing: '-0.01em',
+          fontSize: 16.5,
+          fontWeight: 800,
+          lineHeight: 1.25,
+          letterSpacing: '-0.015em',
           color: '#0F172A',
           display: '-webkit-box',
           WebkitLineClamp: 2,
@@ -128,41 +186,32 @@ function VideoLargeCardInner({ post, index, allPosts }: VideoLargeCardProps) {
         {post.caption || `${channel} on Clbhouz`}
       </div>
 
-      <div style={{ marginTop: 8, display: 'flex', alignItems: 'center', gap: 8, minWidth: 0 }}>
-        <SquircleAvatar size={28} src={post.avatarUrl} alt={channel} hideRing />
-        <div
-          style={{
-            flex: 1,
-            minWidth: 0,
-            display: 'flex',
-            alignItems: 'center',
-            gap: 5,
-            fontSize: 12.5,
-            fontWeight: 500,
-            color: '#64748B',
-            whiteSpace: 'nowrap',
-            overflow: 'hidden',
-            textOverflow: 'ellipsis',
-          }}
-        >
-          <span style={{ overflow: 'hidden', textOverflow: 'ellipsis' }}>
-            {channel} · {ageLabel}
-          </span>
-          {(post.likeCount ?? 0) > 0 && (
-            <>
-              <span style={{ flexShrink: 0 }}>·</span>
-              <Heart size={12} strokeWidth={0} style={{ color: '#F7931E', fill: '#F7931E', flexShrink: 0 }} />
-              <span style={{ flexShrink: 0, fontVariantNumeric: 'tabular-nums' }}>
-                {abbreviateCount(post.likeCount ?? 0)}
-              </span>
-            </>
-          )}
-        </div>
+      <div
+        style={{
+          marginTop: 6,
+          padding: '0 2px',
+          display: 'inline-flex',
+          alignItems: 'center',
+          gap: 6,
+          fontSize: 12.5,
+          fontWeight: 500,
+          color: '#64748B',
+        }}
+      >
+        <span>{ageLabel}</span>
+        {likeCount > 0 && (
+          <>
+            <span style={{ flexShrink: 0 }}>·</span>
+            <Heart size={12} strokeWidth={0} style={{ color: '#F7931E', fill: '#F7931E', flexShrink: 0 }} />
+            <span style={{ flexShrink: 0, fontVariantNumeric: 'tabular-nums' }}>
+              {abbreviateCount(likeCount)}
+            </span>
+          </>
+        )}
       </div>
-
     </section>
   );
 }
 
-export const VideoLargeCard = memo(VideoLargeCardInner);
-export default VideoLargeCard;
+export const VideoHeroCard = memo(VideoHeroCardInner);
+export default VideoHeroCard;

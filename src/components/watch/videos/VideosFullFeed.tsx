@@ -4,7 +4,7 @@ import { Loader2 } from 'lucide-react';
 import { useVideosFeed, type VideosFilter } from '@/components/videos-tab/hooks/useVideosFeed';
 import { moodToCategory, type VideosMoodId } from './hooks/useVideosMood';
 import CompactVideoRow from './CompactVideoRow';
-import VideoLargeCard from './VideoLargeCard';
+import VideoHeroCard from './VideoHeroCard';
 import { useVideosFollowingRail } from './hooks/useVideosFollowingRail';
 import { VideosFollowingRail } from './VideosFollowingRail';
 import { VideosSuggestedCreatorsRail } from './VideosSuggestedCreatorsRail';
@@ -18,54 +18,38 @@ interface VideosFullFeedProps {
 }
 
 type Segment =
-  | { kind: 'large'; posts: FeedPost[]; startIndex: number }
-  | { kind: 'list'; posts: FeedPost[]; startIndex: number }
-  | { kind: 'rail' }
-  | { kind: 'clips' };
+  | { kind: 'hero'; post: FeedPost; index: number; chunk: number }
+  | { kind: 'list'; posts: FeedPost[]; startIndex: number; chunk: number }
+  | { kind: 'rail'; chunk: number }
+  | { kind: 'clips'; chunk: number };
 
 /**
- * Rhythm: A=3 large, rail, 5 list, 4 large, 5 list, 5 large, 5 list, then ALL
- * remaining as large cards. Bands grow as you descend; rail appears once.
+ * Repeating three-tier rhythm: HERO → RAIL (alternating creators/clips) → LIST.
+ * Recurs until posts run out so deep scrolling stays varied.
  */
 function buildRhythm(posts: FeedPost[]): Segment[] {
   const seg: Segment[] = [];
   let i = 0;
-  const take = (n: number) => {
-    const start = i;
-    const slice = posts.slice(i, i + n);
-    i += slice.length;
-    return { slice, start };
-  };
+  let chunk = 0;
+  const LIST_N = 5;
 
-  if (i < posts.length) {
-    const { slice, start } = take(3);
-    seg.push({ kind: 'large', posts: slice, startIndex: start });
-  }
-  seg.push({ kind: 'rail' });
-  if (i < posts.length) {
-    const { slice, start } = take(5);
-    seg.push({ kind: 'list', posts: slice, startIndex: start });
-  }
-  seg.push({ kind: 'clips' });
-  if (i < posts.length) {
-    const { slice, start } = take(4);
-    seg.push({ kind: 'large', posts: slice, startIndex: start });
-  }
-  if (i < posts.length) {
-    const { slice, start } = take(5);
-    seg.push({ kind: 'list', posts: slice, startIndex: start });
-  }
-  if (i < posts.length) {
-    const { slice, start } = take(5);
-    seg.push({ kind: 'large', posts: slice, startIndex: start });
-  }
-  if (i < posts.length) {
-    const { slice, start } = take(5);
-    seg.push({ kind: 'list', posts: slice, startIndex: start });
-  }
   while (i < posts.length) {
-    const { slice, start } = take(6);
-    seg.push({ kind: 'large', posts: slice, startIndex: start });
+    seg.push({ kind: 'hero', post: posts[i], index: i, chunk });
+    i += 1;
+    if (i >= posts.length) break;
+
+    if (chunk % 2 === 0) {
+      seg.push({ kind: 'rail', chunk });
+    } else {
+      seg.push({ kind: 'clips', chunk });
+    }
+
+    const start = i;
+    const slice = posts.slice(i, i + LIST_N);
+    i += slice.length;
+    if (slice.length) seg.push({ kind: 'list', posts: slice, startIndex: start, chunk });
+
+    chunk += 1;
   }
   return seg;
 }
@@ -177,21 +161,16 @@ function VideosFullFeedInner({ userId, mood, searchQuery }: VideosFullFeedProps)
                 </div>
               );
             }
-            if (seg.kind === 'large') {
+            if (seg.kind === 'hero') {
+              const eyebrow = seg.chunk === 0 ? 'Featured' : null;
               return (
-                <div
-                  key={`large-${seg.startIndex}`}
-                  style={{ display: 'flex', flexDirection: 'column', gap: 16 }}
-                >
-                  {seg.posts.map((post, i) => (
-                    <VideoLargeCard
-                      key={post.id}
-                      post={post}
-                      index={seg.startIndex + i}
-                      allPosts={posts}
-                    />
-                  ))}
-                </div>
+                <VideoHeroCard
+                  key={`hero-${seg.index}`}
+                  post={seg.post}
+                  index={seg.index}
+                  allPosts={posts}
+                  eyebrow={eyebrow}
+                />
               );
             }
             return (
