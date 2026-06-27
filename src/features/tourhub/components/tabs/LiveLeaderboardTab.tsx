@@ -106,71 +106,61 @@ export function LiveLeaderboardTab() {
     );
   }
 
-  const isLive = selected.status === 'inprogress';
+  const fieldCount = Array.isArray(leaderboard) ? (leaderboard as any[]).length : 0;
 
   return (
     <div style={{ background: SURFACE, minHeight: '60vh' }}>
-      {liveTournaments.length > 1 && (
-        <div
-          role="tablist"
-          aria-label="Live tournaments"
-          style={{
-            display: 'flex',
-            gap: 8,
-            padding: '12px 16px',
-            overflowX: 'auto',
-            overflowY: 'hidden',
-            WebkitOverflowScrolling: 'touch',
-            scrollbarWidth: 'none',
-            background: SLATE_50,
-            borderBottom: `0.5px solid ${INK_TINT_07}`,
-          }}
-        >
-          {liveTournaments.map((t) => {
-            const isActive = t.id === selected.id;
-            return (
-              <button
-                key={t.id}
-                role="tab"
-                aria-selected={isActive}
-                onClick={() => setSelectedId(t.id)}
-                style={{
-                  flex: '0 0 auto',
-                  height: 30,
-                  padding: '0 11px',
-                  borderRadius: 15,
-                  background: isActive ? INK_TINT_06 : 'transparent',
-                  border: `1px solid ${isActive ? 'rgba(15,23,42,0.20)' : INK_TINT_07}`,
-                  color: isActive ? INK : INK_MUTE,
-                  fontFamily: 'Geist, system-ui, -apple-system, BlinkMacSystemFont, sans-serif',
-                  fontSize: 12,
-                  fontWeight: isActive ? 700 : 600,
-                  letterSpacing: '-0.005em',
-                  whiteSpace: 'nowrap',
-                  cursor: 'pointer',
-                  display: 'inline-flex',
-                  alignItems: 'center',
-                  gap: 6,
-                }}
-              >
-                {t.status === 'inprogress' && (
-                  <span
-                    aria-hidden
-                    style={{
-                      width: 6,
-                      height: 6,
-                      borderRadius: '50%',
-                      background: STATUS_LIVE,
-                      boxShadow: isActive ? '0 0 0 2px rgba(16,185,129,0.30)' : 'none',
-                    }}
-                  />
-                )}
-                {pillLabel(t)}
-              </button>
-            );
-          })}
+      {/* Tour selector + search — single row */}
+      <div style={{
+        display: 'flex', alignItems: 'center', gap: 10,
+        padding: '12px 16px', background: '#FFFFFF',
+        borderBottom: `0.5px solid ${INK_TINT_07}`,
+      }}>
+        {liveTournaments.length > 1 && (
+          <button
+            onClick={() => setSelectorOpen(true)}
+            aria-haspopup="dialog"
+            aria-expanded={selectorOpen}
+            style={{
+              display: 'inline-flex', alignItems: 'center', gap: 8, flexShrink: 0,
+              background: INK_TINT_05, borderRadius: 10, padding: '9px 12px',
+              border: 'none', cursor: 'pointer',
+            }}
+          >
+            {selected.status === 'inprogress' && (
+              <span aria-hidden style={{ width: 6, height: 6, borderRadius: '50%', background: STATUS_LIVE }} />
+            )}
+            <span style={{ fontFamily: 'Geist, system-ui, sans-serif', fontSize: 13, fontWeight: 700, color: INK, whiteSpace: 'nowrap' }}>
+              {pillLabel(selected)}
+            </span>
+            <ChevronDown size={15} style={{ color: INK_MUTE }} />
+          </button>
+        )}
+        <div style={{
+          display: 'flex', alignItems: 'center', gap: 8, flex: 1, minWidth: 0,
+          background: INK_TINT_05, borderRadius: 10, padding: '9px 12px',
+        }}>
+          <Search size={15} style={{ color: INK_MUTE, flexShrink: 0 }} strokeWidth={2.5} />
+          <input
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            placeholder="Search players"
+            style={{
+              flex: 1, border: 'none', outline: 'none', background: 'transparent',
+              fontFamily: 'Geist, system-ui, sans-serif', fontSize: 13, color: INK, minWidth: 0,
+            }}
+          />
+          {searchQuery && (
+            <button
+              onClick={() => setSearchQuery('')}
+              aria-label="Clear"
+              style={{ border: 'none', background: 'none', cursor: 'pointer', display: 'flex', padding: 0 }}
+            >
+              <X size={14} style={{ color: INK_MUTE }} />
+            </button>
+          )}
         </div>
-      )}
+      </div>
 
       {/* Header above the leaderboard — minimal */}
       {(() => {
@@ -185,7 +175,7 @@ export function LiveLeaderboardTab() {
 
         return (
           <div style={{ padding: '16px 20px 16px', background: '#FFFFFF', borderBottom: `0.5px solid ${INK_TINT_07}` }}>
-            {/* Row: tour (+ live dot · round) · dates right */}
+            {/* Row: tour (+ live dot · round · field) · dates right */}
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 9 }}>
               <span style={{
                 display: 'inline-flex', alignItems: 'center', gap: 7,
@@ -198,6 +188,7 @@ export function LiveLeaderboardTab() {
                 )}
                 {tourFullName}
                 {isLive && selected.currentRound != null && ` · Round ${selected.currentRound}`}
+                {fieldCount > 0 && ` · ${fieldCount} in field`}
               </span>
               {rightMeta && (
                 <span style={{
@@ -233,8 +224,6 @@ export function LiveLeaderboardTab() {
         );
       })()}
 
-
-
       {isLoadingBoard && (!leaderboard || (leaderboard as any[]).length === 0) ? (
         <LiveLeaderboardSkeleton />
       ) : ((leaderboard as any[] | undefined)?.length ?? 0) === 0 ? (
@@ -249,10 +238,59 @@ export function LiveLeaderboardTab() {
           tournamentStatus={selected.status}
           tournamentName={selected.name}
           venuePar={selected.venue_par}
+          searchQuery={searchQuery}
+          onSearchChange={setSearchQuery}
+          hideSearchInput
         />
       )}
+
+      {/* Tour selector bottom sheet */}
+      <BottomSheet
+        open={selectorOpen}
+        onClose={() => setSelectorOpen(false)}
+        ariaLabelledBy="live-tour-sheet-title"
+      >
+        <SheetHeader
+          eyebrow="LIVE NOW"
+          title={<span id="live-tour-sheet-title">Select tournament</span>}
+          onClose={() => setSelectorOpen(false)}
+        />
+        <div style={{ paddingBottom: 8 }}>
+          {liveTournaments.map((t) => {
+            const isActive = t.id === selected.id;
+            const loc = [t.venue_city, expandCountry(t.venue_country)].filter(Boolean).join(', ');
+            return (
+              <button
+                key={t.id}
+                onClick={() => { setSelectedId(t.id); setSelectorOpen(false); }}
+                style={{
+                  width: '100%', display: 'flex', alignItems: 'center', gap: 12,
+                  padding: '14px 20px', background: 'transparent', border: 'none',
+                  borderBottom: `0.5px solid ${INK_TINT_07}`, cursor: 'pointer', textAlign: 'left',
+                }}
+              >
+                {t.status === 'inprogress' && (
+                  <span aria-hidden style={{ width: 7, height: 7, borderRadius: '50%', background: STATUS_LIVE, flexShrink: 0 }} />
+                )}
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <div style={{ fontFamily: 'Geist, system-ui, sans-serif', fontSize: 14, fontWeight: 700, color: INK, letterSpacing: '-0.01em' }}>
+                    {pillLabel(t)}
+                  </div>
+                  {loc && (
+                    <div style={{ fontFamily: 'Geist, system-ui, sans-serif', fontSize: 12, fontWeight: 500, color: INK_MUTE, marginTop: 2 }}>
+                      {loc}
+                    </div>
+                  )}
+                </div>
+                {isActive && <Check size={18} style={{ color: INK, flexShrink: 0 }} strokeWidth={2.5} />}
+              </button>
+            );
+          })}
+        </div>
+      </BottomSheet>
     </div>
   );
+
 }
 
 function LiveLeaderboardSkeleton() {
