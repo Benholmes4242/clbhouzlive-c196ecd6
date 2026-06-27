@@ -148,20 +148,20 @@ function VideosFullFeedInner({ userId, mood, searchQuery, onClearSearch, onReset
     if (!isLoading && posts.length === 0) {
       if (searchQuery) {
         return (
-          <div style={{ padding: '32px 16px', textAlign: 'center' }}>
-            <p style={{ fontSize: 14, fontWeight: 600, color: '#0F172A', marginBottom: 4 }}>
-              No videos match "{searchQuery}".
-            </p>
-          </div>
+          <WatchEmptyState
+            title={`No videos for “${searchQuery}”`}
+            message="Nothing here matches that search yet. Try different words, or clear it to see everything."
+            action={onClearSearch ? { label: 'Clear search', onClick: onClearSearch, icon: 'clear' } : undefined}
+          />
         );
       }
       if (mood === 'for_you') return null;
       return (
-        <div style={{ padding: '32px 16px', textAlign: 'center' }}>
-          <p style={{ fontSize: 14, fontWeight: 600, color: '#0F172A', marginBottom: 4 }}>
-            No videos here yet.
-          </p>
-        </div>
+        <WatchEmptyState
+          title="Nothing here yet"
+          message="No videos match this filter right now. New ones land here as creators post."
+          action={onResetMood ? { label: 'Back to For You', onClick: onResetMood, icon: 'back' } : undefined}
+        />
       );
     }
 
