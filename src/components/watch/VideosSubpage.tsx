@@ -59,9 +59,18 @@ export default function VideosSubpage() {
 
         <div style={{ paddingTop: 'var(--chrome-total-h, 0px)' }}>
           {isSearching ? (
-            <VideosFullFeed userId={userId} mood="for_you" searchQuery={searchQuery} />
+            <VideosFullFeed
+              userId={userId}
+              mood="for_you"
+              searchQuery={searchQuery}
+              onClearSearch={handleSearchClose}
+            />
           ) : (
-            <VideosFullFeed userId={userId} mood={mood} />
+            <VideosFullFeed
+              userId={userId}
+              mood={mood}
+              onResetMood={() => setMood('for_you')}
+            />
           )}
         </div>
 
