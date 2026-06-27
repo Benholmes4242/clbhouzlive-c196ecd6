@@ -121,7 +121,7 @@ export function LiveLeaderboardTab() {
       {/* Tour selector + search — single row */}
       <div style={{
         display: 'flex', alignItems: 'center', gap: 10,
-        padding: '12px 16px', background: '#FFFFFF',
+        padding: '12px 16px', background: SLATE_50,
         borderBottom: `0.5px solid ${INK_TINT_07}`,
       }}>
         {liveTournaments.length > 1 && (
@@ -131,8 +131,8 @@ export function LiveLeaderboardTab() {
             aria-expanded={selectorOpen}
             style={{
               display: 'inline-flex', alignItems: 'center', gap: 8, flexShrink: 0,
-              background: INK_TINT_05, borderRadius: 10, padding: '9px 12px',
-              border: 'none', cursor: 'pointer',
+              background: '#FFFFFF', borderRadius: 10, padding: '9px 12px',
+              border: `0.5px solid ${INK_TINT_07}`, cursor: 'pointer',
             }}
           >
             {selected.status === 'inprogress' && (
@@ -146,7 +146,7 @@ export function LiveLeaderboardTab() {
         )}
         <div style={{
           display: 'flex', alignItems: 'center', gap: 8, flex: 1, minWidth: 0,
-          background: INK_TINT_05, borderRadius: 10, padding: '9px 12px',
+          background: '#FFFFFF', border: `0.5px solid ${INK_TINT_07}`, borderRadius: 10, padding: '9px 12px',
         }}>
           <Search size={15} style={{ color: INK_MUTE, flexShrink: 0 }} strokeWidth={2.5} />
           <input
