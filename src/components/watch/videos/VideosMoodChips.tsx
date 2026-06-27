@@ -20,13 +20,12 @@ function VideosMoodChipsInner({
       className="relative"
       style={{
         background: '#F8FAFC',
-        borderBottom: '0.5px solid rgba(15,23,42,0.07)',
       }}
 
     >
       <div
         className="flex items-center gap-1.5"
-        style={{ padding: '8.5px 28px 8.5px 16px' }}
+        style={{ padding: '8.5px 16px 8.5px 16px' }}
       >
         {searchOpen ? (
           <ChipRowSearchField
@@ -79,9 +78,17 @@ function VideosMoodChipsInner({
 
       <div
         aria-hidden
+        className="pointer-events-none absolute top-0 left-0 h-full"
+        style={{
+          width: 36,
+          background: 'linear-gradient(to left, rgba(248,250,252,0) 0%, #F8FAFC 100%)',
+        }}
+      />
+      <div
+        aria-hidden
         className="pointer-events-none absolute top-0 right-0 h-full"
         style={{
-          width: 28,
+          width: 36,
           background: 'linear-gradient(to right, rgba(248,250,252,0) 0%, #F8FAFC 100%)',
         }}
       />
