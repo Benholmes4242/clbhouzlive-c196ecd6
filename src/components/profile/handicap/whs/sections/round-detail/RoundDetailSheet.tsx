@@ -221,7 +221,8 @@ export const RoundDetailSheet: React.FC<Props> = ({ open, onClose, scoreId, hand
           <div style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '10px 18px 6px' }}>
             <SquircleAvatar
               src={profile?.profile_photo_url ?? undefined}
-              name={profile?.display_name ?? profile?.full_name ?? ''}
+              alt={profile?.display_name ?? ''}
+              userId={profile?.id ?? null}
               size={46}
               hideRing
             />
@@ -234,7 +235,7 @@ export const RoundDetailSheet: React.FC<Props> = ({ open, onClose, scoreId, hand
                 letterSpacing: '-0.01em',
               }}
             >
-              {profile?.display_name ?? profile?.full_name ?? 'You'}
+              {profile?.display_name ?? 'You'}
             </div>
           </div>
 
