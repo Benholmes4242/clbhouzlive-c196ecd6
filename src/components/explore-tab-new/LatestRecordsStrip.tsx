@@ -5,7 +5,7 @@ import {
   useRecentCourseRecords,
   type RecentCourseRecord,
 } from '@/hooks/gam/useRecentCourseRecords';
-import { ExploreSectionHeader } from './ExploreSectionHeader';
+import { SectionHeader } from '@/components/ui/SectionHeader';
 import {
   INK,
   INK_MUTE,
