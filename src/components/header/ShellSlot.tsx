@@ -1,4 +1,5 @@
 import React, { useEffect, useLayoutEffect, useRef, useState } from 'react';
+import { useTourHeroOverlay } from '@/hooks/useTourHeroOverlay';
 
 interface ShellSlotProps {
   children: React.ReactNode;
