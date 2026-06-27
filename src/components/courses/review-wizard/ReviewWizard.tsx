@@ -452,7 +452,7 @@ export function ReviewWizard({
           wizard.setReview(merged.slice(0, MAX_REVIEW_LENGTH));
         }
       } catch {
-        toast.error("Couldn't transcribe — try again");
+        toast.error("Couldn't transcribe - try again");
       } finally {
         if (!cancelled) {
           setVoiceState('idle');
@@ -654,7 +654,7 @@ export function ReviewWizard({
                       }}
                     >
                       {wizard.isSubmitting
-                        ? (isEditMode ? 'Updating…' : 'Publishing…')
+                        ? (isEditMode ? 'Updating' : 'Publishing')
                         : (isEditMode ? 'Update' : 'Publish')}
                     </button>
                   </div>
@@ -675,6 +675,9 @@ export function ReviewWizard({
                     <button
                       onClick={() => !course && setShowCourseSearch(true)}
                       disabled={!!course}
+                      onPointerDown={(e) => { if (!course) e.currentTarget.style.transform = 'scale(0.99)'; }}
+                      onPointerUp={(e) => { e.currentTarget.style.transform = 'scale(1)'; }}
+                      onPointerLeave={(e) => { e.currentTarget.style.transform = 'scale(1)'; }}
                       style={{
                         width: '100%',
                         display: 'flex',
@@ -686,6 +689,8 @@ export function ReviewWizard({
                         border: 'none',
                         textAlign: 'left',
                         cursor: course ? 'default' : 'pointer',
+                        transition: 'transform 120ms ease',
+                        WebkitTapHighlightColor: 'transparent',
                       }}
                     >
                       {activeCourse?.thumbnail_image ? (
@@ -882,7 +887,7 @@ export function ReviewWizard({
                         onChange={handleReviewChange}
                         onFocus={() => setVerdictFocused(true)}
                         onBlur={() => setVerdictFocused(false)}
-                        placeholder="What stood out? Best holes, conditions, the welcome…"
+                        placeholder="What stood out? Best holes, conditions, the welcome"
                         style={{
                           width: '100%',
                           boxSizing: 'border-box',
@@ -917,6 +922,9 @@ export function ReviewWizard({
                               e.stopPropagation();
                               voiceState === 'listening' ? stopListening() : startListening();
                             }}
+                            onPointerDown={(e) => { e.currentTarget.style.transform = 'scale(0.92)'; }}
+                            onPointerUp={(e) => { e.currentTarget.style.transform = 'scale(1)'; }}
+                            onPointerLeave={(e) => { e.currentTarget.style.transform = 'scale(1)'; }}
                             aria-label={voiceState === 'listening' ? 'Stop voice input' : 'Voice input'}
                             style={{
                               width: 38,
@@ -939,6 +947,8 @@ export function ReviewWizard({
                                   : voiceState === 'processing'
                                   ? AMBER
                                   : INK_MUTE,
+                              transition: 'transform 120ms ease, background 120ms ease',
+                              WebkitTapHighlightColor: 'transparent',
                             }}
                           >
                             {voiceState === 'listening' ? (
@@ -950,16 +960,16 @@ export function ReviewWizard({
                             )}
                           </button>
                           {voiceState === 'listening' ? (
-                            <span style={{ fontSize: 12, color: INK_MUTE }}>Listening… tap to stop</span>
+                            <span style={{ fontSize: 12, color: INK_MUTE }}>Listening - tap to stop</span>
                           ) : voiceState === 'processing' ? (
-                            <span style={{ fontSize: 12, color: INK_MUTE }}>Writing it down…</span>
+                            <span style={{ fontSize: 12, color: INK_MUTE }}>Writing it down</span>
                           ) : (
                             <span style={{ display: 'flex', flexDirection: 'column', minWidth: 0 }}>
                               <span style={{ fontSize: 12.5, fontWeight: 700, color: INK, lineHeight: 1.25 }}>
                                 Tap the mic to speak your review
                               </span>
                               <span style={{ fontSize: 11, color: INK_MUTE, lineHeight: 1.25, marginTop: 1 }}>
-                                No typing needed — say it and we'll write it for you
+                                No typing needed - say it and we'll write it for you
                               </span>
                             </span>
                           )}
