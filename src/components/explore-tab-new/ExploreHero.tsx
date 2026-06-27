@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { ChevronRight } from 'lucide-react';
 import { useExploreHero } from './hooks/useExploreHero';
 import type { ExploreMoodId } from './hooks/useExploreMood';
-import { ExploreSectionHeader } from './ExploreSectionHeader';
+import SectionHeader from '@/components/ui/SectionHeader';
 import { FlameMark } from './DiscoverMarks';
 import clbhouzLogo from '@/assets/clbhouz-logo.png';
 import { AMBER, INK_TINT_06 } from '@/features/courses/_shared/tokens';
@@ -77,9 +77,8 @@ function ExploreHeroInner({ userId, mood }: ExploreHeroProps) {
 
   return (
     <>
-      <ExploreSectionHeader
+      <SectionHeader tier="editorial"
         kicker="BEST OF THE BEST"
-        kickerColor="amber"
         title="Standout courses"
         sub="The course worth your attention right now"
         mark={<FlameMark />}

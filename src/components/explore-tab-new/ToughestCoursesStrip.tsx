@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { Mountain } from 'lucide-react';
 import { MountainMark } from './DiscoverMarks';
 import { useNotableDifficultCourses, type DifficultCourse } from '@/hooks/gam/useNotableDifficultCourses';
-import { ExploreSectionHeader } from './ExploreSectionHeader';
+import SectionHeader from '@/components/ui/SectionHeader';
 import {
   INK,
   INK_MUTE,
@@ -32,7 +32,7 @@ export function ToughestCoursesStrip(_: Props = {}) {
   if (isLoading) {
     return (
       <section style={{ padding: '0 0 0', fontFamily: FONT }}>
-        <ExploreSectionHeader
+        <SectionHeader tier="editorial"
           mark={<MountainMark />}
           title="Toughest courses"
           sub="The hardest courses, based on official WHS round data"
@@ -60,7 +60,7 @@ export function ToughestCoursesStrip(_: Props = {}) {
 
   return (
     <section style={{ padding: '0 0 0', fontFamily: FONT }}>
-      <ExploreSectionHeader
+      <SectionHeader tier="editorial"
         mark={<MountainMark />}
         title="Toughest courses"
         sub="The hardest courses, based on official WHS round data"
