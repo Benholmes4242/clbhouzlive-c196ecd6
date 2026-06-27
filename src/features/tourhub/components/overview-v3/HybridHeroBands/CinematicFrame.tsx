@@ -36,7 +36,7 @@ const TICKER_BAR_H = 34;
 const CHAMPION_BAND_H = 62;
 const UPCOMING_BAND_H = 104;
 const LIVE_BOTTOM_H = CHAMPION_BAND_H + TICKER_BAR_H;
-const LIVE_BOARD_H = 210; // header + up to 3 rows + footer
+const LIVE_BOARD_H = 185; // header + up to 3 rows + footer
 const RESULTS_FOOTER_H = 34;
 const BOTTOM_STACK_H = TICKER_BAR_H + CHAMPION_BAND_H;
 import { getPlayerHeadshotCandidates } from '@/utils/playerHeadshot';
@@ -1133,7 +1133,7 @@ export function CinematicFrame({
                 }}
               >
                 <span style={{ ...NUMERIC_STYLE, fontSize: 10, fontWeight: 600, color: 'rgba(255,255,255,0.5)' }}>
-                  {fieldStrength?.totalPlayers != null ? `n = ${fieldStrength.totalPlayers} in the field` : ''}
+                  {fieldStrength?.totalPlayers != null ? `${fieldStrength.totalPlayers} in the field` : ''}
                 </span>
                 <span style={{ display: 'inline-flex', alignItems: 'center', gap: 4 }}>
                   <span style={{ ...NUMERIC_STYLE, fontSize: 11, fontWeight: 800, letterSpacing: '0.06em', color: AMBER }}>LEADERBOARD</span>
@@ -1294,7 +1294,7 @@ export function CinematicFrame({
               }}
             >
               <span style={{ ...NUMERIC_STYLE, fontSize: 10, fontWeight: 600, color: 'rgba(255,255,255,0.5)' }}>
-                n = {fieldSize} in the field
+                {fieldSize} in the field
               </span>
               <span style={{ display: 'inline-flex', alignItems: 'center', gap: 4 }}>
                 <span style={{ ...NUMERIC_STYLE, fontSize: 11, fontWeight: 800, letterSpacing: '0.06em', color: AMBER }}>LEADERBOARD</span>
