@@ -362,8 +362,8 @@ export function CourseSearchSheet({
                             width: 42,
                             height: 42,
                             borderRadius: 12,
-                            background: 'rgba(34,197,94,0.08)',
-                            border: '1px solid rgba(34,197,94,0.18)',
+                            background: 'rgba(15,23,42,0.05)',
+                            border: '1px solid rgba(15,23,42,0.08)',
                           }}
                         >
                           {s.thumbnail ? (
@@ -426,20 +426,22 @@ export function CourseSearchSheet({
                         ) : s.tier === 'played' ? (
                           <span
                             style={{
-                              fontSize: 9,
+                              display: 'inline-flex',
+                              alignItems: 'center',
+                              gap: 3,
+                              fontSize: 11,
                               fontWeight: 700,
-                              letterSpacing: '0.06em',
-                              textTransform: 'uppercase',
-                              padding: '3px 7px',
+                              padding: '5px 9px 5px 11px',
                               borderRadius: 20,
                               flexShrink: 0,
-                              background: 'rgba(34,197,94,0.10)',
-                              border: '1px solid rgba(34,197,94,0.22)',
-                              color: '#15803D',
+                              background: 'rgba(247,147,30,0.12)',
+                              border: '1px solid rgba(247,147,30,0.28)',
+                              color: '#9A5B12',
                               whiteSpace: 'nowrap',
                             }}
                           >
-                            ✓ Played
+                            Rate
+                            <ChevronRight size={12} strokeWidth={2.5} />
                           </span>
                         ) : null}
                       </button>
