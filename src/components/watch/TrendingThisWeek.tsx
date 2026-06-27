@@ -3,7 +3,7 @@ import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useWatchFeed } from './hooks/useWatchFeed';
 import { useViewedPostIds } from './hooks/useViewedPostIds';
 import WatchRailTile from './WatchRailTile';
-import WatchSectionHeader from './WatchSectionHeader';
+import { SectionHeader } from '@/components/ui/SectionHeader';
 import { HRail } from './proshop/HRail';
 import { ClipsMark } from './proshop/SectionMarks';
 
