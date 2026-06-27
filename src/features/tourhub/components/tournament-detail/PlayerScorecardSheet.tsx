@@ -3,14 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { BottomSheet } from '@/components/ui/BottomSheet';
 import CountryFlag from '@/components/ui/country-flag';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
-import {
-  SC_ACE,
-  SC_EAGLE,
-  SC_BIRDIE,
-  SC_PAR,
-  SC_BOGEY,
-  SC_DOUBLE,
-} from '@/features/courses/components/holes/_constants';
+import { ScoreMark } from '@/features/courses/_shared/ScoreMark';
 import { playerRoute } from '../../routes';
 import {
   useTournamentScorecard,
@@ -28,15 +21,6 @@ const NUM: React.CSSProperties = {
   fontFeatureSettings: '"zero" 0',
 };
 
-function holeColor(stp: number | null): string {
-  if (stp == null) return 'transparent';
-  if (stp <= -3) return SC_ACE;
-  if (stp === -2) return SC_EAGLE;
-  if (stp === -1) return SC_BIRDIE;
-  if (stp === 0) return SC_PAR;
-  if (stp === 1) return SC_BOGEY;
-  return SC_DOUBLE;
-}
 
 function fmtRel(n: number | null, played: boolean): string {
   if (!played || n == null) return '—';
@@ -57,24 +41,16 @@ function initialsOf(name: string): string {
 }
 
 function HoleCell({ h }: { h: ScorecardHole }) {
-  const filled = h.strokes != null;
-  const stp = h.scoreToPar;
   return (
     <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4, minWidth: 0 }}>
       <div style={{ ...NUM, fontSize: 9, fontWeight: 700, color: INK_MUTE }}>{h.hole}</div>
       <div style={{ ...NUM, fontSize: 9, fontWeight: 600, color: '#CBD5E1' }}>{h.par ?? '-'}</div>
-      <div
-        style={{
-          width: 26, height: 26, borderRadius: 8,
-          background: filled ? holeColor(stp) : '#F1F5F9',
-          display: 'flex', alignItems: 'center', justifyContent: 'center',
-          ...NUM, fontSize: 13, fontWeight: 800,
-          color: filled ? '#fff' : '#E2E8F0',
-          boxShadow: filled && stp != null && stp <= -2 ? `0 0 0 2px ${holeColor(stp)}40` : 'none',
-        }}
-      >
-        {filled ? h.strokes : '·'}
-      </div>
+      <ScoreMark
+        strokes={h.strokes ?? null}
+        par={h.par ?? 4}
+        size={28}
+        fontFamily={GEIST}
+      />
     </div>
   );
 }
@@ -297,18 +273,18 @@ export function PlayerScorecardSheet({
         </div>
       )}
 
-      {/* legend */}
+      {/* legend — refined-outline key, shared with Holes + handicap */}
       {hasAnyData && (
-        <div style={{ display: 'flex', justifyContent: 'center', gap: 12, padding: '0 18px 14px', flexWrap: 'wrap' }}>
+        <div style={{ display: 'flex', justifyContent: 'center', gap: 16, padding: '4px 18px 14px', flexWrap: 'wrap' }}>
           {([
-            ['Eagle+', SC_EAGLE],
-            ['Birdie', SC_BIRDIE],
-            ['Par', SC_PAR],
-            ['Bogey', SC_BOGEY],
-            ['Dbl+', SC_DOUBLE],
-          ] as Array<[string, string]>).map(([lbl, c]) => (
-            <div key={lbl} style={{ display: 'flex', alignItems: 'center', gap: 5 }}>
-              <span style={{ width: 9, height: 9, borderRadius: 3, background: c }} />
+            ['Eagle',  2, 4],
+            ['Birdie', 3, 4],
+            ['Par',    4, 4],
+            ['Bogey',  5, 4],
+            ['Dbl+',   6, 4],
+          ] as Array<[string, number, number]>).map(([lbl, strokes, par]) => (
+            <div key={lbl} style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+              <ScoreMark strokes={strokes} par={par} size={22} fontFamily={GEIST} />
               <span style={{ fontSize: 10, fontWeight: 600, color: INK_MUTE }}>{lbl}</span>
             </div>
           ))}

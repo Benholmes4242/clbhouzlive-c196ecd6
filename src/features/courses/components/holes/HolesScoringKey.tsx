@@ -1,25 +1,21 @@
 import React from 'react';
-import {
-  FONT,
-  INK,
-  SC_ACCENT,
-  SC_ACE,
-  SC_ALBATROSS,
-  SC_EAGLE,
-  SC_BIRDIE,
-  SC_PAR,
-  SC_BOGEY,
-  SC_DOUBLE,
-} from './_constants';
+import { FONT, INK, SC_ACCENT } from './_constants';
+import { ScoreMark } from '@/features/courses/_shared/ScoreMark';
 
-const items: Array<{ c: string; label: string }> = [
-  { c: SC_ACE,       label: 'Ace' },
-  { c: SC_ALBATROSS, label: 'Albatross −3' },
-  { c: SC_EAGLE,     label: 'Eagle −2' },
-  { c: SC_BIRDIE,    label: 'Birdie −1' },
-  { c: SC_PAR,       label: 'Par' },
-  { c: SC_BOGEY,     label: 'Bogey +1' },
-  { c: SC_DOUBLE,    label: 'Double or worse' },
+interface KeyItem {
+  label: string;
+  strokes: number | null;
+  par: number;
+}
+
+// Each item is rendered as a real ScoreMark so the legend stays in lockstep
+// with the renderer everywhere it appears.
+const items: KeyItem[] = [
+  { label: 'Eagle',  strokes: 2, par: 4 }, // −2 → double-ring circle
+  { label: 'Birdie', strokes: 3, par: 4 }, // −1 → single circle
+  { label: 'Par',    strokes: 4, par: 4 }, // bare numeral
+  { label: 'Bogey',  strokes: 5, par: 4 }, // +1 → single square
+  { label: 'Dbl+',   strokes: 6, par: 4 }, // +2 → double-ring square
 ];
 
 export const HolesScoringKey: React.FC = () => (
@@ -37,30 +33,22 @@ export const HolesScoringKey: React.FC = () => (
         letterSpacing: '0.16em',
         textTransform: 'uppercase',
         color: SC_ACCENT,
-        marginBottom: 10,
+        marginBottom: 12,
       }}
     >
-      Scoring key · gross
+      Scoring key
     </div>
     <div
       style={{
-        display: 'grid',
-        gridTemplateColumns: '1fr 1fr',
-        rowGap: 8,
-        columnGap: 12,
+        display: 'flex',
+        flexWrap: 'wrap',
+        gap: 18,
+        rowGap: 10,
       }}
     >
       {items.map((it) => (
-        <div key={it.label} style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-          <span
-            style={{
-              width: 10,
-              height: 10,
-              borderRadius: 3,
-              background: it.c,
-              display: 'inline-block',
-            }}
-          />
+        <div key={it.label} style={{ display: 'flex', alignItems: 'center', gap: 7 }}>
+          <ScoreMark strokes={it.strokes} par={it.par} size={26} />
           <span style={{ fontSize: 12, fontWeight: 600, color: INK }}>{it.label}</span>
         </div>
       ))}

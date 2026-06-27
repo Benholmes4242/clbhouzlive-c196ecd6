@@ -6,13 +6,13 @@ export const FONT = 'Geist, -apple-system, BlinkMacSystemFont, system-ui, sans-s
 // Mono numeral stack — analyst-grade tabular alignment on the Holes tab (data-page exception).
 export const MONO = "'Geist', -apple-system, BlinkMacSystemFont, system-ui, sans-serif";
 
-// Diverging scoring scale — anchored to the leaderboard under-par green (#059669).
-// Cool greens = under par (good), neutral slate = par, warm = over par (bad).
-export const SC_ACE       = '#022C22'; // rarest — near-black green
-export const SC_ALBATROSS = '#064E3B'; // −3
-export const SC_EAGLE     = '#047857'; // −2
-export const SC_BIRDIE    = '#059669'; // −1 — anchored to leaderboard under-par green
-export const SC_PAR       = '#94A3B8'; // neutral slate
-export const SC_BOGEY     = '#EA8C3A'; // +1 — warm
-export const SC_DOUBLE    = '#C2410C'; // +2 or worse
-export const SC_ACCENT    = '#047857'; // teal eyebrow/accent — match new eagle depth
+// Refined-outline diverging scoring scale — desaturated, upmarket.
+// Pine greens = under par, quiet slate = par (nearly invisible), clay = over par.
+export const SC_ACE       = '#163D2C'; // deepest pine — rarest
+export const SC_ALBATROSS = '#1E4D38'; // −3
+export const SC_EAGLE     = '#26593F'; // −2 deep pine
+export const SC_BIRDIE    = '#2F6B4F'; // −1 refined pine (anchored to leaderboard)
+export const SC_PAR       = '#9AA4B0'; // quiet slate — par nearly disappears
+export const SC_BOGEY     = '#B5703C'; // +1 muted clay
+export const SC_DOUBLE    = '#9B4722'; // +2 or worse — deep terracotta
+export const SC_ACCENT    = '#2F6B4F'; // pine accent — eyebrow/headers
