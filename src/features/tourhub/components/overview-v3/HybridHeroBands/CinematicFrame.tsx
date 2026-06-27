@@ -1224,9 +1224,9 @@ export function CinematicFrame({
               <span style={{ width: RANK_W, flexShrink: 0 }} />
               <span style={{ width: 26, flexShrink: 0 }} />
               <span style={{ flex: 1 }} />
-              {anyToday && <span style={{ ...NUMERIC_STYLE, width: COL_TODAY, textAlign: 'right', fontSize: 8, fontWeight: 800, letterSpacing: '0.1em', color: 'rgba(255,255,255,0.4)' }}>TODAY</span>}
-              <span style={{ ...NUMERIC_STYLE, width: COL_TOTAL, textAlign: 'right', fontSize: 8, fontWeight: 800, letterSpacing: '0.1em', color: 'rgba(255,255,255,0.4)' }}>TOTAL</span>
-              <span style={{ ...NUMERIC_STYLE, width: COL_THRU, textAlign: 'right', fontSize: 8, fontWeight: 800, letterSpacing: '0.1em', color: 'rgba(255,255,255,0.4)' }}>THRU</span>
+              {anyToday && <span style={{ ...NUMERIC_STYLE, width: COL_TODAY, textAlign: 'right', fontSize: 9, fontWeight: 800, letterSpacing: '0.12em', color: 'rgba(255,255,255,0.6)' }}>TODAY</span>}
+              <span style={{ ...NUMERIC_STYLE, width: COL_TOTAL, textAlign: 'right', fontSize: 9, fontWeight: 800, letterSpacing: '0.12em', color: 'rgba(255,255,255,0.6)' }}>TOTAL</span>
+              <span style={{ ...NUMERIC_STYLE, width: COL_THRU, textAlign: 'right', fontSize: 9, fontWeight: 800, letterSpacing: '0.12em', color: 'rgba(255,255,255,0.6)' }}>THRU</span>
             </div>
 
             {/* Score rows */}
@@ -1235,6 +1235,7 @@ export function CinematicFrame({
                 display: 'flex', alignItems: 'center', gap: 10,
                 padding: '8px 16px',
                 borderTop: '0.5px solid rgba(255,255,255,0.08)',
+                background: row.isLeader ? 'rgba(247,147,30,0.08)' : 'transparent',
               };
               if (row.kind === 'solo') {
                 const entry = row.entry;
@@ -1250,9 +1251,10 @@ export function CinematicFrame({
                       alt={name}
                       userId={entry?.player?.id ?? null}
                       size={26}
-                      hideRing
+                      hideRing={!row.isLeader}
+                      ringColor={row.isLeader ? 'rgba(247,147,30,0.55)' : undefined}
                     />
-                    <span style={{ flex: 1, minWidth: 0, fontSize: 14, fontWeight: 600, color: 'white', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{name}</span>
+                    <span style={{ flex: 1, minWidth: 0, fontSize: 14, fontWeight: row.isLeader ? 700 : 600, color: 'white', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{name}</span>
                     {anyToday && (
                       <span style={{ ...NUMERIC_STYLE, width: COL_TODAY, textAlign: 'right', fontSize: 13, fontWeight: 700, color: scoreColor(today) }}>
                         {today == null ? '—' : fmtScore(today)}
