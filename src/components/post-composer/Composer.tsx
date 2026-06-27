@@ -1568,8 +1568,6 @@ function MediaPreview({
         WebkitOverflowScrolling: 'touch',
         scrollbarWidth: 'none',
         paddingBottom: 2,
-        margin: '0 -16px',
-        paddingLeft: 16,
         paddingRight: 16,
       }}
     >
