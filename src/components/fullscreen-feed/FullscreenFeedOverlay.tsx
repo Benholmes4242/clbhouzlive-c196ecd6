@@ -122,9 +122,13 @@ export function FullscreenFeedOverlay() {
     return () => clearTimeout(t);
   }, [isOpen, openCommentsInitially, posts.length, openComments, consumeOpenCommentsInitially, consumeInitialCommentId, readOnly]);
 
-  // Body scroll lock
+  // Body scroll lock + #root scroll preservation
   useEffect(() => {
     if (isOpen) {
+      // Snapshot #root scroll before any clamp/reset happens.
+      const rootEl = document.getElementById('root');
+      const savedScrollTop = rootEl ? rootEl.scrollTop : 0;
+
       // Clear any stale 'open' span left un-closed from a prior session before
       // starting a fresh one (prevents a leftover span producing a fake duration).
       fsTimeEnd('open', '(stale open span discarded)');
@@ -154,6 +158,14 @@ export function FullscreenFeedOverlay() {
         if (shield) shield.style.backgroundColor = 'transparent';
         document.documentElement.style.backgroundColor = '';
         document.body.style.backgroundColor = '';
+
+        // Restore #root scroll position on the next frame so the feed's scroll
+        // height is settled after the overlay unmounts.
+        if (rootEl) {
+          requestAnimationFrame(() => {
+            rootEl.scrollTop = savedScrollTop;
+          });
+        }
       };
     }
   }, [isOpen]);
