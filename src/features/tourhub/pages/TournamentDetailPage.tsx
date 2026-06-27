@@ -160,34 +160,6 @@ export function TournamentDetailPage() {
   }
 
   const hasLeaderboard = leaderboard && leaderboard.length > 0;
-  const fullBleedHero = activeTab === 'overview' && (isLive || isCompleted);
-
-  const [heroCovering, setHeroCovering] = useState(true);
-  const heroSentinelRef = useRef<HTMLDivElement>(null);
-  useEffect(() => {
-    if (!fullBleedHero) { setHeroCovering(false); return; }
-    setHeroCovering(true);
-    const el = heroSentinelRef.current;
-    if (!el) return;
-    const obs = new IntersectionObserver(
-      ([entry]) => setHeroCovering(entry.isIntersecting),
-      { rootMargin: `-96px 0px 0px 0px`, threshold: 0 }
-    );
-    obs.observe(el);
-    return () => obs.disconnect();
-  }, [fullBleedHero, activeTab]);
-
-  // Signal global chrome (CompactHeader + ShellSlot) to switch to transparent
-  // overlay styling while the cinematic hero is covering the viewport top.
-  useEffect(() => {
-    const on = fullBleedHero && heroCovering;
-    document.documentElement.style.setProperty('--tour-hero-overlay', on ? '1' : '0');
-    window.dispatchEvent(new CustomEvent('tour-hero-overlay', { detail: on }));
-    return () => {
-      document.documentElement.style.setProperty('--tour-hero-overlay', '0');
-      window.dispatchEvent(new CustomEvent('tour-hero-overlay', { detail: false }));
-    };
-  }, [fullBleedHero, heroCovering]);
   
   const renderTabContent = () => {
     switch (activeTab) {
