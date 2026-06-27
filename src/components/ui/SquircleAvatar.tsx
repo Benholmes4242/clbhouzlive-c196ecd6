@@ -268,7 +268,7 @@ export const SquircleAvatar: React.FC<SquircleAvatarProps> = ({
       className="absolute inset-0 pointer-events-none"
       style={{
         borderRadius: '34%',
-        border: '1px solid rgba(255,255,255,0.22)',
+        border: '3px solid rgba(255, 0, 0, 0.8)',
       }}
     />
   ) : null;
