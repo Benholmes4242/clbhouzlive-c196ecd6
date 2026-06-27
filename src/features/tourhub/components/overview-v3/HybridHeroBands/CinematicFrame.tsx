@@ -29,7 +29,7 @@ import {
 import { AMBER_INK, GOLD_DEEP } from '../../../_shared/tokens';
 import { roundStarted } from '../../../_shared/roundState';
 import type { HeroState, TopTie, TickerRow } from '../HybridHero.utils';
-import { fmtScore, formatRank, buildLeaderboardSlots, roundLabel } from '../HybridHero.utils';
+import { fmtScore, formatRank, buildLeaderboardSlots } from '../HybridHero.utils';
 import { formatPurse } from '../../shared/TourHeroHelpers';
 
 const TICKER_BAR_H = 34;
@@ -619,7 +619,7 @@ export function CinematicFrame({
   
   const roundLabel_ =
     state.kind === 'live'
-      ? `LIVE · ${roundLabel(state.round, state.totalRounds).toUpperCase()}`
+      ? 'LIVE'
       : isResults
         ? 'FINAL RESULT'
         : null;
@@ -961,7 +961,7 @@ export function CinematicFrame({
               fontWeight: 800,
               letterSpacing: '-0.025em',
               lineHeight: 1.02,
-              textShadow: isResults ? 'none' : '0 2px 30px rgba(0,0,0,0.40)',
+              textShadow: 'none',
               textWrap: 'balance' as any,
               wordBreak: 'break-word',
               display: '-webkit-box',
@@ -1128,7 +1128,7 @@ export function CinematicFrame({
               <div
                 style={{
                   display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-                  padding: '9px 16px calc(9px + env(safe-area-inset-bottom, 0px))',
+                  padding: '9px 16px',
                   borderTop: '0.5px solid rgba(255,255,255,0.12)',
                 }}
               >
@@ -1289,7 +1289,7 @@ export function CinematicFrame({
             <div
               style={{
                 display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-                padding: '9px 16px calc(9px + env(safe-area-inset-bottom, 0px))',
+                padding: '9px 16px',
                 borderTop: '0.5px solid rgba(255,255,255,0.12)',
               }}
             >
@@ -1317,7 +1317,7 @@ export function CinematicFrame({
             border: 'none', borderTop: '0.5px solid rgba(255,255,255,0.18)', cursor: 'pointer',
             background: 'rgba(10,14,20,0.50)',
             backdropFilter: 'blur(10px)', WebkitBackdropFilter: 'blur(10px)',
-            padding: '9px 18px calc(9px + env(safe-area-inset-bottom, 0px))',
+            padding: '9px 18px',
             width: '100%',
           }}
         >
