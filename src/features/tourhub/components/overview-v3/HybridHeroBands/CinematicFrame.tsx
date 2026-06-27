@@ -1255,7 +1255,7 @@ export function CinematicFrame({
                     <span style={{ ...NUMERIC_STYLE, width: COL_TOTAL, textAlign: 'center', fontSize: 16, fontWeight: 800, letterSpacing: '-0.02em', color: scoreColor(entry?.score) }}>
                       {fmtScore(entry?.score)}
                     </span>
-                    <span style={{ ...NUMERIC_STYLE, width: COL_THRU, textAlign: 'right', fontSize: 11, fontWeight: 600, color: 'rgba(255,255,255,0.4)' }}>
+                    <span style={{ ...NUMERIC_STYLE, width: COL_THRU, textAlign: 'center', fontSize: 11, fontWeight: 600, color: 'rgba(255,255,255,0.4)' }}>
                       {thruDisplay}
                     </span>
                   </div>
