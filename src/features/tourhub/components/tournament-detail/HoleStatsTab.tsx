@@ -17,7 +17,7 @@ import { RoundSelector } from './RoundSelector';
 import { EditorialEmpty } from './EditorialEmpty';
 import { useTourHoleStats } from '../../hooks/useTourHubData';
 import { HoleRow } from '@/features/courses/components/holes/HoleRow';
-import { HolesScoringKey } from '@/features/courses/components/holes/HolesScoringKey';
+
 import type { CourseHole } from '@/hooks/gam/useCourseHoleAnalysis';
 import {
   AMBER, FONT, INK, INK_MUTE, INK_TINT_06, INK_TINT_07, SLATE_50, SURFACE,
@@ -302,7 +302,7 @@ export function HoleStatsTab({ tournamentId, isCompleted, courseId, courseName }
             />
           ))}
 
-          <HolesScoringKey />
+          
         </div>
       )}
     </motion.div>
