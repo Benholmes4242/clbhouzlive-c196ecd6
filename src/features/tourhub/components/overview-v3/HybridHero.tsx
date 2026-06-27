@@ -290,6 +290,39 @@ export function HybridHero({ slide, activeTournamentId, onSelectTour }: HybridHe
     state.kind === 'upcoming';
 
   if (useCinematicFrame && !(state.kind === 'results' && state.variant === 'cancelled')) {
+    // Stage 1: full-bleed cinematic hero for live/results.
+    // Upcoming stays on the existing CinematicFrame until Stage 2/3.
+    if (state.kind === 'live' || state.kind === 'results') {
+      const leaderEntry: any = safeLeaderboard[0];
+      const leaderPhotoUrl =
+        state.kind === 'results'
+          ? tournament.winnerPhotoUrl ?? leaderEntry?.player?.photo_url ?? null
+          : leaderEntry?.player?.photo_url ?? null;
+      return (
+        <div
+          style={{
+            background: BG,
+            width: '100%',
+            height: '100%',
+            display: 'flex',
+            flexDirection: 'column',
+          }}
+        >
+          <CinematicHeroFullBleed
+            title={tournament.name}
+            tourLabel={tourLabel}
+            state={state}
+            leaderboard={safeLeaderboard}
+            tiedLeaders={tiedLeaders}
+            fieldSize={safeLeaderboard.length}
+            leaderPhotoUrl={leaderPhotoUrl}
+            tourSlug={tournament.tourSlug}
+            onCtaTap={onCtaTap}
+          />
+        </div>
+      );
+    }
+
     return (
       <div
         style={{
