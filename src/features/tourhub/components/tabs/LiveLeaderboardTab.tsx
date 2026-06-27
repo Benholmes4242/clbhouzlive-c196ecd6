@@ -10,6 +10,7 @@ import { EditorialEmpty } from '../tournament-detail/EditorialEmpty';
 import { INK, INK_MUTE, INK_TINT_05, INK_TINT_07, INK_TINT_06, SURFACE, STATUS_LIVE, STATUS_LIVE_TINT_10 } from '../../_shared/tokens';
 import { tourPriorityIndex, TOUR_LABEL, shortTournamentToken } from '../../_shared/tourOrder';
 import { TOUR_CONFIG } from '../../hooks/useOverviewData';
+import { getTourLogo, hasTourLogo } from '../../utils/tourLogos';
 import type { LiveTournamentLite } from '../../hooks/useLiveTournaments';
 
 const COUNTRY_NAMES: Record<string, string> = {
@@ -269,16 +270,16 @@ export function LiveLeaderboardTab() {
                   padding: '12px 16px',
                   background: isActive ? STATUS_LIVE_TINT_10 : 'transparent',
                   border: 'none',
-                  borderLeft: isLiveTournament ? `3px solid ${STATUS_LIVE}` : '3px solid transparent',
                   borderBottom: `0.5px solid ${INK_TINT_07}`,
                   cursor: 'pointer', textAlign: 'left' as const,
                 }}
               >
-                {/* Live status indicator chip */}
-                <div style={{ width: 28, height: 20, borderRadius: 4, background: isLiveTournament ? STATUS_LIVE_TINT_10 : INK_TINT_06, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-                  {isLiveTournament && (
-                    <span aria-hidden style={{ width: 6, height: 6, borderRadius: '50%', background: STATUS_LIVE, flexShrink: 0 }} />
-                  )}
+                {/* Tour logo chip */}
+                <div style={{ width: 36, height: 22, borderRadius: 4, background: INK_TINT_06, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                  {hasTourLogo(t.tourSlug.toLowerCase())
+                    ? <img src={getTourLogo(t.tourSlug.toLowerCase())} alt="" style={{ width: 28, height: 18, objectFit: 'contain' }} />
+                    : null
+                  }
                 </div>
 
                 {/* Label + location */}
