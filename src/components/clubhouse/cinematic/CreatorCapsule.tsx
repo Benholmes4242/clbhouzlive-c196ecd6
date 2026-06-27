@@ -532,7 +532,7 @@ export const CreatorCapsule: React.FC<CreatorCapsuleProps> = ({
             src={user?.avatar}
             alt={user?.name ?? 'Creator'}
             fallback={initials}
-            hideRing
+            hairlineRing
           />
           <span
             style={{

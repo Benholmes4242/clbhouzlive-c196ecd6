@@ -286,7 +286,7 @@ export const FeedActionRail: React.FC<FeedActionRailProps> = ({
               src={creator.avatarUrl}
               alt={creator.displayName}
               fallback={creator.displayName?.[0] ?? '?'}
-              hideRing
+              hairlineRing
             />
           </button>
 

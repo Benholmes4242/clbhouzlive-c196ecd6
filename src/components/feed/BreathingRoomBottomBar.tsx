@@ -209,7 +209,7 @@ export const BreathingRoomBottomBar: React.FC<BreathingRoomBottomBarProps> = ({
                 src={author.avatarUrl}
                 alt={author.displayName}
                 fallback={author.displayName?.[0] ?? '?'}
-                hideRing
+                hairlineRing
               />
             </div>
             <div style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', gap: 1 }}>
