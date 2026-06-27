@@ -1,6 +1,6 @@
 import { useMemo, Fragment } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
-import { RefreshCw, AlertCircle, ChevronRight, Crown, GraduationCap } from 'lucide-react';
+import { RefreshCw, AlertCircle, Crown } from 'lucide-react';
 import { getCollegeLogoUrl } from '@/utils/collegeLogo';
 import { TourHubShell } from '../components/TourHubShell';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -18,7 +18,6 @@ import { useCollegeMediaMap } from '../hooks/useCollegeMedia';
 
 import { collegeHubRoute } from '../routes';
 import {
-  AMBER,
   GOLD,
   GOLD_BORDER,
   GOLD_DEEP,
