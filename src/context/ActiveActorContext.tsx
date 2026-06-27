@@ -191,11 +191,16 @@ export function ActiveActorProvider({ children }: { children: ReactNode }) {
       const isSwitch =
         !activeActor || activeActor.type !== actor.type || activeActor.id !== actor.id;
 
-
-
+      // [DEBUG_ACTOR] audit instrumentation
+      const DEBUG_ACTOR = true;
+      if (DEBUG_ACTOR && isSwitch) {
+        // eslint-disable-next-line no-console
+        console.log('[actor-switch]', { type: actor.type, id: actor.id });
+      }
 
       setShouldPersist(persist);
       setActiveActorState(actor);
+
 
       // If persisting, update localStorage immediately
       if (persist) {
