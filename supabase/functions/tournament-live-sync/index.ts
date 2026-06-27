@@ -12,6 +12,7 @@
 
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
 import { isWithinPlayingHoursForTimezone, isTournamentDay } from '../_shared/countryTimezoneMap.ts'
+import { getActiveRound } from '../_shared/roundState.ts'
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -275,38 +276,9 @@ Deno.serve(async (req) => {
 // ── Per-tournament sync (FIX 1 + FIX 2) ──────────────────────────────
 // FIX 1: Gated tournaments stamp last_live_sync so round-robin advances.
 // FIX 2: Called for ALL tournaments per invocation, not just the stalest.
-
-async function deriveActiveRound(supabase: any, tournamentId: string): Promise<number | undefined> {
-  // Pull round columns for the whole field (not just 5 — we need full-field completeness).
-  const { data: roundCheck } = await supabase
-    .from('sr_leaderboards')
-    .select('round_1, round_2, round_3, round_4')
-    .eq('tournament_id', tournamentId)
-    .not('strokes', 'is', null);
-  if (!roundCheck?.length) return undefined;
-
-  const fieldSize = roundCheck.length;
-  const recorded = (r: number) =>
-    roundCheck.filter((e: any) => e[`round_${r}`] != null).length;
-
-  // Active round = highest round number with meaningful field participation.
-  // A round counts as "underway" once enough players have a score in it — this
-  // ignores WD/DQ/straggler gaps in earlier rounds and avoids over-advancing on
-  // a single early poster.
-  const MIN_FRACTION = 0.10;
-  const MIN_PLAYERS = 5;
-  const threshold = Math.max(MIN_PLAYERS, Math.ceil(fieldSize * MIN_FRACTION));
-
-  let active = 1;
-  for (let r = 1; r <= 4; r++) {
-    if (recorded(r) >= threshold) {
-      active = r;
-    } else {
-      break;
-    }
-  }
-  return active;
-}
+//
+// Round detection lives in ../_shared/roundState.ts (getActiveRound) — the
+// single source of truth. Do not re-derive the active round in this file.
 
 
 async function syncTournament(
