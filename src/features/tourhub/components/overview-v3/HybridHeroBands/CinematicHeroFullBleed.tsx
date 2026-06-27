@@ -45,7 +45,7 @@ const FALLBACK_GRADIENT = 'linear-gradient(180deg,#1E4D38,#0F172A)';
 // Single dial for hero photo crop. Tuned for typical golf action/headshot
 // framing — keeps faces comfortably in the upper third without cutting heads.
 // One-line knob if we need to nudge later.
-const PHOTO_FOCAL = 'center 24%';
+const IMAGE_FOCAL = 'center 40%';
 
 // ---- helpers --------------------------------------------------------------
 
