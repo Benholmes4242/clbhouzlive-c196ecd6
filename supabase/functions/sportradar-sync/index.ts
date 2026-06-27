@@ -1,5 +1,6 @@
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
 import { resolveTimezone } from '../_shared/countryTimezoneMap.ts'
+import { roundStarted } from '../_shared/roundState.ts'
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -665,27 +666,26 @@ async function syncLeaderboard(supabase: any, apiKey: string, tour: string, year
     while (
       rounds.length > 0 &&
       rounds[rounds.length - 1]?.synthesized &&
-      ((rounds[rounds.length - 1]?.thru ?? 0) === 0)
+      !roundStarted(rounds[rounds.length - 1])
     ) {
       rounds = rounds.slice(0, -1);
     }
     if (!liveRoundMap || liveRoundNum == null) return rounds;
     const live = liveRoundMap.get(entry.id);
-    // Only synthesize when the live round has ACTUALLY started.
-    // thru>0 = at least one hole played; matches getLiveRoundData's
-    // not-started definition (thru===0 && strokes===0).
-    const started = !!live && (live.thru ?? 0) > 0;
-    if (started && rounds.length < liveRoundNum) {
+    // Only synthesize when the live round has ACTUALLY started — shared
+    // definition with the client readers (CinematicFrame, FullLeaderboard).
+    if (live && roundStarted(live) && rounds.length < liveRoundNum) {
       rounds[liveRoundNum - 1] = {
         sequence: liveRoundNum,
-        score: live!.score,
-        thru: live!.thru,
-        strokes: live!.strokes,
+        score: live.score,
+        thru: live.thru,
+        strokes: live.strokes,
         synthesized: true,
       };
     }
     return rounds;
   };
+
 
   for (const entry of leaderboard) {
     const isTeamEntry = Array.isArray(entry.players) && entry.players.length > 0;
