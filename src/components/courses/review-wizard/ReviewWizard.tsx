@@ -864,7 +864,9 @@ export function ReviewWizard({
                       </span>
                     </div>
                     <div
-                      onClick={() => taRef.current?.focus()}
+                      onClick={(e) => {
+                        if (e.currentTarget === e.target) taRef.current?.focus();
+                      }}
                       style={{
                         margin: `0 ${PAD_X}`,
                         border: `1px solid ${
