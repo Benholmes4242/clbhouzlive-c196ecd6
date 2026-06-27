@@ -1,4 +1,5 @@
 import React, { useEffect, useLayoutEffect, useRef, useState } from 'react';
+import { useTourHeroOverlay } from '@/hooks/useTourHeroOverlay';
 
 interface ShellSlotProps {
   children: React.ReactNode;
@@ -25,6 +26,7 @@ interface ShellSlotProps {
 export const ShellSlot: React.FC<ShellSlotProps & { dark?: boolean }> = ({ children, dark = false }) => {
   const ref = useRef<HTMLDivElement>(null);
   const [scrolled, setScrolled] = useState(false);
+  const overlayActive = useTourHeroOverlay();
 
   // Measure height → write to CSS variable
   useLayoutEffect(() => {
@@ -73,15 +75,17 @@ export const ShellSlot: React.FC<ShellSlotProps & { dark?: boolean }> = ({ child
         width: '100%',
         maxWidth: 480,
         zIndex: 29, // CompactHeader is var(--z-header) = 30; sit one below it.
-        background: dark ? '#0A0E14' : 'hsl(var(--background))',
-        borderBottom: dark
-          ? '1px solid rgba(255,255,255,0.06)'
-          : '0.5px solid rgba(15,23,42,0.07)',
-        boxShadow: scrolled
-          ? (dark
+        background: overlayActive ? 'transparent' : (dark ? '#0A0E14' : 'hsl(var(--background))'),
+        borderBottom: overlayActive
+          ? 'none'
+          : (dark
+              ? '1px solid rgba(255,255,255,0.06)'
+              : '0.5px solid rgba(15,23,42,0.07)'),
+        boxShadow: overlayActive || !scrolled
+          ? 'none'
+          : (dark
               ? '0 6px 18px -10px rgba(0,0,0,0.4)'
-              : '0 6px 16px -6px rgba(15,23,42,0.18)')
-          : 'none',
+              : '0 6px 16px -6px rgba(15,23,42,0.18)'),
         transition: 'box-shadow 200ms ease',
       }}
     >

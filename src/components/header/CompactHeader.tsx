@@ -16,6 +16,7 @@ import { haptic } from '@/utils/haptics';
 import { safeGoBack } from '@/utils/navigation';
 import { useMedianStatusBar } from '@/hooks/useMedianStatusBar';
 import { useWhsConnection } from '@/lib/whs/hooks';
+import { useTourHeroOverlay } from '@/hooks/useTourHeroOverlay';
 
 interface CompactHeaderProps {
   className?: string;
@@ -165,6 +166,10 @@ const CompactHeader: React.FC<CompactHeaderProps> = ({ className }) => {
   const useDarkChrome = false;
   const useLightTheme = true;
 
+  // Tournament Overview live/results: transparent chrome over the cinematic hero.
+  const tourHeroOverlay = useTourHeroOverlay();
+  const overlayActive = tourHeroOverlay && isTourTournamentRoute;
+
   // Keep the native status bar on the light surface for handicap (was previously
   // toggled dark↔light around the search overlay; now uniformly light).
   useMedianStatusBar(
@@ -262,24 +267,40 @@ const CompactHeader: React.FC<CompactHeaderProps> = ({ className }) => {
         )}
         style={{
           top: 0,
-          background: useDarkChrome ? '#0A0E14' : 'hsl(var(--background))',
-          backdropFilter: useDarkChrome ? 'none' : 'blur(20px)',
-          WebkitBackdropFilter: useDarkChrome ? 'none' : 'blur(20px)',
+          background: overlayActive
+            ? 'transparent'
+            : (useDarkChrome ? '#0A0E14' : 'hsl(var(--background))'),
+          backdropFilter: overlayActive ? 'none' : (useDarkChrome ? 'none' : 'blur(20px)'),
+          WebkitBackdropFilter: overlayActive ? 'none' : (useDarkChrome ? 'none' : 'blur(20px)'),
           height: `calc(${contentHeight}px + var(--sat, 0px))`,
           paddingTop: 'var(--sat, 0px)',
-          borderBottom: useDarkChrome
-            ? '1px solid rgba(255,255,255,0.06)'
-            : '0.5px solid rgba(15,23,42,0.07)',
-          boxShadow: !useDarkChrome && scrolled
+          borderBottom: overlayActive
+            ? 'none'
+            : (useDarkChrome
+                ? '1px solid rgba(255,255,255,0.06)'
+                : '0.5px solid rgba(15,23,42,0.07)'),
+          boxShadow: !useDarkChrome && !overlayActive && scrolled
             ? '0 6px 16px -6px rgba(15,23,42,0.18)'
             : 'none',
-          transition: 'box-shadow 200ms ease',
+          transition: 'box-shadow 200ms ease, background 200ms ease',
         }}
       >
+        {/* Scrim for legibility over the cinematic hero photo */}
+        {overlayActive && (
+          <div
+            aria-hidden
+            style={{
+              position: 'absolute',
+              inset: 0,
+              pointerEvents: 'none',
+              background: 'linear-gradient(180deg, rgba(15,23,42,0.45) 0%, rgba(15,23,42,0.18) 60%, rgba(15,23,42,0) 100%)',
+            }}
+          />
+        )}
         {/* Content wrapper - always 55px, positioned below safe area on Clubhouse */}
         <div 
           className="mx-auto flex items-center justify-between px-3 sm:px-4 max-w-5xl"
-          style={{ height: `${contentHeight}px` }}
+          style={{ height: `${contentHeight}px`, position: 'relative', zIndex: 1 }}
         >
           {/* Left section: Back Button or Logo (fixed width, 44px tap target) */}
           <div className="flex-shrink-0">
@@ -290,7 +311,8 @@ const CompactHeader: React.FC<CompactHeaderProps> = ({ className }) => {
               aria-label={isBackArrowRoute ? "Go back" : "Go to home"}
             >
               {isBackArrowRoute ? (
-              <ArrowLeft className={cn("h-6 w-6", useDarkChrome ? "text-white" : "text-foreground")} />
+              <ArrowLeft className={cn("h-6 w-6", (useDarkChrome || overlayActive) ? "text-white" : "text-foreground")} />
+
               ) : (
                 <img
                   src="/lovable-uploads/29e83040-b5c5-48e4-84d7-3f99640e4a80.png"
@@ -342,7 +364,8 @@ const CompactHeader: React.FC<CompactHeaderProps> = ({ className }) => {
           {/* Right section: Search + Identity pill (fixed width) */}
           <div className="flex items-center gap-1.5 sm:gap-2 flex-shrink-0">
             {/* Handicap chip — left of search, all routes */}
-            <HandicapChip light={useLightTheme} />
+            <HandicapChip light={useLightTheme && !overlayActive} />
+
 
             {/* Search Button — 44px tap target */}
             <Button
@@ -354,7 +377,7 @@ const CompactHeader: React.FC<CompactHeaderProps> = ({ className }) => {
                 !isDarkChrome && !useLightTheme && "hover:bg-[hsl(var(--clubhouse-active-bg))]"
               )}
               style={{
-                color: useDarkChrome ? '#FFFFFF' : 'hsl(var(--foreground))',
+                color: (useDarkChrome || overlayActive) ? '#FFFFFF' : 'hsl(var(--foreground))',
                 transition: 'all var(--motion-fast) var(--ease-standard)'
               }}
               onClick={handleSearchClick}
@@ -372,7 +395,7 @@ const CompactHeader: React.FC<CompactHeaderProps> = ({ className }) => {
                   isOpen={menuOpen}
                   hasUnreadNotifications={hasUnread}
                   notificationCount={unreadCount}
-                  useLightTheme={useLightTheme}
+                  useLightTheme={useLightTheme && !overlayActive}
                   compact={isEditorialChromeRoute}
                 />
               ) : (
