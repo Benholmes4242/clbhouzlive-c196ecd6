@@ -20,7 +20,7 @@ import { LeaderboardCard } from './LeaderboardCard';
 import { CourseInfoCard } from './CourseInfoCard';
 import { EditorialEmpty } from './EditorialEmpty';
 import type { TourTournament } from '../../hooks/useTourHubData';
-import { AMBER, INK, INK_MUTE, INK_TINT_07, SLATE_50, SURFACE } from '../../_shared/tokens';
+import { AMBER, INK, INK_MUTE, INK_TINT_07, SLATE_50 } from '../../_shared/tokens';
 
 interface LiveOverviewTabProps {
   tournament: TourTournament;
@@ -90,7 +90,7 @@ function CutContextCard({
   return (
     <div
       style={{
-        background: SURFACE,
+        background: SLATE_50,
         borderTop: `1px solid ${INK_TINT_07}`,
         borderBottom: `1px solid ${INK_TINT_07}`,
       }}
@@ -171,7 +171,6 @@ export function LiveOverviewTab({
       )}
 
       {/* 2. CUT */}
-      {sectionRule('Cut')}
       <CutContextCard tournament={tournament} leaderboard={leaderboard} />
 
       {/* 3. COURSE */}
