@@ -390,6 +390,12 @@ export function ScheduleTab() {
           tourCode={nextUpTournament.tour_code}
           name={nextUpTournament.name}
           daysUntil={daysUntilNext}
+          courseName={(nextUpTournament as any).venue_course_name}
+          city={(nextUpTournament as any).venue_city}
+          state={(nextUpTournament as any).venue_state}
+          par={(nextUpTournament as any).venue_par}
+          yardage={(nextUpTournament as any).venue_yardage}
+          purse={(nextUpTournament as any).purse}
         />
       )}
 
