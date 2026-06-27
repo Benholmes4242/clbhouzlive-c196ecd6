@@ -161,21 +161,16 @@ function VideosFullFeedInner({ userId, mood, searchQuery }: VideosFullFeedProps)
                 </div>
               );
             }
-            if (seg.kind === 'large') {
+            if (seg.kind === 'hero') {
+              const eyebrow = seg.chunk === 0 ? 'Featured' : null;
               return (
-                <div
-                  key={`large-${seg.startIndex}`}
-                  style={{ display: 'flex', flexDirection: 'column', gap: 16 }}
-                >
-                  {seg.posts.map((post, i) => (
-                    <VideoLargeCard
-                      key={post.id}
-                      post={post}
-                      index={seg.startIndex + i}
-                      allPosts={posts}
-                    />
-                  ))}
-                </div>
+                <VideoHeroCard
+                  key={`hero-${seg.index}`}
+                  post={seg.post}
+                  index={seg.index}
+                  allPosts={posts}
+                  eyebrow={eyebrow}
+                />
               );
             }
             return (
