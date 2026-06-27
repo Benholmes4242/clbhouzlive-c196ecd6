@@ -11,6 +11,7 @@ import CountryFlag from '@/components/ui/country-flag';
 import { formatThruDisplay } from '../../utils/formatThruDisplay';
 import { playerRoute } from '../../routes';
 import { AMBER, AMBER_SOFT_BG, GOLD_DEEP, HAIRLINE_INK_12, INK, INK_FAINT, INK_LIGHT, INK_MUTE, INK_TINT_02, INK_TINT_05, INK_TINT_07, LEADER_GOLD_TINT_10, SCORE_OVER_PAR_LIGHT, SURFACE } from '../../_shared/tokens';
+import { roundStarted } from '../../_shared/roundState';
 
 interface RawRoundData {
   thru?: number;
@@ -47,7 +48,7 @@ function getLiveRoundData(entry: FullLeaderboardEntry, roundNum: number): { scor
   const rounds = (entry.raw_data as any)?.rounds as RawRoundData[] | undefined;
   if (!rounds || rounds.length < roundNum) return null;
   const round = rounds[roundNum - 1];
-  if (!round || (round.thru === 0 && round.strokes === 0)) return null;
+  if (!roundStarted(round)) return null;
   return { score: round.score ?? null, thru: round.thru ?? null };
 }
 
