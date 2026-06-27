@@ -5,7 +5,7 @@ import { CrownMark } from './DiscoverMarks';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useWhsConnection } from '@/lib/whs/hooks';
 import { useTitlesInReach, type TitleInReach } from '@/hooks/gam/useTitlesInReach';
-import { ExploreSectionHeader } from './ExploreSectionHeader';
+import { SectionHeader } from '@/components/ui/SectionHeader';
 import { SLATE_50, SURFACE } from '@/features/courses/_shared/tokens';
 
 const AMBER = '#F7931E';
