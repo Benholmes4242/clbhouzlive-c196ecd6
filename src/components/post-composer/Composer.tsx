@@ -1161,7 +1161,12 @@ export function Composer({
                   alignItems: 'center',
                   justifyContent: 'center',
                   gap: 8,
+                  transition: 'transform 120ms ease, background 120ms ease',
+                  WebkitTapHighlightColor: 'transparent',
                 }}
+                onPointerDown={(e) => { e.currentTarget.style.transform = 'scale(0.99)'; e.currentTarget.style.background = 'rgba(15,23,42,0.02)'; }}
+                onPointerUp={(e) => { e.currentTarget.style.transform = 'scale(1)'; e.currentTarget.style.background = 'transparent'; }}
+                onPointerLeave={(e) => { e.currentTarget.style.transform = 'scale(1)'; e.currentTarget.style.background = 'transparent'; }}
               >
                 <ImagePlus size={16} strokeWidth={2} />
                 Add more
@@ -1532,7 +1537,12 @@ function MediaPreview({
             border: 'none',
             background: 'transparent',
             cursor: 'pointer',
+            transition: 'transform 140ms cubic-bezier(0.16,1,0.3,1)',
+            WebkitTapHighlightColor: 'transparent',
           }}
+          onPointerDown={(e) => { e.currentTarget.style.transform = 'scale(0.97)'; }}
+          onPointerUp={(e) => { e.currentTarget.style.transform = 'scale(1)'; }}
+          onPointerLeave={(e) => { e.currentTarget.style.transform = 'scale(1)'; }}
         >
           <MediaStage
             item={{ ...item, restoredFromStream: !!item.restoredStreamId }}
@@ -1592,7 +1602,12 @@ function MediaPreview({
               border: 'none',
               background: 'transparent',
               cursor: 'pointer',
+              transition: 'transform 140ms cubic-bezier(0.16,1,0.3,1)',
+              WebkitTapHighlightColor: 'transparent',
             }}
+            onPointerDown={(e) => { e.currentTarget.style.transform = 'scale(0.97)'; }}
+            onPointerUp={(e) => { e.currentTarget.style.transform = 'scale(1)'; }}
+            onPointerLeave={(e) => { e.currentTarget.style.transform = 'scale(1)'; }}
           >
             <MediaStage
               item={{ ...item, restoredFromStream: !!item.restoredStreamId }}
@@ -1659,7 +1674,12 @@ function CornerButton({
         cursor: 'pointer',
         color: '#fff',
         zIndex: 3,
+        transition: 'transform 120ms ease, background 120ms ease',
+        WebkitTapHighlightColor: 'transparent',
       }}
+      onPointerDown={(e) => { e.stopPropagation(); e.currentTarget.style.transform = 'scale(0.88)'; e.currentTarget.style.background = 'rgba(0,0,0,0.7)'; }}
+      onPointerUp={(e) => { e.currentTarget.style.transform = 'scale(1)'; e.currentTarget.style.background = 'rgba(0,0,0,0.55)'; }}
+      onPointerLeave={(e) => { e.currentTarget.style.transform = 'scale(1)'; e.currentTarget.style.background = 'rgba(0,0,0,0.55)'; }}
     >
       {children}
     </button>
