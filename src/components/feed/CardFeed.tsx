@@ -352,9 +352,20 @@ export const CardFeed: React.FC<CardFeedProps> = ({
     [topPadding, bottomPadding],
   );
 
+  // [DEBUG_ACTOR] audit instrumentation — function identity tracking
+  useEffect(() => {
+    // eslint-disable-next-line no-console
+    console.log('[cardfeed] getLikeState identity changed');
+  }, [getLikeState]);
+  useEffect(() => {
+    // eslint-disable-next-line no-console
+    console.log('[cardfeed] itemContent recomputed');
+  }, [itemContent]);
+
   const handleEndReached = useCallback(() => {
     if (hasNextPage && onNearEnd) onNearEnd();
   }, [hasNextPage, onNearEnd]);
+
 
 
 
