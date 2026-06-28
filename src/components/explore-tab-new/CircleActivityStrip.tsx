@@ -79,11 +79,10 @@ export function CircleActivityStrip({ userId }: Props) {
 
   const Header = (
     <SectionHeader
-      tier="editorial"
-      kicker="FRIENDS RECENT HIGHLIGHTS"
+      role="section"
+      kicker="YOUR CIRCLE"
       title="Your friends"
       sub="What your circle's been pulling off"
-      mark={<LinkedRingsMark />}
       paddingTop={32}
       paddingX={16}
     />

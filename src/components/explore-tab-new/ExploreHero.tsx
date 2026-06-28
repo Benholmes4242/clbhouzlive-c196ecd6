@@ -77,11 +77,10 @@ function ExploreHeroInner({ userId, mood }: ExploreHeroProps) {
 
   return (
     <>
-      <SectionHeader tier="editorial"
-        kicker="BEST OF THE BEST"
+      <SectionHeader role="prime"
+        kicker="COURSE"
         title="Standout courses"
         sub="The course worth your attention right now"
-        mark={<FlameMark />}
         paddingTop={20}
         paddingX={16}
       />

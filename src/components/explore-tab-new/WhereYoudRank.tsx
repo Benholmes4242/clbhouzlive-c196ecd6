@@ -220,9 +220,9 @@ function WhereYoudRankInner({ userId }: WhereYoudRankProps) {
   return (
     <section style={{ padding: '0 0 0' }}>
       <SectionHeader
-        tier="editorial"
+        role="section"
+        kicker="YOUR CIRCLE"
         title="Titles within your reach"
-        mark={<CrownMark />}
         sub="Courses you've played, where you're close to the lead"
         paddingTop={32}
         paddingX={16}
