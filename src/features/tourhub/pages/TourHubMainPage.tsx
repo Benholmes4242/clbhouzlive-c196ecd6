@@ -91,7 +91,7 @@ export function TourHubMainPage() {
   const renderTab = () => {
     switch (activeTab) {
       case 'overview':
-        return <OverviewTab />;
+        return <OverviewTab topRightSlot={<TourSwitcherAffordance variant="glass" />} />;
       case 'live':
         return <LiveLeaderboardTab />;
       case 'schedule':
