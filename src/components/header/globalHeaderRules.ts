@@ -18,6 +18,7 @@ export const GLOBAL_HEADER_EXCLUDED_ROUTES = [
   '/notificationmessages',
   '/settings',
   '/edit-profile',
+  '/handicap',
 ] as const;
 
 export const GLOBAL_HEADER_EXCLUDED_PREFIXES = [
@@ -29,6 +30,7 @@ export const GLOBAL_HEADER_EXCLUDED_PREFIXES = [
   '/top100/', // Individual region top 100 pages - immersive layout
   '/discover/explore/region/', // Individual region pages - immersive hero
   '/achievements/', // Other user's quest page - has own back nav
+  '/handicap/', // Handicap sub-routes use FloatingPageHeader
 ] as const;
 
 /**
