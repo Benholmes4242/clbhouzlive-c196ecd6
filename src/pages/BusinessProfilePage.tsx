@@ -16,7 +16,7 @@ import { toast } from 'sonner';
 
 import ScrollToTopGlass from '@/components/common/ScrollToTopGlass';
 import { PageRoot } from '@/components/layout/PageRoot';
-
+import { useMedianStatusBar } from '@/hooks/useMedianStatusBar';
 import { useHideHeader } from '@/hooks/useHeaderVisibility';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useBusinessProfile } from '@/hooks/useBusinessProfile';
@@ -33,7 +33,7 @@ import { useStartDM } from '@/hooks/useStartDM';
 
 import { Button } from '@/components/ui/button';
 import { VerifiedBadge } from '@/components/ui/VerifiedBadge';
-
+import { CoverPhotoFallback } from '@/components/ui/CoverPhotoFallback';
 import { AvatarLightbox } from '@/components/shared/AvatarLightbox';
 import { ImageCropModal } from '@/components/business/ImageCropModal';
 import { BusinessProfileInfo } from '@/components/business/BusinessProfileInfo';
@@ -95,7 +95,7 @@ const BusinessProfilePage: React.FC = () => {
   const { user, loading: authLoading } = useSupabaseSession();
 
   useHideHeader();
-  // Status bar transparency is owned by FloatingPageHeader (single owner).
+  useMedianStatusBar('dark', 'transparent', true, false);
 
   const { data: business, isLoading, error } = useBusinessProfile(idOrSlug);
   const { data: membership } = useBusinessMembership(business?.id);
@@ -224,24 +224,7 @@ const BusinessProfilePage: React.FC = () => {
   };
 
   // ───── early returns ─────
-  if (authLoading || isLoading) {
-    return (
-      <div className="relative min-h-screen">
-        {/* Dark bleed behind the notch so the transparent safe-area shield
-            doesn't flash light grey before the cinematic cover loads. */}
-        <div
-          aria-hidden
-          className="fixed top-0 left-0 right-0 pointer-events-none z-50"
-          style={{
-            height: 'calc(env(safe-area-inset-top, 0px) + 80px)',
-            background:
-              'linear-gradient(180deg, #1E4D38 0%, #163A2B 65%, rgba(15,23,42,0) 100%)',
-          }}
-        />
-        <GenericPageSkeleton />
-      </div>
-    );
-  }
+  if (authLoading || isLoading) return <GenericPageSkeleton />;
 
   if (error || !business) {
     return (
@@ -306,21 +289,13 @@ const BusinessProfilePage: React.FC = () => {
     <PageRoot className="min-h-screen" style={{ background: 'var(--bg-page)' }} immersiveStatusBar immersive>
       {/* ───── Hero (full-bleed) ───── */}
       <div className="relative pointer-events-none" style={{ zIndex: 1 }}>
-        <div
-          className="relative w-full overflow-hidden"
-          style={(() => {
-            const scrim = 'linear-gradient(180deg, rgba(15,23,42,0.45) 0%, rgba(15,23,42,0.1) 20%, rgba(15,23,42,0) 40%, rgba(15,23,42,0.5) 100%)';
-            const bg = heroUrl
-              ? `${scrim}, url(${heroUrl}) center / cover no-repeat`
-              : 'linear-gradient(180deg,#1E4D38,#0F172A)';
-            return {
-              minHeight: 'calc(var(--profile-hero-h) + env(safe-area-inset-top, 0px))',
-              background: bg,
-              backgroundColor: '#0F172A',
-              paddingTop: 'env(safe-area-inset-top, 0px)',
-            } as React.CSSProperties;
-          })()}
-        >
+        <div className="relative w-full overflow-hidden" style={{ height: 'calc(var(--profile-hero-h) + env(safe-area-inset-top, 0px))' }}>
+          {heroUrl ? (
+            <img src={heroUrl} alt="Business cover" className="w-full h-full object-cover object-center" />
+          ) : (
+            <CoverPhotoFallback className="w-full h-full" />
+          )}
+
           {isOwner && (
             <button
               onClick={() => heroFileInputRef.current?.click()}
@@ -338,7 +313,6 @@ const BusinessProfilePage: React.FC = () => {
             </button>
           )}
         </div>
-
 
         {/* Floating header — canonical glass control row under the notch */}
         <FloatingPageHeader

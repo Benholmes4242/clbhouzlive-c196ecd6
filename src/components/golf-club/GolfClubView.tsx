@@ -147,26 +147,46 @@ const GolfClubView: React.FC<GolfClubViewProps> = ({ courseId, isInModal = false
   );
 
   // Standalone (non-modal) full-bleed cinematic hero — bleeds into the notch.
-  // Pattern mirrors Tour hero: image as container `background` + paddingTop env(sat).
-  const heroScrim =
-    'linear-gradient(180deg, rgba(15,23,42,0.5) 0%, rgba(15,23,42,0.12) 22%, rgba(15,23,42,0) 42%, rgba(15,23,42,0) 55%, rgba(15,23,42,0.6) 100%)';
-  const heroBackground = course.thumbnail_image
-    ? `${heroScrim}, url(${course.thumbnail_image}) center 40% / cover no-repeat`
-    : 'linear-gradient(180deg,#1E4D38,#0F172A)';
-
   const cinematicHero = (
     <div
-      className="relative overflow-hidden"
+      className="relative overflow-hidden bg-background"
       style={{
+        height: 'clamp(380px, 44dvh, 460px)',
         width: '100%',
-        minHeight: 'calc(clamp(380px, 44dvh, 460px) + env(safe-area-inset-top, 0px))',
-        background: heroBackground,
-        backgroundColor: '#0F172A',
-        display: 'flex',
-        flexDirection: 'column',
-        paddingTop: 'env(safe-area-inset-top, 0px)',
       }}
     >
+      <div className="absolute inset-0 h-full w-full bg-gradient-to-br from-green-400 to-blue-500" />
+      {course.thumbnail_image && (
+        <img
+          src={course.thumbnail_image}
+          alt={course.name}
+          className="absolute inset-0 h-full w-full object-cover"
+          onError={(e) => { e.currentTarget.style.display = 'none'; }}
+        />
+      )}
+
+      {/* Top scrim — legibility for floating controls + status clock */}
+      <div
+        aria-hidden
+        className="absolute inset-x-0 top-0 pointer-events-none"
+        style={{
+          height: 'calc(env(safe-area-inset-top, 0px) + 110px)',
+          background:
+            'linear-gradient(180deg, rgba(15,23,42,0.5) 0%, rgba(15,23,42,0.1) 60%, rgba(15,23,42,0) 100%)',
+        }}
+      />
+
+      {/* Bottom scrim — title legibility */}
+      <div
+        aria-hidden
+        className="absolute inset-x-0 bottom-0 pointer-events-none"
+        style={{
+          height: '55%',
+          background:
+            'linear-gradient(180deg, rgba(15,23,42,0) 45%, rgba(15,23,42,0.55) 100%)',
+        }}
+      />
+
       <CourseTitleOverlay course={course} courseMeta={courseMeta} />
     </div>
   );

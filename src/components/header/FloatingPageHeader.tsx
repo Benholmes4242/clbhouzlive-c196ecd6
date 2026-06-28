@@ -75,40 +75,24 @@ export const FloatingPageHeader: React.FC<FloatingPageHeaderProps> = ({
   }, []);
 
   // Self-contained notch transparency: set on mount, restore on unmount.
-  // Also reapply on visibility/focus and after fullscreen media closes, so
-  // foreground / lifecycle events can't repaint the shield grey while mounted.
   useEffect(() => {
     let prevShield = '#F8FAFC';
     try {
       const shield = document.getElementById('safe-area-shield');
       if (shield) prevShield = shield.style.backgroundColor || '#F8FAFC';
     } catch {}
+    applyShieldColor('transparent');
 
-    const applyTransparent = () => {
-      applyShieldColor('transparent');
-      try {
-        (window as any).median?.statusbar?.set({
-          style: 'dark',
-          color: '00000000',
-          overlay: true,
-          blur: false,
-        });
-      } catch {}
-    };
-
-    applyTransparent();
-
-    const onVisibility = () => { if (!document.hidden) applyTransparent(); };
-    const onFocus = () => applyTransparent();
-    const onMediaClosed = () => applyTransparent();
-    document.addEventListener('visibilitychange', onVisibility);
-    window.addEventListener('focus', onFocus);
-    window.addEventListener('media-viewer-closed', onMediaClosed);
+    try {
+      (window as any).median?.statusbar?.set({
+        style: 'dark',
+        color: '00000000',
+        overlay: true,
+        blur: false,
+      });
+    } catch {}
 
     return () => {
-      document.removeEventListener('visibilitychange', onVisibility);
-      window.removeEventListener('focus', onFocus);
-      window.removeEventListener('media-viewer-closed', onMediaClosed);
       applyShieldColor(prevShield && prevShield !== 'transparent' ? prevShield : '#F8FAFC');
       try {
         (window as any).median?.statusbar?.set({

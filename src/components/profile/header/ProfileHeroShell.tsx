@@ -92,48 +92,104 @@ const ProfileHeroShell: React.FC<ProfileHeroShellProps> = ({
     });
   };
 
-  // Mirror Tour hero: image-as-background + paddingTop env(sat) so the photo
-  // fills the notch automatically. No separate <img>, no negative marginTop.
-  const focal = isMobile ? getMobileCrop() : getDesktopCropPosition();
-  const heroScrim =
-    'linear-gradient(180deg, rgba(15,23,42,0.45) 0%, rgba(15,23,42,0.1) 20%, rgba(15,23,42,0) 40%, rgba(15,23,42,0.5) 100%)';
-  const heroBackground = hasImage && imageSrc
-    ? `${heroScrim}, url(${imageSrc}) ${focal} / cover no-repeat`
-    : 'linear-gradient(180deg,#1E4D38,#0F172A)';
-
   return (
-    <div
+    <div 
       ref={containerRef}
-      className="relative w-full overflow-hidden"
-      style={{
-        minHeight: 'calc(var(--profile-hero-h) + env(safe-area-inset-top, 0px))',
-        background: heroBackground,
-        backgroundColor: '#0F172A',
-        paddingTop: 'env(safe-area-inset-top, 0px)',
+      className="relative w-full overflow-hidden" 
+      style={{ 
+        height: 'calc(var(--profile-hero-h) + env(safe-area-inset-top, 0px))',
+        marginTop: 'calc(-55px - env(safe-area-inset-top, 0px))',
       }}
     >
-      {!hasImage && isOwnProfile && (
-        <div className="absolute inset-0 flex flex-col items-center justify-center text-white/50 pointer-events-none">
-          <Camera className="w-12 h-12 mb-3 opacity-60" />
-          <p className="text-sm font-medium">Upload a cover photo in Edit Profile</p>
-        </div>
+      {/* Loading state placeholder with subtle animation */}
+      <div 
+        className={cn(
+          "absolute inset-0 bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900",
+          "transition-opacity duration-500",
+          imageLoaded ? "opacity-0 pointer-events-none" : "opacity-100"
+        )}
+      >
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_40%,rgba(255,255,255,0.03),transparent_50%)]" />
+      </div>
+      
+      {hasImage ? (
+        <>
+          {/* Blurred background layer for profile photo fallback */}
+          {useBlurredFallback && (
+            <div 
+              className="absolute inset-0 scale-110"
+              style={{
+                backgroundImage: `url(${imageSrc})`,
+                backgroundSize: 'cover',
+                backgroundPosition: 'center',
+                filter: 'blur(30px) brightness(0.7)',
+              }}
+            />
+          )}
+          
+          {/* Main hero image with parallax */}
+          <img
+            src={imageSrc}
+            alt={displayName || 'Profile'}
+            className={cn(
+              "h-full w-full object-cover transition-all duration-700",
+              imageLoaded ? "opacity-100 scale-100" : "opacity-0 scale-[1.02]"
+            )}
+            style={{ 
+              objectPosition: isMobile ? getMobileCrop() : getDesktopCropPosition(),
+              objectFit: 'cover',
+              transform: !isMobile ? `translateY(${parallaxOffset}px)` : undefined,
+            }}
+            loading="eager"
+            decoding="async"
+            onLoad={() => setImageLoaded(true)}
+            onError={(e) => {
+              e.currentTarget.src = '/placeholder.svg';
+              setImageLoaded(true);
+            }}
+          />
+        </>
+      ) : (
+        <>
+          <CoverPhotoFallback className="w-full h-full" />
+          {isOwnProfile && (
+            <div className="absolute inset-0 flex flex-col items-center justify-center text-slate-500 pointer-events-none">
+              <Camera className="w-12 h-12 mb-3 opacity-60" />
+              <p className="text-sm font-medium">Upload a cover photo in Edit Profile</p>
+            </div>
+          )}
+        </>
       )}
-      {/* Mark image as loaded immediately for fade hooks downstream (no img el). */}
-      {!imageLoaded && <ImageLoadProbe src={imageSrc} onLoaded={() => setImageLoaded(true)} />}
+
+      {/* Cinematic gradient overlays */}
+      {/* Top vignette */}
+      <div 
+        className="absolute top-0 left-0 right-0 h-24 pointer-events-none z-[4]"
+        style={{
+          background: 'linear-gradient(to bottom, rgba(0,0,0,0.3) 0%, transparent 100%)',
+        }}
+      />
+      
+      {/* Bottom fade gradient - transitions to glass panel */}
+      <div 
+        className={cn(
+          "absolute bottom-0 left-0 w-full pointer-events-none z-[5]",
+          isMobile ? "h-24" : "h-28"
+        )}
+        style={{
+          background: 'linear-gradient(to top, hsl(var(--background)) 0%, hsl(var(--background) / 0.8) 30%, hsl(var(--background) / 0.4) 60%, transparent 100%)',
+        }}
+      />
+      
+      {/* Subtle side vignettes for cinematic feel */}
+      <div 
+        className="absolute inset-0 pointer-events-none z-[3]"
+        style={{
+          background: 'radial-gradient(ellipse at center, transparent 50%, rgba(0,0,0,0.2) 100%)',
+        }}
+      />
     </div>
   );
-};
-
-// Tiny helper: preload the cover so downstream loaded-state callbacks still fire.
-const ImageLoadProbe: React.FC<{ src: string; onLoaded: () => void }> = ({ src, onLoaded }) => {
-  useEffect(() => {
-    if (!src) { onLoaded(); return; }
-    const img = new Image();
-    img.onload = onLoaded;
-    img.onerror = onLoaded;
-    img.src = src;
-  }, [src, onLoaded]);
-  return null;
 };
 
 export default ProfileHeroShell;
