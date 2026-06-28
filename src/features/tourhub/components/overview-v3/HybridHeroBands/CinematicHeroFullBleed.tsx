@@ -517,6 +517,20 @@ export function CinematicHeroFullBleed({
         paddingTop: 'env(safe-area-inset-top, 0px)',
       }}
     >
+      {/* Top-right slot (scrolls with hero) — aligns with the fixed menu/search pills */}
+      {topRightSlot && (
+        <div
+          style={{
+            position: 'absolute',
+            top: 'calc(env(safe-area-inset-top, 0px) + 10px)',
+            right: 16,
+            zIndex: 5,
+          }}
+        >
+          {topRightSlot}
+        </div>
+      )}
+
       {/* Spacer */}
       <div style={{ flex: 1, minHeight: 220 }} />
 
