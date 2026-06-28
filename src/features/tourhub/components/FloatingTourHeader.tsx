@@ -6,17 +6,12 @@
  * and shield lifecycle. No global event bus, no shared CSS vars.
  */
 import React, { useEffect } from 'react';
-import { Menu, Search, TrendingUp } from 'lucide-react';
-import { useSupabaseSession } from '@/hooks/useSupabaseSession';
+import { Menu, Search } from 'lucide-react';
 import { applyShieldColor } from '@/hooks/useMedianStatusBar';
 
 export interface FloatingTourHeaderProps {
   onMenuTap: () => void;
   onSearchTap: () => void;
-  onAvatarTap: () => void;
-  onHandicapTap?: () => void;
-  /** Pre-formatted handicap index, e.g. "2.8". */
-  handicapValue: string;
   /** Optional extra pill rendered at end of the row (e.g. tour picker). */
   endSlot?: React.ReactNode;
 }
@@ -47,16 +42,9 @@ const pillStyle: React.CSSProperties = {
 export const FloatingTourHeader: React.FC<FloatingTourHeaderProps> = ({
   onMenuTap,
   onSearchTap,
-  onAvatarTap,
-  onHandicapTap,
-  handicapValue,
   endSlot,
 }) => {
-  const { user } = useSupabaseSession();
-  const avatarUrl =
-    (user?.user_metadata as any)?.avatar_url ||
-    (user?.user_metadata as any)?.picture ||
-    '';
+
 
   // Self-contained notch transparency: set on mount, restore on unmount.
   useEffect(() => {
@@ -148,34 +136,6 @@ export const FloatingTourHeader: React.FC<FloatingTourHeaderProps> = ({
             <Menu size={18} color="#FFFFFF" strokeWidth={2.2} />
           </button>
 
-          {/* Handicap */}
-          <button
-            type="button"
-            aria-label={`Handicap ${handicapValue}`}
-            onClick={onHandicapTap}
-            style={{
-              ...pillStyle,
-              minWidth: 0,
-              paddingLeft: 12,
-              paddingRight: 12,
-              gap: 6,
-            }}
-            className="active:scale-[0.96]"
-          >
-            <span
-              style={{
-                fontSize: 13,
-                fontWeight: 700,
-                color: '#FFFFFF',
-                fontVariantNumeric: 'tabular-nums',
-                letterSpacing: '-0.01em',
-              }}
-            >
-              {handicapValue}
-            </span>
-            <TrendingUp size={12} color="#FFFFFF" strokeWidth={2.4} />
-          </button>
-
           {/* Search */}
           <button
             type="button"
@@ -187,42 +147,6 @@ export const FloatingTourHeader: React.FC<FloatingTourHeaderProps> = ({
             <Search size={18} color="#FFFFFF" strokeWidth={2.2} />
           </button>
 
-          {/* Avatar */}
-          <button
-            type="button"
-            aria-label="Profile menu"
-            onClick={onAvatarTap}
-            style={{
-              ...pillStyle,
-              padding: 0,
-              overflow: 'hidden',
-              borderRadius: 999,
-            }}
-            className="active:scale-[0.96]"
-          >
-            {avatarUrl ? (
-              // eslint-disable-next-line @next/next/no-img-element
-              <img
-                src={avatarUrl}
-                alt=""
-                style={{
-                  width: '100%',
-                  height: '100%',
-                  objectFit: 'cover',
-                  borderRadius: 999,
-                }}
-              />
-            ) : (
-              <div
-                style={{
-                  width: '100%',
-                  height: '100%',
-                  borderRadius: 999,
-                  background: 'rgba(255,255,255,0.18)',
-                }}
-              />
-            )}
-          </button>
 
           {endSlot}
         </div>
