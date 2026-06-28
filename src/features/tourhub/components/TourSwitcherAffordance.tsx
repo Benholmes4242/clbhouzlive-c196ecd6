@@ -30,16 +30,21 @@ import {
 // Canonical tour priority order — PGA → LPGA → DP World → Korn Ferry → Champions → LIV.
 // Object insertion order is preserved by Object.entries below.
 const TOUR_LABEL: Record<string, string> = {
-  pga: 'PGA',
+  pga: 'PGA TOUR',
   lpga: 'LPGA',
-  euro: 'DPWT',
+  euro: 'DP WORLD TOUR',
   pgad: 'KORN FERRY',
   champ: 'CHAMPIONS',
-  liv: 'LIV',
+  liv: 'LIV GOLF',
 };
 
+export interface TourSwitcherAffordanceProps {
+  variant?: 'glass' | 'default';
+}
 
-export const TourSwitcherAffordance: React.FC = () => {
+export const TourSwitcherAffordance: React.FC<TourSwitcherAffordanceProps> = ({
+  variant = 'default',
+}) => {
   const { data } = useAllToursTickerData();
   const [open, setOpen] = useState(false);
   const { selectedTourSlug, selectTour, viewingTourSlug } = useTourSelection();
@@ -61,56 +66,95 @@ export const TourSwitcherAffordance: React.FC = () => {
 
   return (
     <>
-      <button
-        type="button"
-        onClick={() => setOpen(true)}
-        aria-label="Switch tour"
-        aria-haspopup="dialog"
-        aria-expanded={open}
-        style={{
-          flexShrink: 0,
-          display: 'inline-flex',
-          flexDirection: 'column',
-          alignItems: 'flex-start',
-          justifyContent: 'center',
-          gap: 2,
-          padding: '0 14px 0 10px',
-          background: 'transparent',
-          border: 'none',
-          cursor: 'pointer',
-          fontFamily: FONT,
-          height: 36,
-        }}
-      >
-        <span
+      {variant === 'glass' ? (
+        <button
+          type="button"
+          onClick={() => setOpen(true)}
+          aria-label="Switch tour"
+          aria-haspopup="dialog"
+          aria-expanded={open}
+          className="active:scale-[0.96]"
           style={{
-            fontSize: 8,
-            fontWeight: 800,
-            letterSpacing: '0.14em',
-            color: AMBER,
-            textTransform: 'uppercase',
-            lineHeight: 1,
-          }}
-        >
-          Tour
-        </span>
-        <span
-          style={{
+            height: 40,
             display: 'inline-flex',
             alignItems: 'center',
-            gap: 5,
-            fontSize: 11,
-            fontWeight: 700,
-            letterSpacing: '0.04em',
-            color: '#0A0E14',
-            textTransform: 'uppercase',
-            lineHeight: 1,
+            gap: 7,
+            padding: '0 15px',
+            borderRadius: 999,
+            background: 'rgba(255,255,255,0.16)',
+            border: '1px solid rgba(255,255,255,0.30)',
+            backdropFilter: 'blur(14px)',
+            WebkitBackdropFilter: 'blur(14px)',
+            whiteSpace: 'nowrap',
+            cursor: 'pointer',
           }}
         >
-          {TOUR_LABEL[activeTourSlug] ?? 'PGA'}
-          <ArrowLeftRight size={11} strokeWidth={2.2} color="#0A0E14" aria-hidden />
-        </span>
-      </button>
+          <span
+            style={{
+              fontFamily: 'Geist',
+              fontVariantNumeric: 'tabular-nums',
+              fontSize: 13,
+              fontWeight: 800,
+              letterSpacing: '0.02em',
+              color: '#FFFFFF',
+            }}
+          >
+            {TOUR_LABEL[activeTourSlug] ?? 'PGA TOUR'}
+          </span>
+          <ArrowLeftRight size={14} strokeWidth={2.4} color="#F7931E" />
+        </button>
+      ) : (
+        <button
+          type="button"
+          onClick={() => setOpen(true)}
+          aria-label="Switch tour"
+          aria-haspopup="dialog"
+          aria-expanded={open}
+          style={{
+            flexShrink: 0,
+            display: 'inline-flex',
+            flexDirection: 'column',
+            alignItems: 'flex-start',
+            justifyContent: 'center',
+            gap: 2,
+            padding: '0 14px 0 10px',
+            background: 'transparent',
+            border: 'none',
+            cursor: 'pointer',
+            fontFamily: FONT,
+            height: 36,
+          }}
+        >
+          <span
+            style={{
+              fontSize: 8,
+              fontWeight: 800,
+              letterSpacing: '0.14em',
+              color: AMBER,
+              textTransform: 'uppercase',
+              lineHeight: 1,
+            }}
+          >
+            Tour
+          </span>
+          <span
+            style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: 5,
+              fontSize: 11,
+              fontWeight: 700,
+              letterSpacing: '0.04em',
+              color: '#0A0E14',
+              textTransform: 'uppercase',
+              lineHeight: 1,
+            }}
+          >
+            {TOUR_LABEL[activeTourSlug] ?? 'PGA TOUR'}
+            <ArrowLeftRight size={11} strokeWidth={2.2} color="#0A0E14" aria-hidden />
+          </span>
+        </button>
+      )}
 
       <BottomSheet
         open={open}
