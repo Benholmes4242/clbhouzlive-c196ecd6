@@ -134,7 +134,7 @@ export function TourHubMainPage() {
             <FloatingTourHeader
               onMenuTap={() => setMenuOpen(true)}
               onSearchTap={() => navigate('/search')}
-              endSlot={<TourSwitcherAffordance />}
+              endSlot={<TourSwitcherAffordance variant="glass" />}
             />
 
             <TourSideMenu
