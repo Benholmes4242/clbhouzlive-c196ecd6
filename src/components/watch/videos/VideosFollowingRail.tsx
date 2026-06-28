@@ -20,7 +20,7 @@ function VideosFollowingRailInner({ userId }: VideosFollowingRailProps) {
 
   return (
     <section>
-      <SectionHeader tier="rail" title="From creators you follow" paddingTop={20} paddingX={16} />
+      <SectionHeader role="rail" title="From creators you follow" paddingTop={20} paddingX={16} />
       <HRail paddingBottom={10}>
         {posts.map((post, i) => (
           <VideoRailTile key={post.id} post={post} index={i} allPosts={posts} width={280} />

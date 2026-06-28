@@ -98,7 +98,7 @@ export default function TrendingThisWeek({ enabled = true }: TrendingThisWeekPro
   return (
     <div style={{ background: 'hsl(var(--background))' }}>
       <SectionHeader
-        tier="rail"
+        role="rail"
         title="Quick clips"
         action={{ label: 'More clips', onClick: () => navigate('/watch/clips') }}
         paddingX={16}

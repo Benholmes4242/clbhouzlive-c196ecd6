@@ -15,7 +15,7 @@ function VideosSuggestedCreatorsRailInner({ userId }: VideosSuggestedCreatorsRai
   if (creators.length === 0) return null;
   return (
     <section>
-      <SectionHeader tier="rail" title="Suggested creators" paddingTop={20} paddingX={16} />
+      <SectionHeader role="rail" title="Suggested creators" paddingTop={20} paddingX={16} />
       <HRail paddingBottom={10}>
         {creators.map((c) => (
           <SuggestedCreatorCard key={c.userId} creator={c} currentUserId={userId} />

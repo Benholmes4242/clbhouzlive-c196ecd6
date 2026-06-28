@@ -23,7 +23,7 @@ function VideosQuickClipsRailInner({ userId }: VideosQuickClipsRailProps) {
 
   return (
     <section>
-      <SectionHeader tier="rail" title="Quick clips" paddingTop={8} paddingX={16} />
+      <SectionHeader role="rail" title="Quick clips" paddingTop={8} paddingX={16} />
       <HRail paddingBottom={20}>
         {posts.map((post, i) => (
           <div
