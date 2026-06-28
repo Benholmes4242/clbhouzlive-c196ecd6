@@ -32,7 +32,7 @@ function BioSection({ text }: { text: string }) {
           type="button"
           onClick={() => setExpanded(v => !v)}
           className="mt-1 text-[0.8125rem] font-semibold flex items-center gap-0.5 min-h-[44px] active:scale-[0.97] transition-transform"
-          style={{ color: '#F7931E' }}
+          style={{ color: '#64748B' }}
           aria-expanded={expanded}
         >
           {expanded ? 'Show less' : 'Read more'}
