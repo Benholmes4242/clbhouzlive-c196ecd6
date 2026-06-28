@@ -3,24 +3,19 @@ import { useLocation, useSearchParams } from 'react-router-dom';
 import CompactHeader from './CompactHeader';
 import { useModalContext } from '@/contexts/ModalContext';
 import { isGlobalHeaderExcluded, isConditionallyExcluded } from './globalHeaderRules';
+import { useFloatingHeaderActive } from '@/features/tourhub/_shared/floatingHeaderSignal';
 
-/**
- * GlobalHeader - Renders CompactHeader on all pages except:
- * - Clubhouse (/ and /clubhouse) - has its own dark header
- * - Auth pages (/auth, /signup, /onboarding) - clean auth flow
- * - Admin pages (/admin/*) - separate admin layout
- * - Hub overlays and full-screen modals
- * - Create moment page - full-screen composer
- * - Tour Hub Overview (/tourhub with tab=overview or no tab) - immersive hero
- */
 const GlobalHeader: React.FC = () => {
   const location = useLocation();
   const [searchParams] = useSearchParams();
   const { shouldHideHeader } = useModalContext();
+  const floatingHeaderActive = useFloatingHeaderActive();
 
   const pathname = location.pathname;
 
-  // Check both static exclusions and conditional (query-param based) exclusions
+  // Cinematic tour overview owns its own floating header — suppress the global one.
+  if (floatingHeaderActive) return null;
+
   if (shouldHideHeader || isGlobalHeaderExcluded(pathname) || isConditionallyExcluded(pathname, searchParams)) {
     return null;
   }
