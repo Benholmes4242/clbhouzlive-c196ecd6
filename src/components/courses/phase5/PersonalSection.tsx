@@ -10,7 +10,7 @@ import CourseStatusToggle from './CourseStatusToggle';
 import PersonalReviewCard from './PersonalReviewCard';
 import CourseMoments from './CourseMoments';
 import { SectionHeader } from '@/components/ui/SectionHeader';
-import { Flag } from 'lucide-react';
+
 
 interface PersonalSectionProps {
   courseId: string;
@@ -46,9 +46,9 @@ export const PersonalSection: React.FC<PersonalSectionProps> = ({
 
   return (
     <section style={{ padding: '20px 0', display: 'flex', flexDirection: 'column', gap: 20 }}>
-      {/* Section header — canonical SectionHeader (standard/amber + inline icon) */}
+      {/* Section header — canonical SectionHeader */}
       <div style={{ marginBottom: -14 }}>
-        <SectionHeader tier="standard" tone="amber" inlineIcon icon={Flag} kicker="Your Journey" paddingX={16} />
+        <SectionHeader role="section" kicker="YOUR JOURNEY" paddingX={16} />
       </div>
 
       {/* Status toggle */}
