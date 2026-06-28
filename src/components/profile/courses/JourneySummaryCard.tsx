@@ -8,6 +8,7 @@ import { useNavigate } from 'react-router-dom';
 import { MapPin, Trophy, Globe, Star } from 'lucide-react';
 import { motion, useReducedMotion } from 'framer-motion';
 import { cn } from '@/lib/utils';
+import { SectionHeader } from '@/components/ui/SectionHeader';
 
 interface JourneySummaryCardProps {
   coursesPlayed: number;
@@ -28,22 +29,10 @@ const CARD_STYLE: React.CSSProperties = {
   overflow: 'hidden',
 };
 
-// Canonical amber eyebrow with icon (matches Courses Discover SectionLabel)
+// Canonical SectionHeader eyebrow (role="section" → AA amber, 11px, cut-line)
 const Eyebrow: React.FC<{ label: string }> = ({ label }) => (
-  <div className="flex items-center gap-1.5 mb-2 px-2.5">
-    <Trophy size={11} strokeWidth={2.4} color="#F7931E" />
-    <span
-      style={{
-        fontFamily: FONT_SANS,
-        fontSize: 10.5,
-        fontWeight: 800,
-        color: '#F7931E',
-        letterSpacing: '0.14em',
-        textTransform: 'uppercase',
-      }}
-    >
-      {label}
-    </span>
+  <div className="px-2.5">
+    <SectionHeader role="section" kicker={label.toUpperCase()} />
   </div>
 );
 
