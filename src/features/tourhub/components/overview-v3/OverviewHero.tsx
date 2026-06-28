@@ -95,7 +95,7 @@ export function OverviewHero({ height = 528 }: OverviewHeroProps) {
 
   return (
     <div style={{ position: 'relative', width: '100%' }} onTouchStart={onTouchStart} onTouchMove={onTouchMove} onTouchEnd={onTouchEnd}>
-      <div style={{ position: 'absolute', top: 'calc(env(safe-area-inset-top) + 8px)', right: 14, zIndex: 55 }}>
+      <div style={{ position: 'absolute', top: 'calc(env(safe-area-inset-top) + 8px)', right: 14, zIndex: 65 }}>
         <TourSwitcherAffordance variant="glass" />
       </div>
       <AnimatePresence mode="wait">
