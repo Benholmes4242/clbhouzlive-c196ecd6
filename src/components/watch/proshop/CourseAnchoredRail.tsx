@@ -48,6 +48,7 @@ function CourseAnchoredRailInner() {
         tier="rail"
         kicker="From your courses"
         title={topCourse.course_name}
+        paddingX={16}
         action={{
           label: 'See all',
           onClick: () => navigate(`/courses/${topCourse.course_id}#video`),
