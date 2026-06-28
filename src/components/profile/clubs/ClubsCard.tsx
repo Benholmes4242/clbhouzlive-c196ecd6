@@ -2,6 +2,7 @@ import React from 'react';
 import { motion } from 'framer-motion';
 import { Plus, Pencil } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { SectionHeader } from '@/components/ui/SectionHeader';
 
 interface Club {
   id: string;
@@ -40,7 +41,9 @@ const ClubsCard: React.FC<ClubsCardProps> = ({
         transition={{ duration: 0.24 }}
         className={cn('px-5 py-4', className)}
       >
-        <h3 className="text-base font-semibold text-foreground mb-3">Clubs & Memberships</h3>
+        <div className="mb-3">
+          <SectionHeader role="section" kicker="CLUBS" title="Clubs & Memberships" />
+        </div>
         <p className="text-sm text-muted-foreground mb-4">
           Add your home club and any clubs you play at.
         </p>
@@ -68,7 +71,9 @@ const ClubsCard: React.FC<ClubsCardProps> = ({
         transition={{ duration: 0.24 }}
         className={cn('px-5 py-4', className)}
       >
-        <h3 className="text-base font-semibold text-foreground mb-3">Clubs & Memberships</h3>
+        <div className="mb-3">
+          <SectionHeader role="section" kicker="CLUBS" title="Clubs & Memberships" />
+        </div>
         <p className="text-sm text-muted-foreground">
           Clubs are private.
         </p>
@@ -86,7 +91,7 @@ const ClubsCard: React.FC<ClubsCardProps> = ({
       className={cn('', className)}
     >
       <div className="flex items-center justify-between mb-2">
-        <h3 className="text-base font-semibold text-foreground">Clubs & Memberships</h3>
+        <SectionHeader role="section" kicker="CLUBS" title="Clubs & Memberships" />
         {isOwner && onEditClick && (
           <motion.button
             onClick={onEditClick}

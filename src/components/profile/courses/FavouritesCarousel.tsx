@@ -3,13 +3,14 @@
  */
 import React, { useState, useCallback, useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Plus, ChevronRight, Trophy } from 'lucide-react';
+import { Plus, Trophy } from 'lucide-react';
 import { CarouselDots } from '@/components/media/CarouselDots';
 import { cn } from '@/lib/utils';
 import { useUserTopTenCourses, TopTenCourse } from '@/hooks/useUserTopTenCourses';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { Top10CourseCard } from './Top10CourseCard';
+import { SectionHeader } from '@/components/ui/SectionHeader';
 
 
 interface FavouritesCarouselProps {
@@ -150,17 +151,13 @@ export const FavouritesCarousel: React.FC<FavouritesCarouselProps> = ({
     return (
       <section className={cn("w-full", className)}>
         {/* Header */}
-        <div className="flex items-center justify-between px-4 mb-4">
-          <div className="flex items-center gap-3">
-            <div>
-              <h2 className="text-lg font-semibold text-foreground">
-                {getTitle()}
-              </h2>
-              <p className="text-sm text-muted-foreground">
-                {getSubtitle()}
-              </p>
-            </div>
-          </div>
+        <div className="px-4 mb-4">
+          <SectionHeader
+            role="section"
+            kicker="YOUR TOP 10"
+            title={getTitle()}
+            sub={getSubtitle()}
+          />
         </div>
         
         {/* Empty Content Card */}
@@ -203,29 +200,21 @@ export const FavouritesCarousel: React.FC<FavouritesCarouselProps> = ({
   return (
     <section className={cn("w-full", className)}>
       {/* Refined Header */}
-      <div className="flex items-center justify-between mb-4 px-4">
-        <div className="flex items-center gap-3">
-          <div>
-            <h2 className="text-lg font-semibold text-foreground">
-              {getTitle()}
-            </h2>
-            <p className="text-sm text-muted-foreground">
-              {getSubtitle()}
-            </p>
+      <div className="mb-4 px-4">
+        <div className="flex items-start justify-between gap-3">
+          <div className="flex-1 min-w-0">
+            <SectionHeader
+              role="section"
+              kicker="YOUR TOP 10"
+              title={getTitle()}
+              sub={getSubtitle()}
+              action={isOwnProfile && onManage ? { label: 'Manage', onClick: onManage } : undefined}
+            />
           </div>
+          {!(isOwnProfile && onManage) && (
+            <span className="text-muted-foreground text-xs pt-1 shrink-0">{courseCount}/10</span>
+          )}
         </div>
-        
-        {isOwnProfile && onManage ? (
-          <button 
-            onClick={onManage}
-            className="flex items-center gap-0.5 text-[0.8125rem] font-medium text-muted-foreground min-h-[44px] active:scale-95 transition-transform"
-          >
-            Manage
-            <ChevronRight className="w-3.5 h-3.5 opacity-60" />
-          </button>
-        ) : (
-          <span className="text-muted-foreground text-xs">{courseCount}/10</span>
-        )}
       </div>
       
       {/* Carousel */}
