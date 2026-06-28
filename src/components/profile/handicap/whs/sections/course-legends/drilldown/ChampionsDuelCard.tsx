@@ -5,6 +5,7 @@ import { ChampionsListRow } from './ChampionsListRow';
 import { duelLine, chaseProgress } from './_shared/duelTension';
 import { ProBenchmarkBand } from './ProBenchmarkBand';
 import type { ProProfile, ProBandBase } from './_shared/proBenchmark';
+import { SectionHeader } from '@/components/ui/SectionHeader';
 
 export interface DuelRow {
   rank: number;
@@ -222,22 +223,15 @@ export const ChampionsDuelCard: React.FC<ChampionsDuelCardProps> = ({
       }}
     >
       {/* Header */}
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
-        <span
-          style={{
-            fontSize: 10,
-            fontWeight: 800,
-            letterSpacing: '0.14em',
-            textTransform: 'uppercase',
-            color: INK_55,
-            display: 'inline-flex',
-            alignItems: 'center',
-            gap: 6,
-          }}
-        >
-          <CatIcon size={11} strokeWidth={2.4} />
-          {categoryLabel}
-        </span>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 12, marginBottom: 6 }}>
+        <div style={{ flex: 1, minWidth: 0 }}>
+          <SectionHeader
+            role="section"
+            kicker={categoryLabel.toUpperCase()}
+            inlineIcon
+            icon={CatIcon}
+          />
+        </div>
         <span
           style={{
             fontSize: 9,
@@ -248,6 +242,7 @@ export const ChampionsDuelCard: React.FC<ChampionsDuelCardProps> = ({
             background: defending ? 'rgba(251,188,46,0.16)' : 'var(--hcp-tint-1)',
             color: defending ? DEEP_AMBER : INK_55,
             whiteSpace: 'nowrap',
+            flexShrink: 0,
           }}
         >
           {pillText}
@@ -490,9 +485,9 @@ export const ChampionsDuelCard: React.FC<ChampionsDuelCardProps> = ({
             type="button"
             onClick={onFullLeaderboardTap}
             style={{
-              fontSize: 9.5,
+              fontSize: 11,
               fontWeight: 800,
-              letterSpacing: '0.10em',
+              letterSpacing: '0.14em',
               textTransform: 'uppercase',
               color: INK,
               background: 'none',
@@ -501,7 +496,7 @@ export const ChampionsDuelCard: React.FC<ChampionsDuelCardProps> = ({
               padding: 0,
             }}
           >
-            {totalCount > 5 ? `Full leaderboard (${totalCount}) ›` : 'Full leaderboard ›'}
+            {totalCount > 5 ? `FULL LEADERBOARD (${totalCount}) ›` : 'FULL LEADERBOARD ›'}
           </button>
         </div>
       </div>

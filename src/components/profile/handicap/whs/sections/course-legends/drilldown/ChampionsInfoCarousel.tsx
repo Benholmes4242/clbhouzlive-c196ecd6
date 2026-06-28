@@ -1,8 +1,9 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Crown, ShieldCheck, X } from 'lucide-react';
+import { ShieldCheck, X } from 'lucide-react';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useWhsConnection } from '@/lib/whs/hooks';
+import { SectionHeader } from '@/components/ui/SectionHeader';
 
 const FONT = 'Geist, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
 const KEY_EXPLAINER = 'champions_explainer_dismissed_v1';
@@ -57,12 +58,7 @@ const CardShell: React.FC<CardShellProps> = ({ onDismiss, background, border, ch
 
 const ExplainerContent: React.FC<{ window: 'all_time' | '90d' }> = ({ window }) => (
   <>
-    <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 5 }}>
-      <Crown size={12} color="#B26818" strokeWidth={2.6} fill="#FBBC2E" />
-      <span style={{ fontSize: 9.5, fontWeight: 800, letterSpacing: '0.14em', color: 'var(--hcp-gold-text)', textTransform: 'uppercase' }}>
-        What are Champions?
-      </span>
-    </div>
+    <SectionHeader role="section" kicker="WHAT ARE CHAMPIONS" />
     <p style={{ fontSize: 12, fontWeight: 500, color: 'var(--hcp-t-60)', lineHeight: 1.55, margin: 0 }}>
       The clubhouse records board, digitalised. Lowest gross, best stableford, most birdies
       and more — ranked from{' '}
@@ -74,12 +70,7 @@ const ExplainerContent: React.FC<{ window: 'all_time' | '90d' }> = ({ window }) 
 
 const ProvenanceContent: React.FC<{ onSync: () => void; isSynced: boolean }> = ({ onSync, isSynced }) => (
   <>
-    <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 5 }}>
-      <ShieldCheck size={12} color="var(--hcp-gold-text)" strokeWidth={2.6} />
-      <span style={{ fontSize: 9.5, fontWeight: 800, letterSpacing: '0.14em', color: 'var(--hcp-gold-text)', textTransform: 'uppercase' }}>
-        Official scores only
-      </span>
-    </div>
+    <SectionHeader role="section" kicker="OFFICIAL SCORES ONLY" inlineIcon icon={ShieldCheck} />
     <p style={{ fontSize: 12, fontWeight: 500, color: 'var(--hcp-t-60)', lineHeight: 1.55, margin: 0 }}>
       That ace only counts if it's on your{' '}
       <b style={{ color: 'var(--hcp-t-100)', fontWeight: 700 }}>official handicap record</b>.
