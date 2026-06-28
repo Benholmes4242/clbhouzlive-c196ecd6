@@ -390,7 +390,7 @@ const CompactHeader: React.FC<CompactHeaderProps> = ({ className }) => {
 
             {/* Handicap chip — next to avatar, all routes */}
             <div className="[&>button]:!rounded-full">
-              <HandicapChip light={useLightTheme && !overlayActive} />
+              <HandicapChip light={useLightTheme && !overlayActive} pill={isEditorialChromeRoute} />
             </div>
 
             {/* Identity pill (mobile only) */}
@@ -405,6 +405,7 @@ const CompactHeader: React.FC<CompactHeaderProps> = ({ className }) => {
                     notificationCount={unreadCount}
                     useLightTheme={useLightTheme && !overlayActive}
                     compact={isEditorialChromeRoute}
+                    size={isEditorialChromeRoute ? 'lg' : undefined}
                   />
                 </div>
               ) : (
