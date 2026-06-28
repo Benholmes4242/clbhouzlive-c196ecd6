@@ -9,7 +9,7 @@
  * or a whs_friend_matches.friend_row_id (non-Clbhouz friend, owner-view only).
  */
 import React, { useMemo, useRef, useState } from 'react';
-import { useParams, Link } from 'react-router-dom';
+import { useParams, Link, useNavigate } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { toast } from 'sonner';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
@@ -18,6 +18,7 @@ import { useFriendRivalries, useWhsConnection } from '@/lib/whs/hooks';
 import { fetchPrimaryRivalryWithOwner, fetchAdHocRivalry } from '@/lib/whs/friendViewRivalries';
 import type { FriendRivalryHydrated } from '@/lib/whs/types';
 import { PageRoot } from '@/components/layout/PageRoot';
+import FloatingPageHeader from '@/components/header/FloatingPageHeader';
 import { useRivalryDimension } from '@/lib/whs/utils/useRivalryDimension';
 import { useOpenFriendSheet } from '@/components/friend-sheet/FriendSheetProvider';
 
@@ -170,8 +171,8 @@ const RivalryPage: React.FC = () => {
   const rivalParam = params.rivalUserId ?? params.rivalId ?? undefined;
   const friendParam = params.friendUserId ?? undefined;
   const isFriendView = !!friendParam;
+  const navigate = useNavigate();
 
-  
   const { user } = useSupabaseSession();
   const viewerId = user?.id;
   const openHybridSheet = useOpenFriendSheet().open;
@@ -374,9 +375,10 @@ const RivalryPage: React.FC = () => {
         minHeight: '100vh',
         fontFamily: FONT,
         color: T100,
-        paddingTop: 'calc(var(--header-h, 55px) + 34px)',
+        paddingTop: 'calc(env(safe-area-inset-top, 0px) + 80px)',
       }}
     >
+      <FloatingPageHeader onBack={() => navigate(-1)} showHandicap={false} />
 
 
       {!viewerId && (
