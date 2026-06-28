@@ -1,10 +1,11 @@
 import React, { useState } from 'react';
-import { Pencil, ThumbsUp, ThumbsDown } from 'lucide-react';
+import { ThumbsUp, ThumbsDown } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { formatRatingValue } from '@/utils/formatters';
 import { getScoreRingColors } from '@/hooks/useTierStyles';
 import { ReviewMediaStrip, ReviewMediaItem } from './ReviewMediaStrip';
+import { SectionHeader } from '@/components/ui/SectionHeader';
 
 interface Review {
   id: string;
@@ -140,34 +141,14 @@ export const ReviewBlockFlat: React.FC<ReviewBlockFlatProps> = ({
       className={cn('transition-all', isHighlighted && 'animate-soft-pulse')}
       style={{ padding: '14px 0 16px' }}
     >
-      {/* "Your Review" eyebrow + Edit (only for own review) */}
+      {/* "YOUR REVIEW" eyebrow + Edit (only for own review) — canonical SectionHeader */}
       {isMine && (
-        <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 10 }}>
-          <span style={{ fontSize: 9, fontWeight: 900, color: '#F7931E', letterSpacing: '0.16em', textTransform: 'uppercase' }}>
-            Your Review
-          </span>
-          <div style={{ flex: 1 }} />
-          {onEditClick && (
-            <button
-              type="button"
-              onClick={onEditClick}
-              style={{
-                display: 'inline-flex',
-                alignItems: 'center',
-                gap: 4,
-                background: 'none',
-                border: 'none',
-                color: '#94A3B8',
-                fontSize: 11,
-                fontWeight: 700,
-                cursor: 'pointer',
-                padding: 0,
-              }}
-            >
-              <Pencil size={12} strokeWidth={2.2} /> Edit
-            </button>
-          )}
-        </div>
+        <SectionHeader
+          role="section"
+          kicker="YOUR REVIEW"
+          action={onEditClick ? { label: 'Edit', onClick: onEditClick } : undefined}
+          className="mb-[10px]"
+        />
       )}
 
 
