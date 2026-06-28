@@ -91,7 +91,7 @@ export function TourHubMainPage() {
   const renderTab = () => {
     switch (activeTab) {
       case 'overview':
-        return <OverviewTab topRightSlot={<TourSwitcherAffordance variant="glass" />} />;
+        return <OverviewTab />;
       case 'live':
         return <LiveLeaderboardTab />;
       case 'schedule':
@@ -136,7 +136,7 @@ export function TourHubMainPage() {
             <FloatingTourHeader
               onMenuTap={() => setMenuOpen(true)}
               onSearchTap={() => setSearchOpen(true)}
-              /* endSlot removed — picker now lives in the hero so it scrolls away with it */
+              endSlot={<TourSwitcherAffordance variant="glass" />}
             />
             <GlobalSearchOverlay isOpen={searchOpen} onClose={() => setSearchOpen(false)} />
 

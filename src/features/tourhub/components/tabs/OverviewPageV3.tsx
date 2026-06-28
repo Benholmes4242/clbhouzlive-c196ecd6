@@ -23,11 +23,7 @@ import { WifiOff } from 'lucide-react';
 import ScrollToTopGlass from '@/components/common/ScrollToTopGlass';
 
 
-interface OverviewPageV3Props {
-  topRightSlot?: React.ReactNode;
-}
-
-export function OverviewPageV3({ topRightSlot }: OverviewPageV3Props = {}) {
+export function OverviewPageV3() {
   const { isOnline } = useNetworkStatus();
 
   return (
@@ -58,7 +54,7 @@ export function OverviewPageV3({ topRightSlot }: OverviewPageV3Props = {}) {
       >
         {/* Tour Hub hero — self-contained carousel (single-owner index, random
             landing slide, all three states eligible). See OverviewHero.tsx. */}
-        <OverviewHero topRightSlot={topRightSlot} />
+        <OverviewHero />
 
 
 

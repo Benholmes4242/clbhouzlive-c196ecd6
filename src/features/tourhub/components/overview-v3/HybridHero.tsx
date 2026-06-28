@@ -77,11 +77,9 @@ export interface HybridHeroProps {
   // Pass 5
   activeTournamentId: string | null;
   onSelectTour: (tournamentId: string) => void;
-  /** Optional content rendered at the hero's top-right (cinematic full-bleed only). Scrolls with the hero. */
-  topRightSlot?: React.ReactNode;
 }
 
-export function HybridHero({ slide, activeTournamentId, onSelectTour, topRightSlot }: HybridHeroProps) {
+export function HybridHero({ slide, activeTournamentId, onSelectTour }: HybridHeroProps) {
   const { tournament } = slide;
   const navigate = useNavigate();
 
@@ -340,7 +338,6 @@ export function HybridHero({ slide, activeTournamentId, onSelectTour, topRightSl
             hoursUntilStart={hoursUntilStart}
             venueName={tournament.venueName}
             datesString={datesStringForHero}
-            topRightSlot={topRightSlot}
           />
         </div>
       );

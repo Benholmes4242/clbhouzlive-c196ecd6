@@ -279,8 +279,6 @@ export interface CinematicHeroFullBleedProps {
   hoursUntilStart?: number;
   venueName?: string | null;
   datesString?: string | null;
-  /** Optional content rendered absolutely at the hero's top-right (e.g. tour switcher). Scrolls with the hero. */
-  topRightSlot?: React.ReactNode;
 }
 
 // ---- component ------------------------------------------------------------
@@ -301,7 +299,6 @@ export function CinematicHeroFullBleed({
   hoursUntilStart,
   venueName,
   datesString,
-  topRightSlot,
 }: CinematicHeroFullBleedProps) {
   const isLive = state.kind === 'live';
   const isResults = state.kind === 'results';
@@ -517,20 +514,6 @@ export function CinematicHeroFullBleed({
         paddingTop: 'env(safe-area-inset-top, 0px)',
       }}
     >
-      {/* Top-right slot (scrolls with hero) — aligns with the fixed menu/search pills */}
-      {topRightSlot && (
-        <div
-          style={{
-            position: 'absolute',
-            top: 'calc(env(safe-area-inset-top, 0px) + 10px)',
-            right: 16,
-            zIndex: 5,
-          }}
-        >
-          {topRightSlot}
-        </div>
-      )}
-
       {/* Spacer */}
       <div style={{ flex: 1, minHeight: 220 }} />
 
