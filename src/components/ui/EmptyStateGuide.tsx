@@ -19,7 +19,7 @@
  */
 
 import React from 'react';
-import { SectionLabel } from '@/components/courses/course-detail/SectionLabel';
+import { SectionHeader } from '@/components/ui/SectionHeader';
 import { ListChecks, type LucideIcon } from 'lucide-react';
 
 const INK = '#0F172A';
@@ -53,7 +53,7 @@ export const EmptyStateGuide: React.FC<EmptyStateGuideProps> = ({
 }) => {
   return (
     <div className={className}>
-      <SectionLabel text={kicker} icon={ListChecks} />
+      <SectionHeader tier="standard" tone="amber" inlineIcon icon={ListChecks} kicker={kicker} paddingX={16} />
       <div style={{ padding: '0 16px' }}>
         {items.map((item, i) => {
           const Icon = item.icon;

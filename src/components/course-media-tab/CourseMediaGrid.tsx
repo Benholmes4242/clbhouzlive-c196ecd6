@@ -6,7 +6,7 @@ import { AlertCircle, Camera, Loader2, Film, ListChecks, Flag, Sunrise, Building
 import type { FeedPost } from '@/components/media-system/types/media';
 import { CourseMediaTile } from './CourseMediaTile';
 import { CourseMediaGridSkeleton } from './CourseMediaGridSkeleton';
-import { SectionLabel } from '@/components/courses/course-detail/SectionLabel';
+
 import { PrimaryAmberCTA } from '@/components/ui/PrimaryAmberCTA';
 import { EmptyStateGuide } from '@/components/ui/EmptyStateGuide';
 import { AMBER, HAIRLINE_INK_7, HAIRLINE_INK_10, INK, INK_FAINT, INK_TINT_02, INK_TINT_06, SURFACE } from '@/features/courses/_shared/tokens';

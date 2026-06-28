@@ -9,7 +9,7 @@ import { useCourseRatingAggregates } from '@/hooks/useCourseRatingAggregates';
 import CourseStatusToggle from './CourseStatusToggle';
 import PersonalReviewCard from './PersonalReviewCard';
 import CourseMoments from './CourseMoments';
-import { SectionLabel } from '@/components/courses/course-detail/SectionLabel';
+import { SectionHeader } from '@/components/ui/SectionHeader';
 import { Flag } from 'lucide-react';
 
 interface PersonalSectionProps {
@@ -46,9 +46,9 @@ export const PersonalSection: React.FC<PersonalSectionProps> = ({
 
   return (
     <section style={{ padding: '20px 0', display: 'flex', flexDirection: 'column', gap: 20 }}>
-      {/* Section header — canonical SectionLabel for cross-page consistency */}
+      {/* Section header — canonical SectionHeader (standard/amber + inline icon) */}
       <div style={{ marginBottom: -14 }}>
-        <SectionLabel text="Your Journey" icon={Flag} />
+        <SectionHeader tier="standard" tone="amber" inlineIcon icon={Flag} kicker="Your Journey" paddingX={16} />
       </div>
 
       {/* Status toggle */}
