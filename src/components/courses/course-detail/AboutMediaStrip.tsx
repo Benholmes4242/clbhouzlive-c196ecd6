@@ -166,8 +166,8 @@ const AboutMediaStrip: React.FC<AboutMediaStripProps> = ({ clubId, onSeeAllClick
   if (!hasMedia) {
     return (
       <div>
-        <div style={{ padding: '0 16px', marginBottom: 12 }}>
-          <div style={EYEBROW_STYLE}>Media</div>
+        <div style={{ marginBottom: 12 }}>
+          <SectionHeader tier="standard" tone="amber" inlineIcon icon={Camera} kicker="Media" paddingX={16} />
         </div>
 
         <div
