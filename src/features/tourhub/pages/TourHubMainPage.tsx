@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
+import GlobalSearchOverlay from '@/components/search/GlobalSearchOverlay';
 import { TourHubShell } from '../components/TourHubShell';
 import { TourHubShellTabs } from '../components/TourHubShellTabs';
 import { ShellSlot } from '@/components/header/ShellSlot';
@@ -26,6 +27,7 @@ export function TourHubMainPage() {
   const tabParam = searchParams.get('tab') as TourHubTab | null;
   const [activeTab, setActiveTab] = useState<TourHubTab>(tabParam || 'overview');
   const [menuOpen, setMenuOpen] = useState(false);
+  const [searchOpen, setSearchOpen] = useState(false);
 
   // Subscribe to tournament status changes (live/completed transitions)
   useTournamentStatusRealtime();
@@ -133,9 +135,10 @@ export function TourHubMainPage() {
             <div>{renderTab()}</div>
             <FloatingTourHeader
               onMenuTap={() => setMenuOpen(true)}
-              onSearchTap={() => navigate('/search')}
+              onSearchTap={() => setSearchOpen(true)}
               endSlot={<TourSwitcherAffordance variant="glass" />}
             />
+            <GlobalSearchOverlay isOpen={searchOpen} onClose={() => setSearchOpen(false)} />
 
             <TourSideMenu
               open={menuOpen}
