@@ -36,11 +36,10 @@ const HIDDEN_ROUTE_PREFIXES = [
   '/verified', // Verified page - standalone, no app chrome
 ];
 
-// Routes that use different nav styling (like clubhouse)
-const CLUBHOUSE_ROUTES = [
-  '/', 
-  '/clubhouse'
-];
+// Routes that use the dark Clubhouse nav chrome.
+// Mirrors isDarkChromeRoute() in globalHeaderRules — kept here for the
+// scroll-direction nav-hide behaviour that only applies to the feed.
+const CLUBHOUSE_ROUTES = ['/', '/clubhouse'];
 
 // Routes that use the warm gradient Cleo design
 const WARM_GRADIENT_ROUTES = [
