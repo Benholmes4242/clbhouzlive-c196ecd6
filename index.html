@@ -61,7 +61,11 @@
   </head>
 
   <body style="background-color:#15171F;margin:0;">
-    <div id="safe-area-shield" aria-hidden="true" style="background-color:#15171F;"></div>
+    <!-- Shield seeded TRANSPARENT so full-bleed/immersive heroes (tour/course/profile/business)
+         can bleed into the notch from frame 0. The body+root behind it remain #15171F, so the
+         Clubhouse cold-launch chain still reads as seamless charcoal. Dark-chrome routes
+         (Clubhouse) repaint the shield to #15171F via App.tsx's route effect. -->
+    <div id="safe-area-shield" aria-hidden="true" style="background-color:transparent;"></div>
     <div id="root"><div style="background:#15171F;min-height:100vh;width:100%;"></div></div>
     <div id="portal-root"></div>
     <script>
