@@ -155,73 +155,88 @@ function SectionHeaderInner(props: SectionHeaderProps) {
   const defaultEyebrowColor = isPrime ? AMBER_AA : '#94A3B8';
   const eyebrowColor = tone ? EYEBROW_TONE[tone] : defaultEyebrowColor;
 
+  const hasTitle = Boolean(title);
+
   return (
     <div className={className} style={{ ...pad, marginBottom: 14 }}>
       {kicker && (
         <div
           style={{
-            display: 'inline-flex',
-            alignItems: 'center',
-            gap: 6,
-            fontFamily: GEIST,
-            fontSize: 11,
-            fontWeight: 800,
-            letterSpacing: '0.14em',
-            textTransform: 'uppercase',
-            color: eyebrowColor,
-            fontFeatureSettings: '"kern" 1, "liga" 1',
+            display: 'flex',
+            alignItems: 'baseline',
+            justifyContent: 'space-between',
+            gap: 12,
             marginBottom: 5,
           }}
         >
-          {inlineIcon && Icon && (
-            <Icon size={11} strokeWidth={2.4} color={eyebrowColor} />
-          )}
-          {kicker}
-          {required && (
-            <span aria-hidden="true" style={{ color: AMBER, marginLeft: 3, letterSpacing: 0 }}>
-              *
-            </span>
-          )}
-          {count != null && (
-            <span
-              style={{
-                marginLeft: 8,
-                fontFamily: GEIST,
-                fontSize: 11,
-                fontWeight: 800,
-                color: '#94A3B8',
-                fontVariantNumeric: 'tabular-nums',
-                letterSpacing: 0,
-              }}
-            >
-              {count.toLocaleString()}
-            </span>
-          )}
+          <div
+            style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: 6,
+              fontFamily: GEIST,
+              fontSize: 11,
+              fontWeight: 800,
+              letterSpacing: '0.14em',
+              textTransform: 'uppercase',
+              color: eyebrowColor,
+              fontFeatureSettings: '"kern" 1, "liga" 1',
+            }}
+          >
+            {inlineIcon && Icon && (
+              <Icon size={11} strokeWidth={2.4} color={eyebrowColor} />
+            )}
+            {kicker}
+            {required && (
+              <span aria-hidden="true" style={{ color: AMBER, marginLeft: 3, letterSpacing: 0 }}>
+                *
+              </span>
+            )}
+            {count != null && (
+              <span
+                style={{
+                  marginLeft: 8,
+                  fontFamily: GEIST,
+                  fontSize: 11,
+                  fontWeight: 800,
+                  color: '#94A3B8',
+                  fontVariantNumeric: 'tabular-nums',
+                  letterSpacing: 0,
+                }}
+              >
+                {count.toLocaleString()}
+              </span>
+            )}
+          </div>
+          {!hasTitle && action && <ActionAffordance action={action} />}
         </div>
       )}
-      <div
-        style={{
-          display: 'flex',
-          alignItems: 'baseline',
-          justifyContent: 'space-between',
-          gap: 12,
-        }}
-      >
-        <h2
+      {hasTitle && (
+        <div
           style={{
-            margin: 0,
-            fontFamily: GEIST,
-            fontSize: titleSize,
-            fontWeight: 800,
-            letterSpacing: titleTracking,
-            color: INK,
-            lineHeight: 1.15,
+            display: 'flex',
+            alignItems: 'baseline',
+            justifyContent: 'space-between',
+            gap: 12,
           }}
         >
-          {title}
-        </h2>
-        {action && <ActionAffordance action={action} />}
-      </div>
+          <h2
+            style={{
+              margin: 0,
+              fontFamily: GEIST,
+              fontSize: titleSize,
+              fontWeight: 800,
+              letterSpacing: titleTracking,
+              color: INK,
+              lineHeight: 1.15,
+            }}
+          >
+            {title}
+          </h2>
+          {action && <ActionAffordance action={action} />}
+        </div>
+      )}
+
       <div
         aria-hidden="true"
         style={{
