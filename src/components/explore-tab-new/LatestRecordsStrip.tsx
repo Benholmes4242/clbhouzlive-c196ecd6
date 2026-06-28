@@ -105,8 +105,8 @@ export function LatestRecordsStrip(_: Props = {}) {
   return (
     <section style={{ padding: '0 0 0', fontFamily: FONT }}>
       <SectionHeader
-        tier="editorial"
-        mark={<TrophyMark />}
+        role="section"
+        kicker="RECORDS"
         title="Latest records"
         sub="Recent course records from official WHS data"
         paddingTop={32}
