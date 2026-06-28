@@ -327,10 +327,20 @@ function AppRoutes() {
     // Reset shield
     const shield = document.getElementById('safe-area-shield');
     if (shield) shield.style.backgroundColor = 'transparent';
-    // Reset html/body to the app's light surface to prevent stale dark bleeding
-    // through WebView compositing. Clubhouse feed paints its own dark bg.
-    document.documentElement.style.backgroundColor = '#F8FAFC';
-    document.body.style.backgroundColor = '#F8FAFC';
+    // Reset html/body to the route's surface to prevent stale colour bleeding
+    // through WebView compositing. Dark-chrome routes (Clubhouse) stay charcoal
+    // so the full cold-launch chain (splash → shell → skeleton → feed) shows
+    // ZERO colour change. Light routes get the standard light surface.
+    const darkChrome = isDarkChromeRoute(location.pathname);
+    const surface = darkChrome ? '#15171F' : '#F8FAFC';
+    document.documentElement.style.backgroundColor = surface;
+    document.body.style.backgroundColor = surface;
+
+    // Keep body route classes in sync with current route so stale
+    // `route-clubhouse` / `route-auth` classes from the pre-React shell
+    // never apply dark CSS to a light page (or vice-versa).
+    document.body.classList.toggle('route-clubhouse', darkChrome);
+    document.body.classList.toggle('route-auth', location.pathname.startsWith('/auth'));
 
     // FIX: Mark immersive routes so CSS can suppress .app-shell's
     // #F8FAFC background-color before the hero page mounts.
