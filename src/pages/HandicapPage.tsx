@@ -25,6 +25,7 @@ import { useWhsConnection } from '@/lib/whs/hooks';
 import WhsHandicapTab from '@/components/profile/handicap/whs/WhsHandicapTab';
 import HandicapDashboard from '@/components/profile/handicap/whs/HandicapDashboard';
 import ShellSlot from '@/components/header/ShellSlot';
+import FloatingPageHeader from '@/components/header/FloatingPageHeader';
 import SegmentedControl from '@/components/discover/SegmentedControl';
 import { RivalryCTA } from '@/components/profile/handicap/whs/sections/header/RivalryCTA';
 import { firstName } from '@/pages/rivalry-page/_shared/helpers';
