@@ -333,7 +333,10 @@ function AppRoutes() {
     // so the full cold-launch chain (splash → shell → skeleton → feed) shows
     // ZERO colour change. Light routes get the standard light surface.
     const darkChrome = isDarkChromeRoute(location.pathname);
-    const surface = darkChrome ? '#15171F' : '#F8FAFC';
+    const immersive = isImmersiveRoute(location.pathname);
+    // Immersive routes (course/profile/business) get a DARK ink fallback so
+    // any pre-paint glimpse in the notch/safe-area is cinematic, not grey.
+    const surface = darkChrome ? '#15171F' : immersive ? '#0F172A' : '#F8FAFC';
     document.documentElement.style.backgroundColor = surface;
     document.body.style.backgroundColor = surface;
 
@@ -346,10 +349,35 @@ function AppRoutes() {
     // FIX: Mark immersive routes so CSS can suppress .app-shell's
     // #F8FAFC background-color before the hero page mounts.
     // This eliminates the grey safe-area flash on return navigation.
-    if (isImmersiveRoute(location.pathname)) {
+    if (immersive) {
       document.documentElement.setAttribute('data-immersive-route', 'true');
+      // Apply transparent shield + Median overlay SYNCHRONOUSLY (pre-paint)
+      // so the webview is told to extend under the status bar before the hero
+      // lays out. Without this, the first paint has --sat=0 and the hero's
+      // marginTop:-sat pull-up collapses → grey strip in the notch zone.
+      try {
+        applyShieldColor('transparent');
+        (window as any).median?.statusbar?.set({
+          style: 'dark',
+          color: '00000000',
+          overlay: true,
+          blur: false,
+        });
+      } catch {}
     } else {
       document.documentElement.removeAttribute('data-immersive-route');
+      // Leaving an immersive route: restore normal shield + opaque native bar
+      // so non-immersive routes aren't left transparent if a race beats the
+      // FloatingPageHeader unmount cleanup.
+      try {
+        applyShieldColor(darkChrome ? '#15171F' : '#F8FAFC');
+        (window as any).median?.statusbar?.set({
+          style: darkChrome ? 'light' : 'light',
+          color: darkChrome ? 'FF15171F' : 'FFF8FAFC',
+          overlay: false,
+          blur: false,
+        });
+      } catch {}
     }
   }, [location.pathname]);
   
