@@ -217,7 +217,7 @@ export const LOCKED_PALETTE: RarityPalette = {
   border: 'rgba(148,163,184,0.35)',
   label: 'LOCKED',
   heroGradient: 'linear-gradient(160deg, rgba(148,163,184,0.14) 0%, var(--hcp-bg-1) 70%)',
-  cardSweep: 'linear-gradient(160deg, #EEF1F5 0%, #F8FAFC 100%)',
+  cardSweep: 'linear-gradient(160deg, rgba(148,163,184,0.14) 0%, #1B1E27 100%)',
   topStripe: null,
   outerGlow: null,
   metaColor: 'rgba(100,116,139,0.85)',

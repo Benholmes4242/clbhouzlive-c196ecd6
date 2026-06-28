@@ -92,7 +92,7 @@ const StandardCard: React.FC<Props> = ({ item, onTap }) => {
         flexDirection: 'column',
         justifyContent: 'space-between',
         color: 'var(--hcp-t-100)',
-        boxShadow: [palette.outerGlow, '0 1px 2px rgba(15,23,42,0.04)', '0 4px 12px rgba(15,23,42,0.06)']
+        boxShadow: [palette.outerGlow, '0 1px 2px rgba(0,0,0,0.25)', '0 4px 12px rgba(0,0,0,0.30)']
           .filter(Boolean)
           .join(', '),
       }}
