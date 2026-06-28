@@ -14,6 +14,7 @@ import { useHeroCarouselData, type HeroSlide } from '../../hooks/useHeroCarousel
 import { HybridHero } from './HybridHero';
 import { useTourSelection } from '../../context/TourSelectionContext';
 import { INK_TINT_06 } from '../../_shared/tokens';
+import { TourSwitcherAffordance } from '../TourSwitcherAffordance';
 
 function shuffle<T>(input: T[]): T[] {
   const a = [...input];
