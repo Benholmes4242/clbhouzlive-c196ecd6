@@ -16,7 +16,7 @@ import { useHeroFullBleed } from '../_shared/heroFullBleedSignal';
 import { setFloatingHeaderActive } from '../_shared/floatingHeaderSignal';
 import { FloatingTourHeader } from '../components/FloatingTourHeader';
 import { TourSideMenu } from '../components/TourSideMenu';
-import { TourSwitcherAffordance } from '../components/TourSwitcherAffordance';
+
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useWhsConnection, useHandicapTrend } from '@/lib/whs/hooks';
 import { useLogout } from '@/hooks/useLogout';
@@ -136,7 +136,6 @@ export function TourHubMainPage() {
             <FloatingTourHeader
               onMenuTap={() => setMenuOpen(true)}
               onSearchTap={() => setSearchOpen(true)}
-              endSlot={<TourSwitcherAffordance variant="glass" />}
             />
             <GlobalSearchOverlay isOpen={searchOpen} onClose={() => setSearchOpen(false)} />
 
