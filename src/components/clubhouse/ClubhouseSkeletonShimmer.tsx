@@ -33,8 +33,8 @@ const SkeletonBlock: React.FC<{
   style?: React.CSSProperties;
 }> = ({ className, isStatic = false, style }) => (
   <div
-    className={cn('relative overflow-hidden', !isStatic && 'clb-shimmer-light', className)}
-    style={{ background: 'rgba(15,23,42,0.05)', ...style }}
+    className={cn('relative overflow-hidden', !isStatic && 'clb-shimmer-dark', className)}
+    style={{ background: 'rgba(255,255,255,0.06)', ...style }}
   />
 );
 
@@ -242,9 +242,9 @@ const ReviewBottomSkeleton: React.FC<{ isStatic?: boolean }> = ({ isStatic }) =>
   </div>
 );
 
-const CARD_BG = '#FFFFFF';
-const HAIRLINE = 'rgba(15,23,42,0.07)';
-const CANVAS = '#F8FAFC';
+const CARD_BG = '#1B1E27';
+const HAIRLINE = 'rgba(255,255,255,0.08)';
+const CANVAS = '#15171F';
 
 const CardSkeleton: React.FC<{
   isStatic?: boolean;
@@ -376,7 +376,7 @@ export const ClubhouseSkeletonShimmer: React.FC<ClubhouseSkeletonShimmerProps> =
     <AnimatePresence>
       {isVisible && (
         <motion.div
-          className={cn('absolute inset-0 z-50 pointer-events-none', 'bg-[#F8FAFC]', className)}
+          className={cn('absolute inset-0 z-50 pointer-events-none', 'bg-[#15171F]', className)}
           initial={{ opacity: 1 }}
           exit={{ opacity: 0 }}
           transition={{ duration: 0.2, ease: 'easeOut' }}
