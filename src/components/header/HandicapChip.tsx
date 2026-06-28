@@ -119,8 +119,12 @@ export function HandicapChip({ light = false, pill = false }: { light?: boolean;
         pill
           ? {
               ...PILL_STYLE,
-              border: '0.5px dashed rgba(15,23,42,0.22)',
-              boxShadow: '0 1px 2px rgba(15,23,42,0.04)',
+              background: 'transparent',
+              border: light
+                ? '0.5px dashed rgba(15,23,42,0.22)'
+                : '1px dashed rgba(255,255,255,0.26)',
+              boxShadow: light ? '0 1px 2px rgba(15,23,42,0.04)' : 'none',
+              filter: light ? 'none' : shadow,
               whiteSpace: 'nowrap',
             }
           : {
