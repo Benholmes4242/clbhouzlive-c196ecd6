@@ -1,5 +1,4 @@
 import React from 'react';
-import { INK } from '@/features/courses/_shared/tokens';
 import { cn } from '@/lib/utils';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useNetworkActivity } from '@/hooks/useNetworkActivity';
@@ -35,21 +34,13 @@ export const YourNetworkSection: React.FC<YourNetworkSectionProps> = ({ classNam
         className,
       )}
     >
-      <div className="mb-2">
-        <SectionHeader tier="standard" kicker="Your network plays" tone="amber" className="mb-[3px]" />
-        <h2
-          style={{
-            fontSize: 22,
-            fontWeight: 800,
-            color: INK,
-            letterSpacing: '-0.025em',
-            margin: 0,
-            lineHeight: 1.15,
-          }}
-        >
-          Courses played by friends
-        </h2>
-      </div>
+      <SectionHeader
+        role="section"
+        kicker="YOUR CIRCLE"
+        title="Courses played by friends"
+        paddingX={16}
+        className="mb-2"
+      />
 
       <NetworkHighlightCarousel highlights={data.highlights} />
     </section>
