@@ -97,7 +97,7 @@ const ProfileHeroShell: React.FC<ProfileHeroShellProps> = ({
       ref={containerRef}
       className="relative w-full overflow-hidden" 
       style={{ 
-        height: 'calc(var(--hero-h) + env(safe-area-inset-top, 0px))',
+        height: 'calc(var(--profile-hero-h) + env(safe-area-inset-top, 0px))',
         marginTop: 'calc(-55px - env(safe-area-inset-top, 0px))',
       }}
     >
