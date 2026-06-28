@@ -2,6 +2,7 @@ import React from 'react';
 import { Crown, type LucideIcon } from 'lucide-react';
 import type { LegendCategory, LegendWindow } from '@/lib/gam/types';
 import { WindowToggle } from '../CourseLegendsSection';
+import { SectionHeader } from '@/components/ui/SectionHeader';
 
 export interface CabinetSlot {
   key: LegendCategory;
@@ -17,7 +18,6 @@ interface CrownCabinetProps {
   onWindowChange: (w: LegendWindow) => void;
 }
 
-const AMBER = '#F7931E';
 const HELD_LABEL = 'var(--hcp-gold-text)';
 const INK = 'var(--hcp-t-100)';
 
@@ -39,24 +39,19 @@ export const CrownCabinet: React.FC<CrownCabinetProps> = ({
         padding: '14px 16px',
       }}
     >
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: 12 }}>
-        <span
-          style={{
-            fontSize: 10.5,
-            fontWeight: 800,
-            letterSpacing: '0.16em',
-            textTransform: 'uppercase',
-            color: AMBER,
-          }}
-        >
-          Your crown cabinet
-        </span>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 12, marginBottom: 6 }}>
+        <div style={{ flex: 1, minWidth: 0 }}>
+          <SectionHeader role="section" kicker="YOUR CROWN CABINET" />
+        </div>
         <span
           style={{
             fontSize: 12.5,
             fontWeight: 800,
             color: INK,
             fontVariantNumeric: 'tabular-nums',
+            lineHeight: 1,
+            paddingTop: 2,
+            whiteSpace: 'nowrap',
           }}
         >
           {heldCount} / {slots.length}
