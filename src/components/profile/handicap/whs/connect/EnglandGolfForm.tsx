@@ -201,7 +201,7 @@ export const EnglandGolfForm: React.FC<Props> = ({
           <ShieldCheck size={18} color={GREEN} strokeWidth={2.2} style={{ marginTop: 1, flexShrink: 0 }} />
           <div style={{ fontSize: 12, color: '#334155', lineHeight: 1.45 }}>
             <span style={{ fontWeight: 700, color: INK }}>Your password is safe.</span>{' '}
-            Stored encrypted, used only to fetch your handicap from England Golf. clbhouz staff can't read it. Disconnect anytime.
+            Stored encrypted and used only to sync your handicap from England Golf. You can disconnect or delete it anytime.
           </div>
         </div>
 
