@@ -50,10 +50,12 @@ export const PageRoot = React.forwardRef<HTMLDivElement, PageRootProps>(
     // Bottom nav (64px) + safe area spacer (30px) = 94px clearance
     const bottomPadding = hasBottomNav ? '94px' : undefined;
 
-    // Immersive pages pull themselves up into .app-shell's padding-top so heroes can bleed to viewport top
-    const immersiveMargin = immersive
-      ? 'calc(-1 * var(--sat))'
-      : undefined;
+    // Option B: .app-shell padding-top is zeroed via CSS on immersive routes
+    // (html[data-immersive-route='true']), so the hero already sits at physical
+    // y=0. No negative marginTop needed — that pull-up raced the native
+    // overlay:true bridge call and collapsed to 0 when --sat wasn't ready,
+    // pushing the image below the notch.
+    const immersiveMargin = undefined;
 
     return (
       <div

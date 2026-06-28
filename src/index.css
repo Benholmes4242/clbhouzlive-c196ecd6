@@ -839,6 +839,12 @@ body.route-light .app-shell {
    ============================================================ */
 html[data-immersive-route='true'] .app-shell {
   background-color: transparent !important;
+  /* Option B fix: do NOT push content down by var(--sat). The immersive hero
+     owns its own paddingTop: env(safe-area-inset-top) and fills from physical
+     y=0. This removes the dependency on --sat being correct at first layout
+     (which was racing the async median.statusbar.set({overlay:true}) bridge
+     call and collapsing the hero's marginTop:-sat pull-up to 0). */
+  padding-top: 0 !important;
 }
 
 /* Desktop backdrop behind the app column */
