@@ -34,14 +34,14 @@ import { PageRoot } from '@/components/layout/PageRoot';
 import { ProfileSkeleton } from '@/components/skeletons/ProfileSkeleton';
 import ScrollToTopGlass from '@/components/common/ScrollToTopGlass';
 import { useHideHeader } from '@/hooks/useHeaderVisibility';
-import { useMedianStatusBar } from '@/hooks/useMedianStatusBar';
+
 import { safeGoBack } from '@/utils/navigation';
 import { uploadToR2Only } from '@/utils/r2OnlyUpload';
 import { FavouritesCarousel } from '@/components/profile/courses/FavouritesCarousel';
 import { AddCourseModal } from '@/components/profile/courses/AddCourseModal';
 import { PrivateProfileGate } from '@/components/profile/PrivateProfileGate';
 import { CoverPhotoFallback } from '@/components/ui/CoverPhotoFallback';
-import { ProfileFloatingHeader } from '@/components/profile/ProfileFloatingHeader';
+import FloatingPageHeader from '@/components/header/FloatingPageHeader';
 
 
 import { useProfileAchievements } from '@/hooks/useProfileAchievements';
@@ -124,15 +124,7 @@ const ProfilePageV2Content: React.FC = () => {
   
   // Hide global header for full-bleed immersive profile
   useHideHeader();
-  // Re-apply status bar when returning from fullscreen media viewer
-  const [statusBarKey, setStatusBarKey] = useState(0);
-  useEffect(() => {
-    const handler = () => setStatusBarKey(k => k + 1);
-    window.addEventListener('media-viewer-closed', handler);
-    return () => window.removeEventListener('media-viewer-closed', handler);
-  }, []);
-  // Transparent status bar for immersive hero bleed into safe area
-  useMedianStatusBar("dark", "transparent", true, false, true, statusBarKey);
+  // Status bar transparency is owned by FloatingPageHeader (single owner).
   
   // If viewing via /profile/:username, fetch that profile; otherwise show own profile
   // Resolve profileUserId — cached query for username routes, synchronous for own profile
@@ -562,11 +554,11 @@ const ProfilePageV2Content: React.FC = () => {
         </div>
 
         {/* Floating header — transparent control row under the notch */}
-        <ProfileFloatingHeader
-          isSelf={isSelf}
-          backFallback="/clubhouse"
-          onSettingsClick={() => navigate('/settings')}
+        <FloatingPageHeader
+          onBack={isSelf ? () => navigate('/settings') : undefined}
+          showHandicap={!!user}
         />
+
 
         {/* Avatar - squircle, left-aligned */}
         <div

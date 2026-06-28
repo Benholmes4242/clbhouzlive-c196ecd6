@@ -2516,6 +2516,9 @@ html[data-immersive="true"] .app-shell--topSpacer {
     
     /* Responsive Profile Hero System */
     --hero-h: clamp(44vh, 52vh, 60vh);
+    /* Personal profile cinematic hero — shorter than course/tour because the
+       avatar + name + stats are the focus, the cover is a backdrop. */
+    --profile-hero-h: clamp(30vh, 32vh, 36vh);
     --panel-overlap: clamp(56px, 7vh, 96px);
     --panel-pad-x: clamp(16px, 4vw, 32px);
     --panel-pad-y: clamp(12px, 2.6vh, 24px);
