@@ -224,7 +224,24 @@ const BusinessProfilePage: React.FC = () => {
   };
 
   // ───── early returns ─────
-  if (authLoading || isLoading) return <GenericPageSkeleton />;
+  if (authLoading || isLoading) {
+    return (
+      <div className="relative min-h-screen">
+        {/* Dark bleed behind the notch so the transparent safe-area shield
+            doesn't flash light grey before the cinematic cover loads. */}
+        <div
+          aria-hidden
+          className="fixed top-0 left-0 right-0 pointer-events-none z-50"
+          style={{
+            height: 'calc(env(safe-area-inset-top, 0px) + 80px)',
+            background:
+              'linear-gradient(180deg, #1E4D38 0%, #163A2B 65%, rgba(15,23,42,0) 100%)',
+          }}
+        />
+        <GenericPageSkeleton />
+      </div>
+    );
+  }
 
   if (error || !business) {
     return (
