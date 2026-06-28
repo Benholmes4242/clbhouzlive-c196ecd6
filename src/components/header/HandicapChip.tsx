@@ -42,6 +42,18 @@ const BASE_STYLE = {
   flexShrink: 0,
 } as const;
 
+const PILL_STYLE = {
+  display: 'inline-flex',
+  alignItems: 'center',
+  padding: '0 10px',
+  borderRadius: 999,
+  background: '#FFFFFF',
+  cursor: 'pointer',
+  fontFamily: 'Geist, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
+  height: 30,
+  flexShrink: 0,
+} as const;
+
 function resolveSource(pathname: string): string {
   if (pathname === '/') return 'home_header';
   if (pathname === '/tourhub' || pathname === '/tour') return 'tourhub_header';
