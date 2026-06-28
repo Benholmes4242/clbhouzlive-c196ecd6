@@ -340,6 +340,7 @@ export function HybridHero({ slide, activeTournamentId, onSelectTour, topRightSl
             hoursUntilStart={hoursUntilStart}
             venueName={tournament.venueName}
             datesString={datesStringForHero}
+            topRightSlot={topRightSlot}
           />
         </div>
       );
