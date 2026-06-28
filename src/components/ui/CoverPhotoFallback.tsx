@@ -24,10 +24,7 @@ export const CoverPhotoFallback: React.FC<CoverPhotoFallbackProps> = ({
     <div
       className={cn('relative w-full h-full overflow-hidden', className)}
       style={{
-        // Cinematic dark fallback so full-bleed heroes bleed into the notch
-        // intentionally (instead of reading as a grey status-bar strip).
-        background:
-          'linear-gradient(180deg, #1E4D38 0%, #163A2B 45%, #0F172A 100%)',
+        background: 'linear-gradient(135deg, #F1F5F9 0%, #E2E8F0 50%, #CBD5E1 100%)',
       }}
     >
       {!hideWatermark && (
@@ -35,7 +32,7 @@ export const CoverPhotoFallback: React.FC<CoverPhotoFallbackProps> = ({
           <Flag
             className="w-24 h-24"
             strokeWidth={1.5}
-            style={{ color: '#FFFFFF', opacity: 0.10 }}
+            style={{ color: '#0F172A', opacity: 0.08 }}
           />
         </div>
       )}

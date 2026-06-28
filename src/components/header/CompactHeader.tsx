@@ -253,13 +253,11 @@ const CompactHeader: React.FC<CompactHeaderProps> = ({ className }) => {
 
   // Publish header height as a CSS variable so ShellSlot + --chrome-total-h
   // can adapt without each consumer needing to know about tour-specific sizing.
-  // useLayoutEffect: applies BEFORE paint so destination route renders at the
-  // correct offset on first frame (eliminates the 55→52 jump on Watch→Tour).
-  // Cleanup does NOT reset — the next CompactHeader instance (or the inline
-  // default in index.html) owns the value; resetting mid-route causes a 0/55
-  // bounce that shifts content.
-  React.useLayoutEffect(() => {
+  React.useEffect(() => {
     document.documentElement.style.setProperty('--header-h', `${contentHeight}px`);
+    return () => {
+      document.documentElement.style.setProperty('--header-h', '55px');
+    };
   }, [contentHeight]);
   
   return (
@@ -323,7 +321,7 @@ const CompactHeader: React.FC<CompactHeaderProps> = ({ className }) => {
                 <img
                   src="/lovable-uploads/29e83040-b5c5-48e4-84d7-3f99640e4a80.png"
                   alt="clbhouz"
-                  className={cn("object-contain", isEditorialChromeRoute ? "h-[38px] w-[38px]" : "h-9 w-9")}
+                  className={cn("object-contain", isEditorialChromeRoute ? "h-[30px] w-[30px]" : "h-9 w-9")}
                 />
               )}
             </button>
@@ -390,7 +388,7 @@ const CompactHeader: React.FC<CompactHeaderProps> = ({ className }) => {
 
             {/* Handicap chip — next to avatar, all routes */}
             <div className="[&>button]:!rounded-full">
-              <HandicapChip light={useLightTheme && !overlayActive} pill={isEditorialChromeRoute} />
+              <HandicapChip light={useLightTheme && !overlayActive} />
             </div>
 
             {/* Identity pill (mobile only) */}
@@ -405,7 +403,6 @@ const CompactHeader: React.FC<CompactHeaderProps> = ({ className }) => {
                     notificationCount={unreadCount}
                     useLightTheme={useLightTheme && !overlayActive}
                     compact={isEditorialChromeRoute}
-                    size={isEditorialChromeRoute ? 'lg' : undefined}
                   />
                 </div>
               ) : (

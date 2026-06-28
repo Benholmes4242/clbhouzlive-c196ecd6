@@ -3,76 +3,51 @@ import { useTourHeroOverlay } from '@/hooks/useTourHeroOverlay';
 
 interface ShellSlotProps {
   children: React.ReactNode;
-  dark?: boolean;
 }
 
 /**
  * ShellSlot
  * --------
- * Fixed container that pins tabs / pills / filter rows directly beneath
- * CompactHeader. Writes its own measured height to `--shell-extra-h`, but
- * via a SINGLETON STACK PUBLISHER so coexisting instances (KeepAlive) do
- * not thrash the variable on every navigation.
+ * A fixed container that renders directly beneath CompactHeader and is shared
+ * by every page that needs to pin tabs / pills / filter rows below the header.
  *
  * Contract:
- *   - The most-recently-mounted ShellSlot owns the var.
- *   - On unmount, the previous owner re-publishes its measured value.
- *   - The var is only zeroed when NO ShellSlot is mounted — never mid-route
- *     transition. This eliminates the "0 → N" jump on page changes.
+ *   - Sits at top: calc(55px + var(--sat)) — flush under CompactHeader.
+ *   - Same surface colour as the body (--background) so they read as one canvas.
+ *   - Below CompactHeader on the z-axis (z-header - 1), above page content.
+ *   - Writes its own measured height to --shell-extra-h on :root. Pages
+ *     that consume the slot offset their main scroll container with
+ *     paddingTop: var(--chrome-total-h), which composes CompactHeader
+ *     (55px + safe-area) plus --shell-extra-h via CSS calc().
+ *
+ * No scroll listeners, no sticky positioning, no threshold transitions —
+ * the shell is in its final position from mount.
  */
-
-type Owner = { id: number; height: number };
-const stack: Owner[] = [];
-let nextId = 1;
-
-function publish() {
-  const top = stack[stack.length - 1];
-  const value = top ? `${top.height}px` : '0px';
-  document.documentElement.style.setProperty('--shell-extra-h', value);
-}
-
-function register(initialHeight: number): number {
-  const id = nextId++;
-  stack.push({ id, height: initialHeight });
-  publish();
-  return id;
-}
-
-function update(id: number, height: number) {
-  const owner = stack.find((o) => o.id === id);
-  if (!owner || owner.height === height) return;
-  owner.height = height;
-  if (stack[stack.length - 1]?.id === id) publish();
-}
-
-function unregister(id: number) {
-  const idx = stack.findIndex((o) => o.id === id);
-  if (idx === -1) return;
-  stack.splice(idx, 1);
-  publish();
-}
-
-export const ShellSlot: React.FC<ShellSlotProps> = ({ children, dark = false }) => {
+export const ShellSlot: React.FC<ShellSlotProps & { dark?: boolean }> = ({ children, dark = false }) => {
   const ref = useRef<HTMLDivElement>(null);
   const [scrolled, setScrolled] = useState(false);
   const overlayActive = useTourHeroOverlay();
 
+  // Measure height → write to CSS variable
   useLayoutEffect(() => {
     const el = ref.current;
     if (!el) return;
 
-    const initial = el.getBoundingClientRect().height;
-    const id = register(initial);
+    const write = (h: number) => {
+      document.documentElement.style.setProperty('--shell-extra-h', `${h}px`);
+    };
+
+    write(el.getBoundingClientRect().height);
 
     const ro = new ResizeObserver((entries) => {
       const h = entries[0]?.contentRect.height ?? el.getBoundingClientRect().height;
-      update(id, h);
+      write(h);
     });
     ro.observe(el);
 
     return () => {
       ro.disconnect();
-      unregister(id);
+      document.documentElement.style.setProperty('--shell-extra-h', '0px');
     };
   }, []);
 
@@ -99,7 +74,7 @@ export const ShellSlot: React.FC<ShellSlotProps> = ({ children, dark = false }) 
         marginRight: 'auto',
         width: '100%',
         maxWidth: 480,
-        zIndex: 29,
+        zIndex: 29, // CompactHeader is var(--z-header) = 30; sit one below it.
         background: overlayActive ? 'transparent' : (dark ? '#0A0E14' : 'hsl(var(--background))'),
         borderBottom: overlayActive
           ? 'none'

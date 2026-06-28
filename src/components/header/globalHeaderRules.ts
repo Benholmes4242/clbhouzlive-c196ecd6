@@ -56,9 +56,11 @@ export function isConditionallyExcluded(pathname: string, searchParams: URLSearc
     return true;
   }
 
-  // Course detail: /courses/:courseId (exactly 3 segments) uses its OWN
-  // FloatingPageHeader — exclude from global CompactHeader.
+  // Course detail: /courses/:courseId (exactly 3 segments) shows the header.
+  // Immersive sub-flows (/rate, /reviews, /share-review) stay excluded.
   if (pathname.startsWith('/courses/')) {
+    const segments = pathname.split('/');
+    if (segments.length === 3) return false;
     return true;
   }
 
@@ -121,18 +123,4 @@ export function isImmersiveRoute(pathname: string): boolean {
     (p) => pathname.startsWith(p)
   );
   return exactMatch || prefixMatch;
-}
-
-/**
- * Dark-chrome routes = the charcoal launch/landing surfaces (Clubhouse).
- * Single source of truth for: html/body bg, status bar, bottom nav,
- * PageRoot status-bar styling, and pre-React shell seeding.
- *
- * The cold-launch chain (splash → shell → skeleton → feed) is all
- * `#15171F` on these routes so there is no perceptible colour transition.
- */
-export const DARK_CHROME_ROUTES = ['/', '/clubhouse'] as const;
-
-export function isDarkChromeRoute(pathname: string): boolean {
-  return (DARK_CHROME_ROUTES as readonly string[]).includes(pathname);
 }

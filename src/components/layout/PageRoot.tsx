@@ -2,7 +2,15 @@ import * as React from "react";
 import { useLocation } from "react-router-dom";
 import { cn } from "@/lib/utils";
 import { useMedianStatusBar } from "@/hooks/useMedianStatusBar";
-import { isDarkChromeRoute } from "@/components/header/globalHeaderRules";
+
+/**
+ * Routes that keep the dark chrome (notch/status bar stays dark).
+ * Currently empty — Clubhouse and Handicap are both light. Kept as a hook for
+ * future dark-chrome routes.
+ */
+function isDarkChromeRoute(_pathname: string): boolean {
+  return false;
+}
 
 interface PageRootProps extends React.HTMLAttributes<HTMLDivElement> {
   children: React.ReactNode;
@@ -34,17 +42,13 @@ export const PageRoot = React.forwardRef<HTMLDivElement, PageRootProps>(
     const resolvedDark = dark ?? isDarkChromeRoute(location.pathname);
 
     // Default light chrome for the Clubhouse/Profile pages; dark elsewhere.
-    // Status bar text style: 'light' = white icons (paired with dark bg),
-    // 'dark' = dark icons (paired with light bg).
-    const statusBarStyle = resolvedDark ? 'light' : 'dark';
-    const statusBarColor = resolvedDark ? '#15171F' : '#F8FAFC';
     useMedianStatusBar(
-      statusBarStyle,
-      statusBarColor,
+      resolvedDark ? "dark" : "light",
+      resolvedDark ? "#0A0E14" : "#F8FAFC",
       false,
       false,
       !immersiveStatusBar,
-      statusBarStyle,
+      resolvedDark ? "dark" : "light",
     );
 
     // Bottom nav (64px) + safe area spacer (30px) = 94px clearance
