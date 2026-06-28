@@ -36,7 +36,7 @@ const CourseDetailPage = () => {
 
   if (!courseId) {
     return (
-      <PageRoot className="min-h-screen bg-background flex items-center justify-center">
+      <PageRoot className="min-h-screen bg-background flex items-center justify-center" immersiveStatusBar immersive>
         <div className="text-center">
           <h1 className="text-2xl font-bold mb-4">Course not found</h1>
           <p className="text-muted-foreground mb-4">The course you're looking for doesn't exist.</p>
