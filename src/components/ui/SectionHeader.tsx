@@ -161,7 +161,8 @@ function SectionHeaderInner(props: SectionHeaderProps) {
   const cutWidth = isPrime ? 34 : 22;
   const cutHeight = isPrime ? 3 : 2;
   const defaultEyebrowColor = isPrime ? AMBER_AA : '#94A3B8';
-  const eyebrowColor = tone ? EYEBROW_TONE[tone] : defaultEyebrowColor;
+  const eyebrowColor = accent ?? (tone ? EYEBROW_TONE[tone] : defaultEyebrowColor);
+  const cutColor = accent ?? AMBER;
 
   const hasTitle = Boolean(title);
 
