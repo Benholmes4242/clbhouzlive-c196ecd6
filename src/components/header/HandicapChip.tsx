@@ -61,7 +61,7 @@ function resolveSource(pathname: string): string {
   return 'global_header';
 }
 
-export function HandicapChip({ light = false, pill = false }: { light?: boolean; pill?: boolean } = {}) {
+export function HandicapChip({ light = false, pill = false, large = false }: { light?: boolean; pill?: boolean; large?: boolean } = {}) {
   const { user } = useSupabaseSession();
   const navigate = useNavigate();
   const location = useLocation();
@@ -78,9 +78,12 @@ export function HandicapChip({ light = false, pill = false }: { light?: boolean;
   const baseStyle = pill
     ? {
         ...PILL_STYLE,
-        background: light ? '#FFFFFF' : 'rgba(255,255,255,0.08)',
-        border: light ? '0.5px solid rgba(15,23,42,0.10)' : '1px solid rgba(255,255,255,0.12)',
+        ...(large ? { height: 38, padding: '0 13px' } : null),
+        background: light ? '#FFFFFF' : 'rgba(255,255,255,0.14)',
+        border: light ? '0.5px solid rgba(15,23,42,0.10)' : '1px solid rgba(255,255,255,0.30)',
         boxShadow: light ? '0 1px 2px rgba(15,23,42,0.04)' : 'none',
+        backdropFilter: light ? undefined : 'blur(14px)',
+        WebkitBackdropFilter: light ? undefined : 'blur(14px)',
         filter: light ? 'none' : shadow,
       }
     : { ...BASE_STYLE, border: `1px solid ${HAIRLINE}`, filter: shadow };
