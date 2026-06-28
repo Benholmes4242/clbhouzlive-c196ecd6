@@ -609,7 +609,7 @@ export const CourseFormCard: React.FC<Props> = ({
   if (isLoading) {
     return (
       <section style={sectionStyle}>
-        <SectionHeader kicker="COURSE FORM" title={courseTitle} />
+        <SectionHeader kicker="COURSE FORM" title={courseTitle} paddingX={20} />
         <div style={{ padding: '0 20px' }}>
           <div
             className="animate-pulse"
@@ -646,6 +646,7 @@ export const CourseFormCard: React.FC<Props> = ({
         <SectionHeader
           kicker="COURSE FORM"
           title={courseTitle}
+          paddingX={20}
         />
         <div style={{ padding: '24px 20px 28px', textAlign: 'center' }}>
           <p style={{ margin: 0, fontSize: 13, fontWeight: 700, color: T.ink, fontFamily: FONT }}>
@@ -661,7 +662,7 @@ export const CourseFormCard: React.FC<Props> = ({
 
   return (
     <section style={sectionStyle}>
-      <SectionHeader kicker="COURSE FORM" title={courseTitle} />
+      <SectionHeader kicker="COURSE FORM" title={courseTitle} paddingX={20} />
       <div style={{ padding: '0 20px' }}>
         <ViewToggle activeView={activeView} onChange={setActiveView} />
         <CourseList

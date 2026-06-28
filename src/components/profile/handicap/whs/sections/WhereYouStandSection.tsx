@@ -487,7 +487,7 @@ export const WhereYouStandSection: React.FC<Props> = ({ userId }) => {
   if (isLoading) {
     return (
       <section style={{ marginTop: 32 }}>
-        <SectionHeader kicker="WHERE YOU STAND" title="Among active golfers" />
+        <SectionHeader kicker="WHERE YOU STAND" title="Among active golfers" paddingX={16} />
         <div
           style={{
             margin: '0 16px',
@@ -508,7 +508,7 @@ export const WhereYouStandSection: React.FC<Props> = ({ userId }) => {
 
   return (
     <section ref={sectionRef} style={{ marginTop: 32 }}>
-      <SectionHeader kicker="WHERE YOU STAND" title="Among active golfers" />
+      <SectionHeader kicker="WHERE YOU STAND" title="Among active golfers" paddingX={16} />
       {d.available === true ? (
         <AvailableCard data={d} />
       ) : (
