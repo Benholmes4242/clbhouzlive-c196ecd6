@@ -84,10 +84,14 @@ export const CourseMoments: React.FC<CourseMomentsProps> = ({
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
       {/* Header */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-        <span style={{ fontSize: 12, fontWeight: 700, color: '#0F172A' }}>📷 Your Moments</span>
-        <span style={{ fontSize: 12, color: '#94A3B8' }}>({moments.length})</span>
-      </div>
+      <SectionHeader
+        tier="standard"
+        tone="amber"
+        inlineIcon
+        icon={Camera}
+        kicker="Your Moments"
+        count={moments.length}
+      />
 
       {/* Gallery */}
       <div
