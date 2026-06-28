@@ -24,11 +24,8 @@ const Header: React.FC<{ photoCount: number; videoCount: number; onSeeAll?: () =
   onSeeAll,
 }) => (
   <SectionHeader
-    tier="standard"
-    tone="amber"
-    inlineIcon
-    icon={Camera}
-    kicker="Media"
+    role="section"
+    kicker="MEDIA"
     sub={`${photoCount} ${photoCount === 1 ? 'photo' : 'photos'} · ${videoCount} ${videoCount === 1 ? 'video' : 'videos'}`}
     action={onSeeAll ? { label: 'See all', onClick: onSeeAll } : undefined}
     paddingX={16}
@@ -167,7 +164,7 @@ const AboutMediaStrip: React.FC<AboutMediaStripProps> = ({ clubId, onSeeAllClick
     return (
       <div>
         <div style={{ marginBottom: 12 }}>
-          <SectionHeader tier="standard" tone="amber" inlineIcon icon={Camera} kicker="Media" paddingX={16} />
+          <SectionHeader role="section" kicker="MEDIA" paddingX={16} />
         </div>
 
         <div
