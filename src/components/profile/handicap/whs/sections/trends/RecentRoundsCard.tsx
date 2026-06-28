@@ -5,7 +5,7 @@ import { format } from 'date-fns';
 import { useAllScores, useHandicapTrend } from '@/lib/whs/hooks';
 import { computeRoundDeltas, type RoundWithDelta } from './computeRoundDeltas';
 import RoundDetailSheet from '../round-detail/RoundDetailSheet';
-import { SectionHeader } from '@/components/ui/SectionHeader';
+import { DarkSectionHeader } from '../_shared/darkAtoms';
 
 
 interface Props {
