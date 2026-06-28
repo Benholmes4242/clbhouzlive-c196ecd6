@@ -136,7 +136,7 @@ export function TourHubMainPage() {
             <FloatingTourHeader
               onMenuTap={() => setMenuOpen(true)}
               onSearchTap={() => setSearchOpen(true)}
-              endSlot={<TourSwitcherAffordance variant="glass" />}
+              /* endSlot removed — picker now lives in the hero so it scrolls away with it */
             />
             <GlobalSearchOverlay isOpen={searchOpen} onClose={() => setSearchOpen(false)} />
 
