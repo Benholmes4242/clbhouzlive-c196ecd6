@@ -284,4 +284,106 @@ const GolfClubView: React.FC<GolfClubViewProps> = ({ courseId, isInModal = false
   />;
 };
 
+interface CourseTitleOverlayProps {
+  course: any;
+  courseMeta: any;
+}
+
+const CourseTitleOverlay: React.FC<CourseTitleOverlayProps> = ({ course, courseMeta }) => (
+  <div className="absolute inset-x-0 bottom-4 px-4 z-[1]">
+    <h1
+      className="text-[24px] md:text-[28px] font-extrabold tracking-[-0.3px] text-white drop-shadow-2xl mb-1"
+      style={{ lineHeight: 1.15 }}
+    >
+      {course.name}
+    </h1>
+    <p
+      className="drop-shadow-lg mb-1"
+      style={{ fontSize: 14, fontWeight: 600, color: 'rgba(255,255,255,0.85)' }}
+    >
+      {formatCourseLocation(course)}
+    </p>
+    {(courseMeta?.course_cr != null || courseMeta?.course_slope != null) && (
+      <p
+        className="drop-shadow-lg mb-2"
+        style={{
+          fontSize: 12,
+          fontWeight: 700,
+          letterSpacing: '0.08em',
+          color: 'rgba(255,255,255,0.7)',
+          fontVariantNumeric: 'tabular-nums',
+        }}
+      >
+        {[
+          courseMeta?.course_cr != null ? `CR ${courseMeta.course_cr}` : null,
+          courseMeta?.course_slope != null ? `SLOPE ${courseMeta.course_slope}` : null,
+        ]
+          .filter(Boolean)
+          .join(' · ')}
+      </p>
+    )}
+    {(course.global_rank || course.regional_rank || course.usa_rank) && (
+      <div
+        className="inline-flex"
+        style={{
+          background: 'rgba(15,23,42,0.5)',
+          backdropFilter: 'blur(10px)',
+          WebkitBackdropFilter: 'blur(10px)',
+          borderRadius: 8,
+          padding: '4px 8px',
+        }}
+      >
+        <CourseRankBadges
+          globalRank={course.global_rank ?? null}
+          regionalRank={course.regional_rank ?? null}
+          usaRank={course.usa_rank ?? null}
+          country={course.country}
+          positioning="inline"
+        />
+      </div>
+    )}
+  </div>
+);
+
+interface StandaloneCourseDetailProps {
+  course: any;
+  courseMeta: any;
+  activeTab: string;
+  handleTabChange: (tab: string) => void;
+  cinematicHero: React.ReactNode;
+  tabContent: React.ReactNode;
+}
+
+const StandaloneCourseDetail: React.FC<StandaloneCourseDetailProps> = ({
+  activeTab,
+  handleTabChange,
+  cinematicHero,
+  tabContent,
+}) => {
+  const navigate = useNavigate();
+  return (
+    <div
+      className="min-h-screen w-full bg-background"
+      style={{ paddingBottom: 'calc(var(--sab, env(safe-area-inset-bottom, 0px)) + 80px)' }}
+    >
+      <FloatingPageHeader onBack={() => safeGoBack(navigate, '/courses')} />
+      {cinematicHero}
+      <div
+        className="sticky bg-[#F8FAFC]"
+        style={{
+          top: 0,
+          zIndex: 30,
+          borderBottom: '0.5px solid rgba(15,23,42,0.07)',
+        }}
+      >
+        <CourseDetailShellTabs
+          activeTab={activeTab as any}
+          onTabChange={handleTabChange as any}
+        />
+      </div>
+      {tabContent}
+    </div>
+  );
+};
+
 export default GolfClubView;
