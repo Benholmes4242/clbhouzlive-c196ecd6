@@ -148,7 +148,7 @@ function StackedAvatars({
             height: size,
             borderRadius: 8,
             background: 'rgba(255,255,255,0.16)',
-            boxShadow: `0 0 0 ${ringWidth}px ${ringColor ?? 'rgba(13,30,22,0.95)'}`,
+            boxShadow: `0 0 0 1.5px rgba(255,255,255,0.25)`,
             color: 'rgba(255,255,255,0.92)',
             fontSize: 10,
             fontWeight: 800,
