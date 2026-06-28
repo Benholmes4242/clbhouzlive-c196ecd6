@@ -10,12 +10,17 @@ export * from './ProfileSkeletonHelpers';
 export const ProfileSkeleton = () => {
   return (
     <div className="min-h-screen bg-[#F8FAFC] pb-28 relative overflow-hidden">
-      {/* Spacer for fixed header */}
-      <div style={{ height: 'var(--header-h-mobile, 55px)' }} />
-      
-      {/* Hero header skeleton - matches h-[250px] */}
-      <div className="relative h-[250px]">
-        <Skeleton className="absolute inset-0 rounded-none" />
+      {/* Hero block bleeds into the notch so the transparent safe-area shield
+          doesn't flash light grey before the cinematic cover loads. */}
+      <div
+        className="relative"
+        style={{
+          height: 'calc(env(safe-area-inset-top, 0px) + 250px)',
+          background:
+            'linear-gradient(180deg, #1E4D38 0%, #163A2B 55%, #0F172A 100%)',
+        }}
+      >
+        <Skeleton className="absolute inset-0 rounded-none opacity-30" />
       </div>
       
       {/* Meta card overlay */}
