@@ -432,7 +432,10 @@ function ProfileHubSheet({
   // Sub-copy line: `@{username} · {hcp/connect/England Golf}`
   const identitySubLine = (() => {
     const handlePart = username ? `@${username}` : (activeProfile.subtitle || '');
-    return [handlePart, handicapSubCopy].filter(Boolean).join(' · ');
+    const parts = activeProfileType === 'business'
+      ? [handlePart]
+      : [handlePart, handicapSubCopy];
+    return parts.filter(Boolean).join(' · ');
   })();
 
   // Stat strip variant
