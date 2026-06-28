@@ -252,7 +252,7 @@ function SectionHeaderInner(props: SectionHeaderProps) {
           marginTop: 7,
           width: cutWidth,
           height: cutHeight,
-          background: AMBER,
+          background: cutColor,
           borderRadius: cutHeight,
         }}
       />
