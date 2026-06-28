@@ -109,12 +109,21 @@ export function HandicapChip({ light = false, pill = false }: { light?: boolean;
       type="button"
       onClick={() => handleTap('disconnected')}
       aria-label="Connect handicap"
-      style={{
-        ...BASE_STYLE,
-        border: `1px dashed ${light ? 'rgba(15,23,42,0.22)' : 'rgba(255,255,255,0.26)'}`,
-        filter: shadow,
-        whiteSpace: 'nowrap',
-      }}
+      style={
+        pill
+          ? {
+              ...PILL_STYLE,
+              border: '0.5px dashed rgba(15,23,42,0.22)',
+              boxShadow: '0 1px 2px rgba(15,23,42,0.04)',
+              whiteSpace: 'nowrap',
+            }
+          : {
+              ...BASE_STYLE,
+              border: `1px dashed ${light ? 'rgba(15,23,42,0.22)' : 'rgba(255,255,255,0.26)'}`,
+              filter: shadow,
+              whiteSpace: 'nowrap',
+            }
+      }
       className="active:scale-[0.97] transition-transform"
     >
       <span
