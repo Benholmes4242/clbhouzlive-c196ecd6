@@ -376,7 +376,7 @@ export const ClubhouseSkeletonShimmer: React.FC<ClubhouseSkeletonShimmerProps> =
     <AnimatePresence>
       {isVisible && (
         <motion.div
-          className={cn('absolute inset-0 z-50 pointer-events-none', 'bg-[#F8FAFC]', className)}
+          className={cn('absolute inset-0 z-50 pointer-events-none', 'bg-[#15171F]', className)}
           initial={{ opacity: 1 }}
           exit={{ opacity: 0 }}
           transition={{ duration: 0.2, ease: 'easeOut' }}
