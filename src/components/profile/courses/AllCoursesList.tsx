@@ -8,6 +8,7 @@ import { StickyFilterBar, CoursePrimaryTab, CourseSortOption } from './StickyFil
 import { type QuickRegion } from '@/components/leaderboard/courses/CourseRegionPills';
 import { Button } from '@/components/ui/button';
 import { ChevronDown, ClipboardList, History } from 'lucide-react';
+import { SectionHeader } from '@/components/ui/SectionHeader';
 import { compareOwnRatings } from '@/lib/sortCoursesByRating';
 import DossierCard from './DossierCard';
 import BreakdownsPrompt from './BreakdownsPrompt';
@@ -318,17 +319,10 @@ export const AllCoursesList: React.FC<AllCoursesListProps> = ({
   return (
     <div ref={sectionRef} className="py-4">
       {/* Section header — amber eyebrow with icon (matches Courses Discover) */}
-      <div className="mb-3 px-2.5">
-        <div className="flex items-center gap-1.5 mb-1.5">
-          <History size={11} strokeWidth={2.4} color="#F7931E" />
-          <span style={{ fontSize: 10.5, fontWeight: 800, color: '#F7931E', letterSpacing: '0.14em', textTransform: 'uppercase' as const }}>
-            Course History
-          </span>
-        </div>
-        <p className="text-[13px] text-muted-foreground">
-          {ownerSubtitle}
-        </p>
+      <div className="px-2.5">
+        <SectionHeader role="section" kicker="COURSE HISTORY" sub={ownerSubtitle} />
       </div>
+
 
       {/* Filter bar */}
       <StickyFilterBar

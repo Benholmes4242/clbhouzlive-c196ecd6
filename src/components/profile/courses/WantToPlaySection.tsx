@@ -5,6 +5,7 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { MapPin, Trophy, ListChecks, X } from 'lucide-react';
+import { SectionHeader } from '@/components/ui/SectionHeader';
 import { cn } from '@/lib/utils';
 import { useUserWantToPlay, WantToPlayCourse } from '@/hooks/useUserWantToPlay';
 import { formatDistanceToNow } from 'date-fns';
@@ -57,14 +58,10 @@ export const WantToPlaySection: React.FC<WantToPlaySectionProps> = ({
   return (
     <section className={cn(className)}>
       {/* Eyebrow */}
-      <div className="flex items-center justify-between mb-3 px-4">
-        <div className="flex items-center gap-1.5">
-          <ListChecks size={11} strokeWidth={2.4} color="#F7931E" />
-          <span style={{ fontSize: 10.5, fontWeight: 800, color: '#F7931E', letterSpacing: '0.14em', textTransform: 'uppercase' as const }}>
-            On Your List
-          </span>
-        </div>
+      <div className="px-4">
+        <SectionHeader role="section" kicker="ON YOUR LIST" />
       </div>
+
 
       {/* Horizontal snap carousel */}
       <div
