@@ -136,34 +136,6 @@ export const FloatingTourHeader: React.FC<FloatingTourHeaderProps> = ({
             <Menu size={18} color="#FFFFFF" strokeWidth={2.2} />
           </button>
 
-          {/* Handicap */}
-          <button
-            type="button"
-            aria-label={`Handicap ${handicapValue}`}
-            onClick={onHandicapTap}
-            style={{
-              ...pillStyle,
-              minWidth: 0,
-              paddingLeft: 12,
-              paddingRight: 12,
-              gap: 6,
-            }}
-            className="active:scale-[0.96]"
-          >
-            <span
-              style={{
-                fontSize: 13,
-                fontWeight: 700,
-                color: '#FFFFFF',
-                fontVariantNumeric: 'tabular-nums',
-                letterSpacing: '-0.01em',
-              }}
-            >
-              {handicapValue}
-            </span>
-            <TrendingUp size={12} color="#FFFFFF" strokeWidth={2.4} />
-          </button>
-
           {/* Search */}
           <button
             type="button"
@@ -175,42 +147,6 @@ export const FloatingTourHeader: React.FC<FloatingTourHeaderProps> = ({
             <Search size={18} color="#FFFFFF" strokeWidth={2.2} />
           </button>
 
-          {/* Avatar */}
-          <button
-            type="button"
-            aria-label="Profile menu"
-            onClick={onAvatarTap}
-            style={{
-              ...pillStyle,
-              padding: 0,
-              overflow: 'hidden',
-              borderRadius: 999,
-            }}
-            className="active:scale-[0.96]"
-          >
-            {avatarUrl ? (
-              // eslint-disable-next-line @next/next/no-img-element
-              <img
-                src={avatarUrl}
-                alt=""
-                style={{
-                  width: '100%',
-                  height: '100%',
-                  objectFit: 'cover',
-                  borderRadius: 999,
-                }}
-              />
-            ) : (
-              <div
-                style={{
-                  width: '100%',
-                  height: '100%',
-                  borderRadius: 999,
-                  background: 'rgba(255,255,255,0.18)',
-                }}
-              />
-            )}
-          </button>
 
           {endSlot}
         </div>
