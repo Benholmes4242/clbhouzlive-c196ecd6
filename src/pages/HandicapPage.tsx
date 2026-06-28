@@ -330,6 +330,7 @@ const FriendHandicapDashboard: React.FC<{ userId: string; ownerFirstName: string
 
 const HandicapPage: React.FC = () => {
   const { user, loading } = useSupabaseSession();
+  const navigate = useNavigate();
   const params = useParams<{ userId?: string }>();
   const [searchParams, setSearchParams] = useSearchParams();
 
