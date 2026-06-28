@@ -261,7 +261,7 @@ const GolfClubView: React.FC<GolfClubViewProps> = ({ courseId, isInModal = false
   if (isInModal) {
     return (
       <div className="w-full">
-        {heroBlock}
+        {modalHeroBlock}
         {/* Modal mode: legacy sticky underline tabs (no CompactHeader present) */}
         <div
           className="sticky bg-background"
@@ -274,23 +274,14 @@ const GolfClubView: React.FC<GolfClubViewProps> = ({ courseId, isInModal = false
     );
   }
 
-  return (
-    <div
-      className="min-h-screen w-full bg-background"
-      style={{ paddingBottom: 'calc(var(--sab, env(safe-area-inset-bottom, 0px)) + 80px)' }}
-    >
-      <ShellSlot>
-        <CourseDetailShellTabs
-          activeTab={activeTab as any}
-          onTabChange={handleTabChange as any}
-        />
-      </ShellSlot>
-      <div style={{ paddingTop: 'calc(var(--chrome-total-h, 0px) - 1px)' }}>
-        {heroBlock}
-        {tabContent}
-      </div>
-    </div>
-  );
+  return <StandaloneCourseDetail
+    course={course}
+    courseMeta={courseMeta}
+    activeTab={activeTab}
+    handleTabChange={handleTabChange}
+    cinematicHero={cinematicHero}
+    tabContent={tabContent}
+  />;
 };
 
 export default GolfClubView;
