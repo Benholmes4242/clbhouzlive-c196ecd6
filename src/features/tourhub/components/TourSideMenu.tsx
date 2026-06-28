@@ -141,46 +141,9 @@ export const TourSideMenu: React.FC<TourSideMenuProps> = ({
           willChange: 'transform',
         }}
       >
-        {/* Top: logo + handicap pill */}
-        <div
-          style={{
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'space-between',
-            padding: '20px 20px 0',
-          }}
-        >
-          <img
-            src="/lovable-uploads/29e83040-b5c5-48e4-84d7-3f99640e4a80.png"
-            alt="clbhouz"
-            style={{ height: 30, width: 30, objectFit: 'contain' }}
-          />
-          <div
-            style={{
-              display: 'inline-flex',
-              alignItems: 'center',
-              gap: 6,
-              height: 30,
-              padding: '0 10px',
-              borderRadius: 999,
-              background: '#FFFFFF',
-              border: '0.5px solid rgba(15,23,42,0.10)',
-              boxShadow: '0 1px 2px rgba(15,23,42,0.04)',
-            }}
-          >
-            <span
-              style={{
-                fontSize: 12,
-                fontWeight: 700,
-                color: INK,
-                fontVariantNumeric: 'tabular-nums',
-              }}
-            >
-              {handicapValue}
-            </span>
-            <TrendingUp size={11} color={PINE} strokeWidth={2.4} />
-          </div>
-        </div>
+        {/* Top: logo + handicap chip + identity pill */}
+        <TopBar />
+
 
         {/* Nav list */}
         <nav style={{ marginTop: 16, flex: 1, overflowY: 'auto' }}>
