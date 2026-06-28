@@ -3,7 +3,7 @@
  */
 import React, { useState, useCallback, useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Plus, ChevronRight, Trophy } from 'lucide-react';
+import { Plus, Trophy } from 'lucide-react';
 import { CarouselDots } from '@/components/media/CarouselDots';
 import { cn } from '@/lib/utils';
 import { useUserTopTenCourses, TopTenCourse } from '@/hooks/useUserTopTenCourses';
