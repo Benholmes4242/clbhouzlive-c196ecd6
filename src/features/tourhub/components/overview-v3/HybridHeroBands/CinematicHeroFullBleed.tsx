@@ -279,6 +279,8 @@ export interface CinematicHeroFullBleedProps {
   hoursUntilStart?: number;
   venueName?: string | null;
   datesString?: string | null;
+  /** Optional content rendered absolutely at the hero's top-right (e.g. tour switcher). Scrolls with the hero. */
+  topRightSlot?: React.ReactNode;
 }
 
 // ---- component ------------------------------------------------------------
@@ -299,6 +301,7 @@ export function CinematicHeroFullBleed({
   hoursUntilStart,
   venueName,
   datesString,
+  topRightSlot,
 }: CinematicHeroFullBleedProps) {
   const isLive = state.kind === 'live';
   const isResults = state.kind === 'results';
