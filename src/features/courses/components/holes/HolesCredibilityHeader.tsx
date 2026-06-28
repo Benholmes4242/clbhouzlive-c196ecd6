@@ -1,5 +1,6 @@
 import React from 'react';
 import { FONT, INK, SC_ACCENT } from './_constants';
+import { SectionHeader } from '@/components/ui/SectionHeader';
 
 interface Props {
   totalRounds: number;
@@ -7,42 +8,12 @@ interface Props {
 
 export const HolesCredibilityHeader: React.FC<Props> = ({ totalRounds }) => {
   return (
-    <div
-      style={{
-        padding: '20px 18px 18px',
-        boxShadow: `inset 0 -1.5px 0 ${SC_ACCENT}`,
-        fontFamily: FONT,
-      }}
-    >
-      <div
-        style={{
-          display: 'inline-flex',
-          alignItems: 'center',
-          gap: 8,
-          marginBottom: 8,
-        }}
-      >
-        <span
-          style={{
-            width: 6,
-            height: 6,
-            borderRadius: 999,
-            background: SC_ACCENT,
-            display: 'inline-block',
-          }}
-        />
-        <span
-          style={{
-            fontSize: 10.5,
-            fontWeight: 800,
-            letterSpacing: '0.16em',
-            textTransform: 'uppercase',
-            color: SC_ACCENT,
-          }}
-        >
-          Official hole data
-        </span>
-      </div>
+    <div style={{ padding: '20px 18px 18px', fontFamily: FONT }}>
+      <SectionHeader
+        role="section"
+        kicker="OFFICIAL HOLE DATA"
+        accent={SC_ACCENT}
+      />
       <div
         style={{
           fontSize: 14,

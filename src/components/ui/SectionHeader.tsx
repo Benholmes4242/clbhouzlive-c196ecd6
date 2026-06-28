@@ -59,6 +59,13 @@ interface SectionHeaderProps {
   paddingTop?: number;
   paddingX?: number;
   className?: string;
+  /**
+   * Accent colour for the eyebrow + cut-line. Defaults to amber.
+   * Reserved for pure-data surfaces that align the header to a semantic scale
+   * (e.g. Holes tab passes pine #2F6B4F = SC_BIRDIE). Must be AA-safe on the surface.
+   * See docs/canonical/section-titles.md "Accent exception".
+   */
+  accent?: string;
 }
 
 function ActionAffordance({
@@ -109,6 +116,7 @@ function SectionHeaderInner(props: SectionHeaderProps) {
     paddingTop = 0,
     paddingX = 0,
     className,
+    accent,
   } = props;
 
   const role: Role = roleProp ?? TIER_TO_ROLE[tierProp ?? 'standard'];
@@ -153,7 +161,8 @@ function SectionHeaderInner(props: SectionHeaderProps) {
   const cutWidth = isPrime ? 34 : 22;
   const cutHeight = isPrime ? 3 : 2;
   const defaultEyebrowColor = isPrime ? AMBER_AA : '#94A3B8';
-  const eyebrowColor = tone ? EYEBROW_TONE[tone] : defaultEyebrowColor;
+  const eyebrowColor = accent ?? (tone ? EYEBROW_TONE[tone] : defaultEyebrowColor);
+  const cutColor = accent ?? AMBER;
 
   const hasTitle = Boolean(title);
 
@@ -243,7 +252,7 @@ function SectionHeaderInner(props: SectionHeaderProps) {
           marginTop: 7,
           width: cutWidth,
           height: cutHeight,
-          background: AMBER,
+          background: cutColor,
           borderRadius: cutHeight,
         }}
       />

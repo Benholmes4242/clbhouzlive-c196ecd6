@@ -9,6 +9,7 @@ import { HolesEmptyState } from './HolesEmptyState';
 import { FONT, INK, SC_ACCENT } from './_constants';
 import { HAIRLINE_INK_8, INK_MUTE, SURFACE } from '@/features/courses/_shared/tokens';
 import { ConnectHandicapCue } from '@/components/courses/course-detail/ConnectHandicapCue';
+import { SectionHeader } from '@/components/ui/SectionHeader';
 
 interface Props {
   courseId: string | undefined;
@@ -90,17 +91,12 @@ export const CourseHolesTab: React.FC<Props> = ({ courseId }) => {
           alignItems: 'center',
         }}
       >
-        <div
-          style={{
-            fontSize: 10.5,
-            fontWeight: 800,
-            color: SC_ACCENT,
-            letterSpacing: '0.16em',
-            textTransform: 'uppercase',
-          }}
-        >
-          All holes
-        </div>
+        <SectionHeader
+          role="section"
+          kicker="ALL HOLES"
+          accent={SC_ACCENT}
+          className="!mb-0"
+        />
         <div
           style={{
             display: 'inline-flex',
