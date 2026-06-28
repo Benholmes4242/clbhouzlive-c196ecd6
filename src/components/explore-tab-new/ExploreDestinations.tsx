@@ -15,7 +15,7 @@ function ExploreDestinationsInner({ activeRegion, onRegionSelect }: ExploreDesti
   if (isLoading) {
     return (
       <section style={{ padding: '0 0 0' }}>
-        <SectionHeader tier="editorial" title="Destinations" mark={<PinMark />} paddingX={16} />
+        <SectionHeader role="section" kicker="EXPLORE" title="Destinations" paddingX={16} />
         <div className="flex gap-3 px-4 overflow-x-auto scrollbar-hide">
           {[0, 1, 2, 3].map(i => (
             <div
