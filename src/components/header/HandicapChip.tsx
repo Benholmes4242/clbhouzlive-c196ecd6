@@ -138,7 +138,7 @@ export function HandicapChip({ light = false, pill = false }: { light?: boolean;
     >
       <span
         style={{
-          fontSize: 11,
+          fontSize: pill ? 13 : 11,
           fontWeight: 700,
           color: INK,
           letterSpacing: '0.02em',
