@@ -15,6 +15,7 @@ interface PostingAsPillProps {
   useGlassTheme?: boolean; // Clubhouse frosted-glass treatment
   useBareTheme?: boolean; // No background, no chevron — TikTok-style floating avatar
   compact?: boolean; // One-size-smaller for tour routes
+  size?: 'sm' | 'md' | 'lg'; // Optional explicit size; 'lg' matches 38px tour pill
 }
 
 /**
@@ -22,7 +23,7 @@ interface PostingAsPillProps {
  * Uses forwardRef to allow parent to get anchor position for desktop popover
  */
 export const PostingAsPill = forwardRef<HTMLButtonElement, PostingAsPillProps>(
-  ({ onClick, isOpen, hasUnreadNotifications = false, notificationCount = 0, useLightTheme = false, useGlassTheme = false, useBareTheme = false, compact = false }, ref) => {
+  ({ onClick, isOpen, hasUnreadNotifications = false, notificationCount = 0, useLightTheme = false, useGlassTheme = false, useBareTheme = false, compact = false, size }, ref) => {
     const { activeActor, isLoading } = useActiveActor();
 
     // Per-actor unread (badge hybrid): show a small dot on the pill when ANY
@@ -170,7 +171,9 @@ export const PostingAsPill = forwardRef<HTMLButtonElement, PostingAsPillProps>(
         onClick={onClick}
           className={cn(
             "flex items-center",
-            compact ? "p-1 h-9" : "p-1.5 h-11",
+            size === 'lg'
+              ? "p-[5px] h-[38px]"
+              : compact ? "p-1 h-9" : "p-1.5 h-11",
             "rounded-xl transition-all duration-500",
             "max-w-[160px] min-w-0",
             "active:scale-[0.97]",
@@ -191,7 +194,7 @@ export const PostingAsPill = forwardRef<HTMLButtonElement, PostingAsPillProps>(
             }}
           >
             <SquircleAvatar
-              size={compact ? 26 : 28}
+              size={size === 'lg' ? 28 : compact ? 26 : 28}
               src={activeActor.avatarUrl}
               alt={activeActor.name}
               userId={activeActor.id}

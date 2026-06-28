@@ -45,12 +45,12 @@ const BASE_STYLE = {
 const PILL_STYLE = {
   display: 'inline-flex',
   alignItems: 'center',
-  padding: '0 10px',
+  padding: '0 12px',
   borderRadius: 999,
   background: '#FFFFFF',
   cursor: 'pointer',
   fontFamily: 'Geist, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
-  height: 30,
+  height: 38,
   flexShrink: 0,
 } as const;
 
@@ -138,7 +138,7 @@ export function HandicapChip({ light = false, pill = false }: { light?: boolean;
     >
       <span
         style={{
-          fontSize: 11,
+          fontSize: pill ? 13 : 11,
           fontWeight: 700,
           color: INK,
           letterSpacing: '0.02em',
@@ -179,7 +179,7 @@ export function HandicapChip({ light = false, pill = false }: { light?: boolean;
     >
       <span
         style={{
-          fontSize: 12,
+          fontSize: pill ? 14 : 12,
           fontWeight: 700,
           color: INK,
           fontVariantNumeric: 'tabular-nums',
@@ -188,7 +188,7 @@ export function HandicapChip({ light = false, pill = false }: { light?: boolean;
       >
         {formattedIndex}
       </span>
-      {showArrow && <ArrowIcon size={11} color={arrowColor} strokeWidth={2.4} />}
+      {showArrow && <ArrowIcon size={pill ? 13 : 11} color={arrowColor} strokeWidth={2.4} />}
     </button>
   );
 }
