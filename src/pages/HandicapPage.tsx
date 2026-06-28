@@ -416,7 +416,7 @@ const HandicapPage: React.FC = () => {
   const isConnectFlow = !isFriendView && !connLoading && !ownConnection;
 
   if (loading) {
-    return <PageRoot dark={false}><div /></PageRoot>;
+    return <PageRoot dark={true}><div /></PageRoot>;
   }
 
   if (!user?.id) {
@@ -433,7 +433,7 @@ const HandicapPage: React.FC = () => {
   }
 
   return (
-    <PageRoot dark={false} style={{ background: 'var(--hcp-bg-0)' }}>
+    <PageRoot dark={true} style={{ background: 'var(--hcp-bg-0)' }}>
       <HandicapPageHeader
         ownerUserId={ownerUserId}
         displayName={displayName}
