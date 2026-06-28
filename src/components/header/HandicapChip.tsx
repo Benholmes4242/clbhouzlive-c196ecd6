@@ -42,6 +42,18 @@ const BASE_STYLE = {
   flexShrink: 0,
 } as const;
 
+const PILL_STYLE = {
+  display: 'inline-flex',
+  alignItems: 'center',
+  padding: '0 10px',
+  borderRadius: 999,
+  background: '#FFFFFF',
+  cursor: 'pointer',
+  fontFamily: 'Geist, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
+  height: 30,
+  flexShrink: 0,
+} as const;
+
 function resolveSource(pathname: string): string {
   if (pathname === '/') return 'home_header';
   if (pathname === '/tourhub' || pathname === '/tour') return 'tourhub_header';
@@ -49,7 +61,7 @@ function resolveSource(pathname: string): string {
   return 'global_header';
 }
 
-export function HandicapChip({ light = false }: { light?: boolean } = {}) {
+export function HandicapChip({ light = false, pill = false }: { light?: boolean; pill?: boolean } = {}) {
   const { user } = useSupabaseSession();
   const navigate = useNavigate();
   const location = useLocation();
@@ -59,15 +71,13 @@ export function HandicapChip({ light = false }: { light?: boolean } = {}) {
   const trend = useHandicapTrend90d(connection?.id);
 
   // Theme-aware tokens
-  const INK = light ? DARK_INK : WHITE;
+  const INK = pill ? DARK_INK : light ? DARK_INK : WHITE;
   const HAIRLINE = light ? DARK_HAIRLINE : WHITE_HAIRLINE;
   const shadow = light ? 'none' : FLOAT_SHADOW;
 
-  const baseStyle = {
-    ...BASE_STYLE,
-    border: `1px solid ${HAIRLINE}`,
-    filter: shadow,
-  };
+  const baseStyle = pill
+    ? { ...PILL_STYLE, border: '0.5px solid rgba(15,23,42,0.10)', boxShadow: '0 1px 2px rgba(15,23,42,0.04)' }
+    : { ...BASE_STYLE, border: `1px solid ${HAIRLINE}`, filter: shadow };
 
   if (!user) return null;
 
@@ -99,12 +109,21 @@ export function HandicapChip({ light = false }: { light?: boolean } = {}) {
       type="button"
       onClick={() => handleTap('disconnected')}
       aria-label="Connect handicap"
-      style={{
-        ...BASE_STYLE,
-        border: `1px dashed ${light ? 'rgba(15,23,42,0.22)' : 'rgba(255,255,255,0.26)'}`,
-        filter: shadow,
-        whiteSpace: 'nowrap',
-      }}
+      style={
+        pill
+          ? {
+              ...PILL_STYLE,
+              border: '0.5px dashed rgba(15,23,42,0.22)',
+              boxShadow: '0 1px 2px rgba(15,23,42,0.04)',
+              whiteSpace: 'nowrap',
+            }
+          : {
+              ...BASE_STYLE,
+              border: `1px dashed ${light ? 'rgba(15,23,42,0.22)' : 'rgba(255,255,255,0.26)'}`,
+              filter: shadow,
+              whiteSpace: 'nowrap',
+            }
+      }
       className="active:scale-[0.97] transition-transform"
     >
       <span

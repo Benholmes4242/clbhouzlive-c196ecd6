@@ -264,7 +264,7 @@ function TopBar() {
           style={{ height: 30, width: 30, objectFit: 'contain' }}
         />
         <div style={{ display: 'inline-flex', alignItems: 'center', gap: 8 }}>
-          <HandicapChip light />
+          <HandicapChip light pill />
           {user && (
             <div className="[&_button]:!rounded-full">
               <PostingAsPill
