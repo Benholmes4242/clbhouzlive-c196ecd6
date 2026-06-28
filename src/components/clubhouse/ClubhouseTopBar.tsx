@@ -143,7 +143,7 @@ export const ClubhouseTopBar: React.FC<ClubhouseTopBarProps> = ({
               </button>
             )}
 
-            {!hideProfilePill && user && <HandicapChip light pill />}
+            {!hideProfilePill && user && <HandicapChip pill />}
 
             {!hideProfilePill && user && (
               <div className="[&_button]:!rounded-full">
@@ -153,7 +153,6 @@ export const ClubhouseTopBar: React.FC<ClubhouseTopBarProps> = ({
                   isOpen={menuOpen}
                   hasUnreadNotifications={hasUnread}
                   notificationCount={unreadCount}
-                  useLightTheme
                   compact
                 />
               </div>

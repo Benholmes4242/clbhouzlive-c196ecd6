@@ -71,12 +71,18 @@ export function HandicapChip({ light = false, pill = false }: { light?: boolean;
   const trend = useHandicapTrend90d(connection?.id);
 
   // Theme-aware tokens
-  const INK = pill ? DARK_INK : light ? DARK_INK : WHITE;
+  const INK = light ? DARK_INK : WHITE;
   const HAIRLINE = light ? DARK_HAIRLINE : WHITE_HAIRLINE;
   const shadow = light ? 'none' : FLOAT_SHADOW;
 
   const baseStyle = pill
-    ? { ...PILL_STYLE, border: '0.5px solid rgba(15,23,42,0.10)', boxShadow: '0 1px 2px rgba(15,23,42,0.04)' }
+    ? {
+        ...PILL_STYLE,
+        background: light ? '#FFFFFF' : 'rgba(255,255,255,0.08)',
+        border: light ? '0.5px solid rgba(15,23,42,0.10)' : '1px solid rgba(255,255,255,0.12)',
+        boxShadow: light ? '0 1px 2px rgba(15,23,42,0.04)' : 'none',
+        filter: light ? 'none' : shadow,
+      }
     : { ...BASE_STYLE, border: `1px solid ${HAIRLINE}`, filter: shadow };
 
   if (!user) return null;
@@ -113,8 +119,12 @@ export function HandicapChip({ light = false, pill = false }: { light?: boolean;
         pill
           ? {
               ...PILL_STYLE,
-              border: '0.5px dashed rgba(15,23,42,0.22)',
-              boxShadow: '0 1px 2px rgba(15,23,42,0.04)',
+              background: 'transparent',
+              border: light
+                ? '0.5px dashed rgba(15,23,42,0.22)'
+                : '1px dashed rgba(255,255,255,0.26)',
+              boxShadow: light ? '0 1px 2px rgba(15,23,42,0.04)' : 'none',
+              filter: light ? 'none' : shadow,
               whiteSpace: 'nowrap',
             }
           : {
