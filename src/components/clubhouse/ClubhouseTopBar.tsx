@@ -143,17 +143,20 @@ export const ClubhouseTopBar: React.FC<ClubhouseTopBarProps> = ({
               </button>
             )}
 
-            {!hideProfilePill && user && <HandicapChip />}
+            {!hideProfilePill && user && <HandicapChip light pill />}
 
             {!hideProfilePill && user && (
-              <PostingAsPill
-                ref={pillRef}
-                onClick={() => setMenuOpen((v) => !v)}
-                isOpen={menuOpen}
-                hasUnreadNotifications={hasUnread}
-                notificationCount={unreadCount}
-                useBareTheme={true}
-              />
+              <div className="[&_button]:!rounded-full">
+                <PostingAsPill
+                  ref={pillRef}
+                  onClick={() => setMenuOpen((v) => !v)}
+                  isOpen={menuOpen}
+                  hasUnreadNotifications={hasUnread}
+                  notificationCount={unreadCount}
+                  useLightTheme
+                  compact
+                />
+              </div>
             )}
           </div>
         </div>
