@@ -71,15 +71,13 @@ export function HandicapChip({ light = false, pill = false }: { light?: boolean;
   const trend = useHandicapTrend90d(connection?.id);
 
   // Theme-aware tokens
-  const INK = light ? DARK_INK : WHITE;
+  const INK = pill ? DARK_INK : light ? DARK_INK : WHITE;
   const HAIRLINE = light ? DARK_HAIRLINE : WHITE_HAIRLINE;
   const shadow = light ? 'none' : FLOAT_SHADOW;
 
-  const baseStyle = {
-    ...BASE_STYLE,
-    border: `1px solid ${HAIRLINE}`,
-    filter: shadow,
-  };
+  const baseStyle = pill
+    ? { ...PILL_STYLE, border: '0.5px solid rgba(15,23,42,0.10)', boxShadow: '0 1px 2px rgba(15,23,42,0.04)' }
+    : { ...BASE_STYLE, border: `1px solid ${HAIRLINE}`, filter: shadow };
 
   if (!user) return null;
 
