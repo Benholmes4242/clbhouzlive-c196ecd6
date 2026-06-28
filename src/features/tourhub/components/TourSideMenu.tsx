@@ -4,6 +4,7 @@
  * Does NOT depend on any shared drawer/sheet component.
  */
 import React, { useEffect, useState } from 'react';
+import type { LucideIcon } from 'lucide-react';
 import {
   Compass,
   Trophy,
