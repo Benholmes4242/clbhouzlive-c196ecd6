@@ -19,11 +19,11 @@
 
 .hcp-dark {
   /* ── Surface hierarchy ──────────────────────────────────────────── */
-  --hcp-bg-0:   #0A0E14;          /* page canvas */
-  --hcp-bg-1:   #0F1419;          /* default card */
-  --hcp-bg-2:   #161C24;          /* raised / inset */
-  --hcp-bg-3:   #1F2730;          /* track / chip / icon-square neutral */
-  --hcp-bg-4:   #283341;          /* hover / pressed */
+  --hcp-bg-0:   #15171F;          /* page canvas — match Clubhouse charcoal */
+  --hcp-bg-1:   #1B1E27;          /* default card */
+  --hcp-bg-2:   #20242E;          /* raised / inset */
+  --hcp-bg-3:   #272C37;          /* track / chip / icon-square neutral */
+  --hcp-bg-4:   #313643;          /* hover / pressed */
 
   /* Hairlines */
   --hcp-line:   rgba(255, 255, 255, 0.06);  /* default card border */
