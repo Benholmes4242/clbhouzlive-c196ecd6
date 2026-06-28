@@ -921,9 +921,7 @@ export function CinematicHeroFullBleed({
                     alt={entryName(row.entry)}
                     userId={row.entry?.player?.id ?? null}
                     size={26}
-                    hideRing={!row.isLeader}
-                    hairlineRing={row.isLeader}
-                    ringColor={row.isLeader ? LEADER_GREEN_RING : undefined}
+                    hideRing
                   />
                   <span
                     style={{
