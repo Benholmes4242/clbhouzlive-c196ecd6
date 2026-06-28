@@ -368,7 +368,7 @@ const RivalryPage: React.FC = () => {
 
   return (
     <PageRoot
-      className="hcp-light"
+      dark={true}
       style={{
         background: BG_0,
         minHeight: '100vh',
@@ -589,8 +589,8 @@ const PrivacyBlockedView: React.FC = () => (
         display: 'inline-block',
         marginTop: 24,
         padding: '10px 18px',
-        background: '#FFFFFF',
-        color: '#0F172A',
+        background: BG_1,
+        color: T100,
         borderRadius: 999,
         fontWeight: 700,
         fontSize: 13,
