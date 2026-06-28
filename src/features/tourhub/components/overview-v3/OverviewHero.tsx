@@ -101,6 +101,7 @@ export function OverviewHero({ height = 528, topRightSlot }: OverviewHeroProps) 
             slide={active}
             activeTournamentId={active.tournament.id}
             onSelectTour={NOOP}
+            topRightSlot={topRightSlot}
           />
         </motion.div>
       </AnimatePresence>
