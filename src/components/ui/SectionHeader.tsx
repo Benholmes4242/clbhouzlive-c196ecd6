@@ -13,8 +13,15 @@ const INK = '#0F172A';
 const INK_MUTE = '#64748B';
 
 type Tier = 'editorial' | 'standard' | 'rail';
+type Role = 'prime' | 'section' | 'rail';
 type IconTone = 'amber' | 'ink';
 type EyebrowTone = 'slate' | 'amber' | 'danger';
+
+const ROLE_TO_TIER: Record<Role, Tier> = {
+  prime: 'editorial',
+  section: 'standard',
+  rail: 'rail',
+};
 
 const EYEBROW_TONE: Record<EyebrowTone, string> = {
   slate: '#64748B',
@@ -24,6 +31,8 @@ const EYEBROW_TONE: Record<EyebrowTone, string> = {
 
 interface SectionHeaderProps {
   tier?: Tier;
+  /** Canonical role vocabulary (per docs/canonical/section-titles.md). Maps onto tier. */
+  role?: Role;
   /** Caps kicker above the title (editorial) OR the caps label itself (standard). */
   kicker?: string;
   /** Main title. */
