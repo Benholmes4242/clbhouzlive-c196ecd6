@@ -38,8 +38,8 @@ export const DimensionToggle: React.FC<Props> = ({ value, onChange }) => (
           style={{
             padding: '3px 9px',
             borderRadius: 999,
-            background: active ? '#FFFFFF' : 'transparent',
-            color: active ? '#0F172A' : 'rgba(255,255,255,0.6)',
+            background: active ? 'var(--hcp-bg-3)' : 'transparent',
+            color: active ? 'var(--hcp-t-100)' : 'var(--hcp-t-60)',
             border: 'none',
             cursor: 'pointer',
             fontSize: 9.5,
