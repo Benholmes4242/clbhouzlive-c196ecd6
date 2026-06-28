@@ -289,7 +289,7 @@ const BusinessProfilePage: React.FC = () => {
     <PageRoot className="min-h-screen" style={{ background: 'var(--bg-page)' }} immersiveStatusBar immersive>
       {/* ───── Hero (full-bleed) ───── */}
       <div className="relative pointer-events-none" style={{ zIndex: 1 }}>
-        <div className="relative w-full overflow-hidden" style={{ height: '35dvh' }}>
+        <div className="relative w-full overflow-hidden" style={{ height: 'calc(var(--profile-hero-h) + env(safe-area-inset-top, 0px))' }}>
           {heroUrl ? (
             <img src={heroUrl} alt="Business cover" className="w-full h-full object-cover object-center" />
           ) : (
