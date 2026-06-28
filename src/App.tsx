@@ -85,7 +85,7 @@ const Discover = lazy(() => import("./pages/Discover"));
 import ErrorLogPage from "./pages/ErrorLogPage";
 import { HeaderProvider } from '@/contexts/GlobalHeaderContext';
 import GlobalHeader from '@/components/header/GlobalHeader';
-import { isImmersiveRoute } from '@/components/header/globalHeaderRules';
+import { isImmersiveRoute, isDarkChromeRoute } from '@/components/header/globalHeaderRules';
 import { KeepAliveOutlet } from '@/components/keep-alive/KeepAliveOutlet';
 
 
