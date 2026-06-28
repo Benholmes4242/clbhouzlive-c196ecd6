@@ -36,7 +36,7 @@ export const PageRoot = React.forwardRef<HTMLDivElement, PageRootProps>(
     // Default light chrome for the Clubhouse/Profile pages; dark elsewhere.
     useMedianStatusBar(
       resolvedDark ? "dark" : "light",
-      resolvedDark ? "#0A0E14" : "#F8FAFC",
+      resolvedDark ? "#15171F" : "#F8FAFC",
       false,
       false,
       !immersiveStatusBar,
