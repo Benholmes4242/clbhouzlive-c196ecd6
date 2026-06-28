@@ -368,7 +368,7 @@ const CompactHeader: React.FC<CompactHeaderProps> = ({ className }) => {
           {/* Right section: Search + Identity pill (fixed width) */}
           <div className="flex items-center gap-1.5 sm:gap-2 flex-shrink-0">
             {/* Handicap chip — left of search, all routes */}
-            <HandicapChip light={useLightTheme && !overlayActive} />
+            <HandicapChip light={useLightTheme && !overlayActive} pill={useLightTheme && !overlayActive} />
 
 
             {/* Search Button — 44px tap target */}
@@ -393,15 +393,17 @@ const CompactHeader: React.FC<CompactHeaderProps> = ({ className }) => {
             {/* Identity pill (mobile only) */}
             <div className="sm:hidden">
               {user ? (
-                <PostingAsPill 
-                  ref={pillRef}
-                  onClick={handleMenuClick} 
-                  isOpen={menuOpen}
-                  hasUnreadNotifications={hasUnread}
-                  notificationCount={unreadCount}
-                  useLightTheme={useLightTheme && !overlayActive}
-                  compact={isEditorialChromeRoute}
-                />
+                <div className="[&_button]:!rounded-full">
+                  <PostingAsPill
+                    ref={pillRef}
+                    onClick={handleMenuClick}
+                    isOpen={menuOpen}
+                    hasUnreadNotifications={hasUnread}
+                    notificationCount={unreadCount}
+                    useLightTheme={useLightTheme && !overlayActive}
+                    compact={isEditorialChromeRoute}
+                  />
+                </div>
               ) : (
                 /* Skeleton placeholder while auth resolves — prevents layout shift */
                 <div 
