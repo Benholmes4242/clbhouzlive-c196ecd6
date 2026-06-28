@@ -1,5 +1,4 @@
 import React from 'react';
-import { INK } from '@/features/courses/_shared/tokens';
 import { cn } from '@/lib/utils';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useNetworkActivity } from '@/hooks/useNetworkActivity';
