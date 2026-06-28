@@ -16,7 +16,7 @@ import { toast } from 'sonner';
 
 import ScrollToTopGlass from '@/components/common/ScrollToTopGlass';
 import { PageRoot } from '@/components/layout/PageRoot';
-import { useMedianStatusBar } from '@/hooks/useMedianStatusBar';
+
 import { useHideHeader } from '@/hooks/useHeaderVisibility';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useBusinessProfile } from '@/hooks/useBusinessProfile';
@@ -33,7 +33,7 @@ import { useStartDM } from '@/hooks/useStartDM';
 
 import { Button } from '@/components/ui/button';
 import { VerifiedBadge } from '@/components/ui/VerifiedBadge';
-import { CoverPhotoFallback } from '@/components/ui/CoverPhotoFallback';
+
 import { AvatarLightbox } from '@/components/shared/AvatarLightbox';
 import { ImageCropModal } from '@/components/business/ImageCropModal';
 import { BusinessProfileInfo } from '@/components/business/BusinessProfileInfo';
@@ -41,7 +41,7 @@ import { BusinessTeamTab } from '@/components/business/BusinessTeamTab';
 import { GenericPageSkeleton } from '@/components/skeletons/GenericPageSkeleton';
 
 import PostsTabContent from '@/components/posts-tab/PostsTabContent';
-import { ProfileFloatingHeader } from '@/components/profile/ProfileFloatingHeader';
+import FloatingPageHeader from '@/components/header/FloatingPageHeader';
 
 import {
   DropdownMenu, DropdownMenuContent, DropdownMenuItem,
@@ -95,7 +95,7 @@ const BusinessProfilePage: React.FC = () => {
   const { user, loading: authLoading } = useSupabaseSession();
 
   useHideHeader();
-  useMedianStatusBar('dark', 'transparent', true, false);
+  // Status bar transparency is owned by FloatingPageHeader (single owner).
 
   const { data: business, isLoading, error } = useBusinessProfile(idOrSlug);
   const { data: membership } = useBusinessMembership(business?.id);
@@ -224,7 +224,24 @@ const BusinessProfilePage: React.FC = () => {
   };
 
   // ───── early returns ─────
-  if (authLoading || isLoading) return <GenericPageSkeleton />;
+  if (authLoading || isLoading) {
+    return (
+      <div className="relative min-h-screen">
+        {/* Dark bleed behind the notch so the transparent safe-area shield
+            doesn't flash light grey before the cinematic cover loads. */}
+        <div
+          aria-hidden
+          className="fixed top-0 left-0 right-0 pointer-events-none z-50"
+          style={{
+            height: 'calc(env(safe-area-inset-top, 0px) + 80px)',
+            background:
+              'linear-gradient(180deg, #1E4D38 0%, #163A2B 65%, rgba(15,23,42,0) 100%)',
+          }}
+        />
+        <GenericPageSkeleton />
+      </div>
+    );
+  }
 
   if (error || !business) {
     return (
@@ -289,13 +306,21 @@ const BusinessProfilePage: React.FC = () => {
     <PageRoot className="min-h-screen" style={{ background: 'var(--bg-page)' }} immersiveStatusBar immersive>
       {/* ───── Hero (full-bleed) ───── */}
       <div className="relative pointer-events-none" style={{ zIndex: 1 }}>
-        <div className="relative w-full overflow-hidden" style={{ height: '35dvh' }}>
-          {heroUrl ? (
-            <img src={heroUrl} alt="Business cover" className="w-full h-full object-cover object-center" />
-          ) : (
-            <CoverPhotoFallback className="w-full h-full" />
-          )}
-
+        <div
+          className="relative w-full overflow-hidden"
+          style={(() => {
+            const scrim = 'linear-gradient(180deg, rgba(15,23,42,0.45) 0%, rgba(15,23,42,0.1) 20%, rgba(15,23,42,0) 40%, rgba(15,23,42,0.5) 100%)';
+            const bg = heroUrl
+              ? `${scrim}, url(${heroUrl}) center / cover no-repeat`
+              : 'linear-gradient(180deg,#1E4D38,#0F172A)';
+            return {
+              minHeight: 'calc(var(--profile-hero-h) + env(safe-area-inset-top, 0px))',
+              background: bg,
+              backgroundColor: '#0F172A',
+              paddingTop: 'env(safe-area-inset-top, 0px)',
+            } as React.CSSProperties;
+          })()}
+        >
           {isOwner && (
             <button
               onClick={() => heroFileInputRef.current?.click()}
@@ -314,10 +339,11 @@ const BusinessProfilePage: React.FC = () => {
           )}
         </div>
 
-        {/* Floating header — transparent control row under the notch */}
-        <ProfileFloatingHeader
-          isSelf={false}
-          backFallback="/clubhouse"
+
+        {/* Floating header — canonical glass control row under the notch */}
+        <FloatingPageHeader
+          onBack={() => navigate('/clubhouse')}
+          showHandicap={!!user}
         />
 
         {/* Avatar (squircle) — owner: tap to upload; visitor: tap to lightbox */}
@@ -363,7 +389,7 @@ const BusinessProfilePage: React.FC = () => {
 
         {/* City pill (right of hero) */}
         {business.city && (
-          <div className="absolute right-5 z-20 pointer-events-auto" style={{ top: 'calc(35dvh + 12px)' }}>
+          <div className="absolute right-5 z-20 pointer-events-auto" style={{ top: 'calc(var(--profile-hero-h) + env(safe-area-inset-top, 0px) + 12px)' }}>
             <span
               className="px-4 py-1.5 text-sm font-semibold rounded-full text-foreground flex items-center gap-1.5"
               style={{ background: '#ffffff', border: '1px solid rgba(15,23,42,0.07)' }}
