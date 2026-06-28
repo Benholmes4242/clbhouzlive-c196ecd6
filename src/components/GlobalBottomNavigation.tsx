@@ -15,6 +15,7 @@ import { useNavigationHandlers } from './bottom-navigation/useNavigationHandlers
 import { useUnseenFriendReviews } from '@/hooks/useUnseenFriendReviews';
 import { useTournamentsCache } from '@/hooks/useTournamentsCache';
 import { isMedianApp } from '@/utils/median/isMedianApp';
+import { isDarkChromeRoute } from '@/components/header/globalHeaderRules';
 
 import { cn } from '@/lib/utils';
 import { auditComponentMount, markPerformance } from '@/utils/clubhouseAudit';
