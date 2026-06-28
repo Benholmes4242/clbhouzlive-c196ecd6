@@ -314,10 +314,10 @@ const BusinessProfilePage: React.FC = () => {
           )}
         </div>
 
-        {/* Floating header — transparent control row under the notch */}
-        <ProfileFloatingHeader
-          isSelf={false}
-          backFallback="/clubhouse"
+        {/* Floating header — canonical glass control row under the notch */}
+        <FloatingPageHeader
+          onBack={() => navigate('/clubhouse')}
+          showHandicap={!!user}
         />
 
         {/* Avatar (squircle) — owner: tap to upload; visitor: tap to lightbox */}
