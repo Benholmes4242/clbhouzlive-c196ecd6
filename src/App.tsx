@@ -86,6 +86,7 @@ import ErrorLogPage from "./pages/ErrorLogPage";
 import { HeaderProvider } from '@/contexts/GlobalHeaderContext';
 import GlobalHeader from '@/components/header/GlobalHeader';
 import { isImmersiveRoute, isDarkChromeRoute } from '@/components/header/globalHeaderRules';
+import { applyShieldColor } from '@/hooks/useMedianStatusBar';
 import { KeepAliveOutlet } from '@/components/keep-alive/KeepAliveOutlet';
 
 
