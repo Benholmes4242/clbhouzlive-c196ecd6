@@ -25,6 +25,8 @@ import { useWhsConnection } from '@/lib/whs/hooks';
 import WhsHandicapTab from '@/components/profile/handicap/whs/WhsHandicapTab';
 import HandicapDashboard from '@/components/profile/handicap/whs/HandicapDashboard';
 import ShellSlot from '@/components/header/ShellSlot';
+import FloatingPageHeader from '@/components/header/FloatingPageHeader';
+import { safeGoBack } from '@/utils/navigation';
 import SegmentedControl from '@/components/discover/SegmentedControl';
 import { RivalryCTA } from '@/components/profile/handicap/whs/sections/header/RivalryCTA';
 import { firstName } from '@/pages/rivalry-page/_shared/helpers';
@@ -328,6 +330,7 @@ const FriendHandicapDashboard: React.FC<{ userId: string; ownerFirstName: string
 
 const HandicapPage: React.FC = () => {
   const { user, loading } = useSupabaseSession();
+  const navigate = useNavigate();
   const params = useParams<{ userId?: string }>();
   const [searchParams, setSearchParams] = useSearchParams();
 
@@ -434,6 +437,7 @@ const HandicapPage: React.FC = () => {
 
   return (
     <PageRoot dark={true} style={{ background: 'var(--hcp-bg-0)' }}>
+      <FloatingPageHeader onBack={() => safeGoBack(navigate, '/profile')} showHandicap={false} />
       <HandicapPageHeader
         ownerUserId={ownerUserId}
         displayName={displayName}
