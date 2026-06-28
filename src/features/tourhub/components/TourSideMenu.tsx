@@ -29,7 +29,7 @@ export interface TourSideMenuProps {
   onSignOut: () => void;
 }
 
-const DESTINATIONS: { id: string; label: string; Icon: React.ComponentType<{ size?: number; color?: string; strokeWidth?: number }> }[] = [
+const DESTINATIONS: { id: string; label: string; Icon: LucideIcon }[] = [
   { id: 'overview',     label: 'Overview',     Icon: Compass },
   { id: 'live',         label: 'Leaderboards', Icon: Trophy },
   { id: 'schedule',     label: 'Schedule',     Icon: CalendarDays },
@@ -238,7 +238,7 @@ function SecondaryLink({
   label,
   onClick,
 }: {
-  Icon: React.ComponentType<{ size?: number; color?: string; strokeWidth?: number }>;
+  Icon: LucideIcon;
   label: string;
   onClick: () => void;
 }) {
