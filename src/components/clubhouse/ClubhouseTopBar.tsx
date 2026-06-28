@@ -98,7 +98,7 @@ export const ClubhouseTopBar: React.FC<ClubhouseTopBarProps> = ({
             transition: 'opacity 240ms cubic-bezier(0.22, 0.61, 0.36, 1), transform 240ms cubic-bezier(0.22, 0.61, 0.36, 1)',
           }}
         >
-          <div style={{ display: 'flex', alignItems: 'center', gap: 9, maxWidth: '100%', minWidth: 0 }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 'clamp(8px, 2.2vw, 14px)', maxWidth: '100%', minWidth: 0 }}>
             {!hideTabs && (
               <ClubhouseTabToggle
                 activeTab={activeTab}
@@ -125,31 +125,28 @@ export const ClubhouseTopBar: React.FC<ClubhouseTopBarProps> = ({
                 type="button"
                 onClick={() => setSearchOpen(true)}
                 aria-label="Search"
-                className="active:scale-[0.94]"
                 style={{
-                  width: 38,
-                  height: 38,
-                  borderRadius: 999,
+                  width: 26,
+                  height: 30,
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
-                  background: 'rgba(255,255,255,0.16)',
-                  border: '1px solid rgba(255,255,255,0.30)',
-                  backdropFilter: 'blur(14px)',
-                  WebkitBackdropFilter: 'blur(14px)',
+                  background: 'transparent',
+                  border: 'none',
                   padding: 0,
                   cursor: 'pointer',
                   color: '#FFFFFF',
+                  filter: 'none',
                 }}
               >
-                <Search size={18} strokeWidth={2.2} color="#FFFFFF" />
+                <Search size={20} strokeWidth={FLOAT_STROKE} />
               </button>
             )}
 
-            {!hideProfilePill && user && <HandicapChip pill large />}
+            {!hideProfilePill && user && <HandicapChip pill />}
 
             {!hideProfilePill && user && (
-              <div className="[&_button]:!rounded-full [&_button]:!h-[38px] [&_button]:!w-[38px] [&_button]:!p-0">
+              <div className="[&_button]:!rounded-full">
                 <PostingAsPill
                   ref={pillRef}
                   onClick={() => setMenuOpen((v) => !v)}
