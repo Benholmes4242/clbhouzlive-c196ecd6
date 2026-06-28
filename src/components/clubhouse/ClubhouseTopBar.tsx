@@ -91,7 +91,7 @@ export const ClubhouseTopBar: React.FC<ClubhouseTopBarProps> = ({
           style={{
             top: TOP_STRIP_TOP,
             padding: '0 clamp(10px, 3vw, 16px)',
-            height: 44,
+            height: 52,
             opacity: hidden ? 0 : 1,
             transform: hidden ? 'translateY(-100%)' : 'translateY(0)',
             pointerEvents: hidden ? 'none' : 'auto',
@@ -112,7 +112,7 @@ export const ClubhouseTopBar: React.FC<ClubhouseTopBarProps> = ({
                 aria-hidden="true"
                 style={{
                   width: 1,
-                  height: 18,
+                  height: 22,
                   background: 'rgba(255,255,255,0.10)',
                   flexShrink: 0,
                   margin: 0,
@@ -126,8 +126,8 @@ export const ClubhouseTopBar: React.FC<ClubhouseTopBarProps> = ({
                 onClick={() => setSearchOpen(true)}
                 aria-label="Search"
                 style={{
-                  width: 26,
-                  height: 30,
+                  width: 38,
+                  height: 38,
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
@@ -139,7 +139,7 @@ export const ClubhouseTopBar: React.FC<ClubhouseTopBarProps> = ({
                   filter: 'none',
                 }}
               >
-                <Search size={20} strokeWidth={FLOAT_STROKE} />
+                <Search size={24} strokeWidth={FLOAT_STROKE} />
               </button>
             )}
 
@@ -153,7 +153,7 @@ export const ClubhouseTopBar: React.FC<ClubhouseTopBarProps> = ({
                   isOpen={menuOpen}
                   hasUnreadNotifications={hasUnread}
                   notificationCount={unreadCount}
-                  compact
+                  size="lg"
                 />
               </div>
             )}
