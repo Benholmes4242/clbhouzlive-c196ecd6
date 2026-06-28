@@ -6,17 +6,12 @@
  * and shield lifecycle. No global event bus, no shared CSS vars.
  */
 import React, { useEffect } from 'react';
-import { Menu, Search, TrendingUp } from 'lucide-react';
-import { useSupabaseSession } from '@/hooks/useSupabaseSession';
+import { Menu, Search } from 'lucide-react';
 import { applyShieldColor } from '@/hooks/useMedianStatusBar';
 
 export interface FloatingTourHeaderProps {
   onMenuTap: () => void;
   onSearchTap: () => void;
-  onAvatarTap: () => void;
-  onHandicapTap?: () => void;
-  /** Pre-formatted handicap index, e.g. "2.8". */
-  handicapValue: string;
   /** Optional extra pill rendered at end of the row (e.g. tour picker). */
   endSlot?: React.ReactNode;
 }
