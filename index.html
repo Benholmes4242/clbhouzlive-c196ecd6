@@ -65,6 +65,38 @@
     <div id="root"><div style="background:#0A0E14;min-height:100vh;width:100%;"></div></div>
     <div id="portal-root"></div>
     <script>
+      // ============================================================
+      // CHROME-HEIGHT COLD-LOAD DEFAULTS
+      // Set --header-h and --shell-extra-h synchronously based on the
+      // current pathname so first paint positions content at the correct
+      // offset. ShellSlot's singleton publisher reconciles to the exact
+      // measured height after mount; this just prevents the 0→N jump on
+      // hard reload of /tourhub, /watch, /courses, /discover, /handicap.
+      // ============================================================
+      (function () {
+        try {
+          var p = location.pathname || '/';
+          var de = document.documentElement;
+          // Header: tour routes are 52px, everything else is 55px.
+          var headerH = /^\/tourhub(\/|$)/.test(p) ? 52 : 55;
+          // Sub-chrome (tab row) defaults per route prefix. 0 if none.
+          var subH = 0;
+          if (
+            /^\/tourhub(\/|$)/.test(p) ||
+            /^\/watch(\/|$)/.test(p) ||
+            /^\/courses(\/|$)/.test(p) ||
+            /^\/discover(\/|$)/.test(p) ||
+            /^\/handicap(\/|$)/.test(p)
+          ) {
+            subH = 46;
+          }
+          de.style.setProperty('--header-h', headerH + 'px');
+          de.style.setProperty('--shell-extra-h', subH + 'px');
+        } catch (e) {}
+      })();
+    </script>
+    <script>
+
       // Chunk recovery - Must be before main script to catch early errors
       // NOTE: Plain var / function syntax — this inline script runs untranspiled
       // on iOS WebView and must stay compatible.
