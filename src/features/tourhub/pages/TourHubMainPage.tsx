@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { useSearchParams } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { TourHubShell } from '../components/TourHubShell';
 import { TourHubShellTabs } from '../components/TourHubShellTabs';
 import { ShellSlot } from '@/components/header/ShellSlot';
@@ -12,12 +12,20 @@ import { useTournamentStatusRealtime } from '../hooks/useTournamentStatusRealtim
 import { useLiveTournaments } from '../hooks/useLiveTournaments';
 import { TourSelectionProvider } from '../context/TourSelectionContext';
 import { useHeroFullBleed } from '../_shared/heroFullBleedSignal';
-import { applyShieldColor } from '@/hooks/useMedianStatusBar';
+import { setFloatingHeaderActive } from '../_shared/floatingHeaderSignal';
+import { FloatingTourHeader } from '../components/FloatingTourHeader';
+import { TourSideMenu } from '../components/TourSideMenu';
+import { TourSwitcherAffordance } from '../components/TourSwitcherAffordance';
+import { useSupabaseSession } from '@/hooks/useSupabaseSession';
+import { useWhsConnection, useHandicapTrend } from '@/lib/whs/hooks';
+import { useLogout } from '@/hooks/useLogout';
 
 export function TourHubMainPage() {
   const [searchParams, setSearchParams] = useSearchParams();
+  const navigate = useNavigate();
   const tabParam = searchParams.get('tab') as TourHubTab | null;
   const [activeTab, setActiveTab] = useState<TourHubTab>(tabParam || 'overview');
+  const [menuOpen, setMenuOpen] = useState(false);
 
   // Subscribe to tournament status changes (live/completed transitions)
   useTournamentStatusRealtime();
@@ -59,64 +67,24 @@ export function TourHubMainPage() {
     return () => window.removeEventListener('clbhouz-active-tab-retap', onRetap);
   }, [setSearchParams]);
 
-  // ───────── Cinematic full-bleed hero overlay machinery ─────────
-  // HybridHero (inside OverviewTab → OverviewHero) flips the heroFullBleed
-  // signal when it is rendering CinematicHeroFullBleed (live/results).
+  // Cinematic full-bleed hero is on iff Overview tab AND hero is in cinematic mode.
   const heroIsCinematic = useHeroFullBleed();
   const fullBleedHero = activeTab === 'overview' && heroIsCinematic;
 
-  // heroCovering = the hero still covers the top of the viewport.
-  // Scroll-threshold based: true at mount; flips false after scrolling past
-  // the hero. (Hero height ≈ 528px; chrome ≈ 96px.)
-  const [heroCovering, setHeroCovering] = useState(true);
+  // Tell GlobalHeader to suppress CompactHeader on this surface.
   useEffect(() => {
-    if (!fullBleedHero) {
-      setHeroCovering(false);
-      return;
-    }
-    setHeroCovering(true);
-    const HERO_HEIGHT = 528;
-    const CHROME = 96;
-    const threshold = HERO_HEIGHT - CHROME;
-    const onScroll = () => {
-      const y = window.scrollY || document.documentElement.scrollTop || 0;
-      setHeroCovering(y < threshold);
-    };
-    onScroll();
-    window.addEventListener('scroll', onScroll, { passive: true });
-    return () => window.removeEventListener('scroll', onScroll);
+    setFloatingHeaderActive(fullBleedHero);
+    return () => setFloatingHeaderActive(false);
   }, [fullBleedHero]);
 
-  // Drive the global chrome flag (CompactHeader + ShellSlot read this).
-  useEffect(() => {
-    const on = fullBleedHero && heroCovering;
-    document.documentElement.style.setProperty('--tour-hero-overlay', on ? '1' : '0');
-    window.dispatchEvent(new CustomEvent('tour-hero-overlay', { detail: on }));
+  // Handicap value for the floating row + side menu.
+  const { user } = useSupabaseSession();
+  const { data: connection } = useWhsConnection(user?.id);
+  const { data: trendData } = useHandicapTrend(connection?.id);
+  const handicapValue =
+    trendData?.current != null ? Number(trendData.current).toFixed(1) : '—';
 
-    if (on) {
-      // CSS shield → transparent via the source of truth (so useMedianStatusBar
-      // foreground/visibility re-applies pick up 'transparent', not '#F8FAFC').
-      applyShieldColor('transparent');
-      // Native Median status bar → transparent overlay with light glyphs for the
-      // dark cinematic hero. Restoration happens when immersiveStatusBar flips
-      // false and PageRoot's useMedianStatusBar re-fires.
-      try {
-        (window as any).median?.statusbar?.set({
-          style: 'dark',
-          color: '00000000',
-          overlay: true,
-          blur: false,
-        });
-      } catch {}
-    }
-
-    return () => {
-      document.documentElement.style.setProperty('--tour-hero-overlay', '0');
-      window.dispatchEvent(new CustomEvent('tour-hero-overlay', { detail: false }));
-    };
-  }, [fullBleedHero, heroCovering]);
-
-  const overlay = fullBleedHero && heroCovering;
+  const { logout } = useLogout();
 
   const renderTab = () => {
     switch (activeTab) {
@@ -144,21 +112,54 @@ export function TourHubMainPage() {
     }
   };
 
+  const handleSelectTab = (id: string) => {
+    if (id === 'college') {
+      navigate('/tourhub/college-golf');
+      return;
+    }
+    const tab = id as TourHubTab;
+    setActiveTab(tab);
+    setSearchParams({ tab: id }, { replace: true });
+    window.scrollTo(0, 0);
+  };
+
   return (
     <TourSelectionProvider>
-      <TourHubShell showBack={false} immersiveStatusBar={overlay}>
-        <ShellSlot>
-          <TourHubShellTabs overlay={overlay} />
-          {renderShellRow()}
-        </ShellSlot>
-
+      <TourHubShell showBack={false} immersiveStatusBar={fullBleedHero}>
         {fullBleedHero ? (
-          // Hero bleeds into the notch behind the (now-transparent) chrome.
-          <div>{renderTab()}</div>
+          // Cinematic overview: hero bleeds into the notch behind the floating
+          // pill row. No ShellSlot tabs — destinations live in the side menu.
+          <>
+            <div>{renderTab()}</div>
+            <FloatingTourHeader
+              handicapValue={handicapValue}
+              onMenuTap={() => setMenuOpen(true)}
+              onSearchTap={() => navigate('/search')}
+              onAvatarTap={() => navigate('/profile')}
+              onHandicapTap={() => navigate('/handicap')}
+              endSlot={<TourSwitcherAffordance />}
+            />
+            <TourSideMenu
+              open={menuOpen}
+              onClose={() => setMenuOpen(false)}
+              activeTab={activeTab}
+              onSelectTab={handleSelectTab}
+              handicapValue={handicapValue}
+              onSettings={() => navigate('/settings')}
+              onProfile={() => navigate('/profile')}
+              onSignOut={() => { void logout(); }}
+            />
+          </>
         ) : (
-          <div style={{ paddingTop: 'calc(var(--chrome-total-h, 0px) - 1px)' }}>
-            {renderTab()}
-          </div>
+          <>
+            <ShellSlot>
+              <TourHubShellTabs />
+              {renderShellRow()}
+            </ShellSlot>
+            <div style={{ paddingTop: 'calc(var(--chrome-total-h, 0px) - 1px)' }}>
+              {renderTab()}
+            </div>
+          </>
         )}
       </TourHubShell>
     </TourSelectionProvider>
