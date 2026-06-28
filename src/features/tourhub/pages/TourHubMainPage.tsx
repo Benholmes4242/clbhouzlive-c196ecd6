@@ -132,13 +132,11 @@ export function TourHubMainPage() {
           <>
             <div>{renderTab()}</div>
             <FloatingTourHeader
-              handicapValue={handicapValue}
               onMenuTap={() => setMenuOpen(true)}
               onSearchTap={() => navigate('/search')}
-              onAvatarTap={() => navigate('/profile')}
-              onHandicapTap={() => navigate('/handicap')}
               endSlot={<TourSwitcherAffordance />}
             />
+
             <TourSideMenu
               open={menuOpen}
               onClose={() => setMenuOpen(false)}
