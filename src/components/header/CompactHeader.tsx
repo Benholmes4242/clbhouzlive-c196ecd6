@@ -367,12 +367,6 @@ const CompactHeader: React.FC<CompactHeaderProps> = ({ className }) => {
 
           {/* Right section: Search + Identity pill (fixed width) */}
           <div className="flex items-center gap-1.5 sm:gap-2 flex-shrink-0">
-            {/* Handicap chip — left of search, all routes */}
-            <div className="[&>button]:!rounded-full">
-              <HandicapChip light={useLightTheme && !overlayActive} />
-            </div>
-
-
             {/* Search Button — 44px tap target */}
             <Button
               variant="ghost"
@@ -391,6 +385,11 @@ const CompactHeader: React.FC<CompactHeaderProps> = ({ className }) => {
             >
               <Search className={isEditorialChromeRoute ? "h-[18px] w-[18px]" : "h-5 w-5"} />
             </Button>
+
+            {/* Handicap chip — next to avatar, all routes */}
+            <div className="[&>button]:!rounded-full">
+              <HandicapChip light={useLightTheme && !overlayActive} />
+            </div>
 
             {/* Identity pill (mobile only) */}
             <div className="sm:hidden">
