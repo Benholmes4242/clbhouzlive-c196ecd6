@@ -279,8 +279,6 @@ const HandicapPageHeader: React.FC<HeaderProps> = ({
                   <span
                     style={{
                       display: 'inline-block',
-                      paddingBottom: 4,
-                      borderBottom: active ? '1.5px solid #0A0E14' : '1.5px solid transparent',
                     }}
                   >
                     {tab.label}
