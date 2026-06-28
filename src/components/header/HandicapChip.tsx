@@ -179,7 +179,7 @@ export function HandicapChip({ light = false, pill = false }: { light?: boolean;
     >
       <span
         style={{
-          fontSize: 12,
+          fontSize: pill ? 14 : 12,
           fontWeight: 700,
           color: INK,
           fontVariantNumeric: 'tabular-nums',
@@ -188,7 +188,7 @@ export function HandicapChip({ light = false, pill = false }: { light?: boolean;
       >
         {formattedIndex}
       </span>
-      {showArrow && <ArrowIcon size={11} color={arrowColor} strokeWidth={2.4} />}
+      {showArrow && <ArrowIcon size={pill ? 13 : 11} color={arrowColor} strokeWidth={2.4} />}
     </button>
   );
 }
