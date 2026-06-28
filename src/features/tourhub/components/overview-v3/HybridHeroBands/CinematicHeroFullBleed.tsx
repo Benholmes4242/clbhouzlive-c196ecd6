@@ -126,7 +126,7 @@ function StackedAvatars({
             marginLeft: i === 0 ? 0 : -overlap,
             zIndex: visible.length - i,
             borderRadius: 9,
-            boxShadow: `0 0 0 ${ringWidth}px ${ringColor ?? 'rgba(13,30,22,0.95)'}`,
+            boxShadow: `0 0 0 1.5px rgba(255,255,255,0.25)`,
             display: 'inline-block',
           }}
         >
