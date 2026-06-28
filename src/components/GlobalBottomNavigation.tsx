@@ -114,8 +114,8 @@ const GlobalBottomNavigation: React.FC<GlobalBottomNavigationProps> = ({ chromeS
   const isWarmGradientRoute = WARM_GRADIENT_ROUTES.some(r => location.pathname.startsWith(r));
   const isTourHubRoute = location.pathname.startsWith('/tourhub');
   const isHandicapRoute = location.pathname.startsWith('/handicap');
-  /** Charcoal nav chrome on the Clubhouse page only; light everywhere else. */
-  const isDarkChromeRoute = isClubhouseRoute;
+  /** Single source of truth for dark chrome — shared with App.tsx / PageRoot. */
+  const isDarkChromeRouteActive = isDarkChromeRoute(location.pathname);
   
   const showNavigation = isVisible && !shouldHideForRoute;
 
