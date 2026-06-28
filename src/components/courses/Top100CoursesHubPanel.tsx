@@ -215,10 +215,11 @@ const Top100CoursesHubPanel = () => {
       {/* Editorial header — eyebrow + title + optional progress sub-line.
           Parent already supplies px-4 — don't double-pad. */}
       <div className="pt-1">
-        <SectionHeader tier="standard" kicker="Official World Ranking" tone="amber" className="mb-[3px]" />
-        <h2 style={{ fontSize: 22, fontWeight: 800, color: INK, letterSpacing: '-0.025em', margin: 0, lineHeight: 1.15 }}>
-          The world's best
-        </h2>
+        <SectionHeader
+          role="prime"
+          kicker="TOP 100"
+          title="The world's best"
+        />
         {crossListProgress && (
           <p
             style={{
