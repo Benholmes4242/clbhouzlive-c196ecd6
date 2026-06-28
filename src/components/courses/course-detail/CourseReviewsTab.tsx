@@ -16,7 +16,7 @@ import { RatingFilterChips, RatingFilterValue } from '../review/RatingFilterChip
 import { WriteReviewPrompt } from '../review/WriteReviewPrompt';
 import { SegmentedTabOption } from '@/components/ui/SegmentedTabs';
 import { Search, X, Pencil, ArrowUpDown, ListChecks, MessageSquarePlus, Flag, Map, Building2, Tag } from 'lucide-react';
-import { SectionLabel } from './SectionLabel';
+
 import { PrimaryAmberCTA } from '@/components/ui/PrimaryAmberCTA';
 import { EmptyStateGuide } from '@/components/ui/EmptyStateGuide';
 import { AppSelect } from '@/components/ui/AppSelect';
