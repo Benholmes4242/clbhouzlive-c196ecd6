@@ -116,6 +116,7 @@ function SectionHeaderInner(props: SectionHeaderProps) {
     paddingTop = 0,
     paddingX = 0,
     className,
+    accent,
   } = props;
 
   const role: Role = roleProp ?? TIER_TO_ROLE[tierProp ?? 'standard'];
