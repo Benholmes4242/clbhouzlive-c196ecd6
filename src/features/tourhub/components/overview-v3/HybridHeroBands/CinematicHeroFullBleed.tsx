@@ -126,7 +126,7 @@ function StackedAvatars({
             marginLeft: i === 0 ? 0 : -overlap,
             zIndex: visible.length - i,
             borderRadius: 9,
-            boxShadow: `0 0 0 ${ringWidth}px ${ringColor ?? 'rgba(13,30,22,0.95)'}`,
+            boxShadow: `0 0 0 1.5px rgba(255,255,255,0.25)`,
             display: 'inline-block',
           }}
         >
@@ -148,7 +148,7 @@ function StackedAvatars({
             height: size,
             borderRadius: 8,
             background: 'rgba(255,255,255,0.16)',
-            boxShadow: `0 0 0 ${ringWidth}px ${ringColor ?? 'rgba(13,30,22,0.95)'}`,
+            boxShadow: `0 0 0 1.5px rgba(255,255,255,0.25)`,
             color: 'rgba(255,255,255,0.92)',
             fontSize: 10,
             fontWeight: 800,
@@ -921,9 +921,7 @@ export function CinematicHeroFullBleed({
                     alt={entryName(row.entry)}
                     userId={row.entry?.player?.id ?? null}
                     size={26}
-                    hideRing={!row.isLeader}
-                    hairlineRing={row.isLeader}
-                    ringColor={row.isLeader ? LEADER_GREEN_RING : undefined}
+                    hideRing
                   />
                   <span
                     style={{
