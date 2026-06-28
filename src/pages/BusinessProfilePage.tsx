@@ -95,7 +95,7 @@ const BusinessProfilePage: React.FC = () => {
   const { user, loading: authLoading } = useSupabaseSession();
 
   useHideHeader();
-  useMedianStatusBar('dark', 'transparent', true, false);
+  // Status bar transparency is owned by FloatingPageHeader (single owner).
 
   const { data: business, isLoading, error } = useBusinessProfile(idOrSlug);
   const { data: membership } = useBusinessMembership(business?.id);
