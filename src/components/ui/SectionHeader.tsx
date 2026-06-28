@@ -94,7 +94,8 @@ function ActionAffordance({
 
 function SectionHeaderInner(props: SectionHeaderProps) {
   const {
-    tier = 'standard',
+    tier: tierProp,
+    role,
     kicker,
     title,
     sub,
@@ -110,6 +111,8 @@ function SectionHeaderInner(props: SectionHeaderProps) {
     paddingX = 0,
     className,
   } = props;
+
+  const tier: Tier = role ? ROLE_TO_TIER[role] : (tierProp ?? 'standard');
 
   const pad = { paddingTop, paddingLeft: paddingX, paddingRight: paddingX };
 
