@@ -41,7 +41,7 @@ import { BusinessTeamTab } from '@/components/business/BusinessTeamTab';
 import { GenericPageSkeleton } from '@/components/skeletons/GenericPageSkeleton';
 
 import PostsTabContent from '@/components/posts-tab/PostsTabContent';
-import { ProfileFloatingHeader } from '@/components/profile/ProfileFloatingHeader';
+import FloatingPageHeader from '@/components/header/FloatingPageHeader';
 
 import {
   DropdownMenu, DropdownMenuContent, DropdownMenuItem,
