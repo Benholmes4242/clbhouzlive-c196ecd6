@@ -44,6 +44,8 @@ interface SectionHeaderProps {
   count?: number;
   /** Render an amber required asterisk after the eyebrow label. */
   required?: boolean;
+  /** Render the `icon` as a small inline glyph before a standard-tier eyebrow (SectionLabel parity). */
+  inlineIcon?: boolean;
   paddingTop?: number;
   paddingX?: number;
   className?: string;
@@ -94,6 +96,7 @@ function SectionHeaderInner(props: SectionHeaderProps) {
     tone,
     count,
     required,
+    inlineIcon,
     paddingTop = 0,
     paddingX = 0,
     className,
@@ -149,6 +152,9 @@ function SectionHeaderInner(props: SectionHeaderProps) {
           <div style={{ display: 'flex', alignItems: 'baseline', gap: 8 }}>
             <span
               style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: 6,
                 fontFamily: GEIST,
                 fontSize: 11,
                 fontWeight: 800,
@@ -158,6 +164,9 @@ function SectionHeaderInner(props: SectionHeaderProps) {
                 fontFeatureSettings: '"kern" 1, "liga" 1',
               }}
             >
+              {inlineIcon && Icon && (
+                <Icon size={11} strokeWidth={2.4} color={eyebrowColor} />
+              )}
               {eyebrowText}
               {required && (
                 <span aria-hidden="true" style={{ color: '#F7931E', marginLeft: 3, letterSpacing: 0 }}>
