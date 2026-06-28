@@ -96,13 +96,11 @@ function ActionAffordance({
 function SectionHeaderInner(props: SectionHeaderProps) {
   const {
     tier: tierProp,
-    role,
+    role: roleProp,
     kicker,
     title,
     sub,
     icon: Icon,
-    iconTone = 'amber',
-    mark,
     action,
     tone,
     count,
@@ -113,12 +111,12 @@ function SectionHeaderInner(props: SectionHeaderProps) {
     className,
   } = props;
 
-  const tier: Tier = role ? ROLE_TO_TIER[role] : (tierProp ?? 'standard');
+  const role: Role = roleProp ?? TIER_TO_ROLE[tierProp ?? 'standard'];
 
   const pad = { paddingTop, paddingLeft: paddingX, paddingRight: paddingX };
 
-  // ── TIER 3 · RAIL ──
-  if (tier === 'rail') {
+  // ── RAIL ── (no cut-line)
+  if (role === 'rail') {
     return (
       <div
         className={className}
@@ -148,189 +146,106 @@ function SectionHeaderInner(props: SectionHeaderProps) {
     );
   }
 
-  // ── TIER 2 · STANDARD (tone-able eyebrow, NO icon) ──
-  if (tier === 'standard') {
-    const eyebrowText = kicker ?? title;
-    const eyebrowColor = EYEBROW_TONE[tone ?? 'slate'];
-    return (
-      <div className={className} style={{ ...pad, marginBottom: 12 }}>
+  // ── PRIME / SECTION ── share the cut-line signature.
+  const isPrime = role === 'prime';
+  const titleSize = isPrime ? 26 : 20;
+  const titleTracking = isPrime ? '-0.02em' : '-0.02em';
+  const cutWidth = isPrime ? 34 : 22;
+  const cutHeight = isPrime ? 3 : 2;
+  const defaultEyebrowColor = isPrime ? AMBER_AA : '#94A3B8';
+  const eyebrowColor = tone ? EYEBROW_TONE[tone] : defaultEyebrowColor;
+
+  return (
+    <div className={className} style={{ ...pad, marginBottom: 14 }}>
+      {kicker && (
         <div
           style={{
-            display: 'flex',
+            display: 'inline-flex',
             alignItems: 'center',
-            justifyContent: 'space-between',
-            gap: 12,
+            gap: 6,
+            fontFamily: GEIST,
+            fontSize: 11,
+            fontWeight: 800,
+            letterSpacing: '0.14em',
+            textTransform: 'uppercase',
+            color: eyebrowColor,
+            fontFeatureSettings: '"kern" 1, "liga" 1',
+            marginBottom: 5,
           }}
         >
-          <div style={{ display: 'flex', alignItems: 'baseline', gap: 8 }}>
+          {inlineIcon && Icon && (
+            <Icon size={11} strokeWidth={2.4} color={eyebrowColor} />
+          )}
+          {kicker}
+          {required && (
+            <span aria-hidden="true" style={{ color: AMBER, marginLeft: 3, letterSpacing: 0 }}>
+              *
+            </span>
+          )}
+          {count != null && (
             <span
               style={{
-                display: 'inline-flex',
-                alignItems: 'center',
-                gap: 6,
+                marginLeft: 8,
                 fontFamily: GEIST,
                 fontSize: 11,
                 fontWeight: 800,
-                letterSpacing: '0.14em',
-                textTransform: 'uppercase',
-                color: eyebrowColor,
-                fontFeatureSettings: '"kern" 1, "liga" 1',
+                color: '#94A3B8',
+                fontVariantNumeric: 'tabular-nums',
+                letterSpacing: 0,
               }}
             >
-              {inlineIcon && Icon && (
-                <Icon size={11} strokeWidth={2.4} color={eyebrowColor} />
-              )}
-              {eyebrowText}
-              {required && (
-                <span aria-hidden="true" style={{ color: '#F7931E', marginLeft: 3, letterSpacing: 0 }}>
-                  *
-                </span>
-              )}
+              {count.toLocaleString()}
             </span>
-            {count != null && (
-              <span
-                style={{
-                  fontFamily: GEIST,
-                  fontSize: 11,
-                  fontWeight: 800,
-                  color: '#94A3B8',
-                  fontVariantNumeric: 'tabular-nums',
-                }}
-              >
-                {count.toLocaleString()}
-              </span>
-            )}
-          </div>
-          {action && <ActionAffordance action={action} />}
+          )}
         </div>
-        {kicker && title && (
-          <h3
-            style={{
-              margin: '6px 0 0 0',
-              fontFamily: GEIST,
-              fontSize: 20,
-              fontWeight: 800,
-              letterSpacing: '-0.01em',
-              color: INK,
-            }}
-          >
-            {title}
-          </h3>
-        )}
-        {sub && (
-          <p
-            style={{
-              margin: '4px 0 0 0',
-              fontFamily: GEIST,
-              fontSize: 13,
-              fontWeight: 500,
-              color: INK_MUTE,
-              lineHeight: 1.4,
-            }}
-          >
-            {sub}
-          </p>
-        )}
-      </div>
-    );
-  }
-
-  // ── TIER 1 · EDITORIAL ──
-  const markBg =
-    iconTone === 'ink'
-      ? 'linear-gradient(135deg,#0F172A 0%,#1e293b 100%)'
-      : AMBER;
-  const markShadow =
-    iconTone === 'ink'
-      ? '0 4px 10px -2px rgba(15,23,42,0.30)'
-      : '0 4px 10px -2px rgba(247,147,30,0.40)';
-
-  const markNode =
-    mark ??
-    (Icon && (
+      )}
       <div
         style={{
-          flexShrink: 0,
-          width: 40,
-          height: 40,
-          borderRadius: 12,
-          background: markBg,
           display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          boxShadow: markShadow,
+          alignItems: 'baseline',
+          justifyContent: 'space-between',
+          gap: 12,
         }}
       >
-        <Icon size={20} strokeWidth={2.25} color="#FFFFFF" />
-      </div>
-    ));
-
-  return (
-    <div
-      className={className}
-      style={{
-        ...pad,
-        display: 'flex',
-        alignItems: 'flex-start',
-        gap: 12,
-        marginBottom: 14,
-      }}
-    >
-      {markNode}
-      <div style={{ flex: 1, minWidth: 0 }}>
-        {kicker && (
-          <div
-            style={{
-              fontFamily: GEIST,
-              fontSize: 11,
-              fontWeight: 800,
-              letterSpacing: '0.14em',
-              textTransform: 'uppercase',
-              color: AMBER_AA,
-              marginBottom: 2,
-            }}
-          >
-            {kicker}
-          </div>
-        )}
-        <div
+        <h2
           style={{
-            display: 'flex',
-            alignItems: 'baseline',
-            justifyContent: 'space-between',
-            gap: 12,
+            margin: 0,
+            fontFamily: GEIST,
+            fontSize: titleSize,
+            fontWeight: 800,
+            letterSpacing: titleTracking,
+            color: INK,
+            lineHeight: 1.15,
           }}
         >
-          <h2
-            style={{
-              margin: 0,
-              fontFamily: GEIST,
-              fontSize: 22,
-              fontWeight: 800,
-              letterSpacing: '-0.015em',
-              color: INK,
-              lineHeight: 1.15,
-            }}
-          >
-            {title}
-          </h2>
-          {action && <ActionAffordance action={action} />}
-        </div>
-        {sub && (
-          <p
-            style={{
-              margin: '4px 0 0 0',
-              fontFamily: GEIST,
-              fontSize: 13,
-              fontWeight: 500,
-              color: INK_MUTE,
-              lineHeight: 1.4,
-            }}
-          >
-            {sub}
-          </p>
-        )}
+          {title}
+        </h2>
+        {action && <ActionAffordance action={action} />}
       </div>
+      <div
+        aria-hidden="true"
+        style={{
+          marginTop: 7,
+          width: cutWidth,
+          height: cutHeight,
+          background: AMBER,
+          borderRadius: cutHeight,
+        }}
+      />
+      {sub && (
+        <p
+          style={{
+            margin: '8px 0 0 0',
+            fontFamily: GEIST,
+            fontSize: 13,
+            fontWeight: 500,
+            color: INK_MUTE,
+            lineHeight: 1.4,
+          }}
+        >
+          {sub}
+        </p>
+      )}
     </div>
   );
 }
