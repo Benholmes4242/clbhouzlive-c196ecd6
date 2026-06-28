@@ -59,7 +59,7 @@ export const PageRoot = React.forwardRef<HTMLDivElement, PageRootProps>(
       <div
         ref={ref}
         className={cn(
-          `page-root w-full max-w-[480px] md:max-w-[620px] mx-auto flex flex-col ${immersiveStatusBar ? (resolvedDark ? 'bg-black' : 'bg-[var(--bg-page)]') : 'bg-[var(--bg-page)]'}`,
+          `page-root w-full max-w-[480px] md:max-w-[620px] mx-auto flex flex-col ${immersiveStatusBar ? 'bg-[#0F172A]' : 'bg-[var(--bg-page)]'}`,
           dark === true && 'hcp-dark',
           dark === false && 'hcp-light',
           !fixedHeight && "min-h-[100vh]",
