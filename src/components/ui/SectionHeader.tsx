@@ -59,6 +59,13 @@ interface SectionHeaderProps {
   paddingTop?: number;
   paddingX?: number;
   className?: string;
+  /**
+   * Accent colour for the eyebrow + cut-line. Defaults to amber.
+   * Reserved for pure-data surfaces that align the header to a semantic scale
+   * (e.g. Holes tab passes pine #2F6B4F = SC_BIRDIE). Must be AA-safe on the surface.
+   * See docs/canonical/section-titles.md "Accent exception".
+   */
+  accent?: string;
 }
 
 function ActionAffordance({
