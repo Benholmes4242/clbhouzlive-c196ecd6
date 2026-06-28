@@ -171,15 +171,14 @@ export const RecentRoundsCard: React.FC<Props> = ({ connectionId, viewMode = 'ow
       <style>{`
         .rr-last-row > button[data-feedrow="true"] { border-bottom: none; }
       `}</style>
-      <SectionHeader
-        kicker="RECENT ROUNDS"
+      <DarkSectionHeader
+        eyebrow="RECENT ROUNDS"
         title={`${rounds.length} ${rounds.length === 1 ? 'round' : 'rounds'} tracked`}
         sub={
           viewMode === 'friend'
             ? `${ownerFirstName ? `${ownerFirstName}'s` : 'Their'} full posted history.`
             : 'Your full posted history.'
         }
-        action={counterCount > 0 ? { label: `${counterCount}`, onClick: () => {} } : undefined}
       />
 
 
