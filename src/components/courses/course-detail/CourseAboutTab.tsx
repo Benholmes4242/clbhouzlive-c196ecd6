@@ -191,7 +191,7 @@ const CourseAboutTab = ({ course, onTabChange }: CourseAboutTabProps) => {
       {course.description && (
         <>
           <div style={{ marginTop: 24 }}>
-            <SectionHeader tier="standard" kicker="ABOUT" paddingX={16} />
+            <SectionHeader role="section" kicker="ABOUT" paddingX={16} />
             <div style={{ padding: '0 16px' }}>
               <div style={{ fontSize: 14, color: SLATE_600, lineHeight: 1.7, position: 'relative' }}>
                 {formatDescription(displayDescription)}
@@ -256,7 +256,7 @@ const CourseAboutTab = ({ course, onTabChange }: CourseAboutTabProps) => {
         return (
           <>
             <div>
-              <SectionHeader tier="standard" kicker="COURSE DETAILS" paddingX={16} />
+              <SectionHeader role="section" kicker="COURSE DETAILS" paddingX={16} />
               <div style={{ display: 'grid', gridTemplateColumns: `repeat(${Math.min(stats.length, 4)}, 1fr)`, padding: '0 16px' }}>
                 {stats.slice(0, 4).map((s, i, arr) => (
                   <div key={s.label} style={{ textAlign: 'center', padding: '4px 0', borderRight: i < arr.length - 1 ? `0.5px solid ${HAIRLINE_INK_8}` : 'none' }}>
@@ -273,7 +273,7 @@ const CourseAboutTab = ({ course, onTabChange }: CourseAboutTabProps) => {
 
       {/* 8. Location */}
       <section>
-        <SectionHeader tier="standard" kicker="LOCATION" paddingX={16} />
+        <SectionHeader role="section" kicker="LOCATION" paddingX={16} />
         <div style={{ padding: '0 16px' }}>
           {coordsLoading && <Skeleton className="w-full h-[180px] rounded-xl" />}
           {coords && (
