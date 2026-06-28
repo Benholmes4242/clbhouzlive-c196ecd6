@@ -90,17 +90,12 @@ export const CourseHolesTab: React.FC<Props> = ({ courseId }) => {
           alignItems: 'center',
         }}
       >
-        <div
-          style={{
-            fontSize: 10.5,
-            fontWeight: 800,
-            color: SC_ACCENT,
-            letterSpacing: '0.16em',
-            textTransform: 'uppercase',
-          }}
-        >
-          All holes
-        </div>
+        <SectionHeader
+          role="section"
+          kicker="ALL HOLES"
+          accent={SC_ACCENT}
+          className="!mb-0"
+        />
         <div
           style={{
             display: 'inline-flex',
