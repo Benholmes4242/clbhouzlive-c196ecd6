@@ -41,7 +41,7 @@ import { BusinessTeamTab } from '@/components/business/BusinessTeamTab';
 import { GenericPageSkeleton } from '@/components/skeletons/GenericPageSkeleton';
 
 import PostsTabContent from '@/components/posts-tab/PostsTabContent';
-import FloatingPageHeader from '@/components/header/FloatingPageHeader';
+import { ProfileFloatingHeader } from '@/components/profile/ProfileFloatingHeader';
 
 import {
   DropdownMenu, DropdownMenuContent, DropdownMenuItem,
@@ -289,7 +289,7 @@ const BusinessProfilePage: React.FC = () => {
     <PageRoot className="min-h-screen" style={{ background: 'var(--bg-page)' }} immersiveStatusBar immersive>
       {/* ───── Hero (full-bleed) ───── */}
       <div className="relative pointer-events-none" style={{ zIndex: 1 }}>
-        <div className="relative w-full overflow-hidden" style={{ height: 'calc(var(--profile-hero-h) + env(safe-area-inset-top, 0px))' }}>
+        <div className="relative w-full overflow-hidden" style={{ height: '35dvh' }}>
           {heroUrl ? (
             <img src={heroUrl} alt="Business cover" className="w-full h-full object-cover object-center" />
           ) : (
@@ -314,10 +314,10 @@ const BusinessProfilePage: React.FC = () => {
           )}
         </div>
 
-        {/* Floating header — canonical glass control row under the notch */}
-        <FloatingPageHeader
-          onBack={() => navigate('/clubhouse')}
-          showHandicap={!!user}
+        {/* Floating header — transparent control row under the notch */}
+        <ProfileFloatingHeader
+          isSelf={false}
+          backFallback="/clubhouse"
         />
 
         {/* Avatar (squircle) — owner: tap to upload; visitor: tap to lightbox */}
@@ -363,7 +363,7 @@ const BusinessProfilePage: React.FC = () => {
 
         {/* City pill (right of hero) */}
         {business.city && (
-          <div className="absolute right-5 z-20 pointer-events-auto" style={{ top: 'calc(var(--profile-hero-h) + env(safe-area-inset-top, 0px) + 12px)' }}>
+          <div className="absolute right-5 z-20 pointer-events-auto" style={{ top: 'calc(35dvh + 12px)' }}>
             <span
               className="px-4 py-1.5 text-sm font-semibold rounded-full text-foreground flex items-center gap-1.5"
               style={{ background: '#ffffff', border: '1px solid rgba(15,23,42,0.07)' }}

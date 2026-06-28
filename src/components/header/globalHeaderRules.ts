@@ -56,9 +56,11 @@ export function isConditionallyExcluded(pathname: string, searchParams: URLSearc
     return true;
   }
 
-  // Course detail: /courses/:courseId (exactly 3 segments) uses its OWN
-  // FloatingPageHeader — exclude from global CompactHeader.
+  // Course detail: /courses/:courseId (exactly 3 segments) shows the header.
+  // Immersive sub-flows (/rate, /reviews, /share-review) stay excluded.
   if (pathname.startsWith('/courses/')) {
+    const segments = pathname.split('/');
+    if (segments.length === 3) return false;
     return true;
   }
 

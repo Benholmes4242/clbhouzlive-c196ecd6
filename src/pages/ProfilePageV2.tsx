@@ -41,7 +41,7 @@ import { FavouritesCarousel } from '@/components/profile/courses/FavouritesCarou
 import { AddCourseModal } from '@/components/profile/courses/AddCourseModal';
 import { PrivateProfileGate } from '@/components/profile/PrivateProfileGate';
 import { CoverPhotoFallback } from '@/components/ui/CoverPhotoFallback';
-import FloatingPageHeader from '@/components/header/FloatingPageHeader';
+import { ProfileFloatingHeader } from '@/components/profile/ProfileFloatingHeader';
 
 
 import { useProfileAchievements } from '@/hooks/useProfileAchievements';
@@ -562,11 +562,11 @@ const ProfilePageV2Content: React.FC = () => {
         </div>
 
         {/* Floating header — transparent control row under the notch */}
-        <FloatingPageHeader
-          onBack={isSelf ? () => navigate('/settings') : undefined}
-          showHandicap={!!user}
+        <ProfileFloatingHeader
+          isSelf={isSelf}
+          backFallback="/clubhouse"
+          onSettingsClick={() => navigate('/settings')}
         />
-
 
         {/* Avatar - squircle, left-aligned */}
         <div
