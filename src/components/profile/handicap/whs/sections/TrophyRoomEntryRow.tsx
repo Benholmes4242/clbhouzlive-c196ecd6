@@ -75,7 +75,7 @@ const TrophyRoomEntryRow: React.FC<Props> = ({ userId, viewMode = 'owner', owner
             height: 46,
             borderRadius: 14,
             flexShrink: 0,
-            background: '#ffffff',
+            background: 'var(--hcp-amber-tint)',
             boxShadow: '0 2px 8px rgba(247,147,30,0.18)',
             display: 'flex',
             alignItems: 'center',
