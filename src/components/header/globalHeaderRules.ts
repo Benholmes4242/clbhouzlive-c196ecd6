@@ -136,5 +136,6 @@ export function isImmersiveRoute(pathname: string): boolean {
 export const DARK_CHROME_ROUTES = ['/', '/clubhouse'] as const;
 
 export function isDarkChromeRoute(pathname: string): boolean {
-  return (DARK_CHROME_ROUTES as readonly string[]).includes(pathname);
+  return (DARK_CHROME_ROUTES as readonly string[]).includes(pathname)
+    || pathname.startsWith('/handicap');
 }
