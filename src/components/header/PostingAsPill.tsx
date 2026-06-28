@@ -171,7 +171,9 @@ export const PostingAsPill = forwardRef<HTMLButtonElement, PostingAsPillProps>(
         onClick={onClick}
           className={cn(
             "flex items-center",
-            compact ? "p-1 h-9" : "p-1.5 h-11",
+            size === 'lg'
+              ? "p-[5px] h-[38px]"
+              : compact ? "p-1 h-9" : "p-1.5 h-11",
             "rounded-xl transition-all duration-500",
             "max-w-[160px] min-w-0",
             "active:scale-[0.97]",
@@ -192,7 +194,7 @@ export const PostingAsPill = forwardRef<HTMLButtonElement, PostingAsPillProps>(
             }}
           >
             <SquircleAvatar
-              size={compact ? 26 : 28}
+              size={size === 'lg' ? 28 : compact ? 26 : 28}
               src={activeActor.avatarUrl}
               alt={activeActor.name}
               userId={activeActor.id}
