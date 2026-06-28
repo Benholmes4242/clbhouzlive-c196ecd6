@@ -442,7 +442,7 @@ const CourseReviewsTab: React.FC<CourseReviewsTabProps> = ({
         {/* What to include guide */}
         <div style={{ padding: '20px 0 0' }}>
           <EmptyStateGuide
-            kicker="What to include"
+            kicker="WHAT TO INCLUDE"
             items={[
               { icon: Flag,      label: 'Course condition', sub: 'Greens, fairways, bunkers, rough' },
               { icon: Map,       label: 'Layout & design',  sub: 'Challenge, variety, scenery, routing' },
