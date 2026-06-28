@@ -242,9 +242,9 @@ const ReviewBottomSkeleton: React.FC<{ isStatic?: boolean }> = ({ isStatic }) =>
   </div>
 );
 
-const CARD_BG = '#FFFFFF';
-const HAIRLINE = 'rgba(15,23,42,0.07)';
-const CANVAS = '#F8FAFC';
+const CARD_BG = '#1B1E27';
+const HAIRLINE = 'rgba(255,255,255,0.08)';
+const CANVAS = '#15171F';
 
 const CardSkeleton: React.FC<{
   isStatic?: boolean;
