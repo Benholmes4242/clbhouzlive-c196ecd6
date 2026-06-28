@@ -439,18 +439,18 @@ const HandicapPage: React.FC = () => {
   return (
     <PageRoot dark={true} style={{ background: 'var(--hcp-bg-0)' }}>
       <FloatingPageHeader onBack={() => safeGoBack(navigate, '/profile')} showHandicap={false} />
-      <HandicapPageHeader
-        ownerUserId={ownerUserId}
-        displayName={displayName}
-        readOnly={isFriendView}
-        activeTab={activeTab}
-        onTabChange={handleTabChange}
-        hasConnection={hasConnection}
-        friendAvatarUrl={isFriendView ? profile?.profile_photo_url : null}
-        friendUsername={isFriendView ? profile?.username : null}
-        viewerUserId={user.id}
-      />
-      <main style={{ paddingTop: 'var(--chrome-total-h, 0px)' }}>
+      <main style={{ paddingTop: 'calc(env(safe-area-inset-top, 0px) + 80px)' }}>
+        <HandicapPageHeader
+          ownerUserId={ownerUserId}
+          displayName={displayName}
+          readOnly={isFriendView}
+          activeTab={activeTab}
+          onTabChange={handleTabChange}
+          hasConnection={hasConnection}
+          friendAvatarUrl={isFriendView ? profile?.profile_photo_url : null}
+          friendUsername={isFriendView ? profile?.username : null}
+          viewerUserId={user.id}
+        />
         {isFriendView ? (
           <FriendHandicapDashboard userId={ownerUserId} ownerFirstName={displayName} />
         ) : (
