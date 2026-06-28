@@ -36,7 +36,7 @@ export default function LatestVideosRail() {
     return (
       <div>
         <SectionHeader
-          tier="rail"
+          role="rail"
           title="Latest videos"
           action={{ label: 'More videos', onClick: () => navigate('/watch/videos') }}
           paddingTop={6}
