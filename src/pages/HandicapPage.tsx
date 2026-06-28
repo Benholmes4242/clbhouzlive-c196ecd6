@@ -435,6 +435,7 @@ const HandicapPage: React.FC = () => {
 
   return (
     <PageRoot dark={true} style={{ background: 'var(--hcp-bg-0)' }}>
+      <FloatingPageHeader onBack={() => safeGoBack(navigate, '/profile')} showHandicap={false} />
       <HandicapPageHeader
         ownerUserId={ownerUserId}
         displayName={displayName}
