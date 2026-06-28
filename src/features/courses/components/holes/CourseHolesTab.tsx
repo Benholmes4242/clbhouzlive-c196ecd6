@@ -9,6 +9,7 @@ import { HolesEmptyState } from './HolesEmptyState';
 import { FONT, INK, SC_ACCENT } from './_constants';
 import { HAIRLINE_INK_8, INK_MUTE, SURFACE } from '@/features/courses/_shared/tokens';
 import { ConnectHandicapCue } from '@/components/courses/course-detail/ConnectHandicapCue';
+import { SectionHeader } from '@/components/ui/SectionHeader';
 
 interface Props {
   courseId: string | undefined;
