@@ -323,7 +323,7 @@ const CompactHeader: React.FC<CompactHeaderProps> = ({ className }) => {
                 <img
                   src="/lovable-uploads/29e83040-b5c5-48e4-84d7-3f99640e4a80.png"
                   alt="clbhouz"
-                  className={cn("object-contain", isEditorialChromeRoute ? "h-[30px] w-[30px]" : "h-9 w-9")}
+                  className={cn("object-contain", isEditorialChromeRoute ? "h-[38px] w-[38px]" : "h-9 w-9")}
                 />
               )}
             </button>
