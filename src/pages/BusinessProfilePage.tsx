@@ -363,7 +363,7 @@ const BusinessProfilePage: React.FC = () => {
 
         {/* City pill (right of hero) */}
         {business.city && (
-          <div className="absolute right-5 z-20 pointer-events-auto" style={{ top: 'calc(35dvh + 12px)' }}>
+          <div className="absolute right-5 z-20 pointer-events-auto" style={{ top: 'calc(var(--profile-hero-h) + env(safe-area-inset-top, 0px) + 12px)' }}>
             <span
               className="px-4 py-1.5 text-sm font-semibold rounded-full text-foreground flex items-center gap-1.5"
               style={{ background: '#ffffff', border: '1px solid rgba(15,23,42,0.07)' }}
