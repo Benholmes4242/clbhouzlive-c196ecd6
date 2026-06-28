@@ -24,7 +24,7 @@ import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useWhsConnection } from '@/lib/whs/hooks';
 import WhsHandicapTab from '@/components/profile/handicap/whs/WhsHandicapTab';
 import HandicapDashboard from '@/components/profile/handicap/whs/HandicapDashboard';
-import ShellSlot from '@/components/header/ShellSlot';
+
 import FloatingPageHeader from '@/components/header/FloatingPageHeader';
 import { safeGoBack } from '@/utils/navigation';
 import SegmentedControl from '@/components/discover/SegmentedControl';
@@ -209,7 +209,7 @@ const HandicapPageHeader: React.FC<HeaderProps> = ({
   }, [readOnly]);
 
   return (
-    <ShellSlot>
+    <>
       {readOnly ? (
         <div style={{ padding: '12px 16px 12px' }}>
           <FriendTitleRow
@@ -238,6 +238,7 @@ const HandicapPageHeader: React.FC<HeaderProps> = ({
             scrollbarWidth: 'none',
             msOverflowStyle: 'none',
             fontFamily: FONT_GEIST,
+            background: 'var(--hcp-bg-0)',
           }}
           className="hcp-tab-row"
         >
@@ -265,7 +266,7 @@ const HandicapPageHeader: React.FC<HeaderProps> = ({
                     borderRadius: 0,
                     border: 'none',
                     background: 'transparent',
-                    color: active ? '#0A0E14' : '#64748B',
+                    color: active ? 'var(--hcp-t-100)' : 'var(--hcp-t-60)',
                     fontFamily: 'inherit',
                     fontSize: 14,
                     fontWeight: active ? 700 : 600,
@@ -293,7 +294,7 @@ const HandicapPageHeader: React.FC<HeaderProps> = ({
           <style>{`.hcp-tab-row::-webkit-scrollbar { display: none; }`}</style>
         </div>
       )}
-    </ShellSlot>
+    </>
   );
 };
 
@@ -438,18 +439,18 @@ const HandicapPage: React.FC = () => {
   return (
     <PageRoot dark={true} style={{ background: 'var(--hcp-bg-0)' }}>
       <FloatingPageHeader onBack={() => safeGoBack(navigate, '/profile')} showHandicap={false} />
-      <HandicapPageHeader
-        ownerUserId={ownerUserId}
-        displayName={displayName}
-        readOnly={isFriendView}
-        activeTab={activeTab}
-        onTabChange={handleTabChange}
-        hasConnection={hasConnection}
-        friendAvatarUrl={isFriendView ? profile?.profile_photo_url : null}
-        friendUsername={isFriendView ? profile?.username : null}
-        viewerUserId={user.id}
-      />
-      <main style={{ paddingTop: 'var(--chrome-total-h, 0px)' }}>
+      <main style={{ paddingTop: 'calc(env(safe-area-inset-top, 0px) + 80px)' }}>
+        <HandicapPageHeader
+          ownerUserId={ownerUserId}
+          displayName={displayName}
+          readOnly={isFriendView}
+          activeTab={activeTab}
+          onTabChange={handleTabChange}
+          hasConnection={hasConnection}
+          friendAvatarUrl={isFriendView ? profile?.profile_photo_url : null}
+          friendUsername={isFriendView ? profile?.username : null}
+          viewerUserId={user.id}
+        />
         {isFriendView ? (
           <FriendHandicapDashboard userId={ownerUserId} ownerFirstName={displayName} />
         ) : (
