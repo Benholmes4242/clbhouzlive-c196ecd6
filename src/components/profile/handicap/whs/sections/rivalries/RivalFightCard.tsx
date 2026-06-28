@@ -116,11 +116,11 @@ export const RivalFightCard: React.FC<Props> = ({
         border: '1px solid var(--hcp-line)',
         borderRadius: 18,
         overflow: 'hidden',
-        background: '#FFFFFF',
+        background: 'var(--hcp-bg-1)',
         fontFamily: FONT_GEIST,
         cursor: tappable ? 'pointer' : 'default',
         color: 'var(--hcp-t-100)',
-        boxShadow: '0 1px 2px rgba(15,23,42,0.04), 0 6px 16px rgba(15,23,42,0.08)',
+        boxShadow: '0 1px 2px rgba(0,0,0,0.3), 0 6px 16px rgba(0,0,0,0.25)',
       }}
     >
       {/* ===== HEADER BAND — dark, symmetrical you | score | them ===== */}
