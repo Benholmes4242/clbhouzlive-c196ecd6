@@ -82,7 +82,7 @@ function BucketListRailInner() {
 
   return (
     <section style={{ background: 'hsl(var(--background))' }}>
-      <SectionHeader paddingTop={18} paddingX={16} title="Bucket list" />
+      <SectionHeader role="rail" paddingTop={18} paddingX={16} title="Bucket list" />
       <HRail>
         {orderedPosts.map((post, i) => (
           <div
