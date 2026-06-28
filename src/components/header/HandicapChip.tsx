@@ -49,7 +49,7 @@ function resolveSource(pathname: string): string {
   return 'global_header';
 }
 
-export function HandicapChip({ light = false }: { light?: boolean } = {}) {
+export function HandicapChip({ light = false, pill = false }: { light?: boolean; pill?: boolean } = {}) {
   const { user } = useSupabaseSession();
   const navigate = useNavigate();
   const location = useLocation();
