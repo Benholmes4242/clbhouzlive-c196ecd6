@@ -17,9 +17,10 @@ type Role = 'prime' | 'section' | 'rail';
 type IconTone = 'amber' | 'ink';
 type EyebrowTone = 'slate' | 'amber' | 'danger';
 
-const ROLE_TO_TIER: Record<Role, Tier> = {
-  prime: 'editorial',
-  section: 'standard',
+// Canonical mapping: legacy tiers map onto the role vocabulary.
+const TIER_TO_ROLE: Record<Tier, Role> = {
+  editorial: 'prime',
+  standard: 'section',
   rail: 'rail',
 };
 
