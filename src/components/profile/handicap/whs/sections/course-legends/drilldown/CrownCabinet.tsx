@@ -18,7 +18,6 @@ interface CrownCabinetProps {
   onWindowChange: (w: LegendWindow) => void;
 }
 
-const AMBER = '#F7931E';
 const HELD_LABEL = 'var(--hcp-gold-text)';
 const INK = 'var(--hcp-t-100)';
 
