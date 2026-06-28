@@ -294,17 +294,24 @@ export function HybridHero({ slide, activeTournamentId, onSelectTour }: HybridHe
   // cinematic variant (live/results). Used by TourHubMainPage to drop chrome
   // padding + engage the transparent-chrome overlay.
   const isFullBleedCinematic =
-    (state.kind === 'live' || state.kind === 'results') &&
+    (state.kind === 'live' || state.kind === 'results' || state.kind === 'upcoming') &&
     !(state.kind === 'results' && state.variant === 'cancelled');
   useEffect(() => {
     setHeroFullBleed(isFullBleedCinematic);
     return () => setHeroFullBleed(false);
   }, [isFullBleedCinematic]);
 
+  // Compute hours-until-start for the cinematic upcoming countdown
+  const datesStringForHero =
+    startD && endD
+      ? `${format(startD, 'MMM d').toUpperCase()} – ${format(endD, 'd').toUpperCase()}`
+      : endD
+        ? format(endD, 'MMM d').toUpperCase()
+        : null;
+
   if (useCinematicFrame && !(state.kind === 'results' && state.variant === 'cancelled')) {
-    // Stage 1: full-bleed cinematic hero for live/results.
-    // Upcoming stays on the existing CinematicFrame until Stage 2/3.
-    if (state.kind === 'live' || state.kind === 'results') {
+    // Full-bleed cinematic hero for live / results / upcoming.
+    if (state.kind === 'live' || state.kind === 'results' || state.kind === 'upcoming') {
       return (
         <div
           style={{
@@ -325,10 +332,17 @@ export function HybridHero({ slide, activeTournamentId, onSelectTour }: HybridHe
             venueImageUrl={venueImageUrl}
             tourSlug={tournament.tourSlug}
             onCtaTap={onCtaTap}
+            champion={champion}
+            defendingChamp={defendingChamp ?? null}
+            courseStats={courseStats ?? null}
+            hoursUntilStart={hoursUntilStart}
+            venueName={tournament.venueName}
+            datesString={datesStringForHero}
           />
         </div>
       );
     }
+
 
     return (
       <div
