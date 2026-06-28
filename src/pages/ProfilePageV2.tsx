@@ -41,7 +41,7 @@ import { FavouritesCarousel } from '@/components/profile/courses/FavouritesCarou
 import { AddCourseModal } from '@/components/profile/courses/AddCourseModal';
 import { PrivateProfileGate } from '@/components/profile/PrivateProfileGate';
 import { CoverPhotoFallback } from '@/components/ui/CoverPhotoFallback';
-import { ProfileFloatingHeader } from '@/components/profile/ProfileFloatingHeader';
+import FloatingPageHeader from '@/components/header/FloatingPageHeader';
 
 
 import { useProfileAchievements } from '@/hooks/useProfileAchievements';
