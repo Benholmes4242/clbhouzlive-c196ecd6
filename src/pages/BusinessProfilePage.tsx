@@ -33,7 +33,7 @@ import { useStartDM } from '@/hooks/useStartDM';
 
 import { Button } from '@/components/ui/button';
 import { VerifiedBadge } from '@/components/ui/VerifiedBadge';
-import { CoverPhotoFallback } from '@/components/ui/CoverPhotoFallback';
+
 import { AvatarLightbox } from '@/components/shared/AvatarLightbox';
 import { ImageCropModal } from '@/components/business/ImageCropModal';
 import { BusinessProfileInfo } from '@/components/business/BusinessProfileInfo';
