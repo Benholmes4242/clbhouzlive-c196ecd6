@@ -124,3 +124,17 @@ export function isImmersiveRoute(pathname: string): boolean {
   );
   return exactMatch || prefixMatch;
 }
+
+/**
+ * Dark-chrome routes = the charcoal launch/landing surfaces (Clubhouse).
+ * Single source of truth for: html/body bg, status bar, bottom nav,
+ * PageRoot status-bar styling, and pre-React shell seeding.
+ *
+ * The cold-launch chain (splash → shell → skeleton → feed) is all
+ * `#15171F` on these routes so there is no perceptible colour transition.
+ */
+export const DARK_CHROME_ROUTES = ['/', '/clubhouse'] as const;
+
+export function isDarkChromeRoute(pathname: string): boolean {
+  return (DARK_CHROME_ROUTES as readonly string[]).includes(pathname);
+}
