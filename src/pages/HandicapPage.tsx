@@ -24,7 +24,7 @@ import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useWhsConnection } from '@/lib/whs/hooks';
 import WhsHandicapTab from '@/components/profile/handicap/whs/WhsHandicapTab';
 import HandicapDashboard from '@/components/profile/handicap/whs/HandicapDashboard';
-import ShellSlot from '@/components/header/ShellSlot';
+
 import FloatingPageHeader from '@/components/header/FloatingPageHeader';
 import { safeGoBack } from '@/utils/navigation';
 import SegmentedControl from '@/components/discover/SegmentedControl';
