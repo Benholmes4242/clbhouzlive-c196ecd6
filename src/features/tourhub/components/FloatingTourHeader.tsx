@@ -116,38 +116,39 @@ export const FloatingTourHeader: React.FC<FloatingTourHeaderProps> = ({
         <div
           style={{
             display: 'flex',
-            justifyContent: 'center',
+            justifyContent: 'space-between',
             alignItems: 'center',
             gap: 8,
             paddingTop: 8,
             paddingBottom: 10,
-            paddingLeft: 12,
-            paddingRight: 12,
+            paddingLeft: 14,
+            paddingRight: 14,
           }}
         >
-          {/* Menu (hamburger) */}
-          <button
-            type="button"
-            aria-label="Open menu"
-            onClick={onMenuTap}
-            style={pillStyle}
-            className="active:scale-[0.94]"
-          >
-            <Menu size={18} color="#FFFFFF" strokeWidth={2.2} />
-          </button>
+          {/* LEFT cluster: menu + search */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: 9 }}>
+            <button
+              type="button"
+              aria-label="Open menu"
+              onClick={onMenuTap}
+              style={pillStyle}
+              className="active:scale-[0.94]"
+            >
+              <Menu size={18} color="#FFFFFF" strokeWidth={2.2} />
+            </button>
 
-          {/* Search */}
-          <button
-            type="button"
-            aria-label="Search"
-            onClick={onSearchTap}
-            style={pillStyle}
-            className="active:scale-[0.94]"
-          >
-            <Search size={18} color="#FFFFFF" strokeWidth={2.2} />
-          </button>
+            <button
+              type="button"
+              aria-label="Search"
+              onClick={onSearchTap}
+              style={pillStyle}
+              className="active:scale-[0.94]"
+            >
+              <Search size={18} color="#FFFFFF" strokeWidth={2.2} />
+            </button>
+          </div>
 
-
+          {/* RIGHT: tour switcher pill */}
           {endSlot}
         </div>
       </div>
