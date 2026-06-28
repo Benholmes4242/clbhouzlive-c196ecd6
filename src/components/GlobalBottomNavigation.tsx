@@ -15,6 +15,7 @@ import { useNavigationHandlers } from './bottom-navigation/useNavigationHandlers
 import { useUnseenFriendReviews } from '@/hooks/useUnseenFriendReviews';
 import { useTournamentsCache } from '@/hooks/useTournamentsCache';
 import { isMedianApp } from '@/utils/median/isMedianApp';
+import { isDarkChromeRoute } from '@/components/header/globalHeaderRules';
 
 import { cn } from '@/lib/utils';
 import { auditComponentMount, markPerformance } from '@/utils/clubhouseAudit';
@@ -35,11 +36,10 @@ const HIDDEN_ROUTE_PREFIXES = [
   '/verified', // Verified page - standalone, no app chrome
 ];
 
-// Routes that use different nav styling (like clubhouse)
-const CLUBHOUSE_ROUTES = [
-  '/', 
-  '/clubhouse'
-];
+// Routes that use the dark Clubhouse nav chrome.
+// Mirrors isDarkChromeRoute() in globalHeaderRules — kept here for the
+// scroll-direction nav-hide behaviour that only applies to the feed.
+const CLUBHOUSE_ROUTES = ['/', '/clubhouse'];
 
 // Routes that use the warm gradient Cleo design
 const WARM_GRADIENT_ROUTES = [
@@ -114,8 +114,8 @@ const GlobalBottomNavigation: React.FC<GlobalBottomNavigationProps> = ({ chromeS
   const isWarmGradientRoute = WARM_GRADIENT_ROUTES.some(r => location.pathname.startsWith(r));
   const isTourHubRoute = location.pathname.startsWith('/tourhub');
   const isHandicapRoute = location.pathname.startsWith('/handicap');
-  /** Charcoal nav chrome on the Clubhouse page only; light everywhere else. */
-  const isDarkChromeRoute = isClubhouseRoute;
+  /** Single source of truth for dark chrome — shared with App.tsx / PageRoot. */
+  const isDarkChromeRouteActive = isDarkChromeRoute(location.pathname);
   
   const showNavigation = isVisible && !shouldHideForRoute;
 
@@ -226,8 +226,8 @@ const GlobalBottomNavigation: React.FC<GlobalBottomNavigationProps> = ({ chromeS
                 data-chrome="bottom-nav"
                 style={{
                   // Charcoal nav chrome on Clubhouse; matches feed surface (#15171F).
-                  background: isDarkChromeRoute ? '#15171F' : '#F8FAFC',
-                  borderTop: isDarkChromeRoute
+                  background: isDarkChromeRouteActive ? '#15171F' : '#F8FAFC',
+                  borderTop: isDarkChromeRouteActive
                     ? '0.5px solid rgba(255,255,255,0.06)'
                     : '0.5px solid rgba(15,23,42,0.08)',
                   paddingBottom: 'max(env(safe-area-inset-bottom, 0px), 20px)',
@@ -238,7 +238,7 @@ const GlobalBottomNavigation: React.FC<GlobalBottomNavigationProps> = ({ chromeS
                   activeTab={activeTab}
                   onTabClick={handleTabClickWithCamera}
                   onPrefetch={handleNavPrefetch}
-                  variant={isDarkChromeRoute ? 'clubhouse' : 'default'}
+                  variant={isDarkChromeRouteActive ? 'clubhouse' : 'default'}
                   isDimmed={false}
                   useAmberActive={false}
                   showBorder={false}
