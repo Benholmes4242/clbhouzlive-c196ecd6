@@ -2,11 +2,12 @@
  * CourseMoments - User's own media/content at this course
  */
 import React, { useMemo, useCallback } from 'react';
-import { Play } from 'lucide-react';
+import { Play, Camera } from 'lucide-react';
 import { useUserCourseMoments } from '@/hooks/useUserCourseMoments';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useProfileData } from '@/hooks/useProfileData';
 import { useFullscreenFeedStore } from '@/store/fullscreenFeedStore';
+import { SectionHeader } from '@/components/ui/SectionHeader';
 import type { FeedPost } from '@/components/media-system/types/media';
 
 interface CourseMomentsProps {
