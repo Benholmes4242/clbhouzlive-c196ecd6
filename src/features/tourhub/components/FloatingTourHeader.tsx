@@ -42,16 +42,9 @@ const pillStyle: React.CSSProperties = {
 export const FloatingTourHeader: React.FC<FloatingTourHeaderProps> = ({
   onMenuTap,
   onSearchTap,
-  onAvatarTap,
-  onHandicapTap,
-  handicapValue,
   endSlot,
 }) => {
-  const { user } = useSupabaseSession();
-  const avatarUrl =
-    (user?.user_metadata as any)?.avatar_url ||
-    (user?.user_metadata as any)?.picture ||
-    '';
+
 
   // Self-contained notch transparency: set on mount, restore on unmount.
   useEffect(() => {
