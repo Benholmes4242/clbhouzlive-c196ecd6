@@ -15,6 +15,7 @@ interface PostingAsPillProps {
   useGlassTheme?: boolean; // Clubhouse frosted-glass treatment
   useBareTheme?: boolean; // No background, no chevron — TikTok-style floating avatar
   compact?: boolean; // One-size-smaller for tour routes
+  size?: 'sm' | 'md' | 'lg'; // Optional explicit size; 'lg' matches 38px tour pill
 }
 
 /**
