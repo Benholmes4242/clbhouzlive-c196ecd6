@@ -11,17 +11,7 @@ import { useFullscreenFeedStore } from '@/store/fullscreenFeedStore';
 import { flattenPostsToMedia, flatIndexFor } from '@/components/fullscreen-feed/flattenPostsToMedia';
 import type { FeedPost, MediaItem } from '@/components/media-system/types/media';
 import { AMBER } from '@/features/courses/_shared/tokens';
-
-const EYEBROW_STYLE: React.CSSProperties = {
-  display: 'inline-flex',
-  alignItems: 'center',
-  gap: 6,
-  fontSize: 10.5,
-  fontWeight: 800,
-  color: AMBER,
-  letterSpacing: '0.14em',
-  textTransform: 'uppercase' as const,
-};
+import { SectionHeader } from '@/components/ui/SectionHeader';
 
 interface AboutMediaStripProps {
   clubId: string;
@@ -33,48 +23,16 @@ const Header: React.FC<{ photoCount: number; videoCount: number; onSeeAll?: () =
   videoCount,
   onSeeAll,
 }) => (
-  <div
-    style={{
-      display: 'flex',
-      alignItems: 'center',
-      justifyContent: 'space-between',
-      padding: '0 16px',
-      marginBottom: 10,
-    }}
-  >
-    <div>
-      <div style={EYEBROW_STYLE}>
-        <Camera size={11} strokeWidth={2.4} />
-        Media
-      </div>
-      <div style={{ fontSize: 11, color: '#94A3B8', marginTop: 4 }}>
-        {photoCount} {photoCount === 1 ? 'photo' : 'photos'} · {videoCount}{' '}
-        {videoCount === 1 ? 'video' : 'videos'}
-      </div>
-    </div>
-    {onSeeAll && (
-      <button
-        type="button"
-        onClick={(e) => {
-          e.stopPropagation();
-          onSeeAll();
-        }}
-        style={{
-          background: 'none',
-          border: 'none',
-          cursor: 'pointer',
-          fontSize: 12,
-          fontWeight: 700,
-          color: '#64748B',
-          display: 'flex',
-          alignItems: 'center',
-          gap: 4,
-        }}
-      >
-        See all <span style={{ fontSize: 14, color: '#CBD5E1' }}>›</span>
-      </button>
-    )}
-  </div>
+  <SectionHeader
+    tier="standard"
+    tone="amber"
+    inlineIcon
+    icon={Camera}
+    kicker="Media"
+    sub={`${photoCount} ${photoCount === 1 ? 'photo' : 'photos'} · ${videoCount} ${videoCount === 1 ? 'video' : 'videos'}`}
+    action={onSeeAll ? { label: 'See all', onClick: onSeeAll } : undefined}
+    paddingX={16}
+  />
 );
 
 const AboutMediaStrip: React.FC<AboutMediaStripProps> = ({ clubId, onSeeAllClick }) => {
@@ -208,8 +166,8 @@ const AboutMediaStrip: React.FC<AboutMediaStripProps> = ({ clubId, onSeeAllClick
   if (!hasMedia) {
     return (
       <div>
-        <div style={{ padding: '0 16px', marginBottom: 12 }}>
-          <div style={EYEBROW_STYLE}>Media</div>
+        <div style={{ marginBottom: 12 }}>
+          <SectionHeader tier="standard" tone="amber" inlineIcon icon={Camera} kicker="Media" paddingX={16} />
         </div>
 
         <div
