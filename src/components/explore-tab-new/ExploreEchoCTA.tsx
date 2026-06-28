@@ -246,8 +246,8 @@ function ExploreEchoCTAInner({ mood }: ExploreEchoCTAProps) {
 
   return (
     <section>
-      <SectionHeader tier="editorial"
-        mark={<WaveformMark />}
+      <SectionHeader role="section"
+        kicker="ECHO"
         title="Echo, your course concierge"
         sub="Describe what you want. She'll find it."
         paddingTop={32}
