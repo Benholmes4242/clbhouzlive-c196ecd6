@@ -9,7 +9,7 @@
  * or a whs_friend_matches.friend_row_id (non-Clbhouz friend, owner-view only).
  */
 import React, { useMemo, useRef, useState } from 'react';
-import { useParams, Link } from 'react-router-dom';
+import { useParams, Link, useNavigate } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { toast } from 'sonner';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
