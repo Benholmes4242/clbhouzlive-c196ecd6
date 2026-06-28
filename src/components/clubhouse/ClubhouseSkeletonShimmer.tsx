@@ -33,8 +33,8 @@ const SkeletonBlock: React.FC<{
   style?: React.CSSProperties;
 }> = ({ className, isStatic = false, style }) => (
   <div
-    className={cn('relative overflow-hidden', !isStatic && 'clb-shimmer-light', className)}
-    style={{ background: 'rgba(15,23,42,0.05)', ...style }}
+    className={cn('relative overflow-hidden', !isStatic && 'clb-shimmer-dark', className)}
+    style={{ background: 'rgba(255,255,255,0.06)', ...style }}
   />
 );
 
