@@ -28,9 +28,10 @@ const NOOP = () => {};
 
 interface OverviewHeroProps {
   height?: number;
+  topRightSlot?: React.ReactNode;
 }
 
-export function OverviewHero({ height = 528 }: OverviewHeroProps) {
+export function OverviewHero({ height = 528, topRightSlot }: OverviewHeroProps) {
   const { data: rawSlides = [], isLoading } = useHeroCarouselData();
 
   const idSignature = useMemo(
