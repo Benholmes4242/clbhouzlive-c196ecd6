@@ -2,15 +2,7 @@ import * as React from "react";
 import { useLocation } from "react-router-dom";
 import { cn } from "@/lib/utils";
 import { useMedianStatusBar } from "@/hooks/useMedianStatusBar";
-
-/**
- * Routes that keep the dark chrome (notch/status bar stays dark).
- * Currently empty — Clubhouse and Handicap are both light. Kept as a hook for
- * future dark-chrome routes.
- */
-function isDarkChromeRoute(_pathname: string): boolean {
-  return false;
-}
+import { isDarkChromeRoute } from "@/components/header/globalHeaderRules";
 
 interface PageRootProps extends React.HTMLAttributes<HTMLDivElement> {
   children: React.ReactNode;
