@@ -100,17 +100,15 @@ const GolfClubView: React.FC<GolfClubViewProps> = ({ courseId, isInModal = false
     return <CourseDetailSkeleton />;
   }
 
-  const heroBlock = (
+  // Modal-mode hero (legacy boxed image, 306px).
+  const modalHeroBlock = (
     <div
       className="relative overflow-hidden bg-background"
       style={{
-        height: isInModal
-          ? 'calc(306px + var(--sat, env(safe-area-inset-top, 0px)))'
-          : '306px',
+        height: 'calc(306px + var(--sat, env(safe-area-inset-top, 0px)))',
         marginTop: 0,
       }}
     >
-      {/* Always render gradient fallback behind image */}
       <div className="absolute inset-0 h-full w-full bg-gradient-to-br from-green-400 to-blue-500" />
       {course.thumbnail_image && (
         <img
@@ -120,17 +118,13 @@ const GolfClubView: React.FC<GolfClubViewProps> = ({ courseId, isInModal = false
           onError={(e) => { e.currentTarget.style.display = 'none'; }}
         />
       )}
-
-      {/* Dark gradient scrim */}
       <div
         className="absolute inset-0 pointer-events-none"
         style={{
           background: 'linear-gradient(to top, rgba(0,0,0,0.65) 0%, rgba(0,0,0,0.3) 40%, rgba(0,0,0,0.05) 70%, transparent 100%)',
         }}
       />
-
-      {/* Floating back button only in modal mode — standalone uses CompactHeader */}
-      {isInModal && onClose && (
+      {onClose && (
         <button
           onClick={onClose}
           className="absolute left-4 flex h-[34px] w-[34px] items-center justify-center active:scale-95 transition-all z-10"
@@ -148,46 +142,52 @@ const GolfClubView: React.FC<GolfClubViewProps> = ({ courseId, isInModal = false
           <ChevronLeft className="h-[18px] w-[18px] text-white" strokeWidth={2.5} />
         </button>
       )}
+      <CourseTitleOverlay course={course} courseMeta={courseMeta} />
+    </div>
+  );
 
-      {/* Course name and location overlay */}
-      <div className="absolute inset-x-0 bottom-4 px-4">
-        <h1 className="text-[22px] md:text-[28px] font-extrabold tracking-[-0.3px] text-white drop-shadow-2xl mb-1" style={{ lineHeight: 1.15 }}>
-          {course.name}
-        </h1>
-        <p className="drop-shadow-lg mb-1" style={{ fontSize: '14px', fontWeight: 500, color: 'rgba(255,255,255,0.75)' }}>
-          {formatCourseLocation(course)}
-        </p>
+  // Standalone (non-modal) full-bleed cinematic hero — bleeds into the notch.
+  const cinematicHero = (
+    <div
+      className="relative overflow-hidden bg-background"
+      style={{
+        height: 'clamp(380px, 44dvh, 460px)',
+        width: '100%',
+      }}
+    >
+      <div className="absolute inset-0 h-full w-full bg-gradient-to-br from-green-400 to-blue-500" />
+      {course.thumbnail_image && (
+        <img
+          src={course.thumbnail_image}
+          alt={course.name}
+          className="absolute inset-0 h-full w-full object-cover"
+          onError={(e) => { e.currentTarget.style.display = 'none'; }}
+        />
+      )}
 
-        {(courseMeta?.course_cr != null || courseMeta?.course_slope != null) && (
-          <p
-            className="drop-shadow-lg mb-2"
-            style={{
-              fontSize: 11,
-              fontWeight: 700,
-              letterSpacing: '0.08em',
-              color: 'rgba(255,255,255,0.65)',
-              fontVariantNumeric: 'tabular-nums',
-            }}
-          >
-            {[
-              courseMeta?.course_cr != null ? `CR ${courseMeta.course_cr}` : null,
-              courseMeta?.course_slope != null ? `SLOPE ${courseMeta.course_slope}` : null,
-            ]
-              .filter(Boolean)
-              .join(' · ')}
-          </p>
-        )}
+      {/* Top scrim — legibility for floating controls + status clock */}
+      <div
+        aria-hidden
+        className="absolute inset-x-0 top-0 pointer-events-none"
+        style={{
+          height: 'calc(env(safe-area-inset-top, 0px) + 110px)',
+          background:
+            'linear-gradient(180deg, rgba(15,23,42,0.5) 0%, rgba(15,23,42,0.1) 60%, rgba(15,23,42,0) 100%)',
+        }}
+      />
 
-        {(course.global_rank || course.regional_rank || course.usa_rank) && (
-          <CourseRankBadges
-            globalRank={course.global_rank ?? null}
-            regionalRank={course.regional_rank ?? null}
-            usaRank={course.usa_rank ?? null}
-            country={course.country}
-            positioning="inline"
-          />
-        )}
-      </div>
+      {/* Bottom scrim — title legibility */}
+      <div
+        aria-hidden
+        className="absolute inset-x-0 bottom-0 pointer-events-none"
+        style={{
+          height: '55%',
+          background:
+            'linear-gradient(180deg, rgba(15,23,42,0) 45%, rgba(15,23,42,0.55) 100%)',
+        }}
+      />
+
+      <CourseTitleOverlay course={course} courseMeta={courseMeta} />
     </div>
   );
 
