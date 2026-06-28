@@ -307,7 +307,7 @@ const RangePills: React.FC<{
             style={{
               padding: '5px 12px',
               background: active ? 'var(--hcp-bg-3)' : 'transparent',
-              color: active ? '#0A0E14' : 'var(--hcp-t-60)',
+              color: active ? 'var(--hcp-t-100)' : 'var(--hcp-t-60)',
               fontFamily: FONT,
               fontSize: 11,
               fontWeight: 800,
