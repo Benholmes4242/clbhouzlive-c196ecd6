@@ -257,7 +257,7 @@ function SheetGroup({
         <div
           style={{
             padding: '0 4px 6px',
-            fontSize: 10.5,
+            fontSize: 11,
             fontWeight: 800,
             color: INK_FAINT,
             letterSpacing: '0.14em',
