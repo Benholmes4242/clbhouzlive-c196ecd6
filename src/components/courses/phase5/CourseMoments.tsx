@@ -2,7 +2,7 @@
  * CourseMoments - User's own media/content at this course
  */
 import React, { useMemo, useCallback } from 'react';
-import { Play, Camera } from 'lucide-react';
+import { Play } from 'lucide-react';
 import { useUserCourseMoments } from '@/hooks/useUserCourseMoments';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useProfileData } from '@/hooks/useProfileData';
@@ -85,11 +85,8 @@ export const CourseMoments: React.FC<CourseMomentsProps> = ({
     <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
       {/* Header */}
       <SectionHeader
-        tier="standard"
-        tone="amber"
-        inlineIcon
-        icon={Camera}
-        kicker="Your Moments"
+        role="section"
+        kicker="YOUR MOMENTS"
         count={moments.length}
       />
 
