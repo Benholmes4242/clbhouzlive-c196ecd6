@@ -202,10 +202,9 @@ function SectionHeaderInner(props: SectionHeaderProps) {
       <div
         style={{
           display: 'flex',
-          alignItems: 'center',
+          alignItems: 'baseline',
           justifyContent: 'space-between',
           gap: 12,
-          minHeight: titleSize,
         }}
       >
         <h2
