@@ -49,7 +49,7 @@ const CourseDetailPage = () => {
   }
 
   return (
-    <PageRoot className="min-h-screen bg-background" style={{ overscrollBehaviorY: 'none' }}>
+    <PageRoot className="min-h-screen bg-background" style={{ overscrollBehaviorY: 'none' }} immersiveStatusBar immersive>
       <FadeInContent>
         <GolfClubView courseId={courseId} isInModal={false} />
       </FadeInContent>
