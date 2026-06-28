@@ -16,7 +16,7 @@ import { toast } from 'sonner';
 
 import ScrollToTopGlass from '@/components/common/ScrollToTopGlass';
 import { PageRoot } from '@/components/layout/PageRoot';
-import { useMedianStatusBar } from '@/hooks/useMedianStatusBar';
+
 import { useHideHeader } from '@/hooks/useHeaderVisibility';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useBusinessProfile } from '@/hooks/useBusinessProfile';
