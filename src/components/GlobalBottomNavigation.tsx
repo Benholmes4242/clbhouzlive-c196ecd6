@@ -226,8 +226,8 @@ const GlobalBottomNavigation: React.FC<GlobalBottomNavigationProps> = ({ chromeS
                 data-chrome="bottom-nav"
                 style={{
                   // Charcoal nav chrome on Clubhouse; matches feed surface (#15171F).
-                  background: isDarkChromeRoute ? '#15171F' : '#F8FAFC',
-                  borderTop: isDarkChromeRoute
+                  background: isDarkChromeRouteActive ? '#15171F' : '#F8FAFC',
+                  borderTop: isDarkChromeRouteActive
                     ? '0.5px solid rgba(255,255,255,0.06)'
                     : '0.5px solid rgba(15,23,42,0.08)',
                   paddingBottom: 'max(env(safe-area-inset-bottom, 0px), 20px)',
@@ -238,7 +238,7 @@ const GlobalBottomNavigation: React.FC<GlobalBottomNavigationProps> = ({ chromeS
                   activeTab={activeTab}
                   onTabClick={handleTabClickWithCamera}
                   onPrefetch={handleNavPrefetch}
-                  variant={isDarkChromeRoute ? 'clubhouse' : 'default'}
+                  variant={isDarkChromeRouteActive ? 'clubhouse' : 'default'}
                   isDimmed={false}
                   useAmberActive={false}
                   showBorder={false}
