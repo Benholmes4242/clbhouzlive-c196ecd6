@@ -1,6 +1,6 @@
 import React, { useState, useCallback, useEffect } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
-import { useLocation, useSearchParams } from 'react-router-dom';
+import { useLocation, useSearchParams, useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { ChevronLeft } from 'lucide-react';
 import { Tabs, TabsContent } from '@/components/ui/tabs';
@@ -10,8 +10,9 @@ import CourseReviewsTab from '@/components/courses/course-detail/CourseReviewsTa
 import CourseMediaTabNew from '@/components/course-media-tab/CourseMediaTabNew';
 import CourseRankBadges from '@/components/courses/CourseRankBadges';
 import { CourseTabs } from '@/components/courses/course-detail/CourseTabs';
-import ShellSlot from '@/components/header/ShellSlot';
 import CourseDetailShellTabs from '@/features/courses/components/CourseDetailShellTabs';
+import FloatingPageHeader from '@/components/header/FloatingPageHeader';
+import { safeGoBack } from '@/utils/navigation';
 import { formatCourseLocation } from '@/utils/courseLocation';
 import { CourseDetailSkeleton } from '@/components/skeletons/CourseDetailSkeleton';
 import { useCourseRatingAggregates } from '@/hooks/useCourseRatingAggregates';
