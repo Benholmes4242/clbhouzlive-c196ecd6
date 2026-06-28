@@ -34,13 +34,15 @@ export const PageRoot = React.forwardRef<HTMLDivElement, PageRootProps>(
     const resolvedDark = dark ?? isDarkChromeRoute(location.pathname);
 
     // Default light chrome for the Clubhouse/Profile pages; dark elsewhere.
+    // Status bar text style: 'light' = white icons (for dark bg),
+    // 'dark' = dark icons (for light bg). Pair with the matching surface.
     useMedianStatusBar(
-      resolvedDark ? "dark" : "light",
+      resolvedDark ? "light" : "light",
       resolvedDark ? "#15171F" : "#F8FAFC",
       false,
       false,
       !immersiveStatusBar,
-      resolvedDark ? "dark" : "light",
+      resolvedDark ? "light" : "light",
     );
 
     // Bottom nav (64px) + safe area spacer (30px) = 94px clearance
