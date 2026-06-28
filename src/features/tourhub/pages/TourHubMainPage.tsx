@@ -16,7 +16,7 @@ import { useHeroFullBleed } from '../_shared/heroFullBleedSignal';
 import { setFloatingHeaderActive } from '../_shared/floatingHeaderSignal';
 import { FloatingTourHeader } from '../components/FloatingTourHeader';
 import { TourSideMenu } from '../components/TourSideMenu';
-import { TourSwitcherAffordance } from '../components/TourSwitcherAffordance';
+
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useWhsConnection, useHandicapTrend } from '@/lib/whs/hooks';
 import { useLogout } from '@/hooks/useLogout';
