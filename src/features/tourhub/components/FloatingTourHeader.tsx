@@ -37,6 +37,7 @@ const pillStyle: React.CSSProperties = {
   padding: 0,
   fontFamily: 'Geist, system-ui, -apple-system, BlinkMacSystemFont, sans-serif',
   transition: 'transform 120ms ease',
+  pointerEvents: 'auto',
 };
 
 export const FloatingTourHeader: React.FC<FloatingTourHeaderProps> = ({
