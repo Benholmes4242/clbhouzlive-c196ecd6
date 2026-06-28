@@ -209,7 +209,7 @@ const HandicapPageHeader: React.FC<HeaderProps> = ({
   }, [readOnly]);
 
   return (
-    <ShellSlot>
+    <>
       {readOnly ? (
         <div style={{ padding: '12px 16px 12px' }}>
           <FriendTitleRow
@@ -238,6 +238,7 @@ const HandicapPageHeader: React.FC<HeaderProps> = ({
             scrollbarWidth: 'none',
             msOverflowStyle: 'none',
             fontFamily: FONT_GEIST,
+            background: 'var(--hcp-bg-0)',
           }}
           className="hcp-tab-row"
         >
@@ -265,7 +266,7 @@ const HandicapPageHeader: React.FC<HeaderProps> = ({
                     borderRadius: 0,
                     border: 'none',
                     background: 'transparent',
-                    color: active ? '#0A0E14' : '#64748B',
+                    color: active ? 'var(--hcp-t-100)' : 'var(--hcp-t-60)',
                     fontFamily: 'inherit',
                     fontSize: 14,
                     fontWeight: active ? 700 : 600,
@@ -293,7 +294,7 @@ const HandicapPageHeader: React.FC<HeaderProps> = ({
           <style>{`.hcp-tab-row::-webkit-scrollbar { display: none; }`}</style>
         </div>
       )}
-    </ShellSlot>
+    </>
   );
 };
 
