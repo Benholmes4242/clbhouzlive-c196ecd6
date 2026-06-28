@@ -32,8 +32,8 @@ export function ToughestCoursesStrip(_: Props = {}) {
   if (isLoading) {
     return (
       <section style={{ padding: '0 0 0', fontFamily: FONT }}>
-        <SectionHeader tier="editorial"
-          mark={<MountainMark />}
+        <SectionHeader role="section"
+          kicker="COURSE"
           title="Toughest courses"
           sub="The hardest courses, based on official WHS round data"
           paddingX={16}
