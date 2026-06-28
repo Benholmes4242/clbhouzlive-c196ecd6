@@ -253,11 +253,13 @@ const CompactHeader: React.FC<CompactHeaderProps> = ({ className }) => {
 
   // Publish header height as a CSS variable so ShellSlot + --chrome-total-h
   // can adapt without each consumer needing to know about tour-specific sizing.
-  React.useEffect(() => {
+  // useLayoutEffect: applies BEFORE paint so destination route renders at the
+  // correct offset on first frame (eliminates the 55→52 jump on Watch→Tour).
+  // Cleanup does NOT reset — the next CompactHeader instance (or the inline
+  // default in index.html) owns the value; resetting mid-route causes a 0/55
+  // bounce that shifts content.
+  React.useLayoutEffect(() => {
     document.documentElement.style.setProperty('--header-h', `${contentHeight}px`);
-    return () => {
-      document.documentElement.style.setProperty('--header-h', '55px');
-    };
   }, [contentHeight]);
   
   return (
