@@ -127,7 +127,6 @@ function StackedAvatars({
             zIndex: visible.length - i,
             borderRadius: 9,
             display: 'inline-block',
-            display: 'inline-block',
           }}
         >
           <SquircleAvatar
