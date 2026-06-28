@@ -562,11 +562,11 @@ const ProfilePageV2Content: React.FC = () => {
         </div>
 
         {/* Floating header — transparent control row under the notch */}
-        <ProfileFloatingHeader
-          isSelf={isSelf}
-          backFallback="/clubhouse"
-          onSettingsClick={() => navigate('/settings')}
+        <FloatingPageHeader
+          onBack={isSelf ? () => navigate('/settings') : undefined}
+          showHandicap={!!user}
         />
+
 
         {/* Avatar - squircle, left-aligned */}
         <div
