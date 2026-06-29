@@ -801,6 +801,7 @@ const AppInner: React.FC = () => {
                                                 {/* Global header for all pages except Clubhouse/Auth/Admin */}
                                                 <GlobalHeader />
                                                 <AppRoutes />
+                                                <DebugQueueUploadButton />
                                               </div>
                                             </Suspense>
                                             {/* Mini Player - persists across navigation */}
