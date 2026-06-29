@@ -26,7 +26,7 @@ export const HolesCredibilityHeader: React.FC<Props> = ({ totalRounds }) => {
         <span style={{ fontWeight: 800 }}>
           {totalRounds.toLocaleString()} round{totalRounds === 1 ? '' : 's'}
         </span>{' '}
-        from Global Golfers holding official WHS handicaps. Gross scoring.
+        by Global Golfers holding official WHS handicaps. Gross scoring.
       </div>
     </div>
   );
