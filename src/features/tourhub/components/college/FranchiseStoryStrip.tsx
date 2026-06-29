@@ -69,10 +69,8 @@ export function FranchiseStoryStrip({ normalizedName, className }: FranchiseStor
 
   return (
     <div className={className} style={{ background: SURFACE, borderTop: `0.5px solid ${INK_TINT_07}` }}>
-      {/* Eyebrow */}
-      <div style={{ padding: '10px 16px 6px' }}>
-        <span style={EYEBROW}>Franchise Dispatch</span>
-      </div>
+      {/* Eyebrow — canonical SectionHeader */}
+      <SectionHeader role="section" kicker="FRANCHISE DISPATCH" paddingX={16} paddingTop={12} />
 
       {/* This Week — compact inline row */}
       <div style={{
