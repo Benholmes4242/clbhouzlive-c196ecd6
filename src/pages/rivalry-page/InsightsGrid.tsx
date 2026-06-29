@@ -33,7 +33,7 @@ export const InsightsGrid: React.FC<Props> = ({ insights }) => {
           gap: 8,
           overflowX: 'auto',
           scrollSnapType: 'x mandatory',
-          padding: '10px 16px 4px',
+          padding: '10px 0 4px',
           marginRight: 0,
           scrollbarWidth: 'none',
         }}
