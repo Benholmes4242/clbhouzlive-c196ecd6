@@ -7,6 +7,7 @@ import { MapPin, X } from 'lucide-react';
 import { useSwipeable } from 'react-swipeable';
 import { createGlassyMarkerElement } from './MapMarker';
 import { MAP_CONFIG } from '@/config/maps';
+import { openExternalUrl } from '@/utils/median/openExternalUrl';
 
 interface MapExpandedViewProps {
   open: boolean;
@@ -185,7 +186,7 @@ export const MapExpandedView: React.FC<MapExpandedViewProps> = ({
             {isIOS && (
               <Button
                 className="flex-1 bg-[#f59e0b] text-white hover:bg-[#e8920f] shadow-none"
-                onClick={() => window.open(appleMapsUrl, '_blank')}
+                onClick={() => openExternalUrl(appleMapsUrl)}
               >
                 Open in Apple Maps
               </Button>
@@ -193,7 +194,7 @@ export const MapExpandedView: React.FC<MapExpandedViewProps> = ({
             <Button
               className={isIOS ? "flex-1" : "flex-1 bg-[#f59e0b] text-white hover:bg-[#e8920f]"}
               variant={isIOS ? 'outline' : 'default'}
-              onClick={() => window.open(googleMapsUrl, '_blank')}
+              onClick={() => openExternalUrl(googleMapsUrl)}
             >
               Open in Google Maps
             </Button>

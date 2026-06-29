@@ -4,6 +4,7 @@ import { UserPlus, UserCheck, ExternalLink, MoreVertical } from 'lucide-react';
 import { useRelationshipStatus } from '@/hooks/useRelationshipStatus';
 import { useProfileActions } from './useProfileActions';
 import { analyticsEvents } from '@/utils/analyticsEvents';
+import { openExternalUrl } from '@/utils/median/openExternalUrl';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -147,7 +148,7 @@ export const BusinessProfileActions: React.FC<BusinessProfileActionsProps> = ({
       size="sm"
       onClick={() => {
         const url = websiteUrl.startsWith('http') ? websiteUrl : `https://${websiteUrl}`;
-        window.open(url, '_blank', 'noopener,noreferrer');
+        openExternalUrl(url);
       }}
       className={isMobile ? 'flex-1' : ''}
     >

@@ -5,6 +5,7 @@ import { format } from 'date-fns';
 import { VerifiedBadge } from '@/components/ui/VerifiedBadge';
 import { SectionHeader } from '@/components/ui/SectionHeader';
 import { useNavigate } from 'react-router-dom';
+import { openExternalUrl } from '@/utils/median/openExternalUrl';
 
 interface BusinessProfileInfoProps {
   business: BusinessProfile;
@@ -132,14 +133,14 @@ export function BusinessProfileInfo({ business, canManage }: BusinessProfileInfo
       const url = business.website.startsWith('http')
         ? business.website
         : `https://${business.website}`;
-      window.open(url, '_blank', 'noopener,noreferrer');
+      openExternalUrl(url);
     }
   };
 
   const handleDirections = () => {
     if (business.location) {
       const query = encodeURIComponent(business.location);
-      window.open(`https://www.google.com/maps/search/?api=1&query=${query}`, '_blank');
+      openExternalUrl(`https://www.google.com/maps/search/?api=1&query=${query}`);
     }
   };
 
