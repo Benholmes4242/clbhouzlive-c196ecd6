@@ -164,6 +164,7 @@ export const RoundByRoundSection: React.FC<Props> = ({
       {visible.length === 0 ? (
         <div
           style={{
+            margin: '0 16px',
             padding: '32px 8px',
             color: T50,
             fontSize: 13,
@@ -176,6 +177,7 @@ export const RoundByRoundSection: React.FC<Props> = ({
       ) : (
         <div
           style={{
+            margin: '0 16px',
             background: BG_1,
             border: `0.5px solid ${LINE}`,
             borderRadius: 16,
