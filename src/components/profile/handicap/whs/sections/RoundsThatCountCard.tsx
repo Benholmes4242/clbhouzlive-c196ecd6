@@ -4,7 +4,7 @@ import { useCounters, useAllScores } from '@/lib/whs/hooks';
 import { fmtDiff, fmtAxis } from '@/lib/whs/format';
 import { projectNextRound } from '@/lib/whs/handicapMath';
 import HandicapExplainerSheet from './HandicapExplainerSheet';
-import { SectionHeader } from './_shared/atoms';
+import { DarkSectionHeader } from './_shared/darkAtoms';
 import type { WhsScore } from '@/lib/whs/types';
 import RoundDetailSheet from './round-detail/RoundDetailSheet';
 
@@ -85,7 +85,7 @@ function computeAxis(dataMin: number, dataMax: number): {
 
 const Skeleton: React.FC<{ title: string }> = ({ title }) => (
   <section style={{ marginTop: 32 }}>
-    <SectionHeader eyebrow="ROUNDS THAT COUNT" title={title} />
+    <DarkSectionHeader eyebrow="ROUNDS THAT COUNT" title={title} />
     <div style={{ padding: '0 20px' }}>
     <div style={{ height: 12, width: 140, background: 'var(--hcp-bg-3)', borderRadius: 2, marginBottom: 10 }} />
     <div style={{ height: 56, background: 'var(--hcp-bg-3)', borderRadius: 12, marginBottom: 12 }} />
@@ -232,7 +232,7 @@ export const RoundsThatCountCard: React.FC<Props> = ({
   return (
     <>
     <section style={{ marginTop: 32 }}>
-      <SectionHeader
+      <DarkSectionHeader
         eyebrow="ROUNDS THAT COUNT"
         title=""
       />

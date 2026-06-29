@@ -9,78 +9,13 @@ const AMBER_DEEP = '#C97211';
 const CREAM = '#FFFBF5';
 
 /**
- * Section header — primary pattern for introducing a section.
- * Amber tab marker + AMBER EYEBROW + bold title + optional sub.
+ * SectionHeader was removed from this module — it duplicated the
+ * canonical `@/components/ui/SectionHeader`. Dark callsites should
+ * use `DarkSectionHeader` from `./darkAtoms` (shim over canonical
+ * with `surface="dark"`). Light callsites should import the canonical
+ * component directly.
  */
-export interface SectionHeaderProps {
-  eyebrow: string;
-  title: React.ReactNode;
-  sub?: string;
-  right?: React.ReactNode;
-}
 
-export const SectionHeader: React.FC<SectionHeaderProps> = ({
-  eyebrow,
-  title,
-  sub,
-  right,
-}) => (
-  <div
-    style={{
-      display: 'flex',
-      alignItems: 'flex-start',
-      justifyContent: 'space-between',
-      gap: 12,
-      padding: '0 16px 12px',
-      fontFamily: FONT,
-    }}
-  >
-    <div style={{ flex: 1, minWidth: 0 }}>
-      <div style={{ marginBottom: 6 }}>
-        <span
-          style={{
-            fontSize: 9,
-            fontWeight: 800,
-            color: 'var(--hcp-t-60)',
-            letterSpacing: '0.16em',
-            textTransform: 'uppercase',
-          }}
-        >
-          {eyebrow}
-        </span>
-      </div>
-      {title !== '' && title != null && (
-        <h2
-          style={{
-            fontSize: 18,
-            fontWeight: 800,
-            fontFamily: FONT,
-            letterSpacing: '-0.015em',
-            lineHeight: 1.2,
-            color: 'var(--hcp-t-100)',
-            margin: 0,
-          }}
-        >
-          {title}
-        </h2>
-      )}
-      {sub && (
-        <p
-          style={{
-            fontSize: 13,
-            fontWeight: 500,
-            lineHeight: 1.3,
-            color: 'var(--hcp-t-60)',
-            margin: '6px 0 0',
-          }}
-        >
-          {sub}
-        </p>
-      )}
-    </div>
-    {right && <div style={{ flexShrink: 0 }}>{right}</div>}
-  </div>
-);
 
 /**
  * Inline card header — used INSIDE cards/widgets that need an
