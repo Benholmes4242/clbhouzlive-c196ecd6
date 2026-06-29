@@ -712,37 +712,57 @@ export function Composer({
       return;
     }
 
-    // Bake crops per item (only images with non-original frame).
-    // When a crop is baked, upload the original separately so post_media can
-    // store original_media_url and recrop can later re-bake from it.
-    // Build a unified MediaInput[] preserving order; restored Stream videos
-    // are passed through as 'restoredVideo' so they're re-attached by stream_id
-    // without re-uploading.
+    // ── NET-NEW path: bake crops + upload originals locally (preserves
+    // recrop), then enqueue the background job and CLOSE IMMEDIATELY.
+    // The composer no longer awaits the upload — UploadToastsBridge owns
+    // the success toast + cache invalidations on `upload:complete`.
     const { uploadToCloudflareR2 } = await import('@/utils/cloudflareUpload');
-    const mediaInputs: import('@/hooks/usePostSubmission').MediaInput[] = [];
+    const { enqueuePostUpload } = await import('@/uploads/uploadPipeline');
+
+    // Pull restored entries (drafts) out — they bypass file upload and
+    // are re-attached via mediaItems (isRestored).
+    const restoredMediaItems: NonNullable<
+      Parameters<typeof enqueuePostUpload>[0]['mediaItems']
+    > = [];
+    // Parallel arrays for new files (index-aligned with files[]).
+    const newFiles: File[] = [];
+    const newOriginalUrls: (string | null)[] = [];
+    const newMediaMeta: NonNullable<
+      Parameters<typeof enqueuePostUpload>[0]['mediaItems']
+    > = [];
+
     for (const item of mediaItems) {
+      // Restored video (Cloudflare Stream — already uploaded).
       if (item.type === 'video' && item.restoredStreamId && item.restoredMediaUrl) {
-        mediaInputs.push({
-          kind: 'restoredVideo',
-          streamId: item.restoredStreamId,
-          mediaUrl: item.restoredMediaUrl,
-          posterUrl: item.posterUrl ?? null,
-          width: item.width ?? null,
-          height: item.height ?? null,
-          durationSeconds: item.durationSeconds ?? null,
+        restoredMediaItems.push({
+          id: item.id,
+          type: 'video',
+          isRestored: true,
+          restoredMediaUrl: item.restoredMediaUrl,
+          restoredStreamId: item.restoredStreamId,
+          width: item.width,
+          height: item.height,
+          duration: item.durationSeconds,
         });
         continue;
       }
+      // Restored image (R2 — already uploaded).
       if (item.type === 'image' && item.restoredMediaUrl && !item.file) {
-        mediaInputs.push({
-          kind: 'restoredImage',
-          mediaUrl: item.restoredMediaUrl,
-          width: item.width ?? null,
-          height: item.height ?? null,
+        restoredMediaItems.push({
+          id: item.id,
+          type: 'image',
+          isRestored: true,
+          restoredMediaUrl: item.restoredMediaUrl,
+          width: item.width,
+          height: item.height,
         });
         continue;
       }
       if (!item.file) continue;
+
+      // New file. Bake crop locally (fast, ~Canvas op) so the queue gets the
+      // final image; upload the pre-bake original in parallel so recrop stays
+      // possible later.
       if (item.type === 'image' && item.frame !== 'original') {
         let baked: File;
         try {
@@ -750,7 +770,6 @@ export function Composer({
         } catch {
           baked = item.file;
         }
-        // Upload the genuine pre-bake source (parallel-safe; one fetch per crop).
         let originalUrl: string | null = null;
         try {
           const ext = (item.file.name.split('.').pop() || 'jpg').toLowerCase();
@@ -766,9 +785,24 @@ export function Composer({
         } catch (err) {
           console.warn('[Composer] original upload failed (recrop disabled for this item):', err);
         }
-        mediaInputs.push({ kind: 'file', file: baked, originalUrl });
+        newFiles.push(baked);
+        newOriginalUrls.push(originalUrl);
+        newMediaMeta.push({
+          id: item.id,
+          type: 'image',
+          width: item.width,
+          height: item.height,
+        });
       } else {
-        mediaInputs.push({ kind: 'file', file: item.file, originalUrl: null });
+        newFiles.push(item.file);
+        newOriginalUrls.push(null);
+        newMediaMeta.push({
+          id: item.id,
+          type: item.type,
+          width: item.width,
+          height: item.height,
+          duration: item.durationSeconds,
+        });
       }
     }
 
@@ -777,44 +811,55 @@ export function Composer({
     const actorId =
       actorType === 'business' ? displayActor.id : displayActor.id || user.id;
 
-    await submitPost({
-      user,
-      content: caption,
-      mediaInputs,
-      selectedTags: [],
-      courses: taggedCourses.map((c) => ({
-        id: c.courseId,
-        name: c.courseName,
-        country: c.country ?? '',
-      })),
-      actorType,
-      actorId,
-      visibility,
-      scheduledAt,
-      onSuccess: () => {
-        if (scheduledAt) {
-          const when = scheduledAt.toLocaleString(undefined, {
-            weekday: 'short',
-            month: 'short',
-            day: 'numeric',
-            hour: 'numeric',
-            minute: '2-digit',
-          });
-          toast.success(`Scheduled for ${when}`);
-          // Refresh the scheduled list + count so the new post shows immediately
-          queryClient.invalidateQueries({ queryKey: ['scheduled-posts'] });
-          queryClient.invalidateQueries({ queryKey: ['scheduled-posts-count'] });
-        } else {
-          toast.success('Posted');
-        }
-        // Delete the draft we resumed from — it's now published (or queued).
-        if (currentDraftId) {
-          void deleteDraft(currentDraftId);
-        }
-        onClose();
-      },
-      onError: () => {},
-    });
+    try {
+      const jobId = enqueuePostUpload({
+        userId: user.id,
+        actorType,
+        actorId,
+        caption,
+        courseInfo: taggedCourses[0]
+          ? {
+              id: taggedCourses[0].courseId,
+              name: taggedCourses[0].courseName,
+              country: taggedCourses[0].country ?? '',
+            }
+          : undefined,
+        courseIds: taggedCourses.map((c) => c.courseId),
+        selectedTags: [],
+        visibility,
+        scheduledAt,
+        files: newFiles,
+        originalMediaUrls: newOriginalUrls,
+        mediaItems: [...newMediaMeta, ...restoredMediaItems],
+        draftId: currentDraftId ?? undefined,
+      });
+      console.log('[UPLOAD-DEBUG][new] composer enqueued jobId', jobId);
+    } catch (err: any) {
+      console.error('[Composer] enqueue failed:', err);
+      toast.error("Couldn't post", { description: err?.message ?? 'Try again' });
+      return;
+    }
+
+    // Scheduled posts get an immediate scheduling toast here; "live" toasts
+    // are owned by UploadToastsBridge on upload:complete.
+    if (scheduledAt) {
+      const when = scheduledAt.toLocaleString(undefined, {
+        weekday: 'short',
+        month: 'short',
+        day: 'numeric',
+        hour: 'numeric',
+        minute: '2-digit',
+      });
+      toast.success(`Scheduled for ${when}`);
+      queryClient.invalidateQueries({ queryKey: ['scheduled-posts'] });
+      queryClient.invalidateQueries({ queryKey: ['scheduled-posts-count'] });
+    }
+
+    // Close immediately — upload runs in the background.
+    // Draft deletion happens in UploadToastsBridge on upload:complete
+    // (after the publish succeeds), so we don't orphan a draft on failure.
+    onClose();
+
 
   }, [
 
