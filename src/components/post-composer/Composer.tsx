@@ -833,7 +833,54 @@ export function Composer({
         mediaItems: [...newMediaMeta, ...restoredMediaItems],
         draftId: currentDraftId ?? undefined,
       });
-      
+
+      // Phase 2 — Register optimistic pending entry (non-scheduled posts only).
+      // Scheduled posts don't surface as pending feed cards; they live in the
+      // scheduled-posts list until publish time.
+      if (!scheduledAt) {
+        try {
+          const { usePendingPostsStore } = await import('@/uploads/pendingPostsStore');
+          const previewMedia = [...newMediaMeta, ...restoredMediaItems]
+            .map((m, idx) => {
+              const f = (m as any).file ?? newFiles[idx];
+              let previewUrl: string | null = (m as any).restoredMediaUrl ?? null;
+              if (!previewUrl && f instanceof File) {
+                try { previewUrl = URL.createObjectURL(f); } catch { previewUrl = null; }
+              }
+              if (!previewUrl) return null;
+              return {
+                id: m.id,
+                kind: (m.type === 'video' ? 'video' : 'image') as 'image' | 'video',
+                previewUrl,
+              };
+            })
+            .filter(Boolean) as Array<{ id: string; kind: 'image' | 'video'; previewUrl: string }>;
+
+          usePendingPostsStore.getState().addPending({
+            jobId,
+            postId: null,
+            actorType,
+            actorId,
+            userId: user.id,
+            viewerActorType: (activeActor?.type === 'business' ? 'business' : 'personal'),
+            viewerActorId: activeActor?.id ?? user.id,
+            authorName: displayActor.name ?? 'You',
+            authorAvatarUrl: displayActor.avatar ?? null,
+            authorUsername: (displayActor as any).username ?? null,
+            caption,
+            media: previewMedia,
+            courseId: taggedCourses[0]?.courseId,
+            courseName: taggedCourses[0]?.courseName,
+            totalFiles: Math.max(1, previewMedia.length),
+            fileProgress: {},
+            status: 'queued',
+            files: newFiles,
+            createdAt: new Date().toISOString(),
+          });
+        } catch (err) {
+          console.warn('[Composer] pending entry registration failed:', err);
+        }
+      }
     } catch (err: any) {
       console.error('[Composer] enqueue failed:', err);
       toast.error("Couldn't post", { description: err?.message ?? 'Try again' });
