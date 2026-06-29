@@ -182,10 +182,10 @@ function HandicapMasthead({ userId, onConnectTap, onCardTap }: Props) {
             >
               <div
                 style={{
-                  fontSize: 9,
-                  fontWeight: 700,
+                  fontSize: 11,
+                  fontWeight: 800,
                   color: INK_FAINT,
-                  letterSpacing: '0.12em',
+                  letterSpacing: '0.14em',
                   textTransform: 'uppercase' as const,
                   marginBottom: 6,
                 }}
@@ -222,10 +222,10 @@ function HandicapMasthead({ userId, onConnectTap, onCardTap }: Props) {
               <div style={{ padding: '10px 18px', borderBottom: `0.5px solid ${HAIRLINE}` }}>
                 <div
                   style={{
-                    fontSize: 9,
-                    fontWeight: 700,
+                    fontSize: 11,
+                    fontWeight: 800,
                     color: INK_FAINT,
-                    letterSpacing: '0.12em',
+                    letterSpacing: '0.14em',
                     textTransform: 'uppercase' as const,
                   }}
                 >
@@ -248,10 +248,10 @@ function HandicapMasthead({ userId, onConnectTap, onCardTap }: Props) {
               <div style={{ padding: '10px 18px' }}>
                 <div
                   style={{
-                    fontSize: 9,
-                    fontWeight: 700,
+                    fontSize: 11,
+                    fontWeight: 800,
                     color: INK_FAINT,
-                    letterSpacing: '0.12em',
+                    letterSpacing: '0.14em',
                     textTransform: 'uppercase' as const,
                   }}
                 >
@@ -376,10 +376,10 @@ function HandicapMasthead({ userId, onConnectTap, onCardTap }: Props) {
           >
             <div
               style={{
-                fontSize: 9,
-                fontWeight: 700,
+                fontSize: 11,
+                fontWeight: 800,
                 color: INK_FAINT,
-                letterSpacing: '0.12em',
+                letterSpacing: '0.14em',
                 textTransform: 'uppercase' as const,
                 marginBottom: 6,
               }}
@@ -405,10 +405,10 @@ function HandicapMasthead({ userId, onConnectTap, onCardTap }: Props) {
             <div style={{ padding: '10px 18px', borderBottom: `0.5px solid ${HAIRLINE}` }}>
               <div
                 style={{
-                  fontSize: 9,
-                  fontWeight: 700,
+                  fontSize: 11,
+                  fontWeight: 800,
                   color: INK_FAINT,
-                  letterSpacing: '0.12em',
+                  letterSpacing: '0.14em',
                   textTransform: 'uppercase' as const,
                 }}
               >
@@ -440,10 +440,10 @@ function HandicapMasthead({ userId, onConnectTap, onCardTap }: Props) {
             <div style={{ padding: '10px 18px' }}>
               <div
                 style={{
-                  fontSize: 9,
-                  fontWeight: 700,
+                  fontSize: 11,
+                  fontWeight: 800,
                   color: INK_FAINT,
-                  letterSpacing: '0.12em',
+                  letterSpacing: '0.14em',
                   textTransform: 'uppercase' as const,
                 }}
               >
