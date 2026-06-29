@@ -37,7 +37,13 @@ export function H2HRivalStrip({ normalizedName, className }: H2HRivalStripProps)
     return (
       <div className={className} style={{ background: SLATE_50, borderTop: `0.5px solid ${INK_TINT_07}` }}>
 
-        <SectionHeader />
+        <SectionHeader
+          role="section"
+          kicker="HEAD-TO-HEAD"
+          sub="Compare with another program"
+          paddingX={SECTION_PADDING_X}
+          paddingTop={14}
+        />
         <div style={{ display: 'flex', gap: 10, padding: '4px 16px 16px', overflowX: 'auto' }}>
           {[1, 2, 3].map(i => (
             <div key={i} className="animate-pulse" style={{ flexShrink: 0, width: 168, height: 78, borderRadius: 12, background: INK_TINT_06 }} />
@@ -52,7 +58,13 @@ export function H2HRivalStrip({ normalizedName, className }: H2HRivalStripProps)
 
   return (
     <div className={className} style={{ background: SLATE_50, borderTop: `0.5px solid ${INK_TINT_07}` }}>
-      <SectionHeader />
+      <SectionHeader
+        role="section"
+        kicker="HEAD-TO-HEAD"
+        sub="Compare with another program"
+        paddingX={SECTION_PADDING_X}
+        paddingTop={14}
+      />
       <div
         style={{
           display: 'flex', gap: 10,
