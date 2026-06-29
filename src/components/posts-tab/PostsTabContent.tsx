@@ -30,6 +30,8 @@ import CommentsSheet from '@/components/comments/CommentsSheet';
 import { getActorRouteByType } from '@/types/actor';
 import { useReviewSheetStore } from '@/stores/reviewSheetStore';
 import { useReviewerStats } from '@/hooks/useReviewerStats';
+import { usePendingPostsForActor } from '@/uploads/usePendingPostsForActor';
+import { PendingPostCard } from './PendingPostCard';
 
 type PostsFilter = 'all' | 'videos' | 'shorts' | 'images' | 'reviews';
 
