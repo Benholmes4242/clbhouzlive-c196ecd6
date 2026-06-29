@@ -10,6 +10,7 @@ import type { LucideIcon } from 'lucide-react';
 import { INK, GOLD, NUMERIC_STYLE, STRIP_HEIGHT } from '../HybridHero.constants';
 import { SCORE_OVER_PAR_DARK_PALE, SLATE_800, WHITE_ALPHA_65 } from '../../../_shared/tokens';
 import { TrajectorySparkline } from './TrajectorySparkline';
+import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 
 interface ChampionStripProps {
   name: string;
@@ -31,18 +32,12 @@ interface ChampionStripProps {
 
 function PlayerHead({ size = 42, src }: { size?: number; src?: string | null }) {
   return (
-    <div
-      style={{
-        width: size,
-        height: size,
-        borderRadius: '34%',
-        background: src
-          ? `url(${src}) center/cover`
-          : `linear-gradient(135deg, #475569 0%, ${SLATE_800} 100%)`,
-        boxShadow: '0 0 0 2px rgba(251,188,46,0.55)',
-        flexShrink: 0,
-      }}
-      aria-hidden="true"
+    <SquircleAvatar
+      src={src ?? undefined}
+      size={size}
+      hideRing
+      hairlineRing
+      ringColor={GOLD}
     />
   );
 }
@@ -257,16 +252,14 @@ export function PlayoffStrip({ count, score }: PlayoffStripProps) {
           <div
             key={i}
             style={{
-              width: 36,
-              height: 36,
-              borderRadius: '34%',
               marginLeft: i === 0 ? 0 : -10,
-              background: `linear-gradient(135deg, #475569 0%, ${SLATE_800} 100%)`,
-              boxShadow: '0 0 0 2px rgba(251,188,46,0.55)',
               zIndex: 3 - i,
               opacity: count > 3 && i === 2 ? 0.85 : 1,
+              display: 'inline-flex',
             }}
-          />
+          >
+            <SquircleAvatar size={36} hideRing hairlineRing ringColor={GOLD} />
+          </div>
         ))}
       </div>
       <div style={{ flex: 1, minWidth: 0, position: 'relative' }}>
