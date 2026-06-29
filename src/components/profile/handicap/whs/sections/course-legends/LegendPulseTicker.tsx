@@ -8,6 +8,7 @@ import {
 } from '@/lib/gam/visuals';
 import { PULSE_DARK, type PulseKind } from '../../gam/pulseTokens';
 import { GAM } from '../../gam/tokens';
+import { DarkSectionHeader } from '../_shared/darkAtoms';
 import type { LegendWindow } from '@/lib/gam/types';
 import type { CourseSelection } from './types';
 
@@ -213,41 +214,7 @@ export const LegendPulseTicker: React.FC<Props> = ({
 
   return (
     <div style={{ marginTop: 20, marginBottom: 20 }}>
-      {/* Eyebrow */}
-      <div
-        style={{
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'space-between',
-          padding: '0 16px',
-          marginBottom: 8,
-        }}
-      >
-        <span
-          style={{
-            fontSize: 9.5,
-            fontWeight: 700,
-            letterSpacing: '0.16em',
-            textTransform: 'uppercase',
-            color: 'var(--hcp-t-40)',
-            fontFamily: GAM.FONT_GEIST,
-          }}
-        >
-          Live Pulse
-        </span>
-        <span
-          style={{
-            fontSize: 9.5,
-            fontWeight: 700,
-            letterSpacing: '0.16em',
-            color: 'var(--hcp-t-40)',
-            fontFamily: GAM.FONT_GEIST,
-            ...GAM.TABULAR,
-          }}
-        >
-          {indicator}
-        </span>
-      </div>
+      <DarkSectionHeader eyebrow="LIVE PULSE" right={indicator} />
 
       {/* Rail */}
       <div
