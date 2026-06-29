@@ -6,7 +6,8 @@ import {
   type StablefordScope,
 } from './computeStablefordDistribution';
 import StablefordDetailSheet from './StablefordDetailSheet';
-import { SectionHeader } from '@/components/ui/SectionHeader';
+import { DarkSectionHeader } from '../_shared/darkAtoms';
+import { SC_BIRDIE, SC_PAR, SC_BOGEY, SC_DOUBLE } from '@/features/courses/components/holes/_constants';
 import { useTrophyAggregates } from '@/lib/whs/hooks';
 
 interface Props {
@@ -40,10 +41,10 @@ const T = {
 const FONT = 'Geist, -apple-system, BlinkMacSystemFont, system-ui, sans-serif';
 
 const HOLE_C = {
-  birdie: '#DC2626',
-  par: '#94A3B8',
-  bogey: '#2563EB',
-  double: '#1E3A5F',
+  birdie: SC_BIRDIE,
+  par: SC_PAR,
+  bogey: SC_BOGEY,
+  double: SC_DOUBLE,
 };
 
 const SECTION_STYLE: React.CSSProperties = {
@@ -209,11 +210,32 @@ interface CardHeaderProps {
 }
 
 const CardHeader: React.FC<CardHeaderProps> = ({ eyebrow, title, onOpenSheet }) => (
-  <div style={{ paddingBottom: 0 }}>
-    <SectionHeader
-      kicker={eyebrow}
+  <div style={{ paddingBottom: 0, position: 'relative' }}>
+    <DarkSectionHeader
+      eyebrow={eyebrow}
       title={title}
-      action={{ label: 'Info', onClick: onOpenSheet }}
+      right={
+        <button
+          type="button"
+          onClick={onOpenSheet}
+          aria-label="About this card"
+          style={{
+            display: 'inline-flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            width: 28,
+            height: 28,
+            borderRadius: 999,
+            background: 'transparent',
+            border: 'none',
+            color: 'var(--hcp-t-60)',
+            cursor: 'pointer',
+            padding: 0,
+          }}
+        >
+          <Info size={16} strokeWidth={2} />
+        </button>
+      }
     />
   </div>
 );
@@ -222,12 +244,11 @@ const CardHeader: React.FC<CardHeaderProps> = ({ eyebrow, title, onOpenSheet }) 
 const ModeToggle: React.FC<{ mode: Mode; setMode: (m: Mode) => void }> = ({ mode, setMode }) => (
   <div
     style={{
-      display: 'grid',
-      gridTemplateColumns: '1fr 1fr',
-      gap: 4,
-      padding: 3,
-      background: T.ink04,
-      borderRadius: 12,
+      display: 'inline-flex',
+      background: 'var(--hcp-bg-2)',
+      borderRadius: 999,
+      padding: 2,
+      gap: 2,
     }}
   >
     {(['points', 'shots'] as Mode[]).map((m) => {
@@ -238,16 +259,17 @@ const ModeToggle: React.FC<{ mode: Mode; setMode: (m: Mode) => void }> = ({ mode
           onClick={() => setMode(m)}
           aria-pressed={active}
           style={{
-            padding: '9px 8px',
-            borderRadius: 9,
-            background: active ? T.ink : 'transparent',
-            color: active ? 'var(--hcp-bg-1)' : T.ink70,
+            padding: '5px 14px',
+            background: active ? 'var(--hcp-bg-3)' : 'transparent',
+            color: active ? 'var(--hcp-t-100)' : 'var(--hcp-t-60)',
             border: 'none',
+            borderRadius: 999,
             cursor: 'pointer',
             fontFamily: FONT,
             fontSize: 11,
             fontWeight: 800,
             letterSpacing: '0.08em',
+            transition: 'background 160ms ease, color 160ms ease',
           }}
         >
           {m === 'points' ? 'POINTS' : 'SCORE STATS'}
@@ -265,8 +287,8 @@ const ScopeToggle: React.FC<{
   <div
     style={{
       display: 'inline-flex',
-      background: T.ink04,
-      borderRadius: 99,
+      background: 'var(--hcp-bg-2)',
+      borderRadius: 999,
       padding: 2,
       gap: 2,
     }}
@@ -277,16 +299,17 @@ const ScopeToggle: React.FC<{
         onClick={() => setScope(s)}
         aria-pressed={scope === s}
         style={{
-          padding: '4px 9px',
-          borderRadius: 99,
-          background: scope === s ? T.ink : 'transparent',
-          color: scope === s ? 'var(--hcp-bg-1)' : T.ink70,
+          padding: '4px 11px',
+          borderRadius: 999,
+          background: scope === s ? 'var(--hcp-bg-3)' : 'transparent',
+          color: scope === s ? 'var(--hcp-t-100)' : 'var(--hcp-t-60)',
           border: 'none',
           cursor: 'pointer',
           fontFamily: FONT,
           fontSize: 10,
           fontWeight: 800,
           letterSpacing: '0.06em',
+          transition: 'background 160ms ease, color 160ms ease',
         }}
       >
         {SCOPE_BTN_LABEL[s]}
