@@ -172,7 +172,11 @@ function SectionHeaderInner(props: SectionHeaderProps) {
   const titleTracking = isPrime ? '-0.02em' : '-0.02em';
   const cutWidth = isPrime ? 34 : 22;
   const cutHeight = isPrime ? 3 : 2;
-  const defaultEyebrowColor = isPrime ? AMBER_AA : '#94A3B8';
+  const defaultEyebrowColor = isPrime
+    ? AMBER_AA
+    : isDark
+      ? 'var(--hcp-t-60)'
+      : '#94A3B8';
   const eyebrowColor = accent ?? (tone ? EYEBROW_TONE[tone] : defaultEyebrowColor);
   const cutColor = accent ?? AMBER;
 
