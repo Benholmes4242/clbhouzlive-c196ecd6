@@ -3,6 +3,7 @@ import { Phone, Mail, Globe, MapPin, Building2, Calendar, Pencil, ArrowUpRight, 
 import { BusinessProfile } from '@/hooks/useBusinessProfile';
 import { format } from 'date-fns';
 import { VerifiedBadge } from '@/components/ui/VerifiedBadge';
+import { SectionHeader } from '@/components/ui/SectionHeader';
 import { useNavigate } from 'react-router-dom';
 
 interface BusinessProfileInfoProps {
