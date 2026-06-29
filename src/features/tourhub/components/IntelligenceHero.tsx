@@ -43,6 +43,7 @@ import type {
 } from '../hooks/useAIPredictions';
 import type { TrackedPrediction } from './tournament-insights/types';
 import { IntelligenceSheet } from './IntelligenceSheet';
+import { SectionHeader as CanonicalSectionHeader } from '@/components/ui/SectionHeader';
 import {
   getPlayerHeadshotCandidates,
 } from '@/utils/playerHeadshot';
