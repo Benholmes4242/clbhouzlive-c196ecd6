@@ -26,6 +26,7 @@ import {
 } from '../hooks/useOverviewModules';
 import { usePlayerRankHistory } from '../hooks/usePlayerRankHistory';
 import { SectionErrorState } from './SectionErrorState';
+import { SectionHeader } from '@/components/ui/SectionHeader';
 import CountryFlag from '@/components/ui/country-flag';
 import { toTitleCase } from '../hooks/useWorldRankings';
 import { getTourLogo } from '../utils/tourLogos';
@@ -815,47 +816,22 @@ export const WorldRankingsHero = memo(function WorldRankingsHero() {
 
   return (
     <section className="px-4" aria-label="World Golf Rankings">
-      {/* ─── Section header (StatWatch style) ─────────────────────────── */}
-      <div style={{ marginBottom: 14 }}>
-        <button
-          onClick={() => navigate('/tourhub?tab=leaderboards')}
-          aria-label="Open leaderboards"
-          style={{
-            background: 'transparent',
-            border: 'none',
-            padding: 0,
-            cursor: 'pointer',
-            display: 'inline-flex',
-            alignItems: 'center',
-            gap: 6,
-            marginBottom: 6,
-          }}
-        >
-          <Crown size={13} color={AMBER} strokeWidth={2.5} />
-          <span style={{
-            fontSize: 10.5,
-            fontWeight: 700,
-            letterSpacing: '0.14em',
-            color: AMBER,
-          }}>
-            WORLD RANKINGS
-          </span>
-          <ChevronRight
-            size={11}
-            color={AMBER}
-            strokeWidth={2.5}
-            style={{ marginTop: 1 }}
-          />
-        </button>
-        <div style={{
-          fontSize: 13,
-          fontWeight: 700,
-          color: INK,
-          letterSpacing: '-0.005em',
-          lineHeight: 1.25,
-        }}>
-          {new Date().getFullYear()} Season
-        </div>
+      {/* ─── Canonical section header (minimal density — no icon) ──────── */}
+      <SectionHeader
+        tier="standard"
+        kicker="WORLD RANKINGS"
+        action={{ label: 'Leaderboards', onClick: () => navigate('/tourhub?tab=leaderboards') }}
+        paddingX={0}
+      />
+      <div style={{
+        fontSize: 13,
+        fontWeight: 700,
+        color: INK,
+        letterSpacing: '-0.005em',
+        lineHeight: 1.25,
+        marginBottom: 14,
+      }}>
+        {new Date().getFullYear()} Season
       </div>
 
       {/* ─── Tour dropdown + updated ────────────────────────────────────── */}

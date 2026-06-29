@@ -43,6 +43,7 @@ import type {
 } from '../hooks/useAIPredictions';
 import type { TrackedPrediction } from './tournament-insights/types';
 import { IntelligenceSheet } from './IntelligenceSheet';
+import { SectionHeader as CanonicalSectionHeader } from '@/components/ui/SectionHeader';
 import {
   getPlayerHeadshotCandidates,
 } from '@/utils/playerHeadshot';
@@ -169,7 +170,7 @@ function PlayerHeadshot({
   );
 }
 
-// ─── Section header ─────────────────────────────────────────────────────────
+// ─── Section header (canonical wrapper + sibling narrative headline) ───────
 function SectionHeader({
   meta,
   headline,
@@ -183,71 +184,43 @@ function SectionHeader({
   courseName?: string;
   onAboutClick: () => void;
 }) {
+  const club = meta.course && meta.course !== '—' ? meta.course : null;
+  const parts = [club, meta.country || null].filter(Boolean) as string[];
+  const locationText = parts.length ? parts.join(', ') : meta.cityCountry;
+
   return (
-    <div style={{ padding: '0 16px', marginBottom: 14 }}>
-      <button
-        onClick={onAboutClick}
-        aria-label="About Tournament Intelligence"
-        style={{
-          background: 'transparent',
-          border: 'none',
-          padding: 0,
-          cursor: 'pointer',
-          fontFamily: FONT,
-          display: 'inline-flex',
-          alignItems: 'center',
-          gap: 6,
-          marginBottom: 8,
-        }}
-      >
-        <Brain size={13} color={AMBER} strokeWidth={2.5} />
-        <span
+    <>
+      <CanonicalSectionHeader
+        tier="standard"
+        kicker="TOURNAMENT INTELLIGENCE"
+        action={{ label: 'About', onClick: onAboutClick }}
+        paddingX={16}
+      />
+      <div style={{ padding: '0 16px', marginBottom: 14 }}>
+        <div
           style={{
-            fontSize: 10.5,
-            fontWeight: 700,
-            letterSpacing: '0.14em',
-            color: AMBER,
+            fontFamily: FONT,
+            fontSize: 18,
+            fontWeight: 800,
+            color: INK,
+            letterSpacing: '-0.015em',
+            lineHeight: 1.2,
           }}
         >
-          TOURNAMENT INTELLIGENCE
-        </span>
-        <ChevronRight
-          size={11}
-          color={AMBER}
-          strokeWidth={2.5}
-          style={{ marginTop: 1 }}
-        />
-      </button>
-
-      <div
-        style={{
-          fontFamily: FONT,
-          fontSize: 18,
-          fontWeight: 800,
-          color: INK,
-          letterSpacing: '-0.015em',
-          lineHeight: 1.2,
-        }}
-      >
-        {headline}
-        {tournamentName && (
-          <>
-            {' '}
-            <span style={{ color: AMBER }}>{tournamentName}</span>
-          </>
-        )}
-        {courseName && (
-          <>
-            {' '}at {courseName}
-          </>
-        )}
-      </div>
-      {(() => {
-        const club = meta.course && meta.course !== '—' ? meta.course : null;
-        const parts = [club, meta.country || null].filter(Boolean);
-        // Fallback: if no club known, keep the old city+country so we never show blank.
-        const text = parts.length ? parts.join(', ') : meta.cityCountry;
-        return text ? (
+          {headline}
+          {tournamentName && (
+            <>
+              {' '}
+              <span style={{ color: AMBER }}>{tournamentName}</span>
+            </>
+          )}
+          {courseName && (
+            <>
+              {' '}at {courseName}
+            </>
+          )}
+        </div>
+        {locationText && (
           <div
             style={{
               marginTop: 6,
@@ -259,13 +232,14 @@ function SectionHeader({
               letterSpacing: '-0.005em',
             }}
           >
-            {text}
+            {locationText}
           </div>
-        ) : null;
-      })()}
-    </div>
+        )}
+      </div>
+    </>
   );
 }
+
 
 // ─── Meta tray (expand-on-tap reasons) ──────────────────────────────────────
 function CardMetaTray({
