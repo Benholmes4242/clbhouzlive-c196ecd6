@@ -251,38 +251,14 @@ export function CollegeRivalry() {
 
   return (
     <section aria-label="This week's college rivalry">
-      {/* Section header — single line */}
+      {/* Canonical section header (minimal density — no icon) */}
+      <SectionHeader
+        tier="standard"
+        kicker="COLLEGE FRANCHISE BATTLE"
+        action={{ label: 'Franchise rankings', onClick: () => navigate('/tourhub?tab=college') }}
+        paddingX={16}
+      />
       <div style={{ padding: '0 16px', marginBottom: 14 }}>
-        <button
-          onClick={() => navigate('/tourhub?tab=college')}
-          aria-label="Open college franchise rankings"
-          style={{
-            background: 'transparent',
-            border: 'none',
-            padding: 0,
-            cursor: 'pointer',
-            display: 'inline-flex',
-            alignItems: 'center',
-            gap: 6,
-            marginBottom: 6,
-          }}
-        >
-          <GraduationCap size={13} color={AMBER} strokeWidth={2.5} />
-          <span style={{
-            fontSize: 10.5,
-            fontWeight: 700,
-            letterSpacing: '0.14em',
-            color: AMBER,
-          }}>
-            COLLEGE FRANCHISE BATTLE
-          </span>
-          <ChevronRight
-            size={11}
-            color={AMBER}
-            strokeWidth={2.5}
-            style={{ marginTop: 1 }}
-          />
-        </button>
         <div style={{
           fontSize: 13,
           fontWeight: 700,
