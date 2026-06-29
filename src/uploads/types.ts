@@ -99,6 +99,8 @@ export interface UploadJob {
   
   // Scheduling fields
   scheduledAt?: Date | null;
+  draftId?: string;
+  originalMediaUrls?: (string | null)[];
 
   files: File[];
   createdAt: string;
