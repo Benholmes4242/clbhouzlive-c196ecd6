@@ -714,6 +714,8 @@ async function processPostJob(jobId: string, job: any): Promise<void> {
             stream_id: streamId,
             poster_url: posterUrl,
             upload_status: 'completed' as any,
+            // Pre-bake original (recrop source) — parallel to job.files[index].
+            original_media_url: job.originalMediaUrls?.[index] ?? null,
             // Trim range (video only)
             trim_start: mediaItem?.trimStart ?? null,
             trim_end: mediaItem?.trimEnd ?? null,
