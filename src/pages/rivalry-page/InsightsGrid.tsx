@@ -4,10 +4,10 @@ import {
   TAB,
   BG_1,
   T50,
-  T100,
   AMBER,
   LINE,
 } from './_shared/tokens';
+import { DarkSectionHeader } from '@/components/profile/handicap/whs/sections/_shared/darkAtoms';
 import type { Insight } from './_shared/insights';
 
 interface Props {
