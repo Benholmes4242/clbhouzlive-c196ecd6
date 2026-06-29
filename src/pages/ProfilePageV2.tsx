@@ -170,23 +170,31 @@ const ProfilePageV2Content: React.FC = () => {
   const { data: reviewsCount = 0, isLoading: reviewsCountLoading } = usePersonalReviewsCount(profileUserId);
   const { data: achievements } = useProfileAchievements(profileUserId);
   
-  const isSelf = user?.id === profileUserId;
-  
+  // Two-flag model:
+  //   isOwnAccount = the auth user owns this profile (drives personal-identity UI:
+  //                  handicap, Top Ten curation, settings, avatar uploader, bio prompt).
+  //   isSelfView   = actor-aware "truly me viewing me" (drives action-button row,
+  //                  follow/friendship hooks, sticky CTAs). When acting as a business
+  //                  on the owner's personal profile, isOwnAccount=true but isSelfView=false.
+  const isOwnAccount = user?.id === profileUserId;
+  const isSelf = isOwnAccount; // legacy alias - preserves personal-identity-owned UI below
+
 
   const followToggle = useToggleFollow();
   const { activeActor } = useActiveActor();
   const viewerActorType: 'personal' | 'business' = activeActor?.type ?? 'personal';
   const viewerActorId = activeActor?.id ?? user?.id;
+  const isSelfView = isOwnAccount && viewerActorType === 'personal';
   const { isFollowing: cachedFollowing } = useFollowState({
     targetActorType: 'personal',
-    targetActorId: isSelf ? undefined : profileUserId,
+    targetActorId: isSelfView ? undefined : profileUserId,
     viewerActorType,
     viewerActorId,
   });
   const isFollowing = cachedFollowing ?? false;
   const followBusy = followToggle.isPending;
   const toggleFollow = () => {
-    if (isSelf || !user?.id || !profileUserId || !viewerActorId) return;
+    if (isSelfView || !user?.id || !profileUserId || !viewerActorId) return;
     followToggle.mutate({
       targetActorType: 'personal',
       targetActorId: profileUserId,
@@ -207,7 +215,7 @@ const ProfilePageV2Content: React.FC = () => {
     acceptRequest,
     declineRequest,
     unfriend,
-  } = useFriendship(isSelf ? undefined : profileUserId);
+  } = useFriendship(isSelfView || viewerActorType === 'business' ? undefined : profileUserId);
 
   const isPrivateAndLocked =
     !isSelf &&
@@ -680,7 +688,7 @@ const ProfilePageV2Content: React.FC = () => {
 
       {/* Action Buttons - different for self vs other */}
       <div className="mt-3 px-5 flex items-center gap-1.5 sm:gap-2 relative z-10 pointer-events-auto">
-        {isSelf ? (
+        {isSelfView ? (
           /* ── Self-profile: prominent Edit Profile + overflow menu ── */
           <div className="flex items-center gap-3 w-full">
             <button
