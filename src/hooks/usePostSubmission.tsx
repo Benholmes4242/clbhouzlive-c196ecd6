@@ -85,6 +85,12 @@ export const usePostSubmission = () => {
   }: PostSubmissionData) => {
     setIsSubmitting(true);
 
+    console.log('[UPLOAD-DEBUG][old] submitPost called', {
+      hasMedia: (mediaFiles?.length ?? 0) + (mediaInputs?.length ?? 0) + (originalMediaUrls?.length ?? 0),
+      actorType,
+      isScheduled: !!scheduledAt,
+    });
+
     try {
       // Normalise to a single ordered MediaInput[] regardless of caller shape.
       const inputs: MediaInput[] =

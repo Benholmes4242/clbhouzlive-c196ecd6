@@ -295,6 +295,7 @@ const CommentDeepLinkPage = lazy(() => import("./components/comments/CommentDeep
 
 // Import season wrap modal
 import { SeasonWrapModal } from '@/components/season/SeasonWrapModal';
+import { DebugQueueUploadButton } from '@/components/debug/DebugQueueUploadButton';
 
 // Creator routes removed - now handled via Business Creator profiles or Personal Creator Mode
 
@@ -801,6 +802,7 @@ const AppInner: React.FC = () => {
                                                 {/* Global header for all pages except Clubhouse/Auth/Admin */}
                                                 <GlobalHeader />
                                                 <AppRoutes />
+                                                <DebugQueueUploadButton />
                                               </div>
                                             </Suspense>
                                             {/* Mini Player - persists across navigation */}
