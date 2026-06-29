@@ -135,6 +135,7 @@ export function getNotificationBadgeIcon(type: string): React.ReactElement {
     case 'golfer_verification_invite':
     case 'business_verification_more_proof_requested':
     case 'course_claim_needs_info':
+    case 'course_claim_submitted':
       return <Clock {...p} />;
     case 'business_verification_rejected':
     case 'golfer_verification_rejected':

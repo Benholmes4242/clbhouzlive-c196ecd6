@@ -238,7 +238,8 @@ function getContextUrl(notification: any): string {
   if (
     type === 'course_claim_approved' ||
     type === 'course_claim_rejected' ||
-    type === 'course_claim_needs_info'
+    type === 'course_claim_needs_info' ||
+    type === 'course_claim_submitted'
   ) {
     const d = (typeof data === 'object' && data !== null && !Array.isArray(data)) ? (data as any) : {};
     const courseId = d.source_course_id;
