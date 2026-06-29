@@ -295,6 +295,7 @@ const CommentDeepLinkPage = lazy(() => import("./components/comments/CommentDeep
 
 // Import season wrap modal
 import { SeasonWrapModal } from '@/components/season/SeasonWrapModal';
+import { DebugQueueUploadButton } from '@/components/debug/DebugQueueUploadButton';
 
 // Creator routes removed - now handled via Business Creator profiles or Personal Creator Mode
 
