@@ -250,6 +250,13 @@ function VideosFullFeedInner({ userId, mood, searchQuery, onClearSearch, onReset
 
   return (
     <>
+      {visiblePending.length > 0 && (
+        <div style={{ padding: '8px 0 0' }}>
+          {visiblePending.map((p) => (
+            <PendingPostCard key={p.jobId} entry={p} theme="light" />
+          ))}
+        </div>
+      )}
       {renderVideoFeedBody()}
     </>
   );
