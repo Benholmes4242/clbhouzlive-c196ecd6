@@ -210,11 +210,32 @@ interface CardHeaderProps {
 }
 
 const CardHeader: React.FC<CardHeaderProps> = ({ eyebrow, title, onOpenSheet }) => (
-  <div style={{ paddingBottom: 0 }}>
-    <SectionHeader
-      kicker={eyebrow}
+  <div style={{ paddingBottom: 0, position: 'relative' }}>
+    <DarkSectionHeader
+      eyebrow={eyebrow}
       title={title}
-      action={{ label: 'Info', onClick: onOpenSheet }}
+      right={
+        <button
+          type="button"
+          onClick={onOpenSheet}
+          aria-label="About this card"
+          style={{
+            display: 'inline-flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            width: 28,
+            height: 28,
+            borderRadius: 999,
+            background: 'transparent',
+            border: 'none',
+            color: 'var(--hcp-t-60)',
+            cursor: 'pointer',
+            padding: 0,
+          }}
+        >
+          <Info size={16} strokeWidth={2} />
+        </button>
+      }
     />
   </div>
 );
