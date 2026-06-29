@@ -107,6 +107,25 @@ function ActionAffordance({
   );
 }
 
+function MetaSlot({ children }: { children: ReactNode }) {
+  return (
+    <span
+      style={{
+        fontFamily: GEIST,
+        fontSize: 10,
+        fontWeight: 700,
+        letterSpacing: '0.12em',
+        textTransform: 'uppercase',
+        color: 'var(--hcp-t-40, #94A3B8)',
+        fontVariantNumeric: 'tabular-nums',
+        fontFeatureSettings: '"kern" 1, "liga" 1',
+        whiteSpace: 'nowrap',
+      }}
+    >
+      {children}
+    </span>
+  );
+
 function SectionHeaderInner(props: SectionHeaderProps) {
   const {
     tier: tierProp,
