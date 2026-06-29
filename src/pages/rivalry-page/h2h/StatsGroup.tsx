@@ -9,9 +9,9 @@ import {
   GREEN,
   RED,
   T35,
-  T100,
   LINE,
 } from '@/pages/rivalry-page/_shared/tokens';
+import { DarkSectionHeader } from '@/components/profile/handicap/whs/sections/_shared/darkAtoms';
 import { StatRow } from './StatRow';
 import type { H2HStatDef } from './_shared/h2hStats';
 import { whoLeads } from './_shared/whoLeads';
