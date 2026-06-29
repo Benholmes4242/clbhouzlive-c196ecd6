@@ -100,12 +100,14 @@ export async function createPost(input: CreatePostInput): Promise<CreatePostResu
   // Use courseId if provided, otherwise first course from courseIds array
   const primaryCourseId = input.courseId ?? (input.courseIds?.[0] ?? null);
   
+  const resolvedStatus = input.status ?? (isScheduled ? 'scheduled' : 'published');
+
   console.log('[createPost] Creating post:', {
     userId: input.userId,
     actorType: input.actorType,
     actorId: input.actorId,
     isScheduled,
-    status: isScheduled ? 'scheduled' : 'published',
+    status: resolvedStatus,
     courseCount: input.courseIds?.length || (input.courseId ? 1 : 0),
   });
   
@@ -132,7 +134,7 @@ export async function createPost(input: CreatePostInput): Promise<CreatePostResu
       post_categories: finalCategories,
       badges: input.badges ?? [],
       visibility: input.visibility ?? 'anyone',
-      status: isScheduled ? 'scheduled' : 'published',
+      status: resolvedStatus,
       scheduled_at: input.scheduledAt?.toISOString() ?? null,
     })
     .select('id, user_id, content, actor_type, actor_id, achievement_id, course_id, categories, badges, visibility, status, scheduled_at, created_at, updated_at')
@@ -142,7 +144,8 @@ export async function createPost(input: CreatePostInput): Promise<CreatePostResu
     console.error('[createPost] Database error:', error.message, error.code, error.details);
     throw error;
   }
-  
+
+  console.log('[UPLOAD-DEBUG][createPost] inserted', { postId: data?.id, status: data?.status });
   console.log('[createPost] Post created:', data.id);
 
   // Insert into post_courses junction table for multi-course support
