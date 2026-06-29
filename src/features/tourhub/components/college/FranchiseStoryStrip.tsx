@@ -12,20 +12,13 @@ import { useCollegeWeeklyMovers } from '../../hooks/useCollegeMovers';
 import { useCollegeAlumni } from '../../hooks/useCollegeAlumni';
 import { formatCurrency } from '@/lib/utils/formatCurrency';
 import { playerRoute } from '../../routes';
+import { SectionHeader } from '@/components/ui/SectionHeader';
 import { AMBER, INK, INK_FAINT, INK_MUTE, INK_TINT_06, INK_TINT_07, LIVE_INK, SURFACE, TREND_DOWN } from '../../_shared/tokens';
 
 interface FranchiseStoryStripProps {
   normalizedName: string;
   className?: string;
 }
-
-const EYEBROW: React.CSSProperties = {
-  fontSize: 10,
-  fontWeight: 700,
-  color: INK_MUTE,
-  letterSpacing: '0.16em',
-  textTransform: 'uppercase' as const,
-};
 
 const LABEL: React.CSSProperties = {
   fontSize: 9,
