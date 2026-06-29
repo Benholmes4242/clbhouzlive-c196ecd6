@@ -439,7 +439,7 @@ const HandicapPage: React.FC = () => {
   return (
     <PageRoot dark={true} style={{ background: 'var(--hcp-bg-0)' }}>
       <FloatingPageHeader onBack={() => safeGoBack(navigate, '/profile')} showHandicap={false} />
-      <main style={{ paddingTop: 'calc(env(safe-area-inset-top, 0px) + 80px)' }}>
+      <main style={{ paddingTop: 'calc(env(safe-area-inset-top, 0px) + 56px)' }}>
         <HandicapPageHeader
           ownerUserId={ownerUserId}
           displayName={displayName}
