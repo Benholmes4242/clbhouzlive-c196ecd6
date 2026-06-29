@@ -6,7 +6,7 @@
 import { motion } from 'framer-motion';
 import { format, isSameMonth } from 'date-fns';
 import type { TourTournament } from '../../hooks/useTourHubData';
-import { INK, INK_FAINT, INK_MUTE, INK_TINT_07, SURFACE } from '../../_shared/tokens';
+import { INK, INK_FAINT, INK_TINT_07, SURFACE } from '../../_shared/tokens';
 import { SectionHeader } from '@/components/ui/SectionHeader';
 
 interface TournamentInfoGridProps {
