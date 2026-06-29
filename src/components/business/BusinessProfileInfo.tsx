@@ -3,6 +3,7 @@ import { Phone, Mail, Globe, MapPin, Building2, Calendar, Pencil, ArrowUpRight, 
 import { BusinessProfile } from '@/hooks/useBusinessProfile';
 import { format } from 'date-fns';
 import { VerifiedBadge } from '@/components/ui/VerifiedBadge';
+import { SectionHeader } from '@/components/ui/SectionHeader';
 import { useNavigate } from 'react-router-dom';
 
 interface BusinessProfileInfoProps {
@@ -50,12 +51,14 @@ function SectionDivider() {
   return <div className="mx-6 h-px" style={{ background: 'rgba(15,23,42,0.07)' }} />;
 }
 
-/* ── Section eyebrow heading ── */
+/* ── Section eyebrow heading (canonical) ── */
 function SectionHeading({ children }: { children: React.ReactNode }) {
   return (
-    <h2 className="text-[11px] font-semibold uppercase tracking-[1.5px] text-muted-foreground mb-3">
-      {children}
-    </h2>
+    <SectionHeader
+      role="section"
+      kicker={typeof children === 'string' ? children.toUpperCase() : undefined}
+      title={typeof children !== 'string' ? children as string : undefined}
+    />
   );
 }
 
