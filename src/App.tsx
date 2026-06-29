@@ -38,6 +38,7 @@ import { BottomNavigationProvider } from '@/contexts/BottomNavigationContext';
 
 import { PostEventsBridge } from '@/events/PostEventsBridge';
 import { UploadToastsBridge } from '@/uploads/UploadToastsBridge';
+import { PendingPostsController } from '@/uploads/PendingPostsController';
 import UploadProgressBanner from '@/components/uploads/UploadProgressBanner';
 import GlobalBottomNavigation from '@/components/GlobalBottomNavigation';
 import { GlobalPostComposer } from '@/components/post-composer/GlobalPostComposer';
