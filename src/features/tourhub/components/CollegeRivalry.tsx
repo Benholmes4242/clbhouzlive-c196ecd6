@@ -21,6 +21,7 @@
 import { useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ChevronRight, GraduationCap } from 'lucide-react';
+import { SectionHeader } from '@/components/ui/SectionHeader';
 import { useCollegeSeasonStats, type CollegeSeasonStats } from '../hooks/useCollegeStats';
 import { useCollegeMediaMap, type CollegeMedia } from '../hooks/useCollegeMedia';
 import { useFranchiseCaptains } from '../hooks/useFranchiseCaptains';
