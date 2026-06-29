@@ -141,6 +141,7 @@ export type UploadEvent =
   | UploadFailedEvent
   | UploadPartialFailureEvent
   | ReviewRatingCreatedEvent
+  | PostShellCreatedEvent
   | FileUploadStartEvent
   | FileUploadProgressEvent
   | FileUploadCompleteEvent
