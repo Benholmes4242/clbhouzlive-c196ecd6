@@ -145,6 +145,3 @@ export function H2HRivalStrip({ normalizedName, className }: H2HRivalStripProps)
     </div>
   );
 }
-
-  );
-}
