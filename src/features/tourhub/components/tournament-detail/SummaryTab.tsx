@@ -201,9 +201,7 @@ export function SummaryTab({
         return (
           <motion.div style={{ marginTop: '8px' }} {...sectionEntrance}>
             <div style={{ padding: '14px 20px 12px', background: SLATE_50 }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                <span style={{ fontSize: '9px', fontWeight: 800, color: INK_MUTE, letterSpacing: '0.16em', textTransform: 'uppercase' as const }}>Field Statistics</span>
-              </div>
+              <SectionHeader role="section" kicker="FIELD STATISTICS" className="!mb-0" />
             </div>
             <div style={{ background: SLATE_50, borderTop: `0.5px solid ${INK_TINT_07}`, borderBottom: `1px solid ${INK_TINT_07}`, padding: '12px 20px 16px' }}>
               <div style={{ display: 'flex', height: '6px', borderRadius: '3px', overflow: 'hidden', marginBottom: '10px' }}>
