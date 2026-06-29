@@ -169,7 +169,10 @@ class UploadManager {
     uploadEventBus.emit('upload:complete', {
       type: 'upload:complete',
       jobId,
-      postId,
+      uploadType: job.type || 'post',
+      postId: job.type === 'review' ? undefined : postId,
+      ratingId: job.type === 'review' ? postId : undefined,
+      courseId: job.reviewData?.courseId,
       actorType: job.actorType,
       actorId: job.actorId,
       isScheduled,
