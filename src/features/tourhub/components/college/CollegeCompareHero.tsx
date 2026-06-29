@@ -332,12 +332,8 @@ export function CollegeCompareHero({ data, className }: CollegeCompareHeroProps)
     <div className={className}>
       {/* ── SEASON VERDICT ── */}
       <div style={{ background: SLATE_50, borderTop: `0.5px solid ${INK_TINT_07}` }}>
-        {/* Section eyebrow — canonical §6 slate-caps */}
-        <div style={{ padding: '14px 16px 10px' }}>
-          <span style={{ fontSize: '9px', fontWeight: 800, color: INK_MUTE, letterSpacing: '0.16em', textTransform: 'uppercase' as const }}>
-            Season Verdict · {seasonYear}
-          </span>
-        </div>
+        {/* Section eyebrow — canonical SectionHeader */}
+        <SectionHeader role="section" kicker={`Season Verdict · ${seasonYear}`} paddingX={16} />
 
         {/* Three-column verdict — Path B: absorbs earnings + alumni count from old VS band */}
         <div style={{ display: 'flex', alignItems: 'flex-start', padding: '12px 16px 18px' }}>
