@@ -630,7 +630,7 @@ const BusinessProfilePage: React.FC = () => {
       </div>
 
       {/* ───── Tabs ───── */}
-      <section className="px-4 bg-background" style={{ borderBottom: '1px solid hsl(var(--border))' }}>
+      <section className="px-4 bg-background">
         <div style={{ display: 'flex', gap: 20, justifyContent: 'center' }}>
           {tabs.map(tab => {
             const isActive = activeTab === tab.id;
@@ -660,7 +660,7 @@ const BusinessProfilePage: React.FC = () => {
                 {isActive && (
                   <div style={{
                     position: 'absolute', bottom: 0, left: 0, right: 0, height: 2.5,
-                    borderRadius: 2, background: 'linear-gradient(90deg, #F59E0B, #F7931E)',
+                    borderRadius: 2, background: '#0F172A',
                   }} />
                 )}
               </button>
