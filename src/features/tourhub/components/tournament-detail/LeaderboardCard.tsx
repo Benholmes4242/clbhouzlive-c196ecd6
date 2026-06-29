@@ -142,7 +142,7 @@ export function LeaderboardCard({
         );
       })}
 
-      {onViewAll && (
+      {onViewAll && !showHeader && (
         <button
           onClick={onViewAll}
           style={{
