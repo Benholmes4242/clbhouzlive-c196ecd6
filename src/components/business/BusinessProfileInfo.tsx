@@ -251,8 +251,7 @@ export function BusinessProfileInfo({ business, canManage }: BusinessProfileInfo
                 <button
                   type="button"
                   onClick={handleDirections}
-                  className="text-[0.8125rem] font-semibold mt-2 min-h-[44px] flex items-center gap-0.5 active:scale-[0.97] transition-transform"
-                  className="text-[0.8125rem] font-semibold text-foreground"
+                  className="text-[0.8125rem] font-semibold text-foreground mt-2 min-h-[44px] flex items-center gap-0.5 active:scale-[0.97] transition-transform"
                 >
                   Get directions
                   <ArrowUpRight className="h-3.5 w-3.5 opacity-70" style={{ color: '#64748B' }} />
