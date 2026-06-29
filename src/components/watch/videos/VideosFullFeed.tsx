@@ -12,6 +12,9 @@ import { VideosSuggestedCreatorsRail } from './VideosSuggestedCreatorsRail';
 import { VideosQuickClipsRail } from './VideosQuickClipsRail';
 import type { FeedPost } from '@/components/media-system/types/media';
 import WatchEmptyState from '@/components/watch/shared/WatchEmptyState';
+import { usePendingPostsForActor } from '@/uploads/usePendingPostsForActor';
+import { PendingPostCard } from '@/components/posts-tab/PendingPostCard';
+import { useActiveActor } from '@/context/ActiveActorContext';
 
 interface VideosFullFeedProps {
   userId: string | undefined;
