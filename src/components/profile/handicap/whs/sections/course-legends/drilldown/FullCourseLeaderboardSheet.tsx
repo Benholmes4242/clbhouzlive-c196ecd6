@@ -38,7 +38,7 @@ interface Props {
   yourRanks: Partial<Record<LegendCategory, number | null>>;
 }
 
-const DEEP_AMBER = '#B26818';
+const DEEP_AMBER = '#c97a10';
 const GOLD = '#FBBC2E';
 const INK = '#0F172A';
 const INK_55 = '#64748B';

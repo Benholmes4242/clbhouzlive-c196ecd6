@@ -121,7 +121,7 @@ const HolderCell: React.FC<HolderCellProps> = ({ short, holder, selfLabel }) => 
               size={9}
               strokeWidth={2.6}
               fill="#FBBC2E"
-              style={{ color: '#B26818' }}
+              style={{ color: '#c97a10' }}
             />
           )}
           {short}

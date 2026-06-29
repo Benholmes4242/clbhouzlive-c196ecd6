@@ -12,7 +12,7 @@ const INK = '#0F172A';
 const INK_MUTE = '#94A3B8';
 const PINE = '#2F6B4F';
 const CLAY = '#B5703C';
-const AMBER_BROWN = '#B26818';
+const AMBER_BROWN = '#c97a10';
 const GEIST = "'Geist', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif";
 const NUM: React.CSSProperties = {
   fontFamily: GEIST,
