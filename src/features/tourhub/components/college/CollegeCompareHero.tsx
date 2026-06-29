@@ -134,12 +134,8 @@ function AlumniCompareBlock({ title, alumni1, alumni2, statKey, name1, name2, em
 
   return (
     <div style={{ background: SLATE_50, borderTop: `0.5px solid ${INK_TINT_07}` }}>
-      {/* Section eyebrow — canonical §6 slate-caps */}
-      <div style={{ padding: '14px 16px 10px' }}>
-        <span style={{ fontSize: '9px', fontWeight: 800, color: INK_MUTE, letterSpacing: '0.16em', textTransform: 'uppercase' as const }}>
-          {title}
-        </span>
-      </div>
+      {/* Section eyebrow — canonical SectionHeader */}
+      <SectionHeader role="section" kicker={title} paddingX={16} />
 
       {/* Column headers — de-boxed, single bottom hairline */}
       <div style={{ display: 'flex', alignItems: 'center', padding: '4px 16px 6px', borderBottom: `0.5px solid ${INK_TINT_07}` }}>
