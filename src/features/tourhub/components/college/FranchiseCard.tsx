@@ -121,7 +121,7 @@ export function FranchiseCard({
   // Tier-driven row metrics
   const logoSize = isTopThree ? 38 : 34;
   const nameWeight = isTopThree ? 800 : 700;
-  const primaryValueColor = isTopThree ? AMBER : INK;
+  const primaryValueColor = INK;
   const rowPaddingY = isTopThree ? 12 : 11;
   const rankNumberColor = isTopThree ? GOLD_DEEP : 'rgba(15,23,42,0.10)';
 
