@@ -57,17 +57,12 @@ export function TournamentInfoGrid({ tournament, fieldSize }: TournamentInfoGrid
 
   return (
     <motion.div
-      style={{ background: SURFACE, borderTop: `0.5px solid ${INK_TINT_07}`, padding: '14px 16px 18px' }}
+      style={{ background: SURFACE, borderTop: `0.5px solid ${INK_TINT_07}`, padding: '0 0 18px' }}
       initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.3 }}
     >
-      <div style={{ marginBottom: 12 }}>
-        <span style={{
-          fontSize: 9, fontWeight: 800, color: INK_MUTE,
-          letterSpacing: '0.16em', textTransform: 'uppercase',
-        }}>Tournament Info</span>
-      </div>
+      <SectionHeader role="section" kicker="TOURNAMENT INFO" paddingX={16} />
 
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px 16px' }}>
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px 16px', padding: '0 16px' }}>
         {items.map(([label, value]) => (
           <div key={label}>
             <span style={{
