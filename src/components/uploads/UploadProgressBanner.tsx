@@ -10,11 +10,28 @@
 
 import React, { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useLocation, matchPath } from 'react-router-dom';
 import { X, AlertCircle, CheckCircle, Loader2, Star, RotateCcw, AlertTriangle } from 'lucide-react';
 import { uploadEventBus } from '@/uploads/uploadEventBus';
 import { formatBytes, formatDuration, formatBytesPerSecond } from '@/uploads/uploadSpeedTracker';
 import { retryJob, cancelJob, retryFailedItems } from '@/uploads/uploadPipeline';
+import { usePendingPostsStore } from '@/uploads/pendingPostsStore';
 import { cn } from '@/lib/utils';
+
+// Routes that render PendingPostCard inline. The banner is suppressed for
+// post-type uploads on these routes so progress isn't double-shown (card +
+// banner). The banner still appears on every other surface as a global
+// fallback, and review uploads still surface here everywhere.
+const PENDING_CARD_ROUTE_PATTERNS = [
+  '/profile',
+  '/profile/:username',
+  '/business/:idOrSlug',
+  '/watch/videos',
+];
+
+function routeRendersPendingCards(pathname: string): boolean {
+  return PENDING_CARD_ROUTE_PATTERNS.some((p) => matchPath({ path: p, end: true }, pathname));
+}
 
 interface ActiveUpload {
   jobId: string;
