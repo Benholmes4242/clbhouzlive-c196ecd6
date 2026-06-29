@@ -55,6 +55,11 @@ interface ActiveUpload {
 }
 
 export function UploadProgressBanner() {
+  return null;
+}
+
+// DIAGNOSTIC STUB: original implementation preserved below while the banner is disabled.
+export function UploadProgressBannerOriginalDiagnosticDisabled() {
   const [activeUploads, setActiveUploads] = useState<ActiveUpload[]>([]);
   const [dismissedJobs, setDismissedJobs] = useState<Set<string>>(new Set());
   
