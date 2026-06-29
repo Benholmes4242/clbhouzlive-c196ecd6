@@ -125,6 +125,9 @@ function MetaSlot({ children }: { children: ReactNode }) {
       {children}
     </span>
   );
+}
+
+
 
 function SectionHeaderInner(props: SectionHeaderProps) {
   const {
