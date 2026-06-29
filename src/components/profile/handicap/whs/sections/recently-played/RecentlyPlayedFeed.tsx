@@ -70,7 +70,7 @@ export const RecentlyPlayedFeed: React.FC<Props> = ({ ownerUserId }) => {
   return (
     <section style={{ marginTop: 32 }}>
       <DarkSectionHeader
-        eyebrow="Friends' Rounds"
+        eyebrow="FRIENDS' ROUNDS"
         right={!isLoading && items.length > 0 ? 'Last fortnight' : undefined}
       />
 
