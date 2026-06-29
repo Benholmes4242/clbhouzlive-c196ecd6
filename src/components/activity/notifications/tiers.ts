@@ -21,11 +21,11 @@ const LINE_TYPES = new Set([
   'top_ten_comment', 'top_ten_reply',
   'friend_accept', 'friend_accepted',
   'new_post',
-  'review_response',
+  'review_response_posted',
 ]);
 
 const REVIEW_TYPES = new Set([
-  'course_review', 'friend_course_review', 'business_course_review',
+  'course_review', 'friend_course_review', 'course_review_received',
 ]);
 
 const TROPHY_TYPES = new Set([
