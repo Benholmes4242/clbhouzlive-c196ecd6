@@ -40,6 +40,7 @@ import { MediaStage } from './MediaStage';
 import { MediaEditor } from './MediaEditor';
 import { ScheduleSheet } from './ScheduleSheet';
 import { bakeFrameCrop } from './bakeFrameCrop';
+import { BottomSheet } from '@/components/ui/BottomSheet';
 import {
   filesToComposerMedia,
   measureImage,
