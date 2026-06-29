@@ -233,47 +233,25 @@ export const StatOfTheWeek = memo(function StatOfTheWeek() {
   return (
     <>
       <section className="px-4" aria-label="Stat of the Week">
-        {/* ── Single-line section header ── */}
-        <div style={{ marginBottom: 14 }}>
-          <button
-            onClick={() => navigate(`/tourhub?tab=leaderboards&category=${category.key}`)}
-            aria-label="Open all leaders"
-            style={{
-              background: 'transparent',
-              border: 'none',
-              padding: 0,
-              cursor: 'pointer',
-              display: 'inline-flex',
-              alignItems: 'center',
-              gap: 6,
-              marginBottom: 6,
-            }}
-          >
-            <Activity size={13} color={AMBER} strokeWidth={2.5} />
-            <span style={{
-              fontSize: 10.5,
-              fontWeight: 700,
-              letterSpacing: '0.14em',
-              color: AMBER,
-            }}>
-              STAT WATCH
-            </span>
-            <ChevronRight
-              size={11}
-              color={AMBER}
-              strokeWidth={2.5}
-              style={{ marginTop: 1 }}
-            />
-          </button>
-          <div style={{
-            fontSize: 13,
-            fontWeight: 700,
-            color: INK,
-            letterSpacing: '-0.005em',
-            lineHeight: 1.25,
-          }}>
-            {scopeLabel}
-          </div>
+        {/* ── Canonical section header (minimal density — no icon) ── */}
+        <SectionHeader
+          tier="standard"
+          kicker="STAT WATCH"
+          action={{
+            label: 'All leaders',
+            onClick: () => navigate(`/tourhub?tab=leaderboards&category=${category.key}`),
+          }}
+          paddingX={0}
+        />
+        <div style={{
+          fontSize: 13,
+          fontWeight: 700,
+          color: INK,
+          letterSpacing: '-0.005em',
+          lineHeight: 1.25,
+          marginBottom: 14,
+        }}>
+          {scopeLabel}
         </div>
 
         <div
