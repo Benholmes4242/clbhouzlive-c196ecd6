@@ -8,6 +8,7 @@ import {
 } from '@/lib/gam/visuals';
 import { PULSE_DARK, type PulseKind } from '../../gam/pulseTokens';
 import { GAM } from '../../gam/tokens';
+import { DarkSectionHeader } from '../_shared/darkAtoms';
 import type { LegendWindow } from '@/lib/gam/types';
 import type { CourseSelection } from './types';
 
