@@ -84,9 +84,9 @@ function ContactRow({
     >
       <Icon className="h-4 w-4 text-muted-foreground mt-0.5 shrink-0" />
       <div className="min-w-0 flex-1">
-        <p className="text-sm font-medium truncate" style={{ color: isLink ? '#F7931E' : undefined }}>
+        <p className="text-sm font-medium truncate text-foreground">
           {value}
-          {isLink && <ArrowUpRight className="inline h-3 w-3 ml-0.5 opacity-70" style={{ color: '#F7931E' }} />}
+          {isLink && <ArrowUpRight className="inline h-3 w-3 ml-0.5 opacity-70" style={{ color: '#64748B' }} />}
         </p>
         <p className="text-xs text-muted-foreground">{label}</p>
       </div>
@@ -201,9 +201,9 @@ export function BusinessProfileInfo({ business, canManage }: BusinessProfileInfo
             >
               <Flag className="h-4 w-4 text-muted-foreground mt-0.5 shrink-0" />
               <div className="min-w-0 flex-1">
-                <p className="text-sm font-semibold truncate" style={{ color: '#F7931E' }}>
+                <p className="text-sm font-semibold truncate text-foreground">
                   {business.club_name}
-                  <ArrowUpRight className="inline h-3 w-3 ml-0.5 opacity-70" />
+                  <ArrowUpRight className="inline h-3 w-3 ml-0.5 opacity-70" style={{ color: '#64748B' }} />
                 </p>
                 <p className="text-xs text-muted-foreground">Course</p>
               </div>
@@ -252,10 +252,10 @@ export function BusinessProfileInfo({ business, canManage }: BusinessProfileInfo
                   type="button"
                   onClick={handleDirections}
                   className="text-[0.8125rem] font-semibold mt-2 min-h-[44px] flex items-center gap-0.5 active:scale-[0.97] transition-transform"
-                  style={{ color: '#F7931E' }}
+                  className="text-[0.8125rem] font-semibold text-foreground"
                 >
                   Get directions
-                  <ArrowUpRight className="h-3.5 w-3.5 opacity-70" style={{ color: '#F7931E' }} />
+                  <ArrowUpRight className="h-3.5 w-3.5 opacity-70" style={{ color: '#64748B' }} />
                 </button>
               </div>
             </div>
