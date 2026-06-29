@@ -801,6 +801,7 @@ const ProfilePageV2Content: React.FC = () => {
               )}
             </button>
             
+            {viewerActorType !== 'business' && (
             <button 
               className={cn(
                 'h-11 flex-1 min-w-0 rounded-full text-sm font-semibold flex items-center justify-center gap-1.5',
@@ -851,6 +852,7 @@ const ProfilePageV2Content: React.FC = () => {
                 </>
               )}
             </button>
+            )}
 
             {/* Fix 2: Other user overflow menu */}
             <DropdownMenu onOpenChange={(open) => {
@@ -884,7 +886,7 @@ const ProfilePageV2Content: React.FC = () => {
                   Copy link
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
-                {friendshipStatus === 'friends' && (
+                {viewerActorType !== 'business' && friendshipStatus === 'friends' && (
                   <DropdownMenuItem
                     onClick={() => unfriend()}
                     className="text-destructive focus:text-destructive"
@@ -1224,7 +1226,7 @@ const ProfilePageV2Content: React.FC = () => {
       />
 
       {/* Block confirmation dialog */}
-      {!isSelf && profileUserId && (
+      {!isSelfView && profileUserId && (
         <AlertDialog open={showBlockDialog} onOpenChange={setShowBlockDialog}>
           <AlertDialogContent>
             <AlertDialogHeader>
@@ -1251,7 +1253,7 @@ const ProfilePageV2Content: React.FC = () => {
       )}
 
       {/* Report confirmation dialog */}
-      {!isSelf && profileUserId && (
+      {!isSelfView && profileUserId && (
         <AlertDialog open={showReportDialog} onOpenChange={setShowReportDialog}>
           <AlertDialogContent>
             <AlertDialogHeader>
