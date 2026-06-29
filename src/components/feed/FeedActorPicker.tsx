@@ -3,22 +3,25 @@ import { ChevronDown, Check } from 'lucide-react';
 import { useActiveActor } from '@/context/ActiveActorContext';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { BottomSheet } from '@/components/ui/BottomSheet';
+import { SectionHeader } from '@/components/ui/SectionHeader';
 import type { ActiveActor } from '@/types/actor';
 
 const PALETTE = {
   dark: {
-    chevron: 'rgba(255,255,255,0.52)',
-    label: 'rgba(255,255,255,0.52)',
-    rowText: '#fff',
-    activeRowBg: 'rgba(255,255,255,0.06)',
+    chevron: 'var(--hcp-t-60)',
+    rowText: 'var(--hcp-t-100)',
+    activeRowBg: 'var(--hcp-bg-2)',
     sheetVariant: 'dark' as const,
+    hcpScope: 'hcp-dark',
+    sheetBg: 'var(--hcp-bg-0)',
   },
   light: {
-    chevron: 'rgba(15,23,42,0.52)',
-    label: 'rgba(15,23,42,0.52)',
-    rowText: '#0F172A',
-    activeRowBg: 'rgba(15,23,42,0.05)',
+    chevron: 'var(--hcp-t-60)',
+    rowText: 'var(--hcp-t-100)',
+    activeRowBg: 'var(--hcp-bg-2)',
     sheetVariant: 'light' as const,
+    hcpScope: 'hcp-light',
+    sheetBg: 'var(--hcp-bg-0)',
   },
 };
 
@@ -96,24 +99,14 @@ export const FeedActorPicker: React.FC<FeedActorPickerProps> = ({ value, onChang
         open={sheetOpen}
         onClose={() => setSheetOpen(false)}
         variant={c.sheetVariant}
-        style={c.sheetVariant === 'dark' ? { background: '#15171F' } : undefined}
+        className={c.hcpScope}
+        style={{ background: c.sheetBg }}
       >
         <div
           onClick={(e) => e.stopPropagation()}
           style={{ padding: '4px 8px 8px' }}
         >
-          <div
-            style={{
-              fontSize: 12,
-              fontWeight: 700,
-              letterSpacing: '0.08em',
-              textTransform: 'uppercase',
-              color: c.label,
-              padding: '4px 12px 10px',
-            }}
-          >
-            Post as
-          </div>
+          <SectionHeader role="prime" kicker="POST AS" surface={c.sheetVariant === 'dark' ? 'dark' : 'light'} paddingX={12} />
           {availableActors.map((a) => {
             const isActive = a.id === current.id && a.type === current.type;
             return (
