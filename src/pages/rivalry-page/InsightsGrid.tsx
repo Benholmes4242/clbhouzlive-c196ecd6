@@ -33,7 +33,7 @@ export const InsightsGrid: React.FC<Props> = ({ insights }) => {
           gap: 8,
           overflowX: 'auto',
           scrollSnapType: 'x mandatory',
-          padding: '10px 16px 4px',
+          padding: '10px 0 4px',
           marginRight: 0,
           scrollbarWidth: 'none',
         }}
@@ -54,6 +54,8 @@ export const InsightsGrid: React.FC<Props> = ({ insights }) => {
                 borderRadius: 14,
                 padding: '12px 14px',
                 fontFamily: FONT,
+                marginLeft: i === 0 ? 16 : 0,
+                marginRight: i === insights.length - 1 ? 16 : 0,
               }}
             >
               <div
