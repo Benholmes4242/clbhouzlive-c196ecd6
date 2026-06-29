@@ -10,7 +10,8 @@ import { BatchPlayerAvatar } from '../PlayerAvatar';
 import { EditorialEmpty } from './EditorialEmpty';
 import { useTournamentScoringStats } from '../../hooks/useTourHubData';
 import { playerRoute } from '../../routes';
-import { AMBER, INK, INK_FAINT, INK_MUTE, INK_TINT_02, INK_TINT_06, INK_TINT_07, LIVE_DOT, LIVE_INK, SCORE_OVER_PAR_LIGHT, SLATE_50, SURFACE, TREND_DOWN, TREND_UP } from '../../_shared/tokens';
+import { AMBER, GOLD, GOLD_DEEP, GOLD_TINT_10, INK, INK_FAINT, INK_MUTE, INK_TINT_02, INK_TINT_06, INK_TINT_07, LIVE_DOT, LIVE_INK, SCORE_OVER_PAR_LIGHT, SLATE_50, SURFACE, TREND_DOWN, TREND_UP } from '../../_shared/tokens';
+import { SectionHeader } from '@/components/ui/SectionHeader';
 
 interface SummaryTabProps {
   tournamentId: string;
