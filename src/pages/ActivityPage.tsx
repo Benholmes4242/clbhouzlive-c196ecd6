@@ -374,7 +374,7 @@ const ActivityPage: React.FC = () => {
 
                   return sections.map(section => (
                     <section key={section.label}>
-                      <SectionHeader label={section.label} />
+                      <DateGroupLabel label={section.label} />
                       <div className="px-4 pb-5 pt-2">
                         <NotificationList
                           items={section.items}
