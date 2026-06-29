@@ -26,6 +26,7 @@ import {
 } from '../hooks/useOverviewModules';
 import { usePlayerRankHistory } from '../hooks/usePlayerRankHistory';
 import { SectionErrorState } from './SectionErrorState';
+import { SectionHeader } from '@/components/ui/SectionHeader';
 import CountryFlag from '@/components/ui/country-flag';
 import { toTitleCase } from '../hooks/useWorldRankings';
 import { getTourLogo } from '../utils/tourLogos';
