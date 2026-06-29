@@ -116,6 +116,7 @@ function SectionHeaderInner(props: SectionHeaderProps) {
     sub,
     icon: Icon,
     action,
+    meta,
     tone,
     count,
     required,
@@ -124,9 +125,13 @@ function SectionHeaderInner(props: SectionHeaderProps) {
     paddingX = 0,
     className,
     accent,
+    surface = 'light',
   } = props;
 
   const role: Role = roleProp ?? TIER_TO_ROLE[tierProp ?? 'standard'];
+  const isDark = surface === 'dark';
+  const titleColor = isDark ? 'var(--hcp-t-100)' : INK;
+  const subColor = isDark ? 'var(--hcp-t-60)' : INK_MUTE;
 
   const pad = { paddingTop, paddingLeft: paddingX, paddingRight: paddingX };
 
