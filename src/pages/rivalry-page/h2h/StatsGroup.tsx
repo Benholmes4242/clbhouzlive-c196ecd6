@@ -9,9 +9,9 @@ import {
   GREEN,
   RED,
   T35,
-  T100,
   LINE,
 } from '@/pages/rivalry-page/_shared/tokens';
+import { DarkSectionHeader } from '@/components/profile/handicap/whs/sections/_shared/darkAtoms';
 import { StatRow } from './StatRow';
 import type { H2HStatDef } from './_shared/h2hStats';
 import { whoLeads } from './_shared/whoLeads';
@@ -42,36 +42,20 @@ export const StatsGroup: React.FC<Props> = ({ title, stats }) => {
   const showChip = tally.me > 0 || tally.them > 0;
 
   return (
-    <section style={{ padding: '0 16px' }}>
-      <div
-        style={{
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'space-between',
-          margin: '26px 2px 10px',
-          gap: 12,
-        }}
-      >
-        <div
-          style={{
-            color: T100,
-            fontSize: 11,
-            fontWeight: 800,
-            letterSpacing: '0.16em',
-            textTransform: 'uppercase',
-            fontFamily: FONT,
-          }}
-        >
-          {title}
-        </div>
+    <section>
+      <div style={{ position: 'relative' }}>
+        <DarkSectionHeader eyebrow={title.toUpperCase()} />
         {showChip && (
           <div
             style={{
+              position: 'absolute',
+              right: 16,
+              top: 22,
               display: 'inline-flex',
               alignItems: 'center',
               gap: 6,
               padding: '3px 9px',
-              background: 'rgba(15,23,42,0.05)',
+              background: 'rgba(255,255,255,0.06)',
               borderRadius: 999,
               fontFamily: FONT,
               fontSize: 11,
@@ -88,6 +72,7 @@ export const StatsGroup: React.FC<Props> = ({ title, stats }) => {
 
       <div
         style={{
+          margin: '10px 16px 0',
           background: BG_1,
           border: `0.5px solid ${LINE}`,
           borderRadius: 16,

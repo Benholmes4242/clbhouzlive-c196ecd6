@@ -4,10 +4,10 @@ import {
   TAB,
   BG_1,
   T50,
-  T100,
   AMBER,
   LINE,
 } from './_shared/tokens';
+import { DarkSectionHeader } from '@/components/profile/handicap/whs/sections/_shared/darkAtoms';
 import type { Insight } from './_shared/insights';
 
 interface Props {
@@ -25,36 +25,16 @@ export const InsightsGrid: React.FC<Props> = ({ insights }) => {
   if (insights.length === 0) return null;
 
   return (
-    <section style={{ padding: '0 16px' }}>
-      <div
-        style={{
-          display: 'flex',
-          alignItems: 'center',
-          margin: '26px 2px 10px',
-        }}
-      >
-        <div
-          style={{
-            color: T100,
-            fontSize: 11,
-            fontWeight: 800,
-            letterSpacing: '0.16em',
-            textTransform: 'uppercase',
-            fontFamily: FONT,
-          }}
-        >
-          Did you know
-        </div>
-      </div>
+    <section>
+      <DarkSectionHeader eyebrow="DID YOU KNOW" />
       <div
         style={{
           display: 'flex',
           gap: 8,
           overflowX: 'auto',
           scrollSnapType: 'x mandatory',
-          paddingBottom: 4,
-          marginRight: -16,
-          paddingRight: 16,
+          padding: '10px 16px 4px',
+          marginRight: 0,
           scrollbarWidth: 'none',
         }}
         className="scrollbar-none"

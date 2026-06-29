@@ -9,8 +9,8 @@ import {
   BG_2,
   LINE,
   LINE_2,
-  
 } from './_shared/tokens';
+import { DarkSectionHeader } from '@/components/profile/handicap/whs/sections/_shared/darkAtoms';
 import { RoundCard } from './RoundCard';
 import type { FriendRivalryHydrated } from '@/lib/whs/types';
 import type { RivalryDimension } from '@/lib/whs/utils/useRivalryDimension';
@@ -69,22 +69,10 @@ export const RoundByRoundSection: React.FC<Props> = ({
   const showAllButton = !showAll && filtered.length > INITIAL_LIMIT;
 
   return (
-    <section ref={scrollAnchor} style={{ padding: '0 16px 32px' }}>
-      <div
-        style={{
-          margin: '26px 2px 10px',
-          color: T100,
-          fontSize: 11,
-          fontWeight: 800,
-          letterSpacing: '0.16em',
-          textTransform: 'uppercase',
-          fontFamily: FONT,
-        }}
-      >
-        Round-by-round
-      </div>
+    <section ref={scrollAnchor} style={{ paddingBottom: 32 }}>
+      <DarkSectionHeader eyebrow="ROUND-BY-ROUND" />
 
-      <div style={{ display: 'flex', gap: 8, marginBottom: 12, flexWrap: 'wrap' }}>
+      <div style={{ display: 'flex', gap: 8, margin: '10px 16px 12px', flexWrap: 'wrap' }}>
         <Chip
           active={courseFilter === null}
           onClick={() => {
@@ -176,6 +164,7 @@ export const RoundByRoundSection: React.FC<Props> = ({
       {visible.length === 0 ? (
         <div
           style={{
+            margin: '0 16px',
             padding: '32px 8px',
             color: T50,
             fontSize: 13,
@@ -188,6 +177,7 @@ export const RoundByRoundSection: React.FC<Props> = ({
       ) : (
         <div
           style={{
+            margin: '0 16px',
             background: BG_1,
             border: `0.5px solid ${LINE}`,
             borderRadius: 16,

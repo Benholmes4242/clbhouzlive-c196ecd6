@@ -9,6 +9,7 @@ import {
   AMBER,
   LINE,
 } from './_shared/tokens';
+import { DarkSectionHeader } from '@/components/profile/handicap/whs/sections/_shared/darkAtoms';
 import type { FriendRivalryHydrated } from '@/lib/whs/types';
 import type { RivalryDimension } from '@/lib/whs/utils/useRivalryDimension';
 
@@ -77,22 +78,11 @@ export const CoursesPlayedSection: React.FC<Props> = ({
   if (courses.length === 0) return null;
 
   return (
-    <section style={{ padding: '0 16px' }}>
+    <section>
+      <DarkSectionHeader eyebrow="COURSES PLAYED TOGETHER" />
       <div
         style={{
-          margin: '26px 2px 10px',
-          color: T100,
-          fontSize: 11,
-          fontWeight: 800,
-          letterSpacing: '0.16em',
-          textTransform: 'uppercase',
-          fontFamily: FONT,
-        }}
-      >
-        Courses played together
-      </div>
-      <div
-        style={{
+          margin: '10px 16px 0',
           background: BG_1,
           border: `0.5px solid ${LINE}`,
           borderRadius: 16,
