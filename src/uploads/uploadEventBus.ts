@@ -9,6 +9,7 @@ import type {
   UploadFailedEvent,
   UploadPartialFailureEvent,
   ReviewRatingCreatedEvent,
+  PostShellCreatedEvent,
   FileUploadStartEvent,
   FileUploadProgressEvent,
   FileUploadCompleteEvent,
