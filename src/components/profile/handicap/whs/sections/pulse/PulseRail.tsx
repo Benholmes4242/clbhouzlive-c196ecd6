@@ -51,18 +51,13 @@ export const PulseRail: React.FC<Props> = ({ userId, onOpenSearch }) => {
 
   return (
     <div style={{ marginTop: 18 }}>
-      <SectionHeader count={friends.length} />
-      <div
-        style={{
-          fontFamily: FONT,
-          fontSize: 11,
-          color: 'var(--hcp-t-60)',
-          padding: '0 20px',
-          marginBottom: 10,
-        }}
-      >
-        Friends who've played recently
-      </div>
+      <SectionHeader
+        surface="dark"
+        role="section"
+        kicker="PULSE"
+        count={friends.length}
+        sub="Friends who've played recently"
+      />
       <div
         style={{
           display: 'flex',
