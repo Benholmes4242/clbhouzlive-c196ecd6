@@ -762,7 +762,7 @@ function CommentsSheet({
                       animate={{ opacity: 1, scale: 1 }}
                       exit={{ opacity: 0, scale: 0.95 }}
                       transition={{ duration: 0.15 }}
-                      style={{ display: 'flex', alignItems: 'center', gap: 2, borderRadius: 8, background: 'rgba(15,23,42,0.05)', padding: '2px' }}
+                      style={{ display: 'flex', alignItems: 'center', gap: 2, borderRadius: 999, background: 'rgba(15,23,42,0.05)', padding: '2px' }}
                     >
                       {(['best', 'newest'] as const).map(s => {
                         const active = sort === s;
@@ -773,7 +773,7 @@ function CommentsSheet({
                             onClick={() => setSort(s)}
                             style={{
                               padding: '5px 11px',
-                              borderRadius: 6,
+                              borderRadius: 999,
                               fontSize: 12,
                               fontWeight: 600,
                               minHeight: 28,
