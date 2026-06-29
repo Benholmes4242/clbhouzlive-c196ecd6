@@ -319,7 +319,17 @@ export function useHeroCarouselData() {
 
       completedTournaments.forEach(t => {
         const tournament = transformTournament(t, true);
-        if (completedByTour[tournament.tourSlug]) completedByTour[tournament.tourSlug].push(tournament);
+        // Defensive re-bucket: a closed event whose top is tied + no confirmed winner
+        // is "unresolved" (playoff pending) — route to the LIVE bucket so it stays
+        // featured and never gets crowned.
+        const tie = tieMap[t.id];
+        const winnerConfirmed = confirmedWinnerSet.has(t.id) || Boolean(t.winner_id);
+        const isUnresolved = !winnerConfirmed && (tie?.topTie || (tie?.topRowCount ?? 1) > 1);
+        if (isUnresolved && liveByTour[tournament.tourSlug]) {
+          liveByTour[tournament.tourSlug].push(tournament);
+        } else if (completedByTour[tournament.tourSlug]) {
+          completedByTour[tournament.tourSlug].push(tournament);
+        }
       });
 
       upcomingTournaments.forEach(t => {
