@@ -244,21 +244,6 @@ const CardHeader: React.FC<CardHeaderProps> = ({ eyebrow, title, onOpenSheet }) 
 const ModeToggle: React.FC<{ mode: Mode; setMode: (m: Mode) => void }> = ({ mode, setMode }) => (
   <div
     style={{
-      display: 'grid',
-      gridTemplateColumns: '1fr 1fr',
-      gap: 4,
-      padding: 3,
-      background: T.ink04,
-      borderRadius: 12,
-    }}
-  >
-    {(['points', 'shots'] as Mode[]).map((m) => {
-      const active = mode === m;
-      return (
-// ─── Mode toggle ────────────────────────────────────────────────────────
-const ModeToggle: React.FC<{ mode: Mode; setMode: (m: Mode) => void }> = ({ mode, setMode }) => (
-  <div
-    style={{
       display: 'inline-flex',
       background: 'var(--hcp-bg-2)',
       borderRadius: 999,
