@@ -3,6 +3,7 @@
  */
 
 import { useState } from 'react';
+import SectionHeader from '@/components/ui/SectionHeader';
 import { Link } from 'react-router-dom';
 import { ChevronDown, ChevronUp, Trophy } from 'lucide-react';
 import { format } from 'date-fns';
@@ -40,12 +41,8 @@ export function PlayerTournamentHistory({ playerId, playerName }: PlayerTourname
 
   return (
     <div style={{ background: SURFACE, borderTop: `0.5px solid ${INK_TINT_07}` }}>
-      {/* Section eyebrow — canonical §6 slate-caps */}
-      <div style={{ padding: '14px 16px 8px' }}>
-        <span style={{ fontSize: '9px', fontWeight: 800, color: INK_MUTE, letterSpacing: '0.16em', textTransform: 'uppercase' as const }}>
-          Recent Tournaments
-        </span>
-      </div>
+      {/* Section eyebrow — canonical SectionHeader */}
+      <SectionHeader role="section" kicker="Recent Tournaments" paddingX={16} paddingTop={14} />
 
       {isLoading ? (
         <div className="space-y-3 px-4 pb-4">

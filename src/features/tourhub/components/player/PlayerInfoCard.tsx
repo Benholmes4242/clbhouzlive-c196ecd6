@@ -3,8 +3,9 @@
  */
 
 import { Link } from 'react-router-dom';
+import SectionHeader from '@/components/ui/SectionHeader';
 import type { TourPlayer } from '../../hooks/useTourHubData';
-import { INK, INK_FAINT, INK_MUTE, INK_TINT_06, INK_TINT_07, SURFACE } from '../../_shared/tokens';
+import { INK, INK_FAINT, INK_TINT_06, INK_TINT_07, SURFACE } from '../../_shared/tokens';
 
 function formatHeight(inches: string | number | null | undefined): string | null {
   if (!inches) return null;
@@ -105,13 +106,10 @@ export function PlayerInfoCard({ player }: PlayerInfoCardProps) {
   }
 
   return (
-    <div style={{ background: SURFACE, borderTop: `0.5px solid ${INK_TINT_07}`, padding: '14px 16px 16px' }}>
-      {/* Section eyebrow — canonical §6 slate-caps */}
-      <div style={{ marginBottom: '16px' }}>
-        <span style={{ fontSize: '9px', fontWeight: 800, color: INK_MUTE, letterSpacing: '0.16em', textTransform: 'uppercase' as const }}>
-          Player Info
-        </span>
-      </div>
+    <div style={{ background: SURFACE, borderTop: `0.5px solid ${INK_TINT_07}`, padding: '0 0 16px' }}>
+      {/* Section eyebrow — canonical SectionHeader */}
+      <SectionHeader role="section" kicker="Player Info" paddingX={16} paddingTop={14} />
+      <div style={{ padding: '0 16px' }}>
 
       {personalFields.length > 0 && (
         <div>
@@ -142,6 +140,7 @@ export function PlayerInfoCard({ player }: PlayerInfoCardProps) {
           </div>
         </div>
       )}
+      </div>
     </div>
   );
 }

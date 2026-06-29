@@ -8,6 +8,7 @@
  */
 
 import { useEffect, useRef, useState } from 'react';
+import SectionHeader from '@/components/ui/SectionHeader';
 import { format } from 'date-fns';
 import { ArrowDownRight, ArrowRight, ArrowUpRight } from 'lucide-react';
 import { usePlayerResults, formatPositionShort, formatScore, type PlayerTournamentResult } from '../../hooks/usePlayerResults';
@@ -364,22 +365,10 @@ export function FormSection({ playerId }: FormSectionProps) {
         style={{
           background: SLATE_50,
           borderTop: `0.5px solid ${INK_TINT_07}`,
-          padding: '14px 16px 16px',
+          padding: '0 16px 16px',
         }}
       >
-        <div style={{ marginBottom: 14 }}>
-          <span
-            style={{
-              fontSize: 9,
-              fontWeight: 800,
-              color: INK_MUTE,
-              letterSpacing: '0.16em',
-              textTransform: 'uppercase' as const,
-            }}
-          >
-            Recent Results
-          </span>
-        </div>
+        <SectionHeader role="section" kicker="Recent Results" paddingTop={14} />
         <DotStrip events={visible} />
       </div>
     );
@@ -402,23 +391,11 @@ export function FormSection({ playerId }: FormSectionProps) {
       style={{
         background: SLATE_50,
         borderTop: `0.5px solid ${INK_TINT_07}`,
-        padding: '14px 16px 16px',
+        padding: '0 16px 16px',
       }}
     >
-      {/* Eyebrow */}
-      <div style={{ marginBottom: 14 }}>
-        <span
-          style={{
-            fontSize: 9,
-            fontWeight: 800,
-            color: INK_MUTE,
-            letterSpacing: '0.16em',
-            textTransform: 'uppercase' as const,
-          }}
-        >
-          Form · last {Math.min(10, trend.length)} events
-        </span>
-      </div>
+      {/* Eyebrow — canonical SectionHeader */}
+      <SectionHeader role="section" kicker={`Form · last ${Math.min(10, trend.length)} events`} paddingTop={14} />
 
       {/* Fixed-height detail slot ABOVE the line (44px) so layout never jumps */}
       <div

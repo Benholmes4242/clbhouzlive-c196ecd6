@@ -3,6 +3,7 @@
  */
 
 import { useState } from 'react';
+import SectionHeader from '@/components/ui/SectionHeader';
 import { motion, AnimatePresence } from 'framer-motion';
 import type { TourPlayerStatistics } from '../../hooks/useTourHubData';
 import { AMBER, HAIRLINE_INK_8, HAIRLINE_INK_15, INK, INK_FAINT, INK_MUTE, INK_TINT_07, SLATE_50, SURFACE } from '../../_shared/tokens';
@@ -148,13 +149,9 @@ export function PlayerSeasonStats({ playerStats }: PlayerSeasonStatsProps) {
 
   return (
     <div style={{ background: SLATE_50, borderTop: `0.5px solid ${INK_TINT_07}` }}>
-      {/* Dispatch section header */}
-      <div style={{ padding: '14px 16px 0' }}>
-        <div style={{ marginBottom: '12px' }}>
-          <span style={{ fontSize: '9px', fontWeight: 800, color: INK_MUTE, letterSpacing: '0.16em', textTransform: 'uppercase' as const }}>
-            STATS · {activeTab}
-          </span>
-        </div>
+      {/* Section eyebrow — canonical SectionHeader */}
+      <SectionHeader role="section" kicker={`Stats · ${activeTab}`} paddingX={16} paddingTop={14} />
+      <div style={{ padding: '0 16px' }}>
 
         {/* Underline tabs — matches TourHubShellTabs style (swipable carousel, 14px, underline) */}
         <div
