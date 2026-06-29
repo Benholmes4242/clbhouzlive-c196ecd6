@@ -35,9 +35,9 @@ export function getNotificationActionText(n: ActivityNotification): string {
     case 'friend_course_review':
     case 'course_review':
       return 'reviewed this course';
-    case 'business_course_review':
-      return 'left a review';
-    case 'review_response':
+    case 'course_review_received':
+      return 'left a review on your course';
+    case 'review_response_posted':
       return 'responded to your review';
     default:
       return title || message || 'New notification';
