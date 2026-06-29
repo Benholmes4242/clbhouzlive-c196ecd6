@@ -48,6 +48,8 @@ interface SectionHeaderProps {
   mark?: ReactNode;
   /** Right-side action affordance. */
   action?: { label: string; onClick: () => void };
+  /** Non-interactive right-aligned caps text (e.g. "FRI 19 JUN", "SCORE DIFF VS HCP"). */
+  meta?: ReactNode;
   /** Tier-2 eyebrow colour. 'slate' default (#64748B) | 'amber' (#c97a10) | 'danger' (#DC2626). */
   tone?: EyebrowTone;
   /** Optional inline count rendered after the eyebrow (slate-400, tabular). */
@@ -59,6 +61,11 @@ interface SectionHeaderProps {
   paddingTop?: number;
   paddingX?: number;
   className?: string;
+  /**
+   * Surface theme. Default 'light' (white surfaces, ink title, slate eyebrow).
+   * 'dark' uses --hcp-* theme tokens for eyebrow/title; cut-line stays amber.
+   */
+  surface?: 'light' | 'dark';
   /**
    * Accent colour for the eyebrow + cut-line. Defaults to amber.
    * Reserved for pure-data surfaces that align the header to a semantic scale
