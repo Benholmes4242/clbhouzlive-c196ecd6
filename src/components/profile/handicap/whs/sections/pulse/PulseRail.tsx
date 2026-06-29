@@ -55,6 +55,7 @@ export const PulseRail: React.FC<Props> = ({ userId, onOpenSearch }) => {
         surface="dark"
         role="section"
         kicker="PULSE"
+        paddingX={20}
         count={friends.length}
         sub="Friends who've played recently"
       />
