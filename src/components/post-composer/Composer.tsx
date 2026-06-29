@@ -865,7 +865,7 @@ export function Composer({
             viewerActorType: (activeActor?.type === 'business' ? 'business' : 'personal'),
             viewerActorId: activeActor?.id ?? user.id,
             authorName: displayActor.name ?? 'You',
-            authorAvatarUrl: displayActor.avatar ?? null,
+            authorAvatarUrl: (displayActor as any).avatarUrl ?? (displayActor as any).avatar ?? null,
             authorUsername: (displayActor as any).username ?? null,
             caption,
             media: previewMedia,
