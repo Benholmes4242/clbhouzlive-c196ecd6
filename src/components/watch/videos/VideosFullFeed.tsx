@@ -104,6 +104,21 @@ function VideosFullFeedInner({ userId, mood, searchQuery, onClearSearch, onReset
     refetch,
   } = useVideosFeed({ userId, filter, category, searchQuery });
 
+  const { activeActor } = useActiveActor();
+  const realPostIds = useMemo(() => posts.map((p) => p.id), [posts]);
+  const pendingEntries = usePendingPostsForActor({
+    authorActorType: (activeActor?.type === 'business' ? 'business' : 'personal'),
+    authorActorId: activeActor?.id ?? userId ?? '',
+    viewerActorType: (activeActor?.type === 'business' ? 'business' : 'personal'),
+    viewerActorId: activeActor?.id ?? userId ?? '',
+    realPostIds,
+  });
+  // Only show pending entries that include video media (videos surface)
+  const visiblePending = useMemo(
+    () => pendingEntries.filter((e) => e.media.some((m) => m.kind === 'video')),
+    [pendingEntries]
+  );
+
   useEffect(() => {
     if (inView && hasNextPage && !isFetchingNextPage && !fetchGuard.current) {
       fetchGuard.current = true;
