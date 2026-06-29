@@ -74,73 +74,54 @@ export const YourCircleSection: React.FC<Props> = ({ userId }) => {
 
   return (
     <section style={{ marginTop: 32, fontFamily: FONT }}>
-      {/* Compact merged header */}
-      <div
-        style={{
-          display: 'flex',
-          alignItems: 'flex-end',
-          justifyContent: 'space-between',
-          padding: '0 16px',
-          gap: 12,
-        }}
-      >
-        <div style={{ minWidth: 0 }}>
-          <div
-            style={{
-              fontSize: 11,
-              fontWeight: 800,
-              letterSpacing: '0.14em',
-              color: 'var(--hcp-t-60)',
-              textTransform: 'uppercase',
-            }}
-          >
-            Your Circle
+      <DarkSectionHeader eyebrow="YOUR CIRCLE" title={title} />
+
+      {(stats.yourRank > 0 && stats.total > 0) || overflow > 0 ? (
+        <div
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            padding: '4px 16px 0',
+            gap: 12,
+          }}
+        >
+          <div style={{ minWidth: 0, fontSize: 13, color: 'var(--hcp-t-60)' }}>
+            {stats.yourRank > 0 && stats.total > 0 && (
+              <>
+                You're{' '}
+                <span style={{ fontWeight: 800, color: 'var(--hcp-t-100)' }}>
+                  {ordinal(stats.yourRank)}
+                </span>{' '}
+                of {stats.total}
+              </>
+            )}
           </div>
-          <div
-            style={{
-              marginTop: 4,
-              fontSize: 23,
-              fontWeight: 800,
-              color: 'var(--hcp-t-100)',
-              letterSpacing: '-0.02em',
-              lineHeight: 1.1,
-            }}
-          >
-            {title}
-          </div>
-          {stats.yourRank > 0 && stats.total > 0 && (
-            <div style={{ marginTop: 3, fontSize: 13, color: 'var(--hcp-t-60)' }}>
-              You're{' '}
-              <span style={{ fontWeight: 800, color: 'var(--hcp-t-100)' }}>
-                {ordinal(stats.yourRank)}
-              </span>{' '}
-              of {stats.total}
-            </div>
+
+          {overflow > 0 && (
+            <button
+              type="button"
+              onClick={() => setShowAll((v) => !v)}
+              style={{
+                flexShrink: 0,
+                background: 'transparent',
+                border: 'none',
+                padding: 0,
+                fontSize: 10,
+                fontWeight: 800,
+                letterSpacing: '0.14em',
+                color: 'var(--hcp-t-60)',
+                textTransform: 'uppercase',
+                cursor: 'pointer',
+                whiteSpace: 'nowrap',
+              }}
+            >
+              {showAll ? 'Show less' : `See all · ${rail.length}`}
+            </button>
           )}
         </div>
+      ) : null}
 
-        {overflow > 0 && (
-          <button
-            type="button"
-            onClick={() => setShowAll((v) => !v)}
-            style={{
-              flexShrink: 0,
-              background: 'transparent',
-              border: 'none',
-              padding: '0 0 4px',
-              fontSize: 10,
-              fontWeight: 800,
-              letterSpacing: '0.14em',
-              color: 'var(--hcp-t-60)',
-              textTransform: 'uppercase',
-              cursor: 'pointer',
-              whiteSpace: 'nowrap',
-            }}
-          >
-            {showAll ? 'Show less' : `See all · ${rail.length}`}
-          </button>
-        )}
-      </div>
 
       {/* Rail — you lead, then recently-active friends */}
       <div
