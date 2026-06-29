@@ -420,15 +420,16 @@ export function CollegeCompareHero({ data, className }: CollegeCompareHeroProps)
 
       {/* ── SEASON OVERVIEW ── */}
       <div style={{ background: SLATE_50, borderTop: `0.5px solid ${INK_TINT_07}` }}>
+        {/* Section eyebrow — canonical SectionHeader */}
+        <SectionHeader role="section" kicker="Season Overview" paddingX={16} />
         {/* Mini logo column headers */}
-        <div style={{ display: 'flex', alignItems: 'center', padding: '12px 16px 0' }}>
+        <div style={{ display: 'flex', alignItems: 'center', padding: '4px 16px 0' }}>
           <div style={{ flex: 1, display: 'flex', alignItems: 'center', gap: '5px' }}>
             <div style={{ width: '18px', height: '18px', borderRadius: '4px', overflow: 'hidden', background: INK_TINT_04, border: `1px solid ${HAIRLINE_INK_8}`, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
               {logo1 ? <img src={logo1} alt={name1} style={{ width: '13px', height: '13px', objectFit: 'contain' }} onError={e => { e.currentTarget.style.display = 'none'; }} /> : null}
             </div>
             <span style={{ fontSize: '13px', fontWeight: 800, color: INK_MUTE }}>{name1}</span>
           </div>
-          <span style={{ fontSize: '9px', fontWeight: 800, color: INK_MUTE, letterSpacing: '0.16em', textTransform: 'uppercase' as const }}>Season Overview</span>
           <div style={{ flex: 1, display: 'flex', alignItems: 'center', gap: '5px', justifyContent: 'flex-end' }}>
             <span style={{ fontSize: '13px', fontWeight: 800, color: INK_MUTE }}>{name2}</span>
             <div style={{ width: '18px', height: '18px', borderRadius: '4px', overflow: 'hidden', background: INK_TINT_04, border: `1px solid ${HAIRLINE_INK_8}`, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
