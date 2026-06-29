@@ -61,7 +61,7 @@ const ExplainerContent: React.FC<{ window: 'all_time' | '90d' }> = ({ window }) 
     <SectionHeader role="section" kicker="WHAT ARE CHAMPIONS" />
     <p style={{ fontSize: 12, fontWeight: 500, color: 'var(--hcp-t-60)', lineHeight: 1.55, margin: 0 }}>
       The clubhouse records board, digitalised. Lowest gross, best stableford, most birdies
-      and more — ranked from{' '}
+      and more - ranked from{' '}
       <b style={{ color: 'var(--hcp-t-100)', fontWeight: 700 }}>official WHS scores</b>{' '}
       at this course, {window === 'all_time' ? 'all time' : 'over the last 90 days'}.
     </p>
@@ -74,7 +74,7 @@ const ProvenanceContent: React.FC<{ onSync: () => void; isSynced: boolean }> = (
     <p style={{ fontSize: 12, fontWeight: 500, color: 'var(--hcp-t-60)', lineHeight: 1.55, margin: 0 }}>
       That ace only counts if it's on your{' '}
       <b style={{ color: 'var(--hcp-t-100)', fontWeight: 700 }}>official handicap record</b>.
-      Log every round with your club or golf union to register it on your WHS record — no logged rounds, no crowns.
+      Log every round with your club or golf union to register it on your WHS record - no logged rounds, no crowns.
       {!isSynced && (
         <>{' '}
           <b
