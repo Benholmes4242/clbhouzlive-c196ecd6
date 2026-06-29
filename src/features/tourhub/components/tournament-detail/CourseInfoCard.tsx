@@ -67,13 +67,13 @@ export function CourseInfoCard({ tournament, courseId }: CourseInfoCardProps) {
       </div>
 
       {cityLine && (
-        <div style={{ fontSize: 12, fontWeight: 600, color: INK_MUTE, marginTop: 2 }}>
+        <div style={{ fontSize: 12, fontWeight: 600, color: INK_MUTE, marginTop: 2, padding: '0 16px' }}>
           {cityLine}
         </div>
       )}
 
       {stats.length > 0 && (
-        <div style={{ display: 'flex', gap: 28, marginTop: 14 }}>
+        <div style={{ display: 'flex', gap: 28, marginTop: 14, padding: '0 16px' }}>
           {stats.map(([label, value]) => (
             <div key={label}>
               <span style={{
@@ -89,7 +89,7 @@ export function CourseInfoCard({ tournament, courseId }: CourseInfoCardProps) {
       )}
 
       {courseId && tournament.venue_course_name && (
-        <div style={{ marginTop: 14 }}>
+        <div style={{ marginTop: 14, padding: '0 16px' }}>
           <ConnectHandicapCue variant="tour-venue" courseName={tournament.venue_course_name} />
         </div>
       )}
