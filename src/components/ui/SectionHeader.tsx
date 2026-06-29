@@ -48,6 +48,8 @@ interface SectionHeaderProps {
   mark?: ReactNode;
   /** Right-side action affordance. */
   action?: { label: string; onClick: () => void };
+  /** Non-interactive right-aligned caps text (e.g. "FRI 19 JUN", "SCORE DIFF VS HCP"). */
+  meta?: ReactNode;
   /** Tier-2 eyebrow colour. 'slate' default (#64748B) | 'amber' (#c97a10) | 'danger' (#DC2626). */
   tone?: EyebrowTone;
   /** Optional inline count rendered after the eyebrow (slate-400, tabular). */
@@ -59,6 +61,11 @@ interface SectionHeaderProps {
   paddingTop?: number;
   paddingX?: number;
   className?: string;
+  /**
+   * Surface theme. Default 'light' (white surfaces, ink title, slate eyebrow).
+   * 'dark' uses --hcp-* theme tokens for eyebrow/title; cut-line stays amber.
+   */
+  surface?: 'light' | 'dark';
   /**
    * Accent colour for the eyebrow + cut-line. Defaults to amber.
    * Reserved for pure-data surfaces that align the header to a semantic scale
@@ -100,6 +107,28 @@ function ActionAffordance({
   );
 }
 
+function MetaSlot({ children }: { children: ReactNode }) {
+  return (
+    <span
+      style={{
+        fontFamily: GEIST,
+        fontSize: 10,
+        fontWeight: 700,
+        letterSpacing: '0.12em',
+        textTransform: 'uppercase',
+        color: 'var(--hcp-t-40, #94A3B8)',
+        fontVariantNumeric: 'tabular-nums',
+        fontFeatureSettings: '"kern" 1, "liga" 1',
+        whiteSpace: 'nowrap',
+      }}
+    >
+      {children}
+    </span>
+  );
+}
+
+
+
 function SectionHeaderInner(props: SectionHeaderProps) {
   const {
     tier: tierProp,
@@ -109,6 +138,7 @@ function SectionHeaderInner(props: SectionHeaderProps) {
     sub,
     icon: Icon,
     action,
+    meta,
     tone,
     count,
     required,
@@ -117,9 +147,13 @@ function SectionHeaderInner(props: SectionHeaderProps) {
     paddingX = 0,
     className,
     accent,
+    surface = 'light',
   } = props;
 
   const role: Role = roleProp ?? TIER_TO_ROLE[tierProp ?? 'standard'];
+  const isDark = surface === 'dark';
+  const titleColor = isDark ? 'var(--hcp-t-100)' : INK;
+  const subColor = isDark ? 'var(--hcp-t-60)' : INK_MUTE;
 
   const pad = { paddingTop, paddingLeft: paddingX, paddingRight: paddingX };
 
@@ -144,7 +178,7 @@ function SectionHeaderInner(props: SectionHeaderProps) {
             fontSize: 19,
             fontWeight: 800,
             letterSpacing: '-0.01em',
-            color: INK,
+            color: titleColor,
           }}
         >
           {title}
@@ -160,7 +194,11 @@ function SectionHeaderInner(props: SectionHeaderProps) {
   const titleTracking = isPrime ? '-0.02em' : '-0.02em';
   const cutWidth = isPrime ? 34 : 22;
   const cutHeight = isPrime ? 3 : 2;
-  const defaultEyebrowColor = isPrime ? AMBER_AA : '#94A3B8';
+  const defaultEyebrowColor = isPrime
+    ? AMBER_AA
+    : isDark
+      ? 'var(--hcp-t-60)'
+      : '#94A3B8';
   const eyebrowColor = accent ?? (tone ? EYEBROW_TONE[tone] : defaultEyebrowColor);
   const cutColor = accent ?? AMBER;
 
@@ -218,6 +256,7 @@ function SectionHeaderInner(props: SectionHeaderProps) {
             )}
           </div>
           {!hasTitle && action && <ActionAffordance action={action} />}
+          {!hasTitle && !action && meta && <MetaSlot>{meta}</MetaSlot>}
         </div>
       )}
       {hasTitle && (
@@ -236,13 +275,13 @@ function SectionHeaderInner(props: SectionHeaderProps) {
               fontSize: titleSize,
               fontWeight: 800,
               letterSpacing: titleTracking,
-              color: INK,
+              color: titleColor,
               lineHeight: 1.15,
             }}
           >
             {title}
           </h2>
-          {action && <ActionAffordance action={action} />}
+          {action ? <ActionAffordance action={action} /> : meta ? <MetaSlot>{meta}</MetaSlot> : null}
         </div>
       )}
 
@@ -263,7 +302,7 @@ function SectionHeaderInner(props: SectionHeaderProps) {
             fontFamily: GEIST,
             fontSize: 13,
             fontWeight: 500,
-            color: INK_MUTE,
+            color: subColor,
             lineHeight: 1.4,
           }}
         >

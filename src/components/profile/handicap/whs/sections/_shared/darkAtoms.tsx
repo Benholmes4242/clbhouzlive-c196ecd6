@@ -41,17 +41,29 @@ export function verdictForDelta(
   return isPositive ? 'bad' : 'good';
 }
 
-// ── Section header (replaces light SectionHeader for dark zone) ────
+// ── Section header (dark shim over canonical SectionHeader) ───────
+//
+// Path A (convergence): DarkSectionHeader is now a thin adapter that
+// renders SectionHeader with `surface="dark"`. Geometry is therefore
+// identical to light surfaces (11px/0.14em/800 eyebrow, 20px title,
+// 22×2 amber cut-line). Eyebrow & title colours pull from --hcp-*
+// tokens so they remain legible on the charcoal surface.
+//
+// Prop mapping (legacy → canonical):
+//   eyebrow → kicker
+//   right   → meta (non-interactive right-aligned caps text)
+//   title, sub → passthrough
+//   withDot → no-op (unused at callsites; legacy amber-bullet kept
+//             out of canonical to preserve geometry parity)
+
+import { SectionHeader } from '@/components/ui/SectionHeader';
 
 export interface DarkSectionHeaderProps {
   eyebrow: string;
   title?: React.ReactNode;
   sub?: string;
   right?: React.ReactNode;
-  /**
-   * Render the amber bullet via .hcp-eyebrow::before. Opt-IN — most
-   * sections render dotless for a cleaner read.
-   */
+  /** @deprecated no-op under the canonical shim; retained for API compat. */
   withDot?: boolean;
 }
 
@@ -60,75 +72,17 @@ export const DarkSectionHeader: React.FC<DarkSectionHeaderProps> = ({
   title,
   sub,
   right,
-  withDot = false,
 }) => (
-  <>
-    <div
-      style={{
-        display: 'flex',
-        alignItems: 'baseline',
-        justifyContent: 'space-between',
-        padding: '22px 16px 8px',
-        fontFamily: FONT,
-      }}
-    >
-      <span
-        className={withDot ? 'hcp-eyebrow' : undefined}
-        style={!withDot ? {
-          textTransform: 'uppercase',
-          fontSize: 10.5,
-          letterSpacing: '0.16em',
-          fontWeight: 700,
-          color: 'var(--hcp-t-60)',
-        } : undefined}
-      >
-        {eyebrow}
-      </span>
-      {right && (
-        <span
-          style={{
-            textTransform: 'uppercase',
-            fontSize: 10,
-            letterSpacing: '0.12em',
-            color: 'var(--hcp-t-40)',
-            fontWeight: 600,
-          }}
-        >
-          {right}
-        </span>
-      )}
-    </div>
-    {title && (
-      <h2
-        style={{
-          padding: '0 16px 4px',
-          fontSize: 19,
-          fontWeight: 800,
-          letterSpacing: '-0.018em',
-          lineHeight: 1.2,
-          color: 'var(--hcp-t-100)',
-          margin: 0,
-          fontFamily: FONT,
-        }}
-      >
-        {title}
-      </h2>
-    )}
-    {sub && (
-      <p
-        style={{
-          padding: '0 16px 12px',
-          fontSize: 12.5,
-          color: 'var(--hcp-t-60)',
-          lineHeight: 1.5,
-          margin: 0,
-          fontFamily: FONT,
-        }}
-      >
-        {sub}
-      </p>
-    )}
-  </>
+  <SectionHeader
+    surface="dark"
+    role="section"
+    kicker={eyebrow}
+    title={typeof title === 'string' ? title : title ? String(title) : undefined}
+    sub={sub}
+    meta={right}
+    paddingTop={22}
+    paddingX={16}
+  />
 );
 
 // ── Card wrapper ───────────────────────────────────────────────────
