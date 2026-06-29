@@ -5,7 +5,7 @@ import { useUserHomeClubCourses } from '@/hooks/gam/useUserHomeClubCourses';
 import type { LegendCategory } from '@/lib/gam/types';
 import type { CourseLegendHolderRow } from '@/hooks/gam/useCourseLegendHolders';
 import { Skeleton, EmptyStub } from '../../../../gam/_shared/GamAtoms';
-import SectionHeader from '@/components/ui/SectionHeader';
+import { DarkSectionHeader } from '../../_shared/darkAtoms';
 import CourseLegendsCard from '../CourseLegendsCard';
 import type { CourseSelection } from '../types';
 
@@ -134,7 +134,7 @@ export const HomeClubSubsection: React.FC<Props> = ({
   if (query.isLoading) {
     return (
       <>
-        <div style={{ marginTop: 24 }}><SectionHeader tier="standard" kicker="HOME CLUB" paddingX={16} /></div>
+        <div style={{ marginTop: 24 }}><DarkSectionHeader eyebrow="HOME CLUB" /></div>
         <div style={{ padding: '0 16px' }}>
           <Skeleton height={220} radius={14} />
         </div>
@@ -151,7 +151,7 @@ export const HomeClubSubsection: React.FC<Props> = ({
   if (homeClubName && courses.length === 0) {
     return (
       <>
-        <div style={{ marginTop: 24 }}><SectionHeader tier="standard" kicker={`HOME CLUB · ${homeClubName.toUpperCase()}`} paddingX={16} /></div>
+        <div style={{ marginTop: 24 }}><DarkSectionHeader eyebrow={`HOME CLUB · ${homeClubName.toUpperCase()}`} /></div>
         <div style={{ padding: '0 16px' }}>
           <EmptyStub
             title="Courses not found"
@@ -173,7 +173,7 @@ export const HomeClubSubsection: React.FC<Props> = ({
 
   return (
     <>
-      <div style={{ marginTop: 24 }}><SectionHeader tier="standard" kicker={`HOME CLUB · ${(homeClubName || '').toUpperCase()}`} paddingX={16} /></div>
+      <div style={{ marginTop: 24 }}><DarkSectionHeader eyebrow={`HOME CLUB · ${(homeClubName || '').toUpperCase()}`} /></div>
       <div style={{ padding: '0 16px', display: 'flex', flexDirection: 'column', gap: 10 }}>
         {populatedCourses.map((c) => (
           <CourseLegendsCard
