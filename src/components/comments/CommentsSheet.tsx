@@ -699,12 +699,13 @@ function CommentsSheet({
           >
             {/* Drag handle */}
             <div className="flex justify-center pt-2.5 pb-1 shrink-0">
-              <div style={{ width: 36, height: 4, borderRadius: 2, background: 'rgba(15,23,42,0.12)' }} />
+              <div style={{ width: 36, height: 4, borderRadius: 99, background: 'rgba(15,23,42,0.12)' }} />
             </div>
 
             {/* Header */}
             <div className="flex items-end justify-between px-4 pt-3 pb-0 shrink-0">
               {/* Left: tabs with inline counts */}
+              {/* Primary nav tabs (underline intentional) — NOT SegmentedTabs sub-tabs. Do not convert. */}
               <div className="flex items-end gap-6">
                 {(['comments', 'likes'] as const).map((tab) => {
                   const isActive = activeTab === tab;
@@ -729,7 +730,7 @@ function CommentsSheet({
                           color: isActive ? INK : '#64748B',
                           lineHeight: 1.2,
                           paddingBottom: 4,
-                          borderBottom: isActive ? '1.5px solid #0A0E14' : '1.5px solid transparent',
+                          borderBottom: isActive ? '1.5px solid #0F172A' : '1.5px solid transparent',
                         }}
                       >
                         {label}
@@ -814,7 +815,7 @@ function CommentsSheet({
                       <MentionText
                         text={cleanCaption}
                         className="text-[13px] leading-[18px] line-clamp-2"
-                        mentionClassName="font-semibold [color:#E8980A]"
+                        mentionClassName="font-semibold [color:#c97a10]"
                       />
                     </div>
                   )}
