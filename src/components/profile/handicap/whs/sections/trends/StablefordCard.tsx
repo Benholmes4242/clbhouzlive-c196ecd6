@@ -41,10 +41,10 @@ const T = {
 const FONT = 'Geist, -apple-system, BlinkMacSystemFont, system-ui, sans-serif';
 
 const HOLE_C = {
-  birdie: '#DC2626',
-  par: '#94A3B8',
-  bogey: '#2563EB',
-  double: '#1E3A5F',
+  birdie: SC_BIRDIE,
+  par: SC_PAR,
+  bogey: SC_BOGEY,
+  double: SC_DOUBLE,
 };
 
 const SECTION_STYLE: React.CSSProperties = {
