@@ -404,8 +404,8 @@ async function processPostJob(jobId: string, job: any): Promise<void> {
       badges: job.badges || [],
       // Scheduling support
       scheduledAt: job.scheduledAt || null,
-      // Always start as 'uploading' — set 'published' or 'scheduled' only in finalizePost after all media uploaded
-      status: 'uploading',
+      // Always start as 'processing' — set 'published' or 'scheduled' only in finalizePost after all media uploaded
+      status: 'processing',
     });
 
     const postId = postData.id;
