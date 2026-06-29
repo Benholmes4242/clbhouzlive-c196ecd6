@@ -227,12 +227,7 @@ export function HoleStatsTab({ tournamentId, isCompleted, courseId, courseName }
 
       {/* Section eyebrow */}
       <div style={{ background: SLATE_50, borderTop: `0.5px solid ${INK_TINT_07}`, padding: '14px 16px 10px' }}>
-        <span style={{
-          fontSize: 9, fontWeight: 800, color: INK_MUTE,
-          letterSpacing: '0.16em', textTransform: 'uppercase',
-        }}>
-          Hole Stats · {roundLabel}
-        </span>
+        <SectionHeader role="section" kicker={`HOLE STATS · ${roundLabel.toUpperCase()}`} accent={SC_ACCENT} paddingX={0} className="!mb-0" />
       </div>
 
       {/* Round selector */}
