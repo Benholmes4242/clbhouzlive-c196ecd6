@@ -1815,63 +1815,21 @@ function SelectedDot() {
   );
 }
 
-function BottomSheet({
-  open,
-  onClose,
-  title,
-  children,
-}: {
-  open: boolean;
-  onClose: () => void;
-  title: string;
-  children: React.ReactNode;
-}) {
+function SheetEyebrow({ children }: { children: React.ReactNode }) {
   return (
-    <AnimatePresence>
-      {open && (
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
-          style={{
-            position: 'fixed',
-            inset: 0,
-            background: 'rgba(0,0,0,0.4)',
-            zIndex: 10000,
-          }}
-          onClick={onClose}
-        >
-          <motion.div
-            initial={{ y: '100%' }}
-            animate={{ y: 0 }}
-            exit={{ y: '100%' }}
-            transition={{ type: 'spring', damping: 28, stiffness: 300 }}
-            onClick={(e) => e.stopPropagation()}
-            style={{
-              position: 'absolute',
-              left: 0,
-              right: 0,
-              bottom: 0,
-              background: SURFACE,
-              borderRadius: '20px 20px 0 0',
-              paddingBottom: 'env(safe-area-inset-bottom, 16px)',
-              maxHeight: '80vh',
-              overflow: 'hidden',
-            }}
-          >
-            <div style={{ display: 'flex', justifyContent: 'center', padding: '10px 0 4px' }}>
-              <div style={{ width: 36, height: 4, borderRadius: 2, background: 'rgba(15,23,42,0.12)' }} />
-            </div>
-            <div style={{ padding: '8px 20px 12px' }}>
-              <div style={{ fontSize: 11, fontWeight: 900, color: '#CBD5E1', letterSpacing: '0.14em', textTransform: 'uppercase' }}>
-                {title}
-              </div>
-            </div>
-            <div style={{ overflowY: 'auto', maxHeight: 'calc(80vh - 60px)' }}>{children}</div>
-          </motion.div>
-        </motion.div>
-      )}
-    </AnimatePresence>
+    <div style={{ padding: '8px 20px 12px' }}>
+      <div
+        style={{
+          fontSize: 11,
+          fontWeight: 800,
+          color: '#94A3B8',
+          letterSpacing: '0.14em',
+          textTransform: 'uppercase',
+        }}
+      >
+        {children}
+      </div>
+    </div>
   );
 }
 
