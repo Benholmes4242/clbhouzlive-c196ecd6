@@ -6,7 +6,8 @@ import {
   type StablefordScope,
 } from './computeStablefordDistribution';
 import StablefordDetailSheet from './StablefordDetailSheet';
-import { SectionHeader } from '@/components/ui/SectionHeader';
+import { DarkSectionHeader } from '../_shared/darkAtoms';
+import { SC_BIRDIE, SC_PAR, SC_BOGEY, SC_DOUBLE } from '@/features/courses/components/holes/_constants';
 import { useTrophyAggregates } from '@/lib/whs/hooks';
 
 interface Props {
