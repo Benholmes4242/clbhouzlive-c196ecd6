@@ -204,12 +204,12 @@ function getContextUrl(notification: any): string {
     return actor_id ? `/profile/${actor_id}` : '/';
   }
   // Friend/business course review
-  if ((type === 'friend_course_review' || type === 'course_review' || type === 'business_course_review') && data?.course_id) {
+  if ((type === 'friend_course_review' || type === 'course_review' || type === 'course_review_received') && data?.course_id) {
     const reviewId = data?.review_id || entity_id;
     return `/courses/${data.course_id}?tab=reviews&review=${reviewId}`;
   }
-  // Review response
-  if (type === 'review_response' && data?.course_id) {
+  // Review response posted (back to the reviewer)
+  if (type === 'review_response_posted' && data?.course_id) {
     const reviewId = data?.review_id || entity_id;
     return `/courses/${data.course_id}?tab=reviews&review=${reviewId}`;
   }
