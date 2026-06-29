@@ -54,6 +54,8 @@ export const InsightsGrid: React.FC<Props> = ({ insights }) => {
                 borderRadius: 14,
                 padding: '12px 14px',
                 fontFamily: FONT,
+                marginLeft: i === 0 ? 16 : 0,
+                marginRight: i === insights.length - 1 ? 16 : 0,
               }}
             >
               <div
