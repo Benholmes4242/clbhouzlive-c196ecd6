@@ -14,9 +14,19 @@ export const uploadToCloudflareR2 = async (
   originalFileName?: string
 ): Promise<CloudflareUploadResult> => {
   try {
+    // Offline guard — surface a clear connection error instead of
+    // a misleading "Not authenticated" when getSession() fails because
+    // the network is down.
+    if (typeof navigator !== 'undefined' && navigator.onLine === false) {
+      throw new Error('No connection - reconnect and try again');
+    }
+
     // Get the current session
     const { data: { session } } = await supabase.auth.getSession();
     if (!session) {
+      if (typeof navigator !== 'undefined' && navigator.onLine === false) {
+        throw new Error('No connection - reconnect and try again');
+      }
       throw new Error('User not authenticated');
     }
 

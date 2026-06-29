@@ -43,6 +43,16 @@ export const PendingPostCard: React.FC<PendingPostCardProps> = ({ entry, theme =
 
   const handleRetry = useCallback(async () => {
     if (retrying) return;
+
+    // Offline guard — don't even try while offline; the auth check inside
+    // the upload path would falsely surface "Not authenticated".
+    if (typeof navigator !== 'undefined' && navigator.onLine === false) {
+      usePendingPostsStore
+        .getState()
+        .markFailed(entry.jobId, 'No connection - reconnect and try again');
+      return;
+    }
+
     setRetrying(true);
 
     try {
@@ -185,7 +195,15 @@ export const PendingPostCard: React.FC<PendingPostCardProps> = ({ entry, theme =
                     position: 'relative',
                   }}
                 >
-                  {firstMedia && (
+                  {m.kind === 'video' ? (
+                    <video
+                      src={`${m.previewUrl}#t=0.1`}
+                      muted
+                      playsInline
+                      preload="metadata"
+                      style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                    />
+                  ) : (
                     <img
                       src={m.previewUrl}
                       alt=""
