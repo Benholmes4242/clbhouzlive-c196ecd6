@@ -20,14 +20,15 @@ import { getCollegeLogoUrl } from '@/utils/collegeLogo';
 import { useCollegeRivalries } from '../../hooks/useCollegeMovers';
 import { collegeH2HRoute } from '../../routes';
 import { PlayerInitialAvatar } from '../shared/PlayerInitialAvatar';
-import { AMBER, HAIRLINE_INK_8, INK, INK_FAINT, INK_MUTE, INK_TINT_06, INK_TINT_07, SLATE_50, SURFACE } from '../../_shared/tokens';
+import { SectionHeader } from '@/components/ui/SectionHeader';
+import { HAIRLINE_INK_8, INK, INK_FAINT, INK_MUTE, INK_TINT_06, INK_TINT_07, SLATE_50, SURFACE } from '../../_shared/tokens';
 
 interface H2HRivalStripProps {
   normalizedName: string;
   className?: string;
 }
 
-const SECTION_PADDING = '14px 16px 0';
+const SECTION_PADDING_X = 16;
 
 export function H2HRivalStrip({ normalizedName, className }: H2HRivalStripProps) {
   const { data: rivalries, isLoading } = useCollegeRivalries(normalizedName);
@@ -36,7 +37,13 @@ export function H2HRivalStrip({ normalizedName, className }: H2HRivalStripProps)
     return (
       <div className={className} style={{ background: SLATE_50, borderTop: `0.5px solid ${INK_TINT_07}` }}>
 
-        <SectionHeader />
+        <SectionHeader
+          role="section"
+          kicker="HEAD-TO-HEAD"
+          sub="Compare with another program"
+          paddingX={SECTION_PADDING_X}
+          paddingTop={14}
+        />
         <div style={{ display: 'flex', gap: 10, padding: '4px 16px 16px', overflowX: 'auto' }}>
           {[1, 2, 3].map(i => (
             <div key={i} className="animate-pulse" style={{ flexShrink: 0, width: 168, height: 78, borderRadius: 12, background: INK_TINT_06 }} />
@@ -51,7 +58,13 @@ export function H2HRivalStrip({ normalizedName, className }: H2HRivalStripProps)
 
   return (
     <div className={className} style={{ background: SLATE_50, borderTop: `0.5px solid ${INK_TINT_07}` }}>
-      <SectionHeader />
+      <SectionHeader
+        role="section"
+        kicker="HEAD-TO-HEAD"
+        sub="Compare with another program"
+        paddingX={SECTION_PADDING_X}
+        paddingTop={14}
+      />
       <div
         style={{
           display: 'flex', gap: 10,
@@ -104,7 +117,7 @@ export function H2HRivalStrip({ normalizedName, className }: H2HRivalStripProps)
                   {subtitle}
                 </div>
               </div>
-              <ArrowLeftRight size={13} strokeWidth={2.5} style={{ color: AMBER, flexShrink: 0 }} />
+              <ArrowLeftRight size={13} strokeWidth={2.5} style={{ color: INK_MUTE, flexShrink: 0 }} />
             </Link>
           );
         })}
@@ -128,21 +141,6 @@ export function H2HRivalStrip({ normalizedName, className }: H2HRivalStripProps)
           <span style={{ fontSize: 12, fontWeight: 700, color: INK }}>Browse all</span>
           <ChevronRight size={14} strokeWidth={2.5} style={{ color: INK_FAINT }} />
         </Link>
-      </div>
-    </div>
-  );
-}
-
-function SectionHeader() {
-  return (
-    <div style={{ padding: SECTION_PADDING }}>
-      <div style={{ display: 'flex', alignItems: 'center', marginBottom: 6 }}>
-        <span style={{ fontSize: 9, fontWeight: 800, color: INK_MUTE, letterSpacing: '0.16em', textTransform: 'uppercase' as const }}>
-          Head-to-Head
-        </span>
-      </div>
-      <div style={{ fontSize: 13, fontWeight: 500, color: INK_MUTE, marginBottom: 10 }}>
-        Compare with another program
       </div>
     </div>
   );

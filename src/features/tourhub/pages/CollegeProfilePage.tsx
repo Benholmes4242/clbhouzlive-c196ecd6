@@ -1,6 +1,6 @@
 import { useMemo, Fragment } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
-import { RefreshCw, AlertCircle, Crown } from 'lucide-react';
+import { RefreshCw, AlertCircle } from 'lucide-react';
 import { getCollegeLogoUrl } from '@/utils/collegeLogo';
 import { TourHubShell } from '../components/TourHubShell';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -20,7 +20,7 @@ import { collegeHubRoute } from '../routes';
 import {
   GOLD,
   GOLD_BORDER,
-  GOLD_DEEP,
+  
   GOLD_TINT,
   GOLD_TINT_10,
   INK,
@@ -91,12 +91,11 @@ export function CollegeProfilePage() {
                 marginBottom: 12,
                 flexWrap: 'wrap' as const,
               }}>
-                <Crown size={13} strokeWidth={2.5} fill={GOLD} style={{ color: GOLD_DEEP, flexShrink: 0 }} />
                 {captionMetadata.map((part, i) => (
                   <Fragment key={i}>
-                    {i > 0 && <span style={{ fontSize: 10.5, fontWeight: 800, color: INK_MUTE }}>·</span>}
+                    {i > 0 && <span style={{ fontSize: 11, fontWeight: 800, color: INK_MUTE }}>·</span>}
                     <span style={{
-                      fontSize: 10.5,
+                      fontSize: 11,
                       fontWeight: 800,
                       letterSpacing: '0.14em',
                       color: i === 0 ? INK : INK_MUTE,
@@ -197,9 +196,9 @@ export function CollegeProfilePage() {
                       {primarySuffix && <span style={{ color: INK }}>{primarySuffix}</span>}
                     </div>
                     <div style={{
-                      fontSize: 9,
+                      fontSize: 11,
                       fontWeight: 800,
-                      letterSpacing: '0.16em',
+                      letterSpacing: '0.14em',
                       color: INK_MUTE,
                       textTransform: 'uppercase' as const,
                       marginTop: 4,

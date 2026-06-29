@@ -12,20 +12,13 @@ import { useCollegeWeeklyMovers } from '../../hooks/useCollegeMovers';
 import { useCollegeAlumni } from '../../hooks/useCollegeAlumni';
 import { formatCurrency } from '@/lib/utils/formatCurrency';
 import { playerRoute } from '../../routes';
+import { SectionHeader } from '@/components/ui/SectionHeader';
 import { AMBER, INK, INK_FAINT, INK_MUTE, INK_TINT_06, INK_TINT_07, LIVE_INK, SURFACE, TREND_DOWN } from '../../_shared/tokens';
 
 interface FranchiseStoryStripProps {
   normalizedName: string;
   className?: string;
 }
-
-const EYEBROW: React.CSSProperties = {
-  fontSize: 10,
-  fontWeight: 700,
-  color: INK_MUTE,
-  letterSpacing: '0.16em',
-  textTransform: 'uppercase' as const,
-};
 
 const LABEL: React.CSSProperties = {
   fontSize: 9,
@@ -76,10 +69,8 @@ export function FranchiseStoryStrip({ normalizedName, className }: FranchiseStor
 
   return (
     <div className={className} style={{ background: SURFACE, borderTop: `0.5px solid ${INK_TINT_07}` }}>
-      {/* Eyebrow */}
-      <div style={{ padding: '10px 16px 6px' }}>
-        <span style={EYEBROW}>Franchise Dispatch</span>
-      </div>
+      {/* Eyebrow — canonical SectionHeader */}
+      <SectionHeader role="section" kicker="FRANCHISE DISPATCH" paddingX={16} paddingTop={12} />
 
       {/* This Week — compact inline row */}
       <div style={{
