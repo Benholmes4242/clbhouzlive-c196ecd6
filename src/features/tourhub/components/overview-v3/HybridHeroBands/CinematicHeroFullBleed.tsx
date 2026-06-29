@@ -584,19 +584,14 @@ export function CinematicHeroFullBleed({
             gap: 14,
           }}
         >
-          <div
-            style={{
-              borderRadius: 16,
-              boxShadow: `0 0 0 2px ${GOLD_RING}, 0 4px 18px rgba(232,194,106,0.25)`,
-            }}
-          >
-            <SquircleAvatar
-              srcCandidates={champion.avatarCandidates ?? (champion.avatarUrl ? [champion.avatarUrl] : [])}
-              alt={champion.name}
-              size={56}
-              hideRing
-            />
-          </div>
+          <SquircleAvatar
+            srcCandidates={champion.avatarCandidates ?? (champion.avatarUrl ? [champion.avatarUrl] : [])}
+            alt={champion.name}
+            size={56}
+            hideRing
+            hairlineRing
+            ringColor={GOLD_RING}
+          />
           <div style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', gap: 4 }}>
             <span
               style={{
