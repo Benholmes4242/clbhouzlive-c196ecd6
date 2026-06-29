@@ -76,14 +76,12 @@ export function LeaderboardCard({
       transition={{ duration: 0.3 }}
     >
       {showHeader && (
-        <div style={{ padding: '14px 16px 10px' }}>
-          <span style={{
-            fontSize: 9, fontWeight: 800, color: INK_MUTE,
-            letterSpacing: '0.16em', textTransform: 'uppercase',
-          }}>
-            {title}
-          </span>
-        </div>
+        <SectionHeader
+          role="section"
+          kicker={title.toUpperCase()}
+          paddingX={16}
+          action={onViewAll ? { label: 'Full Leaderboard', onClick: onViewAll } : undefined}
+        />
       )}
 
       {/* De-boxed column header */}
