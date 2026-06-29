@@ -16,6 +16,7 @@ import { uploadEventBus } from '@/uploads/uploadEventBus';
 import { formatBytes, formatDuration, formatBytesPerSecond } from '@/uploads/uploadSpeedTracker';
 import { retryJob, cancelJob, retryFailedItems } from '@/uploads/uploadPipeline';
 import { usePendingPostsStore } from '@/uploads/pendingPostsStore';
+import { useShallow } from 'zustand/react/shallow';
 import { cn } from '@/lib/utils';
 
 // Routes that render PendingPostCard inline. The banner is suppressed for
@@ -224,17 +225,21 @@ export function UploadProgressBanner() {
     typeof window !== 'undefined' ? window.location.pathname : '/'
   );
   useEffect(() => {
-    const update = () => setPathname(window.location.pathname);
+    const update = () => {
+      const next = window.location.pathname;
+      setPathname((prev) => (prev === next ? prev : next));
+    };
     window.addEventListener('popstate', update);
-    // SPA navigations via pushState don't fire popstate; poll lightly as fallback
-    const id = window.setInterval(update, 500);
+    const id = window.setInterval(update, 1000);
     return () => {
       window.removeEventListener('popstate', update);
       window.clearInterval(id);
     };
   }, []);
   const suppressPostUploads = routeRendersPendingCards(pathname);
-  const pendingPostJobIds = usePendingPostsStore((s) => Object.keys(s.byJobId));
+  const pendingPostJobIds = usePendingPostsStore(
+    useShallow((s) => Object.keys(s.byJobId))
+  );
 
   const visibleUploads = activeUploads.filter((u) => {
     if (dismissedJobs.has(u.jobId)) return false;
