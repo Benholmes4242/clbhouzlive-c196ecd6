@@ -419,6 +419,16 @@ async function processPostJob(jobId: string, job: any): Promise<void> {
     console.log('[UPLOAD-DEBUG][rls] created row', { postId, status: postData.status, visibility: postData.visibility });
     console.log(`[uploadPipeline] Created post ${postId} for job ${jobId}`);
 
+    // Signal: post shell exists. Composer waits/closes on this.
+    uploadEventBus.emit('post:shell-created', {
+      type: 'post:shell-created',
+      jobId,
+      postId,
+      actorType: job.actorType,
+      actorId: job.actorId,
+      hasMedia: (job.files?.length ?? 0) > 0 || hasCompiledVideo || hasRestoredMedia,
+    });
+
     // Handle compiled video specially (no file upload needed)
     if (hasCompiledVideo) {
       const compiledMedia = job.mediaItems?.find(m => m.compiledVideo);
