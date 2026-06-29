@@ -9,8 +9,8 @@ import {
   BG_2,
   LINE,
   LINE_2,
-  
 } from './_shared/tokens';
+import { DarkSectionHeader } from '@/components/profile/handicap/whs/sections/_shared/darkAtoms';
 import { RoundCard } from './RoundCard';
 import type { FriendRivalryHydrated } from '@/lib/whs/types';
 import type { RivalryDimension } from '@/lib/whs/utils/useRivalryDimension';
