@@ -99,8 +99,9 @@ export function useHeroCarouselData() {
         .map(t => t.defending_champion)
         .filter((name): name is string => !!name);
 
-      // Fetch winner details, leaderboard data, and defending champion photos in parallel
-      const [winnersResult, leaderboardResult, defendingChampionResult] = await Promise.all([
+      // Fetch winner details, leaderboard data, defending champion photos,
+      // AND confirmed event_winners rows in parallel.
+      const [winnersResult, leaderboardResult, defendingChampionResult, eventWinnersResult] = await Promise.all([
         winnerSrIds.length > 0
           ? supabase
               .from('sr_players')
@@ -111,7 +112,7 @@ export function useHeroCarouselData() {
           ? supabase
               .from('sr_leaderboards')
               .select(`
-                tournament_id, position, score,
+                tournament_id, position, position_tied, score,
                 player:sr_players!sr_leaderboards_player_id_fkey(sr_id, first_name, last_name, photo_url, pga_tour_id),
                 team:sr_teams!sr_leaderboards_team_id_fkey(
                   sr_id, display_name, abbr_name,
@@ -135,6 +136,13 @@ export function useHeroCarouselData() {
                   return `and(first_name.ilike.${first},last_name.ilike.${last})`;
                 }).join(',')
               )
+          : Promise.resolve({ data: [] }),
+        allTournamentIds.length > 0
+          ? supabase
+              .from('event_winners')
+              .select('tournament_id, player_id')
+              .in('tournament_id', allTournamentIds)
+              .not('player_id', 'is', null)
           : Promise.resolve({ data: [] }),
       ]);
 
