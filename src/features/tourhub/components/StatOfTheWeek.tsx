@@ -588,14 +588,15 @@ export const StatOfTheWeek = memo(function StatOfTheWeek() {
               background: 'transparent',
               border: 'none',
               padding: 0,
-              color: AMBER,
-              fontSize: 12,
+              color: '#0F172A',
+              fontSize: 13,
               fontWeight: 700,
               cursor: 'pointer',
               marginLeft: 'auto',
             }}
           >
-            See full leaderboard <ChevronRight size={13} />
+            See full leaderboard <ChevronRight size={14} strokeWidth={2.5} />
+
           </button>
         </div>
       </section>
