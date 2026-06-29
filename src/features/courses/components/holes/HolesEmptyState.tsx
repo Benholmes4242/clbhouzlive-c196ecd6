@@ -48,7 +48,7 @@ export const HolesEmptyState: React.FC<{ courseName: string | null }> = ({ cours
       Hole insights are coming
     </div>
     <div style={{ fontSize: 13.5, color: SLATE, lineHeight: 1.55, maxWidth: 310, margin: '0 auto 22px' }}>
-      When England Golf members log rounds with hole scores at{' '}
+      When Global Golfers holding official WHS handicaps log rounds with hole scores at{' '}
       <strong style={{ color: INK, fontWeight: 700 }}>{courseName ?? 'this course'}</strong>, we'll
       break down every hole — average score, hardest and easiest, and the full birdie-to-double spread.
     </div>
