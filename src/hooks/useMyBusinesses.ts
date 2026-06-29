@@ -16,6 +16,7 @@ export interface BusinessMembership {
     logo_url: string | null;
     is_verified: boolean;
     is_deleted: boolean | null;
+    club_id: string | null;
   };
 }
 
@@ -44,7 +45,8 @@ export function useMyBusinesses(userProfileId?: string) {
             country,
             logo_url,
             is_verified,
-            is_deleted
+            is_deleted,
+            club_id
           )
         `)
         .eq('user_profile_id', userProfileId);
