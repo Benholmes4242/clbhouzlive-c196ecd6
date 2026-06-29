@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/button';
 import { Globe, Copy, ExternalLink, Check } from 'lucide-react';
 import { toast } from 'sonner';
 import { motion } from 'framer-motion';
+import { openExternalUrl } from '@/utils/median/openExternalUrl';
 
 interface ExternalLinkSheetProps {
   isOpen: boolean;
@@ -43,7 +44,7 @@ export const ExternalLinkSheet: React.FC<ExternalLinkSheetProps> = ({
   };
 
   const handleOpenWebsite = () => {
-    window.open(url, '_blank', 'noopener,noreferrer');
+    openExternalUrl(url);
     onClose();
   };
 
