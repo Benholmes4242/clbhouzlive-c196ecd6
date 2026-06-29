@@ -216,8 +216,24 @@ export function UploadProgressBanner() {
   // Suppress post-type uploads on routes that render a PendingPostCard
   // (profile + business profile + watch/videos). Review uploads still
   // surface everywhere as they have no in-feed equivalent.
-  const location = useLocation();
-  const suppressPostUploads = routeRendersPendingCards(location.pathname);
+  //
+  // UploadProgressBanner mounts ABOVE BrowserRouter, so useLocation() is
+  // unavailable. Read pathname directly and keep it fresh via popstate +
+  // a light interval for SPA pushState navigations.
+  const [pathname, setPathname] = useState(() =>
+    typeof window !== 'undefined' ? window.location.pathname : '/'
+  );
+  useEffect(() => {
+    const update = () => setPathname(window.location.pathname);
+    window.addEventListener('popstate', update);
+    // SPA navigations via pushState don't fire popstate; poll lightly as fallback
+    const id = window.setInterval(update, 500);
+    return () => {
+      window.removeEventListener('popstate', update);
+      window.clearInterval(id);
+    };
+  }, []);
+  const suppressPostUploads = routeRendersPendingCards(pathname);
   const pendingPostJobIds = usePendingPostsStore((s) => Object.keys(s.byJobId));
 
   const visibleUploads = activeUploads.filter((u) => {
