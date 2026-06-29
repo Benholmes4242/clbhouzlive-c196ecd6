@@ -7,9 +7,10 @@ import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import type { TourTournament } from '../../hooks/useTourHubData';
 import {
-  AMBER, INK, INK_FAINT, INK_MUTE, INK_TINT_07, SLATE_50,
+  INK, INK_FAINT, INK_MUTE, INK_TINT_07, SLATE_50,
 } from '../../_shared/tokens';
 import { ConnectHandicapCue } from '@/components/courses/course-detail/ConnectHandicapCue';
+import { SectionHeader } from '@/components/ui/SectionHeader';
 
 interface CourseInfoCardProps {
   tournament: TourTournament;
@@ -46,36 +47,33 @@ export function CourseInfoCard({ tournament, courseId }: CourseInfoCardProps) {
 
   return (
     <motion.div
-      style={{ background: SLATE_50, borderTop: `0.5px solid ${INK_TINT_07}`, padding: '14px 16px 16px' }}
+      style={{ background: SLATE_50, borderTop: `0.5px solid ${INK_TINT_07}`, padding: '0 0 16px' }}
       initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.3 }}
     >
-      <div style={{ marginBottom: 12 }}>
-        <span style={{
-          fontSize: 9, fontWeight: 800, color: INK_MUTE,
-          letterSpacing: '0.16em', textTransform: 'uppercase',
-        }}>Course</span>
+      <SectionHeader role="section" kicker="COURSE" paddingX={16} />
+
+      <div style={{ padding: '0 16px' }}>
+        <NameTag
+          {...(nameProps as any)}
+          style={{
+            fontSize: 16, fontWeight: 800,
+            color: INK,
+            textDecoration: 'none', display: 'block',
+          }}
+          className={courseLink ? 'active:opacity-70 transition-opacity' : undefined}
+        >
+          {venueName}
+        </NameTag>
       </div>
 
-      <NameTag
-        {...(nameProps as any)}
-        style={{
-          fontSize: 16, fontWeight: 800,
-          color: courseLink ? AMBER : INK,
-          textDecoration: 'none', display: 'block',
-        }}
-        className={courseLink ? 'active:opacity-70 transition-opacity' : undefined}
-      >
-        {venueName}
-      </NameTag>
-
       {cityLine && (
-        <div style={{ fontSize: 12, fontWeight: 600, color: INK_MUTE, marginTop: 2 }}>
+        <div style={{ fontSize: 12, fontWeight: 600, color: INK_MUTE, marginTop: 2, padding: '0 16px' }}>
           {cityLine}
         </div>
       )}
 
       {stats.length > 0 && (
-        <div style={{ display: 'flex', gap: 28, marginTop: 14 }}>
+        <div style={{ display: 'flex', gap: 28, marginTop: 14, padding: '0 16px' }}>
           {stats.map(([label, value]) => (
             <div key={label}>
               <span style={{
@@ -91,7 +89,7 @@ export function CourseInfoCard({ tournament, courseId }: CourseInfoCardProps) {
       )}
 
       {courseId && tournament.venue_course_name && (
-        <div style={{ marginTop: 14 }}>
+        <div style={{ marginTop: 14, padding: '0 16px' }}>
           <ConnectHandicapCue variant="tour-venue" courseName={tournament.venue_course_name} />
         </div>
       )}

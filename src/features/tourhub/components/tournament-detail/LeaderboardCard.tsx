@@ -8,9 +8,10 @@ import { motion } from 'framer-motion';
 import CountryFlag from '@/components/ui/country-flag';
 import { playerRoute } from '../../routes';
 import {
-  AMBER_SOFT_BG, GOLD_DEEP, INK, INK_FAINT, INK_MUTE, INK_TINT_07,
+  AMBER_SOFT_BG, GOLD_DEEP, INK, INK_MUTE, INK_TINT_07,
   SCORE_OVER_PAR_LIGHT, SLATE_50,
 } from '../../_shared/tokens';
+import { SectionHeader } from '@/components/ui/SectionHeader';
 
 function abbrevName(full: string): string {
   const parts = full.trim().split(/\s+/);
@@ -75,14 +76,12 @@ export function LeaderboardCard({
       transition={{ duration: 0.3 }}
     >
       {showHeader && (
-        <div style={{ padding: '14px 16px 10px' }}>
-          <span style={{
-            fontSize: 9, fontWeight: 800, color: INK_MUTE,
-            letterSpacing: '0.16em', textTransform: 'uppercase',
-          }}>
-            {title}
-          </span>
-        </div>
+        <SectionHeader
+          role="section"
+          kicker={title.toUpperCase()}
+          paddingX={16}
+          action={onViewAll ? { label: 'Full Leaderboard', onClick: onViewAll } : undefined}
+        />
       )}
 
       {/* De-boxed column header */}
@@ -143,7 +142,7 @@ export function LeaderboardCard({
         );
       })}
 
-      {onViewAll && (
+      {onViewAll && !showHeader && (
         <button
           onClick={onViewAll}
           style={{
