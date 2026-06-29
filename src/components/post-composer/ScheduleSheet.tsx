@@ -171,12 +171,12 @@ export function ScheduleSheet({
         <label
           style={{
             display: 'block',
-            fontSize: 12,
-            fontWeight: 700,
+            fontSize: 11,
+            fontWeight: 800,
             color: INK_MUTE,
             marginBottom: 6,
             textTransform: 'uppercase',
-            letterSpacing: '0.04em',
+            letterSpacing: '0.14em',
           }}
         >
           Date &amp; time
