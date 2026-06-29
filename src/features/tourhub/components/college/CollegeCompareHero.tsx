@@ -1,4 +1,5 @@
 import { Link } from 'react-router-dom';
+import SectionHeader from '@/components/ui/SectionHeader';
 import { getCollegeLogoUrl } from '@/utils/collegeLogo';
 import { getPlayerHeadshotCandidates } from '@/utils/playerHeadshot';
 import { PlayerInitialAvatar } from '../shared/PlayerInitialAvatar';
