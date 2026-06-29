@@ -52,6 +52,19 @@ export interface ReviewRatingCreatedEvent {
   hasMedia: boolean; // True if media uploads are pending
 }
 
+/**
+ * Emitted immediately after a post row is created in the DB (status='processing').
+ * Lets the composer / UI navigate away as soon as the row exists.
+ */
+export interface PostShellCreatedEvent {
+  type: 'post:shell-created';
+  jobId: string;
+  postId: string;
+  actorType: 'personal' | 'business';
+  actorId: string;
+  hasMedia: boolean;
+}
+
 export interface UploadFailedEvent {
   type: 'upload:failed';
   jobId: string;
@@ -128,6 +141,7 @@ export type UploadEvent =
   | UploadFailedEvent
   | UploadPartialFailureEvent
   | ReviewRatingCreatedEvent
+  | PostShellCreatedEvent
   | FileUploadStartEvent
   | FileUploadProgressEvent
   | FileUploadCompleteEvent

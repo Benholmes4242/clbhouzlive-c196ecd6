@@ -99,6 +99,8 @@ export interface UploadJob {
   
   // Scheduling fields
   scheduledAt?: Date | null;
+  draftId?: string;
+  originalMediaUrls?: (string | null)[];
 
   files: File[];
   createdAt: string;
@@ -173,6 +175,10 @@ export interface UploadJobInput {
   visibility?: 'anyone' | 'followers' | 'private';
   // Scheduling
   scheduledAt?: Date | null;
+  /** Optional draft id to delete after successful publish. */
+  draftId?: string;
+  /** Parallel to `files`: pre-bake original URL per new file (recrop source). */
+  originalMediaUrls?: (string | null)[];
   
   // Review-specific fields (only used when type === 'review')
   reviewData?: ReviewDataPayload;

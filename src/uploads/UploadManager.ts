@@ -31,6 +31,7 @@ class UploadManager {
       caption: input.caption,
       achievementId: input.achievementId,
       courseInfo: input.courseInfo,
+      courseIds: input.courseIds,
       selectedTags: input.selectedTags,
       files: input.files,
       mediaItems: input.mediaItems,
@@ -43,6 +44,8 @@ class UploadManager {
       
       // Scheduling
       scheduledAt: input.scheduledAt,
+      draftId: input.draftId,
+      originalMediaUrls: input.originalMediaUrls,
 
       createdAt: new Date().toISOString(),
       status: 'queued',
@@ -55,14 +58,9 @@ class UploadManager {
     this.jobs.set(jobId, job);
     this.persistToStorage();
 
-    // Emit enqueued event
-    uploadEventBus.emit('upload:enqueued', {
-      type: 'upload:enqueued',
-      jobId,
-      actorType: input.actorType,
-      actorId: input.actorId,
-      fileCount: input.files.length,
-    });
+    // NOTE: upload:enqueued is emitted by enqueuePostUpload / enqueueReviewUpload
+    // (those payloads carry uploadType + metadata). Removed duplicate emit here
+    // so UploadProgressBanner doesn't show two entries per upload.
 
     console.log(`[UploadManager] Enqueued job ${jobId} with ${input.files.length} files`);
 
@@ -171,7 +169,10 @@ class UploadManager {
     uploadEventBus.emit('upload:complete', {
       type: 'upload:complete',
       jobId,
-      postId,
+      uploadType: job.type || 'post',
+      postId: job.type === 'review' ? undefined : postId,
+      ratingId: job.type === 'review' ? postId : undefined,
+      courseId: job.reviewData?.courseId,
       actorType: job.actorType,
       actorId: job.actorId,
       isScheduled,
