@@ -63,7 +63,7 @@ const AuthHeroScreen: React.FC<AuthHeroScreenProps> = ({
 }) => {
 
   // Light status bar + safe-area shield for Median.co wrapper
-  useMedianStatusBar('light', '#F8FAFC', true, false);
+  useMedianStatusBar('dark', '#15171F', true, false);
 
   const [loginEmail, setLoginEmail] = useState('');
   const [emailError, setEmailError] = useState<string | null>(null);
@@ -115,7 +115,7 @@ const AuthHeroScreen: React.FC<AuthHeroScreenProps> = ({
       {/* Background */}
       <div
         className="absolute inset-0"
-        style={{ background: '#F8FAFC' }}
+        style={{ background: '#15171F' }}
       />
 
       <div className="relative flex-1 flex flex-col px-6 pt-safe overflow-y-auto">
@@ -133,7 +133,7 @@ const AuthHeroScreen: React.FC<AuthHeroScreenProps> = ({
             className="h-[90px] md:h-[100px] w-auto relative z-10"
           />
           {SHOW_WORDMARK && (
-            <span className="text-[24px] font-medium tracking-tight" style={{ color: '#1C1C1E' }}>clbhouz</span>
+            <span className="text-[24px] font-medium tracking-tight" style={{ color: 'rgba(255,255,255,0.96)' }}>clbhouz</span>
           )}
         </div>
 
@@ -141,7 +141,7 @@ const AuthHeroScreen: React.FC<AuthHeroScreenProps> = ({
         <div className="flex-1 flex flex-col justify-center items-center text-center -mt-4">
           <h1
             className="text-[38px] md:text-[44px] font-semibold leading-tight auth-tagline-animate"
-            style={{ letterSpacing: '-0.02em', color: '#1C1C1E' }}
+            style={{ letterSpacing: '-0.02em', color: 'rgba(255,255,255,0.96)' }}
           >
             stay in play.
           </h1>
@@ -151,7 +151,7 @@ const AuthHeroScreen: React.FC<AuthHeroScreenProps> = ({
         <div
           className="pb-8 pt-6 -mx-6 px-6"
           style={{
-            background: '#F8FAFC',
+            background: '#15171F',
           }}
         >
           <div className="auth-button-6 space-y-3">
@@ -196,7 +196,7 @@ const AuthHeroScreen: React.FC<AuthHeroScreenProps> = ({
                     style={{
                       minHeight: 52,
                       background: '#FFFFFF',
-                      border: '1px solid rgba(15,23,42,0.12)',
+                      border: '1px solid rgba(255,255,255,0.10)',
                       color: '#1F1F1F',
                       fontSize: 15,
                       fontWeight: 600,
@@ -214,9 +214,9 @@ const AuthHeroScreen: React.FC<AuthHeroScreenProps> = ({
                 )}
 
                 <div className="flex items-center gap-3" aria-hidden="true">
-                  <div style={{ flex: 1, height: 1, background: 'rgba(15,23,42,0.10)' }} />
-                  <span style={{ fontSize: 11, color: '#8E8E93' }}>or</span>
-                  <div style={{ flex: 1, height: 1, background: 'rgba(15,23,42,0.10)' }} />
+                  <div style={{ flex: 1, height: 1, background: 'rgba(255,255,255,0.10)' }} />
+                  <span style={{ fontSize: 11, color: 'rgba(255,255,255,0.55)' }}>or</span>
+                  <div style={{ flex: 1, height: 1, background: 'rgba(255,255,255,0.10)' }} />
                 </div>
 
               </>
@@ -236,9 +236,9 @@ const AuthHeroScreen: React.FC<AuthHeroScreenProps> = ({
                 disabled={submitting}
                 className="auth-email-input w-full h-[54px] px-6 rounded-[14px] font-medium text-[15px] text-center focus:outline-none transition-all disabled:opacity-50"
                 style={{
-                  background: '#F5F5F7',
-                  border: '1px solid rgba(15,23,42,0.10)',
-                  color: '#1C1C1E',
+                  background: '#20242E',
+                  border: '1px solid rgba(255,255,255,0.10)',
+                  color: 'rgba(255,255,255,0.96)',
                 }}
                 autoComplete="email"
                 inputMode="email"
@@ -265,9 +265,9 @@ const AuthHeroScreen: React.FC<AuthHeroScreenProps> = ({
               aria-label="Continue"
               className="w-full h-[54px] flex items-center justify-center gap-2 rounded-[14px] font-bold text-[15px] transition-all duration-150 active:scale-[0.98]"
               style={{
-                background: canContinue ? '#F7931E' : '#F5F5F7',
-                color: canContinue ? '#FFFFFF' : '#AEAEB2',
-                border: canContinue ? 'none' : '1px solid rgba(15,23,42,0.10)',
+                background: canContinue ? '#F7931E' : 'rgba(255,255,255,0.06)',
+                color: canContinue ? '#FFFFFF' : 'rgba(255,255,255,0.38)',
+                border: canContinue ? 'none' : '1px solid rgba(255,255,255,0.10)',
                 boxShadow: 'none',
                 cursor: !canContinue ? 'not-allowed' : 'pointer',
               }}
@@ -284,7 +284,7 @@ const AuthHeroScreen: React.FC<AuthHeroScreenProps> = ({
 
             <p
               className="text-center"
-              style={{ fontSize: 12, color: '#8E8E93' }}
+              style={{ fontSize: 12, color: 'rgba(255,255,255,0.55)' }}
             >
               We'll email you a 6-digit code. No password needed.
             </p>
@@ -293,7 +293,7 @@ const AuthHeroScreen: React.FC<AuthHeroScreenProps> = ({
       </div>
 
       <style>{`
-        html, body { background-color: #F8FAFC !important; }
+        html, body { background-color: #15171F !important; }
 
         @keyframes auth-logo-in {
           0% { opacity: 0; transform: scale(0.85) translateY(20px); }
@@ -313,7 +313,7 @@ const AuthHeroScreen: React.FC<AuthHeroScreenProps> = ({
         .auth-button-6 { animation: auth-button-in 0.4s ease-out 0.45s both; }
 
         .auth-email-input::placeholder {
-          color: #8E8E93;
+          color: rgba(255,255,255,0.38);
           font-weight: 500;
           font-size: 15px;
         }

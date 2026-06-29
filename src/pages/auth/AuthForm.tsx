@@ -424,9 +424,9 @@ const AuthForm: React.FC<AuthFormProps> = ({ authNotice }) => {
           <div
             className="p-4 rounded-2xl text-center text-[14px]"
             style={{
-              backgroundColor: '#FFFFFF',
-              color: '#1C1C1E',
-              border: '1px solid rgba(15,23,42,0.10)',
+              backgroundColor: '#1B1E27',
+              color: 'rgba(255,255,255,0.96)',
+              border: '1px solid rgba(255,255,255,0.10)',
             }}
           >
             {authNotice.message}
