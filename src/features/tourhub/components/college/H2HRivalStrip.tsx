@@ -146,17 +146,5 @@ export function H2HRivalStrip({ normalizedName, className }: H2HRivalStripProps)
   );
 }
 
-function SectionHeader() {
-  return (
-    <div style={{ padding: SECTION_PADDING }}>
-      <div style={{ display: 'flex', alignItems: 'center', marginBottom: 6 }}>
-        <span style={{ fontSize: 9, fontWeight: 800, color: INK_MUTE, letterSpacing: '0.16em', textTransform: 'uppercase' as const }}>
-          Head-to-Head
-        </span>
-      </div>
-      <div style={{ fontSize: 13, fontWeight: 500, color: INK_MUTE, marginBottom: 10 }}>
-        Compare with another program
-      </div>
-    </div>
   );
 }
