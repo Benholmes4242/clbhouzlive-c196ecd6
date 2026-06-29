@@ -1,6 +1,5 @@
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
-import { AppLog } from '@/lib/logger';
 
 function average(items: Record<string, unknown>[], key: string): number | null {
   const valid = items.filter(r => r[key] != null && typeof r[key] === 'number');
@@ -20,7 +19,6 @@ export interface BusinessReviewStats {
   };
   recentReviews: number;
   reviewTrend: number;
-  unrespondedCount: number;
   courses: Array<{
     id: string;
     name: string;
@@ -119,23 +117,6 @@ export function useBusinessReviewStats(businessId: string | undefined) {
         };
       }).sort((a, b) => b.reviewCount - a.reviewCount);
 
-      // Count unresponded reviews
-      // NOTE: If RLS denies access to review_responses for this business,
-      // respondedCount will be 0, making all reviews appear unresponded.
-      // Ensure RLS policy grants read access to business owners and managers.
-      const { count: respondedCount, error: responsesError } = await supabase
-        .from('review_responses')
-        .select('review_id', { count: 'exact', head: true })
-        .eq('business_id', businessId)
-        .eq('is_deleted', false);
-
-      if (responsesError) {
-        AppLog.error('[useBusinessReviewStats]', 'Failed to fetch response count:', responsesError);
-        // Don't throw — use 0 as fallback so other stats still render
-      }
-
-      const unrespondedCount = Math.max(0, totalReviews - (respondedCount || 0));
-
       return {
         totalReviews,
         avgRating,
@@ -143,7 +124,6 @@ export function useBusinessReviewStats(businessId: string | undefined) {
         subRatings,
         recentReviews,
         reviewTrend,
-        unrespondedCount,
         courses: coursesStats,
       };
     },

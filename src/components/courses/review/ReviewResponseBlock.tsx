@@ -1,7 +1,13 @@
 import React, { useState } from 'react';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { VerifiedBadge } from '@/components/ui/VerifiedBadge';
+import { Pencil, Trash2 } from 'lucide-react';
+import { Link } from 'react-router-dom';
 import type { ReviewResponse } from '@/hooks/useReviewResponses';
+import {
+  useUpdateReviewResponse,
+  useDeleteReviewResponse,
+} from '@/hooks/useReviewResponses';
 import type { BusinessClaimContext } from '@/hooks/useBusinessClaimForCourse';
 
 const formatRelativeDate = (dateString: string) => {
@@ -13,20 +19,59 @@ const formatRelativeDate = (dateString: string) => {
   if (diffInDays === 0) return 'Today';
   if (diffInDays === 1) return 'Yesterday';
   if (diffInDays < 7) return `${diffInDays}d ago`;
-  const weeks = Math.floor(diffInDays / 7);
-  if (diffInDays < 30) return `${weeks}w ago`;
-  const months = Math.floor(diffInDays / 30);
-  if (diffInDays < 365) return `${months}mo ago`;
+  if (diffInDays < 30) return `${Math.floor(diffInDays / 7)}w ago`;
+  if (diffInDays < 365) return `${Math.floor(diffInDays / 30)}mo ago`;
   return `${Math.floor(diffInDays / 365)}y ago`;
 };
 
-// --- Existing response display ---
+// ============================================================
+// ResponseDisplay
+// ============================================================
 
 interface ResponseDisplayProps {
   response: ReviewResponse;
+  courseId: string;
+  /**
+   * Viewer's claim context for this course. If it matches the response's
+   * business_id, edit/delete affordances are surfaced.
+   */
+  viewerClaim?: BusinessClaimContext | null;
 }
 
-export const ResponseDisplay: React.FC<ResponseDisplayProps> = ({ response }) => {
+export const ResponseDisplay: React.FC<ResponseDisplayProps> = ({
+  response,
+  courseId,
+  viewerClaim,
+}) => {
+  const canManage =
+    !!viewerClaim &&
+    viewerClaim.businessId === response.business_id &&
+    (viewerClaim.role === 'owner' || viewerClaim.role === 'admin');
+
+  const [isEditing, setIsEditing] = useState(false);
+  const [text, setText] = useState(response.response_text);
+
+  const updateMutation = useUpdateReviewResponse(courseId);
+  const deleteMutation = useDeleteReviewResponse(courseId);
+
+  const handleSave = () => {
+    const trimmed = text.trim();
+    if (!trimmed || trimmed === response.response_text) {
+      setIsEditing(false);
+      setText(response.response_text);
+      return;
+    }
+    updateMutation.mutate(
+      { responseId: response.id, responseText: trimmed },
+      { onSuccess: () => setIsEditing(false) },
+    );
+  };
+
+  const handleDelete = () => {
+    if (!window.confirm('Delete this response? This cannot be undone.')) return;
+    deleteMutation.mutate({ responseId: response.id });
+  };
+
   return (
     <div className="ml-4 mt-3 pl-4 border-l-2 border-amber-300">
       <div className="flex items-center gap-2 mb-1.5">
@@ -42,19 +87,85 @@ export const ResponseDisplay: React.FC<ResponseDisplayProps> = ({ response }) =>
             {response.business_name.slice(0, 2).toUpperCase()}
           </div>
         )}
-        <div className="flex items-center gap-1.5 flex-wrap">
-          <span className="text-sm font-semibold text-foreground">{response.business_name}</span>
+        <div className="flex items-center gap-1.5 flex-wrap min-w-0">
+          <span className="text-sm font-semibold text-foreground truncate">
+            {response.business_name}
+          </span>
           {response.business_is_verified && <VerifiedBadge size="sm" />}
-          <span className="text-xs text-muted-foreground">· Owner response</span>
+          <span className="text-xs text-muted-foreground">- Owner response</span>
         </div>
       </div>
-      <p className="text-sm text-foreground leading-relaxed">{response.response_text}</p>
-      <p className="text-xs text-muted-foreground mt-1">{formatRelativeDate(response.created_at)}</p>
+
+      {!isEditing ? (
+        <>
+          <p className="text-sm text-foreground leading-relaxed whitespace-pre-wrap">
+            {response.response_text}
+          </p>
+          <div className="flex items-center gap-2 mt-1 flex-wrap">
+            <p className="text-xs text-muted-foreground">
+              {formatRelativeDate(response.created_at)}
+              {response.edited_at ? ' (edited)' : ''}
+            </p>
+            {canManage && (
+              <>
+                <button
+                  type="button"
+                  onClick={() => { setText(response.response_text); setIsEditing(true); }}
+                  className="text-xs text-muted-foreground hover:text-foreground flex items-center gap-1 active:opacity-70 px-1"
+                  aria-label="Edit response"
+                >
+                  <Pencil className="w-3 h-3" /> Edit
+                </button>
+                <button
+                  type="button"
+                  onClick={handleDelete}
+                  disabled={deleteMutation.isPending}
+                  className="text-xs text-muted-foreground hover:text-destructive flex items-center gap-1 active:opacity-70 disabled:opacity-50 px-1"
+                  aria-label="Delete response"
+                >
+                  <Trash2 className="w-3 h-3" /> Delete
+                </button>
+              </>
+            )}
+          </div>
+        </>
+      ) : (
+        <div>
+          <textarea
+            value={text}
+            onChange={(e) => setText(e.target.value.slice(0, 1000))}
+            className="w-full min-h-[80px] p-3 text-sm bg-card border border-border rounded-lg resize-none focus:outline-none focus:ring-1 focus:ring-border placeholder:text-muted-foreground"
+            maxLength={1000}
+          />
+          <div className="flex items-center justify-between mt-2">
+            <span className="text-xs text-muted-foreground">{text.length}/1000</span>
+            <div className="flex items-center gap-3">
+              <button
+                type="button"
+                onClick={() => { setIsEditing(false); setText(response.response_text); }}
+                className="text-sm text-muted-foreground active:opacity-70 min-h-[40px] px-2"
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                onClick={handleSave}
+                disabled={!text.trim() || updateMutation.isPending}
+                className="bg-[#f59e0b] text-white min-h-[40px] rounded-full px-4 text-sm font-medium active:scale-[0.97] transition-transform disabled:opacity-50"
+              >
+                {updateMutation.isPending ? 'Saving...' : 'Save'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
 
-// --- Reply form for business owners ---
+// ============================================================
+// ReplyForm
+// ============================================================
 
 interface ReplyFormProps {
   businessClaim: BusinessClaimContext;
@@ -87,8 +198,9 @@ export const ReplyForm: React.FC<ReplyFormProps> = ({
   }
 
   const handleSubmit = () => {
-    if (!text.trim()) return;
-    onSubmit(reviewId, businessClaim.businessId, text.trim());
+    const trimmed = text.trim();
+    if (!trimmed) return;
+    onSubmit(reviewId, businessClaim.businessId, trimmed);
     setText('');
     setExpanded(false);
   };
@@ -98,7 +210,7 @@ export const ReplyForm: React.FC<ReplyFormProps> = ({
       <textarea
         value={text}
         onChange={(e) => setText(e.target.value.slice(0, 1000))}
-        placeholder={`Respond as ${businessClaim.businessName}…`}
+        placeholder={`Respond as ${businessClaim.businessName}...`}
         className="w-full min-h-[80px] p-3 text-sm bg-card border border-border rounded-lg resize-none focus:outline-none focus:ring-1 focus:ring-border placeholder:text-muted-foreground"
         maxLength={1000}
       />
@@ -118,10 +230,37 @@ export const ReplyForm: React.FC<ReplyFormProps> = ({
             disabled={!text.trim() || isSubmitting}
             className="bg-[#f59e0b] text-white min-h-[40px] rounded-full px-4 text-sm font-medium active:scale-[0.97] transition-transform disabled:opacity-50"
           >
-            {isSubmitting ? 'Posting…' : 'Post response'}
+            {isSubmitting ? 'Posting...' : 'Post response'}
           </button>
         </div>
       </div>
+    </div>
+  );
+};
+
+// ============================================================
+// VerifyToRespondPrompt
+// ============================================================
+
+interface VerifyToRespondPromptProps {
+  businessClaim: BusinessClaimContext;
+}
+
+export const VerifyToRespondPrompt: React.FC<VerifyToRespondPromptProps> = ({
+  businessClaim,
+}) => {
+  const href = businessClaim.businessSlug
+    ? `/business/${businessClaim.businessSlug}/verification`
+    : `/business/${businessClaim.businessId}/verification`;
+
+  return (
+    <div className="ml-4 mt-2 pl-4 border-l-2 border-border">
+      <p className="text-xs text-muted-foreground">
+        <Link to={href} className="font-medium text-[#d97706] active:opacity-70">
+          Verify {businessClaim.businessName}
+        </Link>{' '}
+        to respond to reviews.
+      </p>
     </div>
   );
 };

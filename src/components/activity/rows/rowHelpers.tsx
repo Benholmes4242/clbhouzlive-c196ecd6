@@ -153,9 +153,9 @@ export function getNotificationBadgeIcon(type: string): React.ReactElement {
     case 'friend_course_review':
     case 'course_review':
       return <Flag {...p} />;
-    case 'business_course_review':
+    case 'course_review_received':
       return <Star {...p} fill="#FFFFFF" />;
-    case 'review_response':
+    case 'review_response_posted':
       return <MessageCircle {...p} />;
     default:
       return <Bell {...p} />;

@@ -26,7 +26,7 @@ const FRIEND_TYPES = new Set([
 ]);
 
 const REVIEW_TYPES = new Set([
-  'course_review', 'friend_course_review', 'business_course_review', 'review_response',
+  'course_review', 'friend_course_review', 'course_review_received', 'review_response_posted',
 ]);
 
 // Intentional divergence from original brief: excludes generic 'comment' / 'comment_reply'

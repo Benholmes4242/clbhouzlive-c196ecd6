@@ -11,7 +11,7 @@ import { useCourseReviews, type ReviewsSortBy, type CourseReview, type ReviewMed
 import { useReviewResponses, useSubmitReviewResponse } from '@/hooks/useReviewResponses';
 import { useBusinessClaimForCourse } from '@/hooks/useBusinessClaimForCourse';
 import { ReviewBlockFlat } from '../review/ReviewBlockFlat';
-import { ResponseDisplay, ReplyForm } from '../review/ReviewResponseBlock';
+import { ResponseDisplay, ReplyForm, VerifyToRespondPrompt } from '../review/ReviewResponseBlock';
 import { RatingFilterChips, RatingFilterValue } from '../review/RatingFilterChips';
 import { WriteReviewPrompt } from '../review/WriteReviewPrompt';
 import { SegmentedTabOption } from '@/components/ui/SegmentedTabs';
@@ -547,7 +547,7 @@ const CourseReviewsTab: React.FC<CourseReviewsTabProps> = ({
           />
           {(() => {
             const response = reviewResponses?.find(r => r.review_id === filteredMyReview.id);
-            if (response) return <div style={{ paddingBottom: 14 }}><ResponseDisplay response={response} /></div>;
+            if (response) return <div style={{ paddingBottom: 14 }}><ResponseDisplay response={response} courseId={courseId} viewerClaim={businessClaim} /></div>;
             return null;
           })()}
         </div>
@@ -571,7 +571,9 @@ const CourseReviewsTab: React.FC<CourseReviewsTabProps> = ({
         {otherReviews.map((review) => {
           const isDeepLinked = review.id === highlightedReviewId;
           const response = reviewResponses?.find(r => r.review_id === review.id);
-          const canReply = businessClaim?.isVerified && !response;
+          const isClaimAdmin = !!businessClaim && (businessClaim.role === 'owner' || businessClaim.role === 'admin');
+          const canReply = isClaimAdmin && businessClaim?.isVerified && !response;
+          const showVerifyPrompt = isClaimAdmin && !businessClaim?.isVerified && !response;
           return (
             <div key={review.id} style={{ borderBottom: `0.5px solid ${INK_TINT_06}` }}>
               <div style={{ padding: '2px 16px 0' }}>
@@ -584,7 +586,7 @@ const CourseReviewsTab: React.FC<CourseReviewsTabProps> = ({
                   }}
                   onUserClick={() => navigate(getProfilePathById(review.user_id))}
                 />
-                {response && <ResponseDisplay response={response} />}
+                {response && <ResponseDisplay response={response} courseId={courseId} viewerClaim={businessClaim} />}
                 {canReply && (
                   <ReplyForm
                     businessClaim={businessClaim}
@@ -594,6 +596,9 @@ const CourseReviewsTab: React.FC<CourseReviewsTabProps> = ({
                     }
                     isSubmitting={submitResponseMutation.isPending}
                   />
+                )}
+                {showVerifyPrompt && businessClaim && (
+                  <VerifyToRespondPrompt businessClaim={businessClaim} />
                 )}
               </div>
             </div>

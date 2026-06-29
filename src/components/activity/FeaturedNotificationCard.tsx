@@ -66,8 +66,8 @@ function getNotificationActionText(notification: ActivityNotification): string {
     case 'friend_request_sent': return 'Friend request sent';
     case 'friend_course_review':
     case 'course_review': return 'reviewed a course';
-    case 'business_course_review': return 'left a review';
-    case 'review_response': return 'responded to your review';
+    case 'course_review_received': return 'left a review on your course';
+    case 'review_response_posted': return 'responded to your review';
     default: return title || message || 'New notification';
   }
 }

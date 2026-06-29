@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useParams, useNavigate } from 'react-router-dom';
-import { ChevronLeft, Star, MessageCircle } from 'lucide-react';
+import { ChevronLeft, Star } from 'lucide-react';
 import { useBusinessProfile } from '@/hooks/useBusinessProfile';
 import { useBusinessMembership } from '@/hooks/useBusinessMembership';
 import { useBusinessReviewStats } from '@/hooks/useBusinessReviewStats';
@@ -139,14 +139,8 @@ const ReviewsSection = ({ businessId, navigate }: { businessId: string; navigate
       </div>
 
       {/* Action prompts */}
-      <div className="flex flex-col sm:flex-row gap-2">
-        {reviewStats.unrespondedCount > 0 && (
-          <div className="flex items-center gap-2 text-xs" style={{ color: '#F7931E' }}>
-            <MessageCircle className="h-3.5 w-3.5" />
-            <span>{reviewStats.unrespondedCount} review{reviewStats.unrespondedCount !== 1 ? 's' : ''} awaiting your response</span>
-          </div>
-        )}
-      </div>
+      <div className="flex flex-col sm:flex-row gap-2" />
+
 
       {/* Multi-course breakdown */}
       {reviewStats.courses.length > 1 && (

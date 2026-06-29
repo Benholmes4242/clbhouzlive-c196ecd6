@@ -8665,33 +8665,36 @@ export type Database = {
       review_responses: {
         Row: {
           business_id: string
-          created_at: string | null
+          created_at: string
+          edited_at: string | null
           id: string
-          is_deleted: boolean | null
+          is_deleted: boolean
           responded_by: string
           response_text: string
           review_id: string
-          updated_at: string | null
+          updated_at: string
         }
         Insert: {
           business_id: string
-          created_at?: string | null
+          created_at?: string
+          edited_at?: string | null
           id?: string
-          is_deleted?: boolean | null
+          is_deleted?: boolean
           responded_by: string
           response_text: string
           review_id: string
-          updated_at?: string | null
+          updated_at?: string
         }
         Update: {
           business_id?: string
-          created_at?: string | null
+          created_at?: string
+          edited_at?: string | null
           id?: string
-          is_deleted?: boolean | null
+          is_deleted?: boolean
           responded_by?: string
           response_text?: string
           review_id?: string
-          updated_at?: string | null
+          updated_at?: string
         }
         Relationships: [
           {
@@ -8704,7 +8707,7 @@ export type Database = {
           {
             foreignKeyName: "review_responses_review_id_fkey"
             columns: ["review_id"]
-            isOneToOne: false
+            isOneToOne: true
             referencedRelation: "course_ratings"
             referencedColumns: ["id"]
           },
