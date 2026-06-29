@@ -323,9 +323,9 @@ export function CourseSearchSheet({
                 <>
                   <p
                     style={{
-                      fontSize: 10,
-                      fontWeight: 700,
-                      letterSpacing: '0.10em',
+                      fontSize: 11,
+                      fontWeight: 800,
+                      letterSpacing: '0.14em',
                       textTransform: 'uppercase',
                       color: 'rgba(15,23,42,0.40)',
                       paddingTop: 10,
