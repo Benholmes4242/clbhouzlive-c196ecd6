@@ -156,7 +156,7 @@ function SectionHeaderInner(props: SectionHeaderProps) {
             fontSize: 19,
             fontWeight: 800,
             letterSpacing: '-0.01em',
-            color: INK,
+            color: titleColor,
           }}
         >
           {title}
