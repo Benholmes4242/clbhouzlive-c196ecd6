@@ -237,7 +237,9 @@ export function UploadProgressBanner() {
     };
   }, []);
   const suppressPostUploads = routeRendersPendingCards(pathname);
-  const pendingPostJobIds = usePendingPostsStore((s) => Object.keys(s.byJobId));
+  const pendingPostJobIds = usePendingPostsStore(
+    useShallow((s) => Object.keys(s.byJobId))
+  );
 
   const visibleUploads = activeUploads.filter((u) => {
     if (dismissedJobs.has(u.jobId)) return false;
