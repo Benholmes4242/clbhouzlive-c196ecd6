@@ -16,7 +16,6 @@ import { uploadEventBus } from '@/uploads/uploadEventBus';
 import { formatBytes, formatDuration, formatBytesPerSecond } from '@/uploads/uploadSpeedTracker';
 import { retryJob, cancelJob, retryFailedItems } from '@/uploads/uploadPipeline';
 import { usePendingPostsStore } from '@/uploads/pendingPostsStore';
-import { useShallow } from 'zustand/react/shallow';
 import { cn } from '@/lib/utils';
 
 // Routes that render PendingPostCard inline. The banner is suppressed for
@@ -55,11 +54,6 @@ interface ActiveUpload {
 }
 
 export function UploadProgressBanner() {
-  return null;
-}
-
-// DIAGNOSTIC STUB: original implementation preserved below while the banner is disabled.
-export function UploadProgressBannerOriginalDiagnosticDisabled() {
   const [activeUploads, setActiveUploads] = useState<ActiveUpload[]>([]);
   const [dismissedJobs, setDismissedJobs] = useState<Set<string>>(new Set());
   
@@ -242,8 +236,10 @@ export function UploadProgressBannerOriginalDiagnosticDisabled() {
     };
   }, []);
   const suppressPostUploads = routeRendersPendingCards(pathname);
-  const pendingPostJobIds = usePendingPostsStore(
-    useShallow((s) => Object.keys(s.byJobId))
+  const byJobId = usePendingPostsStore((s) => s.byJobId);
+  const pendingPostJobIds = React.useMemo(
+    () => Object.keys(byJobId),
+    [byJobId]
   );
 
   const visibleUploads = activeUploads.filter((u) => {
