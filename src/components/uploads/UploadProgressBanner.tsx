@@ -225,10 +225,12 @@ export function UploadProgressBanner() {
     typeof window !== 'undefined' ? window.location.pathname : '/'
   );
   useEffect(() => {
-    const update = () => setPathname(window.location.pathname);
+    const update = () => {
+      const next = window.location.pathname;
+      setPathname((prev) => (prev === next ? prev : next));
+    };
     window.addEventListener('popstate', update);
-    // SPA navigations via pushState don't fire popstate; poll lightly as fallback
-    const id = window.setInterval(update, 500);
+    const id = window.setInterval(update, 1000);
     return () => {
       window.removeEventListener('popstate', update);
       window.clearInterval(id);
