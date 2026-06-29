@@ -157,7 +157,11 @@ export function useLiveTournaments() {
             tour_name
           )
         `)
-        .eq('status', 'inprogress')
+        .in('status', [
+          'inprogress', 'in_progress',
+          'playoff', 'inplayoff', 'in_playoff',
+          'suspended', 'delayed', 'weather', 'holdup',
+        ])
         .order('start_date', { ascending: true });
 
       if (error) throw error;
