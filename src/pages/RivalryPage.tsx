@@ -375,7 +375,7 @@ const RivalryPage: React.FC = () => {
         minHeight: '100vh',
         fontFamily: FONT,
         color: T100,
-        paddingTop: 'calc(env(safe-area-inset-top, 0px) + 80px)',
+        paddingTop: 'calc(env(safe-area-inset-top, 0px) + 56px)',
       }}
     >
       <FloatingPageHeader onBack={() => navigate(-1)} showHandicap={false} />
