@@ -66,8 +66,17 @@ export function useTourOverviewData() {
   const seasonStatus = useMemo(() => {
     if (!tournaments || tournaments.length === 0) return 'upcoming';
     const now = new Date();
-    if (tournaments.some(t => getTournamentDisplayState(t.status, t.end_date, now) === 'live')) return 'live';
-    const allDone = tournaments.every(t => t.status === 'closed' || t.status === 'complete');
+    const hasActive = tournaments.some(t => {
+      const st = getTournamentDisplayState(t.status, t.end_date, now);
+      return st === 'live' || st === 'unresolved';
+    });
+    if (hasActive) return 'live';
+    // allDone: every event has a terminal status AND none are unresolved.
+    const allDone = tournaments.every(t => {
+      const st = getTournamentDisplayState(t.status, t.end_date, now);
+      return st !== 'live' && st !== 'unresolved' &&
+        (t.status === 'closed' || t.status === 'complete' || t.status === 'cancelled' || t.status === 'canceled');
+    });
     if (allDone) return 'completed';
     return 'active';
   }, [tournaments]);
@@ -77,9 +86,11 @@ export function useTourOverviewData() {
     if (!tournaments || tournaments.length === 0) return null;
     const now = new Date();
 
-    const live = tournaments.find(t =>
-      getTournamentDisplayState(t.status, t.end_date, now) === 'live'
-    );
+    // Live OR unresolved (playoff / suspended) — both count as the featured event.
+    const live = tournaments.find(t => {
+      const st = getTournamentDisplayState(t.status, t.end_date, now);
+      return st === 'live' || st === 'unresolved';
+    });
     if (live) return { tournament: live, type: 'live' };
 
     const inResultWindow = tournaments
