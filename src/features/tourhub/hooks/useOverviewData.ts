@@ -522,9 +522,14 @@ export function useTournamentsByTour() {
 
         const stats = tourMap.get(tourId)!;
         stats.tournamentCount++;
-        if (row.status === 'inprogress') stats.liveCount++;
-        if (row.status === 'scheduled' || row.status === 'created') stats.upcomingCount++;
-        if (row.status === 'closed') stats.completedCount++;
+        const _st = (row.status || '').toLowerCase();
+        if (_st === 'inprogress' || _st === 'in_progress' ||
+            _st === 'playoff' || _st === 'inplayoff' || _st === 'in_playoff' ||
+            _st === 'suspended' || _st === 'delayed' || _st === 'weather' || _st === 'holdup') {
+          stats.liveCount++;
+        }
+        if (_st === 'scheduled' || _st === 'created') stats.upcomingCount++;
+        if (_st === 'closed' || _st === 'complete') stats.completedCount++;
       });
 
       // Assign next tournament to each tour
