@@ -1403,8 +1403,8 @@ export function Composer({
       <BottomSheet
         open={actorSheetOpen}
         onClose={() => setActorSheetOpen(false)}
-        title="Post as"
       >
+        <SheetEyebrow>Post as</SheetEyebrow>
         {availableActors.map((actor) => {
           const isSelected =
             displayActor.type === actor.type && displayActor.id === actor.id;
