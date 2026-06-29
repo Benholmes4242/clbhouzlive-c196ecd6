@@ -231,7 +231,7 @@ const ActivityPage: React.FC = () => {
                 </button>
                 <div>
                   <div className="flex items-center gap-2 mb-1.5">
-                    <span style={{ fontSize: 9, fontWeight: 800, color: '#64748B', letterSpacing: '0.16em', textTransform: 'uppercase' }}>Activity</span>
+                    <span style={{ fontSize: 11, fontWeight: 800, color: '#94A3B8', letterSpacing: '0.14em', textTransform: 'uppercase' }}>ACTIVITY</span>
                   </div>
                   <div className="flex items-baseline gap-2.5">
                     <h1
