@@ -451,9 +451,8 @@ export function CollegeCompareHero({ data, className }: CollegeCompareHeroProps)
       {/* ── PERFORMANCE STATS ── */}
       {hasPerformanceData && (
         <div style={{ background: SLATE_50, borderTop: `0.5px solid ${INK_TINT_07}` }}>
-          <div style={{ padding: '14px 16px 10px' }}>
-            <span style={{ fontSize: '9px', fontWeight: 800, color: INK_MUTE, letterSpacing: '0.16em', textTransform: 'uppercase' as const }}>Performance Stats</span>
-          </div>
+          {/* Section eyebrow — canonical SectionHeader */}
+          <SectionHeader role="section" kicker="Performance Stats" paddingX={16} />
           <div>
             <MetricCompareRow label="Avg Scoring" value1={s1?.avg_scoring || 0} value2={s2?.avg_scoring || 0} format={formatAvg} lowerIsBetter />
             <MetricCompareRow label="Avg SG Total" value1={s1?.avg_sg_total || 0} value2={s2?.avg_sg_total || 0} format={formatSg} />
