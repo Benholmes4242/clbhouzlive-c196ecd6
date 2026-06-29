@@ -51,7 +51,7 @@ const AuthBottomSheet: React.FC<AuthBottomSheetProps> = ({
         )}
         style={{ 
           backdropFilter: 'blur(4px)',
-          background: 'rgba(15, 23, 42, 0.35)',
+          background: 'rgba(0, 0, 0, 0.55)',
         }}
         onClick={onClose}
       />
@@ -68,16 +68,16 @@ const AuthBottomSheet: React.FC<AuthBottomSheetProps> = ({
             : "translate-y-full opacity-0"
         )}
         style={{
-          background: '#FFFFFF',
+          background: '#1B1E27',
           backdropFilter: 'blur(28px)',
           WebkitBackdropFilter: 'blur(28px)',
-          borderTop: '1px solid rgba(15, 23, 42, 0.08)',
+          borderTop: '1px solid rgba(255,255,255,0.06)',
         }}
       >
         
         {/* Handle bar */}
         <div style={{ display: 'flex', justifyContent: 'center', padding: '10px 0 4px' }}>
-          <div style={{ width: 36, height: 4, borderRadius: 2, background: 'rgba(15,23,42,0.15)' }} />
+          <div style={{ width: 36, height: 4, borderRadius: 2, background: 'rgba(255,255,255,0.20)' }} />
         </div>
         
         {/* Header with close button */}
@@ -88,7 +88,7 @@ const AuthBottomSheet: React.FC<AuthBottomSheetProps> = ({
                 style={{ 
                   fontSize: 20,
                   fontWeight: 900,
-                  color: '#1C1C1E',
+                  color: 'rgba(255,255,255,0.96)',
                   letterSpacing: '-0.03em',
                   marginBottom: 4,
                 }}
@@ -101,7 +101,7 @@ const AuthBottomSheet: React.FC<AuthBottomSheetProps> = ({
                 className="text-[14px]"
                 style={{ 
                   lineHeight: '1.45',
-                  color: '#8E8E93',
+                  color: 'rgba(255,255,255,0.72)',
                 }}
               >
                 {subtitle}
@@ -112,10 +112,10 @@ const AuthBottomSheet: React.FC<AuthBottomSheetProps> = ({
             onClick={onClose}
             className="w-8 h-8 flex items-center justify-center rounded-full transition-all active:scale-95"
             style={{
-              background: '#F5F5F7',
+              background: 'rgba(255,255,255,0.08)',
             }}
           >
-            <X className="w-4 h-4" style={{ color: '#8E8E93' }} />
+            <X className="w-4 h-4" style={{ color: 'rgba(255,255,255,0.55)' }} />
           </button>
         </div>
         

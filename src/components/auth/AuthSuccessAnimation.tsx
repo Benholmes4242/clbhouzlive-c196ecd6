@@ -18,7 +18,7 @@ export function AuthSuccessAnimation({
   }, [onComplete, duration]);
 
   return (
-    <div className="fixed inset-0 z-[9999] flex items-center justify-center animate-fade-in" style={{ background: '#F8FAFC' }}>
+    <div className="fixed inset-0 z-[9999] flex items-center justify-center animate-fade-in" style={{ background: '#15171F' }}>
       <div className="flex flex-col items-center gap-3 animate-scale-in">
         {/* Success checkmark circle */}
         <div className="relative">
@@ -33,7 +33,7 @@ export function AuthSuccessAnimation({
 
         {/* Success message */}
         {message && (
-          <p className="text-lg font-medium" style={{ color: '#1C1C1E' }}>
+          <p className="text-lg font-medium" style={{ color: 'rgba(255,255,255,0.96)' }}>
             {message}
           </p>
         )}
