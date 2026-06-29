@@ -2,7 +2,7 @@ import React, { useMemo } from 'react';
 import { useAllScores } from '@/lib/whs/hooks';
 import { fmtDiff } from '@/lib/whs/format';
 import { isReasonableGross, isReasonableDiff } from '@/lib/whs/handicapMath';
-import { SectionHeader } from '../_shared/atoms';
+import { DarkSectionHeader } from '../_shared/darkAtoms';
 import type { WhsScore } from '@/lib/whs/types';
 import { TrendingDown, Flag, Target, Award, CalendarDays, type LucideIcon } from 'lucide-react';
 
@@ -157,7 +157,7 @@ export const PersonalBests: React.FC<Props> = ({ connectionId, currentHandicap, 
 
   return (
     <section style={{ marginTop: 0, fontFamily: FONT }}>
-      <SectionHeader
+      <DarkSectionHeader
         eyebrow="PERSONAL BESTS"
         title={
           viewMode === 'friend'

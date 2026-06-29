@@ -3,7 +3,7 @@ import { ChevronRight } from 'lucide-react';
 import { useUserAchievements } from '@/hooks/gam/useUserAchievements';
 import { openGamAchievements } from '../../gam/events';
 import { renderBadgeIcon } from '../../gam/badgeIcons';
-import { SectionHeader } from '../_shared/atoms';
+import { DarkSectionHeader } from '../_shared/darkAtoms';
 
 interface Props {
   userId: string;
@@ -52,7 +52,7 @@ export const AchievementsCard: React.FC<Props> = ({ userId, viewMode = 'owner', 
 
   return (
     <section style={{ marginTop: 32 }}>
-      <SectionHeader
+      <DarkSectionHeader
         eyebrow="ACHIEVEMENTS"
         title={isFriend ? `${possessive} trophy cabinet` : 'Your trophy cabinet'}
         sub={
