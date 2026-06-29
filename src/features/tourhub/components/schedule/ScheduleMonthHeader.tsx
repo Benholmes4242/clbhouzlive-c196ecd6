@@ -6,7 +6,7 @@
  */
 
 
-import { AMBER, AMBER_BORDER, AMBER_SOFT_BG, INK, INK_MUTE, INK_TINT_07 } from '../../_shared/tokens';
+import { AMBER, AMBER_BORDER, AMBER_SOFT_BG, INK_MUTE, INK_TINT_07 } from '../../_shared/tokens';
 
 interface ScheduleMonthHeaderProps {
   monthLabel: string;
@@ -56,8 +56,8 @@ export function ScheduleMonthHeader({
         <span style={{
           marginLeft: 'auto',
           fontSize: 13,
-          fontWeight: 700,
-          color: INK,
+          fontWeight: 600,
+          color: INK_MUTE,
           letterSpacing: '-0.005em',
         }}>
           {eventCount} event{eventCount !== 1 ? 's' : ''}
