@@ -674,25 +674,37 @@ function ProfileHubSheet({
                   </div>
 
                   {/* ── 5a. Account group ── */}
-                  <SheetGroup label="Account" style={{ marginTop: 18 }}>
-                    <GroupedRow
-                      Icon={UserCog}
-                      label="View profile"
-                      onClick={() => handleNav(`/profile/${localActiveId}`)}
-                      isFirst
-                    />
-                    <GroupedRow
-                      Icon={UserCog}
-                      label="Edit profile"
-                      onClick={() => handleNav(editRoute)}
-                    />
-                    <GroupedRow
-                      Icon={SettingsIcon}
-                      label="Settings"
-                      onClick={() => handleNav('/settings')}
-                      isLast
-                    />
-                  </SheetGroup>
+                  {(() => {
+                    const isBusinessActor = activeProfileType === 'business';
+                    const editTarget = isBusinessActor
+                      ? `/business/${localActiveId}/edit`
+                      : editRoute;
+
+                    return (
+                      <SheetGroup label="Account" style={{ marginTop: 18 }}>
+                        <GroupedRow
+                          Icon={UserCog}
+                          label="View profile"
+                          onClick={() => handleNav(`/profile/${localActiveId}`)}
+                          isFirst
+                        />
+                        <GroupedRow
+                          Icon={UserCog}
+                          label="Edit profile"
+                          onClick={() => handleNav(editTarget)}
+                          isLast={isBusinessActor}
+                        />
+                        {!isBusinessActor && (
+                          <GroupedRow
+                            Icon={SettingsIcon}
+                            label="Settings"
+                            onClick={() => handleNav('/settings')}
+                            isLast
+                          />
+                        )}
+                      </SheetGroup>
+                    );
+                  })()}
 
                   {/* ── 5b. Businesses group (only for existing owners) ── */}
                   {hasBusinesses && (
