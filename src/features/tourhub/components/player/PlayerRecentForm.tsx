@@ -8,6 +8,7 @@
  */
 
 import { useEffect, useRef, useState } from 'react';
+import SectionHeader from '@/components/ui/SectionHeader';
 import { format } from 'date-fns';
 import { ArrowDownRight, ArrowRight, ArrowUpRight } from 'lucide-react';
 import { usePlayerResults, formatPositionShort, formatScore, type PlayerTournamentResult } from '../../hooks/usePlayerResults';
@@ -364,22 +365,10 @@ export function FormSection({ playerId }: FormSectionProps) {
         style={{
           background: SLATE_50,
           borderTop: `0.5px solid ${INK_TINT_07}`,
-          padding: '14px 16px 16px',
+          padding: '0 16px 16px',
         }}
       >
-        <div style={{ marginBottom: 14 }}>
-          <span
-            style={{
-              fontSize: 9,
-              fontWeight: 800,
-              color: INK_MUTE,
-              letterSpacing: '0.16em',
-              textTransform: 'uppercase' as const,
-            }}
-          >
-            Recent Results
-          </span>
-        </div>
+        <SectionHeader role="section" kicker="Recent Results" paddingTop={14} />
         <DotStrip events={visible} />
       </div>
     );
