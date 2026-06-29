@@ -239,9 +239,7 @@ export function SummaryTab({
         return (
           <motion.div style={{ marginTop: '8px' }} {...sectionEntrance}>
             <div style={{ padding: '14px 20px 12px', background: SLATE_50 }}>
-              <div>
-                <span style={{ fontSize: '9px', fontWeight: 800, color: INK_MUTE, letterSpacing: '0.16em', textTransform: 'uppercase' as const }}>Best Round of the Week</span>
-              </div>
+              <SectionHeader role="section" kicker="BEST ROUND OF THE WEEK" className="!mb-0" />
             </div>
             <Link
               {...playerRoute(best.playerId, tournamentName ? { kind: 'tournament', tournamentName } : undefined)}
