@@ -48,7 +48,9 @@ const AMBER = '#F7931E';
 const AMBER_DEEP = '#C97A10';
 const FONT_SERIF = '"Geist", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif';
 
-const SectionHeader: React.FC<{ label: string }> = ({ label }) => (
+// Temporal date-group divider for the notification list (TODAY / YESTERDAY / EARLIER).
+// NOT a canonical SectionHeader — date labels are a distinct tier from section eyebrows.
+const DateGroupLabel: React.FC<{ label: string }> = ({ label }) => (
     <div
     className="flex items-center gap-2 px-5 py-2 z-10"
     style={{ background: BG_SURFACE }}
