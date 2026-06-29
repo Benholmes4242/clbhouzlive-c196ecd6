@@ -153,8 +153,8 @@ export function deriveHeroState(
     };
   }
 
-  // Live
-  if (status === 'inprogress' || status === 'inplayoff' || status === 'delayed') {
+  // Live — Sportradar is actively reporting in-progress play.
+  if (status === 'inprogress' || status === 'in_progress') {
     return {
       kind: 'live',
       round: tournament.currentRound ?? 1,
@@ -163,6 +163,22 @@ export function deriveHeroState(
       // when the cache exposes it.
       totalRounds: tournament.tourSlug === 'lpga' ? 3 : 4,
       thruLabel: 'F THRU',
+    };
+  }
+
+  // Unresolved — playoff / suspended / weather / delayed. Play not finished:
+  // stay featured, but render the awaiting-playoff variant rather than crowning.
+  const UNRESOLVED = [
+    'playoff', 'inplayoff', 'in_playoff',
+    'suspended', 'delayed', 'weather', 'holdup',
+  ];
+  if (UNRESOLVED.includes(status)) {
+    const isSuspended = status === 'suspended' || status === 'delayed' || status === 'weather' || status === 'holdup';
+    return {
+      kind: 'results',
+      variant: 'awaiting-playoff',
+      finishDate: tournament.endDate || '',
+      meta: isSuspended ? 'PLAY SUSPENDED' : 'PLAYOFF',
     };
   }
 

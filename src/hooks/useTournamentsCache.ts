@@ -76,11 +76,17 @@ async function fetchTournamentsCache(): Promise<TournamentsCache> {
   void UPCOMING_WINDOW_DAYS;
 
   const [liveRes, completedRes, upcomingRes] = await Promise.all([
-    // Live + starting soon
+    // Live + unresolved (playoff / suspended / weather / delayed).
+    // Per tournamentState.ts vocabulary — these all mean "play not finished",
+    // so they belong in the LIVE bucket (kept featured, never crowned).
     supabase
       .from('sr_tournaments')
       .select(CACHE_SELECT)
-      .eq('status', 'inprogress')
+      .in('status', [
+        'inprogress', 'in_progress',
+        'playoff', 'inplayoff', 'in_playoff',
+        'suspended', 'delayed', 'weather', 'holdup',
+      ])
       .order('start_date', { ascending: true })
       .order('purse', { ascending: false }),
 

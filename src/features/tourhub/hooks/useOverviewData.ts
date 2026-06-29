@@ -157,7 +157,11 @@ export function useLiveTournaments() {
             tour_name
           )
         `)
-        .eq('status', 'inprogress')
+        .in('status', [
+          'inprogress', 'in_progress',
+          'playoff', 'inplayoff', 'in_playoff',
+          'suspended', 'delayed', 'weather', 'holdup',
+        ])
         .order('start_date', { ascending: true });
 
       if (error) throw error;
@@ -522,9 +526,14 @@ export function useTournamentsByTour() {
 
         const stats = tourMap.get(tourId)!;
         stats.tournamentCount++;
-        if (row.status === 'inprogress') stats.liveCount++;
-        if (row.status === 'scheduled' || row.status === 'created') stats.upcomingCount++;
-        if (row.status === 'closed') stats.completedCount++;
+        const _st = (row.status || '').toLowerCase();
+        if (_st === 'inprogress' || _st === 'in_progress' ||
+            _st === 'playoff' || _st === 'inplayoff' || _st === 'in_playoff' ||
+            _st === 'suspended' || _st === 'delayed' || _st === 'weather' || _st === 'holdup') {
+          stats.liveCount++;
+        }
+        if (_st === 'scheduled' || _st === 'created') stats.upcomingCount++;
+        if (_st === 'closed' || _st === 'complete') stats.completedCount++;
       });
 
       // Assign next tournament to each tour
@@ -596,7 +605,11 @@ export function useOverviewStats() {
       const liveRes = await supabase
         .from('sr_tournaments')
         .select('id', { count: 'exact', head: true })
-        .eq('status', 'inprogress');
+        .in('status', [
+          'inprogress', 'in_progress',
+          'playoff', 'inplayoff', 'in_playoff',
+          'suspended', 'delayed', 'weather', 'holdup',
+        ]);
 
       const worldNo1Data = worldNo1Res.data as any;
 

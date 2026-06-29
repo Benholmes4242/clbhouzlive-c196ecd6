@@ -19,6 +19,7 @@ import { TOUR_CONFIG, type TourId } from './useOverviewData';
 import { useTournamentsCache, type CachedTournament } from '@/hooks/useTournamentsCache';
 import { getContextLabel } from '../utils/tournamentClassification';
 import { isAnyMajor } from '../utils/majorScope';
+import { isTournamentDecided } from '@/utils/tournamentDecided';
 
 // Tour priority order for sorting live tournaments
 const TOUR_PRIORITY: TourId[] = ['pga', 'liv', 'euro', 'lpga', 'pgad', 'champ'];
@@ -98,8 +99,9 @@ export function useHeroCarouselData() {
         .map(t => t.defending_champion)
         .filter((name): name is string => !!name);
 
-      // Fetch winner details, leaderboard data, and defending champion photos in parallel
-      const [winnersResult, leaderboardResult, defendingChampionResult] = await Promise.all([
+      // Fetch winner details, leaderboard data, defending champion photos,
+      // AND confirmed event_winners rows in parallel.
+      const [winnersResult, leaderboardResult, defendingChampionResult, eventWinnersResult] = await Promise.all([
         winnerSrIds.length > 0
           ? supabase
               .from('sr_players')
@@ -110,7 +112,7 @@ export function useHeroCarouselData() {
           ? supabase
               .from('sr_leaderboards')
               .select(`
-                tournament_id, position, score,
+                tournament_id, position, position_tied, score,
                 player:sr_players!sr_leaderboards_player_id_fkey(sr_id, first_name, last_name, photo_url, pga_tour_id),
                 team:sr_teams!sr_leaderboards_team_id_fkey(
                   sr_id, display_name, abbr_name,
@@ -135,6 +137,13 @@ export function useHeroCarouselData() {
                 }).join(',')
               )
           : Promise.resolve({ data: [] }),
+        allTournamentIds.length > 0
+          ? supabase
+              .from('event_winners')
+              .select('tournament_id, player_id')
+              .in('tournament_id', allTournamentIds)
+              .not('player_id', 'is', null)
+          : Promise.resolve({ data: [] }),
       ]);
 
       // Build winner map
@@ -150,9 +159,20 @@ export function useHeroCarouselData() {
         }
       });
 
-      // Build leaderboard map — synthesize a player-shaped object from team data when needed
+      // Build leaderboard map — synthesize a player-shaped object from team data when needed.
+      // Also track per-tournament tie state: count of pos=1 rows + position_tied flag +
+      // whether the leader is a team entry.
       const leaderboardMap: Record<string, { score: number | null; player: any }> = {};
+      const tieMap: Record<string, { topRowCount: number; topTie: boolean; isTeamEvent: boolean }> = {};
       (leaderboardResult.data || []).forEach((entry: any) => {
+        // Accumulate tie metadata first (every pos=1 row counts).
+        const prev = tieMap[entry.tournament_id] || { topRowCount: 0, topTie: false, isTeamEvent: false };
+        tieMap[entry.tournament_id] = {
+          topRowCount: prev.topRowCount + 1,
+          topTie: prev.topTie || Boolean(entry.position_tied),
+          isTeamEvent: prev.isTeamEvent || Boolean(entry.team && !entry.player),
+        };
+
         let player = entry.player;
         if (!player && entry.team) {
           // Team event: synthesize a "player" object so downstream renders show the team name
@@ -161,7 +181,6 @@ export function useHeroCarouselData() {
             .sort((a: any, b: any) => a.position_in_team - b.position_in_team);
           const primary = members[0]?.player;
           const teamName = entry.team.abbr_name || entry.team.display_name || '';
-          const parts = teamName.split(' / ');
           player = {
             sr_id: entry.team.sr_id,
             first_name: '',
@@ -177,9 +196,16 @@ export function useHeroCarouselData() {
             })),
           };
         }
-        if (player) {
+        if (player && !leaderboardMap[entry.tournament_id]) {
+          // First pos=1 row only — leaderboardMap holds the "regulation leader".
           leaderboardMap[entry.tournament_id] = { score: entry.score, player };
         }
+      });
+
+      // Build confirmed-winner map from event_winners (authoritative).
+      const confirmedWinnerSet = new Set<string>();
+      ((eventWinnersResult as any).data || []).forEach((w: any) => {
+        if (w.tournament_id) confirmedWinnerSet.add(w.tournament_id);
       });
 
       // Build defending champion map
@@ -206,20 +232,38 @@ export function useHeroCarouselData() {
         if (includeWinner) {
           const winnerFromId = row.winner_id ? winnerMap[row.winner_id] : null;
           const leaderboardEntry = leaderboardMap[row.id];
+          const tie = tieMap[row.id];
 
-          winnerName = winnerFromId
-            ? `${winnerFromId.first_name} ${winnerFromId.last_name}`.trim()
-            : leaderboardEntry?.player
-              ? `${leaderboardEntry.player.first_name} ${leaderboardEntry.player.last_name}`.trim()
+          // Format-aware "decided" gate — never crown a tied top.
+          const winnerConfirmed = confirmedWinnerSet.has(row.id) || Boolean(winnerFromId);
+          const { decided } = isTournamentDecided({
+            status: row.status,
+            winnerConfirmed,
+            topRowCount: tie?.topRowCount ?? 1,
+            topTie: tie?.topTie ?? false,
+            isTeamEvent: tie?.isTeamEvent ?? false,
+            // Team event "decided" only when an authoritative winner row exists.
+            teamWinnerConfirmed: winnerConfirmed,
+          });
+
+          if (decided) {
+            winnerName = winnerFromId
+              ? `${winnerFromId.first_name} ${winnerFromId.last_name}`.trim()
+              : leaderboardEntry?.player
+                ? `${leaderboardEntry.player.first_name} ${leaderboardEntry.player.last_name}`.trim()
+                : null;
+
+            winnerPhotoUrl = winnerFromId?.photo_url || leaderboardEntry?.player?.photo_url || null;
+            winnerPgaTourId = winnerFromId?.pga_tour_id || leaderboardEntry?.player?.pga_tour_id || null;
+
+            winnerScore = leaderboardEntry?.score != null
+              ? (leaderboardEntry.score <= 0 ? String(leaderboardEntry.score) : `+${leaderboardEntry.score}`)
               : null;
-
-          winnerPhotoUrl = winnerFromId?.photo_url || leaderboardEntry?.player?.photo_url || null;
-          winnerPgaTourId = winnerFromId?.pga_tour_id || leaderboardEntry?.player?.pga_tour_id || null;
-
-          winnerScore = leaderboardEntry?.score != null
-            ? (leaderboardEntry.score <= 0 ? String(leaderboardEntry.score) : `+${leaderboardEntry.score}`)
-            : null;
+          }
+          // Undecided → leave winnerName null; the hero's winner-gate renders
+          // the awaiting-playoff / tie summary instead of crowning regulation leader.
         }
+
 
         // Defending champion photo lookup
         const champKey = (row.defending_champion || '').toLowerCase();
@@ -275,7 +319,17 @@ export function useHeroCarouselData() {
 
       completedTournaments.forEach(t => {
         const tournament = transformTournament(t, true);
-        if (completedByTour[tournament.tourSlug]) completedByTour[tournament.tourSlug].push(tournament);
+        // Defensive re-bucket: a closed event whose top is tied + no confirmed winner
+        // is "unresolved" (playoff pending) — route to the LIVE bucket so it stays
+        // featured and never gets crowned.
+        const tie = tieMap[t.id];
+        const winnerConfirmed = confirmedWinnerSet.has(t.id) || Boolean(t.winner_id);
+        const isUnresolved = !winnerConfirmed && (tie?.topTie || (tie?.topRowCount ?? 1) > 1);
+        if (isUnresolved && liveByTour[tournament.tourSlug]) {
+          liveByTour[tournament.tourSlug].push(tournament);
+        } else if (completedByTour[tournament.tourSlug]) {
+          completedByTour[tournament.tourSlug].push(tournament);
+        }
       });
 
       upcomingTournaments.forEach(t => {
