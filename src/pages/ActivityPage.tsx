@@ -48,7 +48,9 @@ const AMBER = '#F7931E';
 const AMBER_DEEP = '#C97A10';
 const FONT_SERIF = '"Geist", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif';
 
-const SectionHeader: React.FC<{ label: string }> = ({ label }) => (
+// Temporal date-group divider for the notification list (TODAY / YESTERDAY / EARLIER).
+// NOT a canonical SectionHeader — date labels are a distinct tier from section eyebrows.
+const DateGroupLabel: React.FC<{ label: string }> = ({ label }) => (
     <div
     className="flex items-center gap-2 px-5 py-2 z-10"
     style={{ background: BG_SURFACE }}
@@ -229,7 +231,7 @@ const ActivityPage: React.FC = () => {
                 </button>
                 <div>
                   <div className="flex items-center gap-2 mb-1.5">
-                    <span style={{ fontSize: 9, fontWeight: 800, color: '#64748B', letterSpacing: '0.16em', textTransform: 'uppercase' }}>Activity</span>
+                    <span style={{ fontSize: 11, fontWeight: 800, color: '#94A3B8', letterSpacing: '0.14em', textTransform: 'uppercase' }}>ACTIVITY</span>
                   </div>
                   <div className="flex items-baseline gap-2.5">
                     <h1
@@ -372,7 +374,7 @@ const ActivityPage: React.FC = () => {
 
                   return sections.map(section => (
                     <section key={section.label}>
-                      <SectionHeader label={section.label} />
+                      <DateGroupLabel label={section.label} />
                       <div className="px-4 pb-5 pt-2">
                         <NotificationList
                           items={section.items}
