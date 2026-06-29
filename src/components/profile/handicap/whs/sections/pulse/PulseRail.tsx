@@ -1,6 +1,7 @@
 import React from 'react';
 import { PulseCard } from './PulseCard';
 import { PulseEmpty } from './PulseEmpty';
+import { SectionHeader } from '@/components/ui/SectionHeader';
 import { usePulseFriends } from '@/hooks/gam/usePulseFriends';
 
 const FONT = 'Geist, -apple-system, BlinkMacSystemFont, system-ui, sans-serif';
@@ -10,35 +11,13 @@ interface Props {
   onOpenSearch: () => void;
 }
 
-const SectionHeader: React.FC<{ count: number | null }> = ({ count }) => (
-  <div
-    style={{
-      padding: '0 20px',
-      display: 'flex',
-      alignItems: 'baseline',
-      justifyContent: 'space-between',
-      fontFamily: FONT,
-      marginBottom: 10,
-    }}
-  >
-    <div style={{ display: 'flex', alignItems: 'baseline', gap: 6 }}>
-      <span style={{ fontSize: 16, fontWeight: 700, color: 'var(--hcp-t-100)' }}>Pulse</span>
-      {count != null && (
-        <span style={{ fontSize: 12, color: 'var(--hcp-t-60)', fontVariantNumeric: 'tabular-nums' }}>
-          ({count})
-        </span>
-      )}
-    </div>
-  </div>
-);
-
 export const PulseRail: React.FC<Props> = ({ userId, onOpenSearch }) => {
   const { data: friends = [], isLoading } = usePulseFriends(userId);
 
   if (isLoading) {
     return (
       <div style={{ marginTop: 18 }}>
-        <SectionHeader count={null} />
+        <SectionHeader surface="dark" role="section" kicker="PULSE" />
         <div
           style={{
             display: 'flex',
@@ -72,18 +51,13 @@ export const PulseRail: React.FC<Props> = ({ userId, onOpenSearch }) => {
 
   return (
     <div style={{ marginTop: 18 }}>
-      <SectionHeader count={friends.length} />
-      <div
-        style={{
-          fontFamily: FONT,
-          fontSize: 11,
-          color: 'var(--hcp-t-60)',
-          padding: '0 20px',
-          marginBottom: 10,
-        }}
-      >
-        Friends who've played recently
-      </div>
+      <SectionHeader
+        surface="dark"
+        role="section"
+        kicker="PULSE"
+        count={friends.length}
+        sub="Friends who've played recently"
+      />
       <div
         style={{
           display: 'flex',
