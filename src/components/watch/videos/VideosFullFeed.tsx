@@ -12,6 +12,9 @@ import { VideosSuggestedCreatorsRail } from './VideosSuggestedCreatorsRail';
 import { VideosQuickClipsRail } from './VideosQuickClipsRail';
 import type { FeedPost } from '@/components/media-system/types/media';
 import WatchEmptyState from '@/components/watch/shared/WatchEmptyState';
+import { usePendingPostsForActor } from '@/uploads/usePendingPostsForActor';
+import { PendingPostCard } from '@/components/posts-tab/PendingPostCard';
+import { useActiveActor } from '@/context/ActiveActorContext';
 
 interface VideosFullFeedProps {
   userId: string | undefined;
@@ -100,6 +103,21 @@ function VideosFullFeedInner({ userId, mood, searchQuery, onClearSearch, onReset
     fetchNextPage,
     refetch,
   } = useVideosFeed({ userId, filter, category, searchQuery });
+
+  const { activeActor } = useActiveActor();
+  const realPostIds = useMemo(() => posts.map((p) => p.id), [posts]);
+  const pendingEntries = usePendingPostsForActor({
+    authorActorType: (activeActor?.type === 'business' ? 'business' : 'personal'),
+    authorActorId: activeActor?.id ?? userId ?? '',
+    viewerActorType: (activeActor?.type === 'business' ? 'business' : 'personal'),
+    viewerActorId: activeActor?.id ?? userId ?? '',
+    realPostIds,
+  });
+  // Only show pending entries that include video media (videos surface)
+  const visiblePending = useMemo(
+    () => pendingEntries.filter((e) => e.media.some((m) => m.kind === 'video')),
+    [pendingEntries]
+  );
 
   useEffect(() => {
     if (inView && hasNextPage && !isFetchingNextPage && !fetchGuard.current) {
@@ -232,6 +250,13 @@ function VideosFullFeedInner({ userId, mood, searchQuery, onClearSearch, onReset
 
   return (
     <>
+      {visiblePending.length > 0 && (
+        <div style={{ padding: '8px 0 0' }}>
+          {visiblePending.map((p) => (
+            <PendingPostCard key={p.jobId} entry={p} theme="light" />
+          ))}
+        </div>
+      )}
       {renderVideoFeedBody()}
     </>
   );

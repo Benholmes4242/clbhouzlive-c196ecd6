@@ -30,6 +30,8 @@ import CommentsSheet from '@/components/comments/CommentsSheet';
 import { getActorRouteByType } from '@/types/actor';
 import { useReviewSheetStore } from '@/stores/reviewSheetStore';
 import { useReviewerStats } from '@/hooks/useReviewerStats';
+import { usePendingPostsForActor } from '@/uploads/usePendingPostsForActor';
+import { PendingPostCard } from './PendingPostCard';
 
 type PostsFilter = 'all' | 'videos' | 'shorts' | 'images' | 'reviews';
 
@@ -71,6 +73,15 @@ const PostsTabContent: React.FC<PostsTabContentProps> = ({
     userId: user?.id,
     actorType,
     actorId,
+  });
+
+  const realPostIds = useMemo(() => posts.map((p) => p.id), [posts]);
+  const pendingEntries = usePendingPostsForActor({
+    authorActorType: actorType,
+    authorActorId: actorId,
+    viewerActorType: (activeActor?.type === 'business' ? 'business' : 'personal'),
+    viewerActorId: activeActor?.id ?? user?.id ?? '',
+    realPostIds,
   });
 
   const filteredPosts = useMemo(() => {
@@ -214,9 +225,18 @@ const PostsTabContent: React.FC<PostsTabContentProps> = ({
         </div>
       )}
 
-      {filteredPosts.length === 0 ? (
+      {/* Optimistic pending posts (author + viewer matched) */}
+      {isOwnProfile && pendingEntries.length > 0 && (
+        <div>
+          {pendingEntries.map((p) => (
+            <PendingPostCard key={p.jobId} entry={p} theme="light" />
+          ))}
+        </div>
+      )}
+
+      {filteredPosts.length === 0 && pendingEntries.length === 0 ? (
         emptyState
-      ) : (
+      ) : filteredPosts.length === 0 ? null : (
         <LightCardFeed
           posts={filteredPosts}
           
