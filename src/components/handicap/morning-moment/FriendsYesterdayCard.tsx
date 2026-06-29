@@ -10,6 +10,7 @@ import { FriendPostcard } from './friends-yesterday';
 import RoundDetailSheet from '@/components/profile/handicap/whs/sections/round-detail/RoundDetailSheet';
 import type { WhsFriendActivityWithImage, FriendLeaderboardEntry } from '@/lib/whs/types';
 import { useOpenFriendSheet } from '@/components/friend-sheet/FriendSheetProvider';
+import { DarkSectionHeader } from '@/components/profile/handicap/whs/sections/_shared/darkAtoms';
 
 const toWhsOnlyEntry = (friend: FriendYesterday): FriendLeaderboardEntry => ({
   is_self: false,
