@@ -225,9 +225,18 @@ const PostsTabContent: React.FC<PostsTabContentProps> = ({
         </div>
       )}
 
-      {filteredPosts.length === 0 ? (
+      {/* Optimistic pending posts (author + viewer matched) */}
+      {isOwnProfile && pendingEntries.length > 0 && (
+        <div>
+          {pendingEntries.map((p) => (
+            <PendingPostCard key={p.jobId} entry={p} theme="light" />
+          ))}
+        </div>
+      )}
+
+      {filteredPosts.length === 0 && pendingEntries.length === 0 ? (
         emptyState
-      ) : (
+      ) : filteredPosts.length === 0 ? null : (
         <LightCardFeed
           posts={filteredPosts}
           
