@@ -157,9 +157,7 @@ export function SummaryTab({
       {scoringStats && scoringStats.rounds.length > 0 && (
         <motion.div style={{ marginTop: '8px' }} {...sectionEntrance}>
           <div style={{ padding: '14px 20px 12px', background: SLATE_50 }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-              <span style={{ fontSize: '9px', fontWeight: 800, color: INK_MUTE, letterSpacing: '0.16em', textTransform: 'uppercase' as const }}>Round Scoring</span>
-            </div>
+            <SectionHeader role="section" kicker="ROUND SCORING" className="!mb-0" />
           </div>
 
           {/* Column headers */}
