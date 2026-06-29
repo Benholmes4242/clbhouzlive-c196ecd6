@@ -23,7 +23,9 @@ import {
   AMBER, FONT, INK, INK_MUTE, INK_TINT_06, INK_TINT_07, SLATE_50, SURFACE,
 } from '../../_shared/tokens';
 import { HAIRLINE_INK_8 } from '@/features/courses/_shared/tokens';
+import { SC_ACCENT } from '@/features/courses/components/holes/_constants';
 import { ConnectHandicapCue } from '@/components/courses/course-detail/ConnectHandicapCue';
+import { SectionHeader } from '@/components/ui/SectionHeader';
 
 interface HoleStatsTabProps {
   tournamentId: string;
