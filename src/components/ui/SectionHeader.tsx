@@ -234,6 +234,7 @@ function SectionHeaderInner(props: SectionHeaderProps) {
             )}
           </div>
           {!hasTitle && action && <ActionAffordance action={action} />}
+          {!hasTitle && !action && meta && <MetaSlot>{meta}</MetaSlot>}
         </div>
       )}
       {hasTitle && (
@@ -252,13 +253,13 @@ function SectionHeaderInner(props: SectionHeaderProps) {
               fontSize: titleSize,
               fontWeight: 800,
               letterSpacing: titleTracking,
-              color: INK,
+              color: titleColor,
               lineHeight: 1.15,
             }}
           >
             {title}
           </h2>
-          {action && <ActionAffordance action={action} />}
+          {action ? <ActionAffordance action={action} /> : meta ? <MetaSlot>{meta}</MetaSlot> : null}
         </div>
       )}
 
