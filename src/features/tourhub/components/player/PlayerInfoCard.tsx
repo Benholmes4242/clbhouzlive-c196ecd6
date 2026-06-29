@@ -5,7 +5,7 @@
 import { Link } from 'react-router-dom';
 import SectionHeader from '@/components/ui/SectionHeader';
 import type { TourPlayer } from '../../hooks/useTourHubData';
-import { INK, INK_FAINT, INK_MUTE, INK_TINT_06, INK_TINT_07, SURFACE } from '../../_shared/tokens';
+import { INK, INK_FAINT, INK_TINT_06, INK_TINT_07, SURFACE } from '../../_shared/tokens';
 
 function formatHeight(inches: string | number | null | undefined): string | null {
   if (!inches) return null;
