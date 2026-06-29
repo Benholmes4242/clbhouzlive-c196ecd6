@@ -241,12 +241,7 @@ export function TeeTimesTab({ tournamentId, tournamentName, isCompleted }: TeeTi
     <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.3 }}>
       {/* Section eyebrow */}
       <div style={{ background: SLATE_50, borderTop: `0.5px solid ${INK_TINT_07}`, padding: '14px 16px 10px' }}>
-        <span style={{
-          fontSize: 9, fontWeight: 800, color: INK_MUTE,
-          letterSpacing: '0.16em', textTransform: 'uppercase',
-        }}>
-          Tee Times · {selectedRound}
-        </span>
+        <SectionHeader role="section" kicker={`TEE TIMES · ${selectedRound}`} paddingX={0} className="!mb-0" />
       </div>
 
       {/* Round selector */}
