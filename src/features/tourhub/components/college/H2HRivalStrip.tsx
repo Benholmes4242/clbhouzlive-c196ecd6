@@ -117,7 +117,7 @@ export function H2HRivalStrip({ normalizedName, className }: H2HRivalStripProps)
                   {subtitle}
                 </div>
               </div>
-              <ArrowLeftRight size={13} strokeWidth={2.5} style={{ color: AMBER, flexShrink: 0 }} />
+              <ArrowLeftRight size={13} strokeWidth={2.5} style={{ color: INK_MUTE, flexShrink: 0 }} />
             </Link>
           );
         })}
