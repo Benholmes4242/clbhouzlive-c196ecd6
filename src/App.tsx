@@ -871,6 +871,7 @@ const App: React.FC = () => {
                     <RehydrationProvider>
                       <PostEventsBridge>
                         <UploadToastsBridge />
+                        <PendingPostsController />
                         <UploadProgressBanner />
                         <AppInner />
                       </PostEventsBridge>
