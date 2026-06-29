@@ -137,20 +137,7 @@ const FriendsYesterdayCard: React.FC<Props> = ({ data, userId }) => {
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', fontFamily: FONT }}>
-      {/* Section eyebrow */}
-      <div style={{ marginBottom: 12 }}>
-        <span
-          style={{
-            fontSize: 11,
-            fontWeight: 700,
-            color: T.ink55,
-            letterSpacing: '0.18em',
-            textTransform: 'uppercase',
-          }}
-        >
-          FRIENDS YESTERDAY · {count} PLAYED
-        </span>
-      </div>
+      <DarkSectionHeader eyebrow="FRIENDS YESTERDAY" title={`${count} played`} />
 
       <div
         className="fyc-scroll"
@@ -159,7 +146,7 @@ const FriendsYesterdayCard: React.FC<Props> = ({ data, userId }) => {
           gap: 10,
           overflowX: 'auto',
           overflowY: 'hidden',
-          padding: '0 0 6px',
+          padding: '12px 16px 6px',
           scrollPaddingLeft: 16,
           scrollPaddingRight: 16,
           scrollSnapType: 'x mandatory',
