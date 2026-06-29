@@ -17,6 +17,7 @@ import {
   AMBER, INK, INK_FAINT, INK_MUTE, INK_TINT_06, INK_TINT_07,
   SCORE_OVER_PAR_LIGHT, SURFACE, SLATE_50,
 } from '../../_shared/tokens';
+import { SectionHeader } from '@/components/ui/SectionHeader';
 
 type ScoreInfo = { score: number | null; position: number | null; tied: boolean; status: string | null };
 
