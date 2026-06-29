@@ -19,6 +19,7 @@ import { TOUR_CONFIG, type TourId } from './useOverviewData';
 import { useTournamentsCache, type CachedTournament } from '@/hooks/useTournamentsCache';
 import { getContextLabel } from '../utils/tournamentClassification';
 import { isAnyMajor } from '../utils/majorScope';
+import { isTournamentDecided } from '@/utils/tournamentDecided';
 
 // Tour priority order for sorting live tournaments
 const TOUR_PRIORITY: TourId[] = ['pga', 'liv', 'euro', 'lpga', 'pgad', 'champ'];
