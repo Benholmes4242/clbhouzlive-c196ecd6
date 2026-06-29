@@ -16,6 +16,7 @@ import { uploadEventBus } from '@/uploads/uploadEventBus';
 import { formatBytes, formatDuration, formatBytesPerSecond } from '@/uploads/uploadSpeedTracker';
 import { retryJob, cancelJob, retryFailedItems } from '@/uploads/uploadPipeline';
 import { usePendingPostsStore } from '@/uploads/pendingPostsStore';
+import { useShallow } from 'zustand/react/shallow';
 import { cn } from '@/lib/utils';
 
 // Routes that render PendingPostCard inline. The banner is suppressed for
