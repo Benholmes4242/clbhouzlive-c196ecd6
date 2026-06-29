@@ -75,6 +75,15 @@ const PostsTabContent: React.FC<PostsTabContentProps> = ({
     actorId,
   });
 
+  const realPostIds = useMemo(() => posts.map((p) => p.id), [posts]);
+  const pendingEntries = usePendingPostsForActor({
+    authorActorType: actorType,
+    authorActorId: actorId,
+    viewerActorType: (activeActor?.type === 'business' ? 'business' : 'personal'),
+    viewerActorId: activeActor?.id ?? user?.id ?? '',
+    realPostIds,
+  });
+
   const filteredPosts = useMemo(() => {
     if (activeFilter === 'all') return posts;
     return posts.filter(post => {
