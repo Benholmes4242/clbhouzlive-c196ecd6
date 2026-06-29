@@ -17,7 +17,7 @@ export const PulseRail: React.FC<Props> = ({ userId, onOpenSearch }) => {
   if (isLoading) {
     return (
       <div style={{ marginTop: 18 }}>
-        <SectionHeader count={null} />
+        <SectionHeader surface="dark" role="section" kicker="PULSE" />
         <div
           style={{
             display: 'flex',
