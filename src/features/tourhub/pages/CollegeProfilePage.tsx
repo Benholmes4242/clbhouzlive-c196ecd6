@@ -1,6 +1,6 @@
 import { useMemo, Fragment } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
-import { RefreshCw, AlertCircle, Crown } from 'lucide-react';
+import { RefreshCw, AlertCircle } from 'lucide-react';
 import { getCollegeLogoUrl } from '@/utils/collegeLogo';
 import { TourHubShell } from '../components/TourHubShell';
 import { Skeleton } from '@/components/ui/skeleton';
