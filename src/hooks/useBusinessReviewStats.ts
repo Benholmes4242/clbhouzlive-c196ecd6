@@ -19,7 +19,6 @@ export interface BusinessReviewStats {
   };
   recentReviews: number;
   reviewTrend: number;
-  unrespondedCount: number;
   courses: Array<{
     id: string;
     name: string;
