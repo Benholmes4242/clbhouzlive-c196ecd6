@@ -273,7 +273,7 @@ export function LeadersTab() {
         {searchExpanded && (
           <div style={{ padding: '6px 16px 8px' }}>
             <div style={{ position: 'relative' }}>
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 z-10 w-4 h-4" style={{ color: AMBER }} strokeWidth={2.5} />
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 z-10 w-4 h-4" style={{ color: '#64748B' }} strokeWidth={2.5} />
               <input
                 type="text"
                 autoFocus

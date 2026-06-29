@@ -226,7 +226,7 @@ export function LeadersMasthead({
               <Crown size={13} strokeWidth={2.5} fill={GOLD} style={{ color: GOLD_DEEP, flexShrink: 0 }} />
               <span
                 style={{
-                  fontSize: 10.5,
+                  fontSize: 11,
                   fontWeight: 800,
                   color: INK,
                   letterSpacing: '0.14em',
