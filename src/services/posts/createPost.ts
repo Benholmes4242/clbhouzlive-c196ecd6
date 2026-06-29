@@ -20,10 +20,10 @@ export interface CreatePostInput {
   visibility?: 'anyone' | 'followers' | 'private';
   // Scheduling fields
   scheduledAt?: Date | null;
-  // 'uploading' = post created, media still uploading (hidden from feeds)
+  // 'processing' = post created, media still uploading (author-only via RLS)
   // 'published' = fully ready and visible in feeds
   // 'scheduled' = will be published at scheduledAt time
-  status?: 'published' | 'scheduled' | 'uploading';
+  status?: 'published' | 'scheduled' | 'processing';
 }
 
 export interface CreatePostResult {
