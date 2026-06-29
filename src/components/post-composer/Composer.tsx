@@ -1453,8 +1453,8 @@ export function Composer({
       <BottomSheet
         open={visibilitySheetOpen}
         onClose={() => setVisibilitySheetOpen(false)}
-        title="Who can see this?"
       >
+        <SheetEyebrow>Who can see this?</SheetEyebrow>
         {VISIBILITY_OPTIONS.map(({ value, label, sub, Icon }) => {
           const isSelected = visibility === value;
           return (
