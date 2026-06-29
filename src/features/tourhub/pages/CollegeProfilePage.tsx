@@ -196,9 +196,9 @@ export function CollegeProfilePage() {
                       {primarySuffix && <span style={{ color: INK }}>{primarySuffix}</span>}
                     </div>
                     <div style={{
-                      fontSize: 9,
+                      fontSize: 11,
                       fontWeight: 800,
-                      letterSpacing: '0.16em',
+                      letterSpacing: '0.14em',
                       color: INK_MUTE,
                       textTransform: 'uppercase' as const,
                       marginTop: 4,
