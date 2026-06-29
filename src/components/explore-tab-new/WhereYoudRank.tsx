@@ -9,7 +9,7 @@ import { SectionHeader } from '@/components/ui/SectionHeader';
 import { SLATE_50, SURFACE } from '@/features/courses/_shared/tokens';
 
 const AMBER = '#F7931E';
-const DEEP_AMBER = '#f '#c97a10';
+const DEEP_AMBER = '#c97a10';
 const GOLD = '#FBBC2E';
 
 interface WhereYoudRankProps {
