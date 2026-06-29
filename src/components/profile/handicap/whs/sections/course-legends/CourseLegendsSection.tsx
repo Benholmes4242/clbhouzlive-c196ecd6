@@ -1,5 +1,6 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
-import { Crown, Search } from 'lucide-react';
+import { Search } from 'lucide-react';
+import { DarkSectionHeader } from '../_shared/darkAtoms';
 import { useUserPlayedCourses } from '@/hooks/gam/useUserPlayedCourses';
 import { useUserHomeClubCourses } from '@/hooks/gam/useUserHomeClubCourses';
 import { useDiscoverCoursesThisWeek } from '@/hooks/gam/useDiscoverCoursesThisWeek';
@@ -97,45 +98,23 @@ const SectionHero: React.FC<{
   >
 
     {/* Top half: title + count + toggle */}
-    <div style={{ position: 'relative', zIndex: 1, padding: '18px 18px 16px' }}>
-      <div
-        style={{
-          display: 'flex',
-          alignItems: 'center',
-          gap: 6,
-          fontSize: 10,
-          fontWeight: 800,
-          color: 'var(--hcp-t-100)',
-          letterSpacing: '0.16em',
-          marginBottom: 8,
-        }}
-      >
-        <Crown size={11} strokeWidth={2.4} />
-        COURSE CHAMPIONS
-      </div>
-
-      <div
-        style={{
-          fontSize: 24,
-          fontWeight: 800,
-          color: 'var(--hcp-t-100)',
-          letterSpacing: '-0.025em',
-          lineHeight: 1.15,
-        }}
-      >
-        {titleCount === 0
-          ? (friendName ? `${friendName}'s reign starts here` : 'Your reign starts here')
-          : (friendName
-              ? `${friendName} holds ${titleCount} title${titleCount === 1 ? '' : 's'}`
-              : `You hold ${titleCount} title${titleCount === 1 ? '' : 's'}`)}
-      </div>
+    <div style={{ position: 'relative', zIndex: 1, padding: '4px 0 16px' }}>
+      <DarkSectionHeader
+        eyebrow="COURSE CHAMPIONS"
+        title={
+          titleCount === 0
+            ? (friendName ? `${friendName}'s reign starts here` : 'Your reign starts here')
+            : (friendName
+                ? `${friendName} holds ${titleCount} title${titleCount === 1 ? '' : 's'}`
+                : `You hold ${titleCount} title${titleCount === 1 ? '' : 's'}`)
+        }
+      />
 
       <div
         style={{
           fontSize: 12.5,
           color: 'var(--hcp-t-60)',
-          marginTop: 4,
-          marginBottom: 14,
+          margin: '6px 18px 14px',
         }}
       >
         {titleCount === 0
@@ -147,7 +126,9 @@ const SectionHero: React.FC<{
             : 'across all-time course records'}
       </div>
 
-      <WindowToggle window={window} setWindow={setWindow} />
+      <div style={{ padding: '0 18px' }}>
+        <WindowToggle window={window} setWindow={setWindow} />
+      </div>
     </div>
 
     {/* Hairline divider */}
