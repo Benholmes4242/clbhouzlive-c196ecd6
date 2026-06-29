@@ -1,4 +1,5 @@
 import { Link } from 'react-router-dom';
+import SectionHeader from '@/components/ui/SectionHeader';
 import { getCollegeLogoUrl } from '@/utils/collegeLogo';
 import { getPlayerHeadshotCandidates } from '@/utils/playerHeadshot';
 import { PlayerInitialAvatar } from '../shared/PlayerInitialAvatar';
@@ -133,12 +134,8 @@ function AlumniCompareBlock({ title, alumni1, alumni2, statKey, name1, name2, em
 
   return (
     <div style={{ background: SLATE_50, borderTop: `0.5px solid ${INK_TINT_07}` }}>
-      {/* Section eyebrow — canonical §6 slate-caps */}
-      <div style={{ padding: '14px 16px 10px' }}>
-        <span style={{ fontSize: '9px', fontWeight: 800, color: INK_MUTE, letterSpacing: '0.16em', textTransform: 'uppercase' as const }}>
-          {title}
-        </span>
-      </div>
+      {/* Section eyebrow — canonical SectionHeader */}
+      <SectionHeader role="section" kicker={title} paddingX={16} />
 
       {/* Column headers — de-boxed, single bottom hairline */}
       <div style={{ display: 'flex', alignItems: 'center', padding: '4px 16px 6px', borderBottom: `0.5px solid ${INK_TINT_07}` }}>
@@ -335,12 +332,8 @@ export function CollegeCompareHero({ data, className }: CollegeCompareHeroProps)
     <div className={className}>
       {/* ── SEASON VERDICT ── */}
       <div style={{ background: SLATE_50, borderTop: `0.5px solid ${INK_TINT_07}` }}>
-        {/* Section eyebrow — canonical §6 slate-caps */}
-        <div style={{ padding: '14px 16px 10px' }}>
-          <span style={{ fontSize: '9px', fontWeight: 800, color: INK_MUTE, letterSpacing: '0.16em', textTransform: 'uppercase' as const }}>
-            Season Verdict · {seasonYear}
-          </span>
-        </div>
+        {/* Section eyebrow — canonical SectionHeader */}
+        <SectionHeader role="section" kicker={`Season Verdict · ${seasonYear}`} paddingX={16} />
 
         {/* Three-column verdict — Path B: absorbs earnings + alumni count from old VS band */}
         <div style={{ display: 'flex', alignItems: 'flex-start', padding: '12px 16px 18px' }}>
@@ -427,15 +420,16 @@ export function CollegeCompareHero({ data, className }: CollegeCompareHeroProps)
 
       {/* ── SEASON OVERVIEW ── */}
       <div style={{ background: SLATE_50, borderTop: `0.5px solid ${INK_TINT_07}` }}>
+        {/* Section eyebrow — canonical SectionHeader */}
+        <SectionHeader role="section" kicker="Season Overview" paddingX={16} />
         {/* Mini logo column headers */}
-        <div style={{ display: 'flex', alignItems: 'center', padding: '12px 16px 0' }}>
+        <div style={{ display: 'flex', alignItems: 'center', padding: '4px 16px 0' }}>
           <div style={{ flex: 1, display: 'flex', alignItems: 'center', gap: '5px' }}>
             <div style={{ width: '18px', height: '18px', borderRadius: '4px', overflow: 'hidden', background: INK_TINT_04, border: `1px solid ${HAIRLINE_INK_8}`, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
               {logo1 ? <img src={logo1} alt={name1} style={{ width: '13px', height: '13px', objectFit: 'contain' }} onError={e => { e.currentTarget.style.display = 'none'; }} /> : null}
             </div>
             <span style={{ fontSize: '13px', fontWeight: 800, color: INK_MUTE }}>{name1}</span>
           </div>
-          <span style={{ fontSize: '9px', fontWeight: 800, color: INK_MUTE, letterSpacing: '0.16em', textTransform: 'uppercase' as const }}>Season Overview</span>
           <div style={{ flex: 1, display: 'flex', alignItems: 'center', gap: '5px', justifyContent: 'flex-end' }}>
             <span style={{ fontSize: '13px', fontWeight: 800, color: INK_MUTE }}>{name2}</span>
             <div style={{ width: '18px', height: '18px', borderRadius: '4px', overflow: 'hidden', background: INK_TINT_04, border: `1px solid ${HAIRLINE_INK_8}`, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
@@ -457,9 +451,8 @@ export function CollegeCompareHero({ data, className }: CollegeCompareHeroProps)
       {/* ── PERFORMANCE STATS ── */}
       {hasPerformanceData && (
         <div style={{ background: SLATE_50, borderTop: `0.5px solid ${INK_TINT_07}` }}>
-          <div style={{ padding: '14px 16px 10px' }}>
-            <span style={{ fontSize: '9px', fontWeight: 800, color: INK_MUTE, letterSpacing: '0.16em', textTransform: 'uppercase' as const }}>Performance Stats</span>
-          </div>
+          {/* Section eyebrow — canonical SectionHeader */}
+          <SectionHeader role="section" kicker="Performance Stats" paddingX={16} />
           <div>
             <MetricCompareRow label="Avg Scoring" value1={s1?.avg_scoring || 0} value2={s2?.avg_scoring || 0} format={formatAvg} lowerIsBetter />
             <MetricCompareRow label="Avg SG Total" value1={s1?.avg_sg_total || 0} value2={s2?.avg_sg_total || 0} format={formatSg} />
@@ -472,9 +465,8 @@ export function CollegeCompareHero({ data, className }: CollegeCompareHeroProps)
       {/* ── BALL STRIKING ── */}
       {hasBallStrikingData && (
         <div style={{ background: SLATE_50, borderTop: `0.5px solid ${INK_TINT_07}` }}>
-          <div style={{ padding: '14px 16px 10px' }}>
-            <span style={{ fontSize: '9px', fontWeight: 800, color: INK_MUTE, letterSpacing: '0.16em', textTransform: 'uppercase' as const }}>Ball Striking</span>
-          </div>
+          {/* Section eyebrow — canonical SectionHeader */}
+          <SectionHeader role="section" kicker="Ball Striking" paddingX={16} />
           <div>
             <MetricCompareRow label="Driving Distance" value1={s1?.avg_driving_distance || 0} value2={s2?.avg_driving_distance || 0} format={formatDist} />
             <MetricCompareRow label="Driving Accuracy" value1={s1?.avg_driving_accuracy || 0} value2={s2?.avg_driving_accuracy || 0} format={formatPct} />
