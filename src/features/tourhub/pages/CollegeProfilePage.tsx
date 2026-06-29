@@ -20,7 +20,7 @@ import { collegeHubRoute } from '../routes';
 import {
   GOLD,
   GOLD_BORDER,
-  GOLD_DEEP,
+  
   GOLD_TINT,
   GOLD_TINT_10,
   INK,
