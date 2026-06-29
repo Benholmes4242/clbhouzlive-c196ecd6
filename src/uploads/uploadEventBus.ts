@@ -28,6 +28,8 @@ type UploadEventMap = {
   'upload:partial-failure': UploadPartialFailureEvent;
   // Review-specific: emitted immediately when rating record is created
   'review:rating-created': ReviewRatingCreatedEvent;
+  // Post-specific: emitted immediately when post row is created
+  'post:shell-created': PostShellCreatedEvent;
   // Per-file events
   'file:upload-start': FileUploadStartEvent;
   'file:upload-progress': FileUploadProgressEvent;
