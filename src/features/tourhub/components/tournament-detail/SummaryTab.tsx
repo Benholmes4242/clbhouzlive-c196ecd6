@@ -10,7 +10,8 @@ import { BatchPlayerAvatar } from '../PlayerAvatar';
 import { EditorialEmpty } from './EditorialEmpty';
 import { useTournamentScoringStats } from '../../hooks/useTourHubData';
 import { playerRoute } from '../../routes';
-import { AMBER, INK, INK_FAINT, INK_MUTE, INK_TINT_02, INK_TINT_06, INK_TINT_07, LIVE_DOT, LIVE_INK, SCORE_OVER_PAR_LIGHT, SLATE_50, SURFACE, TREND_DOWN, TREND_UP } from '../../_shared/tokens';
+import { AMBER, GOLD, GOLD_DEEP, GOLD_TINT_10, INK, INK_FAINT, INK_MUTE, INK_TINT_02, INK_TINT_06, INK_TINT_07, LIVE_DOT, LIVE_INK, SCORE_OVER_PAR_LIGHT, SLATE_50, SURFACE, TREND_DOWN, TREND_UP } from '../../_shared/tokens';
+import { SectionHeader } from '@/components/ui/SectionHeader';
 
 interface SummaryTabProps {
   tournamentId: string;
@@ -76,18 +77,16 @@ function WinnerCard({ winner, runnerUp, headshotMap, tournamentName }: { winner:
     <motion.div style={{ marginTop: '8px' }} {...sectionEntrance}>
       {/* Section eyebrow */}
       <div style={{ padding: '14px 20px 12px', background: SLATE_50 }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-          <span style={{ fontSize: '9px', fontWeight: 800, color: INK_MUTE, letterSpacing: '0.16em', textTransform: 'uppercase' as const }}>Tournament Champion</span>
-        </div>
+        <SectionHeader role="section" kicker="TOURNAMENT CHAMPION" className="!mb-0" />
       </div>
 
       {/* Winner hero row */}
       <div style={{ background: SLATE_50, borderBottom: `1px solid ${INK_TINT_07}` }}>
         <Link {...playerRoute(winner.player?.id ?? '', tournamentName ? { kind: 'tournament', tournamentName } : undefined)} style={{ display: 'block', textDecoration: 'none' }} className="active:opacity-80 transition-opacity">
-          <div style={{ padding: '12px 20px 14px', borderLeft: `3px solid ${AMBER}`, background: 'rgba(247,147,30,0.025)', borderTop: `0.5px solid ${INK_TINT_07}` }}>
+          <div style={{ padding: '12px 20px 14px', borderLeft: `3px solid ${GOLD_DEEP}`, background: GOLD_TINT_10, borderTop: `0.5px solid ${INK_TINT_07}` }}>
             <div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between', gap: '12px' }}>
               <div style={{ flex: 1, minWidth: 0 }}>
-                <div style={{ fontSize: '9px', fontWeight: 800, color: AMBER, letterSpacing: '0.14em', textTransform: 'uppercase' as const, marginBottom: '4px' }}>Winner</div>
+                <div style={{ fontSize: '9px', fontWeight: 800, color: GOLD_DEEP, letterSpacing: '0.14em', textTransform: 'uppercase' as const, marginBottom: '4px' }}>Winner</div>
                 <div style={{ fontSize: '24px', fontWeight: 900, color: INK, letterSpacing: '-0.03em', lineHeight: 1.1, marginBottom: '4px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' as const }}>
                   {winner.player?.full_name ?? 'Unknown'}
                 </div>
@@ -158,9 +157,7 @@ export function SummaryTab({
       {scoringStats && scoringStats.rounds.length > 0 && (
         <motion.div style={{ marginTop: '8px' }} {...sectionEntrance}>
           <div style={{ padding: '14px 20px 12px', background: SLATE_50 }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-              <span style={{ fontSize: '9px', fontWeight: 800, color: INK_MUTE, letterSpacing: '0.16em', textTransform: 'uppercase' as const }}>Round Scoring</span>
-            </div>
+            <SectionHeader role="section" kicker="ROUND SCORING" className="!mb-0" />
           </div>
 
           {/* Column headers */}
@@ -204,9 +201,7 @@ export function SummaryTab({
         return (
           <motion.div style={{ marginTop: '8px' }} {...sectionEntrance}>
             <div style={{ padding: '14px 20px 12px', background: SLATE_50 }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                <span style={{ fontSize: '9px', fontWeight: 800, color: INK_MUTE, letterSpacing: '0.16em', textTransform: 'uppercase' as const }}>Field Statistics</span>
-              </div>
+              <SectionHeader role="section" kicker="FIELD STATISTICS" className="!mb-0" />
             </div>
             <div style={{ background: SLATE_50, borderTop: `0.5px solid ${INK_TINT_07}`, borderBottom: `1px solid ${INK_TINT_07}`, padding: '12px 20px 16px' }}>
               <div style={{ display: 'flex', height: '6px', borderRadius: '3px', overflow: 'hidden', marginBottom: '10px' }}>
@@ -244,9 +239,7 @@ export function SummaryTab({
         return (
           <motion.div style={{ marginTop: '8px' }} {...sectionEntrance}>
             <div style={{ padding: '14px 20px 12px', background: SLATE_50 }}>
-              <div>
-                <span style={{ fontSize: '9px', fontWeight: 800, color: INK_MUTE, letterSpacing: '0.16em', textTransform: 'uppercase' as const }}>Best Round of the Week</span>
-              </div>
+              <SectionHeader role="section" kicker="BEST ROUND OF THE WEEK" className="!mb-0" />
             </div>
             <Link
               {...playerRoute(best.playerId, tournamentName ? { kind: 'tournament', tournamentName } : undefined)}

@@ -23,7 +23,9 @@ import {
   AMBER, FONT, INK, INK_MUTE, INK_TINT_06, INK_TINT_07, SLATE_50, SURFACE,
 } from '../../_shared/tokens';
 import { HAIRLINE_INK_8 } from '@/features/courses/_shared/tokens';
+import { SC_ACCENT } from '@/features/courses/components/holes/_constants';
 import { ConnectHandicapCue } from '@/components/courses/course-detail/ConnectHandicapCue';
+import { SectionHeader } from '@/components/ui/SectionHeader';
 
 interface HoleStatsTabProps {
   tournamentId: string;
@@ -225,12 +227,7 @@ export function HoleStatsTab({ tournamentId, isCompleted, courseId, courseName }
 
       {/* Section eyebrow */}
       <div style={{ background: SLATE_50, borderTop: `0.5px solid ${INK_TINT_07}`, padding: '14px 16px 10px' }}>
-        <span style={{
-          fontSize: 9, fontWeight: 800, color: INK_MUTE,
-          letterSpacing: '0.16em', textTransform: 'uppercase',
-        }}>
-          Hole Stats · {roundLabel}
-        </span>
+        <SectionHeader role="section" kicker={`HOLE STATS · ${roundLabel.toUpperCase()}`} accent={SC_ACCENT} paddingX={0} className="!mb-0" />
       </div>
 
       {/* Round selector */}
