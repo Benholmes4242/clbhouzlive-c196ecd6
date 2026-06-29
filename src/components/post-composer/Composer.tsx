@@ -28,7 +28,7 @@ import { AnimatePresence, motion } from 'framer-motion';
 import { toast } from 'sonner';
 import { useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
-import { usePostSubmission } from '@/hooks/usePostSubmission';
+
 import { useEditablePost } from '@/hooks/useEditablePost';
 import { useUpdatePost } from '@/hooks/useUpdatePost';
 import { useActiveActor } from '@/context/ActiveActorContext';
@@ -114,7 +114,7 @@ export function Composer({
   editPostId = null,
   draftId = null,
 }: ComposerProps) {
-  const { submitPost, isSubmitting } = usePostSubmission();
+  const isSubmitting = false;
   const { updatePost, isUpdating } = useUpdatePost();
   const editablePostQuery = useEditablePost(editPostId);
   const isEditMode = !!editPostId;
@@ -833,7 +833,7 @@ export function Composer({
         mediaItems: [...newMediaMeta, ...restoredMediaItems],
         draftId: currentDraftId ?? undefined,
       });
-      console.log('[UPLOAD-DEBUG][new] composer enqueued jobId', jobId);
+      
     } catch (err: any) {
       console.error('[Composer] enqueue failed:', err);
       toast.error("Couldn't post", { description: err?.message ?? 'Try again' });
@@ -873,7 +873,6 @@ export function Composer({
     visibility,
     removedMediaIds,
     updatePost,
-    submitPost,
     onClose,
     currentDraftId,
     queryClient,

@@ -145,7 +145,7 @@ export async function createPost(input: CreatePostInput): Promise<CreatePostResu
     throw error;
   }
 
-  console.log('[UPLOAD-DEBUG][createPost] inserted', { postId: data?.id, status: data?.status });
+  
   console.log('[createPost] Post created:', data.id);
 
   // Insert into post_courses junction table for multi-course support

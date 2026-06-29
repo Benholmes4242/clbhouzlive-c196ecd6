@@ -1,54 +1,20 @@
-import { supabase } from '@/integrations/supabase/client';
-import { uploadMediaWithRetry, uploadMultipleMediaWithRetry } from '@/components/posts/utils/mediaUpload';
-import { createPostTags, rollbackPost, createTagNotifications } from '@/components/posts/utils/postOperations';
+import { createPostTags, createTagNotifications } from '@/components/posts/utils/postOperations';
 import { TaggableEntity } from './types';
 
 // Re-export the canonical createPost from services
 // This ensures all imports use the same, complete implementation
 export { createPost } from '@/services/posts/createPost';
 
-export const uploadMediaFiles = async (
-  mediaFiles: File[], 
-  postId: string, 
-  userId: string,
-  onFileError: (file: File, error: any) => void
-) => {
-  if (!mediaFiles || mediaFiles.length === 0) return;
-
-  console.log('Starting media upload for', mediaFiles.length, 'files');
-  
-  const uploadPromises = mediaFiles.map(async (file, index) => {
-    try {
-      console.log(`Uploading file ${index + 1}/${mediaFiles.length}:`, file.name, file.type, `${(file.size / 1024 / 1024).toFixed(2)}MB`);
-      await uploadMediaWithRetry(file, postId, userId);
-      console.log(`Successfully uploaded file ${index + 1}/${mediaFiles.length}:`, file.name);
-    } catch (error) {
-      console.error(`Failed to upload ${file.name} after retries:`, error);
-      onFileError(file, error);
-      
-      // For videos, continue with other files instead of failing completely
-      const isVideo = file.type.startsWith('video/');
-      if (!isVideo) {
-        throw new Error(`Failed to upload ${file.name}: ${error}`);
-      }
-    }
-  });
-
-  // Wait for all uploads to complete
-  await Promise.all(uploadPromises);
-  console.log('All media files processed successfully');
-};
-
 export const handlePostTags = async (
-  postId: string, 
-  selectedTags: TaggableEntity[], 
+  postId: string,
+  selectedTags: TaggableEntity[],
   userId: string,
   caption: string = ''
 ) => {
   if (!selectedTags || selectedTags.length === 0) return;
 
   console.log('Creating post tags...', { postId, tagCount: selectedTags.length });
-  
+
   try {
     await createPostTags(postId, selectedTags, userId, caption);
     console.log('Post tags created successfully');

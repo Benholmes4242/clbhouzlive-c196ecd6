@@ -127,10 +127,6 @@ export function enqueuePostUpload(input: UploadJobInput): string {
     (input.mediaItems?.filter(m => m.isRestored).length || 0) +
     (hasCompiledVideo ? 1 : 0);
 
-  console.log('[UPLOAD-DEBUG][new] enqueuePostUpload called', {
-    hasMedia: input.files?.length ?? 0,
-    actorType: input.actorType,
-  });
   console.log('[uploadPipeline] Enqueueing job:', {
     newFiles: input.files?.length || 0,
     restoredMedia: input.mediaItems?.filter(m => m.isRestored).length || 0,
@@ -415,8 +411,6 @@ async function processPostJob(jobId: string, job: any): Promise<void> {
     const postId = postData.id;
     uploadManager.updateStatus(jobId, 'uploading_media', postId);
 
-    console.log('[UPLOAD-DEBUG][new] post row created', { postId, status: postData.status, jobId });
-    console.log('[UPLOAD-DEBUG][rls] created row', { postId, status: postData.status, visibility: postData.visibility });
     console.log(`[uploadPipeline] Created post ${postId} for job ${jobId}`);
 
     // Signal: post shell exists. Composer waits/closes on this.
@@ -1049,20 +1043,14 @@ async function finalizePost(jobId: string, postId: string, job: any, uploadedStr
       console.log(`[uploadPipeline] Post ${postId} now scheduled`);
     }
   } else {
-    // TEMP DEBUG: hold processing for 45s so RLS can be verified. REMOVE after Phase 0 sign-off.
-    if ((job as any)?.__debugHold) {
-      console.log('[UPLOAD-DEBUG][new] holding processing 45s for RLS check', { postId });
-      await new Promise((r) => setTimeout(r, 45000));
-    }
     const { error: statusError } = await supabase
       .from('posts')
       .update({ status: 'published' })
       .eq('id', postId);
-    
+
     if (statusError) {
       console.warn('[uploadPipeline] Failed to update post status to published:', statusError);
     } else {
-      console.log('[UPLOAD-DEBUG][new] post flipped to published', { postId, jobId });
       console.log(`[uploadPipeline] Post ${postId} now published`);
     }
   }
