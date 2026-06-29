@@ -18,9 +18,6 @@ interface Props {
 export const CategoryNavRail: React.FC<Props> = ({ categories, onSelect }) => (
   <div
     style={{
-      position: 'sticky',
-      top: 'var(--chrome-total-h, 0px)',
-      zIndex: 10,
       background: 'var(--hcp-bg-0)',
       padding: '10px 14px',
       marginTop: 14,
