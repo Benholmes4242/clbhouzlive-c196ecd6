@@ -117,7 +117,7 @@ const Eyebrow: React.FC<{ ownerFirstName?: string | null; isFriendView?: boolean
   </div>
 );
 
-const SectionHeader: React.FC<{
+const TrophyGroupLabel: React.FC<{
   Icon?: LucideIcon | null;
   iconColor?: string;
   label: string;
@@ -450,7 +450,7 @@ export const TrophyRoomSheet: React.FC<Props> = ({ userId, viewerUserId, ownerFi
               <>
                 {lifetime.length > 0 && (
                   <>
-                    <SectionHeader label="Lifetime" count={lifetime.length} />
+                    <TrophyGroupLabel label="Lifetime" count={lifetime.length} />
                     <Grid items={lifetime} onTap={openDetail} />
                   </>
                 )}
@@ -459,7 +459,7 @@ export const TrophyRoomSheet: React.FC<Props> = ({ userId, viewerUserId, ownerFi
                   if (!items || items.length === 0) return null;
                   return (
                     <React.Fragment key={`earned-${cat}`}>
-                      <SectionHeader label={CATEGORY_LABEL[cat]} count={items.length} />
+                      <TrophyGroupLabel label={CATEGORY_LABEL[cat]} count={items.length} />
                       <Grid items={items} onTap={openDetail} />
                     </React.Fragment>
                   );
@@ -485,7 +485,7 @@ export const TrophyRoomSheet: React.FC<Props> = ({ userId, viewerUserId, ownerFi
               <>
                 {lifetime.length > 0 && (
                   <>
-                    <SectionHeader label="Lifetime" count={lifetime.length} />
+                    <TrophyGroupLabel label="Lifetime" count={lifetime.length} />
                     <Grid items={lifetime} onTap={openDetail} />
                   </>
                 )}
@@ -494,7 +494,7 @@ export const TrophyRoomSheet: React.FC<Props> = ({ userId, viewerUserId, ownerFi
                   if (!items || items.length === 0) return null;
                   return (
                     <React.Fragment key={`all-${cat}`}>
-                      <SectionHeader label={CATEGORY_LABEL[cat]} count={items.length} />
+                      <TrophyGroupLabel label={CATEGORY_LABEL[cat]} count={items.length} />
                       <Grid items={items} onTap={openDetail} />
                     </React.Fragment>
                   );
@@ -516,7 +516,7 @@ export const TrophyRoomSheet: React.FC<Props> = ({ userId, viewerUserId, ownerFi
               <>
                 {lifetime.length > 0 && (
                   <>
-                    <SectionHeader label="Lifetime" count={lifetime.length} />
+                    <TrophyGroupLabel label="Lifetime" count={lifetime.length} />
                     <Grid items={lifetime} onTap={openDetail} />
                   </>
                 )}
@@ -525,7 +525,7 @@ export const TrophyRoomSheet: React.FC<Props> = ({ userId, viewerUserId, ownerFi
                   if (!items || items.length === 0) return null;
                   return (
                     <React.Fragment key={`locked-${cat}`}>
-                      <SectionHeader label={CATEGORY_LABEL[cat]} count={items.length} />
+                      <TrophyGroupLabel label={CATEGORY_LABEL[cat]} count={items.length} />
                       <Grid items={items} onTap={openDetail} />
                     </React.Fragment>
                   );
