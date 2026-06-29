@@ -213,7 +213,24 @@ export function UploadProgressBanner() {
     setActiveUploads(prev => prev.filter(u => u.jobId !== jobId));
   };
   
-  const visibleUploads = activeUploads.filter(u => !dismissedJobs.has(u.jobId));
+  // Suppress post-type uploads on routes that render a PendingPostCard
+  // (profile + business profile + watch/videos). Review uploads still
+  // surface everywhere as they have no in-feed equivalent.
+  const location = useLocation();
+  const suppressPostUploads = routeRendersPendingCards(location.pathname);
+  const pendingPostJobIds = usePendingPostsStore((s) => Object.keys(s.byJobId));
+
+  const visibleUploads = activeUploads.filter((u) => {
+    if (dismissedJobs.has(u.jobId)) return false;
+    if (
+      suppressPostUploads &&
+      u.uploadType !== 'review' &&
+      pendingPostJobIds.includes(u.jobId)
+    ) {
+      return false;
+    }
+    return true;
+  });
   if (visibleUploads.length === 0) return null;
   
   return (
