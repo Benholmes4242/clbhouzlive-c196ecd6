@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useParams, useNavigate } from 'react-router-dom';
-import { ChevronLeft, Star, MessageCircle } from 'lucide-react';
+import { ChevronLeft, Star } from 'lucide-react';
 import { useBusinessProfile } from '@/hooks/useBusinessProfile';
 import { useBusinessMembership } from '@/hooks/useBusinessMembership';
 import { useBusinessReviewStats } from '@/hooks/useBusinessReviewStats';
