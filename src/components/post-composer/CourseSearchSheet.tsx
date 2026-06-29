@@ -436,7 +436,7 @@ export function CourseSearchSheet({
                               flexShrink: 0,
                               background: 'rgba(247,147,30,0.12)',
                               border: '1px solid rgba(247,147,30,0.28)',
-                              color: '#9A5B12',
+                              color: '#c97a10',
                               whiteSpace: 'nowrap',
                             }}
                           >
