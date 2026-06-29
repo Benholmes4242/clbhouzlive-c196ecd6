@@ -1037,6 +1037,11 @@ async function finalizePost(jobId: string, postId: string, job: any, uploadedStr
       console.log(`[uploadPipeline] Post ${postId} now scheduled`);
     }
   } else {
+    // TEMP DEBUG: hold processing for 45s so RLS can be verified. REMOVE after Phase 0 sign-off.
+    if ((job as any)?.__debugHold) {
+      console.log('[UPLOAD-DEBUG][new] holding processing 45s for RLS check', { postId });
+      await new Promise((r) => setTimeout(r, 45000));
+    }
     const { error: statusError } = await supabase
       .from('posts')
       .update({ status: 'published' })
