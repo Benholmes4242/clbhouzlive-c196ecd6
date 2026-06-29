@@ -302,7 +302,7 @@ function SectionHeaderInner(props: SectionHeaderProps) {
             fontFamily: GEIST,
             fontSize: 13,
             fontWeight: 500,
-            color: INK_MUTE,
+            color: subColor,
             lineHeight: 1.4,
           }}
         >
