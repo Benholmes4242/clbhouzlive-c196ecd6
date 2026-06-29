@@ -43,6 +43,16 @@ export const PendingPostCard: React.FC<PendingPostCardProps> = ({ entry, theme =
 
   const handleRetry = useCallback(async () => {
     if (retrying) return;
+
+    // Offline guard — don't even try while offline; the auth check inside
+    // the upload path would falsely surface "Not authenticated".
+    if (typeof navigator !== 'undefined' && navigator.onLine === false) {
+      usePendingPostsStore
+        .getState()
+        .markFailed(entry.jobId, 'No connection - reconnect and try again');
+      return;
+    }
+
     setRetrying(true);
 
     try {
