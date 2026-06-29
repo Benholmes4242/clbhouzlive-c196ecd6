@@ -605,7 +605,11 @@ export function useOverviewStats() {
       const liveRes = await supabase
         .from('sr_tournaments')
         .select('id', { count: 'exact', head: true })
-        .eq('status', 'inprogress');
+        .in('status', [
+          'inprogress', 'in_progress',
+          'playoff', 'inplayoff', 'in_playoff',
+          'suspended', 'delayed', 'weather', 'holdup',
+        ]);
 
       const worldNo1Data = worldNo1Res.data as any;
 
