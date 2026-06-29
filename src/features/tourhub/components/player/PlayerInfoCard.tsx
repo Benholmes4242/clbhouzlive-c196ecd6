@@ -140,6 +140,7 @@ export function PlayerInfoCard({ player }: PlayerInfoCardProps) {
           </div>
         </div>
       )}
+      </div>
     </div>
   );
 }
