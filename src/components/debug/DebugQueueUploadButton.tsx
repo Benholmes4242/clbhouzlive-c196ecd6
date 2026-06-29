@@ -36,7 +36,9 @@ export function DebugQueueUploadButton() {
         caption: 'DEBUG queue test',
         files: [file],
         visibility: 'anyone',
-      });
+        // TEMP DEBUG: hold processing 45s for RLS verification. REMOVE after Phase 0 sign-off.
+        __debugHold: true,
+      } as any);
       console.log('[UPLOAD-DEBUG][new] enqueue returned jobId', jobId);
       toast.success(`Queue job ${jobId.slice(0, 6)}…`);
     } catch (e: any) {
