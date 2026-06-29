@@ -547,7 +547,7 @@ const CourseReviewsTab: React.FC<CourseReviewsTabProps> = ({
           />
           {(() => {
             const response = reviewResponses?.find(r => r.review_id === filteredMyReview.id);
-            if (response) return <div style={{ paddingBottom: 14 }}><ResponseDisplay response={response} /></div>;
+            if (response) return <div style={{ paddingBottom: 14 }}><ResponseDisplay response={response} courseId={courseId} viewerClaim={businessClaim} /></div>;
             return null;
           })()}
         </div>
