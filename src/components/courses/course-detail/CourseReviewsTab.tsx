@@ -11,7 +11,7 @@ import { useCourseReviews, type ReviewsSortBy, type CourseReview, type ReviewMed
 import { useReviewResponses, useSubmitReviewResponse } from '@/hooks/useReviewResponses';
 import { useBusinessClaimForCourse } from '@/hooks/useBusinessClaimForCourse';
 import { ReviewBlockFlat } from '../review/ReviewBlockFlat';
-import { ResponseDisplay, ReplyForm } from '../review/ReviewResponseBlock';
+import { ResponseDisplay, ReplyForm, VerifyToRespondPrompt } from '../review/ReviewResponseBlock';
 import { RatingFilterChips, RatingFilterValue } from '../review/RatingFilterChips';
 import { WriteReviewPrompt } from '../review/WriteReviewPrompt';
 import { SegmentedTabOption } from '@/components/ui/SegmentedTabs';
