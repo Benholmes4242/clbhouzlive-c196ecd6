@@ -255,21 +255,36 @@ const ModeToggle: React.FC<{ mode: Mode; setMode: (m: Mode) => void }> = ({ mode
     {(['points', 'shots'] as Mode[]).map((m) => {
       const active = mode === m;
       return (
+// ─── Mode toggle ────────────────────────────────────────────────────────
+const ModeToggle: React.FC<{ mode: Mode; setMode: (m: Mode) => void }> = ({ mode, setMode }) => (
+  <div
+    style={{
+      display: 'inline-flex',
+      background: 'var(--hcp-bg-2)',
+      borderRadius: 999,
+      padding: 2,
+      gap: 2,
+    }}
+  >
+    {(['points', 'shots'] as Mode[]).map((m) => {
+      const active = mode === m;
+      return (
         <button
           key={m}
           onClick={() => setMode(m)}
           aria-pressed={active}
           style={{
-            padding: '9px 8px',
-            borderRadius: 9,
-            background: active ? T.ink : 'transparent',
-            color: active ? 'var(--hcp-bg-1)' : T.ink70,
+            padding: '5px 14px',
+            background: active ? 'var(--hcp-bg-3)' : 'transparent',
+            color: active ? 'var(--hcp-t-100)' : 'var(--hcp-t-60)',
             border: 'none',
+            borderRadius: 999,
             cursor: 'pointer',
             fontFamily: FONT,
             fontSize: 11,
             fontWeight: 800,
             letterSpacing: '0.08em',
+            transition: 'background 160ms ease, color 160ms ease',
           }}
         >
           {m === 'points' ? 'POINTS' : 'SCORE STATS'}
@@ -287,8 +302,8 @@ const ScopeToggle: React.FC<{
   <div
     style={{
       display: 'inline-flex',
-      background: T.ink04,
-      borderRadius: 99,
+      background: 'var(--hcp-bg-2)',
+      borderRadius: 999,
       padding: 2,
       gap: 2,
     }}
@@ -299,16 +314,17 @@ const ScopeToggle: React.FC<{
         onClick={() => setScope(s)}
         aria-pressed={scope === s}
         style={{
-          padding: '4px 9px',
-          borderRadius: 99,
-          background: scope === s ? T.ink : 'transparent',
-          color: scope === s ? 'var(--hcp-bg-1)' : T.ink70,
+          padding: '4px 11px',
+          borderRadius: 999,
+          background: scope === s ? 'var(--hcp-bg-3)' : 'transparent',
+          color: scope === s ? 'var(--hcp-t-100)' : 'var(--hcp-t-60)',
           border: 'none',
           cursor: 'pointer',
           fontFamily: FONT,
           fontSize: 10,
           fontWeight: 800,
           letterSpacing: '0.06em',
+          transition: 'background 160ms ease, color 160ms ease',
         }}
       >
         {SCOPE_BTN_LABEL[s]}
