@@ -252,16 +252,14 @@ export function PlayoffStrip({ count, score }: PlayoffStripProps) {
           <div
             key={i}
             style={{
-              width: 36,
-              height: 36,
-              borderRadius: '34%',
               marginLeft: i === 0 ? 0 : -10,
-              background: `linear-gradient(135deg, #475569 0%, ${SLATE_800} 100%)`,
-              boxShadow: '0 0 0 2px rgba(251,188,46,0.55)',
               zIndex: 3 - i,
               opacity: count > 3 && i === 2 ? 0.85 : 1,
+              display: 'inline-flex',
             }}
-          />
+          >
+            <SquircleAvatar size={36} hideRing hairlineRing ringColor={GOLD} />
+          </div>
         ))}
       </div>
       <div style={{ flex: 1, minWidth: 0, position: 'relative' }}>
