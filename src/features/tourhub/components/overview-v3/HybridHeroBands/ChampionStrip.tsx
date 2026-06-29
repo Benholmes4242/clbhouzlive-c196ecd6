@@ -32,18 +32,12 @@ interface ChampionStripProps {
 
 function PlayerHead({ size = 42, src }: { size?: number; src?: string | null }) {
   return (
-    <div
-      style={{
-        width: size,
-        height: size,
-        borderRadius: '34%',
-        background: src
-          ? `url(${src}) center/cover`
-          : `linear-gradient(135deg, #475569 0%, ${SLATE_800} 100%)`,
-        boxShadow: '0 0 0 2px rgba(251,188,46,0.55)',
-        flexShrink: 0,
-      }}
-      aria-hidden="true"
+    <SquircleAvatar
+      src={src ?? undefined}
+      size={size}
+      hideRing
+      hairlineRing
+      ringColor={GOLD}
     />
   );
 }
