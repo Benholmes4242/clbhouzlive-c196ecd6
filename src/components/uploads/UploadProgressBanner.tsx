@@ -10,7 +10,7 @@
 
 import React, { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { useLocation, matchPath } from 'react-router-dom';
+import { matchPath } from 'react-router-dom';
 import { X, AlertCircle, CheckCircle, Loader2, Star, RotateCcw, AlertTriangle } from 'lucide-react';
 import { uploadEventBus } from '@/uploads/uploadEventBus';
 import { formatBytes, formatDuration, formatBytesPerSecond } from '@/uploads/uploadSpeedTracker';
