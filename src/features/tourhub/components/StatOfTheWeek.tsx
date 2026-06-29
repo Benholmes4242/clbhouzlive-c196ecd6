@@ -21,6 +21,7 @@ import SheetHeader from '@/components/ui/SheetHeader';
 import { PlayerAvatar } from './PlayerAvatar';
 import { Shimmer } from './shared/Shimmer';
 import CountryFlag from '@/components/ui/country-flag';
+import { SectionHeader } from '@/components/ui/SectionHeader';
 
 import {
   AMBER,
