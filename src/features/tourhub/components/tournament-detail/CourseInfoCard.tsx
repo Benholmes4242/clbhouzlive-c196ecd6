@@ -7,9 +7,10 @@ import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import type { TourTournament } from '../../hooks/useTourHubData';
 import {
-  AMBER, INK, INK_FAINT, INK_MUTE, INK_TINT_07, SLATE_50,
+  INK, INK_FAINT, INK_MUTE, INK_TINT_07, SLATE_50,
 } from '../../_shared/tokens';
 import { ConnectHandicapCue } from '@/components/courses/course-detail/ConnectHandicapCue';
+import { SectionHeader } from '@/components/ui/SectionHeader';
 
 interface CourseInfoCardProps {
   tournament: TourTournament;
