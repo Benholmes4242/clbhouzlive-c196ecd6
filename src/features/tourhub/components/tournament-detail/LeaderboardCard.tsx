@@ -8,9 +8,10 @@ import { motion } from 'framer-motion';
 import CountryFlag from '@/components/ui/country-flag';
 import { playerRoute } from '../../routes';
 import {
-  AMBER_SOFT_BG, GOLD_DEEP, INK, INK_FAINT, INK_MUTE, INK_TINT_07,
+  AMBER_SOFT_BG, GOLD_DEEP, INK, INK_MUTE, INK_TINT_07,
   SCORE_OVER_PAR_LIGHT, SLATE_50,
 } from '../../_shared/tokens';
+import { SectionHeader } from '@/components/ui/SectionHeader';
 
 function abbrevName(full: string): string {
   const parts = full.trim().split(/\s+/);
