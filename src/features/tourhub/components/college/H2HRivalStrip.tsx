@@ -28,7 +28,7 @@ interface H2HRivalStripProps {
   className?: string;
 }
 
-const SECTION_PADDING = '14px 16px 0';
+const SECTION_PADDING_X = 16;
 
 export function H2HRivalStrip({ normalizedName, className }: H2HRivalStripProps) {
   const { data: rivalries, isLoading } = useCollegeRivalries(normalizedName);
