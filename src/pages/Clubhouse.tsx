@@ -606,13 +606,12 @@ const ClubhouseContent = () => {
         )
       ) : posts.length > 0 ? (
         <>
-          {(() => { const _r = virtuosoSnapshots.current[activeTab]; console.log('[snap] RENDER tab', activeTab, 'restoreFrom?', !!_r, 'scrollTop', (_r as any)?.scrollTop, 'ranges', (_r as any)?.ranges?.length, 'posts', posts.length); return null; })()}
           <CardFeed
             ref={cardFeedRef}
             key={activeTab}
             tab={activeTab}
             initialState={virtuosoSnapshots.current[activeTab]}
-            onSnapshot={(s) => { console.log('[snap] WRITE slot', activeTab, 'scrollTop', (s as any)?.scrollTop, 'ranges', (s as any)?.ranges?.length); virtuosoSnapshots.current[activeTab] = s; }}
+            onSnapshot={(s) => { virtuosoSnapshots.current[activeTab] = s; }}
             posts={posts}
             topPadding={'calc(env(safe-area-inset-top, 0px) + 59px)'}
             onNearEnd={handleNearEnd}
