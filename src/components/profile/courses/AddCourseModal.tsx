@@ -1,12 +1,12 @@
 /**
- * AddCourseModal — Bottom sheet for managing the Personal Top 10.
+ * AddCourseModal - Bottom sheet for managing the Personal Top 10.
  *
  * Two tabs:
  *  - Manage: drag-to-reorder + chevrons + remove (preserves dnd-kit behavior)
  *  - Add Course: search played courses, add rated, prompt to rate unrated
  *
- * Visual language: 'The Dispatch' editorial — serif titles, amber-bar eyebrows,
- * #F8FAFC sheet shell with #FFFFFF rows, hairline dividers, podium-coloured rank badges.
+ * Canonical sheet language: SheetHeader with amber cut-line, CAPS eyebrows,
+ * Geist throughout, plain tabular-num scores, podium-coloured rank badges.
  */
 import React, { useState, useMemo, useRef, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
