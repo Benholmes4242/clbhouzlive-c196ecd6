@@ -4,6 +4,7 @@ import {
   markContentPainted,
   markDataSettled,
   markSkeletonShown,
+  markSkeletonExempt,
   notePageRootMount,
 } from './navTiming';
 
@@ -41,5 +42,13 @@ export function useSkeletonShown() {
   useLayoutEffect(() => {
     if (!isPerfEnabled()) return;
     markSkeletonShown();
+  }, []);
+}
+
+/** Page declares it intentionally has no skeleton (neutral hold is by design). */
+export function usePageSkeletonExempt() {
+  useLayoutEffect(() => {
+    if (!isPerfEnabled()) return;
+    markSkeletonExempt();
   }, []);
 }
