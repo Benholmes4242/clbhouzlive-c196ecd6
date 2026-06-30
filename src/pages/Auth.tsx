@@ -151,7 +151,12 @@ const Auth: React.FC<AuthProps> = ({ defaultSignUp = false }) => {
         authNotice={authNotice}
         setAuthNotice={setAuthNotice}
       />
+      {/* PRE-LAUNCH ONLY: visible debug toggle. Remove before public release. */}
+      <div style={{ padding: '0 16px 16px' }}>
+        <PerfToggleButton />
+      </div>
     </div>
+
   );
 };
 export default Auth;
