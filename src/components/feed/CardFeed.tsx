@@ -315,6 +315,8 @@ export const CardFeed: React.FC<CardFeedProps> = ({
             onFollow={onFollow}
             currentUserId={currentUserId}
             feedIndex={index}
+            isFirstCard={index === 0}
+            onContentReady={index === 0 ? onFirstContentReady : undefined}
           />
           {/* Subtle inter-card seam — just-perceptible lift above ink chrome */}
           <div aria-hidden style={{ height: 5, background: '#1E212B' }} />
