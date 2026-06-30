@@ -8,7 +8,6 @@ import { getTourLogo, hasTourLogo } from '../../utils/tourLogos';
 import { getTourMeta } from '../../constants/tourMap';
 import type { ScheduleFilterType, TourFilterCode } from '../schedule';
 import {
-  AMBER,
   AMBER_TINT_04,
   INK,
   INK_FAINT,
