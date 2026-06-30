@@ -842,6 +842,7 @@ const AppInner: React.FC = () => {
               </BottomNavigationProvider>
             </ModalProvider>
           </HeaderProvider>
+        </NavTimingProvider>
       </BrowserRouter>
     </TooltipProvider>
   );
