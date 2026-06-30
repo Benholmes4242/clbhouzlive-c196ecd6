@@ -11,7 +11,7 @@
 
 import React, { useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ChevronRight, Trophy } from 'lucide-react';
+import { Trophy } from 'lucide-react';
 import {
   useWhsConnection,
   useHandicapTrend,
@@ -122,7 +122,6 @@ const ProfileHandicapCard: React.FC<Props> = ({
   if (handicap == null) return null;
 
   const resolvedName = (displayName ?? '').trim().split(/\s+/)[0] || 'this golfer';
-  const trophyPossessive = isOwnProfile ? 'your case' : `${resolvedName}'s case`;
 
   const handleTap = () => {
     if (!isOwnProfile) {
@@ -238,72 +237,95 @@ const ProfileHandicapCard: React.FC<Props> = ({
           </div>
         </div>
 
-        {/* Trophies CTA */}
-        {trophyCount > 0 && (
-          <div style={{ marginTop: 14 }}>
-            <button
-              type="button"
-              onClick={(e) => {
-                e.stopPropagation();
-                navigate(`/handicap/${userId}?gam=trophies`);
-              }}
-              aria-label={`See ${isOwnProfile ? 'your' : `${resolvedName}'s`} trophies`}
+        {/* Trophies info strip */}
+        <div style={{ marginTop: 14 }}>
+          <div
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: 12,
+              padding: '12px 14px',
+              borderTop: '1px solid var(--hcp-line)',
+              background: 'var(--hcp-amber-tint, rgba(247,147,30,0.10))',
+            }}
+          >
+            <div
               style={{
-                width: '100%',
+                width: 36,
+                height: 36,
+                borderRadius: 10,
+                background: '#fff',
                 display: 'flex',
                 alignItems: 'center',
-                gap: 12,
-                background: 'var(--hcp-amber-tint, rgba(247,147,30,0.10))',
-                border: 'none',
-                borderRadius: 12,
-                padding: '11px 13px',
-                cursor: 'pointer',
-                textAlign: 'left',
+                justifyContent: 'center',
+                flexShrink: 0,
+                boxShadow: '0 1px 2px rgba(15,23,42,0.06)',
               }}
             >
-              <div
-                style={{
-                  width: 36,
-                  height: 36,
-                  borderRadius: 10,
-                  background: 'rgba(247,147,30,0.18)',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  flexShrink: 0,
-                }}
-              >
-                <Trophy size={18} strokeWidth={2} color="#F7931E" />
-              </div>
+              <Trophy
+                size={18}
+                color={trophyCount > 0 ? '#c97a10' : 'var(--hcp-t-60)'}
+                strokeWidth={2.2}
+              />
+            </div>
+            {trophyCount > 0 ? (
               <div style={{ flex: 1, minWidth: 0 }}>
                 <div
                   style={{
-                    fontSize: 13,
-                    fontWeight: 700,
+                    fontSize: 13.5,
                     color: 'var(--hcp-t-100)',
-                    letterSpacing: '-0.01em',
+                    lineHeight: 1.35,
                   }}
                 >
-                  <span style={{ fontVariantNumeric: 'tabular-nums', color: '#F7931E' }}>
+                  <span style={{ fontWeight: 800, color: '#c97a10' }}>
                     {trophyCount}
-                  </span>{' '}
-                  {trophyCount === 1 ? 'trophy' : 'trophies'} in {trophyPossessive}
+                  </span>
+                  <span style={{ fontWeight: 700 }}>
+                    {' '}
+                    {trophyCount === 1 ? 'trophy' : 'trophies'} in{' '}
+                    {isOwnProfile ? 'your' : `${resolvedName}'s`} case
+                  </span>
                 </div>
                 <div
                   style={{
-                    fontSize: 11,
-                    fontWeight: 600,
+                    fontSize: 11.5,
                     color: 'var(--hcp-t-60)',
-                    marginTop: 2,
+                    marginTop: 1,
                   }}
                 >
-                  See them all
+                  Tap anywhere to see{' '}
+                  {isOwnProfile ? 'your' : 'their'} full record
                 </div>
               </div>
-              <ChevronRight size={16} color="#F7931E" strokeWidth={2.2} />
-            </button>
+            ) : (
+              <div style={{ flex: 1, minWidth: 0 }}>
+                <div
+                  style={{
+                    fontSize: 13.5,
+                    color: 'var(--hcp-t-100)',
+                    lineHeight: 1.35,
+                    fontWeight: 700,
+                  }}
+                >
+                  {isOwnProfile
+                    ? 'Start your trophy hunt'
+                    : `${resolvedName} is on the trophy hunt`}
+                </div>
+                <div
+                  style={{
+                    fontSize: 11.5,
+                    color: 'var(--hcp-t-60)',
+                    marginTop: 1,
+                  }}
+                >
+                  {isOwnProfile
+                    ? 'Play rounds and post reviews to earn your first'
+                    : 'No trophies earned yet'}
+                </div>
+              </div>
+            )}
           </div>
-        )}
+        </div>
       </div>
     </div>
   );
