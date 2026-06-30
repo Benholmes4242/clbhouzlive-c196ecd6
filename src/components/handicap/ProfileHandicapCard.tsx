@@ -8,7 +8,7 @@
  *   friend       → /handicap/:userId   (fires friend_handicap_page_viewed)
  *
  * Renders null when the user has no WHS connection or no current handicap
- * — same gating as FriendHandicapHero.
+ * Same gating as FriendHandicapHero.
  */
 
 import React, { useMemo } from 'react';
