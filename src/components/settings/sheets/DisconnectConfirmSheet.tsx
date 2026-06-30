@@ -69,7 +69,7 @@ export default function DisconnectConfirmSheet({ open, onClose, onConfirm, isWor
             disabled={isWorking}
             style={{
               width: '100%', padding: '14px 16px', borderRadius: 12,
-              background: AMBER, color: '#fff', border: 'none',
+              background: RED, color: '#fff', border: 'none',
               fontSize: 15, fontWeight: 600, fontFamily: FONT,
               cursor: isWorking ? 'default' : 'pointer',
               opacity: isWorking ? 0.6 : 1, marginBottom: 8,
