@@ -75,6 +75,7 @@ export const CardFeed: React.FC<CardFeedProps> = ({
   currentUserId,
   onRefresh,
   isRefreshing = false,
+  onFirstContentReady,
 }) => {
 
   const virtuosoRef = useRef<VirtuosoHandle | null>(null);
