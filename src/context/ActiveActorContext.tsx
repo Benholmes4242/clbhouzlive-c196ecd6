@@ -235,7 +235,18 @@ export function ActiveActorProvider({ children }: { children: ReactNode }) {
 export function useActiveActor() {
   const context = useContext(ActiveActorContext);
   if (!context) {
-    throw new Error('useActiveActor must be used within ActiveActorProvider');
+    // Degrade gracefully instead of crashing the subtree. activeActor: null is
+    // already a state every consumer handles (logged-out / pre-init). This makes
+    // an accidental provider-boundary mistake a no-op rather than a white screen.
+    if (process.env.NODE_ENV !== 'production') {
+      console.warn('[useActiveActor] called outside ActiveActorProvider; returning safe default');
+    }
+    return {
+      activeActor: null,
+      setActiveActor: () => {},
+      availableActors: [],
+      isLoading: false,
+    } as const;
   }
   return context;
 }
