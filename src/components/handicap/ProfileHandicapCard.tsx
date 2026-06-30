@@ -184,7 +184,7 @@ const ProfileHandicapCard: React.FC<Props> = ({
   const resolvedName = (displayName ?? '').trim().split(/\s+/)[0] || 'this golfer';
 
   return (
-    <div className="hcp-light" style={{ padding: '8px 16px 16px' }}>
+    <div className="hcp-dark" style={{ padding: '8px 16px 16px' }}>
       <div
         role="button"
         tabIndex={0}
@@ -192,17 +192,17 @@ const ProfileHandicapCard: React.FC<Props> = ({
         onKeyDown={handleKey}
         aria-label={
           isOwnProfile
-            ? 'See your full handicap — trends, records, rounds'
-            : `See ${resolvedName}'s full handicap — trends, records, rounds`
+            ? 'See your full handicap: trends, records, rounds'
+            : `See ${resolvedName}'s full handicap: trends, records, rounds`
         }
         style={{
-          background: 'var(--hcp-bg-1)',
-          border: '1px solid var(--hcp-line)',
-          borderRadius: 14,
-          padding: '14px 14px 12px',
+          background: 'linear-gradient(168deg, var(--hcp-bg-2) 0%, var(--hcp-bg-0) 100%)',
+          border: '1px solid var(--hcp-line-2)',
+          borderRadius: 18,
+          padding: '16px 16px 14px',
           fontFamily: FONT,
           cursor: 'pointer',
-          boxShadow: '0 1px 0 rgba(15,23,42,0.02)',
+          boxShadow: '0 8px 30px rgba(15,23,42,0.22), inset 0 1px 0 rgba(255,255,255,0.05)',
         }}
       >
         {/* Eyebrow */}
