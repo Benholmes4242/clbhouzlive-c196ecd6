@@ -245,7 +245,7 @@ const ProfileHandicapCard: React.FC<Props> = ({
               type="button"
               onClick={(e) => {
                 e.stopPropagation();
-                openGamAchievements();
+                navigate(`/handicap/${userId}?gam=trophies`);
               }}
               aria-label={`See ${isOwnProfile ? 'your' : `${resolvedName}'s`} trophies`}
               style={{
