@@ -15,7 +15,7 @@
  * (most-in-view card). Only one inline video plays at a time across the
  * whole feed; tapping any media opens the immersive `FullscreenFeedOverlay`.
  */
-import React, { useLayoutEffect, useMemo, useRef, useState } from 'react';
+import React, { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Heart, MapPin, MessageCircle, Share } from 'lucide-react';
 import { PostOwnerMenu } from '@/components/posts/PostOwnerMenu';
@@ -100,6 +100,10 @@ export interface FeedCardProps {
   currentUserId?: string;
   /** Feed index — threaded down to InlineVideo for greppable per-tile traces. */
   feedIndex?: number;
+  /** True only for the index-0 card — gates `onContentReady` to one signal. */
+  isFirstCard?: boolean;
+  /** Fires once when this card's primary content is paint-ready (decoded image / first video frame / rAF for text). */
+  onContentReady?: () => void;
 }
 
 interface CaptionBlockProps {
@@ -235,6 +239,8 @@ const FeedCardImpl: React.FC<FeedCardProps> = ({
   onFollow,
   currentUserId,
   feedIndex,
+  isFirstCard = false,
+  onContentReady,
 }) => {
   const navigate = useNavigate();
   const { activeActor, setActiveActor } = useActiveActor();
@@ -243,6 +249,15 @@ const FeedCardImpl: React.FC<FeedCardProps> = ({
   // Actor selection is GLOBAL — picker reads and writes the session-wide activeActor.
   const effectiveActor: ActiveActor | null = activeActor;
   const captionTextRef = useRef<HTMLDivElement | null>(null);
+
+  // Fire-once paint-ready signal — gated to the first card so the skeleton
+  // controller hears exactly one event per feed mount.
+  const contentReadyFiredRef = useRef(false);
+  const fireContentReady = React.useCallback(() => {
+    if (contentReadyFiredRef.current || !isFirstCard || !onContentReady) return;
+    contentReadyFiredRef.current = true;
+    onContentReady();
+  }, [isFirstCard, onContentReady]);
 
   const reviewCourseId = post.review?.courseId ?? post.courseId;
   const reviewId = post.review?.reviewId;
@@ -287,6 +302,69 @@ const FeedCardImpl: React.FC<FeedCardProps> = ({
   }, [post, isDeal]);
 
   const mediaUrl = media?.imageUrl || media?.thumbnailUrl || '';
+
+  // Single-image / video-poster decode path — drives the paint-ready signal
+  // for non-video cards. We use img.decode() (proper decoded-pixels promise),
+  // falling back to onLoad and finally to mount + rAF so we never strand the
+  // skeleton on a quirky image.
+  const primaryImgRef = useRef<HTMLImageElement | null>(null);
+  const usesPrimaryImage =
+    isFirstCard &&
+    !isMulti &&
+    !!media &&
+    !(media.type === 'video' && (post as any).mountVideo); // not strictly needed; effect re-runs by ref
+
+  // Text-only / multi-media fallback: fire on the next paint (the surrounding
+  // shell is already in the DOM and visually settled by then).
+  useEffect(() => {
+    if (!isFirstCard) return;
+    if (isMulti || !media) {
+      const raf = requestAnimationFrame(() => fireContentReady());
+      return () => cancelAnimationFrame(raf);
+    }
+  }, [isFirstCard, isMulti, media, fireContentReady]);
+
+  // Image decode path for first card.
+  useEffect(() => {
+    if (!isFirstCard) return;
+    if (isMulti || !media) return;
+    if (media.type === 'video') {
+      // Video card: if we DON'T mount the player (mountVideo=false), the
+      // visible content is the thumbnail <img>, so decode that. If we DO
+      // mount the player, InlineVideo's onFirstFrameReady handles it.
+      // We can detect "no player mounted" by absence of the video element —
+      // but cleaner to attempt decode on the poster ref unconditionally;
+      // if the img isn't in the tree the ref is null and we skip.
+    }
+    const img = primaryImgRef.current;
+    if (!img) return;
+    let cancelled = false;
+    const fire = () => { if (!cancelled) fireContentReady(); };
+
+    if (img.complete && img.naturalWidth > 0) {
+      // Already loaded — still pay decode() the courtesy if available.
+      if (typeof img.decode === 'function') {
+        img.decode().then(fire, fire);
+      } else {
+        fire();
+      }
+      return () => { cancelled = true; };
+    }
+    if (typeof img.decode === 'function') {
+      img.decode().then(fire, fire);
+    }
+    const onLoad = () => fire();
+    const onError = () => fire();
+    img.addEventListener('load', onLoad);
+    img.addEventListener('error', onError);
+    return () => {
+      cancelled = true;
+      img.removeEventListener('load', onLoad);
+      img.removeEventListener('error', onError);
+    };
+  }, [isFirstCard, isMulti, media, fireContentReady]);
+
+
 
   return (
     <article
@@ -496,10 +574,12 @@ const FeedCardImpl: React.FC<FeedCardProps> = ({
                     isNear={mountVideo}
                     feedIndex={feedIndex}
                     objectFit="cover"
+                    onFirstFrameReady={isFirstCard ? fireContentReady : undefined}
                   />
 
                 ) : media.thumbnailUrl ? (
                   <img
+                    ref={isFirstCard ? primaryImgRef : undefined}
                     src={media.thumbnailUrl}
                     alt={post.caption || post.displayName}
                     loading="lazy"
@@ -516,6 +596,7 @@ const FeedCardImpl: React.FC<FeedCardProps> = ({
                 ) : null
               ) : mediaUrl ? (
                 <img
+                  ref={isFirstCard ? primaryImgRef : undefined}
                   src={mediaUrl}
                   alt={post.caption || post.displayName}
                   loading="lazy"

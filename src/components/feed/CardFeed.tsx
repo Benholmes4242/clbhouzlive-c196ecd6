@@ -50,6 +50,8 @@ export interface CardFeedProps {
   currentUserId?: string;
   onRefresh?: () => void | Promise<void>;
   isRefreshing?: boolean;
+  /** Fires once when the first card's primary content is paint-ready. */
+  onFirstContentReady?: () => void;
 }
 
 const PTR_THRESHOLD = 64;
@@ -73,6 +75,7 @@ export const CardFeed: React.FC<CardFeedProps> = ({
   currentUserId,
   onRefresh,
   isRefreshing = false,
+  onFirstContentReady,
 }) => {
 
   const virtuosoRef = useRef<VirtuosoHandle | null>(null);
@@ -312,6 +315,8 @@ export const CardFeed: React.FC<CardFeedProps> = ({
             onFollow={onFollow}
             currentUserId={currentUserId}
             feedIndex={index}
+            isFirstCard={index === 0}
+            onContentReady={index === 0 ? onFirstContentReady : undefined}
           />
           {/* Subtle inter-card seam — just-perceptible lift above ink chrome */}
           <div aria-hidden style={{ height: 5, background: '#1E212B' }} />
@@ -336,6 +341,7 @@ export const CardFeed: React.FC<CardFeedProps> = ({
       onShare,
       onFollow,
       currentUserId,
+      onFirstContentReady,
     ],
   );
 
