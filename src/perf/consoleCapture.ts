@@ -2,7 +2,7 @@
 // Patches console.* once and forwards to the originals, so desktop devtools is unchanged.
 // Gated by the same flag as the perf instrument: install() no-ops unless DEV || ?perf=1.
 
-import { isPerfEnabled } from './navTiming';
+import { isPerfEnabled, subscribePerfLive } from './navTiming';
 
 export interface LogLine {
   t: number;                 // ms since capture start
@@ -36,6 +36,25 @@ export function installConsoleCapture(): void {
   installed = true;
   startTs = performance.now();
 
+  // First buffered line: when capture actually installed (so the copied log shows what preceded it).
+  buffer.push({ t: 0, level: 'info', text: `consoleCapture installed (boot +${Math.round(performance.now())}ms)` });
+
+  // Drain anything the index.html early-log shim captured before modules evaluated.
+  try {
+    const early = (window as any).__earlyLogs as Array<[string, number, unknown[]]> | undefined;
+    if (early && early.length) {
+      const base = early[0][1];
+      early.forEach(([lvl, ts, args]) => {
+        buffer.push({
+          t: Math.max(0, ts - base),
+          level: (['log','info','warn','error','debug'].includes(lvl) ? lvl : 'log') as LogLine['level'],
+          text: '[pre-init] ' + args.map(fmtArg).join(' '),
+        });
+      });
+      (window as any).__earlyLogs = [];
+    }
+  } catch {}
+
   (['log', 'info', 'warn', 'error', 'debug'] as const).forEach((level) => {
     const orig = console[level].bind(console);
     console[level] = (...args: unknown[]) => {
@@ -43,6 +62,13 @@ export function installConsoleCapture(): void {
       orig(...args);
     };
   });
+
+  // Capture runtime errors (native has no other way to see these).
+  try {
+    window.addEventListener('error', (e) => push('error', [`[window.onerror] ${e.message}`]));
+    window.addEventListener('unhandledrejection', (e: any) =>
+      push('error', [`[unhandledrejection] ${e?.reason?.message ?? e?.reason ?? ''}`]));
+  } catch {}
 }
 
 export const consoleCapture = {
@@ -57,3 +83,7 @@ export const consoleCapture = {
 // Self-install at module-eval time so boot logs are captured before any other
 // module runs. main.tsx imports this file as its very first line.
 installConsoleCapture();
+
+// Also install on a live-enable so flipping the flag from the on-screen button
+// starts capture immediately (installed guard makes repeated calls safe).
+subscribePerfLive(() => { try { installConsoleCapture(); } catch {} });

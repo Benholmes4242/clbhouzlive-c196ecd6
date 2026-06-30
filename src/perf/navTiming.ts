@@ -73,16 +73,31 @@ function perfEnabled(): boolean {
   return false;
 }
 
-export function enablePerf(): void {
-  try { localStorage.setItem(PERF_FLAG_KEY, '1'); } catch {}
-  try { window.location.reload(); } catch {}
-}
-export function disablePerf(): void {
-  try { localStorage.removeItem(PERF_FLAG_KEY); } catch {}
-  try { window.location.reload(); } catch {}
+const ENABLED = perfEnabled();
+
+// Live visibility gate for UI surfaces (HUDs, console capture). Re-reads each call so an in-app
+// toggle takes effect WITHOUT a reload (Median WebView reloads may not re-eval modules).
+// Hot-path instrumentation keeps using the frozen ENABLED const above for true zero-cost.
+let liveOverride: boolean | null = null;
+const perfLiveSubs = new Set<() => void>();
+
+export const subscribePerfLive = (fn: () => void) => {
+  perfLiveSubs.add(fn);
+  return () => { perfLiveSubs.delete(fn); };
+};
+
+export function setPerfLive(on: boolean): void {
+  liveOverride = on;
+  try {
+    if (on) localStorage.setItem(PERF_FLAG_KEY, '1');
+    else localStorage.removeItem(PERF_FLAG_KEY);
+  } catch {}
+  perfLiveSubs.forEach((f) => { try { f(); } catch {} });
 }
 
-const ENABLED = perfEnabled();
+export const enablePerf = () => setPerfLive(true);
+export const disablePerf = () => setPerfLive(false);
+
 
 class NavTimingController {
   private nextId = 1;
@@ -301,7 +316,12 @@ export const navTiming = new NavTimingController();
 
 // --- Public helper API (no-ops in production) ---
 
-export const isPerfEnabled = () => ENABLED;
+export const isPerfEnabled = (): boolean => {
+  if (liveOverride !== null) return liveOverride;
+  if (ENABLED) return true;
+  try { if (localStorage.getItem(PERF_FLAG_KEY) === '1') return true; } catch {}
+  return false;
+};
 
 export function beginNav(path: string) {
   navTiming.beginNav(path);

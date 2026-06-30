@@ -2,6 +2,8 @@
 // Production-safe: returns null unless DEV || ?perf=1. Mirrors PerfHud.
 import React, { useEffect, useState, useCallback, memo } from 'react';
 import { consoleCapture, type LogLine } from './consoleCapture';
+import { subscribePerfLive } from './navTiming';
+
 
 const LEVEL_COLOR: Record<LogLine['level'], string> = {
   log: '#e5e7eb',
@@ -23,10 +25,13 @@ const btn: React.CSSProperties = {
 };
 
 export const LogHud = memo(function LogHud() {
+  const [, forceShow] = useState(0);
+  useEffect(() => subscribePerfLive(() => forceShow((n) => n + 1)), []);
   const enabled = consoleCapture.isEnabled();
   const [open, setOpen] = useState(false);
   const [, force] = useState(0);
   const [copied, setCopied] = useState(false);
+
 
   useEffect(() => {
     if (!enabled || !open) return;
