@@ -44,3 +44,15 @@ export function getCountryById(id: string | null): WhsCountry | null {
   if (!id) return null;
   return WHS_COUNTRIES.find(c => c.id === id) ?? null;
 }
+
+// Maps the whs_connections.provider enum to the governing body display name.
+// Defaults to England Golf (the only live provider today).
+const WHS_PROVIDER_BODY: Record<string, string> = {
+  england_golf: 'England Golf',
+  // france_golf: 'Fédération Française de Golf',  // add when launched
+  // australia_golf: 'Golf Australia',
+};
+
+export function bodyNameForProvider(provider: string | null | undefined): string {
+  return (provider && WHS_PROVIDER_BODY[provider]) || 'England Golf';
+}

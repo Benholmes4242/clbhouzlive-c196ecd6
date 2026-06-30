@@ -6,6 +6,8 @@ export interface WhsConnection {
   last_sync_status: string | null;
   initial_sync_complete: boolean;
   created_at: string;
+  /** whs_provider enum value, e.g. 'england_golf'. */
+  provider: string;
 }
 
 export interface WhsHandicapTrend {

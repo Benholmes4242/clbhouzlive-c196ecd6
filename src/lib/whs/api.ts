@@ -38,7 +38,7 @@ export async function fetchWhsConnection(userId: string): Promise<WhsConnection 
   const { data, error } = await supabase
     .from('whs_connections' as any)
     .select(
-      'id, passport_id, membership_number, last_synced_at, last_sync_status, initial_sync_complete, created_at'
+      'id, passport_id, membership_number, last_synced_at, last_sync_status, initial_sync_complete, created_at, provider'
     )
     .eq('user_id', userId)
     .eq('provider', 'england_golf')
