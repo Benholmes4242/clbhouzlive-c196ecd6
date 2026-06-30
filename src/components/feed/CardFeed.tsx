@@ -578,6 +578,6 @@ export const CardFeed = forwardRef<CardFeedHandle, CardFeedProps>(function CardF
 
     </div>
   );
-};
+});
 
 CardFeed.displayName = 'CardFeed';
