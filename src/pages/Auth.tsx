@@ -33,7 +33,6 @@ const Auth: React.FC<AuthProps> = ({ defaultSignUp = false }) => {
   
   useHideBottomNav();
   useHideHeader();
-  usePageSkeletonExempt();
 
   useLayoutEffect(() => {
     document.body.classList.add('route-auth');
