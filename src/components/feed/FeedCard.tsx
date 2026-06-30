@@ -574,10 +574,12 @@ const FeedCardImpl: React.FC<FeedCardProps> = ({
                     isNear={mountVideo}
                     feedIndex={feedIndex}
                     objectFit="cover"
+                    onFirstFrameReady={isFirstCard ? fireContentReady : undefined}
                   />
 
                 ) : media.thumbnailUrl ? (
                   <img
+                    ref={isFirstCard ? primaryImgRef : undefined}
                     src={media.thumbnailUrl}
                     alt={post.caption || post.displayName}
                     loading="lazy"
@@ -594,6 +596,7 @@ const FeedCardImpl: React.FC<FeedCardProps> = ({
                 ) : null
               ) : mediaUrl ? (
                 <img
+                  ref={isFirstCard ? primaryImgRef : undefined}
                   src={mediaUrl}
                   alt={post.caption || post.displayName}
                   loading="lazy"
