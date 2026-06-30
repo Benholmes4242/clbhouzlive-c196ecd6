@@ -792,6 +792,8 @@ const AppInner: React.FC = () => {
       <BrowserRouter>
         <NavTimingProvider>
         <PerfHud />
+        <LogHud />
+
         <HeaderProvider>
             <ModalProvider>
               <BottomNavigationProvider>
