@@ -155,7 +155,7 @@ export const ManageRivalsSheet: React.FC<Props> = ({ userId, open, onClose }) =>
             style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.65)', zIndex: 80 }}
           />
           <DrawerPrimitive.Content
-            className="hcp-light"
+            className="hcp-dark"
             style={{
               position: 'fixed',
               left: 0,
@@ -184,7 +184,7 @@ export const ManageRivalsSheet: React.FC<Props> = ({ userId, open, onClose }) =>
                 flexShrink: 0,
               }}
             >
-              <div style={{ width: 36, height: 4, borderRadius: 2, background: 'var(--hcp-line-2)' }} />
+              <div style={{ width: 36, height: 4, borderRadius: 99, background: 'var(--hcp-line-2)' }} />
             </div>
 
             <SheetHeader
