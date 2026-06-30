@@ -127,9 +127,13 @@ const SortableManageItem: React.FC<SortableItemProps> = ({
     ? course.rating
     : course.rating != null ? parseFloat(course.rating) : null;
 
+  const stopDrag = (e: React.PointerEvent) => e.stopPropagation();
+
   return (
     <div
       ref={setNodeRef}
+      {...attributes}
+      {...listeners}
       style={{
         ...dragStyle,
         background: '#FFFFFF',
@@ -138,6 +142,8 @@ const SortableManageItem: React.FC<SortableItemProps> = ({
         padding: '12px 14px',
         boxShadow: isDragging ? '0 4px 12px rgba(0,0,0,0.08)' : '0 1px 2px rgba(15,23,42,0.04)',
         marginBottom: 10,
+        cursor: 'grab',
+        touchAction: 'none',
       }}
     >
       <div style={{ display: 'flex', gap: 10, alignItems: 'flex-start' }}>
@@ -204,6 +210,7 @@ const SortableManageItem: React.FC<SortableItemProps> = ({
               {course.name}
             </div>
             <button
+              onPointerDown={stopDrag}
               onClick={() => onRemove(course.course_id)}
               disabled={isRemoving}
               aria-label={`Remove ${course.name} from Top 10`}
@@ -223,26 +230,8 @@ const SortableManageItem: React.FC<SortableItemProps> = ({
             </button>
           </div>
 
-          {/* Grip (six dot) — left of location */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginTop: 8 }}>
-            <button
-              {...attributes}
-              {...listeners}
-              aria-label="Drag to reorder"
-              style={{
-                border: 'none',
-                background: 'transparent',
-                cursor: 'grab',
-                padding: 2,
-                flexShrink: 0,
-                touchAction: 'none',
-                color: '#CBD5E1',
-                display: 'flex',
-                alignItems: 'center',
-              }}
-            >
-              <GripVertical size={16} />
-            </button>
+          {/* Location flush under name */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginTop: 6 }}>
             <div style={{ flex: 1, minWidth: 0, display: 'flex', gap: 6, alignItems: 'baseline', flexWrap: 'wrap' }}>
               <span style={{
                 fontSize: 10,
@@ -262,6 +251,7 @@ const SortableManageItem: React.FC<SortableItemProps> = ({
             </div>
             <div style={{ display: 'flex', gap: 4, flexShrink: 0 }}>
               <button
+                onPointerDown={stopDrag}
                 onClick={() => onMoveUp(index)}
                 disabled={index === 0 || isReordering}
                 aria-label="Move up"
@@ -281,6 +271,7 @@ const SortableManageItem: React.FC<SortableItemProps> = ({
                 <ChevronUp size={15} />
               </button>
               <button
+                onPointerDown={stopDrag}
                 onClick={() => onMoveDown(index)}
                 disabled={index === totalItems - 1 || isReordering}
                 aria-label="Move down"
