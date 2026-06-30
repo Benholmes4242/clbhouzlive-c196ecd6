@@ -607,6 +607,7 @@ const ClubhouseContent = () => {
       ) : posts.length > 0 ? (
         <>
           <CardFeed
+            ref={cardFeedRef}
             key={activeTab}
             tab={activeTab}
             initialState={virtuosoSnapshots.current[activeTab]}
