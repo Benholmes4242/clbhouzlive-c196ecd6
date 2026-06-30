@@ -665,13 +665,16 @@ export function ReviewWizard({
                   <div
                     style={{
                       flex: 1,
+                      display: 'flex',
+                      flexDirection: 'column',
                       overflowY: 'auto',
                       overflowX: 'hidden',
                       WebkitOverflowScrolling: 'touch',
                       paddingBottom: `calc(${keyboardHeight}px + 64px + env(safe-area-inset-bottom, 0px) + 16px)`,
                     }}
                   >
-                    <div style={{ width: '100%', maxWidth: 480, marginInline: 'auto' }}>
+                    <div style={{ width: '100%', maxWidth: 480, marginInline: 'auto', display: 'flex', flexDirection: 'column', minHeight: keyboardHeight > 0 ? undefined : '100%' }}>
+
                     {/* Course row */}
                     <button
                       onClick={() => !course && setShowCourseSearch(true)}
