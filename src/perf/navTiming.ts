@@ -319,8 +319,6 @@ export function trackedLazy<T extends { default: React.ComponentType<any> }>(
   _label: string,
   factory: () => Promise<T>,
 ) {
-  // Lazy import to avoid circular type cycles
-  const React = require('react');
   return React.lazy(() => {
     if (ENABLED) markNav('lazy-start');
     return factory().then((mod) => {
