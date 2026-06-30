@@ -233,10 +233,16 @@ export const InlineVideo: React.FC<Props> = ({
     }
   }, [isActive, regId, tag, feedIndex]);
 
-  // Trace the reveal moment.
+  // Trace the reveal moment + surface the paint-ready signal upstream (fires once).
+  const firstFrameSignalledRef = useRef(false);
   useEffect(() => {
-    if (hasFirstFrame) logTileLife(tag, feedIndex, 'FRAME_REVEALED');
-  }, [hasFirstFrame, tag, feedIndex]);
+    if (!hasFirstFrame) return;
+    logTileLife(tag, feedIndex, 'FRAME_REVEALED');
+    if (!firstFrameSignalledRef.current) {
+      firstFrameSignalledRef.current = true;
+      onFirstFrameReady?.();
+    }
+  }, [hasFirstFrame, tag, feedIndex, onFirstFrameReady]);
 
   // Keep muted state live without re-attach.
   useEffect(() => {
