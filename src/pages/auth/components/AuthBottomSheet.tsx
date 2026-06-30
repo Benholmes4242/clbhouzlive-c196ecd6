@@ -77,24 +77,27 @@ const AuthBottomSheet: React.FC<AuthBottomSheetProps> = ({
         
         {/* Handle bar */}
         <div style={{ display: 'flex', justifyContent: 'center', padding: '10px 0 4px' }}>
-          <div style={{ width: 36, height: 4, borderRadius: 2, background: 'rgba(255,255,255,0.20)' }} />
+          <div style={{ width: 36, height: 4, borderRadius: 99, background: 'rgba(255,255,255,0.20)' }} />
         </div>
         
         {/* Header with close button */}
         <div className="flex items-start justify-between px-6 pb-3">
           <div className="flex-1 pr-4">
             {title && (
-              <h2 
-                style={{ 
-                  fontSize: 20,
-                  fontWeight: 900,
-                  color: 'rgba(255,255,255,0.96)',
-                  letterSpacing: '-0.03em',
-                  marginBottom: 4,
-                }}
-              >
-                {title}
-              </h2>
+              <div>
+                <h2 
+                  style={{ 
+                    fontSize: 20,
+                    fontWeight: 800,
+                    color: 'rgba(255,255,255,0.96)',
+                    letterSpacing: '-0.03em',
+                    marginBottom: 4,
+                  }}
+                >
+                  {title}
+                </h2>
+                <div style={{ width: 28, height: 3, borderRadius: 99, background: '#F7931E', marginTop: 8 }} />
+              </div>
             )}
             {subtitle && (
               <p 
