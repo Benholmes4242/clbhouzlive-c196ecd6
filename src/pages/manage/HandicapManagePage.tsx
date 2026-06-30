@@ -9,6 +9,7 @@ import { callDisconnectWhs, callDeleteWhsData } from '@/lib/whs/api';
 import { useWhsConnection, whsKeys } from '@/lib/whs/hooks';
 import type { WhsConnection } from '@/lib/whs/types';
 import { WhsConnectScreen } from '@/components/profile/handicap/whs/WhsConnectScreen';
+import { bodyNameForProvider } from '@/lib/whs/whsCountries';
 import DisconnectConfirmSheet from '@/components/settings/sheets/DisconnectConfirmSheet';
 import DeleteAllDataConfirmSheet from '@/components/settings/sheets/DeleteAllDataConfirmSheet';
 
@@ -84,7 +85,7 @@ export default function HandicapManagePage() {
   };
 
   return (
-    <ManagePageShell title={connection ? 'England Golf' : 'Connect handicap'}>
+    <ManagePageShell title={connection ? bodyNameForProvider(connection.provider) : 'Connect handicap'}>
       <div className="px-4 pt-4 pb-8">
         {connection ? (
           <SyncedBody
