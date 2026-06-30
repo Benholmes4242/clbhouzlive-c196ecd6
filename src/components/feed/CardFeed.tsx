@@ -95,20 +95,31 @@ export const CardFeed = forwardRef<CardFeedHandle, CardFeedProps>(function CardF
   const virtuosoRef = useRef<VirtuosoHandle | null>(null);
   const scrollerElRef = useRef<HTMLElement | null>(null);
 
-  // Snapshot Virtuoso state on unmount so the parent can hand it back on
-  // remount (per-tab scroll retention — IG/TikTok feel). Keep `onSnapshot`
-  // in a ref so the cleanup never depends on identity churn.
+  // Snapshot Virtuoso state per-tab. Keep `onSnapshot` in a ref so the
+  // imperative capture never depends on identity churn.
   const onSnapshotRef = useRef(onSnapshot);
   useEffect(() => { onSnapshotRef.current = onSnapshot; }, [onSnapshot]);
-  useEffect(() => {
-    return () => {
-      try {
-        virtuosoRef.current?.getState?.((snap) => {
-          onSnapshotRef.current?.(snap);
-        });
-      } catch {}
-    };
+
+  // getState(cb) is synchronous while the instance is still mounted —
+  // the callback fires inline. Expose this so the parent can capture
+  // BEFORE flipping activeTab (the keyed remount tears us down otherwise).
+  const captureSnapshot = useCallback(() => {
+    try {
+      virtuosoRef.current?.getState?.((snap) => {
+        onSnapshotRef.current?.(snap);
+      });
+    } catch {}
   }, []);
+
+  useImperativeHandle(ref, () => ({ captureSnapshot }), [captureSnapshot]);
+
+  // Secondary fallback: useLayoutEffect cleanup runs BEFORE the ref is
+  // nulled (unlike a passive useEffect cleanup), so the snapshot still
+  // lands if the parent forgets to call captureSnapshot pre-flip.
+  useLayoutEffect(() => {
+    return () => { captureSnapshot(); };
+  }, [captureSnapshot]);
+
 
   // Explore tab retap → scroll Clubhouse feed to top
   useEffect(() => {
