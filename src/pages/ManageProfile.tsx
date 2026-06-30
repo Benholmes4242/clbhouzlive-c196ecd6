@@ -216,7 +216,6 @@ export default function ManageProfile() {
             background: 'rgba(248,250,252,0.85)',
             backdropFilter: 'saturate(180%) blur(14px)',
             WebkitBackdropFilter: 'saturate(180%) blur(14px)',
-            borderBottom: '1px solid rgba(15,23,42,0.08)',
           }}
         >
           <div
@@ -265,39 +264,45 @@ export default function ManageProfile() {
           </div>
 
           {showTabBar && (
-            <div className="flex items-center gap-6 px-4" role="tablist">
-              {(['profile', 'settings'] as TabId[]).map((t) => {
-                const active = activeTab === t;
-                return (
-                  <button
-                    key={t}
-                    role="tab"
-                    aria-selected={active}
-                    onClick={() => onTabChange(t)}
-                    style={{
-                      position: 'relative',
-                      padding: '10px 2px 11px',
-                      background: 'none', border: 'none', cursor: 'pointer',
-                      fontFamily: GEIST,
-                      fontSize: 15,
-                      fontWeight: active ? 600 : 500,
-                      color: active ? INK : INK_55,
-                      letterSpacing: '-0.005em',
-                    }}
-                  >
-                    {t === 'profile' ? 'Profile' : 'Settings'}
-                    {active && (
-                      <span
-                        style={{
-                          position: 'absolute', left: 0, right: 0, bottom: -1,
-                          height: 2, background: INK, borderRadius: 2,
-                        }}
-                      />
-                    )}
-                  </button>
-                );
-              })}
-            </div>
+            <>
+              <div className="flex items-center gap-6 px-4" role="tablist">
+                {(['profile', 'settings'] as TabId[]).map((t) => {
+                  const active = activeTab === t;
+                  return (
+                    <button
+                      key={t}
+                      role="tab"
+                      aria-selected={active}
+                      onClick={() => onTabChange(t)}
+                      style={{
+                        position: 'relative',
+                        padding: '10px 2px 14px',
+                        background: 'none', border: 'none', cursor: 'pointer',
+                        fontFamily: GEIST,
+                        fontSize: 15,
+                        fontWeight: active ? 600 : 500,
+                        color: active ? INK : INK_55,
+                        letterSpacing: '-0.005em',
+                      }}
+                    >
+                      {t === 'profile' ? 'Profile' : 'Settings'}
+                      {active && (
+                        <span
+                          style={{
+                            position: 'absolute', left: 0, right: 0, bottom: 6,
+                            height: 2, background: INK, borderRadius: 2,
+                          }}
+                        />
+                      )}
+                    </button>
+                  );
+                })}
+              </div>
+              <div style={{ height: 1, width: '100%', background: 'rgba(15,23,42,0.08)' }} />
+            </>
+          )}
+          {!showTabBar && (
+            <div style={{ height: 1, width: '100%', background: 'rgba(15,23,42,0.08)' }} />
           )}
         </div>
 
