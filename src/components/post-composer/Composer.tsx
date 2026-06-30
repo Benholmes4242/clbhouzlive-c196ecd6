@@ -71,7 +71,7 @@ const CHIP = '#F5F5F7';
 const HAIR = 'rgba(15,23,42,0.07)';
 const AMBER = '#F7931E';
 const AMBER_SOFT = '#FEF3E7';
-const GOLD_DEEP = '#D97706';
+const GOLD_DEEP = '#D97706'; // mirrors tourhub gold ramp deep shade (features/tourhub/_shared/tokens GOLD_DEEP); local by design - no app-level palette
 const GOLD_BORDER = 'rgba(255,184,0,0.32)';
 
 type Visibility = 'anyone' | 'followers' | 'private';

@@ -65,7 +65,7 @@ const CHIP = '#F5F5F7';
 const HAIR = 'rgba(15,23,42,0.07)';
 const AMBER = '#F7931E';
 const AMBER_SOFT = '#FEF3E7';
-const GOLD_DEEP = '#D97706';
+const GOLD_DEEP = '#D97706'; // mirrors tourhub gold ramp deep shade (features/tourhub/_shared/tokens GOLD_DEEP); local by design - no app-level palette
 
 const MAX_REVIEW_LENGTH = 4000;
 const PAD_X = 'clamp(12px, 4vw, 16px)';

@@ -10,7 +10,7 @@ const INK_MUTE = '#64748B';
 const INK_FAINT = '#94A3B8';
 const AMBER = '#F7931E';
 const GOLD = '#FFB800';
-const GOLD_DEEP = '#D97706';
+const GOLD_DEEP = '#D97706'; // mirrors tourhub gold ramp deep shade (features/tourhub/_shared/tokens GOLD_DEEP); local by design - no app-level palette
 
 type Tier = { label: string; gold: boolean } | null;
 function tierFor(score: number | null): Tier {
