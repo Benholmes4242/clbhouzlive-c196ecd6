@@ -213,7 +213,6 @@ function ScheduleShellRowInner() {
                   <div style={{ fontSize: 12, color: INK_FAINT, marginTop: 2 }}>{description}</div>
                 </div>
                 <span style={{ fontSize: 13, color: INK_FAINT, fontVariantNumeric: 'tabular-nums', flexShrink: 0 }}>{count}</span>
-                {isSelected && <div style={{ width: 6, height: 6, borderRadius: '50%', background: AMBER, flexShrink: 0 }} />}
               </button>
             );
           })}
