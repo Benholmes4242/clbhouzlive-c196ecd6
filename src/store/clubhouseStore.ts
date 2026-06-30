@@ -15,38 +15,92 @@ function getInitialMuted(): boolean {
 // Tracks recent user gesture for autoplay policy compliance
 let _userGestureUnmuteTs = 0;
 
+export type TabKey = string; // 'foryou' | 'friends' | other surfaces (LightCardFeed etc use 'default')
+
+const DEFAULT_TAB: TabKey = 'foryou';
+
 interface ClubhouseState {
+  /** Tab whose slot is mirrored to the legacy `activeIndex` / `carouselPositions`. */
+  activeTab: TabKey;
+  activeIndexByTab: Record<TabKey, number>;
+  carouselPositionsByTab: Record<TabKey, Map<number, number>>;
+
+  // Legacy mirrors of the active tab's slot (kept for back-compat with the
+  // many consumers that read these directly — FeedOverlayLayer, FeedSlide,
+  // FullscreenCarouselOverlay, LightCardFeed, FeedImageCarousel, etc.).
   activeIndex: number;
+  carouselPositions: Map<number, number>;
+
   isMuted: boolean;
   userPaused: boolean;
   activeVideoElement: HTMLVideoElement | null;
   activeVideoRef: React.RefObject<HTMLVideoElement> | null;
-  carouselPositions: Map<number, number>;
   isTournamentCardActive: boolean;
 
-  setActiveIndex: (idx: number) => void;
+  setActiveTab: (tab: TabKey) => void;
+  setActiveIndex: (idx: number, tab?: TabKey) => void;
+  setCarouselPosition: (feedIdx: number, mediaIdx: number, tab?: TabKey) => void;
   setIsMuted: (v: boolean) => void;
   toggleMute: () => void;
   setUserPaused: (v: boolean) => void;
   setActiveVideoElement: (el: HTMLVideoElement | null, ref: React.RefObject<HTMLVideoElement> | null) => void;
-  setCarouselPosition: (feedIdx: number, mediaIdx: number) => void;
   setIsTournamentCardActive: (v: boolean) => void;
   markUserGestureUnmute: () => void;
   isRecentUserGesture: () => boolean;
 }
 
+function trimMap(map: Map<number, number>, cap = 20) {
+  while (map.size > cap) {
+    const firstKey = map.keys().next().value;
+    if (firstKey === undefined) break;
+    map.delete(firstKey);
+  }
+}
+
 export const useClubhouseStore = create<ClubhouseState>()((set) => ({
+  activeTab: DEFAULT_TAB,
+  activeIndexByTab: { [DEFAULT_TAB]: 0 },
+  carouselPositionsByTab: { [DEFAULT_TAB]: new Map() },
+
   activeIndex: 0,
+  carouselPositions: new Map(),
+
   isMuted: getInitialMuted(),
   userPaused: false,
   activeVideoElement: null,
   activeVideoRef: null,
-  carouselPositions: new Map(),
   isTournamentCardActive: false,
 
-  setActiveIndex: (idx) => {
-    set({ activeIndex: idx });
-  },
+  setActiveTab: (tab) => set((s) => {
+    const idx = s.activeIndexByTab[tab] ?? 0;
+    const positions = s.carouselPositionsByTab[tab] ?? new Map<number, number>();
+    return {
+      activeTab: tab,
+      activeIndexByTab: tab in s.activeIndexByTab ? s.activeIndexByTab : { ...s.activeIndexByTab, [tab]: 0 },
+      carouselPositionsByTab: tab in s.carouselPositionsByTab ? s.carouselPositionsByTab : { ...s.carouselPositionsByTab, [tab]: positions },
+      activeIndex: idx,
+      carouselPositions: positions,
+    };
+  }),
+
+  setActiveIndex: (idx, tab) => set((s) => {
+    const target = tab ?? s.activeTab;
+    const nextByTab = { ...s.activeIndexByTab, [target]: idx };
+    const mirror = target === s.activeTab ? { activeIndex: idx } : {};
+    return { activeIndexByTab: nextByTab, ...mirror };
+  }),
+
+  setCarouselPosition: (feedIdx, mediaIdx, tab) => set((s) => {
+    const target = tab ?? s.activeTab;
+    const prev = s.carouselPositionsByTab[target] ?? new Map<number, number>();
+    const next = new Map(prev);
+    next.set(feedIdx, mediaIdx);
+    trimMap(next, 20);
+    const nextByTab = { ...s.carouselPositionsByTab, [target]: next };
+    const mirror = target === s.activeTab ? { carouselPositions: next } : {};
+    return { carouselPositionsByTab: nextByTab, ...mirror };
+  }),
+
   setIsMuted: (v) => {
     try { sessionStorage.setItem(SESSION_MUTE_KEY, JSON.stringify(v)); } catch {}
     set({ isMuted: v });
@@ -58,17 +112,6 @@ export const useClubhouseStore = create<ClubhouseState>()((set) => ({
   }),
   setUserPaused: (v) => set({ userPaused: v }),
   setActiveVideoElement: (el, ref) => set({ activeVideoElement: el, activeVideoRef: ref }),
-  setCarouselPosition: (feedIdx, mediaIdx) =>
-    set((s) => {
-      const next = new Map(s.carouselPositions);
-      next.set(feedIdx, mediaIdx);
-      // Trim to 20 entries — evict oldest keys beyond the window
-      if (next.size > 20) {
-        const firstKey = next.keys().next().value;
-        if (firstKey !== undefined) next.delete(firstKey);
-      }
-      return { carouselPositions: next };
-    }),
   setIsTournamentCardActive: (v) => set({ isTournamentCardActive: v }),
   markUserGestureUnmute: () => { _userGestureUnmuteTs = Date.now(); },
   isRecentUserGesture: () => Date.now() - _userGestureUnmuteTs < 2000,
