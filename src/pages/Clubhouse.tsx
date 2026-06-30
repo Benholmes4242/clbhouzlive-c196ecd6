@@ -248,10 +248,18 @@ const ClubhouseContent = () => {
   const { moreOptionsOpen, setMoreOptionsOpen, handleShare, handleReport, handleNotInterested } = useClubhouseShare(user?.id);
   
   // ── Feed navigation ──
+  // Skeleton single owner: onTabSwitch (post-commit). Re-show only when the
+  // now-active feed has never loaded (uncached). Cached -> instant, like IG/TikTok.
   const { handleNearEnd, handleRefresh } = useClubhouseFeedNav({
     activeTab,
     activeFeed,
-    onTabSwitch: () => { resetFollows(); resetComments(); },
+    onTabSwitch: () => {
+      resetFollows();
+      resetComments();
+      if (!(activeFeed as any).hasEverLoaded) {
+        resetSkeleton();
+      }
+    },
   });
   
   // ── Carousel media index ──
@@ -459,11 +467,10 @@ const ClubhouseContent = () => {
       <ClubhouseTopBar
         activeTab={activeTab}
         onTabChange={(tab) => {
+          // Skeleton reset is owned by onTabSwitch (post-commit) in
+          // useClubhouseFeedNav, where activeFeed.hasEverLoaded is fresh.
+          // Do NOT gate skeleton here — query state is stale at tap time.
           setActiveTab(tab);
-          const targetFeed = tab === 'friends' ? friendsFeed : suggestedFeed;
-          if (targetFeed.isLoading) {
-            resetSkeleton();
-          }
         }}
         isBusinessActor={isBusinessActor}
         user={user}
