@@ -30,16 +30,23 @@ export const ProfilePhotoCard = forwardRef<ProfilePhotoCardHandle, ProfilePhotoC
   const inputRef = useRef<HTMLInputElement>(null);
   const [cropperImage, setCropperImage] = useState<string | null>(null);
   const [showCropper, setShowCropper] = useState(false);
+  const [sheetOpen, setSheetOpen] = useState(false);
 
   const displayUrl = previewUrl || currentUrl;
 
   const handleClick = () => {
-    inputRef.current?.click();
+    if (variant === 'bare') {
+      setSheetOpen(true);
+    } else {
+      inputRef.current?.click();
+    }
   };
 
   useImperativeHandle(ref, () => ({
     openPicker: () => inputRef.current?.click(),
+    openSheet: () => setSheetOpen(true),
   }), []);
+
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
