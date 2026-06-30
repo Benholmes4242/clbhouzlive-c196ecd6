@@ -1,4 +1,4 @@
-import React, { useRef, useState, useCallback } from 'react';
+import React, { useRef, useState, useCallback, useImperativeHandle, forwardRef } from 'react';
 import { Camera, User, Plus } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { ImageCropperModal } from './ImageCropperModal';
@@ -8,17 +8,23 @@ interface ProfilePhotoCardProps {
   previewUrl?: string | null;
   onFileChange: (file: File | null) => void;
   onRemove?: () => void;
+  variant?: 'card' | 'bare';
+}
+
+export interface ProfilePhotoCardHandle {
+  openPicker: () => void;
 }
 
 // Profile photo aspect ratio: squircle spec (1:1.05)
 const PROFILE_ASPECT_RATIO = 1 / 1.05;
 
-export const ProfilePhotoCard: React.FC<ProfilePhotoCardProps> = ({
+export const ProfilePhotoCard = forwardRef<ProfilePhotoCardHandle, ProfilePhotoCardProps>(({
   currentUrl,
   previewUrl,
   onFileChange,
   onRemove,
-}) => {
+  variant = 'card',
+}, ref) => {
   const inputRef = useRef<HTMLInputElement>(null);
   const [cropperImage, setCropperImage] = useState<string | null>(null);
   const [showCropper, setShowCropper] = useState(false);
@@ -28,6 +34,10 @@ export const ProfilePhotoCard: React.FC<ProfilePhotoCardProps> = ({
   const handleClick = () => {
     inputRef.current?.click();
   };
+
+  useImperativeHandle(ref, () => ({
+    openPicker: () => inputRef.current?.click(),
+  }), []);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -55,6 +65,99 @@ export const ProfilePhotoCard: React.FC<ProfilePhotoCardProps> = ({
     setShowCropper(open);
   };
 
+  const fileInput = (
+    <input
+      ref={inputRef}
+      type="file"
+      accept="image/jpeg,image/png,image/webp"
+      onChange={handleChange}
+      className="hidden"
+    />
+  );
+
+  const cropper = cropperImage ? (
+    <ImageCropperModal
+      open={showCropper}
+      onOpenChange={handleCropperClose}
+      image={cropperImage}
+      aspectRatio={PROFILE_ASPECT_RATIO}
+      cropShape="rect"
+      title="Crop Profile Photo"
+      onCropComplete={handleCropComplete}
+    />
+  ) : null;
+
+  if (variant === 'bare') {
+    return (
+      <>
+        <div style={{ position: 'relative', width: 78, height: 78 }}>
+          <button
+            type="button"
+            onClick={handleClick}
+            aria-label={displayUrl ? 'Change profile photo' : 'Add profile photo'}
+            style={{
+              width: 78,
+              height: 78,
+              borderRadius: 20,
+              overflow: 'hidden',
+              background: '#E2E8F0',
+              border: '3px solid #ffffff',
+              boxShadow: '0 4px 14px rgba(15,23,42,0.18)',
+              padding: 0,
+              cursor: 'pointer',
+              display: 'block',
+            }}
+          >
+            {displayUrl ? (
+              <img
+                src={displayUrl}
+                alt=""
+                style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
+              />
+            ) : (
+              <div style={{
+                width: '100%', height: '100%',
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                background: 'linear-gradient(135deg,#F1F5F9,#E2E8F0)',
+              }}>
+                <User size={28} strokeWidth={1.75} style={{ color: '#94A3B8' }} />
+              </div>
+            )}
+          </button>
+          <button
+            type="button"
+            onClick={handleClick}
+            aria-label={displayUrl ? 'Change profile photo' : 'Add profile photo'}
+            style={{
+              position: 'absolute',
+              right: -2,
+              bottom: -2,
+              width: 27,
+              height: 27,
+              borderRadius: '50%',
+              background: '#0F172A',
+              border: '2.5px solid #ffffff',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              cursor: 'pointer',
+              padding: 0,
+              boxShadow: '0 2px 6px rgba(15,23,42,0.25)',
+            }}
+          >
+            {displayUrl ? (
+              <Camera size={12} strokeWidth={2.25} style={{ color: '#fff' }} />
+            ) : (
+              <Plus size={13} strokeWidth={2.5} style={{ color: '#fff' }} />
+            )}
+          </button>
+        </div>
+        {fileInput}
+        {cropper}
+      </>
+    );
+  }
+
   return (
     <div>
       <div className="mb-4">
@@ -65,14 +168,13 @@ export const ProfilePhotoCard: React.FC<ProfilePhotoCardProps> = ({
       </div>
 
       <div className="flex items-center gap-4">
-        {/* Profile photo preview — 100px squircle */}
         <div className="relative">
           <button
             type="button"
             onClick={handleClick}
             className="relative group"
           >
-            <div 
+            <div
               className={cn(
                 "overflow-hidden bg-muted relative transition-transform group-hover:scale-[1.02]",
                 "border-4 border-background shadow-xl"
@@ -85,13 +187,12 @@ export const ProfilePhotoCard: React.FC<ProfilePhotoCardProps> = ({
             >
               {displayUrl ? (
                 <>
-                  <img 
-                    src={displayUrl} 
-                    alt="Profile preview" 
-                    className="h-full w-full object-cover" 
+                  <img
+                    src={displayUrl}
+                    alt="Profile preview"
+                    className="h-full w-full object-cover"
                   />
-                  {/* Hover overlay */}
-                  <div 
+                  <div
                     className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center"
                     style={{ borderRadius: '34%' }}
                   >
@@ -104,8 +205,7 @@ export const ProfilePhotoCard: React.FC<ProfilePhotoCardProps> = ({
                 </div>
               )}
             </div>
-            
-            {/* Upload button badge — 28px */}
+
             <div className={cn(
               "absolute -bottom-1 -right-1 w-7 h-7 rounded-full shadow-lg flex items-center justify-center",
               "bg-[hsl(38,92%,50%)] text-white",
@@ -115,8 +215,7 @@ export const ProfilePhotoCard: React.FC<ProfilePhotoCardProps> = ({
             </div>
           </button>
         </div>
-        
-        {/* Text and action */}
+
         <div className="flex-1">
           {!displayUrl ? (
             <div>
@@ -150,26 +249,10 @@ export const ProfilePhotoCard: React.FC<ProfilePhotoCardProps> = ({
         </div>
       </div>
 
-      <input
-        ref={inputRef}
-        type="file"
-        accept="image/jpeg,image/png,image/webp"
-        onChange={handleChange}
-        className="hidden"
-      />
-
-      {/* Image Cropper Modal */}
-      {cropperImage && (
-        <ImageCropperModal
-          open={showCropper}
-          onOpenChange={handleCropperClose}
-          image={cropperImage}
-          aspectRatio={PROFILE_ASPECT_RATIO}
-          cropShape="rect"
-          title="Crop Profile Photo"
-          onCropComplete={handleCropComplete}
-        />
-      )}
+      {fileInput}
+      {cropper}
     </div>
   );
-};
+});
+
+ProfilePhotoCard.displayName = 'ProfilePhotoCard';

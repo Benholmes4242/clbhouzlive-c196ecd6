@@ -17,7 +17,7 @@ import { PageRoot } from '@/components/layout/PageRoot';
 import { ManageCard, Label, Nudge, PAGE_BG, INK as INK_TOKEN, INK_45 as INK_45_TOKEN } from '@/components/manage/ui';
 import { SegToggle } from '@/components/profile/edit-v2/SegToggle';
 import { HeaderPhotoCard } from '@/components/profile/edit-v2/HeaderPhotoCard';
-import { ProfilePhotoCard } from '@/components/profile/edit-v2/ProfilePhotoCard';
+import { ProfilePhotoCard, type ProfilePhotoCardHandle } from '@/components/profile/edit-v2/ProfilePhotoCard';
 import { HomeClubCard } from '@/components/profile/edit-v2/HomeClubCard';
 import { AdditionalClubsList } from '@/components/profile/edit-v2/AdditionalClubsList';
 
@@ -216,7 +216,6 @@ export default function ManageProfile() {
             background: 'rgba(248,250,252,0.85)',
             backdropFilter: 'saturate(180%) blur(14px)',
             WebkitBackdropFilter: 'saturate(180%) blur(14px)',
-            borderBottom: '1px solid rgba(15,23,42,0.08)',
           }}
         >
           <div
@@ -265,39 +264,45 @@ export default function ManageProfile() {
           </div>
 
           {showTabBar && (
-            <div className="flex items-center gap-6 px-4" role="tablist">
-              {(['profile', 'settings'] as TabId[]).map((t) => {
-                const active = activeTab === t;
-                return (
-                  <button
-                    key={t}
-                    role="tab"
-                    aria-selected={active}
-                    onClick={() => onTabChange(t)}
-                    style={{
-                      position: 'relative',
-                      padding: '10px 2px 11px',
-                      background: 'none', border: 'none', cursor: 'pointer',
-                      fontFamily: GEIST,
-                      fontSize: 15,
-                      fontWeight: active ? 600 : 500,
-                      color: active ? INK : INK_55,
-                      letterSpacing: '-0.005em',
-                    }}
-                  >
-                    {t === 'profile' ? 'Profile' : 'Settings'}
-                    {active && (
-                      <span
-                        style={{
-                          position: 'absolute', left: 0, right: 0, bottom: -1,
-                          height: 2, background: INK, borderRadius: 2,
-                        }}
-                      />
-                    )}
-                  </button>
-                );
-              })}
-            </div>
+            <>
+              <div className="flex items-center gap-6 px-4" role="tablist">
+                {(['profile', 'settings'] as TabId[]).map((t) => {
+                  const active = activeTab === t;
+                  return (
+                    <button
+                      key={t}
+                      role="tab"
+                      aria-selected={active}
+                      onClick={() => onTabChange(t)}
+                      style={{
+                        position: 'relative',
+                        padding: '10px 2px 14px',
+                        background: 'none', border: 'none', cursor: 'pointer',
+                        fontFamily: GEIST,
+                        fontSize: 15,
+                        fontWeight: active ? 600 : 500,
+                        color: active ? INK : INK_55,
+                        letterSpacing: '-0.005em',
+                      }}
+                    >
+                      {t === 'profile' ? 'Profile' : 'Settings'}
+                      {active && (
+                        <span
+                          style={{
+                            position: 'absolute', left: 0, right: 0, bottom: 6,
+                            height: 2, background: INK, borderRadius: 2,
+                          }}
+                        />
+                      )}
+                    </button>
+                  );
+                })}
+              </div>
+              <div style={{ height: 1, width: '100%', background: 'rgba(15,23,42,0.08)' }} />
+            </>
+          )}
+          {!showTabBar && (
+            <div style={{ height: 1, width: '100%', background: 'rgba(15,23,42,0.08)' }} />
           )}
         </div>
 
@@ -383,13 +388,18 @@ function ProfileTabBody({
   navigate, showSocial, setShowSocial,
   handleSave, isDisabled, isSaving, isDirty,
 }: ProfileTabBodyProps) {
+  const profilePickerRef = useRef<ProfilePhotoCardHandle>(null);
+  const hasAvatar = Boolean(form.profilePhotoBlob || form.profilePhotoUrl);
+  const hasHeader = Boolean(form.headerPhotoBlob || form.headerPhotoUrl);
+
   return (
     <>
       {/* Photos card: cover band with overlapping squircle */}
       <div className="px-4 pb-4">
-        <ManageCard padding={0} style={{ overflow: 'hidden' }}>
-          <div className="relative">
+        <ManageCard padding={0} style={{ overflow: 'visible' }}>
+          <div style={{ position: 'relative', borderTopLeftRadius: 14, borderTopRightRadius: 14, overflow: 'hidden' }}>
             <HeaderPhotoCard
+              variant="bare"
               currentUrl={form.headerPhotoUrl}
               onFileChange={(file) => {
                 setField('headerPhotoBlob', file);
@@ -400,22 +410,71 @@ function ProfileTabBody({
                 setField('headerPhotoUrl', null);
               }}
             />
-            <div className="absolute" style={{ left: 16, bottom: -28 }}>
+          </div>
+          <div style={{ position: 'relative', padding: '0 16px' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 14, marginTop: -34 }}>
               <ProfilePhotoCard
+                ref={profilePickerRef}
+                variant="bare"
                 currentUrl={form.profilePhotoUrl}
                 onFileChange={(file) => {
                   setField('profilePhotoBlob', file);
                   if (file) setField('profilePhotoUrl', URL.createObjectURL(file));
                 }}
+                onRemove={() => {
+                  setField('profilePhotoBlob', null);
+                  setField('profilePhotoUrl', null);
+                }}
               />
+              <button
+                type="button"
+                onClick={() => profilePickerRef.current?.openPicker()}
+                style={{
+                  marginTop: 28,
+                  background: 'transparent',
+                  border: 'none',
+                  padding: '6px 2px',
+                  cursor: 'pointer',
+                  fontFamily: GEIST,
+                  fontSize: 13.5,
+                  fontWeight: 600,
+                  color: INK,
+                  letterSpacing: '-0.005em',
+                }}
+              >
+                Change photos
+              </button>
             </div>
-          </div>
-          <div style={{ padding: '36px 16px 14px' }}>
-            {!form.profilePhotoBlob && !form.profilePhotoUrl ? (
-              <Nudge icon={<Sparkles size={12} strokeWidth={2.25} />}>
-                Golfers with a photo get 3x more friend requests
-              </Nudge>
-            ) : null}
+            <div style={{ paddingTop: 12, paddingBottom: 14 }}>
+              {!hasAvatar ? (
+                <Nudge icon={<Sparkles size={12} strokeWidth={2.25} />}>
+                  Golfers with a photo get 3x more friend requests
+                </Nudge>
+              ) : null}
+              {hasHeader ? (
+                <button
+                  type="button"
+                  onClick={() => {
+                    setField('headerPhotoBlob', null);
+                    setField('headerPhotoUrl', null);
+                  }}
+                  style={{
+                    marginTop: hasAvatar ? 0 : 6,
+                    marginLeft: 4,
+                    background: 'transparent',
+                    border: 'none',
+                    padding: 0,
+                    cursor: 'pointer',
+                    fontFamily: GEIST,
+                    fontSize: 12,
+                    fontWeight: 500,
+                    color: '#DC2626',
+                  }}
+                >
+                  Remove cover
+                </button>
+              ) : null}
+            </div>
           </div>
         </ManageCard>
       </div>
