@@ -52,9 +52,11 @@ export function useClubhouseFeedNav({ activeTab, activeFeed, onTabSwitch }: UseF
 
   const handleRefresh = useCallback(async () => {
     resetSeen();
+    // Refresh resets the current tab to the top
+    useClubhouseStore.getState().setActiveIndex(0, activeTab);
     onTabSwitch();
     await refetch();
-  }, [resetSeen, onTabSwitch, refetch]);
+  }, [resetSeen, onTabSwitch, refetch, activeTab]);
 
   return { handleNearEnd, handleRefresh };
 }
