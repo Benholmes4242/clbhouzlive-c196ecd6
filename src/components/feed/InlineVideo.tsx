@@ -31,6 +31,7 @@ export const InlineVideo: React.FC<Props> = ({
   isNear,
   feedIndex,
   objectFit = 'cover',
+  onFirstFrameReady,
 }) => {
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const containerRef = useRef<HTMLDivElement | null>(null);
