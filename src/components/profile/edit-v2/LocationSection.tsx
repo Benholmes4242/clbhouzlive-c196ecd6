@@ -115,8 +115,8 @@ function CountryPicker({ value, onChange }: { value: string; onChange: (v: strin
                   onClick={() => { onChange(c); setOpen(false); setSearch(''); }}
                   className="w-full text-left px-4 py-2.5 text-[14px] transition-colors"
                   style={{
-                    background: c === value ? 'rgba(245,159,11,0.08)' : 'transparent',
-                    color: c === value ? '#92400E' : '#0F172A',
+                    background: c === value ? 'rgba(15,23,42,0.06)' : 'transparent',
+                    color: '#0F172A',
                     fontFamily: GEIST,
                     fontWeight: c === value ? 600 : 400,
                   }}
