@@ -797,6 +797,7 @@ const AppInner: React.FC = () => {
         <PerfHud />
         <LogHud />
         <PerfToggleButton />
+        <BootTimelineToggleButton />
         
 
         <HeaderProvider>
