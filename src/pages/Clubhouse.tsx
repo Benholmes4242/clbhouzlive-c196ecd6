@@ -27,6 +27,7 @@ import { useNetworkStatus } from '@/hooks/useNetworkStatus';
 
 // ── New feed components ──
 import { CardFeed } from '@/components/feed/CardFeed';
+import type { StateSnapshot } from 'react-virtuoso';
 import { FeedOverlayLayer } from '@/components/feed/FeedOverlayLayer';
 import { FullscreenCarouselOverlay } from '@/components/media/FullscreenCarouselOverlay';
 import { CarouselDots } from '@/components/media/CarouselDots';
@@ -154,6 +155,18 @@ const ClubhouseContent = () => {
   const carouselPositions = useClubhouseStore(s => s.carouselPositions);
   const currentMediaIndex = carouselPositions.get(activeIndex) ?? 0;
   const isTournamentCardActive = useClubhouseStore(s => s.isTournamentCardActive);
+  const setStoreActiveTab = useClubhouseStore(s => s.setActiveTab);
+
+  // Keep the store's active-tab mirror in sync so legacy consumers
+  // (FeedOverlayLayer, top-bar carousel chip, FullscreenCarouselOverlay)
+  // read the correct tab's slot after a switch.
+  useEffect(() => {
+    setStoreActiveTab(activeTab);
+  }, [activeTab, setStoreActiveTab]);
+
+  // Per-tab Virtuoso snapshots — captured on switch-AWAY (CardFeed unmount)
+  // and restored on switch-BACK so each tab retains its exact scroll offset.
+  const virtuosoSnapshots = useRef<Record<string, StateSnapshot | undefined>>({});
 
 
 
@@ -584,6 +597,10 @@ const ClubhouseContent = () => {
       ) : posts.length > 0 ? (
         <>
           <CardFeed
+            key={activeTab}
+            tab={activeTab}
+            initialState={virtuosoSnapshots.current[activeTab]}
+            onSnapshot={(s) => { virtuosoSnapshots.current[activeTab] = s; }}
             posts={posts}
             topPadding={'calc(env(safe-area-inset-top, 0px) + 59px)'}
             onNearEnd={handleNearEnd}

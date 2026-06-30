@@ -19,7 +19,7 @@
  *  - Persisted multi-media carousel position via `clubhouseStore`.
  */
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { Virtuoso, type VirtuosoHandle } from 'react-virtuoso';
+import { Virtuoso, type VirtuosoHandle, type StateSnapshot } from 'react-virtuoso';
 import type { FeedPost } from '@/components/media-system/types/media';
 import type { ActiveActor } from '@/types/actor';
 import { useFullscreenFeedStore } from '@/store/fullscreenFeedStore';
@@ -52,6 +52,12 @@ export interface CardFeedProps {
   isRefreshing?: boolean;
   /** Fires once when the first card's primary content is paint-ready. */
   onFirstContentReady?: () => void;
+  /** Per-tab key — routes activeIndex/carouselPosition writes to the right slot. */
+  tab?: string;
+  /** Restore Virtuoso scroll state from a prior snapshot (per-tab handoff). */
+  initialState?: StateSnapshot;
+  /** Called on unmount with the current Virtuoso state snapshot. */
+  onSnapshot?: (state: StateSnapshot) => void;
 }
 
 const PTR_THRESHOLD = 64;
@@ -76,10 +82,28 @@ export const CardFeed: React.FC<CardFeedProps> = ({
   onRefresh,
   isRefreshing = false,
   onFirstContentReady,
+  tab,
+  initialState,
+  onSnapshot,
 }) => {
 
   const virtuosoRef = useRef<VirtuosoHandle | null>(null);
   const scrollerElRef = useRef<HTMLElement | null>(null);
+
+  // Snapshot Virtuoso state on unmount so the parent can hand it back on
+  // remount (per-tab scroll retention — IG/TikTok feel). Keep `onSnapshot`
+  // in a ref so the cleanup never depends on identity churn.
+  const onSnapshotRef = useRef(onSnapshot);
+  useEffect(() => { onSnapshotRef.current = onSnapshot; }, [onSnapshot]);
+  useEffect(() => {
+    return () => {
+      try {
+        virtuosoRef.current?.getState?.((snap) => {
+          onSnapshotRef.current?.(snap);
+        });
+      } catch {}
+    };
+  }, []);
 
   // Explore tab retap → scroll Clubhouse feed to top
   useEffect(() => {
@@ -204,15 +228,18 @@ export const CardFeed: React.FC<CardFeedProps> = ({
 
   const setActiveIndex = useClubhouseStore((s) => s.setActiveIndex);
   const setCarouselPosition = useClubhouseStore((s) => s.setCarouselPosition);
-  const carouselPositions = useClubhouseStore((s) => s.carouselPositions);
+  const carouselPositionsByTab = useClubhouseStore((s) => s.carouselPositionsByTab);
+  const globalCarouselPositions = useClubhouseStore((s) => s.carouselPositions);
+  const carouselPositions = tab ? (carouselPositionsByTab[tab] ?? globalCarouselPositions) : globalCarouselPositions;
   const openFullscreen = useFullscreenFeedStore((s) => s.open);
   const fsOpen = useFullscreenFeedStore((s) => s.isOpen);
 
   // Sync the active card to the global store so other consumers (top-bar
-  // carousel chip, fullscreen handoff, etc.) stay in step.
+  // carousel chip, fullscreen handoff, etc.) stay in step. Routed to the
+  // owning tab's slot so switching back retains the centred card.
   useEffect(() => {
-    setActiveIndex(activeIdx);
-  }, [activeIdx, setActiveIndex]);
+    setActiveIndex(activeIdx, tab);
+  }, [activeIdx, setActiveIndex, tab]);
 
   // Warm-start the next 1-2 upcoming videos so they play instantly on arrival.
   useEffect(() => {
@@ -239,11 +266,11 @@ export const CardFeed: React.FC<CardFeedProps> = ({
     (post: FeedPost, mediaIndex: number) => {
       const idx = posts.findIndex((p) => p.id === post.id);
       if (idx < 0) return;
-      setActiveIndex(idx);
-      if (mediaIndex > 0) setCarouselPosition(idx, mediaIndex);
+      setActiveIndex(idx, tab);
+      if (mediaIndex > 0) setCarouselPosition(idx, mediaIndex, tab);
       openFullscreen(posts, idx);
     },
-    [posts, setActiveIndex, setCarouselPosition, openFullscreen],
+    [posts, setActiveIndex, setCarouselPosition, openFullscreen, tab],
   );
 
   // Stable per-post carousel-change callback so FeedCard memo holds.
@@ -256,13 +283,13 @@ export const CardFeed: React.FC<CardFeedProps> = ({
         fn = (post: FeedPost, slide: number) => {
           // Recompute index at call time — `posts` may have grown.
           const idx = posts.findIndex((p) => p.id === post.id);
-          if (idx >= 0) setCarouselPosition(idx, slide);
+          if (idx >= 0) setCarouselPosition(idx, slide, tab);
         };
         cache.set(postId, fn);
       }
       return fn;
     },
-    [posts, setCarouselPosition],
+    [posts, setCarouselPosition, tab],
   );
 
   // Garbage-collect carousel-change cache when posts shrink/change.
@@ -316,7 +343,7 @@ export const CardFeed: React.FC<CardFeedProps> = ({
             currentUserId={currentUserId}
             feedIndex={index}
             isFirstCard={index === 0}
-            onContentReady={index === 0 ? onFirstContentReady : undefined}
+            onContentReady={onFirstContentReady}
           />
           {/* Subtle inter-card seam — just-perceptible lift above ink chrome */}
           <div aria-hidden style={{ height: 5, background: '#1E212B' }} />
@@ -525,6 +552,7 @@ export const CardFeed: React.FC<CardFeedProps> = ({
           increaseViewportBy={{ top: 400, bottom: 800 }}
           overscan={{ main: 400, reverse: 400 }}
           components={components}
+          restoreStateFrom={initialState}
           style={{ height: '100%', width: '100%' }}
         />
       </div>

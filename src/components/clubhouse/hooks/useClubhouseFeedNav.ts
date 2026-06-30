@@ -24,11 +24,17 @@ export function useClubhouseFeedNav({ activeTab, activeFeed, onTabSwitch }: UseF
   useEffect(() => {
     if (prevTabRef.current !== activeTab) {
       analyticsEvents.track('feed_tab_switch', { from: prevTabRef.current, to: activeTab });
-      useClubhouseStore.getState().setActiveIndex(0);
+      // Only reset the *target tab's* index when it has no cached scroll
+      // position. Cached returns must keep their index so the centred-card
+      // restoration matches the per-tab Virtuoso scroll restore.
+      const targetHasEverLoaded = (activeFeed as any).hasEverLoaded;
+      if (!targetHasEverLoaded) {
+        useClubhouseStore.getState().setActiveIndex(0, activeTab);
+      }
       onTabSwitch();
       prevTabRef.current = activeTab;
     }
-  }, [activeTab, onTabSwitch]);
+  }, [activeTab, onTabSwitch, activeFeed]);
 
   const {
     fetchNextPage,
@@ -46,9 +52,11 @@ export function useClubhouseFeedNav({ activeTab, activeFeed, onTabSwitch }: UseF
 
   const handleRefresh = useCallback(async () => {
     resetSeen();
+    // Refresh resets the current tab to the top
+    useClubhouseStore.getState().setActiveIndex(0, activeTab);
     onTabSwitch();
     await refetch();
-  }, [resetSeen, onTabSwitch, refetch]);
+  }, [resetSeen, onTabSwitch, refetch, activeTab]);
 
   return { handleNearEnd, handleRefresh };
 }
