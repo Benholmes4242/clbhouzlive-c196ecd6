@@ -37,17 +37,16 @@ import {
 import { CSS } from '@dnd-kit/utilities';
 import { restrictToVerticalAxis } from '@dnd-kit/modifiers';
 
-// ---- Locked Dispatch tokens ----
+// ---- Canonical tokens ----
 const INK = '#0F172A';
 const INK_SOFT = '#475569';
 const INK_SUBTLE = '#94A3B8';
 const AMBER = '#F7931E';
-const AMBER_DEEP = '#C97A10';
+const AMBER_DEEP = '#c97a10';
 const AMBER_WASH = 'rgba(247,147,30,0.08)';
 const AMBER_BORDER = 'rgba(247,147,30,0.30)';
 const BORDER = 'rgba(15,23,42,0.07)';
 const BG_SURFACE = '#F8FAFC';
-const FONT_SERIF = '"Geist", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif';
 
 interface AddCourseModalProps {
   userId: string;
