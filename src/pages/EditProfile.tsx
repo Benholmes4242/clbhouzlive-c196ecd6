@@ -28,6 +28,7 @@ import { LocationSection } from '@/components/profile/edit-v2/LocationSection';
 import { SocialLinksSection } from '@/components/profile/edit-v2/SocialLinksSection';
 import { DISPLAY_NAME_MAX, USERNAME_MAX } from '@/components/profile/profile-wizard/types';
 import HandicapConnectSheet from '@/components/profile/handicap/HandicapConnectSheet';
+import { SettingsTabContent } from '@/components/settings/SettingsTabContent';
 
 const GEIST = 'Geist, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif';
 const INK = '#0F172A';
@@ -330,7 +331,7 @@ export default function EditProfile() {
               isDirty={isDirty}
             />
           ) : (
-            <SettingsTabPlaceholder />
+            <SettingsTabContent />
           )}
         </div>
 
@@ -344,19 +345,8 @@ export default function EditProfile() {
   );
 }
 
-// -------------------------------------------------------------------------
-// Settings tab (placeholder for Phase 1)
-// -------------------------------------------------------------------------
-function SettingsTabPlaceholder() {
-  return (
-    <div
-      className="px-6 py-16 text-center"
-      style={{ fontFamily: GEIST, color: INK_55, fontSize: 14, lineHeight: 1.6 }}
-    >
-      Settings - coming in the next update.
-    </div>
-  );
-}
+
+
 
 // -------------------------------------------------------------------------
 // Profile tab body
