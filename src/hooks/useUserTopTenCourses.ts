@@ -58,6 +58,25 @@ export function useUserTopTenCourses(userId: string | undefined) {
 
       if (pinnedError) throw pinnedError;
 
+      const pinnedIds = (pinnedData || []).map((p: any) => p.course_id);
+
+      // Fetch this user's ratings for pinned course_ids so pinned-and-rated courses display their score.
+      const pinnedRatingMap = new Map<string, number>();
+      if (pinnedIds.length > 0) {
+        const { data: pinnedRatings } = await supabase
+          .from('course_ratings')
+          .select('course_id, rating')
+          .eq('user_id', userId)
+          .eq('is_mock', false)
+          .in('course_id', pinnedIds);
+        (pinnedRatings || []).forEach((r: any) => {
+          const prev = pinnedRatingMap.get(r.course_id);
+          if (prev == null || (r.rating != null && r.rating > prev)) {
+            pinnedRatingMap.set(r.course_id, r.rating);
+          }
+        });
+      }
+
       const pinnedCourses: TopTenCourse[] = (pinnedData || []).map((p: any) => ({
         id: p.id,
         position: p.position,
@@ -71,10 +90,9 @@ export function useUserTopTenCourses(userId: string | undefined) {
         global_rank: p.golf_courses?.global_rank,
         regional_rank: p.golf_courses?.regional_rank,
         usa_rank: p.golf_courses?.usa_rank,
-        rating: null,
+        rating: pinnedRatingMap.get(p.course_id) ?? null,
       }));
 
-      const pinnedIds = pinnedCourses.map(p => p.course_id);
 
       // 2. Get exclusions
       const { data: exclusionsData } = await supabase

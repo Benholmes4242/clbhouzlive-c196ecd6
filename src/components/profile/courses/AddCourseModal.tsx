@@ -231,7 +231,7 @@ const SortableManageItem: React.FC<SortableItemProps> = ({
           </div>
 
           {/* Location flush under name */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginTop: 6 }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginTop: 3 }}>
             <div style={{ flex: 1, minWidth: 0, display: 'flex', gap: 6, alignItems: 'baseline', flexWrap: 'wrap' }}>
               <span style={{
                 fontSize: 10,
