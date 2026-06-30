@@ -372,6 +372,8 @@ export const ClubhouseSkeletonShimmer: React.FC<ClubhouseSkeletonShimmerProps> =
 }) => {
   const reduceMotion = prefersReducedMotion();
   const effectiveStatic = isStatic || reduceMotion;
+  useSkeletonShownWhenVisible(isVisible);
+
 
   return (
     <AnimatePresence>
