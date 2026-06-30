@@ -778,6 +778,8 @@ const AppInner: React.FC = () => {
     <TooltipProvider>
       <SecurityHeaders />
       <BrowserRouter>
+        <NavTimingProvider>
+        <PerfHud />
         <HeaderProvider>
             <ModalProvider>
               <BottomNavigationProvider>
