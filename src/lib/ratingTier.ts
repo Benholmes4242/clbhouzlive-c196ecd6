@@ -55,10 +55,16 @@ export function getRatingTierLabel(rating: number | null | undefined): string {
  *  - amber: Good / Excellent (6.0 – 8.9)
  *  - gold:  Exceptional (≥ 9.0) — the reward state, visibly brighter
  */
+// NOTE: ramp keys (grey/amber/gold) are legacy names. As of the Ember-to-Gold
+// pass (Option B), ALL three are warm. "grey" is the low-end ember ramp, not grey.
+// Key rename deferred to post-launch to avoid churn across ~6 consumers.
 export const RATING_RAMPS = {
-  grey: { hi: '#AEB6C2', mid: '#8A95A4', lo: '#677280' },
-  amber: { hi: '#FAC775', mid: '#F7931E', lo: '#D97706' },
-  gold: { hi: '#FFE08A', mid: '#FFC23D', lo: '#F7931E' },
+  // Low end (Poor / Fair). Deep ember — reads clearly "low" via depth, not grey.
+  grey: { hi: '#C9670F', mid: '#A85110', lo: '#9A4A0E' },
+  // Mid (Good / Excellent). Warm amber.
+  amber: { hi: '#FFCB45', mid: '#E8800C', lo: '#C9670F' },
+  // Top (Exceptional). Bright reward gold.
+  gold: { hi: '#FFE08A', mid: '#FFCB45', lo: '#E8800C' },
 } as const;
 
 export type RatingRamp = (typeof RATING_RAMPS)[keyof typeof RATING_RAMPS];
