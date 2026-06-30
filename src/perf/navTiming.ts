@@ -316,7 +316,12 @@ export const navTiming = new NavTimingController();
 
 // --- Public helper API (no-ops in production) ---
 
-export const isPerfEnabled = () => ENABLED;
+export const isPerfEnabled = (): boolean => {
+  if (liveOverride !== null) return liveOverride;
+  if (ENABLED) return true;
+  try { if (localStorage.getItem(PERF_FLAG_KEY) === '1') return true; } catch {}
+  return false;
+};
 
 export function beginNav(path: string) {
   navTiming.beginNav(path);
