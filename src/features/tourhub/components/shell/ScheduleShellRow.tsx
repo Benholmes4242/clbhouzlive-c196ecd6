@@ -8,7 +8,6 @@ import { getTourLogo, hasTourLogo } from '../../utils/tourLogos';
 import { getTourMeta } from '../../constants/tourMap';
 import type { ScheduleFilterType, TourFilterCode } from '../schedule';
 import {
-  AMBER,
   AMBER_TINT_04,
   INK,
   INK_FAINT,
@@ -213,7 +212,6 @@ function ScheduleShellRowInner() {
                   <div style={{ fontSize: 12, color: INK_FAINT, marginTop: 2 }}>{description}</div>
                 </div>
                 <span style={{ fontSize: 13, color: INK_FAINT, fontVariantNumeric: 'tabular-nums', flexShrink: 0 }}>{count}</span>
-                {isSelected && <div style={{ width: 6, height: 6, borderRadius: '50%', background: AMBER, flexShrink: 0 }} />}
               </button>
             );
           })}
