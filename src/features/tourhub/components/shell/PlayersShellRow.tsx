@@ -5,7 +5,6 @@ import { BottomSheet } from '@/components/ui/BottomSheet';
 import SheetHeader from '@/components/ui/SheetHeader';
 import { getTourLogo, hasTourLogo } from '../../utils/tourLogos';
 import {
-  AMBER,
   AMBER_TINT_04,
   INK,
   INK_FAINT,
