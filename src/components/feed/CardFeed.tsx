@@ -266,11 +266,11 @@ export const CardFeed: React.FC<CardFeedProps> = ({
     (post: FeedPost, mediaIndex: number) => {
       const idx = posts.findIndex((p) => p.id === post.id);
       if (idx < 0) return;
-      setActiveIndex(idx);
-      if (mediaIndex > 0) setCarouselPosition(idx, mediaIndex);
+      setActiveIndex(idx, tab);
+      if (mediaIndex > 0) setCarouselPosition(idx, mediaIndex, tab);
       openFullscreen(posts, idx);
     },
-    [posts, setActiveIndex, setCarouselPosition, openFullscreen],
+    [posts, setActiveIndex, setCarouselPosition, openFullscreen, tab],
   );
 
   // Stable per-post carousel-change callback so FeedCard memo holds.
