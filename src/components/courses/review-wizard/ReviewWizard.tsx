@@ -870,7 +870,10 @@ export function ReviewWizard({
                     <div
                       onClick={() => taRef.current?.focus()}
                       style={{
-                        margin: `0 ${PAD_X}`,
+                        margin: verdictGrows ? `0 ${PAD_X} 16px` : `0 ${PAD_X}`,
+                        flex: verdictGrows ? 1 : 'none',
+                        display: 'flex',
+                        flexDirection: 'column',
                         border: `1px solid ${
                           verdictFocused ? 'rgba(247,147,30,0.55)' : HAIR
                         }`,
@@ -903,7 +906,8 @@ export function ReviewWizard({
                           lineHeight: 1.45,
                           color: INK,
                           background: 'transparent',
-                          minHeight: 64,
+                          flex: verdictGrows ? 1 : 'none',
+                          minHeight: verdictGrows ? 0 : 64,
                           fontFamily: 'inherit',
                           overflow: 'hidden',
                           caretColor: AMBER,
