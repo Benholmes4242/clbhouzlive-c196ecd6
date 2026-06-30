@@ -1,3 +1,7 @@
+// On-screen log capture (on-device testing). Self-installs on import.
+// No-op unless DEV || ?perf=1. MUST be first so it catches boot-time logs.
+import './perf/consoleCapture';
+
 // Boot Timeline: Import for side effects (attaches to window)
 import './utils/bootTimeline';
 // Discover Timing: Import for side effects (attaches to window)
