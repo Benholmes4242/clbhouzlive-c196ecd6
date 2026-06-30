@@ -147,9 +147,20 @@ export const HeaderPhotoCard: React.FC<HeaderPhotoCardProps> = ({
         </button>
         {fileInput}
         {cropper}
+        <PhotoActionSheet
+          open={sheetOpen}
+          onClose={() => setSheetOpen(false)}
+          title="Cover photo"
+          hasPhoto={Boolean(displayUrl)}
+          removeLabel="Remove cover"
+          onChoose={triggerPicker}
+          onTake={triggerCapture}
+          onRemove={onRemove}
+        />
       </>
     );
   }
+
 
   return (
     <div>
