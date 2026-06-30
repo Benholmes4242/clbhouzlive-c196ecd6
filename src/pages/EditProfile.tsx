@@ -345,19 +345,8 @@ export default function EditProfile() {
   );
 }
 
-// -------------------------------------------------------------------------
-// Settings tab (placeholder for Phase 1)
-// -------------------------------------------------------------------------
-function SettingsTabPlaceholder() {
-  return (
-    <div
-      className="px-6 py-16 text-center"
-      style={{ fontFamily: GEIST, color: INK_55, fontSize: 14, lineHeight: 1.6 }}
-    >
-      Settings - coming in the next update.
-    </div>
-  );
-}
+
+
 
 // -------------------------------------------------------------------------
 // Profile tab body
