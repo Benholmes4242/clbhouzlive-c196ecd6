@@ -14,8 +14,7 @@ import { resolveDisplayHandicap } from '@/lib/handicap/resolveHandicap';
 import { formatHcp } from '@/lib/formatHcp';
 import { Button } from '@/components/ui/button';
 import { PageRoot } from '@/components/layout/PageRoot';
-import { SectionHeader } from '@/components/ui/SectionHeader';
-import { SectionCard } from '@/components/profile/edit-v2/SectionCard';
+import { ManageCard, Label, Nudge, PAGE_BG, INK as INK_TOKEN, INK_45 as INK_45_TOKEN } from '@/components/manage/ui';
 import { SegToggle } from '@/components/profile/edit-v2/SegToggle';
 import { HeaderPhotoCard } from '@/components/profile/edit-v2/HeaderPhotoCard';
 import { ProfilePhotoCard } from '@/components/profile/edit-v2/ProfilePhotoCard';
@@ -31,10 +30,11 @@ import { DISPLAY_NAME_MAX, USERNAME_MAX } from '@/components/profile/profile-wiz
 import { SettingsTabContent } from '@/components/settings/SettingsTabContent';
 
 const GEIST = 'Geist, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif';
-const INK = '#0F172A';
-const INK_55 = '#64748B';
-const SLATE_BG = '#F4F6F8';
+const INK = INK_TOKEN;
+const INK_55 = INK_45_TOKEN;
+const SLATE_BG = PAGE_BG;
 const GREEN = '#059669';
+
 
 const GENDER_OPTIONS = [
   { value: 'male', label: 'Male' },
@@ -213,7 +213,7 @@ export default function ManageProfile() {
         <div
           className="sticky top-0 z-30"
           style={{
-            background: 'rgba(244,246,248,0.85)',
+            background: 'rgba(248,250,252,0.85)',
             backdropFilter: 'saturate(180%) blur(14px)',
             WebkitBackdropFilter: 'saturate(180%) blur(14px)',
             borderBottom: '1px solid rgba(15,23,42,0.08)',
@@ -385,168 +385,164 @@ function ProfileTabBody({
 }: ProfileTabBodyProps) {
   return (
     <>
-      {/* Photos + Identity */}
-      <div className="space-y-4 px-4 pb-4">
-        <HeaderPhotoCard
-          currentUrl={form.headerPhotoUrl}
-          onFileChange={(file) => {
-            setField('headerPhotoBlob', file);
-            if (file) setField('headerPhotoUrl', URL.createObjectURL(file));
-          }}
-          onRemove={() => {
-            setField('headerPhotoBlob', null);
-            setField('headerPhotoUrl', null);
-          }}
-        />
-
-        <div className="-mt-10 ml-4 mb-2 z-10 relative">
-          <ProfilePhotoCard
-            currentUrl={form.profilePhotoUrl}
-            onFileChange={(file) => {
-              setField('profilePhotoBlob', file);
-              if (file) setField('profilePhotoUrl', URL.createObjectURL(file));
-            }}
-          />
-          {!form.profilePhotoBlob && !form.profilePhotoUrl && (
-            <p
-              className="text-[12px] mt-1.5 ml-1 inline-flex items-center gap-1.5"
-              style={{ color: INK_55, fontFamily: GEIST }}
-            >
-              <Sparkles size={12} strokeWidth={2.25} />
-              <span>Golfers with a photo get 3x more friend requests</span>
-            </p>
-          )}
-        </div>
-
-        <SectionCard noPadding>
-          <div>
-            {/* Name */}
-            <div className="px-4 pt-4 pb-3" style={{ borderBottom: '0.5px solid rgba(15,23,42,0.07)' }}>
-              <div style={{ marginBottom: 8 }}>
-                <SectionHeader tier="standard" kicker="Name" />
-              </div>
-              <div className="flex gap-2">
-                <input
-                  type="text"
-                  value={form.firstName}
-                  onChange={(e) => setField('firstName', e.target.value)}
-                  placeholder="First name"
-                  className="w-1/2 bg-[#F8FAFC] border border-border/60 rounded-[10px] px-3.5 py-2.5 text-[15px] text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-[hsl(38,92%,50%)]/40 focus:bg-background transition-colors"
-                />
-                <input
-                  type="text"
-                  value={form.lastName}
-                  onChange={(e) => setField('lastName', e.target.value)}
-                  placeholder="Last name"
-                  className="w-1/2 bg-[#F8FAFC] border border-border/60 rounded-[10px] px-3.5 py-2.5 text-[15px] text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-[hsl(38,92%,50%)]/40 focus:bg-background transition-colors"
-                />
-              </div>
-            </div>
-
-            {/* Display Name */}
-            <div className="px-4 pt-4 pb-3" style={{ borderBottom: '0.5px solid rgba(15,23,42,0.07)' }}>
-              <div className="flex justify-between items-baseline">
-                <div style={{ marginBottom: 8 }}>
-                  <SectionHeader tier="standard" kicker="Display Name" />
-                </div>
-                <span className="text-[11px] text-muted-foreground/60">
-                  {form.displayName.length}/{DISPLAY_NAME_MAX}
-                </span>
-              </div>
-              <input
-                type="text"
-                value={form.displayName}
-                maxLength={DISPLAY_NAME_MAX}
-                onChange={(e) => { setHasTouchedDisplayName(true); setField('displayName', e.target.value); }}
-                placeholder="Your full name"
-                className="w-full bg-[#F8FAFC] border border-border/60 rounded-[10px] px-3.5 py-2.5 text-[15px] text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-[hsl(38,92%,50%)]/40 focus:bg-background transition-colors"
-              />
-              {errors.displayName && (
-                <p className="text-[12px] text-destructive mt-1">{errors.displayName}</p>
-              )}
-            </div>
-
-            {/* Username */}
-            <div className="px-4 pt-3 pb-4" style={{ borderBottom: '0.5px solid rgba(15,23,42,0.07)' }}>
-              <div className="flex justify-between items-baseline">
-                <div style={{ marginBottom: 8 }}>
-                  <SectionHeader tier="standard" kicker="Username" />
-                </div>
-                {usernameIsLocked && (
-                  <span className="text-[11px] text-muted-foreground/60">
-                    Contact{' '}
-                    <a href="mailto:support@clbhouz.co.uk" className="underline text-muted-foreground/60">
-                      support@clbhouz.co.uk
-                    </a>{' '}to change
-                  </span>
-                )}
-              </div>
-              <div className="relative">
-                <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-[15px] text-muted-foreground">@</span>
-                <input
-                  type="text"
-                  value={form.username}
-                  maxLength={USERNAME_MAX}
-                  readOnly={usernameIsLocked}
-                  onChange={(e) => {
-                    if (usernameIsLocked) return;
-                    setField('username', e.target.value.toLowerCase());
-                  }}
-                  placeholder="choose a username"
-                  className={`w-full bg-[#F8FAFC] border border-border/60 rounded-[10px] pl-8 pr-24 py-2.5 text-[15px] text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-[hsl(38,92%,50%)]/40 focus:bg-background transition-colors ${usernameIsLocked ? 'opacity-50 cursor-not-allowed' : ''}`}
-                />
-                {!usernameIsLocked && isNewUser && form.username.trim().length > 0 && (
-                  <span className="absolute right-3 top-1/2 -translate-y-1/2 inline-flex items-center gap-1 text-[12px]">
-                    {usernameStatus === 'checking' && (
-                      <span style={{ width: 12, height: 12, border: `2px solid ${INK}`, borderTopColor: 'transparent', borderRadius: '50%' }} className="animate-spin" />
-                    )}
-                    {usernameStatus === 'available' && (
-                      <span style={{ color: GREEN, display: 'inline-flex', alignItems: 'center', gap: 4 }}>
-                        <CheckCircle2 size={14} strokeWidth={2.25} /> available
-                      </span>
-                    )}
-                    {usernameStatus === 'taken' && (<span style={{ color: '#DC2626' }}>taken</span>)}
-                    {usernameStatus === 'invalid' && (<span style={{ color: '#DC2626' }}>invalid</span>)}
-                  </span>
-                )}
-              </div>
-              {!usernameIsLocked && isNewUser && (
-                <p className="text-[12px] text-muted-foreground mt-1.5">
-                  3-20 characters - lowercase letters, numbers, underscores, periods
-                </p>
-              )}
-            </div>
-
-            {/* Gender (INK active) */}
-            <div className="px-4 pt-3 pb-4">
-              <div style={{ marginBottom: 8 }}>
-                <SectionHeader tier="standard" kicker="Gender" />
-              </div>
-              <SegToggle
-                value={form.gender}
-                onChange={(v) => setField('gender', v as any)}
-                options={GENDER_OPTIONS}
+      {/* Photos card: cover band with overlapping squircle */}
+      <div className="px-4 pb-4">
+        <ManageCard padding={0} style={{ overflow: 'hidden' }}>
+          <div className="relative">
+            <HeaderPhotoCard
+              currentUrl={form.headerPhotoUrl}
+              onFileChange={(file) => {
+                setField('headerPhotoBlob', file);
+                if (file) setField('headerPhotoUrl', URL.createObjectURL(file));
+              }}
+              onRemove={() => {
+                setField('headerPhotoBlob', null);
+                setField('headerPhotoUrl', null);
+              }}
+            />
+            <div className="absolute" style={{ left: 16, bottom: -28 }}>
+              <ProfilePhotoCard
+                currentUrl={form.profilePhotoUrl}
+                onFileChange={(file) => {
+                  setField('profilePhotoBlob', file);
+                  if (file) setField('profilePhotoUrl', URL.createObjectURL(file));
+                }}
               />
             </div>
           </div>
-        </SectionCard>
+          <div style={{ padding: '36px 16px 14px' }}>
+            {!form.profilePhotoBlob && !form.profilePhotoUrl ? (
+              <Nudge icon={<Sparkles size={12} strokeWidth={2.25} />}>
+                Golfers with a photo get 3x more friend requests
+              </Nudge>
+            ) : null}
+          </div>
+        </ManageCard>
+      </div>
+
+      {/* Identity card (hairline-divided rows) */}
+      <div className="px-4 pb-4">
+        <ManageCard padding={0}>
+          {/* Name */}
+          <div className="px-4 pt-4 pb-3" style={{ borderBottom: '1px solid rgba(15,23,42,0.06)' }}>
+            <Label>Name</Label>
+            <div className="flex gap-2">
+              <input
+                type="text"
+                value={form.firstName}
+                onChange={(e) => setField('firstName', e.target.value)}
+                placeholder="First name"
+                className="w-1/2 bg-[#F8FAFC] border border-[rgba(15,23,42,0.08)] rounded-[10px] px-3.5 py-2.5 text-[15px] text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-[rgba(15,23,42,0.20)] focus:bg-background transition-colors"
+              />
+              <input
+                type="text"
+                value={form.lastName}
+                onChange={(e) => setField('lastName', e.target.value)}
+                placeholder="Last name"
+                className="w-1/2 bg-[#F8FAFC] border border-[rgba(15,23,42,0.08)] rounded-[10px] px-3.5 py-2.5 text-[15px] text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-[rgba(15,23,42,0.20)] focus:bg-background transition-colors"
+              />
+            </div>
+          </div>
+
+          {/* Display Name */}
+          <div className="px-4 pt-4 pb-3" style={{ borderBottom: '1px solid rgba(15,23,42,0.06)' }}>
+            <Label right={
+              <span className="text-[11px] text-muted-foreground/60">
+                {form.displayName.length}/{DISPLAY_NAME_MAX}
+              </span>
+            }>
+              Display name
+            </Label>
+            <input
+              type="text"
+              value={form.displayName}
+              maxLength={DISPLAY_NAME_MAX}
+              onChange={(e) => { setHasTouchedDisplayName(true); setField('displayName', e.target.value); }}
+              placeholder="Your full name"
+              className="w-full bg-[#F8FAFC] border border-[rgba(15,23,42,0.08)] rounded-[10px] px-3.5 py-2.5 text-[15px] text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-[rgba(15,23,42,0.20)] focus:bg-background transition-colors"
+            />
+            {errors.displayName && (
+              <p className="text-[12px] text-destructive mt-1">{errors.displayName}</p>
+            )}
+          </div>
+
+          {/* Username */}
+          <div className="px-4 pt-3 pb-4" style={{ borderBottom: '1px solid rgba(15,23,42,0.06)' }}>
+            <Label right={
+              usernameIsLocked ? (
+                <span className="text-[11px] text-muted-foreground/60">
+                  Contact{' '}
+                  <a href="mailto:support@clbhouz.co.uk" className="underline text-muted-foreground/60">
+                    support@clbhouz.co.uk
+                  </a>{' '}to change
+                </span>
+              ) : undefined
+            }>
+              Username
+            </Label>
+            <div className="relative">
+              <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-[15px] text-muted-foreground">@</span>
+              <input
+                type="text"
+                value={form.username}
+                maxLength={USERNAME_MAX}
+                readOnly={usernameIsLocked}
+                onChange={(e) => {
+                  if (usernameIsLocked) return;
+                  setField('username', e.target.value.toLowerCase());
+                }}
+                placeholder="choose a username"
+                className={`w-full bg-[#F8FAFC] border border-[rgba(15,23,42,0.08)] rounded-[10px] pl-8 pr-24 py-2.5 text-[15px] text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-[rgba(15,23,42,0.20)] focus:bg-background transition-colors ${usernameIsLocked ? 'opacity-50 cursor-not-allowed' : ''}`}
+              />
+              {!usernameIsLocked && isNewUser && form.username.trim().length > 0 && (
+                <span className="absolute right-3 top-1/2 -translate-y-1/2 inline-flex items-center gap-1 text-[12px]">
+                  {usernameStatus === 'checking' && (
+                    <span style={{ width: 12, height: 12, border: `2px solid ${INK}`, borderTopColor: 'transparent', borderRadius: '50%' }} className="animate-spin" />
+                  )}
+                  {usernameStatus === 'available' && (
+                    <span style={{ color: GREEN, display: 'inline-flex', alignItems: 'center', gap: 4 }}>
+                      <CheckCircle2 size={14} strokeWidth={2.25} /> available
+                    </span>
+                  )}
+                  {usernameStatus === 'taken' && (<span style={{ color: '#DC2626' }}>taken</span>)}
+                  {usernameStatus === 'invalid' && (<span style={{ color: '#DC2626' }}>invalid</span>)}
+                </span>
+              )}
+            </div>
+            {!usernameIsLocked && isNewUser && (
+              <p className="text-[12px] text-muted-foreground mt-1.5">
+                3-20 characters - lowercase letters, numbers, underscores, periods
+              </p>
+            )}
+          </div>
+
+          {/* Gender (INK active) */}
+          <div className="px-4 pt-3 pb-4">
+            <Label>Gender</Label>
+            <SegToggle
+              value={form.gender}
+              onChange={(v) => setField('gender', v as any)}
+              options={GENDER_OPTIONS}
+            />
+          </div>
+        </ManageCard>
       </div>
 
       {/* Location */}
-      <div className="space-y-4 px-4 pb-4">
-        <SectionCard>
+      <div className="px-4 pb-4">
+        <ManageCard>
           <LocationSection
             country={form.country}
             city={form.city}
             onCountryChange={(v) => setField('country', v)}
             onCityChange={(v) => setField('city', v)}
           />
-        </SectionCard>
+        </ManageCard>
       </div>
 
       {/* Golf */}
       <div className="space-y-4 px-4 pb-4">
-        <SectionCard>
+        <ManageCard>
           <HomeClubCard
             clubName={form.homeClubName}
             clubId={form.primaryClubId}
@@ -558,20 +554,13 @@ function ProfileTabBody({
             onVisibilityChange={(v) => setField('homeClubVisibility', v)}
           />
           {!form.homeClubName && (
-            <p
-              style={{
-                fontFamily: GEIST, fontSize: 12, color: INK_55,
-                marginTop: 6, marginLeft: 4,
-                display: 'inline-flex', alignItems: 'center', gap: 6,
-              }}
-            >
-              <Flag size={12} strokeWidth={2.25} />
-              <span>Your home club appears on your profile and leaderboards</span>
-            </p>
+            <Nudge icon={<Flag size={12} strokeWidth={2.25} />}>
+              Your home club appears on your profile and leaderboards
+            </Nudge>
           )}
-        </SectionCard>
+        </ManageCard>
 
-        <SectionCard>
+        <ManageCard>
           <AdditionalClubsList
             clubs={form.additionalClubs}
             visibility={form.additionalClubsVisibility}
@@ -579,9 +568,9 @@ function ProfileTabBody({
             onRemove={removeClub}
             onVisibilityChange={(v) => setField('additionalClubsVisibility', v)}
           />
-        </SectionCard>
+        </ManageCard>
 
-        <SectionCard>
+        <ManageCard>
           <HandicapRow
             state={
               resolved.source === 'whs' ? 'whs'
@@ -596,12 +585,12 @@ function ProfileTabBody({
             onOpenConnect={() => navigate('/manage/handicap')}
             onViewFullStats={() => navigate('/handicap')}
           />
-        </SectionCard>
+        </ManageCard>
       </div>
 
       {/* About */}
       <div className="space-y-4 px-4 pb-4">
-        <SectionCard>
+        <ManageCard>
           <BioWebsitesSection
             bio={form.bio}
             websites={form.websites}
@@ -612,7 +601,7 @@ function ProfileTabBody({
             onRemoveWebsite={removeWebsite}
             onUpdateWebsite={updateWebsite}
           />
-        </SectionCard>
+        </ManageCard>
 
         <button
           onClick={() => setShowSocial((v: boolean) => !v)}
@@ -624,7 +613,7 @@ function ProfileTabBody({
         </button>
 
         {showSocial && (
-          <SectionCard>
+          <ManageCard>
             <SocialLinksSection
               instagram={form.instagramHandle}
               twitter={form.twitterHandle}
@@ -635,7 +624,7 @@ function ProfileTabBody({
               onTiktokChange={(v) => setField('tiktokHandle', v)}
               onYoutubeChange={(v) => setField('youtubeHandle', v)}
             />
-          </SectionCard>
+          </ManageCard>
         )}
       </div>
 
@@ -644,7 +633,7 @@ function ProfileTabBody({
         <Button
           onClick={handleSave}
           disabled={isDisabled}
-          className="w-full min-h-[52px] rounded-[14px] text-[15px] font-bold border-0 active:opacity-90 transition-opacity"
+          className="w-full min-h-[52px] rounded-[13px] text-[15px] font-bold border-0 active:opacity-90 transition-opacity"
           style={{
             background: isDisabled ? 'rgba(15,23,42,0.06)' : INK,
             color: isDisabled ? 'rgba(15,23,42,0.45)' : '#fff',
@@ -691,9 +680,7 @@ function HandicapRow({
   if (state === 'whs') {
     return (
       <div style={{ fontFamily: GEIST }}>
-        <div style={{ marginBottom: 8 }}>
-          <SectionHeader tier="standard" kicker="Official Handicap" />
-        </div>
+        <Label>Official handicap</Label>
         <div style={{ display: 'flex', alignItems: 'baseline', gap: 12, marginBottom: 12 }}>
           <span style={{ fontSize: 34, fontWeight: 800, color: INK, letterSpacing: '-0.02em', fontVariantNumeric: 'tabular-nums' }}>
             {value != null ? formatHcp(value) : '-'}
@@ -713,7 +700,7 @@ function HandicapRow({
             onClick={onViewFullStats}
             style={{
               display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-              padding: '12px 14px', borderRadius: 12,
+              padding: '12px 14px', borderRadius: 10,
               background: '#F8FAFC', border: '1px solid rgba(15,23,42,0.08)',
               fontSize: 14, fontWeight: 600, color: INK, fontFamily: GEIST, cursor: 'pointer',
             }}
@@ -725,7 +712,7 @@ function HandicapRow({
             onClick={onOpenConnect}
             style={{
               display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-              padding: '12px 14px', borderRadius: 12,
+              padding: '12px 14px', borderRadius: 10,
               background: '#fff', border: '1px solid rgba(15,23,42,0.08)',
               fontSize: 13, fontWeight: 500, color: INK_55, fontFamily: GEIST, cursor: 'pointer',
             }}
@@ -764,9 +751,7 @@ function HandicapRow({
 
   return (
     <div style={{ fontFamily: GEIST }}>
-      <div style={{ marginBottom: 8 }}>
-        <SectionHeader tier="standard" kicker="Handicap" />
-      </div>
+      <Label>Handicap</Label>
       <button
         onClick={onOpenConnect}
         style={{
@@ -782,19 +767,21 @@ function HandicapRow({
       <p style={{ fontSize: 12, color: INK_55, margin: '10px 4px 14px', lineHeight: 1.5 }}>
         {HELPER_COPY}
       </p>
-      <button
-        onClick={onToggleManualEntry}
-        style={{
-          width: '100%', textAlign: 'center',
-          padding: '8px 12px', borderRadius: 999,
-          background: 'transparent', border: 'none',
-          fontSize: 13, fontWeight: 600, color: INK_55, fontFamily: GEIST, cursor: 'pointer',
-        }}
-      >
-        {showManualEntry ? 'Hide manual entry' : 'or enter manually'}
-      </button>
+      <p style={{ fontSize: 13, color: INK_55, margin: '4px 4px 0', lineHeight: 1.5, textAlign: 'center' }}>
+        Don't have an official WHS handicap?{' '}
+        <button
+          onClick={onToggleManualEntry}
+          style={{
+            background: 'transparent', border: 'none', padding: 0,
+            fontSize: 13, fontWeight: 600, color: INK_55, fontFamily: GEIST,
+            cursor: 'pointer', textDecoration: 'underline',
+          }}
+        >
+          {showManualEntry ? 'Hide manual entry' : 'Enter yours manually'}
+        </button>
+      </p>
       {showManualEntry && (
-        <div style={{ marginTop: 8 }}>
+        <div style={{ marginTop: 12 }}>
           <HandicapInput value={form.handicapIndex} onChange={onChange} />
         </div>
       )}

@@ -3,7 +3,7 @@ import { Plus, X, Search } from 'lucide-react';
 import { useClubSearch } from '@/hooks/useClubSearch';
 import { ClubEntry } from '@/components/profile/profile-wizard/types';
 import { VisibilityDropdown } from './VisibilityDropdown';
-import { SectionHeader } from '@/components/ui/SectionHeader';
+import { Label } from '@/components/manage/ui';
 
 interface Props {
   clubs: ClubEntry[];
@@ -31,10 +31,10 @@ export function AdditionalClubsList({
 
   return (
     <div className="space-y-3">
-      <div className="flex items-center justify-between mb-3">
-        <SectionHeader tier="standard" kicker="Additional Clubs" />
-        <VisibilityDropdown value={visibility as any} onChange={onVisibilityChange as any} />
-      </div>
+      <Label right={<VisibilityDropdown value={visibility as any} onChange={onVisibilityChange as any} />}>
+        Additional clubs
+      </Label>
+
 
       {clubs.length > 0 && (
         <div className="space-y-2">
@@ -90,13 +90,13 @@ export function AdditionalClubsList({
         <button
           onClick={() => setShowSearch(true)}
           className="flex items-center gap-2.5 text-[14px] font-semibold min-h-[44px]"
-          style={{ color: '#F7931E' }}
+          style={{ color: '#0F172A' }}
         >
           <div
             className="w-6 h-6 rounded-full flex items-center justify-center"
-            style={{ backgroundColor: 'rgba(247,147,30,0.10)' }}
+            style={{ backgroundColor: '#F8FAFC', border: '1px solid rgba(15,23,42,0.08)' }}
           >
-            <Plus size={14} style={{ color: '#F7931E' }} />
+            <Plus size={14} style={{ color: '#475569' }} />
           </div>
           Add a club
         </button>

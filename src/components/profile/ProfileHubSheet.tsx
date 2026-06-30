@@ -690,18 +690,10 @@ function ProfileHubSheet({
                         />
                         <GroupedRow
                           Icon={UserCog}
-                          label="Edit profile"
+                          label={isBusinessActor ? 'Edit profile' : 'Manage profile'}
                           onClick={() => handleNav(editTarget)}
-                          isLast={isBusinessActor}
+                          isLast
                         />
-                        {!isBusinessActor && (
-                          <GroupedRow
-                            Icon={SettingsIcon}
-                            label="Settings"
-                            onClick={() => handleNav('/edit-profile?tab=settings')}
-                            isLast
-                          />
-                        )}
                       </SheetGroup>
                     );
                   })()}

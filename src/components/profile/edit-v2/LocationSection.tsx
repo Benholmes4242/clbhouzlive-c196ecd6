@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { MapPin, ChevronDown, Search, X } from 'lucide-react';
 import { MAP_CONFIG } from '@/config/maps';
-import { SectionHeader } from '@/components/ui/SectionHeader';
+import { Label } from '@/components/manage/ui';
 
 const GEIST = 'Geist, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif';
 
@@ -115,8 +115,8 @@ function CountryPicker({ value, onChange }: { value: string; onChange: (v: strin
                   onClick={() => { onChange(c); setOpen(false); setSearch(''); }}
                   className="w-full text-left px-4 py-2.5 text-[14px] transition-colors"
                   style={{
-                    background: c === value ? 'rgba(245,159,11,0.08)' : 'transparent',
-                    color: c === value ? '#92400E' : '#0F172A',
+                    background: c === value ? 'rgba(15,23,42,0.06)' : 'transparent',
+                    color: '#0F172A',
                     fontFamily: GEIST,
                     fontWeight: c === value ? 600 : 400,
                   }}
@@ -212,7 +212,7 @@ function CitySearch({ value, onChange, country }: { value: string; onChange: (v:
           </button>
         )}
         {loading && (
-          <div style={{ position: 'absolute', right: 12, top: '50%', transform: 'translateY(-50%)', width: 12, height: 12, border: '2px solid #F7931E', borderTopColor: 'transparent', borderRadius: '50%' }} className="animate-spin" />
+          <div style={{ position: 'absolute', right: 12, top: '50%', transform: 'translateY(-50%)', width: 12, height: 12, border: '2px solid #0F172A', borderTopColor: 'transparent', borderRadius: '50%' }} className="animate-spin" />
         )}
       </div>
 
@@ -251,12 +251,10 @@ export function LocationSection({ country, city, onCountryChange, onCityChange }
 
   return (
     <div className="space-y-3">
-      <div style={{ marginBottom: 8 }}>
-        <SectionHeader tier="standard" kicker="Location" required />
-      </div>
+      <Label>Location</Label>
       {/* Country first */}
       <CountryPicker value={country} onChange={handleCountryChange} />
-      {/* City second — locked until country selected, biased to that country */}
+      {/* City second - locked until country selected, biased to that country */}
       <CitySearch value={city} onChange={onCityChange} country={country} />
     </div>
   );

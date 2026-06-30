@@ -73,7 +73,7 @@ export function SettingsToggleRow({
             checked={checked}
             onCheckedChange={onCheckedChange}
             disabled={disabled || isLoading}
-            className="data-[state=checked]:bg-[#F7931E] data-[state=unchecked]:bg-muted"
+            className="data-[state=checked]:bg-[#0F172A] data-[state=unchecked]:bg-[rgba(15,23,42,0.15)]"
           />
         </div>
 

@@ -2,7 +2,7 @@ import { useState, useRef, useEffect } from 'react';
 import { Search, X, MapPin, Check } from 'lucide-react';
 import { useClubSearch } from '@/hooks/useClubSearch';
 import { VisibilityDropdown } from './VisibilityDropdown';
-import { SectionHeader } from '@/components/ui/SectionHeader';
+import { Label } from '@/components/manage/ui';
 
 interface Props {
   clubName: string;
@@ -14,6 +14,7 @@ interface Props {
 
 const INK = '#0F172A';
 const GREEN = '#059669';
+
 
 export function HomeClubCard({
   clubName, clubId, visibility,
@@ -63,9 +64,10 @@ export function HomeClubCard({
   if (clubId) {
     return (
       <div className="space-y-3">
-        <div style={{ marginBottom: 8 }}>
-          <SectionHeader tier="standard" kicker="Home Club" />
-        </div>
+        <Label right={<VisibilityDropdown value={visibility as any} onChange={onVisibilityChange as any} />}>
+          Home club
+        </Label>
+
         <div
           className="w-full flex items-center justify-between bg-[#F8FAFC] border border-border/60 rounded-[11px] px-3.5 py-3 min-h-[48px]"
           style={{ borderColor: 'rgba(15,23,42,0.10)' }}
@@ -88,19 +90,15 @@ export function HomeClubCard({
           </button>
         </div>
 
-        <div className="flex items-center justify-between">
-          <p className="text-[12px] text-muted-foreground/70">Visibility</p>
-          <VisibilityDropdown value={visibility as any} onChange={onVisibilityChange as any} />
-        </div>
       </div>
     );
   }
 
   return (
     <div className="space-y-3">
-      <div style={{ marginBottom: 8 }}>
-        <SectionHeader tier="standard" kicker="Home Club" />
-      </div>
+      <Label right={<VisibilityDropdown value={visibility as any} onChange={onVisibilityChange as any} />}>
+        Home club
+      </Label>
       <div ref={containerRef} className="relative">
         <div className="relative">
           <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
@@ -152,11 +150,6 @@ export function HomeClubCard({
             )}
           </div>
         )}
-      </div>
-
-      <div className="flex items-center justify-between">
-        <p className="text-[12px] text-muted-foreground/70">Visibility</p>
-        <VisibilityDropdown value={visibility as any} onChange={onVisibilityChange as any} />
       </div>
     </div>
   );
