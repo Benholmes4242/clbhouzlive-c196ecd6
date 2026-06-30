@@ -69,6 +69,30 @@
     <div id="root"><div style="background:#15171F;min-height:100vh;width:100%;"></div></div>
     <div id="portal-root"></div>
     <script>
+      // Early log buffer: captures console output BEFORE the JS modules evaluate, so the on-screen
+      // LogHud can show the full boot timeline. Drained by consoleCapture on install. Plain ES5 syntax.
+      window.__earlyLogs = [];
+      (function () {
+        var levels = ['log', 'info', 'warn', 'error', 'debug'];
+        for (var i = 0; i < levels.length; i++) {
+          (function (k) {
+            var orig = console[k];
+            console[k] = function () {
+              try { window.__earlyLogs.push([k, Date.now(), Array.prototype.slice.call(arguments)]); } catch (e) {}
+              return orig.apply(console, arguments);
+            };
+          })(levels[i]);
+        }
+        window.addEventListener('error', function (e) {
+          try { window.__earlyLogs.push(['error', Date.now(), ['[window.onerror] ' + (e.message || e)]]); } catch (x) {}
+        });
+        window.addEventListener('unhandledrejection', function (e) {
+          try { window.__earlyLogs.push(['error', Date.now(), ['[unhandledrejection] ' + (e.reason && e.reason.message || e.reason || '')]]); } catch (x) {}
+        });
+      })();
+    </script>
+    <script>
+
       // ============================================================
       // CHROME-HEIGHT COLD-LOAD DEFAULTS
       // Set --header-h and --shell-extra-h synchronously based on the
