@@ -14,14 +14,24 @@
  * route to the H2H page with the rival pre-selected.
  */
 
+import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { ArrowLeftRight, ChevronRight } from 'lucide-react';
 import { getCollegeLogoUrl } from '@/utils/collegeLogo';
 import { useCollegeRivalries } from '../../hooks/useCollegeMovers';
+import { useCollegeMediaMap } from '../../hooks/useCollegeMedia';
 import { collegeH2HRoute } from '../../routes';
 import { PlayerInitialAvatar } from '../shared/PlayerInitialAvatar';
 import { SectionHeader } from '@/components/ui/SectionHeader';
+import { CollegeComparePickerSheet } from './CollegeComparePickerSheet';
 import { HAIRLINE_INK_8, INK, INK_FAINT, INK_MUTE, INK_TINT_06, INK_TINT_07, SLATE_50, SURFACE } from '../../_shared/tokens';
+
+function formatCollegeName(normalizedName: string): string {
+  return normalizedName
+    .split('-')
+    .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
+    .join(' ');
+}
 
 interface H2HRivalStripProps {
   normalizedName: string;
