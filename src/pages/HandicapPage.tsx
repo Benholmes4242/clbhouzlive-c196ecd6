@@ -26,6 +26,7 @@ import WhsHandicapTab from '@/components/profile/handicap/whs/WhsHandicapTab';
 import HandicapDashboard from '@/components/profile/handicap/whs/HandicapDashboard';
 
 import FloatingPageHeader from '@/components/header/FloatingPageHeader';
+import { ManagePageShell } from '@/components/manage/ManagePageShell';
 import { safeGoBack } from '@/utils/navigation';
 import SegmentedControl from '@/components/discover/SegmentedControl';
 import { RivalryCTA } from '@/components/profile/handicap/whs/sections/header/RivalryCTA';
@@ -335,10 +336,9 @@ const HandicapPage: React.FC = () => {
   const params = useParams<{ userId?: string }>();
   const [searchParams, setSearchParams] = useSearchParams();
 
-  useLayoutEffect(() => {
-    document.body.classList.add('route-handicap');
-    return () => { document.body.classList.remove('route-handicap'); };
-  }, []);
+  // Body class is applied conditionally below (skipped during connect flow
+  // so the dark theming does not bleed into the light Direction A header).
+
 
   // Determine mode + the user whose handicap we're showing.
   const friendId = params.userId ?? null;
@@ -429,6 +429,15 @@ const HandicapPage: React.FC = () => {
   // a special-case background.
   const isConnectFlow = !isFriendView && !connLoading && !ownConnection;
 
+  // Apply the dark route theming only when NOT in the connect flow.
+  // The connect flow uses Direction A (light) and the dark theming would
+  // bleed through child surfaces.
+  useLayoutEffect(() => {
+    if (isConnectFlow) return;
+    document.body.classList.add('route-handicap');
+    return () => { document.body.classList.remove('route-handicap'); };
+  }, [isConnectFlow]);
+
   if (loading) {
     return <PageRoot dark={true}><div /></PageRoot>;
   }
@@ -444,6 +453,19 @@ const HandicapPage: React.FC = () => {
 
   if (!ownerUserId) {
     return <Navigate to="/auth" replace />;
+  }
+
+  // Connect flow: Direction A header (matches /manage/handicap exactly).
+  if (isConnectFlow) {
+    return (
+      <ManagePageShell
+        title="Connect handicap"
+        onBack={() => safeGoBack(navigate, '/profile')}
+      >
+        <WhsHandicapTab userId={ownerUserId} ownerFirstName={displayName} />
+        <GamMount ownerUserId={ownerUserId} viewerUserId={user.id} ownerFirstName={displayName} readOnly={false} />
+      </ManagePageShell>
+    );
   }
 
   return (
