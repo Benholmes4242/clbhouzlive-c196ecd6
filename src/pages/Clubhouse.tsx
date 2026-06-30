@@ -467,11 +467,10 @@ const ClubhouseContent = () => {
       <ClubhouseTopBar
         activeTab={activeTab}
         onTabChange={(tab) => {
+          // Skeleton reset is owned by onTabSwitch (post-commit) in
+          // useClubhouseFeedNav, where activeFeed.hasEverLoaded is fresh.
+          // Do NOT gate skeleton here — query state is stale at tap time.
           setActiveTab(tab);
-          const targetFeed = tab === 'friends' ? friendsFeed : suggestedFeed;
-          if (targetFeed.isLoading) {
-            resetSkeleton();
-          }
         }}
         isBusinessActor={isBusinessActor}
         user={user}
