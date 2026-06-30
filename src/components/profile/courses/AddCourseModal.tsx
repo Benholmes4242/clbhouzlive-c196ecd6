@@ -277,7 +277,7 @@ const SortableManageItem: React.FC<SortableItemProps> = ({
           {ratingNum != null && (
             <>
               <span style={{ color: '#CBD5E1' }}>·</span>
-              <SerifScore value={ratingNum} size={13} />
+              <PlainScore value={ratingNum} size={13} />
             </>
           )}
         </div>
