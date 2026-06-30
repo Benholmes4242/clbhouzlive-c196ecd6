@@ -5,7 +5,7 @@ import { SectionHeader } from '@/components/ui/SectionHeader';
 
 const INK = '#0F172A';
 const INK_55 = '#64748B';
-const AMBER = '#F7931E';
+const RED = '#DC2626';
 const FONT = 'Geist, -apple-system, BlinkMacSystemFont, system-ui, sans-serif';
 
 interface Props {
@@ -38,7 +38,7 @@ export default function DisconnectConfirmSheet({ open, onClose, onConfirm, isWor
         <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', padding: '4px 20px 12px' }}>
           <div style={{ flex: 1, minWidth: 0 }}>
             <div style={{ marginBottom: 6 }}>
-              <SectionHeader tier="standard" kicker="Disconnect" tone="amber" />
+              <SectionHeader tier="standard" kicker="Disconnect" tone="danger" />
             </div>
             <h2 style={{ fontSize: 22, fontWeight: 800, letterSpacing: '-0.025em', margin: 0, lineHeight: 1.2 }}>
               Disconnect England Golf?
@@ -69,7 +69,7 @@ export default function DisconnectConfirmSheet({ open, onClose, onConfirm, isWor
             disabled={isWorking}
             style={{
               width: '100%', padding: '14px 16px', borderRadius: 12,
-              background: AMBER, color: '#fff', border: 'none',
+              background: RED, color: '#fff', border: 'none',
               fontSize: 15, fontWeight: 600, fontFamily: FONT,
               cursor: isWorking ? 'default' : 'pointer',
               opacity: isWorking ? 0.6 : 1, marginBottom: 8,

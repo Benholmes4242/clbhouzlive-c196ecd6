@@ -27,7 +27,7 @@ import { BioWebsitesSection } from '@/components/profile/edit-v2/BioWebsitesSect
 import { LocationSection } from '@/components/profile/edit-v2/LocationSection';
 import { SocialLinksSection } from '@/components/profile/edit-v2/SocialLinksSection';
 import { DISPLAY_NAME_MAX, USERNAME_MAX } from '@/components/profile/profile-wizard/types';
-import HandicapConnectSheet from '@/components/profile/handicap/HandicapConnectSheet';
+// HandicapConnectSheet was removed in Phase 3 — now lives at /manage/handicap.
 import { SettingsTabContent } from '@/components/settings/SettingsTabContent';
 
 const GEIST = 'Geist, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif';
@@ -116,7 +116,7 @@ export default function EditProfile() {
 
   const [showSocial, setShowSocial] = useState(false);
   const [showManualEntry, setShowManualEntry] = useState(false);
-  const [connectSheetOpen, setConnectSheetOpen] = useState(false);
+  // connectSheetOpen state removed in Phase 3 — handicap connect is now /manage/handicap.
 
   const [usernameStatus, setUsernameStatus] = useState<
     'idle' | 'invalid' | 'checking' | 'available' | 'taken'
@@ -321,7 +321,7 @@ export default function EditProfile() {
               resolved={resolved}
               showManualEntry={showManualEntry}
               setShowManualEntry={setShowManualEntry}
-              setConnectSheetOpen={setConnectSheetOpen}
+              
               navigate={navigate}
               showSocial={showSocial}
               setShowSocial={setShowSocial}
@@ -335,15 +335,11 @@ export default function EditProfile() {
           )}
         </div>
 
-        <HandicapConnectSheet
-          open={connectSheetOpen}
-          onClose={() => setConnectSheetOpen(false)}
-          userId={user?.id}
-        />
       </div>
     </PageRoot>
   );
 }
+
 
 
 
@@ -368,7 +364,7 @@ interface ProfileTabBodyProps {
   resolved: { source: string; value: number | null };
   showManualEntry: boolean;
   setShowManualEntry: (fn: any) => void;
-  setConnectSheetOpen: (v: boolean) => void;
+  
   navigate: (to: any, opts?: any) => void;
   showSocial: boolean;
   setShowSocial: (fn: any) => void;
@@ -383,7 +379,7 @@ function ProfileTabBody({
   addWebsite, removeWebsite, updateWebsite,
   isNewUser, usernameIsLocked, usernameStatus,
   hasTouchedDisplayName, setHasTouchedDisplayName,
-  resolved, showManualEntry, setShowManualEntry, setConnectSheetOpen,
+  resolved, showManualEntry, setShowManualEntry,
   navigate, showSocial, setShowSocial,
   handleSave, isDisabled, isSaving, isDirty,
 }: ProfileTabBodyProps) {
@@ -597,7 +593,7 @@ function ProfileTabBody({
             onChange={(v) => setField('handicapIndex', v)}
             showManualEntry={showManualEntry}
             onToggleManualEntry={() => setShowManualEntry((s: boolean) => !s)}
-            onOpenConnect={() => setConnectSheetOpen(true)}
+            onOpenConnect={() => navigate('/manage/handicap')}
             onViewFullStats={() => navigate('/handicap')}
           />
         </SectionCard>
