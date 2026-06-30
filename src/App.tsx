@@ -81,6 +81,7 @@ import { migrateChatHistory } from '@/utils/chatHistoryMigration';
 import { NavTimingProvider } from '@/perf/NavTimingProvider';
 import { PerfHud } from '@/perf/PerfHud';
 import { LogHud } from '@/perf/LogHud';
+import { PerfToggleButton } from '@/perf/PerfToggleButton';
 
 
 
@@ -794,6 +795,7 @@ const AppInner: React.FC = () => {
         <NavTimingProvider>
         <PerfHud />
         <LogHud />
+        <PerfToggleButton />
         
 
         <HeaderProvider>
