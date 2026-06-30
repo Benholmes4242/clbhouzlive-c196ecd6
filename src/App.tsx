@@ -208,6 +208,13 @@ const AccountTypeOnboarding = lazy(() => import("./pages/onboarding/AccountTypeO
 
 
 const EditProfilePage = lazy(() => import("./pages/EditProfile"));
+const ManageEmailPage = lazy(() => import("./pages/manage/EmailPage"));
+const ManageBlockedPage = lazy(() => import("./pages/manage/BlockedPage"));
+const ManageNotificationsPage = lazy(() => import("./pages/manage/NotificationsPage"));
+const ManageHelpPage = lazy(() => import("./pages/manage/HelpPage"));
+const ManageContactPage = lazy(() => import("./pages/manage/ContactPage"));
+const ManageLegalPage = lazy(() => import("./pages/manage/LegalPage"));
+const ManageHandicapPage = lazy(() => import("./pages/manage/HandicapManagePage"));
 // ProfileHandicapView removed — /profile/handicap now redirects to /handicap (fix brief §2.1)
 const HandicapPage = lazy(() => import("./pages/HandicapPage"));
 const RivalryPage = lazy(() => import("./pages/RivalryPage"));
@@ -459,6 +466,13 @@ function AppRoutes() {
         <Route path="/profile/quest/index" element={<Suspense fallback={<ProfileSkeleton />}><QuestIndexView /></Suspense>} />
         <Route path="/profile/quest/replay" element={<Navigate to="/profile" replace />} />
         <Route path="/edit-profile" element={<Suspense fallback={<ProfileSkeleton />}><EditProfilePage /></Suspense>} />
+        <Route path="/manage/email" element={<Suspense fallback={<ProfileSkeleton />}><ManageEmailPage /></Suspense>} />
+        <Route path="/manage/blocked" element={<Suspense fallback={<ProfileSkeleton />}><ManageBlockedPage /></Suspense>} />
+        <Route path="/manage/notifications" element={<Suspense fallback={<ProfileSkeleton />}><ManageNotificationsPage /></Suspense>} />
+        <Route path="/manage/help" element={<Suspense fallback={<ProfileSkeleton />}><ManageHelpPage /></Suspense>} />
+        <Route path="/manage/contact" element={<Suspense fallback={<ProfileSkeleton />}><ManageContactPage /></Suspense>} />
+        <Route path="/manage/legal" element={<Suspense fallback={<ProfileSkeleton />}><ManageLegalPage /></Suspense>} />
+        <Route path="/manage/handicap" element={<Suspense fallback={<ProfileSkeleton />}><ManageHandicapPage /></Suspense>} />
         
         
         <Route path="/profile/:username" element={<ProfileWrapped />} />
