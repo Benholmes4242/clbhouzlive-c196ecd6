@@ -680,9 +680,7 @@ function HandicapRow({
   if (state === 'whs') {
     return (
       <div style={{ fontFamily: GEIST }}>
-        <div style={{ marginBottom: 8 }}>
-          <SectionHeader tier="standard" kicker="Official Handicap" />
-        </div>
+        <Label>Official handicap</Label>
         <div style={{ display: 'flex', alignItems: 'baseline', gap: 12, marginBottom: 12 }}>
           <span style={{ fontSize: 34, fontWeight: 800, color: INK, letterSpacing: '-0.02em', fontVariantNumeric: 'tabular-nums' }}>
             {value != null ? formatHcp(value) : '-'}
@@ -702,7 +700,7 @@ function HandicapRow({
             onClick={onViewFullStats}
             style={{
               display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-              padding: '12px 14px', borderRadius: 12,
+              padding: '12px 14px', borderRadius: 10,
               background: '#F8FAFC', border: '1px solid rgba(15,23,42,0.08)',
               fontSize: 14, fontWeight: 600, color: INK, fontFamily: GEIST, cursor: 'pointer',
             }}
@@ -714,7 +712,7 @@ function HandicapRow({
             onClick={onOpenConnect}
             style={{
               display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-              padding: '12px 14px', borderRadius: 12,
+              padding: '12px 14px', borderRadius: 10,
               background: '#fff', border: '1px solid rgba(15,23,42,0.08)',
               fontSize: 13, fontWeight: 500, color: INK_55, fontFamily: GEIST, cursor: 'pointer',
             }}
@@ -753,9 +751,7 @@ function HandicapRow({
 
   return (
     <div style={{ fontFamily: GEIST }}>
-      <div style={{ marginBottom: 8 }}>
-        <SectionHeader tier="standard" kicker="Handicap" />
-      </div>
+      <Label>Handicap</Label>
       <button
         onClick={onOpenConnect}
         style={{
@@ -771,19 +767,21 @@ function HandicapRow({
       <p style={{ fontSize: 12, color: INK_55, margin: '10px 4px 14px', lineHeight: 1.5 }}>
         {HELPER_COPY}
       </p>
-      <button
-        onClick={onToggleManualEntry}
-        style={{
-          width: '100%', textAlign: 'center',
-          padding: '8px 12px', borderRadius: 999,
-          background: 'transparent', border: 'none',
-          fontSize: 13, fontWeight: 600, color: INK_55, fontFamily: GEIST, cursor: 'pointer',
-        }}
-      >
-        {showManualEntry ? 'Hide manual entry' : 'or enter manually'}
-      </button>
+      <p style={{ fontSize: 13, color: INK_55, margin: '4px 4px 0', lineHeight: 1.5, textAlign: 'center' }}>
+        Don't have an official WHS handicap?{' '}
+        <button
+          onClick={onToggleManualEntry}
+          style={{
+            background: 'transparent', border: 'none', padding: 0,
+            fontSize: 13, fontWeight: 600, color: INK_55, fontFamily: GEIST,
+            cursor: 'pointer', textDecoration: 'underline',
+          }}
+        >
+          {showManualEntry ? 'Hide manual entry' : 'Enter yours manually'}
+        </button>
+      </p>
       {showManualEntry && (
-        <div style={{ marginTop: 8 }}>
+        <div style={{ marginTop: 12 }}>
           <HandicapInput value={form.handicapIndex} onChange={onChange} />
         </div>
       )}
