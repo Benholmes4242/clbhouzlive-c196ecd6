@@ -341,8 +341,13 @@ const ClubhouseContent = () => {
   // bounded by useSupabaseSession's own 8s safety timeout, so this can
   // never hang indefinitely.
   if (authLoading) {
-    return <ClubhouseSkeletonShimmer isVisible={true} isStatic={false} surface="card" />;
+    return (
+      <PageRoot>
+        <ClubhouseSkeletonShimmer isVisible={true} isStatic={false} surface="card" />
+      </PageRoot>
+    );
   }
+
 
   // ── Terminal early return: feed finished loading with no content ──
   // Covers logged-out, empty, and error cases. We render the visible
