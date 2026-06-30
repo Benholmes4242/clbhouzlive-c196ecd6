@@ -239,6 +239,8 @@ const FeedCardImpl: React.FC<FeedCardProps> = ({
   onFollow,
   currentUserId,
   feedIndex,
+  isFirstCard = false,
+  onContentReady,
 }) => {
   const navigate = useNavigate();
   const { activeActor, setActiveActor } = useActiveActor();
@@ -247,6 +249,15 @@ const FeedCardImpl: React.FC<FeedCardProps> = ({
   // Actor selection is GLOBAL — picker reads and writes the session-wide activeActor.
   const effectiveActor: ActiveActor | null = activeActor;
   const captionTextRef = useRef<HTMLDivElement | null>(null);
+
+  // Fire-once paint-ready signal — gated to the first card so the skeleton
+  // controller hears exactly one event per feed mount.
+  const contentReadyFiredRef = useRef(false);
+  const fireContentReady = React.useCallback(() => {
+    if (contentReadyFiredRef.current || !isFirstCard || !onContentReady) return;
+    contentReadyFiredRef.current = true;
+    onContentReady();
+  }, [isFirstCard, onContentReady]);
 
   const reviewCourseId = post.review?.courseId ?? post.courseId;
   const reviewId = post.review?.reviewId;
