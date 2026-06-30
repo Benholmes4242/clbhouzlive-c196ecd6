@@ -116,6 +116,7 @@ export const disablePerf = () => setPerfLive(false);
 class NavTimingController {
   private nextId = 1;
   private current: NavTransaction | null = null;
+  private settling: NavTransaction | null = null; // finalized headline, still awaiting late content-painted
   private recent: NavSummary[] = [];
   private listeners = new Set<Listener>();
   private finalizeTimer: ReturnType<typeof setTimeout> | null = null;
@@ -151,6 +152,10 @@ class NavTimingController {
     if (this.current && !this.current.finalized) {
       this.finalize('superseded');
     }
+    // Close any settling tx from a previous nav (it keeps whatever it last emitted).
+    if (this.settling) {
+      this.closeTx(this.settling);
+    }
     const id = this.nextId++;
     const now = performance.now();
     this.current = {
@@ -172,13 +177,31 @@ class NavTimingController {
   }
 
   mark(phase: NavPhase) {
-    if (!ENABLED || !this.current) return;
-    if (this.current.marks[phase] != null) return; // first-write-wins per phase
+    if (!ENABLED) return;
+    // Late content-painted (and data-settled) may land on the settling tx after interactive closed
+    // the headline. Everything else only applies to the live current tx.
+    const tx =
+      this.current ??
+      (this.settling && (phase === 'content-painted' || phase === 'data-settled')
+        ? this.settling
+        : null);
+    if (!tx) return;
+    if (tx.marks[phase] != null) return; // first-write-wins per phase
     const t = performance.now();
-    this.current.marks[phase] = t;
-    try { performance.mark(`clbz:nav:${this.current.id}:${phase}`); } catch { /* ignore */ }
+    tx.marks[phase] = t;
+    try { performance.mark(`clbz:nav:${tx.id}:${phase}`); } catch { /* ignore */ }
     if (phase === 'interactive') {
       this.finalize('interactive');
+      return;
+    }
+    if (tx === this.settling && phase === 'content-painted') {
+      // Late LCP landed: recompute + re-emit corrected summary, then close.
+      const summary = this.buildSummary(tx);
+      this.recent = [summary, ...this.recent.filter((s) => s.id !== tx.id)].slice(0, RECENT_LIMIT);
+      this.emit(summary, 'content');
+      this.notify();
+      this.closeTx(tx);
+      return;
     }
     this.notify();
   }
@@ -233,20 +256,13 @@ class NavTimingController {
 
   private armFinalizeTimer() {
     if (this.finalizeTimer) clearTimeout(this.finalizeTimer);
-    this.finalizeTimer = setTimeout(() => this.finalize('timeout'), FINALIZE_TIMEOUT_MS);
+    this.finalizeTimer = setTimeout(() => {
+      if (this.current) this.finalize('timeout');
+      else if (this.settling) this.closeTx(this.settling);
+    }, FINALIZE_TIMEOUT_MS);
   }
 
-  private finalize(reason: 'interactive' | 'timeout' | 'superseded') {
-    if (!this.current || this.current.finalized) return;
-    const tx = this.current;
-    tx.finalized = true;
-    if (this.finalizeTimer) {
-      clearTimeout(this.finalizeTimer);
-      this.finalizeTimer = null;
-    }
-    try { this.clsObserver?.disconnect(); } catch { /* ignore */ }
-    this.clsObserver = null;
-
+  private buildSummary(tx: NavTransaction): NavSummary {
     const m = tx.marks;
     // `total` = shell paint (FCP-equivalent). We keep nav close at interactive
     // so every page stays comparable on first-paint regardless of deep data.
@@ -282,7 +298,7 @@ class NavTimingController {
 
     let skeletonVerdict: NavSummary['skeletonVerdict'] = 'NA';
     if (isSkeletonExemptPath(tx.path) || m['skeleton-exempt'] != null) {
-      skeletonVerdict = 'NA';                       // intentional neutral hold (e.g. /auth BootHold)
+      skeletonVerdict = 'NA';
     } else if (m['skeleton-shown'] != null) {
       skeletonVerdict = skeleton < 100 ? 'FLASH' : 'OK';
     } else if (total > 200) {
@@ -296,7 +312,7 @@ class NavTimingController {
       tx.cls > 0.1 ||
       doubleMount;
 
-    const summary: NavSummary = {
+    return {
       id: tx.id,
       path: tx.path,
       total,
@@ -312,12 +328,42 @@ class NavTimingController {
       doubleMount,
       flagged,
     };
+  }
 
-    this.recent = [summary, ...this.recent].slice(0, RECENT_LIMIT);
-    this.current = null;
-
-    this.emit(summary, reason);
+  private closeTx(tx: NavTransaction) {
+    if (this.finalizeTimer) {
+      clearTimeout(this.finalizeTimer);
+      this.finalizeTimer = null;
+    }
+    try { this.clsObserver?.disconnect(); } catch { /* ignore */ }
+    this.clsObserver = null;
+    if (this.current === tx) this.current = null;
+    if (this.settling === tx) this.settling = null;
     this.notify();
+  }
+
+  private finalize(reason: 'interactive' | 'timeout' | 'superseded' | 'content') {
+    if (!this.current || this.current.finalized) return;
+    const tx = this.current;
+    tx.finalized = true;
+
+    const summary = this.buildSummary(tx);
+    this.recent = [summary, ...this.recent.filter((s) => s.id !== tx.id)].slice(0, RECENT_LIMIT);
+    this.emit(summary, reason);
+
+    if (reason === 'interactive' && tx.marks['content-painted'] == null) {
+      // Keep amendable for a late content milestone. Stop the CLS observer (interactive = end of
+      // the CLS window) but keep tx alive in the settling slot. finalizeTimer remains as hard cap.
+      try { this.clsObserver?.disconnect(); } catch { /* ignore */ }
+      this.clsObserver = null;
+      this.settling = tx;
+      this.current = null;
+      this.notify();
+      return;
+    }
+
+    // Fully close (timeout / superseded / content already present at interactive).
+    this.closeTx(tx);
   }
 
   private emit(s: NavSummary, reason: string) {
@@ -337,6 +383,7 @@ class NavTimingController {
     }
   }
 }
+
 
 export const navTiming = new NavTimingController();
 
