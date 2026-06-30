@@ -21,6 +21,7 @@ import { ThemeProvider } from '@/components/theme-provider';
 
 import { SecurityHeaders } from "@/components/security/SecurityHeaders";
 import AuthWrapper from "@/components/auth/AuthWrapper";
+import BootHold from "@/components/BootHold";
 import { GlobalAudioProvider } from './contexts/GlobalAudioContext';
 // REMOVED: FullscreenPlayerProvider — Phase 5 fullscreen system deleted
 import { RehydrationProvider } from './contexts/RehydrationContext';
