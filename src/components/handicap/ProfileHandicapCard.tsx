@@ -122,7 +122,6 @@ const ProfileHandicapCard: React.FC<Props> = ({
   if (handicap == null) return null;
 
   const resolvedName = (displayName ?? '').trim().split(/\s+/)[0] || 'this golfer';
-  const trophyPossessive = isOwnProfile ? 'your case' : `${resolvedName}'s case`;
 
   const handleTap = () => {
     if (!isOwnProfile) {
