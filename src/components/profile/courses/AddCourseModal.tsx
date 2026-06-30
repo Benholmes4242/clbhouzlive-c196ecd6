@@ -418,7 +418,6 @@ const CourseRow: React.FC<CourseRowProps> = ({
 
     <div style={{ flex: 1, minWidth: 0 }}>
       <div style={{
-        fontFamily: FONT_SERIF,
         fontSize: 15,
         fontWeight: 700,
         color: INK,
