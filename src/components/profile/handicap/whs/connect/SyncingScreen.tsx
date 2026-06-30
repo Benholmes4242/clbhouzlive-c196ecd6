@@ -1,10 +1,13 @@
 import React, { useEffect, useState } from 'react';
-import { Check } from 'lucide-react';
+import { Check, Flag } from 'lucide-react';
 
 const INK = '#0F172A';
-const INK_55 = '#64748B';
-const AMBER = '#F7931E';
+const INK_30 = '#94A3B8';
+const INK_45 = '#64748B';
+const HAIR = 'rgba(15,23,42,0.08)';
+const FIELD_FILL = '#F8FAFC';
 const GREEN = '#059669';
+const GREEN_BG = 'rgba(5,150,105,0.08)';
 const FONT = 'Geist, -apple-system, BlinkMacSystemFont, system-ui, sans-serif';
 
 const STEPS = [
@@ -27,73 +30,51 @@ export const SyncingScreen: React.FC = () => {
   return (
     <div
       style={{
-        flex: 1,
+        background: '#fff',
+        border: `1px solid ${HAIR}`,
+        borderRadius: 16,
+        padding: '36px 22px 30px',
         display: 'flex',
         flexDirection: 'column',
-        justifyContent: 'center',
         alignItems: 'center',
-        padding: '28px 36px',
-        textAlign: 'center',
         fontFamily: FONT,
       }}
     >
-      <div style={{ width: 140, height: 140, position: 'relative', marginBottom: 28 }}>
-        <svg width="140" height="140" viewBox="0 0 140 140">
-          <defs>
-            <linearGradient id="orbit-grad-1" x1="0" y1="0" x2="1" y2="0">
-              <stop offset="0%" stopColor={AMBER} />
-              <stop offset="100%" stopColor="#FBA738" stopOpacity="0" />
-            </linearGradient>
-          </defs>
-
-          <circle cx="70" cy="70" r="60" fill="none" stroke="rgba(247,147,30,0.10)" strokeWidth="2" />
-          <circle cx="70" cy="70" r="44" fill="none" stroke="rgba(247,147,30,0.16)" strokeWidth="2" />
-
-          <circle cx="70" cy="70" r="28" fill="rgba(247,147,30,0.10)">
-            <animate attributeName="r" values="26;30;26" dur="2s" repeatCount="indefinite" />
-            <animate attributeName="opacity" values="0.10;0.20;0.10" dur="2s" repeatCount="indefinite" />
-          </circle>
-
+      {/* Green ring */}
+      <div style={{ width: 92, height: 92, position: 'relative', marginBottom: 24 }}>
+        <svg width="92" height="92" viewBox="0 0 92 92">
+          <circle cx="46" cy="46" r="40" fill={GREEN_BG} />
           <circle
-            cx="70" cy="70" r="60"
+            cx="46"
+            cy="46"
+            r="40"
             fill="none"
-            stroke="url(#orbit-grad-1)"
+            stroke={GREEN}
             strokeWidth="3"
             strokeLinecap="round"
-            strokeDasharray="120 376"
-            transform="rotate(-90 70 70)"
-          >
-            <animateTransform
-              attributeName="transform" type="rotate"
-              from="-90 70 70" to="270 70 70"
-              dur="2.4s" repeatCount="indefinite"
-            />
-          </circle>
-
-          <circle
-            cx="70" cy="70" r="44"
-            fill="none"
-            stroke={AMBER}
-            strokeWidth="3"
-            strokeLinecap="round"
-            strokeDasharray="60 276"
-            transform="rotate(45 70 70)"
-          >
-            <animateTransform
-              attributeName="transform" type="rotate"
-              from="45 70 70" to="-315 70 70"
-              dur="1.8s" repeatCount="indefinite"
-            />
-          </circle>
-
-          <g transform="translate(70 70)">
-            <line x1="-2" y1="-14" x2="-2" y2="14" stroke={INK} strokeWidth="2.5" strokeLinecap="round" />
-            <path d="M -2 -12 L 14 -8 L -2 -4 Z" fill={AMBER} stroke={INK} strokeWidth="1.5" strokeLinejoin="round" />
-          </g>
+            strokeDasharray="70 252"
+            transform="rotate(-90 46 46)"
+            style={{ transformOrigin: '46px 46px', animation: 'whs-spin 0.9s linear infinite' }}
+          />
         </svg>
+        <div
+          style={{
+            position: 'absolute',
+            inset: 0,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+          }}
+        >
+          <Flag size={32} color={GREEN} strokeWidth={2.2} />
+        </div>
       </div>
 
-      <div style={{ width: '100%', maxWidth: 280, textAlign: 'left' }}>
+      <div style={{ fontSize: 17, fontWeight: 700, color: INK, marginBottom: 22, letterSpacing: '-0.01em' }}>
+        Connecting your handicap
+      </div>
+
+      <div style={{ width: '100%', maxWidth: 320, textAlign: 'left', display: 'flex', flexDirection: 'column', gap: 4 }}>
         {STEPS.map((label, i) => {
           const isDone = i < activeStep;
           const isActive = i === activeStep;
@@ -101,53 +82,67 @@ export const SyncingScreen: React.FC = () => {
             <div
               key={label}
               style={{
-                display: 'flex', gap: 12, alignItems: 'center',
-                padding: '10px 0',
-                opacity: i > activeStep ? 0.55 : 1,
-                transition: 'opacity 400ms ease',
+                display: 'flex',
+                gap: 12,
+                alignItems: 'center',
+                padding: '8px 0',
               }}
             >
               <div
                 style={{
-                  width: 22, height: 22, borderRadius: '50%',
+                  width: 26,
+                  height: 26,
+                  borderRadius: '50%',
                   flexShrink: 0,
-                  display: 'flex', alignItems: 'center', justifyContent: 'center',
-                  background: isDone ? GREEN : isActive ? 'rgba(247,147,30,0.18)' : 'rgba(15,23,42,0.05)',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  background: isDone ? GREEN : isActive ? GREEN_BG : FIELD_FILL,
                   border: isDone
                     ? `1.5px solid ${GREEN}`
                     : isActive
-                      ? `1.5px solid ${AMBER}`
-                      : '1.5px solid rgba(15,23,42,0.15)',
+                    ? `1.5px solid ${GREEN}`
+                    : `1px solid ${HAIR}`,
                   color: '#fff',
-                  transition: 'all 400ms ease',
+                  transition: 'all 300ms ease',
                 }}
               >
-                {isDone && <Check size={12} strokeWidth={3} />}
+                {isDone && <Check size={14} strokeWidth={3} />}
                 {isActive && (
-                  <div style={{
-                    width: 8, height: 8, borderRadius: '50%', background: AMBER,
-                    animation: 'pulse 1.4s ease-in-out infinite',
-                  }} />
+                  <div
+                    style={{
+                      width: 9,
+                      height: 9,
+                      borderRadius: '50%',
+                      background: GREEN,
+                      animation: 'whs-pulse 1.4s ease-in-out infinite',
+                    }}
+                  />
                 )}
               </div>
               <div
                 style={{
-                  fontSize: 13.5,
-                  fontWeight: isActive ? 700 : 500,
-                  color: isActive ? INK : INK_55,
-                  transition: 'all 400ms ease',
+                  fontSize: 15.5,
+                  fontWeight: isActive ? 700 : isDone ? 500 : 500,
+                  color: isActive ? INK : isDone ? INK : INK_30,
+                  transition: 'color 300ms ease',
                 }}
               >
                 {label}
-                {isActive && '…'}
+                {isActive && '...'}
               </div>
             </div>
           );
         })}
       </div>
 
+      <div style={{ fontSize: 12.5, color: INK_45, marginTop: 22 }}>
+        This usually takes a few seconds.
+      </div>
+
       <style>{`
-        @keyframes pulse {
+        @keyframes whs-spin { to { transform: rotate(360deg); } }
+        @keyframes whs-pulse {
           0%, 100% { transform: scale(1); opacity: 1; }
           50% { transform: scale(1.3); opacity: 0.6; }
         }
