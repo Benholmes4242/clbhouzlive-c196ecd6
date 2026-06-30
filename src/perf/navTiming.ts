@@ -16,6 +16,7 @@ export type NavPhase =
   | 'lazy-start'
   | 'lazy-end'
   | 'skeleton-shown'
+  | 'skeleton-exempt'
   | 'data-settled'
   | 'content-painted'
   | 'interactive';
@@ -259,7 +260,9 @@ class NavTimingController {
     const doubleMount = mounts > 1;
 
     let skeletonVerdict: NavSummary['skeletonVerdict'] = 'NA';
-    if (m['skeleton-shown'] != null) {
+    if (m['skeleton-exempt'] != null) {
+      skeletonVerdict = 'NA';                       // intentional neutral hold (e.g. /auth BootHold)
+    } else if (m['skeleton-shown'] != null) {
       skeletonVerdict = skeleton < 100 ? 'FLASH' : 'OK';
     } else if (total > 200) {
       skeletonVerdict = 'MISSING';
@@ -331,6 +334,9 @@ export function markNav(phase: NavPhase) {
 }
 export function markSkeletonShown() {
   navTiming.mark('skeleton-shown');
+}
+export function markSkeletonExempt() {
+  navTiming.mark('skeleton-exempt');
 }
 export function markDataSettled() {
   navTiming.mark('data-settled');
