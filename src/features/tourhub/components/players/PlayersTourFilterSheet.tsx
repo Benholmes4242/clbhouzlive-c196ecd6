@@ -136,8 +136,6 @@ export function PlayersTourFilterSheet({
                 {/* Count */}
                 <span style={{ fontSize: 12, color: '#94A3B8', fontVariantNumeric: 'tabular-nums', flexShrink: 0 }}>{count}</span>
 
-                {/* Active dot */}
-                {isActive && <div style={{ width: 6, height: 6, borderRadius: '50%', background: '#F7931E', flexShrink: 0 }} />}
               </button>
             );
           })}
