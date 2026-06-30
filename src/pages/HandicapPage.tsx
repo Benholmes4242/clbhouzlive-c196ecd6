@@ -455,6 +455,19 @@ const HandicapPage: React.FC = () => {
     return <Navigate to="/auth" replace />;
   }
 
+  // Connect flow: Direction A header (matches /manage/handicap exactly).
+  if (isConnectFlow) {
+    return (
+      <ManagePageShell
+        title="Connect handicap"
+        onBack={() => safeGoBack(navigate, '/profile')}
+      >
+        <WhsHandicapTab userId={ownerUserId} ownerFirstName={displayName} />
+        <GamMount ownerUserId={ownerUserId} viewerUserId={user.id} ownerFirstName={displayName} readOnly={false} />
+      </ManagePageShell>
+    );
+  }
+
   return (
     <PageRoot dark={true} style={{ background: 'var(--hcp-bg-0)' }}>
       <FloatingPageHeader onBack={() => safeGoBack(navigate, '/profile')} showHandicap={false} />
