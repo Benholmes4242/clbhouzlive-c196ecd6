@@ -490,6 +490,8 @@ const CourseReviewsTab: React.FC<CourseReviewsTabProps> = ({
           </div>
         </div>
       </div>
+        );
+      })()}
 
 
       <Divider />
