@@ -453,9 +453,9 @@ function formatDateRange(startIso: string, endIso: string): string {
   const end = new Date(endIso);
   const sameMonth = start.getMonth() === end.getMonth();
   if (sameMonth) {
-    return `${MONTHS[start.getMonth()]} ${start.getDate()}–${end.getDate()}`;
+    return `${MONTHS[start.getMonth()]} ${start.getDate()}-${end.getDate()}`;
   }
-  return `${MONTHS[start.getMonth()]} ${start.getDate()}–${MONTHS[end.getMonth()]} ${end.getDate()}`;
+  return `${MONTHS[start.getMonth()]} ${start.getDate()}-${MONTHS[end.getMonth()]} ${end.getDate()}`;
 }
 
 function matchesFilter(outcome: IntelligenceOutcome, filter: FilterKey): boolean {
