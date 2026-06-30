@@ -477,7 +477,7 @@ function AppRoutes() {
         
         <Route path="/profile/:username" element={<ProfileWrapped />} />
         <Route path="/profile/:username/reviews" element={<Suspense fallback={<ProfileSkeleton />}><UserReviewsPage /></Suspense>} />
-        <Route path="/settings" element={<Navigate to="/edit-profile?tab=settings" replace />} />
+        
         
         <Route path="/watch" element={<Suspense fallback={<main className="pb-20 bg-background min-h-screen" style={{ paddingTop: 'var(--chrome-total-h, 0px)' }}><WatchGridSkeleton /></main>}><WatchHub /></Suspense>} />
         <Route path="/videos" element={<Navigate to="/watch" replace />} />
