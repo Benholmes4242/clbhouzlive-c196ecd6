@@ -698,7 +698,7 @@ function ProfileHubSheet({
                           <GroupedRow
                             Icon={SettingsIcon}
                             label="Settings"
-                            onClick={() => handleNav('/settings')}
+                            onClick={() => handleNav('/edit-profile?tab=settings')}
                             isLast
                           />
                         )}

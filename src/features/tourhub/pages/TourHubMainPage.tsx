@@ -145,7 +145,7 @@ export function TourHubMainPage() {
               activeTab={activeTab}
               onSelectTab={handleSelectTab}
               handicapValue={handicapValue}
-              onSettings={() => navigate('/settings')}
+              onSettings={() => navigate('/edit-profile?tab=settings')}
               onProfile={() => navigate('/profile')}
               onSignOut={() => { void logout(); }}
             />

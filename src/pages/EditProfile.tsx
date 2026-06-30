@@ -27,7 +27,7 @@ import { BioWebsitesSection } from '@/components/profile/edit-v2/BioWebsitesSect
 import { LocationSection } from '@/components/profile/edit-v2/LocationSection';
 import { SocialLinksSection } from '@/components/profile/edit-v2/SocialLinksSection';
 import { DISPLAY_NAME_MAX, USERNAME_MAX } from '@/components/profile/profile-wizard/types';
-// HandicapConnectSheet was removed in Phase 3 — now lives at /manage/handicap.
+
 import { SettingsTabContent } from '@/components/settings/SettingsTabContent';
 
 const GEIST = 'Geist, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif';

@@ -190,7 +190,7 @@ const RootGate: React.FC = () => {
 import DiscoverWrapped from "./pages/DiscoverWrapped";
 import CoursesWrapped from "./pages/CoursesWrapped";
 import ProfileWrapped from "./pages/ProfileWrapped";
-import SettingsWrapped from "./pages/SettingsWrapped";
+
 import AuthWrapped from "./pages/AuthWrapped";
 import { useModalContext } from '@/contexts/ModalContext';
 
@@ -225,7 +225,7 @@ const QuestIndexView = lazy(() => import("./pages/QuestIndexView"));
 const QuestReplayView = lazy(() => import("./pages/QuestReplayView"));
 
 const UserReviewsPage = lazy(() => import("./pages/UserReviewsPage"));
-// Old Settings page removed - now using SettingsPageV2 via SettingsWrapped
+
 // Courses page now uses CoursesWrapped (imported above) which handles header/dim reset
 const CourseDetailPage = lazy(() => import("./pages/CourseDetailPage"));
 const CourseReviewsPage = lazy(() => import("./pages/CourseReviewsPage"));
@@ -477,7 +477,7 @@ function AppRoutes() {
         
         <Route path="/profile/:username" element={<ProfileWrapped />} />
         <Route path="/profile/:username/reviews" element={<Suspense fallback={<ProfileSkeleton />}><UserReviewsPage /></Suspense>} />
-        <Route path="/settings" element={<SettingsWrapped />} />
+        
         
         <Route path="/watch" element={<Suspense fallback={<main className="pb-20 bg-background min-h-screen" style={{ paddingTop: 'var(--chrome-total-h, 0px)' }}><WatchGridSkeleton /></main>}><WatchHub /></Suspense>} />
         <Route path="/videos" element={<Navigate to="/watch" replace />} />

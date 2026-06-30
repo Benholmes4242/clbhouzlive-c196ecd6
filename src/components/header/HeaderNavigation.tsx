@@ -123,7 +123,7 @@ const HeaderNavigation: React.FC<HeaderNavigationProps> = ({ onInteraction, useL
 
   const handleSettingsClick = () => {
     onInteraction?.();
-    navigate('/settings');
+    navigate('/edit-profile?tab=settings');
   };
 
   const handleLogout = async () => {
@@ -170,7 +170,7 @@ const HeaderNavigation: React.FC<HeaderNavigationProps> = ({ onInteraction, useL
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end" className="w-48 mr-2 bg-card border-border shadow-lg">
-            <DropdownMenuItem onClick={() => navigate('/settings')}>
+            <DropdownMenuItem onClick={() => navigate('/edit-profile?tab=settings')}>
               Settings
             </DropdownMenuItem>
             <DropdownMenuSeparator />
@@ -232,7 +232,7 @@ const HeaderNavigation: React.FC<HeaderNavigationProps> = ({ onInteraction, useL
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end" className="w-48 mr-2 bg-card border-border shadow-lg">
-          <DropdownMenuItem onClick={() => navigate('/settings')}>
+          <DropdownMenuItem onClick={() => navigate('/edit-profile?tab=settings')}>
             Settings
           </DropdownMenuItem>
           {hasAdminAccess && (
