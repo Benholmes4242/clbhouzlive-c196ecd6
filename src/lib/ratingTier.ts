@@ -85,7 +85,7 @@ export function ratingTextColor(rating: number | null | undefined): string {
   const tier = getRatingTier(rating);
   if (tier === 'EXCEPTIONAL') return '#F0A500'; // deeper gold, legible on light surfaces
   if (tier === 'EXCELLENT' || tier === 'GOOD') return '#D97706';
-  return '#64748B';
+  return '#9A4A0E'; // low-end ember (was grey #64748B)
 }
 
 /**
