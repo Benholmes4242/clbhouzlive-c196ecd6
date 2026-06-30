@@ -25,10 +25,13 @@ const btn: React.CSSProperties = {
 };
 
 export const LogHud = memo(function LogHud() {
+  const [, forceShow] = useState(0);
+  useEffect(() => subscribePerfLive(() => forceShow((n) => n + 1)), []);
   const enabled = consoleCapture.isEnabled();
   const [open, setOpen] = useState(false);
   const [, force] = useState(0);
   const [copied, setCopied] = useState(false);
+
 
   useEffect(() => {
     if (!enabled || !open) return;
