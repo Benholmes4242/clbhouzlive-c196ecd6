@@ -1,0 +1,1 @@
+ALTER TABLE public.push_notification_queue ALTER COLUMN device_id DROP NOT NULL;
