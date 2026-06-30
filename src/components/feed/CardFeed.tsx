@@ -60,10 +60,15 @@ export interface CardFeedProps {
   onSnapshot?: (state: StateSnapshot) => void;
 }
 
+export interface CardFeedHandle {
+  /** Synchronously snapshot Virtuoso state via the parent's `onSnapshot`. */
+  captureSnapshot: () => void;
+}
+
 const PTR_THRESHOLD = 64;
 const PTR_MAX_PULL = 96;
 
-export const CardFeed: React.FC<CardFeedProps> = ({
+export const CardFeed = forwardRef<CardFeedHandle, CardFeedProps>(function CardFeed({
   posts,
   onLike,
   onComment,
@@ -85,7 +90,7 @@ export const CardFeed: React.FC<CardFeedProps> = ({
   tab,
   initialState,
   onSnapshot,
-}) => {
+}, ref) {
 
   const virtuosoRef = useRef<VirtuosoHandle | null>(null);
   const scrollerElRef = useRef<HTMLElement | null>(null);
