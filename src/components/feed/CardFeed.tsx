@@ -52,6 +52,12 @@ export interface CardFeedProps {
   isRefreshing?: boolean;
   /** Fires once when the first card's primary content is paint-ready. */
   onFirstContentReady?: () => void;
+  /** Per-tab key — routes activeIndex/carouselPosition writes to the right slot. */
+  tab?: string;
+  /** Restore Virtuoso scroll state from a prior snapshot (per-tab handoff). */
+  initialState?: StateSnapshot;
+  /** Called on unmount with the current Virtuoso state snapshot. */
+  onSnapshot?: (state: StateSnapshot) => void;
 }
 
 const PTR_THRESHOLD = 64;
