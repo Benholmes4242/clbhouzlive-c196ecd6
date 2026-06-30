@@ -330,7 +330,7 @@ export default function EditProfile() {
               isDirty={isDirty}
             />
           ) : (
-            <SettingsTabPlaceholder />
+            <SettingsTabContent />
           )}
         </div>
 
