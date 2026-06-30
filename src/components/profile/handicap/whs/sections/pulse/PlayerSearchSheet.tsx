@@ -192,20 +192,28 @@ export const PlayerSearchSheet: React.FC<Props> = ({ open, onClose }) => {
           </div>
         </div>
 
-        {q.length >= 2 && (
+        {q.length >= 2 ? (
           <>
             <div style={{ marginTop: 24 }}><SectionHeader tier="standard" surface="dark" kicker="SEARCH RESULTS" paddingX={16} /></div>
             <div style={{ padding: '0 16px', display: 'flex', flexDirection: 'column', gap: 10 }}>
               {isLoading && <Skeleton height={68} radius={12} />}
               {isError && <RetryStub message="Couldn't search players" onRetry={() => refetch()} />}
               {!isLoading && !isError && results.length === 0 && (
-                <EmptyStub title="No matches" body={`Nothing found for "${q}".`} />
+                <EmptyStub title="No matches" body={`Nothing found for "${q}"`} />
               )}
               {!isLoading &&
                 !isError &&
                 results.map((p) => <PlayerRow key={p.id} p={p} onTap={() => handleSelect(p.id)} />)}
             </div>
           </>
+        ) : (
+          <div style={{ marginTop: 48 }}>
+            <EmptyStub
+              icon={<Search size={28} color="var(--hcp-t-40)" strokeWidth={2} />}
+              title="Search for a player"
+              body="Type a name to find players to add to your Pulse."
+            />
+          </div>
         )}
       </div>
     </GamSheet>
