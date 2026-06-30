@@ -5,7 +5,7 @@ import { SectionHeader } from '@/components/ui/SectionHeader';
 
 const INK = '#0F172A';
 const INK_55 = '#64748B';
-const AMBER = '#F7931E';
+const RED = '#DC2626';
 const FONT = 'Geist, -apple-system, BlinkMacSystemFont, system-ui, sans-serif';
 
 interface Props {
