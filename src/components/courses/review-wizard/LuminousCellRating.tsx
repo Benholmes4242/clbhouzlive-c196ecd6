@@ -123,7 +123,7 @@ export function LuminousCellRating({
   const glowOpacity = active ? 0.6 : restGlow;
   const fillTransition = active
     ? 'none'
-    : 'width 200ms cubic-bezier(.22,.61,.36,1), background 180ms ease';
+    : 'width 360ms cubic-bezier(.34,1.56,.64,1), background 180ms ease';
   const glowTransition = active
     ? 'none'
     : 'opacity 220ms ease, width 200ms cubic-bezier(.22,.61,.36,1)';
