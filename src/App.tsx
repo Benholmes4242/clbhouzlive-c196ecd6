@@ -1,4 +1,10 @@
-import React, { Suspense, lazy, useEffect, useLayoutEffect, useMemo } from "react";
+import React, { Suspense, lazy as _reactLazy, useEffect, useLayoutEffect, useMemo } from "react";
+import { trackedLazy } from '@/perf/navTiming';
+// Shadow React.lazy so EVERY route-level lazy import is automatically tracked
+// for nav-timing chunk-fetch ms. trackedLazy falls back to React.lazy when
+// perf is disabled (production without ?perf=1).
+const lazy = <T extends { default: React.ComponentType<any> }>(factory: () => Promise<T>) =>
+  trackedLazy('route', factory);
 import { usePageTracking } from '@/hooks/usePageTracking';
 import { MessagingProvider } from '@/contexts/MessagingContext';
 
