@@ -2,6 +2,8 @@ import React, { useRef, useState, useCallback } from 'react';
 import { Camera } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { ImageCropperModal } from './ImageCropperModal';
+import { PhotoActionSheet } from './PhotoActionSheet';
+
 
 interface HeaderPhotoCardProps {
   currentUrl?: string | null;
