@@ -106,5 +106,7 @@ export function useSuggestedFeed(userId: string | undefined) {
     refetch: query.refetch,
     isRefetching: query.isRefetching,
     resetSeen,
+    // True once this feed has fetched at least once (cached). 0 until first success.
+    hasEverLoaded: query.dataUpdatedAt > 0,
   };
 }
