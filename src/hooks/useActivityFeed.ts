@@ -201,6 +201,14 @@ function getContextUrl(notification: any): string {
   }
   // Follow notifications
   if (FOLLOW_TYPES.has(type)) {
+    // Only 'follow' can have a business follower; friend_* types are always personal.
+    if (type === 'follow') {
+      const fType = data?.follower_actor_type;
+      const fId = data?.follower_actor_id;
+      if (fType === 'business' && fId) return `/business/${fId}`;
+      if (fType === 'personal' && fId) return `/profile/${fId}`;
+    }
+    // Fallback (friend_* types, or legacy rows missing follower actor data)
     return actor_id ? `/profile/${actor_id}` : '/';
   }
   // Friend/business course review
