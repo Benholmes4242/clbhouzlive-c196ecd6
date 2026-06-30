@@ -34,6 +34,7 @@ const HIDDEN_ROUTE_PREFIXES = [
   '/echo', // Echo AI page - immersive full-screen experience
   '/admin-v2', // Admin console — uses its own sidebar/header chrome
   '/verified', // Verified page - standalone, no app chrome
+  '/manage/', // Manage Profile sub-pages — pushed standalone, no bottom nav
 ];
 
 // Routes that use the dark Clubhouse nav chrome.
