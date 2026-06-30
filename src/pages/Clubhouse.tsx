@@ -597,6 +597,7 @@ const ClubhouseContent = () => {
             currentUserId={user?.id}
             onRefresh={handleRefresh}
             isRefreshing={activeFeed.isRefetching}
+            onFirstContentReady={signalFirstContentReady}
           />
         </>
       ) : (
