@@ -283,6 +283,7 @@ export function LuminousCellRating({
           }}
         >
           {Array.from({ length: 9 }).map((_, i) => {
+            if (i !== 4) return null; // Level 2: keep only the midpoint (5.0) reference tick
             const x = ((i + 1) / 10) * 100;
             const filled = fillPct >= x;
             return (
