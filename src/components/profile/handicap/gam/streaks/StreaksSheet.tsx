@@ -31,7 +31,7 @@ function derivePbState(row: StreakRow | null): PbState {
   return 'AT_PB';
 }
 
-const SectionHeader: React.FC<{
+const StreakGroupLabel: React.FC<{
   label: string;
   count: number;
   amberDot?: boolean;
@@ -271,15 +271,11 @@ const Eyebrow: React.FC = () => (
     style={{
       fontSize: 11,
       fontWeight: 800,
-      letterSpacing: '0.16em',
+      letterSpacing: '0.14em',
       textTransform: 'uppercase',
-      color: 'var(--hcp-t-100)',
-      display: 'flex',
-      alignItems: 'center',
-      gap: 6,
+      color: 'var(--hcp-t-60)',
     }}
   >
-    <span style={{ color: AMBER }} aria-hidden>•</span>
     STREAKS
   </div>
 );
@@ -323,7 +319,7 @@ export const StreaksSheet: React.FC<StreaksSheetProps> = ({ open, onClose }) => 
           style={{
             width: 36,
             height: 4,
-            borderRadius: 2,
+            borderRadius: 99,
             background: 'var(--hcp-line-2, var(--hcp-line))',
           }}
         />
@@ -338,6 +334,8 @@ export const StreaksSheet: React.FC<StreaksSheetProps> = ({ open, onClose }) => 
         }}
       >
         <Eyebrow />
+        {/* canonical amber cut-line */}
+        <div style={{ width: 34, height: 3, borderRadius: 99, background: 'var(--hcp-amber)', marginTop: 9 }} />
         <div
           style={{
             fontSize: 34,
@@ -425,7 +423,7 @@ export const StreaksSheet: React.FC<StreaksSheetProps> = ({ open, onClose }) => 
 
         {!isLoading && !isError && activeTypes.length > 0 && (
           <>
-            <SectionHeader label="Active" count={activeTypes.length} amberDot />
+            <StreakGroupLabel label="Active" count={activeTypes.length} amberDot />
             {activeTypes.map((type) => (
               <StreakRowView key={type} type={type} row={byType.get(type) ?? null} />
             ))}
@@ -434,7 +432,7 @@ export const StreaksSheet: React.FC<StreaksSheetProps> = ({ open, onClose }) => 
 
         {!isLoading && !isError && dormantTypes.length > 0 && (
           <>
-            <SectionHeader label="Dormant" count={dormantTypes.length} />
+            <StreakGroupLabel label="Dormant" count={dormantTypes.length} />
             {dormantTypes.map((type) => (
               <StreakRowView key={type} type={type} row={byType.get(type) ?? null} />
             ))}
