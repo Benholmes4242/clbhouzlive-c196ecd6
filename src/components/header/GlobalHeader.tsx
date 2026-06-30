@@ -1,9 +1,19 @@
-import React from 'react';
+import React, { useLayoutEffect } from 'react';
 import { useLocation, useSearchParams } from 'react-router-dom';
 import CompactHeader from './CompactHeader';
 import { useModalContext } from '@/contexts/ModalContext';
 import { isGlobalHeaderExcluded, isConditionallyExcluded } from './globalHeaderRules';
 import { useFloatingHeaderActive } from '@/features/tourhub/_shared/floatingHeaderSignal';
+import { isPerfEnabled, noteHeaderMount, noteHeaderUnmount } from '@/perf/navTiming';
+
+const HeaderPerfTracker: React.FC = () => {
+  useLayoutEffect(() => {
+    if (!isPerfEnabled()) return;
+    noteHeaderMount();
+    return () => noteHeaderUnmount();
+  }, []);
+  return null;
+};
 
 const GlobalHeader: React.FC = () => {
   const location = useLocation();
@@ -20,7 +30,13 @@ const GlobalHeader: React.FC = () => {
     return null;
   }
 
-  return <CompactHeader />;
+  return (
+    <>
+      <HeaderPerfTracker />
+      <CompactHeader />
+    </>
+  );
 };
 
 export default GlobalHeader;
+
