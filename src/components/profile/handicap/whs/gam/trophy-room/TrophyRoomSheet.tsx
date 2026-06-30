@@ -276,7 +276,7 @@ export const TrophyRoomSheet: React.FC<Props> = ({ userId, viewerUserId, ownerFi
       <GamSheet open={open} onClose={() => setOpen(false)}>
         {/* Drag handle */}
         <div style={{ display: 'flex', justifyContent: 'center', paddingTop: 8, flexShrink: 0 }}>
-          <div style={{ width: 36, height: 4, borderRadius: 2, background: 'var(--hcp-line-2)' }} />
+          <div style={{ width: 36, height: 4, borderRadius: 99, background: 'var(--hcp-line-2)' }} />
         </div>
 
         {/* Header */}
@@ -289,6 +289,8 @@ export const TrophyRoomSheet: React.FC<Props> = ({ userId, viewerUserId, ownerFi
           }}
         >
           <Eyebrow ownerFirstName={ownerFirstName} isFriendView={isFriendView} />
+          {/* canonical amber cut-line */}
+          <div style={{ width: 34, height: 3, borderRadius: 99, background: 'var(--hcp-amber)', marginTop: 9 }} />
           <div
             style={{
               fontSize: 34,
