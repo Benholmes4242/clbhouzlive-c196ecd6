@@ -334,6 +334,8 @@ export const StreaksSheet: React.FC<StreaksSheetProps> = ({ open, onClose }) => 
         }}
       >
         <Eyebrow />
+        {/* canonical amber cut-line */}
+        <div style={{ width: 34, height: 3, borderRadius: 99, background: 'var(--hcp-amber)', marginTop: 9 }} />
         <div
           style={{
             fontSize: 34,
@@ -421,7 +423,7 @@ export const StreaksSheet: React.FC<StreaksSheetProps> = ({ open, onClose }) => 
 
         {!isLoading && !isError && activeTypes.length > 0 && (
           <>
-            <SectionHeader label="Active" count={activeTypes.length} amberDot />
+            <StreakGroupLabel label="Active" count={activeTypes.length} amberDot />
             {activeTypes.map((type) => (
               <StreakRowView key={type} type={type} row={byType.get(type) ?? null} />
             ))}
@@ -430,7 +432,7 @@ export const StreaksSheet: React.FC<StreaksSheetProps> = ({ open, onClose }) => 
 
         {!isLoading && !isError && dormantTypes.length > 0 && (
           <>
-            <SectionHeader label="Dormant" count={dormantTypes.length} />
+            <StreakGroupLabel label="Dormant" count={dormantTypes.length} />
             {dormantTypes.map((type) => (
               <StreakRowView key={type} type={type} row={byType.get(type) ?? null} />
             ))}
