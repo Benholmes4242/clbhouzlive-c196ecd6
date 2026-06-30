@@ -593,7 +593,7 @@ function ProfileTabBody({
             onChange={(v) => setField('handicapIndex', v)}
             showManualEntry={showManualEntry}
             onToggleManualEntry={() => setShowManualEntry((s: boolean) => !s)}
-            onOpenConnect={() => setConnectSheetOpen(true)}
+            onOpenConnect={() => navigate('/manage/handicap')}
             onViewFullStats={() => navigate('/handicap')}
           />
         </SectionCard>
