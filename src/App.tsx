@@ -71,6 +71,10 @@ import { forceUnlockBodyScroll } from '@/lib/bodyScrollLock';
 import { ReviewIslandLoader } from '@/ReviewIslandLoader';
 import { supabase } from '@/integrations/supabase/client';
 import { migrateChatHistory } from '@/utils/chatHistoryMigration';
+import { NavTimingProvider } from '@/perf/NavTimingProvider';
+import { PerfHud } from '@/perf/PerfHud';
+
+
 
 
 import { AchievementToastContainer } from '@/components/achievements/AchievementToastContainer';
@@ -774,6 +778,8 @@ const AppInner: React.FC = () => {
     <TooltipProvider>
       <SecurityHeaders />
       <BrowserRouter>
+        <NavTimingProvider>
+        <PerfHud />
         <HeaderProvider>
             <ModalProvider>
               <BottomNavigationProvider>
@@ -836,6 +842,7 @@ const AppInner: React.FC = () => {
               </BottomNavigationProvider>
             </ModalProvider>
           </HeaderProvider>
+        </NavTimingProvider>
       </BrowserRouter>
     </TooltipProvider>
   );

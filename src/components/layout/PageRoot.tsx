@@ -3,6 +3,7 @@ import { useLocation } from "react-router-dom";
 import { cn } from "@/lib/utils";
 import { useMedianStatusBar } from "@/hooks/useMedianStatusBar";
 import { isDarkChromeRoute } from "@/components/header/globalHeaderRules";
+import { usePageRootMount } from "@/perf/usePageReady";
 
 interface PageRootProps extends React.HTMLAttributes<HTMLDivElement> {
   children: React.ReactNode;
@@ -46,6 +47,10 @@ export const PageRoot = React.forwardRef<HTMLDivElement, PageRootProps>(
       !immersiveStatusBar,
       statusBarStyle,
     );
+
+    usePageRootMount();
+
+
 
     // Bottom nav (64px) + safe area spacer (30px) = 94px clearance
     const bottomPadding = hasBottomNav ? '94px' : undefined;
