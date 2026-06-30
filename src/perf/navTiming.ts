@@ -49,6 +49,9 @@ interface NavSummary {
   id: number;
   path: string;
   total: number;
+  /** Time from nav start to content-painted (LCP-equivalent). Null when
+   * the page didn't call usePageReady — most non-feed pages today. */
+  content: number | null;
   lazy: number;
   skeleton: number;
   data: number;
@@ -245,8 +248,16 @@ class NavTimingController {
     this.clsObserver = null;
 
     const m = tx.marks;
+    // `total` = shell paint (FCP-equivalent). We keep nav close at interactive
+    // so every page stays comparable on first-paint regardless of deep data.
     const end = m.interactive ?? m['content-painted'] ?? m['data-settled'] ?? performance.now();
     const total = Math.round(end - tx.startedAt);
+    // `content` = settle (LCP-equivalent). Null when the page didn't signal
+    // readiness via usePageReady — most non-feed pages today.
+    const content =
+      m['content-painted'] != null
+        ? Math.round(m['content-painted']! - tx.startedAt)
+        : null;
 
     const lazy =
       m['lazy-start'] != null && m['lazy-end'] != null
@@ -289,6 +300,7 @@ class NavTimingController {
       id: tx.id,
       path: tx.path,
       total,
+      content,
       lazy,
       skeleton,
       data,
@@ -311,8 +323,9 @@ class NavTimingController {
   private emit(s: NavSummary, reason: string) {
     const tag = `nav#${s.id}`;
     const line =
-      `${s.path.padEnd(24)} total ${s.total}ms | ` +
-      `lazy ${s.lazy} · skeleton ${s.skeleton} · data ${s.data} · paint ${s.paint} | ` +
+      `${s.path.padEnd(24)} fcp ${s.total}ms` +
+      (s.content != null ? ` · content ${s.content}ms` : '') +
+      ` | lazy ${s.lazy} · skeleton ${s.skeleton} · data ${s.data} · paint ${s.paint} | ` +
       `CLS ${s.cls} · header:${s.headerFlash > 0 ? `FLASH(${s.headerFlash + 1})` : 'OK'} · ` +
       `skeleton:${s.skeletonVerdict} · mounts:${s.mounts}` +
       (reason !== 'interactive' ? `  [${reason}]` : '');

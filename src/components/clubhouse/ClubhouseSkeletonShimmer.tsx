@@ -14,6 +14,7 @@ import React from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import { prefersReducedMotion } from '@/utils/safePlay';
+import { useSkeletonShownWhenVisible } from '@/perf/usePageReady';
 
 interface ClubhouseSkeletonShimmerProps {
   isVisible: boolean;
@@ -371,6 +372,8 @@ export const ClubhouseSkeletonShimmer: React.FC<ClubhouseSkeletonShimmerProps> =
 }) => {
   const reduceMotion = prefersReducedMotion();
   const effectiveStatic = isStatic || reduceMotion;
+  useSkeletonShownWhenVisible(isVisible);
+
 
   return (
     <AnimatePresence>

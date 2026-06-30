@@ -19,6 +19,7 @@ import { logRouteClubhouse } from '@/utils/bootTimeline';
 import { ClubhouseSkeletonShimmer } from '@/components/clubhouse/ClubhouseSkeletonShimmer';
 import { useClubhouseSkeletonTiming } from '@/hooks/useClubhouseSkeletonTiming';
 import { useRehydrationSafe } from '@/contexts/RehydrationContext';
+import { usePageReady } from '@/perf/usePageReady';
 import { ClubhouseTabProvider, useClubhouseTab } from '@/contexts/ClubhouseTabContext';
 import { useNetworkStatus } from '@/hooks/useNetworkStatus';
 
@@ -193,6 +194,12 @@ const ClubhouseContent = () => {
     resetSkeleton,
   } = useClubhouseSkeletonTiming(!isLoading && posts.length > 0);
 
+  // Perf: signal content-painted when skeleton resolves (posts loaded +
+  // first video canplaythrough + min-hold). This is the LCP-equivalent for
+  // the feed and drives the `content` settle number in nav summaries.
+  usePageReady(skeletonMode === 'hidden');
+
+
   // Effect 2: Once feed is ready, gate on tournament card state
   useEffect(() => {
     if (!skeletonVisible) {
@@ -334,8 +341,13 @@ const ClubhouseContent = () => {
   // bounded by useSupabaseSession's own 8s safety timeout, so this can
   // never hang indefinitely.
   if (authLoading) {
-    return <ClubhouseSkeletonShimmer isVisible={true} isStatic={false} surface="card" />;
+    return (
+      <PageRoot>
+        <ClubhouseSkeletonShimmer isVisible={true} isStatic={false} surface="card" />
+      </PageRoot>
+    );
   }
+
 
   // ── Terminal early return: feed finished loading with no content ──
   // Covers logged-out, empty, and error cases. We render the visible
