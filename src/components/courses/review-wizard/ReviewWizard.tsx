@@ -799,52 +799,53 @@ export function ReviewWizard({
 
                       <div
                         style={{
-                          display: 'grid',
-                          gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))',
-                          gap: '18px 14px',
-                          alignItems: 'start',
-                          paddingTop: 12,
+                          display: 'flex',
+                          flexDirection: 'column',
+                          paddingTop: 6,
                         }}
                       >
-                        {BREAKDOWNS.map(({ key, label, desc }) => {
+                        {BREAKDOWNS.map(({ key, label }, i) => {
                           const val = wizard.state.breakdowns[key];
                           return (
-                            <div key={key} style={{ minWidth: 0 }}>
-                              <div style={{ fontSize: 13.5, fontWeight: 700, color: INK, lineHeight: 1.2 }}>
-                                {label}
+                            <div
+                              key={key}
+                              style={{
+                                display: 'flex',
+                                alignItems: 'center',
+                                gap: 12,
+                                padding: '13px 0',
+                                borderTop: i === 0 ? 'none' : `0.5px solid ${HAIR}`,
+                              }}
+                            >
+                              {/* Label column - 92px so long labels wrap to 2 lines, Clubhouse stays 1 */}
+                              <div style={{ width: 92, flexShrink: 0 }}>
+                                <div style={{ fontSize: 13.5, fontWeight: 700, color: INK, lineHeight: 1.2 }}>
+                                  {label}
+                                </div>
                               </div>
-                              <div
+                              {/* Full-width bar */}
+                              <div style={{ flex: 1, minWidth: 0 }}>
+                                <TickScrubber
+                                  value={val}
+                                  onChange={(v) => wizard.setBreakdown(key, v)}
+                                  ariaLabel={label}
+                                  compact
+                                />
+                              </div>
+                              {/* Value */}
+                              <span
                                 style={{
-                                  fontSize: 11,
-                                  color: INK_FAINT,
-                                  marginTop: 2,
-                                  marginBottom: 8,
-                                  lineHeight: 1.25,
+                                  fontSize: 13,
+                                  fontWeight: 800,
+                                  color: val != null ? ratingTextColor(val) : 'rgba(15,23,42,0.20)',
+                                  flexShrink: 0,
+                                  fontVariantNumeric: 'tabular-nums',
+                                  minWidth: 30,
+                                  textAlign: 'right',
                                 }}
                               >
-                                {desc}
-                              </div>
-                              <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                                <div style={{ flex: 1, minWidth: 0 }}>
-                                  <TickScrubber
-                                    value={val}
-                                    onChange={(v) => wizard.setBreakdown(key, v)}
-                                    ariaLabel={label}
-                                    compact
-                                  />
-                                </div>
-                                <span
-                                  style={{
-                                    fontSize: 13,
-                                    fontWeight: 800,
-                                    color: val != null ? ratingTextColor(val) : 'rgba(15,23,42,0.20)',
-                                    flexShrink: 0,
-                                    fontVariantNumeric: 'tabular-nums',
-                                  }}
-                                >
-                                  {val != null ? val.toFixed(1) : '—'}
-                                </span>
-                              </div>
+                                {val != null ? val.toFixed(1) : '—'}
+                              </span>
                             </div>
                           );
                         })}
