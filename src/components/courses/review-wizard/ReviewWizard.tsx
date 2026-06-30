@@ -487,6 +487,7 @@ export function ReviewWizard({
 
   /* ── Keyboard docking (visualViewport) ───────────────────────────────── */
   const [keyboardHeight, setKeyboardHeight] = useState(0);
+  const verdictGrows = keyboardHeight === 0 && !hasMedia;
   useEffect(() => {
     const vv = window.visualViewport;
     if (!vv) return;
