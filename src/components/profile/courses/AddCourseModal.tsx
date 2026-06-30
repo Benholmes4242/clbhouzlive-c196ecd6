@@ -889,8 +889,7 @@ export const AddCourseModal: React.FC<AddCourseModalProps> = ({
                     items={topTen.map(c => c.course_id)}
                     strategy={verticalListSortingStrategy}
                   >
-                    <div style={{ padding: '12px 16px' }}>
-
+                    <div style={{ paddingTop: 4 }}>
                       {topTen.map((course, index) => (
                         <SortableManageItem
                           key={course.course_id}
