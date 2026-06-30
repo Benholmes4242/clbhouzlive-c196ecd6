@@ -288,8 +288,8 @@ const LightFeedCardImpl: React.FC<LightFeedCardProps> = ({
           EXCEPTIONAL: 'rgba(240,165,0,0.20)',    // #F0A500 gold
           EXCELLENT:   'rgba(217,119,6,0.18)',    // #D97706 amber
           GOOD:        'rgba(217,119,6,0.15)',    // #D97706 amber
-          FAIR:        'rgba(100,116,139,0.18)',  // #64748B slate
-          POOR:        'rgba(100,116,139,0.15)',  // #64748B slate
+          FAIR:        'rgba(154,74,14,0.18)',    // #9A4A0E ember (Option B low end)
+          POOR:        'rgba(154,74,14,0.15)',    // #9A4A0E ember (Option B low end)
         } as const;
         const tierKey = getRatingTier(reviewRating);
         return (
@@ -383,6 +383,7 @@ const LightFeedCardImpl: React.FC<LightFeedCardProps> = ({
           )}
           {reviewRating != null && (() => {
             const tierLabel = getRatingTierLabel(reviewRating);
+            const isExceptional = getRatingTier(reviewRating) === 'EXCEPTIONAL';
             return (
               <button
                 type="button"
@@ -394,10 +395,14 @@ const LightFeedCardImpl: React.FC<LightFeedCardProps> = ({
                 }}
                 aria-label={`Your review: ${formatRatingValue(reviewRating)} ${tierLabel}`}
               >
-                <span style={{
-                  fontSize: 12.5, fontWeight: 800, letterSpacing: '0.14em', textTransform: 'uppercase',
-                  color: ratingTextColor(reviewRating), whiteSpace: 'nowrap',
-                }}>
+                <span
+                  className={isExceptional ? 'clbhouz-gold-shimmer-light' : undefined}
+                  style={{
+                    fontSize: 12.5, fontWeight: 800, letterSpacing: '0.14em', textTransform: 'uppercase',
+                    ...(isExceptional ? {} : { color: ratingTextColor(reviewRating) }),
+                    whiteSpace: 'nowrap',
+                  }}
+                >
                   {tierLabel}
                 </span>
               </button>
