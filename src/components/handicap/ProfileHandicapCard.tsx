@@ -401,7 +401,7 @@ const ProfileHandicapCard: React.FC<Props> = ({
               color: 'var(--hcp-t-60)',
             }}
           >
-            See full handicap — trends, records, rounds
+            See full handicap: trends, records, rounds
           </span>
           <ChevronRight size={14} color="var(--hcp-t-60)" />
         </div>
