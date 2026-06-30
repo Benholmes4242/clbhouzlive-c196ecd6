@@ -283,13 +283,13 @@ export const CardFeed: React.FC<CardFeedProps> = ({
         fn = (post: FeedPost, slide: number) => {
           // Recompute index at call time — `posts` may have grown.
           const idx = posts.findIndex((p) => p.id === post.id);
-          if (idx >= 0) setCarouselPosition(idx, slide);
+          if (idx >= 0) setCarouselPosition(idx, slide, tab);
         };
         cache.set(postId, fn);
       }
       return fn;
     },
-    [posts, setCarouselPosition],
+    [posts, setCarouselPosition, tab],
   );
 
   // Garbage-collect carousel-change cache when posts shrink/change.
