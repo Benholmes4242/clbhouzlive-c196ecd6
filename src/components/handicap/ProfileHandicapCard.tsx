@@ -1,5 +1,5 @@
 /**
- * ProfileHandicapCard — light-mode handicap summary card for the profile page.
+ * ProfileHandicapCard: light-mode handicap summary card for the profile page.
  *
  * Replaces the legacy FriendHandicapHero / HeroHandicapCard dual-ring block.
  * Mirrors the visual language of HeroHandicapCardDark (verdict ring) but
