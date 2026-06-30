@@ -77,7 +77,7 @@ const AuthBottomSheet: React.FC<AuthBottomSheetProps> = ({
         
         {/* Handle bar */}
         <div style={{ display: 'flex', justifyContent: 'center', padding: '10px 0 4px' }}>
-          <div style={{ width: 36, height: 4, borderRadius: 2, background: 'rgba(255,255,255,0.20)' }} />
+          <div style={{ width: 36, height: 4, borderRadius: 99, background: 'rgba(255,255,255,0.20)' }} />
         </div>
         
         {/* Header with close button */}
@@ -87,7 +87,7 @@ const AuthBottomSheet: React.FC<AuthBottomSheetProps> = ({
               <h2 
                 style={{ 
                   fontSize: 20,
-                  fontWeight: 900,
+                  fontWeight: 800,
                   color: 'rgba(255,255,255,0.96)',
                   letterSpacing: '-0.03em',
                   marginBottom: 4,
@@ -95,6 +95,7 @@ const AuthBottomSheet: React.FC<AuthBottomSheetProps> = ({
               >
                 {title}
               </h2>
+              <div style={{ width: 28, height: 3, borderRadius: 99, background: '#F7931E', marginTop: 8 }} />
             )}
             {subtitle && (
               <p 

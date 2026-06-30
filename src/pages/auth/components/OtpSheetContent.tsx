@@ -253,8 +253,8 @@ const OtpSheetContent: React.FC<OtpSheetContentProps> = ({
           }}
         >
           {resendCooldown > 0
-            ? `You can resend in ${resendCooldown}s — your code stays valid for 1 hour`
-            : "Didn't get it? Resend code — check spam too"}
+            ? `You can resend in ${resendCooldown}s. Your code stays valid for 1 hour.`
+            : "Didn't get it? Resend code, or check your spam folder."}
         </button>
       </div>
     </div>
