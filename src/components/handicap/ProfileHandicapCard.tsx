@@ -1,58 +1,96 @@
 /**
  * ProfileHandicapCard: light-mode handicap summary card for the profile page.
  *
- * Replaces the legacy FriendHandicapHero / HeroHandicapCard dual-ring block.
- * Mirrors the visual language of HeroHandicapCardDark (verdict ring) but
- * themed light via the `.hcp-light` scope. Whole card taps through:
- *   own profile  → /handicap
- *   friend       → /handicap/:userId   (fires friend_handicap_page_viewed)
+ * Index block mirrors HeroHandicapCardDark (handicap page) re-themed light.
+ * Whole card taps through:
+ *   own profile  -> /handicap
+ *   friend       -> /handicap/:userId   (fires friend_handicap_page_viewed)
  *
- * Renders null when the user has no WHS connection or no current handicap
- * Same gating as FriendHandicapHero.
+ * Renders null when the user has no WHS connection or no current handicap.
  */
 
 import React, { useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ChevronRight } from 'lucide-react';
+import { ChevronRight, Trophy } from 'lucide-react';
 import {
   useWhsConnection,
   useHandicapTrend,
   useHandicapHistory,
-  useAllScores,
 } from '@/lib/whs/hooks';
 import { useHandicapTrend12mo } from '@/hooks/useHandicapTrend12mo';
-import { fmtHcp } from '@/lib/whs/format';
+import { useUserAchievements } from '@/hooks/gam/useUserAchievements';
+import { openGamAchievements } from '@/components/profile/handicap/whs/gam/events';
 import { analyticsEvents } from '@/utils/analyticsEvents';
 
 const FONT = 'Geist, system-ui, -apple-system, BlinkMacSystemFont, sans-serif';
-const AMBER = '#F7931E';
-
-type Verdict = 'good' | 'bad' | 'steady';
-
-function verdictFor(delta: number | null): Verdict {
-  if (delta == null) return 'steady';
-  if (delta < -0.05) return 'good';
-  if (delta > 0.05) return 'bad';
-  return 'steady';
-}
-
-function arcGradient(v: Verdict) {
-  if (v === 'good') return { from: '#22C55E', to: '#4ADE80', solid: '#22C55E' };
-  if (v === 'bad') return { from: '#EF4444', to: '#F87171', solid: '#EF4444' };
-  return { from: AMBER, to: '#FFB45A', solid: AMBER };
-}
-
-// Ring geometry
-const RING_BOX = 108;
-const STROKE_W = 9;
-const CIRC_R = (RING_BOX - STROKE_W) / 2;
-const CIRCUMFERENCE = 2 * Math.PI * CIRC_R;
 
 interface Props {
   userId: string;
   viewerUserId: string;
   isOwnProfile: boolean;
   displayName?: string | null;
+}
+
+interface TrendRowProps {
+  label: string;
+  delta: number | null;
+  caption: string;
+  borderTop?: boolean;
+}
+
+function TrendRow({ label, delta, caption, borderTop }: TrendRowProps) {
+  const improved = delta != null && delta < -0.05;
+  const drifted = delta != null && delta > 0.05;
+  const color = improved ? '#16A34A' : drifted ? '#DC2626' : 'var(--hcp-t-40)';
+  const arrow = improved ? '\u2193 ' : drifted ? '\u2191 ' : '';
+  const fmt =
+    delta == null
+      ? 'N/A'
+      : `${delta > 0 ? '+' : delta < 0 ? '-' : ''}${Math.abs(delta).toFixed(1)}`;
+  return (
+    <div
+      style={{
+        padding: '10px 0 10px 16px',
+        borderTop: borderTop ? '1px solid var(--hcp-line-2)' : 'none',
+      }}
+    >
+      <div
+        style={{
+          fontSize: 9,
+          fontWeight: 700,
+          letterSpacing: '0.12em',
+          textTransform: 'uppercase',
+          color: 'var(--hcp-t-40)',
+          marginBottom: 4,
+        }}
+      >
+        {label}
+      </div>
+      <div
+        style={{
+          fontSize: 22,
+          fontWeight: 700,
+          color,
+          fontVariantNumeric: 'tabular-nums',
+          letterSpacing: '-0.01em',
+          lineHeight: 1,
+        }}
+      >
+        {arrow}
+        {fmt}
+      </div>
+      <div
+        style={{
+          fontSize: 10,
+          color: 'var(--hcp-t-40)',
+          fontWeight: 600,
+          marginTop: 4,
+        }}
+      >
+        {caption}
+      </div>
+    </div>
+  );
 }
 
 const ProfileHandicapCard: React.FC<Props> = ({
@@ -65,8 +103,8 @@ const ProfileHandicapCard: React.FC<Props> = ({
   const { data: connection, isLoading: connLoading } = useWhsConnection(userId);
   const { data: trend, isLoading: trendLoading } = useHandicapTrend(connection?.id);
   const { data: history90 } = useHandicapHistory(connection?.id, 90);
-  const { data: allScores } = useAllScores(connection?.id);
   const trend12 = useHandicapTrend12mo(connection?.id);
+  const { data: achievements } = useUserAchievements(userId);
 
   const handicap = trend?.current ?? null;
 
@@ -77,75 +115,14 @@ const ProfileHandicapCard: React.FC<Props> = ({
     );
   }, [history90]);
 
-  const verdict = useMemo<Verdict>(() => verdictFor(delta90), [delta90]);
-  const grad = arcGradient(verdict);
+  const trophyCount = (achievements ?? []).filter((b: any) => b.is_earned).length;
 
-  // Fill fraction: magnitude of 90d delta vs a 1.0 stroke target (clamped).
-  const fillFraction = useMemo(() => {
-    if (delta90 == null) return 0;
-    return Math.min(Math.abs(delta90) / 1.0, 1);
-  }, [delta90]);
-  const dashOffset = CIRCUMFERENCE * (1 - fillFraction);
-
-  // Scoring avg over last 90 days (mirrors HeroHandicapCardDark).
-  const scoringAvg90 = useMemo<number | null>(() => {
-    const scores = (allScores ?? []) as Array<{
-      play_date?: string;
-      adjusted_gross?: number;
-    }>;
-    const cutoff = Date.now() - 90 * 86_400_000;
-    const vals = scores
-      .filter((s) => {
-        if (!s?.play_date) return false;
-        const t = new Date(s.play_date).getTime();
-        return Number.isFinite(t) && t >= cutoff;
-      })
-      .map((s) => s.adjusted_gross)
-      .filter((v): v is number => typeof v === 'number');
-    if (vals.length < 3) return null;
-    return vals.reduce((a, b) => a + b, 0) / vals.length;
-  }, [allScores]);
-
-  // Sparkline points: built from history90.
-  const spark = useMemo(() => {
-    if (!history90 || history90.length < 2) return null;
-    const pts = history90.map((h) => h.handicap_index);
-    const min = Math.min(...pts);
-    const max = Math.max(...pts);
-    const range = max - min || 1;
-    const W = 100;
-    const H = 32;
-    const PAD_Y = 3; // keeps the stroke off the top/bottom edges
-    const stepX = pts.length > 1 ? W / (pts.length - 1) : 0;
-    const plotH = H - PAD_Y * 2;
-    const path = pts
-      .map((v, i) => {
-        const x = i * stepX;
-        const y = PAD_Y + (plotH - ((v - min) / range) * plotH);
-        return `${i === 0 ? 'M' : 'L'}${x.toFixed(2)},${y.toFixed(2)}`;
-      })
-      .join(' ');
-    const firstDate = history90[0]?.observed_at
-      ? new Date(history90[0].observed_at)
-      : null;
-    const lastDate = history90[history90.length - 1]?.observed_at
-      ? new Date(history90[history90.length - 1].observed_at)
-      : null;
-    const fmtMonth = (d: Date) =>
-      d.toLocaleDateString('en-GB', { month: 'short' }).toUpperCase();
-    return {
-      path,
-      W,
-      H,
-      startLabel: firstDate ? fmtMonth(firstDate) : '',
-      endLabel: lastDate ? fmtMonth(lastDate) : '',
-    };
-  }, [history90]);
-
-  // Gating: match FriendHandicapHero behaviour.
   if (connLoading || trendLoading) return null;
   if (!connection) return null;
   if (handicap == null) return null;
+
+  const resolvedName = (displayName ?? '').trim().split(/\s+/)[0] || 'this golfer';
+  const trophyPossessive = isOwnProfile ? 'your case' : `${resolvedName}'s case`;
 
   const handleTap = () => {
     if (!isOwnProfile) {
@@ -167,24 +144,8 @@ const ProfileHandicapCard: React.FC<Props> = ({
     }
   };
 
-  const deltaColor = (d: number | null) => {
-    if (d == null) return 'var(--hcp-t-60)';
-    if (d < -0.05) return '#16A34A';
-    if (d > 0.05) return '#DC2626';
-    return 'var(--hcp-t-60)';
-  };
-  const fmtDelta = (d: number | null) => {
-    if (d == null) return '—';
-    const abs = Math.abs(d).toFixed(1);
-    if (d < -0.05) return `−${abs}`;
-    if (d > 0.05) return `+${abs}`;
-    return '0.0';
-  };
-
-  const resolvedName = (displayName ?? '').trim().split(/\s+/)[0] || 'this golfer';
-
   return (
-    <div className="hcp-dark" style={{ padding: '8px 16px 16px' }}>
+    <div className="hcp-light" style={{ padding: '8px 16px 16px' }}>
       <div
         role="button"
         tabIndex={0}
@@ -196,13 +157,12 @@ const ProfileHandicapCard: React.FC<Props> = ({
             : `See ${resolvedName}'s full handicap: trends, records, rounds`
         }
         style={{
-          background: 'linear-gradient(168deg, var(--hcp-bg-2) 0%, var(--hcp-bg-0) 100%)',
-          border: '1px solid var(--hcp-line-2)',
+          background: 'var(--hcp-bg-1)',
+          border: '1px solid var(--hcp-line)',
           borderRadius: 18,
           padding: '16px 16px 14px',
           fontFamily: FONT,
           cursor: 'pointer',
-          boxShadow: '0 8px 30px rgba(15,23,42,0.22), inset 0 1px 0 rgba(255,255,255,0.05)',
         }}
       >
         {/* Eyebrow */}
@@ -226,231 +186,127 @@ const ProfileHandicapCard: React.FC<Props> = ({
           </span>
         </div>
 
-        {/* Ring + KPI trio */}
-        <div
-          style={{
-            display: 'flex',
-            alignItems: 'center',
-            gap: 14,
-          }}
-        >
-          {/* Verdict ring */}
+        {/* Index grid: CURRENT INDEX | 90d / 12mo */}
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr' }}>
           <div
             style={{
-              position: 'relative',
-              width: RING_BOX,
-              height: RING_BOX,
-              flexShrink: 0,
+              borderRight: '1px solid var(--hcp-line-2)',
+              paddingRight: 16,
+              display: 'flex',
+              flexDirection: 'column',
+              justifyContent: 'center',
             }}
           >
-            <svg
-              width={RING_BOX}
-              height={RING_BOX}
-              viewBox={`0 0 ${RING_BOX} ${RING_BOX}`}
-              style={{ transform: 'rotate(-90deg)' }}
-              aria-hidden
-            >
-              <defs>
-                <linearGradient
-                  id="hcp-light-arc"
-                  gradientUnits="userSpaceOnUse"
-                  x1="0"
-                  y1="0"
-                  x2={RING_BOX}
-                  y2={RING_BOX}
-                >
-                  <stop offset="0%" stopColor={grad.from} />
-                  <stop offset="100%" stopColor={grad.to} />
-                </linearGradient>
-              </defs>
-              <circle
-                cx={RING_BOX / 2}
-                cy={RING_BOX / 2}
-                r={CIRC_R}
-                fill="none"
-                stroke="var(--hcp-bg-3)"
-                strokeWidth={STROKE_W}
-              />
-              <circle
-                cx={RING_BOX / 2}
-                cy={RING_BOX / 2}
-                r={CIRC_R}
-                fill="none"
-                stroke="url(#hcp-light-arc)"
-                strokeWidth={STROKE_W}
-                strokeLinecap="round"
-                strokeDasharray={CIRCUMFERENCE}
-                strokeDashoffset={dashOffset}
-                style={{
-                  transition:
-                    'stroke-dashoffset 700ms cubic-bezier(0.22,0.61,0.36,1)',
-                  transform: verdict === 'bad' ? 'scaleX(-1)' : undefined,
-                  transformOrigin: 'center',
-                  transformBox: 'fill-box',
-                }}
-              />
-            </svg>
             <div
               style={{
-                position: 'absolute',
-                inset: 0,
+                fontSize: 9,
+                fontWeight: 700,
+                letterSpacing: '0.12em',
+                textTransform: 'uppercase',
+                color: 'var(--hcp-t-40)',
+                marginBottom: 8,
+              }}
+            >
+              Current Index
+            </div>
+            <div
+              style={{
+                fontSize: 56,
+                fontWeight: 200,
+                color: 'var(--hcp-t-100)',
+                lineHeight: 0.9,
+                letterSpacing: '-0.03em',
+                fontVariantNumeric: 'tabular-nums',
+              }}
+            >
+              {handicap != null
+                ? handicap < 0
+                  ? `+${Math.abs(handicap).toFixed(1)}`
+                  : handicap.toFixed(1)
+                : 'N/A'}
+            </div>
+          </div>
+
+          <div style={{ display: 'flex', flexDirection: 'column' }}>
+            <TrendRow label="90 Days" delta={delta90} caption="over 90 days" />
+            <TrendRow
+              label="12 Months"
+              delta={trend12.delta}
+              caption="over 12 months"
+              borderTop
+            />
+          </div>
+        </div>
+
+        {/* Trophies CTA */}
+        {trophyCount > 0 && (
+          <div style={{ marginTop: 14 }}>
+            <button
+              type="button"
+              onClick={(e) => {
+                e.stopPropagation();
+                openGamAchievements();
+              }}
+              aria-label={`See ${isOwnProfile ? 'your' : `${resolvedName}'s`} trophies`}
+              style={{
+                width: '100%',
                 display: 'flex',
                 alignItems: 'center',
-                justifyContent: 'center',
-                pointerEvents: 'none',
+                gap: 12,
+                background: 'var(--hcp-amber-tint, rgba(247,147,30,0.10))',
+                border: 'none',
+                borderRadius: 12,
+                padding: '11px 13px',
+                cursor: 'pointer',
+                textAlign: 'left',
               }}
             >
-              <span
+              <div
                 style={{
-                  fontSize: 32,
-                  fontWeight: 700,
-                  letterSpacing: '-0.04em',
-                  lineHeight: 1,
-                  color: 'var(--hcp-t-100)',
-                  fontVariantNumeric: 'tabular-nums',
+                  width: 36,
+                  height: 36,
+                  borderRadius: 10,
+                  background: 'rgba(247,147,30,0.18)',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  flexShrink: 0,
                 }}
               >
-                {fmtHcp(handicap)}
-              </span>
-            </div>
-          </div>
-
-          {/* KPI trio */}
-          <div
-            style={{
-              flex: 1,
-              display: 'grid',
-              gridTemplateColumns: '1fr 1fr 1fr',
-              gap: 8,
-            }}
-          >
-            <KPI
-              label="SCORING"
-              value={scoringAvg90 != null ? scoringAvg90.toFixed(1) : '—'}
-              sub="90d avg"
-              color="var(--hcp-t-100)"
-            />
-            <KPI
-              label="90D"
-              value={fmtDelta(delta90)}
-              sub="vs start"
-              color={deltaColor(delta90)}
-            />
-            <KPI
-              label="12MO"
-              value={fmtDelta(trend12.delta)}
-              sub="vs year"
-              color={deltaColor(trend12.delta)}
-            />
-          </div>
-        </div>
-
-        {/* Sparkline */}
-        {spark && (
-          <div style={{ marginTop: 14 }}>
-            <svg
-              width="100%"
-              height={spark.H}
-              viewBox={`0 0 ${spark.W} ${spark.H}`}
-              preserveAspectRatio="none"
-              aria-hidden
-              style={{ display: 'block', overflow: 'visible' }}
-            >
-              <path
-                d={spark.path}
-                fill="none"
-                stroke={grad.solid}
-                strokeWidth={1.5}
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                vectorEffect="non-scaling-stroke"
-              />
-            </svg>
-            <div
-              style={{
-                display: 'flex',
-                justifyContent: 'space-between',
-                marginTop: 4,
-                fontSize: 9,
-                fontWeight: 800,
-                letterSpacing: '0.18em',
-                color: 'var(--hcp-t-40)',
-              }}
-            >
-              <span>{spark.startLabel}</span>
-              <span>{spark.endLabel}</span>
-            </div>
+                <Trophy size={18} strokeWidth={2} color="#F7931E" />
+              </div>
+              <div style={{ flex: 1, minWidth: 0 }}>
+                <div
+                  style={{
+                    fontSize: 13,
+                    fontWeight: 700,
+                    color: 'var(--hcp-t-100)',
+                    letterSpacing: '-0.01em',
+                  }}
+                >
+                  <span style={{ fontVariantNumeric: 'tabular-nums', color: '#F7931E' }}>
+                    {trophyCount}
+                  </span>{' '}
+                  {trophyCount === 1 ? 'trophy' : 'trophies'} in {trophyPossessive}
+                </div>
+                <div
+                  style={{
+                    fontSize: 11,
+                    fontWeight: 600,
+                    color: 'var(--hcp-t-60)',
+                    marginTop: 2,
+                  }}
+                >
+                  See them all
+                </div>
+              </div>
+              <ChevronRight size={16} color="#F7931E" strokeWidth={2.2} />
+            </button>
           </div>
         )}
-
-        {/* Footer */}
-        <div
-          style={{
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'space-between',
-            marginTop: 12,
-            paddingTop: 10,
-            borderTop: '1px solid var(--hcp-line)',
-          }}
-        >
-          <span
-            style={{
-              fontSize: 12,
-              fontStyle: 'italic',
-              color: 'var(--hcp-t-60)',
-            }}
-          >
-            See full handicap: trends, records, rounds
-          </span>
-          <ChevronRight size={14} color="var(--hcp-t-60)" />
-        </div>
       </div>
     </div>
   );
 };
-
-interface KPIProps {
-  label: string;
-  value: string;
-  sub: string;
-  color: string;
-}
-
-const KPI: React.FC<KPIProps> = ({ label, value, sub, color }) => (
-  <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 2, minWidth: 0, textAlign: 'center' }}>
-    <span
-      style={{
-        fontSize: 9,
-        fontWeight: 800,
-        letterSpacing: '0.18em',
-        color: 'var(--hcp-t-40)',
-      }}
-    >
-      {label}
-    </span>
-    <span
-      style={{
-        fontSize: 18,
-        fontWeight: 700,
-        lineHeight: 1.1,
-        color,
-        fontVariantNumeric: 'tabular-nums',
-        letterSpacing: '-0.01em',
-      }}
-    >
-      {value}
-    </span>
-    <span
-      style={{
-        fontSize: 10,
-        fontWeight: 600,
-        color: 'var(--hcp-t-40)',
-      }}
-    >
-      {sub}
-    </span>
-  </div>
-);
 
 export default ProfileHandicapCard;
