@@ -382,8 +382,8 @@ const FeedCardImpl: React.FC<FeedCardProps> = ({
           EXCEPTIONAL: 'rgba(255,194,61,0.16)',
           EXCELLENT:   'rgba(247,147,30,0.14)',
           GOOD:        'rgba(247,147,30,0.12)',
-          FAIR:        'rgba(138,149,164,0.14)',
-          POOR:        'rgba(138,149,164,0.12)',
+          FAIR:        'rgba(154,74,14,0.14)',
+          POOR:        'rgba(154,74,14,0.12)',
         } as const;
         const tierKey = getRatingTier(reviewRating);
         return (

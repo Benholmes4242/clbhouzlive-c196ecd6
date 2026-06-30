@@ -460,15 +460,24 @@ const CourseReviewsTab: React.FC<CourseReviewsTabProps> = ({
     <PullToRefreshContainer onRefresh={handlePullToRefresh}>
     <div style={{ paddingBottom: 40, background: SLATE_50, minHeight: '100%' }}>
       {/* Community score header — horizontal (matches About Option B) */}
+      {(() => {
+        const isExceptional = getScoreTier(communityScore).isExceptional;
+        return (
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 16, padding: '18px 16px 14px' }}>
         <div style={{ display: 'flex', alignItems: 'baseline', gap: 2, flexShrink: 0 }}>
-          <span style={{ fontSize: 58, ...HERO_NUMBER_STYLE, color: ratingTextColor(communityScore), lineHeight: 1 }}>
+          <span
+            className={isExceptional ? 'clbhouz-gold-shimmer-light' : undefined}
+            style={{ fontSize: 58, ...HERO_NUMBER_STYLE, ...(isExceptional ? {} : { color: ratingTextColor(communityScore) }), lineHeight: 1 }}
+          >
             {communityScore.toFixed(1)}
           </span>
           <span style={{ fontSize: 19, fontWeight: 800, color: 'rgba(15,23,42,0.25)', letterSpacing: '-0.02em' }}>/10</span>
         </div>
         <div style={{ minWidth: 0 }}>
-          <div style={{ fontSize: 12, ...TIER_LABEL_STYLE, color: ratingTextColor(communityScore) }}>
+          <div
+            className={isExceptional ? 'clbhouz-gold-shimmer-light' : undefined}
+            style={{ fontSize: 12, ...TIER_LABEL_STYLE, ...(isExceptional ? {} : { color: ratingTextColor(communityScore) }) }}
+          >
             {getScoreTier(communityScore).label}
           </div>
           <div style={{ fontSize: 11.5, color: INK_FAINT, marginTop: 3, display: 'flex', alignItems: 'center', gap: 6, flexWrap: 'wrap' }}>
@@ -481,6 +490,8 @@ const CourseReviewsTab: React.FC<CourseReviewsTabProps> = ({
           </div>
         </div>
       </div>
+        );
+      })()}
 
 
       <Divider />
