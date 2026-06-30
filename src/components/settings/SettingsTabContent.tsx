@@ -253,7 +253,7 @@ export function SettingsTabContent() {
           className="pt-4 text-center"
           style={{ fontFamily: 'Geist, -apple-system, BlinkMacSystemFont, sans-serif', fontSize: 12, color: '#94A3B8', letterSpacing: '0.01em' }}
         >
-          clbhouz \u00B7 v{APP_VERSION}
+          {`clbhouz \u00B7 v${APP_VERSION}`}
         </div>
       </div>
 
