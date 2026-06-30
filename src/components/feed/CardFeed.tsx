@@ -608,7 +608,7 @@ export const CardFeed = forwardRef<CardFeedHandle, CardFeedProps>(function CardF
           initialScrollTop={restoreScrollTopRef.current ?? 0}
           initialTopMostItemIndex={initialState ? undefined : 0}
           style={{ height: '100%', width: '100%' }}
-      </div>
+        />
       </div>
 
     </div>
