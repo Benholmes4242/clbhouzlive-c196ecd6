@@ -106,9 +106,9 @@ const Eyebrow: React.FC<{ ownerFirstName?: string | null; isFriendView?: boolean
     style={{
       fontSize: 11,
       fontWeight: 800,
-      letterSpacing: '0.16em',
+      letterSpacing: '0.14em',
       textTransform: 'uppercase',
-      color: 'var(--hcp-t-100)',
+      color: 'var(--hcp-t-60)',
     }}
   >
     {isFriendView && ownerFirstName
