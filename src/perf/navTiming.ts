@@ -55,14 +55,31 @@ type Listener = (snapshot: { current: NavTransaction | null; recent: NavSummary[
 const RECENT_LIMIT = 20;
 const FINALIZE_TIMEOUT_MS = 5000;
 
+const PERF_FLAG_KEY = 'clbhouz:perf';
+
 function perfEnabled(): boolean {
   if (typeof window === 'undefined') return false;
   if (import.meta.env.DEV) return true;
   try {
-    return new URLSearchParams(window.location.search).get('perf') === '1';
-  } catch {
-    return false;
-  }
+    const sp = new URLSearchParams(window.location.search);
+    if (sp.get('perf') === '1') return true;
+  } catch {}
+  try {
+    if (window.location.hash.includes('perf')) return true;
+  } catch {}
+  try {
+    if (localStorage.getItem(PERF_FLAG_KEY) === '1') return true;
+  } catch {}
+  return false;
+}
+
+export function enablePerf(): void {
+  try { localStorage.setItem(PERF_FLAG_KEY, '1'); } catch {}
+  try { window.location.reload(); } catch {}
+}
+export function disablePerf(): void {
+  try { localStorage.removeItem(PERF_FLAG_KEY); } catch {}
+  try { window.location.reload(); } catch {}
 }
 
 const ENABLED = perfEnabled();
