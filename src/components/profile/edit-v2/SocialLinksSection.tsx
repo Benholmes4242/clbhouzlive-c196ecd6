@@ -49,7 +49,7 @@ function SocialRow({
         autoCapitalize="none"
         autoCorrect="off"
         spellCheck={false}
-        className="flex-1 bg-[#F8FAFC] px-3 py-2.5 text-[15px] text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-[hsl(38,92%,50%)]/40 transition-colors"
+        className="flex-1 bg-[#F8FAFC] px-3 py-2.5 text-[15px] text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-[rgba(15,23,42,0.20)] transition-colors"
       />
     </div>
   );

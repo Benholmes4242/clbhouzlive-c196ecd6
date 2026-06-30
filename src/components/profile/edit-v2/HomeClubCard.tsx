@@ -113,7 +113,7 @@ export function HomeClubCard({
               setTimeout(() => setIsOpen(false), 150);
             }}
             placeholder="Search for your home club"
-            className="w-full bg-[#F8FAFC] border border-border/60 rounded-[11px] pl-9 pr-10 py-3 text-[15px] text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-[hsl(38,92%,50%)]/40 focus:bg-background transition-colors"
+            className="w-full bg-[#F8FAFC] border border-border/60 rounded-[11px] pl-9 pr-10 py-3 text-[15px] text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-[rgba(15,23,42,0.20)] focus:bg-background transition-colors"
           />
           {query && (
             <button
