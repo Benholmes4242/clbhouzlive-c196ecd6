@@ -1,5 +1,5 @@
 /**
- * IntelligenceSheet — merged About + Picks History sheet.
+ * IntelligenceSheet - merged About + Picks History sheet.
  *
  * Replaces the previous IntelligenceAboutSheet and IntelligenceAllPicksSheet.
  * Two-tab pill toggle ("How we pick" / "Picks history") below a shared header.
@@ -97,42 +97,22 @@ function Header({ onClose }: { onClose: () => void }) {
         flexShrink: 0,
       }}
     >
-      <div style={{ display: 'flex', alignItems: 'center', gap: 12, minWidth: 0, flex: 1 }}>
-        <div
-          style={{
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            flexShrink: 0,
-          }}
-        >
-          <Brain size={22} color={AMBER} strokeWidth={2.5} />
+      <div style={{ minWidth: 0, flex: 1 }}>
+        {/* canonical eyebrow: Brain mark + caps tag */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: 7 }}>
+          <Brain size={14} color={AMBER} strokeWidth={2.5} />
+          <span style={{ fontSize: 11, fontWeight: 800, letterSpacing: '0.14em', textTransform: 'uppercase', color: '#94A3B8', lineHeight: 1 }}>
+            Intelligence
+          </span>
         </div>
-        <div style={{ minWidth: 0 }}>
-          <h2
-            id="intelligence-sheet-title"
-            style={{
-              margin: 0,
-              fontSize: 17,
-              fontWeight: 800,
-              color: SLATE_900,
-              letterSpacing: '-0.3px',
-              lineHeight: 1.15,
-            }}
-          >
-            Tournament Intelligence
-          </h2>
-          <p
-            style={{
-              margin: '2px 0 0',
-              fontSize: 12,
-              color: SLATE_600,
-              letterSpacing: '-0.05px',
-            }}
-          >
-            How we make our picks — and how they've played out.
-          </p>
-        </div>
+        {/* amber cut-line */}
+        <div style={{ width: 34, height: 3, borderRadius: 99, background: AMBER, marginTop: 9 }} />
+        <h2 id="intelligence-sheet-title" style={{ margin: '9px 0 0', fontSize: 20, fontWeight: 800, color: SLATE_900, letterSpacing: '-0.01em', lineHeight: 1.15 }}>
+          Tournament Intelligence
+        </h2>
+        <p style={{ margin: '6px 0 0', fontSize: 13, fontWeight: 500, color: SLATE_600, letterSpacing: '-0.05px', lineHeight: 1.4 }}>
+          How we make our picks, and how they've played out.
+        </p>
       </div>
       <button
         type="button"
