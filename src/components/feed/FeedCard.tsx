@@ -100,6 +100,10 @@ export interface FeedCardProps {
   currentUserId?: string;
   /** Feed index — threaded down to InlineVideo for greppable per-tile traces. */
   feedIndex?: number;
+  /** True only for the index-0 card — gates `onContentReady` to one signal. */
+  isFirstCard?: boolean;
+  /** Fires once when this card's primary content is paint-ready (decoded image / first video frame / rAF for text). */
+  onContentReady?: () => void;
 }
 
 interface CaptionBlockProps {
