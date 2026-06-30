@@ -21,6 +21,8 @@ interface Props {
   isNear: boolean;
   feedIndex?: number;
   objectFit?: 'cover' | 'contain';
+  /** Fires once when the video's first frame is painted (paint-ready signal). */
+  onFirstFrameReady?: () => void;
 }
 
 export const InlineVideo: React.FC<Props> = ({
