@@ -1,12 +1,12 @@
 /**
- * AddCourseModal — Bottom sheet for managing the Personal Top 10.
+ * AddCourseModal - Bottom sheet for managing the Personal Top 10.
  *
  * Two tabs:
  *  - Manage: drag-to-reorder + chevrons + remove (preserves dnd-kit behavior)
  *  - Add Course: search played courses, add rated, prompt to rate unrated
  *
- * Visual language: 'The Dispatch' editorial — serif titles, amber-bar eyebrows,
- * #F8FAFC sheet shell with #FFFFFF rows, hairline dividers, podium-coloured rank badges.
+ * Canonical sheet language: SheetHeader with amber cut-line, CAPS eyebrows,
+ * Geist throughout, plain tabular-num scores, podium-coloured rank badges.
  */
 import React, { useState, useMemo, useRef, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
@@ -37,17 +37,16 @@ import {
 import { CSS } from '@dnd-kit/utilities';
 import { restrictToVerticalAxis } from '@dnd-kit/modifiers';
 
-// ---- Locked Dispatch tokens ----
+// ---- Canonical tokens ----
 const INK = '#0F172A';
 const INK_SOFT = '#475569';
 const INK_SUBTLE = '#94A3B8';
 const AMBER = '#F7931E';
-const AMBER_DEEP = '#C97A10';
+const AMBER_DEEP = '#c97a10';
 const AMBER_WASH = 'rgba(247,147,30,0.08)';
 const AMBER_BORDER = 'rgba(247,147,30,0.30)';
 const BORDER = 'rgba(15,23,42,0.07)';
 const BG_SURFACE = '#F8FAFC';
-const FONT_SERIF = '"Geist", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif';
 
 interface AddCourseModalProps {
   userId: string;
@@ -97,20 +96,19 @@ const getPositionBadgeStyle = (position: number): { bg: string; text: string; sh
   }
 };
 
-// Serif rating score with reduced decimal — matches Courses tab editorial language
-const SerifScore: React.FC<{ value: number; size?: number }> = ({ value, size = 13 }) => {
+// Plain tabular score (e.g. 9.7) - canonical replacement for the retired SerifScore.
+const PlainScore: React.FC<{ value: number; size?: number }> = ({ value, size = 13 }) => {
   const safe = Number.isFinite(value) ? value : 0;
-  const int = Math.floor(safe);
-  const dec = Math.round((safe * 10) % 10);
   return (
     <span style={{
-      fontFamily: FONT_SERIF,
+      fontSize: size,
+      fontWeight: 800,
       color: INK,
-      lineHeight: 1,
-      letterSpacing: '-0.02em',
+      letterSpacing: '-0.01em',
+      fontVariantNumeric: 'tabular-nums',
+      fontFeatureSettings: '"kern" 1, "liga" 1, "tnum" 1',
     }}>
-      <span style={{ fontSize: size, fontWeight: 900 }}>{int}</span>
-      <span style={{ fontSize: size * 0.65, fontWeight: 700 }}>.{dec}</span>
+      {safe.toFixed(1)}
     </span>
   );
 };
@@ -248,10 +246,9 @@ const SortableManageItem: React.FC<SortableItemProps> = ({
         </div>
       </div>
 
-      {/* Course info — serif name + dispatch caps + serif score */}
+      {/* Course info - canonical row text */}
       <div style={{ flex: 1, minWidth: 0 }}>
         <div style={{
-          fontFamily: FONT_SERIF,
           fontSize: 15,
           fontWeight: 700,
           color: INK,
@@ -280,7 +277,7 @@ const SortableManageItem: React.FC<SortableItemProps> = ({
           {ratingNum != null && (
             <>
               <span style={{ color: '#CBD5E1' }}>·</span>
-              <SerifScore value={ratingNum} size={13} />
+              <PlainScore value={ratingNum} size={13} />
             </>
           )}
         </div>
@@ -421,7 +418,6 @@ const CourseRow: React.FC<CourseRowProps> = ({
 
     <div style={{ flex: 1, minWidth: 0 }}>
       <div style={{
-        fontFamily: FONT_SERIF,
         fontSize: 15,
         fontWeight: 700,
         color: INK,
@@ -450,7 +446,7 @@ const CourseRow: React.FC<CourseRowProps> = ({
         {course.has_rating && course.rating_value != null && (
           <>
             <span style={{ color: '#CBD5E1' }}>·</span>
-            <SerifScore value={course.rating_value} size={13} />
+            <PlainScore value={course.rating_value} size={13} />
           </>
         )}
       </div>
@@ -670,7 +666,6 @@ export const AddCourseModal: React.FC<AddCourseModalProps> = ({
           eyebrow="YOUR COURSES"
           title={<span id="add-course-title">Personal Top 10</span>}
           onClose={onClose}
-          borderBottom={false}
         />
 
         {/* 10 / 10 status line */}
@@ -686,7 +681,7 @@ export const AddCourseModal: React.FC<AddCourseModalProps> = ({
           }}>
             <span style={{ color: AMBER_DEEP, fontWeight: 700 }}>10 / 10 list complete</span>
             <span style={{ color: '#CBD5E1' }}>·</span>
-            <span style={{ fontStyle: 'italic' }}>Remove one to add another</span>
+            <span>Remove one to add another</span>
           </div>
         )}
 
@@ -833,7 +828,7 @@ export const AddCourseModal: React.FC<AddCourseModalProps> = ({
                         <span style={{
                           fontSize: 10,
                           fontWeight: 800,
-                          letterSpacing: '0.22em',
+                          letterSpacing: '0.14em',
                           color: INK_SUBTLE,
                           textTransform: 'uppercase',
                         }}>
@@ -841,9 +836,8 @@ export const AddCourseModal: React.FC<AddCourseModalProps> = ({
                         </span>
                       </div>
                       <p style={{
-                        fontFamily: FONT_SERIF,
                         fontSize: 14,
-                        fontWeight: 400,
+                        fontWeight: 500,
                         color: INK,
                         lineHeight: 1.4,
                         margin: 0,
@@ -973,7 +967,7 @@ export const AddCourseModal: React.FC<AddCourseModalProps> = ({
                 {/* Pre-selected course highlight */}
                 {preSelectedCourse && !isPreSelectedInTop10 && (
                   <>
-                    <div style={{ padding: '14px 16px 8px' }}><SectionHeader tier="standard" kicker="Course You're Reviewing" /></div>
+                    <div style={{ padding: '14px 16px 8px' }}><SectionHeader tier="standard" kicker="COURSE YOU'RE REVIEWING" /></div>
                     <CourseRow
                       course={{
                         id: preSelectedCourse.id,
@@ -994,7 +988,7 @@ export const AddCourseModal: React.FC<AddCourseModalProps> = ({
 
                 {ratedCourses.length > 0 && (
                   <>
-                    <div style={{ padding: '14px 16px 8px' }}><SectionHeader tier="standard" kicker="Your Rated Courses" /></div>
+                    <div style={{ padding: '14px 16px 8px' }}><SectionHeader tier="standard" kicker="YOUR RATED COURSES" /></div>
                     {ratedCourses
                       .filter(c => c.id !== preSelectedCourseId)
                       .map((course) => (
@@ -1012,7 +1006,7 @@ export const AddCourseModal: React.FC<AddCourseModalProps> = ({
 
                 {unratedCourses.length > 0 && (
                   <>
-                    <div style={{ padding: '14px 16px 8px' }}><SectionHeader tier="standard" kicker="Rate to Add" /></div>
+                    <div style={{ padding: '14px 16px 8px' }}><SectionHeader tier="standard" kicker="RATE TO ADD" /></div>
                     {unratedCourses.map((course) => (
                       <CourseRow
                         key={course.id}
