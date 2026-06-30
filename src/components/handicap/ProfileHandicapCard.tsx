@@ -11,7 +11,7 @@
 
 import React, { useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ChevronRight, Trophy } from 'lucide-react';
+import { Trophy } from 'lucide-react';
 import {
   useWhsConnection,
   useHandicapTrend,
