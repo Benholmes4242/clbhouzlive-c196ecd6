@@ -105,22 +105,13 @@ export const CardFeed = forwardRef<CardFeedHandle, CardFeedProps>(function CardF
   // BEFORE flipping activeTab (the keyed remount tears us down otherwise).
   const captureSnapshot = useCallback(() => {
     try {
-      const vr = virtuosoRef.current;
-      console.log('[snap] capture called, ref?', !!vr);
-      vr?.getState?.((snap: any) => {
-        console.log('[snap] getState fired, ranges?', !!snap, snap?.ranges?.length, 'scrollTop', snap?.scrollTop);
+      virtuosoRef.current?.getState?.((snap: any) => {
         onSnapshotRef.current?.(snap);
       });
-    } catch (e) { console.log('[snap] capture threw', e); }
+    } catch { /* noop */ }
   }, []);
 
   useImperativeHandle(ref, () => ({ captureSnapshot }), [captureSnapshot]);
-
-  // DBG: mount log
-  useEffect(() => {
-    console.log('[snap] CardFeed mount tab=', tab, 'initialState?', !!initialState, 'scrollTop', (initialState as any)?.scrollTop, 'posts', posts.length);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
 
   // Secondary fallback: useLayoutEffect cleanup runs BEFORE the ref is
   // nulled (unlike a passive useEffect cleanup), so the snapshot still
@@ -128,6 +119,42 @@ export const CardFeed = forwardRef<CardFeedHandle, CardFeedProps>(function CardF
   useLayoutEffect(() => {
     return () => { captureSnapshot(); };
   }, [captureSnapshot]);
+
+  // ── Restore scrollTop explicitly ──────────────────────────────────
+  // `restoreStateFrom` rehydrates the materialized item RANGES so the
+  // target cards mount, but react-virtuoso does NOT reliably restore raw
+  // scrollTop on a fresh mount when item heights are dynamic (cards with
+  // images/video that measure after mount). Items re-measure, offsets
+  // recompute, scroll resets to 0. So drive scrollTop ourselves, with a
+  // short rAF retry loop to absorb the post-measure shift.
+  // Guard `> 0` skips PTR rubber-band negative "top" snapshots.
+  const restoreScrollTopRef = useRef<number | null>(
+    initialState && typeof (initialState as any).scrollTop === 'number' && (initialState as any).scrollTop > 0
+      ? (initialState as any).scrollTop
+      : null
+  );
+
+  useLayoutEffect(() => {
+    const target = restoreScrollTopRef.current;
+    if (target == null) return;
+    let tries = 0;
+    let raf = 0;
+    const apply = () => {
+      const vr = virtuosoRef.current;
+      const scroller = scrollerElRef.current;
+      if (!vr || !scroller) { raf = requestAnimationFrame(apply); return; }
+      vr.scrollTo({ top: target });
+      tries++;
+      if (tries < 6 && Math.abs(scroller.scrollTop - target) > 4) {
+        raf = requestAnimationFrame(apply);
+      } else {
+        restoreScrollTopRef.current = null; // release so we never fight the user
+      }
+    };
+    raf = requestAnimationFrame(apply);
+    return () => cancelAnimationFrame(raf);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
 
   // Explore tab retap → scroll Clubhouse feed to top
