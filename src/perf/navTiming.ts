@@ -248,11 +248,17 @@ class NavTimingController {
     this.clsObserver = null;
 
     const m = tx.marks;
+    // `total` = shell paint (FCP-equivalent). We keep nav close at interactive
+    // so every page stays comparable on first-paint regardless of deep data.
     const end = m.interactive ?? m['content-painted'] ?? m['data-settled'] ?? performance.now();
     const total = Math.round(end - tx.startedAt);
+    // `content` = settle (LCP-equivalent). Null when the page didn't signal
+    // readiness via usePageReady — most non-feed pages today.
+    const content =
+      m['content-painted'] != null
+        ? Math.round(m['content-painted']! - tx.startedAt)
+        : null;
 
-    const lazy =
-      m['lazy-start'] != null && m['lazy-end'] != null
         ? Math.round(m['lazy-end']! - m['lazy-start']!)
         : 0;
     const skeleton =
