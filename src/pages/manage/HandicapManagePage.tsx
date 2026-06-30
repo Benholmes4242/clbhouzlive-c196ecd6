@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Link2Off, Trash2, CheckCircle2, AlertTriangle } from 'lucide-react';
+import { Link2, Trash2, CheckCircle2, AlertTriangle } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
 import { toast } from 'sonner';
 import { useQueryClient } from '@tanstack/react-query';
@@ -8,16 +8,18 @@ import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { callDisconnectWhs, callDeleteWhsData } from '@/lib/whs/api';
 import { useWhsConnection, whsKeys } from '@/lib/whs/hooks';
 import type { WhsConnection } from '@/lib/whs/types';
-import { MiniFlag } from '@/components/profile/handicap/whs/connect/MiniFlag';
 import { WhsConnectScreen } from '@/components/profile/handicap/whs/WhsConnectScreen';
 import DisconnectConfirmSheet from '@/components/settings/sheets/DisconnectConfirmSheet';
 import DeleteAllDataConfirmSheet from '@/components/settings/sheets/DeleteAllDataConfirmSheet';
 
 const INK = '#0F172A';
-const INK_55 = '#64748B';
-const AMBER = '#F7931E';
+const INK_45 = '#64748B';
+const HAIR = 'rgba(15,23,42,0.08)';
 const GREEN = '#059669';
-const RED = '#B91C1C';
+const GREEN_BG = 'rgba(5,150,105,0.08)';
+const AMBER_SOFT_BG = 'rgba(180,83,9,0.08)';
+const AMBER_SOFT_FG = '#B45309';
+const DANGER = '#DC2626';
 const FONT = 'Geist, -apple-system, BlinkMacSystemFont, system-ui, sans-serif';
 
 export default function HandicapManagePage() {
@@ -83,14 +85,7 @@ export default function HandicapManagePage() {
 
   return (
     <ManagePageShell title={connection ? 'England Golf' : 'Connect handicap'}>
-      <div className="px-4 pt-4">
-        <div className="flex items-center gap-2 mb-3 px-1">
-          <MiniFlag iso="GB-ENG" />
-          <span className="text-[11px] font-semibold uppercase tracking-[1.5px]" style={{ color: AMBER, fontFamily: FONT }}>
-            England Golf
-          </span>
-        </div>
-
+      <div className="px-4 pt-4 pb-8">
         {connection ? (
           <SyncedBody
             connection={connection}
@@ -98,9 +93,7 @@ export default function HandicapManagePage() {
             onDelete={() => setConfirmDelete(true)}
           />
         ) : (
-          <div className="rounded-2xl overflow-hidden" style={{ background: '#fff', border: '1px solid rgba(15,23,42,0.07)' }}>
-            <WhsConnectScreen onConnected={() => { invalidateAll(); }} onSkip={() => { /* stay on page */ }} />
-          </div>
+          <WhsConnectScreen onConnected={() => { invalidateAll(); }} onSkip={() => { /* stay on page */ }} />
         )}
       </div>
 
@@ -130,64 +123,129 @@ const SyncedBody: React.FC<{
   const isAuthFailed = connection.last_sync_status === 'auth_failed';
   const connectedAt = new Date(connection.created_at);
 
+  const rows = [
+    { label: 'Membership', value: connection.membership_number || '--' },
+    { label: 'Passport ID', value: String(connection.passport_id ?? '--') },
+    { label: 'Connected', value: formatDistanceToNow(connectedAt, { addSuffix: true }) },
+    { label: 'Last sync', value: lastSyncedAt ? formatDistanceToNow(lastSyncedAt, { addSuffix: true }) : '--' },
+  ];
+
   return (
-    <div className="space-y-4">
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 14, fontFamily: FONT }}>
       {/* Facts card */}
-      <div className="rounded-2xl px-4" style={{ background: '#fff', border: '1px solid rgba(15,23,42,0.07)' }}>
-        <FactRow label="Membership" value={connection.membership_number || '\u2014'} />
-        <FactRow label="Passport ID" value={String(connection.passport_id ?? '\u2014')} />
-        <FactRow label="Connected" value={formatDistanceToNow(connectedAt, { addSuffix: true })} />
-        <FactRow
-          label="Last sync"
-          value={lastSyncedAt ? formatDistanceToNow(lastSyncedAt, { addSuffix: true }) : '\u2014'}
-          isLast
-        />
+      <div style={{ background: '#fff', border: `1px solid ${HAIR}`, borderRadius: 16, padding: '4px 16px' }}>
+        {rows.map((r, i) => (
+          <div
+            key={r.label}
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              padding: '14px 0',
+              borderBottom: i === rows.length - 1 ? 'none' : `1px solid ${HAIR}`,
+            }}
+          >
+            <span
+              style={{
+                fontSize: 11,
+                fontWeight: 700,
+                letterSpacing: '0.12em',
+                textTransform: 'uppercase',
+                color: INK_45,
+              }}
+            >
+              {r.label}
+            </span>
+            <span
+              style={{
+                fontSize: 15,
+                fontWeight: 600,
+                color: INK,
+                fontVariantNumeric: 'tabular-nums',
+              }}
+            >
+              {r.value}
+            </span>
+          </div>
+        ))}
       </div>
 
       {/* Status pill */}
-      <div
-        style={{
-          display: 'flex', alignItems: 'center', gap: 8,
-          padding: '10px 14px', borderRadius: 999,
-          background: isAuthFailed ? 'rgba(247,147,30,0.10)' : 'rgba(5,150,105,0.10)',
-        }}
-      >
-        {isAuthFailed
-          ? <AlertTriangle size={16} color={AMBER} strokeWidth={2.4} />
-          : <CheckCircle2 size={16} color={GREEN} strokeWidth={2.4} />}
-        <span style={{ fontSize: 13, fontWeight: 600, color: isAuthFailed ? AMBER : GREEN, fontFamily: FONT }}>
-          {isAuthFailed
-            ? 'Sync issue \u2014 try disconnect & reconnect'
-            : `Synced ${lastSyncedAt ? formatDistanceToNow(lastSyncedAt, { addSuffix: true }) : 'recently'}`}
-        </span>
+      <div style={{ display: 'flex', justifyContent: 'center' }}>
+        <div
+          style={{
+            display: 'inline-flex',
+            alignItems: 'center',
+            gap: 8,
+            padding: '8px 14px',
+            borderRadius: 999,
+            background: isAuthFailed ? AMBER_SOFT_BG : GREEN_BG,
+          }}
+        >
+          {isAuthFailed ? (
+            <AlertTriangle size={15} color={AMBER_SOFT_FG} strokeWidth={2.4} />
+          ) : (
+            <CheckCircle2 size={15} color={GREEN} strokeWidth={2.4} />
+          )}
+          <span
+            style={{
+              fontSize: 13,
+              fontWeight: 600,
+              color: isAuthFailed ? AMBER_SOFT_FG : GREEN,
+            }}
+          >
+            {isAuthFailed
+              ? 'Sync issue, try disconnect and reconnect'
+              : `Synced ${lastSyncedAt ? formatDistanceToNow(lastSyncedAt, { addSuffix: true }) : 'recently'}`}
+          </span>
+        </div>
       </div>
 
-      <p style={{ fontSize: 13, color: INK_55, textAlign: 'center', lineHeight: 1.5, fontFamily: FONT }}>
+      <p style={{ fontSize: 13, color: INK_45, textAlign: 'center', lineHeight: 1.5, margin: 0 }}>
         Your handicap syncs automatically twice daily.
       </p>
 
       <button
         onClick={onDisconnect}
         style={{
-          width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
-          padding: '13px 16px', borderRadius: 12,
-          background: '#fff', color: INK,
-          border: '1px solid rgba(15,23,42,0.14)',
-          fontSize: 15, fontWeight: 500, fontFamily: FONT, cursor: 'pointer',
+          width: '100%',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          gap: 8,
+          minHeight: 52,
+          padding: '13px 16px',
+          borderRadius: 14,
+          background: '#fff',
+          color: INK,
+          border: `1px solid ${HAIR}`,
+          fontSize: 15,
+          fontWeight: 600,
+          fontFamily: FONT,
+          cursor: 'pointer',
         }}
       >
-        <Link2Off size={16} />
+        <Link2 size={16} color={INK} />
         Disconnect
       </button>
 
       <button
         onClick={onDelete}
         style={{
-          width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6,
-          padding: '11px 16px', borderRadius: 12,
-          background: 'transparent', color: RED,
+          width: '100%',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          gap: 6,
+          padding: '12px 16px',
+          borderRadius: 12,
+          background: 'transparent',
+          color: DANGER,
           border: 'none',
-          fontSize: 13, fontWeight: 500, fontFamily: FONT, cursor: 'pointer',
+          fontSize: 13,
+          fontWeight: 600,
+          fontFamily: FONT,
+          cursor: 'pointer',
         }}
       >
         <Trash2 size={14} />
@@ -196,22 +254,3 @@ const SyncedBody: React.FC<{
     </div>
   );
 };
-
-function FactRow({ label, value, isLast }: { label: string; value: string; isLast?: boolean }) {
-  return (
-    <div
-      style={{
-        display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-        padding: '14px 0',
-        borderBottom: isLast ? 'none' : '0.5px solid rgba(15,23,42,0.08)',
-      }}
-    >
-      <span style={{ fontSize: 11, fontWeight: 600, letterSpacing: '0.10em', textTransform: 'uppercase', color: INK_55, fontFamily: FONT }}>
-        {label}
-      </span>
-      <span style={{ fontSize: 14, fontWeight: 500, color: INK, fontVariantNumeric: 'tabular-nums', fontFamily: FONT }}>
-        {value}
-      </span>
-    </div>
-  );
-}
