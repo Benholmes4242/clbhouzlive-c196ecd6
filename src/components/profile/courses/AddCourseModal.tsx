@@ -967,7 +967,7 @@ export const AddCourseModal: React.FC<AddCourseModalProps> = ({
                 {/* Pre-selected course highlight */}
                 {preSelectedCourse && !isPreSelectedInTop10 && (
                   <>
-                    <div style={{ padding: '14px 16px 8px' }}><SectionHeader tier="standard" kicker="Course You're Reviewing" /></div>
+                    <div style={{ padding: '14px 16px 8px' }}><SectionHeader tier="standard" kicker="COURSE YOU'RE REVIEWING" /></div>
                     <CourseRow
                       course={{
                         id: preSelectedCourse.id,
