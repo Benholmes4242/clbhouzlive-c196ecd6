@@ -2,6 +2,7 @@ import React, { useRef, useState, useCallback, useImperativeHandle, forwardRef }
 import { Camera, User, Plus } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { ImageCropperModal } from './ImageCropperModal';
+import { PhotoActionSheet } from './PhotoActionSheet';
 
 interface ProfilePhotoCardProps {
   currentUrl?: string | null;
@@ -13,10 +14,11 @@ interface ProfilePhotoCardProps {
 
 export interface ProfilePhotoCardHandle {
   openPicker: () => void;
+  openSheet: () => void;
 }
 
-// Profile photo aspect ratio: squircle spec (1:1.05)
-const PROFILE_ASPECT_RATIO = 1 / 1.05;
+// Profile photo: even square (1:1) for the squircle avatar.
+const PROFILE_ASPECT_RATIO = 1;
 
 export const ProfilePhotoCard = forwardRef<ProfilePhotoCardHandle, ProfilePhotoCardProps>(({
   currentUrl,
@@ -28,16 +30,23 @@ export const ProfilePhotoCard = forwardRef<ProfilePhotoCardHandle, ProfilePhotoC
   const inputRef = useRef<HTMLInputElement>(null);
   const [cropperImage, setCropperImage] = useState<string | null>(null);
   const [showCropper, setShowCropper] = useState(false);
+  const [sheetOpen, setSheetOpen] = useState(false);
 
   const displayUrl = previewUrl || currentUrl;
 
   const handleClick = () => {
-    inputRef.current?.click();
+    if (variant === 'bare') {
+      setSheetOpen(true);
+    } else {
+      inputRef.current?.click();
+    }
   };
 
   useImperativeHandle(ref, () => ({
     openPicker: () => inputRef.current?.click(),
+    openSheet: () => setSheetOpen(true),
   }), []);
+
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -81,11 +90,21 @@ export const ProfilePhotoCard = forwardRef<ProfilePhotoCardHandle, ProfilePhotoC
       onOpenChange={handleCropperClose}
       image={cropperImage}
       aspectRatio={PROFILE_ASPECT_RATIO}
-      cropShape="rect"
+      cropShape={variant === 'bare' ? 'round' : 'rect'}
       title="Crop Profile Photo"
       onCropComplete={handleCropComplete}
     />
   ) : null;
+
+  const triggerPicker = () => inputRef.current?.click();
+  const triggerCapture = () => {
+    const el = inputRef.current;
+    if (!el) return;
+    el.setAttribute('capture', 'user');
+    el.click();
+    // Remove capture so subsequent "Choose photo" opens the gallery normally.
+    setTimeout(() => el.removeAttribute('capture'), 300);
+  };
 
   if (variant === 'bare') {
     return (
@@ -98,11 +117,11 @@ export const ProfilePhotoCard = forwardRef<ProfilePhotoCardHandle, ProfilePhotoC
             style={{
               width: 78,
               height: 78,
-              borderRadius: 20,
+              borderRadius: '34%',
               overflow: 'hidden',
               background: '#E2E8F0',
               border: '3px solid #ffffff',
-              boxShadow: '0 4px 14px rgba(15,23,42,0.18)',
+              boxShadow: '0 2px 10px rgba(0,0,0,0.10)',
               padding: 0,
               cursor: 'pointer',
               display: 'block',
@@ -154,9 +173,20 @@ export const ProfilePhotoCard = forwardRef<ProfilePhotoCardHandle, ProfilePhotoC
         </div>
         {fileInput}
         {cropper}
+        <PhotoActionSheet
+          open={sheetOpen}
+          onClose={() => setSheetOpen(false)}
+          title="Profile photo"
+          hasPhoto={Boolean(displayUrl)}
+          removeLabel="Remove photo"
+          onChoose={triggerPicker}
+          onTake={triggerCapture}
+          onRemove={onRemove}
+        />
       </>
     );
   }
+
 
   return (
     <div>

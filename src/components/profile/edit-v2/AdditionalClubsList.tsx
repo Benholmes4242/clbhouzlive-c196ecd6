@@ -41,12 +41,25 @@ export function AdditionalClubsList({
           {clubs.map((club) => (
             <div
               key={club.id}
-              className="flex items-center justify-between bg-[#F8FAFC] border border-border/60 rounded-[11px] px-4 py-3 min-h-[44px]"
+              className="flex items-center justify-between bg-[#F8FAFC] border border-border/60 rounded-[11px] px-3.5 py-3"
             >
-              <p className="text-[14px] font-medium text-foreground">{club.name}</p>
+              <p className="text-[15px] text-foreground">{club.name}</p>
               <button
                 onClick={() => onRemove(club.id)}
-                className="flex items-center justify-center min-h-[44px] min-w-[44px] text-muted-foreground -mr-2"
+                aria-label={`Remove ${club.name}`}
+                style={{
+                  width: 24,
+                  height: 24,
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  background: 'transparent',
+                  border: 'none',
+                  padding: 4,
+                  margin: '-6px -4px -6px 0',
+                  color: '#94A3B8',
+                  cursor: 'pointer',
+                }}
               >
                 <X size={16} />
               </button>
@@ -54,6 +67,7 @@ export function AdditionalClubsList({
           ))}
         </div>
       )}
+
 
       {showSearch ? (
         <div className="relative">

@@ -426,24 +426,6 @@ function ProfileTabBody({
                   setField('profilePhotoUrl', null);
                 }}
               />
-              <button
-                type="button"
-                onClick={() => profilePickerRef.current?.openPicker()}
-                style={{
-                  marginTop: 28,
-                  background: 'transparent',
-                  border: 'none',
-                  padding: '6px 2px',
-                  cursor: 'pointer',
-                  fontFamily: GEIST,
-                  fontSize: 13.5,
-                  fontWeight: 600,
-                  color: INK,
-                  letterSpacing: '-0.005em',
-                }}
-              >
-                Change photos
-              </button>
             </div>
             <div style={{ paddingTop: 12, paddingBottom: 14 }}>
               {!hasAvatar ? (
@@ -451,33 +433,11 @@ function ProfileTabBody({
                   Golfers with a photo get 3x more friend requests
                 </Nudge>
               ) : null}
-              {hasHeader ? (
-                <button
-                  type="button"
-                  onClick={() => {
-                    setField('headerPhotoBlob', null);
-                    setField('headerPhotoUrl', null);
-                  }}
-                  style={{
-                    marginTop: hasAvatar ? 0 : 6,
-                    marginLeft: 4,
-                    background: 'transparent',
-                    border: 'none',
-                    padding: 0,
-                    cursor: 'pointer',
-                    fontFamily: GEIST,
-                    fontSize: 12,
-                    fontWeight: 500,
-                    color: '#DC2626',
-                  }}
-                >
-                  Remove cover
-                </button>
-              ) : null}
             </div>
           </div>
         </ManageCard>
       </div>
+
 
       {/* Identity card (hairline-divided rows) */}
       <div className="px-4 pb-4">
