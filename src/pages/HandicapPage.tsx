@@ -429,6 +429,15 @@ const HandicapPage: React.FC = () => {
   // a special-case background.
   const isConnectFlow = !isFriendView && !connLoading && !ownConnection;
 
+  // Apply the dark route theming only when NOT in the connect flow.
+  // The connect flow uses Direction A (light) and the dark theming would
+  // bleed through child surfaces.
+  useLayoutEffect(() => {
+    if (isConnectFlow) return;
+    document.body.classList.add('route-handicap');
+    return () => { document.body.classList.remove('route-handicap'); };
+  }, [isConnectFlow]);
+
   if (loading) {
     return <PageRoot dark={true}><div /></PageRoot>;
   }
