@@ -96,20 +96,19 @@ const getPositionBadgeStyle = (position: number): { bg: string; text: string; sh
   }
 };
 
-// Serif rating score with reduced decimal — matches Courses tab editorial language
-const SerifScore: React.FC<{ value: number; size?: number }> = ({ value, size = 13 }) => {
+// Plain tabular score (e.g. 9.7) - canonical replacement for the retired SerifScore.
+const PlainScore: React.FC<{ value: number; size?: number }> = ({ value, size = 13 }) => {
   const safe = Number.isFinite(value) ? value : 0;
-  const int = Math.floor(safe);
-  const dec = Math.round((safe * 10) % 10);
   return (
     <span style={{
-      fontFamily: FONT_SERIF,
+      fontSize: size,
+      fontWeight: 800,
       color: INK,
-      lineHeight: 1,
-      letterSpacing: '-0.02em',
+      letterSpacing: '-0.01em',
+      fontVariantNumeric: 'tabular-nums',
+      fontFeatureSettings: '"kern" 1, "liga" 1, "tnum" 1',
     }}>
-      <span style={{ fontSize: size, fontWeight: 900 }}>{int}</span>
-      <span style={{ fontSize: size * 0.65, fontWeight: 700 }}>.{dec}</span>
+      {safe.toFixed(1)}
     </span>
   );
 };
