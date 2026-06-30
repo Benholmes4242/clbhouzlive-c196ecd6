@@ -176,7 +176,10 @@ class NavTimingController {
         }
         this.notify();
       });
-      this.clsObserver.observe({ type: 'layout-shift', buffered: true } as any);
+      // Intentionally NOT buffered: we want only shifts that occur during
+      // THIS nav's window, not every shift since page load (which would make
+      // CLS climb monotonically across the session).
+      this.clsObserver.observe({ type: 'layout-shift' } as any);
     } catch {
       this.clsObserver = null;
     }
