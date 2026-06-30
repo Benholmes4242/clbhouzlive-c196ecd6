@@ -45,7 +45,7 @@ function makeInitial(profile: any): ProfileFormData {
     city: profile?.city ?? '',
     isPublic: profile?.is_public ?? true,
     gender: profile?.gender ?? '',
-    handicapPageVisibility: profile?.handicap_page_visibility ?? 'everyone',
+    
   };
 }
 
@@ -99,8 +99,7 @@ export function useProfileForm(profile: any, loading?: boolean) {
       JSON.stringify(form.additionalClubs) !== JSON.stringify(initialData.additionalClubs) ||
       form.homeClubVisibility !== initialData.homeClubVisibility ||
       form.additionalClubsVisibility !== initialData.additionalClubsVisibility ||
-      form.gender !== initialData.gender ||
-      form.handicapPageVisibility !== initialData.handicapPageVisibility
+      form.gender !== initialData.gender
     );
   }, [form, initialData]);
 
