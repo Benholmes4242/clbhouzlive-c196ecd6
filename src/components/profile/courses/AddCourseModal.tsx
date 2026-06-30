@@ -615,6 +615,7 @@ export const AddCourseModal: React.FC<AddCourseModalProps> = ({
           eyebrow="YOUR COURSES"
           title={<span id="add-course-title">Personal Top 10</span>}
           onClose={onClose}
+          borderBottom={false}
         />
 
         {/* 10 / 10 status line */}
