@@ -300,6 +300,7 @@ class NavTimingController {
       id: tx.id,
       path: tx.path,
       total,
+      content,
       lazy,
       skeleton,
       data,
