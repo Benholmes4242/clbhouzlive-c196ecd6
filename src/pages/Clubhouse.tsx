@@ -186,11 +186,11 @@ const ClubhouseContent = () => {
   const isLoading = activeFeed.isLoading;
   const hasNextPage = activeFeed.hasNextPage ?? false;
   
-  // Skeleton timing
-  const { 
-    skeletonVisible, 
-    skeletonMode, 
-    signalFirstFrameReady,
+  // Skeleton timing — first-content-ready contract
+  const {
+    skeletonVisible,
+    skeletonMode,
+    signalFirstContentReady,
     resetSkeleton,
   } = useClubhouseSkeletonTiming(!isLoading && posts.length > 0);
 
