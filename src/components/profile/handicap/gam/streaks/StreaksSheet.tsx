@@ -31,7 +31,7 @@ function derivePbState(row: StreakRow | null): PbState {
   return 'AT_PB';
 }
 
-const SectionHeader: React.FC<{
+const StreakGroupLabel: React.FC<{
   label: string;
   count: number;
   amberDot?: boolean;
@@ -271,15 +271,11 @@ const Eyebrow: React.FC = () => (
     style={{
       fontSize: 11,
       fontWeight: 800,
-      letterSpacing: '0.16em',
+      letterSpacing: '0.14em',
       textTransform: 'uppercase',
-      color: 'var(--hcp-t-100)',
-      display: 'flex',
-      alignItems: 'center',
-      gap: 6,
+      color: 'var(--hcp-t-60)',
     }}
   >
-    <span style={{ color: AMBER }} aria-hidden>•</span>
     STREAKS
   </div>
 );
@@ -323,7 +319,7 @@ export const StreaksSheet: React.FC<StreaksSheetProps> = ({ open, onClose }) => 
           style={{
             width: 36,
             height: 4,
-            borderRadius: 2,
+            borderRadius: 99,
             background: 'var(--hcp-line-2, var(--hcp-line))',
           }}
         />
