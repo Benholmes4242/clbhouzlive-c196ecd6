@@ -2,6 +2,7 @@ import React, { useRef, useState, useCallback, useImperativeHandle, forwardRef }
 import { Camera, User, Plus } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { ImageCropperModal } from './ImageCropperModal';
+import { PhotoActionSheet } from './PhotoActionSheet';
 
 interface ProfilePhotoCardProps {
   currentUrl?: string | null;
@@ -13,10 +14,11 @@ interface ProfilePhotoCardProps {
 
 export interface ProfilePhotoCardHandle {
   openPicker: () => void;
+  openSheet: () => void;
 }
 
-// Profile photo aspect ratio: squircle spec (1:1.05)
-const PROFILE_ASPECT_RATIO = 1 / 1.05;
+// Profile photo: even square (1:1) for the squircle avatar.
+const PROFILE_ASPECT_RATIO = 1;
 
 export const ProfilePhotoCard = forwardRef<ProfilePhotoCardHandle, ProfilePhotoCardProps>(({
   currentUrl,
