@@ -245,14 +245,34 @@ const BusinessProfilePage: React.FC = () => {
 
   if (error || !business) {
     return (
-      <div className="min-h-screen flex items-center justify-center p-4 bg-background">
-        <div className="max-w-md text-center">
-          <AlertCircle className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-          <h1 className="text-2xl font-semibold mb-2">Business not found</h1>
-          <p className="text-muted-foreground mb-6">
-            This business may have been removed or is no longer available.
+      <div className="min-h-screen flex items-center justify-center p-6 bg-background">
+        <div className="max-w-sm w-full text-center">
+          {/* Amber flag-on-green motif */}
+          <div
+            className="mx-auto mb-6 flex h-20 w-20 items-center justify-center rounded-full"
+            style={{ background: 'rgba(247,147,30,0.10)' }}
+          >
+            <Flag className="h-9 w-9" style={{ color: '#F7931E' }} strokeWidth={2.2} />
+          </div>
+          <h1 className="text-[22px] font-semibold tracking-tight mb-2">
+            This club isn&apos;t on the course
+          </h1>
+          <p className="text-muted-foreground text-[15px] leading-relaxed mb-7">
+            We couldn&apos;t find this business. It may have been removed, renamed, or the link
+            you followed is out of date.
           </p>
-          <Button onClick={() => navigate(-1)}>Go back</Button>
+          <div className="flex flex-col gap-2.5">
+            <Button onClick={() => navigate('/')} className="w-full h-12 text-[15px] font-semibold">
+              Back to home
+            </Button>
+            <Button
+              variant="ghost"
+              onClick={() => (window.history.length > 1 ? navigate(-1) : navigate('/'))}
+              className="w-full h-11 text-[15px] text-muted-foreground"
+            >
+              Go back
+            </Button>
+          </div>
         </div>
       </div>
     );
