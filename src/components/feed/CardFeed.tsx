@@ -105,13 +105,22 @@ export const CardFeed = forwardRef<CardFeedHandle, CardFeedProps>(function CardF
   // BEFORE flipping activeTab (the keyed remount tears us down otherwise).
   const captureSnapshot = useCallback(() => {
     try {
-      virtuosoRef.current?.getState?.((snap) => {
+      const vr = virtuosoRef.current;
+      console.log('[snap] capture called, ref?', !!vr);
+      vr?.getState?.((snap: any) => {
+        console.log('[snap] getState fired, ranges?', !!snap, snap?.ranges?.length, 'scrollTop', snap?.scrollTop);
         onSnapshotRef.current?.(snap);
       });
-    } catch {}
+    } catch (e) { console.log('[snap] capture threw', e); }
   }, []);
 
   useImperativeHandle(ref, () => ({ captureSnapshot }), [captureSnapshot]);
+
+  // DBG: mount log
+  useEffect(() => {
+    console.log('[snap] CardFeed mount tab=', tab, 'initialState?', !!initialState, 'scrollTop', (initialState as any)?.scrollTop, 'posts', posts.length);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   // Secondary fallback: useLayoutEffect cleanup runs BEFORE the ref is
   // nulled (unlike a passive useEffect cleanup), so the snapshot still
