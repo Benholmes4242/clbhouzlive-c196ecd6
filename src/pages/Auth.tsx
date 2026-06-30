@@ -5,7 +5,7 @@ import AuthForm from "./auth/AuthForm";
 import { useHideBottomNav } from '@/hooks/useBottomNavVisibility';
 import { useHideHeader } from '@/hooks/useHeaderVisibility';
 import { useSupabaseSession } from "@/hooks/useSupabaseSession";
-import { PerfToggleButton } from "@/perf/PerfToggleButton";
+
 
 
 interface AuthProps {
@@ -151,10 +151,6 @@ const Auth: React.FC<AuthProps> = ({ defaultSignUp = false }) => {
         authNotice={authNotice}
         setAuthNotice={setAuthNotice}
       />
-      {/* PRE-LAUNCH ONLY: visible debug toggle. Remove before public release. */}
-      <div style={{ padding: '0 16px 16px' }}>
-        <PerfToggleButton />
-      </div>
     </div>
 
   );

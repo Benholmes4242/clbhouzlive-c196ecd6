@@ -1,4 +1,4 @@
-// Pre-launch visible debug toggle. Mounted on /auth only. REMOVE before public release.
+// Pre-launch visible debug toggle. Mounted app-wide in App.tsx. REMOVE before public release.
 import React, { useState, useEffect } from 'react';
 import { isPerfEnabled, setPerfLive, subscribePerfLive } from '@/perf/navTiming';
 
@@ -10,19 +10,23 @@ export function PerfToggleButton() {
     <button
       type="button"
       onClick={() => setPerfLive(!on)}
+      aria-label="Toggle debug logging"
       style={{
-        marginTop: 16,
-        width: '100%',
-        padding: '8px 12px',
-        fontSize: 12,
+        position: 'fixed',
+        bottom: 80,
+        left: 8,
+        zIndex: 100000,
+        padding: '6px 10px',
+        fontSize: 11,
         fontFamily: 'monospace',
-        background: on ? 'rgba(103,232,249,0.15)' : 'rgba(255,255,255,0.04)',
+        background: on ? 'rgba(103,232,249,0.18)' : 'rgba(0,0,0,0.7)',
         color: on ? '#67e8f9' : '#9ca3af',
-        border: '1px solid rgba(103,232,249,0.3)',
-        borderRadius: 8,
+        border: '1px solid rgba(103,232,249,0.35)',
+        borderRadius: 6,
+        WebkitTapHighlightColor: 'transparent',
       }}
     >
-      {on ? 'Debug logging ON — tap to disable' : 'Enable debug logging'}
+      {on ? 'DBG ON' : 'DBG'}
     </button>
   );
 }
