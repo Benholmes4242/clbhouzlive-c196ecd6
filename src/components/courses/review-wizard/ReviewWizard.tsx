@@ -208,7 +208,6 @@ export function ReviewWizard({
   );
 
   const hasMedia = existingTiles.length + pendingTiles.length > 0;
-  const verdictGrows = keyboardHeight === 0 && !hasMedia;
 
   /* ── Media editor state ──────────────────────────────────────────────── */
   const [editorOpen, setEditorOpen] = useState(false);
