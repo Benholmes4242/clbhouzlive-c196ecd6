@@ -50,6 +50,8 @@ export interface CardFeedProps {
   currentUserId?: string;
   onRefresh?: () => void | Promise<void>;
   isRefreshing?: boolean;
+  /** Fires once when the first card's primary content is paint-ready. */
+  onFirstContentReady?: () => void;
 }
 
 const PTR_THRESHOLD = 64;
