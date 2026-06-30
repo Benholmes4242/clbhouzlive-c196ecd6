@@ -988,7 +988,7 @@ export const AddCourseModal: React.FC<AddCourseModalProps> = ({
 
                 {ratedCourses.length > 0 && (
                   <>
-                    <div style={{ padding: '14px 16px 8px' }}><SectionHeader tier="standard" kicker="Your Rated Courses" /></div>
+                    <div style={{ padding: '14px 16px 8px' }}><SectionHeader tier="standard" kicker="YOUR RATED COURSES" /></div>
                     {ratedCourses
                       .filter(c => c.id !== preSelectedCourseId)
                       .map((course) => (
