@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { Search, ChevronRight, X } from 'lucide-react';
+import { Search, ChevronRight, X, Swords, Pin } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import GamSheet from '@/components/profile/handicap/gam/_shared/GamSheet';
 import { Skeleton, EmptyStub, RetryStub } from '@/components/profile/handicap/gam/_shared/GamAtoms';
@@ -207,12 +207,22 @@ export const PlayerSearchSheet: React.FC<Props> = ({ open, onClose }) => {
             </div>
           </>
         ) : (
-          <div style={{ marginTop: 48 }}>
-            <EmptyStub
-              icon={<Search size={28} color="var(--hcp-t-40)" strokeWidth={2} />}
-              title="Search for a player"
-              body="Type a name to find players to add to your Pulse."
-            />
+          <div style={{ padding: '40px 28px 32px', textAlign: 'center' }}>
+            {/* rivalry mark: Swords in an amber-tint square + small Pin badge */}
+            <div style={{ position: 'relative', display: 'inline-flex', marginBottom: 22 }}>
+              <div style={{ width: 64, height: 64, borderRadius: 18, background: 'var(--hcp-amber-tint)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                <Swords size={28} color="var(--hcp-amber)" strokeWidth={2} />
+              </div>
+              <div style={{ position: 'absolute', bottom: -4, right: -4, width: 26, height: 26, borderRadius: 99, background: 'var(--hcp-bg-0)', display: 'flex', alignItems: 'center', justifyContent: 'center', border: '2px solid var(--hcp-bg-1)' }}>
+                <Pin size={13} color="var(--hcp-amber)" strokeWidth={2.4} />
+              </div>
+            </div>
+            <div style={{ fontSize: 19, fontWeight: 800, color: 'var(--hcp-t-100)', letterSpacing: '-0.02em', lineHeight: 1.2 }}>
+              Every handicap is a rivalry waiting to happen
+            </div>
+            <div style={{ fontSize: 13.5, color: 'var(--hcp-t-60)', marginTop: 10, lineHeight: 1.5, maxWidth: 300, marginLeft: 'auto', marginRight: 'auto' }}>
+              Search for a player and pin them to your Pulse to watch your handicaps battle it out, round by round.
+            </div>
           </div>
         )}
       </div>
