@@ -195,7 +195,7 @@ export function LuminousCellRating({
           height: rowHeight,
           marginTop: hero ? 8 : 0,
           borderRadius: radius,
-          background: 'rgba(118,118,128,0.12)',
+          background: 'rgba(154,74,14,0.07)',
           boxShadow: 'inset 0 0 0 0.5px rgba(15,23,42,0.05)',
           overflow: 'hidden',
           touchAction: 'none',
