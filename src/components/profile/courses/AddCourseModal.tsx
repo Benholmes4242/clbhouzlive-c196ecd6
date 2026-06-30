@@ -829,7 +829,7 @@ export const AddCourseModal: React.FC<AddCourseModalProps> = ({
                         <span style={{
                           fontSize: 10,
                           fontWeight: 800,
-                          letterSpacing: '0.22em',
+                          letterSpacing: '0.14em',
                           color: INK_SUBTLE,
                           textTransform: 'uppercase',
                         }}>
@@ -837,9 +837,8 @@ export const AddCourseModal: React.FC<AddCourseModalProps> = ({
                         </span>
                       </div>
                       <p style={{
-                        fontFamily: FONT_SERIF,
                         fontSize: 14,
-                        fontWeight: 400,
+                        fontWeight: 500,
                         color: INK,
                         lineHeight: 1.4,
                         margin: 0,
