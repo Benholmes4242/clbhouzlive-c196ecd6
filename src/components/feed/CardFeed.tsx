@@ -341,6 +341,7 @@ export const CardFeed: React.FC<CardFeedProps> = ({
       onShare,
       onFollow,
       currentUserId,
+      onFirstContentReady,
     ],
   );
 
