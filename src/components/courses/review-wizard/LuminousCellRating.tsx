@@ -118,7 +118,7 @@ export function LuminousCellRating({
       ? 'rgba(255,194,61,0.9)'
       : tierKey === 'EXCELLENT' || tierKey === 'GOOD'
       ? 'rgba(247,147,30,0.85)'
-      : 'rgba(138,149,164,0.8)';
+      : 'rgba(154,74,14,0.55)';
   const restGlow = tierKey === 'EXCEPTIONAL' ? 0.22 : 0;
   const glowOpacity = active ? 0.6 : restGlow;
   const fillTransition = active
