@@ -8,7 +8,7 @@
  */
 
 import React, { useState } from 'react';
-import { ArrowLeftRight, Check, Trophy } from 'lucide-react';
+import { ArrowLeftRight, Trophy } from 'lucide-react';
 import { BottomSheet } from '@/components/ui/BottomSheet';
 import { SheetHeader } from '@/components/ui/SheetHeader';
 import { getTourLogo } from '../utils/tourLogos';
@@ -251,9 +251,6 @@ export const TourSwitcherAffordance: React.FC<TourSwitcherAffordanceProps> = ({
                   </span>
                 )}
 
-                {isActive && (
-                  <Check size={16} strokeWidth={2.5} color={AMBER} />
-                )}
               </button>
             );
           })}
