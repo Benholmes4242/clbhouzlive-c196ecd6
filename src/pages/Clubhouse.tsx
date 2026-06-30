@@ -194,6 +194,12 @@ const ClubhouseContent = () => {
     resetSkeleton,
   } = useClubhouseSkeletonTiming(!isLoading && posts.length > 0);
 
+  // Perf: signal content-painted when skeleton resolves (posts loaded +
+  // first video canplaythrough + min-hold). This is the LCP-equivalent for
+  // the feed and drives the `content` settle number in nav summaries.
+  usePageReady(skeletonMode === 'hidden');
+
+
   // Effect 2: Once feed is ready, gate on tournament card state
   useEffect(() => {
     if (!skeletonVisible) {
