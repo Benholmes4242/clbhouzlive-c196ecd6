@@ -248,10 +248,18 @@ const ClubhouseContent = () => {
   const { moreOptionsOpen, setMoreOptionsOpen, handleShare, handleReport, handleNotInterested } = useClubhouseShare(user?.id);
   
   // ── Feed navigation ──
+  // Skeleton single owner: onTabSwitch (post-commit). Re-show only when the
+  // now-active feed has never loaded (uncached). Cached -> instant, like IG/TikTok.
   const { handleNearEnd, handleRefresh } = useClubhouseFeedNav({
     activeTab,
     activeFeed,
-    onTabSwitch: () => { resetFollows(); resetComments(); },
+    onTabSwitch: () => {
+      resetFollows();
+      resetComments();
+      if (!(activeFeed as any).hasEverLoaded) {
+        resetSkeleton();
+      }
+    },
   });
   
   // ── Carousel media index ──
