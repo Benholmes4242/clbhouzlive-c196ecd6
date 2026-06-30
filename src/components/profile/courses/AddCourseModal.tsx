@@ -666,7 +666,6 @@ export const AddCourseModal: React.FC<AddCourseModalProps> = ({
           eyebrow="YOUR COURSES"
           title={<span id="add-course-title">Personal Top 10</span>}
           onClose={onClose}
-          borderBottom={false}
         />
 
         {/* 10 / 10 status line */}
@@ -682,7 +681,7 @@ export const AddCourseModal: React.FC<AddCourseModalProps> = ({
           }}>
             <span style={{ color: AMBER_DEEP, fontWeight: 700 }}>10 / 10 list complete</span>
             <span style={{ color: '#CBD5E1' }}>·</span>
-            <span style={{ fontStyle: 'italic' }}>Remove one to add another</span>
+            <span>Remove one to add another</span>
           </div>
         )}
 
