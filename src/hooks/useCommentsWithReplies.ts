@@ -128,7 +128,9 @@ export function useCommentsWithReplies(
       const cActorId = comment.actor_id || comment.user_id;
       if (cActorType === 'business') {
         const b = businessMap.get(cActorId);
-        return { actor_type: 'business' as const, actor_id: cActorId, user_name: b?.name || 'Business', avatar_url: b?.logo_url || null };
+        // Null-guard: business actor with deleted/missing business row renders a neutral
+        // placeholder rather than an empty name or broken avatar.
+        return { actor_type: 'business' as const, actor_id: cActorId, user_name: b?.name || 'Unavailable', avatar_url: b?.logo_url || null };
       }
       const p = profileMap.get(cActorId);
       return { actor_type: 'personal' as const, actor_id: cActorId, user_name: p?.display_name || 'User', avatar_url: p?.profile_photo_url || null };
