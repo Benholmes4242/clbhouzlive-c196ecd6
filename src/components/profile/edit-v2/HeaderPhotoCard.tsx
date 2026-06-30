@@ -8,6 +8,7 @@ interface HeaderPhotoCardProps {
   previewUrl?: string | null;
   onFileChange: (file: File | null) => void;
   onRemove?: () => void;
+  variant?: 'card' | 'bare';
 }
 
 // Matches profile hero: full-width × clamp(200px, 28vw, 280px). ~2:1 on mobile.
@@ -18,6 +19,7 @@ export const HeaderPhotoCard: React.FC<HeaderPhotoCardProps> = ({
   previewUrl,
   onFileChange,
   onRemove,
+  variant = 'card',
 }) => {
   const inputRef = useRef<HTMLInputElement>(null);
   const [cropperImage, setCropperImage] = useState<string | null>(null);
@@ -54,6 +56,83 @@ export const HeaderPhotoCard: React.FC<HeaderPhotoCardProps> = ({
     }
     setShowCropper(open);
   };
+
+  const cropper = cropperImage ? (
+    <ImageCropperModal
+      open={showCropper}
+      onOpenChange={handleCropperClose}
+      image={cropperImage}
+      aspectRatio={HEADER_ASPECT_RATIO}
+      cropShape="rect"
+      title="Crop Header Photo"
+      onCropComplete={handleCropComplete}
+    />
+  ) : null;
+
+  const fileInput = (
+    <input
+      ref={inputRef}
+      type="file"
+      accept="image/jpeg,image/png,image/webp"
+      onChange={handleChange}
+      className="hidden"
+    />
+  );
+
+  if (variant === 'bare') {
+    return (
+      <>
+        <button
+          type="button"
+          onClick={handleClick}
+          aria-label={displayUrl ? 'Edit cover' : 'Add cover'}
+          style={{
+            position: 'relative',
+            display: 'block',
+            width: '100%',
+            height: 132,
+            background: displayUrl ? 'transparent' : 'linear-gradient(135deg,#E2E8F0,#F1F5F9)',
+            overflow: 'hidden',
+            border: 'none',
+            padding: 0,
+            cursor: 'pointer',
+          }}
+        >
+          {displayUrl ? (
+            <img
+              src={displayUrl}
+              alt=""
+              style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
+            />
+          ) : null}
+          <span
+            style={{
+              position: 'absolute',
+              top: 10,
+              right: 10,
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: 6,
+              background: 'rgba(0,0,0,0.45)',
+              color: '#fff',
+              fontFamily: 'Geist, -apple-system, sans-serif',
+              fontSize: 12.5,
+              fontWeight: 500,
+              padding: '7px 11px',
+              borderRadius: 9,
+              backdropFilter: 'blur(8px)',
+              WebkitBackdropFilter: 'blur(8px)',
+            }}
+          >
+            <Camera size={13} strokeWidth={2.25} />
+            {displayUrl ? 'Edit cover' : 'Add cover'}
+          </span>
+        </button>
+        {fileInput}
+        {cropper}
+      </>
+    );
+  }
 
   return (
     <div>
@@ -93,8 +172,8 @@ export const HeaderPhotoCard: React.FC<HeaderPhotoCardProps> = ({
           "relative w-full overflow-hidden rounded-2xl border-2 border-dashed transition-all",
           "h-[180px] flex flex-col items-center justify-center",
           "group",
-          displayUrl 
-            ? "border-transparent" 
+          displayUrl
+            ? "border-transparent"
             : "border-border hover:border-[hsl(38,92%,50%)]/50 hover:bg-[hsl(38,92%,50%)]/5"
         )}
       >
@@ -105,7 +184,6 @@ export const HeaderPhotoCard: React.FC<HeaderPhotoCardProps> = ({
               alt="Header preview"
               className="h-full w-full object-cover object-center rounded-xl"
             />
-            {/* Always-visible frosted camera overlay */}
             <div className="absolute inset-0 bg-black/30 flex items-center justify-center rounded-xl">
               <div className="w-12 h-12 rounded-full bg-black/40 backdrop-blur-md flex items-center justify-center border border-white/20">
                 <Camera className="w-5 h-5 text-white" />
@@ -121,32 +199,14 @@ export const HeaderPhotoCard: React.FC<HeaderPhotoCardProps> = ({
               Upload header photo
             </p>
             <p className="text-xs text-muted-foreground">
-              Recommended: 1600×800px • JPG, PNG or WebP
+              Recommended: 1600x800px - JPG, PNG or WebP
             </p>
           </div>
         )}
       </button>
 
-      <input
-        ref={inputRef}
-        type="file"
-        accept="image/jpeg,image/png,image/webp"
-        onChange={handleChange}
-        className="hidden"
-      />
-
-      {/* Image Cropper Modal */}
-      {cropperImage && (
-        <ImageCropperModal
-          open={showCropper}
-          onOpenChange={handleCropperClose}
-          image={cropperImage}
-          aspectRatio={HEADER_ASPECT_RATIO}
-          cropShape="rect"
-          title="Crop Header Photo"
-          onCropComplete={handleCropComplete}
-        />
-      )}
+      {fileInput}
+      {cropper}
     </div>
   );
 };
