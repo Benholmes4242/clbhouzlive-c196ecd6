@@ -2,6 +2,8 @@
 // Production-safe: returns null unless DEV || ?perf=1. Mirrors PerfHud.
 import React, { useEffect, useState, useCallback, memo } from 'react';
 import { consoleCapture, type LogLine } from './consoleCapture';
+import { subscribePerfLive } from './navTiming';
+
 
 const LEVEL_COLOR: Record<LogLine['level'], string> = {
   log: '#e5e7eb',
