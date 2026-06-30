@@ -18,7 +18,7 @@
  *    WebView's `<video>` budget.
  *  - Persisted multi-media carousel position via `clubhouseStore`.
  */
-import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import React, { forwardRef, useCallback, useEffect, useImperativeHandle, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import { Virtuoso, type VirtuosoHandle, type StateSnapshot } from 'react-virtuoso';
 import type { FeedPost } from '@/components/media-system/types/media';
 import type { ActiveActor } from '@/types/actor';
@@ -60,10 +60,15 @@ export interface CardFeedProps {
   onSnapshot?: (state: StateSnapshot) => void;
 }
 
+export interface CardFeedHandle {
+  /** Synchronously snapshot Virtuoso state via the parent's `onSnapshot`. */
+  captureSnapshot: () => void;
+}
+
 const PTR_THRESHOLD = 64;
 const PTR_MAX_PULL = 96;
 
-export const CardFeed: React.FC<CardFeedProps> = ({
+export const CardFeed = forwardRef<CardFeedHandle, CardFeedProps>(function CardFeed({
   posts,
   onLike,
   onComment,
@@ -85,25 +90,36 @@ export const CardFeed: React.FC<CardFeedProps> = ({
   tab,
   initialState,
   onSnapshot,
-}) => {
+}, ref) {
 
   const virtuosoRef = useRef<VirtuosoHandle | null>(null);
   const scrollerElRef = useRef<HTMLElement | null>(null);
 
-  // Snapshot Virtuoso state on unmount so the parent can hand it back on
-  // remount (per-tab scroll retention — IG/TikTok feel). Keep `onSnapshot`
-  // in a ref so the cleanup never depends on identity churn.
+  // Snapshot Virtuoso state per-tab. Keep `onSnapshot` in a ref so the
+  // imperative capture never depends on identity churn.
   const onSnapshotRef = useRef(onSnapshot);
   useEffect(() => { onSnapshotRef.current = onSnapshot; }, [onSnapshot]);
-  useEffect(() => {
-    return () => {
-      try {
-        virtuosoRef.current?.getState?.((snap) => {
-          onSnapshotRef.current?.(snap);
-        });
-      } catch {}
-    };
+
+  // getState(cb) is synchronous while the instance is still mounted —
+  // the callback fires inline. Expose this so the parent can capture
+  // BEFORE flipping activeTab (the keyed remount tears us down otherwise).
+  const captureSnapshot = useCallback(() => {
+    try {
+      virtuosoRef.current?.getState?.((snap) => {
+        onSnapshotRef.current?.(snap);
+      });
+    } catch {}
   }, []);
+
+  useImperativeHandle(ref, () => ({ captureSnapshot }), [captureSnapshot]);
+
+  // Secondary fallback: useLayoutEffect cleanup runs BEFORE the ref is
+  // nulled (unlike a passive useEffect cleanup), so the snapshot still
+  // lands if the parent forgets to call captureSnapshot pre-flip.
+  useLayoutEffect(() => {
+    return () => { captureSnapshot(); };
+  }, [captureSnapshot]);
+
 
   // Explore tab retap → scroll Clubhouse feed to top
   useEffect(() => {
@@ -553,12 +569,15 @@ export const CardFeed: React.FC<CardFeedProps> = ({
           overscan={{ main: 400, reverse: 400 }}
           components={components}
           restoreStateFrom={initialState}
+          initialTopMostItemIndex={
+            initialState ? undefined : Math.min(0, Math.max(0, posts.length - 1))
+          }
           style={{ height: '100%', width: '100%' }}
         />
       </div>
 
     </div>
   );
-};
+});
 
 CardFeed.displayName = 'CardFeed';

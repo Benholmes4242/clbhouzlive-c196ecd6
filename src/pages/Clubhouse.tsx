@@ -26,7 +26,7 @@ import { useNetworkStatus } from '@/hooks/useNetworkStatus';
 
 
 // ── New feed components ──
-import { CardFeed } from '@/components/feed/CardFeed';
+import { CardFeed, type CardFeedHandle } from '@/components/feed/CardFeed';
 import type { StateSnapshot } from 'react-virtuoso';
 import { FeedOverlayLayer } from '@/components/feed/FeedOverlayLayer';
 import { FullscreenCarouselOverlay } from '@/components/media/FullscreenCarouselOverlay';
@@ -167,6 +167,10 @@ const ClubhouseContent = () => {
   // Per-tab Virtuoso snapshots — captured on switch-AWAY (CardFeed unmount)
   // and restored on switch-BACK so each tab retains its exact scroll offset.
   const virtuosoSnapshots = useRef<Record<string, StateSnapshot | undefined>>({});
+  // Imperative ref into CardFeed so we can capture the outgoing tab's
+  // snapshot BEFORE flipping activeTab (the keyed remount tears down the
+  // instance, which makes a post-flip capture impossible).
+  const cardFeedRef = useRef<CardFeedHandle | null>(null);
 
 
 
@@ -480,6 +484,12 @@ const ClubhouseContent = () => {
       <ClubhouseTopBar
         activeTab={activeTab}
         onTabChange={(tab) => {
+          if (tab === activeTab) return;
+          // Capture the OUTGOING feed's scroll state while it's still
+          // mounted, into its own slot. onSnapshot's closure reads
+          // activeTab at call-time — the flip hasn't happened yet, so
+          // the snapshot lands in the correct (outgoing) slot.
+          cardFeedRef.current?.captureSnapshot();
           // Skeleton reset is owned by onTabSwitch (post-commit) in
           // useClubhouseFeedNav, where activeFeed.hasEverLoaded is fresh.
           // Do NOT gate skeleton here — query state is stale at tap time.
@@ -597,6 +607,7 @@ const ClubhouseContent = () => {
       ) : posts.length > 0 ? (
         <>
           <CardFeed
+            ref={cardFeedRef}
             key={activeTab}
             tab={activeTab}
             initialState={virtuosoSnapshots.current[activeTab]}
