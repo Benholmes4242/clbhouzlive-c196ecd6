@@ -644,29 +644,24 @@ export const AddCourseModal: React.FC<AddCourseModalProps> = ({
           onClose={onClose}
         />
 
-        {/* 10 / 10 status line */}
+        {/* 10 of 10 status line */}
         {topTen.length === 10 && (
           <div style={{
-            padding: '4px 16px 10px',
-            display: 'flex',
-            alignItems: 'baseline',
-            gap: 6,
+            padding: '4px 16px 12px',
             fontSize: 11,
             fontWeight: 600,
             color: INK_SUBTLE,
           }}>
-            <span style={{ color: AMBER_DEEP, fontWeight: 700 }}>10 / 10 list complete</span>
-            <span style={{ color: '#CBD5E1' }}>·</span>
-            <span>Remove one to add another</span>
+            <span style={{ color: AMBER_DEEP, fontWeight: 700 }}>10 of 10 ranked</span>
+            {'  '}<span style={{ color: '#CBD5E1' }}>·</span>{'  '}Drag to reorder
           </div>
         )}
 
-        {/* Tab strip */}
+        {/* Tab strip — NO container border; only the active-tab underline reads */}
         <div style={{
           display: 'flex',
           gap: 24,
           padding: '0 16px',
-          borderBottom: `0.5px solid rgba(15,23,42,0.08)`,
         }}>
           {(['manage', 'add'] as const).map(tab => {
             const isActive = activeTab === tab;
