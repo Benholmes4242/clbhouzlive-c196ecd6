@@ -794,7 +794,7 @@ const AppInner: React.FC = () => {
         <NavTimingProvider>
         <PerfHud />
         <LogHud />
-        <PerfArmTap />
+        
 
         <HeaderProvider>
             <ModalProvider>
