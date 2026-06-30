@@ -38,7 +38,7 @@ export default function DisconnectConfirmSheet({ open, onClose, onConfirm, isWor
         <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', padding: '4px 20px 12px' }}>
           <div style={{ flex: 1, minWidth: 0 }}>
             <div style={{ marginBottom: 6 }}>
-              <SectionHeader tier="standard" kicker="Disconnect" tone="amber" />
+              <SectionHeader tier="standard" kicker="Disconnect" tone="danger" />
             </div>
             <h2 style={{ fontSize: 22, fontWeight: 800, letterSpacing: '-0.025em', margin: 0, lineHeight: 1.2 }}>
               Disconnect England Golf?
