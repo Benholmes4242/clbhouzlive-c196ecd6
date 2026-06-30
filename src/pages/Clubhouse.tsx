@@ -597,6 +597,10 @@ const ClubhouseContent = () => {
       ) : posts.length > 0 ? (
         <>
           <CardFeed
+            key={activeTab}
+            tab={activeTab}
+            initialState={virtuosoSnapshots.current[activeTab]}
+            onSnapshot={(s) => { virtuosoSnapshots.current[activeTab] = s; }}
             posts={posts}
             topPadding={'calc(env(safe-area-inset-top, 0px) + 59px)'}
             onNearEnd={handleNearEnd}
