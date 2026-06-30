@@ -90,6 +90,21 @@ export const CardFeed: React.FC<CardFeedProps> = ({
   const virtuosoRef = useRef<VirtuosoHandle | null>(null);
   const scrollerElRef = useRef<HTMLElement | null>(null);
 
+  // Snapshot Virtuoso state on unmount so the parent can hand it back on
+  // remount (per-tab scroll retention — IG/TikTok feel). Keep `onSnapshot`
+  // in a ref so the cleanup never depends on identity churn.
+  const onSnapshotRef = useRef(onSnapshot);
+  useEffect(() => { onSnapshotRef.current = onSnapshot; }, [onSnapshot]);
+  useEffect(() => {
+    return () => {
+      try {
+        virtuosoRef.current?.getState?.((snap) => {
+          onSnapshotRef.current?.(snap);
+        });
+      } catch {}
+    };
+  }, []);
+
   // Explore tab retap → scroll Clubhouse feed to top
   useEffect(() => {
     const onRetap = (e: Event) => {
