@@ -446,7 +446,7 @@ const CourseRow: React.FC<CourseRowProps> = ({
         {course.has_rating && course.rating_value != null && (
           <>
             <span style={{ color: '#CBD5E1' }}>·</span>
-            <SerifScore value={course.rating_value} size={13} />
+            <PlainScore value={course.rating_value} size={13} />
           </>
         )}
       </div>
