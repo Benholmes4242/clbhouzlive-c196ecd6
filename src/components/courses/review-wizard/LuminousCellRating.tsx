@@ -123,7 +123,7 @@ export function LuminousCellRating({
   const glowOpacity = active ? 0.6 : restGlow;
   const fillTransition = active
     ? 'none'
-    : 'width 200ms cubic-bezier(.22,.61,.36,1), background 180ms ease';
+    : 'width 360ms cubic-bezier(.34,1.56,.64,1), background 180ms ease';
   const glowTransition = active
     ? 'none'
     : 'opacity 220ms ease, width 200ms cubic-bezier(.22,.61,.36,1)';
@@ -195,7 +195,7 @@ export function LuminousCellRating({
           height: rowHeight,
           marginTop: hero ? 8 : 0,
           borderRadius: radius,
-          background: 'rgba(118,118,128,0.12)',
+          background: 'rgba(154,74,14,0.07)',
           boxShadow: 'inset 0 0 0 0.5px rgba(15,23,42,0.05)',
           overflow: 'hidden',
           touchAction: 'none',
@@ -204,19 +204,21 @@ export function LuminousCellRating({
           outline: 'none',
         }}
       >
-        {/* Bloom glow behind fill */}
+        {/* Bloom glow at fill head */}
         <div
           aria-hidden
           style={{
             position: 'absolute',
             top: 0,
             bottom: 0,
-            left: 0,
-            width: `${fillPct}%`,
+            left: `${Math.max(0, fillPct - 22)}%`,
+            width: '22%',
             filter: 'blur(12px)',
             opacity: glowOpacity,
-            background: `linear-gradient(90deg, transparent 0%, ${glowColor} 100%)`,
-            transition: glowTransition,
+            background: `radial-gradient(circle at right, ${glowColor}, transparent 70%)`,
+            transition: active
+              ? 'none'
+              : 'opacity 220ms ease, left 360ms cubic-bezier(.34,1.56,.64,1)',
             pointerEvents: 'none',
             zIndex: 0,
           }}
@@ -234,6 +236,8 @@ export function LuminousCellRating({
             transition: fillTransition,
             zIndex: 1,
             overflow: 'hidden',
+            borderTopRightRadius: radius,
+            borderBottomRightRadius: radius,
           }}
         >
           {/* Top sheen */}
@@ -279,6 +283,7 @@ export function LuminousCellRating({
           }}
         >
           {Array.from({ length: 9 }).map((_, i) => {
+            if (i !== 4) return null; // Level 2: keep only the midpoint (5.0) reference tick
             const x = ((i + 1) / 10) * 100;
             const filled = fillPct >= x;
             return (
