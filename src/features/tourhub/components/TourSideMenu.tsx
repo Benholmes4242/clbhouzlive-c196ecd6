@@ -43,10 +43,12 @@ const DESTINATIONS: { id: string; label: string; Icon: LucideIcon }[] = [
   { id: 'college',      label: 'College',      Icon: GraduationCap },
 ];
 
-const PINE = '#2F6B4F';
+
 const INK = '#0F172A';
 const MUTED = '#64748B';
 const DIVIDER = '#e4e8ec';
+const FAINT = '#94A3B8';
+const AMBER = '#F7931E';
 const DURATION = 280;
 
 function usePrefersReducedMotion() {
@@ -144,9 +146,13 @@ export const TourSideMenu: React.FC<TourSideMenuProps> = ({
         {/* Top: logo + handicap chip + identity pill */}
         <TopBar />
 
+        {/* Primary group header */}
+        <div style={{ marginTop: 16 }}>
+          <GroupHeader>Tour</GroupHeader>
+        </div>
 
         {/* Nav list */}
-        <nav style={{ marginTop: 16, flex: 1, overflowY: 'auto' }}>
+        <nav style={{ marginTop: 4, flex: 1, overflowY: 'auto' }}>
           {DESTINATIONS.map(({ id, label, Icon }) => {
             const isActive = id === activeTab;
             return (
@@ -167,7 +173,7 @@ export const TourSideMenu: React.FC<TourSideMenuProps> = ({
                   border: 'none',
                   borderRadius: 14,
                   background: isActive ? '#FFFFFF' : 'transparent',
-                  color: isActive ? PINE : INK,
+                  color: INK,
                   fontFamily: 'inherit',
                   fontSize: 16,
                   fontWeight: isActive ? 800 : 600,
@@ -179,7 +185,7 @@ export const TourSideMenu: React.FC<TourSideMenuProps> = ({
                 }}
               >
                 <span style={{ width: 22, display: 'inline-flex', justifyContent: 'center' }}>
-                  <Icon size={20} color={isActive ? PINE : INK} strokeWidth={isActive ? 2.4 : 2} />
+                  <Icon size={20} color={INK} strokeWidth={isActive ? 2.4 : 2} />
                 </span>
                 {label}
               </button>
@@ -187,11 +193,15 @@ export const TourSideMenu: React.FC<TourSideMenuProps> = ({
           })}
         </nav>
 
-        {/* Divider */}
-        <div style={{ height: 1, background: DIVIDER, margin: '12px 20px' }} />
+        {/* Secondary group header */}
+        <div style={{ marginTop: 8, paddingTop: 12, borderTop: `1px solid ${DIVIDER}` }}>
+          <div style={{ marginTop: 12 }}>
+            <GroupHeader>Account</GroupHeader>
+          </div>
+        </div>
 
         {/* Secondary links */}
-        <div style={{ display: 'flex', flexDirection: 'column', padding: '0 20px 20px', gap: 4 }}>
+        <div style={{ display: 'flex', flexDirection: 'column', padding: '0 24px 22px', gap: 4 }}>
           <SecondaryLink Icon={Settings} label="Settings" onClick={() => { onClose(); onSettings(); }} />
           <SecondaryLink Icon={User}     label="Profile"  onClick={() => { onClose(); onProfile(); }} />
           <SecondaryLink Icon={LogOut}   label="Sign Out" onClick={() => { onClose(); onSignOut(); }} />
@@ -200,6 +210,17 @@ export const TourSideMenu: React.FC<TourSideMenuProps> = ({
     </div>
   );
 };
+
+function GroupHeader({ children }: { children: React.ReactNode }) {
+  return (
+    <div style={{ padding: '0 24px', marginBottom: 8 }}>
+      <div style={{ fontSize: 11, fontWeight: 800, letterSpacing: '0.14em', textTransform: 'uppercase', color: FAINT, lineHeight: 1 }}>
+        {children}
+      </div>
+      <div style={{ width: 34, height: 3, borderRadius: 99, background: AMBER, marginTop: 9 }} />
+    </div>
+  );
+}
 
 function SecondaryLink({
   Icon,
