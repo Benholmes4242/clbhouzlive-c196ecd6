@@ -336,10 +336,9 @@ const HandicapPage: React.FC = () => {
   const params = useParams<{ userId?: string }>();
   const [searchParams, setSearchParams] = useSearchParams();
 
-  useLayoutEffect(() => {
-    document.body.classList.add('route-handicap');
-    return () => { document.body.classList.remove('route-handicap'); };
-  }, []);
+  // Body class is applied conditionally below (skipped during connect flow
+  // so the dark theming does not bleed into the light Direction A header).
+
 
   // Determine mode + the user whose handicap we're showing.
   const friendId = params.userId ?? null;
