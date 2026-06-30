@@ -357,6 +357,16 @@ const HandicapPage: React.FC = () => {
     setSearchParams(params, { replace: true });
   }, [searchParams, setSearchParams]);
 
+  // Deep-link: ?gam=trophies opens the Trophy Room sheet once on arrival.
+  useEffect(() => {
+    if (searchParams.get('gam') === 'trophies') {
+      openGamAchievements();
+      const next = new URLSearchParams(searchParams);
+      next.delete('gam');
+      setSearchParams(next, { replace: true });
+    }
+  }, [searchParams, setSearchParams]);
+
   // Fetch profile for greeting/title.
   // Uses display_name when available (extracts first name), falls back to username.
   const { data: profile } = useQuery<{
