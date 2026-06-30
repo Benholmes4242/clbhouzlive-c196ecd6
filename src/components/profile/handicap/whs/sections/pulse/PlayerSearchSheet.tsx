@@ -119,7 +119,7 @@ export const PlayerSearchSheet: React.FC<Props> = ({ open, onClose }) => {
     <GamSheet open={open} onClose={onClose}>
       {/* Drag handle */}
       <div style={{ display: 'flex', justifyContent: 'center', paddingTop: 8, flexShrink: 0 }}>
-        <div style={{ width: 36, height: 4, borderRadius: 2, background: 'var(--hcp-line-2)' }} />
+        <div style={{ width: 36, height: 4, borderRadius: 99, background: 'var(--hcp-line-2)' }} />
       </div>
 
       {/* Sticky header */}
@@ -127,13 +127,21 @@ export const PlayerSearchSheet: React.FC<Props> = ({ open, onClose }) => {
         style={{
           display: 'flex',
           alignItems: 'center',
-          justifyContent: 'space-between',
+          justifyContent:M: 'space-between',
           padding: '14px 20px 10px',
           borderBottom: '0.5px solid var(--hcp-line)',
           fontFamily: FONT,
         }}
       >
-        <div style={{ fontSize: 16, fontWeight: 700, color: 'var(--hcp-t-100)' }}>Find a player</div>
+        <div style={{ flex: 1, minWidth: 0 }}>
+          <SectionHeader
+            tier="editorial"
+            surface="dark"
+            kicker="SEARCH"
+            title="Find a player"
+            paddingX={0}
+          />
+        </div>
         <button
           onClick={onClose}
           aria-label="Close"
@@ -186,7 +194,7 @@ export const PlayerSearchSheet: React.FC<Props> = ({ open, onClose }) => {
 
         {q.length >= 2 && (
           <>
-            <div style={{ marginTop: 24 }}><SectionHeader tier="standard" kicker="SEARCH RESULTS" paddingX={16} /></div>
+            <div style={{ marginTop: 24 }}><SectionHeader tier="standard" surface="dark" kicker="SEARCH RESULTS" paddingX={16} /></div>
             <div style={{ padding: '0 16px', display: 'flex', flexDirection: 'column', gap: 10 }}>
               {isLoading && <Skeleton height={68} radius={12} />}
               {isError && <RetryStub message="Couldn't search players" onRetry={() => refetch()} />}
