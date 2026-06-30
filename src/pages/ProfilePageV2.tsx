@@ -563,7 +563,7 @@ const ProfilePageV2Content: React.FC = () => {
 
         {/* Floating header — transparent control row under the notch */}
         <FloatingPageHeader
-          onBack={isSelf ? () => navigate('/settings') : undefined}
+          onBack={isSelf ? () => navigate('/edit-profile?tab=settings') : undefined}
           showHandicap={!!user}
         />
 
@@ -735,7 +735,7 @@ const ProfilePageV2Content: React.FC = () => {
                   <Pencil className="w-4 h-4 mr-2" />
                   Edit profile
                 </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => navigate('/settings')}>
+                <DropdownMenuItem onClick={() => navigate('/edit-profile?tab=settings')}>
                   <Settings className="w-4 h-4 mr-2" />
                   Settings
                 </DropdownMenuItem>

@@ -16,7 +16,7 @@ export const GLOBAL_HEADER_EXCLUDED_ROUTES = [
   '/achievements',
   '/golferstofollow',
   '/notificationmessages',
-  '/settings',
+  
   '/edit-profile',
   '/handicap',
 ] as const;

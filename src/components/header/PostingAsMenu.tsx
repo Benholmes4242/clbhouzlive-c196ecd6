@@ -199,7 +199,7 @@ export function PostingAsMenu({ isOpen, onClose, useLightTheme = false, anchorRe
   // notification toggles live; personal stays on the global settings page.
   const settingsRoute = isBusinessActor && activeActor?.id
     ? `/business/${activeActor.id}/edit`
-    : '/settings';
+    : '/edit-profile?tab=settings';
 
   // Handle navigation from ProfileHubSheet
   const handleAccountHubNavigate = (route: string) => {
