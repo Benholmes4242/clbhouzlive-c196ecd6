@@ -204,19 +204,21 @@ export function LuminousCellRating({
           outline: 'none',
         }}
       >
-        {/* Bloom glow behind fill */}
+        {/* Bloom glow at fill head */}
         <div
           aria-hidden
           style={{
             position: 'absolute',
             top: 0,
             bottom: 0,
-            left: 0,
-            width: `${fillPct}%`,
+            left: `${Math.max(0, fillPct - 22)}%`,
+            width: '22%',
             filter: 'blur(12px)',
             opacity: glowOpacity,
-            background: `linear-gradient(90deg, transparent 0%, ${glowColor} 100%)`,
-            transition: glowTransition,
+            background: `radial-gradient(circle at right, ${glowColor}, transparent 70%)`,
+            transition: active
+              ? 'none'
+              : 'opacity 220ms ease, left 360ms cubic-bezier(.34,1.56,.64,1)',
             pointerEvents: 'none',
             zIndex: 0,
           }}
