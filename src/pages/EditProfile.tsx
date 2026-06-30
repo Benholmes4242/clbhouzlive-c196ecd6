@@ -28,6 +28,7 @@ import { LocationSection } from '@/components/profile/edit-v2/LocationSection';
 import { SocialLinksSection } from '@/components/profile/edit-v2/SocialLinksSection';
 import { DISPLAY_NAME_MAX, USERNAME_MAX } from '@/components/profile/profile-wizard/types';
 import HandicapConnectSheet from '@/components/profile/handicap/HandicapConnectSheet';
+import { SettingsTabContent } from '@/components/settings/SettingsTabContent';
 
 const GEIST = 'Geist, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif';
 const INK = '#0F172A';
