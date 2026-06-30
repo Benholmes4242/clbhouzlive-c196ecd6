@@ -26,12 +26,27 @@ export const HeaderPhotoCard: React.FC<HeaderPhotoCardProps> = ({
   const inputRef = useRef<HTMLInputElement>(null);
   const [cropperImage, setCropperImage] = useState<string | null>(null);
   const [showCropper, setShowCropper] = useState(false);
+  const [sheetOpen, setSheetOpen] = useState(false);
 
   const displayUrl = previewUrl || currentUrl;
 
   const handleClick = () => {
-    inputRef.current?.click();
+    if (variant === 'bare') {
+      setSheetOpen(true);
+    } else {
+      inputRef.current?.click();
+    }
   };
+
+  const triggerPicker = () => inputRef.current?.click();
+  const triggerCapture = () => {
+    const el = inputRef.current;
+    if (!el) return;
+    el.setAttribute('capture', 'environment');
+    el.click();
+    setTimeout(() => el.removeAttribute('capture'), 300);
+  };
+
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
