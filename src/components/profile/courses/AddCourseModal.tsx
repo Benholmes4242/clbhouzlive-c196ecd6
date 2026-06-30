@@ -1006,7 +1006,7 @@ export const AddCourseModal: React.FC<AddCourseModalProps> = ({
 
                 {unratedCourses.length > 0 && (
                   <>
-                    <div style={{ padding: '14px 16px 8px' }}><SectionHeader tier="standard" kicker="Rate to Add" /></div>
+                    <div style={{ padding: '14px 16px 8px' }}><SectionHeader tier="standard" kicker="RATE TO ADD" /></div>
                     {unratedCourses.map((course) => (
                       <CourseRow
                         key={course.id}
