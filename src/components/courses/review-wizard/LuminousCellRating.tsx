@@ -236,6 +236,8 @@ export function LuminousCellRating({
             transition: fillTransition,
             zIndex: 1,
             overflow: 'hidden',
+            borderTopRightRadius: radius,
+            borderBottomRightRadius: radius,
           }}
         >
           {/* Top sheen */}
