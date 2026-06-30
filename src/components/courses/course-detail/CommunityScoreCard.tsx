@@ -190,10 +190,11 @@ const CommunityScoreCard: React.FC<CommunityScoreCardProps> = ({
       <div style={{ display: 'flex', alignItems: 'center', gap: 16, marginBottom: 18 }}>
         <div style={{ display: 'flex', alignItems: 'baseline', gap: 2, flexShrink: 0 }}>
           <span
+            className={tierLabel === 'EXCEPTIONAL' ? 'clbhouz-gold-shimmer-light' : undefined}
             style={{
               fontSize: 58,
               ...HERO_NUMBER_STYLE,
-              color: ratingTextColor(communityAverage),
+              ...(tierLabel === 'EXCEPTIONAL' ? {} : { color: ratingTextColor(communityAverage) }),
               lineHeight: 1,
             }}
           >
@@ -205,7 +206,14 @@ const CommunityScoreCard: React.FC<CommunityScoreCardProps> = ({
         </div>
         <div style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', alignItems: 'flex-start', gap: 7 }}>
           <div>
-            <div style={{ fontSize: 12, ...TIER_LABEL_STYLE, color: ratingTextColor(communityAverage) }}>
+            <div
+              className={tierLabel === 'EXCEPTIONAL' ? 'clbhouz-gold-shimmer-light' : undefined}
+              style={{
+                fontSize: 12,
+                ...TIER_LABEL_STYLE,
+                ...(tierLabel === 'EXCEPTIONAL' ? {} : { color: ratingTextColor(communityAverage) }),
+              }}
+            >
               {tierLabel}
             </div>
             <div style={{ fontSize: 11.5, color: INK_FAINT, marginTop: 2 }}>
