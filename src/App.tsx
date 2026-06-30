@@ -169,12 +169,16 @@ const RootGate: React.FC = () => {
   // App-only product: only the native app or an approved preview sees the app; everyone else → coming-soon.
   if (!isMedianApp && !previewBypass) return <BetaGatePage />;
 
-  // Logged-out native/preview launch: route straight to auth instead of
-  // letting the Clubhouse feed sit on skeletons forever waiting for a user.
-  // (Apple 2.1 fix — reviewers hit infinite skeletons on a fresh device.)
-  if (!authLoading && !user) {
-    return <Navigate to="/auth" replace />;
-  }
+  // While the session is resolving we do NOT yet know if there's a user. Render a
+  // neutral charcoal hold matching index.html's pre-React shell (#15171F) so the
+  // boot stays seamless. Without this, a logged-out cold launch falls through to
+  // <ClubhouseWrapped/> and flashes the feed skeletons before redirecting to /auth.
+  // Also prevents the keep-alive cache from mounting a phantom Clubhouse instance
+  // (with its queries/realtime/timers) under /auth for logged-out users.
+  if (authLoading) return <BootHold />;
+
+  // Logged-out: straight to auth (no Clubhouse paint).
+  if (!user) return <Navigate to="/auth" replace />;
 
   return <ClubhouseWrapped />;
 };
