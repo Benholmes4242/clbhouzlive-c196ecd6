@@ -5,7 +5,6 @@ import AuthForm from "./auth/AuthForm";
 import { useHideBottomNav } from '@/hooks/useBottomNavVisibility';
 import { useHideHeader } from '@/hooks/useHeaderVisibility';
 import { useSupabaseSession } from "@/hooks/useSupabaseSession";
-import { usePageSkeletonExempt } from "@/perf/usePageReady";
 
 
 
@@ -34,7 +33,6 @@ const Auth: React.FC<AuthProps> = ({ defaultSignUp = false }) => {
   
   useHideBottomNav();
   useHideHeader();
-  usePageSkeletonExempt();
 
   useLayoutEffect(() => {
     document.body.classList.add('route-auth');
