@@ -14,14 +14,24 @@
  * route to the H2H page with the rival pre-selected.
  */
 
+import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { ArrowLeftRight, ChevronRight } from 'lucide-react';
 import { getCollegeLogoUrl } from '@/utils/collegeLogo';
 import { useCollegeRivalries } from '../../hooks/useCollegeMovers';
+import { useCollegeMediaMap } from '../../hooks/useCollegeMedia';
 import { collegeH2HRoute } from '../../routes';
 import { PlayerInitialAvatar } from '../shared/PlayerInitialAvatar';
 import { SectionHeader } from '@/components/ui/SectionHeader';
+import { CollegeComparePickerSheet } from './CollegeComparePickerSheet';
 import { HAIRLINE_INK_8, INK, INK_FAINT, INK_MUTE, INK_TINT_06, INK_TINT_07, SLATE_50, SURFACE } from '../../_shared/tokens';
+
+function formatCollegeName(normalizedName: string): string {
+  return normalizedName
+    .split('-')
+    .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
+    .join(' ');
+}
 
 interface H2HRivalStripProps {
   normalizedName: string;
@@ -32,6 +42,13 @@ const SECTION_PADDING_X = 16;
 
 export function H2HRivalStrip({ normalizedName, className }: H2HRivalStripProps) {
   const { data: rivalries, isLoading } = useCollegeRivalries(normalizedName);
+  const { data: collegeMap } = useCollegeMediaMap();
+  const [pickerOpen, setPickerOpen] = useState(false);
+
+  const c1Media = collegeMap?.get(normalizedName);
+  const c1DisplayName =
+    c1Media?.short_name || c1Media?.college_name || formatCollegeName(normalizedName);
+
 
   if (isLoading) {
     return (
@@ -123,8 +140,9 @@ export function H2HRivalStrip({ normalizedName, className }: H2HRivalStripProps)
         })}
 
         {/* Browse all terminal card */}
-        <Link
-          to={collegeH2HRoute(normalizedName)}
+        <button
+          type="button"
+          onClick={() => setPickerOpen(true)}
           style={{
             flexShrink: 0,
             display: 'flex',
@@ -134,14 +152,22 @@ export function H2HRivalStrip({ normalizedName, className }: H2HRivalStripProps)
             borderRadius: 12,
             background: SURFACE,
             border: '1px dashed rgba(15,23,42,0.18)',
-            textDecoration: 'none',
+            cursor: 'pointer',
           }}
           className="active:scale-[0.98] transition-transform"
         >
           <span style={{ fontSize: 12, fontWeight: 700, color: INK }}>Browse all</span>
           <ChevronRight size={14} strokeWidth={2.5} style={{ color: INK_FAINT }} />
-        </Link>
+        </button>
       </div>
+
+      <CollegeComparePickerSheet
+        open={pickerOpen}
+        onClose={() => setPickerOpen(false)}
+        c1={normalizedName}
+        c1DisplayName={c1DisplayName}
+      />
     </div>
   );
 }
+
