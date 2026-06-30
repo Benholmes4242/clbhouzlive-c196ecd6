@@ -7,13 +7,11 @@ import {
 } from 'lucide-react';
 import { useHasBusinesses } from '@/hooks/useMyBusinesses';
 import { useWhsConnection } from '@/lib/whs/hooks';
-import HandicapConnectSheet from '@/components/profile/handicap/HandicapConnectSheet';
 import { formatHcp } from '@/lib/formatHcp';
 import { useProfileData } from '@/hooks/useProfileData';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { usePrivacySettings } from '@/hooks/usePrivacySettings';
 import { useDeleteAccount } from '@/hooks/useDeleteAccount';
-import { useSettingsSheets } from '@/hooks/useSettingsSheets';
 import { supabase } from '@/integrations/supabase/client';
 import {
   SettingsSection,
@@ -24,25 +22,16 @@ import {
 } from './ui';
 import type { VisibilityLevel } from '@/hooks/usePrivacySettings';
 import {
-  EmailChangeSheet,
-  BlockedUsersSheet,
-  NotificationsSheet,
-  HelpCentreSheet,
-  ContactSupportSheet,
-  LegalSheet,
-} from './sheets';
-import {
   AlertDialog,
   AlertDialogAction,
-  AlertDialogCancel,
   AlertDialogContent,
   AlertDialogDescription,
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
-import { Input } from '@/components/ui/input';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
+import DeleteAccountConfirmSheet from '@/components/manage/overlays/DeleteAccountConfirmSheet';
 
 const APP_VERSION = '1.0.0';
 
@@ -55,8 +44,8 @@ function maskEmail(email: string): string {
 
 /**
  * Settings content for the Manage Profile -> Settings tab.
- * Mirrors SettingsPageV2 but without the page header and the now-redundant
- * "Edit Profile" row (it is the sibling Profile tab).
+ * Rows navigate to /manage/* sub-pages (Phase 3). Destructive confirms stay
+ * as overlays.
  */
 export function SettingsTabContent() {
   const navigate = useNavigate();
@@ -78,9 +67,7 @@ export function SettingsTabContent() {
   );
 
   const deleteAccount = useDeleteAccount(user?.id);
-  const { sheets, open, close } = useSettingsSheets();
   const { data: whsConnection } = useWhsConnection(user?.id);
-  const [whsSheetOpen, setWhsSheetOpen] = useState(false);
 
   const handleSignOut = async () => {
     await supabase.auth.signOut();
@@ -136,7 +123,7 @@ export function SettingsTabContent() {
             title="Email"
             value={user?.email ? maskEmail(user.email) : undefined}
             iconTheme="account"
-            onClick={() => open('email')}
+            onClick={() => navigate('/manage/email')}
           />
         </SettingsSection>
 
@@ -184,7 +171,7 @@ export function SettingsTabContent() {
             icon={<UserX size={18} />}
             title="Blocked Users"
             iconTheme="privacy"
-            onClick={() => open('blocked')}
+            onClick={() => navigate('/manage/blocked')}
           />
         </SettingsSection>
 
@@ -195,7 +182,7 @@ export function SettingsTabContent() {
             title="Notification Preferences"
             isBeta
             iconTheme="notifications"
-            onClick={() => open('notifications')}
+            onClick={() => navigate('/manage/notifications')}
           />
         </SettingsSection>
 
@@ -206,7 +193,7 @@ export function SettingsTabContent() {
             title="England Golf"
             subtitle={whsSubtitle}
             iconTheme="account"
-            onClick={() => setWhsSheetOpen(true)}
+            onClick={() => navigate('/manage/handicap')}
           />
         </SettingsSection>
 
@@ -216,19 +203,19 @@ export function SettingsTabContent() {
             icon={<HelpCircle size={18} />}
             title="Help Centre"
             iconTheme="support"
-            onClick={() => open('help')}
+            onClick={() => navigate('/manage/help')}
           />
           <SettingsChevronRow
             icon={<MessageSquare size={18} />}
             title="Contact Us"
             iconTheme="support"
-            onClick={() => open('contact')}
+            onClick={() => navigate('/manage/contact')}
           />
           <SettingsChevronRow
             icon={<FileText size={18} />}
             title="Legal & Policies"
             iconTheme="legal"
-            onClick={() => open('legal')}
+            onClick={() => navigate('/manage/legal')}
           />
         </SettingsSection>
 
@@ -257,20 +244,7 @@ export function SettingsTabContent() {
         </div>
       </div>
 
-      {/* Sheets */}
-      <EmailChangeSheet open={sheets.email} onClose={() => close('email')} />
-      <BlockedUsersSheet open={sheets.blocked} onClose={() => close('blocked')} userId={user?.id} />
-      <NotificationsSheet open={sheets.notifications} onClose={() => close('notifications')} userId={user?.id} />
-      <HelpCentreSheet open={sheets.help} onClose={() => close('help')} />
-      <ContactSupportSheet open={sheets.contact} onClose={() => close('contact')} />
-      <LegalSheet open={sheets.legal} onClose={() => close('legal')} />
-      <HandicapConnectSheet
-        open={whsSheetOpen}
-        onClose={() => setWhsSheetOpen(false)}
-        userId={user?.id}
-      />
-
-      {/* Business warning dialog */}
+      {/* Business warning dialog (kept as AlertDialog: informational, not destructive confirm) */}
       <AlertDialog open={deleteAccount.showBusinessWarning} onOpenChange={deleteAccount.setShowBusinessWarning}>
         <AlertDialogContent>
           <AlertDialogHeader>
@@ -287,36 +261,15 @@ export function SettingsTabContent() {
         </AlertDialogContent>
       </AlertDialog>
 
-      {/* Delete account confirmation */}
-      <AlertDialog open={deleteAccount.showDeleteConfirm} onOpenChange={deleteAccount.setShowDeleteConfirm}>
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>Delete Account Permanently?</AlertDialogTitle>
-            <AlertDialogDescription>
-              This action cannot be undone. All your data, posts, and connections will be permanently removed.
-              Type <strong>DELETE</strong> to confirm.
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <div className="px-1 pb-2">
-            <Input
-              placeholder="Type DELETE to confirm"
-              value={deleteAccount.deleteConfirmText}
-              onChange={(e) => deleteAccount.setDeleteConfirmText(e.target.value)}
-              className="mt-2"
-            />
-          </div>
-          <AlertDialogFooter>
-            <AlertDialogCancel onClick={() => deleteAccount.setDeleteConfirmText('')}>Cancel</AlertDialogCancel>
-            <AlertDialogAction
-              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
-              disabled={deleteAccount.deleteConfirmText !== 'DELETE' || deleteAccount.isDeleting}
-              onClick={deleteAccount.confirmDelete}
-            >
-              {deleteAccount.isDeleting ? 'Deleting...' : 'Delete My Account'}
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
+      {/* Delete-account confirm (Direction A overlay) */}
+      <DeleteAccountConfirmSheet
+        open={deleteAccount.showDeleteConfirm}
+        onClose={() => deleteAccount.setShowDeleteConfirm(false)}
+        onConfirm={deleteAccount.confirmDelete}
+        confirmText={deleteAccount.deleteConfirmText}
+        setConfirmText={deleteAccount.setDeleteConfirmText}
+        isWorking={deleteAccount.isDeleting}
+      />
     </>
   );
 }
