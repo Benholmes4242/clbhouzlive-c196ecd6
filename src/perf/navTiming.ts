@@ -323,8 +323,9 @@ class NavTimingController {
   private emit(s: NavSummary, reason: string) {
     const tag = `nav#${s.id}`;
     const line =
-      `${s.path.padEnd(24)} total ${s.total}ms | ` +
-      `lazy ${s.lazy} · skeleton ${s.skeleton} · data ${s.data} · paint ${s.paint} | ` +
+      `${s.path.padEnd(24)} fcp ${s.total}ms` +
+      (s.content != null ? ` · content ${s.content}ms` : '') +
+      ` | lazy ${s.lazy} · skeleton ${s.skeleton} · data ${s.data} · paint ${s.paint} | ` +
       `CLS ${s.cls} · header:${s.headerFlash > 0 ? `FLASH(${s.headerFlash + 1})` : 'OK'} · ` +
       `skeleton:${s.skeletonVerdict} · mounts:${s.mounts}` +
       (reason !== 'interactive' ? `  [${reason}]` : '');
