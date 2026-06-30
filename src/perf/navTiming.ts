@@ -8,6 +8,7 @@
  * `nav:interactive` (or on timeout). Flagged navs warn with [PERF-WARN].
  */
 
+import * as React from 'react';
 import { AppLog } from '@/lib/logger';
 
 export type NavPhase =
