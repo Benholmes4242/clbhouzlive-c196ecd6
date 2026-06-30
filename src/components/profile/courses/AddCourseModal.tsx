@@ -140,26 +140,8 @@ const SortableManageItem: React.FC<SortableItemProps> = ({
         marginBottom: 10,
       }}
     >
-      {/* Row 1: drag handle + rank + FULL NAME (wraps) + remove */}
       <div style={{ display: 'flex', gap: 10, alignItems: 'flex-start' }}>
-        <button
-          {...attributes}
-          {...listeners}
-          aria-label="Drag to reorder"
-          style={{
-            border: 'none',
-            background: 'transparent',
-            cursor: 'grab',
-            padding: 2,
-            flexShrink: 0,
-            touchAction: 'none',
-            color: '#CBD5E1',
-            display: 'flex',
-            alignItems: 'center',
-          }}
-        >
-          <GripVertical size={16} />
-        </button>
+        {/* Rank numeral — left of thumbnail */}
         <div style={{
           fontSize: 16,
           fontWeight: 900,
@@ -172,40 +154,8 @@ const SortableManageItem: React.FC<SortableItemProps> = ({
         }}>
           {position}
         </div>
-        <div style={{
-          flex: 1,
-          minWidth: 0,
-          fontSize: 15,
-          fontWeight: 700,
-          color: INK,
-          letterSpacing: '-0.01em',
-          lineHeight: 1.3,
-          wordBreak: 'break-word',
-        }}>
-          {course.name}
-        </div>
-        <button
-          onClick={() => onRemove(course.course_id)}
-          disabled={isRemoving}
-          aria-label={`Remove ${course.name} from Top 10`}
-          style={{
-            border: 'none',
-            background: 'transparent',
-            cursor: isRemoving ? 'not-allowed' : 'pointer',
-            padding: 2,
-            flexShrink: 0,
-            color: '#DC2626',
-            opacity: isRemoving ? 0.4 : 1,
-            display: 'flex',
-            alignItems: 'center',
-          }}
-        >
-          <Trash2 size={16} />
-        </button>
-      </div>
 
-      {/* Row 2: thumb + country + score + reorder chevrons */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginTop: 10, paddingLeft: 28 }}>
+        {/* Thumbnail — left of name */}
         {course.thumbnail_image ? (
           <img
             src={course.thumbnail_image}
@@ -236,62 +186,121 @@ const SortableManageItem: React.FC<SortableItemProps> = ({
             <Trophy size={14} color={INK_SUBTLE} />
           </div>
         )}
-        <div style={{ flex: 1, minWidth: 0, display: 'flex', gap: 6, alignItems: 'baseline', flexWrap: 'wrap' }}>
-          <span style={{
-            fontSize: 10,
-            fontWeight: 700,
-            letterSpacing: '0.14em',
-            textTransform: 'uppercase',
-            color: INK_SUBTLE,
-          }}>
-            {course.sub_country || course.country}
-          </span>
-          {ratingNum != null && (
-            <>
-              <span style={{ color: '#CBD5E1' }}>·</span>
-              <PlainScore value={ratingNum} size={13} />
-            </>
-          )}
-        </div>
-        <div style={{ display: 'flex', gap: 4, flexShrink: 0 }}>
-          <button
-            onClick={() => onMoveUp(index)}
-            disabled={index === 0 || isReordering}
-            aria-label="Move up"
-            style={{
-              border: 'none',
-              background: '#F1F5F9',
-              borderRadius: 7,
-              cursor: index === 0 || isReordering ? 'not-allowed' : 'pointer',
-              padding: 5,
-              color: INK_SOFT,
-              opacity: index === 0 || isReordering ? 0.4 : 1,
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-            }}
-          >
-            <ChevronUp size={15} />
-          </button>
-          <button
-            onClick={() => onMoveDown(index)}
-            disabled={index === totalItems - 1 || isReordering}
-            aria-label="Move down"
-            style={{
-              border: 'none',
-              background: '#F1F5F9',
-              borderRadius: 7,
-              cursor: index === totalItems - 1 || isReordering ? 'not-allowed' : 'pointer',
-              padding: 5,
-              color: INK_SOFT,
-              opacity: index === totalItems - 1 || isReordering ? 0.4 : 1,
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-            }}
-          >
-            <ChevronDown size={15} />
-          </button>
+
+        {/* Right column: name + location row */}
+        <div style={{ flex: 1, minWidth: 0 }}>
+          {/* Name + remove */}
+          <div style={{ display: 'flex', gap: 10, alignItems: 'flex-start' }}>
+            <div style={{
+              flex: 1,
+              minWidth: 0,
+              fontSize: 15,
+              fontWeight: 700,
+              color: INK,
+              letterSpacing: '-0.01em',
+              lineHeight: 1.3,
+              wordBreak: 'break-word',
+            }}>
+              {course.name}
+            </div>
+            <button
+              onClick={() => onRemove(course.course_id)}
+              disabled={isRemoving}
+              aria-label={`Remove ${course.name} from Top 10`}
+              style={{
+                border: 'none',
+                background: 'transparent',
+                cursor: isRemoving ? 'not-allowed' : 'pointer',
+                padding: 2,
+                flexShrink: 0,
+                color: '#DC2626',
+                opacity: isRemoving ? 0.4 : 1,
+                display: 'flex',
+                alignItems: 'center',
+              }}
+            >
+              <Trash2 size={16} />
+            </button>
+          </div>
+
+          {/* Grip (six dot) — left of location */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginTop: 8 }}>
+            <button
+              {...attributes}
+              {...listeners}
+              aria-label="Drag to reorder"
+              style={{
+                border: 'none',
+                background: 'transparent',
+                cursor: 'grab',
+                padding: 2,
+                flexShrink: 0,
+                touchAction: 'none',
+                color: '#CBD5E1',
+                display: 'flex',
+                alignItems: 'center',
+              }}
+            >
+              <GripVertical size={16} />
+            </button>
+            <div style={{ flex: 1, minWidth: 0, display: 'flex', gap: 6, alignItems: 'baseline', flexWrap: 'wrap' }}>
+              <span style={{
+                fontSize: 10,
+                fontWeight: 700,
+                letterSpacing: '0.14em',
+                textTransform: 'uppercase',
+                color: INK_SUBTLE,
+              }}>
+                {course.sub_country || course.country}
+              </span>
+              {ratingNum != null && (
+                <>
+                  <span style={{ color: '#CBD5E1' }}>·</span>
+                  <PlainScore value={ratingNum} size={13} />
+                </>
+              )}
+            </div>
+            <div style={{ display: 'flex', gap: 4, flexShrink: 0 }}>
+              <button
+                onClick={() => onMoveUp(index)}
+                disabled={index === 0 || isReordering}
+                aria-label="Move up"
+                style={{
+                  border: 'none',
+                  background: '#F1F5F9',
+                  borderRadius: 7,
+                  cursor: index === 0 || isReordering ? 'not-allowed' : 'pointer',
+                  padding: 5,
+                  color: INK_SOFT,
+                  opacity: index === 0 || isReordering ? 0.4 : 1,
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                }}
+              >
+                <ChevronUp size={15} />
+              </button>
+              <button
+                onClick={() => onMoveDown(index)}
+                disabled={index === totalItems - 1 || isReordering}
+                aria-label="Move down"
+                style={{
+                  border: 'none',
+                  background: '#F1F5F9',
+                  borderRadius: 7,
+                  cursor: index === totalItems - 1 || isReordering ? 'not-allowed' : 'pointer',
+                  padding: 5,
+                  color: INK_SOFT,
+                  opacity: index === totalItems - 1 || isReordering ? 0.4 : 1,
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                }}
+              >
+                <ChevronDown size={15} />
+              </button>
+            </div>
+          </div>
         </div>
       </div>
     </div>
@@ -606,6 +615,7 @@ export const AddCourseModal: React.FC<AddCourseModalProps> = ({
           eyebrow="YOUR COURSES"
           title={<span id="add-course-title">Personal Top 10</span>}
           onClose={onClose}
+          borderBottom={false}
         />
 
         {/* 10 / 10 status line */}
