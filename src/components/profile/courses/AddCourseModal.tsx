@@ -824,30 +824,51 @@ export const AddCourseModal: React.FC<AddCourseModalProps> = ({
                         </button>
                       </div>
                     </div>
-                  ) : (
-                    <button
-                      onClick={() => setShowResetConfirm(true)}
-                      style={{
-                        display: 'flex',
-                        margin: '12px 16px',
-                        padding: '10px 16px',
-                        background: '#FFFFFF',
-                        border: `1px solid ${AMBER_BORDER}`,
-                        borderRadius: 10,
-                        color: AMBER_DEEP,
-                        fontSize: 13,
-                        fontWeight: 700,
-                        cursor: 'pointer',
-                        minHeight: 44,
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        gap: 8,
-                      }}
-                    >
-                      <RotateCcw size={14} strokeWidth={2.25} />
-                      Sort by highest rated
-                    </button>
-                  )
+                  ) : !sortTileDismissed ? (
+                    <div style={{ display: 'flex', gap: 8, margin: '12px 16px', alignItems: 'stretch' }}>
+                      <button
+                        onClick={() => setShowResetConfirm(true)}
+                        style={{
+                          flex: 1,
+                          display: 'flex',
+                          padding: '10px 16px',
+                          background: '#FFFFFF',
+                          border: `1px solid ${AMBER_BORDER}`,
+                          borderRadius: 10,
+                          color: AMBER_DEEP,
+                          fontSize: 13,
+                          fontWeight: 700,
+                          cursor: 'pointer',
+                          minHeight: 44,
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          gap: 8,
+                        }}
+                      >
+                        <RotateCcw size={14} strokeWidth={2.25} />
+                        Sort by highest rated
+                      </button>
+                      <button
+                        onClick={(e) => { e.stopPropagation(); setSortTileDismissed(true); }}
+                        aria-label="Dismiss"
+                        style={{
+                          width: 44,
+                          flexShrink: 0,
+                          borderRadius: 10,
+                          border: `1px solid ${AMBER_BORDER}`,
+                          background: '#FFFFFF',
+                          color: AMBER_DEEP,
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          cursor: 'pointer',
+                        }}
+                      >
+                        <X size={16} strokeWidth={2.25} />
+                      </button>
+                    </div>
+                  ) : null
+
                 )}
 
                 <DndContext
