@@ -552,6 +552,7 @@ export const CardFeed: React.FC<CardFeedProps> = ({
           increaseViewportBy={{ top: 400, bottom: 800 }}
           overscan={{ main: 400, reverse: 400 }}
           components={components}
+          restoreStateFrom={initialState}
           style={{ height: '100%', width: '100%' }}
         />
       </div>
