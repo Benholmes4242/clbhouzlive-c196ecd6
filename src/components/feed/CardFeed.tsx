@@ -605,6 +605,14 @@ export const CardFeed = forwardRef<CardFeedHandle, CardFeedProps>(function CardF
           overscan={{ main: 400, reverse: 400 }}
           components={components}
           restoreStateFrom={initialState}
+          initialScrollTop={restoreScrollTopRef.current ?? 0}
+          initialTopMostItemIndex={initialState ? undefined : 0}
+          style={{ height: '100%', width: '100%' }}
+        />
+          increaseViewportBy={{ top: 400, bottom: 800 }}
+          overscan={{ main: 400, reverse: 400 }}
+          components={components}
+          restoreStateFrom={initialState}
           initialTopMostItemIndex={
             initialState ? undefined : Math.min(0, Math.max(0, posts.length - 1))
           }
