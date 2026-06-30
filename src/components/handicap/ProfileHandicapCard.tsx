@@ -159,6 +159,7 @@ const ProfileHandicapCard: React.FC<Props> = ({
           background: 'var(--hcp-bg-1)',
           border: '1px solid var(--hcp-line)',
           borderRadius: 18,
+          overflow: 'hidden',
           padding: '16px 16px 14px',
           fontFamily: FONT,
           cursor: 'pointer',
@@ -238,17 +239,17 @@ const ProfileHandicapCard: React.FC<Props> = ({
         </div>
 
         {/* Trophies info strip */}
-        <div style={{ marginTop: 14 }}>
-          <div
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: 12,
-              padding: '12px 14px',
-              borderTop: '1px solid var(--hcp-line)',
-              background: 'var(--hcp-amber-tint, rgba(247,147,30,0.10))',
-            }}
-          >
+        <div
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: 12,
+            margin: '14px -16px -14px',
+            padding: '12px 16px',
+            borderTop: '1px solid var(--hcp-line)',
+            background: 'var(--hcp-amber-tint, rgba(247,147,30,0.10))',
+          }}
+        >
             <div
               style={{
                 width: 36,
@@ -326,7 +327,6 @@ const ProfileHandicapCard: React.FC<Props> = ({
             )}
           </div>
         </div>
-      </div>
     </div>
   );
 };
