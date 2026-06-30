@@ -270,7 +270,7 @@ class NavTimingController {
     const doubleMount = mounts > 1;
 
     let skeletonVerdict: NavSummary['skeletonVerdict'] = 'NA';
-    if (m['skeleton-exempt'] != null) {
+    if (isSkeletonExemptPath(tx.path) || m['skeleton-exempt'] != null) {
       skeletonVerdict = 'NA';                       // intentional neutral hold (e.g. /auth BootHold)
     } else if (m['skeleton-shown'] != null) {
       skeletonVerdict = skeleton < 100 ? 'FLASH' : 'OK';
