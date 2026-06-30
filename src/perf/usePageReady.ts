@@ -45,6 +45,19 @@ export function useSkeletonShown() {
   }, []);
 }
 
+/**
+ * Variant for skeletons whose visibility is toggled via prop. Marks the
+ * skeleton-shown phase the first time `visible` flips true within a nav.
+ * first-write-wins in mark() means later toggles (tab switch resets) won't
+ * move the original timestamp — correct: tab switches are intra-nav.
+ */
+export function useSkeletonShownWhenVisible(visible: boolean) {
+  useLayoutEffect(() => {
+    if (!isPerfEnabled() || !visible) return;
+    markSkeletonShown();
+  }, [visible]);
+}
+
 /** Page declares it intentionally has no skeleton (neutral hold is by design). */
 export function usePageSkeletonExempt() {
   useLayoutEffect(() => {
