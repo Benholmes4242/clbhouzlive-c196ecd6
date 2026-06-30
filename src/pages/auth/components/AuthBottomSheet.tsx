@@ -84,18 +84,20 @@ const AuthBottomSheet: React.FC<AuthBottomSheetProps> = ({
         <div className="flex items-start justify-between px-6 pb-3">
           <div className="flex-1 pr-4">
             {title && (
-              <h2 
-                style={{ 
-                  fontSize: 20,
-                  fontWeight: 800,
-                  color: 'rgba(255,255,255,0.96)',
-                  letterSpacing: '-0.03em',
-                  marginBottom: 4,
-                }}
-              >
-                {title}
-              </h2>
-              <div style={{ width: 28, height: 3, borderRadius: 99, background: '#F7931E', marginTop: 8 }} />
+              <div>
+                <h2 
+                  style={{ 
+                    fontSize: 20,
+                    fontWeight: 800,
+                    color: 'rgba(255,255,255,0.96)',
+                    letterSpacing: '-0.03em',
+                    marginBottom: 4,
+                  }}
+                >
+                  {title}
+                </h2>
+                <div style={{ width: 28, height: 3, borderRadius: 99, background: '#F7931E', marginTop: 8 }} />
+              </div>
             )}
             {subtitle && (
               <p 
