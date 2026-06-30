@@ -335,15 +335,11 @@ export default function EditProfile() {
           )}
         </div>
 
-        <HandicapConnectSheet
-          open={connectSheetOpen}
-          onClose={() => setConnectSheetOpen(false)}
-          userId={user?.id}
-        />
       </div>
     </PageRoot>
   );
 }
+
 
 
 
