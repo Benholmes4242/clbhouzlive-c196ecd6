@@ -11,14 +11,19 @@ export function NavTimingProvider({ children }: { children: React.ReactNode }) {
   const location = useLocation();
   const lastKey = useRef<string>('');
 
+  // Open the transaction SYNCHRONOUSLY during render when the route changes
+  // so that child useLayoutEffects (e.g. PageRoot.usePageRootMount) attribute
+  // to the new nav rather than the previous one (or null).
+  if (isPerfEnabled()) {
+    const key = location.pathname + location.search;
+    if (key !== lastKey.current) {
+      lastKey.current = key;
+      beginNav(location.pathname);
+    }
+  }
+
   useEffect(() => {
     if (!isPerfEnabled()) return;
-    const key = location.pathname + location.search;
-    if (key === lastKey.current) return;
-    lastKey.current = key;
-
-    beginNav(location.pathname);
-
     // After the next paint, schedule an idle callback to mark interactive.
     let raf1 = 0;
     let raf2 = 0;
@@ -48,5 +53,6 @@ export function NavTimingProvider({ children }: { children: React.ReactNode }) {
 
   return children as any;
 }
+
 
 export default NavTimingProvider;
