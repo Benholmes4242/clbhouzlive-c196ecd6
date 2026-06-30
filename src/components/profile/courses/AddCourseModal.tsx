@@ -14,7 +14,7 @@ import { useUserCourseActivity } from '@/hooks/useUserCourseActivity';
 import { useUserTopTenCourses } from '@/hooks/useUserTopTenCourses';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
-import { Search, X, Star, Plus, Trash2, ChevronUp, ChevronDown, GripVertical, Trophy, RotateCcw } from 'lucide-react';
+import { Search, X, Star, Plus, Trash2, ChevronUp, ChevronDown, Trophy, RotateCcw } from 'lucide-react';
 import { BottomSheet } from '@/components/ui/BottomSheet';
 import SheetHeader from '@/components/ui/SheetHeader';
 import { toast } from 'sonner';
@@ -127,9 +127,13 @@ const SortableManageItem: React.FC<SortableItemProps> = ({
     ? course.rating
     : course.rating != null ? parseFloat(course.rating) : null;
 
+  const stopDrag = (e: React.PointerEvent) => e.stopPropagation();
+
   return (
     <div
       ref={setNodeRef}
+      {...attributes}
+      {...listeners}
       style={{
         ...dragStyle,
         background: '#FFFFFF',
@@ -138,6 +142,8 @@ const SortableManageItem: React.FC<SortableItemProps> = ({
         padding: '12px 14px',
         boxShadow: isDragging ? '0 4px 12px rgba(0,0,0,0.08)' : '0 1px 2px rgba(15,23,42,0.04)',
         marginBottom: 10,
+        cursor: 'grab',
+        touchAction: 'none',
       }}
     >
       <div style={{ display: 'flex', gap: 10, alignItems: 'flex-start' }}>
@@ -204,6 +210,7 @@ const SortableManageItem: React.FC<SortableItemProps> = ({
               {course.name}
             </div>
             <button
+              onPointerDown={stopDrag}
               onClick={() => onRemove(course.course_id)}
               disabled={isRemoving}
               aria-label={`Remove ${course.name} from Top 10`}
@@ -223,26 +230,8 @@ const SortableManageItem: React.FC<SortableItemProps> = ({
             </button>
           </div>
 
-          {/* Grip (six dot) — left of location */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginTop: 8 }}>
-            <button
-              {...attributes}
-              {...listeners}
-              aria-label="Drag to reorder"
-              style={{
-                border: 'none',
-                background: 'transparent',
-                cursor: 'grab',
-                padding: 2,
-                flexShrink: 0,
-                touchAction: 'none',
-                color: '#CBD5E1',
-                display: 'flex',
-                alignItems: 'center',
-              }}
-            >
-              <GripVertical size={16} />
-            </button>
+          {/* Location flush under name */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginTop: 6 }}>
             <div style={{ flex: 1, minWidth: 0, display: 'flex', gap: 6, alignItems: 'baseline', flexWrap: 'wrap' }}>
               <span style={{
                 fontSize: 10,
@@ -262,6 +251,7 @@ const SortableManageItem: React.FC<SortableItemProps> = ({
             </div>
             <div style={{ display: 'flex', gap: 4, flexShrink: 0 }}>
               <button
+                onPointerDown={stopDrag}
                 onClick={() => onMoveUp(index)}
                 disabled={index === 0 || isReordering}
                 aria-label="Move up"
@@ -281,6 +271,7 @@ const SortableManageItem: React.FC<SortableItemProps> = ({
                 <ChevronUp size={15} />
               </button>
               <button
+                onPointerDown={stopDrag}
                 onClick={() => onMoveDown(index)}
                 disabled={index === totalItems - 1 || isReordering}
                 aria-label="Move down"
@@ -442,6 +433,7 @@ export const AddCourseModal: React.FC<AddCourseModalProps> = ({
   const [activeTab, setActiveTab] = useState<'manage' | 'add'>(preSelectedCourseId ? 'add' : 'manage');
   const [showResetConfirm, setShowResetConfirm] = useState(false);
   const [isResetting, setIsResetting] = useState(false);
+  const [sortTileDismissed, setSortTileDismissed] = useState(false);
   const searchInputRef = useRef<HTMLInputElement>(null);
 
   const navigate = useNavigate();
@@ -832,30 +824,51 @@ export const AddCourseModal: React.FC<AddCourseModalProps> = ({
                         </button>
                       </div>
                     </div>
-                  ) : (
-                    <button
-                      onClick={() => setShowResetConfirm(true)}
-                      style={{
-                        display: 'flex',
-                        margin: '12px 16px',
-                        padding: '10px 16px',
-                        background: '#FFFFFF',
-                        border: `1px solid ${AMBER_BORDER}`,
-                        borderRadius: 10,
-                        color: AMBER_DEEP,
-                        fontSize: 13,
-                        fontWeight: 700,
-                        cursor: 'pointer',
-                        minHeight: 44,
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        gap: 8,
-                      }}
-                    >
-                      <RotateCcw size={14} strokeWidth={2.25} />
-                      Sort by highest rated
-                    </button>
-                  )
+                  ) : !sortTileDismissed ? (
+                    <div style={{ display: 'flex', gap: 8, margin: '12px 16px', alignItems: 'stretch' }}>
+                      <button
+                        onClick={() => setShowResetConfirm(true)}
+                        style={{
+                          flex: 1,
+                          display: 'flex',
+                          padding: '10px 16px',
+                          background: '#FFFFFF',
+                          border: `1px solid ${AMBER_BORDER}`,
+                          borderRadius: 10,
+                          color: AMBER_DEEP,
+                          fontSize: 13,
+                          fontWeight: 700,
+                          cursor: 'pointer',
+                          minHeight: 44,
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          gap: 8,
+                        }}
+                      >
+                        <RotateCcw size={14} strokeWidth={2.25} />
+                        Sort by highest rated
+                      </button>
+                      <button
+                        onClick={(e) => { e.stopPropagation(); setSortTileDismissed(true); }}
+                        aria-label="Dismiss"
+                        style={{
+                          width: 44,
+                          flexShrink: 0,
+                          borderRadius: 10,
+                          border: `1px solid ${AMBER_BORDER}`,
+                          background: '#FFFFFF',
+                          color: AMBER_DEEP,
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          cursor: 'pointer',
+                        }}
+                      >
+                        <X size={16} strokeWidth={2.25} />
+                      </button>
+                    </div>
+                  ) : null
+
                 )}
 
                 <DndContext

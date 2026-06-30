@@ -19,7 +19,7 @@ import {
 } from '@/lib/whs/hooks';
 import { useHandicapTrend12mo } from '@/hooks/useHandicapTrend12mo';
 import { useUserAchievements } from '@/hooks/gam/useUserAchievements';
-import { openGamAchievements } from '@/components/profile/handicap/whs/gam/events';
+
 import { analyticsEvents } from '@/utils/analyticsEvents';
 
 const FONT = 'Geist, system-ui, -apple-system, BlinkMacSystemFont, sans-serif';
@@ -245,7 +245,7 @@ const ProfileHandicapCard: React.FC<Props> = ({
               type="button"
               onClick={(e) => {
                 e.stopPropagation();
-                openGamAchievements();
+                navigate(`/handicap/${userId}?gam=trophies`);
               }}
               aria-label={`See ${isOwnProfile ? 'your' : `${resolvedName}'s`} trophies`}
               style={{

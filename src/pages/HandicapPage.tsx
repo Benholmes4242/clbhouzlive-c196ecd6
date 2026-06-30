@@ -15,7 +15,7 @@ import React, { useCallback, useEffect, useLayoutEffect, useMemo } from 'react';
 import { useNavigate, Navigate, useSearchParams, useParams } from 'react-router-dom';
 import { ChevronRight, Trophy, Activity, Bell } from 'lucide-react';
 import GamMount from '@/components/profile/handicap/whs/gam/GamMount';
-import { openNotifications } from '@/components/profile/handicap/whs/gam/events';
+import { openNotifications, openGamAchievements } from '@/components/profile/handicap/whs/gam/events';
 
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
@@ -355,6 +355,16 @@ const HandicapPage: React.FC = () => {
     const params = new URLSearchParams(searchParams);
     params.set('subtab', next);
     setSearchParams(params, { replace: true });
+  }, [searchParams, setSearchParams]);
+
+  // Deep-link: ?gam=trophies opens the Trophy Room sheet once on arrival.
+  useEffect(() => {
+    if (searchParams.get('gam') === 'trophies') {
+      openGamAchievements();
+      const next = new URLSearchParams(searchParams);
+      next.delete('gam');
+      setSearchParams(next, { replace: true });
+    }
   }, [searchParams, setSearchParams]);
 
   // Fetch profile for greeting/title.
