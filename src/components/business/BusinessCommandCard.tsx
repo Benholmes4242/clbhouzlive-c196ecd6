@@ -62,6 +62,10 @@ export function BusinessCommandCard({ membership, userId, index = 0, isActive = 
 
   const { business, role } = membership;
 
+  // Null-guard: if the joined business row is missing (deleted or soft-deleted between
+  // fetch and render), bail out cleanly rather than crashing on business.id / business.name.
+  if (!business) return null;
+
   // Fetch 7-day stats for visits/impressions
   const { data: stats, isLoading: statsLoading } = useBusinessStats7d(business.id);
 
