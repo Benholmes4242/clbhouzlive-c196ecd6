@@ -66,37 +66,7 @@ interface CourseWithRating {
   has_rating: boolean;
 }
 
-// Position badge colors — gold/silver/bronze podium, slate for 4-10
-const getPositionBadgeStyle = (position: number): { bg: string; text: string; shadow?: string } => {
-  switch (position) {
-    case 1:
-      return {
-        bg: '#C1A84C',
-        text: '#FFFFFF',
-        shadow: '0 2px 8px rgba(193, 168, 76, 0.4)',
-      };
-    case 2:
-      return {
-        bg: 'linear-gradient(145deg, #94A3B8 0%, #64748B 100%)',
-        text: '#FFFFFF',
-        shadow: '0 2px 6px rgba(100, 116, 139, 0.35)',
-      };
-    case 3:
-      return {
-        bg: 'linear-gradient(145deg, #D97706 0%, #B45309 100%)',
-        text: '#FFFFFF',
-        shadow: '0 2px 6px rgba(217, 119, 6, 0.35)',
-      };
-    default:
-      return {
-        bg: '#F1F5F9',
-        text: '#475569',
-        shadow: 'inset 0 1px 2px rgba(0,0,0,0.06)',
-      };
-  }
-};
-
-// Plain tabular score (e.g. 9.7) - canonical replacement for the retired SerifScore.
+// Plain tabular score - canonical replacement for the retired SerifScore.
 const PlainScore: React.FC<{ value: number; size?: number }> = ({ value, size = 13 }) => {
   const safe = Number.isFinite(value) ? value : 0;
   return (
@@ -113,7 +83,7 @@ const PlainScore: React.FC<{ value: number; size?: number }> = ({ value, size = 
   );
 };
 
-// ---- Sortable Manage row ----
+// ---- Sortable Manage row (Option C stacked card) ----
 interface SortableItemProps {
   course: any;
   index: number;
@@ -152,7 +122,7 @@ const SortableManageItem: React.FC<SortableItemProps> = ({
   };
 
   const position = index + 1;
-  const badgeStyle = getPositionBadgeStyle(position);
+  const isPodium = position <= 3;
   const ratingNum = typeof course.rating === 'number'
     ? course.rating
     : course.rating != null ? parseFloat(course.rating) : null;
@@ -162,116 +132,118 @@ const SortableManageItem: React.FC<SortableItemProps> = ({
       ref={setNodeRef}
       style={{
         ...dragStyle,
-        display: 'flex',
-        alignItems: 'center',
-        gap: 12,
-        padding: '14px 16px',
         background: '#FFFFFF',
-        borderBottom: `1px solid ${BORDER}`,
-        boxShadow: isDragging ? '0 4px 12px rgba(0,0,0,0.08)' : 'none',
+        border: `1px solid ${BORDER}`,
+        borderRadius: 14,
+        padding: '12px 14px',
+        boxShadow: isDragging ? '0 4px 12px rgba(0,0,0,0.08)' : '0 1px 2px rgba(15,23,42,0.04)',
+        marginBottom: 10,
       }}
     >
-      {/* Drag handle — 32×44 hit target */}
-      <button
-        {...attributes}
-        {...listeners}
-        style={{
-          width: 32,
-          height: 44,
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          background: 'transparent',
-          border: 0,
-          cursor: 'grab',
-          color: INK_SUBTLE,
-          padding: 0,
+      {/* Row 1: drag handle + rank + FULL NAME (wraps) + remove */}
+      <div style={{ display: 'flex', gap: 10, alignItems: 'flex-start' }}>
+        <button
+          {...attributes}
+          {...listeners}
+          aria-label="Drag to reorder"
+          style={{
+            border: 'none',
+            background: 'transparent',
+            cursor: 'grab',
+            padding: 2,
+            flexShrink: 0,
+            touchAction: 'none',
+            color: '#CBD5E1',
+            display: 'flex',
+            alignItems: 'center',
+          }}
+        >
+          <GripVertical size={16} />
+        </button>
+        <div style={{
+          fontSize: 16,
+          fontWeight: 900,
+          color: isPodium ? AMBER_DEEP : INK_SUBTLE,
+          letterSpacing: '-0.03em',
+          fontVariantNumeric: 'tabular-nums',
+          lineHeight: 1.3,
           flexShrink: 0,
-          touchAction: 'none',
-        }}
-        aria-label="Drag to reorder"
-      >
-        <GripVertical size={18} strokeWidth={2} />
-      </button>
+          minWidth: 18,
+        }}>
+          {position}
+        </div>
+        <div style={{
+          flex: 1,
+          minWidth: 0,
+          fontSize: 15,
+          fontWeight: 700,
+          color: INK,
+          letterSpacing: '-0.01em',
+          lineHeight: 1.3,
+          wordBreak: 'break-word',
+        }}>
+          {course.name}
+        </div>
+        <button
+          onClick={() => onRemove(course.course_id)}
+          disabled={isRemoving}
+          aria-label={`Remove ${course.name} from Top 10`}
+          style={{
+            border: 'none',
+            background: 'transparent',
+            cursor: isRemoving ? 'not-allowed' : 'pointer',
+            padding: 2,
+            flexShrink: 0,
+            color: '#DC2626',
+            opacity: isRemoving ? 0.4 : 1,
+            display: 'flex',
+            alignItems: 'center',
+          }}
+        >
+          <Trash2 size={16} />
+        </button>
+      </div>
 
-      {/* Thumbnail with podium badge overlap */}
-      <div style={{ position: 'relative', flexShrink: 0 }}>
+      {/* Row 2: thumb + country + score + reorder chevrons */}
+      <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginTop: 10, paddingLeft: 28 }}>
         {course.thumbnail_image ? (
           <img
             src={course.thumbnail_image}
-            alt={course.name}
+            alt=""
             loading="lazy"
             decoding="async"
             style={{
-              width: 56,
-              height: 56,
+              width: 30,
+              height: 30,
               objectFit: 'cover',
-              borderRadius: 12,
+              borderRadius: 7,
               background: '#F1F5F9',
+              flexShrink: 0,
               display: 'block',
             }}
           />
         ) : (
           <div style={{
-            width: 56,
-            height: 56,
-            borderRadius: 12,
+            width: 30,
+            height: 30,
+            borderRadius: 7,
             background: '#F1F5F9',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
+            flexShrink: 0,
           }}>
-            <Trophy size={20} color={INK_SUBTLE} />
+            <Trophy size={14} color={INK_SUBTLE} />
           </div>
         )}
-        <div style={{
-          position: 'absolute',
-          top: -4,
-          left: -4,
-          width: 22,
-          height: 22,
-          borderRadius: '50%',
-          background: badgeStyle.bg,
-          color: badgeStyle.text,
-          boxShadow: badgeStyle.shadow,
-          border: '2px solid #FFFFFF',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          fontSize: 10,
-          fontWeight: 900,
-          letterSpacing: '-0.02em',
-        }}>
-          {position}
-        </div>
-      </div>
-
-      {/* Course info - canonical row text */}
-      <div style={{ flex: 1, minWidth: 0 }}>
-        <div style={{
-          fontSize: 15,
-          fontWeight: 700,
-          color: INK,
-          lineHeight: 1.25,
-          marginBottom: 3,
-          overflow: 'hidden',
-          textOverflow: 'ellipsis',
-          whiteSpace: 'nowrap',
-        }}>
-          {course.name}
-        </div>
-        <div style={{
-          display: 'flex',
-          alignItems: 'baseline',
-          gap: 6,
-          fontSize: 10,
-          fontWeight: 700,
-          letterSpacing: '0.14em',
-          color: INK_SUBTLE,
-          textTransform: 'uppercase',
-          overflow: 'hidden',
-        }}>
-          <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+        <div style={{ flex: 1, minWidth: 0, display: 'flex', gap: 6, alignItems: 'baseline', flexWrap: 'wrap' }}>
+          <span style={{
+            fontSize: 10,
+            fontWeight: 700,
+            letterSpacing: '0.14em',
+            textTransform: 'uppercase',
+            color: INK_SUBTLE,
+          }}>
             {course.sub_country || course.country}
           </span>
           {ratingNum != null && (
@@ -281,84 +253,52 @@ const SortableManageItem: React.FC<SortableItemProps> = ({
             </>
           )}
         </div>
+        <div style={{ display: 'flex', gap: 4, flexShrink: 0 }}>
+          <button
+            onClick={() => onMoveUp(index)}
+            disabled={index === 0 || isReordering}
+            aria-label="Move up"
+            style={{
+              border: 'none',
+              background: '#F1F5F9',
+              borderRadius: 7,
+              cursor: index === 0 || isReordering ? 'not-allowed' : 'pointer',
+              padding: 5,
+              color: INK_SOFT,
+              opacity: index === 0 || isReordering ? 0.4 : 1,
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+            }}
+          >
+            <ChevronUp size={15} />
+          </button>
+          <button
+            onClick={() => onMoveDown(index)}
+            disabled={index === totalItems - 1 || isReordering}
+            aria-label="Move down"
+            style={{
+              border: 'none',
+              background: '#F1F5F9',
+              borderRadius: 7,
+              cursor: index === totalItems - 1 || isReordering ? 'not-allowed' : 'pointer',
+              padding: 5,
+              color: INK_SOFT,
+              opacity: index === totalItems - 1 || isReordering ? 0.4 : 1,
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+            }}
+          >
+            <ChevronDown size={15} />
+          </button>
+        </div>
       </div>
-
-      {/* Reorder chevrons */}
-      <div style={{
-        display: 'flex',
-        flexDirection: 'column',
-        gap: 0,
-        flexShrink: 0,
-      }}>
-        <button
-          onClick={() => onMoveUp(index)}
-          disabled={index === 0 || isReordering}
-          style={{
-            width: 32,
-            height: 22,
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            background: 'transparent',
-            border: 0,
-            cursor: index === 0 || isReordering ? 'not-allowed' : 'pointer',
-            color: INK_SUBTLE,
-            opacity: index === 0 || isReordering ? 0.3 : 1,
-            padding: 0,
-          }}
-          aria-label="Move up"
-        >
-          <ChevronUp size={16} strokeWidth={2.25} />
-        </button>
-        <button
-          onClick={() => onMoveDown(index)}
-          disabled={index === totalItems - 1 || isReordering}
-          style={{
-            width: 32,
-            height: 22,
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            background: 'transparent',
-            border: 0,
-            cursor: index === totalItems - 1 || isReordering ? 'not-allowed' : 'pointer',
-            color: INK_SUBTLE,
-            opacity: index === totalItems - 1 || isReordering ? 0.3 : 1,
-            padding: 0,
-          }}
-          aria-label="Move down"
-        >
-          <ChevronDown size={16} strokeWidth={2.25} />
-        </button>
-      </div>
-
-      {/* Remove */}
-      <button
-        onClick={() => onRemove(course.course_id)}
-        disabled={isRemoving}
-        style={{
-          width: 36,
-          height: 36,
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          background: 'transparent',
-          border: 0,
-          cursor: isRemoving ? 'not-allowed' : 'pointer',
-          color: '#EF4444',
-          opacity: isRemoving ? 0.4 : 0.7,
-          padding: 0,
-          flexShrink: 0,
-        }}
-        aria-label={`Remove ${course.name} from Top 10`}
-      >
-        <Trash2 size={18} strokeWidth={2} />
-      </button>
     </div>
   );
 };
 
-// ---- Add Course row ----
+// ---- Add Course row (name wraps freely) ----
 interface CourseRowProps {
   course: CourseWithRating;
   onAction: () => void;
@@ -378,7 +318,7 @@ const CourseRow: React.FC<CourseRowProps> = ({
 }) => (
   <div style={{
     display: 'flex',
-    alignItems: 'center',
+    alignItems: 'flex-start',
     gap: 12,
     padding: '14px 16px',
     background: '#FFFFFF',
@@ -388,14 +328,14 @@ const CourseRow: React.FC<CourseRowProps> = ({
     {course.thumbnail_image ? (
       <img
         src={course.thumbnail_image}
-        alt={course.name}
+        alt=""
         loading="lazy"
         decoding="async"
         style={{
-          width: 56,
-          height: 56,
+          width: 48,
+          height: 48,
           objectFit: 'cover',
-          borderRadius: 12,
+          borderRadius: 10,
           background: '#F1F5F9',
           flexShrink: 0,
           display: 'block',
@@ -403,16 +343,16 @@ const CourseRow: React.FC<CourseRowProps> = ({
       />
     ) : (
       <div style={{
-        width: 56,
-        height: 56,
-        borderRadius: 12,
+        width: 48,
+        height: 48,
+        borderRadius: 10,
         background: '#F1F5F9',
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
         flexShrink: 0,
       }}>
-        <Trophy size={20} color={INK_SUBTLE} />
+        <Trophy size={18} color={INK_SUBTLE} />
       </div>
     )}
 
@@ -421,11 +361,10 @@ const CourseRow: React.FC<CourseRowProps> = ({
         fontSize: 15,
         fontWeight: 700,
         color: INK,
-        lineHeight: 1.25,
-        marginBottom: 3,
-        overflow: 'hidden',
-        textOverflow: 'ellipsis',
-        whiteSpace: 'nowrap',
+        letterSpacing: '-0.01em',
+        lineHeight: 1.3,
+        marginBottom: 4,
+        wordBreak: 'break-word',
       }}>
         {course.name}
       </div>
@@ -433,14 +372,15 @@ const CourseRow: React.FC<CourseRowProps> = ({
         display: 'flex',
         alignItems: 'baseline',
         gap: 6,
-        fontSize: 10,
-        fontWeight: 700,
-        letterSpacing: '0.14em',
-        color: INK_SUBTLE,
-        textTransform: 'uppercase',
-        overflow: 'hidden',
+        flexWrap: 'wrap',
       }}>
-        <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+        <span style={{
+          fontSize: 10,
+          fontWeight: 700,
+          letterSpacing: '0.14em',
+          color: INK_SUBTLE,
+          textTransform: 'uppercase',
+        }}>
           {course.sub_country || course.country}
         </span>
         {course.has_rating && course.rating_value != null && (
@@ -918,7 +858,8 @@ export const AddCourseModal: React.FC<AddCourseModalProps> = ({
                     items={topTen.map(c => c.course_id)}
                     strategy={verticalListSortingStrategy}
                   >
-                    <div>
+                    <div style={{ padding: '12px 16px' }}>
+
                       {topTen.map((course, index) => (
                         <SortableManageItem
                           key={course.course_id}
