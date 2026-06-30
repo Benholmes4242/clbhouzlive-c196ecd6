@@ -49,6 +49,9 @@ interface NavSummary {
   id: number;
   path: string;
   total: number;
+  /** Time from nav start to content-painted (LCP-equivalent). Null when
+   * the page didn't call usePageReady — most non-feed pages today. */
+  content: number | null;
   lazy: number;
   skeleton: number;
   data: number;
