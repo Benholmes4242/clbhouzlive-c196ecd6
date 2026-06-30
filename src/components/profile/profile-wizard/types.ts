@@ -40,7 +40,7 @@ export interface ProfileFormData {
   isPublic: boolean;
   gender: string;
   /** Handicap page stats + peer comparison visibility — 'everyone' | 'friends' | 'nobody'. */
-  handicapPageVisibility: string;
+  
 }
 
 export const STEP_TITLES: Record<WizardStep, string> = {

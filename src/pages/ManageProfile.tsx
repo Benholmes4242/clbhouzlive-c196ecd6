@@ -44,7 +44,7 @@ const GENDER_OPTIONS = [
 
 type TabId = 'profile' | 'settings';
 
-export default function EditProfile() {
+export default function ManageProfile() {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const { user } = useSupabaseSession();

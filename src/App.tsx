@@ -207,7 +207,7 @@ const VideosSubpageWrapped = lazy(() => import("./components/watch/VideosSubpage
 const AccountTypeOnboarding = lazy(() => import("./pages/onboarding/AccountTypeOnboarding"));
 
 
-const EditProfilePage = lazy(() => import("./pages/EditProfile"));
+const ManageProfilePage = lazy(() => import("./pages/ManageProfile"));
 const ManageEmailPage = lazy(() => import("./pages/manage/EmailPage"));
 const ManageBlockedPage = lazy(() => import("./pages/manage/BlockedPage"));
 const ManageNotificationsPage = lazy(() => import("./pages/manage/NotificationsPage"));
@@ -465,7 +465,7 @@ function AppRoutes() {
         <Route path="/profile/quest" element={<Suspense fallback={<ProfileSkeleton />}><ProfileQuestView /></Suspense>} />
         <Route path="/profile/quest/index" element={<Suspense fallback={<ProfileSkeleton />}><QuestIndexView /></Suspense>} />
         <Route path="/profile/quest/replay" element={<Navigate to="/profile" replace />} />
-        <Route path="/edit-profile" element={<Suspense fallback={<ProfileSkeleton />}><EditProfilePage /></Suspense>} />
+        <Route path="/edit-profile" element={<Suspense fallback={<ProfileSkeleton />}><ManageProfilePage /></Suspense>} />
         <Route path="/manage/email" element={<Suspense fallback={<ProfileSkeleton />}><ManageEmailPage /></Suspense>} />
         <Route path="/manage/blocked" element={<Suspense fallback={<ProfileSkeleton />}><ManageBlockedPage /></Suspense>} />
         <Route path="/manage/notifications" element={<Suspense fallback={<ProfileSkeleton />}><ManageNotificationsPage /></Suspense>} />
