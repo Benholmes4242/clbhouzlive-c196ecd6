@@ -5,7 +5,7 @@
  */
 
 import React, { useEffect, useState, useCallback, memo } from 'react';
-import { navTiming, isPerfEnabled, type NavTransaction } from './navTiming';
+import { navTiming, isPerfEnabled, subscribePerfLive, type NavTransaction } from './navTiming';
 
 type Summary = ReturnType<typeof navTiming.getRecent>[number];
 
@@ -13,12 +13,15 @@ const TIER = (ms: number, green: number, amber: number) =>
   ms <= green ? '#4ade80' : ms <= amber ? '#fbbf24' : '#f87171';
 
 export const PerfHud = memo(function PerfHud() {
+  const [, forcePerf] = useState(0);
+  useEffect(() => subscribePerfLive(() => forcePerf((n) => n + 1)), []);
   const enabled = isPerfEnabled();
   const [expanded, setExpanded] = useState(false);
   const [snap, setSnap] = useState<{ current: NavTransaction | null; recent: Summary[] }>(() => ({
     current: navTiming.getCurrent(),
     recent: navTiming.getRecent(),
   }));
+
 
   // Keybinding (Ctrl/Cmd + Shift + P)
   useEffect(() => {
