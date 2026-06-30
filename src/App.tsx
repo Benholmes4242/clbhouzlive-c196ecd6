@@ -71,6 +71,10 @@ import { forceUnlockBodyScroll } from '@/lib/bodyScrollLock';
 import { ReviewIslandLoader } from '@/ReviewIslandLoader';
 import { supabase } from '@/integrations/supabase/client';
 import { migrateChatHistory } from '@/utils/chatHistoryMigration';
+import { NavTimingProvider } from '@/perf/NavTimingProvider';
+import { PerfHud } from '@/perf/PerfHud';
+
+
 
 
 import { AchievementToastContainer } from '@/components/achievements/AchievementToastContainer';
