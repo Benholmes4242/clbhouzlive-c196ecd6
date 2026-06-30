@@ -670,17 +670,58 @@ const AppInner: React.FC = () => {
   // Global focus re-auth hook
   useReauthOnFocus();
 
-  // Push notification registration — runs on every cold launch
+  // Push notification registration — runs on every cold launch.
+  // Waits for the Median bridge to be ready (avoids TLS-cold-pool transport
+  // rejections), then retries the edge invoke with backoff.
   useEffect(() => {
+    let cancelled = false;
+    let pollInterval: ReturnType<typeof setInterval> | null = null;
+
+    const runWhenMedianReady = (fn: () => void) => {
+      const w = window as any;
+      if (w.median?.onReady?.push) {
+        w.median.onReady.push(fn);
+        return;
+      }
+      // Fallback: poll for the bridge up to ~8s.
+      let tries = 0;
+      pollInterval = setInterval(() => {
+        tries++;
+        if ((window as any).median?.onesignal || tries > 16) {
+          if (pollInterval) clearInterval(pollInterval);
+          pollInterval = null;
+          if (!cancelled) fn();
+        }
+      }, 500);
+    };
+
+    const registerWithRetry = async (platform: string, attempts = 3): Promise<boolean> => {
+      for (let i = 0; i < attempts; i++) {
+        if (cancelled) return false;
+        try {
+          const { error } = await supabase.functions.invoke('register-push-device', {
+            body: { platform, enabled: true },
+          });
+          if (!error) return true;
+          console.error('[Push] Registration failed:', error.message ?? error);
+        } catch (e: any) {
+          // FunctionsFetchError (transport reject) lands here on cold boot.
+          console.error('[Push] invoke threw:', e?.name, e?.message);
+        }
+        await new Promise(r => setTimeout(r, 800 * (i + 1)));
+      }
+      return false;
+    };
+
     const register = async () => {
       try {
-        // Only in Median native app
         const os = (window as any).median?.onesignal;
         if (!os) return;
 
-        // Wait for auth — retry every second for up to 10 seconds
+        // Wait for auth — retry every second for up to 10 seconds.
         let session = null;
         for (let i = 0; i < 10; i++) {
+          if (cancelled) return;
           const { data } = await supabase.auth.getSession();
           if (data.session?.user) { session = data.session; break; }
           await new Promise(r => setTimeout(r, 1000));
@@ -688,29 +729,30 @@ const AppInner: React.FC = () => {
         if (!session?.user) return;
 
         const userId = session.user.id;
-        os.userPrivacyConsent?.(true);
-        os.login?.(userId);
-        os.register?.();
+
+        // OneSignal v5 bridge: setConsentGiven + login link external_id.
+        // Older method names are kept as fallbacks (?. no-ops if undefined).
+        try { os.setConsentGiven?.(true); } catch {}
+        try { os.userPrivacyConsent?.(true); } catch {}
+        try { os.login?.(userId); } catch {}
+        try { os.User?.addAlias?.('external_id', userId); } catch {}
 
         const platform = /iphone|ipad|ipod/.test(navigator.userAgent.toLowerCase())
           ? 'ios' : 'android';
 
-        const { error } = await supabase.functions.invoke('register-push-device', {
-          body: { platform, enabled: true },
-        });
-
-        if (error) {
-          console.error('[Push] Registration failed:', error);
-        } else {
-          console.log('[Push] Registered:', userId);
-        }
-      } catch (e) {
-        console.error('[Push] Error:', e);
+        const ok = await registerWithRetry(platform);
+        if (ok) console.log('[Push] Registered:', userId);
+      } catch (e: any) {
+        console.error('[Push] Error:', e?.name, e?.message);
       }
     };
 
-    const timer = setTimeout(register, 2000);
-    return () => clearTimeout(timer);
+    runWhenMedianReady(register);
+
+    return () => {
+      cancelled = true;
+      if (pollInterval) clearInterval(pollInterval);
+    };
   }, []);
 
   // ── Analytics: session start + page tracking ──

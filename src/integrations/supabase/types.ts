@@ -8448,7 +8448,7 @@ export type Database = {
           body: string | null
           created_at: string | null
           data: Json | null
-          device_id: string
+          device_id: string | null
           error: string | null
           id: string
           sent_at: string | null
@@ -8459,7 +8459,7 @@ export type Database = {
           body?: string | null
           created_at?: string | null
           data?: Json | null
-          device_id: string
+          device_id?: string | null
           error?: string | null
           id?: string
           sent_at?: string | null
@@ -8470,7 +8470,7 @@ export type Database = {
           body?: string | null
           created_at?: string | null
           data?: Json | null
-          device_id?: string
+          device_id?: string | null
           error?: string | null
           id?: string
           sent_at?: string | null
