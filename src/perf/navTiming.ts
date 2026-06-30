@@ -259,6 +259,8 @@ class NavTimingController {
         ? Math.round(m['content-painted']! - tx.startedAt)
         : null;
 
+    const lazy =
+      m['lazy-start'] != null && m['lazy-end'] != null
         ? Math.round(m['lazy-end']! - m['lazy-start']!)
         : 0;
     const skeleton =
