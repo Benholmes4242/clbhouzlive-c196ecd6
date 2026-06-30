@@ -80,7 +80,7 @@ const ProfileHandicapCard: React.FC<Props> = ({
   const verdict = useMemo<Verdict>(() => verdictFor(delta90), [delta90]);
   const grad = arcGradient(verdict);
 
-  // Fill fraction — magnitude of 90d delta vs a 1.0 stroke target (clamped).
+  // Fill fraction: magnitude of 90d delta vs a 1.0 stroke target (clamped).
   const fillFraction = useMemo(() => {
     if (delta90 == null) return 0;
     return Math.min(Math.abs(delta90) / 1.0, 1);
