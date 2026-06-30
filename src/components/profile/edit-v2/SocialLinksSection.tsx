@@ -1,5 +1,5 @@
+import { Label } from '@/components/manage/ui';
 import { Instagram, Youtube } from 'lucide-react';
-import { SectionHeader } from '@/components/ui/SectionHeader';
 
 function XIcon() {
   return (
@@ -61,9 +61,8 @@ export function SocialLinksSection({
 }: Props) {
   return (
     <div className="space-y-2">
-      <div style={{ marginBottom: 8 }}>
-        <SectionHeader tier="standard" kicker="Social Links" />
-      </div>
+      <Label>Social links</Label>
+
       <SocialRow icon={<Instagram size={16} />} placeholder="instagram username" value={instagram} onChange={onInstagramChange} />
       <SocialRow icon={<XIcon />} placeholder="x username" value={twitter} onChange={onTwitterChange} />
       <SocialRow icon={<TikTokIcon />} placeholder="tiktok username" value={tiktok} onChange={onTiktokChange} />

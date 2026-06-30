@@ -14,8 +14,7 @@ import { resolveDisplayHandicap } from '@/lib/handicap/resolveHandicap';
 import { formatHcp } from '@/lib/formatHcp';
 import { Button } from '@/components/ui/button';
 import { PageRoot } from '@/components/layout/PageRoot';
-import { SectionHeader } from '@/components/ui/SectionHeader';
-import { SectionCard } from '@/components/profile/edit-v2/SectionCard';
+import { ManageCard, Label, Nudge, PAGE_BG, INK as INK_TOKEN, INK_45 as INK_45_TOKEN } from '@/components/manage/ui';
 import { SegToggle } from '@/components/profile/edit-v2/SegToggle';
 import { HeaderPhotoCard } from '@/components/profile/edit-v2/HeaderPhotoCard';
 import { ProfilePhotoCard } from '@/components/profile/edit-v2/ProfilePhotoCard';
@@ -31,10 +30,11 @@ import { DISPLAY_NAME_MAX, USERNAME_MAX } from '@/components/profile/profile-wiz
 import { SettingsTabContent } from '@/components/settings/SettingsTabContent';
 
 const GEIST = 'Geist, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif';
-const INK = '#0F172A';
-const INK_55 = '#64748B';
-const SLATE_BG = '#F4F6F8';
+const INK = INK_TOKEN;
+const INK_55 = INK_45_TOKEN;
+const SLATE_BG = PAGE_BG;
 const GREEN = '#059669';
+
 
 const GENDER_OPTIONS = [
   { value: 'male', label: 'Male' },

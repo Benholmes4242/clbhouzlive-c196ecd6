@@ -1,7 +1,7 @@
 import type React from 'react';
 import { Plus, X } from 'lucide-react';
 import { WebsiteEntry, BIO_MAX } from '@/components/profile/profile-wizard/types';
-import { SectionHeader } from '@/components/ui/SectionHeader';
+import { Label } from '@/components/manage/ui';
 
 interface Props {
   bio: string;
@@ -14,14 +14,6 @@ interface Props {
   onUpdateWebsite: (id: string, url: string) => void;
 }
 
-function RuleLabel({ text }: { text: string }) {
-  return (
-    <div style={{ marginBottom: 8 }}>
-      <SectionHeader tier="standard" kicker={text} />
-    </div>
-  );
-}
-
 export function BioWebsitesSection({
   bio, websites, bioError, websitesError,
   onBioChange, onAddWebsite, onRemoveWebsite, onUpdateWebsite,
@@ -29,26 +21,29 @@ export function BioWebsitesSection({
   return (
     <div className="space-y-4">
       <div>
-        <div className="flex justify-between items-baseline mb-2">
-          <RuleLabel text="Bio" />
-          <span className={`text-[11px] ${bio.length > BIO_MAX * 0.9 ? 'text-destructive' : 'text-muted-foreground/60'}`}>
-            {bio.length}/{BIO_MAX}
-          </span>
-        </div>
+        <Label
+          right={
+            <span className={`text-[11px] ${bio.length > BIO_MAX * 0.9 ? 'text-destructive' : 'text-muted-foreground/60'}`}>
+              {bio.length}/{BIO_MAX}
+            </span>
+          }
+        >
+          Bio
+        </Label>
         <textarea
           value={bio}
           onChange={(e) => onBioChange(e.target.value)}
           maxLength={BIO_MAX}
           rows={4}
           placeholder="Tell the clbhouz community about yourself and your golf game…"
-          className="scrollbar-hide w-full bg-[#F8FAFC] border border-border/60 rounded-[11px] px-3.5 py-2.5 text-[15px] leading-relaxed text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-[hsl(38,92%,50%)]/40 focus:bg-background transition-colors resize-none"
+          className="scrollbar-hide w-full bg-[#F8FAFC] border border-border/60 rounded-[10px] px-3.5 py-2.5 text-[15px] leading-relaxed text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-[rgba(15,23,42,0.20)] focus:bg-background transition-colors resize-none"
           style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' } as React.CSSProperties}
         />
         {bioError && <p className="text-[12px] text-destructive mt-1">{bioError}</p>}
       </div>
 
       <div>
-        <RuleLabel text="Websites" />
+        <Label>Websites</Label>
         <div className="space-y-2">
           {websites.map((site) => (
             <div key={site.id} className="flex items-center gap-2">
@@ -58,7 +53,7 @@ export function BioWebsitesSection({
                 value={site.url}
                 onChange={(e) => onUpdateWebsite(site.id, e.target.value)}
                 placeholder="https://yoursite.com"
-                className="flex-1 bg-[#F8FAFC] border border-border/60 rounded-[11px] px-3.5 py-2.5 text-[15px] text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-[hsl(38,92%,50%)]/40 focus:bg-background transition-colors"
+                className="flex-1 bg-[#F8FAFC] border border-border/60 rounded-[10px] px-3.5 py-2.5 text-[15px] text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-[rgba(15,23,42,0.20)] focus:bg-background transition-colors"
               />
               <button
                 onClick={() => onRemoveWebsite(site.id)}
@@ -75,13 +70,13 @@ export function BioWebsitesSection({
             <button
               onClick={onAddWebsite}
               className="flex items-center gap-2.5 text-[14px] font-semibold min-h-[44px]"
-              style={{ color: '#F7931E' }}
+              style={{ color: '#0F172A' }}
             >
               <div
                 className="w-6 h-6 rounded-full flex items-center justify-center"
-                style={{ backgroundColor: 'rgba(247,147,30,0.10)' }}
+                style={{ backgroundColor: '#F8FAFC', border: '1px solid rgba(15,23,42,0.08)' }}
               >
-                <Plus size={14} style={{ color: '#F7931E' }} />
+                <Plus size={14} style={{ color: '#475569' }} />
               </div>
               Add website
             </button>

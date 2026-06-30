@@ -1,17 +1,16 @@
-/** Shared icon color theme for settings rows */
+/** Shared icon color theme for settings rows (Direction A: neutral slate, green for privacy, red for danger). */
 export type IconTheme = 'account' | 'creator' | 'privacy' | 'notifications' | 'security' | 'support' | 'legal' | 'danger' | 'default';
 
-// TODO: Add dark mode variants for icon container colors in a future pass.
-// These hardcoded light-mode colors (bg-blue-50, etc.) intentionally mimic
-// iOS Settings per-category coloring but won't adapt to dark mode.
+// Direction A: no amber. Neutral slate tiles for normal rows; green for privacy
+// status; red for danger. Icons render as ink_60 on a slate field tile.
 export const iconThemeStyles: Record<IconTheme, { bg: string; text: string }> = {
-  account: { bg: 'bg-indigo-50', text: 'text-indigo-500' },
-  creator: { bg: 'bg-purple-50', text: 'text-purple-500' },
-  privacy: { bg: 'bg-emerald-50', text: 'text-emerald-500' },
-  notifications: { bg: 'bg-amber-50', text: 'text-[#F7931E]' },
-  security: { bg: 'bg-red-50', text: 'text-red-400' },
-  support: { bg: 'bg-sky-50', text: 'text-sky-500' },
-  legal: { bg: 'bg-slate-100', text: 'text-slate-400' },
-  danger: { bg: 'bg-red-50', text: 'text-red-500' },
-  default: { bg: 'bg-slate-100', text: 'text-slate-500' },
+  account:       { bg: 'bg-[#F8FAFC] border border-[rgba(15,23,42,0.06)]', text: 'text-[#475569]' },
+  creator:       { bg: 'bg-[#F8FAFC] border border-[rgba(15,23,42,0.06)]', text: 'text-[#475569]' },
+  privacy:       { bg: 'bg-[rgba(5,150,105,0.08)]',                        text: 'text-[#059669]' },
+  notifications: { bg: 'bg-[#F8FAFC] border border-[rgba(15,23,42,0.06)]', text: 'text-[#475569]' },
+  security:      { bg: 'bg-[rgba(220,38,38,0.08)]',                        text: 'text-[#DC2626]' },
+  support:       { bg: 'bg-[#F8FAFC] border border-[rgba(15,23,42,0.06)]', text: 'text-[#475569]' },
+  legal:         { bg: 'bg-[#F8FAFC] border border-[rgba(15,23,42,0.06)]', text: 'text-[#475569]' },
+  danger:        { bg: 'bg-[rgba(220,38,38,0.08)]',                        text: 'text-[#DC2626]' },
+  default:       { bg: 'bg-[#F8FAFC] border border-[rgba(15,23,42,0.06)]', text: 'text-[#475569]' },
 };

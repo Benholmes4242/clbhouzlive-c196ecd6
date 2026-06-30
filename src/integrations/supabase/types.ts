@@ -13081,7 +13081,6 @@ export type Database = {
           gender: string
           golfer_verified_at: string | null
           golfer_verified_by: string | null
-          handicap_page_visibility: string
           handicap_sync_interest: boolean | null
           handicap_sync_interest_at: string | null
           handicap_visibility: string
@@ -13206,7 +13205,6 @@ export type Database = {
           gender?: string
           golfer_verified_at?: string | null
           golfer_verified_by?: string | null
-          handicap_page_visibility?: string
           handicap_sync_interest?: boolean | null
           handicap_sync_interest_at?: string | null
           handicap_visibility?: string
@@ -13331,7 +13329,6 @@ export type Database = {
           gender?: string
           golfer_verified_at?: string | null
           golfer_verified_by?: string | null
-          handicap_page_visibility?: string
           handicap_sync_interest?: boolean | null
           handicap_sync_interest_at?: string | null
           handicap_visibility?: string
