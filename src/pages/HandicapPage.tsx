@@ -26,6 +26,7 @@ import WhsHandicapTab from '@/components/profile/handicap/whs/WhsHandicapTab';
 import HandicapDashboard from '@/components/profile/handicap/whs/HandicapDashboard';
 
 import FloatingPageHeader from '@/components/header/FloatingPageHeader';
+import { ManagePageShell } from '@/components/manage/ManagePageShell';
 import { safeGoBack } from '@/utils/navigation';
 import SegmentedControl from '@/components/discover/SegmentedControl';
 import { RivalryCTA } from '@/components/profile/handicap/whs/sections/header/RivalryCTA';
