@@ -8,6 +8,16 @@
  * `nav:interactive` (or on timeout). Flagged navs warn with [PERF-WARN].
  */
 
+// Routes that intentionally hold a neutral background instead of a skeleton (e.g. /auth shows the
+// charcoal BootHold while the session resolves, then paints in one shot). These must NOT be flagged
+// skeleton:MISSING. Path-based so the verdict is race-proof (no dependency on effect timing).
+const SKELETON_EXEMPT_PATHS = new Set<string>(['/auth']);
+
+function isSkeletonExemptPath(path: string): boolean {
+  // exact match or known auth subpaths (e.g. /auth/callback) if added later
+  return SKELETON_EXEMPT_PATHS.has(path);
+}
+
 import * as React from 'react';
 import { AppLog } from '@/lib/logger';
 
