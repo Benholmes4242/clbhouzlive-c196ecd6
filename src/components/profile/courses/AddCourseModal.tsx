@@ -132,80 +132,45 @@ const SortableManageItem: React.FC<SortableItemProps> = ({
       ref={setNodeRef}
       style={{
         ...dragStyle,
-        background: '#FFFFFF',
-        border: `1px solid ${BORDER}`,
-        borderRadius: 14,
-        padding: '12px 14px',
-        boxShadow: isDragging ? '0 4px 12px rgba(0,0,0,0.08)' : '0 1px 2px rgba(15,23,42,0.04)',
-        marginBottom: 10,
+        display: 'flex',
+        alignItems: 'flex-start',
+        gap: 0,
+        padding: '0 16px',
+        background: isDragging ? '#FFFFFF' : 'transparent',
+        boxShadow: isDragging ? '0 4px 12px rgba(0,0,0,0.08)' : 'none',
       }}
     >
-      {/* Row 1: drag handle + rank + FULL NAME (wraps) + remove */}
-      <div style={{ display: 'flex', gap: 10, alignItems: 'flex-start' }}>
-        <button
-          {...attributes}
-          {...listeners}
-          aria-label="Drag to reorder"
-          style={{
-            border: 'none',
-            background: 'transparent',
-            cursor: 'grab',
-            padding: 2,
-            flexShrink: 0,
-            touchAction: 'none',
-            color: '#CBD5E1',
-            display: 'flex',
-            alignItems: 'center',
-          }}
-        >
-          <GripVertical size={16} />
-        </button>
-        <div style={{
-          fontSize: 16,
-          fontWeight: 900,
-          color: isPodium ? AMBER_DEEP : INK_SUBTLE,
-          letterSpacing: '-0.03em',
+      {/* Rank spine — amber-AA top 3, faint slate otherwise */}
+      <div style={{
+        width: 44,
+        flexShrink: 0,
+        display: 'flex',
+        justifyContent: 'center',
+        paddingTop: 16,
+      }}>
+        <span style={{
+          fontSize: 30,
+          fontWeight: 800,
+          color: isPodium ? AMBER_DEEP : '#E2E8F0',
+          letterSpacing: '-0.05em',
+          lineHeight: 1,
           fontVariantNumeric: 'tabular-nums',
-          lineHeight: 1.3,
-          flexShrink: 0,
-          minWidth: 18,
         }}>
           {position}
-        </div>
-        <div style={{
-          flex: 1,
-          minWidth: 0,
-          fontSize: 15,
-          fontWeight: 700,
-          color: INK,
-          letterSpacing: '-0.01em',
-          lineHeight: 1.3,
-          wordBreak: 'break-word',
-        }}>
-          {course.name}
-        </div>
-        <button
-          onClick={() => onRemove(course.course_id)}
-          disabled={isRemoving}
-          aria-label={`Remove ${course.name} from Top 10`}
-          style={{
-            border: 'none',
-            background: 'transparent',
-            cursor: isRemoving ? 'not-allowed' : 'pointer',
-            padding: 2,
-            flexShrink: 0,
-            color: '#DC2626',
-            opacity: isRemoving ? 0.4 : 1,
-            display: 'flex',
-            alignItems: 'center',
-          }}
-        >
-          <Trash2 size={16} />
-        </button>
+        </span>
       </div>
 
-      {/* Row 2: thumb + country + score + reorder chevrons */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginTop: 10, paddingLeft: 28 }}>
+      {/* Content column with per-row hairline (NOT a header divider) */}
+      <div style={{
+        flex: 1,
+        minWidth: 0,
+        display: 'flex',
+        gap: 12,
+        alignItems: 'flex-start',
+        padding: '14px 0',
+        borderBottom: index === totalItems - 1 ? 'none' : `1px solid ${BORDER}`,
+      }}>
+        {/* Thumb */}
         {course.thumbnail_image ? (
           <img
             src={course.thumbnail_image}
@@ -213,85 +178,156 @@ const SortableManageItem: React.FC<SortableItemProps> = ({
             loading="lazy"
             decoding="async"
             style={{
-              width: 30,
-              height: 30,
+              width: 46,
+              height: 46,
               objectFit: 'cover',
-              borderRadius: 7,
-              background: '#F1F5F9',
+              borderRadius: 10,
+              background: '#E2E8F0',
               flexShrink: 0,
               display: 'block',
             }}
           />
         ) : (
           <div style={{
-            width: 30,
-            height: 30,
-            borderRadius: 7,
-            background: '#F1F5F9',
+            width: 46,
+            height: 46,
+            borderRadius: 10,
+            background: '#E2E8F0',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
             flexShrink: 0,
           }}>
-            <Trophy size={14} color={INK_SUBTLE} />
+            <Trophy size={18} color={INK_SUBTLE} />
           </div>
         )}
-        <div style={{ flex: 1, minWidth: 0, display: 'flex', gap: 6, alignItems: 'baseline', flexWrap: 'wrap' }}>
-          <span style={{
+
+        {/* Name (wraps) + country */}
+        <div style={{ flex: 1, minWidth: 0, paddingTop: 1 }}>
+          <div style={{
+            fontSize: 15,
+            fontWeight: 700,
+            color: INK,
+            letterSpacing: '-0.01em',
+            lineHeight: 1.3,
+            wordBreak: 'break-word',
+          }}>
+            {course.name}
+          </div>
+          <div style={{
             fontSize: 10,
             fontWeight: 700,
             letterSpacing: '0.14em',
             textTransform: 'uppercase',
             color: INK_SUBTLE,
+            marginTop: 3,
           }}>
             {course.sub_country || course.country}
-          </span>
-          {ratingNum != null && (
-            <>
-              <span style={{ color: '#CBD5E1' }}>·</span>
-              <PlainScore value={ratingNum} size={13} />
-            </>
-          )}
+          </div>
         </div>
-        <div style={{ display: 'flex', gap: 4, flexShrink: 0 }}>
-          <button
-            onClick={() => onMoveUp(index)}
-            disabled={index === 0 || isReordering}
-            aria-label="Move up"
-            style={{
-              border: 'none',
-              background: '#F1F5F9',
-              borderRadius: 7,
-              cursor: index === 0 || isReordering ? 'not-allowed' : 'pointer',
-              padding: 5,
-              color: INK_SOFT,
-              opacity: index === 0 || isReordering ? 0.4 : 1,
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-            }}
-          >
-            <ChevronUp size={15} />
-          </button>
-          <button
-            onClick={() => onMoveDown(index)}
-            disabled={index === totalItems - 1 || isReordering}
-            aria-label="Move down"
-            style={{
-              border: 'none',
-              background: '#F1F5F9',
-              borderRadius: 7,
-              cursor: index === totalItems - 1 || isReordering ? 'not-allowed' : 'pointer',
-              padding: 5,
-              color: INK_SOFT,
-              opacity: index === totalItems - 1 || isReordering ? 0.4 : 1,
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-            }}
-          >
-            <ChevronDown size={15} />
-          </button>
+
+        {/* Right cluster: rating figure + control row */}
+        <div style={{
+          flexShrink: 0,
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'flex-end',
+          gap: 8,
+        }}>
+          {ratingNum != null && (
+            <div style={{ textAlign: 'right' }}>
+              <span style={{
+                fontSize: 17,
+                fontWeight: 800,
+                color: INK,
+                letterSpacing: '-0.02em',
+                fontVariantNumeric: 'tabular-nums',
+              }}>
+                {ratingNum.toFixed(1)}
+              </span>
+              <span style={{
+                display: 'block',
+                fontSize: 8.5,
+                fontWeight: 700,
+                letterSpacing: '0.16em',
+                textTransform: 'uppercase',
+                color: '#CBD5E1',
+                marginTop: 2,
+              }}>
+                Rated
+              </span>
+            </div>
+          )}
+          <div style={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+            <button
+              {...attributes}
+              {...listeners}
+              aria-label="Drag to reorder"
+              style={{
+                border: 'none',
+                background: 'transparent',
+                cursor: 'grab',
+                padding: 4,
+                touchAction: 'none',
+                display: 'flex',
+                alignItems: 'center',
+              }}
+            >
+              <GripVertical size={15} color="#CBD5E1" />
+            </button>
+            <button
+              onClick={() => onMoveUp(index)}
+              disabled={index === 0 || isReordering}
+              aria-label="Move up"
+              style={{
+                border: 'none',
+                background: '#F1F5F9',
+                borderRadius: 7,
+                cursor: index === 0 || isReordering ? 'not-allowed' : 'pointer',
+                padding: 5,
+                opacity: index === 0 || isReordering ? 0.4 : 1,
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+              }}
+            >
+              <ChevronUp size={14} color={INK_SOFT} />
+            </button>
+            <button
+              onClick={() => onMoveDown(index)}
+              disabled={index === totalItems - 1 || isReordering}
+              aria-label="Move down"
+              style={{
+                border: 'none',
+                background: '#F1F5F9',
+                borderRadius: 7,
+                cursor: index === totalItems - 1 || isReordering ? 'not-allowed' : 'pointer',
+                padding: 5,
+                opacity: index === totalItems - 1 || isReordering ? 0.4 : 1,
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+              }}
+            >
+              <ChevronDown size={14} color={INK_SOFT} />
+            </button>
+            <button
+              onClick={() => onRemove(course.course_id)}
+              disabled={isRemoving}
+              aria-label={`Remove ${course.name} from Top 10`}
+              style={{
+                border: 'none',
+                background: 'transparent',
+                cursor: isRemoving ? 'not-allowed' : 'pointer',
+                padding: 4,
+                opacity: isRemoving ? 0.4 : 1,
+                display: 'flex',
+                alignItems: 'center',
+              }}
+            >
+              <Trash2 size={15} color="#C0392B" />
+            </button>
+          </div>
         </div>
       </div>
     </div>
