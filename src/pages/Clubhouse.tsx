@@ -155,6 +155,18 @@ const ClubhouseContent = () => {
   const carouselPositions = useClubhouseStore(s => s.carouselPositions);
   const currentMediaIndex = carouselPositions.get(activeIndex) ?? 0;
   const isTournamentCardActive = useClubhouseStore(s => s.isTournamentCardActive);
+  const setStoreActiveTab = useClubhouseStore(s => s.setActiveTab);
+
+  // Keep the store's active-tab mirror in sync so legacy consumers
+  // (FeedOverlayLayer, top-bar carousel chip, FullscreenCarouselOverlay)
+  // read the correct tab's slot after a switch.
+  useEffect(() => {
+    setStoreActiveTab(activeTab);
+  }, [activeTab, setStoreActiveTab]);
+
+  // Per-tab Virtuoso snapshots — captured on switch-AWAY (CardFeed unmount)
+  // and restored on switch-BACK so each tab retains its exact scroll offset.
+  const virtuosoSnapshots = useRef<Record<string, StateSnapshot | undefined>>({});
 
 
 
