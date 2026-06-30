@@ -48,6 +48,10 @@ export const PageRoot = React.forwardRef<HTMLDivElement, PageRootProps>(
       statusBarStyle,
     );
 
+    usePageRootMount();
+
+
+
     // Bottom nav (64px) + safe area spacer (30px) = 94px clearance
     const bottomPadding = hasBottomNav ? '94px' : undefined;
 
