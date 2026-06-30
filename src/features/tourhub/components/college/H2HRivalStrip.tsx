@@ -42,6 +42,13 @@ const SECTION_PADDING_X = 16;
 
 export function H2HRivalStrip({ normalizedName, className }: H2HRivalStripProps) {
   const { data: rivalries, isLoading } = useCollegeRivalries(normalizedName);
+  const { data: collegeMap } = useCollegeMediaMap();
+  const [pickerOpen, setPickerOpen] = useState(false);
+
+  const c1Media = collegeMap?.get(normalizedName);
+  const c1DisplayName =
+    c1Media?.short_name || c1Media?.college_name || formatCollegeName(normalizedName);
+
 
   if (isLoading) {
     return (
