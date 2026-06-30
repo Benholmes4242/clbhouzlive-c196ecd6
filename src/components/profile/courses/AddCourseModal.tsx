@@ -433,6 +433,7 @@ export const AddCourseModal: React.FC<AddCourseModalProps> = ({
   const [activeTab, setActiveTab] = useState<'manage' | 'add'>(preSelectedCourseId ? 'add' : 'manage');
   const [showResetConfirm, setShowResetConfirm] = useState(false);
   const [isResetting, setIsResetting] = useState(false);
+  const [sortTileDismissed, setSortTileDismissed] = useState(false);
   const searchInputRef = useRef<HTMLInputElement>(null);
 
   const navigate = useNavigate();
