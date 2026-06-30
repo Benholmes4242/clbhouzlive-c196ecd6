@@ -246,10 +246,9 @@ const SortableManageItem: React.FC<SortableItemProps> = ({
         </div>
       </div>
 
-      {/* Course info — serif name + dispatch caps + serif score */}
+      {/* Course info - canonical row text */}
       <div style={{ flex: 1, minWidth: 0 }}>
         <div style={{
-          fontFamily: FONT_SERIF,
           fontSize: 15,
           fontWeight: 700,
           color: INK,
