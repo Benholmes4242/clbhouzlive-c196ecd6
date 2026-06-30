@@ -5,7 +5,6 @@ import { BottomSheet } from '@/components/ui/BottomSheet';
 import SheetHeader from '@/components/ui/SheetHeader';
 import { getTourLogo, hasTourLogo } from '../../utils/tourLogos';
 import {
-  AMBER,
   AMBER_TINT_04,
   INK,
   INK_FAINT,
@@ -138,7 +137,7 @@ function PlayersShellRowInner() {
                 <div style={{ fontSize: 15, fontWeight: isSelected ? 700 : 500, color: INK }}>{TOUR_LABELS[code]}</div>
                 <div style={{ fontSize: 12, color: INK_FAINT, marginTop: 2 }}>{TOUR_DESCRIPTIONS[code]}</div>
               </div>
-              {isSelected && <div style={{ width: 6, height: 6, borderRadius: '50%', background: AMBER, flexShrink: 0 }} />}
+              
             </button>
           );
         })}
