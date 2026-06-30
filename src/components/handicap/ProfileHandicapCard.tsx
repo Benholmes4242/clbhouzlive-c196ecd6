@@ -1,5 +1,5 @@
 /**
- * ProfileHandicapCard — light-mode handicap summary card for the profile page.
+ * ProfileHandicapCard: light-mode handicap summary card for the profile page.
  *
  * Replaces the legacy FriendHandicapHero / HeroHandicapCard dual-ring block.
  * Mirrors the visual language of HeroHandicapCardDark (verdict ring) but
@@ -8,7 +8,7 @@
  *   friend       → /handicap/:userId   (fires friend_handicap_page_viewed)
  *
  * Renders null when the user has no WHS connection or no current handicap
- * — same gating as FriendHandicapHero.
+ * Same gating as FriendHandicapHero.
  */
 
 import React, { useMemo } from 'react';
@@ -80,7 +80,7 @@ const ProfileHandicapCard: React.FC<Props> = ({
   const verdict = useMemo<Verdict>(() => verdictFor(delta90), [delta90]);
   const grad = arcGradient(verdict);
 
-  // Fill fraction — magnitude of 90d delta vs a 1.0 stroke target (clamped).
+  // Fill fraction: magnitude of 90d delta vs a 1.0 stroke target (clamped).
   const fillFraction = useMemo(() => {
     if (delta90 == null) return 0;
     return Math.min(Math.abs(delta90) / 1.0, 1);
@@ -106,7 +106,7 @@ const ProfileHandicapCard: React.FC<Props> = ({
     return vals.reduce((a, b) => a + b, 0) / vals.length;
   }, [allScores]);
 
-  // Sparkline points — built from history90.
+  // Sparkline points: built from history90.
   const spark = useMemo(() => {
     if (!history90 || history90.length < 2) return null;
     const pts = history90.map((h) => h.handicap_index);
@@ -142,7 +142,7 @@ const ProfileHandicapCard: React.FC<Props> = ({
     };
   }, [history90]);
 
-  // Gating — match FriendHandicapHero behaviour.
+  // Gating: match FriendHandicapHero behaviour.
   if (connLoading || trendLoading) return null;
   if (!connection) return null;
   if (handicap == null) return null;
@@ -184,7 +184,7 @@ const ProfileHandicapCard: React.FC<Props> = ({
   const resolvedName = (displayName ?? '').trim().split(/\s+/)[0] || 'this golfer';
 
   return (
-    <div className="hcp-light" style={{ padding: '8px 16px 16px' }}>
+    <div className="hcp-dark" style={{ padding: '8px 16px 16px' }}>
       <div
         role="button"
         tabIndex={0}
@@ -192,17 +192,17 @@ const ProfileHandicapCard: React.FC<Props> = ({
         onKeyDown={handleKey}
         aria-label={
           isOwnProfile
-            ? 'See your full handicap — trends, records, rounds'
-            : `See ${resolvedName}'s full handicap — trends, records, rounds`
+            ? 'See your full handicap: trends, records, rounds'
+            : `See ${resolvedName}'s full handicap: trends, records, rounds`
         }
         style={{
-          background: 'var(--hcp-bg-1)',
-          border: '1px solid var(--hcp-line)',
-          borderRadius: 14,
-          padding: '14px 14px 12px',
+          background: 'linear-gradient(168deg, var(--hcp-bg-2) 0%, var(--hcp-bg-0) 100%)',
+          border: '1px solid var(--hcp-line-2)',
+          borderRadius: 18,
+          padding: '16px 16px 14px',
           fontFamily: FONT,
           cursor: 'pointer',
-          boxShadow: '0 1px 0 rgba(15,23,42,0.02)',
+          boxShadow: '0 8px 30px rgba(15,23,42,0.22), inset 0 1px 0 rgba(255,255,255,0.05)',
         }}
       >
         {/* Eyebrow */}
@@ -401,7 +401,7 @@ const ProfileHandicapCard: React.FC<Props> = ({
               color: 'var(--hcp-t-60)',
             }}
           >
-            See full handicap — trends, records, rounds
+            See full handicap: trends, records, rounds
           </span>
           <ChevronRight size={14} color="var(--hcp-t-60)" />
         </div>
