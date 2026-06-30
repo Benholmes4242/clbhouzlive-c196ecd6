@@ -167,6 +167,10 @@ const ClubhouseContent = () => {
   // Per-tab Virtuoso snapshots — captured on switch-AWAY (CardFeed unmount)
   // and restored on switch-BACK so each tab retains its exact scroll offset.
   const virtuosoSnapshots = useRef<Record<string, StateSnapshot | undefined>>({});
+  // Imperative ref into CardFeed so we can capture the outgoing tab's
+  // snapshot BEFORE flipping activeTab (the keyed remount tears down the
+  // instance, which makes a post-flip capture impossible).
+  const cardFeedRef = useRef<CardFeedHandle | null>(null);
 
 
 
