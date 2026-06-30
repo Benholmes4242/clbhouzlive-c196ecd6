@@ -142,7 +142,7 @@ const ProfileHandicapCard: React.FC<Props> = ({
     };
   }, [history90]);
 
-  // Gating — match FriendHandicapHero behaviour.
+  // Gating: match FriendHandicapHero behaviour.
   if (connLoading || trendLoading) return null;
   if (!connection) return null;
   if (handicap == null) return null;
