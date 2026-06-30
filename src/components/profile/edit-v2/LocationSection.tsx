@@ -212,7 +212,7 @@ function CitySearch({ value, onChange, country }: { value: string; onChange: (v:
           </button>
         )}
         {loading && (
-          <div style={{ position: 'absolute', right: 12, top: '50%', transform: 'translateY(-50%)', width: 12, height: 12, border: '2px solid #F7931E', borderTopColor: 'transparent', borderRadius: '50%' }} className="animate-spin" />
+          <div style={{ position: 'absolute', right: 12, top: '50%', transform: 'translateY(-50%)', width: 12, height: 12, border: '2px solid #0F172A', borderTopColor: 'transparent', borderRadius: '50%' }} className="animate-spin" />
         )}
       </div>
 
