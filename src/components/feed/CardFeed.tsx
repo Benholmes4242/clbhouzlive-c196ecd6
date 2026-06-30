@@ -228,15 +228,18 @@ export const CardFeed: React.FC<CardFeedProps> = ({
 
   const setActiveIndex = useClubhouseStore((s) => s.setActiveIndex);
   const setCarouselPosition = useClubhouseStore((s) => s.setCarouselPosition);
-  const carouselPositions = useClubhouseStore((s) => s.carouselPositions);
+  const carouselPositionsByTab = useClubhouseStore((s) => s.carouselPositionsByTab);
+  const globalCarouselPositions = useClubhouseStore((s) => s.carouselPositions);
+  const carouselPositions = tab ? (carouselPositionsByTab[tab] ?? globalCarouselPositions) : globalCarouselPositions;
   const openFullscreen = useFullscreenFeedStore((s) => s.open);
   const fsOpen = useFullscreenFeedStore((s) => s.isOpen);
 
   // Sync the active card to the global store so other consumers (top-bar
-  // carousel chip, fullscreen handoff, etc.) stay in step.
+  // carousel chip, fullscreen handoff, etc.) stay in step. Routed to the
+  // owning tab's slot so switching back retains the centred card.
   useEffect(() => {
-    setActiveIndex(activeIdx);
-  }, [activeIdx, setActiveIndex]);
+    setActiveIndex(activeIdx, tab);
+  }, [activeIdx, setActiveIndex, tab]);
 
   // Warm-start the next 1-2 upcoming videos so they play instantly on arrival.
   useEffect(() => {
