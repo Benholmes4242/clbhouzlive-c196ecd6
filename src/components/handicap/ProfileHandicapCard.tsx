@@ -106,7 +106,7 @@ const ProfileHandicapCard: React.FC<Props> = ({
     return vals.reduce((a, b) => a + b, 0) / vals.length;
   }, [allScores]);
 
-  // Sparkline points — built from history90.
+  // Sparkline points: built from history90.
   const spark = useMemo(() => {
     if (!history90 || history90.length < 2) return null;
     const pts = history90.map((h) => h.handicap_index);
