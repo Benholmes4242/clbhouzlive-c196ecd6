@@ -74,7 +74,7 @@ const OtpSheetContent: React.FC<OtpSheetContentProps> = ({
 
     // Paste: multi-char input – distribute across boxes from current index
     if (cleaned.length > 1) {
-      // Overwrite guard: typing into a filled box yields "<old><new>" — treat as retype
+      // Overwrite guard: typing into a filled box yields "<old><new>" - treat as retype
       if (cleaned.length === 2 && cleaned[0] === digits[i]) {
         setDigit(i, cleaned[1]);
         if (i < BOX_COUNT - 1) {
