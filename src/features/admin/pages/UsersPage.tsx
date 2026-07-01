@@ -3,7 +3,7 @@ import { useSearchParams, useNavigate } from 'react-router-dom';
 import { formatDistanceToNow } from 'date-fns';
 import {
   CheckCircle2, ShieldCheck, Mail, KeyRound, Trash2, Ban, X,
-  UserPlus, MoreVertical, Search,
+  UserPlus, MoreVertical, Search, ShieldAlert,
 } from 'lucide-react';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { useUserActions } from '@/hooks/admin/useUserDetails';
@@ -19,6 +19,9 @@ import { useVerifications, useProofConflict, type VerificationRow } from '../hoo
 import { useTeam, type TeamMember } from '../hooks/useTeam';
 import { useInvites, type InviteRow } from '../hooks/useInvites';
 import { useDebouncedValue } from '@/hooks/useDebouncedValue';
+import { usePanelRole } from '@/hooks/usePanelRole';
+import { panelCan } from '@/lib/panelCan';
+import { useCreateAdminActionRequest } from '../hooks/useAdminActionRequests';
 
 type TabId = 'all' | 'verifications' | 'team' | 'invites';
 
@@ -38,6 +41,10 @@ function relTime(iso: string | null | undefined): string {
 
 export default function UsersPage() {
   const [params, setParams] = useSearchParams();
+  const { role } = usePanelRole();
+  const caps = panelCan(role);
+  const isFullAdmin = caps.manageAdmins;
+
   const tab = (params.get('tab') as TabId) ?? 'all';
   const setTab = (id: string) => {
     const next = new URLSearchParams(params);
@@ -48,12 +55,17 @@ export default function UsersPage() {
   const verifs = useVerifications();
   const invites = useInvites();
 
-  const tabs = useMemo(() => [
-    { id: 'all', label: 'All Users' },
-    { id: 'verifications', label: 'Verifications', count: verifs.counts.pending || undefined },
-    { id: 'team', label: 'Team & Roles' },
-    { id: 'invites', label: 'Invites', count: invites.counts.pending || undefined },
-  ], [verifs.counts.pending, invites.counts.pending]);
+  const tabs = useMemo(() => {
+    const base: Array<{ id: TabId; label: string; count?: number }> = [
+      { id: 'all', label: 'All Users' },
+      { id: 'verifications', label: 'Verifications', count: verifs.counts.pending || undefined },
+    ];
+    if (isFullAdmin) {
+      base.push({ id: 'team', label: 'Team & Roles' });
+      base.push({ id: 'invites', label: 'Invites', count: invites.counts.pending || undefined });
+    }
+    return base;
+  }, [verifs.counts.pending, invites.counts.pending, isFullAdmin]);
 
   // Refetch on header refresh event
   useEffect(() => {
@@ -65,13 +77,15 @@ export default function UsersPage() {
     return () => window.removeEventListener('admin-v2:refetch', handler);
   }, [verifs, invites]);
 
+  const effectiveTab: TabId = !isFullAdmin && (tab === 'team' || tab === 'invites') ? 'all' : tab;
+
   return (
     <div style={{ padding: 16, display: 'flex', flexDirection: 'column', gap: 16, maxWidth: 1180, margin: '0 auto' }}>
-      <SectionTabs tabs={tabs} activeId={tab} onChange={setTab} />
-      {tab === 'all' && <AllUsersTab />}
-      {tab === 'verifications' && <VerificationsTab data={verifs.data} loading={verifs.isLoading} review={verifs.reviewMutation} />}
-      {tab === 'team' && <TeamTab />}
-      {tab === 'invites' && <InvitesTab />}
+      <SectionTabs tabs={tabs} activeId={effectiveTab} onChange={setTab} />
+      {effectiveTab === 'all' && <AllUsersTab />}
+      {effectiveTab === 'verifications' && <VerificationsTab data={verifs.data} loading={verifs.isLoading} review={verifs.reviewMutation} />}
+      {effectiveTab === 'team' && isFullAdmin && <TeamTab />}
+      {effectiveTab === 'invites' && isFullAdmin && <InvitesTab />}
     </div>
   );
 }
@@ -269,10 +283,18 @@ function UserDetailPanel({
 }) {
   const navigate = useNavigate();
   const actions = useUserActions();
+  const { role: panelRole } = usePanelRole();
+  const isFullAdmin = panelCan(panelRole).manageAdmins;
+  const isLimited = panelRole === 'limited';
+  const createRequest = useCreateAdminActionRequest();
+
   const [confirm, setConfirm] = useState<null | 'suspend' | 'delete' | 'reset'>(null);
   const [busy, setBusy] = useState(false);
+  const [requestMode, setRequestMode] = useState<null | 'delete' | 'ban' | 'role'>(null);
+  const [reqReason, setReqReason] = useState('');
+  const [reqRoleAction, setReqRoleAction] = useState<'grant_limited' | 'grant_full' | 'downgrade' | 'revoke'>('grant_limited');
 
-  const close = () => { setConfirm(null); onClose(); };
+  const close = () => { setConfirm(null); setRequestMode(null); setReqReason(''); onClose(); };
   const name = detail?.display_name ?? detail?.username ?? 'user';
 
   const runConfirmed = async () => {
@@ -289,6 +311,39 @@ function UserDetailPanel({
     }
   };
 
+  const submitRequest = () => {
+    if (!detail || !requestMode) return;
+    if (requestMode === 'delete') {
+      createRequest.mutate(
+        {
+          action_type: 'delete_user',
+          target_user_id: detail.id,
+          target_email: detail.email ?? null,
+          payload: { reason: reqReason.trim() || 'Deletion requested' },
+        },
+        { onSuccess: () => close() },
+      );
+    } else if (requestMode === 'ban') {
+      createRequest.mutate(
+        {
+          action_type: 'permanent_ban',
+          target_user_id: detail.id,
+          payload: { reason: reqReason.trim() || 'Permanent ban requested' },
+        },
+        { onSuccess: () => close() },
+      );
+    } else if (requestMode === 'role') {
+      createRequest.mutate(
+        {
+          action_type: 'role_change',
+          target_user_id: detail.id,
+          payload: { roleAction: reqRoleAction, reason: reqReason.trim() || undefined },
+        },
+        { onSuccess: () => close() },
+      );
+    }
+  };
+
   return (
     <DetailDrawer
       open={!!userId}
@@ -299,9 +354,20 @@ function UserDetailPanel({
         detail ? (
           <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
             <DrawerBtn onClick={() => navigate(`/profile/${detail.id}`)}>Public profile</DrawerBtn>
-            <DrawerBtn icon={<KeyRound size={14} />} onClick={() => setConfirm('reset')}>Reset password</DrawerBtn>
-            <DrawerBtn icon={<Ban size={14} />}  tone="warn"   onClick={() => setConfirm('suspend')}>Suspend</DrawerBtn>
-            <DrawerBtn icon={<Trash2 size={14} />} tone="danger" onClick={() => setConfirm('delete')}>Delete</DrawerBtn>
+            {isFullAdmin && (
+              <>
+                <DrawerBtn icon={<KeyRound size={14} />} onClick={() => setConfirm('reset')}>Reset password</DrawerBtn>
+                <DrawerBtn icon={<Ban size={14} />}  tone="warn"   onClick={() => setConfirm('suspend')}>Suspend</DrawerBtn>
+                <DrawerBtn icon={<Trash2 size={14} />} tone="danger" onClick={() => setConfirm('delete')}>Delete</DrawerBtn>
+              </>
+            )}
+            {isLimited && (
+              <>
+                <DrawerBtn icon={<ShieldAlert size={14} />} tone="warn" onClick={() => { setRequestMode('ban'); setReqReason(''); }}>Request permanent ban</DrawerBtn>
+                <DrawerBtn icon={<Trash2 size={14} />} tone="danger" onClick={() => { setRequestMode('delete'); setReqReason(''); }}>Request delete</DrawerBtn>
+                <DrawerBtn icon={<ShieldCheck size={14} />} onClick={() => { setRequestMode('role'); setReqReason(''); }}>Request role change</DrawerBtn>
+              </>
+            )}
           </div>
         ) : undefined
       }
@@ -337,37 +403,39 @@ function UserDetailPanel({
             <StatTile label="Joined" value={relTime(detail.created_at)} />
           </div>
 
-          {/* Role select */}
-          <div style={{
-            background: t.canvas, border: `1px solid ${t.line}`,
-            borderRadius: t.radius.md, padding: 12,
-          }}>
-            <div style={{ fontSize: 11, color: t.inkFaint, fontWeight: 600, textTransform: 'uppercase' }}>
-              App Role
+          {/* Role select (full-admin direct edit) */}
+          {isFullAdmin && (
+            <div style={{
+              background: t.canvas, border: `1px solid ${t.line}`,
+              borderRadius: t.radius.md, padding: 12,
+            }}>
+              <div style={{ fontSize: 11, color: t.inkFaint, fontWeight: 600, textTransform: 'uppercase' }}>
+                App Role
+              </div>
+              <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', marginTop: 8 }}>
+                {ROLE_OPTIONS.map(opt => {
+                  const active = (detail.role ?? null) === opt.value;
+                  return (
+                    <button
+                      key={opt.value ?? 'none'}
+                      disabled={roleUpdating}
+                      onClick={() => onUpdateRole(detail.id, opt.value)}
+                      style={{
+                        padding: '6px 12px', borderRadius: 999,
+                        border: `1px solid ${active ? 'transparent' : t.line}`,
+                        background: active ? t.brandSoft : t.surface,
+                        color: active ? t.brandText : t.inkMuted,
+                        fontSize: 12, fontWeight: 600,
+                        cursor: roleUpdating ? 'progress' : 'pointer',
+                      }}
+                    >
+                      {opt.label}
+                    </button>
+                  );
+                })}
+              </div>
             </div>
-            <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', marginTop: 8 }}>
-              {ROLE_OPTIONS.map(opt => {
-                const active = (detail.role ?? null) === opt.value;
-                return (
-                  <button
-                    key={opt.value ?? 'none'}
-                    disabled={roleUpdating}
-                    onClick={() => onUpdateRole(detail.id, opt.value)}
-                    style={{
-                      padding: '6px 12px', borderRadius: 999,
-                      border: `1px solid ${active ? 'transparent' : t.line}`,
-                      background: active ? t.brandSoft : t.surface,
-                      color: active ? t.brandText : t.inkMuted,
-                      fontSize: 12, fontWeight: 600,
-                      cursor: roleUpdating ? 'progress' : 'pointer',
-                    }}
-                  >
-                    {opt.label}
-                  </button>
-                );
-              })}
-            </div>
-          </div>
+          )}
 
           {detail.bio && (
             <div>
@@ -409,6 +477,97 @@ function UserDetailPanel({
         tone="danger"
         busy={busy}
       />
+      {requestMode !== null && detail && (
+        <div
+          role="dialog" aria-modal="true"
+          onClick={() => !createRequest.isPending && setRequestMode(null)}
+          style={{
+            position: 'fixed', inset: 0, zIndex: 300,
+            background: 'rgba(15,23,42,0.55)',
+            display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 16,
+          }}
+        >
+          <div
+            onClick={(e) => e.stopPropagation()}
+            style={{
+              background: t.surface, borderRadius: t.radius.lg, boxShadow: t.shadowPop,
+              width: '100%', maxWidth: 460, padding: 20,
+              display: 'flex', flexDirection: 'column', gap: 14,
+            }}
+          >
+            <div>
+              <div style={{ fontSize: 16, fontWeight: 700, color: t.ink }}>
+                {requestMode === 'delete' ? 'Request user deletion'
+                  : requestMode === 'ban' ? 'Request permanent ban'
+                  : 'Request role change'}
+              </div>
+              <div style={{ fontSize: 13, color: t.inkMuted, marginTop: 6, lineHeight: 1.45 }}>
+                A Full admin will review and either approve (which executes the action) or reject.
+              </div>
+            </div>
+
+            {requestMode === 'role' && (
+              <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
+                {(['grant_limited', 'grant_full', 'downgrade', 'revoke'] as const).map(ra => {
+                  const active = reqRoleAction === ra;
+                  return (
+                    <button
+                      key={ra}
+                      onClick={() => setReqRoleAction(ra)}
+                      style={{
+                        padding: '6px 12px', borderRadius: 999,
+                        border: `1px solid ${active ? 'transparent' : t.line}`,
+                        background: active ? t.brandSoft : t.surface,
+                        color: active ? t.brandText : t.inkMuted,
+                        fontSize: 12, fontWeight: 600, cursor: 'pointer',
+                      }}
+                    >
+                      {ra.replace('_', ' ')}
+                    </button>
+                  );
+                })}
+              </div>
+            )}
+
+            <textarea
+              autoFocus
+              placeholder="Reason (required)"
+              value={reqReason}
+              onChange={(e) => setReqReason(e.target.value)}
+              rows={3}
+              style={{
+                width: '100%', padding: 10, borderRadius: t.radius.md,
+                border: `1px solid ${t.line}`, background: t.surface, color: t.ink,
+                fontSize: 13, fontFamily: 'inherit', resize: 'vertical', outline: 'none',
+              }}
+            />
+            <div style={{ display: 'flex', gap: 8, justifyContent: 'flex-end' }}>
+              <button
+                onClick={() => setRequestMode(null)}
+                disabled={createRequest.isPending}
+                style={{
+                  padding: '8px 14px', borderRadius: t.radius.md,
+                  border: `1px solid ${t.line}`, background: t.surface, color: t.ink,
+                  fontSize: 13, fontWeight: 600, cursor: 'pointer',
+                }}
+              >Cancel</button>
+              <button
+                onClick={submitRequest}
+                disabled={createRequest.isPending || !reqReason.trim()}
+                style={{
+                  padding: '8px 14px', borderRadius: t.radius.md,
+                  border: 'none', background: t.ink, color: t.surface,
+                  fontSize: 13, fontWeight: 700,
+                  cursor: (createRequest.isPending || !reqReason.trim()) ? 'not-allowed' : 'pointer',
+                  opacity: (createRequest.isPending || !reqReason.trim()) ? 0.55 : 1,
+                }}
+              >
+                {createRequest.isPending ? 'Submitting...' : 'Submit request'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </DetailDrawer>
   );
 }

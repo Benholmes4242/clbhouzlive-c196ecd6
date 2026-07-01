@@ -56,6 +56,51 @@ export type Database = {
         }
         Relationships: []
       }
+      admin_action_requests: {
+        Row: {
+          action_type: string
+          created_at: string
+          id: string
+          payload: Json | null
+          related_report_id: string | null
+          requested_by: string
+          review_note: string | null
+          reviewed_at: string | null
+          reviewed_by: string | null
+          status: string
+          target_email: string | null
+          target_user_id: string | null
+        }
+        Insert: {
+          action_type: string
+          created_at?: string
+          id?: string
+          payload?: Json | null
+          related_report_id?: string | null
+          requested_by: string
+          review_note?: string | null
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          status?: string
+          target_email?: string | null
+          target_user_id?: string | null
+        }
+        Update: {
+          action_type?: string
+          created_at?: string
+          id?: string
+          payload?: Json | null
+          related_report_id?: string | null
+          requested_by?: string
+          review_note?: string | null
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          status?: string
+          target_email?: string | null
+          target_user_id?: string | null
+        }
+        Relationships: []
+      }
       admin_audit_log: {
         Row: {
           action: string
@@ -19678,6 +19723,7 @@ export type Database = {
         Args: { followed: string; follower: string }
         Returns: boolean
       }
+      is_full_admin: { Args: never; Returns: boolean }
       is_hub_conversation_member: {
         Args: { _conversation_id: string; _user_id?: string }
         Returns: boolean

@@ -5,6 +5,7 @@ import { adminTheme as t } from '../theme';
 import DetailDrawer from './DetailDrawer';
 import StatusPill from './StatusPill';
 import { useModerationActions } from '../hooks/useModerationActions';
+import { useCreateAdminActionRequest } from '../hooks/useAdminActionRequests';
 import { usePanelRole } from '@/hooks/usePanelRole';
 import { panelCan } from '@/lib/panelCan';
 import type { ModerationQueueRow, ReportStatus } from '../hooks/useModerationQueue';
@@ -41,9 +42,11 @@ export default function ModerationDetailDrawer({ open, onClose, row }: Props) {
     setReviewingBulk, dismiss,
     warnUser, suspendUser, hidePost,
   } = useModerationActions();
+  const createRequest = useCreateAdminActionRequest();
   const { role } = usePanelRole();
   const caps = panelCan(role);
   const canPermanent = caps.permanentBanDirect;
+  const isLimited = role === 'limited';
 
   const [dismissOpen, setDismissOpen] = useState(false);
   const [note, setNote] = useState('');
@@ -112,6 +115,21 @@ export default function ModerationDetailDrawer({ open, onClose, row }: Props) {
       if (!targetUserId) return;
       const text = message.trim();
       if (!text) return;
+
+      // Limited admins requesting permanent -> create an approval request.
+      if (duration === null && isLimited) {
+        createRequest.mutate(
+          {
+            action_type: 'permanent_ban',
+            target_user_id: targetUserId,
+            payload: { reason: text },
+            related_report_id: ids[0] ?? null,
+          },
+          { onSuccess: () => closeAll() },
+        );
+        return;
+      }
+
       if (duration === null && !canPermanent) return;
       suspendUser.mutate(
         {
@@ -134,7 +152,7 @@ export default function ModerationDetailDrawer({ open, onClose, row }: Props) {
   };
 
   const enforceBusy =
-    warnUser.isPending || suspendUser.isPending || hidePost.isPending;
+    warnUser.isPending || suspendUser.isPending || hidePost.isPending || createRequest.isPending;
 
   const canEnforce = caps.actModeration;
   const showFooter = row && row.status !== 'dismissed' && row.status !== 'actioned';
@@ -167,6 +185,7 @@ export default function ModerationDetailDrawer({ open, onClose, row }: Props) {
                   duration={duration}
                   setDuration={setDuration}
                   canPermanent={canPermanent}
+                  isLimited={isLimited}
                   onCancel={resetEnforce}
                   onSubmit={submitEnforce}
                   busy={enforceBusy}
@@ -315,7 +334,7 @@ export default function ModerationDetailDrawer({ open, onClose, row }: Props) {
 
 function EnforcePanel({
   mode, message, setMessage, duration, setDuration,
-  canPermanent, onCancel, onSubmit, busy,
+  canPermanent, isLimited, onCancel, onSubmit, busy,
 }: {
   mode: Exclude<EnforceMode, null>;
   message: string;
@@ -323,13 +342,17 @@ function EnforcePanel({
   duration: number | null;
   setDuration: (v: number | null) => void;
   canPermanent: boolean;
+  isLimited: boolean;
   onCancel: () => void;
   onSubmit: () => void;
   busy: boolean;
 }) {
+  const isPermanentSelected = mode === 'suspend' && duration === null;
+  const willRequest = isPermanentSelected && isLimited;
+
   const title =
     mode === 'warn' ? 'Send a warning'
-    : mode === 'suspend' ? 'Suspend account'
+    : mode === 'suspend' ? (willRequest ? 'Request permanent ban' : 'Suspend account')
     : 'Hide post';
 
   const placeholder =
@@ -340,7 +363,13 @@ function EnforcePanel({
   const submitDisabled =
     busy
     || (mode === 'suspend' && !message.trim())
-    || (mode === 'suspend' && duration === null && !canPermanent);
+    || (isPermanentSelected && !canPermanent && !isLimited);
+
+  const submitLabel =
+    busy ? 'Working...'
+    : mode === 'warn' ? 'Send warning'
+    : mode === 'suspend' ? (willRequest ? 'Request permanent ban' : (isPermanentSelected ? 'Permanent ban' : 'Suspend'))
+    : 'Hide post';
 
   return (
     <div style={{
@@ -354,12 +383,13 @@ function EnforcePanel({
         <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
           {DURATION_OPTIONS.map((opt) => {
             const isPermanent = opt.value === null;
-            const disabled = isPermanent && !canPermanent;
+            // Limited admins can select Permanent; it routes to a request.
+            const disabled = isPermanent && !canPermanent && !isLimited;
             const selected = duration === opt.value;
             return (
               <button
                 key={opt.label}
-                title={disabled ? 'Full admin only' : undefined}
+                title={isPermanent && isLimited ? 'Full-admin approval required' : (disabled ? 'Full admin only' : undefined)}
                 disabled={disabled}
                 onClick={() => setDuration(opt.value)}
                 style={{
@@ -380,6 +410,12 @@ function EnforcePanel({
         </div>
       )}
 
+      {willRequest && (
+        <div style={{ fontSize: 12, color: t.inkMuted, lineHeight: 1.5 }}>
+          This will submit a request for a Full admin to review and execute.
+        </div>
+      )}
+
       <textarea
         placeholder={placeholder}
         value={message}
@@ -391,7 +427,7 @@ function EnforcePanel({
       <div style={{ display: 'flex', gap: 8, justifyContent: 'flex-end' }}>
         <button onClick={onCancel} disabled={busy} style={btnGhost()}>Cancel</button>
         <button onClick={onSubmit} disabled={submitDisabled} style={btnPrimary(submitDisabled)}>
-          {busy ? 'Working...' : mode === 'warn' ? 'Send warning' : mode === 'suspend' ? 'Suspend' : 'Hide post'}
+          {submitLabel}
         </button>
       </div>
     </div>
