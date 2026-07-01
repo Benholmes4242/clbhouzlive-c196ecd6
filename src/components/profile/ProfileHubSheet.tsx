@@ -537,7 +537,7 @@ function ProfileHubSheet({
 
             {/* Scrollable content */}
             <div className="flex-1 overflow-y-auto overscroll-contain px-4">
-              {isLoading ? (
+              {(isLoading || !contentReady) ? (
                 <ProfileHubSheetSkeleton />
               ) : (
                 <>
