@@ -541,11 +541,12 @@ function ProfileHubSheet({
   // unified /account screen. For now, this row routes to the edit-profile flow.
 
   const content = (
-    <AnimatePresence onExitComplete={() => { if (ovlId.current >= 0) overlayMark(ovlId.current, 'closed'); }}>
-      {open && (
-        <>
-          {/* Backdrop */}
+    <>
+      {/* Backdrop — opacity-only, safe with AnimatePresence */}
+      <AnimatePresence>
+        {open && (
           <motion.div
+            key="profile-hub-backdrop"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
@@ -553,29 +554,26 @@ function ProfileHubSheet({
             className="fixed inset-0 z-[9998] bg-black/40"
             onClick={onClose}
           />
+        )}
+      </AnimatePresence>
 
-          {/* Panel */}
-          <motion.div
-            drag="y"
-            dragConstraints={{ top: 0, bottom: 0 }}
-            dragElastic={{ top: 0, bottom: 0.4 }}
-            onDragEnd={handleSheetDragEnd}
-            style={{
-              y: sheetY,
-              maxHeight: '78dvh',
-              paddingBottom: 'env(safe-area-inset-bottom, 0px)',
-            }}
-            initial={{ y: '100%' }}
-            animate={{ y: 0 }}
-            exit={{ y: '100%' }}
-            transition={{ type: 'tween', duration: 0.25, ease: [0.32, 0.72, 0, 1] }}
-            onAnimationStart={() => {
-              if (ovlId.current >= 0) overlayMark(ovlId.current, 'animation-start');
-              setContentReady(true);
-            }}
-            onAnimationComplete={() => { if (open && ovlId.current >= 0) overlayMark(ovlId.current, 'animation-done'); }}
-            className="fixed inset-x-0 bottom-0 z-[9999] w-full rounded-t-[16px] bg-[#F4F6F9] flex flex-col md:inset-x-auto md:left-1/2 md:-translate-x-1/2 md:w-full md:max-w-[560px]"
-          >
+      {/* Panel — imperative slide via sheetY. Mount held through close anim. */}
+      {mounted && (
+        <motion.div
+          ref={panelRef}
+          drag="y"
+          dragConstraints={{ top: 0, bottom: 0 }}
+          dragElastic={{ top: 0, bottom: 0.4 }}
+          onDragStart={() => { openTweenRef.current?.stop(); }}
+          onDragEnd={handleSheetDragEnd}
+          style={{
+            y: sheetY,
+            maxHeight: '78dvh',
+            paddingBottom: 'env(safe-area-inset-bottom, 0px)',
+          }}
+          className="fixed inset-x-0 bottom-0 z-[9999] w-full rounded-t-[16px] bg-[#F4F6F9] flex flex-col md:inset-x-auto md:left-1/2 md:-translate-x-1/2 md:w-full md:max-w-[560px]"
+        >
+
             {/* Drag handle */}
             <div className="flex justify-center pt-2.5 pb-1 shrink-0 touch-none cursor-grab active:cursor-grabbing">
               <div style={{ width: 36, height: 4, borderRadius: 2, background: HAIRLINE }} />
