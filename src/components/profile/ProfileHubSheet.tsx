@@ -416,8 +416,9 @@ function ProfileHubSheet({
   }, [open, statsSettled, mastheadSettled]);
 
   useLayoutEffect(() => {
-    if (!open) return;
+    if (!open) { contentPaintedRef.current = false; return; }
     if (contentPaintedRef.current) return;
+    if (!contentReady) return;
     if (!statsSettled || !mastheadSettled) return;
     contentPaintedRef.current = true;
     const id = ovlId.current;
@@ -425,7 +426,7 @@ function ProfileHubSheet({
       requestAnimationFrame(() => overlayMark(id, 'content-painted')),
     );
     return () => cancelAnimationFrame(r1);
-  }, [open, statsSettled, mastheadSettled]);
+  }, [open, contentReady, statsSettled, mastheadSettled]);
 
 
   // Reset confirm + switcher when closing
