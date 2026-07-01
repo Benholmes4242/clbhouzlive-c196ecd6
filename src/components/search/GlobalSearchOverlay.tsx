@@ -347,7 +347,7 @@ function GlobalSearchOverlay({ isOpen, onClose }: GlobalSearchOverlayProps) {
           animate={{ y: 0 }}
           exit={{ y: '100%' }}
           transition={{ duration: 0.25, ease: 'easeOut' }}
-          onAnimationStart={() => overlayMark(ovlId.current, 'animation-start')}
+          onAnimationStart={() => { overlayMark(ovlId.current, 'animation-start'); setContentReady(true); }}
           onAnimationComplete={() => { if (isOpen) overlayMark(ovlId.current, 'animation-done'); }}
         >
           {/* Header */}
