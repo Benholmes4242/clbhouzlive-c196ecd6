@@ -15,13 +15,15 @@ const UsersPage = lazy(() => import('./pages/UsersPage'));
 const ContentPage = lazy(() => import('./pages/ContentPage'));
 const AnalyticsPage = lazy(() => import('./pages/AnalyticsPage'));
 const SystemPage = lazy(() => import('./pages/SystemPage'));
+const ModerationPage = lazy(() => import('./pages/ModerationPage'));
 
 const SECTION_TITLES: Record<string, string> = {
-  dashboard: 'Dashboard',
-  users:     'Users',
-  content:   'Content',
-  analytics: 'Analytics',
-  system:    'System',
+  dashboard:  'Dashboard',
+  moderation: 'Moderation',
+  users:      'Users',
+  content:    'Content',
+  analytics:  'Analytics',
+  system:     'System',
 };
 
 export default function AdminShell() {
