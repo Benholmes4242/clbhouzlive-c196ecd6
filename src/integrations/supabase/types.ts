@@ -11052,6 +11052,42 @@ export type Database = {
         }
         Relationships: []
       }
+      suspension_appeals: {
+        Row: {
+          created_at: string
+          id: string
+          message: string
+          review_note: string | null
+          reviewed_at: string | null
+          reviewed_by: string | null
+          status: string
+          suspension_ref: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          message: string
+          review_note?: string | null
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          status?: string
+          suspension_ref: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          message?: string
+          review_note?: string | null
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          status?: string
+          suspension_ref?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       swing_phase_results: {
         Row: {
           confidence: number | null
@@ -18454,6 +18490,7 @@ export type Database = {
           permanent: boolean
           reason: string
           suspended: boolean
+          suspended_at: string
           suspended_until: string
         }[]
       }
