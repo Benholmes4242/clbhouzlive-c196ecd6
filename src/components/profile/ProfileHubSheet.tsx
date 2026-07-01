@@ -11,8 +11,10 @@
  *   7. Sign out (muted text → confirm reveal)
  */
 
-import React, { memo, useState, useEffect, useCallback } from 'react';
+import React, { memo, useState, useEffect, useLayoutEffect, useRef, useCallback } from 'react';
 import { AnimatedEchoWave } from '@/features/echo/components/ui/AnimatedEchoWave';
+import { lockBodyScroll, unlockBodyScroll } from '@/lib/bodyScrollLock';
+import { overlayOpen, overlayMark } from '@/perf/overlayTiming';
 import { createPortal } from 'react-dom';
 import { motion, AnimatePresence, useMotionValue, animate } from 'framer-motion';
 import type { PanInfo } from 'framer-motion';
@@ -344,10 +346,17 @@ function ProfileHubSheet({
   const { data: userProfile } = useUserProfile(personalId);
   const username = userProfile?.username || null;
 
+  // ── Sheet-lifecycle gating: pay the 5-query stats fan-out only after the
+  // sheet has been opened at least once (sheet is always mounted by
+  // PostingAsMenu, so this avoids app-shell-wide cost). ──
+  const [hasEverOpened, setHasEverOpened] = useState(false);
+  useEffect(() => { if (open) setHasEverOpened(true); }, [open]);
+  const statsEnabled = open || hasEverOpened;
+
   // ── Handicap data (for sub-copy + stat strip variant) ──
-  const { data: whsConnection } = useWhsConnection(localActiveId);
-  const { data: trend } = useHandicapTrend(whsConnection?.id);
-  const stats = useProfileSheetStats(localActiveId);
+  const { data: whsConnection } = useWhsConnection(statsEnabled ? localActiveId : undefined);
+  const { data: trend } = useHandicapTrend(statsEnabled ? whsConnection?.id : undefined);
+  const stats = useProfileSheetStats(localActiveId, statsEnabled);
 
   // ── Business ownership (always resolved against the personal account,
   // regardless of which actor is currently selected) ──
@@ -373,11 +382,46 @@ function ProfileHubSheet({
   // Sync localActiveId when currentActor changes externally
   useEffect(() => { setLocalActiveId(currentActor.id); }, [currentActor.id]);
 
-  // Lock body scroll
+  // Lock body scroll (reference-counted, prevents iOS scroll-jump)
   useEffect(() => {
-    if (open) document.body.style.overflow = 'hidden';
-    return () => { document.body.style.overflow = ''; };
+    if (!open) return;
+    lockBodyScroll();
+    return () => unlockBodyScroll();
   }, [open]);
+
+  // ── overlayTiming instrumentation ──
+  const ovlId = useRef<number>(-1);
+  const contentPaintedRef = useRef(false);
+  useEffect(() => {
+    if (open) {
+      ovlId.current = overlayOpen('profile-hub');
+    } else if (ovlId.current >= 0) {
+      overlayMark(ovlId.current, 'close-start');
+      contentPaintedRef.current = false;
+    }
+  }, [open]);
+
+  const statsSettled = !isLoading && stats.rounds30d !== null;
+  const mastheadSettled =
+    activeProfileType !== 'personal' || handicapState !== 'data' || trend?.current != null;
+
+  useEffect(() => {
+    if (!open || ovlId.current < 0) return;
+    if (statsSettled && mastheadSettled) overlayMark(ovlId.current, 'data-settled');
+  }, [open, statsSettled, mastheadSettled]);
+
+  useLayoutEffect(() => {
+    if (!open) return;
+    if (contentPaintedRef.current) return;
+    if (!statsSettled || !mastheadSettled) return;
+    contentPaintedRef.current = true;
+    const id = ovlId.current;
+    const r1 = requestAnimationFrame(() =>
+      requestAnimationFrame(() => overlayMark(id, 'content-painted')),
+    );
+    return () => cancelAnimationFrame(r1);
+  }, [open, statsSettled, mastheadSettled]);
+
 
   // Reset confirm + switcher when closing
   useEffect(() => {
@@ -446,7 +490,7 @@ function ProfileHubSheet({
   // unified /account screen. For now, this row routes to the edit-profile flow.
 
   const content = (
-    <AnimatePresence>
+    <AnimatePresence onExitComplete={() => { if (ovlId.current >= 0) overlayMark(ovlId.current, 'closed'); }}>
       {open && (
         <>
           {/* Backdrop */}
@@ -474,6 +518,8 @@ function ProfileHubSheet({
             animate={{ y: 0 }}
             exit={{ y: '100%' }}
             transition={{ type: 'tween', duration: 0.25, ease: [0.32, 0.72, 0, 1] }}
+            onAnimationStart={() => { if (ovlId.current >= 0) overlayMark(ovlId.current, 'animation-start'); }}
+            onAnimationComplete={() => { if (open && ovlId.current >= 0) overlayMark(ovlId.current, 'animation-done'); }}
             className="fixed inset-x-0 bottom-0 z-[9999] w-full rounded-t-[16px] bg-[#F4F6F9] flex flex-col md:inset-x-auto md:left-1/2 md:-translate-x-1/2 md:w-full md:max-w-[560px]"
           >
             {/* Drag handle */}
