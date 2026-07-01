@@ -123,7 +123,7 @@ class OverlayTimingController {
     // keep the first one so drags after open don't move it.
     if (tx.marks[phase] == null) tx.marks[phase] = performance.now();
 
-    if (phase === 'content-painted') this.emit(tx);
+    if (phase === 'animation-start' || phase === 'content-painted') this.emit(tx);
     if (phase === 'closed') { this.emit(tx); this.finalize(tx); }
   }
 
