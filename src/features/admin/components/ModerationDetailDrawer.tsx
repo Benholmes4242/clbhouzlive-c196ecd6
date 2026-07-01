@@ -334,7 +334,7 @@ export default function ModerationDetailDrawer({ open, onClose, row }: Props) {
 
 function EnforcePanel({
   mode, message, setMessage, duration, setDuration,
-  canPermanent, onCancel, onSubmit, busy,
+  canPermanent, isLimited, onCancel, onSubmit, busy,
 }: {
   mode: Exclude<EnforceMode, null>;
   message: string;
@@ -342,13 +342,17 @@ function EnforcePanel({
   duration: number | null;
   setDuration: (v: number | null) => void;
   canPermanent: boolean;
+  isLimited: boolean;
   onCancel: () => void;
   onSubmit: () => void;
   busy: boolean;
 }) {
+  const isPermanentSelected = mode === 'suspend' && duration === null;
+  const willRequest = isPermanentSelected && isLimited;
+
   const title =
     mode === 'warn' ? 'Send a warning'
-    : mode === 'suspend' ? 'Suspend account'
+    : mode === 'suspend' ? (willRequest ? 'Request permanent ban' : 'Suspend account')
     : 'Hide post';
 
   const placeholder =
@@ -359,7 +363,13 @@ function EnforcePanel({
   const submitDisabled =
     busy
     || (mode === 'suspend' && !message.trim())
-    || (mode === 'suspend' && duration === null && !canPermanent);
+    || (isPermanentSelected && !canPermanent && !isLimited);
+
+  const submitLabel =
+    busy ? 'Working...'
+    : mode === 'warn' ? 'Send warning'
+    : mode === 'suspend' ? (willRequest ? 'Request permanent ban' : (isPermanentSelected ? 'Permanent ban' : 'Suspend'))
+    : 'Hide post';
 
   return (
     <div style={{
@@ -373,12 +383,13 @@ function EnforcePanel({
         <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
           {DURATION_OPTIONS.map((opt) => {
             const isPermanent = opt.value === null;
-            const disabled = isPermanent && !canPermanent;
+            // Limited admins can select Permanent; it routes to a request.
+            const disabled = isPermanent && !canPermanent && !isLimited;
             const selected = duration === opt.value;
             return (
               <button
                 key={opt.label}
-                title={disabled ? 'Full admin only' : undefined}
+                title={isPermanent && isLimited ? 'Full-admin approval required' : (disabled ? 'Full admin only' : undefined)}
                 disabled={disabled}
                 onClick={() => setDuration(opt.value)}
                 style={{
@@ -399,6 +410,12 @@ function EnforcePanel({
         </div>
       )}
 
+      {willRequest && (
+        <div style={{ fontSize: 12, color: t.inkMuted, lineHeight: 1.5 }}>
+          This will submit a request for a Full admin to review and execute.
+        </div>
+      )}
+
       <textarea
         placeholder={placeholder}
         value={message}
@@ -410,7 +427,7 @@ function EnforcePanel({
       <div style={{ display: 'flex', gap: 8, justifyContent: 'flex-end' }}>
         <button onClick={onCancel} disabled={busy} style={btnGhost()}>Cancel</button>
         <button onClick={onSubmit} disabled={submitDisabled} style={btnPrimary(submitDisabled)}>
-          {busy ? 'Working...' : mode === 'warn' ? 'Send warning' : mode === 'suspend' ? 'Suspend' : 'Hide post'}
+          {submitLabel}
         </button>
       </div>
     </div>
