@@ -23,6 +23,7 @@ const SECTION_TITLES: Record<string, string> = {
   dashboard:  'Dashboard',
   moderation: 'Moderation',
   approvals:  'Approvals',
+  appeals:    'Appeals',
   users:      'Users',
   content:    'Content',
   analytics:  'Analytics',
