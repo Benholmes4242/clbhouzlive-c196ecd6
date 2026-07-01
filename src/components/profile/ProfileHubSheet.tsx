@@ -346,10 +346,17 @@ function ProfileHubSheet({
   const { data: userProfile } = useUserProfile(personalId);
   const username = userProfile?.username || null;
 
+  // ── Sheet-lifecycle gating: pay the 5-query stats fan-out only after the
+  // sheet has been opened at least once (sheet is always mounted by
+  // PostingAsMenu, so this avoids app-shell-wide cost). ──
+  const [hasEverOpened, setHasEverOpened] = useState(false);
+  useEffect(() => { if (open) setHasEverOpened(true); }, [open]);
+  const statsEnabled = open || hasEverOpened;
+
   // ── Handicap data (for sub-copy + stat strip variant) ──
-  const { data: whsConnection } = useWhsConnection(localActiveId);
-  const { data: trend } = useHandicapTrend(whsConnection?.id);
-  const stats = useProfileSheetStats(localActiveId);
+  const { data: whsConnection } = useWhsConnection(statsEnabled ? localActiveId : undefined);
+  const { data: trend } = useHandicapTrend(statsEnabled ? whsConnection?.id : undefined);
+  const stats = useProfileSheetStats(localActiveId, statsEnabled);
 
   // ── Business ownership (always resolved against the personal account,
   // regardless of which actor is currently selected) ──
