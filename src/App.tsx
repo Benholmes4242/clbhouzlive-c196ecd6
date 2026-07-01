@@ -171,6 +171,10 @@ const RootGate: React.FC = () => {
   const previewBypass = usePreviewBypass();
   const { user, loading: authLoading } = useSupabaseSession();
 
+  // Suspension gate hook must be called unconditionally to respect hooks order.
+  // It internally no-ops until a user id is present, and fails OPEN on error.
+  const suspension = useSuspensionStatus(user?.id);
+
   // App-only product: only the native app or an approved preview sees the app; everyone else → coming-soon.
   if (!isMedianApp && !previewBypass) return <BetaGatePage />;
 
@@ -184,6 +188,13 @@ const RootGate: React.FC = () => {
 
   // Logged-out: straight to auth (no Clubhouse paint).
   if (!user) return <Navigate to="/auth" replace />;
+
+  // Suspension gate — FAIL OPEN. 'loading' falls through to the app (option (a)
+  // in the brief): a suspended user seeing one frame of the app before the gate
+  // flips is harmless, and we NEVER hold the whole app on this check.
+  if (suspension.status === 'suspended') {
+    return <SuspendedScreen suspension={suspension.suspension} />;
+  }
 
   return <ClubhouseWrapped />;
 };
