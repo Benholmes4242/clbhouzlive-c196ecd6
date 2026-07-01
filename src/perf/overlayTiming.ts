@@ -103,15 +103,20 @@ class OverlayTimingController {
 
   private buildSummary(tx: OverlayTx): OverlaySummary {
     const m = tx.marks;
-    const at = m['animation-start'];
-    const openLatency = at != null && m['open-start'] != null ? Math.round(at - m['open-start']!) : null;
-    const settle = at != null && m['content-painted'] != null ? Math.round(m['content-painted']! - at) : null;
-    const data = at != null && m['data-settled'] != null ? Math.round(m['data-settled']! - at) : null;
-    const animDone = at != null && m['animation-done'] != null ? Math.round(m['animation-done']! - at) : null;
+    const t0 = m['open-start'];
+    const clamp = (x: number | null) => (x == null ? null : Math.max(0, Math.round(x)));
+    const openLatency = t0 != null && m['animation-start'] != null ? clamp(m['animation-start']! - t0) : null;
+    const settle = t0 != null && m['content-painted'] != null ? clamp(m['content-painted']! - t0) : null;
+    const data = t0 != null && m['data-settled'] != null ? clamp(m['data-settled']! - t0) : null;
+    const animDone = t0 != null && m['animation-done'] != null ? clamp(m['animation-done']! - t0) : null;
     let verdict: OverlaySummary['verdict'] = 'NA';
     if (settle != null) {
-      if (settle <= 16) verdict = 'SYNC-COMMIT';
-      else if (settle > 400) verdict = 'SLOW';
+      const syncUnderAnim =
+        m['animation-start'] != null &&
+        m['content-painted'] != null &&
+        (m['content-painted']! - m['animation-start']!) < 16;
+      if (syncUnderAnim) verdict = 'SYNC-COMMIT';
+      else if (settle > 500) verdict = 'SLOW';
       else verdict = 'OK';
     }
     const flagged = verdict === 'SLOW' || verdict === 'SYNC-COMMIT' || (openLatency != null && openLatency > 120);
