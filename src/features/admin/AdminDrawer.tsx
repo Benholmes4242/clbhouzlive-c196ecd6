@@ -42,7 +42,10 @@ export default function AdminDrawer({ open, onClose, role, canManageAdmins }: Pr
     return () => window.removeEventListener('keydown', onKey);
   }, [open, onClose]);
 
-  const items = NAV.filter(n => !n.requireFull || canManageAdmins);
+  const items = NAV.filter(n => {
+    if (role === 'moderator') return !!n.moderatorAllowed;
+    return !n.requireFull || canManageAdmins;
+  });
 
   return (
     <>
