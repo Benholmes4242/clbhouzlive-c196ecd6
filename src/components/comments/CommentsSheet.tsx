@@ -148,6 +148,9 @@ function CommentsSheet({
   const [commentToDelete, setCommentToDelete] = useState<CommentWithReplies | CommentReply | null>(null);
   const [inputText, setInputText] = useState('');
   const [highlightedId, setHighlightedId] = useState<string | null>(null);
+  // Defer the comment-list render until AFTER the panel slide starts, so the O(N) commit
+  // doesn't block framer-motion's first frame. Skeleton covers the slide window.
+  const [listReady, setListReady] = useState(false);
   const [mentionQuery, setMentionQuery] = useState<string | null>(null);
   const [mentionResults, setMentionResults] = useState<{ id: string; username: string; display_name: string; avatar: string | null }[]>([]);
 
