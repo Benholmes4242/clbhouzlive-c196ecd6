@@ -2,12 +2,13 @@ import { serve } from "https://deno.land/std@0.224.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.45.4";
 import { cors } from "../_shared/cors.ts";
 
-type PanelRoleServer = "full" | "limited" | "none";
+type PanelRoleServer = "full" | "limited" | "moderator" | "none";
 
 // Maps admin_memberships.role values to client role
 const mapDbRoleToClient = (role: string | null): PanelRoleServer => {
   if (role === "full") return "full";
   if (role === "limited") return "limited";
+  if (role === "moderator") return "moderator";
   return "none";
 };
 
