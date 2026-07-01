@@ -78,6 +78,8 @@ import { AvatarLightbox } from '@/components/shared/AvatarLightbox';
 import { ImageCropModal } from '@/components/business/ImageCropModal';
 import { ProfileTouchDebugProvider, useProfileTouchDebug } from '@/components/profile/debug/ProfileTouchDebugProvider';
 import { ProfileTouchDebugPanel } from '@/components/profile/debug/ProfileTouchDebugPanel';
+import { ReportSheet } from '@/components/messaging/ReportSheet';
+
 
 // Background color - uses CSS variable for theme support
 const BG_COLOR = 'var(--bg-page)';
@@ -1252,28 +1254,16 @@ const ProfilePageV2Content: React.FC = () => {
         </AlertDialog>
       )}
 
-      {/* Report confirmation dialog */}
+      {/* Report sheet (real submission via submit_report RPC) */}
       {!isSelfView && profileUserId && (
-        <AlertDialog open={showReportDialog} onOpenChange={setShowReportDialog}>
-          <AlertDialogContent>
-            <AlertDialogHeader>
-              <AlertDialogTitle>Report {displayName}?</AlertDialogTitle>
-              <AlertDialogDescription>
-                We'll review this profile and take action if it violates our Community Guidelines.
-              </AlertDialogDescription>
-            </AlertDialogHeader>
-            <AlertDialogFooter>
-              <AlertDialogCancel>Cancel</AlertDialogCancel>
-              <AlertDialogAction onClick={() => {
-                toast.success('Report submitted. Thank you.');
-                setShowReportDialog(false);
-              }}>
-                Submit Report
-              </AlertDialogAction>
-            </AlertDialogFooter>
-          </AlertDialogContent>
-        </AlertDialog>
+        <ReportSheet
+          open={showReportDialog}
+          onOpenChange={setShowReportDialog}
+          reportType="user"
+          reportedUserId={profileUserId}
+        />
       )}
+
 
       {/* Hidden file inputs for inline photo upload */}
       <input ref={avatarFileInputRef} type="file" accept="image/*" onChange={handleAvatarFileSelected} className="hidden" />

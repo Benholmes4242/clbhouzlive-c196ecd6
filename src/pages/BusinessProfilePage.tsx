@@ -53,6 +53,8 @@ import {
 } from '@/components/ui/alert-dialog';
 
 import { trackBusinessProfileVisit, trackBusinessAction } from '@/lib/businessAnalyticsTracking';
+import { ReportSheet } from '@/components/messaging/ReportSheet';
+
 
 type BusinessTab = 'posts' | 'about' | 'team';
 
@@ -709,26 +711,14 @@ const BusinessProfilePage: React.FC = () => {
         fallbackInitial={initials}
       />
 
-      {/* Report dialog */}
-      <AlertDialog open={showReportDialog} onOpenChange={setShowReportDialog}>
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>Report {business.name}?</AlertDialogTitle>
-            <AlertDialogDescription>
-              We'll review this profile and take action if it violates our Community Guidelines.
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel>Cancel</AlertDialogCancel>
-            <AlertDialogAction onClick={() => {
-              toast.success('Report submitted. Thank you.');
-              setShowReportDialog(false);
-            }}>
-              Submit Report
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
+      {/* Report sheet (real submission via submit_report RPC) */}
+      <ReportSheet
+        open={showReportDialog}
+        onOpenChange={setShowReportDialog}
+        reportType="user"
+        reportedUserId={business.id}
+      />
+
 
       {/* Hidden file inputs */}
       <input ref={logoFileInputRef} type="file" accept="image/*" onChange={handleLogoFileSelected} className="hidden" />
