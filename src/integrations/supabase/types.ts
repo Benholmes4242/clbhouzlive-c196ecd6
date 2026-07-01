@@ -7772,6 +7772,10 @@ export type Database = {
           post_id: string
           reason: string | null
           reporter_id: string
+          resolution_note: string | null
+          reviewed_at: string | null
+          reviewed_by: string | null
+          status: string
         }
         Insert: {
           created_at?: string | null
@@ -7779,6 +7783,10 @@ export type Database = {
           post_id: string
           reason?: string | null
           reporter_id: string
+          resolution_note?: string | null
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          status?: string
         }
         Update: {
           created_at?: string | null
@@ -7786,6 +7794,10 @@ export type Database = {
           post_id?: string
           reason?: string | null
           reporter_id?: string
+          resolution_note?: string | null
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          status?: string
         }
         Relationships: [
           {
@@ -8630,6 +8642,9 @@ export type Database = {
           reported_conversation_id: string | null
           reported_user_id: string | null
           reporter_id: string
+          resolution_note: string | null
+          reviewed_at: string | null
+          reviewed_by: string | null
           status: string | null
         }
         Insert: {
@@ -8640,6 +8655,9 @@ export type Database = {
           reported_conversation_id?: string | null
           reported_user_id?: string | null
           reporter_id: string
+          resolution_note?: string | null
+          reviewed_at?: string | null
+          reviewed_by?: string | null
           status?: string | null
         }
         Update: {
@@ -8650,6 +8668,9 @@ export type Database = {
           reported_conversation_id?: string | null
           reported_user_id?: string | null
           reporter_id?: string
+          resolution_note?: string | null
+          reviewed_at?: string | null
+          reviewed_by?: string | null
           status?: string | null
         }
         Relationships: [
@@ -16625,6 +16646,7 @@ export type Database = {
       }
       can_change_email: { Args: { user_id_param: string }; Returns: boolean }
       can_manage_business: { Args: { _business_id: string }; Returns: boolean }
+      can_moderate: { Args: never; Returns: boolean }
       can_view_followers_post: {
         Args: {
           p_actor_id: string
