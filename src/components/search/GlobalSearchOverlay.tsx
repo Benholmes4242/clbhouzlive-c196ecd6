@@ -334,7 +334,7 @@ function GlobalSearchOverlay({ isOpen, onClose }: GlobalSearchOverlayProps) {
   const matchedNonCourse = people.length > 0 || businesses.length > 0;
 
   return createPortal(
-    <AnimatePresence>
+    <AnimatePresence onExitComplete={() => overlayMark(ovlId.current, 'closed')}>
       {isOpen && (
         <motion.div
           className="fixed inset-0 z-[10100] bg-[#F8FAFC] flex flex-col md:items-center"
@@ -342,6 +342,8 @@ function GlobalSearchOverlay({ isOpen, onClose }: GlobalSearchOverlayProps) {
           animate={{ y: 0 }}
           exit={{ y: '100%' }}
           transition={{ duration: 0.25, ease: 'easeOut' }}
+          onAnimationStart={() => overlayMark(ovlId.current, 'animation-start')}
+          onAnimationComplete={() => { if (isOpen) overlayMark(ovlId.current, 'animation-done'); }}
         >
           {/* Header */}
           <div
