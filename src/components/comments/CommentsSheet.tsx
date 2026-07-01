@@ -33,6 +33,7 @@ import { CommentingAsIndicator } from '@/components/comments/CommentingAsIndicat
 import { relativeTime } from '@/utils/relativeTime';
 import { usePostLikes } from '@/hooks/usePostLikes';
 import { supabase } from '@/integrations/supabase/client';
+import { overlayOpen, overlayMark } from '@/perf/overlayTiming';
 import {
   AlertDialog,
   AlertDialogAction,
