@@ -403,37 +403,39 @@ function UserDetailPanel({
             <StatTile label="Joined" value={relTime(detail.created_at)} />
           </div>
 
-          {/* Role select */}
-          <div style={{
-            background: t.canvas, border: `1px solid ${t.line}`,
-            borderRadius: t.radius.md, padding: 12,
-          }}>
-            <div style={{ fontSize: 11, color: t.inkFaint, fontWeight: 600, textTransform: 'uppercase' }}>
-              App Role
+          {/* Role select (full-admin direct edit) */}
+          {isFullAdmin && (
+            <div style={{
+              background: t.canvas, border: `1px solid ${t.line}`,
+              borderRadius: t.radius.md, padding: 12,
+            }}>
+              <div style={{ fontSize: 11, color: t.inkFaint, fontWeight: 600, textTransform: 'uppercase' }}>
+                App Role
+              </div>
+              <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', marginTop: 8 }}>
+                {ROLE_OPTIONS.map(opt => {
+                  const active = (detail.role ?? null) === opt.value;
+                  return (
+                    <button
+                      key={opt.value ?? 'none'}
+                      disabled={roleUpdating}
+                      onClick={() => onUpdateRole(detail.id, opt.value)}
+                      style={{
+                        padding: '6px 12px', borderRadius: 999,
+                        border: `1px solid ${active ? 'transparent' : t.line}`,
+                        background: active ? t.brandSoft : t.surface,
+                        color: active ? t.brandText : t.inkMuted,
+                        fontSize: 12, fontWeight: 600,
+                        cursor: roleUpdating ? 'progress' : 'pointer',
+                      }}
+                    >
+                      {opt.label}
+                    </button>
+                  );
+                })}
+              </div>
             </div>
-            <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', marginTop: 8 }}>
-              {ROLE_OPTIONS.map(opt => {
-                const active = (detail.role ?? null) === opt.value;
-                return (
-                  <button
-                    key={opt.value ?? 'none'}
-                    disabled={roleUpdating}
-                    onClick={() => onUpdateRole(detail.id, opt.value)}
-                    style={{
-                      padding: '6px 12px', borderRadius: 999,
-                      border: `1px solid ${active ? 'transparent' : t.line}`,
-                      background: active ? t.brandSoft : t.surface,
-                      color: active ? t.brandText : t.inkMuted,
-                      fontSize: 12, fontWeight: 600,
-                      cursor: roleUpdating ? 'progress' : 'pointer',
-                    }}
-                  >
-                    {opt.label}
-                  </button>
-                );
-              })}
-            </div>
-          </div>
+          )}
 
           {detail.bio && (
             <div>
