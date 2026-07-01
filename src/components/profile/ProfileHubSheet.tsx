@@ -328,6 +328,9 @@ function ProfileHubSheet({
   ) || 0;
 
   const sheetY = useMotionValue(0);
+  const panelRef = useRef<HTMLDivElement | null>(null);
+  const openTweenRef = useRef<ReturnType<typeof animate> | null>(null);
+  const [mounted, setMounted] = useState(false);
   const handleSheetDragEnd = (_: MouseEvent | TouchEvent | PointerEvent, info: PanInfo) => {
     if (info.offset.y > 100 || info.velocity.y > 500) {
       onClose();
@@ -344,6 +347,48 @@ function ProfileHubSheet({
   useEffect(() => {
     if (!open) setContentReady(false);
   }, [open]);
+
+  // ── OPEN: mount panel, measure height, imperatively slide from h → 0. ──
+  // Owns the real visible open motion + the true animation-start mark.
+  useEffect(() => {
+    if (!open) return;
+    // Seed sheetY off-screen BEFORE mount so first paint is off-screen
+    // (no flash at rest). Refined once we can measure the panel.
+    const fallbackH = typeof window !== 'undefined' ? window.innerHeight : 1000;
+    sheetY.set(fallbackH);
+    setMounted(true);
+    const raf = requestAnimationFrame(() => {
+      const h = panelRef.current?.offsetHeight ?? fallbackH;
+      sheetY.set(h);
+      if (ovlId.current >= 0) overlayMark(ovlId.current, 'animation-start');
+      setContentReady(true);
+      openTweenRef.current?.stop();
+      openTweenRef.current = animate(sheetY, 0, {
+        type: 'tween', duration: 0.25, ease: [0.32, 0.72, 0, 1],
+      });
+      openTweenRef.current.finished
+        .then(() => { if (ovlId.current >= 0) overlayMark(ovlId.current, 'animation-done'); })
+        .catch(() => {});
+    });
+    return () => cancelAnimationFrame(raf);
+  }, [open, sheetY]);
+
+  // ── CLOSE: slide panel down, then unmount + fire 'closed'. ──
+  useEffect(() => {
+    if (open || !mounted) return;
+    openTweenRef.current?.stop();
+    const h = panelRef.current?.offsetHeight ?? window.innerHeight;
+    const t = animate(sheetY, h, {
+      type: 'tween', duration: 0.22, ease: [0.32, 0.72, 0, 1],
+    });
+    t.finished
+      .then(() => {
+        setMounted(false);
+        if (ovlId.current >= 0) overlayMark(ovlId.current, 'closed');
+      })
+      .catch(() => {});
+    return () => { t.stop(); };
+  }, [open, mounted, sheetY]);
 
   // ── Profile (for @handle) ──
   const activeProfileType = profiles.find(p => p.id === localActiveId)?.type || currentActor.type;
