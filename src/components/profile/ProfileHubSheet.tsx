@@ -339,6 +339,11 @@ function ProfileHubSheet({
   const [localActiveId, setLocalActiveId] = useState(currentActor.id);
   const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
   const [switcherOpen, setSwitcherOpen] = useState(false);
+  const [contentReady, setContentReady] = useState(false);
+
+  useEffect(() => {
+    if (!open) setContentReady(false);
+  }, [open]);
 
   // ── Profile (for @handle) ──
   const activeProfileType = profiles.find(p => p.id === localActiveId)?.type || currentActor.type;
@@ -411,8 +416,9 @@ function ProfileHubSheet({
   }, [open, statsSettled, mastheadSettled]);
 
   useLayoutEffect(() => {
-    if (!open) return;
+    if (!open) { contentPaintedRef.current = false; return; }
     if (contentPaintedRef.current) return;
+    if (!contentReady) return;
     if (!statsSettled || !mastheadSettled) return;
     contentPaintedRef.current = true;
     const id = ovlId.current;
@@ -420,7 +426,7 @@ function ProfileHubSheet({
       requestAnimationFrame(() => overlayMark(id, 'content-painted')),
     );
     return () => cancelAnimationFrame(r1);
-  }, [open, statsSettled, mastheadSettled]);
+  }, [open, contentReady, statsSettled, mastheadSettled]);
 
 
   // Reset confirm + switcher when closing
@@ -518,7 +524,10 @@ function ProfileHubSheet({
             animate={{ y: 0 }}
             exit={{ y: '100%' }}
             transition={{ type: 'tween', duration: 0.25, ease: [0.32, 0.72, 0, 1] }}
-            onAnimationStart={() => { if (ovlId.current >= 0) overlayMark(ovlId.current, 'animation-start'); }}
+            onAnimationStart={() => {
+              if (ovlId.current >= 0) overlayMark(ovlId.current, 'animation-start');
+              setContentReady(true);
+            }}
             onAnimationComplete={() => { if (open && ovlId.current >= 0) overlayMark(ovlId.current, 'animation-done'); }}
             className="fixed inset-x-0 bottom-0 z-[9999] w-full rounded-t-[16px] bg-[#F4F6F9] flex flex-col md:inset-x-auto md:left-1/2 md:-translate-x-1/2 md:w-full md:max-w-[560px]"
           >
@@ -529,7 +538,7 @@ function ProfileHubSheet({
 
             {/* Scrollable content */}
             <div className="flex-1 overflow-y-auto overscroll-contain px-4">
-              {isLoading ? (
+              {(isLoading || !contentReady) ? (
                 <ProfileHubSheetSkeleton />
               ) : (
                 <>
