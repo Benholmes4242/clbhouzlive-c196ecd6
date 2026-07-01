@@ -627,7 +627,7 @@ function GlobalSearchOverlay({ isOpen, onClose }: GlobalSearchOverlayProps) {
             )}
 
             {/* Active search states — AnimatePresence crossfade */}
-            <AnimatePresence mode="wait">
+            <AnimatePresence>{/* parallel crossfade: skeleton→results overlap, no blank gap */}
               {isLoading && hasQuery ? (
                 <motion.div key="search-skeleton" {...FADE_PROPS}>
                   <SearchSkeleton />
