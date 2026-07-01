@@ -180,12 +180,6 @@ interface GlobalSearchOverlayProps {
   onClose: () => void;
 }
 
-function SearchPanelMountedMark({ ovlId }: { ovlId: { current: number } }) {
-  useLayoutEffect(() => {
-    overlayMark(ovlId.current, 'mounted');
-  }, [ovlId]);
-  return null;
-}
 
 function GlobalSearchOverlay({ isOpen, onClose }: GlobalSearchOverlayProps) {
   const navigate = useNavigate();

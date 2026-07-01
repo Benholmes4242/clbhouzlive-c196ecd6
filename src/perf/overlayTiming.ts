@@ -26,8 +26,6 @@ interface OverlayTx {
   name: string;
   startedAt: number;
   marks: Partial<Record<OverlayPhase, number>>;
-  longTasks: { start: number; duration: number }[];
-  longTaskObserver?: PerformanceObserver;
   finalized: boolean;
 }
 
@@ -35,14 +33,9 @@ export interface OverlaySummary {
   id: number;
   name: string;
   openLatency: number | null;
-  mounted: number | null;
-  commitToAnim: number | null;
   settle: number | null;
   data: number | null;
   animDone: number | null;
-  longTaskCount: number;
-  longTaskTotal: number;
-  longTaskMax: number;
   verdict: 'OK' | 'SLOW' | 'JANK' | 'NA';
   flagged: boolean;
 }
