@@ -41,6 +41,10 @@ function relTime(iso: string | null | undefined): string {
 
 export default function UsersPage() {
   const [params, setParams] = useSearchParams();
+  const { role } = usePanelRole();
+  const caps = panelCan(role);
+  const isFullAdmin = caps.manageAdmins;
+
   const tab = (params.get('tab') as TabId) ?? 'all';
   const setTab = (id: string) => {
     const next = new URLSearchParams(params);
@@ -51,12 +55,17 @@ export default function UsersPage() {
   const verifs = useVerifications();
   const invites = useInvites();
 
-  const tabs = useMemo(() => [
-    { id: 'all', label: 'All Users' },
-    { id: 'verifications', label: 'Verifications', count: verifs.counts.pending || undefined },
-    { id: 'team', label: 'Team & Roles' },
-    { id: 'invites', label: 'Invites', count: invites.counts.pending || undefined },
-  ], [verifs.counts.pending, invites.counts.pending]);
+  const tabs = useMemo(() => {
+    const base: Array<{ id: TabId; label: string; count?: number }> = [
+      { id: 'all', label: 'All Users' },
+      { id: 'verifications', label: 'Verifications', count: verifs.counts.pending || undefined },
+    ];
+    if (isFullAdmin) {
+      base.push({ id: 'team', label: 'Team & Roles' });
+      base.push({ id: 'invites', label: 'Invites', count: invites.counts.pending || undefined });
+    }
+    return base;
+  }, [verifs.counts.pending, invites.counts.pending, isFullAdmin]);
 
   // Refetch on header refresh event
   useEffect(() => {
@@ -68,13 +77,15 @@ export default function UsersPage() {
     return () => window.removeEventListener('admin-v2:refetch', handler);
   }, [verifs, invites]);
 
+  const effectiveTab: TabId = !isFullAdmin && (tab === 'team' || tab === 'invites') ? 'all' : tab;
+
   return (
     <div style={{ padding: 16, display: 'flex', flexDirection: 'column', gap: 16, maxWidth: 1180, margin: '0 auto' }}>
-      <SectionTabs tabs={tabs} activeId={tab} onChange={setTab} />
-      {tab === 'all' && <AllUsersTab />}
-      {tab === 'verifications' && <VerificationsTab data={verifs.data} loading={verifs.isLoading} review={verifs.reviewMutation} />}
-      {tab === 'team' && <TeamTab />}
-      {tab === 'invites' && <InvitesTab />}
+      <SectionTabs tabs={tabs} activeId={effectiveTab} onChange={setTab} />
+      {effectiveTab === 'all' && <AllUsersTab />}
+      {effectiveTab === 'verifications' && <VerificationsTab data={verifs.data} loading={verifs.isLoading} review={verifs.reviewMutation} />}
+      {effectiveTab === 'team' && isFullAdmin && <TeamTab />}
+      {effectiveTab === 'invites' && isFullAdmin && <InvitesTab />}
     </div>
   );
 }
