@@ -477,6 +477,97 @@ function UserDetailPanel({
         tone="danger"
         busy={busy}
       />
+      {requestMode !== null && detail && (
+        <div
+          role="dialog" aria-modal="true"
+          onClick={() => !createRequest.isPending && setRequestMode(null)}
+          style={{
+            position: 'fixed', inset: 0, zIndex: 300,
+            background: 'rgba(15,23,42,0.55)',
+            display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 16,
+          }}
+        >
+          <div
+            onClick={(e) => e.stopPropagation()}
+            style={{
+              background: t.surface, borderRadius: t.radius.lg, boxShadow: t.shadowPop,
+              width: '100%', maxWidth: 460, padding: 20,
+              display: 'flex', flexDirection: 'column', gap: 14,
+            }}
+          >
+            <div>
+              <div style={{ fontSize: 16, fontWeight: 700, color: t.ink }}>
+                {requestMode === 'delete' ? 'Request user deletion'
+                  : requestMode === 'ban' ? 'Request permanent ban'
+                  : 'Request role change'}
+              </div>
+              <div style={{ fontSize: 13, color: t.inkMuted, marginTop: 6, lineHeight: 1.45 }}>
+                A Full admin will review and either approve (which executes the action) or reject.
+              </div>
+            </div>
+
+            {requestMode === 'role' && (
+              <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
+                {(['grant_limited', 'grant_full', 'downgrade', 'revoke'] as const).map(ra => {
+                  const active = reqRoleAction === ra;
+                  return (
+                    <button
+                      key={ra}
+                      onClick={() => setReqRoleAction(ra)}
+                      style={{
+                        padding: '6px 12px', borderRadius: 999,
+                        border: `1px solid ${active ? 'transparent' : t.line}`,
+                        background: active ? t.brandSoft : t.surface,
+                        color: active ? t.brandText : t.inkMuted,
+                        fontSize: 12, fontWeight: 600, cursor: 'pointer',
+                      }}
+                    >
+                      {ra.replace('_', ' ')}
+                    </button>
+                  );
+                })}
+              </div>
+            )}
+
+            <textarea
+              autoFocus
+              placeholder="Reason (required)"
+              value={reqReason}
+              onChange={(e) => setReqReason(e.target.value)}
+              rows={3}
+              style={{
+                width: '100%', padding: 10, borderRadius: t.radius.md,
+                border: `1px solid ${t.line}`, background: t.surface, color: t.ink,
+                fontSize: 13, fontFamily: 'inherit', resize: 'vertical', outline: 'none',
+              }}
+            />
+            <div style={{ display: 'flex', gap: 8, justifyContent: 'flex-end' }}>
+              <button
+                onClick={() => setRequestMode(null)}
+                disabled={createRequest.isPending}
+                style={{
+                  padding: '8px 14px', borderRadius: t.radius.md,
+                  border: `1px solid ${t.line}`, background: t.surface, color: t.ink,
+                  fontSize: 13, fontWeight: 600, cursor: 'pointer',
+                }}
+              >Cancel</button>
+              <button
+                onClick={submitRequest}
+                disabled={createRequest.isPending || !reqReason.trim()}
+                style={{
+                  padding: '8px 14px', borderRadius: t.radius.md,
+                  border: 'none', background: t.ink, color: t.surface,
+                  fontSize: 13, fontWeight: 700,
+                  cursor: (createRequest.isPending || !reqReason.trim()) ? 'not-allowed' : 'pointer',
+                  opacity: (createRequest.isPending || !reqReason.trim()) ? 0.55 : 1,
+                }}
+              >
+                {createRequest.isPending ? 'Submitting...' : 'Submit request'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </DetailDrawer>
   );
 }
