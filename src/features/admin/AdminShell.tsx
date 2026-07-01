@@ -102,7 +102,8 @@ export default function AdminShell() {
                 <Route index element={<Navigate to={role === 'moderator' ? 'moderation' : 'dashboard'} replace />} />
                 <Route path="dashboard" element={<DashboardPage />} />
                 <Route path="moderation/*" element={can.viewModeration ? <ModerationPage /> : <AdminAccessDenied />} />
-                <Route path="users/*"     element={can.manageAdmins ? <UsersPage /> : <AdminAccessDenied />} />
+                <Route path="approvals/*"  element={can.approveRequests ? <ApprovalsPage /> : <AdminAccessDenied />} />
+                <Route path="users/*"     element={can.viewUsers ? <UsersPage /> : <AdminAccessDenied />} />
                 <Route path="content/*"   element={<ContentPage />} />
                 <Route path="analytics/*" element={can.manageAdmins ? <AnalyticsPage /> : <AdminAccessDenied />} />
                 <Route path="system/*"    element={<SystemPage />} />
