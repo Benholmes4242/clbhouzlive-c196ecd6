@@ -3,7 +3,7 @@
  * Rebuilt from scratch. Hooks (useCommentsWithReplies, useCommentsRealtime) are untouched.
  */
 
-import { memo, useRef, useState, useEffect, useCallback, useMemo } from 'react';
+import { memo, useRef, useState, useEffect, useLayoutEffect, useCallback, useMemo } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { removeGolfCourseFromContent } from '@/utils/golfCourseExtractor';
 import { createPortal } from 'react-dom';
@@ -257,6 +257,20 @@ function CommentsSheet({
   useEffect(() => {
     if (isOpen && !commentsLoading) overlayMark(ovlId.current, 'data-settled');
   }, [isOpen, commentsLoading]);
+
+  // Content-painted: fire once when real content (rows or empty state) has committed.
+  const contentPaintedRef = useRef(false);
+  useLayoutEffect(() => {
+    if (!isOpen) { contentPaintedRef.current = false; return; }
+    if (contentPaintedRef.current) return;
+    const isEmptyState = !commentsLoading && sortedComments.length === 0;
+    const hasContent = !commentsLoading && (sortedComments.length > 0 || isEmptyState);
+    if (hasContent) {
+      contentPaintedRef.current = true;
+      const id = ovlId.current;
+      requestAnimationFrame(() => requestAnimationFrame(() => overlayMark(id, 'content-painted')));
+    }
+  }, [isOpen, commentsLoading, sortedComments.length]);
 
   // Auto-resize textarea
   useEffect(() => {
@@ -994,7 +1008,6 @@ function CommentsSheet({
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
                     transition={{ duration: 0.15 }}
-                    onAnimationComplete={() => overlayMark(ovlId.current, 'content-painted')}
                     className="flex-1 flex flex-col items-center justify-center px-8 gap-4 min-h-[220px]"
                   >
                     {/* Staggered bounce emoji cluster */}
@@ -1021,7 +1034,6 @@ function CommentsSheet({
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
                     transition={{ duration: 0.15 }}
-                    onAnimationComplete={() => { if (sortedComments.length > 0) overlayMark(ovlId.current, 'content-painted'); }}
                   >
                     {sortedComments.map((comment, idx) => renderTopLevelComment(comment, idx))}
                     <div ref={sentinelRef} className="h-px" />
