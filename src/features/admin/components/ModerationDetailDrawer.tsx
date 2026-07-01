@@ -42,9 +42,11 @@ export default function ModerationDetailDrawer({ open, onClose, row }: Props) {
     setReviewingBulk, dismiss,
     warnUser, suspendUser, hidePost,
   } = useModerationActions();
+  const createRequest = useCreateAdminActionRequest();
   const { role } = usePanelRole();
   const caps = panelCan(role);
   const canPermanent = caps.permanentBanDirect;
+  const isLimited = role === 'limited';
 
   const [dismissOpen, setDismissOpen] = useState(false);
   const [note, setNote] = useState('');
