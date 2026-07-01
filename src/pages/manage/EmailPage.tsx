@@ -1,14 +1,26 @@
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { toast } from 'sonner';
 import { useNavigate } from 'react-router-dom';
+import { Mail, Check } from 'lucide-react';
 import { ManagePageShell } from '@/components/manage/ManagePageShell';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { InputOTP, InputOTPGroup, InputOTPSlot } from '@/components/ui/input-otp';
 import { supabase } from '@/integrations/supabase/client';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 
+// Direction A tokens
+const INK = '#0F172A';
 const INK_55 = '#64748B';
+const FIELD_FILL = '#F1F5F9';
+const HAIRLINE = '1px solid rgba(15,23,42,0.07)';
+const CARD_BG = '#FFFFFF';
+const GREEN = '#059669';
+const GREEN_SOFT = 'rgba(5,150,105,0.10)';
+const DANGER = '#B91C1C';
+
+const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 function maskEmail(email: string): string {
   const [local, domain] = email.split('@');
@@ -17,86 +29,238 @@ function maskEmail(email: string): string {
   return `${visible}${'\u2022'.repeat(Math.max(2, local.length - 2))}@${domain}`;
 }
 
+type Step = 'email' | 'code' | 'success';
+
 export default function EmailPage() {
   const navigate = useNavigate();
   const { user } = useSupabaseSession();
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [isLoading, setIsLoading] = useState(false);
 
-  const handleSubmit = async () => {
-    if (!email || !password) return;
-    setIsLoading(true);
+  const [step, setStep] = useState<Step>('email');
+  const [newEmail, setNewEmail] = useState('');
+  const [code, setCode] = useState('');
+  const [submitting, setSubmitting] = useState(false);
+  const [otpError, setOtpError] = useState<string | null>(null);
+  const [resendCooldown, setResendCooldown] = useState(0);
+
+  const emailValid = EMAIL_RE.test(newEmail.trim().toLowerCase());
+
+  // Countdown for resend
+  useEffect(() => {
+    if (resendCooldown <= 0) return;
+    const t = setTimeout(() => setResendCooldown((n) => n - 1), 1000);
+    return () => clearTimeout(t);
+  }, [resendCooldown]);
+
+  const sendCode = async (): Promise<boolean> => {
+    const target = newEmail.trim().toLowerCase();
+    if (!EMAIL_RE.test(target)) return false;
+    setSubmitting(true);
     try {
-      const { data: { session } } = await supabase.auth.getSession();
-      if (!session) throw new Error('No session');
-      const { error } = await supabase.functions.invoke('secure-email-change', {
-        body: { newEmail: email, password },
-        headers: { Authorization: `Bearer ${session.access_token}` },
+      const { error } = await supabase.auth.updateUser({ email: target });
+      if (error) throw error;
+      setResendCooldown(30);
+      return true;
+    } catch (err: any) {
+      const msg = err?.message ?? 'Could not send code. Try again.';
+      toast.error(msg);
+      return false;
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  const handleSendInitial = async () => {
+    const ok = await sendCode();
+    if (ok) {
+      setCode('');
+      setOtpError(null);
+      setStep('code');
+    }
+  };
+
+  const handleResend = async () => {
+    if (resendCooldown > 0 || submitting) return;
+    setCode('');
+    setOtpError(null);
+    const ok = await sendCode();
+    if (ok) toast.success('New code sent');
+  };
+
+  const handleVerify = async (token: string) => {
+    if (token.length !== 6 || submitting) return;
+    setSubmitting(true);
+    setOtpError(null);
+    try {
+      const { error } = await supabase.auth.verifyOtp({
+        email: newEmail.trim().toLowerCase(),
+        token,
+        type: 'email_change',
       });
       if (error) throw error;
-      toast.success('Verification email sent', { description: 'Check your new inbox to confirm the change.' });
-      setEmail('');
-      setPassword('');
-      navigate(-1);
+      setStep('success');
     } catch (err: any) {
-      toast.error(err.message ?? 'Could not update email.');
+      const msg = (err?.message ?? '').toLowerCase();
+      const status = err?.status;
+      if (msg.includes('expired')) {
+        setOtpError('That code is no longer valid. If you requested more than one, use the newest email.');
+      } else if (status === 401 || status === 403 || msg.includes('invalid') || msg.includes('token')) {
+        setOtpError('That code is not right. Check the email and try again.');
+      } else {
+        setOtpError(err?.message ?? 'Could not verify code.');
+      }
+      setCode('');
     } finally {
-      setIsLoading(false);
+      setSubmitting(false);
     }
   };
 
   return (
     <ManagePageShell title="Email">
-      <div className="px-4 pt-4 space-y-4">
-        {/* Current email card */}
-        <div className="rounded-2xl p-4" style={{ background: '#fff', border: '1px solid rgba(15,23,42,0.07)' }}>
-          <p className="text-[11px] font-semibold uppercase tracking-[1.5px]" style={{ color: INK_55 }}>
-            Current email
-          </p>
-          <p className="text-[15px] font-medium text-foreground mt-1.5">
-            {user?.email ? maskEmail(user.email) : '\u2014'}
-          </p>
-        </div>
+      <div className="px-4 pt-4 space-y-4 pb-8">
+        {step === 'email' && (
+          <>
+            {/* Current email */}
+            <div className="rounded-2xl p-4" style={{ background: CARD_BG, border: HAIRLINE }}>
+              <p className="text-[11px] font-semibold uppercase tracking-[1.5px]" style={{ color: INK_55 }}>
+                Current email
+              </p>
+              <p className="text-[15px] font-medium mt-1.5" style={{ color: INK }}>
+                {user?.email ? maskEmail(user.email) : '\u2014'}
+              </p>
+            </div>
 
-        {/* Change email card */}
-        <div className="rounded-2xl p-4 space-y-4" style={{ background: '#fff', border: '1px solid rgba(15,23,42,0.07)' }}>
-          <div className="space-y-1.5">
-            <Label className="text-[11px] font-semibold uppercase tracking-[1.5px]" style={{ color: INK_55 }}>
-              New email
-            </Label>
-            <Input
-              type="email"
-              placeholder="your@email.com"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              autoCapitalize="none"
-              autoComplete="email"
-            />
-          </div>
-          <div className="space-y-1.5">
-            <Label className="text-[11px] font-semibold uppercase tracking-[1.5px]" style={{ color: INK_55 }}>
-              Current password
-            </Label>
-            <Input
-              type="password"
-              placeholder="Confirm with your password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-            />
-          </div>
-          <Button
-            className="w-full min-h-[44px]"
-            disabled={!email || !password || isLoading}
-            onClick={handleSubmit}
-          >
-            {isLoading ? 'Sending\u2026' : 'Send verification email'}
-          </Button>
-        </div>
+            {/* New email */}
+            <div className="rounded-2xl p-4 space-y-4" style={{ background: CARD_BG, border: HAIRLINE }}>
+              <div className="space-y-1.5">
+                <Label className="text-[11px] font-semibold uppercase tracking-[1.5px]" style={{ color: INK_55 }}>
+                  New email
+                </Label>
+                <Input
+                  type="email"
+                  inputMode="email"
+                  placeholder="your@email.com"
+                  value={newEmail}
+                  onChange={(e) => setNewEmail(e.target.value.toLowerCase())}
+                  autoCapitalize="none"
+                  autoComplete="email"
+                  spellCheck={false}
+                  style={{ background: FIELD_FILL, border: 'none' }}
+                />
+              </div>
+              <Button
+                className="w-full min-h-[44px] font-semibold"
+                disabled={!emailValid || submitting}
+                onClick={handleSendInitial}
+                style={{ background: INK, color: '#fff' }}
+              >
+                {submitting ? 'Sending\u2026' : 'Send verification code'}
+              </Button>
+            </div>
 
-        <p className="text-[12px] leading-relaxed px-1" style={{ color: INK_55 }}>
-          You will need to confirm the change from a link sent to your new address. Until you confirm, your account email stays the same.
-        </p>
+            <p className="text-[12px] leading-relaxed px-1" style={{ color: INK_55 }}>
+              We will send a 6-digit code to your new address. Your account email only changes once you enter that code. No password needed.
+            </p>
+          </>
+        )}
+
+        {step === 'code' && (
+          <div className="rounded-2xl p-6 space-y-5" style={{ background: CARD_BG, border: HAIRLINE }}>
+            <div className="flex flex-col items-center text-center gap-3">
+              <div
+                className="flex items-center justify-center rounded-2xl"
+                style={{ width: 56, height: 56, background: GREEN_SOFT }}
+              >
+                <Mail size={26} style={{ color: GREEN }} />
+              </div>
+              <div>
+                <p className="text-[17px] font-semibold" style={{ color: INK }}>
+                  Enter verification code
+                </p>
+                <p className="text-[13px] mt-1" style={{ color: INK_55 }}>
+                  We sent a 6-digit code to {newEmail}
+                </p>
+              </div>
+            </div>
+
+            <div className="flex justify-center">
+              <InputOTP
+                value={code}
+                onChange={(v) => { setCode(v); if (otpError) setOtpError(null); }}
+                maxLength={6}
+                onComplete={handleVerify}
+                disabled={submitting}
+              >
+                <InputOTPGroup>
+                  <InputOTPSlot index={0} />
+                  <InputOTPSlot index={1} />
+                  <InputOTPSlot index={2} />
+                  <InputOTPSlot index={3} />
+                  <InputOTPSlot index={4} />
+                  <InputOTPSlot index={5} />
+                </InputOTPGroup>
+              </InputOTP>
+            </div>
+
+            {otpError && (
+              <p className="text-[13px] text-center leading-relaxed" style={{ color: DANGER }}>
+                {otpError}
+              </p>
+            )}
+
+            <div className="flex flex-col items-center gap-2 pt-1">
+              <button
+                type="button"
+                onClick={handleResend}
+                disabled={resendCooldown > 0 || submitting}
+                className="text-[13px] font-medium"
+                style={{
+                  color: resendCooldown > 0 ? 'rgba(15,23,42,0.35)' : INK,
+                  textDecoration: resendCooldown > 0 ? 'none' : 'underline',
+                  cursor: resendCooldown > 0 ? 'default' : 'pointer',
+                }}
+              >
+                {resendCooldown > 0 ? `Resend code in ${resendCooldown}s` : 'Resend code'}
+              </button>
+              <button
+                type="button"
+                onClick={() => { setStep('email'); setCode(''); setOtpError(null); }}
+                disabled={submitting}
+                className="text-[13px]"
+                style={{ color: INK_55, textDecoration: 'underline', cursor: 'pointer' }}
+              >
+                Use a different email
+              </button>
+            </div>
+          </div>
+        )}
+
+        {step === 'success' && (
+          <div className="rounded-2xl p-6 space-y-5" style={{ background: CARD_BG, border: HAIRLINE }}>
+            <div className="flex flex-col items-center text-center gap-3">
+              <div
+                className="flex items-center justify-center rounded-2xl"
+                style={{ width: 56, height: 56, background: GREEN_SOFT }}
+              >
+                <Check size={28} style={{ color: GREEN }} strokeWidth={2.5} />
+              </div>
+              <div>
+                <p className="text-[17px] font-semibold" style={{ color: INK }}>
+                  Email updated
+                </p>
+                <p className="text-[13px] mt-1 leading-relaxed" style={{ color: INK_55 }}>
+                  Your account email is now {newEmail}. Use it next time you sign in.
+                </p>
+              </div>
+            </div>
+            <Button
+              className="w-full min-h-[44px] font-semibold"
+              onClick={() => navigate(-1)}
+              style={{ background: INK, color: '#fff' }}
+            >
+              Done
+            </Button>
+          </div>
+        )}
       </div>
     </ManagePageShell>
   );
