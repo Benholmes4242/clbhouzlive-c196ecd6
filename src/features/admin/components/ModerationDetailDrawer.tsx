@@ -5,6 +5,8 @@ import { adminTheme as t } from '../theme';
 import DetailDrawer from './DetailDrawer';
 import StatusPill from './StatusPill';
 import { useModerationActions } from '../hooks/useModerationActions';
+import { usePanelRole } from '@/hooks/usePanelRole';
+import { panelCan } from '@/lib/panelCan';
 import type { ModerationQueueRow, ReportStatus } from '../hooks/useModerationQueue';
 
 interface Props {
@@ -13,9 +15,18 @@ interface Props {
   row: ModerationQueueRow | null;
 }
 
+type EnforceMode = null | 'warn' | 'suspend' | 'hide';
+
+const DURATION_OPTIONS: Array<{ label: string; value: number | null }> = [
+  { label: '24h', value: 1 },
+  { label: '7d', value: 7 },
+  { label: '30d', value: 30 },
+  { label: 'Permanent', value: null },
+];
+
 function relTime(iso: string | null | undefined) {
-  if (!iso) return '—';
-  try { return formatDistanceToNow(new Date(iso), { addSuffix: true }); } catch { return '—'; }
+  if (!iso) return '-';
+  try { return formatDistanceToNow(new Date(iso), { addSuffix: true }); } catch { return '-'; }
 }
 
 function statusTone(s: ReportStatus) {
@@ -26,9 +37,19 @@ function statusTone(s: ReportStatus) {
 }
 
 export default function ModerationDetailDrawer({ open, onClose, row }: Props) {
-  const { setReviewingBulk, dismiss } = useModerationActions();
+  const {
+    setReviewingBulk, dismiss,
+    warnUser, suspendUser, hidePost,
+  } = useModerationActions();
+  const { role } = usePanelRole();
+  const caps = panelCan(role);
+  const canPermanent = caps.permanentBanDirect;
+
   const [dismissOpen, setDismissOpen] = useState(false);
   const [note, setNote] = useState('');
+  const [mode, setMode] = useState<EnforceMode>(null);
+  const [message, setMessage] = useState('');
+  const [duration, setDuration] = useState<number | null>(7);
 
   const ids = useMemo(() => (row ? row.reports.map((r) => r.raw.id) : []), [row]);
   const kind = row?.kind;
@@ -43,9 +64,20 @@ export default function ModerationDetailDrawer({ open, onClose, row }: Props) {
     ? `${row.report_count} report${row.report_count === 1 ? '' : 's'} - ${relTime(row.created_at)}`
     : '';
 
+  const resetEnforce = () => {
+    setMode(null);
+    setMessage('');
+    setDuration(7);
+  };
+
+  const closeAll = () => {
+    resetEnforce();
+    onClose();
+  };
+
   const onStartReviewing = () => {
     if (!row || !kind) return;
-    setReviewingBulk.mutate({ kind, ids }, { onSuccess: () => onClose() });
+    setReviewingBulk.mutate({ kind, ids }, { onSuccess: () => closeAll() });
   };
 
   const onDismissConfirm = () => {
@@ -56,56 +88,109 @@ export default function ModerationDetailDrawer({ open, onClose, row }: Props) {
         onSuccess: () => {
           setDismissOpen(false);
           setNote('');
-          onClose();
+          closeAll();
         },
       },
     );
   };
 
+  const submitEnforce = () => {
+    if (!row || !kind) return;
+
+    if (mode === 'warn') {
+      const targetUserId =
+        row.kind === 'user' ? row.targetUser?.id : row.targetPost?.user_id;
+      if (!targetUserId) return;
+      const text = message.trim() || 'Please review the community guidelines.';
+      warnUser.mutate(
+        { userId: targetUserId, message: text, relatedKind: kind, relatedIds: ids },
+        { onSuccess: () => closeAll() },
+      );
+    } else if (mode === 'suspend') {
+      const targetUserId =
+        row.kind === 'user' ? row.targetUser?.id : row.targetPost?.user_id;
+      if (!targetUserId) return;
+      const text = message.trim();
+      if (!text) return;
+      if (duration === null && !canPermanent) return;
+      suspendUser.mutate(
+        {
+          userId: targetUserId,
+          durationDays: duration,
+          reason: text,
+          relatedKind: kind,
+          relatedIds: ids,
+        },
+        { onSuccess: () => closeAll() },
+      );
+    } else if (mode === 'hide') {
+      if (row.kind !== 'post' || !row.targetPost?.id) return;
+      const text = message.trim() || 'Violation of community guidelines';
+      hidePost.mutate(
+        { postId: row.targetPost.id, reason: text, relatedKind: kind, relatedIds: ids },
+        { onSuccess: () => closeAll() },
+      );
+    }
+  };
+
+  const enforceBusy =
+    warnUser.isPending || suspendUser.isPending || hidePost.isPending;
+
+  const canEnforce = caps.actModeration;
+  const showFooter = row && row.status !== 'dismissed' && row.status !== 'actioned';
+
   return (
     <>
       <DetailDrawer
         open={open}
-        onClose={onClose}
+        onClose={closeAll}
         title={targetTitle}
         subtitle={subtitle}
         footer={
-          row && row.status !== 'dismissed' && row.status !== 'actioned' ? (
-            <div style={{ display: 'flex', gap: 8, justifyContent: 'flex-end' }}>
-              <button
-                onClick={() => setDismissOpen(true)}
-                disabled={dismiss.isPending}
-                style={{
-                  padding: '10px 14px',
-                  borderRadius: t.radius.md,
-                  border: `1px solid ${t.line}`,
-                  background: t.surface,
-                  color: t.ink,
-                  fontSize: 13,
-                  fontWeight: 600,
-                  cursor: 'pointer',
-                }}
-              >
-                Dismiss (no violation)
-              </button>
-              {row.status === 'pending' && (
-                <button
-                  onClick={onStartReviewing}
-                  disabled={setReviewingBulk.isPending}
-                  style={{
-                    padding: '10px 14px',
-                    borderRadius: t.radius.md,
-                    border: 'none',
-                    background: t.ink,
-                    color: t.surface,
-                    fontSize: 13,
-                    fontWeight: 600,
-                    cursor: 'pointer',
-                  }}
-                >
-                  Start reviewing
-                </button>
+          showFooter ? (
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+              {canEnforce && mode === null && (
+                <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+                  <button onClick={() => setMode('warn')} style={btnGhost()}>Warn</button>
+                  <button onClick={() => setMode('suspend')} style={btnGhost()}>Suspend</button>
+                  {row?.kind === 'post' && (
+                    <button onClick={() => setMode('hide')} style={btnGhost()}>Hide post</button>
+                  )}
+                </div>
               )}
+
+              {canEnforce && mode !== null && (
+                <EnforcePanel
+                  mode={mode}
+                  message={message}
+                  setMessage={setMessage}
+                  duration={duration}
+                  setDuration={setDuration}
+                  canPermanent={canPermanent}
+                  onCancel={resetEnforce}
+                  onSubmit={submitEnforce}
+                  busy={enforceBusy}
+                />
+              )}
+
+              <div style={{ display: 'flex', gap: 8, justifyContent: 'flex-end' }}>
+                <button
+                  onClick={() => setDismissOpen(true)}
+                  disabled={dismiss.isPending}
+                  style={btnGhost()}
+                >
+                  Dismiss (no violation)
+                </button>
+                {row?.status === 'pending' && (
+                  <button
+                    onClick={onStartReviewing}
+                    disabled={setReviewingBulk.isPending}
+                    style={btnPrimary()}
+                  >
+                    Start reviewing
+                  </button>
+                )}
+              </div>
             </div>
           ) : null
         }
@@ -114,25 +199,24 @@ export default function ModerationDetailDrawer({ open, onClose, row }: Props) {
           <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
             <StatusPill tone={statusTone(row.status)}>{row.status}</StatusPill>
 
-            {/* Target */}
             <section style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-              <div style={{ fontSize: 11, fontWeight: 700, color: t.inkFaint, textTransform: 'uppercase', letterSpacing: 0.4 }}>
+              <div style={sectionLabel()}>
                 {row.kind === 'user' ? 'Reported user' : 'Reported post'}
               </div>
 
               {row.kind === 'user' && row.targetUser && (
-                <div style={{ display: 'flex', alignItems: 'center', gap: 12, padding: 12, border: `1px solid ${t.line}`, borderRadius: t.radius.md, background: t.canvas }}>
+                <div style={cardStyle()}>
                   <SquircleAvatar src={row.targetUser.profile_photo_url ?? undefined} alt={row.targetUser.display_name ?? undefined} size={44} />
                   <div style={{ display: 'flex', flexDirection: 'column', lineHeight: 1.2 }}>
                     <span style={{ color: t.ink, fontWeight: 700, fontSize: 15 }}>{row.targetUser.display_name ?? 'Unknown'}</span>
-                    <span style={{ color: t.inkMuted, fontSize: 12 }}>@{row.targetUser.username ?? '—'}</span>
+                    <span style={{ color: t.inkMuted, fontSize: 12 }}>@{row.targetUser.username ?? '-'}</span>
                     <span style={{ color: t.inkFaint, fontSize: 11, marginTop: 2, fontFamily: 'monospace' }}>{row.targetUser.id}</span>
                   </div>
                 </div>
               )}
 
               {row.kind === 'post' && row.targetPost && (
-                <div style={{ padding: 12, border: `1px solid ${t.line}`, borderRadius: t.radius.md, background: t.canvas, display: 'flex', flexDirection: 'column', gap: 10 }}>
+                <div style={{ ...cardStyle(), flexDirection: 'column', alignItems: 'stretch', gap: 10 }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
                     <SquircleAvatar src={row.targetPost.author?.profile_photo_url ?? undefined} alt={row.targetPost.author?.display_name ?? undefined} size={32} />
                     <div style={{ display: 'flex', flexDirection: 'column', lineHeight: 1.2 }}>
@@ -150,11 +234,8 @@ export default function ModerationDetailDrawer({ open, onClose, row }: Props) {
               )}
             </section>
 
-            {/* Reports */}
             <section style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-              <div style={{ fontSize: 11, fontWeight: 700, color: t.inkFaint, textTransform: 'uppercase', letterSpacing: 0.4 }}>
-                Reports ({row.report_count})
-              </div>
+              <div style={sectionLabel()}>Reports ({row.report_count})</div>
               <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
                 {row.reports.map((r) => {
                   const details = 'details' in r.raw ? (r.raw as any).details : null;
@@ -217,49 +298,11 @@ export default function ModerationDetailDrawer({ open, onClose, row }: Props) {
               value={note}
               onChange={(e) => setNote(e.target.value)}
               rows={3}
-              style={{
-                width: '100%',
-                padding: 10,
-                borderRadius: t.radius.md,
-                border: `1px solid ${t.line}`,
-                background: t.canvas,
-                color: t.ink,
-                fontSize: 13,
-                fontFamily: 'inherit',
-                resize: 'vertical',
-                outline: 'none',
-              }}
+              style={textareaStyle()}
             />
             <div style={{ display: 'flex', gap: 8, justifyContent: 'flex-end' }}>
-              <button
-                onClick={() => setDismissOpen(false)}
-                disabled={dismiss.isPending}
-                style={{
-                  padding: '8px 14px',
-                  borderRadius: t.radius.md,
-                  border: `1px solid ${t.line}`,
-                  background: t.surface,
-                  color: t.ink,
-                  fontSize: 13, fontWeight: 600,
-                  cursor: 'pointer',
-                }}
-              >
-                Cancel
-              </button>
-              <button
-                onClick={onDismissConfirm}
-                disabled={dismiss.isPending}
-                style={{
-                  padding: '8px 14px',
-                  borderRadius: t.radius.md,
-                  border: 'none',
-                  background: t.ink,
-                  color: t.surface,
-                  fontSize: 13, fontWeight: 600,
-                  cursor: dismiss.isPending ? 'not-allowed' : 'pointer',
-                  opacity: dismiss.isPending ? 0.55 : 1,
-                }}
-              >
+              <button onClick={() => setDismissOpen(false)} disabled={dismiss.isPending} style={btnGhost()}>Cancel</button>
+              <button onClick={onDismissConfirm} disabled={dismiss.isPending} style={btnPrimary(dismiss.isPending)}>
                 {dismiss.isPending ? 'Working...' : 'Dismiss'}
               </button>
             </div>
@@ -268,4 +311,128 @@ export default function ModerationDetailDrawer({ open, onClose, row }: Props) {
       )}
     </>
   );
+}
+
+function EnforcePanel({
+  mode, message, setMessage, duration, setDuration,
+  canPermanent, onCancel, onSubmit, busy,
+}: {
+  mode: Exclude<EnforceMode, null>;
+  message: string;
+  setMessage: (v: string) => void;
+  duration: number | null;
+  setDuration: (v: number | null) => void;
+  canPermanent: boolean;
+  onCancel: () => void;
+  onSubmit: () => void;
+  busy: boolean;
+}) {
+  const title =
+    mode === 'warn' ? 'Send a warning'
+    : mode === 'suspend' ? 'Suspend account'
+    : 'Hide post';
+
+  const placeholder =
+    mode === 'warn' ? 'Warning message (visible to the user)'
+    : mode === 'suspend' ? 'Suspension reason (visible to the user)'
+    : 'Reason for hiding (internal)';
+
+  const submitDisabled =
+    busy
+    || (mode === 'suspend' && !message.trim())
+    || (mode === 'suspend' && duration === null && !canPermanent);
+
+  return (
+    <div style={{
+      border: `1px solid ${t.line}`, borderRadius: t.radius.md,
+      background: t.canvas, padding: 12,
+      display: 'flex', flexDirection: 'column', gap: 10,
+    }}>
+      <div style={{ fontSize: 13, fontWeight: 700, color: t.ink }}>{title}</div>
+
+      {mode === 'suspend' && (
+        <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
+          {DURATION_OPTIONS.map((opt) => {
+            const isPermanent = opt.value === null;
+            const disabled = isPermanent && !canPermanent;
+            const selected = duration === opt.value;
+            return (
+              <button
+                key={opt.label}
+                title={disabled ? 'Full admin only' : undefined}
+                disabled={disabled}
+                onClick={() => setDuration(opt.value)}
+                style={{
+                  padding: '6px 12px',
+                  borderRadius: t.radius.md,
+                  border: `1px solid ${selected ? t.ink : t.line}`,
+                  background: selected ? t.ink : t.surface,
+                  color: selected ? t.surface : (disabled ? t.inkFaint : t.ink),
+                  fontSize: 12, fontWeight: 600,
+                  cursor: disabled ? 'not-allowed' : 'pointer',
+                  opacity: disabled ? 0.55 : 1,
+                }}
+              >
+                {opt.label}
+              </button>
+            );
+          })}
+        </div>
+      )}
+
+      <textarea
+        placeholder={placeholder}
+        value={message}
+        onChange={(e) => setMessage(e.target.value)}
+        rows={3}
+        style={textareaStyle()}
+      />
+
+      <div style={{ display: 'flex', gap: 8, justifyContent: 'flex-end' }}>
+        <button onClick={onCancel} disabled={busy} style={btnGhost()}>Cancel</button>
+        <button onClick={onSubmit} disabled={submitDisabled} style={btnPrimary(submitDisabled)}>
+          {busy ? 'Working...' : mode === 'warn' ? 'Send warning' : mode === 'suspend' ? 'Suspend' : 'Hide post'}
+        </button>
+      </div>
+    </div>
+  );
+}
+
+// ---- inline style helpers ----
+function sectionLabel(): React.CSSProperties {
+  return {
+    fontSize: 11, fontWeight: 700, color: t.inkFaint,
+    textTransform: 'uppercase', letterSpacing: 0.4,
+  };
+}
+function cardStyle(): React.CSSProperties {
+  return {
+    display: 'flex', alignItems: 'center', gap: 12, padding: 12,
+    border: `1px solid ${t.line}`, borderRadius: t.radius.md, background: t.canvas,
+  };
+}
+function textareaStyle(): React.CSSProperties {
+  return {
+    width: '100%', padding: 10,
+    borderRadius: t.radius.md,
+    border: `1px solid ${t.line}`,
+    background: t.surface, color: t.ink,
+    fontSize: 13, fontFamily: 'inherit', resize: 'vertical', outline: 'none',
+  };
+}
+function btnGhost(): React.CSSProperties {
+  return {
+    padding: '8px 14px', borderRadius: t.radius.md,
+    border: `1px solid ${t.line}`, background: t.surface,
+    color: t.ink, fontSize: 13, fontWeight: 600, cursor: 'pointer',
+  };
+}
+function btnPrimary(disabled = false): React.CSSProperties {
+  return {
+    padding: '8px 14px', borderRadius: t.radius.md,
+    border: 'none', background: t.ink, color: t.surface,
+    fontSize: 13, fontWeight: 600,
+    cursor: disabled ? 'not-allowed' : 'pointer',
+    opacity: disabled ? 0.55 : 1,
+  };
 }
