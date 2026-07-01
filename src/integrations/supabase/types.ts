@@ -18403,6 +18403,15 @@ export type Database = {
           unit: string
         }[]
       }
+      get_my_suspension_status: {
+        Args: never
+        Returns: {
+          permanent: boolean
+          reason: string
+          suspended: boolean
+          suspended_until: string
+        }[]
+      }
       get_nearby_courses: {
         Args: {
           p_limit?: number
