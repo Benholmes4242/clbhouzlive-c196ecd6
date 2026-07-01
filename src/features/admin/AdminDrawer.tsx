@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import {
-  LayoutDashboard, Users, MapPin, BarChart3, Settings, Shield, ShieldAlert, ShieldCheck, ArrowLeft,
+  LayoutDashboard, Users, MapPin, BarChart3, Settings, Shield, ShieldAlert, ShieldCheck, LifeBuoy, ArrowLeft,
   type LucideIcon,
 } from 'lucide-react';
 import { adminTheme as t } from './theme';
