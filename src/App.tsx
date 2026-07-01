@@ -111,6 +111,8 @@ import ClubhouseWrapped from "./pages/ClubhouseWrapped";
 import BetaGatePage from "./pages/BetaGatePage";
 
 import { useSupabaseSession } from "@/hooks/useSupabaseSession";
+import { useSuspensionStatus } from "@/hooks/useSuspensionStatus";
+import SuspendedScreen from "@/components/SuspendedScreen";
 
 // Gate is platform-based: native app or approved preview only. Desktop/mobile web → coming-soon.
 const PREVIEW_BYPASS_KEY = 'clbhouz_preview_bypass';
