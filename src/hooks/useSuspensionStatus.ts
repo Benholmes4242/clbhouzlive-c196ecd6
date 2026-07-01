@@ -49,6 +49,7 @@ export function useSuspensionStatus(userId: string | undefined): SuspensionState
           suspended_until: row.suspended_until ?? null,
           reason: row.reason ?? null,
           permanent: !!row.permanent,
+          suspended_at: row.suspended_at ?? null,
         };
       } catch (e) {
         console.warn('[useSuspensionStatus] threw, failing open:', e);
