@@ -117,7 +117,8 @@ function CommentsSheet({
   const effectiveActor = activeActor;
 
   // ── Hook — use editorial comments hook when editorialCardId is provided ──
-  const standardHook = useCommentsWithReplies(editorialCardId ? '' : postId, onCommentDeleted);
+  // Gate the standard hook on isOpen so per-swipe background fetches stop while the sheet is closed.
+  const standardHook = useCommentsWithReplies(editorialCardId || !isOpen ? '' : postId, onCommentDeleted);
   const editorialHook = useEditorialComments(editorialCardId ?? '', onCommentDeleted);
   const activeHook = editorialCardId ? editorialHook : standardHook;
 
