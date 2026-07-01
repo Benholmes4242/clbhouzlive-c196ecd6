@@ -709,7 +709,10 @@ function CommentsSheet({
   // ── Portal content ──
 
   const content = (
-    <AnimatePresence onExitComplete={() => overlayMark(ovlId.current, 'closed')}>
+    <AnimatePresence onExitComplete={() => {
+      overlayMark(ovlId.current, 'closed');
+      ovlId.current = -1;
+    }}>
       {isOpen && (
         <>
           {/* Backdrop */}
