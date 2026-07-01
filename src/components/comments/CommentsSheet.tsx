@@ -34,6 +34,8 @@ import { relativeTime } from '@/utils/relativeTime';
 import { usePostLikes } from '@/hooks/usePostLikes';
 import { supabase } from '@/integrations/supabase/client';
 import { overlayOpen, overlayMark } from '@/perf/overlayTiming';
+import { lockBodyScroll, unlockBodyScroll } from '@/lib/bodyScrollLock';
+
 import {
   AlertDialog,
   AlertDialogAction,
@@ -252,15 +254,14 @@ function CommentsSheet({
     }
   }, [isOpen]);
 
-  // Lock body scroll
+  // Lock body scroll (reference-counted; preserves feed scroll position)
   useEffect(() => {
-    if (isOpen) document.body.style.overflow = 'hidden';
-    return () => { document.body.style.overflow = ''; };
+    if (!isOpen) return;
+    lockBodyScroll();
+    return () => unlockBodyScroll();
   }, [isOpen]);
 
-  useLayoutEffect(() => {
-    if (isOpen) overlayMark(ovlId.current, 'mounted');
-  }, [isOpen]);
+
   useEffect(() => {
     if (!isOpen && ovlId.current >= 0) {
       overlayMark(ovlId.current, 'close-start');
