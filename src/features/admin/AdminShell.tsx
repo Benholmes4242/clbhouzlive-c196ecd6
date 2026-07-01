@@ -97,13 +97,14 @@ export default function AdminShell() {
           >
             <Suspense fallback={<AdminLoading />}>
               <Routes>
-                <Route index element={<Navigate to="dashboard" replace />} />
+                <Route index element={<Navigate to={role === 'moderator' ? 'moderation' : 'dashboard'} replace />} />
                 <Route path="dashboard" element={<DashboardPage />} />
+                <Route path="moderation/*" element={can.viewModeration ? <ModerationPage /> : <AdminAccessDenied />} />
                 <Route path="users/*"     element={can.manageAdmins ? <UsersPage /> : <AdminAccessDenied />} />
                 <Route path="content/*"   element={<ContentPage />} />
                 <Route path="analytics/*" element={can.manageAdmins ? <AnalyticsPage /> : <AdminAccessDenied />} />
                 <Route path="system/*"    element={<SystemPage />} />
-                <Route path="*" element={<Navigate to="dashboard" replace />} />
+                <Route path="*" element={<Navigate to={role === 'moderator' ? 'moderation' : 'dashboard'} replace />} />
               </Routes>
             </Suspense>
           </motion.div>
