@@ -123,7 +123,7 @@ export default function ModerationDetailDrawer({ open, onClose, row }: Props) {
 
               {row.kind === 'user' && row.targetUser && (
                 <div style={{ display: 'flex', alignItems: 'center', gap: 12, padding: 12, border: `1px solid ${t.line}`, borderRadius: t.radius.md, background: t.canvas }}>
-                  <SquircleAvatar src={row.targetUser.profile_photo_url ?? undefined} name={row.targetUser.display_name ?? undefined} size={44} />
+                  <SquircleAvatar src={row.targetUser.profile_photo_url ?? undefined} alt={row.targetUser.display_name ?? undefined} size={44} />
                   <div style={{ display: 'flex', flexDirection: 'column', lineHeight: 1.2 }}>
                     <span style={{ color: t.ink, fontWeight: 700, fontSize: 15 }}>{row.targetUser.display_name ?? 'Unknown'}</span>
                     <span style={{ color: t.inkMuted, fontSize: 12 }}>@{row.targetUser.username ?? '—'}</span>
@@ -135,7 +135,7 @@ export default function ModerationDetailDrawer({ open, onClose, row }: Props) {
               {row.kind === 'post' && row.targetPost && (
                 <div style={{ padding: 12, border: `1px solid ${t.line}`, borderRadius: t.radius.md, background: t.canvas, display: 'flex', flexDirection: 'column', gap: 10 }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-                    <SquircleAvatar src={row.targetPost.author?.profile_photo_url ?? undefined} name={row.targetPost.author?.display_name ?? undefined} size={32} />
+                    <SquircleAvatar src={row.targetPost.author?.profile_photo_url ?? undefined} alt={row.targetPost.author?.display_name ?? undefined} size={32} />
                     <div style={{ display: 'flex', flexDirection: 'column', lineHeight: 1.2 }}>
                       <span style={{ color: t.ink, fontWeight: 700, fontSize: 13 }}>
                         {row.targetPost.author?.display_name ?? 'Unknown author'}
@@ -163,7 +163,7 @@ export default function ModerationDetailDrawer({ open, onClose, row }: Props) {
                     <div key={r.raw.id} style={{ padding: 12, border: `1px solid ${t.line}`, borderRadius: t.radius.md, background: t.surface }}>
                       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 8 }}>
                         <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                          <SquircleAvatar src={r.reporter?.profile_photo_url ?? undefined} name={r.reporter?.display_name ?? undefined} size={24} />
+                          <SquircleAvatar src={r.reporter?.profile_photo_url ?? undefined} alt={r.reporter?.display_name ?? undefined} size={24} />
                           <span style={{ color: t.ink, fontSize: 13, fontWeight: 600 }}>
                             {r.reporter?.display_name ?? 'Unknown reporter'}
                           </span>
