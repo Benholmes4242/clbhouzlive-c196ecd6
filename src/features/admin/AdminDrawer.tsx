@@ -130,7 +130,7 @@ export default function AdminDrawer({ open, onClose, role, canManageAdmins }: Pr
               }}
             />
             <span style={{ fontSize: 12, color: t.inkMuted }}>
-              {role === 'full' ? 'Full Admin' : role === 'limited' ? 'Limited Admin' : '—'}
+              {role === 'full' ? 'Full Admin' : role === 'limited' ? 'Limited Admin' : role === 'moderator' ? 'Moderator' : '—'}
             </span>
           </div>
           <Link
