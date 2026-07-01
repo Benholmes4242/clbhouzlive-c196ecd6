@@ -20904,7 +20904,7 @@ export type Database = {
       }
     }
     Enums: {
-      admin_role: "none" | "limited" | "full"
+      admin_role: "none" | "moderator" | "limited" | "full"
       app_role: "admin" | "moderator" | "user" | "limited_admin"
       badge_category: "top_100_courses" | "engagement" | "community" | "special"
       badge_tier: "bronze" | "silver" | "gold" | "platinum" | "diamond"
@@ -21110,7 +21110,7 @@ export type CompositeTypes<
 export const Constants = {
   public: {
     Enums: {
-      admin_role: ["none", "limited", "full"],
+      admin_role: ["none", "moderator", "limited", "full"],
       app_role: ["admin", "moderator", "user", "limited_admin"],
       badge_category: ["top_100_courses", "engagement", "community", "special"],
       badge_tier: ["bronze", "silver", "gold", "platinum", "diamond"],
