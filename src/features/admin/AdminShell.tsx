@@ -16,10 +16,12 @@ const ContentPage = lazy(() => import('./pages/ContentPage'));
 const AnalyticsPage = lazy(() => import('./pages/AnalyticsPage'));
 const SystemPage = lazy(() => import('./pages/SystemPage'));
 const ModerationPage = lazy(() => import('./pages/ModerationPage'));
+const ApprovalsPage = lazy(() => import('./pages/ApprovalsPage'));
 
 const SECTION_TITLES: Record<string, string> = {
   dashboard:  'Dashboard',
   moderation: 'Moderation',
+  approvals:  'Approvals',
   users:      'Users',
   content:    'Content',
   analytics:  'Analytics',
