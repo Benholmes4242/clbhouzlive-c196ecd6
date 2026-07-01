@@ -185,6 +185,7 @@ export default function ModerationDetailDrawer({ open, onClose, row }: Props) {
                   duration={duration}
                   setDuration={setDuration}
                   canPermanent={canPermanent}
+                  isLimited={isLimited}
                   onCancel={resetEnforce}
                   onSubmit={submitEnforce}
                   busy={enforceBusy}
