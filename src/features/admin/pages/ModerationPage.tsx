@@ -132,7 +132,7 @@ export default function ModerationPage() {
             if (row) setSelected(row);
           }}
         >
-          <DataList<ModerationQueueRow>
+          <DataList
             columns={columns.map<DataListColumn<ModerationQueueRow>>((c) => ({
               ...c,
               render: (row: ModerationQueueRow) => (
