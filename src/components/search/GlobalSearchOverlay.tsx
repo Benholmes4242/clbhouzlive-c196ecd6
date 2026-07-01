@@ -189,6 +189,10 @@ function GlobalSearchOverlay({ isOpen, onClose }: GlobalSearchOverlayProps) {
   const debouncedQuery = useDebounce(inputValue, 250);
   const [recent, setRecent] = useState<RecentSearch[]>(() => getRecentSearches());
   const [typeFilter, setTypeFilter] = useState<'all' | 'courses' | 'people' | 'businesses'>('all');
+  // Defer heavy content (shelves + results) until the panel begins animating,
+  // so the slide-in doesn't get starved by synchronous subtree commits.
+  const [contentReady, setContentReady] = useState(false);
+  useEffect(() => { if (!isOpen) setContentReady(false); }, [isOpen]);
 
   const { people, clubs, businesses, trending, trendingLoading, isLoading } =
     useGlobalEntitySearch({ query: debouncedQuery, enabled: isOpen });
