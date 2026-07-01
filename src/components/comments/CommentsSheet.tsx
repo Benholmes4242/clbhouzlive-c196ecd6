@@ -1034,7 +1034,6 @@ function CommentsSheet({
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
                     transition={{ duration: 0.15 }}
-                    onAnimationComplete={() => { if (sortedComments.length > 0) overlayMark(ovlId.current, 'content-painted'); }}
                   >
                     {sortedComments.map((comment, idx) => renderTopLevelComment(comment, idx))}
                     <div ref={sentinelRef} className="h-px" />
