@@ -6,14 +6,15 @@
  * (content-settle vs skeleton-missing). Purely additive; shares the perf
  * gate (isPerfEnabled) and LogHud surface (AppLog).
  *
- * Phases (per instance): open-start · animation-start · data-settled ·
- * content-painted · animation-done · close-start · closed.
+ * Phases (per instance): open-start · mounted · animation-start ·
+ * data-settled · content-painted · animation-done · close-start · closed.
  */
 import { isPerfEnabled } from './navTiming';
 import { AppLog } from '@/lib/logger';
 
 export type OverlayPhase =
   | 'open-start'
+  | 'mounted'
   | 'animation-start'
   | 'data-settled'
   | 'content-painted'
@@ -29,13 +30,24 @@ interface OverlayTx {
   finalized: boolean;
 }
 
+interface OverlayLongTask {
+  start: number;
+  duration: number;
+  name: string;
+}
+
 export interface OverlaySummary {
   id: number;
   name: string;
   openLatency: number | null;
+  mounted: number | null;
+  commitToAnim: number | null;
   settle: number | null;
   data: number | null;
   animDone: number | null;
+  openLongTaskCount: number;
+  openLongTaskMs: number;
+  openLongTaskMax: number;
   verdict: 'OK' | 'SLOW' | 'SYNC-COMMIT' | 'NA';
   flagged: boolean;
 }
@@ -48,6 +60,30 @@ class OverlayTimingController {
   private listeners = new Set<(s: { recent: OverlaySummary[] }) => void>();
   private notifyScheduled = false;
   private FINALIZE_MS = 6000;
+  private longTasks: OverlayLongTask[] = [];
+  private longTaskObserverStarted = false;
+
+  private ensureLongTaskObserver() {
+    if (this.longTaskObserverStarted) return;
+    this.longTaskObserverStarted = true;
+    if (typeof PerformanceObserver === 'undefined') return;
+    try {
+      const po = new PerformanceObserver((list) => {
+        const now = performance.now();
+        for (const entry of list.getEntries()) {
+          this.longTasks.push({
+            start: entry.startTime,
+            duration: entry.duration,
+            name: entry.name || 'longtask',
+          });
+        }
+        this.longTasks = this.longTasks.filter((task) => task.start + task.duration >= now - 30_000).slice(-120);
+      });
+      po.observe({ type: 'longtask', buffered: true } as PerformanceObserverInit);
+    } catch {
+      // Long Task API is not available in every WebView. Overlay timing still works.
+    }
+  }
 
   private notify() {
     if (this.notifyScheduled) return;
@@ -68,6 +104,7 @@ class OverlayTimingController {
 
   open(name: string): number {
     if (!isPerfEnabled()) return -1;
+    this.ensureLongTaskObserver();
     const id = this.nextId++;
     const now = performance.now();
     const tx: OverlayTx = { id, name, startedAt: now, marks: { 'open-start': now }, finalized: false };
@@ -86,7 +123,7 @@ class OverlayTimingController {
     // keep the first one so drags after open don't move it.
     if (tx.marks[phase] == null) tx.marks[phase] = performance.now();
 
-    if (phase === 'content-painted') this.emit(tx);
+    if (phase === 'animation-start' || phase === 'content-painted') this.emit(tx);
     if (phase === 'closed') { this.emit(tx); this.finalize(tx); }
   }
 
@@ -106,9 +143,22 @@ class OverlayTimingController {
     const t0 = m['open-start'];
     const clamp = (x: number | null) => (x == null ? null : Math.max(0, Math.round(x)));
     const openLatency = t0 != null && m['animation-start'] != null ? clamp(m['animation-start']! - t0) : null;
+    const mounted = t0 != null && m.mounted != null ? clamp(m.mounted - t0) : null;
+    const commitToAnim = m.mounted != null && m['animation-start'] != null ? clamp(m['animation-start']! - m.mounted) : null;
     const settle = t0 != null && m['content-painted'] != null ? clamp(m['content-painted']! - t0) : null;
     const data = t0 != null && m['data-settled'] != null ? clamp(m['data-settled']! - t0) : null;
     const animDone = t0 != null && m['animation-done'] != null ? clamp(m['animation-done']! - t0) : null;
+    const openWindowEnd = m['animation-start'] ?? performance.now();
+    const openTasks = t0 == null
+      ? []
+      : this.longTasks.filter((task) => task.start < openWindowEnd && task.start + task.duration > t0);
+    const openLongTaskCount = openTasks.length;
+    const openLongTaskMs = Math.round(openTasks.reduce((sum, task) => {
+      const overlapStart = Math.max(task.start, t0 ?? task.start);
+      const overlapEnd = Math.min(task.start + task.duration, openWindowEnd);
+      return sum + Math.max(0, overlapEnd - overlapStart);
+    }, 0));
+    const openLongTaskMax = Math.round(openTasks.reduce((max, task) => Math.max(max, task.duration), 0));
     let verdict: OverlaySummary['verdict'] = 'NA';
     if (settle != null) {
       const syncUnderAnim =
@@ -119,8 +169,8 @@ class OverlayTimingController {
       else if (settle > 500) verdict = 'SLOW';
       else verdict = 'OK';
     }
-    const flagged = verdict === 'SLOW' || verdict === 'SYNC-COMMIT' || (openLatency != null && openLatency > 120);
-    return { id: tx.id, name: tx.name, openLatency, settle, data, animDone, verdict, flagged };
+    const flagged = verdict === 'SLOW' || verdict === 'SYNC-COMMIT' || (openLatency != null && openLatency > 120) || openLongTaskMs > 120;
+    return { id: tx.id, name: tx.name, openLatency, mounted, commitToAnim, settle, data, animDone, openLongTaskCount, openLongTaskMs, openLongTaskMax, verdict, flagged };
   }
 
   private emit(tx: OverlayTx) {
@@ -128,7 +178,8 @@ class OverlayTimingController {
     this.recent = [s, ...this.recent.filter((r) => r.id !== s.id)].slice(0, 20);
     const line =
       `overlay:${s.name.padEnd(12)} open ${s.openLatency ?? '-'}ms · settle ${s.settle ?? '-'}ms` +
-      ` · data ${s.data ?? '-'} · anim ${s.animDone ?? '-'} · ${s.verdict}`;
+      ` · mounted ${s.mounted ?? '-'} · c→anim ${s.commitToAnim ?? '-'} · data ${s.data ?? '-'} · anim ${s.animDone ?? '-'}` +
+      ` · LT ${s.openLongTaskCount}/${s.openLongTaskMs}ms max${s.openLongTaskMax} · ${s.verdict}`;
     if (s.flagged) AppLog.warn(`OVL-WARN ovl#${s.id}`, line);
     else AppLog.info(`ovl#${s.id}`, line);
     this.notify();

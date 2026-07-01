@@ -116,6 +116,15 @@ function CommentsSheet({
   // Actor selection is GLOBAL — the composer and like writes always use activeActor.
   const effectiveActor = activeActor;
 
+  // ── Overlay perf instrumentation (dev/?perf=1 only; no-op otherwise) ──
+  const ovlId = useRef<number>(-1);
+  // Diagnostic: start as early as this component can observe an open render, before
+  // query hooks/subscriptions below are constructed. `mounted` runs after commit,
+  // splitting render+commit from framer's first animation frame.
+  if (isOpen && ovlId.current < 0) {
+    ovlId.current = overlayOpen('comments');
+  }
+
   // ── Hook — use editorial comments hook when editorialCardId is provided ──
   // Gate the standard hook on isOpen so per-swipe background fetches stop while the sheet is closed.
   const standardHook = useCommentsWithReplies(editorialCardId || !isOpen ? '' : postId, onCommentDeleted);
@@ -249,12 +258,11 @@ function CommentsSheet({
     return () => { document.body.style.overflow = ''; };
   }, [isOpen]);
 
-  // ── Overlay perf instrumentation (dev/?perf=1 only; no-op otherwise) ──
-  const ovlId = useRef<number>(-1);
+  useLayoutEffect(() => {
+    if (isOpen) overlayMark(ovlId.current, 'mounted');
+  }, [isOpen]);
   useEffect(() => {
-    if (isOpen) {
-      ovlId.current = overlayOpen('comments');
-    } else if (ovlId.current >= 0) {
+    if (!isOpen && ovlId.current >= 0) {
       overlayMark(ovlId.current, 'close-start');
     }
   }, [isOpen]);
@@ -701,7 +709,10 @@ function CommentsSheet({
   // ── Portal content ──
 
   const content = (
-    <AnimatePresence onExitComplete={() => overlayMark(ovlId.current, 'closed')}>
+    <AnimatePresence onExitComplete={() => {
+      overlayMark(ovlId.current, 'closed');
+      ovlId.current = -1;
+    }}>
       {isOpen && (
         <>
           {/* Backdrop */}
