@@ -251,11 +251,16 @@ function CommentsSheet({
 
   // ── Overlay perf instrumentation (dev/?perf=1 only; no-op otherwise) ──
   const ovlId = useRef<number>(-1);
+  // Diagnostic: start as early as this component can observe an open render, before commit.
+  // `mounted` below runs in layout-effect after commit, splitting render/commit from framer's first frame.
+  if (isOpen && ovlId.current < 0) {
+    ovlId.current = overlayOpen('comments');
+  }
   useLayoutEffect(() => {
-    if (isOpen) {
-      ovlId.current = overlayOpen('comments');
-      overlayMark(ovlId.current, 'mounted');
-    } else if (ovlId.current >= 0) {
+    if (isOpen) overlayMark(ovlId.current, 'mounted');
+  }, [isOpen]);
+  useEffect(() => {
+    if (!isOpen && ovlId.current >= 0) {
       overlayMark(ovlId.current, 'close-start');
     }
   }, [isOpen]);
