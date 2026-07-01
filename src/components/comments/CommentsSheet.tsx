@@ -3,7 +3,7 @@
  * Rebuilt from scratch. Hooks (useCommentsWithReplies, useCommentsRealtime) are untouched.
  */
 
-import { memo, useRef, useState, useEffect, useCallback, useMemo } from 'react';
+import { memo, useRef, useState, useEffect, useLayoutEffect, useCallback, useMemo } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { removeGolfCourseFromContent } from '@/utils/golfCourseExtractor';
 import { createPortal } from 'react-dom';
