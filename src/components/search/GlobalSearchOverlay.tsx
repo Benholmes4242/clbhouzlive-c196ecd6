@@ -180,6 +180,13 @@ interface GlobalSearchOverlayProps {
   onClose: () => void;
 }
 
+function SearchPanelMountedMark({ ovlId }: { ovlId: { current: number } }) {
+  useLayoutEffect(() => {
+    overlayMark(ovlId.current, 'mounted');
+  }, [ovlId]);
+  return null;
+}
+
 function GlobalSearchOverlay({ isOpen, onClose }: GlobalSearchOverlayProps) {
   const navigate = useNavigate();
   const { user } = useSupabaseSession();
@@ -232,10 +239,12 @@ function GlobalSearchOverlay({ isOpen, onClose }: GlobalSearchOverlayProps) {
 
   // Overlay timing: open-start / close-start
   const ovlId = useRef<number>(-1);
+  if (isOpen && ovlId.current < 0) {
+    ovlId.current = overlayOpen('search');
+  }
+
   useEffect(() => {
-    if (isOpen) {
-      ovlId.current = overlayOpen('search');
-    } else if (ovlId.current >= 0) {
+    if (!isOpen && ovlId.current >= 0) {
       overlayMark(ovlId.current, 'close-start');
     }
   }, [isOpen]);
@@ -339,7 +348,10 @@ function GlobalSearchOverlay({ isOpen, onClose }: GlobalSearchOverlayProps) {
   const matchedNonCourse = people.length > 0 || businesses.length > 0;
 
   return createPortal(
-    <AnimatePresence onExitComplete={() => overlayMark(ovlId.current, 'closed')}>
+    <AnimatePresence onExitComplete={() => {
+      overlayMark(ovlId.current, 'closed');
+      ovlId.current = -1;
+    }}>
       {isOpen && (
         <motion.div
           className="fixed inset-0 z-[10100] bg-[#F8FAFC] flex flex-col md:items-center"
@@ -350,6 +362,7 @@ function GlobalSearchOverlay({ isOpen, onClose }: GlobalSearchOverlayProps) {
           onAnimationStart={() => { overlayMark(ovlId.current, 'animation-start'); setContentReady(true); }}
           onAnimationComplete={() => { if (isOpen) overlayMark(ovlId.current, 'animation-done'); }}
         >
+          <SearchPanelMountedMark ovlId={ovlId} />
           {/* Header */}
           <div
             className="w-full md:max-w-[560px] flex items-center gap-3 px-4 pb-3"
