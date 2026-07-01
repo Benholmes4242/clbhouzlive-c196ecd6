@@ -1,4 +1,4 @@
-import { memo, useRef, useState, useEffect, useCallback } from 'react';
+import { memo, useRef, useState, useEffect, useLayoutEffect, useCallback } from 'react';
 import { RequestCourseCTA } from '@/components/courses/RequestCourseCTA';
 import { createPortal } from 'react-dom';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -8,6 +8,8 @@ import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { SuggestedCreatorsShelf } from '@/components/shared/SuggestedCreatorsShelf';
 import { useNavigate } from 'react-router-dom';
 import { useDebounce } from '@/hooks/useDebounce';
+import { lockBodyScroll, unlockBodyScroll } from '@/lib/bodyScrollLock';
+import { overlayOpen, overlayMark } from '@/perf/overlayTiming';
 import {
   useGlobalEntitySearch,
   saveRecentSearch,
