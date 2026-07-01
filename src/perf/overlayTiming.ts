@@ -6,8 +6,8 @@
  * (content-settle vs skeleton-missing). Purely additive; shares the perf
  * gate (isPerfEnabled) and LogHud surface (AppLog).
  *
- * Phases (per instance): open-start · animation-start · data-settled ·
- * mounted · content-painted · animation-done · close-start · closed.
+ * Phases (per instance): open-start · mounted · animation-start ·
+ * data-settled · content-painted · animation-done · close-start · closed.
  */
 import { isPerfEnabled } from './navTiming';
 import { AppLog } from '@/lib/logger';
