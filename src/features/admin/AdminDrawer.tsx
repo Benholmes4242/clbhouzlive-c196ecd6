@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import {
-  LayoutDashboard, Users, MapPin, BarChart3, Settings, Shield, ArrowLeft,
+  LayoutDashboard, Users, MapPin, BarChart3, Settings, Shield, ShieldAlert, ArrowLeft,
   type LucideIcon,
 } from 'lucide-react';
 import { adminTheme as t } from './theme';
@@ -12,14 +12,16 @@ interface NavItem {
   label: string;
   icon: LucideIcon;
   requireFull?: boolean;
+  moderatorAllowed?: boolean;
 }
 
 const NAV: NavItem[] = [
-  { to: '/admin-v2/dashboard', label: 'Dashboard', icon: LayoutDashboard },
-  { to: '/admin-v2/users',     label: 'Users',     icon: Users, requireFull: true },
-  { to: '/admin-v2/content',   label: 'Content',   icon: MapPin },
-  { to: '/admin-v2/analytics', label: 'Analytics', icon: BarChart3, requireFull: true },
-  { to: '/admin-v2/system',    label: 'System',    icon: Settings },
+  { to: '/admin-v2/dashboard',  label: 'Dashboard',  icon: LayoutDashboard },
+  { to: '/admin-v2/moderation', label: 'Moderation', icon: ShieldAlert, moderatorAllowed: true },
+  { to: '/admin-v2/users',      label: 'Users',      icon: Users, requireFull: true },
+  { to: '/admin-v2/content',    label: 'Content',    icon: MapPin },
+  { to: '/admin-v2/analytics',  label: 'Analytics',  icon: BarChart3, requireFull: true },
+  { to: '/admin-v2/system',     label: 'System',     icon: Settings },
 ];
 
 interface Props {
