@@ -7938,6 +7938,7 @@ export type Database = {
           pinned_until: string | null
           post_categories: string[] | null
           post_type: string | null
+          pre_moderation_status: string | null
           scheduled_at: string | null
           source_review_id: string | null
           status: string
@@ -7971,6 +7972,7 @@ export type Database = {
           pinned_until?: string | null
           post_categories?: string[] | null
           post_type?: string | null
+          pre_moderation_status?: string | null
           scheduled_at?: string | null
           source_review_id?: string | null
           status?: string
@@ -8004,6 +8006,7 @@ export type Database = {
           pinned_until?: string | null
           post_categories?: string[] | null
           post_type?: string | null
+          pre_moderation_status?: string | null
           scheduled_at?: string | null
           source_review_id?: string | null
           status?: string
