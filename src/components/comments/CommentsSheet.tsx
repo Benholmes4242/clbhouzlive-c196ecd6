@@ -982,7 +982,7 @@ function CommentsSheet({
               ) : (
                 /* ── COMMENTS TAB ── */
                 <AnimatePresence mode="wait">
-                {commentsLoading ? (
+                {(commentsLoading || !listReady) ? (
                   /* Loading skeletons with crossfade */
                   <motion.div
                     key="comments-skeleton"
