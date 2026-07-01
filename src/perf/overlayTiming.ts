@@ -14,7 +14,6 @@ import { AppLog } from '@/lib/logger';
 
 export type OverlayPhase =
   | 'open-start'
-  | 'mounted'
   | 'animation-start'
   | 'data-settled'
   | 'content-painted'
