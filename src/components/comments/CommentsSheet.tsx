@@ -708,6 +708,8 @@ function CommentsSheet({
                 onClose();
               }
             }}
+            onAnimationStart={() => overlayMark(ovlId.current, 'animation-start')}
+            onAnimationComplete={() => { if (isOpen) overlayMark(ovlId.current, 'animation-done'); }}
             className="fixed inset-x-0 bottom-0 z-[211] w-full rounded-t-[20px] md:inset-x-auto md:left-1/2 md:-translate-x-1/2 md:max-w-[560px] flex flex-col bg-[#F8FAFC]"
             style={{ minHeight: 'min(52dvh, 380px)', maxHeight: '92dvh' }}
           >
