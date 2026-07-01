@@ -262,19 +262,21 @@ function CommentsSheet({
     if (isOpen && !commentsLoading) overlayMark(ovlId.current, 'data-settled');
   }, [isOpen, commentsLoading]);
 
-  // Content-painted: fire once when real content (rows or empty state) has committed.
+  // Content-painted: fires once real rows (or the empty state) have committed AFTER the deferred list mounted.
   const contentPaintedRef = useRef(false);
   useLayoutEffect(() => {
     if (!isOpen) { contentPaintedRef.current = false; return; }
     if (contentPaintedRef.current) return;
-    const isEmptyState = !commentsLoading && sortedComments.length === 0;
-    const hasContent = !commentsLoading && (sortedComments.length > 0 || isEmptyState);
-    if (hasContent) {
+    const rowsPainted = listReady && !commentsLoading;
+    if (rowsPainted) {
       contentPaintedRef.current = true;
       const id = ovlId.current;
       requestAnimationFrame(() => requestAnimationFrame(() => overlayMark(id, 'content-painted')));
     }
-  }, [isOpen, commentsLoading, sortedComments.length]);
+  }, [isOpen, listReady, commentsLoading, sortedComments.length]);
+
+  // Reset listReady on close so next open re-defers.
+  useEffect(() => { if (!isOpen) setListReady(false); }, [isOpen]);
 
   // Auto-resize textarea
   useEffect(() => {
