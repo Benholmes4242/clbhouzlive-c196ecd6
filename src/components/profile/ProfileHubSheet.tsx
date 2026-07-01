@@ -11,8 +11,10 @@
  *   7. Sign out (muted text → confirm reveal)
  */
 
-import React, { memo, useState, useEffect, useCallback } from 'react';
+import React, { memo, useState, useEffect, useLayoutEffect, useRef, useCallback } from 'react';
 import { AnimatedEchoWave } from '@/features/echo/components/ui/AnimatedEchoWave';
+import { lockBodyScroll, unlockBodyScroll } from '@/lib/bodyScrollLock';
+import { overlayOpen, overlayMark } from '@/perf/overlayTiming';
 import { createPortal } from 'react-dom';
 import { motion, AnimatePresence, useMotionValue, animate } from 'framer-motion';
 import type { PanInfo } from 'framer-motion';
