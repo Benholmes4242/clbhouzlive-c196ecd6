@@ -891,11 +891,11 @@ function ProfileHubSheet({
                 </>
               )}
             </div>
-          </motion.div>
-        </>
+        </motion.div>
       )}
-    </AnimatePresence>
+    </>
   );
+
 
   return typeof window !== 'undefined'
     ? createPortal(content, document.body)
