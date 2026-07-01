@@ -4,7 +4,6 @@ import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { adminTheme as t } from '../theme';
 import DetailDrawer from './DetailDrawer';
 import StatusPill from './StatusPill';
-import ConfirmDialog from './ConfirmDialog';
 import { useModerationActions } from '../hooks/useModerationActions';
 import type { ModerationQueueRow, ReportStatus } from '../hooks/useModerationQueue';
 
