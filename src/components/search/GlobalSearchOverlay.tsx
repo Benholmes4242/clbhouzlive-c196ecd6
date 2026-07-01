@@ -189,6 +189,10 @@ function GlobalSearchOverlay({ isOpen, onClose }: GlobalSearchOverlayProps) {
   const debouncedQuery = useDebounce(inputValue, 250);
   const [recent, setRecent] = useState<RecentSearch[]>(() => getRecentSearches());
   const [typeFilter, setTypeFilter] = useState<'all' | 'courses' | 'people' | 'businesses'>('all');
+  // Defer heavy content (shelves + results) until the panel begins animating,
+  // so the slide-in doesn't get starved by synchronous subtree commits.
+  const [contentReady, setContentReady] = useState(false);
+  useEffect(() => { if (!isOpen) setContentReady(false); }, [isOpen]);
 
   const { people, clubs, businesses, trending, trendingLoading, isLoading } =
     useGlobalEntitySearch({ query: debouncedQuery, enabled: isOpen });
@@ -249,6 +253,7 @@ function GlobalSearchOverlay({ isOpen, onClose }: GlobalSearchOverlayProps) {
   useLayoutEffect(() => {
     if (!isOpen) { contentPaintedRef.current = false; return; }
     if (contentPaintedRef.current) return;
+    if (!contentReady) return;
     const hasQ = debouncedQuery.trim().length > 0;
     const allEmptyNow = clubs.length === 0 && people.length === 0 && businesses.length === 0;
     const noResultsNow = hasQ && !isLoading && allEmptyNow;
@@ -260,7 +265,7 @@ function GlobalSearchOverlay({ isOpen, onClose }: GlobalSearchOverlayProps) {
       const id = ovlId.current;
       requestAnimationFrame(() => requestAnimationFrame(() => overlayMark(id, 'content-painted')));
     }
-  }, [isOpen, debouncedQuery, isLoading, trendingLoading, clubs.length, people.length, businesses.length]);
+  }, [isOpen, contentReady, debouncedQuery, isLoading, trendingLoading, clubs.length, people.length, businesses.length]);
 
 
   const handleInputChange = useCallback((value: string) => {
@@ -342,7 +347,7 @@ function GlobalSearchOverlay({ isOpen, onClose }: GlobalSearchOverlayProps) {
           animate={{ y: 0 }}
           exit={{ y: '100%' }}
           transition={{ duration: 0.25, ease: 'easeOut' }}
-          onAnimationStart={() => overlayMark(ovlId.current, 'animation-start')}
+          onAnimationStart={() => { overlayMark(ovlId.current, 'animation-start'); setContentReady(true); }}
           onAnimationComplete={() => { if (isOpen) overlayMark(ovlId.current, 'animation-done'); }}
         >
           {/* Header */}
@@ -458,6 +463,8 @@ function GlobalSearchOverlay({ isOpen, onClose }: GlobalSearchOverlayProps) {
             className="flex-1 overflow-y-auto overscroll-contain w-full md:max-w-[560px]"
             style={{ WebkitOverflowScrolling: 'touch', paddingBottom: 'var(--bottom-nav-height, 88px)' }}
           >
+            {/* Defer heavy content (shelves + query results) until slide-in has started */}
+            {contentReady && <>
             {/* Idle state */}
             {!hasQuery && (
               <>
@@ -861,6 +868,7 @@ function GlobalSearchOverlay({ isOpen, onClose }: GlobalSearchOverlayProps) {
                 </motion.div>
               ) : null}
             </AnimatePresence>
+            </>}
           </div>
         </motion.div>
       )}
