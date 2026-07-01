@@ -115,6 +115,21 @@ export default function ModerationDetailDrawer({ open, onClose, row }: Props) {
       if (!targetUserId) return;
       const text = message.trim();
       if (!text) return;
+
+      // Limited admins requesting permanent -> create an approval request.
+      if (duration === null && isLimited) {
+        createRequest.mutate(
+          {
+            action_type: 'permanent_ban',
+            target_user_id: targetUserId,
+            payload: { reason: text },
+            related_report_id: ids[0] ?? null,
+          },
+          { onSuccess: () => closeAll() },
+        );
+        return;
+      }
+
       if (duration === null && !canPermanent) return;
       suspendUser.mutate(
         {
@@ -137,7 +152,7 @@ export default function ModerationDetailDrawer({ open, onClose, row }: Props) {
   };
 
   const enforceBusy =
-    warnUser.isPending || suspendUser.isPending || hidePost.isPending;
+    warnUser.isPending || suspendUser.isPending || hidePost.isPending || createRequest.isPending;
 
   const canEnforce = caps.actModeration;
   const showFooter = row && row.status !== 'dismissed' && row.status !== 'actioned';
