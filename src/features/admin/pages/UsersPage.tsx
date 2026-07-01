@@ -283,10 +283,18 @@ function UserDetailPanel({
 }) {
   const navigate = useNavigate();
   const actions = useUserActions();
+  const { role: panelRole } = usePanelRole();
+  const isFullAdmin = panelCan(panelRole).manageAdmins;
+  const isLimited = panelRole === 'limited';
+  const createRequest = useCreateAdminActionRequest();
+
   const [confirm, setConfirm] = useState<null | 'suspend' | 'delete' | 'reset'>(null);
   const [busy, setBusy] = useState(false);
+  const [requestMode, setRequestMode] = useState<null | 'delete' | 'ban' | 'role'>(null);
+  const [reqReason, setReqReason] = useState('');
+  const [reqRoleAction, setReqRoleAction] = useState<'grant_limited' | 'grant_full' | 'downgrade' | 'revoke'>('grant_limited');
 
-  const close = () => { setConfirm(null); onClose(); };
+  const close = () => { setConfirm(null); setRequestMode(null); setReqReason(''); onClose(); };
   const name = detail?.display_name ?? detail?.username ?? 'user';
 
   const runConfirmed = async () => {
@@ -303,6 +311,39 @@ function UserDetailPanel({
     }
   };
 
+  const submitRequest = () => {
+    if (!detail || !requestMode) return;
+    if (requestMode === 'delete') {
+      createRequest.mutate(
+        {
+          action_type: 'delete_user',
+          target_user_id: detail.id,
+          target_email: detail.email ?? null,
+          payload: { reason: reqReason.trim() || 'Deletion requested' },
+        },
+        { onSuccess: () => close() },
+      );
+    } else if (requestMode === 'ban') {
+      createRequest.mutate(
+        {
+          action_type: 'permanent_ban',
+          target_user_id: detail.id,
+          payload: { reason: reqReason.trim() || 'Permanent ban requested' },
+        },
+        { onSuccess: () => close() },
+      );
+    } else if (requestMode === 'role') {
+      createRequest.mutate(
+        {
+          action_type: 'role_change',
+          target_user_id: detail.id,
+          payload: { roleAction: reqRoleAction, reason: reqReason.trim() || undefined },
+        },
+        { onSuccess: () => close() },
+      );
+    }
+  };
+
   return (
     <DetailDrawer
       open={!!userId}
@@ -313,9 +354,20 @@ function UserDetailPanel({
         detail ? (
           <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
             <DrawerBtn onClick={() => navigate(`/profile/${detail.id}`)}>Public profile</DrawerBtn>
-            <DrawerBtn icon={<KeyRound size={14} />} onClick={() => setConfirm('reset')}>Reset password</DrawerBtn>
-            <DrawerBtn icon={<Ban size={14} />}  tone="warn"   onClick={() => setConfirm('suspend')}>Suspend</DrawerBtn>
-            <DrawerBtn icon={<Trash2 size={14} />} tone="danger" onClick={() => setConfirm('delete')}>Delete</DrawerBtn>
+            {isFullAdmin && (
+              <>
+                <DrawerBtn icon={<KeyRound size={14} />} onClick={() => setConfirm('reset')}>Reset password</DrawerBtn>
+                <DrawerBtn icon={<Ban size={14} />}  tone="warn"   onClick={() => setConfirm('suspend')}>Suspend</DrawerBtn>
+                <DrawerBtn icon={<Trash2 size={14} />} tone="danger" onClick={() => setConfirm('delete')}>Delete</DrawerBtn>
+              </>
+            )}
+            {isLimited && (
+              <>
+                <DrawerBtn icon={<ShieldAlert size={14} />} tone="warn" onClick={() => { setRequestMode('ban'); setReqReason(''); }}>Request permanent ban</DrawerBtn>
+                <DrawerBtn icon={<Trash2 size={14} />} tone="danger" onClick={() => { setRequestMode('delete'); setReqReason(''); }}>Request delete</DrawerBtn>
+                <DrawerBtn icon={<ShieldCheck size={14} />} onClick={() => { setRequestMode('role'); setReqReason(''); }}>Request role change</DrawerBtn>
+              </>
+            )}
           </div>
         ) : undefined
       }
