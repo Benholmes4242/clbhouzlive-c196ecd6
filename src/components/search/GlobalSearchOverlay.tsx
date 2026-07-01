@@ -868,6 +868,7 @@ function GlobalSearchOverlay({ isOpen, onClose }: GlobalSearchOverlayProps) {
                 </motion.div>
               ) : null}
             </AnimatePresence>
+            </>}
           </div>
         </motion.div>
       )}
