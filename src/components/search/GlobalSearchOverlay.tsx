@@ -239,10 +239,12 @@ function GlobalSearchOverlay({ isOpen, onClose }: GlobalSearchOverlayProps) {
 
   // Overlay timing: open-start / close-start
   const ovlId = useRef<number>(-1);
+  if (isOpen && ovlId.current < 0) {
+    ovlId.current = overlayOpen('search');
+  }
+
   useEffect(() => {
-    if (isOpen) {
-      ovlId.current = overlayOpen('search');
-    } else if (ovlId.current >= 0) {
+    if (!isOpen && ovlId.current >= 0) {
       overlayMark(ovlId.current, 'close-start');
     }
   }, [isOpen]);
@@ -346,7 +348,10 @@ function GlobalSearchOverlay({ isOpen, onClose }: GlobalSearchOverlayProps) {
   const matchedNonCourse = people.length > 0 || businesses.length > 0;
 
   return createPortal(
-    <AnimatePresence onExitComplete={() => overlayMark(ovlId.current, 'closed')}>
+    <AnimatePresence onExitComplete={() => {
+      overlayMark(ovlId.current, 'closed');
+      ovlId.current = -1;
+    }}>
       {isOpen && (
         <motion.div
           className="fixed inset-0 z-[10100] bg-[#F8FAFC] flex flex-col md:items-center"
