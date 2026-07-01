@@ -643,7 +643,7 @@ const ClubhouseContent = () => {
 
 
       {/* ═══ COMMENTS + MORE OPTIONS ═══ */}
-      {activePost && posts.length > 0 && (
+      {activePost && posts.length > 0 && commentsMounted && (
         <>
           <CommentsSheet
             isOpen={commentsOpen}
