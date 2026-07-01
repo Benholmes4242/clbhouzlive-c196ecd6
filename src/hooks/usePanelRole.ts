@@ -3,10 +3,10 @@ import { supabase } from "@/integrations/supabase/client";
 import { useSupabaseSession } from "@/hooks/useSupabaseSession";
 import { invokeWithAuth } from "@/lib/invokeWithAuth";
 
-export type PanelRole = "none" | "limited" | "full" | "unknown";
+export type PanelRole = "none" | "moderator" | "limited" | "full" | "unknown";
 
-// Server returns: "full" | "limited" | "none"
-type PanelRoleServer = "full" | "limited" | "none";
+// Server returns: "full" | "limited" | "moderator" | "none"
+type PanelRoleServer = "full" | "limited" | "moderator" | "none";
 
 export function usePanelRole() {
   const { user, loading: sessionLoading } = useSupabaseSession();
