@@ -3,7 +3,7 @@ import { useSearchParams, useNavigate } from 'react-router-dom';
 import { formatDistanceToNow } from 'date-fns';
 import {
   CheckCircle2, ShieldCheck, Mail, KeyRound, Trash2, Ban, X,
-  UserPlus, MoreVertical, Search,
+  UserPlus, MoreVertical, Search, ShieldAlert,
 } from 'lucide-react';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { useUserActions } from '@/hooks/admin/useUserDetails';
@@ -19,6 +19,9 @@ import { useVerifications, useProofConflict, type VerificationRow } from '../hoo
 import { useTeam, type TeamMember } from '../hooks/useTeam';
 import { useInvites, type InviteRow } from '../hooks/useInvites';
 import { useDebouncedValue } from '@/hooks/useDebouncedValue';
+import { usePanelRole } from '@/hooks/usePanelRole';
+import { panelCan } from '@/lib/panelCan';
+import { useCreateAdminActionRequest } from '../hooks/useAdminActionRequests';
 
 type TabId = 'all' | 'verifications' | 'team' | 'invites';
 
