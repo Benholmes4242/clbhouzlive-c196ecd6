@@ -382,11 +382,46 @@ function ProfileHubSheet({
   // Sync localActiveId when currentActor changes externally
   useEffect(() => { setLocalActiveId(currentActor.id); }, [currentActor.id]);
 
-  // Lock body scroll
+  // Lock body scroll (reference-counted, prevents iOS scroll-jump)
   useEffect(() => {
-    if (open) document.body.style.overflow = 'hidden';
-    return () => { document.body.style.overflow = ''; };
+    if (!open) return;
+    lockBodyScroll();
+    return () => unlockBodyScroll();
   }, [open]);
+
+  // ── overlayTiming instrumentation ──
+  const ovlId = useRef<number>(-1);
+  const contentPaintedRef = useRef(false);
+  useEffect(() => {
+    if (open) {
+      ovlId.current = overlayOpen('profile-hub');
+    } else if (ovlId.current >= 0) {
+      overlayMark(ovlId.current, 'close-start');
+      contentPaintedRef.current = false;
+    }
+  }, [open]);
+
+  const statsSettled = !isLoading && stats.rounds30d !== null;
+  const mastheadSettled =
+    activeProfileType !== 'personal' || handicapState !== 'data' || trend?.current != null;
+
+  useEffect(() => {
+    if (!open || ovlId.current < 0) return;
+    if (statsSettled && mastheadSettled) overlayMark(ovlId.current, 'data-settled');
+  }, [open, statsSettled, mastheadSettled]);
+
+  useLayoutEffect(() => {
+    if (!open) return;
+    if (contentPaintedRef.current) return;
+    if (!statsSettled || !mastheadSettled) return;
+    contentPaintedRef.current = true;
+    const id = ovlId.current;
+    const r1 = requestAnimationFrame(() =>
+      requestAnimationFrame(() => overlayMark(id, 'content-painted')),
+    );
+    return () => cancelAnimationFrame(r1);
+  }, [open, statsSettled, mastheadSettled]);
+
 
   // Reset confirm + switcher when closing
   useEffect(() => {
