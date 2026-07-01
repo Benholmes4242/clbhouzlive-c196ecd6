@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import {
-  LayoutDashboard, Users, MapPin, BarChart3, Settings, Shield, ArrowLeft,
+  LayoutDashboard, Users, MapPin, BarChart3, Settings, Shield, ShieldAlert, ArrowLeft,
   type LucideIcon,
 } from 'lucide-react';
 import { adminTheme as t } from './theme';
@@ -12,14 +12,16 @@ interface NavItem {
   label: string;
   icon: LucideIcon;
   requireFull?: boolean;
+  moderatorAllowed?: boolean;
 }
 
 const NAV: NavItem[] = [
-  { to: '/admin-v2/dashboard', label: 'Dashboard', icon: LayoutDashboard },
-  { to: '/admin-v2/users',     label: 'Users',     icon: Users, requireFull: true },
-  { to: '/admin-v2/content',   label: 'Content',   icon: MapPin },
-  { to: '/admin-v2/analytics', label: 'Analytics', icon: BarChart3, requireFull: true },
-  { to: '/admin-v2/system',    label: 'System',    icon: Settings },
+  { to: '/admin-v2/dashboard',  label: 'Dashboard',  icon: LayoutDashboard },
+  { to: '/admin-v2/moderation', label: 'Moderation', icon: ShieldAlert, moderatorAllowed: true },
+  { to: '/admin-v2/users',      label: 'Users',      icon: Users, requireFull: true },
+  { to: '/admin-v2/content',    label: 'Content',    icon: MapPin },
+  { to: '/admin-v2/analytics',  label: 'Analytics',  icon: BarChart3, requireFull: true },
+  { to: '/admin-v2/system',     label: 'System',     icon: Settings },
 ];
 
 interface Props {
@@ -40,7 +42,10 @@ export default function AdminDrawer({ open, onClose, role, canManageAdmins }: Pr
     return () => window.removeEventListener('keydown', onKey);
   }, [open, onClose]);
 
-  const items = NAV.filter(n => !n.requireFull || canManageAdmins);
+  const items = NAV.filter(n => {
+    if (role === 'moderator') return !!n.moderatorAllowed;
+    return !n.requireFull || canManageAdmins;
+  });
 
   return (
     <>
@@ -125,7 +130,7 @@ export default function AdminDrawer({ open, onClose, role, canManageAdmins }: Pr
               }}
             />
             <span style={{ fontSize: 12, color: t.inkMuted }}>
-              {role === 'full' ? 'Full Admin' : role === 'limited' ? 'Limited Admin' : '—'}
+              {role === 'full' ? 'Full Admin' : role === 'limited' ? 'Limited Admin' : role === 'moderator' ? 'Moderator' : '—'}
             </span>
           </div>
           <Link

@@ -15,13 +15,15 @@ const UsersPage = lazy(() => import('./pages/UsersPage'));
 const ContentPage = lazy(() => import('./pages/ContentPage'));
 const AnalyticsPage = lazy(() => import('./pages/AnalyticsPage'));
 const SystemPage = lazy(() => import('./pages/SystemPage'));
+const ModerationPage = lazy(() => import('./pages/ModerationPage'));
 
 const SECTION_TITLES: Record<string, string> = {
-  dashboard: 'Dashboard',
-  users:     'Users',
-  content:   'Content',
-  analytics: 'Analytics',
-  system:    'System',
+  dashboard:  'Dashboard',
+  moderation: 'Moderation',
+  users:      'Users',
+  content:    'Content',
+  analytics:  'Analytics',
+  system:     'System',
 };
 
 export default function AdminShell() {
@@ -95,13 +97,14 @@ export default function AdminShell() {
           >
             <Suspense fallback={<AdminLoading />}>
               <Routes>
-                <Route index element={<Navigate to="dashboard" replace />} />
+                <Route index element={<Navigate to={role === 'moderator' ? 'moderation' : 'dashboard'} replace />} />
                 <Route path="dashboard" element={<DashboardPage />} />
+                <Route path="moderation/*" element={can.viewModeration ? <ModerationPage /> : <AdminAccessDenied />} />
                 <Route path="users/*"     element={can.manageAdmins ? <UsersPage /> : <AdminAccessDenied />} />
                 <Route path="content/*"   element={<ContentPage />} />
                 <Route path="analytics/*" element={can.manageAdmins ? <AnalyticsPage /> : <AdminAccessDenied />} />
                 <Route path="system/*"    element={<SystemPage />} />
-                <Route path="*" element={<Navigate to="dashboard" replace />} />
+                <Route path="*" element={<Navigate to={role === 'moderator' ? 'moderation' : 'dashboard'} replace />} />
               </Routes>
             </Suspense>
           </motion.div>
