@@ -184,19 +184,36 @@ export default function ModerationDetailDrawer({ open, onClose, row }: Props) {
         )}
       </DetailDrawer>
 
-      <ConfirmDialog
-        open={dismissOpen}
-        onClose={() => setDismissOpen(false)}
-        onConfirm={onDismissConfirm}
-        title="Dismiss reports"
-        description="Mark these reports as dismissed with no violation. You can add an optional internal note."
-        confirmLabel="Dismiss"
-        busy={dismiss.isPending}
-      />
       {dismissOpen && (
-        <div style={{ position: 'fixed', inset: 0, zIndex: 310, pointerEvents: 'none', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 16 }}>
-          <div style={{ pointerEvents: 'auto', width: '100%', maxWidth: 420, marginTop: 120 }}>
+        <div
+          role="dialog"
+          aria-modal="true"
+          onClick={() => !dismiss.isPending && setDismissOpen(false)}
+          style={{
+            position: 'fixed', inset: 0, zIndex: 300,
+            background: 'rgba(15,23,42,0.55)',
+            display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 16,
+          }}
+        >
+          <div
+            onClick={(e) => e.stopPropagation()}
+            style={{
+              background: t.surface,
+              borderRadius: t.radius.lg,
+              boxShadow: t.shadowPop,
+              width: '100%', maxWidth: 440,
+              padding: 20,
+              display: 'flex', flexDirection: 'column', gap: 14,
+            }}
+          >
+            <div>
+              <div style={{ fontSize: 16, fontWeight: 700, color: t.ink }}>Dismiss reports</div>
+              <div style={{ fontSize: 13, color: t.inkMuted, marginTop: 6, lineHeight: 1.45 }}>
+                Mark these reports as dismissed with no violation. You can add an optional internal note.
+              </div>
+            </div>
             <textarea
+              autoFocus
               placeholder="Optional resolution note (internal)"
               value={note}
               onChange={(e) => setNote(e.target.value)}
@@ -206,13 +223,47 @@ export default function ModerationDetailDrawer({ open, onClose, row }: Props) {
                 padding: 10,
                 borderRadius: t.radius.md,
                 border: `1px solid ${t.line}`,
-                background: t.surface,
+                background: t.canvas,
                 color: t.ink,
                 fontSize: 13,
                 fontFamily: 'inherit',
                 resize: 'vertical',
+                outline: 'none',
               }}
             />
+            <div style={{ display: 'flex', gap: 8, justifyContent: 'flex-end' }}>
+              <button
+                onClick={() => setDismissOpen(false)}
+                disabled={dismiss.isPending}
+                style={{
+                  padding: '8px 14px',
+                  borderRadius: t.radius.md,
+                  border: `1px solid ${t.line}`,
+                  background: t.surface,
+                  color: t.ink,
+                  fontSize: 13, fontWeight: 600,
+                  cursor: 'pointer',
+                }}
+              >
+                Cancel
+              </button>
+              <button
+                onClick={onDismissConfirm}
+                disabled={dismiss.isPending}
+                style={{
+                  padding: '8px 14px',
+                  borderRadius: t.radius.md,
+                  border: 'none',
+                  background: t.ink,
+                  color: t.surface,
+                  fontSize: 13, fontWeight: 600,
+                  cursor: dismiss.isPending ? 'not-allowed' : 'pointer',
+                  opacity: dismiss.isPending ? 0.55 : 1,
+                }}
+              >
+                {dismiss.isPending ? 'Working...' : 'Dismiss'}
+              </button>
+            </div>
           </div>
         </div>
       )}
