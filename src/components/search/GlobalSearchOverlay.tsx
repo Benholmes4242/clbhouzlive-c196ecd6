@@ -180,12 +180,6 @@ interface GlobalSearchOverlayProps {
   onClose: () => void;
 }
 
-function SearchPanelMountedMark({ ovlId }: { ovlId: { current: number } }) {
-  useLayoutEffect(() => {
-    overlayMark(ovlId.current, 'mounted');
-  }, [ovlId]);
-  return null;
-}
 
 function GlobalSearchOverlay({ isOpen, onClose }: GlobalSearchOverlayProps) {
   const navigate = useNavigate();
@@ -362,7 +356,6 @@ function GlobalSearchOverlay({ isOpen, onClose }: GlobalSearchOverlayProps) {
           onAnimationStart={() => { overlayMark(ovlId.current, 'animation-start'); setContentReady(true); }}
           onAnimationComplete={() => { if (isOpen) overlayMark(ovlId.current, 'animation-done'); }}
         >
-          <SearchPanelMountedMark ovlId={ovlId} />
           {/* Header */}
           <div
             className="w-full md:max-w-[560px] flex items-center gap-3 px-4 pb-3"
