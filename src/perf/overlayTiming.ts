@@ -7,13 +7,14 @@
  * gate (isPerfEnabled) and LogHud surface (AppLog).
  *
  * Phases (per instance): open-start · animation-start · data-settled ·
- * content-painted · animation-done · close-start · closed.
+ * mounted · content-painted · animation-done · close-start · closed.
  */
 import { isPerfEnabled } from './navTiming';
 import { AppLog } from '@/lib/logger';
 
 export type OverlayPhase =
   | 'open-start'
+  | 'mounted'
   | 'animation-start'
   | 'data-settled'
   | 'content-painted'
@@ -33,6 +34,8 @@ export interface OverlaySummary {
   id: number;
   name: string;
   openLatency: number | null;
+  mounted: number | null;
+  commitToAnim: number | null;
   settle: number | null;
   data: number | null;
   animDone: number | null;
@@ -106,6 +109,8 @@ class OverlayTimingController {
     const t0 = m['open-start'];
     const clamp = (x: number | null) => (x == null ? null : Math.max(0, Math.round(x)));
     const openLatency = t0 != null && m['animation-start'] != null ? clamp(m['animation-start']! - t0) : null;
+    const mounted = t0 != null && m.mounted != null ? clamp(m.mounted - t0) : null;
+    const commitToAnim = m.mounted != null && m['animation-start'] != null ? clamp(m['animation-start']! - m.mounted) : null;
     const settle = t0 != null && m['content-painted'] != null ? clamp(m['content-painted']! - t0) : null;
     const data = t0 != null && m['data-settled'] != null ? clamp(m['data-settled']! - t0) : null;
     const animDone = t0 != null && m['animation-done'] != null ? clamp(m['animation-done']! - t0) : null;
@@ -120,7 +125,7 @@ class OverlayTimingController {
       else verdict = 'OK';
     }
     const flagged = verdict === 'SLOW' || verdict === 'SYNC-COMMIT' || (openLatency != null && openLatency > 120);
-    return { id: tx.id, name: tx.name, openLatency, settle, data, animDone, verdict, flagged };
+    return { id: tx.id, name: tx.name, openLatency, mounted, commitToAnim, settle, data, animDone, verdict, flagged };
   }
 
   private emit(tx: OverlayTx) {
@@ -128,7 +133,7 @@ class OverlayTimingController {
     this.recent = [s, ...this.recent.filter((r) => r.id !== s.id)].slice(0, 20);
     const line =
       `overlay:${s.name.padEnd(12)} open ${s.openLatency ?? '-'}ms · settle ${s.settle ?? '-'}ms` +
-      ` · data ${s.data ?? '-'} · anim ${s.animDone ?? '-'} · ${s.verdict}`;
+      ` · mounted ${s.mounted ?? '-'} · c→anim ${s.commitToAnim ?? '-'} · data ${s.data ?? '-'} · anim ${s.animDone ?? '-'} · ${s.verdict}`;
     if (s.flagged) AppLog.warn(`OVL-WARN ovl#${s.id}`, line);
     else AppLog.info(`ovl#${s.id}`, line);
     this.notify();

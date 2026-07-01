@@ -251,9 +251,10 @@ function CommentsSheet({
 
   // ── Overlay perf instrumentation (dev/?perf=1 only; no-op otherwise) ──
   const ovlId = useRef<number>(-1);
-  useEffect(() => {
+  useLayoutEffect(() => {
     if (isOpen) {
       ovlId.current = overlayOpen('comments');
+      overlayMark(ovlId.current, 'mounted');
     } else if (ovlId.current >= 0) {
       overlayMark(ovlId.current, 'close-start');
     }
