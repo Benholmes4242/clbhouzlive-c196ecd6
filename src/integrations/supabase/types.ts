@@ -7929,6 +7929,10 @@ export type Database = {
           id: string
           is_pinned: boolean | null
           like_count: number
+          moderation_hidden: boolean
+          moderation_hidden_at: string | null
+          moderation_hidden_by: string | null
+          moderation_hidden_reason: string | null
           pinned_at: string | null
           pinned_by: string | null
           pinned_until: string | null
@@ -7958,6 +7962,10 @@ export type Database = {
           id?: string
           is_pinned?: boolean | null
           like_count?: number
+          moderation_hidden?: boolean
+          moderation_hidden_at?: string | null
+          moderation_hidden_by?: string | null
+          moderation_hidden_reason?: string | null
           pinned_at?: string | null
           pinned_by?: string | null
           pinned_until?: string | null
@@ -7987,6 +7995,10 @@ export type Database = {
           id?: string
           is_pinned?: boolean | null
           like_count?: number
+          moderation_hidden?: boolean
+          moderation_hidden_at?: string | null
+          moderation_hidden_by?: string | null
+          moderation_hidden_reason?: string | null
           pinned_at?: string | null
           pinned_by?: string | null
           pinned_until?: string | null
@@ -13162,6 +13174,10 @@ export type Database = {
           show_in_exploration_leaderboards: boolean
           show_in_handicap_leaderboards: boolean
           social_links: Json | null
+          suspended_at: string | null
+          suspended_by: string | null
+          suspended_until: string | null
+          suspension_reason: string | null
           tiktok_handle: string
           top_ten_comments_privacy: string | null
           top100_visible: boolean | null
@@ -13286,6 +13302,10 @@ export type Database = {
           show_in_exploration_leaderboards?: boolean
           show_in_handicap_leaderboards?: boolean
           social_links?: Json | null
+          suspended_at?: string | null
+          suspended_by?: string | null
+          suspended_until?: string | null
+          suspension_reason?: string | null
           tiktok_handle?: string
           top_ten_comments_privacy?: string | null
           top100_visible?: boolean | null
@@ -13410,6 +13430,10 @@ export type Database = {
           show_in_exploration_leaderboards?: boolean
           show_in_handicap_leaderboards?: boolean
           social_links?: Json | null
+          suspended_at?: string | null
+          suspended_by?: string | null
+          suspended_until?: string | null
+          suspension_reason?: string | null
           tiktok_handle?: string
           top_ten_comments_privacy?: string | null
           top100_visible?: boolean | null
