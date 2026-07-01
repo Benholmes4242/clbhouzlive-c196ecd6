@@ -258,6 +258,20 @@ function CommentsSheet({
     if (isOpen && !commentsLoading) overlayMark(ovlId.current, 'data-settled');
   }, [isOpen, commentsLoading]);
 
+  // Content-painted: fire once when real content (rows or empty state) has committed.
+  const contentPaintedRef = useRef(false);
+  useLayoutEffect(() => {
+    if (!isOpen) { contentPaintedRef.current = false; return; }
+    if (contentPaintedRef.current) return;
+    const isEmptyState = !commentsLoading && sortedComments.length === 0;
+    const hasContent = !commentsLoading && (sortedComments.length > 0 || isEmptyState);
+    if (hasContent) {
+      contentPaintedRef.current = true;
+      const id = ovlId.current;
+      requestAnimationFrame(() => requestAnimationFrame(() => overlayMark(id, 'content-painted')));
+    }
+  }, [isOpen, commentsLoading, sortedComments.length]);
+
   // Auto-resize textarea
   useEffect(() => {
     const el = textareaRef.current;
