@@ -253,6 +253,7 @@ function GlobalSearchOverlay({ isOpen, onClose }: GlobalSearchOverlayProps) {
   useLayoutEffect(() => {
     if (!isOpen) { contentPaintedRef.current = false; return; }
     if (contentPaintedRef.current) return;
+    if (!contentReady) return;
     const hasQ = debouncedQuery.trim().length > 0;
     const allEmptyNow = clubs.length === 0 && people.length === 0 && businesses.length === 0;
     const noResultsNow = hasQ && !isLoading && allEmptyNow;
@@ -264,7 +265,7 @@ function GlobalSearchOverlay({ isOpen, onClose }: GlobalSearchOverlayProps) {
       const id = ovlId.current;
       requestAnimationFrame(() => requestAnimationFrame(() => overlayMark(id, 'content-painted')));
     }
-  }, [isOpen, debouncedQuery, isLoading, trendingLoading, clubs.length, people.length, businesses.length]);
+  }, [isOpen, contentReady, debouncedQuery, isLoading, trendingLoading, clubs.length, people.length, businesses.length]);
 
 
   const handleInputChange = useCallback((value: string) => {
