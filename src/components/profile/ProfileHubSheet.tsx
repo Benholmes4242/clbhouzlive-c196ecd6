@@ -339,6 +339,11 @@ function ProfileHubSheet({
   const [localActiveId, setLocalActiveId] = useState(currentActor.id);
   const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
   const [switcherOpen, setSwitcherOpen] = useState(false);
+  const [contentReady, setContentReady] = useState(false);
+
+  useEffect(() => {
+    if (!open) setContentReady(false);
+  }, [open]);
 
   // ── Profile (for @handle) ──
   const activeProfileType = profiles.find(p => p.id === localActiveId)?.type || currentActor.type;
