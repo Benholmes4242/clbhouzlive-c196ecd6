@@ -6,6 +6,7 @@ export type SuspensionDetails = {
   suspended_until: string | null;
   reason: string | null;
   permanent: boolean;
+  suspended_at: string | null;
 };
 
 export type SuspensionState =
