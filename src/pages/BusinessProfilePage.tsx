@@ -53,6 +53,8 @@ import {
 } from '@/components/ui/alert-dialog';
 
 import { trackBusinessProfileVisit, trackBusinessAction } from '@/lib/businessAnalyticsTracking';
+import { ReportSheet } from '@/components/messaging/ReportSheet';
+
 
 type BusinessTab = 'posts' | 'about' | 'team';
 
