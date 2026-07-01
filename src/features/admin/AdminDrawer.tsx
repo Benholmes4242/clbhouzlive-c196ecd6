@@ -19,6 +19,7 @@ const NAV: NavItem[] = [
   { to: '/admin-v2/dashboard',  label: 'Dashboard',  icon: LayoutDashboard },
   { to: '/admin-v2/moderation', label: 'Moderation', icon: ShieldAlert, moderatorAllowed: true },
   { to: '/admin-v2/approvals',  label: 'Approvals',  icon: ShieldCheck, requireFull: true },
+  { to: '/admin-v2/appeals',    label: 'Appeals',    icon: LifeBuoy, moderatorAllowed: true },
   { to: '/admin-v2/users',      label: 'Users',      icon: Users },
   { to: '/admin-v2/content',    label: 'Content',    icon: MapPin },
   { to: '/admin-v2/analytics',  label: 'Analytics',  icon: BarChart3, requireFull: true },
