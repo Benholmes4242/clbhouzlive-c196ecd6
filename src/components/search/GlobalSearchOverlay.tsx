@@ -1,4 +1,4 @@
-import { memo, useRef, useState, useEffect, useCallback } from 'react';
+import { memo, useRef, useState, useEffect, useLayoutEffect, useCallback } from 'react';
 import { RequestCourseCTA } from '@/components/courses/RequestCourseCTA';
 import { createPortal } from 'react-dom';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -8,6 +8,8 @@ import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { SuggestedCreatorsShelf } from '@/components/shared/SuggestedCreatorsShelf';
 import { useNavigate } from 'react-router-dom';
 import { useDebounce } from '@/hooks/useDebounce';
+import { lockBodyScroll, unlockBodyScroll } from '@/lib/bodyScrollLock';
+import { overlayOpen, overlayMark } from '@/perf/overlayTiming';
 import {
   useGlobalEntitySearch,
   saveRecentSearch,
@@ -217,19 +219,49 @@ function GlobalSearchOverlay({ isOpen, onClose }: GlobalSearchOverlayProps) {
     setRecent(getRecentSearches());
   }, []);
 
-  // Lock body scroll
+  // Lock body scroll (reference-counted so overlapping overlays don't stomp state)
   useEffect(() => {
-    if (isOpen) {
-      document.body.style.overflow = 'hidden';
-    } else {
-      document.body.style.overflow = '';
-    }
-    return () => { document.body.style.overflow = ''; };
+    if (!isOpen) return;
+    lockBodyScroll();
+    return () => unlockBodyScroll();
   }, [isOpen]);
 
-  // Belt-and-braces: guarantee the body lock releases on unmount, even if a
-  // future caller forgets to flip `isOpen` before unmounting the overlay.
-  useEffect(() => () => { document.body.style.overflow = ''; }, []);
+  // Overlay timing: open-start / close-start
+  const ovlId = useRef<number>(-1);
+  useEffect(() => {
+    if (isOpen) {
+      ovlId.current = overlayOpen('search');
+    } else if (ovlId.current >= 0) {
+      overlayMark(ovlId.current, 'close-start');
+    }
+  }, [isOpen]);
+
+  // data-settled: path-aware (query path OR idle/trending path)
+  useEffect(() => {
+    if (!isOpen || ovlId.current < 0) return;
+    const hasQ = debouncedQuery.trim().length > 0;
+    const settled = (hasQ && !isLoading) || (!hasQ && !trendingLoading);
+    if (settled) overlayMark(ovlId.current, 'data-settled');
+  }, [isOpen, debouncedQuery, isLoading, trendingLoading]);
+
+  // content-painted: once per open, after settled content commits (double-rAF)
+  const contentPaintedRef = useRef(false);
+  useLayoutEffect(() => {
+    if (!isOpen) { contentPaintedRef.current = false; return; }
+    if (contentPaintedRef.current) return;
+    const hasQ = debouncedQuery.trim().length > 0;
+    const allEmptyNow = clubs.length === 0 && people.length === 0 && businesses.length === 0;
+    const noResultsNow = hasQ && !isLoading && allEmptyNow;
+    const painted =
+      (hasQ && !isLoading && (clubs.length + people.length + businesses.length > 0 || noResultsNow)) ||
+      (!hasQ && !trendingLoading);
+    if (painted) {
+      contentPaintedRef.current = true;
+      const id = ovlId.current;
+      requestAnimationFrame(() => requestAnimationFrame(() => overlayMark(id, 'content-painted')));
+    }
+  }, [isOpen, debouncedQuery, isLoading, trendingLoading, clubs.length, people.length, businesses.length]);
+
 
   const handleInputChange = useCallback((value: string) => {
     setInputValue(value);
@@ -302,7 +334,7 @@ function GlobalSearchOverlay({ isOpen, onClose }: GlobalSearchOverlayProps) {
   const matchedNonCourse = people.length > 0 || businesses.length > 0;
 
   return createPortal(
-    <AnimatePresence>
+    <AnimatePresence onExitComplete={() => overlayMark(ovlId.current, 'closed')}>
       {isOpen && (
         <motion.div
           className="fixed inset-0 z-[10100] bg-[#F8FAFC] flex flex-col md:items-center"
@@ -310,6 +342,8 @@ function GlobalSearchOverlay({ isOpen, onClose }: GlobalSearchOverlayProps) {
           animate={{ y: 0 }}
           exit={{ y: '100%' }}
           transition={{ duration: 0.25, ease: 'easeOut' }}
+          onAnimationStart={() => overlayMark(ovlId.current, 'animation-start')}
+          onAnimationComplete={() => { if (isOpen) overlayMark(ovlId.current, 'animation-done'); }}
         >
           {/* Header */}
           <div
@@ -593,7 +627,7 @@ function GlobalSearchOverlay({ isOpen, onClose }: GlobalSearchOverlayProps) {
             )}
 
             {/* Active search states — AnimatePresence crossfade */}
-            <AnimatePresence mode="wait">
+            <AnimatePresence>{/* parallel crossfade: skeleton→results overlap, no blank gap */}
               {isLoading && hasQuery ? (
                 <motion.div key="search-skeleton" {...FADE_PROPS}>
                   <SearchSkeleton />
