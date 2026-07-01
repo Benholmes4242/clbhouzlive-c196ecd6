@@ -463,6 +463,8 @@ function GlobalSearchOverlay({ isOpen, onClose }: GlobalSearchOverlayProps) {
             className="flex-1 overflow-y-auto overscroll-contain w-full md:max-w-[560px]"
             style={{ WebkitOverflowScrolling: 'touch', paddingBottom: 'var(--bottom-nav-height, 88px)' }}
           >
+            {/* Defer heavy content (shelves + query results) until slide-in has started */}
+            {contentReady && <>
             {/* Idle state */}
             {!hasQuery && (
               <>
