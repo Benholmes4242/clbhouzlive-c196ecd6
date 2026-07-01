@@ -132,10 +132,10 @@ export default function ModerationPage() {
             if (row) setSelected(row);
           }}
         >
-          <DataList
-            columns={columns.map((c) => ({
+          <DataList<ModerationQueueRow>
+            columns={columns.map<DataListColumn<ModerationQueueRow>>((c) => ({
               ...c,
-              render: (row) => (
+              render: (row: ModerationQueueRow) => (
                 <span data-row-key={row.key} style={{ cursor: 'pointer', display: 'block' }}>
                   {c.render(row)}
                 </span>
@@ -144,7 +144,7 @@ export default function ModerationPage() {
             rows={rows}
             rowKey={(r) => r.key}
             loading={isLoading}
-            renderCard={(row) => (
+            renderCard={(row: ModerationQueueRow) => (
               <div data-row-key={row.key} style={{ cursor: 'pointer', display: 'flex', flexDirection: 'column', gap: 8 }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 8 }}>
                   <TargetCell row={row} />
