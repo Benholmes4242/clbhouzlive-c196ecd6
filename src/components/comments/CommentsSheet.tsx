@@ -117,7 +117,8 @@ function CommentsSheet({
   const effectiveActor = activeActor;
 
   // ── Hook — use editorial comments hook when editorialCardId is provided ──
-  const standardHook = useCommentsWithReplies(editorialCardId ? '' : postId, onCommentDeleted);
+  // Gate the standard hook on isOpen so per-swipe background fetches stop while the sheet is closed.
+  const standardHook = useCommentsWithReplies(editorialCardId || !isOpen ? '' : postId, onCommentDeleted);
   const editorialHook = useEditorialComments(editorialCardId ?? '', onCommentDeleted);
   const activeHook = editorialCardId ? editorialHook : standardHook;
 
@@ -147,6 +148,9 @@ function CommentsSheet({
   const [commentToDelete, setCommentToDelete] = useState<CommentWithReplies | CommentReply | null>(null);
   const [inputText, setInputText] = useState('');
   const [highlightedId, setHighlightedId] = useState<string | null>(null);
+  // Defer the comment-list render until AFTER the panel slide starts, so the O(N) commit
+  // doesn't block framer-motion's first frame. Skeleton covers the slide window.
+  const [listReady, setListReady] = useState(false);
   const [mentionQuery, setMentionQuery] = useState<string | null>(null);
   const [mentionResults, setMentionResults] = useState<{ id: string; username: string; display_name: string; avatar: string | null }[]>([]);
 
@@ -258,19 +262,21 @@ function CommentsSheet({
     if (isOpen && !commentsLoading) overlayMark(ovlId.current, 'data-settled');
   }, [isOpen, commentsLoading]);
 
-  // Content-painted: fire once when real content (rows or empty state) has committed.
+  // Content-painted: fires once real rows (or the empty state) have committed AFTER the deferred list mounted.
   const contentPaintedRef = useRef(false);
   useLayoutEffect(() => {
     if (!isOpen) { contentPaintedRef.current = false; return; }
     if (contentPaintedRef.current) return;
-    const isEmptyState = !commentsLoading && sortedComments.length === 0;
-    const hasContent = !commentsLoading && (sortedComments.length > 0 || isEmptyState);
-    if (hasContent) {
+    const rowsPainted = listReady && !commentsLoading;
+    if (rowsPainted) {
       contentPaintedRef.current = true;
       const id = ovlId.current;
       requestAnimationFrame(() => requestAnimationFrame(() => overlayMark(id, 'content-painted')));
     }
-  }, [isOpen, commentsLoading, sortedComments.length]);
+  }, [isOpen, listReady, commentsLoading, sortedComments.length]);
+
+  // Reset listReady on close so next open re-defers.
+  useEffect(() => { if (!isOpen) setListReady(false); }, [isOpen]);
 
   // Auto-resize textarea
   useEffect(() => {
@@ -722,7 +728,7 @@ function CommentsSheet({
                 onClose();
               }
             }}
-            onAnimationStart={() => overlayMark(ovlId.current, 'animation-start')}
+            onAnimationStart={() => { overlayMark(ovlId.current, 'animation-start'); setListReady(true); }}
             onAnimationComplete={() => { if (isOpen) overlayMark(ovlId.current, 'animation-done'); }}
             className="fixed inset-x-0 bottom-0 z-[211] w-full rounded-t-[20px] md:inset-x-auto md:left-1/2 md:-translate-x-1/2 md:max-w-[560px] flex flex-col bg-[#F8FAFC]"
             style={{ minHeight: 'min(52dvh, 380px)', maxHeight: '92dvh' }}
@@ -976,7 +982,7 @@ function CommentsSheet({
               ) : (
                 /* ── COMMENTS TAB ── */
                 <AnimatePresence mode="wait">
-                {commentsLoading ? (
+                {(commentsLoading || !listReady) ? (
                   /* Loading skeletons with crossfade */
                   <motion.div
                     key="comments-skeleton"
