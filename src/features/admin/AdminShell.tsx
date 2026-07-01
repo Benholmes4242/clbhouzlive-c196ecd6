@@ -17,6 +17,7 @@ const AnalyticsPage = lazy(() => import('./pages/AnalyticsPage'));
 const SystemPage = lazy(() => import('./pages/SystemPage'));
 const ModerationPage = lazy(() => import('./pages/ModerationPage'));
 const ApprovalsPage = lazy(() => import('./pages/ApprovalsPage'));
+const AppealsPage = lazy(() => import('./pages/AppealsPage'));
 
 const SECTION_TITLES: Record<string, string> = {
   dashboard:  'Dashboard',
