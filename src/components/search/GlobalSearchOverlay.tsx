@@ -194,6 +194,13 @@ function GlobalSearchOverlay({ isOpen, onClose }: GlobalSearchOverlayProps) {
   const [contentReady, setContentReady] = useState(false);
   useEffect(() => { if (!isOpen) setContentReady(false); }, [isOpen]);
 
+  function PanelMountedMark() {
+    useLayoutEffect(() => {
+      overlayMark(ovlId.current, 'mounted');
+    }, []);
+    return null;
+  }
+
   const { people, clubs, businesses, trending, trendingLoading, isLoading } =
     useGlobalEntitySearch({ query: debouncedQuery, enabled: isOpen });
 
@@ -350,6 +357,7 @@ function GlobalSearchOverlay({ isOpen, onClose }: GlobalSearchOverlayProps) {
           onAnimationStart={() => { overlayMark(ovlId.current, 'animation-start'); setContentReady(true); }}
           onAnimationComplete={() => { if (isOpen) overlayMark(ovlId.current, 'animation-done'); }}
         >
+          <PanelMountedMark />
           {/* Header */}
           <div
             className="w-full md:max-w-[560px] flex items-center gap-3 px-4 pb-3"
