@@ -5,6 +5,7 @@ import { adminTheme as t } from '../theme';
 import DetailDrawer from './DetailDrawer';
 import StatusPill from './StatusPill';
 import { useModerationActions } from '../hooks/useModerationActions';
+import { useCreateAdminActionRequest } from '../hooks/useAdminActionRequests';
 import { usePanelRole } from '@/hooks/usePanelRole';
 import { panelCan } from '@/lib/panelCan';
 import type { ModerationQueueRow, ReportStatus } from '../hooks/useModerationQueue';
