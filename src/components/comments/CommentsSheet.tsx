@@ -33,6 +33,7 @@ import { CommentingAsIndicator } from '@/components/comments/CommentingAsIndicat
 import { relativeTime } from '@/utils/relativeTime';
 import { usePostLikes } from '@/hooks/usePostLikes';
 import { supabase } from '@/integrations/supabase/client';
+import { overlayOpen, overlayMark } from '@/perf/overlayTiming';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -243,6 +244,19 @@ function CommentsSheet({
     if (isOpen) document.body.style.overflow = 'hidden';
     return () => { document.body.style.overflow = ''; };
   }, [isOpen]);
+
+  // ── Overlay perf instrumentation (dev/?perf=1 only; no-op otherwise) ──
+  const ovlId = useRef<number>(-1);
+  useEffect(() => {
+    if (isOpen) {
+      ovlId.current = overlayOpen('comments');
+    } else if (ovlId.current >= 0) {
+      overlayMark(ovlId.current, 'close-start');
+    }
+  }, [isOpen]);
+  useEffect(() => {
+    if (isOpen && !commentsLoading) overlayMark(ovlId.current, 'data-settled');
+  }, [isOpen, commentsLoading]);
 
   // Auto-resize textarea
   useEffect(() => {
@@ -667,7 +681,7 @@ function CommentsSheet({
   // ── Portal content ──
 
   const content = (
-    <AnimatePresence>
+    <AnimatePresence onExitComplete={() => overlayMark(ovlId.current, 'closed')}>
       {isOpen && (
         <>
           {/* Backdrop */}
@@ -694,6 +708,8 @@ function CommentsSheet({
                 onClose();
               }
             }}
+            onAnimationStart={() => overlayMark(ovlId.current, 'animation-start')}
+            onAnimationComplete={() => { if (isOpen) overlayMark(ovlId.current, 'animation-done'); }}
             className="fixed inset-x-0 bottom-0 z-[211] w-full rounded-t-[20px] md:inset-x-auto md:left-1/2 md:-translate-x-1/2 md:max-w-[560px] flex flex-col bg-[#F8FAFC]"
             style={{ minHeight: 'min(52dvh, 380px)', maxHeight: '92dvh' }}
           >
@@ -978,6 +994,7 @@ function CommentsSheet({
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
                     transition={{ duration: 0.15 }}
+                    onAnimationComplete={() => overlayMark(ovlId.current, 'content-painted')}
                     className="flex-1 flex flex-col items-center justify-center px-8 gap-4 min-h-[220px]"
                   >
                     {/* Staggered bounce emoji cluster */}
@@ -1004,6 +1021,7 @@ function CommentsSheet({
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
                     transition={{ duration: 0.15 }}
+                    onAnimationComplete={() => { if (sortedComments.length > 0) overlayMark(ovlId.current, 'content-painted'); }}
                   >
                     {sortedComments.map((comment, idx) => renderTopLevelComment(comment, idx))}
                     <div ref={sentinelRef} className="h-px" />
