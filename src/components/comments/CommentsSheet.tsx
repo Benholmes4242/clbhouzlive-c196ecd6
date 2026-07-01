@@ -245,6 +245,19 @@ function CommentsSheet({
     return () => { document.body.style.overflow = ''; };
   }, [isOpen]);
 
+  // ── Overlay perf instrumentation (dev/?perf=1 only; no-op otherwise) ──
+  const ovlId = useRef<number>(-1);
+  useEffect(() => {
+    if (isOpen) {
+      ovlId.current = overlayOpen('comments');
+    } else if (ovlId.current >= 0) {
+      overlayMark(ovlId.current, 'close-start');
+    }
+  }, [isOpen]);
+  useEffect(() => {
+    if (isOpen && !commentsLoading) overlayMark(ovlId.current, 'data-settled');
+  }, [isOpen, commentsLoading]);
+
   // Auto-resize textarea
   useEffect(() => {
     const el = textareaRef.current;
