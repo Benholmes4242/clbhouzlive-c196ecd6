@@ -34,6 +34,8 @@ import { relativeTime } from '@/utils/relativeTime';
 import { usePostLikes } from '@/hooks/usePostLikes';
 import { supabase } from '@/integrations/supabase/client';
 import { overlayOpen, overlayMark } from '@/perf/overlayTiming';
+import { lockBodyScroll, unlockBodyScroll } from '@/lib/bodyScrollLock';
+
 import {
   AlertDialog,
   AlertDialogAction,
