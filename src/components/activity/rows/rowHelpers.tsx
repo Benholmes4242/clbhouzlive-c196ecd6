@@ -48,6 +48,9 @@ export function isIncompleteProfile(notification: ActivityNotification): boolean
 }
 
 export function getActorDisplayName(notification: ActivityNotification): string {
+  if (notification.type === 'support_reply') {
+    return 'clbhouz support';
+  }
   if (isBusinessEntityNotification(notification.type)) {
     const businessName = notification.data?.business_name || notification.data?.entity_name;
     if (businessName) return businessName;
@@ -77,6 +80,9 @@ export function getActorDisplayName(notification: ActivityNotification): string 
 }
 
 export function getActorAvatarUrl(notification: ActivityNotification): string | null {
+  if (notification.type === 'support_reply') {
+    return CLBHOUZ_LOGOMARK_URL;
+  }
   if (isBusinessEntityNotification(notification.type)) {
     const businessAvatar = notification.data?.business_avatar_url ||
       notification.data?.business_logo_url ||
