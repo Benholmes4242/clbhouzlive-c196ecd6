@@ -23,7 +23,7 @@ interface Props {
  * Sticky translucent header, 32px circle back chevron, 18/600 title,
  * 1px hairline bottom border, slate background.
  */
-export function ManagePageShell({ title, children, right, onBack }: Props) {
+export function ManagePageShell({ title, children, right, onBack, belowTitle }: Props) {
   const navigate = useNavigate();
   const handleBack = () => (onBack ? onBack() : navigate(-1));
 
