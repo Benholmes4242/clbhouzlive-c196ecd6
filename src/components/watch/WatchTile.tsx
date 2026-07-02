@@ -3,7 +3,8 @@ import { Film, Heart } from 'lucide-react';
 import type { FeedPost } from '@/components/media-system/types/media';
 import { useFullscreenFeedStore } from '@/store/fullscreenFeedStore';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
-import DecodedImage from './shared/DecodedImage';
+import AnimatedTileThumb from './shared/AnimatedTileThumb';
+
 
 function abbreviateCount(n: number): string {
   if (n >= 1_000_000) return `${(n / 1_000_000).toFixed(1)}M`;
