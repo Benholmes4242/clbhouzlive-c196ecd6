@@ -1,4 +1,5 @@
 import { memo, useMemo } from 'react';
+import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useUserBucketListAnchoredContent } from './hooks/useUserBucketListAnchoredContent';
@@ -7,6 +8,7 @@ import { SectionHeader } from '@/components/ui/SectionHeader';
 import { HRail } from './HRail';
 import WatchRailTile from '../WatchRailTile';
 import { useActiveActor } from '@/context/ActiveActorContext';
+import { useWatchReveal } from '../WatchRevealContext';
 import type { CourseAnchoredRow } from './hooks/useCourseAnchoredContent';
 import type { FeedPost } from '@/components/media-system/types/media';
 
