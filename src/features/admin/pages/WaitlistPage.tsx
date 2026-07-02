@@ -244,7 +244,39 @@ export default function WaitlistPage() {
         title={selected?.body_name}
         subtitle={selected ? `${selected.total.toLocaleString()} golfers waiting` : undefined}
       >
-        <div style={{ padding: 16, display: 'flex', flexDirection: 'column', gap: 8 }}>
+        <div style={{ padding: 16, display: 'flex', flexDirection: 'column', gap: 12 }}>
+          {selected && caps.approveRequests && (
+            <div style={{
+              display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12,
+              padding: '12px 14px', background: t.canvas, border: `1px solid ${t.line}`, borderRadius: t.radius.md,
+            }}>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 2, minWidth: 0 }}>
+                <span style={{ color: t.ink, fontSize: 13, fontWeight: 600 }}>
+                  {isLaunched(selected.country_id) ? 'All waiting golfers notified' : 'Ready to launch?'}
+                </span>
+                <span style={{ color: t.inkMuted, fontSize: 11, lineHeight: 1.4 }}>
+                  Only press this after the {selected.body_name} integration is live and verified.
+                </span>
+              </div>
+              <button
+                type="button"
+                onClick={() => setLaunchOpen(true)}
+                disabled={launching}
+                style={{
+                  display: 'inline-flex', alignItems: 'center', gap: 6,
+                  padding: '8px 12px', borderRadius: t.radius.md,
+                  background: t.ink, color: t.surface, border: 'none',
+                  fontSize: 12, fontWeight: 700, whiteSpace: 'nowrap',
+                  cursor: launching ? 'not-allowed' : 'pointer',
+                  opacity: launching ? 0.6 : 1,
+                }}
+              >
+                <Rocket size={14} />
+                Launch + notify
+              </button>
+            </div>
+          )}
+
           {drilldownLoading ? (
             Array.from({ length: 5 }).map((_, i) => (
               <div
