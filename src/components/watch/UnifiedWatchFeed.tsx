@@ -36,6 +36,7 @@ export default function UnifiedWatchFeed({ embedded = false }: UnifiedWatchFeedP
   const {
     posts,
     isLoading,
+    isFetching,
     isError,
     hasNextPage,
     isFetchingNextPage,
@@ -46,6 +47,10 @@ export default function UnifiedWatchFeed({ embedded = false }: UnifiedWatchFeedP
     mood,
     category: undefined,
   });
+
+  usePageReady(!isLoading && posts.length > 0);
+
+
 
   return (
     <div className="min-h-screen" style={{ background: 'hsl(var(--background))' }}>
