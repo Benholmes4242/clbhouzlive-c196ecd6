@@ -10,6 +10,31 @@ export function streamPosterFrom(url?: string) {
 }
 
 /**
+ * Build a tiny (~1-3KB) LQIP variant of an existing thumbnail URL.
+ * Rendered blurred as an underlay so grey placeholder boxes become
+ * blurred previews of the actual content. Returns null when no
+ * meaningful LQIP can be produced (blob:, placeholder, empty).
+ *
+ * Both CDN paths accept the returned params:
+ *  - Cloudflare Stream thumbnails accept ?time=&height=&fit= (proven
+ *    in src/utils/posterPrefetch.ts). The early-return in
+ *    buildImageThumbnailUrl only applied to R2-style width/height/fit
+ *    on Stream — the LQIP shape below is what Stream actually supports.
+ *  - imagedelivery / R2 accept ?width=&height=&fit=.
+ */
+export function buildLqipUrl(url: string | null | undefined): string | null {
+  if (!url) return null;
+  if (url.startsWith('blob:')) return null;
+  if (url.includes('/placeholder')) return null;
+  const sep = url.includes('?') ? '&' : '?';
+  const isStreamThumb =
+    /\/thumbnails\/thumbnail\.jpg/i.test(url) &&
+    (url.includes('videodelivery.net') || url.includes('cloudflarestream.com'));
+  if (isStreamThumb) return `${url}${sep}time=1s&height=24&fit=crop`;
+  return `${url}${sep}width=32&height=24&fit=cover`;
+}
+
+/**
  * Build a thumbnail URL for images with size constraints
  * Optimizes memory by loading resized versions instead of full-res
  */

@@ -26,6 +26,7 @@ import { MediaCarousel } from '@/components/feed/MediaCarousel';
 import { FeedFollowPill } from '@/components/feed/FeedFollowPill';
 import { FeedActorPicker } from '@/components/feed/FeedActorPicker';
 import type { ActiveActor } from '@/types/actor';
+import LqipUnderlay from '@/components/shared/LqipUnderlay';
 
 // Light palette — cards sit on the page background (#F8FAFC); dividers are
 // a touch darker than bg. Text drops to ink (#0F172A) with proportional
@@ -482,8 +483,33 @@ const LightFeedCardImpl: React.FC<LightFeedCardProps> = ({
                     objectFit="cover"
                   />
                 ) : media.thumbnailUrl ? (
+                  <>
+                    {feedIndex != null && feedIndex >= 1 && (
+                      <LqipUnderlay from={media.thumbnailUrl} />
+                    )}
+                    <img
+                      src={media.thumbnailUrl}
+                      alt={post.caption || post.displayName}
+                      loading="lazy"
+                      style={{
+                        position: 'absolute',
+                        inset: 0,
+                        width: '100%',
+                        height: '100%',
+                        objectFit: 'cover',
+                        objectPosition: 'center',
+                        display: 'block',
+                      }}
+                    />
+                  </>
+                ) : null
+              ) : mediaUrl ? (
+                <>
+                  {feedIndex != null && feedIndex >= 1 && (
+                    <LqipUnderlay from={mediaUrl} />
+                  )}
                   <img
-                    src={media.thumbnailUrl}
+                    src={mediaUrl}
                     alt={post.caption || post.displayName}
                     loading="lazy"
                     style={{
@@ -496,22 +522,7 @@ const LightFeedCardImpl: React.FC<LightFeedCardProps> = ({
                       display: 'block',
                     }}
                   />
-                ) : null
-              ) : mediaUrl ? (
-                <img
-                  src={mediaUrl}
-                  alt={post.caption || post.displayName}
-                  loading="lazy"
-                  style={{
-                    position: 'absolute',
-                    inset: 0,
-                    width: '100%',
-                    height: '100%',
-                    objectFit: 'cover',
-                    objectPosition: 'center',
-                    display: 'block',
-                  }}
-                />
+                </>
               ) : null}
             </div>
           </button>
