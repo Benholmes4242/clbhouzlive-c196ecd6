@@ -82,10 +82,18 @@ const WatchGrid: React.FC<WatchGridProps> = ({
     }
   }, [posts.length, onFirstRowDecoded]);
 
-  // Infinite scroll via IntersectionObserver
+  // Infinite scroll via IntersectionObserver.
+  // Phase 6: rootMargin tiers by connection quality — 4g gets more lookahead
+  // (600px), 3g gets less (200px), Save-Data pulls it to the sentinel (0px).
   useEffect(() => {
     const sentinel = sentinelRef.current;
     if (!sentinel) return;
+
+    const conn: any = typeof navigator !== 'undefined' ? (navigator as any).connection : null;
+    let rootMargin = '400px';
+    if (conn?.saveData) rootMargin = '0px';
+    else if (conn?.effectiveType === '4g') rootMargin = '600px';
+    else if (conn?.effectiveType === '3g') rootMargin = '200px';
 
     const observer = new IntersectionObserver(
       (entries) => {
@@ -93,7 +101,7 @@ const WatchGrid: React.FC<WatchGridProps> = ({
           fetchNextPage();
         }
       },
-      { rootMargin: '400px' }
+      { rootMargin }
     );
 
     observer.observe(sentinel);
