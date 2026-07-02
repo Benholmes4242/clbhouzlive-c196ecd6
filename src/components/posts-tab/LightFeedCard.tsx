@@ -645,6 +645,7 @@ const LightFeedCardImpl: React.FC<LightFeedCardProps> = ({
           active={liked}
           onClick={() => onLike(post, effectiveActor)}
           activeColor={AMBER}
+          haptic={!liked ? 'selection' : 'none'}
         />
         <FooterButton
           icon={MessageCircle}
@@ -663,11 +664,14 @@ const FooterButton: React.FC<{
   onClick: () => void;
   active?: boolean;
   activeColor?: string;
-}> = ({ icon: Icon, label, onClick, active, activeColor }) => (
-  <button
-    type="button"
-    onClick={(e) => {
-      e.stopPropagation();
+  haptic?: 'none' | 'selection' | 'success' | 'warning';
+}> = ({ icon: Icon, label, onClick, active, activeColor, haptic = 'none' }) => (
+  <Pressable
+    as="button"
+    variant="icon"
+    haptic={haptic}
+    onPress={(e) => {
+      (e as React.MouseEvent).stopPropagation?.();
       onClick();
     }}
     style={{
@@ -678,10 +682,10 @@ const FooterButton: React.FC<{
       border: 'none',
       padding: 0,
       color: active ? activeColor ?? T100 : T60,
-      cursor: 'pointer',
       fontSize: 12,
       fontVariantNumeric: 'tabular-nums',
     }}
+    innerStyle={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}
   >
     <Icon
       size={24}
@@ -690,8 +694,9 @@ const FooterButton: React.FC<{
       fill={active ? activeColor ?? 'none' : 'none'}
     />
     {label && <span>{label}</span>}
-  </button>
+  </Pressable>
 );
+
 
 export const LightFeedCard = React.memo(LightFeedCardImpl);
 LightFeedCard.displayName = 'LightFeedCard';
