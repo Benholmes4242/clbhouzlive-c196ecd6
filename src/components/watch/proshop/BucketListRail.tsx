@@ -153,6 +153,7 @@ function BucketListRailInner() {
               width={158}
               aspectRatio="1/1"
               radius={6}
+              onDecoded={i < VISIBLE_COUNT ? onDecoded : undefined}
             />
             {courseNameByPostId.get(post.id) && (
               <div
