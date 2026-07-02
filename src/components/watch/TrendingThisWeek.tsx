@@ -26,9 +26,10 @@ export default function TrendingThisWeek({ enabled = true }: TrendingThisWeekPro
   const { data: viewedPostIds } = useViewedPostIds();
 
   const topPosts = [...posts].sort((a, b) => b.likeCount - a.likeCount).slice(0, 5);
+  const revealed = useWatchReveal('trending-this-week', !isLoading);
 
-  // ── Loading skeleton ──
-  if (isLoading) {
+  // ── Loading skeleton (held until coordinated reveal) ──
+  if (!revealed || isLoading) {
     const shimmerBase = {
       background: 'rgba(0,0,0,0.06)',
       backgroundImage:
