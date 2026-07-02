@@ -35,19 +35,40 @@ function toAARRGGBB(hex: string) {
   return `FF${clean.toUpperCase()}`;
 }
 
+/**
+ * Translate PageRoot's *intent* into the value Median's native bridge expects.
+ *
+ * PageRoot semantics (what callers pass):
+ *   'dark'  → caller wants DARK icons (light background)
+ *   'light' → caller wants LIGHT/white icons (dark background)
+ *   'auto'  → leave to Median
+ *
+ * Empirically Median's `statusbar.set({ style })` is inverted vs. that intent
+ * on iOS — passing 'dark' produces WHITE icons (dark status-bar theme) and
+ * vice versa. Flip once, at the single mapping point, so every caller's
+ * intent renders correctly on device. Do not flip 'auto'.
+ */
+function toMedianStyle(intent: string): string {
+  if (intent === 'dark') return 'light';   // dark icons → Median 'light' theme
+  if (intent === 'light') return 'dark';   // white icons → Median 'dark' theme
+  return intent;                            // 'auto' passes through untouched
+}
+
 function applyMedianStatusBar(style: string, hexColor: string, overlay: boolean, blur: boolean) {
   if (typeof window === 'undefined') return;
   if (!navigator.userAgent.toLowerCase().includes('median')) return;
 
   try {
+    const medianStyle = toMedianStyle(style);
     const params = {
-      style,
+      style: medianStyle,
       color: toAARRGGBB(hexColor),
       overlay,
       blur,
     };
     console.info('[sbar] bridge', {
-      style,
+      intent: style,
+      medianStyle,
       color: hexColor,
       hasMedian: !!window.median?.statusbar,
       params,
