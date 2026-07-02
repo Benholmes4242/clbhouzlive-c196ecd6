@@ -32,7 +32,10 @@ export const WhsHandicapTab: React.FC<Props> = ({ userId, ownerFirstName = null 
   if (!connection) {
     return (
       <WhsConnectScreen
-        onConnected={() => refetch()}
+        onConnected={async () => {
+          await refetch();
+          navigate('/handicap', { replace: true });
+        }}
         onSkip={() => navigate(-1)}
       />
     );
