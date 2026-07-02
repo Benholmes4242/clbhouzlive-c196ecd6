@@ -1,4 +1,4 @@
-import React, { useMemo, useRef, useEffect } from 'react';
+import React, { useCallback, useMemo, useRef, useEffect } from 'react';
 import { useFullscreenFeedStore } from '@/store/fullscreenFeedStore';
 import type { FeedPost } from '@/components/media-system/types/media';
 import WatchTile from './WatchTile';
@@ -19,6 +19,8 @@ interface WatchGridProps {
   emptyTitle?: string;
   emptyMessage?: string;
   emptyAction?: { label: string; onClick: () => void; icon?: 'clear' | 'back' };
+  /** Fired once the first visible row of tiles has decoded and painted. */
+  onFirstRowDecoded?: () => void;
 }
 
 
@@ -57,8 +59,28 @@ const WatchGrid: React.FC<WatchGridProps> = ({
   emptyTitle = 'No clips yet',
   emptyMessage = 'This is where short golf clips will show up. Check back soon — there’s more on the way.',
   emptyAction,
+  onFirstRowDecoded,
 }) => {
   const sentinelRef = useRef<HTMLDivElement>(null);
+  const decodedCountRef = useRef(0);
+  const firedRef = useRef(false);
+
+  // Reset the first-row-decoded latch whenever the underlying post set
+  // fundamentally changes (mood/category switch → fresh page ready gate).
+  useEffect(() => {
+    decodedCountRef.current = 0;
+    firedRef.current = false;
+  }, [posts.length === 0 ? 0 : posts[0]?.id]);
+
+  const handleTileDecoded = useCallback(() => {
+    if (firedRef.current) return;
+    decodedCountRef.current += 1;
+    const target = Math.min(COLS, posts.length);
+    if (target > 0 && decodedCountRef.current >= target) {
+      firedRef.current = true;
+      onFirstRowDecoded?.();
+    }
+  }, [posts.length, onFirstRowDecoded]);
 
   // Infinite scroll via IntersectionObserver
   useEffect(() => {
@@ -178,7 +200,13 @@ const WatchGrid: React.FC<WatchGridProps> = ({
                   overflow: 'hidden',
                 }}
               >
-                <WatchTile post={post} index={index} allPosts={posts} />
+                <WatchTile
+                  post={post}
+                  index={index}
+                  allPosts={posts}
+                  onDecoded={index < COLS ? handleTileDecoded : undefined}
+                />
+
               </div>
             ))}
           </div>
