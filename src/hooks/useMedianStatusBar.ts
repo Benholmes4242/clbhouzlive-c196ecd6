@@ -66,13 +66,6 @@ function applyMedianStatusBar(style: string, hexColor: string, overlay: boolean,
       overlay,
       blur,
     };
-    console.info('[sbar] bridge', {
-      intent: style,
-      medianStyle,
-      color: hexColor,
-      hasMedian: !!window.median?.statusbar,
-      params,
-    });
     if (window.median?.statusbar?.set) {
       window.median.statusbar.set(params);
     }
