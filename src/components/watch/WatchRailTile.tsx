@@ -26,6 +26,9 @@ interface WatchRailTileProps {
   radius?: number;
   /** Fires once the tile's thumbnail bitmap is ready (used to gate coordinated reveal). */
   onDecoded?: () => void;
+  /** Temporary telemetry id like "trending#3". */
+  debugId?: string;
+
 }
 
 const NEW_THRESHOLD_MS = 24 * 60 * 60 * 1000; // 24h
