@@ -167,6 +167,11 @@ const ActivityPage: React.FC = () => {
 
   const handleNotificationClick = async (n: ActivityNotification) => {
     if (n.is_unread && !n.is_mock) await handleMarkRead(n.id);
+    if (n.type === 'handicap_authority_live') {
+      const countryId = (n as any).data?.country_id as string | undefined;
+      navigate('/handicap', countryId ? { state: { preselectCountryId: countryId } } : undefined);
+      return;
+    }
     if (n.context_url && n.entity_type && n.entity_id) {
       const exists = await checkContentExists(n.entity_type, n.entity_id);
       if (!exists) {
