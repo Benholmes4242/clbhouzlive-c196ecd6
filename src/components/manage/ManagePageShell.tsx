@@ -27,6 +27,18 @@ export function ManagePageShell({ title, children, right, onBack, belowTitle }: 
   const navigate = useNavigate();
   const handleBack = () => (onBack ? onBack() : navigate(-1));
 
+  // Snapshot safe-area inset once so header height doesn't shift when the
+  // mobile URL bar collapses/expands during scroll.
+  const [safeTop, setSafeTop] = useState(0);
+  useLayoutEffect(() => {
+    const probe = document.createElement('div');
+    probe.style.cssText = 'position:fixed;top:0;left:0;height:env(safe-area-inset-top,0px);width:0;visibility:hidden;pointer-events:none;';
+    document.body.appendChild(probe);
+    const measured = probe.getBoundingClientRect().height;
+    document.body.removeChild(probe);
+    setSafeTop(Math.max(measured, 8));
+  }, []);
+
   return (
     <PageRoot hasBottomNav={false} className="md:!max-w-[440px]" style={{ background: SLATE_BG } as any}>
       <div className="min-h-screen flex flex-col w-full" style={{ background: SLATE_BG }}>
