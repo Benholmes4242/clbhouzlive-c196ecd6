@@ -78,7 +78,7 @@ export function useWaitlistDrilldown(countryId: string | null) {
       if (!countryId) return [];
       const { data, error } = await supabase
         .from('handicap_authority_waitlist')
-        .select('id, user_id, created_at, body_name, country_id')
+        .select('id, user_id, created_at, body_name, country_id, notified_live')
         .eq('country_id', countryId)
         .order('created_at', { ascending: false })
         .limit(500);
@@ -89,6 +89,7 @@ export function useWaitlistDrilldown(countryId: string | null) {
         created_at: string;
         body_name: string;
         country_id: string;
+        notified_live: boolean;
       }>;
       if (!rows.length) return [];
 
