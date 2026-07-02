@@ -12,6 +12,8 @@ import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import 'mapbox-gl/dist/mapbox-gl.css';
 import { QueryClient, QueryClientProvider, QueryCache, MutationCache } from "@tanstack/react-query";
+import { PersistQueryClientProvider } from "@tanstack/react-query-persist-client";
+import { queryPersister, shouldPersistQuery, PERSIST_MAX_AGE_MS } from "@/lib/queryPersister";
 import { ErrorBoundary } from '@/components/ErrorBoundary';
 import { BrowserRouter, Routes, Route, useLocation, Navigate, useParams, useNavigate } from "react-router-dom";
 import { setNavigateRef } from '@/utils/navigation';
