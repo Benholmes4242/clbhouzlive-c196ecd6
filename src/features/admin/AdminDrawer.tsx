@@ -2,6 +2,7 @@ import React, { useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import {
   LayoutDashboard, Users, MapPin, BarChart3, Settings, Shield, ShieldAlert, ShieldCheck, LifeBuoy, ArrowLeft,
+  ClipboardList,
   type LucideIcon,
 } from 'lucide-react';
 import { adminTheme as t } from './theme';
@@ -23,6 +24,7 @@ const NAV: NavItem[] = [
   { to: '/admin-v2/users',      label: 'Users',      icon: Users },
   { to: '/admin-v2/content',    label: 'Content',    icon: MapPin },
   { to: '/admin-v2/analytics',  label: 'Analytics',  icon: BarChart3, requireFull: true },
+  { to: '/admin-v2/waitlist',   label: 'Handicap demand', icon: ClipboardList, moderatorAllowed: true },
   { to: '/admin-v2/system',     label: 'System',     icon: Settings },
 ];
 
