@@ -1,6 +1,8 @@
 import { useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
+import { usePageReady } from '@/perf/usePageReady';
+
 import TrendingThisWeek from './TrendingThisWeek';
 import LatestVideosRail from './LatestVideosRail';
 import WatchAutoplay from './WatchAutoplay';
@@ -36,6 +38,7 @@ export default function UnifiedWatchFeed({ embedded = false }: UnifiedWatchFeedP
   const {
     posts,
     isLoading,
+    isFetching,
     isError,
     hasNextPage,
     isFetchingNextPage,
@@ -46,6 +49,10 @@ export default function UnifiedWatchFeed({ embedded = false }: UnifiedWatchFeedP
     mood,
     category: undefined,
   });
+
+  usePageReady(!isLoading && posts.length > 0);
+
+
 
   return (
     <div className="min-h-screen" style={{ background: 'hsl(var(--background))' }}>
@@ -89,6 +96,8 @@ export default function UnifiedWatchFeed({ embedded = false }: UnifiedWatchFeedP
         <WatchGrid
           posts={posts}
           isLoading={isLoading}
+          isFetching={isFetching}
+
           isError={isError}
           hasNextPage={hasNextPage}
           isFetchingNextPage={isFetchingNextPage}

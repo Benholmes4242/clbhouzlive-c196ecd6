@@ -1,8 +1,11 @@
 import React from 'react';
 import { Skeleton } from '@/components/ui/skeleton';
+import { useSkeletonShown } from '@/perf/usePageReady';
 
 const WatchGridSkeleton: React.FC = () => {
+  useSkeletonShown();
   return (
+
     <div className="space-y-0">
       {/* Category chips skeleton */}
       <div className="flex gap-2 px-4 py-3 overflow-hidden">

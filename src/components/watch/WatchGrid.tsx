@@ -8,6 +8,7 @@ import WatchEmptyState from './shared/WatchEmptyState';
 interface WatchGridProps {
   posts: FeedPost[];
   isLoading: boolean;
+  isFetching?: boolean;
   isError?: boolean;
   hasNextPage: boolean | undefined;
   isFetchingNextPage: boolean;
@@ -19,6 +20,7 @@ interface WatchGridProps {
   emptyMessage?: string;
   emptyAction?: { label: string; onClick: () => void; icon?: 'clear' | 'back' };
 }
+
 
 const GAP = 1;
 const COLS = 2;
@@ -44,7 +46,9 @@ interface PlacedTile {
 const WatchGrid: React.FC<WatchGridProps> = ({
   posts,
   isLoading,
+  isFetching = false,
   isError,
+
   hasNextPage,
   isFetchingNextPage,
   fetchNextPage,
@@ -107,9 +111,10 @@ const WatchGrid: React.FC<WatchGridProps> = ({
     return cols;
   }, [posts]);
 
-  if (isLoading && posts.length === 0) {
+  if ((isLoading || isFetching) && posts.length === 0) {
     return <WatchGridSkeleton />;
   }
+
 
   if (isError && posts.length === 0) {
     return (
