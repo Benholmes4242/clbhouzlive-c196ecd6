@@ -201,6 +201,7 @@ export default function WatchRailTile({
         alt=""
         loading="lazy"
         onDecoded={onDecoded}
+        lqipSrc={shouldUseLqip(index, 3) ? buildLqipUrl(thumb) : null}
         style={{
           position: 'absolute',
           inset: 0,
