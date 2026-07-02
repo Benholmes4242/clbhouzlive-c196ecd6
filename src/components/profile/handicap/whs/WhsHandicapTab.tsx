@@ -54,5 +54,3 @@ export const WhsHandicapTab: React.FC<Props> = ({ userId, ownerFirstName = null 
 };
 
 export default WhsHandicapTab;
-
-export default WhsHandicapTab;
