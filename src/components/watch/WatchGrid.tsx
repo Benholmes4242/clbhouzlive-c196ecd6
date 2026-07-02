@@ -111,9 +111,10 @@ const WatchGrid: React.FC<WatchGridProps> = ({
     return cols;
   }, [posts]);
 
-  if (isLoading && posts.length === 0) {
+  if ((isLoading || isFetching) && posts.length === 0) {
     return <WatchGridSkeleton />;
   }
+
 
   if (isError && posts.length === 0) {
     return (
