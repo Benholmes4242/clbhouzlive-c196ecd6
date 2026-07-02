@@ -83,7 +83,8 @@ function BucketListRailInner() {
   }, [courses]);
 
   const stillLoading = coursesLoading || postsLoading;
-  const revealed = useWatchReveal('bucket-list', !stillLoading);
+  const { settled: firstVisibleDecoded, onDecoded } = useFirstVisibleDecoded(orderedPosts.length, VISIBLE_COUNT);
+  const revealed = useWatchReveal('bucket-list', !stillLoading && firstVisibleDecoded);
 
   // Reserve final height while loading so late-resolving posts don't push
   // the rest of the feed down. Held until coordinated reveal.
