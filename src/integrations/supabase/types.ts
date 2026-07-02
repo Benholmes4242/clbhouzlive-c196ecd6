@@ -6351,6 +6351,33 @@ export type Database = {
           },
         ]
       }
+      handicap_authority_waitlist: {
+        Row: {
+          body_name: string
+          country_id: string
+          created_at: string
+          id: string
+          notified_live: boolean
+          user_id: string
+        }
+        Insert: {
+          body_name: string
+          country_id: string
+          created_at?: string
+          id?: string
+          notified_live?: boolean
+          user_id: string
+        }
+        Update: {
+          body_name?: string
+          country_id?: string
+          created_at?: string
+          id?: string
+          notified_live?: boolean
+          user_id?: string
+        }
+        Relationships: []
+      }
       hidden_comments: {
         Row: {
           comment_id: string
@@ -19578,6 +19605,14 @@ export type Database = {
           user_id: string
           username: string
           why_ai: string
+        }[]
+      }
+      get_waitlist_display: {
+        Args: { _country_id: string }
+        Returns: {
+          already_joined: boolean
+          show_count: boolean
+          total: number
         }[]
       }
       get_watch_category_counts: {
