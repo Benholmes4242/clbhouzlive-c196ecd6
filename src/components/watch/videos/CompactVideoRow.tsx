@@ -2,11 +2,14 @@ import { memo, useCallback, useMemo, useState } from 'react';
 import { useFullscreenFeedStore } from '@/store/fullscreenFeedStore';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import type { FeedPost } from '@/components/media-system/types/media';
+import DecodedImage from '../shared/DecodedImage';
 
 interface CompactVideoRowProps {
   post: FeedPost;
   index: number;
   allPosts: FeedPost[];
+  /** Fires once the thumbnail bitmap is ready. */
+  onDecoded?: () => void;
 }
 
 function formatHMS(seconds: number | null | undefined): string {
