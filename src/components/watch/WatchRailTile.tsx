@@ -1,4 +1,4 @@
-import { useFullscreenFeedStore } from '@/store/fullscreenFeedStore';
+import { openWithOrigin } from '@/lib/openWithOrigin';
 import { useRef, useEffect, useState, useCallback, useMemo } from 'react';
 import { Heart } from 'lucide-react';
 import type { FeedPost } from '@/components/media-system/types/media';
@@ -163,8 +163,14 @@ export default function WatchRailTile({
   }, [isAutoplayActive, hlsUrl, mp4Url]);
 
   const handleClick = useCallback(() => {
-    useFullscreenFeedStore.getState().open(allPosts, index);
-  }, [allPosts, index]);
+    openWithOrigin({
+      posts: allPosts,
+      index,
+      originEl: cardRef.current,
+      posterUrl: thumb ?? null,
+      handOffUrls: [hlsUrl],
+    });
+  }, [allPosts, index, thumb, hlsUrl]);
 
   const surfacingReason = useMemo(
     () => deriveSurfacingReason(post, viewedPostIds),
@@ -175,6 +181,7 @@ export default function WatchRailTile({
     <div
       ref={cardRef}
       data-rail-tile-index={index}
+      data-post-id={post.id}
       style={{
         flexShrink: 0,
         position: 'relative',

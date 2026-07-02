@@ -7,6 +7,7 @@ import { useWatchReveal, useWatchRevealed } from '../WatchRevealContext';
 import { useWatchMood } from './hooks/useWatchMood';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useFullscreenFeedStore } from '@/store/fullscreenFeedStore';
+import { openWithOrigin } from '@/lib/openWithOrigin';
 import { Kicker } from './Kicker';
 import { Pin } from './Pin';
 import { useActiveActor } from '@/context/ActiveActorContext';
@@ -181,7 +182,12 @@ function WatchOfTheWeekHeroInner() {
   const handleTap = () => {
     // Open fullscreen viewer with a synthetic single-post array. The viewer
     // accepts the FeedPost shape; we provide the minimum fields it needs.
-    useFullscreenFeedStore.getState().open(
+    openWithOrigin({
+      originEl: heroTileRef.current,
+      posterUrl: pick.thumbnail_url ?? null,
+      handOffUrls: [pick.hls_url ?? undefined],
+      index: 0,
+      posts:
       [{
         id: pick.post_id,
         userId: pick.user_id,
@@ -217,8 +223,7 @@ function WatchOfTheWeekHeroInner() {
         courseId: pick.course_id ?? undefined,
         tags: (pick as any).post_tags ?? [],
       } as any],
-      0,
-    );
+    });
   };
 
   return (

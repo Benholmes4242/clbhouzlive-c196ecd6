@@ -80,7 +80,11 @@ export interface FeedCardProps {
   onLike: (post: FeedPost, actor?: ActiveActor | null) => void;
   onComment: (post: FeedPost, actor?: ActiveActor | null) => void;
   onShare: (post: FeedPost) => void;
-  onOpenMedia: (post: FeedPost, mediaIndex: number) => void;
+  onOpenMedia: (
+    post: FeedPost,
+    mediaIndex: number,
+    origin?: { el: HTMLElement | null; posterUrl?: string | null; handOffUrl?: string | null },
+  ) => void;
   onProfile: (post: FeedPost) => void;
   onReviewTap?: (post: FeedPost) => void;
   onCourse?: (post: FeedPost) => void;
@@ -308,6 +312,7 @@ const FeedCardImpl: React.FC<FeedCardProps> = ({
   // falling back to onLoad and finally to mount + rAF so we never strand the
   // skeleton on a quirky image.
   const primaryImgRef = useRef<HTMLImageElement | null>(null);
+  const singleMediaBtnRef = useRef<HTMLButtonElement | null>(null);
   const usesPrimaryImage =
     isFirstCard &&
     !isMulti &&
@@ -547,7 +552,15 @@ const FeedCardImpl: React.FC<FeedCardProps> = ({
         ) : media ? (
           <button
             type="button"
-            onClick={() => onOpenMedia(post, 0)}
+            ref={singleMediaBtnRef}
+            data-post-id={post.id}
+            onClick={() =>
+              onOpenMedia(post, 0, {
+                el: singleMediaBtnRef.current,
+                posterUrl: media.thumbnailUrl ?? (media as any).imageUrl ?? null,
+                handOffUrl: (media as any).hlsUrl ?? null,
+              })
+            }
             style={{
               display: 'block',
               width: '100%',

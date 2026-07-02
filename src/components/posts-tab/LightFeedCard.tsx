@@ -77,7 +77,11 @@ export interface LightFeedCardProps {
   onLike: (post: FeedPost, actor?: ActiveActor | null) => void;
   onComment: (post: FeedPost, actor?: ActiveActor | null) => void;
   onShare: (post: FeedPost) => void;
-  onOpenMedia: (post: FeedPost, mediaIndex: number) => void;
+  onOpenMedia: (
+    post: FeedPost,
+    mediaIndex: number,
+    origin?: { el: HTMLElement | null; posterUrl?: string | null; handOffUrl?: string | null },
+  ) => void;
   onProfile: (post: FeedPost) => void;
   onReviewTap?: (post: FeedPost) => void;
   onCourse?: (post: FeedPost) => void;
@@ -227,6 +231,7 @@ const LightFeedCardImpl: React.FC<LightFeedCardProps> = ({
   // Actor selection is GLOBAL — picker reads and writes the session-wide activeActor.
   const effectiveActor: ActiveActor | null = activeActor;
   const captionTextRef = useRef<HTMLDivElement | null>(null);
+  const singleMediaBtnRef = useRef<HTMLButtonElement | null>(null);
 
   const reviewCourseId = post.review?.courseId ?? post.courseId;
   const reviewId = post.review?.reviewId;
@@ -439,7 +444,15 @@ const LightFeedCardImpl: React.FC<LightFeedCardProps> = ({
         ) : media ? (
           <button
             type="button"
-            onClick={() => onOpenMedia(post, 0)}
+            ref={singleMediaBtnRef}
+            data-post-id={post.id}
+            onClick={() =>
+              onOpenMedia(post, 0, {
+                el: singleMediaBtnRef.current,
+                posterUrl: media.thumbnailUrl ?? (media as any).imageUrl ?? null,
+                handOffUrl: (media as any).hlsUrl ?? null,
+              })
+            }
             style={{
               display: 'block',
               width: '100%',

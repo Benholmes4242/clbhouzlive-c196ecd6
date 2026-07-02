@@ -23,6 +23,7 @@ import { Virtuoso, type VirtuosoHandle, type StateSnapshot } from 'react-virtuos
 import type { FeedPost } from '@/components/media-system/types/media';
 import type { ActiveActor } from '@/types/actor';
 import { useFullscreenFeedStore } from '@/store/fullscreenFeedStore';
+import { openWithOrigin } from '@/lib/openWithOrigin';
 import { useClubhouseStore } from '@/store/clubhouseStore';
 import { prefetchTile } from '@/hooks/useTileVideoPlayer';
 import { FeedCard } from './FeedCard';
@@ -315,12 +316,26 @@ export const CardFeed = forwardRef<CardFeedHandle, CardFeedProps>(function CardF
   }, [posts?.length]);
 
   const handleOpenMedia = useCallback(
-    (post: FeedPost, mediaIndex: number) => {
+    (
+      post: FeedPost,
+      mediaIndex: number,
+      origin?: { el: HTMLElement | null; posterUrl?: string | null; handOffUrl?: string | null },
+    ) => {
       const idx = posts.findIndex((p) => p.id === post.id);
       if (idx < 0) return;
       setActiveIndex(idx, tab);
       if (mediaIndex > 0) setCarouselPosition(idx, mediaIndex, tab);
-      openFullscreen(posts, idx);
+      if (origin?.el) {
+        openWithOrigin({
+          posts,
+          index: idx,
+          originEl: origin.el,
+          posterUrl: origin.posterUrl ?? null,
+          handOffUrls: origin.handOffUrl ? [origin.handOffUrl] : undefined,
+        });
+      } else {
+        openFullscreen(posts, idx);
+      }
     },
     [posts, setActiveIndex, setCarouselPosition, openFullscreen, tab],
   );

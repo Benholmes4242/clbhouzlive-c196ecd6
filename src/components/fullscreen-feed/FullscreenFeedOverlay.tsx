@@ -1,4 +1,4 @@
-import React, { useEffect, useCallback } from 'react';
+import React, { useEffect, useCallback, useState, useRef } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 
 import { useNavigate } from 'react-router-dom';
@@ -7,6 +7,7 @@ import { useClubhouseStore } from '@/store/clubhouseStore';
 import { SnapFeed } from '@/components/feed/SnapFeed';
 import { ClubhouseSkeletonShimmer } from '@/components/clubhouse/ClubhouseSkeletonShimmer';
 import { pauseAllAudio } from '@/utils/globalVideoMute';
+import { lockBodyScroll, unlockBodyScroll } from '@/lib/bodyScrollLock';
 
 import { FeedOverlayLayer } from '@/components/feed/FeedOverlayLayer';
 import { FullscreenCarouselOverlay } from '@/components/media/FullscreenCarouselOverlay';
@@ -35,6 +36,15 @@ export function FullscreenFeedOverlay() {
   const fetchNextPage = useFullscreenFeedStore(s => s.fetchNextPage);
   const isFetchingNextPage = useFullscreenFeedStore(s => s.isFetchingNextPage);
   const readOnly = useFullscreenFeedStore(s => s.readOnly);
+  const origin = useFullscreenFeedStore(s => s.origin);
+
+  // ── FLIP clone state ──
+  // When origin is present, we mount a transform-only expanding poster clone
+  // over the (opacity-0) SnapFeed and crossfade it out on first frame.
+  const [cloneVisible, setCloneVisible] = useState(false);
+  const [cloneExpanded, setCloneExpanded] = useState(false);
+  const [firstFrameReady, setFirstFrameReady] = useState(false);
+  const watchdogRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   // Use the real active actor (personal or business) so users in business
   // mode can like/comment/follow as their business from fullscreen. Falls
@@ -136,7 +146,7 @@ export function FullscreenFeedOverlay() {
       fsTimeStart('open');
       fsEvent('🚀 FULLSCREEN_OPEN', { startIndex });
       pauseAllAudio();
-      document.body.style.overflow = "hidden";
+      lockBodyScroll();
 
       // ── Safe area bleed (mirrors Clubhouse) ──
       document.body.classList.add('route-fullscreen-overlay');
@@ -149,7 +159,7 @@ export function FullscreenFeedOverlay() {
       } catch {}
 
       return () => {
-        document.body.style.overflow = "";
+        unlockBodyScroll();
         document.body.classList.remove('route-fullscreen-overlay');
         // Restore shield to transparent (NOT #F8FAFC) so the dark feed background
         // shows through — matches the prior CourseMediaViewer behaviour and
@@ -170,6 +180,58 @@ export function FullscreenFeedOverlay() {
     }
   }, [isOpen]);
 
+  // ── FLIP clone lifecycle ──
+  // On open with origin: mount the clone at the tile's rect, then on the
+  // NEXT frame flip cloneExpanded=true to trigger the transform → target rect.
+  // Crossfade the clone out either when the active slide fires
+  // onFirstFrameReady, or after a 400ms watchdog — whichever first.
+  useEffect(() => {
+    if (isOpen && origin) {
+      setCloneVisible(true);
+      setCloneExpanded(false);
+      setFirstFrameReady(false);
+      // Force layout with the initial rect, then expand on next frame.
+      const raf1 = requestAnimationFrame(() => {
+        const raf2 = requestAnimationFrame(() => setCloneExpanded(true));
+        (raf1 as any)._raf2 = raf2;
+      });
+      // Watchdog: release the clone if the first-frame signal never arrives.
+      watchdogRef.current = setTimeout(() => setFirstFrameReady(true), 400);
+      return () => {
+        cancelAnimationFrame(raf1);
+        if ((raf1 as any)._raf2) cancelAnimationFrame((raf1 as any)._raf2);
+        if (watchdogRef.current) clearTimeout(watchdogRef.current);
+      };
+    } else if (!isOpen) {
+      setCloneVisible(false);
+      setCloneExpanded(false);
+      setFirstFrameReady(false);
+      if (watchdogRef.current) clearTimeout(watchdogRef.current);
+    }
+  }, [isOpen, origin]);
+
+  const handleSnapFeedFirstFrame = useCallback(() => {
+    if (watchdogRef.current) clearTimeout(watchdogRef.current);
+    setFirstFrameReady(true);
+  }, []);
+
+  // Retire the clone shortly after the crossfade completes.
+  useEffect(() => {
+    if (!firstFrameReady || !cloneVisible) return;
+    const t = setTimeout(() => setCloneVisible(false), 180);
+    return () => clearTimeout(t);
+  }, [firstFrameReady, cloneVisible]);
+
+  // Target rect for the FLIP expand: viewport-sized on phone; on iPad the
+  // viewer is centred so we honour the same layout as the overlay chrome.
+  const targetRect = React.useMemo(() => {
+    if (typeof window === 'undefined') return null;
+    const vw = window.innerWidth;
+    const vh = window.innerHeight;
+    return { top: 0, left: 0, width: vw, height: vh };
+  }, [isOpen]);
+
+
   return (
     <>
       <AnimatePresence>
@@ -188,57 +250,99 @@ export function FullscreenFeedOverlay() {
               <ClubhouseSkeletonShimmer isVisible={true} isStatic={false} />
             ) : (
               <>
-                <SnapFeed
-                  posts={posts}
-                  activeTab="foryou"
-                  onNearEnd={() => {
-                    if (hasNextPage && fetchNextPage && !isFetchingNextPage) {
-                      fetchNextPage();
-                    }
+                <div
+                  style={{
+                    position: 'absolute',
+                    inset: 0,
+                    opacity: origin && !firstFrameReady ? 0 : 1,
+                    transition: 'opacity 120ms linear',
                   }}
-                  onRefresh={async () => {}}
-                  isRefreshing={isFetchingNextPage}
-                  hasNextPage={hasNextPage}
-                  followOverrides={followOverrides}
-                  onFollowChange={handleFollowChange}
-                  startIndex={startIndex}
-                  onActiveIndexChange={setActiveIndex}
-                  activeIndexOverride={activeIndex}
-                  isFullscreen
-                  surface="fullscreen"
-                  readOnly={readOnly}
-                />
+                >
+                  <SnapFeed
+                    posts={posts}
+                    activeTab="foryou"
+                    onNearEnd={() => {
+                      if (hasNextPage && fetchNextPage && !isFetchingNextPage) {
+                        fetchNextPage();
+                      }
+                    }}
+                    onRefresh={async () => {}}
+                    isRefreshing={isFetchingNextPage}
+                    hasNextPage={hasNextPage}
+                    followOverrides={followOverrides}
+                    onFollowChange={handleFollowChange}
+                    onFirstFrameReady={handleSnapFeedFirstFrame}
+                    startIndex={startIndex}
+                    onActiveIndexChange={setActiveIndex}
+                    activeIndexOverride={activeIndex}
+                    isFullscreen
+                    surface="fullscreen"
+                    readOnly={readOnly}
+                  />
 
-                <FeedOverlayLayer
-                  posts={posts}
-                  activeIndexOverride={activeIndex}
-                  onLike={handleLike}
-                  onComment={safeOpenComments}
-                  onShare={handleShare}
-                  onMore={() => {}}
-                  getLikeState={getActiveLikeState}
-                  getCommentCount={getCommentCount}
-                  getFollowState={getFollowState}
-                  onFollow={(post) => handleFollowChange(post.userId, !getFollowState(post))}
-                  onViewProfile={handleViewProfile}
-                  onReviewTap={handleReviewTap}
-                  onBeforeNavigate={close}
-                  overlayVisible={true}
-                  isOwnPost={isOwnPost}
-                  golfCourse={golfCourse}
-                  activeReview={activeReview}
-                  isActiveReview={isActiveReview}
-                  bottomOffset={0}
-                  topActionBar
-                  onClose={close}
-                  readOnly={readOnly}
-                />
+                  <FeedOverlayLayer
+                    posts={posts}
+                    activeIndexOverride={activeIndex}
+                    onLike={handleLike}
+                    onComment={safeOpenComments}
+                    onShare={handleShare}
+                    onMore={() => {}}
+                    getLikeState={getActiveLikeState}
+                    getCommentCount={getCommentCount}
+                    getFollowState={getFollowState}
+                    onFollow={(post) => handleFollowChange(post.userId, !getFollowState(post))}
+                    onViewProfile={handleViewProfile}
+                    onReviewTap={handleReviewTap}
+                    onBeforeNavigate={close}
+                    overlayVisible={true}
+                    isOwnPost={isOwnPost}
+                    golfCourse={golfCourse}
+                    activeReview={activeReview}
+                    isActiveReview={isActiveReview}
+                    bottomOffset={0}
+                    topActionBar
+                    onClose={close}
+                    readOnly={readOnly}
+                  />
 
 
-                <FullscreenCarouselOverlay
-                  activePost={activePost}
-                  activeIndex={activeIndex}
-                />
+                  <FullscreenCarouselOverlay
+                    activePost={activePost}
+                    activeIndex={activeIndex}
+                  />
+                </div>
+
+                {/* ── FLIP clone layer (Phase 3 shared-element expand) ── */}
+                {origin && cloneVisible && targetRect && (
+                  <img
+                    src={origin.posterUrl ?? undefined}
+                    alt=""
+                    aria-hidden
+                    style={{
+                      position: 'fixed',
+                      top: 0,
+                      left: 0,
+                      width: cloneExpanded ? targetRect.width : origin.rect.width,
+                      height: cloneExpanded ? targetRect.height : origin.rect.height,
+                      transform: cloneExpanded
+                        ? `translate(${targetRect.left}px, ${targetRect.top}px)`
+                        : `translate(${origin.rect.left}px, ${origin.rect.top}px)`,
+                      objectFit: 'cover',
+                      borderRadius: cloneExpanded ? 0 : origin.borderRadius,
+                      willChange: 'transform, width, height, opacity, border-radius',
+                      transition:
+                        'transform 300ms cubic-bezier(0.32,0.72,0,1),' +
+                        ' width 300ms cubic-bezier(0.32,0.72,0,1),' +
+                        ' height 300ms cubic-bezier(0.32,0.72,0,1),' +
+                        ' border-radius 240ms cubic-bezier(0.32,0.72,0,1),' +
+                        ' opacity 120ms linear',
+                      opacity: firstFrameReady ? 0 : 1,
+                      pointerEvents: 'none',
+                      zIndex: 2,
+                      background: '#000',
+                    }}
+                  />
+                )}
               </>
             )}
             {/* <FullscreenDebugPanel /> — hidden; re-enable here when debugging needed */}

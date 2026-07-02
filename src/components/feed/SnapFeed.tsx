@@ -515,7 +515,7 @@ export function SnapFeed({
             activeTab={activeTab}
             followOverrides={followOverrides}
             onFollowChange={onFollowChange}
-            onFirstFrameReady={idx === 0 ? handleFirstFrame : undefined}
+            onFirstFrameReady={idx === (startIndex ?? 0) ? handleFirstFrame : undefined}
             onLike={onLike}
             onComment={onComment}
             onShare={onShare}

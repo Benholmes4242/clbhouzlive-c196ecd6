@@ -1,7 +1,7 @@
 import React, { useEffect, useRef } from 'react';
 import { Film, Heart } from 'lucide-react';
 import type { FeedPost } from '@/components/media-system/types/media';
-import { useFullscreenFeedStore } from '@/store/fullscreenFeedStore';
+import { openWithOrigin } from '@/lib/openWithOrigin';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import DecodedImage from './shared/DecodedImage';
 
@@ -32,10 +32,16 @@ const WatchTile: React.FC<WatchTileProps> = ({ post, index, allPosts, onDecoded 
   const thumbnailUrl = media?.thumbnailUrl;
   const posterUrl = (media as any)?.posterUrl || (media as any)?.poster || undefined;
   const likeCount = post.likeCount ?? 0;
-  const { open } = useFullscreenFeedStore();
+  const rootRef = useRef<HTMLDivElement>(null);
 
   const handleClick = () => {
-    open(allPosts ?? [post], index);
+    openWithOrigin({
+      posts: allPosts ?? [post],
+      index,
+      originEl: rootRef.current,
+      posterUrl: thumbnailUrl ?? posterUrl ?? null,
+      handOffUrls: [media?.hlsUrl],
+    });
   };
 
   const creator = post.displayName || post.username || '';
@@ -51,7 +57,9 @@ const WatchTile: React.FC<WatchTileProps> = ({ post, index, allPosts, onDecoded 
 
   return (
     <div
+      ref={rootRef}
       data-watch-index={index}
+      data-post-id={post.id}
       className="relative w-full h-full overflow-hidden cursor-pointer select-none bg-muted/40"
       onClick={handleClick}
       style={
