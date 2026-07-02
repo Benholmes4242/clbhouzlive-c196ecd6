@@ -250,57 +250,99 @@ export function FullscreenFeedOverlay() {
               <ClubhouseSkeletonShimmer isVisible={true} isStatic={false} />
             ) : (
               <>
-                <SnapFeed
-                  posts={posts}
-                  activeTab="foryou"
-                  onNearEnd={() => {
-                    if (hasNextPage && fetchNextPage && !isFetchingNextPage) {
-                      fetchNextPage();
-                    }
+                <div
+                  style={{
+                    position: 'absolute',
+                    inset: 0,
+                    opacity: origin && !firstFrameReady ? 0 : 1,
+                    transition: 'opacity 120ms linear',
                   }}
-                  onRefresh={async () => {}}
-                  isRefreshing={isFetchingNextPage}
-                  hasNextPage={hasNextPage}
-                  followOverrides={followOverrides}
-                  onFollowChange={handleFollowChange}
-                  startIndex={startIndex}
-                  onActiveIndexChange={setActiveIndex}
-                  activeIndexOverride={activeIndex}
-                  isFullscreen
-                  surface="fullscreen"
-                  readOnly={readOnly}
-                />
+                >
+                  <SnapFeed
+                    posts={posts}
+                    activeTab="foryou"
+                    onNearEnd={() => {
+                      if (hasNextPage && fetchNextPage && !isFetchingNextPage) {
+                        fetchNextPage();
+                      }
+                    }}
+                    onRefresh={async () => {}}
+                    isRefreshing={isFetchingNextPage}
+                    hasNextPage={hasNextPage}
+                    followOverrides={followOverrides}
+                    onFollowChange={handleFollowChange}
+                    onFirstFrameReady={handleSnapFeedFirstFrame}
+                    startIndex={startIndex}
+                    onActiveIndexChange={setActiveIndex}
+                    activeIndexOverride={activeIndex}
+                    isFullscreen
+                    surface="fullscreen"
+                    readOnly={readOnly}
+                  />
 
-                <FeedOverlayLayer
-                  posts={posts}
-                  activeIndexOverride={activeIndex}
-                  onLike={handleLike}
-                  onComment={safeOpenComments}
-                  onShare={handleShare}
-                  onMore={() => {}}
-                  getLikeState={getActiveLikeState}
-                  getCommentCount={getCommentCount}
-                  getFollowState={getFollowState}
-                  onFollow={(post) => handleFollowChange(post.userId, !getFollowState(post))}
-                  onViewProfile={handleViewProfile}
-                  onReviewTap={handleReviewTap}
-                  onBeforeNavigate={close}
-                  overlayVisible={true}
-                  isOwnPost={isOwnPost}
-                  golfCourse={golfCourse}
-                  activeReview={activeReview}
-                  isActiveReview={isActiveReview}
-                  bottomOffset={0}
-                  topActionBar
-                  onClose={close}
-                  readOnly={readOnly}
-                />
+                  <FeedOverlayLayer
+                    posts={posts}
+                    activeIndexOverride={activeIndex}
+                    onLike={handleLike}
+                    onComment={safeOpenComments}
+                    onShare={handleShare}
+                    onMore={() => {}}
+                    getLikeState={getActiveLikeState}
+                    getCommentCount={getCommentCount}
+                    getFollowState={getFollowState}
+                    onFollow={(post) => handleFollowChange(post.userId, !getFollowState(post))}
+                    onViewProfile={handleViewProfile}
+                    onReviewTap={handleReviewTap}
+                    onBeforeNavigate={close}
+                    overlayVisible={true}
+                    isOwnPost={isOwnPost}
+                    golfCourse={golfCourse}
+                    activeReview={activeReview}
+                    isActiveReview={isActiveReview}
+                    bottomOffset={0}
+                    topActionBar
+                    onClose={close}
+                    readOnly={readOnly}
+                  />
 
 
-                <FullscreenCarouselOverlay
-                  activePost={activePost}
-                  activeIndex={activeIndex}
-                />
+                  <FullscreenCarouselOverlay
+                    activePost={activePost}
+                    activeIndex={activeIndex}
+                  />
+                </div>
+
+                {/* ── FLIP clone layer (Phase 3 shared-element expand) ── */}
+                {origin && cloneVisible && targetRect && (
+                  <img
+                    src={origin.posterUrl ?? undefined}
+                    alt=""
+                    aria-hidden
+                    style={{
+                      position: 'fixed',
+                      top: 0,
+                      left: 0,
+                      width: cloneExpanded ? targetRect.width : origin.rect.width,
+                      height: cloneExpanded ? targetRect.height : origin.rect.height,
+                      transform: cloneExpanded
+                        ? `translate(${targetRect.left}px, ${targetRect.top}px)`
+                        : `translate(${origin.rect.left}px, ${origin.rect.top}px)`,
+                      objectFit: 'cover',
+                      borderRadius: cloneExpanded ? 0 : origin.borderRadius,
+                      willChange: 'transform, width, height, opacity, border-radius',
+                      transition:
+                        'transform 300ms cubic-bezier(0.32,0.72,0,1),' +
+                        ' width 300ms cubic-bezier(0.32,0.72,0,1),' +
+                        ' height 300ms cubic-bezier(0.32,0.72,0,1),' +
+                        ' border-radius 240ms cubic-bezier(0.32,0.72,0,1),' +
+                        ' opacity 120ms linear',
+                      opacity: firstFrameReady ? 0 : 1,
+                      pointerEvents: 'none',
+                      zIndex: 2,
+                      background: '#000',
+                    }}
+                  />
+                )}
               </>
             )}
             {/* <FullscreenDebugPanel /> — hidden; re-enable here when debugging needed */}
