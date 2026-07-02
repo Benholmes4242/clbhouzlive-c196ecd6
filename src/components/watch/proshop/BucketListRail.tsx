@@ -1,4 +1,5 @@
-import { memo, useMemo } from 'react';
+import { memo, useMemo, useRef } from 'react';
+import { useRailAutoplay } from '../shared/useRailAutoplay';
 import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
@@ -124,6 +125,9 @@ function BucketListRailInner() {
     </section>
   );
 
+  const railRef = useRef<HTMLDivElement>(null);
+  const activeIdx = useRailAutoplay(railRef, orderedPosts.length);
+
   if (!hasResolved || stillLoading) return skeleton;
   if (courses.length === 0 || orderedPosts.length === 0) return null;
 
@@ -136,43 +140,47 @@ function BucketListRailInner() {
         style={{ pointerEvents: revealed ? 'auto' : 'none' }}
       >
         <SectionHeader role="rail" paddingTop={18} paddingX={16} title="Bucket list" />
-        <HRail>
-          {orderedPosts.map((post, i) => (
-            <div
-              key={post.id}
-              style={{ scrollSnapAlign: 'start', flexShrink: 0, width: 158 }}
-            >
-              <WatchRailTile
-                post={post}
-                index={i}
-                allPosts={orderedPosts}
-                width={158}
-                aspectRatio="1/1"
-                radius={6}
-                thumbHeightPx={316}
-                onDecoded={i < VISIBLE_COUNT ? onDecoded : undefined}
-              />
+        <div ref={railRef}>
+          <HRail>
+            {orderedPosts.map((post, i) => (
+              <div
+                key={post.id}
+                style={{ scrollSnapAlign: 'start', flexShrink: 0, width: 158 }}
+              >
+                <WatchRailTile
+                  post={post}
+                  index={i}
+                  allPosts={orderedPosts}
+                  width={158}
+                  aspectRatio="1/1"
+                  radius={6}
+                  thumbHeightPx={316}
+                  onDecoded={i < VISIBLE_COUNT ? onDecoded : undefined}
+                  isAutoplayActive={activeIdx === i}
+                />
 
-              {courseNameByPostId.get(post.id) && (
-                <div
-                  style={{
-                    fontSize: 12.5,
-                    fontWeight: 700,
-                    color: '#0F172A',
-                    marginTop: 6,
-                    whiteSpace: 'nowrap',
-                    overflow: 'hidden',
-                    textOverflow: 'ellipsis',
-                    maxWidth: 158,
-                  }}
-                >
-                  {courseNameByPostId.get(post.id)}
-                </div>
-              )}
-            </div>
-          ))}
-        </HRail>
+                {courseNameByPostId.get(post.id) && (
+                  <div
+                    style={{
+                      fontSize: 12.5,
+                      fontWeight: 700,
+                      color: '#0F172A',
+                      marginTop: 6,
+                      whiteSpace: 'nowrap',
+                      overflow: 'hidden',
+                      textOverflow: 'ellipsis',
+                      maxWidth: 158,
+                    }}
+                  >
+                    {courseNameByPostId.get(post.id)}
+                  </div>
+                )}
+              </div>
+            ))}
+          </HRail>
+        </div>
       </motion.section>
+
 
       {!revealed && (
         <div style={{ position: 'absolute', inset: 0, pointerEvents: 'none' }}>
