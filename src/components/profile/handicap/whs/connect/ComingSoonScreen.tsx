@@ -162,9 +162,7 @@ export const ComingSoonScreen: React.FC<Props> = ({ country, onChangeCountry }) 
         lineHeight: 1.5,
       }}
     >
-      {joined
-        ? `You're one of the first to request ${country.body}.`
-        : `Be one of the first to request ${country.body}.`}
+      Your request counts - we prioritise the most-requested authorities.
     </div>
   );
 
