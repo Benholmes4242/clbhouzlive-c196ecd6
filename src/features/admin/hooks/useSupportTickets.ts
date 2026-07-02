@@ -98,7 +98,8 @@ export function useSupportThread(ticketId: string | null) {
     enabled: !!ticketId,
     queryFn: async (): Promise<SupportMessageRow[]> => {
       if (!ticketId) return [];
-      const { data, error } = await supabase
+      const sb: any = supabase;
+      const { data, error } = await sb
         .from('support_messages')
         .select('id, ticket_id, sender_id, sender_role, body, created_at')
         .eq('ticket_id', ticketId)
@@ -107,7 +108,7 @@ export function useSupportThread(ticketId: string | null) {
       const rows = (data ?? []) as any[];
       const senderIds = Array.from(new Set(rows.map((r) => r.sender_id)));
       if (senderIds.length === 0) return [];
-      const { data: profiles } = await supabase
+      const { data: profiles } = await sb
         .from('user_profiles')
         .select('user_id, display_name, username, profile_photo_url')
         .in('user_id', senderIds);
