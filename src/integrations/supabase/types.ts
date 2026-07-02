@@ -6378,6 +6378,39 @@ export type Database = {
         }
         Relationships: []
       }
+      help_articles: {
+        Row: {
+          answer: string
+          category: string
+          created_at: string
+          id: string
+          is_published: boolean
+          question: string
+          sort_order: number
+          updated_at: string
+        }
+        Insert: {
+          answer: string
+          category?: string
+          created_at?: string
+          id?: string
+          is_published?: boolean
+          question: string
+          sort_order?: number
+          updated_at?: string
+        }
+        Update: {
+          answer?: string
+          category?: string
+          created_at?: string
+          id?: string
+          is_published?: boolean
+          question?: string
+          sort_order?: number
+          updated_at?: string
+        }
+        Relationships: []
+      }
       hidden_comments: {
         Row: {
           comment_id: string
@@ -11052,36 +11085,71 @@ export type Database = {
           },
         ]
       }
-      support_tickets: {
+      support_messages: {
         Row: {
-          context: Json | null
+          body: string
           created_at: string
-          description: string
           id: string
-          status: string
-          type: string
-          updated_at: string
-          user_id: string | null
+          sender_id: string
+          sender_role: string
+          ticket_id: string
         }
         Insert: {
-          context?: Json | null
+          body: string
           created_at?: string
-          description: string
           id?: string
-          status?: string
-          type?: string
-          updated_at?: string
-          user_id?: string | null
+          sender_id: string
+          sender_role: string
+          ticket_id: string
         }
         Update: {
-          context?: Json | null
+          body?: string
           created_at?: string
-          description?: string
           id?: string
+          sender_id?: string
+          sender_role?: string
+          ticket_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "support_messages_ticket_id_fkey"
+            columns: ["ticket_id"]
+            isOneToOne: false
+            referencedRelation: "support_tickets"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      support_tickets: {
+        Row: {
+          category: string
+          created_at: string
+          id: string
+          last_message_at: string
+          last_sender: string
+          status: string
+          subject: string
+          user_id: string
+        }
+        Insert: {
+          category?: string
+          created_at?: string
+          id?: string
+          last_message_at?: string
+          last_sender?: string
           status?: string
-          type?: string
-          updated_at?: string
-          user_id?: string | null
+          subject: string
+          user_id: string
+        }
+        Update: {
+          category?: string
+          created_at?: string
+          id?: string
+          last_message_at?: string
+          last_sender?: string
+          status?: string
+          subject?: string
+          user_id?: string
         }
         Relationships: []
       }
