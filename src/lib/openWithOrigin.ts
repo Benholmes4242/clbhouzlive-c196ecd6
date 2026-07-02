@@ -56,9 +56,15 @@ interface OpenWithOriginArgs {
   posterUrl: string | null | undefined;
   /** HLS urls to hand off (typically the tapped tile's active url). */
   handOffUrls?: (string | null | undefined)[];
-  options?: Parameters<typeof useFullscreenFeedStore.getState>[0] extends never
-    ? never
-    : Omit<Parameters<ReturnType<typeof useFullscreenFeedStore.getState>['open']>[2] & object, 'origin'>;
+  options?: {
+    openCommentsInitially?: boolean;
+    initialCommentId?: string | null;
+    onClose?: () => void;
+    hasNextPage?: boolean;
+    fetchNextPage?: () => void;
+    isFetchingNextPage?: boolean;
+    readOnly?: boolean;
+  };
 }
 
 export function openWithOrigin({
