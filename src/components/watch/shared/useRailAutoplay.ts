@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState, type RefObject } from 'react';
-import usePrefersReducedMotion from '@/hooks/usePrefersReducedMotion';
+import { usePrefersReducedMotion } from '@/hooks/usePrefersReducedMotion';
 import { useWatchRevealed } from '../WatchRevealContext';
 
 /**
