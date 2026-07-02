@@ -374,6 +374,20 @@ export function AppPrefetchProvider({
   const queryClient = useQueryClient();
   const prefetchedRoutes = useRef<Set<string>>(new Set());
   const timeoutRef = useRef<NodeJS.Timeout | null>(null);
+  // Phase 6: single AbortController for all speculative HLS work.
+  // Aborted on visibilitychange -> hidden; replaced when visible again.
+  const speculativeAbortRef = useRef<AbortController>(new AbortController());
+
+  useEffect(() => {
+    const onVis = () => {
+      if (document.visibilityState === 'hidden') {
+        speculativeAbortRef.current.abort();
+        speculativeAbortRef.current = new AbortController();
+      }
+    };
+    document.addEventListener('visibilitychange', onVis);
+    return () => document.removeEventListener('visibilitychange', onVis);
+  }, []);
 
   // Check if we should prefetch based on connection
   const shouldPrefetch = useCallback(() => {
