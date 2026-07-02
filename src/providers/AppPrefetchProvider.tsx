@@ -414,7 +414,7 @@ export function AppPrefetchProvider({
       if (urlsToPreload.length === 0) return;
 
       await Promise.allSettled(
-        urlsToPreload.map(url => preloadHlsManifest(url))
+        urlsToPreload.map(url => preloadHlsManifest(url, undefined, { signal: speculativeAbortRef.current.signal }))
       );
     } catch {
       // Silent fail - prefetch errors shouldn't block the app
