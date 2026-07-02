@@ -16,7 +16,6 @@
  */
 import type { FeedPost } from '@/components/media-system/types/media';
 import { useFullscreenFeedStore, type OpenOrigin } from '@/store/fullscreenFeedStore';
-import { lockBodyScroll } from '@/lib/bodyScrollLock';
 import { HLSPoolManager } from '@/media/HLSPoolManager';
 
 function prefersReducedMotion(): boolean {
