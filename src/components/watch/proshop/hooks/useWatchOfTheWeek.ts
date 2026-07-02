@@ -20,7 +20,9 @@ export interface WatchOfTheWeek {
   comment_count: number;
   created_at: string;
   why_ai: string | null;
+  stream_id: string | null;
 }
+
 
 export function useWatchOfTheWeek(
   userId: string | undefined,
