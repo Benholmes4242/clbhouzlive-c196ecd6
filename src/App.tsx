@@ -486,8 +486,11 @@ function AppRoutes() {
         <Route path="/manage/notifications" element={<Suspense fallback={<ProfileSkeleton />}><ManageNotificationsPage /></Suspense>} />
         <Route path="/manage/help" element={<Suspense fallback={<ProfileSkeleton />}><ManageHelpPage /></Suspense>} />
         <Route path="/manage/contact" element={<Suspense fallback={<ProfileSkeleton />}><ManageContactPage /></Suspense>} />
+        <Route path="/manage/requests" element={<Suspense fallback={<ProfileSkeleton />}><ManageMyRequestsPage /></Suspense>} />
+        <Route path="/support/thread/:id" element={<Suspense fallback={<ProfileSkeleton />}><SupportThreadPage /></Suspense>} />
         <Route path="/manage/legal" element={<Suspense fallback={<ProfileSkeleton />}><ManageLegalPage /></Suspense>} />
         <Route path="/manage/handicap" element={<Suspense fallback={<ProfileSkeleton />}><ManageHandicapPage /></Suspense>} />
+
         
         
         <Route path="/profile/:username" element={<ProfileWrapped />} />
