@@ -236,10 +236,10 @@ function WatchOfTheWeekHeroInner() {
       >
         <Kicker color="amber">Watch of the Week</Kicker>
 
-        <button
-          type="button"
-          onClick={handleTap}
-          className="block w-full text-left active:scale-[0.99] transition-transform"
+        <Pressable
+          as="button"
+          variant="card"
+          onPress={handleTap}
           style={{
             position: 'relative',
             width: '100%',
@@ -250,8 +250,12 @@ function WatchOfTheWeekHeroInner() {
             border: 'none',
             padding: 0,
             marginTop: 6,
+            display: 'block',
+            textAlign: 'left',
           }}
+          innerStyle={{ position: 'absolute', inset: 0 }}
         >
+
           <div ref={heroTileRef} style={{ position: 'absolute', inset: 0 }}>
             {pick.thumbnail_url ? (
               <DecodedImage
