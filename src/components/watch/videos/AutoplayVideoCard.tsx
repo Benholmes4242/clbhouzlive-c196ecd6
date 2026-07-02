@@ -42,6 +42,7 @@ export interface AutoplayVideoCardProps {
   metaPadX?: number;
   /** Fires once the poster thumbnail bitmap is ready. */
   onDecoded?: () => void;
+  debugId?: string;
 }
 
 function AutoplayVideoCardInner({ post, index, allPosts, userId, active, borderRadius = 6, metaPadX = 16, onDecoded }: AutoplayVideoCardProps) {
