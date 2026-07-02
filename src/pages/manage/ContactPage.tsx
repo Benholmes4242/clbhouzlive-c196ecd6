@@ -31,6 +31,10 @@ export default function ContactPage() {
   const [submitting, setSubmitting] = useState(false);
   const [submittedId, setSubmittedId] = useState<string | null>(null);
 
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
+
   const canSubmit =
     !submitting && subject.trim().length > 0 && message.trim().length > 0 && !!user?.id;
 
