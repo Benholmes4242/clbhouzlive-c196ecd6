@@ -1,8 +1,8 @@
-import { lazy, Suspense, useState } from 'react';
+import { Suspense, useState, lazy } from 'react';
 import WatchGridSkeleton from '@/components/watch/WatchGridSkeleton';
+import WatchTabContent from '@/components/watch/WatchTabContent';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 
-const WatchTabContent = lazy(() => import('@/components/watch/WatchTabContent'));
 const WatchSearchOverlay = lazy(() => import('@/components/watch/WatchSearchOverlay'));
 
 export default function WatchTab() {
@@ -12,9 +12,7 @@ export default function WatchTab() {
 
   return (
     <>
-      <Suspense fallback={<WatchGridSkeleton />}>
-        <WatchTabContent embedded />
-      </Suspense>
+      <WatchTabContent embedded />
       {isSearchOpen && (
         <Suspense fallback={null}>
           <WatchSearchOverlay
