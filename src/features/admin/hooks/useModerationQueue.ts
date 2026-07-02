@@ -17,6 +17,7 @@ export interface RawUserReport {
   reviewed_by: string | null;
   reviewed_at: string | null;
   resolution_note?: string | null;
+  is_high_priority?: boolean | null;
 }
 
 export interface RawPostReport {
@@ -43,6 +44,8 @@ export interface PostLite {
   user_id: string;
   content: string | null;
   created_at: string;
+  auto_hidden?: boolean | null;
+  moderation_hidden?: boolean | null;
   author?: ProfileLite | null;
 }
 
@@ -64,6 +67,8 @@ export interface ModerationQueueRow {
   created_at: string; // newest report timestamp
   reviewed_by?: string | null;
   reviewed_at?: string | null;
+  is_high_priority: boolean;
+  auto_hidden: boolean;
 }
 
 export interface QueueFilters {
