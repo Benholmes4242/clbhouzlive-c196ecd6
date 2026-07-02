@@ -40,8 +40,6 @@ function UnifiedWatchFeedInner({ embedded = false }: UnifiedWatchFeedProps) {
   const userId = session?.user?.id;
   const gridRef = useRef<HTMLDivElement>(null);
 
-  // wrtStart lives inside WatchRevealProvider now — it fires during provider
-  // render before any child registers, giving warm visits a sane t0.
 
 
 
