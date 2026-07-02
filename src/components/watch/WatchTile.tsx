@@ -6,6 +6,8 @@ import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import DecodedImage from './shared/DecodedImage';
 import { buildLqipUrl } from '@/utils/mediaThumbs';
 import { shouldUseLqip } from '@/utils/lqipQueue';
+import Pressable from '@/components/ui/Pressable';
+
 
 
 function abbreviateCount(n: number): string {
