@@ -77,7 +77,53 @@ function BucketListRailInner() {
     return m;
   }, [courses]);
 
-  if (coursesLoading || postsLoading) return null;
+  const stillLoading = coursesLoading || postsLoading;
+
+  // Reserve final height while loading so late-resolving posts don't push
+  // the rest of the feed down. Only collapse once we've confirmed the user
+  // has no bucket list or no resolvable posts.
+  if (stillLoading) {
+    return (
+      <section style={{ background: 'hsl(var(--background))' }}>
+        <SectionHeader role="rail" paddingTop={18} paddingX={16} title="Bucket list" />
+        <div
+          style={{
+            display: 'flex',
+            gap: 12,
+            padding: '0 16px 4px',
+            overflow: 'hidden',
+          }}
+        >
+          {[0, 1, 2, 3].map((i) => (
+            <div key={i} style={{ flexShrink: 0, width: 158 }}>
+              <div
+                style={{
+                  width: 158,
+                  height: 158,
+                  borderRadius: 6,
+                  background: 'rgba(0,0,0,0.06)',
+                  backgroundImage:
+                    'linear-gradient(90deg, transparent 0%, rgba(0,0,0,0.08) 50%, transparent 100%)',
+                  backgroundSize: '200% 100%',
+                  animation: `clb-shimmer ${1.5 + i * 0.15}s ease-in-out infinite`,
+                }}
+              />
+              <div
+                style={{
+                  marginTop: 6,
+                  width: 120,
+                  height: 12,
+                  borderRadius: 4,
+                  background: 'rgba(0,0,0,0.06)',
+                }}
+              />
+            </div>
+          ))}
+        </div>
+      </section>
+    );
+  }
+
   if (courses.length === 0 || orderedPosts.length === 0) return null;
 
   return (
