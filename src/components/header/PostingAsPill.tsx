@@ -203,7 +203,9 @@ export const PostingAsPill = forwardRef<HTMLButtonElement, PostingAsPillProps>(
               alt={activeActor.name}
               userId={activeActor.id}
               hairlineRing
+              onLoad={onAvatarLoad}
             />
+
           </span>
           
           {/* Orange badge — social notifications (top-right) */}
