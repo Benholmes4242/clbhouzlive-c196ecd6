@@ -63,6 +63,7 @@ export default function WatchRailTile({
   aspectRatio = '3/4',
   radius = 6,
   onDecoded,
+  debugId,
 }: WatchRailTileProps) {
   const cardRef = useRef<HTMLDivElement>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
