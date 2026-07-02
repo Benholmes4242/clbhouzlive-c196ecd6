@@ -97,7 +97,7 @@ const DecodedImage = React.forwardRef<HTMLImageElement, DecodedImageProps>(
 
     // LQIP: rate-limited fetch slot so 20 tiles can't flood the network.
     useEffect(() => {
-      if (!lqipSrc) {
+      if (!useLqip) {
         setLqipResolved(null);
         setLqipLoaded(false);
         return;
@@ -116,12 +116,13 @@ const DecodedImage = React.forwardRef<HTMLImageElement, DecodedImageProps>(
         cancelled = true;
         if (releaseFn) releaseFn();
       };
-    }, [lqipSrc]);
+    }, [lqipSrc, useLqip]);
 
     if (!src) return null;
 
-    // No LQIP requested — legacy shape (bare <img>) to keep parent layouts identical.
-    if (!lqipSrc) {
+    // No LQIP requested (or reduced-motion) — legacy shape (bare <img>).
+    if (!useLqip) {
+
       return (
         <img
           ref={setRefs}
