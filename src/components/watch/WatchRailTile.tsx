@@ -163,8 +163,14 @@ export default function WatchRailTile({
   }, [isAutoplayActive, hlsUrl, mp4Url]);
 
   const handleClick = useCallback(() => {
-    useFullscreenFeedStore.getState().open(allPosts, index);
-  }, [allPosts, index]);
+    openWithOrigin({
+      posts: allPosts,
+      index,
+      originEl: cardRef.current,
+      posterUrl: thumb ?? null,
+      handOffUrls: [hlsUrl],
+    });
+  }, [allPosts, index, thumb, hlsUrl]);
 
   const surfacingReason = useMemo(
     () => deriveSurfacingReason(post, viewedPostIds),
