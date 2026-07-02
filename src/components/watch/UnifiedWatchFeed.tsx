@@ -40,6 +40,11 @@ function UnifiedWatchFeedInner({ embedded = false }: UnifiedWatchFeedProps) {
   const userId = session?.user?.id;
   const gridRef = useRef<HTMLDivElement>(null);
 
+  useEffect(() => {
+    wrtStart();
+  }, []);
+
+
   const { mood, setMood } = useWatchMood();
 
   // Mood pills (in ShellSlot) drive both rails and the grid. useWatchFeed
