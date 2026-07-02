@@ -1,10 +1,10 @@
 import { useFullscreenFeedStore } from '@/store/fullscreenFeedStore';
 import { useRef, useEffect, useState, useCallback, useMemo } from 'react';
 import { Heart } from 'lucide-react';
-import Hls from 'hls.js';
 import type { FeedPost } from '@/components/media-system/types/media';
 import { Pin } from './proshop/Pin';
-import AnimatedTileThumb from './shared/AnimatedTileThumb';
+import DecodedImage from './shared/DecodedImage';
+import { attachHlsToTile } from '@/hooks/useTileVideoPlayer';
 import { getThumbnailUrl } from '@/media/utils/thumbnail';
 
 
@@ -28,9 +28,14 @@ interface WatchRailTileProps {
   radius?: number;
   /** Fires once the tile's thumbnail bitmap is ready (used to gate coordinated reveal). */
   onDecoded?: () => void;
-  /** When set, request a sized thumbnail variant (e.g. imagedelivery /h=NNN) sized
-   *  for this tile geometry instead of decoding the full-res original. */
+  /** When set, request a sized thumbnail variant. */
   thumbHeightPx?: number;
+  /**
+   * Rail-coordinator-owned autoplay slot. When true, mount + play muted looped
+   * video; when false, pause and hide video (poster stays visible under).
+   * Absent → no autoplay attempted (used by lists that don't coordinate).
+   */
+  isAutoplayActive?: boolean;
 }
 
 
@@ -51,10 +56,8 @@ function deriveSurfacingReason(
 
 /**
  * Canonical horizontal-rail tile for the Watch surface.
- * Used by `TrendingThisWeek` (with rank) and `LatestVideosRail` (no rank).
- *
- * Per-card autoplay: plays once when 40% visible, freezes on last frame,
- * shows a glass play affordance afterwards.
+ * Autoplay is externally coordinated: only plays when `isAutoplayActive`
+ * is true. Muted + looped for as long as the slot is held.
  */
 export default function WatchRailTile({
   post,
@@ -67,79 +70,97 @@ export default function WatchRailTile({
   radius = 6,
   onDecoded,
   thumbHeightPx,
+  isAutoplayActive = false,
 }: WatchRailTileProps) {
   const cardRef = useRef<HTMLDivElement>(null);
-  const videoRef = useRef<HTMLVideoElement>(null);
-  const hlsRef = useRef<Hls | null>(null);
-  const [hasPlayed, setHasPlayed] = useState(false);
-  const [isPlaying, setIsPlaying] = useState(false);
+  const videoRef = useRef<HTMLVideoElement | null>(null);
+  const hlsRef = useRef<any>(null);
+  const [videoVisible, setVideoVisible] = useState(false);
 
   const media = post.mediaItems[0];
   const rawThumb = media?.thumbnailUrl || media?.imageUrl || '';
   const thumb = useMemo(() => {
     if (!rawThumb || !thumbHeightPx) return rawThumb;
-    // Sized variant: routes imagedelivery.net through /h=NNN; passes through
-    // other hosts unchanged. Cloudflare Stream posters would be routed via
-    // streamId if MediaItem carried one — it does not today, so imageUrl
-    // pass-through is the correct fallback.
     return getThumbnailUrl({ imageUrl: rawThumb, height: thumbHeightPx });
   }, [rawThumb, thumbHeightPx]);
   const hlsUrl = media?.hlsUrl || '';
+  const mp4Url = (media as any)?.videoUrl || (media as any)?.mp4Url;
 
-
+  // Coordinator-owned autoplay: attach HLS + loop when active, tear down when not.
   useEffect(() => {
-    const el = cardRef.current;
-    if (!el || !hlsUrl || hasPlayed) return;
+    const card = cardRef.current;
+    if (!card) return;
+    if (!isAutoplayActive) {
+      // Losing the slot — pause + hide + release.
+      setVideoVisible(false);
+      const v = videoRef.current;
+      if (v) {
+        try { v.pause(); } catch {}
+        v.removeAttribute('src');
+        try { v.load(); } catch {}
+        if (v.parentElement) v.parentElement.removeChild(v);
+      }
+      videoRef.current = null;
+      if (hlsRef.current) {
+        try { hlsRef.current.destroy(); } catch {}
+        hlsRef.current = null;
+      }
+      return;
+    }
+    if (!hlsUrl && !mp4Url) return;
 
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting && !hasPlayed) {
-          startAutoplay();
-          observer.disconnect();
-        }
-      },
-      { threshold: 0.4 },
-    );
-    observer.observe(el);
-    return () => observer.disconnect();
-  }, [hlsUrl, hasPlayed]);
+    let cancelled = false;
+    const v = document.createElement('video');
+    v.muted = true;
+    v.loop = true;
+    v.playsInline = true;
+    v.setAttribute('webkit-playsinline', '');
+    v.setAttribute('muted', '');
+    v.style.cssText =
+      'position:absolute;inset:0;width:100%;height:100%;object-fit:cover;pointer-events:none;opacity:0;transition:opacity 200ms ease;z-index:1;';
+    card.appendChild(v);
+    videoRef.current = v;
 
-  const startAutoplay = useCallback(() => {
-    const video = videoRef.current;
-    if (!video || !hlsUrl) return;
+    const onReady = () => {
+      if (cancelled) return;
+      v.style.opacity = '1';
+      setVideoVisible(true);
+      v.play().catch(() => {});
+    };
 
-    video.muted = true;
-    video.playsInline = true;
-
-    if (Hls.isSupported()) {
-      const hls = new Hls({ enableWorker: false, maxBufferLength: 4 });
-      hls.loadSource(hlsUrl);
-      hls.attachMedia(video);
-      hls.on(Hls.Events.MANIFEST_PARSED, () => {
-        video.play().catch(() => {});
-      });
-      hlsRef.current = hls;
-    } else if (video.canPlayType('application/vnd.apple.mpegurl')) {
-      video.src = hlsUrl;
-      video.play().catch(() => {});
+    if (hlsUrl) {
+      attachHlsToTile({ hlsUrl, mp4Fallback: mp4Url, video: v, onReady })
+        .then((hls) => {
+          if (cancelled) {
+            hls?.destroy?.();
+            return;
+          }
+          hlsRef.current = hls;
+        })
+        .catch(() => {});
+    } else if (mp4Url) {
+      v.src = mp4Url;
+      v.addEventListener('canplay', onReady, { once: true });
+      v.play().catch(() => {});
     }
 
-    setIsPlaying(true);
-
-    video.onended = () => {
-      setIsPlaying(false);
-      setHasPlayed(true);
-      hlsRef.current?.destroy();
-      hlsRef.current = null;
-    };
-  }, [hlsUrl]);
-
-  useEffect(() => {
     return () => {
-      hlsRef.current?.destroy();
-      hlsRef.current = null;
+      cancelled = true;
+      setVideoVisible(false);
+      const cur = videoRef.current;
+      if (cur) {
+        try { cur.pause(); } catch {}
+        cur.removeAttribute('src');
+        try { cur.load(); } catch {}
+        if (cur.parentElement) cur.parentElement.removeChild(cur);
+      }
+      videoRef.current = null;
+      if (hlsRef.current) {
+        try { hlsRef.current.destroy(); } catch {}
+        hlsRef.current = null;
+      }
     };
-  }, []);
+  }, [isAutoplayActive, hlsUrl, mp4Url]);
 
   const handleClick = useCallback(() => {
     useFullscreenFeedStore.getState().open(allPosts, index);
@@ -153,6 +174,7 @@ export default function WatchRailTile({
   return (
     <div
       ref={cardRef}
+      data-rail-tile-index={index}
       style={{
         flexShrink: 0,
         position: 'relative',
@@ -164,38 +186,22 @@ export default function WatchRailTile({
       }}
       onClick={handleClick}
     >
-      {/* Thumbnail — decode-gated so the coordinated reveal only fires
-          when pixels are actually painted. */}
-      <AnimatedTileThumb
-        posterSrc={thumb}
-        streamId={media?.streamId}
-        heightPx={thumbHeightPx ?? 316}
-        dwellMs={1000}
+      {/* Poster — decode-gated for coordinated reveal. Stays behind video. */}
+      <DecodedImage
+        src={thumb}
         alt=""
+        loading="lazy"
         onDecoded={onDecoded}
         style={{
           position: 'absolute',
           inset: 0,
+          width: '100%',
+          height: '100%',
+          objectFit: 'cover',
+          opacity: videoVisible ? 0 : 1,
+          transition: 'opacity 200ms ease',
         }}
       />
-
-      {/* Autoplay video layer */}
-      {hlsUrl && (
-        <video
-          ref={videoRef}
-          muted
-          playsInline
-          style={{
-            position: 'absolute',
-            inset: 0,
-            width: '100%',
-            height: '100%',
-            objectFit: 'cover',
-            opacity: isPlaying ? 1 : 0,
-            transition: 'opacity 0.3s',
-          }}
-        />
-      )}
 
       {/* Gradient */}
       <div
@@ -205,10 +211,11 @@ export default function WatchRailTile({
           background:
             'linear-gradient(to top, rgba(0,0,0,0.80) 0%, rgba(0,0,0,0.1) 45%, transparent 70%)',
           pointerEvents: 'none',
+          zIndex: 2,
         }}
       />
 
-      {/* Surfacing reason — amber Pin (NEW / POPULAR REVIEW), top-left */}
+      {/* Surfacing reason */}
       {surfacingReason && (
         <div
           style={{
@@ -224,7 +231,7 @@ export default function WatchRailTile({
         </div>
       )}
 
-      {/* Optional rank — bold translucent filled marker, top-left */}
+      {/* Optional rank */}
       {typeof rank === 'number' && (
         <span
           style={{
@@ -238,7 +245,7 @@ export default function WatchRailTile({
             color: 'rgba(255,255,255,0.32)',
             textShadow: '0 2px 12px rgba(0,0,0,0.18)',
             pointerEvents: 'none',
-            zIndex: 2,
+            zIndex: 3,
             userSelect: 'none',
           }}
         >
@@ -246,8 +253,7 @@ export default function WatchRailTile({
         </span>
       )}
 
-
-      {/* Likes — amber heart, no pill, text-shadow handles legibility */}
+      {/* Likes */}
       {(post.likeCount ?? 0) > 0 && (
         <div
           style={{
@@ -262,6 +268,7 @@ export default function WatchRailTile({
             alignItems: 'center',
             gap: 4,
             textShadow: '0 1px 3px rgba(0,0,0,0.6)',
+            zIndex: 3,
           }}
         >
           <Heart
@@ -271,7 +278,6 @@ export default function WatchRailTile({
           {post.likeCount}
         </div>
       )}
-
     </div>
   );
 }
