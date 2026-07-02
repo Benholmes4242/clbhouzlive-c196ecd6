@@ -325,6 +325,35 @@ const ROUTE_CONFIGS: RoutePrefetchConfig[] = [
     },
     videoPrefetchCount: 8,
   },
+  // ============ Phase 6 additions ============
+  // Route stubs at priority 2. No queryFn — the existing prefetchConfig()
+  // path will only HLS-warm from cache if the primary hook has already
+  // populated it (e.g. previous visit, persisted cache). This makes the
+  // paths "known" to triggerPrefetch(), so tab-touchstart warm-up is a
+  // no-op-safe call rather than a "not found" fall-through. Rails warm
+  // themselves on reveal via useRailAutoplay — do not compete here.
+  {
+    // /watch primary grid: warm HLS for any short-form video cache hit.
+    path: '/watch',
+    queryKey: ['clubhouse-explore-shorts'],
+    priority: 2,
+    extractVideoUrls: (data) => extractVideoUrlsFromArray(data, 6),
+    videoPrefetchCount: 6,
+  },
+  {
+    // /courses is thumbnail-only — no video prefetch (LQIP handles perceived load).
+    path: '/courses',
+    queryKey: ['golf-courses-infinite'],
+    priority: 2,
+    videoPrefetchCount: 0,
+  },
+  {
+    // /tourhub: warm cached tournaments; no video prefetch (hero rarely a video).
+    path: '/tourhub',
+    queryKey: ['tournaments-cache'],
+    priority: 2,
+    videoPrefetchCount: 0,
+  },
 ];
 
 // ============ Provider ============
