@@ -1,6 +1,8 @@
 import { useEffect, useRef, useCallback } from 'react';
 import type { FeedPost } from '@/components/media-system/types/media';
 import { attachHlsToTile, prefetchTile } from '@/hooks/useTileVideoPlayer';
+import { usePrefersReducedMotion } from '@/hooks/usePrefersReducedMotion';
+
 
 const VIDEO_POOL_SIZE = 2;
 const AUTOPLAY_THRESHOLD = 0.5;
