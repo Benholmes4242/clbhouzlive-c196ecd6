@@ -30,12 +30,6 @@ export interface WaitlistNotifyStatus {
   pending: number;
   total: number;
 }
-  profile: {
-    display_name: string | null;
-    username: string | null;
-    profile_photo_url: string | null;
-  } | null;
-}
 
 export const WAITLIST_SUMMARY_KEY = ['admin-v2', 'waitlist', 'summary'] as const;
 export const WAITLIST_DRILLDOWN_KEY = (countryId: string | null) =>
