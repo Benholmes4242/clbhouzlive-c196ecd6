@@ -96,7 +96,13 @@ export default function HandicapManagePage() {
             onDelete={() => setConfirmDelete(true)}
           />
         ) : (
-          <WhsConnectScreen onConnected={() => { invalidateAll(); }} onSkip={() => { /* stay on page */ }} />
+          <WhsConnectScreen
+            onConnected={async () => {
+              invalidateAll();
+              navigate('/handicap', { replace: true });
+            }}
+            onSkip={() => { /* stay on page */ }}
+          />
         )}
       </div>
 
