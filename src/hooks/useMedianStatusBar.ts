@@ -88,7 +88,16 @@ export function useMedianStatusBar(
       const c = configRef.current;
       if (!c.enabled) return;
 
+      // Route-scope guard: bail if this hook does not own the current route.
+      const owner = ownerRef.current;
+      if (owner) {
+        const path = window.location.pathname;
+        const matches = typeof owner === 'function' ? owner(path) : owner === path;
+        if (!matches) return;
+      }
+
       const color = c.hexColor === 'transparent' ? 'transparent' : (c.hexColor || '#000000');
+
 
       // 1. Update the persistent shield — this NEVER gets cleaned up
       applyShieldColor(color);
