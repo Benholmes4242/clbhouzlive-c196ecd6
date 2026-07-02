@@ -55,21 +55,12 @@ const WatchTile: React.FC<WatchTileProps> = ({ post, index, allPosts, onDecoded 
       }
     >
       {thumbnailUrl ? (
-        <img
-          ref={imgRef}
+        <DecodedImage
           src={thumbnailUrl}
           alt=""
           className="absolute inset-0 w-full h-full object-cover"
           loading="lazy"
-          decoding="async"
-          onLoad={() => {
-            setLoaded(true);
-            notifyDecoded();
-          }}
-          style={{
-            opacity: loaded ? 1 : 0,
-            transition: 'opacity 120ms ease-out',
-          }}
+          onDecoded={onDecoded}
         />
       ) : (
         <div className="absolute inset-0 flex items-center justify-center bg-muted">
