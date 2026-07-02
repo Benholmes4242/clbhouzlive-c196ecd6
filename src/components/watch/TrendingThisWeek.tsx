@@ -89,6 +89,21 @@ export default function TrendingThisWeek({ enabled = true }: TrendingThisWeekPro
 
   // Data present: mount content NOW so DecodedImages can decode under the
   // skeleton overlay. Content stays hidden until coordinated reveal fires.
+  return <TrendingThisWeekBody topPosts={topPosts} navigate={navigate} viewedPostIds={viewedPostIds} onDecoded={onDecoded} revealed={revealed} skeleton={skeleton} />;
+}
+
+interface BodyProps {
+  topPosts: any[];
+  navigate: ReturnType<typeof useNavigate>;
+  viewedPostIds: Set<string> | undefined;
+  onDecoded: (() => void) | undefined;
+  revealed: boolean;
+  skeleton: React.ReactNode;
+}
+
+function TrendingThisWeekBody({ topPosts, navigate, viewedPostIds, onDecoded, revealed, skeleton }: BodyProps) {
+  const railRef = useRef<HTMLDivElement>(null);
+  const activeIdx = useRailAutoplay(railRef, topPosts.length);
   return (
     <div style={{ position: 'relative', background: 'hsl(var(--background))' }}>
       <motion.div
@@ -104,20 +119,24 @@ export default function TrendingThisWeek({ enabled = true }: TrendingThisWeekPro
           paddingX={16}
         />
 
-        <HRail paddingBottom={4}>
-          {topPosts.map((post, i) => (
-            <div key={post.id} style={{ scrollSnapAlign: 'start' }}>
-              <WatchRailTile
-                post={post}
-                index={i}
-                allPosts={topPosts}
-                viewedPostIds={viewedPostIds}
-                onDecoded={i < VISIBLE_COUNT ? onDecoded : undefined}
-              />
-            </div>
-          ))}
-        </HRail>
+        <div ref={railRef}>
+          <HRail paddingBottom={4}>
+            {topPosts.map((post, i) => (
+              <div key={post.id} style={{ scrollSnapAlign: 'start' }}>
+                <WatchRailTile
+                  post={post}
+                  index={i}
+                  allPosts={topPosts}
+                  viewedPostIds={viewedPostIds}
+                  onDecoded={i < VISIBLE_COUNT ? onDecoded : undefined}
+                  isAutoplayActive={activeIdx === i}
+                />
+              </div>
+            ))}
+          </HRail>
+        </div>
       </motion.div>
+
 
       {!revealed && (
         <div style={{ position: 'absolute', inset: 0, pointerEvents: 'none' }}>
