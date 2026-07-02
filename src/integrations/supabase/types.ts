@@ -7964,6 +7964,7 @@ export type Database = {
           actor_id: string
           actor_type: string
           audio_mode: string | null
+          auto_hidden: boolean
           badges: string[]
           caddie_pick_comment_id: string | null
           categories: string[]
@@ -7998,6 +7999,7 @@ export type Database = {
           actor_id: string
           actor_type?: string
           audio_mode?: string | null
+          auto_hidden?: boolean
           badges?: string[]
           caddie_pick_comment_id?: string | null
           categories?: string[]
@@ -8032,6 +8034,7 @@ export type Database = {
           actor_id?: string
           actor_type?: string
           audio_mode?: string | null
+          auto_hidden?: boolean
           badges?: string[]
           caddie_pick_comment_id?: string | null
           categories?: string[]
@@ -8698,6 +8701,7 @@ export type Database = {
           created_at: string | null
           details: string | null
           id: string
+          is_high_priority: boolean
           reason: string
           reported_conversation_id: string | null
           reported_user_id: string | null
@@ -8711,6 +8715,7 @@ export type Database = {
           created_at?: string | null
           details?: string | null
           id?: string
+          is_high_priority?: boolean
           reason: string
           reported_conversation_id?: string | null
           reported_user_id?: string | null
@@ -8724,6 +8729,7 @@ export type Database = {
           created_at?: string | null
           details?: string | null
           id?: string
+          is_high_priority?: boolean
           reason?: string
           reported_conversation_id?: string | null
           reported_user_id?: string | null
@@ -19844,6 +19850,10 @@ export type Database = {
       normalize_course_name: { Args: { name: string }; Returns: string }
       normalize_key: { Args: { p_text: string }; Returns: string }
       notifications_minute_bucket: { Args: { ts: string }; Returns: string }
+      notify_moderators: {
+        Args: { _data: Json; _message: string; _title: string }
+        Returns: undefined
+      }
       populate_geometry_columns:
         | { Args: { tbl_oid: unknown; use_typmod?: boolean }; Returns: number }
         | { Args: { use_typmod?: boolean }; Returns: string }
