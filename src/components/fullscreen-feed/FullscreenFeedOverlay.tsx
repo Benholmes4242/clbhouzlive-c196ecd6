@@ -1,4 +1,4 @@
-import React, { useEffect, useCallback } from 'react';
+import React, { useEffect, useCallback, useState, useRef } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 
 import { useNavigate } from 'react-router-dom';
@@ -7,6 +7,7 @@ import { useClubhouseStore } from '@/store/clubhouseStore';
 import { SnapFeed } from '@/components/feed/SnapFeed';
 import { ClubhouseSkeletonShimmer } from '@/components/clubhouse/ClubhouseSkeletonShimmer';
 import { pauseAllAudio } from '@/utils/globalVideoMute';
+import { lockBodyScroll, unlockBodyScroll } from '@/lib/bodyScrollLock';
 
 import { FeedOverlayLayer } from '@/components/feed/FeedOverlayLayer';
 import { FullscreenCarouselOverlay } from '@/components/media/FullscreenCarouselOverlay';
