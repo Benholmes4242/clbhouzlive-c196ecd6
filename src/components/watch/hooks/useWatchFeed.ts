@@ -170,5 +170,10 @@ export function useWatchFeed({ userId, filter, mood, category, searchQuery, user
     fetchNextPage: query.fetchNextPage,
     refetch: query.refetch,
     resetSeen,
+    // Canonical "never-fetched" signal: dataUpdatedAt === 0 until first
+    // successful fetch. Rails use this to distinguish empty-because-loading
+    // from empty-because-resolved-with-no-results.
+    dataUpdatedAt: query.dataUpdatedAt,
+    hasResolved: query.dataUpdatedAt > 0,
   };
 }
