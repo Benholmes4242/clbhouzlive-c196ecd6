@@ -1,20 +1,27 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { formatDistanceToNow } from 'date-fns';
-import { ClipboardList, Copy, Check } from 'lucide-react';
+import { ClipboardList, Copy, Check, Rocket } from 'lucide-react';
 import { useQueryClient } from '@tanstack/react-query';
+import { toast } from 'sonner';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
+import { supabase } from '@/integrations/supabase/client';
 import { adminTheme as t } from '../theme';
 import KpiCard from '../components/KpiCard';
 import DataList, { type DataListColumn } from '../components/DataList';
 import EmptyState from '../components/EmptyState';
 import DetailDrawer from '../components/DetailDrawer';
 import AdminAccessDenied from '../components/AdminAccessDenied';
+import ConfirmDialog from '../components/ConfirmDialog';
+import StatusPill from '../components/StatusPill';
 import { usePanelRole } from '@/hooks/usePanelRole';
 import { panelCan } from '@/lib/panelCan';
 import {
   useWaitlistSummary,
   useWaitlistDrilldown,
+  useWaitlistNotifyStatus,
   WAITLIST_SUMMARY_KEY,
+  WAITLIST_NOTIFY_STATUS_KEY,
+  WAITLIST_DRILLDOWN_KEY,
   type WaitlistSummaryRow,
 } from '../hooks/useWaitlistDemand';
 
