@@ -114,16 +114,25 @@ const CompactHeader: React.FC<CompactHeaderProps> = ({ className }) => {
   // avoid a double shadow.)
   const isWatchMainRoute = location.pathname === '/watch';
   const headerOwnsScrollShadow = isWatchMainRoute || isTourPlayerRoute || isTourCollegeProfileRoute;
+  const wasScrolledRef = useRef(false);
   React.useEffect(() => {
     if (!headerOwnsScrollShadow) {
+      wasScrolledRef.current = false;
       setScrolled(false);
       return;
     }
-    const onScroll = () => setScrolled(window.scrollY > 4);
+    const onScroll = () => {
+      const next = window.scrollY > 4;
+      if (next !== wasScrolledRef.current) {
+        wasScrolledRef.current = next;
+        setScrolled(next);
+      }
+    };
     onScroll();
     window.addEventListener('scroll', onScroll, { passive: true });
     return () => window.removeEventListener('scroll', onScroll);
   }, [headerOwnsScrollShadow]);
+
   // Editorial-geometry chrome (52px / 30px logo / 38px search) applies to
   // tab-landing surfaces. Tour-specific behaviors (compact avatar pill,
   // back-arrow) stay gated on isTourRoute.
