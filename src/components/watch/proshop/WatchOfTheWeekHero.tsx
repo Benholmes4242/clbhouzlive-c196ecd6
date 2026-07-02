@@ -1,7 +1,9 @@
 import { memo } from 'react';
+import { motion } from 'framer-motion';
 import { useQuery } from '@tanstack/react-query';
 
 import { useWatchOfTheWeek } from './hooks/useWatchOfTheWeek';
+import { useWatchReveal } from '../WatchRevealContext';
 import { useWatchMood } from './hooks/useWatchMood';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useFullscreenFeedStore } from '@/store/fullscreenFeedStore';
@@ -32,7 +34,36 @@ function WatchOfTheWeekHeroInner() {
     staleTime: 60_000,
   });
 
-  if (isLoading || !pick) return null;
+  const revealed = useWatchReveal('watch-of-the-week', !isLoading);
+
+  if (!revealed || isLoading) {
+    return (
+      <section style={{ padding: '24px 16px 12px' }}>
+        <div
+          style={{
+            width: 140,
+            height: 12,
+            borderRadius: 4,
+            background: 'rgba(0,0,0,0.06)',
+            marginBottom: 10,
+          }}
+        />
+        <div
+          style={{
+            width: '100%',
+            aspectRatio: '16/10',
+            borderRadius: 12,
+            background: 'rgba(0,0,0,0.06)',
+            backgroundImage:
+              'linear-gradient(90deg, transparent 0%, rgba(0,0,0,0.08) 50%, transparent 100%)',
+            backgroundSize: '200% 100%',
+            animation: 'clb-shimmer 1.5s ease-in-out infinite',
+          }}
+        />
+      </section>
+    );
+  }
+  if (!pick) return null;
 
   const handleTap = () => {
     // Open fullscreen viewer with a synthetic single-post array. The viewer
@@ -76,7 +107,12 @@ function WatchOfTheWeekHeroInner() {
   };
 
   return (
-    <section style={{ padding: '24px 16px 12px' }}>
+    <motion.section
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={{ duration: 0.18 }}
+      style={{ padding: '24px 16px 12px' }}
+    >
       <Kicker color="amber">Watch of the Week</Kicker>
 
       <button
@@ -164,7 +200,7 @@ function WatchOfTheWeekHeroInner() {
           {pick.why_ai}
         </p>
       ) : null}
-    </section>
+    </motion.section>
   );
 }
 

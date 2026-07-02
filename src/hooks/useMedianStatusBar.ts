@@ -66,13 +66,6 @@ function applyMedianStatusBar(style: string, hexColor: string, overlay: boolean,
       overlay,
       blur,
     };
-    console.info('[sbar] bridge', {
-      intent: style,
-      medianStyle,
-      color: hexColor,
-      hasMedian: !!window.median?.statusbar,
-      params,
-    });
     if (window.median?.statusbar?.set) {
       window.median.statusbar.set(params);
     }
@@ -110,7 +103,6 @@ export function useMedianStatusBar(
 
 
   useEffect(() => {
-    console.info('[sbar] effect-run', { reapplyKey, enabled });
     if (!enabled) return;
 
     const apply = () => {
@@ -121,13 +113,6 @@ export function useMedianStatusBar(
       const owner = ownerRef.current;
       const path = window.location.pathname;
       const matches = !owner || (typeof owner === 'function' ? owner(path) : owner === path);
-      console.info('[sbar] apply', {
-        owner: typeof owner === 'function' ? 'fn' : owner,
-        path,
-        matches,
-        style: c.style,
-        color: c.hexColor,
-      });
       if (owner && !matches) return;
 
       const color = c.hexColor === 'transparent' ? 'transparent' : (c.hexColor || '#000000');

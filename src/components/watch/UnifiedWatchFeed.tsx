@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { usePageReady } from '@/perf/usePageReady';
 
+import { WatchRevealProvider, useWatchRevealed } from './WatchRevealContext';
 import TrendingThisWeek from './TrendingThisWeek';
 import LatestVideosRail from './LatestVideosRail';
 import WatchAutoplay from './WatchAutoplay';
@@ -24,7 +25,15 @@ interface UnifiedWatchFeedProps {
   embedded?: boolean;
 }
 
-export default function UnifiedWatchFeed({ embedded = false }: UnifiedWatchFeedProps) {
+export default function UnifiedWatchFeed(props: UnifiedWatchFeedProps) {
+  return (
+    <WatchRevealProvider>
+      <UnifiedWatchFeedInner {...props} />
+    </WatchRevealProvider>
+  );
+}
+
+function UnifiedWatchFeedInner({ embedded = false }: UnifiedWatchFeedProps) {
   const { session } = useSupabaseSession();
   const navigate = useNavigate();
   const userId = session?.user?.id;
@@ -64,7 +73,11 @@ export default function UnifiedWatchFeed({ embedded = false }: UnifiedWatchFeedP
     setFirstRowDecoded(false);
   }, [mood, firstPostId]);
 
-  usePageReady(!isLoading && posts.length > 0 && firstRowDecoded);
+  // Coordinated reveal — flips true when all above-the-fold rails settle,
+  // or when the deadline elapses. Drives the page-level content milestone.
+  const revealed = useWatchRevealed();
+
+  usePageReady(revealed);
 
 
 

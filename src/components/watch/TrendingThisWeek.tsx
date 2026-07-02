@@ -1,7 +1,9 @@
+import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useWatchFeed } from './hooks/useWatchFeed';
 import { useViewedPostIds } from './hooks/useViewedPostIds';
+import { useWatchReveal } from './WatchRevealContext';
 import WatchRailTile from './WatchRailTile';
 import { SectionHeader } from '@/components/ui/SectionHeader';
 import { HRail } from './proshop/HRail';
@@ -24,9 +26,10 @@ export default function TrendingThisWeek({ enabled = true }: TrendingThisWeekPro
   const { data: viewedPostIds } = useViewedPostIds();
 
   const topPosts = [...posts].sort((a, b) => b.likeCount - a.likeCount).slice(0, 5);
+  const revealed = useWatchReveal('trending-this-week', !isLoading);
 
-  // ── Loading skeleton ──
-  if (isLoading) {
+  // ── Loading skeleton (held until coordinated reveal) ──
+  if (!revealed || isLoading) {
     const shimmerBase = {
       background: 'rgba(0,0,0,0.06)',
       backgroundImage:
@@ -96,7 +99,12 @@ export default function TrendingThisWeek({ enabled = true }: TrendingThisWeekPro
   if (topPosts.length === 0) return null;
 
   return (
-    <div style={{ background: 'hsl(var(--background))' }}>
+    <motion.div
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={{ duration: 0.18 }}
+      style={{ background: 'hsl(var(--background))' }}
+    >
       <SectionHeader
         role="rail"
         title="Quick clips"
@@ -112,6 +120,6 @@ export default function TrendingThisWeek({ enabled = true }: TrendingThisWeekPro
           </div>
         ))}
       </HRail>
-    </div>
+    </motion.div>
   );
 }
