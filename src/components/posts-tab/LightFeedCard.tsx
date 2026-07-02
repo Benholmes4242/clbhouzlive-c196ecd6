@@ -26,6 +26,7 @@ import { MediaCarousel } from '@/components/feed/MediaCarousel';
 import { FeedFollowPill } from '@/components/feed/FeedFollowPill';
 import { FeedActorPicker } from '@/components/feed/FeedActorPicker';
 import type { ActiveActor } from '@/types/actor';
+import LqipUnderlay from '@/components/shared/LqipUnderlay';
 
 // Light palette — cards sit on the page background (#F8FAFC); dividers are
 // a touch darker than bg. Text drops to ink (#0F172A) with proportional
