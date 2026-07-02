@@ -474,8 +474,7 @@ export function AppPrefetchProvider({
 
     // Priority 1 routes (landing page) - start immediately (100ms for hydration)
     const criticalRoutes = ROUTE_CONFIGS.filter(r => r.priority === 1);
-    const standardRoutes = ROUTE_CONFIGS.filter(r => r.priority >= 2 && r.priority < 1);
-    
+
     // Critical routes start almost immediately
     const criticalTimeout = setTimeout(() => {
       console.log('[AppPrefetch] Starting critical prefetch (landing page)');
@@ -484,7 +483,10 @@ export function AppPrefetchProvider({
       });
     }, 100); // Just enough for React to hydrate
 
-    // Standard routes wait for the configured delay
+    // Standard routes wait for the configured delay.
+    // Phase 6: the previous `standardRoutes` filter used an impossible
+    // predicate (`priority >= 2 && priority < 1`) and was dead code — the
+    // real >= 2 pass is done here.
     timeoutRef.current = setTimeout(() => {
       console.log('[AppPrefetch] Starting standard prefetch');
       const highPriorityRoutes = ROUTE_CONFIGS
