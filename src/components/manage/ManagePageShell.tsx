@@ -65,6 +65,7 @@ export function ManagePageShell({ title, children, right, onBack, belowTitle }: 
             </div>
             {right}
           </div>
+          {belowTitle}
         </div>
 
         <div className="flex-1 pb-32">
