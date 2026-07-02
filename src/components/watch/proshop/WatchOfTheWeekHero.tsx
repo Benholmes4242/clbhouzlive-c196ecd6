@@ -13,7 +13,9 @@ import { useActiveActor } from '@/context/ActiveActorContext';
 import { isPostLikedByMe } from '@/lib/likedPostIds';
 import DecodedImage from '../shared/DecodedImage';
 import { attachHlsToTile } from '@/hooks/useTileVideoPlayer';
+import { extractCloudflareUid } from '@/utils/videoIdUtils';
 import { usePrefersReducedMotion } from '@/hooks/usePrefersReducedMotion';
+
 
 // Note: useNavigate import previously here was unused.
 
@@ -197,10 +199,12 @@ function WatchOfTheWeekHeroInner() {
           hlsUrl: pick.hls_url ?? undefined,
           imageUrl: pick.thumbnail_url ?? undefined,
           thumbnailUrl: pick.thumbnail_url ?? undefined,
+          streamId: pick.stream_id ?? (pick.hls_url ? extractCloudflareUid(pick.hls_url) : null),
           width: 0,
           height: 0,
           duration: pick.duration_seconds ?? undefined,
         }],
+
         createdAt: pick.created_at,
         likeCount: pick.like_count,
         commentCount: pick.comment_count,
