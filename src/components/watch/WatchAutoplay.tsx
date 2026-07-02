@@ -67,7 +67,8 @@ const WatchAutoplay: React.FC<WatchAutoplayProps> = ({ posts, gridRef }) => {
       });
       videoPoolRef.current = [];
     };
-  }, [isSlowNetwork]);
+  }, [isSlowNetwork, prefersReducedMotion]);
+
 
   const attachToTile = useCallback(async (slot: number, tileIdx: number, hlsUrl: string, tileEl: HTMLElement) => {
     if (isSlowNetwork()) return;
