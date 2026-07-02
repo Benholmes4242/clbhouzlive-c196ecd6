@@ -8,6 +8,9 @@ import WatchRailTile from './WatchRailTile';
 import { SectionHeader } from '@/components/ui/SectionHeader';
 import { HRail } from './proshop/HRail';
 import { ClipsMark } from './proshop/SectionMarks';
+import { useFirstVisibleDecoded } from './shared/useFirstVisibleDecoded';
+
+const VISIBLE_COUNT = 3;
 
 interface TrendingThisWeekProps {
   enabled?: boolean;
