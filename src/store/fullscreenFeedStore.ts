@@ -89,6 +89,7 @@ export const useFullscreenFeedStore = create<FullscreenFeedState>((set, get) => 
       fetchNextPage: options?.fetchNextPage ?? null,
       isFetchingNextPage: options?.isFetchingNextPage ?? false,
       readOnly: !!options?.readOnly,
+      origin: options?.origin ?? null,
     }),
   close: () => {
     const cb = get().onCloseCallback;
