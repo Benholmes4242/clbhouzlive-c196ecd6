@@ -18,6 +18,18 @@ export interface WaitlistDrilldownRow {
   created_at: string;
   body_name: string;
   country_id: string;
+  notified_live: boolean;
+  profile: {
+    display_name: string | null;
+    username: string | null;
+    profile_photo_url: string | null;
+  } | null;
+}
+
+export interface WaitlistNotifyStatus {
+  pending: number;
+  total: number;
+}
   profile: {
     display_name: string | null;
     username: string | null;
