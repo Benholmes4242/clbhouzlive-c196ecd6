@@ -86,11 +86,14 @@ function CompactVideoRowInner({ post, index, allPosts, onDecoded }: CompactVideo
         }}
       >
         {thumb && !failed && (
-          <img
+          <DecodedImage
             src={thumb}
             alt=""
             loading="lazy"
-            onError={() => setFailed(true)}
+            onDecoded={onDecoded}
+            onError={() => {
+              setFailed(true);
+            }}
             style={{
               position: 'absolute',
               inset: 0,
