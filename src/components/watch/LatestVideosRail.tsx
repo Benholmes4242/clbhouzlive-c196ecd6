@@ -37,7 +37,8 @@ export default function LatestVideosRail() {
     return () => io.disconnect();
   }, [posts.length]);
 
-  const revealed = useWatchReveal('latest-videos', !isLoading);
+  const { settled: firstVisibleDecoded, onDecoded } = useFirstVisibleDecoded(posts.length, VISIBLE_COUNT);
+  const revealed = useWatchReveal('latest-videos', !isLoading && firstVisibleDecoded);
 
   if (!revealed || isLoading) {
     return (
