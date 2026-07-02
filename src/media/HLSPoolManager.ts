@@ -335,6 +335,33 @@ class HLSPoolManagerClass {
       return false;
     }
   }
+
+  /**
+   * Phase 3 tile→viewer transition. Detach the instance from the tile's video
+   * element WITHOUT evicting the pool entry, so the viewer's next promote(url,
+   * viewerEl) inherits buffered segments + bandwidth history. Idempotent; safe
+   * to call even if the URL isn't pooled.
+   */
+  handOff(url: string): boolean {
+    const entry = this.pool.get(url);
+    if (!entry) return false;
+    try {
+      entry.hls.stopLoad();
+      try { entry.hls.detachMedia(); } catch {}
+      entry.isPromoted = false;
+      entry.preloadedByVideo = null;
+      if (entry.timeoutId) clearTimeout(entry.timeoutId);
+      const ttl = this.getTTL();
+      entry.timeoutId = setTimeout(() => {
+        if (!this.pool.get(url)?.isPromoted) this.cleanup(url);
+      }, ttl);
+      logPoolEvent('success', 'demote', url, this.stats.demoted, this.pool.size);
+      return true;
+    } catch {
+      this.cleanup(url);
+      return false;
+    }
+  }
   /**
    * Fullscreen-only pruning. Cleans any pool entry tagged with `surface` that is
    * NOT in keepUrls and NOT currently promoted. Entries of OTHER surfaces (e.g.
