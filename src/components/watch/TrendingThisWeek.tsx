@@ -21,7 +21,7 @@ export default function TrendingThisWeek({ enabled = true }: TrendingThisWeekPro
   const { session } = useSupabaseSession();
   const userId = session?.user?.id;
 
-  const { posts, isLoading } = useWatchFeed({
+  const { posts, isLoading, hasResolved } = useWatchFeed({
     userId,
     filter: 'top',
     enabled: !!userId && enabled,
@@ -30,7 +30,11 @@ export default function TrendingThisWeek({ enabled = true }: TrendingThisWeekPro
 
   const topPosts = [...posts].sort((a, b) => b.likeCount - a.likeCount).slice(0, 5);
   const { settled: firstVisibleDecoded, onDecoded } = useFirstVisibleDecoded(topPosts.length, VISIBLE_COUNT);
-  const revealed = useWatchReveal('trending-this-week', !isLoading && firstVisibleDecoded);
+  const isEmpty = hasResolved && topPosts.length === 0;
+  const revealed = useWatchReveal(
+    'trending-this-week',
+    hasResolved && (isEmpty || firstVisibleDecoded),
+  );
 
   // ── Loading skeleton (held until coordinated reveal) ──
   if (!revealed || isLoading) {
