@@ -8,6 +8,7 @@ import WatchEmptyState from './shared/WatchEmptyState';
 interface WatchGridProps {
   posts: FeedPost[];
   isLoading: boolean;
+  isFetching?: boolean;
   isError?: boolean;
   hasNextPage: boolean | undefined;
   isFetchingNextPage: boolean;
@@ -19,6 +20,7 @@ interface WatchGridProps {
   emptyMessage?: string;
   emptyAction?: { label: string; onClick: () => void; icon?: 'clear' | 'back' };
 }
+
 
 const GAP = 1;
 const COLS = 2;
