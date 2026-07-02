@@ -75,7 +75,7 @@ function UnifiedWatchFeedInner({ embedded = false }: UnifiedWatchFeedProps) {
 
   // Coordinated reveal — flips true when all above-the-fold rails settle,
   // or when the deadline elapses. Drives the page-level content milestone.
-  const revealed = useWatchReveal('page', true);
+  const revealed = useWatchRevealed();
 
   usePageReady(revealed);
 
