@@ -95,7 +95,7 @@ export default function LatestVideosRail() {
           </div>
         )}
       </div>
-    </div>
+    </motion.div>
   );
 }
 
