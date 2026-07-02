@@ -24,6 +24,7 @@ import './index.css'
 import './styles/superellipse.css'
 import './styles/theme.css'
 import './styles/theme-tokens.css'
+import 'flag-icons/css/flag-icons.min.css'
 
 // ============================================================================
 // PRE-REACT IMMERSIVE FLAGS
