@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { CheckCircle2 } from 'lucide-react';
 import { toast } from 'sonner';
@@ -30,6 +30,10 @@ export default function ContactPage() {
   const [message, setMessage] = useState('');
   const [submitting, setSubmitting] = useState(false);
   const [submittedId, setSubmittedId] = useState<string | null>(null);
+
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
 
   const canSubmit =
     !submitting && subject.trim().length > 0 && message.trim().length > 0 && !!user?.id;
@@ -95,7 +99,7 @@ export default function ContactPage() {
               className="w-full min-h-[44px] rounded-xl text-[15px] font-semibold text-white"
               style={{ background: INK }}
             >
-              Go to My requests
+              Go to my requests
             </button>
             <button
               type="button"
