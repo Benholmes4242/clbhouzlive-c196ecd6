@@ -72,7 +72,9 @@ export const PostingAsPill = forwardRef<HTMLButtonElement, PostingAsPillProps>(
               alt={activeActor.name}
               fallback={initials}
               hairlineRing
+              onLoad={onAvatarLoad}
             />
+
           </span>
 
           {hasUnreadNotifications && (
