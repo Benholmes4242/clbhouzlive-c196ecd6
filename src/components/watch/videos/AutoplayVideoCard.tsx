@@ -45,7 +45,7 @@ export interface AutoplayVideoCardProps {
   debugId?: string;
 }
 
-function AutoplayVideoCardInner({ post, index, allPosts, userId, active, borderRadius = 6, metaPadX = 16, onDecoded }: AutoplayVideoCardProps) {
+function AutoplayVideoCardInner({ post, index, allPosts, userId, active, borderRadius = 6, metaPadX = 16, onDecoded, debugId }: AutoplayVideoCardProps) {
   const navigate = useNavigate();
   const tileRef = useRef<HTMLDivElement>(null);
   const videoRef = useRef<HTMLVideoElement | null>(null);
