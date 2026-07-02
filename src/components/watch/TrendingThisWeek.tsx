@@ -1,7 +1,9 @@
+import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useWatchFeed } from './hooks/useWatchFeed';
 import { useViewedPostIds } from './hooks/useViewedPostIds';
+import { useWatchReveal } from './WatchRevealContext';
 import WatchRailTile from './WatchRailTile';
 import { SectionHeader } from '@/components/ui/SectionHeader';
 import { HRail } from './proshop/HRail';
