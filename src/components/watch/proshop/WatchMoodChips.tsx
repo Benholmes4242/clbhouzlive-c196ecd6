@@ -1,5 +1,6 @@
-import { memo } from 'react';
+import { memo, useRef } from 'react';
 import { WATCH_MOODS, type WatchMoodId } from './hooks/useWatchMood';
+import { useEdgeFades } from '../shared/useEdgeFades';
 
 interface WatchMoodChipsProps {
   active: WatchMoodId;
@@ -8,18 +9,22 @@ interface WatchMoodChipsProps {
 
 /**
  * Pro Shop primitive — the row of mood chips above the "Clips to explore" grid.
- * Light-surface styling: #F8FAFC background, subtle outlined pills matching
- * ClipsMoodChips / VideosMoodChips treatment, right-edge fade blending to #F8FAFC.
+ * Phase 7: conditional edge fades (right only appears when scrollable; left only
+ * after the user has scrolled right).
  */
 function WatchMoodChipsInner({ active, onChange }: WatchMoodChipsProps) {
+  const wrapperRef = useRef<HTMLDivElement>(null);
+  const scrollerRef = useRef<HTMLDivElement>(null);
+  useEdgeFades(scrollerRef, wrapperRef);
+
   return (
     <div
-      className="relative"
-      style={{
-        background: '#F8FAFC',
-      }}
+      ref={wrapperRef}
+      className="relative hrail-edge-fade"
+      style={{ background: '#F8FAFC' }}
     >
       <div
+        ref={scrollerRef}
         role="tablist"
         aria-label="Filter Watch by mood"
         className="flex gap-1.5 overflow-x-auto scrollbar-hide"
@@ -55,13 +60,26 @@ function WatchMoodChipsInner({ active, onChange }: WatchMoodChipsProps) {
         })}
       </div>
 
-      {/* Right-edge fade — blends into the light page background */}
+      {/* Left fade (only after scrolling right) */}
       <div
         aria-hidden
-        className="pointer-events-none absolute top-0 right-0 h-full"
+        className="pointer-events-none absolute top-0 left-0 h-full hrail-fade hrail-fade-left"
+        style={{
+          width: 28,
+          background: 'linear-gradient(to right, #F8FAFC 0%, rgba(248,250,252,0) 100%)',
+          opacity: 0,
+          transition: 'opacity 150ms ease',
+        }}
+      />
+      {/* Right fade (only when scrollable further right) */}
+      <div
+        aria-hidden
+        className="pointer-events-none absolute top-0 right-0 h-full hrail-fade hrail-fade-right"
         style={{
           width: 28,
           background: 'linear-gradient(to right, rgba(248,250,252,0) 0%, #F8FAFC 100%)',
+          opacity: 0,
+          transition: 'opacity 150ms ease',
         }}
       />
     </div>
