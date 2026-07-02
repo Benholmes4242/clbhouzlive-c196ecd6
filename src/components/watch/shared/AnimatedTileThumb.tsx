@@ -188,7 +188,6 @@ const AnimatedTileThumb: React.FC<AnimatedTileThumbProps> = ({
           width: '100%',
           height: '100%',
           objectFit: 'cover',
-          ...(imgRest.style ?? {}),
         }}
       />
 
