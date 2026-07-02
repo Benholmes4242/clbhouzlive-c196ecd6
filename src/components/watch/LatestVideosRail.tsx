@@ -83,6 +83,7 @@ export default function LatestVideosRail() {
             userId={userId}
             active={heroActive}
             borderRadius={6}
+            onDecoded={onDecoded}
           />
         </div>
 
@@ -94,6 +95,7 @@ export default function LatestVideosRail() {
                 post={post}
                 index={i + 1}
                 allPosts={posts}
+                onDecoded={i < VISIBLE_COUNT - 1 ? onDecoded : undefined}
               />
             ))}
           </div>
