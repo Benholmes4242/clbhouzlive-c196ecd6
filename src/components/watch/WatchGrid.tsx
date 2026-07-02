@@ -19,6 +19,8 @@ interface WatchGridProps {
   emptyTitle?: string;
   emptyMessage?: string;
   emptyAction?: { label: string; onClick: () => void; icon?: 'clear' | 'back' };
+  /** Fired once the first visible row of tiles has decoded and painted. */
+  onFirstRowDecoded?: () => void;
 }
 
 
