@@ -330,6 +330,7 @@ const BusinessActivityPage = lazy(() => import("./pages/BusinessActivityPage"));
 const NotFound = lazy(() => import("./pages/NotFound"));
 const PrivacyPolicyPage = lazy(() => import("./pages/legal/PrivacyPolicyPage"));
 const TermsPage = lazy(() => import("./pages/legal/TermsPage"));
+const LegalDocumentPage = lazy(() => import("./pages/legal/LegalDocumentPage"));
 
 
 // PostsTabTestPage removed — Posts tab now integrated into profiles
