@@ -43,34 +43,35 @@ function WatchOfTheWeekHeroInner() {
   const heroReady = hasResolved && (isEmpty || heroDecoded);
   const revealed = useWatchReveal('watch-of-the-week', heroReady);
 
-  if (!revealed || isLoading) {
-    return (
-      <section style={{ padding: '24px 16px 12px' }}>
-        <div
-          style={{
-            width: 140,
-            height: 12,
-            borderRadius: 4,
-            background: 'rgba(0,0,0,0.06)',
-            marginBottom: 10,
-          }}
-        />
-        <div
-          style={{
-            width: '100%',
-            aspectRatio: '16/10',
-            borderRadius: 12,
-            background: 'rgba(0,0,0,0.06)',
-            backgroundImage:
-              'linear-gradient(90deg, transparent 0%, rgba(0,0,0,0.08) 50%, transparent 100%)',
-            backgroundSize: '200% 100%',
-            animation: 'clb-shimmer 1.5s ease-in-out infinite',
-          }}
-        />
-      </section>
-    );
-  }
+  const skeleton = (
+    <section style={{ padding: '24px 16px 12px' }}>
+      <div
+        style={{
+          width: 140,
+          height: 12,
+          borderRadius: 4,
+          background: 'rgba(0,0,0,0.06)',
+          marginBottom: 10,
+        }}
+      />
+      <div
+        style={{
+          width: '100%',
+          aspectRatio: '16/10',
+          borderRadius: 12,
+          background: 'rgba(0,0,0,0.06)',
+          backgroundImage:
+            'linear-gradient(90deg, transparent 0%, rgba(0,0,0,0.08) 50%, transparent 100%)',
+          backgroundSize: '200% 100%',
+          animation: 'clb-shimmer 1.5s ease-in-out infinite',
+        }}
+      />
+    </section>
+  );
+
+  if (!hasResolved || isLoading) return skeleton;
   if (!pick) return null;
+
 
   const handleTap = () => {
     // Open fullscreen viewer with a synthetic single-post array. The viewer
