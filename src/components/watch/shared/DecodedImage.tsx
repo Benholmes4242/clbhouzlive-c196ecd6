@@ -1,5 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { acquireLqipSlot } from '@/utils/lqipQueue';
+import { usePrefersReducedMotion } from '@/hooks/usePrefersReducedMotion';
+
 
 export interface DecodedImageProps extends React.ImgHTMLAttributes<HTMLImageElement> {
   /**
