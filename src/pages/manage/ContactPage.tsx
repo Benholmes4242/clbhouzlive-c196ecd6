@@ -99,7 +99,7 @@ export default function ContactPage() {
               className="w-full min-h-[44px] rounded-xl text-[15px] font-semibold text-white"
               style={{ background: INK }}
             >
-              Go to My requests
+              Go to my requests
             </button>
             <button
               type="button"
