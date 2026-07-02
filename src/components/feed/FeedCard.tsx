@@ -592,9 +592,35 @@ const FeedCardImpl: React.FC<FeedCardProps> = ({
                   />
 
                 ) : media.thumbnailUrl ? (
+                  <>
+                    {feedIndex != null && feedIndex >= 1 && (
+                      <LqipUnderlay from={media.thumbnailUrl} />
+                    )}
+                    <img
+                      ref={isFirstCard ? primaryImgRef : undefined}
+                      src={media.thumbnailUrl}
+                      alt={post.caption || post.displayName}
+                      loading="lazy"
+                      style={{
+                        position: 'absolute',
+                        inset: 0,
+                        width: '100%',
+                        height: '100%',
+                        objectFit: 'cover',
+                        objectPosition: 'center',
+                        display: 'block',
+                      }}
+                    />
+                  </>
+                ) : null
+              ) : mediaUrl ? (
+                <>
+                  {feedIndex != null && feedIndex >= 1 && (
+                    <LqipUnderlay from={mediaUrl} />
+                  )}
                   <img
                     ref={isFirstCard ? primaryImgRef : undefined}
-                    src={media.thumbnailUrl}
+                    src={mediaUrl}
                     alt={post.caption || post.displayName}
                     loading="lazy"
                     style={{
@@ -607,23 +633,7 @@ const FeedCardImpl: React.FC<FeedCardProps> = ({
                       display: 'block',
                     }}
                   />
-                ) : null
-              ) : mediaUrl ? (
-                <img
-                  ref={isFirstCard ? primaryImgRef : undefined}
-                  src={mediaUrl}
-                  alt={post.caption || post.displayName}
-                  loading="lazy"
-                  style={{
-                    position: 'absolute',
-                    inset: 0,
-                    width: '100%',
-                    height: '100%',
-                    objectFit: 'cover',
-                    objectPosition: 'center',
-                    display: 'block',
-                  }}
-                />
+                </>
               ) : null}
             </div>
           </button>
