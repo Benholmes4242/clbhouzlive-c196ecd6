@@ -320,7 +320,7 @@ function WatchOfTheWeekHeroInner() {
               {pick.duration_seconds ? <span>{formatDuration(pick.duration_seconds)}</span> : null}
             </div>
           </div>
-        </button>
+        </Pressable>
 
         {pick.why_ai ? (
           <p
