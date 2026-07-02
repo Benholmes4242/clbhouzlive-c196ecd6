@@ -1,7 +1,7 @@
 import React, { useEffect, useRef } from 'react';
 import { Film, Heart } from 'lucide-react';
 import type { FeedPost } from '@/components/media-system/types/media';
-import { useFullscreenFeedStore } from '@/store/fullscreenFeedStore';
+import { openWithOrigin } from '@/lib/openWithOrigin';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import DecodedImage from './shared/DecodedImage';
 
