@@ -8,6 +8,7 @@ import { uploadEventBus } from './uploadEventBus';
 import { postKeys } from '@/queryKeys/posts';
 import { deleteDraft } from '@/services/drafts/draftService';
 import { uploadManager } from './UploadManager';
+import { triggerHaptic } from '@/lib/ui/haptics';
 
 const TOAST_DURATION_ERROR_MS = 4000;
 
@@ -30,8 +31,10 @@ export function UploadToastsBridge() {
         });
       } else if (evt.uploadType === 'review') {
         toast.success('Your review is live', { duration: 4000 });
+        triggerHaptic('success');
       } else {
         toast.success('Your moment is live.', { duration: 4000 });
+        triggerHaptic('success');
       }
 
       // Scheduled list refresh.

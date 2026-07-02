@@ -2,6 +2,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useSupabaseSession } from './useSupabaseSession';
 import { toast } from 'sonner';
+import { triggerHaptic } from '@/lib/ui/haptics';
 import { patchFollow } from '@/lib/followCache';
 import { whsKeys } from '@/lib/whs/hooks';
 
@@ -202,6 +203,7 @@ export function useFriendship(targetUserId: string | undefined) {
     },
     onSuccess: () => {
       toast.success('Request accepted');
+      triggerHaptic('success');
       invalidateQueries();
     },
     onError: (error) => {

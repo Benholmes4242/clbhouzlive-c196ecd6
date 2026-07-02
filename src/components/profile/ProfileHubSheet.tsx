@@ -12,6 +12,7 @@
  */
 
 import React, { memo, useState, useEffect, useLayoutEffect, useRef, useCallback } from 'react';
+import { Pressable } from '@/components/ui/Pressable';
 import { AnimatedEchoWave } from '@/features/echo/components/ui/AnimatedEchoWave';
 import { lockBodyScroll, unlockBodyScroll } from '@/lib/bodyScrollLock';
 import { overlayOpen, overlayMark } from '@/perf/overlayTiming';
@@ -229,11 +230,13 @@ function AccountRow({
   onClick: () => void;
 }) {
   return (
-    <button
-      type="button"
-      onClick={onClick}
-      className="w-full flex items-center gap-3 active:bg-[rgba(15,23,42,0.03)] transition-colors"
-      style={{ padding: '14px 0', background: 'transparent', border: 'none', cursor: 'pointer', textAlign: 'left' }}
+    <Pressable
+      as="button"
+      variant="row"
+      haptic="selection"
+      onPress={onClick}
+      innerClassName="w-full flex items-center gap-3"
+      style={{ padding: '14px 12px', margin: '0 -12px', borderRadius: 10, background: 'transparent', border: 'none', textAlign: 'left', width: 'calc(100% + 24px)' }}
     >
       <Icon size={16} color={INK_SOFT} strokeWidth={1.8} />
       <div style={{ flex: 1, minWidth: 0 }}>
@@ -241,7 +244,7 @@ function AccountRow({
         <div style={{ fontSize: 11.5, fontWeight: 400, color: INK_FAINT, marginTop: 1 }}>{sub}</div>
       </div>
       <ChevronRight size={13} color="rgba(15,23,42,0.30)" />
-    </button>
+    </Pressable>
   );
 }
 
@@ -293,23 +296,26 @@ function GroupedRow({
   isLast?: boolean;
 }) {
   return (
-    <button
-      type="button"
-      onClick={onClick}
-      className="w-full flex items-center gap-3 active:bg-[rgba(15,23,42,0.03)] transition-colors"
+    <Pressable
+      as="button"
+      variant="row"
+      haptic="selection"
+      onPress={onClick}
+      innerClassName="w-full flex items-center gap-3"
       style={{
         padding: '14px 14px',
         background: 'transparent',
         border: 'none',
         borderTop: isFirst ? 'none' : `0.5px solid ${HAIRLINE_SOFT}`,
-        cursor: 'pointer',
         textAlign: 'left',
+        width: '100%',
+        borderRadius: isFirst && isLast ? 14 : (isFirst ? '14px 14px 0 0' : (isLast ? '0 0 14px 14px' : 0)),
       }}
     >
       <Icon size={16} color={INK_SOFT} strokeWidth={1.8} />
       <div style={{ flex: 1, minWidth: 0, fontSize: 14, fontWeight: 600, color: INK }}>{label}</div>
       <ChevronRight size={13} color="rgba(15,23,42,0.30)" />
-    </button>
+    </Pressable>
   );
 }
 
