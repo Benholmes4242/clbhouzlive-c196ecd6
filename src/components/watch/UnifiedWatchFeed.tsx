@@ -96,6 +96,8 @@ export default function UnifiedWatchFeed({ embedded = false }: UnifiedWatchFeedP
         <WatchGrid
           posts={posts}
           isLoading={isLoading}
+          isFetching={isFetching}
+
           isError={isError}
           hasNextPage={hasNextPage}
           isFetchingNextPage={isFetchingNextPage}
