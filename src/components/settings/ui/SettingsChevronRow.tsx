@@ -69,7 +69,7 @@ export function SettingsChevronRow({
 
       <div className="flex-shrink-0 ml-3 flex items-center gap-2">
         {value && (
-          <span className="text-[13px] text-muted-foreground max-w-[40%] truncate">{value}</span>
+          <span className="text-[13px] text-muted-foreground truncate text-right max-w-[160px]">{value}</span>
         )}
         {isLocked ? (
           <span
