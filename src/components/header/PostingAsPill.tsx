@@ -16,6 +16,8 @@ interface PostingAsPillProps {
   useBareTheme?: boolean; // No background, no chevron — TikTok-style floating avatar
   compact?: boolean; // One-size-smaller for tour routes
   size?: 'sm' | 'md' | 'lg'; // Optional explicit size; 'lg' matches 38px tour pill
+  /** Fires once the actor avatar bitmap has loaded — used for [hdr] telemetry. */
+  onAvatarLoad?: () => void;
 }
 
 /**
@@ -23,7 +25,7 @@ interface PostingAsPillProps {
  * Uses forwardRef to allow parent to get anchor position for desktop popover
  */
 export const PostingAsPill = forwardRef<HTMLButtonElement, PostingAsPillProps>(
-  ({ onClick, isOpen, hasUnreadNotifications = false, notificationCount = 0, useLightTheme = false, useGlassTheme = false, useBareTheme = false, compact = false, size }, ref) => {
+  ({ onClick, isOpen, hasUnreadNotifications = false, notificationCount = 0, useLightTheme = false, useGlassTheme = false, useBareTheme = false, compact = false, size, onAvatarLoad }, ref) => {
     const { activeActor, isLoading } = useActiveActor();
 
     // Per-actor unread (badge hybrid): show a small dot on the pill when ANY
