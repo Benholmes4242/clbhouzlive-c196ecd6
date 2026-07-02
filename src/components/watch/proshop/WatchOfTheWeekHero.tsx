@@ -223,8 +223,7 @@ function WatchOfTheWeekHeroInner() {
         courseId: pick.course_id ?? undefined,
         tags: (pick as any).post_tags ?? [],
       } as any],
-      0,
-    );
+    });
   };
 
   return (
