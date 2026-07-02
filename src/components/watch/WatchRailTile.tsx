@@ -8,6 +8,8 @@ import { attachHlsToTile } from '@/hooks/useTileVideoPlayer';
 import { getThumbnailUrl } from '@/media/utils/thumbnail';
 import { buildLqipUrl } from '@/utils/mediaThumbs';
 import { shouldUseLqip } from '@/utils/lqipQueue';
+import Pressable from '@/components/ui/Pressable';
+
 
 
 interface WatchRailTileProps {
