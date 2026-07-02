@@ -1,4 +1,6 @@
 import * as React from "react";
+import { useRef } from "react";
+
 import { useLocation } from "react-router-dom";
 import { cn } from "@/lib/utils";
 import { useMedianStatusBar } from "@/hooks/useMedianStatusBar";
