@@ -230,6 +230,8 @@ export function useModerationQueue(filters: QueueFilters = { status: 'all', type
       pending: all.filter((r) => r.status === 'pending').length,
       reviewing: all.filter((r) => r.status === 'reviewing').length,
       resolved: all.filter((r) => r.status === 'actioned' || r.status === 'dismissed').length,
+      highPriority: all.filter((r) => r.is_high_priority && (r.status === 'pending' || r.status === 'reviewing')).length,
+      autoHidden: all.filter((r) => r.auto_hidden && (r.status === 'pending' || r.status === 'reviewing')).length,
       actionedThisWeek: all.filter((r) => {
         if (r.status !== 'actioned') return false;
         if (!r.reviewed_at) return false;
