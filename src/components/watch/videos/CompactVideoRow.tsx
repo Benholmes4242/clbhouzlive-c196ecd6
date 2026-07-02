@@ -45,7 +45,7 @@ function formatAge(iso: string | null | undefined): string {
   return `${years} ${years === 1 ? 'year' : 'years'} ago`;
 }
 
-function CompactVideoRowInner({ post, index, allPosts, onDecoded }: CompactVideoRowProps) {
+function CompactVideoRowInner({ post, index, allPosts, onDecoded, debugId }: CompactVideoRowProps) {
   const media = post.mediaItems.find((m) => m.type === 'video') ?? post.mediaItems[0];
   const thumb = media?.thumbnailUrl || media?.imageUrl || '';
   const duration = media?.duration ?? 0;
