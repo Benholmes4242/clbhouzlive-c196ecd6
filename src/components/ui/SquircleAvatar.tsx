@@ -152,6 +152,7 @@ export const SquircleAvatar: React.FC<SquircleAvatarProps> = ({
   useEffect(() => {
     setCandidateIdx(0);
     setImageLoaded(false);
+    notifiedRef.current = false;
     if (candidates.length === 0) {
       setImageSrc(null);
       setShowFallback(true);
