@@ -20,6 +20,7 @@ import { logGridItemRender, logGridItemPlayAttempt } from '@/utils/gridAuditTime
 import TextOverlayRenderer from '@/components/studio/TextOverlayRenderer';
 import { getFilterClass } from '@/utils/studioFilters';
 import { getCropWrapperClass, getPixelLayerStyle } from '@/utils/studioEdit';
+import { tilePriority } from '@/utils/fetchPriority';
 
 import { PostOwnerMenu } from '@/components/posts/PostOwnerMenu';
 import { extractCloudflareUid } from '@/utils/videoIdUtils';
