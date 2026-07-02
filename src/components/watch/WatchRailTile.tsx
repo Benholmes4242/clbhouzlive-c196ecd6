@@ -4,7 +4,7 @@ import { Heart } from 'lucide-react';
 import Hls from 'hls.js';
 import type { FeedPost } from '@/components/media-system/types/media';
 import { Pin } from './proshop/Pin';
-import DecodedImage from './shared/DecodedImage';
+import AnimatedTileThumb from './shared/AnimatedTileThumb';
 import { getThumbnailUrl } from '@/media/utils/thumbnail';
 
 
