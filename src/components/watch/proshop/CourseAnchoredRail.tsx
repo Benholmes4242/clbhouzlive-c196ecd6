@@ -39,7 +39,49 @@ function CourseAnchoredRailInner() {
     actor,
   );
 
-  if (coursesLoading || postsLoading) return null;
+  const stillLoading = coursesLoading || postsLoading;
+
+  // Reserved-height skeleton while resolving so this rail can't push
+  // subsequent content down after settling. Collapses only when confirmed
+  // that no played course has resolvable posts for this mood.
+  if (stillLoading) {
+    return (
+      <section style={{ background: 'hsl(var(--background))' }}>
+        <SectionHeader
+          role="rail"
+          kicker="From your courses"
+          title="Loading…"
+          paddingX={16}
+        />
+        <div
+          style={{
+            display: 'flex',
+            gap: 12,
+            padding: '0 16px 4px',
+            overflow: 'hidden',
+          }}
+        >
+          {[0, 1, 2, 3].map((i) => (
+            <div
+              key={i}
+              style={{
+                flexShrink: 0,
+                width: 200,
+                aspectRatio: '3/4',
+                borderRadius: 12,
+                background: 'rgba(0,0,0,0.06)',
+                backgroundImage:
+                  'linear-gradient(90deg, transparent 0%, rgba(0,0,0,0.08) 50%, transparent 100%)',
+                backgroundSize: '200% 100%',
+                animation: `clb-shimmer ${1.5 + i * 0.15}s ease-in-out infinite`,
+              }}
+            />
+          ))}
+        </div>
+      </section>
+    );
+  }
+
   if (!topCourse || posts.length === 0) return null;
 
   return (
