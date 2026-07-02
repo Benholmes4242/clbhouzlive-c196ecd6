@@ -24,6 +24,7 @@ import type { VisibilityLevel } from '@/hooks/usePrivacySettings';
 import {
   AlertDialog,
   AlertDialogAction,
+  AlertDialogCancel,
   AlertDialogContent,
   AlertDialogDescription,
   AlertDialogFooter,
@@ -32,6 +33,8 @@ import {
 } from '@/components/ui/alert-dialog';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import DeleteAccountConfirmSheet from '@/components/manage/overlays/DeleteAccountConfirmSheet';
+import { useLogout } from '@/hooks/useLogout';
+
 
 const APP_VERSION = '1.0.0';
 
@@ -69,10 +72,22 @@ export function SettingsTabContent() {
   const deleteAccount = useDeleteAccount(user?.id);
   const { data: whsConnection } = useWhsConnection(user?.id);
 
-  const handleSignOut = async () => {
-    await supabase.auth.signOut();
-    navigate('/auth');
+  const { logout } = useLogout();
+  const [signOutOpen, setSignOutOpen] = useState(false);
+  const [signingOut, setSigningOut] = useState(false);
+
+  const handleConfirmSignOut = async () => {
+    if (signingOut) return;
+    setSigningOut(true);
+    try { (window as any).median?.onesignal?.logout?.(); } catch {}
+    try {
+      await logout();
+    } catch {
+      setSigningOut(false);
+      setSignOutOpen(false);
+    }
   };
+
 
   if (sessionLoading || loading || !profile) return <SettingsSkeleton />;
 
@@ -230,7 +245,7 @@ export function SettingsTabContent() {
           <SettingsChevronRow
             icon={<LogOut size={18} />}
             title="Sign Out"
-            onClick={handleSignOut}
+            onClick={() => setSignOutOpen(true)}
             iconTheme="danger"
           />
           <SettingsChevronRow
@@ -250,7 +265,30 @@ export function SettingsTabContent() {
         </div>
       </div>
 
+      {/* Sign out confirm */}
+      <AlertDialog open={signOutOpen} onOpenChange={(o) => { if (!signingOut) setSignOutOpen(o); }}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Sign out?</AlertDialogTitle>
+            <AlertDialogDescription>
+              You will need to sign in again with your email to get back in.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={signingOut}>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={(e) => { e.preventDefault(); handleConfirmSignOut(); }}
+              disabled={signingOut}
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+            >
+              {signingOut ? 'Signing out...' : 'Sign out'}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
       {/* Business warning dialog (kept as AlertDialog: informational, not destructive confirm) */}
+
       <AlertDialog open={deleteAccount.showBusinessWarning} onOpenChange={deleteAccount.setShowBusinessWarning}>
         <AlertDialogContent>
           <AlertDialogHeader>
