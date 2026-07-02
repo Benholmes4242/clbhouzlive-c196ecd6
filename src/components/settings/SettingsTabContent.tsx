@@ -72,10 +72,22 @@ export function SettingsTabContent() {
   const deleteAccount = useDeleteAccount(user?.id);
   const { data: whsConnection } = useWhsConnection(user?.id);
 
-  const handleSignOut = async () => {
-    await supabase.auth.signOut();
-    navigate('/auth');
+  const { logout } = useLogout();
+  const [signOutOpen, setSignOutOpen] = useState(false);
+  const [signingOut, setSigningOut] = useState(false);
+
+  const handleConfirmSignOut = async () => {
+    if (signingOut) return;
+    setSigningOut(true);
+    try { (window as any).median?.onesignal?.logout?.(); } catch {}
+    try {
+      await logout();
+    } catch {
+      setSigningOut(false);
+      setSignOutOpen(false);
+    }
   };
+
 
   if (sessionLoading || loading || !profile) return <SettingsSkeleton />;
 
