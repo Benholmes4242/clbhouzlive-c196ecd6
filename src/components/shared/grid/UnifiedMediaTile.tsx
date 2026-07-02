@@ -279,8 +279,8 @@ const UnifiedMediaTile: React.FC<UnifiedMediaTileProps> = ({
                     "absolute inset-0 h-full w-full object-cover transition-opacity duration-200",
                     isPosterLoaded ? "opacity-100" : "opacity-0"
                   )}
-                  loading={index < 6 ? "eager" : "lazy"}
-                  fetchPriority={index < 6 ? "high" : "auto"}
+                  loading={index < 3 ? "eager" : "lazy"}
+                  fetchPriority={tilePriority(index)}
                   draggable={false}
                   onLoad={() => setIsPosterLoaded(true)}
                   onError={() => setIsPosterBroken(true)}
