@@ -144,18 +144,26 @@ function WatchOfTheWeekHeroInner() {
             marginTop: 6,
           }}
         >
-          {pick.thumbnail_url ? (
-            <AnimatedTileThumb
-              posterSrc={pick.thumbnail_url}
-              streamId={pick.hls_url ? extractCloudflareUid(pick.hls_url) || undefined : undefined}
-              heightPx={400}
-              dwellMs={0}
-              alt={pick.caption ?? ''}
-              loading="lazy"
-              onDecoded={() => setHeroDecoded(true)}
-              style={{ position: 'absolute', inset: 0 }}
-            />
-          ) : null}
+          <div ref={heroTileRef} style={{ position: 'absolute', inset: 0 }}>
+            {pick.thumbnail_url ? (
+              <DecodedImage
+                src={pick.thumbnail_url}
+                alt={pick.caption ?? ''}
+                loading="lazy"
+                onDecoded={() => setHeroDecoded(true)}
+                style={{
+                  position: 'absolute',
+                  inset: 0,
+                  width: '100%',
+                  height: '100%',
+                  objectFit: 'cover',
+                  opacity: heroVideoVisible ? 0 : 1,
+                  transition: 'opacity 200ms ease',
+                }}
+              />
+            ) : null}
+          </div>
+
 
 
           <div
