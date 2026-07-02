@@ -71,7 +71,7 @@ export const SyncingScreen: React.FC = () => {
       </div>
 
       <div style={{ fontSize: 17, fontWeight: 700, color: INK, marginBottom: 22, letterSpacing: '-0.01em' }}>
-        Connecting your handicap
+        Connecting your official WHS handicap
       </div>
 
       <div style={{ width: '100%', maxWidth: 320, textAlign: 'left', display: 'flex', flexDirection: 'column', gap: 4 }}>

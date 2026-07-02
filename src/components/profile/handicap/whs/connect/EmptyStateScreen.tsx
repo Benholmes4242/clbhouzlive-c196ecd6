@@ -55,7 +55,7 @@ export const EmptyStateScreen: React.FC<Props> = ({ onPickCountry }) => {
           maxWidth: 280,
         }}
       >
-        Connect your handicap
+        Connect your official WHS handicap
       </h2>
 
       <p
