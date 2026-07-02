@@ -6,6 +6,11 @@ import { visualizer } from 'rollup-plugin-visualizer';
 
 // https://vitejs.dev/config/
 export default defineConfig(({ mode }) => ({
+  define: {
+    // Cache-buster for the persisted React Query store (see src/lib/queryPersister.ts).
+    // Every build produces a fresh id — schema changes wipe the persisted cache cleanly.
+    __BUILD_ID__: JSON.stringify(Date.now().toString(36)),
+  },
   base: '/',
   server: {
     host: true,
