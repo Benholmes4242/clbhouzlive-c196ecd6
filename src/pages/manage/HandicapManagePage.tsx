@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Link2, Trash2, CheckCircle2, AlertTriangle } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
 import { toast } from 'sonner';
@@ -26,6 +27,7 @@ const FONT = 'Geist, -apple-system, BlinkMacSystemFont, system-ui, sans-serif';
 export default function HandicapManagePage() {
   const { user } = useSupabaseSession();
   const userId = user?.id;
+  const navigate = useNavigate();
   const queryClient = useQueryClient();
   const { data: connection } = useWhsConnection(userId);
   const [confirmDisconnect, setConfirmDisconnect] = useState(false);
@@ -94,7 +96,13 @@ export default function HandicapManagePage() {
             onDelete={() => setConfirmDelete(true)}
           />
         ) : (
-          <WhsConnectScreen onConnected={() => { invalidateAll(); }} onSkip={() => { /* stay on page */ }} />
+          <WhsConnectScreen
+            onConnected={async () => {
+              invalidateAll();
+              navigate('/handicap', { replace: true });
+            }}
+            onSkip={() => { /* stay on page */ }}
+          />
         )}
       </div>
 
