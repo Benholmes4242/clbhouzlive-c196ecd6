@@ -34,7 +34,9 @@ export default function LatestVideosRail() {
     return () => io.disconnect();
   }, [posts.length]);
 
-  if (isLoading || posts.length === 0) {
+  const revealed = useWatchReveal('latest-videos', !isLoading);
+
+  if (!revealed || isLoading) {
     return (
       <div>
         <SectionHeader
@@ -49,11 +51,17 @@ export default function LatestVideosRail() {
     );
   }
 
+  if (posts.length === 0) return null;
+
   const hero = posts[0];
   const rest = posts.slice(1, 6);
 
   return (
-    <div>
+    <motion.div
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={{ duration: 0.18 }}
+    >
       <SectionHeader
         role="rail"
         title="Latest videos"
