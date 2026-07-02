@@ -25,7 +25,15 @@ interface UnifiedWatchFeedProps {
   embedded?: boolean;
 }
 
-export default function UnifiedWatchFeed({ embedded = false }: UnifiedWatchFeedProps) {
+export default function UnifiedWatchFeed(props: UnifiedWatchFeedProps) {
+  return (
+    <WatchRevealProvider>
+      <UnifiedWatchFeedInner {...props} />
+    </WatchRevealProvider>
+  );
+}
+
+function UnifiedWatchFeedInner({ embedded = false }: UnifiedWatchFeedProps) {
   const { session } = useSupabaseSession();
   const navigate = useNavigate();
   const userId = session?.user?.id;
