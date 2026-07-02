@@ -211,7 +211,7 @@ export const SquircleAvatar: React.FC<SquircleAvatarProps> = ({
 
   // If the browser served the image from cache, `onLoad` may have fired
   // before this component's listener attached. Detect completeness on mount
-  // and after src changes so [hdr] avatar-decoded still fires.
+  // and after src changes so onLoad consumers still fire reliably.
   useEffect(() => {
     if (!imageSrc || showFallback) return;
     const img = imgRef.current;
