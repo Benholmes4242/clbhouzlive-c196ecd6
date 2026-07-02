@@ -36,6 +36,15 @@ export function FullscreenFeedOverlay() {
   const fetchNextPage = useFullscreenFeedStore(s => s.fetchNextPage);
   const isFetchingNextPage = useFullscreenFeedStore(s => s.isFetchingNextPage);
   const readOnly = useFullscreenFeedStore(s => s.readOnly);
+  const origin = useFullscreenFeedStore(s => s.origin);
+
+  // ── FLIP clone state ──
+  // When origin is present, we mount a transform-only expanding poster clone
+  // over the (opacity-0) SnapFeed and crossfade it out on first frame.
+  const [cloneVisible, setCloneVisible] = useState(false);
+  const [cloneExpanded, setCloneExpanded] = useState(false);
+  const [firstFrameReady, setFirstFrameReady] = useState(false);
+  const watchdogRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   // Use the real active actor (personal or business) so users in business
   // mode can like/comment/follow as their business from fullscreen. Falls
