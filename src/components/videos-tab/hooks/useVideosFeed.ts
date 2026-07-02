@@ -87,7 +87,9 @@ export function useVideosFeed({ userId, filter, searchQuery, category = null, en
     enabled: !!userId && externalEnabled,
     placeholderData: keepPreviousData,
     staleTime: 2 * 60 * 1000,
-    gcTime: 10 * 60 * 1000,
+    // Persisted (see queryPersister.ts)
+    gcTime: 24 * 60 * 60 * 1000,
+    refetchOnMount: true,
   });
 
   const allPosts = useMemo(() => {

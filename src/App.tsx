@@ -12,6 +12,8 @@ import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import 'mapbox-gl/dist/mapbox-gl.css';
 import { QueryClient, QueryClientProvider, QueryCache, MutationCache } from "@tanstack/react-query";
+import { PersistQueryClientProvider } from "@tanstack/react-query-persist-client";
+import { queryPersister, shouldPersistQuery, PERSIST_MAX_AGE_MS } from "@/lib/queryPersister";
 import { ErrorBoundary } from '@/components/ErrorBoundary';
 import { BrowserRouter, Routes, Route, useLocation, Navigate, useParams, useNavigate } from "react-router-dom";
 import { setNavigateRef } from '@/utils/navigation';
@@ -966,7 +968,15 @@ const App: React.FC = () => {
         <ErrorBoundary>
           <ThemeProvider defaultTheme="dark" storageKey="clbhouz-ui-theme">
             <Top100DebugProvider>
-              <QueryClientProvider client={queryClient}>
+              <PersistQueryClientProvider
+                client={queryClient}
+                persistOptions={{
+                  persister: queryPersister,
+                  maxAge: PERSIST_MAX_AGE_MS,
+                  buster: __BUILD_ID__,
+                  dehydrateOptions: { shouldDehydrateQuery: shouldPersistQuery },
+                }}
+              >
                 <Suspense fallback={<div style={{ background: '#0A0E14', minHeight: '100dvh' }} />}>
                   <AppPrefetchProvider delay={2000} enabled={true}>
                     <RehydrationProvider>
@@ -979,7 +989,7 @@ const App: React.FC = () => {
                     </RehydrationProvider>
                   </AppPrefetchProvider>
                 </Suspense>
-              </QueryClientProvider>
+              </PersistQueryClientProvider>
             </Top100DebugProvider>
           </ThemeProvider>
         </ErrorBoundary>

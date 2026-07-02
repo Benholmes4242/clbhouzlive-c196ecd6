@@ -1,8 +1,11 @@
 import { useState } from 'react';
+import { useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
+import { removePersistedQueryCache } from '@/lib/queryPersister';
 
 export function useDeleteAccount(userId: string | undefined) {
+  const queryClient = useQueryClient();
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [showBusinessWarning, setShowBusinessWarning] = useState(false);
   const [ownedBusinessNames, setOwnedBusinessNames] = useState<string[]>([]);
@@ -42,6 +45,8 @@ export function useDeleteAccount(userId: string | undefined) {
       });
       if (error) throw error;
       await supabase.auth.signOut();
+      queryClient.clear();
+      await removePersistedQueryCache();
       window.location.href = '/auth';
     } catch (err) {
       console.error('[deleteAccount] Error:', err);

@@ -84,7 +84,10 @@ export function useSuggestedFeed(userId: string | undefined) {
     initialPageParam: undefined as string | undefined,
     enabled: !!userId,
     staleTime: 0,
-    gcTime: 10 * 60 * 1000,
+    // Persisted (see queryPersister.ts): hold 24h so restored entries survive
+    // hydrate, and revalidate on mount so SW-R kicks after paint.
+    gcTime: 24 * 60 * 60 * 1000,
+    refetchOnMount: true,
   });
 
   const allPosts = useMemo(
