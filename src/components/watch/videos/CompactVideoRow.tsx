@@ -10,6 +10,7 @@ interface CompactVideoRowProps {
   allPosts: FeedPost[];
   /** Fires once the thumbnail bitmap is ready. */
   onDecoded?: () => void;
+  debugId?: string;
 }
 
 function formatHMS(seconds: number | null | undefined): string {
