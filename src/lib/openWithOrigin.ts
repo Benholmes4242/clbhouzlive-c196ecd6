@@ -76,8 +76,9 @@ export function openWithOrigin({
 }: OpenWithOriginArgs): void {
   const origin = snapshotOrigin(originEl, posterUrl ?? null);
 
-  // Chrome flip + scroll lock at TAP time (not effect time) to kill the strobe.
-  try { lockBodyScroll(); } catch {}
+  // Chrome flip at TAP time (not effect time) to kill the strobe. Scroll
+  // lock is owned by the overlay's isOpen effect (ref-counted so it composes
+  // cleanly with CommentsSheet stacking on top).
   try {
     (window as any).median?.statusbar?.set({
       style: 'dark',
