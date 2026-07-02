@@ -83,12 +83,13 @@ export default function HelpPage() {
   return (
     <ManagePageShell title="Help centre">
       <div
-        className="sticky z-20 px-4 pt-3 pb-3"
+        className="sticky z-20 px-4 pt-0 pb-3"
         style={{
           top: 'calc(max(var(--safe-top, env(safe-area-inset-top, 0px)), 8px) + 56px)',
           background: 'rgba(244,246,248,0.92)',
           backdropFilter: 'saturate(180%) blur(14px)',
           WebkitBackdropFilter: 'saturate(180%) blur(14px)',
+          marginTop: -1,
         }}
       >
         <div
