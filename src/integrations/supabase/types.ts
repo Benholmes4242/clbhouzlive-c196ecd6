@@ -16724,6 +16724,10 @@ export type Database = {
             }[]
           }
       admin_guard: { Args: never; Returns: undefined }
+      admin_launch_authority: {
+        Args: { _body_name: string; _country_id: string }
+        Returns: number
+      }
       admin_overview_metrics: {
         Args: never
         Returns: {

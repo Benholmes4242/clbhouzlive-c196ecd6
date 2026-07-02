@@ -18,6 +18,7 @@ export interface WaitlistDrilldownRow {
   created_at: string;
   body_name: string;
   country_id: string;
+  notified_live: boolean;
   profile: {
     display_name: string | null;
     username: string | null;
@@ -25,9 +26,38 @@ export interface WaitlistDrilldownRow {
   } | null;
 }
 
+export interface WaitlistNotifyStatus {
+  pending: number;
+  total: number;
+}
+
 export const WAITLIST_SUMMARY_KEY = ['admin-v2', 'waitlist', 'summary'] as const;
 export const WAITLIST_DRILLDOWN_KEY = (countryId: string | null) =>
   ['admin-v2', 'waitlist', 'drilldown', countryId] as const;
+export const WAITLIST_NOTIFY_STATUS_KEY = ['admin-v2', 'waitlist', 'notify-status'] as const;
+
+export function useWaitlistNotifyStatus() {
+  return useQuery({
+    queryKey: WAITLIST_NOTIFY_STATUS_KEY,
+    queryFn: async (): Promise<Record<string, WaitlistNotifyStatus>> => {
+      const { data, error } = await supabase
+        .from('handicap_authority_waitlist')
+        .select('country_id, notified_live')
+        .limit(5000);
+      if (error) throw error;
+      const rows = (data ?? []) as Array<{ country_id: string; notified_live: boolean }>;
+      const out: Record<string, WaitlistNotifyStatus> = {};
+      for (const r of rows) {
+        const s = out[r.country_id] ?? { pending: 0, total: 0 };
+        s.total += 1;
+        if (!r.notified_live) s.pending += 1;
+        out[r.country_id] = s;
+      }
+      return out;
+    },
+    staleTime: 60_000,
+  });
+}
 
 function enrichCountry(row: {
   country_id: string;
@@ -72,7 +102,7 @@ export function useWaitlistDrilldown(countryId: string | null) {
       if (!countryId) return [];
       const { data, error } = await supabase
         .from('handicap_authority_waitlist')
-        .select('id, user_id, created_at, body_name, country_id')
+        .select('id, user_id, created_at, body_name, country_id, notified_live')
         .eq('country_id', countryId)
         .order('created_at', { ascending: false })
         .limit(500);
@@ -83,6 +113,7 @@ export function useWaitlistDrilldown(countryId: string | null) {
         created_at: string;
         body_name: string;
         country_id: string;
+        notified_live: boolean;
       }>;
       if (!rows.length) return [];
 

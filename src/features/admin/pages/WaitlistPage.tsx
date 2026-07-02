@@ -1,20 +1,27 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { formatDistanceToNow } from 'date-fns';
-import { ClipboardList, Copy, Check } from 'lucide-react';
+import { ClipboardList, Copy, Check, Rocket } from 'lucide-react';
 import { useQueryClient } from '@tanstack/react-query';
+import { toast } from 'sonner';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
+import { supabase } from '@/integrations/supabase/client';
 import { adminTheme as t } from '../theme';
 import KpiCard from '../components/KpiCard';
 import DataList, { type DataListColumn } from '../components/DataList';
 import EmptyState from '../components/EmptyState';
 import DetailDrawer from '../components/DetailDrawer';
 import AdminAccessDenied from '../components/AdminAccessDenied';
+import ConfirmDialog from '../components/ConfirmDialog';
+import StatusPill from '../components/StatusPill';
 import { usePanelRole } from '@/hooks/usePanelRole';
 import { panelCan } from '@/lib/panelCan';
 import {
   useWaitlistSummary,
   useWaitlistDrilldown,
+  useWaitlistNotifyStatus,
   WAITLIST_SUMMARY_KEY,
+  WAITLIST_NOTIFY_STATUS_KEY,
+  WAITLIST_DRILLDOWN_KEY,
   type WaitlistSummaryRow,
 } from '../hooks/useWaitlistDemand';
 
@@ -46,17 +53,46 @@ export default function WaitlistPage() {
   const qc = useQueryClient();
   const [selected, setSelected] = useState<WaitlistSummaryRow | null>(null);
   const [copied, setCopied] = useState(false);
+  const [launchOpen, setLaunchOpen] = useState(false);
+  const [launching, setLaunching] = useState(false);
 
   const { data = [], isLoading } = useWaitlistSummary();
   const { data: drilldown = [], isLoading: drilldownLoading } = useWaitlistDrilldown(
     selected?.country_id ?? null,
   );
+  const { data: notifyStatus = {} } = useWaitlistNotifyStatus();
 
   useEffect(() => {
-    const handler = () => qc.invalidateQueries({ queryKey: WAITLIST_SUMMARY_KEY });
+    const handler = () => {
+      qc.invalidateQueries({ queryKey: WAITLIST_SUMMARY_KEY });
+      qc.invalidateQueries({ queryKey: WAITLIST_NOTIFY_STATUS_KEY });
+    };
     window.addEventListener('admin-v2:refetch', handler);
     return () => window.removeEventListener('admin-v2:refetch', handler);
   }, [qc]);
+
+  const handleLaunch = async () => {
+    if (!selected) return;
+    setLaunching(true);
+    try {
+      const { data: count, error } = await supabase.rpc('admin_launch_authority', {
+        _country_id: selected.country_id,
+        _body_name: selected.body_name,
+      });
+      if (error) throw error;
+      const n = Number(count ?? 0);
+      if (n > 0) toast.success(`Notified ${n} golfer${n === 1 ? '' : 's'}`);
+      else toast('No one new to notify');
+      qc.invalidateQueries({ queryKey: WAITLIST_SUMMARY_KEY });
+      qc.invalidateQueries({ queryKey: WAITLIST_NOTIFY_STATUS_KEY });
+      qc.invalidateQueries({ queryKey: WAITLIST_DRILLDOWN_KEY(selected.country_id) });
+      setLaunchOpen(false);
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : 'Launch failed');
+    } finally {
+      setLaunching(false);
+    }
+  };
 
   if (!caps.viewModeration) return <AdminAccessDenied />;
 
@@ -77,12 +113,20 @@ export default function WaitlistPage() {
     }
   };
 
+  const isLaunched = (countryId: string): boolean => {
+    const s = notifyStatus[countryId];
+    return !!s && s.total > 0 && s.pending === 0;
+  };
+
   const columns: DataListColumn<WaitlistSummaryRow>[] = [
     { key: 'country', header: 'Country', render: (r) => (
       <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
         <FlagBadge iso={r.iso} />
         <div style={{ display: 'flex', flexDirection: 'column', lineHeight: 1.2, minWidth: 0 }}>
-          <span style={{ color: t.ink, fontWeight: 600, fontSize: 13 }}>{r.country_name}</span>
+          <span style={{ color: t.ink, fontWeight: 600, fontSize: 13, display: 'inline-flex', alignItems: 'center', gap: 6 }}>
+            {r.country_name}
+            {isLaunched(r.country_id) && <StatusPill tone="ok">Launched</StatusPill>}
+          </span>
           <span style={{ color: t.inkFaint, fontSize: 11 }}>{r.body_name}</span>
         </div>
       </div>
@@ -171,7 +215,10 @@ export default function WaitlistPage() {
                   <div style={{ display: 'flex', alignItems: 'center', gap: 10, minWidth: 0 }}>
                     <FlagBadge iso={row.iso} />
                     <div style={{ display: 'flex', flexDirection: 'column', lineHeight: 1.2, minWidth: 0 }}>
-                      <span style={{ color: t.ink, fontWeight: 600, fontSize: 14 }}>{row.country_name}</span>
+                      <span style={{ color: t.ink, fontWeight: 600, fontSize: 14, display: 'inline-flex', alignItems: 'center', gap: 6 }}>
+                        {row.country_name}
+                        {isLaunched(row.country_id) && <StatusPill tone="ok">Launched</StatusPill>}
+                      </span>
                       <span style={{ color: t.inkFaint, fontSize: 11 }}>{row.body_name}</span>
                     </div>
                   </div>
@@ -197,7 +244,39 @@ export default function WaitlistPage() {
         title={selected?.body_name}
         subtitle={selected ? `${selected.total.toLocaleString()} golfers waiting` : undefined}
       >
-        <div style={{ padding: 16, display: 'flex', flexDirection: 'column', gap: 8 }}>
+        <div style={{ padding: 16, display: 'flex', flexDirection: 'column', gap: 12 }}>
+          {selected && caps.approveRequests && (
+            <div style={{
+              display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12,
+              padding: '12px 14px', background: t.canvas, border: `1px solid ${t.line}`, borderRadius: t.radius.md,
+            }}>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 2, minWidth: 0 }}>
+                <span style={{ color: t.ink, fontSize: 13, fontWeight: 600 }}>
+                  {isLaunched(selected.country_id) ? 'All waiting golfers notified' : 'Ready to launch?'}
+                </span>
+                <span style={{ color: t.inkMuted, fontSize: 11, lineHeight: 1.4 }}>
+                  Only press this after the {selected.body_name} integration is live and verified.
+                </span>
+              </div>
+              <button
+                type="button"
+                onClick={() => setLaunchOpen(true)}
+                disabled={launching}
+                style={{
+                  display: 'inline-flex', alignItems: 'center', gap: 6,
+                  padding: '8px 12px', borderRadius: t.radius.md,
+                  background: t.ink, color: t.surface, border: 'none',
+                  fontSize: 12, fontWeight: 700, whiteSpace: 'nowrap',
+                  cursor: launching ? 'not-allowed' : 'pointer',
+                  opacity: launching ? 0.6 : 1,
+                }}
+              >
+                <Rocket size={14} />
+                Launch + notify
+              </button>
+            </div>
+          )}
+
           {drilldownLoading ? (
             Array.from({ length: 5 }).map((_, i) => (
               <div
@@ -235,12 +314,27 @@ export default function WaitlistPage() {
                     <span style={{ color: t.inkFaint, fontSize: 11 }}>@{row.profile.username}</span>
                   )}
                 </div>
+                {row.notified_live && <StatusPill tone="ok">Notified</StatusPill>}
                 <span style={{ color: t.inkMuted, fontSize: 11 }}>{relTime(row.created_at)}</span>
               </div>
             ))
           )}
         </div>
       </DetailDrawer>
+
+      <ConfirmDialog
+        open={launchOpen}
+        onClose={() => (launching ? null : setLaunchOpen(false))}
+        onConfirm={handleLaunch}
+        title={selected ? `Launch ${selected.body_name}?` : 'Launch authority?'}
+        description={selected
+          ? `This notifies all ${selected.total.toLocaleString()} waiting golfers that they can now connect. Only do this after the ${selected.body_name} integration is live.`
+          : ''}
+        confirmLabel="Launch + notify"
+        cancelLabel="Cancel"
+        tone="danger"
+        busy={launching}
+      />
     </div>
   );
 }

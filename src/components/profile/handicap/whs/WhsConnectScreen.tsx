@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
+import { useLocation } from 'react-router-dom';
 import { callConnectWhs } from '@/lib/whs/api';
 import type { ConnectWhsSuccess } from '@/lib/whs/types';
 import { useSelectedCountry } from '@/lib/whs/useSelectedCountry';
@@ -27,10 +28,17 @@ interface Props {
 
 export const WhsConnectScreen: React.FC<Props> = ({ onConnected, onSkip }) => {
   const { country, setCountryId } = useSelectedCountry();
+  const location = useLocation();
   const [pickerOpen, setPickerOpen] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [successData, setSuccessData] = useState<ConnectWhsSuccess | null>(null);
+
+  useEffect(() => {
+    const preselect = (location.state as { preselectCountryId?: string } | null)?.preselectCountryId;
+    if (preselect) setCountryId(preselect);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const handlePick = (c: WhsCountry) => {
     setCountryId(c.id);
