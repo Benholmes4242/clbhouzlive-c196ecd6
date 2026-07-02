@@ -101,7 +101,7 @@ export const preloadHlsManifest = async (
 /**
  * Internal: Actually performs the prefetch work
  */
-async function performPrefetch(hlsUrl: string, effectiveVideoId: string): Promise<void> {
+async function performPrefetch(hlsUrl: string, effectiveVideoId: string, signal?: AbortSignal): Promise<void> {
   // Fetch manifest
   const manifestResponse = await fetch(hlsUrl, { 
     method: 'GET',
