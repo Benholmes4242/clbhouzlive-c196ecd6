@@ -68,6 +68,12 @@ export default function ModerationPage() {
       render: (row) => <TargetCell row={row} />,
     },
     {
+      key: 'flags',
+      header: 'Flags',
+      width: 180,
+      render: (row) => <FlagsCell row={row} />,
+    },
+    {
       key: 'reasons',
       header: 'Reason(s)',
       render: (row) => <ReasonsCell reasons={row.reasons} />,
@@ -105,9 +111,12 @@ export default function ModerationPage() {
         }}
       >
         <KpiCard label="Open reports" value={counts.pending + counts.reviewing} loading={isLoading} />
+        <KpiCard label="High priority" value={counts.highPriority} loading={isLoading} />
+        <KpiCard label="Auto-hidden posts" value={counts.autoHidden} loading={isLoading} />
         <KpiCard label="Reports today" value={counts.reportsToday} loading={isLoading} />
         <KpiCard label="Actioned this week" value={counts.actionedThisWeek} loading={isLoading} />
       </div>
+
 
       <SectionTabs tabs={statusTabs} activeId={status} onChange={setStatus} />
 
