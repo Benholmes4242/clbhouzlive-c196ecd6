@@ -75,6 +75,7 @@ export const useFullscreenFeedStore = create<FullscreenFeedState>((set, get) => 
   fetchNextPage: null,
   isFetchingNextPage: false,
   readOnly: false,
+  origin: null,
   open: (posts, startIndex = 0, options) =>
     set({
       isOpen: true,
