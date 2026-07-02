@@ -14,7 +14,8 @@ export function useQuickClipsRail(userId: string | undefined, limit = 8) {
     queryKey: ['quick-clips-rail', userId, limit],
     enabled: !!userId,
     staleTime: 2 * 60 * 1000,
-    gcTime: 10 * 60 * 1000,
+    gcTime: 24 * 60 * 60 * 1000, // Persisted (queryPersister.ts)
+    refetchOnMount: true,
     queryFn: async (): Promise<FeedPost[]> => {
       if (!userId) return [];
       const { data, error } = await supabase.rpc('get_watch_shorts', {

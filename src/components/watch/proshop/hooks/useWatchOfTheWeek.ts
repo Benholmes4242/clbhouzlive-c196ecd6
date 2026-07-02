@@ -44,6 +44,7 @@ export function useWatchOfTheWeek(
       return row ?? null;
     },
     staleTime: 60 * 60 * 1000,
-    gcTime: 6 * 60 * 60 * 1000,
+    gcTime: 24 * 60 * 60 * 1000, // Persisted (queryPersister.ts)
+    refetchOnMount: true,
   });
 }

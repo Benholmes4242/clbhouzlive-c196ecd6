@@ -45,7 +45,8 @@ export function useSuggestedCreators(userId: string | undefined) {
     },
     enabled: !!userId,
     staleTime: 5 * 60 * 1000,
-    gcTime: 15 * 60 * 1000,
+    gcTime: 24 * 60 * 60 * 1000, // Persisted (queryPersister.ts)
+    refetchOnMount: true,
     placeholderData: keepPreviousData,
   });
 }
