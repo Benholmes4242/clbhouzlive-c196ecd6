@@ -107,7 +107,12 @@ function WatchOfTheWeekHeroInner() {
   };
 
   return (
-    <section style={{ padding: '24px 16px 12px' }}>
+    <motion.section
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={{ duration: 0.18 }}
+      style={{ padding: '24px 16px 12px' }}
+    >
       <Kicker color="amber">Watch of the Week</Kicker>
 
       <button
