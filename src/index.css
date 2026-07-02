@@ -504,6 +504,18 @@ html.lightbox-open {
   }
 }
 
+/* ===== Phase 7: EdgeFadeScroller (HRail + CarouselRow + chip bars) =====
+   Wrapper carries data-fade-left / data-fade-right via useEdgeFades();
+   sibling gradient overlays fade in only when the scroller can actually
+   go that direction. Prevents phantom edges on short non-scrollable rails. */
+.hrail-edge-fade[data-fade-left] .hrail-fade-left { opacity: 1 !important; }
+.hrail-edge-fade[data-fade-right] .hrail-fade-right { opacity: 1 !important; }
+@media (min-width: 768px) {
+  .hrail-edge-fade .hrail-fade { width: 32px; }
+}
+
+
+
 .rating-slider {
   touch-action: pan-y;
 }
