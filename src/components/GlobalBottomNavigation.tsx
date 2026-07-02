@@ -10,6 +10,7 @@ import { usePostStudioStore } from '@/stores/usePostStudioStore';
 
 // Note: usePrefetch is accessed via useAppPrefetch to avoid static/dynamic import conflict
 import { useAppPrefetch } from '@/hooks/useAppPrefetch';
+import { warmChunk } from '@/routes/chunkLoaders';
 import NavigationBar from './bottom-navigation/NavigationBar';
 import { useNavigationHandlers } from './bottom-navigation/useNavigationHandlers';
 import { useUnseenFriendReviews } from '@/hooks/useUnseenFriendReviews';
