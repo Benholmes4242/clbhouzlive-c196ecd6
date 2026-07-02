@@ -11,6 +11,9 @@ import { useActiveActor } from '@/context/ActiveActorContext';
 import { useWatchReveal } from '../WatchRevealContext';
 import type { CourseAnchoredRow } from './hooks/useCourseAnchoredContent';
 import type { FeedPost } from '@/components/media-system/types/media';
+import { useFirstVisibleDecoded } from '../shared/useFirstVisibleDecoded';
+
+const VISIBLE_COUNT = 3;
 
 const MAX_TILES = 40;
 
