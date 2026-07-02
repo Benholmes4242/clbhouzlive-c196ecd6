@@ -200,7 +200,13 @@ const WatchGrid: React.FC<WatchGridProps> = ({
                   overflow: 'hidden',
                 }}
               >
-                <WatchTile post={post} index={index} allPosts={posts} />
+                <WatchTile
+                  post={post}
+                  index={index}
+                  allPosts={posts}
+                  onDecoded={index < COLS ? handleTileDecoded : undefined}
+                />
+
               </div>
             ))}
           </div>
