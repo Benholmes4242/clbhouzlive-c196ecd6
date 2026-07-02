@@ -1,4 +1,4 @@
-import { memo } from 'react';
+import { memo, useState } from 'react';
 import { motion } from 'framer-motion';
 import { useQuery } from '@tanstack/react-query';
 
@@ -11,6 +11,7 @@ import { Kicker } from './Kicker';
 import { Pin } from './Pin';
 import { useActiveActor } from '@/context/ActiveActorContext';
 import { isPostLikedByMe } from '@/lib/likedPostIds';
+import DecodedImage from '../shared/DecodedImage';
 // Note: useNavigate import previously here was unused.
 
 function formatDuration(seconds: number | null): string {
