@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { usePageReady } from '@/perf/usePageReady';
 
-import { WatchRevealProvider, useWatchReveal } from './WatchRevealContext';
+import { WatchRevealProvider, useWatchRevealed } from './WatchRevealContext';
 import TrendingThisWeek from './TrendingThisWeek';
 import LatestVideosRail from './LatestVideosRail';
 import WatchAutoplay from './WatchAutoplay';
