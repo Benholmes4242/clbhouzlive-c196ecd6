@@ -330,6 +330,7 @@ const BusinessActivityPage = lazy(() => import("./pages/BusinessActivityPage"));
 const NotFound = lazy(() => import("./pages/NotFound"));
 const PrivacyPolicyPage = lazy(() => import("./pages/legal/PrivacyPolicyPage"));
 const TermsPage = lazy(() => import("./pages/legal/TermsPage"));
+const LegalDocumentPage = lazy(() => import("./pages/legal/LegalDocumentPage"));
 
 
 // PostsTabTestPage removed — Posts tab now integrated into profiles
@@ -618,6 +619,7 @@ function AppRoutes() {
 
         <Route path="/privacy" element={<Suspense fallback={<GenericPageSkeleton />}><PrivacyPolicyPage /></Suspense>} />
         <Route path="/terms" element={<Suspense fallback={<GenericPageSkeleton />}><TermsPage /></Suspense>} />
+        <Route path="/legal/:slug" element={<Suspense fallback={<GenericPageSkeleton />}><LegalDocumentPage /></Suspense>} />
         <Route path="*" element={<Suspense fallback={<GenericPageSkeleton />}><NotFound /></Suspense>} />
       </Routes>
 

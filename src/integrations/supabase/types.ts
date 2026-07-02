@@ -6732,6 +6732,39 @@ export type Database = {
           },
         ]
       }
+      legal_documents: {
+        Row: {
+          body: string
+          effective_date: string | null
+          id: string
+          is_published: boolean
+          slug: string
+          sort_order: number
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          body: string
+          effective_date?: string | null
+          id?: string
+          is_published?: boolean
+          slug: string
+          sort_order?: number
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          body?: string
+          effective_date?: string | null
+          id?: string
+          is_published?: boolean
+          slug?: string
+          sort_order?: number
+          title?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       logos: {
         Row: {
           category: string
@@ -19749,6 +19782,7 @@ export type Database = {
           like_count: number
           post_id: string
           post_tags: Json
+          stream_id: string
           thumbnail_url: string
           user_id: string
           username: string

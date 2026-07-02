@@ -29,15 +29,16 @@ import { useCourses, createCourse, type AdminCourseRow } from '../hooks/useCours
 import { useCourseRequests } from '../hooks/useCourseRequests';
 import CourseRequestsTab from '../components/CourseRequestsTab';
 import HelpArticlesTab from '../components/HelpArticlesTab';
+import LegalDocumentsTab from '../components/LegalDocumentsTab';
 
-type TabId = 'courses' | 'course-requests' | 'help' | 'tour' | 'players';
+type TabId = 'courses' | 'course-requests' | 'help' | 'legal' | 'tour' | 'players';
 
 export default function ContentPage() {
   const { role } = usePanelRole();
   const can = panelCan(role);
   const [params, setParams] = useSearchParams();
   const requested = (params.get('tab') as TabId) || 'courses';
-  const allowedForLimited: TabId[] = ['courses', 'course-requests', 'help'];
+  const allowedForLimited: TabId[] = ['courses', 'course-requests', 'help', 'legal'];
   // Hide tour tabs from limited admins
   const tab: TabId = !can.manageAdmins && !allowedForLimited.includes(requested) ? 'courses' : requested;
   const setTab = (id: string) => {
@@ -55,6 +56,7 @@ export default function ContentPage() {
     ];
     if (can.viewModeration) {
       base.push({ id: 'help', label: 'Help articles' });
+      base.push({ id: 'legal', label: 'Legal' });
     }
     if (can.manageAdmins) {
       base.push({ id: 'tour', label: 'Tour Data' });
@@ -69,6 +71,7 @@ export default function ContentPage() {
       {tab === 'courses' && <CoursesTab />}
       {tab === 'course-requests' && <CourseRequestsTab />}
       {tab === 'help' && (can.viewModeration ? <HelpArticlesTab /> : <AdminAccessDenied />)}
+      {tab === 'legal' && (can.viewModeration ? <LegalDocumentsTab /> : <AdminAccessDenied />)}
       {tab === 'tour' && (can.manageAdmins ? <TourDataTab /> : <AdminAccessDenied />)}
       {tab === 'players' && (can.manageAdmins ? <TourPlayersTab /> : <AdminAccessDenied />)}
     </div>
