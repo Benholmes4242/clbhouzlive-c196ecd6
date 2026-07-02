@@ -37,7 +37,7 @@ export default function ContentPage() {
   const can = panelCan(role);
   const [params, setParams] = useSearchParams();
   const requested = (params.get('tab') as TabId) || 'courses';
-  const allowedForLimited: TabId[] = ['courses', 'course-requests'];
+  const allowedForLimited: TabId[] = ['courses', 'course-requests', 'help'];
   // Hide tour tabs from limited admins
   const tab: TabId = !can.manageAdmins && !allowedForLimited.includes(requested) ? 'courses' : requested;
   const setTab = (id: string) => {
@@ -53,18 +53,22 @@ export default function ContentPage() {
       { id: 'courses', label: 'Courses' },
       { id: 'course-requests', label: 'Course requests', count: pendingCount > 0 ? pendingCount : undefined },
     ];
+    if (can.viewModeration) {
+      base.push({ id: 'help', label: 'Help articles' });
+    }
     if (can.manageAdmins) {
       base.push({ id: 'tour', label: 'Tour Data' });
       base.push({ id: 'players', label: 'Tour Players' });
     }
     return base;
-  }, [can.manageAdmins, pendingCount]);
+  }, [can.manageAdmins, can.viewModeration, pendingCount]);
 
   return (
     <div style={{ padding: 16, display: 'flex', flexDirection: 'column', gap: 16, maxWidth: 1180, margin: '0 auto' }}>
       <SectionTabs tabs={tabs} activeId={tab} onChange={setTab} />
       {tab === 'courses' && <CoursesTab />}
       {tab === 'course-requests' && <CourseRequestsTab />}
+      {tab === 'help' && (can.viewModeration ? <HelpArticlesTab /> : <AdminAccessDenied />)}
       {tab === 'tour' && (can.manageAdmins ? <TourDataTab /> : <AdminAccessDenied />)}
       {tab === 'players' && (can.manageAdmins ? <TourPlayersTab /> : <AdminAccessDenied />)}
     </div>
