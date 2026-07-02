@@ -166,10 +166,11 @@ function AutoplayVideoCardInner({ post, index, allPosts, userId, active, borderR
       >
         <div ref={tileRef} style={{ position: 'absolute', inset: 0 }}>
           {thumbnail ? (
-            <img
+            <DecodedImage
               src={thumbnail}
               alt=""
               loading="lazy"
+              onDecoded={onDecoded}
               style={{
                 position: 'absolute',
                 inset: 0,
