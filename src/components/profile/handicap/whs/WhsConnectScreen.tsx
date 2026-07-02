@@ -32,23 +32,14 @@ export const WhsConnectScreen: React.FC<Props> = ({ onConnected, onSkip }) => {
   const [error, setError] = useState<string | null>(null);
   const [successData, setSuccessData] = useState<ConnectWhsSuccess | null>(null);
 
-  const notifyMeFiredRef = useRef(false);
-
   const handlePick = (c: WhsCountry) => {
     setCountryId(c.id);
     setPickerOpen(false);
     setError(null);
-    notifyMeFiredRef.current = false;
   };
 
   const handleChangeCountry = () => {
     setPickerOpen(true);
-  };
-
-  const handleNotifyMe = (c: WhsCountry) => {
-    if (notifyMeFiredRef.current) return;
-    notifyMeFiredRef.current = true;
-    window.alert(`Thanks — we'll let you know when ${c.body} is ready.`);
   };
 
   const handleSubmit = async (membershipNumber: string, password: string) => {
