@@ -84,6 +84,7 @@ export default function LatestVideosRail() {
             active={heroActive}
             borderRadius={6}
             onDecoded={onDecoded}
+            debugId="latest-videos#0"
           />
         </div>
 
