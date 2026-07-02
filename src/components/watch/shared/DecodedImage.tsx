@@ -1,4 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
+import { wrtMark } from '@/perf/watchRevealDebug';
 
 export interface DecodedImageProps extends React.ImgHTMLAttributes<HTMLImageElement> {
   /**
