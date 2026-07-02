@@ -33,8 +33,17 @@ export const WhsHandicapTab: React.FC<Props> = ({ userId, ownerFirstName = null 
     return (
       <WhsConnectScreen
         onConnected={async () => {
-          await refetch();
-          navigate('/handicap', { replace: true });
+          // Refresh the shared ['whs-connection', userId] cache. Both this
+          // observer and HandicapPage.ownConnection update together, so
+          // isConnectFlow flips false and the dashboard renders — no navigate
+          // needed (user is already on /handicap).
+          let res = await refetch();
+          // Guard: server-side propagation lag after callConnectWhs. Retry
+          // once after a short delay before giving up.
+          if (!res.data) {
+            await new Promise((r) => setTimeout(r, 500));
+            res = await refetch();
+          }
         }}
         onSkip={() => navigate(-1)}
       />
