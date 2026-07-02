@@ -296,23 +296,26 @@ function GroupedRow({
   isLast?: boolean;
 }) {
   return (
-    <button
-      type="button"
-      onClick={onClick}
-      className="w-full flex items-center gap-3 active:bg-[rgba(15,23,42,0.03)] transition-colors"
+    <Pressable
+      as="button"
+      variant="row"
+      haptic="selection"
+      onPress={onClick}
+      innerClassName="w-full flex items-center gap-3"
       style={{
         padding: '14px 14px',
         background: 'transparent',
         border: 'none',
         borderTop: isFirst ? 'none' : `0.5px solid ${HAIRLINE_SOFT}`,
-        cursor: 'pointer',
         textAlign: 'left',
+        width: '100%',
+        borderRadius: isFirst && isLast ? 14 : (isFirst ? '14px 14px 0 0' : (isLast ? '0 0 14px 14px' : 0)),
       }}
     >
       <Icon size={16} color={INK_SOFT} strokeWidth={1.8} />
       <div style={{ flex: 1, minWidth: 0, fontSize: 14, fontWeight: 600, color: INK }}>{label}</div>
       <ChevronRight size={13} color="rgba(15,23,42,0.30)" />
-    </button>
+    </Pressable>
   );
 }
 
