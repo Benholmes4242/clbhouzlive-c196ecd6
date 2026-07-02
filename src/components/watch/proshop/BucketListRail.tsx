@@ -80,11 +80,11 @@ function BucketListRailInner() {
   }, [courses]);
 
   const stillLoading = coursesLoading || postsLoading;
+  const revealed = useWatchReveal('bucket-list', !stillLoading);
 
   // Reserve final height while loading so late-resolving posts don't push
-  // the rest of the feed down. Only collapse once we've confirmed the user
-  // has no bucket list or no resolvable posts.
-  if (stillLoading) {
+  // the rest of the feed down. Held until coordinated reveal.
+  if (!revealed || stillLoading) {
     return (
       <section style={{ background: 'hsl(var(--background))' }}>
         <SectionHeader role="rail" paddingTop={18} paddingX={16} title="Bucket list" />
@@ -129,7 +129,12 @@ function BucketListRailInner() {
   if (courses.length === 0 || orderedPosts.length === 0) return null;
 
   return (
-    <section style={{ background: 'hsl(var(--background))' }}>
+    <motion.section
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={{ duration: 0.18 }}
+      style={{ background: 'hsl(var(--background))' }}
+    >
       <SectionHeader role="rail" paddingTop={18} paddingX={16} title="Bucket list" />
       <HRail>
         {orderedPosts.map((post, i) => (
