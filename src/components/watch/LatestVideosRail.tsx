@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
+import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useVideosFeed } from '@/components/videos-tab/hooks/useVideosFeed';
@@ -7,6 +8,7 @@ import { SectionHeader } from '@/components/ui/SectionHeader';
 import AutoplayVideoCard from './videos/AutoplayVideoCard';
 import CompactVideoRow from './videos/CompactVideoRow';
 import { VideosMark } from './proshop/SectionMarks';
+import { useWatchReveal } from './WatchRevealContext';
 
 /**
  * "Latest videos" — 1 full-width hero (autoplays when in view) +
