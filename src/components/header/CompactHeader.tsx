@@ -73,26 +73,8 @@ const CompactHeader: React.FC<CompactHeaderProps> = ({ className }) => {
   const [scrolled, setScrolled] = useState(false);
   const pillRef = useRef<HTMLButtonElement>(null);
 
-  // [hdr] temporary telemetry — see BRIEF addendum. Anchored at header mount.
-  const hdrT0 = useRef(performance.now());
-  const hdr = React.useCallback((what: string) => {
-    // eslint-disable-next-line no-console
-    console.info(`[hdr] ${what} ${Math.round(performance.now() - hdrT0.current)}ms`);
-  }, []);
-  React.useLayoutEffect(() => { hdr('mount'); }, [hdr]);
-  const userReadyRef = useRef(false);
-  React.useEffect(() => {
-    if (user && !userReadyRef.current) {
-      userReadyRef.current = true;
-      hdr('pill-data');
-    }
-  }, [user, hdr]);
-  const avatarReadyRef = useRef(false);
-  const handleAvatarLoad = React.useCallback(() => {
-    if (avatarReadyRef.current) return;
-    avatarReadyRef.current = true;
-    hdr('avatar-decoded');
-  }, [hdr]);
+
+
 
 
   
@@ -437,8 +419,8 @@ const CompactHeader: React.FC<CompactHeaderProps> = ({ className }) => {
                     useLightTheme={useLightTheme && !overlayActive}
                     compact={isEditorialChromeRoute}
                     size={isEditorialChromeRoute ? 'lg' : undefined}
-                    onAvatarLoad={handleAvatarLoad}
                   />
+
                 </div>
               ) : (
                 /* Skeleton placeholder while auth resolves — prevents layout shift */
