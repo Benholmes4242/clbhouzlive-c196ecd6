@@ -221,7 +221,7 @@ const WatchAutoplay: React.FC<WatchAutoplayProps> = ({ posts, gridRef }) => {
       }
       activeMap.clear();
     };
-  }, [posts, gridRef, isSlowNetwork, attachToTile, detachSlot]);
+  }, [posts, gridRef, isSlowNetwork, attachToTile, detachSlot, prefersReducedMotion]);
 
   // Re-observe new tiles as infinite scroll loads
   useEffect(() => {
