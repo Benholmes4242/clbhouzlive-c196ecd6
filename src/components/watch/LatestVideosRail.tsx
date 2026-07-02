@@ -9,6 +9,9 @@ import AutoplayVideoCard from './videos/AutoplayVideoCard';
 import CompactVideoRow from './videos/CompactVideoRow';
 import { VideosMark } from './proshop/SectionMarks';
 import { useWatchReveal } from './WatchRevealContext';
+import { useFirstVisibleDecoded } from './shared/useFirstVisibleDecoded';
+
+const VISIBLE_COUNT = 3; // hero + 2 compact rows on-screen at rest
 
 /**
  * "Latest videos" — 1 full-width hero (autoplays when in view) +
@@ -34,7 +37,8 @@ export default function LatestVideosRail() {
     return () => io.disconnect();
   }, [posts.length]);
 
-  const revealed = useWatchReveal('latest-videos', !isLoading);
+  const { settled: firstVisibleDecoded, onDecoded } = useFirstVisibleDecoded(posts.length, VISIBLE_COUNT);
+  const revealed = useWatchReveal('latest-videos', !isLoading && firstVisibleDecoded);
 
   if (!revealed || isLoading) {
     return (
@@ -79,6 +83,7 @@ export default function LatestVideosRail() {
             userId={userId}
             active={heroActive}
             borderRadius={6}
+            onDecoded={onDecoded}
           />
         </div>
 
@@ -90,6 +95,7 @@ export default function LatestVideosRail() {
                 post={post}
                 index={i + 1}
                 allPosts={posts}
+                onDecoded={i < VISIBLE_COUNT - 1 ? onDecoded : undefined}
               />
             ))}
           </div>

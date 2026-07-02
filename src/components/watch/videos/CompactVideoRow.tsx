@@ -2,11 +2,14 @@ import { memo, useCallback, useMemo, useState } from 'react';
 import { useFullscreenFeedStore } from '@/store/fullscreenFeedStore';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import type { FeedPost } from '@/components/media-system/types/media';
+import DecodedImage from '../shared/DecodedImage';
 
 interface CompactVideoRowProps {
   post: FeedPost;
   index: number;
   allPosts: FeedPost[];
+  /** Fires once the thumbnail bitmap is ready. */
+  onDecoded?: () => void;
 }
 
 function formatHMS(seconds: number | null | undefined): string {
@@ -41,7 +44,7 @@ function formatAge(iso: string | null | undefined): string {
   return `${years} ${years === 1 ? 'year' : 'years'} ago`;
 }
 
-function CompactVideoRowInner({ post, index, allPosts }: CompactVideoRowProps) {
+function CompactVideoRowInner({ post, index, allPosts, onDecoded }: CompactVideoRowProps) {
   const media = post.mediaItems.find((m) => m.type === 'video') ?? post.mediaItems[0];
   const thumb = media?.thumbnailUrl || media?.imageUrl || '';
   const duration = media?.duration ?? 0;
@@ -83,11 +86,14 @@ function CompactVideoRowInner({ post, index, allPosts }: CompactVideoRowProps) {
         }}
       >
         {thumb && !failed && (
-          <img
+          <DecodedImage
             src={thumb}
             alt=""
             loading="lazy"
-            onError={() => setFailed(true)}
+            onDecoded={onDecoded}
+            onError={() => {
+              setFailed(true);
+            }}
             style={{
               position: 'absolute',
               inset: 0,

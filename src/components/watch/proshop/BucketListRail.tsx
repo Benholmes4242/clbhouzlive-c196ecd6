@@ -11,6 +11,9 @@ import { useActiveActor } from '@/context/ActiveActorContext';
 import { useWatchReveal } from '../WatchRevealContext';
 import type { CourseAnchoredRow } from './hooks/useCourseAnchoredContent';
 import type { FeedPost } from '@/components/media-system/types/media';
+import { useFirstVisibleDecoded } from '../shared/useFirstVisibleDecoded';
+
+const VISIBLE_COUNT = 3;
 
 const MAX_TILES = 40;
 
@@ -80,7 +83,8 @@ function BucketListRailInner() {
   }, [courses]);
 
   const stillLoading = coursesLoading || postsLoading;
-  const revealed = useWatchReveal('bucket-list', !stillLoading);
+  const { settled: firstVisibleDecoded, onDecoded } = useFirstVisibleDecoded(orderedPosts.length, VISIBLE_COUNT);
+  const revealed = useWatchReveal('bucket-list', !stillLoading && firstVisibleDecoded);
 
   // Reserve final height while loading so late-resolving posts don't push
   // the rest of the feed down. Held until coordinated reveal.
@@ -149,6 +153,7 @@ function BucketListRailInner() {
               width={158}
               aspectRatio="1/1"
               radius={6}
+              onDecoded={i < VISIBLE_COUNT ? onDecoded : undefined}
             />
             {courseNameByPostId.get(post.id) && (
               <div

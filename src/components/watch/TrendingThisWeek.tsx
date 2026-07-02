@@ -8,6 +8,9 @@ import WatchRailTile from './WatchRailTile';
 import { SectionHeader } from '@/components/ui/SectionHeader';
 import { HRail } from './proshop/HRail';
 import { ClipsMark } from './proshop/SectionMarks';
+import { useFirstVisibleDecoded } from './shared/useFirstVisibleDecoded';
+
+const VISIBLE_COUNT = 3;
 
 interface TrendingThisWeekProps {
   enabled?: boolean;
@@ -26,7 +29,8 @@ export default function TrendingThisWeek({ enabled = true }: TrendingThisWeekPro
   const { data: viewedPostIds } = useViewedPostIds();
 
   const topPosts = [...posts].sort((a, b) => b.likeCount - a.likeCount).slice(0, 5);
-  const revealed = useWatchReveal('trending-this-week', !isLoading);
+  const { settled: firstVisibleDecoded, onDecoded } = useFirstVisibleDecoded(topPosts.length, VISIBLE_COUNT);
+  const revealed = useWatchReveal('trending-this-week', !isLoading && firstVisibleDecoded);
 
   // ── Loading skeleton (held until coordinated reveal) ──
   if (!revealed || isLoading) {
@@ -116,7 +120,13 @@ export default function TrendingThisWeek({ enabled = true }: TrendingThisWeekPro
       <HRail paddingBottom={4}>
         {topPosts.map((post, i) => (
           <div key={post.id} style={{ scrollSnapAlign: 'start' }}>
-            <WatchRailTile post={post} index={i} allPosts={topPosts} viewedPostIds={viewedPostIds} />
+            <WatchRailTile
+              post={post}
+              index={i}
+              allPosts={topPosts}
+              viewedPostIds={viewedPostIds}
+              onDecoded={i < VISIBLE_COUNT ? onDecoded : undefined}
+            />
           </div>
         ))}
       </HRail>

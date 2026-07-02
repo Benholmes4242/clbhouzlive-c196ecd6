@@ -1,4 +1,4 @@
-import { memo } from 'react';
+import { memo, useState } from 'react';
 import { motion } from 'framer-motion';
 import { useQuery } from '@tanstack/react-query';
 
@@ -11,6 +11,7 @@ import { Kicker } from './Kicker';
 import { Pin } from './Pin';
 import { useActiveActor } from '@/context/ActiveActorContext';
 import { isPostLikedByMe } from '@/lib/likedPostIds';
+import DecodedImage from '../shared/DecodedImage';
 // Note: useNavigate import previously here was unused.
 
 function formatDuration(seconds: number | null): string {
@@ -34,7 +35,11 @@ function WatchOfTheWeekHeroInner() {
     staleTime: 60_000,
   });
 
-  const revealed = useWatchReveal('watch-of-the-week', !isLoading);
+  // Gate the reveal on both data + pixel: the hero image bitmap must have
+  // decoded (or be empty) before we call markSettled.
+  const [heroDecoded, setHeroDecoded] = useState(false);
+  const heroReady = !isLoading && (!pick || !pick.thumbnail_url || heroDecoded);
+  const revealed = useWatchReveal('watch-of-the-week', heroReady);
 
   if (!revealed || isLoading) {
     return (
@@ -132,10 +137,11 @@ function WatchOfTheWeekHeroInner() {
         }}
       >
         {pick.thumbnail_url ? (
-          <img
+          <DecodedImage
             src={pick.thumbnail_url}
             alt={pick.caption ?? ''}
             loading="lazy"
+            onDecoded={() => setHeroDecoded(true)}
             style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover' }}
           />
         ) : null}

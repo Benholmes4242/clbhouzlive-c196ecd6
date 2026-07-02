@@ -10,6 +10,7 @@ import { VideoCardMenu } from '@/components/videos-tab/VideoCardMenu';
 import { Pin } from '../proshop/Pin';
 import { ExpandableCaption } from '@/components/posts/ExpandableCaption';
 import { attachHlsToTile } from '@/hooks/useTileVideoPlayer';
+import DecodedImage from '../shared/DecodedImage';
 
 function formatHMS(seconds: number | null | undefined): string {
   if (!seconds || seconds <= 0) return '';
@@ -39,9 +40,11 @@ export interface AutoplayVideoCardProps {
   borderRadius?: number;
   /** Horizontal padding (px) for the meta row under the thumbnail. Defaults to 16. */
   metaPadX?: number;
+  /** Fires once the poster thumbnail bitmap is ready. */
+  onDecoded?: () => void;
 }
 
-function AutoplayVideoCardInner({ post, index, allPosts, userId, active, borderRadius = 6, metaPadX = 16 }: AutoplayVideoCardProps) {
+function AutoplayVideoCardInner({ post, index, allPosts, userId, active, borderRadius = 6, metaPadX = 16, onDecoded }: AutoplayVideoCardProps) {
   const navigate = useNavigate();
   const tileRef = useRef<HTMLDivElement>(null);
   const videoRef = useRef<HTMLVideoElement | null>(null);
@@ -163,20 +166,28 @@ function AutoplayVideoCardInner({ post, index, allPosts, userId, active, borderR
       >
         <div ref={tileRef} style={{ position: 'absolute', inset: 0 }}>
           {thumbnail ? (
-            <img
-              src={thumbnail}
-              alt=""
-              loading="lazy"
+            <div
               style={{
                 position: 'absolute',
                 inset: 0,
-                width: '100%',
-                height: '100%',
-                objectFit: 'cover',
                 opacity: videoVisible ? 0 : 1,
                 transition: 'opacity 200ms ease',
               }}
-            />
+            >
+              <DecodedImage
+                src={thumbnail}
+                alt=""
+                loading="lazy"
+                onDecoded={onDecoded}
+                style={{
+                  position: 'absolute',
+                  inset: 0,
+                  width: '100%',
+                  height: '100%',
+                  objectFit: 'cover',
+                }}
+              />
+            </div>
           ) : null}
         </div>
 

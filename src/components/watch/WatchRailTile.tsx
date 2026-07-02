@@ -4,6 +4,7 @@ import { Heart } from 'lucide-react';
 import Hls from 'hls.js';
 import type { FeedPost } from '@/components/media-system/types/media';
 import { Pin } from './proshop/Pin';
+import DecodedImage from './shared/DecodedImage';
 
 interface WatchRailTileProps {
   post: FeedPost;
@@ -23,6 +24,8 @@ interface WatchRailTileProps {
   aspectRatio?: string;
   /** Border radius in px. Defaults to 6. */
   radius?: number;
+  /** Fires once the tile's thumbnail bitmap is ready (used to gate coordinated reveal). */
+  onDecoded?: () => void;
 }
 
 const NEW_THRESHOLD_MS = 24 * 60 * 60 * 1000; // 24h
@@ -56,6 +59,7 @@ export default function WatchRailTile({
   viewedPostIds,
   aspectRatio = '3/4',
   radius = 6,
+  onDecoded,
 }: WatchRailTileProps) {
   const cardRef = useRef<HTMLDivElement>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
@@ -144,10 +148,12 @@ export default function WatchRailTile({
       }}
       onClick={handleClick}
     >
-      {/* Thumbnail */}
-      <img
+      {/* Thumbnail — decode-gated so the coordinated reveal only fires
+          when pixels are actually painted. */}
+      <DecodedImage
         src={thumb}
         alt=""
+        onDecoded={onDecoded}
         style={{
           width: '100%',
           height: '100%',

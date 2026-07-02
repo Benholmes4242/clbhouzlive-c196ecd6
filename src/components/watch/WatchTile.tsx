@@ -1,8 +1,9 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef } from 'react';
 import { Film, Heart } from 'lucide-react';
 import type { FeedPost } from '@/components/media-system/types/media';
 import { useFullscreenFeedStore } from '@/store/fullscreenFeedStore';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
+import DecodedImage from './shared/DecodedImage';
 
 function abbreviateCount(n: number): string {
   if (n >= 1_000_000) return `${(n / 1_000_000).toFixed(1)}M`;
@@ -22,12 +23,8 @@ interface WatchTileProps {
  * Masonry tile for the Watch "Clips to explore" grid. Fills its parent
  * (which controls aspect ratio based on real media width/height) and renders
  * the standard short-form overlay: top scrim, like top-right, squircle +
- * creator name bottom-left. Tap → fullscreen player.
- *
- * Reveal is decode-gated: the <img> mounts at opacity 0, we await
- * img.decode(), then fade in over ~120ms. This eliminates the classic
- * broken→pop transition and matches the ThumbnailSkeleton polish used
- * elsewhere in the app.
+ * creator name bottom-left. Tap → fullscreen player. Uses the shared
+ * decode-gated <DecodedImage>.
  */
 const WatchTile: React.FC<WatchTileProps> = ({ post, index, allPosts, onDecoded }) => {
   const media = post.mediaItems[0];
@@ -36,55 +33,20 @@ const WatchTile: React.FC<WatchTileProps> = ({ post, index, allPosts, onDecoded 
   const likeCount = post.likeCount ?? 0;
   const { open } = useFullscreenFeedStore();
 
-  const [loaded, setLoaded] = useState(false);
-  const imgRef = useRef<HTMLImageElement>(null);
-  const notifiedRef = useRef(false);
-
-  const notifyDecoded = () => {
-    if (notifiedRef.current) return;
-    notifiedRef.current = true;
-    onDecoded?.();
-  };
-
-  useEffect(() => {
-    if (!thumbnailUrl) {
-      // No image to decode — count as ready so the page can settle.
-      notifyDecoded();
-      return;
-    }
-    const img = imgRef.current;
-    if (!img) return;
-    let cancelled = false;
-
-    const reveal = () => {
-      if (cancelled) return;
-      setLoaded(true);
-      notifyDecoded();
-    };
-
-    if (img.complete && img.naturalWidth > 0) {
-      reveal();
-      return;
-    }
-
-    if (typeof img.decode === 'function') {
-      img.decode().then(reveal).catch(() => {
-        // decode() rejects on some browsers for cross-origin / animated;
-        // fall back to onLoad path.
-      });
-    }
-
-    return () => {
-      cancelled = true;
-    };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [thumbnailUrl]);
-
   const handleClick = () => {
     open(allPosts ?? [post], index);
   };
 
   const creator = post.displayName || post.username || '';
+
+  // No thumbnail → unblock the reveal immediately; there's nothing to decode.
+  const notifiedNoThumbRef = useRef(false);
+  useEffect(() => {
+    if (!thumbnailUrl && !notifiedNoThumbRef.current) {
+      notifiedNoThumbRef.current = true;
+      onDecoded?.();
+    }
+  }, [thumbnailUrl, onDecoded]);
 
   return (
     <div
@@ -102,21 +64,12 @@ const WatchTile: React.FC<WatchTileProps> = ({ post, index, allPosts, onDecoded 
       }
     >
       {thumbnailUrl ? (
-        <img
-          ref={imgRef}
+        <DecodedImage
           src={thumbnailUrl}
           alt=""
           className="absolute inset-0 w-full h-full object-cover"
           loading="lazy"
-          decoding="async"
-          onLoad={() => {
-            setLoaded(true);
-            notifyDecoded();
-          }}
-          style={{
-            opacity: loaded ? 1 : 0,
-            transition: 'opacity 120ms ease-out',
-          }}
+          onDecoded={onDecoded}
         />
       ) : (
         <div className="absolute inset-0 flex items-center justify-center bg-muted">
