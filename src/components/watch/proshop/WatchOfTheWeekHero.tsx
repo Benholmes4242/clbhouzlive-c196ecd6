@@ -11,7 +11,9 @@ import { Kicker } from './Kicker';
 import { Pin } from './Pin';
 import { useActiveActor } from '@/context/ActiveActorContext';
 import { isPostLikedByMe } from '@/lib/likedPostIds';
-import DecodedImage from '../shared/DecodedImage';
+import AnimatedTileThumb from '../shared/AnimatedTileThumb';
+import { extractCloudflareUid } from '@/utils/videoIdUtils';
+
 // Note: useNavigate import previously here was unused.
 
 function formatDuration(seconds: number | null): string {
