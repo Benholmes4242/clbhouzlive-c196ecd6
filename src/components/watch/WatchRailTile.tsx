@@ -59,6 +59,7 @@ export default function WatchRailTile({
   viewedPostIds,
   aspectRatio = '3/4',
   radius = 6,
+  onDecoded,
 }: WatchRailTileProps) {
   const cardRef = useRef<HTMLDivElement>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
