@@ -454,13 +454,17 @@ function CommentsSheet({
         )}
       >
         {/* Avatar */}
-        <button
-          type="button"
-          onClick={() => navigate(getActorRouteByType(
+        <Pressable
+          as="button"
+          variant="row"
+          haptic="selection"
+          onPress={() => navigate(getActorRouteByType(
             comment.actor_type,
             comment.actor_id || comment.user_id
           ))}
           className="shrink-0"
+          innerClassName="block"
+          style={{ borderRadius: 12 }}
         >
           <SquircleAvatar
             size={isReply ? 28 : 36}
@@ -469,7 +473,8 @@ function CommentsSheet({
             fallback={comment.user_name?.charAt(0) || '?'}
             hideRing
           />
-        </button>
+        </Pressable>
+
 
         {/* Body */}
         <div className="flex-1 min-w-0">
