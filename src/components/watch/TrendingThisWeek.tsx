@@ -29,7 +29,8 @@ export default function TrendingThisWeek({ enabled = true }: TrendingThisWeekPro
   const { data: viewedPostIds } = useViewedPostIds();
 
   const topPosts = [...posts].sort((a, b) => b.likeCount - a.likeCount).slice(0, 5);
-  const revealed = useWatchReveal('trending-this-week', !isLoading);
+  const { settled: firstVisibleDecoded, onDecoded } = useFirstVisibleDecoded(topPosts.length, VISIBLE_COUNT);
+  const revealed = useWatchReveal('trending-this-week', !isLoading && firstVisibleDecoded);
 
   // ── Loading skeleton (held until coordinated reveal) ──
   if (!revealed || isLoading) {
