@@ -113,12 +113,20 @@ export default function WaitlistPage() {
     }
   };
 
+  const isLaunched = (countryId: string): boolean => {
+    const s = notifyStatus[countryId];
+    return !!s && s.total > 0 && s.pending === 0;
+  };
+
   const columns: DataListColumn<WaitlistSummaryRow>[] = [
     { key: 'country', header: 'Country', render: (r) => (
       <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
         <FlagBadge iso={r.iso} />
         <div style={{ display: 'flex', flexDirection: 'column', lineHeight: 1.2, minWidth: 0 }}>
-          <span style={{ color: t.ink, fontWeight: 600, fontSize: 13 }}>{r.country_name}</span>
+          <span style={{ color: t.ink, fontWeight: 600, fontSize: 13, display: 'inline-flex', alignItems: 'center', gap: 6 }}>
+            {r.country_name}
+            {isLaunched(r.country_id) && <StatusPill tone="ok">Launched</StatusPill>}
+          </span>
           <span style={{ color: t.inkFaint, fontSize: 11 }}>{r.body_name}</span>
         </div>
       </div>
