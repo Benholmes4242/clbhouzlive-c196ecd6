@@ -444,7 +444,15 @@ const LightFeedCardImpl: React.FC<LightFeedCardProps> = ({
         ) : media ? (
           <button
             type="button"
-            onClick={() => onOpenMedia(post, 0)}
+            ref={singleMediaBtnRef}
+            data-post-id={post.id}
+            onClick={() =>
+              onOpenMedia(post, 0, {
+                el: singleMediaBtnRef.current,
+                posterUrl: media.thumbnailUrl ?? (media as any).imageUrl ?? null,
+                handOffUrl: (media as any).hlsUrl ?? null,
+              })
+            }
             style={{
               display: 'block',
               width: '100%',
