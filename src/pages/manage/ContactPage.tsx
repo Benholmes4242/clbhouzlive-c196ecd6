@@ -4,7 +4,7 @@ import { CheckCircle2 } from 'lucide-react';
 import { toast } from 'sonner';
 import { ManagePageShell } from '@/components/manage/ManagePageShell';
 import { supabase } from '@/integrations/supabase/client';
-import { useAuth } from '@/hooks/useAuth';
+import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 
 const INK = '#0F172A';
 const INK_55 = '#64748B';
@@ -23,7 +23,7 @@ type CategoryValue = (typeof CATEGORIES)[number]['value'];
 
 export default function ContactPage() {
   const navigate = useNavigate();
-  const { user } = useAuth();
+  const { user } = useSupabaseSession();
 
   const [category, setCategory] = useState<CategoryValue>('bug');
   const [subject, setSubject] = useState('');
