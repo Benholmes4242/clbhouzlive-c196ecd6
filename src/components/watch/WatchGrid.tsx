@@ -46,7 +46,9 @@ interface PlacedTile {
 const WatchGrid: React.FC<WatchGridProps> = ({
   posts,
   isLoading,
+  isFetching = false,
   isError,
+
   hasNextPage,
   isFetchingNextPage,
   fetchNextPage,
