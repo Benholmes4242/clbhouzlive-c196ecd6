@@ -5,6 +5,8 @@ import Hls from 'hls.js';
 import type { FeedPost } from '@/components/media-system/types/media';
 import { Pin } from './proshop/Pin';
 import DecodedImage from './shared/DecodedImage';
+import { getThumbnailUrl } from '@/media/utils/thumbnail';
+
 
 interface WatchRailTileProps {
   post: FeedPost;
@@ -28,8 +30,11 @@ interface WatchRailTileProps {
   onDecoded?: () => void;
   /** Temporary telemetry id like "trending#3". */
   debugId?: string;
-
+  /** When set, request a sized thumbnail variant (e.g. imagedelivery /h=NNN) sized
+   *  for this tile geometry instead of decoding the full-res original. */
+  thumbHeightPx?: number;
 }
+
 
 const NEW_THRESHOLD_MS = 24 * 60 * 60 * 1000; // 24h
 const POPULAR_REVIEW_LIKES = 25;
@@ -64,6 +69,7 @@ export default function WatchRailTile({
   radius = 6,
   onDecoded,
   debugId,
+  thumbHeightPx,
 }: WatchRailTileProps) {
   const cardRef = useRef<HTMLDivElement>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
@@ -72,8 +78,17 @@ export default function WatchRailTile({
   const [isPlaying, setIsPlaying] = useState(false);
 
   const media = post.mediaItems[0];
-  const thumb = media?.thumbnailUrl || media?.imageUrl || '';
+  const rawThumb = media?.thumbnailUrl || media?.imageUrl || '';
+  const thumb = useMemo(() => {
+    if (!rawThumb || !thumbHeightPx) return rawThumb;
+    // Sized variant: routes imagedelivery.net through /h=NNN; passes through
+    // other hosts unchanged. Cloudflare Stream posters would be routed via
+    // streamId if MediaItem carried one — it does not today, so imageUrl
+    // pass-through is the correct fallback.
+    return getThumbnailUrl({ imageUrl: rawThumb, height: thumbHeightPx });
+  }, [rawThumb, thumbHeightPx]);
   const hlsUrl = media?.hlsUrl || '';
+
 
   useEffect(() => {
     const el = cardRef.current;
