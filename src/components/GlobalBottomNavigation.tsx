@@ -36,6 +36,9 @@ const HIDDEN_ROUTE_PREFIXES = [
   '/verified', // Verified page - standalone, no app chrome
   '/manage/', // Manage Profile sub-pages — pushed standalone, no bottom nav
   '/support/', // Support thread — pushed standalone, no bottom nav
+  '/legal', // Legal document pages — standalone, no bottom nav
+  '/privacy', // Privacy policy — standalone, no bottom nav
+  '/terms', // Terms of service — standalone, no bottom nav
 ];
 
 // Routes that use the dark Clubhouse nav chrome.
