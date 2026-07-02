@@ -31,9 +31,7 @@ export function ManagePageShell({ title, children, right, onBack }: Props) {
         <div
           className="sticky top-0 z-30"
           style={{
-            background: 'rgba(244,246,248,0.85)',
-            backdropFilter: 'saturate(180%) blur(14px)',
-            WebkitBackdropFilter: 'saturate(180%) blur(14px)',
+            background: SLATE_BG,
             borderBottom: '1px solid rgba(15,23,42,0.08)',
           }}
         >
