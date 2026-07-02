@@ -27,6 +27,7 @@ const FONT = 'Geist, -apple-system, BlinkMacSystemFont, system-ui, sans-serif';
 export default function HandicapManagePage() {
   const { user } = useSupabaseSession();
   const userId = user?.id;
+  const navigate = useNavigate();
   const queryClient = useQueryClient();
   const { data: connection } = useWhsConnection(userId);
   const [confirmDisconnect, setConfirmDisconnect] = useState(false);
