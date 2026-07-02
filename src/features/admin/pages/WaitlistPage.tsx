@@ -314,6 +314,7 @@ export default function WaitlistPage() {
                     <span style={{ color: t.inkFaint, fontSize: 11 }}>@{row.profile.username}</span>
                   )}
                 </div>
+                {row.notified_live && <StatusPill tone="ok">Notified</StatusPill>}
                 <span style={{ color: t.inkMuted, fontSize: 11 }}>{relTime(row.created_at)}</span>
               </div>
             ))
