@@ -1,5 +1,4 @@
 import { createContext, useCallback, useContext, useEffect, useLayoutEffect, useMemo, useRef, useState, type ReactNode } from 'react';
-import { wrtMark, wrtStart } from '@/perf/watchRevealDebug';
 
 interface WatchRevealValue {
   register: (id: string) => void;
@@ -44,10 +43,6 @@ interface ProviderProps {
 }
 
 export function WatchRevealProvider({ children, deadlineMs = 1500 }: ProviderProps) {
-  // Reset perf timer at provider mount so warm visits also get a sane t0.
-  // Runs during render (once per mount) — BEFORE any child renders/registers,
-  // so every wrtMark from below has a coherent zero point.
-  useMemo(() => { wrtStart(); }, []);
 
   const [revealed, setRevealed] = useState(false);
   const [evaluationReady, setEvaluationReady] = useState(false);
