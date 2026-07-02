@@ -32,7 +32,9 @@ import LqipUnderlay from '@/components/shared/LqipUnderlay';
 import { MediaCarousel } from './MediaCarousel';
 import { FeedFollowPill } from './FeedFollowPill';
 import { FeedActorPicker } from './FeedActorPicker';
+import Pressable from '@/components/ui/Pressable';
 import type { ActiveActor } from '@/types/actor';
+
 
 // Full-bleed charcoal chrome — one charcoal (#15171F) across the app: tab
 // underline, primary text base, and the feed card surface all share this token.
@@ -759,6 +761,7 @@ const FeedCardImpl: React.FC<FeedCardProps> = ({
           active={liked}
           onClick={() => onLike(post, effectiveActor)}
           activeColor={AMBER}
+          haptic={!liked ? 'selection' : 'none'}
         />
         <FooterButton
           icon={MessageCircle}
@@ -766,6 +769,7 @@ const FeedCardImpl: React.FC<FeedCardProps> = ({
           onClick={() => onComment(post, effectiveActor)}
         />
         <FooterButton icon={Share} onClick={() => onShare(post)} />
+
       </div>
     </article>
   );
@@ -777,11 +781,14 @@ const FooterButton: React.FC<{
   onClick: () => void;
   active?: boolean;
   activeColor?: string;
-}> = ({ icon: Icon, label, onClick, active, activeColor }) => (
-  <button
-    type="button"
-    onClick={(e) => {
-      e.stopPropagation();
+  haptic?: 'none' | 'selection' | 'success' | 'warning';
+}> = ({ icon: Icon, label, onClick, active, activeColor, haptic = 'none' }) => (
+  <Pressable
+    as="button"
+    variant="icon"
+    haptic={haptic}
+    onPress={(e) => {
+      (e as React.MouseEvent).stopPropagation?.();
       onClick();
     }}
     style={{
@@ -792,10 +799,10 @@ const FooterButton: React.FC<{
       border: 'none',
       padding: 0,
       color: active ? activeColor ?? T100 : T60,
-      cursor: 'pointer',
       fontSize: 12,
       fontVariantNumeric: 'tabular-nums',
     }}
+    innerStyle={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}
   >
     <Icon
       size={24}
@@ -804,8 +811,9 @@ const FooterButton: React.FC<{
       fill={active ? activeColor ?? 'none' : 'none'}
     />
     {label && <span>{label}</span>}
-  </button>
+  </Pressable>
 );
+
 
 export const FeedCard = React.memo(FeedCardImpl);
 FeedCard.displayName = 'FeedCard';

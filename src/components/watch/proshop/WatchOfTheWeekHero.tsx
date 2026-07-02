@@ -8,6 +8,8 @@ import { useWatchMood } from './hooks/useWatchMood';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useFullscreenFeedStore } from '@/store/fullscreenFeedStore';
 import { openWithOrigin } from '@/lib/openWithOrigin';
+import Pressable from '@/components/ui/Pressable';
+
 import { Kicker } from './Kicker';
 import { Pin } from './Pin';
 import { useActiveActor } from '@/context/ActiveActorContext';
@@ -236,10 +238,10 @@ function WatchOfTheWeekHeroInner() {
       >
         <Kicker color="amber">Watch of the Week</Kicker>
 
-        <button
-          type="button"
-          onClick={handleTap}
-          className="block w-full text-left active:scale-[0.99] transition-transform"
+        <Pressable
+          as="button"
+          variant="card"
+          onPress={handleTap}
           style={{
             position: 'relative',
             width: '100%',
@@ -250,8 +252,12 @@ function WatchOfTheWeekHeroInner() {
             border: 'none',
             padding: 0,
             marginTop: 6,
+            display: 'block',
+            textAlign: 'left',
           }}
+          innerStyle={{ position: 'absolute', inset: 0 }}
         >
+
           <div ref={heroTileRef} style={{ position: 'absolute', inset: 0 }}>
             {pick.thumbnail_url ? (
               <DecodedImage
@@ -316,7 +322,7 @@ function WatchOfTheWeekHeroInner() {
               {pick.duration_seconds ? <span>{formatDuration(pick.duration_seconds)}</span> : null}
             </div>
           </div>
-        </button>
+        </Pressable>
 
         {pick.why_ai ? (
           <p
