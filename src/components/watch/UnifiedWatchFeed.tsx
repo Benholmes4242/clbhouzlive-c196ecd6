@@ -50,7 +50,21 @@ export default function UnifiedWatchFeed({ embedded = false }: UnifiedWatchFeedP
     category: undefined,
   });
 
-  usePageReady(!isLoading && posts.length > 0);
+  // Page is "ready" only once the first visible row of the Clips grid has
+  // decoded — otherwise usePageReady fires while tiles are still blank and
+  // the perf timeline reports content-painted before the user sees content.
+  const [firstRowDecoded, setFirstRowDecoded] = useState(false);
+  const handleFirstRowDecoded = useCallback(() => setFirstRowDecoded(true), []);
+
+  // Reset the decoded latch whenever the feed identity fundamentally changes
+  // (mood switch → new first tile). Keyed on the id of the first post so we
+  // re-await paint after a mood pill flip.
+  const firstPostId = posts[0]?.id;
+  useEffect(() => {
+    setFirstRowDecoded(false);
+  }, [mood, firstPostId]);
+
+  usePageReady(!isLoading && posts.length > 0 && firstRowDecoded);
 
 
 
