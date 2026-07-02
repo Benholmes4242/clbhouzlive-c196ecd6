@@ -22,7 +22,7 @@ const ERROR_MESSAGES: Record<string, string> = {
 };
 
 interface Props {
-  onConnected: () => void;
+  onConnected: () => void | Promise<void>;
   onSkip?: () => void;
 }
 
