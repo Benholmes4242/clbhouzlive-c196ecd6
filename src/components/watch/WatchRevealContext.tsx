@@ -1,5 +1,5 @@
-import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
-import { wrtMark } from '@/perf/watchRevealDebug';
+import { createContext, useCallback, useContext, useEffect, useLayoutEffect, useMemo, useRef, useState, type ReactNode } from 'react';
+import { wrtMark, wrtStart } from '@/perf/watchRevealDebug';
 
 interface WatchRevealValue {
   register: (id: string) => void;
@@ -19,7 +19,11 @@ export function useWatchReveal(id: string, settled: boolean) {
   const ctx = useContext(WatchRevealContext);
   const { register, markSettled, revealed } = ctx;
 
-  useEffect(() => {
+  // useLayoutEffect: child commit effects run BEFORE the parent provider's
+  // useLayoutEffect, which is how we deterministically close the registration
+  // race — every rail is in the registry before the provider flips
+  // `evaluationReady` and starts checking all-settled.
+  useLayoutEffect(() => {
     register(id);
   }, [register, id]);
 
@@ -40,10 +44,17 @@ interface ProviderProps {
 }
 
 export function WatchRevealProvider({ children, deadlineMs = 1500 }: ProviderProps) {
+  // Reset perf timer at provider mount so warm visits also get a sane t0.
+  // Runs during render (once per mount) — BEFORE any child renders/registers,
+  // so every wrtMark from below has a coherent zero point.
+  useMemo(() => { wrtStart(); }, []);
+
   const [revealed, setRevealed] = useState(false);
+  const [evaluationReady, setEvaluationReady] = useState(false);
   const registeredRef = useRef<Set<string>>(new Set());
   const settledRef = useRef<Set<string>>(new Set());
   const revealedRef = useRef(false);
+  const evaluationReadyRef = useRef(false);
 
   const doReveal = useCallback((cause: string) => {
     if (revealedRef.current) return;
@@ -54,6 +65,7 @@ export function WatchRevealProvider({ children, deadlineMs = 1500 }: ProviderPro
 
   const checkAllSettled = useCallback(() => {
     if (revealedRef.current) return;
+    if (!evaluationReadyRef.current) return; // gate: wait for child registration window to close
     const reg = registeredRef.current;
     if (reg.size === 0) return;
     const settled = settledRef.current;
@@ -75,6 +87,20 @@ export function WatchRevealProvider({ children, deadlineMs = 1500 }: ProviderPro
     wrtMark(id, 'settled');
     checkAllSettled();
   }, [checkAllSettled]);
+
+  // Parent useLayoutEffect runs AFTER all children's useLayoutEffects —
+  // by the time this fires, every rail/hero using useWatchReveal has
+  // registered. Only now do we permit all-settled evaluation.
+  useLayoutEffect(() => {
+    evaluationReadyRef.current = true;
+    setEvaluationReady(true);
+  }, []);
+
+  // If a warm visit had everything pre-settled during registration, run the
+  // check the moment evaluation opens.
+  useEffect(() => {
+    if (evaluationReady) checkAllSettled();
+  }, [evaluationReady, checkAllSettled]);
 
   // Deadline fallback — reveal even if a rail never settles.
   useEffect(() => {

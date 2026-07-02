@@ -153,9 +153,11 @@ function BucketListRailInner() {
               width={158}
               aspectRatio="1/1"
               radius={6}
+              thumbHeightPx={316}
               onDecoded={i < VISIBLE_COUNT ? onDecoded : undefined}
               debugId={`bucket-list#${i}`}
             />
+
             {courseNameByPostId.get(post.id) && (
               <div
                 style={{
