@@ -35,7 +35,11 @@ function WatchOfTheWeekHeroInner() {
     staleTime: 60_000,
   });
 
-  const revealed = useWatchReveal('watch-of-the-week', !isLoading);
+  // Gate the reveal on both data + pixel: the hero image bitmap must have
+  // decoded (or be empty) before we call markSettled.
+  const [heroDecoded, setHeroDecoded] = useState(false);
+  const heroReady = !isLoading && (!pick || !pick.thumbnail_url || heroDecoded);
+  const revealed = useWatchReveal('watch-of-the-week', heroReady);
 
   if (!revealed || isLoading) {
     return (
