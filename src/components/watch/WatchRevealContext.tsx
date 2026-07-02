@@ -1,4 +1,5 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
+import { wrtMark } from '@/perf/watchRevealDebug';
 
 interface WatchRevealValue {
   register: (id: string) => void;
