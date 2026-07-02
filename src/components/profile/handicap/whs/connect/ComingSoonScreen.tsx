@@ -209,7 +209,7 @@ export const ComingSoonScreen: React.FC<Props> = ({ country, onChangeCountry }) 
             maxWidth: 320,
           }}
         >
-          Your request counts &mdash; we prioritise the most-requested authorities. We'll notify you in-app when <strong style={{ color: INK, fontWeight: 700 }}>{country.body}</strong> is live.
+          Your request counts - we prioritise the most-requested authorities. We'll notify you in-app when <strong style={{ color: INK, fontWeight: 700 }}>{country.body}</strong> is live.
         </p>
 
         {socialProof}
