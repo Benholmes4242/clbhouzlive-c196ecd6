@@ -5,6 +5,7 @@ import { toast } from 'sonner';
 import { removePersistedQueryCache } from '@/lib/queryPersister';
 
 export function useDeleteAccount(userId: string | undefined) {
+  const queryClient = useQueryClient();
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [showBusinessWarning, setShowBusinessWarning] = useState(false);
   const [ownedBusinessNames, setOwnedBusinessNames] = useState<string[]>([]);
