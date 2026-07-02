@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useRef } from 'react';
 import { Film, Heart } from 'lucide-react';
 import type { FeedPost } from '@/components/media-system/types/media';
 import { useFullscreenFeedStore } from '@/store/fullscreenFeedStore';
