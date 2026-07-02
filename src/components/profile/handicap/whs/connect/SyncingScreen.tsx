@@ -40,10 +40,24 @@ export const SyncingScreen: React.FC = () => {
         fontFamily: FONT,
       }}
     >
-      {/* Green ring */}
+      {/* Green ring orb */}
       <div style={{ width: 92, height: 92, position: 'relative', marginBottom: 24 }}>
+        {/* static base ring */}
         <svg width="92" height="92" viewBox="0 0 92 92">
           <circle cx="46" cy="46" r="40" fill={GREEN_BG} />
+        </svg>
+        {/* spinning arc: the whole SVG rotates about its own center = reliable */}
+        <svg
+          width="92"
+          height="92"
+          viewBox="0 0 92 92"
+          style={{
+            position: 'absolute',
+            top: 0,
+            left: 0,
+            animation: 'whs-spin 0.9s linear infinite',
+          }}
+        >
           <circle
             cx="46"
             cy="46"
@@ -54,9 +68,9 @@ export const SyncingScreen: React.FC = () => {
             strokeLinecap="round"
             strokeDasharray="70 252"
             transform="rotate(-90 46 46)"
-            style={{ transformOrigin: '46px 46px', animation: 'whs-spin 0.9s linear infinite' }}
           />
         </svg>
+        {/* flag, centered */}
         <div
           style={{
             position: 'absolute',
