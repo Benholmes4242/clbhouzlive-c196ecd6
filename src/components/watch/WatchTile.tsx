@@ -3,7 +3,7 @@ import { Film, Heart } from 'lucide-react';
 import type { FeedPost } from '@/components/media-system/types/media';
 import { useFullscreenFeedStore } from '@/store/fullscreenFeedStore';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
-import AnimatedTileThumb from './shared/AnimatedTileThumb';
+import DecodedImage from './shared/DecodedImage';
 
 
 function abbreviateCount(n: number): string {
