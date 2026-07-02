@@ -53,7 +53,7 @@ export function useSupportTickets() {
       const userIds = Array.from(new Set(tickets.map((t) => t.user_id)));
       const ticketIds = tickets.map((t) => t.id);
 
-      const [{ data: profiles }, { data: firstMsgs }] = await Promise.all([
+      const [profilesRes, firstMsgsRes] = await Promise.all([
         supabase
           .from('user_profiles')
           .select('user_id, display_name, username, profile_photo_url')
@@ -64,9 +64,11 @@ export function useSupportTickets() {
           .in('ticket_id', ticketIds)
           .order('created_at', { ascending: true }),
       ]);
+      const profiles = (profilesRes.data ?? []) as any[];
+      const firstMsgs = (firstMsgsRes.data ?? []) as any[];
 
       const pMap = new Map<string, SupportTicketRow['profile']>();
-      (profiles ?? []).forEach((p: any) => {
+      profiles.forEach((p: any) => {
         pMap.set(p.user_id, {
           display_name: p.display_name,
           username: p.username,
