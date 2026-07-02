@@ -59,8 +59,28 @@ const WatchGrid: React.FC<WatchGridProps> = ({
   emptyTitle = 'No clips yet',
   emptyMessage = 'This is where short golf clips will show up. Check back soon — there’s more on the way.',
   emptyAction,
+  onFirstRowDecoded,
 }) => {
   const sentinelRef = useRef<HTMLDivElement>(null);
+  const decodedCountRef = useRef(0);
+  const firedRef = useRef(false);
+
+  // Reset the first-row-decoded latch whenever the underlying post set
+  // fundamentally changes (mood/category switch → fresh page ready gate).
+  useEffect(() => {
+    decodedCountRef.current = 0;
+    firedRef.current = false;
+  }, [posts.length === 0 ? 0 : posts[0]?.id]);
+
+  const handleTileDecoded = useCallback(() => {
+    if (firedRef.current) return;
+    decodedCountRef.current += 1;
+    const target = Math.min(COLS, posts.length);
+    if (target > 0 && decodedCountRef.current >= target) {
+      firedRef.current = true;
+      onFirstRowDecoded?.();
+    }
+  }, [posts.length, onFirstRowDecoded]);
 
   // Infinite scroll via IntersectionObserver
   useEffect(() => {
