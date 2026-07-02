@@ -51,28 +51,41 @@ export const clearPrefetchCache = (keepUids?: string[]): void => {
  * DEDUPLICATION: Returns existing promise if already in-flight,
  * or resolves immediately if already complete.
  */
-export const preloadHlsManifest = async (hlsUrl: string, videoId?: string): Promise<void> => {
+export const preloadHlsManifest = async (
+  hlsUrl: string,
+  videoId?: string,
+  options?: { signal?: AbortSignal },
+): Promise<void> => {
+  // Phase 6: speculative fetches only run while the tab is visible; on
+  // Save-Data they don't run at all.
+  if (typeof document !== 'undefined' && document.visibilityState !== 'visible') {
+    return;
+  }
+  const conn: any = typeof navigator !== 'undefined' ? (navigator as any).connection : null;
+  if (conn?.saveData) return;
+  if (options?.signal?.aborted) return;
+
   // CRITICAL: Use extractCloudflareUid for consistent cache keys
   const effectiveVideoId = videoId || extractCloudflareUid(hlsUrl) || 'unknown';
-  
+
   // DEDUPLICATION: Skip if already completed
   if (prefetchComplete.has(effectiveVideoId)) {
     return;
   }
-  
+
   // DEDUPLICATION: Return existing promise if in-flight
   const existing = prefetchInFlight.get(effectiveVideoId);
   if (existing) {
     return existing;
   }
-  
+
   // Start new prefetch and track it
   const prefetchPromise = (async () => {
     prefetchDebug.prefetchInitiated(effectiveVideoId, hlsUrl);
     videoReadyFlags.markPending(effectiveVideoId);
 
     try {
-      await performPrefetch(hlsUrl, effectiveVideoId);
+      await performPrefetch(hlsUrl, effectiveVideoId, options?.signal);
       prefetchComplete.add(effectiveVideoId);
     } catch (err) {
       prefetchDebug.prefetchFailed(effectiveVideoId, err instanceof Error ? err.message : 'Unknown error');
@@ -80,7 +93,7 @@ export const preloadHlsManifest = async (hlsUrl: string, videoId?: string): Prom
       prefetchInFlight.delete(effectiveVideoId);
     }
   })();
-  
+
   prefetchInFlight.set(effectiveVideoId, prefetchPromise);
   return prefetchPromise;
 };
