@@ -137,10 +137,11 @@ function WatchOfTheWeekHeroInner() {
         }}
       >
         {pick.thumbnail_url ? (
-          <img
+          <DecodedImage
             src={pick.thumbnail_url}
             alt={pick.caption ?? ''}
             loading="lazy"
+            onDecoded={() => setHeroDecoded(true)}
             style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover' }}
           />
         ) : null}
