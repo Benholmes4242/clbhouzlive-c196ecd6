@@ -108,6 +108,7 @@ export default function UnifiedWatchFeed({ embedded = false }: UnifiedWatchFeedP
           gridRef={gridRef as React.RefObject<HTMLDivElement>}
         />
         <WatchGrid
+          onFirstRowDecoded={handleFirstRowDecoded}
           posts={posts}
           isLoading={isLoading}
           isFetching={isFetching}
