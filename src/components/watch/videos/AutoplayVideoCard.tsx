@@ -44,6 +44,7 @@ export interface AutoplayVideoCardProps {
   onDecoded?: () => void;
 }
 
+function AutoplayVideoCardInner({ post, index, allPosts, userId, active, borderRadius = 6, metaPadX = 16, onDecoded }: AutoplayVideoCardProps) {
   const navigate = useNavigate();
   const tileRef = useRef<HTMLDivElement>(null);
   const videoRef = useRef<HTMLVideoElement | null>(null);
