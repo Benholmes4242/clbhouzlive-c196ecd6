@@ -97,7 +97,6 @@ export const WhsConnectScreen: React.FC<Props> = ({ onConnected, onSkip }) => {
       <>
         <ComingSoonScreen
           country={country}
-          onNotifyMe={handleNotifyMe}
           onChangeCountry={handleChangeCountry}
         />
         <CountryPickerSheet
