@@ -14,6 +14,8 @@ interface Props {
   right?: React.ReactNode;
   /** Override the back behaviour. Defaults to navigate(-1). */
   onBack?: () => void;
+  /** Renders inside the sticky header, below the title row. */
+  belowTitle?: React.ReactNode;
 }
 
 /**
