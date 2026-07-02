@@ -40,6 +40,11 @@ const DecodedImage = React.forwardRef<HTMLImageElement, DecodedImageProps>(
     const [lqipResolved, setLqipResolved] = useState<string | null>(null);
     const innerRef = useRef<HTMLImageElement>(null);
     const notifiedRef = useRef(false);
+    // Phase 7: under RM the blur underlay + blur->sharp filter transition is
+    // exactly the kind of decorative motion the RM contract asks us to skip.
+    const prefersReducedMotion = usePrefersReducedMotion();
+    const useLqip = !!lqipSrc && !prefersReducedMotion;
+
 
     const setRefs = (node: HTMLImageElement | null) => {
       innerRef.current = node;
