@@ -14,6 +14,8 @@ interface Props {
   right?: React.ReactNode;
   /** Override the back behaviour. Defaults to navigate(-1). */
   onBack?: () => void;
+  /** Renders inside the sticky header, below the title row. */
+  belowTitle?: React.ReactNode;
 }
 
 /**
@@ -21,7 +23,7 @@ interface Props {
  * Sticky translucent header, 32px circle back chevron, 18/600 title,
  * 1px hairline bottom border, slate background.
  */
-export function ManagePageShell({ title, children, right, onBack }: Props) {
+export function ManagePageShell({ title, children, right, onBack, belowTitle }: Props) {
   const navigate = useNavigate();
   const handleBack = () => (onBack ? onBack() : navigate(-1));
 
@@ -36,8 +38,8 @@ export function ManagePageShell({ title, children, right, onBack }: Props) {
           }}
         >
           <div
-            className="flex items-center justify-between px-4 pb-3"
-            style={{ paddingTop: 'max(var(--safe-top, env(safe-area-inset-top, 0px)), 8px)', minHeight: 56 }}
+            className="flex items-center justify-between px-4"
+            style={{ paddingTop: 'max(var(--safe-top, env(safe-area-inset-top, 0px)), 8px)', paddingBottom: belowTitle ? 8 : 12, minHeight: 56 }}
           >
             <div className="flex items-center gap-3 flex-1 min-w-0">
               <button
@@ -63,6 +65,7 @@ export function ManagePageShell({ title, children, right, onBack }: Props) {
             </div>
             {right}
           </div>
+          {belowTitle}
         </div>
 
         <div className="flex-1 pb-32">

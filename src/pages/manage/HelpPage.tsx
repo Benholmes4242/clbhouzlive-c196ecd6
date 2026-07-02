@@ -80,34 +80,27 @@ export default function HelpPage() {
 
   const categoryOrder = data ? Object.keys(data.grouped) : [];
 
-  return (
-    <ManagePageShell title="Help centre">
+  const searchBar = (
+    <div className="px-4 pb-3">
       <div
-        className="sticky z-20 px-4 pt-0 pb-3"
-        style={{
-          top: 'calc(max(var(--safe-top, env(safe-area-inset-top, 0px)), 8px) + 56px)',
-          background: 'rgba(244,246,248,0.92)',
-          backdropFilter: 'saturate(180%) blur(14px)',
-          WebkitBackdropFilter: 'saturate(180%) blur(14px)',
-          marginTop: -1,
-        }}
+        className="flex items-center gap-2 h-11 px-3 rounded-xl"
+        style={{ background: '#fff', border: `1px solid ${CARD_BORDER}` }}
       >
-        <div
-          className="flex items-center gap-2 h-11 px-3 rounded-xl"
-          style={{ background: '#fff', border: `1px solid ${CARD_BORDER}` }}
-        >
-          <Search size={16} style={{ color: INK_55 }} className="shrink-0" />
-          <input
-            type="text"
-            value={query}
-            onChange={(e) => setQuery(e.target.value)}
-            placeholder="Search help articles"
-            className="flex-1 bg-transparent text-[15px] outline-none placeholder:text-[#94A3B8]"
-            style={{ color: INK }}
-          />
-        </div>
+        <Search size={16} style={{ color: INK_55 }} className="shrink-0" />
+        <input
+          type="text"
+          value={query}
+          onChange={(e) => setQuery(e.target.value)}
+          placeholder="Search help articles"
+          className="flex-1 bg-transparent text-[15px] outline-none placeholder:text-[#94A3B8]"
+          style={{ color: INK }}
+        />
       </div>
+    </div>
+  );
 
+  return (
+    <ManagePageShell title="Help centre" belowTitle={searchBar}>
       <div className="px-4 pt-2 pb-8 space-y-5">
         {isLoading && (
           <div className="text-[13px]" style={{ color: INK_55 }}>Loading articles...</div>
