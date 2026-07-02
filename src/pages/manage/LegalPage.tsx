@@ -12,9 +12,6 @@ export default function LegalPage() {
   return (
     <ManagePageShell title="Legal & policies">
       <div className="px-4 pt-4 pb-16">
-        <p className="text-[12px] mb-3" style={{ color: INK_55 }}>
-          Operated by CLBHOUZ LTD. Last updated dates are shown on each document.
-        </p>
 
         <div
           className="rounded-2xl overflow-hidden"
