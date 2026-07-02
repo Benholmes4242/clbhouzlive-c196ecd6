@@ -4,6 +4,8 @@ import type { FeedPost } from '@/components/media-system/types/media';
 import { openWithOrigin } from '@/lib/openWithOrigin';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import DecodedImage from './shared/DecodedImage';
+import { buildLqipUrl } from '@/utils/mediaThumbs';
+import { shouldUseLqip } from '@/utils/lqipQueue';
 
 
 function abbreviateCount(n: number): string {
