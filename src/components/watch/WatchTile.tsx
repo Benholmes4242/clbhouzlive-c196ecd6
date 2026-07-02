@@ -70,8 +70,8 @@ const WatchTile: React.FC<WatchTileProps> = ({ post, index, allPosts, onDecoded 
           className="absolute inset-0 w-full h-full object-cover"
           loading="lazy"
           onDecoded={onDecoded}
-          debugId={`grid#${index}`}
         />
+
 
       ) : (
         <div className="absolute inset-0 flex items-center justify-center bg-muted">
