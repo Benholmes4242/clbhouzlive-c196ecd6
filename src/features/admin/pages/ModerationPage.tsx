@@ -159,6 +159,7 @@ export default function ModerationPage() {
                   <TargetCell row={row} />
                   <StatusPill tone={statusTone(row.status)}>{row.status}</StatusPill>
                 </div>
+                <FlagsCell row={row} />
                 <ReasonsCell reasons={row.reasons} />
                 <div style={{ display: 'flex', justifyContent: 'space-between', color: t.inkMuted, fontSize: 12 }}>
                   <span>{row.report_count} report{row.report_count === 1 ? '' : 's'}</span>
