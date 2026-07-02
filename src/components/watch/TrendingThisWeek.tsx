@@ -1,3 +1,4 @@
+import { useRef } from 'react';
 import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
@@ -9,6 +10,8 @@ import { SectionHeader } from '@/components/ui/SectionHeader';
 import { HRail } from './proshop/HRail';
 import { ClipsMark } from './proshop/SectionMarks';
 import { useFirstVisibleDecoded } from './shared/useFirstVisibleDecoded';
+import { useRailAutoplay } from './shared/useRailAutoplay';
+
 
 const VISIBLE_COUNT = 3;
 
