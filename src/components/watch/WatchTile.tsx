@@ -36,13 +36,13 @@ const WatchTile: React.FC<WatchTileProps> = ({ post, index, allPosts, onDecoded 
   const thumbnailUrl = media?.thumbnailUrl;
   const posterUrl = (media as any)?.posterUrl || (media as any)?.poster || undefined;
   const likeCount = post.likeCount ?? 0;
-  const rootRef = useRef<HTMLDivElement>(null);
+  const rootRef = useRef<HTMLElement>(null);
 
   const handleClick = () => {
     openWithOrigin({
       posts: allPosts ?? [post],
       index,
-      originEl: rootRef.current,
+      originEl: rootRef.current as HTMLElement | null,
       posterUrl: thumbnailUrl ?? posterUrl ?? null,
       handOffUrls: [media?.hlsUrl],
     });
@@ -60,12 +60,15 @@ const WatchTile: React.FC<WatchTileProps> = ({ post, index, allPosts, onDecoded 
   }, [thumbnailUrl, onDecoded]);
 
   return (
-    <div
+    <Pressable
       ref={rootRef}
+      as="div"
+      variant="card"
+      onPress={handleClick}
       data-watch-index={index}
       data-post-id={post.id}
-      className="relative w-full h-full overflow-hidden cursor-pointer select-none bg-muted/40"
-      onClick={handleClick}
+      className="relative w-full h-full overflow-hidden select-none bg-muted/40"
+      innerStyle={{ position: 'relative', width: '100%', height: '100%' }}
       style={
         posterUrl
           ? {
@@ -76,6 +79,7 @@ const WatchTile: React.FC<WatchTileProps> = ({ post, index, allPosts, onDecoded 
           : undefined
       }
     >
+
       {thumbnailUrl ? (
         <DecodedImage
           src={thumbnailUrl}
