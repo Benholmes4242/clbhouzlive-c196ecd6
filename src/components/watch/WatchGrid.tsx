@@ -79,13 +79,36 @@ const WatchGrid: React.FC<WatchGridProps> = ({
     if (target > 0 && decodedCountRef.current >= target) {
       firedRef.current = true;
       onFirstRowDecoded?.();
+      // Phase 6: post-reveal idle prefetch of page 2 — network is quiet after
+      // the first row paints. Skip on Save-Data; page 2 must not already be
+      // in-flight or absent. requestIdleCallback keeps it off the main path.
+      try {
+        const conn: any = typeof navigator !== 'undefined' ? (navigator as any).connection : null;
+        if (conn?.saveData) return;
+        if (!hasNextPage || isFetchingNextPage) return;
+        const ric: any = (typeof window !== 'undefined' && (window as any).requestIdleCallback)
+          || ((cb: () => void) => setTimeout(cb, 800));
+        ric(() => {
+          if (document.visibilityState !== 'visible') return;
+          if (!hasNextPage || isFetchingNextPage) return;
+          fetchNextPage();
+        }, { timeout: 3000 });
+      } catch { /* noop */ }
     }
-  }, [posts.length, onFirstRowDecoded]);
+  }, [posts.length, onFirstRowDecoded, hasNextPage, isFetchingNextPage, fetchNextPage]);
 
-  // Infinite scroll via IntersectionObserver
+  // Infinite scroll via IntersectionObserver.
+  // Phase 6: rootMargin tiers by connection quality — 4g gets more lookahead
+  // (600px), 3g gets less (200px), Save-Data pulls it to the sentinel (0px).
   useEffect(() => {
     const sentinel = sentinelRef.current;
     if (!sentinel) return;
+
+    const conn: any = typeof navigator !== 'undefined' ? (navigator as any).connection : null;
+    let rootMargin = '400px';
+    if (conn?.saveData) rootMargin = '0px';
+    else if (conn?.effectiveType === '4g') rootMargin = '600px';
+    else if (conn?.effectiveType === '3g') rootMargin = '200px';
 
     const observer = new IntersectionObserver(
       (entries) => {
@@ -93,7 +116,7 @@ const WatchGrid: React.FC<WatchGridProps> = ({
           fetchNextPage();
         }
       },
-      { rootMargin: '400px' }
+      { rootMargin }
     );
 
     observer.observe(sentinel);

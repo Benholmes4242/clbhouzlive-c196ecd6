@@ -51,28 +51,41 @@ export const clearPrefetchCache = (keepUids?: string[]): void => {
  * DEDUPLICATION: Returns existing promise if already in-flight,
  * or resolves immediately if already complete.
  */
-export const preloadHlsManifest = async (hlsUrl: string, videoId?: string): Promise<void> => {
+export const preloadHlsManifest = async (
+  hlsUrl: string,
+  videoId?: string,
+  options?: { signal?: AbortSignal },
+): Promise<void> => {
+  // Phase 6: speculative fetches only run while the tab is visible; on
+  // Save-Data they don't run at all.
+  if (typeof document !== 'undefined' && document.visibilityState !== 'visible') {
+    return;
+  }
+  const conn: any = typeof navigator !== 'undefined' ? (navigator as any).connection : null;
+  if (conn?.saveData) return;
+  if (options?.signal?.aborted) return;
+
   // CRITICAL: Use extractCloudflareUid for consistent cache keys
   const effectiveVideoId = videoId || extractCloudflareUid(hlsUrl) || 'unknown';
-  
+
   // DEDUPLICATION: Skip if already completed
   if (prefetchComplete.has(effectiveVideoId)) {
     return;
   }
-  
+
   // DEDUPLICATION: Return existing promise if in-flight
   const existing = prefetchInFlight.get(effectiveVideoId);
   if (existing) {
     return existing;
   }
-  
+
   // Start new prefetch and track it
   const prefetchPromise = (async () => {
     prefetchDebug.prefetchInitiated(effectiveVideoId, hlsUrl);
     videoReadyFlags.markPending(effectiveVideoId);
 
     try {
-      await performPrefetch(hlsUrl, effectiveVideoId);
+      await performPrefetch(hlsUrl, effectiveVideoId, options?.signal);
       prefetchComplete.add(effectiveVideoId);
     } catch (err) {
       prefetchDebug.prefetchFailed(effectiveVideoId, err instanceof Error ? err.message : 'Unknown error');
@@ -80,7 +93,7 @@ export const preloadHlsManifest = async (hlsUrl: string, videoId?: string): Prom
       prefetchInFlight.delete(effectiveVideoId);
     }
   })();
-  
+
   prefetchInFlight.set(effectiveVideoId, prefetchPromise);
   return prefetchPromise;
 };
@@ -88,9 +101,10 @@ export const preloadHlsManifest = async (hlsUrl: string, videoId?: string): Prom
 /**
  * Internal: Actually performs the prefetch work
  */
-async function performPrefetch(hlsUrl: string, effectiveVideoId: string): Promise<void> {
+async function performPrefetch(hlsUrl: string, effectiveVideoId: string, signal?: AbortSignal): Promise<void> {
   // Fetch manifest
-  const manifestResponse = await fetch(hlsUrl, { 
+  const manifestResponse = await fetch(hlsUrl, {
+    signal,
     method: 'GET',
     mode: 'cors',
     credentials: 'omit',
@@ -121,6 +135,7 @@ async function performPrefetch(hlsUrl: string, effectiveVideoId: string): Promis
 
       // Fetch variant playlist (warms SW + HTTP cache)
       const variantResponse = await fetch(variantUrl, {
+        signal,
         method: 'GET',
         mode: 'cors',
         credentials: 'omit',
@@ -137,7 +152,7 @@ async function performPrefetch(hlsUrl: string, effectiveVideoId: string): Promis
         if (variantSegments.length > 0) {
           // Warm first two segments — SW catches the bytes; we just discard the body.
           const segmentsToPreload = variantSegments.slice(0, 2);
-          await preloadSegments(segmentsToPreload, variantUrl, effectiveVideoId);
+          await preloadSegments(segmentsToPreload, variantUrl, effectiveVideoId, signal);
 
           videoReadyFlags.markReady(effectiveVideoId);
           prefetchDebug.prefetchComplete(effectiveVideoId, segmentsToPreload.length);
@@ -149,7 +164,7 @@ async function performPrefetch(hlsUrl: string, effectiveVideoId: string): Promis
 
   // Warm first two segments in parallel
   const segmentsToPreload = segmentLines.slice(0, 2);
-  await preloadSegments(segmentsToPreload, hlsUrl, effectiveVideoId);
+  await preloadSegments(segmentsToPreload, hlsUrl, effectiveVideoId, signal);
 
   videoReadyFlags.markReady(effectiveVideoId);
   prefetchDebug.prefetchComplete(effectiveVideoId, segmentsToPreload.length);
@@ -162,13 +177,15 @@ async function performPrefetch(hlsUrl: string, effectiveVideoId: string): Promis
 async function preloadSegments(
   segmentLines: string[],
   baseUrl: string,
-  videoId: string
+  videoId: string,
+  signal?: AbortSignal,
 ): Promise<void> {
   const segmentPromises = segmentLines.map(async (segmentLine, index) => {
     try {
       const segmentUrl = new URL(segmentLine.trim(), baseUrl).href;
 
       const segmentResponse = await fetch(segmentUrl, {
+        signal,
         method: 'GET',
         mode: 'cors',
         credentials: 'omit',

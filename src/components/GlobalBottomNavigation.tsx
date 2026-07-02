@@ -10,6 +10,7 @@ import { usePostStudioStore } from '@/stores/usePostStudioStore';
 
 // Note: usePrefetch is accessed via useAppPrefetch to avoid static/dynamic import conflict
 import { useAppPrefetch } from '@/hooks/useAppPrefetch';
+import { warmChunk } from '@/routes/chunkLoaders';
 import NavigationBar from './bottom-navigation/NavigationBar';
 import { useNavigationHandlers } from './bottom-navigation/useNavigationHandlers';
 import { useUnseenFriendReviews } from '@/hooks/useUnseenFriendReviews';
@@ -72,9 +73,20 @@ const GlobalBottomNavigation: React.FC<GlobalBottomNavigationProps> = ({ chromeS
   
   const navRef = useRef<HTMLDivElement>(null);
   
-  // Prefetch routes on hover/touch for faster navigation
+  // Prefetch routes on hover/touch for faster navigation.
+  // Phase 6: also warms the lazy route CHUNK (import()) on pointerdown so it
+  // is parsed by the time <Suspense> mounts — closes the mounts:0 race in the
+  // warm-tap case. Dedupes per-session per-path to avoid repeat imports.
+  const warmedRef = useRef<Set<string>>(new Set());
   const handleNavPrefetch = useCallback((path: string) => {
-    triggerPrefetch(path);
+    if (typeof document !== 'undefined' && document.visibilityState !== 'visible') return;
+    if (warmedRef.current.has(path)) {
+      // Data prefetch is already idempotent internally — safe to skip on repeat.
+      return;
+    }
+    warmedRef.current.add(path);
+    warmChunk(path);           // (a) lazy chunk
+    triggerPrefetch(path);     // (b) data (already idempotent via prefetchedRoutes)
     handlePrefetch(path);
   }, [triggerPrefetch, handlePrefetch]);
   

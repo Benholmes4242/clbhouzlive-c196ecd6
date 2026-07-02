@@ -62,15 +62,14 @@ const OptimizedMedalIconComponent: React.FC<OptimizedMedalIconProps> = ({
   const altText = ALT_TEXT[type];
   const sizeClass = SIZE_CLASSES[size];
 
-  // Preload image for better performance
+  // Preload image for better performance.
+  // Phase 6: medal icons are decorative — never `high`. Even a "priority"
+  // medal only warrants normal auto scheduling; LQIP/decorative rule is low.
   useEffect(() => {
     if (!imageUrl) return;
 
     const img = new Image();
-    if (priority) {
-      img.fetchPriority = 'high';
-    }
-    
+    // Decorative: never set fetchPriority='high' here.
     img.onload = () => setImageLoaded(true);
     img.onerror = () => setImageError(true);
     img.src = imageUrl;
@@ -95,7 +94,7 @@ const OptimizedMedalIconComponent: React.FC<OptimizedMedalIconProps> = ({
         imageLoaded ? 'opacity-100' : 'opacity-0'
       } ${className}`}
       loading={priority ? 'eager' : 'lazy'}
-      fetchPriority={priority ? 'high' : 'auto'}
+      fetchPriority="low"
       decoding="async"
       onLoad={() => setImageLoaded(true)}
       onError={() => setImageError(true)}

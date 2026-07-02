@@ -325,6 +325,35 @@ const ROUTE_CONFIGS: RoutePrefetchConfig[] = [
     },
     videoPrefetchCount: 8,
   },
+  // ============ Phase 6 additions ============
+  // Route stubs at priority 2. No queryFn — the existing prefetchConfig()
+  // path will only HLS-warm from cache if the primary hook has already
+  // populated it (e.g. previous visit, persisted cache). This makes the
+  // paths "known" to triggerPrefetch(), so tab-touchstart warm-up is a
+  // no-op-safe call rather than a "not found" fall-through. Rails warm
+  // themselves on reveal via useRailAutoplay — do not compete here.
+  {
+    // /watch primary grid: warm HLS for any short-form video cache hit.
+    path: '/watch',
+    queryKey: ['clubhouse-explore-shorts'],
+    priority: 2,
+    extractVideoUrls: (data) => extractVideoUrlsFromArray(data, 6),
+    videoPrefetchCount: 6,
+  },
+  {
+    // /courses is thumbnail-only — no video prefetch (LQIP handles perceived load).
+    path: '/courses',
+    queryKey: ['golf-courses-infinite'],
+    priority: 2,
+    videoPrefetchCount: 0,
+  },
+  {
+    // /tourhub: warm cached tournaments; no video prefetch (hero rarely a video).
+    path: '/tourhub',
+    queryKey: ['tournaments-cache'],
+    priority: 2,
+    videoPrefetchCount: 0,
+  },
 ];
 
 // ============ Provider ============
@@ -345,6 +374,20 @@ export function AppPrefetchProvider({
   const queryClient = useQueryClient();
   const prefetchedRoutes = useRef<Set<string>>(new Set());
   const timeoutRef = useRef<NodeJS.Timeout | null>(null);
+  // Phase 6: single AbortController for all speculative HLS work.
+  // Aborted on visibilitychange -> hidden; replaced when visible again.
+  const speculativeAbortRef = useRef<AbortController>(new AbortController());
+
+  useEffect(() => {
+    const onVis = () => {
+      if (document.visibilityState === 'hidden') {
+        speculativeAbortRef.current.abort();
+        speculativeAbortRef.current = new AbortController();
+      }
+    };
+    document.addEventListener('visibilitychange', onVis);
+    return () => document.removeEventListener('visibilitychange', onVis);
+  }, []);
 
   // Check if we should prefetch based on connection
   const shouldPrefetch = useCallback(() => {
@@ -371,7 +414,7 @@ export function AppPrefetchProvider({
       if (urlsToPreload.length === 0) return;
 
       await Promise.allSettled(
-        urlsToPreload.map(url => preloadHlsManifest(url))
+        urlsToPreload.map(url => preloadHlsManifest(url, undefined, { signal: speculativeAbortRef.current.signal }))
       );
     } catch {
       // Silent fail - prefetch errors shouldn't block the app
@@ -445,8 +488,7 @@ export function AppPrefetchProvider({
 
     // Priority 1 routes (landing page) - start immediately (100ms for hydration)
     const criticalRoutes = ROUTE_CONFIGS.filter(r => r.priority === 1);
-    const standardRoutes = ROUTE_CONFIGS.filter(r => r.priority >= 2 && r.priority < 1);
-    
+
     // Critical routes start almost immediately
     const criticalTimeout = setTimeout(() => {
       console.log('[AppPrefetch] Starting critical prefetch (landing page)');
@@ -455,7 +497,10 @@ export function AppPrefetchProvider({
       });
     }, 100); // Just enough for React to hydrate
 
-    // Standard routes wait for the configured delay
+    // Standard routes wait for the configured delay.
+    // Phase 6: the previous `standardRoutes` filter used an impossible
+    // predicate (`priority >= 2 && priority < 1`) and was dead code — the
+    // real >= 2 pass is done here.
     timeoutRef.current = setTimeout(() => {
       console.log('[AppPrefetch] Starting standard prefetch');
       const highPriorityRoutes = ROUTE_CONFIGS

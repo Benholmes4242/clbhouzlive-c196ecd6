@@ -52,7 +52,8 @@ const LqipUnderlay: React.FC<LqipUnderlayProps> = ({ from, radius }) => {
       alt=""
       aria-hidden="true"
       decoding="async"
-      loading="lazy"
+      // Phase 6: eager + low — fetch now, never compete with the real image.
+      loading="eager"
       // @ts-expect-error — non-standard but widely supported
       fetchpriority="low"
       onLoad={() => setLoaded(true)}

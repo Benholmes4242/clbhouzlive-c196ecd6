@@ -166,7 +166,9 @@ const DecodedImage = React.forwardRef<HTMLImageElement, DecodedImageProps>(
             decoding="async"
             // @ts-expect-error — non-standard but widely supported HTML attribute
             fetchpriority="low"
-            loading="lazy"
+            // Phase 6: eager so it fetches immediately, but low priority so it
+            // never competes with the real image (per fetchPriority contract).
+            loading="eager"
             onLoad={() => setLqipLoaded(true)}
             onError={() => setLqipLoaded(false)}
             style={{
