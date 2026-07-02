@@ -73,7 +73,11 @@ function UnifiedWatchFeedInner({ embedded = false }: UnifiedWatchFeedProps) {
     setFirstRowDecoded(false);
   }, [mood, firstPostId]);
 
-  usePageReady(!isLoading && posts.length > 0 && firstRowDecoded);
+  // Coordinated reveal — flips true when all above-the-fold rails settle,
+  // or when the deadline elapses. Drives the page-level content milestone.
+  const revealed = useWatchReveal('page', true);
+
+  usePageReady(revealed);
 
 
 
