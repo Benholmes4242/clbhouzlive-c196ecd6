@@ -203,6 +203,7 @@ export function useFriendship(targetUserId: string | undefined) {
     },
     onSuccess: () => {
       toast.success('Request accepted');
+      triggerHaptic('success');
       invalidateQueries();
     },
     onError: (error) => {
