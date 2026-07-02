@@ -1,9 +1,9 @@
-import { memo, useState } from 'react';
+import { memo, useEffect, useRef, useState } from 'react';
 import { motion } from 'framer-motion';
 import { useQuery } from '@tanstack/react-query';
 
 import { useWatchOfTheWeek } from './hooks/useWatchOfTheWeek';
-import { useWatchReveal } from '../WatchRevealContext';
+import { useWatchReveal, useWatchRevealed } from '../WatchRevealContext';
 import { useWatchMood } from './hooks/useWatchMood';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useFullscreenFeedStore } from '@/store/fullscreenFeedStore';
@@ -11,10 +11,12 @@ import { Kicker } from './Kicker';
 import { Pin } from './Pin';
 import { useActiveActor } from '@/context/ActiveActorContext';
 import { isPostLikedByMe } from '@/lib/likedPostIds';
-import AnimatedTileThumb from '../shared/AnimatedTileThumb';
-import { extractCloudflareUid } from '@/utils/videoIdUtils';
+import DecodedImage from '../shared/DecodedImage';
+import { attachHlsToTile } from '@/hooks/useTileVideoPlayer';
+import { usePrefersReducedMotion } from '@/hooks/usePrefersReducedMotion';
 
 // Note: useNavigate import previously here was unused.
+
 
 function formatDuration(seconds: number | null): string {
   if (!seconds) return '';
