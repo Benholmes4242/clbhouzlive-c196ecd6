@@ -32,6 +32,10 @@ const WatchAutoplay: React.FC<WatchAutoplayProps> = ({ posts, gridRef }) => {
   const postsRef = useRef<FeedPost[]>(posts);
   postsRef.current = posts;
 
+  // Phase 7: honour prefers-reduced-motion consistently with rails + hero.
+  // Under RM: no pool, no autoplay — posters only.
+  const prefersReducedMotion = usePrefersReducedMotion();
+
   const isSlowNetwork = useCallback(() => {
     const connection = (navigator as any).connection;
     const type = connection?.effectiveType || '4g';
@@ -40,7 +44,9 @@ const WatchAutoplay: React.FC<WatchAutoplayProps> = ({ posts, gridRef }) => {
 
   // Create persistent video pool
   useEffect(() => {
+    if (prefersReducedMotion) return;
     if (isSlowNetwork()) return;
+
 
     const pool: HTMLVideoElement[] = [];
     for (let i = 0; i < VIDEO_POOL_SIZE; i++) {
