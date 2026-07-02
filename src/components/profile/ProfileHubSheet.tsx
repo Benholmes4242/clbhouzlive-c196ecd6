@@ -230,11 +230,13 @@ function AccountRow({
   onClick: () => void;
 }) {
   return (
-    <button
-      type="button"
-      onClick={onClick}
-      className="w-full flex items-center gap-3 active:bg-[rgba(15,23,42,0.03)] transition-colors"
-      style={{ padding: '14px 0', background: 'transparent', border: 'none', cursor: 'pointer', textAlign: 'left' }}
+    <Pressable
+      as="button"
+      variant="row"
+      haptic="selection"
+      onPress={onClick}
+      innerClassName="w-full flex items-center gap-3"
+      style={{ padding: '14px 12px', margin: '0 -12px', borderRadius: 10, background: 'transparent', border: 'none', textAlign: 'left', width: 'calc(100% + 24px)' }}
     >
       <Icon size={16} color={INK_SOFT} strokeWidth={1.8} />
       <div style={{ flex: 1, minWidth: 0 }}>
@@ -242,7 +244,7 @@ function AccountRow({
         <div style={{ fontSize: 11.5, fontWeight: 400, color: INK_FAINT, marginTop: 1 }}>{sub}</div>
       </div>
       <ChevronRight size={13} color="rgba(15,23,42,0.30)" />
-    </button>
+    </Pressable>
   );
 }
 
