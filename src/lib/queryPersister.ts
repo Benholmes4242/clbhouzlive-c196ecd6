@@ -1,6 +1,6 @@
 import { createAsyncStoragePersister } from '@tanstack/query-async-storage-persister';
 import { get, set, del } from 'idb-keyval';
-import type { Query } from '@tanstack/react-query';
+
 
 /**
  * Persisted query cache — IndexedDB backed, throttled, first-page-only.
