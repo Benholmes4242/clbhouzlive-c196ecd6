@@ -36,6 +36,8 @@ export function mapRowToFeedPost(row: FeedRpcRow): FeedPost {
     mp4Url: undefined,
     thumbnailUrl: row.poster_url || (streamId ? buildThumbnailUrl(streamId) : undefined),
     imageUrl: row.media_type === 'image' ? row.media_url : undefined,
+    // Threaded through so AnimatedTileThumb can request the animated variant.
+    streamId: streamId ?? undefined,
     width: row.width || 1080,
     height: row.height || 1920,
     duration: row.duration_seconds ? Number(row.duration_seconds) : undefined,

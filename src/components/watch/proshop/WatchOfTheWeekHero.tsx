@@ -11,7 +11,9 @@ import { Kicker } from './Kicker';
 import { Pin } from './Pin';
 import { useActiveActor } from '@/context/ActiveActorContext';
 import { isPostLikedByMe } from '@/lib/likedPostIds';
-import DecodedImage from '../shared/DecodedImage';
+import AnimatedTileThumb from '../shared/AnimatedTileThumb';
+import { extractCloudflareUid } from '@/utils/videoIdUtils';
+
 // Note: useNavigate import previously here was unused.
 
 function formatDuration(seconds: number | null): string {
@@ -141,14 +143,18 @@ function WatchOfTheWeekHeroInner() {
           }}
         >
           {pick.thumbnail_url ? (
-            <DecodedImage
-              src={pick.thumbnail_url}
+            <AnimatedTileThumb
+              posterSrc={pick.thumbnail_url}
+              streamId={pick.hls_url ? extractCloudflareUid(pick.hls_url) || undefined : undefined}
+              heightPx={400}
+              dwellMs={0}
               alt={pick.caption ?? ''}
               loading="lazy"
               onDecoded={() => setHeroDecoded(true)}
-              style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover' }}
+              style={{ position: 'absolute', inset: 0 }}
             />
           ) : null}
+
 
           <div
             aria-hidden

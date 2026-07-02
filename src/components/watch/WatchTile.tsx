@@ -3,7 +3,8 @@ import { Film, Heart } from 'lucide-react';
 import type { FeedPost } from '@/components/media-system/types/media';
 import { useFullscreenFeedStore } from '@/store/fullscreenFeedStore';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
-import DecodedImage from './shared/DecodedImage';
+import AnimatedTileThumb from './shared/AnimatedTileThumb';
+
 
 function abbreviateCount(n: number): string {
   if (n >= 1_000_000) return `${(n / 1_000_000).toFixed(1)}M`;
@@ -64,13 +65,19 @@ const WatchTile: React.FC<WatchTileProps> = ({ post, index, allPosts, onDecoded 
       }
     >
       {thumbnailUrl ? (
-        <DecodedImage
-          src={thumbnailUrl}
+        <AnimatedTileThumb
+          posterSrc={thumbnailUrl}
+          streamId={media?.streamId}
+          heightPx={media?.height ? Math.min(media.height, 400) : 400}
+          dwellMs={1000}
           alt=""
-          className="absolute inset-0 w-full h-full object-cover"
+          className="absolute inset-0 w-full h-full"
           loading="lazy"
           onDecoded={onDecoded}
         />
+
+
+
 
 
       ) : (
