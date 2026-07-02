@@ -968,7 +968,15 @@ const App: React.FC = () => {
         <ErrorBoundary>
           <ThemeProvider defaultTheme="dark" storageKey="clbhouz-ui-theme">
             <Top100DebugProvider>
-              <QueryClientProvider client={queryClient}>
+              <PersistQueryClientProvider
+                client={queryClient}
+                persistOptions={{
+                  persister: queryPersister,
+                  maxAge: PERSIST_MAX_AGE_MS,
+                  buster: __BUILD_ID__,
+                  dehydrateOptions: { shouldDehydrateQuery: shouldPersistQuery },
+                }}
+              >
                 <Suspense fallback={<div style={{ background: '#0A0E14', minHeight: '100dvh' }} />}>
                   <AppPrefetchProvider delay={2000} enabled={true}>
                     <RehydrationProvider>
@@ -981,7 +989,7 @@ const App: React.FC = () => {
                     </RehydrationProvider>
                   </AppPrefetchProvider>
                 </Suspense>
-              </QueryClientProvider>
+              </PersistQueryClientProvider>
             </Top100DebugProvider>
           </ThemeProvider>
         </ErrorBoundary>
