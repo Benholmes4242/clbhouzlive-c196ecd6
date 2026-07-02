@@ -199,7 +199,7 @@ export const CountryPickerSheet: React.FC<Props> = ({ open, onClose, onSelect })
                     <div style={{ flex: 1, minWidth: 0 }}>
                       <div style={{ fontSize: 16, fontWeight: 700, color: INK }}>{c.name}</div>
                       <div style={{ fontSize: 12.5, color: GREEN, fontWeight: 600 }}>
-                        {c.body} · ready
+                        {c.body}
                       </div>
                     </div>
                     <ChevronRight size={18} color={GREEN} strokeWidth={2} />
