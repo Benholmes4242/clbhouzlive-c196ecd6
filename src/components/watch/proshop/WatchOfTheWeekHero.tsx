@@ -42,10 +42,109 @@ function WatchOfTheWeekHeroInner() {
   // Gate the reveal on both data + pixel: the hero image bitmap must have
   // decoded (or be empty) before we call markSettled.
   const [heroDecoded, setHeroDecoded] = useState(false);
+  const heroTileRef = useRef<HTMLDivElement>(null);
+  const heroVideoRef = useRef<HTMLVideoElement | null>(null);
+  const heroHlsRef = useRef<any>(null);
+  const [heroInView, setHeroInView] = useState(false);
+  const [heroVideoVisible, setHeroVideoVisible] = useState(false);
+  const pageRevealed = useWatchRevealed();
+  const reducedMotion = usePrefersReducedMotion();
   const hasResolved = dataUpdatedAt > 0;
   const isEmpty = hasResolved && (!pick || !pick.thumbnail_url);
   const heroReady = hasResolved && (isEmpty || heroDecoded);
   const revealed = useWatchReveal('watch-of-the-week', heroReady);
+
+  // Track hero visibility for autoplay.
+  useEffect(() => {
+    const el = heroTileRef.current;
+    if (!el) return;
+    const io = new IntersectionObserver(
+      ([entry]) => setHeroInView(entry.intersectionRatio >= 0.6),
+      { threshold: [0, 0.3, 0.6, 1] },
+    );
+    io.observe(el);
+    return () => io.disconnect();
+  }, [pick?.post_id]);
+
+  // Slow-network guard (2g / saveData) — no autoplay.
+  const isSlowNet = () => {
+    if (typeof navigator === 'undefined') return false;
+    const c: any = (navigator as any).connection;
+    if (!c) return false;
+    return c.effectiveType === '2g' || c.effectiveType === 'slow-2g' || c.saveData;
+  };
+
+  // Mount/tear-down hero video based on visibility gates.
+  useEffect(() => {
+    const tile = heroTileRef.current;
+    const hlsUrl = pick?.hls_url;
+    if (!tile || !hlsUrl) return;
+    const canPlay =
+      pageRevealed && heroInView && !reducedMotion && !isSlowNet();
+    if (!canPlay) {
+      setHeroVideoVisible(false);
+      const v = heroVideoRef.current;
+      if (v) {
+        try { v.pause(); } catch {}
+        v.removeAttribute('src');
+        try { v.load(); } catch {}
+        if (v.parentElement) v.parentElement.removeChild(v);
+      }
+      heroVideoRef.current = null;
+      if (heroHlsRef.current) {
+        try { heroHlsRef.current.destroy(); } catch {}
+        heroHlsRef.current = null;
+      }
+      return;
+    }
+
+    let cancelled = false;
+    const v = document.createElement('video');
+    v.muted = true;
+    v.loop = true;
+    v.playsInline = true;
+    v.setAttribute('webkit-playsinline', '');
+    v.setAttribute('muted', '');
+    v.style.cssText =
+      'position:absolute;inset:0;width:100%;height:100%;object-fit:cover;pointer-events:none;opacity:0;transition:opacity 200ms ease;z-index:0;';
+    tile.appendChild(v);
+    heroVideoRef.current = v;
+
+    const onReady = () => {
+      if (cancelled) return;
+      v.style.opacity = '1';
+      setHeroVideoVisible(true);
+      v.play().catch(() => {});
+    };
+
+    attachHlsToTile({ hlsUrl, video: v, onReady })
+      .then((hls) => {
+        if (cancelled) {
+          hls?.destroy?.();
+          return;
+        }
+        heroHlsRef.current = hls;
+      })
+      .catch(() => {});
+
+    return () => {
+      cancelled = true;
+      setHeroVideoVisible(false);
+      const cur = heroVideoRef.current;
+      if (cur) {
+        try { cur.pause(); } catch {}
+        cur.removeAttribute('src');
+        try { cur.load(); } catch {}
+        if (cur.parentElement) cur.parentElement.removeChild(cur);
+      }
+      heroVideoRef.current = null;
+      if (heroHlsRef.current) {
+        try { heroHlsRef.current.destroy(); } catch {}
+        heroHlsRef.current = null;
+      }
+    };
+  }, [pageRevealed, heroInView, reducedMotion, pick?.hls_url]);
+
 
   const skeleton = (
     <section style={{ padding: '24px 16px 12px' }}>
