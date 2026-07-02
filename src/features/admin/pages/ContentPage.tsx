@@ -29,8 +29,9 @@ import { useCourses, createCourse, type AdminCourseRow } from '../hooks/useCours
 import { useCourseRequests } from '../hooks/useCourseRequests';
 import CourseRequestsTab from '../components/CourseRequestsTab';
 import HelpArticlesTab from '../components/HelpArticlesTab';
+import LegalDocumentsTab from '../components/LegalDocumentsTab';
 
-type TabId = 'courses' | 'course-requests' | 'help' | 'tour' | 'players';
+type TabId = 'courses' | 'course-requests' | 'help' | 'legal' | 'tour' | 'players';
 
 export default function ContentPage() {
   const { role } = usePanelRole();
