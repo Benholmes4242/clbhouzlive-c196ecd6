@@ -99,7 +99,7 @@ function CourseAnchoredRailInner() {
       <HRail>
         {posts.map((post, i) => (
           <div key={post.id} style={{ scrollSnapAlign: 'start' }}>
-            <WatchRailTile post={post} index={i} allPosts={posts} />
+            <WatchRailTile post={post} index={i} allPosts={posts} debugId={`course-anchored#${i}`} />
           </div>
         ))}
       </HRail>

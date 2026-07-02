@@ -142,6 +142,7 @@ function WatchOfTheWeekHeroInner() {
             alt={pick.caption ?? ''}
             loading="lazy"
             onDecoded={() => setHeroDecoded(true)}
+            debugId="hero#0"
             style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover' }}
           />
         ) : null}

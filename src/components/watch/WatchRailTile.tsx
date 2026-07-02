@@ -26,6 +26,9 @@ interface WatchRailTileProps {
   radius?: number;
   /** Fires once the tile's thumbnail bitmap is ready (used to gate coordinated reveal). */
   onDecoded?: () => void;
+  /** Temporary telemetry id like "trending#3". */
+  debugId?: string;
+
 }
 
 const NEW_THRESHOLD_MS = 24 * 60 * 60 * 1000; // 24h
@@ -60,6 +63,7 @@ export default function WatchRailTile({
   aspectRatio = '3/4',
   radius = 6,
   onDecoded,
+  debugId,
 }: WatchRailTileProps) {
   const cardRef = useRef<HTMLDivElement>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
@@ -154,6 +158,7 @@ export default function WatchRailTile({
         src={thumb}
         alt=""
         onDecoded={onDecoded}
+        debugId={debugId}
         style={{
           width: '100%',
           height: '100%',
