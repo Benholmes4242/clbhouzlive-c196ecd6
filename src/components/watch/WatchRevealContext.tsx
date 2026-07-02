@@ -45,9 +45,10 @@ export function WatchRevealProvider({ children, deadlineMs = 1500 }: ProviderPro
   const settledRef = useRef<Set<string>>(new Set());
   const revealedRef = useRef(false);
 
-  const doReveal = useCallback(() => {
+  const doReveal = useCallback((cause: string) => {
     if (revealedRef.current) return;
     revealedRef.current = true;
+    wrtMark('page', 'page-revealed', undefined, cause);
     setRevealed(true);
   }, []);
 
@@ -59,25 +60,28 @@ export function WatchRevealProvider({ children, deadlineMs = 1500 }: ProviderPro
     for (const id of reg) {
       if (!settled.has(id)) return;
     }
-    doReveal();
+    doReveal('all-settled');
   }, [doReveal]);
 
   const register = useCallback((id: string) => {
     if (revealedRef.current) return;
     registeredRef.current.add(id);
+    wrtMark(id, 'registered');
   }, []);
 
   const markSettled = useCallback((id: string) => {
     if (revealedRef.current) return;
     settledRef.current.add(id);
+    wrtMark(id, 'settled');
     checkAllSettled();
   }, [checkAllSettled]);
 
   // Deadline fallback — reveal even if a rail never settles.
   useEffect(() => {
-    const t = setTimeout(doReveal, deadlineMs);
+    const t = setTimeout(() => doReveal('deadline'), deadlineMs);
     return () => clearTimeout(t);
   }, [doReveal, deadlineMs]);
+
 
   const value = useMemo<WatchRevealValue>(
     () => ({ register, markSettled, revealed }),
