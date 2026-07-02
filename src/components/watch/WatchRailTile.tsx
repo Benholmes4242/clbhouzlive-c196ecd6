@@ -166,15 +166,14 @@ export default function WatchRailTile({
     >
       {/* Thumbnail — decode-gated so the coordinated reveal only fires
           when pixels are actually painted. */}
-      <DecodedImage
-        src={thumb}
+      <AnimatedTileThumb
+        posterSrc={thumb}
+        streamId={media?.streamId}
+        heightPx={thumbHeightPx ?? 316}
+        dwellMs={1000}
         alt=""
         onDecoded={onDecoded}
         style={{
-          width: '100%',
-          height: '100%',
-          objectFit: 'cover',
-          display: 'block',
           position: 'absolute',
           inset: 0,
         }}
