@@ -245,7 +245,7 @@ export function SettingsTabContent() {
           <SettingsChevronRow
             icon={<LogOut size={18} />}
             title="Sign Out"
-            onClick={handleSignOut}
+            onClick={() => setSignOutOpen(true)}
             iconTheme="danger"
           />
           <SettingsChevronRow
