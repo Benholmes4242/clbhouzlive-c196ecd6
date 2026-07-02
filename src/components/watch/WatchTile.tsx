@@ -80,6 +80,7 @@ const WatchTile: React.FC<WatchTileProps> = ({ post, index, allPosts, onDecoded 
           alt=""
           loading="lazy"
           onDecoded={onDecoded}
+          lqipSrc={shouldUseLqip(index, 6) ? buildLqipUrl(thumbnailUrl) : null}
           className="absolute inset-0 w-full h-full"
           style={{ objectFit: 'cover' }}
         />
