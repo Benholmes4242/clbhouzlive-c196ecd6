@@ -2,6 +2,7 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { usePageReady } from '@/perf/usePageReady';
+import { wrtStart } from '@/perf/watchRevealDebug';
 
 import { WatchRevealProvider, useWatchRevealed } from './WatchRevealContext';
 import TrendingThisWeek from './TrendingThisWeek';
