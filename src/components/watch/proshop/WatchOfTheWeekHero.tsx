@@ -200,7 +200,7 @@ function WatchOfTheWeekHeroInner() {
           {pick.why_ai}
         </p>
       ) : null}
-    </section>
+    </motion.section>
   );
 }
 
