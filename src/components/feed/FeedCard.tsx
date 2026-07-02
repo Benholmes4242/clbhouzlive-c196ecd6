@@ -312,6 +312,7 @@ const FeedCardImpl: React.FC<FeedCardProps> = ({
   // falling back to onLoad and finally to mount + rAF so we never strand the
   // skeleton on a quirky image.
   const primaryImgRef = useRef<HTMLImageElement | null>(null);
+  const singleMediaBtnRef = useRef<HTMLButtonElement | null>(null);
   const usesPrimaryImage =
     isFirstCard &&
     !isMulti &&
