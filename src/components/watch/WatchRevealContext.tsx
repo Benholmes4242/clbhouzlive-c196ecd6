@@ -28,6 +28,9 @@ export function useWatchReveal(id: string, settled: boolean) {
 
   return revealed;
 }
+export function useWatchRevealed() {
+  return useContext(WatchRevealContext).revealed;
+}
 
 interface ProviderProps {
   children: ReactNode;
