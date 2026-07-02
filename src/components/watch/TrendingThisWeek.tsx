@@ -99,7 +99,12 @@ export default function TrendingThisWeek({ enabled = true }: TrendingThisWeekPro
   if (topPosts.length === 0) return null;
 
   return (
-    <div style={{ background: 'hsl(var(--background))' }}>
+    <motion.div
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={{ duration: 0.18 }}
+      style={{ background: 'hsl(var(--background))' }}
+    >
       <SectionHeader
         role="rail"
         title="Quick clips"
@@ -115,6 +120,6 @@ export default function TrendingThisWeek({ enabled = true }: TrendingThisWeekPro
           </div>
         ))}
       </HRail>
-    </div>
+    </motion.div>
   );
 }
