@@ -413,7 +413,133 @@ Deno.serve(async (req) => {
       deletionResults.ai_caption_usage = { deleted: 0, error: String(e) }
     }
 
+    // 23. Delete WHS (England Golf) handicap data — mirrors delete-whs-data logic.
+    try {
+      const { data: allConns } = await adminClient
+        .from('whs_connections')
+        .select('id, vault_secret_id')
+        .eq('user_id', user.id)
+
+      const connectionIds = (allConns ?? []).map((c: any) => c.id)
+      let whsRowsDeleted = 0
+
+      if (connectionIds.length > 0) {
+        const { data: scoreIds } = await adminClient
+          .from('whs_scores')
+          .select('id')
+          .in('connection_id', connectionIds)
+        const scoreIdList = (scoreIds ?? []).map((s: any) => s.id)
+
+        if (scoreIdList.length > 0) {
+          const { count: holesCount } = await adminClient
+            .from('whs_score_holes')
+            .delete({ count: 'exact' })
+            .in('score_id', scoreIdList)
+          whsRowsDeleted += holesCount || 0
+        }
+
+        const { count: scoresCount } = await adminClient
+          .from('whs_scores')
+          .delete({ count: 'exact' })
+          .in('connection_id', connectionIds)
+        whsRowsDeleted += scoresCount || 0
+
+        const { count: snapCount } = await adminClient
+          .from('whs_handicap_snapshots')
+          .delete({ count: 'exact' })
+          .in('connection_id', connectionIds)
+        whsRowsDeleted += snapCount || 0
+
+        const { count: friendsCount } = await adminClient
+          .from('whs_friends')
+          .delete({ count: 'exact' })
+          .in('connection_id', connectionIds)
+        whsRowsDeleted += friendsCount || 0
+      }
+
+      const { count: invitesCount } = await adminClient
+        .from('whs_invites')
+        .delete({ count: 'exact' })
+        .eq('inviter_user_id', user.id)
+      whsRowsDeleted += invitesCount || 0
+
+      const { count: completionsCount } = await adminClient
+        .from('whs_invite_completions')
+        .delete({ count: 'exact' })
+        .or(`inviter_user_id.eq.${user.id},invitee_user_id.eq.${user.id}`)
+      whsRowsDeleted += completionsCount || 0
+
+      if (connectionIds.length > 0) {
+        const { count: connCount } = await adminClient
+          .from('whs_connections')
+          .delete({ count: 'exact' })
+          .in('id', connectionIds)
+        whsRowsDeleted += connCount || 0
+      }
+
+      // Best-effort vault secret cleanup for each connection.
+      for (const c of allConns ?? []) {
+        if ((c as any).vault_secret_id) {
+          try {
+            await adminClient.rpc('vault_delete_secret', { secret_id: (c as any).vault_secret_id })
+          } catch (err) {
+            console.error('[delete-account] whs vault delete failed (non-fatal):', err)
+          }
+        }
+      }
+
+      deletionResults.whs_data = { deleted: whsRowsDeleted }
+    } catch (e) {
+      console.error('[delete-account] Error deleting WHS data:', e)
+      deletionResults.whs_data = { deleted: 0, error: String(e) }
+    }
+
+    // 24. Delete handicap authority waitlist entries
+    try {
+      const { count } = await adminClient
+        .from('handicap_authority_waitlist')
+        .delete({ count: 'exact' })
+        .eq('user_id', user.id)
+      deletionResults.handicap_authority_waitlist = { deleted: count || 0 }
+    } catch (e) {
+      deletionResults.handicap_authority_waitlist = { deleted: 0, error: String(e) }
+    }
+
+    // 25. Delete support messages authored by user (tickets themselves are anonymized above)
+    try {
+      const { count } = await adminClient
+        .from('support_messages')
+        .delete({ count: 'exact' })
+        .eq('sender_id', user.id)
+      deletionResults.support_messages = { deleted: count || 0 }
+    } catch (e) {
+      deletionResults.support_messages = { deleted: 0, error: String(e) }
+    }
+
+    // 26. Delete reports filed by user (user-report queue)
+    try {
+      const { count } = await adminClient
+        .from('reports')
+        .delete({ count: 'exact' })
+        .eq('reporter_id', user.id)
+      deletionResults.reports = { deleted: count || 0 }
+    } catch (e) {
+      deletionResults.reports = { deleted: 0, error: String(e) }
+    }
+
+    // 27. Delete post reports filed by user
+    try {
+      const { count } = await adminClient
+        .from('post_reports')
+        .delete({ count: 'exact' })
+        .eq('reporter_id', user.id)
+      deletionResults.post_reports = { deleted: count || 0 }
+    } catch (e) {
+      deletionResults.post_reports = { deleted: 0, error: String(e) }
+    }
+
     // ========== DELETE MEDIA FROM STORAGE ==========
+
     try {
       // List and delete user's media from storage buckets
       const buckets = ['avatars', 'covers', 'post-media', 'review-media']
