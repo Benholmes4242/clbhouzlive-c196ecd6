@@ -234,3 +234,45 @@ function ReasonsCell({ reasons }: { reasons: string[] }) {
     </div>
   );
 }
+
+function FlagsCell({ row }: { row: ModerationQueueRow }) {
+  if (!row.is_high_priority && !row.auto_hidden) {
+    return <span style={{ color: t.inkFaint, fontSize: 12 }}>—</span>;
+  }
+  return (
+    <div style={{ display: 'inline-flex', alignItems: 'center', gap: 6, flexWrap: 'wrap' }}>
+      {row.is_high_priority && (
+        <span
+          style={{
+            padding: '2px 10px',
+            borderRadius: 999,
+            background: t.dangerSoft,
+            color: t.dangerText,
+            fontSize: 11,
+            fontWeight: 700,
+            textTransform: 'uppercase',
+            letterSpacing: 0.3,
+          }}
+        >
+          High priority
+        </span>
+      )}
+      {row.auto_hidden && (
+        <span
+          style={{
+            padding: '2px 10px',
+            borderRadius: 999,
+            background: t.warnSoft,
+            color: t.warnText,
+            fontSize: 11,
+            fontWeight: 700,
+            textTransform: 'uppercase',
+            letterSpacing: 0.3,
+          }}
+        >
+          Auto-hidden
+        </span>
+      )}
+    </div>
+  );
+}
