@@ -231,6 +231,7 @@ const LightFeedCardImpl: React.FC<LightFeedCardProps> = ({
   // Actor selection is GLOBAL — picker reads and writes the session-wide activeActor.
   const effectiveActor: ActiveActor | null = activeActor;
   const captionTextRef = useRef<HTMLDivElement | null>(null);
+  const singleMediaBtnRef = useRef<HTMLButtonElement | null>(null);
 
   const reviewCourseId = post.review?.courseId ?? post.courseId;
   const reviewId = post.review?.reviewId;
