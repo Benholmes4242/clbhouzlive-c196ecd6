@@ -169,7 +169,7 @@ function BucketListRailInner() {
           </div>
         ))}
       </HRail>
-    </section>
+    </motion.section>
   );
 }
 
