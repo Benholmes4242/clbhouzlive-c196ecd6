@@ -172,6 +172,13 @@ const ActivityPage: React.FC = () => {
       navigate('/handicap', countryId ? { state: { preselectCountryId: countryId } } : undefined);
       return;
     }
+    if (n.type === 'support_reply') {
+      const ticketId = ((n as any).data?.ticket_id as string | undefined) ?? n.entity_id;
+      if (ticketId) {
+        navigate(`/support/thread/${ticketId}`);
+        return;
+      }
+    }
     if (n.context_url && n.entity_type && n.entity_id) {
       const exists = await checkContentExists(n.entity_type, n.entity_id);
       if (!exists) {
