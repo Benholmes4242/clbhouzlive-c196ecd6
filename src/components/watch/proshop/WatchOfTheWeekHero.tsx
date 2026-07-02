@@ -182,7 +182,12 @@ function WatchOfTheWeekHeroInner() {
   const handleTap = () => {
     // Open fullscreen viewer with a synthetic single-post array. The viewer
     // accepts the FeedPost shape; we provide the minimum fields it needs.
-    useFullscreenFeedStore.getState().open(
+    openWithOrigin({
+      originEl: heroTileRef.current,
+      posterUrl: pick.thumbnail_url ?? null,
+      handOffUrls: [pick.hls_url ?? undefined],
+      index: 0,
+      posts:
       [{
         id: pick.post_id,
         userId: pick.user_id,
