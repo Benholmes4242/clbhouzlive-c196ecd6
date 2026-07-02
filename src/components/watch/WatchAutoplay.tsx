@@ -1,6 +1,8 @@
 import { useEffect, useRef, useCallback } from 'react';
 import type { FeedPost } from '@/components/media-system/types/media';
 import { attachHlsToTile, prefetchTile } from '@/hooks/useTileVideoPlayer';
+import { usePrefersReducedMotion } from '@/hooks/usePrefersReducedMotion';
+
 
 const VIDEO_POOL_SIZE = 2;
 const AUTOPLAY_THRESHOLD = 0.5;
@@ -30,6 +32,10 @@ const WatchAutoplay: React.FC<WatchAutoplayProps> = ({ posts, gridRef }) => {
   const postsRef = useRef<FeedPost[]>(posts);
   postsRef.current = posts;
 
+  // Phase 7: honour prefers-reduced-motion consistently with rails + hero.
+  // Under RM: no pool, no autoplay — posters only.
+  const prefersReducedMotion = usePrefersReducedMotion();
+
   const isSlowNetwork = useCallback(() => {
     const connection = (navigator as any).connection;
     const type = connection?.effectiveType || '4g';
@@ -38,7 +44,9 @@ const WatchAutoplay: React.FC<WatchAutoplayProps> = ({ posts, gridRef }) => {
 
   // Create persistent video pool
   useEffect(() => {
+    if (prefersReducedMotion) return;
     if (isSlowNetwork()) return;
+
 
     const pool: HTMLVideoElement[] = [];
     for (let i = 0; i < VIDEO_POOL_SIZE; i++) {
@@ -59,7 +67,8 @@ const WatchAutoplay: React.FC<WatchAutoplayProps> = ({ posts, gridRef }) => {
       });
       videoPoolRef.current = [];
     };
-  }, [isSlowNetwork]);
+  }, [isSlowNetwork, prefersReducedMotion]);
+
 
   const attachToTile = useCallback(async (slot: number, tileIdx: number, hlsUrl: string, tileEl: HTMLElement) => {
     if (isSlowNetwork()) return;
@@ -141,7 +150,9 @@ const WatchAutoplay: React.FC<WatchAutoplayProps> = ({ posts, gridRef }) => {
 
   // IntersectionObserver — observe designated tiles only
   useEffect(() => {
+    if (prefersReducedMotion) return;
     if (isSlowNetwork()) return;
+
     const grid = gridRef.current;
     if (!grid || posts.length === 0 || videoPoolRef.current.length === 0) return;
 
@@ -210,7 +221,7 @@ const WatchAutoplay: React.FC<WatchAutoplayProps> = ({ posts, gridRef }) => {
       }
       activeMap.clear();
     };
-  }, [posts, gridRef, isSlowNetwork, attachToTile, detachSlot]);
+  }, [posts, gridRef, isSlowNetwork, attachToTile, detachSlot, prefersReducedMotion]);
 
   // Re-observe new tiles as infinite scroll loads
   useEffect(() => {

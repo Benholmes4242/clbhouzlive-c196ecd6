@@ -2,6 +2,8 @@ import { useEffect, useRef, useState } from 'react';
 import type { FeedPost } from '@/components/media-system/types/media';
 import AutoplayVideoCard from './AutoplayVideoCard';
 import { prefetchTile } from '@/hooks/useTileVideoPlayer';
+import { useEdgeFades } from '@/components/watch/shared/useEdgeFades';
+
 
 interface CarouselRowProps {
   items: FeedPost[];
@@ -79,7 +81,8 @@ export default function CarouselRow({ items, allPosts, baseIndex, userId }: Caro
   if (items.length === 0) return null;
 
   return (
-    <div ref={containerRef}>
+    <div ref={containerRef} className="hrail-edge-fade" style={{ position: 'relative' }}>
+      <CarouselEdgeFadeBinding scrollerRef={scrollerRef} wrapperRef={containerRef} />
       <div
         ref={scrollerRef}
         style={{
@@ -112,6 +115,40 @@ export default function CarouselRow({ items, allPosts, baseIndex, userId }: Caro
           </div>
         ))}
       </div>
+
+      <div
+        aria-hidden
+        className="hrail-fade hrail-fade-left"
+        style={{
+          position: 'absolute', top: 0, bottom: 0, left: 0, width: 24,
+          pointerEvents: 'none',
+          background: 'linear-gradient(to right, hsl(var(--background)) 0%, hsl(var(--background) / 0) 100%)',
+          opacity: 0, transition: 'opacity 150ms ease',
+        }}
+      />
+      <div
+        aria-hidden
+        className="hrail-fade hrail-fade-right"
+        style={{
+          position: 'absolute', top: 0, bottom: 0, right: 0, width: 24,
+          pointerEvents: 'none',
+          background: 'linear-gradient(to left, hsl(var(--background)) 0%, hsl(var(--background) / 0) 100%)',
+          opacity: 0, transition: 'opacity 150ms ease',
+        }}
+      />
     </div>
   );
 }
+
+// Small binding component so we can call the hook without restructuring the parent.
+function CarouselEdgeFadeBinding({
+  scrollerRef,
+  wrapperRef,
+}: {
+  scrollerRef: React.RefObject<HTMLDivElement | null>;
+  wrapperRef: React.RefObject<HTMLDivElement | null>;
+}) {
+  useEdgeFades(scrollerRef, wrapperRef);
+  return null;
+}
+
