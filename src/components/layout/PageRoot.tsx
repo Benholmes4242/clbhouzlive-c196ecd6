@@ -33,6 +33,10 @@ export const PageRoot = React.forwardRef<HTMLDivElement, PageRootProps>(
     // the dark handicap chrome (notch + status bar + canvas).
     const location = useLocation();
     const resolvedDark = dark ?? isDarkChromeRoute(location.pathname);
+    // Capture mount-time pathname once. Keep-alive pages (e.g. Clubhouse)
+    // stay mounted while the user navigates elsewhere; ownerPath ensures the
+    // stale hook does not re-assert chrome on unrelated routes.
+    const ownerPathRef = useRef(location.pathname);
 
     // Default light chrome for the Clubhouse/Profile pages; dark elsewhere.
     // Status bar text style: 'light' = white icons (paired with dark bg),
@@ -46,7 +50,9 @@ export const PageRoot = React.forwardRef<HTMLDivElement, PageRootProps>(
       false,
       !immersiveStatusBar,
       statusBarStyle,
+      ownerPathRef.current,
     );
+
 
     usePageRootMount();
 
