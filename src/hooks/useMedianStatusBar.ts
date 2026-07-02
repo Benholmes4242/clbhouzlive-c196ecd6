@@ -40,13 +40,20 @@ function applyMedianStatusBar(style: string, hexColor: string, overlay: boolean,
   if (!navigator.userAgent.toLowerCase().includes('median')) return;
 
   try {
+    const params = {
+      style,
+      color: toAARRGGBB(hexColor),
+      overlay,
+      blur,
+    };
+    console.log('[sbar] bridge', {
+      style,
+      color: hexColor,
+      hasMedian: !!window.median?.statusbar,
+      params,
+    });
     if (window.median?.statusbar?.set) {
-      window.median.statusbar.set({
-        style,
-        color: toAARRGGBB(hexColor),
-        overlay,
-        blur,
-      });
+      window.median.statusbar.set(params);
     }
   } catch {
     // Median bridge not ready — fail silently
@@ -82,6 +89,7 @@ export function useMedianStatusBar(
 
 
   useEffect(() => {
+    console.log('[sbar] effect-run', { reapplyKey, enabled });
     if (!enabled) return;
 
     const apply = () => {
@@ -90,11 +98,16 @@ export function useMedianStatusBar(
 
       // Route-scope guard: bail if this hook does not own the current route.
       const owner = ownerRef.current;
-      if (owner) {
-        const path = window.location.pathname;
-        const matches = typeof owner === 'function' ? owner(path) : owner === path;
-        if (!matches) return;
-      }
+      const path = window.location.pathname;
+      const matches = !owner || (typeof owner === 'function' ? owner(path) : owner === path);
+      console.log('[sbar] apply', {
+        owner: typeof owner === 'function' ? 'fn' : owner,
+        path,
+        matches,
+        style: c.style,
+        color: c.hexColor,
+      });
+      if (owner && !matches) return;
 
       const color = c.hexColor === 'transparent' ? 'transparent' : (c.hexColor || '#000000');
 
