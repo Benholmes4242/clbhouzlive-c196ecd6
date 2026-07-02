@@ -151,7 +151,6 @@ function BucketListRailInner() {
                 radius={6}
                 thumbHeightPx={316}
                 onDecoded={i < VISIBLE_COUNT ? onDecoded : undefined}
-                debugId={`bucket-list#${i}`}
               />
 
               {courseNameByPostId.get(post.id) && (

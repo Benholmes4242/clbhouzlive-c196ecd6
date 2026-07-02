@@ -170,7 +170,6 @@ export default function WatchRailTile({
         src={thumb}
         alt=""
         onDecoded={onDecoded}
-        debugId={debugId}
         style={{
           width: '100%',
           height: '100%',
