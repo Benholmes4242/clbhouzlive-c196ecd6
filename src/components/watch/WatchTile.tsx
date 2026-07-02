@@ -39,6 +39,15 @@ const WatchTile: React.FC<WatchTileProps> = ({ post, index, allPosts, onDecoded 
 
   const creator = post.displayName || post.username || '';
 
+  // No thumbnail → unblock the reveal immediately; there's nothing to decode.
+  const notifiedNoThumbRef = useRef(false);
+  useEffect(() => {
+    if (!thumbnailUrl && !notifiedNoThumbRef.current) {
+      notifiedNoThumbRef.current = true;
+      onDecoded?.();
+    }
+  }, [thumbnailUrl, onDecoded]);
+
   return (
     <div
       data-watch-index={index}
