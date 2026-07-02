@@ -163,6 +163,7 @@ export function useWatchFeed({ userId, filter, mood, category, searchQuery, user
   return {
     posts: allPosts,
     isLoading: query.isLoading,
+    isFetching: query.isFetching,
     isError: query.isError,
     hasNextPage: query.hasNextPage,
     isFetchingNextPage: query.isFetchingNextPage,
