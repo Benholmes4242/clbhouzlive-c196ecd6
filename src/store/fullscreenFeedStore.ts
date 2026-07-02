@@ -50,6 +50,7 @@ interface FullscreenFeedState {
   fetchNextPage: (() => void) | null;
   isFetchingNextPage: boolean;
   readOnly: boolean;
+  origin: OpenOrigin | null;
   open: (posts: FeedPost[], startIndex?: number, options?: OpenOptions) => void;
   close: () => void;
   appendPosts: (newPosts: FeedPost[]) => void;
