@@ -32,6 +32,7 @@ export const GLOBAL_HEADER_EXCLUDED_PREFIXES = [
   '/achievements/', // Other user's quest page - has own back nav
   '/handicap/', // Handicap sub-routes use FloatingPageHeader
   '/manage/', // Manage Profile sub-pages use ManagePageShell (own header, no global chrome)
+  '/support/', // Support thread pages use ManagePageShell (own header, no global chrome)
 ] as const;
 
 /**
