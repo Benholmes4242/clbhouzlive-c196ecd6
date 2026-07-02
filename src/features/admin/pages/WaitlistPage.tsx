@@ -53,17 +53,46 @@ export default function WaitlistPage() {
   const qc = useQueryClient();
   const [selected, setSelected] = useState<WaitlistSummaryRow | null>(null);
   const [copied, setCopied] = useState(false);
+  const [launchOpen, setLaunchOpen] = useState(false);
+  const [launching, setLaunching] = useState(false);
 
   const { data = [], isLoading } = useWaitlistSummary();
   const { data: drilldown = [], isLoading: drilldownLoading } = useWaitlistDrilldown(
     selected?.country_id ?? null,
   );
+  const { data: notifyStatus = {} } = useWaitlistNotifyStatus();
 
   useEffect(() => {
-    const handler = () => qc.invalidateQueries({ queryKey: WAITLIST_SUMMARY_KEY });
+    const handler = () => {
+      qc.invalidateQueries({ queryKey: WAITLIST_SUMMARY_KEY });
+      qc.invalidateQueries({ queryKey: WAITLIST_NOTIFY_STATUS_KEY });
+    };
     window.addEventListener('admin-v2:refetch', handler);
     return () => window.removeEventListener('admin-v2:refetch', handler);
   }, [qc]);
+
+  const handleLaunch = async () => {
+    if (!selected) return;
+    setLaunching(true);
+    try {
+      const { data: count, error } = await supabase.rpc('admin_launch_authority', {
+        _country_id: selected.country_id,
+        _body_name: selected.body_name,
+      });
+      if (error) throw error;
+      const n = Number(count ?? 0);
+      if (n > 0) toast.success(`Notified ${n} golfer${n === 1 ? '' : 's'}`);
+      else toast('No one new to notify');
+      qc.invalidateQueries({ queryKey: WAITLIST_SUMMARY_KEY });
+      qc.invalidateQueries({ queryKey: WAITLIST_NOTIFY_STATUS_KEY });
+      qc.invalidateQueries({ queryKey: WAITLIST_DRILLDOWN_KEY(selected.country_id) });
+      setLaunchOpen(false);
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : 'Launch failed');
+    } finally {
+      setLaunching(false);
+    }
+  };
 
   if (!caps.viewModeration) return <AdminAccessDenied />;
 
