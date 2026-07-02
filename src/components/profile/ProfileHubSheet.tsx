@@ -12,6 +12,7 @@
  */
 
 import React, { memo, useState, useEffect, useLayoutEffect, useRef, useCallback } from 'react';
+import { Pressable } from '@/components/ui/Pressable';
 import { AnimatedEchoWave } from '@/features/echo/components/ui/AnimatedEchoWave';
 import { lockBodyScroll, unlockBodyScroll } from '@/lib/bodyScrollLock';
 import { overlayOpen, overlayMark } from '@/perf/overlayTiming';
