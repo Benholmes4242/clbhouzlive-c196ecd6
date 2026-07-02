@@ -85,7 +85,7 @@ export default function HandicapManagePage() {
   };
 
   return (
-    <ManagePageShell title={connection ? bodyNameForProvider(connection.provider) : 'Connect handicap'}>
+    <ManagePageShell title={connection ? bodyNameForProvider(connection.provider) : 'Connect your official WHS handicap'}>
       <div className="px-4 pt-4 pb-8">
         {connection ? (
           <SyncedBody

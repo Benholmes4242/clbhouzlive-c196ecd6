@@ -459,7 +459,7 @@ const HandicapPage: React.FC = () => {
   if (isConnectFlow) {
     return (
       <ManagePageShell
-        title="Connect handicap"
+        title="Connect your official WHS handicap"
         onBack={() => safeGoBack(navigate, '/profile')}
       >
         <WhsHandicapTab userId={ownerUserId} ownerFirstName={displayName} />

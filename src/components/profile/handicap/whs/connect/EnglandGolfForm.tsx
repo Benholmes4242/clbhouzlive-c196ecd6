@@ -253,7 +253,7 @@ export const EnglandGolfForm: React.FC<Props> = ({
             fontFamily: FONT,
           }}
         >
-          Connect handicap
+          Connect official WHS handicap
           {isValid && !submitting && <ArrowRight size={18} strokeWidth={2.4} />}
         </button>
 
