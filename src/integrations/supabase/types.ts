@@ -16739,6 +16739,16 @@ export type Database = {
         Args: { p_photo_url: string }
         Returns: undefined
       }
+      admin_waitlist_summary: {
+        Args: never
+        Returns: {
+          body_name: string
+          country_id: string
+          joined_last_7d: number
+          latest_join: string
+          total: number
+        }[]
+      }
       aggregate_business_daily_metrics: {
         Args: { target_date?: string }
         Returns: undefined
