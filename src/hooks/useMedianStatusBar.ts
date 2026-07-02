@@ -70,9 +70,16 @@ export function useMedianStatusBar(
    * Pass location.pathname for keep-alive pages (e.g. Clubhouse)
    * so the status bar is re-applied on every navigation back. */
   reapplyKey?: string | number,
+  /** Route-scope: if set, apply() bails when window.location.pathname
+   * does not match. Prevents keep-alive pages from re-asserting chrome
+   * while the user is on a different route. */
+  ownerPath?: string | ((path: string) => boolean),
 ) {
   const configRef = useRef({ style, hexColor, overlay, blur, enabled });
   configRef.current = { style, hexColor, overlay, blur, enabled };
+  const ownerRef = useRef(ownerPath);
+  ownerRef.current = ownerPath;
+
 
   useEffect(() => {
     if (!enabled) return;
