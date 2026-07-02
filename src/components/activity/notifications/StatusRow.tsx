@@ -1,7 +1,7 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 import {
-  CheckCircle2, Clock, Ban, Building2,
+  CheckCircle2, Clock, Ban, Building2, Flag,
 } from 'lucide-react';
 import type { ActivityNotification } from '@/hooks/useActivityFeed';
 import {
@@ -16,6 +16,7 @@ interface Props {
 }
 
 function iconFor(type: string) {
+  if (type === 'handicap_authority_live') return Flag;
   if (type.endsWith('_approved') || type === 'business_access_approved') return CheckCircle2;
   if (type.endsWith('_rejected') || type.endsWith('_removed') || type.endsWith('_revoked') || type === 'business_access_declined') return Ban;
   if (type === 'business_member_added') return Building2;
@@ -23,6 +24,7 @@ function iconFor(type: string) {
 }
 
 function toneFor(type: string): { fg: string; bg: string } {
+  if (type === 'handicap_authority_live') return { fg: '#F7931E', bg: 'rgba(247,147,30,0.10)' };
   if (type.endsWith('_approved') || type === 'business_access_approved') return { fg: '#16A34A', bg: 'rgba(22,163,74,0.10)' };
   if (type.endsWith('_rejected') || type.endsWith('_removed') || type.endsWith('_revoked') || type === 'business_access_declined') return { fg: '#DC2626', bg: 'rgba(220,38,38,0.08)' };
   return { fg: '#475569', bg: 'rgba(15,23,42,0.05)' };
