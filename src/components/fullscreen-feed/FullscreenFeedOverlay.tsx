@@ -146,7 +146,7 @@ export function FullscreenFeedOverlay() {
       fsTimeStart('open');
       fsEvent('🚀 FULLSCREEN_OPEN', { startIndex });
       pauseAllAudio();
-      document.body.style.overflow = "hidden";
+      lockBodyScroll();
 
       // ── Safe area bleed (mirrors Clubhouse) ──
       document.body.classList.add('route-fullscreen-overlay');
