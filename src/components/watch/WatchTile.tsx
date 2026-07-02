@@ -159,7 +159,8 @@ const WatchTile: React.FC<WatchTileProps> = ({ post, index, allPosts, onDecoded 
           {creator}
         </span>
       </div>
-    </div>
+    </Pressable>
+
   );
 };
 
