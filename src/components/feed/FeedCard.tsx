@@ -80,7 +80,11 @@ export interface FeedCardProps {
   onLike: (post: FeedPost, actor?: ActiveActor | null) => void;
   onComment: (post: FeedPost, actor?: ActiveActor | null) => void;
   onShare: (post: FeedPost) => void;
-  onOpenMedia: (post: FeedPost, mediaIndex: number) => void;
+  onOpenMedia: (
+    post: FeedPost,
+    mediaIndex: number,
+    origin?: { el: HTMLElement | null; posterUrl?: string | null; handOffUrl?: string | null },
+  ) => void;
   onProfile: (post: FeedPost) => void;
   onReviewTap?: (post: FeedPost) => void;
   onCourse?: (post: FeedPost) => void;
