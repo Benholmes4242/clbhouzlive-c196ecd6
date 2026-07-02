@@ -10,6 +10,9 @@ import './utils/discoverTimeline';
 import { logAppStart } from './utils/bootTimeline';
 try { logAppStart(); } catch {}
 
+// Layer B diagnostic: does this runtime expose a service worker at boot?
+console.info('[boot] sw-available', 'serviceWorker' in navigator);
+
 // Cold start manifest warming - prefetch first video manifest ASAP
 import { ManifestWarmer } from './utils/video/ManifestWarmer';
 try { ManifestWarmer.warmOnStartup(); } catch {}
