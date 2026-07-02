@@ -40,7 +40,7 @@ function statusTone(s: ReportStatus) {
 export default function ModerationDetailDrawer({ open, onClose, row }: Props) {
   const {
     setReviewingBulk, dismiss,
-    warnUser, suspendUser, hidePost,
+    warnUser, suspendUser, hidePost, unhidePost, keepHiddenActioned,
   } = useModerationActions();
   const createRequest = useCreateAdminActionRequest();
   const { role } = usePanelRole();
