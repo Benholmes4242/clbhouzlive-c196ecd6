@@ -40,9 +40,11 @@ export interface AutoplayVideoCardProps {
   borderRadius?: number;
   /** Horizontal padding (px) for the meta row under the thumbnail. Defaults to 16. */
   metaPadX?: number;
+  /** Fires once the poster thumbnail bitmap is ready. */
+  onDecoded?: () => void;
 }
 
-function AutoplayVideoCardInner({ post, index, allPosts, userId, active, borderRadius = 6, metaPadX = 16 }: AutoplayVideoCardProps) {
+function AutoplayVideoCardInner({ post, index, allPosts, userId, active, borderRadius = 6, metaPadX = 16, onDecoded }: AutoplayVideoCardProps) {
   const navigate = useNavigate();
   const tileRef = useRef<HTMLDivElement>(null);
   const videoRef = useRef<HTMLVideoElement | null>(null);
