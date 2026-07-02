@@ -73,6 +73,22 @@ const CompactHeader: React.FC<CompactHeaderProps> = ({ className }) => {
   const [scrolled, setScrolled] = useState(false);
   const pillRef = useRef<HTMLButtonElement>(null);
 
+  // [hdr] temporary telemetry — see BRIEF addendum. Anchored at header mount.
+  const hdrT0 = useRef(performance.now());
+  const hdr = React.useCallback((what: string) => {
+    // eslint-disable-next-line no-console
+    console.info(`[hdr] ${what} ${Math.round(performance.now() - hdrT0.current)}ms`);
+  }, []);
+  React.useLayoutEffect(() => { hdr('mount'); }, [hdr]);
+  const userReadyRef = useRef(false);
+  React.useEffect(() => {
+    if (user && !userReadyRef.current) {
+      userReadyRef.current = true;
+      hdr('pill-data');
+    }
+  }, [user, hdr]);
+
+
   
   // Tour routes are treated identically across all sub-tabs.
   // The clbhouz logo renders on the left; tour menu access lives in the bottom-nav 'Tour Nav' button.
@@ -324,7 +340,16 @@ const CompactHeader: React.FC<CompactHeaderProps> = ({ className }) => {
                   src="/lovable-uploads/29e83040-b5c5-48e4-84d7-3f99640e4a80.png"
                   alt="clbhouz"
                   className={cn("object-contain", isEditorialChromeRoute ? "h-[38px] w-[38px]" : "h-9 w-9")}
+                  onLoad={(e) => {
+                    const img = e.currentTarget;
+                    if (typeof img.decode === 'function') {
+                      img.decode().then(() => hdr('logo-decoded')).catch(() => hdr('logo-decoded'));
+                    } else {
+                      hdr('logo-decoded');
+                    }
+                  }}
                 />
+
               )}
             </button>
           </div>
