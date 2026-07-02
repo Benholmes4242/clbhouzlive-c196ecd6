@@ -150,7 +150,9 @@ const WatchAutoplay: React.FC<WatchAutoplayProps> = ({ posts, gridRef }) => {
 
   // IntersectionObserver — observe designated tiles only
   useEffect(() => {
+    if (prefersReducedMotion) return;
     if (isSlowNetwork()) return;
+
     const grid = gridRef.current;
     if (!grid || posts.length === 0 || videoPoolRef.current.length === 0) return;
 
