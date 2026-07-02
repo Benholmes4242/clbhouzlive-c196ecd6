@@ -1,11 +1,12 @@
 import React from 'react';
-import { ArrowRight, Check } from 'lucide-react';
+import { ArrowRight, Check, TrendingUp } from 'lucide-react';
 
 const INK = '#0F172A';
 const INK_45 = '#64748B';
 const HAIR = 'rgba(15,23,42,0.08)';
 const FIELD_FILL = '#F8FAFC';
 const GREEN = '#059669';
+const GREEN_TINT = 'rgba(5,150,105,0.16)';
 const FONT = 'Geist, -apple-system, BlinkMacSystemFont, system-ui, sans-serif';
 
 interface Props {
@@ -36,7 +37,7 @@ export const WelcomeAboardScreen: React.FC<Props> = ({
         background: '#fff',
         border: `1px solid ${HAIR}`,
         borderRadius: 16,
-        padding: '32px 22px 24px',
+        padding: '30px 22px 24px',
         display: 'flex',
         flexDirection: 'column',
         alignItems: 'center',
@@ -44,26 +45,51 @@ export const WelcomeAboardScreen: React.FC<Props> = ({
         fontFamily: FONT,
       }}
     >
-      {/* Success medallion */}
+      {/* Success mark: green check inside soft green ring */}
       <div
         style={{
-          width: 76,
-          height: 76,
+          width: 88,
+          height: 88,
           borderRadius: '50%',
-          background: GREEN,
-          boxShadow: '0 8px 22px rgba(5,150,105,0.30)',
+          background: GREEN_TINT,
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
-          marginBottom: 20,
+          marginBottom: 18,
         }}
       >
-        <Check size={38} color="#fff" strokeWidth={3} />
+        <div
+          style={{
+            width: 62,
+            height: 62,
+            borderRadius: '50%',
+            background: GREEN,
+            boxShadow: '0 10px 24px rgba(5,150,105,0.30)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+          }}
+        >
+          <Check size={32} color="#fff" strokeWidth={3} />
+        </div>
+      </div>
+
+      <div
+        style={{
+          fontSize: 11,
+          fontWeight: 800,
+          color: GREEN,
+          letterSpacing: '0.14em',
+          textTransform: 'uppercase',
+          marginBottom: 6,
+        }}
+      >
+        You're connected
       </div>
 
       <h2
         style={{
-          fontSize: 24,
+          fontSize: 25,
           fontWeight: 800,
           color: INK,
           letterSpacing: '-0.02em',
@@ -73,46 +99,96 @@ export const WelcomeAboardScreen: React.FC<Props> = ({
         Welcome aboard, {firstName}
       </h2>
 
-      {/* Dark handicap card */}
+      {/* Hero handicap panel: charcoal gradient + green radial glow */}
       <div
         style={{
+          position: 'relative',
           width: '100%',
           maxWidth: 360,
-          background: INK,
+          background:
+            'linear-gradient(160deg, #12141c 0%, #1c2030 100%)',
           borderRadius: 18,
-          padding: '22px 20px',
+          padding: '22px 22px 20px',
           color: '#fff',
           marginBottom: 14,
           textAlign: 'left',
+          overflow: 'hidden',
+          boxShadow: '0 12px 32px rgba(15,23,42,0.22)',
         }}
       >
+        {/* radial glow */}
         <div
+          aria-hidden
           style={{
-            fontSize: 10.5,
-            fontWeight: 800,
-            color: GREEN,
-            letterSpacing: '0.16em',
-            textTransform: 'uppercase',
-            marginBottom: 8,
+            position: 'absolute',
+            top: -60,
+            right: -60,
+            width: 200,
+            height: 200,
+            background:
+              'radial-gradient(circle, rgba(5,150,105,0.35) 0%, rgba(5,150,105,0) 70%)',
+            pointerEvents: 'none',
           }}
-        >
-          Handicap index
+        />
+
+        <div style={{ position: 'relative' }}>
+          <div
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              marginBottom: 8,
+            }}
+          >
+            <div
+              style={{
+                fontSize: 10.5,
+                fontWeight: 800,
+                color: '#34d399',
+                letterSpacing: '0.16em',
+                textTransform: 'uppercase',
+              }}
+            >
+              Handicap index
+            </div>
+            <div
+              style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: 4,
+                background: 'rgba(52,211,153,0.16)',
+                color: '#34d399',
+                borderRadius: 999,
+                padding: '3px 8px',
+                fontSize: 10.5,
+                fontWeight: 700,
+                letterSpacing: '0.06em',
+                textTransform: 'uppercase',
+              }}
+            >
+              <TrendingUp size={11} strokeWidth={2.6} />
+              Live
+            </div>
+          </div>
+
+          <div
+            style={{
+              fontSize: 58,
+              fontWeight: 800,
+              lineHeight: 1,
+              letterSpacing: '-0.04em',
+              fontVariantNumeric: 'tabular-nums',
+              marginBottom: homeClub ? 10 : 0,
+            }}
+          >
+            {formatHandicap(handicapIndex)}
+          </div>
+          {homeClub && (
+            <div style={{ fontSize: 13, color: 'rgba(255,255,255,0.6)' }}>
+              at {homeClub}
+            </div>
+          )}
         </div>
-        <div
-          style={{
-            fontSize: 56,
-            fontWeight: 800,
-            lineHeight: 1,
-            letterSpacing: '-0.04em',
-            fontVariantNumeric: 'tabular-nums',
-            marginBottom: homeClub ? 8 : 0,
-          }}
-        >
-          {formatHandicap(handicapIndex)}
-        </div>
-        {homeClub && (
-          <div style={{ fontSize: 13, color: 'rgba(255,255,255,0.55)' }}>at {homeClub}</div>
-        )}
       </div>
 
       {/* Stat tiles */}
@@ -176,7 +252,7 @@ export const WelcomeAboardScreen: React.FC<Props> = ({
           maxWidth: 300,
         }}
       >
-        Everything is live. Your handicap updates automatically after every counting round.
+        Everything's live. Your handicap updates automatically after every counting round.
       </p>
 
       <button
