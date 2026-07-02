@@ -1,5 +1,4 @@
 import { createContext, useCallback, useContext, useEffect, useLayoutEffect, useMemo, useRef, useState, type ReactNode } from 'react';
-import { wrtMark, wrtStart } from '@/perf/watchRevealDebug';
 
 interface WatchRevealValue {
   register: (id: string) => void;
@@ -44,10 +43,6 @@ interface ProviderProps {
 }
 
 export function WatchRevealProvider({ children, deadlineMs = 1500 }: ProviderProps) {
-  // Reset perf timer at provider mount so warm visits also get a sane t0.
-  // Runs during render (once per mount) — BEFORE any child renders/registers,
-  // so every wrtMark from below has a coherent zero point.
-  useMemo(() => { wrtStart(); }, []);
 
   const [revealed, setRevealed] = useState(false);
   const [evaluationReady, setEvaluationReady] = useState(false);
@@ -56,10 +51,9 @@ export function WatchRevealProvider({ children, deadlineMs = 1500 }: ProviderPro
   const revealedRef = useRef(false);
   const evaluationReadyRef = useRef(false);
 
-  const doReveal = useCallback((cause: string) => {
+  const doReveal = useCallback((_cause: string) => {
     if (revealedRef.current) return;
     revealedRef.current = true;
-    wrtMark('page', 'page-revealed', undefined, cause);
     setRevealed(true);
   }, []);
 
@@ -78,13 +72,11 @@ export function WatchRevealProvider({ children, deadlineMs = 1500 }: ProviderPro
   const register = useCallback((id: string) => {
     if (revealedRef.current) return;
     registeredRef.current.add(id);
-    wrtMark(id, 'registered');
   }, []);
 
   const markSettled = useCallback((id: string) => {
     if (revealedRef.current) return;
     settledRef.current.add(id);
-    wrtMark(id, 'settled');
     checkAllSettled();
   }, [checkAllSettled]);
 

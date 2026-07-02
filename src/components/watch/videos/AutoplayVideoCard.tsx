@@ -42,10 +42,9 @@ export interface AutoplayVideoCardProps {
   metaPadX?: number;
   /** Fires once the poster thumbnail bitmap is ready. */
   onDecoded?: () => void;
-  debugId?: string;
 }
 
-function AutoplayVideoCardInner({ post, index, allPosts, userId, active, borderRadius = 6, metaPadX = 16, onDecoded, debugId }: AutoplayVideoCardProps) {
+function AutoplayVideoCardInner({ post, index, allPosts, userId, active, borderRadius = 6, metaPadX = 16, onDecoded }: AutoplayVideoCardProps) {
   const navigate = useNavigate();
   const tileRef = useRef<HTMLDivElement>(null);
   const videoRef = useRef<HTMLVideoElement | null>(null);
@@ -180,7 +179,6 @@ function AutoplayVideoCardInner({ post, index, allPosts, userId, active, borderR
                 alt=""
                 loading="lazy"
                 onDecoded={onDecoded}
-                debugId={debugId}
                 style={{
                   position: 'absolute',
                   inset: 0,

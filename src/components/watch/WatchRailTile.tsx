@@ -28,8 +28,6 @@ interface WatchRailTileProps {
   radius?: number;
   /** Fires once the tile's thumbnail bitmap is ready (used to gate coordinated reveal). */
   onDecoded?: () => void;
-  /** Temporary telemetry id like "trending#3". */
-  debugId?: string;
   /** When set, request a sized thumbnail variant (e.g. imagedelivery /h=NNN) sized
    *  for this tile geometry instead of decoding the full-res original. */
   thumbHeightPx?: number;
@@ -68,7 +66,6 @@ export default function WatchRailTile({
   aspectRatio = '3/4',
   radius = 6,
   onDecoded,
-  debugId,
   thumbHeightPx,
 }: WatchRailTileProps) {
   const cardRef = useRef<HTMLDivElement>(null);
@@ -173,7 +170,6 @@ export default function WatchRailTile({
         src={thumb}
         alt=""
         onDecoded={onDecoded}
-        debugId={debugId}
         style={{
           width: '100%',
           height: '100%',

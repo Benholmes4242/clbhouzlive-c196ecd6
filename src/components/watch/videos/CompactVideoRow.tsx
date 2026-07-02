@@ -10,7 +10,6 @@ interface CompactVideoRowProps {
   allPosts: FeedPost[];
   /** Fires once the thumbnail bitmap is ready. */
   onDecoded?: () => void;
-  debugId?: string;
 }
 
 function formatHMS(seconds: number | null | undefined): string {
@@ -45,7 +44,7 @@ function formatAge(iso: string | null | undefined): string {
   return `${years} ${years === 1 ? 'year' : 'years'} ago`;
 }
 
-function CompactVideoRowInner({ post, index, allPosts, onDecoded, debugId }: CompactVideoRowProps) {
+function CompactVideoRowInner({ post, index, allPosts, onDecoded }: CompactVideoRowProps) {
   const media = post.mediaItems.find((m) => m.type === 'video') ?? post.mediaItems[0];
   const thumb = media?.thumbnailUrl || media?.imageUrl || '';
   const duration = media?.duration ?? 0;
@@ -92,7 +91,6 @@ function CompactVideoRowInner({ post, index, allPosts, onDecoded, debugId }: Com
             alt=""
             loading="lazy"
             onDecoded={onDecoded}
-            debugId={debugId}
             onError={() => {
               setFailed(true);
             }}

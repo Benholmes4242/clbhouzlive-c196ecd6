@@ -110,7 +110,6 @@ export default function TrendingThisWeek({ enabled = true }: TrendingThisWeekPro
                 allPosts={topPosts}
                 viewedPostIds={viewedPostIds}
                 onDecoded={i < VISIBLE_COUNT ? onDecoded : undefined}
-                debugId={`trending#${i}`}
               />
             </div>
           ))}
