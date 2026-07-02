@@ -293,6 +293,7 @@ export default function WatchRailTile({
           {post.likeCount}
         </div>
       )}
-    </div>
+    </Pressable>
+
   );
 }
