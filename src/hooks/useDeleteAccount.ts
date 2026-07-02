@@ -45,6 +45,8 @@ export function useDeleteAccount(userId: string | undefined) {
       });
       if (error) throw error;
       await supabase.auth.signOut();
+      queryClient.clear();
+      await removePersistedQueryCache();
       window.location.href = '/auth';
     } catch (err) {
       console.error('[deleteAccount] Error:', err);
