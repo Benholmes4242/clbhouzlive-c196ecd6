@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useLayoutEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ChevronLeft } from 'lucide-react';
 import { PageRoot } from '@/components/layout/PageRoot';
@@ -27,6 +27,18 @@ export function ManagePageShell({ title, children, right, onBack, belowTitle }: 
   const navigate = useNavigate();
   const handleBack = () => (onBack ? onBack() : navigate(-1));
 
+  // Snapshot safe-area inset once so header height doesn't shift when the
+  // mobile URL bar collapses/expands during scroll.
+  const [safeTop, setSafeTop] = useState(0);
+  useLayoutEffect(() => {
+    const probe = document.createElement('div');
+    probe.style.cssText = 'position:fixed;top:0;left:0;height:env(safe-area-inset-top,0px);width:0;visibility:hidden;pointer-events:none;';
+    document.body.appendChild(probe);
+    const measured = probe.getBoundingClientRect().height;
+    document.body.removeChild(probe);
+    setSafeTop(Math.max(measured, 8));
+  }, []);
+
   return (
     <PageRoot hasBottomNav={false} className="md:!max-w-[440px]" style={{ background: SLATE_BG } as any}>
       <div className="min-h-screen flex flex-col w-full" style={{ background: SLATE_BG }}>
@@ -39,7 +51,7 @@ export function ManagePageShell({ title, children, right, onBack, belowTitle }: 
         >
           <div
             className="flex items-center justify-between px-4"
-            style={{ paddingTop: 'max(var(--safe-top, env(safe-area-inset-top, 0px)), 8px)', paddingBottom: belowTitle ? 8 : 12, minHeight: 56 }}
+            style={{ paddingTop: safeTop, paddingBottom: belowTitle ? 8 : 12, minHeight: 56 }}
           >
             <div className="flex items-center gap-3 flex-1 min-w-0">
               <button
