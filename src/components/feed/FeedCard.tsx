@@ -761,6 +761,7 @@ const FeedCardImpl: React.FC<FeedCardProps> = ({
           active={liked}
           onClick={() => onLike(post, effectiveActor)}
           activeColor={AMBER}
+          haptic={!liked ? 'selection' : 'none'}
         />
         <FooterButton
           icon={MessageCircle}
@@ -768,6 +769,7 @@ const FeedCardImpl: React.FC<FeedCardProps> = ({
           onClick={() => onComment(post, effectiveActor)}
         />
         <FooterButton icon={Share} onClick={() => onShare(post)} />
+
       </div>
     </article>
   );
