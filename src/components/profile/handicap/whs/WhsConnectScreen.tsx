@@ -78,9 +78,9 @@ export const WhsConnectScreen: React.FC<Props> = ({ onConnected, onSkip }) => {
         homeClub={successData.home_club ?? null}
         scoresImported={successData.scores_imported ?? 0}
         friendsImported={successData.friends_imported ?? 0}
-        onContinue={() => {
+        onContinue={async () => {
+          await onConnected();
           setSuccessData(null);
-          onConnected();
         }}
       />
     );
