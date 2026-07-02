@@ -31,8 +31,10 @@ export function UploadToastsBridge() {
         });
       } else if (evt.uploadType === 'review') {
         toast.success('Your review is live', { duration: 4000 });
+        triggerHaptic('success');
       } else {
         toast.success('Your moment is live.', { duration: 4000 });
+        triggerHaptic('success');
       }
 
       // Scheduled list refresh.
