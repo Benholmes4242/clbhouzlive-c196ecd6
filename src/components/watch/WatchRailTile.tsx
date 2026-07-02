@@ -6,6 +6,8 @@ import { Pin } from './proshop/Pin';
 import DecodedImage from './shared/DecodedImage';
 import { attachHlsToTile } from '@/hooks/useTileVideoPlayer';
 import { getThumbnailUrl } from '@/media/utils/thumbnail';
+import { buildLqipUrl } from '@/utils/mediaThumbs';
+import { shouldUseLqip } from '@/utils/lqipQueue';
 
 
 interface WatchRailTileProps {
