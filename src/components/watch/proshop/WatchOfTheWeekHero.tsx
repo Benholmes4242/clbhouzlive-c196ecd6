@@ -8,6 +8,8 @@ import { useWatchMood } from './hooks/useWatchMood';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useFullscreenFeedStore } from '@/store/fullscreenFeedStore';
 import { openWithOrigin } from '@/lib/openWithOrigin';
+import Pressable from '@/components/ui/Pressable';
+
 import { Kicker } from './Kicker';
 import { Pin } from './Pin';
 import { useActiveActor } from '@/context/ActiveActorContext';
