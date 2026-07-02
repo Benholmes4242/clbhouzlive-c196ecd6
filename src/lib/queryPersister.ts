@@ -81,7 +81,7 @@ const PERSIST_PREFIXES = [
   'profile-clubs',
 ];
 
-export const shouldPersistQuery = (query: Query): boolean => {
+export const shouldPersistQuery = (query: { queryKey: readonly unknown[] }): boolean => {
   const root = query.queryKey?.[0];
   if (typeof root !== 'string') return false;
   return PERSIST_PREFIXES.some((p) => root.startsWith(p));
