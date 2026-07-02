@@ -9,6 +9,9 @@ import AutoplayVideoCard from './videos/AutoplayVideoCard';
 import CompactVideoRow from './videos/CompactVideoRow';
 import { VideosMark } from './proshop/SectionMarks';
 import { useWatchReveal } from './WatchRevealContext';
+import { useFirstVisibleDecoded } from './shared/useFirstVisibleDecoded';
+
+const VISIBLE_COUNT = 3; // hero + 2 compact rows on-screen at rest
 
 /**
  * "Latest videos" — 1 full-width hero (autoplays when in view) +
