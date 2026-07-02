@@ -180,6 +180,58 @@ export function FullscreenFeedOverlay() {
     }
   }, [isOpen]);
 
+  // ── FLIP clone lifecycle ──
+  // On open with origin: mount the clone at the tile's rect, then on the
+  // NEXT frame flip cloneExpanded=true to trigger the transform → target rect.
+  // Crossfade the clone out either when the active slide fires
+  // onFirstFrameReady, or after a 400ms watchdog — whichever first.
+  useEffect(() => {
+    if (isOpen && origin) {
+      setCloneVisible(true);
+      setCloneExpanded(false);
+      setFirstFrameReady(false);
+      // Force layout with the initial rect, then expand on next frame.
+      const raf1 = requestAnimationFrame(() => {
+        const raf2 = requestAnimationFrame(() => setCloneExpanded(true));
+        (raf1 as any)._raf2 = raf2;
+      });
+      // Watchdog: release the clone if the first-frame signal never arrives.
+      watchdogRef.current = setTimeout(() => setFirstFrameReady(true), 400);
+      return () => {
+        cancelAnimationFrame(raf1);
+        if ((raf1 as any)._raf2) cancelAnimationFrame((raf1 as any)._raf2);
+        if (watchdogRef.current) clearTimeout(watchdogRef.current);
+      };
+    } else if (!isOpen) {
+      setCloneVisible(false);
+      setCloneExpanded(false);
+      setFirstFrameReady(false);
+      if (watchdogRef.current) clearTimeout(watchdogRef.current);
+    }
+  }, [isOpen, origin]);
+
+  const handleSnapFeedFirstFrame = useCallback(() => {
+    if (watchdogRef.current) clearTimeout(watchdogRef.current);
+    setFirstFrameReady(true);
+  }, []);
+
+  // Retire the clone shortly after the crossfade completes.
+  useEffect(() => {
+    if (!firstFrameReady || !cloneVisible) return;
+    const t = setTimeout(() => setCloneVisible(false), 180);
+    return () => clearTimeout(t);
+  }, [firstFrameReady, cloneVisible]);
+
+  // Target rect for the FLIP expand: viewport-sized on phone; on iPad the
+  // viewer is centred so we honour the same layout as the overlay chrome.
+  const targetRect = React.useMemo(() => {
+    if (typeof window === 'undefined') return null;
+    const vw = window.innerWidth;
+    const vh = window.innerHeight;
+    return { top: 0, left: 0, width: vw, height: vh };
+  }, [isOpen]);
+
+
   return (
     <>
       <AnimatePresence>
