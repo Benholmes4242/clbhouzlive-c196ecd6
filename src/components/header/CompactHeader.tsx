@@ -87,6 +87,12 @@ const CompactHeader: React.FC<CompactHeaderProps> = ({ className }) => {
       hdr('pill-data');
     }
   }, [user, hdr]);
+  const avatarReadyRef = useRef(false);
+  const handleAvatarLoad = React.useCallback(() => {
+    if (avatarReadyRef.current) return;
+    avatarReadyRef.current = true;
+    hdr('avatar-decoded');
+  }, [hdr]);
 
 
   
@@ -431,6 +437,7 @@ const CompactHeader: React.FC<CompactHeaderProps> = ({ className }) => {
                     useLightTheme={useLightTheme && !overlayActive}
                     compact={isEditorialChromeRoute}
                     size={isEditorialChromeRoute ? 'lg' : undefined}
+                    onAvatarLoad={handleAvatarLoad}
                   />
                 </div>
               ) : (

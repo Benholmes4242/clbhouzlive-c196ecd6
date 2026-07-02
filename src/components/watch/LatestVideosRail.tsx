@@ -24,7 +24,7 @@ export default function LatestVideosRail() {
   const heroRef = useRef<HTMLDivElement>(null);
   const [heroActive, setHeroActive] = useState(false);
 
-  const { posts, isLoading } = useVideosFeed({ userId, filter: 'latest' });
+  const { posts, isLoading, hasResolved } = useVideosFeed({ userId, filter: 'latest' });
 
   useEffect(() => {
     const el = heroRef.current;
@@ -38,7 +38,11 @@ export default function LatestVideosRail() {
   }, [posts.length]);
 
   const { settled: firstVisibleDecoded, onDecoded } = useFirstVisibleDecoded(posts.length, VISIBLE_COUNT);
-  const revealed = useWatchReveal('latest-videos', !isLoading && firstVisibleDecoded);
+  const isEmpty = hasResolved && posts.length === 0;
+  const revealed = useWatchReveal(
+    'latest-videos',
+    hasResolved && (isEmpty || firstVisibleDecoded),
+  );
 
   if (!revealed || isLoading) {
     return (

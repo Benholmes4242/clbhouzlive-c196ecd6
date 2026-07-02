@@ -58,6 +58,11 @@
     </noscript>
     <link rel="icon" href="https://iiil.io/FRnqBFp.png" type="image/png" />
     <link rel="apple-touch-icon" href="https://iiil.io/FRnqBFp.png" />
+    <!-- Preload the header brand mark (used by CompactHeader) so it decodes in
+         parallel with the JS bundle instead of after first paint. Kills the
+         ~230ms cold-boot straggle between the pill and the logo. -->
+    <link rel="preload" as="image" href="/lovable-uploads/29e83040-b5c5-48e4-84d7-3f99640e4a80.png" fetchpriority="high" />
+
   </head>
 
   <body style="background-color:#15171F;margin:0;">

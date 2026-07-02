@@ -24,7 +24,7 @@ function formatDuration(seconds: number | null): string {
 function WatchOfTheWeekHeroInner() {
   const { session } = useSupabaseSession();
   const { mood } = useWatchMood();
-  const { data: pick, isLoading } = useWatchOfTheWeek(session?.user?.id, mood);
+  const { data: pick, isLoading, dataUpdatedAt } = useWatchOfTheWeek(session?.user?.id, mood);
   const { activeActor } = useActiveActor();
   const actor = activeActor ? { id: activeActor.id, type: activeActor.type } : null;
 
@@ -38,7 +38,9 @@ function WatchOfTheWeekHeroInner() {
   // Gate the reveal on both data + pixel: the hero image bitmap must have
   // decoded (or be empty) before we call markSettled.
   const [heroDecoded, setHeroDecoded] = useState(false);
-  const heroReady = !isLoading && (!pick || !pick.thumbnail_url || heroDecoded);
+  const hasResolved = dataUpdatedAt > 0;
+  const isEmpty = hasResolved && (!pick || !pick.thumbnail_url);
+  const heroReady = hasResolved && (isEmpty || heroDecoded);
   const revealed = useWatchReveal('watch-of-the-week', heroReady);
 
   if (!revealed || isLoading) {

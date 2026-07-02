@@ -113,5 +113,8 @@ export function useVideosFeed({ userId, filter, searchQuery, category = null, en
     fetchNextPage: query.fetchNextPage,
     refetch: query.refetch,
     resetSeen,
+    // Canonical "never-fetched" signal — see useWatchFeed for rationale.
+    dataUpdatedAt: query.dataUpdatedAt,
+    hasResolved: query.dataUpdatedAt > 0,
   };
 }

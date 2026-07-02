@@ -16,6 +16,8 @@ interface PostingAsPillProps {
   useBareTheme?: boolean; // No background, no chevron — TikTok-style floating avatar
   compact?: boolean; // One-size-smaller for tour routes
   size?: 'sm' | 'md' | 'lg'; // Optional explicit size; 'lg' matches 38px tour pill
+  /** Fires once the actor avatar bitmap has loaded — used for [hdr] telemetry. */
+  onAvatarLoad?: () => void;
 }
 
 /**
@@ -23,7 +25,7 @@ interface PostingAsPillProps {
  * Uses forwardRef to allow parent to get anchor position for desktop popover
  */
 export const PostingAsPill = forwardRef<HTMLButtonElement, PostingAsPillProps>(
-  ({ onClick, isOpen, hasUnreadNotifications = false, notificationCount = 0, useLightTheme = false, useGlassTheme = false, useBareTheme = false, compact = false, size }, ref) => {
+  ({ onClick, isOpen, hasUnreadNotifications = false, notificationCount = 0, useLightTheme = false, useGlassTheme = false, useBareTheme = false, compact = false, size, onAvatarLoad }, ref) => {
     const { activeActor, isLoading } = useActiveActor();
 
     // Per-actor unread (badge hybrid): show a small dot on the pill when ANY
@@ -70,7 +72,9 @@ export const PostingAsPill = forwardRef<HTMLButtonElement, PostingAsPillProps>(
               alt={activeActor.name}
               fallback={initials}
               hairlineRing
+              onLoad={onAvatarLoad}
             />
+
           </span>
 
           {hasUnreadNotifications && (
@@ -199,7 +203,9 @@ export const PostingAsPill = forwardRef<HTMLButtonElement, PostingAsPillProps>(
               alt={activeActor.name}
               userId={activeActor.id}
               hairlineRing
+              onLoad={onAvatarLoad}
             />
+
           </span>
           
           {/* Orange badge — social notifications (top-right) */}

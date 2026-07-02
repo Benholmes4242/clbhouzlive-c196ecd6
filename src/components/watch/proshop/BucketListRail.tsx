@@ -54,18 +54,21 @@ function BucketListRailInner() {
   const { session } = useSupabaseSession();
   const userId = session?.user?.id;
 
-  const { data: courses = [], isLoading: coursesLoading } =
-    useUserBucketListAnchoredContent(userId);
+  const {
+    data: courses = [],
+    isLoading: coursesLoading,
+    dataUpdatedAt: coursesUpdatedAt,
+  } = useUserBucketListAnchoredContent(userId);
 
   const orderedIds = useMemo(() => interleaveByCourse(courses), [courses]);
 
   const { activeActor } = useActiveActor();
   const actor = activeActor ? { id: activeActor.id, type: activeActor.type } : null;
-  const { data: posts = [], isLoading: postsLoading } = useFeedPostsByIds(
-    orderedIds,
-    userId,
-    actor,
-  );
+  const {
+    data: posts = [],
+    isLoading: postsLoading,
+    dataUpdatedAt: postsUpdatedAt,
+  } = useFeedPostsByIds(orderedIds, userId, actor);
 
   // .in('id', ids) returns rows in arbitrary order — re-apply the interleave.
   const orderedPosts = useMemo<FeedPost[]>(() => {
@@ -84,7 +87,17 @@ function BucketListRailInner() {
 
   const stillLoading = coursesLoading || postsLoading;
   const { settled: firstVisibleDecoded, onDecoded } = useFirstVisibleDecoded(orderedPosts.length, VISIBLE_COUNT);
-  const revealed = useWatchReveal('bucket-list', !stillLoading && firstVisibleDecoded);
+
+  // Canonical resolve: courses query resolved AND either (a) no ids to fetch
+  // so the posts query is skipped, or (b) the posts query has also resolved.
+  const coursesResolved = coursesUpdatedAt > 0;
+  const postsResolved = orderedIds.length === 0 || postsUpdatedAt > 0;
+  const hasResolved = coursesResolved && postsResolved;
+  const isEmpty = hasResolved && orderedPosts.length === 0;
+  const revealed = useWatchReveal(
+    'bucket-list',
+    hasResolved && (isEmpty || firstVisibleDecoded),
+  );
 
   // Reserve final height while loading so late-resolving posts don't push
   // the rest of the feed down. Held until coordinated reveal.
