@@ -619,6 +619,7 @@ function AppRoutes() {
 
         <Route path="/privacy" element={<Suspense fallback={<GenericPageSkeleton />}><PrivacyPolicyPage /></Suspense>} />
         <Route path="/terms" element={<Suspense fallback={<GenericPageSkeleton />}><TermsPage /></Suspense>} />
+        <Route path="/legal/:slug" element={<Suspense fallback={<GenericPageSkeleton />}><LegalDocumentPage /></Suspense>} />
         <Route path="*" element={<Suspense fallback={<GenericPageSkeleton />}><NotFound /></Suspense>} />
       </Routes>
 
