@@ -182,8 +182,11 @@ export default function WatchRailTile({
   );
 
   return (
-    <div
-      ref={cardRef}
+    <Pressable
+      as="div"
+      variant="card"
+      onPress={handleClick}
+      ref={cardRef as any}
       data-rail-tile-index={index}
       data-post-id={post.id}
       style={{
@@ -192,11 +195,11 @@ export default function WatchRailTile({
         width,
         borderRadius: radius,
         overflow: 'hidden',
-        cursor: 'pointer',
         aspectRatio,
       }}
-      onClick={handleClick}
+      innerStyle={{ position: 'absolute', inset: 0 }}
     >
+
       {/* Poster — decode-gated for coordinated reveal. Stays behind video. */}
       <DecodedImage
         src={thumb}
