@@ -112,7 +112,7 @@ serve(async (req) => {
 
     const categoryLabel = CATEGORY_LABELS[ticket.category] ?? ticket.category;
     const bodyText = firstMsg?.body ?? "(no message body)";
-    const adminUrl = `https://clbhouz.com/admin-v2/support?ticket=${ticket.id}`;
+    const adminUrl = `https://www.clbhouz.co.uk/admin-v2/support?ticket=${ticket.id}`;
 
     const html = `
       <div style="font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;color:#0F172A;max-width:640px;">
