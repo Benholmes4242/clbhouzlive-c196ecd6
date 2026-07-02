@@ -10,6 +10,9 @@ export interface DecodedImageProps extends React.ImgHTMLAttributes<HTMLImageElem
   onDecoded?: () => void;
   /** Fade duration in ms. Defaults to 120. */
   fadeMs?: number;
+  /** Temporary telemetry id like "trending#3" — feeds watchRevealDebug. */
+  debugId?: string;
+
 }
 
 /**
