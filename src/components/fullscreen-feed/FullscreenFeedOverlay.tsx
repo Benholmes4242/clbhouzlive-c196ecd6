@@ -159,7 +159,7 @@ export function FullscreenFeedOverlay() {
       } catch {}
 
       return () => {
-        document.body.style.overflow = "";
+        unlockBodyScroll();
         document.body.classList.remove('route-fullscreen-overlay');
         // Restore shield to transparent (NOT #F8FAFC) so the dark feed background
         // shows through — matches the prior CourseMediaViewer behaviour and
