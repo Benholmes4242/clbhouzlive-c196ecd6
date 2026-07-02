@@ -17,6 +17,7 @@ export interface RawUserReport {
   reviewed_by: string | null;
   reviewed_at: string | null;
   resolution_note?: string | null;
+  is_high_priority?: boolean | null;
 }
 
 export interface RawPostReport {
@@ -43,6 +44,8 @@ export interface PostLite {
   user_id: string;
   content: string | null;
   created_at: string;
+  auto_hidden?: boolean | null;
+  moderation_hidden?: boolean | null;
   author?: ProfileLite | null;
 }
 
@@ -64,6 +67,8 @@ export interface ModerationQueueRow {
   created_at: string; // newest report timestamp
   reviewed_by?: string | null;
   reviewed_at?: string | null;
+  is_high_priority: boolean;
+  auto_hidden: boolean;
 }
 
 export interface QueueFilters {
@@ -95,7 +100,7 @@ async function fetchQueue(): Promise<ModerationQueueRow[]> {
   const [{ data: userReports, error: uErr }, { data: postReports, error: pErr }] = await Promise.all([
     supabase
       .from('reports')
-      .select('id, reporter_id, reported_user_id, reported_conversation_id, reason, details, status, created_at, reviewed_by, reviewed_at, resolution_note')
+      .select('id, reporter_id, reported_user_id, reported_conversation_id, reason, details, status, created_at, reviewed_by, reviewed_at, resolution_note, is_high_priority')
       .order('created_at', { ascending: false })
       .limit(500),
     supabase
@@ -115,7 +120,7 @@ async function fetchQueue(): Promise<ModerationQueueRow[]> {
   if (postIds.length) {
     const { data: postData, error: postErr } = await supabase
       .from('posts')
-      .select('id, user_id, content, created_at')
+      .select('id, user_id, content, created_at, auto_hidden, moderation_hidden')
       .in('id', Array.from(new Set(postIds)));
     if (postErr) throw postErr;
     for (const p of postData ?? []) posts[p.id] = p as PostLite;
@@ -132,7 +137,14 @@ async function fetchQueue(): Promise<ModerationQueueRow[]> {
 
   const groups = new Map<string, ModerationQueueRow>();
 
-  const addToGroup = (key: string, base: Partial<ModerationQueueRow>, item: ReportItem, status: ReportStatus, createdAt: string) => {
+  const addToGroup = (
+    key: string,
+    base: Partial<ModerationQueueRow>,
+    item: ReportItem,
+    status: ReportStatus,
+    createdAt: string,
+    highPriority: boolean,
+  ) => {
     const existing = groups.get(key);
     if (!existing) {
       groups.set(key, {
@@ -147,6 +159,8 @@ async function fetchQueue(): Promise<ModerationQueueRow[]> {
         created_at: createdAt,
         reviewed_by: (item.raw as any).reviewed_by ?? null,
         reviewed_at: (item.raw as any).reviewed_at ?? null,
+        is_high_priority: highPriority,
+        auto_hidden: base.kind === 'post' ? !!base.targetPost?.auto_hidden : false,
       });
     } else {
       existing.reports.push(item);
@@ -154,6 +168,7 @@ async function fetchQueue(): Promise<ModerationQueueRow[]> {
       if (!existing.reasons.includes(item.raw.reason)) existing.reasons.push(item.raw.reason);
       if (STATUS_RANK[status] < STATUS_RANK[existing.status]) existing.status = status;
       if (createdAt > existing.created_at) existing.created_at = createdAt;
+      if (highPriority) existing.is_high_priority = true;
     }
   };
 
@@ -164,6 +179,7 @@ async function fetchQueue(): Promise<ModerationQueueRow[]> {
       { kind: 'user', raw: r, reporter: profiles[r.reporter_id] ?? null },
       r.status,
       r.created_at,
+      !!r.is_high_priority,
     );
   }
   for (const r of pRows) {
@@ -174,6 +190,7 @@ async function fetchQueue(): Promise<ModerationQueueRow[]> {
       { kind: 'post', raw: r, reporter: profiles[r.reporter_id] ?? null },
       r.status,
       r.created_at,
+      false,
     );
   }
 
@@ -181,6 +198,8 @@ async function fetchQueue(): Promise<ModerationQueueRow[]> {
   rows.sort((a, b) => {
     const sr = STATUS_RANK[a.status] - STATUS_RANK[b.status];
     if (sr !== 0) return sr;
+    // High priority floats to top within the same status bucket.
+    if (a.is_high_priority !== b.is_high_priority) return a.is_high_priority ? -1 : 1;
     if (b.report_count !== a.report_count) return b.report_count - a.report_count;
     return b.created_at.localeCompare(a.created_at);
   });
@@ -211,6 +230,8 @@ export function useModerationQueue(filters: QueueFilters = { status: 'all', type
       pending: all.filter((r) => r.status === 'pending').length,
       reviewing: all.filter((r) => r.status === 'reviewing').length,
       resolved: all.filter((r) => r.status === 'actioned' || r.status === 'dismissed').length,
+      highPriority: all.filter((r) => r.is_high_priority && (r.status === 'pending' || r.status === 'reviewing')).length,
+      autoHidden: all.filter((r) => r.auto_hidden && (r.status === 'pending' || r.status === 'reviewing')).length,
       actionedThisWeek: all.filter((r) => {
         if (r.status !== 'actioned') return false;
         if (!r.reviewed_at) return false;

@@ -40,7 +40,7 @@ function statusTone(s: ReportStatus) {
 export default function ModerationDetailDrawer({ open, onClose, row }: Props) {
   const {
     setReviewingBulk, dismiss,
-    warnUser, suspendUser, hidePost,
+    warnUser, suspendUser, hidePost, unhidePost, keepHiddenActioned,
   } = useModerationActions();
   const createRequest = useCreateAdminActionRequest();
   const { role } = usePanelRole();
@@ -216,7 +216,72 @@ export default function ModerationDetailDrawer({ open, onClose, row }: Props) {
       >
         {row && (
           <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
-            <StatusPill tone={statusTone(row.status)}>{row.status}</StatusPill>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
+              <StatusPill tone={statusTone(row.status)}>{row.status}</StatusPill>
+              {row.is_high_priority && (
+                <StatusPill tone="danger">High priority</StatusPill>
+              )}
+              {row.auto_hidden && (
+                <StatusPill tone="warn">Auto-hidden</StatusPill>
+              )}
+            </div>
+
+            {row.kind === 'post' && row.auto_hidden && row.targetPost && (
+              <div
+                style={{
+                  border: `1px solid ${t.warnText}`,
+                  background: t.warnSoft,
+                  color: t.warnText,
+                  borderRadius: t.radius.md,
+                  padding: 12,
+                  display: 'flex',
+                  flexDirection: 'column',
+                  gap: 10,
+                }}
+              >
+                <div style={{ fontSize: 13, fontWeight: 700 }}>
+                  Automatically hidden after {row.report_count} report{row.report_count === 1 ? '' : 's'}
+                </div>
+                <div style={{ fontSize: 12, lineHeight: 1.45, color: t.ink }}>
+                  This post is already hidden from feeds pending review. Confirm the hide or restore it.
+                </div>
+                <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+                  <button
+                    onClick={() => {
+                      if (!row.targetPost?.id) return;
+                      unhidePost.mutate(
+                        { postId: row.targetPost.id },
+                        {
+                          onSuccess: () => {
+                            dismiss.mutate(
+                              { kind: 'post', ids, note: 'Auto-hide reverted; no violation' },
+                              { onSuccess: () => closeAll() },
+                            );
+                          },
+                        },
+                      );
+                    }}
+                    disabled={unhidePost.isPending || dismiss.isPending}
+                    style={btnGhost()}
+                  >
+                    Restore post
+                  </button>
+                  <button
+                    onClick={() => {
+                      keepHiddenActioned.mutate(
+                        { kind: 'post', ids, note: 'Auto-hide confirmed by moderator' },
+                        { onSuccess: () => closeAll() },
+                      );
+                    }}
+                    disabled={keepHiddenActioned.isPending}
+                    style={btnPrimary(keepHiddenActioned.isPending)}
+                  >
+                    Keep hidden
+                  </button>
+                </div>
+              </div>
+            )}
+
 
             <section style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
               <div style={sectionLabel()}>

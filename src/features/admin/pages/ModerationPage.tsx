@@ -68,6 +68,12 @@ export default function ModerationPage() {
       render: (row) => <TargetCell row={row} />,
     },
     {
+      key: 'flags',
+      header: 'Flags',
+      width: 180,
+      render: (row) => <FlagsCell row={row} />,
+    },
+    {
       key: 'reasons',
       header: 'Reason(s)',
       render: (row) => <ReasonsCell reasons={row.reasons} />,
@@ -105,9 +111,12 @@ export default function ModerationPage() {
         }}
       >
         <KpiCard label="Open reports" value={counts.pending + counts.reviewing} loading={isLoading} />
+        <KpiCard label="High priority" value={counts.highPriority} loading={isLoading} />
+        <KpiCard label="Auto-hidden posts" value={counts.autoHidden} loading={isLoading} />
         <KpiCard label="Reports today" value={counts.reportsToday} loading={isLoading} />
         <KpiCard label="Actioned this week" value={counts.actionedThisWeek} loading={isLoading} />
       </div>
+
 
       <SectionTabs tabs={statusTabs} activeId={status} onChange={setStatus} />
 
@@ -150,6 +159,7 @@ export default function ModerationPage() {
                   <TargetCell row={row} />
                   <StatusPill tone={statusTone(row.status)}>{row.status}</StatusPill>
                 </div>
+                <FlagsCell row={row} />
                 <ReasonsCell reasons={row.reasons} />
                 <div style={{ display: 'flex', justifyContent: 'space-between', color: t.inkMuted, fontSize: 12 }}>
                   <span>{row.report_count} report{row.report_count === 1 ? '' : 's'}</span>
@@ -220,6 +230,48 @@ function ReasonsCell({ reasons }: { reasons: string[] }) {
       </span>
       {extra > 0 && (
         <span style={{ color: t.inkFaint, fontSize: 12, fontWeight: 600 }}>+{extra}</span>
+      )}
+    </div>
+  );
+}
+
+function FlagsCell({ row }: { row: ModerationQueueRow }) {
+  if (!row.is_high_priority && !row.auto_hidden) {
+    return <span style={{ color: t.inkFaint, fontSize: 12 }}>—</span>;
+  }
+  return (
+    <div style={{ display: 'inline-flex', alignItems: 'center', gap: 6, flexWrap: 'wrap' }}>
+      {row.is_high_priority && (
+        <span
+          style={{
+            padding: '2px 10px',
+            borderRadius: 999,
+            background: t.dangerSoft,
+            color: t.dangerText,
+            fontSize: 11,
+            fontWeight: 700,
+            textTransform: 'uppercase',
+            letterSpacing: 0.3,
+          }}
+        >
+          High priority
+        </span>
+      )}
+      {row.auto_hidden && (
+        <span
+          style={{
+            padding: '2px 10px',
+            borderRadius: 999,
+            background: t.warnSoft,
+            color: t.warnText,
+            fontSize: 11,
+            fontWeight: 700,
+            textTransform: 'uppercase',
+            letterSpacing: 0.3,
+          }}
+        >
+          Auto-hidden
+        </span>
       )}
     </div>
   );

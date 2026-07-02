@@ -496,6 +496,7 @@ serve(async (req) => {
             moderation_hidden_at: null,
             moderation_hidden_by: null,
             moderation_hidden_reason: null,
+            auto_hidden: false,
           })
           .eq('id', postId)
           .select('user_id')

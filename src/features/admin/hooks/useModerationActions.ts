@@ -196,6 +196,19 @@ export function useModerationActions() {
     onError: (e: any) => toast.error(e?.message ?? 'Failed to restore post'),
   });
 
+  // Mark reports as actioned without changing the post's hidden state.
+  // Used by the "Keep hidden" action on auto-hidden posts.
+  const keepHiddenActioned = useMutation({
+    mutationFn: async (params: { kind: ReportKind; ids: string[]; note?: string }) => {
+      await markReportsActioned(params.kind, params.ids, params.note ?? 'Auto-hide confirmed by moderator');
+    },
+    onSuccess: () => {
+      toast.success('Reports actioned, post remains hidden');
+      qc.invalidateQueries({ queryKey: QUEUE_QUERY_KEY });
+    },
+    onError: (e: any) => toast.error(e?.message ?? 'Failed to update reports'),
+  });
+
   return {
     setReviewing,
     setReviewingBulk,
@@ -205,5 +218,6 @@ export function useModerationActions() {
     unsuspendUser,
     hidePost,
     unhidePost,
+    keepHiddenActioned,
   };
 }
