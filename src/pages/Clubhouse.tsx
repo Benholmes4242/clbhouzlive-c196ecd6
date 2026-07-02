@@ -14,6 +14,7 @@ import { useSeasonRecap } from '@/hooks/useSeasonRecap';
 import { Compass, Flag, EyeOff, Link as LinkIcon, Users } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Drawer, DrawerContent } from '@/components/ui/drawer';
+import { isDarkChromeRoute } from '@/components/header/globalHeaderRules';
 import { useMedianStatusBar } from '@/hooks/useMedianStatusBar';
 import { logRouteClubhouse } from '@/utils/bootTimeline';
 import { ClubhouseSkeletonShimmer } from '@/components/clubhouse/ClubhouseSkeletonShimmer';
@@ -127,7 +128,7 @@ const ClubhouseContent = () => {
   }, []);
 
   useHeaderVariant('solid-light');
-  useMedianStatusBar("auto", "transparent", true, false, true, pathname);
+  useMedianStatusBar("auto", "transparent", true, false, true, pathname, (p) => isDarkChromeRoute(p));
   
   // route-clubhouse class is now applied by ClubhouseWrapped (eagerly loaded)
   // to prevent white flash during lazy chunk loading
