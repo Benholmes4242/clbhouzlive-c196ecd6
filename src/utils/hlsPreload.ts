@@ -103,7 +103,8 @@ export const preloadHlsManifest = async (
  */
 async function performPrefetch(hlsUrl: string, effectiveVideoId: string, signal?: AbortSignal): Promise<void> {
   // Fetch manifest
-  const manifestResponse = await fetch(hlsUrl, { 
+  const manifestResponse = await fetch(hlsUrl, {
+    signal,
     method: 'GET',
     mode: 'cors',
     credentials: 'omit',
@@ -134,6 +135,7 @@ async function performPrefetch(hlsUrl: string, effectiveVideoId: string, signal?
 
       // Fetch variant playlist (warms SW + HTTP cache)
       const variantResponse = await fetch(variantUrl, {
+        signal,
         method: 'GET',
         mode: 'cors',
         credentials: 'omit',
@@ -150,7 +152,7 @@ async function performPrefetch(hlsUrl: string, effectiveVideoId: string, signal?
         if (variantSegments.length > 0) {
           // Warm first two segments — SW catches the bytes; we just discard the body.
           const segmentsToPreload = variantSegments.slice(0, 2);
-          await preloadSegments(segmentsToPreload, variantUrl, effectiveVideoId);
+          await preloadSegments(segmentsToPreload, variantUrl, effectiveVideoId, signal);
 
           videoReadyFlags.markReady(effectiveVideoId);
           prefetchDebug.prefetchComplete(effectiveVideoId, segmentsToPreload.length);
@@ -162,7 +164,7 @@ async function performPrefetch(hlsUrl: string, effectiveVideoId: string, signal?
 
   // Warm first two segments in parallel
   const segmentsToPreload = segmentLines.slice(0, 2);
-  await preloadSegments(segmentsToPreload, hlsUrl, effectiveVideoId);
+  await preloadSegments(segmentsToPreload, hlsUrl, effectiveVideoId, signal);
 
   videoReadyFlags.markReady(effectiveVideoId);
   prefetchDebug.prefetchComplete(effectiveVideoId, segmentsToPreload.length);
@@ -175,13 +177,15 @@ async function performPrefetch(hlsUrl: string, effectiveVideoId: string, signal?
 async function preloadSegments(
   segmentLines: string[],
   baseUrl: string,
-  videoId: string
+  videoId: string,
+  signal?: AbortSignal,
 ): Promise<void> {
   const segmentPromises = segmentLines.map(async (segmentLine, index) => {
     try {
       const segmentUrl = new URL(segmentLine.trim(), baseUrl).href;
 
       const segmentResponse = await fetch(segmentUrl, {
+        signal,
         method: 'GET',
         mode: 'cors',
         credentials: 'omit',
