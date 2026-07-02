@@ -118,6 +118,9 @@ export const SquircleAvatar: React.FC<SquircleAvatarProps> = ({
   const [showFallback, setShowFallback] = useState(false);
   const [imageLoaded, setImageLoaded] = useState(false);
   const [candidateIdx, setCandidateIdx] = useState(0);
+  const imgRef = React.useRef<HTMLImageElement>(null);
+  const notifiedRef = React.useRef(false);
+
 
   // Normalised candidate list — drives both single-src and multi-candidate modes.
   // Keyed by URL contents (not array reference) so unrelated parent re-renders
@@ -149,6 +152,7 @@ export const SquircleAvatar: React.FC<SquircleAvatarProps> = ({
   useEffect(() => {
     setCandidateIdx(0);
     setImageLoaded(false);
+    notifiedRef.current = false;
     if (candidates.length === 0) {
       setImageSrc(null);
       setShowFallback(true);
@@ -181,10 +185,16 @@ export const SquircleAvatar: React.FC<SquircleAvatarProps> = ({
     setImageLoaded(false);
   }, [candidates, candidateIdx]);
 
+  const fireLoadedOnce = () => {
+    if (notifiedRef.current) return;
+    notifiedRef.current = true;
+    onLoad?.();
+  };
+
   const handleImageLoad = () => {
     setImageLoaded(true);
     setShowFallback(false);
-    onLoad?.();
+    fireLoadedOnce();
   };
 
   const handleImageError = () => {
@@ -194,7 +204,30 @@ export const SquircleAvatar: React.FC<SquircleAvatarProps> = ({
     }
     setShowFallback(true);
     setImageLoaded(false);
+    // Fallback path — no bitmap will decode; still surface a load signal
+    // so telemetry / gating consumers don't wait forever.
+    fireLoadedOnce();
   };
+
+  // If the browser served the image from cache, `onLoad` may have fired
+  // before this component's listener attached. Detect completeness on mount
+  // and after src changes so [hdr] avatar-decoded still fires.
+  useEffect(() => {
+    if (!imageSrc || showFallback) return;
+    const img = imgRef.current;
+    if (img && img.complete && img.naturalWidth > 0) {
+      setImageLoaded(true);
+      fireLoadedOnce();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [imageSrc, showFallback]);
+
+  // Fallback rendered without an image at all (no candidates): fire once.
+  useEffect(() => {
+    if (showFallback && candidates.length === 0) fireLoadedOnce();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [showFallback, candidates.length]);
+
 
   // Initials kept for aria-label accessibility and fallback rendering.
   const fallbackInitials = fallback || getInitialsFromName(alt) || '?';
@@ -241,6 +274,7 @@ export const SquircleAvatar: React.FC<SquircleAvatarProps> = ({
       )}
       {imageSrc && !showFallback && (
         <img
+          ref={imgRef}
           src={imageSrc}
           alt={alt}
           className="absolute inset-0 w-full h-full object-cover"

@@ -43,34 +43,35 @@ function WatchOfTheWeekHeroInner() {
   const heroReady = hasResolved && (isEmpty || heroDecoded);
   const revealed = useWatchReveal('watch-of-the-week', heroReady);
 
-  if (!revealed || isLoading) {
-    return (
-      <section style={{ padding: '24px 16px 12px' }}>
-        <div
-          style={{
-            width: 140,
-            height: 12,
-            borderRadius: 4,
-            background: 'rgba(0,0,0,0.06)',
-            marginBottom: 10,
-          }}
-        />
-        <div
-          style={{
-            width: '100%',
-            aspectRatio: '16/10',
-            borderRadius: 12,
-            background: 'rgba(0,0,0,0.06)',
-            backgroundImage:
-              'linear-gradient(90deg, transparent 0%, rgba(0,0,0,0.08) 50%, transparent 100%)',
-            backgroundSize: '200% 100%',
-            animation: 'clb-shimmer 1.5s ease-in-out infinite',
-          }}
-        />
-      </section>
-    );
-  }
+  const skeleton = (
+    <section style={{ padding: '24px 16px 12px' }}>
+      <div
+        style={{
+          width: 140,
+          height: 12,
+          borderRadius: 4,
+          background: 'rgba(0,0,0,0.06)',
+          marginBottom: 10,
+        }}
+      />
+      <div
+        style={{
+          width: '100%',
+          aspectRatio: '16/10',
+          borderRadius: 12,
+          background: 'rgba(0,0,0,0.06)',
+          backgroundImage:
+            'linear-gradient(90deg, transparent 0%, rgba(0,0,0,0.08) 50%, transparent 100%)',
+          backgroundSize: '200% 100%',
+          animation: 'clb-shimmer 1.5s ease-in-out infinite',
+        }}
+      />
+    </section>
+  );
+
+  if (!hasResolved || isLoading) return skeleton;
   if (!pick) return null;
+
 
   const handleTap = () => {
     // Open fullscreen viewer with a synthetic single-post array. The viewer
@@ -114,102 +115,107 @@ function WatchOfTheWeekHeroInner() {
   };
 
   return (
-    <motion.section
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      transition={{ duration: 0.18 }}
-      style={{ padding: '24px 16px 12px' }}
-    >
-      <Kicker color="amber">Watch of the Week</Kicker>
-
-      <button
-        type="button"
-        onClick={handleTap}
-        className="block w-full text-left active:scale-[0.99] transition-transform"
-        style={{
-          position: 'relative',
-          width: '100%',
-          aspectRatio: '16/10',
-          borderRadius: 12,
-          overflow: 'hidden',
-          background: 'transparent',
-          border: 'none',
-          padding: 0,
-          marginTop: 6,
-        }}
+    <div style={{ position: 'relative' }}>
+      <motion.section
+        initial={false}
+        animate={{ opacity: revealed ? 1 : 0 }}
+        transition={{ duration: 0.18 }}
+        style={{ padding: '24px 16px 12px', pointerEvents: revealed ? 'auto' : 'none' }}
       >
-        {pick.thumbnail_url ? (
-          <DecodedImage
-            src={pick.thumbnail_url}
-            alt={pick.caption ?? ''}
-            loading="lazy"
-            onDecoded={() => setHeroDecoded(true)}
-            debugId="hero#0"
-            style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover' }}
-          />
-        ) : null}
+        <Kicker color="amber">Watch of the Week</Kicker>
 
-        {/* Bottom gradient */}
-        <div
-          aria-hidden
+        <button
+          type="button"
+          onClick={handleTap}
+          className="block w-full text-left active:scale-[0.99] transition-transform"
           style={{
-            position: 'absolute',
-            inset: 0,
-            background: 'linear-gradient(to top, rgba(0,0,0,0.78) 0%, rgba(0,0,0,0.05) 55%, transparent 100%)',
-          }}
-        />
-
-        {/* Top-left badges */}
-        <div style={{ position: 'absolute', top: 10, left: 10, display: 'flex', gap: 6, maxWidth: 'calc(100% - 80px)' }}>
-          <Pin variant="dark">{pick.format === 'clip' ? 'CLIP' : 'VIDEO'}</Pin>
-          {pick.course_name ? (
-            <Pin variant="dark" icon={<span style={{ fontSize: 10 }}>📍</span>}>
-              {pick.course_name}
-            </Pin>
-          ) : null}
-        </div>
-
-        {/* Bottom: title + creator + duration */}
-        <div style={{ position: 'absolute', left: 14, right: 14, bottom: 12, color: 'white' }}>
-          <div
-            style={{
-              fontSize: 17,
-              fontWeight: 800,
-              lineHeight: 1.25,
-              letterSpacing: '-0.015em',
-              display: '-webkit-box',
-              WebkitLineClamp: 2,
-              WebkitBoxOrient: 'vertical',
-              overflow: 'hidden',
-              textShadow: '0 1px 4px rgba(0,0,0,0.5)',
-            }}
-          >
-            {pick.caption || (pick.display_name ? `${pick.display_name} on Clbhouz` : 'Featured')}
-          </div>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginTop: 6, fontSize: 11, fontWeight: 600, opacity: 0.9 }}>
-            <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-              {pick.display_name || pick.username || 'Clbhouz'}
-            </span>
-            {pick.duration_seconds ? <span aria-hidden>·</span> : null}
-            {pick.duration_seconds ? <span>{formatDuration(pick.duration_seconds)}</span> : null}
-          </div>
-        </div>
-      </button>
-
-      {pick.why_ai ? (
-        <p
-          style={{
-            marginTop: 12,
-            fontSize: 13,
-            lineHeight: 1.5,
-            color: 'rgba(15,23,42,0.72)',
+            position: 'relative',
+            width: '100%',
+            aspectRatio: '16/10',
+            borderRadius: 12,
+            overflow: 'hidden',
+            background: 'transparent',
+            border: 'none',
+            padding: 0,
+            marginTop: 6,
           }}
         >
-          <span style={{ fontWeight: 700, color: '#0F172A' }}>Why we're featuring this: </span>
-          {pick.why_ai}
-        </p>
-      ) : null}
-    </motion.section>
+          {pick.thumbnail_url ? (
+            <DecodedImage
+              src={pick.thumbnail_url}
+              alt={pick.caption ?? ''}
+              loading="lazy"
+              onDecoded={() => setHeroDecoded(true)}
+              debugId="hero#0"
+              style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover' }}
+            />
+          ) : null}
+
+          <div
+            aria-hidden
+            style={{
+              position: 'absolute',
+              inset: 0,
+              background: 'linear-gradient(to top, rgba(0,0,0,0.78) 0%, rgba(0,0,0,0.05) 55%, transparent 100%)',
+            }}
+          />
+
+          <div style={{ position: 'absolute', top: 10, left: 10, display: 'flex', gap: 6, maxWidth: 'calc(100% - 80px)' }}>
+            <Pin variant="dark">{pick.format === 'clip' ? 'CLIP' : 'VIDEO'}</Pin>
+            {pick.course_name ? (
+              <Pin variant="dark" icon={<span style={{ fontSize: 10 }}>📍</span>}>
+                {pick.course_name}
+              </Pin>
+            ) : null}
+          </div>
+
+          <div style={{ position: 'absolute', left: 14, right: 14, bottom: 12, color: 'white' }}>
+            <div
+              style={{
+                fontSize: 17,
+                fontWeight: 800,
+                lineHeight: 1.25,
+                letterSpacing: '-0.015em',
+                display: '-webkit-box',
+                WebkitLineClamp: 2,
+                WebkitBoxOrient: 'vertical',
+                overflow: 'hidden',
+                textShadow: '0 1px 4px rgba(0,0,0,0.5)',
+              }}
+            >
+              {pick.caption || (pick.display_name ? `${pick.display_name} on Clbhouz` : 'Featured')}
+            </div>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginTop: 6, fontSize: 11, fontWeight: 600, opacity: 0.9 }}>
+              <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                {pick.display_name || pick.username || 'Clbhouz'}
+              </span>
+              {pick.duration_seconds ? <span aria-hidden>·</span> : null}
+              {pick.duration_seconds ? <span>{formatDuration(pick.duration_seconds)}</span> : null}
+            </div>
+          </div>
+        </button>
+
+        {pick.why_ai ? (
+          <p
+            style={{
+              marginTop: 12,
+              fontSize: 13,
+              lineHeight: 1.5,
+              color: 'rgba(15,23,42,0.72)',
+            }}
+          >
+            <span style={{ fontWeight: 700, color: '#0F172A' }}>Why we're featuring this: </span>
+            {pick.why_ai}
+          </p>
+        ) : null}
+      </motion.section>
+
+      {!revealed && (
+        <div style={{ position: 'absolute', inset: 0, pointerEvents: 'none' }}>
+          {skeleton}
+        </div>
+      )}
+    </div>
   );
 }
 

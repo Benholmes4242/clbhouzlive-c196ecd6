@@ -44,32 +44,8 @@ export default function LatestVideosRail() {
     hasResolved && (isEmpty || firstVisibleDecoded),
   );
 
-  if (!revealed || isLoading) {
-    return (
-      <div>
-        <SectionHeader
-          role="rail"
-          title="Latest videos"
-          action={{ label: 'More videos', onClick: () => navigate('/watch/videos') }}
-          paddingTop={6}
-          paddingX={16}
-        />
-        <VideosFeedSkeleton />
-      </div>
-    );
-  }
-
-  if (posts.length === 0) return null;
-
-  const hero = posts[0];
-  const rest = posts.slice(1, 6);
-
-  return (
-    <motion.div
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      transition={{ duration: 0.18 }}
-    >
+  const skeleton = (
+    <div>
       <SectionHeader
         role="rail"
         title="Latest videos"
@@ -77,37 +53,69 @@ export default function LatestVideosRail() {
         paddingTop={6}
         paddingX={16}
       />
+      <VideosFeedSkeleton />
+    </div>
+  );
 
-      <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
-        <div ref={heroRef} style={{ padding: '0 16px' }}>
-          <AutoplayVideoCard
-            post={hero}
-            index={0}
-            allPosts={posts}
-            userId={userId}
-            active={heroActive}
-            borderRadius={6}
-            onDecoded={onDecoded}
-            debugId="latest-videos#0"
-          />
-        </div>
+  if (!hasResolved || isLoading) return skeleton;
+  if (posts.length === 0) return null;
 
-        {rest.length > 0 && (
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 12, padding: '4px 16px 0' }}>
-            {rest.map((post, i) => (
-              <CompactVideoRow
-                key={post.id}
-                post={post}
-                index={i + 1}
-                allPosts={posts}
-                onDecoded={i < VISIBLE_COUNT - 1 ? onDecoded : undefined}
-                debugId={`latest-videos#${i + 1}`}
-              />
-            ))}
+  const hero = posts[0];
+  const rest = posts.slice(1, 6);
+
+  return (
+    <div style={{ position: 'relative' }}>
+      <motion.div
+        initial={false}
+        animate={{ opacity: revealed ? 1 : 0 }}
+        transition={{ duration: 0.18 }}
+        style={{ pointerEvents: revealed ? 'auto' : 'none' }}
+      >
+        <SectionHeader
+          role="rail"
+          title="Latest videos"
+          action={{ label: 'More videos', onClick: () => navigate('/watch/videos') }}
+          paddingTop={6}
+          paddingX={16}
+        />
+
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+          <div ref={heroRef} style={{ padding: '0 16px' }}>
+            <AutoplayVideoCard
+              post={hero}
+              index={0}
+              allPosts={posts}
+              userId={userId}
+              active={heroActive}
+              borderRadius={6}
+              onDecoded={onDecoded}
+              debugId="latest-videos#0"
+            />
           </div>
-        )}
-      </div>
-    </motion.div>
+
+          {rest.length > 0 && (
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 12, padding: '4px 16px 0' }}>
+              {rest.map((post, i) => (
+                <CompactVideoRow
+                  key={post.id}
+                  post={post}
+                  index={i + 1}
+                  allPosts={posts}
+                  onDecoded={i < VISIBLE_COUNT - 1 ? onDecoded : undefined}
+                  debugId={`latest-videos#${i + 1}`}
+                />
+              ))}
+            </div>
+          )}
+        </div>
+      </motion.div>
+
+      {!revealed && (
+        <div style={{ position: 'absolute', inset: 0, pointerEvents: 'none' }}>
+          {skeleton}
+        </div>
+      )}
+    </div>
   );
 }
 
