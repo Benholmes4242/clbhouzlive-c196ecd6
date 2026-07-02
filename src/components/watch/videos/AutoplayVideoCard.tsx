@@ -180,6 +180,7 @@ function AutoplayVideoCardInner({ post, index, allPosts, userId, active, borderR
                 alt=""
                 loading="lazy"
                 onDecoded={onDecoded}
+                debugId={debugId}
                 style={{
                   position: 'absolute',
                   inset: 0,
