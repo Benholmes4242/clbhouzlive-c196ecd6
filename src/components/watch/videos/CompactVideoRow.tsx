@@ -92,6 +92,7 @@ function CompactVideoRowInner({ post, index, allPosts, onDecoded, debugId }: Com
             alt=""
             loading="lazy"
             onDecoded={onDecoded}
+            debugId={debugId}
             onError={() => {
               setFailed(true);
             }}
