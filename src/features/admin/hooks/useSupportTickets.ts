@@ -53,17 +53,15 @@ export function useSupportTickets() {
       const userIds = Array.from(new Set(tickets.map((t) => t.user_id)));
       const ticketIds = tickets.map((t) => t.id);
 
-      const [profilesRes, firstMsgsRes] = await Promise.all([
-        supabase
-          .from('user_profiles')
-          .select('user_id, display_name, username, profile_photo_url')
-          .in('user_id', userIds),
-        supabase
-          .from('support_messages')
-          .select('ticket_id, body, created_at')
-          .in('ticket_id', ticketIds)
-          .order('created_at', { ascending: true }),
-      ]);
+      const profilesRes = await supabase
+        .from('user_profiles')
+        .select('user_id, display_name, username, profile_photo_url')
+        .in('user_id', userIds);
+      const firstMsgsRes = await supabase
+        .from('support_messages')
+        .select('ticket_id, body, created_at')
+        .in('ticket_id', ticketIds)
+        .order('created_at', { ascending: true });
       const profiles = (profilesRes.data ?? []) as any[];
       const firstMsgs = (firstMsgsRes.data ?? []) as any[];
 
