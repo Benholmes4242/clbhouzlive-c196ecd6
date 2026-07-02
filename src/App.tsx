@@ -970,35 +970,38 @@ const App: React.FC = () => {
       <AppShell>
         <ReviewIslandLoader />
         <ErrorBoundary>
-          <ThemeProvider defaultTheme="dark" storageKey="clbhouz-ui-theme">
-            <Top100DebugProvider>
-              <PersistQueryClientProvider
-                client={queryClient}
-                persistOptions={{
-                  persister: queryPersister,
-                  maxAge: PERSIST_MAX_AGE_MS,
-                  buster: __BUILD_ID__,
-                  dehydrateOptions: { shouldDehydrateQuery: shouldPersistQuery },
-                }}
-              >
-                <Suspense fallback={<div style={{ background: '#0A0E14', minHeight: '100dvh' }} />}>
-                  <AppPrefetchProvider delay={2000} enabled={true}>
-                    <RehydrationProvider>
-                      <PostEventsBridge>
-                        <UploadToastsBridge />
-                        <PendingPostsController />
-                        <UploadProgressBanner />
-                        <AppInner />
-                      </PostEventsBridge>
-                    </RehydrationProvider>
-                  </AppPrefetchProvider>
-                </Suspense>
-              </PersistQueryClientProvider>
-            </Top100DebugProvider>
-          </ThemeProvider>
+          <MotionConfig reducedMotion="user">
+            <ThemeProvider defaultTheme="dark" storageKey="clbhouz-ui-theme">
+              <Top100DebugProvider>
+                <PersistQueryClientProvider
+                  client={queryClient}
+                  persistOptions={{
+                    persister: queryPersister,
+                    maxAge: PERSIST_MAX_AGE_MS,
+                    buster: __BUILD_ID__,
+                    dehydrateOptions: { shouldDehydrateQuery: shouldPersistQuery },
+                  }}
+                >
+                  <Suspense fallback={<div style={{ background: '#0A0E14', minHeight: '100dvh' }} />}>
+                    <AppPrefetchProvider delay={2000} enabled={true}>
+                      <RehydrationProvider>
+                        <PostEventsBridge>
+                          <UploadToastsBridge />
+                          <PendingPostsController />
+                          <UploadProgressBanner />
+                          <AppInner />
+                        </PostEventsBridge>
+                      </RehydrationProvider>
+                    </AppPrefetchProvider>
+                  </Suspense>
+                </PersistQueryClientProvider>
+              </Top100DebugProvider>
+            </ThemeProvider>
+          </MotionConfig>
         </ErrorBoundary>
       </AppShell>
     </>
+
   );
 };
 
