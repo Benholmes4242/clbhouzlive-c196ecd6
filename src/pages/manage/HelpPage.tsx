@@ -192,6 +192,14 @@ export default function HelpPage() {
           >
             Contact support
           </button>
+          <button
+            type="button"
+            onClick={() => navigate('/manage/requests')}
+            className="w-full min-h-[44px] mt-2 text-[14px] font-semibold"
+            style={{ color: INK }}
+          >
+            View my requests
+          </button>
         </div>
       </div>
     </ManagePageShell>
