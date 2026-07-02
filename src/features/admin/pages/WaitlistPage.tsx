@@ -215,7 +215,10 @@ export default function WaitlistPage() {
                   <div style={{ display: 'flex', alignItems: 'center', gap: 10, minWidth: 0 }}>
                     <FlagBadge iso={row.iso} />
                     <div style={{ display: 'flex', flexDirection: 'column', lineHeight: 1.2, minWidth: 0 }}>
-                      <span style={{ color: t.ink, fontWeight: 600, fontSize: 14 }}>{row.country_name}</span>
+                      <span style={{ color: t.ink, fontWeight: 600, fontSize: 14, display: 'inline-flex', alignItems: 'center', gap: 6 }}>
+                        {row.country_name}
+                        {isLaunched(row.country_id) && <StatusPill tone="ok">Launched</StatusPill>}
+                      </span>
                       <span style={{ color: t.inkFaint, fontSize: 11 }}>{row.body_name}</span>
                     </div>
                   </div>
