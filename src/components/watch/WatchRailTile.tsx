@@ -181,6 +181,7 @@ export default function WatchRailTile({
     <div
       ref={cardRef}
       data-rail-tile-index={index}
+      data-post-id={post.id}
       style={{
         flexShrink: 0,
         position: 'relative',
