@@ -23,10 +23,20 @@ export interface DecodedImageProps extends React.ImgHTMLAttributes<HTMLImageElem
  * finished, not just requested.
  */
 const DecodedImage = React.forwardRef<HTMLImageElement, DecodedImageProps>(
-  ({ src, onDecoded, fadeMs = 120, style, onLoad, onError, ...rest }, forwardedRef) => {
+  ({ src, onDecoded, fadeMs = 120, debugId, style, onLoad, onError, ...rest }, forwardedRef) => {
     const [loaded, setLoaded] = useState(false);
     const innerRef = useRef<HTMLImageElement>(null);
     const notifiedRef = useRef(false);
+
+    const parsed = React.useMemo(() => {
+      if (!debugId) return null;
+      const [section, idx] = debugId.split('#');
+      return { section, index: Number(idx) };
+    }, [debugId]);
+
+    useEffect(() => {
+      if (parsed) wrtMark(parsed.section, 'tile-mount', parsed.index);
+    }, [parsed]);
 
     const setRefs = (node: HTMLImageElement | null) => {
       innerRef.current = node;
@@ -37,8 +47,10 @@ const DecodedImage = React.forwardRef<HTMLImageElement, DecodedImageProps>(
     const notify = () => {
       if (notifiedRef.current) return;
       notifiedRef.current = true;
+      if (parsed) wrtMark(parsed.section, 'tile-decoded', parsed.index);
       onDecoded?.();
     };
+
 
     // No src → nothing to decode; unblock the reveal immediately.
     useEffect(() => {
