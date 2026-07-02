@@ -321,6 +321,20 @@ export default function WaitlistPage() {
           )}
         </div>
       </DetailDrawer>
+
+      <ConfirmDialog
+        open={launchOpen}
+        onClose={() => (launching ? null : setLaunchOpen(false))}
+        onConfirm={handleLaunch}
+        title={selected ? `Launch ${selected.body_name}?` : 'Launch authority?'}
+        description={selected
+          ? `This notifies all ${selected.total.toLocaleString()} waiting golfers that they can now connect. Only do this after the ${selected.body_name} integration is live.`
+          : ''}
+        confirmLabel="Launch + notify"
+        cancelLabel="Cancel"
+        tone="danger"
+        busy={launching}
+      />
     </div>
   );
 }
