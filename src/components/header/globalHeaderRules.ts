@@ -33,6 +33,9 @@ export const GLOBAL_HEADER_EXCLUDED_PREFIXES = [
   '/handicap/', // Handicap sub-routes use FloatingPageHeader
   '/manage/', // Manage Profile sub-pages use ManagePageShell (own header, no global chrome)
   '/support/', // Support thread pages use ManagePageShell (own header, no global chrome)
+  '/legal', // Legal index + document pages have their own back-arrow shell
+  '/privacy', // Privacy policy page has its own header
+  '/terms', // Terms page has its own header
 ] as const;
 
 /**
