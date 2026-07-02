@@ -115,7 +115,7 @@ export default function SupportTicketDrawer({ ticket, onClose }: Props) {
         recipient_actor_type: 'personal',
         actor_id: user.id,
         type: 'support_reply',
-        title: 'Support replied to your request',
+        title: 'replied to your request',
         message: snippet,
         entity_type: 'support_ticket',
         entity_id: ticket.id,
