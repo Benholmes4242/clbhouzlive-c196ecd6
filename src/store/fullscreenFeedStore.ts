@@ -3,8 +3,19 @@ import type { FeedPost } from '@/components/media-system/types/media';
 import { engagementBus } from '@/lib/engagementBus';
 import { applyEngagementDelta } from '@/lib/applyEngagementDelta';
 
+export interface OpenOrigin {
+  rect: { top: number; left: number; width: number; height: number };
+  posterUrl: string | null;
+  borderRadius: string;
+  aspectRatio: number;
+}
+
 interface OpenOptions {
   openCommentsInitially?: boolean;
+  /** Origin geometry for the FLIP tile→viewer expand transition. When
+   *  omitted (deep-link / notification), the overlay falls back to a plain
+   *  opacity fade. */
+  origin?: OpenOrigin | null;
   /** Optional comment id to highlight/scroll-to once the comments sheet opens
    *  (used by notification deep-links to a specific comment). */
   initialCommentId?: string | null;
