@@ -65,16 +65,15 @@ const WatchTile: React.FC<WatchTileProps> = ({ post, index, allPosts, onDecoded 
       }
     >
       {thumbnailUrl ? (
-        <AnimatedTileThumb
-          posterSrc={thumbnailUrl}
-          streamId={media?.streamId}
-          heightPx={media?.height ? Math.min(media.height, 400) : 400}
-          dwellMs={1000}
+        <DecodedImage
+          src={thumbnailUrl}
           alt=""
-          className="absolute inset-0 w-full h-full"
           loading="lazy"
           onDecoded={onDecoded}
+          className="absolute inset-0 w-full h-full"
+          style={{ objectFit: 'cover' }}
         />
+
 
 
 
