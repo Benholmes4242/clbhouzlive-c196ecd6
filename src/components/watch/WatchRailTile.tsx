@@ -148,10 +148,12 @@ export default function WatchRailTile({
       }}
       onClick={handleClick}
     >
-      {/* Thumbnail */}
-      <img
+      {/* Thumbnail — decode-gated so the coordinated reveal only fires
+          when pixels are actually painted. */}
+      <DecodedImage
         src={thumb}
         alt=""
+        onDecoded={onDecoded}
         style={{
           width: '100%',
           height: '100%',
