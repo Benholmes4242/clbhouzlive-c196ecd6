@@ -28,8 +28,9 @@ import { VALID_CONTINENTS, COURSE_TYPES } from '../constants';
 import { useCourses, createCourse, type AdminCourseRow } from '../hooks/useCourses';
 import { useCourseRequests } from '../hooks/useCourseRequests';
 import CourseRequestsTab from '../components/CourseRequestsTab';
+import HelpArticlesTab from '../components/HelpArticlesTab';
 
-type TabId = 'courses' | 'course-requests' | 'tour' | 'players';
+type TabId = 'courses' | 'course-requests' | 'help' | 'tour' | 'players';
 
 export default function ContentPage() {
   const { role } = usePanelRole();
