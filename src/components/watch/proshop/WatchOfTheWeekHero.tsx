@@ -199,10 +199,12 @@ function WatchOfTheWeekHeroInner() {
           hlsUrl: pick.hls_url ?? undefined,
           imageUrl: pick.thumbnail_url ?? undefined,
           thumbnailUrl: pick.thumbnail_url ?? undefined,
+          streamId: pick.stream_id ?? (pick.hls_url ? extractCloudflareUid(pick.hls_url) : null),
           width: 0,
           height: 0,
           duration: pick.duration_seconds ?? undefined,
         }],
+
         createdAt: pick.created_at,
         likeCount: pick.like_count,
         commentCount: pick.comment_count,
