@@ -2,6 +2,8 @@ import { useEffect, useRef, useState } from 'react';
 import type { FeedPost } from '@/components/media-system/types/media';
 import AutoplayVideoCard from './AutoplayVideoCard';
 import { prefetchTile } from '@/hooks/useTileVideoPlayer';
+import { useEdgeFades } from '@/components/watch/shared/useEdgeFades';
+
 
 interface CarouselRowProps {
   items: FeedPost[];
