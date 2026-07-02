@@ -5,6 +5,12 @@ export interface MediaItem {
   mp4Url?: string;
   imageUrl?: string;
   thumbnailUrl?: string;
+  /**
+   * Cloudflare Stream UID. Present for video media items when the DB row has a
+   * `stream_id` (or when the uid could be extracted from `media_url`). Enables
+   * animated-thumbnail overlays (see `getAnimatedThumbnailUrl`).
+   */
+  streamId?: string;
   width: number;
   height: number;
   duration?: number;
