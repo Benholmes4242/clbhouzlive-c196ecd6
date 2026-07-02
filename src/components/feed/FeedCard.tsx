@@ -32,7 +32,9 @@ import LqipUnderlay from '@/components/shared/LqipUnderlay';
 import { MediaCarousel } from './MediaCarousel';
 import { FeedFollowPill } from './FeedFollowPill';
 import { FeedActorPicker } from './FeedActorPicker';
+import Pressable from '@/components/ui/Pressable';
 import type { ActiveActor } from '@/types/actor';
+
 
 // Full-bleed charcoal chrome — one charcoal (#15171F) across the app: tab
 // underline, primary text base, and the feed card surface all share this token.
