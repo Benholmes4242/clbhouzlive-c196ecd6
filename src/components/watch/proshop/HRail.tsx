@@ -1,23 +1,32 @@
-import { memo } from 'react';
+import { memo, useRef } from 'react';
+import { useEdgeFades } from '../shared/useEdgeFades';
 
 interface HRailProps {
   children: React.ReactNode;
   /** Padding-bottom in px (default 16). */
   paddingBottom?: number;
   /**
-   * Padding-top in px (default 0).
-   * Added in Phase 2 so callers like LatestVideosRail can preserve a small
-   * top-gap above the rail without re-implementing the scroll container.
-   * Defaults to 0 to keep all existing Clips/Videos consumers unchanged.
+   * Padding-top in px (default 0). Preserved for callers like LatestVideosRail
+   * that want a small top gap.
    */
   paddingTop?: number;
   /** When true, applies scroll-snap to children. Default true. */
   snap?: boolean;
 }
 
+const EDGE_FADE_WIDTH = 24;
+
 /**
  * Pro Shop primitive — horizontal scroll rail with consistent padding,
- * gap, and scroll-snap behaviour. Children should set their own width.
+ * gap, and scroll-snap behaviour.
+ *
+ * Phase 7:
+ *   - snap type = `x proximity` (mandatory fights ballistic flicks on long
+ *     shelves; proximity keeps the snap feel without trapping mid-decay).
+ *   - Right inset (16px) + scroll-padding-inline-end (28px) so every rest
+ *     position peeks the next tile.
+ *   - Sibling gradient overlays (data-fade-left / data-fade-right) — cheaper
+ *     than mask-image on the scrolling layer.
  */
 function HRailInner({
   children,
@@ -26,24 +35,68 @@ function HRailInner({
   snap = true,
 }: HRailProps) {
   const leftInset = 16;
+  const rightInset = 16;
+  const wrapperRef = useRef<HTMLDivElement>(null);
+  const scrollerRef = useRef<HTMLDivElement>(null);
+
+  useEdgeFades(scrollerRef, wrapperRef);
 
   return (
     <div
-      style={{
-        display: 'flex',
-        gap: 12,
-        overflowX: 'auto',
-        // The rail uses scroll-snap on its children. Without matching
-        // scrollPaddingLeft, the browser can snap the first tile flush to the
-        // viewport edge and visually cancel the rail's leading inset.
-        padding: `${paddingTop}px 0 ${paddingBottom}px ${leftInset}px`,
-        scrollPaddingLeft: leftInset,
-        scrollbarWidth: 'none',
-        WebkitOverflowScrolling: 'touch',
-        scrollSnapType: snap ? 'x mandatory' : 'none',
-      }}
+      ref={wrapperRef}
+      className="hrail-edge-fade"
+      style={{ position: 'relative' }}
     >
-      {children}
+      <div
+        ref={scrollerRef}
+        style={{
+          display: 'flex',
+          gap: 12,
+          overflowX: 'auto',
+          padding: `${paddingTop}px ${rightInset}px ${paddingBottom}px ${leftInset}px`,
+          scrollPaddingLeft: leftInset,
+          scrollPaddingInlineEnd: 28,
+          scrollbarWidth: 'none',
+          WebkitOverflowScrolling: 'touch',
+          scrollSnapType: snap ? 'x proximity' : 'none',
+        }}
+      >
+        {children}
+      </div>
+
+      {/* Sibling gradient overlays — free composite; visibility controlled by wrapper data-attrs (see index.css .hrail-edge-fade rules). */}
+      <div
+        aria-hidden
+        className="hrail-fade hrail-fade-left"
+        style={{
+          position: 'absolute',
+          top: 0,
+          bottom: 0,
+          left: 0,
+          width: EDGE_FADE_WIDTH,
+          pointerEvents: 'none',
+          background:
+            'linear-gradient(to right, hsl(var(--background)) 0%, hsl(var(--background) / 0) 100%)',
+          opacity: 0,
+          transition: 'opacity 150ms ease',
+        }}
+      />
+      <div
+        aria-hidden
+        className="hrail-fade hrail-fade-right"
+        style={{
+          position: 'absolute',
+          top: 0,
+          bottom: 0,
+          right: 0,
+          width: EDGE_FADE_WIDTH,
+          pointerEvents: 'none',
+          background:
+            'linear-gradient(to left, hsl(var(--background)) 0%, hsl(var(--background) / 0) 100%)',
+          opacity: 0,
+          transition: 'opacity 150ms ease',
+        }}
+      />
     </div>
   );
 }
