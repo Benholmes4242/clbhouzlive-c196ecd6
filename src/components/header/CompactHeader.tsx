@@ -437,6 +437,7 @@ const CompactHeader: React.FC<CompactHeaderProps> = ({ className }) => {
                     useLightTheme={useLightTheme && !overlayActive}
                     compact={isEditorialChromeRoute}
                     size={isEditorialChromeRoute ? 'lg' : undefined}
+                    onAvatarLoad={handleAvatarLoad}
                   />
                 </div>
               ) : (
