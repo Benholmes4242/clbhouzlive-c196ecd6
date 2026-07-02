@@ -226,6 +226,8 @@ const ManageBlockedPage = lazy(() => import("./pages/manage/BlockedPage"));
 const ManageNotificationsPage = lazy(() => import("./pages/manage/NotificationsPage"));
 const ManageHelpPage = lazy(() => import("./pages/manage/HelpPage"));
 const ManageContactPage = lazy(() => import("./pages/manage/ContactPage"));
+const ManageMyRequestsPage = lazy(() => import("./pages/manage/MyRequestsPage"));
+const SupportThreadPage = lazy(() => import("./pages/manage/SupportThreadPage"));
 const ManageLegalPage = lazy(() => import("./pages/manage/LegalPage"));
 const ManageHandicapPage = lazy(() => import("./pages/manage/HandicapManagePage"));
 // ProfileHandicapView removed — /profile/handicap now redirects to /handicap (fix brief §2.1)
