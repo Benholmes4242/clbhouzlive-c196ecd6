@@ -193,12 +193,26 @@ export const LightCardFeed: React.FC<LightCardFeedProps> = ({
   }, [posts?.length]);
 
   const handleOpenMedia = useCallback(
-    (post: FeedPost, mediaIndex: number) => {
+    (
+      post: FeedPost,
+      mediaIndex: number,
+      origin?: { el: HTMLElement | null; posterUrl?: string | null; handOffUrl?: string | null },
+    ) => {
       const idx = posts.findIndex((p) => p.id === post.id);
       if (idx < 0) return;
       setActiveIndex(idx);
       if (mediaIndex > 0) setCarouselPosition(idx, mediaIndex);
-      openFullscreen(posts, idx);
+      if (origin?.el) {
+        openWithOrigin({
+          posts,
+          index: idx,
+          originEl: origin.el,
+          posterUrl: origin.posterUrl ?? null,
+          handOffUrls: origin.handOffUrl ? [origin.handOffUrl] : undefined,
+        });
+      } else {
+        openFullscreen(posts, idx);
+      }
     },
     [posts, setActiveIndex, setCarouselPosition, openFullscreen],
   );
