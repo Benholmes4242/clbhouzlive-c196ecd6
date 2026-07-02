@@ -212,6 +212,12 @@ export function SettingsTabContent() {
             onClick={() => navigate('/manage/contact')}
           />
           <SettingsChevronRow
+            icon={<MessageSquare size={18} />}
+            title="My requests"
+            iconTheme="support"
+            onClick={() => navigate('/manage/requests')}
+          />
+          <SettingsChevronRow
             icon={<FileText size={18} />}
             title="Legal & Policies"
             iconTheme="legal"
