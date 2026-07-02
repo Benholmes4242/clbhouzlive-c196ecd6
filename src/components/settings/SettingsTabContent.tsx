@@ -24,6 +24,7 @@ import type { VisibilityLevel } from '@/hooks/usePrivacySettings';
 import {
   AlertDialog,
   AlertDialogAction,
+  AlertDialogCancel,
   AlertDialogContent,
   AlertDialogDescription,
   AlertDialogFooter,
@@ -32,6 +33,8 @@ import {
 } from '@/components/ui/alert-dialog';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import DeleteAccountConfirmSheet from '@/components/manage/overlays/DeleteAccountConfirmSheet';
+import { useLogout } from '@/hooks/useLogout';
+
 
 const APP_VERSION = '1.0.0';
 
