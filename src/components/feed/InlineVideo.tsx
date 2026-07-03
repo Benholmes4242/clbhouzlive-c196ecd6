@@ -139,8 +139,19 @@ export const InlineVideo: React.FC<Props> = ({
           return;
         }
         logTileLife(tag, feedIndex, 'ATTACH_DONE', { readyState: video.readyState });
+        // FLIP handoff continuity: seek to the playhead captured by
+        // openWithOrigin (fullscreen open) OR by emitClose (feed-tile return)
+        // BEFORE any play() call. Falls back to the tiny nudge that forces a
+        // first frame paint.
+        const start = flipContinuity.consumeStart(hlsUrl);
+        const back = flipContinuity.consumeReturn(hlsUrl);
+        const seekTo = start?.t ?? back?.t ?? null;
         try {
-          if (video.currentTime < 0.001) video.currentTime = 0.001;
+          if (seekTo != null && seekTo > 0.05) {
+            video.currentTime = seekTo;
+          } else if (video.currentTime < 0.001) {
+            video.currentTime = 0.001;
+          }
         } catch {}
         setAttachToken((t) => t + 1);
         logTileLife(tag, feedIndex, 'ATTACH_SETTLED', {
@@ -149,7 +160,8 @@ export const InlineVideo: React.FC<Props> = ({
           active: isActiveRef.current,
           paused: video.paused,
         });
-        if (isActiveRef.current && video.paused) {
+        const shouldPlay = isActiveRef.current && video.paused && (start?.wasPlaying !== false);
+        if (shouldPlay) {
           video.play().catch(() => {});
         }
       });
