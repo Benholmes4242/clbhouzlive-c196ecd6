@@ -33,8 +33,7 @@ interface ClubhouseState {
 
   isMuted: boolean;
   userPaused: boolean;
-  activeVideoElement: HTMLVideoElement | null;
-  activeVideoRef: React.RefObject<HTMLVideoElement> | null;
+  // [VIDEO-TEARDOWN] activeVideoElement / activeVideoRef removed — poster-only chassis.
   isTournamentCardActive: boolean;
 
   setActiveTab: (tab: TabKey) => void;
@@ -43,7 +42,7 @@ interface ClubhouseState {
   setIsMuted: (v: boolean) => void;
   toggleMute: () => void;
   setUserPaused: (v: boolean) => void;
-  setActiveVideoElement: (el: HTMLVideoElement | null, ref: React.RefObject<HTMLVideoElement> | null) => void;
+  // [VIDEO-TEARDOWN] setActiveVideoElement removed — engine severed.
   setIsTournamentCardActive: (v: boolean) => void;
   markUserGestureUnmute: () => void;
   isRecentUserGesture: () => boolean;
@@ -86,8 +85,7 @@ export const useClubhouseStore = create<ClubhouseState>()((set) => ({
 
   isMuted: getInitialMuted(),
   userPaused: false,
-  activeVideoElement: null,
-  activeVideoRef: null,
+  // [VIDEO-TEARDOWN] activeVideoElement / activeVideoRef initial values removed.
   isTournamentCardActive: false,
 
   setActiveTab: (tab) => set((s) => {
@@ -143,7 +141,7 @@ export const useClubhouseStore = create<ClubhouseState>()((set) => ({
     return { isMuted: next };
   }),
   setUserPaused: (v) => set({ userPaused: v }),
-  setActiveVideoElement: (el, ref) => set({ activeVideoElement: el, activeVideoRef: ref }),
+  // [VIDEO-TEARDOWN] setActiveVideoElement setter removed.
   setIsTournamentCardActive: (v) => set({ isTournamentCardActive: v }),
   markUserGestureUnmute: () => { _userGestureUnmuteTs = Date.now(); },
   isRecentUserGesture: () => Date.now() - _userGestureUnmuteTs < 2000,
