@@ -116,6 +116,7 @@ async function fetchVerifications(): Promise<VerificationRow[]> {
       claimClubId: r.club_id ?? null,
       claimSourceCourseId: r.source_course_id ?? null,
       claimProofNote: r.proof_note ?? null,
+      businessAlreadyVerified: r.business_id ? (bizVerifiedById.get(r.business_id) ?? false) : null,
     })),
   ];
 
