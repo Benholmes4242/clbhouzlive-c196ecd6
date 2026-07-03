@@ -278,7 +278,10 @@ class VideoEngineImpl {
       if (this.loadingCount > 0) this.loadingCount--;
       if (lane.state === 'loading') this.transition(lane, 'ready');
     };
-    const onTime = () => this.emit(lane);
+    const onTime = () => {
+      if (lane.postId) this.lastPos.set(lane.postId, lane.el.currentTime || 0);
+      this.emit(lane);
+    };
     const onPlay = () => this.transition(lane, 'playing');
     const onPause = () => {
       if (lane.state !== 'error') this.transition(lane, 'paused');
