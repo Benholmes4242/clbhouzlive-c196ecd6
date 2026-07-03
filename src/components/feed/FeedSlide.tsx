@@ -5,6 +5,9 @@ import { FeedImageCarousel } from './FeedImageCarousel';
 import { usePinchZoomPointer } from '@/hooks/usePinchZoomPointer';
 import { CarouselDots } from '@/components/media/CarouselDots';
 import type { FeedPost } from '@/components/media-system/types/media';
+import { useVideoLane } from '@/video/useVideoLane';
+import { VideoEngine } from '@/video/VideoEngine';
+import { useFullscreenFeedStore } from '@/store/fullscreenFeedStore';
 
 interface FeedSlideProps {
   post: FeedPost;
@@ -85,29 +88,31 @@ export const FeedSlide = memo(function FeedSlide({
       );
     }
 
-    // Single video — poster-only (Stage B3 teardown, no <video>).
+    // Single video — engine-backed in fullscreen, poster-only otherwise.
     if (media?.[0]?.type === 'video') {
       const first = media[0];
       const posterSrc = first.thumbnailUrl || '';
-      // Fire the paint-ready signal once for surfaces that gate on it.
-      // Handled inline via the <img>'s onLoad below.
+      if (isFullscreen) {
+        return (
+          <FullscreenVideoSlot
+            postId={post.id}
+            hlsUrl={(first as any).hlsUrl || null}
+            posterSrc={posterSrc}
+            isActive={isActive}
+            onFirstFrameReady={onFirstFrameReady}
+          />
+        );
+      }
       return (
         <div className="absolute inset-0 overflow-hidden">
-          {isFullscreen ? (
-            <div aria-hidden="true" className="absolute inset-0" style={{
-              backgroundImage: `url(${posterSrc})`, backgroundSize: 'cover', backgroundPosition: 'center',
-              filter: 'blur(40px) brightness(0.5) saturate(1.2)', transform: 'scale(1.2)',
-            }} />
-          ) : (
-            <div className="absolute inset-0" style={{ background: '#0A0E14' }} aria-hidden="true" />
-          )}
+          <div className="absolute inset-0" style={{ background: '#0A0E14' }} aria-hidden="true" />
           {posterSrc && (
             <img
               src={posterSrc}
               alt=""
               aria-hidden
               className="w-full h-full"
-              style={{ position: 'absolute', inset: 0, objectFit: isFullscreen ? 'contain' : 'cover', zIndex: 1 }}
+              style={{ position: 'absolute', inset: 0, objectFit: 'cover', zIndex: 1 }}
               loading="lazy"
               draggable={false}
               onLoad={() => onFirstFrameReady?.()}
@@ -208,3 +213,99 @@ export const FeedSlide = memo(function FeedSlide({
 });
 
 export default FeedSlide;
+
+/**
+ * FullscreenVideoSlot — binds the engine's `fullscreen` lane when the
+ * fullscreen slide becomes active. Reads `startPosition` from the store
+ * (set by openWithOrigin). On unmount, records fullscreen currentTime into
+ * engine.lastPos so the feed-active lane resumes at the same position.
+ */
+const FullscreenVideoSlot: React.FC<{
+  postId: string;
+  hlsUrl: string | null;
+  posterSrc: string;
+  isActive: boolean;
+  onFirstFrameReady?: () => void;
+}> = ({ postId, hlsUrl, posterSrc, isActive, onFirstFrameReady }) => {
+  const isMuted = useClubhouseStore((s) => s.isMuted);
+  const storedStart = useFullscreenFeedStore((s) => s.startPosition);
+  // Only apply store.startPosition on the initially-tapped slide; other
+  // slides in the fullscreen deck start from 0.
+  const startPosition = React.useMemo(() => {
+    if (!isActive) return -1;
+    const t = VideoEngine.getLastPos(postId);
+    if (t > 0) return t;
+    return storedStart > 0 ? storedStart : -1;
+  }, [isActive, postId, storedStart]);
+
+  const lane = useVideoLane('fullscreen', {
+    hlsUrl: isActive ? hlsUrl : null,
+    posterUrl: posterSrc || null,
+    startPosition,
+    active: isActive,
+    muted: isMuted,
+    postId,
+  });
+
+  React.useEffect(() => {
+    VideoEngine.setObjectFit('fullscreen', 'contain');
+  }, []);
+
+  React.useEffect(() => {
+    if (isActive) {
+      VideoEngine.trace('V1_FS_LOAD', { postId, startPosition });
+    }
+  }, [isActive, postId, startPosition]);
+
+  React.useEffect(() => {
+    // On unmount/deactivation the engine has already been tracking
+    // currentTime -> lastPos[postId] via onTimeUpdate. Just emit V1_CLOSE
+    // for verification; no manual write needed.
+    return () => {
+      const t = VideoEngine.getLastPos(postId);
+      if (postId && t > 0) {
+        VideoEngine.trace('V1_CLOSE', { postId, fsTime: t });
+      }
+    };
+  }, [postId]);
+
+  React.useEffect(() => {
+    if (posterSrc && lane.snapshot.firstFrame === false) {
+      onFirstFrameReady?.();
+    }
+  }, [posterSrc, lane.snapshot.firstFrame, onFirstFrameReady]);
+
+  return (
+    <div className="absolute inset-0 overflow-hidden">
+      {posterSrc && (
+        <div aria-hidden="true" className="absolute inset-0" style={{
+          backgroundImage: `url(${posterSrc})`, backgroundSize: 'cover', backgroundPosition: 'center',
+          filter: 'blur(40px) brightness(0.5) saturate(1.2)', transform: 'scale(1.2)',
+        }} />
+      )}
+      {posterSrc && (
+        <img
+          src={posterSrc}
+          alt=""
+          aria-hidden
+          className="w-full h-full"
+          style={{
+            position: 'absolute', inset: 0, objectFit: 'contain', zIndex: 1,
+            opacity: lane.snapshot.firstFrame ? 0 : 1,
+            transition: 'opacity 120ms linear',
+          }}
+          loading="eager"
+          draggable={false}
+        />
+      )}
+      <div
+        ref={lane.hostRef}
+        style={{
+          position: 'absolute', inset: 0, zIndex: 2, pointerEvents: 'none',
+          opacity: lane.snapshot.firstFrame ? 1 : 0,
+          transition: 'opacity 120ms linear',
+        }}
+      />
+    </div>
+  );
+};

@@ -50,6 +50,8 @@ interface Lane {
   posterUrl: string | null;
   startPosition: number;
   firstFrame: boolean;
+  /** postId this lane's current source belongs to (for lastPos tracking). */
+  postId: string | null;
   listeners: Set<LaneListener>;
   detachFns: Array<() => void>;
 }
@@ -119,6 +121,7 @@ class VideoEngineImpl {
         posterUrl: null,
         startPosition: -1,
         firstFrame: false,
+        postId: null,
         listeners: new Set(),
         detachFns: [],
       });
@@ -166,10 +169,12 @@ class VideoEngineImpl {
    */
   load(
     laneId: LaneId,
-    opts: { hlsUrl: string; posterUrl?: string | null; startPosition?: number }
+    opts: { hlsUrl: string; posterUrl?: string | null; startPosition?: number; postId?: string | null }
   ): void {
     const lane = this.getLane(laneId);
-    const { hlsUrl, posterUrl = null, startPosition = -1 } = opts;
+    const { hlsUrl, posterUrl = null, startPosition = -1, postId = null } = opts;
+    lane.postId = postId;
+
 
     if (this.saveDataGated) {
       DBG(laneId, 'skip load: save-data gated');
@@ -268,12 +273,20 @@ class VideoEngineImpl {
     const onLoadedData = () => {
       if (!lane.firstFrame) {
         lane.firstFrame = true;
+        if (lane.id === 'fullscreen') {
+          this.trace('V1_FS_FIRSTFRAME', { postId: lane.postId, videoTime: lane.el.currentTime });
+        } else if (lane.id === 'feed-active') {
+          this.trace('V1_TILE_FIRSTFRAME', { postId: lane.postId, videoTime: lane.el.currentTime });
+        }
         this.emit(lane);
       }
       if (this.loadingCount > 0) this.loadingCount--;
       if (lane.state === 'loading') this.transition(lane, 'ready');
     };
-    const onTime = () => this.emit(lane);
+    const onTime = () => {
+      if (lane.postId) this.lastPos.set(lane.postId, lane.el.currentTime || 0);
+      this.emit(lane);
+    };
     const onPlay = () => this.transition(lane, 'playing');
     const onPause = () => {
       if (lane.state !== 'error') this.transition(lane, 'paused');
@@ -337,6 +350,11 @@ class VideoEngineImpl {
     this.emit(lane);
   }
 
+  /** Set object-fit on the lane's <video> element. */
+  setObjectFit(laneId: LaneId, fit: 'cover' | 'contain'): void {
+    this.getLane(laneId).el.style.objectFit = fit;
+  }
+
   /** Release the current source but keep the element+instance for reuse. */
   release(laneId: LaneId): void {
     const lane = this.getLane(laneId);
@@ -398,6 +416,20 @@ class VideoEngineImpl {
         /* noop */
       }
     });
+  }
+
+  /** Read the last known playback position for a post (session-scoped). */
+  getLastPos(postId: string | null | undefined): number {
+    if (!postId) return 0;
+    return this.lastPos.get(postId) ?? 0;
+  }
+
+  /** [V1] DBG-gated structured trace for two-way resume verification. */
+  trace(tag: string, data?: Record<string, unknown>): void {
+    if (typeof window !== 'undefined' && (window as any).__VIDEO_ENGINE_DBG__) {
+      // eslint-disable-next-line no-console
+      console.info(`[V1] ${tag}`, data ?? {});
+    }
   }
 
   /** Test-only utility: list lane ids currently registered. */

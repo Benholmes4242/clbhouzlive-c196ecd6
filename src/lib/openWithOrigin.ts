@@ -16,6 +16,7 @@
  */
 import type { FeedPost } from '@/components/media-system/types/media';
 import { useFullscreenFeedStore, type OpenOrigin } from '@/store/fullscreenFeedStore';
+import { VideoEngine } from '@/video/VideoEngine';
 // [VIDEOSTUB] HLSPoolManager + mobileVideoDebug imports removed — engine severed.
 
 
@@ -78,9 +79,23 @@ export function openWithOrigin({
   const origin = snapshotOrigin(originEl, posterUrl ?? null);
   const postId = (posts[index] as any)?.id ?? null;
 
+  // [V1] Two-way resume: prefer the live feed-active lane time when it's
+  // playing the tapped post; fall back to the engine's session lastPos map.
+  let startPosition = 0;
+  try {
+    const feedSnap = VideoEngine.snapshot('feed-active');
+    if (postId && feedSnap.currentTime > 0) {
+      startPosition = feedSnap.currentTime;
+    } else if (postId) {
+      startPosition = VideoEngine.getLastPos(postId);
+    }
+    VideoEngine.trace('V1_TAP', { postId, feedTime: startPosition });
+  } catch {
+    /* engine may not be booted yet on deep-link openers */
+  }
+
   // [VIDEOSTUB] Handoff + pool manager removed — poster-only chassis.
   void handOffUrls;
-  void postId;
 
   // Chrome flip at TAP time (not effect time) to kill the strobe. Scroll
   // lock is owned by the overlay's isOpen effect (ref-counted so it composes
@@ -98,5 +113,6 @@ export function openWithOrigin({
   useFullscreenFeedStore.getState().open(posts, index, {
     ...(options ?? {}),
     origin,
+    startPosition,
   });
 }

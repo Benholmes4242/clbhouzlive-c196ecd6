@@ -15,6 +15,7 @@ export interface UseVideoLaneOptions {
   startPosition?: number;
   active?: boolean;
   muted?: boolean;
+  postId?: string | null;
 }
 
 export interface UseVideoLaneResult {
@@ -58,8 +59,9 @@ export function useVideoLane(
       hlsUrl: opts.hlsUrl,
       posterUrl: opts.posterUrl ?? null,
       startPosition: opts.startPosition ?? -1,
+      postId: opts.postId ?? null,
     });
-  }, [laneId, opts.hlsUrl, opts.posterUrl, opts.startPosition]);
+  }, [laneId, opts.hlsUrl, opts.posterUrl, opts.startPosition, opts.postId]);
 
   // Auto play/pause based on `active`.
   useEffect(() => {
