@@ -85,11 +85,6 @@ export const InlineVideo: React.FC<Props> = ({
   // Used to detect "denied at preload, now active" → retry attach.
   const attachedRef = useRef(false);
   const cancelledRef = useRef(false);
-  // Ordering-independent play flag: set when a return-seek settles while the
-  // tile is not yet active. The [isActive] effect below issues play() as soon
-  // as the tile flips active, closing the 1-2 frame gap where scroll-restore
-  // and emitClose can race.
-  const pendingPlayAfterActiveRef = useRef(false);
 
   // Stable attach routine — callable from the [isNear] effect AND from the
   // [isActive] retry effect (P1-E: denied slot recovers when promoted to playing).
@@ -138,19 +133,14 @@ export const InlineVideo: React.FC<Props> = ({
     if (hlsUrl) {
       logTileLife(tag, feedIndex, 'ATTACH_START');
       attachedRef.current = true;
-      // FLIP handoff continuity: tile consumes ONLY the RETURN entry BEFORE
-      // attach so useHlsPool can thread startPosition into hls.js — the tile
-      // re-fetches at the return position instead of restarting at 0.
-      const back = flipContinuity.consumeReturn(hlsUrl);
-      const startPos = back && back.t > 0.05 ? back.t : undefined;
-      pool.attach(hlsUrl, video, mp4Url, 'feed', startPos).then(() => {
+      pool.attach(hlsUrl, video, mp4Url, 'feed').then(() => {
         if (cancelledRef.current) {
           logTileLife(tag, feedIndex, 'ATTACH_CANCELLED');
           return;
         }
         logTileLife(tag, feedIndex, 'ATTACH_DONE', { readyState: video.readyState });
         try {
-          if (startPos == null && video.currentTime < 0.001) {
+          if (video.currentTime < 0.001) {
             video.currentTime = 0.001;
           }
         } catch {}
@@ -161,14 +151,9 @@ export const InlineVideo: React.FC<Props> = ({
           active: isActiveRef.current,
           paused: video.paused,
         });
-        // Ordering-independent resume: if this tile is the active slot now,
-        // play immediately. Otherwise arm the flag and let the [isActive]
-        // effect fire play() when the slot flips active (covers the
-        // scroll-restore-vs-emitClose race without depending on ordering).
-        if (isActiveRef.current) {
-          if (video.paused) video.play().catch(() => {});
-        } else if (startPos != null) {
-          pendingPlayAfterActiveRef.current = true;
+        // Resume autoplay if this tile is the active slot after attach settles.
+        if (isActiveRef.current && video.paused) {
+          video.play().catch(() => {});
         }
       });
     } else if (mp4Url) {
