@@ -28,6 +28,7 @@ import { useActiveActor } from '@/context/ActiveActorContext';
 
 import type { FeedPost } from '@/components/media-system/types/media';
 import { InlineVideo } from './InlineVideo';
+import * as feedTelemetry from '@/lib/feedTelemetry';
 import LqipUnderlay from '@/components/shared/LqipUnderlay';
 import { MediaCarousel } from './MediaCarousel';
 import { FeedFollowPill } from './FeedFollowPill';
@@ -603,6 +604,7 @@ const FeedCardImpl: React.FC<FeedCardProps> = ({
                       src={media.thumbnailUrl}
                       alt={post.caption || post.displayName}
                       loading="lazy"
+                      onLoad={() => { if (feedIndex != null) feedTelemetry.markPoster(feedIndex); }}
                       style={{
                         position: 'absolute',
                         inset: 0,
@@ -625,6 +627,7 @@ const FeedCardImpl: React.FC<FeedCardProps> = ({
                     src={mediaUrl}
                     alt={post.caption || post.displayName}
                     loading="lazy"
+                    onLoad={() => { if (feedIndex != null) feedTelemetry.markPoster(feedIndex); }}
                     style={{
                       position: 'absolute',
                       inset: 0,

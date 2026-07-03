@@ -26,6 +26,7 @@ import { useFullscreenFeedStore } from '@/store/fullscreenFeedStore';
 import { openWithOrigin } from '@/lib/openWithOrigin';
 import { useClubhouseStore } from '@/store/clubhouseStore';
 import { prefetchTile } from '@/hooks/useTileVideoPlayer';
+import * as feedTelemetry from '@/lib/feedTelemetry';
 import { FeedCard } from './FeedCard';
 
 const CANVAS = '#15171F';
@@ -237,8 +238,10 @@ export const CardFeed = forwardRef<CardFeedHandle, CardFeedProps>(function CardF
         for (const e of entries) {
           const idx = Number((e.target as HTMLElement).dataset.cardIndex);
           if (Number.isNaN(idx)) continue;
-          if (e.isIntersecting) visibilityRef.current.set(idx, e.intersectionRatio);
-          else visibilityRef.current.delete(idx);
+          if (e.isIntersecting) {
+            visibilityRef.current.set(idx, e.intersectionRatio);
+            if (e.intersectionRatio >= 0.5) feedTelemetry.markVisible(idx);
+          } else visibilityRef.current.delete(idx);
         }
         recheckActive();
       },
@@ -292,7 +295,12 @@ export const CardFeed = forwardRef<CardFeedHandle, CardFeedProps>(function CardF
   // owning tab's slot so switching back retains the centred card.
   useEffect(() => {
     setActiveIndex(activeIdx, tab);
-  }, [activeIdx, setActiveIndex, tab]);
+    const post = posts[activeIdx];
+    const media = post?.mediaItems?.[0];
+    const kind: 'img' | 'vid' | 'mix' | '?' =
+      !media ? '?' : media.type === 'video' ? 'vid' : (post?.mediaItems?.length ?? 0) > 1 ? 'mix' : 'img';
+    feedTelemetry.markSwipe(activeIdx, kind);
+  }, [activeIdx, setActiveIndex, tab, posts]);
 
   // Warm-start the next 1-2 upcoming videos so they play instantly on arrival.
   useEffect(() => {
@@ -510,6 +518,7 @@ export const CardFeed = forwardRef<CardFeedHandle, CardFeedProps>(function CardF
         // Snap to resting position and fire
         pullRef.current = PTR_THRESHOLD;
         setPull(PTR_THRESHOLD);
+        feedTelemetry.markPTR();
         Promise.resolve(onRefresh()).catch(() => {});
       } else {
         pullRef.current = 0;
