@@ -8,6 +8,7 @@ import { SnapFeed } from '@/components/feed/SnapFeed';
 import { ClubhouseSkeletonShimmer } from '@/components/clubhouse/ClubhouseSkeletonShimmer';
 import { pauseAllAudio } from '@/utils/globalVideoMute';
 import { lockBodyScroll, unlockBodyScroll } from '@/lib/bodyScrollLock';
+import { flipContinuity } from '@/media/flipContinuity';
 
 import { FeedOverlayLayer } from '@/components/feed/FeedOverlayLayer';
 import { FullscreenCarouselOverlay } from '@/components/media/FullscreenCarouselOverlay';
@@ -168,6 +169,12 @@ export function FullscreenFeedOverlay() {
         if (shield) shield.style.backgroundColor = 'transparent';
         document.documentElement.style.backgroundColor = '';
         document.body.style.backgroundColor = '';
+
+        // FLIP handoff return — tell every origin tile whose url was handed off
+        // to re-promote from the pool and seek to its last known playhead.
+        // Deferred so the fullscreen SnapFeed has finished unmounting (and
+        // demoting its promoted instance back to the pool) first.
+        setTimeout(() => flipContinuity.emitClose(), 0);
 
         // Restore #root scroll position on the next frame so the feed's scroll
         // height is settled after the overlay unmounts.

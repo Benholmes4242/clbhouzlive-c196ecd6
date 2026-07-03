@@ -14,6 +14,7 @@ import { DecoderLimitManager } from '@/utils/video/DecoderLimitManager';
 import { extractCloudflareUid } from '@/utils/videoIdUtils';
 import { logTileLife, attachVideoEventLoggers, isVideoDebugOn } from '@/media/mobileVideoDebug';
 import { HLSPoolManager } from '@/media/HLSPoolManager';
+import { flipContinuity } from '@/media/flipContinuity';
 
 import type { MediaItem } from '@/components/media-system/types/media';
 
@@ -138,8 +139,19 @@ export const InlineVideo: React.FC<Props> = ({
           return;
         }
         logTileLife(tag, feedIndex, 'ATTACH_DONE', { readyState: video.readyState });
+        // FLIP handoff continuity: seek to the playhead captured by
+        // openWithOrigin (fullscreen open) OR by emitClose (feed-tile return)
+        // BEFORE any play() call. Falls back to the tiny nudge that forces a
+        // first frame paint.
+        const start = flipContinuity.consumeStart(hlsUrl);
+        const back = flipContinuity.consumeReturn(hlsUrl);
+        const seekTo = start?.t ?? back?.t ?? null;
         try {
-          if (video.currentTime < 0.001) video.currentTime = 0.001;
+          if (seekTo != null && seekTo > 0.05) {
+            video.currentTime = seekTo;
+          } else if (video.currentTime < 0.001) {
+            video.currentTime = 0.001;
+          }
         } catch {}
         setAttachToken((t) => t + 1);
         logTileLife(tag, feedIndex, 'ATTACH_SETTLED', {
@@ -148,7 +160,8 @@ export const InlineVideo: React.FC<Props> = ({
           active: isActiveRef.current,
           paused: video.paused,
         });
-        if (isActiveRef.current && video.paused) {
+        const shouldPlay = isActiveRef.current && video.paused && (start?.wasPlaying !== false);
+        if (shouldPlay) {
           video.play().catch(() => {});
         }
       });
@@ -262,6 +275,33 @@ export const InlineVideo: React.FC<Props> = ({
     [],
   );
 
+  // FLIP handoff return: when the fullscreen viewer closes, any tile whose
+  // url was handed off has a stale, detached hlsRef. Snapshot the last known
+  // playhead as a return entry, tear the stale ref down, and re-attempt the
+  // attach. ATTACH_DONE will consume the return entry and seek back to the
+  // playhead. The poster underlay (below) covers the reattach gap so the
+  // user never sees black.
+  useEffect(() => {
+    if (!hlsUrl) return;
+    return flipContinuity.onClose(() => {
+      if (!flipContinuity.wasHandedOff(hlsUrl)) return;
+      const video = videoRef.current;
+      if (!video) return;
+      const last = flipContinuity.getLast(hlsUrl) ?? (Number.isFinite(video.currentTime) ? video.currentTime : 0);
+      flipContinuity.setReturn(hlsUrl, { t: Math.max(0, last) });
+      flipContinuity.clearHandOff(hlsUrl);
+      // Defer to next tick so the fullscreen surface has finished demoting.
+      setTimeout(() => {
+        if (!videoRef.current) return;
+        pool.teardown(hlsUrl);
+        attachedRef.current = false;
+        reset();
+        attemptAttach();
+      }, 0);
+    });
+  }, [hlsUrl, pool, reset, attemptAttach]);
+
+
   // Duration + playhead tracking for gapless-loop (<15s) and progress bar (>20s).
   const [duration, setDuration] = useState(0);
   const [progress, setProgress] = useState(0); // 0..1
@@ -274,6 +314,12 @@ export const InlineVideo: React.FC<Props> = ({
   const handleTimeUpdate = useCallback(() => {
     const v = videoRef.current;
     if (!v) return;
+    // Write playhead for FLIP handoff continuity (last-writer-wins). On
+    // fullscreen close, the origin tile reads this to resume where the viewer
+    // left off, instead of restarting at 0.
+    if (hlsUrl && Number.isFinite(v.currentTime)) {
+      flipContinuity.writeLast(hlsUrl, v.currentTime);
+    }
     const d = duration || (Number.isFinite(v.duration) ? v.duration : 0);
     if (d <= 0) return;
     // Gapless manual loop for short clips: pre-empt the native loop gap.
@@ -287,16 +333,38 @@ export const InlineVideo: React.FC<Props> = ({
     if (d > 20) {
       setProgress(Math.max(0, Math.min(1, v.currentTime / d)));
     }
-  }, [duration]);
+  }, [duration, hlsUrl]);
   // Native loop only for >=15s clips; short clips use the manual seek above.
   const useNativeLoop = duration === 0 || duration >= 15;
   const showProgress = duration > 20 && hasFirstFrame;
+
+  const posterUrl = (item as any).thumbnailUrl as string | undefined;
 
   return (
     <div
       ref={containerRef}
       style={{ position: 'absolute', inset: 0, backgroundColor: '#0a0a0a' }}
     >
+      {/* Poster underlay — the never-black fallback. Sits under the <video>
+          (zIndex 0) and stays mounted so the FLIP-return re-attach gap is
+          covered by the real thumbnail instead of a black frame. */}
+      {posterUrl && (
+        <img
+          src={posterUrl}
+          alt=""
+          aria-hidden
+          style={{
+            position: 'absolute',
+            inset: 0,
+            width: '100%',
+            height: '100%',
+            objectFit,
+            display: 'block',
+            zIndex: 0,
+            pointerEvents: 'none',
+          }}
+        />
+      )}
       <video
         ref={videoRef}
         muted
@@ -312,7 +380,7 @@ export const InlineVideo: React.FC<Props> = ({
           height: '100%',
           objectFit,
           display: 'block',
-          backgroundColor: '#0a0a0a',
+          backgroundColor: 'transparent',
           opacity: hasFirstFrame ? 1 : 0,
           transition: 'opacity 120ms ease-out',
           zIndex: 1,
