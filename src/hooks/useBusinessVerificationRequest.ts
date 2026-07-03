@@ -70,6 +70,10 @@ export function deriveVerificationState(
   // Cancelled requests are treated as never-applied: the Get-verified prompt
   // should show again. Explicit mapping so this is not a silent fall-through.
   if (request.status === 'cancelled') return 'none';
+  // Superseded means a newer request has taken over. This row is terminal and
+  // no longer represents the live state, so map to 'none' - the newer row
+  // (fetched by created_at DESC LIMIT 1) will drive the actual state.
+  if (request.status === 'superseded') return 'none';
   if (request.status === 'approved') return 'verified';
   return 'none';
 }
