@@ -74,6 +74,8 @@ export default function DomainStep({ businessId, onDone }: Props) {
 
   const domain = request?.domain;
 
+  // requires_domain_check is admin-initiated; the client never sets this.
+  // When true the owner must complete this Domain step before an admin can approve.
   if (!request?.requires_domain_check) {
     return (
       <div className="text-center py-12">
