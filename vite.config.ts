@@ -32,8 +32,7 @@ export default defineConfig(({ mode }) => ({
           'react-vendor': ['react', 'react-dom', 'react-router-dom'],
           // Supabase client
           'supabase': ['@supabase/supabase-js'],
-          // HLS.js - lazy loaded when needed
-          'hls': ['hls.js'],
+
           // UI components - radix primitives
           'ui-core': [
             '@radix-ui/react-dialog',
@@ -58,7 +57,7 @@ export default defineConfig(({ mode }) => ({
     pure: mode === 'production' ? ['console.log', 'console.debug'] : [],
   },
   optimizeDeps: {
-    include: ['@supabase/supabase-js', '@tanstack/react-query', 'hls.js'],
+    include: ['@supabase/supabase-js', '@tanstack/react-query'],
   },
   worker: {
     format: 'es',
