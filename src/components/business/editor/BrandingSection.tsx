@@ -114,7 +114,7 @@ export function BrandingSection({
                 </div>
               ) : (
                 <div
-                  className="aspect-[3.2/1] rounded-xl border-2 border-dashed flex flex-col items-center justify-center"
+                  className="aspect-[3/2] rounded-xl border-2 border-dashed flex flex-col items-center justify-center"
                   style={{ borderColor: BIZ.hairDashed, background: 'rgba(15,23,42,0.03)' }}
                 >
                   <div
