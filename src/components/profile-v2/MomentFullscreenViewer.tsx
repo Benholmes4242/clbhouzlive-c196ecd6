@@ -30,20 +30,16 @@ export const MomentFullscreenViewer: React.FC<MomentFullscreenViewerProps> = ({
   onOpenChange,
   onIndexChange,
 }) => {
-  const playerRef = useRef<HLSPlayerRef>(null);
-  const [isVideoReady, setIsVideoReady] = useState(false);
   const currentMoment = moments[currentIndex];
 
   const goToPrev = useCallback(() => {
     if (currentIndex > 0) {
-      setIsVideoReady(false);
       onIndexChange(currentIndex - 1);
     }
   }, [currentIndex, onIndexChange]);
 
   const goToNext = useCallback(() => {
     if (currentIndex < moments.length - 1) {
-      setIsVideoReady(false);
       onIndexChange(currentIndex + 1);
     }
   }, [currentIndex, moments.length, onIndexChange]);
@@ -54,17 +50,14 @@ export const MomentFullscreenViewer: React.FC<MomentFullscreenViewerProps> = ({
     trackMouse: false,
   });
 
-  const handleCanPlayThrough = useCallback(() => {
-    setIsVideoReady(true);
-  }, []);
-
   if (!currentMoment) return null;
 
-  // Extract stream info for HLS playback
+  // Poster-only chassis: derive a still frame for video moments.
   const isVideo = currentMoment.mediaType === 'video';
   const streamId = isVideo ? uidFromNode({ src: currentMoment.mediaUrl }) : null;
-  const hlsUrl = streamId ? generateStreamHlsUrl(streamId) : currentMoment.mediaUrl;
-  const posterUrl = streamId ? generateStreamThumbnailUrl(streamId, { height: 1080 }) : undefined;
+  const posterUrl = streamId
+    ? generateStreamThumbnailUrl(streamId, { height: 1080 })
+    : (isVideo ? undefined : currentMoment.mediaUrl);
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
