@@ -33,8 +33,7 @@ import { RehydrationProvider } from './contexts/RehydrationContext';
 // These competed with MediaRuntime for playback control.
 // All playback is now centralized in MediaSystemProvider.
 import { MediaSystemProvider } from './media';
-// Eagerly preload hls.js at app startup to eliminate first-load delay
-import '@/utils/hlsLoader';
+// [VIDEO-TEARDOWN] hlsLoader boot import removed — engine severed.
 import { useImageUploadSafeguard } from '@/hooks/useImageUploadSafeguard';
 import { useGlobalMemoryMonitor } from '@/hooks/useMemoryMonitor';
 import { usePresenceTracker } from '@/hooks/usePresenceTracker';
