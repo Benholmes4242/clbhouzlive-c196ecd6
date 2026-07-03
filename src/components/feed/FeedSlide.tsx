@@ -258,11 +258,12 @@ const FullscreenVideoSlot: React.FC<{
   }, [isActive, postId, startPosition]);
 
   React.useEffect(() => {
-    // On unmount/deactivation, persist fullscreen time so the tile resumes.
+    // On unmount/deactivation the engine has already been tracking
+    // currentTime -> lastPos[postId] via onTimeUpdate. Just emit V1_CLOSE
+    // for verification; no manual write needed.
     return () => {
-      const t = VideoEngine.snapshot('fullscreen').currentTime;
+      const t = VideoEngine.getLastPos(postId);
       if (postId && t > 0) {
-        VideoEngine.lastPos.set(postId, t);
         VideoEngine.trace('V1_CLOSE', { postId, fsTime: t });
       }
     };
