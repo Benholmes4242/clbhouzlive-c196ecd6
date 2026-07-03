@@ -207,18 +207,8 @@ export function SnapFeed({
     };
   }, [setActiveIndex]);
 
-  // Fullscreen-only pruning: on each active-index change, evict any 'fullscreen'-
-  // tagged pool entries that aren't in the 3-URL keep-window [active-1, active, active+1].
-  // Feed-tagged entries are untouchable by this path (pruneSurface filters by surface).
-  useEffect(() => {
-    if (surface !== 'fullscreen') return;
-    const keep: string[] = [];
-    for (const i of [activeIndex - 1, activeIndex, activeIndex + 1]) {
-      const u = postsRef.current[i]?.mediaItems?.[0]?.hlsUrl;
-      if (u) keep.push(u);
-    }
-    HLSPoolManager.pruneSurface('fullscreen', keep);
-  }, [activeIndex, surface]);
+  // Stage B3 teardown: fullscreen HLS-pool pruning removed (no pool anymore).
+
 
 
 
