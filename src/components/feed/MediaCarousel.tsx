@@ -109,14 +109,15 @@ export const MediaCarousel: React.FC<Props> = ({
           const url = m.imageUrl || m.thumbnailUrl || '';
           const isVideo = m.type === 'video';
           const isActiveSlide = isCardActive && i === active;
+          const handleTap = createTapHandler({
+            onSingle: (e) => { e.stopPropagation(); onOpen(i); },
+            onDouble: (e) => { e.stopPropagation(); onDoubleTap?.(); },
+          });
           return (
             <button
               type="button"
               key={m.id || i}
-              onClick={(e) => {
-                e.stopPropagation();
-                onOpen(i);
-              }}
+              onClick={onDoubleTap ? handleTap : (e) => { e.stopPropagation(); onOpen(i); }}
               style={{
                 flex: '0 0 100%',
                 width: '100%',
