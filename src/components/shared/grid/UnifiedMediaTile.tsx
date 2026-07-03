@@ -257,69 +257,37 @@ const UnifiedMediaTile: React.FC<UnifiedMediaTileProps> = ({
           style={pixelLayerStyle}
         >
           {/* Thumbnail - with shimmer base, fade-in, and error fallback */}
-          {(!isVideo || !isVideoReady) && (
-            <>
-              {/* Shimmer base layer - visible until poster loads */}
-              {!isPosterLoaded && !isPosterBroken && (
-                <div className="absolute inset-0 bg-muted overflow-hidden">
-                  <div className="absolute inset-0 -translate-x-full animate-[shimmer_1.5s_infinite] bg-gradient-to-r from-transparent via-background/40 to-transparent" />
-                </div>
-              )}
-              {/* Broken image fallback */}
-              {isPosterBroken && (
-                <div className="absolute inset-0 bg-muted flex items-center justify-center">
-                  <Images className="h-6 w-6 text-muted-foreground/40" />
-                </div>
-              )}
-              {/* Poster image with fade-in */}
-              {!isPosterBroken && (
-                <img
-                  src={thumbnailSrc}
-                  alt=""
-                  className={cn(
-                    "absolute inset-0 h-full w-full object-cover transition-opacity duration-200",
-                    isPosterLoaded ? "opacity-100" : "opacity-0"
-                  )}
-                  loading={index < 3 ? "eager" : "lazy"}
-                  fetchPriority={tilePriority(index)}
-                  draggable={false}
-                  onLoad={() => setIsPosterLoaded(true)}
-                  onError={() => setIsPosterBroken(true)}
-                />
-              )}
-            </>
-          )}
-
-          {/* Video layer - uses UnifiedVideoPlayer with 150ms crossfade */}
-          {/* FIX: Use postId as mediaId to match registration ID and ensure playingIds check works */}
-          {isVideo && isAutoplayCandidate && item.playbackUrl && config.autoplayEnabled && (
-            <div className={cn(
-              "absolute inset-0 transition-opacity duration-150 ease-out",
-              isVideoReady ? "opacity-100" : "opacity-0"
-            )}>
-              <UnifiedVideoPlayer
-                ref={playerRef}
-                src={item.playbackUrl}
-                autoplay={shouldPlay}
-                muted
-                loop
-                objectFit="cover"
-                managedByMediaRuntime={false}
-                preload="auto"
-                surface={mapGridSurfaceToMediaSurface(config.surface)}
-                mediaId={item.postId}
-                onLoadedData={handleCanPlay}
-                className="absolute inset-0 h-full w-full"
+          {/* [VIDEOSTUB] Poster-only: video tiles render <img> where <video> was */}
+          <>
+            {/* Shimmer base layer - visible until poster loads */}
+            {!isPosterLoaded && !isPosterBroken && (
+              <div className="absolute inset-0 bg-muted overflow-hidden">
+                <div className="absolute inset-0 -translate-x-full animate-[shimmer_1.5s_infinite] bg-gradient-to-r from-transparent via-background/40 to-transparent" />
+              </div>
+            )}
+            {/* Broken image fallback */}
+            {isPosterBroken && (
+              <div className="absolute inset-0 bg-muted flex items-center justify-center">
+                <Images className="h-6 w-6 text-muted-foreground/40" />
+              </div>
+            )}
+            {/* Poster image with fade-in */}
+            {!isPosterBroken && (
+              <img
+                src={thumbnailSrc}
+                alt=""
+                className={cn(
+                  "absolute inset-0 h-full w-full object-cover transition-opacity duration-200",
+                  isPosterLoaded ? "opacity-100" : "opacity-0"
+                )}
+                loading={index < 3 ? "eager" : "lazy"}
+                fetchPriority={tilePriority(index)}
+                draggable={false}
+                onLoad={() => setIsPosterLoaded(true)}
+                onError={() => setIsPosterBroken(true)}
               />
-            </div>
-          )}
-          
-           {/* Grey shimmer loading state (Watch tab standard) */}
-           {isVideo && isAutoplayCandidate && config.autoplayEnabled && !isVideoReady && !isVisible && (
-            <div className="absolute inset-0 bg-muted overflow-hidden">
-              <div className="absolute inset-0 -translate-x-full animate-[shimmer_1.5s_infinite] bg-gradient-to-r from-transparent via-background/40 to-transparent" />
-            </div>
-          )}
+            )}
+          </>
         </div>
       </div>
 
@@ -331,10 +299,7 @@ const UnifiedMediaTile: React.FC<UnifiedMediaTileProps> = ({
         />
       )}
 
-      {/* Video scrubber - positioned at bottom of media, above gradient/meta */}
-      {isVideo && videoEl && (
-        <VideoScrubber videoEl={videoEl} height={3} />
-      )}
+      {/* [VIDEOSTUB] Video scrubber removed — no live video element */}
 
       {/* Bottom gradient overlay (Watch tab standard: from-black/70, bottom 1/3) */}
       <div className="pointer-events-none absolute bottom-0 left-0 right-0 h-1/3 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
