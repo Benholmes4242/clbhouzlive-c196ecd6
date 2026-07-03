@@ -108,6 +108,7 @@ export const SnapVideoPlayer = memo(function SnapVideoPlayer({
         }
         setAttachToken((t) => t + 1);
         try { if (video.currentTime < 0.001) video.currentTime = 0.001; } catch {}
+      });
       return () => { cancelled = true; };
     } else {
       pool.teardown(hlsUrl);
