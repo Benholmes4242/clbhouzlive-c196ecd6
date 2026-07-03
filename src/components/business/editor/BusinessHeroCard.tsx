@@ -1,6 +1,5 @@
 import React, { useRef } from 'react';
 import { Camera, Plus } from 'lucide-react';
-import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { BIZ } from '@/components/business/businessTokens';
 
 interface Props {
@@ -41,12 +40,12 @@ export function BusinessHeroCard({
           border: '1px solid rgba(15,23,42,0.07)',
         }}
       >
-        {/* Cover */}
+        {/* Cover — matches personal HeaderPhotoCard bare (132px) */}
         <label
           className="block relative cursor-pointer"
           style={{
             width: '100%',
-            aspectRatio: '3.2 / 1',
+            height: 132,
             background: coverUrl
               ? 'transparent'
               : 'linear-gradient(135deg,#E2E8F0,#F1F5F9)',
@@ -68,8 +67,7 @@ export function BusinessHeroCard({
             <img
               src={coverUrl}
               alt=""
-              className="w-full h-full object-cover"
-              style={{ display: 'block' }}
+              style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
             />
           )}
           <span
@@ -82,6 +80,7 @@ export function BusinessHeroCard({
               gap: 6,
               background: 'rgba(0,0,0,0.45)',
               color: '#fff',
+              fontFamily: 'Geist, -apple-system, sans-serif',
               fontSize: 12.5,
               fontWeight: 500,
               padding: '7px 11px',
@@ -96,7 +95,7 @@ export function BusinessHeroCard({
           </span>
         </label>
 
-        {/* Logo row */}
+        {/* Logo row — matches personal ProfilePhotoCard bare (78×78, 34% squircle, 3px white border) */}
         <div
           className="relative"
           style={{ padding: '0 16px 14px', marginTop: -34 }}
@@ -110,11 +109,12 @@ export function BusinessHeroCard({
                   display: 'block',
                   width: 78,
                   height: 78,
-                  borderRadius: '24px',
+                  borderRadius: '34%',
                   overflow: 'hidden',
                   background: '#E2E8F0',
                   border: '3px solid #ffffff',
                   boxShadow: '0 2px 10px rgba(0,0,0,0.10)',
+                  padding: 0,
                 }}
               >
                 <input
@@ -128,12 +128,30 @@ export function BusinessHeroCard({
                     if (logoInput.current) logoInput.current.value = '';
                   }}
                 />
-                <SquircleAvatar
-                  key={logoUrl || 'empty'}
-                  src={logoUrl || undefined}
-                  fallback={resolvedName?.[0] || 'B'}
-                  size={72}
-                />
+                {logoUrl ? (
+                  <img
+                    src={logoUrl}
+                    alt=""
+                    style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
+                  />
+                ) : (
+                  <div
+                    style={{
+                      width: '100%',
+                      height: '100%',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      background: 'linear-gradient(135deg,#F1F5F9,#E2E8F0)',
+                      color: '#94A3B8',
+                      fontFamily: 'Geist, -apple-system, sans-serif',
+                      fontSize: 24,
+                      fontWeight: 600,
+                    }}
+                  >
+                    {resolvedName?.[0]?.toUpperCase() || 'B'}
+                  </div>
+                )}
               </label>
               <button
                 type="button"
