@@ -1,41 +1,25 @@
 /**
- * Global video audio mutex
- * Ensures only one video source plays audio at a time across the entire app.
- * All video surfaces must register here and call pauseAllExcept() before unmuting.
+ * Global video audio mutex — inert (Stage C, BRIEF_VIDEO_TEARDOWN.md).
+ *
+ * No video plays in the poster-only chassis, so there's nothing to mute/pause.
+ * The exports are preserved as no-ops so every caller continues to compile.
+ * Rewire to the new engine when it lands.
  */
 
 type PauseCallback = () => void;
 
-const registry = new Map<string, PauseCallback>();
-
-/** Register a video surface with a callback that pauses/mutes it */
-export function registerAudioSource(id: string, pauseFn: PauseCallback): void {
-  registry.set(id, pauseFn);
+export function registerAudioSource(_id: string, _pauseFn: PauseCallback): void {
+  // no-op
 }
 
-/** Unregister when component unmounts */
-export function unregisterAudioSource(id: string): void {
-  registry.delete(id);
+export function unregisterAudioSource(_id: string): void {
+  // no-op
 }
 
-/**
- * Pause all registered audio sources except the one with the given ID.
- * Call this before unmuting any video.
- */
-export function pauseAllExcept(exceptId: string): void {
-  for (const [id, pauseFn] of registry) {
-    if (id !== exceptId) {
-      try { pauseFn(); } catch { /* silent */ }
-    }
-  }
+export function pauseAllExcept(_exceptId: string): void {
+  // no-op
 }
 
-/**
- * Pause ALL registered audio sources.
- * Call this when opening any overlay or navigating away.
- */
 export function pauseAllAudio(): void {
-  for (const pauseFn of registry.values()) {
-    try { pauseFn(); } catch { /* silent */ }
-  }
+  // no-op
 }
