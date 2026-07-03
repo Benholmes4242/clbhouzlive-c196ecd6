@@ -15,6 +15,7 @@ export interface HlsPoolHandle {
     video: HTMLVideoElement,
     mp4Fallback?: string,
     surface?: 'feed' | 'fullscreen',
+    startPosition?: number,
   ) => Promise<void>;
   teardown: (hlsUrl: string) => void;
 }
@@ -23,20 +24,39 @@ export function useHlsPool(): HlsPoolHandle {
   const hlsRef = useRef<any>(null);
 
   const attach = useCallback(
-    async (hlsUrl: string, video: HTMLVideoElement, mp4Fallback?: string, surface: 'feed' | 'fullscreen' = 'feed') => {
+    async (
+      hlsUrl: string,
+      video: HTMLVideoElement,
+      mp4Fallback?: string,
+      surface: 'feed' | 'fullscreen' = 'feed',
+      startPosition?: number,
+    ) => {
       const { default: Hls } = await import('hls.js');
+
+      const hasStart = startPosition != null && startPosition > 0.05;
 
       // Native HLS (iOS Safari): no hls.js instance, pool not applicable.
       if (!Hls.isSupported()) {
         if (hlsUrl) video.src = hlsUrl;
         else if (mp4Fallback) video.src = mp4Fallback;
+        if (hasStart) {
+          const seek = () => { try { video.currentTime = startPosition!; } catch {} };
+          if (video.readyState >= 1) seek();
+          else video.addEventListener('loadedmetadata', seek, { once: true });
+        }
         return;
       }
 
-      // Pool first — instant reuse.
-      const pooled = HLSPoolManager.promote(hlsUrl, video);
+      // Pool first — instant reuse. Thread startPosition so hls.js starts
+      // fetching segments at the seek point (not 0).
+      const pooled = HLSPoolManager.promote(hlsUrl, video, hasStart ? startPosition : undefined);
       if (pooled) {
-        pooled.startLoad();
+        if (hasStart) {
+          try { video.currentTime = startPosition!; } catch {}
+          try { pooled.startLoad(startPosition!); } catch { try { pooled.startLoad(); } catch {} }
+        } else {
+          pooled.startLoad();
+        }
         pooled.on(Hls.Events.FRAG_LOADED, (_: any, d: any) => {
           if (d.frag?.stats?.bwEstimate > 0)
             saveSharedBandwidth(d.frag.stats.bwEstimate);
@@ -53,9 +73,17 @@ export function useHlsPool(): HlsPoolHandle {
         maxBufferLength: 12,
         maxMaxBufferLength: 24,
         enableWorker: true,
+        startPosition: hasStart ? startPosition! : -1,
       });
       hls.loadSource(hlsUrl);
       hls.attachMedia(video);
+      // Seek inside MEDIA_ATTACHED so hls.js's own sourceopen startPosition
+      // handling doesn't clobber a post-attach microtask seek.
+      hls.once(Hls.Events.MEDIA_ATTACHED, () => {
+        if (hasStart) {
+          try { video.currentTime = startPosition!; } catch {}
+        }
+      });
       hls.on(Hls.Events.MANIFEST_PARSED, () => {
         if (hlsUrl && !HLSPoolManager.has(hlsUrl)) {
           try {
