@@ -18,11 +18,17 @@
  *                          firstframe p50=190 p95=640 max=1420
  */
 
+import { isPerfEnabled } from '@/perf/navTiming';
+
 const FLAG_KEY = 'FEED_TELEMETRY';
+const AUTO_FLUSH_EVERY = 20;
 
 function on(): boolean {
   try {
-    return typeof localStorage !== 'undefined' && localStorage.getItem(FLAG_KEY) === '1';
+    if (typeof localStorage !== 'undefined' && localStorage.getItem(FLAG_KEY) === '1') return true;
+  } catch {}
+  try {
+    return isPerfEnabled();
   } catch {
     return false;
   }
