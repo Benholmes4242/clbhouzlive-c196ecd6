@@ -25,7 +25,6 @@ import type { ActiveActor } from '@/types/actor';
 import { useFullscreenFeedStore } from '@/store/fullscreenFeedStore';
 import { openWithOrigin } from '@/lib/openWithOrigin';
 import { useClubhouseStore } from '@/store/clubhouseStore';
-import { prefetchTile } from '@/hooks/useTileVideoPlayer';
 
 import { FeedCard } from './FeedCard';
 
@@ -307,7 +306,6 @@ export const CardFeed = forwardRef<CardFeedHandle, CardFeedProps>(function CardF
       if (!next) continue;
       const media = next.mediaItems?.[0];
       const hlsUrl = media?.hlsUrl;
-      if (hlsUrl) prefetchTile(hlsUrl);
     }
   }, [activeIdx, posts]);
 
@@ -316,7 +314,6 @@ export const CardFeed = forwardRef<CardFeedHandle, CardFeedProps>(function CardF
     if (!posts?.length) return;
     [0, 1].forEach((i) => {
       const hlsUrl = posts[i]?.mediaItems?.[0]?.hlsUrl;
-      if (hlsUrl) prefetchTile(hlsUrl);
     });
   }, [posts?.length]);
 
@@ -333,7 +330,6 @@ export const CardFeed = forwardRef<CardFeedHandle, CardFeedProps>(function CardF
     registerTabWarmer(tab, () => {
       const idx = activeIdxRef.current;
       const hlsUrl = postsRef.current[idx]?.mediaItems?.[0]?.hlsUrl;
-      if (hlsUrl) prefetchTile(hlsUrl);
     });
     return () => { registerTabWarmer(tab, null); };
   }, [tab, registerTabWarmer]);

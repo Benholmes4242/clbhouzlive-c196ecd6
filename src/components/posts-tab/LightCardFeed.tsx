@@ -20,7 +20,6 @@ import type { ActiveActor } from '@/types/actor';
 import { useFullscreenFeedStore } from '@/store/fullscreenFeedStore';
 import { openWithOrigin } from '@/lib/openWithOrigin';
 import { useClubhouseStore } from '@/store/clubhouseStore';
-import { prefetchTile } from '@/hooks/useTileVideoPlayer';
 import { getDocumentScrollParent } from '@/lib/getScrollParent';
 import { LightFeedCard } from './LightFeedCard';
 
@@ -180,7 +179,6 @@ export const LightCardFeed: React.FC<LightCardFeedProps> = ({
       const next = posts[activeIdx + i];
       if (!next) continue;
       const hlsUrl = next.mediaItems?.[0]?.hlsUrl;
-      if (hlsUrl) prefetchTile(hlsUrl);
     }
   }, [activeIdx, posts]);
 
@@ -188,7 +186,6 @@ export const LightCardFeed: React.FC<LightCardFeedProps> = ({
     if (!posts?.length) return;
     [0, 1].forEach((i) => {
       const hlsUrl = posts[i]?.mediaItems?.[0]?.hlsUrl;
-      if (hlsUrl) prefetchTile(hlsUrl);
     });
   }, [posts?.length]);
 
