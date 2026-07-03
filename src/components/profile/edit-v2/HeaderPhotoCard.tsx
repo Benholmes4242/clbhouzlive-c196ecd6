@@ -107,7 +107,7 @@ export const HeaderPhotoCard: React.FC<HeaderPhotoCardProps> = ({
             position: 'relative',
             display: 'block',
             width: '100%',
-            height: 132,
+            aspectRatio: '3 / 2',
             background: displayUrl ? 'transparent' : 'linear-gradient(135deg,#E2E8F0,#F1F5F9)',
             overflow: 'hidden',
             border: 'none',
