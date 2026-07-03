@@ -86,6 +86,8 @@ async function fetchVerifications(): Promise<VerificationRow[]> {
       proofMethod: r.proof_method ?? null,
       proofValue: r.proof_value ?? null,
       proofMetadata: r.proof_metadata ?? null,
+      contactEmail: r.contact_email ?? null,
+      contactRole: r.contact_role ?? null,
     })),
     ...(golfer.data ?? []).map(r => ({
       id: r.id, type: 'golfer' as const, status: r.status,
