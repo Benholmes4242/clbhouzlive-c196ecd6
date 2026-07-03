@@ -26,7 +26,7 @@ import { useFullscreenFeedStore } from '@/store/fullscreenFeedStore';
 import { openWithOrigin } from '@/lib/openWithOrigin';
 import { useClubhouseStore } from '@/store/clubhouseStore';
 import { prefetchTile } from '@/hooks/useTileVideoPlayer';
-import * as feedTelemetry from '@/lib/feedTelemetry';
+
 import { FeedCard } from './FeedCard';
 
 const CANVAS = '#15171F';
@@ -240,11 +240,8 @@ export const CardFeed = forwardRef<CardFeedHandle, CardFeedProps>(function CardF
           if (Number.isNaN(idx)) continue;
           if (e.isIntersecting) {
             visibilityRef.current.set(idx, e.intersectionRatio);
-            if (e.intersectionRatio >= 0.6) feedTelemetry.markVisible(idx, e.intersectionRatio);
-            else feedTelemetry.markHidden(idx);
           } else {
             visibilityRef.current.delete(idx);
-            feedTelemetry.markHidden(idx);
           }
 
         }
@@ -300,12 +297,7 @@ export const CardFeed = forwardRef<CardFeedHandle, CardFeedProps>(function CardF
   // owning tab's slot so switching back retains the centred card.
   useEffect(() => {
     setActiveIndex(activeIdx, tab);
-    const post = posts[activeIdx];
-    const media = post?.mediaItems?.[0];
-    const kind: 'img' | 'vid' | 'mix' | '?' =
-      !media ? '?' : media.type === 'video' ? 'vid' : (post?.mediaItems?.length ?? 0) > 1 ? 'mix' : 'img';
-    feedTelemetry.markSwipe(activeIdx, kind);
-  }, [activeIdx, setActiveIndex, tab, posts]);
+  }, [activeIdx, setActiveIndex, tab]);
 
   // Warm-start the next 1-2 upcoming videos so they play instantly on arrival.
   useEffect(() => {
@@ -327,6 +319,24 @@ export const CardFeed = forwardRef<CardFeedHandle, CardFeedProps>(function CardF
       if (hlsUrl) prefetchTile(hlsUrl);
     });
   }, [posts?.length]);
+
+  // Tab warmer — fires on setActiveTab (from clubhouseStore) so tab-restore
+  // pre-warms the active card's HLS first segment (manifest is already pooled;
+  // this closes the cold-segment gap).
+  const registerTabWarmer = useClubhouseStore((s) => s.registerTabWarmer);
+  const activeIdxRef = useRef(activeIdx);
+  useEffect(() => { activeIdxRef.current = activeIdx; }, [activeIdx]);
+  const postsRef = useRef(posts);
+  useEffect(() => { postsRef.current = posts; }, [posts]);
+  useEffect(() => {
+    if (!tab) return;
+    registerTabWarmer(tab, () => {
+      const idx = activeIdxRef.current;
+      const hlsUrl = postsRef.current[idx]?.mediaItems?.[0]?.hlsUrl;
+      if (hlsUrl) prefetchTile(hlsUrl);
+    });
+    return () => { registerTabWarmer(tab, null); };
+  }, [tab, registerTabWarmer]);
 
   const handleOpenMedia = useCallback(
     (
@@ -523,7 +533,7 @@ export const CardFeed = forwardRef<CardFeedHandle, CardFeedProps>(function CardF
         // Snap to resting position and fire
         pullRef.current = PTR_THRESHOLD;
         setPull(PTR_THRESHOLD);
-        feedTelemetry.markPTR();
+        
         Promise.resolve(onRefresh()).catch(() => {});
       } else {
         pullRef.current = 0;

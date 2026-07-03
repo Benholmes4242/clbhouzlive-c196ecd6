@@ -47,6 +47,25 @@ interface ClubhouseState {
   setIsTournamentCardActive: (v: boolean) => void;
   markUserGestureUnmute: () => void;
   isRecentUserGesture: () => boolean;
+  /** Per-tab warmer — CardFeed registers a callback that prefetches the tab's
+   *  active-index HLS first segment. Fired on setActiveTab so tab-restore
+   *  doesn't stall on the cold segment fetch (manifest is already pooled). */
+  registerTabWarmer: (tab: TabKey, fn: (() => void) | null) => void;
+}
+
+// Kept outside the state so callers don't retrigger React re-renders when
+// registering/unregistering warmers.
+const _tabWarmers = new Map<TabKey, () => void>();
+
+function isSaveDataOn(): boolean {
+  try {
+    const c: any = (navigator as any).connection;
+    return !!c?.saveData;
+  } catch { return false; }
+}
+
+function isVisible(): boolean {
+  try { return document.visibilityState === 'visible'; } catch { return true; }
 }
 
 function trimMap(map: Map<number, number>, cap = 20) {
@@ -73,8 +92,17 @@ export const useClubhouseStore = create<ClubhouseState>()((set) => ({
 
   setActiveTab: (tab) => set((s) => {
     if (tab !== s.activeTab) {
-      // Fire-and-forget telemetry mark (no-op unless FEED_TELEMETRY=1).
-      import('@/lib/feedTelemetry').then((m) => m.markTabSwitch(String(s.activeTab), String(tab))).catch(() => {});
+      // Warm the restored tab's active-index HLS first segment. The manifest
+      // is typically already pooled; this closes the cold-segment gap that
+      // makes tab-restore first-frame noticeably slower than steady-state.
+      // Gated on visibility + Save-Data.
+      if (isVisible() && !isSaveDataOn()) {
+        const warm = _tabWarmers.get(tab);
+        if (warm) {
+          // Defer so the tab-switch render commits first.
+          queueMicrotask(() => { try { warm(); } catch {} });
+        }
+      }
     }
     const idx = s.activeIndexByTab[tab] ?? 0;
     const positions = s.carouselPositionsByTab[tab] ?? new Map<number, number>();
@@ -119,4 +147,8 @@ export const useClubhouseStore = create<ClubhouseState>()((set) => ({
   setIsTournamentCardActive: (v) => set({ isTournamentCardActive: v }),
   markUserGestureUnmute: () => { _userGestureUnmuteTs = Date.now(); },
   isRecentUserGesture: () => Date.now() - _userGestureUnmuteTs < 2000,
+  registerTabWarmer: (tab, fn) => {
+    if (fn) _tabWarmers.set(tab, fn);
+    else _tabWarmers.delete(tab);
+  },
 }));

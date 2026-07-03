@@ -14,7 +14,7 @@ import { DecoderLimitManager } from '@/utils/video/DecoderLimitManager';
 import { extractCloudflareUid } from '@/utils/videoIdUtils';
 import { logTileLife, attachVideoEventLoggers, isVideoDebugOn } from '@/media/mobileVideoDebug';
 import { HLSPoolManager } from '@/media/HLSPoolManager';
-import * as feedTelemetry from '@/lib/feedTelemetry';
+
 import type { MediaItem } from '@/components/media-system/types/media';
 
 interface Props {
@@ -242,10 +242,6 @@ export const InlineVideo: React.FC<Props> = ({
     logTileLife(tag, feedIndex, 'FRAME_REVEALED');
     if (!firstFrameSignalledRef.current) {
       firstFrameSignalledRef.current = true;
-      const v = videoRef.current;
-      const poolHit = !!hlsUrl && HLSPoolManager.isPooled(hlsUrl);
-      const cached = !!v && v.readyState >= 2;
-      if (feedIndex != null) feedTelemetry.markFirstFrame(feedIndex, { poolHit, cached });
       onFirstFrameReady?.();
     }
   }, [hasFirstFrame, tag, feedIndex, onFirstFrameReady, hlsUrl]);

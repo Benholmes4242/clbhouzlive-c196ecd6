@@ -28,7 +28,7 @@ import { useActiveActor } from '@/context/ActiveActorContext';
 
 import type { FeedPost } from '@/components/media-system/types/media';
 import { InlineVideo } from './InlineVideo';
-import * as feedTelemetry from '@/lib/feedTelemetry';
+import { buildImageThumbnailUrl } from '@/utils/mediaThumbs';
 import LqipUnderlay from '@/components/shared/LqipUnderlay';
 import { MediaCarousel } from './MediaCarousel';
 import { FeedFollowPill } from './FeedFollowPill';
@@ -422,7 +422,7 @@ const FeedCardImpl: React.FC<FeedCardProps> = ({
           onClick={() => onProfile(post)}
           style={{ background: 'transparent', border: 'none', padding: 0, cursor: 'pointer' }}
         >
-          <SquircleAvatar src={post.avatarUrl} alt={post.displayName} size={34} hairlineRing />
+          <SquircleAvatar src={buildImageThumbnailUrl(post.avatarUrl, { width: 72, height: 72 })} alt={post.displayName} size={34} hairlineRing />
         </button>
         <div style={{ minWidth: 0, flex: 1 }}>
           <button
@@ -604,7 +604,6 @@ const FeedCardImpl: React.FC<FeedCardProps> = ({
                       src={media.thumbnailUrl}
                       alt={post.caption || post.displayName}
                       loading="lazy"
-                      onLoad={() => { if (feedIndex != null) feedTelemetry.markPoster(feedIndex); }}
                       style={{
                         position: 'absolute',
                         inset: 0,
@@ -627,7 +626,7 @@ const FeedCardImpl: React.FC<FeedCardProps> = ({
                     src={mediaUrl}
                     alt={post.caption || post.displayName}
                     loading="lazy"
-                    onLoad={() => { if (feedIndex != null) feedTelemetry.markPoster(feedIndex); }}
+                    
                     style={{
                       position: 'absolute',
                       inset: 0,
