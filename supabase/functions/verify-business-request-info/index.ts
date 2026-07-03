@@ -25,6 +25,37 @@ async function isSuperAdmin(userId: string): Promise<boolean> {
   return !!data && data.role === "full";
 }
 
+async function queueOwnerPush(
+  admin: ReturnType<typeof createClient>,
+  businessId: string,
+  payload: { title: string; body: string; data: Record<string, unknown> },
+) {
+  const { data: members } = await admin
+    .from("business_members")
+    .select("user_id, role")
+    .eq("business_id", businessId);
+  const owner = (members ?? []).find((m: any) => m.role === "owner") ?? (members ?? [])[0];
+  const ownerId = owner?.user_id as string | undefined;
+  if (!ownerId) return;
+
+  const { data: devices } = await admin
+    .from("user_push_devices")
+    .select("provider_id")
+    .eq("user_id", ownerId);
+  if (!devices || devices.length === 0) return;
+
+  for (const d of devices as any[]) {
+    await admin.from("push_notification_queue").insert({
+      user_id: ownerId,
+      recipient_actor_type: "personal",
+      recipient_actor_id: ownerId,
+      device_id: d.provider_id,
+      title: payload.title,
+      body: payload.body,
+      data: payload.data,
+    });
+  }
+
 serve(async (req) => {
   if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
 
@@ -99,6 +130,12 @@ serve(async (req) => {
         body: { business_id: request.business_id, outcome: "needs_more_info", admin_note: admin_notes },
       })
       .catch((e) => console.error("[request-info] result-email failed", e));
+
+    queueOwnerPush(supabaseAdmin, request.business_id, {
+      title: "More info needed",
+      body: "A reviewer needs a bit more information to verify your business.",
+      data: { type: "business_verification_result", outcome: "needs_more_info", business_id: request.business_id },
+    }).catch((e) => console.error("[request-info] push queue failed", e));
 
 
 

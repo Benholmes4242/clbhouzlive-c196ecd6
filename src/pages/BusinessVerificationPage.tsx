@@ -66,6 +66,8 @@ export default function BusinessVerificationPage() {
     setSheetOpen(true);
   };
 
+  // requires_domain_check is admin-initiated; the client never sets this.
+  // When true the owner must complete the Domain step before an admin can approve.
   const needsDomain =
     state === 'pending' && !!request?.requires_domain_check && !request?.domain_confirmed;
 

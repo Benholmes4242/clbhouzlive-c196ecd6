@@ -20,6 +20,7 @@ const ApprovalsPage = lazy(() => import('./pages/ApprovalsPage'));
 const AppealsPage = lazy(() => import('./pages/AppealsPage'));
 const WaitlistPage = lazy(() => import('./pages/WaitlistPage'));
 const SupportPage = lazy(() => import('./pages/SupportPage'));
+const VerificationsPage = lazy(() => import('./pages/VerificationsPage'));
 
 const SECTION_TITLES: Record<string, string> = {
   dashboard:  'Dashboard',
@@ -32,6 +33,7 @@ const SECTION_TITLES: Record<string, string> = {
   system:     'System',
   waitlist:   'Handicap demand',
   support:    'Support',
+  verifications: 'Verifications',
 };
 
 export default function AdminShell() {
@@ -116,6 +118,7 @@ export default function AdminShell() {
                 <Route path="system/*"    element={<SystemPage />} />
                 <Route path="waitlist/*"  element={can.viewModeration ? <WaitlistPage /> : <AdminAccessDenied />} />
                 <Route path="support/*"   element={can.viewModeration ? <SupportPage /> : <AdminAccessDenied />} />
+                <Route path="verifications/*" element={can.viewUsers ? <VerificationsPage /> : <AdminAccessDenied />} />
                 <Route path="*" element={<Navigate to={role === 'moderator' ? 'moderation' : 'dashboard'} replace />} />
               </Routes>
             </Suspense>

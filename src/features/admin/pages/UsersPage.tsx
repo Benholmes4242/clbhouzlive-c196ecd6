@@ -23,11 +23,10 @@ import { usePanelRole } from '@/hooks/usePanelRole';
 import { panelCan } from '@/lib/panelCan';
 import { useCreateAdminActionRequest } from '../hooks/useAdminActionRequests';
 
-type TabId = 'all' | 'verifications' | 'team' | 'invites';
+type TabId = 'all' | 'team' | 'invites';
 
 const TAB_TITLES: Record<TabId, string> = {
   all: 'All Users',
-  verifications: 'Verifications',
   team: 'Team & Roles',
   invites: 'Invites',
 };
@@ -52,30 +51,27 @@ export default function UsersPage() {
     setParams(next, { replace: true });
   };
 
-  const verifs = useVerifications();
   const invites = useInvites();
 
   const tabs = useMemo(() => {
     const base: Array<{ id: TabId; label: string; count?: number }> = [
       { id: 'all', label: 'All Users' },
-      { id: 'verifications', label: 'Verifications', count: verifs.counts.pending || undefined },
     ];
     if (isFullAdmin) {
       base.push({ id: 'team', label: 'Team & Roles' });
       base.push({ id: 'invites', label: 'Invites', count: invites.counts.pending || undefined });
     }
     return base;
-  }, [verifs.counts.pending, invites.counts.pending, isFullAdmin]);
+  }, [invites.counts.pending, isFullAdmin]);
 
   // Refetch on header refresh event
   useEffect(() => {
     const handler = () => {
-      verifs.refetch();
       invites.refetch();
     };
     window.addEventListener('admin-v2:refetch', handler);
     return () => window.removeEventListener('admin-v2:refetch', handler);
-  }, [verifs, invites]);
+  }, [invites]);
 
   const effectiveTab: TabId = !isFullAdmin && (tab === 'team' || tab === 'invites') ? 'all' : tab;
 
@@ -83,7 +79,6 @@ export default function UsersPage() {
     <div style={{ padding: 16, display: 'flex', flexDirection: 'column', gap: 16, maxWidth: 1180, margin: '0 auto' }}>
       <SectionTabs tabs={tabs} activeId={effectiveTab} onChange={setTab} />
       {effectiveTab === 'all' && <AllUsersTab />}
-      {effectiveTab === 'verifications' && <VerificationsTab data={verifs.data} loading={verifs.isLoading} review={verifs.reviewMutation} />}
       {effectiveTab === 'team' && isFullAdmin && <TeamTab />}
       {effectiveTab === 'invites' && isFullAdmin && <InvitesTab />}
     </div>
@@ -618,7 +613,7 @@ const PROOF_NOUNS: Record<string, string> = {
 
 type EntityFilter = 'business' | 'golfer' | 'course_claim';
 
-function VerificationsTab({
+export function VerificationsTab({
   data, loading, review,
 }: {
   data: VerificationRow[];
@@ -819,6 +814,22 @@ function VerificationsTab({
 
             {active.type === 'course_claim' && (
               <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+                {active.businessAlreadyVerified && (
+                  <div
+                    style={{
+                      background: 'rgba(245, 158, 11, 0.10)',
+                      border: '1px solid rgba(245, 158, 11, 0.35)',
+                      color: '#b45309',
+                      padding: '8px 10px',
+                      borderRadius: 8,
+                      fontSize: 12,
+                      lineHeight: 1.4,
+                    }}
+                  >
+                    Note: this business is already verified. Course claims grant club linkage,
+                    which the verified tick alone does not - review the claim on its own merits.
+                  </div>
+                )}
                 {active.claimBusinessName && <Field label="Business" value={active.claimBusinessName} />}
                 {active.claimCourseName && <Field label="Course / Club" value={active.claimCourseName} />}
                 {active.claimProofNote && <Field label="Proof note" value={active.claimProofNote} />}

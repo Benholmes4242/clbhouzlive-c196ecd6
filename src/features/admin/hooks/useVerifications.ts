@@ -34,6 +34,13 @@ export interface VerificationRow {
   claimClubId?: string | null;
   claimSourceCourseId?: string | null;
   claimProofNote?: string | null;
+  /**
+   * True when the business referenced by this course claim is already verified
+   * via another path (e.g. an approved business_verification_request). Surfaced
+   * so the admin reviewing the claim has cross-path context - claims are about
+   * club ownership, not just the verified tick.
+   */
+  businessAlreadyVerified?: boolean | null;
 }
 
 async function fetchVerifications(): Promise<VerificationRow[]> {
@@ -60,7 +67,7 @@ async function fetchVerifications(): Promise<VerificationRow[]> {
 
   const [claimBizMap, claimCourseBySource, claimCourseByClub] = await Promise.all([
     claimBusinessIds.length
-      ? supabase.from('business_accounts').select('id, name').in('id', claimBusinessIds)
+      ? supabase.from('business_accounts').select('id, name, is_verified').in('id', claimBusinessIds)
       : Promise.resolve({ data: [] as any[] }),
     claimSourceCourseIds.length
       ? supabase.from('golf_courses').select('id, name').in('id', claimSourceCourseIds)
@@ -71,6 +78,7 @@ async function fetchVerifications(): Promise<VerificationRow[]> {
   ]);
 
   const bizNameById = new Map(((claimBizMap.data ?? []) as any[]).map((b) => [b.id, b.name]));
+  const bizVerifiedById = new Map(((claimBizMap.data ?? []) as any[]).map((b) => [b.id, !!b.is_verified]));
   const courseNameBySourceId = new Map(((claimCourseBySource.data ?? []) as any[]).map((c) => [c.id, c.name]));
   const courseNameByClubId = new Map<string, string>();
   for (const c of (claimCourseByClub.data ?? []) as any[]) {
@@ -108,6 +116,7 @@ async function fetchVerifications(): Promise<VerificationRow[]> {
       claimClubId: r.club_id ?? null,
       claimSourceCourseId: r.source_course_id ?? null,
       claimProofNote: r.proof_note ?? null,
+      businessAlreadyVerified: r.business_id ? (bizVerifiedById.get(r.business_id) ?? false) : null,
     })),
   ];
 

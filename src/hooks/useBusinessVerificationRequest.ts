@@ -5,7 +5,10 @@ import { AppLog } from '@/lib/logger';
 export interface BusinessVerificationRequest {
   id: string;
   business_id: string;
-  status: 'pending' | 'approved' | 'rejected' | 'revoked' | 'needs_more_info' | 'cancelled';
+  // 'superseded' is set automatically by the DB when a newer request replaces
+  // an older needs_more_info/rejected row (see supersede_prior_verification_requests
+  // trigger). It is treated as terminal and maps to 'none' in deriveVerificationState.
+  status: 'pending' | 'approved' | 'rejected' | 'revoked' | 'needs_more_info' | 'cancelled' | 'superseded';
   requested_by: string;
   created_at: string;
   reviewed_at: string | null;
@@ -67,6 +70,10 @@ export function deriveVerificationState(
   // Cancelled requests are treated as never-applied: the Get-verified prompt
   // should show again. Explicit mapping so this is not a silent fall-through.
   if (request.status === 'cancelled') return 'none';
+  // Superseded means a newer request has taken over. This row is terminal and
+  // no longer represents the live state, so map to 'none' - the newer row
+  // (fetched by created_at DESC LIMIT 1) will drive the actual state.
+  if (request.status === 'superseded') return 'none';
   if (request.status === 'approved') return 'verified';
   return 'none';
 }
