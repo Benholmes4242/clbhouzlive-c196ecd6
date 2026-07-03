@@ -596,38 +596,15 @@ const FeedCardImpl: React.FC<FeedCardProps> = ({
               }}
             >
               {media.type === 'video' ? (
-                mountVideo ? (
-                  <InlineVideo
-                    item={media}
-                    isActive={isActive}
-                    isNear={mountVideo}
-                    feedIndex={feedIndex}
-                    objectFit="cover"
-                    onFirstFrameReady={isFirstCard ? fireContentReady : undefined}
-                  />
-
-                ) : media.thumbnailUrl ? (
-                  <>
-                    {feedIndex != null && feedIndex >= 1 && (
-                      <LqipUnderlay from={media.thumbnailUrl} />
-                    )}
-                    <img
-                      ref={isFirstCard ? primaryImgRef : undefined}
-                      src={media.thumbnailUrl}
-                      alt={post.caption || post.displayName}
-                      loading="lazy"
-                      style={{
-                        position: 'absolute',
-                        inset: 0,
-                        width: '100%',
-                        height: '100%',
-                        objectFit: 'cover',
-                        objectPosition: 'center',
-                        display: 'block',
-                      }}
-                    />
-                  </>
-                ) : null
+                <InlineVideo
+                  item={media}
+                  isActive={isActive}
+                  isNear={mountVideo}
+                  feedIndex={feedIndex}
+                  postId={post.id}
+                  objectFit="cover"
+                  onFirstFrameReady={isFirstCard ? fireContentReady : undefined}
+                />
               ) : mediaUrl ? (
                 <>
                   {feedIndex != null && feedIndex >= 1 && (
