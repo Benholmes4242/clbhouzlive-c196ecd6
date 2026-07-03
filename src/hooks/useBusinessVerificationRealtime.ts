@@ -38,6 +38,10 @@ export function useBusinessVerificationRealtime(businessId: string | undefined) 
           filter: `business_id=eq.${businessId}`,
         },
         () => {
+          // Match the exact key shape used by useBusinessVerificationRequest so the
+          // owner's open UI refreshes when an admin flips status.
+          queryClient.invalidateQueries({ queryKey: ['business-verification-request', businessId] });
+          // Legacy key kept in case any other surface still references it.
           queryClient.invalidateQueries({ queryKey: ['business-verification-request-status', businessId] });
         }
       )
