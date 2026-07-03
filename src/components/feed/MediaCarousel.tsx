@@ -38,11 +38,13 @@ export const MediaCarousel: React.FC<Props> = ({
   isCardActive,
   initialIndex,
   frameRatio = FRAME_DEFAULT,
-  mountVideo = false,
+  mountVideo: _mountVideoIgnored = false,
   onIndexChange,
   onOpen,
   onDoubleTap,
 }) => {
+  // Stage B3 teardown: video slides render poster-only, never <video>.
+  const mountVideo = false;
   const trackRef = useRef<HTMLDivElement | null>(null);
   const [active, setActive] = useState(() =>
     Math.max(0, Math.min(initialIndex || 0, items.length - 1)),
