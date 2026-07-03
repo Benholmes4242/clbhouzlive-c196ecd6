@@ -618,7 +618,7 @@ const PROOF_NOUNS: Record<string, string> = {
 
 type EntityFilter = 'business' | 'golfer' | 'course_claim';
 
-function VerificationsTab({
+export function VerificationsTab({
   data, loading, review,
 }: {
   data: VerificationRow[];
