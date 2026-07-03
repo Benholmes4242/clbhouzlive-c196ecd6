@@ -87,11 +87,13 @@ function createLaneElement(laneId: LaneId): HTMLVideoElement {
   el.dataset.laneId = laneId;
   el.playsInline = true;
   el.muted = true;
+  el.loop = true; // Stage-1 polish: loop by default on both feed + fullscreen lanes.
   el.preload = 'metadata';
   el.setAttribute('webkit-playsinline', 'true');
   el.style.cssText = 'width:100%;height:100%;object-fit:cover;background:#000;';
   return el;
 }
+
 
 function isNativeHlsSupported(el: HTMLVideoElement): boolean {
   return el.canPlayType('application/vnd.apple.mpegurl') !== '';
