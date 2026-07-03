@@ -794,6 +794,40 @@ const FeedCardImpl: React.FC<FeedCardProps> = ({
   );
 };
 
+const SingleMediaTapButton: React.FC<{
+  onSingle: () => void;
+  onDouble: () => void;
+  innerRef: React.RefObject<HTMLButtonElement>;
+  postId: string;
+  children: React.ReactNode;
+}> = ({ onSingle, onDouble, innerRef, postId, children }) => {
+  const handleTap = React.useMemo(
+    () => createTapHandler({
+      onSingle: () => onSingle(),
+      onDouble: () => onDouble(),
+    }),
+    [onSingle, onDouble],
+  );
+  return (
+    <button
+      type="button"
+      ref={innerRef}
+      data-post-id={postId}
+      onClick={handleTap}
+      style={{
+        display: 'block',
+        width: '100%',
+        background: 'transparent',
+        border: 'none',
+        padding: 0,
+        cursor: 'pointer',
+      }}
+    >
+      {children}
+    </button>
+  );
+};
+
 const FooterButton: React.FC<{
   icon: React.ComponentType<any>;
   label?: string;
