@@ -1,11 +1,36 @@
 import React from 'react';
 
-import { SectionHeader } from '@/components/ui/SectionHeader';
 import { SectionCard } from '@/components/profile/edit-v2/SectionCard';
 import { BIZ } from '@/components/business/businessTokens';
 
-import { HINT_CLASS } from './editorStyles';
-import { SOCIAL_PLATFORMS, SocialFields } from './editorTypes';
+import { HINT_CLASS, LABEL_CLASS } from './editorStyles';
+import { SocialFields } from './editorTypes';
+import { Instagram, Music2, Youtube, Facebook } from 'lucide-react';
+
+interface Row {
+  field: keyof SocialFields;
+  label: string;
+  placeholder: string;
+  kind: 'handle' | 'url';
+  Icon: React.ComponentType<any>;
+}
+
+// Match personal SocialLinksSection ordering + iconography, plus Facebook.
+const ROWS: Row[] = [
+  { field: 'instagram', label: 'Instagram', placeholder: '@yourhandle',  kind: 'handle', Icon: Instagram },
+  { field: 'tiktok',    label: 'TikTok',    placeholder: '@yourhandle',  kind: 'handle', Icon: Music2 },
+  { field: 'twitter',   label: 'X / Twitter', placeholder: '@yourhandle', kind: 'handle', Icon: XIcon },
+  { field: 'youtube',   label: 'YouTube',   placeholder: 'youtube.com/c/...', kind: 'url', Icon: Youtube },
+  { field: 'facebook',  label: 'Facebook',  placeholder: 'facebook.com/...', kind: 'url', Icon: Facebook },
+];
+
+function XIcon({ size = 16, className }: { size?: number; className?: string }) {
+  return (
+    <svg viewBox="0 0 24 24" width={size} height={size} className={className} fill="currentColor" aria-hidden>
+      <path d="M18.244 2H21l-6.52 7.45L22 22h-6.828l-4.77-6.24L4.8 22H2.04l6.98-7.97L2 2h6.914l4.32 5.71L18.244 2Zm-1.2 18h1.87L7.03 4H5.06l11.984 16Z" />
+    </svg>
+  );
+}
 
 export interface SocialSectionProps {
   social: SocialFields;
@@ -13,39 +38,46 @@ export interface SocialSectionProps {
 }
 
 export function SocialSection({ social, setSocial }: SocialSectionProps) {
+  const setField = (field: keyof SocialFields, raw: string, kind: 'handle' | 'url') => {
+    let v = raw;
+    if (kind === 'handle') v = v.replace(/^@+/, '');
+    setSocial({ ...social, [field]: v });
+  };
+
   return (
-    <>
-      <div className="px-4 mt-2 mb-2">
-        <SectionHeader tier="standard" kicker="SOCIAL" />
-      </div>
-      <div className="space-y-4 px-4 pb-4">
-        <SectionCard>
-          <div className="space-y-3">
-            <p className={HINT_CLASS} style={{ marginTop: 0 }}>
-              Link your social media so golfers can follow you off the course.
+    <div className="space-y-4 px-4 pb-4 pt-2">
+      <SectionCard>
+        <div className="space-y-3">
+          <div>
+            <p className="text-[14px] font-semibold text-foreground">Social links</p>
+            <p className={HINT_CLASS} style={{ marginTop: 2 }}>
+              Link your socials so golfers can follow you off the course.
             </p>
-            {SOCIAL_PLATFORMS.map(({ field, label, placeholder, icon }) => (
-              <div key={field} className="flex items-center gap-3">
+          </div>
+          {ROWS.map(({ field, label, placeholder, kind, Icon }) => (
+            <div key={field} className="space-y-1.5">
+              <label className={LABEL_CLASS}>{label}</label>
+              <div className="flex items-center gap-2">
                 <div
-                  className="w-9 h-9 rounded-[10px] flex items-center justify-center flex-shrink-0 text-lg"
-                  style={{ background: 'rgba(15,23,42,0.04)', border: `1px solid ${BIZ.hair}` }}
+                  className="w-10 h-11 rounded-[10px] flex items-center justify-center flex-shrink-0"
+                  style={{ background: '#F8FAFC', border: '1px solid rgba(15,23,42,0.08)', color: '#0F172A' }}
                 >
-                  {icon}
+                  <Icon size={16} strokeWidth={2} />
                 </div>
                 <input
                   type="text"
-                  value={social[field as keyof SocialFields]}
-                  onChange={(e) => setSocial({ ...social, [field]: e.target.value })}
+                  value={social[field] || ''}
+                  onChange={(e) => setField(field, e.target.value, kind)}
                   placeholder={placeholder}
                   aria-label={label}
-                  className="flex-1 h-10 rounded-[10px] px-3 text-[14px] text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-[#F7931E]/40"
-                  style={{ background: '#ffffff', border: `1px solid ${BIZ.hair}` }}
+                  className="flex-1 h-11 rounded-[10px] px-3.5 text-[15px] focus:outline-none focus:ring-2 focus:ring-[rgba(15,23,42,0.20)]"
+                  style={{ background: '#F8FAFC', border: '1px solid rgba(15,23,42,0.08)', color: '#0F172A' }}
                 />
               </div>
-            ))}
-          </div>
-        </SectionCard>
-      </div>
-    </>
+            </div>
+          ))}
+        </div>
+      </SectionCard>
+    </div>
   );
 }

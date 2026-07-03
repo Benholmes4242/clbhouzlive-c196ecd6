@@ -34,7 +34,10 @@ const FRAME: React.CSSProperties = {
 };
 
 export const MiniFlag: React.FC<Props> = ({ iso, dimmed }) => {
-  const code = FLAG_CODE[iso];
+  // Prefer the curated mapping (e.g. GB-ENG); fall back to any ISO-alpha-2.
+  const code =
+    FLAG_CODE[iso] ??
+    (iso && iso.length === 2 ? iso.toLowerCase() : null);
   return (
     <span style={{ ...FRAME, opacity: dimmed ? 0.65 : 1, display: 'inline-block' }}>
       {code ? (

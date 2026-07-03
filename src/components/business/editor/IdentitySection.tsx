@@ -1,7 +1,8 @@
 import React from 'react';
 import { AlertCircle, Lock, MapPin } from 'lucide-react';
 
-import { SectionHeader } from '@/components/ui/SectionHeader';
+
+
 import { SectionCard } from '@/components/profile/edit-v2/SectionCard';
 import { BIZ } from '@/components/business/businessTokens';
 import { BUSINESS_CATEGORIES_WITH_ICONS } from '@/constants/businessCategories';

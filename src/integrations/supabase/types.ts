@@ -721,6 +721,7 @@ export type Database = {
           address_label: string | null
           address_line1: string | null
           address_line2: string | null
+          amenities: string[]
           booking_url: string | null
           category: string | null
           city: string | null
@@ -751,7 +752,9 @@ export type Database = {
           opening_hours: Json | null
           phone: string | null
           postcode: string | null
+          primary_action: string | null
           region: string | null
+          show_opening_hours: boolean
           slug: string | null
           social_links: Json | null
           updated_at: string | null
@@ -764,6 +767,7 @@ export type Database = {
           address_label?: string | null
           address_line1?: string | null
           address_line2?: string | null
+          amenities?: string[]
           booking_url?: string | null
           category?: string | null
           city?: string | null
@@ -794,7 +798,9 @@ export type Database = {
           opening_hours?: Json | null
           phone?: string | null
           postcode?: string | null
+          primary_action?: string | null
           region?: string | null
+          show_opening_hours?: boolean
           slug?: string | null
           social_links?: Json | null
           updated_at?: string | null
@@ -807,6 +813,7 @@ export type Database = {
           address_label?: string | null
           address_line1?: string | null
           address_line2?: string | null
+          amenities?: string[]
           booking_url?: string | null
           category?: string | null
           city?: string | null
@@ -837,7 +844,9 @@ export type Database = {
           opening_hours?: Json | null
           phone?: string | null
           postcode?: string | null
+          primary_action?: string | null
           region?: string | null
+          show_opening_hours?: boolean
           slug?: string | null
           social_links?: Json | null
           updated_at?: string | null
