@@ -120,6 +120,7 @@ export function markFirstFrame(
   console.info(
     `[FEEDTEL] firstframe   i=${index} dt_swipe_ff=${dt >= 0 ? fmt(dt) + 'ms' : 'n/a'} poolHit=${meta.poolHit ? 1 : 0} cached=${meta.cached ? 1 : 0}`,
   );
+  if (poolTotal > 0 && poolTotal % AUTO_FLUSH_EVERY === 0) flushSummary();
 }
 
 export function markTabSwitch(from: string, to: string): void {
