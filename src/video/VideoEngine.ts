@@ -50,6 +50,8 @@ interface Lane {
   posterUrl: string | null;
   startPosition: number;
   firstFrame: boolean;
+  /** postId this lane's current source belongs to (for lastPos tracking). */
+  postId: string | null;
   listeners: Set<LaneListener>;
   detachFns: Array<() => void>;
 }
