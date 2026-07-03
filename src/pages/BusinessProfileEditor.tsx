@@ -682,6 +682,7 @@ export default function BusinessProfileEditor() {
     mode, user?.id, id, isValid, resolvedName, category, description, foundedYear, website, email,
     phone, bookingUrl, openingHours, social, address, businessName, isClubLinked, isGolfClub,
     selectedClub, claimProofNote, logo, cover, queryClient, navigate, uploadLogo, removeLogo, uploadCover, removeCover,
+    amenities, primaryAction, showOpeningHours,
   ]);
 
   /* ── loading / error states (edit) ──────────────── */
