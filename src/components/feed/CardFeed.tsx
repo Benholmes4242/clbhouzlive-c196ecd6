@@ -399,7 +399,8 @@ export const CardFeed = forwardRef<CardFeedHandle, CardFeedProps>(function CardF
       const isActive = !fsOpen && index === playingIdx; // PLAYS — settle-gated; suspended while fullscreen
 
       const isNear = !fsOpen && Math.abs(index - activeIdx) <= VIDEO_NEIGHBOUR_RADIUS; // mounts + paints frame — instant; suspended while fullscreen
-      const mountVideo = isNear;
+      const mountVideo = false; // Stage B3 teardown: no video mounts.
+      void isNear;
       return (
         <div
           data-card-index={index}
