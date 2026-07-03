@@ -161,71 +161,32 @@ const MediaDisplay: React.FC<MediaDisplayProps> = ({
       )}
       
       {media.media_type === 'video' && !isInvalidSrc ? (
-        shouldAutoplay ? (
-          <div className="relative w-full h-full">
-            {/* Filtered pixel layer */}
-            <div className={cn("w-full h-full", filterClass)}>
-              <UnifiedVideoPlayer
-                src={media.media_url}
-                posterUrl={thumbnailUrl || undefined}
-                autoplay={shouldAutoplay}
-                muted={videoIsMuted}
-                loop={loop}
-                className="w-full h-full"
-                objectFit="cover"
-                surface="grid"
-                showMuteButton={false}
+        /* [VIDEOSTUB] Poster-only: no <video> playback, always show thumbnail */
+        <div className="relative w-full h-full">
+          <div className={cn("w-full h-full", filterClass)}>
+            {hasCloudflareThumb ? (
+              <HighQualityImage
+                src={thumbnailUrl}
+                alt={itemTitle || 'Video thumbnail'}
+                className="w-full h-full object-cover"
+                onLoad={handleImageLoad}
+                onError={handleImageError}
+                width={1200}
+                height={1600}
               />
-            </div>
-            
-            {/* Sound Toggle for autoplaying videos */}
-            <div className="absolute top-3 right-3 z-30">
-              <SoundToggle
-                isMuted={videoIsMuted}
-                onToggle={toggleVideoMute}
-                size="sm"
-                className="rounded-full w-6 h-6 md:w-8 md:h-8"
-              />
-            </div>
-          </div>
-        ) : (
-          /* Video thumbnail - use Cloudflare thumbnail or video element with first frame */
-          <div className="relative w-full h-full">
-            {/* Filtered pixel layer */}
-            <div className={cn("w-full h-full", filterClass)}>
-              {hasCloudflareThumb ? (
-                 <HighQualityImage
-                   src={thumbnailUrl}
-                   alt={itemTitle || 'Video thumbnail'}
-                   className="w-full h-full object-cover"
-                    onLoad={handleImageLoad}
-                    onError={handleImageError}
-                   width={1200}
-                   height={1600}
-                 />
-              ) : (
-                /* For non-Cloudflare videos, show video element with preload="metadata" to display first frame */
-                <video
-                  src={media.media_url}
-                  className="w-full h-full object-cover"
-                  preload="metadata"
-                  muted
-                  onLoadedMetadata={handleImageLoad}
-                  onError={handleImageError}
-                />
-              )}
-            </div>
-            
-            {/* Play icon for non-autoplaying videos */}
-            {!hidePlayButton && (
-              <div className="absolute bottom-3 right-3 z-20">
-                <div className="rounded-full bg-white/10 backdrop-blur-2xl border border-white/20 w-5 h-5 md:w-7 md:h-7 flex items-center justify-center">
-                  <Play className="h-2.5 w-2.5 md:h-3.5 md:w-3.5 text-white ml-0.5" fill="currentColor" />
-                </div>
-              </div>
+            ) : (
+              <div className="w-full h-full bg-muted" onLoad={handleImageLoad} />
             )}
           </div>
-        )
+
+          {!hidePlayButton && (
+            <div className="absolute bottom-3 right-3 z-20">
+              <div className="rounded-full bg-white/10 backdrop-blur-2xl border border-white/20 w-5 h-5 md:w-7 md:h-7 flex items-center justify-center">
+                <Play className="h-2.5 w-2.5 md:h-3.5 md:w-3.5 text-white ml-0.5" fill="currentColor" />
+              </div>
+            </div>
+          )}
+        </div>
       ) : (
         <div className="relative w-full h-full">
           {/* Filtered pixel layer */}

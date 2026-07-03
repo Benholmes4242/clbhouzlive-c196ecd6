@@ -72,32 +72,7 @@ const UnifiedMediaGrid: React.FC<UnifiedMediaGridProps> = ({
     };
   }, []);
 
-  // CRITICAL: Preload first video immediately in layout phase (before paint)
-  // This eliminates the 2+ second React render delay on first load
-  useLayoutEffect(() => {
-    if (hasPreloadedFirst.current) return;
-    if (!items.length) return;
-
-    // Find first video item
-    const firstVideo = items.find(item => item.type === 'video');
-    if (!firstVideo) return;
-
-    hasPreloadedFirst.current = true;
-
-    // Preload HLS manifest immediately
-    const videoUrl = firstVideo.url;
-    if (videoUrl) {
-      const uid = uidFromNode({ src: videoUrl });
-      if (uid) {
-        const hlsUrl = generateStreamHlsUrl(uid);
-        logGrid('LAYOUT_EFFECT_PRELOAD', { 
-          id: firstVideo.id.slice(0, 8),
-          hlsUrl: hlsUrl.slice(0, 50)
-        });
-        preloadHlsManifest(hlsUrl);
-      }
-    }
-  }, [items]);
+  // [VIDEOSTUB] HLS manifest preload removed — poster-only chassis
 
 
   // Mark autoplay candidates and build layout
