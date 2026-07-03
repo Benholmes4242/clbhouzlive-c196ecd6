@@ -350,6 +350,11 @@ class VideoEngineImpl {
     this.emit(lane);
   }
 
+  /** Set object-fit on the lane's <video> element. */
+  setObjectFit(laneId: LaneId, fit: 'cover' | 'contain'): void {
+    this.getLane(laneId).el.style.objectFit = fit;
+  }
+
   /** Release the current source but keep the element+instance for reuse. */
   release(laneId: LaneId): void {
     const lane = this.getLane(laneId);
