@@ -239,107 +239,47 @@ const MediaDisplay: React.FC<MediaDisplayProps> = ({
       )}
       
       {media.media_type === 'video' && !isInvalidSrc ? (
-        (() => {
-          // Determine if should autoplay based on context
-          const effectiveShouldAutoplay = isDiscoverPage ? discoverPreview.shouldAutoplay : shouldAutoplay;
-          const effectiveMuted = isDiscoverPage ? discoverPreview.shouldMute : videoIsMuted;
-          
-          return effectiveShouldAutoplay ? (
-            <div 
-              className="relative w-full h-full"
-              {...(isDiscoverPage ? discoverPreview : {})}
-            >
-              {/* Filtered pixel layer */}
-              <div className={cn("w-full h-full", filterClass)}>
-                <EnhancedVideoPlayer
-                  ref={videoRefCallback}
-                  src={media.media_url}
-                  autoplay={true}
-                  muted={effectiveMuted}
-                  loop={loop}
-                  className={`w-full h-full pointer-events-none ${fitClass}`}
-                  enableHLS={true}
-                />
-              </div>
-              
-              {/* Sound Toggle for autoplaying videos - only show if not in Discover preview mode */}
-              {!isDiscoverPage && (
-                <div className="absolute top-3 right-3 z-30">
-                  <SoundToggle
-                    isMuted={videoIsMuted}
-                    onToggle={toggleVideoMute}
-                    size="sm"
-                    className="rounded-full w-6 h-6 md:w-8 md:h-8"
-                  />
-                </div>
-              )}
-              
-              {/* Creator overlay for Discover page */}
-              {isDiscoverPage && user && (
-                <CreatorOverlay user={user} onCreatorClick={onCreatorClick} />
-              )}
-            </div>
-        ) : (
-          /* Video thumbnail - ALWAYS use static poster in grid, defer HLS until click */
-          <div 
-            className="relative w-full h-full"
-            {...(isDiscoverPage ? discoverPreview : {})}
-          >
-            {/* Video thumbnail loading placeholder - lightweight for off-screen items */}
-            {!isAboveTheFold && !mediaLoaded && (
-              <div className="absolute inset-0 bg-muted z-0" />
-            )}
-            
-            {/* Filtered pixel layer */}
-            <div className={cn("w-full h-full", filterClass)}>
-              {hasCloudflareThumb ? (
-                 <HighQualityImage
-                   src={thumbnailUrl}
-                   alt={itemTitle || 'Video thumbnail'}
-                    className={`w-full h-full ${fitClass}`}
-                    onLoad={handleImageLoad}
-                    onError={handleImageError}
-                   width={1200}
-                   height={1600}
-                   isAboveTheFold={isAboveTheFold}
-                 />
-              ) : (
-                /* For non-Cloudflare videos, show video element with preload="metadata" to display first frame */
-                <video
-                  src={media.media_url}
-                  className={`w-full h-full videoEl ${fitClass} transition-opacity duration-200 ${
-                    mediaLoaded ? 'opacity-100' : 'opacity-0'
-                  }`}
-                  preload="metadata"
-                  muted
-                  onLoadedMetadata={() => {
-                    setMediaLoaded(true);
-                    handleImageLoad(); // This now calls onLoaded
-                  }}
-                  onError={() => {
-                    setMediaLoaded(true);
-                    handleImageError(); // This now calls onLoaded
-                  }}
-                />
-              )}
-            </div>
-            
-            {/* Play icon for non-autoplaying videos */}
-            {!hidePlayButton && (
-              <div className="absolute bottom-3 right-3 z-20">
-                <div className="rounded-full bg-white/10 backdrop-blur-2xl border border-white/20 w-6 h-6 md:w-8 md:h-8 flex items-center justify-center">
-                  <Play className="h-3 w-3 md:h-4 md:w-4 text-white ml-0.5" fill="currentColor" />
-                </div>
-              </div>
-            )}
-            
-            {/* Creator overlay for Discover page */}
-            {isDiscoverPage && user && (
-              <CreatorOverlay user={user} onCreatorClick={onCreatorClick} />
+        /* [VIDEOSTUB] Poster-only: no <video>/EnhancedVideoPlayer playback */
+        <div
+          className="relative w-full h-full"
+          {...(isDiscoverPage ? discoverPreview : {})}
+        >
+          {!isAboveTheFold && !mediaLoaded && (
+            <div className="absolute inset-0 bg-muted z-0" />
+          )}
+
+          <div className={cn("w-full h-full", filterClass)}>
+            {hasCloudflareThumb ? (
+              <HighQualityImage
+                src={thumbnailUrl}
+                alt={itemTitle || 'Video thumbnail'}
+                className={`w-full h-full ${fitClass}`}
+                onLoad={handleImageLoad}
+                onError={handleImageError}
+                width={1200}
+                height={1600}
+                isAboveTheFold={isAboveTheFold}
+              />
+            ) : (
+              <div
+                className={`w-full h-full ${fitClass} bg-muted`}
+                onLoad={handleImageLoad as any}
+              />
             )}
           </div>
-        );
-        })()
+
+          {!hidePlayButton && (
+            <div className="absolute bottom-3 right-3 z-20">
+              <div className="rounded-full bg-white/10 backdrop-blur-2xl border border-white/20 w-6 h-6 md:w-8 md:h-8 flex items-center justify-center">
+                <Play className="h-3 w-3 md:h-4 md:w-4 text-white ml-0.5" fill="currentColor" />
+              </div>
+            </div>
+          )}
+
+          {isDiscoverPage && user && (
+            <CreatorOverlay user={user} onCreatorClick={onCreatorClick} />
+          )}
+        </div>
       ) : (
         /* Image display with high quality optimization */
         <div className="relative w-full h-full">

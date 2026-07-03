@@ -1,10 +1,9 @@
 import { openWithOrigin } from '@/lib/openWithOrigin';
-import { useRef, useEffect, useState, useCallback, useMemo } from 'react';
+import { useRef, useCallback, useMemo } from 'react';
 import { Heart } from 'lucide-react';
 import type { FeedPost } from '@/components/media-system/types/media';
 import { Pin } from './proshop/Pin';
 import DecodedImage from './shared/DecodedImage';
-import { attachHlsToTile } from '@/hooks/useTileVideoPlayer';
 import { getThumbnailUrl } from '@/media/utils/thumbnail';
 import { buildLqipUrl } from '@/utils/mediaThumbs';
 import { shouldUseLqip } from '@/utils/lqipQueue';
@@ -77,9 +76,6 @@ export default function WatchRailTile({
   isAutoplayActive = false,
 }: WatchRailTileProps) {
   const cardRef = useRef<HTMLDivElement>(null);
-  const videoRef = useRef<HTMLVideoElement | null>(null);
-  const hlsRef = useRef<any>(null);
-  const [videoVisible, setVideoVisible] = useState(false);
 
   const media = post.mediaItems[0];
   const rawThumb = media?.thumbnailUrl || media?.imageUrl || '';
@@ -88,83 +84,8 @@ export default function WatchRailTile({
     return getThumbnailUrl({ imageUrl: rawThumb, height: thumbHeightPx });
   }, [rawThumb, thumbHeightPx]);
   const hlsUrl = media?.hlsUrl || '';
-  const mp4Url = (media as any)?.videoUrl || (media as any)?.mp4Url;
 
-  // Coordinator-owned autoplay: attach HLS + loop when active, tear down when not.
-  useEffect(() => {
-    const card = cardRef.current;
-    if (!card) return;
-    if (!isAutoplayActive) {
-      // Losing the slot — pause + hide + release.
-      setVideoVisible(false);
-      const v = videoRef.current;
-      if (v) {
-        try { v.pause(); } catch {}
-        v.removeAttribute('src');
-        try { v.load(); } catch {}
-        if (v.parentElement) v.parentElement.removeChild(v);
-      }
-      videoRef.current = null;
-      if (hlsRef.current) {
-        try { hlsRef.current.destroy(); } catch {}
-        hlsRef.current = null;
-      }
-      return;
-    }
-    if (!hlsUrl && !mp4Url) return;
-
-    let cancelled = false;
-    const v = document.createElement('video');
-    v.muted = true;
-    v.loop = true;
-    v.playsInline = true;
-    v.setAttribute('webkit-playsinline', '');
-    v.setAttribute('muted', '');
-    v.style.cssText =
-      'position:absolute;inset:0;width:100%;height:100%;object-fit:cover;pointer-events:none;opacity:0;transition:opacity 200ms ease;z-index:1;';
-    card.appendChild(v);
-    videoRef.current = v;
-
-    const onReady = () => {
-      if (cancelled) return;
-      v.style.opacity = '1';
-      setVideoVisible(true);
-      v.play().catch(() => {});
-    };
-
-    if (hlsUrl) {
-      attachHlsToTile({ hlsUrl, mp4Fallback: mp4Url, video: v, onReady })
-        .then((hls) => {
-          if (cancelled) {
-            hls?.destroy?.();
-            return;
-          }
-          hlsRef.current = hls;
-        })
-        .catch(() => {});
-    } else if (mp4Url) {
-      v.src = mp4Url;
-      v.addEventListener('canplay', onReady, { once: true });
-      v.play().catch(() => {});
-    }
-
-    return () => {
-      cancelled = true;
-      setVideoVisible(false);
-      const cur = videoRef.current;
-      if (cur) {
-        try { cur.pause(); } catch {}
-        cur.removeAttribute('src');
-        try { cur.load(); } catch {}
-        if (cur.parentElement) cur.parentElement.removeChild(cur);
-      }
-      videoRef.current = null;
-      if (hlsRef.current) {
-        try { hlsRef.current.destroy(); } catch {}
-        hlsRef.current = null;
-      }
-    };
-  }, [isAutoplayActive, hlsUrl, mp4Url]);
+  // [VIDEOSTUB] Video mount/HLS attach removed — poster-only rail tile.
 
   const handleClick = useCallback(() => {
     openWithOrigin({
@@ -200,7 +121,7 @@ export default function WatchRailTile({
       innerStyle={{ position: 'absolute', inset: 0 }}
     >
 
-      {/* Poster — decode-gated for coordinated reveal. Stays behind video. */}
+      {/* Poster — decode-gated for coordinated reveal. */}
       <DecodedImage
         src={thumb}
         alt=""
@@ -213,8 +134,6 @@ export default function WatchRailTile({
           width: '100%',
           height: '100%',
           objectFit: 'cover',
-          opacity: videoVisible ? 0 : 1,
-          transition: 'opacity 200ms ease',
         }}
       />
 
