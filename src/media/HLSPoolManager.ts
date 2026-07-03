@@ -268,7 +268,7 @@ class HLSPoolManagerClass {
    * Promote a preloaded HLS instance to a new video element
    * Returns the HLS instance if successful, null otherwise
    */
-  promote(url: string, targetVideo: HTMLVideoElement, startPosition?: number): HlsType | null {
+  promote(url: string, targetVideo: HTMLVideoElement): HlsType | null {
     const entry = this.pool.get(url);
     
     if (!entry || entry.isPromoted) {
@@ -303,12 +303,8 @@ class HLSPoolManagerClass {
         clearTimeout(entry.timeoutId);
       }
 
-      // FLIP continuity v3: thread startPosition BEFORE attachMedia so hls.js
-      // fetches segments starting at s.t on the (re-)opened MediaSource,
-      // instead of loading from 0 and stalling until the seek catches up.
-      if (startPosition != null && startPosition > 0.05) {
-        try { (entry.hls as any).config.startPosition = startPosition; } catch {}
-      }
+      // Playhead-sync deleted: pool promote just re-attaches the pooled
+      // instance to the new video element; playback starts from 0/natural.
 
       // Detach from preload video and attach to target
       entry.hls.detachMedia();

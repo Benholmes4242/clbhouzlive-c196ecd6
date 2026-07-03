@@ -6,7 +6,7 @@ import { useHlsPool } from '@/media/hooks/useHlsPool';
 import { usePausedFirstFrame } from '@/media/hooks/usePausedFirstFrame';
 import { useGaplessLoop } from '@/utils/video/GaplessLoop';
 import { fsTimeStart, fsTimeEnd, fsEvent, logTileLife } from '@/media/mobileVideoDebug';
-import { flipContinuity } from '@/media/flipContinuity';
+
 
 interface SnapVideoPlayerProps {
   hlsUrl: string;
@@ -94,20 +94,9 @@ export const SnapVideoPlayer = memo(function SnapVideoPlayer({
     if (shouldAttach) {
       video.muted = useClubhouseStore.getState().isMuted;
       video.playsInline = true;
-      // FLIP continuity — fullscreen only. Consume the start entry BEFORE
-      // attach so useHlsPool can thread startPosition into hls.js config and
-      // startLoad(pos). This makes the first fetched segment already the seek
-      // point — no restart-at-0 stall.
-      const s = isFullscreen ? flipContinuity.consumeStart(hlsUrl) : null;
-      const startPos = s && s.t > 0.05 ? s.t : undefined;
-      pool.attach(hlsUrl, video, mp4Url, isFullscreen ? 'fullscreen' : 'feed', startPos).then(() => {
+      pool.attach(hlsUrl, video, mp4Url, isFullscreen ? 'fullscreen' : 'feed').then(() => {
         if (cancelled) return;
         setAttachToken((t) => t + 1);
-        if (startPos != null) {
-          fsEvent('🎯 FS_CONSUME_START', { url: hlsUrl, t: startPos, wasPlaying: s?.wasPlaying });
-          if (s?.wasPlaying !== false) { try { video.play().catch(() => {}); } catch {} }
-          return;
-        }
         try { if (video.currentTime < 0.001) video.currentTime = 0.001; } catch {}
       });
       return () => { cancelled = true; };

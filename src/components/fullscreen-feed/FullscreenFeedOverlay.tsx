@@ -8,7 +8,7 @@ import { SnapFeed } from '@/components/feed/SnapFeed';
 import { ClubhouseSkeletonShimmer } from '@/components/clubhouse/ClubhouseSkeletonShimmer';
 import { pauseAllAudio } from '@/utils/globalVideoMute';
 import { lockBodyScroll, unlockBodyScroll } from '@/lib/bodyScrollLock';
-import { flipContinuity } from '@/media/flipContinuity';
+
 
 import { FeedOverlayLayer } from '@/components/feed/FeedOverlayLayer';
 import { FullscreenCarouselOverlay } from '@/components/media/FullscreenCarouselOverlay';
@@ -170,21 +170,8 @@ export function FullscreenFeedOverlay() {
         document.documentElement.style.backgroundColor = '';
         document.body.style.backgroundColor = '';
 
-        // FLIP handoff return — capture the LIVE fullscreen playhead from the
-        // active <video> BEFORE emitting close (SnapVideoPlayer registers the
-        // active element in useClubhouseStore). Feed tile then consumes this
-        // return entry on re-attach and resumes autoplay if in its active slot.
-        try {
-          const activeVideo = useClubhouseStore.getState().activeVideoElement;
-          const fsState = useFullscreenFeedStore.getState();
-          const currentPost: any = fsState.posts?.[fsState.activeIndex];
-          const url = currentPost?.mediaItems?.[0]?.hlsUrl;
-          if (activeVideo && url && Number.isFinite(activeVideo.currentTime)) {
-            flipContinuity.setReturn(url, { t: Math.max(0, activeVideo.currentTime) });
-            fsEvent('🎯 FS_CAPTURE_RETURN', { url, t: activeVideo.currentTime });
-          }
-        } catch {}
-        setTimeout(() => flipContinuity.emitClose(), 0);
+        // Playhead-sync deleted per BRIEF_NUKE_PLAYHEAD_SYNC — short looping
+        // clips restart naturally on close, poster underlay covers the gap.
 
         // Restore #root scroll position on the next frame so the feed's scroll
         // height is settled after the overlay unmounts.

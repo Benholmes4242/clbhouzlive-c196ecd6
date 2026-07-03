@@ -14,7 +14,7 @@ import { DecoderLimitManager } from '@/utils/video/DecoderLimitManager';
 import { extractCloudflareUid } from '@/utils/videoIdUtils';
 import { logTileLife, attachVideoEventLoggers, isVideoDebugOn } from '@/media/mobileVideoDebug';
 import { HLSPoolManager } from '@/media/HLSPoolManager';
-import { flipContinuity } from '@/media/flipContinuity';
+
 
 import type { MediaItem } from '@/components/media-system/types/media';
 
@@ -85,11 +85,6 @@ export const InlineVideo: React.FC<Props> = ({
   // Used to detect "denied at preload, now active" → retry attach.
   const attachedRef = useRef(false);
   const cancelledRef = useRef(false);
-  // Ordering-independent play flag: set when a return-seek settles while the
-  // tile is not yet active. The [isActive] effect below issues play() as soon
-  // as the tile flips active, closing the 1-2 frame gap where scroll-restore
-  // and emitClose can race.
-  const pendingPlayAfterActiveRef = useRef(false);
 
   // Stable attach routine — callable from the [isNear] effect AND from the
   // [isActive] retry effect (P1-E: denied slot recovers when promoted to playing).
@@ -138,19 +133,14 @@ export const InlineVideo: React.FC<Props> = ({
     if (hlsUrl) {
       logTileLife(tag, feedIndex, 'ATTACH_START');
       attachedRef.current = true;
-      // FLIP handoff continuity: tile consumes ONLY the RETURN entry BEFORE
-      // attach so useHlsPool can thread startPosition into hls.js — the tile
-      // re-fetches at the return position instead of restarting at 0.
-      const back = flipContinuity.consumeReturn(hlsUrl);
-      const startPos = back && back.t > 0.05 ? back.t : undefined;
-      pool.attach(hlsUrl, video, mp4Url, 'feed', startPos).then(() => {
+      pool.attach(hlsUrl, video, mp4Url, 'feed').then(() => {
         if (cancelledRef.current) {
           logTileLife(tag, feedIndex, 'ATTACH_CANCELLED');
           return;
         }
         logTileLife(tag, feedIndex, 'ATTACH_DONE', { readyState: video.readyState });
         try {
-          if (startPos == null && video.currentTime < 0.001) {
+          if (video.currentTime < 0.001) {
             video.currentTime = 0.001;
           }
         } catch {}
@@ -161,14 +151,9 @@ export const InlineVideo: React.FC<Props> = ({
           active: isActiveRef.current,
           paused: video.paused,
         });
-        // Ordering-independent resume: if this tile is the active slot now,
-        // play immediately. Otherwise arm the flag and let the [isActive]
-        // effect fire play() when the slot flips active (covers the
-        // scroll-restore-vs-emitClose race without depending on ordering).
-        if (isActiveRef.current) {
-          if (video.paused) video.play().catch(() => {});
-        } else if (startPos != null) {
-          pendingPlayAfterActiveRef.current = true;
+        // Resume autoplay if this tile is the active slot after attach settles.
+        if (isActiveRef.current && video.paused) {
+          video.play().catch(() => {});
         }
       });
     } else if (mp4Url) {
@@ -251,12 +236,6 @@ export const InlineVideo: React.FC<Props> = ({
         hasSrc: !!v?.src,
         readyState: v?.readyState,
       });
-      // Ordering-independent resume: if attach settled before we became
-      // active (scroll-restore/emitClose race), play now.
-      if (pendingPlayAfterActiveRef.current && v) {
-        pendingPlayAfterActiveRef.current = false;
-        if (v.paused) v.play().catch(() => {});
-      }
     }
   }, [isActive, regId, tag, feedIndex]);
 
@@ -287,31 +266,8 @@ export const InlineVideo: React.FC<Props> = ({
     [],
   );
 
-  // FLIP handoff return: when the fullscreen viewer closes, any tile whose
-  // url was handed off has a stale, detached hlsRef. Snapshot the last known
-  // playhead as a return entry, tear the stale ref down, and re-attempt the
-  // attach. ATTACH_DONE will consume the return entry and seek back to the
-  // playhead. The poster underlay (below) covers the reattach gap so the
-  // user never sees black.
-  useEffect(() => {
-    if (!hlsUrl) return;
-    return flipContinuity.onClose(() => {
-      if (!flipContinuity.wasHandedOff(hlsUrl)) return;
-      // The authoritative return-time is set by FullscreenFeedOverlay from the
-      // LIVE fullscreen <video>.currentTime before this event fires. We do NOT
-      // read from the tile's detached <video> here — it's been stopped since
-      // handOff and would produce the open-time frame.
-      flipContinuity.clearHandOff(hlsUrl);
-      // Defer to next tick so the fullscreen surface has finished demoting.
-      setTimeout(() => {
-        if (!videoRef.current) return;
-        pool.teardown(hlsUrl);
-        attachedRef.current = false;
-        reset();
-        attemptAttach();
-      }, 0);
-    });
-  }, [hlsUrl, pool, reset, attemptAttach]);
+
+
 
 
   // Duration + playhead tracking for gapless-loop (<15s) and progress bar (>20s).
@@ -326,12 +282,6 @@ export const InlineVideo: React.FC<Props> = ({
   const handleTimeUpdate = useCallback(() => {
     const v = videoRef.current;
     if (!v) return;
-    // Write playhead for FLIP handoff continuity (last-writer-wins). On
-    // fullscreen close, the origin tile reads this to resume where the viewer
-    // left off, instead of restarting at 0.
-    if (hlsUrl && Number.isFinite(v.currentTime)) {
-      flipContinuity.writeLast(hlsUrl, v.currentTime);
-    }
     const d = duration || (Number.isFinite(v.duration) ? v.duration : 0);
     if (d <= 0) return;
     // Gapless manual loop for short clips: pre-empt the native loop gap.
