@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect, memo } from 'react';
 import { OptimizedImage } from './optimized-image';
-import EnhancedVideoPlayer from './enhanced-video-player';
+// [VIDEOSTUB] EnhancedVideoPlayer import removed — poster-only chassis.
 import { useIntersectionObserver } from '@/hooks/useIntersectionObserver';
 import { useMobileOptimizations } from '@/hooks/useMobileOptimizations';
 
@@ -87,25 +87,24 @@ const SmartMediaContainer: React.FC<SmartMediaContainerProps> = ({
       >
         {/* Main media display */}
         {currentMedia.type === 'video' ? (
-          loadedMedia.has(currentIndex) ? (
-            <EnhancedVideoPlayer
-              src={currentMedia.url}
-              autoplay={autoplay && isInView}
-              muted={true}
-              loop={true}
-              className="w-full h-full"
-              enableHLS={currentMedia.url.includes('.m3u8')}
-              adaptiveBitrate={!isSlowNetwork}
-              preloadLevel={isSlowNetwork ? 'none' : 'metadata'}
-              quality={isSlowNetwork ? '480p' : 'auto'}
-              onClick={() => handleMediaClick(currentMedia, currentIndex)}
-            />
-          ) : (
-            <div className="w-full h-full bg-media-loading animate-pulse flex items-center justify-center">
-              <div className="w-12 h-12 border-2 border-muted-foreground/30 border-t-muted-foreground/70 rounded-full animate-spin" />
-            </div>
-          )
+          <div
+            className="relative w-full h-full cursor-pointer"
+            onClick={() => handleMediaClick(currentMedia, currentIndex)}
+          >
+            {currentMedia.posterUrl || currentMedia.poster ? (
+              <img
+                src={currentMedia.posterUrl || currentMedia.poster || currentMedia.url}
+                alt={currentMedia.alt || 'Video poster'}
+                className="w-full h-full object-cover"
+                loading="lazy"
+                draggable={false}
+              />
+            ) : (
+              <div className="w-full h-full bg-media-loading" />
+            )}
+          </div>
         ) : (
+
           loadedMedia.has(currentIndex) ? (
             <OptimizedImage
               src={currentMedia.url}
