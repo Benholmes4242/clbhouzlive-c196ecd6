@@ -172,10 +172,8 @@ const MediaTile = memo<MediaTileProps>(({
       {isVideo && config.showDuration && resolvedDuration && (
         <div className="absolute top-2 left-2 z-10">
           <div className="px-1.5 py-0.5 rounded bg-black/60 text-white text-[10px] font-medium">
-            {isVisible
-              ? formatDuration(Math.max(0, resolvedDuration - currentPlaybackTime))
-              : formatDuration(resolvedDuration)
-            }
+            {formatDuration(resolvedDuration)}
+
           </div>
         </div>
       )}
