@@ -819,6 +819,22 @@ function VerificationsTab({
 
             {active.type === 'course_claim' && (
               <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+                {active.businessAlreadyVerified && (
+                  <div
+                    style={{
+                      background: 'rgba(245, 158, 11, 0.10)',
+                      border: '1px solid rgba(245, 158, 11, 0.35)',
+                      color: '#b45309',
+                      padding: '8px 10px',
+                      borderRadius: 8,
+                      fontSize: 12,
+                      lineHeight: 1.4,
+                    }}
+                  >
+                    Note: this business is already verified. Course claims grant club linkage,
+                    which the verified tick alone does not - review the claim on its own merits.
+                  </div>
+                )}
                 {active.claimBusinessName && <Field label="Business" value={active.claimBusinessName} />}
                 {active.claimCourseName && <Field label="Course / Club" value={active.claimCourseName} />}
                 {active.claimProofNote && <Field label="Proof note" value={active.claimProofNote} />}
