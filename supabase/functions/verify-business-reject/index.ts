@@ -152,6 +152,12 @@ serve(async (req) => {
       })
       .catch((e) => console.error("[reject] result-email failed", e));
 
+    queueOwnerPush(supabaseAdmin, request.business_id, {
+      title: "Verification update",
+      body: "Your verification request was not approved. Tap to see the reviewer's note.",
+      data: { type: "business_verification_result", outcome: "rejected", business_id: request.business_id },
+    }).catch((e) => console.error("[reject] push queue failed", e));
+
 
 
 
