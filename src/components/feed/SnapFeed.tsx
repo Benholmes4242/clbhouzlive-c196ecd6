@@ -172,16 +172,8 @@ export function SnapFeed({
       if (bestEntry && bestEntry.intersectionRatio >= ACTIVE_SLIDE_RATIO) {
         const idx = Number((bestEntry.target as HTMLElement).dataset.index);
         if (!isNaN(idx)) {
-          // Directional warm: NEXT slide only (was N+1 AND N+2 — two hidden
-          // decoded instances oversubscribed the iOS budget). N+1 collapses into
-          // the radius-1 attach slot on swipe (net 0 extra decoders).
-          const nextPost = postsRef.current[idx + 1];
-          const hlsUrl = nextPost?.mediaItems?.[0]?.hlsUrl;
-          if (hlsUrl) {
-            preloadHlsManifest(hlsUrl)
-              .then(() => registerInPool(hlsUrl, surface))
-              .catch(() => {});
-          }
+          // Stage B3 teardown: HLS manifest preload / pool registration removed.
+
           
           pendingIndexRef.current = idx;
           if (debounceTimerRef.current) clearTimeout(debounceTimerRef.current);
