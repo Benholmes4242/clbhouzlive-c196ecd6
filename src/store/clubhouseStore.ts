@@ -47,6 +47,25 @@ interface ClubhouseState {
   setIsTournamentCardActive: (v: boolean) => void;
   markUserGestureUnmute: () => void;
   isRecentUserGesture: () => boolean;
+  /** Per-tab warmer — CardFeed registers a callback that prefetches the tab's
+   *  active-index HLS first segment. Fired on setActiveTab so tab-restore
+   *  doesn't stall on the cold segment fetch (manifest is already pooled). */
+  registerTabWarmer: (tab: TabKey, fn: (() => void) | null) => void;
+}
+
+// Kept outside the state so callers don't retrigger React re-renders when
+// registering/unregistering warmers.
+const _tabWarmers = new Map<TabKey, () => void>();
+
+function isSaveDataOn(): boolean {
+  try {
+    const c: any = (navigator as any).connection;
+    return !!c?.saveData;
+  } catch { return false; }
+}
+
+function isVisible(): boolean {
+  try { return document.visibilityState === 'visible'; } catch { return true; }
 }
 
 function trimMap(map: Map<number, number>, cap = 20) {
