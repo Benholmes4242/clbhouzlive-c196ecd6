@@ -86,7 +86,9 @@ export function BusinessCommandCard({ membership, userId, index = 0, isActive = 
   // Derive verification state
   const verificationState = deriveVerificationState(business.is_verified, verificationRequest);
 
-  // Check if domain verification is required
+  // Check if domain verification is required.
+  // Note: requires_domain_check is admin-initiated; the client never sets it.
+  // When true the owner must complete the Domain step before an admin can approve.
   const needsDomainVerification = verificationRequest?.requires_domain_check && !verificationRequest?.domain_confirmed;
 
   // Format stat display - show "-" for zero/empty
