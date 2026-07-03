@@ -13,8 +13,8 @@ interface HeaderPhotoCardProps {
   variant?: 'card' | 'bare';
 }
 
-// Matches profile hero: full-width × clamp(200px, 28vw, 280px). ~2:1 on mobile.
-const HEADER_ASPECT_RATIO = 2 / 1;
+// Matches profile hero: 3:2 (width-based). Crop and display are pixel-matched.
+const HEADER_ASPECT_RATIO = 3 / 2;
 
 export const HeaderPhotoCard: React.FC<HeaderPhotoCardProps> = ({
   currentUrl,
