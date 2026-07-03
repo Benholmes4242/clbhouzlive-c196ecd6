@@ -170,6 +170,12 @@ export function FullscreenFeedOverlay() {
         document.documentElement.style.backgroundColor = '';
         document.body.style.backgroundColor = '';
 
+        // FLIP handoff return — tell every origin tile whose url was handed off
+        // to re-promote from the pool and seek to its last known playhead.
+        // Deferred so the fullscreen SnapFeed has finished unmounting (and
+        // demoting its promoted instance back to the pool) first.
+        setTimeout(() => flipContinuity.emitClose(), 0);
+
         // Restore #root scroll position on the next frame so the feed's scroll
         // height is settled after the overlay unmounts.
         if (rootEl) {
