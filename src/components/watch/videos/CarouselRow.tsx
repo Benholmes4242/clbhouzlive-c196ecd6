@@ -1,7 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import type { FeedPost } from '@/components/media-system/types/media';
 import AutoplayVideoCard from './AutoplayVideoCard';
-import { prefetchTile } from '@/hooks/useTileVideoPlayer';
 import { useEdgeFades } from '@/components/watch/shared/useEdgeFades';
 
 
@@ -71,12 +70,7 @@ export default function CarouselRow({ items, allPosts, baseIndex, userId }: Caro
     return () => io.disconnect();
   }, []);
 
-  // Prefetch the next card's hls when active changes
-  useEffect(() => {
-    const next = items[activeIndex + 1];
-    const url = (next?.mediaItems?.find((m) => m.type === 'video') as any)?.hlsUrl;
-    if (url) prefetchTile(url);
-  }, [activeIndex, items]);
+  // [VIDEOSTUB] Prefetch of next card removed — poster-only chassis.
 
   if (items.length === 0) return null;
 

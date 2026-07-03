@@ -101,28 +101,19 @@ function AutoplayVideoCardInner({ post, index, allPosts, userId, active, borderR
       >
         <div ref={tileRef} style={{ position: 'absolute', inset: 0 }}>
           {thumbnail ? (
-            <div
+            <DecodedImage
+              src={thumbnail}
+              alt=""
+              loading="lazy"
+              onDecoded={onDecoded}
               style={{
                 position: 'absolute',
                 inset: 0,
-                opacity: videoVisible ? 0 : 1,
-                transition: 'opacity 200ms ease',
+                width: '100%',
+                height: '100%',
+                objectFit: 'cover',
               }}
-            >
-              <DecodedImage
-                src={thumbnail}
-                alt=""
-                loading="lazy"
-                onDecoded={onDecoded}
-                style={{
-                  position: 'absolute',
-                  inset: 0,
-                  width: '100%',
-                  height: '100%',
-                  objectFit: 'cover',
-                }}
-              />
-            </div>
+            />
           ) : null}
         </div>
 
