@@ -6,8 +6,9 @@ import { useActiveActor } from '@/context/ActiveActorContext';
 import { startOfDay, subDays, startOfWeek } from 'date-fns';
 
 // ⚡ DEV FLAG: Mock notifications for testing (auto-disabled in production)
+const PROD_HOSTS = new Set(['clbhouz.com', 'www.clbhouz.com', 'clbhouz.co.uk', 'www.clbhouz.co.uk']);
 const isProd = typeof window !== 'undefined' &&
-  (import.meta.env.MODE === 'production' || window.location.hostname === 'clbhouz.com');
+  (import.meta.env.MODE === 'production' || PROD_HOSTS.has(window.location.hostname));
 const SHOW_MOCK_ACTIVITY = !isProd && false; // Set second operand to true to enable in dev only
 
 // Content existence check for deleted content navigation guard

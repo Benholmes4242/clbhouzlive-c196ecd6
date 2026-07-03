@@ -7,7 +7,7 @@ const corsHeaders = {
 };
 
 // Admin email recipients - comma-separated list
-const ADMIN_EMAILS = Deno.env.get("BUSINESS_VERIFICATION_ADMIN_EMAILS") || "admin@clbhouz.com";
+const ADMIN_EMAILS = Deno.env.get("BUSINESS_VERIFICATION_ADMIN_EMAILS") || "admin@clbhouz.co.uk";
 
 interface VerificationRequestPayload {
   profileId: string;
@@ -50,7 +50,7 @@ serve(async (req) => {
     }
 
     // Build email content
-    const adminPanelUrl = `https://clbhouz.com/admin/business-verifications`;
+    const adminPanelUrl = `https://www.clbhouz.co.uk/admin-v2/users?tab=verifications`;
     
     const emailSubject = `New Business Verification Request – ${businessName || 'Unknown Business'}`;
     

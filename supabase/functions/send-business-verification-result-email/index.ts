@@ -148,7 +148,7 @@ serve(async (req) => {
       });
     }
 
-    const appBase = Deno.env.get("APP_BASE_URL") || "https://clbhouz.com";
+    const appBase = Deno.env.get("APP_BASE_URL") || "https://www.clbhouz.co.uk";
     const profileUrl = biz.slug ? `${appBase}/business/${biz.slug}` : `${appBase}/businesses/manage`;
     const verificationUrl = `${appBase}/business/${biz.id}/verification`;
 
