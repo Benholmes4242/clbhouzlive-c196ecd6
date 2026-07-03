@@ -270,6 +270,22 @@ const FeedCardImpl: React.FC<FeedCardProps> = ({
     onContentReady();
   }, [isFirstCard, onContentReady]);
 
+  // Double-tap-to-like: burst overlay + like-only (never unlike) commit.
+  const [burstKey, setBurstKey] = useState(0);
+  const [burstVisible, setBurstVisible] = useState(false);
+  const handleMediaDoubleTap = React.useCallback(() => {
+    // Always show the burst (confirms even when already liked)…
+    setBurstKey((k) => k + 1);
+    setBurstVisible(true);
+    // …but only fire the like when currently unliked (TikTok/IG parity).
+    if (!liked) {
+      triggerHaptic('medium');
+      onLike(post, effectiveActor);
+    } else {
+      triggerHaptic('light');
+    }
+  }, [liked, onLike, post, effectiveActor]);
+
   const reviewCourseId = post.review?.courseId ?? post.courseId;
   const reviewId = post.review?.reviewId;
   const handleReadReview = (e: React.MouseEvent) => {
