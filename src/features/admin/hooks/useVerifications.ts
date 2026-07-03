@@ -40,7 +40,7 @@ async function fetchVerifications(): Promise<VerificationRow[]> {
   const [biz, golfer, claims] = await Promise.all([
     supabase
       .from('business_verification_requests')
-      .select('id, status, requested_by, created_at, reviewed_at, note, admin_note, business_id, domain, domain_confirmed, proof_method, proof_value, proof_metadata')
+      .select('id, status, requested_by, created_at, reviewed_at, note, admin_note, business_id, domain, domain_confirmed, proof_method, proof_value, proof_metadata, contact_email, contact_role')
       .order('created_at', { ascending: false }),
     supabase
       .from('golfer_verification_requests')
