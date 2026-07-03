@@ -389,6 +389,7 @@ class HLSPoolManagerClass {
       entry.hls.stopLoad();
       try { entry.hls.detachMedia(); } catch {}
       entry.isPromoted = false;
+      entry.role = 'handoff';
       entry.preloadedByVideo = null;
       if (entry.timeoutId) clearTimeout(entry.timeoutId);
       const ttl = this.getTTL();
