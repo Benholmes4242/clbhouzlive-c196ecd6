@@ -17,6 +17,8 @@ export const MOBILE_VIDEO_DEBUG = (() => {
   }
 })();
 
+import { isPerfEnabled } from '@/perf/navTiming';
+
 // Runtime in-memory enable so the panel can be flipped on-device without a console.
 let runtimeEnabled = false;
 export function enableVideoDebug() { runtimeEnabled = true; }
@@ -28,12 +30,7 @@ export function isVideoDebugOn(): boolean {
   // (DEV or ?perf=1 or the runtime perf toggle), video debug traces are also
   // on — so `logHandoff` writes land in the LOG pill's copy buffer without
   // requiring a separate localStorage flag.
-  try {
-    // Lazy require to avoid a circular import at module init.
-    // eslint-disable-next-line @typescript-eslint/no-var-requires
-    const { isPerfEnabled } = require('@/perf/navTiming') as { isPerfEnabled: () => boolean };
-    if (isPerfEnabled && isPerfEnabled()) return true;
-  } catch {}
+  try { if (isPerfEnabled()) return true; } catch {}
   return false;
 }
 
