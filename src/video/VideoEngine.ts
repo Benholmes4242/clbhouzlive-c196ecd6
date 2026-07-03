@@ -273,6 +273,11 @@ class VideoEngineImpl {
     const onLoadedData = () => {
       if (!lane.firstFrame) {
         lane.firstFrame = true;
+        if (lane.id === 'fullscreen') {
+          this.trace('V1_FS_FIRSTFRAME', { postId: lane.postId, videoTime: lane.el.currentTime });
+        } else if (lane.id === 'feed-active') {
+          this.trace('V1_TILE_FIRSTFRAME', { postId: lane.postId, videoTime: lane.el.currentTime });
+        }
         this.emit(lane);
       }
       if (this.loadingCount > 0) this.loadingCount--;
