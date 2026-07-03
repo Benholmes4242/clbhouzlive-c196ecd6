@@ -3,7 +3,6 @@ import { useClubhouseStore } from '@/store/clubhouseStore';
 import { SnapVideoPlayer } from './SnapVideoPlayer';
 import { usePinchZoomPointer } from '@/hooks/usePinchZoomPointer';
 import { preloadHlsManifest } from '@/utils/hlsPreload';
-import { registerInPool } from '@/utils/hlsPoolPreloader';
 import type { MediaItem } from '@/components/media-system/types/media';
 
 interface FeedImageCarouselProps {
@@ -103,7 +102,6 @@ export const FeedImageCarousel = memo(function FeedImageCarousel({
       const hlsUrl = firstAdjacent.hlsUrl || '';
       if (hlsUrl && !hlsUrl.startsWith('blob:')) {
         preloadHlsManifest(hlsUrl)
-          .then(() => registerInPool(hlsUrl))
           .catch(() => {});
       }
     }
@@ -124,7 +122,6 @@ export const FeedImageCarousel = memo(function FeedImageCarousel({
       const hlsUrl = item.hlsUrl || '';
       if (!hlsUrl || hlsUrl.startsWith('blob:')) return;
       preloadHlsManifest(hlsUrl)
-        .then(() => registerInPool(hlsUrl))
         .catch(() => {});
     });
   }, [currentSlide, mediaItems]);
