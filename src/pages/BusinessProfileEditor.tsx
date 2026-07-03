@@ -448,9 +448,10 @@ export default function BusinessProfileEditor() {
     try {
       const socialLinks = {
         instagram: social.instagram || null,
-        twitter: social.twitter || null,
-        facebook: social.facebook || null,
-        youtube: social.youtube || null,
+        tiktok:    social.tiktok    || null,
+        twitter:   social.twitter   || null,
+        facebook:  social.facebook  || null,
+        youtube:   social.youtube   || null,
       };
       const hasSocial = Object.values(socialLinks).some(Boolean);
 
