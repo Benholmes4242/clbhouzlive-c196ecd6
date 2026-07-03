@@ -1,6 +1,5 @@
 import React, { useRef } from 'react';
 import { Camera, Plus } from 'lucide-react';
-import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { BIZ } from '@/components/business/businessTokens';
 
 interface Props {
