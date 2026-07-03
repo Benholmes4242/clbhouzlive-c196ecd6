@@ -33,15 +33,8 @@ const MediaGrid = ({
               onClick={() => onImageClick(index)}
             >
               {selectedImages[index]?.type.startsWith('video/') ? (
-                <div className="relative w-full h-full">
-                  <video 
-                    src={url} 
-                    className="w-full h-full object-cover"
-                    muted
-                  />
-                  <div className="absolute inset-0 flex items-center justify-center">
-                    <Video className="h-8 w-8 text-white drop-shadow-lg" />
-                  </div>
+                <div className="relative w-full h-full bg-black flex items-center justify-center">
+                  <Video className="h-8 w-8 text-white drop-shadow-lg" />
                 </div>
               ) : (
                 <img 
