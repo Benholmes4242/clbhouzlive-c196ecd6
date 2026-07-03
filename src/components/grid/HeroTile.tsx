@@ -51,8 +51,8 @@ const HeroTile = memo<HeroTileProps>(({
   
   return (
     <motion.button
-      ref={inViewRef}
       type="button"
+
       className="w-full aspect-video relative overflow-hidden rounded-lg"
       onClick={handleClick}
       whileHover={{ scale: 1.01 }}
