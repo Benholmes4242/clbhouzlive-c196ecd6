@@ -43,7 +43,7 @@ export interface BusinessProfile {
   founded_year: number | null;
   booking_url: string | null;
   opening_hours: Record<string, { open: string; close: string; closed: boolean }> | null;
-  social_links: { instagram?: string; twitter?: string; facebook?: string; youtube?: string } | null;
+  social_links: { instagram?: string; tiktok?: string; twitter?: string; facebook?: string; youtube?: string } | null;
 }
 
 export function useBusinessProfile(idOrSlug: string | undefined) {
