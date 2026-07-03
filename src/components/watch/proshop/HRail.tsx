@@ -76,7 +76,7 @@ function HRailInner({
           width: EDGE_FADE_WIDTH,
           pointerEvents: 'none',
           background:
-            'linear-gradient(to right, hsl(var(--background)) 0%, hsl(var(--background) / 0) 100%)',
+            'linear-gradient(to right, #F8FAFC 0%, rgba(248,250,252,0) 100%)',
           opacity: 0,
           transition: 'opacity 150ms ease',
         }}
@@ -92,7 +92,7 @@ function HRailInner({
           width: EDGE_FADE_WIDTH,
           pointerEvents: 'none',
           background:
-            'linear-gradient(to left, hsl(var(--background)) 0%, hsl(var(--background) / 0) 100%)',
+            'linear-gradient(to right, rgba(248,250,252,0) 0%, #F8FAFC 100%)',
           opacity: 0,
           transition: 'opacity 150ms ease',
         }}
