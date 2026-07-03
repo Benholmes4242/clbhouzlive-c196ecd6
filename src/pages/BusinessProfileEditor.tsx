@@ -709,8 +709,20 @@ export default function BusinessProfileEditor() {
         title={mode === 'create' ? 'Create a business' : 'Edit business'}
         onBack={handleClose}
       >
-        <div className="flex-1 overflow-y-auto pt-3 pb-12" style={{ background: BIZ.pageBg }}>
+        <div className="flex-1 overflow-y-auto pb-12" style={{ background: BIZ.pageBg }}>
 
+          {/* 1. HERO — cover + squircle logo at top */}
+          <BusinessHeroCard
+            logoUrl={effectiveLogoUrl}
+            coverUrl={effectiveCoverUrl}
+            resolvedName={resolvedName}
+            onLogoFile={onLogoFile}
+            onLogoRemove={onLogoRemove}
+            onCoverFile={onCoverFile}
+            onCoverRemove={onCoverRemove}
+          />
+
+          {/* 2. IDENTITY */}
           <IdentitySection
             mode={mode}
             category={category}
@@ -753,8 +765,6 @@ export default function BusinessProfileEditor() {
             </div>
           )}
 
-          {/* Proof note — create-mode golf-club claim only.
-              Helps the admin verify your connection to the club. Optional. */}
           {mode === 'create' && isGolfClub && selectedClub && !existingBusinessForClub && !clubClaimPending && (
             <div style={{ padding: '0 16px', marginTop: 8, marginBottom: 16 }}>
               <label
@@ -774,7 +784,7 @@ export default function BusinessProfileEditor() {
                 id="claim-proof-note"
                 value={claimProofNote}
                 onChange={(e) => setClaimProofNote(e.target.value.slice(0, 500))}
-                placeholder="e.g. I'm the General Manager — work email on the club domain, happy to send a verification email."
+                placeholder="e.g. I'm the General Manager, work email on the club domain, happy to send a verification email."
                 rows={3}
                 maxLength={500}
                 style={{
@@ -796,6 +806,14 @@ export default function BusinessProfileEditor() {
             </div>
           )}
 
+          {/* 3. FACILITIES (category-aware) */}
+          <FacilitiesSection
+            category={category}
+            amenities={amenities}
+            setAmenities={setAmenities}
+          />
+
+          {/* 4. LOCATION & CONTACT */}
           <LocationContactSection
             mode={mode}
             isClubLinked={isClubLinked}
@@ -822,21 +840,31 @@ export default function BusinessProfileEditor() {
             businessLocationFallback={business?.location ?? null}
           />
 
-          <BrandingSection
-            effectiveLogoUrl={effectiveLogoUrl}
-            effectiveCoverUrl={effectiveCoverUrl}
-            resolvedName={resolvedName}
-            onLogoFile={onLogoFile}
-            onLogoRemove={onLogoRemove}
-            onCoverFile={onCoverFile}
-            onCoverRemove={onCoverRemove}
+          {/* 5. PRIMARY BUTTON */}
+          <PrimaryActionSection value={primaryAction} onChange={setPrimaryAction} />
+
+          {/* 6. BOOKING — coming soon */}
+          <BookingComingSoonSection />
+
+          {/* 7. OPENING HOURS with master toggle */}
+          <OpeningHoursSection
+            enabled={showOpeningHours}
+            setEnabled={setShowOpeningHours}
+            openingHours={openingHours}
+            setOpeningHours={setOpeningHours}
           />
 
+          {/* 8. SOCIAL */}
           <SocialSection social={social} setSocial={setSocial} />
 
           {mode === 'edit' && business?.id && (
             <NotificationsSection businessId={business.id} />
           )}
+
+          {/* 9. VERIFICATION NUDGE */}
+          <VerificationNudgeSection />
+
+
 
 
           {/* Inline Save — bottom, matches personal Edit Profile */}
