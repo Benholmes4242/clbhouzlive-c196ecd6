@@ -1,15 +1,13 @@
 import { useNavigate } from 'react-router-dom';
 import { useEffect, useMemo } from 'react';
-import { ChevronLeft } from 'lucide-react';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useMyBusinesses } from '@/hooks/useMyBusinesses';
-import { PageRoot } from '@/components/layout/PageRoot';
 import { BusinessCommandCard } from '@/components/business/BusinessCommandCard';
 import { AddBusinessCard } from '@/components/business/AddBusinessCard';
 import { useActiveActor } from '@/context/ActiveActorContext';
 import { useHideBottomNav } from '@/hooks/useBottomNavVisibility';
 import { useHideHeader } from '@/hooks/useHeaderVisibility';
-import { SectionHeader } from '@/components/ui/SectionHeader';
+import { ManagePageShell } from '@/components/manage/ManagePageShell';
 import { BIZ } from '@/components/business/businessTokens';
 
 // Inline skeleton used by loading state — kept local since it is private to this page.
