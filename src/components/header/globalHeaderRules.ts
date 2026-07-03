@@ -36,6 +36,7 @@ export const GLOBAL_HEADER_EXCLUDED_PREFIXES = [
   '/legal', // Legal index + document pages have their own back-arrow shell
   '/privacy', // Privacy policy page has its own header
   '/terms', // Terms page has its own header
+  '/businesses/manage', // Manage business profiles uses ManagePageShell (own header, no global chrome)
 ] as const;
 
 /**
