@@ -178,7 +178,7 @@ const SuspendedScreen: React.FC<Props> = ({ suspension }) => {
             Appeal this decision
           </button>
           <a
-            href="mailto:support@clbhouz.com?subject=Account%20suspension"
+            href="mailto:support@clbhouz.co.uk?subject=Account%20suspension"
             style={{
               display: 'block', textAlign: 'center', padding: '12px 16px', borderRadius: 999,
               background: 'transparent', color: '#F8FAFC', border: '1px solid rgba(248, 250, 252, 0.24)',
