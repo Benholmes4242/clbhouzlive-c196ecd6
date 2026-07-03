@@ -1,3 +1,8 @@
+// FLAGGED (Stage B5, BRIEF_VIDEO_TEARDOWN.md):
+// KeyframePlayer is swing-analysis frame-scrubbing, not streamed feed playback.
+// It requires a real <video> element for currentTime seeking (biomechanical review).
+// Converting to poster-only would break the swing review UX, so it is intentionally
+// left functional here. Rewire to the new engine once it lands.
 import React, { useRef, useEffect, useState, useId } from 'react';
 import { Play, Pause, Maximize2 } from 'lucide-react';
 import EnhancedVideoPlayer from '@/components/ui/enhanced-video-player';
