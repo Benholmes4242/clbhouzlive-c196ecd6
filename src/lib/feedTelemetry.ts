@@ -1,185 +1,153 @@
 /**
- * Feed telemetry — swipe → poster → first-frame timings.
+ * Feed telemetry — compact, greppable, LogHud-friendly.
  *
- * Enable at runtime: localStorage.setItem('FEED_TELEMETRY', '1')
- * Disable:          localStorage.removeItem('FEED_TELEMETRY')
+ * Emits ONE formatted string per event via console.info (never console.table,
+ * never bare object args), because the device LogHud → COPY path drops both.
  *
- * Output: compact single-line console.info entries (device LogHud safe).
- * No console.table, no bare object args — every line is a pre-formatted string
- * so the LogHud → COPY path preserves it verbatim.
+ * Flag-gated: only active when localStorage.FEED_TELEMETRY === '1'.
  *
- * One line per card commit:
- *   [card] #12 img  swipe→vis 4ms  vis→poster 62ms  swipe→ff  -    pool=hit  cached=y
- *   [card] #13 vid  swipe→vis 5ms  vis→poster 71ms  swipe→ff 214ms pool=miss cached=n
- *
- * Summary line after 20 commits (or on flush):
- *   [card] SUMMARY n=20 swipe→ff p50=180ms p95=520ms  poster p50=68ms p95=140ms  poolHit=14/18 cached=6/20
- *
- * Tab-switch and PTR resolve on the next first-frame after their mark:
- *   [card] TAB for-you→friends resolved-in 340ms (via #0)
- *   [card] PTR resolved-in 610ms (via #0)
+ * Line shapes (all prefixed with [FEEDTEL]):
+ *   [FEEDTEL] swipe        i=12 kind=vid t=1737054321987
+ *   [FEEDTEL] visible      i=12 dt_swipe_visible=48ms
+ *   [FEEDTEL] poster       i=12 dt_swipe_poster=112ms
+ *   [FEEDTEL] firstframe   i=12 dt_swipe_ff=214ms poolHit=1 cached=0
+ *   [FEEDTEL] tab          from=for-you to=friends t=...
+ *   [FEEDTEL] ptr          t=...
+ *   [FEEDTEL] summary      n=42 poolHitRate=0.71 cachedRate=0.55 |
+ *                          poster p50=98 p95=310 max=812 |
+ *                          firstframe p50=190 p95=640 max=1420
  */
 
-const FLAG = 'FEED_TELEMETRY';
+const FLAG_KEY = 'FEED_TELEMETRY';
 
 function on(): boolean {
   try {
-    return typeof window !== 'undefined' && window.localStorage?.getItem(FLAG) === '1';
+    return typeof localStorage !== 'undefined' && localStorage.getItem(FLAG_KEY) === '1';
   } catch {
     return false;
   }
 }
 
-const now = (): number =>
-  typeof performance !== 'undefined' && performance.now ? performance.now() : Date.now();
+function now(): number {
+  return typeof performance !== 'undefined' && performance.now ? performance.now() : Date.now();
+}
 
-type Kind = 'img' | 'vid' | 'mix' | '?';
-
-interface CardRecord {
-  idx: number;
-  kind: Kind;
-  tSwipe: number;
-  tVisible?: number;
-  tPoster?: number;
-  tFirstFrame?: number;
+interface CardStamps {
+  swipe?: number;
+  visible?: number;
+  poster?: number;
+  firstFrame?: number;
   poolHit?: boolean;
   cached?: boolean;
-  source?: string;
-  emitted?: boolean;
 }
 
-const cards = new Map<number, CardRecord>();
-const swipeFF: number[] = []; // ms
-const posterMs: number[] = [];
-let poolHitCount = 0;
-let poolTotalCount = 0;
-let cachedCount = 0;
-let cardCount = 0;
+const stamps = new Map<number, CardStamps>();
+const posterDeltas: number[] = [];
+const firstFrameDeltas: number[] = [];
+let poolHits = 0;
+let poolTotal = 0;
+let cachedHits = 0;
+let cachedTotal = 0;
 
-let pendingTab: { label: string; t: number } | null = null;
-let pendingPTR: { t: number } | null = null;
-
-function pad(n: number | undefined, w = 4): string {
-  if (n == null) return '-'.padStart(w, ' ');
-  return `${Math.round(n)}ms`.padStart(w + 2, ' ');
+function get(i: number): CardStamps {
+  let s = stamps.get(i);
+  if (!s) { s = {}; stamps.set(i, s); }
+  return s;
 }
 
-function pct(arr: number[], p: number): number | undefined {
-  if (!arr.length) return undefined;
-  const sorted = [...arr].sort((a, b) => a - b);
-  const i = Math.min(sorted.length - 1, Math.floor((p / 100) * sorted.length));
-  return sorted[i];
+function fmt(n: number): string {
+  return Math.round(n).toString();
 }
 
-function emit(rec: CardRecord): void {
-  if (rec.emitted) return;
-  rec.emitted = true;
-  const dtVis = rec.tVisible != null ? rec.tVisible - rec.tSwipe : undefined;
-  const dtPoster = rec.tVisible != null && rec.tPoster != null ? rec.tPoster - rec.tVisible : undefined;
-  const dtFF = rec.tFirstFrame != null ? rec.tFirstFrame - rec.tSwipe : undefined;
-
-  if (dtFF != null) swipeFF.push(dtFF);
-  if (dtPoster != null) posterMs.push(dtPoster);
-  poolTotalCount += 1;
-  if (rec.poolHit) poolHitCount += 1;
-  if (rec.cached) cachedCount += 1;
-  cardCount += 1;
-
-  const line =
-    `[card] #${String(rec.idx).padStart(2, ' ')} ${rec.kind.padEnd(3, ' ')} ` +
-    `swipe→vis ${pad(dtVis)}  vis→poster ${pad(dtPoster)}  swipe→ff ${pad(dtFF)}  ` +
-    `pool=${rec.poolHit == null ? '-' : rec.poolHit ? 'hit ' : 'miss'} ` +
-    `cached=${rec.cached == null ? '-' : rec.cached ? 'y' : 'n'}` +
-    (rec.source ? ` src=${rec.source}` : '');
-  // eslint-disable-next-line no-console
-  console.info(line);
-
-  if (cardCount % 20 === 0) flushSummary();
-
-  // resolve tab / PTR waits on the next first-frame after their mark
-  if (dtFF != null && rec.tFirstFrame != null) {
-    if (pendingTab && rec.tFirstFrame >= pendingTab.t) {
-      const dt = Math.round(rec.tFirstFrame - pendingTab.t);
-      // eslint-disable-next-line no-console
-      console.info(`[card] TAB ${pendingTab.label} resolved-in ${dt}ms (via #${rec.idx})`);
-      pendingTab = null;
-    }
-    if (pendingPTR && rec.tFirstFrame >= pendingPTR.t) {
-      const dt = Math.round(rec.tFirstFrame - pendingPTR.t);
-      // eslint-disable-next-line no-console
-      console.info(`[card] PTR resolved-in ${dt}ms (via #${rec.idx})`);
-      pendingPTR = null;
-    }
-  }
-}
-
-export function flushSummary(): void {
+export function markSwipe(index: number, kind: 'img' | 'vid' | 'mix' | '?'): void {
   if (!on()) return;
-  const line =
-    `[card] SUMMARY n=${cardCount} ` +
-    `swipe→ff p50=${pad(pct(swipeFF, 50))} p95=${pad(pct(swipeFF, 95))}  ` +
-    `poster p50=${pad(pct(posterMs, 50))} p95=${pad(pct(posterMs, 95))}  ` +
-    `poolHit=${poolHitCount}/${poolTotalCount} cached=${cachedCount}/${cardCount}`;
-  // eslint-disable-next-line no-console
-  console.info(line);
+  const t = now();
+  const s = get(index);
+  // Reset per-card stamps on every swipe-in so we always measure the fresh cycle.
+  s.swipe = t;
+  s.visible = undefined;
+  s.poster = undefined;
+  s.firstFrame = undefined;
+  s.poolHit = undefined;
+  s.cached = undefined;
+  console.info(`[FEEDTEL] swipe        i=${index} kind=${kind} t=${fmt(t)}`);
 }
 
-/** Fired when the user commits to card `idx` (Virtuoso settles / activeIdx changes). */
-export function markSwipe(idx: number, kind: Kind = '?'): void {
+export function markVisible(index: number): void {
   if (!on()) return;
-  // flush any prior record we never resolved
-  const prior = cards.get(idx);
-  if (prior && !prior.emitted && prior.tSwipe) emit(prior);
-  cards.set(idx, { idx, kind, tSwipe: now() });
+  const s = get(index);
+  if (s.visible != null) return; // first visible only, per swipe cycle
+  const t = now();
+  s.visible = t;
+  const dt = s.swipe != null ? t - s.swipe : -1;
+  console.info(`[FEEDTEL] visible      i=${index} dt_swipe_visible=${dt >= 0 ? fmt(dt) + 'ms' : 'n/a'}`);
 }
 
-/** Fired when the card first hits the intersection threshold (may equal swipe). */
-export function markVisible(idx: number): void {
+export function markPoster(index: number): void {
   if (!on()) return;
-  const rec = cards.get(idx);
-  if (!rec || rec.tVisible != null) return;
-  rec.tVisible = now();
+  const s = get(index);
+  if (s.poster != null) return;
+  const t = now();
+  s.poster = t;
+  const dt = s.swipe != null ? t - s.swipe : -1;
+  if (dt >= 0) posterDeltas.push(dt);
+  console.info(`[FEEDTEL] poster       i=${index} dt_swipe_poster=${dt >= 0 ? fmt(dt) + 'ms' : 'n/a'}`);
 }
 
-/** Fired from DecodedImage/LqipUnderlay onDecoded. */
-export function markPoster(idx: number): void {
-  if (!on()) return;
-  const rec = cards.get(idx);
-  if (!rec || rec.tPoster != null) return;
-  rec.tPoster = now();
-  // image-only cards emit here (no first-frame will come)
-  if (rec.kind === 'img') {
-    // small tick so poster paints have a chance to be measured
-    setTimeout(() => emit(rec), 0);
-  }
-}
-
-/** Fired from SnapVideoPlayer when hasFirstFrame flips true. */
 export function markFirstFrame(
-  idx: number,
-  meta?: { poolHit?: boolean; cached?: boolean; source?: string },
+  index: number,
+  meta: { poolHit: boolean; cached: boolean },
 ): void {
   if (!on()) return;
-  const rec = cards.get(idx);
-  if (!rec || rec.tFirstFrame != null) return;
-  rec.tFirstFrame = now();
-  if (meta) {
-    rec.poolHit = meta.poolHit;
-    rec.cached = meta.cached;
-    rec.source = meta.source;
-  }
-  if (rec.kind === '?' || rec.kind === 'img') rec.kind = 'vid';
-  emit(rec);
+  const s = get(index);
+  if (s.firstFrame != null) return;
+  const t = now();
+  s.firstFrame = t;
+  s.poolHit = meta.poolHit;
+  s.cached = meta.cached;
+  const dt = s.swipe != null ? t - s.swipe : -1;
+  if (dt >= 0) firstFrameDeltas.push(dt);
+  poolTotal += 1;
+  if (meta.poolHit) poolHits += 1;
+  cachedTotal += 1;
+  if (meta.cached) cachedHits += 1;
+  console.info(
+    `[FEEDTEL] firstframe   i=${index} dt_swipe_ff=${dt >= 0 ? fmt(dt) + 'ms' : 'n/a'} poolHit=${meta.poolHit ? 1 : 0} cached=${meta.cached ? 1 : 0}`,
+  );
 }
 
-/** Called from clubhouseStore.setActiveTab. */
 export function markTabSwitch(from: string, to: string): void {
   if (!on()) return;
-  pendingTab = { label: `${from}→${to}`, t: now() };
+  console.info(`[FEEDTEL] tab          from=${from} to=${to} t=${fmt(now())}`);
 }
 
-/** Called from CardFeed onRefresh. */
 export function markPTR(): void {
   if (!on()) return;
-  pendingPTR = { t: now() };
+  console.info(`[FEEDTEL] ptr          t=${fmt(now())}`);
+}
+
+function pct(sorted: number[], p: number): number {
+  if (sorted.length === 0) return 0;
+  const idx = Math.min(sorted.length - 1, Math.floor((p / 100) * sorted.length));
+  return sorted[idx];
+}
+
+/** Emit one compact summary line covering every card seen since last flush. */
+export function flushSummary(): void {
+  if (!on()) return;
+  const n = Math.max(posterDeltas.length, firstFrameDeltas.length);
+  const psorted = [...posterDeltas].sort((a, b) => a - b);
+  const fsorted = [...firstFrameDeltas].sort((a, b) => a - b);
+  const poolRate = poolTotal ? poolHits / poolTotal : 0;
+  const cachedRate = cachedTotal ? cachedHits / cachedTotal : 0;
+  console.info(
+    `[FEEDTEL] summary      n=${n} poolHitRate=${poolRate.toFixed(2)} cachedRate=${cachedRate.toFixed(2)} | ` +
+      `poster p50=${fmt(pct(psorted, 50))} p95=${fmt(pct(psorted, 95))} max=${fmt(psorted[psorted.length - 1] ?? 0)} | ` +
+      `firstframe p50=${fmt(pct(fsorted, 50))} p95=${fmt(pct(fsorted, 95))} max=${fmt(fsorted[fsorted.length - 1] ?? 0)}`,
+  );
+}
+
+// Expose a manual flush hook for the device COPY path.
+if (typeof window !== 'undefined') {
+  (window as unknown as { __feedTelFlush?: () => void }).__feedTelFlush = flushSummary;
 }
