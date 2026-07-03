@@ -843,7 +843,8 @@ export default function BusinessProfileEditor() {
             </button>
           </div>
         </div>
-      </div>
+      </ManagePageShell>
+
 
 
       {/* Close confirm */}
