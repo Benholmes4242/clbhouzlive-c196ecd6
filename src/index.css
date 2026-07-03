@@ -511,7 +511,7 @@ html.lightbox-open {
 .hrail-edge-fade[data-fade-left] .hrail-fade-left { opacity: 1 !important; }
 .hrail-edge-fade[data-fade-right] .hrail-fade-right { opacity: 1 !important; }
 @media (min-width: 768px) {
-  .hrail-edge-fade .hrail-fade { width: 10px; }
+  .hrail-edge-fade .hrail-fade { width: 5px; }
 }
 
 
