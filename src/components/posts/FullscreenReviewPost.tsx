@@ -3,7 +3,7 @@ import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { useSwipeable } from 'react-swipeable';
 import { motion, AnimatePresence } from 'framer-motion';
 import { getScoreTier } from '@/utils/getScoreTier';
-import HLSPlayer, { HLSPlayerRef } from '@/media/HLSPlayer';
+// [VIDEOSTUB] HLSPlayer import removed — poster-only chassis.
 import { cn } from '@/lib/utils';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { CreatorCapsule } from '@/components/clubhouse/cinematic/CreatorCapsule';
@@ -158,7 +158,7 @@ export function FullscreenReviewPost({
   const [isTransitioning, setIsTransitioning] = useState(false);
   const [isMuted, setIsMuted] = useState(true);
   const containerRef = useRef<HTMLDivElement>(null);
-  const videoPlayerRef = useRef<HLSPlayerRef>(null);
+  // [VIDEOSTUB] videoPlayerRef removed — no player mounted.
   
   const hasMultipleMedia = sortedMedia.length > 1;
   const currentMedia = sortedMedia[currentIndex];
@@ -238,21 +238,16 @@ export function FullscreenReviewPost({
                   className="absolute inset-0 bg-black"
                   style={{ zIndex: 0 }}
                 />
-                {/* Main video — contain so nothing is cropped */}
+                {/* [VIDEOSTUB] Poster-only render — video engine severed */}
                 <div className="absolute inset-0" style={{ zIndex: 1 }}>
-                  <HLSPlayer
-                    key={`review-video-${currentMedia.id}-${currentIndex}`}
-                    ref={videoPlayerRef}
-                    src={currentMedia.media_url}
+                  <img
+                    src={currentMedia.poster_url || currentMedia.media_url}
+                    alt=""
                     className="w-full h-full object-contain"
-                    muted={isMuted}
-                    loop={true}
-                    autoplay={true}
-                    showMuteButton={false}
-                    showPlayButton={false}
-                    mediaId={`review-preview-${currentMedia.id}`}
+                    draggable={false}
                   />
                 </div>
+
               </>
             ) : (
               <>
