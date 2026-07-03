@@ -293,6 +293,7 @@ export function SnapFeed({
     posters.forEach(post => {
       const thumb = post?.mediaItems?.[0]?.thumbnailUrl;
       if (thumb) { const img = new Image(); img.src = thumb; }
+    });
     // Manifests removed (Stage B3 teardown) — posters only.
   }, [activeIndex]);
 
