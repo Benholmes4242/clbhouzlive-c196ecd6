@@ -1,6 +1,6 @@
 import React, { useState, useCallback, useMemo, useRef, useEffect } from 'react';
 import SmartMediaContainer from '@/components/ui/smart-media-container';
-import UnifiedVideoPlayer from '@/media/components/UnifiedVideoPlayer';
+// [VIDEOSTUB] UnifiedVideoPlayer import removed — poster-only.
 import SoundToggle from '@/components/ui/sound-toggle';
 import { Play } from 'lucide-react';
 import { Loader2 } from 'lucide-react';
