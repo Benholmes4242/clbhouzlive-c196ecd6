@@ -7,7 +7,7 @@ const corsHeaders = {
 };
 
 // Admin email recipients - comma-separated list
-const ADMIN_EMAILS = Deno.env.get("BUSINESS_VERIFICATION_ADMIN_EMAILS") || "admin@clbhouz.com";
+const ADMIN_EMAILS = Deno.env.get("BUSINESS_VERIFICATION_ADMIN_EMAILS") || "admin@clbhouz.co.uk";
 
 interface VerificationRequestPayload {
   profileId: string;
