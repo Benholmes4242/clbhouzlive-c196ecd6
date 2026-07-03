@@ -9,8 +9,8 @@ import { cn } from '@/lib/utils';
 import { buildImageThumbnailUrl, buildVideoPosterUrl } from '@/utils/mediaThumbs';
 import { StudioEdits } from '@/types/studio';
 import { getCropWrapperClass, getPixelLayerStyle } from '@/utils/studioEdit';
-import UnifiedVideoPlayer, { UnifiedVideoPlayerRef } from '@/media/components/UnifiedVideoPlayer';
-import { VideoScrubber } from '@/components/video/VideoScrubber';
+// [VIDEOSTUB] UnifiedVideoPlayer + VideoScrubber imports removed — poster-only chassis.
+
 import TextOverlayRenderer from '@/components/studio/TextOverlayRenderer';
 
 // Helper to detect if URL requires HLS player
@@ -74,7 +74,7 @@ export default function CarouselSlide({
   const [generatedPosterUrl, setGeneratedPosterUrl] = useState<string | null>(null);
   const [videoDims, setVideoDims] = useState<{ w: number; h: number } | null>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
-  const hlsPlayerRef = useRef<UnifiedVideoPlayerRef>(null);
+  const hlsPlayerRef = useRef<HTMLVideoElement | null>(null);
   const objectUrlRef = useRef<string | null>(null);
   const showSkeleton = useCappedLoading(loaded, 600);
   const filterClass = getFilterClass(studioEdits?.filter);
@@ -203,25 +203,14 @@ export default function CarouselSlide({
     };
   }, [onVideoRef]);
 
-  // Pause video when slide becomes inactive - handles both UnifiedVideoPlayer and native video
+  // [VIDEOSTUB] Poster-only: no player to pause on inactive.
   useEffect(() => {
-    if (!isActive) {
-      // Try UnifiedVideoPlayer first
-      const unifiedPlayer = hlsPlayerRef.current;
-      if (unifiedPlayer) {
-        const videoEl = unifiedPlayer.getVideoElement();
-        if (videoEl && !videoEl.paused) {
-          unifiedPlayer.pause();
-          setIsPlaying(false);
-        }
-      }
-      // Also check native video
-      if (videoRef.current && !videoRef.current.paused) {
-        videoRef.current.pause();
-        setIsPlaying(false);
-      }
+    if (!isActive && videoRef.current && !videoRef.current.paused) {
+      videoRef.current.pause();
+      setIsPlaying(false);
     }
   }, [isActive]);
+
 
   // Format duration/time as countdown
   const formatTime = (seconds: number): string => {
@@ -308,15 +297,8 @@ export default function CarouselSlide({
           </div>
         )}
 
-        {/* Video scrubber - positioned at bottom of video */}
-        {loaded && duration > 0 && (
-          <VideoScrubber
-            videoEl={needsUnifiedPlayer ? hlsPlayerRef.current?.getVideoElement() ?? null : videoRef.current}
-            height={3}
-            variant={scrubberVariant}
-            className="absolute left-0 right-0 bottom-10 z-30"
-          />
-        )}
+        {/* [VIDEOSTUB] Scrubber removed — no live playback surface */}
+
 
         {/* Video badge - bottom-right of video */}
         {!hideVideoOverlays && (
