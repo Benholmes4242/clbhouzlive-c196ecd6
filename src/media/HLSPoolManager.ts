@@ -24,15 +24,23 @@ import type HlsType from 'hls.js';
 import { logVideoTelemetry } from '@/utils/videoTelemetry';
 import { logPoolEvent } from '@/media/mobileVideoDebug';
 
+type PoolRole = 'speculative' | 'handoff' | 'promoted';
+
 interface PooledHLSInstance {
   hls: HlsType;
   url: string;
   created: number;
   preloadedByVideo: HTMLVideoElement | null;
   isPromoted: boolean;
+  role: PoolRole;
   timeoutId?: NodeJS.Timeout;
   surface: 'feed' | 'fullscreen';
 }
+
+// Speculative sub-cap: guarantees room for handoff + promoted entries so a
+// prefetch storm cannot starve the active/opening video.
+const SPECULATIVE_SUBCAP = 8;
+const SPECULATIVE_SUBCAP_LOW_MEMORY = 5;
 
 // Pool configuration
 const POOL_CONFIG = {
@@ -138,14 +146,20 @@ class HLSPoolManagerClass {
   }
 
   /**
-   * Register a preloaded HLS instance with the pool
+   * Register a preloaded HLS instance with the pool.
+   * `role` orders eviction priority ('speculative' evicted first, 'handoff' only
+   * if no speculative exists, 'promoted' never). Defaults to 'speculative' so
+   * existing callers are unchanged. Returns true on success, false when the
+   * pool is full-all-promoted (or speculative sub-cap is full with no
+   * speculative to evict) — callers should fall back to a cold attach.
    */
   register(
-    url: string, 
-    hls: HlsType, 
+    url: string,
+    hls: HlsType,
     preloadVideo: HTMLVideoElement,
     surface: 'feed' | 'fullscreen' = 'feed',
-  ): void {
+    role: 'speculative' | 'handoff' = 'speculative',
+  ): boolean {
     // GUARD: never clobber a promoted (live, on-screen) instance. If one exists
     // for this URL, destroy the INCOMING duplicate instead and bail. This is the
     // foot-gun behind the re-attach miss storm — registering over a live decoder
@@ -153,15 +167,37 @@ class HLSPoolManagerClass {
     const existing = this.pool.get(url);
     if (existing?.isPromoted) {
       try { hls.destroy(); } catch {}
-      return;
+      return false;
     }
 
     // FIX #9: Use dynamic max based on memory pressure
     const maxInstances = this.getMaxInstances();
-    
-    // Evict oldest if at capacity
+
+    // Speculative sub-cap: reserve slots for handoff/promoted entries.
+    if (role === 'speculative') {
+      const subCap = this.isLowMemory ? SPECULATIVE_SUBCAP_LOW_MEMORY : SPECULATIVE_SUBCAP;
+      let speculativeCount = 0;
+      this.pool.forEach((e) => { if (e.role === 'speculative') speculativeCount++; });
+      while (speculativeCount >= subCap) {
+        const evicted = this.evictLowestPriority('speculative-only');
+        if (!evicted) {
+          logVideoTelemetry('hls_pool_full_speculative_subcap', { poolSize: this.pool.size });
+          try { hls.destroy(); } catch {}
+          return false;
+        }
+        speculativeCount--;
+      }
+    }
+
+    // Evict lowest-priority (oldest speculative, then oldest handoff) if at capacity
     while (this.pool.size >= maxInstances) {
-      this.evictOldest();
+      const evicted = this.evictLowestPriority();
+      if (!evicted) {
+        // All entries are promoted — refuse rather than exceed the cap.
+        logVideoTelemetry('hls_pool_full_all_promoted', { poolSize: this.pool.size });
+        try { hls.destroy(); } catch {}
+        return false;
+      }
     }
 
     // Clear any existing entry for this URL
@@ -176,6 +212,7 @@ class HLSPoolManagerClass {
       created: Date.now(),
       preloadedByVideo: preloadVideo,
       isPromoted: false,
+      role,
       surface,
       timeoutId: setTimeout(() => {
         // Auto-cleanup if not promoted within TTL
@@ -189,10 +226,11 @@ class HLSPoolManagerClass {
     this.pool.set(url, entry);
     this.stats.registered++;
     logPoolEvent('success', 'register', url, this.stats.registered, this.pool.size);
-    logVideoTelemetry('hls_pool_registered', { 
-      url, 
-      poolSize: this.pool.size 
+    logVideoTelemetry('hls_pool_registered', {
+      url,
+      poolSize: this.pool.size,
     });
+    return true;
   }
 
   /**
@@ -272,6 +310,7 @@ class HLSPoolManagerClass {
       
       // Mark as promoted
       entry.isPromoted = true;
+      entry.role = 'promoted';
       entry.preloadedByVideo = null;
       this.promotionTimestamps.set(url, Date.now());
 
@@ -309,6 +348,7 @@ class HLSPoolManagerClass {
       const entry = this.pool.get(url);
       if (entry) {
         entry.isPromoted = false;
+        entry.role = 'speculative';
         entry.preloadedByVideo = newPreloadVideo || null;
 
         // Clear any existing TTL timer before assigning a new one — otherwise
@@ -349,6 +389,7 @@ class HLSPoolManagerClass {
       entry.hls.stopLoad();
       try { entry.hls.detachMedia(); } catch {}
       entry.isPromoted = false;
+      entry.role = 'handoff';
       entry.preloadedByVideo = null;
       if (entry.timeoutId) clearTimeout(entry.timeoutId);
       const ttl = this.getTTL();
@@ -415,23 +456,49 @@ class HLSPoolManagerClass {
   }
 
   /**
-   * Evict the oldest non-promoted instance
+   * Evict the lowest-priority non-promoted instance.
+   * Priority order (evicted first -> last): 'speculative' -> 'handoff'.
+   * 'promoted' entries are NEVER evicted. Returns true if something was evicted.
+   * `mode='speculative-only'` restricts eviction to speculative entries
+   * (used by the speculative sub-cap enforcement).
    */
-  private evictOldest(): void {
-    let oldestUrl: string | null = null;
-    let oldestTime = Infinity;
+  private evictLowestPriority(mode: 'default' | 'speculative-only' = 'default'): boolean {
+    let candidateUrl: string | null = null;
+    let candidateRole: PoolRole | null = null;
+    let candidateTime = Infinity;
 
+    // Pass 1: oldest speculative
     this.pool.forEach((entry, url) => {
-      if (!entry.isPromoted && entry.created < oldestTime) {
-        oldestTime = entry.created;
-        oldestUrl = url;
+      if (entry.role !== 'speculative') return;
+      if (entry.created < candidateTime) {
+        candidateTime = entry.created;
+        candidateUrl = url;
+        candidateRole = 'speculative';
       }
     });
 
-    if (oldestUrl) {
-      logVideoTelemetry('hls_pool_evicted', { url: oldestUrl });
-      this.cleanup(oldestUrl);
+    // Pass 2: oldest handoff (only if no speculative exists)
+    if (!candidateUrl && mode === 'default') {
+      this.pool.forEach((entry, url) => {
+        if (entry.role !== 'handoff') return;
+        if (entry.isPromoted) return; // defensive
+        if (entry.created < candidateTime) {
+          candidateTime = entry.created;
+          candidateUrl = url;
+          candidateRole = 'handoff';
+        }
+      });
     }
+
+    if (candidateUrl) {
+      // TEMP: verify only speculative gets evicted under stress. Strip after.
+      // eslint-disable-next-line no-console
+      console.info('[hls_pool_evict]', { role: candidateRole, url: candidateUrl });
+      logVideoTelemetry('hls_pool_evicted', { url: candidateUrl, role: candidateRole });
+      this.cleanup(candidateUrl);
+      return true;
+    }
+    return false;
   }
 
   /**
@@ -458,6 +525,7 @@ class HLSPoolManagerClass {
       if (entry.hls && entry.isPromoted) {
         entry.hls.stopLoad(); // Stop loading new segments but preserve buffer
         entry.isPromoted = false; // Demote to preloaded state
+        entry.role = 'speculative';
         suspended++;
       }
     });
@@ -477,6 +545,8 @@ class HLSPoolManagerClass {
     if (entry?.hls && !entry.isPromoted) {
       entry.hls.startLoad(-1); // Resume loading from current position
       entry.isPromoted = true;
+      entry.role = 'promoted';
+      
       
       logVideoTelemetry('hls_pool_resumed', { 
         url: videoUrl 
