@@ -246,7 +246,8 @@ export const LightCardFeed: React.FC<LightCardFeedProps> = ({
       const initialSlide = carouselPositions.get(index) ?? 0;
       const isActive = !fsOpen && index === playingIdx;
       const isNear = !fsOpen && Math.abs(index - activeIdx) <= VIDEO_NEIGHBOUR_RADIUS;
-      const mountVideo = isNear;
+      const mountVideo = false; // Stage B3 teardown: no video mounts.
+      void isNear;
       return (
         <div
           data-card-index={index}
