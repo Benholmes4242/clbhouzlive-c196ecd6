@@ -2,7 +2,7 @@
  * MomentCard - Large cinematic post card for the Moments timeline
  */
 
-import React, { useState, useRef } from 'react';
+import React, { useState } from 'react';
 import { cn } from '@/lib/utils';
 import { Heart, MessageCircle, MapPin } from 'lucide-react';
 import { MomentPost } from './types';
@@ -21,7 +21,6 @@ export const MomentCard: React.FC<MomentCardProps> = ({
   className,
 }) => {
   const [isLoaded, setIsLoaded] = useState(false);
-  const videoRef = useRef<HTMLVideoElement>(null);
 
   const formattedDate = moment.date 
     ? formatDistanceToNow(new Date(moment.date), { addSuffix: true })
