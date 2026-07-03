@@ -15,6 +15,7 @@
  */
 
 import Hls, { type HlsConfig } from 'hls.js';
+import { isPerfEnabled } from '@/perf/navTiming';
 import {
   ABR_MAX_KBPS,
   DEFAULT_LANE_IDS,
@@ -424,13 +425,16 @@ class VideoEngineImpl {
     return this.lastPos.get(postId) ?? 0;
   }
 
-  /** [V1] DBG-gated structured trace for two-way resume verification. */
+  /** [V1] Structured trace — fires when either the engine DBG flag or the perf DBG pill is on. */
   trace(tag: string, data?: Record<string, unknown>): void {
-    if (typeof window !== 'undefined' && (window as any).__VIDEO_ENGINE_DBG__) {
+    if (typeof window === 'undefined') return;
+    const perfOn = (() => { try { return isPerfEnabled(); } catch { return false; } })();
+    if ((window as any).__VIDEO_ENGINE_DBG__ || perfOn) {
       // eslint-disable-next-line no-console
       console.info(`[V1] ${tag}`, data ?? {});
     }
   }
+
 
   /** Test-only utility: list lane ids currently registered. */
   listLanes(): LaneId[] {
