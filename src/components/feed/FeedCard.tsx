@@ -34,6 +34,9 @@ import { MediaCarousel } from './MediaCarousel';
 import { FeedFollowPill } from './FeedFollowPill';
 import { FeedActorPicker } from './FeedActorPicker';
 import Pressable from '@/components/ui/Pressable';
+import { HeartBurst } from './HeartBurst';
+import { createTapHandler } from './mediaTap';
+import { triggerHaptic } from '@/lib/ui/haptics';
 import type { ActiveActor } from '@/types/actor';
 
 
@@ -266,6 +269,22 @@ const FeedCardImpl: React.FC<FeedCardProps> = ({
     contentReadyFiredRef.current = true;
     onContentReady();
   }, [isFirstCard, onContentReady]);
+
+  // Double-tap-to-like: burst overlay + like-only (never unlike) commit.
+  const [burstKey, setBurstKey] = useState(0);
+  const [burstVisible, setBurstVisible] = useState(false);
+  const handleMediaDoubleTap = React.useCallback(() => {
+    // Always show the burst (confirms even when already liked)…
+    setBurstKey((k) => k + 1);
+    setBurstVisible(true);
+    // …but only fire the like when currently unliked (TikTok/IG parity).
+    if (!liked) {
+      triggerHaptic('medium');
+      onLike(post, effectiveActor);
+    } else {
+      triggerHaptic('light');
+    }
+  }, [liked, onLike, post, effectiveActor]);
 
   const reviewCourseId = post.review?.courseId ?? post.courseId;
   const reviewId = post.review?.reviewId;
@@ -552,27 +571,20 @@ const FeedCardImpl: React.FC<FeedCardProps> = ({
             mountVideo={mountVideo}
             onIndexChange={(idx) => onCarouselIndexChange?.(post, idx)}
             onOpen={(idx) => onOpenMedia(post, idx)}
+            onDoubleTap={handleMediaDoubleTap}
           />
         ) : media ? (
-          <button
-            type="button"
-            ref={singleMediaBtnRef}
-            data-post-id={post.id}
-            onClick={() =>
+          <SingleMediaTapButton
+            onSingle={() =>
               onOpenMedia(post, 0, {
                 el: singleMediaBtnRef.current,
                 posterUrl: media.thumbnailUrl ?? (media as any).imageUrl ?? null,
                 handOffUrl: (media as any).hlsUrl ?? null,
               })
             }
-            style={{
-              display: 'block',
-              width: '100%',
-              background: 'transparent',
-              border: 'none',
-              padding: 0,
-              cursor: 'pointer',
-            }}
+            onDouble={handleMediaDoubleTap}
+            innerRef={singleMediaBtnRef}
+            postId={post.id}
           >
             <div
               style={{
@@ -626,7 +638,7 @@ const FeedCardImpl: React.FC<FeedCardProps> = ({
                     src={mediaUrl}
                     alt={post.caption || post.displayName}
                     loading="lazy"
-                    
+
                     style={{
                       position: 'absolute',
                       inset: 0,
@@ -640,9 +652,14 @@ const FeedCardImpl: React.FC<FeedCardProps> = ({
                 </>
               ) : null}
             </div>
-          </button>
+          </SingleMediaTapButton>
         ) : null}
+        {burstVisible && (
+          <HeartBurst key={burstKey} onDone={() => setBurstVisible(false)} />
+        )}
       </div>
+
+
 
       {/* Course eyebrow + location (above caption) */}
       {post.courseName && (() => {
@@ -774,6 +791,40 @@ const FeedCardImpl: React.FC<FeedCardProps> = ({
 
       </div>
     </article>
+  );
+};
+
+const SingleMediaTapButton: React.FC<{
+  onSingle: () => void;
+  onDouble: () => void;
+  innerRef: React.RefObject<HTMLButtonElement>;
+  postId: string;
+  children: React.ReactNode;
+}> = ({ onSingle, onDouble, innerRef, postId, children }) => {
+  const handleTap = React.useMemo(
+    () => createTapHandler({
+      onSingle: () => onSingle(),
+      onDouble: () => onDouble(),
+    }),
+    [onSingle, onDouble],
+  );
+  return (
+    <button
+      type="button"
+      ref={innerRef}
+      data-post-id={postId}
+      onClick={handleTap}
+      style={{
+        display: 'block',
+        width: '100%',
+        background: 'transparent',
+        border: 'none',
+        padding: 0,
+        cursor: 'pointer',
+      }}
+    >
+      {children}
+    </button>
   );
 };
 

@@ -12,10 +12,11 @@
  *    `clubhouseStore.carouselPositions` keyed by post index.
  *  - Inline video lifecycle: only the active slide may autoplay.
  */
-import React, { useCallback, useEffect, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import type { MediaItem } from '@/components/media-system/types/media';
 import { CarouselDots } from '@/components/media/CarouselDots';
 import { InlineVideo } from './InlineVideo';
+import { createTapHandler } from './mediaTap';
 
 interface Props {
   items: MediaItem[];
@@ -26,6 +27,8 @@ interface Props {
   mountVideo?: boolean;
   onIndexChange?: (idx: number) => void;
   onOpen: (mediaIndex: number) => void;
+  /** Double-tap on any slide → like + heart burst (owner: FeedCard). */
+  onDoubleTap?: () => void;
 }
 
 const FRAME_DEFAULT = 4 / 5;
@@ -38,6 +41,7 @@ export const MediaCarousel: React.FC<Props> = ({
   mountVideo = false,
   onIndexChange,
   onOpen,
+  onDoubleTap,
 }) => {
   const trackRef = useRef<HTMLDivElement | null>(null);
   const [active, setActive] = useState(() =>
@@ -105,14 +109,15 @@ export const MediaCarousel: React.FC<Props> = ({
           const url = m.imageUrl || m.thumbnailUrl || '';
           const isVideo = m.type === 'video';
           const isActiveSlide = isCardActive && i === active;
+          const handleTap = createTapHandler({
+            onSingle: (e) => { e.stopPropagation(); onOpen(i); },
+            onDouble: (e) => { e.stopPropagation(); onDoubleTap?.(); },
+          });
           return (
             <button
               type="button"
               key={m.id || i}
-              onClick={(e) => {
-                e.stopPropagation();
-                onOpen(i);
-              }}
+              onClick={onDoubleTap ? handleTap : (e) => { e.stopPropagation(); onOpen(i); }}
               style={{
                 flex: '0 0 100%',
                 width: '100%',
