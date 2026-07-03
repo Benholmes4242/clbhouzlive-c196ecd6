@@ -314,9 +314,11 @@ function GroupedRow({
         borderRadius: isFirst && isLast ? 14 : (isFirst ? '14px 14px 0 0' : (isLast ? '0 0 14px 14px' : 0)),
       }}
     >
-      <Icon size={16} color={INK_SOFT} strokeWidth={1.8} />
-      <div style={{ flex: 1, minWidth: 0, fontSize: 14, fontWeight: 600, color: INK }}>{label}</div>
-      <ChevronRight size={13} color="rgba(15,23,42,0.30)" />
+      <div style={{ display: 'flex', alignItems: 'center', gap: 12, width: '100%' }}>
+        <Icon size={16} color={INK_SOFT} strokeWidth={1.8} />
+        <div style={{ flex: 1, minWidth: 0, fontSize: 14, fontWeight: 600, color: INK }}>{label}</div>
+        <ChevronRight size={13} color="rgba(15,23,42,0.30)" />
+      </div>
     </Pressable>
   );
 }
