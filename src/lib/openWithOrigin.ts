@@ -16,8 +16,8 @@
  */
 import type { FeedPost } from '@/components/media-system/types/media';
 import { useFullscreenFeedStore, type OpenOrigin } from '@/store/fullscreenFeedStore';
-import { HLSPoolManager } from '@/media/HLSPoolManager';
-import { logHandoff } from '@/media/mobileVideoDebug';
+// [VIDEOSTUB] HLSPoolManager + mobileVideoDebug imports removed — engine severed.
+
 
 function prefersReducedMotion(): boolean {
   if (typeof window === 'undefined' || !window.matchMedia) return false;
@@ -78,14 +78,9 @@ export function openWithOrigin({
   const origin = snapshotOrigin(originEl, posterUrl ?? null);
   const postId = (posts[index] as any)?.id ?? null;
 
-  // TAP boundary — playhead/paused reads removed with the video teardown; the
-  // poster-only chassis has no <video> on the tile to inspect.
-  try {
-    logHandoff(postId, 'tile', 'TAP', {
-      handOffUrl: handOffUrls?.[0] ?? null,
-    });
-  } catch {}
-
+  // [VIDEOSTUB] Handoff + pool manager removed — poster-only chassis.
+  void handOffUrls;
+  void postId;
 
   // Chrome flip at TAP time (not effect time) to kill the strobe. Scroll
   // lock is owned by the overlay's isOpen effect (ref-counted so it composes
@@ -99,16 +94,6 @@ export function openWithOrigin({
     });
   } catch {}
 
-  // Buffered handoff (Path A). Detach the live tile decoder without evicting
-  // its pool entry so the viewer's promote() inherits the buffered segments.
-  // No playhead sync — short looping clips restart naturally on open/close.
-  if (handOffUrls) {
-    for (const url of handOffUrls) {
-      if (!url) continue;
-      try { HLSPoolManager.handOff(url); } catch {}
-      logHandoff(postId, 'tile', 'HANDOFF_DONE', { url });
-    }
-  }
 
   useFullscreenFeedStore.getState().open(posts, index, {
     ...(options ?? {}),
