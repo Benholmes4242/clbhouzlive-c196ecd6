@@ -1,7 +1,6 @@
 import React, { memo, useEffect } from 'react';
 import { useClubhouseStore } from '@/store/clubhouseStore';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
-import { SnapVideoPlayer } from './SnapVideoPlayer';
 import { FeedImageCarousel } from './FeedImageCarousel';
 import { usePinchZoomPointer } from '@/hooks/usePinchZoomPointer';
 import { CarouselDots } from '@/components/media/CarouselDots';
@@ -86,25 +85,35 @@ export const FeedSlide = memo(function FeedSlide({
       );
     }
 
-    // Single video
+    // Single video — poster-only (Stage B3 teardown, no <video>).
     if (media?.[0]?.type === 'video') {
       const first = media[0];
+      const posterSrc = first.thumbnailUrl || '';
+      // Fire the paint-ready signal once for surfaces that gate on it.
+      // Handled inline via the <img>'s onLoad below.
       return (
-        <SnapVideoPlayer
-          hlsUrl={first.hlsUrl || ''}
-          mp4Url={first.mp4Url}
-          thumbnailUrl={first.thumbnailUrl}
-          width={first.width}
-          height={first.height}
-          duration={first.duration}
-          isActive={isActive}
-          activeIndex={activeIndex}
-          feedIndex={index}
-          isSuggestedFeed={isSuggestedFeed}
-          onFirstFrameReady={onFirstFrameReady}
-          isFullscreen={isFullscreen}
-          postId={post.id}
-        />
+        <div className="absolute inset-0 overflow-hidden">
+          {isFullscreen ? (
+            <div aria-hidden="true" className="absolute inset-0" style={{
+              backgroundImage: `url(${posterSrc})`, backgroundSize: 'cover', backgroundPosition: 'center',
+              filter: 'blur(40px) brightness(0.5) saturate(1.2)', transform: 'scale(1.2)',
+            }} />
+          ) : (
+            <div className="absolute inset-0" style={{ background: '#0A0E14' }} aria-hidden="true" />
+          )}
+          {posterSrc && (
+            <img
+              src={posterSrc}
+              alt=""
+              aria-hidden
+              className="w-full h-full"
+              style={{ position: 'absolute', inset: 0, objectFit: isFullscreen ? 'contain' : 'cover', zIndex: 1 }}
+              loading="lazy"
+              draggable={false}
+              onLoad={() => onFirstFrameReady?.()}
+            />
+          )}
+        </div>
       );
     }
 

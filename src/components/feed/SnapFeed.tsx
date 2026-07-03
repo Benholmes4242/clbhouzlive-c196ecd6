@@ -4,9 +4,7 @@ import { useClubhouseStore } from '@/store/clubhouseStore';
 import { FeedSlide } from './FeedSlide';
 import type { FeedPost } from '@/components/media-system/types/media';
 import { haptic } from '@/utils/haptics';
-import { preloadHlsManifest } from '@/utils/hlsPreload';
-import { registerInPool } from '@/utils/hlsPoolPreloader';
-import { HLSPoolManager } from '@/media/HLSPoolManager';
+// Stage B3 teardown: HLS preload / pool wiring removed.
 import { pauseAllAudio } from '@/utils/globalVideoMute';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useWatchProgressTracker } from '@/components/watch/hooks/useWatchProgressTracker';
@@ -174,16 +172,8 @@ export function SnapFeed({
       if (bestEntry && bestEntry.intersectionRatio >= ACTIVE_SLIDE_RATIO) {
         const idx = Number((bestEntry.target as HTMLElement).dataset.index);
         if (!isNaN(idx)) {
-          // Directional warm: NEXT slide only (was N+1 AND N+2 — two hidden
-          // decoded instances oversubscribed the iOS budget). N+1 collapses into
-          // the radius-1 attach slot on swipe (net 0 extra decoders).
-          const nextPost = postsRef.current[idx + 1];
-          const hlsUrl = nextPost?.mediaItems?.[0]?.hlsUrl;
-          if (hlsUrl) {
-            preloadHlsManifest(hlsUrl)
-              .then(() => registerInPool(hlsUrl, surface))
-              .catch(() => {});
-          }
+          // Stage B3 teardown: HLS manifest preload / pool registration removed.
+
           
           pendingIndexRef.current = idx;
           if (debounceTimerRef.current) clearTimeout(debounceTimerRef.current);
@@ -217,18 +207,8 @@ export function SnapFeed({
     };
   }, [setActiveIndex]);
 
-  // Fullscreen-only pruning: on each active-index change, evict any 'fullscreen'-
-  // tagged pool entries that aren't in the 3-URL keep-window [active-1, active, active+1].
-  // Feed-tagged entries are untouchable by this path (pruneSurface filters by surface).
-  useEffect(() => {
-    if (surface !== 'fullscreen') return;
-    const keep: string[] = [];
-    for (const i of [activeIndex - 1, activeIndex, activeIndex + 1]) {
-      const u = postsRef.current[i]?.mediaItems?.[0]?.hlsUrl;
-      if (u) keep.push(u);
-    }
-    HLSPoolManager.pruneSurface('fullscreen', keep);
-  }, [activeIndex, surface]);
+  // Stage B3 teardown: fullscreen HLS-pool pruning removed (no pool anymore).
+
 
 
 
@@ -314,13 +294,11 @@ export function SnapFeed({
       const thumb = post?.mediaItems?.[0]?.thumbnailUrl;
       if (thumb) { const img = new Image(); img.src = thumb; }
     });
-    // Manifests only for the next 2 — network warm, NO decoded instances.
-    const manifests = postsRef.current.slice(activeIndex + 1, activeIndex + 3);
-    manifests.forEach(post => {
-      const url = post?.mediaItems?.[0]?.hlsUrl;
-      if (url) preloadHlsManifest(url).catch(() => {});
-    });
+    // Manifests removed (Stage B3 teardown) — posters only.
   }, [activeIndex]);
+
+
+
 
   // ── Editorial card sentinel observer ──
   const setIsTournamentCardActive = useClubhouseStore(s => s.setIsTournamentCardActive);
