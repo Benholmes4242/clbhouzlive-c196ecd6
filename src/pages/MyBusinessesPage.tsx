@@ -117,7 +117,8 @@ const MyBusinessesPage = () => {
       {!isLoading && (
         <div className="flex flex-col gap-4 pt-4 px-4 max-w-xl mx-auto w-full pb-8">
           {!hasBusinesses ? (
-            <AddBusinessCard isFirst onClick={handleCreateBusiness} />
+            <BusinessEmptyState onCreate={handleCreateBusiness} />
+
           ) : (
             <>
               {sortedBusinesses.map((membership, index) => {
