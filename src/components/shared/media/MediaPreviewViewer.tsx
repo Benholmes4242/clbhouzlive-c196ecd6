@@ -101,11 +101,11 @@ export function MediaPreviewViewer({
       {/* Media */}
       <div className="flex-1 flex items-center justify-center relative" style={{ paddingBottom: 'max(env(safe-area-inset-bottom, 0px), 24px)' }}>
         {item.type === 'video' ? (
-          <video
+          <img
             src={item.previewUrl}
-            controls
-            playsInline
+            alt=""
             className="w-full h-full object-contain"
+            draggable={false}
           />
         ) : (
           <div ref={zoomRef} style={zoomStyle}>
