@@ -20,6 +20,7 @@ const ApprovalsPage = lazy(() => import('./pages/ApprovalsPage'));
 const AppealsPage = lazy(() => import('./pages/AppealsPage'));
 const WaitlistPage = lazy(() => import('./pages/WaitlistPage'));
 const SupportPage = lazy(() => import('./pages/SupportPage'));
+const VerificationsPage = lazy(() => import('./pages/VerificationsPage'));
 
 const SECTION_TITLES: Record<string, string> = {
   dashboard:  'Dashboard',
