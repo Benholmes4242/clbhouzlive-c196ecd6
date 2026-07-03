@@ -39,7 +39,9 @@ serve(async (req) => {
       );
     }
 
-    // Validate email domain matches the required domain
+    // Validate email domain matches the required domain.
+    // Note: requires_domain_check is admin-initiated; the client never sets it.
+    // When true the owner must complete the Domain step before an admin can approve.
     const { data: verificationRequest, error: reqError } = await supabase
       .from("business_verification_requests")
       .select("domain, requires_domain_check")
