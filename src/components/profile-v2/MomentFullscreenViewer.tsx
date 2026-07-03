@@ -110,47 +110,18 @@ export const MomentFullscreenViewer: React.FC<MomentFullscreenViewerProps> = ({
             </button>
           )}
 
-          {/* Media */}
+          {/* Media — poster-only chassis (playback severed) */}
           <div className="absolute inset-0 flex items-center justify-center">
             {isVideo ? (
-              <>
-                {/* HLSPlayer with UNIFIED direct autoplay */}
-                <div className={cn(
-                  "w-full h-full transition-opacity duration-200",
-                  isVideoReady ? "opacity-100" : "opacity-0"
-                )}>
-                  <HLSPlayer
-                    ref={playerRef}
-                    key={`fullscreen-${currentMoment.id}`}
-                    src={hlsUrl}
-                    mediaId={streamId || currentMoment.id}
-                    autoplay={open}
-                    muted={false}
-                    loop
-                    className="w-full h-full object-contain"
-                    objectFit="contain"
-                    managedByMediaRuntime={false}
-                    externallyManaged={false}
-                    preload="auto"
-                    showMuteButton
-                    onCanPlayThrough={handleCanPlayThrough}
-                  />
-                </div>
-                
-                {/* Loading spinner */}
-                {!isVideoReady && (
-                  <div className="absolute inset-0 flex items-center justify-center bg-black">
-                    {posterUrl && (
-                      <img 
-                        src={posterUrl} 
-                        alt=""
-                        className="absolute inset-0 w-full h-full object-contain opacity-50"
-                      />
-                    )}
-                    <Loader2 className="w-8 h-8 animate-spin text-white/70" />
-                  </div>
-                )}
-              </>
+              posterUrl ? (
+                <img
+                  src={posterUrl}
+                  alt=""
+                  className="max-w-full max-h-full object-contain"
+                />
+              ) : (
+                <div className="absolute inset-0 bg-black" />
+              )
             ) : (
               <img
                 src={currentMoment.mediaUrl}
