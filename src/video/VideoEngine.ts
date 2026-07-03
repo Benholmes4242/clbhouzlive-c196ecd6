@@ -271,21 +271,35 @@ class VideoEngineImpl {
 
   private wireElementEvents(lane: Lane, _usingHls: boolean) {
     const el = lane.el;
+    const markFsFirstFrame = () => {
+      if (lane.firstFrame || lane.id !== 'fullscreen') return;
+      const target = lane.startPosition > 0 ? lane.startPosition : 0;
+      const now = lane.el.currentTime || 0;
+      // Only fire once the element has actually reached (or passed) the requested seek.
+      if (target > 0 && now < target - 0.5) return;
+      lane.firstFrame = true;
+      this.trace('V1_FS_FIRSTFRAME', {
+        postId: lane.postId,
+        videoTime: now,
+        startPosition: target,
+      });
+      this.emit(lane);
+    };
     const onLoadedData = () => {
-      if (!lane.firstFrame) {
+      if (!lane.firstFrame && lane.id === 'feed-active') {
         lane.firstFrame = true;
-        if (lane.id === 'fullscreen') {
-          this.trace('V1_FS_FIRSTFRAME', { postId: lane.postId, videoTime: lane.el.currentTime });
-        } else if (lane.id === 'feed-active') {
-          this.trace('V1_TILE_FIRSTFRAME', { postId: lane.postId, videoTime: lane.el.currentTime });
-        }
+        this.trace('V1_TILE_FIRSTFRAME', { postId: lane.postId, videoTime: lane.el.currentTime });
         this.emit(lane);
       }
       if (this.loadingCount > 0) this.loadingCount--;
       if (lane.state === 'loading') this.transition(lane, 'ready');
+      // Fullscreen with startPosition === 0 (or none) can fire immediately too.
+      if (lane.id === 'fullscreen' && (lane.startPosition <= 0)) markFsFirstFrame();
     };
+    const onSeeked = () => markFsFirstFrame();
     const onTime = () => {
       if (lane.postId) this.lastPos.set(lane.postId, lane.el.currentTime || 0);
+      if (lane.id === 'fullscreen' && !lane.firstFrame) markFsFirstFrame();
       this.emit(lane);
     };
     const onPlay = () => this.transition(lane, 'playing');
@@ -294,18 +308,21 @@ class VideoEngineImpl {
     };
     const onError = () => this.transition(lane, 'error');
     el.addEventListener('loadeddata', onLoadedData);
+    el.addEventListener('seeked', onSeeked);
     el.addEventListener('timeupdate', onTime);
     el.addEventListener('play', onPlay);
     el.addEventListener('pause', onPause);
     el.addEventListener('error', onError);
     lane.detachFns.push(() => {
       el.removeEventListener('loadeddata', onLoadedData);
+      el.removeEventListener('seeked', onSeeked);
       el.removeEventListener('timeupdate', onTime);
       el.removeEventListener('play', onPlay);
       el.removeEventListener('pause', onPause);
       el.removeEventListener('error', onError);
     });
   }
+
 
   play(laneId: LaneId): Promise<void> {
     const lane = this.getLane(laneId);
