@@ -1,15 +1,13 @@
 import { useNavigate } from 'react-router-dom';
 import { useEffect, useMemo } from 'react';
-import { ChevronLeft } from 'lucide-react';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useMyBusinesses } from '@/hooks/useMyBusinesses';
-import { PageRoot } from '@/components/layout/PageRoot';
 import { BusinessCommandCard } from '@/components/business/BusinessCommandCard';
 import { AddBusinessCard } from '@/components/business/AddBusinessCard';
 import { useActiveActor } from '@/context/ActiveActorContext';
 import { useHideBottomNav } from '@/hooks/useBottomNavVisibility';
 import { useHideHeader } from '@/hooks/useHeaderVisibility';
-import { SectionHeader } from '@/components/ui/SectionHeader';
+import { ManagePageShell } from '@/components/manage/ManagePageShell';
 import { BIZ } from '@/components/business/businessTokens';
 
 // Inline skeleton used by loading state — kept local since it is private to this page.
@@ -91,101 +89,57 @@ const MyBusinessesPage = () => {
 
   if (error) {
     return (
-      <PageRoot>
-        <div
-          className="min-h-screen flex items-center justify-center px-4"
-          style={{ background: BIZ.pageBg }}
-        >
+      <ManagePageShell title="Manage business profiles">
+        <div className="min-h-[40vh] flex items-center justify-center px-4">
           <p className="text-sm text-center" style={{ color: BIZ.inkMute }}>
             Failed to load your businesses.
           </p>
         </div>
-      </PageRoot>
+      </ManagePageShell>
     );
   }
 
   const hasBusinesses = sortedBusinesses.length > 0;
 
   return (
-    <PageRoot>
-      <div className="min-h-screen" style={{ background: BIZ.pageBg }}>
-
-        {/* Header — canonical eyebrow + h1 pattern, left-aligned */}
-        <div
-          className="sticky top-0 z-10 backdrop-blur-xl"
-          style={{
-            background: 'rgba(248,250,252,0.97)',
-            borderBottom: `0.5px solid ${BIZ.hair}`,
-          }}
-        >
-          <div className="flex items-center gap-2 px-4 py-2.5">
-            <button
-              onClick={() => navigate(-1)}
-              aria-label="Back"
-              className="min-h-[44px] min-w-[44px] flex items-center justify-center -ml-2 active:scale-[0.97] transition-transform"
-              style={{ color: BIZ.ink }}
-            >
-              <ChevronLeft className="w-5 h-5" />
-            </button>
-
-            <div className="flex-1 min-w-0">
-              <SectionHeader tier="standard" kicker="BUSINESSES" tone="amber" />
-              <h1
-                className="truncate"
-                style={{
-                  fontSize: 18,
-                  fontWeight: 700,
-                  color: BIZ.ink,
-                  letterSpacing: '-0.01em',
-                  marginTop: 2,
-                }}
-              >
-                Your business profiles
-              </h1>
-            </div>
-          </div>
+    <ManagePageShell title="Manage business profiles">
+      {/* Loading state */}
+      {isLoading && (
+        <div className="flex flex-col gap-4 pt-4 px-4 max-w-xl mx-auto w-full">
+          <BusinessCardSkeleton />
+          <BusinessCardSkeleton />
         </div>
+      )}
 
-        {/* Loading state */}
-        {isLoading && (
-          <div className="flex flex-col gap-4 pt-4 px-4 max-w-xl mx-auto">
-            <BusinessCardSkeleton />
-            <BusinessCardSkeleton />
-          </div>
-        )}
+      {/* Content */}
+      {!isLoading && (
+        <div className="flex flex-col gap-4 pt-4 px-4 max-w-xl mx-auto w-full pb-8">
+          {!hasBusinesses ? (
+            <AddBusinessCard isFirst onClick={handleCreateBusiness} />
+          ) : (
+            <>
+              {sortedBusinesses.map((membership, index) => {
+                const isActive =
+                  activeActor?.type === 'business' &&
+                  activeActor?.id === membership.business.id;
 
-        {/* Content */}
-        {!isLoading && (
-          <div className="flex flex-col gap-4 pt-4 px-4 max-w-xl mx-auto pb-8">
-            {!hasBusinesses ? (
-              <AddBusinessCard isFirst onClick={handleCreateBusiness} />
-            ) : (
-              <>
-                {sortedBusinesses.map((membership, index) => {
-                  // A business is "active" only if it is the currently selected actor.
-                  // No default-to-first guesswork — reflects the real posting context.
-                  const isActive =
-                    activeActor?.type === 'business' &&
-                    activeActor?.id === membership.business.id;
+                return (
+                  <BusinessCommandCard
+                    key={membership.id}
+                    membership={membership}
+                    userId={user?.id || ''}
+                    index={index}
+                    isActive={isActive}
+                  />
+                );
+              })}
 
-                  return (
-                    <BusinessCommandCard
-                      key={membership.id}
-                      membership={membership}
-                      userId={user?.id || ''}
-                      index={index}
-                      isActive={isActive}
-                    />
-                  );
-                })}
-
-                <AddBusinessCard onClick={handleCreateBusiness} />
-              </>
-            )}
-          </div>
-        )}
-      </div>
-    </PageRoot>
+              <AddBusinessCard onClick={handleCreateBusiness} />
+            </>
+          )}
+        </div>
+      )}
+    </ManagePageShell>
   );
 };
 
