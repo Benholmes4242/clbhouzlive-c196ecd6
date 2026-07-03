@@ -269,11 +269,19 @@ const FullscreenVideoSlot: React.FC<{
     };
   }, [postId]);
 
+  // Fire onFirstFrameReady ONLY when the engine has painted the real frame
+  // at (or past) startPosition — this is what the FLIP overlay listens for
+  // to crossfade the poster clone out over the already-playing video.
+  const firedRef = React.useRef(false);
   React.useEffect(() => {
-    if (posterSrc && lane.snapshot.firstFrame === false) {
+    if (!isActive) { firedRef.current = false; return; }
+    if (firedRef.current) return;
+    if (lane.snapshot.firstFrame === true) {
+      firedRef.current = true;
       onFirstFrameReady?.();
     }
-  }, [posterSrc, lane.snapshot.firstFrame, onFirstFrameReady]);
+  }, [isActive, lane.snapshot.firstFrame, onFirstFrameReady]);
+
 
   return (
     <div className="absolute inset-0 overflow-hidden">
