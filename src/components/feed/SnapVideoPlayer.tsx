@@ -1,12 +1,17 @@
-import React, { useRef, useEffect, useCallback, useState, memo } from 'react';
+/**
+ * SnapVideoPlayer — poster-only chassis (Stage B4 of the video teardown).
+ *
+ * All hls/<video>/.play()/pool/seek/loop logic has been severed. This file
+ * exists as an inert shell that renders the poster where the video used to
+ * be, preserving layout, blurred-fill backdrop, object-fit selection, and
+ * the tap-pause UI (as a store toggle only — no playback to pause).
+ *
+ * The file + export are intentionally kept so upstream feed code (FeedCard,
+ * MediaCarousel, FeedSlide, etc.) continues to import without churn. When
+ * the new VideoEngine lands it will re-mount here.
+ */
+import React, { useCallback, memo } from 'react';
 import { useClubhouseStore } from '@/store/clubhouseStore';
-import { haptic } from '@/utils/haptics';
-import { registerAudioSource, unregisterAudioSource } from '@/utils/globalVideoMute';
-import { useHlsPool } from '@/media/hooks/useHlsPool';
-import { usePausedFirstFrame } from '@/media/hooks/usePausedFirstFrame';
-import { useGaplessLoop } from '@/utils/video/GaplessLoop';
-import { fsTimeStart, fsTimeEnd, fsEvent, logTileLife, logHandoff, isVideoDebugOn } from '@/media/mobileVideoDebug';
-
 
 interface SnapVideoPlayerProps {
   hlsUrl: string;
@@ -25,228 +30,33 @@ interface SnapVideoPlayerProps {
 }
 
 export const SnapVideoPlayer = memo(function SnapVideoPlayer({
-  hlsUrl,
-  mp4Url,
   thumbnailUrl,
   width,
   height,
-  duration,
-  isActive,
-  activeIndex,
-  feedIndex,
   isSuggestedFeed,
-  onFirstFrameReady,
   isFullscreen = false,
-  postId,
 }: SnapVideoPlayerProps) {
-  const videoRef = useRef<HTMLVideoElement>(null);
-  const [showReplay, setShowReplay] = useState(false);
-  const [attachToken, setAttachToken] = useState(0);
-
-  const firstFrameFiredRef = useRef(false);
-
-  const isMuted = useClubhouseStore(s => s.isMuted);
-  const userPaused = useClubhouseStore(s => s.userPaused);
-
-  const pool = useHlsPool();
-  const { hasFirstFrame, reset } = usePausedFirstFrame(videoRef, isActive, attachToken);
-
-  // Register with global audio mutex
-  useEffect(() => {
-    const id = `snap-video-${feedIndex}`;
-    registerAudioSource(id, () => {
-      const video = videoRef.current;
-      if (video) {
-        video.muted = true;
-      }
-    });
-    return () => unregisterAudioSource(id);
-  }, [feedIndex]);
-
   const aspect = (height ?? 1) > 0 && (width ?? 0) > 0
     ? (height as number) / (width as number)
     : 1;
-  // Screen aspect via visualViewport (stable across keyboard/rotation in WebView).
   const vv = typeof window !== 'undefined' ? window.visualViewport : null;
   const screenAspect = vv && vv.width > 0
     ? vv.height / vv.width
     : (typeof window !== 'undefined' && window.innerWidth > 0
         ? window.innerHeight / window.innerWidth
         : 2.17);
-  // Full-bleed when the video is portrait enough to fill without ugly cropping.
-  // 0.85: 9:16 (1.78) / screen (~2.17) ≈ 0.82 — full-bleeds standard vertical;
-  // landscape + square fall below and letterbox.
   const FULL_BLEED_RATIO = 0.85;
   const objectFit: 'cover' | 'contain' = isFullscreen
     ? (aspect >= screenAspect * FULL_BLEED_RATIO ? 'cover' : 'contain')
     : (isSuggestedFeed ? 'cover' : (aspect >= 1.5 ? 'cover' : 'contain'));
   const isFullBleed = isFullscreen && objectFit === 'cover';
 
-  // ── Attach/teardown via shared hook (pool-aware demote-not-destroy) ──
-  // Whether this slide should hold an attached instance (active or within radius).
-  const shouldAttach = isActive || Math.abs(feedIndex - activeIndex) <= 1;
-
-  useEffect(() => {
-    const video = videoRef.current;
-    if (!video) return;
-    let cancelled = false;
-    let firstPlayFired = false;
-    let onTU: ((e: Event) => void) | null = null;
-
-    if (shouldAttach) {
-      video.muted = useClubhouseStore.getState().isMuted;
-      video.playsInline = true;
-      pool.attach(hlsUrl, video, mp4Url, isFullscreen ? 'fullscreen' : 'feed').then(() => {
-        if (cancelled) return;
-        if (isFullscreen) {
-          logHandoff(postId, 'fs', 'FS_ATTACH', {
-            videoT: video.currentTime,
-            readyState: video.readyState,
-            paused: video.paused,
-          });
-          // Temp FS_FIRSTPLAY probe — first time currentTime advances >0.1 after attach.
-          onTU = () => {
-            if (firstPlayFired) return;
-            if (video.currentTime > 0.1) {
-              firstPlayFired = true;
-              logHandoff(postId, 'fs', 'FS_FIRSTPLAY', { videoT: video.currentTime });
-              if (onTU) video.removeEventListener('timeupdate', onTU);
-            }
-          };
-          video.addEventListener('timeupdate', onTU);
-        }
-        setAttachToken((t) => t + 1);
-        try {
-          if (video.currentTime < 0.001) {
-            video.currentTime = 0.001;
-            if (isFullscreen) logHandoff(postId, 'fs', 'FS_SEEK', { to: 0.001 });
-          }
-        } catch {}
-      });
-      return () => {
-        cancelled = true;
-        if (onTU) { try { video.removeEventListener('timeupdate', onTU); } catch {} }
-      };
-    } else {
-      pool.teardown(hlsUrl);
-      reset();
-      try { video.removeAttribute('src'); video.load(); } catch {}
-      setShowReplay(false);
-      useClubhouseStore.getState().setActiveVideoElement(null, null);
-    }
-    // Deps: shouldAttach (a boolean that only flips on window enter/exit) — NOT
-    // activeIndex. This converts "re-attach on every swipe" → "attach once on
-    // enter, teardown once on exit", which stops the re-attach/destroy churn.
-  }, [shouldAttach, hlsUrl, mp4Url]);
-
-  // ── Active-element store registration (shell concern) ──
-  // Hook owns play(); we own the global active-element pointer.
-  useEffect(() => {
-    const video = videoRef.current;
-    if (!video) return;
-    if (isActive) {
-      video.muted = useClubhouseStore.getState().isMuted;
-      useClubhouseStore.getState().setActiveVideoElement(video, videoRef);
-    } else {
-      try { video.pause(); } catch {}
-    }
-  }, [isActive]);
-
-  // First-frame ready callback (fires once per mount when hook signals frame).
-  useEffect(() => {
-    if (hasFirstFrame && !firstFrameFiredRef.current) {
-      firstFrameFiredRef.current = true;
-      onFirstFrameReady?.();
-      // Timing: first frame painted → blur is now gone. Ends the blur-visible span.
-      fsTimeEnd(`slide:${feedIndex}`, `🎞️ FRAME_PAINTED #${feedIndex} (blur→video)`);
-      // Close the open→visible span on the FIRST slide to paint after open, regardless
-      // of whether isActive has propagated yet (the isActive gate caused stale spans to
-      // be closed seconds later by a different slide → fake multi-second readings).
-      fsTimeEnd('open', `✅ OPEN→FRAME #${feedIndex} (tap→video visible)`);
-    }
-  }, [hasFirstFrame, onFirstFrameReady, feedIndex, isActive]);
-
-  // Timing: when this slide becomes active, start the blur-visible span.
-  // The gap between this and FRAME_PAINTED IS the blur-on-screen duration.
-  useEffect(() => {
-    if (isActive && !hasFirstFrame) {
-      fsTimeStart(`slide:${feedIndex}`);
-      fsEvent(`👁️ BLUR_VISIBLE #${feedIndex}`, { hasFrame: hasFirstFrame });
-      logTileLife(`fs${feedIndex}`, feedIndex, 'ACTIVE', { hasFirstFrame });
-    }
-  }, [isActive, hasFirstFrame, feedIndex]);
-
-  // ── Sync muted state ──
-  useEffect(() => {
-    const video = videoRef.current;
-    if (video && isActive) {
-      video.muted = isMuted;
-    }
-  }, [isMuted, isActive]);
-
-  // ── Sync userPaused ──
-  useEffect(() => {
-    const video = videoRef.current;
-    if (!video || !isActive) return;
-    if (userPaused) {
-      video.pause();
-    } else {
-      video.play().catch(() => {});
-    }
-  }, [userPaused, isActive]);
-
-  // Seamless loop while this slide is active (RAF-based, no seek-black seam).
-  useGaplessLoop(videoRef, isActive, false);
-
-  // ── Continue-watching seek (event-based, no DOM poll) ──
-  const pendingSeekRef = useRef<number | null>(null);
-  useEffect(() => {
-    if (!postId) return;
-    const onSeek = (e: Event) => {
-      const detail = (e as CustomEvent).detail as { postId: string; seconds: number };
-      if (!detail?.postId || detail.postId !== postId || !detail.seconds) return;
-      const video = videoRef.current;
-      if (!video) { pendingSeekRef.current = detail.seconds; return; }
-      if (isFinite(video.duration) && video.duration > 0) {
-        try { video.currentTime = Math.min(detail.seconds, video.duration - 1); } catch {}
-      } else {
-        pendingSeekRef.current = detail.seconds;
-      }
-    };
-    window.addEventListener('continue-watching:seek', onSeek as EventListener);
-    return () => window.removeEventListener('continue-watching:seek', onSeek as EventListener);
-  }, [postId]);
-
-  useEffect(() => {
-    const video = videoRef.current;
-    if (!video) return;
-    const onMeta = () => {
-      if (pendingSeekRef.current != null && isFinite(video.duration) && video.duration > 0) {
-        try { video.currentTime = Math.min(pendingSeekRef.current, video.duration - 1); } catch {}
-        pendingSeekRef.current = null;
-      }
-    };
-    video.addEventListener('loadedmetadata', onMeta);
-    video.addEventListener('durationchange', onMeta);
-    return () => {
-      video.removeEventListener('loadedmetadata', onMeta);
-      video.removeEventListener('durationchange', onMeta);
-    };
-  }, []);
-
-  // ── Tap handling (single tap = play/pause) ──
+  // Tap toggles the store's userPaused flag — kept as an inert UI shell so
+  // the tap-pause affordance still round-trips through the store when the
+  // new engine is wired back in.
   const handleTap = useCallback(() => {
     const store = useClubhouseStore.getState();
     store.setUserPaused(!store.userPaused);
-  }, []);
-
-  // ── Replay handler ──
-  const handleReplay = useCallback(() => {
-    const video = videoRef.current;
-    if (!video) return;
-    setShowReplay(false);
-    video.currentTime = 0;
-    video.play().catch(() => {});
   }, []);
 
   return (
@@ -255,25 +65,20 @@ export const SnapVideoPlayer = memo(function SnapVideoPlayer({
       style={{ background: '#0A0E14' }}
       onClick={handleTap}
     >
-      {/* World-class blurred fill — letterbox (contain) only. Skipped entirely
-          when full-bleed (cover covers the screen — no bars, no blur cost). */}
+      {/* Blurred-fill backdrop — only when letterboxing (contain). */}
       {isFullscreen && thumbnailUrl && !isFullBleed ? (
         <div aria-hidden="true" className="absolute inset-0 overflow-hidden">
-          {/* Layer 1 — deep wash: heavy blur, oversized to hide edges. */}
           <div className="absolute inset-0" style={{
             backgroundImage: `url(${thumbnailUrl})`, backgroundSize: 'cover', backgroundPosition: 'center',
             filter: 'blur(60px) saturate(1.3) brightness(0.55)', transform: 'scale(1.4)', willChange: 'transform',
           }} />
-          {/* Layer 2 — edge structure: lighter blur at low opacity (Apple Music/TV trick). */}
           <div className="absolute inset-0" style={{
             backgroundImage: `url(${thumbnailUrl})`, backgroundSize: 'cover', backgroundPosition: 'center',
             filter: 'blur(20px) brightness(0.6)', transform: 'scale(1.05)', opacity: 0.5,
           }} />
-          {/* Layer 3 — radial vignette: glow focus on the centre frame. */}
           <div className="absolute inset-0" style={{
             background: 'radial-gradient(ellipse at center, transparent 55%, rgba(0,0,0,0.55) 100%)',
           }} />
-          {/* Layer 4 — top/bottom scrims: cinematic bars + caption legibility. */}
           <div className="absolute inset-0" style={{
             background: 'linear-gradient(to bottom, rgba(0,0,0,0.35) 0%, transparent 18%, transparent 82%, rgba(0,0,0,0.35) 100%)',
           }} />
@@ -282,9 +87,7 @@ export const SnapVideoPlayer = memo(function SnapVideoPlayer({
         <div className="absolute inset-0" style={{ background: '#0A0E14' }} aria-hidden="true" />
       )}
 
-      {/* Crisp first-frame poster — instant arrival frame at same object-fit
-          as the video, sitting above the blur and below the video. No decoder
-          cost. Fades out as the decoded video fades in (identical frame). */}
+      {/* Poster — the only rendered media surface in the poster-only chassis. */}
       {thumbnailUrl && (
         <img
           src={thumbnailUrl}
@@ -294,52 +97,8 @@ export const SnapVideoPlayer = memo(function SnapVideoPlayer({
             objectFit,
             objectPosition: 'center',
             zIndex: 1,
-            opacity: hasFirstFrame ? 0 : 1,
-            transition: 'opacity 120ms ease-out',
           }}
         />
-      )}
-
-      {/* Video element — fades in over the crisp poster (seamless crossfade). */}
-      <video
-        ref={videoRef}
-        playsInline
-        preload="metadata"
-        className="absolute inset-0 w-full h-full"
-        style={{
-          objectFit,
-          zIndex: 2,
-          opacity: hasFirstFrame ? 1 : 0,
-          transition: 'opacity 120ms ease-out',
-        }}
-      />
-
-      {/* Buffering indicator — subtle bottom bar (clears home indicator in cover). */}
-      {isActive && !hasFirstFrame && (
-        <div
-          className="absolute bottom-0 left-0 right-0 h-1"
-          style={{
-            zIndex: 3,
-            marginBottom: 'env(safe-area-inset-bottom, 0px)',
-            background: 'linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent)',
-            animation: 'pulse 1.5s ease-in-out infinite',
-          }}
-        />
-      )}
-
-      {/* Replay overlay */}
-      {showReplay && (
-        <div
-          className="absolute inset-0 flex items-center justify-center"
-          style={{ zIndex: 10, background: 'rgba(0,0,0,0.3)' }}
-          onClick={(e) => { e.stopPropagation(); handleReplay(); }}
-        >
-          <div className="w-16 h-16 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="white">
-              <path d="M12 5V1L7 6l5 5V7c3.31 0 6 2.69 6 6s-2.69 6-6 6-6-2.69-6-6H4c0 4.42 3.58 8 8 8s8-3.58 8-8-3.58-8-8-8z" />
-            </svg>
-          </div>
-        </div>
       )}
     </div>
   );
