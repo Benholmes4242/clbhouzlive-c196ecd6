@@ -359,11 +359,12 @@ export default function BusinessProfileEditor() {
     if (mode !== 'edit') return '';
     return JSON.stringify({
       n: businessName, d: description, fy: foundedYear ? parseInt(foundedYear, 10) : null,
-      w: website, e: email, p: phone?.fullNumber || null, b: bookingUrl,
+      w: website, e: email, p: phone?.fullNumber || null,
       oh: openingHours, sl: social,
       addr: address?.label || null, loc: address?.label || null,
+      am: amenities, pa: primaryAction, soh: showOpeningHours,
     });
-  }, [mode, businessName, description, foundedYear, website, email, phone, bookingUrl, openingHours, social, address]);
+  }, [mode, businessName, description, foundedYear, website, email, phone, openingHours, social, address, amenities, primaryAction, showOpeningHours]);
 
   const isDirty = useMemo(() => {
     if (mode === 'create') {
