@@ -240,8 +240,13 @@ export const CardFeed = forwardRef<CardFeedHandle, CardFeedProps>(function CardF
           if (Number.isNaN(idx)) continue;
           if (e.isIntersecting) {
             visibilityRef.current.set(idx, e.intersectionRatio);
-            if (e.intersectionRatio >= 0.5) feedTelemetry.markVisible(idx);
-          } else visibilityRef.current.delete(idx);
+            if (e.intersectionRatio >= 0.6) feedTelemetry.markVisible(idx, e.intersectionRatio);
+            else feedTelemetry.markHidden(idx);
+          } else {
+            visibilityRef.current.delete(idx);
+            feedTelemetry.markHidden(idx);
+          }
+
         }
         recheckActive();
       },
