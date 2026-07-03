@@ -302,8 +302,22 @@ class VideoEngineImpl {
     const onTime = () => {
       if (lane.postId) this.lastPos.set(lane.postId, lane.el.currentTime || 0);
       if (lane.id === 'fullscreen' && !lane.firstFrame) markFsFirstFrame();
+      // Gapless loop for short clips (<15s): native loop leaves a 100-300ms
+      // gap on iOS HLS. Preempt the seam by seeking to 0 + play() ourselves.
+      const dur = lane.el.duration;
+      if (isFinite(dur) && dur > 0 && dur < 15) {
+        const remaining = dur - (lane.el.currentTime || 0);
+        if (remaining < 0.1) {
+          try { lane.el.currentTime = 0; } catch { /* noop */ }
+          const p = lane.el.play();
+          if (p && typeof (p as Promise<void>).catch === 'function') {
+            (p as Promise<void>).catch(() => { /* autoplay reject — safe */ });
+          }
+        }
+      }
       this.emit(lane);
     };
+
     const onPlay = () => this.transition(lane, 'playing');
     const onPause = () => {
       if (lane.state !== 'error') this.transition(lane, 'paused');
