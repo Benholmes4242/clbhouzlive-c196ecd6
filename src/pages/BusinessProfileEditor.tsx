@@ -618,6 +618,9 @@ export default function BusinessProfileEditor() {
         booking_url: bookingUrl || null,
         opening_hours: openingHours as any,
         social_links: hasSocial ? (socialLinks as any) : null,
+        amenities: amenities.length ? amenities : null,
+        primary_action: primaryAction || null,
+        show_opening_hours: showOpeningHours,
 
         updated_at: new Date().toISOString(),
       };
