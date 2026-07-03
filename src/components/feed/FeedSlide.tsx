@@ -1,7 +1,6 @@
 import React, { memo, useEffect } from 'react';
 import { useClubhouseStore } from '@/store/clubhouseStore';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
-import { SnapVideoPlayer } from './SnapVideoPlayer';
 import { FeedImageCarousel } from './FeedImageCarousel';
 import { usePinchZoomPointer } from '@/hooks/usePinchZoomPointer';
 import { CarouselDots } from '@/components/media/CarouselDots';
