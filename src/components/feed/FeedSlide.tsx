@@ -213,3 +213,94 @@ export const FeedSlide = memo(function FeedSlide({
 });
 
 export default FeedSlide;
+
+/**
+ * FullscreenVideoSlot — binds the engine's `fullscreen` lane when the
+ * fullscreen slide becomes active. Reads `startPosition` from the store
+ * (set by openWithOrigin). On unmount, records fullscreen currentTime into
+ * engine.lastPos so the feed-active lane resumes at the same position.
+ */
+const FullscreenVideoSlot: React.FC<{
+  postId: string;
+  hlsUrl: string | null;
+  posterSrc: string;
+  isActive: boolean;
+  onFirstFrameReady?: () => void;
+}> = ({ postId, hlsUrl, posterSrc, isActive, onFirstFrameReady }) => {
+  const isMuted = useClubhouseStore((s) => s.isMuted);
+  const storedStart = useFullscreenFeedStore((s) => s.startPosition);
+  // Only apply store.startPosition on the initially-tapped slide; other
+  // slides in the fullscreen deck start from 0.
+  const startPosition = React.useMemo(() => {
+    if (!isActive) return -1;
+    const t = VideoEngine.getLastPos(postId);
+    if (t > 0) return t;
+    return storedStart > 0 ? storedStart : -1;
+  }, [isActive, postId, storedStart]);
+
+  const lane = useVideoLane('fullscreen', {
+    hlsUrl: isActive ? hlsUrl : null,
+    posterUrl: posterSrc || null,
+    startPosition,
+    active: isActive,
+    muted: isMuted,
+    postId,
+  });
+
+  React.useEffect(() => {
+    if (isActive) {
+      VideoEngine.trace('V1_FS_LOAD', { postId, startPosition });
+    }
+  }, [isActive, postId, startPosition]);
+
+  React.useEffect(() => {
+    // On unmount/deactivation, persist fullscreen time so the tile resumes.
+    return () => {
+      const t = VideoEngine.snapshot('fullscreen').currentTime;
+      if (postId && t > 0) {
+        VideoEngine.lastPos.set(postId, t);
+        VideoEngine.trace('V1_CLOSE', { postId, fsTime: t });
+      }
+    };
+  }, [postId]);
+
+  React.useEffect(() => {
+    if (posterSrc && lane.snapshot.firstFrame === false) {
+      onFirstFrameReady?.();
+    }
+  }, [posterSrc, lane.snapshot.firstFrame, onFirstFrameReady]);
+
+  return (
+    <div className="absolute inset-0 overflow-hidden">
+      {posterSrc && (
+        <div aria-hidden="true" className="absolute inset-0" style={{
+          backgroundImage: `url(${posterSrc})`, backgroundSize: 'cover', backgroundPosition: 'center',
+          filter: 'blur(40px) brightness(0.5) saturate(1.2)', transform: 'scale(1.2)',
+        }} />
+      )}
+      {posterSrc && (
+        <img
+          src={posterSrc}
+          alt=""
+          aria-hidden
+          className="w-full h-full"
+          style={{
+            position: 'absolute', inset: 0, objectFit: 'contain', zIndex: 1,
+            opacity: lane.snapshot.firstFrame ? 0 : 1,
+            transition: 'opacity 120ms linear',
+          }}
+          loading="eager"
+          draggable={false}
+        />
+      )}
+      <div
+        ref={lane.hostRef}
+        style={{
+          position: 'absolute', inset: 0, zIndex: 2, pointerEvents: 'none',
+          opacity: lane.snapshot.firstFrame ? 1 : 0,
+          transition: 'opacity 120ms linear',
+        }}
+      />
+    </div>
+  );
+};
