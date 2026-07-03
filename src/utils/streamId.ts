@@ -4,7 +4,16 @@
  * rebuild-critical consumers survive the sweep.
  */
 
+import { CLOUDFLARE_STREAM_SUBDOMAIN } from '@/config/streamConstants';
+
 const UID_RE = /([a-f0-9]{32})/i;
+
+/** Build the HLS manifest URL for a Cloudflare Stream UID (or accepts a full URL). */
+export function buildHlsUrl(uidOrUrl: string): string {
+  const uid = extractCloudflareUid(uidOrUrl);
+  if (!uid) return '';
+  return `https://${CLOUDFLARE_STREAM_SUBDOMAIN}/${uid}/manifest/video.m3u8`;
+}
 
 export function extractCloudflareUid(input: string): string {
   if (!input) return '';
