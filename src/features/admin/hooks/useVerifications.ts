@@ -34,6 +34,13 @@ export interface VerificationRow {
   claimClubId?: string | null;
   claimSourceCourseId?: string | null;
   claimProofNote?: string | null;
+  /**
+   * True when the business referenced by this course claim is already verified
+   * via another path (e.g. an approved business_verification_request). Surfaced
+   * so the admin reviewing the claim has cross-path context - claims are about
+   * club ownership, not just the verified tick.
+   */
+  businessAlreadyVerified?: boolean | null;
 }
 
 async function fetchVerifications(): Promise<VerificationRow[]> {
