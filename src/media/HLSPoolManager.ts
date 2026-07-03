@@ -525,6 +525,7 @@ class HLSPoolManagerClass {
       if (entry.hls && entry.isPromoted) {
         entry.hls.stopLoad(); // Stop loading new segments but preserve buffer
         entry.isPromoted = false; // Demote to preloaded state
+        entry.role = 'speculative';
         suspended++;
       }
     });
