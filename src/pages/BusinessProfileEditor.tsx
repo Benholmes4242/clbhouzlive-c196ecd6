@@ -529,13 +529,21 @@ export default function BusinessProfileEditor() {
           await supabase.from('business_accounts').update(patch).eq('id', newId);
         }
 
-        // owner row
-        const { error: memberErr } = await supabase.from('business_members').insert({
-          business_id: newId,
-          user_profile_id: user.id,
-          role: 'owner',
-        });
-        if (memberErr) throw memberErr;
+        // owner row — a DB trigger auto-creates the owner membership on
+        // business creation, so a plain insert here fails with 23505
+        // (business_members_business_id_user_profile_id_key). Upsert with
+        // ignoreDuplicates as belt-and-braces in case the trigger is ever
+        // removed. Do NOT throw on failure — the business already exists;
+        // surface softly instead of reporting "failed to create business".
+        const { error: memberErr } = await supabase
+          .from('business_members')
+          .upsert(
+            { business_id: newId, user_profile_id: user.id, role: 'owner' },
+            { onConflict: 'business_id,user_profile_id', ignoreDuplicates: true },
+          );
+        if (memberErr) {
+          console.warn('[BusinessProfileEditor] owner membership upsert warning:', memberErr);
+        }
 
         // For golf-club businesses: file a course-claim request for admin review.
         // The business is already created; the claim links club ownership only on approval.
