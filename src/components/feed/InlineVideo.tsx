@@ -266,31 +266,8 @@ export const InlineVideo: React.FC<Props> = ({
     [],
   );
 
-  // FLIP handoff return: when the fullscreen viewer closes, any tile whose
-  // url was handed off has a stale, detached hlsRef. Snapshot the last known
-  // playhead as a return entry, tear the stale ref down, and re-attempt the
-  // attach. ATTACH_DONE will consume the return entry and seek back to the
-  // playhead. The poster underlay (below) covers the reattach gap so the
-  // user never sees black.
-  useEffect(() => {
-    if (!hlsUrl) return;
-    return flipContinuity.onClose(() => {
-      if (!flipContinuity.wasHandedOff(hlsUrl)) return;
-      // The authoritative return-time is set by FullscreenFeedOverlay from the
-      // LIVE fullscreen <video>.currentTime before this event fires. We do NOT
-      // read from the tile's detached <video> here — it's been stopped since
-      // handOff and would produce the open-time frame.
-      flipContinuity.clearHandOff(hlsUrl);
-      // Defer to next tick so the fullscreen surface has finished demoting.
-      setTimeout(() => {
-        if (!videoRef.current) return;
-        pool.teardown(hlsUrl);
-        attachedRef.current = false;
-        reset();
-        attemptAttach();
-      }, 0);
-    });
-  }, [hlsUrl, pool, reset, attemptAttach]);
+
+
 
 
   // Duration + playhead tracking for gapless-loop (<15s) and progress bar (>20s).
