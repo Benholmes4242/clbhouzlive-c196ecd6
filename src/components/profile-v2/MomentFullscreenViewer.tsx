@@ -4,18 +4,16 @@
  * UNIFIED WITH CLUBHOUSE: Uses direct visibility-based autoplay pattern
  */
 
-import React, { useRef, useState, useCallback } from 'react';
+import React, { useState, useCallback } from 'react';
 import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog';
 import { VisuallyHidden } from '@radix-ui/react-visually-hidden';
 import { MomentPost } from './types';
-import { X, ChevronLeft, ChevronRight, Heart, MessageCircle, MapPin, Loader2 } from 'lucide-react';
+import { X, ChevronLeft, ChevronRight, Heart, MessageCircle, MapPin } from 'lucide-react';
 import { format } from 'date-fns';
 import { useSwipeable } from 'react-swipeable';
-import HLSPlayer, { HLSPlayerRef } from '@/media/HLSPlayer';
 import TextOverlayRenderer from '@/components/studio/TextOverlayRenderer';
 import { uidFromNode } from '@/utils/cloudflareStreamTransform';
-import { generateStreamHlsUrl, generateStreamThumbnailUrl } from '@/config/cloudflareStream';
-import { cn } from '@/lib/utils';
+import { generateStreamThumbnailUrl } from '@/config/cloudflareStream';
 
 interface MomentFullscreenViewerProps {
   moments: MomentPost[];
