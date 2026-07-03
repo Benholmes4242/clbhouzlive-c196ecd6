@@ -14,7 +14,7 @@ interface HRailProps {
   snap?: boolean;
 }
 
-const EDGE_FADE_WIDTH = 28;
+const EDGE_FADE_WIDTH = 20;
 
 /**
  * Pro Shop primitive — horizontal scroll rail with consistent padding,
