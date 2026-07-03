@@ -10,12 +10,10 @@
 import React, { useCallback, useRef, useEffect, useState, memo } from 'react';
 import { cn } from '@/lib/utils';
 import { motion } from 'framer-motion';
-import { HLSPlayer, HLSPlayerRef } from '@/media';
 import { Images, Trophy, Heart } from 'lucide-react';
-import { VideoScrubber } from '@/components/video/VideoScrubber';
-import { UniversalMediaItem, UniversalGridConfig, PORTRAIT_ASPECT, LANDSCAPE_ASPECT } from './types';
-import { uidFromNode } from '@/utils/cloudflareStreamTransform';
+import { UniversalMediaItem, UniversalGridConfig } from './types';
 import { PostOwnerMenu } from '@/components/posts/PostOwnerMenu';
+
 
 // Format counts for display (1K, 1.5M, etc.)
 function formatCount(count: number): string {
@@ -53,95 +51,32 @@ const MediaTile = memo<MediaTileProps>(({
   onEdit,
   onDelete,
 }) => {
-  const playerRef = useRef<HLSPlayerRef>(null);
   const tileRef = useRef<HTMLButtonElement>(null);
-  const [videoEl, setVideoEl] = useState<HTMLVideoElement | null>(null);
-  const [resolvedDuration, setResolvedDuration] = useState<number | null | undefined>(
-    item.durationSeconds
-  );
-  
-  // Visibility-based autoplay (40% threshold)
-  const [isVisible, setIsVisible] = useState(false);
-  
-  // Track current playback time for dynamic timer countdown
-  const [currentPlaybackTime, setCurrentPlaybackTime] = useState(0);
-  
+  const resolvedDuration = item.durationSeconds;
+
   const isVideo = item.type === 'video';
-  const isAutoplayCandidate = item.isAutoplayCandidate ?? false;
   const isLandscape = variant === 'landscape';
   const thumbnailSrc = item.thumbnailUrl || item.url;
-  
-  // Aspect class
+
   const aspectClass = isLandscape ? 'aspect-video' : 'aspect-[3/4]';
-  
-  // Handle click
+
   const handleClick = useCallback(() => {
     onPress?.(item, index);
   }, [item, index, onPress]);
-  
-  // Handle author click
+
   const handleAuthorClick = useCallback((e: React.MouseEvent) => {
     e.stopPropagation();
     if (item.creator?.id) {
       onAuthorClick?.(item.creator.id);
     }
   }, [item.creator?.id, onAuthorClick]);
-  
-  // Visibility observer for autoplay
-  useEffect(() => {
-    if (!isVideo || !isAutoplayCandidate) return;
-    
-    const observer = new IntersectionObserver(
-      (entries) => {
-        const entry = entries[0];
-        setIsVisible(entry.intersectionRatio >= 0.4);
-      },
-      { threshold: [0, 0.4, 0.5, 1.0] }
-    );
-    
-    if (tileRef.current) {
-      observer.observe(tileRef.current);
-    }
-    
-    return () => observer.disconnect();
-  }, [isVideo, isAutoplayCandidate]);
-  
-  // Reset current time when video stops playing
-  useEffect(() => {
-    if (!isVisible) {
-      setCurrentPlaybackTime(0);
-    }
-  }, [isVisible]);
-  
-  // Track if we've reported ready
-  const hasReportedReadyRef = useRef(false);
 
-  // Handle video ready
-  const handleCanPlay = useCallback(() => {
-    const el = playerRef.current?.getElement();
-    if (el) setVideoEl(el);
-    
-    // Report first frame ready
-    if (!hasReportedReadyRef.current) {
-      hasReportedReadyRef.current = true;
-      onFirstFrameReady?.(item.id);
-    }
-    
-    // Resolve duration if not provided
-    if (!item.durationSeconds && playerRef.current) {
-      const d = playerRef.current.getDuration();
-      if (Number.isFinite(d) && d > 0 && d !== Infinity) {
-        setResolvedDuration(d);
-      }
-    }
-  }, [item.durationSeconds, item.id, onFirstFrameReady]);
-  
-  // Handle time update for dynamic timer
-  const handleTimeUpdate = useCallback((currentTime: number, duration: number) => {
-    if (isVisible) {
-      setCurrentPlaybackTime(currentTime);
-    }
-  }, [isVisible]);
+  // Poster-only chassis: no playback tracking.
+  useEffect(() => {
+    if (isVideo) onFirstFrameReady?.(item.id);
+  }, [isVideo, item.id, onFirstFrameReady]);
+
+
   
   // Top-left override content
   let topLeftOverride: React.ReactNode = null;
