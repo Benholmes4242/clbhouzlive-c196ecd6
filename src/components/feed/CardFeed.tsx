@@ -238,8 +238,10 @@ export const CardFeed = forwardRef<CardFeedHandle, CardFeedProps>(function CardF
         for (const e of entries) {
           const idx = Number((e.target as HTMLElement).dataset.cardIndex);
           if (Number.isNaN(idx)) continue;
-          if (e.isIntersecting) visibilityRef.current.set(idx, e.intersectionRatio);
-          else visibilityRef.current.delete(idx);
+          if (e.isIntersecting) {
+            visibilityRef.current.set(idx, e.intersectionRatio);
+            if (e.intersectionRatio >= 0.5) feedTelemetry.markVisible(idx);
+          } else visibilityRef.current.delete(idx);
         }
         recheckActive();
       },
