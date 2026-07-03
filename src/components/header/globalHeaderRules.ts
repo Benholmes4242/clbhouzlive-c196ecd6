@@ -37,6 +37,8 @@ export const GLOBAL_HEADER_EXCLUDED_PREFIXES = [
   '/privacy', // Privacy policy page has its own header
   '/terms', // Terms page has its own header
   '/businesses/manage', // Manage business profiles uses ManagePageShell (own header, no global chrome)
+  '/business/create', // Create business profile uses ManagePageShell (own header, no global chrome)
+
 ] as const;
 
 /**
