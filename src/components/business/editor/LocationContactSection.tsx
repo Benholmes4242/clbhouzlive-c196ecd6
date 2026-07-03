@@ -1,7 +1,7 @@
 import React from 'react';
 import { Lock, MapPin } from 'lucide-react';
 
-import { SectionHeader } from '@/components/ui/SectionHeader';
+
 import { SectionCard } from '@/components/profile/edit-v2/SectionCard';
 import { BIZ } from '@/components/business/businessTokens';
 import { AddressAutocomplete, AddressValue } from '@/components/business/AddressAutocomplete';
