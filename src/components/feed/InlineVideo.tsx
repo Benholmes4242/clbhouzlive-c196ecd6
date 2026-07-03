@@ -12,7 +12,7 @@ import { usePausedFirstFrame } from '@/media/hooks/usePausedFirstFrame';
 import { MediaRuntime } from '@/media/runtime/MediaRuntime';
 import { DecoderLimitManager } from '@/utils/video/DecoderLimitManager';
 import { extractCloudflareUid } from '@/utils/videoIdUtils';
-import { logTileLife, attachVideoEventLoggers, isVideoDebugOn } from '@/media/mobileVideoDebug';
+import { logTileLife, attachVideoEventLoggers, isVideoDebugOn, logHandoff } from '@/media/mobileVideoDebug';
 import { HLSPoolManager } from '@/media/HLSPoolManager';
 
 
