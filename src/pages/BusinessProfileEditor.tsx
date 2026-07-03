@@ -468,7 +468,12 @@ export default function BusinessProfileEditor() {
           opening_hours: openingHours as any,
           social_links: hasSocial ? (socialLinks as any) : null,
           is_verified: false,
-        };
+          amenities: amenities.length ? (amenities as any) : null,
+          primary_action: primaryAction || null,
+          show_opening_hours: showOpeningHours,
+        } as any;
+
+
 
 
         if (isGolfClub && selectedClub) {
