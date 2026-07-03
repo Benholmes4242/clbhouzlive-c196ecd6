@@ -491,9 +491,6 @@ class HLSPoolManagerClass {
     }
 
     if (candidateUrl) {
-      // TEMP: verify only speculative gets evicted under stress. Strip after.
-      // eslint-disable-next-line no-console
-      console.info('[hls_pool_evict]', { role: candidateRole, url: candidateUrl });
       logVideoTelemetry('hls_pool_evicted', { url: candidateUrl, role: candidateRole });
       this.cleanup(candidateUrl);
       return true;
