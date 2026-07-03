@@ -1,4 +1,4 @@
-import { memo, useEffect, useRef, useState } from 'react';
+import { memo, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Heart, MessageCircle } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
@@ -9,7 +9,6 @@ import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { VideoCardMenu } from '@/components/videos-tab/VideoCardMenu';
 import { Pin } from '../proshop/Pin';
 import { ExpandableCaption } from '@/components/posts/ExpandableCaption';
-import { attachHlsToTile } from '@/hooks/useTileVideoPlayer';
 import DecodedImage from '../shared/DecodedImage';
 
 function formatHMS(seconds: number | null | undefined): string {
@@ -47,14 +46,9 @@ export interface AutoplayVideoCardProps {
 function AutoplayVideoCardInner({ post, index, allPosts, userId, active, borderRadius = 6, metaPadX = 16, onDecoded }: AutoplayVideoCardProps) {
   const navigate = useNavigate();
   const tileRef = useRef<HTMLDivElement>(null);
-  const videoRef = useRef<HTMLVideoElement | null>(null);
-  const hlsRef = useRef<any>(null);
-  const [videoVisible, setVideoVisible] = useState(false);
 
   const firstVideo = post.mediaItems.find((m) => m.type === 'video');
   const thumbnail = firstVideo?.thumbnailUrl || firstVideo?.imageUrl || '';
-  const hlsUrl = (firstVideo as any)?.hlsUrl as string | undefined;
-  const mp4Url = (firstVideo as any)?.videoUrl || (firstVideo as any)?.mp4Url;
   const duration = firstVideo?.duration ?? 0;
   const courseName = (post as any).courseName ?? null;
 
@@ -66,66 +60,7 @@ function AutoplayVideoCardInner({ post, index, allPosts, userId, active, borderR
     }
   })();
 
-  // Manage autoplay video layer based on `active`
-  useEffect(() => {
-    const tile = tileRef.current;
-    if (!tile) return;
-
-    let cancelled = false;
-
-    if (active && (hlsUrl || mp4Url)) {
-      const v = document.createElement('video');
-      v.muted = true;
-      v.loop = true;
-      v.playsInline = true;
-      v.setAttribute('webkit-playsinline', '');
-      v.setAttribute('muted', '');
-      v.style.cssText =
-        'position:absolute;inset:0;width:100%;height:100%;object-fit:cover;pointer-events:none;opacity:0;transition:opacity 150ms ease;z-index:1;';
-      tile.appendChild(v);
-      videoRef.current = v;
-
-      const onReady = () => {
-        if (cancelled) return;
-        v.style.opacity = '1';
-        setVideoVisible(true);
-        v.play().catch(() => {});
-      };
-
-      if (hlsUrl) {
-        attachHlsToTile({ hlsUrl, mp4Fallback: mp4Url, video: v, onReady })
-          .then((hls) => {
-            if (cancelled) {
-              hls?.destroy?.();
-              return;
-            }
-            hlsRef.current = hls;
-          })
-          .catch(() => {});
-      } else if (mp4Url) {
-        v.src = mp4Url;
-        v.addEventListener('canplay', onReady, { once: true });
-        v.play().catch(() => {});
-      }
-    }
-
-    return () => {
-      cancelled = true;
-      setVideoVisible(false);
-      const v = videoRef.current;
-      if (v) {
-        try { v.pause(); } catch {}
-        v.removeAttribute('src');
-        try { v.load(); } catch {}
-        if (v.parentElement) v.parentElement.removeChild(v);
-      }
-      videoRef.current = null;
-      if (hlsRef.current) {
-        try { hlsRef.current.destroy(); } catch {}
-        hlsRef.current = null;
-      }
-    };
-  }, [active, hlsUrl, mp4Url]);
+  // [VIDEOSTUB] Autoplay video mount removed — poster only.
 
   const handleTap = () => {
     useFullscreenFeedStore.getState().open(allPosts, index);
