@@ -1,7 +1,7 @@
 import React from 'react';
 import { Lock, MapPin } from 'lucide-react';
 
-import { SectionHeader } from '@/components/ui/SectionHeader';
+
 import { SectionCard } from '@/components/profile/edit-v2/SectionCard';
 import { BIZ } from '@/components/business/businessTokens';
 import { AddressAutocomplete, AddressValue } from '@/components/business/AddressAutocomplete';
@@ -94,10 +94,8 @@ export function LocationContactSection({
 
   return (
     <>
-      <div className="px-4 mt-2 mb-2">
-        <SectionHeader tier="standard" kicker="LOCATION & CONTACT" />
-      </div>
-      <div className="space-y-4 px-4 pb-4">
+      <div className="space-y-4 px-4 pb-4 pt-2">
+
         <SectionCard>
           <div className="space-y-3">
             {isClubLinked ? (
@@ -223,85 +221,6 @@ export function LocationContactSection({
                 style={INPUT_STYLE}
               />
             </div>
-            <div style={{ height: '0.5px', background: BIZ.hair, margin: '12px 0' }} />
-            <div className="space-y-1.5">
-              <label className={LABEL_CLASS}>Booking link</label>
-              <input
-                type="url"
-                value={bookingUrl}
-                onChange={(e) => setBookingUrl(e.target.value)}
-                placeholder="https://bookings.yourgolfclub.com"
-                className={INPUT_CLASS}
-                style={INPUT_STYLE}
-              />
-              <p className={HINT_CLASS}>
-                If you use an online tee sheet, paste the booking URL here.
-              </p>
-            </div>
-          </div>
-        </SectionCard>
-
-        {/* Opening hours */}
-        <SectionCard>
-          <div className="space-y-3">
-            <div>
-              <p className="text-[14px] font-semibold text-foreground">Opening Hours</p>
-              <p className={HINT_CLASS} style={{ marginTop: 2 }}>
-                Displayed on your profile so golfers know when to visit.
-              </p>
-            </div>
-            <div className="space-y-1">
-              {DAYS_ORDER.map((day) => {
-                const entry =
-                  openingHours[day] ?? { open: '08:00', close: '18:00', closed: false };
-                return (
-                  <div key={day} className="flex items-center gap-2 min-h-[44px]">
-                    <span className="w-10 text-[13px] font-medium text-foreground flex-shrink-0">
-                      {day}
-                    </span>
-                    {entry.closed ? (
-                      <span className="flex-1 text-[13px] text-muted-foreground">Closed</span>
-                    ) : (
-                      <div className="flex-1 flex items-center gap-2">
-                        <input
-                          type="time"
-                          value={entry.open}
-                          onChange={(e) => updateDay(day, { open: e.target.value })}
-                          className="flex-1 h-9 rounded-lg px-2 text-[13px] text-foreground focus:outline-none focus:ring-1 focus:ring-[#F7931E]/40"
-                          style={{ background: 'rgba(15,23,42,0.03)', border: `0.5px solid ${BIZ.hair}` }}
-                        />
-                        <span className="text-muted-foreground text-xs">–</span>
-                        <input
-                          type="time"
-                          value={entry.close}
-                          onChange={(e) => updateDay(day, { close: e.target.value })}
-                          className="flex-1 h-9 rounded-lg px-2 text-[13px] text-foreground focus:outline-none focus:ring-1 focus:ring-[#F7931E]/40"
-                          style={{ background: 'rgba(15,23,42,0.03)', border: `0.5px solid ${BIZ.hair}` }}
-                        />
-                      </div>
-                    )}
-                    <button
-                      type="button"
-                      onClick={() => updateDay(day, { closed: !entry.closed })}
-                      className="text-[12px] font-semibold flex-shrink-0 min-w-[44px] min-h-[44px] flex items-center justify-end"
-                      style={{ color: entry.closed ? BIZ.amber : '#94A3B8' }}
-                    >
-                      {entry.closed ? 'Open' : 'Close'}
-                    </button>
-                  </div>
-                );
-              })}
-            </div>
-            {firstOpenDay && (
-              <button
-                type="button"
-                onClick={() => setAllDays(openingHours[firstOpenDay])}
-                className="text-[13px] font-semibold"
-                style={{ color: BIZ.amber }}
-              >
-                + Apply first day to all days
-              </button>
-            )}
           </div>
         </SectionCard>
       </div>

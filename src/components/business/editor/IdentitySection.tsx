@@ -1,7 +1,8 @@
 import React from 'react';
 import { AlertCircle, Lock, MapPin } from 'lucide-react';
 
-import { SectionHeader } from '@/components/ui/SectionHeader';
+
+
 import { SectionCard } from '@/components/profile/edit-v2/SectionCard';
 import { BIZ } from '@/components/business/businessTokens';
 import { BUSINESS_CATEGORIES_WITH_ICONS } from '@/constants/businessCategories';
@@ -62,10 +63,8 @@ export function IdentitySection({
 }: IdentitySectionProps) {
   return (
     <>
-      <div className="px-4 mb-2">
-        <SectionHeader tier="standard" kicker="IDENTITY" tone="amber" />
-      </div>
-      <div className="space-y-4 px-4 pb-4">
+      <div className="space-y-4 px-4 pb-4 pt-2">
+
         {/* Category */}
         <SectionCard>
           <div className="space-y-1.5">

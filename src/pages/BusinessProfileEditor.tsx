@@ -49,7 +49,12 @@ import { getCountryCodeFromClub } from '@/utils/countryCodeMapping';
 
 import { IdentitySection } from '@/components/business/editor/IdentitySection';
 import { LocationContactSection } from '@/components/business/editor/LocationContactSection';
-import { BrandingSection } from '@/components/business/editor/BrandingSection';
+import { BusinessHeroCard } from '@/components/business/editor/BusinessHeroCard';
+import { FacilitiesSection } from '@/components/business/editor/FacilitiesSection';
+import { PrimaryActionSection } from '@/components/business/editor/PrimaryActionSection';
+import { BookingComingSoonSection } from '@/components/business/editor/BookingComingSoonSection';
+import { OpeningHoursSection } from '@/components/business/editor/OpeningHoursSection';
+import { VerificationNudgeSection } from '@/components/business/editor/VerificationNudgeSection';
 import { SocialSection } from '@/components/business/editor/SocialSection';
 import { NotificationsSection } from '@/components/business/editor/NotificationsSection';
 import {
@@ -58,6 +63,7 @@ import {
   SocialFields,
   ImageState,
   emptyImage,
+  PrimaryActionKey,
 } from '@/components/business/editor/editorTypes';
 
 import { useHideBottomNav } from '@/hooks/useBottomNavVisibility';
@@ -127,10 +133,16 @@ export default function BusinessProfileEditor() {
   /* ── social ───────────────────────────────────────── */
   const [social, setSocial] = useState<SocialFields>({
     instagram: '',
+    tiktok: '',
     twitter: '',
     facebook: '',
     youtube: '',
   });
+
+  /* ── new: facilities, primary action, opening-hours toggle ── */
+  const [amenities, setAmenities] = useState<string[]>([]);
+  const [primaryAction, setPrimaryAction] = useState<PrimaryActionKey | null>(null);
+  const [showOpeningHours, setShowOpeningHours] = useState(false);
 
   /* ── flow state ───────────────────────────────────── */
   const [saving, setSaving] = useState(false);
@@ -231,14 +243,19 @@ export default function BusinessProfileEditor() {
       });
     }
 
+    setShowOpeningHours(!!(business as any).show_opening_hours);
     setOpeningHours(business.opening_hours ? { ...business.opening_hours } : { ...DEFAULT_OPENING_HOURS });
+
+    setAmenities(Array.isArray((business as any).amenities) ? (business as any).amenities : []);
+    setPrimaryAction(((business as any).primary_action as PrimaryActionKey | null) || null);
 
     const sl = business.social_links || {};
     setSocial({
       instagram: sl.instagram || '',
-      twitter: sl.twitter || '',
-      facebook: sl.facebook || '',
-      youtube: sl.youtube || '',
+      tiktok:    sl.tiktok    || '',
+      twitter:   sl.twitter   || '',
+      facebook:  sl.facebook  || '',
+      youtube:   sl.youtube   || '',
     });
 
     setLogo({ ...emptyImage, url: business.logo_url || null });
@@ -247,8 +264,11 @@ export default function BusinessProfileEditor() {
     // snapshot for dirty detection (stringify a stable subset)
     initialSnapshotRef.current = JSON.stringify({
       n: business.name, d: business.description, fy: business.founded_year,
-      w: business.website, e: business.email, p: business.phone, b: business.booking_url,
+      w: business.website, e: business.email, p: business.phone,
       oh: business.opening_hours, sl, addr: business.address_label, loc: business.location,
+      am: (business as any).amenities || [],
+      pa: (business as any).primary_action || null,
+      soh: !!(business as any).show_opening_hours,
     });
   }, [mode, business]);
 
@@ -339,11 +359,12 @@ export default function BusinessProfileEditor() {
     if (mode !== 'edit') return '';
     return JSON.stringify({
       n: businessName, d: description, fy: foundedYear ? parseInt(foundedYear, 10) : null,
-      w: website, e: email, p: phone?.fullNumber || null, b: bookingUrl,
+      w: website, e: email, p: phone?.fullNumber || null,
       oh: openingHours, sl: social,
       addr: address?.label || null, loc: address?.label || null,
+      am: amenities, pa: primaryAction, soh: showOpeningHours,
     });
-  }, [mode, businessName, description, foundedYear, website, email, phone, bookingUrl, openingHours, social, address]);
+  }, [mode, businessName, description, foundedYear, website, email, phone, openingHours, social, address, amenities, primaryAction, showOpeningHours]);
 
   const isDirty = useMemo(() => {
     if (mode === 'create') {
@@ -428,9 +449,10 @@ export default function BusinessProfileEditor() {
     try {
       const socialLinks = {
         instagram: social.instagram || null,
-        twitter: social.twitter || null,
-        facebook: social.facebook || null,
-        youtube: social.youtube || null,
+        tiktok:    social.tiktok    || null,
+        twitter:   social.twitter   || null,
+        facebook:  social.facebook  || null,
+        youtube:   social.youtube   || null,
       };
       const hasSocial = Object.values(socialLinks).some(Boolean);
 
@@ -447,7 +469,12 @@ export default function BusinessProfileEditor() {
           opening_hours: openingHours as any,
           social_links: hasSocial ? (socialLinks as any) : null,
           is_verified: false,
-        };
+          amenities: amenities.length ? (amenities as any) : null,
+          primary_action: primaryAction || null,
+          show_opening_hours: showOpeningHours,
+        } as any;
+
+
 
 
         if (isGolfClub && selectedClub) {
@@ -592,6 +619,9 @@ export default function BusinessProfileEditor() {
         booking_url: bookingUrl || null,
         opening_hours: openingHours as any,
         social_links: hasSocial ? (socialLinks as any) : null,
+        amenities: amenities.length ? amenities : null,
+        primary_action: primaryAction || null,
+        show_opening_hours: showOpeningHours,
 
         updated_at: new Date().toISOString(),
       };
@@ -652,6 +682,7 @@ export default function BusinessProfileEditor() {
     mode, user?.id, id, isValid, resolvedName, category, description, foundedYear, website, email,
     phone, bookingUrl, openingHours, social, address, businessName, isClubLinked, isGolfClub,
     selectedClub, claimProofNote, logo, cover, queryClient, navigate, uploadLogo, removeLogo, uploadCover, removeCover,
+    amenities, primaryAction, showOpeningHours,
   ]);
 
   /* ── loading / error states (edit) ──────────────── */
@@ -689,8 +720,20 @@ export default function BusinessProfileEditor() {
         title={mode === 'create' ? 'Create a business' : 'Edit business'}
         onBack={handleClose}
       >
-        <div className="flex-1 overflow-y-auto pt-3 pb-12" style={{ background: BIZ.pageBg }}>
+        <div className="flex-1 overflow-y-auto pb-12" style={{ background: BIZ.pageBg }}>
 
+          {/* 1. HERO — cover + squircle logo at top */}
+          <BusinessHeroCard
+            logoUrl={effectiveLogoUrl}
+            coverUrl={effectiveCoverUrl}
+            resolvedName={resolvedName}
+            onLogoFile={onLogoFile}
+            onLogoRemove={onLogoRemove}
+            onCoverFile={onCoverFile}
+            onCoverRemove={onCoverRemove}
+          />
+
+          {/* 2. IDENTITY */}
           <IdentitySection
             mode={mode}
             category={category}
@@ -733,8 +776,6 @@ export default function BusinessProfileEditor() {
             </div>
           )}
 
-          {/* Proof note — create-mode golf-club claim only.
-              Helps the admin verify your connection to the club. Optional. */}
           {mode === 'create' && isGolfClub && selectedClub && !existingBusinessForClub && !clubClaimPending && (
             <div style={{ padding: '0 16px', marginTop: 8, marginBottom: 16 }}>
               <label
@@ -754,7 +795,7 @@ export default function BusinessProfileEditor() {
                 id="claim-proof-note"
                 value={claimProofNote}
                 onChange={(e) => setClaimProofNote(e.target.value.slice(0, 500))}
-                placeholder="e.g. I'm the General Manager — work email on the club domain, happy to send a verification email."
+                placeholder="e.g. I'm the General Manager, work email on the club domain, happy to send a verification email."
                 rows={3}
                 maxLength={500}
                 style={{
@@ -776,6 +817,14 @@ export default function BusinessProfileEditor() {
             </div>
           )}
 
+          {/* 3. FACILITIES (category-aware) */}
+          <FacilitiesSection
+            category={category}
+            amenities={amenities}
+            setAmenities={setAmenities}
+          />
+
+          {/* 4. LOCATION & CONTACT */}
           <LocationContactSection
             mode={mode}
             isClubLinked={isClubLinked}
@@ -802,21 +851,31 @@ export default function BusinessProfileEditor() {
             businessLocationFallback={business?.location ?? null}
           />
 
-          <BrandingSection
-            effectiveLogoUrl={effectiveLogoUrl}
-            effectiveCoverUrl={effectiveCoverUrl}
-            resolvedName={resolvedName}
-            onLogoFile={onLogoFile}
-            onLogoRemove={onLogoRemove}
-            onCoverFile={onCoverFile}
-            onCoverRemove={onCoverRemove}
+          {/* 5. PRIMARY BUTTON */}
+          <PrimaryActionSection value={primaryAction} onChange={setPrimaryAction} />
+
+          {/* 6. BOOKING — coming soon */}
+          <BookingComingSoonSection />
+
+          {/* 7. OPENING HOURS with master toggle */}
+          <OpeningHoursSection
+            enabled={showOpeningHours}
+            setEnabled={setShowOpeningHours}
+            openingHours={openingHours}
+            setOpeningHours={setOpeningHours}
           />
 
+          {/* 8. SOCIAL */}
           <SocialSection social={social} setSocial={setSocial} />
 
           {mode === 'edit' && business?.id && (
             <NotificationsSection businessId={business.id} />
           )}
+
+          {/* 9. VERIFICATION NUDGE */}
+          <VerificationNudgeSection />
+
+
 
 
           {/* Inline Save — bottom, matches personal Edit Profile */}
