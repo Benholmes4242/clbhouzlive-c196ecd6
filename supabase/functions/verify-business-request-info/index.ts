@@ -131,6 +131,12 @@ serve(async (req) => {
       })
       .catch((e) => console.error("[request-info] result-email failed", e));
 
+    queueOwnerPush(supabaseAdmin, request.business_id, {
+      title: "More info needed",
+      body: "A reviewer needs a bit more information to verify your business.",
+      data: { type: "business_verification_result", outcome: "needs_more_info", business_id: request.business_id },
+    }).catch((e) => console.error("[request-info] push queue failed", e));
+
 
 
 
