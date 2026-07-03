@@ -1,7 +1,7 @@
 /**
  * Minimal telemetry for video autoplay analytics
  */
-import { DEBUG_MEDIA } from '@/media/debug';
+import { DEBUG_MEDIA } from '@/utils/debugFlags';
 
 interface VideoTelemetryEvent {
   event: string;

@@ -3,7 +3,7 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import { navigationTabs } from './navigationTabs';
 import { analyticsEvents } from '@/utils/analyticsEvents';
 
-import { prefetchProfileVideos, resolveUsernameToId } from '@/utils/profileVideoPrefetch';
+import { prefetchProfileVideos, resolveUsernameToId } from '@/utils/username';
 import { useActiveActor } from '@/context/ActiveActorContext';
 import { supabase } from '@/integrations/supabase/client';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';

@@ -13,7 +13,7 @@
 
 import React, { useState, useCallback, useMemo, forwardRef } from 'react';
 import { cn } from '@/lib/utils';
-import { AspectRatio as AspectRatioType } from '@/media/types';
+import { AspectRatio as AspectRatioType } from '@/types/media';
 import { ImagePlaceholder } from './ImagePlaceholder';
 
 export interface UnifiedImageProps {

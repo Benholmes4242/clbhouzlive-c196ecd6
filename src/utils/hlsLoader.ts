@@ -1,5 +1,5 @@
 import type HlsType from 'hls.js';
-import { DEBUG_MEDIA } from '@/media/debug';
+import { DEBUG_MEDIA } from '@/utils/debugFlags';
 
 let hlsLibPromise: Promise<typeof HlsType | null> | null = null;
 

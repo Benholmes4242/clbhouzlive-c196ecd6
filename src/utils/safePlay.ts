@@ -9,7 +9,7 @@
 
 import { USE_SAFE_AUTOPLAY_V2 } from './featureFlags';
 import { logVideoTelemetry } from './videoTelemetry';
-import { DEBUG_SAFE_PLAY } from '@/media/debug';
+import { DEBUG_SAFE_PLAY } from '@/utils/debugFlags';
 import { BlobUrlManager } from '@/hooks/useBlobUrlManager';
 import { 
   MOBILE_VIDEO_DEBUG, 

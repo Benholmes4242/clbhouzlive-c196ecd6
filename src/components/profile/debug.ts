@@ -11,7 +11,7 @@
  * ENABLED: January 2026 debugging session
  */
 
-import { DEBUG_PROFILE } from '@/media/debug';
+import { DEBUG_PROFILE } from '@/utils/debugFlags';
 
 // Color-coded log categories
 const LOG_COLORS = {

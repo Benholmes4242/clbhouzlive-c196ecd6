@@ -2,12 +2,12 @@
 // IMPORTANT: All URL generation MUST use CUSTOMER_SUBDOMAIN only.
 // videodelivery.net is NOT valid for our Stream configuration and causes 404s.
 
-import { CLOUDFLARE_STREAM_SUBDOMAIN } from '@/media/constants';
-import { getThumbnailUrl } from '@/media/utils/thumbnail';
+import { CLOUDFLARE_STREAM_SUBDOMAIN } from '@/config/streamConstants';
+import { getThumbnailUrl } from '@/utils/thumbnail';
 
 export const CLOUDFLARE_STREAM_CONFIG = {
   ACCOUNT_ID: 'a1b264d44ddbe2b5127bb6ff5c274108',
-  /** @deprecated Use CLOUDFLARE_STREAM_SUBDOMAIN from @/media/constants */
+  /** @deprecated Use CLOUDFLARE_STREAM_SUBDOMAIN from @/config/streamConstants */
   CUSTOMER_SUBDOMAIN: CLOUDFLARE_STREAM_SUBDOMAIN,
 } as const;
 

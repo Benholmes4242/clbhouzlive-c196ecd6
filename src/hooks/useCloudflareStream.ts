@@ -9,7 +9,7 @@
  * const result = await upload(videoFile, { destination: 'stream' });
  */
 
-import { useMediaUpload } from '@/media/hooks/useMediaUpload';
+import { useMediaUpload } from '@/uploads/hooks/useMediaUpload';
 
 export const useCloudflareStream = () => {
   const { upload, progress, status, error, cancel } = useMediaUpload();

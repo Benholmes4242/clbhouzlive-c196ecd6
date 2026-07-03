@@ -23,7 +23,7 @@ import { getCropWrapperClass, getPixelLayerStyle } from '@/utils/studioEdit';
 import { tilePriority } from '@/utils/fetchPriority';
 
 import { PostOwnerMenu } from '@/components/posts/PostOwnerMenu';
-import { extractCloudflareUid } from '@/utils/videoIdUtils';
+import { extractCloudflareUid } from '@/utils/streamId';
 
 /**
  * Map grid surface to MediaRuntime surface
