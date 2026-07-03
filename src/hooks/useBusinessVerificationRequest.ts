@@ -5,7 +5,10 @@ import { AppLog } from '@/lib/logger';
 export interface BusinessVerificationRequest {
   id: string;
   business_id: string;
-  status: 'pending' | 'approved' | 'rejected' | 'revoked' | 'needs_more_info' | 'cancelled';
+  // 'superseded' is set automatically by the DB when a newer request replaces
+  // an older needs_more_info/rejected row (see supersede_prior_verification_requests
+  // trigger). It is treated as terminal and maps to 'none' in deriveVerificationState.
+  status: 'pending' | 'approved' | 'rejected' | 'revoked' | 'needs_more_info' | 'cancelled' | 'superseded';
   requested_by: string;
   created_at: string;
   reviewed_at: string | null;
