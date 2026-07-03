@@ -78,16 +78,14 @@ export function openWithOrigin({
   const origin = snapshotOrigin(originEl, posterUrl ?? null);
   const postId = (posts[index] as any)?.id ?? null;
 
-  // TAP boundary — capture the live tile playhead + play-state at tap so we
-  // can compare against FS_ATTACH / FS_FIRSTPLAY on the other side.
+  // TAP boundary — playhead/paused reads removed with the video teardown; the
+  // poster-only chassis has no <video> on the tile to inspect.
   try {
-    const tileVideo = originEl?.querySelector('video') as HTMLVideoElement | null;
     logHandoff(postId, 'tile', 'TAP', {
-      tileT: tileVideo?.currentTime ?? -1,
-      paused: tileVideo?.paused ?? null,
       handOffUrl: handOffUrls?.[0] ?? null,
     });
   } catch {}
+
 
   // Chrome flip at TAP time (not effect time) to kill the strobe. Scroll
   // lock is owned by the overlay's isOpen effect (ref-counted so it composes
