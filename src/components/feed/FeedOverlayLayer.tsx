@@ -7,7 +7,6 @@ import { FeedActionRail } from './FeedActionRail';
 import { FeedTopActionBar } from './FeedTopActionBar';
 import { Z } from '@/config/zIndex';
 import { ReviewOverlaySlot } from './ReviewOverlaySlot';
-import { VideoScrubber } from '@/components/video/VideoScrubber';
 import { formatTimeAgo } from '@/utils/formatTime';
 import { PostOwnerMenu } from '@/components/posts/PostOwnerMenu';
 import type { FeedPost } from '@/components/media-system/types/media';
