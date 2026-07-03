@@ -297,20 +297,14 @@ function MomentShareCard({
       <div className="relative aspect-square overflow-hidden bg-muted">
         {mediaUrls.length > 0 ? (
           <>
-            {isVideo(mediaUrls[currentIndex]) ? (
-              <video 
-                src={mediaUrls[currentIndex]} 
-                className="w-full h-full object-cover"
-                controls
-                onClick={(e) => e.stopPropagation()}
-              />
-            ) : (
-              <img 
-                src={mediaUrls[currentIndex]} 
-                alt="Shared moment"
-                className="w-full h-full object-cover"
-              />
-            )}
+            {/* [VIDEOSTUB] Poster-only chassis — streaming <video> severed; render thumbnail/first frame. */}
+            <img
+              src={moment.thumbnail_url || mediaUrls[currentIndex]}
+              alt="Shared moment"
+              className="w-full h-full object-cover"
+              onClick={(e) => e.stopPropagation()}
+            />
+
             
             {/* Navigation arrows for multiple media */}
             {hasMultiple && (

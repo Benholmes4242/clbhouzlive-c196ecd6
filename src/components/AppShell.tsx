@@ -1,5 +1,4 @@
 import React, { PropsWithChildren, useEffect } from "react";
-import { warmHlsJs } from "@/hooks/useHlsUrlCache";
 import { initMobileVideoDebug } from "@/media/mobileVideoDebug";
 import VideoDebugPanel from "@/components/VideoDebugPanel";
 
@@ -16,9 +15,8 @@ import VideoDebugPanel from "@/components/VideoDebugPanel";
  * Video debug panel: tap-triggered via <VideoDebugPanel /> (tiny 🐞 button).
  */
 export default function AppShell({ children }: PropsWithChildren) {
-  // Warm hls.js chunk on app start to avoid delay on first video
+  // [VIDEO-TEARDOWN] hls.js boot warmer removed — engine severed.
   useEffect(() => {
-    warmHlsJs();
     initMobileVideoDebug();
   }, []);
 

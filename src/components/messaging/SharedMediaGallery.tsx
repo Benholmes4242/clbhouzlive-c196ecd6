@@ -214,11 +214,12 @@ export function SharedMediaGallery({ conversationId, onClose }: SharedMediaGalle
                     className="overflow-hidden"
                     style={{ aspectRatio: '1', borderRadius: 14, background: 'rgba(0,0,0,0.04)', border: 'none', cursor: 'pointer', padding: 0 }}
                   >
-                    {item.type === 'image' ? (
-                      <img src={item.url} alt="" className="w-full h-full object-cover" />
-                    ) : (
-                      <video src={item.url} className="w-full h-full object-cover" />
-                    )}
+                    {/* [VIDEOSTUB] Poster-only chassis — streaming <video> severed to <img>. */}
+                    <img
+                      src={item.type === 'image' ? item.url : ((item as any).thumbnail_url || item.url)}
+                      alt=""
+                      className="w-full h-full object-cover"
+                    />
                   </button>
                 ))}
               </div>

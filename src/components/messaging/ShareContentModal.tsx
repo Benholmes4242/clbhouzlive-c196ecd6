@@ -285,6 +285,7 @@ export function ShareContentModal({
                   {mediaPreviews.map((preview, index) => (
                     <div key={index} className="relative aspect-square rounded-xl overflow-hidden" style={{ background: '#f1f5f9' }}>
                       {isVideo(selectedMedia[index]) ? (
+                        // [VIDEO-TEARDOWN-OUT-OF-SCOPE] local upload preview, not streaming.
                         <video src={preview} className="w-full h-full object-cover" />
                       ) : (
                         <img src={preview} alt="" className="w-full h-full object-cover" />

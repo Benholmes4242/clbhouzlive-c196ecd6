@@ -16,16 +16,7 @@ export function useClubhouseComments(activeActor?: { type: string; id: string } 
     setCommentCountOverrides(new Map());
   }, [activeActor?.id, activeActor?.type]);
 
-  // Pause/resume video when comments open/close
-  useEffect(() => {
-    const { activeVideoElement, userPaused } = useClubhouseStore.getState();
-    if (!activeVideoElement) return;
-    if (commentsOpen) {
-      if (!activeVideoElement.paused) activeVideoElement.pause();
-    } else {
-      if (!userPaused) activeVideoElement.play().catch(() => {});
-    }
-  }, [commentsOpen]);
+  // [VIDEO-TEARDOWN] activeVideoElement pause/resume block removed — poster-only chassis.
 
   const openComments = useCallback((_post?: FeedPost | null) => {
     setCommentsOpen(true);

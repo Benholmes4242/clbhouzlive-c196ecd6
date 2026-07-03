@@ -44,10 +44,7 @@ export const useHlsUrlCache = () => {
   };
 };
 
-// Warm hls.js chunk early
+// [VIDEO-TEARDOWN] warmHlsJs boot warmer removed — engine severed.
 export const warmHlsJs = () => {
-  // Fire and forget to warm the code-split chunk
-  import('hls.js').catch(() => {
-    // Silently handle import errors
-  });
+  /* no-op */
 };

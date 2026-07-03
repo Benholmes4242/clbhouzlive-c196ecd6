@@ -17,8 +17,7 @@ console.info('[boot] sw-available', 'serviceWorker' in navigator);
 import { ManifestWarmer } from './utils/video/ManifestWarmer';
 try { ManifestWarmer.warmOnStartup(); } catch {}
 
-// Fix 4: Eagerly load HLS.js so it's ready when first video needs it
-import('hls.js').catch(() => {});
+// [VIDEO-TEARDOWN] hls.js boot warmer removed — engine severed.
 
 import React from 'react'
 import { createRoot } from 'react-dom/client'

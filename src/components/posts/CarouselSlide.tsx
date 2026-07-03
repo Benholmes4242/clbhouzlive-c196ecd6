@@ -231,34 +231,10 @@ export default function CarouselSlide({
     return `${mins}:${secs.toString().padStart(2, '0')}`;
   };
 
-  // Toggle play/pause on tap - works for both UnifiedVideoPlayer and native video
+  // [VIDEO-TEARDOWN] handleVideoTap gutted — poster-only chassis, no playback to toggle.
   const handleVideoTap = useCallback((e: React.MouseEvent) => {
     e.stopPropagation();
     haptic('light');
-    
-    // Try UnifiedVideoPlayer first
-    const unifiedPlayer = hlsPlayerRef.current;
-    if (unifiedPlayer) {
-      const videoEl = unifiedPlayer.getVideoElement();
-      if (videoEl) {
-        if (videoEl.paused) {
-          unifiedPlayer.play().catch(console.error);
-        } else {
-          unifiedPlayer.pause();
-        }
-        return;
-      }
-    }
-    
-    // Fallback to native video
-    const video = videoRef.current;
-    if (!video) return;
-    
-    if (video.paused) {
-      video.play().catch(console.error);
-    } else {
-      video.pause();
-    }
   }, []);
 
   // Handle video time update for countdown

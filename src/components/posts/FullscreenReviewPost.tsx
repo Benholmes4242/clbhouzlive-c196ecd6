@@ -164,22 +164,7 @@ export function FullscreenReviewPost({
   const currentMedia = sortedMedia[currentIndex];
   const tierData = getScoreTier(rating);
   
-  // Video playback - only when renderMedia=true (we own the video element)
-  useEffect(() => {
-    // Skip when we don't render media - parent handles video playback
-    if (!renderMedia) return;
-    
-    if (currentMedia?.media_type === 'video' && videoPlayerRef.current) {
-      // Small delay to ensure video element is ready after index change
-      const timer = setTimeout(() => {
-        videoPlayerRef.current?.play().catch(() => {
-          // Autoplay blocked - silently ignore
-        });
-      }, 100);
-      
-      return () => clearTimeout(timer);
-    }
-  }, [currentIndex, currentMedia?.media_type, currentMedia?.id, renderMedia]);
+  // [VIDEO-TEARDOWN] Autoplay-on-mount effect removed — poster-only chassis, engine severed.
   
   // Navigation
   const goToNext = useCallback(() => {

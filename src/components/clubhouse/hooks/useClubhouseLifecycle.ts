@@ -9,7 +9,7 @@ import { useEffect } from 'react';
  * Will be re-wired in Brief 3 with new scroll-snap feed.
  */
 export function useClubhouseLifecycle(
-  _getStore?: () => { activeVideoElement: HTMLVideoElement | null; userPaused: boolean }
+  _getStore?: () => { userPaused: boolean }
 ) {
   // Screen Wake Lock
   useEffect(() => {

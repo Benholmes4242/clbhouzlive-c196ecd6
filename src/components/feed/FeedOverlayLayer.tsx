@@ -78,7 +78,7 @@ export const FeedOverlayLayer = memo(function FeedOverlayLayer({
   const navigate = useNavigate();
   const clubhouseActiveIndex = useClubhouseStore((s) => s.activeIndex);
   const activeIndex = activeIndexOverride ?? clubhouseActiveIndex;
-  const activeVideoElement = useClubhouseStore((s) => s.activeVideoElement);
+  // [VIDEO-TEARDOWN] activeVideoElement removed from store — scrubber suppressed.
   const isMuted = useClubhouseStore((s) => s.isMuted);
   const toggleMute = useClubhouseStore((s) => s.toggleMute);
   const markUserGestureUnmute = useClubhouseStore((s) => s.markUserGestureUnmute);
@@ -316,22 +316,8 @@ export const FeedOverlayLayer = memo(function FeedOverlayLayer({
         />
       )}
 
-      {/* Video scrubber — sits between bottom content and action rail on video posts */}
-      {isVideo && activeVideoElement && overlayVisible && (
-        <div
-          style={{
-            position: 'fixed',
-            left: 0,
-            right: 0,
-            bottom: bottomCalc(0),
-            height: 2,
-            pointerEvents: 'auto',
-            zIndex: Z.echo + 1,
-          }}
-        >
-          <VideoScrubber videoEl={activeVideoElement} height={2} variant="default" />
-        </div>
-      )}
+      {/* [VIDEO-TEARDOWN] Video scrubber removed — no live video element to scrub. */}
+
 
       {/* Bottom-right floating mute — Clubhouse only (fullscreen mute lives in top bar) */}
       {isVideo && bottomOffset === undefined && !topActionBar && (

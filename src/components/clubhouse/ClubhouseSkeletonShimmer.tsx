@@ -13,7 +13,7 @@
 import React from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { cn } from '@/lib/utils';
-import { prefersReducedMotion } from '@/utils/safePlay';
+import { prefersReducedMotion } from '@/utils/env';
 import { useSkeletonShownWhenVisible } from '@/perf/usePageReady';
 
 interface ClubhouseSkeletonShimmerProps {
