@@ -42,7 +42,7 @@ const PostDeepLinkPage: React.FC = () => {
   const navState = location.state as { openComments?: boolean; initialCommentId?: string } | null;
   const [searchParams] = useSearchParams();
   const { user, loading: authLoading } = useSupabaseSession();
-  const videoRef = useRef<HTMLVideoElement>(null);
+  // videoRef removed — poster-only chassis per BRIEF_VIDEO_TEARDOWN.md.
 
   const [post, setPost] = useState<PostPreview | null>(null);
   const [feedPost, setFeedPost] = useState<ReturnType<typeof mapActivityPostToFeedPost> | null>(null);
