@@ -243,14 +243,19 @@ export default function BusinessProfileEditor() {
       });
     }
 
+    setShowOpeningHours(!!(business as any).show_opening_hours);
     setOpeningHours(business.opening_hours ? { ...business.opening_hours } : { ...DEFAULT_OPENING_HOURS });
+
+    setAmenities(Array.isArray((business as any).amenities) ? (business as any).amenities : []);
+    setPrimaryAction(((business as any).primary_action as PrimaryActionKey | null) || null);
 
     const sl = business.social_links || {};
     setSocial({
       instagram: sl.instagram || '',
-      twitter: sl.twitter || '',
-      facebook: sl.facebook || '',
-      youtube: sl.youtube || '',
+      tiktok:    sl.tiktok    || '',
+      twitter:   sl.twitter   || '',
+      facebook:  sl.facebook  || '',
+      youtube:   sl.youtube   || '',
     });
 
     setLogo({ ...emptyImage, url: business.logo_url || null });
@@ -259,8 +264,11 @@ export default function BusinessProfileEditor() {
     // snapshot for dirty detection (stringify a stable subset)
     initialSnapshotRef.current = JSON.stringify({
       n: business.name, d: business.description, fy: business.founded_year,
-      w: business.website, e: business.email, p: business.phone, b: business.booking_url,
+      w: business.website, e: business.email, p: business.phone,
       oh: business.opening_hours, sl, addr: business.address_label, loc: business.location,
+      am: (business as any).amenities || [],
+      pa: (business as any).primary_action || null,
+      soh: !!(business as any).show_opening_hours,
     });
   }, [mode, business]);
 
