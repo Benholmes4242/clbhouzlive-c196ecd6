@@ -295,93 +295,27 @@ export default function CarouselSlide({
   const useFittedWrapper = objectFit === 'contain' && videoDims;
 
   if (item.type === 'video') {
-    // The video player element (shared between both render paths)
-    const videoPlayer = needsUnifiedPlayer ? (
-      <UnifiedVideoPlayer
-        ref={hlsPlayerRef}
-        src={baseUrl}
-        posterUrl={resolvedPosterUrl}
-        autoplay={false}
-        muted={forceVideoMuted}
-        loop
-        className={cn(
-          "w-full h-full transition-all duration-150",
-          loaded ? 'scale-100 blur-0' : 'scale-105 blur-sm',
-          filterClass
-        )}
-        objectFit={useFittedWrapper ? 'cover' : objectFit}
-        showMuteButton={false}
-        surface="grid"
-        onLoadedData={() => {
-          console.log('[CarouselSlide] Video loaded successfully');
-          setLoaded(true);
-          const player = hlsPlayerRef.current;
-          if (player) {
-            setDuration(player.getDuration());
-            const videoEl = player.getVideoElement();
-            if (videoEl) {
-              handleVideoDimsCapture(videoEl);
-              onDimensionsLoaded?.(item.id, videoEl.videoWidth, videoEl.videoHeight);
-            }
-          }
-        }}
-        onPlay={() => setIsPlaying(true)}
-        onPause={() => setIsPlaying(false)}
-        onEnded={() => {
-          setIsPlaying(false);
-          setCurrentTime(0);
-        }}
-        onTimeUpdate={(current, dur) => {
-          setCurrentTime(current);
-          if (dur > 0) setDuration(dur);
-        }}
-        onError={(error) => console.error('[CarouselSlide] Video error:', error)}
-      />
-    ) : (
-      <video
-        ref={videoRef}
-        src={baseUrl}
-        poster={resolvedPosterUrl}
-        preload="metadata"
-        playsInline
-        controls={false}
-        muted={forceVideoMuted}
-        loop
+    // [VIDEOSTUB] Poster-only chassis (Stage D remediation).
+    // Streaming <video> removed; render the poster <img> only.
+    void needsUnifiedPlayer;
+    void handleVideoDimsCapture;
+    const videoPlayer = (
+      <img
+        src={resolvedPosterUrl || ''}
+        alt=""
+        draggable={false}
+        onLoad={() => setLoaded(true)}
         className={cn(
           "w-full h-full transition-all duration-150 block",
           loaded ? 'scale-100 blur-0' : 'scale-105 blur-sm',
           filterClass
         )}
-        style={{ 
+        style={{
           ...pixelStyle,
           width: '100%',
           height: '100%',
-          objectFit: useFittedWrapper ? 'cover' : 'contain',
+          objectFit: useFittedWrapper ? 'cover' : (objectFit === 'contain' ? 'contain' : 'cover'),
           display: 'block',
-        }}
-        onLoadedMetadata={() => {
-          console.log('[CarouselSlide] Video metadata loaded successfully');
-          handleLoadedMetadata();
-          const video = videoRef.current;
-          if (video) {
-            handleVideoDimsCapture(video);
-            onDimensionsLoaded?.(item.id, video.videoWidth, video.videoHeight);
-          }
-        }}
-        onCanPlay={() => console.log('[CarouselSlide] Video can play')}
-        onError={(e) => console.error('[CarouselSlide] Video error:', e.currentTarget.error)}
-        onTimeUpdate={handleTimeUpdate}
-        onPlay={() => setIsPlaying(true)}
-        onPause={() => setIsPlaying(false)}
-        onEnded={() => {
-          setIsPlaying(false);
-          setCurrentTime(0);
-        }}
-        onVolumeChange={(e) => {
-          if (forceVideoMuted && !e.currentTarget.muted) {
-            e.currentTarget.muted = true;
-            onMuteBlocked?.();
-          }
         }}
       />
     );
