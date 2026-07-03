@@ -268,7 +268,7 @@ class HLSPoolManagerClass {
    * Promote a preloaded HLS instance to a new video element
    * Returns the HLS instance if successful, null otherwise
    */
-  promote(url: string, targetVideo: HTMLVideoElement, startPosition?: number): HlsType | null {
+  promote(url: string, targetVideo: HTMLVideoElement): HlsType | null {
     const entry = this.pool.get(url);
     
     if (!entry || entry.isPromoted) {
