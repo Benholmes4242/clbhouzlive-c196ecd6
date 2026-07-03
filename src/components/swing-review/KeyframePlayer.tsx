@@ -1,12 +1,9 @@
-// FLAGGED (Stage B5, BRIEF_VIDEO_TEARDOWN.md):
-// KeyframePlayer is swing-analysis frame-scrubbing, not streamed feed playback.
-// It requires a real <video> element for currentTime seeking (biomechanical review).
-// Converting to poster-only would break the swing review UX, so it is intentionally
-// left functional here. Rewire to the new engine once it lands.
-import React, { useRef, useEffect, useState, useId } from 'react';
+// [VIDEO-TEARDOWN-OUT-OF-SCOPE] KeyframePlayer is swing-analysis frame-scrubbing,
+// not streamed feed playback. It needs a real <video> element for currentTime seeking
+// (biomechanical review). Uses a direct native <video> tag; no HLS engine involved.
+// Rewire to the new engine once it lands.
+import React, { useRef, useEffect, useState } from 'react';
 import { Play, Pause, Maximize2 } from 'lucide-react';
-import EnhancedVideoPlayer from '@/components/ui/enhanced-video-player';
-import { MediaRuntime } from '@/media/runtime/MediaRuntime';
 
 interface KeyframePlayerProps {
   videoUrl: string;
@@ -17,14 +14,16 @@ interface KeyframePlayerProps {
 export const KeyframePlayer: React.FC<KeyframePlayerProps> = ({
   videoUrl,
   currentTime,
-  onTimeUpdate
+  onTimeUpdate,
 }) => {
   const videoRef = useRef<HTMLVideoElement>(null);
   const [isPlaying, setIsPlaying] = useState(false);
-  const mediaId = useId();
 
   useEffect(() => {
-    if (videoRef.current && Math.abs(videoRef.current.currentTime - currentTime) > 0.5) {
+    if (
+      videoRef.current &&
+      Math.abs(videoRef.current.currentTime - currentTime) > 0.5
+    ) {
       videoRef.current.currentTime = currentTime;
     }
   }, [currentTime]);
@@ -35,39 +34,43 @@ export const KeyframePlayer: React.FC<KeyframePlayerProps> = ({
     }
   };
 
-  const togglePlay = () => {
-    if (videoRef.current) {
+  const togglePlay = async () => {
+    const video = videoRef.current;
+    if (!video) return;
+    try {
       if (isPlaying) {
-        MediaRuntime.requestPause({ id: mediaId, reason: 'user' });
+        video.pause();
+        setIsPlaying(false);
       } else {
-        MediaRuntime.requestPlay({ id: mediaId, surface: 'grid', reason: 'user' });
+        await video.play();
+        setIsPlaying(true);
       }
-      setIsPlaying(!isPlaying);
+    } catch {
+      setIsPlaying(false);
     }
   };
 
   const handleFullscreen = () => {
-    if (videoRef.current) {
-      videoRef.current.requestFullscreen?.();
-    }
+    videoRef.current?.requestFullscreen?.();
   };
 
   return (
     <div className="w-full">
       <div className="relative aspect-video bg-black rounded-2xl overflow-hidden">
-        {/* Top overlay gradient */}
         <div className="absolute inset-x-0 top-0 h-20 bg-gradient-to-b from-black/40 to-transparent pointer-events-none z-10" />
-        
-        {/* Video */}
-        <EnhancedVideoPlayer
+
+        {/* [VIDEO-TEARDOWN-OUT-OF-SCOPE] direct <video> for frame scrubbing */}
+        <video
           ref={videoRef}
           src={videoUrl}
-          className="w-full h-full"
+          className="w-full h-full object-contain"
+          playsInline
+          preload="metadata"
           onTimeUpdate={handleTimeUpdate}
-          objectFit="contain"
+          onPlay={() => setIsPlaying(true)}
+          onPause={() => setIsPlaying(false)}
         />
 
-        {/* Fullscreen button */}
         <button
           type="button"
           aria-label="View fullscreen"
@@ -77,7 +80,6 @@ export const KeyframePlayer: React.FC<KeyframePlayerProps> = ({
           <Maximize2 className="h-4 w-4" />
         </button>
 
-        {/* Bottom controls bar */}
         <div className="absolute inset-x-0 bottom-0 p-3 flex items-center justify-between z-10">
           <button
             type="button"
