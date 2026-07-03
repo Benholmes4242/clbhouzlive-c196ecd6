@@ -18,11 +18,17 @@
  *                          firstframe p50=190 p95=640 max=1420
  */
 
+import { isPerfEnabled } from '@/perf/navTiming';
+
 const FLAG_KEY = 'FEED_TELEMETRY';
+const AUTO_FLUSH_EVERY = 20;
 
 function on(): boolean {
   try {
-    return typeof localStorage !== 'undefined' && localStorage.getItem(FLAG_KEY) === '1';
+    if (typeof localStorage !== 'undefined' && localStorage.getItem(FLAG_KEY) === '1') return true;
+  } catch {}
+  try {
+    return isPerfEnabled();
   } catch {
     return false;
   }
@@ -114,6 +120,7 @@ export function markFirstFrame(
   console.info(
     `[FEEDTEL] firstframe   i=${index} dt_swipe_ff=${dt >= 0 ? fmt(dt) + 'ms' : 'n/a'} poolHit=${meta.poolHit ? 1 : 0} cached=${meta.cached ? 1 : 0}`,
   );
+  if (poolTotal > 0 && poolTotal % AUTO_FLUSH_EVERY === 0) flushSummary();
 }
 
 export function markTabSwitch(from: string, to: string): void {
@@ -150,4 +157,9 @@ export function flushSummary(): void {
 // Expose a manual flush hook for the device COPY path.
 if (typeof window !== 'undefined') {
   (window as unknown as { __feedTelFlush?: () => void }).__feedTelFlush = flushSummary;
+  const autoFlush = () => { try { flushSummary(); } catch {} };
+  window.addEventListener('pagehide', autoFlush);
+  document.addEventListener('visibilitychange', () => {
+    if (document.visibilityState === 'hidden') autoFlush();
+  });
 }
