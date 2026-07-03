@@ -116,6 +116,13 @@ serve(async (req) => {
       })
       .catch((e) => console.error("[approve] result-email failed", e));
 
+    // Fire-and-forget push notification to the business owner
+    queueOwnerPush(supabaseAdmin, request.business_id, {
+      title: "You're verified",
+      body: "Your business has been verified on clbhouz.",
+      data: { type: "business_verification_result", outcome: "approved", business_id: request.business_id },
+    }).catch((e) => console.error("[approve] push queue failed", e));
+
 
 
 
