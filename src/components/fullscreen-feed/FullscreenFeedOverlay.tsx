@@ -170,10 +170,20 @@ export function FullscreenFeedOverlay() {
         document.documentElement.style.backgroundColor = '';
         document.body.style.backgroundColor = '';
 
-        // FLIP handoff return — tell every origin tile whose url was handed off
-        // to re-promote from the pool and seek to its last known playhead.
-        // Deferred so the fullscreen SnapFeed has finished unmounting (and
-        // demoting its promoted instance back to the pool) first.
+        // FLIP handoff return — capture the LIVE fullscreen playhead from the
+        // active <video> BEFORE emitting close (SnapVideoPlayer registers the
+        // active element in useClubhouseStore). Feed tile then consumes this
+        // return entry on re-attach and resumes autoplay if in its active slot.
+        try {
+          const activeVideo = useClubhouseStore.getState().activeVideoElement;
+          const fsState = useFullscreenFeedStore.getState();
+          const currentPost: any = fsState.posts?.[fsState.activeIndex];
+          const url = currentPost?.mediaItems?.[0]?.hlsUrl;
+          if (activeVideo && url && Number.isFinite(activeVideo.currentTime)) {
+            flipContinuity.setReturn(url, { t: Math.max(0, activeVideo.currentTime) });
+            fsEvent('🎯 FS_CAPTURE_RETURN', { url, t: activeVideo.currentTime });
+          }
+        } catch {}
         setTimeout(() => flipContinuity.emitClose(), 0);
 
         // Restore #root scroll position on the next frame so the feed's scroll

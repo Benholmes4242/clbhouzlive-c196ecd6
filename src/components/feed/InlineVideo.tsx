@@ -139,13 +139,12 @@ export const InlineVideo: React.FC<Props> = ({
           return;
         }
         logTileLife(tag, feedIndex, 'ATTACH_DONE', { readyState: video.readyState });
-        // FLIP handoff continuity: seek to the playhead captured by
-        // openWithOrigin (fullscreen open) OR by emitClose (feed-tile return)
-        // BEFORE any play() call. Falls back to the tiny nudge that forces a
-        // first frame paint.
-        const start = flipContinuity.consumeStart(hlsUrl);
+        // FLIP handoff continuity: tile consumes ONLY the RETURN entry (set by
+        // FullscreenFeedOverlay on close, reading the live fullscreen playhead).
+        // The START entry is owned by SnapVideoPlayer on fullscreen open — if
+        // we consumed it here the one-shot would starve the fullscreen player.
         const back = flipContinuity.consumeReturn(hlsUrl);
-        const seekTo = start?.t ?? back?.t ?? null;
+        const seekTo = back?.t ?? null;
         try {
           if (seekTo != null && seekTo > 0.05) {
             video.currentTime = seekTo;
@@ -160,7 +159,8 @@ export const InlineVideo: React.FC<Props> = ({
           active: isActiveRef.current,
           paused: video.paused,
         });
-        const shouldPlay = isActiveRef.current && video.paused && (start?.wasPlaying !== false);
+        // Resume autoplay in the active slot after a return seek (muted loop).
+        const shouldPlay = isActiveRef.current && video.paused;
         if (shouldPlay) {
           video.play().catch(() => {});
         }
@@ -285,10 +285,10 @@ export const InlineVideo: React.FC<Props> = ({
     if (!hlsUrl) return;
     return flipContinuity.onClose(() => {
       if (!flipContinuity.wasHandedOff(hlsUrl)) return;
-      const video = videoRef.current;
-      if (!video) return;
-      const last = flipContinuity.getLast(hlsUrl) ?? (Number.isFinite(video.currentTime) ? video.currentTime : 0);
-      flipContinuity.setReturn(hlsUrl, { t: Math.max(0, last) });
+      // The authoritative return-time is set by FullscreenFeedOverlay from the
+      // LIVE fullscreen <video>.currentTime before this event fires. We do NOT
+      // read from the tile's detached <video> here — it's been stopped since
+      // handOff and would produce the open-time frame.
       flipContinuity.clearHandOff(hlsUrl);
       // Defer to next tick so the fullscreen surface has finished demoting.
       setTimeout(() => {

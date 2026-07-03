@@ -6,6 +6,7 @@ import { useHlsPool } from '@/media/hooks/useHlsPool';
 import { usePausedFirstFrame } from '@/media/hooks/usePausedFirstFrame';
 import { useGaplessLoop } from '@/utils/video/GaplessLoop';
 import { fsTimeStart, fsTimeEnd, fsEvent, logTileLife } from '@/media/mobileVideoDebug';
+import { flipContinuity } from '@/media/flipContinuity';
 
 interface SnapVideoPlayerProps {
   hlsUrl: string;
@@ -95,6 +96,16 @@ export const SnapVideoPlayer = memo(function SnapVideoPlayer({
       video.playsInline = true;
       pool.attach(hlsUrl, video, mp4Url, isFullscreen ? 'fullscreen' : 'feed').then(() => {
         if (cancelled) return;
+        // FLIP continuity — fullscreen only. Consume the start entry stashed by
+        // openWithOrigin BEFORE the 0.001 nudge (which would clobber the seek).
+        const s = isFullscreen ? flipContinuity.consumeStart(hlsUrl) : null;
+        if (s && s.t > 0.05) {
+          try { video.currentTime = s.t; } catch {}
+          setAttachToken((t) => t + 1);
+          fsEvent('🎯 FS_CONSUME_START', { url: hlsUrl, t: s.t, wasPlaying: s.wasPlaying });
+          if (s.wasPlaying !== false) { try { video.play().catch(() => {}); } catch {} }
+          return;
+        }
         setAttachToken((t) => t + 1);
         try { if (video.currentTime < 0.001) video.currentTime = 0.001; } catch {}
       });
