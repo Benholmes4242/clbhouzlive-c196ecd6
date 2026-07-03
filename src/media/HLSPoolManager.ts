@@ -310,6 +310,7 @@ class HLSPoolManagerClass {
       
       // Mark as promoted
       entry.isPromoted = true;
+      entry.role = 'promoted';
       entry.preloadedByVideo = null;
       this.promotionTimestamps.set(url, Date.now());
 
