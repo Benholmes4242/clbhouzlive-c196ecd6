@@ -798,7 +798,7 @@ function ProfileHubSheet({
                         />
                         <GroupedRow
                           Icon={UserCog}
-                          label={isBusinessActor ? 'Edit profile' : 'Manage profile'}
+                          label={isBusinessActor ? 'Edit profile' : 'Manage profile and settings'}
                           onClick={() => handleNav(editTarget)}
                           isLast
                         />
