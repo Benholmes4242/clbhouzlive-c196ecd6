@@ -14,7 +14,7 @@ import { DecoderLimitManager } from '@/utils/video/DecoderLimitManager';
 import { extractCloudflareUid } from '@/utils/videoIdUtils';
 import { logTileLife, attachVideoEventLoggers, isVideoDebugOn } from '@/media/mobileVideoDebug';
 import { HLSPoolManager } from '@/media/HLSPoolManager';
-import * as feedTelemetry from '@/lib/feedTelemetry';
+
 import type { MediaItem } from '@/components/media-system/types/media';
 
 interface Props {
