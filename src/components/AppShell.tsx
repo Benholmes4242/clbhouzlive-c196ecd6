@@ -1,33 +1,22 @@
-import React, { PropsWithChildren, useEffect } from "react";
-import { initMobileVideoDebug } from "@/media/mobileVideoDebug";
-import VideoDebugPanel from "@/components/VideoDebugPanel";
+import React, { PropsWithChildren } from "react";
 
 /**
  * Wrap the entire app in <AppShell> so content respects iOS safe areas,
  * fills the screen, and avoids white bars in a webview.
- * Also handles early performance optimizations.
  *
- * Safe Area Handling:
- * - Uses CSS class .app-shell which applies padding for notch/status bar
- * - Uses 100dvh (dynamic viewport height) for proper mobile sizing
- * - Works with Capacitor/PWA/browser environments
- *
- * Video debug panel: tap-triggered via <VideoDebugPanel /> (tiny 🐞 button).
+ * [VIDEO-TEARDOWN] initMobileVideoDebug + VideoDebugPanel removed — engine severed.
  */
 export default function AppShell({ children }: PropsWithChildren) {
-  // [VIDEO-TEARDOWN] hls.js boot warmer removed — engine severed.
-  useEffect(() => {
-    initMobileVideoDebug();
-  }, []);
-
   return (
     <>
-      <div className="app-shell">
-        {children}
-      </div>
+      <div className="app-shell">{children}</div>
       {/* Global A11y live region for screen reader announcements */}
-      <div id="a11y-live" className="sr-live" aria-live="polite" aria-atomic="true" />
-      {/* VideoDebugPanel hidden — re-enable here when debugging needed */}
+      <div
+        id="a11y-live"
+        className="sr-live"
+        aria-live="polite"
+        aria-atomic="true"
+      />
     </>
   );
 }

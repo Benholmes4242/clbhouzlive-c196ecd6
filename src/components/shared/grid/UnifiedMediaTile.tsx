@@ -11,11 +11,10 @@ import { cn } from '@/lib/utils';
 import { formatRatingValue } from '@/utils/formatters';
 import { UnifiedMediaItem, UnifiedGridConfig, GridSurface } from './types';
 import { OverlayCorners } from '@/components/shared/overlay';
-import { UnifiedVideoPlayer, UnifiedVideoPlayerRef } from '@/media/components/UnifiedVideoPlayer';
-import type { MediaSurface } from '@/media/runtime/MediaRuntime';
-import { Images, Trophy, Loader2 } from 'lucide-react';
+// [VIDEOSTUB] Player + runtime + scrubber imports removed — poster-only tile.
+import { Images, Trophy } from 'lucide-react';
 import { motion } from 'framer-motion';
-import { VideoScrubber } from '@/components/video/VideoScrubber';
+
 import { logGridItemRender, logGridItemPlayAttempt } from '@/utils/gridAuditTimeline';
 import TextOverlayRenderer from '@/components/studio/TextOverlayRenderer';
 import { getFilterClass } from '@/utils/studioFilters';
@@ -23,22 +22,10 @@ import { getCropWrapperClass, getPixelLayerStyle } from '@/utils/studioEdit';
 import { tilePriority } from '@/utils/fetchPriority';
 
 import { PostOwnerMenu } from '@/components/posts/PostOwnerMenu';
-import { extractCloudflareUid } from '@/utils/videoIdUtils';
+import { extractCloudflareUid } from '@/utils/streamId';
 
-/**
- * Map grid surface to MediaRuntime surface
- */
-function mapGridSurfaceToMediaSurface(gridSurface: GridSurface | undefined): MediaSurface {
-  switch (gridSurface) {
-    case 'profile-activity':
-    case 'profile':
-      return 'profile';
-    case 'watch':
-      return 'watch';
-    default:
-      return 'grid';
-  }
-}
+// [VIDEOSTUB] MediaSurface mapping removed — runtime severed.
+
 
 // Debug logging for video lifecycle analysis - DISABLED in production
 const DEBUG_UNIFIED_TILE = false;
@@ -86,10 +73,9 @@ const UnifiedMediaTile: React.FC<UnifiedMediaTileProps> = ({
   onEdit,
   onDelete,
 }) => {
-  const playerRef = useRef<UnifiedVideoPlayerRef>(null);
-  const tileRef = useRef<HTMLButtonElement>(null); // Sentinel for IntersectionObserver
+  const tileRef = useRef<HTMLButtonElement>(null);
   const hasReportedReadyRef = useRef(false);
-  const [videoEl, setVideoEl] = useState<HTMLVideoElement | null>(null);
+
   const [isVisible, setIsVisible] = useState(false);
   const [resolvedDurationSeconds, setResolvedDurationSeconds] = useState<number | null | undefined>(
     item.durationSeconds
@@ -170,33 +156,12 @@ const UnifiedMediaTile: React.FC<UnifiedMediaTileProps> = ({
   }, [isVideo, isAutoplayCandidate, config.autoplayEnabled]);
 
   useEffect(() => {
-    if (isVisible && isVideo) {
-      logGridItemPlayAttempt(item.postId, 'visibility_autoplay');
-    }
-  }, [isVisible, isVideo, item.postId]);
-
-  const handleCanPlay = useCallback(() => {
-    // Capture video element reference for scrubber
-    const el = playerRef.current?.getVideoElement();
-    if (el) setVideoEl(el);
-
-    const dbDuration = item.durationSeconds;
-    const hasValidDbDuration = typeof dbDuration === 'number' && Number.isFinite(dbDuration) && dbDuration > 0;
-    
-    if (!hasValidDbDuration && playerRef.current) {
-      const d = playerRef.current.getDuration();
-      if (Number.isFinite(d) && d > 0 && d !== Infinity) {
-        setResolvedDurationSeconds(d);
-      }
-    }
-    
-    // Report video ready for prefetch queue
-    if (!hasReportedReadyRef.current && isVideo) {
+    if (isVideo && !hasReportedReadyRef.current) {
       hasReportedReadyRef.current = true;
-      logTile('VIDEO_READY', { postId: item.postId });
       onReady?.(runtimeMediaId);
     }
-  }, [item.durationSeconds, item.postId, isVideo, onReady, runtimeMediaId]);
+  }, [isVideo, onReady, runtimeMediaId]);
+
 
   const thumbnailSrc = item.thumbnailUrl || item.url;
   const aspectClass = isLandscape ? 'aspect-[16/9]' : 'aspect-[3/4]';

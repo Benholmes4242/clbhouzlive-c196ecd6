@@ -14,7 +14,7 @@ import { Pin } from './Pin';
 import { useActiveActor } from '@/context/ActiveActorContext';
 import { isPostLikedByMe } from '@/lib/likedPostIds';
 import DecodedImage from '../shared/DecodedImage';
-import { extractCloudflareUid } from '@/utils/videoIdUtils';
+import { extractCloudflareUid } from '@/utils/streamId';
 
 
 // Note: useNavigate import previously here was unused.

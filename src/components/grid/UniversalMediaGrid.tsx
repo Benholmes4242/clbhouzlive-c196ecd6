@@ -32,7 +32,13 @@ import {
   useViewportTracking,
   useGridMediaRuntime,
 } from './hooks';
-import { useVideoReadyQueue } from '@/hooks/useVideoReadyQueue';
+// [VIDEOSTUB] useVideoReadyQueue deleted — inert local stub.
+const useVideoReadyQueue = (_opts: unknown) => ({
+  isReady: (_id: string) => true,
+  markReady: (_id: string) => {},
+  initiatePrefetch: (_ids: string[], _urls: Map<string, string>) => {},
+});
+
 import { uidFromNode } from '@/utils/cloudflareStreamTransform';
 import { generateStreamHlsUrl } from '@/config/cloudflareStream';
 import MediaTile from './MediaTile';

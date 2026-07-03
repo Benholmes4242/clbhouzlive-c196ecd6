@@ -29,11 +29,10 @@ import BootHold from "@/components/BootHold";
 import { GlobalAudioProvider } from './contexts/GlobalAudioContext';
 // REMOVED: FullscreenPlayerProvider — Phase 5 fullscreen system deleted
 import { RehydrationProvider } from './contexts/RehydrationContext';
-// RETIRED: VideoManagerProvider and VideoPlaybackManagerProvider
-// These competed with MediaRuntime for playback control.
-// All playback is now centralized in MediaSystemProvider.
-import { MediaSystemProvider } from './media';
+// RETIRED: VideoManagerProvider, VideoPlaybackManagerProvider, MediaSystemProvider.
+// Video engine severed — playback is poster-only across every surface.
 // [VIDEO-TEARDOWN] hlsLoader boot import removed — engine severed.
+
 import { useImageUploadSafeguard } from '@/hooks/useImageUploadSafeguard';
 import { useGlobalMemoryMonitor } from '@/hooks/useMemoryMonitor';
 import { usePresenceTracker } from '@/hooks/usePresenceTracker';
@@ -889,8 +888,7 @@ const AppInner: React.FC = () => {
                           
                           <ScrollToTop />
                           <ScrollRestoration />
-                          <MediaSystemProvider>
-                            <GlobalAudioProvider>
+                          <GlobalAudioProvider>
                               {/* REMOVED: FullscreenPlayerProvider — Phase 5 fullscreen system deleted */}
                                 <TopTenProvider>
                                   <VideoPlaybackProvider>
@@ -933,7 +931,7 @@ const AppInner: React.FC = () => {
                                 </TopTenProvider>
                               {/* END REMOVED FullscreenPlayerProvider */}
                             </GlobalAudioProvider>
-                          </MediaSystemProvider>
+
                         </ActiveActorProvider>
                     
                   </UIProvider>

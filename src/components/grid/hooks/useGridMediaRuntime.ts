@@ -5,7 +5,9 @@
  * compile without changes but nothing plays.
  */
 
-import type { RegisterMediaFn } from '@/media';
+// [VIDEOSTUB] RegisterMediaFn defined locally; @/media barrel deleted in Stage E.
+type RegisterMediaFn = (...args: any[]) => void;
+
 import type { GridSurface, UniversalMediaItem } from '../types';
 
 interface UseGridMediaRuntimeOptions {

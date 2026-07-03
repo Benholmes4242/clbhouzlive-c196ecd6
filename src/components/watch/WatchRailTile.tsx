@@ -4,7 +4,7 @@ import { Heart } from 'lucide-react';
 import type { FeedPost } from '@/components/media-system/types/media';
 import { Pin } from './proshop/Pin';
 import DecodedImage from './shared/DecodedImage';
-import { getThumbnailUrl } from '@/media/utils/thumbnail';
+import { getThumbnailUrl } from '@/utils/thumbnail';
 import { buildLqipUrl } from '@/utils/mediaThumbs';
 import { shouldUseLqip } from '@/utils/lqipQueue';
 import Pressable from '@/components/ui/Pressable';

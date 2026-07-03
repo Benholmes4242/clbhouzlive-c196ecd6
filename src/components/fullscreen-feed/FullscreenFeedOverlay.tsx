@@ -25,8 +25,11 @@ import { useActiveActor } from '@/context/ActiveActorContext';
 import { useManageableBusinessIds } from '@/hooks/useManageableBusinessIds';
 import { canManagePost } from '@/lib/canManagePost';
 import { getActorRouteByType } from '@/types/actor';
-import FullscreenDebugPanel from '@/components/FullscreenDebugPanel';
-import { fsTimeStart, fsTimeEnd, fsEvent } from '@/media/mobileVideoDebug';
+// [VIDEOSTUB] FullscreenDebugPanel + mobileVideoDebug imports removed — engine severed.
+const fsTimeStart = (_label: string) => {};
+const fsTimeEnd = (_label: string, _note?: string) => {};
+const fsEvent = (_label: string, _data?: unknown) => {};
+
 
 export function FullscreenFeedOverlay() {
   const navigate = useNavigate();

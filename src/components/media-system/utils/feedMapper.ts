@@ -1,4 +1,4 @@
-import { CLOUDFLARE_STREAM_SUBDOMAIN } from '@/media/constants';
+import { CLOUDFLARE_STREAM_SUBDOMAIN } from '@/config/streamConstants';
 import type { FeedPost, FeedRpcRow, MediaItem, ReviewData, CreatorRelation, FeedPostTag } from '../types/media';
 import { isPortraitAdmissible } from './mediaOrientation';
 
