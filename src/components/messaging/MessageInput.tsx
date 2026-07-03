@@ -203,6 +203,7 @@ export function MessageInput({
             {mediaPreview.type === 'image' ? (
               <img src={mediaPreview.url} alt="Preview" className="max-h-24 rounded-xl object-cover" />
             ) : (
+              // Upload/preview <video> — not streaming playback; out of teardown scope.
               <video src={mediaPreview.url} className="max-h-24 rounded-xl" controls={false} />
             )}
             <button
