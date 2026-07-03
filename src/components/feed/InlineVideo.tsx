@@ -285,10 +285,10 @@ export const InlineVideo: React.FC<Props> = ({
     if (!hlsUrl) return;
     return flipContinuity.onClose(() => {
       if (!flipContinuity.wasHandedOff(hlsUrl)) return;
-      const video = videoRef.current;
-      if (!video) return;
-      const last = flipContinuity.getLast(hlsUrl) ?? (Number.isFinite(video.currentTime) ? video.currentTime : 0);
-      flipContinuity.setReturn(hlsUrl, { t: Math.max(0, last) });
+      // The authoritative return-time is set by FullscreenFeedOverlay from the
+      // LIVE fullscreen <video>.currentTime before this event fires. We do NOT
+      // read from the tile's detached <video> here — it's been stopped since
+      // handOff and would produce the open-time frame.
       flipContinuity.clearHandOff(hlsUrl);
       // Defer to next tick so the fullscreen surface has finished demoting.
       setTimeout(() => {
