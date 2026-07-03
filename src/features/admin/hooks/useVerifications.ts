@@ -21,6 +21,8 @@ export interface VerificationRow {
   proofMethod?: string | null;
   proofValue?: string | null;
   proofMetadata?: Record<string, unknown> | null;
+  contactEmail?: string | null;
+  contactRole?: string | null;
   evidenceUrl?: string | null;
   inviteReason?: string | null;
   displayName?: string | null;
