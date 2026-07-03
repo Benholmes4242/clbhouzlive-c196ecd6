@@ -26,7 +26,7 @@ import { useManageableBusinessIds } from '@/hooks/useManageableBusinessIds';
 import { canManagePost } from '@/lib/canManagePost';
 import { getActorRouteByType } from '@/types/actor';
 import FullscreenDebugPanel from '@/components/FullscreenDebugPanel';
-import { fsTimeStart, fsTimeEnd, fsEvent } from '@/media/mobileVideoDebug';
+import { fsTimeStart, fsTimeEnd, fsEvent, logHandoff } from '@/media/mobileVideoDebug';
 
 export function FullscreenFeedOverlay() {
   const navigate = useNavigate();
