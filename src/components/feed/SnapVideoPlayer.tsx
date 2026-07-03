@@ -6,6 +6,7 @@ import { useHlsPool } from '@/media/hooks/useHlsPool';
 import { usePausedFirstFrame } from '@/media/hooks/usePausedFirstFrame';
 import { useGaplessLoop } from '@/utils/video/GaplessLoop';
 import { fsTimeStart, fsTimeEnd, fsEvent, logTileLife } from '@/media/mobileVideoDebug';
+import { flipContinuity } from '@/media/flipContinuity';
 
 interface SnapVideoPlayerProps {
   hlsUrl: string;
