@@ -148,7 +148,7 @@ export function SnapFeed({
   // cross-target each other's <video> elements.
   const { session } = useSupabaseSession();
   const trackerUserId = session?.user?.id;
-  void getTrackerContainer; void trackerUserId;
+  void trackerUserId;
 
 
   // ── IntersectionObserver setup ──
