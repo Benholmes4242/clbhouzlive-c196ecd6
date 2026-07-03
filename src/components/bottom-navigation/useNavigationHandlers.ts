@@ -3,7 +3,7 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import { navigationTabs } from './navigationTabs';
 import { analyticsEvents } from '@/utils/analyticsEvents';
 
-import { prefetchProfileVideos, resolveUsernameToId } from '@/utils/username';
+import { resolveUsernameToId } from '@/utils/username';
 import { useActiveActor } from '@/context/ActiveActorContext';
 import { supabase } from '@/integrations/supabase/client';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
@@ -81,24 +81,14 @@ export const useNavigationHandlers = () => {
   const handlePrefetch = useCallback((path: string) => {
     // TODO: Clubhouse prefetch removed — will be re-added with new media player
     
-    // Prefetch for Profile page
-    if (path.includes('/profile') || path.includes('/u/')) {
-      // Extract userId or username from path
-      const userIdMatch = path.match(/\/profile\/([^\/]+)/);
+    // Prefetch for Profile page (username -> id only; video prefetch removed with engine)
+    if (path.includes('/u/')) {
       const usernameMatch = path.match(/\/u\/([^\/]+)/);
-      
       if (usernameMatch?.[1]) {
-        resolveUsernameToId(usernameMatch[1]).then(userId => {
-          if (userId) {
-            prefetchProfileVideos(userId);
-          }
-        });
-      } else if (userIdMatch?.[1]) {
-        prefetchProfileVideos(userIdMatch[1]);
-      } else {
-        prefetchProfileVideos();
+        resolveUsernameToId(usernameMatch[1]);
       }
     }
+
   }, []);
 
   return {
