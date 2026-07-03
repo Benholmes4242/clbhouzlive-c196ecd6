@@ -42,7 +42,7 @@ const PostDeepLinkPage: React.FC = () => {
   const navState = location.state as { openComments?: boolean; initialCommentId?: string } | null;
   const [searchParams] = useSearchParams();
   const { user, loading: authLoading } = useSupabaseSession();
-  const videoRef = useRef<HTMLVideoElement>(null);
+  // videoRef removed — poster-only chassis per BRIEF_VIDEO_TEARDOWN.md.
 
   const [post, setPost] = useState<PostPreview | null>(null);
   const [feedPost, setFeedPost] = useState<ReturnType<typeof mapActivityPostToFeedPost> | null>(null);
@@ -259,14 +259,11 @@ const PostDeepLinkPage: React.FC = () => {
       {/* Full-screen media */}
       <div className="absolute inset-0" style={{ background: gradient }}>
         {mediaUrl && isVideo && (
-          <video
-            ref={videoRef}
+          <img
             src={mediaUrl}
-            autoPlay
-            loop
-            playsInline
-            muted
+            alt=""
             className="absolute inset-0 w-full h-full object-cover"
+            onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }}
           />
         )}
         {mediaUrl && !isVideo && (

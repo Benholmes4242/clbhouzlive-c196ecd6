@@ -1,14 +1,12 @@
 /**
- * HeroMedia - Full-bleed hero section with image or video support
- * 
- * User-only playback - videos do NOT autoplay.
- * Taps route through MediaRuntime.
+ * HeroMedia - Full-bleed hero section (poster-only chassis)
+ *
+ * Video playback severed per BRIEF_VIDEO_TEARDOWN.md. Videos render their
+ * poster frame as an <img>; images render as before. No <video>, no runtime.
  */
 
-import React, { useRef, useState, useCallback } from 'react';
-import { Play } from 'lucide-react';
+import React, { useRef, useState } from 'react';
 import { cn } from '@/lib/utils';
-import { MediaRuntime, runtimeUserTap } from '@/media/runtime';
 import { isPosterFailed } from '@/utils/posterPrefetch';
 
 interface HeroMediaProps {
@@ -21,103 +19,36 @@ interface HeroMediaProps {
 }
 
 export const HeroMedia: React.FC<HeroMediaProps> = ({
-  mediaId,
   mediaType,
   url,
   posterUrl,
   height = '45vh',
   className,
 }) => {
-  const videoRef = useRef<HTMLVideoElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const [isLoaded, setIsLoaded] = useState(false);
-  const [isPlaying, setIsPlaying] = useState(false);
 
-  // Register with MediaRuntime on mount (for user-only playback)
-  React.useEffect(() => {
-    const video = videoRef.current;
-    if (mediaType !== 'video' || !video) return;
-
-    MediaRuntime.registerMedia({
-      id: mediaId,
-      element: video,
-      surface: 'grid',
-      sortIndex: 0,
-      observeTarget: containerRef.current ?? video,
-    });
-
-    // Track play/pause state
-    const handlePlay = () => setIsPlaying(true);
-    const handlePause = () => setIsPlaying(false);
-    video.addEventListener('play', handlePlay);
-    video.addEventListener('pause', handlePause);
-
-    return () => {
-      MediaRuntime.unregisterMedia(mediaId);
-      video.removeEventListener('play', handlePlay);
-      video.removeEventListener('pause', handlePause);
-    };
-  }, [mediaId, mediaType]);
-
-  // Handle tap to play/pause via runtime
-  const handleVideoTap = useCallback(() => {
-    if (isPlaying) {
-      MediaRuntime.requestPause({ id: mediaId, reason: 'user' });
-    } else {
-      runtimeUserTap(mediaId);
-    }
-  }, [mediaId, isPlaying]);
+  const posterSafe = posterUrl && !isPosterFailed(posterUrl) ? posterUrl : undefined;
+  const displaySrc = mediaType === 'video' ? posterSafe : url;
 
   return (
     <div
       ref={containerRef}
-      className={cn(
-        'relative w-full overflow-hidden',
-        className
-      )}
-      style={{ 
+      className={cn('relative w-full overflow-hidden', className)}
+      style={{
         height,
-        // POSTER-FIRST: Show poster as CSS background immediately (skip failed posters)
         backgroundColor: 'hsl(var(--clubhouse-bg-page, 222 47% 11%))',
-        ...(posterUrl && mediaType === 'video' && !isPosterFailed(posterUrl) ? {
-          backgroundImage: `url(${posterUrl})`,
+        ...(mediaType === 'video' && posterSafe ? {
+          backgroundImage: `url(${posterSafe})`,
           backgroundSize: 'cover',
           backgroundPosition: 'center',
           backgroundRepeat: 'no-repeat',
         } : {}),
       }}
     >
-      {mediaType === 'video' ? (
-        <>
-          <video
-            ref={videoRef}
-            src={url}
-            loop
-            muted
-            playsInline
-            className={cn(
-              'absolute inset-0 w-full h-full object-cover transition-opacity duration-500 cursor-pointer',
-              isLoaded ? 'opacity-100' : 'opacity-0'
-            )}
-            onLoadedData={() => setIsLoaded(true)}
-            onClick={handleVideoTap}
-          />
-          {/* Play button overlay when paused */}
-          {!isPlaying && isLoaded && (
-            <button
-              onClick={handleVideoTap}
-              className="absolute inset-0 flex items-center justify-center bg-black/20 hover:bg-black/30 transition-colors"
-              aria-label="Play video"
-            >
-              <div className="w-16 h-16 rounded-full bg-black/50 backdrop-blur-sm flex items-center justify-center">
-                <Play className="w-8 h-8 text-white ml-1" fill="white" />
-              </div>
-            </button>
-          )}
-        </>
-      ) : (
+      {displaySrc && (
         <img
-          src={url}
+          src={displaySrc}
           alt=""
           className={cn(
             'absolute inset-0 w-full h-full object-cover transition-opacity duration-500',
@@ -128,15 +59,11 @@ export const HeroMedia: React.FC<HeroMediaProps> = ({
         />
       )}
 
-      {/* Placeholder while loading - shows poster via CSS background on container */}
-      {!isLoaded && !posterUrl && (
+      {!isLoaded && !posterSafe && mediaType !== 'video' && (
         <div className="absolute inset-0 bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 animate-pulse" />
       )}
 
-      {/* Top scrim gradient for text readability */}
       <div className="absolute inset-0 dgp-hero-scrim-top pointer-events-none" />
-
-      {/* Bottom scrim gradient for seamless transition to content */}
       <div className="absolute inset-0 dgp-hero-scrim-bottom pointer-events-none" />
     </div>
   );

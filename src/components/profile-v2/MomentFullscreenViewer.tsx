@@ -4,18 +4,16 @@
  * UNIFIED WITH CLUBHOUSE: Uses direct visibility-based autoplay pattern
  */
 
-import React, { useRef, useState, useCallback } from 'react';
+import React, { useState, useCallback } from 'react';
 import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog';
 import { VisuallyHidden } from '@radix-ui/react-visually-hidden';
 import { MomentPost } from './types';
-import { X, ChevronLeft, ChevronRight, Heart, MessageCircle, MapPin, Loader2 } from 'lucide-react';
+import { X, ChevronLeft, ChevronRight, Heart, MessageCircle, MapPin } from 'lucide-react';
 import { format } from 'date-fns';
 import { useSwipeable } from 'react-swipeable';
-import HLSPlayer, { HLSPlayerRef } from '@/media/HLSPlayer';
 import TextOverlayRenderer from '@/components/studio/TextOverlayRenderer';
 import { uidFromNode } from '@/utils/cloudflareStreamTransform';
-import { generateStreamHlsUrl, generateStreamThumbnailUrl } from '@/config/cloudflareStream';
-import { cn } from '@/lib/utils';
+import { generateStreamThumbnailUrl } from '@/config/cloudflareStream';
 
 interface MomentFullscreenViewerProps {
   moments: MomentPost[];
@@ -32,20 +30,16 @@ export const MomentFullscreenViewer: React.FC<MomentFullscreenViewerProps> = ({
   onOpenChange,
   onIndexChange,
 }) => {
-  const playerRef = useRef<HLSPlayerRef>(null);
-  const [isVideoReady, setIsVideoReady] = useState(false);
   const currentMoment = moments[currentIndex];
 
   const goToPrev = useCallback(() => {
     if (currentIndex > 0) {
-      setIsVideoReady(false);
       onIndexChange(currentIndex - 1);
     }
   }, [currentIndex, onIndexChange]);
 
   const goToNext = useCallback(() => {
     if (currentIndex < moments.length - 1) {
-      setIsVideoReady(false);
       onIndexChange(currentIndex + 1);
     }
   }, [currentIndex, moments.length, onIndexChange]);
@@ -56,17 +50,14 @@ export const MomentFullscreenViewer: React.FC<MomentFullscreenViewerProps> = ({
     trackMouse: false,
   });
 
-  const handleCanPlayThrough = useCallback(() => {
-    setIsVideoReady(true);
-  }, []);
-
   if (!currentMoment) return null;
 
-  // Extract stream info for HLS playback
+  // Poster-only chassis: derive a still frame for video moments.
   const isVideo = currentMoment.mediaType === 'video';
   const streamId = isVideo ? uidFromNode({ src: currentMoment.mediaUrl }) : null;
-  const hlsUrl = streamId ? generateStreamHlsUrl(streamId) : currentMoment.mediaUrl;
-  const posterUrl = streamId ? generateStreamThumbnailUrl(streamId, { height: 1080 }) : undefined;
+  const posterUrl = streamId
+    ? generateStreamThumbnailUrl(streamId, { height: 1080 })
+    : (isVideo ? undefined : currentMoment.mediaUrl);
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -119,47 +110,18 @@ export const MomentFullscreenViewer: React.FC<MomentFullscreenViewerProps> = ({
             </button>
           )}
 
-          {/* Media */}
+          {/* Media — poster-only chassis (playback severed) */}
           <div className="absolute inset-0 flex items-center justify-center">
             {isVideo ? (
-              <>
-                {/* HLSPlayer with UNIFIED direct autoplay */}
-                <div className={cn(
-                  "w-full h-full transition-opacity duration-200",
-                  isVideoReady ? "opacity-100" : "opacity-0"
-                )}>
-                  <HLSPlayer
-                    ref={playerRef}
-                    key={`fullscreen-${currentMoment.id}`}
-                    src={hlsUrl}
-                    mediaId={streamId || currentMoment.id}
-                    autoplay={open}
-                    muted={false}
-                    loop
-                    className="w-full h-full object-contain"
-                    objectFit="contain"
-                    managedByMediaRuntime={false}
-                    externallyManaged={false}
-                    preload="auto"
-                    showMuteButton
-                    onCanPlayThrough={handleCanPlayThrough}
-                  />
-                </div>
-                
-                {/* Loading spinner */}
-                {!isVideoReady && (
-                  <div className="absolute inset-0 flex items-center justify-center bg-black">
-                    {posterUrl && (
-                      <img 
-                        src={posterUrl} 
-                        alt=""
-                        className="absolute inset-0 w-full h-full object-contain opacity-50"
-                      />
-                    )}
-                    <Loader2 className="w-8 h-8 animate-spin text-white/70" />
-                  </div>
-                )}
-              </>
+              posterUrl ? (
+                <img
+                  src={posterUrl}
+                  alt=""
+                  className="max-w-full max-h-full object-contain"
+                />
+              ) : (
+                <div className="absolute inset-0 bg-black" />
+              )
             ) : (
               <img
                 src={currentMoment.mediaUrl}
@@ -244,7 +206,6 @@ export const MomentFullscreenViewer: React.FC<MomentFullscreenViewerProps> = ({
                 <button
                   key={index}
                   onClick={() => {
-                    setIsVideoReady(false);
                     onIndexChange(index);
                   }}
                   className="w-1.5 h-1.5 rounded-full transition-all"

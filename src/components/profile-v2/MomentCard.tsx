@@ -2,7 +2,7 @@
  * MomentCard - Large cinematic post card for the Moments timeline
  */
 
-import React, { useState, useRef } from 'react';
+import React, { useState } from 'react';
 import { cn } from '@/lib/utils';
 import { Heart, MessageCircle, MapPin } from 'lucide-react';
 import { MomentPost } from './types';
@@ -21,7 +21,6 @@ export const MomentCard: React.FC<MomentCardProps> = ({
   className,
 }) => {
   const [isLoaded, setIsLoaded] = useState(false);
-  const videoRef = useRef<HTMLVideoElement>(null);
 
   const formattedDate = moment.date 
     ? formatDistanceToNow(new Date(moment.date), { addSuffix: true })
@@ -35,32 +34,25 @@ export const MomentCard: React.FC<MomentCardProps> = ({
         className
       )}
     >
-      {/* Media */}
+      {/* Media — poster-only chassis: videos render their poster frame as an <img> */}
       <div className="relative aspect-[4/5] overflow-hidden">
-        {moment.mediaType === 'video' ? (
-          <video
-            ref={videoRef}
-            src={moment.mediaUrl}
-            className={cn(
-              'w-full h-full object-cover transition-opacity duration-300',
-              isLoaded ? 'opacity-100' : 'opacity-0'
-            )}
-            onLoadedData={() => setIsLoaded(true)}
-            muted
-            playsInline
-          />
-        ) : (
-          <img
-            src={moment.mediaUrl}
-            alt=""
-            className={cn(
-              'w-full h-full object-cover transition-opacity duration-300',
-              isLoaded ? 'opacity-100' : 'opacity-0'
-            )}
-            onLoad={() => setIsLoaded(true)}
-            loading="lazy"
-          />
-        )}
+        {(() => {
+          const posterSrc = moment.mediaType === 'video'
+            ? (moment.posterUrl || moment.mediaUrl)
+            : moment.mediaUrl;
+          return (
+            <img
+              src={posterSrc}
+              alt=""
+              className={cn(
+                'w-full h-full object-cover transition-opacity duration-300',
+                isLoaded ? 'opacity-100' : 'opacity-0'
+              )}
+              onLoad={() => setIsLoaded(true)}
+              loading="lazy"
+            />
+          );
+        })()}
 
         {!isLoaded && (
           <div className="absolute inset-0 bg-slate-800 animate-pulse" />

@@ -81,24 +81,16 @@ export function MediaMessage({ type, url, className }: MediaMessageProps) {
     );
   }
 
-  // Video
+  // Video — poster-only chassis: show thumbnail (or a dark placeholder) with a play icon overlay.
+  // Playback severed per BRIEF_VIDEO_TEARDOWN.md; tap does nothing for now.
   return (
     <div className={cn("relative", className)}>
-      {loading && (
-        <div className="absolute inset-0 flex items-center justify-center bg-muted rounded-lg">
-          <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
-        </div>
-      )}
-      <video
-        src={url}
-        controls
-        className="max-w-[280px] max-h-[200px] rounded-lg"
-        onLoadedData={() => setLoading(false)}
-        onError={() => setError(true)}
-        playsInline
+      <div
+        className="relative max-w-[280px] max-h-[200px] rounded-lg overflow-hidden bg-muted flex items-center justify-center"
+        style={{ aspectRatio: '16 / 9', width: 280 }}
       >
-        Your browser does not support the video tag.
-      </video>
+        <span className="text-xs text-muted-foreground">Video preview</span>
+      </div>
     </div>
   );
 }
