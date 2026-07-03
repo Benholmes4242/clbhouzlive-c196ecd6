@@ -515,7 +515,7 @@ export const CardFeed = forwardRef<CardFeedHandle, CardFeedProps>(function CardF
         // Snap to resting position and fire
         pullRef.current = PTR_THRESHOLD;
         setPull(PTR_THRESHOLD);
-        feedTelemetry.markPTR();
+        
         Promise.resolve(onRefresh()).catch(() => {});
       } else {
         pullRef.current = 0;
