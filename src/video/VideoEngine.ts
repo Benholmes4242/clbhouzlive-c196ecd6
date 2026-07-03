@@ -121,6 +121,7 @@ class VideoEngineImpl {
         posterUrl: null,
         startPosition: -1,
         firstFrame: false,
+        postId: null,
         listeners: new Set(),
         detachFns: [],
       });
@@ -168,10 +169,12 @@ class VideoEngineImpl {
    */
   load(
     laneId: LaneId,
-    opts: { hlsUrl: string; posterUrl?: string | null; startPosition?: number }
+    opts: { hlsUrl: string; posterUrl?: string | null; startPosition?: number; postId?: string | null }
   ): void {
     const lane = this.getLane(laneId);
-    const { hlsUrl, posterUrl = null, startPosition = -1 } = opts;
+    const { hlsUrl, posterUrl = null, startPosition = -1, postId = null } = opts;
+    lane.postId = postId;
+
 
     if (this.saveDataGated) {
       DBG(laneId, 'skip load: save-data gated');
