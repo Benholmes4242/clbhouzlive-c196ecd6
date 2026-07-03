@@ -3,7 +3,7 @@ import { AnimatePresence, motion } from 'framer-motion';
 
 import { useNavigate } from 'react-router-dom';
 import { useFullscreenFeedStore } from '@/store/fullscreenFeedStore';
-import { useClubhouseStore } from '@/store/clubhouseStore';
+
 import { SnapFeed } from '@/components/feed/SnapFeed';
 import { ClubhouseSkeletonShimmer } from '@/components/clubhouse/ClubhouseSkeletonShimmer';
 import { pauseAllAudio } from '@/utils/globalVideoMute';
@@ -26,7 +26,7 @@ import { useManageableBusinessIds } from '@/hooks/useManageableBusinessIds';
 import { canManagePost } from '@/lib/canManagePost';
 import { getActorRouteByType } from '@/types/actor';
 import FullscreenDebugPanel from '@/components/FullscreenDebugPanel';
-import { fsTimeStart, fsTimeEnd, fsEvent, logHandoff } from '@/media/mobileVideoDebug';
+import { fsTimeStart, fsTimeEnd, fsEvent } from '@/media/mobileVideoDebug';
 
 export function FullscreenFeedOverlay() {
   const navigate = useNavigate();
