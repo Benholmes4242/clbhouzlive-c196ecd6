@@ -1,6 +1,6 @@
 import React, { useState, useCallback, useMemo, useRef, useEffect } from 'react';
 import SmartMediaContainer from '@/components/ui/smart-media-container';
-import EnhancedVideoPlayer from '@/components/ui/enhanced-video-player';
+// [VIDEOSTUB] EnhancedVideoPlayer import removed — MediaDisplay is poster-only.
 import SoundToggle from '@/components/ui/sound-toggle';
 import { Play } from 'lucide-react';
 import { Loader2 } from 'lucide-react';
