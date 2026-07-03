@@ -102,7 +102,7 @@ export function BrandingSection({
                 className="hidden"
               />
               {effectiveCoverUrl ? (
-                <div className="relative aspect-[3.2/1] rounded-xl overflow-hidden group">
+                <div className="relative aspect-[3/2] rounded-xl overflow-hidden group">
                   <img
                     src={effectiveCoverUrl}
                     alt="Cover preview"
