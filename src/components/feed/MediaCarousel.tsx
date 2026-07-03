@@ -41,6 +41,7 @@ export const MediaCarousel: React.FC<Props> = ({
   mountVideo = false,
   onIndexChange,
   onOpen,
+  onDoubleTap,
 }) => {
   const trackRef = useRef<HTMLDivElement | null>(null);
   const [active, setActive] = useState(() =>
