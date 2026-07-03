@@ -28,6 +28,7 @@ import { useActiveActor } from '@/context/ActiveActorContext';
 
 import type { FeedPost } from '@/components/media-system/types/media';
 import { InlineVideo } from './InlineVideo';
+import * as feedTelemetry from '@/lib/feedTelemetry';
 import LqipUnderlay from '@/components/shared/LqipUnderlay';
 import { MediaCarousel } from './MediaCarousel';
 import { FeedFollowPill } from './FeedFollowPill';
