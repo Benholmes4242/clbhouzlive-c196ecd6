@@ -282,12 +282,6 @@ export const InlineVideo: React.FC<Props> = ({
   const handleTimeUpdate = useCallback(() => {
     const v = videoRef.current;
     if (!v) return;
-    // Write playhead for FLIP handoff continuity (last-writer-wins). On
-    // fullscreen close, the origin tile reads this to resume where the viewer
-    // left off, instead of restarting at 0.
-    if (hlsUrl && Number.isFinite(v.currentTime)) {
-      flipContinuity.writeLast(hlsUrl, v.currentTime);
-    }
     const d = duration || (Number.isFinite(v.duration) ? v.duration : 0);
     if (d <= 0) return;
     // Gapless manual loop for short clips: pre-empt the native loop gap.
