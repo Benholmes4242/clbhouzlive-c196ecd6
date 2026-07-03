@@ -262,6 +262,36 @@ export const InlineVideo: React.FC<Props> = ({
     [],
   );
 
+  // Duration + playhead tracking for gapless-loop (<15s) and progress bar (>20s).
+  const [duration, setDuration] = useState(0);
+  const [progress, setProgress] = useState(0); // 0..1
+  const handleLoadedMetadata = useCallback(() => {
+    const v = videoRef.current;
+    if (!v) return;
+    const d = Number.isFinite(v.duration) ? v.duration : 0;
+    if (d > 0) setDuration(d);
+  }, []);
+  const handleTimeUpdate = useCallback(() => {
+    const v = videoRef.current;
+    if (!v) return;
+    const d = duration || (Number.isFinite(v.duration) ? v.duration : 0);
+    if (d <= 0) return;
+    // Gapless manual loop for short clips: pre-empt the native loop gap.
+    if (d < 15 && d - v.currentTime < 0.1) {
+      try {
+        v.currentTime = 0;
+        const p = v.play();
+        if (p && typeof p.catch === 'function') p.catch(() => {});
+      } catch {}
+    }
+    if (d > 20) {
+      setProgress(Math.max(0, Math.min(1, v.currentTime / d)));
+    }
+  }, [duration]);
+  // Native loop only for >=15s clips; short clips use the manual seek above.
+  const useNativeLoop = duration === 0 || duration >= 15;
+  const showProgress = duration > 20 && hasFirstFrame;
+
   return (
     <div
       ref={containerRef}
@@ -271,8 +301,10 @@ export const InlineVideo: React.FC<Props> = ({
         ref={videoRef}
         muted
         playsInline
-        loop
+        loop={useNativeLoop}
         preload="auto"
+        onLoadedMetadata={handleLoadedMetadata}
+        onTimeUpdate={handleTimeUpdate}
         style={{
           position: 'absolute',
           inset: 0,
@@ -286,6 +318,32 @@ export const InlineVideo: React.FC<Props> = ({
           zIndex: 1,
         }}
       />
+      {showProgress && (
+        <div
+          aria-hidden
+          style={{
+            position: 'absolute',
+            left: 0,
+            right: 0,
+            bottom: 0,
+            height: 2,
+            background: 'rgba(255,255,255,0.10)',
+            pointerEvents: 'none',
+            zIndex: 4,
+            opacity: hasFirstFrame ? 1 : 0,
+            transition: 'opacity 200ms ease-out',
+          }}
+        >
+          <div
+            style={{
+              width: `${progress * 100}%`,
+              height: '100%',
+              background: '#F7931E',
+              transition: 'width 120ms linear',
+            }}
+          />
+        </div>
+      )}
       {isActive && (
         <div
           role="button"
