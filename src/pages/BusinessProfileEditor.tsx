@@ -49,7 +49,12 @@ import { getCountryCodeFromClub } from '@/utils/countryCodeMapping';
 
 import { IdentitySection } from '@/components/business/editor/IdentitySection';
 import { LocationContactSection } from '@/components/business/editor/LocationContactSection';
-import { BrandingSection } from '@/components/business/editor/BrandingSection';
+import { BusinessHeroCard } from '@/components/business/editor/BusinessHeroCard';
+import { FacilitiesSection } from '@/components/business/editor/FacilitiesSection';
+import { PrimaryActionSection } from '@/components/business/editor/PrimaryActionSection';
+import { BookingComingSoonSection } from '@/components/business/editor/BookingComingSoonSection';
+import { OpeningHoursSection } from '@/components/business/editor/OpeningHoursSection';
+import { VerificationNudgeSection } from '@/components/business/editor/VerificationNudgeSection';
 import { SocialSection } from '@/components/business/editor/SocialSection';
 import { NotificationsSection } from '@/components/business/editor/NotificationsSection';
 import {
@@ -58,6 +63,7 @@ import {
   SocialFields,
   ImageState,
   emptyImage,
+  PrimaryActionKey,
 } from '@/components/business/editor/editorTypes';
 
 import { useHideBottomNav } from '@/hooks/useBottomNavVisibility';
