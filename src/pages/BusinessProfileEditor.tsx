@@ -930,7 +930,7 @@ export default function BusinessProfileEditor() {
           title="Crop Cover Photo"
         />
       )}
-    </PageRoot>
+    </>
   );
 }
 
