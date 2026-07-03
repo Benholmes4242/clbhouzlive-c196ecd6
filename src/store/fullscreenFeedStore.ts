@@ -110,6 +110,7 @@ export const useFullscreenFeedStore = create<FullscreenFeedState>((set, get) => 
       isFetchingNextPage: false,
       readOnly: false,
       origin: null,
+      startPosition: 0,
     });
     if (cb) {
       try { cb(); } catch {}
