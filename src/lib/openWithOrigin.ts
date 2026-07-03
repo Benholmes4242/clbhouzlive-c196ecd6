@@ -91,11 +91,18 @@ export function openWithOrigin({
 
   // Buffered handoff (Path A). Detach the live tile decoder without evicting
   // its pool entry so the viewer's promote() inherits the buffered segments.
+  // Capture {currentTime, wasPlaying} from the origin <video> BEFORE detach
+  // so the fullscreen instance can seek to the same playhead on attach (kills
+  // the "restart at 0" jump), and stash the url so the origin tile knows to
+  // re-promote itself on viewer close.
   if (handOffUrls) {
+    const videoEl = (originEl?.querySelector?.('video') as HTMLVideoElement | null) ?? null;
+    const t = videoEl && Number.isFinite(videoEl.currentTime) ? Math.max(0, videoEl.currentTime) : 0;
+    const wasPlaying = !!(videoEl && !videoEl.paused && !videoEl.ended);
     for (const url of handOffUrls) {
-      if (url) {
-        try { HLSPoolManager.handOff(url); } catch {}
-      }
+      if (!url) continue;
+      flipContinuity.setStart(url, { t, wasPlaying });
+      try { HLSPoolManager.handOff(url); } catch {}
     }
   }
 
