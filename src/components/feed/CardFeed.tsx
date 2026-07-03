@@ -26,6 +26,7 @@ import { useFullscreenFeedStore } from '@/store/fullscreenFeedStore';
 import { openWithOrigin } from '@/lib/openWithOrigin';
 import { useClubhouseStore } from '@/store/clubhouseStore';
 import { prefetchTile } from '@/hooks/useTileVideoPlayer';
+import * as feedTelemetry from '@/lib/feedTelemetry';
 import { FeedCard } from './FeedCard';
 
 const CANVAS = '#15171F';
