@@ -94,10 +94,8 @@ export function LocationContactSection({
 
   return (
     <>
-      <div className="px-4 mt-2 mb-2">
-        <SectionHeader tier="standard" kicker="LOCATION & CONTACT" />
-      </div>
-      <div className="space-y-4 px-4 pb-4">
+      <div className="space-y-4 px-4 pb-4 pt-2">
+
         <SectionCard>
           <div className="space-y-3">
             {isClubLinked ? (
