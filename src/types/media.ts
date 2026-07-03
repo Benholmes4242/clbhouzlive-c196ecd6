@@ -2,6 +2,17 @@
  * Shared media types across the application
  */
 
+/** Aspect ratio preset or 'auto' for natural dimensions */
+export type AspectRatio =
+  | '3:4'
+  | '1:1'
+  | '16:9'
+  | '9:16'
+  | '21:9'
+  | '4:3'
+  | 'auto';
+
+
 export type MediaKind = 'image' | 'video';
 
 export interface MediaItem {
