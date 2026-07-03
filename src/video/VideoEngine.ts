@@ -408,6 +408,20 @@ class VideoEngineImpl {
     });
   }
 
+  /** Read the last known playback position for a post (session-scoped). */
+  getLastPos(postId: string | null | undefined): number {
+    if (!postId) return 0;
+    return this.lastPos.get(postId) ?? 0;
+  }
+
+  /** [V1] DBG-gated structured trace for two-way resume verification. */
+  trace(tag: string, data?: Record<string, unknown>): void {
+    if (typeof window !== 'undefined' && (window as any).__VIDEO_ENGINE_DBG__) {
+      // eslint-disable-next-line no-console
+      console.info(`[V1] ${tag}`, data ?? {});
+    }
+  }
+
   /** Test-only utility: list lane ids currently registered. */
   listLanes(): LaneId[] {
     return Array.from(this.lanes.keys());
