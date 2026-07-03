@@ -24,15 +24,23 @@ import type HlsType from 'hls.js';
 import { logVideoTelemetry } from '@/utils/videoTelemetry';
 import { logPoolEvent } from '@/media/mobileVideoDebug';
 
+type PoolRole = 'speculative' | 'handoff' | 'promoted';
+
 interface PooledHLSInstance {
   hls: HlsType;
   url: string;
   created: number;
   preloadedByVideo: HTMLVideoElement | null;
   isPromoted: boolean;
+  role: PoolRole;
   timeoutId?: NodeJS.Timeout;
   surface: 'feed' | 'fullscreen';
 }
+
+// Speculative sub-cap: guarantees room for handoff + promoted entries so a
+// prefetch storm cannot starve the active/opening video.
+const SPECULATIVE_SUBCAP = 8;
+const SPECULATIVE_SUBCAP_LOW_MEMORY = 5;
 
 // Pool configuration
 const POOL_CONFIG = {
