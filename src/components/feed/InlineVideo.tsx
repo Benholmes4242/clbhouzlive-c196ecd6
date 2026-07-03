@@ -380,7 +380,7 @@ export const InlineVideo: React.FC<Props> = ({
           height: '100%',
           objectFit,
           display: 'block',
-          backgroundColor: '#0a0a0a',
+          backgroundColor: 'transparent',
           opacity: hasFirstFrame ? 1 : 0,
           transition: 'opacity 120ms ease-out',
           zIndex: 1,
