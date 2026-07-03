@@ -34,6 +34,8 @@ interface OpenOptions {
    *  Used by course-detail media entry points. Defaults false so Clubhouse
    *  and deep-link openers keep social actions. */
   readOnly?: boolean;
+  /** Two-way resume: seconds to seek fullscreen lane to on first paint. */
+  startPosition?: number;
 }
 
 interface FullscreenFeedState {
@@ -51,6 +53,7 @@ interface FullscreenFeedState {
   isFetchingNextPage: boolean;
   readOnly: boolean;
   origin: OpenOrigin | null;
+  startPosition: number;
   open: (posts: FeedPost[], startIndex?: number, options?: OpenOptions) => void;
   close: () => void;
   appendPosts: (newPosts: FeedPost[]) => void;
@@ -76,6 +79,7 @@ export const useFullscreenFeedStore = create<FullscreenFeedState>((set, get) => 
   isFetchingNextPage: false,
   readOnly: false,
   origin: null,
+  startPosition: 0,
   open: (posts, startIndex = 0, options) =>
     set({
       isOpen: true,
@@ -90,6 +94,7 @@ export const useFullscreenFeedStore = create<FullscreenFeedState>((set, get) => 
       isFetchingNextPage: options?.isFetchingNextPage ?? false,
       readOnly: !!options?.readOnly,
       origin: options?.origin ?? null,
+      startPosition: options?.startPosition ?? 0,
     }),
   close: () => {
     const cb = get().onCloseCallback;
