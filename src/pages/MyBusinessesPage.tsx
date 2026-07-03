@@ -4,6 +4,8 @@ import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useMyBusinesses } from '@/hooks/useMyBusinesses';
 import { BusinessCommandCard } from '@/components/business/BusinessCommandCard';
 import { AddBusinessCard } from '@/components/business/AddBusinessCard';
+import { BusinessEmptyState } from '@/components/business/BusinessEmptyState';
+
 import { useActiveActor } from '@/context/ActiveActorContext';
 import { useHideBottomNav } from '@/hooks/useBottomNavVisibility';
 import { useHideHeader } from '@/hooks/useHeaderVisibility';
@@ -115,7 +117,8 @@ const MyBusinessesPage = () => {
       {!isLoading && (
         <div className="flex flex-col gap-4 pt-4 px-4 max-w-xl mx-auto w-full pb-8">
           {!hasBusinesses ? (
-            <AddBusinessCard isFirst onClick={handleCreateBusiness} />
+            <BusinessEmptyState onCreate={handleCreateBusiness} />
+
           ) : (
             <>
               {sortedBusinesses.map((membership, index) => {
