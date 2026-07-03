@@ -63,10 +63,8 @@ export function IdentitySection({
 }: IdentitySectionProps) {
   return (
     <>
-      <div className="px-4 mb-2">
-        <SectionHeader tier="standard" kicker="IDENTITY" tone="amber" />
-      </div>
-      <div className="space-y-4 px-4 pb-4">
+      <div className="space-y-4 px-4 pb-4 pt-2">
+
         {/* Category */}
         <SectionCard>
           <div className="space-y-1.5">
