@@ -156,33 +156,12 @@ const UnifiedMediaTile: React.FC<UnifiedMediaTileProps> = ({
   }, [isVideo, isAutoplayCandidate, config.autoplayEnabled]);
 
   useEffect(() => {
-    if (isVisible && isVideo) {
-      logGridItemPlayAttempt(item.postId, 'visibility_autoplay');
-    }
-  }, [isVisible, isVideo, item.postId]);
-
-  const handleCanPlay = useCallback(() => {
-    // Capture video element reference for scrubber
-    const el = playerRef.current?.getVideoElement();
-    if (el) setVideoEl(el);
-
-    const dbDuration = item.durationSeconds;
-    const hasValidDbDuration = typeof dbDuration === 'number' && Number.isFinite(dbDuration) && dbDuration > 0;
-    
-    if (!hasValidDbDuration && playerRef.current) {
-      const d = playerRef.current.getDuration();
-      if (Number.isFinite(d) && d > 0 && d !== Infinity) {
-        setResolvedDurationSeconds(d);
-      }
-    }
-    
-    // Report video ready for prefetch queue
-    if (!hasReportedReadyRef.current && isVideo) {
+    if (isVideo && !hasReportedReadyRef.current) {
       hasReportedReadyRef.current = true;
-      logTile('VIDEO_READY', { postId: item.postId });
       onReady?.(runtimeMediaId);
     }
-  }, [item.durationSeconds, item.postId, isVideo, onReady, runtimeMediaId]);
+  }, [isVideo, onReady, runtimeMediaId]);
+
 
   const thumbnailSrc = item.thumbnailUrl || item.url;
   const aspectClass = isLandscape ? 'aspect-[16/9]' : 'aspect-[3/4]';
