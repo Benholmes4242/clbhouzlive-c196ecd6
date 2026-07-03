@@ -8,7 +8,7 @@ import { SnapFeed } from '@/components/feed/SnapFeed';
 import { ClubhouseSkeletonShimmer } from '@/components/clubhouse/ClubhouseSkeletonShimmer';
 import { pauseAllAudio } from '@/utils/globalVideoMute';
 import { lockBodyScroll, unlockBodyScroll } from '@/lib/bodyScrollLock';
-import { flipContinuity } from '@/media/flipContinuity';
+
 
 import { FeedOverlayLayer } from '@/components/feed/FeedOverlayLayer';
 import { FullscreenCarouselOverlay } from '@/components/media/FullscreenCarouselOverlay';
