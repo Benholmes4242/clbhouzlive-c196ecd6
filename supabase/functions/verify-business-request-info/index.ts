@@ -72,7 +72,7 @@ serve(async (req) => {
         status: 404, headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
-    if (request.status !== "pending") {
+    if (request.status !== "pending" && request.status !== "needs_more_info") {
       return new Response(JSON.stringify({ ok: false, error: "Request is not pending" }), {
         status: 409, headers: { ...corsHeaders, "Content-Type": "application/json" },
       });

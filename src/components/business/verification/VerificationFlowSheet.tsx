@@ -156,7 +156,9 @@ export default function VerificationFlowSheet({ open, onOpenChange, businessId, 
           proof_method: selectedProof,
           proof_value,
           proof_metadata,
-        });
+          contact_email: contactEmail.trim() || null,
+          contact_role: role || null,
+        } as any);
       if (error) throw error;
     },
     onSuccess: () => {

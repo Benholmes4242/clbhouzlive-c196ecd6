@@ -21,6 +21,8 @@ export interface VerificationRow {
   proofMethod?: string | null;
   proofValue?: string | null;
   proofMetadata?: Record<string, unknown> | null;
+  contactEmail?: string | null;
+  contactRole?: string | null;
   evidenceUrl?: string | null;
   inviteReason?: string | null;
   displayName?: string | null;
@@ -38,7 +40,7 @@ async function fetchVerifications(): Promise<VerificationRow[]> {
   const [biz, golfer, claims] = await Promise.all([
     supabase
       .from('business_verification_requests')
-      .select('id, status, requested_by, created_at, reviewed_at, note, admin_note, business_id, domain, domain_confirmed, proof_method, proof_value, proof_metadata')
+      .select('id, status, requested_by, created_at, reviewed_at, note, admin_note, business_id, domain, domain_confirmed, proof_method, proof_value, proof_metadata, contact_email, contact_role')
       .order('created_at', { ascending: false }),
     supabase
       .from('golfer_verification_requests')
@@ -84,6 +86,8 @@ async function fetchVerifications(): Promise<VerificationRow[]> {
       proofMethod: r.proof_method ?? null,
       proofValue: r.proof_value ?? null,
       proofMetadata: r.proof_metadata ?? null,
+      contactEmail: r.contact_email ?? null,
+      contactRole: r.contact_role ?? null,
     })),
     ...(golfer.data ?? []).map(r => ({
       id: r.id, type: 'golfer' as const, status: r.status,

@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import {
-  MoreHorizontal, Eye, Pencil, BarChart3, Trash2, MapPin, ShieldCheck, Clock, CheckCircle, Mail, Users, Zap,
+  MoreHorizontal, Eye, Pencil, BarChart3, Trash2, MapPin, ShieldCheck, Clock, CheckCircle, Mail, Users, Zap, ChevronRight,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
@@ -218,9 +218,32 @@ export function BusinessCommandCard({ membership, userId, index = 0, isActive = 
             )}
 
             {verificationState === 'pending' && (
-              <p className="text-[12px] mt-1" style={{ color: BIZ.amberSoft }}>
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  navigate(`/business/${business.id}/verification`);
+                }}
+                className="inline-flex items-center gap-1 mt-1.5 px-2 py-0.5 rounded-full text-[11px] font-semibold active:opacity-70 transition-opacity"
+                style={{ background: BIZ.amberTint, color: BIZ.amber, border: `1px solid ${BIZ.amberHair}` }}
+              >
+                <Clock className="w-3 h-3" />
                 {needsDomainVerification ? 'Action required: verify your domain' : 'Pending verification'}
-              </p>
+              </button>
+            )}
+
+            {verificationState === 'none' && (
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  navigate(`/business/${business.id}/verification`);
+                }}
+                className="inline-flex items-center gap-1 mt-1.5 px-2 py-0.5 rounded-full text-[11px] font-semibold active:opacity-70 transition-opacity"
+                style={{ background: BIZ.card, color: BIZ.ink, border: `1px solid ${BIZ.hair}` }}
+              >
+                <ShieldCheck className="w-3 h-3" style={{ color: BIZ.amber }} />
+                Get verified
+                <ChevronRight className="w-3 h-3" style={{ color: BIZ.inkMute }} />
+              </button>
             )}
 
             {(verificationState === 'needs_more_info' || verificationState === 'rejected') && (

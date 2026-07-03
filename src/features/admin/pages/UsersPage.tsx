@@ -891,6 +891,12 @@ function VerificationsTab({
             {active.domain && (
               <Field label="Domain" value={`${active.domain}${active.domainConfirmed ? ' (confirmed)' : ' (unconfirmed)'}`} />
             )}
+            {active.type === 'business' && active.contactEmail && (
+              <Field label="Applicant contact email" value={active.contactEmail} />
+            )}
+            {active.type === 'business' && active.contactRole && (
+              <Field label="Applicant role" value={active.contactRole} />
+            )}
 
             {active.note && <Field label="Request note" value={active.note} />}
             {active.evidenceUrl && (

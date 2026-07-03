@@ -1488,6 +1488,8 @@ export type Database = {
           admin_note: string | null
           approval_count: number
           business_id: string
+          contact_email: string | null
+          contact_role: string | null
           created_at: string
           domain: string | null
           domain_confirmed: boolean
@@ -1510,6 +1512,8 @@ export type Database = {
           admin_note?: string | null
           approval_count?: number
           business_id: string
+          contact_email?: string | null
+          contact_role?: string | null
           created_at?: string
           domain?: string | null
           domain_confirmed?: boolean
@@ -1532,6 +1536,8 @@ export type Database = {
           admin_note?: string | null
           approval_count?: number
           business_id?: string
+          contact_email?: string | null
+          contact_role?: string | null
           created_at?: string
           domain?: string | null
           domain_confirmed?: boolean

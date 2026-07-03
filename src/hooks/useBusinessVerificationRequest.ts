@@ -5,14 +5,18 @@ import { AppLog } from '@/lib/logger';
 export interface BusinessVerificationRequest {
   id: string;
   business_id: string;
-  status: 'pending' | 'approved' | 'rejected' | 'revoked' | 'needs_more_info';
+  status: 'pending' | 'approved' | 'rejected' | 'revoked' | 'needs_more_info' | 'cancelled';
   requested_by: string;
   created_at: string;
   reviewed_at: string | null;
   admin_note: string | null;
+  // admin-initiated flag; client never sets this. When true the owner must
+  // complete the Domain step before an admin can approve the request.
   requires_domain_check: boolean;
   domain: string | null;
   domain_confirmed: boolean;
+  contact_email: string | null;
+  contact_role: string | null;
 }
 
 /**
@@ -27,7 +31,7 @@ export function useBusinessVerificationRequest(businessId: string | undefined) {
 
       const { data, error } = await supabase
         .from('business_verification_requests')
-        .select('id, business_id, status, requested_by, created_at, reviewed_at, admin_note, requires_domain_check, domain, domain_confirmed')
+        .select('id, business_id, status, requested_by, created_at, reviewed_at, admin_note, requires_domain_check, domain, domain_confirmed, contact_email, contact_role')
         .eq('business_id', businessId)
         .order('created_at', { ascending: false })
         .limit(1)
@@ -40,7 +44,7 @@ export function useBusinessVerificationRequest(businessId: string | undefined) {
 
       // NOTE: BusinessVerificationRequest.status is cast from string — if new statuses
       // are added to the DB, update the union type in this file to match.
-      return data as BusinessVerificationRequest | null;
+      return data as unknown as BusinessVerificationRequest | null;
     },
     staleTime: 30_000, // 30 seconds
   });
@@ -60,6 +64,9 @@ export function deriveVerificationState(
   if (request.status === 'rejected') return 'rejected';
   // Revoked status means unverified - show as 'none' to allow re-request
   if (request.status === 'revoked') return 'none';
+  // Cancelled requests are treated as never-applied: the Get-verified prompt
+  // should show again. Explicit mapping so this is not a silent fall-through.
+  if (request.status === 'cancelled') return 'none';
   if (request.status === 'approved') return 'verified';
   return 'none';
 }
