@@ -12,7 +12,7 @@ import { usePausedFirstFrame } from '@/media/hooks/usePausedFirstFrame';
 import { MediaRuntime } from '@/media/runtime/MediaRuntime';
 import { DecoderLimitManager } from '@/utils/video/DecoderLimitManager';
 import { extractCloudflareUid } from '@/utils/videoIdUtils';
-import { logTileLife, attachVideoEventLoggers, isVideoDebugOn } from '@/media/mobileVideoDebug';
+import { logTileLife, attachVideoEventLoggers, isVideoDebugOn, logHandoff } from '@/media/mobileVideoDebug';
 import { HLSPoolManager } from '@/media/HLSPoolManager';
 
 
@@ -139,6 +139,22 @@ export const InlineVideo: React.FC<Props> = ({
           return;
         }
         logTileLife(tag, feedIndex, 'ATTACH_DONE', { readyState: video.readyState });
+        logHandoff(regId, 'tile', 'TILE_REATTACH', {
+          videoT: video.currentTime,
+          isActive: isActiveRef.current,
+          readyState: video.readyState,
+        });
+        // TILE_RESUME probe — first timeupdate>0.1 after re-attach.
+        let resumeFired = false;
+        const onTU = () => {
+          if (resumeFired) return;
+          if (video.currentTime > 0.1) {
+            resumeFired = true;
+            logHandoff(regId, 'tile', 'TILE_RESUME', { videoT: video.currentTime });
+            try { video.removeEventListener('timeupdate', onTU); } catch {}
+          }
+        };
+        try { video.addEventListener('timeupdate', onTU); } catch {}
         try {
           if (video.currentTime < 0.001) {
             video.currentTime = 0.001;

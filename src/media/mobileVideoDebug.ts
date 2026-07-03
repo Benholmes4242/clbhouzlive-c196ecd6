@@ -114,6 +114,41 @@ export function logPoolTrace(msg: string): void {
   addLogEntry('info', 'PATH', `🔍 ${msg}`);
 }
 
+// ============ Handoff Boundary Tracing (tile ⇄ fullscreen) ============
+/**
+ * logHandoff — single-tag trace of the tile→fullscreen→tile boundary so we can
+ * align playhead/state across the same video. Emits a `[HANDOFF]` console.info
+ * (prod-safe: gated on isVideoDebugOn) AND stores in the on-screen debug panel
+ * under the `HANDOFF` category.
+ *
+ * Convention: postId is truncated to the last 6 chars for readability. Every
+ * line carries surface ('tile'|'fs') and the current video time when known.
+ */
+export function logHandoff(
+  postId: string | null | undefined,
+  surface: 'tile' | 'fs',
+  event: string,
+  detail?: Record<string, any>,
+): void {
+  if (!isVideoDebugOn()) return;
+  const pid = (postId ?? '??????').toString().slice(-6);
+  const parts: string[] = [];
+  if (detail) {
+    for (const k of Object.keys(detail)) {
+      const v = detail[k];
+      const s = typeof v === 'number' ? (Number.isFinite(v) ? v.toFixed(3) : String(v))
+                : typeof v === 'object' ? JSON.stringify(v)
+                : String(v);
+      parts.push(`${k}=${s}`);
+    }
+  }
+  const suffix = parts.length ? ' ' + parts.join(' ') : '';
+  const msg = `[${pid} ${surface}] ${event}${suffix}`;
+  // eslint-disable-next-line no-console
+  console.info(`[HANDOFF] ${msg}`);
+  addLogEntry('info', 'HANDOFF', msg);
+}
+
 // ============ Per-Tile Lifecycle Tracing ============
 /**
  * logTileLife — greppable per-tile lifecycle trace for the Clubhouse feed.

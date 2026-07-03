@@ -17,6 +17,7 @@
 import type { FeedPost } from '@/components/media-system/types/media';
 import { useFullscreenFeedStore, type OpenOrigin } from '@/store/fullscreenFeedStore';
 import { HLSPoolManager } from '@/media/HLSPoolManager';
+import { logHandoff } from '@/media/mobileVideoDebug';
 
 function prefersReducedMotion(): boolean {
   if (typeof window === 'undefined' || !window.matchMedia) return false;
@@ -75,6 +76,18 @@ export function openWithOrigin({
   options,
 }: OpenWithOriginArgs): void {
   const origin = snapshotOrigin(originEl, posterUrl ?? null);
+  const postId = (posts[index] as any)?.id ?? null;
+
+  // TAP boundary — capture the live tile playhead + play-state at tap so we
+  // can compare against FS_ATTACH / FS_FIRSTPLAY on the other side.
+  try {
+    const tileVideo = originEl?.querySelector('video') as HTMLVideoElement | null;
+    logHandoff(postId, 'tile', 'TAP', {
+      tileT: tileVideo?.currentTime ?? -1,
+      paused: tileVideo?.paused ?? null,
+      handOffUrl: handOffUrls?.[0] ?? null,
+    });
+  } catch {}
 
   // Chrome flip at TAP time (not effect time) to kill the strobe. Scroll
   // lock is owned by the overlay's isOpen effect (ref-counted so it composes
@@ -95,6 +108,7 @@ export function openWithOrigin({
     for (const url of handOffUrls) {
       if (!url) continue;
       try { HLSPoolManager.handOff(url); } catch {}
+      logHandoff(postId, 'tile', 'HANDOFF_DONE', { url });
     }
   }
 

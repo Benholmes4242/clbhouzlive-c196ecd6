@@ -5,7 +5,7 @@ import { registerAudioSource, unregisterAudioSource } from '@/utils/globalVideoM
 import { useHlsPool } from '@/media/hooks/useHlsPool';
 import { usePausedFirstFrame } from '@/media/hooks/usePausedFirstFrame';
 import { useGaplessLoop } from '@/utils/video/GaplessLoop';
-import { fsTimeStart, fsTimeEnd, fsEvent, logTileLife } from '@/media/mobileVideoDebug';
+import { fsTimeStart, fsTimeEnd, fsEvent, logTileLife, logHandoff, isVideoDebugOn } from '@/media/mobileVideoDebug';
 
 
 interface SnapVideoPlayerProps {
@@ -90,16 +90,43 @@ export const SnapVideoPlayer = memo(function SnapVideoPlayer({
     const video = videoRef.current;
     if (!video) return;
     let cancelled = false;
+    let firstPlayFired = false;
+    let onTU: ((e: Event) => void) | null = null;
 
     if (shouldAttach) {
       video.muted = useClubhouseStore.getState().isMuted;
       video.playsInline = true;
       pool.attach(hlsUrl, video, mp4Url, isFullscreen ? 'fullscreen' : 'feed').then(() => {
         if (cancelled) return;
+        if (isFullscreen) {
+          logHandoff(postId, 'fs', 'FS_ATTACH', {
+            videoT: video.currentTime,
+            readyState: video.readyState,
+            paused: video.paused,
+          });
+          // Temp FS_FIRSTPLAY probe — first time currentTime advances >0.1 after attach.
+          onTU = () => {
+            if (firstPlayFired) return;
+            if (video.currentTime > 0.1) {
+              firstPlayFired = true;
+              logHandoff(postId, 'fs', 'FS_FIRSTPLAY', { videoT: video.currentTime });
+              if (onTU) video.removeEventListener('timeupdate', onTU);
+            }
+          };
+          video.addEventListener('timeupdate', onTU);
+        }
         setAttachToken((t) => t + 1);
-        try { if (video.currentTime < 0.001) video.currentTime = 0.001; } catch {}
+        try {
+          if (video.currentTime < 0.001) {
+            video.currentTime = 0.001;
+            if (isFullscreen) logHandoff(postId, 'fs', 'FS_SEEK', { to: 0.001 });
+          }
+        } catch {}
       });
-      return () => { cancelled = true; };
+      return () => {
+        cancelled = true;
+        if (onTU) { try { video.removeEventListener('timeupdate', onTU); } catch {} }
+      };
     } else {
       pool.teardown(hlsUrl);
       reset();
