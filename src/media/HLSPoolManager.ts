@@ -545,6 +545,8 @@ class HLSPoolManagerClass {
     if (entry?.hls && !entry.isPromoted) {
       entry.hls.startLoad(-1); // Resume loading from current position
       entry.isPromoted = true;
+      entry.role = 'promoted';
+      
       
       logVideoTelemetry('hls_pool_resumed', { 
         url: videoUrl 
