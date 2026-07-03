@@ -208,15 +208,15 @@ export function FullscreenFeedOverlay() {
       setCloneExpanded(false);
       setFirstFrameReady(false);
       // Force layout with the initial rect, then expand on next frame.
+      let raf2: number | undefined;
       const raf1 = requestAnimationFrame(() => {
-        const raf2 = requestAnimationFrame(() => setCloneExpanded(true));
-        (raf1 as any)._raf2 = raf2;
+        raf2 = requestAnimationFrame(() => setCloneExpanded(true));
       });
       // Watchdog: release the clone if the first-frame signal never arrives.
       watchdogRef.current = setTimeout(() => setFirstFrameReady(true), 400);
       return () => {
         cancelAnimationFrame(raf1);
-        if ((raf1 as any)._raf2) cancelAnimationFrame((raf1 as any)._raf2);
+        if (raf2 != null) cancelAnimationFrame(raf2);
         if (watchdogRef.current) clearTimeout(watchdogRef.current);
       };
     } else if (!isOpen) {
