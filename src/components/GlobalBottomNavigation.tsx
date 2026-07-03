@@ -40,6 +40,7 @@ const HIDDEN_ROUTE_PREFIXES = [
   '/legal', // Legal document pages — standalone, no bottom nav
   '/privacy', // Privacy policy — standalone, no bottom nav
   '/terms', // Terms of service — standalone, no bottom nav
+  '/businesses/manage', // Manage business profiles — standalone shell, no bottom nav
 ];
 
 // Routes that use the dark Clubhouse nav chrome.
