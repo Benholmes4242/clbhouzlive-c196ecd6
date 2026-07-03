@@ -721,7 +721,7 @@ export type Database = {
           address_label: string | null
           address_line1: string | null
           address_line2: string | null
-          amenities: string[]
+          amenities: string[] | null
           booking_url: string | null
           category: string | null
           city: string | null
@@ -767,7 +767,7 @@ export type Database = {
           address_label?: string | null
           address_line1?: string | null
           address_line2?: string | null
-          amenities?: string[]
+          amenities?: string[] | null
           booking_url?: string | null
           category?: string | null
           city?: string | null
@@ -813,7 +813,7 @@ export type Database = {
           address_label?: string | null
           address_line1?: string | null
           address_line2?: string | null
-          amenities?: string[]
+          amenities?: string[] | null
           booking_url?: string | null
           category?: string | null
           city?: string | null
