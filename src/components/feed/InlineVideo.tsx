@@ -236,12 +236,6 @@ export const InlineVideo: React.FC<Props> = ({
         hasSrc: !!v?.src,
         readyState: v?.readyState,
       });
-      // Ordering-independent resume: if attach settled before we became
-      // active (scroll-restore/emitClose race), play now.
-      if (pendingPlayAfterActiveRef.current && v) {
-        pendingPlayAfterActiveRef.current = false;
-        if (v.paused) v.play().catch(() => {});
-      }
     }
   }, [isActive, regId, tag, feedIndex]);
 
