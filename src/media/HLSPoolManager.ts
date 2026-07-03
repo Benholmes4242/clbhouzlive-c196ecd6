@@ -348,6 +348,7 @@ class HLSPoolManagerClass {
       const entry = this.pool.get(url);
       if (entry) {
         entry.isPromoted = false;
+        entry.role = 'speculative';
         entry.preloadedByVideo = newPreloadVideo || null;
 
         // Clear any existing TTL timer before assigning a new one — otherwise
