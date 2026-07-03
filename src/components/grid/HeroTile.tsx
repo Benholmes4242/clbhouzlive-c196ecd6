@@ -7,18 +7,14 @@
  * - preload="auto" for instant buffering
  */
 
-import React, { useRef, useCallback, useEffect, useState, memo } from 'react';
+import React, { useCallback, memo } from 'react';
 import { cn } from '@/lib/utils';
 import { motion } from 'framer-motion';
-import { HLSPlayer, HLSPlayerRef } from '@/media';
-import { OverlayCorners } from '@/components/shared/overlay';
 import { Play } from 'lucide-react';
 import { UniversalMediaItem, UniversalGridConfig } from './types';
 import TextOverlayRenderer from '@/components/studio/TextOverlayRenderer';
 import { getFilterClass } from '@/utils/studioFilters';
 import { getPixelLayerStyle } from '@/utils/studioEdit';
-import { uidFromNode } from '@/utils/cloudflareStreamTransform';
-import { useInView } from 'react-intersection-observer';
 
 interface HeroTileProps {
   item: UniversalMediaItem;
@@ -33,13 +29,7 @@ const HeroTile = memo<HeroTileProps>(({
   onPress,
   onAuthorClick,
 }) => {
-  const playerRef = useRef<HLSPlayerRef>(null);
-  
-  // Visibility-based autoplay (40% threshold)
-  const { ref: inViewRef, inView: isVisible } = useInView({
-    threshold: 0.4,
-    triggerOnce: false,
-  });
+
   
   const isVideo = item.type === 'video';
   const thumbnailSrc = item.thumbnailUrl || item.url;
