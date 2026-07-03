@@ -627,6 +627,7 @@ const FeedCardImpl: React.FC<FeedCardProps> = ({
                     src={mediaUrl}
                     alt={post.caption || post.displayName}
                     loading="lazy"
+                    onLoad={() => { if (feedIndex != null) feedTelemetry.markPoster(feedIndex); }}
                     style={{
                       position: 'absolute',
                       inset: 0,
