@@ -167,10 +167,24 @@ export const InlineVideo: React.FC<Props> = ({
           active: isActiveRef.current,
           paused: video.paused,
         });
-        // Resume autoplay if this tile is the active slot after attach settles.
-        if (isActiveRef.current && video.paused) {
-          video.play().catch(() => {});
-        }
+        // Resume autoplay when this tile is the active slot — but only once
+        // the media can actually render a frame. play() at readyState 0
+        // (right after promote's detach/attachMedia) silently rejects on iOS,
+        // leaving the poster underlay frozen.
+        const tryResume = () => {
+          if (!isActiveRef.current) return;
+          const v = video;
+          if (!v) return;
+          if (v.readyState >= 2) {
+            v.play().catch(() => {});
+          } else {
+            const onReady = () => {
+              if (isActiveRef.current) v.play().catch(() => {});
+            };
+            try { v.addEventListener('loadeddata', onReady, { once: true }); } catch {}
+          }
+        };
+        tryResume();
       });
     } else if (mp4Url) {
       attachedRef.current = true;

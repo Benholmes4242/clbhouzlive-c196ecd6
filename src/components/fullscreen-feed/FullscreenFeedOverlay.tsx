@@ -3,7 +3,7 @@ import { AnimatePresence, motion } from 'framer-motion';
 
 import { useNavigate } from 'react-router-dom';
 import { useFullscreenFeedStore } from '@/store/fullscreenFeedStore';
-import { useClubhouseStore } from '@/store/clubhouseStore';
+
 import { SnapFeed } from '@/components/feed/SnapFeed';
 import { ClubhouseSkeletonShimmer } from '@/components/clubhouse/ClubhouseSkeletonShimmer';
 import { pauseAllAudio } from '@/utils/globalVideoMute';
@@ -26,7 +26,7 @@ import { useManageableBusinessIds } from '@/hooks/useManageableBusinessIds';
 import { canManagePost } from '@/lib/canManagePost';
 import { getActorRouteByType } from '@/types/actor';
 import FullscreenDebugPanel from '@/components/FullscreenDebugPanel';
-import { fsTimeStart, fsTimeEnd, fsEvent, logHandoff } from '@/media/mobileVideoDebug';
+import { fsTimeStart, fsTimeEnd, fsEvent } from '@/media/mobileVideoDebug';
 
 export function FullscreenFeedOverlay() {
   const navigate = useNavigate();
@@ -160,17 +160,11 @@ export function FullscreenFeedOverlay() {
       } catch {}
 
       return () => {
-        // FS_CLOSE — where fullscreen was when it closed (playhead of the active
-        // slide's <video>). Reads directly from the clubhouse store's tracked
-        // active video element (set by SnapVideoPlayer while active).
-        try {
-          const activeVideo = useClubhouseStore.getState().activeVideoElement as HTMLVideoElement | null;
-          const closingPost = posts[activeIndex] as any;
-          logHandoff(closingPost?.id ?? null, 'fs', 'FS_CLOSE', {
-            fsT: activeVideo?.currentTime ?? -1,
-            paused: activeVideo?.paused ?? null,
-          });
-        } catch {}
+        // FS_CLOSE currentTime read removed — playhead sync is nuked, and the
+        // fullscreen <video> is typically detached by the time this cleanup
+        // runs (always logged fsT=-1). Kept as a no-op boundary.
+
+
 
         unlockBodyScroll();
         document.body.classList.remove('route-fullscreen-overlay');
