@@ -456,23 +456,49 @@ class HLSPoolManagerClass {
   }
 
   /**
-   * Evict the oldest non-promoted instance
+   * Evict the lowest-priority non-promoted instance.
+   * Priority order (evicted first -> last): 'speculative' -> 'handoff'.
+   * 'promoted' entries are NEVER evicted. Returns true if something was evicted.
+   * `mode='speculative-only'` restricts eviction to speculative entries
+   * (used by the speculative sub-cap enforcement).
    */
-  private evictOldest(): void {
-    let oldestUrl: string | null = null;
-    let oldestTime = Infinity;
+  private evictLowestPriority(mode: 'default' | 'speculative-only' = 'default'): boolean {
+    let candidateUrl: string | null = null;
+    let candidateRole: PoolRole | null = null;
+    let candidateTime = Infinity;
 
+    // Pass 1: oldest speculative
     this.pool.forEach((entry, url) => {
-      if (!entry.isPromoted && entry.created < oldestTime) {
-        oldestTime = entry.created;
-        oldestUrl = url;
+      if (entry.role !== 'speculative') return;
+      if (entry.created < candidateTime) {
+        candidateTime = entry.created;
+        candidateUrl = url;
+        candidateRole = 'speculative';
       }
     });
 
-    if (oldestUrl) {
-      logVideoTelemetry('hls_pool_evicted', { url: oldestUrl });
-      this.cleanup(oldestUrl);
+    // Pass 2: oldest handoff (only if no speculative exists)
+    if (!candidateUrl && mode === 'default') {
+      this.pool.forEach((entry, url) => {
+        if (entry.role !== 'handoff') return;
+        if (entry.isPromoted) return; // defensive
+        if (entry.created < candidateTime) {
+          candidateTime = entry.created;
+          candidateUrl = url;
+          candidateRole = 'handoff';
+        }
+      });
     }
+
+    if (candidateUrl) {
+      // TEMP: verify only speculative gets evicted under stress. Strip after.
+      // eslint-disable-next-line no-console
+      console.info('[hls_pool_evict]', { role: candidateRole, url: candidateUrl });
+      logVideoTelemetry('hls_pool_evicted', { url: candidateUrl, role: candidateRole });
+      this.cleanup(candidateUrl);
+      return true;
+    }
+    return false;
   }
 
   /**
