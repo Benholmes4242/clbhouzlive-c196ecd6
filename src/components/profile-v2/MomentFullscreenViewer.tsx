@@ -206,7 +206,6 @@ export const MomentFullscreenViewer: React.FC<MomentFullscreenViewerProps> = ({
                 <button
                   key={index}
                   onClick={() => {
-                    setIsVideoReady(false);
                     onIndexChange(index);
                   }}
                   className="w-1.5 h-1.5 rounded-full transition-all"
