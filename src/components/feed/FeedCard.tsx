@@ -604,7 +604,6 @@ const FeedCardImpl: React.FC<FeedCardProps> = ({
                       src={media.thumbnailUrl}
                       alt={post.caption || post.displayName}
                       loading="lazy"
-                      loading="lazy"
                       style={{
                         position: 'absolute',
                         inset: 0,
