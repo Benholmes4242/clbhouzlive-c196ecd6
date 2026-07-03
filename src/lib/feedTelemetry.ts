@@ -157,4 +157,9 @@ export function flushSummary(): void {
 // Expose a manual flush hook for the device COPY path.
 if (typeof window !== 'undefined') {
   (window as unknown as { __feedTelFlush?: () => void }).__feedTelFlush = flushSummary;
+  const autoFlush = () => { try { flushSummary(); } catch {} };
+  window.addEventListener('pagehide', autoFlush);
+  document.addEventListener('visibilitychange', () => {
+    if (document.visibilityState === 'hidden') autoFlush();
+  });
 }
