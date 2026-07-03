@@ -94,19 +94,20 @@ export const SnapVideoPlayer = memo(function SnapVideoPlayer({
     if (shouldAttach) {
       video.muted = useClubhouseStore.getState().isMuted;
       video.playsInline = true;
-      pool.attach(hlsUrl, video, mp4Url, isFullscreen ? 'fullscreen' : 'feed').then(() => {
+      // FLIP continuity — fullscreen only. Consume the start entry BEFORE
+      // attach so useHlsPool can thread startPosition into hls.js config and
+      // startLoad(pos). This makes the first fetched segment already the seek
+      // point — no restart-at-0 stall.
+      const s = isFullscreen ? flipContinuity.consumeStart(hlsUrl) : null;
+      const startPos = s && s.t > 0.05 ? s.t : undefined;
+      pool.attach(hlsUrl, video, mp4Url, isFullscreen ? 'fullscreen' : 'feed', startPos).then(() => {
         if (cancelled) return;
-        // FLIP continuity — fullscreen only. Consume the start entry stashed by
-        // openWithOrigin BEFORE the 0.001 nudge (which would clobber the seek).
-        const s = isFullscreen ? flipContinuity.consumeStart(hlsUrl) : null;
-        if (s && s.t > 0.05) {
-          try { video.currentTime = s.t; } catch {}
-          setAttachToken((t) => t + 1);
-          fsEvent('🎯 FS_CONSUME_START', { url: hlsUrl, t: s.t, wasPlaying: s.wasPlaying });
-          if (s.wasPlaying !== false) { try { video.play().catch(() => {}); } catch {} }
+        setAttachToken((t) => t + 1);
+        if (startPos != null) {
+          fsEvent('🎯 FS_CONSUME_START', { url: hlsUrl, t: startPos, wasPlaying: s?.wasPlaying });
+          if (s?.wasPlaying !== false) { try { video.play().catch(() => {}); } catch {} }
           return;
         }
-        setAttachToken((t) => t + 1);
         try { if (video.currentTime < 0.001) video.currentTime = 0.001; } catch {}
       });
       return () => { cancelled = true; };
