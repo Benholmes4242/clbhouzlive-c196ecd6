@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useMemo, useRef, useState, useId } from "react";
+import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { X, Play, Pause, ListMusic, Maximize2, Volume2, VolumeX, AlertTriangle } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useVideoPlaybackSafe } from "@/context/VideoPlaybackContext";
@@ -6,9 +6,7 @@ import { usePostData } from "@/hooks/usePostData";
 import { useVideoProgress } from "@/hooks/useVideoProgress";
 import { useVideoQueue } from "@/hooks/useVideoQueue";
 import { uidFromNode, generateHlsUrl, generateThumbnailUrl } from "@/utils/cloudflareStreamTransform";
-import UnifiedVideoPlayer, { UnifiedVideoPlayerRef } from '@/media/components/UnifiedVideoPlayer';
 import { trackVideoCloseMini } from "@/lib/analytics/videoAnalytics";
-import { MediaRuntime } from '@/media/runtime/MediaRuntime';
 import { useClubhouseStore } from '@/store/clubhouseStore';
 
 type MiniVideo = {
