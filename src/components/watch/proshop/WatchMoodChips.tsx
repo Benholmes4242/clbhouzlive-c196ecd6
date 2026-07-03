@@ -65,18 +65,7 @@ function WatchMoodChipsInner({ active, onChange }: WatchMoodChipsProps) {
         aria-hidden
         className="pointer-events-none absolute top-0 left-0 h-full hrail-fade hrail-fade-left"
         style={{
-          width: 28,
-          background: 'linear-gradient(to right, #F8FAFC 0%, rgba(248,250,252,0) 100%)',
-          opacity: 0,
-          transition: 'opacity 150ms ease',
-        }}
-      />
-      {/* Right fade (only when scrollable further right) */}
-      <div
-        aria-hidden
-        className="pointer-events-none absolute top-0 right-0 h-full hrail-fade hrail-fade-right"
-        style={{
-          width: 28,
+          width: 20,
           background: 'linear-gradient(to right, rgba(248,250,252,0) 0%, #F8FAFC 100%)',
           opacity: 0,
           transition: 'opacity 150ms ease',

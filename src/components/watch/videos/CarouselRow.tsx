@@ -120,7 +120,7 @@ export default function CarouselRow({ items, allPosts, baseIndex, userId }: Caro
         aria-hidden
         className="hrail-fade hrail-fade-left"
         style={{
-          position: 'absolute', top: 0, bottom: 0, left: 0, width: 28,
+          position: 'absolute', top: 0, bottom: 0, left: 0, width: 20,
           pointerEvents: 'none',
           background: 'linear-gradient(to right, #F8FAFC 0%, rgba(248,250,252,0) 100%)',
           opacity: 0, transition: 'opacity 150ms ease',
@@ -130,7 +130,7 @@ export default function CarouselRow({ items, allPosts, baseIndex, userId }: Caro
         aria-hidden
         className="hrail-fade hrail-fade-right"
         style={{
-          position: 'absolute', top: 0, bottom: 0, right: 0, width: 28,
+          position: 'absolute', top: 0, bottom: 0, right: 0, width: 20,
           pointerEvents: 'none',
           background: 'linear-gradient(to right, rgba(248,250,252,0) 0%, #F8FAFC 100%)',
           opacity: 0, transition: 'opacity 150ms ease',
