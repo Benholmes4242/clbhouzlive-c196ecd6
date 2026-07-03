@@ -338,11 +338,33 @@ export const InlineVideo: React.FC<Props> = ({
   const useNativeLoop = duration === 0 || duration >= 15;
   const showProgress = duration > 20 && hasFirstFrame;
 
+  const posterUrl = (item as any).thumbnailUrl as string | undefined;
+
   return (
     <div
       ref={containerRef}
       style={{ position: 'absolute', inset: 0, backgroundColor: '#0a0a0a' }}
     >
+      {/* Poster underlay — the never-black fallback. Sits under the <video>
+          (zIndex 0) and stays mounted so the FLIP-return re-attach gap is
+          covered by the real thumbnail instead of a black frame. */}
+      {posterUrl && (
+        <img
+          src={posterUrl}
+          alt=""
+          aria-hidden
+          style={{
+            position: 'absolute',
+            inset: 0,
+            width: '100%',
+            height: '100%',
+            objectFit,
+            display: 'block',
+            zIndex: 0,
+            pointerEvents: 'none',
+          }}
+        />
+      )}
       <video
         ref={videoRef}
         muted
