@@ -1,13 +1,7 @@
-/**
- * Media Upload System
- * 
- * Re-exports all upload-related functionality
- */
-
-export { 
+export {
   useMediaUpload,
   default as useMediaUploadDefault,
-} from '../hooks/useMediaUpload';
+} from '@/uploads/hooks/useMediaUpload';
 
 export type {
   UploadMediaStatus,
@@ -17,4 +11,4 @@ export type {
   MediaUploadOptions,
   R2BucketType,
   UseMediaUploadReturn,
-} from '../hooks/useMediaUpload';
+} from '@/uploads/hooks/useMediaUpload';
