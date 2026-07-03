@@ -45,6 +45,7 @@ export function MediaThumbnail({
     >
       <button onClick={onExpand} className="w-full h-full">
         {isVideo && !item.thumbnailUrl ? (
+          // Upload/preview <video> — not streaming playback; out of teardown scope.
           <video
             src={item.previewUrl}
             className="w-full h-full object-cover pointer-events-none"

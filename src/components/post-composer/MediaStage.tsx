@@ -216,6 +216,7 @@ export function MediaStage({
               </div>
             </div>
           ) : (
+            // Upload/preview <video> — not streaming playback; out of teardown scope.
             <video
               src={item.previewUrl}
               poster={item.posterUrl}

@@ -1,120 +1,49 @@
 /**
- * UnifiedVideoPlayer - THE video player for the entire app
- * 
- * Single component that replaces HLSPlayer, HLSVideoCard, and EnhancedVideoPlayer.
- * 
- * Architecture:
- * - Paused-Video-First: Video loads paused, displays first frame, then unpauses
- * - MediaRuntime Integration: Registers with runtime for playback coordination
- * - HLS.js with Native Fallback: HLS.js on most browsers, native on iOS Safari
- * - HLS Pool Integration: Promotes preloaded HLS instances for instant playback
- * - Composition: Controls, scrubber, overlay are optional
+ * UnifiedVideoPlayer — [VIDEOSTUB] poster-only chassis (Stage D remediation)
+ *
+ * All HLS/<video>/attachMedia/MediaRuntime playback logic has been removed.
+ * Renders the poster image only. The component + ref API are exported as
+ * inert no-ops so the 6 importers (enhanced-video-player, VideoPlayerModal,
+ * CarouselSlide, UnifiedMediaTile, MediaDisplay, VideoOverlay re-export, and
+ * HLSPlayer wrapper) continue to compile without change.
  */
 
 import React, {
   forwardRef,
   useImperativeHandle,
   useRef,
-  useState,
   useEffect,
-  useCallback,
-  useMemo,
 } from 'react';
 import { cn } from '@/lib/utils';
-import { loadHlsJs } from '@/utils/hlsLoader';
-import { safePlay } from '@/utils/safePlay';
-import { MediaRuntime } from '@/media/runtime/MediaRuntime';
 import type { MediaSurface } from '@/media/runtime/MediaRuntime';
-import { CLOUDFLARE_STREAM_PATTERNS } from '@/media/constants';
 import type { PlaybackState, MediaError, AspectRatio } from '@/media/types';
-import { VideoOverlay } from './VideoOverlay';
-import { registerHlsForDebug, unregisterHlsForDebug } from '@/components/debug/hlsDebugRegistry';
 
-import { DecoderLimitManager } from '@/utils/video/DecoderLimitManager';
-import { useGaplessLoop } from '@/utils/video/GaplessLoop';
-import { videoDebug } from '@/config/videoDebug';
-import { VideoControls } from './VideoControls';
-import { VideoScrubber } from '@/components/video/VideoScrubber';
-import { Volume2, VolumeX } from 'lucide-react';
-import { extractCloudflareUid } from '@/utils/videoIdUtils';
-// TODO Brief 3: re-wire cachedHlsLoader
-import { HLSPoolManager } from '@/media/HLSPoolManager';
-import { useBufferingIndicator } from '@/hooks/useBufferingIndicator';
-import { useAudioFade } from '@/hooks/useAudioFade';
-import { videoReadyFlags } from '@/utils/videoReadyFlags';
-import type HlsType from 'hls.js';
-import { 
-  MOBILE_VIDEO_DEBUG, 
-  attachVideoEventLoggers, 
-  logAutoplayEffectFire,
-  logHlsEvent,
-  logHlsError,
-  logVideoElementMount,
-  logVideoElementUnmount,
-  logPoolTrace,
-} from '@/media/mobileVideoDebug';
-
-import { getSharedBandwidth, saveSharedBandwidth } from '@/utils/sharedBandwidth';
-const setNativeHlsSource = async (video: HTMLVideoElement, url: string) => { video.src = url; };
-
-// ============ Types ============
+// ============ Types (preserved) ============
 
 export interface UnifiedVideoPlayerProps {
-  /** HLS URL, Stream URL, or MP4 URL */
   src?: string;
-  /** Cloudflare Stream UID (alternative to src) */
   streamId?: string;
-  /** Thumbnail/poster image URL */
   posterUrl?: string;
-  /** MP4 fallback URL for error recovery */
   mp4FallbackUrl?: string;
-  
-  /** Aspect ratio preset or 'auto' */
   aspectRatio?: AspectRatio | '3:4' | '16:9' | '1:1' | '9:16';
-  /** Object fit mode */
   objectFit?: 'cover' | 'contain';
-  
-  /** Enable autoplay when visible */
   autoplay?: boolean;
-  /** Start muted */
   muted?: boolean;
-  /** Loop playback */
   loop?: boolean;
-  
-  /** Surface type for priority */
   surface?: MediaSurface;
-  
-  /** Show controls bar */
   controls?: boolean;
-  /** Show progress scrubber */
   scrubber?: boolean;
-  /** Show center play button */
   showPlayButton?: boolean;
-  /** Show mute toggle button */
   showMuteButton?: boolean;
-  /** Show HD quality badge */
   showQualityBadge?: boolean;
-  
-  /** Preload strategy */
   preload?: 'auto' | 'metadata' | 'none';
-  /** Start time in seconds */
   startTime?: number;
-  /** Media ID for runtime tracking */
   mediaId?: string;
-  /** If true, MediaRuntime controls playback */
   managedByMediaRuntime?: boolean;
-  
-  /** Trim range — start playback at this time */
   trimStart?: number | null;
-  /** Trim range — loop/stop at this time */
   trimEnd?: number | null;
-  
-  /** Additional CSS classes */
   className?: string;
-  /** Inline styles */
   style?: React.CSSProperties;
-  
-  // Callbacks
   onPlay?: () => void;
   onPause?: () => void;
   onEnded?: () => void;
@@ -146,1077 +75,87 @@ export interface UnifiedVideoPlayerRef {
   isAttached: () => boolean;
 }
 
-// ============ Component ============
+const ASPECT_CLASS: Record<string, string> = {
+  '16:9': 'aspect-video',
+  '9:16': 'aspect-[9/16]',
+  '1:1': 'aspect-square',
+  '3:4': 'aspect-[3/4]',
+};
 
-const UnifiedVideoPlayerInner = forwardRef<UnifiedVideoPlayerRef, UnifiedVideoPlayerProps>(
+if (typeof window !== 'undefined' && !(window as any).__VIDEOSTUB_LOGGED__) {
+  (window as any).__VIDEOSTUB_LOGGED__ = true;
+  // eslint-disable-next-line no-console
+  console.log('[VIDEOSTUB] active — UnifiedVideoPlayer is poster-only');
+}
+
+export const UnifiedVideoPlayer = forwardRef<UnifiedVideoPlayerRef, UnifiedVideoPlayerProps>(
   (props, ref) => {
     const {
-      src,
-      streamId,
       posterUrl,
-      mp4FallbackUrl,
       aspectRatio = 'auto',
       objectFit = 'cover',
-      autoplay = false,
-      muted = true,
-      loop = false,
-      surface = 'grid',
-      controls = false,
-      scrubber = false,
-      showPlayButton = false,
-      showMuteButton = false,
-      showQualityBadge = false,
-      preload = 'metadata',
-      startTime,
-      mediaId,
-      managedByMediaRuntime = false,
-      trimStart,
-      trimEnd,
       className,
       style,
-      onPlay,
-      onPause,
-      onEnded,
       onClick,
-      onError,
-      onTimeUpdate,
-      onStateChange,
       onLoadedData,
-      onCanPlayThrough,
     } = props;
 
-    // ============ Refs ============
-    const videoRef = useRef<HTMLVideoElement>(null);
     const containerRef = useRef<HTMLDivElement>(null);
-    const hlsRef = useRef<HlsType | null>(null);
-    const mountedRef = useRef(true);
-    const isAttachedRef = useRef(true);
-    const currentSrcRef = useRef<string | null>(null);
-    // FIX #7: Timeout ref for first frame fallback
-    const firstFrameTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
-    // ============ State ============
-    const [playbackState, setPlaybackState] = useState<PlaybackState>('idle');
-    const [currentTime, setCurrentTime] = useState(0);
-    const [duration, setDuration] = useState(0);
-    const [isMutedState, setIsMutedState] = useState(muted);
-    const [error, setError] = useState<MediaError | null>(null);
-    const [quality, setQuality] = useState(0);
-    const [hasFirstFrame, setHasFirstFrame] = useState(false);
-    const [showPlaceholder, setShowPlaceholder] = useState(true);
-    const [bufferedPct, setBufferedPct] = useState(0);
-    
-    // ============ TikTok-Level Buffering Indicator ============
-    // FIX #3: For clubhouse/hero videos, effectively disable spinner (999999ms delay)
-    // Showing a static first-frame is visually superior to a spinner
-    const isFeedVideo = surface === 'clubhouse' || surface === 'hero' || surface === 'watch';
-    const { showBuffering, isBuffering } = useBufferingIndicator(videoRef.current, {
-      showDelay: isFeedVideo ? 999999 : 800,
-      minDisplayTime: 400,
-    });
-
-    // ============ FIX #10: Audio Fade Hook ============
-    // Smooth 150ms volume transitions instead of abrupt mute/unmute
-    const { fadeIn, fadeOut } = useAudioFade({ duration: 150, easing: 'easeOut' });
-
-    // ============ Gapless Loop Hook ============
-    // Enable gapless looping for feed videos (not for fullscreen scrubbing scenarios)
-    // Uses RAF monitoring to seek before end, eliminating black frame gap
-    const enableGaplessLoop = loop && !managedByMediaRuntime;
-    useGaplessLoop(videoRef, enableGaplessLoop, false);
-
-    // ============ Derived Values ============
-    const hlsUrl = useMemo(() => {
-      if (streamId) {
-        return CLOUDFLARE_STREAM_PATTERNS.HLS(streamId);
-      }
-      return src;
-    }, [streamId, src]);
-
-    const poster = useMemo(() => {
-      if (posterUrl) return posterUrl;
-      if (streamId) {
-        return CLOUDFLARE_STREAM_PATTERNS.THUMBNAIL(streamId);
-      }
-      return undefined;
-    }, [posterUrl, streamId]);
-
-    const mp4Fallback = useMemo(() => {
-      if (mp4FallbackUrl) return mp4FallbackUrl;
-      if (streamId) {
-        return CLOUDFLARE_STREAM_PATTERNS.MP4(streamId);
-      }
-      return undefined;
-    }, [mp4FallbackUrl, streamId]);
-
-    const uniqueMediaId = useMemo(() => {
-      return mediaId || `video-${Date.now()}-${Math.random().toString(36).slice(2)}`;
-    }, [mediaId]);
-
-    // Extract Cloudflare UID for cache key consistency
-    const cloudflareUid = useMemo(() => {
-      return hlsUrl ? extractCloudflareUid(hlsUrl) : '';
-    }, [hlsUrl]);
-
-    // ============ Aspect Ratio Styles ============
-    const aspectRatioStyle = useMemo(() => {
-      if (aspectRatio === 'auto') return {};
-      const ratioMap: Record<string, string> = {
-        '3:4': '3/4',
-        '4:3': '4/3',
-        '16:9': '16/9',
-        '9:16': '9/16',
-        '1:1': '1/1',
-        '21:9': '21/9',
-      };
-      return { aspectRatio: ratioMap[aspectRatio] || aspectRatio };
-    }, [aspectRatio]);
-
-    // ============ State Change Handler ============
-    const updatePlaybackState = useCallback((newState: PlaybackState) => {
-      setPlaybackState(newState);
-      onStateChange?.(newState);
-    }, [onStateChange]);
-
-    // ============ Imperative Handle ============
     useImperativeHandle(ref, () => ({
-      play: async () => {
-        const video = videoRef.current;
-        if (!video) return false;
-        return await safePlay(video);
-      },
-      pause: () => {
-        videoRef.current?.pause();
-      },
-      toggle: () => {
-        const video = videoRef.current;
-        if (!video) return;
-        if (video.paused) {
-          safePlay(video);
-        } else {
-          video.pause();
-        }
-      },
-      seek: (time: number) => {
-        const video = videoRef.current;
-        if (video) {
-          video.currentTime = time;
-        }
-      },
-      seekToPercent: (percent: number) => {
-        const video = videoRef.current;
-        if (video && video.duration) {
-          video.currentTime = (percent / 100) * video.duration;
-        }
-      },
-      getCurrentTime: () => videoRef.current?.currentTime ?? 0,
-      getDuration: () => videoRef.current?.duration ?? 0,
-      getPlaybackState: () => playbackState,
-      isPaused: () => videoRef.current?.paused ?? true,
-      isMuted: () => isMutedState,
-      // FIX #10: Use audio fade for smooth mute transition
-      mute: async () => {
-        if (videoRef.current) {
-          setIsMutedState(true);
-          await fadeOut(videoRef.current);
-        }
-      },
-      // FIX #10: Use audio fade for smooth unmute transition
-      unmute: async () => {
-        if (videoRef.current) {
-          setIsMutedState(false);
-          await fadeIn(videoRef.current, 1);
-        }
-      },
-      // FIX #10: Use audio fade for smooth toggle
-      toggleMute: async () => {
-        if (videoRef.current) {
-          const newMuted = !isMutedState;
-          setIsMutedState(newMuted);
-          if (newMuted) {
-            await fadeOut(videoRef.current);
-          } else {
-            await fadeIn(videoRef.current, 1);
-          }
-        }
-      },
-      getVideoElement: () => videoRef.current,
-      isAttached: () => isAttachedRef.current,
-      attach: () => {
-        if (!isAttachedRef.current && videoRef.current && hlsUrl) {
-          isAttachedRef.current = true;
-          currentSrcRef.current = null;
-          setHasFirstFrame(false);
-          setShowPlaceholder(true);
-          setPlaybackState('idle');
-        }
-      },
-      detach: () => {
-        const video = videoRef.current;
-        if (!video) return;
-        
-        isAttachedRef.current = false;
-        currentSrcRef.current = null;
-        video.pause();
-        
-        if (hlsRef.current) {
-          try {
-            // Phase 1: return to pool for reuse instead of destroying, if pool-eligible.
-            // demote() handles stopLoad + detach internally.
-            logPoolTrace(`teardown: has=${hlsUrl ? HLSPoolManager.has(hlsUrl) : 'noUrl'} url=…${hlsUrl ? hlsUrl.slice(-16) : ''}`);
-            if (hlsUrl && HLSPoolManager.has(hlsUrl)) {
-              HLSPoolManager.demote(hlsUrl, hlsRef.current);
-            } else {
-              hlsRef.current.stopLoad();
-              hlsRef.current.detachMedia();
-              hlsRef.current.destroy();
-            }
-          } catch {}
-          hlsRef.current = null;
-        }
-        
-        video.removeAttribute('src');
-        video.load();
-        setShowPlaceholder(true);
-        setHasFirstFrame(false);
-        setPlaybackState('idle');
-      },
-    }), [playbackState, isMutedState, hlsUrl]);
+      play: async () => false,
+      pause: () => {},
+      toggle: () => {},
+      seek: () => {},
+      seekToPercent: () => {},
+      getCurrentTime: () => 0,
+      getDuration: () => 0,
+      getPlaybackState: () => 'idle' as PlaybackState,
+      isPaused: () => true,
+      isMuted: () => true,
+      mute: () => {},
+      unmute: () => {},
+      toggleMute: () => {},
+      getVideoElement: () => null,
+      attach: () => {},
+      detach: () => {},
+      isAttached: () => false,
+    }), []);
 
-    // ============ Sync Muted State ============
-    // Belt-and-suspenders: keep DOM .muted in sync with the muted prop from GlobalAudioContext.
-    // This effect is the primary mechanism — the playing enforcer below is the safety net.
+    // Fire onLoadedData once so consumers that gate UI on it don't hang.
     useEffect(() => {
-      setIsMutedState(muted);
-      if (videoRef.current) {
-        videoRef.current.muted = muted;
-        // Restore volume when unmuting so audio is audible
-        if (!muted && videoRef.current.volume === 0) {
-          videoRef.current.volume = 1;
-        }
-      }
-    }, [muted]);
+      if (!posterUrl) return;
+      const t = setTimeout(() => onLoadedData?.(), 0);
+      return () => clearTimeout(t);
+    }, [posterUrl, onLoadedData]);
 
-    // ============ Change 7: Playing Event Enforcer ============
-    // Every time the video transitions to "playing" (including after buffering stalls,
-    // seeks, gesture retries, or source changes), re-apply the global mute state.
-    // This is the ultimate safety net against any drift from any source.
-    useEffect(() => {
-      const video = videoRef.current;
-      if (!video) return;
+    const aspectClass = ASPECT_CLASS[aspectRatio as string] ?? '';
 
-      const enforceGlobalMute = () => {
-        if (video.muted !== muted) {
-          video.muted = muted;
-        }
-        // Also ensure volume is non-zero when unmuted
-        if (!muted && video.volume === 0) {
-          video.volume = 1;
-        }
-      };
-
-      video.addEventListener('playing', enforceGlobalMute);
-      return () => video.removeEventListener('playing', enforceGlobalMute);
-    }, [muted]);
-
-    // ============ Video Element Lifecycle Logging ============
-    useEffect(() => {
-      const video = videoRef.current;
-      const id = cloudflareUid || uniqueMediaId;
-      if (!video) return;
-      
-      // Log mount
-      logVideoElementMount(id, video);
-      
-      // Log unmount on cleanup
-      return () => {
-        logVideoElementUnmount(id);
-      };
-    }, [cloudflareUid, uniqueMediaId]);
-
-    // ============ Mobile Video Debug Event Loggers ============
-    useEffect(() => {
-      const video = videoRef.current;
-      if (!video) return;
-      
-      // Attach comprehensive event loggers for mobile debugging
-      const cleanup = attachVideoEventLoggers(video, cloudflareUid || uniqueMediaId);
-      return cleanup;
-    }, [cloudflareUid, uniqueMediaId]);
-
-    // ============ Video Event Handlers ============
-    useEffect(() => {
-      const video = videoRef.current;
-      if (!video) return;
-
-      const handlePlay = () => {
-        updatePlaybackState('playing');
-        onPlay?.();
-        // Trim: ensure playback starts within trim range
-        if (trimStart != null && video.currentTime < trimStart) {
-          video.currentTime = trimStart;
-        }
-        if (trimEnd != null && video.currentTime >= trimEnd) {
-          video.currentTime = trimStart || 0;
-        }
-      };
-
-      const handlePause = () => {
-        updatePlaybackState('paused');
-        onPause?.();
-      };
-
-      const handleEnded = () => {
-        updatePlaybackState('ended');
-        onEnded?.();
-      };
-
-      const handleWaiting = () => {
-        // Note: isBuffering is now managed by useBufferingIndicator hook
-        updatePlaybackState('loading');
-      };
-
-      const handlePlaying = () => {
-        // Note: isBuffering is now managed by useBufferingIndicator hook
-        updatePlaybackState('playing');
-
-        // Poster crossfade fallback: 'playing' fires before first frame paints,
-        // but rVFC below is the precise trigger. Both are guarded by !hasFirstFrame.
-        if (!hasFirstFrame) {
-          setHasFirstFrame(true);
-          setShowPlaceholder(false);
-        }
-      };
-
-      // Phase 1: precise reveal on first painted frame (iOS Safari 15.4+, modern Chrome).
-      // Falls back to 'playing' handler on older webviews without rVFC.
-      const anyVideo = video as any;
-      if (typeof anyVideo.requestVideoFrameCallback === 'function') {
-        anyVideo.requestVideoFrameCallback(() => {
-          if (!hasFirstFrame) {
-            setHasFirstFrame(true);
-            setShowPlaceholder(false);
-          }
-        });
-      }
-
-      const handleCanPlay = () => {
-        // [Bootstrap Diagnostic] First video canplay
-        videoDebug('bootstrap', 'Video canplay', { 
-          timestamp: performance.now().toFixed(1),
-          uniqueMediaId,
-          readyState: video.readyState
-        });
-        
-        
-        if (playbackState === 'loading' || playbackState === 'idle') {
-          updatePlaybackState('ready');
-        }
-      };
-
-      const handleLoadedData = () => {
-        // FIX #7: Clear first frame timeout when loadeddata fires normally
-        if (firstFrameTimeoutRef.current) {
-          clearTimeout(firstFrameTimeoutRef.current);
-          firstFrameTimeoutRef.current = null;
-        }
-        // Trim: seek to trim start on load
-        if (trimStart != null && video.currentTime < trimStart) {
-          video.currentTime = trimStart;
-        }
-        // Poster crossfade moved to 'playing' handler — loadeddata only
-        // means the first frame is decoded, not that playback has started.
-        updatePlaybackState('ready');
-        onLoadedData?.();
-      };
-
-      const handleCanPlayThrough = () => {
-        onCanPlayThrough?.();
-      };
-
-      const handleTimeUpdate = () => {
-        const time = video.currentTime;
-        const dur = video.duration;
-        setCurrentTime(time);
-        if (Number.isFinite(dur)) {
-          setDuration(dur);
-        }
-        onTimeUpdate?.(time, dur || 0);
-
-        // Trim: enforce trim_end boundary
-        if (trimEnd != null && time >= trimEnd) {
-          if (loop) {
-            video.currentTime = trimStart || 0;
-          } else {
-            video.pause();
-          }
-        }
-
-        // Update buffered percentage
-        if (video.buffered.length > 0 && dur > 0) {
-          const bufferedEnd = video.buffered.end(video.buffered.length - 1);
-          setBufferedPct(bufferedEnd / dur);
-        }
-      };
-
-      const handleError = () => {
-        const mediaError: MediaError = {
-          type: 'unknown',
-          message: video.error?.message || 'Video playback error',
-          recoverable: !!mp4Fallback,
-        };
-        setError(mediaError);
-        updatePlaybackState('error');
-        onError?.(mediaError);
-      };
-
-      video.addEventListener('play', handlePlay);
-      video.addEventListener('pause', handlePause);
-      video.addEventListener('ended', handleEnded);
-      video.addEventListener('waiting', handleWaiting);
-      video.addEventListener('playing', handlePlaying);
-      video.addEventListener('canplay', handleCanPlay);
-      video.addEventListener('loadeddata', handleLoadedData);
-      video.addEventListener('canplaythrough', handleCanPlayThrough);
-      video.addEventListener('timeupdate', handleTimeUpdate);
-      video.addEventListener('error', handleError);
-
-      return () => {
-        video.removeEventListener('play', handlePlay);
-        video.removeEventListener('pause', handlePause);
-        video.removeEventListener('ended', handleEnded);
-        video.removeEventListener('waiting', handleWaiting);
-        video.removeEventListener('playing', handlePlaying);
-        video.removeEventListener('canplay', handleCanPlay);
-        video.removeEventListener('loadeddata', handleLoadedData);
-        video.removeEventListener('canplaythrough', handleCanPlayThrough);
-        video.removeEventListener('timeupdate', handleTimeUpdate);
-        video.removeEventListener('error', handleError);
-      };
-    }, [mp4Fallback, onPlay, onPause, onEnded, onError, onTimeUpdate, onLoadedData, onCanPlayThrough, updatePlaybackState, playbackState, trimStart, trimEnd, loop]);
-
-    // ============ HLS Setup ============
-    useEffect(() => {
-      const video = videoRef.current;
-      if (!video || !hlsUrl) return;
-      if (!isAttachedRef.current) return;
-      
-      // GUARD: Skip if same source already loaded (prevents re-render spam)
-      // This single check handles both HLS.js and native iOS playback
-      if (hlsUrl === currentSrcRef.current) {
-        return;
-      }
-      
-      currentSrcRef.current = hlsUrl;
-      mountedRef.current = true;
-      
-      // Reset state for new source
-      setError(null);
-      setHasFirstFrame(false);
-      setShowPlaceholder(true);
-      updatePlaybackState('loading');
-      
-      // FIX #7: Clear any existing first frame timeout
-      if (firstFrameTimeoutRef.current) {
-        clearTimeout(firstFrameTimeoutRef.current);
-        firstFrameTimeoutRef.current = null;
-      }
-      
-      // FIX #7: Set up first frame timeout fallback (3s)
-      // If loadeddata never fires (stalled network), force transition if video has any data
-      firstFrameTimeoutRef.current = setTimeout(() => {
-        if (!mountedRef.current) return;
-        
-        const video = videoRef.current;
-        if (!video) return;
-        
-        // Only force first frame if we haven't already got it and video has some data
-        if (!hasFirstFrame && (video.readyState >= 1 || video.buffered.length > 0)) {
-          console.log('[UnifiedVideoPlayer] First frame timeout fallback triggered');
-          setHasFirstFrame(true);
-          setShowPlaceholder(false);
-        }
-      }, 3000);
-
-      // Cleanup previous HLS instance — Phase 1: demote pool-eligible instances.
-      if (hlsRef.current) {
-        try {
-          logPoolTrace(`teardown: has=${hlsUrl ? HLSPoolManager.has(hlsUrl) : 'noUrl'} url=…${hlsUrl ? hlsUrl.slice(-16) : ''}`);
-          if (hlsUrl && HLSPoolManager.has(hlsUrl)) {
-            HLSPoolManager.demote(hlsUrl, hlsRef.current);
-          } else {
-            hlsRef.current.stopLoad();
-            hlsRef.current.detachMedia();
-            hlsRef.current.destroy();
-          }
-        } catch {}
-        hlsRef.current = null;
-      }
-
-      const setupSource = async () => {
-        const video = videoRef.current;
-        if (!video) return;
-
-        // FIX #1: Wait for prefetch before HLS setup
-        // Check if this video is already prefetched and ready
-        if (cloudflareUid) {
-          if (videoReadyFlags.isReady(cloudflareUid)) {
-            videoDebug('hlsEvents', 'Prefetch ready (SW-cached segments expected)', { uid: cloudflareUid });
-          } else if (videoReadyFlags.isPending(cloudflareUid)) {
-            // Prefetch is in progress — wait for it to complete (max 3 seconds)
-            videoDebug('hlsEvents', 'Waiting for prefetch to complete', { uid: cloudflareUid });
-            // Removed: 3s waitForReady was blocking HLS setup unnecessarily
-          }
-        }
-
-        // Request decoder slot before proceeding
-        const slotGranted = DecoderLimitManager.requestSlot(
-          uniqueMediaId,
-          video,
-          autoplay ? 'playing' : 'visible',
-          () => {
-            // This callback is called if we get evicted
-            videoDebug('decoderLimit', 'Evicted from decoder pool', { uniqueMediaId });
-            // Detach HLS to free decoder
-            if (hlsRef.current) {
-              hlsRef.current.stopLoad();
-              hlsRef.current.detachMedia();
-            }
-          }
-        );
-
-        if (!slotGranted) {
-          videoDebug('decoderLimit', 'Decoder slot denied, skipping setup', { uniqueMediaId });
-          return; // Don't attach if no slot available
-        }
-
-        // Check for native HLS support — do NOT short-circuit on isIOS.
-        // Modern iOS Safari (15.1+) supports MediaSource Extensions, so HLS.js
-        // works correctly and gives us full ABR quality control.
-        // Falling back to native Safari HLS surrenders all quality configuration.
-        const Hls = await loadHlsJs();
-        
-        const canPlayNatively = (!Hls || !Hls.isSupported()) &&
-          (video.canPlayType('application/vnd.apple.mpegurl') !== '' ||
-          video.canPlayType('application/vnd.apple.mpegURL') !== '');
-
-        const isHlsUrl = hlsUrl.includes('.m3u8');
-        logPoolTrace(`canPlayNatively=${canPlayNatively} isHlsUrl=${isHlsUrl} HlsSupported=${Hls ? Hls.isSupported() : 'noHls'}`);
-
-        if (canPlayNatively || !isHlsUrl) {
-          logPoolTrace(`→ NATIVE path (pool skipped) url=…${hlsUrl.slice(-16)}`);
-          // Native playback - fetch manifest and select highest quality rendition
-          // Native playback - fetch manifest and select highest quality rendition
-          // iOS native HLS ignores all query hints, so we parse the manifest ourselves
-          await setNativeHlsSource(video, hlsUrl);
-          video.load();
-          
-          if (startTime && startTime > 0) {
-            video.currentTime = startTime;
-          }
-          // Register with debug panel — null hls since native path has no HLS.js instance
-          registerHlsForDebug(cloudflareUid || uniqueMediaId, null, video);
-          return;
-        }
-        // HLS.js playback — Hls is already loaded above
-
-        // HLS.js playback — Hls is already loaded above
-        try {
-          if (!Hls || !Hls.isSupported() || !mountedRef.current) {
-            // Fall back to native — fetch manifest and select highest quality rendition
-            await setNativeHlsSource(video, hlsUrl);
-            return;
-          }
-
-          // FIX #2: Check HLS Pool for preloaded instance first
-          // This promotes pre-created instances instead of creating new ones
-          logPoolTrace(`→ HLS.JS path, checking pool, has=${HLSPoolManager.has(hlsUrl)} url=…${hlsUrl.slice(-16)}`);
-          const pooledHls = HLSPoolManager.promote(hlsUrl, video);
-          
-          if (pooledHls) {
-            // Use promoted instance - already attached to video
-            hlsRef.current = pooledHls;
-            registerHlsForDebug(cloudflareUid || uniqueMediaId, pooledHls, video);
-            
-            // Re-wire event handlers for the promoted instance
-            pooledHls.on(Hls.Events.MANIFEST_PARSED, () => {
-              if (MOBILE_VIDEO_DEBUG) {
-                logHlsEvent('MANIFEST_PARSED (promoted)', cloudflareUid || uniqueMediaId);
-              }
-              if (startTime && startTime > 0) {
-                video.currentTime = startTime;
-              }
-              // FIX #5: Call play() immediately after MANIFEST_PARSED with skipReadyStateWait
-              if (autoplay && !managedByMediaRuntime) {
-                const isFeed = surface === 'clubhouse' || surface === 'hero' || surface === 'watch';
-                safePlay(video, { skipReadyStateWait: isFeed });
-              }
-            });
-
-            pooledHls.on(Hls.Events.LEVEL_SWITCHED, (_, data) => {
-              const level = pooledHls.levels[data.level];
-              if (level) {
-                setQuality(level.height);
-                // Save real bitrate measurement for next video instance
-                if (level.bitrate > 0) {
-                  saveSharedBandwidth(level.bitrate);
-                }
-              }
-            });
-
-            pooledHls.on(Hls.Events.FRAG_LOADED, (_, data) => {
-              // Save real measured download bandwidth for next HLS.js instance
-              if (data.frag?.stats?.bwEstimate && data.frag.stats.bwEstimate > 0) {
-                saveSharedBandwidth(data.frag.stats.bwEstimate);
-              }
-            });
-
-            pooledHls.on(Hls.Events.ERROR, (_, data) => {
-              if (MOBILE_VIDEO_DEBUG) {
-                logHlsError(cloudflareUid || uniqueMediaId, data.fatal, data.type, data.details);
-              }
-              if (data.fatal && mp4Fallback) {
-                pooledHls.destroy();
-                hlsRef.current = null;
-                video.src = mp4Fallback;
-              }
-            });
-
-            // Start loading if stopped
-            pooledHls.startLoad();
-            
-            if (MOBILE_VIDEO_DEBUG) {
-              logHlsEvent('HLS_POOL_PROMOTED', cloudflareUid || uniqueMediaId);
-            }
-            return;
-          }
-
-          // No pooled instance available - create new one
-          const hls = new Hls({
-            // Quality: let ABR auto-select start level based on measured bandwidth.
-            // startLevel: 0 was forcing lowest quality (blurry) — removed.
-            startLevel: -1,
-
-            // Quality: do NOT cap quality to player pixel dimensions.
-            // capLevelToPlayerSize: true was capping at ~360-540p on phones — removed.
-            capLevelToPlayerSize: false,
-
-            // Quality: seed with shared bandwidth from previous video, or 8 Mbps default.
-            // Shared estimate ensures video #2+ starts at the quality video #1 measured.
-            abrEwmaDefaultEstimate: getSharedBandwidth() > 0
-              ? getSharedBandwidth()
-              : 8_000_000,   // 8 Mbps default on first video — aggressive but safe given observed 100% buffer health
-
-            // Quality: ramp up to higher quality more aggressively.
-            abrBandWidthFactor: 0.95,         // Use 95% of measured bandwidth
-            abrBandWidthUpFactor: 0.5,        // Step up quality much more aggressively
-            highBufferWatchdogPeriod: 1,      // Check for quality step-up every 1s (default 3s)
-            nudgeOffset: 0.1,                 // Smaller nudge for stall recovery
-            abrMaxWithRealBitrate: true,      // Use real bitrate for ABR decisions
-
-            // Buffer: balanced for mobile
-            maxBufferLength: 30,
-            maxMaxBufferLength: 60,
-            maxBufferSize: 60 * 1000000,
-            maxBufferHole: 0.5,
-            lowLatencyMode: false,
-            backBufferLength: 30,
-
-            // Startup
-            startFragPrefetch: true,
-            testBandwidth: false,
-            enableWorker: true,
-
-            // Wire up cached loader for prefetched segments
-            // TODO Brief 3: re-wire cachedHlsLoader
-            // loader: cloudflareUid ? createCachedHlsLoader(cloudflareUid) : undefined,
-          });
-
-          hls.on(Hls.Events.MANIFEST_PARSED, () => {
-            // MOBILE VIDEO DEBUG: Log HLS manifest parsed
-            if (MOBILE_VIDEO_DEBUG) {
-              logHlsEvent('MANIFEST_PARSED', cloudflareUid || uniqueMediaId);
-            }
-
-            // Phase 1: register cold-init instance in the pool so it can be
-            // demoted back on teardown (otherwise demote() no-ops, instance is destroyed).
-            logPoolTrace(`MANIFEST_PARSED reached, registering=${hlsUrl && !HLSPoolManager.has(hlsUrl)} url=…${hlsUrl.slice(-16)}`);
-            if (hlsUrl && !HLSPoolManager.has(hlsUrl)) {
-              HLSPoolManager.register(hlsUrl, hls, video);
-            }
-
-            if (startTime && startTime > 0) {
-              video.currentTime = startTime;
-            }
-            
-            // FIX #5: Auto-play immediately if autoplay is enabled and not managed by runtime
-            // Use skipReadyStateWait for feed videos to eliminate double-wait bottleneck
-            if (autoplay && !managedByMediaRuntime) {
-              const isFeed = surface === 'clubhouse' || surface === 'hero' || surface === 'watch';
-              safePlay(video, { skipReadyStateWait: isFeed });
-            }
-          });
-
-          hls.on(Hls.Events.LEVEL_SWITCHED, (_, data) => {
-            const level = hls.levels[data.level];
-            if (level) {
-              setQuality(level.height);
-              // Save real bitrate measurement for next video instance
-              if (level.bitrate > 0) {
-                saveSharedBandwidth(level.bitrate);
-              }
-              // Log level switch for debugging ABR behavior
-              videoDebug('hlsEvents', `Quality switched to level ${data.level}`, { height: level.height });
-              if (MOBILE_VIDEO_DEBUG) {
-                logHlsEvent('LEVEL_SWITCHED', cloudflareUid || uniqueMediaId, { height: level.height });
-              }
-            }
-          });
-
-          // Verification logging for first fragment optimization
-          hls.on(Hls.Events.FRAG_LOADED, (_, data) => {
-            // Save real measured download bandwidth for next HLS.js instance
-            if (data.frag?.stats?.bwEstimate && data.frag.stats.bwEstimate > 0) {
-              saveSharedBandwidth(data.frag.stats.bwEstimate);
-            }
-            if (data.frag.sn === 0 || data.frag.sn === 1) {
-              videoDebug('hlsEvents', `Fragment ${data.frag.sn} loaded`, { 
-                level: data.frag.level, 
-                size: data.frag.stats.total 
-              });
-            }
-          });
-
-          hls.on(Hls.Events.ERROR, (_, data) => {
-            // MOBILE VIDEO DEBUG: Log HLS errors
-            if (MOBILE_VIDEO_DEBUG) {
-              logHlsError(cloudflareUid || uniqueMediaId, data.fatal, data.type, data.details);
-            }
-            
-            if (data.fatal) {
-              const mediaError: MediaError = {
-                type: 'hls',
-                message: data.details || 'HLS playback error',
-                recoverable: !!mp4Fallback,
-              };
-              
-              // Try MP4 fallback
-              if (mp4Fallback) {
-                hls.destroy();
-                hlsRef.current = null;
-                video.src = mp4Fallback;
-              } else {
-                setError(mediaError);
-                updatePlaybackState('error');
-                onError?.(mediaError);
-              }
-            }
-          });
-
-          hls.loadSource(hlsUrl);
-          hls.attachMedia(video);
-          hlsRef.current = hls;
-          registerHlsForDebug(cloudflareUid || uniqueMediaId, hls, video);
-        } catch (err) {
-          // Fall back to native — fetch manifest and select highest quality rendition
-          await setNativeHlsSource(video, hlsUrl);
-        }
-      };
-
-      setupSource();
-
-      return () => {
-        mountedRef.current = false;
-        
-        // FIX #7: Clear first frame timeout on cleanup
-        if (firstFrameTimeoutRef.current) {
-          clearTimeout(firstFrameTimeoutRef.current);
-          firstFrameTimeoutRef.current = null;
-        }
-        
-        // Release decoder slot on cleanup
-        DecoderLimitManager.releaseSlot(uniqueMediaId);
-        
-        if (hlsRef.current) {
-          try {
-            // Phase 1: return to pool for reuse instead of destroying, if pool-eligible.
-            logPoolTrace(`teardown: has=${hlsUrl ? HLSPoolManager.has(hlsUrl) : 'noUrl'} url=…${hlsUrl ? hlsUrl.slice(-16) : ''}`);
-            if (hlsUrl && HLSPoolManager.has(hlsUrl)) {
-              HLSPoolManager.demote(hlsUrl, hlsRef.current);
-            } else {
-              hlsRef.current.stopLoad();
-              hlsRef.current.detachMedia();
-              hlsRef.current.destroy();
-            }
-          } catch {}
-          hlsRef.current = null;
-        }
-      };
-    }, [hlsUrl, startTime, autoplay, managedByMediaRuntime, mp4Fallback, onError, updatePlaybackState, cloudflareUid, hasFirstFrame]);
-
-    // ============ Debug registry: unregister only on true unmount ============
-    // Separate from the main setup effect (which has many deps and re-runs often)
-    // so that HLS_REGISTRY entries persist across dep-change re-renders.
-    useEffect(() => {
-      const debugId = cloudflareUid || uniqueMediaId;
-      return () => {
-        unregisterHlsForDebug(debugId);
-      };
-      // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, []);
-
-    // ============ MediaRuntime Registration ============
-    useEffect(() => {
-      const video = videoRef.current;
-      const container = containerRef.current;
-      if (!video || !managedByMediaRuntime) return;
-
-      // Use Cloudflare UID as registration ID for cache key consistency
-      const registrationId = cloudflareUid || uniqueMediaId;
-
-      MediaRuntime.registerMedia({
-        id: registrationId,
-        element: video,
-        surface,
-        sortIndex: 0,
-        observeTarget: container || video,
-      });
-
-      // Store ref on element for runtime access
-      (video as any).__hlsPlayerRef = {
-        detach: () => {
-          if (hlsRef.current) {
-            hlsRef.current.stopLoad();
-            hlsRef.current.detachMedia();
-          }
-        },
-        attach: () => {
-          if (hlsRef.current && video) {
-            hlsRef.current.attachMedia(video);
-            hlsRef.current.startLoad();
-          }
-        },
-      };
-
-      return () => {
-        MediaRuntime.unregisterMedia(registrationId);
-      };
-    }, [uniqueMediaId, cloudflareUid, surface, managedByMediaRuntime]);
-
-    // ============ Autoplay Effect ============
-    // CRITICAL: This effect must react to `autoplay` prop changes, not just initial mount.
-    // When users scroll to a new video or scroll back to a previous one, `autoplay` changes
-    // from false→true based on IntersectionObserver in useVerticalFeedLogic.
-    useEffect(() => {
-      const video = videoRef.current;
-      if (!video || !autoplay || managedByMediaRuntime) return;
-      if (!hlsUrl) return;
-
-      // MOBILE VIDEO DEBUG: Log autoplay effect firing
-      if (MOBILE_VIDEO_DEBUG) {
-        logAutoplayEffectFire(video, cloudflareUid || uniqueMediaId, autoplay);
-      }
-
-      // Attempt autoplay - safePlay handles readyState checks and muted fallback
-      const attemptAutoplay = () => {
-        safePlay(video);
-      };
-
-      // Set up listeners for videos still loading
-      video.addEventListener('loadedmetadata', attemptAutoplay, { once: true });
-      video.addEventListener('canplay', attemptAutoplay, { once: true });
-
-      // CRITICAL: Attempt immediately if video is already ready (videos 3+, or revisiting videos 1-2)
-      // This handles the case where the video was previously loaded/paused and autoplay becomes true again
-      if (video.readyState >= 1) {
-        safePlay(video);
-      }
-
-      return () => {
-        video.removeEventListener('loadedmetadata', attemptAutoplay);
-        video.removeEventListener('canplay', attemptAutoplay);
-      };
-    }, [autoplay, managedByMediaRuntime, hlsUrl, cloudflareUid, uniqueMediaId]);
-
-    // ============ Pause when autoplay becomes false ============
-    // When user scrolls away, pause the video to prevent background audio
-    useEffect(() => {
-      const video = videoRef.current;
-      if (!video || managedByMediaRuntime) return;
-      
-      if (!autoplay && !video.paused) {
-        video.pause();
-      }
-    }, [autoplay, managedByMediaRuntime]);
-
-    // ============ Decoder Priority Update ============
-    // Update decoder slot priority when play state changes
-    useEffect(() => {
-      if (autoplay) {
-        DecoderLimitManager.updatePriority(uniqueMediaId, 'playing');
-      } else {
-        DecoderLimitManager.updatePriority(uniqueMediaId, 'visible');
-      }
-    }, [autoplay, uniqueMediaId]);
-
-    // ============ Click Handler ============
-    const handleContainerClick = useCallback(() => {
-      onClick?.();
-      
-      if (!controls && showPlayButton) {
-        const video = videoRef.current;
-        if (video) {
-          if (video.paused) {
-            safePlay(video);
-          } else {
-            video.pause();
-          }
-        }
-      }
-    }, [onClick, controls, showPlayButton]);
-
-    // ============ Retry Handler ============
-    const handleRetry = useCallback(() => {
-      setError(null);
-      updatePlaybackState('loading');
-      currentSrcRef.current = null; // Force reload
-      
-      if (videoRef.current && hlsUrl) {
-        videoRef.current.load();
-      }
-    }, [hlsUrl, updatePlaybackState]);
-
-    // ============ Mute Toggle Handler ============
-    // FIX #10: Use audio fade for smooth mute/unmute transitions
-    const handleMuteToggle = useCallback(async () => {
-      if (videoRef.current) {
-        const newMuted = !isMutedState;
-        setIsMutedState(newMuted);
-        if (newMuted) {
-          await fadeOut(videoRef.current);
-        } else {
-          await fadeIn(videoRef.current, 1);
-        }
-      }
-    }, [isMutedState, fadeIn, fadeOut]);
-
-    // ============ Render ============
     return (
       <div
         ref={containerRef}
-        className={cn(
-          "relative overflow-hidden bg-neutral-900",
-          className
-        )}
-        style={{
-          ...aspectRatioStyle,
-          ...style,
-          // Bottom layer: poster as container background so any sub-frame gap shows the image, never black
-          ...(poster ? { backgroundImage: `url(${poster})`, backgroundSize: 'cover', backgroundPosition: 'center', backgroundRepeat: 'no-repeat' } : {}),
-        }}
-        onClick={handleContainerClick}
+        className={cn('relative overflow-hidden bg-black', aspectClass, className)}
+        style={style}
+        onClick={onClick}
       >
-        {/* Poster/Placeholder - opaque underneath until video reveals on top */}
-        {/* Phase 1: poster fades slower (300ms) than video appears (150ms) so video covers poster before it disappears */}
-        {poster && (
-          <div
+        {posterUrl ? (
+          <img
+            src={posterUrl}
+            alt=""
+            draggable={false}
             className={cn(
-              "absolute inset-0 bg-cover bg-center bg-no-repeat z-[1]",
-              "transition-opacity duration-300 ease-out",
-              hasFirstFrame ? "opacity-0 pointer-events-none" : "opacity-100"
+              'w-full h-full',
+              objectFit === 'contain' ? 'object-contain' : 'object-cover'
             )}
-            style={{ backgroundImage: `url(${poster})` }}
           />
-        )}
-
-        {/* Video Element - stacked ABOVE poster (z-[2]); appears in 150ms on first real frame */}
-        <video
-          ref={videoRef}
-          className={cn(
-            "absolute inset-0 w-full h-full z-[2]",
-            objectFit === 'cover' ? 'object-cover' : 'object-contain',
-            "transition-opacity duration-150 ease-out",
-            hasFirstFrame ? "opacity-100" : "opacity-0"
-          )}
-          playsInline
-          webkit-playsinline="true"
-          muted={isMutedState}
-          // Don't use native loop when gapless loop is enabled - it handles looping via RAF
-          loop={loop && managedByMediaRuntime}
-          preload={preload}
-        />
-
-        {/* Overlay (loading, error, play button, buffering) */}
-        <VideoOverlay
-          playbackState={playbackState}
-          error={error}
-          showPlayButton={showPlayButton && !controls}
-          showQualityBadge={showQualityBadge}
-          quality={quality}
-          showBuffering={showBuffering}
-          hideLoadingSpinner={isFeedVideo}
-          onPlayClick={() => {
-            if (videoRef.current) {
-              safePlay(videoRef.current);
-            }
-          }}
-          onRetryClick={handleRetry}
-        />
-
-        {/* Mute Button */}
-        {showMuteButton && !controls && (
-          <button
-            onClick={(e) => {
-              e.stopPropagation();
-              handleMuteToggle();
-            }}
-            className="absolute top-3 right-3 w-8 h-8 bg-black/50 hover:bg-black/70 rounded-full flex items-center justify-center text-white transition-colors z-10"
-            aria-label={isMutedState ? 'Unmute' : 'Mute'}
-          >
-            {isMutedState ? <VolumeX size={16} /> : <Volume2 size={16} />}
-          </button>
-        )}
-
-        {/* Controls Bar */}
-        {controls && (
-          <VideoControls
-            isPlaying={playbackState === 'playing'}
-            isMuted={isMutedState}
-            currentTime={currentTime}
-            duration={duration}
-            onPlayPause={() => {
-              const video = videoRef.current;
-              if (video) {
-                if (video.paused) {
-                  safePlay(video);
-                } else {
-                  video.pause();
-                }
-              }
-            }}
-            onMuteToggle={handleMuteToggle}
-          />
-        )}
-
-        {/* Scrubber */}
-        {scrubber && (
-          <VideoScrubber
-            videoEl={videoRef.current}
-            mediaId={uniqueMediaId}
-            bufferedPct={bufferedPct}
-            isBuffering={isBuffering}
-            hasFirstFrame={hasFirstFrame}
-            isAttached={isAttachedRef.current}
-          />
+        ) : (
+          <div className="w-full h-full bg-black" />
         )}
       </div>
     );
   }
 );
 
-UnifiedVideoPlayerInner.displayName = 'UnifiedVideoPlayer';
-
-// Wrap with React.memo to prevent unnecessary re-renders from parent state changes
-export const UnifiedVideoPlayer = React.memo(UnifiedVideoPlayerInner);
+UnifiedVideoPlayer.displayName = 'UnifiedVideoPlayer';
 
 export default UnifiedVideoPlayer;

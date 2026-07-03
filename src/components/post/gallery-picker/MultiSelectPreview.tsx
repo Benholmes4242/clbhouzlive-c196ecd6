@@ -25,6 +25,7 @@ const MultiSelectPreview: React.FC<MultiSelectPreviewProps> = ({
           return (
             <div key={index} className="relative group">
               {isVideo ? (
+                // Upload/preview <video> — not streaming playback; out of teardown scope.
                 <video 
                   src={url} 
                   className="w-full h-20 object-cover rounded-lg"
