@@ -125,7 +125,7 @@ export function BrandingSection({
                   </div>
                   <p className="text-[13px] font-medium text-foreground">Upload cover photo</p>
                   <p className="text-[12px] text-muted-foreground">
-                    Recommended: 1600×500px • JPG, PNG, WebP
+                    Recommended: 1500x1000px, 3:2 - JPG, PNG, WebP
                   </p>
                 </div>
               )}
