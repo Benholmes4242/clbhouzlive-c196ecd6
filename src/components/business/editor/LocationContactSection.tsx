@@ -221,21 +221,6 @@ export function LocationContactSection({
                 style={INPUT_STYLE}
               />
             </div>
-            <div style={{ height: '0.5px', background: BIZ.hair, margin: '12px 0' }} />
-            <div className="space-y-1.5">
-              <label className={LABEL_CLASS}>Booking link</label>
-              <input
-                type="url"
-                value={bookingUrl}
-                onChange={(e) => setBookingUrl(e.target.value)}
-                placeholder="https://bookings.yourgolfclub.com"
-                className={INPUT_CLASS}
-                style={INPUT_STYLE}
-              />
-              <p className={HINT_CLASS}>
-                If you use an online tee sheet, paste the booking URL here.
-              </p>
-            </div>
           </div>
         </SectionCard>
       </div>
