@@ -111,6 +111,15 @@ class MediaRuntimeStub {
       registrySize: 0,
       activeIds: [] as string[],
       primaryActiveId: null as string | null,
+      activeMediaId: null as string | null,
+      activeSurface: null as MediaSurface | null,
+      warmPoolSize: 0,
+      uiState: {
+        isScrolling: false,
+        isPanning: false,
+        isPanelOpen: false,
+        isModalOpen: false,
+      } as UIState,
     };
   }
 
