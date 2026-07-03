@@ -50,7 +50,7 @@ serve(async (req) => {
     }
 
     // Build email content
-    const adminPanelUrl = `https://clbhouz.com/admin/business-verifications`;
+    const adminPanelUrl = `https://www.clbhouz.co.uk/admin-v2/users?tab=verifications`;
     
     const emailSubject = `New Business Verification Request – ${businessName || 'Unknown Business'}`;
     
