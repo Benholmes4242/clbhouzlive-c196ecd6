@@ -196,6 +196,7 @@ export const PendingPostCard: React.FC<PendingPostCardProps> = ({ entry, theme =
                   }}
                 >
                   {m.kind === 'video' ? (
+                    // [VIDEO-TEARDOWN-OUT-OF-SCOPE] Local upload-preview poster-frame, not streaming playback.
                     <video
                       src={`${m.previewUrl}#t=0.1`}
                       muted
