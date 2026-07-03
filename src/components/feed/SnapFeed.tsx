@@ -7,7 +7,7 @@ import { haptic } from '@/utils/haptics';
 // Stage B3 teardown: HLS preload / pool wiring removed.
 import { pauseAllAudio } from '@/utils/globalVideoMute';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
-import { useWatchProgressTracker } from '@/components/watch/hooks/useWatchProgressTracker';
+// [VIDEOSTUB] useWatchProgressTracker call removed — no playback to track.
 
 
 const NEAR_END_THRESHOLD = 3;
@@ -148,13 +148,8 @@ export function SnapFeed({
   // cross-target each other's <video> elements.
   const { session } = useSupabaseSession();
   const trackerUserId = session?.user?.id;
-  const getTrackerContainer = useCallback(() => containerRef.current, []);
-  useWatchProgressTracker({
-    userId: readOnly ? undefined : trackerUserId,
-    activeIndex,
-    posts,
-    getContainer: getTrackerContainer,
-  });
+  void getTrackerContainer; void trackerUserId;
+
 
   // ── IntersectionObserver setup ──
   useEffect(() => {
