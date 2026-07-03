@@ -293,7 +293,12 @@ export const CardFeed = forwardRef<CardFeedHandle, CardFeedProps>(function CardF
   // owning tab's slot so switching back retains the centred card.
   useEffect(() => {
     setActiveIndex(activeIdx, tab);
-  }, [activeIdx, setActiveIndex, tab]);
+    const post = posts[activeIdx];
+    const media = post?.mediaItems?.[0];
+    const kind: 'img' | 'vid' | 'mix' | '?' =
+      !media ? '?' : media.type === 'video' ? 'vid' : (post?.mediaItems?.length ?? 0) > 1 ? 'mix' : 'img';
+    feedTelemetry.markSwipe(activeIdx, kind);
+  }, [activeIdx, setActiveIndex, tab, posts]);
 
   // Warm-start the next 1-2 upcoming videos so they play instantly on arrival.
   useEffect(() => {
