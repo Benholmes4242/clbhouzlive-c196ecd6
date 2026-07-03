@@ -17,7 +17,6 @@
 import type { FeedPost } from '@/components/media-system/types/media';
 import { useFullscreenFeedStore, type OpenOrigin } from '@/store/fullscreenFeedStore';
 import { HLSPoolManager } from '@/media/HLSPoolManager';
-import { flipContinuity } from '@/media/flipContinuity';
 
 function prefersReducedMotion(): boolean {
   if (typeof window === 'undefined' || !window.matchMedia) return false;
