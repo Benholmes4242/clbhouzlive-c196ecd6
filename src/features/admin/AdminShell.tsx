@@ -118,6 +118,7 @@ export default function AdminShell() {
                 <Route path="system/*"    element={<SystemPage />} />
                 <Route path="waitlist/*"  element={can.viewModeration ? <WaitlistPage /> : <AdminAccessDenied />} />
                 <Route path="support/*"   element={can.viewModeration ? <SupportPage /> : <AdminAccessDenied />} />
+                <Route path="verifications/*" element={can.viewUsers ? <VerificationsPage /> : <AdminAccessDenied />} />
                 <Route path="*" element={<Navigate to={role === 'moderator' ? 'moderation' : 'dashboard'} replace />} />
               </Routes>
             </Suspense>
