@@ -160,6 +160,18 @@ export function FullscreenFeedOverlay() {
       } catch {}
 
       return () => {
+        // FS_CLOSE — where fullscreen was when it closed (playhead of the active
+        // slide's <video>). Reads directly from the clubhouse store's tracked
+        // active video element (set by SnapVideoPlayer while active).
+        try {
+          const activeVideo = useClubhouseStore.getState().activeVideoElement as HTMLVideoElement | null;
+          const closingPost = posts[activeIndex] as any;
+          logHandoff(closingPost?.id ?? null, 'fs', 'FS_CLOSE', {
+            fsT: activeVideo?.currentTime ?? -1,
+            paused: activeVideo?.paused ?? null,
+          });
+        } catch {}
+
         unlockBodyScroll();
         document.body.classList.remove('route-fullscreen-overlay');
         // Restore shield to transparent (NOT #F8FAFC) so the dark feed background
