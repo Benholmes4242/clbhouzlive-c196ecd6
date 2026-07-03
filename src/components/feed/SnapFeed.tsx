@@ -294,13 +294,8 @@ export function SnapFeed({
       const thumb = post?.mediaItems?.[0]?.thumbnailUrl;
       if (thumb) { const img = new Image(); img.src = thumb; }
     });
-    // Manifests only for the next 2 — network warm, NO decoded instances.
-    const manifests = postsRef.current.slice(activeIndex + 1, activeIndex + 3);
-    manifests.forEach(post => {
-      const url = post?.mediaItems?.[0]?.hlsUrl;
-      if (url) preloadHlsManifest(url).catch(() => {});
-    });
-  }, [activeIndex]);
+    // Manifests removed (Stage B3 teardown) — posters only.
+
 
   // ── Editorial card sentinel observer ──
   const setIsTournamentCardActive = useClubhouseStore(s => s.setIsTournamentCardActive);
