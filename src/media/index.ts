@@ -108,8 +108,8 @@ export type { MediaTileProps } from './MediaTile';
 // ============================================
 // UPLOAD HOOK (Phase 6)
 // ============================================
-export { useMediaUpload } from './hooks/useMediaUpload';
-export type { 
+export { useMediaUpload } from '@/uploads/hooks/useMediaUpload';
+export type {
   UseMediaUploadReturn,
   UploadMediaStatus,
   MediaUploadProgress,
@@ -117,7 +117,8 @@ export type {
   MediaUploadError,
   MediaUploadOptions,
   R2BucketType,
-} from './hooks/useMediaUpload';
+} from '@/uploads/hooks/useMediaUpload';
+
 
 // ============================================
 // HLS POOL MANAGER (Fix #2)
