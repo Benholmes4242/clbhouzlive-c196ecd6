@@ -571,27 +571,20 @@ const FeedCardImpl: React.FC<FeedCardProps> = ({
             mountVideo={mountVideo}
             onIndexChange={(idx) => onCarouselIndexChange?.(post, idx)}
             onOpen={(idx) => onOpenMedia(post, idx)}
+            onDoubleTap={handleMediaDoubleTap}
           />
         ) : media ? (
-          <button
-            type="button"
-            ref={singleMediaBtnRef}
-            data-post-id={post.id}
-            onClick={() =>
+          <SingleMediaTapButton
+            onSingle={() =>
               onOpenMedia(post, 0, {
                 el: singleMediaBtnRef.current,
                 posterUrl: media.thumbnailUrl ?? (media as any).imageUrl ?? null,
                 handOffUrl: (media as any).hlsUrl ?? null,
               })
             }
-            style={{
-              display: 'block',
-              width: '100%',
-              background: 'transparent',
-              border: 'none',
-              padding: 0,
-              cursor: 'pointer',
-            }}
+            onDouble={handleMediaDoubleTap}
+            innerRef={singleMediaBtnRef}
+            postId={post.id}
           >
             <div
               style={{
@@ -645,7 +638,7 @@ const FeedCardImpl: React.FC<FeedCardProps> = ({
                     src={mediaUrl}
                     alt={post.caption || post.displayName}
                     loading="lazy"
-                    
+
                     style={{
                       position: 'absolute',
                       inset: 0,
@@ -659,9 +652,14 @@ const FeedCardImpl: React.FC<FeedCardProps> = ({
                 </>
               ) : null}
             </div>
-          </button>
+          </SingleMediaTapButton>
         ) : null}
+        {burstVisible && (
+          <HeartBurst key={burstKey} onDone={() => setBurstVisible(false)} />
+        )}
       </div>
+
+
 
       {/* Course eyebrow + location (above caption) */}
       {post.courseName && (() => {
