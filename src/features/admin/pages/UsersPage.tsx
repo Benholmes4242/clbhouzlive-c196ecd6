@@ -23,11 +23,10 @@ import { usePanelRole } from '@/hooks/usePanelRole';
 import { panelCan } from '@/lib/panelCan';
 import { useCreateAdminActionRequest } from '../hooks/useAdminActionRequests';
 
-type TabId = 'all' | 'verifications' | 'team' | 'invites';
+type TabId = 'all' | 'team' | 'invites';
 
 const TAB_TITLES: Record<TabId, string> = {
   all: 'All Users',
-  verifications: 'Verifications',
   team: 'Team & Roles',
   invites: 'Invites',
 };
