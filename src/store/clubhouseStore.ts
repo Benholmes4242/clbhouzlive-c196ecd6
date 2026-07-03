@@ -72,6 +72,10 @@ export const useClubhouseStore = create<ClubhouseState>()((set) => ({
   isTournamentCardActive: false,
 
   setActiveTab: (tab) => set((s) => {
+    if (tab !== s.activeTab) {
+      // Fire-and-forget telemetry mark (no-op unless FEED_TELEMETRY=1).
+      import('@/lib/feedTelemetry').then((m) => m.markTabSwitch(String(s.activeTab), String(tab))).catch(() => {});
+    }
     const idx = s.activeIndexByTab[tab] ?? 0;
     const positions = s.carouselPositionsByTab[tab] ?? new Map<number, number>();
     return {
