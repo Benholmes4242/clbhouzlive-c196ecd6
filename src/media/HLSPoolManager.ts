@@ -146,14 +146,20 @@ class HLSPoolManagerClass {
   }
 
   /**
-   * Register a preloaded HLS instance with the pool
+   * Register a preloaded HLS instance with the pool.
+   * `role` orders eviction priority ('speculative' evicted first, 'handoff' only
+   * if no speculative exists, 'promoted' never). Defaults to 'speculative' so
+   * existing callers are unchanged. Returns true on success, false when the
+   * pool is full-all-promoted (or speculative sub-cap is full with no
+   * speculative to evict) — callers should fall back to a cold attach.
    */
   register(
-    url: string, 
-    hls: HlsType, 
+    url: string,
+    hls: HlsType,
     preloadVideo: HTMLVideoElement,
     surface: 'feed' | 'fullscreen' = 'feed',
-  ): void {
+    role: 'speculative' | 'handoff' = 'speculative',
+  ): boolean {
     // GUARD: never clobber a promoted (live, on-screen) instance. If one exists
     // for this URL, destroy the INCOMING duplicate instead and bail. This is the
     // foot-gun behind the re-attach miss storm — registering over a live decoder
@@ -161,15 +167,37 @@ class HLSPoolManagerClass {
     const existing = this.pool.get(url);
     if (existing?.isPromoted) {
       try { hls.destroy(); } catch {}
-      return;
+      return false;
     }
 
     // FIX #9: Use dynamic max based on memory pressure
     const maxInstances = this.getMaxInstances();
-    
-    // Evict oldest if at capacity
+
+    // Speculative sub-cap: reserve slots for handoff/promoted entries.
+    if (role === 'speculative') {
+      const subCap = this.isLowMemory ? SPECULATIVE_SUBCAP_LOW_MEMORY : SPECULATIVE_SUBCAP;
+      let speculativeCount = 0;
+      this.pool.forEach((e) => { if (e.role === 'speculative') speculativeCount++; });
+      while (speculativeCount >= subCap) {
+        const evicted = this.evictLowestPriority('speculative-only');
+        if (!evicted) {
+          logVideoTelemetry('hls_pool_full_speculative_subcap', { poolSize: this.pool.size });
+          try { hls.destroy(); } catch {}
+          return false;
+        }
+        speculativeCount--;
+      }
+    }
+
+    // Evict lowest-priority (oldest speculative, then oldest handoff) if at capacity
     while (this.pool.size >= maxInstances) {
-      this.evictOldest();
+      const evicted = this.evictLowestPriority();
+      if (!evicted) {
+        // All entries are promoted — refuse rather than exceed the cap.
+        logVideoTelemetry('hls_pool_full_all_promoted', { poolSize: this.pool.size });
+        try { hls.destroy(); } catch {}
+        return false;
+      }
     }
 
     // Clear any existing entry for this URL
@@ -184,6 +212,7 @@ class HLSPoolManagerClass {
       created: Date.now(),
       preloadedByVideo: preloadVideo,
       isPromoted: false,
+      role,
       surface,
       timeoutId: setTimeout(() => {
         // Auto-cleanup if not promoted within TTL
@@ -197,10 +226,11 @@ class HLSPoolManagerClass {
     this.pool.set(url, entry);
     this.stats.registered++;
     logPoolEvent('success', 'register', url, this.stats.registered, this.pool.size);
-    logVideoTelemetry('hls_pool_registered', { 
-      url, 
-      poolSize: this.pool.size 
+    logVideoTelemetry('hls_pool_registered', {
+      url,
+      poolSize: this.pool.size,
     });
+    return true;
   }
 
   /**
