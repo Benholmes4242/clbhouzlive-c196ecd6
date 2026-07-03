@@ -251,6 +251,7 @@ const FullscreenVideoSlot: React.FC<{
     VideoEngine.setObjectFit('fullscreen', 'contain');
   }, []);
 
+  React.useEffect(() => {
     if (isActive) {
       VideoEngine.trace('V1_FS_LOAD', { postId, startPosition });
     }
