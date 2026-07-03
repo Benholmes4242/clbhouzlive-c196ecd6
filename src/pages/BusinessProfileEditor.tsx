@@ -684,27 +684,13 @@ export default function BusinessProfileEditor() {
 
   /* ── render ──────────────────────────────────────── */
   return (
-    <PageRoot className="md:!max-w-[440px]">
-      <div
-        className="min-h-screen flex flex-col w-full"
-        style={{ background: BIZ.pageBg, paddingTop: 'var(--chrome-total-h, 0px)' }}
+    <>
+      <ManagePageShell
+        title={mode === 'create' ? 'Create a business' : 'Edit business'}
+        onBack={handleClose}
       >
-        {/* Title block — CompactHeader provides the back arrow */}
-        <div className="px-4 pt-3 pb-2">
-          <p
-            style={{
-              fontSize: 15,
-              fontWeight: 700,
-              color: BIZ.ink,
-              letterSpacing: '-0.01em',
-            }}
-          >
-            {mode === 'create' ? 'Create business' : 'Edit business'}
-          </p>
-        </div>
+        <div className="flex-1 overflow-y-auto pt-3 pb-12" style={{ background: BIZ.pageBg }}>
 
-
-        <div className="flex-1 overflow-y-auto pt-3 pb-12">
           <IdentitySection
             mode={mode}
             category={category}
