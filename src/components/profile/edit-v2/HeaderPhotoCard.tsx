@@ -196,9 +196,10 @@ export const HeaderPhotoCard: React.FC<HeaderPhotoCardProps> = ({
       <button
         type="button"
         onClick={handleClick}
+        style={{ aspectRatio: '3 / 2' }}
         className={cn(
           "relative w-full overflow-hidden rounded-2xl border-2 border-dashed transition-all",
-          "h-[180px] flex flex-col items-center justify-center",
+          "flex flex-col items-center justify-center",
           "group",
           displayUrl
             ? "border-transparent"
