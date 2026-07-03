@@ -17,13 +17,21 @@ export const MOBILE_VIDEO_DEBUG = (() => {
   }
 })();
 
+import { isPerfEnabled } from '@/perf/navTiming';
+
 // Runtime in-memory enable so the panel can be flipped on-device without a console.
 let runtimeEnabled = false;
 export function enableVideoDebug() { runtimeEnabled = true; }
 export function disableVideoDebug() { runtimeEnabled = false; }
 export function isVideoDebugOn(): boolean {
   if (runtimeEnabled) return true;
-  try { return localStorage.getItem('clbhouz-video-debug') === 'true'; } catch { return false; }
+  try { if (localStorage.getItem('clbhouz-video-debug') === 'true') return true; } catch {}
+  // Unified with the on-screen DBG/LOG pill (perf HUD). When perf is enabled
+  // (DEV or ?perf=1 or the runtime perf toggle), video debug traces are also
+  // on — so `logHandoff` writes land in the LOG pill's copy buffer without
+  // requiring a separate localStorage flag.
+  try { if (isPerfEnabled()) return true; } catch {}
+  return false;
 }
 
 // ============ In-Memory Log Store for On-Screen Debug Panel ============
