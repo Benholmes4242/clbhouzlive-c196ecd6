@@ -259,14 +259,11 @@ const PostDeepLinkPage: React.FC = () => {
       {/* Full-screen media */}
       <div className="absolute inset-0" style={{ background: gradient }}>
         {mediaUrl && isVideo && (
-          <video
-            ref={videoRef}
+          <img
             src={mediaUrl}
-            autoPlay
-            loop
-            playsInline
-            muted
+            alt=""
             className="absolute inset-0 w-full h-full object-cover"
+            onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }}
           />
         )}
         {mediaUrl && !isVideo && (
