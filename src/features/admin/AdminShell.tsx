@@ -33,6 +33,7 @@ const SECTION_TITLES: Record<string, string> = {
   system:     'System',
   waitlist:   'Handicap demand',
   support:    'Support',
+  verifications: 'Verifications',
 };
 
 export default function AdminShell() {
