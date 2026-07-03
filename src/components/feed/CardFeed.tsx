@@ -320,6 +320,24 @@ export const CardFeed = forwardRef<CardFeedHandle, CardFeedProps>(function CardF
     });
   }, [posts?.length]);
 
+  // Tab warmer — fires on setActiveTab (from clubhouseStore) so tab-restore
+  // pre-warms the active card's HLS first segment (manifest is already pooled;
+  // this closes the cold-segment gap).
+  const registerTabWarmer = useClubhouseStore((s) => s.registerTabWarmer);
+  const activeIdxRef = useRef(activeIdx);
+  useEffect(() => { activeIdxRef.current = activeIdx; }, [activeIdx]);
+  const postsRef = useRef(posts);
+  useEffect(() => { postsRef.current = posts; }, [posts]);
+  useEffect(() => {
+    if (!tab) return;
+    registerTabWarmer(tab, () => {
+      const idx = activeIdxRef.current;
+      const hlsUrl = postsRef.current[idx]?.mediaItems?.[0]?.hlsUrl;
+      if (hlsUrl) prefetchTile(hlsUrl);
+    });
+    return () => { registerTabWarmer(tab, null); };
+  }, [tab, registerTabWarmer]);
+
   const handleOpenMedia = useCallback(
     (
       post: FeedPost,
