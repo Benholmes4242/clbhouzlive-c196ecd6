@@ -133,10 +133,16 @@ export default function BusinessProfileEditor() {
   /* ── social ───────────────────────────────────────── */
   const [social, setSocial] = useState<SocialFields>({
     instagram: '',
+    tiktok: '',
     twitter: '',
     facebook: '',
     youtube: '',
   });
+
+  /* ── new: facilities, primary action, opening-hours toggle ── */
+  const [amenities, setAmenities] = useState<string[]>([]);
+  const [primaryAction, setPrimaryAction] = useState<PrimaryActionKey | null>(null);
+  const [showOpeningHours, setShowOpeningHours] = useState(false);
 
   /* ── flow state ───────────────────────────────────── */
   const [saving, setSaving] = useState(false);
