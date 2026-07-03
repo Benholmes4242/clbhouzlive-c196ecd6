@@ -187,30 +187,7 @@ const MediaTile = memo<MediaTileProps>(({
         draggable={false}
       />
       
-      {/* Video layer - UNIFIED WITH CLUBHOUSE */}
-      {isVideo && isAutoplayCandidate && item.playbackUrl && (
-        <HLSPlayer
-          ref={playerRef}
-          src={item.playbackUrl}
-          posterUrl={item.thumbnailUrl}
-          autoplay={isVisible}
-          muted
-          loop
-          objectFit="cover"
-          managedByMediaRuntime={false}
-          externallyManaged={false}
-          preload="auto"
-          mediaId={uidFromNode({ src: item.playbackUrl }) || item.postId}
-          onLoadedData={handleCanPlay}
-          onTimeUpdate={handleTimeUpdate}
-          className="absolute inset-0 h-full w-full"
-        />
-      )}
-      
-      {/* Video scrubber */}
-      {isVideo && videoEl && (
-        <VideoScrubber videoEl={videoEl} height={3} />
-      )}
+      {/* [VIDEOSTUB] Video/HLSPlayer + scrubber removed — poster <img> above is the only render */}
       
       {/* No gradient overlay - clean look */}
       

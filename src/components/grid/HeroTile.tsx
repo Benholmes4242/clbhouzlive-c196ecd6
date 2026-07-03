@@ -79,25 +79,8 @@ const HeroTile = memo<HeroTileProps>(({
         />
       </div>
       
-      {/* Video layer - UNIFIED WITH CLUBHOUSE */}
-      {isVideo && item.playbackUrl && (
-        <div className={cn("absolute inset-0 w-full h-full", filterClass)} style={pixelStyle}>
-          <HLSPlayer
-            ref={playerRef}
-            src={item.playbackUrl}
-            autoplay={isVisible && shouldAutoplay}
-            muted
-            loop
-            objectFit="cover"
-            managedByMediaRuntime={false}
-            externallyManaged={false}
-            preload="auto"
-            mediaId={uidFromNode({ src: item.playbackUrl }) || item.postId}
-            className="absolute inset-0 h-full w-full"
-          />
-        </div>
-      )}
-      
+      {/* [VIDEOSTUB] HLSPlayer removed — poster <img> above is the only render */}
+
       {/* Text overlays from studio_edits */}
       {(item as any).studioEdits?.textOverlays?.length > 0 && (
         <TextOverlayRenderer
@@ -109,8 +92,8 @@ const HeroTile = memo<HeroTileProps>(({
       {/* Gradient overlay */}
       <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent" />
       
-      {/* Play button hint for videos */}
-      {isVideo && !isVisible && (
+      {/* Play button hint for videos (poster-only chassis) */}
+      {isVideo && (
         <div className="absolute inset-0 flex items-center justify-center">
           <div className="w-16 h-16 rounded-full bg-black/40 backdrop-blur-sm flex items-center justify-center">
             <Play className="w-8 h-8 text-white fill-white ml-1" />

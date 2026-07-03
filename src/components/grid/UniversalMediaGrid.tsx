@@ -151,12 +151,7 @@ export function UniversalMediaGrid({
     return map;
   }, [items]);
 
-  // Initialize prefetch on mount
-  useEffect(() => {
-    if (videoIds.length > 0 && videoUrlMap.size > 0) {
-      initiatePrefetch(videoIds, 0, videoUrlMap);
-    }
-  }, [videoIds, videoUrlMap, initiatePrefetch]);
+  // [VIDEOSTUB] Video prefetch disabled — poster-only chassis
   
   // Mark autoplay candidates based on pattern
   const processedItems = useMemo(() => {
