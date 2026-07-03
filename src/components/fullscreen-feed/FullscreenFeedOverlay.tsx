@@ -176,7 +176,9 @@ export function FullscreenFeedOverlay() {
         // return entry on re-attach and resumes autoplay if in its active slot.
         try {
           const activeVideo = useClubhouseStore.getState().activeVideoElement;
-          const url = (activePost as any)?.mediaItems?.[0]?.hlsUrl;
+          const fsState = useFullscreenFeedStore.getState();
+          const currentPost: any = fsState.posts?.[fsState.activeIndex];
+          const url = currentPost?.mediaItems?.[0]?.hlsUrl;
           if (activeVideo && url && Number.isFinite(activeVideo.currentTime)) {
             flipContinuity.setReturn(url, { t: Math.max(0, activeVideo.currentTime) });
             fsEvent('🎯 FS_CAPTURE_RETURN', { url, t: activeVideo.currentTime });
