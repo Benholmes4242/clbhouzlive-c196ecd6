@@ -67,7 +67,7 @@ async function fetchVerifications(): Promise<VerificationRow[]> {
 
   const [claimBizMap, claimCourseBySource, claimCourseByClub] = await Promise.all([
     claimBusinessIds.length
-      ? supabase.from('business_accounts').select('id, name').in('id', claimBusinessIds)
+      ? supabase.from('business_accounts').select('id, name, is_verified').in('id', claimBusinessIds)
       : Promise.resolve({ data: [] as any[] }),
     claimSourceCourseIds.length
       ? supabase.from('golf_courses').select('id, name').in('id', claimSourceCourseIds)
@@ -78,6 +78,7 @@ async function fetchVerifications(): Promise<VerificationRow[]> {
   ]);
 
   const bizNameById = new Map(((claimBizMap.data ?? []) as any[]).map((b) => [b.id, b.name]));
+  const bizVerifiedById = new Map(((claimBizMap.data ?? []) as any[]).map((b) => [b.id, !!b.is_verified]));
   const courseNameBySourceId = new Map(((claimCourseBySource.data ?? []) as any[]).map((c) => [c.id, c.name]));
   const courseNameByClubId = new Map<string, string>();
   for (const c of (claimCourseByClub.data ?? []) as any[]) {
