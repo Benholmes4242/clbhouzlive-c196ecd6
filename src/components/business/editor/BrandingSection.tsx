@@ -102,7 +102,7 @@ export function BrandingSection({
                 className="hidden"
               />
               {effectiveCoverUrl ? (
-                <div className="relative aspect-[3.2/1] rounded-xl overflow-hidden group">
+                <div className="relative aspect-[3/2] rounded-xl overflow-hidden group">
                   <img
                     src={effectiveCoverUrl}
                     alt="Cover preview"
@@ -114,7 +114,7 @@ export function BrandingSection({
                 </div>
               ) : (
                 <div
-                  className="aspect-[3.2/1] rounded-xl border-2 border-dashed flex flex-col items-center justify-center"
+                  className="aspect-[3/2] rounded-xl border-2 border-dashed flex flex-col items-center justify-center"
                   style={{ borderColor: BIZ.hairDashed, background: 'rgba(15,23,42,0.03)' }}
                 >
                   <div
@@ -125,7 +125,7 @@ export function BrandingSection({
                   </div>
                   <p className="text-[13px] font-medium text-foreground">Upload cover photo</p>
                   <p className="text-[12px] text-muted-foreground">
-                    Recommended: 1600×500px • JPG, PNG, WebP
+                    Recommended: 1500x1000px, 3:2 - JPG, PNG, WebP
                   </p>
                 </div>
               )}

@@ -13,8 +13,8 @@ interface HeaderPhotoCardProps {
   variant?: 'card' | 'bare';
 }
 
-// Matches profile hero: full-width × clamp(200px, 28vw, 280px). ~2:1 on mobile.
-const HEADER_ASPECT_RATIO = 2 / 1;
+// Matches profile hero: 3:2 (width-based). Crop and display are pixel-matched.
+const HEADER_ASPECT_RATIO = 3 / 2;
 
 export const HeaderPhotoCard: React.FC<HeaderPhotoCardProps> = ({
   currentUrl,
@@ -107,7 +107,7 @@ export const HeaderPhotoCard: React.FC<HeaderPhotoCardProps> = ({
             position: 'relative',
             display: 'block',
             width: '100%',
-            height: 132,
+            aspectRatio: '3 / 2',
             background: displayUrl ? 'transparent' : 'linear-gradient(135deg,#E2E8F0,#F1F5F9)',
             overflow: 'hidden',
             border: 'none',
@@ -196,9 +196,10 @@ export const HeaderPhotoCard: React.FC<HeaderPhotoCardProps> = ({
       <button
         type="button"
         onClick={handleClick}
+        style={{ aspectRatio: '3 / 2' }}
         className={cn(
           "relative w-full overflow-hidden rounded-2xl border-2 border-dashed transition-all",
-          "h-[180px] flex flex-col items-center justify-center",
+          "flex flex-col items-center justify-center",
           "group",
           displayUrl
             ? "border-transparent"
@@ -227,7 +228,7 @@ export const HeaderPhotoCard: React.FC<HeaderPhotoCardProps> = ({
               Upload header photo
             </p>
             <p className="text-xs text-muted-foreground">
-              Recommended: 1600x800px - JPG, PNG or WebP
+              Recommended: 1500x1000px, 3:2 - JPG, PNG or WebP
             </p>
           </div>
         )}
