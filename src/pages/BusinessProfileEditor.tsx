@@ -891,7 +891,7 @@ export default function BusinessProfileEditor() {
             <button
               onClick={handleSave}
               disabled={!saveEnabled}
-              className="w-full min-h-[52px] rounded-[14px] text-[15px] font-bold border-0 active:opacity-90 transition-opacity flex items-center justify-center"
+              className="w-full min-h-[52px] rounded-[14px] text-[15px] font-bold border-0 outline-none focus:outline-none focus-visible:outline-none focus:ring-0 active:opacity-90 transition-opacity flex items-center justify-center"
               style={{
                 background: saveEnabled ? BIZ.amber : 'rgba(15,23,42,0.06)',
                 color: saveEnabled ? '#fff' : 'rgba(15,23,42,0.45)',
