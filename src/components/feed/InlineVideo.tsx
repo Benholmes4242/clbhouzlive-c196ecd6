@@ -179,10 +179,25 @@ export const InlineVideo: React.FC<Props> = ({
   }, [hlsUrl, mp4Url, regId, tag, feedIndex, pool, reset]);
 
   // Attach when near; demote-to-pool when leaving the radius.
+  //
+  // CHURN GUARD: `isNear` can oscillate during snap-scroll as `activeIdx`
+  // briefly resettles (e.g. user drags between tiles). Without a hold, every
+  // false→true bounce tears down and re-attaches the HLS instance, producing
+  // repeated TILE_REATTACH at videoT=0/readyState=0. We defer teardown for a
+  // short window (300ms) and cancel it if `isNear` bounces back true — so
+  // attach happens once on truly entering the radius, teardown once on
+  // truly leaving it.
+  const teardownTimerRef = useRef<number | null>(null);
   useEffect(() => {
     const video = videoRef.current;
     if (!video) return;
     cancelledRef.current = false;
+
+    // Any state change cancels a pending teardown.
+    if (teardownTimerRef.current != null) {
+      clearTimeout(teardownTimerRef.current);
+      teardownTimerRef.current = null;
+    }
 
     if (isNear) {
       attemptAttach();
@@ -190,19 +205,28 @@ export const InlineVideo: React.FC<Props> = ({
         cancelledRef.current = true;
       };
     } else {
-      if (isVideoDebugOn()) {
-        logTileLife(tag, feedIndex, 'LEAVE_RADIUS_TEARDOWN', {
-          decoders: DecoderLimitManager.getSlotCount(),
-        });
-      }
-      DecoderLimitManager.releaseSlot(regId);
-      pool.teardown(hlsUrl);
-      attachedRef.current = false;
-      try {
-        video.removeAttribute('src');
-        video.load();
-      } catch {}
-      reset();
+      teardownTimerRef.current = window.setTimeout(() => {
+        teardownTimerRef.current = null;
+        if (isVideoDebugOn()) {
+          logTileLife(tag, feedIndex, 'LEAVE_RADIUS_TEARDOWN', {
+            decoders: DecoderLimitManager.getSlotCount(),
+          });
+        }
+        DecoderLimitManager.releaseSlot(regId);
+        pool.teardown(hlsUrl);
+        attachedRef.current = false;
+        try {
+          video.removeAttribute('src');
+          video.load();
+        } catch {}
+        reset();
+      }, 300);
+      return () => {
+        if (teardownTimerRef.current != null) {
+          clearTimeout(teardownTimerRef.current);
+          teardownTimerRef.current = null;
+        }
+      };
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isNear, hlsUrl, mp4Url]);
