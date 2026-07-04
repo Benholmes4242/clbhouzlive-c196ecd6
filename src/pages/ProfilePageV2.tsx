@@ -561,10 +561,21 @@ const ProfilePageV2Content: React.FC = () => {
           ) : (
             <CoverPhotoFallback className="w-full h-full" />
           )}
-          {/* Cover photo edit affordance — self-profile only */}
+          {/* Whole-cover tap target — owner only */}
           {isSelf && (
             <button
-              onClick={() => heroFileInputRef.current?.click()}
+              type="button"
+              onClick={() => setPhotoSheet('hero')}
+              className="absolute inset-0 z-[5] pointer-events-auto cursor-pointer"
+              style={{ background: 'transparent', border: 'none' }}
+              aria-label="Change cover photo"
+              disabled={isUploadingHero}
+            />
+          )}
+          {/* Cover photo camera chip — self-profile only */}
+          {isSelf && (
+            <button
+              onClick={() => setPhotoSheet('hero')}
               className="absolute bottom-3 right-3 h-11 w-11 rounded-full flex items-center justify-center active:scale-[0.97] z-10 pointer-events-auto transition-transform"
               style={{
                 background: 'rgba(0, 0, 0, 0.45)',
