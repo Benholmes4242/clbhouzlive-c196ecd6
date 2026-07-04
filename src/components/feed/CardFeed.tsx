@@ -271,7 +271,7 @@ export const CardFeed = forwardRef<CardFeedHandle, CardFeedProps>(function CardF
         }
         recheckActive();
       },
-      { threshold: [0, 0.01, 0.25, 0.5, 0.75, 1.0] },
+      { threshold: [0, 0.1, 0.2, 0.3, 0.35, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0] },
     );
     observerRef.current = observer;
     return () => {
