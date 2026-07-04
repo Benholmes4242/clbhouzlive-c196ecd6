@@ -712,16 +712,32 @@ export default function BusinessProfileEditor() {
       >
         <div className="flex-1 overflow-y-auto pb-12" style={{ background: BIZ.pageBg }}>
 
-          {/* 1. HERO — cover + squircle logo at top */}
-          <BusinessHeroCard
-            logoUrl={effectiveLogoUrl}
-            coverUrl={effectiveCoverUrl}
-            resolvedName={resolvedName}
-            onLogoFile={onLogoFile}
-            onLogoRemove={onLogoRemove}
-            onCoverFile={onCoverFile}
-            onCoverRemove={onCoverRemove}
-          />
+          {/* 1. HERO — cover + squircle logo at top (matches personal edit-v2) */}
+          <div className="px-4 pt-2 pb-4">
+            <div
+              style={{
+                borderRadius: 16,
+                overflow: 'hidden',
+                background: '#fff',
+                border: '1px solid rgba(15,23,42,0.07)',
+              }}
+            >
+              <HeaderPhotoCard
+                variant="bare"
+                currentUrl={effectiveCoverUrl}
+                onFileChange={(file) => { if (file) onCoverFile(file); }}
+                onRemove={onCoverRemove}
+              />
+              <div style={{ position: 'relative', padding: '0 16px 14px', marginTop: -34 }}>
+                <ProfilePhotoCard
+                  variant="bare"
+                  currentUrl={effectiveLogoUrl}
+                  onFileChange={(file) => { if (file) onLogoFile(file); }}
+                  onRemove={onLogoRemove}
+                />
+              </div>
+            </div>
+          </div>
 
           {/* 2. IDENTITY */}
           <IdentitySection
