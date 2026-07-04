@@ -195,6 +195,8 @@ export const FeedSlide = memo(function FeedSlide({
         post.postType === 'course_of_week_card') && (
         <div data-pga-sentinel="true" className="absolute inset-0 pointer-events-none" />
       )}
+      <PostViewSentinel postId={post.id} />
+
       {renderContent()}
 
       {/* Inline carousel dots — top-right, always visible, multi-media non-editorial only */}
