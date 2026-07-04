@@ -8,6 +8,7 @@ import type { FeedPost } from '@/components/media-system/types/media';
 import { useVideoLane } from '@/video/useVideoLane';
 import { VideoEngine } from '@/video/VideoEngine';
 import { useFullscreenFeedStore } from '@/store/fullscreenFeedStore';
+import { fsv } from '@/perf/fsvTelemetry';
 
 interface FeedSlideProps {
   post: FeedPost;
@@ -234,9 +235,18 @@ const FullscreenVideoSlot: React.FC<{
   const startPosition = React.useMemo(() => {
     if (!isActive) return -1;
     const t = VideoEngine.getLastPos(postId);
-    if (t > 0) return t;
-    return storedStart > 0 ? storedStart : -1;
-  }, [isActive, postId, storedStart]);
+    const chosen = t > 0 ? t : storedStart > 0 ? storedStart : -1;
+    fsv('slot.mount', {
+      phase: 'startPos.compute',
+      postId,
+      isActive,
+      hasHls: !!hlsUrl,
+      storedStart,
+      lastPos: t,
+      chosen,
+    });
+    return chosen;
+  }, [isActive, postId, storedStart, hlsUrl]);
 
   const lane = useVideoLane('fullscreen', {
     hlsUrl: isActive ? hlsUrl : null,
@@ -252,10 +262,12 @@ const FullscreenVideoSlot: React.FC<{
   }, []);
 
   React.useEffect(() => {
-    // On unmount/deactivation the engine has already been tracking
-    // currentTime -> lastPos[postId] via onTimeUpdate. No manual write needed.
+    fsv('slot.active', { postId, isActive });
+  }, [postId, isActive]);
+
+  React.useEffect(() => {
     return () => {
-      void postId;
+      fsv('slot.unmount', { postId });
     };
   }, [postId]);
 
@@ -268,9 +280,15 @@ const FullscreenVideoSlot: React.FC<{
     if (firedRef.current) return;
     if (lane.snapshot.firstFrame === true) {
       firedRef.current = true;
+      fsv('slot.snapFF', {
+        postId,
+        ct: +lane.snapshot.currentTime.toFixed(3),
+        startPosition: +startPosition.toFixed(3),
+      });
       onFirstFrameReady?.();
     }
-  }, [isActive, lane.snapshot.firstFrame, onFirstFrameReady]);
+  }, [isActive, lane.snapshot.firstFrame, lane.snapshot.currentTime, onFirstFrameReady, postId, startPosition]);
+
 
 
   return (
