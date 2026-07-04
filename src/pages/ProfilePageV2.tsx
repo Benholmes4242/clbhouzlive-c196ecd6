@@ -379,6 +379,23 @@ const ProfilePageV2Content: React.FC = () => {
     }
   };
 
+  const handleAvatarRemove = async () => {
+    if (!user?.id) return;
+    const { error } = await supabase.from('user_profiles').update({ profile_photo_url: null }).eq('id', user.id);
+    if (error) { toast.error('Failed to remove profile photo'); return; }
+    queryClient.invalidateQueries({ queryKey: ['user-profile', profileUserId] });
+    queryClient.invalidateQueries({ queryKey: ['profile', user.id] });
+    toast.success('Profile photo removed');
+  };
+  const handleHeroRemove = async () => {
+    if (!user?.id) return;
+    const { error } = await supabase.from('user_profiles').update({ header_photo_url: null }).eq('id', user.id);
+    if (error) { toast.error('Failed to remove cover photo'); return; }
+    queryClient.invalidateQueries({ queryKey: ['user-profile', profileUserId] });
+    queryClient.invalidateQueries({ queryKey: ['profile', user.id] });
+    toast.success('Cover photo removed');
+  };
+
   const handleCropComplete = (croppedFile: File) => {
     setIsCropModalOpen(false);
     if (cropImageSrc) {
