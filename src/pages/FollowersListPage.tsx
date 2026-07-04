@@ -8,9 +8,12 @@ import { UserListPage } from '@/components/social/UserListPage';
 import { analyticsEvents } from '@/utils/analyticsEvents';
 import ScrollToTopGlass from '@/components/common/ScrollToTopGlass';
 import { useHideBottomNav } from '@/hooks/useBottomNavVisibility';
+import { useHideHeader } from '@/hooks/useHeaderVisibility';
+import { ManagePageShell } from '@/components/manage/ManagePageShell';
 
-const FollowersListPage = () => {
+const FollowersListPage = ({ initialTab = 'followers' }: { initialTab?: 'followers' | 'following' }) => {
   useHideBottomNav();
+  useHideHeader();
   const { username } = useParams<{ username: string }>();
   const { user: currentUser } = useSupabaseSession();
 
@@ -100,7 +103,7 @@ const FollowersListPage = () => {
   }
 
   return (
-    <>
+    <ManagePageShell title={initialTab === 'following' ? 'Following' : 'Followers'} onBack={() => window.history.back()}>
       <UserListPage
         mode="followers"
         title="Followers"
@@ -116,6 +119,9 @@ const FollowersListPage = () => {
         onLoadMore={() => fetchNextPage()}
         onRefetch={() => refetch()}
         backPath={`/profile/${profileUser.username}`}
+        hideBackButton
+        embeddedInShell
+        initialTab={initialTab}
         isOwnProfile={isOwnProfile}
         profileUsername={profileUser.username}
         // Following tab data
@@ -129,7 +135,7 @@ const FollowersListPage = () => {
         onFollowingRefetch={() => followingRefetch()}
       />
       <ScrollToTopGlass />
-    </>
+    </ManagePageShell>
   );
 };
 
