@@ -433,7 +433,7 @@ const BusinessProfilePage: React.FC = () => {
               onClick={() => setPhotoSheet('cover')}
               className="absolute bottom-3 right-3 h-11 w-11 flex items-center justify-center rounded-full active:scale-[0.97] transition-transform pointer-events-auto"
               style={{
-                zIndex: 2,
+                zIndex: 10,
                 background: 'rgba(0,0,0,0.45)',
                 backdropFilter: 'blur(24px) saturate(180%)',
                 WebkitBackdropFilter: 'blur(24px) saturate(180%)',
