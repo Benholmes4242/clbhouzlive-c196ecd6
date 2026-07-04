@@ -32,6 +32,14 @@ export interface UseVideoLaneOptions {
   active?: boolean;
   muted?: boolean;
   postId?: string | null;
+  /**
+   * Media-level ownership key (e.g. `${postId}:${mediaIndex}`). When present,
+   * this — not `postId` — is used as the VideoEngine caller/owner key so the
+   * owner-guard in pause() can reject stale outgoing cards. Never null for a
+   * real feed card; only genuine engine-wide pauses (pauseAll / visibility /
+   * release) may pass a null caller.
+   */
+  ownerKey?: string | null;
 }
 
 export interface UseVideoLaneResult {
