@@ -754,12 +754,10 @@ export const UserListPage: React.FC<UserListPageProps> = ({
           {/* User list */}
           {!activeIsLoading && !activeError && filteredUsers.length > 0 && (
             <>
-              <div style={{ padding: '20px 20px 10px' }}>
-                <SectionHeader tier="standard"
-                  kicker={activeMode === 'followers' ? 'All Followers' : 'All Following'}
-                  count={displayTotal}
-                />
-              </div>
+              <SectionKicker
+                label={activeMode === 'followers' ? 'All Followers' : 'All Following'}
+                count={displayTotal}
+              />
               <InfiniteUserList
                 users={filteredUsers}
                 currentUserId={user?.id}
