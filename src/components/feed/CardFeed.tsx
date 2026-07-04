@@ -424,10 +424,8 @@ export const CardFeed = forwardRef<CardFeedHandle, CardFeedProps>(function CardF
 
       const initialSlide = carouselPositions.get(index) ?? 0;
       const isActive = !fsOpen && index === playingIdx; // PLAYS — settle-gated; suspended while fullscreen
-
-      const isNear = !fsOpen && Math.abs(index - activeIdx) <= VIDEO_NEIGHBOUR_RADIUS; // mounts + paints frame — instant; suspended while fullscreen
-      const mountVideo = false; // Stage B3 teardown: no video mounts.
-      void isNear;
+      const isNear = !fsOpen && Math.abs(index - activeIdx) <= VIDEO_NEIGHBOUR_RADIUS; // mounts InlineVideo + host so it's in the DOM before activation
+      const mountVideo = isNear;
       return (
         <div
           data-card-index={index}

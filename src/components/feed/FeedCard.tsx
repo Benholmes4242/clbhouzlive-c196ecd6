@@ -340,7 +340,7 @@ const FeedCardImpl: React.FC<FeedCardProps> = ({
     isFirstCard &&
     !isMulti &&
     !!media &&
-    !(media.type === 'video' && (post as any).mountVideo); // not strictly needed; effect re-runs by ref
+    media.type !== 'video';
 
   // Text-only / multi-media fallback: fire on the next paint (the surrounding
   // shell is already in the DOM and visually settled by then).
