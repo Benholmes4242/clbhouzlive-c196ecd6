@@ -441,9 +441,11 @@ const LightFeedCardImpl: React.FC<LightFeedCardProps> = ({
             isCardActive={isActive}
             initialIndex={initialMediaIndex}
             mountVideo={mountVideo}
+            postId={post.id}
             onIndexChange={(idx) => onCarouselIndexChange?.(post, idx)}
             onOpen={(idx) => onOpenMedia(post, idx)}
           />
+
         ) : media ? (
           <button
             type="button"
@@ -482,8 +484,11 @@ const LightFeedCardImpl: React.FC<LightFeedCardProps> = ({
                     isActive={isActive}
                     isNear={mountVideo}
                     feedIndex={feedIndex}
+                    postId={post.id}
+                    ownerKey={`${post.id}:0`}
                     objectFit="cover"
                   />
+
                 ) : media.thumbnailUrl ? (
                   <>
                     {feedIndex != null && feedIndex >= 1 && (

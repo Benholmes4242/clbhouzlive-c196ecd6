@@ -32,6 +32,14 @@ export interface UseVideoLaneOptions {
   active?: boolean;
   muted?: boolean;
   postId?: string | null;
+  /**
+   * Media-level ownership key (e.g. `${postId}:${mediaIndex}`). When present,
+   * this — not `postId` — is used as the VideoEngine caller/owner key so the
+   * owner-guard in pause() can reject stale outgoing cards. Never null for a
+   * real feed card; only genuine engine-wide pauses (pauseAll / visibility /
+   * release) may pass a null caller.
+   */
+  ownerKey?: string | null;
 }
 
 export interface UseVideoLaneResult {
@@ -98,7 +106,8 @@ export function useVideoLane(
   // Auto play/pause based on `active`. play() is safe to call before mount:
   // the engine queues it and consumes on the next mountLane.
   useEffect(() => {
-    const callerPostId = opts.postId ?? null;
+    // Prefer media-level ownerKey; fall back to postId for legacy callers.
+    const callerPostId = opts.ownerKey ?? opts.postId ?? null;
     PPRACE('effect fire', { callerPostId, active: !!opts.active });
     if (opts.active) {
       void VideoEngine.play(laneId, { callerPostId });
@@ -108,7 +117,7 @@ export function useVideoLane(
     return () => {
       PPRACE('effect cleanup', { callerPostId });
     };
-  }, [laneId, opts.active, opts.postId]);
+  }, [laneId, opts.active, opts.ownerKey, opts.postId]);
 
 
   // Apply mute.

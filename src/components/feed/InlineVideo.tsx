@@ -23,6 +23,12 @@ interface Props {
   objectFit?: 'cover' | 'contain';
   /** Post id — required for two-way resume + lastPos tracking. */
   postId?: string | null;
+  /**
+   * Media-level ownership key. Should be `${postId}:${mediaIndex}` (single
+   * video → `${postId}:0`). Must be non-null for any real feed card so the
+   * VideoEngine owner-guard can reject stale outgoing cards on scroll.
+   */
+  ownerKey?: string | null;
   /** Fires once when the poster image has painted. */
   onFirstFrameReady?: () => void;
 }
@@ -31,6 +37,7 @@ export const InlineVideo: React.FC<Props> = ({
   item,
   isActive,
   postId,
+  ownerKey,
   objectFit = 'cover',
   onFirstFrameReady,
 }) => {
@@ -50,6 +57,10 @@ export const InlineVideo: React.FC<Props> = ({
     return t > 0 ? t : -1;
   }, [isActive, postId]);
 
+  // Fallback ownership key so single-video callers that only pass postId
+  // still get a non-null owner (closes the null-caller pause hole).
+  const resolvedOwnerKey = ownerKey ?? (postId ? `${postId}:0` : null);
+
   const lane = useVideoLane('feed-active', {
     hlsUrl: isActive ? hlsUrl ?? null : null,
     posterUrl: posterUrl || null,
@@ -57,6 +68,7 @@ export const InlineVideo: React.FC<Props> = ({
     active: isActive,
     muted: isMuted,
     postId,
+    ownerKey: resolvedOwnerKey,
   });
 
   // Emit V1_TILE_RESUME once when this active tile paints its first frame.

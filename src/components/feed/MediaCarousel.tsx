@@ -25,6 +25,12 @@ interface Props {
   frameRatio?: number; // default 4/5
   /** When false, video slides render their poster only (no <video> element). */
   mountVideo?: boolean;
+  /**
+   * Post id — threaded to InlineVideo so each video slide gets a stable
+   * media-level ownership key (`${postId}:${i}`). Required so the VideoEngine
+   * owner-guard engages on card-to-card handoff (no null callers).
+   */
+  postId?: string | null;
   onIndexChange?: (idx: number) => void;
   onOpen: (mediaIndex: number) => void;
   /** Double-tap on any slide → like + heart burst (owner: FeedCard). */
@@ -39,6 +45,7 @@ export const MediaCarousel: React.FC<Props> = ({
   initialIndex,
   frameRatio = FRAME_DEFAULT,
   mountVideo = false,
+  postId,
   onIndexChange,
   onOpen,
   onDoubleTap,
@@ -134,7 +141,14 @@ export const MediaCarousel: React.FC<Props> = ({
             >
               {isVideo ? (
                 mountVideo ? (
-                  <InlineVideo item={m} isActive={isActiveSlide} isNear={mountVideo} objectFit="cover" />
+                  <InlineVideo
+                    item={m}
+                    isActive={isActiveSlide}
+                    isNear={mountVideo}
+                    postId={postId ?? null}
+                    ownerKey={postId ? `${postId}:${i}` : `${m.id ?? 'noid'}:${i}`}
+                    objectFit="cover"
+                  />
                 ) : m.thumbnailUrl ? (
                   <img
                     src={m.thumbnailUrl}

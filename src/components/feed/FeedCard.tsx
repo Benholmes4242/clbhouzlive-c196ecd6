@@ -569,10 +569,12 @@ const FeedCardImpl: React.FC<FeedCardProps> = ({
             isCardActive={isActive}
             initialIndex={initialMediaIndex}
             mountVideo={mountVideo}
+            postId={post.id}
             onIndexChange={(idx) => onCarouselIndexChange?.(post, idx)}
             onOpen={(idx) => onOpenMedia(post, idx)}
             onDoubleTap={handleMediaDoubleTap}
           />
+
         ) : media ? (
           <SingleMediaTapButton
             onSingle={() =>
@@ -602,9 +604,11 @@ const FeedCardImpl: React.FC<FeedCardProps> = ({
                   isNear={mountVideo}
                   feedIndex={feedIndex}
                   postId={post.id}
+                  ownerKey={`${post.id}:0`}
                   objectFit="cover"
                   onFirstFrameReady={isFirstCard ? fireContentReady : undefined}
                 />
+
               ) : mediaUrl ? (
                 <>
                   {feedIndex != null && feedIndex >= 1 && (
