@@ -33,6 +33,7 @@ const medBaseStyle = (z: number, first: boolean): React.CSSProperties => ({
   alignItems: 'center',
   justifyContent: 'center',
   boxShadow: '0 1px 2px rgba(15,23,42,0.18)',
+  boxSizing: 'border-box',
 });
 
 const Medallion: React.FC<{ rarity: BadgeRarity; z: number; first: boolean }> = ({
@@ -187,9 +188,17 @@ const TrophyRoomEntryRow: React.FC<Props> = ({
 
   // ---- FILLED STATE: shelf preview ----
   const title =
-    weeklyCount > 0
-      ? `${weeklyCount} new ${trophyWord(weeklyCount)}${isFriend ? ` for ${name}` : ''} this week`
-      : `${lifetimeCount} ${trophyWord(lifetimeCount)} in ${isFriend ? `${poss} case` : 'your case'}`;
+    weeklyCount > 0 ? (
+      <>
+        <span style={{ color: '#F7931E', fontVariantNumeric: 'tabular-nums' }}>{weeklyCount}</span>{' '}
+        new {trophyWord(weeklyCount)}{isFriend ? ` for ${name}` : ''} this week
+      </>
+    ) : (
+      <>
+        <span style={{ color: '#F7931E', fontVariantNumeric: 'tabular-nums' }}>{lifetimeCount}</span>{' '}
+        {trophyWord(lifetimeCount)} in {isFriend ? `${poss} case` : 'your case'}
+      </>
+    );
 
   const sub =
     weeklyCount > 0
