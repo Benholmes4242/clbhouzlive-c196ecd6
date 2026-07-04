@@ -165,7 +165,7 @@ function BusinessesAccordion({
     <>
       {memberships.map((membership, index) => {
         const bizId = membership.business?.id;
-        const isExpanded = memberships.length === 1 ? true : openId === bizId;
+        const isExpanded = openId === bizId;
         const isActive = activeBusinessId != null && activeBusinessId === bizId;
         return (
           <BusinessCommandCard
