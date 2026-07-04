@@ -14,6 +14,12 @@
 
 import { useEffect, useRef, useState } from 'react';
 import { VideoEngine, type LaneId, type LaneSnapshot } from './VideoEngine';
+import { fsv } from '@/perf/fsvTelemetry';
+
+/** Only trace these lanes — the perf-critical ones for the fullscreen viewer flow. */
+const TRACED_LANES = new Set<LaneId>(['fullscreen', 'feed-active']);
+
+
 
 
 
@@ -59,6 +65,7 @@ export function useVideoLane(
   // element out of us automatically; no explicit unmount needed here.
   useEffect(() => {
     if (!opts.active) return;
+    if (TRACED_LANES.has(laneId)) fsv('lane.mount', { laneId, postId: opts.postId ?? null });
     // Belt-and-braces: if the host ref hasn't attached yet (rare timing edge
     // when the card mounts + activates in the same commit), retry on the
     // next frame instead of silently dropping the mount.
@@ -87,6 +94,14 @@ export function useVideoLane(
   // inside the engine, so remounting the active card is cheap.
   useEffect(() => {
     if (!opts.active || !opts.hlsUrl) return;
+    if (TRACED_LANES.has(laneId)) {
+      fsv('lane.load', {
+        laneId,
+        postId: opts.postId ?? null,
+        startPosition: opts.startPosition ?? -1,
+        hlsUrlTail: opts.hlsUrl.slice(-42),
+      });
+    }
     VideoEngine.load(laneId, {
       hlsUrl: opts.hlsUrl,
       posterUrl: opts.posterUrl ?? null,
@@ -101,11 +116,14 @@ export function useVideoLane(
     // Prefer media-level ownerKey; fall back to postId for legacy callers.
     const callerPostId = opts.ownerKey ?? opts.postId ?? null;
     if (opts.active) {
+      if (TRACED_LANES.has(laneId)) fsv('lane.play', { laneId, callerPostId });
       void VideoEngine.play(laneId, { callerPostId });
     } else {
+      if (TRACED_LANES.has(laneId)) fsv('lane.pause', { laneId, callerPostId });
       VideoEngine.pause(laneId, { callerPostId });
     }
   }, [laneId, opts.active, opts.ownerKey, opts.postId]);
+
 
 
   // Apply mute.
