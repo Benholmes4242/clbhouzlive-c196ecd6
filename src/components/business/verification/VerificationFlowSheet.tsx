@@ -10,7 +10,7 @@
  * The mode='domain' entry (admin-initiated domain check on an existing
  * pending request) still renders the standalone DomainStep, unchanged.
  */
-import { useEffect, useMemo, useRef, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { motion } from 'framer-motion';
 import {
