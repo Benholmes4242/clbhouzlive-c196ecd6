@@ -10,6 +10,21 @@ import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useProfileData } from '@/hooks/useProfileData';
 import { useHasBusinesses } from '@/hooks/useMyBusinesses';
 import { PageRoot } from '@/components/layout/PageRoot';
+import { useBusinessImpression } from '@/hooks/useBusinessImpression';
+
+const DirectoryRow: React.FC<{ biz: BusinessDirectoryItem; onOpen: () => void; children: React.ReactNode }> = ({ biz, onOpen, children }) => {
+  const attach = useBusinessImpression(biz.id, 'directory');
+  return (
+    <button
+      ref={attach as any}
+      key={biz.id}
+      className="rounded-sq-md border bg-card p-4 text-left hover:border-foreground/40 transition-colors"
+      onClick={onOpen}
+    >
+      {children}
+    </button>
+  );
+};
 
 const BusinessDirectoryPage = () => {
   const navigate = useNavigate();
