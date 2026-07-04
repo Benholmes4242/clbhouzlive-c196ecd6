@@ -44,6 +44,9 @@ export interface BusinessProfile {
   booking_url: string | null;
   opening_hours: Record<string, { open: string; close: string; closed: boolean }> | null;
   social_links: { instagram?: string; tiktok?: string; twitter?: string; facebook?: string; youtube?: string } | null;
+  amenities: string[] | null;
+  show_opening_hours: boolean | null;
+  primary_action: string | null;
 }
 
 export function useBusinessProfile(idOrSlug: string | undefined) {
