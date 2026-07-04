@@ -79,6 +79,7 @@ import { ImageCropModal } from '@/components/business/ImageCropModal';
 import { ProfileTouchDebugProvider, useProfileTouchDebug } from '@/components/profile/debug/ProfileTouchDebugProvider';
 import { ProfileTouchDebugPanel } from '@/components/profile/debug/ProfileTouchDebugPanel';
 import { ReportSheet } from '@/components/messaging/ReportSheet';
+import { PhotoActionSheet } from '@/components/profile/edit-v2/PhotoActionSheet';
 
 
 // Background color - uses CSS variable for theme support
@@ -240,12 +241,15 @@ const ProfilePageV2Content: React.FC = () => {
   const [showTopTenModal, setShowTopTenModal] = useState(false);
 
   const avatarFileInputRef = useRef<HTMLInputElement>(null);
+  const avatarTakeInputRef = useRef<HTMLInputElement>(null);
   const heroFileInputRef = useRef<HTMLInputElement>(null);
+  const heroTakeInputRef = useRef<HTMLInputElement>(null);
   const [isUploadingAvatar, setIsUploadingAvatar] = useState(false);
   const [isUploadingHero, setIsUploadingHero] = useState(false);
   const [cropImageSrc, setCropImageSrc] = useState<string | null>(null);
   const [cropMode, setCropMode] = useState<'avatar' | 'hero' | null>(null);
   const [isCropModalOpen, setIsCropModalOpen] = useState(false);
+  const [photoSheet, setPhotoSheet] = useState<'avatar' | 'hero' | null>(null);
   const queryClient = useQueryClient();
 
   const profileTypeInfo = getProfileType(profile?.user_type);
@@ -373,6 +377,23 @@ const ProfilePageV2Content: React.FC = () => {
     } finally {
       setIsUploadingHero(false);
     }
+  };
+
+  const handleAvatarRemove = async () => {
+    if (!user?.id) return;
+    const { error } = await supabase.from('user_profiles').update({ profile_photo_url: null }).eq('id', user.id);
+    if (error) { toast.error('Failed to remove profile photo'); return; }
+    queryClient.invalidateQueries({ queryKey: ['user-profile', profileUserId] });
+    queryClient.invalidateQueries({ queryKey: ['profile', user.id] });
+    toast.success('Profile photo removed');
+  };
+  const handleHeroRemove = async () => {
+    if (!user?.id) return;
+    const { error } = await supabase.from('user_profiles').update({ header_photo_url: null }).eq('id', user.id);
+    if (error) { toast.error('Failed to remove cover photo'); return; }
+    queryClient.invalidateQueries({ queryKey: ['user-profile', profileUserId] });
+    queryClient.invalidateQueries({ queryKey: ['profile', user.id] });
+    toast.success('Cover photo removed');
   };
 
   const handleCropComplete = (croppedFile: File) => {
@@ -540,10 +561,21 @@ const ProfilePageV2Content: React.FC = () => {
           ) : (
             <CoverPhotoFallback className="w-full h-full" />
           )}
-          {/* Cover photo edit affordance — self-profile only */}
+          {/* Whole-cover tap target — owner only */}
           {isSelf && (
             <button
-              onClick={() => heroFileInputRef.current?.click()}
+              type="button"
+              onClick={() => setPhotoSheet('hero')}
+              className="absolute inset-0 z-[5] pointer-events-auto cursor-pointer"
+              style={{ background: 'transparent', border: 'none' }}
+              aria-label="Change cover photo"
+              disabled={isUploadingHero}
+            />
+          )}
+          {/* Cover photo camera chip — self-profile only */}
+          {isSelf && (
+            <button
+              onClick={() => setPhotoSheet('hero')}
               className="absolute bottom-3 right-3 h-11 w-11 rounded-full flex items-center justify-center active:scale-[0.97] z-10 pointer-events-auto transition-transform"
               style={{
                 background: 'rgba(0, 0, 0, 0.45)',
@@ -585,7 +617,7 @@ const ProfilePageV2Content: React.FC = () => {
               if (isUploadingAvatar) return;
               logPoint('profile_photo.click');
               if (isSelf) {
-                avatarFileInputRef.current?.click();
+                setPhotoSheet('avatar');
               } else {
                 setIsAvatarLightboxOpen(true);
               }
@@ -1265,9 +1297,25 @@ const ProfilePageV2Content: React.FC = () => {
       )}
 
 
-      {/* Hidden file inputs for inline photo upload */}
+      {/* Hidden file inputs for inline photo upload (choose + take) */}
       <input ref={avatarFileInputRef} type="file" accept="image/*" onChange={handleAvatarFileSelected} className="hidden" />
+      <input ref={avatarTakeInputRef} type="file" accept="image/*" capture="user" onChange={handleAvatarFileSelected} className="hidden" />
       <input ref={heroFileInputRef} type="file" accept="image/*" onChange={handleHeroFileSelected} className="hidden" />
+      <input ref={heroTakeInputRef} type="file" accept="image/*" capture="environment" onChange={handleHeroFileSelected} className="hidden" />
+
+      {/* Unified photo action sheet — owner only */}
+      {isSelf && (
+        <PhotoActionSheet
+          open={photoSheet !== null}
+          onClose={() => setPhotoSheet(null)}
+          title={photoSheet === 'hero' ? 'Cover photo' : 'Profile photo'}
+          hasPhoto={photoSheet === 'hero' ? !!profile?.header_photo_url : !!profile?.profile_photo_url}
+          removeLabel={photoSheet === 'hero' ? 'Remove cover photo' : 'Remove profile photo'}
+          onChoose={() => (photoSheet === 'hero' ? heroFileInputRef : avatarFileInputRef).current?.click()}
+          onTake={() => (photoSheet === 'hero' ? heroTakeInputRef : avatarTakeInputRef).current?.click()}
+          onRemove={() => (photoSheet === 'hero' ? handleHeroRemove() : handleAvatarRemove())}
+        />
+      )}
 
       {/* Crop Modal */}
       {isCropModalOpen && cropImageSrc && (

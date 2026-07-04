@@ -49,12 +49,14 @@ interface PostsTabContentProps {
   actorType: 'personal' | 'business';
   actorId: string;
   isOwnProfile?: boolean;
+  businessName?: string;
 }
 
 const PostsTabContent: React.FC<PostsTabContentProps> = ({
   actorType,
   actorId,
   isOwnProfile = false,
+  businessName,
 }) => {
   const navigate = useNavigate();
   const { user } = useSupabaseSession();
@@ -178,6 +180,17 @@ const PostsTabContent: React.FC<PostsTabContentProps> = ({
     );
   }
 
+  const isBusiness = actorType === 'business';
+  const emptyCopy = (() => {
+    if (activeFilter !== 'all') return null;
+    if (isBusiness) {
+      return isOwnProfile
+        ? 'Share news, offers, and course updates with your followers.'
+        : `${businessName || 'This business'} hasn't posted yet. Follow to see their updates first.`;
+    }
+    return isOwnProfile ? 'Share your first moment on the course' : null;
+  })();
+
   const emptyState = (
     <div className="flex flex-col items-center justify-center py-20 gap-3 px-6 text-center">
       <div className="w-12 h-12 rounded-full bg-muted flex items-center justify-center">
@@ -186,8 +199,8 @@ const PostsTabContent: React.FC<PostsTabContentProps> = ({
       <p className="text-sm font-medium text-foreground">
         {activeFilter === 'all' ? 'No posts yet' : 'No posts match this filter'}
       </p>
-      {isOwnProfile && activeFilter === 'all' && (
-        <p className="text-xs text-muted-foreground">Share your first moment on the course</p>
+      {emptyCopy && (
+        <p className="text-xs text-muted-foreground max-w-[280px]">{emptyCopy}</p>
       )}
     </div>
   );

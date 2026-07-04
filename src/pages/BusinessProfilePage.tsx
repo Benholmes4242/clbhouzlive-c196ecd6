@@ -11,6 +11,7 @@ import {
   Phone, Globe, MapPin, MoreHorizontal, Check, Loader2, ChevronLeft,
   Share2, Link2, AlertCircle, Camera, Flag, Pencil, Mail, MessageCircle,
   Instagram, Facebook, Youtube, Linkedin, Twitter, Music2,
+  Star, ChevronRight, Navigation, Calendar,
 } from 'lucide-react';
 import { toast } from 'sonner';
 
@@ -54,6 +55,11 @@ import {
 
 import { trackBusinessProfileVisit, trackBusinessAction } from '@/lib/businessAnalyticsTracking';
 import { ReportSheet } from '@/components/messaging/ReportSheet';
+import { PhotoActionSheet } from '@/components/profile/edit-v2/PhotoActionSheet';
+import { useBusinessReviewStats } from '@/hooks/useBusinessReviewStats';
+import { supabase } from '@/integrations/supabase/client';
+import { useQuery } from '@tanstack/react-query';
+import { openExternalUrl } from '@/utils/median/openExternalUrl';
 
 
 type BusinessTab = 'posts' | 'about' | 'team';
@@ -105,6 +111,26 @@ const BusinessProfilePage: React.FC = () => {
   const { data: followersCount = 0 } = useBusinessFollowersCount(business?.id);
   const { data: followingCount = 0 } = useBusinessFollowingCount(business?.id);
   const { data: teamMembers } = useBusinessTeam(business?.id);
+  const { data: reviewStats } = useBusinessReviewStats(business?.id);
+
+  // Home course (club_id only): first course under the business's club
+  const { data: homeCourse } = useQuery({
+    queryKey: ['business-home-course', business?.club_id],
+    enabled: !!business?.club_id,
+    staleTime: 5 * 60 * 1000,
+    queryFn: async () => {
+      if (!business?.club_id) return null;
+      const { data, error } = await supabase
+        .from('golf_courses')
+        .select('id, name, region, country')
+        .eq('club_id', business.club_id)
+        .order('created_at', { ascending: true })
+        .limit(1)
+        .maybeSingle();
+      if (error) throw error;
+      return data;
+    },
+  });
 
   const { activeActor } = useActiveActor();
   const viewerActorType: 'personal' | 'business' = activeActor?.type ?? 'personal';
@@ -119,13 +145,16 @@ const BusinessProfilePage: React.FC = () => {
   const toggleFollow = useToggleFollow();
   const { startDM, isStarting: isStartingDM } = useStartDM();
 
-  const { uploadLogo, uploadCover, uploadingLogo, uploadingCover } =
+  const { uploadLogo, removeLogo, uploadCover, removeCover, uploadingLogo, uploadingCover } =
     useBusinessImageUpload(business?.id);
-  const logoFileInputRef = useRef<HTMLInputElement>(null);
-  const heroFileInputRef = useRef<HTMLInputElement>(null);
+  const logoChooseInputRef = useRef<HTMLInputElement>(null);
+  const logoTakeInputRef = useRef<HTMLInputElement>(null);
+  const heroChooseInputRef = useRef<HTMLInputElement>(null);
+  const heroTakeInputRef = useRef<HTMLInputElement>(null);
   const [cropImageSrc, setCropImageSrc] = useState<string | null>(null);
   const [cropMode, setCropMode] = useState<'logo' | 'cover' | null>(null);
   const [isCropModalOpen, setIsCropModalOpen] = useState(false);
+  const [photoSheet, setPhotoSheet] = useState<'cover' | 'logo' | null>(null);
 
   const [activeTab, setActiveTab] = useState<BusinessTab>('posts');
   const [bioExpanded, setBioExpanded] = useState(false);
@@ -177,19 +206,19 @@ const BusinessProfilePage: React.FC = () => {
   // ───── image upload ─────
   const handleLogoFileSelected = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
+    e.target.value = '';
     if (!file) return;
     setCropImageSrc(URL.createObjectURL(file));
     setCropMode('logo');
     setIsCropModalOpen(true);
-    if (logoFileInputRef.current) logoFileInputRef.current.value = '';
   };
   const handleCoverFileSelected = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
+    e.target.value = '';
     if (!file) return;
     setCropImageSrc(URL.createObjectURL(file));
     setCropMode('cover');
     setIsCropModalOpen(true);
-    if (heroFileInputRef.current) heroFileInputRef.current.value = '';
   };
   const handleCropComplete = (croppedFile: File) => {
     setIsCropModalOpen(false);
@@ -303,15 +332,7 @@ const BusinessProfilePage: React.FC = () => {
     business.category, business.country, business.region, business.city
   );
 
-  // Build contact/social rows (omit nulls)
-  const socialLinks = (business.social_links || {}) as Record<string, string | null | undefined>;
-  const socialRow = SOCIAL_CONFIG
-    .filter(s => socialLinks[s.key] && socialLinks[s.key]!.trim().length > 0)
-    // Dedup so `twitter` and `x` don't both render
-    .filter((s, i, arr) => arr.findIndex(o => o.Icon === s.Icon) === i);
-
-  const hasAnyContact =
-    !!business.website || !!business.phone || !!business.email || socialRow.length > 0;
+  // (Contact/social icons row removed — surfaced via action rows + About tab)
 
   const tabs: Array<{ id: BusinessTab; label: string }> = [
     { id: 'posts', label: 'Posts' },
@@ -327,10 +348,11 @@ const BusinessProfilePage: React.FC = () => {
             actorType="business"
             actorId={business.id}
             isOwnProfile={isOwner || false}
+            businessName={business.name}
           />
         );
       case 'about':
-        return <BusinessProfileInfo business={business} canManage={isOwner} />;
+        return <BusinessProfileInfo business={business} canManage={isOwner} userId={user?.id} />;
       case 'team':
         return <BusinessTeamTab businessId={business.id} />;
       default:
@@ -399,7 +421,7 @@ const BusinessProfilePage: React.FC = () => {
           />
           {isOwner && (
             <button
-              onClick={() => heroFileInputRef.current?.click()}
+              onClick={() => setPhotoSheet('cover')}
               className="absolute bottom-3 right-3 h-11 w-11 flex items-center justify-center rounded-full active:scale-[0.97] transition-transform pointer-events-auto"
               style={{
                 zIndex: 2,
@@ -429,7 +451,7 @@ const BusinessProfilePage: React.FC = () => {
           <button
             className="relative w-[124px] h-[124px] block cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-[#F7931E] focus-visible:ring-offset-2 rounded-[34%] transition-transform hover:scale-[1.02] active:scale-[0.98]"
             onClick={() => {
-              if (isOwner) logoFileInputRef.current?.click();
+              if (isOwner) setPhotoSheet('logo');
               else if (!uploadingLogo) setIsAvatarLightboxOpen(true);
             }}
             aria-label={isOwner ? 'Change business logo' : 'View business logo'}
@@ -517,195 +539,263 @@ const BusinessProfilePage: React.FC = () => {
           </div>
         )}
 
-        {/* Manages [course] chip */}
-        {business.club_id && business.club_name && (
-          <button
-            type="button"
-            onClick={() => navigate(`/courses/${business.club_id}`)}
-            className="mt-3 inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-semibold active:scale-[0.97] transition-transform"
-            style={{
-              color: '#F7931E',
-              background: 'rgba(247,147,30,0.10)',
-              border: '1px solid rgba(247,147,30,0.20)',
-            }}
-          >
-            <Flag className="w-3 h-3" />
-            Manages {business.club_name}
-          </button>
-        )}
-
-        {/* Contact / social row */}
-        {hasAnyContact && (
-          <div className="mt-3 flex items-center gap-2 flex-wrap">
-            {business.website && (
-              <a
-                href={ensureProtocol(business.website)}
-                target="_blank"
-                rel="noopener noreferrer"
-                onClick={() => trackBusinessAction(business.id, 'website', user?.id)}
-                aria-label="Website"
-                className="h-10 w-10 inline-flex items-center justify-center rounded-full active:scale-[0.97] transition-transform"
-                style={{ background: 'rgba(15,23,42,0.05)', border: '1px solid rgba(15,23,42,0.07)' }}
-              >
-                <Globe className="w-4 h-4 text-foreground" />
-              </a>
-            )}
-            {business.phone && (
-              <a
-                href={`tel:${business.phone}`}
-                onClick={() => trackBusinessAction(business.id, 'call', user?.id)}
-                aria-label="Call"
-                className="h-10 w-10 inline-flex items-center justify-center rounded-full active:scale-[0.97] transition-transform"
-                style={{ background: 'rgba(15,23,42,0.05)', border: '1px solid rgba(15,23,42,0.07)' }}
-              >
-                <Phone className="w-4 h-4 text-foreground" />
-              </a>
-            )}
-            {business.email && (
-              <a
-                href={`mailto:${business.email}`}
-                aria-label="Email"
-                className="h-10 w-10 inline-flex items-center justify-center rounded-full active:scale-[0.97] transition-transform"
-                style={{ background: 'rgba(15,23,42,0.05)', border: '1px solid rgba(15,23,42,0.07)' }}
-              >
-                <Mail className="w-4 h-4 text-foreground" />
-              </a>
-            )}
-            {socialRow.map(({ key, Icon, label }) => (
-              <a
-                key={key}
-                href={ensureProtocol(socialLinks[key] as string)}
-                target="_blank"
-                rel="noopener noreferrer"
-                aria-label={label}
-                className="h-10 w-10 inline-flex items-center justify-center rounded-full active:scale-[0.97] transition-transform"
-                style={{ background: 'rgba(15,23,42,0.05)', border: '1px solid rgba(15,23,42,0.07)' }}
-              >
-                <Icon className="w-4 h-4 text-foreground" />
-              </a>
-            ))}
-          </div>
-        )}
-      </div>
-
-      {/* ───── Primary actions ───── */}
-      <div className="mt-4 px-5 flex items-center gap-2 relative z-10 pointer-events-auto">
-        {isOwner ? (
-          <button
-            className="h-11 flex-1 rounded-full text-sm font-semibold flex items-center justify-center gap-1.5 transition-transform active:scale-[0.98]"
-            style={{ background: '#0F172A', color: '#ffffff' }}
-            onClick={() => navigate(`/business/${business.id}/edit`)}
-          >
-            <Pencil className="w-3.5 h-3.5" />
-            Edit profile
-          </button>
-        ) : (
-          <>
-            <button
-              className="h-11 flex-1 rounded-full text-sm font-semibold flex items-center justify-center gap-1.5 transition-transform active:scale-[0.98]"
-              style={
-                isFollowing
-                  ? { background: '#ffffff', border: '1px solid rgba(15,23,42,0.07)', color: '#0F172A' }
-                  : { background: '#0F172A', color: '#ffffff' }
-              }
-              onClick={handleFollowToggle}
+        {/* Proof line: rating chip (club-only) + followers + posts */}
+        <div className="mt-3 flex items-center gap-3 flex-wrap text-[13px]">
+          {business.club_id && reviewStats && reviewStats.totalReviews > 0 && (
+            <span
+              className="inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-[12px] font-semibold"
+              style={{ background: 'rgba(247,147,30,0.10)', color: '#F7931E', border: '1px solid rgba(247,147,30,0.20)' }}
             >
-              {isFollowing ? (<><Check className="w-3.5 h-3.5" />Following</>) : 'Follow'}
-            </button>
-            <button
-              className="h-11 px-4 rounded-full text-sm font-semibold flex items-center justify-center gap-1.5 transition-transform active:scale-[0.98]"
-              style={{ background: '#ffffff', border: '1px solid rgba(15,23,42,0.07)', color: '#0F172A' }}
-              onClick={() => { trackBusinessAction(business.id, 'message', user?.id); startDM(business.id, 'business'); }}
-              disabled={isStartingDM === business.id}
-              aria-label={`Message ${business.name}`}
-            >
-              {isStartingDM === business.id
-                ? <Loader2 className="w-3.5 h-3.5 animate-spin" />
-                : <MessageCircle className="w-3.5 h-3.5" />}
-              Message
-            </button>
-          </>
-        )}
-
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <button
-              className="min-h-[44px] min-w-[44px] flex-shrink-0 rounded-full flex items-center justify-center active:scale-[0.97] transition-transform"
-              style={{ background: 'rgba(15,23,42,0.05)', border: '1px solid rgba(15,23,42,0.07)' }}
-              aria-label="More options"
-            >
-              <MoreHorizontal className="w-5 h-5 text-foreground" />
-            </button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end" className="w-48">
-            {isOwner ? (
-              <>
-                <DropdownMenuItem onClick={() => navigate(`/business/${business.id}/edit`)}>
-                  <Pencil className="h-4 w-4 mr-2" />
-                  Edit business profile
-                </DropdownMenuItem>
-                <DropdownMenuSeparator />
-                <DropdownMenuItem onClick={handleShare}>
-                  <Share2 className="h-4 w-4 mr-2" />
-                  Share profile
-                </DropdownMenuItem>
-                <DropdownMenuItem onClick={handleCopyLink}>
-                  <Link2 className="h-4 w-4 mr-2" />
-                  Copy link
-                </DropdownMenuItem>
-              </>
-            ) : (
-              <>
-                <DropdownMenuItem onClick={handleShare}>
-                  <Share2 className="h-4 w-4 mr-2" />
-                  Share profile
-                </DropdownMenuItem>
-                <DropdownMenuItem onClick={handleCopyLink}>
-                  <Link2 className="h-4 w-4 mr-2" />
-                  Copy link
-                </DropdownMenuItem>
-                <DropdownMenuSeparator />
-                <DropdownMenuItem onClick={() => setShowReportDialog(true)} className="text-destructive">
-                  <Flag className="h-4 w-4 mr-2" />
-                  Report
-                </DropdownMenuItem>
-              </>
-            )}
-          </DropdownMenuContent>
-        </DropdownMenu>
-      </div>
-
-      {/* ───── Stats row ───── */}
-      <div className="mt-6 px-5 mb-4">
-        <div className="flex items-center">
-          <button
-            type="button"
-            onClick={() => setActiveTab('posts')}
-            className="flex items-center gap-1.5 min-h-[44px] cursor-pointer active:opacity-70 transition-opacity pr-6"
-          >
-            <span className="text-sm text-muted-foreground">Posts</span>
-            <span className="text-base font-semibold text-foreground">{postsCount}</span>
-          </button>
-          <div className="w-px h-6 self-center" style={{ background: 'rgba(15,23,42,0.08)' }} />
+              <Star className="w-3 h-3" fill="#F7931E" strokeWidth={0} />
+              {reviewStats.avgRating.toFixed(1)}
+              <span style={{ color: '#F7931E', opacity: 0.8, fontWeight: 500 }}>({reviewStats.totalReviews})</span>
+            </span>
+          )}
           <button
             type="button"
             onClick={() => navigate(`/business/${business.slug || business.id}/followers`)}
-            className="flex items-center gap-1.5 min-h-[44px] cursor-pointer active:opacity-70 transition-opacity px-6"
+            className="inline-flex items-center gap-1 active:opacity-70 transition-opacity"
           >
-            <span className="text-sm text-muted-foreground">Followers</span>
-            <span className="text-base font-semibold text-foreground">{followersCount}</span>
+            <span className="font-semibold text-foreground tabular-nums">{followersCount}</span>
+            <span className="text-muted-foreground">followers</span>
           </button>
-          <div className="w-px h-6 self-center" style={{ background: 'rgba(15,23,42,0.08)' }} />
           <button
             type="button"
-            onClick={() => navigate(`/business/${business.slug || business.id}/followers?tab=following`)}
-            className="flex items-center gap-1.5 min-h-[44px] cursor-pointer active:opacity-70 transition-opacity pl-6"
+            onClick={() => setActiveTab('posts')}
+            className="inline-flex items-center gap-1 active:opacity-70 transition-opacity"
           >
-            <span className="text-sm text-muted-foreground">Following</span>
-            <span className="text-base font-semibold text-foreground">{followingCount}</span>
+            <span className="font-semibold text-foreground tabular-nums">{postsCount}</span>
+            <span className="text-muted-foreground">posts</span>
           </button>
         </div>
       </div>
+
+      {/* ───── Action rows ───── */}
+      {(() => {
+        // Secondary action defs
+        type SecKey = 'website' | 'call' | 'directions' | 'email' | 'book';
+        const secDefs: Record<SecKey, { label: string; icon: React.ElementType; onClick: () => void; available: boolean } > = {
+          website: {
+            label: 'Website', icon: Globe, available: !!business.website,
+            onClick: () => {
+              if (!business.website) return;
+              trackBusinessAction(business.id, 'website', user?.id);
+              openExternalUrl(ensureProtocol(business.website));
+            },
+          },
+          call: {
+            label: 'Call', icon: Phone, available: !!business.phone,
+            onClick: () => {
+              if (!business.phone) return;
+              trackBusinessAction(business.id, 'call', user?.id);
+              window.location.href = `tel:${business.phone}`;
+            },
+          },
+          directions: {
+            label: 'Directions', icon: Navigation, available: !!(business.location || (business.lat && business.lng)),
+            onClick: () => {
+              trackBusinessAction(business.id, 'directions', user?.id);
+              const q = business.location
+                ? encodeURIComponent(business.location)
+                : `${business.lat},${business.lng}`;
+              openExternalUrl(`https://www.google.com/maps/search/?api=1&query=${q}`);
+            },
+          },
+          email: {
+            label: 'Email', icon: Mail, available: !!business.email,
+            onClick: () => { if (business.email) window.location.href = `mailto:${business.email}`; },
+          },
+          book: {
+            label: 'Book', icon: Calendar, available: !!business.booking_url,
+            onClick: () => {
+              if (!business.booking_url) return;
+              trackBusinessAction(business.id, 'website', user?.id);
+              openExternalUrl(ensureProtocol(business.booking_url));
+            },
+          },
+        };
+
+        const pa = (business.primary_action || null) as SecKey | null;
+        const promoted = pa && secDefs[pa]?.available ? pa : null;
+
+        const secOrder: SecKey[] = ['website', 'call', 'directions'];
+        const secondary = secOrder.filter(k => secDefs[k].available && k !== promoted);
+
+        const OutlineBtn: React.FC<{ onClick: () => void; icon: React.ElementType; label: string; className?: string; disabled?: boolean; loading?: boolean }> = ({ onClick, icon: Icon, label, className, disabled, loading }) => (
+          <button
+            type="button"
+            disabled={disabled}
+            onClick={onClick}
+            className={cn('h-11 rounded-full text-sm font-semibold flex items-center justify-center gap-1.5 transition-transform active:scale-[0.98]', className)}
+            style={{ background: '#ffffff', border: '1px solid rgba(15,23,42,0.07)', color: '#0F172A' }}
+          >
+            {loading ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Icon className="w-3.5 h-3.5" />}
+            {label}
+          </button>
+        );
+
+        return (
+          <>
+            {/* Primary row */}
+            <div className="mt-4 px-5 flex items-center gap-2 relative z-10 pointer-events-auto">
+              {isOwner ? (
+                <>
+                  <button
+                    className="h-11 flex-1 rounded-full text-sm font-semibold flex items-center justify-center gap-1.5 transition-transform active:scale-[0.98]"
+                    style={{ background: '#0F172A', color: '#ffffff' }}
+                    onClick={() => navigate(`/business/${business.id}/edit`)}
+                  >
+                    <Pencil className="w-3.5 h-3.5" />
+                    Edit profile
+                  </button>
+                  <button
+                    className="h-11 px-4 rounded-full text-sm font-semibold flex items-center justify-center gap-1.5 transition-transform active:scale-[0.98]"
+                    style={{ background: '#ffffff', border: '1px solid rgba(15,23,42,0.07)', color: '#0F172A' }}
+                    onClick={() => navigate(`/business/${business.id}/manage`)}
+                  >
+                    Manage
+                  </button>
+                </>
+              ) : (
+                <>
+                  <button
+                    className="h-11 rounded-full text-sm font-semibold flex items-center justify-center gap-1.5 transition-transform active:scale-[0.98]"
+                    style={{
+                      flex: 1.6,
+                      ...(isFollowing
+                        ? { background: '#ffffff', border: '1px solid rgba(15,23,42,0.07)', color: '#0F172A' }
+                        : { background: '#0F172A', color: '#ffffff' }),
+                    }}
+                    onClick={handleFollowToggle}
+                  >
+                    {isFollowing ? (<><Check className="w-3.5 h-3.5" />Following</>) : 'Follow'}
+                  </button>
+                  <button
+                    className="h-11 flex-1 rounded-full text-sm font-semibold flex items-center justify-center gap-1.5 transition-transform active:scale-[0.98]"
+                    style={{ background: '#ffffff', border: '1px solid rgba(15,23,42,0.07)', color: '#0F172A' }}
+                    onClick={() => { trackBusinessAction(business.id, 'message', user?.id); startDM(business.id, 'business'); }}
+                    disabled={isStartingDM === business.id}
+                    aria-label={`Message ${business.name}`}
+                  >
+                    {isStartingDM === business.id
+                      ? <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                      : <MessageCircle className="w-3.5 h-3.5" />}
+                    Message
+                  </button>
+                  {promoted && (
+                    <OutlineBtn
+                      onClick={secDefs[promoted].onClick}
+                      icon={secDefs[promoted].icon}
+                      label={secDefs[promoted].label}
+                      className="flex-1"
+                    />
+                  )}
+                </>
+              )}
+
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <button
+                    className="min-h-[44px] min-w-[44px] flex-shrink-0 rounded-full flex items-center justify-center active:scale-[0.97] transition-transform"
+                    style={{ background: 'rgba(15,23,42,0.05)', border: '1px solid rgba(15,23,42,0.07)' }}
+                    aria-label="More options"
+                  >
+                    <MoreHorizontal className="w-5 h-5 text-foreground" />
+                  </button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" className="w-48">
+                  {isOwner ? (
+                    <>
+                      <DropdownMenuItem onClick={() => navigate(`/business/${business.id}/edit`)}>
+                        <Pencil className="h-4 w-4 mr-2" />
+                        Edit business profile
+                      </DropdownMenuItem>
+                      <DropdownMenuSeparator />
+                      <DropdownMenuItem onClick={handleShare}>
+                        <Share2 className="h-4 w-4 mr-2" />
+                        Share profile
+                      </DropdownMenuItem>
+                      <DropdownMenuItem onClick={handleCopyLink}>
+                        <Link2 className="h-4 w-4 mr-2" />
+                        Copy link
+                      </DropdownMenuItem>
+                    </>
+                  ) : (
+                    <>
+                      <DropdownMenuItem onClick={handleShare}>
+                        <Share2 className="h-4 w-4 mr-2" />
+                        Share profile
+                      </DropdownMenuItem>
+                      <DropdownMenuItem onClick={handleCopyLink}>
+                        <Link2 className="h-4 w-4 mr-2" />
+                        Copy link
+                      </DropdownMenuItem>
+                      <DropdownMenuSeparator />
+                      <DropdownMenuItem onClick={() => setShowReportDialog(true)} className="text-destructive">
+                        <Flag className="h-4 w-4 mr-2" />
+                        Report
+                      </DropdownMenuItem>
+                    </>
+                  )}
+                </DropdownMenuContent>
+              </DropdownMenu>
+            </div>
+
+            {/* Secondary row (visitor only, hidden when empty) */}
+            {!isOwner && secondary.length > 0 && (
+              <div className="mt-2 px-5 flex items-center gap-2 relative z-10 pointer-events-auto">
+                {secondary.map((k) => (
+                  <OutlineBtn
+                    key={k}
+                    onClick={secDefs[k].onClick}
+                    icon={secDefs[k].icon}
+                    label={secDefs[k].label}
+                    className="flex-1"
+                  />
+                ))}
+              </div>
+            )}
+          </>
+        );
+      })()}
+
+      {/* ───── Home course card (club-only) ───── */}
+      {business.club_id && homeCourse && (
+        <button
+          type="button"
+          onClick={() => navigate(`/courses/${homeCourse.id}`)}
+          className="mt-4 mx-5 flex items-center gap-3 rounded-2xl px-4 py-3 text-left active:scale-[0.99] transition-transform"
+          style={{ background: '#ffffff', border: '1px solid rgba(15,23,42,0.07)' }}
+        >
+          <div className="flex-1 min-w-0">
+            <p className="text-[10.5px] font-bold tracking-[0.08em] uppercase" style={{ color: '#F7931E' }}>
+              Home course
+            </p>
+            <p className="mt-1 text-[15px] font-semibold text-foreground truncate">
+              {homeCourse.name}
+            </p>
+            <p className="mt-0.5 flex items-center gap-2 text-[12.5px] text-muted-foreground">
+              {reviewStats && reviewStats.totalReviews > 0 && (
+                <span className="inline-flex items-center gap-1 font-semibold text-foreground tabular-nums">
+                  <Star className="w-3 h-3" fill="#F7931E" strokeWidth={0} />
+                  {reviewStats.avgRating.toFixed(1)}
+                  <span className="text-muted-foreground font-normal">({reviewStats.totalReviews})</span>
+                </span>
+              )}
+              {(homeCourse.region || homeCourse.country) && (
+                <span className="truncate">
+                  {[homeCourse.region, homeCourse.country].filter(Boolean).join(', ')}
+                </span>
+              )}
+            </p>
+          </div>
+          <ChevronRight className="w-5 h-5 text-muted-foreground shrink-0" />
+        </button>
+      )}
+
+      <div className="h-4" />
+
+
 
       {/* ───── Tabs ───── */}
       <section className="px-4 bg-background">
@@ -776,9 +866,25 @@ const BusinessProfilePage: React.FC = () => {
       />
 
 
-      {/* Hidden file inputs */}
-      <input ref={logoFileInputRef} type="file" accept="image/*" onChange={handleLogoFileSelected} className="hidden" />
-      <input ref={heroFileInputRef} type="file" accept="image/*" onChange={handleCoverFileSelected} className="hidden" />
+      {/* Hidden file inputs (choose + take, for both logo and cover) */}
+      <input ref={logoChooseInputRef} type="file" accept="image/*" onChange={handleLogoFileSelected} className="hidden" />
+      <input ref={logoTakeInputRef} type="file" accept="image/*" capture="environment" onChange={handleLogoFileSelected} className="hidden" />
+      <input ref={heroChooseInputRef} type="file" accept="image/*" onChange={handleCoverFileSelected} className="hidden" />
+      <input ref={heroTakeInputRef} type="file" accept="image/*" capture="environment" onChange={handleCoverFileSelected} className="hidden" />
+
+      {/* Unified photo action sheet */}
+      {isOwner && (
+        <PhotoActionSheet
+          open={photoSheet !== null}
+          onClose={() => setPhotoSheet(null)}
+          title={photoSheet === 'cover' ? 'Cover photo' : 'Business logo'}
+          hasPhoto={photoSheet === 'cover' ? !!business.cover_image_url : !!business.logo_url}
+          removeLabel={photoSheet === 'cover' ? 'Remove cover photo' : 'Remove logo'}
+          onChoose={() => (photoSheet === 'cover' ? heroChooseInputRef : logoChooseInputRef).current?.click()}
+          onTake={() => (photoSheet === 'cover' ? heroTakeInputRef : logoTakeInputRef).current?.click()}
+          onRemove={() => (photoSheet === 'cover' ? removeCover() : removeLogo())}
+        />
+      )}
 
       {/* Crop modal */}
       {isCropModalOpen && cropImageSrc && (
