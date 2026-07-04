@@ -337,7 +337,15 @@ class VideoEngineImpl {
       if (lane.state !== 'error') this.transition(lane, 'paused');
     };
     const onError = () => this.transition(lane, 'error');
+    const onCanPlay = () => {
+      if (lane.id === 'feed-active') fp.canplay(lane.postId);
+    };
+    const onPlaying = () => {
+      if (lane.id === 'feed-active') fp.firstFrame(lane.postId);
+    };
     el.addEventListener('loadeddata', onLoadedData);
+    el.addEventListener('canplay', onCanPlay);
+    el.addEventListener('playing', onPlaying);
     el.addEventListener('seeked', onSeeked);
     el.addEventListener('timeupdate', onTime);
     el.addEventListener('play', onPlay);
@@ -345,6 +353,8 @@ class VideoEngineImpl {
     el.addEventListener('error', onError);
     lane.detachFns.push(() => {
       el.removeEventListener('loadeddata', onLoadedData);
+      el.removeEventListener('canplay', onCanPlay);
+      el.removeEventListener('playing', onPlaying);
       el.removeEventListener('seeked', onSeeked);
       el.removeEventListener('timeupdate', onTime);
       el.removeEventListener('play', onPlay);
@@ -356,6 +366,7 @@ class VideoEngineImpl {
 
   play(laneId: LaneId): Promise<void> {
     const lane = this.getLane(laneId);
+    if (laneId === 'feed-active') fp.playCall(lane.postId);
     const p = lane.el.play();
     return Promise.resolve(p).catch((err) => {
       DBG(laneId, 'play() rejected', err);
