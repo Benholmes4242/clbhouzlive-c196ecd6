@@ -219,8 +219,13 @@ const BusinessProfilePage: React.FC = () => {
       isFollowing,
     });
   };
+  const buildShareUrl = () => {
+    const u = new URL(window.location.href);
+    u.searchParams.set('src', 'share');
+    return u.toString();
+  };
   const handleShare = async () => {
-    const url = window.location.href;
+    const url = buildShareUrl();
     if (business?.id) trackBusinessAction(business.id, 'share_profile', user?.id);
     if (navigator.share) {
       try { await navigator.share({ title: business?.name, url }); } catch {}
@@ -230,7 +235,7 @@ const BusinessProfilePage: React.FC = () => {
     }
   };
   const handleCopyLink = async () => {
-    await navigator.clipboard.writeText(window.location.href);
+    await navigator.clipboard.writeText(buildShareUrl());
     toast.success('Copied to clipboard');
   };
 
