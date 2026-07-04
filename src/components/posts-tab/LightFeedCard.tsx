@@ -280,8 +280,10 @@ const LightFeedCardImpl: React.FC<LightFeedCardProps> = ({
 
   const mediaUrl = media?.imageUrl || media?.thumbnailUrl || '';
 
+  const attachViewTracker = usePostViewTracker(post.id, true);
   return (
     <article
+      ref={attachViewTracker as any}
       style={{
         background: CARD,
         overflow: 'hidden',
