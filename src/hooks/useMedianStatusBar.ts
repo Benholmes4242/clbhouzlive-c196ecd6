@@ -13,6 +13,13 @@ const getShield = (): HTMLElement | null =>
 // Single source of truth for current status bar color
 export let currentShieldColor = '#000000';
 
+// Module-level flag: has the Median native bridge fired its ready callback yet?
+// Used to gate the 250/750ms failsafe retries — they exist purely to cover the
+// cold-start race where the bridge isn't up at first paint. Once ready, the
+// retries are pure overhead that cause a visible ~250ms repaint after every
+// SPA navigation, so we skip them.
+let medianLibraryReady = false;
+
 export function applyShieldColor(color: string) {
   currentShieldColor = color;
   const shield = getShield();
