@@ -1,5 +1,4 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { cn } from '@/lib/utils';
 import { useNavigate } from 'react-router-dom';
 import { useActivityFeed, ActivityNotification, checkContentExists } from '@/hooks/useActivityFeed';
 import { NotificationList } from '@/components/activity/notifications/NotificationList';
@@ -48,7 +47,6 @@ const BORDER = 'rgba(15,23,42,0.07)';
 const BG_SURFACE = '#F8FAFC';
 const AMBER = '#F7931E';
 const AMBER_DEEP = '#C97A10';
-const FONT_SERIF = '"Geist", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif';
 
 // Temporal date-group divider for the notification list (TODAY / YESTERDAY / EARLIER).
 // NOT a canonical SectionHeader — date labels are a distinct tier from section eyebrows.
@@ -69,7 +67,6 @@ const ActivityPage: React.FC = () => {
   const [chipFilter, setChipFilter] = useState<ChipFilter>('All');
 
   const { isRehydrating } = useRehydrationSafe();
-  const [isRefreshing, setIsRefreshing] = useState(false);
 
   const [actionSheetOpen, setActionSheetOpen] = useState(false);
   const [selectedNotification, setSelectedNotification] = useState<ActivityNotification | null>(null);
@@ -120,14 +117,6 @@ const ActivityPage: React.FC = () => {
 
 
   if (isRehydrating) return <ActivityPageSkeleton />;
-
-  const handleRefresh = async () => {
-    if (isRefreshing) return;
-    setIsRefreshing(true);
-    await queryClient.invalidateQueries({ queryKey: ['activity-feed'] });
-    await queryClient.invalidateQueries({ queryKey: ['activity-unread-count'] });
-    setTimeout(() => setIsRefreshing(false), 500);
-  };
 
   const handleMarkRead = async (id: string) => {
     const { error } = await supabase.from('notifications').update({ is_read: true }).eq('id', id);
