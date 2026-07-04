@@ -24,6 +24,7 @@ export interface VerificationRow {
   contactEmail?: string | null;
   contactRole?: string | null;
   evidenceUrl?: string | null;
+  proofDocumentUrl?: string | null;
   inviteReason?: string | null;
   displayName?: string | null;
   username?: string | null;
