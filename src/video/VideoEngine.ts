@@ -400,6 +400,14 @@ class VideoEngineImpl {
     const onError = () => this.transition(lane, 'error');
     const onCanPlay = () => {
       if (lane.id === 'feed-active') fp.canplay(lane.postId);
+      // Honor persistent play-intent: if play() was called before/while the
+      // (new) source was loading, kick it off now that it's ready.
+      if (lane.wantPlay && lane.mountedHost && lane.el.paused) {
+        const p = lane.el.play();
+        if (p && typeof (p as Promise<void>).catch === 'function') {
+          (p as Promise<void>).catch(() => { /* autoplay reject — safe */ });
+        }
+      }
     };
     const onPlaying = () => {
       if (lane.id === 'feed-active') fp.firstFrame(lane.postId);
@@ -427,11 +435,9 @@ class VideoEngineImpl {
 
   play(laneId: LaneId): Promise<void> {
     const lane = this.getLane(laneId);
-    // Guard: no play until the lane element is mounted into a real host.
-    // Effects across sibling cards can race; queue the intent and let
-    // mountLane consume it once the element lands in the active card.
+    // Persistent intent: set now, honored on mount + on canplay after (re)load.
+    lane.wantPlay = true;
     if (!lane.mountedHost) {
-      lane.pendingPlay = true;
       DBG(laneId, 'play() queued — no mounted host');
       return Promise.resolve();
     }
@@ -444,14 +450,18 @@ class VideoEngineImpl {
 
   pause(laneId: LaneId): void {
     const lane = this.getLane(laneId);
+    lane.wantPlay = false;
     if (!lane.el.paused) lane.el.pause();
   }
 
   pauseAll(): void {
     this.lanes.forEach((lane) => {
+      lane.wantPlay = false;
       if (!lane.el.paused) lane.el.pause();
     });
   }
+
+
 
   seek(laneId: LaneId, seconds: number): void {
     const lane = this.getLane(laneId);
