@@ -30,11 +30,8 @@ const BLUE_SOFT = 'rgba(37,99,235,0.09)';
 const NEUTRAL_TINT = '#F1F5F9';
 const UNREAD_BG = 'rgba(247,147,30,0.045)';
 
-type TypeSpec = {
-  icon: React.ComponentType<{ size?: number; color?: string; strokeWidth?: number; fill?: string }>;
-  fg: string;
-  bg: string;
-};
+import type { LucideIcon } from 'lucide-react';
+type TypeSpec = { icon: LucideIcon; fg: string; bg: string };
 
 function typeSpec(type: string): TypeSpec {
   switch (type) {
