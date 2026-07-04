@@ -236,6 +236,15 @@ export function BusinessCommandCard({
                   <BarChart3 className="h-4 w-4" style={{ color: BIZ.inkMute }} />
                   Insights
                 </DropdownMenuItem>
+                <DropdownMenuItem
+                  onClick={(e) => { e.stopPropagation(); goto('/reviews'); }}
+                  className="gap-2.5 cursor-pointer min-h-[44px] active:bg-muted"
+                >
+                  <Star className="h-4 w-4" style={{ color: BIZ.inkMute }} />
+                  Reviews
+                  {awaitingReplies > 0 && (
+                    <span className="ml-auto h-2 w-2 rounded-full" style={{ background: BIZ.amber }} />
+                  )}
 
                 {canManage && (
                   <>
