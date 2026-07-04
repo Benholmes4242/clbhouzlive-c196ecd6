@@ -125,10 +125,6 @@ export default function BusinessProfileEditor() {
   /* ── branding ─────────────────────────────────────── */
   const [logo, setLogo] = useState<ImageState>(emptyImage);
   const [cover, setCover] = useState<ImageState>(emptyImage);
-  const [logoCropOpen, setLogoCropOpen] = useState(false);
-  const [coverCropOpen, setCoverCropOpen] = useState(false);
-  const [logoCropSrc, setLogoCropSrc] = useState<string | null>(null);
-  const [coverCropSrc, setCoverCropSrc] = useState<string | null>(null);
 
   /* ── social ───────────────────────────────────────── */
   const [social, setSocial] = useState<SocialFields>({
