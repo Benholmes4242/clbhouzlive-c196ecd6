@@ -18,6 +18,7 @@ import { AlertCircle, ChevronLeft } from 'lucide-react';
 import { RateCourseNudge } from '@/components/activity/RateCourseNudge';
 import { toast } from 'sonner';
 import { useUnseenFriendReviews } from '@/hooks/useUnseenFriendReviews';
+import { useHideBottomNav } from '@/hooks/useBottomNavVisibility';
 
 const FRIEND_TYPES = new Set([
   'friend_request', 'friend_accept', 'friend_accepted',
