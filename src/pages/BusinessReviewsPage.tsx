@@ -419,6 +419,7 @@ export default function BusinessReviewsPage() {
 
   const { data: membership } = useBusinessMembership(businessId);
   const canManage = !!membership?.canManage;
+  const { data: businessProfile, isLoading: profileLoading } = useBusinessProfile(businessId);
 
   const [chip, setChip] = useState<ChipKey>('all');
   const active = CHIPS.find((c) => c.key === chip)!;
