@@ -233,6 +233,12 @@ class VideoEngineImpl {
     lane.posterUrl = posterUrl;
     lane.startPosition = startPosition;
     lane.firstFrame = false;
+    // Reset playback position on source change so B doesn't inherit A's time.
+    if (startPosition <= 0) {
+      try { lane.el.currentTime = 0; } catch { /* noop */ }
+    }
+    // NOTE: do NOT clear wantPlay here — a mid-load play() intent must persist
+    // so the engine can start playback once the new source reaches canplay.
 
     if (posterUrl) lane.el.poster = posterUrl;
 
