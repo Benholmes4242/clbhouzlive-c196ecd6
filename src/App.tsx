@@ -372,64 +372,84 @@ function AppRoutes() {
   // between reset and the final applyShieldColor() below. The effect ends by
   // calling applyShieldColor(...) with the correct route value, so cold boot
   // still lands on a real colour (initial `transparent` comes from index.html).
+  //
+  // AppRoutes is now the SOLE writer of shield / html+body bg / route classes /
+  // native status bar (single-writer consolidation). Idempotency cache below
+  // makes unchanged navs skip every DOM + bridge call — most navs share chrome.
   useLayoutEffect(() => {
     // Safety net: release any stranded body scroll-lock from an overlay that
     // didn't unmount cleanly before route change. Prevents a stuck `position:
     // fixed` body from freezing the next page.
     forceUnlockBodyScroll();
 
-    // Reset html/body to the route's surface to prevent stale colour bleeding
-    // through WebView compositing. Dark-chrome routes (Clubhouse) stay charcoal
-    // so the full cold-launch chain (splash → shell → skeleton → feed) shows
-    // ZERO colour change. Light routes get the standard light surface.
     const darkChrome = isDarkChromeRoute(location.pathname);
     const immersive = isImmersiveRoute(location.pathname);
+    const isAuth = location.pathname.startsWith('/auth');
     // Immersive routes (course/profile/business) get a DARK ink fallback so
     // any pre-paint glimpse in the notch/safe-area is cinematic, not grey.
     const surface = darkChrome ? '#15171F' : immersive ? '#0F172A' : '#F8FAFC';
-    document.documentElement.style.backgroundColor = surface;
-    document.body.style.backgroundColor = surface;
+    const shieldColor = immersive ? 'transparent' : (darkChrome ? '#15171F' : '#F8FAFC');
+    const statusBar = immersive
+      ? { style: 'dark' as const, color: '00000000', overlay: true, blur: false }
+      : { style: 'light' as const, color: darkChrome ? 'FF15171F' : 'FFF8FAFC', overlay: false, blur: false };
 
-    // Keep body route classes in sync with current route so stale
-    // `route-clubhouse` / `route-auth` classes from the pre-React shell
-    // never apply dark CSS to a light page (or vice-versa).
-    document.body.classList.toggle('route-clubhouse', darkChrome);
-    document.body.classList.toggle('route-auth', location.pathname.startsWith('/auth'));
+    // Idempotency: cache the last-applied values on the effect's module scope.
+    // If nothing changed (very common between similar routes) skip every write.
+    const prev = (window as any).__lvChromeCache as
+      | { surface: string; darkChrome: boolean; isAuth: boolean; immersive: boolean; shieldColor: string; sbKey: string }
+      | undefined;
+    const sbKey = `${statusBar.style}|${statusBar.color}|${statusBar.overlay}|${statusBar.blur}`;
 
-    // FIX: Mark immersive routes so CSS can suppress .app-shell's
-    // #F8FAFC background-color before the hero page mounts.
-    // This eliminates the grey safe-area flash on return navigation.
-    if (immersive) {
-      document.documentElement.setAttribute('data-immersive-route', 'true');
-      // Apply transparent shield + Median overlay SYNCHRONOUSLY (pre-paint)
-      // so the webview is told to extend under the status bar before the hero
-      // lays out. Without this, the first paint has --sat=0 and the hero's
-      // marginTop:-sat pull-up collapses → grey strip in the notch zone.
+    if (
+      prev &&
+      prev.surface === surface &&
+      prev.darkChrome === darkChrome &&
+      prev.isAuth === isAuth &&
+      prev.immersive === immersive &&
+      prev.shieldColor === shieldColor &&
+      prev.sbKey === sbKey
+    ) {
+      return;
+    }
+
+    // html/body surface — only rewrite when it actually changed.
+    if (!prev || prev.surface !== surface) {
+      document.documentElement.style.backgroundColor = surface;
+      document.body.style.backgroundColor = surface;
+    }
+
+    // Body route classes — only toggle when they actually changed.
+    if (!prev || prev.darkChrome !== darkChrome) {
+      document.body.classList.toggle('route-clubhouse', darkChrome);
+    }
+    if (!prev || prev.isAuth !== isAuth) {
+      document.body.classList.toggle('route-auth', isAuth);
+    }
+
+    // Immersive marker — only flip when it changed.
+    if (!prev || prev.immersive !== immersive) {
+      if (immersive) {
+        document.documentElement.setAttribute('data-immersive-route', 'true');
+      } else {
+        document.documentElement.removeAttribute('data-immersive-route');
+      }
+    }
+
+    // Shield colour — only rewrite when it changed.
+    if (!prev || prev.shieldColor !== shieldColor) {
+      try { applyShieldColor(shieldColor); } catch {}
+    }
+
+    // Native status bar bridge — only call when parameters changed.
+    if (!prev || prev.sbKey !== sbKey) {
       try {
-        applyShieldColor('transparent');
-        (window as any).median?.statusbar?.set({
-          style: 'dark',
-          color: '00000000',
-          overlay: true,
-          blur: false,
-        });
-      } catch {}
-    } else {
-      document.documentElement.removeAttribute('data-immersive-route');
-      // Leaving an immersive route: restore normal shield + opaque native bar
-      // so non-immersive routes aren't left transparent if a race beats the
-      // FloatingPageHeader unmount cleanup.
-      try {
-        applyShieldColor(darkChrome ? '#15171F' : '#F8FAFC');
-        (window as any).median?.statusbar?.set({
-          style: darkChrome ? 'light' : 'light',
-          color: darkChrome ? 'FF15171F' : 'FFF8FAFC',
-          overlay: false,
-          blur: false,
-        });
+        (window as any).median?.statusbar?.set(statusBar);
       } catch {}
     }
+
+    (window as any).__lvChromeCache = { surface, darkChrome, isAuth, immersive, shieldColor, sbKey };
   }, [location.pathname]);
+
   
   // Render origin page when we have a background location
   const routesLocation = state?.backgroundLocation || location;

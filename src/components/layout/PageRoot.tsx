@@ -3,7 +3,7 @@ import { useRef } from "react";
 
 import { useLocation } from "react-router-dom";
 import { cn } from "@/lib/utils";
-import { useMedianStatusBar } from "@/hooks/useMedianStatusBar";
+// useMedianStatusBar removed — chrome is owned solely by AppRoutes now.
 import { isDarkChromeRoute } from "@/components/header/globalHeaderRules";
 import { usePageRootMount } from "@/perf/usePageReady";
 
@@ -40,20 +40,14 @@ export const PageRoot = React.forwardRef<HTMLDivElement, PageRootProps>(
     // stale hook does not re-assert chrome on unrelated routes.
     const ownerPathRef = useRef(location.pathname);
 
-    // Default light chrome for the Clubhouse/Profile pages; dark elsewhere.
-    // Status bar text style: 'light' = white icons (paired with dark bg),
-    // 'dark' = dark icons (paired with light bg).
-    const statusBarStyle = resolvedDark ? 'light' : 'dark';
-    const statusBarColor = resolvedDark ? '#15171F' : '#F8FAFC';
-    useMedianStatusBar(
-      statusBarStyle,
-      statusBarColor,
-      false,
-      false,
-      !immersiveStatusBar,
-      statusBarStyle,
-      ownerPathRef.current,
-    );
+    // Chrome writers (shield / html-body bg / native status bar) are owned
+    // solely by AppRoutes now. PageRoot no longer races them per mount.
+    // Retained: ownerPathRef (used elsewhere) and dark/light class application
+    // via className. Route-derived status-bar values are computed in AppRoutes
+    // via isDarkChromeRoute / isImmersiveRoute — no per-page override needed.
+    void immersiveStatusBar;
+    void ownerPathRef;
+
 
 
     usePageRootMount();
