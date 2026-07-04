@@ -5,7 +5,7 @@
  */
 
 import React, { useState, useEffect, useRef, useMemo } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useNavigate, useParams, useLocation, useSearchParams } from 'react-router-dom';
 import { cn } from '@/lib/utils';
 import {
   Phone, Globe, MapPin, MoreHorizontal, Check, Loader2, ChevronLeft,
