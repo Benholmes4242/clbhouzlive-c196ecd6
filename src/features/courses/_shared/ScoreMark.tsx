@@ -70,6 +70,18 @@ const SPECS: Record<Variant, VariantSpec> = {
   triple: { shape: 'square',   depth: 3, colour: SC_DOUBLE },
 };
 
+const SPECS_DARK: Record<Variant, VariantSpec> = {
+  empty:  { shape: null,       depth: 0, colour: 'rgba(242,244,247,0.20)' },
+  par:    { shape: null,       depth: 0, colour: SC_PAR_DARK },
+  birdie: { shape: 'circle',   depth: 1, colour: SC_BIRDIE_DARK },
+  eagle:  { shape: 'circle',   depth: 2, colour: SC_EAGLE_DARK },
+  alba:   { shape: 'circle',   depth: 3, colour: SC_ALBATROSS_DARK },
+  hio:    { shape: 'circle',   depth: 3, colour: SC_ACE_DARK },
+  bogey:  { shape: 'square',   depth: 1, colour: SC_BOGEY_DARK },
+  doub:   { shape: 'square',   depth: 2, colour: SC_DOUBLE_DARK },
+  triple: { shape: 'square',   depth: 3, colour: SC_DOUBLE_DARK },
+};
+
 const Shape: React.FC<{
   kind: 'circle' | 'square' | 'triangle';
   insetVB: number;
