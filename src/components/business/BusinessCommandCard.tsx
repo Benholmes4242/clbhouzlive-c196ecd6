@@ -78,6 +78,11 @@ export function BusinessCommandCard({
   // Fetch pending access requests count for indicator
   const { data: pendingRequestsCount } = useBusinessPendingRequestsCount(business.id);
 
+  // Reviews summary — used for the Reviews action badge / rating.
+  const { data: reviewsData } = useBusinessReviews(business.id, { filter: 'all', sort: 'recent', limit: 1 });
+  const awaitingReplies = reviewsData?.summary?.awaiting_reply ?? 0;
+  const avgReviewRating = reviewsData?.summary?.avg ?? null;
+
   // Subscribe to realtime updates for access requests
   useBusinessAccessRequestsRealtime(business.id);
 
