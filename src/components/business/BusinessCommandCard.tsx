@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
-  MoreHorizontal, Eye, Pencil, BarChart3, Trash2, ShieldCheck, Clock, CheckCircle, Users, ChevronRight, ChevronDown, MapPin,
+  MoreHorizontal, Eye, Pencil, BarChart3, Trash2, ShieldCheck, Clock, CheckCircle, Users, ChevronRight, ChevronDown, MapPin, Star,
 } from 'lucide-react';
 import {
   DropdownMenu,
