@@ -1,48 +1,63 @@
 import { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { ChevronLeft, Plus, Users, MoreHorizontal, Trash2 } from 'lucide-react';
+import {
+  Crown, Shield, Edit3, BarChart3, MoreHorizontal, Trash2,
+  Eye, EyeOff, Mail, AtSign, UserPlus, Plus,
+} from 'lucide-react';
+import { motion } from 'framer-motion';
 import { Skeleton } from '@/components/ui/skeleton';
-import { Button } from '@/components/ui/button';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { ConfirmModal } from '@/components/ui/confirm-modal';
 import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
+  DropdownMenu, DropdownMenuContent, DropdownMenuItem,
+  DropdownMenuSeparator, DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
+import { ManagePageShell } from '@/components/manage/ManagePageShell';
 import { useBusinessMembership } from '@/hooks/useBusinessMembership';
 import { useBusinessProfile } from '@/hooks/useBusinessProfile';
 import {
-  useBusinessTeam,
-  useBusinessInvites,
-  useRemoveMember,
-  useUpdateMemberRole,
-  useRevokeInvite,
-  useSetMemberVisibility,
-  BUSINESS_ROLE_LABELS,
-  BusinessMember,
-  BusinessRole,
-  AssignableBusinessRole,
+  useBusinessTeam, useBusinessInvites, useRemoveMember, useUpdateMemberRole,
+  useRevokeInvite, useSetMemberVisibility,
+  BUSINESS_ROLE_LABELS, BusinessMember, BusinessRole, AssignableBusinessRole,
 } from '@/hooks/useBusinessTeam';
 import { AccessRequestsSection } from '@/components/business/AccessRequestsSection';
 import { useHideBottomNav } from '@/hooks/useBottomNavVisibility';
 import { useHideHeader } from '@/hooks/useHeaderVisibility';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
-import { Switch } from '@/components/ui/switch';
-import { toast } from 'sonner';
 
-const ROLE_DESCRIPTIONS: Record<BusinessRole, string> = {
-  owner: 'Full control, including verification and team access.',
-  admin: 'Manage the business profile, posts, and team.',
-  editor: 'Create and publish posts as the business.',
-  analyst: 'View insights and analytics only.',
-};
+const INK = '#0F172A';
+const INK_45 = '#64748B';
+const HAIR = 'rgba(15,23,42,0.08)';
+const AMBER = '#F7931E';
+const AMBER_SOFT = 'rgba(247,147,30,0.10)';
+const CARD_BG = '#FFFFFF';
 
 const ASSIGNABLE_ROLES: AssignableBusinessRole[] = ['admin', 'editor', 'analyst'];
 
-import SectionHeader from '@/components/ui/SectionHeader';
+const ROLE_ICON: Record<BusinessRole, React.ComponentType<{ size?: number; color?: string; strokeWidth?: number }>> = {
+  owner: Crown,
+  admin: Shield,
+  editor: Edit3,
+  analyst: BarChart3,
+};
+
+function RoleChip({ role }: { role: BusinessRole }) {
+  const Icon = ROLE_ICON[role];
+  const isOwner = role === 'owner';
+  return (
+    <span
+      className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px] font-semibold"
+      style={{
+        background: isOwner ? AMBER_SOFT : 'rgba(15,23,42,0.05)',
+        color: isOwner ? '#B4650C' : INK_45,
+        border: `1px solid ${isOwner ? 'rgba(247,147,30,0.22)' : HAIR}`,
+      }}
+    >
+      <Icon size={11} strokeWidth={2.5} />
+      {BUSINESS_ROLE_LABELS[role]}
+    </span>
+  );
+}
 
 export default function BusinessTeamPage() {
   const { businessId } = useParams<{ businessId: string }>();
@@ -63,102 +78,85 @@ export default function BusinessTeamPage() {
   const currentUserId = user?.id;
 
   const [removeConfirm, setRemoveConfirm] = useState<{ open: boolean; member: BusinessMember | null }>({
-    open: false,
-    member: null,
+    open: false, member: null,
   });
 
   const canManage = !!membership?.canManage;
-
   const pendingInvites = (invites || []).filter((i) => i.status === 'pending');
-
-  const grouped: Record<BusinessRole, BusinessMember[]> = {
-    owner: [],
-    admin: [],
-    editor: [],
-    analyst: [],
-  };
-  (team || []).forEach((m) => {
-    if (grouped[m.role]) grouped[m.role].push(m);
-  });
 
   const handleRemoveMember = async () => {
     if (!removeConfirm.member) return;
-    try {
-      await removeMember.mutateAsync(removeConfirm.member.user_profile_id);
-    } catch {
-      // toast handled in hook
-    }
+    try { await removeMember.mutateAsync(removeConfirm.member.user_profile_id); } catch {}
     setRemoveConfirm({ open: false, member: null });
-  };
-
-  const handleRoleChange = async (member: BusinessMember, newRole: AssignableBusinessRole) => {
-    try {
-      await updateRole.mutateAsync({ memberUserId: member.user_profile_id, newRole });
-    } catch {
-      toast.error('Failed to update role');
-    }
   };
 
   if (!businessId) return null;
 
-  const MemberRow = ({ member, manageable }: { member: BusinessMember; manageable: boolean }) => {
-    const profile = member.user_profile;
-    const isSelf = !!currentUserId && member.user_profile_id === currentUserId;
+  const MemberRow = ({ m }: { m: BusinessMember }) => {
+    const profile = m.user_profile;
+    const isOwner = m.role === 'owner';
+    const isSelf = !!currentUserId && m.user_profile_id === currentUserId;
     const canToggleVisibility = canManage || isSelf;
-    const isPublic = member.is_public === true;
+    const canRowManage = canManage && !isOwner;
+    const isPublic = m.is_public === true;
+    const name = profile?.display_name || profile?.username || 'Team member';
+
     return (
       <div className="flex items-center gap-3 py-3">
         <SquircleAvatar
           src={profile?.profile_photo_url || undefined}
-          alt={profile?.display_name || 'Member'}
+          alt={name}
           size={44}
+          hideRing
         />
         <div className="flex-1 min-w-0">
-          <p className="font-medium text-[15px] text-foreground truncate">
-            {profile?.display_name || profile?.username || 'Unknown'}
-          </p>
-          <p className="text-xs text-muted-foreground truncate">
-            {profile?.username ? `@${profile.username}` : BUSINESS_ROLE_LABELS[member.role]}
-          </p>
+          <div className="flex items-center gap-2 flex-wrap">
+            <p className="font-semibold text-[15px] truncate" style={{ color: INK }}>{name}</p>
+            <RoleChip role={m.role} />
+          </div>
+          {profile?.username && (
+            <p className="text-[12px] truncate" style={{ color: INK_45 }}>@{profile.username}</p>
+          )}
           {canToggleVisibility && (
-            <div className="flex items-center gap-2 mt-2">
-              <Switch
-                checked={isPublic}
-                disabled={setVisibility.isPending}
-                onCheckedChange={async (next) => {
-                  try {
-                    await setVisibility.mutateAsync({
-                      memberUserId: member.user_profile_id,
-                      isPublic: next,
-                    });
-                  } catch {
-                    // toast handled in hook
-                  }
-                }}
-                aria-label="Show on public profile"
-              />
-              <span className="text-[11px] text-muted-foreground">
-                {isPublic ? 'Shown on public profile' : 'Hidden from public profile'}
-              </span>
-            </div>
+            <button
+              type="button"
+              onClick={async () => {
+                try {
+                  await setVisibility.mutateAsync({
+                    memberUserId: m.user_profile_id,
+                    isPublic: !isPublic,
+                  });
+                } catch {}
+              }}
+              disabled={setVisibility.isPending}
+              className="mt-1.5 inline-flex items-center gap-1.5 text-[11px] active:opacity-70"
+              style={{ color: isPublic ? '#059669' : INK_45 }}
+              aria-label={isPublic ? 'Hide from public profile' : 'Show on public profile'}
+            >
+              {isPublic ? <Eye size={12} strokeWidth={2.25} /> : <EyeOff size={12} strokeWidth={2.25} />}
+              {isPublic ? 'Shown on public profile' : 'Hidden from public profile'}
+            </button>
           )}
         </div>
-        {manageable && (
+        {canRowManage && (
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground">
-                <MoreHorizontal className="h-4 w-4" />
-              </Button>
+              <button
+                className="h-8 w-8 flex items-center justify-center rounded-full active:bg-black/[0.04]"
+                aria-label="Member actions"
+              >
+                <MoreHorizontal size={16} color={INK_45} />
+              </button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="w-48">
-              <div className="px-2 py-1.5 text-xs font-medium text-muted-foreground uppercase tracking-wide">
+              <div className="px-2 py-1.5 text-[10px] font-semibold uppercase tracking-wide" style={{ color: INK_45 }}>
                 Change role
               </div>
               {ASSIGNABLE_ROLES.map((r) => (
                 <DropdownMenuItem
                   key={r}
-                  onClick={() => handleRoleChange(member, r)}
-                  disabled={member.role === r}
+                  onClick={() => updateRole.mutate({ memberUserId: m.user_profile_id, newRole: r })}
+                  disabled={m.role === r}
                   className="text-sm"
                 >
                   {BUSINESS_ROLE_LABELS[r]}
@@ -167,9 +165,9 @@ export default function BusinessTeamPage() {
               <DropdownMenuSeparator />
               <DropdownMenuItem
                 className="text-destructive text-sm"
-                onClick={() => setRemoveConfirm({ open: true, member })}
+                onClick={() => setRemoveConfirm({ open: true, member: m })}
               >
-                <Trash2 className="h-4 w-4 mr-2" />
+                <Trash2 size={14} className="mr-2" />
                 Remove access
               </DropdownMenuItem>
             </DropdownMenuContent>
@@ -179,144 +177,173 @@ export default function BusinessTeamPage() {
     );
   };
 
-  const RoleGroup = ({ role, members }: { role: BusinessRole; members: BusinessMember[] }) => {
-    if (role !== 'owner' && members.length === 0) return null;
-    const labelPlural =
-      role === 'owner' ? 'OWNER' : `${BUSINESS_ROLE_LABELS[role].toUpperCase()}S`;
-    return (
-      <section>
-        <SectionHeader tier="standard" kicker={labelPlural} tone="slate" />
-        <p className="text-xs text-muted-foreground mb-2">{ROLE_DESCRIPTIONS[role]}</p>
-        <div className="[&>*+*]:border-t [&>*+*]:[border-top-color:rgba(15,23,42,0.07)]">
-          {role === 'owner' && teamLoading && members.length === 0 ? (
-            <div className="space-y-3 py-2">
-              {[0, 1].map((i) => (
-                <div key={i} className="flex items-center gap-3 py-2">
-                  <Skeleton className="w-11 h-11 rounded-2xl shrink-0" />
-                  <div className="flex-1 space-y-2">
-                    <Skeleton className="h-4 w-1/2" />
-                    <Skeleton className="h-3 w-1/3" />
-                  </div>
-                </div>
-              ))}
-            </div>
-          ) : role === 'owner' && members.length === 0 ? (
-            <div className="py-4 text-center text-muted-foreground text-sm">No owner</div>
-          ) : (
-            members.map((m) => (
-              <MemberRow key={m.id} member={m} manageable={canManage && role !== 'owner'} />
-            ))
-          )}
-        </div>
-      </section>
-    );
-  };
-
   return (
-    <div
-      className="min-h-screen bg-background md:max-w-[620px] md:mx-auto"
-      style={{ paddingTop: 'var(--chrome-total-h, 0px)' }}
-    >
-      {/* Title block — CompactHeader provides the back arrow */}
-      <div className="px-4 pt-3 pb-3 flex items-end justify-between">
-        <div>
-          <SectionHeader tier="standard" kicker="TEAM" tone="amber" />
-          <h1 className="text-[18px] text-foreground leading-none mt-0.5" style={{ fontWeight: 900, letterSpacing: '-0.01em' }}>
-            Manage team
-          </h1>
-        </div>
-        {canManage && (
-          <button
-            onClick={() => navigate(`/business/${businessId}/team/invite`)}
-            className="min-h-[44px] min-w-[44px] flex items-center justify-center rounded-xl text-white active:scale-[0.97] transition-transform"
-            style={{ background: '#F7931E' }}
-            aria-label="Invite teammate"
+    <ManagePageShell title="Manage team">
+      <main className="px-4 pt-4 pb-32 max-w-lg mx-auto">
+        <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }}>
+          <p className="text-[13px] leading-relaxed mb-5" style={{ color: INK_45 }}>
+            Invite people to help manage this business. Public members appear on your profile's Team tab.
+          </p>
+
+          <AccessRequestsSection
+            businessId={businessId}
+            businessName={business?.name || 'Business'}
+            businessAvatarUrl={business?.logo_url}
+            canManage={canManage}
+          />
+
+          {/* MEMBERS */}
+          <div
+            className="mb-6"
+            style={{
+              background: CARD_BG,
+              border: `1px solid ${HAIR}`,
+              borderRadius: 14,
+              padding: '4px 14px',
+            }}
           >
-            <Plus className="w-5 h-5" />
-          </button>
-        )}
-      </div>
-
-
-      <div className="max-w-lg mx-auto px-4 py-6 space-y-8">
-        <AccessRequestsSection
-          businessId={businessId}
-          businessName={business?.name || 'Business'}
-          businessAvatarUrl={business?.logo_url}
-          canManage={canManage}
-        />
-
-        <p className="text-xs text-muted-foreground -mt-2">
-          Public members appear on your business profile's Team tab.
-        </p>
-
-        <RoleGroup role="owner" members={grouped.owner} />
-        <RoleGroup role="admin" members={grouped.admin} />
-        <RoleGroup role="editor" members={grouped.editor} />
-        <RoleGroup role="analyst" members={grouped.analyst} />
-
-
-        {canManage && pendingInvites.length > 0 && (
-          <section>
-            <SectionHeader tier="standard" kicker="PENDING" tone="slate" />
-            <div className="[&>*+*]:border-t [&>*+*]:[border-top-color:rgba(15,23,42,0.07)]">
-              {pendingInvites.map((invite) => (
-                <div key={invite.id} className="flex items-center gap-3 py-3">
-                  <div
-                    className="h-11 w-11 rounded-sq-md flex items-center justify-center"
-                    style={{ background: 'rgba(15,23,42,0.05)', border: '1px solid rgba(15,23,42,0.07)' }}
-                  >
-                    <Users className="h-5 w-5 text-muted-foreground" />
+            <div className="pt-3 pb-1 flex items-center justify-between">
+              <span className="text-[10.5px] font-bold uppercase tracking-[0.08em]" style={{ color: INK_45 }}>
+                Members
+              </span>
+              <span className="text-[11px] tabular-nums" style={{ color: INK_45 }}>
+                {(team || []).length}
+              </span>
+            </div>
+            <div className="[&>*+*]:border-t" style={{ ['--tw-border-opacity' as any]: 1 }}>
+              {teamLoading ? (
+                [0, 1, 2].map(i => (
+                  <div key={i} className="flex items-center gap-3 py-3">
+                    <Skeleton className="w-11 h-11 rounded-2xl shrink-0" />
+                    <div className="flex-1 space-y-2">
+                      <Skeleton className="h-4 w-1/2" />
+                      <Skeleton className="h-3 w-1/3" />
+                    </div>
                   </div>
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-2">
-                      <p className="font-medium text-[15px] truncate">{invite.invitee_email}</p>
-                      <span
-                        className="inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-medium"
+                ))
+              ) : (team || []).length === 0 ? (
+                <div className="py-6 text-center text-[13px]" style={{ color: INK_45 }}>
+                  No members yet.
+                </div>
+              ) : (
+                (team || []).map(m => (
+                  <div key={m.id} style={{ borderTopColor: HAIR }}>
+                    <MemberRow m={m} />
+                  </div>
+                ))
+              )}
+            </div>
+          </div>
+
+          {/* PENDING INVITES */}
+          {canManage && pendingInvites.length > 0 && (
+            <div
+              className="mb-6"
+              style={{
+                background: CARD_BG,
+                border: `1px solid ${HAIR}`,
+                borderRadius: 14,
+                padding: '4px 14px',
+              }}
+            >
+              <div className="pt-3 pb-1 flex items-center justify-between">
+                <span className="text-[10.5px] font-bold uppercase tracking-[0.08em]" style={{ color: INK_45 }}>
+                  Pending invites
+                </span>
+                <span className="text-[11px] tabular-nums" style={{ color: INK_45 }}>
+                  {pendingInvites.length}
+                </span>
+              </div>
+              {pendingInvites.map((invite) => {
+                const label = invite.invitee_profile?.username
+                  ? `@${invite.invitee_profile.username}`
+                  : invite.invitee_email || 'Invited user';
+                const isUser = !!invite.invitee_user_id;
+                return (
+                  <div key={invite.id} className="flex items-center gap-3 py-3" style={{ borderTop: `1px solid ${HAIR}` }}>
+                    {isUser && invite.invitee_profile ? (
+                      <SquircleAvatar
+                        src={invite.invitee_profile.profile_photo_url || undefined}
+                        alt={label}
+                        size={40}
+                        hideRing
+                      />
+                    ) : (
+                      <div
+                        className="h-10 w-10 flex items-center justify-center"
                         style={{
-                          background: 'rgba(234,179,8,0.10)',
-                          color: '#CA8A04',
-                          border: '1px solid rgba(234,179,8,0.25)',
+                          background: 'rgba(15,23,42,0.05)',
+                          border: `1px solid ${HAIR}`,
+                          borderRadius: 12,
                         }}
                       >
-                        {BUSINESS_ROLE_LABELS[invite.role]}
-                      </span>
+                        {isUser ? <AtSign size={16} color={INK_45} /> : <Mail size={16} color={INK_45} />}
+                      </div>
+                    )}
+                    <div className="flex-1 min-w-0">
+                      <p className="font-semibold text-[14px] truncate" style={{ color: INK }}>
+                        {label}
+                      </p>
+                      <p className="text-[11.5px]" style={{ color: INK_45 }}>
+                        Pending · {BUSINESS_ROLE_LABELS[invite.role]}
+                      </p>
                     </div>
-                    <p className="text-xs text-muted-foreground">Invitation pending</p>
+                    <button
+                      type="button"
+                      onClick={() => revokeInvite.mutate(invite.id)}
+                      disabled={revokeInvite.isPending}
+                      className="text-[12px] font-semibold px-3 py-1.5 rounded-full active:opacity-70"
+                      style={{
+                        color: '#DC2626',
+                        background: 'rgba(220,38,38,0.06)',
+                        border: '1px solid rgba(220,38,38,0.18)',
+                      }}
+                    >
+                      Revoke
+                    </button>
                   </div>
-                  <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                      <Button variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground">
-                        <MoreHorizontal className="h-4 w-4" />
-                      </Button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end" className="w-40">
-                      <DropdownMenuItem
-                        className="text-destructive text-sm"
-                        onClick={() => revokeInvite.mutate(invite.id)}
-                        disabled={revokeInvite.isPending}
-                      >
-                        Revoke invite
-                      </DropdownMenuItem>
-                    </DropdownMenuContent>
-                  </DropdownMenu>
-                </div>
-              ))}
+                );
+              })}
             </div>
-          </section>
-        )}
+          )}
+        </motion.div>
+      </main>
 
-        {canManage && (
-          <Button
-            className="w-full text-white border-0"
-            style={{ background: '#F7931E' }}
-            onClick={() => navigate(`/business/${businessId}/team/invite`)}
+      {/* Sticky CTA */}
+      {canManage && (
+        <div
+          className="fixed left-0 right-0 pointer-events-none"
+          style={{ bottom: 0, zIndex: 40 }}
+        >
+          <div
+            className="pointer-events-auto md:max-w-[440px] md:mx-auto px-4"
+            style={{
+              paddingBottom: 'max(env(safe-area-inset-bottom, 0px), 16px)',
+              paddingTop: 12,
+              background: 'linear-gradient(to top, #F4F6F8 60%, rgba(244,246,248,0))',
+            }}
           >
-            <Plus className="h-4 w-4 mr-2" />
-            Invite teammate
-          </Button>
-        )}
-      </div>
+            <button
+              type="button"
+              onClick={() => navigate(`/business/${businessId}/team/invite`)}
+              className="w-full flex items-center justify-center gap-2 active:opacity-90"
+              style={{
+                minHeight: 52,
+                borderRadius: 14,
+                background: INK,
+                color: '#FFFFFF',
+                fontSize: 15,
+                fontWeight: 700,
+                letterSpacing: '-0.01em',
+                border: 'none',
+              }}
+            >
+              <UserPlus size={18} strokeWidth={2.25} />
+              Invite teammate
+            </button>
+          </div>
+        </div>
+      )}
 
       <ConfirmModal
         isOpen={removeConfirm.open}
@@ -327,6 +354,6 @@ export default function BusinessTeamPage() {
         confirmText="Remove"
         confirmVariant="destructive"
       />
-    </div>
+    </ManagePageShell>
   );
 }
