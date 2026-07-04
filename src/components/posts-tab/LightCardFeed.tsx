@@ -96,34 +96,19 @@ export const LightCardFeed: React.FC<LightCardFeedProps> = ({
   }, [activeIdx]);
 
   const recheckActive = useCallback(() => {
-    const viewportCenter = window.innerHeight / 2;
     let bestIdx = -1;
-    let bestDist = Infinity;
-
-    visibilityRef.current.forEach((_ratio, idx) => {
-      const el = cardEls.current.get(idx);
-      if (!el) return;
-      const r = el.getBoundingClientRect();
-      const cardCenter = r.top + r.height / 2;
-      const dist = Math.abs(cardCenter - viewportCenter);
-      if (dist < bestDist) {
-        bestDist = dist;
-        bestIdx = idx;
-      }
+    let bestRatio = 0;
+    visibilityRef.current.forEach((ratio, idx) => {
+      if (ratio > bestRatio) { bestRatio = ratio; bestIdx = idx; }
     });
 
-    if (bestIdx >= 0) {
-      setActiveIdx((prev) => {
-        if (prev === bestIdx) return prev;
-        const prevEl = cardEls.current.get(prev);
-        if (prevEl) {
-          const pr = prevEl.getBoundingClientRect();
-          const prevDist = Math.abs((pr.top + pr.height / 2) - viewportCenter);
-          if (prevDist - bestDist < 40) return prev;
-        }
-        return bestIdx;
-      });
-    }
+    setActiveIdx((prev) => {
+      const prevRatio = prev >= 0 ? (visibilityRef.current.get(prev) ?? 0) : 0;
+      if (prev >= 0 && prevRatio >= PLAY_OUT && (bestRatio - prevRatio) < HYSTERESIS) return prev;
+      if (bestIdx >= 0 && bestRatio >= PLAY_IN) return bestIdx;
+      if (prev >= 0 && prevRatio >= PLAY_OUT) return prev;
+      return bestIdx >= 0 && bestRatio >= PLAY_OUT ? bestIdx : prev;
+    });
   }, []);
 
   useEffect(() => {
