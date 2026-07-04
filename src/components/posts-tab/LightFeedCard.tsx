@@ -484,8 +484,11 @@ const LightFeedCardImpl: React.FC<LightFeedCardProps> = ({
                     isActive={isActive}
                     isNear={mountVideo}
                     feedIndex={feedIndex}
+                    postId={post.id}
+                    ownerKey={`${post.id}:0`}
                     objectFit="cover"
                   />
+
                 ) : media.thumbnailUrl ? (
                   <>
                     {feedIndex != null && feedIndex >= 1 && (
