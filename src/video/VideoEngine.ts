@@ -393,10 +393,15 @@ class VideoEngineImpl {
       this.emit(lane);
     };
 
-    const onPlay = () => this.transition(lane, 'playing');
+    const onPlay = () => {
+      PPRACE('EL_PLAY', { lanePostId: lane.postId, t: lane.el.currentTime });
+      this.transition(lane, 'playing');
+    };
     const onPause = () => {
+      PPRACE('EL_PAUSE', { lanePostId: lane.postId, t: lane.el.currentTime });
       if (lane.state !== 'error') this.transition(lane, 'paused');
     };
+
     const onError = () => this.transition(lane, 'error');
     const onCanPlay = () => {
       if (lane.id === 'feed-active') fp.canplay(lane.postId);
