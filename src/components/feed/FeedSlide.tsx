@@ -252,20 +252,10 @@ const FullscreenVideoSlot: React.FC<{
   }, []);
 
   React.useEffect(() => {
-    if (isActive) {
-      VideoEngine.trace('V1_FS_LOAD', { postId, startPosition });
-    }
-  }, [isActive, postId, startPosition]);
-
-  React.useEffect(() => {
     // On unmount/deactivation the engine has already been tracking
-    // currentTime -> lastPos[postId] via onTimeUpdate. Just emit V1_CLOSE
-    // for verification; no manual write needed.
+    // currentTime -> lastPos[postId] via onTimeUpdate. No manual write needed.
     return () => {
-      const t = VideoEngine.getLastPos(postId);
-      if (postId && t > 0) {
-        VideoEngine.trace('V1_CLOSE', { postId, fsTime: t });
-      }
+      void postId;
     };
   }, [postId]);
 

@@ -71,16 +71,6 @@ export const InlineVideo: React.FC<Props> = ({
     ownerKey: resolvedOwnerKey,
   });
 
-  // Emit V1_TILE_RESUME once when this active tile paints its first frame.
-  useEffect(() => {
-    if (!isActive || !postId) return;
-    if (lane.snapshot.firstFrame) {
-      VideoEngine.trace('V1_TILE_RESUME', {
-        postId,
-        videoTime: lane.snapshot.currentTime,
-      });
-    }
-  }, [isActive, postId, lane.snapshot.firstFrame, lane.snapshot.currentTime]);
 
   // Poster paint-ready signal for surfaces that gate on it.
   useEffect(() => {

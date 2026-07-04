@@ -13,16 +13,8 @@
  */
 
 import { useEffect, useRef, useState } from 'react';
-import { isPerfEnabled } from '@/perf/navTiming';
 import { VideoEngine, type LaneId, type LaneSnapshot } from './VideoEngine';
 
-const PPRACE = (tag: string, data: Record<string, unknown>) => {
-  try {
-    if (!isPerfEnabled()) return;
-  } catch { return; }
-  // eslint-disable-next-line no-console
-  console.info('[PPRACE]', tag, data);
-};
 
 
 export interface UseVideoLaneOptions {
@@ -108,15 +100,11 @@ export function useVideoLane(
   useEffect(() => {
     // Prefer media-level ownerKey; fall back to postId for legacy callers.
     const callerPostId = opts.ownerKey ?? opts.postId ?? null;
-    PPRACE('effect fire', { callerPostId, active: !!opts.active });
     if (opts.active) {
       void VideoEngine.play(laneId, { callerPostId });
     } else {
       VideoEngine.pause(laneId, { callerPostId });
     }
-    return () => {
-      PPRACE('effect cleanup', { callerPostId });
-    };
   }, [laneId, opts.active, opts.ownerKey, opts.postId]);
 
 
