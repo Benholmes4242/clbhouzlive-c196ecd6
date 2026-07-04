@@ -42,8 +42,11 @@ export const TrajectoryLine: React.FC<Props> = ({
   const maxAbs = Math.max(...pts.map((p) => Math.abs(p.cum)), 1);
   const n = plottable.length;
   const x = (i: number) => padX + (n === 1 ? 0 : (i / (n - 1)) * (w - padX * 2));
+  // par baseline sits mid-band; the line tracks the score as a number:
+  // under par plots DOWN (score falling), over par plots UP -- consistent
+  // with the Pulse and 90-day sparklines where improvement descends.
   const y0 = height / 2;
-  const y = (c: number) => y0 + (c / maxAbs) * (height / 2 - 12);
+  const y = (c: number) => y0 - (c / maxAbs) * (height / 2 - 12);
 
   const path = pts
     .map((p, idx) => `${idx === 0 ? 'M' : 'L'} ${x(p.i).toFixed(1)} ${y(p.cum).toFixed(1)}`)
@@ -77,7 +80,7 @@ export const TrajectoryLine: React.FC<Props> = ({
             height="5.6" rx="1.4" fill={theme.bg} stroke={damageTok} strokeWidth="1.6" />
         ) : null,
       )}
-      <text x={w - padX} y={y(final) + (final >= 0 ? 14 : -7)} fill={lineColor}
+      <text x={w - padX} y={y(final) + (final >= 0 ? -7 : 14)} fill={lineColor}
         fontSize="11" fontWeight="800" textAnchor="end" fontFamily={GEIST}>
         {finalLabel}
       </text>
