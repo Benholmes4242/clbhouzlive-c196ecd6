@@ -444,7 +444,7 @@ class VideoEngineImpl {
     const onTime = () => {
       if (lane.postId) this.lastPos.set(lane.postId, lane.el.currentTime || 0);
       if (trace) fsvTimeSample(`${lane.id}:time`, el, { laneId: lane.id, target: lane.startPosition });
-      if (lane.id === 'fullscreen' && !lane.firstFrame) markFsFirstFrame('timeupdate');
+      if (!lane.firstFrame) markReadyToShow('timeupdate');
       // Gapless loop for short clips (<15s): native loop leaves a 100-300ms
       // gap on iOS HLS. Preempt the seam by seeking to 0 + play() ourselves.
       const dur = lane.el.duration;
