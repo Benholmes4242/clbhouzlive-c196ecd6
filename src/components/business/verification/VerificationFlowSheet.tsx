@@ -1,46 +1,103 @@
-import { useEffect, useMemo, useState } from 'react';
+/**
+ * VerificationFlowSheet — single-page "Get verified" flow.
+ *
+ * Rebuild of the previous 3-step wizard as ONE scrolling page with three
+ * numbered sections and a sticky Submit. Adds:
+ *  - Optional supporting document upload (private bucket + admin signed URL).
+ *  - OTP-verified business email (reuses useDomainVerification infra).
+ *  - Post-submit confirmation screen with the request reference.
+ *
+ * The mode='domain' entry (admin-initiated domain check on an existing
+ * pending request) still renders the standalone DomainStep, unchanged.
+ */
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { AnimatePresence } from 'framer-motion';
-import { ChevronLeft, ChevronRight, Loader2, X } from 'lucide-react';
+import { motion } from 'framer-motion';
+import {
+  CheckCircle2,
+  ChevronLeft,
+  ExternalLink,
+  FileText,
+  Image as ImageIcon,
+  Loader2,
+  ShieldCheck,
+  Upload,
+  X,
+} from 'lucide-react';
+import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent } from '@/components/ui/dialog';
+import { Input } from '@/components/ui/input';
+import { InputOTP, InputOTPGroup, InputOTPSlot } from '@/components/ui/input-otp';
+import { Label } from '@/components/ui/label';
+import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
+import { Textarea } from '@/components/ui/textarea';
 import { supabase } from '@/integrations/supabase/client';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { toast } from 'sonner';
 import { BIZ } from '@/components/business/businessTokens';
-import ReadinessStep from './steps/ReadinessStep';
-import ProofStep from './steps/ProofStep';
-import OwnershipStep from './steps/OwnershipStep';
 import DomainStep from './steps/DomainStep';
 import {
+  PROOF_OPTIONS,
+  REGISTRY_OPTIONS,
+  ROLE_OPTIONS,
   isValidEmail,
   isValidUrl,
   type ProofMethod,
-  type Step,
 } from './steps/verificationTypes';
+import {
+  useSendDomainCode,
+  useVerifyDomainCode,
+} from '@/hooks/useDomainVerification';
+
+const DOC_BUCKET = 'business-verification-docs';
+const MAX_DOC_BYTES = 10 * 1024 * 1024; // 10 MB
+const ACCEPTED_DOC = 'image/*,application/pdf';
 
 const PROOF_CONFLICT_MESSAGE: Record<ProofMethod, string> = {
-  official_website:    'This website is already linked to a verified business.',
-  business_email:      'This email address is already linked to a verified business.',
+  official_website: 'This website is already linked to a verified business.',
+  business_email: 'This email address is already linked to a verified business.',
   registered_business: 'This company registration is already linked to a verified business.',
-  creator_business:    'This contact is already linked to a verified business.',
-  golf_course:         'This golf course website is already linked to a verified business.',
+  creator_business: 'This contact is already linked to a verified business.',
+  golf_course: 'This golf course website is already linked to a verified business.',
 };
-
 
 interface Props {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   businessId: string;
-  /** When 'domain', sheet opens directly on the domain-confirm step for the existing pending request. */
+  /** When 'domain', opens the standalone domain OTP step for an existing pending request. */
   mode?: 'submit' | 'domain';
 }
 
-export default function VerificationFlowSheet({ open, onOpenChange, businessId, mode = 'submit' }: Props) {
+type SectionKey = 'details' | 'proof' | 'ownership';
+
+function safeFilename(name: string): string {
+  return name
+    .toLowerCase()
+    .replace(/[^a-z0-9._-]+/g, '-')
+    .replace(/-+/g, '-')
+    .replace(/^-|-$/g, '')
+    .slice(0, 80) || 'file';
+}
+
+export default function VerificationFlowSheet({
+  open,
+  onOpenChange,
+  businessId,
+  mode = 'submit',
+}: Props) {
   const { user } = useSupabaseSession();
   const queryClient = useQueryClient();
 
-  const [step, setStep] = useState<Step>(mode === 'domain' ? 'domain' : 'readiness');
+  // --- proof state ---
   const [selectedProof, setSelectedProof] = useState<ProofMethod | ''>('');
   const [proofWebsiteUrl, setProofWebsiteUrl] = useState('');
   const [proofEmail, setProofEmail] = useState('');
@@ -51,22 +108,71 @@ export default function VerificationFlowSheet({ open, onOpenChange, businessId, 
   const [creatorEmail, setCreatorEmail] = useState('');
   const [creatorPhone, setCreatorPhone] = useState('');
   const [golfCourseWebsite, setGolfCourseWebsite] = useState('');
+
+  // --- ownership state ---
   const [contactEmail, setContactEmail] = useState('');
   const [role, setRole] = useState('');
   const [notes, setNotes] = useState('');
-  const [exclusivityError, setExclusivityError] = useState('');
 
-  // Reset on open
+  // --- doc upload state ---
+  const [docPath, setDocPath] = useState<string | null>(null);
+  const [docFileName, setDocFileName] = useState<string | null>(null);
+  const [docPreviewUrl, setDocPreviewUrl] = useState<string | null>(null);
+  const [docKind, setDocKind] = useState<'image' | 'pdf' | null>(null);
+  const [docUploading, setDocUploading] = useState(false);
+
+  // --- OTP state (business_email method, pre-submit) ---
+  const [otpRequestId, setOtpRequestId] = useState<string | null>(null);
+  const [otpVerificationId, setOtpVerificationId] = useState<string | null>(null);
+  const [otpCode, setOtpCode] = useState('');
+  const [otpEmailVerified, setOtpEmailVerified] = useState(false);
+  const [otpSent, setOtpSent] = useState(false);
+  const [otpSending, setOtpSending] = useState(false);
+  const sendCode = useSendDomainCode(businessId);
+  const verifyCode = useVerifyDomainCode();
+
+  // --- ui state ---
+  const [exclusivityError, setExclusivityError] = useState('');
+  const [validationError, setValidationError] = useState<{ section: SectionKey; message: string } | null>(null);
+  const [confirmation, setConfirmation] = useState<{ requestId: string; method: ProofMethod } | null>(null);
+  const fileInputRef = useRef<HTMLInputElement | null>(null);
+
+  const detailsRef = useRef<HTMLDivElement | null>(null);
+  const proofRef = useRef<HTMLDivElement | null>(null);
+  const ownershipRef = useRef<HTMLDivElement | null>(null);
+
+  // Reset the form each time the sheet is (re)opened.
   useEffect(() => {
-    if (open) {
-      setStep(mode === 'domain' ? 'domain' : 'readiness');
-      setExclusivityError('');
-    }
+    if (!open) return;
+    setExclusivityError('');
+    setValidationError(null);
+    setConfirmation(null);
+    setSelectedProof('');
+    setProofWebsiteUrl('');
+    setProofEmail('');
+    setProofRegistry('');
+    setProofCompanyNumber('');
+    setProofRegistryUrl('');
+    setCreatorContactType('email');
+    setCreatorEmail('');
+    setCreatorPhone('');
+    setGolfCourseWebsite('');
+    setRole('');
+    setNotes('');
+    setDocPath(null);
+    setDocFileName(null);
+    setDocPreviewUrl(null);
+    setDocKind(null);
+    setOtpRequestId(null);
+    setOtpVerificationId(null);
+    setOtpCode('');
+    setOtpEmailVerified(false);
+    setOtpSent(false);
   }, [open, mode]);
 
   const { data: business, isLoading: isLoadingBusiness } = useQuery({
     queryKey: ['business-verification-wizard', businessId],
-    enabled: !!businessId && open,
+    enabled: !!businessId && open && mode !== 'domain',
     staleTime: 0,
     refetchOnMount: 'always',
     queryFn: async () => {
@@ -82,55 +188,225 @@ export default function VerificationFlowSheet({ open, onOpenChange, businessId, 
 
   useEffect(() => {
     if (business?.email && !contactEmail) setContactEmail(business.email);
-  }, [business?.email]);
+  }, [business?.email]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  const missingWebsite = !business?.website;
-  const missingEmail = !business?.email;
-  const canProceedReadiness = !missingWebsite && !missingEmail;
-
-  const validateProof = useMemo(() => {
-    if (!selectedProof) return false;
-    switch (selectedProof) {
-      case 'official_website': return !!proofWebsiteUrl.trim() && isValidUrl(proofWebsiteUrl);
-      case 'business_email': return !!proofEmail.trim() && isValidEmail(proofEmail);
-      case 'registered_business': return !!proofRegistry && (!!proofCompanyNumber.trim() || !!proofRegistryUrl.trim());
-      case 'creator_business':
-        return creatorContactType === 'email'
-          ? !!creatorEmail.trim() && isValidEmail(creatorEmail)
-          : !!creatorPhone.trim();
-      case 'golf_course': return !!golfCourseWebsite.trim() && isValidUrl(golfCourseWebsite);
-      default: return false;
-    }
-  }, [selectedProof, proofWebsiteUrl, proofEmail, proofRegistry, proofCompanyNumber, proofRegistryUrl, creatorContactType, creatorEmail, creatorPhone, golfCourseWebsite]);
-
-  const canProceedOwnership = !!contactEmail.trim() && !!role;
-
+  // ---- validation & DB helpers ----
   const getProofData = () => {
     switch (selectedProof) {
-      case 'official_website': return { proof_value: proofWebsiteUrl.trim(), proof_metadata: {} };
-      case 'business_email': return { proof_value: proofEmail.trim(), proof_metadata: {} };
+      case 'official_website':
+        return { proof_value: proofWebsiteUrl.trim(), proof_metadata: {} as Record<string, unknown> };
+      case 'business_email':
+        return {
+          proof_value: proofEmail.trim(),
+          proof_metadata: {
+            email_verified: otpEmailVerified,
+          } as Record<string, unknown>,
+        };
       case 'registered_business':
         return {
           proof_value: proofCompanyNumber.trim() || proofRegistryUrl.trim(),
-          proof_metadata: { registry: proofRegistry, registry_url: proofRegistryUrl.trim() || null },
+          proof_metadata: {
+            registry: proofRegistry,
+            registry_url: proofRegistryUrl.trim() || null,
+          } as Record<string, unknown>,
         };
       case 'creator_business':
         return {
           proof_value: creatorContactType === 'email' ? creatorEmail.trim() : creatorPhone.trim(),
-          proof_metadata: { contact_type: creatorContactType },
+          proof_metadata: { contact_type: creatorContactType } as Record<string, unknown>,
         };
-      case 'golf_course': return { proof_value: golfCourseWebsite.trim(), proof_metadata: {} };
-      default: return { proof_value: '', proof_metadata: {} };
+      case 'golf_course':
+        return { proof_value: golfCourseWebsite.trim(), proof_metadata: {} as Record<string, unknown> };
+      default:
+        return { proof_value: '', proof_metadata: {} as Record<string, unknown> };
     }
   };
 
+  const proofIsValid = useMemo(() => {
+    if (!selectedProof) return false;
+    switch (selectedProof) {
+      case 'official_website':
+        return !!proofWebsiteUrl.trim() && isValidUrl(proofWebsiteUrl);
+      case 'business_email':
+        return !!proofEmail.trim() && isValidEmail(proofEmail);
+      case 'registered_business':
+        return !!proofRegistry && (!!proofCompanyNumber.trim() || !!proofRegistryUrl.trim());
+      case 'creator_business':
+        return creatorContactType === 'email'
+          ? !!creatorEmail.trim() && isValidEmail(creatorEmail)
+          : !!creatorPhone.trim();
+      case 'golf_course':
+        return !!golfCourseWebsite.trim() && isValidUrl(golfCourseWebsite);
+      default:
+        return false;
+    }
+  }, [
+    selectedProof,
+    proofWebsiteUrl,
+    proofEmail,
+    proofRegistry,
+    proofCompanyNumber,
+    proofRegistryUrl,
+    creatorContactType,
+    creatorEmail,
+    creatorPhone,
+    golfCourseWebsite,
+  ]);
+
+  const detailsReady = !!business?.website && !!business?.email;
+
+  // ---- document upload ----
+  async function handleDocPick(file: File) {
+    if (!file) return;
+    if (file.size > MAX_DOC_BYTES) {
+      toast.error('That file is over 10 MB. Please choose a smaller one.');
+      return;
+    }
+    const isImage = file.type.startsWith('image/');
+    const isPdf = file.type === 'application/pdf';
+    if (!isImage && !isPdf) {
+      toast.error('Only image or PDF files are supported.');
+      return;
+    }
+    setDocUploading(true);
+    try {
+      const path = `${businessId}/${Date.now()}-${safeFilename(file.name)}`;
+      const { error } = await supabase.storage
+        .from(DOC_BUCKET)
+        .upload(path, file, { contentType: file.type, upsert: false });
+      if (error) throw error;
+      setDocPath(path);
+      setDocFileName(file.name);
+      setDocKind(isImage ? 'image' : 'pdf');
+      if (isImage) {
+        const { data: signed } = await supabase.storage
+          .from(DOC_BUCKET)
+          .createSignedUrl(path, 60 * 10);
+        setDocPreviewUrl(signed?.signedUrl ?? null);
+      } else {
+        setDocPreviewUrl(null);
+      }
+      toast.success('Document attached');
+    } catch (e) {
+      toast.error((e as Error).message || 'Upload failed');
+    } finally {
+      setDocUploading(false);
+      if (fileInputRef.current) fileInputRef.current.value = '';
+    }
+  }
+
+  async function handleDocRemove() {
+    if (!docPath) return;
+    try {
+      await supabase.storage.from(DOC_BUCKET).remove([docPath]);
+    } catch {
+      /* best-effort */
+    }
+    setDocPath(null);
+    setDocFileName(null);
+    setDocPreviewUrl(null);
+    setDocKind(null);
+  }
+
+  // ---- OTP flow (business_email) ----
+  async function ensureOtpRequest(): Promise<string | null> {
+    if (otpRequestId) return otpRequestId;
+    if (!user?.id) return null;
+    const email = proofEmail.trim();
+    if (!email || !isValidEmail(email)) return null;
+    const domain = email.split('@')[1]?.toLowerCase();
+    if (!domain) return null;
+    const { data, error } = await supabase
+      .from('business_verification_requests')
+      .insert({
+        business_id: businessId,
+        requested_by: user.id,
+        website: business?.website || null,
+        status: 'pending',
+        proof_method: 'business_email',
+        proof_value: email,
+        proof_metadata: { email_verified: false, otp_flow: true } as any,
+        contact_email: contactEmail.trim() || business?.email || null,
+        contact_role: role || null,
+        note: notes || null,
+        domain,
+        requires_domain_check: true,
+      } as any)
+      .select('id')
+      .single();
+    if (error) {
+      toast.error(error.message || 'Could not start verification');
+      return null;
+    }
+    setOtpRequestId(data.id);
+    return data.id;
+  }
+
+  async function handleSendOtp() {
+    const email = proofEmail.trim();
+    if (!email || !isValidEmail(email)) {
+      toast.error('Enter a valid business email first.');
+      return;
+    }
+    setOtpSending(true);
+    try {
+      const rid = await ensureOtpRequest();
+      if (!rid) return;
+      const result = await sendCode.mutateAsync({ requestId: rid, email });
+      if (result?.verificationId) {
+        setOtpVerificationId(result.verificationId);
+        setOtpSent(true);
+      }
+    } catch {
+      /* toast already fired inside mutation */
+    } finally {
+      setOtpSending(false);
+    }
+  }
+
+  async function handleVerifyOtp() {
+    if (!otpVerificationId || otpCode.length !== 6) return;
+    try {
+      await verifyCode.mutateAsync({ verificationId: otpVerificationId, code: otpCode });
+      setOtpEmailVerified(true);
+    } catch {
+      /* toast already fired inside mutation */
+    }
+  }
+
+  // ---- submit ----
   const submitMutation = useMutation({
     mutationFn: async () => {
       if (!user?.id) throw new Error('Not authenticated');
-      if (!selectedProof) throw new Error('Please select a proof method');
-      const { proof_value, proof_metadata } = getProofData();
-      if (!proof_value) throw new Error('Please complete the required proof details');
 
+      // Scroll-to-first-error validation.
+      if (!detailsReady) {
+        setValidationError({
+          section: 'details',
+          message: 'Add a website and contact email to your business profile first.',
+        });
+        detailsRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        throw new Error('__validation__');
+      }
+      if (!selectedProof || !proofIsValid) {
+        setValidationError({ section: 'proof', message: 'Choose a proof method and fill in the details.' });
+        proofRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        throw new Error('__validation__');
+      }
+      if (!contactEmail.trim() || !isValidEmail(contactEmail) || !role) {
+        setValidationError({
+          section: 'ownership',
+          message: 'Add your contact email and role so we can confirm you represent this business.',
+        });
+        ownershipRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        throw new Error('__validation__');
+      }
+      setValidationError(null);
+
+      const { proof_value, proof_metadata } = getProofData();
+      if (!proof_value) throw new Error('Please complete the required proof details.');
+
+      // Exclusivity check.
       const { data: existingApproved, error: checkError } = await supabase
         .from('business_verification_requests')
         .select('id, business_id')
@@ -141,29 +417,49 @@ export default function VerificationFlowSheet({ open, onOpenChange, businessId, 
         .limit(1);
       if (checkError) throw checkError;
       if (existingApproved && existingApproved.length > 0) {
-        throw new Error(PROOF_CONFLICT_MESSAGE[selectedProof] ?? 'This proof is already linked to a verified business.');
+        throw new Error(
+          PROOF_CONFLICT_MESSAGE[selectedProof] ?? 'This proof is already linked to a verified business.',
+        );
       }
 
+      const payload: Record<string, unknown> = {
+        website: business?.website || null,
+        note: notes || null,
+        proof_method: selectedProof,
+        proof_value,
+        proof_metadata,
+        contact_email: contactEmail.trim() || null,
+        contact_role: role || null,
+        proof_document_url: docPath,
+      };
 
-      const { error } = await supabase
-        .from('business_verification_requests')
-        .insert({
-          business_id: businessId,
-          requested_by: user.id,
-          website: business?.website || null,
-          note: notes || null,
-          status: 'pending',
-          proof_method: selectedProof,
-          proof_value,
-          proof_metadata,
-          contact_email: contactEmail.trim() || null,
-          contact_role: role || null,
-        } as any);
-      if (error) throw error;
+      let requestId = otpRequestId;
+      if (requestId) {
+        // OTP path already created the row — UPDATE with the final values.
+        const { error } = await supabase
+          .from('business_verification_requests')
+          .update(payload as any)
+          .eq('id', requestId);
+        if (error) throw error;
+      } else {
+        const { data, error } = await supabase
+          .from('business_verification_requests')
+          .insert({
+            business_id: businessId,
+            requested_by: user.id,
+            status: 'pending',
+            ...payload,
+          } as any)
+          .select('id')
+          .single();
+        if (error) throw error;
+        requestId = data.id;
+      }
+
+      return { requestId: requestId as string, method: selectedProof as ProofMethod };
     },
-    onSuccess: () => {
-      toast.success('Verification request submitted.');
-      // Fire-and-forget admin notification (best-effort; never block success).
+    onSuccess: (result) => {
+      // Fire-and-forget admin email; DB trigger already fired the in-app + push notification.
       supabase.functions
         .invoke('send-business-verification-email', {
           body: {
@@ -180,196 +476,732 @@ export default function VerificationFlowSheet({ open, onOpenChange, businessId, 
       queryClient.invalidateQueries({ queryKey: ['business-verification-request-status'] });
       queryClient.invalidateQueries({ queryKey: ['business-account'] });
       queryClient.invalidateQueries({ queryKey: ['business-account-verification-status'] });
-      onOpenChange(false);
+      queryClient.invalidateQueries({ queryKey: ['admin-v2', 'verifications'] });
+      setConfirmation(result);
     },
     onError: (error: unknown) => {
       const message = (error as Error).message || 'Failed to submit verification request';
-      if (message.includes('already linked')) setExclusivityError(message);
+      if (message === '__validation__') return;
+      if (message.toLowerCase().includes('already linked')) setExclusivityError(message);
       toast.error(message);
-
     },
   });
 
-  const handleBack = () => {
-    if (step === 'readiness' || step === 'domain') {
-      onOpenChange(false);
-    } else if (step === 'proof') {
-      setStep('readiness');
-    } else if (step === 'ownership') {
-      setStep('proof');
-    }
-  };
-
-  const stepIndex = step === 'readiness' ? 1 : step === 'proof' ? 2 : step === 'ownership' ? 3 : 0;
+  // ---- render ----
+  const showDomainMode = mode === 'domain';
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent
         className="p-0 gap-0 max-w-[440px] w-full h-[100dvh] sm:h-[92vh] sm:max-h-[820px] sm:rounded-2xl flex flex-col overflow-hidden border-0"
-        style={{ background: '#F8FAFC' }}
+        style={{ background: BIZ.pageBg }}
       >
         {/* Header */}
         <header
           className="sticky top-0 z-10 backdrop-blur-xl shrink-0"
-          style={{ background: 'rgba(248,250,252,0.97)', borderBottom: '0.5px solid rgba(15,23,42,0.07)' }}
+          style={{ background: 'rgba(248,250,252,0.97)', borderBottom: `0.5px solid ${BIZ.hair}` }}
         >
           <div className="flex items-center px-4 h-14">
             <button
-              onClick={handleBack}
+              onClick={() => onOpenChange(false)}
               className="min-h-[44px] min-w-[44px] flex items-center justify-center -ml-2 text-foreground active:scale-[0.97] transition-transform"
-              aria-label="Back"
+              aria-label="Close"
             >
-              {step === 'readiness' || step === 'domain' ? <X className="w-5 h-5" /> : <ChevronLeft className="w-5 h-5" />}
+              {showDomainMode ? <ChevronLeft className="w-5 h-5" /> : <X className="w-5 h-5" />}
             </button>
             <div className="flex-1 text-center">
-              <h2 className="text-[16px] text-foreground" style={{ fontWeight: 900, letterSpacing: '-0.01em' }}>
-                {step === 'domain' ? 'Verify domain' : 'Get verified'}
+              <h2
+                className="text-[16px] text-foreground"
+                style={{ fontWeight: 900, letterSpacing: '-0.01em' }}
+              >
+                {showDomainMode ? 'Verify domain' : 'Get verified'}
               </h2>
-              {step !== 'domain' && (
-                <p className="text-[12px] text-muted-foreground leading-none mt-0.5">Step {stepIndex} of 3</p>
-              )}
             </div>
             <div className="w-11" />
           </div>
         </header>
 
-        <main className="flex-1 overflow-y-auto px-4 py-6 pb-32">
-          {step !== 'domain' && (
-            <div className="flex items-center justify-center gap-2 mb-6">
-              {[1, 2, 3].map((s) => (
-                <div
-                  key={s}
-                  className="h-2.5 w-2.5 rounded-full transition-colors"
-                  style={{
-                    backgroundColor: s === stepIndex ? '#F7931E' : 'rgba(15,23,42,0.25)',
-                    outline: s === stepIndex ? '2px solid rgba(247,147,30,0.20)' : 'none',
-                  }}
-                />
-              ))}
-            </div>
-          )}
-
-          {isLoadingBusiness && step !== 'domain' ? (
+        <main className="flex-1 overflow-y-auto px-4 py-5 pb-32">
+          {showDomainMode ? (
+            <DomainStep businessId={businessId} onDone={() => onOpenChange(false)} />
+          ) : confirmation ? (
+            <ConfirmationView
+              requestId={confirmation.requestId}
+              method={confirmation.method}
+              onDone={() => onOpenChange(false)}
+            />
+          ) : isLoadingBusiness ? (
             <div className="space-y-3">
-              <div className="h-12 animate-pulse rounded-xl" style={{ background: 'rgba(15,23,42,0.08)' }} />
-              <div className="h-24 animate-pulse rounded-xl" style={{ background: 'rgba(15,23,42,0.08)' }} />
+              <div className="h-14 animate-pulse rounded-2xl" style={{ background: BIZ.fillStrong }} />
+              <div className="h-32 animate-pulse rounded-2xl" style={{ background: BIZ.fillStrong }} />
+              <div className="h-24 animate-pulse rounded-2xl" style={{ background: BIZ.fillStrong }} />
             </div>
           ) : (
-            <AnimatePresence mode="wait">
-              {step === 'readiness' && (
-                <ReadinessStep
-                  businessId={businessId}
-                  business={business}
-                  missingWebsite={missingWebsite}
-                  missingEmail={missingEmail}
-                  onLeaveToEdit={() => onOpenChange(false)}
-                />
-              )}
+            <div className="space-y-4">
+              {/* Intro strip */}
+              <div
+                className="flex items-start gap-3 px-4 py-3 rounded-2xl"
+                style={{ background: BIZ.amberTint, border: `1px solid ${BIZ.amberHair}` }}
+              >
+                <ShieldCheck className="h-5 w-5 mt-0.5 shrink-0" style={{ color: BIZ.amber }} />
+                <p className="text-[13px] leading-snug" style={{ color: BIZ.ink }}>
+                  Two minutes. We review within a few days and add your badge once approved.
+                </p>
+              </div>
 
-              {step === 'proof' && (
-                <ProofStep
-                  selectedProof={selectedProof}
-                  setSelectedProof={setSelectedProof}
-                  proofWebsiteUrl={proofWebsiteUrl}
-                  setProofWebsiteUrl={setProofWebsiteUrl}
-                  proofEmail={proofEmail}
-                  setProofEmail={setProofEmail}
-                  proofRegistry={proofRegistry}
-                  setProofRegistry={setProofRegistry}
-                  proofCompanyNumber={proofCompanyNumber}
-                  setProofCompanyNumber={setProofCompanyNumber}
-                  proofRegistryUrl={proofRegistryUrl}
-                  setProofRegistryUrl={setProofRegistryUrl}
-                  creatorContactType={creatorContactType}
-                  setCreatorContactType={setCreatorContactType}
-                  creatorEmail={creatorEmail}
-                  setCreatorEmail={setCreatorEmail}
-                  creatorPhone={creatorPhone}
-                  setCreatorPhone={setCreatorPhone}
-                  golfCourseWebsite={golfCourseWebsite}
-                  setGolfCourseWebsite={setGolfCourseWebsite}
-                  exclusivityError={exclusivityError}
-                  clearExclusivityError={() => setExclusivityError('')}
-                />
-              )}
+              {/* SECTION 1 */}
+              <SectionCard ref={detailsRef} number={1} title="Confirm your details">
+                <div className="space-y-0">
+                  <DetailRow label="Business name" value={business?.name} />
+                  <DetailRow label="Category" value={business?.category} />
+                  <DetailRow label="Location" value={business?.location} />
+                  <DetailRow
+                    label="Website"
+                    value={business?.website}
+                    missing={!business?.website}
+                    missingMessage="Website required"
+                  />
+                  <DetailRow
+                    label="Contact email"
+                    value={business?.email}
+                    missing={!business?.email}
+                    missingMessage="Contact email required"
+                    last
+                  />
+                </div>
+                <div className="pt-3">
+                  <Link
+                    to={`/business/${businessId}/edit`}
+                    onClick={() => onOpenChange(false)}
+                    className="inline-flex items-center gap-1.5 text-[13px] font-medium"
+                    style={{ color: BIZ.amber }}
+                  >
+                    <ExternalLink className="h-3.5 w-3.5" />
+                    Edit business profile
+                  </Link>
+                </div>
+                {validationError?.section === 'details' && (
+                  <p className="text-[12px] text-destructive mt-3">{validationError.message}</p>
+                )}
+              </SectionCard>
 
-              {step === 'ownership' && (
-                <OwnershipStep
-                  contactEmail={contactEmail}
-                  setContactEmail={setContactEmail}
-                  role={role}
-                  setRole={setRole}
-                  notes={notes}
-                  setNotes={setNotes}
-                />
-              )}
+              {/* SECTION 2 */}
+              <SectionCard ref={proofRef} number={2} title="Prove your business is real">
+                <RadioGroup
+                  value={selectedProof}
+                  onValueChange={(v) => {
+                    setSelectedProof(v as ProofMethod);
+                    setExclusivityError('');
+                    // If user picks a different method, drop OTP progress so it doesn't
+                    // leak into the wrong proof — the row stays and can be updated on submit.
+                    if (v !== 'business_email') {
+                      setOtpEmailVerified(false);
+                      setOtpSent(false);
+                      setOtpCode('');
+                    }
+                  }}
+                  className="space-y-2.5"
+                >
+                  {PROOF_OPTIONS.map((option) => {
+                    const isSelected = selectedProof === option.id;
+                    const Icon = option.icon;
+                    return (
+                      <div key={option.id}>
+                        <label
+                          className="flex items-start gap-3 p-3 rounded-xl border cursor-pointer transition-colors"
+                          style={
+                            isSelected
+                              ? { borderColor: BIZ.amber, background: BIZ.amberTint }
+                              : { borderColor: BIZ.hair, background: BIZ.card }
+                          }
+                        >
+                          <RadioGroupItem
+                            value={option.id}
+                            className="mt-0.5 [&]:border-[#F7931E] [&]:text-[#F7931E]"
+                          />
+                          <Icon className="h-4 w-4 mt-0.5 shrink-0" style={{ color: BIZ.inkMute }} />
+                          <div className="flex-1 min-w-0">
+                            <p className="text-[14px] font-medium" style={{ color: BIZ.ink }}>
+                              {option.label}
+                            </p>
+                            <p className="text-[12px]" style={{ color: BIZ.inkMute }}>
+                              {option.subtitle}
+                            </p>
+                          </div>
+                        </label>
+                        {isSelected && (
+                          <div className="mt-3 pl-7">
+                            {option.id === 'official_website' && (
+                              <FieldGroup label="Website URL">
+                                <Input
+                                  value={proofWebsiteUrl}
+                                  onChange={(e) => setProofWebsiteUrl(e.target.value)}
+                                  placeholder="https://yourbusiness.com"
+                                  type="url"
+                                />
+                              </FieldGroup>
+                            )}
+                            {option.id === 'business_email' && (
+                              <div className="space-y-3">
+                                <FieldGroup label="Business email">
+                                  <div className="flex gap-2">
+                                    <Input
+                                      value={proofEmail}
+                                      onChange={(e) => {
+                                        setProofEmail(e.target.value);
+                                        if (otpEmailVerified) setOtpEmailVerified(false);
+                                        if (otpSent) setOtpSent(false);
+                                      }}
+                                      placeholder="name@yourbusiness.com"
+                                      type="email"
+                                      disabled={otpEmailVerified}
+                                      className="flex-1"
+                                    />
+                                    {otpEmailVerified ? (
+                                      <span
+                                        className="inline-flex items-center gap-1.5 px-3 rounded-md text-[12px] font-semibold"
+                                        style={{ background: 'rgba(5,150,105,0.10)', color: '#059669' }}
+                                      >
+                                        <CheckCircle2 className="h-3.5 w-3.5" />
+                                        Verified
+                                      </span>
+                                    ) : (
+                                      <Button
+                                        type="button"
+                                        size="sm"
+                                        variant="outline"
+                                        onClick={handleSendOtp}
+                                        disabled={
+                                          !proofEmail.trim() ||
+                                          !isValidEmail(proofEmail) ||
+                                          otpSending ||
+                                          sendCode.isPending
+                                        }
+                                      >
+                                        {otpSending || sendCode.isPending ? (
+                                          <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                                        ) : otpSent ? (
+                                          'Resend code'
+                                        ) : (
+                                          'Send code'
+                                        )}
+                                      </Button>
+                                    )}
+                                  </div>
+                                  <p className="text-[11px]" style={{ color: BIZ.inkMute }}>
+                                    Optional: verify your email now with a 6-digit code to speed up review.
+                                  </p>
+                                </FieldGroup>
+                                {otpSent && !otpEmailVerified && (
+                                  <div className="space-y-2">
+                                    <Label className="text-[13px]" style={{ color: BIZ.ink }}>
+                                      Enter the 6-digit code
+                                    </Label>
+                                    <div className="flex items-center gap-3">
+                                      <InputOTP
+                                        value={otpCode}
+                                        onChange={setOtpCode}
+                                        maxLength={6}
+                                        onComplete={handleVerifyOtp}
+                                      >
+                                        <InputOTPGroup>
+                                          {[0, 1, 2, 3, 4, 5].map((i) => (
+                                            <InputOTPSlot key={i} index={i} />
+                                          ))}
+                                        </InputOTPGroup>
+                                      </InputOTP>
+                                      <Button
+                                        type="button"
+                                        size="sm"
+                                        onClick={handleVerifyOtp}
+                                        disabled={otpCode.length !== 6 || verifyCode.isPending}
+                                        style={{ background: BIZ.ink, color: '#fff' }}
+                                      >
+                                        {verifyCode.isPending ? (
+                                          <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                                        ) : (
+                                          'Verify'
+                                        )}
+                                      </Button>
+                                    </div>
+                                  </div>
+                                )}
+                              </div>
+                            )}
+                            {option.id === 'registered_business' && (
+                              <div className="space-y-3">
+                                <FieldGroup label="Register">
+                                  <Select value={proofRegistry} onValueChange={setProofRegistry}>
+                                    <SelectTrigger>
+                                      <SelectValue placeholder="Select register" />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                      {REGISTRY_OPTIONS.map((opt) => (
+                                        <SelectItem key={opt.value} value={opt.value}>
+                                          {opt.label}
+                                        </SelectItem>
+                                      ))}
+                                    </SelectContent>
+                                  </Select>
+                                </FieldGroup>
+                                <FieldGroup label="Company / registration number">
+                                  <Input
+                                    value={proofCompanyNumber}
+                                    onChange={(e) => setProofCompanyNumber(e.target.value)}
+                                    placeholder="12345678"
+                                  />
+                                </FieldGroup>
+                                <FieldGroup
+                                  label={
+                                    <>
+                                      Or registry URL{' '}
+                                      <span className="font-normal" style={{ color: BIZ.inkMute }}>
+                                        (alternative)
+                                      </span>
+                                    </>
+                                  }
+                                >
+                                  <Input
+                                    value={proofRegistryUrl}
+                                    onChange={(e) => setProofRegistryUrl(e.target.value)}
+                                    placeholder="https://…"
+                                    type="url"
+                                  />
+                                </FieldGroup>
+                              </div>
+                            )}
+                            {option.id === 'creator_business' && (
+                              <div className="space-y-3">
+                                <div className="flex gap-2">
+                                  {(['email', 'phone'] as const).map((t) => {
+                                    const active = creatorContactType === t;
+                                    return (
+                                      <button
+                                        key={t}
+                                        type="button"
+                                        onClick={() => setCreatorContactType(t)}
+                                        className="px-4 py-2 text-[13px] font-medium rounded-lg min-h-[40px]"
+                                        style={
+                                          active
+                                            ? { background: BIZ.amber, color: '#fff' }
+                                            : { background: BIZ.fill, color: BIZ.inkMute }
+                                        }
+                                      >
+                                        {t === 'email' ? 'Email' : 'Phone'}
+                                      </button>
+                                    );
+                                  })}
+                                </div>
+                                {creatorContactType === 'email' ? (
+                                  <FieldGroup label="Business email">
+                                    <Input
+                                      value={creatorEmail}
+                                      onChange={(e) => setCreatorEmail(e.target.value)}
+                                      placeholder="creator@brand.com"
+                                      type="email"
+                                    />
+                                  </FieldGroup>
+                                ) : (
+                                  <FieldGroup label="Business phone number">
+                                    <Input
+                                      value={creatorPhone}
+                                      onChange={(e) => setCreatorPhone(e.target.value)}
+                                      placeholder="+44 7xxx xxxxxx"
+                                      type="tel"
+                                    />
+                                  </FieldGroup>
+                                )}
+                              </div>
+                            )}
+                            {option.id === 'golf_course' && (
+                              <FieldGroup label="Official course / facility website">
+                                <Input
+                                  value={golfCourseWebsite}
+                                  onChange={(e) => setGolfCourseWebsite(e.target.value)}
+                                  placeholder="https://yourgolfclub.com"
+                                  type="url"
+                                />
+                              </FieldGroup>
+                            )}
+                          </div>
+                        )}
+                      </div>
+                    );
+                  })}
+                </RadioGroup>
 
-              {step === 'domain' && (
-                <DomainStep businessId={businessId} onDone={() => onOpenChange(false)} />
-              )}
-            </AnimatePresence>
+                {exclusivityError && (
+                  <p className="text-[12px] text-destructive bg-destructive/10 p-3 rounded-lg mt-3">
+                    {exclusivityError}
+                  </p>
+                )}
+
+                {/* Supporting document uploader */}
+                <div
+                  className="mt-4 pt-4"
+                  style={{ borderTop: `0.5px solid ${BIZ.hair}` }}
+                >
+                  <div className="flex items-start justify-between gap-3 mb-2">
+                    <div className="flex-1 min-w-0">
+                      <p className="text-[13px] font-semibold" style={{ color: BIZ.ink }}>
+                        Supporting document{' '}
+                        <span className="font-normal" style={{ color: BIZ.inkMute }}>
+                          (optional)
+                        </span>
+                      </p>
+                      <p className="text-[12px] mt-0.5" style={{ color: BIZ.inkMute }}>
+                        Attach a document that proves your business (e.g. registration certificate, licence).
+                        Strengthens your request.
+                      </p>
+                    </div>
+                  </div>
+
+                  {docPath ? (
+                    <div
+                      className="flex items-center gap-3 p-3 rounded-xl"
+                      style={{ background: BIZ.card, border: `1px solid ${BIZ.hair}` }}
+                    >
+                      {docKind === 'image' && docPreviewUrl ? (
+                        <img
+                          src={docPreviewUrl}
+                          alt=""
+                          className="h-10 w-10 rounded-md object-cover"
+                        />
+                      ) : (
+                        <div
+                          className="h-10 w-10 rounded-md flex items-center justify-center"
+                          style={{ background: BIZ.fillStrong }}
+                        >
+                          {docKind === 'image' ? (
+                            <ImageIcon className="h-4 w-4" style={{ color: BIZ.inkMute }} />
+                          ) : (
+                            <FileText className="h-4 w-4" style={{ color: BIZ.inkMute }} />
+                          )}
+                        </div>
+                      )}
+                      <div className="flex-1 min-w-0">
+                        <p
+                          className="text-[13px] font-medium truncate"
+                          style={{ color: BIZ.ink }}
+                        >
+                          {docFileName}
+                        </p>
+                        <p className="text-[11px]" style={{ color: BIZ.inkMute }}>
+                          Attached
+                        </p>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={handleDocRemove}
+                        className="h-8 w-8 rounded-md flex items-center justify-center"
+                        style={{ color: BIZ.inkMute }}
+                        aria-label="Remove document"
+                      >
+                        <X className="h-4 w-4" />
+                      </button>
+                    </div>
+                  ) : (
+                    <button
+                      type="button"
+                      onClick={() => fileInputRef.current?.click()}
+                      disabled={docUploading}
+                      className="w-full flex items-center justify-center gap-2 py-3 rounded-xl text-[13px] font-medium"
+                      style={{
+                        border: `1px dashed ${BIZ.hairDashed}`,
+                        color: BIZ.inkMute,
+                        background: BIZ.card,
+                      }}
+                    >
+                      {docUploading ? (
+                        <>
+                          <Loader2 className="h-4 w-4 animate-spin" />
+                          Uploading…
+                        </>
+                      ) : (
+                        <>
+                          <Upload className="h-4 w-4" />
+                          Attach document (image or PDF, max 10MB)
+                        </>
+                      )}
+                    </button>
+                  )}
+                  <input
+                    ref={fileInputRef}
+                    type="file"
+                    accept={ACCEPTED_DOC}
+                    className="hidden"
+                    onChange={(e) => {
+                      const f = e.target.files?.[0];
+                      if (f) void handleDocPick(f);
+                    }}
+                  />
+                </div>
+
+                {validationError?.section === 'proof' && (
+                  <p className="text-[12px] text-destructive mt-3">{validationError.message}</p>
+                )}
+              </SectionCard>
+
+              {/* SECTION 3 */}
+              <SectionCard
+                ref={ownershipRef}
+                number={3}
+                title="Confirm you represent this business"
+              >
+                <div className="space-y-3">
+                  <FieldGroup label="Contact email">
+                    <Input
+                      value={contactEmail}
+                      onChange={(e) => setContactEmail(e.target.value)}
+                      placeholder="name@yourdomain.com"
+                      type="email"
+                    />
+                    <p className="text-[11px]" style={{ color: BIZ.inkMute }}>
+                      Use a business email if possible.
+                    </p>
+                  </FieldGroup>
+                  <FieldGroup label="Your role">
+                    <Select value={role} onValueChange={setRole}>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select your role" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {ROLE_OPTIONS.map((opt) => (
+                          <SelectItem key={opt.value} value={opt.value}>
+                            {opt.label}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                    {role === 'owner' && (
+                      <p className="text-[10px] font-medium" style={{ color: BIZ.amber }}>
+                        Owners are typically verified fastest.
+                      </p>
+                    )}
+                  </FieldGroup>
+                  <FieldGroup
+                    label={
+                      <>
+                        How are you connected to this business?{' '}
+                        <span className="font-normal" style={{ color: BIZ.inkMute }}>
+                          (max 500)
+                        </span>
+                      </>
+                    }
+                  >
+                    <Textarea
+                      value={notes}
+                      onChange={(e) => setNotes(e.target.value.slice(0, 500))}
+                      placeholder="What does this business do, and what's your role?"
+                      rows={3}
+                      className="resize-none text-sm"
+                    />
+                  </FieldGroup>
+                </div>
+                <p
+                  className="text-[11px] mt-4 pt-3"
+                  style={{ color: BIZ.inkMute, borderTop: `0.5px solid ${BIZ.hair}` }}
+                >
+                  By submitting, you confirm you're authorised to represent this business on clbhouz.
+                </p>
+                {validationError?.section === 'ownership' && (
+                  <p className="text-[12px] text-destructive mt-3">{validationError.message}</p>
+                )}
+              </SectionCard>
+            </div>
           )}
         </main>
 
-        {/* Footer */}
-        {step !== 'domain' && (
+        {/* Sticky footer — only for the single-page submit flow, not for domain-mode or confirmation */}
+        {!showDomainMode && !confirmation && (
           <footer
             className="shrink-0 backdrop-blur-xl"
             style={{
-              borderTop: '0.5px solid rgba(15,23,42,0.07)',
+              borderTop: `0.5px solid ${BIZ.hair}`,
               background: 'rgba(248,250,252,0.97)',
               paddingBottom: 'calc(env(safe-area-inset-bottom, 0px) + 16px)',
             }}
           >
-            <div className="mx-auto flex w-full items-center justify-between gap-3 px-4 py-3">
-              <button
-                type="button"
-                onClick={handleBack}
-                className="flex-1 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors py-2.5"
+            <div className="mx-auto flex w-full items-center gap-3 px-4 py-3">
+              <Button
+                onClick={() => submitMutation.mutate()}
+                disabled={submitMutation.isPending}
+                className="flex-1 h-12 text-white border-0 text-[15px]"
+                style={{ background: BIZ.ink, borderRadius: BIZ.rInner, fontWeight: 700 }}
               >
-                {step === 'readiness' ? 'Cancel' : 'Back'}
-              </button>
-              {step === 'readiness' && (
-                <Button
-                  onClick={() => setStep('proof')}
-                  disabled={!canProceedReadiness}
-                  className="flex-[1.5] h-11 gap-1 text-white border-0"
-                  style={{ background: BIZ.ink }}
-                >
-                  Continue <ChevronRight className="h-4 w-4" />
-                </Button>
-              )}
-              {step === 'proof' && (
-                <Button
-                  onClick={() => setStep('ownership')}
-                  disabled={!validateProof}
-                  className="flex-[1.5] h-11 gap-1 text-white border-0"
-                  style={{ background: BIZ.ink }}
-                >
-                  Continue <ChevronRight className="h-4 w-4" />
-                </Button>
-              )}
-              {step === 'ownership' && (
-                <Button
-                  onClick={() => submitMutation.mutate()}
-                  disabled={!canProceedOwnership || submitMutation.isPending}
-                  className="flex-[1.5] h-11 text-white border-0"
-                  style={{ background: BIZ.ink }}
-                >
-                  {submitMutation.isPending ? (
-                    <span className="flex items-center gap-2">
-                      <Loader2 className="h-4 w-4 animate-spin" />
-                      Submitting…
-                    </span>
-                  ) : (
-                    'Submit for review'
-                  )}
-                </Button>
-              )}
+                {submitMutation.isPending ? (
+                  <span className="flex items-center gap-2">
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                    Submitting…
+                  </span>
+                ) : (
+                  'Submit for review'
+                )}
+              </Button>
             </div>
           </footer>
         )}
       </DialogContent>
     </Dialog>
+  );
+}
+
+// ---- small building blocks ----
+
+const SectionCard = ({
+  number,
+  title,
+  children,
+  ref,
+}: {
+  number: number;
+  title: string;
+  children: React.ReactNode;
+  ref?: React.RefObject<HTMLDivElement>;
+}) => {
+  // Using forwardRef-style via `ref` prop passed by parent (React 19 style). Fallback below.
+  return (
+    <div
+      ref={ref}
+      className="rounded-2xl p-4"
+      style={{ background: BIZ.card, border: `1px solid ${BIZ.hair}` }}
+    >
+      <div className="flex items-center gap-2.5 mb-3">
+        <div
+          className="h-6 w-6 rounded-full flex items-center justify-center text-[12px] font-bold"
+          style={{ background: BIZ.ink, color: '#fff' }}
+        >
+          {number}
+        </div>
+        <h3 className="text-[15px] font-semibold" style={{ color: BIZ.ink }}>
+          {title}
+        </h3>
+      </div>
+      {children}
+    </div>
+  );
+};
+
+function DetailRow({
+  label,
+  value,
+  missing,
+  missingMessage,
+  last,
+}: {
+  label: string;
+  value?: string | null;
+  missing?: boolean;
+  missingMessage?: string;
+  last?: boolean;
+}) {
+  return (
+    <div
+      className="flex items-start gap-3 py-2.5"
+      style={last ? undefined : { borderBottom: `0.5px solid ${BIZ.hair}` }}
+    >
+      <span className="text-[13px] shrink-0 w-[110px]" style={{ color: BIZ.inkMute }}>
+        {label}
+      </span>
+      {missing ? (
+        <span className="text-[12px] text-destructive flex-1 min-w-0 text-right">
+          {missingMessage}
+        </span>
+      ) : (
+        <span
+          className="text-[13px] flex-1 min-w-0 text-right overflow-hidden text-ellipsis whitespace-nowrap"
+          style={{ color: BIZ.ink }}
+        >
+          {value || '—'}
+        </span>
+      )}
+    </div>
+  );
+}
+
+function FieldGroup({
+  label,
+  children,
+}: {
+  label: React.ReactNode;
+  children: React.ReactNode;
+}) {
+  return (
+    <div className="space-y-1.5">
+      <Label className="text-[13px]" style={{ color: BIZ.ink }}>
+        {label}
+      </Label>
+      {children}
+    </div>
+  );
+}
+
+function ConfirmationView({
+  requestId,
+  method,
+  onDone,
+}: {
+  requestId: string;
+  method: ProofMethod;
+  onDone: () => void;
+}) {
+  const shortRef = requestId.slice(0, 8).toUpperCase();
+  const methodLabel = PROOF_OPTIONS.find((o) => o.id === method)?.label ?? method;
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 12 }}
+      animate={{ opacity: 1, y: 0 }}
+      className="text-center py-8"
+    >
+      <div
+        className="h-16 w-16 rounded-full flex items-center justify-center mx-auto mb-4"
+        style={{ background: 'rgba(5,150,105,0.10)' }}
+      >
+        <CheckCircle2 className="h-8 w-8" style={{ color: '#059669' }} />
+      </div>
+      <h2 className="text-xl font-bold mb-2" style={{ color: BIZ.ink }}>
+        Request submitted
+      </h2>
+      <p className="text-[14px] max-w-xs mx-auto" style={{ color: BIZ.inkMute }}>
+        We'll review your request, usually within a few days, and let you know by notification
+        and email.
+      </p>
+      <div
+        className="mt-6 mx-auto max-w-xs rounded-2xl p-4 text-left"
+        style={{ background: BIZ.card, border: `1px solid ${BIZ.hair}` }}
+      >
+        <div className="flex items-center justify-between py-1">
+          <span className="text-[12px]" style={{ color: BIZ.inkMute }}>
+            Reference
+          </span>
+          <span
+            className="text-[13px] font-mono"
+            style={{ color: BIZ.ink, letterSpacing: '0.02em' }}
+          >
+            {shortRef}
+          </span>
+        </div>
+        <div
+          className="flex items-center justify-between py-1"
+          style={{ borderTop: `0.5px solid ${BIZ.hair}` }}
+        >
+          <span className="text-[12px]" style={{ color: BIZ.inkMute }}>
+            Method
+          </span>
+          <span className="text-[13px]" style={{ color: BIZ.ink }}>
+            {methodLabel}
+          </span>
+        </div>
+      </div>
+      <div className="mt-8">
+        <Button
+          onClick={onDone}
+          className="w-full h-11 text-white border-0"
+          style={{ background: BIZ.ink, borderRadius: BIZ.rInner }}
+        >
+          Done
+        </Button>
+      </div>
+    </motion.div>
   );
 }
