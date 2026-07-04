@@ -257,6 +257,7 @@ class VideoEngineImpl {
         return lvl.bitrate <= cap ? idx : best;
       }, hls.levels.length - 1);
       hls.autoLevelCapping = maxLevel;
+      if (lane.id === 'feed-active') fp.hlsManifest(lane.postId);
       this.transition(lane, 'ready');
     };
     const onError = (_evt: unknown, data: any) => {
