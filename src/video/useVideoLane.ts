@@ -13,7 +13,17 @@
  */
 
 import { useEffect, useRef, useState } from 'react';
+import { isPerfEnabled } from '@/perf/navTiming';
 import { VideoEngine, type LaneId, type LaneSnapshot } from './VideoEngine';
+
+const PPRACE = (tag: string, data: Record<string, unknown>) => {
+  try {
+    if (!isPerfEnabled()) return;
+  } catch { return; }
+  // eslint-disable-next-line no-console
+  console.info('[PPRACE]', tag, data);
+};
+
 
 export interface UseVideoLaneOptions {
   hlsUrl: string | null | undefined;
@@ -88,12 +98,18 @@ export function useVideoLane(
   // Auto play/pause based on `active`. play() is safe to call before mount:
   // the engine queues it and consumes on the next mountLane.
   useEffect(() => {
+    const callerPostId = opts.postId ?? null;
+    PPRACE('effect fire', { callerPostId, active: !!opts.active });
     if (opts.active) {
-      void VideoEngine.play(laneId);
+      void VideoEngine.play(laneId, { callerPostId });
     } else {
-      VideoEngine.pause(laneId);
+      VideoEngine.pause(laneId, { callerPostId });
     }
-  }, [laneId, opts.active]);
+    return () => {
+      PPRACE('effect cleanup', { callerPostId });
+    };
+  }, [laneId, opts.active, opts.postId]);
+
 
   // Apply mute.
   useEffect(() => {

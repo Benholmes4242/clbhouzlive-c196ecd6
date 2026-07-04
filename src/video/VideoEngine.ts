@@ -70,6 +70,15 @@ const DBG = (...args: unknown[]) => {
   }
 };
 
+const PPRACE = (tag: string, data: Record<string, unknown>) => {
+  try {
+    if (!isPerfEnabled()) return;
+  } catch { return; }
+  // eslint-disable-next-line no-console
+  console.info('[PPRACE]', tag, data);
+};
+
+
 const HIDDEN_HOST_ID = '__video_engine_hidden_host__';
 
 function ensureHiddenHost(): HTMLElement {
@@ -393,10 +402,15 @@ class VideoEngineImpl {
       this.emit(lane);
     };
 
-    const onPlay = () => this.transition(lane, 'playing');
+    const onPlay = () => {
+      PPRACE('EL_PLAY', { lanePostId: lane.postId, t: lane.el.currentTime });
+      this.transition(lane, 'playing');
+    };
     const onPause = () => {
+      PPRACE('EL_PAUSE', { lanePostId: lane.postId, t: lane.el.currentTime });
       if (lane.state !== 'error') this.transition(lane, 'paused');
     };
+
     const onError = () => this.transition(lane, 'error');
     const onCanPlay = () => {
       if (lane.id === 'feed-active') fp.canplay(lane.postId);
@@ -433,8 +447,16 @@ class VideoEngineImpl {
   }
 
 
-  play(laneId: LaneId): Promise<void> {
+  play(laneId: LaneId, opts: { callerPostId?: string | null } = {}): Promise<void> {
     const lane = this.getLane(laneId);
+    PPRACE('PLAY', {
+      laneId,
+      callerPostId: opts.callerPostId ?? null,
+      lanePostId: lane.postId,
+      wantPlayBefore: lane.wantPlay,
+      paused: lane.el.paused,
+      t: lane.el.currentTime,
+    });
     // Persistent intent: set now, honored on mount + on canplay after (re)load.
     lane.wantPlay = true;
     if (!lane.mountedHost) {
@@ -448,8 +470,16 @@ class VideoEngineImpl {
     });
   }
 
-  pause(laneId: LaneId): void {
+  pause(laneId: LaneId, opts: { callerPostId?: string | null } = {}): void {
     const lane = this.getLane(laneId);
+    PPRACE('PAUSE', {
+      laneId,
+      callerPostId: opts.callerPostId ?? null,
+      lanePostId: lane.postId,
+      wantPlayBefore: lane.wantPlay,
+      paused: lane.el.paused,
+      t: lane.el.currentTime,
+    });
     lane.wantPlay = false;
     if (!lane.el.paused) lane.el.pause();
   }
@@ -460,6 +490,7 @@ class VideoEngineImpl {
       if (!lane.el.paused) lane.el.pause();
     });
   }
+
 
 
 
