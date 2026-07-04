@@ -6,7 +6,7 @@ import { ChevronLeft, Clock, XCircle, BadgeCheck, Mail, AlertCircle, ArrowRight,
 import { format } from 'date-fns';
 import { Button } from '@/components/ui/button';
 import { ManagePageShell } from '@/components/manage/ManagePageShell';
-import { SectionHeader } from '@/components/ui/SectionHeader';
+
 import { VerifiedBadge } from '@/components/ui/VerifiedBadge';
 import { supabase } from '@/integrations/supabase/client';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
