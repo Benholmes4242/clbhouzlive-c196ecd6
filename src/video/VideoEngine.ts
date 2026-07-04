@@ -556,7 +556,15 @@ class VideoEngineImpl {
     // already took the lane. Null caller = engine-wide (pauseAll/visibility/
     // release) — always allowed.
     if (caller != null && lane.postId != null && caller !== lane.postId) {
+      if (isFsv(laneId)) {
+        fsv('eng.pause.stale', { laneId, caller, lanePostId: lane.postId });
+      }
       return;
+    }
+    if (isFsv(laneId)) {
+      fsvEl('eng.pause', lane.el, {
+        laneId, caller, lanePostId: lane.postId, wantPlayBefore: lane.wantPlay,
+      });
     }
     lane.wantPlay = false;
     if (!lane.el.paused) lane.el.pause();
