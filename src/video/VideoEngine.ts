@@ -449,14 +449,19 @@ class VideoEngineImpl {
 
   play(laneId: LaneId, opts: { callerPostId?: string | null } = {}): Promise<void> {
     const lane = this.getLane(laneId);
+    const caller = opts.callerPostId ?? null;
     PPRACE('PLAY', {
       laneId,
-      callerPostId: opts.callerPostId ?? null,
+      callerPostId: caller,
       lanePostId: lane.postId,
       wantPlayBefore: lane.wantPlay,
       paused: lane.el.paused,
       t: lane.el.currentTime,
     });
+    // Ownership: the moment a card issues play() it becomes the lane owner.
+    // Guarantees pause() owner-guard below can reject stale outgoing cards
+    // even if load() hasn't yet updated lane.postId for this caller.
+    if (caller != null) lane.postId = caller;
     // Persistent intent: set now, honored on mount + on canplay after (re)load.
     lane.wantPlay = true;
     if (!lane.mountedHost) {
@@ -472,9 +477,22 @@ class VideoEngineImpl {
 
   pause(laneId: LaneId, opts: { callerPostId?: string | null } = {}): void {
     const lane = this.getLane(laneId);
+    const caller = opts.callerPostId ?? null;
+    // OWNER GUARD: only the current lane owner may pause it. Stale outgoing
+    // cards (caller != lane.postId) must NOT pause the incoming card that
+    // already took the lane. Null caller = engine-wide (pauseAll/visibility/
+    // release) — always allowed.
+    if (caller != null && lane.postId != null && caller !== lane.postId) {
+      PPRACE('PAUSE_IGNORED_STALE', {
+        laneId,
+        callerPostId: caller,
+        lanePostId: lane.postId,
+      });
+      return;
+    }
     PPRACE('PAUSE', {
       laneId,
-      callerPostId: opts.callerPostId ?? null,
+      callerPostId: caller,
       lanePostId: lane.postId,
       wantPlayBefore: lane.wantPlay,
       paused: lane.el.paused,
@@ -483,6 +501,7 @@ class VideoEngineImpl {
     lane.wantPlay = false;
     if (!lane.el.paused) lane.el.pause();
   }
+
 
   pauseAll(): void {
     this.lanes.forEach((lane) => {
