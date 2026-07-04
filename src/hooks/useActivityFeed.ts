@@ -266,6 +266,26 @@ function getContextUrl(notification: any): string {
     if (businessSlug) return `/business/${businessSlug}`;
   }
 
+  // Business team invite — deep-link into the accept page with token
+  if (type === 'business_team_invited') {
+    const d = (typeof data === 'object' && data !== null && !Array.isArray(data)) ? (data as any) : {};
+    if (d.token) return `/business/invite/accept?token=${encodeURIComponent(d.token)}`;
+    const bizId = d.business_slug || d.business_id || entity_id;
+    if (bizId) return `/business/${bizId}`;
+  }
+
+  // Business team join events — new member -> business profile; owners/admins -> team page
+  if (type === 'business_team_joined') {
+    const d = (typeof data === 'object' && data !== null && !Array.isArray(data)) ? (data as any) : {};
+    const bizId = d.business_slug || d.business_id || entity_id;
+    if (bizId) return `/business/${bizId}`;
+  }
+  if (type === 'business_team_member_joined') {
+    const d = (typeof data === 'object' && data !== null && !Array.isArray(data)) ? (data as any) : {};
+    const bizId = d.business_id || entity_id;
+    if (bizId) return `/business/${bizId}/team`;
+  }
+
   
   // Tag and mention notifications — post_id lives in the data JSONB, fallback to entity_id
   if (type === 'tag' || type === 'mention' || type === 'mention_post' || type === 'comment_mention') {
