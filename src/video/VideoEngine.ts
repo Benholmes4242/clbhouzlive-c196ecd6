@@ -400,6 +400,14 @@ class VideoEngineImpl {
 
   play(laneId: LaneId): Promise<void> {
     const lane = this.getLane(laneId);
+    // Guard: no play until the lane element is mounted into a real host.
+    // Effects across sibling cards can race; queue the intent and let
+    // mountLane consume it once the element lands in the active card.
+    if (!lane.mountedHost) {
+      lane.pendingPlay = true;
+      DBG(laneId, 'play() queued — no mounted host');
+      return Promise.resolve();
+    }
     if (laneId === 'feed-active') fp.playCall(lane.postId);
     const p = lane.el.play();
     return Promise.resolve(p).catch((err) => {
