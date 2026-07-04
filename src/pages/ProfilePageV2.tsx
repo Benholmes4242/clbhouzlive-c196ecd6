@@ -617,7 +617,7 @@ const ProfilePageV2Content: React.FC = () => {
               if (isUploadingAvatar) return;
               logPoint('profile_photo.click');
               if (isSelf) {
-                avatarFileInputRef.current?.click();
+                setPhotoSheet('avatar');
               } else {
                 setIsAvatarLightboxOpen(true);
               }
