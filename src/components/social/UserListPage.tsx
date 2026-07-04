@@ -1095,6 +1095,7 @@ interface UserRowFlatProps {
   onUserRemoved?: (userId: string) => void;
   relationshipStatus?: RelationshipStatusRow;
   isOwnProfile: boolean;
+  isFirst?: boolean;
 }
 
 const UserRowFlat: React.FC<UserRowFlatProps> = ({
@@ -1104,6 +1105,7 @@ const UserRowFlat: React.FC<UserRowFlatProps> = ({
   onUserRemoved,
   relationshipStatus,
   isOwnProfile,
+  isFirst = false,
 }) => {
   const navigate = useNavigate();
   const isSelf = currentUserId === user.id;
