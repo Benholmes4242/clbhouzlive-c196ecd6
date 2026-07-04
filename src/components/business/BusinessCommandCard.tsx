@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
-  MoreHorizontal, Eye, Pencil, BarChart3, Trash2, ShieldCheck, Clock, CheckCircle, Users, ChevronRight, ChevronDown, MapPin,
+  MoreHorizontal, Eye, Pencil, BarChart3, Trash2, ShieldCheck, Clock, CheckCircle, Users, ChevronRight, ChevronDown, MapPin, Star,
 } from 'lucide-react';
 import {
   DropdownMenu,
@@ -18,6 +18,7 @@ import { useBusinessPendingRequestsCount } from '@/hooks/useBusinessPendingReque
 import { useBusinessAccessRequestsRealtime } from '@/hooks/useBusinessAccessRequestsRealtime';
 import { VerifiedBadge } from '@/components/ui/VerifiedBadge';
 import { useBusinessVerificationRequest, deriveVerificationState } from '@/hooks/useBusinessVerificationRequest';
+import { useBusinessReviews } from '@/hooks/useBusinessReviews';
 import { getCityCountry } from '@/lib/locationDisplay';
 import type { BusinessMembership } from '@/hooks/useMyBusinesses';
 import { BIZ } from './businessTokens';
@@ -76,6 +77,11 @@ export function BusinessCommandCard({
 
   // Fetch pending access requests count for indicator
   const { data: pendingRequestsCount } = useBusinessPendingRequestsCount(business.id);
+
+  // Reviews summary — used for the Reviews action badge / rating.
+  const { data: reviewsData } = useBusinessReviews(business.id, { filter: 'all', sort: 'recent', limit: 1 });
+  const awaitingReplies = reviewsData?.summary?.awaiting_reply ?? 0;
+  const avgReviewRating = reviewsData?.summary?.avg ?? null;
 
   // Subscribe to realtime updates for access requests
   useBusinessAccessRequestsRealtime(business.id);
@@ -230,6 +236,17 @@ export function BusinessCommandCard({
                   <BarChart3 className="h-4 w-4" style={{ color: BIZ.inkMute }} />
                   Insights
                 </DropdownMenuItem>
+                <DropdownMenuItem
+                  onClick={(e) => { e.stopPropagation(); goto('/reviews'); }}
+                  className="gap-2.5 cursor-pointer min-h-[44px] active:bg-muted"
+                >
+                  <Star className="h-4 w-4" style={{ color: BIZ.inkMute }} />
+                  Reviews
+                  {awaitingReplies > 0 && (
+                    <span className="ml-auto h-2 w-2 rounded-full" style={{ background: BIZ.amber }} />
+                  )}
+                </DropdownMenuItem>
+
 
                 {canManage && (
                   <>
@@ -378,6 +395,17 @@ export function BusinessCommandCard({
                 >
                   <ActionRow icon={Pencil} label="Edit profile" onClick={() => goto('/edit')} />
                   <ActionRow icon={BarChart3} label="Insights" onClick={() => goto('/insights')} />
+                  <ActionRow
+                    icon={Star}
+                    label="Reviews"
+                    onClick={() => goto('/reviews')}
+                    hint={
+                      avgReviewRating != null
+                        ? `${(Math.round(avgReviewRating * 10) / 10).toFixed(1)}`
+                        : undefined
+                    }
+                    badge={awaitingReplies > 0}
+                  />
                   {canManage && (
                     <ActionRow
                       icon={Users}
@@ -462,12 +490,14 @@ function ActionRow({
   label,
   onClick,
   badge = false,
+  hint,
   last = false,
 }: {
   icon: React.ComponentType<{ className?: string; style?: React.CSSProperties }>;
   label: string;
   onClick: () => void;
   badge?: boolean;
+  hint?: string;
   last?: boolean;
 }) {
   return (
@@ -498,6 +528,11 @@ function ActionRow({
       >
         {label}
       </span>
+      {hint && (
+        <span className="text-[11.5px] font-semibold tabular-nums" style={{ color: BIZ.inkMute }}>
+          {hint}
+        </span>
+      )}
       {badge && (
         <span className="h-2 w-2 rounded-full" style={{ background: BIZ.amber }} />
       )}
@@ -505,3 +540,4 @@ function ActionRow({
     </button>
   );
 }
+
