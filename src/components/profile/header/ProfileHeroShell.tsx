@@ -92,14 +92,15 @@ const ProfileHeroShell: React.FC<ProfileHeroShellProps> = ({
     });
   };
 
-  // Mirror Tour hero: image-as-background + paddingTop env(sat) so the photo
-  // fills the notch automatically. No separate <img>, no negative marginTop.
+  // Cover image is rendered as its own absolutely-positioned layer locked
+  // to 3:2 of the container width — the exact aspect the editor previews.
+  // The content box may be TALLER than 3:2 (safe area, name row, etc.); we
+  // don't stretch the image to fill that extra height, so what the user
+  // framed is exactly what shows. Content extends below the image over the
+  // dark background.
   const focal = isMobile ? getMobileCrop() : getDesktopCropPosition();
   const heroScrim =
     'linear-gradient(180deg, rgba(15,23,42,0.45) 0%, rgba(15,23,42,0.1) 20%, rgba(15,23,42,0) 40%, rgba(15,23,42,0.5) 100%)';
-  const heroBackground = hasImage && imageSrc
-    ? `${heroScrim}, url(${imageSrc}) ${focal} / cover no-repeat`
-    : 'linear-gradient(180deg,#1E4D38,#0F172A)';
 
   return (
     <div
@@ -107,13 +108,57 @@ const ProfileHeroShell: React.FC<ProfileHeroShellProps> = ({
       className="relative w-full overflow-hidden"
       style={{
         minHeight: 'calc(var(--profile-hero-h) + env(safe-area-inset-top, 0px))',
-        background: heroBackground,
         backgroundColor: '#0F172A',
         paddingTop: 'env(safe-area-inset-top, 0px)',
       }}
     >
+      {/* Cover image layer — 3:2, matches editor preview exactly. */}
+      {hasImage && imageSrc ? (
+        <div
+          aria-hidden
+          style={{
+            position: 'absolute',
+            top: 0,
+            left: 0,
+            right: 0,
+            aspectRatio: '3 / 2',
+            backgroundImage: `url(${imageSrc})`,
+            backgroundSize: 'cover',
+            backgroundPosition: focal,
+            backgroundRepeat: 'no-repeat',
+            zIndex: 0,
+          }}
+        />
+      ) : (
+        <div
+          aria-hidden
+          style={{
+            position: 'absolute',
+            top: 0,
+            left: 0,
+            right: 0,
+            aspectRatio: '3 / 2',
+            background: 'linear-gradient(180deg,#1E4D38,#0F172A)',
+            zIndex: 0,
+          }}
+        />
+      )}
+      {/* Scrim over the cover image only */}
+      <div
+        aria-hidden
+        style={{
+          position: 'absolute',
+          top: 0,
+          left: 0,
+          right: 0,
+          aspectRatio: '3 / 2',
+          background: heroScrim,
+          zIndex: 1,
+          pointerEvents: 'none',
+        }}
+      />
       {!hasImage && isOwnProfile && (
-        <div className="absolute inset-0 flex flex-col items-center justify-center text-white/50 pointer-events-none">
+        <div className="absolute inset-0 flex flex-col items-center justify-center text-white/50 pointer-events-none" style={{ zIndex: 2 }}>
           <Camera className="w-12 h-12 mb-3 opacity-60" />
           <p className="text-sm font-medium">Upload a cover photo in Edit Profile</p>
         </div>
