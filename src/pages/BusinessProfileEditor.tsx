@@ -50,7 +50,7 @@ import { getCountryCodeFromClub } from '@/utils/countryCodeMapping';
 
 import { IdentitySection } from '@/components/business/editor/IdentitySection';
 import { LocationContactSection } from '@/components/business/editor/LocationContactSection';
-import { BusinessHeroCard } from '@/components/business/editor/BusinessHeroCard';
+
 import { FacilitiesSection } from '@/components/business/editor/FacilitiesSection';
 import { PrimaryActionSection } from '@/components/business/editor/PrimaryActionSection';
 import { BookingComingSoonSection } from '@/components/business/editor/BookingComingSoonSection';
