@@ -438,7 +438,7 @@ const BusinessProfilePage: React.FC = () => {
           <button
             className="relative w-[124px] h-[124px] block cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-[#F7931E] focus-visible:ring-offset-2 rounded-[34%] transition-transform hover:scale-[1.02] active:scale-[0.98]"
             onClick={() => {
-              if (isOwner) logoFileInputRef.current?.click();
+              if (isOwner) setPhotoSheet('logo');
               else if (!uploadingLogo) setIsAvatarLightboxOpen(true);
             }}
             aria-label={isOwner ? 'Change business logo' : 'View business logo'}
