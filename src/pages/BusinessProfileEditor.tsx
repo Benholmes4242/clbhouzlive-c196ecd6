@@ -375,11 +375,6 @@ export default function BusinessProfileEditor() {
 
   /* ── image handlers ──────────────────────────────── */
   const onLogoFile = (file: File) => {
-    const url = URL.createObjectURL(file);
-    setLogoCropSrc(url);
-    setLogoCropOpen(true);
-  };
-  const onLogoCropped = (file: File) => {
     if (logo.localPreview) URL.revokeObjectURL(logo.localPreview);
     setLogo({
       ...logo,
@@ -387,19 +382,12 @@ export default function BusinessProfileEditor() {
       pendingRemove: false,
       localPreview: URL.createObjectURL(file),
     });
-    if (logoCropSrc) URL.revokeObjectURL(logoCropSrc);
-    setLogoCropSrc(null);
   };
   const onLogoRemove = () => {
     if (logo.localPreview) URL.revokeObjectURL(logo.localPreview);
     setLogo({ ...logo, pendingFile: null, pendingRemove: true, localPreview: null });
   };
   const onCoverFile = (file: File) => {
-    const url = URL.createObjectURL(file);
-    setCoverCropSrc(url);
-    setCoverCropOpen(true);
-  };
-  const onCoverCropped = (file: File) => {
     if (cover.localPreview) URL.revokeObjectURL(cover.localPreview);
     setCover({
       ...cover,
@@ -407,8 +395,6 @@ export default function BusinessProfileEditor() {
       pendingRemove: false,
       localPreview: URL.createObjectURL(file),
     });
-    if (coverCropSrc) URL.revokeObjectURL(coverCropSrc);
-    setCoverCropSrc(null);
   };
   const onCoverRemove = () => {
     if (cover.localPreview) URL.revokeObjectURL(cover.localPreview);
