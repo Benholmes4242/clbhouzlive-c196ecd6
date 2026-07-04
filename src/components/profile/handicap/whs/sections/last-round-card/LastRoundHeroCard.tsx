@@ -2,6 +2,10 @@ import React from 'react';
 import { ChevronRight } from 'lucide-react';
 import { useFriendRoundDetail } from '@/lib/whs/hooks';
 import type { WhsLastRound } from '@/lib/whs/types';
+import {
+  COURSE_GRADIENT,
+  COURSE_SCRIMS,
+} from '@/features/tourhub/components/overview-v3/HybridHero.constants';
 
 const FONT = 'Geist, system-ui, -apple-system, BlinkMacSystemFont, sans-serif';
 
@@ -15,105 +19,122 @@ interface Props {
   ownerFirstName?: string | null;
 }
 
-const Col: React.FC<{
-  label: string;
-  value: React.ReactNode;
-  color: string;
-  first?: boolean;
-}> = ({ label, value, color, first }) => (
-  <div
-    style={{
-      flex: 1,
-      borderLeft: first ? 'none' : '1px solid var(--hcp-line)',
-      paddingLeft: first ? 0 : 14,
-    }}
-  >
-    <div
-      style={{
-        fontSize: 11,
-        fontWeight: 700,
-        letterSpacing: '0.06em',
-        textTransform: 'uppercase',
-        color: 'var(--hcp-t-40)',
-        marginBottom: 3,
-      }}
-    >
-      {label}
-    </div>
-    <div
-      style={{
-        fontSize: 22,
-        fontWeight: 800,
-        color,
-        letterSpacing: '-0.02em',
-        fontVariantNumeric: 'tabular-nums',
-        lineHeight: 1,
-      }}
-    >
-      {value}
-    </div>
-  </div>
-);
+const MEDIA_HEIGHT = 118;
 
-const Thumb: React.FC<{ src: string | null }> = ({ src }) => {
+/** Bottom scrim so the course name reads on any photo. */
+const NAME_SCRIM =
+  'linear-gradient(180deg, rgba(11,15,20,0) 30%, rgba(11,15,20,0.78) 100%)';
+
+const MediaBand: React.FC<{ src: string | null; course: string; meta: string | null }> = ({
+  src,
+  course,
+  meta,
+}) => {
   const [failed, setFailed] = React.useState(false);
-  const ok = !!src && !failed;
-  if (!ok) {
-    return (
-      <div
-        style={{
-          width: 56,
-          height: 56,
-          borderRadius: 12,
-          flexShrink: 0,
-          position: 'relative',
-          overflow: 'hidden',
-          background: 'linear-gradient(135deg, #46665a 0%, #2f4a40 100%)',
-          border: '1px solid var(--hcp-line)',
-        }}
-      >
-        <svg
-          viewBox="0 0 100 100"
-          preserveAspectRatio="xMidYMid meet"
-          style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', opacity: 0.3, color: '#fff' }}
-          aria-hidden
-        >
-          <g fill="none" stroke="currentColor" strokeWidth="1.4">
-            <circle cx="50" cy="50" r="40" />
-            <circle cx="50" cy="50" r="28" />
-            <circle cx="50" cy="50" r="16" />
-            <circle cx="50" cy="50" r="5" fill="currentColor" />
-          </g>
-        </svg>
-      </div>
-    );
-  }
+  const showPhoto = !!src && !failed;
+
   return (
     <div
       style={{
-        width: 56,
-        height: 56,
-        borderRadius: 12,
-        flexShrink: 0,
-        overflow: 'hidden',
-        border: '1px solid var(--hcp-line)',
         position: 'relative',
+        width: '100%',
+        height: MEDIA_HEIGHT,
+        overflow: 'hidden',
+        background: 'var(--hcp-bg-2)',
       }}
     >
-      <img
-        src={src!}
-        alt=""
-        onError={() => setFailed(true)}
-        style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
+      {showPhoto ? (
+        <img
+          src={src!}
+          alt=""
+          onError={() => setFailed(true)}
+          style={{
+            position: 'absolute',
+            inset: 0,
+            width: '100%',
+            height: '100%',
+            objectFit: 'cover',
+            display: 'block',
+          }}
+        />
+      ) : (
+        <>
+          {/* Tours Overview hero fallback — single source of truth */}
+          <div
+            aria-hidden
+            style={{
+              position: 'absolute',
+              inset: 0,
+              background: COURSE_GRADIENT,
+            }}
+          />
+          <div
+            aria-hidden
+            style={{
+              position: 'absolute',
+              inset: 0,
+              background: COURSE_SCRIMS,
+            }}
+          />
+        </>
+      )}
+
+      {/* Name legibility scrim */}
+      <div
+        aria-hidden
+        style={{
+          position: 'absolute',
+          inset: 0,
+          background: NAME_SCRIM,
+          pointerEvents: 'none',
+        }}
       />
+
+      {/* Course name + meta */}
+      <div
+        style={{
+          position: 'absolute',
+          left: 16,
+          right: 16,
+          bottom: 12,
+          color: '#fff',
+        }}
+      >
+        <div
+          style={{
+            fontSize: 18,
+            fontWeight: 800,
+            letterSpacing: '-0.01em',
+            lineHeight: 1.15,
+            overflow: 'hidden',
+            textOverflow: 'ellipsis',
+            whiteSpace: 'nowrap',
+            textShadow: '0 1px 2px rgba(0,0,0,0.35)',
+          }}
+        >
+          {course}
+        </div>
+        {meta && (
+          <div
+            style={{
+              marginTop: 4,
+              fontSize: 11,
+              fontWeight: 700,
+              letterSpacing: '0.08em',
+              textTransform: 'uppercase',
+              color: 'rgba(255,255,255,0.82)',
+              textShadow: '0 1px 2px rgba(0,0,0,0.35)',
+            }}
+          >
+            {meta}
+          </div>
+        )}
+      </div>
     </div>
   );
 };
 
-const LastRoundHeroCard: React.FC<Props> = ({
-  round,
-  onClick,
-}) => {
+const LastRoundHeroCard: React.FC<Props> = ({ round, onClick }) => {
   const courseName = round.course?.name ?? 'Unknown course';
   const { data: detail } = useFriendRoundDetail(round.id);
 
@@ -129,14 +150,57 @@ const LastRoundHeroCard: React.FC<Props> = ({
   const stableford = round.stableford_points;
   const diff = round.handicap_differential;
   const handicapDelta = round.handicap_delta ?? null;
+  const indexAfter = round.handicap_index_at_time ?? null;
 
-  const diffDisplay = diff == null ? '—' : `${diff > 0 ? '+' : ''}${diff.toFixed(1)}`;
+  const metaParts: string[] = [];
+  if (par != null) metaParts.push(`PAR ${par}`);
+  if (slope != null) metaParts.push(`SL ${slope}`);
+  const meta = metaParts.length ? metaParts.join(' \u00b7 ') : null;
+
+  const diffDisplay = diff == null ? '\u2014' : `${diff > 0 ? '+' : ''}${diff.toFixed(1)}`;
   const diffColor =
-    diff == null
-      ? 'var(--hcp-t-100)'
-      : diff > 0
-        ? 'var(--hcp-bad)'
-        : 'var(--hcp-good-2)';
+    diff == null ? 'var(--hcp-t-100)' : diff > 0 ? 'var(--hcp-bad)' : 'var(--hcp-good-2)';
+
+  // ---- consequence line ----
+  // Order matters: non-counting first, then no-previous-index, then move/hold.
+  const dim: React.CSSProperties = { fontSize: 12, fontWeight: 700, color: 'var(--hcp-t-60)' };
+  const strong: React.CSSProperties = { color: 'var(--hcp-t-100)', fontWeight: 800 };
+  let consequence: React.ReactNode;
+  if (!round.is_counter) {
+    consequence = <span style={dim}>No effect on your index</span>;
+  } else if (handicapDelta == null || indexAfter == null) {
+    consequence =
+      indexAfter != null ? (
+        <span style={dim}>
+          index <span style={strong}>{indexAfter.toFixed(1)}</span>
+        </span>
+      ) : (
+        <span />
+      );
+  } else if (Math.abs(handicapDelta) < 0.05) {
+    consequence = (
+      <span style={dim}>
+        index holds at <span style={strong}>{indexAfter.toFixed(1)}</span>
+      </span>
+    );
+  } else {
+    const up = handicapDelta > 0;
+    consequence = (
+      <span
+        style={{
+          fontSize: 12,
+          fontWeight: 700,
+          color: up ? 'var(--hcp-bad)' : 'var(--hcp-good-2)',
+        }}
+      >
+        {up ? '\u2191' : '\u2193'} {Math.abs(handicapDelta).toFixed(1)}{' '}
+        <span style={{ color: 'var(--hcp-t-60)', fontWeight: 700 }}>
+          {'\u00b7'} index {up ? 'climbs' : 'drops'} to{' '}
+          <span style={strong}>{indexAfter.toFixed(1)}</span>
+        </span>
+      </span>
+    );
+  }
 
   return (
     <button
@@ -150,79 +214,87 @@ const LastRoundHeroCard: React.FC<Props> = ({
         background: 'var(--hcp-bg-1)',
         border: '1px solid var(--hcp-line)',
         borderRadius: 16,
-        padding: 18,
+        padding: 0,
+        overflow: 'hidden',
         cursor: 'pointer',
         fontFamily: FONT,
         WebkitTapHighlightColor: 'transparent',
       }}
     >
-      <div style={{ display: 'flex', gap: 14, alignItems: 'center', marginBottom: 16 }}>
-        <Thumb src={round.course_thumbnail_image ?? null} />
-        <div style={{ minWidth: 0, flex: 1 }}>
+      <MediaBand src={round.course_thumbnail_image ?? null} course={courseName} meta={meta} />
+
+      {/* stat strip at the seam */}
+      <div
+        style={{
+          display: 'flex',
+          background: 'var(--hcp-bg-2)',
+          borderTop: '1px solid var(--hcp-line)',
+          borderBottom: '1px solid var(--hcp-line)',
+        }}
+      >
+        {(
+          [
+            ['Score diff', diffDisplay, diffColor],
+            ['Gross', gross != null ? String(gross) : '\u2014', 'var(--hcp-t-100)'],
+            [
+              'Stableford',
+              stableford != null ? String(stableford) : '\u2014',
+              'var(--hcp-t-100)',
+            ],
+          ] as const
+        ).map(([label, value, color], i) => (
           <div
+            key={label}
             style={{
-              fontSize: 17,
-              fontWeight: 800,
-              color: 'var(--hcp-t-100)',
-              letterSpacing: '-0.01em',
-              overflow: 'hidden',
-              textOverflow: 'ellipsis',
-              whiteSpace: 'nowrap',
+              flex: 1,
+              padding: '12px 14px',
+              borderLeft: i === 0 ? 'none' : '1px solid var(--hcp-line)',
             }}
           >
-            {courseName}
-          </div>
-          {(par != null || slope != null) && (
             <div
               style={{
-                fontSize: 12,
-                color: 'var(--hcp-t-40)',
-                fontWeight: 600,
-                marginTop: 3,
-                letterSpacing: '0.04em',
-              }}
-            >
-              {par != null && <>PAR {par}</>}
-              {par != null && slope != null && <> · </>}
-              {slope != null && <>SL {slope}</>}
-            </div>
-          )}
-        </div>
-      </div>
-
-      <div style={{ display: 'flex' }}>
-        <Col label="Score Diff" value={diffDisplay} color={diffColor} first />
-        <Col
-          label="Gross"
-          value={gross != null ? String(gross) : '—'}
-          color="var(--hcp-t-100)"
-        />
-        <Col
-          label="Stableford"
-          value={stableford != null ? String(stableford) : '—'}
-          color="var(--hcp-t-100)"
-        />
-      </div>
-
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginTop: 14 }}>
-        {handicapDelta != null ? (
-          handicapDelta === 0 ? (
-            <div style={{ fontSize: 12, fontWeight: 700, color: 'var(--hcp-t-60)' }}>
-              No change to your index
-            </div>
-          ) : (
-            <div
-              style={{
-                fontSize: 12,
+                fontSize: 10,
                 fontWeight: 700,
-                color: handicapDelta > 0 ? 'var(--hcp-bad)' : 'var(--hcp-good-2)',
+                letterSpacing: '0.08em',
+                textTransform: 'uppercase',
+                color: 'var(--hcp-t-40)',
+                marginBottom: 4,
               }}
             >
-              {handicapDelta > 0 ? '↑' : '↓'} {Math.abs(handicapDelta).toFixed(1)} to your index
+              {label}
             </div>
-          )
-        ) : <span />}
-        <ChevronRight size={20} color="var(--hcp-t-60)" strokeWidth={2.4} style={{ flexShrink: 0 }} />
+            <div
+              style={{
+                fontSize: 19,
+                fontWeight: 800,
+                color,
+                letterSpacing: '-0.02em',
+                fontVariantNumeric: 'tabular-nums',
+                lineHeight: 1,
+              }}
+            >
+              {value}
+            </div>
+          </div>
+        ))}
+      </div>
+
+      {/* consequence line */}
+      <div
+        style={{
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          padding: '12px 16px',
+        }}
+      >
+        {consequence}
+        <ChevronRight
+          size={18}
+          color="var(--hcp-t-60)"
+          strokeWidth={2.4}
+          style={{ flexShrink: 0, marginLeft: 8 }}
+        />
       </div>
     </button>
   );
