@@ -287,7 +287,8 @@ const CompactHeader: React.FC<CompactHeaderProps> = ({ className, hidden = false
       <header
         data-chrome="header"
         aria-hidden={hidden || undefined}
-        inert={hidden ? '' as unknown as undefined : undefined}
+        {...(hidden ? { inert: '' } : {})}
+
         className={cn(
           "compact-header clubhouse-header",
           "fixed inset-x-0 mx-auto w-full max-w-[480px] md:max-w-[620px] z-header",
