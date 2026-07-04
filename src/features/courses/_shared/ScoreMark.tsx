@@ -142,6 +142,8 @@ export interface ScoreMarkProps {
   colourOverride?: string;
   /** Custom font for the numeral. */
   fontFamily?: string;
+  /** Surface the mark lives on. Defaults to 'light'. */
+  surface?: 'light' | 'dark';
 }
 
 const FONT_GEIST = "'Geist', -apple-system, BlinkMacSystemFont, system-ui, sans-serif";
@@ -153,9 +155,10 @@ export const ScoreMark: React.FC<ScoreMarkProps> = ({
   showStroke = true,
   colourOverride,
   fontFamily = FONT_GEIST,
+  surface = 'light',
 }) => {
   const variant = variantFor(strokes, par);
-  const spec = SPECS[variant];
+  const spec = surface === 'dark' ? SPECS_DARK[variant] : SPECS[variant];
   const colour = colourOverride ?? spec.colour;
 
   // Stroke calibrated so at size=38 the line is ~1.5px; scales with size.
@@ -166,11 +169,13 @@ export const ScoreMark: React.FC<ScoreMarkProps> = ({
   const INSET_3 = 22;
 
   const numeral = strokes == null ? '·' : strokes;
+  const emptyInk = surface === 'dark' ? 'rgba(242,244,247,0.35)' : '#CBD5E1';
+  const parInk = surface === 'dark' ? 'rgba(242,244,247,0.80)' : SC_PAR;
   const numColour =
     strokes == null
-      ? '#CBD5E1'
+      ? emptyInk
       : variant === 'par'
-      ? SC_PAR
+      ? parInk
       : colour;
 
   return (
