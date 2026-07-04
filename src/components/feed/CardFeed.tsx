@@ -25,7 +25,7 @@ import type { ActiveActor } from '@/types/actor';
 import { useFullscreenFeedStore } from '@/store/fullscreenFeedStore';
 import { openWithOrigin } from '@/lib/openWithOrigin';
 import { useClubhouseStore } from '@/store/clubhouseStore';
-import { fp } from '@/perf/feedPlayTelemetry';
+
 import { VideoEngine } from '@/video/VideoEngine';
 
 import { FeedCard } from './FeedCard';
@@ -199,20 +199,14 @@ export const CardFeed = forwardRef<CardFeedHandle, CardFeedProps>(function CardF
     settleTimer.current = setTimeout(() => {
       setPlayingIdx(activeIdx);
     }, SETTLE_MS);
-    // [FEEDPLAY] mark FP_ACTIVE for the newly-active video card.
-    const p = posts[activeIdx];
-    if (p && p.mediaItems?.[0]?.type === 'video') fp.active(p.id);
     return () => {
       if (settleTimer.current) clearTimeout(settleTimer.current);
     };
   }, [activeIdx, posts]);
 
-  // [FEEDPLAY] mark FP_PLAYING_IDX when the settle-promoted index changes,
-  // and warm the NEXT card's HLS into the `feed-next` lane so its manifest
+  // Warm the NEXT card's HLS into the `feed-next` lane so its manifest
   // + first segment are already in the CDN/hls cache when it becomes active.
   useEffect(() => {
-    const p = posts[playingIdx];
-    if (p && p.mediaItems?.[0]?.type === 'video') fp.playingIdx(p.id);
     const next = posts[playingIdx + 1];
     const nextMedia = next?.mediaItems?.[0];
     if (next && nextMedia?.type === 'video' && (nextMedia as any).hlsUrl) {
@@ -257,16 +251,10 @@ export const CardFeed = forwardRef<CardFeedHandle, CardFeedProps>(function CardF
           if (Number.isNaN(idx)) continue;
           if (e.isIntersecting) {
             visibilityRef.current.set(idx, e.intersectionRatio);
-            // [FEEDPLAY] mark first-visible for video cards.
-            const p = posts[idx];
-            if (p && p.mediaItems?.[0]?.type === 'video') {
-              fp.visible(p.id, e.intersectionRatio);
-            }
           } else {
             visibilityRef.current.delete(idx);
-            const p = posts[idx];
-            if (p) fp.reset(p.id); // allow next re-entry to re-measure
           }
+
 
         }
         recheckActive();

@@ -79,7 +79,7 @@ export function openWithOrigin({
   const origin = snapshotOrigin(originEl, posterUrl ?? null);
   const postId = (posts[index] as any)?.id ?? null;
 
-  // [V1] Two-way resume: prefer the live feed-active lane time when it's
+  // Two-way resume: prefer the live feed-active lane time when it's
   // playing the tapped post; fall back to the engine's session lastPos map.
   let startPosition = 0;
   try {
@@ -89,7 +89,6 @@ export function openWithOrigin({
     } else if (postId) {
       startPosition = VideoEngine.getLastPos(postId);
     }
-    VideoEngine.trace('V1_TAP', { postId, feedTime: startPosition });
   } catch {
     /* engine may not be booted yet on deep-link openers */
   }
