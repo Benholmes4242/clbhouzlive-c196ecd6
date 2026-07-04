@@ -1,10 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import {
-  MoreHorizontal, Eye, Pencil, BarChart3, Trash2, MapPin, ShieldCheck, Clock, CheckCircle, Mail, Users, Zap, ChevronRight,
+  MoreHorizontal, Eye, Pencil, BarChart3, Trash2, ShieldCheck, Clock, CheckCircle, Users, ChevronRight, ChevronDown,
 } from 'lucide-react';
-import { Button } from '@/components/ui/button';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -17,7 +16,6 @@ import { useBusinessStats7d } from '@/hooks/useBusinessStats7d';
 import { useBusinessFollowersCount } from '@/hooks/useBusinessFollow';
 import { useBusinessPendingRequestsCount } from '@/hooks/useBusinessPendingRequestsCount';
 import { useBusinessAccessRequestsRealtime } from '@/hooks/useBusinessAccessRequestsRealtime';
-import { cn } from '@/lib/utils';
 import { VerifiedBadge } from '@/components/ui/VerifiedBadge';
 import { useBusinessVerificationRequest, deriveVerificationState } from '@/hooks/useBusinessVerificationRequest';
 import { getCityCountry } from '@/lib/locationDisplay';
@@ -29,6 +27,10 @@ interface BusinessCommandCardProps {
   userId: string;
   index?: number;
   isActive?: boolean;
+  /** Whether this card's dashboard is expanded. */
+  expanded?: boolean;
+  /** Toggle handler — called when the user taps the summary row / chevron. */
+  onToggle?: () => void;
 }
 
 // Access level labels for UI (not DB roles)
@@ -39,16 +41,14 @@ const ACCESS_LABELS: Record<string, string> = {
   analyst: 'Analyst',
 };
 
-// Map category to cleaner display text
-function getCategoryDisplay(category: string | null | undefined): string {
-  if (!category) return '';
-  if (category.toLowerCase().includes('brand')) return 'Brand';
-  return category;
-}
-
-const HAIRLINE: React.CSSProperties = { height: '0.5px', background: BIZ.hair };
-
-export function BusinessCommandCard({ membership, userId, index = 0, isActive = false }: BusinessCommandCardProps) {
+export function BusinessCommandCard({
+  membership,
+  userId,
+  index = 0,
+  isActive: _isActive = false,
+  expanded = false,
+  onToggle,
+}: BusinessCommandCardProps) {
   const navigate = useNavigate();
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   const [dropdownOpen, setDropdownOpen] = useState(false);
@@ -66,7 +66,7 @@ export function BusinessCommandCard({ membership, userId, index = 0, isActive = 
   // fetch and render), bail out cleanly rather than crashing on business.id / business.name.
   if (!business) return null;
 
-  // Fetch 7-day stats for visits/impressions
+  // Fetch 7-day stats for visits/impressions — only when expanded, to keep collapsed rows cheap.
   const { data: stats, isLoading: statsLoading } = useBusinessStats7d(business.id);
 
   // Fetch TOTAL followers count (source of truth)
@@ -85,47 +85,18 @@ export function BusinessCommandCard({ membership, userId, index = 0, isActive = 
 
   // Derive verification state
   const verificationState = deriveVerificationState(business.is_verified, verificationRequest);
+  const isVerified = verificationState === 'verified';
 
-  // Check if domain verification is required.
-  // Note: requires_domain_check is admin-initiated; the client never sets it.
-  // When true the owner must complete the Domain step before an admin can approve.
-  const needsDomainVerification = verificationRequest?.requires_domain_check && !verificationRequest?.domain_confirmed;
+  // Domain-verification requirement (admin-initiated).
+  const needsDomainVerification =
+    verificationRequest?.requires_domain_check && !verificationRequest?.domain_confirmed;
 
-  // Format stat display - show "-" for zero/empty
+  // Format stat display — "-" for zero/empty (never fabricate).
   const formatStat = (value: number | undefined) => {
     if (value === undefined || value === 0) return '-';
     return value.toLocaleString();
   };
 
-  // Format 7-day delta with +/- prefix
-  const formatDelta = (value: number | undefined) => {
-    if (value === undefined || value === 0) return '+0';
-    return value >= 0 ? `+${value.toLocaleString()}` : value.toLocaleString();
-  };
-
-  const handleManageTeam = (e: React.MouseEvent) => {
-    e.stopPropagation();
-    setDropdownOpen(false);
-    requestAnimationFrame(() => {
-      navigate(`/business/${business.id}/team`);
-    });
-  };
-
-  const handleRowClick = (e: React.MouseEvent) => {
-    if ((e.target as HTMLElement).closest('button')) return;
-    navigate(`/business/${business.id}`);
-  };
-
-  // Stat tap handlers — followers has its own list; visits/impressions go to insights.
-  const handleStatTap = (target: 'followers' | 'insights') => {
-    if (target === 'followers') {
-      navigate(`/business/${business.id}/followers`);
-    } else {
-      navigate(`/business/${business.id}/insights`);
-    }
-  };
-
-  const categoryDisplay = getCategoryDisplay(business.category);
   const locationDisplay = getCityCountry({
     city: business.city,
     region: business.region,
@@ -135,11 +106,24 @@ export function BusinessCommandCard({ membership, userId, index = 0, isActive = 
 
   const hasPendingRequests = (pendingRequestsCount ?? 0) > 0;
 
-  const outlineBtnStyle: React.CSSProperties = {
-    background: BIZ.card,
-    border: `1px solid ${BIZ.hair}`,
-    borderRadius: BIZ.rInner,
-    color: BIZ.ink,
+  // Verify-banner label per state.
+  const verifyLabel = (() => {
+    if (verificationState === 'none') return 'Get verified';
+    if (verificationState === 'pending') {
+      return needsDomainVerification ? 'Action required: verify your domain' : 'Pending verification';
+    }
+    if (verificationState === 'needs_more_info') return 'Action needed: more info';
+    if (verificationState === 'rejected') return 'Action needed: reapply';
+    return '';
+  })();
+
+  const goto = (path: string) => navigate(`/business/${business.id}${path}`);
+
+  const handleSummaryTap = (e: React.MouseEvent) => {
+    // Ignore taps that originated inside interactive children (menu, chevron button).
+    const target = e.target as HTMLElement;
+    if (target.closest('[data-summary-ignore="true"]')) return;
+    onToggle?.();
   };
 
   return (
@@ -151,22 +135,29 @@ export function BusinessCommandCard({ membership, userId, index = 0, isActive = 
         className="overflow-hidden"
         style={{
           background: BIZ.card,
-          border: `1px solid ${BIZ.hair}`,
+          border: `1px solid ${expanded ? 'rgba(15,23,42,0.12)' : BIZ.hair}`,
           borderRadius: BIZ.rCard,
+          boxShadow: expanded ? '0 6px 24px rgba(15,23,42,0.06)' : 'none',
+          transition: 'box-shadow 200ms ease, border-color 200ms ease',
         }}
       >
-        {/* Identity row */}
-        <div
-          onClick={handleRowClick}
-          className="flex items-start gap-3 p-4 cursor-pointer"
+        {/* ─── SUMMARY ROW ─── */}
+        <button
+          type="button"
+          onClick={handleSummaryTap}
+          aria-expanded={expanded}
+          className="w-full flex items-center gap-3 p-4 text-left active:opacity-95 transition-opacity"
+          style={{ background: 'transparent', border: 'none' }}
         >
-          {/* Logo — 48px squircle */}
+          {/* Logo — 46px squircle */}
           <div
-            className="w-12 h-12 overflow-hidden shrink-0 flex items-center justify-center"
+            className="shrink-0 overflow-hidden flex items-center justify-center"
             style={{
+              width: 46,
+              height: 46,
               background: BIZ.fillStrong,
               border: `1px solid ${BIZ.hair}`,
-              borderRadius: BIZ.rInner,
+              borderRadius: 14,
             }}
           >
             {business.logo_url ? (
@@ -178,317 +169,219 @@ export function BusinessCommandCard({ membership, userId, index = 0, isActive = 
             )}
           </div>
 
-          {/* Name & meta */}
+          {/* Name + sub */}
           <div className="flex-1 min-w-0">
             <div className="flex items-center gap-1.5">
-              <span className="font-semibold text-[16px] truncate leading-tight" style={{ color: BIZ.ink }}>
+              <span
+                className="truncate leading-tight"
+                style={{ color: BIZ.ink, fontSize: 16, fontWeight: 800, letterSpacing: '-0.01em' }}
+              >
                 {business.name}
               </span>
-              {business.is_verified && <VerifiedBadge size="sm" />}
+              {isVerified && <VerifiedBadge size="sm" />}
             </div>
-
-            <p className="text-[12px] mt-0.5" style={{ color: BIZ.inkMute }}>
-              {ACCESS_LABELS[role] || role}
+            <p
+              className="truncate mt-0.5"
+              style={{ color: BIZ.inkMute, fontSize: 12, fontWeight: 500 }}
+            >
+              {[ACCESS_LABELS[role] || role, locationDisplay].filter(Boolean).join(' · ')}
             </p>
-
-            {isActive && (
-              <span
-                className="inline-flex items-center gap-1 mt-1.5 px-2 py-0.5 rounded-full text-[11px] font-semibold"
-                style={{ background: BIZ.amberTint, color: BIZ.amber, border: `1px solid ${BIZ.amberHair}` }}
-              >
-                <Zap className="w-3 h-3" />
-                Posting as this business
-              </span>
-            )}
-
-            {categoryDisplay && (
-              <span
-                className="inline-flex mt-1.5 px-2 py-0.5 rounded-full text-[11px]"
-                style={{ background: BIZ.hairSoft, border: `1px solid ${BIZ.hair}`, color: BIZ.inkMute }}
-              >
-                {categoryDisplay}
-              </span>
-            )}
-
-            {locationDisplay && (
-              <div className="flex items-center gap-1 mt-1">
-                <MapPin className="w-3 h-3 shrink-0" style={{ color: BIZ.inkMute }} />
-                <span className="text-[12px] truncate" style={{ color: BIZ.inkMute }}>
-                  {locationDisplay}
-                </span>
-              </div>
-            )}
-
-            {verificationState === 'pending' && (
-              <button
-                onClick={(e) => {
-                  e.stopPropagation();
-                  navigate(`/business/${business.id}/verification`);
-                }}
-                className="inline-flex items-center gap-1 mt-1.5 px-2 py-0.5 rounded-full text-[11px] font-semibold active:opacity-70 transition-opacity"
-                style={{ background: BIZ.amberTint, color: BIZ.amber, border: `1px solid ${BIZ.amberHair}` }}
-              >
-                <Clock className="w-3 h-3" />
-                {needsDomainVerification ? 'Action required: verify your domain' : 'Pending verification'}
-              </button>
-            )}
-
-            {verificationState === 'none' && (
-              <button
-                onClick={(e) => {
-                  e.stopPropagation();
-                  navigate(`/business/${business.id}/verification`);
-                }}
-                className="inline-flex items-center gap-1 mt-1.5 px-2 py-0.5 rounded-full text-[11px] font-semibold active:opacity-70 transition-opacity"
-                style={{ background: BIZ.card, color: BIZ.ink, border: `1px solid ${BIZ.hair}` }}
-              >
-                <ShieldCheck className="w-3 h-3" style={{ color: BIZ.amber }} />
-                Get verified
-                <ChevronRight className="w-3 h-3" style={{ color: BIZ.inkMute }} />
-              </button>
-            )}
-
-            {(verificationState === 'needs_more_info' || verificationState === 'rejected') && (
-              <button
-                onClick={(e) => {
-                  e.stopPropagation();
-                  navigate(`/business/${business.id}/verification`);
-                }}
-                className="inline-flex items-center gap-1 mt-1.5 px-2 py-0.5 rounded-full text-[11px] font-semibold active:opacity-70 transition-opacity"
-                style={
-                  verificationState === 'needs_more_info'
-                    ? { background: BIZ.amberTint, color: BIZ.amber, border: `1px solid ${BIZ.amberHair}` }
-                    : { background: 'hsl(var(--destructive) / 0.1)', color: 'hsl(var(--destructive))', border: '1px solid hsl(var(--destructive) / 0.3)' }
-                }
-              >
-                <ShieldCheck className="w-3 h-3" />
-                {verificationState === 'needs_more_info' ? 'Action needed: more info' : 'Action needed: reapply'}
-              </button>
-            )}
-
           </div>
 
-          {/* Three-dot menu */}
-          <DropdownMenu open={dropdownOpen} onOpenChange={setDropdownOpen}>
-            <DropdownMenuTrigger asChild>
-              <button
-                className="min-h-[44px] min-w-[44px] flex items-center justify-center -mr-2 -mt-1 active:opacity-60 transition-opacity"
-                style={{ borderRadius: BIZ.rInner }}
-                onClick={(e) => e.stopPropagation()}
-              >
-                <MoreHorizontal className="h-5 w-5" style={{ color: BIZ.inkMute }} />
-              </button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="w-52 rounded-xl shadow-lg border-border">
-              <DropdownMenuItem
-                onClick={(e) => { e.stopPropagation(); navigate(`/business/${business.id}`); }}
-                className="gap-2.5 cursor-pointer min-h-[44px] active:bg-muted"
-              >
-                <Eye className="h-4 w-4" style={{ color: BIZ.inkMute }} />
-                View profile
-              </DropdownMenuItem>
-              <DropdownMenuItem
-                onClick={(e) => { e.stopPropagation(); navigate(`/business/${business.id}/edit`); }}
-                className="gap-2.5 cursor-pointer min-h-[44px] active:bg-muted"
-              >
-                <Pencil className="h-4 w-4" style={{ color: BIZ.inkMute }} />
-                Edit profile
-              </DropdownMenuItem>
-              <DropdownMenuItem
-                onClick={(e) => { e.stopPropagation(); navigate(`/business/${business.id}/insights`); }}
-                className="gap-2.5 cursor-pointer min-h-[44px] active:bg-muted"
-              >
-                <BarChart3 className="h-4 w-4" style={{ color: BIZ.inkMute }} />
-                Insights
-              </DropdownMenuItem>
+          {/* Overflow menu — never toggles the card. */}
+          <span data-summary-ignore="true" onClick={(e) => e.stopPropagation()}>
+            <DropdownMenu open={dropdownOpen} onOpenChange={setDropdownOpen}>
+              <DropdownMenuTrigger asChild>
+                <button
+                  type="button"
+                  className="min-h-[40px] min-w-[40px] flex items-center justify-center active:opacity-60 transition-opacity"
+                  style={{ borderRadius: BIZ.rInner }}
+                  onClick={(e) => e.stopPropagation()}
+                  aria-label="More options"
+                >
+                  <MoreHorizontal className="h-5 w-5" style={{ color: BIZ.inkMute }} />
+                </button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="w-52 rounded-xl shadow-lg border-border">
+                <DropdownMenuItem
+                  onClick={(e) => { e.stopPropagation(); navigate(`/business/${business.id}`); }}
+                  className="gap-2.5 cursor-pointer min-h-[44px] active:bg-muted"
+                >
+                  <Eye className="h-4 w-4" style={{ color: BIZ.inkMute }} />
+                  View profile
+                </DropdownMenuItem>
+                <DropdownMenuItem
+                  onClick={(e) => { e.stopPropagation(); goto('/edit'); }}
+                  className="gap-2.5 cursor-pointer min-h-[44px] active:bg-muted"
+                >
+                  <Pencil className="h-4 w-4" style={{ color: BIZ.inkMute }} />
+                  Edit profile
+                </DropdownMenuItem>
+                <DropdownMenuItem
+                  onClick={(e) => { e.stopPropagation(); goto('/insights'); }}
+                  className="gap-2.5 cursor-pointer min-h-[44px] active:bg-muted"
+                >
+                  <BarChart3 className="h-4 w-4" style={{ color: BIZ.inkMute }} />
+                  Insights
+                </DropdownMenuItem>
 
-              {canManage && (
-                <>
-                  <DropdownMenuSeparator className="my-1" />
-                  <DropdownMenuItem
-                    onClick={handleManageTeam}
-                    className="gap-2.5 cursor-pointer min-h-[44px] active:bg-muted"
-                  >
-                    <Users className="h-4 w-4" style={{ color: BIZ.inkMute }} />
-                    Manage team
-                    {hasPendingRequests && (
-                      <span className="ml-auto h-2 w-2 rounded-full" style={{ background: BIZ.amber }} />
-                    )}
-                  </DropdownMenuItem>
-
-                  {verificationState === 'verified' ? (
-                    <DropdownMenuItem disabled className="gap-2.5 min-h-[44px] opacity-50 cursor-default" style={{ color: BIZ.amber }}>
-                      <CheckCircle className="h-4 w-4" />
-                      Verified
-                    </DropdownMenuItem>
-                  ) : verificationState === 'pending' ? (
-                    <DropdownMenuItem disabled className="gap-2.5 min-h-[44px] opacity-50 cursor-default" style={{ color: BIZ.amberSoft }}>
-                      <Clock className="h-4 w-4" />
-                      Verification pending
-                    </DropdownMenuItem>
-                  ) : (
+                {canManage && (
+                  <>
+                    <DropdownMenuSeparator className="my-1" />
                     <DropdownMenuItem
                       onClick={(e) => {
                         e.stopPropagation();
-                        navigate(`/business/${business.id}/verification`);
+                        setDropdownOpen(false);
+                        requestAnimationFrame(() => goto('/team'));
                       }}
                       className="gap-2.5 cursor-pointer min-h-[44px] active:bg-muted"
                     >
-                      <ShieldCheck className="h-4 w-4" style={{ color: BIZ.inkMute }} />
-                      {verificationState === 'rejected' ? 'Request verification (reapply)' : 'Request verification'}
+                      <Users className="h-4 w-4" style={{ color: BIZ.inkMute }} />
+                      Manage team
+                      {hasPendingRequests && (
+                        <span className="ml-auto h-2 w-2 rounded-full" style={{ background: BIZ.amber }} />
+                      )}
                     </DropdownMenuItem>
-                  )}
-                </>
-              )}
 
-              {canDelete && (
-                <>
-                  <DropdownMenuSeparator className="my-1" />
-                  <DropdownMenuItem
-                    onClick={(e) => { e.stopPropagation(); setShowDeleteDialog(true); }}
-                    className="gap-2.5 cursor-pointer min-h-[44px] text-destructive focus:text-destructive focus:bg-destructive/10"
-                  >
-                    <Trash2 className="h-4 w-4" />
-                    Delete business profile
-                  </DropdownMenuItem>
-                </>
-              )}
-            </DropdownMenuContent>
-          </DropdownMenu>
-        </div>
+                    {isVerified ? (
+                      <DropdownMenuItem disabled className="gap-2.5 min-h-[44px] opacity-50 cursor-default" style={{ color: BIZ.amber }}>
+                        <CheckCircle className="h-4 w-4" />
+                        Verified
+                      </DropdownMenuItem>
+                    ) : verificationState === 'pending' ? (
+                      <DropdownMenuItem disabled className="gap-2.5 min-h-[44px] opacity-50 cursor-default" style={{ color: BIZ.amberSoft }}>
+                        <Clock className="h-4 w-4" />
+                        Verification pending
+                      </DropdownMenuItem>
+                    ) : (
+                      <DropdownMenuItem
+                        onClick={(e) => { e.stopPropagation(); goto('/verification'); }}
+                        className="gap-2.5 cursor-pointer min-h-[44px] active:bg-muted"
+                      >
+                        <ShieldCheck className="h-4 w-4" style={{ color: BIZ.inkMute }} />
+                        {verificationState === 'rejected' ? 'Request verification (reapply)' : 'Request verification'}
+                      </DropdownMenuItem>
+                    )}
+                  </>
+                )}
 
-        {/* Divider */}
-        <div style={HAIRLINE} />
+                {canDelete && (
+                  <>
+                    <DropdownMenuSeparator className="my-1" />
+                    <DropdownMenuItem
+                      onClick={(e) => { e.stopPropagation(); setShowDeleteDialog(true); }}
+                      className="gap-2.5 cursor-pointer min-h-[44px] text-destructive focus:text-destructive focus:bg-destructive/10"
+                    >
+                      <Trash2 className="h-4 w-4" />
+                      Delete business profile
+                    </DropdownMenuItem>
+                  </>
+                )}
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </span>
 
-        {/* Stats strip */}
-        <div className="mx-4 my-3">
-          <div
-            className="p-3 grid grid-cols-3"
-            style={{ background: BIZ.fill, border: `1px solid ${BIZ.hair}`, borderRadius: BIZ.rInner }}
+          {/* Chevron */}
+          <motion.span
+            animate={{ rotate: expanded ? 180 : 0 }}
+            transition={{ duration: 0.2, ease: BIZ.ease }}
+            style={{ display: 'inline-flex' }}
           >
-            <button
-              onClick={() => handleStatTap('insights')}
-              className="flex flex-col items-center justify-center cursor-pointer active:opacity-70 transition-opacity"
+            <ChevronDown className="h-5 w-5" style={{ color: BIZ.inkMute }} />
+          </motion.span>
+        </button>
+
+        {/* ─── EXPANDED BODY ─── */}
+        <AnimatePresence initial={false}>
+          {expanded && (
+            <motion.div
+              key="body"
+              initial={{ height: 0, opacity: 0 }}
+              animate={{ height: 'auto', opacity: 1 }}
+              exit={{ height: 0, opacity: 0 }}
+              transition={{ duration: 0.22, ease: BIZ.ease }}
+              style={{ overflow: 'hidden' }}
             >
-              <p
-                className={cn(
-                  'text-[16px] font-bold tabular-nums min-w-[2ch]',
-                  statsLoading ? 'opacity-0' : '',
-                )}
-                style={{ color: stats?.visits ? BIZ.ink : BIZ.inkMute }}
-              >
-                {statsLoading ? '-' : formatStat(stats?.visits)}
-              </p>
-              <p className="text-[11px] uppercase tracking-wide mt-0.5" style={{ color: BIZ.inkMute }}>
-                Visits (7d)
-              </p>
-            </button>
+              <div style={{ height: '0.5px', background: BIZ.hair }} />
 
-            <button
-              onClick={() => handleStatTap('followers')}
-              className="flex flex-col items-center justify-center cursor-pointer active:opacity-70 transition-opacity"
-              style={{ borderLeft: `0.5px solid ${BIZ.hair}`, borderRight: `0.5px solid ${BIZ.hair}` }}
-            >
-              <p
-                className={cn(
-                  'text-[16px] font-bold tabular-nums min-w-[2ch]',
-                  followersLoading ? 'opacity-0' : '',
-                )}
-                style={{ color: totalFollowers ? BIZ.ink : BIZ.inkMute }}
-              >
-                {followersLoading ? '-' : formatStat(totalFollowers)}
-              </p>
-              <p className="text-[11px] uppercase tracking-wide mt-0.5" style={{ color: BIZ.inkMute }}>
-                Followers
-                {!statsLoading && stats?.followersGained !== undefined && stats.followersGained !== 0 && (
-                  <span className="ml-1 opacity-60">({formatDelta(stats.followersGained)})</span>
-                )}
-              </p>
-            </button>
-
-            <button
-              onClick={() => handleStatTap('insights')}
-              className="flex flex-col items-center justify-center cursor-pointer active:opacity-70 transition-opacity"
-            >
-              <p
-                className={cn(
-                  'text-[16px] font-bold tabular-nums min-w-[2ch]',
-                  statsLoading ? 'opacity-0' : '',
-                )}
-                style={{ color: stats?.impressions ? BIZ.ink : BIZ.inkMute }}
-              >
-                {statsLoading ? '-' : formatStat(stats?.impressions)}
-              </p>
-              <p className="text-[11px] uppercase tracking-wide mt-0.5" style={{ color: BIZ.inkMute }}>
-                Impressions (7d)
-              </p>
-            </button>
-          </div>
-        </div>
-
-        {/* Divider */}
-        <div style={HAIRLINE} />
-
-        {/* Actions row */}
-        <div className="flex items-center gap-2 p-4 pt-3">
-          {needsDomainVerification ? (
-            <Button
-              size="sm"
-              onClick={(e) => {
-                e.stopPropagation();
-                navigate(`/business/${business.id}/verification`);
-              }}
-              className="gap-1.5 min-h-[44px] flex-1 active:scale-[0.97] transition-all text-white border-0"
-              style={{ background: BIZ.amber, borderRadius: BIZ.rInner }}
-            >
-              <Mail className="h-3.5 w-3.5" />
-              Verify domain now
-            </Button>
-          ) : (
-            <>
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={(e) => { e.stopPropagation(); navigate(`/business/${business.id}/edit`); }}
-                className="min-h-[44px] flex-1 text-[13px] font-medium active:scale-[0.97] transition-transform flex items-center justify-center gap-1.5"
-                style={outlineBtnStyle}
-              >
-                <Pencil className="h-3.5 w-3.5" />
-                Edit profile
-              </Button>
-
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={(e) => { e.stopPropagation(); navigate(`/business/${business.id}/insights`); }}
-                className="min-h-[44px] flex-1 text-[13px] font-medium active:scale-[0.97] transition-transform flex items-center justify-center gap-1.5"
-                style={outlineBtnStyle}
-              >
-                <BarChart3 className="h-3.5 w-3.5" />
-                Insights
-              </Button>
-
-              {canManage && (
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={handleManageTeam}
-                  className="min-h-[44px] flex-1 text-[13px] font-medium active:scale-[0.97] transition-transform flex items-center justify-center gap-1.5 relative"
-                  style={outlineBtnStyle}
-                >
-                  <Users className="h-3.5 w-3.5" />
-                  Manage team
-                  {hasPendingRequests && (
+              <div className="p-4 pt-3 space-y-3">
+                {/* Verify banner */}
+                {!isVerified && (
+                  <button
+                    type="button"
+                    onClick={() => goto('/verification')}
+                    className="w-full flex items-center gap-3 p-3 active:opacity-90 transition-opacity"
+                    style={{
+                      background: `linear-gradient(90deg, ${BIZ.amberTint} 0%, rgba(247,147,30,0.04) 100%)`,
+                      border: `1px solid ${BIZ.amberHair}`,
+                      borderRadius: BIZ.rInner,
+                    }}
+                  >
                     <span
-                      className="absolute -top-1 -right-1 h-2.5 w-2.5 rounded-full ring-2 ring-white"
-                      style={{ background: BIZ.amber }}
+                      className="shrink-0 flex items-center justify-center"
+                      style={{
+                        width: 32, height: 32,
+                        background: '#fff',
+                        border: `1px solid ${BIZ.amberHair}`,
+                        borderRadius: 10,
+                      }}
+                    >
+                      <ShieldCheck className="h-4 w-4" style={{ color: BIZ.amber }} />
+                    </span>
+                    <span
+                      className="flex-1 text-left truncate"
+                      style={{ color: BIZ.ink, fontSize: 13.5, fontWeight: 700 }}
+                    >
+                      {verifyLabel}
+                    </span>
+                    <ChevronRight className="h-4 w-4 shrink-0" style={{ color: BIZ.amber }} />
+                  </button>
+                )}
+
+                {/* Metrics — 3 tiles */}
+                <div className="grid grid-cols-3 gap-2">
+                  <MetricTile
+                    label="Visits (7d)"
+                    value={statsLoading ? '-' : formatStat(stats?.visits)}
+                    onClick={() => goto('/insights')}
+                  />
+                  <MetricTile
+                    label="Followers"
+                    value={followersLoading ? '-' : formatStat(totalFollowers)}
+                    onClick={() => goto('/followers')}
+                  />
+                  <MetricTile
+                    label="Impressions (7d)"
+                    value={statsLoading ? '-' : formatStat(stats?.impressions)}
+                    onClick={() => goto('/insights')}
+                  />
+                </div>
+
+                {/* Action rows */}
+                <div
+                  style={{
+                    background: BIZ.card,
+                    border: `1px solid ${BIZ.hair}`,
+                    borderRadius: BIZ.rInner,
+                    overflow: 'hidden',
+                  }}
+                >
+                  <ActionRow icon={Pencil} label="Edit profile" onClick={() => goto('/edit')} />
+                  <ActionRow icon={BarChart3} label="Insights" onClick={() => goto('/insights')} />
+                  {canManage && (
+                    <ActionRow
+                      icon={Users}
+                      label="Manage team"
+                      onClick={() => goto('/team')}
+                      badge={hasPendingRequests}
                     />
                   )}
-                </Button>
-              )}
-            </>
+                  <ActionRow icon={Eye} label="View live profile" onClick={() => goto('')} last />
+                </div>
+              </div>
+            </motion.div>
           )}
-        </div>
+        </AnimatePresence>
       </motion.div>
 
       <DeleteBusinessDialog
@@ -499,5 +392,106 @@ export function BusinessCommandCard({ membership, userId, index = 0, isActive = 
         userId={userId}
       />
     </>
+  );
+}
+
+/* ─────────────────────── sub-components ─────────────────────── */
+
+function MetricTile({
+  label,
+  value,
+  onClick,
+}: {
+  label: string;
+  value: string;
+  onClick?: () => void;
+}) {
+  const isEmpty = value === '-';
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      className="text-left active:opacity-70 transition-opacity"
+      style={{
+        background: BIZ.card,
+        border: `1px solid ${BIZ.hair}`,
+        borderRadius: 12,
+        padding: '12px 12px 11px',
+      }}
+    >
+      <div
+        className="tabular-nums"
+        style={{
+          color: isEmpty ? BIZ.inkMute : BIZ.ink,
+          fontSize: 20,
+          fontWeight: 800,
+          letterSpacing: '-0.02em',
+          lineHeight: 1.1,
+        }}
+      >
+        {value}
+      </div>
+      <div
+        className="mt-1"
+        style={{
+          color: BIZ.inkMute,
+          fontSize: 11,
+          fontWeight: 600,
+          textTransform: 'uppercase',
+          letterSpacing: '0.04em',
+        }}
+      >
+        {label}
+      </div>
+    </button>
+  );
+}
+
+function ActionRow({
+  icon: Icon,
+  label,
+  onClick,
+  badge = false,
+  last = false,
+}: {
+  icon: React.ComponentType<{ className?: string; style?: React.CSSProperties }>;
+  label: string;
+  onClick: () => void;
+  badge?: boolean;
+  last?: boolean;
+}) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      className="w-full flex items-center gap-3 px-3 py-3 active:bg-black/[0.03] transition-colors"
+      style={{
+        borderBottom: last ? 'none' : `0.5px solid ${BIZ.hair}`,
+        background: 'transparent',
+        minHeight: 52,
+      }}
+    >
+      <span
+        className="shrink-0 flex items-center justify-center"
+        style={{
+          width: 32, height: 32,
+          background: BIZ.fill,
+          border: `1px solid ${BIZ.hair}`,
+          borderRadius: 10,
+        }}
+      >
+        <Icon className="h-4 w-4" style={{ color: BIZ.ink }} />
+      </span>
+      <span
+        className="flex-1 text-left"
+        style={{ color: BIZ.ink, fontSize: 14, fontWeight: 600 }}
+      >
+        {label}
+      </span>
+      {badge && (
+        <span className="h-2 w-2 rounded-full" style={{ background: BIZ.amber }} />
+      )}
+      <ChevronRight className="h-4 w-4" style={{ color: BIZ.inkMute }} />
+    </button>
   );
 }
