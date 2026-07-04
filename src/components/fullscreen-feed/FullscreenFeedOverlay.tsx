@@ -215,6 +215,13 @@ export function FullscreenFeedOverlay() {
   // NEXT frame flip cloneExpanded=true to trigger the transform → target rect.
   // Crossfade the clone out either when the active slide fires
   // onFirstFrameReady, or after a 400ms watchdog — whichever first.
+  // Measured video-host rect — the actual container the fullscreen SnapFeed
+  // renders into (inset:0 inside the overlay). We measure this AFTER the
+  // body/statusbar mutations settle, so the clone target matches the video's
+  // final on-screen rect exactly. Prevents zoom-out-then-in re-settle.
+  const hostRef = useRef<HTMLDivElement>(null);
+  const [targetRect, setTargetRect] = useState<{ top: number; left: number; width: number; height: number } | null>(null);
+
   useEffect(() => {
     if (isOpen && origin) {
       fsv('clone.init', {
@@ -226,14 +233,24 @@ export function FullscreenFeedOverlay() {
       setCloneVisible(true);
       setCloneExpanded(false);
       setFirstFrameReady(false);
-      // Force layout with the initial rect, then expand on next frame.
-      let raf2: number | undefined;
-      const raf1 = requestAnimationFrame(() => {
+      setTargetRect(null);
+      // Single rAF: after the host mounts (inset:0, opacity:0) + body-class
+      // mutations settle, measure the ACTUAL host rect and expand to it.
+      const raf = requestAnimationFrame(() => {
+        const host = hostRef.current;
+        const measured = host
+          ? host.getBoundingClientRect()
+          : { top: 0, left: 0, width: window.innerWidth, height: window.innerHeight } as DOMRect;
+        const rect = {
+          top: measured.top,
+          left: measured.left,
+          width: measured.width,
+          height: measured.height,
+        };
+        fsv('clone.target', { rect, viewport: fsvViewport(), measuredFromHost: !!host });
+        setTargetRect(rect);
         fsv('clone.raf1', { viewport: fsvViewport() });
-        raf2 = requestAnimationFrame(() => {
-          fsv('clone.raf2', { viewport: fsvViewport() });
-          setCloneExpanded(true);
-        });
+        setCloneExpanded(true);
       });
       // Watchdog: release the clone if the first-frame signal never arrives.
       watchdogRef.current = setTimeout(() => {
@@ -241,14 +258,14 @@ export function FullscreenFeedOverlay() {
         setFirstFrameReady(true);
       }, 400);
       return () => {
-        cancelAnimationFrame(raf1);
-        if (raf2 != null) cancelAnimationFrame(raf2);
+        cancelAnimationFrame(raf);
         if (watchdogRef.current) clearTimeout(watchdogRef.current);
       };
     } else if (!isOpen) {
       setCloneVisible(false);
       setCloneExpanded(false);
       setFirstFrameReady(false);
+      setTargetRect(null);
       if (watchdogRef.current) clearTimeout(watchdogRef.current);
     }
   }, [isOpen, origin]);
@@ -269,16 +286,7 @@ export function FullscreenFeedOverlay() {
     return () => clearTimeout(t);
   }, [firstFrameReady, cloneVisible]);
 
-  // Target rect for the FLIP expand: viewport-sized on phone; on iPad the
-  // viewer is centred so we honour the same layout as the overlay chrome.
-  const targetRect = React.useMemo(() => {
-    if (typeof window === 'undefined') return null;
-    const vw = window.innerWidth;
-    const vh = window.innerHeight;
-    const rect = { top: 0, left: 0, width: vw, height: vh };
-    fsv('target', { rect, viewport: fsvViewport(), isOpen });
-    return rect;
-  }, [isOpen]);
+
 
 
   return (
