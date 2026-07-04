@@ -34,7 +34,7 @@ const CARD_BG = '#FFFFFF';
 
 const ASSIGNABLE_ROLES: AssignableBusinessRole[] = ['admin', 'editor', 'analyst'];
 
-const ROLE_ICON: Record<BusinessRole, React.ComponentType<{ size?: number; color?: string; strokeWidth?: number }>> = {
+const ROLE_ICON: Record<BusinessRole, typeof Crown> = {
   owner: Crown,
   admin: Shield,
   editor: Edit3,
