@@ -418,6 +418,16 @@ const BusinessProfilePage: React.FC = () => {
               pointerEvents: 'none',
             }}
           />
+          {/* Whole-cover tap target — owner only */}
+          {isOwner && (
+            <button
+              type="button"
+              onClick={() => setPhotoSheet('cover')}
+              className="absolute inset-0 pointer-events-auto cursor-pointer"
+              style={{ zIndex: 5, background: 'transparent', border: 'none' }}
+              aria-label="Change cover photo"
+            />
+          )}
           {isOwner && (
             <button
               onClick={() => setPhotoSheet('cover')}
