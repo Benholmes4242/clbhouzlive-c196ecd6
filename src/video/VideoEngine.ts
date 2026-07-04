@@ -509,6 +509,7 @@ class VideoEngineImpl {
     lane.detachFns = [];
     lane.hlsUrl = null;
     lane.firstFrame = false;
+    lane.wantPlay = false;
     this.transition(lane, 'idle');
     DBG(laneId, 'released');
   }
