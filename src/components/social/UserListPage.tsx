@@ -503,70 +503,74 @@ export const UserListPage: React.FC<UserListPageProps> = ({
 
   const pageContent = (
       <div className="w-full">
-        {/* Sticky editorial header */}
+        {/* Sticky Network header — mirrors Activity page anatomy */}
         <div
-          className={embeddedInShell ? 'relative z-20' : 'sticky z-40 backdrop-blur-xl'}
+          className={embeddedInShell ? 'relative z-20' : 'sticky top-0 z-40'}
           style={{
-            top: embeddedInShell ? undefined : (hideBackButton ? 'var(--chrome-total-h, 0px)' : 0),
-            paddingTop: embeddedInShell || hideBackButton
-              ? 0
-              : 'max(var(--safe-top, env(safe-area-inset-top, 0px)), 8px)',
-            background: 'rgba(248,250,252,0.97)',
-            borderBottom: `0.5px solid ${BORDER}`,
+            background: BG_SURFACE,
+            borderBottom: `1px solid ${HAIR}`,
+            paddingTop: embeddedInShell || hideBackButton ? 0 : safeTop + 6,
           }}
         >
           {/* Back row */}
           {!hideBackButton && (
-            <div className="flex items-center px-2 pt-1 pb-1">
+            <div
+              className="flex items-center justify-between px-4"
+              style={{ paddingBottom: 8, minHeight: 40 }}
+            >
               <button
                 onClick={handleBack}
-                className="flex items-center justify-center min-h-[44px] min-w-[44px]"
-                style={{ color: INK }}
                 aria-label="Back"
+                style={{
+                  width: 32, height: 32, borderRadius: '50%',
+                  background: '#FFFFFF', border: `1px solid ${HAIR2}`,
+                  display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  cursor: 'pointer',
+                }}
               >
-                <ChevronLeft className="w-5 h-5" />
+                <ChevronLeft size={18} strokeWidth={2.5} color={INK} />
               </button>
+              <span />
             </div>
           )}
 
-          {/* Eyebrow + title */}
-          <div className="px-5 pb-3">
-            <SectionHeader tier="standard" kicker="Network" />
-            <div style={{ display: 'flex', alignItems: 'baseline', gap: 10, marginTop: 6 }}>
-              <h1
-                style={{
-                  fontFamily: FONT_SERIF,
-                  fontSize: 34,
-                  fontWeight: 800,
-                  color: INK,
-                  lineHeight: 1.05,
-                  letterSpacing: '-0.025em',
-                  margin: 0,
-                  fontFeatureSettings: '"kern" 1, "liga" 1',
-                }}
-              >
-                {displayTitle}
-              </h1>
-              {displayTotal > 0 && (
-                <span
-                  style={{
-                    fontFamily: FONT_SERIF,
-                    fontSize: 26,
-                    fontWeight: 700,
-                    color: AMBER_DEEP,
-                    fontVariantNumeric: 'tabular-nums',
-                    lineHeight: 1.05,
-                  }}
-                >
-                  {displayTotal.toLocaleString()}
-                </span>
-              )}
+          {/* Kicker + title */}
+          <div className="px-4" style={{ paddingTop: hideBackButton ? 6 : 0, paddingBottom: 10 }}>
+            <div style={{ marginBottom: 6 }}>
+              <Kicker label="Network" />
             </div>
+            <h1
+              style={{
+                fontSize: 26,
+                fontWeight: 800,
+                color: INK,
+                letterSpacing: '-0.02em',
+                margin: 0,
+                lineHeight: 1.1,
+                fontFamily: FONT_SERIF,
+              }}
+            >
+              {displayTitle}
+              {displayTotal > 0 && (
+                <>
+                  {' '}
+                  <span
+                    style={{
+                      color: AMBER_DEEP,
+                      fontVariantNumeric: 'tabular-nums',
+                      fontWeight: 800,
+                    }}
+                  >
+                    {displayTotal.toLocaleString()}
+                  </span>
+                </>
+              )}
+            </h1>
           </div>
 
-          {/* Search + tabs */}
-          <div className="px-4 pb-3 space-y-2.5">
-            <div className="relative">
+          {/* Search + tabs + filter chips */}
+          <div className="px-4" style={{ paddingBottom: 10 }}>
+            <div className="relative" style={{ marginBottom: 10 }}>
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4" style={{ color: INK_SUBTLE }} />
               <Input
                 type="search"
@@ -574,56 +578,30 @@ export const UserListPage: React.FC<UserListPageProps> = ({
                 value={searchInput}
                 onChange={(e) => setSearchInput(e.target.value)}
                 className="pl-10 h-11 rounded-xl focus-visible:ring-[#F7931E]/40"
-                style={{ background: '#ffffff', border: `1px solid ${BORDER}`, color: INK }}
+                style={{ background: '#ffffff', border: `1px solid ${HAIR}`, color: INK }}
                 aria-label="Search by name or club"
               />
             </div>
 
             {hasFollowingTab && (
-              <div className="flex gap-2">
-                {(['followers', 'following'] as const).map((tabKey) => {
-                  const isActive = activeTab === tabKey;
-                  const count = tabKey === 'followers' ? followersTabCount : followingTabCount;
-                  const label = tabKey === 'followers' ? 'Followers' : 'Following';
-                  return (
-                    <button
-                      key={tabKey}
-                      onClick={() => handleTabChange(tabKey)}
-                      aria-pressed={isActive}
-                      style={{
-                        flex: 1,
-                        minHeight: 36,
-                        background: isActive ? INK : 'transparent',
-                        color: isActive ? '#FFFFFF' : INK_SOFT,
-                        border: isActive ? 'none' : `1px solid ${BORDER}`,
-                        borderRadius: 12,
-                        fontSize: 13,
-                        fontWeight: 700,
-                        cursor: 'pointer',
-                        display: 'inline-flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        gap: 6,
-                        fontVariantNumeric: 'tabular-nums',
-                      }}
-                    >
-                      {label}
-                      <span
-                        style={{
-                          opacity: isActive ? 0.85 : 0.7,
-                          fontWeight: 600,
-                        }}
-                      >
-                        {count.toLocaleString()}
-                      </span>
-                    </button>
-                  );
-                })}
+              <div className="flex gap-2" style={{ marginBottom: showFilterChips ? 10 : 0 }}>
+                <PillTab
+                  label="Followers"
+                  count={followersTabCount}
+                  isActive={activeTab === 'followers'}
+                  onClick={() => handleTabChange('followers')}
+                />
+                <PillTab
+                  label="Following"
+                  count={followingTabCount}
+                  isActive={activeTab === 'following'}
+                  onClick={() => handleTabChange('following')}
+                />
               </div>
             )}
 
             {showFilterChips && (
-              <div className="flex gap-2 overflow-x-auto" style={{ scrollbarWidth: 'none' }}>
+              <div className="flex gap-2 overflow-x-auto scrollbar-none" style={{ scrollbarWidth: 'none' }}>
                 <FollowingFilterChip
                   label="All"
                   count={allFollowingCount}
@@ -647,13 +625,10 @@ export const UserListPage: React.FC<UserListPageProps> = ({
           </div>
         </div>
 
-        {/* Suggested Golfers strip — owner view, no active search */}
-        {isOwnProfile && !isSearching && user?.id && (
-          <SuggestedCreatorsShelf
+        {/* Suggested Golfers — compact horizontal rail (owner view, followers tab, no search) */}
+        {isOwnProfile && !isSearching && !isFollowingTab && user?.id && (
+          <SuggestedRail
             userId={user.id}
-            title="Discover · Suggested Golfers"
-            variant="light"
-            showViewAll
             onViewAll={() => navigate('/golferstofollow')}
           />
         )}
@@ -669,6 +644,7 @@ export const UserListPage: React.FC<UserListPageProps> = ({
               <h3 style={{ fontFamily: FONT_SERIF, fontSize: 20, fontWeight: 700, color: INK, marginBottom: 4 }}>
                 Something went wrong
               </h3>
+
               <p className="text-sm text-center max-w-[260px] mb-6" style={{ color: INK_SOFT }}>
                 We couldn't load {modeDisplayName}. Please try again.
               </p>
