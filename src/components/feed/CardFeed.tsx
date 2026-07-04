@@ -240,8 +240,15 @@ export const CardFeed = forwardRef<CardFeedHandle, CardFeedProps>(function CardF
           if (Number.isNaN(idx)) continue;
           if (e.isIntersecting) {
             visibilityRef.current.set(idx, e.intersectionRatio);
+            // [FEEDPLAY] mark first-visible for video cards.
+            const p = posts[idx];
+            if (p && p.mediaItems?.[0]?.type === 'video') {
+              fp.visible(p.id, e.intersectionRatio);
+            }
           } else {
             visibilityRef.current.delete(idx);
+            const p = posts[idx];
+            if (p) fp.reset(p.id); // allow next re-entry to re-measure
           }
 
         }
@@ -256,7 +263,7 @@ export const CardFeed = forwardRef<CardFeedHandle, CardFeedProps>(function CardF
       visibilityRef.current.clear();
       cardEls.current.clear();
     };
-  }, [recheckActive]);
+  }, [recheckActive, posts]);
 
   // Re-evaluate on scroll — IntersectionObserver alone doesn't fire
   // continuously during scroll within the on-screen set.
