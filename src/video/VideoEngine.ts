@@ -155,12 +155,25 @@ class VideoEngineImpl {
     return lane;
   }
 
-  /** Move the lane's <video> into a host container. Instance stays bound. */
+  /**
+   * Move the lane's <video> into a host container. Idempotent + move-safe:
+   * appendChild atomically removes the element from any previous parent and
+   * inserts it here. Safe to call from whichever card just became active.
+   */
   mountLane(laneId: LaneId, hostEl: HTMLElement): void {
     const lane = this.getLane(laneId);
     if (lane.el.parentElement !== hostEl) {
       hostEl.appendChild(lane.el);
       DBG(laneId, 'mounted');
+    }
+    lane.mountedHost = hostEl;
+    // If play() was called before we had a real host, kick it off now.
+    if (lane.pendingPlay) {
+      lane.pendingPlay = false;
+      const p = lane.el.play();
+      if (p && typeof (p as Promise<void>).catch === 'function') {
+        (p as Promise<void>).catch(() => { /* autoplay reject — safe */ });
+      }
     }
   }
 
@@ -172,6 +185,8 @@ class VideoEngineImpl {
       host.appendChild(lane.el);
       DBG(laneId, 'unmounted');
     }
+    lane.mountedHost = null;
+    lane.pendingPlay = false;
   }
 
   /**
