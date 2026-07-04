@@ -332,15 +332,7 @@ const BusinessProfilePage: React.FC = () => {
     business.category, business.country, business.region, business.city
   );
 
-  // Build contact/social rows (omit nulls)
-  const socialLinks = (business.social_links || {}) as Record<string, string | null | undefined>;
-  const socialRow = SOCIAL_CONFIG
-    .filter(s => socialLinks[s.key] && socialLinks[s.key]!.trim().length > 0)
-    // Dedup so `twitter` and `x` don't both render
-    .filter((s, i, arr) => arr.findIndex(o => o.Icon === s.Icon) === i);
-
-  const hasAnyContact =
-    !!business.website || !!business.phone || !!business.email || socialRow.length > 0;
+  // (Contact/social icons row removed — surfaced via action rows + About tab)
 
   const tabs: Array<{ id: BusinessTab; label: string }> = [
     { id: 'posts', label: 'Posts' },
