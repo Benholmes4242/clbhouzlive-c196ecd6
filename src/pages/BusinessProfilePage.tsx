@@ -149,10 +149,18 @@ const BusinessProfilePage: React.FC = () => {
     if (activeTab === 'team' && !showTeamTab) setActiveTab('posts');
   }, [activeTab, showTeamTab]);
 
-  // Track profile visit
+  // Track profile visit — pass a real source from navigation state / query.
+  const location = useLocation();
+  const [searchParams] = useSearchParams();
+  const visitSource = (() => {
+    const s = (location.state as { source?: string } | null)?.source
+      ?? searchParams.get('src') ?? searchParams.get('source');
+    const allowed = ['search', 'content', 'course_page', 'share', 'direct', 'directory', 'feed'] as const;
+    return (allowed as readonly string[]).includes(s ?? '') ? (s as typeof allowed[number]) : 'direct';
+  })();
   useEffect(() => {
-    if (business?.id) trackBusinessProfileVisit(business.id, user?.id, 'direct');
-  }, [business?.id, user?.id]);
+    if (business?.id) trackBusinessProfileVisit(business.id, user?.id, visitSource);
+  }, [business?.id, user?.id, visitSource]);
 
   // Clamp detection for bio
   useEffect(() => {
