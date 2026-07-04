@@ -1443,3 +1443,40 @@ function CreateInviteDrawer({
     </DetailDrawer>
   );
 }
+
+function SupportingDocLink({ path, tokens }: { path: string; tokens: any }) {
+  const [busy, setBusy] = React.useState(false);
+  const open = async () => {
+    setBusy(true);
+    try {
+      const { supabase } = await import('@/integrations/supabase/client');
+      const { data, error } = await supabase.storage
+        .from('business-verification-docs')
+        .createSignedUrl(path, 60 * 10);
+      if (error) throw error;
+      if (data?.signedUrl) window.open(data.signedUrl, '_blank', 'noopener,noreferrer');
+    } catch (e) {
+      console.warn('[verification] signed URL failed', e);
+    } finally {
+      setBusy(false);
+    }
+  };
+  return (
+    <button
+      type="button"
+      onClick={open}
+      disabled={busy}
+      style={{
+        fontSize: 13,
+        color: tokens?.brandText ?? '#F7931E',
+        textDecoration: 'underline',
+        background: 'transparent',
+        border: 'none',
+        padding: 0,
+        cursor: busy ? 'wait' : 'pointer',
+      }}
+    >
+      {busy ? 'Opening…' : 'View supporting document'}
+    </button>
+  );
+}
