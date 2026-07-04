@@ -367,17 +367,17 @@ function AppRoutes() {
   const state = location.state as { backgroundLocation?: Location; fromHub?: boolean; fromVideo?: boolean } | null;
   const { shouldHideHeader } = useModalContext();
   
-  // BUG-1 FIX: Reset shield to transparent on every route change as a baseline.
-  // Individual page hooks then opt-in to their own color (e.g. PageRoot → #F8FAFC).
-  // This prevents stale shield colors when navigating back to immersive/KeepAlive pages.
+  // BUG-1 FIX (flicker pass): the previous baseline `shield = transparent` step
+  // was removed — it exposed the raw #0d0d0d .app-shell background for a frame
+  // between reset and the final applyShieldColor() below. The effect ends by
+  // calling applyShieldColor(...) with the correct route value, so cold boot
+  // still lands on a real colour (initial `transparent` comes from index.html).
   useLayoutEffect(() => {
     // Safety net: release any stranded body scroll-lock from an overlay that
     // didn't unmount cleanly before route change. Prevents a stuck `position:
     // fixed` body from freezing the next page.
     forceUnlockBodyScroll();
-    // Reset shield
-    const shield = document.getElementById('safe-area-shield');
-    if (shield) shield.style.backgroundColor = 'transparent';
+
     // Reset html/body to the route's surface to prevent stale colour bleeding
     // through WebView compositing. Dark-chrome routes (Clubhouse) stay charcoal
     // so the full cold-launch chain (splash → shell → skeleton → feed) shows
