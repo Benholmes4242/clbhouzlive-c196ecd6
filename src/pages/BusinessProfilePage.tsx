@@ -221,6 +221,7 @@ const BusinessProfilePage: React.FC = () => {
   };
   const handleShare = async () => {
     const url = window.location.href;
+    if (business?.id) trackBusinessAction(business.id, 'share_profile', user?.id);
     if (navigator.share) {
       try { await navigator.share({ title: business?.name, url }); } catch {}
     } else {
