@@ -24,7 +24,7 @@ import { useBusinessProfile } from '@/hooks/useBusinessProfile';
 import { useBusinessMembership } from '@/hooks/useBusinessMembership';
 import { useBusinessPostsCount } from '@/hooks/useBusinessPosts';
 import { useBusinessFollowersCount } from '@/hooks/useBusinessFollow';
-import { useBusinessFollowingCount } from '@/hooks/useBusinessSocialLists';
+
 import { useFollowState } from '@/hooks/useFollowState';
 import { useToggleFollow } from '@/hooks/useToggleFollow';
 import { useActiveActor } from '@/context/ActiveActorContext';
@@ -109,7 +109,6 @@ const BusinessProfilePage: React.FC = () => {
   const { data: membership } = useBusinessMembership(business?.id);
   const { data: postsCount = 0 } = useBusinessPostsCount(business?.id);
   const { data: followersCount = 0 } = useBusinessFollowersCount(business?.id);
-  const { data: followingCount = 0 } = useBusinessFollowingCount(business?.id);
   const { data: teamMembers } = useBusinessTeam(business?.id);
   const { data: reviewStats } = useBusinessReviewStats(business?.id);
 
@@ -419,12 +418,22 @@ const BusinessProfilePage: React.FC = () => {
               pointerEvents: 'none',
             }}
           />
+          {/* Whole-cover tap target — owner only */}
+          {isOwner && (
+            <button
+              type="button"
+              onClick={() => setPhotoSheet('cover')}
+              className="absolute inset-0 pointer-events-auto cursor-pointer"
+              style={{ zIndex: 5, background: 'transparent', border: 'none' }}
+              aria-label="Change cover photo"
+            />
+          )}
           {isOwner && (
             <button
               onClick={() => setPhotoSheet('cover')}
               className="absolute bottom-3 right-3 h-11 w-11 flex items-center justify-center rounded-full active:scale-[0.97] transition-transform pointer-events-auto"
               style={{
-                zIndex: 2,
+                zIndex: 10,
                 background: 'rgba(0,0,0,0.45)',
                 backdropFilter: 'blur(24px) saturate(180%)',
                 WebkitBackdropFilter: 'blur(24px) saturate(180%)',
