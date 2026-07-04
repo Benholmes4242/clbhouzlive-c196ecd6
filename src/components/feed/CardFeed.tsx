@@ -182,7 +182,10 @@ export const CardFeed = forwardRef<CardFeedHandle, CardFeedProps>(function CardF
   // (iOS cold HLS attach ~1.3s vs. active-window ~400-800ms during scroll).
   const [playingIdx, setPlayingIdx] = useState(0);
   const settleTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const SETTLE_MS = 150;
+  const SETTLE_MS = 80;
+  const PLAY_IN = 0.5;
+  const PLAY_OUT = 0.35;
+  const HYSTERESIS = 0.1;
   const visibilityRef = useRef<Map<number, number>>(new Map());
   const observerRef = useRef<IntersectionObserver | null>(null);
   const cardEls = useRef<Map<number, HTMLElement>>(new Map());
