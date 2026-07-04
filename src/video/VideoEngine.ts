@@ -70,6 +70,15 @@ const DBG = (...args: unknown[]) => {
   }
 };
 
+const PPRACE = (tag: string, data: Record<string, unknown>) => {
+  try {
+    if (!isPerfEnabled()) return;
+  } catch { return; }
+  // eslint-disable-next-line no-console
+  console.info('[PPRACE]', tag, data);
+};
+
+
 const HIDDEN_HOST_ID = '__video_engine_hidden_host__';
 
 function ensureHiddenHost(): HTMLElement {
