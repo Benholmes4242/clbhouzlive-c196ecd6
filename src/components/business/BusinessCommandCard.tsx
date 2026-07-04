@@ -88,6 +88,9 @@ export function BusinessCommandCard({
 
   const canDelete = role === 'owner';
   const canManage = role === 'owner' || role === 'admin';
+  // Reviews only exist for course-linked businesses (course_ratings live on their courses).
+  // Brands / coaches / retailers without a claimed club never see the Reviews UI.
+  const hasCourse = !!business.club_id;
 
   // Derive verification state
   const verificationState = deriveVerificationState(business.is_verified, verificationRequest);
