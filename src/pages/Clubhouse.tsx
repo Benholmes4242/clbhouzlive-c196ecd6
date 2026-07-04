@@ -632,7 +632,7 @@ const ClubhouseContent = () => {
             onLike={(post) => handleLike(post)}
             onComment={(post) => openComments(post)}
             onShare={(post) => handleShare(post)}
-            onProfile={(post) => navigate(getActorRouteByType(post.actorType, post.actorId))}
+            onProfile={(post) => navigate(getActorRouteByType(post.actorType, post.actorId), { state: post.actorType === 'business' ? { source: 'feed' } : undefined })}
             onCourse={(post) => post.courseId && navigate(`/courses/${post.courseId}`)}
             onReviewTap={(post) => handleReviewTap(post)}
             getLikeState={(post) => {

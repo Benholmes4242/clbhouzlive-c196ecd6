@@ -93,7 +93,7 @@ export async function resolveAndNavigate(
     if (!data) return; // no match — don't navigate to a broken route
 
     if (data.entity_type === 'business') {
-      navigate(`/business/${data.entity_id}`);
+      navigate(`/business/${data.entity_id}`, { state: { source: 'content' } });
     } else {
       navigate(`/profile/${data.entity_id}`);
     }

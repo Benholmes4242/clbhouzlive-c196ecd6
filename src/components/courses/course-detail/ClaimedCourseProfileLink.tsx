@@ -61,7 +61,7 @@ const ClaimedCourseProfileLink: React.FC<Props> = ({ business }) => {
       </div>
       <button
         type="button"
-        onClick={() => navigate(target)}
+        onClick={() => navigate(target, { state: { source: 'course_page' } })}
         style={{
           display: 'inline-flex',
           alignItems: 'center',

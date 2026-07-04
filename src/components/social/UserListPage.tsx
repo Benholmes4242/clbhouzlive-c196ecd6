@@ -947,7 +947,7 @@ const UserRowFlat: React.FC<UserRowFlatProps> = ({
 
   const handleRowClick = () => {
     if (user.actorType === 'business') {
-      navigate(user.slug ? `/business/${user.slug}` : `/business/${user.id}`);
+      navigate(user.slug ? `/business/${user.slug}` : `/business/${user.id}`, { state: { source: 'search' } });
       return;
     }
     const profilePath = getProfilePathById(user.id, user.creatorOnly, user.username);

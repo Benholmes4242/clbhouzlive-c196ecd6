@@ -28,6 +28,7 @@ import { FeedActorPicker } from '@/components/feed/FeedActorPicker';
 import type { ActiveActor } from '@/types/actor';
 import LqipUnderlay from '@/components/shared/LqipUnderlay';
 import Pressable from '@/components/ui/Pressable';
+import { usePostViewTracker } from '@/hooks/usePostViewTracker';
 
 
 // Light palette — cards sit on the page background (#F8FAFC); dividers are
@@ -280,8 +281,10 @@ const LightFeedCardImpl: React.FC<LightFeedCardProps> = ({
 
   const mediaUrl = media?.imageUrl || media?.thumbnailUrl || '';
 
+  const attachViewTracker = usePostViewTracker(post.id, true);
   return (
     <article
+      ref={attachViewTracker as any}
       style={{
         background: CARD,
         overflow: 'hidden',

@@ -319,7 +319,7 @@ function GlobalSearchOverlay({ isOpen, onClose }: GlobalSearchOverlayProps) {
 
   const selectBusiness = useCallback((business: BusinessResult) => {
     handleSaveRecent(business.name);
-    navigate(`/business/${business.slug ?? business.id}`);
+    navigate(`/business/${business.slug ?? business.id}`, { state: { source: 'search' } });
     onClose();
   }, [navigate, onClose, handleSaveRecent]);
 

@@ -224,7 +224,7 @@ export const CreatorCapsule: React.FC<CreatorCapsuleProps> = ({
       const path = user.actorType
         ? getActorRouteByType(user.actorType, user.actorId ?? user.id)
         : getProfilePathById(user.id);
-      navigate(path);
+      navigate(path, user.actorType === 'business' ? { state: { source: 'feed' } } : undefined);
     }
   }, [navigate, onViewProfile, onBeforeNavigate, user.id, user.actorType, user.actorId]);
 
