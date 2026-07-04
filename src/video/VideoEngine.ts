@@ -211,6 +211,12 @@ class VideoEngineImpl {
       // Safari path — no hls.js instance, use the element's native player.
       lane.el.src = hlsUrl;
       this.wireElementEvents(lane, /* usingHls */ false);
+      const onMetaFp = () => {
+        if (lane.id === 'feed-active') fp.hlsManifest(lane.postId);
+        lane.el.removeEventListener('loadedmetadata', onMetaFp);
+      };
+      lane.el.addEventListener('loadedmetadata', onMetaFp);
+      lane.detachFns.push(() => lane.el.removeEventListener('loadedmetadata', onMetaFp));
       if (startPosition > 0) {
         const onMeta = () => {
           try {
