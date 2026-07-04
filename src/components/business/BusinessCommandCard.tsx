@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
-  MoreHorizontal, Eye, Pencil, BarChart3, Trash2, ShieldCheck, Clock, CheckCircle, Users, ChevronRight, ChevronDown,
+  MoreHorizontal, Eye, Pencil, BarChart3, Trash2, ShieldCheck, Clock, CheckCircle, Users, ChevronRight, ChevronDown, MapPin,
 } from 'lucide-react';
 import {
   DropdownMenu,
@@ -180,12 +180,18 @@ export function BusinessCommandCard({
               </span>
               {isVerified && <VerifiedBadge size="sm" />}
             </div>
-            <p
-              className="truncate mt-0.5"
-              style={{ color: BIZ.inkMute, fontSize: 12, fontWeight: 500 }}
-            >
-              {[ACCESS_LABELS[role] || role, locationDisplay].filter(Boolean).join(' · ')}
+            <p style={{ color: BIZ.inkMute, fontSize: 12, fontWeight: 500, lineHeight: 1.35 }}>
+              {ACCESS_LABELS[role] || role}
             </p>
+            {locationDisplay && (
+              <p
+                className="flex items-center gap-1"
+                style={{ color: 'rgba(15,23,42,0.45)', fontSize: 12, fontWeight: 500, lineHeight: 1.35 }}
+              >
+                <MapPin className="h-3 w-3 shrink-0" style={{ color: 'rgba(15,23,42,0.45)' }} />
+                {locationDisplay}
+              </p>
+            )}
           </div>
 
           {/* Overflow menu — never toggles the card. */}
@@ -328,13 +334,17 @@ export function BusinessCommandCard({
                     >
                       <ShieldCheck className="h-4 w-4" style={{ color: BIZ.amber }} />
                     </span>
-                    <span
-                      className="flex-1 text-left truncate"
-                      style={{ color: BIZ.ink, fontSize: 13.5, fontWeight: 700 }}
-                    >
-                      {verifyLabel}
-                    </span>
-                    <ChevronRight className="h-4 w-4 shrink-0" style={{ color: BIZ.amber }} />
+                    <div className="flex-1 text-left min-w-0">
+                      <div className="truncate" style={{ color: BIZ.ink, fontSize: 13.5, fontWeight: 700 }}>
+                        {verifyLabel}
+                      </div>
+                      {verificationState === 'none' && (
+                        <div style={{ color: 'rgba(15,23,42,0.60)', fontSize: 12, fontWeight: 500, marginTop: 2 }}>
+                          Earn the badge and win golfers&apos; trust.
+                        </div>
+                      )}
+                    </div>
+                    <ChevronRight className="h-4 w-4 shrink-0 self-center" style={{ color: BIZ.amber }} />
                   </button>
                 )}
 
