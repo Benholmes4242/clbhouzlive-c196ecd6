@@ -14,6 +14,7 @@ import type { MediaItem } from '@/components/media-system/types/media';
 import { useVideoLane } from '@/video/useVideoLane';
 import { VideoEngine } from '@/video/VideoEngine';
 import { useClubhouseStore } from '@/store/clubhouseStore';
+import { fsv } from '@/perf/fsvTelemetry';
 
 interface Props {
   item: MediaItem;
@@ -71,6 +72,25 @@ export const InlineVideo: React.FC<Props> = ({
     ownerKey: resolvedOwnerKey,
   });
 
+
+  // Trace inline (feed-active) lifecycle — close-flash forensics.
+  useEffect(() => {
+    fsv('inline.mount', { postId, hasHls: !!hlsUrl, isActive });
+    return () => {
+      fsv('inline.unmount', { postId });
+    };
+  }, [postId, hlsUrl, isActive]);
+  useEffect(() => {
+    fsv('inline.active', { postId, isActive });
+  }, [postId, isActive]);
+  useEffect(() => {
+    fsv('inline.snapFF', {
+      postId,
+      firstFrame: lane.snapshot.firstFrame,
+      ct: +lane.snapshot.currentTime.toFixed(3),
+      isActive,
+    });
+  }, [postId, lane.snapshot.firstFrame, lane.snapshot.currentTime, isActive]);
 
   // Poster paint-ready signal for surfaces that gate on it.
   useEffect(() => {
