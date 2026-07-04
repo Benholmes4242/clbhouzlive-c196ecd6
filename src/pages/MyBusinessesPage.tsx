@@ -121,21 +121,13 @@ const MyBusinessesPage = () => {
 
           ) : (
             <>
-              {sortedBusinesses.map((membership, index) => {
-                const isActive =
-                  activeActor?.type === 'business' &&
-                  activeActor?.id === membership.business.id;
-
-                return (
-                  <BusinessCommandCard
-                    key={membership.id}
-                    membership={membership}
-                    userId={user?.id || ''}
-                    index={index}
-                    isActive={isActive}
-                  />
-                );
-              })}
+              <BusinessesAccordion
+                memberships={sortedBusinesses}
+                userId={user?.id || ''}
+                activeBusinessId={
+                  activeActor?.type === 'business' ? activeActor?.id ?? null : null
+                }
+              />
 
               <AddBusinessCard onClick={handleCreateBusiness} />
             </>
@@ -145,5 +137,54 @@ const MyBusinessesPage = () => {
     </ManagePageShell>
   );
 };
+
+/* ─────────────────────── accordion controller ─────────────────────── */
+
+function BusinessesAccordion({
+  memberships,
+  userId,
+  activeBusinessId,
+}: {
+  memberships: ReturnType<typeof useMyBusinesses>['data'] extends (infer T)[] | undefined ? T[] : never;
+  userId: string;
+  activeBusinessId: string | null;
+}) {
+  // Default open: single business → itself; multi → first entry (sorted: active first).
+  const defaultOpenId = memberships[0]?.business?.id ?? null;
+  const [openId, setOpenId] = useState<string | null>(defaultOpenId);
+
+  // Re-sync default when the list identity changes (e.g. after create/delete).
+  useEffect(() => {
+    setOpenId((prev) => {
+      if (prev && memberships.some((m) => m.business?.id === prev)) return prev;
+      return memberships[0]?.business?.id ?? null;
+    });
+  }, [memberships]);
+
+  return (
+    <>
+      {memberships.map((membership, index) => {
+        const bizId = membership.business?.id;
+        const isExpanded = memberships.length === 1 ? true : openId === bizId;
+        const isActive = activeBusinessId != null && activeBusinessId === bizId;
+        return (
+          <BusinessCommandCard
+            key={membership.id}
+            membership={membership}
+            userId={userId}
+            index={index}
+            isActive={isActive}
+            expanded={isExpanded}
+            onToggle={() => {
+              if (memberships.length === 1) return; // single → always open
+              setOpenId((prev) => (prev === bizId ? null : bizId ?? null));
+            }}
+          />
+        );
+      })}
+    </>
+  );
+}
+
 
 export default MyBusinessesPage;
