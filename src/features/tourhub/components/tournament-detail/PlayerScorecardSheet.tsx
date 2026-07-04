@@ -3,7 +3,9 @@ import { useNavigate } from 'react-router-dom';
 import { BottomSheet } from '@/components/ui/BottomSheet';
 import CountryFlag from '@/components/ui/country-flag';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
-import { ScoreMark } from '@/features/courses/_shared/ScoreMark';
+import { SCORECARD_LIGHT } from '@/features/courses/_shared/scorecard/scorecardTheme';
+import { TrajectoryLine, type TrajectoryHole } from '@/features/courses/_shared/scorecard/TrajectoryLine';
+import { NineGrid } from '@/features/courses/_shared/scorecard/NineGrid';
 import { playerRoute } from '../../routes';
 import {
   useTournamentScorecard,
@@ -11,9 +13,10 @@ import {
   type RoundScorecard,
 } from '../../hooks/useTournamentScorecard';
 
+const T = SCORECARD_LIGHT;
 const AMBER = '#F7931E';
-const INK = '#0F172A';
-const INK_MUTE = '#94A3B8';
+const INK = T.ink;
+const INK_MUTE = T.faint;
 const GEIST = "'Geist', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif";
 const NUM: React.CSSProperties = {
   fontFamily: GEIST,
@@ -40,44 +43,14 @@ function initialsOf(name: string): string {
   return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
 }
 
-function HoleCell({ h }: { h: ScorecardHole }) {
-  return (
-    <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4, minWidth: 0 }}>
-      <div style={{ ...NUM, fontSize: 9, fontWeight: 700, color: INK_MUTE }}>{h.hole}</div>
-      <div style={{ ...NUM, fontSize: 9, fontWeight: 600, color: '#CBD5E1' }}>{h.par ?? '-'}</div>
-      <ScoreMark
-        strokes={h.strokes ?? null}
-        par={h.par ?? 4}
-        size={28}
-        fontFamily={GEIST}
-      />
-    </div>
-  );
+function toTrajectory(holes: ScorecardHole[]): TrajectoryHole[] {
+  return holes.map((h) => ({
+    holeNo: h.hole,
+    par: h.par ?? null,
+    strokes: h.strokes ?? null,
+  }));
 }
 
-function Nine({ holes, label }: { holes: ScorecardHole[]; label: 'OUT' | 'IN' }) {
-  const totalPar = holes.reduce((a, h) => a + (h.par ?? 0), 0);
-  const totalStrokes = holes.reduce((a, h) => a + (h.strokes ?? 0), 0);
-  const anyPlayed = holes.some((h) => h.strokes != null);
-  return (
-    <div style={{ display: 'flex', alignItems: 'flex-end', gap: 4 }}>
-      <div style={{ display: 'flex', flex: 1, gap: 2 }}>
-        {holes.map((h) => <HoleCell key={h.hole} h={h} />)}
-      </div>
-      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4, width: 34, flexShrink: 0 }}>
-        <div style={{ ...NUM, fontSize: 9, fontWeight: 800, color: INK, letterSpacing: '0.04em' }}>{label}</div>
-        <div style={{ ...NUM, fontSize: 9, fontWeight: 600, color: '#CBD5E1' }}>{totalPar || '-'}</div>
-        <div style={{
-          width: 30, height: 26, borderRadius: 8, background: '#F8FAFC', border: '1px solid #E2E8F0',
-          display: 'flex', alignItems: 'center', justifyContent: 'center',
-          ...NUM, fontSize: 13, fontWeight: 800, color: anyPlayed ? INK : '#E2E8F0',
-        }}>
-          {anyPlayed ? totalStrokes : '·'}
-        </div>
-      </div>
-    </div>
-  );
-}
 
 export interface PlayerScorecardSheetProps {
   open: boolean;
