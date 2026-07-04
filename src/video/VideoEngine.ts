@@ -224,13 +224,22 @@ class VideoEngineImpl {
       lane.state !== 'error';
     if (alreadyLoaded) {
       DBG(laneId, 'skip reload: same postId+url', { state: lane.state });
+      if (isFsv(laneId)) {
+        fsvEl('eng.load', lane.el, {
+          laneId, postId, startPosition, alreadyLoaded: true, state: lane.state,
+        });
+      }
       return;
     }
+    const priorPostId = lane.postId;
+    const priorHlsUrl = lane.hlsUrl;
+    const priorFirstFrame = lane.firstFrame;
     lane.postId = postId;
 
 
     if (this.saveDataGated) {
       DBG(laneId, 'skip load: save-data gated');
+      if (isFsv(laneId)) fsv('eng.load', { laneId, skipped: 'save-data-gated' });
       return;
     }
     if (this.loadingCount >= MAX_CONCURRENT_LOADS && lane.state !== 'ready' && lane.state !== 'playing') {
@@ -243,8 +252,9 @@ class VideoEngineImpl {
     lane.startPosition = startPosition;
     lane.firstFrame = false;
     // Reset playback position on source change so B doesn't inherit A's time.
+    let resetToZero = false;
     if (startPosition <= 0) {
-      try { lane.el.currentTime = 0; } catch { /* noop */ }
+      try { lane.el.currentTime = 0; resetToZero = true; } catch { /* noop */ }
     }
     // NOTE: do NOT clear wantPlay here — a mid-load play() intent must persist
     // so the engine can start playback once the new source reaches canplay.
@@ -256,12 +266,29 @@ class VideoEngineImpl {
     lane.detachFns = [];
 
     const native = isNativeHlsSupported(lane.el);
-    if (native && !Hls.isSupported()) {
+    const usingNative = native && !Hls.isSupported();
+    if (isFsv(laneId)) {
+      fsvEl('eng.load', lane.el, {
+        laneId,
+        postId,
+        priorPostId,
+        urlChanged: priorHlsUrl !== hlsUrl,
+        priorFirstFrame,
+        startPosition,
+        resetToZero,
+        wantPlay: lane.wantPlay,
+        native: usingNative,
+        hlsInstanceReused: !!lane.hls,
+        hlsUrlTail: hlsUrl.slice(-42),
+      });
+    }
+    if (usingNative) {
       // Safari path — no hls.js instance, use the element's native player.
       lane.el.src = hlsUrl;
       this.wireElementEvents(lane, /* usingHls */ false);
       if (startPosition > 0) {
         const onMeta = () => {
+          if (isFsv(laneId)) fsvEl('eng.load.nativeSeek', lane.el, { laneId, seekTo: startPosition });
           try {
             lane.el.currentTime = startPosition;
           } catch {
@@ -298,6 +325,13 @@ class VideoEngineImpl {
     const hls = lane.hls;
     hls.config.startPosition = startPosition;
     hls.loadSource(hlsUrl);
+    if (isFsv(laneId)) {
+      fsv('eng.load.hlsCfg', {
+        laneId,
+        startPositionCfg: startPosition,
+        instanceReused: !!priorHlsUrl,
+      });
+    }
 
     const onManifest = () => {
       // Enforce ABR ceiling based on manifest levels.
@@ -306,11 +340,16 @@ class VideoEngineImpl {
         return lvl.bitrate <= cap ? idx : best;
       }, hls.levels.length - 1);
       hls.autoLevelCapping = maxLevel;
-      
+      if (isFsv(laneId)) {
+        fsvEl('eng.load.manifest', lane.el, {
+          laneId, levels: hls.levels.length, autoLevelCap: maxLevel,
+        });
+      }
       this.transition(lane, 'ready');
     };
     const onError = (_evt: unknown, data: any) => {
       if (data?.fatal) {
+        if (isFsv(laneId)) fsv('eng.load.error', { laneId, details: data?.details });
         lane.state = 'error';
         this.emit(lane, data?.details ?? 'fatal');
       }
@@ -327,6 +366,7 @@ class VideoEngineImpl {
     this.loadingCount++;
     DBG(laneId, 'load', { hlsUrl, startPosition });
   }
+
 
   /**
    * Preload a source into a lane without playing it. Used to warm the
