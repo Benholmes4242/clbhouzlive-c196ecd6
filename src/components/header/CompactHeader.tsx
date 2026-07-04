@@ -187,16 +187,10 @@ const CompactHeader: React.FC<CompactHeaderProps> = ({ className }) => {
     location.pathname === '/tourhub/';
   const overlayActive = tourHeroOverlay && isTourOverviewSurface;
 
-  // Keep the native status bar on the light surface for handicap (was previously
-  // toggled dark↔light around the search overlay; now uniformly light).
-  useMedianStatusBar(
-    'light',
-    '#F8FAFC',
-    false,
-    false,
-    false,
-    'static-light',
-  );
+  // Chrome (shield + native status bar) is owned solely by AppRoutes now.
+  // The previous useMedianStatusBar call here was already `enabled=false` and
+  // has been removed as part of the single-writer consolidation.
+
 
 
   const handleLogoClick = () => {
