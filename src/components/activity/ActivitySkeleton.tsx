@@ -1,44 +1,29 @@
 import React from 'react';
 import { Skeleton } from '@/components/ui/skeleton';
 
+/** Edge-to-edge row skeletons matching the Inbox row anatomy. */
 export const ActivitySkeleton: React.FC = () => {
   return (
-    <div className="w-full space-y-6">
-      {/* Today section skeleton */}
-      <section>
-        <Skeleton className="h-3 w-12 mb-2" />
-        <div className="rounded-sq-md bg-background shadow-sm divide-y divide-border/40 overflow-hidden">
-          {[...Array(3)].map((_, i) => (
-            <div key={i} className="flex items-center gap-3 px-3 py-3">
-              <Skeleton className="w-1 h-10 rounded-full" />
-              <Skeleton className="h-10 w-10 rounded-sq-sm flex-shrink-0" />
-              <div className="flex-1 space-y-2">
-                <Skeleton className="h-4 w-3/4" />
-                <Skeleton className="h-3 w-1/2" />
-              </div>
-              <Skeleton className="h-6 w-12 rounded-sq-pill" />
-            </div>
-          ))}
+    <div className="w-full">
+      {[...Array(6)].map((_, i) => (
+        <div
+          key={i}
+          className="flex items-start"
+          style={{
+            gap: 12,
+            padding: '13px 16px',
+            borderTop: i > 0 ? '1px solid rgba(15,23,42,0.06)' : undefined,
+            borderLeft: '2.5px solid transparent',
+          }}
+        >
+          <Skeleton style={{ width: 44, height: 44, borderRadius: '34%', flexShrink: 0 }} />
+          <div className="flex-1 min-w-0 space-y-2">
+            <Skeleton className="h-3.5" style={{ width: `${60 + ((i * 7) % 30)}%` }} />
+            <Skeleton className="h-3" style={{ width: `${40 + ((i * 5) % 25)}%` }} />
+          </div>
+          <Skeleton className="h-3 w-8 shrink-0" />
         </div>
-      </section>
-
-      {/* Yesterday section skeleton */}
-      <section>
-        <Skeleton className="h-3 w-16 mb-2" />
-        <div className="rounded-sq-md bg-background shadow-sm divide-y divide-border/40 overflow-hidden">
-          {[...Array(2)].map((_, i) => (
-            <div key={i} className="flex items-center gap-3 px-3 py-3">
-              <Skeleton className="w-1 h-10 rounded-full" />
-              <Skeleton className="h-10 w-10 rounded-sq-sm flex-shrink-0" />
-              <div className="flex-1 space-y-2">
-                <Skeleton className="h-4 w-2/3" />
-                <Skeleton className="h-3 w-1/3" />
-              </div>
-              <Skeleton className="h-6 w-12 rounded-sq-pill" />
-            </div>
-          ))}
-        </div>
-      </section>
+      ))}
     </div>
   );
 };

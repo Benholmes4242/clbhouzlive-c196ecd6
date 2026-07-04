@@ -1,37 +1,58 @@
 import React from 'react';
-import { BellOff, Users } from 'lucide-react';
-import { ActivityTabId } from '@/hooks/useActivityFeed';
+import { BellOff, Users, Star, AtSign } from 'lucide-react';
 
-interface ActivityEmptyStateProps {
-  tab: ActivityTabId;
-}
+const INK = '#0F172A';
+const INK_45 = '#64748B';
+const AMBER = '#F7931E';
+const AMBER_SOFT = 'rgba(247,147,30,0.10)';
 
-const TAB_EMPTY_STATES: Record<ActivityTabId, { icon: typeof BellOff; title: string; description: string }> = {
+type TabId = 'all' | 'friends' | 'reviews' | 'mentions' | string;
+
+const STATES: Record<string, { icon: any; title: string; description: string }> = {
   all: {
     icon: BellOff,
-    title: 'No notifications yet',
-    description: 'When friends interact with your content, you\'ll see it here.',
+    title: "You're all caught up",
+    description: "New activity from friends, reviews and mentions will show up here.",
   },
   friends: {
     icon: Users,
-    title: 'No activity from friends',
-    description: 'When your friends interact with you, their activity will appear here.',
+    title: "Nothing from friends yet",
+    description: "When your friends interact with you, their activity will appear here.",
+  },
+  reviews: {
+    icon: Star,
+    title: "No review activity",
+    description: "Reviews on your courses and reviews from friends will land here.",
+  },
+  mentions: {
+    icon: AtSign,
+    title: "No mentions yet",
+    description: "When someone mentions you in a comment or post, it will appear here.",
   },
 };
 
-export const ActivityEmptyState: React.FC<ActivityEmptyStateProps> = ({ tab }) => {
-  const state = TAB_EMPTY_STATES[tab];
-  const Icon = state.icon;
+interface Props {
+  tab: TabId;
+}
 
+export const ActivityEmptyState: React.FC<Props> = ({ tab }) => {
+  const state = STATES[tab] || STATES.all;
+  const Icon = state.icon;
   return (
-    <div className="flex flex-col items-center justify-center py-16 px-6">
-      <div style={{ width: 60, height: 60, borderRadius: '50%', background: 'rgba(15,23,42,0.05)', border: '1px solid rgba(15,23,42,0.07)', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: 16 }}>
-        <Icon className="w-7 h-7 text-muted-foreground" />
+    <div className="flex flex-col items-center justify-center py-16 px-8">
+      <div
+        style={{
+          width: 64, height: 64, borderRadius: '34%',
+          background: AMBER_SOFT, display: 'flex', alignItems: 'center', justifyContent: 'center',
+          marginBottom: 16,
+        }}
+      >
+        <Icon size={26} color={AMBER} strokeWidth={2} />
       </div>
-      <h3 className="text-[1rem] font-semibold text-foreground mb-1 text-center">
+      <h3 style={{ fontSize: 15.5, fontWeight: 800, color: INK, letterSpacing: '-0.01em', margin: '0 0 4px', textAlign: 'center' }}>
         {state.title}
       </h3>
-      <p className="text-[0.875rem] text-muted-foreground text-center max-w-[280px]">
+      <p style={{ fontSize: 13, color: INK_45, textAlign: 'center', maxWidth: 280, margin: 0, lineHeight: 1.5 }}>
         {state.description}
       </p>
     </div>
