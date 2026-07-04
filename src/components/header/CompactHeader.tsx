@@ -20,7 +20,15 @@ import { useTourHeroOverlay } from '@/hooks/useTourHeroOverlay';
 
 interface CompactHeaderProps {
   className?: string;
+  /**
+   * When true, the header stays mounted (so CompactHeader mount count stays 1
+   * for the session) but renders invisible, non-interactive, zero-height, and
+   * publishes --header-h: 0 so full-bleed pages get the correct paddingTop.
+   * Owned by GlobalHeader based on route exclusion + runtime overlay state.
+   */
+  hidden?: boolean;
 }
+
 
 const LiveStatusInline: React.FC = () => {
   return (
