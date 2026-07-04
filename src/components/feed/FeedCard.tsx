@@ -569,10 +569,12 @@ const FeedCardImpl: React.FC<FeedCardProps> = ({
             isCardActive={isActive}
             initialIndex={initialMediaIndex}
             mountVideo={mountVideo}
+            postId={post.id}
             onIndexChange={(idx) => onCarouselIndexChange?.(post, idx)}
             onOpen={(idx) => onOpenMedia(post, idx)}
             onDoubleTap={handleMediaDoubleTap}
           />
+
         ) : media ? (
           <SingleMediaTapButton
             onSingle={() =>
