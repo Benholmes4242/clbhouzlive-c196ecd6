@@ -400,17 +400,19 @@ export function BusinessCommandCard({
                 >
                   <ActionRow icon={Pencil} label="Edit profile" onClick={() => goto('/edit')} />
                   <ActionRow icon={BarChart3} label="Insights" onClick={() => goto('/insights')} />
-                  <ActionRow
-                    icon={Star}
-                    label="Reviews"
-                    onClick={() => goto('/reviews')}
-                    hint={
-                      avgReviewRating != null
-                        ? `${(Math.round(avgReviewRating * 10) / 10).toFixed(1)}`
-                        : undefined
-                    }
-                    badge={awaitingReplies > 0}
-                  />
+                  {hasCourse && (
+                    <ActionRow
+                      icon={Star}
+                      label="Reviews"
+                      onClick={() => goto('/reviews')}
+                      hint={
+                        avgReviewRating != null
+                          ? `${(Math.round(avgReviewRating * 10) / 10).toFixed(1)}`
+                          : undefined
+                      }
+                      badge={awaitingReplies > 0}
+                    />
+                  )}
                   {canManage && (
                     <ActionRow
                       icon={Users}
