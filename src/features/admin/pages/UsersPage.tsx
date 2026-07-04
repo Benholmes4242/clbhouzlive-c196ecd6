@@ -902,6 +902,20 @@ export function VerificationsTab({
             {active.domain && (
               <Field label="Domain" value={`${active.domain}${active.domainConfirmed ? ' (confirmed)' : ' (unconfirmed)'}`} />
             )}
+            {active.type === 'business' && active.proofMethod === 'business_email' && (
+              <Field label="Email verification">
+                {(active.proofMetadata as any)?.email_verified || active.domainConfirmed ? (
+                  <span style={{ fontSize: 12, fontWeight: 700, color: '#059669' }}>Email verified (OTP)</span>
+                ) : (
+                  <span style={{ fontSize: 12, fontWeight: 600, color: t.inkMuted }}>Email provided (unverified)</span>
+                )}
+              </Field>
+            )}
+            {active.type === 'business' && active.proofDocumentUrl && (
+              <Field label="Supporting document">
+                <SupportingDocLink path={active.proofDocumentUrl} tokens={t} />
+              </Field>
+            )}
             {active.type === 'business' && active.contactEmail && (
               <Field label="Applicant contact email" value={active.contactEmail} />
             )}
