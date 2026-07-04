@@ -10,15 +10,16 @@ import { supabase } from '@/integrations/supabase/client';
 import { useQueryClient } from '@tanstack/react-query';
 import { SuggestedCreatorsShelf } from '@/components/shared/SuggestedCreatorsShelf';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
-import { PageRoot } from '@/components/layout/PageRoot';
 import { useRehydrationSafe } from '@/contexts/RehydrationContext';
 import ScrollToTopGlass from '@/components/common/ScrollToTopGlass';
 import { ActivityPageSkeleton } from '@/components/skeletons/ActivityPageSkeleton';
-import { AlertCircle, ChevronLeft } from 'lucide-react';
+import { AlertCircle } from 'lucide-react';
 import { RateCourseNudge } from '@/components/activity/RateCourseNudge';
 import { toast } from 'sonner';
 import { useUnseenFriendReviews } from '@/hooks/useUnseenFriendReviews';
 import { useHideBottomNav } from '@/hooks/useBottomNavVisibility';
+import { useHideHeader } from '@/hooks/useHeaderVisibility';
+import { ManagePageShell } from '@/components/manage/ManagePageShell';
 
 const FRIEND_TYPES = new Set([
   'friend_request', 'friend_accept', 'friend_accepted',
@@ -64,6 +65,7 @@ const DateGroupLabel: React.FC<{ label: string }> = ({ label }) => (
 
 const ActivityPage: React.FC = () => {
   useHideBottomNav();
+  useHideHeader();
   const [chipFilter, setChipFilter] = useState<ChipFilter>('All');
 
   const { isRehydrating } = useRehydrationSafe();
@@ -220,113 +222,72 @@ const ActivityPage: React.FC = () => {
   const showEmptyState = !!data && !hasNotifications && !isFetching;
   const showMarkAllRead = (sessionNewCount ?? 0) > 0;
 
-  return (
-    <PageRoot hasBottomNav={true}>
-      <div className="flex flex-col min-h-full" style={{ background: BG_SURFACE }}>
-        <div className="max-w-2xl mx-auto w-full flex flex-col flex-1">
+  const activityControls = (
+    <div className="px-4 pb-2" style={{ background: BG_SURFACE }}>
+      <div className="flex gap-2 py-2 overflow-x-auto scrollbar-none">
+        {FILTER_CHIPS.map(chip => {
+          const isActive = chipFilter === chip;
+          const count = chip === 'All' ? allItems.length : null;
+          return (
+            <button
+              key={chip}
+              onClick={() => setChipFilter(chip)}
+              className="shrink-0 rounded-full transition-all active:scale-[0.95] inline-flex items-center"
+              style={{
+                minHeight: 32,
+                padding: '6px 14px',
+                background: isActive ? INK : 'transparent',
+                color: isActive ? '#FFFFFF' : INK_SOFT,
+                border: isActive ? '1px solid transparent' : `1px solid ${BORDER}`,
+                fontSize: 13,
+                fontWeight: 600,
+                gap: 6,
+              }}
+            >
+              {chip}
+              {count != null && count > 0 && (
+                <span style={{ fontSize: 11, opacity: 0.7, fontWeight: 700 }}>{count}</span>
+              )}
+            </button>
+          );
+        })}
+      </div>
 
-          {/* Header — sticky, owns the safe area + filters + mark-all (matches Followers page) */}
-          <div
-            className="sticky top-0 z-40 backdrop-blur-xl px-5 pb-0 flex flex-col"
+      {showMarkAllRead && (
+        <div className="flex justify-end pb-1">
+          <button
+            onClick={handleMarkAllRead}
             style={{
-              paddingTop: 'max(var(--safe-top, env(safe-area-inset-top, 0px)), 8px)',
-              background: 'rgba(248,250,252,0.97)',
+              fontSize: 12,
+              fontWeight: 600,
+              color: AMBER_DEEP,
+              textDecoration: 'underline',
+              textUnderlineOffset: 2,
+              background: 'transparent',
+              border: 'none',
+              cursor: 'pointer',
+              padding: '4px 0',
             }}
           >
-            {/* Title row */}
-            <div className="flex items-end justify-between">
-              <div className="flex items-center gap-3">
-                <button
-                  onClick={() => navigate(-1)}
-                  style={{ width: 36, height: 36, borderRadius: '50%', background: 'rgba(15,23,42,0.05)', border: '0.5px solid rgba(15,23,42,0.10)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, cursor: 'pointer' }}
-                  aria-label="Back"
-                >
-                  <ChevronLeft size={20} strokeWidth={2.5} style={{ color: '#64748B' }} />
-                </button>
-                <div>
-                  <div className="flex items-center gap-2 mb-1.5">
-                    <span style={{ fontSize: 11, fontWeight: 800, color: '#94A3B8', letterSpacing: '0.14em', textTransform: 'uppercase' }}>ACTIVITY</span>
-                  </div>
-                  <div className="flex items-baseline gap-2.5">
-                    <h1
-                      onClick={handleRefresh}
-                      className={cn(
-                        "leading-none cursor-pointer transition-opacity",
-                        isRefreshing && "opacity-50"
-                      )}
-                      style={{
-                        fontFamily: FONT_SERIF,
-                        fontWeight: 800,
-                        color: INK,
-                        fontSize: 34,
-                        letterSpacing: '-0.025em',
-                      }}
-                      aria-label="Notifications - tap to refresh"
-                    >
-                      Notifications
-                    </h1>
-                    {sessionNewCount && sessionNewCount > 0 ? (
-                      <span style={{ fontSize: 12, fontWeight: 700, color: AMBER }}>
-                        {sessionNewCount} new
-                      </span>
-                    ) : null}
-                  </div>
-                </div>
-              </div>
-            </div>
+            Mark all as read
+          </button>
+        </div>
+      )}
+    </div>
+  );
 
-            {/* Filter chips */}
-            <div className="flex gap-2 pt-3 pb-2 overflow-x-auto scrollbar-none">
-              {FILTER_CHIPS.map(chip => {
-                const isActive = chipFilter === chip;
-                const count = chip === 'All' ? allItems.length : null;
-                return (
-                  <button
-                    key={chip}
-                    onClick={() => setChipFilter(chip)}
-                    className="shrink-0 rounded-full transition-all active:scale-[0.95] inline-flex items-center"
-                    style={{
-                      minHeight: 32,
-                      padding: '6px 14px',
-                      background: isActive ? INK : 'transparent',
-                      color: isActive ? '#FFFFFF' : INK_SOFT,
-                      border: isActive ? '1px solid transparent' : `1px solid ${BORDER}`,
-                      fontSize: 13,
-                      fontWeight: 600,
-                      gap: 6,
-                    }}
-                  >
-                    {chip}
-                    {count != null && count > 0 && (
-                      <span style={{ fontSize: 11, opacity: 0.7, fontWeight: 700 }}>{count}</span>
-                    )}
-                  </button>
-                );
-              })}
-            </div>
-
-            {/* Mark all read */}
-            {showMarkAllRead && (
-              <div className="flex justify-end pb-2">
-                <button
-                  onClick={handleMarkAllRead}
-                  style={{
-                    fontSize: 12,
-                    fontWeight: 600,
-                    color: AMBER_DEEP,
-                    textDecoration: 'underline',
-                    textUnderlineOffset: 2,
-                    background: 'transparent',
-                    border: 'none',
-                    cursor: 'pointer',
-                    padding: '4px 0',
-                  }}
-                >
-                  Mark all as read
-                </button>
-              </div>
-            )}
-          </div>
+  return (
+    <ManagePageShell
+      title="Notifications"
+      right={sessionNewCount && sessionNewCount > 0 ? (
+        <span style={{ fontSize: 12, fontWeight: 700, color: AMBER, whiteSpace: 'nowrap' }}>
+          {sessionNewCount} new
+        </span>
+      ) : null}
+      belowTitle={activityControls}
+    >
+      <div className="flex flex-col min-h-full" style={{ background: BG_SURFACE }}>
+        <div className="max-w-2xl mx-auto w-full flex flex-col flex-1">
 
           {/* Content */}
           <div className="flex-1 mt-1">
@@ -415,7 +376,7 @@ const ActivityPage: React.FC = () => {
         onDelete={handleDeleteNotification}
       />
       <ScrollToTopGlass />
-    </PageRoot>
+    </ManagePageShell>
   );
 };
 
