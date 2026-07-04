@@ -88,6 +88,9 @@ export function BusinessCommandCard({
 
   const canDelete = role === 'owner';
   const canManage = role === 'owner' || role === 'admin';
+  // Reviews only exist for course-linked businesses (course_ratings live on their courses).
+  // Brands / coaches / retailers without a claimed club never see the Reviews UI.
+  const hasCourse = !!business.club_id;
 
   // Derive verification state
   const verificationState = deriveVerificationState(business.is_verified, verificationRequest);
@@ -236,16 +239,18 @@ export function BusinessCommandCard({
                   <BarChart3 className="h-4 w-4" style={{ color: BIZ.inkMute }} />
                   Insights
                 </DropdownMenuItem>
-                <DropdownMenuItem
-                  onClick={(e) => { e.stopPropagation(); goto('/reviews'); }}
-                  className="gap-2.5 cursor-pointer min-h-[44px] active:bg-muted"
-                >
-                  <Star className="h-4 w-4" style={{ color: BIZ.inkMute }} />
-                  Reviews
-                  {awaitingReplies > 0 && (
-                    <span className="ml-auto h-2 w-2 rounded-full" style={{ background: BIZ.amber }} />
-                  )}
-                </DropdownMenuItem>
+                {hasCourse && (
+                  <DropdownMenuItem
+                    onClick={(e) => { e.stopPropagation(); goto('/reviews'); }}
+                    className="gap-2.5 cursor-pointer min-h-[44px] active:bg-muted"
+                  >
+                    <Star className="h-4 w-4" style={{ color: BIZ.inkMute }} />
+                    Reviews
+                    {awaitingReplies > 0 && (
+                      <span className="ml-auto h-2 w-2 rounded-full" style={{ background: BIZ.amber }} />
+                    )}
+                  </DropdownMenuItem>
+                )}
 
 
                 {canManage && (
@@ -395,17 +400,19 @@ export function BusinessCommandCard({
                 >
                   <ActionRow icon={Pencil} label="Edit profile" onClick={() => goto('/edit')} />
                   <ActionRow icon={BarChart3} label="Insights" onClick={() => goto('/insights')} />
-                  <ActionRow
-                    icon={Star}
-                    label="Reviews"
-                    onClick={() => goto('/reviews')}
-                    hint={
-                      avgReviewRating != null
-                        ? `${(Math.round(avgReviewRating * 10) / 10).toFixed(1)}`
-                        : undefined
-                    }
-                    badge={awaitingReplies > 0}
-                  />
+                  {hasCourse && (
+                    <ActionRow
+                      icon={Star}
+                      label="Reviews"
+                      onClick={() => goto('/reviews')}
+                      hint={
+                        avgReviewRating != null
+                          ? `${(Math.round(avgReviewRating * 10) / 10).toFixed(1)}`
+                          : undefined
+                      }
+                      badge={awaitingReplies > 0}
+                    />
+                  )}
                   {canManage && (
                     <ActionRow
                       icon={Users}
