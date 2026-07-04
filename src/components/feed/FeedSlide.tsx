@@ -219,6 +219,16 @@ export const FeedSlide = memo(function FeedSlide({
 export default FeedSlide;
 
 /**
+ * Sentinel that records a post_views row once the post has been >=50%
+ * visible for ~1s. Once per post per session. Fire-and-forget.
+ */
+const PostViewSentinel: React.FC<{ postId: string }> = ({ postId }) => {
+  const attach = usePostViewTracker(postId, true);
+  return <div ref={attach} className="absolute inset-0 pointer-events-none" aria-hidden="true" />;
+};
+
+
+/**
  * FullscreenVideoSlot — binds the engine's `fullscreen` lane when the
  * fullscreen slide becomes active. Reads `startPosition` from the store
  * (set by openWithOrigin). On unmount, records fullscreen currentTime into
