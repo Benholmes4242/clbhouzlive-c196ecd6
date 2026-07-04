@@ -946,39 +946,6 @@ export default function BusinessProfileEditor() {
         initialName={clubSearchQuery}
       />
 
-      {/* Crop modals */}
-      {logoCropSrc && (
-        <ImageCropModal
-          open={logoCropOpen}
-          onOpenChange={(open) => {
-            if (!open && logoCropSrc) {
-              URL.revokeObjectURL(logoCropSrc);
-              setLogoCropSrc(null);
-            }
-            setLogoCropOpen(open);
-          }}
-          imageSrc={logoCropSrc}
-          aspectRatio={1 / 1.05}
-          onCropComplete={onLogoCropped}
-          title="Crop Logo"
-        />
-      )}
-      {coverCropSrc && (
-        <ImageCropModal
-          open={coverCropOpen}
-          onOpenChange={(open) => {
-            if (!open && coverCropSrc) {
-              URL.revokeObjectURL(coverCropSrc);
-              setCoverCropSrc(null);
-            }
-            setCoverCropOpen(open);
-          }}
-          imageSrc={coverCropSrc}
-          aspectRatio={COVER_ASPECT_RATIO}
-          onCropComplete={onCoverCropped}
-          title="Crop Cover Photo"
-        />
-      )}
     </>
   );
 }
