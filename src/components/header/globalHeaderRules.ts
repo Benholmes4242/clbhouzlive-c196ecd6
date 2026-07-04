@@ -94,7 +94,7 @@ function isBusinessProfilePage(pathname: string): boolean {
 function isBusinessManagedSubPage(pathname: string): boolean {
   if (!pathname.startsWith('/business/')) return false;
   return (
-    /^\/business\/[^/]+\/(verification|edit|insights|team|activity)(\/.*)?$/.test(pathname)
+    /^\/business\/[^/]+\/(verification|edit|insights|team|activity|followers|following)(\/.*)?$/.test(pathname)
   );
 }
 

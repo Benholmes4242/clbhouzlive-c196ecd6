@@ -1496,6 +1496,7 @@ export type Database = {
           domain_confirmed_at: string | null
           id: string
           note: string | null
+          proof_document_url: string | null
           proof_metadata: Json | null
           proof_method: string | null
           proof_value: string | null
@@ -1520,6 +1521,7 @@ export type Database = {
           domain_confirmed_at?: string | null
           id?: string
           note?: string | null
+          proof_document_url?: string | null
           proof_metadata?: Json | null
           proof_method?: string | null
           proof_value?: string | null
@@ -1544,6 +1546,7 @@ export type Database = {
           domain_confirmed_at?: string | null
           id?: string
           note?: string | null
+          proof_document_url?: string | null
           proof_metadata?: Json | null
           proof_method?: string | null
           proof_value?: string | null

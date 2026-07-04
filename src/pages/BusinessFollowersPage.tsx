@@ -7,8 +7,10 @@ import {
 } from '@/hooks/useBusinessSocialLists';
 import { UserListPage } from '@/components/social/UserListPage';
 import ScrollToTopGlass from '@/components/common/ScrollToTopGlass';
+import { useHideBottomNav } from '@/hooks/useBottomNavVisibility';
 
 export default function BusinessFollowersPage() {
+  useHideBottomNav();
   const { idOrSlug } = useParams<{ idOrSlug: string }>();
   const { data: business, isLoading: bizLoading } = useBusinessProfile(idOrSlug);
 

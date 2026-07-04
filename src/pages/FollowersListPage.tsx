@@ -7,8 +7,10 @@ import { useUserByUsername } from '@/hooks/useUserByUsername';
 import { UserListPage } from '@/components/social/UserListPage';
 import { analyticsEvents } from '@/utils/analyticsEvents';
 import ScrollToTopGlass from '@/components/common/ScrollToTopGlass';
+import { useHideBottomNav } from '@/hooks/useBottomNavVisibility';
 
 const FollowersListPage = () => {
+  useHideBottomNav();
   const { username } = useParams<{ username: string }>();
   const { user: currentUser } = useSupabaseSession();
 
