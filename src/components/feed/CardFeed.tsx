@@ -26,6 +26,7 @@ import { useFullscreenFeedStore } from '@/store/fullscreenFeedStore';
 import { openWithOrigin } from '@/lib/openWithOrigin';
 import { useClubhouseStore } from '@/store/clubhouseStore';
 import { fp } from '@/perf/feedPlayTelemetry';
+import { VideoEngine } from '@/video/VideoEngine';
 
 import { FeedCard } from './FeedCard';
 
