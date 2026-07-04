@@ -1158,6 +1158,7 @@ export type Database = {
           id: string
           invited_by: string
           invitee_email: string
+          invitee_user_id: string | null
           role: string
           status: string
           token: string
@@ -1169,6 +1170,7 @@ export type Database = {
           id?: string
           invited_by: string
           invitee_email: string
+          invitee_user_id?: string | null
           role?: string
           status?: string
           token?: string
@@ -1180,6 +1182,7 @@ export type Database = {
           id?: string
           invited_by?: string
           invitee_email?: string
+          invitee_user_id?: string | null
           role?: string
           status?: string
           token?: string
@@ -1190,6 +1193,34 @@ export type Database = {
             columns: ["business_id"]
             isOneToOne: false
             referencedRelation: "business_accounts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "business_invites_invitee_user_id_fkey"
+            columns: ["invitee_user_id"]
+            isOneToOne: false
+            referencedRelation: "gam_friend_handicap_leaderboard_view"
+            referencedColumns: ["user_id"]
+          },
+          {
+            foreignKeyName: "business_invites_invitee_user_id_fkey"
+            columns: ["invitee_user_id"]
+            isOneToOne: false
+            referencedRelation: "public_golfer_blurbs"
+            referencedColumns: ["user_id"]
+          },
+          {
+            foreignKeyName: "business_invites_invitee_user_id_fkey"
+            columns: ["invitee_user_id"]
+            isOneToOne: false
+            referencedRelation: "public_profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "business_invites_invitee_user_id_fkey"
+            columns: ["invitee_user_id"]
+            isOneToOne: false
+            referencedRelation: "user_profiles"
             referencedColumns: ["id"]
           },
         ]
@@ -19893,6 +19924,14 @@ export type Database = {
         Returns: {
           inserted_count: number
         }[]
+      }
+      invite_business_member_by_user: {
+        Args: {
+          p_business_id: string
+          p_invitee_user_id: string
+          p_role: string
+        }
+        Returns: Json
       }
       invite_golfer_from_discover: {
         Args: { p_user_id: string }
