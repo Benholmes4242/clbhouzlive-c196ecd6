@@ -3,7 +3,7 @@ import { useRef } from "react";
 
 import { useLocation } from "react-router-dom";
 import { cn } from "@/lib/utils";
-import { useMedianStatusBar } from "@/hooks/useMedianStatusBar";
+// useMedianStatusBar removed — chrome is owned solely by AppRoutes now.
 import { isDarkChromeRoute } from "@/components/header/globalHeaderRules";
 import { usePageRootMount } from "@/perf/usePageReady";
 
