@@ -42,14 +42,15 @@ import { SelectedCollege } from '@/components/business/CollegeSearchDropdown';
 import { AddressValue } from '@/components/business/AddressAutocomplete';
 import { PinDropModal } from '@/components/business/PinDropModal';
 import { PhoneValue } from '@/components/business/PhoneInputWithDialCode';
-import { ImageCropModal } from '@/components/business/ImageCropModal';
+import { HeaderPhotoCard } from '@/components/profile/edit-v2/HeaderPhotoCard';
+import { ProfilePhotoCard } from '@/components/profile/edit-v2/ProfilePhotoCard';
 import { RequestAccessModal } from '@/components/business/RequestAccessModal';
 import { RequestClubModal } from '@/components/business/RequestClubModal';
 import { getCountryCodeFromClub } from '@/utils/countryCodeMapping';
 
 import { IdentitySection } from '@/components/business/editor/IdentitySection';
 import { LocationContactSection } from '@/components/business/editor/LocationContactSection';
-import { BusinessHeroCard } from '@/components/business/editor/BusinessHeroCard';
+
 import { FacilitiesSection } from '@/components/business/editor/FacilitiesSection';
 import { PrimaryActionSection } from '@/components/business/editor/PrimaryActionSection';
 import { BookingComingSoonSection } from '@/components/business/editor/BookingComingSoonSection';
@@ -73,7 +74,7 @@ import type { Database } from '@/integrations/supabase/types';
 
 /* ─────────────────────── constants ─────────────────────── */
 
-const COVER_ASPECT_RATIO = 1.5;
+
 
 type Mode = 'create' | 'edit';
 
@@ -125,10 +126,6 @@ export default function BusinessProfileEditor() {
   /* ── branding ─────────────────────────────────────── */
   const [logo, setLogo] = useState<ImageState>(emptyImage);
   const [cover, setCover] = useState<ImageState>(emptyImage);
-  const [logoCropOpen, setLogoCropOpen] = useState(false);
-  const [coverCropOpen, setCoverCropOpen] = useState(false);
-  const [logoCropSrc, setLogoCropSrc] = useState<string | null>(null);
-  const [coverCropSrc, setCoverCropSrc] = useState<string | null>(null);
 
   /* ── social ───────────────────────────────────────── */
   const [social, setSocial] = useState<SocialFields>({
@@ -379,11 +376,6 @@ export default function BusinessProfileEditor() {
 
   /* ── image handlers ──────────────────────────────── */
   const onLogoFile = (file: File) => {
-    const url = URL.createObjectURL(file);
-    setLogoCropSrc(url);
-    setLogoCropOpen(true);
-  };
-  const onLogoCropped = (file: File) => {
     if (logo.localPreview) URL.revokeObjectURL(logo.localPreview);
     setLogo({
       ...logo,
@@ -391,19 +383,12 @@ export default function BusinessProfileEditor() {
       pendingRemove: false,
       localPreview: URL.createObjectURL(file),
     });
-    if (logoCropSrc) URL.revokeObjectURL(logoCropSrc);
-    setLogoCropSrc(null);
   };
   const onLogoRemove = () => {
     if (logo.localPreview) URL.revokeObjectURL(logo.localPreview);
     setLogo({ ...logo, pendingFile: null, pendingRemove: true, localPreview: null });
   };
   const onCoverFile = (file: File) => {
-    const url = URL.createObjectURL(file);
-    setCoverCropSrc(url);
-    setCoverCropOpen(true);
-  };
-  const onCoverCropped = (file: File) => {
     if (cover.localPreview) URL.revokeObjectURL(cover.localPreview);
     setCover({
       ...cover,
@@ -411,8 +396,6 @@ export default function BusinessProfileEditor() {
       pendingRemove: false,
       localPreview: URL.createObjectURL(file),
     });
-    if (coverCropSrc) URL.revokeObjectURL(coverCropSrc);
-    setCoverCropSrc(null);
   };
   const onCoverRemove = () => {
     if (cover.localPreview) URL.revokeObjectURL(cover.localPreview);
@@ -730,16 +713,32 @@ export default function BusinessProfileEditor() {
       >
         <div className="flex-1 overflow-y-auto pb-12" style={{ background: BIZ.pageBg }}>
 
-          {/* 1. HERO — cover + squircle logo at top */}
-          <BusinessHeroCard
-            logoUrl={effectiveLogoUrl}
-            coverUrl={effectiveCoverUrl}
-            resolvedName={resolvedName}
-            onLogoFile={onLogoFile}
-            onLogoRemove={onLogoRemove}
-            onCoverFile={onCoverFile}
-            onCoverRemove={onCoverRemove}
-          />
+          {/* 1. HERO — cover + squircle logo at top (matches personal edit-v2) */}
+          <div className="px-4 pt-2 pb-4">
+            <div
+              style={{
+                borderRadius: 16,
+                overflow: 'hidden',
+                background: '#fff',
+                border: '1px solid rgba(15,23,42,0.07)',
+              }}
+            >
+              <HeaderPhotoCard
+                variant="bare"
+                currentUrl={effectiveCoverUrl}
+                onFileChange={(file) => { if (file) onCoverFile(file); }}
+                onRemove={onCoverRemove}
+              />
+              <div style={{ position: 'relative', padding: '0 16px 14px', marginTop: -34 }}>
+                <ProfilePhotoCard
+                  variant="bare"
+                  currentUrl={effectiveLogoUrl}
+                  onFileChange={(file) => { if (file) onLogoFile(file); }}
+                  onRemove={onLogoRemove}
+                />
+              </div>
+            </div>
+          </div>
 
           {/* 2. IDENTITY */}
           <IdentitySection
@@ -964,39 +963,6 @@ export default function BusinessProfileEditor() {
         initialName={clubSearchQuery}
       />
 
-      {/* Crop modals */}
-      {logoCropSrc && (
-        <ImageCropModal
-          open={logoCropOpen}
-          onOpenChange={(open) => {
-            if (!open && logoCropSrc) {
-              URL.revokeObjectURL(logoCropSrc);
-              setLogoCropSrc(null);
-            }
-            setLogoCropOpen(open);
-          }}
-          imageSrc={logoCropSrc}
-          aspectRatio={1 / 1.05}
-          onCropComplete={onLogoCropped}
-          title="Crop Logo"
-        />
-      )}
-      {coverCropSrc && (
-        <ImageCropModal
-          open={coverCropOpen}
-          onOpenChange={(open) => {
-            if (!open && coverCropSrc) {
-              URL.revokeObjectURL(coverCropSrc);
-              setCoverCropSrc(null);
-            }
-            setCoverCropOpen(open);
-          }}
-          imageSrc={coverCropSrc}
-          aspectRatio={COVER_ASPECT_RATIO}
-          onCropComplete={onCoverCropped}
-          title="Crop Cover Photo"
-        />
-      )}
     </>
   );
 }
