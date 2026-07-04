@@ -49,12 +49,14 @@ interface PostsTabContentProps {
   actorType: 'personal' | 'business';
   actorId: string;
   isOwnProfile?: boolean;
+  businessName?: string;
 }
 
 const PostsTabContent: React.FC<PostsTabContentProps> = ({
   actorType,
   actorId,
   isOwnProfile = false,
+  businessName,
 }) => {
   const navigate = useNavigate();
   const { user } = useSupabaseSession();
