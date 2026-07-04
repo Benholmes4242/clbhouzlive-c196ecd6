@@ -141,7 +141,14 @@ export const MediaCarousel: React.FC<Props> = ({
             >
               {isVideo ? (
                 mountVideo ? (
-                  <InlineVideo item={m} isActive={isActiveSlide} isNear={mountVideo} objectFit="cover" />
+                  <InlineVideo
+                    item={m}
+                    isActive={isActiveSlide}
+                    isNear={mountVideo}
+                    postId={postId ?? null}
+                    ownerKey={postId ? `${postId}:${i}` : `${m.id ?? 'noid'}:${i}`}
+                    objectFit="cover"
+                  />
                 ) : m.thumbnailUrl ? (
                   <img
                     src={m.thumbnailUrl}
