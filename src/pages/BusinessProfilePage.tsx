@@ -111,6 +111,26 @@ const BusinessProfilePage: React.FC = () => {
   const { data: followersCount = 0 } = useBusinessFollowersCount(business?.id);
   const { data: followingCount = 0 } = useBusinessFollowingCount(business?.id);
   const { data: teamMembers } = useBusinessTeam(business?.id);
+  const { data: reviewStats } = useBusinessReviewStats(business?.id);
+
+  // Home course (club_id only): first course under the business's club
+  const { data: homeCourse } = useQuery({
+    queryKey: ['business-home-course', business?.club_id],
+    enabled: !!business?.club_id,
+    staleTime: 5 * 60 * 1000,
+    queryFn: async () => {
+      if (!business?.club_id) return null;
+      const { data, error } = await supabase
+        .from('golf_courses')
+        .select('id, name, region, country')
+        .eq('club_id', business.club_id)
+        .order('created_at', { ascending: true })
+        .limit(1)
+        .maybeSingle();
+      if (error) throw error;
+      return data;
+    },
+  });
 
   const { activeActor } = useActiveActor();
   const viewerActorType: 'personal' | 'business' = activeActor?.type ?? 'personal';
