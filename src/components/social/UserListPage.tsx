@@ -357,6 +357,17 @@ export const UserListPage: React.FC<UserListPageProps> = ({
   const debouncedSearch = useDebounce(searchInput, 300);
   const [removedIds, setRemovedIds] = useState<Set<string>>(new Set());
 
+  // Snapshot safe-area top once so the sticky header height doesn't shift.
+  const [safeTop, setSafeTop] = useState(0);
+  useEffect(() => {
+    if (embeddedInShell || hideBackButton) return;
+    const probe = document.createElement('div');
+    probe.style.cssText = 'position:fixed;top:0;left:0;height:env(safe-area-inset-top,0px);width:0;visibility:hidden;pointer-events:none;';
+    document.body.appendChild(probe);
+    setSafeTop(Math.max(probe.getBoundingClientRect().height, 8));
+    document.body.removeChild(probe);
+  }, [embeddedInShell, hideBackButton]);
+
   const hasFollowingTab = mode === 'followers' && followingUsers !== undefined;
   const initialTab = searchParams.get('tab') === 'following' || initialTabOverride === 'following' ? 'following' : 'followers';
   const [activeTab, setActiveTab] = useState<'followers' | 'following'>(hasFollowingTab ? initialTab : 'followers');
