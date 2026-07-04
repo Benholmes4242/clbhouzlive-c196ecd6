@@ -63,6 +63,7 @@ const DateGroupLabel: React.FC<{ label: string }> = ({ label }) => (
 );
 
 const ActivityPage: React.FC = () => {
+  useHideBottomNav();
   const [chipFilter, setChipFilter] = useState<ChipFilter>('All');
 
   const { isRehydrating } = useRehydrationSafe();
