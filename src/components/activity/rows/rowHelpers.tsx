@@ -32,7 +32,10 @@ export function isBusinessEntityNotification(type: string): boolean {
     type === 'business_member_added' ||
     type === 'business_access_request' ||
     type === 'business_access_approved' ||
-    type === 'business_access_declined'
+    type === 'business_access_declined' ||
+    type === 'business_team_invited' ||
+    type === 'business_team_joined' ||
+    type === 'business_team_member_joined'
   );
 }
 
