@@ -182,7 +182,10 @@ export const CardFeed = forwardRef<CardFeedHandle, CardFeedProps>(function CardF
   // (iOS cold HLS attach ~1.3s vs. active-window ~400-800ms during scroll).
   const [playingIdx, setPlayingIdx] = useState(0);
   const settleTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const SETTLE_MS = 150;
+  const SETTLE_MS = 80;
+  const PLAY_IN = 0.5;
+  const PLAY_OUT = 0.35;
+  const HYSTERESIS = 0.1;
   const visibilityRef = useRef<Map<number, number>>(new Map());
   const observerRef = useRef<IntersectionObserver | null>(null);
   const cardEls = useRef<Map<number, HTMLElement>>(new Map());
@@ -223,36 +226,27 @@ export const CardFeed = forwardRef<CardFeedHandle, CardFeedProps>(function CardF
     }
   }, [playingIdx, posts]);
 
-  const recheckActive = useCallback(() => {
-    const viewportCenter = window.innerHeight / 2;
-    let bestIdx = -1;
-    let bestDist = Infinity;
 
-    visibilityRef.current.forEach((_ratio, idx) => {
-      const el = cardEls.current.get(idx);
-      if (!el) return;
-      const r = el.getBoundingClientRect();
-      const cardCenter = r.top + r.height / 2;
-      const dist = Math.abs(cardCenter - viewportCenter);
-      if (dist < bestDist) {
-        bestDist = dist;
-        bestIdx = idx;
-      }
+  const recheckActive = useCallback(() => {
+    // Platform-standard card-feed activation: eligible at >=PLAY_IN visible,
+    // most-visible eligible card wins, asymmetric PLAY_OUT + hysteresis to
+    // prevent boundary flicker.
+    let bestIdx = -1;
+    let bestRatio = 0;
+    visibilityRef.current.forEach((ratio, idx) => {
+      if (ratio > bestRatio) { bestRatio = ratio; bestIdx = idx; }
     });
 
-    if (bestIdx >= 0) {
-      setActiveIdx((prev) => {
-        if (prev === bestIdx) return prev;
-        const prevEl = cardEls.current.get(prev);
-        if (prevEl) {
-          const pr = prevEl.getBoundingClientRect();
-          const prevDist = Math.abs((pr.top + pr.height / 2) - viewportCenter);
-          // Hysteresis: require new card to be ≥40px closer to center.
-          if (prevDist - bestDist < 40) return prev;
-        }
-        return bestIdx;
-      });
-    }
+    setActiveIdx((prev) => {
+      const prevRatio = prev >= 0 ? (visibilityRef.current.get(prev) ?? 0) : 0;
+      // Keep current active while it's still >=PLAY_OUT and no one clearly beats it.
+      if (prev >= 0 && prevRatio >= PLAY_OUT && (bestRatio - prevRatio) < HYSTERESIS) return prev;
+      // Switch only to a card that has cleared the play-in threshold.
+      if (bestIdx >= 0 && bestRatio >= PLAY_IN) return bestIdx;
+      // If nothing qualifies (between cards), keep last active if still barely visible.
+      if (prev >= 0 && prevRatio >= PLAY_OUT) return prev;
+      return bestIdx >= 0 && bestRatio >= PLAY_OUT ? bestIdx : prev;
+    });
   }, []);
 
   useEffect(() => {
@@ -277,7 +271,7 @@ export const CardFeed = forwardRef<CardFeedHandle, CardFeedProps>(function CardF
         }
         recheckActive();
       },
-      { threshold: [0, 0.01, 0.25, 0.5, 0.75, 1.0] },
+      { threshold: [0, 0.1, 0.2, 0.3, 0.35, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0] },
     );
     observerRef.current = observer;
     return () => {
