@@ -25,6 +25,7 @@ import type { ActiveActor } from '@/types/actor';
 import { useFullscreenFeedStore } from '@/store/fullscreenFeedStore';
 import { openWithOrigin } from '@/lib/openWithOrigin';
 import { useClubhouseStore } from '@/store/clubhouseStore';
+import { fp } from '@/perf/feedPlayTelemetry';
 
 import { FeedCard } from './FeedCard';
 
