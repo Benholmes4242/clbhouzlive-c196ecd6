@@ -1056,8 +1056,8 @@ const InfiniteUserList: React.FC<InfiniteUserListProps> = ({
 
   return (
     <>
-      <div className="flex flex-col gap-2.5 px-4 pb-2">
-        {users.map((socialUser) => (
+      <div>
+        {users.map((socialUser, idx) => (
           <UserRowFlat
             key={socialUser.id}
             user={socialUser}
@@ -1066,6 +1066,7 @@ const InfiniteUserList: React.FC<InfiniteUserListProps> = ({
             onUserRemoved={onUserRemoved}
             relationshipStatus={relationshipMap[socialUser.id]}
             isOwnProfile={isOwnProfile}
+            isFirst={idx === 0}
           />
         ))}
       </div>
