@@ -16,3 +16,14 @@ export const SC_PAR       = '#9AA4B0'; // quiet slate — par nearly disappears
 export const SC_BOGEY     = '#B5703C'; // +1 muted clay
 export const SC_DOUBLE    = '#9B4722'; // +2 or worse — deep terracotta
 export const SC_ACCENT    = '#2F6B4F'; // pine accent — eyebrow/headers
+
+// Dark-surface ramp — same hue families, lifted for ink.
+// Severity inverts with surface: rarer = deeper on light,
+// rarer = brighter on dark.
+export const SC_ACE_DARK       = '#B7F0D3';
+export const SC_ALBATROSS_DARK = '#96E4BE';
+export const SC_EAGLE_DARK     = '#74D3A4';
+export const SC_BIRDIE_DARK    = '#55BD8B';
+export const SC_PAR_DARK       = 'rgba(242,244,247,0.40)';
+export const SC_BOGEY_DARK     = '#DE9A62';
+export const SC_DOUBLE_DARK    = '#E2794D';
