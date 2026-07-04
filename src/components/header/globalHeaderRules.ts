@@ -86,6 +86,18 @@ function isBusinessProfilePage(pathname: string): boolean {
   return segments.length === 3;
 }
 
+/**
+ * Business sub-pages that use ManagePageShell (own header, no global chrome).
+ * Matches /business/:id/verification, /business/:id/edit, /business/:id/insights,
+ * /business/:businessId/team, /business/:businessId/team/invite, /business/:businessId/activity.
+ */
+function isBusinessManagedSubPage(pathname: string): boolean {
+  if (!pathname.startsWith('/business/')) return false;
+  return (
+    /^\/business\/[^/]+\/(verification|edit|insights|team|activity)(\/.*)?$/.test(pathname)
+  );
+}
+
 export function isGlobalHeaderExcluded(pathname: string) {
   const isExcludedExact = (GLOBAL_HEADER_EXCLUDED_ROUTES as readonly string[]).some(
     (route) => pathname === route
@@ -98,7 +110,8 @@ export function isGlobalHeaderExcluded(pathname: string) {
   return (
     isExcludedExact ||
     isExcludedPrefix ||
-    isBusinessProfilePage(pathname)
+    isBusinessProfilePage(pathname) ||
+    isBusinessManagedSubPage(pathname)
   );
 }
 
