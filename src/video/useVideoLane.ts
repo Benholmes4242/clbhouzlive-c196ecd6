@@ -88,12 +88,18 @@ export function useVideoLane(
   // Auto play/pause based on `active`. play() is safe to call before mount:
   // the engine queues it and consumes on the next mountLane.
   useEffect(() => {
+    const callerPostId = opts.postId ?? null;
+    PPRACE('effect fire', { callerPostId, active: !!opts.active });
     if (opts.active) {
-      void VideoEngine.play(laneId);
+      void VideoEngine.play(laneId, { callerPostId });
     } else {
-      VideoEngine.pause(laneId);
+      VideoEngine.pause(laneId, { callerPostId });
     }
-  }, [laneId, opts.active]);
+    return () => {
+      PPRACE('effect cleanup', { callerPostId });
+    };
+  }, [laneId, opts.active, opts.postId]);
+
 
   // Apply mute.
   useEffect(() => {
