@@ -9,6 +9,7 @@ import { useVideoLane } from '@/video/useVideoLane';
 import { VideoEngine } from '@/video/VideoEngine';
 import { useFullscreenFeedStore } from '@/store/fullscreenFeedStore';
 import { fsv } from '@/perf/fsvTelemetry';
+import { usePostViewTracker } from '@/hooks/usePostViewTracker';
 
 interface FeedSlideProps {
   post: FeedPost;
