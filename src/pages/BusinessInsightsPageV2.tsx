@@ -72,6 +72,15 @@ const ReviewsSection = ({ businessId, navigate }: { businessId: string; navigate
         <p className="text-[0.8rem] text-muted-foreground text-center py-6">
           No reviews yet. Once golfers review your courses, you'll see ratings and feedback here.
         </p>
+        <div className="flex justify-center">
+          <button
+            onClick={() => navigate(`/business/${businessId}/reviews`)}
+            className="mt-1 inline-flex items-center gap-1.5 px-3 py-2 rounded-full text-[12.5px] font-bold active:opacity-90"
+            style={{ background: '#0F172A', color: '#fff', border: 'none' }}
+          >
+            Manage reviews
+          </button>
+        </div>
       </section>
     );
   }
