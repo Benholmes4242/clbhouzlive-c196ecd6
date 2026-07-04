@@ -11,6 +11,7 @@ import {
   Phone, Globe, MapPin, MoreHorizontal, Check, Loader2, ChevronLeft,
   Share2, Link2, AlertCircle, Camera, Flag, Pencil, Mail, MessageCircle,
   Instagram, Facebook, Youtube, Linkedin, Twitter, Music2,
+  Star, ChevronRight, Navigation, Calendar,
 } from 'lucide-react';
 import { toast } from 'sonner';
 
