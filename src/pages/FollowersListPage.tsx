@@ -64,10 +64,10 @@ const FollowersListPage = ({ initialTab = 'followers' }: { initialTab?: 'followe
 
   if (profileLoading) {
     return (
-      <div className="min-h-screen bg-background md:max-w-[620px] md:mx-auto">
+      <ManagePageShell title={initialTab === 'following' ? 'Following' : 'Followers'}>
+      <div className="min-h-screen bg-background">
         <div
           className="sticky top-0 bg-background border-b border-border px-4 pb-3 pt-2"
-          style={{ paddingTop: 'max(env(safe-area-inset-top, 0px), 47px)' }}
         >
           <div className="flex items-center gap-3 mb-3">
             <Skeleton className="w-9 h-9 rounded-full" />
@@ -91,19 +91,22 @@ const FollowersListPage = ({ initialTab = 'followers' }: { initialTab?: 'followe
           ))}
         </div>
       </div>
+      </ManagePageShell>
     );
   }
 
   if (!profileUser) {
     return (
+      <ManagePageShell title={initialTab === 'following' ? 'Following' : 'Followers'}>
       <div className="flex items-center justify-center min-h-screen">
         <p className="text-muted-foreground">User not found</p>
       </div>
+      </ManagePageShell>
     );
   }
 
   return (
-    <ManagePageShell title={initialTab === 'following' ? 'Following' : 'Followers'} onBack={() => window.history.back()}>
+    <ManagePageShell title={initialTab === 'following' ? 'Following' : 'Followers'}>
       <UserListPage
         mode="followers"
         title="Followers"
