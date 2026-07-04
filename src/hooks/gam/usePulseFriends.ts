@@ -173,14 +173,21 @@ export function usePulseFriends(userId: string | undefined) {
         const lastPlayed = friendRounds[0].play_date;
         if (lastPlayed < thirtyDaysAgo) continue;
 
+        // lastFive is newest-first (friendRounds is ordered play_date desc)
         const lastFive = friendRounds.slice(0, 5);
+        const last5NewestFirst: boolean[] = [];
         let strongRounds = 0;
         for (const r of lastFive) {
-          if (r.gross_score == null || r.course_par == null) continue;
-          const courseHcp = Math.round(r.hcp_at_time ?? 18);
+          // Skip rounds with missing data entirely -- never assume a handicap
+          if (r.gross_score == null || r.course_par == null || r.hcp_at_time == null) continue;
+          const courseHcp = Math.round(r.hcp_at_time);
           const netVsPar = r.gross_score - courseHcp - r.course_par;
-          if (netVsPar <= 2) strongRounds++;
+          const toHandicapOrBetter = netVsPar <= 0;
+          last5NewestFirst.push(toHandicapOrBetter);
+          if (toHandicapOrBetter) strongRounds++;
         }
+        // Strip renders oldest -> newest, left -> right
+        const last5 = last5NewestFirst.slice().reverse();
         const hot = strongRounds >= 3;
 
         const displayName: string = profile.display_name ?? 'Player';
@@ -200,6 +207,7 @@ export function usePulseFriends(userId: string | undefined) {
           delta90,
           hcp_series: series.map((p) => p.value),
           last_played: lastPlayed,
+          last5,
           hot,
         });
       }
