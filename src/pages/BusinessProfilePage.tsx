@@ -186,19 +186,19 @@ const BusinessProfilePage: React.FC = () => {
   // ───── image upload ─────
   const handleLogoFileSelected = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
+    e.target.value = '';
     if (!file) return;
     setCropImageSrc(URL.createObjectURL(file));
     setCropMode('logo');
     setIsCropModalOpen(true);
-    if (logoFileInputRef.current) logoFileInputRef.current.value = '';
   };
   const handleCoverFileSelected = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
+    e.target.value = '';
     if (!file) return;
     setCropImageSrc(URL.createObjectURL(file));
     setCropMode('cover');
     setIsCropModalOpen(true);
-    if (heroFileInputRef.current) heroFileInputRef.current.value = '';
   };
   const handleCropComplete = (croppedFile: File) => {
     setIsCropModalOpen(false);
