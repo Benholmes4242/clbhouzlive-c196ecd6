@@ -112,12 +112,11 @@ const FriendBadge: React.FC = () => (
     style={{
       display: 'inline-flex',
       alignItems: 'center',
-      padding: '2px 7px',
-      borderRadius: 5,
-      background: 'rgba(247,147,30,0.12)',
-      border: '1px solid rgba(247,147,30,0.28)',
+      padding: '2.5px 7px',
+      borderRadius: 6,
+      background: AMBER_SOFT,
       color: AMBER_DEEP,
-      fontSize: 8.5,
+      fontSize: 9.5,
       fontWeight: 800,
       letterSpacing: '0.12em',
       textTransform: 'uppercase',
@@ -130,13 +129,13 @@ const FriendBadge: React.FC = () => (
 );
 
 const HandicapInline: React.FC<{ value: number }> = ({ value }) => (
-  <span style={{ display: 'inline-flex', alignItems: 'baseline', gap: 4 }}>
+  <span style={{ display: 'inline-flex', alignItems: 'baseline', gap: 3 }}>
     <span
       style={{
-        fontSize: 9,
+        fontSize: 10,
         fontWeight: 800,
-        color: INK_SUBTLE,
-        letterSpacing: '0.14em',
+        color: INK_SOFT,
+        letterSpacing: '0.04em',
         textTransform: 'uppercase',
       }}
     >
@@ -157,6 +156,92 @@ const HandicapInline: React.FC<{ value: number }> = ({ value }) => (
   </span>
 );
 
+// Small amber-bar + uppercase label kicker (matches Activity)
+const Kicker: React.FC<{ label: string; barWidth?: number; color?: string }> = ({ label, barWidth = 26, color = AMBER_DEEP }) => (
+  <div className="flex items-center" style={{ gap: 8 }}>
+    <span style={{ width: barWidth, height: 2.5, background: AMBER, borderRadius: 2 }} />
+    <span
+      style={{
+        fontSize: 10.5,
+        fontWeight: 800,
+        letterSpacing: '0.14em',
+        textTransform: 'uppercase',
+        color,
+      }}
+    >
+      {label}
+    </span>
+  </div>
+);
+
+const SectionKicker: React.FC<{ label: string; count?: number }> = ({ label, count }) => (
+  <div style={{ padding: '18px 16px 10px' }}>
+    <div
+      style={{
+        fontSize: 10.5,
+        fontWeight: 800,
+        color: INK_45,
+        letterSpacing: '0.12em',
+        textTransform: 'uppercase',
+        marginBottom: 6,
+        fontFamily: FONT_SERIF,
+      }}
+    >
+      {label}{typeof count === 'number' ? ` · ${count.toLocaleString()}` : ''}
+    </div>
+    <div style={{ width: 22, height: 2.5, background: AMBER, borderRadius: 2 }} />
+  </div>
+);
+
+interface PillTabProps {
+  label: string;
+  count: number;
+  isActive: boolean;
+  onClick: () => void;
+  size?: 'md' | 'sm';
+}
+
+const PillTab: React.FC<PillTabProps> = ({ label, count, isActive, onClick, size = 'md' }) => {
+  const small = size === 'sm';
+  return (
+    <button
+      onClick={onClick}
+      aria-pressed={isActive}
+      className="shrink-0 inline-flex items-center transition-all active:scale-[0.96]"
+      style={{
+        padding: small ? '6px 12px' : '8px 14px',
+        borderRadius: 30,
+        background: isActive ? INK : '#FFFFFF',
+        color: isActive ? '#FFFFFF' : INK_SOFT,
+        border: isActive ? '1px solid transparent' : `1px solid ${HAIR2}`,
+        fontSize: small ? 12.5 : 13,
+        fontWeight: small ? 700 : 600,
+        gap: 6,
+        fontFamily: FONT_SERIF,
+        cursor: 'pointer',
+      }}
+    >
+      {label}
+      {count > 0 && (
+        <span
+          className="tabular-nums"
+          style={{
+            fontSize: 10.5,
+            fontWeight: 800,
+            padding: '2px 7px',
+            borderRadius: 20,
+            background: isActive ? 'rgba(255,255,255,0.18)' : '#F1F5F9',
+            color: isActive ? '#FFFFFF' : INK_SOFT,
+            lineHeight: 1,
+          }}
+        >
+          {count.toLocaleString()}
+        </span>
+      )}
+    </button>
+  );
+};
+
 interface FollowingFilterChipProps {
   label: string;
   count: number;
@@ -165,37 +250,7 @@ interface FollowingFilterChipProps {
 }
 
 const FollowingFilterChip: React.FC<FollowingFilterChipProps> = ({ label, count, isActive, onClick }) => (
-  <button
-    onClick={onClick}
-    aria-pressed={isActive}
-    style={{
-      minHeight: 32,
-      padding: '6px 14px',
-      background: isActive ? INK : 'transparent',
-      color: isActive ? '#FFFFFF' : INK_SOFT,
-      border: isActive ? '1px solid transparent' : `1px solid ${BORDER}`,
-      borderRadius: 999,
-      fontSize: 13,
-      fontWeight: 700,
-      cursor: 'pointer',
-      display: 'inline-flex',
-      alignItems: 'center',
-      gap: 5,
-      flexShrink: 0,
-    }}
-  >
-    {label}
-    <span
-      style={{
-        fontSize: 11,
-        fontWeight: 700,
-        color: isActive ? 'rgba(255,255,255,0.7)' : INK_SUBTLE,
-        fontVariantNumeric: 'tabular-nums',
-      }}
-    >
-      {count.toLocaleString()}
-    </span>
-  </button>
+  <PillTab label={label} count={count} isActive={isActive} onClick={onClick} size="sm" />
 );
 
 // ---------------------------------------------------------------------------
