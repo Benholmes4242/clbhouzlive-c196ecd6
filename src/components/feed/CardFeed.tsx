@@ -26,6 +26,7 @@ import { useFullscreenFeedStore } from '@/store/fullscreenFeedStore';
 import { openWithOrigin } from '@/lib/openWithOrigin';
 import { useClubhouseStore } from '@/store/clubhouseStore';
 import { fp } from '@/perf/feedPlayTelemetry';
+import { VideoEngine } from '@/video/VideoEngine';
 
 import { FeedCard } from './FeedCard';
 
@@ -203,10 +204,23 @@ export const CardFeed = forwardRef<CardFeedHandle, CardFeedProps>(function CardF
     };
   }, [activeIdx, posts]);
 
-  // [FEEDPLAY] mark FP_PLAYING_IDX when the settle-promoted index changes.
+  // [FEEDPLAY] mark FP_PLAYING_IDX when the settle-promoted index changes,
+  // and warm the NEXT card's HLS into the `feed-next` lane so its manifest
+  // + first segment are already in the CDN/hls cache when it becomes active.
   useEffect(() => {
     const p = posts[playingIdx];
     if (p && p.mediaItems?.[0]?.type === 'video') fp.playingIdx(p.id);
+    const next = posts[playingIdx + 1];
+    const nextMedia = next?.mediaItems?.[0];
+    if (next && nextMedia?.type === 'video' && (nextMedia as any).hlsUrl) {
+      try {
+        VideoEngine.preload('feed-next', {
+          hlsUrl: (nextMedia as any).hlsUrl,
+          posterUrl: (nextMedia as any).thumbnailUrl ?? null,
+          postId: next.id,
+        });
+      } catch { /* engine may not be booted yet — safe to ignore */ }
+    }
   }, [playingIdx, posts]);
 
   const recheckActive = useCallback(() => {

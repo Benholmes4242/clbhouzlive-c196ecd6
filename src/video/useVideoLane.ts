@@ -1,9 +1,15 @@
 /**
  * useVideoLane — thin React binding for VideoEngine.
  *
- * Mounts a lane's <video> element into `hostRef`, loads the given source,
- * optionally auto-plays when `active` is true. React never owns the lane
- * element — the engine does. This hook only wires refs and reports state.
+ * Mounts a lane's <video> element into `hostRef` **only when the card is
+ * active**, so the shared lane element FOLLOWS activation across the feed
+ * (appendChild atomically moves the node from the previous host to the new
+ * one). React never owns the lane element — the engine does. This hook
+ * only wires refs and reports state.
+ *
+ * The mount / load / play effects are all keyed on `active`: exactly one
+ * card at a time asks the engine to mount + load + play. Neighbours stay
+ * on their posters until they take over.
  */
 
 import { useEffect, useRef, useState } from 'react';
@@ -38,32 +44,36 @@ export function useVideoLane(
     return VideoEngine.snapshot(laneId);
   });
 
-  // Mount lane element into hostRef.
+  // Mount the lane element into THIS card's host — but only while active.
+  // When another card becomes active, its mount effect appendChild's the
+  // element out of us automatically; no explicit unmount needed here.
   useEffect(() => {
-    if (!hostRef.current) return;
+    if (!opts.active || !hostRef.current) return;
     VideoEngine.mountLane(laneId, hostRef.current);
-    return () => {
-      VideoEngine.unmountLane(laneId);
-    };
-  }, [laneId]);
+    // No cleanup: the next active card will move the element away, or
+    // the fullscreen close path will call release/unmountLane as needed.
+  }, [laneId, opts.active]);
 
   // Subscribe to lane state.
   useEffect(() => {
     return VideoEngine.subscribe(laneId, setSnapshot);
   }, [laneId]);
 
-  // Load source when it changes.
+  // Load source — only for the active card (avoids every mounted card
+  // thrashing the shared lane on scroll). Same postId+url is a no-op
+  // inside the engine, so remounting the active card is cheap.
   useEffect(() => {
-    if (!opts.hlsUrl) return;
+    if (!opts.active || !opts.hlsUrl) return;
     VideoEngine.load(laneId, {
       hlsUrl: opts.hlsUrl,
       posterUrl: opts.posterUrl ?? null,
       startPosition: opts.startPosition ?? -1,
       postId: opts.postId ?? null,
     });
-  }, [laneId, opts.hlsUrl, opts.posterUrl, opts.startPosition, opts.postId]);
+  }, [laneId, opts.active, opts.hlsUrl, opts.posterUrl, opts.startPosition, opts.postId]);
 
-  // Auto play/pause based on `active`.
+  // Auto play/pause based on `active`. play() is safe to call before mount:
+  // the engine queues it and consumes on the next mountLane.
   useEffect(() => {
     if (opts.active) {
       void VideoEngine.play(laneId);

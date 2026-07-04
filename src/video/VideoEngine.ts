@@ -54,9 +54,14 @@ interface Lane {
   firstFrame: boolean;
   /** postId this lane's current source belongs to (for lastPos tracking). */
   postId: string | null;
+  /** Non-hidden host the lane element is currently mounted into (null while parked). */
+  mountedHost: HTMLElement | null;
+  /** play() called before mount — consumed by the next mountLane. */
+  pendingPlay: boolean;
   listeners: Set<LaneListener>;
   detachFns: Array<() => void>;
 }
+
 
 const DBG = (...args: unknown[]) => {
   if (typeof window !== 'undefined' && (window as any).__VIDEO_ENGINE_DBG__) {
@@ -126,6 +131,8 @@ class VideoEngineImpl {
         startPosition: -1,
         firstFrame: false,
         postId: null,
+        mountedHost: null,
+        pendingPlay: false,
         listeners: new Set(),
         detachFns: [],
       });
@@ -148,12 +155,25 @@ class VideoEngineImpl {
     return lane;
   }
 
-  /** Move the lane's <video> into a host container. Instance stays bound. */
+  /**
+   * Move the lane's <video> into a host container. Idempotent + move-safe:
+   * appendChild atomically removes the element from any previous parent and
+   * inserts it here. Safe to call from whichever card just became active.
+   */
   mountLane(laneId: LaneId, hostEl: HTMLElement): void {
     const lane = this.getLane(laneId);
     if (lane.el.parentElement !== hostEl) {
       hostEl.appendChild(lane.el);
       DBG(laneId, 'mounted');
+    }
+    lane.mountedHost = hostEl;
+    // If play() was called before we had a real host, kick it off now.
+    if (lane.pendingPlay) {
+      lane.pendingPlay = false;
+      const p = lane.el.play();
+      if (p && typeof (p as Promise<void>).catch === 'function') {
+        (p as Promise<void>).catch(() => { /* autoplay reject — safe */ });
+      }
     }
   }
 
@@ -165,6 +185,8 @@ class VideoEngineImpl {
       host.appendChild(lane.el);
       DBG(laneId, 'unmounted');
     }
+    lane.mountedHost = null;
+    lane.pendingPlay = false;
   }
 
   /**
@@ -177,6 +199,18 @@ class VideoEngineImpl {
   ): void {
     const lane = this.getLane(laneId);
     const { hlsUrl, posterUrl = null, startPosition = -1, postId = null } = opts;
+    // Same postId + same URL already loaded → no reload. This makes remount
+    // (element moving between card hosts) cheap and avoids re-fetching HLS.
+    const alreadyLoaded =
+      lane.postId != null &&
+      lane.postId === postId &&
+      lane.hlsUrl === hlsUrl &&
+      lane.state !== 'idle' &&
+      lane.state !== 'error';
+    if (alreadyLoaded) {
+      DBG(laneId, 'skip reload: same postId+url', { state: lane.state });
+      return;
+    }
     // [FEEDPLAY] mark laneLoad for feed-active lane.
     if (laneId === 'feed-active') {
       const preloaded =
@@ -285,6 +319,27 @@ class VideoEngineImpl {
     DBG(laneId, 'load', { hlsUrl, startPosition });
   }
 
+  /**
+   * Preload a source into a lane without playing it. Used to warm the
+   * next feed card (via the `feed-next` lane) so manifest + first segment
+   * are fetched before activation → near-instant play on centering.
+   */
+  preload(
+    laneId: LaneId,
+    opts: { hlsUrl: string; posterUrl?: string | null; postId?: string | null }
+  ): void {
+    this.load(laneId, {
+      hlsUrl: opts.hlsUrl,
+      posterUrl: opts.posterUrl ?? null,
+      startPosition: -1,
+      postId: opts.postId ?? null,
+    });
+    // Explicitly ensure the preload lane is paused (its element is in the
+    // hidden host — nothing to render — but paused keeps the decoder cool).
+    const lane = this.getLane(laneId);
+    if (!lane.el.paused) lane.el.pause();
+  }
+
   private wireElementEvents(lane: Lane, _usingHls: boolean) {
     const el = lane.el;
     const markFsFirstFrame = () => {
@@ -366,6 +421,14 @@ class VideoEngineImpl {
 
   play(laneId: LaneId): Promise<void> {
     const lane = this.getLane(laneId);
+    // Guard: no play until the lane element is mounted into a real host.
+    // Effects across sibling cards can race; queue the intent and let
+    // mountLane consume it once the element lands in the active card.
+    if (!lane.mountedHost) {
+      lane.pendingPlay = true;
+      DBG(laneId, 'play() queued — no mounted host');
+      return Promise.resolve();
+    }
     if (laneId === 'feed-active') fp.playCall(lane.postId);
     const p = lane.el.play();
     return Promise.resolve(p).catch((err) => {
