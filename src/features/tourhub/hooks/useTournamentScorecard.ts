@@ -46,8 +46,9 @@ export function useTournamentScorecard(
         byRound.get(r.round_number)!.push({
           hole: r.hole_number,
           par: r.par,
-          strokes: r.strokes,
-          scoreToPar: r.score_to_par,
+          // Sportradar writes 0 for unreached holes -- treat as unplayed
+          strokes: r.strokes != null && r.strokes > 0 ? r.strokes : null,
+          scoreToPar: r.strokes != null && r.strokes > 0 ? r.score_to_par : null,
         });
       }
 

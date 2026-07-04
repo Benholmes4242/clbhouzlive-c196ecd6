@@ -30,7 +30,9 @@ export const TrajectoryLine: React.FC<Props> = ({
 }) => {
   const w = 358;
   const padX = 6;
-  const plottable = holes.filter((h) => h.par != null && h.strokes != null);
+  const plottable = holes.filter(
+    (h) => h.par != null && h.strokes != null && h.strokes > 0,
+  );
   if (plottable.length < 2) return null;
 
   let cum = 0;

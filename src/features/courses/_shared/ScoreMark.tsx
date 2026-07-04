@@ -40,7 +40,7 @@ type Variant =
   | 'triple';
 
 const variantFor = (strokes: number | null | undefined, par: number): Variant => {
-  if (strokes == null) return 'empty';
+  if (strokes == null || strokes <= 0) return 'empty';
   if (strokes === 1) return 'hio';
   const diff = strokes - par;
   if (diff <= -3) return 'alba';
