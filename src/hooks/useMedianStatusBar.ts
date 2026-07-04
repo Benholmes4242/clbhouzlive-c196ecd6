@@ -180,8 +180,9 @@ export function useMedianStatusBar(
     window.addEventListener('focus', handleFocus);
 
     return () => {
-      clearTimeout(t1);
-      clearTimeout(t2);
+      if (t1) clearTimeout(t1);
+      if (t2) clearTimeout(t2);
+
       document.removeEventListener('visibilitychange', handleVisibility);
       window.removeEventListener('focus', handleFocus);
 
