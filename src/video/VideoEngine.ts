@@ -392,12 +392,17 @@ class VideoEngineImpl {
   private wireElementEvents(lane: Lane, _usingHls: boolean) {
     const el = lane.el;
     const trace = isFsv(lane.id);
-    const markFsFirstFrame = (source: string) => {
-      if (lane.firstFrame || lane.id !== 'fullscreen') return;
+    // Unified "ready to show" gate for BOTH fullscreen (open) and feed-active
+    // (close/resume). Only flip firstFrame once the element has actually
+    // seeked to (or past) the requested position — preventing frame-0 flash.
+    const markReadyToShow = (source: string) => {
+      if (lane.firstFrame) return;
+      if (lane.id !== 'fullscreen' && lane.id !== 'feed-active') return;
       const target = lane.startPosition > 0 ? lane.startPosition : 0;
       const now = lane.el.currentTime || 0;
-      // Only fire once the element has actually reached (or passed) the requested seek.
-      if (target > 0 && now < target - 0.5) {
+      // With a seek target, wait until element playhead is at/past target - 0.3s.
+      // Without a target (startPosition<=0), any painted frame counts.
+      if (target > 0 && now < target - 0.3) {
         if (trace) {
           fsv('eng.markFF', {
             laneId: lane.id, source, target: +target.toFixed(3),
@@ -419,20 +424,18 @@ class VideoEngineImpl {
     const onLoadedMeta = () => { if (trace) fsvEl('el.loadedmeta', el, { laneId: lane.id, startPos: lane.startPosition }); };
     const onLoadedData = () => {
       if (trace) fsvEl('el.loadeddata', el, { laneId: lane.id, startPos: lane.startPosition });
-      if (!lane.firstFrame && lane.id === 'feed-active') {
-        lane.firstFrame = true;
-        this.emit(lane);
-      }
       if (this.loadingCount > 0) this.loadingCount--;
       if (lane.state === 'loading') this.transition(lane, 'ready');
-      // Fullscreen with startPosition === 0 (or none) can fire immediately too.
-      if (lane.id === 'fullscreen' && (lane.startPosition <= 0)) markFsFirstFrame('loadeddata@start<=0');
+      // loadeddata alone does NOT flip firstFrame anymore — we wait for the
+      // seek to land. When there IS no seek target, loadeddata is enough.
+      if (lane.startPosition <= 0) markReadyToShow('loadeddata@start<=0');
     };
     const onSeeking = () => { if (trace) fsvEl('el.seeking', el, { laneId: lane.id, target: lane.startPosition }); };
     const onSeeked = () => {
       if (trace) fsvEl('el.seeked', el, { laneId: lane.id, target: lane.startPosition });
-      markFsFirstFrame('seeked');
+      markReadyToShow('seeked');
     };
+
     const onPlaying = () => { if (trace) fsvEl('el.playing', el, { laneId: lane.id }); };
     const onWaiting = () => { if (trace) fsvEl('el.waiting', el, { laneId: lane.id }); };
     const onStalled = () => { if (trace) fsvEl('el.stalled', el, { laneId: lane.id }); };
@@ -441,7 +444,7 @@ class VideoEngineImpl {
     const onTime = () => {
       if (lane.postId) this.lastPos.set(lane.postId, lane.el.currentTime || 0);
       if (trace) fsvTimeSample(`${lane.id}:time`, el, { laneId: lane.id, target: lane.startPosition });
-      if (lane.id === 'fullscreen' && !lane.firstFrame) markFsFirstFrame('timeupdate');
+      if (!lane.firstFrame) markReadyToShow('timeupdate');
       // Gapless loop for short clips (<15s): native loop leaves a 100-300ms
       // gap on iOS HLS. Preempt the seam by seeking to 0 + play() ourselves.
       const dur = lane.el.duration;
