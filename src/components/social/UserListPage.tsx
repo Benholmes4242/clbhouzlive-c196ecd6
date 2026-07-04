@@ -805,28 +805,37 @@ const EmptyState: React.FC<{
   onCta?: () => void;
 }> = ({ eyebrow, icon, heading, body, ctaLabel, ctaIsAmber, onCta }) => (
   <div className="flex flex-col items-center justify-center py-16 px-6">
-    <div style={{ marginBottom: 12 }}>
-      <SectionHeader tier="standard" kicker={eyebrow} />
-    </div>
+    {eyebrow && (
+      <div style={{ marginBottom: 14 }}>
+        <Kicker label={eyebrow} />
+      </div>
+    )}
     <div
-      className="w-16 h-16 rounded-full flex items-center justify-center mb-4"
-      style={{ background: 'rgba(15,23,42,0.05)', border: `1px solid ${BORDER}` }}
+      className="flex items-center justify-center mb-4"
+      style={{
+        width: 56,
+        height: 56,
+        borderRadius: '34%',
+        background: AMBER_SOFT,
+        color: AMBER_DEEP,
+      }}
     >
       {icon}
     </div>
     <h3
       style={{
         fontFamily: FONT_SERIF,
-        fontSize: 20,
-        fontWeight: 700,
+        fontSize: 15.5,
+        fontWeight: 800,
         color: INK,
         marginBottom: 4,
         textAlign: 'center',
+        letterSpacing: '-0.01em',
       }}
     >
       {heading}
     </h3>
-    <p className="text-sm text-center max-w-[280px] mb-6" style={{ color: INK_SOFT }}>
+    <p className="text-center max-w-[280px] mb-6" style={{ color: INK_45, fontSize: 13, lineHeight: 1.5 }}>
       {body}
     </p>
     {ctaLabel && onCta && (
@@ -844,6 +853,148 @@ const EmptyState: React.FC<{
     )}
   </div>
 );
+
+// ---------------------------------------------------------------------------
+// Suggested golfers — compact horizontal rail
+// ---------------------------------------------------------------------------
+
+const SuggestedRail: React.FC<{ userId: string; onViewAll: () => void }> = ({ userId, onViewAll }) => {
+  const { data: creators, isLoading } = useSuggestedCreators(userId);
+  const items = (creators ?? []).filter((c) => !c.isFollowed).slice(0, 12);
+
+  if (!isLoading && items.length === 0) return null;
+
+  return (
+    <div style={{ padding: '16px 0 12px', background: BG_SURFACE }}>
+      <div className="flex items-end justify-between px-4" style={{ marginBottom: 10 }}>
+        <Kicker label="Suggested Golfers" />
+        <button
+          onClick={onViewAll}
+          className="inline-flex items-center active:opacity-70"
+          style={{
+            gap: 2,
+            fontSize: 12.5,
+            fontWeight: 700,
+            color: AMBER_DEEP,
+            background: 'transparent',
+            border: 'none',
+            cursor: 'pointer',
+            fontFamily: FONT_SERIF,
+          }}
+        >
+          See all
+          <ChevronRight size={14} strokeWidth={2.5} />
+        </button>
+      </div>
+      <div
+        className="flex overflow-x-auto scrollbar-none"
+        style={{ gap: 10, padding: '0 16px', scrollbarWidth: 'none' }}
+      >
+        {isLoading && items.length === 0
+          ? [1, 2, 3, 4].map((i) => <SuggestedRailSkeleton key={i} />)
+          : items.map((c) => <SuggestedRailCard key={c.userId} creator={c} />)}
+      </div>
+    </div>
+  );
+};
+
+const SuggestedRailSkeleton: React.FC = () => (
+  <div
+    className="shrink-0 animate-pulse"
+    style={{
+      width: 128,
+      background: '#FFFFFF',
+      border: `1px solid ${HAIR}`,
+      borderRadius: 16,
+      padding: 12,
+    }}
+  >
+    <div style={{ width: 56, height: 58, borderRadius: '34%', background: 'rgba(15,23,42,0.08)', margin: '0 auto 10px' }} />
+    <div style={{ height: 10, borderRadius: 4, background: 'rgba(15,23,42,0.08)', marginBottom: 6 }} />
+    <div style={{ height: 8, borderRadius: 4, background: 'rgba(15,23,42,0.06)', marginBottom: 10, width: '70%' }} />
+    <div style={{ height: 28, borderRadius: 18, background: 'rgba(15,23,42,0.08)' }} />
+  </div>
+);
+
+const SuggestedRailCard: React.FC<{ creator: SuggestedCreator }> = ({ creator }) => {
+  const navigate = useNavigate();
+  const { followUser, unfollowUser, loading } = useFollowUser();
+  const [followed, setFollowed] = useState<boolean>(!!creator.isFollowed);
+
+  const handleFollow = async (e: React.MouseEvent) => {
+    e.stopPropagation();
+    const prev = followed;
+    setFollowed(!prev);
+    const ok = prev ? await unfollowUser(creator.userId) : await followUser(creator.userId);
+    if (!ok) setFollowed(prev);
+  };
+
+  const goProfile = () => {
+    const path = getProfilePathById(creator.userId, false, creator.username);
+    navigate(path);
+  };
+
+  return (
+    <div
+      role="button"
+      tabIndex={0}
+      onClick={goProfile}
+      onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') goProfile(); }}
+      className="shrink-0 active:scale-[0.98] transition-transform cursor-pointer"
+      style={{
+        width: 128,
+        background: '#FFFFFF',
+        border: `1px solid ${HAIR}`,
+        borderRadius: 16,
+        padding: 12,
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        textAlign: 'center',
+      }}
+    >
+      <SquircleAvatar
+        src={creator.avatarUrl || undefined}
+        alt={creator.displayName}
+        size={56}
+        fallback={creator.displayName?.charAt(0) || '?'}
+        hideRing
+        className="mb-2"
+      />
+      <div
+        className="truncate w-full"
+        style={{ fontSize: 12.5, fontWeight: 700, color: INK, fontFamily: FONT_SERIF, letterSpacing: '-0.005em' }}
+      >
+        {creator.displayName}
+      </div>
+      <div
+        className="truncate w-full"
+        style={{ fontSize: 11, color: INK_45, marginBottom: 10, minHeight: 14 }}
+      >
+        {creator.homeCourse || (creator.username ? `@${creator.username}` : '')}
+      </div>
+      <button
+        onClick={handleFollow}
+        disabled={loading}
+        className="w-full inline-flex items-center justify-center active:scale-[0.97]"
+        style={{
+          height: 28,
+          borderRadius: 18,
+          fontSize: 12,
+          fontWeight: 700,
+          fontFamily: FONT_SERIF,
+          background: followed ? '#FFFFFF' : INK,
+          color: followed ? INK : '#FFFFFF',
+          border: followed ? `1px solid ${HAIR2}` : 'none',
+          cursor: loading ? 'default' : 'pointer',
+          opacity: loading ? 0.7 : 1,
+        }}
+      >
+        {followed ? 'Following' : 'Follow'}
+      </button>
+    </div>
+  );
+};
 
 // ---------------------------------------------------------------------------
 // InfiniteUserList
