@@ -10,8 +10,8 @@ export type BusinessEventType =
   | 'review_submitted'
   | 'follow';
 
-export type ActionType = 'call' | 'website' | 'directions' | 'message';
-export type SourceType = 'search' | 'content' | 'course_page' | 'share' | 'direct';
+export type ActionType = 'call' | 'website' | 'directions' | 'message' | 'email' | 'save' | 'share_profile';
+export type SourceType = 'search' | 'content' | 'course_page' | 'share' | 'direct' | 'directory' | 'feed';
 
 interface TrackEventParams {
   businessId: string;
