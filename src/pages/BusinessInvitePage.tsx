@@ -1,136 +1,308 @@
-import { useState } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { ChevronLeft, Mail, Shield, Edit3, BarChart3, Check } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { useCreateInvite, AssignableBusinessRole } from '@/hooks/useBusinessTeam';
-import { toast } from 'sonner';
+import { Search, Mail, AtSign, Shield, Edit3, BarChart3, Check, X, UserPlus } from 'lucide-react';
+import { motion } from 'framer-motion';
+import { supabase } from '@/integrations/supabase/client';
+import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
+import { ManagePageShell } from '@/components/manage/ManagePageShell';
+import { useDebounce } from '@/hooks/useDebounce';
+import { useHideBottomNav } from '@/hooks/useBottomNavVisibility';
+import { useHideHeader } from '@/hooks/useHeaderVisibility';
+import {
+  useCreateInvite, useCreateInviteByUser,
+  AssignableBusinessRole, BUSINESS_ROLE_LABELS,
+} from '@/hooks/useBusinessTeam';
 
-const roles: ReadonlyArray<{ value: AssignableBusinessRole; label: string; icon: typeof Shield; description: string }> = [
-  { value: 'admin', label: 'Admin', icon: Shield, description: 'Manage the business profile, posts, and team.' },
-  { value: 'editor', label: 'Editor', icon: Edit3, description: 'Create and publish posts as the business.' },
-  { value: 'analyst', label: 'Analyst', icon: BarChart3, description: 'View insights and analytics only.' },
+const INK = '#0F172A';
+const INK_45 = '#64748B';
+const HAIR = 'rgba(15,23,42,0.08)';
+const AMBER = '#F7931E';
+const AMBER_SOFT = 'rgba(247,147,30,0.10)';
+const CARD_BG = '#FFFFFF';
+
+interface UserResult {
+  id: string;
+  username: string;
+  display_name: string | null;
+  profile_photo_url: string | null;
+}
+
+const ROLES: ReadonlyArray<{ value: AssignableBusinessRole; label: string; description: string; icon: typeof Shield }> = [
+  { value: 'admin', label: 'Admin', description: 'Manage the business profile, posts, and team.', icon: Shield },
+  { value: 'editor', label: 'Editor', description: 'Create and publish posts as the business.', icon: Edit3 },
+  { value: 'analyst', label: 'Analyst', description: 'View insights and analytics only.', icon: BarChart3 },
 ];
+
+const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 export default function BusinessInvitePage() {
   const { businessId } = useParams<{ businessId: string }>();
   const navigate = useNavigate();
-  const createInvite = useCreateInvite(businessId || '');
 
-  const [email, setEmail] = useState('');
+  useHideBottomNav();
+  useHideHeader();
+
+  const createEmailInvite = useCreateInvite(businessId || '');
+  const createUserInvite = useCreateInviteByUser(businessId || '');
+
+  const [query, setQuery] = useState('');
+  const [pickedUser, setPickedUser] = useState<UserResult | null>(null);
   const [role, setRole] = useState<AssignableBusinessRole>('editor');
+  const [results, setResults] = useState<UserResult[]>([]);
+  const [isSearching, setIsSearching] = useState(false);
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!email.trim()) return;
+  const debounced = useDebounce(query, 250);
+  const isEmail = useMemo(() => EMAIL_RE.test(query.trim()), [query]);
 
+  useEffect(() => {
+    let cancelled = false;
+    async function run() {
+      if (pickedUser) return;
+      const q = debounced.trim();
+      if (q.length < 2 || EMAIL_RE.test(q)) {
+        setResults([]);
+        return;
+      }
+      setIsSearching(true);
+      try {
+        const clean = q.replace(/^@/, '');
+        const { data, error } = await supabase
+          .from('public_profiles')
+          .select('id, username, display_name, profile_photo_url')
+          .or(`username.ilike.%${clean}%,display_name.ilike.%${clean}%`)
+          .limit(10);
+        if (error) throw error;
+        if (!cancelled) setResults((data || []) as UserResult[]);
+      } catch {
+        if (!cancelled) setResults([]);
+      } finally {
+        if (!cancelled) setIsSearching(false);
+      }
+    }
+    run();
+    return () => { cancelled = true; };
+  }, [debounced, pickedUser]);
+
+  const canSend = !!businessId && !!role && (pickedUser || (isEmail && !!query.trim()));
+
+  const handleSend = async () => {
+    if (!businessId || !canSend) return;
     try {
-      await createInvite.mutateAsync({ email, role });
-      toast.success('Invite sent');
+      if (pickedUser) {
+        await createUserInvite.mutateAsync({ userId: pickedUser.id, role });
+      } else {
+        await createEmailInvite.mutateAsync({ email: query.trim(), role });
+      }
       navigate(-1);
     } catch {
-      toast.error('Failed to send invite');
+      /* toast handled in hook */
     }
   };
 
-  if (!businessId) return null;
+  const pending = createEmailInvite.isPending || createUserInvite.isPending;
 
   return (
-    <div className="min-h-screen bg-background md:max-w-[620px] md:mx-auto">
-      {/* Header */}
-      <div className="sticky top-0 z-10 bg-background/95 backdrop-blur-xl border-b border-border" style={{ paddingTop: 'max(env(safe-area-inset-top, 0px), 8px)' }}>
-        <div className="flex items-center px-4 h-14">
-          <button
-            onClick={() => navigate(-1)}
-            className="min-h-[44px] min-w-[44px] flex items-center justify-center -ml-2 text-foreground active:scale-[0.97] transition-transform"
+    <ManagePageShell title="Invite to team">
+      <main className="px-4 pt-4 pb-32 max-w-lg mx-auto">
+        <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }}>
+          <p className="text-[13px] leading-relaxed mb-5" style={{ color: INK_45 }}>
+            They'll get an email and a clbhouz notification to accept. You can change their role or remove access anytime.
+          </p>
+
+          {/* Recipient */}
+          <div
+            className="mb-5"
+            style={{
+              background: CARD_BG,
+              border: `1px solid ${HAIR}`,
+              borderRadius: 14,
+              padding: 14,
+            }}
           >
-            <ChevronLeft className="w-5 h-5" />
-          </button>
-          <div className="flex-1 text-center">
-            <h1 className="text-[16px] font-semibold text-foreground">Invite to Team</h1>
+            <label className="text-[10.5px] font-bold uppercase tracking-[0.08em]" style={{ color: INK_45 }}>
+              Recipient
+            </label>
+
+            {pickedUser ? (
+              <div className="mt-2 flex items-center gap-3 py-2">
+                <SquircleAvatar
+                  src={pickedUser.profile_photo_url || undefined}
+                  alt={pickedUser.display_name || pickedUser.username}
+                  size={40}
+                  hideRing
+                />
+                <div className="flex-1 min-w-0">
+                  <p className="font-semibold text-[14px] truncate" style={{ color: INK }}>
+                    {pickedUser.display_name || pickedUser.username}
+                  </p>
+                  <p className="text-[12px] truncate" style={{ color: INK_45 }}>@{pickedUser.username}</p>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => { setPickedUser(null); setQuery(''); }}
+                  className="h-8 w-8 flex items-center justify-center rounded-full active:bg-black/[0.06]"
+                  aria-label="Clear recipient"
+                >
+                  <X size={16} color={INK_45} />
+                </button>
+              </div>
+            ) : (
+              <>
+                <div className="relative mt-2">
+                  <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2" style={{ color: INK_45 }} />
+                  <input
+                    type="text"
+                    value={query}
+                    onChange={(e) => setQuery(e.target.value)}
+                    placeholder="Email or @handle"
+                    autoCapitalize="none"
+                    autoComplete="off"
+                    autoCorrect="off"
+                    className="w-full pl-10 pr-3 py-2.5 text-[14px] outline-none"
+                    style={{
+                      background: '#F8FAFC',
+                      border: `1px solid ${HAIR}`,
+                      borderRadius: 10,
+                      color: INK,
+                    }}
+                  />
+                </div>
+
+                {/* State hints */}
+                {query.trim().length >= 2 && (
+                  <div className="mt-3 space-y-1">
+                    {isEmail ? (
+                      <div className="flex items-center gap-2 py-2 px-1 text-[13px]" style={{ color: INK_45 }}>
+                        <Mail size={14} />
+                        Will send an email invite to <span className="font-semibold" style={{ color: INK }}>{query.trim()}</span>
+                      </div>
+                    ) : isSearching ? (
+                      <div className="py-3 text-center text-[12px]" style={{ color: INK_45 }}>Searching…</div>
+                    ) : results.length > 0 ? (
+                      results.map((u) => (
+                        <button
+                          key={u.id}
+                          type="button"
+                          onClick={() => { setPickedUser(u); setQuery(''); setResults([]); }}
+                          className="w-full flex items-center gap-3 py-2 px-1 rounded-lg active:bg-black/[0.03] text-left"
+                        >
+                          <SquircleAvatar
+                            src={u.profile_photo_url || undefined}
+                            alt={u.display_name || u.username}
+                            size={36}
+                            hideRing
+                          />
+                          <div className="flex-1 min-w-0">
+                            <p className="font-semibold text-[13.5px] truncate" style={{ color: INK }}>
+                              {u.display_name || u.username}
+                            </p>
+                            <p className="text-[11.5px] truncate" style={{ color: INK_45 }}>@{u.username}</p>
+                          </div>
+                          <AtSign size={14} color={INK_45} />
+                        </button>
+                      ))
+                    ) : (
+                      <div className="py-3 text-center text-[12px]" style={{ color: INK_45 }}>
+                        No user found. Enter an email to send an invite by mail.
+                      </div>
+                    )}
+                  </div>
+                )}
+              </>
+            )}
           </div>
-          <div className="w-11" />
+
+          {/* Roles */}
+          <div className="mb-5">
+            <div className="mb-2 flex items-center justify-between">
+              <span className="text-[10.5px] font-bold uppercase tracking-[0.08em]" style={{ color: INK_45 }}>
+                Role
+              </span>
+            </div>
+            <div className="space-y-2">
+              {ROLES.map((r) => {
+                const Icon = r.icon;
+                const selected = role === r.value;
+                return (
+                  <button
+                    key={r.value}
+                    type="button"
+                    onClick={() => setRole(r.value)}
+                    className="w-full flex items-start gap-3 p-3.5 text-left active:opacity-90"
+                    style={{
+                      background: CARD_BG,
+                      border: `1px solid ${selected ? 'rgba(247,147,30,0.35)' : HAIR}`,
+                      borderRadius: 14,
+                      boxShadow: selected ? `0 0 0 3px ${AMBER_SOFT}` : 'none',
+                    }}
+                  >
+                    <div
+                      className="h-9 w-9 flex items-center justify-center shrink-0"
+                      style={{
+                        background: selected ? AMBER : 'rgba(15,23,42,0.05)',
+                        borderRadius: 10,
+                      }}
+                    >
+                      <Icon size={16} color={selected ? '#fff' : INK_45} strokeWidth={2.25} />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-2">
+                        <p className="font-semibold text-[14.5px]" style={{ color: INK }}>{r.label}</p>
+                        {selected && (
+                          <span
+                            className="inline-flex items-center justify-center h-4 w-4 rounded-full"
+                            style={{ background: AMBER }}
+                          >
+                            <Check size={10} color="#fff" strokeWidth={3} />
+                          </span>
+                        )}
+                      </div>
+                      <p className="text-[12.5px] leading-snug mt-0.5" style={{ color: INK_45 }}>
+                        {r.description}
+                      </p>
+                    </div>
+                  </button>
+                );
+              })}
+            </div>
+            <p className="text-[11.5px] mt-2" style={{ color: INK_45 }}>
+              Owners have full control and can't be assigned here.
+            </p>
+          </div>
+        </motion.div>
+      </main>
+
+      {/* Sticky footer */}
+      <div className="fixed left-0 right-0 pointer-events-none" style={{ bottom: 0, zIndex: 40 }}>
+        <div
+          className="pointer-events-auto md:max-w-[440px] md:mx-auto px-4"
+          style={{
+            paddingBottom: 'max(env(safe-area-inset-bottom, 0px), 16px)',
+            paddingTop: 12,
+            background: 'linear-gradient(to top, #F4F6F8 60%, rgba(244,246,248,0))',
+          }}
+        >
+          <button
+            type="button"
+            onClick={handleSend}
+            disabled={!canSend || pending}
+            className="w-full flex items-center justify-center gap-2 active:opacity-90 disabled:opacity-50"
+            style={{
+              minHeight: 52,
+              borderRadius: 14,
+              background: INK,
+              color: '#FFFFFF',
+              fontSize: 15,
+              fontWeight: 700,
+              letterSpacing: '-0.01em',
+              border: 'none',
+            }}
+          >
+            <UserPlus size={18} strokeWidth={2.25} />
+            {pending ? 'Sending…' : 'Send invite'}
+          </button>
         </div>
       </div>
-
-      <form onSubmit={handleSubmit} className="max-w-lg mx-auto px-4 py-6 space-y-6">
-        {/* Email */}
-        <div className="space-y-2">
-          <Label htmlFor="email" className="text-sm font-medium">Email address</Label>
-          <div className="relative">
-            <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-            <Input
-              id="email"
-              type="email"
-              placeholder="name@company.com"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              className="pl-10"
-              required
-            />
-          </div>
-        </div>
-
-        {/* Role Selection */}
-        <div className="space-y-3">
-          <Label className="text-sm font-medium">Role</Label>
-          <div className="space-y-2">
-            {roles.map((r) => {
-              const Icon = r.icon;
-              const isSelected = role === r.value;
-
-              return (
-                <button
-                  key={r.value}
-                  type="button"
-                  onClick={() => setRole(r.value)}
-                  className={`w-full flex items-center gap-3 p-4 rounded-sq-md border transition-all text-left ${
-                    isSelected
-                      ? 'border-[hsl(38,92%,50%)] bg-[hsl(38,92%,50%)]/5 ring-1 ring-[hsl(38,92%,50%)]/20'
-                      : 'border-border hover:border-muted-foreground/30 hover:bg-muted/30'
-                  }`}
-                >
-                  <div className={`h-10 w-10 rounded-sq-sm flex items-center justify-center transition-colors ${
-                    isSelected ? 'bg-[hsl(38,92%,50%)] text-white' : 'bg-muted text-muted-foreground'
-                  }`}>
-                    <Icon className="h-5 w-5" />
-                  </div>
-                  <div className="flex-1">
-                    <p className="font-medium text-[15px]">{r.label}</p>
-                    <p className="text-sm text-muted-foreground">{r.description}</p>
-                  </div>
-                  {isSelected && (
-                    <Check className="h-5 w-5 text-[hsl(38,92%,50%)]" />
-                  )}
-                </button>
-              );
-            })}
-          </div>
-          <p className="text-xs text-muted-foreground">
-            You can change their role or remove access at any time.
-          </p>
-        </div>
-
-        {/* Submit */}
-        <div className="flex gap-3">
-          <Button
-            type="button"
-            variant="outline"
-            className="flex-1"
-            onClick={() => navigate(-1)}
-          >
-            Cancel
-          </Button>
-          <Button
-            type="submit"
-            className="flex-1 bg-[hsl(38,92%,50%)] hover:bg-[hsl(36,84%,46%)] text-white border-0"
-            disabled={!email.trim() || createInvite.isPending}
-          >
-            {createInvite.isPending ? 'Sending...' : 'Send invite'}
-          </Button>
-        </div>
-      </form>
-    </div>
+    </ManagePageShell>
   );
 }
