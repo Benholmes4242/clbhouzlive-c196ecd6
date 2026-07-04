@@ -5,7 +5,7 @@
  */
 
 import React, { useState, useEffect, useRef, useMemo } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useNavigate, useParams, useLocation, useSearchParams } from 'react-router-dom';
 import { cn } from '@/lib/utils';
 import {
   Phone, Globe, MapPin, MoreHorizontal, Check, Loader2, ChevronLeft,
@@ -149,10 +149,18 @@ const BusinessProfilePage: React.FC = () => {
     if (activeTab === 'team' && !showTeamTab) setActiveTab('posts');
   }, [activeTab, showTeamTab]);
 
-  // Track profile visit
+  // Track profile visit — pass a real source from navigation state / query.
+  const location = useLocation();
+  const [searchParams] = useSearchParams();
+  const visitSource = (() => {
+    const s = (location.state as { source?: string } | null)?.source
+      ?? searchParams.get('src') ?? searchParams.get('source');
+    const allowed = ['search', 'content', 'course_page', 'share', 'direct', 'directory', 'feed'] as const;
+    return (allowed as readonly string[]).includes(s ?? '') ? (s as typeof allowed[number]) : 'direct';
+  })();
   useEffect(() => {
-    if (business?.id) trackBusinessProfileVisit(business.id, user?.id, 'direct');
-  }, [business?.id, user?.id]);
+    if (business?.id) trackBusinessProfileVisit(business.id, user?.id, visitSource);
+  }, [business?.id, user?.id, visitSource]);
 
   // Clamp detection for bio
   useEffect(() => {
@@ -213,6 +221,7 @@ const BusinessProfilePage: React.FC = () => {
   };
   const handleShare = async () => {
     const url = window.location.href;
+    if (business?.id) trackBusinessAction(business.id, 'share_profile', user?.id);
     if (navigator.share) {
       try { await navigator.share({ title: business?.name, url }); } catch {}
     } else {
@@ -601,7 +610,7 @@ const BusinessProfilePage: React.FC = () => {
             <button
               className="h-11 px-4 rounded-full text-sm font-semibold flex items-center justify-center gap-1.5 transition-transform active:scale-[0.98]"
               style={{ background: '#ffffff', border: '1px solid rgba(15,23,42,0.07)', color: '#0F172A' }}
-              onClick={() => startDM(business.id, 'business')}
+              onClick={() => { trackBusinessAction(business.id, 'message', user?.id); startDM(business.id, 'business'); }}
               disabled={isStartingDM === business.id}
               aria-label={`Message ${business.name}`}
             >

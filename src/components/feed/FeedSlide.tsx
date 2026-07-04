@@ -9,6 +9,7 @@ import { useVideoLane } from '@/video/useVideoLane';
 import { VideoEngine } from '@/video/VideoEngine';
 import { useFullscreenFeedStore } from '@/store/fullscreenFeedStore';
 import { fsv } from '@/perf/fsvTelemetry';
+import { usePostViewTracker } from '@/hooks/usePostViewTracker';
 
 interface FeedSlideProps {
   post: FeedPost;
@@ -194,6 +195,8 @@ export const FeedSlide = memo(function FeedSlide({
         post.postType === 'course_of_week_card') && (
         <div data-pga-sentinel="true" className="absolute inset-0 pointer-events-none" />
       )}
+      <PostViewSentinel postId={post.id} />
+
       {renderContent()}
 
       {/* Inline carousel dots — top-right, always visible, multi-media non-editorial only */}
@@ -214,6 +217,16 @@ export const FeedSlide = memo(function FeedSlide({
 });
 
 export default FeedSlide;
+
+/**
+ * Sentinel that records a post_views row once the post has been >=50%
+ * visible for ~1s. Once per post per session. Fire-and-forget.
+ */
+const PostViewSentinel: React.FC<{ postId: string }> = ({ postId }) => {
+  const attach = usePostViewTracker(postId, true);
+  return <div ref={attach} className="absolute inset-0 pointer-events-none" aria-hidden="true" />;
+};
+
 
 /**
  * FullscreenVideoSlot — binds the engine's `fullscreen` lane when the

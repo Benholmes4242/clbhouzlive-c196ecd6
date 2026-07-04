@@ -1,11 +1,17 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useParams, useNavigate } from 'react-router-dom';
-import { ChevronLeft, Star } from 'lucide-react';
+import {
+  ChevronLeft, Star, ArrowUpRight, Eye, Users, Compass, ExternalLink,
+  UserPlus, MessageCircle, TrendingUp, TrendingDown, Lock, MapPin, ChevronRight,
+} from 'lucide-react';
+import {
+  AreaChart, Area, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend,
+} from 'recharts';
 import { useBusinessProfile } from '@/hooks/useBusinessProfile';
 import { useBusinessMembership } from '@/hooks/useBusinessMembership';
 import { useBusinessReviewStats } from '@/hooks/useBusinessReviewStats';
-import { useBusinessAnalytics } from '@/hooks/useBusinessAnalytics';
+import { useBusinessInsights, deltaPct } from '@/hooks/useBusinessInsights';
 import { PageRoot } from '@/components/layout/PageRoot';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
@@ -16,179 +22,291 @@ import { useHideBottomNav } from '@/hooks/useBottomNavVisibility';
 import { useHideHeader } from '@/hooks/useHeaderVisibility';
 import { BIZ } from '@/components/business/businessTokens';
 import { SectionHeader } from '@/components/ui/SectionHeader';
-import HeadlineGrid from '@/components/business/insights/HeadlineGrid';
-import ProfileVisitsChart from '@/components/business/insights/ProfileVisitsChart';
-import DiscoveryChart from '@/components/business/insights/DiscoveryChart';
-import ActionsChart from '@/components/business/insights/ActionsChart';
-import ContentPerformanceChart from '@/components/business/insights/ContentPerformanceChart';
 
 type DateRange = '7d' | '30d' | '90d';
 
-const cardStyle: React.CSSProperties = {
-  background: BIZ.card,
-  border: `1px solid ${BIZ.hair}`,
+const GREEN = '#059669';
+const RED = '#DC2626';
+
+const cardStyle: React.CSSProperties = { background: BIZ.card, border: `1px solid ${BIZ.hair}` };
+const numFeat: React.CSSProperties = { fontFeatureSettings: '"kern" 1, "liga" 1' };
+
+const formatNum = (n: number) => (n ?? 0).toLocaleString();
+const formatDay = (iso: string) => {
+  try { return new Date(iso).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' }); }
+  catch { return iso; }
 };
 
-const InsightCard = ({ title, children }: { title: string; children: React.ReactNode }) => (
-  <section className="rounded-[18px] p-4 md:p-5" style={cardStyle}>
-    <h3 className="text-[0.9rem] font-medium mb-3" style={{ color: BIZ.ink }}>
-      {title}
-    </h3>
-    {children}
-  </section>
-);
+const SOURCE_LABEL: Record<string, string> = {
+  direct: 'Direct',
+  directory: 'Directory',
+  search: 'Search',
+  feed: 'Feed',
+  shared: 'Shared link',
+  course_page: 'Course page',
+  content: 'From content',
+};
 
-// Reviews section component using real data
+// ─────────────────────────────────────────────────────────────
+// Reused Reviews section (kept intact, course-gated)
+// ─────────────────────────────────────────────────────────────
 const ReviewsSection = ({ businessId, navigate }: { businessId: string; navigate: (path: string) => void }) => {
   const { data: reviewStats, isLoading, error } = useBusinessReviewStats(businessId);
 
-  if (error) {
-    return (
-      <section className="rounded-[18px] p-4 md:p-5" style={{ background: '#ffffff', border: '1px solid rgba(15,23,42,0.07)' }}>
-        <h3 className="text-[0.9rem] font-medium text-foreground mb-4">Reviews & reputation</h3>
-        <div className="px-4 py-8 text-center">
-          <p className="text-sm text-muted-foreground">Failed to load review stats.</p>
-        </div>
-      </section>
-    );
-  }
+  const shell = (children: React.ReactNode) => (
+    <section className="rounded-[18px] p-4 md:p-5 space-y-5" style={cardStyle}>
+      <h3 className="text-[0.9rem] font-medium" style={{ color: BIZ.ink }}>Reviews & reputation</h3>
+      {children}
+    </section>
+  );
 
-  if (isLoading) {
-    return (
-      <section className="rounded-[18px] p-4 md:p-5" style={{ background: '#ffffff', border: '1px solid rgba(15,23,42,0.07)' }}>
-        <h3 className="text-[0.9rem] font-medium text-foreground mb-4">Reviews & reputation</h3>
-        <div className="space-y-3 px-4">
-          <Skeleton className="h-20 rounded-2xl" />
-          <Skeleton className="h-20 rounded-2xl" />
-        </div>
-      </section>
-    );
-  }
-
+  if (error) return shell(<p className="text-sm" style={{ color: BIZ.inkMute }}>Failed to load review stats.</p>);
+  if (isLoading) return shell(<><Skeleton className="h-20 rounded-2xl" /><Skeleton className="h-20 rounded-2xl" /></>);
   if (!reviewStats) {
-    return (
-      <section className="rounded-[18px] p-4 md:p-5" style={{ background: '#ffffff', border: '1px solid rgba(15,23,42,0.07)' }}>
-        <h3 className="text-[0.9rem] font-medium text-foreground mb-4">Reviews & reputation</h3>
-        <p className="text-[0.8rem] text-muted-foreground text-center py-6">
+    return shell(
+      <>
+        <p className="text-[0.8rem] text-center py-6" style={{ color: BIZ.inkMute }}>
           No reviews yet. Once golfers review your courses, you'll see ratings and feedback here.
         </p>
         <div className="flex justify-center">
           <button
             onClick={() => navigate(`/business/${businessId}/reviews`)}
-            className="mt-1 inline-flex items-center gap-1.5 px-3 py-2 rounded-full text-[12.5px] font-bold active:opacity-90"
-            style={{ background: '#0F172A', color: '#fff', border: 'none' }}
+            className="inline-flex items-center gap-1.5 px-3 py-2 rounded-full text-[12.5px] font-bold active:opacity-90"
+            style={{ background: BIZ.ink, color: '#fff', border: 'none' }}
           >
             Manage reviews
           </button>
         </div>
-      </section>
+      </>
     );
   }
 
   const maxCount = Math.max(...reviewStats.distribution.map(d => d.count), 1);
-
-  return (
-    <section className="rounded-[18px] p-4 md:p-5 space-y-5" style={{ background: '#ffffff', border: '1px solid rgba(15,23,42,0.07)' }}>
-      <h3 className="text-[0.9rem] font-medium text-foreground mb-4">Reviews & reputation</h3>
-      
+  return shell(
+    <>
       <div className="flex flex-col md:flex-row gap-6">
-        {/* Rating summary */}
-        <div className="text-center md:text-left flex-shrink-0">
-          <div className="flex items-baseline gap-1 justify-center md:justify-start">
-            <span className="text-[2rem] font-bold text-foreground">{reviewStats.avgRating}</span>
-            <span className="text-muted-foreground">/ 10</span>
+        <div className="flex-shrink-0">
+          <div className="flex items-baseline gap-1">
+            <span className="text-[2rem] font-bold tabular-nums" style={{ color: BIZ.ink, ...numFeat }}>{reviewStats.avgRating}</span>
+            <span style={{ color: BIZ.inkMute }}>/ 10</span>
           </div>
-          <p className="text-[0.8rem] text-muted-foreground mt-1">{reviewStats.totalReviews} review{reviewStats.totalReviews !== 1 ? 's' : ''}</p>
-          
-          {/* Trend */}
-          {reviewStats.recentReviews > 0 && (
-            <div className="mt-2 flex items-center gap-1 justify-center md:justify-start">
-              <span className={cn("text-xs font-medium", reviewStats.reviewTrend >= 0 ? "" : "text-destructive")} style={reviewStats.reviewTrend >= 0 ? { color: '#F7931E' } : undefined}>
-                {reviewStats.recentReviews} new this month
-              </span>
-              {reviewStats.reviewTrend !== 0 && (
-                <span className={cn("text-xs", reviewStats.reviewTrend > 0 ? "" : "text-destructive")} style={reviewStats.reviewTrend > 0 ? { color: '#F7931E' } : undefined}>
-                  ({reviewStats.reviewTrend > 0 ? '+' : ''}{reviewStats.reviewTrend}%)
-                </span>
-              )}
-            </div>
-          )}
+          <p className="text-[0.8rem] mt-1" style={{ color: BIZ.inkMute }}>{reviewStats.totalReviews} review{reviewStats.totalReviews !== 1 ? 's' : ''}</p>
         </div>
-
-        {/* Rating distribution (1-10) */}
         <div className="flex-1 space-y-1">
-          {reviewStats.distribution.slice().reverse().map((item) => (
+          {reviewStats.distribution.slice().reverse().map(item => (
             <div key={item.score} className="flex items-center gap-2">
-              <span className="text-xs text-muted-foreground w-5 text-right">{item.score}</span>
-              <div className="flex-1 h-2 rounded-full overflow-hidden" style={{ background: 'rgba(15,23,42,0.08)' }}>
-                <div
-                  className="h-full rounded-full transition-all"
-                  style={{ width: `${(item.count / maxCount) * 100}%`, background: '#F7931E' }}
-                />
+              <span className="text-xs w-5 text-right tabular-nums" style={{ color: BIZ.inkMute, ...numFeat }}>{item.score}</span>
+              <div className="flex-1 h-2 rounded-full overflow-hidden" style={{ background: BIZ.fill }}>
+                <div className="h-full rounded-full" style={{ width: `${(item.count / maxCount) * 100}%`, background: BIZ.amber }} />
               </div>
-              <span className="text-xs text-muted-foreground w-6 text-right">{item.count}</span>
+              <span className="text-xs w-6 text-right tabular-nums" style={{ color: BIZ.inkMute, ...numFeat }}>{item.count}</span>
             </div>
           ))}
         </div>
       </div>
-
-      {/* Sub-ratings */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-        {[
-          { label: 'Design', value: reviewStats.subRatings.design },
-          { label: 'Condition', value: reviewStats.subRatings.condition },
-          { label: 'Facilities', value: reviewStats.subRatings.facilities },
-          { label: 'Clubhouse', value: reviewStats.subRatings.clubhouse },
-        ].map(sr => (
-          <div key={sr.label} className="rounded-[10px] p-3 text-center" style={{ background: 'rgba(15,23,42,0.04)', border: '1px solid rgba(15,23,42,0.07)' }}>
-            <p className="text-lg font-semibold text-foreground">{sr.value ?? '—'}</p>
-            <p className="text-[0.7rem] text-muted-foreground">{sr.label}</p>
-          </div>
-        ))}
-      </div>
-
-      {/* Action prompts */}
-      <div className="flex flex-col sm:flex-row gap-2" />
-
-
-      {/* Multi-course breakdown */}
-      {reviewStats.courses.length > 1 && (
-        <div className="space-y-2 pt-2" style={{ borderTop: '0.5px solid rgba(15,23,42,0.07)' }}>
-          <h4 className="text-[0.8rem] font-medium text-muted-foreground">Course breakdown</h4>
-          {reviewStats.courses.map(course => (
-            <button
-              key={course.id}
-              onClick={() => navigate(`/courses/${course.id}?tab=reviews`)}
-              className="w-full flex items-center justify-between py-2 px-3 rounded-[10px] transition-colors text-left active:scale-[0.98] active:bg-[rgba(15,23,42,0.03)]"
-            >
-              <div className="min-w-0">
-                <p className="text-[0.8rem] font-medium text-foreground truncate">{course.name}</p>
-                <p className="text-[0.7rem] text-muted-foreground">
-                  {course.reviewCount} review{course.reviewCount !== 1 ? 's' : ''}
-                  {course.recentCount > 0 && ` · ${course.recentCount} new`}
-                </p>
-              </div>
-              <div className="flex items-center gap-1 flex-shrink-0">
-                <Star className="h-3 w-3" style={{ color: '#F7931E', fill: '#F7931E' }} />
-                <span className="text-sm font-medium text-foreground">{course.avgRating}</span>
-              </div>
-            </button>
-          ))}
-        </div>
-      )}
-
-      {/* Manage reviews */}
       <button
         onClick={() => navigate(`/business/${businessId}/reviews`)}
-        className="mt-3 inline-flex items-center gap-1.5 px-3 py-2 rounded-full text-[12.5px] font-bold active:opacity-90"
-        style={{ background: '#0F172A', color: '#fff', border: 'none' }}
+        className="inline-flex items-center gap-1.5 px-3 py-2 rounded-full text-[12.5px] font-bold active:opacity-90"
+        style={{ background: BIZ.ink, color: '#fff', border: 'none' }}
       >
         Manage reviews
       </button>
-    </section>
+    </>
   );
 };
 
+// ─────────────────────────────────────────────────────────────
+// Building blocks
+// ─────────────────────────────────────────────────────────────
+const InsightCard = ({ title, kicker, action, children }: {
+  title: string; kicker?: string; action?: React.ReactNode; children: React.ReactNode;
+}) => (
+  <section className="rounded-[18px] p-4 md:p-5 space-y-4" style={cardStyle}>
+    <div className="flex items-start justify-between gap-3">
+      <div>
+        {kicker && (
+          <p className="text-[10px] font-semibold uppercase tracking-[0.14em] mb-1" style={{ color: BIZ.amber }}>{kicker}</p>
+        )}
+        <h3 className="text-[0.95rem] font-semibold" style={{ color: BIZ.ink }}>{title}</h3>
+      </div>
+      {action}
+    </div>
+    {children}
+  </section>
+);
+
+const Delta = ({ pct }: { pct: number | null }) => {
+  if (pct === null || Number.isNaN(pct)) return null;
+  const up = pct >= 0;
+  const Icon = up ? TrendingUp : TrendingDown;
+  const color = up ? GREEN : RED;
+  return (
+    <span className="inline-flex items-center gap-0.5 text-[10.5px] font-semibold tabular-nums" style={{ color, ...numFeat }}>
+      <Icon className="h-3 w-3" />
+      {up ? '+' : ''}{pct.toFixed(pct >= 10 || pct <= -10 ? 0 : 1)}%
+    </span>
+  );
+};
+
+const MetricTile = ({
+  icon: Icon, label, value, prev, loading,
+}: {
+  icon: React.ComponentType<{ className?: string; style?: React.CSSProperties }>;
+  label: string; value: number; prev: number; loading: boolean;
+}) => {
+  const pct = deltaPct(value, prev);
+  return (
+    <div className="rounded-[14px] p-3.5" style={{ background: BIZ.fill, border: `1px solid ${BIZ.hairSoft}` }}>
+      <div className="flex items-center justify-between mb-2">
+        <span className="inline-flex items-center justify-center h-7 w-7 rounded-full" style={{ background: BIZ.amberTint }}>
+          <Icon className="h-3.5 w-3.5" style={{ color: BIZ.amber }} />
+        </span>
+        {!loading && <Delta pct={pct} />}
+      </div>
+      {loading ? (
+        <>
+          <Skeleton className="h-7 w-14 mb-1.5" />
+          <Skeleton className="h-3 w-20" />
+        </>
+      ) : (
+        <>
+          <p className="text-[1.5rem] font-semibold tabular-nums leading-none" style={{ color: BIZ.ink, ...numFeat }}>
+            {value > 0 ? formatNum(value) : '—'}
+          </p>
+          <p className="text-[0.72rem] mt-1.5" style={{ color: BIZ.inkMute }}>{label}</p>
+        </>
+      )}
+    </div>
+  );
+};
+
+const EmptyBlock = ({ children, height = 200 }: { children: React.ReactNode; height?: number }) => (
+  <div className="flex items-center justify-center rounded-[12px]"
+    style={{ height, background: BIZ.fill, color: BIZ.inkMute, fontSize: '0.85rem', border: `1px dashed ${BIZ.hairDashed}` }}>
+    {children}
+  </div>
+);
+
+// ─────────────────────────────────────────────────────────────
+// Section: Visits over time
+// ─────────────────────────────────────────────────────────────
+const VisitsChart = ({ data }: { data: { day: string; total: number; unique: number }[] }) => {
+  const hasData = data.some(d => d.total > 0 || d.unique > 0);
+  if (!hasData) return <EmptyBlock>No visits yet in this period</EmptyBlock>;
+  const rows = data.map(d => ({ day: formatDay(d.day), Total: d.total, Unique: d.unique }));
+  return (
+    <div style={{ width: '100%', height: 220 }}>
+      <ResponsiveContainer>
+        <AreaChart data={rows} margin={{ top: 8, right: 8, left: 0, bottom: 0 }}>
+          <defs>
+            <linearGradient id="visitsAmber" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stopColor={BIZ.amber} stopOpacity={0.28} />
+              <stop offset="100%" stopColor={BIZ.amber} stopOpacity={0} />
+            </linearGradient>
+          </defs>
+          <CartesianGrid stroke={BIZ.hairSoft} strokeDasharray="2 4" vertical={false} />
+          <XAxis dataKey="day" tick={{ fill: BIZ.inkMute, fontSize: 10 }} axisLine={false} tickLine={false} minTickGap={20} />
+          <YAxis tick={{ fill: BIZ.inkMute, fontSize: 10 }} axisLine={false} tickLine={false} width={28} allowDecimals={false} />
+          <Tooltip contentStyle={{ background: BIZ.card, border: `1px solid ${BIZ.hair}`, borderRadius: 8, fontSize: 12, color: BIZ.ink }} labelStyle={{ color: BIZ.inkMute }} />
+          <Legend wrapperStyle={{ fontSize: 11, color: BIZ.inkMute }} iconType="circle" iconSize={8} />
+          <Area type="monotone" dataKey="Total" stroke={BIZ.amber} strokeWidth={2} fill="url(#visitsAmber)" />
+          <Line type="monotone" dataKey="Unique" stroke={BIZ.ink} strokeWidth={1.75} dot={false} />
+        </AreaChart>
+      </ResponsiveContainer>
+    </div>
+  );
+};
+
+// ─────────────────────────────────────────────────────────────
+// Section: Discovery sources (horizontal % bars)
+// ─────────────────────────────────────────────────────────────
+const DiscoveryBars = ({ sources }: { sources: { source: string; count: number }[] }) => {
+  const total = sources.reduce((a, s) => a + s.count, 0);
+  if (total === 0) return <EmptyBlock height={120}>No discovery data yet in this period</EmptyBlock>;
+  const rows = [...sources].sort((a, b) => b.count - a.count);
+  return (
+    <div className="space-y-3">
+      {rows.map(r => {
+        const pct = (r.count / total) * 100;
+        return (
+          <div key={r.source}>
+            <div className="flex items-baseline justify-between mb-1.5">
+              <span className="text-[0.8rem]" style={{ color: BIZ.ink }}>{SOURCE_LABEL[r.source] ?? r.source}</span>
+              <span className="text-[0.8rem] font-semibold tabular-nums" style={{ color: BIZ.ink, ...numFeat }}>
+                {pct.toFixed(0)}% <span className="font-normal" style={{ color: BIZ.inkMute }}>· {formatNum(r.count)}</span>
+              </span>
+            </div>
+            <div className="h-2 rounded-full overflow-hidden" style={{ background: BIZ.fill }}>
+              <div className="h-full rounded-full" style={{ width: `${pct}%`, background: BIZ.amber }} />
+            </div>
+          </div>
+        );
+      })}
+    </div>
+  );
+};
+
+// ─────────────────────────────────────────────────────────────
+// Section: Followers growth
+// ─────────────────────────────────────────────────────────────
+const FollowersChart = ({ data }: { data: { day: string; count: number }[] }) => {
+  const hasData = data.some(d => d.count > 0);
+  if (!hasData) return <EmptyBlock>Follower activity will appear here as it happens</EmptyBlock>;
+  const rows = data.map(d => ({ day: formatDay(d.day), Followers: d.count }));
+  return (
+    <div style={{ width: '100%', height: 200 }}>
+      <ResponsiveContainer>
+        <LineChart data={rows} margin={{ top: 8, right: 8, left: 0, bottom: 0 }}>
+          <CartesianGrid stroke={BIZ.hairSoft} strokeDasharray="2 4" vertical={false} />
+          <XAxis dataKey="day" tick={{ fill: BIZ.inkMute, fontSize: 10 }} axisLine={false} tickLine={false} minTickGap={20} />
+          <YAxis tick={{ fill: BIZ.inkMute, fontSize: 10 }} axisLine={false} tickLine={false} width={28} allowDecimals={false} />
+          <Tooltip contentStyle={{ background: BIZ.card, border: `1px solid ${BIZ.hair}`, borderRadius: 8, fontSize: 12, color: BIZ.ink }} labelStyle={{ color: BIZ.inkMute }} />
+          <Line type="monotone" dataKey="Followers" stroke={BIZ.amber} strokeWidth={2} dot={false} />
+        </LineChart>
+      </ResponsiveContainer>
+    </div>
+  );
+};
+
+// ─────────────────────────────────────────────────────────────
+// Section: Top posts
+// ─────────────────────────────────────────────────────────────
+const TopPosts = ({
+  items, onOpen,
+}: {
+  items: { post_id: string; content_preview: string; created_at: string; impressions: number; likes: number; comments: number }[];
+  onOpen: (postId: string) => void;
+}) => {
+  if (items.length === 0) return <EmptyBlock height={140}>No posts published in this period</EmptyBlock>;
+  return (
+    <ul className="divide-y" style={{ borderColor: BIZ.hairSoft }}>
+      {items.map(p => (
+        <li key={p.post_id}>
+          <button
+            onClick={() => onOpen(p.post_id)}
+            className="w-full text-left py-3 flex items-start gap-3 active:opacity-70"
+          >
+            <div className="min-w-0 flex-1">
+              <p className="text-[0.85rem] truncate" style={{ color: BIZ.ink }}>
+                {p.content_preview?.trim() || 'Untitled post'}
+              </p>
+              <div className="mt-1 flex items-center gap-3 text-[0.72rem]" style={{ color: BIZ.inkMute, ...numFeat }}>
+                <span className="tabular-nums">{formatNum(p.impressions)} impressions</span>
+                <span className="tabular-nums">{formatNum(p.likes)} likes</span>
+                <span className="tabular-nums">{formatNum(p.comments)} comments</span>
+              </div>
+            </div>
+            <ChevronRight className="h-4 w-4 mt-1 flex-shrink-0" style={{ color: BIZ.inkMute }} />
+          </button>
+        </li>
+      ))}
+    </ul>
+  );
+};
+
+// ─────────────────────────────────────────────────────────────
+// Page
+// ─────────────────────────────────────────────────────────────
 const BusinessInsightsPageV2 = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
@@ -199,28 +317,31 @@ const BusinessInsightsPageV2 = () => {
   useHideHeader();
   const { data: business, isLoading: businessLoading } = useBusinessProfile(id);
   const { data: membership, isLoading: membershipLoading, isFetched: membershipFetched } = useBusinessMembership(id);
-
-  const { daily, headline, isLoading: analyticsLoading } = useBusinessAnalytics(business?.id, dateRange);
+  const { data: insights, isLoading: insightsLoading } = useBusinessInsights(business?.id, dateRange);
 
   const isLoading = businessLoading || membershipLoading;
 
-  // Track page visit
   useEffect(() => {
     if (business?.id && !isLoading) {
-      trackBusinessProfileVisit(business.id, user?.id, 'direct', { page: 'insights' }).catch((err) => {
+      trackBusinessProfileVisit(business.id, user?.id, 'direct', { page: 'insights' }).catch(err => {
         AppLog.error('[BusinessInsightsPageV2]', 'Failed to track visit:', err);
       });
     }
   }, [business?.id, user?.id, isLoading]);
 
-  // Access redirect - only after membership has been fetched
   useEffect(() => {
     if (membershipFetched && !membershipLoading && !membership?.canViewInsights && business) {
       navigate(`/business/${id}`, { replace: true });
     }
   }, [membershipFetched, membershipLoading, membership, business, id, navigate]);
 
-  // Loading state
+  const engagementRate = useMemo(() => {
+    const impr = insights.content.reduce((a, c) => a + c.impressions, 0);
+    if (impr <= 0) return null;
+    const eng = insights.content.reduce((a, c) => a + c.likes + c.comments, 0);
+    return (eng / impr) * 100;
+  }, [insights.content]);
+
   if (isLoading || !membershipFetched) {
     return (
       <PageRoot className="min-h-screen bg-background">
@@ -233,81 +354,52 @@ const BusinessInsightsPageV2 = () => {
     );
   }
 
-  // Business not found
   if (!business) {
     return (
       <PageRoot className="min-h-screen bg-background">
         <div className="max-w-xl mx-auto mt-10 text-center px-4">
-          <p className="text-muted-foreground">Business not found</p>
+          <p style={{ color: BIZ.inkMute }}>Business not found</p>
           <Button onClick={() => navigate('/')} className="mt-4 text-white border-0" style={{ background: BIZ.amber }}>Go home</Button>
         </div>
       </PageRoot>
     );
   }
 
-  // Access check - wait for redirect effect, show loading meanwhile
   if (!membership?.canViewInsights) {
     return (
       <PageRoot className="min-h-screen bg-background">
         <div className="space-y-4 px-4 pt-4">
-          <div className="h-32 animate-pulse rounded-2xl" style={{ background: 'rgba(15,23,42,0.08)' }} />
-          <div className="h-24 animate-pulse rounded-2xl" style={{ background: 'rgba(15,23,42,0.08)' }} />
+          <div className="h-32 animate-pulse rounded-2xl" style={{ background: BIZ.fillStrong }} />
+          <div className="h-24 animate-pulse rounded-2xl" style={{ background: BIZ.fillStrong }} />
         </div>
       </PageRoot>
     );
   }
 
-  const rangeLabels: Record<DateRange, string> = {
-    '7d': '7 days',
-    '30d': '30 days',
-    '90d': '90 days',
-  };
+  const rangeLabels: Record<DateRange, string> = { '7d': '7 days', '30d': '30 days', '90d': '90 days' };
+  const h = insights.headline;
 
   return (
     <PageRoot className="min-h-screen pb-20" style={{ background: BIZ.pageBg }}>
-      {/* Title block — CompactHeader provides the back arrow */}
-      <div
-        className="px-4 pt-3 pb-3"
-        style={{ paddingTop: 'calc(var(--chrome-total-h, 0px) + 12px)' }}
-      >
+      <div className="px-4 pt-3 pb-3" style={{ paddingTop: 'calc(var(--chrome-total-h, 0px) + 12px)' }}>
         <SectionHeader tier="standard" kicker="INSIGHTS" tone="amber" />
-        <h1
-          className="text-[18px] leading-tight mt-0.5"
-          style={{ color: BIZ.ink, fontWeight: 700, letterSpacing: '-0.01em' }}
-        >
+        <h1 className="text-[18px] leading-tight mt-0.5" style={{ color: BIZ.ink, fontWeight: 700, letterSpacing: '-0.01em' }}>
           Insights
         </h1>
       </div>
-      <div
-        className="sticky z-10 backdrop-blur-xl"
-        style={{
-          top: 'var(--chrome-total-h, 0px)',
-          background: 'rgba(248,250,252,0.97)',
-          borderBottom: `0.5px solid ${BIZ.hair}`,
-        }}
-      >
 
-        {/* Date range selector */}
+      <div className="sticky z-10 backdrop-blur-xl"
+        style={{ top: 'var(--chrome-total-h, 0px)', background: 'rgba(248,250,252,0.97)', borderBottom: `0.5px solid ${BIZ.hair}` }}>
         <div className="flex justify-center pb-3">
-          <div
-            className="inline-flex rounded-full p-1"
-            style={{ border: `1px solid ${BIZ.hair}`, background: BIZ.fill }}
-          >
-            {(['7d', '30d', '90d'] as DateRange[]).map((range) => {
+          <div className="inline-flex rounded-full p-1" style={{ border: `1px solid ${BIZ.hair}`, background: BIZ.fill }}>
+            {(['7d', '30d', '90d'] as DateRange[]).map(range => {
               const active = dateRange === range;
               return (
                 <button
                   key={range}
                   onClick={() => setDateRange(range)}
-                  className={cn(
-                    'px-3 md:px-4 py-1.5 text-[0.8rem] rounded-full transition-colors',
-                    active ? 'font-medium' : '',
-                  )}
-                  style={
-                    active
-                      ? { background: BIZ.amber, color: '#ffffff' }
-                      : { color: BIZ.inkMute }
-                  }
+                  className={cn('px-3 md:px-4 py-1.5 text-[0.8rem] rounded-full transition-colors', active ? 'font-medium' : '')}
+                  style={active ? { background: BIZ.amber, color: '#ffffff' } : { color: BIZ.inkMute }}
                 >
                   {rangeLabels[range]}
                 </button>
@@ -318,62 +410,113 @@ const BusinessInsightsPageV2 = () => {
       </div>
 
       <div className="max-w-[1024px] mx-auto px-4 md:px-6 py-6 space-y-5 md:space-y-6">
-        {/* Overview — headline metric tiles */}
+        {/* ── OVERVIEW ── */}
         <section>
-          <h2
-            className="text-[0.75rem] font-medium uppercase tracking-wider mb-3"
-            style={{ color: BIZ.inkMute }}
-          >
-            Overview
-          </h2>
-          <div className="rounded-[18px] p-4 md:p-5" style={cardStyle}>
-            <HeadlineGrid headline={headline} isLoading={analyticsLoading} />
+          <h2 className="text-[0.75rem] font-medium uppercase tracking-wider mb-3" style={{ color: BIZ.inkMute }}>Overview</h2>
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2.5">
+            <MetricTile icon={Eye} label="Profile views" value={h.profile_views.value} prev={h.profile_views.prev} loading={insightsLoading} />
+            <MetricTile icon={Users} label="Unique visitors" value={h.unique_visitors.value} prev={h.unique_visitors.prev} loading={insightsLoading} />
+            <MetricTile icon={Compass} label="Directory impressions" value={h.directory_impressions.value} prev={h.directory_impressions.prev} loading={insightsLoading} />
+            <MetricTile icon={ExternalLink} label="Click-outs" value={h.click_outs.value} prev={h.click_outs.prev} loading={insightsLoading} />
+            <MetricTile icon={UserPlus} label="New followers" value={h.new_followers.value} prev={h.new_followers.prev} loading={insightsLoading} />
+            <MetricTile icon={MessageCircle} label="Message clicks" value={h.message_clicks.value} prev={h.message_clicks.prev} loading={insightsLoading} />
           </div>
         </section>
 
-        {/* Traffic over time */}
-        <InsightCard title="Profile visits over time">
-          {analyticsLoading ? (
-            <Skeleton className="h-[200px] w-full rounded-md" />
-          ) : (
-            <ProfileVisitsChart daily={daily} />
-          )}
+        {/* ── VISITORS ── */}
+        <InsightCard kicker="VISITORS" title="Profile visits over time">
+          {insightsLoading ? <Skeleton className="h-[220px] w-full rounded-md" /> : <VisitsChart data={insights.visits_series} />}
         </InsightCard>
 
-        {/* How golfers discover you */}
-        <InsightCard title="How golfers discover you">
-          {analyticsLoading ? (
-            <div className="space-y-3">
-              <Skeleton className="h-8 w-full" />
-              <Skeleton className="h-8 w-full" />
+        <InsightCard kicker="DISCOVERY" title="How golfers discover you">
+          {insightsLoading
+            ? <div className="space-y-3"><Skeleton className="h-8" /><Skeleton className="h-8" /><Skeleton className="h-8" /></div>
+            : <DiscoveryBars sources={insights.sources} />}
+        </InsightCard>
+
+        {/* ── AUDIENCE / DEMOGRAPHICS (locked placeholder) ── */}
+        <InsightCard
+          kicker="AUDIENCE"
+          title="Who's viewing you"
+          action={
+            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-semibold uppercase tracking-wider"
+              style={{ background: BIZ.amberTint, color: BIZ.amber, border: `1px solid ${BIZ.amberHair}` }}>
+              <Lock className="h-2.5 w-2.5" /> Soon
+            </span>
+          }
+        >
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <p className="text-[10px] font-semibold uppercase tracking-wider mb-2" style={{ color: BIZ.inkMute }}>Handicap range</p>
+              <div className="space-y-2">
+                {['Scratch – 5', '6 – 12', '13 – 20', '21+'].map(label => (
+                  <div key={label} className="flex items-center gap-2">
+                    <span className="text-[0.75rem] w-24" style={{ color: BIZ.ink }}>{label}</span>
+                    <div className="flex-1 h-2 rounded-full" style={{ background: BIZ.fill }} />
+                    <span className="text-[0.75rem] w-6 text-right tabular-nums" style={{ color: BIZ.inkMute, ...numFeat }}>—</span>
+                  </div>
+                ))}
+              </div>
             </div>
-          ) : (
-            <DiscoveryChart headline={headline} />
-          )}
-        </InsightCard>
-
-        {/* What golfers do next */}
-        <InsightCard title="What golfers do next">
-          {analyticsLoading ? (
-            <div className="space-y-3">
-              <Skeleton className="h-8 w-full" />
-              <Skeleton className="h-8 w-full" />
+            <div>
+              <p className="text-[10px] font-semibold uppercase tracking-wider mb-2" style={{ color: BIZ.inkMute }}>Top locations</p>
+              <div className="space-y-2">
+                {[1, 2, 3, 4].map(i => (
+                  <div key={i} className="flex items-center gap-2">
+                    <MapPin className="h-3 w-3" style={{ color: BIZ.inkMute }} />
+                    <span className="text-[0.75rem] flex-1" style={{ color: BIZ.inkMute }}>Location {i}</span>
+                    <span className="text-[0.75rem] tabular-nums" style={{ color: BIZ.inkMute, ...numFeat }}>—</span>
+                  </div>
+                ))}
+              </div>
             </div>
-          ) : (
-            <ActionsChart headline={headline} />
-          )}
+          </div>
+          <p className="text-[11.5px] pt-1" style={{ color: BIZ.inkMute }}>
+            Demographics unlock once you reach enough unique visitors.
+          </p>
         </InsightCard>
 
-        {/* Content performance */}
-        <InsightCard title="Content performance">
-          {analyticsLoading ? (
-            <Skeleton className="h-[220px] w-full rounded-md" />
-          ) : (
-            <ContentPerformanceChart daily={daily} />
-          )}
+        {/* ── FOLLOWERS ── */}
+        <InsightCard
+          kicker="AUDIENCE"
+          title="Follower growth"
+          action={
+            <div className="text-right">
+              <p className="text-[10px] uppercase tracking-wider" style={{ color: BIZ.inkMute }}>Total</p>
+              <p className="text-[1.1rem] font-semibold tabular-nums leading-none" style={{ color: BIZ.ink, ...numFeat }}>
+                {formatNum(h.total_followers)}
+              </p>
+            </div>
+          }
+        >
+          {insightsLoading ? <Skeleton className="h-[200px] w-full rounded-md" /> : <FollowersChart data={insights.followers_series} />}
         </InsightCard>
 
-        {/* Reviews & Reputation — course-linked businesses only */}
+        {/* ── CONTENT ── */}
+        <InsightCard kicker="CONTENT" title="Top posts">
+          {insightsLoading
+            ? <div className="space-y-3"><Skeleton className="h-12" /><Skeleton className="h-12" /><Skeleton className="h-12" /></div>
+            : <TopPosts items={insights.content} onOpen={(postId) => navigate(`/post/${postId}`)} />}
+        </InsightCard>
+
+        <section className="rounded-[18px] p-4 md:p-5" style={cardStyle}>
+          <div className="flex items-baseline justify-between">
+            <div>
+              <p className="text-[10px] font-semibold uppercase tracking-[0.14em]" style={{ color: BIZ.amber }}>ENGAGEMENT</p>
+              <h3 className="text-[0.95rem] font-semibold" style={{ color: BIZ.ink }}>Engagement rate</h3>
+            </div>
+            <p className="text-[1.5rem] font-semibold tabular-nums leading-none" style={{ color: BIZ.ink, ...numFeat }}>
+              {engagementRate === null ? '—' : `${engagementRate.toFixed(1)}%`}
+            </p>
+          </div>
+          <p className="text-[11.5px] mt-2" style={{ color: BIZ.inkMute }}>
+            {engagementRate === null
+              ? 'Publish posts and gather impressions to see your engagement rate.'
+              : 'Likes + comments as a share of impressions. >2% is strong.'}
+          </p>
+        </section>
+
+        {/* ── REPUTATION (course-linked only) ── */}
         {business.club_id && <ReviewsSection businessId={business.id} navigate={navigate} />}
       </div>
     </PageRoot>
