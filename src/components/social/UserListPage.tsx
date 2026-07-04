@@ -24,7 +24,8 @@ import { useFollowUser } from '@/hooks/useFollowUser';
 import { useFriendActions } from '@/hooks/useFriendActions';
 import { useRelationshipStatuses, type RelationshipStatusRow } from '@/hooks/useRelationshipStatuses';
 import { useSocialCounts } from '@/hooks/useSocialCounts';
-import { SuggestedCreatorsShelf } from '@/components/shared/SuggestedCreatorsShelf';
+import { useSuggestedCreators, type SuggestedCreator } from '@/components/watch/hooks/useSuggestedCreators';
+import { ChevronRight } from 'lucide-react';
 import { Sheet, SheetContent } from '@/components/ui/sheet';
 
 import { toast } from 'sonner';
