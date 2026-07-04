@@ -70,7 +70,7 @@ const LiveStatusInline: React.FC = () => {
  * 
  * This distinction was intentionally designed and MUST be preserved.
  */
-const CompactHeader: React.FC<CompactHeaderProps> = ({ className }) => {
+const CompactHeader: React.FC<CompactHeaderProps> = ({ className, hidden = false }) => {
   const navigate = useNavigate();
   const location = useLocation();
   const [searchParams] = useSearchParams();
