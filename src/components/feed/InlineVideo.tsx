@@ -83,7 +83,10 @@ export const InlineVideo: React.FC<Props> = ({
   useEffect(() => {
     fsv('inline.active', { postId, isActive });
   }, [postId, isActive]);
+  const lastFFRef = useRef<boolean | null>(null);
   useEffect(() => {
+    if (lastFFRef.current === lane.snapshot.firstFrame) return;
+    lastFFRef.current = lane.snapshot.firstFrame;
     fsv('inline.snapFF', {
       postId,
       firstFrame: lane.snapshot.firstFrame,
