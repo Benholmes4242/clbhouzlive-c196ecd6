@@ -56,8 +56,8 @@ interface Lane {
   postId: string | null;
   /** Non-hidden host the lane element is currently mounted into (null while parked). */
   mountedHost: HTMLElement | null;
-  /** play() called before mount — consumed by the next mountLane. */
-  pendingPlay: boolean;
+  /** Persistent play-intent. Set true by engine.play(), false by pause()/release()/unmount. */
+  wantPlay: boolean;
   listeners: Set<LaneListener>;
   detachFns: Array<() => void>;
 }
@@ -132,7 +132,7 @@ class VideoEngineImpl {
         firstFrame: false,
         postId: null,
         mountedHost: null,
-        pendingPlay: false,
+        wantPlay: false,
         listeners: new Set(),
         detachFns: [],
       });
@@ -167,9 +167,9 @@ class VideoEngineImpl {
       DBG(laneId, 'mounted');
     }
     lane.mountedHost = hostEl;
-    // If play() was called before we had a real host, kick it off now.
-    if (lane.pendingPlay) {
-      lane.pendingPlay = false;
+    // If play-intent is set (from a pre-mount play() or a still-loading source),
+    // kick it off now — wantPlay persists through source changes.
+    if (lane.wantPlay && lane.el.paused) {
       const p = lane.el.play();
       if (p && typeof (p as Promise<void>).catch === 'function') {
         (p as Promise<void>).catch(() => { /* autoplay reject — safe */ });
@@ -186,7 +186,7 @@ class VideoEngineImpl {
       DBG(laneId, 'unmounted');
     }
     lane.mountedHost = null;
-    lane.pendingPlay = false;
+    lane.wantPlay = false;
   }
 
   /**
@@ -233,6 +233,12 @@ class VideoEngineImpl {
     lane.posterUrl = posterUrl;
     lane.startPosition = startPosition;
     lane.firstFrame = false;
+    // Reset playback position on source change so B doesn't inherit A's time.
+    if (startPosition <= 0) {
+      try { lane.el.currentTime = 0; } catch { /* noop */ }
+    }
+    // NOTE: do NOT clear wantPlay here — a mid-load play() intent must persist
+    // so the engine can start playback once the new source reaches canplay.
 
     if (posterUrl) lane.el.poster = posterUrl;
 
@@ -394,6 +400,14 @@ class VideoEngineImpl {
     const onError = () => this.transition(lane, 'error');
     const onCanPlay = () => {
       if (lane.id === 'feed-active') fp.canplay(lane.postId);
+      // Honor persistent play-intent: if play() was called before/while the
+      // (new) source was loading, kick it off now that it's ready.
+      if (lane.wantPlay && lane.mountedHost && lane.el.paused) {
+        const p = lane.el.play();
+        if (p && typeof (p as Promise<void>).catch === 'function') {
+          (p as Promise<void>).catch(() => { /* autoplay reject — safe */ });
+        }
+      }
     };
     const onPlaying = () => {
       if (lane.id === 'feed-active') fp.firstFrame(lane.postId);
@@ -421,11 +435,9 @@ class VideoEngineImpl {
 
   play(laneId: LaneId): Promise<void> {
     const lane = this.getLane(laneId);
-    // Guard: no play until the lane element is mounted into a real host.
-    // Effects across sibling cards can race; queue the intent and let
-    // mountLane consume it once the element lands in the active card.
+    // Persistent intent: set now, honored on mount + on canplay after (re)load.
+    lane.wantPlay = true;
     if (!lane.mountedHost) {
-      lane.pendingPlay = true;
       DBG(laneId, 'play() queued — no mounted host');
       return Promise.resolve();
     }
@@ -438,14 +450,18 @@ class VideoEngineImpl {
 
   pause(laneId: LaneId): void {
     const lane = this.getLane(laneId);
+    lane.wantPlay = false;
     if (!lane.el.paused) lane.el.pause();
   }
 
   pauseAll(): void {
     this.lanes.forEach((lane) => {
+      lane.wantPlay = false;
       if (!lane.el.paused) lane.el.pause();
     });
   }
+
+
 
   seek(laneId: LaneId, seconds: number): void {
     const lane = this.getLane(laneId);
@@ -493,6 +509,7 @@ class VideoEngineImpl {
     lane.detachFns = [];
     lane.hlsUrl = null;
     lane.firstFrame = false;
+    lane.wantPlay = false;
     this.transition(lane, 'idle');
     DBG(laneId, 'released');
   }
