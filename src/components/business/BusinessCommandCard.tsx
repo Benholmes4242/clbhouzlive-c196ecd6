@@ -245,6 +245,8 @@ export function BusinessCommandCard({
                   {awaitingReplies > 0 && (
                     <span className="ml-auto h-2 w-2 rounded-full" style={{ background: BIZ.amber }} />
                   )}
+                </DropdownMenuItem>
+
 
                 {canManage && (
                   <>
