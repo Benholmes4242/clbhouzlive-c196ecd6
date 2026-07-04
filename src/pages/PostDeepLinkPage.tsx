@@ -4,6 +4,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { Loader2, MapPin } from 'lucide-react';
 import { useFullscreenFeedStore } from '@/store/fullscreenFeedStore';
+import { recordPostViewOnce } from '@/hooks/usePostViewTracker';
 import { mapActivityPostToFeedPost } from '@/lib/activityPostMapper';
 import type { ActivityPost } from '@/components/profile/types/ActivityTypes';
 
