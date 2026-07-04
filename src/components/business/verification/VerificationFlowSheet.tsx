@@ -1048,18 +1048,10 @@ export default function VerificationFlowSheet({
 
 // ---- small building blocks ----
 
-const SectionCard = ({
-  number,
-  title,
-  children,
-  ref,
-}: {
-  number: number;
-  title: string;
-  children: React.ReactNode;
-  ref?: React.RefObject<HTMLDivElement>;
-}) => {
-  // Using forwardRef-style via `ref` prop passed by parent (React 19 style). Fallback below.
+const SectionCard = React.forwardRef<
+  HTMLDivElement,
+  { number: number; title: string; children: React.ReactNode }
+>(function SectionCard({ number, title, children }, ref) {
   return (
     <div
       ref={ref}
@@ -1080,7 +1072,7 @@ const SectionCard = ({
       {children}
     </div>
   );
-};
+});
 
 function DetailRow({
   label,
