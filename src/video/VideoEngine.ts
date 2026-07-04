@@ -15,8 +15,6 @@
  */
 
 import Hls, { type HlsConfig } from 'hls.js';
-import { isPerfEnabled } from '@/perf/navTiming';
-import { fp } from '@/perf/feedPlayTelemetry';
 import {
   ABR_MAX_KBPS,
   DEFAULT_LANE_IDS,
