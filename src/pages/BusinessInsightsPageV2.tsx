@@ -364,8 +364,8 @@ const BusinessInsightsPageV2 = () => {
           )}
         </InsightCard>
 
-        {/* Reviews & Reputation — Real Data */}
-        <ReviewsSection businessId={business.id} navigate={navigate} />
+        {/* Reviews & Reputation — course-linked businesses only */}
+        {business.club_id && <ReviewsSection businessId={business.id} navigate={navigate} />}
       </div>
     </PageRoot>
   );
