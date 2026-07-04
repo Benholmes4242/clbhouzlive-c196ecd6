@@ -168,16 +168,14 @@ const ReviewsSection = ({ businessId, navigate }: { businessId: string; navigate
         </div>
       )}
 
-      {/* View all reviews link */}
-      {reviewStats.courses.length > 0 && (
-        <button
-          onClick={() => navigate(`/courses/${reviewStats.courses[0].id}?tab=reviews`)}
-          className="text-[0.8rem] hover:underline"
-          style={{ color: '#F7931E' }}
-        >
-          View all reviews ›
-        </button>
-      )}
+      {/* Manage reviews */}
+      <button
+        onClick={() => navigate(`/business/${businessId}/reviews`)}
+        className="mt-3 inline-flex items-center gap-1.5 px-3 py-2 rounded-full text-[12.5px] font-bold active:opacity-90"
+        style={{ background: '#0F172A', color: '#fff', border: 'none' }}
+      >
+        Manage reviews
+      </button>
     </section>
   );
 };
