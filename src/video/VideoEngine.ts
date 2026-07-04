@@ -167,11 +167,20 @@ class VideoEngineImpl {
    */
   mountLane(laneId: LaneId, hostEl: HTMLElement): void {
     const lane = this.getLane(laneId);
-    if (lane.el.parentElement !== hostEl) {
+    const alreadyParented = lane.el.parentElement === hostEl;
+    if (!alreadyParented) {
       hostEl.appendChild(lane.el);
       DBG(laneId, 'mounted');
     }
     lane.mountedHost = hostEl;
+    if (isFsv(laneId)) {
+      fsvEl('eng.mountLane', lane.el, {
+        laneId,
+        alreadyParented,
+        wantPlay: lane.wantPlay,
+        postId: lane.postId,
+      });
+    }
     // If play-intent is set (from a pre-mount play() or a still-loading source),
     // kick it off now — wantPlay persists through source changes.
     if (lane.wantPlay && lane.el.paused) {
@@ -190,6 +199,7 @@ class VideoEngineImpl {
       host.appendChild(lane.el);
       DBG(laneId, 'unmounted');
     }
+    if (isFsv(laneId)) fsvEl('eng.unmount', lane.el, { laneId, postId: lane.postId });
     lane.mountedHost = null;
     lane.wantPlay = false;
   }
