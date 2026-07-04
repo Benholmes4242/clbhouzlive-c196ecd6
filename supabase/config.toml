@@ -241,3 +241,6 @@ verify_jwt = false
 
 [functions.backfill-2025-leaderboards]
 verify_jwt = false
+
+[functions.send-business-invite]
+verify_jwt = true
