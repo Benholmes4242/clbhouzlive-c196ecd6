@@ -7,6 +7,13 @@ import {
   SC_PAR,
   SC_BOGEY,
   SC_DOUBLE,
+  SC_ACE_DARK,
+  SC_ALBATROSS_DARK,
+  SC_EAGLE_DARK,
+  SC_BIRDIE_DARK,
+  SC_PAR_DARK,
+  SC_BOGEY_DARK,
+  SC_DOUBLE_DARK,
 } from '@/features/courses/components/holes/_constants';
 
 /**
@@ -61,6 +68,18 @@ const SPECS: Record<Variant, VariantSpec> = {
   bogey:  { shape: 'square',   depth: 1, colour: SC_BOGEY },
   doub:   { shape: 'square',   depth: 2, colour: SC_DOUBLE },
   triple: { shape: 'square',   depth: 3, colour: SC_DOUBLE },
+};
+
+const SPECS_DARK: Record<Variant, VariantSpec> = {
+  empty:  { shape: null,       depth: 0, colour: 'rgba(242,244,247,0.20)' },
+  par:    { shape: null,       depth: 0, colour: SC_PAR_DARK },
+  birdie: { shape: 'circle',   depth: 1, colour: SC_BIRDIE_DARK },
+  eagle:  { shape: 'circle',   depth: 2, colour: SC_EAGLE_DARK },
+  alba:   { shape: 'circle',   depth: 3, colour: SC_ALBATROSS_DARK },
+  hio:    { shape: 'circle',   depth: 3, colour: SC_ACE_DARK },
+  bogey:  { shape: 'square',   depth: 1, colour: SC_BOGEY_DARK },
+  doub:   { shape: 'square',   depth: 2, colour: SC_DOUBLE_DARK },
+  triple: { shape: 'square',   depth: 3, colour: SC_DOUBLE_DARK },
 };
 
 const Shape: React.FC<{
@@ -123,6 +142,8 @@ export interface ScoreMarkProps {
   colourOverride?: string;
   /** Custom font for the numeral. */
   fontFamily?: string;
+  /** Surface the mark lives on. Defaults to 'light'. */
+  surface?: 'light' | 'dark';
 }
 
 const FONT_GEIST = "'Geist', -apple-system, BlinkMacSystemFont, system-ui, sans-serif";
@@ -134,9 +155,10 @@ export const ScoreMark: React.FC<ScoreMarkProps> = ({
   showStroke = true,
   colourOverride,
   fontFamily = FONT_GEIST,
+  surface = 'light',
 }) => {
   const variant = variantFor(strokes, par);
-  const spec = SPECS[variant];
+  const spec = surface === 'dark' ? SPECS_DARK[variant] : SPECS[variant];
   const colour = colourOverride ?? spec.colour;
 
   // Stroke calibrated so at size=38 the line is ~1.5px; scales with size.
@@ -147,11 +169,13 @@ export const ScoreMark: React.FC<ScoreMarkProps> = ({
   const INSET_3 = 22;
 
   const numeral = strokes == null ? '·' : strokes;
+  const emptyInk = surface === 'dark' ? 'rgba(242,244,247,0.35)' : '#CBD5E1';
+  const parInk = surface === 'dark' ? 'rgba(242,244,247,0.80)' : SC_PAR;
   const numColour =
     strokes == null
-      ? '#CBD5E1'
+      ? emptyInk
       : variant === 'par'
-      ? SC_PAR
+      ? parInk
       : colour;
 
   return (

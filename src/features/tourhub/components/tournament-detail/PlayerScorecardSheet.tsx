@@ -3,7 +3,9 @@ import { useNavigate } from 'react-router-dom';
 import { BottomSheet } from '@/components/ui/BottomSheet';
 import CountryFlag from '@/components/ui/country-flag';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
-import { ScoreMark } from '@/features/courses/_shared/ScoreMark';
+import { SCORECARD_LIGHT } from '@/features/courses/_shared/scorecard/scorecardTheme';
+import { TrajectoryLine, type TrajectoryHole } from '@/features/courses/_shared/scorecard/TrajectoryLine';
+import { NineGrid } from '@/features/courses/_shared/scorecard/NineGrid';
 import { playerRoute } from '../../routes';
 import {
   useTournamentScorecard,
@@ -11,9 +13,10 @@ import {
   type RoundScorecard,
 } from '../../hooks/useTournamentScorecard';
 
+const T = SCORECARD_LIGHT;
 const AMBER = '#F7931E';
-const INK = '#0F172A';
-const INK_MUTE = '#94A3B8';
+const INK = T.ink;
+const INK_MUTE = T.faint;
 const GEIST = "'Geist', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif";
 const NUM: React.CSSProperties = {
   fontFamily: GEIST,
@@ -40,44 +43,14 @@ function initialsOf(name: string): string {
   return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
 }
 
-function HoleCell({ h }: { h: ScorecardHole }) {
-  return (
-    <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4, minWidth: 0 }}>
-      <div style={{ ...NUM, fontSize: 9, fontWeight: 700, color: INK_MUTE }}>{h.hole}</div>
-      <div style={{ ...NUM, fontSize: 9, fontWeight: 600, color: '#CBD5E1' }}>{h.par ?? '-'}</div>
-      <ScoreMark
-        strokes={h.strokes ?? null}
-        par={h.par ?? 4}
-        size={28}
-        fontFamily={GEIST}
-      />
-    </div>
-  );
+function toTrajectory(holes: ScorecardHole[]): TrajectoryHole[] {
+  return holes.map((h) => ({
+    holeNo: h.hole,
+    par: h.par ?? null,
+    strokes: h.strokes ?? null,
+  }));
 }
 
-function Nine({ holes, label }: { holes: ScorecardHole[]; label: 'OUT' | 'IN' }) {
-  const totalPar = holes.reduce((a, h) => a + (h.par ?? 0), 0);
-  const totalStrokes = holes.reduce((a, h) => a + (h.strokes ?? 0), 0);
-  const anyPlayed = holes.some((h) => h.strokes != null);
-  return (
-    <div style={{ display: 'flex', alignItems: 'flex-end', gap: 4 }}>
-      <div style={{ display: 'flex', flex: 1, gap: 2 }}>
-        {holes.map((h) => <HoleCell key={h.hole} h={h} />)}
-      </div>
-      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4, width: 34, flexShrink: 0 }}>
-        <div style={{ ...NUM, fontSize: 9, fontWeight: 800, color: INK, letterSpacing: '0.04em' }}>{label}</div>
-        <div style={{ ...NUM, fontSize: 9, fontWeight: 600, color: '#CBD5E1' }}>{totalPar || '-'}</div>
-        <div style={{
-          width: 30, height: 26, borderRadius: 8, background: '#F8FAFC', border: '1px solid #E2E8F0',
-          display: 'flex', alignItems: 'center', justifyContent: 'center',
-          ...NUM, fontSize: 13, fontWeight: 800, color: anyPlayed ? INK : '#E2E8F0',
-        }}>
-          {anyPlayed ? totalStrokes : '·'}
-        </div>
-      </div>
-    </div>
-  );
-}
 
 export interface PlayerScorecardSheetProps {
   open: boolean;
@@ -239,19 +212,37 @@ export function PlayerScorecardSheet({
                 </span>
               </>
             ) : (
-              <span style={{ ...NUM, fontSize: 11, fontWeight: 700, letterSpacing: '0.06em', color: INK_MUTE }}>
+              <span style={{ ...NUM, fontSize: 11, fontWeight: 700, letterSpacing: '0.06em', color: T.dim }}>
                 ROUND {selected.round}{selected.thru >= selected.holes.length ? ' · COMPLETE' : ''}
               </span>
             )}
           </div>
           <div style={{ display: 'flex', alignItems: 'baseline', gap: 5 }}>
-            <span style={{ fontSize: 9, fontWeight: 800, letterSpacing: '0.08em', color: INK_MUTE }}>ROUND</span>
-            <span style={{ ...NUM, fontSize: 18, fontWeight: 800, color: roundRel == null ? INK : roundRel < 0 ? '#2F6B4F' : roundRel > 0 ? '#B5703C' : INK }}>
+            <span style={{ fontSize: 9, fontWeight: 800, letterSpacing: '0.08em', color: T.dim }}>ROUND</span>
+            <span style={{ ...NUM, fontSize: 18, fontWeight: 800, color: roundRel == null ? T.ink : roundRel < 0 ? T.under : roundRel > 0 ? T.over : T.ink }}>
               {fmtRel(roundRel, selected.played)}
             </span>
           </div>
         </div>
       )}
+
+      {/* trajectory */}
+      {selected && selected.played && (() => {
+        const holesToUse = isSelectedLive ? selected.holes.slice(0, selected.thru) : selected.holes;
+        const traj = toTrajectory(holesToUse);
+        if (traj.filter((h) => h.par != null && h.strokes != null).length < 2) return null;
+        return (
+          <div style={{ padding: '0 16px 6px' }}>
+            <div style={{
+              fontFamily: GEIST, fontSize: 9, fontWeight: 800,
+              color: T.faint, letterSpacing: '0.12em', marginBottom: 6,
+            }}>
+              ROUND {selected.round} · THE SHAPE
+            </div>
+            <TrajectoryLine holes={traj} surface="light" theme={T} />
+          </div>
+        );
+      })()}
 
       {/* body */}
       {isLoading ? (
@@ -263,15 +254,16 @@ export function PlayerScorecardSheet({
           Hole-by-hole scorecard isn't available for this tour.
         </div>
       ) : selected && selected.played ? (
-        <div style={{ padding: '0 14px 14px', display: 'flex', flexDirection: 'column', gap: 14 }}>
-          <Nine holes={selected.holes.slice(0, 9)} label="OUT" />
-          <Nine holes={selected.holes.slice(9, 18)} label="IN" />
+        <div style={{ padding: '0 14px 14px', display: 'flex', flexDirection: 'column', gap: 15 }}>
+          <NineGrid holes={toTrajectory(selected.holes.slice(0, 9))} label="OUT" startAt={1} surface="light" theme={T} />
+          <NineGrid holes={toTrajectory(selected.holes.slice(9, 18))} label="IN" startAt={10} surface="light" theme={T} />
         </div>
       ) : (
         <div style={{ padding: '30px 18px 40px', textAlign: 'center', color: INK_MUTE, fontSize: 13 }}>
           Round {selectedRound} hasn't started yet.
         </div>
       )}
+
 
 
       {/* visit profile CTA */}
