@@ -32,7 +32,10 @@ export function isBusinessEntityNotification(type: string): boolean {
     type === 'business_member_added' ||
     type === 'business_access_request' ||
     type === 'business_access_approved' ||
-    type === 'business_access_declined'
+    type === 'business_access_declined' ||
+    type === 'business_team_invited' ||
+    type === 'business_team_joined' ||
+    type === 'business_team_member_joined'
   );
 }
 
@@ -153,6 +156,9 @@ export function getNotificationBadgeIcon(type: string): React.ReactElement {
     case 'business_member_added':
     case 'business_access_approved':
     case 'business_access_request':
+    case 'business_team_invited':
+    case 'business_team_joined':
+    case 'business_team_member_joined':
       return <Building2 {...p} />;
     case 'business_access_declined':
       return <XCircle {...p} />;

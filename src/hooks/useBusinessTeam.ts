@@ -30,11 +30,19 @@ export interface BusinessInvite {
   id: string;
   business_id: string;
   invited_by: string;
-  invitee_email: string;
+  invitee_email: string | null;
+  invitee_user_id: string | null;
   role: AssignableBusinessRole;
   status: 'pending' | 'accepted' | 'revoked' | 'expired';
   created_at: string;
   expires_at: string;
+  token: string | null;
+  invitee_profile?: {
+    id: string;
+    display_name: string | null;
+    username: string | null;
+    profile_photo_url: string | null;
+  } | null;
 }
 
 export function useBusinessTeam(businessId?: string) {
@@ -73,14 +81,36 @@ export function useBusinessInvites(businessId?: string) {
     queryFn: async () => {
       const { data, error } = await supabase
         .from('business_invites')
-        .select('id, business_id, invited_by, invitee_email, role, status, created_at, expires_at')
+        .select('id, business_id, invited_by, invitee_email, invitee_user_id, role, status, created_at, expires_at, token')
         .eq('business_id', businessId)
         .order('created_at', { ascending: false });
 
       if (error) throw error;
-      return data as BusinessInvite[];
+
+      const rows = (data || []) as BusinessInvite[];
+      const userIds = rows.map(r => r.invitee_user_id).filter((v): v is string => !!v);
+      if (!userIds.length) return rows;
+
+      const { data: profiles } = await supabase
+        .from('user_profiles')
+        .select('id, display_name, username, profile_photo_url')
+        .in('id', userIds);
+      const byId = new Map((profiles || []).map(p => [p.id, p]));
+      return rows.map(r => ({
+        ...r,
+        invitee_profile: r.invitee_user_id ? (byId.get(r.invitee_user_id) as any) ?? null : null,
+      })) as BusinessInvite[];
     },
   });
+}
+
+async function fireInviteEmail(inviteId: string) {
+  try {
+    await supabase.functions.invoke('send-business-invite', { body: { inviteId } });
+  } catch (e) {
+    // fire-and-forget
+    console.warn('[send-business-invite] failed', e);
+  }
 }
 
 export function useCreateInvite(businessId: string) {
@@ -103,7 +133,37 @@ export function useCreateInvite(businessId: string) {
         .single();
 
       if (error) throw error;
+
+      // Fire the invite email (non-blocking, we still await so callers can see failures in logs)
+      void fireInviteEmail(data.id);
       return data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['business-invites', businessId] });
+      toast.success('Invitation sent');
+    },
+    onError: (error: Error) => {
+      toast.error('Failed to send invitation', { description: error.message });
+    },
+  });
+}
+
+export function useCreateInviteByUser(businessId: string) {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async ({ userId, role }: { userId: string; role: AssignableBusinessRole }) => {
+      const { data, error } = await (supabase.rpc as any)('invite_business_member_by_user', {
+        p_business_id: businessId,
+        p_invitee_user_id: userId,
+        p_role: role,
+      });
+      if (error) throw error;
+      const result = data as { success?: boolean; error?: string; invite_id?: string };
+      if (result?.success === false) throw new Error(result.error || 'Failed to invite user');
+
+      if (result?.invite_id) void fireInviteEmail(result.invite_id);
+      return result;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['business-invites', businessId] });
@@ -144,13 +204,12 @@ export function useAcceptInvite() {
     mutationFn: async (token: string) => {
       const { data, error } = await supabase.rpc('accept_business_invite', { p_token: token });
       if (error) throw error;
-      const result = data as { success: boolean; error?: string; membership_id?: string };
+      const result = data as { success: boolean; error?: string; membership_id?: string; business_id?: string };
       if (!result.success) throw new Error(result.error || 'Failed to accept invite');
       return result;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['my-businesses'] });
-      toast.success('Invitation accepted', { description: 'You are now a team member' });
     },
     onError: (error: Error) => {
       toast.error('Failed to accept invitation', { description: error.message });

@@ -42,6 +42,7 @@ const HIDDEN_ROUTE_PREFIXES = [
   '/terms', // Terms of service — standalone, no bottom nav
   '/businesses/manage', // Manage business profiles — standalone shell, no bottom nav
   '/business/create', // Create business profile — standalone shell, no bottom nav
+  '/business/invite/accept', // Team invite accept page — standalone shell, no bottom nav
 
 ];
 

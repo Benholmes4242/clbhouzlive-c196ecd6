@@ -38,6 +38,7 @@ export const GLOBAL_HEADER_EXCLUDED_PREFIXES = [
   '/terms', // Terms page has its own header
   '/businesses/manage', // Manage business profiles uses ManagePageShell (own header, no global chrome)
   '/business/create', // Create business profile uses ManagePageShell (own header, no global chrome)
+  '/business/invite/accept', // Team invite accept uses ManagePageShell (own header, no global chrome)
 
 ] as const;
 
