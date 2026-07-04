@@ -348,10 +348,11 @@ const BusinessProfilePage: React.FC = () => {
             actorType="business"
             actorId={business.id}
             isOwnProfile={isOwner || false}
+            businessName={business.name}
           />
         );
       case 'about':
-        return <BusinessProfileInfo business={business} canManage={isOwner} />;
+        return <BusinessProfileInfo business={business} canManage={isOwner} userId={user?.id} />;
       case 'team':
         return <BusinessTeamTab businessId={business.id} />;
       default:
