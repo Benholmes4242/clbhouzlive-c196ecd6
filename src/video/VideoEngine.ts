@@ -447,8 +447,16 @@ class VideoEngineImpl {
   }
 
 
-  play(laneId: LaneId): Promise<void> {
+  play(laneId: LaneId, opts: { callerPostId?: string | null } = {}): Promise<void> {
     const lane = this.getLane(laneId);
+    PPRACE('PLAY', {
+      laneId,
+      callerPostId: opts.callerPostId ?? null,
+      lanePostId: lane.postId,
+      wantPlayBefore: lane.wantPlay,
+      paused: lane.el.paused,
+      t: lane.el.currentTime,
+    });
     // Persistent intent: set now, honored on mount + on canplay after (re)load.
     lane.wantPlay = true;
     if (!lane.mountedHost) {
@@ -462,8 +470,16 @@ class VideoEngineImpl {
     });
   }
 
-  pause(laneId: LaneId): void {
+  pause(laneId: LaneId, opts: { callerPostId?: string | null } = {}): void {
     const lane = this.getLane(laneId);
+    PPRACE('PAUSE', {
+      laneId,
+      callerPostId: opts.callerPostId ?? null,
+      lanePostId: lane.postId,
+      wantPlayBefore: lane.wantPlay,
+      paused: lane.el.paused,
+      t: lane.el.currentTime,
+    });
     lane.wantPlay = false;
     if (!lane.el.paused) lane.el.pause();
   }
@@ -474,6 +490,7 @@ class VideoEngineImpl {
       if (!lane.el.paused) lane.el.pause();
     });
   }
+
 
 
 
