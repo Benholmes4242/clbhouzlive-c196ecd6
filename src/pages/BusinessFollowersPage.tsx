@@ -1,5 +1,5 @@
 import { Skeleton } from '@/components/ui/skeleton';
-import { useParams } from 'react-router-dom';
+import { useParams, useSearchParams } from 'react-router-dom';
 import { useBusinessProfile } from '@/hooks/useBusinessProfile';
 import {
   useBusinessFollowersPaginated,
@@ -15,6 +15,8 @@ export default function BusinessFollowersPage({ initialTab = 'followers' }: { in
   useHideBottomNav();
   useHideHeader();
   const { idOrSlug } = useParams<{ idOrSlug: string }>();
+  const [searchParams] = useSearchParams();
+  const shellTitle = initialTab === 'following' || searchParams.get('tab') === 'following' ? 'Following' : 'Followers';
   const { data: business, isLoading: bizLoading } = useBusinessProfile(idOrSlug);
 
   const {
@@ -45,7 +47,7 @@ export default function BusinessFollowersPage({ initialTab = 'followers' }: { in
 
   if (bizLoading) {
     return (
-      <ManagePageShell title={initialTab === 'following' ? 'Following' : 'Followers'}>
+      <ManagePageShell title={shellTitle}>
       <div className="min-h-screen bg-background">
         <div
           className="bg-background border-b border-border px-4 pb-3 pt-2"
@@ -67,7 +69,7 @@ export default function BusinessFollowersPage({ initialTab = 'followers' }: { in
   const displayName = business.slug || business.name || 'business';
 
   return (
-    <ManagePageShell title={initialTab === 'following' ? 'Following' : 'Followers'}>
+    <ManagePageShell title={shellTitle}>
       <UserListPage
         mode="followers"
         title="Followers"

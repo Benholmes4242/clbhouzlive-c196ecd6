@@ -1,6 +1,6 @@
 import { useEffect } from 'react';
 import { Skeleton } from '@/components/ui/skeleton';
-import { useParams } from 'react-router-dom';
+import { useParams, useSearchParams } from 'react-router-dom';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { usePaginatedFollowers, usePaginatedFollowing } from '@/hooks/useSocialLists';
 import { useUserByUsername } from '@/hooks/useUserByUsername';
@@ -15,7 +15,9 @@ const FollowersListPage = ({ initialTab = 'followers' }: { initialTab?: 'followe
   useHideBottomNav();
   useHideHeader();
   const { username } = useParams<{ username: string }>();
+  const [searchParams] = useSearchParams();
   const { user: currentUser } = useSupabaseSession();
+  const shellTitle = initialTab === 'following' || searchParams.get('tab') === 'following' ? 'Following' : 'Followers';
 
   // Fetch profile user by username
   const { data: profileUser, isLoading: profileLoading } = useUserByUsername(username);
@@ -64,7 +66,7 @@ const FollowersListPage = ({ initialTab = 'followers' }: { initialTab?: 'followe
 
   if (profileLoading) {
     return (
-      <ManagePageShell title={initialTab === 'following' ? 'Following' : 'Followers'}>
+      <ManagePageShell title={shellTitle}>
       <div className="min-h-screen bg-background">
         <div
           className="sticky top-0 bg-background border-b border-border px-4 pb-3 pt-2"
@@ -97,7 +99,7 @@ const FollowersListPage = ({ initialTab = 'followers' }: { initialTab?: 'followe
 
   if (!profileUser) {
     return (
-      <ManagePageShell title={initialTab === 'following' ? 'Following' : 'Followers'}>
+      <ManagePageShell title={shellTitle}>
       <div className="flex items-center justify-center min-h-screen">
         <p className="text-muted-foreground">User not found</p>
       </div>
@@ -106,7 +108,7 @@ const FollowersListPage = ({ initialTab = 'followers' }: { initialTab?: 'followe
   }
 
   return (
-    <ManagePageShell title={initialTab === 'following' ? 'Following' : 'Followers'}>
+    <ManagePageShell title={shellTitle}>
       <UserListPage
         mode="followers"
         title="Followers"
