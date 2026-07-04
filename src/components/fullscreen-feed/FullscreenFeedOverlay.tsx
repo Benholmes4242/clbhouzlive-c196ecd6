@@ -308,6 +308,7 @@ export function FullscreenFeedOverlay() {
             ) : (
               <>
                 <div
+                  ref={hostRef}
                   style={{
                     position: 'absolute',
                     inset: 0,
@@ -315,6 +316,7 @@ export function FullscreenFeedOverlay() {
                     transition: 'opacity 120ms linear',
                   }}
                 >
+
                   <SnapFeed
                     posts={posts}
                     activeTab="foryou"
