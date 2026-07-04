@@ -1214,6 +1214,8 @@ const UserRowFlat: React.FC<UserRowFlatProps> = ({
   // Brief #6: kebab visible only on owner view (visitors don't manage relationships)
   const showKebab = isOwnProfile && !isSelf && !!currentUserId && isPersonalProfile;
 
+  const showFollowingPill = uiState === 'following';
+
   return (
     <>
       <div
@@ -1223,53 +1225,52 @@ const UserRowFlat: React.FC<UserRowFlatProps> = ({
         onKeyDown={(e) => {
           if (e.key === 'Enter' || e.key === ' ') handleRowClick();
         }}
-        className="w-full flex items-center gap-3 px-3.5 py-3 text-left transition-colors active:bg-[rgba(15,23,42,0.02)] cursor-pointer"
-        style={{ background: '#FFFFFF', borderRadius: 16, border: `0.5px solid ${BORDER}` }}
+        className="w-full flex items-center text-left transition-colors active:bg-[rgba(15,23,42,0.02)] cursor-pointer"
+        style={{
+          gap: 12,
+          padding: '11px 16px',
+          background: '#FFFFFF',
+          borderTop: isFirst ? undefined : `1px solid ${HAIR}`,
+        }}
       >
         <SquircleAvatar
           src={user.avatarUrl || undefined}
           alt={user.displayName}
-          size={50}
+          size={46}
           fallback={user.displayName?.charAt(0) || '?'}
           hideRing
           className="flex-shrink-0"
         />
 
         <div className="flex-1 min-w-0">
-          <div className="flex items-center gap-1.5 mb-0.5 min-w-0">
+          <div className="flex items-center gap-1.5 mb-1 min-w-0">
             <span
               className="truncate"
-              style={{ fontSize: 14, fontWeight: 700, color: INK, letterSpacing: '-0.005em' }}
+              style={{ fontSize: 14.5, fontWeight: 700, color: INK, letterSpacing: '-0.005em', fontFamily: FONT_SERIF }}
             >
               {user.displayName}
             </span>
             {isFriend && <FriendBadge />}
           </div>
 
-          {user.username && (
-            <p className="text-xs truncate" style={{ color: INK_SUBTLE, marginBottom: 2 }}>
-              @{user.username}
-            </p>
-          )}
-
-          {(user.homeClub || showHandicap) && (
-            <div className="flex items-center gap-1.5 min-w-0" style={{ marginTop: 2 }}>
-              {user.homeClub && (
-                <span className="text-xs truncate" style={{ color: INK_SOFT }}>
-                  {user.homeClub}
-                </span>
-              )}
-              {user.homeClub && showHandicap && (
-                <span style={{ color: INK_FAINT, fontSize: 11 }}>·</span>
-              )}
-              {showHandicap && <HandicapInline value={user.handicapIndex as number} />}
-            </div>
-          )}
+          <div
+            className="truncate flex items-center"
+            style={{ fontSize: 12.5, color: INK_45, gap: 5, lineHeight: 1.35, minWidth: 0 }}
+          >
+            {user.username && <span className="truncate">@{user.username}</span>}
+            {user.username && user.homeClub && <span style={{ color: INK_FAINT }}>·</span>}
+            {user.homeClub && <span className="truncate">{user.homeClub}</span>}
+            {(user.username || user.homeClub) && showHandicap && (
+              <span style={{ color: INK_FAINT }}>·</span>
+            )}
+            {showHandicap && <HandicapInline value={user.handicapIndex as number} />}
+          </div>
         </div>
 
         {!isSelf && currentUserId && (
           <div
-            className="flex items-center gap-1.5 flex-shrink-0"
+            className="flex items-center flex-shrink-0"
+            style={{ gap: 4 }}
             onClick={(e) => e.stopPropagation()}
           >
             {primaryAction && (
@@ -1281,22 +1282,51 @@ const UserRowFlat: React.FC<UserRowFlatProps> = ({
                   display: 'inline-flex',
                   alignItems: 'center',
                   justifyContent: 'center',
-                  gap: 6,
-                  height: 36,
+                  gap: 5,
+                  height: 32,
                   padding: '0 14px',
-                  borderRadius: 10,
-                  fontSize: 13,
-                  fontWeight: 700,
+                  borderRadius: 20,
+                  fontSize: 12.5,
+                  fontWeight: 800,
                   cursor: primaryAction.disabled ? 'default' : 'pointer',
                   opacity: primaryAction.disabled ? 0.6 : 1,
                   background: primaryAction.isAmber ? AMBER : '#FFFFFF',
                   color: primaryAction.isAmber ? '#FFFFFF' : INK,
-                  border: primaryAction.isAmber ? 'none' : `1px solid ${BORDER}`,
+                  border: primaryAction.isAmber ? 'none' : `1px solid ${HAIR2}`,
                   whiteSpace: 'nowrap',
+                  fontFamily: FONT_SERIF,
                 }}
               >
                 {primaryAction.icon}
                 {primaryAction.label}
+              </button>
+            )}
+            {!primaryAction && showFollowingPill && (
+              <button
+                onClick={handleFollowToggle}
+                disabled={followLoading}
+                aria-label={`Unfollow ${user.displayName}`}
+                style={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  gap: 5,
+                  height: 32,
+                  padding: '0 12px',
+                  borderRadius: 20,
+                  fontSize: 12.5,
+                  fontWeight: 700,
+                  cursor: followLoading ? 'default' : 'pointer',
+                  opacity: followLoading ? 0.6 : 1,
+                  background: '#FFFFFF',
+                  color: INK,
+                  border: `1px solid ${HAIR2}`,
+                  whiteSpace: 'nowrap',
+                  fontFamily: FONT_SERIF,
+                }}
+              >
+                <Check className="w-3.5 h-3.5" />
+                Following
               </button>
             )}
             {showKebab && (
@@ -1307,25 +1337,27 @@ const UserRowFlat: React.FC<UserRowFlatProps> = ({
                 }}
                 aria-label={`More actions for ${user.displayName}`}
                 style={{
-                  width: 36,
-                  height: 36,
+                  width: 32,
+                  height: 32,
                   background: 'transparent',
                   border: 0,
-                  borderRadius: 8,
                   cursor: 'pointer',
-                  color: INK_SUBTLE,
+                  color: INK_45,
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
                   flexShrink: 0,
+                  fontSize: 17,
                 }}
               >
-                <MoreHorizontal className="w-5 h-5" />
+                <MoreHorizontal size={17} />
               </button>
             )}
           </div>
         )}
       </div>
+
+
 
 
       {/* Kebab actions sheet */}
