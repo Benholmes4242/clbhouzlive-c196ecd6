@@ -41,16 +41,20 @@ import {
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
 
-// Locked editorial tokens — consistent with polish arc
+// Network page tokens — mirrors Activity page so both read as one system
 const INK = '#0F172A';
-const INK_SOFT = '#475569';
+const INK_SOFT = '#475569';          // INK_60
+const INK_45 = '#64748B';
 const INK_SUBTLE = '#94A3B8';
 const INK_FAINT = '#CBD5E1';
 const AMBER = '#F7931E';
 const AMBER_DEEP = '#C97A10';
+const AMBER_SOFT = 'rgba(247,147,30,0.10)';
 const AMBER_WASH = 'rgba(247,147,30,0.08)';
 const AMBER_BORDER = 'rgba(247,147,30,0.30)';
-const BORDER = 'rgba(15,23,42,0.07)';
+const HAIR = 'rgba(15,23,42,0.08)';
+const HAIR2 = 'rgba(15,23,42,0.12)';
+const BORDER = HAIR;
 const BG_SURFACE = '#F8FAFC';
 const FONT_SERIF = '"Geist", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif';
 
