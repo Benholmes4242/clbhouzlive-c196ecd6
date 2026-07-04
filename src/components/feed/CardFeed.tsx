@@ -25,6 +25,7 @@ import type { ActiveActor } from '@/types/actor';
 import { useFullscreenFeedStore } from '@/store/fullscreenFeedStore';
 import { openWithOrigin } from '@/lib/openWithOrigin';
 import { useClubhouseStore } from '@/store/clubhouseStore';
+import { fp } from '@/perf/feedPlayTelemetry';
 
 import { FeedCard } from './FeedCard';
 
@@ -194,10 +195,19 @@ export const CardFeed = forwardRef<CardFeedHandle, CardFeedProps>(function CardF
     settleTimer.current = setTimeout(() => {
       setPlayingIdx(activeIdx);
     }, SETTLE_MS);
+    // [FEEDPLAY] mark FP_ACTIVE for the newly-active video card.
+    const p = posts[activeIdx];
+    if (p && p.mediaItems?.[0]?.type === 'video') fp.active(p.id);
     return () => {
       if (settleTimer.current) clearTimeout(settleTimer.current);
     };
-  }, [activeIdx]);
+  }, [activeIdx, posts]);
+
+  // [FEEDPLAY] mark FP_PLAYING_IDX when the settle-promoted index changes.
+  useEffect(() => {
+    const p = posts[playingIdx];
+    if (p && p.mediaItems?.[0]?.type === 'video') fp.playingIdx(p.id);
+  }, [playingIdx, posts]);
 
   const recheckActive = useCallback(() => {
     const viewportCenter = window.innerHeight / 2;
@@ -239,8 +249,15 @@ export const CardFeed = forwardRef<CardFeedHandle, CardFeedProps>(function CardF
           if (Number.isNaN(idx)) continue;
           if (e.isIntersecting) {
             visibilityRef.current.set(idx, e.intersectionRatio);
+            // [FEEDPLAY] mark first-visible for video cards.
+            const p = posts[idx];
+            if (p && p.mediaItems?.[0]?.type === 'video') {
+              fp.visible(p.id, e.intersectionRatio);
+            }
           } else {
             visibilityRef.current.delete(idx);
+            const p = posts[idx];
+            if (p) fp.reset(p.id); // allow next re-entry to re-measure
           }
 
         }
@@ -255,7 +272,7 @@ export const CardFeed = forwardRef<CardFeedHandle, CardFeedProps>(function CardF
       visibilityRef.current.clear();
       cardEls.current.clear();
     };
-  }, [recheckActive]);
+  }, [recheckActive, posts]);
 
   // Re-evaluate on scroll — IntersectionObserver alone doesn't fire
   // continuously during scroll within the on-screen set.

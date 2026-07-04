@@ -16,6 +16,7 @@
 
 import Hls, { type HlsConfig } from 'hls.js';
 import { isPerfEnabled } from '@/perf/navTiming';
+import { fp } from '@/perf/feedPlayTelemetry';
 import {
   ABR_MAX_KBPS,
   DEFAULT_LANE_IDS,
@@ -176,6 +177,12 @@ class VideoEngineImpl {
   ): void {
     const lane = this.getLane(laneId);
     const { hlsUrl, posterUrl = null, startPosition = -1, postId = null } = opts;
+    // [FEEDPLAY] mark laneLoad for feed-active lane.
+    if (laneId === 'feed-active') {
+      const preloaded =
+        lane.hlsUrl === hlsUrl && lane.el.readyState >= 2;
+      fp.laneLoad(postId, { preloaded, startPositionSet: startPosition > 0 });
+    }
     lane.postId = postId;
 
 
@@ -204,6 +211,12 @@ class VideoEngineImpl {
       // Safari path — no hls.js instance, use the element's native player.
       lane.el.src = hlsUrl;
       this.wireElementEvents(lane, /* usingHls */ false);
+      const onMetaFp = () => {
+        if (lane.id === 'feed-active') fp.hlsManifest(lane.postId);
+        lane.el.removeEventListener('loadedmetadata', onMetaFp);
+      };
+      lane.el.addEventListener('loadedmetadata', onMetaFp);
+      lane.detachFns.push(() => lane.el.removeEventListener('loadedmetadata', onMetaFp));
       if (startPosition > 0) {
         const onMeta = () => {
           try {
@@ -250,6 +263,7 @@ class VideoEngineImpl {
         return lvl.bitrate <= cap ? idx : best;
       }, hls.levels.length - 1);
       hls.autoLevelCapping = maxLevel;
+      if (lane.id === 'feed-active') fp.hlsManifest(lane.postId);
       this.transition(lane, 'ready');
     };
     const onError = (_evt: unknown, data: any) => {
@@ -323,7 +337,15 @@ class VideoEngineImpl {
       if (lane.state !== 'error') this.transition(lane, 'paused');
     };
     const onError = () => this.transition(lane, 'error');
+    const onCanPlay = () => {
+      if (lane.id === 'feed-active') fp.canplay(lane.postId);
+    };
+    const onPlaying = () => {
+      if (lane.id === 'feed-active') fp.firstFrame(lane.postId);
+    };
     el.addEventListener('loadeddata', onLoadedData);
+    el.addEventListener('canplay', onCanPlay);
+    el.addEventListener('playing', onPlaying);
     el.addEventListener('seeked', onSeeked);
     el.addEventListener('timeupdate', onTime);
     el.addEventListener('play', onPlay);
@@ -331,6 +353,8 @@ class VideoEngineImpl {
     el.addEventListener('error', onError);
     lane.detachFns.push(() => {
       el.removeEventListener('loadeddata', onLoadedData);
+      el.removeEventListener('canplay', onCanPlay);
+      el.removeEventListener('playing', onPlaying);
       el.removeEventListener('seeked', onSeeked);
       el.removeEventListener('timeupdate', onTime);
       el.removeEventListener('play', onPlay);
@@ -342,6 +366,7 @@ class VideoEngineImpl {
 
   play(laneId: LaneId): Promise<void> {
     const lane = this.getLane(laneId);
+    if (laneId === 'feed-active') fp.playCall(lane.postId);
     const p = lane.el.play();
     return Promise.resolve(p).catch((err) => {
       DBG(laneId, 'play() rejected', err);
