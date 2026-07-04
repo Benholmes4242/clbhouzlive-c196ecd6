@@ -330,24 +330,65 @@ const BusinessProfilePage: React.FC = () => {
       <div className="relative pointer-events-none" style={{ zIndex: 1 }}>
         <div
           className="relative w-full overflow-hidden"
-          style={(() => {
-            const scrim = 'linear-gradient(180deg, rgba(15,23,42,0.45) 0%, rgba(15,23,42,0.1) 20%, rgba(15,23,42,0) 40%, rgba(15,23,42,0.5) 100%)';
-            const bg = heroUrl
-              ? `${scrim}, url(${heroUrl}) center / cover no-repeat`
-              : 'linear-gradient(180deg,#1E4D38,#0F172A)';
-            return {
-              minHeight: 'calc(var(--profile-hero-h) + env(safe-area-inset-top, 0px))',
-              background: bg,
-              backgroundColor: '#0F172A',
-              paddingTop: 'env(safe-area-inset-top, 0px)',
-            } as React.CSSProperties;
-          })()}
+          style={{
+            minHeight: 'calc(var(--profile-hero-h) + env(safe-area-inset-top, 0px))',
+            backgroundColor: '#0F172A',
+            paddingTop: 'env(safe-area-inset-top, 0px)',
+          }}
         >
+          {/* Cover image layer — locked to 3:2 of full width so what the user
+              framed in the editor is exactly what shows. Content below may
+              extend past the image height over the dark background. */}
+          {heroUrl ? (
+            <div
+              aria-hidden
+              style={{
+                position: 'absolute',
+                top: 0,
+                left: 0,
+                right: 0,
+                aspectRatio: '3 / 2',
+                backgroundImage: `url(${heroUrl})`,
+                backgroundSize: 'cover',
+                backgroundPosition: 'center',
+                zIndex: 0,
+              }}
+            />
+          ) : (
+            <div
+              aria-hidden
+              style={{
+                position: 'absolute',
+                top: 0,
+                left: 0,
+                right: 0,
+                aspectRatio: '3 / 2',
+                background: 'linear-gradient(180deg,#1E4D38,#0F172A)',
+                zIndex: 0,
+              }}
+            />
+          )}
+          {/* Scrim over the cover image only */}
+          <div
+            aria-hidden
+            style={{
+              position: 'absolute',
+              top: 0,
+              left: 0,
+              right: 0,
+              aspectRatio: '3 / 2',
+              background:
+                'linear-gradient(180deg, rgba(15,23,42,0.45) 0%, rgba(15,23,42,0.1) 20%, rgba(15,23,42,0) 40%, rgba(15,23,42,0.5) 100%)',
+              zIndex: 1,
+              pointerEvents: 'none',
+            }}
+          />
           {isOwner && (
             <button
               onClick={() => heroFileInputRef.current?.click()}
-              className="absolute bottom-3 right-3 h-11 w-11 flex items-center justify-center rounded-full active:scale-[0.97] transition-transform z-10 pointer-events-auto"
+              className="absolute bottom-3 right-3 h-11 w-11 flex items-center justify-center rounded-full active:scale-[0.97] transition-transform pointer-events-auto"
               style={{
+                zIndex: 2,
                 background: 'rgba(0,0,0,0.45)',
                 backdropFilter: 'blur(24px) saturate(180%)',
                 WebkitBackdropFilter: 'blur(24px) saturate(180%)',
@@ -360,6 +401,7 @@ const BusinessProfilePage: React.FC = () => {
             </button>
           )}
         </div>
+
 
 
         {/* Floating header — canonical glass control row under the notch */}
