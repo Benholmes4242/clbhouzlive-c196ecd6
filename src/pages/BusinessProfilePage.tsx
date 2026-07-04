@@ -55,6 +55,11 @@ import {
 
 import { trackBusinessProfileVisit, trackBusinessAction } from '@/lib/businessAnalyticsTracking';
 import { ReportSheet } from '@/components/messaging/ReportSheet';
+import { PhotoActionSheet } from '@/components/profile/edit-v2/PhotoActionSheet';
+import { useBusinessReviewStats } from '@/hooks/useBusinessReviewStats';
+import { supabase } from '@/integrations/supabase/client';
+import { useQuery } from '@tanstack/react-query';
+import { openExternalUrl } from '@/utils/median/openExternalUrl';
 
 
 type BusinessTab = 'posts' | 'about' | 'team';
