@@ -226,10 +226,6 @@ export const CardFeed = forwardRef<CardFeedHandle, CardFeedProps>(function CardF
     }
   }, [playingIdx, posts]);
 
-  const recheckActive = useCallback(() => {
-    const viewportCenter = window.innerHeight / 2;
-    let bestIdx = -1;
-    let bestDist = Infinity;
 
   const recheckActive = useCallback(() => {
     // Platform-standard card-feed activation: eligible at >=PLAY_IN visible,
