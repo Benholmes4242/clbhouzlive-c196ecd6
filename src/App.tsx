@@ -323,6 +323,7 @@ const BusinessProfileLiveSuccessPage = lazy(() => import("./pages/BusinessProfil
 const BusinessVerificationPage = lazy(() => import("./pages/BusinessVerificationPage"));
 const BusinessTeamPage = lazy(() => import("./pages/BusinessTeamPage"));
 const BusinessInvitePage = lazy(() => import("./pages/BusinessInvitePage"));
+const BusinessInviteAcceptPage = lazy(() => import("./pages/BusinessInviteAcceptPage"));
 const BusinessActivityPage = lazy(() => import("./pages/BusinessActivityPage"));
 
 
