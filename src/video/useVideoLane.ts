@@ -48,10 +48,23 @@ export function useVideoLane(
   // When another card becomes active, its mount effect appendChild's the
   // element out of us automatically; no explicit unmount needed here.
   useEffect(() => {
-    if (!opts.active || !hostRef.current) return;
-    VideoEngine.mountLane(laneId, hostRef.current);
-    // No cleanup: the next active card will move the element away, or
-    // the fullscreen close path will call release/unmountLane as needed.
+    if (!opts.active) return;
+    // Belt-and-braces: if the host ref hasn't attached yet (rare timing edge
+    // when the card mounts + activates in the same commit), retry on the
+    // next frame instead of silently dropping the mount.
+    let raf = 0;
+    const tryMount = () => {
+      const host = hostRef.current;
+      if (host) {
+        VideoEngine.mountLane(laneId, host);
+        return;
+      }
+      raf = requestAnimationFrame(tryMount);
+    };
+    tryMount();
+    return () => {
+      if (raf) cancelAnimationFrame(raf);
+    };
   }, [laneId, opts.active]);
 
   // Subscribe to lane state.
