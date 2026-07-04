@@ -212,19 +212,37 @@ export function PlayerScorecardSheet({
                 </span>
               </>
             ) : (
-              <span style={{ ...NUM, fontSize: 11, fontWeight: 700, letterSpacing: '0.06em', color: INK_MUTE }}>
+              <span style={{ ...NUM, fontSize: 11, fontWeight: 700, letterSpacing: '0.06em', color: T.dim }}>
                 ROUND {selected.round}{selected.thru >= selected.holes.length ? ' · COMPLETE' : ''}
               </span>
             )}
           </div>
           <div style={{ display: 'flex', alignItems: 'baseline', gap: 5 }}>
-            <span style={{ fontSize: 9, fontWeight: 800, letterSpacing: '0.08em', color: INK_MUTE }}>ROUND</span>
-            <span style={{ ...NUM, fontSize: 18, fontWeight: 800, color: roundRel == null ? INK : roundRel < 0 ? '#2F6B4F' : roundRel > 0 ? '#B5703C' : INK }}>
+            <span style={{ fontSize: 9, fontWeight: 800, letterSpacing: '0.08em', color: T.dim }}>ROUND</span>
+            <span style={{ ...NUM, fontSize: 18, fontWeight: 800, color: roundRel == null ? T.ink : roundRel < 0 ? T.under : roundRel > 0 ? T.over : T.ink }}>
               {fmtRel(roundRel, selected.played)}
             </span>
           </div>
         </div>
       )}
+
+      {/* trajectory */}
+      {selected && selected.played && (() => {
+        const holesToUse = isSelectedLive ? selected.holes.slice(0, selected.thru) : selected.holes;
+        const traj = toTrajectory(holesToUse);
+        if (traj.filter((h) => h.par != null && h.strokes != null).length < 2) return null;
+        return (
+          <div style={{ padding: '0 16px 6px' }}>
+            <div style={{
+              fontFamily: GEIST, fontSize: 9, fontWeight: 800,
+              color: T.faint, letterSpacing: '0.12em', marginBottom: 6,
+            }}>
+              ROUND {selected.round} · THE SHAPE
+            </div>
+            <TrajectoryLine holes={traj} surface="light" theme={T} />
+          </div>
+        );
+      })()}
 
       {/* body */}
       {isLoading ? (
@@ -236,15 +254,16 @@ export function PlayerScorecardSheet({
           Hole-by-hole scorecard isn't available for this tour.
         </div>
       ) : selected && selected.played ? (
-        <div style={{ padding: '0 14px 14px', display: 'flex', flexDirection: 'column', gap: 14 }}>
-          <Nine holes={selected.holes.slice(0, 9)} label="OUT" />
-          <Nine holes={selected.holes.slice(9, 18)} label="IN" />
+        <div style={{ padding: '0 14px 14px', display: 'flex', flexDirection: 'column', gap: 15 }}>
+          <NineGrid holes={toTrajectory(selected.holes.slice(0, 9))} label="OUT" startAt={1} surface="light" theme={T} />
+          <NineGrid holes={toTrajectory(selected.holes.slice(9, 18))} label="IN" startAt={10} surface="light" theme={T} />
         </div>
       ) : (
         <div style={{ padding: '30px 18px 40px', textAlign: 'center', color: INK_MUTE, fontSize: 13 }}>
           Round {selectedRound} hasn't started yet.
         </div>
       )}
+
 
 
       {/* visit profile CTA */}
