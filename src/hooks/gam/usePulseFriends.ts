@@ -10,6 +10,7 @@ export interface PulseFriend {
   delta90: number | null;
   hcp_series: number[]; // 90D points, oldest → newest
   last_played: string; // ISO date
+  last5: boolean[]; // up to 5 recent rounds, oldest -> newest; true = played to handicap or better
   hot: boolean;
 }
 
