@@ -26,6 +26,7 @@ import { useManageableBusinessIds } from '@/hooks/useManageableBusinessIds';
 import { canManagePost } from '@/lib/canManagePost';
 import { getActorRouteByType } from '@/types/actor';
 // [VIDEOSTUB] FullscreenDebugPanel + mobileVideoDebug imports removed — engine severed.
+import { fsv, fsvViewport } from '@/perf/fsvTelemetry';
 const fsTimeStart = (_label: string) => {};
 const fsTimeEnd = (_label: string, _note?: string) => {};
 const fsEvent = (_label: string, _data?: unknown) => {};
@@ -143,6 +144,9 @@ export function FullscreenFeedOverlay() {
       const rootEl = document.getElementById('root');
       const savedScrollTop = rootEl ? rootEl.scrollTop : 0;
 
+      fsv('open.effect', { startIndex, savedScrollTop });
+      const vpBefore = fsvViewport();
+
       // Clear any stale 'open' span left un-closed from a prior session before
       // starting a fresh one (prevents a leftover span producing a fake duration).
       fsTimeEnd('open', '(stale open span discarded)');
@@ -162,7 +166,20 @@ export function FullscreenFeedOverlay() {
         (window as any).median?.statusbar?.set({ style: 'dark', color: '00000000', overlay: true, blur: false });
       } catch {}
 
+      // Log viewport before/after body-class + statusbar mutations. The
+      // difference here is the delta that targetRect was memoised BEFORE.
+      // Use rAF so any layout-triggered viewport change is captured.
+      requestAnimationFrame(() => {
+        fsv('open.viewport', {
+          before: vpBefore,
+          afterRAF: fsvViewport(),
+        });
+      });
+
       return () => {
+        fsv('close.effect', {
+          viewport: fsvViewport(),
+        });
         // FS_CLOSE currentTime read removed — playhead sync is nuked, and the
         // fullscreen <video> is typically detached by the time this cleanup
         // runs (always logged fsT=-1). Kept as a no-op boundary.
@@ -200,16 +217,29 @@ export function FullscreenFeedOverlay() {
   // onFirstFrameReady, or after a 400ms watchdog — whichever first.
   useEffect(() => {
     if (isOpen && origin) {
+      fsv('clone.init', {
+        origin,
+        cloneVisibleBefore: cloneVisible,
+        cloneExpandedBefore: cloneExpanded,
+        firstFrameReadyBefore: firstFrameReady,
+      });
       setCloneVisible(true);
       setCloneExpanded(false);
       setFirstFrameReady(false);
       // Force layout with the initial rect, then expand on next frame.
       let raf2: number | undefined;
       const raf1 = requestAnimationFrame(() => {
-        raf2 = requestAnimationFrame(() => setCloneExpanded(true));
+        fsv('clone.raf1', { viewport: fsvViewport() });
+        raf2 = requestAnimationFrame(() => {
+          fsv('clone.raf2', { viewport: fsvViewport() });
+          setCloneExpanded(true);
+        });
       });
       // Watchdog: release the clone if the first-frame signal never arrives.
-      watchdogRef.current = setTimeout(() => setFirstFrameReady(true), 400);
+      watchdogRef.current = setTimeout(() => {
+        fsv('clone.watchdog', { note: 'firing @400ms — slide firstFrame not received' });
+        setFirstFrameReady(true);
+      }, 400);
       return () => {
         cancelAnimationFrame(raf1);
         if (raf2 != null) cancelAnimationFrame(raf2);
@@ -224,6 +254,7 @@ export function FullscreenFeedOverlay() {
   }, [isOpen, origin]);
 
   const handleSnapFeedFirstFrame = useCallback(() => {
+    fsv('clone.slideFF', { note: 'onFirstFrameReady from SnapFeed' });
     if (watchdogRef.current) clearTimeout(watchdogRef.current);
     setFirstFrameReady(true);
   }, []);
@@ -231,7 +262,10 @@ export function FullscreenFeedOverlay() {
   // Retire the clone shortly after the crossfade completes.
   useEffect(() => {
     if (!firstFrameReady || !cloneVisible) return;
-    const t = setTimeout(() => setCloneVisible(false), 180);
+    const t = setTimeout(() => {
+      fsv('clone.retire', {});
+      setCloneVisible(false);
+    }, 180);
     return () => clearTimeout(t);
   }, [firstFrameReady, cloneVisible]);
 
@@ -241,7 +275,9 @@ export function FullscreenFeedOverlay() {
     if (typeof window === 'undefined') return null;
     const vw = window.innerWidth;
     const vh = window.innerHeight;
-    return { top: 0, left: 0, width: vw, height: vh };
+    const rect = { top: 0, left: 0, width: vw, height: vh };
+    fsv('target', { rect, viewport: fsvViewport(), isOpen });
+    return rect;
   }, [isOpen]);
 
 

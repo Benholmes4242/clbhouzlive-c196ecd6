@@ -25,6 +25,11 @@ import {
   PAUSE_ON_HIDDEN,
   shouldGateForSaveData,
 } from './lanePolicy';
+import { fsv, fsvEl, fsvTimeSample } from '@/perf/fsvTelemetry';
+
+/** Lanes we emit rich FSV telemetry for — noisy lanes (feed-next preload) skipped. */
+const FSV_LANES = new Set<LaneId>(['fullscreen', 'feed-active']);
+const isFsv = (id: LaneId): boolean => FSV_LANES.has(id);
 
 type LaneState = 'idle' | 'loading' | 'ready' | 'playing' | 'paused' | 'error';
 
@@ -162,11 +167,20 @@ class VideoEngineImpl {
    */
   mountLane(laneId: LaneId, hostEl: HTMLElement): void {
     const lane = this.getLane(laneId);
-    if (lane.el.parentElement !== hostEl) {
+    const alreadyParented = lane.el.parentElement === hostEl;
+    if (!alreadyParented) {
       hostEl.appendChild(lane.el);
       DBG(laneId, 'mounted');
     }
     lane.mountedHost = hostEl;
+    if (isFsv(laneId)) {
+      fsvEl('eng.mountLane', lane.el, {
+        laneId,
+        alreadyParented,
+        wantPlay: lane.wantPlay,
+        postId: lane.postId,
+      });
+    }
     // If play-intent is set (from a pre-mount play() or a still-loading source),
     // kick it off now — wantPlay persists through source changes.
     if (lane.wantPlay && lane.el.paused) {
@@ -185,6 +199,7 @@ class VideoEngineImpl {
       host.appendChild(lane.el);
       DBG(laneId, 'unmounted');
     }
+    if (isFsv(laneId)) fsvEl('eng.unmount', lane.el, { laneId, postId: lane.postId });
     lane.mountedHost = null;
     lane.wantPlay = false;
   }
@@ -209,13 +224,22 @@ class VideoEngineImpl {
       lane.state !== 'error';
     if (alreadyLoaded) {
       DBG(laneId, 'skip reload: same postId+url', { state: lane.state });
+      if (isFsv(laneId)) {
+        fsvEl('eng.load', lane.el, {
+          laneId, postId, startPosition, alreadyLoaded: true, state: lane.state,
+        });
+      }
       return;
     }
+    const priorPostId = lane.postId;
+    const priorHlsUrl = lane.hlsUrl;
+    const priorFirstFrame = lane.firstFrame;
     lane.postId = postId;
 
 
     if (this.saveDataGated) {
       DBG(laneId, 'skip load: save-data gated');
+      if (isFsv(laneId)) fsv('eng.load', { laneId, skipped: 'save-data-gated' });
       return;
     }
     if (this.loadingCount >= MAX_CONCURRENT_LOADS && lane.state !== 'ready' && lane.state !== 'playing') {
@@ -228,8 +252,9 @@ class VideoEngineImpl {
     lane.startPosition = startPosition;
     lane.firstFrame = false;
     // Reset playback position on source change so B doesn't inherit A's time.
+    let resetToZero = false;
     if (startPosition <= 0) {
-      try { lane.el.currentTime = 0; } catch { /* noop */ }
+      try { lane.el.currentTime = 0; resetToZero = true; } catch { /* noop */ }
     }
     // NOTE: do NOT clear wantPlay here — a mid-load play() intent must persist
     // so the engine can start playback once the new source reaches canplay.
@@ -241,12 +266,29 @@ class VideoEngineImpl {
     lane.detachFns = [];
 
     const native = isNativeHlsSupported(lane.el);
-    if (native && !Hls.isSupported()) {
+    const usingNative = native && !Hls.isSupported();
+    if (isFsv(laneId)) {
+      fsvEl('eng.load', lane.el, {
+        laneId,
+        postId,
+        priorPostId,
+        urlChanged: priorHlsUrl !== hlsUrl,
+        priorFirstFrame,
+        startPosition,
+        resetToZero,
+        wantPlay: lane.wantPlay,
+        native: usingNative,
+        hlsInstanceReused: !!lane.hls,
+        hlsUrlTail: hlsUrl.slice(-42),
+      });
+    }
+    if (usingNative) {
       // Safari path — no hls.js instance, use the element's native player.
       lane.el.src = hlsUrl;
       this.wireElementEvents(lane, /* usingHls */ false);
       if (startPosition > 0) {
         const onMeta = () => {
+          if (isFsv(laneId)) fsvEl('eng.load.nativeSeek', lane.el, { laneId, seekTo: startPosition });
           try {
             lane.el.currentTime = startPosition;
           } catch {
@@ -283,6 +325,13 @@ class VideoEngineImpl {
     const hls = lane.hls;
     hls.config.startPosition = startPosition;
     hls.loadSource(hlsUrl);
+    if (isFsv(laneId)) {
+      fsv('eng.load.hlsCfg', {
+        laneId,
+        startPositionCfg: startPosition,
+        instanceReused: !!priorHlsUrl,
+      });
+    }
 
     const onManifest = () => {
       // Enforce ABR ceiling based on manifest levels.
@@ -291,11 +340,16 @@ class VideoEngineImpl {
         return lvl.bitrate <= cap ? idx : best;
       }, hls.levels.length - 1);
       hls.autoLevelCapping = maxLevel;
-      
+      if (isFsv(laneId)) {
+        fsvEl('eng.load.manifest', lane.el, {
+          laneId, levels: hls.levels.length, autoLevelCap: maxLevel,
+        });
+      }
       this.transition(lane, 'ready');
     };
     const onError = (_evt: unknown, data: any) => {
       if (data?.fatal) {
+        if (isFsv(laneId)) fsv('eng.load.error', { laneId, details: data?.details });
         lane.state = 'error';
         this.emit(lane, data?.details ?? 'fatal');
       }
@@ -312,6 +366,7 @@ class VideoEngineImpl {
     this.loadingCount++;
     DBG(laneId, 'load', { hlsUrl, startPosition });
   }
+
 
   /**
    * Preload a source into a lane without playing it. Used to warm the
@@ -336,16 +391,34 @@ class VideoEngineImpl {
 
   private wireElementEvents(lane: Lane, _usingHls: boolean) {
     const el = lane.el;
-    const markFsFirstFrame = () => {
+    const trace = isFsv(lane.id);
+    const markFsFirstFrame = (source: string) => {
       if (lane.firstFrame || lane.id !== 'fullscreen') return;
       const target = lane.startPosition > 0 ? lane.startPosition : 0;
       const now = lane.el.currentTime || 0;
       // Only fire once the element has actually reached (or passed) the requested seek.
-      if (target > 0 && now < target - 0.5) return;
+      if (target > 0 && now < target - 0.5) {
+        if (trace) {
+          fsv('eng.markFF', {
+            laneId: lane.id, source, target: +target.toFixed(3),
+            now: +now.toFixed(3), flipped: false, reason: 'below-target',
+          });
+        }
+        return;
+      }
       lane.firstFrame = true;
+      if (trace) {
+        fsv('eng.markFF', {
+          laneId: lane.id, source, target: +target.toFixed(3),
+          now: +now.toFixed(3), flipped: true,
+        });
+      }
       this.emit(lane);
     };
+    const onLoadstart = () => { if (trace) fsvEl('el.loadstart', el, { laneId: lane.id }); };
+    const onLoadedMeta = () => { if (trace) fsvEl('el.loadedmeta', el, { laneId: lane.id, startPos: lane.startPosition }); };
     const onLoadedData = () => {
+      if (trace) fsvEl('el.loadeddata', el, { laneId: lane.id, startPos: lane.startPosition });
       if (!lane.firstFrame && lane.id === 'feed-active') {
         lane.firstFrame = true;
         this.emit(lane);
@@ -353,12 +426,22 @@ class VideoEngineImpl {
       if (this.loadingCount > 0) this.loadingCount--;
       if (lane.state === 'loading') this.transition(lane, 'ready');
       // Fullscreen with startPosition === 0 (or none) can fire immediately too.
-      if (lane.id === 'fullscreen' && (lane.startPosition <= 0)) markFsFirstFrame();
+      if (lane.id === 'fullscreen' && (lane.startPosition <= 0)) markFsFirstFrame('loadeddata@start<=0');
     };
-    const onSeeked = () => markFsFirstFrame();
+    const onSeeking = () => { if (trace) fsvEl('el.seeking', el, { laneId: lane.id, target: lane.startPosition }); };
+    const onSeeked = () => {
+      if (trace) fsvEl('el.seeked', el, { laneId: lane.id, target: lane.startPosition });
+      markFsFirstFrame('seeked');
+    };
+    const onPlaying = () => { if (trace) fsvEl('el.playing', el, { laneId: lane.id }); };
+    const onWaiting = () => { if (trace) fsvEl('el.waiting', el, { laneId: lane.id }); };
+    const onStalled = () => { if (trace) fsvEl('el.stalled', el, { laneId: lane.id }); };
+    const onRateChange = () => { if (trace) fsvEl('el.ratechange', el, { laneId: lane.id, rate: el.playbackRate }); };
+    const onCanPlayThru = () => { if (trace) fsvEl('el.canplaythru', el, { laneId: lane.id }); };
     const onTime = () => {
       if (lane.postId) this.lastPos.set(lane.postId, lane.el.currentTime || 0);
-      if (lane.id === 'fullscreen' && !lane.firstFrame) markFsFirstFrame();
+      if (trace) fsvTimeSample(`${lane.id}:time`, el, { laneId: lane.id, target: lane.startPosition });
+      if (lane.id === 'fullscreen' && !lane.firstFrame) markFsFirstFrame('timeupdate');
       // Gapless loop for short clips (<15s): native loop leaves a 100-300ms
       // gap on iOS HLS. Preempt the seam by seeking to 0 + play() ourselves.
       const dur = lane.el.duration;
@@ -376,35 +459,57 @@ class VideoEngineImpl {
     };
 
     const onPlay = () => {
+      if (trace) fsvEl('el.play', el, { laneId: lane.id });
       this.transition(lane, 'playing');
     };
     const onPause = () => {
+      if (trace) fsvEl('el.pause', el, { laneId: lane.id });
       if (lane.state !== 'error') this.transition(lane, 'paused');
     };
 
-    const onError = () => this.transition(lane, 'error');
+    const onError = () => {
+      if (trace) fsvEl('el.error', el, { laneId: lane.id, err: el.error?.code });
+      this.transition(lane, 'error');
+    };
     const onCanPlay = () => {
+      if (trace) fsvEl('el.canplay', el, { laneId: lane.id, wantPlay: lane.wantPlay, mounted: !!lane.mountedHost });
       // Honor persistent play-intent: if play() was called before/while the
       // (new) source was loading, kick it off now that it's ready.
       if (lane.wantPlay && lane.mountedHost && lane.el.paused) {
+        if (trace) fsvEl('eng.canplayKick', el, { laneId: lane.id, startPos: lane.startPosition });
         const p = lane.el.play();
         if (p && typeof (p as Promise<void>).catch === 'function') {
           (p as Promise<void>).catch(() => { /* autoplay reject — safe */ });
         }
       }
     };
+    el.addEventListener('loadstart', onLoadstart);
+    el.addEventListener('loadedmetadata', onLoadedMeta);
     el.addEventListener('loadeddata', onLoadedData);
     el.addEventListener('canplay', onCanPlay);
+    el.addEventListener('canplaythrough', onCanPlayThru);
+    el.addEventListener('seeking', onSeeking);
     el.addEventListener('seeked', onSeeked);
+    el.addEventListener('playing', onPlaying);
+    el.addEventListener('waiting', onWaiting);
+    el.addEventListener('stalled', onStalled);
+    el.addEventListener('ratechange', onRateChange);
     el.addEventListener('timeupdate', onTime);
     el.addEventListener('play', onPlay);
     el.addEventListener('pause', onPause);
     el.addEventListener('error', onError);
     lane.detachFns.push(() => {
+      el.removeEventListener('loadstart', onLoadstart);
+      el.removeEventListener('loadedmetadata', onLoadedMeta);
       el.removeEventListener('loadeddata', onLoadedData);
       el.removeEventListener('canplay', onCanPlay);
-      
+      el.removeEventListener('canplaythrough', onCanPlayThru);
+      el.removeEventListener('seeking', onSeeking);
       el.removeEventListener('seeked', onSeeked);
+      el.removeEventListener('playing', onPlaying);
+      el.removeEventListener('waiting', onWaiting);
+      el.removeEventListener('stalled', onStalled);
+      el.removeEventListener('ratechange', onRateChange);
       el.removeEventListener('timeupdate', onTime);
       el.removeEventListener('play', onPlay);
       el.removeEventListener('pause', onPause);
@@ -416,19 +521,30 @@ class VideoEngineImpl {
   play(laneId: LaneId, opts: { callerPostId?: string | null } = {}): Promise<void> {
     const lane = this.getLane(laneId);
     const caller = opts.callerPostId ?? null;
+    const priorPostId = lane.postId;
+    const priorWantPlay = lane.wantPlay;
     // Ownership: the moment a card issues play() it becomes the lane owner.
     // Guarantees pause() owner-guard below can reject stale outgoing cards
     // even if load() hasn't yet updated lane.postId for this caller.
     if (caller != null) lane.postId = caller;
     // Persistent intent: set now, honored on mount + on canplay after (re)load.
     lane.wantPlay = true;
+    if (isFsv(laneId)) {
+      fsvEl('eng.play', lane.el, {
+        laneId, caller, priorPostId, priorWantPlay,
+        mounted: !!lane.mountedHost, state: lane.state, startPos: lane.startPosition,
+      });
+    }
     if (!lane.mountedHost) {
       DBG(laneId, 'play() queued — no mounted host');
+      if (isFsv(laneId)) fsv('eng.play.queued', { laneId, caller });
       return Promise.resolve();
     }
+    if (isFsv(laneId)) fsvEl('eng.play.kick', lane.el, { laneId });
     const p = lane.el.play();
     return Promise.resolve(p).catch((err) => {
       DBG(laneId, 'play() rejected', err);
+      if (isFsv(laneId)) fsv('eng.play.rejected', { laneId, err: String(err) });
     });
   }
 
@@ -440,7 +556,15 @@ class VideoEngineImpl {
     // already took the lane. Null caller = engine-wide (pauseAll/visibility/
     // release) — always allowed.
     if (caller != null && lane.postId != null && caller !== lane.postId) {
+      if (isFsv(laneId)) {
+        fsv('eng.pause.stale', { laneId, caller, lanePostId: lane.postId });
+      }
       return;
+    }
+    if (isFsv(laneId)) {
+      fsvEl('eng.pause', lane.el, {
+        laneId, caller, lanePostId: lane.postId, wantPlayBefore: lane.wantPlay,
+      });
     }
     lane.wantPlay = false;
     if (!lane.el.paused) lane.el.pause();
