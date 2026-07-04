@@ -559,6 +559,7 @@ function AppRoutes() {
         <Route path="/business/:id/verification" element={<Suspense fallback={<GenericPageSkeleton />}><BusinessVerificationPage /></Suspense>} />
         <Route path="/business/:businessId/team" element={<Suspense fallback={<GenericPageSkeleton />}><BusinessTeamPage /></Suspense>} />
         <Route path="/business/:businessId/team/invite" element={<Suspense fallback={<GenericPageSkeleton />}><BusinessInvitePage /></Suspense>} />
+        <Route path="/business/invite/accept" element={<Suspense fallback={<GenericPageSkeleton />}><BusinessInviteAcceptPage /></Suspense>} />
         <Route path="/business/:businessId/activity" element={<Suspense fallback={<GenericPageSkeleton />}><BusinessActivityPage /></Suspense>} />
         <Route path="/business/:idOrSlug/followers" element={<Suspense fallback={<GenericPageSkeleton />}><BusinessFollowersPage /></Suspense>} />
         <Route path="/business/:idOrSlug/following" element={<Suspense fallback={<GenericPageSkeleton />}><BusinessFollowersPage initialTab="following" /></Suspense>} />
