@@ -23,20 +23,27 @@ const GlobalHeader: React.FC = () => {
 
   const pathname = location.pathname;
 
-  // Cinematic tour overview owns its own floating header — suppress the global one.
-  if (floatingHeaderActive) return null;
-
-  if (shouldHideHeader || isGlobalHeaderExcluded(pathname) || isConditionallyExcluded(pathname, searchParams)) {
-    return null;
-  }
+  // FLICKER FIX (step 5): CompactHeader stays mounted for the entire session so
+  // its mount count remains 1 and there's no unmount/remount flash between
+  // routes. When the route excludes the global header (or a floating header /
+  // modal owns chrome), we pass `hidden` — the header becomes zero-height,
+  // invisible, non-interactive, and publishes --header-h: 0 so full-bleed
+  // pages (courses/:id, profile, handicap, manage, notifications, followers)
+  // get the correct paddingTop.
+  const hidden =
+    floatingHeaderActive ||
+    shouldHideHeader ||
+    isGlobalHeaderExcluded(pathname) ||
+    isConditionallyExcluded(pathname, searchParams);
 
   return (
     <>
       <HeaderPerfTracker />
-      <CompactHeader />
+      <CompactHeader hidden={hidden} />
     </>
   );
 };
 
 export default GlobalHeader;
+
 
