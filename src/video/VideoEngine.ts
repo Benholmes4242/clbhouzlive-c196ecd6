@@ -56,8 +56,8 @@ interface Lane {
   postId: string | null;
   /** Non-hidden host the lane element is currently mounted into (null while parked). */
   mountedHost: HTMLElement | null;
-  /** play() called before mount — consumed by the next mountLane. */
-  pendingPlay: boolean;
+  /** Persistent play-intent. Set true by engine.play(), false by pause()/release()/unmount. */
+  wantPlay: boolean;
   listeners: Set<LaneListener>;
   detachFns: Array<() => void>;
 }
@@ -132,7 +132,7 @@ class VideoEngineImpl {
         firstFrame: false,
         postId: null,
         mountedHost: null,
-        pendingPlay: false,
+        wantPlay: false,
         listeners: new Set(),
         detachFns: [],
       });
@@ -167,9 +167,9 @@ class VideoEngineImpl {
       DBG(laneId, 'mounted');
     }
     lane.mountedHost = hostEl;
-    // If play() was called before we had a real host, kick it off now.
-    if (lane.pendingPlay) {
-      lane.pendingPlay = false;
+    // If play-intent is set (from a pre-mount play() or a still-loading source),
+    // kick it off now — wantPlay persists through source changes.
+    if (lane.wantPlay && lane.el.paused) {
       const p = lane.el.play();
       if (p && typeof (p as Promise<void>).catch === 'function') {
         (p as Promise<void>).catch(() => { /* autoplay reject — safe */ });
@@ -186,7 +186,7 @@ class VideoEngineImpl {
       DBG(laneId, 'unmounted');
     }
     lane.mountedHost = null;
-    lane.pendingPlay = false;
+    lane.wantPlay = false;
   }
 
   /**
