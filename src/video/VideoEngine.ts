@@ -177,6 +177,12 @@ class VideoEngineImpl {
   ): void {
     const lane = this.getLane(laneId);
     const { hlsUrl, posterUrl = null, startPosition = -1, postId = null } = opts;
+    // [FEEDPLAY] mark laneLoad for feed-active lane.
+    if (laneId === 'feed-active') {
+      const preloaded =
+        lane.hlsUrl === hlsUrl && lane.el.readyState >= 2;
+      fp.laneLoad(postId, { preloaded, startPositionSet: startPosition > 0 });
+    }
     lane.postId = postId;
 
 
