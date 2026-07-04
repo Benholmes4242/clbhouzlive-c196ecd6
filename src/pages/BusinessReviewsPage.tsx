@@ -438,6 +438,29 @@ export default function BusinessReviewsPage() {
 
   if (!businessId) return null;
 
+  // Guard: Reviews are only available for course-linked businesses.
+  // Brands / coaches / retailers without a claimed club have no course_ratings to show.
+  if (!profileLoading && businessProfile && !businessProfile.club_id) {
+    return (
+      <ManagePageShell title="Reviews">
+        <main className="px-4 pt-16 pb-32 max-w-lg mx-auto text-center">
+          <div
+            className="mx-auto mb-4 flex items-center justify-center"
+            style={{ width: 56, height: 56, borderRadius: 16, background: AMBER_SOFT }}
+          >
+            <Star size={24} strokeWidth={2} style={{ color: AMBER }} />
+          </div>
+          <h2 style={{ color: INK, fontSize: 20, fontWeight: 800, letterSpacing: '-0.01em' }}>
+            Reviews are for golf course profiles
+          </h2>
+          <p className="mt-2" style={{ color: INK_45, fontSize: 14, lineHeight: 1.45 }}>
+            Only businesses linked to a claimed golf course can receive and reply to reviews.
+          </p>
+        </main>
+      </ManagePageShell>
+    );
+  }
+
   const showEmpty = !isLoading && (summary?.count ?? 0) === 0;
 
   return (
