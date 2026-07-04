@@ -319,6 +319,27 @@ class VideoEngineImpl {
     DBG(laneId, 'load', { hlsUrl, startPosition });
   }
 
+  /**
+   * Preload a source into a lane without playing it. Used to warm the
+   * next feed card (via the `feed-next` lane) so manifest + first segment
+   * are fetched before activation → near-instant play on centering.
+   */
+  preload(
+    laneId: LaneId,
+    opts: { hlsUrl: string; posterUrl?: string | null; postId?: string | null }
+  ): void {
+    this.load(laneId, {
+      hlsUrl: opts.hlsUrl,
+      posterUrl: opts.posterUrl ?? null,
+      startPosition: -1,
+      postId: opts.postId ?? null,
+    });
+    // Explicitly ensure the preload lane is paused (its element is in the
+    // hidden host — nothing to render — but paused keeps the decoder cool).
+    const lane = this.getLane(laneId);
+    if (!lane.el.paused) lane.el.pause();
+  }
+
   private wireElementEvents(lane: Lane, _usingHls: boolean) {
     const el = lane.el;
     const markFsFirstFrame = () => {
