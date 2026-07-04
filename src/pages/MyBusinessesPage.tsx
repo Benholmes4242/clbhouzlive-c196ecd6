@@ -176,7 +176,6 @@ function BusinessesAccordion({
             isActive={isActive}
             expanded={isExpanded}
             onToggle={() => {
-              if (memberships.length === 1) return; // single → always open
               setOpenId((prev) => (prev === bizId ? null : bizId ?? null));
             }}
           />
