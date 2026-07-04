@@ -138,6 +138,7 @@ const GlobalBottomNavigation: React.FC<GlobalBottomNavigationProps> = ({ chromeS
   const isBetaGateRoute = location.pathname === '/' && !isMedianApp() && !isPreviewBypass;
   const shouldHideForRoute = HIDDEN_ROUTES.includes(location.pathname) ||
     HIDDEN_ROUTE_PREFIXES.some(prefix => location.pathname.startsWith(prefix)) ||
+    HIDDEN_ROUTE_PATTERNS.some(re => re.test(location.pathname)) ||
     isOnboardingEditProfile ||
     isBetaGateRoute;
 
