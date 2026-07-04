@@ -263,24 +263,31 @@ const CompactHeader: React.FC<CompactHeaderProps> = ({ className, hidden = false
     setMenuOpen(v => !v);
   };
 
-  // Header height: 52px on tour routes (compact), 55px elsewhere.
-  const contentHeight = isEditorialChromeRoute ? 52 : 55;
+  // Header height: 52px on tour routes (compact), 55px elsewhere. When the
+  // header is `hidden` (excluded route or runtime overlay owns chrome), we
+  // publish 0 so full-bleed pages don't reserve a 52-55px paddingTop gap.
+  //
+  // FLAG (52 vs 55): the 3px editorial vs standard split is *intentional* per
+  // the tour-hub density spec (matches the 38px logo/search vs 36px avatar
+  // geometry on tour surfaces). Kept as-is; if we ever standardize, change
+  // both `contentHeight` and the geometry constants together.
+  const contentHeight = hidden ? 0 : (isEditorialChromeRoute ? 52 : 55);
 
   // Publish header height as a CSS variable so ShellSlot + --chrome-total-h
   // can adapt without each consumer needing to know about tour-specific sizing.
   // useLayoutEffect: applies BEFORE paint so destination route renders at the
-  // correct offset on first frame (eliminates the 55→52 jump on Watch→Tour).
-  // Cleanup does NOT reset — the next CompactHeader instance (or the inline
-  // default in index.html) owns the value; resetting mid-route causes a 0/55
-  // bounce that shifts content.
+  // correct offset on first frame (eliminates the 55↔52 jump on Watch↔Tour,
+  // and the "hidden header still reserves 55px" bug on excluded routes).
   React.useLayoutEffect(() => {
     document.documentElement.style.setProperty('--header-h', `${contentHeight}px`);
   }, [contentHeight]);
-  
+
   return (
     <>
       <header
         data-chrome="header"
+        aria-hidden={hidden || undefined}
+        inert={hidden ? '' as unknown as undefined : undefined}
         className={cn(
           "compact-header clubhouse-header",
           "fixed inset-x-0 mx-auto w-full max-w-[480px] md:max-w-[620px] z-header",
@@ -288,24 +295,32 @@ const CompactHeader: React.FC<CompactHeaderProps> = ({ className, hidden = false
         )}
         style={{
           top: 0,
-          background: overlayActive
+          background: hidden
             ? 'transparent'
-            : (useDarkChrome ? '#0A0E14' : 'hsl(var(--background))'),
-          backdropFilter: overlayActive ? 'none' : (useDarkChrome ? 'none' : 'blur(20px)'),
-          WebkitBackdropFilter: overlayActive ? 'none' : (useDarkChrome ? 'none' : 'blur(20px)'),
-          height: `calc(${contentHeight}px + var(--sat, 0px))`,
-          paddingTop: 'var(--sat, 0px)',
-          borderBottom: overlayActive
+            : overlayActive
+              ? 'transparent'
+              : (useDarkChrome ? '#0A0E14' : 'hsl(var(--background))'),
+          backdropFilter: hidden || overlayActive ? 'none' : (useDarkChrome ? 'none' : 'blur(20px)'),
+          WebkitBackdropFilter: hidden || overlayActive ? 'none' : (useDarkChrome ? 'none' : 'blur(20px)'),
+          height: hidden ? 0 : `calc(${contentHeight}px + var(--sat, 0px))`,
+          paddingTop: hidden ? 0 : 'var(--sat, 0px)',
+          borderBottom: hidden || overlayActive
             ? 'none'
             : (useDarkChrome
                 ? '1px solid rgba(255,255,255,0.06)'
                 : '0.5px solid rgba(15,23,42,0.07)'),
-          boxShadow: !useDarkChrome && !overlayActive && scrolled
+          boxShadow: !hidden && !useDarkChrome && !overlayActive && scrolled
             ? '0 6px 16px -6px rgba(15,23,42,0.18)'
             : 'none',
           transition: 'box-shadow 200ms ease, background 200ms ease',
+          // Keep the DOM node mounted for perf continuity, but hide it from
+          // paint, layout, and tap targets when the route excludes it.
+          visibility: hidden ? 'hidden' : undefined,
+          pointerEvents: hidden ? 'none' : undefined,
+          overflow: hidden ? 'hidden' : undefined,
         }}
       >
+
         {/* Scrim for legibility over the cinematic hero photo */}
         {overlayActive && (
           <div
