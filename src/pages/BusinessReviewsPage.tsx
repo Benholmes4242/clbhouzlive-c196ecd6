@@ -8,6 +8,7 @@ import { ConfirmModal } from '@/components/ui/confirm-modal';
 import { Sheet, SheetContent } from '@/components/ui/sheet';
 import { ManagePageShell } from '@/components/manage/ManagePageShell';
 import { useBusinessMembership } from '@/hooks/useBusinessMembership';
+import { useBusinessProfile } from '@/hooks/useBusinessProfile';
 import { useHideBottomNav } from '@/hooks/useBottomNavVisibility';
 import { useHideHeader } from '@/hooks/useHeaderVisibility';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
