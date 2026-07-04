@@ -174,10 +174,10 @@ const BusinessDirectoryPage = () => {
         ) : (
           <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
             {businesses.map((biz: BusinessDirectoryItem) => (
-              <button
+              <DirectoryRow
                 key={biz.id}
-                className="rounded-sq-md border bg-card p-4 text-left hover:border-foreground/40 transition-colors"
-                onClick={() => navigate(`/business/${biz.slug ?? biz.id}`)}
+                biz={biz}
+                onOpen={() => navigate(`/business/${biz.slug ?? biz.id}`, { state: { source: 'directory' } })}
               >
                 <div className="flex items-center gap-3">
                   {biz.logo_url ? (
@@ -219,7 +219,7 @@ const BusinessDirectoryPage = () => {
                     )}
                   </div>
                 </div>
-              </button>
+              </DirectoryRow>
             ))}
           </div>
         )}
