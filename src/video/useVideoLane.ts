@@ -13,7 +13,17 @@
  */
 
 import { useEffect, useRef, useState } from 'react';
+import { isPerfEnabled } from '@/perf/navTiming';
 import { VideoEngine, type LaneId, type LaneSnapshot } from './VideoEngine';
+
+const PPRACE = (tag: string, data: Record<string, unknown>) => {
+  try {
+    if (!isPerfEnabled()) return;
+  } catch { return; }
+  // eslint-disable-next-line no-console
+  console.info('[PPRACE]', tag, data);
+};
+
 
 export interface UseVideoLaneOptions {
   hlsUrl: string | null | undefined;
