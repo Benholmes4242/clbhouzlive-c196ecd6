@@ -131,6 +131,8 @@ class VideoEngineImpl {
         startPosition: -1,
         firstFrame: false,
         postId: null,
+        mountedHost: null,
+        pendingPlay: false,
         listeners: new Set(),
         detachFns: [],
       });
