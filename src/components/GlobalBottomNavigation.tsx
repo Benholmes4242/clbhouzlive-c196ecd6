@@ -28,6 +28,7 @@ const HIDDEN_ROUTES = [
   '/admin-setup',
   '/onboarding',
   '/map',
+  '/notificationmessages', // Notifications/Activity — settings-style standalone shell
 ];
 
 // Route prefixes where bottom navigation should be hidden
