@@ -146,16 +146,21 @@ export function useMedianStatusBar(
     // Apply immediately
     apply();
 
-    // Register Median's async ready callback
+    // Register Median's async ready callback. Flip the module flag so future
+    // hook invocations know the bridge is up and can skip the failsafe retries.
     const prev = window.median_library_ready;
     window.median_library_ready = () => {
+      medianLibraryReady = true;
       if (typeof prev === 'function') prev();
       apply();
     };
 
-    // Failsafe retries for SPA navigation
-    const t1 = setTimeout(apply, 250);
-    const t2 = setTimeout(apply, 750);
+    // Failsafe retries — ONLY when the Median bridge hasn't reported ready yet.
+    // Cold-start needs them (bridge may come up after first paint); warm SPA
+    // navs don't, and running them there caused a visible ~250ms repaint tail.
+    const t1 = !medianLibraryReady ? setTimeout(apply, 250) : null;
+    const t2 = !medianLibraryReady ? setTimeout(apply, 750) : null;
+
 
     // Re-apply on visibility restore (single retry is sufficient)
     const handleVisibility = () => {
