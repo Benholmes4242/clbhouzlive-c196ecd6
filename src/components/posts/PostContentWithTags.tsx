@@ -85,7 +85,7 @@ const PostContentWithTags: React.FC<PostContentWithTagsProps> = ({
       const path = getProfilePathById(entity.entity_id, null, entity.username);
       navigate(path);
     } else if (entity.entity_type === 'business') {
-      navigate(`/business/${entity.entity_id}`);
+      navigate(`/business/${entity.entity_id}`, { state: { source: 'content' } });
     }
   };
 
