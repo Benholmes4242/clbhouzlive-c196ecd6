@@ -33,7 +33,7 @@ const HcpSparkline: React.FC<{ series: number[]; color: string }> = ({ series, c
     return <div style={{ height: h }} />;
   }
   const w = 110;
-  const PAD = 3; // vertical inset so stroke + end-dot never clip at top/bottom
+  const PAD = 3;
   const min = Math.min(...series);
   const max = Math.max(...series);
   const range = Math.max(0.1, max - min);
@@ -53,6 +53,14 @@ const HcpSparkline: React.FC<{ series: number[]; color: string }> = ({ series, c
   );
 };
 
+const ZONE_LABEL: React.CSSProperties = {
+  fontSize: 8,
+  fontWeight: 800,
+  letterSpacing: '0.14em',
+  color: 'var(--hcp-t-40)',
+  textTransform: 'uppercase',
+};
+
 export const PulseCard: React.FC<Props> = ({ friend }) => {
   const navigate = useNavigate();
   const isUp = (friend.delta90 ?? 0) >= 0.3;
@@ -63,13 +71,11 @@ export const PulseCard: React.FC<Props> = ({ friend }) => {
     : isDown
       ? 'var(--hcp-good, #10B981)'
       : 'var(--hcp-t-40)';
-  const lineColor = friend.hot
-    ? 'var(--hcp-amber-bold, #FBBC2E)'
-    : isDown
-      ? 'var(--hcp-good, #10B981)'
-      : isUp
-        ? 'var(--hcp-bad, #EF4444)'
-        : 'var(--hcp-t-60)';
+  const lineColor = isDown
+    ? 'var(--hcp-good, #10B981)'
+    : isUp
+      ? 'var(--hcp-bad, #EF4444)'
+      : 'var(--hcp-t-60)';
   const lastPlayedLabel = relativeDay(friend.last_played);
   const nameForInitial = friend.first_name ?? friend.display_name;
   const initial = (nameForInitial || '?').charAt(0).toUpperCase();
@@ -83,128 +89,73 @@ export const PulseCard: React.FC<Props> = ({ friend }) => {
         width: 132,
         flexShrink: 0,
         padding: 11,
-        background: friend.hot
-          ? 'linear-gradient(160deg, rgba(247,147,30,0.10) 0%, rgba(247,147,30,0.02) 50%, var(--hcp-bg-1) 100%)'
-          : 'var(--hcp-bg-1)',
-        border: friend.hot ? '1px solid rgba(247,147,30,0.32)' : '1px solid var(--hcp-line)',
+        background: 'var(--hcp-bg-1)',
+        border: '1px solid var(--hcp-line)',
         borderRadius: 13,
         cursor: 'pointer',
-        boxShadow: friend.hot
-          ? '0 0 24px -10px rgba(247,147,30,0.45)'
-          : '0 1px 2px rgba(15,23,42,0.04), 0 4px 12px rgba(15,23,42,0.06)',
+        boxShadow: '0 1px 2px rgba(15,23,42,0.04), 0 4px 12px rgba(15,23,42,0.06)',
         fontFamily: FONT,
-        display: 'flex',
-        flexDirection: 'column',
-        gap: 8,
       }}
     >
-      {friend.hot && (
-        <div
-          style={{
-            position: 'absolute',
-            top: 8,
-            right: 8,
-            display: 'inline-flex',
-            alignItems: 'center',
-            gap: 3,
-            padding: '2px 6px',
-            background: '#F7931E',
-            color: '#0d0d0d',
-            fontSize: 9,
-            fontWeight: 800,
-            letterSpacing: '0.08em',
-            borderRadius: 999,
-            lineHeight: 1,
-          }}
-        >
-          <Flame size={9} strokeWidth={2.5} />
-          HOT
-        </div>
-      )}
-
-      {friend.profile_photo_url ? (
-        <img
-          src={friend.profile_photo_url}
-          alt=""
-          style={{
-            width: 36,
-            height: 36,
-            borderRadius: '34%',
-            objectFit: 'cover',
-            background: 'var(--hcp-bg-2)',
-          }}
-        />
-      ) : (
-        <div
-          style={{
-            width: 36,
-            height: 36,
-            borderRadius: '34%',
-            background: avatarBg,
-            color: '#fff',
-            fontSize: 14,
-            fontWeight: 700,
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-          }}
-        >
-          {initial}
-        </div>
-      )}
-
-      <div
-        style={{
-          fontSize: 13,
-          fontWeight: 700,
-          color: 'var(--hcp-t-100)',
-          whiteSpace: 'nowrap',
-          overflow: 'hidden',
-          textOverflow: 'ellipsis',
-          lineHeight: 1.2,
-        }}
-      >
-        {friend.first_name ?? friend.display_name}
-      </div>
-
-      <div style={{ fontSize: 10, color: 'var(--hcp-t-60)', lineHeight: 1, marginTop: -2 }}>
-        {lastPlayedLabel}
-      </div>
-
-      <div style={{ marginTop: 2 }}>
-        <HcpSparkline series={friend.hcp_series} color={lineColor} />
-      </div>
-
-      <div
-        style={{
-          display: 'flex',
-          alignItems: 'flex-end',
-          justifyContent: 'space-between',
-          gap: 6,
-          marginTop: 2,
-        }}
-      >
-        <div
-          style={{
-            fontSize: 18,
-            fontWeight: 700,
-            color: 'var(--hcp-t-100)',
-            fontVariantNumeric: 'tabular-nums',
-            lineHeight: 1,
-          }}
-        >
-          {friend.handicap_index != null ? friend.handicap_index.toFixed(1) : '—'}
-        </div>
-        {friend.delta90 != null && (
+      {/* Header row: avatar + name/recency */}
+      <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+        {friend.profile_photo_url ? (
+          <img
+            src={friend.profile_photo_url}
+            alt=""
+            style={{
+              width: 32,
+              height: 34,
+              borderRadius: '34%',
+              objectFit: 'cover',
+              background: 'var(--hcp-bg-2)',
+              flexShrink: 0,
+            }}
+          />
+        ) : (
           <div
             style={{
+              width: 32,
+              height: 34,
+              borderRadius: '34%',
+              background: avatarBg,
+              color: '#fff',
+              fontSize: 14,
+              fontWeight: 700,
               display: 'flex',
-              flexDirection: 'column',
-              alignItems: 'flex-end',
-              gap: 1,
-              lineHeight: 1,
+              alignItems: 'center',
+              justifyContent: 'center',
+              flexShrink: 0,
             }}
           >
+            {initial}
+          </div>
+        )}
+        <div style={{ minWidth: 0 }}>
+          <div
+            style={{
+              fontSize: 13,
+              fontWeight: 700,
+              color: 'var(--hcp-t-100)',
+              whiteSpace: 'nowrap',
+              overflow: 'hidden',
+              textOverflow: 'ellipsis',
+              lineHeight: 1.15,
+            }}
+          >
+            {friend.first_name ?? friend.display_name}
+          </div>
+          <div style={{ fontSize: 10, color: 'var(--hcp-t-60)', lineHeight: 1, marginTop: 3 }}>
+            {lastPlayedLabel}
+          </div>
+        </div>
+      </div>
+
+      {/* Zone A: 90-DAY TREND */}
+      <div style={{ marginTop: 10 }}>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 6 }}>
+          <span style={ZONE_LABEL}>90-DAY TREND</span>
+          {friend.delta90 != null && (
             <span
               style={{
                 fontSize: 11,
@@ -214,24 +165,93 @@ export const PulseCard: React.FC<Props> = ({ friend }) => {
                 display: 'inline-flex',
                 alignItems: 'center',
                 gap: 2,
+                lineHeight: 1,
               }}
             >
               {isUp && <ArrowUp size={9} strokeWidth={3} />}
               {isDown && <ArrowDown size={9} strokeWidth={3} />}
-              {isFlat ? '—' : Math.abs(friend.delta90).toFixed(1)}
+              {isFlat ? '--' : Math.abs(friend.delta90).toFixed(1)}
             </span>
-            <span
-              style={{
-                fontSize: 8,
-                fontWeight: 700,
-                color: 'var(--hcp-t-60)',
-                letterSpacing: '0.10em',
-              }}
-            >
-              90D
-            </span>
-          </div>
+          )}
+        </div>
+        <div style={{ marginTop: 5 }}>
+          <HcpSparkline series={friend.hcp_series} color={lineColor} />
+        </div>
+      </div>
+
+      {/* Divider */}
+      <div style={{ height: 1, background: 'var(--hcp-line)', margin: '9px 0 8px' }} />
+
+      {/* Zone B: LAST 5 */}
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 6 }}>
+        <div style={{ display: 'flex', flexDirection: 'column' }}>
+          <span style={ZONE_LABEL}>LAST 5</span>
+          {friend.last5.length > 0 && (
+            <div style={{ display: 'flex', gap: 4, marginTop: 5 }}>
+              {friend.last5.map((hit, i) =>
+                hit ? (
+                  <span
+                    key={i}
+                    style={{
+                      width: 7,
+                      height: 7,
+                      borderRadius: '50%',
+                      background: 'var(--hcp-good, #10B981)',
+                      boxSizing: 'border-box',
+                    }}
+                  />
+                ) : (
+                  <span
+                    key={i}
+                    style={{
+                      width: 7,
+                      height: 7,
+                      borderRadius: '50%',
+                      background: 'transparent',
+                      border: '1.5px solid rgba(239,68,68,0.55)',
+                      boxSizing: 'border-box',
+                    }}
+                  />
+                ),
+              )}
+            </div>
+          )}
+        </div>
+        {friend.hot && (
+          <span
+            style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: 3,
+              padding: '3px 7px',
+              borderRadius: 999,
+              border: '1px solid rgba(247,147,30,0.35)',
+              color: 'var(--hcp-amber-bold, #F7931E)',
+              fontSize: 8.5,
+              fontWeight: 800,
+              letterSpacing: '0.10em',
+              background: 'transparent',
+              lineHeight: 1,
+            }}
+          >
+            <Flame size={9} strokeWidth={2.5} />
+            HOT
+          </span>
         )}
+      </div>
+
+      {/* Zone C: INDEX */}
+      <div
+        style={{
+          marginTop: 8,
+          fontSize: 18,
+          fontWeight: 700,
+          color: 'var(--hcp-t-100)',
+          fontVariantNumeric: 'tabular-nums',
+          lineHeight: 1,
+        }}
+      >
+        {friend.handicap_index != null ? friend.handicap_index.toFixed(1) : '--'}
       </div>
     </div>
   );
