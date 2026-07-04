@@ -24,7 +24,7 @@ import { useBusinessProfile } from '@/hooks/useBusinessProfile';
 import { useBusinessMembership } from '@/hooks/useBusinessMembership';
 import { useBusinessPostsCount } from '@/hooks/useBusinessPosts';
 import { useBusinessFollowersCount } from '@/hooks/useBusinessFollow';
-import { useBusinessFollowingCount } from '@/hooks/useBusinessSocialLists';
+
 import { useFollowState } from '@/hooks/useFollowState';
 import { useToggleFollow } from '@/hooks/useToggleFollow';
 import { useActiveActor } from '@/context/ActiveActorContext';
