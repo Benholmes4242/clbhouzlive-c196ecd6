@@ -74,7 +74,7 @@ import type { Database } from '@/integrations/supabase/types';
 
 /* ─────────────────────── constants ─────────────────────── */
 
-const COVER_ASPECT_RATIO = 1.5;
+
 
 type Mode = 'create' | 'edit';
 
