@@ -2,7 +2,7 @@ import { useMemo, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { motion } from 'framer-motion';
-import { ChevronLeft, Shield, Users, Star, Clock, XCircle, BadgeCheck, Mail, AlertCircle } from 'lucide-react';
+import { ChevronLeft, Clock, XCircle, BadgeCheck, Mail, AlertCircle, ArrowRight, Check, FileCheck } from 'lucide-react';
 import { format } from 'date-fns';
 import { Button } from '@/components/ui/button';
 import { ManagePageShell } from '@/components/manage/ManagePageShell';
@@ -125,59 +125,240 @@ export default function BusinessVerificationPage() {
 }
 
 function NoneState({ onStart }: { onStart: () => void }) {
-  return (
-    <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} className="space-y-8">
-      <div className="text-center">
-        <div className="h-16 w-16 rounded-full flex items-center justify-center mx-auto mb-4" style={{ background: BIZ.amberTint, border: `1px solid ${BIZ.amberHair}` }}>
-          <BadgeCheck className="h-8 w-8" style={{ color: BIZ.amber }} />
-        </div>
-        <h2 className="text-xl font-bold mb-2" style={{ color: BIZ.ink }}>Get verified on clbhouz</h2>
-        <p className="text-sm text-muted-foreground leading-relaxed">
-          Verification helps golfers know your business is authentic and trusted.
-        </p>
-      </div>
+  const MUTED = 'rgba(15,23,42,0.55)';
+  const MUTED_LIGHT = 'rgba(15,23,42,0.45)';
+  const MUTED_FAINT = 'rgba(15,23,42,0.35)';
 
-      <div className="space-y-4">
-        <SectionHeader tier="standard" kicker="WHY GET VERIFIED" />
-        <div className="space-y-3">
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 12 }}
+      animate={{ opacity: 1, y: 0 }}
+      className="flex flex-col"
+      style={{ minHeight: '100%' }}
+    >
+      {/* Scrollable content */}
+      <div className="flex-1" style={{ paddingBottom: 24 }}>
+        {/* Badge Hero */}
+        <div className="flex flex-col items-center" style={{ paddingTop: 8, gap: 14 }}>
+          <div
+            className="flex items-center justify-center"
+            style={{
+              width: 84,
+              height: 84,
+              borderRadius: 26,
+              background: BIZ.amberTint,
+              boxShadow: '0 0 0 6px rgba(247,147,30,0.06)',
+            }}
+          >
+            <BadgeCheck size={40} color={BIZ.amber} strokeWidth={2} />
+          </div>
+          <h2
+            className="text-center"
+            style={{
+              fontSize: 23,
+              fontWeight: 800,
+              color: BIZ.ink,
+              lineHeight: 1.15,
+              margin: 0,
+              letterSpacing: '-0.02em',
+            }}
+          >
+            Get verified on clbhouz
+          </h2>
+          <p
+            className="text-center"
+            style={{
+              fontSize: 14,
+              lineHeight: 1.45,
+              color: MUTED,
+              maxWidth: 300,
+              margin: 0,
+            }}
+          >
+            The verified badge tells golfers your business is authentic and trusted.
+          </p>
+        </div>
+
+        {/* Benefit Cards */}
+        <div className="flex flex-col" style={{ gap: 10, marginTop: 28 }}>
           {[
-            { icon: Shield, title: 'Build trust', desc: 'A verified badge shows golfers your business is legitimate.' },
-            { icon: Users, title: 'Stand out', desc: 'Verified businesses are more visible in search and discovery.' },
-            { icon: Star, title: 'Professional presence', desc: 'Join other verified clubs, coaches, and brands on clbhouz.' },
-          ].map(({ icon: Icon, title, desc }) => (
-            <div key={title} className="flex items-start gap-3">
-              <div className="h-8 w-8 rounded-sq-sm bg-muted flex items-center justify-center shrink-0">
-                <Icon className="h-4 w-4 text-muted-foreground" />
+            { title: 'Build trust', desc: 'A verified badge shows golfers your business is legitimate.' },
+            { title: 'Stand out in search', desc: 'Verified businesses are more visible in search and discovery.' },
+            { title: 'Professional presence', desc: 'Join other verified clubs, coaches, and brands on clbhouz.' },
+          ].map(({ title, desc }) => (
+            <div
+              key={title}
+              className="flex items-start"
+              style={{
+                background: '#FFFFFF',
+                border: `1px solid ${BIZ.hair}`,
+                borderRadius: 14,
+                padding: '14px 15px',
+                gap: 12,
+              }}
+            >
+              <div
+                className="flex items-center justify-center flex-shrink-0"
+                style={{
+                  width: 24,
+                  height: 24,
+                  borderRadius: '50%',
+                  background: 'rgba(5,150,105,0.10)',
+                  marginTop: 1,
+                }}
+              >
+                <Check size={14} color="#059669" strokeWidth={2.5} />
               </div>
-              <div>
-                <p className="text-sm font-medium" style={{ color: BIZ.ink }}>{title}</p>
-                <p className="text-xs text-muted-foreground">{desc}</p>
+              <div className="flex-1 min-w-0" style={{ paddingTop: 1 }}>
+                <div style={{ fontSize: 14.5, fontWeight: 700, color: BIZ.ink, lineHeight: 1.25, marginBottom: 2 }}>
+                  {title}
+                </div>
+                <div style={{ fontSize: 13, lineHeight: 1.4, color: MUTED }}>
+                  {desc}
+                </div>
               </div>
             </div>
           ))}
         </div>
+
+        {/* Stepper */}
+        <div style={{ marginTop: 32 }}>
+          <div
+            className="text-center"
+            style={{
+              fontSize: 11,
+              fontWeight: 700,
+              color: MUTED_FAINT,
+              letterSpacing: '0.08em',
+              textTransform: 'uppercase',
+              marginBottom: 16,
+            }}
+          >
+            THREE SIMPLE STEPS
+          </div>
+          <div style={{ display: 'flex', alignItems: 'flex-start' }}>
+            {/* Node 1 */}
+            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', width: 80, flexShrink: 0 }}>
+              <div
+                className="flex items-center justify-center"
+                style={{
+                  width: 38,
+                  height: 38,
+                  borderRadius: '50%',
+                  background: BIZ.amber,
+                }}
+              >
+                <FileCheck size={18} color="#FFFFFF" strokeWidth={2.5} />
+              </div>
+              <div style={{ fontSize: 12.5, fontWeight: 700, color: BIZ.ink, marginTop: 10, lineHeight: 1.2 }}>
+                Submit
+              </div>
+              <div style={{ fontSize: 11, color: MUTED_LIGHT, marginTop: 2, lineHeight: 1.2 }}>
+                with proof
+              </div>
+            </div>
+            {/* Line 1-2 */}
+            <div style={{ flex: 1, height: 1, background: BIZ.hair, marginTop: 19, minWidth: 16 }} />
+            {/* Node 2 */}
+            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', width: 80, flexShrink: 0 }}>
+              <div
+                className="flex items-center justify-center"
+                style={{
+                  width: 38,
+                  height: 38,
+                  borderRadius: '50%',
+                  background: '#FFFFFF',
+                  border: `1.5px solid ${BIZ.hair}`,
+                }}
+              >
+                <Clock size={18} color={MUTED_FAINT} strokeWidth={2} />
+              </div>
+              <div style={{ fontSize: 12.5, fontWeight: 700, color: BIZ.ink, marginTop: 10, lineHeight: 1.2 }}>
+                We review
+              </div>
+              <div style={{ fontSize: 11, color: MUTED_LIGHT, marginTop: 2, lineHeight: 1.2 }}>
+                a few days
+              </div>
+            </div>
+            {/* Line 2-3 */}
+            <div style={{ flex: 1, height: 1, background: BIZ.hair, marginTop: 19, minWidth: 16 }} />
+            {/* Node 3 */}
+            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', width: 80, flexShrink: 0 }}>
+              <div
+                className="flex items-center justify-center"
+                style={{
+                  width: 38,
+                  height: 38,
+                  borderRadius: '50%',
+                  background: '#FFFFFF',
+                  border: `1.5px solid ${BIZ.hair}`,
+                }}
+              >
+                <BadgeCheck size={18} color={MUTED_FAINT} strokeWidth={2} />
+              </div>
+              <div style={{ fontSize: 12.5, fontWeight: 700, color: BIZ.ink, marginTop: 10, lineHeight: 1.2 }}>
+                Verified
+              </div>
+              <div style={{ fontSize: 11, color: MUTED_LIGHT, marginTop: 2, lineHeight: 1.2 }}>
+                badge added
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
 
-      <div className="space-y-3">
-        <SectionHeader tier="standard" kicker="HOW IT WORKS" />
-        <ol className="space-y-2 text-sm text-muted-foreground">
-          <li className="flex items-start gap-2"><span className="font-medium" style={{ color: BIZ.ink }}>1.</span><span>Submit a verification request with proof of legitimacy</span></li>
-          <li className="flex items-start gap-2"><span className="font-medium" style={{ color: BIZ.ink }}>2.</span><span>We review your request (usually within a few days)</span></li>
-          <li className="flex items-start gap-2"><span className="font-medium" style={{ color: BIZ.ink }}>3.</span><span>Approved profiles receive a verified badge</span></li>
-        </ol>
-      </div>
-
-      <Button
-        onClick={onStart}
-        className="w-full h-11 text-white border-0"
-        style={{ background: BIZ.ink, borderRadius: BIZ.rInner }}
+      {/* Sticky Footer */}
+      <div
+        style={{
+          position: 'sticky',
+          bottom: 0,
+          background: BIZ.pageBg,
+          padding: '16px 0 24px',
+          marginTop: 'auto',
+        }}
       >
-        Start verification
-      </Button>
-
-      <p className="text-[11px] text-muted-foreground/70 text-center">
-        Verification is optional and not required to use clbhouz.
-      </p>
+        {/* Top fade */}
+        <div
+          style={{
+            position: 'absolute',
+            top: -32,
+            left: 0,
+            right: 0,
+            height: 32,
+            background: `linear-gradient(to top, ${BIZ.pageBg}, transparent)`,
+            pointerEvents: 'none',
+          }}
+        />
+        <button
+          type="button"
+          onClick={onStart}
+          className="w-full flex items-center justify-center active:opacity-90 transition-opacity"
+          style={{
+            minHeight: 54,
+            borderRadius: BIZ.rInner,
+            background: BIZ.ink,
+            color: '#FFFFFF',
+            fontSize: 16,
+            fontWeight: 700,
+            gap: 8,
+            border: 'none',
+            cursor: 'pointer',
+          }}
+        >
+          Start verification
+          <ArrowRight size={18} strokeWidth={2.25} />
+        </button>
+        <p
+          className="text-center"
+          style={{
+            fontSize: 11.5,
+            color: MUTED_LIGHT,
+            margin: '10px 0 0',
+          }}
+        >
+          Verification is optional and not required to use clbhouz.
+        </p>
+      </div>
     </motion.div>
   );
 }
