@@ -79,6 +79,7 @@ import { ImageCropModal } from '@/components/business/ImageCropModal';
 import { ProfileTouchDebugProvider, useProfileTouchDebug } from '@/components/profile/debug/ProfileTouchDebugProvider';
 import { ProfileTouchDebugPanel } from '@/components/profile/debug/ProfileTouchDebugPanel';
 import { ReportSheet } from '@/components/messaging/ReportSheet';
+import { PhotoActionSheet } from '@/components/profile/edit-v2/PhotoActionSheet';
 
 
 // Background color - uses CSS variable for theme support
