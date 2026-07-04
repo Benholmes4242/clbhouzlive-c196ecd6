@@ -247,7 +247,7 @@ const PostsTabContent: React.FC<PostsTabContentProps> = ({
           onLike={(post) => handleLike(post)}
           onComment={openComments}
           onShare={(post) => handleShare(post)}
-          onProfile={(post) => navigate(getActorRouteByType(post.actorType, post.actorId))}
+          onProfile={(post) => navigate(getActorRouteByType(post.actorType, post.actorId), { state: post.actorType === 'business' ? { source: 'content' } : undefined })}
           onCourse={(post) => post.courseId && navigate(`/courses/${post.courseId}`)}
           onReviewTap={(post) => handleReviewTap(post)}
           getLikeState={(post) => {
