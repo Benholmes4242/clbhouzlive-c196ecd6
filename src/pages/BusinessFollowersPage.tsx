@@ -1,5 +1,5 @@
 import { Skeleton } from '@/components/ui/skeleton';
-import { useParams } from 'react-router-dom';
+import { useParams, useSearchParams } from 'react-router-dom';
 import { useBusinessProfile } from '@/hooks/useBusinessProfile';
 import {
   useBusinessFollowersPaginated,
@@ -8,10 +8,15 @@ import {
 import { UserListPage } from '@/components/social/UserListPage';
 import ScrollToTopGlass from '@/components/common/ScrollToTopGlass';
 import { useHideBottomNav } from '@/hooks/useBottomNavVisibility';
+import { useHideHeader } from '@/hooks/useHeaderVisibility';
+import { ManagePageShell } from '@/components/manage/ManagePageShell';
 
-export default function BusinessFollowersPage() {
+export default function BusinessFollowersPage({ initialTab = 'followers' }: { initialTab?: 'followers' | 'following' }) {
   useHideBottomNav();
+  useHideHeader();
   const { idOrSlug } = useParams<{ idOrSlug: string }>();
+  const [searchParams] = useSearchParams();
+  const shellTitle = initialTab === 'following' || searchParams.get('tab') === 'following' ? 'Following' : 'Followers';
   const { data: business, isLoading: bizLoading } = useBusinessProfile(idOrSlug);
 
   const {
@@ -42,10 +47,10 @@ export default function BusinessFollowersPage() {
 
   if (bizLoading) {
     return (
-      <div className="min-h-screen bg-background md:max-w-[620px] md:mx-auto">
+      <ManagePageShell title={shellTitle}>
+      <div className="min-h-screen bg-background">
         <div
           className="bg-background border-b border-border px-4 pb-3 pt-2"
-          style={{ paddingTop: 'calc(var(--chrome-total-h, 0px) + 8px)' }}
         >
           <div className="flex items-center gap-3 mb-3">
             <Skeleton className="w-9 h-9 rounded-full" />
@@ -54,6 +59,7 @@ export default function BusinessFollowersPage() {
           <Skeleton className="h-11 w-full rounded-xl" />
         </div>
       </div>
+      </ManagePageShell>
     );
   }
 
@@ -63,7 +69,7 @@ export default function BusinessFollowersPage() {
   const displayName = business.slug || business.name || 'business';
 
   return (
-    <>
+    <ManagePageShell title={shellTitle}>
       <UserListPage
         mode="followers"
         title="Followers"
@@ -81,6 +87,8 @@ export default function BusinessFollowersPage() {
         onRefetch={() => refetch()}
         backPath={backPath}
         hideBackButton
+        embeddedInShell
+        initialTab={initialTab}
         isOwnProfile={false}
         profileUsername={displayName}
         // Following tab data
@@ -94,6 +102,6 @@ export default function BusinessFollowersPage() {
         onFollowingRefetch={() => followingRefetch()}
       />
       <ScrollToTopGlass />
-    </>
+    </ManagePageShell>
   );
 }

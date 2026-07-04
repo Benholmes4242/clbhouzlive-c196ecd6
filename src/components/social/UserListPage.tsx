@@ -91,6 +91,10 @@ interface UserListPageProps {
   profileUserId?: string;
   /** Profile owner's actor type — defaults to 'personal' */
   profileActorType?: 'personal' | 'business';
+  /** Render without its own PageRoot when a route-level shell owns the back header/nav chrome. */
+  embeddedInShell?: boolean;
+  /** Initial tab override for direct /following routes. */
+  initialTab?: 'followers' | 'following';
 }
 
 // ---------------------------------------------------------------------------
@@ -284,6 +288,8 @@ export const UserListPage: React.FC<UserListPageProps> = ({
   profileUsername: _profileUsername,
   profileUserId,
   profileActorType = 'personal',
+  embeddedInShell = false,
+  initialTab: initialTabOverride,
 }) => {
   const navigate = useNavigate();
   const { user } = useSupabaseSession();
@@ -293,7 +299,7 @@ export const UserListPage: React.FC<UserListPageProps> = ({
   const [removedIds, setRemovedIds] = useState<Set<string>>(new Set());
 
   const hasFollowingTab = mode === 'followers' && followingUsers !== undefined;
-  const initialTab = searchParams.get('tab') === 'following' ? 'following' : 'followers';
+  const initialTab = searchParams.get('tab') === 'following' || initialTabOverride === 'following' ? 'following' : 'followers';
   const [activeTab, setActiveTab] = useState<'followers' | 'following'>(hasFollowingTab ? initialTab : 'followers');
 
   // Filter state — Following tab + owner view only
@@ -425,15 +431,14 @@ export const UserListPage: React.FC<UserListPageProps> = ({
 
   const showFilterChips = isFollowingTab && isOwnProfile;
 
-  return (
-    <PageRoot className="min-h-screen" style={{ background: BG_SURFACE }}>
+  const pageContent = (
       <div className="w-full">
         {/* Sticky editorial header */}
         <div
-          className="sticky z-40 backdrop-blur-xl"
+          className={embeddedInShell ? 'relative z-20' : 'sticky z-40 backdrop-blur-xl'}
           style={{
-            top: hideBackButton ? 'var(--chrome-total-h, 0px)' : 0,
-            paddingTop: hideBackButton
+            top: embeddedInShell ? undefined : (hideBackButton ? 'var(--chrome-total-h, 0px)' : 0),
+            paddingTop: embeddedInShell || hideBackButton
               ? 0
               : 'max(var(--safe-top, env(safe-area-inset-top, 0px)), 8px)',
             background: 'rgba(248,250,252,0.97)',
@@ -720,6 +725,19 @@ export const UserListPage: React.FC<UserListPageProps> = ({
           )}
         </div>
       </div>
+  );
+
+  if (embeddedInShell) {
+    return (
+      <div className="min-h-screen" style={{ background: BG_SURFACE }}>
+        {pageContent}
+      </div>
+    );
+  }
+
+  return (
+    <PageRoot className="min-h-screen" style={{ background: BG_SURFACE }}>
+      {pageContent}
     </PageRoot>
   );
 };

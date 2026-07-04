@@ -1,6 +1,6 @@
 import { useEffect } from 'react';
 import { Skeleton } from '@/components/ui/skeleton';
-import { useParams } from 'react-router-dom';
+import { useParams, useSearchParams } from 'react-router-dom';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { usePaginatedFollowers, usePaginatedFollowing } from '@/hooks/useSocialLists';
 import { useUserByUsername } from '@/hooks/useUserByUsername';
@@ -8,11 +8,16 @@ import { UserListPage } from '@/components/social/UserListPage';
 import { analyticsEvents } from '@/utils/analyticsEvents';
 import ScrollToTopGlass from '@/components/common/ScrollToTopGlass';
 import { useHideBottomNav } from '@/hooks/useBottomNavVisibility';
+import { useHideHeader } from '@/hooks/useHeaderVisibility';
+import { ManagePageShell } from '@/components/manage/ManagePageShell';
 
-const FollowersListPage = () => {
+const FollowersListPage = ({ initialTab = 'followers' }: { initialTab?: 'followers' | 'following' }) => {
   useHideBottomNav();
+  useHideHeader();
   const { username } = useParams<{ username: string }>();
+  const [searchParams] = useSearchParams();
   const { user: currentUser } = useSupabaseSession();
+  const shellTitle = initialTab === 'following' || searchParams.get('tab') === 'following' ? 'Following' : 'Followers';
 
   // Fetch profile user by username
   const { data: profileUser, isLoading: profileLoading } = useUserByUsername(username);
@@ -61,10 +66,10 @@ const FollowersListPage = () => {
 
   if (profileLoading) {
     return (
-      <div className="min-h-screen bg-background md:max-w-[620px] md:mx-auto">
+      <ManagePageShell title={shellTitle}>
+      <div className="min-h-screen bg-background">
         <div
           className="sticky top-0 bg-background border-b border-border px-4 pb-3 pt-2"
-          style={{ paddingTop: 'max(env(safe-area-inset-top, 0px), 47px)' }}
         >
           <div className="flex items-center gap-3 mb-3">
             <Skeleton className="w-9 h-9 rounded-full" />
@@ -88,19 +93,22 @@ const FollowersListPage = () => {
           ))}
         </div>
       </div>
+      </ManagePageShell>
     );
   }
 
   if (!profileUser) {
     return (
+      <ManagePageShell title={shellTitle}>
       <div className="flex items-center justify-center min-h-screen">
         <p className="text-muted-foreground">User not found</p>
       </div>
+      </ManagePageShell>
     );
   }
 
   return (
-    <>
+    <ManagePageShell title={shellTitle}>
       <UserListPage
         mode="followers"
         title="Followers"
@@ -116,6 +124,9 @@ const FollowersListPage = () => {
         onLoadMore={() => fetchNextPage()}
         onRefetch={() => refetch()}
         backPath={`/profile/${profileUser.username}`}
+        hideBackButton
+        embeddedInShell
+        initialTab={initialTab}
         isOwnProfile={isOwnProfile}
         profileUsername={profileUser.username}
         // Following tab data
@@ -129,7 +140,7 @@ const FollowersListPage = () => {
         onFollowingRefetch={() => followingRefetch()}
       />
       <ScrollToTopGlass />
-    </>
+    </ManagePageShell>
   );
 };
 
