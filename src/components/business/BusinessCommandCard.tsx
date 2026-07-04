@@ -468,12 +468,14 @@ function ActionRow({
   label,
   onClick,
   badge = false,
+  hint,
   last = false,
 }: {
   icon: React.ComponentType<{ className?: string; style?: React.CSSProperties }>;
   label: string;
   onClick: () => void;
   badge?: boolean;
+  hint?: string;
   last?: boolean;
 }) {
   return (
@@ -504,6 +506,11 @@ function ActionRow({
       >
         {label}
       </span>
+      {hint && (
+        <span className="text-[11.5px] font-semibold tabular-nums" style={{ color: BIZ.inkMute }}>
+          {hint}
+        </span>
+      )}
       {badge && (
         <span className="h-2 w-2 rounded-full" style={{ background: BIZ.amber }} />
       )}
@@ -511,3 +518,4 @@ function ActionRow({
     </button>
   );
 }
+
