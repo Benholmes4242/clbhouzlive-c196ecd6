@@ -5,7 +5,7 @@ import { motion } from 'framer-motion';
 import { ChevronLeft, Shield, Users, Star, Clock, XCircle, BadgeCheck, Mail, AlertCircle } from 'lucide-react';
 import { format } from 'date-fns';
 import { Button } from '@/components/ui/button';
-import { PageRoot } from '@/components/layout/PageRoot';
+import { ManagePageShell } from '@/components/manage/ManagePageShell';
 import { SectionHeader } from '@/components/ui/SectionHeader';
 import { VerifiedBadge } from '@/components/ui/VerifiedBadge';
 import { supabase } from '@/integrations/supabase/client';
@@ -72,19 +72,7 @@ export default function BusinessVerificationPage() {
     state === 'pending' && !!request?.requires_domain_check && !request?.domain_confirmed;
 
   return (
-    <PageRoot className="min-h-screen md:!max-w-[440px]" style={{ background: BIZ.pageBg }}>
-      {/* Title block — CompactHeader provides the back arrow */}
-      <div
-        className="px-4 pt-3 pb-3"
-        style={{ paddingTop: 'calc(var(--chrome-total-h, 0px) + 12px)' }}
-      >
-        <SectionHeader tier="standard" kicker="VERIFICATION" tone="amber" />
-        <h1 className="text-[18px] mt-0.5" style={{ color: BIZ.ink, fontWeight: 800, letterSpacing: '-0.01em' }}>
-          {state === 'verified' ? 'Verified business' : state === 'pending' ? 'Under review' : state === 'needs_more_info' ? 'More info needed' : state === 'rejected' ? 'Not approved' : 'Get verified'}
-        </h1>
-      </div>
-
-
+    <ManagePageShell title="Verification">
       <main className="px-4 py-6 max-w-lg mx-auto pb-20">
         {isLoading ? (
           <div className="space-y-3">
@@ -132,7 +120,7 @@ export default function BusinessVerificationPage() {
           mode={sheetMode}
         />
       )}
-    </PageRoot>
+    </ManagePageShell>
   );
 }
 
