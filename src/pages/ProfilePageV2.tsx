@@ -241,12 +241,15 @@ const ProfilePageV2Content: React.FC = () => {
   const [showTopTenModal, setShowTopTenModal] = useState(false);
 
   const avatarFileInputRef = useRef<HTMLInputElement>(null);
+  const avatarTakeInputRef = useRef<HTMLInputElement>(null);
   const heroFileInputRef = useRef<HTMLInputElement>(null);
+  const heroTakeInputRef = useRef<HTMLInputElement>(null);
   const [isUploadingAvatar, setIsUploadingAvatar] = useState(false);
   const [isUploadingHero, setIsUploadingHero] = useState(false);
   const [cropImageSrc, setCropImageSrc] = useState<string | null>(null);
   const [cropMode, setCropMode] = useState<'avatar' | 'hero' | null>(null);
   const [isCropModalOpen, setIsCropModalOpen] = useState(false);
+  const [photoSheet, setPhotoSheet] = useState<'avatar' | 'hero' | null>(null);
   const queryClient = useQueryClient();
 
   const profileTypeInfo = getProfileType(profile?.user_type);
