@@ -17,6 +17,7 @@
 import type { FeedPost } from '@/components/media-system/types/media';
 import { useFullscreenFeedStore, type OpenOrigin } from '@/store/fullscreenFeedStore';
 import { VideoEngine } from '@/video/VideoEngine';
+import { fsv, fsvNewSession, fsvViewport } from '@/perf/fsvTelemetry';
 // [VIDEOSTUB] HLSPoolManager + mobileVideoDebug imports removed — engine severed.
 
 
@@ -76,22 +77,51 @@ export function openWithOrigin({
   handOffUrls,
   options,
 }: OpenWithOriginArgs): void {
+  fsvNewSession('open-tap', { index });
   const origin = snapshotOrigin(originEl, posterUrl ?? null);
   const postId = (posts[index] as any)?.id ?? null;
+
+  fsv('tap', {
+    postId,
+    index,
+    hasOriginEl: !!originEl,
+    prefersReducedMotion:
+      typeof window !== 'undefined' && !!window.matchMedia?.('(prefers-reduced-motion: reduce)').matches,
+    viewport: fsvViewport(),
+  });
+  fsv('tap.origin', {
+    postId,
+    origin,
+    posterUrl: posterUrl ?? null,
+  });
 
   // Two-way resume: prefer the live feed-active lane time when it's
   // playing the tapped post; fall back to the engine's session lastPos map.
   let startPosition = 0;
+  let startSource: 'feedSnap' | 'lastPos' | 'zero' = 'zero';
+  let feedSnapCT = -1;
+  let lastPosCT = -1;
   try {
     const feedSnap = VideoEngine.snapshot('feed-active');
+    feedSnapCT = feedSnap.currentTime;
     if (postId && feedSnap.currentTime > 0) {
       startPosition = feedSnap.currentTime;
+      startSource = 'feedSnap';
     } else if (postId) {
-      startPosition = VideoEngine.getLastPos(postId);
+      lastPosCT = VideoEngine.getLastPos(postId);
+      startPosition = lastPosCT;
+      startSource = 'lastPos';
     }
   } catch {
     /* engine may not be booted yet on deep-link openers */
   }
+  fsv('tap.start', {
+    postId,
+    startPosition: +startPosition.toFixed(3),
+    source: startSource,
+    feedSnapCT: +feedSnapCT.toFixed(3),
+    lastPosCT: +lastPosCT.toFixed(3),
+  });
 
   // [VIDEOSTUB] Handoff + pool manager removed — poster-only chassis.
   void handOffUrls;
@@ -99,6 +129,7 @@ export function openWithOrigin({
   // Chrome flip at TAP time (not effect time) to kill the strobe. Scroll
   // lock is owned by the overlay's isOpen effect (ref-counted so it composes
   // cleanly with CommentsSheet stacking on top).
+  let statusbarOk = false;
   try {
     (window as any).median?.statusbar?.set({
       style: 'dark',
@@ -106,7 +137,9 @@ export function openWithOrigin({
       overlay: true,
       blur: false,
     });
+    statusbarOk = true;
   } catch {}
+  fsv('tap.statusbar', { attempted: true, ok: statusbarOk, viewport: fsvViewport() });
 
 
   useFullscreenFeedStore.getState().open(posts, index, {
@@ -114,4 +147,5 @@ export function openWithOrigin({
     origin,
     startPosition,
   });
+  fsv('tap.storeOpen', { postId, index, startPosition: +startPosition.toFixed(3) });
 }
