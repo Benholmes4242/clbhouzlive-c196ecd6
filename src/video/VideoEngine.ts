@@ -68,13 +68,6 @@ const DBG = (...args: unknown[]) => {
   }
 };
 
-const PPRACE = (tag: string, data: Record<string, unknown>) => {
-  try {
-    if (!isPerfEnabled()) return;
-  } catch { return; }
-  // eslint-disable-next-line no-console
-  console.info('[PPRACE]', tag, data);
-};
 
 
 const HIDDEN_HOST_ID = '__video_engine_hidden_host__';
@@ -218,12 +211,6 @@ class VideoEngineImpl {
       DBG(laneId, 'skip reload: same postId+url', { state: lane.state });
       return;
     }
-    // [FEEDPLAY] mark laneLoad for feed-active lane.
-    if (laneId === 'feed-active') {
-      const preloaded =
-        lane.hlsUrl === hlsUrl && lane.el.readyState >= 2;
-      fp.laneLoad(postId, { preloaded, startPositionSet: startPosition > 0 });
-    }
     lane.postId = postId;
 
 
@@ -258,12 +245,6 @@ class VideoEngineImpl {
       // Safari path — no hls.js instance, use the element's native player.
       lane.el.src = hlsUrl;
       this.wireElementEvents(lane, /* usingHls */ false);
-      const onMetaFp = () => {
-        if (lane.id === 'feed-active') fp.hlsManifest(lane.postId);
-        lane.el.removeEventListener('loadedmetadata', onMetaFp);
-      };
-      lane.el.addEventListener('loadedmetadata', onMetaFp);
-      lane.detachFns.push(() => lane.el.removeEventListener('loadedmetadata', onMetaFp));
       if (startPosition > 0) {
         const onMeta = () => {
           try {
@@ -310,7 +291,7 @@ class VideoEngineImpl {
         return lvl.bitrate <= cap ? idx : best;
       }, hls.levels.length - 1);
       hls.autoLevelCapping = maxLevel;
-      if (lane.id === 'feed-active') fp.hlsManifest(lane.postId);
+      
       this.transition(lane, 'ready');
     };
     const onError = (_evt: unknown, data: any) => {
@@ -362,17 +343,11 @@ class VideoEngineImpl {
       // Only fire once the element has actually reached (or passed) the requested seek.
       if (target > 0 && now < target - 0.5) return;
       lane.firstFrame = true;
-      this.trace('V1_FS_FIRSTFRAME', {
-        postId: lane.postId,
-        videoTime: now,
-        startPosition: target,
-      });
       this.emit(lane);
     };
     const onLoadedData = () => {
       if (!lane.firstFrame && lane.id === 'feed-active') {
         lane.firstFrame = true;
-        this.trace('V1_TILE_FIRSTFRAME', { postId: lane.postId, videoTime: lane.el.currentTime });
         this.emit(lane);
       }
       if (this.loadingCount > 0) this.loadingCount--;
@@ -401,17 +376,14 @@ class VideoEngineImpl {
     };
 
     const onPlay = () => {
-      PPRACE('EL_PLAY', { lanePostId: lane.postId, t: lane.el.currentTime });
       this.transition(lane, 'playing');
     };
     const onPause = () => {
-      PPRACE('EL_PAUSE', { lanePostId: lane.postId, t: lane.el.currentTime });
       if (lane.state !== 'error') this.transition(lane, 'paused');
     };
 
     const onError = () => this.transition(lane, 'error');
     const onCanPlay = () => {
-      if (lane.id === 'feed-active') fp.canplay(lane.postId);
       // Honor persistent play-intent: if play() was called before/while the
       // (new) source was loading, kick it off now that it's ready.
       if (lane.wantPlay && lane.mountedHost && lane.el.paused) {
@@ -421,12 +393,8 @@ class VideoEngineImpl {
         }
       }
     };
-    const onPlaying = () => {
-      if (lane.id === 'feed-active') fp.firstFrame(lane.postId);
-    };
     el.addEventListener('loadeddata', onLoadedData);
     el.addEventListener('canplay', onCanPlay);
-    el.addEventListener('playing', onPlaying);
     el.addEventListener('seeked', onSeeked);
     el.addEventListener('timeupdate', onTime);
     el.addEventListener('play', onPlay);
@@ -435,7 +403,7 @@ class VideoEngineImpl {
     lane.detachFns.push(() => {
       el.removeEventListener('loadeddata', onLoadedData);
       el.removeEventListener('canplay', onCanPlay);
-      el.removeEventListener('playing', onPlaying);
+      
       el.removeEventListener('seeked', onSeeked);
       el.removeEventListener('timeupdate', onTime);
       el.removeEventListener('play', onPlay);
@@ -448,14 +416,6 @@ class VideoEngineImpl {
   play(laneId: LaneId, opts: { callerPostId?: string | null } = {}): Promise<void> {
     const lane = this.getLane(laneId);
     const caller = opts.callerPostId ?? null;
-    PPRACE('PLAY', {
-      laneId,
-      callerPostId: caller,
-      lanePostId: lane.postId,
-      wantPlayBefore: lane.wantPlay,
-      paused: lane.el.paused,
-      t: lane.el.currentTime,
-    });
     // Ownership: the moment a card issues play() it becomes the lane owner.
     // Guarantees pause() owner-guard below can reject stale outgoing cards
     // even if load() hasn't yet updated lane.postId for this caller.
@@ -466,7 +426,6 @@ class VideoEngineImpl {
       DBG(laneId, 'play() queued — no mounted host');
       return Promise.resolve();
     }
-    if (laneId === 'feed-active') fp.playCall(lane.postId);
     const p = lane.el.play();
     return Promise.resolve(p).catch((err) => {
       DBG(laneId, 'play() rejected', err);
@@ -481,21 +440,8 @@ class VideoEngineImpl {
     // already took the lane. Null caller = engine-wide (pauseAll/visibility/
     // release) — always allowed.
     if (caller != null && lane.postId != null && caller !== lane.postId) {
-      PPRACE('PAUSE_IGNORED_STALE', {
-        laneId,
-        callerPostId: caller,
-        lanePostId: lane.postId,
-      });
       return;
     }
-    PPRACE('PAUSE', {
-      laneId,
-      callerPostId: caller,
-      lanePostId: lane.postId,
-      wantPlayBefore: lane.wantPlay,
-      paused: lane.el.paused,
-      t: lane.el.currentTime,
-    });
     lane.wantPlay = false;
     if (!lane.el.paused) lane.el.pause();
   }
@@ -611,15 +557,6 @@ class VideoEngineImpl {
     return this.lastPos.get(postId) ?? 0;
   }
 
-  /** [V1] Structured trace — fires when either the engine DBG flag or the perf DBG pill is on. */
-  trace(tag: string, data?: Record<string, unknown>): void {
-    if (typeof window === 'undefined') return;
-    const perfOn = (() => { try { return isPerfEnabled(); } catch { return false; } })();
-    if ((window as any).__VIDEO_ENGINE_DBG__ || perfOn) {
-      // eslint-disable-next-line no-console
-      console.info(`[V1] ${tag}`, data ?? {});
-    }
-  }
 
 
   /** Test-only utility: list lane ids currently registered. */
