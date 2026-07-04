@@ -54,9 +54,14 @@ interface Lane {
   firstFrame: boolean;
   /** postId this lane's current source belongs to (for lastPos tracking). */
   postId: string | null;
+  /** Non-hidden host the lane element is currently mounted into (null while parked). */
+  mountedHost: HTMLElement | null;
+  /** play() called before mount — consumed by the next mountLane. */
+  pendingPlay: boolean;
   listeners: Set<LaneListener>;
   detachFns: Array<() => void>;
 }
+
 
 const DBG = (...args: unknown[]) => {
   if (typeof window !== 'undefined' && (window as any).__VIDEO_ENGINE_DBG__) {
