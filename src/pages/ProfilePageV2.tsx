@@ -1297,9 +1297,25 @@ const ProfilePageV2Content: React.FC = () => {
       )}
 
 
-      {/* Hidden file inputs for inline photo upload */}
+      {/* Hidden file inputs for inline photo upload (choose + take) */}
       <input ref={avatarFileInputRef} type="file" accept="image/*" onChange={handleAvatarFileSelected} className="hidden" />
+      <input ref={avatarTakeInputRef} type="file" accept="image/*" capture="user" onChange={handleAvatarFileSelected} className="hidden" />
       <input ref={heroFileInputRef} type="file" accept="image/*" onChange={handleHeroFileSelected} className="hidden" />
+      <input ref={heroTakeInputRef} type="file" accept="image/*" capture="environment" onChange={handleHeroFileSelected} className="hidden" />
+
+      {/* Unified photo action sheet — owner only */}
+      {isSelf && (
+        <PhotoActionSheet
+          open={photoSheet !== null}
+          onClose={() => setPhotoSheet(null)}
+          title={photoSheet === 'hero' ? 'Cover photo' : 'Profile photo'}
+          hasPhoto={photoSheet === 'hero' ? !!profile?.header_photo_url : !!profile?.profile_photo_url}
+          removeLabel={photoSheet === 'hero' ? 'Remove cover photo' : 'Remove profile photo'}
+          onChoose={() => (photoSheet === 'hero' ? heroFileInputRef : avatarFileInputRef).current?.click()}
+          onTake={() => (photoSheet === 'hero' ? heroTakeInputRef : avatarTakeInputRef).current?.click()}
+          onRemove={() => (photoSheet === 'hero' ? handleHeroRemove() : handleAvatarRemove())}
+        />
+      )}
 
       {/* Crop Modal */}
       {isCropModalOpen && cropImageSrc && (
