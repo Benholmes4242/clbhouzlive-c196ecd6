@@ -660,25 +660,29 @@ export const UserListPage: React.FC<UserListPageProps> = ({
             </div>
           )}
 
-          {/* Loading skeletons */}
+          {/* Loading skeletons — Option A row anatomy */}
           {activeIsLoading && !activeError && (
             <div>
-              {[1, 2, 3, 4, 5].map((i) => (
+              {[1, 2, 3, 4, 5, 6].map((i) => (
                 <div
                   key={i}
-                  className="flex items-center gap-3 px-5 py-3.5"
-                  style={{ borderBottom: `0.5px solid ${BORDER}`, background: '#FFFFFF' }}
+                  className="flex items-center"
+                  style={{
+                    gap: 12,
+                    padding: '11px 16px',
+                    borderTop: i > 1 ? `1px solid ${HAIR}` : undefined,
+                    background: BG_SURFACE,
+                  }}
                 >
-                  <div className="w-14 h-14 rounded-sq-md animate-pulse flex-shrink-0" style={{ background: 'rgba(15,23,42,0.08)' }} />
+                  <div
+                    className="animate-pulse flex-shrink-0"
+                    style={{ width: 46, height: 48, borderRadius: '34%', background: 'rgba(15,23,42,0.08)' }}
+                  />
                   <div className="flex-1 space-y-2">
-                    <div className="h-4 animate-pulse rounded w-32" style={{ background: 'rgba(15,23,42,0.08)' }} />
-                    <div className="h-3 animate-pulse rounded w-24" style={{ background: 'rgba(15,23,42,0.06)' }} />
-                    <div className="h-3 animate-pulse rounded w-40" style={{ background: 'rgba(15,23,42,0.06)' }} />
+                    <div className="h-3.5 animate-pulse rounded" style={{ width: `${55 + ((i * 7) % 30)}%`, background: 'rgba(15,23,42,0.08)' }} />
+                    <div className="h-3 animate-pulse rounded" style={{ width: `${40 + ((i * 5) % 25)}%`, background: 'rgba(15,23,42,0.06)' }} />
                   </div>
-                  <div className="flex items-center gap-1.5">
-                    <div className="h-9 w-24 animate-pulse rounded-md" style={{ background: 'rgba(15,23,42,0.06)' }} />
-                    <div className="h-9 w-9 animate-pulse rounded-md" style={{ background: 'rgba(15,23,42,0.04)' }} />
-                  </div>
+                  <div className="h-8 w-20 animate-pulse rounded-full flex-shrink-0" style={{ background: 'rgba(15,23,42,0.06)' }} />
                 </div>
               ))}
             </div>
