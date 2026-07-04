@@ -195,10 +195,19 @@ export const CardFeed = forwardRef<CardFeedHandle, CardFeedProps>(function CardF
     settleTimer.current = setTimeout(() => {
       setPlayingIdx(activeIdx);
     }, SETTLE_MS);
+    // [FEEDPLAY] mark FP_ACTIVE for the newly-active video card.
+    const p = posts[activeIdx];
+    if (p && p.mediaItems?.[0]?.type === 'video') fp.active(p.id);
     return () => {
       if (settleTimer.current) clearTimeout(settleTimer.current);
     };
-  }, [activeIdx]);
+  }, [activeIdx, posts]);
+
+  // [FEEDPLAY] mark FP_PLAYING_IDX when the settle-promoted index changes.
+  useEffect(() => {
+    const p = posts[playingIdx];
+    if (p && p.mediaItems?.[0]?.type === 'video') fp.playingIdx(p.id);
+  }, [playingIdx, posts]);
 
   const recheckActive = useCallback(() => {
     const viewportCenter = window.innerHeight / 2;
