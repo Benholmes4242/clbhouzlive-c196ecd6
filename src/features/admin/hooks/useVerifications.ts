@@ -95,6 +95,7 @@ async function fetchVerifications(): Promise<VerificationRow[]> {
       proofMethod: r.proof_method ?? null,
       proofValue: r.proof_value ?? null,
       proofMetadata: r.proof_metadata ?? null,
+      proofDocumentUrl: r.proof_document_url ?? null,
       contactEmail: r.contact_email ?? null,
       contactRole: r.contact_role ?? null,
     })),
