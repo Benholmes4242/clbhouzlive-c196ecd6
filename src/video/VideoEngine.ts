@@ -199,6 +199,18 @@ class VideoEngineImpl {
   ): void {
     const lane = this.getLane(laneId);
     const { hlsUrl, posterUrl = null, startPosition = -1, postId = null } = opts;
+    // Same postId + same URL already loaded → no reload. This makes remount
+    // (element moving between card hosts) cheap and avoids re-fetching HLS.
+    const alreadyLoaded =
+      lane.postId != null &&
+      lane.postId === postId &&
+      lane.hlsUrl === hlsUrl &&
+      lane.state !== 'idle' &&
+      lane.state !== 'error';
+    if (alreadyLoaded) {
+      DBG(laneId, 'skip reload: same postId+url', { state: lane.state });
+      return;
+    }
     // [FEEDPLAY] mark laneLoad for feed-active lane.
     if (laneId === 'feed-active') {
       const preloaded =
