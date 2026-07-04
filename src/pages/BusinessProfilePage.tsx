@@ -785,9 +785,25 @@ const BusinessProfilePage: React.FC = () => {
       />
 
 
-      {/* Hidden file inputs */}
-      <input ref={logoFileInputRef} type="file" accept="image/*" onChange={handleLogoFileSelected} className="hidden" />
-      <input ref={heroFileInputRef} type="file" accept="image/*" onChange={handleCoverFileSelected} className="hidden" />
+      {/* Hidden file inputs (choose + take, for both logo and cover) */}
+      <input ref={logoChooseInputRef} type="file" accept="image/*" onChange={handleLogoFileSelected} className="hidden" />
+      <input ref={logoTakeInputRef} type="file" accept="image/*" capture="environment" onChange={handleLogoFileSelected} className="hidden" />
+      <input ref={heroChooseInputRef} type="file" accept="image/*" onChange={handleCoverFileSelected} className="hidden" />
+      <input ref={heroTakeInputRef} type="file" accept="image/*" capture="environment" onChange={handleCoverFileSelected} className="hidden" />
+
+      {/* Unified photo action sheet */}
+      {isOwner && (
+        <PhotoActionSheet
+          open={photoSheet !== null}
+          onClose={() => setPhotoSheet(null)}
+          title={photoSheet === 'cover' ? 'Cover photo' : 'Business logo'}
+          hasPhoto={photoSheet === 'cover' ? !!business.cover_image_url : !!business.logo_url}
+          removeLabel={photoSheet === 'cover' ? 'Remove cover photo' : 'Remove logo'}
+          onChoose={() => (photoSheet === 'cover' ? heroChooseInputRef : logoChooseInputRef).current?.click()}
+          onTake={() => (photoSheet === 'cover' ? heroTakeInputRef : logoTakeInputRef).current?.click()}
+          onRemove={() => (photoSheet === 'cover' ? removeCover() : removeLogo())}
+        />
+      )}
 
       {/* Crop modal */}
       {isCropModalOpen && cropImageSrc && (
