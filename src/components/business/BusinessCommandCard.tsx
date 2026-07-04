@@ -18,6 +18,7 @@ import { useBusinessPendingRequestsCount } from '@/hooks/useBusinessPendingReque
 import { useBusinessAccessRequestsRealtime } from '@/hooks/useBusinessAccessRequestsRealtime';
 import { VerifiedBadge } from '@/components/ui/VerifiedBadge';
 import { useBusinessVerificationRequest, deriveVerificationState } from '@/hooks/useBusinessVerificationRequest';
+import { useBusinessReviews } from '@/hooks/useBusinessReviews';
 import { getCityCountry } from '@/lib/locationDisplay';
 import type { BusinessMembership } from '@/hooks/useMyBusinesses';
 import { BIZ } from './businessTokens';
