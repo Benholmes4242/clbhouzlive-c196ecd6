@@ -125,13 +125,16 @@ const BusinessProfilePage: React.FC = () => {
   const toggleFollow = useToggleFollow();
   const { startDM, isStarting: isStartingDM } = useStartDM();
 
-  const { uploadLogo, uploadCover, uploadingLogo, uploadingCover } =
+  const { uploadLogo, removeLogo, uploadCover, removeCover, uploadingLogo, uploadingCover } =
     useBusinessImageUpload(business?.id);
-  const logoFileInputRef = useRef<HTMLInputElement>(null);
-  const heroFileInputRef = useRef<HTMLInputElement>(null);
+  const logoChooseInputRef = useRef<HTMLInputElement>(null);
+  const logoTakeInputRef = useRef<HTMLInputElement>(null);
+  const heroChooseInputRef = useRef<HTMLInputElement>(null);
+  const heroTakeInputRef = useRef<HTMLInputElement>(null);
   const [cropImageSrc, setCropImageSrc] = useState<string | null>(null);
   const [cropMode, setCropMode] = useState<'logo' | 'cover' | null>(null);
   const [isCropModalOpen, setIsCropModalOpen] = useState(false);
+  const [photoSheet, setPhotoSheet] = useState<'cover' | 'logo' | null>(null);
 
   const [activeTab, setActiveTab] = useState<BusinessTab>('posts');
   const [bioExpanded, setBioExpanded] = useState(false);
