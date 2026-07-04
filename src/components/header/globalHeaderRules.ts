@@ -19,6 +19,8 @@ export const GLOBAL_HEADER_EXCLUDED_ROUTES = [
   
   '/edit-profile',
   '/handicap',
+  '/followers',            // Own followers redirect — settings-style standalone
+  '/following',            // Own following redirect — settings-style standalone
 ] as const;
 
 export const GLOBAL_HEADER_EXCLUDED_PREFIXES = [
