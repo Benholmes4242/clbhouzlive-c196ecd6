@@ -24,7 +24,8 @@ import { useFollowUser } from '@/hooks/useFollowUser';
 import { useFriendActions } from '@/hooks/useFriendActions';
 import { useRelationshipStatuses, type RelationshipStatusRow } from '@/hooks/useRelationshipStatuses';
 import { useSocialCounts } from '@/hooks/useSocialCounts';
-import { SuggestedCreatorsShelf } from '@/components/shared/SuggestedCreatorsShelf';
+import { useSuggestedCreators, type SuggestedCreator } from '@/components/watch/hooks/useSuggestedCreators';
+import { ChevronRight } from 'lucide-react';
 import { Sheet, SheetContent } from '@/components/ui/sheet';
 
 import { toast } from 'sonner';
@@ -41,16 +42,20 @@ import {
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
 
-// Locked editorial tokens — consistent with polish arc
+// Network page tokens — mirrors Activity page so both read as one system
 const INK = '#0F172A';
-const INK_SOFT = '#475569';
+const INK_SOFT = '#475569';          // INK_60
+const INK_45 = '#64748B';
 const INK_SUBTLE = '#94A3B8';
 const INK_FAINT = '#CBD5E1';
 const AMBER = '#F7931E';
 const AMBER_DEEP = '#C97A10';
+const AMBER_SOFT = 'rgba(247,147,30,0.10)';
 const AMBER_WASH = 'rgba(247,147,30,0.08)';
 const AMBER_BORDER = 'rgba(247,147,30,0.30)';
-const BORDER = 'rgba(15,23,42,0.07)';
+const HAIR = 'rgba(15,23,42,0.08)';
+const HAIR2 = 'rgba(15,23,42,0.12)';
+const BORDER = HAIR;
 const BG_SURFACE = '#F8FAFC';
 const FONT_SERIF = '"Geist", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif';
 
@@ -108,12 +113,11 @@ const FriendBadge: React.FC = () => (
     style={{
       display: 'inline-flex',
       alignItems: 'center',
-      padding: '2px 7px',
-      borderRadius: 5,
-      background: 'rgba(247,147,30,0.12)',
-      border: '1px solid rgba(247,147,30,0.28)',
+      padding: '2.5px 7px',
+      borderRadius: 6,
+      background: AMBER_SOFT,
       color: AMBER_DEEP,
-      fontSize: 8.5,
+      fontSize: 9.5,
       fontWeight: 800,
       letterSpacing: '0.12em',
       textTransform: 'uppercase',
@@ -126,13 +130,13 @@ const FriendBadge: React.FC = () => (
 );
 
 const HandicapInline: React.FC<{ value: number }> = ({ value }) => (
-  <span style={{ display: 'inline-flex', alignItems: 'baseline', gap: 4 }}>
+  <span style={{ display: 'inline-flex', alignItems: 'baseline', gap: 3 }}>
     <span
       style={{
-        fontSize: 9,
+        fontSize: 10,
         fontWeight: 800,
-        color: INK_SUBTLE,
-        letterSpacing: '0.14em',
+        color: INK_SOFT,
+        letterSpacing: '0.04em',
         textTransform: 'uppercase',
       }}
     >
@@ -153,6 +157,92 @@ const HandicapInline: React.FC<{ value: number }> = ({ value }) => (
   </span>
 );
 
+// Small amber-bar + uppercase label kicker (matches Activity)
+const Kicker: React.FC<{ label: string; barWidth?: number; color?: string }> = ({ label, barWidth = 26, color = AMBER_DEEP }) => (
+  <div className="flex items-center" style={{ gap: 8 }}>
+    <span style={{ width: barWidth, height: 2.5, background: AMBER, borderRadius: 2 }} />
+    <span
+      style={{
+        fontSize: 10.5,
+        fontWeight: 800,
+        letterSpacing: '0.14em',
+        textTransform: 'uppercase',
+        color,
+      }}
+    >
+      {label}
+    </span>
+  </div>
+);
+
+const SectionKicker: React.FC<{ label: string; count?: number }> = ({ label, count }) => (
+  <div style={{ padding: '18px 16px 10px' }}>
+    <div
+      style={{
+        fontSize: 10.5,
+        fontWeight: 800,
+        color: INK_45,
+        letterSpacing: '0.12em',
+        textTransform: 'uppercase',
+        marginBottom: 6,
+        fontFamily: FONT_SERIF,
+      }}
+    >
+      {label}{typeof count === 'number' ? ` · ${count.toLocaleString()}` : ''}
+    </div>
+    <div style={{ width: 22, height: 2.5, background: AMBER, borderRadius: 2 }} />
+  </div>
+);
+
+interface PillTabProps {
+  label: string;
+  count: number;
+  isActive: boolean;
+  onClick: () => void;
+  size?: 'md' | 'sm';
+}
+
+const PillTab: React.FC<PillTabProps> = ({ label, count, isActive, onClick, size = 'md' }) => {
+  const small = size === 'sm';
+  return (
+    <button
+      onClick={onClick}
+      aria-pressed={isActive}
+      className="shrink-0 inline-flex items-center transition-all active:scale-[0.96]"
+      style={{
+        padding: small ? '6px 12px' : '8px 14px',
+        borderRadius: 30,
+        background: isActive ? INK : '#FFFFFF',
+        color: isActive ? '#FFFFFF' : INK_SOFT,
+        border: isActive ? '1px solid transparent' : `1px solid ${HAIR2}`,
+        fontSize: small ? 12.5 : 13,
+        fontWeight: small ? 700 : 600,
+        gap: 6,
+        fontFamily: FONT_SERIF,
+        cursor: 'pointer',
+      }}
+    >
+      {label}
+      {count > 0 && (
+        <span
+          className="tabular-nums"
+          style={{
+            fontSize: 10.5,
+            fontWeight: 800,
+            padding: '2px 7px',
+            borderRadius: 20,
+            background: isActive ? 'rgba(255,255,255,0.18)' : '#F1F5F9',
+            color: isActive ? '#FFFFFF' : INK_SOFT,
+            lineHeight: 1,
+          }}
+        >
+          {count.toLocaleString()}
+        </span>
+      )}
+    </button>
+  );
+};
+
 interface FollowingFilterChipProps {
   label: string;
   count: number;
@@ -161,37 +251,7 @@ interface FollowingFilterChipProps {
 }
 
 const FollowingFilterChip: React.FC<FollowingFilterChipProps> = ({ label, count, isActive, onClick }) => (
-  <button
-    onClick={onClick}
-    aria-pressed={isActive}
-    style={{
-      minHeight: 32,
-      padding: '6px 14px',
-      background: isActive ? INK : 'transparent',
-      color: isActive ? '#FFFFFF' : INK_SOFT,
-      border: isActive ? '1px solid transparent' : `1px solid ${BORDER}`,
-      borderRadius: 999,
-      fontSize: 13,
-      fontWeight: 700,
-      cursor: 'pointer',
-      display: 'inline-flex',
-      alignItems: 'center',
-      gap: 5,
-      flexShrink: 0,
-    }}
-  >
-    {label}
-    <span
-      style={{
-        fontSize: 11,
-        fontWeight: 700,
-        color: isActive ? 'rgba(255,255,255,0.7)' : INK_SUBTLE,
-        fontVariantNumeric: 'tabular-nums',
-      }}
-    >
-      {count.toLocaleString()}
-    </span>
-  </button>
+  <PillTab label={label} count={count} isActive={isActive} onClick={onClick} size="sm" />
 );
 
 // ---------------------------------------------------------------------------
@@ -297,6 +357,17 @@ export const UserListPage: React.FC<UserListPageProps> = ({
   const [searchInput, setSearchInput] = useState('');
   const debouncedSearch = useDebounce(searchInput, 300);
   const [removedIds, setRemovedIds] = useState<Set<string>>(new Set());
+
+  // Snapshot safe-area top once so the sticky header height doesn't shift.
+  const [safeTop, setSafeTop] = useState(0);
+  useEffect(() => {
+    if (embeddedInShell || hideBackButton) return;
+    const probe = document.createElement('div');
+    probe.style.cssText = 'position:fixed;top:0;left:0;height:env(safe-area-inset-top,0px);width:0;visibility:hidden;pointer-events:none;';
+    document.body.appendChild(probe);
+    setSafeTop(Math.max(probe.getBoundingClientRect().height, 8));
+    document.body.removeChild(probe);
+  }, [embeddedInShell, hideBackButton]);
 
   const hasFollowingTab = mode === 'followers' && followingUsers !== undefined;
   const initialTab = searchParams.get('tab') === 'following' || initialTabOverride === 'following' ? 'following' : 'followers';
@@ -433,70 +504,74 @@ export const UserListPage: React.FC<UserListPageProps> = ({
 
   const pageContent = (
       <div className="w-full">
-        {/* Sticky editorial header */}
+        {/* Sticky Network header — mirrors Activity page anatomy */}
         <div
-          className={embeddedInShell ? 'relative z-20' : 'sticky z-40 backdrop-blur-xl'}
+          className={embeddedInShell ? 'relative z-20' : 'sticky top-0 z-40'}
           style={{
-            top: embeddedInShell ? undefined : (hideBackButton ? 'var(--chrome-total-h, 0px)' : 0),
-            paddingTop: embeddedInShell || hideBackButton
-              ? 0
-              : 'max(var(--safe-top, env(safe-area-inset-top, 0px)), 8px)',
-            background: 'rgba(248,250,252,0.97)',
-            borderBottom: `0.5px solid ${BORDER}`,
+            background: BG_SURFACE,
+            borderBottom: `1px solid ${HAIR}`,
+            paddingTop: embeddedInShell || hideBackButton ? 0 : safeTop + 6,
           }}
         >
           {/* Back row */}
           {!hideBackButton && (
-            <div className="flex items-center px-2 pt-1 pb-1">
+            <div
+              className="flex items-center justify-between px-4"
+              style={{ paddingBottom: 8, minHeight: 40 }}
+            >
               <button
                 onClick={handleBack}
-                className="flex items-center justify-center min-h-[44px] min-w-[44px]"
-                style={{ color: INK }}
                 aria-label="Back"
+                style={{
+                  width: 32, height: 32, borderRadius: '50%',
+                  background: '#FFFFFF', border: `1px solid ${HAIR2}`,
+                  display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  cursor: 'pointer',
+                }}
               >
-                <ChevronLeft className="w-5 h-5" />
+                <ChevronLeft size={18} strokeWidth={2.5} color={INK} />
               </button>
+              <span />
             </div>
           )}
 
-          {/* Eyebrow + title */}
-          <div className="px-5 pb-3">
-            <SectionHeader tier="standard" kicker="Network" />
-            <div style={{ display: 'flex', alignItems: 'baseline', gap: 10, marginTop: 6 }}>
-              <h1
-                style={{
-                  fontFamily: FONT_SERIF,
-                  fontSize: 34,
-                  fontWeight: 800,
-                  color: INK,
-                  lineHeight: 1.05,
-                  letterSpacing: '-0.025em',
-                  margin: 0,
-                  fontFeatureSettings: '"kern" 1, "liga" 1',
-                }}
-              >
-                {displayTitle}
-              </h1>
-              {displayTotal > 0 && (
-                <span
-                  style={{
-                    fontFamily: FONT_SERIF,
-                    fontSize: 26,
-                    fontWeight: 700,
-                    color: AMBER_DEEP,
-                    fontVariantNumeric: 'tabular-nums',
-                    lineHeight: 1.05,
-                  }}
-                >
-                  {displayTotal.toLocaleString()}
-                </span>
-              )}
+          {/* Kicker + title */}
+          <div className="px-4" style={{ paddingTop: hideBackButton ? 6 : 0, paddingBottom: 10 }}>
+            <div style={{ marginBottom: 6 }}>
+              <Kicker label="Network" />
             </div>
+            <h1
+              style={{
+                fontSize: 26,
+                fontWeight: 800,
+                color: INK,
+                letterSpacing: '-0.02em',
+                margin: 0,
+                lineHeight: 1.1,
+                fontFamily: FONT_SERIF,
+              }}
+            >
+              {displayTitle}
+              {displayTotal > 0 && (
+                <>
+                  {' '}
+                  <span
+                    style={{
+                      color: AMBER_DEEP,
+                      fontVariantNumeric: 'tabular-nums',
+                      fontWeight: 800,
+                    }}
+                  >
+                    {displayTotal.toLocaleString()}
+                  </span>
+                </>
+              )}
+            </h1>
           </div>
 
-          {/* Search + tabs */}
-          <div className="px-4 pb-3 space-y-2.5">
-            <div className="relative">
+          {/* Search + tabs + filter chips */}
+          <div className="px-4" style={{ paddingBottom: 10 }}>
+            <div className="relative" style={{ marginBottom: 10 }}>
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4" style={{ color: INK_SUBTLE }} />
               <Input
                 type="search"
@@ -504,56 +579,30 @@ export const UserListPage: React.FC<UserListPageProps> = ({
                 value={searchInput}
                 onChange={(e) => setSearchInput(e.target.value)}
                 className="pl-10 h-11 rounded-xl focus-visible:ring-[#F7931E]/40"
-                style={{ background: '#ffffff', border: `1px solid ${BORDER}`, color: INK }}
+                style={{ background: '#ffffff', border: `1px solid ${HAIR}`, color: INK }}
                 aria-label="Search by name or club"
               />
             </div>
 
             {hasFollowingTab && (
-              <div className="flex gap-2">
-                {(['followers', 'following'] as const).map((tabKey) => {
-                  const isActive = activeTab === tabKey;
-                  const count = tabKey === 'followers' ? followersTabCount : followingTabCount;
-                  const label = tabKey === 'followers' ? 'Followers' : 'Following';
-                  return (
-                    <button
-                      key={tabKey}
-                      onClick={() => handleTabChange(tabKey)}
-                      aria-pressed={isActive}
-                      style={{
-                        flex: 1,
-                        minHeight: 36,
-                        background: isActive ? INK : 'transparent',
-                        color: isActive ? '#FFFFFF' : INK_SOFT,
-                        border: isActive ? 'none' : `1px solid ${BORDER}`,
-                        borderRadius: 12,
-                        fontSize: 13,
-                        fontWeight: 700,
-                        cursor: 'pointer',
-                        display: 'inline-flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        gap: 6,
-                        fontVariantNumeric: 'tabular-nums',
-                      }}
-                    >
-                      {label}
-                      <span
-                        style={{
-                          opacity: isActive ? 0.85 : 0.7,
-                          fontWeight: 600,
-                        }}
-                      >
-                        {count.toLocaleString()}
-                      </span>
-                    </button>
-                  );
-                })}
+              <div className="flex gap-2" style={{ marginBottom: showFilterChips ? 10 : 0 }}>
+                <PillTab
+                  label="Followers"
+                  count={followersTabCount}
+                  isActive={activeTab === 'followers'}
+                  onClick={() => handleTabChange('followers')}
+                />
+                <PillTab
+                  label="Following"
+                  count={followingTabCount}
+                  isActive={activeTab === 'following'}
+                  onClick={() => handleTabChange('following')}
+                />
               </div>
             )}
 
             {showFilterChips && (
-              <div className="flex gap-2 overflow-x-auto" style={{ scrollbarWidth: 'none' }}>
+              <div className="flex gap-2 overflow-x-auto scrollbar-none" style={{ scrollbarWidth: 'none' }}>
                 <FollowingFilterChip
                   label="All"
                   count={allFollowingCount}
@@ -577,13 +626,10 @@ export const UserListPage: React.FC<UserListPageProps> = ({
           </div>
         </div>
 
-        {/* Suggested Golfers strip — owner view, no active search */}
-        {isOwnProfile && !isSearching && user?.id && (
-          <SuggestedCreatorsShelf
+        {/* Suggested Golfers — compact horizontal rail (owner view, followers tab, no search) */}
+        {isOwnProfile && !isSearching && !isFollowingTab && user?.id && (
+          <SuggestedRail
             userId={user.id}
-            title="Discover · Suggested Golfers"
-            variant="light"
-            showViewAll
             onViewAll={() => navigate('/golferstofollow')}
           />
         )}
@@ -599,6 +645,7 @@ export const UserListPage: React.FC<UserListPageProps> = ({
               <h3 style={{ fontFamily: FONT_SERIF, fontSize: 20, fontWeight: 700, color: INK, marginBottom: 4 }}>
                 Something went wrong
               </h3>
+
               <p className="text-sm text-center max-w-[260px] mb-6" style={{ color: INK_SOFT }}>
                 We couldn't load {modeDisplayName}. Please try again.
               </p>
@@ -614,25 +661,29 @@ export const UserListPage: React.FC<UserListPageProps> = ({
             </div>
           )}
 
-          {/* Loading skeletons */}
+          {/* Loading skeletons — Option A row anatomy */}
           {activeIsLoading && !activeError && (
             <div>
-              {[1, 2, 3, 4, 5].map((i) => (
+              {[1, 2, 3, 4, 5, 6].map((i) => (
                 <div
                   key={i}
-                  className="flex items-center gap-3 px-5 py-3.5"
-                  style={{ borderBottom: `0.5px solid ${BORDER}`, background: '#FFFFFF' }}
+                  className="flex items-center"
+                  style={{
+                    gap: 12,
+                    padding: '11px 16px',
+                    borderTop: i > 1 ? `1px solid ${HAIR}` : undefined,
+                    background: BG_SURFACE,
+                  }}
                 >
-                  <div className="w-14 h-14 rounded-sq-md animate-pulse flex-shrink-0" style={{ background: 'rgba(15,23,42,0.08)' }} />
+                  <div
+                    className="animate-pulse flex-shrink-0"
+                    style={{ width: 46, height: 48, borderRadius: '34%', background: 'rgba(15,23,42,0.08)' }}
+                  />
                   <div className="flex-1 space-y-2">
-                    <div className="h-4 animate-pulse rounded w-32" style={{ background: 'rgba(15,23,42,0.08)' }} />
-                    <div className="h-3 animate-pulse rounded w-24" style={{ background: 'rgba(15,23,42,0.06)' }} />
-                    <div className="h-3 animate-pulse rounded w-40" style={{ background: 'rgba(15,23,42,0.06)' }} />
+                    <div className="h-3.5 animate-pulse rounded" style={{ width: `${55 + ((i * 7) % 30)}%`, background: 'rgba(15,23,42,0.08)' }} />
+                    <div className="h-3 animate-pulse rounded" style={{ width: `${40 + ((i * 5) % 25)}%`, background: 'rgba(15,23,42,0.06)' }} />
                   </div>
-                  <div className="flex items-center gap-1.5">
-                    <div className="h-9 w-24 animate-pulse rounded-md" style={{ background: 'rgba(15,23,42,0.06)' }} />
-                    <div className="h-9 w-9 animate-pulse rounded-md" style={{ background: 'rgba(15,23,42,0.04)' }} />
-                  </div>
+                  <div className="h-8 w-20 animate-pulse rounded-full flex-shrink-0" style={{ background: 'rgba(15,23,42,0.06)' }} />
                 </div>
               ))}
             </div>
@@ -704,12 +755,10 @@ export const UserListPage: React.FC<UserListPageProps> = ({
           {/* User list */}
           {!activeIsLoading && !activeError && filteredUsers.length > 0 && (
             <>
-              <div style={{ padding: '20px 20px 10px' }}>
-                <SectionHeader tier="standard"
-                  kicker={activeMode === 'followers' ? 'All Followers' : 'All Following'}
-                  count={displayTotal}
-                />
-              </div>
+              <SectionKicker
+                label={activeMode === 'followers' ? 'All Followers' : 'All Following'}
+                count={displayTotal}
+              />
               <InfiniteUserList
                 users={filteredUsers}
                 currentUserId={user?.id}
@@ -756,28 +805,37 @@ const EmptyState: React.FC<{
   onCta?: () => void;
 }> = ({ eyebrow, icon, heading, body, ctaLabel, ctaIsAmber, onCta }) => (
   <div className="flex flex-col items-center justify-center py-16 px-6">
-    <div style={{ marginBottom: 12 }}>
-      <SectionHeader tier="standard" kicker={eyebrow} />
-    </div>
+    {eyebrow && (
+      <div style={{ marginBottom: 14 }}>
+        <Kicker label={eyebrow} />
+      </div>
+    )}
     <div
-      className="w-16 h-16 rounded-full flex items-center justify-center mb-4"
-      style={{ background: 'rgba(15,23,42,0.05)', border: `1px solid ${BORDER}` }}
+      className="flex items-center justify-center mb-4"
+      style={{
+        width: 56,
+        height: 56,
+        borderRadius: '34%',
+        background: AMBER_SOFT,
+        color: AMBER_DEEP,
+      }}
     >
       {icon}
     </div>
     <h3
       style={{
         fontFamily: FONT_SERIF,
-        fontSize: 20,
-        fontWeight: 700,
+        fontSize: 15.5,
+        fontWeight: 800,
         color: INK,
         marginBottom: 4,
         textAlign: 'center',
+        letterSpacing: '-0.01em',
       }}
     >
       {heading}
     </h3>
-    <p className="text-sm text-center max-w-[280px] mb-6" style={{ color: INK_SOFT }}>
+    <p className="text-center max-w-[280px] mb-6" style={{ color: INK_45, fontSize: 13, lineHeight: 1.5 }}>
       {body}
     </p>
     {ctaLabel && onCta && (
@@ -795,6 +853,148 @@ const EmptyState: React.FC<{
     )}
   </div>
 );
+
+// ---------------------------------------------------------------------------
+// Suggested golfers — compact horizontal rail
+// ---------------------------------------------------------------------------
+
+const SuggestedRail: React.FC<{ userId: string; onViewAll: () => void }> = ({ userId, onViewAll }) => {
+  const { data: creators, isLoading } = useSuggestedCreators(userId);
+  const items = (creators ?? []).filter((c) => !c.isFollowed).slice(0, 12);
+
+  if (!isLoading && items.length === 0) return null;
+
+  return (
+    <div style={{ padding: '16px 0 12px', background: BG_SURFACE }}>
+      <div className="flex items-end justify-between px-4" style={{ marginBottom: 10 }}>
+        <Kicker label="Suggested Golfers" />
+        <button
+          onClick={onViewAll}
+          className="inline-flex items-center active:opacity-70"
+          style={{
+            gap: 2,
+            fontSize: 12.5,
+            fontWeight: 700,
+            color: AMBER_DEEP,
+            background: 'transparent',
+            border: 'none',
+            cursor: 'pointer',
+            fontFamily: FONT_SERIF,
+          }}
+        >
+          See all
+          <ChevronRight size={14} strokeWidth={2.5} />
+        </button>
+      </div>
+      <div
+        className="flex overflow-x-auto scrollbar-none"
+        style={{ gap: 10, padding: '0 16px', scrollbarWidth: 'none' }}
+      >
+        {isLoading && items.length === 0
+          ? [1, 2, 3, 4].map((i) => <SuggestedRailSkeleton key={i} />)
+          : items.map((c) => <SuggestedRailCard key={c.userId} creator={c} />)}
+      </div>
+    </div>
+  );
+};
+
+const SuggestedRailSkeleton: React.FC = () => (
+  <div
+    className="shrink-0 animate-pulse"
+    style={{
+      width: 128,
+      background: '#FFFFFF',
+      border: `1px solid ${HAIR}`,
+      borderRadius: 16,
+      padding: 12,
+    }}
+  >
+    <div style={{ width: 56, height: 58, borderRadius: '34%', background: 'rgba(15,23,42,0.08)', margin: '0 auto 10px' }} />
+    <div style={{ height: 10, borderRadius: 4, background: 'rgba(15,23,42,0.08)', marginBottom: 6 }} />
+    <div style={{ height: 8, borderRadius: 4, background: 'rgba(15,23,42,0.06)', marginBottom: 10, width: '70%' }} />
+    <div style={{ height: 28, borderRadius: 18, background: 'rgba(15,23,42,0.08)' }} />
+  </div>
+);
+
+const SuggestedRailCard: React.FC<{ creator: SuggestedCreator }> = ({ creator }) => {
+  const navigate = useNavigate();
+  const { followUser, unfollowUser, loading } = useFollowUser();
+  const [followed, setFollowed] = useState<boolean>(!!creator.isFollowed);
+
+  const handleFollow = async (e: React.MouseEvent) => {
+    e.stopPropagation();
+    const prev = followed;
+    setFollowed(!prev);
+    const ok = prev ? await unfollowUser(creator.userId) : await followUser(creator.userId);
+    if (!ok) setFollowed(prev);
+  };
+
+  const goProfile = () => {
+    const path = getProfilePathById(creator.userId, false, creator.username);
+    navigate(path);
+  };
+
+  return (
+    <div
+      role="button"
+      tabIndex={0}
+      onClick={goProfile}
+      onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') goProfile(); }}
+      className="shrink-0 active:scale-[0.98] transition-transform cursor-pointer"
+      style={{
+        width: 128,
+        background: '#FFFFFF',
+        border: `1px solid ${HAIR}`,
+        borderRadius: 16,
+        padding: 12,
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        textAlign: 'center',
+      }}
+    >
+      <SquircleAvatar
+        src={creator.avatarUrl || undefined}
+        alt={creator.displayName}
+        size={56}
+        fallback={creator.displayName?.charAt(0) || '?'}
+        hideRing
+        className="mb-2"
+      />
+      <div
+        className="truncate w-full"
+        style={{ fontSize: 12.5, fontWeight: 700, color: INK, fontFamily: FONT_SERIF, letterSpacing: '-0.005em' }}
+      >
+        {creator.displayName}
+      </div>
+      <div
+        className="truncate w-full"
+        style={{ fontSize: 11, color: INK_45, marginBottom: 10, minHeight: 14 }}
+      >
+        {creator.homeCourse || (creator.username ? `@${creator.username}` : '')}
+      </div>
+      <button
+        onClick={handleFollow}
+        disabled={loading}
+        className="w-full inline-flex items-center justify-center active:scale-[0.97]"
+        style={{
+          height: 28,
+          borderRadius: 18,
+          fontSize: 12,
+          fontWeight: 700,
+          fontFamily: FONT_SERIF,
+          background: followed ? '#FFFFFF' : INK,
+          color: followed ? INK : '#FFFFFF',
+          border: followed ? `1px solid ${HAIR2}` : 'none',
+          cursor: loading ? 'default' : 'pointer',
+          opacity: loading ? 0.7 : 1,
+        }}
+      >
+        {followed ? 'Following' : 'Follow'}
+      </button>
+    </div>
+  );
+};
 
 // ---------------------------------------------------------------------------
 // InfiniteUserList
@@ -856,8 +1056,8 @@ const InfiniteUserList: React.FC<InfiniteUserListProps> = ({
 
   return (
     <>
-      <div className="flex flex-col gap-2.5 px-4 pb-2">
-        {users.map((socialUser) => (
+      <div>
+        {users.map((socialUser, idx) => (
           <UserRowFlat
             key={socialUser.id}
             user={socialUser}
@@ -866,6 +1066,7 @@ const InfiniteUserList: React.FC<InfiniteUserListProps> = ({
             onUserRemoved={onUserRemoved}
             relationshipStatus={relationshipMap[socialUser.id]}
             isOwnProfile={isOwnProfile}
+            isFirst={idx === 0}
           />
         ))}
       </div>
@@ -894,6 +1095,7 @@ interface UserRowFlatProps {
   onUserRemoved?: (userId: string) => void;
   relationshipStatus?: RelationshipStatusRow;
   isOwnProfile: boolean;
+  isFirst?: boolean;
 }
 
 const UserRowFlat: React.FC<UserRowFlatProps> = ({
@@ -903,6 +1105,7 @@ const UserRowFlat: React.FC<UserRowFlatProps> = ({
   onUserRemoved,
   relationshipStatus,
   isOwnProfile,
+  isFirst = false,
 }) => {
   const navigate = useNavigate();
   const isSelf = currentUserId === user.id;
@@ -1011,6 +1214,8 @@ const UserRowFlat: React.FC<UserRowFlatProps> = ({
   // Brief #6: kebab visible only on owner view (visitors don't manage relationships)
   const showKebab = isOwnProfile && !isSelf && !!currentUserId && isPersonalProfile;
 
+  const showFollowingPill = uiState === 'following';
+
   return (
     <>
       <div
@@ -1020,53 +1225,52 @@ const UserRowFlat: React.FC<UserRowFlatProps> = ({
         onKeyDown={(e) => {
           if (e.key === 'Enter' || e.key === ' ') handleRowClick();
         }}
-        className="w-full flex items-center gap-3 px-3.5 py-3 text-left transition-colors active:bg-[rgba(15,23,42,0.02)] cursor-pointer"
-        style={{ background: '#FFFFFF', borderRadius: 16, border: `0.5px solid ${BORDER}` }}
+        className="w-full flex items-center text-left transition-colors active:bg-[rgba(15,23,42,0.02)] cursor-pointer"
+        style={{
+          gap: 12,
+          padding: '11px 16px',
+          background: '#FFFFFF',
+          borderTop: isFirst ? undefined : `1px solid ${HAIR}`,
+        }}
       >
         <SquircleAvatar
           src={user.avatarUrl || undefined}
           alt={user.displayName}
-          size={50}
+          size={46}
           fallback={user.displayName?.charAt(0) || '?'}
           hideRing
           className="flex-shrink-0"
         />
 
         <div className="flex-1 min-w-0">
-          <div className="flex items-center gap-1.5 mb-0.5 min-w-0">
+          <div className="flex items-center gap-1.5 mb-1 min-w-0">
             <span
               className="truncate"
-              style={{ fontSize: 14, fontWeight: 700, color: INK, letterSpacing: '-0.005em' }}
+              style={{ fontSize: 14.5, fontWeight: 700, color: INK, letterSpacing: '-0.005em', fontFamily: FONT_SERIF }}
             >
               {user.displayName}
             </span>
             {isFriend && <FriendBadge />}
           </div>
 
-          {user.username && (
-            <p className="text-xs truncate" style={{ color: INK_SUBTLE, marginBottom: 2 }}>
-              @{user.username}
-            </p>
-          )}
-
-          {(user.homeClub || showHandicap) && (
-            <div className="flex items-center gap-1.5 min-w-0" style={{ marginTop: 2 }}>
-              {user.homeClub && (
-                <span className="text-xs truncate" style={{ color: INK_SOFT }}>
-                  {user.homeClub}
-                </span>
-              )}
-              {user.homeClub && showHandicap && (
-                <span style={{ color: INK_FAINT, fontSize: 11 }}>·</span>
-              )}
-              {showHandicap && <HandicapInline value={user.handicapIndex as number} />}
-            </div>
-          )}
+          <div
+            className="truncate flex items-center"
+            style={{ fontSize: 12.5, color: INK_45, gap: 5, lineHeight: 1.35, minWidth: 0 }}
+          >
+            {user.username && <span className="truncate">@{user.username}</span>}
+            {user.username && user.homeClub && <span style={{ color: INK_FAINT }}>·</span>}
+            {user.homeClub && <span className="truncate">{user.homeClub}</span>}
+            {(user.username || user.homeClub) && showHandicap && (
+              <span style={{ color: INK_FAINT }}>·</span>
+            )}
+            {showHandicap && <HandicapInline value={user.handicapIndex as number} />}
+          </div>
         </div>
 
         {!isSelf && currentUserId && (
           <div
-            className="flex items-center gap-1.5 flex-shrink-0"
+            className="flex items-center flex-shrink-0"
+            style={{ gap: 4 }}
             onClick={(e) => e.stopPropagation()}
           >
             {primaryAction && (
@@ -1078,22 +1282,51 @@ const UserRowFlat: React.FC<UserRowFlatProps> = ({
                   display: 'inline-flex',
                   alignItems: 'center',
                   justifyContent: 'center',
-                  gap: 6,
-                  height: 36,
+                  gap: 5,
+                  height: 32,
                   padding: '0 14px',
-                  borderRadius: 10,
-                  fontSize: 13,
-                  fontWeight: 700,
+                  borderRadius: 20,
+                  fontSize: 12.5,
+                  fontWeight: 800,
                   cursor: primaryAction.disabled ? 'default' : 'pointer',
                   opacity: primaryAction.disabled ? 0.6 : 1,
                   background: primaryAction.isAmber ? AMBER : '#FFFFFF',
                   color: primaryAction.isAmber ? '#FFFFFF' : INK,
-                  border: primaryAction.isAmber ? 'none' : `1px solid ${BORDER}`,
+                  border: primaryAction.isAmber ? 'none' : `1px solid ${HAIR2}`,
                   whiteSpace: 'nowrap',
+                  fontFamily: FONT_SERIF,
                 }}
               >
                 {primaryAction.icon}
                 {primaryAction.label}
+              </button>
+            )}
+            {!primaryAction && showFollowingPill && (
+              <button
+                onClick={handleFollowToggle}
+                disabled={followLoading}
+                aria-label={`Unfollow ${user.displayName}`}
+                style={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  gap: 5,
+                  height: 32,
+                  padding: '0 12px',
+                  borderRadius: 20,
+                  fontSize: 12.5,
+                  fontWeight: 700,
+                  cursor: followLoading ? 'default' : 'pointer',
+                  opacity: followLoading ? 0.6 : 1,
+                  background: '#FFFFFF',
+                  color: INK,
+                  border: `1px solid ${HAIR2}`,
+                  whiteSpace: 'nowrap',
+                  fontFamily: FONT_SERIF,
+                }}
+              >
+                <Check className="w-3.5 h-3.5" />
+                Following
               </button>
             )}
             {showKebab && (
@@ -1104,25 +1337,27 @@ const UserRowFlat: React.FC<UserRowFlatProps> = ({
                 }}
                 aria-label={`More actions for ${user.displayName}`}
                 style={{
-                  width: 36,
-                  height: 36,
+                  width: 32,
+                  height: 32,
                   background: 'transparent',
                   border: 0,
-                  borderRadius: 8,
                   cursor: 'pointer',
-                  color: INK_SUBTLE,
+                  color: INK_45,
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
                   flexShrink: 0,
+                  fontSize: 17,
                 }}
               >
-                <MoreHorizontal className="w-5 h-5" />
+                <MoreHorizontal size={17} />
               </button>
             )}
           </div>
         )}
       </div>
+
+
 
 
       {/* Kebab actions sheet */}

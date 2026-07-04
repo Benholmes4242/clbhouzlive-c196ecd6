@@ -29,6 +29,8 @@ const HIDDEN_ROUTES = [
   '/onboarding',
   '/map',
   '/notificationmessages', // Notifications/Activity — settings-style standalone shell
+  '/followers',            // Own followers redirect — settings-style standalone
+  '/following',            // Own following redirect — settings-style standalone
 ];
 
 // Route prefixes where bottom navigation should be hidden
@@ -45,6 +47,13 @@ const HIDDEN_ROUTE_PREFIXES = [
   '/business/create', // Create business profile — standalone shell, no bottom nav
   '/business/invite/accept', // Team invite accept page — standalone shell, no bottom nav
 
+];
+
+// Regex-matched routes where bottom nav is hidden — covers social network pages
+// under /profile/:username/followers|following and /business/:idOrSlug/followers|following.
+const HIDDEN_ROUTE_PATTERNS: RegExp[] = [
+  /^\/profile\/[^/]+\/(followers|following)$/,
+  /^\/business\/[^/]+\/(followers|following)$/,
 ];
 
 // Routes that use the dark Clubhouse nav chrome.
@@ -129,6 +138,7 @@ const GlobalBottomNavigation: React.FC<GlobalBottomNavigationProps> = ({ chromeS
   const isBetaGateRoute = location.pathname === '/' && !isMedianApp() && !isPreviewBypass;
   const shouldHideForRoute = HIDDEN_ROUTES.includes(location.pathname) ||
     HIDDEN_ROUTE_PREFIXES.some(prefix => location.pathname.startsWith(prefix)) ||
+    HIDDEN_ROUTE_PATTERNS.some(re => re.test(location.pathname)) ||
     isOnboardingEditProfile ||
     isBetaGateRoute;
 
