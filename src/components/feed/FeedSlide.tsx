@@ -28,13 +28,14 @@ interface FeedSlideProps {
   activeIndexOverride?: number;
   /** When true, suppress the inline top-right elongated dots — fullscreen surfaces render their own segmented dots via FullscreenCarouselOverlay. */
   isFullscreen?: boolean;
-  /** Which media within this post to render on the opening slide. SnapFeed
-   *  passes this ONLY to the slide at startIndex; all other slides get 0 →
-   *  identical behavior (multi-media posts still use FeedImageCarousel from
-   *  media[0]). Course media taps a per-media tile, so passing the tapped
-   *  media's within-post index lets the opening slide mount THAT media
-   *  (video or image), fixing "video slot never mounts" for mixed posts. */
+  /** Positional fallback — SnapFeed passes 0 for non-opening slides. */
   mediaIndex?: number;
+  /** Stable media item id (authoritative). SnapFeed passes it ONLY to the
+   *  slide at startIndex; resolves via `mediaItems.findIndex(m => m.id === mediaId)`
+   *  against the post's grouped mediaItems. Fixes "grouping reorders media"
+   *  drift where positional indices from ungrouped callers land on the wrong
+   *  media (image branch renders instead of video → no play). */
+  mediaId?: string | null;
 }
 
 export const FeedSlide = memo(function FeedSlide({
