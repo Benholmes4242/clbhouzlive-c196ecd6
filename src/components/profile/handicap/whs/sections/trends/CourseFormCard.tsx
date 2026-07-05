@@ -25,7 +25,7 @@ const T = {
   amberTint: 'rgba(247,147,30,0.10)',
   amberInk: '#854F0B',
   greenInk: 'var(--hcp-good-deep)',
-  redInk: 'var(--hcp-bad)',
+  slateInk: 'var(--hcp-t-60)',        // over handicap: quiet slate
   slateTint: 'var(--hcp-bg-2)',
   ink04: 'var(--hcp-bg-2)',
   ink08: 'var(--hcp-line-2)',
@@ -80,7 +80,7 @@ function fmtDelta(d: number): string {
 
 function deltaColor(d: number): string {
   if (d < 0) return T.greenInk;
-  if (d > 0) return T.redInk;
+  if (d > 0) return T.slateInk;
   return T.inkMute;
 }
 
@@ -189,11 +189,11 @@ const CourseRow: React.FC<{
     // Bar colour: green (improving / under hcp), red (over), neutral for most-played.
     const barGradient = isMostPlayed
       ? 'linear-gradient(90deg, #94A3B8, #64748B)'
-      : course.delta < 0
-        ? 'linear-gradient(90deg, #22C55E, var(--hcp-good-deep))'
-        : course.delta > 0
-          ? 'linear-gradient(90deg, #F87171, var(--hcp-bad))'
-          : 'linear-gradient(90deg, #CBD5E1, #94A3B8)';
+        : course.delta < 0
+          ? 'linear-gradient(90deg, #22C55E, var(--hcp-good-deep))'
+          : course.delta > 0
+            ? 'rgba(242,244,247,0.16)'        // flat quiet slate, no gradient
+            : 'linear-gradient(90deg, #CBD5E1, #94A3B8)';
 
     return (
       <div
@@ -426,8 +426,8 @@ const CourseRow: React.FC<{
             />
             <Pill
               label={`Worst ${fmtDelta(course.worst_differential - course.expected_differential)}`}
-              color={T.redInk}
-              bg="rgba(159,29,29,0.12)"
+              color={T.slateInk}
+              bg="rgba(242,244,247,0.10)"
             />
           </div>
         ) : (
