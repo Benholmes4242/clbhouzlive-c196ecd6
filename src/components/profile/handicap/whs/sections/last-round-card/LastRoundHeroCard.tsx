@@ -150,7 +150,13 @@ const LastRoundHeroCard: React.FC<Props> = ({ round, onClick }) => {
   const stableford = round.stableford_points;
   const diff = round.handicap_differential;
   const handicapDelta = round.handicap_delta ?? null;
-  const indexAfter = round.handicap_index_at_time ?? null;
+  // handicap_index_at_time is the PRE-round index; the post-round
+  // index is pre + delta (delta is snapshot-based post minus pre).
+  const indexBefore = round.handicap_index_at_time ?? null;
+  const indexAfter =
+    indexBefore != null && handicapDelta != null
+      ? Number((indexBefore + handicapDelta).toFixed(1))
+      : indexBefore; // no delta: show the index we have
 
   const metaParts: string[] = [];
   if (par != null) metaParts.push(`PAR ${par}`);
