@@ -32,6 +32,7 @@ interface Tile {
   eyebrow: string;
   value: string;
   caption: string | null;
+  valueColor?: string;
 }
 
 function fmtCourseDate(s: WhsScore | null): string | null {
@@ -92,6 +93,7 @@ export const PersonalBests: React.FC<Props> = ({ connectionId, currentHandicap, 
         eyebrow: 'Best Diff',
         value: fmtDiff(best.handicap_differential as number),
         caption: fmtCourseDate(best),
+        valueColor: '#55BD8B',
       };
     }
 
@@ -125,6 +127,7 @@ export const PersonalBests: React.FC<Props> = ({ connectionId, currentHandicap, 
         eyebrow: 'Best vs HCP',
         value: `${sign}${best.vsHcp.toFixed(1)}`,
         caption: fmtCourseDate(best.s),
+        valueColor: '#55BD8B',
       };
     }
 
@@ -211,18 +214,20 @@ export const PersonalBests: React.FC<Props> = ({ connectionId, currentHandicap, 
                       <div
                         style={{
                           width: 30, height: 30, borderRadius: 9,
-                          background: 'rgba(247,147,30,0.10)',
+                          background: 'var(--hcp-bg-2)',
+                          border: '1px solid var(--hcp-line)',
                           display: 'flex', alignItems: 'center', justifyContent: 'center',
                           flexShrink: 0,
+                          boxSizing: 'border-box',
                         }}
                       >
-                        {Icon && <Icon size={15} color="#F7931E" strokeWidth={2.2} />}
+                        {Icon && <Icon size={15} color="var(--hcp-t-60)" strokeWidth={2.2} />}
                       </div>
                       <span
                         style={{
                           fontSize: 30,
                           fontWeight: 300,
-                          color: isEmpty ? 'var(--hcp-t-30)' : D_T100,
+                          color: isEmpty ? 'var(--hcp-t-30)' : (tile.valueColor ?? D_T100),
                           fontVariantNumeric: 'tabular-nums',
                           letterSpacing: '-0.04em',
                           lineHeight: 0.85,
