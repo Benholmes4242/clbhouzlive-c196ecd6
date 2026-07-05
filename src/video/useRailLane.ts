@@ -25,9 +25,10 @@ export interface UseRailLaneResult {
   hostRef: React.RefObject<HTMLDivElement>;
   /** Which lane (if any) is currently rented for this owner. null = show poster. */
   laneId: LaneId | null;
-  /** Whether the rented lane has painted a first frame. */
-  firstFrame: boolean;
+  /** True once the rented lane has enough data to paint (readyState >= 2). */
+  ready: boolean;
 }
+
 
 export function useRailLane(opts: UseRailLaneOptions): UseRailLaneResult {
   const hostRef = useRef<HTMLDivElement>(null);
