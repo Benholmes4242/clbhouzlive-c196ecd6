@@ -37,8 +37,9 @@ const HcpSparkline: React.FC<{ series: number[]; color: string }> = ({ series, c
   const min = Math.min(...series);
   const max = Math.max(...series);
   const range = Math.max(0.1, max - min);
+  const PADX = 3;
   const points = series.map((v, i) => [
-    (i / (series.length - 1)) * w,
+    PADX + (i / (series.length - 1)) * (w - PADX * 2),
     h - PAD - ((v - min) / range) * (h - PAD * 2),
   ]);
   const path = points
@@ -71,9 +72,16 @@ export const PulseCard: React.FC<Props> = ({ friend }) => {
     : isDown
       ? 'var(--hcp-good, #10B981)'
       : 'var(--hcp-t-40)';
-  const lineColor = isDown
+  // Colour describes the visible line. When delta90 is null (thin
+  // history) fall back to the series' own direction so a rising line
+  // is never neutral grey.
+  const s = friend.hcp_series;
+  const seriesMove = s.length >= 2 ? s[s.length - 1] - s[0] : 0;
+  const lineUp = friend.delta90 != null ? isUp : seriesMove >= 0.3;
+  const lineDown = friend.delta90 != null ? isDown : seriesMove <= -0.3;
+  const lineColor = lineDown
     ? 'var(--hcp-good, #10B981)'
-    : isUp
+    : lineUp
       ? 'var(--hcp-bad, #EF4444)'
       : 'var(--hcp-t-60)';
   const lastPlayedLabel = relativeDay(friend.last_played);
