@@ -1,4 +1,4 @@
-import { memo, useRef } from 'react';
+import { memo } from 'react';
 import { useVideosFollowingRail } from './hooks/useVideosFollowingRail';
 import SectionHeader from '@/components/ui/SectionHeader';
 import { HRail } from '../proshop/HRail';
