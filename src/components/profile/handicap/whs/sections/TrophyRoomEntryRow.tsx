@@ -84,7 +84,7 @@ const Medallion: React.FC<{ rarity: BadgeRarity; z: number; first: boolean }> = 
     <div
       style={{
         ...chipBaseStyle(z, first),
-        background: `linear-gradient(to bottom, ${t.top} 0%, ${t.bottom} 100%)`,
+        background: `linear-gradient(160deg, ${t.top} 0%, ${t.bottom} 100%), var(--hcp-bg-1)`,
         border: `1px solid ${t.border}`,
       }}
     >
