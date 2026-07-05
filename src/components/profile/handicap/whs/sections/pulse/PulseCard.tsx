@@ -68,10 +68,10 @@ export const PulseCard: React.FC<Props> = ({ friend }) => {
   const isDown = (friend.delta90 ?? 0) <= -0.3;
   const isFlat = friend.delta90 != null && !isUp && !isDown;
   const deltaColor = isUp
-    ? 'var(--hcp-bad, #EF4444)'
+    ? '#EF4444'
     : isDown
-      ? 'var(--hcp-good, #10B981)'
-      : 'var(--hcp-t-40)';
+      ? '#34D399'
+      : 'rgba(242,244,247,0.38)';
   // Colour describes the visible line. When delta90 is null (thin
   // history) fall back to the series' own direction so a rising line
   // is never neutral grey.
@@ -80,10 +80,10 @@ export const PulseCard: React.FC<Props> = ({ friend }) => {
   const lineUp = friend.delta90 != null ? isUp : seriesMove >= 0.3;
   const lineDown = friend.delta90 != null ? isDown : seriesMove <= -0.3;
   const lineColor = lineDown
-    ? 'var(--hcp-good, #10B981)'
+    ? '#34D399'
     : lineUp
-      ? 'var(--hcp-bad, #EF4444)'
-      : 'var(--hcp-t-60)';
+      ? '#EF4444'
+      : 'rgba(242,244,247,0.55)';
   const lastPlayedLabel = relativeDay(friend.last_played);
   const nameForInitial = friend.first_name ?? friend.display_name;
   const initial = (nameForInitial || '?').charAt(0).toUpperCase();
@@ -204,7 +204,7 @@ export const PulseCard: React.FC<Props> = ({ friend }) => {
                       width: 7,
                       height: 7,
                       borderRadius: '50%',
-                      background: 'var(--hcp-good, #10B981)',
+                      background: '#34D399',
                       boxSizing: 'border-box',
                     }}
                   />

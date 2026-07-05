@@ -190,7 +190,7 @@ const CourseRow: React.FC<{
     const barGradient = isMostPlayed
       ? 'linear-gradient(90deg, #94A3B8, #64748B)'
         : course.delta < 0
-          ? 'linear-gradient(90deg, #22C55E, var(--hcp-good-deep))'
+          ? 'linear-gradient(90deg, #34D399, #059669)'
           : course.delta > 0
             ? 'rgba(242,244,247,0.16)'        // flat quiet slate, no gradient
             : 'linear-gradient(90deg, #CBD5E1, #94A3B8)';
