@@ -60,13 +60,21 @@ function VideoLargeCardInner({ post, index, allPosts }: VideoLargeCardProps) {
   const ageLabel = useMemo(() => formatAge(post.createdAt), [post.createdAt]);
   const courseName = (post as any).courseName as string | undefined;
 
+  const btnRef = useRef<HTMLButtonElement>(null);
   const handleTap = useCallback(() => {
-    useFullscreenFeedStore.getState().open(allPosts, index);
-  }, [allPosts, index]);
+    openWithOrigin({
+      posts: allPosts,
+      index,
+      originEl: btnRef.current,
+      posterUrl: thumb || null,
+      handOffUrls: [(media as any)?.hlsUrl],
+    });
+  }, [allPosts, index, thumb, media]);
 
   return (
     <section style={{ padding: '0 16px' }}>
       <button
+        ref={btnRef}
         type="button"
         onClick={handleTap}
         className="block w-full text-left active:scale-[0.99] transition-transform"
