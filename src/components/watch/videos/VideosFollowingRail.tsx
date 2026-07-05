@@ -15,8 +15,8 @@ interface VideosFollowingRailProps {
  */
 function VideosFollowingRailInner({ userId }: VideosFollowingRailProps) {
   const { data: posts = [], isLoading } = useVideosFollowingRail(userId, 8);
-  const railRef = useRef<HTMLDivElement>(null);
-  const activeIdx = useWatchAutoplay(railRef, { railId: 'vids-following' });
+  const { activeIdx, railRef } = useWatchAutoplay({ railId: 'vids-following' });
+
 
   if (isLoading) return null;
   if (posts.length === 0) return null;
