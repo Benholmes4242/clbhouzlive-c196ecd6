@@ -17,6 +17,7 @@
 import type { FeedPost } from '@/components/media-system/types/media';
 import { useFullscreenFeedStore, type OpenOrigin } from '@/store/fullscreenFeedStore';
 import { VideoEngine } from '@/video/VideoEngine';
+import { RailLanePool } from '@/video/railLanePool';
 import { fsv, fsvNewSession, fsvViewport } from '@/perf/fsvTelemetry';
 // [VIDEOSTUB] HLSPoolManager + mobileVideoDebug imports removed — engine severed.
 
