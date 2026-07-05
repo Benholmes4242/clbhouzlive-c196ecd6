@@ -12,7 +12,7 @@ interface Props {
   onClick?: () => void;
 }
 
-export const RecentlyActiveItem: React.FC<Props> = ({ entry, isActive: _isActive, onClick }) => {
+export const RecentlyActiveItem: React.FC<Props> = ({ entry, isActive, onClick }) => {
   const display = firstName(entry.friend_name);
   const Tag: any = onClick ? 'button' : 'div';
 
@@ -30,12 +30,8 @@ export const RecentlyActiveItem: React.FC<Props> = ({ entry, isActive: _isActive
       style={{
         flex: '0 0 auto',
         width: 92,
-        background: isOnApp
-          ? 'linear-gradient(180deg, rgba(247,147,30,0.08) 0%, rgba(247,147,30,0.015) 100%)'
-          : 'var(--hcp-bg-2)',
-        border: isOnApp
-          ? '1px solid rgba(247,147,30,0.18)'
-          : '1px solid var(--hcp-line)',
+        background: isOnApp ? 'var(--hcp-bg-1)' : 'var(--hcp-bg-2)',
+        border: '1px solid var(--hcp-line)',
         borderRadius: 14,
         padding: '9px 8px',
         cursor: onClick ? 'pointer' : 'default',
@@ -93,7 +89,7 @@ export const RecentlyActiveItem: React.FC<Props> = ({ entry, isActive: _isActive
             fontWeight: 700,
             letterSpacing: '0.04em',
             textTransform: 'uppercase',
-            color: 'var(--hcp-t-40)',
+            color: isActive ? 'var(--hcp-good, #34D399)' : 'var(--hcp-t-40)',
             fontVariantNumeric: 'tabular-nums',
             lineHeight: 1,
           }}
