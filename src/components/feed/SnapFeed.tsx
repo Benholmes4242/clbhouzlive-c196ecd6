@@ -434,6 +434,28 @@ export function SnapFeed({
     }
   }
 
+  // [VDIFF] SnapFeed render trace — compare watch vs course tap line-by-line.
+  if (isPerfEnabled()) {
+    const openStartIdx = startIndex ?? 0;
+    const openPost = posts[openStartIdx];
+    // eslint-disable-next-line no-console
+    console.info('[VDIFF] snapfeed.render', {
+      surface,
+      activeTab,
+      readOnly: !!readOnly,
+      isFullscreen: !!isFullscreen,
+      postsLen: posts.length,
+      startIndex: openStartIdx,
+      activeIndex,
+      activeIndexOverride: activeIndexOverride ?? null,
+      openingMediaId,
+      openingMediaIndex,
+      openPostId: openPost?.id ?? null,
+      openPostMediaCount: openPost?.mediaItems?.length ?? 0,
+      openPostMediaTypes: openPost?.mediaItems?.map(m => m.type) ?? [],
+    });
+  }
+
   return (
     <div
       ref={containerRef}
