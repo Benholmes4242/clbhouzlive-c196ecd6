@@ -331,39 +331,45 @@ export const CourseLegendsCard: React.FC<Props> = ({
         </div>
       </div>
 
-      {/* 2-col row-major grid of champion cells (claimed only) */}
+      {/* 2-col record grid — one anatomy per cell, hairline between row-pairs */}
       {hasAnyClaimed ? (
-        <div style={{ padding: '12px 14px 0' }}>
-          <div style={{ display: 'flex', gap: 6, alignItems: 'flex-start' }}>
-            <div style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', gap: 6 }}>
-              {left.map(({ slot, row, cat }) => (
-                <HolderCell
-                  key={slot.key}
-                  short={slot.short}
-                  holder={row}
-                  category={cat}
-                  selfLabel={selfLabel}
-                />
-              ))}
-            </div>
-            <div style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', gap: 6 }}>
-              {right.map(({ slot, row, cat }) => (
-                <HolderCell
-                  key={slot.key}
-                  short={slot.short}
-                  holder={row}
-                  category={cat}
-                  selfLabel={selfLabel}
-                />
-              ))}
-            </div>
-          </div>
+        <div style={{ padding: '2px 14px 4px' }}>
+          {(() => {
+            const rowPairs: typeof claimed[] = [];
+            for (let i = 0; i < claimed.length; i += 2) {
+              rowPairs.push(claimed.slice(i, i + 2));
+            }
+            return rowPairs.map((pair, rowIdx) => (
+              <div
+                key={rowIdx}
+                style={{
+                  display: 'flex',
+                  gap: 18,
+                  padding: '11px 0',
+                  borderTop: rowIdx === 0 ? 'none' : '1px solid var(--hcp-line)',
+                  alignItems: 'flex-start',
+                }}
+              >
+                {pair.map(({ slot, row, cat }) => (
+                  <HolderCell
+                    key={slot.key}
+                    short={slot.short}
+                    holder={row}
+                    category={cat}
+                    selfLabel={selfLabel}
+                  />
+                ))}
+                {pair.length === 1 && <div style={{ flex: 1 }} />}
+              </div>
+            ));
+          })()}
         </div>
       ) : (
         <div style={{ padding: '14px 16px', fontSize: 12, color: 'var(--hcp-t-60)', fontFamily: FONT }}>
           No champions yet — be the first to claim a title here.
         </div>
       )}
+
 
       {/* Footer */}
       <div
