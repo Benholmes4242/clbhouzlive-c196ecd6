@@ -1,7 +1,10 @@
 import React, { useMemo } from 'react';
 import { ExternalLink } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 import { BottomSheet } from '@/components/ui/BottomSheet';
-import { useRoundDetail } from '@/lib/whs/hooks';
+import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
+import { useRoundDetail, useWhsCourseId } from '@/lib/whs/hooks';
+import { useUserProfile } from '@/hooks/useUserProfile';
 import { SCORECARD_DARK } from '@/features/courses/_shared/scorecard/scorecardTheme';
 import { TrajectoryLine, type TrajectoryHole } from '@/features/courses/_shared/scorecard/TrajectoryLine';
 import { NineGrid } from '@/features/courses/_shared/scorecard/NineGrid';
@@ -15,16 +18,19 @@ const NUM: React.CSSProperties = {
   fontFeatureSettings: '"zero" 0',
 };
 
-// ─── Props (unchanged API) ───────────────────────────────────────────────
+// ─── Props ───────────────────────────────────────────────────────────────
 interface Props {
   open: boolean;
   onClose: () => void;
   scoreId?: string | null;
   handicapDelta?: number | null;
   connectionId?: string | null;
+  /** Owner of this round — enables avatar/name → profile nav. Omit when unknown. */
+  profileUserId?: string | null;
   /** Kept for back-compat. Sheet is always dark on the handicap page. */
   variant?: 'dark' | 'light';
 }
+
 
 function strokesOf(h: WhsScoreHole): number | null {
   return h.adjusted_gross ?? h.actual_gross ?? null;
@@ -77,10 +83,21 @@ const SheetEmpty: React.FC<{ onClose: () => void }> = ({ onClose }) => (
   </div>
 );
 
-export const RoundDetailSheet: React.FC<Props> = ({ open, onClose, scoreId, handicapDelta }) => {
+export const RoundDetailSheet: React.FC<Props> = ({ open, onClose, scoreId, handicapDelta, profileUserId }) => {
+  const navigate = useNavigate();
   const userQuery = useRoundDetail(scoreId, open);
   const userData = userQuery.data;
   const userLoading = userQuery.isLoading;
+
+  const profileQuery = useUserProfile(profileUserId ?? undefined);
+  const profile = profileQuery.data;
+
+  const courseIdQuery = useWhsCourseId(
+    userData?.course?.name ?? null,
+    (userData?.course as any)?.country_code ?? null,
+    open,
+  );
+
 
   const parTotal = useMemo<number | null>(() => {
     const holes = userData?.holes;
@@ -143,66 +160,131 @@ export const RoundDetailSheet: React.FC<Props> = ({ open, onClose, scoreId, hand
         <SheetEmpty onClose={onClose} />
       ) : (
         <>
-          {/* HEADER */}
+          {/* HEADER — tour-style identity row */}
           <div style={{ padding: '14px 20px 6px' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 7, marginBottom: 6 }}>
-              {dateEyebrow && (
-                <span style={{ ...NUM, fontSize: 11, fontWeight: 800, color: T.accent, letterSpacing: '0.06em' }}>
-                  {dateEyebrow}
-                </span>
-              )}
-              {(parTotal != null || userData.slope_rating != null) && (
-                <>
-                  {dateEyebrow && <span style={{ fontSize: 11, color: T.faint }}>·</span>}
-                  <span style={{ ...NUM, fontSize: 11, fontWeight: 700, color: T.faint, letterSpacing: '0.04em' }}>
-                    {parTotal != null ? `PAR ${parTotal}` : ''}
-                    {parTotal != null && userData.slope_rating != null ? ' · ' : ''}
-                    {userData.slope_rating != null ? `SL ${userData.slope_rating}` : ''}
-                  </span>
-                </>
-              )}
-            </div>
-
             <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 14 }}>
-              <div
-                id="round-detail-sheet-title"
+              {/* Avatar + name — ONE tap target → player profile */}
+              <button
+                type="button"
+                onClick={() => profileUserId && navigate(`/handicap/${profileUserId}`)}
+                disabled={!profileUserId}
                 style={{
-                  fontFamily: GEIST,
-                  fontSize: 20,
-                  fontWeight: 800,
-                  color: T.ink,
-                  letterSpacing: '-0.01em',
-                  lineHeight: 1.15,
-                  display: '-webkit-box',
-                  WebkitLineClamp: 2,
-                  WebkitBoxOrient: 'vertical',
-                  overflow: 'hidden',
-                  flex: 1,
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 13,
+                  padding: 0,
+                  background: 'none',
+                  border: 'none',
+                  textAlign: 'left',
                   minWidth: 0,
-                  paddingTop: 6,
+                  flex: 1,
+                  cursor: profileUserId ? 'pointer' : 'default',
+                  WebkitTapHighlightColor: 'transparent',
                 }}
+                aria-label="View player profile"
               >
-                {courseName}
-              </div>
+                <SquircleAvatar
+                  src={profile?.profile_photo_url ?? null}
+                  alt={profile?.display_name ?? ''}
+                  size={52}
+                  userId={profileUserId ?? undefined}
+                  hideRing
+                />
+                <div style={{ display: 'flex', flexDirection: 'column', minWidth: 0, gap: 4 }}>
+                  {/* Row 1: date · PAR · SL eyebrow */}
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 7, minWidth: 0 }}>
+                    {dateEyebrow && (
+                      <span style={{ ...NUM, fontSize: 11, fontWeight: 800, color: T.accent, letterSpacing: '0.06em' }}>
+                        {dateEyebrow}
+                      </span>
+                    )}
+                    {(parTotal != null || userData.slope_rating != null) && (
+                      <>
+                        {dateEyebrow && <span style={{ fontSize: 11, color: T.faint }}>·</span>}
+                        <span style={{ ...NUM, fontSize: 11, fontWeight: 700, color: T.faint, letterSpacing: '0.04em' }}>
+                          {parTotal != null ? `PAR ${parTotal}` : ''}
+                          {parTotal != null && userData.slope_rating != null ? ' · ' : ''}
+                          {userData.slope_rating != null ? `SL ${userData.slope_rating}` : ''}
+                        </span>
+                      </>
+                    )}
+                  </div>
+
+                  {/* Row 2: player name */}
+                  <div
+                    id="round-detail-sheet-title"
+                    style={{
+                      fontFamily: GEIST,
+                      fontSize: 19,
+                      fontWeight: 800,
+                      color: T.ink,
+                      letterSpacing: '-0.01em',
+                      lineHeight: 1.1,
+                      whiteSpace: 'nowrap',
+                      overflow: 'hidden',
+                      textOverflow: 'ellipsis',
+                      minWidth: 0,
+                    }}
+                  >
+                    {profile?.display_name ?? profile?.username ?? ''}
+                  </div>
+                </div>
+              </button>
+
+              {/* Round hero — right */}
               <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', flexShrink: 0 }}>
                 <span style={{
                   ...NUM,
-                  fontSize: 58,
+                  fontSize: 38,
                   fontWeight: 800,
-                  letterSpacing: '-0.04em',
-                  lineHeight: 0.85,
+                  letterSpacing: '-0.03em',
+                  lineHeight: 0.9,
                   color: roundRelColor,
                 }}>
                   {fmtRel(roundRel)}
                 </span>
                 <span style={{
                   fontFamily: GEIST, fontSize: 8.5, fontWeight: 800,
-                  color: T.faint, letterSpacing: '0.14em', marginTop: 6,
+                  color: T.faint, letterSpacing: '0.14em', marginTop: 8,
                 }}>
                   THIS ROUND
                 </span>
               </div>
             </div>
+
+            {/* Row 3: club name — its own tap target → course detail. Aligned
+                under the name column (avatar 52 + gap 13 = 65). */}
+            <button
+              type="button"
+              onClick={() => courseIdQuery.data && navigate(`/courses/${courseIdQuery.data}`)}
+              disabled={!courseIdQuery.data}
+              style={{
+                display: 'block',
+                background: 'none',
+                border: 'none',
+                padding: '0 0 0 65px',
+                margin: '2px 0 0',
+                textAlign: 'left',
+                width: '100%',
+                cursor: courseIdQuery.data ? 'pointer' : 'default',
+                WebkitTapHighlightColor: 'transparent',
+              }}
+              aria-label="View course details"
+            >
+              <span style={{
+                fontFamily: GEIST,
+                fontSize: 12.5,
+                fontWeight: 600,
+                color: courseIdQuery.data ? T.ink : T.dim,
+                letterSpacing: '-0.005em',
+                whiteSpace: 'nowrap',
+                overflow: 'hidden',
+                textOverflow: 'ellipsis',
+                display: 'block',
+              }}>
+                {courseName}
+              </span>
+            </button>
 
             {/* Mini stats */}
             <div style={{ display: 'flex', gap: 22, marginTop: 14 }}>
@@ -222,6 +304,7 @@ export const RoundDetailSheet: React.FC<Props> = ({ open, onClose, scoreId, hand
               ))}
             </div>
           </div>
+
 
           {/* TRAJECTORY */}
           {plottableCount >= 2 && (

@@ -33,7 +33,7 @@ function timeAgoFrom(iso: string): string {
 
 export const LastRoundCard: React.FC<Props> = ({
   connectionId,
-  userId: _userId,
+  userId,
   viewMode = 'owner',
   ownerFirstName = null,
 }) => {
@@ -92,6 +92,7 @@ export const LastRoundCard: React.FC<Props> = ({
       <RoundDetailSheet
         scoreId={lastRound.id}
         connectionId={connectionId}
+        profileUserId={userId ?? null}
         open={sheetOpen}
         onClose={() => setSheetOpen(false)}
         handicapDelta={lastRound.handicap_delta ?? null}

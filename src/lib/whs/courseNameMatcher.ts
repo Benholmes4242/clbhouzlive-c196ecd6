@@ -229,3 +229,14 @@ export async function lookupCourseMetaV2(
   if (!course) return null;
   return { thumbnail_image: course.thumbnail_image, region: course.region };
 }
+
+/** Resolve a WHS-reported course name to an internal `golf_courses.id`.
+ *  Thin wrapper over the same alias matcher used for thumbnails/region. */
+export async function lookupCourseId(
+  whsName: string,
+  countryCode?: string | null,
+): Promise<string | null> {
+  const course = await resolveCourseFromWhsName(whsName, countryCode ?? null);
+  return course?.id ?? null;
+}
+

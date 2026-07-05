@@ -26,6 +26,7 @@ import {
   type RivalIdentity,
   fetchSharedRounds,
   fetchTrophyAggregates,
+  lookupWhsCourseId,
 } from './api';
 
 export const whsKeys = {
@@ -498,5 +499,20 @@ export function useFriendRecentRounds(
       if (error) throw error;
       return (data ?? []) as FriendRecentRound[];
     },
+  });
+}
+
+/** Resolve a WHS-reported course name to an internal `golf_courses.id`
+ *  and cache it for the day. Returns `data: string | null`. */
+export function useWhsCourseId(
+  name: string | null | undefined,
+  countryCode?: string | null,
+  enabled = true,
+) {
+  return useQuery({
+    queryKey: ['whs-course-id', name, countryCode ?? null],
+    queryFn: () => lookupWhsCourseId(name as string, countryCode),
+    enabled: enabled && !!name,
+    staleTime: 24 * 60 * 60 * 1000,
   });
 }
