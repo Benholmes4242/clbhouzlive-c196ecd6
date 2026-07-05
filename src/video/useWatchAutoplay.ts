@@ -36,6 +36,10 @@ const PLAY_IN = 0.5;
 const PLAY_OUT = 0.35;
 const HYSTERESIS = 0.1;
 const SETTLE_MS = 80;
+// Max-wait ceiling: guarantees recompute runs even under continuous IO bursts
+// (hydration churn on masonry/full-feed grids can otherwise starve the trailing
+// debounce indefinitely, leaving landing activation stuck at null until scroll).
+const MAX_SETTLE_MS = 250;
 
 const IO_THRESHOLDS = [0, 0.1, 0.2, 0.3, 0.35, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0];
 
@@ -90,6 +94,7 @@ export function useWatchAutoplay(
 
   const ratiosRef = useRef<Map<number, number>>(new Map());
   const settleTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const maxWaitTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => {
     if (!eligible) {
@@ -126,9 +131,20 @@ export function useWatchAutoplay(
       });
     };
 
+    const runRecompute = () => {
+      if (settleTimer.current) { clearTimeout(settleTimer.current); settleTimer.current = null; }
+      if (maxWaitTimer.current) { clearTimeout(maxWaitTimer.current); maxWaitTimer.current = null; }
+      recompute();
+    };
+
     const scheduleRecompute = () => {
       if (settleTimer.current) clearTimeout(settleTimer.current);
-      settleTimer.current = setTimeout(recompute, SETTLE_MS);
+      settleTimer.current = setTimeout(runRecompute, SETTLE_MS);
+      // Max-wait ceiling: even if bursts keep resetting the trailing timer,
+      // force a recompute so landing activation lands during hydration churn.
+      if (!maxWaitTimer.current) {
+        maxWaitTimer.current = setTimeout(runRecompute, MAX_SETTLE_MS);
+      }
     };
 
     const observeTiles = (tiles: NodeListOf<HTMLElement> | HTMLElement[]) => {
@@ -158,18 +174,23 @@ export function useWatchAutoplay(
 
     const initial = root.querySelectorAll<HTMLElement>('[data-watch-tile-index]');
     observeTiles(initial);
+    // Kick a recompute after initial observe so IO's async first-batch delivery
+    // has a pending compute even if hydration bursts start immediately.
+    scheduleRecompute();
 
     // Re-scan on DOM mutations (feeds paginate / rails hydrate late).
     const mo = new MutationObserver(() => {
       const next = root.querySelectorAll<HTMLElement>('[data-watch-tile-index]');
       observeTiles(next);
+      scheduleRecompute();
     });
     mo.observe(root, { childList: true, subtree: true });
 
     return () => {
       io.disconnect();
       mo.disconnect();
-      if (settleTimer.current) clearTimeout(settleTimer.current);
+      if (settleTimer.current) { clearTimeout(settleTimer.current); settleTimer.current = null; }
+      if (maxWaitTimer.current) { clearTimeout(maxWaitTimer.current); maxWaitTimer.current = null; }
       ratiosRef.current.clear();
     };
   }, [eligible, root]);
