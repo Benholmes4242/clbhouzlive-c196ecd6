@@ -346,6 +346,29 @@ const FullscreenVideoSlot: React.FC<{
     postId,
   });
 
+  // [VDIFF] Slot mount + lane-eligibility trace. Reports the exact reason
+  // the load effect inside useVideoLane will (or won't) fire.
+  React.useEffect(() => {
+    if (!isPerfEnabled()) return;
+    const bailReason = !isActive
+      ? 'inactive'
+      : !hlsUrl
+        ? 'no-hlsUrl'
+        : null;
+    // eslint-disable-next-line no-console
+    console.info('[VDIFF] slot.mount', {
+      postId,
+      isActive,
+      hasHls: !!hlsUrl,
+      hlsUrlTail: hlsUrl ? hlsUrl.slice(-42) : null,
+      hasPoster: !!posterSrc,
+      startPosition,
+      isMuted,
+      laneWillLoad: !bailReason,
+      bailReason,
+    });
+  }, [postId, isActive, hlsUrl, posterSrc, startPosition, isMuted]);
+
   React.useEffect(() => {
     VideoEngine.setObjectFit('fullscreen', 'contain');
   }, []);
