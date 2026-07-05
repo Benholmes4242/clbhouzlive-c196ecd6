@@ -2,6 +2,8 @@ import { create } from 'zustand';
 import type { FeedPost } from '@/components/media-system/types/media';
 import { engagementBus } from '@/lib/engagementBus';
 import { applyEngagementDelta } from '@/lib/applyEngagementDelta';
+import { vdiff } from '@/perf/fsvTelemetry';
+
 
 export interface OpenOrigin {
   rect: { top: number; left: number; width: number; height: number };
@@ -94,7 +96,19 @@ export const useFullscreenFeedStore = create<FullscreenFeedState>((set, get) => 
   startPosition: 0,
   mediaIndex: 0,
   mediaId: null,
-  open: (posts, startIndex = 0, options) =>
+  open: (posts, startIndex = 0, options) => {
+    vdiff('store.open', {
+      layer: 'store',
+      postsLen: posts.length,
+      startIndex,
+      startPostId: posts[startIndex]?.id ?? null,
+      mediaId: options?.mediaId ?? null,
+      mediaIndex: options?.mediaIndex ?? 0,
+      startPosition: options?.startPosition ?? 0,
+      readOnly: !!options?.readOnly,
+      hasOrigin: !!options?.origin,
+      hasNextPage: !!options?.hasNextPage,
+    });
     set({
       isOpen: true,
       posts,
@@ -111,8 +125,10 @@ export const useFullscreenFeedStore = create<FullscreenFeedState>((set, get) => 
       startPosition: options?.startPosition ?? 0,
       mediaIndex: options?.mediaIndex ?? 0,
       mediaId: options?.mediaId ?? null,
-    }),
+    });
+  },
   close: () => {
+    vdiff('store.close', { layer: 'store' });
     const cb = get().onCloseCallback;
     set({
       isOpen: false,
@@ -134,14 +150,34 @@ export const useFullscreenFeedStore = create<FullscreenFeedState>((set, get) => 
       try { cb(); } catch {}
     }
   },
-  appendPosts: (newPosts) =>
-    set((s) => ({ posts: [...s.posts, ...newPosts.filter(p => !s.posts.find(e => e.id === p.id))] })),
-  setActiveIndex: (idx) => set({ activeIndex: idx }),
+  appendPosts: (newPosts) => {
+    const before = get().posts.length;
+    set((s) => ({ posts: [...s.posts, ...newPosts.filter(p => !s.posts.find(e => e.id === p.id))] }));
+    const after = get().posts.length;
+    if (after !== before) {
+      vdiff('store.appendPosts', { layer: 'store', before, after, incoming: newPosts.length });
+    }
+  },
+  setActiveIndex: (idx) => {
+    const prev = get().activeIndex;
+    if (prev === idx) return;
+    vdiff('store.setActiveIndex', { layer: 'store', prev, next: idx });
+    set({ activeIndex: idx });
+  },
   consumeOpenCommentsInitially: () => set({ openCommentsInitially: false }),
   consumeInitialCommentId: () => set({ initialCommentId: null }),
-  setPaginationState: ({ hasNextPage, isFetchingNextPage }) =>
-    set({ hasNextPage, isFetchingNextPage }),
+  setPaginationState: ({ hasNextPage, isFetchingNextPage }) => {
+    const s = get();
+    if (s.hasNextPage === hasNextPage && s.isFetchingNextPage === isFetchingNextPage) return;
+    vdiff('store.setPaginationState', {
+      layer: 'store',
+      hasNextPage, isFetchingNextPage,
+      prevHasNextPage: s.hasNextPage, prevIsFetchingNextPage: s.isFetchingNextPage,
+    });
+    set({ hasNextPage, isFetchingNextPage });
+  },
 }));
+
 
 // Subscribe to engagement updates from the rest of the app. Keeps the
 // fullscreen snapshot in sync with React Query caches that are patched

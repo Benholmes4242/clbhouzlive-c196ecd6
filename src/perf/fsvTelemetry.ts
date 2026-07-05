@@ -163,3 +163,20 @@ export function fsvViewport(): Record<string, number> {
     dpr: window.devicePixelRatio ?? -1,
   };
 }
+
+/**
+ * [VDIFF] Comparative-diff logger — same shape as `fsv()` but under the
+ * VDIFF tag family. Auto-stamped with the current session id so a single
+ * capture reads as one narrative from tap to painted frame. Gated by the
+ * DBG pill; safe to call from render paths.
+ */
+export function vdiff(tag: string, data?: Record<string, unknown>): void {
+  if (!on()) return;
+  // eslint-disable-next-line no-console
+  console.info(`[VDIFF] ${tag}`, {
+    sid: sessionId,
+    t: Math.round(performance.now()),
+    ...(data ?? {}),
+  });
+}
+
