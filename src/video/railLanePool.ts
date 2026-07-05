@@ -15,6 +15,7 @@
 
 import { RAIL_LANE_IDS, type LaneId } from './lanePolicy';
 import { VideoEngine } from './VideoEngine';
+import { isPerfEnabled } from '@/perf/navTiming';
 
 type OwnerKey = string;
 type OwnerListener = (laneId: LaneId | null) => void;
@@ -30,11 +31,13 @@ const subs = new Map<OwnerKey, Set<OwnerListener>>();
 let clock = 0;
 
 const DBG = (evt: string, payload: Record<string, unknown> = {}) => {
-  if (typeof window !== 'undefined' && (window as any).__VIDEO_ENGINE_DBG__) {
-    // eslint-disable-next-line no-console
-    console.info('[RAIL]', evt, payload);
-  }
+  const flag =
+    typeof window !== 'undefined' && (window as any).__VIDEO_ENGINE_DBG__;
+  if (!flag && !isPerfEnabled()) return;
+  // eslint-disable-next-line no-console
+  console.info('[RAIL]', evt, payload);
 };
+
 
 function notify(ownerKey: OwnerKey, laneId: LaneId | null) {
   const set = subs.get(ownerKey);

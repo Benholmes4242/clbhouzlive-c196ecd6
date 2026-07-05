@@ -10,6 +10,28 @@
 import { useEffect, useRef, useState } from 'react';
 import { VideoEngine, type LaneId } from './VideoEngine';
 import { RailLanePool } from './railLanePool';
+import { isPerfEnabled } from '@/perf/navTiming';
+
+// Session-wide hasHls resolve-rate counter, flushed to console at 25-item
+// intervals when the DBG pill is on. Lets us confirm gate #2 (hlsUrl null
+// because stream_id missing from the RPC row) without needing per-item logs.
+const hlsStats = { seen: 0, withHls: 0, lastFlush: 0 };
+function trackHls(hasHls: boolean, ownerKey: string | null | undefined) {
+  if (!isPerfEnabled()) return;
+  hlsStats.seen += 1;
+  if (hasHls) hlsStats.withHls += 1;
+  if (hlsStats.seen - hlsStats.lastFlush >= 25) {
+    hlsStats.lastFlush = hlsStats.seen;
+    // eslint-disable-next-line no-console
+    console.info('[RAIL] hasHls', {
+      seen: hlsStats.seen,
+      withHls: hlsStats.withHls,
+      resolveRate: +(hlsStats.withHls / hlsStats.seen).toFixed(3),
+      lastOwner: ownerKey ?? null,
+    });
+  }
+}
+
 
 export interface UseRailLaneOptions {
   /** Stable per-tile key (typically `${postId}:${mediaIndex}`). */
@@ -36,6 +58,17 @@ export function useRailLane(opts: UseRailLaneOptions): UseRailLaneResult {
   const [ready, setReady] = useState(false);
 
   const eligible = !!(opts.active && opts.hlsUrl && opts.ownerKey);
+
+  // Log hasHls resolve rate exactly once per (ownerKey, hasHls) combination.
+  const trackedRef = useRef<string | null>(null);
+  useEffect(() => {
+    if (!opts.ownerKey) return;
+    const tag = `${opts.ownerKey}:${opts.hlsUrl ? 1 : 0}`;
+    if (trackedRef.current === tag) return;
+    trackedRef.current = tag;
+    trackHls(!!opts.hlsUrl, opts.ownerKey);
+  }, [opts.ownerKey, opts.hlsUrl]);
+
 
   // Acquire / release lane based on active state.
   useEffect(() => {

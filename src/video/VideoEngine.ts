@@ -26,10 +26,12 @@ import {
   shouldGateForSaveData,
 } from './lanePolicy';
 import { fsv, fsvEl, fsvTimeSample } from '@/perf/fsvTelemetry';
+import { isPerfEnabled } from '@/perf/navTiming';
 
 /** Lanes we emit rich FSV telemetry for — noisy lanes (feed-next preload) skipped. */
 const FSV_LANES = new Set<LaneId>(['fullscreen', 'feed-active']);
 const isFsv = (id: LaneId): boolean => FSV_LANES.has(id);
+
 
 type LaneState = 'idle' | 'loading' | 'ready' | 'playing' | 'paused' | 'error';
 
@@ -67,11 +69,16 @@ interface Lane {
 
 
 const DBG = (...args: unknown[]) => {
-  if (typeof window !== 'undefined' && (window as any).__VIDEO_ENGINE_DBG__) {
-    // eslint-disable-next-line no-console
-    console.info('[VideoEngine]', ...args);
-  }
+  // Gate on the DBG pill (isPerfEnabled) so device WebViews (no window
+  // console) can enable traces via the on-screen toggle. Legacy
+  // window.__VIDEO_ENGINE_DBG__ still honored for quick browser flips.
+  const flag =
+    typeof window !== 'undefined' && (window as any).__VIDEO_ENGINE_DBG__;
+  if (!flag && !isPerfEnabled()) return;
+  // eslint-disable-next-line no-console
+  console.info('[VideoEngine]', ...args);
 };
+
 
 
 
