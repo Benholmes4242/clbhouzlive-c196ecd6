@@ -16,9 +16,12 @@ interface Props {
   friend: FriendLeaderboardEntry;
 }
 
-const INK = 'var(--hcp-t-100)';
-const INK_MUTE = 'var(--hcp-t-60)';
-const HAIRLINE = 'var(--hcp-line-2)';
+// Hardcoded dark tokens — sheet portals outside .hcp-dark scope.
+const INK = '#F2F4F7';
+const INK_MUTE = 'rgba(242,244,247,0.55)';
+const HAIRLINE = 'rgba(255,255,255,0.08)';
+const CARD_BG = '#1B1E27';
+const CELL_BG = '#20242E';
 
 const FONT_GEIST = '"Geist", system-ui, -apple-system, BlinkMacSystemFont, sans-serif';
 
@@ -57,7 +60,7 @@ export const InviteCard: React.FC<Props> = ({ friend }) => {
         display: 'flex',
         alignItems: 'center',
         gap: 12,
-        background: 'var(--hcp-bg-1)',
+        background: CARD_BG,
         border: `1px solid ${HAIRLINE}`,
         borderRadius: 14,
         padding: '10px 12px',
@@ -70,7 +73,7 @@ export const InviteCard: React.FC<Props> = ({ friend }) => {
           <div
             style={{
               width: 42, height: 42, borderRadius: 12, overflow: 'hidden',
-              background: 'var(--hcp-bg-2)', flexShrink: 0,
+              background: CELL_BG, flexShrink: 0,
             }}
           >
             <img src={avatarSrc} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />

@@ -1,6 +1,6 @@
 import React from 'react';
 import type { LucideIcon } from 'lucide-react';
-import { T100, LINE_2, FONT } from './_shared/tokens';
+import { BG_0, BG_2, T100, LINE_2, FONT } from './_shared/tokens';
 
 export type FooterAction = {
   label: string;
@@ -47,7 +47,7 @@ const ActionButton: React.FC<FooterAction> = ({
           height: 44,
           borderRadius: 12,
           border: `1px solid ${LINE_2}`,
-          background: 'transparent',
+          background: BG_2,
           color: T100,
           display: 'flex',
           alignItems: 'center',
@@ -72,8 +72,8 @@ const ActionButton: React.FC<FooterAction> = ({
         height: 44,
         borderRadius: 12,
         border: isPrimary ? 'none' : `1px solid ${LINE_2}`,
-        background: isPrimary ? '#FFFFFF' : 'transparent',
-        color: isPrimary ? '#0A0E14' : T100,
+        background: isPrimary ? T100 : BG_2,
+        color: isPrimary ? BG_0 : T100,
         fontSize: 15,
         fontWeight: isPrimary ? 800 : 700,
         cursor: 'pointer',

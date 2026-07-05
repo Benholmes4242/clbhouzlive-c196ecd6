@@ -159,7 +159,7 @@ const Pill: React.FC<{ label: string; tone: 'friends' | 'whs' }> = ({
   const palette =
     tone === 'friends'
       ? {
-          bg: 'rgba(5,150,105,0.18)',
+          bg: 'rgba(52,211,153,0.12)',
           color: GREEN,
         }
       : {

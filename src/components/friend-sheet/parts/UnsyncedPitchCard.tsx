@@ -1,6 +1,6 @@
 import React from 'react';
 import { ArrowLeftRight, TrendingUp, Trophy, Star } from 'lucide-react';
-import { AMBER, BG_1, T100, T60, LINE, FONT } from './_shared/tokens';
+import { AMBER, BG_1, BG_2, T100, T60, LINE, FONT } from './_shared/tokens';
 
 interface Perk {
   icon: React.ReactNode;
@@ -112,7 +112,7 @@ export const UnsyncedPitchCard: React.FC<Props> = ({
 const PerkTile: React.FC<Perk> = ({ icon, title, sub }) => (
   <div
     style={{
-      background: 'rgba(255,255,255,0.025)',
+      background: BG_2,
       border: `1px solid ${LINE}`,
       borderRadius: 12,
       padding: '12px 10px',

@@ -38,11 +38,15 @@ interface Props {
   yourRanks: Partial<Record<LegendCategory, number | null>>;
 }
 
-const DEEP_AMBER = '#c97a10';
-const GOLD = '#FBBC2E';
-const INK = '#0F172A';
-const INK_55 = '#64748B';
-const INK_40 = '#94A3B8';
+// Dark-mode tokens — sheet portals outside .hcp-dark scope, so all values hardcoded.
+const DEEP_AMBER = '#F7931E';
+const GOLD = '#F7931E';
+const INK = '#F2F4F7';
+const INK_55 = 'rgba(242,244,247,0.55)';
+const INK_40 = 'rgba(242,244,247,0.38)';
+const HAIRLINE = 'rgba(255,255,255,0.08)';
+const SURFACE = '#15171F';
+const CARD = '#1B1E27';
 
 const SQUIRCLE_MASK_URL =
   "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cpath d='M40 0h20c22.091 0 40 17.909 40 40v20c0 22.091-17.909 40-40 40H40C17.909 100 0 82.091 0 60V40C0 17.909 17.909 0 40 0z'/%3E%3C/svg%3E\")";
@@ -178,15 +182,15 @@ export const FullCourseLeaderboardSheet: React.FC<Props> = ({
       open={open}
       onClose={onClose}
       ariaLabelledBy="course-legends-full-sheet-title"
+      variant="dark"
+      surfaceColor={SURFACE}
       style={{
-        background: '#F8FAFC',
         maxHeight: '80dvh',
         display: 'flex',
         flexDirection: 'column',
       }}
     >
       <div
-        className="hcp-light"
         style={{
           display: 'flex',
           flexDirection: 'column',
@@ -194,8 +198,8 @@ export const FullCourseLeaderboardSheet: React.FC<Props> = ({
           minHeight: 0,
           position: 'relative',
           fontFamily: GAM.FONT_GEIST,
-          color: 'var(--hcp-t-100)',
-          background: 'var(--hcp-bg-0)',
+          color: INK,
+          background: SURFACE,
         }}
       >
         <SheetHeader
@@ -239,7 +243,7 @@ export const FullCourseLeaderboardSheet: React.FC<Props> = ({
                   textTransform: 'uppercase',
                   padding: '3px 8px',
                   borderRadius: 999,
-                  background: 'rgba(251,188,46,0.16)',
+                  background: 'rgba(247,147,30,0.14)',
                   color: DEEP_AMBER,
                 }}
               >
@@ -254,7 +258,7 @@ export const FullCourseLeaderboardSheet: React.FC<Props> = ({
                   textTransform: 'uppercase',
                   padding: '3px 8px',
                   borderRadius: 999,
-                  background: 'rgba(15,23,42,0.05)',
+                  background: 'rgba(255,255,255,0.06)',
                   color: INK_55,
                 }}
               >
@@ -271,8 +275,8 @@ export const FullCourseLeaderboardSheet: React.FC<Props> = ({
             gap: 7,
             overflowX: 'auto',
             padding: '0 16px 14px',
-            background: 'var(--hcp-bg-0)',
-            borderBottom: '0.5px solid var(--hcp-line)',
+            background: SURFACE,
+            borderBottom: `0.5px solid ${HAIRLINE}`,
             scrollbarWidth: 'none',
             WebkitOverflowScrolling: 'touch',
             flexShrink: 0,
@@ -295,9 +299,9 @@ export const FullCourseLeaderboardSheet: React.FC<Props> = ({
                   gap: 7,
                   padding: '6px 11px',
                   borderRadius: 999,
-                  background: isActive ? '#0F172A' : 'var(--hcp-bg-1)',
-                  border: isActive ? '1px solid #0F172A' : '1px solid var(--hcp-line)',
-                  color: isActive ? '#FFFFFF' : 'var(--hcp-t-100)',
+                  background: isActive ? INK : CARD,
+                  border: isActive ? `1px solid ${INK}` : `1px solid ${HAIRLINE}`,
+                  color: isActive ? SURFACE : INK,
                   fontSize: 11,
                   fontWeight: isActive ? 800 : 700,
                   fontFamily: GAM.FONT_GEIST,
@@ -316,7 +320,7 @@ export const FullCourseLeaderboardSheet: React.FC<Props> = ({
                       height: 6,
                       borderRadius: 999,
                       background: GOLD,
-                      boxShadow: `0 0 0 1.5px ${isActive ? '#0F172A' : '#FFFFFF'}`,
+                      boxShadow: `0 0 0 1.5px ${isActive ? INK : SURFACE}`,
                       flexShrink: 0,
                     }}
                   />
@@ -335,9 +339,9 @@ export const FullCourseLeaderboardSheet: React.FC<Props> = ({
               gap: 12,
               alignItems: 'center',
               padding: '12px 18px',
-              background: 'linear-gradient(180deg, rgba(251,188,46,0.10), rgba(251,188,46,0.045))',
+              background: 'linear-gradient(180deg, rgba(247,147,30,0.12), rgba(247,147,30,0.05))',
               borderTop: `2px solid ${GOLD}`,
-              borderBottom: '0.5px solid var(--hcp-line)',
+              borderBottom: `0.5px solid ${HAIRLINE}`,
               flexShrink: 0,
             }}
           >
@@ -398,7 +402,7 @@ export const FullCourseLeaderboardSheet: React.FC<Props> = ({
             overflowY: 'auto',
             padding: '8px 0 0',
             WebkitOverflowScrolling: 'touch',
-            background: 'var(--hcp-bg-0)',
+            background: SURFACE,
           }}
         >
           {activeRows.length === 0 ? (

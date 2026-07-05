@@ -34,8 +34,13 @@ export const TheirFormSection: React.FC<Props> = ({ handicap }) => {
   const isDeclining = !noData && (delta as number) > 0.3;
   const isFlat = !noData && !isImproving && !isDeclining;
 
-  const chipBg = isImproving ? 'var(--hcp-good-deep-tint)' : isDeclining ? 'var(--hcp-bad-deep-tint)' : BG_2;
-  const chipColor = isImproving ? 'var(--hcp-good-deep)' : isDeclining ? 'var(--hcp-bad-deep)' : T60;
+  // Falling handicap = improving = green; rising handicap = declining = red.
+  const chipBg = isImproving
+    ? 'rgba(52,211,153,0.12)'
+    : isDeclining
+      ? 'rgba(239,68,68,0.12)'
+      : BG_2;
+  const chipColor = isImproving ? '#34D399' : isDeclining ? '#EF4444' : T60;
 
   return (
     <div style={{ padding: '4px 20px 14px', fontFamily: FONT }}>
