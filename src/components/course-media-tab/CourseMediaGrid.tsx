@@ -63,6 +63,12 @@ export const CourseMediaGrid = forwardRef<HTMLDivElement, CourseMediaGridProps>(
 }, ref) => {
   const navigate = useNavigate();
   const sentinelRef = useRef<HTMLDivElement>(null);
+  const { activeIdx, railRef: autoplayRef } = useWatchAutoplay({ railId: 'course-media' });
+  const setGridRef = useCallback((el: HTMLDivElement | null) => {
+    autoplayRef(el);
+    if (typeof ref === 'function') ref(el);
+    else if (ref) (ref as React.MutableRefObject<HTMLDivElement | null>).current = el;
+  }, [autoplayRef, ref]);
 
   // Infinite scroll sentinel
   useEffect(() => {
