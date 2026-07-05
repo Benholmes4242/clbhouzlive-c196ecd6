@@ -498,7 +498,7 @@ function AppRoutes() {
         <Route path="/create-profile" element={<CreateProfileRedirect />} />
         <Route path="/profile" element={<ProfileWrapped />} />
         <Route path="/profile/handicap" element={<Navigate to="/handicap" replace />} />
-        <Route path="/handicap" element={<Suspense fallback={<ProfileSkeleton />}><HandicapPage /></Suspense>} />
+        <Route path="/handicap" element={<Suspense fallback={<HandicapPageSkeleton />}><HandicapPage /></Suspense>} />
         <Route path="/handicap/legends" element={<Navigate to="/handicap?subtab=compete" replace />} />
         <Route path="/handicap/legends/courses/:courseId" element={<Suspense fallback={<ProfileSkeleton />}><CourseLegendsPage /></Suspense>} />
         <Route path="/handicap/rivalry/:rivalUserId" element={<Suspense fallback={<ProfileSkeleton />}><RivalryPage /></Suspense>} />
