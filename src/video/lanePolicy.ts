@@ -5,17 +5,32 @@
  * now?" lives here so the engine stays dumb. No React, no DOM.
  */
 
-export type LaneId = 'feed-active' | 'feed-next' | 'feed-prev' | 'fullscreen';
+export type LaneId =
+  | 'feed-active'
+  | 'feed-next'
+  | 'feed-prev'
+  | 'fullscreen'
+  | 'rail-0'
+  | 'rail-1'
+  | 'rail-2';
 
 export const DEFAULT_LANE_IDS: LaneId[] = [
   'feed-active',
   'feed-next',
   'feed-prev',
   'fullscreen',
+  'rail-0',
+  'rail-1',
+  'rail-2',
 ];
+
+/** Budgeted rail-lane pool size (decoder ceiling — NOT one lane per rail). */
+export const RAIL_LANE_BUDGET = 3;
+export const RAIL_LANE_IDS: LaneId[] = ['rail-0', 'rail-1', 'rail-2'];
 
 /** Max concurrent lanes actively loading a manifest. */
 export const MAX_CONCURRENT_LOADS = 2;
+
 
 /** ABR ceiling (kbps) applied to every lane. */
 export const ABR_MAX_KBPS = 5000;

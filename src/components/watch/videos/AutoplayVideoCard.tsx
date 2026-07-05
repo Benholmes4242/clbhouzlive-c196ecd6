@@ -10,6 +10,8 @@ import { VideoCardMenu } from '@/components/videos-tab/VideoCardMenu';
 import { Pin } from '../proshop/Pin';
 import { ExpandableCaption } from '@/components/posts/ExpandableCaption';
 import DecodedImage from '../shared/DecodedImage';
+import { useRailLane } from '@/video/useRailLane';
+
 
 function formatHMS(seconds: number | null | undefined): string {
   if (!seconds || seconds <= 0) return '';
@@ -49,8 +51,19 @@ function AutoplayVideoCardInner({ post, index, allPosts, userId, active, borderR
 
   const firstVideo = post.mediaItems.find((m) => m.type === 'video');
   const thumbnail = firstVideo?.thumbnailUrl || firstVideo?.imageUrl || '';
+  const hlsUrl = (firstVideo as any)?.hlsUrl as string | undefined;
   const duration = firstVideo?.duration ?? 0;
   const courseName = (post as any).courseName ?? null;
+
+  const isVideo = !!firstVideo && !!hlsUrl;
+  const ownerKey = isVideo ? `${post.id}:0` : null;
+  const { hostRef: laneHostRef, ready: laneReady } = useRailLane({
+    ownerKey,
+    active: active && isVideo,
+    hlsUrl: isVideo ? hlsUrl! : null,
+    posterUrl: thumbnail || null,
+    postId: post.id,
+  });
 
   const timeAgo = (() => {
     try {
@@ -60,7 +73,8 @@ function AutoplayVideoCardInner({ post, index, allPosts, userId, active, borderR
     }
   })();
 
-  // [VIDEOSTUB] Autoplay video mount removed — poster only.
+  // Autoplay video mount is handled by the shared RailLanePool via useRailLane.
+
 
   const handleTap = () => {
     useFullscreenFeedStore.getState().open(allPosts, index);
@@ -115,7 +129,22 @@ function AutoplayVideoCardInner({ post, index, allPosts, userId, active, borderR
               }}
             />
           ) : null}
+          {isVideo && (
+            <div
+              ref={laneHostRef}
+              aria-hidden
+              style={{
+                position: 'absolute',
+                inset: 0,
+                zIndex: 1,
+                opacity: laneReady ? 1 : 0,
+                transition: 'opacity 140ms linear',
+                pointerEvents: 'none',
+              }}
+            />
+          )}
         </div>
+
 
         {courseName ? (
           <div style={{ position: 'absolute', top: 8, left: 8, maxWidth: 'calc(100% - 80px)', zIndex: 2 }}>

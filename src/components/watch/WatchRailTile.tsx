@@ -8,6 +8,8 @@ import { getThumbnailUrl } from '@/utils/thumbnail';
 import { buildLqipUrl } from '@/utils/mediaThumbs';
 import { shouldUseLqip } from '@/utils/lqipQueue';
 import Pressable from '@/components/ui/Pressable';
+import { useRailLane } from '@/video/useRailLane';
+
 
 
 
@@ -85,7 +87,18 @@ export default function WatchRailTile({
   }, [rawThumb, thumbHeightPx]);
   const hlsUrl = media?.hlsUrl || '';
 
-  // [VIDEOSTUB] Video mount/HLS attach removed — poster-only rail tile.
+  // Rail-lane rental — active only when this tile holds its rail's autoplay slot.
+
+  const isVideo = !!media && media.type === 'video' && !!hlsUrl;
+  const ownerKey = isVideo ? `${post.id}:0` : null;
+  const { hostRef: laneHostRef, ready: laneReady } = useRailLane({
+    ownerKey,
+    active: isAutoplayActive && isVideo,
+    hlsUrl: isVideo ? hlsUrl : null,
+    posterUrl: thumb || null,
+    postId: post.id,
+  });
+
 
   const handleClick = useCallback(() => {
     openWithOrigin({
@@ -136,6 +149,22 @@ export default function WatchRailTile({
           objectFit: 'cover',
         }}
       />
+
+      {/* Rail-lane video host — mounted only when we hold a rented lane. */}
+      {isVideo && (
+        <div
+          ref={laneHostRef}
+          aria-hidden
+          style={{
+            position: 'absolute',
+            inset: 0,
+            zIndex: 1,
+            opacity: laneReady ? 1 : 0,
+            transition: 'opacity 140ms linear',
+            pointerEvents: 'none',
+          }}
+        />
+      )}
 
       {/* Gradient */}
       <div
