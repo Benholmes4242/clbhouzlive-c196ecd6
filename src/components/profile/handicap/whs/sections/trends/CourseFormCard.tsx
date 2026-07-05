@@ -189,11 +189,11 @@ const CourseRow: React.FC<{
     // Bar colour: green (improving / under hcp), red (over), neutral for most-played.
     const barGradient = isMostPlayed
       ? 'linear-gradient(90deg, #94A3B8, #64748B)'
-      : course.delta < 0
-        ? 'linear-gradient(90deg, #22C55E, var(--hcp-good-deep))'
-        : course.delta > 0
-          ? 'linear-gradient(90deg, #F87171, var(--hcp-bad))'
-          : 'linear-gradient(90deg, #CBD5E1, #94A3B8)';
+        : course.delta < 0
+          ? 'linear-gradient(90deg, #22C55E, var(--hcp-good-deep))'
+          : course.delta > 0
+            ? 'rgba(242,244,247,0.16)'        // flat quiet slate, no gradient
+            : 'linear-gradient(90deg, #CBD5E1, #94A3B8)';
 
     return (
       <div
