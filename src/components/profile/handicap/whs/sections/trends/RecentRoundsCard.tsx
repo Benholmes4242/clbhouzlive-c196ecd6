@@ -45,7 +45,7 @@ const fmtDiff = (d: number | null | undefined): string => {
 const diffColor = (d: number | null | undefined): string => {
   if (d === null || d === undefined) return T.inkMute;
   if (d < 0) return 'var(--hcp-good-deep)';
-  if (d > 0) return 'var(--hcp-bad)';
+  if (d > 0) return 'var(--hcp-t-60)';
   return T.inkSoft;
 };
 
@@ -78,7 +78,7 @@ const fmtHcpDelta = (n: number | null): HcpDeltaInfo | null => {
   return {
     sign: '\u2191',
     value: n.toFixed(1),
-    color: 'var(--hcp-bad)',
+    color: 'var(--hcp-t-60)',
     glow: 'none',
   };
 };
@@ -576,7 +576,7 @@ const FeedCard: React.FC<FeedCardProps> = ({ round, onTap }) => {
           background:
             round.handicap_differential != null && round.handicap_differential < 0
               ? 'rgba(5,150,105,0.10)'
-              : 'rgba(220,38,38,0.10)',
+              : 'rgba(255,255,255,0.045)',
           fontVariantNumeric: 'tabular-nums',
           padding: '6px 10px',
           borderRadius: 999,
