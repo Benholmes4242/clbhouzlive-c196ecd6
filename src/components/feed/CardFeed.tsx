@@ -25,6 +25,7 @@ import type { ActiveActor } from '@/types/actor';
 import { useFullscreenFeedStore } from '@/store/fullscreenFeedStore';
 import { openWithOrigin } from '@/lib/openWithOrigin';
 import { useClubhouseStore } from '@/store/clubhouseStore';
+import { registerNavScroller } from '@/hooks/useScrollDirection';
 
 import { VideoEngine } from '@/video/VideoEngine';
 
