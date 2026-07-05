@@ -66,8 +66,13 @@ interface OpenWithOriginArgs {
    */
   railOwnerKey?: string | null;
   /** Which media within the opening post to render on the opening slide.
-   *  Default 0 → identical behavior for existing callers. */
+   *  Positional fallback — `mediaId` (below) is authoritative because grouping
+   *  reorders / dedupes mediaItems. Default 0 → identical behavior for
+   *  existing callers. */
   mediaIndex?: number;
+  /** Stable media item id — resolved against the grouped post's mediaItems on
+   *  the opening slide. Preferred over the positional `mediaIndex`. */
+  mediaId?: string | null;
   options?: {
     openCommentsInitially?: boolean;
     initialCommentId?: string | null;
@@ -87,6 +92,7 @@ export function openWithOrigin({
   handOffUrls,
   railOwnerKey,
   mediaIndex,
+  mediaId,
   options,
 }: OpenWithOriginArgs): void {
   fsvNewSession('open-tap', { index });
@@ -174,6 +180,12 @@ export function openWithOrigin({
     origin,
     startPosition,
     mediaIndex: mediaIndex ?? 0,
+    mediaId: mediaId ?? null,
   });
-  fsv('tap.storeOpen', { postId, index, startPosition: +startPosition.toFixed(3), mediaIndex: mediaIndex ?? 0 });
+  fsv('tap.storeOpen', {
+    postId, index,
+    startPosition: +startPosition.toFixed(3),
+    mediaIndex: mediaIndex ?? 0,
+    mediaId: mediaId ?? null,
+  });
 }

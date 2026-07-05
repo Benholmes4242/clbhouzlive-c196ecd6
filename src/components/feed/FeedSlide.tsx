@@ -28,13 +28,14 @@ interface FeedSlideProps {
   activeIndexOverride?: number;
   /** When true, suppress the inline top-right elongated dots — fullscreen surfaces render their own segmented dots via FullscreenCarouselOverlay. */
   isFullscreen?: boolean;
-  /** Which media within this post to render on the opening slide. SnapFeed
-   *  passes this ONLY to the slide at startIndex; all other slides get 0 →
-   *  identical behavior (multi-media posts still use FeedImageCarousel from
-   *  media[0]). Course media taps a per-media tile, so passing the tapped
-   *  media's within-post index lets the opening slide mount THAT media
-   *  (video or image), fixing "video slot never mounts" for mixed posts. */
+  /** Positional fallback — SnapFeed passes 0 for non-opening slides. */
   mediaIndex?: number;
+  /** Stable media item id (authoritative). SnapFeed passes it ONLY to the
+   *  slide at startIndex; resolves via `mediaItems.findIndex(m => m.id === mediaId)`
+   *  against the post's grouped mediaItems. Fixes "grouping reorders media"
+   *  drift where positional indices from ungrouped callers land on the wrong
+   *  media (image branch renders instead of video → no play). */
+  mediaId?: string | null;
 }
 
 export const FeedSlide = memo(function FeedSlide({
@@ -52,6 +53,7 @@ export const FeedSlide = memo(function FeedSlide({
   activeIndexOverride,
   isFullscreen = false,
   mediaIndex = 0,
+  mediaId = null,
 }: FeedSlideProps) {
   const { user } = useSupabaseSession();
   const storeActiveIndex = useClubhouseStore(s => s.activeIndex);
@@ -59,9 +61,16 @@ export const FeedSlide = memo(function FeedSlide({
   const isActive = activeIndex === index;
   const isSuggestedFeed = activeTab === 'foryou';
   const media = post.mediaItems;
-  // Opening-slide media selector — mediaIndex is threaded ONLY for the slide
-  // opened via a per-media tile tap; every other slide receives 0.
-  const openIdx = Math.min(Math.max(mediaIndex, 0), Math.max((media?.length ?? 1) - 1, 0));
+  // Opening-slide media selector — prefer stable `mediaId` (safe against
+  // groupMultiMedia's re-sort/dedupe/filter), fall back to positional
+  // `mediaIndex` for callers that don't pass an id. Non-opening slides get
+  // `mediaId: null` + `mediaIndex: 0` → renders media[0] as today.
+  const resolvedIdx = mediaId
+    ? media?.findIndex(m => m.id === mediaId) ?? -1
+    : -1;
+  const openIdx = resolvedIdx >= 0
+    ? resolvedIdx
+    : Math.min(Math.max(mediaIndex, 0), Math.max((media?.length ?? 1) - 1, 0));
   const carouselSlide = useClubhouseStore(s => s.carouselPositions.get(index) ?? 0);
   const isEditorial =
     post.postType === 'pga_card' ||
@@ -112,11 +121,23 @@ export const FeedSlide = memo(function FeedSlide({
     // Video — engine-backed in fullscreen, poster-only otherwise.
     if (m?.type === 'video') {
       const posterSrc = m.thumbnailUrl || '';
-      if (isFullscreen) {
+      const mHlsUrl = (m as any).hlsUrl || null;
+      if (isFullscreen && !mHlsUrl) {
+        // Legacy uploads without a Cloudflare Stream id can't drive the
+        // fullscreen lane — surface loudly so bad rows are visible in DBG
+        // but still render the poster gracefully (falls through below).
+        // eslint-disable-next-line no-console
+        console.warn('[FSV] video media without hlsUrl', {
+          postId: post.id,
+          mediaId: m.id,
+          openIdx,
+        });
+      }
+      if (isFullscreen && mHlsUrl) {
         return (
           <FullscreenVideoSlot
             postId={post.id}
-            hlsUrl={(m as any).hlsUrl || null}
+            hlsUrl={mHlsUrl}
             posterSrc={posterSrc}
             isActive={isActive}
             onFirstFrameReady={onFirstFrameReady}

@@ -129,10 +129,12 @@ export function SnapFeed({
 
   const storeActiveIndex = useClubhouseStore(s => s.activeIndex);
   const setActiveIndex = useClubhouseStore(s => s.setActiveIndex);
-  // Opening-slide mediaIndex threaded from the tap opener (see openWithOrigin
-  // + fullscreenFeedStore). Only applied to the slide at `startIndex` — every
-  // other slide renders its media[0] as today.
+  // Opening-slide media selectors threaded from the tap opener. `mediaId` is
+  // authoritative (stable id resolved against grouped mediaItems in FeedSlide);
+  // `mediaIndex` is the positional fallback. Only applied to the slide at
+  // `startIndex` — every other slide renders its media[0] as today.
   const openingMediaIndex = useFullscreenFeedStore(s => s.mediaIndex);
+  const openingMediaId = useFullscreenFeedStore(s => s.mediaId);
   // When an override is supplied (e.g. by FullscreenFeedOverlay which owns its
   // own active-index store), it is the source of truth for both rendering AND
   // virtualization window math. Previously SnapFeed used storeActiveIndex for
@@ -503,6 +505,7 @@ export function SnapFeed({
             activeIndexOverride={activeIndexOverride}
             isFullscreen={isFullscreen}
             mediaIndex={idx === (startIndex ?? 0) ? openingMediaIndex : 0}
+            mediaId={idx === (startIndex ?? 0) ? openingMediaId : null}
           />
         );
       })}
