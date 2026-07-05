@@ -264,7 +264,7 @@ export const FriendSheet: React.FC<FriendSheetProps> = ({
                 width: 36,
                 height: 4,
                 borderRadius: 2,
-                background: 'var(--hcp-line-2)',
+                background: 'rgba(255,255,255,0.18)',
               }}
             />
           </div>
@@ -281,7 +281,7 @@ export const FriendSheet: React.FC<FriendSheetProps> = ({
               width: 32,
               height: 32,
               borderRadius: '50%',
-              background: BG_2,
+              background: 'rgba(255,255,255,0.08)',
               border: 'none',
               cursor: 'pointer',
               display: 'flex',

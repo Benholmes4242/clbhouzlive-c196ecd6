@@ -1,4 +1,5 @@
 import React from 'react';
+import { T60 } from './tokens';
 
 export const Eyebrow: React.FC<{ label: string }> = ({ label }) => (
   <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
@@ -6,7 +7,7 @@ export const Eyebrow: React.FC<{ label: string }> = ({ label }) => (
       style={{
         fontSize: 10.5,
         fontWeight: 700,
-        color: 'var(--hcp-t-60)',
+        color: T60,
         letterSpacing: '0.16em',
         textTransform: 'uppercase',
       }}

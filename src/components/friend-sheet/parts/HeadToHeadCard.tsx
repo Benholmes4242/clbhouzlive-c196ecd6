@@ -6,7 +6,7 @@ import {
   T100,
   T60,
   T40,
-  GOLD,
+  AMBER,
   LINE,
   LINE_2,
   FONT,
