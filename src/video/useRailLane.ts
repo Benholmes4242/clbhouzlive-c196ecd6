@@ -33,7 +33,7 @@ export interface UseRailLaneResult {
 export function useRailLane(opts: UseRailLaneOptions): UseRailLaneResult {
   const hostRef = useRef<HTMLDivElement>(null);
   const [laneId, setLaneId] = useState<LaneId | null>(null);
-  const [firstFrame, setFirstFrame] = useState(false);
+  const [ready, setReady] = useState(false);
 
   const eligible = !!(opts.active && opts.hlsUrl && opts.ownerKey);
 
@@ -43,16 +43,16 @@ export function useRailLane(opts: UseRailLaneOptions): UseRailLaneResult {
     const key = opts.ownerKey as string;
     const lane = RailLanePool.acquire(key);
     setLaneId(lane);
-    setFirstFrame(false);
+    setReady(false);
     const unsub = RailLanePool.subscribe(key, (l) => {
       setLaneId(l);
-      if (l == null) setFirstFrame(false);
+      if (l == null) setReady(false);
     });
     return () => {
       unsub();
       RailLanePool.release(key);
       setLaneId(null);
-      setFirstFrame(false);
+      setReady(false);
     };
   }, [eligible, opts.ownerKey]);
 
@@ -78,13 +78,14 @@ export function useRailLane(opts: UseRailLaneOptions): UseRailLaneResult {
     };
   }, [laneId, opts.hlsUrl, opts.posterUrl, opts.postId, opts.ownerKey]);
 
-  // Subscribe to lane snapshot to reflect firstFrame → poster crossfade.
+  // Subscribe to lane snapshot to reflect ready state → poster crossfade.
   useEffect(() => {
     if (!laneId) return;
     return VideoEngine.subscribe(laneId, (snap) => {
-      setFirstFrame(snap.firstFrame);
+      setReady(snap.readyState >= 2 && snap.state === 'playing');
     });
   }, [laneId]);
 
-  return { hostRef, laneId, firstFrame };
+  return { hostRef, laneId, ready };
 }
+
