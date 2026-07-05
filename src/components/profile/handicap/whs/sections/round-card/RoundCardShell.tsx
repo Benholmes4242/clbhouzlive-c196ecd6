@@ -16,9 +16,9 @@ const INK_55 = 'var(--hcp-t-60)';
 const INK_10 = 'var(--hcp-line-2)';
 const AMBER_INK = '#C97211';
 const GREEN_DEEP = '#15803D';
-const GREEN_SOFT = 'rgba(34,197,94,0.12)';
-const RED_INK = '#991B1B';
-const RED_SOFT = 'rgba(220,38,38,0.10)';
+const GREEN_SOFT = 'rgba(52,211,153,0.12)';
+const RED_INK = '#EF4444';
+const RED_SOFT = 'rgba(239,68,68,0.10)';
 const FONT_GEIST = 'Geist, system-ui, -apple-system, BlinkMacSystemFont, sans-serif';
 
 const fmtDiff = (n: number | null | undefined) => {

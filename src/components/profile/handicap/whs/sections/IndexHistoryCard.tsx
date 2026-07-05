@@ -6,7 +6,7 @@ const FONT = 'Geist, -apple-system, BlinkMacSystemFont, system-ui, sans-serif';
 const NUM: React.CSSProperties = { fontFamily: FONT, fontVariantNumeric: 'tabular-nums' };
 
 // ── Tokens ────────────────────────────────────────────────────────────────
-const GOOD = 'var(--hcp-good, #4ADE80)';
+const GOOD = '#34D399';
 const BAD = 'var(--hcp-bad, #EF4444)';
 const INK = 'var(--hcp-t-100)';
 const DIM = 'var(--hcp-t-60)';

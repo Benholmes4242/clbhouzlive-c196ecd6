@@ -88,7 +88,7 @@ const DistributionChart: React.FC<{
           bottom: 28,
           left: 0,
           width: 'calc(2 * ((100% - 36px) / 7) + 6px)',
-          background: 'rgba(34,197,94,0.06)',
+          background: 'rgba(52,211,153,0.06)',
           borderRadius: 6,
           pointerEvents: 'none',
           zIndex: 0,
@@ -286,7 +286,7 @@ const AvailableCard: React.FC<{
             padding: '4px 10px',
             borderRadius: 999,
             background:
-              copy.pillTone === 'positive' ? 'rgba(34,197,94,0.12)'
+              copy.pillTone === 'positive' ? 'rgba(52,211,153,0.12)'
               : copy.pillTone === 'neutral' ? AMBER_14
               : 'var(--hcp-bg-3)',
             color:

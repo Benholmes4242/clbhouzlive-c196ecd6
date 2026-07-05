@@ -137,7 +137,7 @@ export const ChampionsListRow: React.FC<ChampionsListRowProps> = ({
                 fontSize: 8,
                 fontWeight: 800,
                 color: '#16A34A',
-                background: 'rgba(34,197,94,0.10)',
+                background: 'rgba(52,211,153,0.10)',
                 padding: '1px 5px',
                 borderRadius: 4,
                 letterSpacing: '0.10em',

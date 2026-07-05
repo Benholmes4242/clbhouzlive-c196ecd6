@@ -9,7 +9,7 @@ const HAIR = 'rgba(15,23,42,0.08)';
 const FIELD_FILL = '#F8FAFC';
 const GREEN = '#059669';
 const GREEN_BG = 'rgba(5,150,105,0.08)';
-const DANGER = '#DC2626';
+const DANGER = '#EF4444';
 const FONT = 'Geist, -apple-system, BlinkMacSystemFont, system-ui, sans-serif';
 
 interface Props {
@@ -198,8 +198,8 @@ export const EnglandGolfForm: React.FC<Props> = ({
               display: 'flex',
               alignItems: 'flex-start',
               gap: 10,
-              background: 'rgba(220,38,38,0.06)',
-              border: '1px solid rgba(220,38,38,0.20)',
+              background: 'rgba(239,68,68,0.06)',
+              border: '1px solid rgba(239,68,68,0.20)',
               padding: '12px 14px',
               borderRadius: 12,
               fontSize: 13,
@@ -208,7 +208,7 @@ export const EnglandGolfForm: React.FC<Props> = ({
             }}
           >
             <AlertCircle size={16} style={{ marginTop: 1, flexShrink: 0 }} />
-            <span style={{ color: '#991B1B', fontWeight: 500 }}>{error}</span>
+            <span style={{ color: '#EF4444', fontWeight: 500 }}>{error}</span>
           </div>
         )}
 

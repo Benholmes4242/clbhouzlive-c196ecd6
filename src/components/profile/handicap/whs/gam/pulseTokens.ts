@@ -24,7 +24,7 @@ export const PULSE_DARK: Record<PulseKind, PulseRarity> = {
   threat: {
     iconBg: 'rgba(159,29,29,0.18)',
     iconRing: 'rgba(159,29,29,0.55)',
-    labelFg: 'var(--hcp-bad, #DC2626)',
+    labelFg: 'var(--hcp-bad, #EF4444)',
     labelBg: 'rgba(159,29,29,0.18)',
     pillBorder: 'rgba(159,29,29,0.50)',
     cardBorder: 'rgba(159,29,29,0.40)',

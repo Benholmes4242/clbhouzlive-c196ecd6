@@ -24,7 +24,7 @@ interface Props {
 const FONT = 'Geist, -apple-system, BlinkMacSystemFont, system-ui, sans-serif';
 const INK = 'var(--hcp-t-100)';
 const INK_55 = 'var(--hcp-t-60)';
-const HOT_RED = '#DC2626';
+const HOT_RED = '#EF4444';
 const COLD_BLUE = '#0EA5E9';
 const SLATE = 'var(--hcp-t-80)';
 export const TrendCardsStack: React.FC<Props> = ({ connectionId, userId, currentHandicap, splitAt, viewMode = 'owner', ownerFirstName = null }) => {
@@ -163,7 +163,7 @@ export const TrendCardsStack: React.FC<Props> = ({ connectionId, userId, current
                     borderRadius: 999,
                     background:
                       meta.theme === 'positive'
-                        ? 'rgba(220, 38, 38, 0.10)'
+                        ? 'rgba(239,68,68,0.10)'
                         : meta.theme === 'negative'
                           ? 'rgba(14, 165, 233, 0.10)'
                           : 'var(--hcp-bg-2)',
