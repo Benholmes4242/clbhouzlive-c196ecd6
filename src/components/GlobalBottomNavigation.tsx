@@ -269,8 +269,8 @@ const GlobalBottomNavigation: React.FC<GlobalBottomNavigationProps> = ({ chromeS
                 border: tokens.hairline,
                 boxShadow: tokens.shadow,
                 borderRadius: 999,
-                padding: '8px 10px',
-                transition: TRANSITION,
+                padding: pillPadding,
+                transition: PILL_TRANSITION,
                 WebkitTapHighlightColor: 'transparent',
               }}
             >
