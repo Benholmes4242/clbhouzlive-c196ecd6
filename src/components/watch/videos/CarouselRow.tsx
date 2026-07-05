@@ -17,7 +17,12 @@ export default function CarouselRow({ items, allPosts, baseIndex, userId }: Caro
   const containerRef = useRef<HTMLDivElement>(null);
 
   // Engine-native activation: one hook, feed-model gates + hysteresis.
-  const activeIdx = useWatchAutoplay(scrollerRef, { railId: 'videos-carousel-row' });
+  const { activeIdx, railRef: autoplayRef } = useWatchAutoplay({ railId: 'videos-carousel-row' });
+  const setScrollerRef = useCallback((el: HTMLDivElement | null) => {
+    autoplayRef(el);
+    scrollerRef.current = el;
+  }, [autoplayRef]);
+
 
   if (items.length === 0) return null;
 
