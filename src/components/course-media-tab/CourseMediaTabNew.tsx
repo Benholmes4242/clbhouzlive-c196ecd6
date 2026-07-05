@@ -86,7 +86,6 @@ const CourseMediaTabNew: React.FC<CourseMediaTabNewProps> = ({ courseId, courseN
         courseName={courseName}
         courseId={courseId}
       />
-      <CourseMediaAutoplay posts={posts} gridRef={gridRef as React.RefObject<HTMLDivElement>} />
       <ScrollToTopGlass />
     </div>
   );
