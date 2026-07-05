@@ -102,20 +102,28 @@ export const CourseMediaGrid = forwardRef<HTMLDivElement, CourseMediaGridProps>(
     });
   }, [isViewerOpen, hasNextPage, isFetchingNextPage, setPaginationState]);
 
-  // Append flattened pages into the open viewer (store dedupes by flat id),
-  // so infinite scroll keeps loading more without index drift.
+  // Grouped-by-post array for the fullscreen viewer. SnapFeed rejects
+  // ungrouped/duplicate-id posts, so we always hand off groupMultiMedia'd
+  // posts (falling back to grouping on-the-fly if the parent didn't provide
+  // pre-grouped ones).
+  const groupedForViewer = useMemo(
+    () => postsForFullscreen ?? groupMultiMedia(posts),
+    [postsForFullscreen, posts],
+  );
+
+  // Append newly-loaded pages into the open viewer as GROUPED posts (store
+  // dedupes by post id) so infinite scroll keeps loading without corrupting
+  // the viewer with duplicate-id per-media entries.
   useEffect(() => {
     if (!isViewerOpen) return;
-    const { flat } = flattenPostsToMedia(posts);
-    useFullscreenFeedStore.getState().appendPosts(flat);
-  }, [isViewerOpen, posts]);
+    useFullscreenFeedStore.getState().appendPosts(groupedForViewer);
+  }, [isViewerOpen, groupedForViewer]);
 
-  // Single open-fullscreen entrypoint — flattens to one-media-per-slide
-  // and opens the fullscreen viewer in read-only (gallery) mode with the
-  // current pagination callbacks.
-  // Single open-fullscreen entrypoint — flattens to one-media-per-slide
-  // and routes through openWithOrigin so course media gets the FLIP expand +
-  // resume-at-position (via the tile's rail lane owner key).
+  // Single open-fullscreen entrypoint — routes through openWithOrigin so
+  // course media gets the FLIP expand + resume-at-position (via the tile's
+  // rail lane owner key). Opens with GROUPED posts and the tapped POST's
+  // index — multi-media posts open on their first media (Stage-7 carousel
+  // item), consistent with the rest of the app.
   const handleOpenFullscreen = useCallback((
     postsToOpen: FeedPost[],
     index: number,
@@ -126,10 +134,15 @@ export const CourseMediaGrid = forwardRef<HTMLDivElement, CourseMediaGridProps>(
       handOffUrls: (string | null | undefined)[];
     },
   ) => {
-    const { flat, offsetsByParent } = flattenPostsToMedia(postsToOpen);
+    const tappedId = postsToOpen[index]?.id;
+    // The tile's `allPosts` is the per-media flat list from useCourseMedia,
+    // whose ids are already the raw post ids (no `::N` suffix) — but strip
+    // defensively in case that changes.
+    const parentId = typeof tappedId === 'string' ? tappedId.split('::')[0] : tappedId;
+    const groupedIndex = Math.max(0, groupedForViewer.findIndex(p => p.id === parentId));
     openWithOrigin({
-      posts: flat,
-      index: flatIndexFor(offsetsByParent, index, 0),
+      posts: groupedForViewer,
+      index: groupedIndex,
       originEl: ctx.originEl,
       posterUrl: ctx.posterUrl,
       handOffUrls: ctx.handOffUrls,
@@ -141,7 +154,7 @@ export const CourseMediaGrid = forwardRef<HTMLDivElement, CourseMediaGridProps>(
         isFetchingNextPage: isFetchingNextPage ?? false,
       },
     });
-  }, [hasNextPage, fetchNextPage, isFetchingNextPage]);
+  }, [groupedForViewer, hasNextPage, fetchNextPage, isFetchingNextPage]);
 
 
 
