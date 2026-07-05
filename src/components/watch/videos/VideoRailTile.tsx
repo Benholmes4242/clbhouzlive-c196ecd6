@@ -2,6 +2,7 @@ import { memo, useCallback, useMemo, useRef, useState } from 'react';
 
 import { openWithOrigin } from '@/lib/openWithOrigin';
 import type { FeedPost } from '@/components/media-system/types/media';
+import { useRailLane } from '@/video/useRailLane';
 import { Pin } from '../proshop/Pin';
 
 interface VideoRailTileProps {
@@ -14,6 +15,8 @@ interface VideoRailTileProps {
   /** Optional progress 0–1 — renders a thin amber scrubber across the
    *  bottom of the thumb (Continue Watching). */
   progress?: number;
+  /** When true, rent a rail lane and autoplay muted+looped in-place. */
+  active?: boolean;
 }
 
 function formatHMS(seconds: number | null | undefined): string {
@@ -59,11 +62,23 @@ function VideoRailTileInner({
   allPosts,
   width = 200,
   progress,
+  active = false,
 }: VideoRailTileProps) {
   const media = post.mediaItems.find((m) => m.type === 'video') ?? post.mediaItems[0];
   const thumb = media?.thumbnailUrl || media?.imageUrl || '';
   const duration = media?.duration ?? 0;
   const [thumbFailed, setThumbFailed] = useState(false);
+
+  const hlsUrl = (media as any)?.hlsUrl as string | undefined;
+  const isVideo = !!media && media.type === 'video' && !!hlsUrl;
+  const ownerKey = isVideo ? `${post.id}:0` : null;
+  const { hostRef: laneHostRef, ready: laneReady } = useRailLane({
+    ownerKey,
+    active: active && isVideo,
+    hlsUrl: isVideo ? hlsUrl! : null,
+    posterUrl: thumb || null,
+    postId: post.id,
+  });
 
   const courseName = (post as any).courseName ?? null;
   const ageLabel = useMemo(() => formatAge(post.createdAt), [post.createdAt]);
@@ -76,15 +91,17 @@ function VideoRailTileInner({
       index,
       originEl: rootRef.current,
       posterUrl: thumb || null,
-      handOffUrls: [(media as any)?.hlsUrl],
+      handOffUrls: [hlsUrl],
+      railOwnerKey: ownerKey,
     });
-  }, [allPosts, index, thumb, media]);
+  }, [allPosts, index, thumb, hlsUrl, ownerKey]);
 
   const showProgress = typeof progress === 'number' && progress > 0 && progress < 1;
 
   return (
     <div
       ref={rootRef}
+      data-watch-tile-index={index}
       style={{
         flexShrink: 0,
         width,
@@ -127,6 +144,21 @@ function VideoRailTileInner({
           />
         )}
 
+        {isVideo && (
+          <div
+            ref={laneHostRef}
+            aria-hidden
+            style={{
+              position: 'absolute',
+              inset: 0,
+              zIndex: 1,
+              opacity: laneReady ? 1 : 0,
+              transition: 'opacity 140ms linear',
+              pointerEvents: 'none',
+            }}
+          />
+        )}
+
         {/* Course pin — top-left */}
         {courseName ? (
           <div
@@ -136,6 +168,7 @@ function VideoRailTileInner({
               left: 6,
               maxWidth: 'calc(100% - 60px)',
               pointerEvents: 'none',
+              zIndex: 2,
             }}
           >
             <Pin variant="dark" icon={<span style={{ fontSize: 9 }}>📍</span>}>
@@ -152,6 +185,7 @@ function VideoRailTileInner({
               bottom: 6,
               right: 6,
               pointerEvents: 'none',
+              zIndex: 2,
             }}
           >
             <Pin variant="dark">
@@ -172,6 +206,7 @@ function VideoRailTileInner({
               height: 5,
               background: 'rgba(255,255,255,0.28)',
               pointerEvents: 'none',
+              zIndex: 2,
             }}
           >
             <div
