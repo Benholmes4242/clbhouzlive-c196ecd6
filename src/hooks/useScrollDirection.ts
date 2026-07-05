@@ -46,7 +46,20 @@ function setState(next: NavState) {
 }
 
 function getScrollTop(target: HTMLElement | Window): number {
-  if (target === window) return window.scrollY || document.documentElement.scrollTop || 0;
+  if (target === window) {
+    // Read from whichever element the UA is actually scrolling. When body
+    // is styled with `height: 100%; overflow-y: auto` (our light routes),
+    // body — not documentElement — is the scrolling element, and window
+    // never receives scroll events for the document scroll. Fall through
+    // to body as a last resort.
+    return (
+      window.scrollY ||
+      document.scrollingElement?.scrollTop ||
+      document.documentElement.scrollTop ||
+      document.body.scrollTop ||
+      0
+    );
+  }
   return (target as HTMLElement).scrollTop || 0;
 }
 
