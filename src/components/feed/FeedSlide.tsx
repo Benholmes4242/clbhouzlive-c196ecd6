@@ -53,6 +53,7 @@ export const FeedSlide = memo(function FeedSlide({
   activeIndexOverride,
   isFullscreen = false,
   mediaIndex = 0,
+  mediaId = null,
 }: FeedSlideProps) {
   const { user } = useSupabaseSession();
   const storeActiveIndex = useClubhouseStore(s => s.activeIndex);
@@ -60,9 +61,16 @@ export const FeedSlide = memo(function FeedSlide({
   const isActive = activeIndex === index;
   const isSuggestedFeed = activeTab === 'foryou';
   const media = post.mediaItems;
-  // Opening-slide media selector — mediaIndex is threaded ONLY for the slide
-  // opened via a per-media tile tap; every other slide receives 0.
-  const openIdx = Math.min(Math.max(mediaIndex, 0), Math.max((media?.length ?? 1) - 1, 0));
+  // Opening-slide media selector — prefer stable `mediaId` (safe against
+  // groupMultiMedia's re-sort/dedupe/filter), fall back to positional
+  // `mediaIndex` for callers that don't pass an id. Non-opening slides get
+  // `mediaId: null` + `mediaIndex: 0` → renders media[0] as today.
+  const resolvedIdx = mediaId
+    ? media?.findIndex(m => m.id === mediaId) ?? -1
+    : -1;
+  const openIdx = resolvedIdx >= 0
+    ? resolvedIdx
+    : Math.min(Math.max(mediaIndex, 0), Math.max((media?.length ?? 1) - 1, 0));
   const carouselSlide = useClubhouseStore(s => s.carouselPositions.get(index) ?? 0);
   const isEditorial =
     post.postType === 'pga_card' ||
