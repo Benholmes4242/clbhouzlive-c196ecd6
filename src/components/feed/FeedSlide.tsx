@@ -9,6 +9,7 @@ import { useVideoLane } from '@/video/useVideoLane';
 import { VideoEngine } from '@/video/VideoEngine';
 import { useFullscreenFeedStore } from '@/store/fullscreenFeedStore';
 import { fsv } from '@/perf/fsvTelemetry';
+import { isPerfEnabled } from '@/perf/navTiming';
 import { usePostViewTracker } from '@/hooks/usePostViewTracker';
 
 interface FeedSlideProps {
@@ -77,6 +78,43 @@ export const FeedSlide = memo(function FeedSlide({
     post.postType === 'tournament_result' ||
     post.postType === 'course_of_week_card';
   const showInlineDots = !isFullscreen && !isEditorial && (media?.length ?? 0) > 1;
+
+  // [VDIFF] Opening-slide media-choice trace. Only log when this slide is the
+  // one the tap opener targeted (mediaId supplied) OR when active in fullscreen.
+  // Enumerates every media item + reports which was chosen and which branch
+  // will render. Gated by DBG pill so device WebViews stay clean by default.
+  if (isPerfEnabled() && isFullscreen && (mediaId != null || isActive)) {
+    const chosen = media?.[openIdx];
+    const branch =
+      media && media.length > 1 && openIdx === 0
+        ? 'carousel'
+        : chosen?.type === 'video'
+          ? ((chosen as any).hlsUrl ? 'fullscreen-video-slot' : 'video-poster-fallback')
+          : chosen?.type === 'image'
+            ? 'image'
+            : 'text-fallback';
+    // eslint-disable-next-line no-console
+    console.info('[VDIFF] slide.mediaChoice', {
+      postId: post.id,
+      index,
+      isActive,
+      isFullscreen,
+      mediaIdProp: mediaId,
+      mediaIndexProp: mediaIndex,
+      resolvedIdx,
+      openIdx,
+      items: media?.map(m => ({
+        id: m.id,
+        type: m.type,
+        hasHls: !!(m as any).hlsUrl,
+        hasThumb: !!m.thumbnailUrl,
+      })) ?? [],
+      chosenId: chosen?.id ?? null,
+      chosenType: chosen?.type ?? null,
+      chosenHasHls: !!(chosen as any)?.hlsUrl,
+      branch,
+    });
+  }
 
   // Pinch zoom for single images
   const { ref: zoomRef, imgRef, style: zoomStyle, scale: zoomScale, reset: resetZoom } = usePinchZoomPointer();
@@ -307,6 +345,29 @@ const FullscreenVideoSlot: React.FC<{
     muted: isMuted,
     postId,
   });
+
+  // [VDIFF] Slot mount + lane-eligibility trace. Reports the exact reason
+  // the load effect inside useVideoLane will (or won't) fire.
+  React.useEffect(() => {
+    if (!isPerfEnabled()) return;
+    const bailReason = !isActive
+      ? 'inactive'
+      : !hlsUrl
+        ? 'no-hlsUrl'
+        : null;
+    // eslint-disable-next-line no-console
+    console.info('[VDIFF] slot.mount', {
+      postId,
+      isActive,
+      hasHls: !!hlsUrl,
+      hlsUrlTail: hlsUrl ? hlsUrl.slice(-42) : null,
+      hasPoster: !!posterSrc,
+      startPosition,
+      isMuted,
+      laneWillLoad: !bailReason,
+      bailReason,
+    });
+  }, [postId, isActive, hlsUrl, posterSrc, startPosition, isMuted]);
 
   React.useEffect(() => {
     VideoEngine.setObjectFit('fullscreen', 'contain');

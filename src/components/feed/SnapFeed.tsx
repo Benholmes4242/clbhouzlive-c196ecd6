@@ -8,6 +8,7 @@ import { haptic } from '@/utils/haptics';
 import { pauseAllAudio } from '@/utils/globalVideoMute';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useFullscreenFeedStore } from '@/store/fullscreenFeedStore';
+import { isPerfEnabled } from '@/perf/navTiming';
 // [VIDEOSTUB] useWatchProgressTracker call removed — no playback to track.
 
 
@@ -431,6 +432,28 @@ export function SnapFeed({
         ids,
       );
     }
+  }
+
+  // [VDIFF] SnapFeed render trace — compare watch vs course tap line-by-line.
+  if (isPerfEnabled()) {
+    const openStartIdx = startIndex ?? 0;
+    const openPost = posts[openStartIdx];
+    // eslint-disable-next-line no-console
+    console.info('[VDIFF] snapfeed.render', {
+      surface,
+      activeTab,
+      readOnly: !!readOnly,
+      isFullscreen: !!isFullscreen,
+      postsLen: posts.length,
+      startIndex: openStartIdx,
+      activeIndex,
+      activeIndexOverride: activeIndexOverride ?? null,
+      openingMediaId,
+      openingMediaIndex,
+      openPostId: openPost?.id ?? null,
+      openPostMediaCount: openPost?.mediaItems?.length ?? 0,
+      openPostMediaTypes: openPost?.mediaItems?.map(m => m.type) ?? [],
+    });
   }
 
   return (
