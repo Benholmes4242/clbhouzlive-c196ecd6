@@ -129,7 +129,22 @@ function AutoplayVideoCardInner({ post, index, allPosts, userId, active, borderR
               }}
             />
           ) : null}
+          {isVideo && (
+            <div
+              ref={laneHostRef}
+              aria-hidden
+              style={{
+                position: 'absolute',
+                inset: 0,
+                zIndex: 1,
+                opacity: laneReady ? 1 : 0,
+                transition: 'opacity 140ms linear',
+                pointerEvents: 'none',
+              }}
+            />
+          )}
         </div>
+
 
         {courseName ? (
           <div style={{ position: 'absolute', top: 8, left: 8, maxWidth: 'calc(100% - 80px)', zIndex: 2 }}>
