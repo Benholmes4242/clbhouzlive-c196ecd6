@@ -134,12 +134,21 @@ export const CourseMediaGrid = forwardRef<HTMLDivElement, CourseMediaGridProps>(
       handOffUrls: (string | null | undefined)[];
     },
   ) => {
-    const tappedId = postsToOpen[index]?.id;
+    const tapped = postsToOpen[index];
+    const tappedId = tapped?.id;
     // The tile's `allPosts` is the per-media flat list from useCourseMedia,
     // whose ids are already the raw post ids (no `::N` suffix) — but strip
     // defensively in case that changes.
     const parentId = typeof tappedId === 'string' ? tappedId.split('::')[0] : tappedId;
     const groupedIndex = Math.max(0, groupedForViewer.findIndex(p => p.id === parentId));
+    // Compute the media's within-post index by matching the tile's media id
+    // against the grouped post's mediaItems — so fullscreen opens on the
+    // tapped media (video or image), not always media[0].
+    const tappedMediaId = tapped?.mediaItems?.[0]?.id;
+    const groupedPost = groupedForViewer[groupedIndex];
+    const mediaIndex = tappedMediaId
+      ? Math.max(0, groupedPost?.mediaItems?.findIndex(mi => mi.id === tappedMediaId) ?? 0)
+      : 0;
     openWithOrigin({
       posts: groupedForViewer,
       index: groupedIndex,
@@ -147,6 +156,7 @@ export const CourseMediaGrid = forwardRef<HTMLDivElement, CourseMediaGridProps>(
       posterUrl: ctx.posterUrl,
       handOffUrls: ctx.handOffUrls,
       railOwnerKey: ctx.railOwnerKey,
+      mediaIndex,
       options: {
         readOnly: true,
         hasNextPage: hasNextPage ?? false,
