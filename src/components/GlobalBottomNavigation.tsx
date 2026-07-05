@@ -1,26 +1,24 @@
-import React, { useEffect, useState, useRef, useCallback } from 'react';
+import React, { useEffect, useState, useRef, useCallback, useMemo } from 'react';
 import { useLocation } from 'react-router-dom';
-import { motion, AnimatePresence } from 'framer-motion';
-import { useIsDesktop } from '@/hooks/useIsDesktop';
-import { useModalState } from '@/hooks/useModalDetector';
+import { AnimatePresence, motion } from 'framer-motion';
 import { useBottomNavigation } from '@/contexts/BottomNavigationContext';
 import { useModalContext } from '@/contexts/ModalContext';
 import { usePostStudioStore } from '@/stores/usePostStudioStore';
-
-
-// Note: usePrefetch is accessed via useAppPrefetch to avoid static/dynamic import conflict
 import { useAppPrefetch } from '@/hooks/useAppPrefetch';
 import { warmChunk } from '@/routes/chunkLoaders';
-import NavigationBar from './bottom-navigation/NavigationBar';
 import { useNavigationHandlers } from './bottom-navigation/useNavigationHandlers';
+import { navigationTabs } from './bottom-navigation/navigationTabs';
 import { useUnseenFriendReviews } from '@/hooks/useUnseenFriendReviews';
 import { useTournamentsCache } from '@/hooks/useTournamentsCache';
 import { isMedianApp } from '@/utils/median/isMedianApp';
-import { isDarkChromeRoute } from '@/components/header/globalHeaderRules';
-
+import { useNavTheme } from '@/hooks/useNavTheme';
+import { useNavScrollState, pushForceExpand, resetToExpanded } from '@/hooks/useScrollDirection';
 import { cn } from '@/lib/utils';
-import { auditComponentMount, markPerformance } from '@/utils/clubhouseAudit';
 
+// ---- Public token: total vertical space to reserve at the bottom of any
+// scrollable page so its last content clears the floating pill.
+// (66 pill + 10 bottom gap + 16 breathing room = 92)
+export const NAV_CLEARANCE = 'calc(env(safe-area-inset-bottom, 0px) + 92px)';
 
 // Routes where bottom navigation should be hidden
 const HIDDEN_ROUTES = [
@@ -28,105 +26,120 @@ const HIDDEN_ROUTES = [
   '/admin-setup',
   '/onboarding',
   '/map',
-  '/notificationmessages', // Notifications/Activity — settings-style standalone shell
-  '/followers',            // Own followers redirect — settings-style standalone
-  '/following',            // Own following redirect — settings-style standalone
+  '/notificationmessages',
+  '/followers',
+  '/following',
 ];
 
-// Route prefixes where bottom navigation should be hidden
 const HIDDEN_ROUTE_PREFIXES = [
-  '/echo', // Echo AI page - immersive full-screen experience
-  '/admin-v2', // Admin console — uses its own sidebar/header chrome
-  '/verified', // Verified page - standalone, no app chrome
-  '/manage/', // Manage Profile sub-pages — pushed standalone, no bottom nav
-  '/support/', // Support thread — pushed standalone, no bottom nav
-  '/legal', // Legal document pages — standalone, no bottom nav
-  '/privacy', // Privacy policy — standalone, no bottom nav
-  '/terms', // Terms of service — standalone, no bottom nav
-  '/businesses/manage', // Manage business profiles — standalone shell, no bottom nav
-  '/business/create', // Create business profile — standalone shell, no bottom nav
-  '/business/invite/accept', // Team invite accept page — standalone shell, no bottom nav
-
+  '/echo',
+  '/admin-v2',
+  '/verified',
+  '/manage/',
+  '/support/',
+  '/legal',
+  '/privacy',
+  '/terms',
+  '/businesses/manage',
+  '/business/create',
+  '/business/invite/accept',
 ];
 
-// Regex-matched routes where bottom nav is hidden — covers social network pages
-// under /profile/:username/followers|following and /business/:idOrSlug/followers|following.
 const HIDDEN_ROUTE_PATTERNS: RegExp[] = [
   /^\/profile\/[^/]+\/(followers|following)$/,
   /^\/business\/[^/]+\/(followers|following)$/,
-];
-
-// Routes that use the dark Clubhouse nav chrome.
-// Mirrors isDarkChromeRoute() in globalHeaderRules — kept here for the
-// scroll-direction nav-hide behaviour that only applies to the feed.
-const CLUBHOUSE_ROUTES = ['/', '/clubhouse'];
-
-// Routes that use the warm gradient Cleo design
-const WARM_GRADIENT_ROUTES = [
-  '/messages',
 ];
 
 interface GlobalBottomNavigationProps {
   chromeState?: 'visible' | 'hidden';
 }
 
+// --- Theme tokens ------------------------------------------------------------
+type ThemeTokens = {
+  fill: string;
+  hairline: string;
+  shadow: string;
+  ink: string;
+  dim: string;
+  lozenge: string;
+};
+
+const DARK_TOKENS: ThemeTokens = {
+  fill: 'rgba(27,30,39,0.86)',
+  hairline: '1px solid rgba(255,255,255,0.10)',
+  shadow: '0 10px 30px rgba(0,0,0,0.45)',
+  ink: '#F2F4F7',
+  dim: 'rgba(242,244,247,0.5)',
+  lozenge: 'rgba(255,255,255,0.10)',
+};
+
+const LIGHT_TOKENS: ThemeTokens = {
+  fill: 'rgba(250,251,253,0.86)',
+  hairline: '1px solid rgba(15,23,42,0.08)',
+  shadow: '0 10px 30px rgba(15,23,42,0.14)',
+  ink: '#0F172A',
+  dim: 'rgba(15,23,42,0.45)',
+  lozenge: 'rgba(15,23,42,0.07)',
+};
+
+const REDUCED_MOTION =
+  typeof window !== 'undefined' &&
+  window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
+
 const GlobalBottomNavigation: React.FC<GlobalBottomNavigationProps> = ({ chromeState = 'visible' }) => {
   const location = useLocation();
   const { isVisible, setNavRef } = useBottomNavigation();
   const { shouldHideHeader } = useModalContext();
-  
   const { triggerPrefetch } = useAppPrefetch();
   const { activeTab, handleTabClick, handlePrefetch } = useNavigationHandlers();
   const { unseenCount: unseenFriendReviews } = useUnseenFriendReviews();
   const { data: tournamentsCache } = useTournamentsCache();
   const liveTournamentCount = tournamentsCache?.live?.length ?? 0;
-  const liveTabs = liveTournamentCount > 0 ? new Set(['tourhub']) : new Set<string>();
-  const isDesktop = useIsDesktop();
+  const isTourHubLive = liveTournamentCount > 0;
   const openPostStudio = usePostStudioStore((s) => s.openPostStudio);
-  
-  
-  const navRef = useRef<HTMLDivElement>(null);
-  
-  // Prefetch routes on hover/touch for faster navigation.
-  // Phase 6: also warms the lazy route CHUNK (import()) on pointerdown so it
-  // is parsed by the time <Suspense> mounts — closes the mounts:0 race in the
-  // warm-tap case. Dedupes per-session per-path to avoid repeat imports.
+
+  const theme = useNavTheme();
+  const tokens = theme === 'dark' ? DARK_TOKENS : LIGHT_TOKENS;
+  const navState = useNavScrollState();
+  const condensed = navState === 'condensed' && !REDUCED_MOTION;
+
+  const navRef = useRef<HTMLDivElement | null>(null);
+
+  // Route change → reset scroll state to expanded.
+  useEffect(() => {
+    resetToExpanded();
+  }, [location.pathname]);
+
+  // Drawer / sheet active → force expanded (pill sits below sheet scrim).
+  const [isDrawerActive, setIsDrawerActive] = useState(false);
+  useEffect(() => {
+    const check = () => setIsDrawerActive(document.body.classList.contains('drawer-active'));
+    check();
+    const obs = new MutationObserver(check);
+    obs.observe(document.body, { attributes: true, attributeFilter: ['class'] });
+    return () => obs.disconnect();
+  }, []);
+  useEffect(() => {
+    if (isDrawerActive || shouldHideHeader) {
+      return pushForceExpand();
+    }
+  }, [isDrawerActive, shouldHideHeader]);
+
+  // Prefetch on hover/touch.
   const warmedRef = useRef<Set<string>>(new Set());
   const handleNavPrefetch = useCallback((path: string) => {
     if (typeof document !== 'undefined' && document.visibilityState !== 'visible') return;
-    if (warmedRef.current.has(path)) {
-      // Data prefetch is already idempotent internally — safe to skip on repeat.
-      return;
-    }
+    if (warmedRef.current.has(path)) return;
     warmedRef.current.add(path);
-    warmChunk(path);           // (a) lazy chunk
-    triggerPrefetch(path);     // (b) data (already idempotent via prefetchedRoutes)
+    warmChunk(path);
+    triggerPrefetch(path);
     handlePrefetch(path);
   }, [triggerPrefetch, handlePrefetch]);
-  
-  // Check if drawer is active (for clubhouse mini profile or comments)
-  const [isDrawerActive, setIsDrawerActive] = useState(false);
-  
-  useEffect(() => {
-    const checkDrawer = () => {
-      setIsDrawerActive(document.body.classList.contains('drawer-active'));
-    };
-    
-    checkDrawer();
-    const observer = new MutationObserver(checkDrawer);
-    observer.observe(document.body, { attributes: true, attributeFilter: ['class'] });
-    
-    return () => observer.disconnect();
-  }, []);
-  
-  // Determine if current route should hide navigation
+
+  // Route hide detection.
   const isOnboardingEditProfile =
     location.pathname === '/edit-profile' &&
     new URLSearchParams(location.search).get('onboarding') === '1';
-  // On plain web, '/' renders BetaGatePage (coming-soon), not Clubhouse —
-  // never paint the bottom nav over it. BUT: the Lovable preview host (and
-  // ?preview=clbhouz bypass) renders ClubhouseWrapped at '/', so the nav must
-  // still appear there.
   const isPreviewBypass = (() => {
     try {
       const h = window.location.hostname;
@@ -136,152 +149,243 @@ const GlobalBottomNavigation: React.FC<GlobalBottomNavigationProps> = ({ chromeS
     } catch { return false; }
   })();
   const isBetaGateRoute = location.pathname === '/' && !isMedianApp() && !isPreviewBypass;
-  const shouldHideForRoute = HIDDEN_ROUTES.includes(location.pathname) ||
+  const shouldHideForRoute =
+    HIDDEN_ROUTES.includes(location.pathname) ||
     HIDDEN_ROUTE_PREFIXES.some(prefix => location.pathname.startsWith(prefix)) ||
     HIDDEN_ROUTE_PATTERNS.some(re => re.test(location.pathname)) ||
     isOnboardingEditProfile ||
     isBetaGateRoute;
-
-  const isClubhouseRoute = CLUBHOUSE_ROUTES.includes(location.pathname);
-  const isWarmGradientRoute = WARM_GRADIENT_ROUTES.some(r => location.pathname.startsWith(r));
-  const isTourHubRoute = location.pathname.startsWith('/tourhub');
-  const isHandicapRoute = location.pathname.startsWith('/handicap');
-  /** Single source of truth for dark chrome — shared with App.tsx / PageRoot. */
-  const isDarkChromeRouteActive = isDarkChromeRoute(location.pathname);
-  
   const showNavigation = isVisible && !shouldHideForRoute;
 
-  // Scroll-direction hide/show — only on the feed (Clubhouse).
-  // Down past ~80px hides the nav; up shows it; near top always shows.
-  const [navHidden, setNavHidden] = useState(false);
+  // Keep the global --bottom-nav-height CSS var mapped to NAV_CLEARANCE so
+  // existing page padding consumers stay correct regardless of pill state.
   useEffect(() => {
-    if (!isClubhouseRoute) { setNavHidden(false); return; }
-    const lastTopByEl = new WeakMap<EventTarget, number>();
-    let raf = 0;
-    const onScroll = (e: Event) => {
-      const target = e.target as (HTMLElement | Document | null);
-      if (!target) return;
-      const top = target === document
-        ? window.scrollY
-        : (target as HTMLElement).scrollTop ?? 0;
-      const key: EventTarget = target === document ? window : target;
-      if (raf) return;
-      raf = requestAnimationFrame(() => {
-        raf = 0;
-        const prev = lastTopByEl.get(key) ?? 0;
-        const delta = top - prev;
-        lastTopByEl.set(key, top);
-        if (top < 80) { setNavHidden(false); return; }
-        if (delta > 8) setNavHidden(true);
-        else if (delta < -4) setNavHidden(false);
-      });
-    };
-    window.addEventListener('scroll', onScroll, { passive: true, capture: true });
-    return () => {
-      window.removeEventListener('scroll', onScroll, { capture: true } as any);
-      if (raf) cancelAnimationFrame(raf);
-    };
-  }, [isClubhouseRoute]);
-
-  // Audit on mount
-  useEffect(() => {
-    if (isClubhouseRoute) {
-      markPerformance('bottom-nav-mount-start');
-      auditComponentMount(navRef.current, 'GlobalBottomNavigation', {
-        checkLayers: true,
-        checkA11y: true
-      });
-      markPerformance('bottom-nav-mount-end');
+    if (!showNavigation) {
+      document.documentElement.style.setProperty('--bottom-nav-height', '0px');
+      return;
     }
-  }, [isClubhouseRoute]);
+    document.documentElement.style.setProperty('--bottom-nav-height', NAV_CLEARANCE);
+  }, [showNavigation]);
 
-  // Update accessibility when chrome state changes
+  // Chrome hidden — reflect in a11y.
   useEffect(() => {
     if (!navRef.current) return;
-    
     const isHidden = chromeState === 'hidden';
-    navRef.current.setAttribute('aria-hidden', isHidden.toString());
-    
-    const interactiveElements = navRef.current.querySelectorAll('button, a, input');
-    interactiveElements.forEach(el => {
-      if (isHidden) {
-        el.setAttribute('tabindex', '-1');
-      } else {
-        el.removeAttribute('tabindex');
-      }
+    navRef.current.setAttribute('aria-hidden', String(isHidden));
+    const els = navRef.current.querySelectorAll('button, a, input');
+    els.forEach(el => {
+      if (isHidden) el.setAttribute('tabindex', '-1');
+      else el.removeAttribute('tabindex');
     });
   }, [chromeState]);
 
-  // Handle tab clicks including camera action
   const handleTabClickWithCamera = (tab: { id: string; path: string | null; isAction?: boolean }) => {
     if (tab.isAction && tab.id === 'post') {
       openPostStudio({ returnPath: location.pathname });
-    } else if (tab.id === 'debug') {
-      const current = localStorage.getItem('CLBHOUZ_VIDEO_DEBUG') === 'true';
-      localStorage.setItem('CLBHOUZ_VIDEO_DEBUG', current ? 'false' : 'true');
-      window.dispatchEvent(new CustomEvent('clbhouz-debug-toggle'));
-    } else if (
-      tab.id === 'clubhouse' &&
-      (location.pathname === '/' || location.pathname === '/clubhouse')
-    ) {
-      // Already on Clubhouse — CardFeed listens for this event and scrolls Virtuoso to top.
-      window.dispatchEvent(new CustomEvent('clbhouz-active-tab-retap', { detail: { tabId: 'clubhouse' } }));
-    } else if (tab.path && location.pathname === tab.path) {
-      // Already on this tab's route — return to top.
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-      // Let pages with sub-tabs also reset themselves.
-      window.dispatchEvent(new CustomEvent('clbhouz-active-tab-retap', { detail: { tabId: tab.id } }));
-    } else {
-      handleTabClick(tab);
+      return;
     }
+    if (tab.id === 'clubhouse' && (location.pathname === '/' || location.pathname === '/clubhouse')) {
+      window.dispatchEvent(new CustomEvent('clbhouz-active-tab-retap', { detail: { tabId: 'clubhouse' } }));
+      return;
+    }
+    if (tab.path && location.pathname === tab.path) {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+      window.dispatchEvent(new CustomEvent('clbhouz-active-tab-retap', { detail: { tabId: tab.id } }));
+      return;
+    }
+    handleTabClick(tab);
   };
+
+  // Sizes
+  const PILL_MAX_EXPANDED = 'min(360px, 100vw - 32px)';
+  const PILL_MAX_CONDENSED = 'min(320px, 100vw - 48px)';
+  const iconSize = condensed ? 21 : 23;
+  const lozengePad = condensed ? '8px 16px' : '9px 18px';
+
+  const badges = useMemo<Record<string, number>>(() => ({ courses: unseenFriendReviews }), [unseenFriendReviews]);
+
+  // Motion tokens
+  const TRANSITION = REDUCED_MOTION
+    ? 'none'
+    : 'max-width 220ms cubic-bezier(0.2,0.8,0.2,1)';
+  const LABEL_TRANSITION = REDUCED_MOTION
+    ? 'none'
+    : 'height 220ms cubic-bezier(0.2,0.8,0.2,1), opacity 150ms linear';
 
   return (
     <>
-      {/* Global Fixed Bottom Navigation */}
+      {/* One-off style: gate backdrop-filter so unsupported WebViews degrade
+          gracefully to the (already 86%-opaque) fill. */}
+      <style>{`
+        .glass-nav-pill { }
+        @supports (backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px)) {
+          .glass-nav-pill {
+            backdrop-filter: blur(18px) saturate(160%);
+            -webkit-backdrop-filter: blur(18px) saturate(160%);
+          }
+        }
+      `}</style>
+
       <AnimatePresence>
         {showNavigation && (
-          <div className="global-bottom-nav-shell">
-            <motion.div
-              className="global-bottom-nav"
-              initial={{ y: '100%', opacity: 0 }}
-              animate={{ y: navHidden ? '100%' : 0, opacity: navHidden ? 0 : 1 }}
-              exit={{ y: '100%', opacity: 0 }}
-              transition={{ duration: 0.24, ease: [0.22, 0.61, 0.36, 1] }}
+          <motion.div
+            key="floating-nav"
+            initial={{ y: 24, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            exit={{ y: 24, opacity: 0 }}
+            transition={{ duration: 0.22, ease: [0.2, 0.8, 0.2, 1] }}
+            style={{
+              position: 'fixed',
+              left: 0,
+              right: 0,
+              bottom: 'calc(env(safe-area-inset-bottom, 0px) + 10px)',
+              zIndex: 100,
+              pointerEvents: 'none',
+              display: 'flex',
+              justifyContent: 'center',
+            }}
+            role="navigation"
+            aria-label="Main"
+          >
+            <div
+              ref={(el) => {
+                navRef.current = el;
+                setNavRef(el);
+              }}
+              data-chrome="bottom-nav"
+              className={cn('glass-nav-pill')}
+              style={{
+                pointerEvents: 'auto',
+                margin: '0 auto',
+                maxWidth: condensed ? PILL_MAX_CONDENSED : PILL_MAX_EXPANDED,
+                width: '100%',
+                background: tokens.fill,
+                border: tokens.hairline,
+                boxShadow: tokens.shadow,
+                borderRadius: 999,
+                padding: '8px 10px',
+                transition: TRANSITION,
+                WebkitTapHighlightColor: 'transparent',
+              }}
             >
-              <div
-                ref={(el) => {
-                  navRef.current = el;
-                  setNavRef(el);
-                }}
-                className="chrome-bottom-nav clubhouse-footer"
-                data-chrome="bottom-nav"
+              <ul
                 style={{
-                  // Charcoal nav chrome on Clubhouse; matches feed surface (#15171F).
-                  background: isDarkChromeRouteActive ? '#15171F' : '#F8FAFC',
-                  borderTop: isDarkChromeRouteActive
-                    ? '0.5px solid rgba(255,255,255,0.06)'
-                    : '0.5px solid rgba(15,23,42,0.08)',
-                  paddingBottom: 'max(env(safe-area-inset-bottom, 0px), 20px)',
-                  transition: 'all var(--motion-slow) cubic-bezier(0.22, 1, 0.36, 1)',
+                  listStyle: 'none',
+                  margin: 0,
+                  padding: 0,
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
+                  gap: 2,
                 }}
               >
-                <NavigationBar
-                  activeTab={activeTab}
-                  onTabClick={handleTabClickWithCamera}
-                  onPrefetch={handleNavPrefetch}
-                  variant={isDarkChromeRouteActive ? 'clubhouse' : 'default'}
-                  isDimmed={false}
-                  useAmberActive={false}
-                  showBorder={false}
-                  tabBadges={{ courses: unseenFriendReviews }}
-                  liveTabs={liveTabs}
-                  isTourHubActive={isTourHubRoute}
-                />
+                {navigationTabs.map((tab) => {
+                  const isActive = activeTab === tab.id;
+                  const isLive = tab.id === 'tourhub' && isTourHubLive;
+                  const Icon = tab.icon;
+                  const badgeCount = badges[tab.id] ?? 0;
+                  const displayLabel = isLive ? 'Live' : tab.label;
+                  const activeColor = isLive ? '#22C55E' : tokens.ink;
+                  const inactiveColor = tokens.dim;
 
-              </div>
-            </motion.div>
-          </div>
+                  return (
+                    <li key={tab.id} style={{ flex: 1, display: 'flex', justifyContent: 'center' }}>
+                      <button
+                        type="button"
+                        aria-label={tab.label}
+                        aria-current={isActive ? 'page' : undefined}
+                        onClick={(e) => {
+                          e.preventDefault();
+                          e.stopPropagation();
+                          handleTabClickWithCamera(tab);
+                        }}
+                        onMouseEnter={() => tab.path && handleNavPrefetch(tab.path)}
+                        onTouchStart={() => tab.path && handleNavPrefetch(tab.path)}
+                        style={{
+                          appearance: 'none',
+                          border: 0,
+                          background: isActive ? tokens.lozenge : 'transparent',
+                          color: isActive ? activeColor : inactiveColor,
+                          padding: isActive ? lozengePad : (condensed ? '8px 10px' : '9px 12px'),
+                          borderRadius: 999,
+                          display: 'inline-flex',
+                          flexDirection: 'column',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          gap: 2,
+                          minHeight: 44,
+                          fontFamily: 'inherit',
+                          cursor: 'pointer',
+                          transition: REDUCED_MOTION
+                            ? 'none'
+                            : 'background 180ms linear, color 180ms linear, padding 220ms cubic-bezier(0.2,0.8,0.2,1)',
+                        }}
+                      >
+                        <span style={{ position: 'relative', display: 'inline-flex' }}>
+                          <Icon
+                            style={{
+                              width: iconSize,
+                              height: iconSize,
+                              strokeWidth: 1.75,
+                              transition: REDUCED_MOTION ? 'none' : 'width 220ms cubic-bezier(0.2,0.8,0.2,1), height 220ms cubic-bezier(0.2,0.8,0.2,1)',
+                            }}
+                          />
+                          {badgeCount > 0 && (
+                            <span
+                              aria-hidden="true"
+                              style={{
+                                position: 'absolute',
+                                top: -4,
+                                right: -8,
+                                minWidth: 15,
+                                height: 15,
+                                padding: '0 4px',
+                                borderRadius: 999,
+                                background: '#F7931E',
+                                color: '#15171F',
+                                fontSize: 9,
+                                fontWeight: 800,
+                                lineHeight: '15px',
+                                textAlign: 'center',
+                                boxShadow: theme === 'dark' ? '0 0 0 1.5px rgba(27,30,39,0.9)' : '0 0 0 1.5px rgba(250,251,253,0.9)',
+                              }}
+                            >
+                              {badgeCount > 99 ? '99+' : badgeCount}
+                            </span>
+                          )}
+                        </span>
+                        {/* Label row — collapses in condensed state. Kept in
+                            the DOM (visually hidden) for screen readers. */}
+                        <span
+                          style={{
+                            display: 'block',
+                            overflow: 'hidden',
+                            height: condensed ? 0 : 14,
+                            opacity: condensed ? 0 : 1,
+                            transition: LABEL_TRANSITION,
+                          }}
+                        >
+                          <span
+                            style={{
+                              display: 'inline-block',
+                              fontSize: 10,
+                              lineHeight: '14px',
+                              fontWeight: 700,
+                              letterSpacing: 0.1,
+                              color: isActive ? activeColor : inactiveColor,
+                              whiteSpace: 'nowrap',
+                            }}
+                          >
+                            {displayLabel}
+                          </span>
+                        </span>
+                      </button>
+                    </li>
+                  );
+                })}
+              </ul>
+            </div>
+          </motion.div>
         )}
       </AnimatePresence>
     </>
