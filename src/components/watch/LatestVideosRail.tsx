@@ -22,12 +22,12 @@ export default function LatestVideosRail() {
   const navigate = useNavigate();
   const { user } = useSupabaseSession();
   const userId = user?.id;
-  const railRef = useRef<HTMLDivElement>(null);
   const heroRef = useRef<HTMLDivElement>(null);
 
   const { posts, isLoading, hasResolved } = useVideosFeed({ userId, filter: 'latest' });
 
-  const activeIdx = useWatchAutoplay(railRef, { railId: 'latest-videos' });
+  const { activeIdx, railRef } = useWatchAutoplay({ railId: 'latest-videos' });
+
 
   const { settled: firstVisibleDecoded, onDecoded } = useFirstVisibleDecoded(posts.length, VISIBLE_COUNT);
   const isEmpty = hasResolved && posts.length === 0;
