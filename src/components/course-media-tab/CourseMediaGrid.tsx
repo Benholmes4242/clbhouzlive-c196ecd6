@@ -107,13 +107,33 @@ export const CourseMediaGrid = forwardRef<HTMLDivElement, CourseMediaGridProps>(
   // Single open-fullscreen entrypoint — flattens to one-media-per-slide
   // and opens the fullscreen viewer in read-only (gallery) mode with the
   // current pagination callbacks.
-  const handleOpenFullscreen = useCallback((postsToOpen: FeedPost[], index: number) => {
+  // Single open-fullscreen entrypoint — flattens to one-media-per-slide
+  // and routes through openWithOrigin so course media gets the FLIP expand +
+  // resume-at-position (via the tile's rail lane owner key).
+  const handleOpenFullscreen = useCallback((
+    postsToOpen: FeedPost[],
+    index: number,
+    ctx: {
+      originEl: HTMLElement | null;
+      railOwnerKey: string | null;
+      posterUrl: string | null;
+      handOffUrls: (string | null | undefined)[];
+    },
+  ) => {
     const { flat, offsetsByParent } = flattenPostsToMedia(postsToOpen);
-    useFullscreenFeedStore.getState().open(flat, flatIndexFor(offsetsByParent, index, 0), {
-      readOnly: true,
-      hasNextPage: hasNextPage ?? false,
-      fetchNextPage: hasNextPage ? () => fetchNextPage() : undefined,
-      isFetchingNextPage: isFetchingNextPage ?? false,
+    openWithOrigin({
+      posts: flat,
+      index: flatIndexFor(offsetsByParent, index, 0),
+      originEl: ctx.originEl,
+      posterUrl: ctx.posterUrl,
+      handOffUrls: ctx.handOffUrls,
+      railOwnerKey: ctx.railOwnerKey,
+      options: {
+        readOnly: true,
+        hasNextPage: hasNextPage ?? false,
+        fetchNextPage: hasNextPage ? () => fetchNextPage() : undefined,
+        isFetchingNextPage: isFetchingNextPage ?? false,
+      },
     });
   }, [hasNextPage, fetchNextPage, isFetchingNextPage]);
 
