@@ -1,6 +1,6 @@
 import React from 'react';
 import {
-  SC_BIRDIE, SC_DOUBLE, SC_BIRDIE_DARK, SC_DOUBLE_DARK,
+  SC_BIRDIE, SC_BOGEY, SC_DOUBLE, SC_BIRDIE_DARK, SC_BOGEY_DARK, SC_DOUBLE_DARK,
 } from '@/features/courses/components/holes/_constants';
 import type { ScorecardTheme } from './scorecardTheme';
 
@@ -39,7 +39,11 @@ export const TrajectoryLine: React.FC<Props> = ({
   const pts = plottable.map((h, i) => {
     cum += (h.strokes as number) - (h.par as number);
     const d = (h.strokes as number) - (h.par as number);
-    return { i, cum, birdie: d < 0, damage: d >= 2 };
+    return {
+      i,
+      cum,
+      kind: d < 0 ? 'under' : d === 1 ? 'bogey' : d >= 2 ? 'double' : null,
+    };
   });
   const maxAbs = Math.max(...pts.map((p) => Math.abs(p.cum)), 1);
   const n = plottable.length;
@@ -56,8 +60,9 @@ export const TrajectoryLine: React.FC<Props> = ({
 
   const final = pts[pts.length - 1].cum;
   const lineColor = final < 0 ? theme.under : final > 0 ? theme.over : theme.dim;
-  const birdieTok = surface === 'dark' ? SC_BIRDIE_DARK : SC_BIRDIE;
-  const damageTok = surface === 'dark' ? SC_DOUBLE_DARK : SC_DOUBLE;
+  const underTok  = surface === 'dark' ? SC_BIRDIE_DARK : SC_BIRDIE;
+  const bogeyTok  = surface === 'dark' ? SC_BOGEY_DARK  : SC_BOGEY;
+  const doubleTok = surface === 'dark' ? SC_DOUBLE_DARK : SC_DOUBLE;
   const finalLabel = final === 0 ? 'E' : final > 0 ? `+${final}` : `\u2212${Math.abs(final)}`;
   const nineIdx = plottable.findIndex((h) => h.holeNo > 9);
 
@@ -74,12 +79,17 @@ export const TrajectoryLine: React.FC<Props> = ({
       <path d={path} fill="none" stroke={lineColor} strokeWidth="2"
         strokeLinejoin="round" strokeLinecap="round" />
       {pts.map((p) =>
-        p.birdie ? (
+        p.kind === 'under' ? (
           <circle key={p.i} cx={x(p.i)} cy={y(p.cum)} r="3.4"
-            fill={theme.bg} stroke={birdieTok} strokeWidth="1.8" />
-        ) : p.damage ? (
+            fill={theme.bg} stroke={underTok} strokeWidth="1.8" />
+        ) : p.kind === 'bogey' ? (
+          <rect key={p.i} x={x(p.i) - 2.3} y={y(p.cum) - 2.3} width="4.6"
+            height="4.6" rx="1.2" fill={theme.bg} stroke={bogeyTok}
+            strokeWidth="1.5" />
+        ) : p.kind === 'double' ? (
           <rect key={p.i} x={x(p.i) - 2.8} y={y(p.cum) - 2.8} width="5.6"
-            height="5.6" rx="1.4" fill={theme.bg} stroke={damageTok} strokeWidth="1.6" />
+            height="5.6" rx="1.4" fill={theme.bg} stroke={doubleTok}
+            strokeWidth="1.6" />
         ) : null,
       )}
       <text x={w - padX} y={y(final) + (final >= 0 ? -7 : 14)} fill={lineColor}
