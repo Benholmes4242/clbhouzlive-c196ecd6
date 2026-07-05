@@ -505,6 +505,7 @@ export function SnapFeed({
             activeIndexOverride={activeIndexOverride}
             isFullscreen={isFullscreen}
             mediaIndex={idx === (startIndex ?? 0) ? openingMediaIndex : 0}
+            mediaId={idx === (startIndex ?? 0) ? openingMediaId : null}
           />
         );
       })}
