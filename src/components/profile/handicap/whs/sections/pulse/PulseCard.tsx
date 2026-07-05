@@ -72,9 +72,16 @@ export const PulseCard: React.FC<Props> = ({ friend }) => {
     : isDown
       ? 'var(--hcp-good, #10B981)'
       : 'var(--hcp-t-40)';
-  const lineColor = isDown
+  // Colour describes the visible line. When delta90 is null (thin
+  // history) fall back to the series' own direction so a rising line
+  // is never neutral grey.
+  const s = friend.hcp_series;
+  const seriesMove = s.length >= 2 ? s[s.length - 1] - s[0] : 0;
+  const lineUp = friend.delta90 != null ? isUp : seriesMove >= 0.3;
+  const lineDown = friend.delta90 != null ? isDown : seriesMove <= -0.3;
+  const lineColor = lineDown
     ? 'var(--hcp-good, #10B981)'
-    : isUp
+    : lineUp
       ? 'var(--hcp-bad, #EF4444)'
       : 'var(--hcp-t-60)';
   const lastPlayedLabel = relativeDay(friend.last_played);
