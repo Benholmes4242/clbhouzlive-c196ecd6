@@ -498,6 +498,7 @@ export function SnapFeed({
             onZoomChange={handleZoomChange}
             activeIndexOverride={activeIndexOverride}
             isFullscreen={isFullscreen}
+            mediaIndex={idx === (startIndex ?? 0) ? openingMediaIndex : 0}
           />
         );
       })}
