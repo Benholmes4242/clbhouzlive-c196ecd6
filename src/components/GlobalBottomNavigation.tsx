@@ -312,28 +312,25 @@ const GlobalBottomNavigation: React.FC<GlobalBottomNavigationProps> = ({ chromeS
                           border: 0,
                           background: isActive ? tokens.lozenge : 'transparent',
                           color: isActive ? activeColor : inactiveColor,
-                          padding: isActive ? lozengePad : (condensed ? '8px 10px' : '9px 12px'),
+                          padding: isActive ? lozengePad : inactivePad,
                           borderRadius: 999,
                           display: 'inline-flex',
-                          flexDirection: 'column',
                           alignItems: 'center',
                           justifyContent: 'center',
-                          gap: 2,
                           minHeight: 44,
                           fontFamily: 'inherit',
                           cursor: 'pointer',
-                          transition: REDUCED_MOTION
-                            ? 'none'
-                            : 'background 180ms linear, color 180ms linear, padding 220ms cubic-bezier(0.2,0.8,0.2,1)',
+                          transition: BUTTON_TRANSITION,
                         }}
                       >
                         <span style={{ position: 'relative', display: 'inline-flex' }}>
                           <Icon
+                            aria-hidden="true"
                             style={{
                               width: iconSize,
                               height: iconSize,
-                              strokeWidth: 1.75,
-                              transition: REDUCED_MOTION ? 'none' : 'width 220ms cubic-bezier(0.2,0.8,0.2,1), height 220ms cubic-bezier(0.2,0.8,0.2,1)',
+                              strokeWidth: iconStroke,
+                              transition: ICON_TRANSITION,
                             }}
                           />
                           {badgeCount > 0 && (
@@ -360,30 +357,22 @@ const GlobalBottomNavigation: React.FC<GlobalBottomNavigationProps> = ({ chromeS
                             </span>
                           )}
                         </span>
-                        {/* Label row — collapses in condensed state. Kept in
-                            the DOM (visually hidden) for screen readers. */}
+                        {/* Visually-hidden text label — always in DOM for
+                            screen readers (clip-rect pattern). Icons-only UI. */}
                         <span
                           style={{
-                            display: 'block',
+                            position: 'absolute',
+                            width: 1,
+                            height: 1,
+                            padding: 0,
+                            margin: -1,
                             overflow: 'hidden',
-                            height: condensed ? 0 : 14,
-                            opacity: condensed ? 0 : 1,
-                            transition: LABEL_TRANSITION,
+                            clip: 'rect(0,0,0,0)',
+                            whiteSpace: 'nowrap',
+                            border: 0,
                           }}
                         >
-                          <span
-                            style={{
-                              display: 'inline-block',
-                              fontSize: 10,
-                              lineHeight: '14px',
-                              fontWeight: 700,
-                              letterSpacing: 0.1,
-                              color: isActive ? activeColor : inactiveColor,
-                              whiteSpace: 'nowrap',
-                            }}
-                          >
-                            {displayLabel}
-                          </span>
+                          {displayLabel}
                         </span>
                       </button>
                     </li>
