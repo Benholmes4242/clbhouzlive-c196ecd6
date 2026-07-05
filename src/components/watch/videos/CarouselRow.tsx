@@ -1,4 +1,4 @@
-import { useRef } from 'react';
+import { useCallback, useRef } from 'react';
 import type { FeedPost } from '@/components/media-system/types/media';
 import AutoplayVideoCard from './AutoplayVideoCard';
 import { useEdgeFades } from '@/components/watch/shared/useEdgeFades';
@@ -17,7 +17,12 @@ export default function CarouselRow({ items, allPosts, baseIndex, userId }: Caro
   const containerRef = useRef<HTMLDivElement>(null);
 
   // Engine-native activation: one hook, feed-model gates + hysteresis.
-  const activeIdx = useWatchAutoplay(scrollerRef, { railId: 'videos-carousel-row' });
+  const { activeIdx, railRef: autoplayRef } = useWatchAutoplay({ railId: 'videos-carousel-row' });
+  const setScrollerRef = useCallback((el: HTMLDivElement | null) => {
+    autoplayRef(el);
+    scrollerRef.current = el;
+  }, [autoplayRef]);
+
 
   if (items.length === 0) return null;
 
@@ -25,7 +30,8 @@ export default function CarouselRow({ items, allPosts, baseIndex, userId }: Caro
     <div ref={containerRef} className="hrail-edge-fade" style={{ position: 'relative' }}>
       <CarouselEdgeFadeBinding scrollerRef={scrollerRef} wrapperRef={containerRef} />
       <div
-        ref={scrollerRef}
+        ref={setScrollerRef}
+
         style={{
           display: 'flex',
           gap: 12,

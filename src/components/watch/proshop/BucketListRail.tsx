@@ -125,8 +125,8 @@ function BucketListRailInner() {
     </section>
   );
 
-  const railRef = useRef<HTMLDivElement>(null);
-  const activeIdx = useWatchAutoplay(railRef, { railId: 'bucket-list' });
+  const { activeIdx, railRef } = useWatchAutoplay({ railId: 'bucket-list' });
+
 
   if (!hasResolved || stillLoading) return skeleton;
   if (courses.length === 0 || orderedPosts.length === 0) return null;
