@@ -189,7 +189,7 @@ function VideosFullFeedInner({ userId, mood, searchQuery, onClearSearch, onReset
 
     if (useRhythm) {
       return (
-        <div style={{ padding: '12px 0 24px', display: 'flex', flexDirection: 'column', gap: 16 }}>
+        <div ref={feedRef} style={{ padding: '12px 0 24px', display: 'flex', flexDirection: 'column', gap: 16 }}>
           {segments.map((seg, sIdx) => {
             if (seg.kind === 'spotlight') {
               return (
@@ -209,14 +209,18 @@ function VideosFullFeedInner({ userId, mood, searchQuery, onClearSearch, onReset
                 key={`grid-${seg.startIndex}`}
                 style={{ display: 'flex', gap: 12, padding: '0 16px', alignItems: 'stretch' }}
               >
-                {seg.posts.map((post, i) => (
-                  <VideoGridCard
-                    key={post.id}
-                    post={post}
-                    index={seg.startIndex + i}
-                    allPosts={posts}
-                  />
-                ))}
+                {seg.posts.map((post, i) => {
+                  const postIdx = seg.startIndex + i;
+                  return (
+                    <VideoGridCard
+                      key={post.id}
+                      post={post}
+                      index={postIdx}
+                      allPosts={posts}
+                      active={activeGridIdx === postIdx}
+                    />
+                  );
+                })}
                 {seg.posts.length === 1 && <div style={{ flex: 1 }} />}
               </div>
             );
