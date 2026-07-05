@@ -1,5 +1,5 @@
 import { memo, useMemo, useRef } from 'react';
-import { useRailAutoplay } from '../shared/useRailAutoplay';
+import { useWatchAutoplay } from '@/video/useWatchAutoplay';
 import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
