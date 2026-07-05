@@ -115,7 +115,7 @@ export function useRailLane(opts: UseRailLaneOptions): UseRailLaneResult {
   useEffect(() => {
     if (!laneId) return;
     return VideoEngine.subscribe(laneId, (snap) => {
-      setReady(snap.readyState >= 2 && snap.state === 'playing');
+      setReady(snap.firstFrame === true);
     });
   }, [laneId]);
 
