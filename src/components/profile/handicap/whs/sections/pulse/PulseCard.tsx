@@ -215,8 +215,8 @@ export const PulseCard: React.FC<Props> = ({ friend }) => {
                       width: 7,
                       height: 7,
                       borderRadius: '50%',
-                      background: 'transparent',
-                      border: '1.5px solid rgba(239,68,68,0.55)',
+                      background: 'rgba(242,244,247,0.16)',
+                      border: 'none',
                       boxSizing: 'border-box',
                     }}
                   />
