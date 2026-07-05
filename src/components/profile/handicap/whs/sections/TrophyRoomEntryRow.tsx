@@ -70,8 +70,8 @@ const chipBaseStyle = (z: number, first: boolean): React.CSSProperties => ({
   alignItems: 'center',
   justifyContent: 'center',
   boxSizing: 'border-box',
-  // 2px bg-coloured outline creates clean separation ring between overlapping chips
-  outline: '2px solid var(--hcp-bg-1)',
+  // 2px bg-coloured ring creates clean separation between overlapping chips (box-shadow is radius-safe)
+  boxShadow: '0 0 0 2px var(--hcp-bg-1)',
 });
 
 const Medallion: React.FC<{ rarity: BadgeRarity; z: number; first: boolean }> = ({
