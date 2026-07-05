@@ -577,7 +577,7 @@ const PointsRing: React.FC<PointsRingProps> = ({
       })}
       <text
         x={RING_CX}
-        y={78}
+        y={RING_CY - 10}
         textAnchor="middle"
         style={{
           fontFamily: FONT,
@@ -591,7 +591,7 @@ const PointsRing: React.FC<PointsRingProps> = ({
       </text>
       <text
         x={RING_CX}
-        y={96}
+        y={RING_CY + 8}
         textAnchor="middle"
         style={{
           fontFamily: FONT,
@@ -606,7 +606,7 @@ const PointsRing: React.FC<PointsRingProps> = ({
       {delta !== null && delta !== 0 && (
         <text
           x={RING_CX}
-          y={114}
+          y={RING_CY + 26}
           textAnchor="middle"
           style={{
             fontFamily: FONT,
