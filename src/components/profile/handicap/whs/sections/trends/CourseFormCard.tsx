@@ -25,7 +25,7 @@ const T = {
   amberTint: 'rgba(247,147,30,0.10)',
   amberInk: '#854F0B',
   greenInk: 'var(--hcp-good-deep)',
-  redInk: 'var(--hcp-bad)',
+  slateInk: 'var(--hcp-t-60)',        // over handicap: quiet slate
   slateTint: 'var(--hcp-bg-2)',
   ink04: 'var(--hcp-bg-2)',
   ink08: 'var(--hcp-line-2)',
