@@ -693,7 +693,6 @@ export const UserListPage: React.FC<UserListPageProps> = ({
                 />
               ) : activeMode === 'followers' ? (
                 <EmptyState
-                  eyebrow="Empty list"
                   icon={<Users className="w-7 h-7" style={{ color: INK_SUBTLE }} />}
                   heading="No followers yet"
                   body={
@@ -707,7 +706,6 @@ export const UserListPage: React.FC<UserListPageProps> = ({
                 />
               ) : (
                 <EmptyState
-                  eyebrow="Empty list"
                   icon={<UserPlus className="w-7 h-7" style={{ color: INK_SUBTLE }} />}
                   heading="Not following anyone yet"
                   body={
