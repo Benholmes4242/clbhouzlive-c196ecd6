@@ -33,7 +33,7 @@ function timeAgoFrom(iso: string): string {
 
 export const LastRoundCard: React.FC<Props> = ({
   connectionId,
-  userId: _userId,
+  userId,
   viewMode = 'owner',
   ownerFirstName = null,
 }) => {
