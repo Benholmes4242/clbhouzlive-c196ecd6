@@ -1,7 +1,7 @@
 import React, { forwardRef, useCallback, useEffect, useMemo, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useFullscreenFeedStore } from '@/store/fullscreenFeedStore';
-import { flattenPostsToMedia, flatIndexFor } from '@/components/fullscreen-feed/flattenPostsToMedia';
+import { groupMultiMedia } from '@/components/media-system/utils/feedMapper';
 import { AlertCircle, Camera, Loader2, Film, ListChecks, Flag, Sunrise, Building2 } from 'lucide-react';
 import type { FeedPost } from '@/components/media-system/types/media';
 import { CourseMediaTile } from './CourseMediaTile';
