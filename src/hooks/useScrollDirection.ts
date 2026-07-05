@@ -152,22 +152,26 @@ export function useNavScrollState(): NavState {
   return useSyncExternalStore(subscribe, getSnapshot, getSnapshot);
 }
 
-// Auto-register the document scroller once (SSR-safe).
-// We attach to BOTH `window` and `document.body`, because our global CSS
-// sets `body { height: 100%; overflow-y: auto }` — in that configuration
-// body is the scrolling element and scroll events fire on body, not on
-// window. Registering both is harmless (each scroller tracks its own
-// scrollTop) and covers whichever element the UA picks.
-if (typeof window !== 'undefined') {
+// Auto-register document-level scrollers (SSR-safe).
+// Different layouts scroll different elements depending on CSS:
+//   - Some routes let `window` scroll (documentElement).
+//   - Global CSS sets `body { height: 100%; overflow-y: auto }` making
+//     body a scroll container.
+//   - Global CSS also fixes `#root` to `100dvh`, and on light routes
+//     `#root` itself is the actual scroller (its scrollHeight > clientHeight).
+// Registering all three is harmless — each tracks its own scrollTop, and
+// only the one the UA actually scrolls will emit events.
+function autoRegisterRoots() {
   registerNavScroller(window);
+  if (document.body) registerNavScroller(document.body);
+  const root = document.getElementById('root');
+  if (root) registerNavScroller(root);
+}
+
+if (typeof window !== 'undefined') {
   if (typeof document !== 'undefined' && document.body) {
-    registerNavScroller(document.body);
+    autoRegisterRoots();
   } else if (typeof document !== 'undefined') {
-    // body not yet available at module eval — defer.
-    document.addEventListener(
-      'DOMContentLoaded',
-      () => document.body && registerNavScroller(document.body),
-      { once: true },
-    );
+    document.addEventListener('DOMContentLoaded', autoRegisterRoots, { once: true });
   }
 }
