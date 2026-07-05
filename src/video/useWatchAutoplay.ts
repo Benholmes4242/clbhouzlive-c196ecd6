@@ -172,9 +172,10 @@ export function useWatchAutoplay(
       if (settleTimer.current) clearTimeout(settleTimer.current);
       ratiosRef.current.clear();
     };
-  }, [eligible, railRef]);
+  }, [eligible, root]);
 
-  return eligible ? activeIdx : null;
+  return { activeIdx: eligible ? activeIdx : null, railRef };
+
 }
 
 export default useWatchAutoplay;
