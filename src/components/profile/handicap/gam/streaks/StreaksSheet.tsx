@@ -46,7 +46,7 @@ const StreakGroupLabel: React.FC<{
       fontWeight: 800,
       letterSpacing: '0.14em',
       textTransform: 'uppercase',
-      color: 'var(--hcp-t-80)',
+      color: 'rgba(255,255,255,0.72)',
       fontFamily: FONT,
     }}
   >
@@ -54,7 +54,7 @@ const StreakGroupLabel: React.FC<{
     <span>{label}</span>
     <span
       style={{
-        color: 'var(--hcp-t-60)',
+        color: 'rgba(255,255,255,0.55)',
         fontWeight: 700,
         fontVariantNumeric: 'tabular-nums',
       }}
@@ -77,13 +77,13 @@ const PbTag: React.FC<{ state: PbState }> = ({ state }) => {
         borderRadius: 999,
         background: isNew
           ? 'linear-gradient(180deg, rgba(247,147,30,0.22), rgba(247,147,30,0.08))'
-          : 'var(--hcp-bg-2)',
+          : '#20242E',
         border: isNew
           ? '1px solid rgba(247,147,30,0.42)'
-          : '1px solid var(--hcp-line)',
+          : '1px solid rgba(255,255,255,0.06)',
         fontSize: 9,
         fontWeight: 800,
-        color: isNew ? GOLD : 'var(--hcp-t-80)',
+        color: isNew ? GOLD : 'rgba(255,255,255,0.72)',
         letterSpacing: '0.10em',
         textTransform: 'uppercase',
         fontFamily: FONT,
@@ -122,7 +122,7 @@ const StreakRowView: React.FC<{ type: StreakType; row: StreakRow | null }> = ({
         alignItems: 'flex-start',
         gap: 14,
         padding: '14px 16px',
-        borderBottom: '0.5px solid var(--hcp-hairline)',
+        borderBottom: '0.5px solid rgba(255,255,255,0.06)',
         fontFamily: FONT,
         background: isActive
           ? 'linear-gradient(90deg, rgba(247,147,30,0.06) 0%, rgba(247,147,30,0.01) 100%)'
@@ -136,17 +136,17 @@ const StreakRowView: React.FC<{ type: StreakType; row: StreakRow | null }> = ({
           borderRadius: 12,
           background: isActive
             ? 'linear-gradient(180deg, rgba(247,147,30,0.18) 0%, rgba(247,147,30,0.06) 100%)'
-            : 'linear-gradient(180deg, var(--hcp-bg-2), var(--hcp-bg-1))',
+            : 'linear-gradient(180deg, #20242E, #1B1E27)',
           border: isActive
             ? '1px solid rgba(247,147,30,0.32)'
-            : '1px solid var(--hcp-line)',
+            : '1px solid rgba(255,255,255,0.06)',
           boxShadow: 'inset 0 1px 1px rgba(0,0,0,0.30)',
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
           flexShrink: 0,
           position: 'relative',
-          color: isActive ? GOLD : 'var(--hcp-t-80)',
+          color: isActive ? GOLD : 'rgba(255,255,255,0.72)',
         }}
       >
         <Icon size={17} strokeWidth={2.0} aria-hidden />
@@ -162,7 +162,7 @@ const StreakRowView: React.FC<{ type: StreakType; row: StreakRow | null }> = ({
               height: 16,
               borderRadius: '50%',
               background: '#DBEAFE',
-              border: '2px solid var(--hcp-bg-0)',
+              border: '2px solid #15171F',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
@@ -178,7 +178,7 @@ const StreakRowView: React.FC<{ type: StreakType; row: StreakRow | null }> = ({
           style={{
             fontSize: 14,
             fontWeight: 700,
-            color: 'var(--hcp-t-100)',
+            color: 'rgba(255,255,255,0.96)',
             letterSpacing: '-0.01em',
             lineHeight: 1.3,
           }}
@@ -189,7 +189,7 @@ const StreakRowView: React.FC<{ type: StreakType; row: StreakRow | null }> = ({
           style={{
             marginTop: 4,
             fontSize: 12,
-            color: 'var(--hcp-t-60)',
+            color: 'rgba(255,255,255,0.55)',
             lineHeight: 1.4,
           }}
         >
@@ -200,7 +200,7 @@ const StreakRowView: React.FC<{ type: StreakType; row: StreakRow | null }> = ({
             style={{
               marginTop: 6,
               fontSize: 10.5,
-              color: 'var(--hcp-t-40)',
+              color: 'rgba(255,255,255,0.38)',
               fontWeight: 600,
               letterSpacing: '0.04em',
               textTransform: 'uppercase',
@@ -225,7 +225,7 @@ const StreakRowView: React.FC<{ type: StreakType; row: StreakRow | null }> = ({
             style={{
               fontSize: 26,
               fontWeight: 200,
-              color: isActive ? GOLD : 'var(--hcp-t-100)',
+              color: isActive ? GOLD : 'rgba(255,255,255,0.96)',
               lineHeight: 0.95,
               letterSpacing: '-0.04em',
               fontVariantNumeric: 'tabular-nums',
@@ -236,7 +236,7 @@ const StreakRowView: React.FC<{ type: StreakType; row: StreakRow | null }> = ({
           <span
             style={{
               fontSize: 10,
-              color: 'var(--hcp-t-60)',
+              color: 'rgba(255,255,255,0.55)',
               fontWeight: 600,
               letterSpacing: '0.04em',
               textTransform: 'uppercase',
@@ -252,7 +252,7 @@ const StreakRowView: React.FC<{ type: StreakType; row: StreakRow | null }> = ({
             style={{
               fontSize: 10,
               fontWeight: 700,
-              color: 'var(--hcp-t-60)',
+              color: 'rgba(255,255,255,0.55)',
               letterSpacing: '0.10em',
               fontVariantNumeric: 'tabular-nums',
               textTransform: 'uppercase',
@@ -273,7 +273,7 @@ const Eyebrow: React.FC = () => (
       fontWeight: 800,
       letterSpacing: '0.14em',
       textTransform: 'uppercase',
-      color: 'var(--hcp-t-60)',
+      color: 'rgba(255,255,255,0.55)',
     }}
   >
     STREAKS
@@ -320,7 +320,7 @@ export const StreaksSheet: React.FC<StreaksSheetProps> = ({ open, onClose }) => 
             width: 36,
             height: 4,
             borderRadius: 99,
-            background: 'var(--hcp-line-2, var(--hcp-line))',
+            background: 'rgba(255,255,255,0.10)',
           }}
         />
       </div>
@@ -328,20 +328,20 @@ export const StreaksSheet: React.FC<StreaksSheetProps> = ({ open, onClose }) => 
       <div
         style={{
           padding: '12px 20px 10px',
-          borderBottom: '0.5px solid var(--hcp-line)',
+          borderBottom: '0.5px solid rgba(255,255,255,0.06)',
           flexShrink: 0,
           fontFamily: FONT,
         }}
       >
         <Eyebrow />
         {/* canonical amber cut-line */}
-        <div style={{ width: 34, height: 3, borderRadius: 99, background: 'var(--hcp-amber)', marginTop: 9 }} />
+        <div style={{ width: 34, height: 3, borderRadius: 99, background: '#F7931E', marginTop: 9 }} />
         <div
           style={{
             fontSize: 34,
             fontWeight: 200,
             letterSpacing: '-0.045em',
-            color: 'var(--hcp-t-100)',
+            color: 'rgba(255,255,255,0.96)',
             marginTop: 4,
             lineHeight: 0.95,
             fontVariantNumeric: 'tabular-nums',
@@ -352,7 +352,7 @@ export const StreaksSheet: React.FC<StreaksSheetProps> = ({ open, onClose }) => 
         <div
           style={{
             fontSize: 12,
-            color: 'var(--hcp-t-60)',
+            color: 'rgba(255,255,255,0.55)',
             marginTop: 4,
             fontVariantNumeric: 'tabular-nums',
           }}
@@ -412,7 +412,7 @@ export const StreaksSheet: React.FC<StreaksSheetProps> = ({ open, onClose }) => 
             }}
           >
             <Snowflake size={16} color="#60A5FA" />
-            <div style={{ fontSize: 12, color: 'var(--hcp-t-100)', lineHeight: 1.4 }}>
+            <div style={{ fontSize: 12, color: 'rgba(255,255,255,0.96)', lineHeight: 1.4 }}>
               <strong>
                 {totalFreezes} Streak Freeze{totalFreezes === 1 ? '' : 's'} available
               </strong>{' '}

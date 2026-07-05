@@ -9,11 +9,11 @@ import { fmtDiff } from '@/lib/whs/format';
  * explain WHS mechanics; do not friend-prefix or change to third-person.
  */
 
-const INK = 'var(--hcp-t-100)';
-const INK_70 = 'var(--hcp-t-80)';
-const INK_55 = 'var(--hcp-t-60)';
-const INK_10 = 'var(--hcp-line-2)';
-const INK_06 = 'var(--hcp-bg-3)';
+const INK = 'rgba(255,255,255,0.96)';
+const INK_70 = 'rgba(255,255,255,0.72)';
+const INK_55 = 'rgba(255,255,255,0.55)';
+const INK_10 = 'rgba(255,255,255,0.10)';
+const INK_06 = '#272C37';
 const AMBER_DEEP = '#C97211';
 const GREEN = '#059669';
 const RED = '#9F1D1D';
@@ -42,10 +42,10 @@ const ExplainerBlock: React.FC<BlockProps> = ({ eyebrow, eyebrowColor, title, bo
     }}>
       {eyebrow}
     </div>
-    <div style={{ fontSize: 14, fontWeight: 700, color: 'var(--hcp-t-100)', marginBottom: 6 }}>
+    <div style={{ fontSize: 14, fontWeight: 700, color: 'rgba(255,255,255,0.96)', marginBottom: 6 }}>
       {title}
     </div>
-    <div style={{ fontSize: 13, color: 'var(--hcp-t-80)', lineHeight: 1.5 }}>
+    <div style={{ fontSize: 13, color: 'rgba(255,255,255,0.72)', lineHeight: 1.5 }}>
       {body}
     </div>
   </div>
@@ -77,7 +77,7 @@ const HandicapExplainerSheet: React.FC<Props> = ({
       <div
         onClick={onClose}
         style={{
-          position: 'fixed', inset: 0, background: 'var(--hcp-t-40)',
+          position: 'fixed', inset: 0, background: 'rgba(255,255,255,0.38)',
           zIndex: 9998, animation: 'fadeIn 200ms ease',
         }}
       />
@@ -87,7 +87,7 @@ const HandicapExplainerSheet: React.FC<Props> = ({
         style={{
           position: 'fixed', left: 0, right: 0, bottom: 0,
           margin: '0 auto', width: '100%', maxWidth: 420,
-          background: 'var(--hcp-bg-1)',
+          background: '#1B1E27',
           borderRadius: '20px 20px 0 0',
           padding: '20px 0 32px',
           zIndex: 9999,
@@ -136,7 +136,7 @@ const HandicapExplainerSheet: React.FC<Props> = ({
             body={
               <>
                 Your handicap index is the average of those 8 lowest differentials. Right now that's{' '}
-                <strong style={{ color: 'var(--hcp-t-100)', fontWeight: 700 }}>
+                <strong style={{ color: 'rgba(255,255,255,0.96)', fontWeight: 700 }}>
                   {currentHandicap.toFixed(1)}
                 </strong>.
               </>
@@ -167,7 +167,7 @@ const HandicapExplainerSheet: React.FC<Props> = ({
                       {fmtDiff(cutTarget, { plus: true })}
                     </strong>{' '}
                     and your handicap drops. If you don't, it settles at{' '}
-                    <strong style={{ color: 'var(--hcp-t-100)', fontWeight: 700 }}>
+                    <strong style={{ color: 'rgba(255,255,255,0.96)', fontWeight: 700 }}>
                       {fmtDiff(settleAt, { plus: true })}
                     </strong>{' '}
                     — close to where it is now. No risk of going up this round.

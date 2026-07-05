@@ -53,8 +53,8 @@ export const GamCard: React.FC<{
       onTouchEnd={onClick ? () => setPressed(false) : undefined}
       onTouchCancel={onClick ? () => setPressed(false) : undefined}
       style={{
-        background: 'var(--hcp-bg-1)',
-        border: emphasized ? '1px solid var(--hcp-line-2)' : '1px solid var(--hcp-line)',
+        background: '#1B1E27',
+        border: emphasized ? '1px solid rgba(255,255,255,0.10)' : '1px solid rgba(255,255,255,0.06)',
         borderRadius: 12,
         padding: noPad ? 0 : 16,
         cursor: onClick ? 'pointer' : 'default',
@@ -83,7 +83,7 @@ export const Skeleton: React.FC<{ height: number | string; width?: number | stri
       height,
       width,
       borderRadius: radius,
-      background: 'var(--hcp-line)',
+      background: 'rgba(255,255,255,0.06)',
       animation: 'gamPulse 1.6s ease-in-out infinite',
     }}
   />
@@ -98,14 +98,14 @@ export const RetryStub: React.FC<{ message?: string; onRetry?: () => void }> = (
 }) => (
   <div
     style={{
-      background: 'var(--hcp-bg-1)',
-      border: '1px solid var(--hcp-line)',
+      background: '#1B1E27',
+      border: '1px solid rgba(255,255,255,0.06)',
       borderRadius: 12,
       padding: 16,
       textAlign: 'center',
     }}
   >
-    <div style={{ fontFamily: FONT, fontSize: 13, color: 'var(--hcp-t-60)', marginBottom: onRetry ? 10 : 0 }}>
+    <div style={{ fontFamily: FONT, fontSize: 13, color: 'rgba(255,255,255,0.55)', marginBottom: onRetry ? 10 : 0 }}>
       {message}
     </div>
     {onRetry && (
@@ -113,13 +113,13 @@ export const RetryStub: React.FC<{ message?: string; onRetry?: () => void }> = (
         onClick={onRetry}
         style={{
           background: 'transparent',
-          border: '1px solid var(--hcp-line)',
+          border: '1px solid rgba(255,255,255,0.06)',
           borderRadius: 8,
           padding: '6px 14px',
           fontFamily: FONT,
           fontSize: 12,
           fontWeight: 600,
-          color: 'var(--hcp-t-100)',
+          color: 'rgba(255,255,255,0.96)',
           cursor: 'pointer',
         }}
       >
@@ -140,19 +140,19 @@ export const EmptyStub: React.FC<{
 }> = ({ icon, title, body, cta }) => (
   <div
     style={{
-      background: 'var(--hcp-bg-1)',
-      border: '1px solid var(--hcp-line)',
+      background: '#1B1E27',
+      border: '1px solid rgba(255,255,255,0.06)',
       borderRadius: 12,
       padding: 28,
       textAlign: 'center',
     }}
   >
     {icon && <div style={{ marginBottom: 12, opacity: 0.5 }}>{icon}</div>}
-    <div style={{ fontFamily: FONT, fontSize: 15, fontWeight: 700, color: 'var(--hcp-t-100)', marginBottom: body ? 6 : 0 }}>
+    <div style={{ fontFamily: FONT, fontSize: 15, fontWeight: 700, color: 'rgba(255,255,255,0.96)', marginBottom: body ? 6 : 0 }}>
       {title}
     </div>
     {body && (
-      <div style={{ fontFamily: FONT, fontSize: 13, color: 'var(--hcp-t-60)', lineHeight: 1.4 }}>
+      <div style={{ fontFamily: FONT, fontSize: 13, color: 'rgba(255,255,255,0.55)', lineHeight: 1.4 }}>
         {body}
       </div>
     )}

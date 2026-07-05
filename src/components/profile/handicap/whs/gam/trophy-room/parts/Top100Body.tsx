@@ -53,7 +53,7 @@ export const Top100Body: React.FC<Props> = ({ item, ownerUserId, viewerUserId, o
 
   if (!slug) {
     return (
-      <div style={{ padding: '20px 20px', color: 'var(--hcp-t-60)', fontFamily: GAM.FONT_GEIST }}>
+      <div style={{ padding: '20px 20px', color: 'rgba(255,255,255,0.55)', fontFamily: GAM.FONT_GEIST }}>
         Unknown Top 100 list.
       </div>
     );
@@ -64,7 +64,7 @@ export const Top100Body: React.FC<Props> = ({ item, ownerUserId, viewerUserId, o
       style={{
         padding: '4px 0 24px',
         fontFamily: GAM.FONT_GEIST,
-        color: 'var(--hcp-t-100)',
+        color: 'rgba(255,255,255,0.96)',
       }}
     >
       <div style={{ padding: '14px 20px 12px' }}>
@@ -74,7 +74,7 @@ export const Top100Body: React.FC<Props> = ({ item, ownerUserId, viewerUserId, o
             fontWeight: 800,
             letterSpacing: '0.16em',
             textTransform: 'uppercase',
-            color: 'var(--hcp-t-100)',
+            color: 'rgba(255,255,255,0.96)',
             display: 'flex',
             alignItems: 'center',
             gap: 6,
@@ -88,7 +88,7 @@ export const Top100Body: React.FC<Props> = ({ item, ownerUserId, viewerUserId, o
             fontSize: 42,
             fontWeight: 200,
             letterSpacing: '-0.045em',
-            color: 'var(--hcp-t-100)',
+            color: 'rgba(255,255,255,0.96)',
             marginTop: 6,
             lineHeight: 0.95,
             ...GAM.TABULAR,
@@ -99,7 +99,7 @@ export const Top100Body: React.FC<Props> = ({ item, ownerUserId, viewerUserId, o
             style={{
               fontSize: 17,
               fontWeight: 600,
-              color: 'var(--hcp-t-60)',
+              color: 'rgba(255,255,255,0.55)',
               letterSpacing: '0.02em',
               marginLeft: 6,
             }}
@@ -111,12 +111,12 @@ export const Top100Body: React.FC<Props> = ({ item, ownerUserId, viewerUserId, o
           <div
             style={{
               fontSize: 12,
-              color: 'var(--hcp-t-60)',
+              color: 'rgba(255,255,255,0.55)',
               marginTop: 8,
               ...GAM.TABULAR,
             }}
           >
-            <span style={{ color: 'var(--hcp-t-100)', fontWeight: 700 }}>You</span> have played{' '}
+            <span style={{ color: 'rgba(255,255,255,0.96)', fontWeight: 700 }}>You</span> have played{' '}
             <span style={{ color: GAM.AMBER, fontWeight: 700 }}>{viewerPlayedCount}</span> of these
           </div>
         )}
@@ -127,7 +127,7 @@ export const Top100Body: React.FC<Props> = ({ item, ownerUserId, viewerUserId, o
           display: 'flex',
           gap: 4,
           padding: '10px 16px',
-          borderBottom: '0.5px solid var(--hcp-line)',
+          borderBottom: '0.5px solid rgba(255,255,255,0.06)',
           marginBottom: 8,
         }}
       >
@@ -145,7 +145,7 @@ export const Top100Body: React.FC<Props> = ({ item, ownerUserId, viewerUserId, o
                 background: 'transparent',
                 border: 'none',
                 borderBottom: active ? `2px solid ${GAM.AMBER}` : '2px solid transparent',
-                color: active ? 'var(--hcp-t-100)' : 'var(--hcp-t-60)',
+                color: active ? 'rgba(255,255,255,0.96)' : 'rgba(255,255,255,0.55)',
                 fontSize: 12,
                 fontWeight: active ? 800 : 600,
                 letterSpacing: '0.04em',
@@ -158,7 +158,7 @@ export const Top100Body: React.FC<Props> = ({ item, ownerUserId, viewerUserId, o
               }}
             >
               {key === 'played' ? 'Played' : 'Unplayed'}
-              <span style={{ ...GAM.TABULAR, fontWeight: 600, color: 'var(--hcp-t-60)' }}>
+              <span style={{ ...GAM.TABULAR, fontWeight: 600, color: 'rgba(255,255,255,0.55)' }}>
                 {count}
               </span>
             </button>
@@ -168,7 +168,7 @@ export const Top100Body: React.FC<Props> = ({ item, ownerUserId, viewerUserId, o
 
       <div style={{ padding: '0 8px' }}>
         {isLoading ? (
-          <div style={{ padding: '24px', textAlign: 'center', fontSize: 13, color: 'var(--hcp-t-60)' }}>
+          <div style={{ padding: '24px', textAlign: 'center', fontSize: 13, color: 'rgba(255,255,255,0.55)' }}>
             Loading courses…
           </div>
         ) : tab === 'played' ? (
@@ -206,7 +206,7 @@ export const Top100Body: React.FC<Props> = ({ item, ownerUserId, viewerUserId, o
 };
 
 const EmptyState: React.FC<{ message: string }> = ({ message }) => (
-  <div style={{ padding: '32px 20px', textAlign: 'center', fontSize: 13, color: 'var(--hcp-t-60)' }}>
+  <div style={{ padding: '32px 20px', textAlign: 'center', fontSize: 13, color: 'rgba(255,255,255,0.55)' }}>
     {message}
   </div>
 );

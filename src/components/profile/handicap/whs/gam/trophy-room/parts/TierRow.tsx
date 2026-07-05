@@ -28,7 +28,7 @@ export const TierRow: React.FC<Props> = ({ tier, metric, isShowpiece = false }) 
         alignItems: 'center',
         gap: 12,
         padding: '8px 0',
-        borderBottom: '0.5px solid var(--hcp-line)',
+        borderBottom: '0.5px solid rgba(255,255,255,0.06)',
         opacity: earned ? 1 : 0.55,
         fontFamily: GAM.FONT_GEIST,
       }}
@@ -38,8 +38,8 @@ export const TierRow: React.FC<Props> = ({ tier, metric, isShowpiece = false }) 
           width: 28,
           height: 28,
           borderRadius: 8,
-          background: earned ? earnedBg : 'var(--hcp-bg-2)',
-          color: earned ? earnedFg : 'var(--hcp-t-60)',
+          background: earned ? earnedBg : '#20242E',
+          color: earned ? earnedFg : 'rgba(255,255,255,0.55)',
           border: earned ? earnedBorder : 'none',
           display: 'flex',
           alignItems: 'center',
@@ -53,8 +53,8 @@ export const TierRow: React.FC<Props> = ({ tier, metric, isShowpiece = false }) 
         {earned ? <Check size={14} strokeWidth={2.8} /> : tier.tier}
       </div>
       <div style={{ flex: 1, minWidth: 0 }}>
-        <div style={{ fontSize: 13, fontWeight: 700, color: 'var(--hcp-t-100)' }}>{tier.name}</div>
-        <div style={{ fontSize: 10.5, color: 'var(--hcp-t-60)', marginTop: 1, ...GAM.TABULAR }}>
+        <div style={{ fontSize: 13, fontWeight: 700, color: 'rgba(255,255,255,0.96)' }}>{tier.name}</div>
+        <div style={{ fontSize: 10.5, color: 'rgba(255,255,255,0.55)', marginTop: 1, ...GAM.TABULAR }}>
           {tier.threshold}{metric ? ` ${metric.replace(/_/g, ' ')}` : ''}
         </div>
       </div>
@@ -64,7 +64,7 @@ export const TierRow: React.FC<Props> = ({ tier, metric, isShowpiece = false }) 
           fontWeight: 700,
           letterSpacing: '0.06em',
           textTransform: 'uppercase',
-          color: earned ? earnedFg : 'var(--hcp-t-40)',
+          color: earned ? earnedFg : 'rgba(255,255,255,0.38)',
         }}
       >
         {earned

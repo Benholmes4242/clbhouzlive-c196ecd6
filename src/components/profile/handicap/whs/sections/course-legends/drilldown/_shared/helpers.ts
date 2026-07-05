@@ -29,7 +29,7 @@ export const RANK_TIER = {
   gold: { color: '#FBBC2E', bg: 'rgba(251,188,46,0.14)', border: 'rgba(251,188,46,0.40)' },
   silver: { color: '#C0C0C0', bg: 'rgba(192,192,192,0.10)', border: 'rgba(192,192,192,0.30)' },
   bronze: { color: '#CD7F32', bg: 'rgba(205,127,50,0.10)', border: 'rgba(205,127,50,0.30)' },
-  neutral: { color: 'var(--hcp-t-60)', bg: 'rgba(255,255,255,0.04)', border: 'rgba(255,255,255,0.08)' },
+  neutral: { color: 'rgba(255,255,255,0.55)', bg: 'rgba(255,255,255,0.04)', border: 'rgba(255,255,255,0.08)' },
 };
 
 export function rankTier(rank: number) {

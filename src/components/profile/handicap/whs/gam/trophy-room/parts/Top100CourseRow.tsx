@@ -31,7 +31,7 @@ export const Top100CourseRow: React.FC<Props> = ({ row, isFriendView, onNavigate
         textAlign: 'left',
         cursor: 'pointer',
         fontFamily: GAM.FONT_GEIST,
-        color: 'var(--hcp-t-100)',
+        color: 'rgba(255,255,255,0.96)',
         opacity: played ? 1 : 0.65,
       }}
     >
@@ -43,16 +43,16 @@ export const Top100CourseRow: React.FC<Props> = ({ row, isFriendView, onNavigate
           borderRadius: 8,
           background: played
             ? 'linear-gradient(180deg, rgba(247,147,30,0.18), rgba(247,147,30,0.04))'
-            : 'var(--hcp-bg-2)',
+            : '#20242E',
           border: played
             ? '1px solid rgba(247,147,30,0.32)'
-            : '1px solid var(--hcp-line)',
+            : '1px solid rgba(255,255,255,0.06)',
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
           fontSize: 11,
           fontWeight: 800,
-          color: played ? '#FBBC2E' : 'var(--hcp-t-60)',
+          color: played ? '#FBBC2E' : 'rgba(255,255,255,0.55)',
           ...GAM.TABULAR,
         }}
       >
@@ -70,7 +70,7 @@ export const Top100CourseRow: React.FC<Props> = ({ row, isFriendView, onNavigate
             height: 44,
             borderRadius: 10,
             objectFit: 'cover',
-            background: 'var(--hcp-bg-2)',
+            background: '#20242E',
           }}
         />
       ) : (
@@ -80,11 +80,11 @@ export const Top100CourseRow: React.FC<Props> = ({ row, isFriendView, onNavigate
             width: 44,
             height: 44,
             borderRadius: 10,
-            background: 'var(--hcp-bg-2)',
+            background: '#20242E',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
-            color: 'var(--hcp-t-60)',
+            color: 'rgba(255,255,255,0.55)',
           }}
         >
           <MapPin size={18} strokeWidth={2} />
@@ -97,7 +97,7 @@ export const Top100CourseRow: React.FC<Props> = ({ row, isFriendView, onNavigate
             fontSize: 13,
             fontWeight: 700,
             lineHeight: 1.2,
-            color: 'var(--hcp-t-100)',
+            color: 'rgba(255,255,255,0.96)',
             overflow: 'hidden',
             textOverflow: 'ellipsis',
             whiteSpace: 'nowrap',
@@ -110,7 +110,7 @@ export const Top100CourseRow: React.FC<Props> = ({ row, isFriendView, onNavigate
           style={{
             marginTop: 2,
             fontSize: 11,
-            color: 'var(--hcp-t-60)',
+            color: 'rgba(255,255,255,0.55)',
             overflow: 'hidden',
             textOverflow: 'ellipsis',
             whiteSpace: 'nowrap',
@@ -147,7 +147,7 @@ export const Top100CourseRow: React.FC<Props> = ({ row, isFriendView, onNavigate
             flexShrink: 0,
             fontSize: 9,
             fontWeight: 800,
-            color: 'var(--hcp-t-60)',
+            color: 'rgba(255,255,255,0.55)',
             letterSpacing: '0.10em',
             textTransform: 'uppercase',
             marginLeft: 4,

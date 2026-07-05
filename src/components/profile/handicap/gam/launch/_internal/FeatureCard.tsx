@@ -18,8 +18,8 @@ export const FeatureCard: React.FC<FeatureCardProps> = ({ icon: Icon, title, des
       gap: 14,
       padding: '14px 16px',
       borderRadius: 12,
-      background: 'var(--hcp-bg-1)',
-      border: '1px solid var(--hcp-line)',
+      background: '#1B1E27',
+      border: '1px solid rgba(255,255,255,0.06)',
     }}
   >
     <div
@@ -57,7 +57,7 @@ export const FeatureCard: React.FC<FeatureCardProps> = ({ icon: Icon, title, des
           fontSize: 13,
           fontWeight: 500,
           lineHeight: 1.45,
-          color: 'var(--hcp-t-60)',
+          color: 'rgba(255,255,255,0.55)',
         }}
       >
         {description}

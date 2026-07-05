@@ -45,7 +45,7 @@ const RoundBtn: React.FC<{
       alignItems: 'center',
       justifyContent: 'center',
       cursor: onClick ? 'pointer' : 'default',
-      color: 'var(--hcp-t-100)',
+      color: 'rgba(255,255,255,0.96)',
       opacity: onClick ? 1 : 0.3,
       padding: 0,
     }}
@@ -75,7 +75,7 @@ export const DetailHero: React.FC<Props> = ({ item, index, total, onPrev, onNext
         background: palette.heroGradient,
         overflow: 'hidden',
         fontFamily: GAM.FONT_GEIST,
-        color: 'var(--hcp-t-100)',
+        color: 'rgba(255,255,255,0.96)',
       }}
     >
       {/* Watermark */}
@@ -119,7 +119,7 @@ export const DetailHero: React.FC<Props> = ({ item, index, total, onPrev, onNext
         <div
           style={{
             fontSize: 10,
-            color: 'var(--hcp-t-60)',
+            color: 'rgba(255,255,255,0.55)',
             letterSpacing: '0.08em',
             ...GAM.TABULAR,
           }}

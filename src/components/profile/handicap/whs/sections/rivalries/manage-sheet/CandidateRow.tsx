@@ -22,7 +22,7 @@ export const CandidateRow: React.FC<Props> = ({ candidate, onAdd, busy }) => (
       alignItems: 'center',
       gap: 12,
       padding: '10px 8px',
-      borderBottom: '0.5px solid var(--hcp-line-2)',
+      borderBottom: '0.5px solid rgba(255,255,255,0.10)',
       fontFamily: FONT,
     }}
   >
@@ -32,7 +32,7 @@ export const CandidateRow: React.FC<Props> = ({ candidate, onAdd, busy }) => (
         height: 38,
         borderRadius: '34%',
         overflow: 'hidden',
-        background: 'var(--hcp-bg-3)',
+        background: '#272C37',
         flexShrink: 0,
         display: 'flex',
         alignItems: 'center',
@@ -48,7 +48,7 @@ export const CandidateRow: React.FC<Props> = ({ candidate, onAdd, busy }) => (
             style={{ width: '100%', height: '100%', objectFit: 'cover' }}
           />
         ) : (
-          <span style={{ fontSize: 11, fontWeight: 800, color: 'var(--hcp-t-60)' }}>
+          <span style={{ fontSize: 11, fontWeight: 800, color: 'rgba(255,255,255,0.55)' }}>
             {initials(candidate.friend_name)}
           </span>
         );
@@ -60,7 +60,7 @@ export const CandidateRow: React.FC<Props> = ({ candidate, onAdd, busy }) => (
           margin: 0,
           fontSize: 14,
           fontWeight: 700,
-          color: 'var(--hcp-t-100)',
+          color: 'rgba(255,255,255,0.96)',
           whiteSpace: 'nowrap',
           overflow: 'hidden',
           textOverflow: 'ellipsis',
@@ -68,7 +68,7 @@ export const CandidateRow: React.FC<Props> = ({ candidate, onAdd, busy }) => (
       >
         {firstName(candidate.friend_name)}
       </p>
-      <p style={{ margin: 0, fontSize: 11, color: 'var(--hcp-t-60)', fontVariantNumeric: 'tabular-nums' }}>
+      <p style={{ margin: 0, fontSize: 11, color: 'rgba(255,255,255,0.55)', fontVariantNumeric: 'tabular-nums' }}>
         HCP {fmtHcp(candidate.friend_handicap_index)}
         {!candidate.is_clbhouz_user && (
           <span

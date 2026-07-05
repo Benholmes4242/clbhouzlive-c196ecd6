@@ -14,12 +14,12 @@ interface Props {
 
 const T = {
   pageBg: '#F8FAFC',
-  ink: 'var(--hcp-t-100)',
-  inkMute: 'var(--hcp-t-60)',
-  hairline: 'var(--hcp-line-2)',
+  ink: 'rgba(255,255,255,0.96)',
+  inkMute: 'rgba(255,255,255,0.55)',
+  hairline: 'rgba(255,255,255,0.10)',
   green: '#059669',
   greenTint: 'rgba(5,150,105,0.12)',
-  greyTint: 'var(--hcp-bg-2)',
+  greyTint: '#20242E',
 };
 const FONT_GEIST = 'Geist, system-ui, -apple-system, BlinkMacSystemFont, sans-serif';
 
@@ -50,7 +50,7 @@ const StatusBadge: React.FC<{ status: WhsInviteStatus['status'] }> = ({ status }
           padding: '3px 10px',
           borderRadius: 999,
           background: T.greyTint,
-          color: 'var(--hcp-t-60)',
+          color: 'rgba(255,255,255,0.55)',
           fontSize: 11,
           fontWeight: 800,
         }}
@@ -65,7 +65,7 @@ const StatusBadge: React.FC<{ status: WhsInviteStatus['status'] }> = ({ status }
         padding: '3px 10px',
         borderRadius: 999,
         background: T.greyTint,
-        color: 'var(--hcp-t-60)',
+        color: 'rgba(255,255,255,0.55)',
         fontSize: 11,
         fontWeight: 800,
       }}
@@ -89,7 +89,7 @@ export const SentInvitesSheet: React.FC<Props> = ({ open, onClose }) => {
           style={{
             position: 'fixed',
             inset: 0,
-            background: 'var(--hcp-t-40)',
+            background: 'rgba(255,255,255,0.38)',
             zIndex: 50,
           }}
         />
@@ -124,7 +124,7 @@ export const SentInvitesSheet: React.FC<Props> = ({ open, onClose }) => {
               width: 36,
               height: 4,
               borderRadius: 2,
-              background: 'var(--hcp-line-3)',
+              background: 'rgba(255,255,255,0.16)',
             }}
           />
 
@@ -156,7 +156,7 @@ export const SentInvitesSheet: React.FC<Props> = ({ open, onClose }) => {
                   style={{
                     height: 56,
                     margin: '0 20px 8px',
-                    background: 'var(--hcp-bg-2)',
+                    background: '#20242E',
                     borderRadius: 8,
                   }}
                 />
@@ -197,7 +197,7 @@ export const SentInvitesSheet: React.FC<Props> = ({ open, onClose }) => {
                       justifyContent: 'space-between',
                       gap: 12,
                       borderTop: idx === 0 ? 'none' : `1px solid ${T.hairline}`,
-                      background: 'var(--hcp-bg-1)',
+                      background: '#1B1E27',
                       border: 'none',
                       cursor: isPending ? 'pointer' : 'default',
                     }}

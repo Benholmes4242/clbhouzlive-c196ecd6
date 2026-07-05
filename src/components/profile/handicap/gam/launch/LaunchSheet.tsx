@@ -65,7 +65,7 @@ export const LaunchSheet: React.FC<LaunchSheetProps> = ({ open, payload, onDismi
             fontSize: 28,
             fontWeight: 700,
             lineHeight: 1.15,
-            color: 'var(--hcp-t-100)',
+            color: 'rgba(255,255,255,0.96)',
             textAlign: 'center',
             margin: 0,
             letterSpacing: '-0.01em',
@@ -81,7 +81,7 @@ export const LaunchSheet: React.FC<LaunchSheetProps> = ({ open, payload, onDismi
             fontSize: 14,
             fontWeight: 500,
             lineHeight: 1.5,
-            color: 'var(--hcp-t-80)',
+            color: 'rgba(255,255,255,0.72)',
             textAlign: 'center',
             margin: '12px 0 0',
           }}
@@ -94,7 +94,7 @@ export const LaunchSheet: React.FC<LaunchSheetProps> = ({ open, payload, onDismi
         <div
           style={{
             height: 1,
-            background: 'var(--hcp-line)',
+            background: 'rgba(255,255,255,0.06)',
             margin: '22px 0',
           }}
         />
@@ -124,7 +124,7 @@ export const LaunchSheet: React.FC<LaunchSheetProps> = ({ open, payload, onDismi
             <div
               style={{
                 height: 1,
-                background: 'var(--hcp-line)',
+                background: 'rgba(255,255,255,0.06)',
                 margin: '22px 0',
               }}
             />

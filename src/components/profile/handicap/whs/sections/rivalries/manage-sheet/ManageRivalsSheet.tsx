@@ -20,8 +20,8 @@ import { nextAvailableSlot } from './_shared/nextAvailableSlot';
 import type { FriendRivalryHydrated } from '@/lib/whs/types';
 
 const FONT = 'Geist, system-ui, -apple-system, sans-serif';
-const INK_MUTE = 'var(--hcp-t-60)';
-const HAIRLINE = 'var(--hcp-line-2)';
+const INK_MUTE = 'rgba(255,255,255,0.55)';
+const HAIRLINE = 'rgba(255,255,255,0.10)';
 
 interface Props {
   userId: string;
@@ -162,7 +162,7 @@ export const ManageRivalsSheet: React.FC<Props> = ({ userId, open, onClose }) =>
               right: 0,
               bottom: 0,
               zIndex: 81,
-              background: 'var(--hcp-bg-1)',
+              background: '#1B1E27',
               borderTopLeftRadius: 20,
               borderTopRightRadius: 20,
               height: '75dvh',
@@ -184,7 +184,7 @@ export const ManageRivalsSheet: React.FC<Props> = ({ userId, open, onClose }) =>
                 flexShrink: 0,
               }}
             >
-              <div style={{ width: 36, height: 4, borderRadius: 99, background: 'var(--hcp-line-2)' }} />
+              <div style={{ width: 36, height: 4, borderRadius: 99, background: 'rgba(255,255,255,0.10)' }} />
             </div>
 
             <SheetHeader
@@ -305,7 +305,7 @@ const SearchField: React.FC<{ value: string; onChange: (v: string) => void }> = 
       gap: 8,
       padding: '10px 12px',
       borderRadius: 10,
-      background: 'var(--hcp-bg-2)',
+      background: '#20242E',
       border: `1px solid ${HAIRLINE}`,
     }}
   >
@@ -320,7 +320,7 @@ const SearchField: React.FC<{ value: string; onChange: (v: string) => void }> = 
         outline: 'none',
         background: 'transparent',
         fontSize: 14,
-        color: 'var(--hcp-t-100)',
+        color: 'rgba(255,255,255,0.96)',
         fontFamily: 'inherit',
       }}
     />
