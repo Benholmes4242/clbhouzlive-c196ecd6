@@ -217,6 +217,7 @@ const WatchGrid: React.FC<WatchGridProps> = ({
             {col.map(({ post, index, ratio }) => (
               <div
                 key={post.id}
+                data-watch-tile-index={index}
                 style={{
                   position: 'relative',
                   width: '100%',
@@ -230,7 +231,9 @@ const WatchGrid: React.FC<WatchGridProps> = ({
                   index={index}
                   allPosts={posts}
                   onDecoded={index < COLS ? handleTileDecoded : undefined}
+                  isAutoplayActive={activeIdx === index}
                 />
+
 
               </div>
             ))}
