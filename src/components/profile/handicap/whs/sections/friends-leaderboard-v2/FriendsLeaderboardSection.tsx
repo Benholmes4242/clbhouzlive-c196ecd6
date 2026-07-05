@@ -12,6 +12,8 @@ import {
 } from '@/lib/whs/hooks';
 import { useHandicapPercentile } from '@/lib/whs/usePercentile';
 import { useOpenFriendSheet } from '@/components/friend-sheet/FriendSheetProvider';
+import { firstName } from '@/lib/whs/utils/initials';
+
 import { buildLeaderboardCohorts } from '@/lib/whs/utils/buildLeaderboardCohorts';
 import type { FriendLeaderboardEntry } from '@/lib/whs/types';
 
