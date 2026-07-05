@@ -86,7 +86,7 @@ export const FeedSlide = memo(function FeedSlide({
   // FeedSlide will render + the condition that selected it.
   if (isPerfEnabled() && (mediaId != null || isActive)) {
     const chosen = media?.[openIdx];
-    const multiCarousel = !!(media && media.length > 1 && openIdx === 0);
+    const multiCarousel = !isFullscreen && !!(media && media.length > 1 && openIdx === 0);
     const branch = multiCarousel
       ? 'carousel'
       : chosen?.type === 'video'
@@ -97,7 +97,7 @@ export const FeedSlide = memo(function FeedSlide({
           ? 'image'
           : 'text-fallback';
     const branchReason = multiCarousel
-      ? 'media.length>1 && openIdx===0'
+      ? '!isFullscreen && media.length>1 && openIdx===0'
       : chosen?.type === 'video'
         ? (isFullscreen && (chosen as any).hlsUrl
             ? 'video+isFullscreen+hlsUrl'
@@ -107,6 +107,7 @@ export const FeedSlide = memo(function FeedSlide({
         : chosen?.type === 'image'
           ? 'image'
           : 'no-media';
+
     vdiff('slide.mediaChoice', {
       layer: 'slide',
       postId: post.id,
