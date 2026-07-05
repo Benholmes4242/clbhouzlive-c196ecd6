@@ -29,7 +29,7 @@ export const GamSheet: React.FC<GamSheetProps> = ({ open, onClose, children }) =
     style={{
       display: 'flex',
       flexDirection: 'column',
-      background: 'var(--hcp-bg-0)',
+      background: '#15171F',
       height: '80dvh',
       maxHeight: '80dvh',
       minHeight: 0,

@@ -24,7 +24,7 @@ const StatLine: React.FC<StatLineProps> = ({ count, singular, plural }) => (
         fontFamily: FONT,
         fontSize: 14,
         fontWeight: 500,
-        color: 'var(--hcp-t-80)',
+        color: 'rgba(255,255,255,0.72)',
       }}
     >
       <span style={{ fontWeight: 700, fontVariantNumeric: 'tabular-nums' }}>{count}</span>{' '}
@@ -79,7 +79,7 @@ export const PersonalizationSection: React.FC<PersonalizationSectionProps> = ({
           fontSize: 13,
           fontWeight: 500,
           lineHeight: 1.5,
-          color: 'var(--hcp-t-60)',
+          color: 'rgba(255,255,255,0.55)',
           margin: 0,
         }}
       >

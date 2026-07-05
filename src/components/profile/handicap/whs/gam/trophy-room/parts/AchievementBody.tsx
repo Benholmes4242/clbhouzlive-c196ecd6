@@ -20,7 +20,7 @@ const Eyebrow: React.FC<{ children: React.ReactNode; color?: string }> = ({ chil
       fontWeight: 800,
       letterSpacing: '0.14em',
       textTransform: 'uppercase',
-      color: color ?? 'var(--hcp-t-60)',
+      color: color ?? 'rgba(255,255,255,0.55)',
       marginBottom: 8,
     }}
   >
@@ -39,7 +39,7 @@ export const AchievementBody: React.FC<Props> = ({ item, viewerUserId }) => {
       style={{
         padding: '16px 20px 18px',
         fontFamily: GAM.FONT_GEIST,
-        color: 'var(--hcp-t-100)',
+        color: 'rgba(255,255,255,0.96)',
         display: 'flex',
         flexDirection: 'column',
         gap: 16,
@@ -53,7 +53,7 @@ export const AchievementBody: React.FC<Props> = ({ item, viewerUserId }) => {
             letterSpacing: '-0.025em',
             lineHeight: 1.15,
             margin: 0,
-            color: 'var(--hcp-t-100)',
+            color: 'rgba(255,255,255,0.96)',
           }}
         >
           {item.name}
@@ -61,7 +61,7 @@ export const AchievementBody: React.FC<Props> = ({ item, viewerUserId }) => {
         <p
           style={{
             fontSize: 13.5,
-            color: 'var(--hcp-t-60)',
+            color: 'rgba(255,255,255,0.55)',
             lineHeight: 1.45,
             margin: '8px 0 0',
           }}
@@ -73,15 +73,15 @@ export const AchievementBody: React.FC<Props> = ({ item, viewerUserId }) => {
       {showProgress && next != null && nextTier && (
         <div
           style={{
-            background: 'var(--hcp-bg-1)',
-            border: '1px solid var(--hcp-line)',
+            background: '#1B1E27',
+            border: '1px solid rgba(255,255,255,0.06)',
             borderRadius: 12,
             padding: 14,
           }}
         >
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: 8 }}>
             <Eyebrow color={GAM.AMBER}>NEXT — {nextTier.name}</Eyebrow>
-            <div style={{ fontSize: 11, color: 'var(--hcp-t-80)', fontWeight: 700, ...GAM.TABULAR }}>
+            <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.72)', fontWeight: 700, ...GAM.TABULAR }}>
               {current} / {next}
             </div>
           </div>
@@ -89,7 +89,7 @@ export const AchievementBody: React.FC<Props> = ({ item, viewerUserId }) => {
             style={{
               height: 6,
               borderRadius: 3,
-              background: 'var(--hcp-bg-2)',
+              background: '#20242E',
               overflow: 'hidden',
             }}
           >
@@ -101,7 +101,7 @@ export const AchievementBody: React.FC<Props> = ({ item, viewerUserId }) => {
               }}
             />
           </div>
-          <div style={{ fontSize: 11, color: 'var(--hcp-t-60)', marginTop: 8 }}>
+          <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.55)', marginTop: 8 }}>
             <span style={{ color: GAM.AMBER, fontWeight: 800, ...GAM.TABULAR }}>{Math.max(0, next - current)}</span>{' '}
             to go
           </div>
@@ -150,15 +150,15 @@ const TierKey: React.FC = () => {
       style={{
         marginTop: 14,
         padding: '12px 14px',
-        background: 'var(--hcp-bg-1)',
-        border: '1px solid var(--hcp-line)',
+        background: '#1B1E27',
+        border: '1px solid rgba(255,255,255,0.06)',
         borderRadius: 12,
       }}
     >
       <div
         style={{
           fontSize: 11,
-          color: 'var(--hcp-t-60)',
+          color: 'rgba(255,255,255,0.55)',
           lineHeight: 1.45,
           marginBottom: 10,
         }}
@@ -190,7 +190,7 @@ const TierKey: React.FC = () => {
                 style={{
                   fontSize: 12.5,
                   fontWeight: 700,
-                  color: 'var(--hcp-t-100)',
+                  color: 'rgba(255,255,255,0.96)',
                   letterSpacing: '0.02em',
                   width: 72,
                   flexShrink: 0,
@@ -204,7 +204,7 @@ const TierKey: React.FC = () => {
                   flex: 1,
                   height: 4,
                   borderRadius: 2,
-                  background: 'var(--hcp-bg-2)',
+                  background: '#20242E',
                   overflow: 'hidden',
                 }}
               >
@@ -224,7 +224,7 @@ const TierKey: React.FC = () => {
                 style={{
                   fontSize: 10.5,
                   fontWeight: 700,
-                  color: 'var(--hcp-t-40)',
+                  color: 'rgba(255,255,255,0.38)',
                   letterSpacing: '0.06em',
                   flexShrink: 0,
                   ...GAM.TABULAR,

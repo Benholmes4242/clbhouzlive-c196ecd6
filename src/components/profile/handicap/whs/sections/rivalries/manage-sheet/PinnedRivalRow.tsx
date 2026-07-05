@@ -23,7 +23,7 @@ export const PinnedRivalRow: React.FC<Props> = ({ rivalry, onRemove, busy }) => 
       alignItems: 'center',
       gap: 12,
       padding: '10px 8px',
-      borderBottom: '0.5px solid var(--hcp-line-2)',
+      borderBottom: '0.5px solid rgba(255,255,255,0.10)',
       fontFamily: FONT,
     }}
   >
@@ -34,7 +34,7 @@ export const PinnedRivalRow: React.FC<Props> = ({ rivalry, onRemove, busy }) => 
           margin: 0,
           fontSize: 14,
           fontWeight: 700,
-          color: 'var(--hcp-t-100)',
+          color: 'rgba(255,255,255,0.96)',
           whiteSpace: 'nowrap',
           overflow: 'hidden',
           textOverflow: 'ellipsis',
@@ -53,7 +53,7 @@ export const PinnedRivalRow: React.FC<Props> = ({ rivalry, onRemove, busy }) => 
         <span
           style={{
             fontSize: 11,
-            color: 'var(--hcp-t-60)',
+            color: 'rgba(255,255,255,0.55)',
             fontVariantNumeric: 'tabular-nums',
           }}
         >
@@ -93,7 +93,7 @@ export const PinnedRivalRow: React.FC<Props> = ({ rivalry, onRemove, busy }) => 
         border: 'none',
         borderRadius: 8,
         cursor: busy ? 'wait' : 'pointer',
-        color: 'var(--hcp-bad)',
+        color: '#EF4444',
         opacity: busy ? 0.4 : 1,
       }}
     >
@@ -109,7 +109,7 @@ const Avatar: React.FC<{ url: string | null; name: string }> = ({ url, name }) =
       height: 34,
       borderRadius: '34%',
       overflow: 'hidden',
-      background: 'var(--hcp-bg-3)',
+      background: '#272C37',
       flexShrink: 0,
       display: 'flex',
       alignItems: 'center',
@@ -119,7 +119,7 @@ const Avatar: React.FC<{ url: string | null; name: string }> = ({ url, name }) =
     {url ? (
       <img src={url} alt={name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
     ) : (
-      <span style={{ fontSize: 11, fontWeight: 800, color: 'var(--hcp-t-60)' }}>
+      <span style={{ fontSize: 11, fontWeight: 800, color: 'rgba(255,255,255,0.55)' }}>
         {initials(name)}
       </span>
     )}

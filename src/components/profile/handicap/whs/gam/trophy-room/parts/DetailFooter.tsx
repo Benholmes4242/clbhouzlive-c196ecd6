@@ -32,8 +32,8 @@ export const DetailFooter: React.FC<Props> = ({ item, onShare, onOpenCourse }) =
       style={{
         flexShrink: 0,
         padding: '10px 16px 14px',
-        borderTop: '0.5px solid var(--hcp-line)',
-        background: 'var(--hcp-bg-0)',
+        borderTop: '0.5px solid rgba(255,255,255,0.06)',
+        background: '#15171F',
         display: 'flex',
         gap: 10,
       }}
@@ -53,8 +53,8 @@ export const DetailFooter: React.FC<Props> = ({ item, onShare, onOpenCourse }) =
           style={{
             ...baseBtn,
             background: 'transparent',
-            color: 'var(--hcp-t-100)',
-            border: '1px solid var(--hcp-line-2)',
+            color: 'rgba(255,255,255,0.96)',
+            border: '1px solid rgba(255,255,255,0.10)',
           }}
         >
           <MapPin size={16} />

@@ -31,7 +31,7 @@ const SectionHeader: React.FC<{ label: string; action?: { label: string; onClick
         fontWeight: 800,
         letterSpacing: '0.14em',
         textTransform: 'uppercase',
-        color: 'var(--hcp-t-60)',
+        color: 'rgba(255,255,255,0.55)',
       }}
     >
       {label}
@@ -63,11 +63,11 @@ const FriendInitial: React.FC<{ name: string; size?: number }> = ({ name, size =
       width: size,
       height: size,
       borderRadius: '34%',
-      background: 'var(--hcp-bg-3)',
+      background: '#272C37',
       display: 'flex',
       alignItems: 'center',
       justifyContent: 'center',
-      color: 'var(--hcp-t-80)',
+      color: 'rgba(255,255,255,0.72)',
       fontSize: size * 0.4,
       fontWeight: 700,
       flexShrink: 0,
@@ -89,7 +89,7 @@ const FriendAvatar: React.FC<{ name: string; url: string | null; size?: number }
         borderRadius: '34%',
         objectFit: 'cover',
         flexShrink: 0,
-        background: 'var(--hcp-bg-3)',
+        background: '#272C37',
       }}
       loading="lazy"
     />
@@ -136,13 +136,13 @@ const FriendRowAchievement: React.FC<{ name: string; url: string | null; earnedA
       alignItems: 'center',
       gap: 12,
       padding: '8px 0',
-      borderBottom: '0.5px solid var(--hcp-line)',
+      borderBottom: '0.5px solid rgba(255,255,255,0.06)',
     }}
   >
     <FriendAvatar name={name} url={url} />
     <div style={{ flex: 1, minWidth: 0 }}>
-      <div style={{ fontSize: 13, fontWeight: 700, color: 'var(--hcp-t-100)' }}>{name}</div>
-      <div style={{ fontSize: 10.5, color: 'var(--hcp-t-60)', ...GAM.TABULAR }}>{relativeTime(earnedAt)}</div>
+      <div style={{ fontSize: 13, fontWeight: 700, color: 'rgba(255,255,255,0.96)' }}>{name}</div>
+      <div style={{ fontSize: 10.5, color: 'rgba(255,255,255,0.55)', ...GAM.TABULAR }}>{relativeTime(earnedAt)}</div>
     </div>
     {tier != null && tier >= 1 && <TierBadge tier={tier} />}
   </div>
@@ -160,7 +160,7 @@ const FriendRowLegend: React.FC<{ name: string; url: string | null; rank: number
       alignItems: 'center',
       gap: 12,
       padding: '8px 0',
-      borderBottom: '0.5px solid var(--hcp-line)',
+      borderBottom: '0.5px solid rgba(255,255,255,0.06)',
     }}
   >
     <div
@@ -168,8 +168,8 @@ const FriendRowLegend: React.FC<{ name: string; url: string | null; rank: number
         width: 22,
         height: 22,
         borderRadius: 6,
-        background: 'var(--hcp-bg-2)',
-        color: 'var(--hcp-t-80)',
+        background: '#20242E',
+        color: 'rgba(255,255,255,0.72)',
         fontSize: 10,
         fontWeight: 800,
         display: 'flex',
@@ -183,9 +183,9 @@ const FriendRowLegend: React.FC<{ name: string; url: string | null; rank: number
     </div>
     <FriendAvatar name={name} url={url} size={28} />
     <div style={{ flex: 1, minWidth: 0 }}>
-      <div style={{ fontSize: 13, fontWeight: 700, color: 'var(--hcp-t-100)' }}>{name}</div>
+      <div style={{ fontSize: 13, fontWeight: 700, color: 'rgba(255,255,255,0.96)' }}>{name}</div>
     </div>
-    <div style={{ fontSize: 12, color: 'var(--hcp-t-80)', fontWeight: 700, ...GAM.TABULAR }}>{value}</div>
+    <div style={{ fontSize: 12, color: 'rgba(255,255,255,0.72)', fontWeight: 700, ...GAM.TABULAR }}>{value}</div>
   </div>
 );
 
@@ -196,7 +196,7 @@ const FriendsSkeleton: React.FC = () => (
         key={i}
         style={{
           height: 44,
-          background: 'var(--hcp-line)',
+          background: 'rgba(255,255,255,0.06)',
           borderRadius: 10,
           animation: 'gamPulse 1.6s ease-in-out infinite',
         }}
@@ -233,7 +233,7 @@ export const FriendsBlock: React.FC<Props> = ({ badgeId, legendCategory, legendC
       return (
         <div>
           <SectionHeader label="FRIENDS WHO EARNED IT" />
-          <div style={{ fontSize: 12, color: 'var(--hcp-t-60)', lineHeight: 1.5 }}>
+          <div style={{ fontSize: 12, color: 'rgba(255,255,255,0.55)', lineHeight: 1.5 }}>
             No friends have earned this yet — be the first to share.
           </div>
         </div>
@@ -264,7 +264,7 @@ export const FriendsBlock: React.FC<Props> = ({ badgeId, legendCategory, legendC
     return (
       <div>
         <SectionHeader label="YOUR CHASERS" />
-        <div style={{ fontSize: 12, color: 'var(--hcp-t-60)', lineHeight: 1.5 }}>
+        <div style={{ fontSize: 12, color: 'rgba(255,255,255,0.55)', lineHeight: 1.5 }}>
           No friends are ranked at this course yet.
         </div>
       </div>

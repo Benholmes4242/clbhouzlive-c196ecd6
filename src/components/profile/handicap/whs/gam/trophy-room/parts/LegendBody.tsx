@@ -39,7 +39,7 @@ const Eyebrow: React.FC<{ children: React.ReactNode; color?: string }> = ({ chil
       fontWeight: 800,
       letterSpacing: '0.14em',
       textTransform: 'uppercase',
-      color: color ?? 'var(--hcp-t-60)',
+      color: color ?? 'rgba(255,255,255,0.55)',
       marginBottom: 8,
     }}
   >
@@ -62,7 +62,7 @@ export const LegendBody: React.FC<Props> = ({ item, viewerUserId, onNavigateClos
       style={{
         padding: '20px 20px 24px',
         fontFamily: GAM.FONT_GEIST,
-        color: 'var(--hcp-t-100)',
+        color: 'rgba(255,255,255,0.96)',
         display: 'flex',
         flexDirection: 'column',
         gap: 20,
@@ -90,11 +90,11 @@ export const LegendBody: React.FC<Props> = ({ item, viewerUserId, onNavigateClos
             alignItems: 'center',
             gap: 6,
             padding: '6px 10px',
-            background: 'var(--hcp-bg-1)',
-            border: '1px solid var(--hcp-line)',
+            background: '#1B1E27',
+            border: '1px solid rgba(255,255,255,0.06)',
             borderRadius: 999,
             cursor: 'pointer',
-            color: 'var(--hcp-t-100)',
+            color: 'rgba(255,255,255,0.96)',
             fontSize: 12,
             fontWeight: 600,
             fontFamily: GAM.FONT_GEIST,
@@ -102,11 +102,11 @@ export const LegendBody: React.FC<Props> = ({ item, viewerUserId, onNavigateClos
         >
           <MapPin size={12} color={GAM.AMBER} />
           {item.courseName}
-          <ExternalLink size={10} color="var(--hcp-t-60)" />
+          <ExternalLink size={10} color="rgba(255,255,255,0.55)" />
         </button>
 
         {description && (
-          <p style={{ fontSize: 13.5, color: 'var(--hcp-t-60)', lineHeight: 1.45, margin: '12px 0 0' }}>
+          <p style={{ fontSize: 13.5, color: 'rgba(255,255,255,0.55)', lineHeight: 1.45, margin: '12px 0 0' }}>
             {description}
           </p>
         )}
@@ -128,7 +128,7 @@ export const LegendBody: React.FC<Props> = ({ item, viewerUserId, onNavigateClos
         <div style={{ fontSize: 32, fontWeight: 900, color: GAM.GOLD, letterSpacing: '-0.02em', ...GAM.TABULAR }}>
           {item.formattedValue}
         </div>
-        <div style={{ fontSize: 11.5, color: 'var(--hcp-t-60)', marginTop: 6 }}>
+        <div style={{ fontSize: 11.5, color: 'rgba(255,255,255,0.55)', marginTop: 6 }}>
           Held since {relativeTime(item.attainedAt)}
         </div>
       </div>
@@ -142,7 +142,7 @@ export const LegendBody: React.FC<Props> = ({ item, viewerUserId, onNavigateClos
       <div
         style={{
           fontSize: 10.5,
-          color: 'var(--hcp-t-60)',
+          color: 'rgba(255,255,255,0.55)',
           letterSpacing: '0.06em',
           textTransform: 'uppercase',
           fontWeight: 700,

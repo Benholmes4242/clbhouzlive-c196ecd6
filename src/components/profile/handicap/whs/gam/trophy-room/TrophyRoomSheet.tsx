@@ -117,7 +117,7 @@ const Eyebrow: React.FC<{ ownerFirstName?: string | null; isFriendView?: boolean
       fontWeight: 800,
       letterSpacing: '0.14em',
       textTransform: 'uppercase',
-      color: 'var(--hcp-t-60)',
+      color: 'rgba(255,255,255,0.55)',
     }}
   >
     {isFriendView && ownerFirstName
@@ -143,12 +143,12 @@ const TrophyGroupLabel: React.FC<{
       fontWeight: 800,
       letterSpacing: '0.18em',
       textTransform: 'uppercase',
-      color: 'var(--hcp-t-80)',
+      color: 'rgba(255,255,255,0.72)',
     }}
   >
     {Icon && <Icon size={12} color={iconColor ?? 'currentColor'} strokeWidth={2.4} />}
     <span>{label}</span>
-    <span style={{ color: 'var(--hcp-t-60)', ...GAM.TABULAR, fontWeight: 700 }}>({count})</span>
+    <span style={{ color: 'rgba(255,255,255,0.55)', ...GAM.TABULAR, fontWeight: 700 }}>({count})</span>
   </div>
 );
 
@@ -182,7 +182,7 @@ const CourseLegendsCollapsibleSection: React.FC<{
           width: '100%',
           textAlign: 'left',
           cursor: 'pointer',
-          color: 'var(--hcp-t-80)',
+          color: 'rgba(255,255,255,0.72)',
           fontFamily: GAM.FONT_GEIST,
         }}
         aria-expanded={expanded}
@@ -192,12 +192,12 @@ const CourseLegendsCollapsibleSection: React.FC<{
         <span style={{ fontSize: 10, fontWeight: 800, letterSpacing: '0.18em', textTransform: 'uppercase' }}>
           Course legends
         </span>
-        <span style={{ color: 'var(--hcp-t-60)', ...GAM.TABULAR, fontWeight: 700, fontSize: 10, letterSpacing: '0.18em' }}>
+        <span style={{ color: 'rgba(255,255,255,0.55)', ...GAM.TABULAR, fontWeight: 700, fontSize: 10, letterSpacing: '0.18em' }}>
           ({items.length})
         </span>
         <ChevronDown
           size={14}
-          color="var(--hcp-t-60)"
+          color="rgba(255,255,255,0.55)"
           strokeWidth={2.4}
           style={{
             marginLeft: 'auto',
@@ -601,7 +601,7 @@ export const TrophyRoomSheet: React.FC<Props> = ({ userId, viewerUserId, ownerFi
                   key={i}
                   style={{
                     aspectRatio: '1 / 1.22',
-                    background: 'var(--hcp-line)',
+                    background: 'rgba(255,255,255,0.06)',
                     borderRadius: 12,
                     animation: 'gamPulse 1.6s ease-in-out infinite',
                   }}
@@ -729,7 +729,7 @@ const EmptyState: React.FC<{ message: string }> = ({ message }) => (
       padding: '40px 20px',
       textAlign: 'center',
       fontSize: 13,
-      color: 'var(--hcp-t-60)',
+      color: 'rgba(255,255,255,0.55)',
       fontFamily: GAM.FONT_GEIST,
     }}
   >
