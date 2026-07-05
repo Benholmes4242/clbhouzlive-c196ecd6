@@ -80,7 +80,7 @@ function fmtDelta(d: number): string {
 
 function deltaColor(d: number): string {
   if (d < 0) return T.greenInk;
-  if (d > 0) return T.redInk;
+  if (d > 0) return T.slateInk;
   return T.inkMute;
 }
 
