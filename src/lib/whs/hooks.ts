@@ -26,6 +26,7 @@ import {
   type RivalIdentity,
   fetchSharedRounds,
   fetchTrophyAggregates,
+  lookupWhsCourseId,
 } from './api';
 
 export const whsKeys = {
