@@ -7,17 +7,7 @@ interface Props {
   friends?: FriendLeaderboardEntry[];
 }
 
-const T = {
-  bg1: 'var(--hcp-bg-1)',
-  bg2: 'var(--hcp-bg-2)',
-  line2: 'var(--hcp-line-2)',
-  inkMute: 'var(--hcp-t-60)',
-  inkFaded: 'var(--hcp-t-40)',
-  ink100: 'var(--hcp-t-100)',
-  amber: '#F7931E',
-  amberSoft: 'rgba(247,147,30,0.14)',
-};
-
+const FONT = 'Geist, -apple-system, BlinkMacSystemFont, system-ui, sans-serif';
 
 export const WeeklyBanner: React.FC<Props> = ({ banner }) => {
   if (!banner) return null;
@@ -28,49 +18,38 @@ export const WeeklyBanner: React.FC<Props> = ({ banner }) => {
     <div style={{ padding: '8px 16px' }}>
       <div
         style={{
-          background: `linear-gradient(135deg, ${T.bg2} 0%, ${T.bg1} 100%)`,
-          border: `1px solid ${T.line2}`,
-          borderRadius: 12,
-          padding: '10px 14px 10px 12px',
+          background: 'var(--hcp-bg-1)',
+          border: '1px solid var(--hcp-line)',
+          borderLeft: '3px solid #F7931E',
+          borderRadius: 14,
+          padding: '12px 14px',
           display: 'flex',
           alignItems: 'center',
-          gap: 10,
-          position: 'relative',
-          overflow: 'hidden',
+          gap: 12,
+          fontFamily: FONT,
         }}
       >
         <div
-          aria-hidden
           style={{
-            position: 'absolute',
-            top: 0,
-            left: 0,
-            width: 3,
-            bottom: 0,
-            background: T.amber,
-          }}
-        />
-        <div
-          style={{
-            width: 28,
-            height: 28,
-            borderRadius: 8,
-            background: T.amberSoft,
+            width: 36,
+            height: 36,
+            borderRadius: 10,
+            background: 'rgba(247,147,30,0.10)',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
             flexShrink: 0,
           }}
         >
-          <span style={{ fontSize: 16, lineHeight: 1 }} aria-hidden>🔥</span>
+          <span style={{ fontSize: 18, lineHeight: 1 }} aria-hidden>🔥</span>
         </div>
         <div style={{ flex: 1, minWidth: 0 }}>
           <div
             style={{
-              fontSize: 9,
+              fontSize: 8.5,
               fontWeight: 800,
-              letterSpacing: '0.16em',
-              color: T.amber,
+              letterSpacing: '0.12em',
+              color: '#F7931E',
               textTransform: 'uppercase',
             }}
           >
@@ -78,10 +57,10 @@ export const WeeklyBanner: React.FC<Props> = ({ banner }) => {
           </div>
           <div
             style={{
-              fontSize: 12,
-              fontWeight: 600,
-              color: T.ink100,
-              marginTop: 1,
+              fontSize: 14.5,
+              fontWeight: 800,
+              color: 'var(--hcp-t-100)',
+              marginTop: 3,
               letterSpacing: '-0.01em',
               whiteSpace: 'nowrap',
               overflow: 'hidden',
