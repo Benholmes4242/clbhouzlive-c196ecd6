@@ -88,7 +88,7 @@ const DistributionChart: React.FC<{
           bottom: 28,
           left: 0,
           width: 'calc(2 * ((100% - 36px) / 7) + 6px)',
-          background: 'rgba(34,197,94,0.06)',
+          background: 'rgba(52,211,153,0.06)',
           borderRadius: 6,
           pointerEvents: 'none',
           zIndex: 0,
@@ -103,7 +103,7 @@ const DistributionChart: React.FC<{
           left: 0,
           width: 'calc(2 * ((100% - 36px) / 7) + 6px)',
           height: 0,
-          borderTop: '1.5px dashed #22C55E',
+          borderTop: '1.5px dashed #34D399',
           pointerEvents: 'none',
           zIndex: 2,
         }}
@@ -121,7 +121,7 @@ const DistributionChart: React.FC<{
           padding: '2px 6px',
           fontSize: 9,
           fontWeight: 800,
-          color: '#4ADE80',
+          color: '#34D399',
           letterSpacing: '0.14em',
           background: 'var(--hcp-bg-1)',
           pointerEvents: 'none',
@@ -133,7 +133,7 @@ const DistributionChart: React.FC<{
             width: 4,
             height: 4,
             borderRadius: 999,
-            background: '#22C55E',
+            background: '#34D399',
           }}
         />
         SCRATCH
@@ -286,7 +286,7 @@ const AvailableCard: React.FC<{
             padding: '4px 10px',
             borderRadius: 999,
             background:
-              copy.pillTone === 'positive' ? 'rgba(34,197,94,0.12)'
+              copy.pillTone === 'positive' ? 'rgba(52,211,153,0.12)'
               : copy.pillTone === 'neutral' ? AMBER_14
               : 'var(--hcp-bg-3)',
             color:
@@ -408,7 +408,7 @@ const AvailableCard: React.FC<{
                   display: 'inline-block',
                   width: 12,
                   height: 0,
-                  borderTop: '1.5px dashed #22C55E',
+                  borderTop: '1.5px dashed #34D399',
                 }}
               />
               <span>Scratch</span>

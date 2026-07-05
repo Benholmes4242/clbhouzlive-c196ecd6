@@ -112,7 +112,7 @@ export const DarkCard: React.FC<DarkCardProps> = ({
     accent === 'amber'? 'var(--hcp-amber)' : null;
 
   const glowStop =
-    glow === 'good'  ? 'rgba(34, 197, 94, 0.06)' :
+    glow === 'good'  ? 'rgba(52,211,153,0.06)' :
     glow === 'cold'  ? 'rgba(56, 189, 248, 0.10)' :
     glow === 'amber' ? 'rgba(247, 147, 30, 0.10)' : null;
 

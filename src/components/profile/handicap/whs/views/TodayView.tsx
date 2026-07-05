@@ -48,7 +48,7 @@ export const TodayView: React.FC<Props> = ({
       {showReauthBanner && (
         <div
           className="mx-5 mt-5 mb-3 p-3 rounded-xl flex gap-2.5 text-[13px]"
-          style={{ background: 'rgba(220,38,38,0.06)', color: '#B91C1C' }}
+          style={{ background: 'rgba(239,68,68,0.06)', color: '#EF4444' }}
         >
           <AlertTriangle className="h-4 w-4 mt-0.5 flex-shrink-0" />
           <p className="leading-snug">

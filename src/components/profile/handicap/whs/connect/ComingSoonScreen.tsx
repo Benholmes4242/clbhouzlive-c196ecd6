@@ -293,7 +293,7 @@ export const ComingSoonScreen: React.FC<Props> = ({ country, onChangeCountry }) 
       </div>
 
       {error && (
-        <div style={{ fontSize: 12, color: '#DC2626', marginBottom: 8 }}>{error}</div>
+        <div style={{ fontSize: 12, color: '#EF4444', marginBottom: 8 }}>{error}</div>
       )}
 
       <div style={{ marginTop: 6, background: FIELD_FILL, borderRadius: 8, padding: 0 }} />

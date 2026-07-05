@@ -193,7 +193,7 @@ export const YourCircleSection: React.FC<Props> = ({ userId }) => {
                 style={{
                   marginTop: 3, marginBottom: 0, fontSize: 9, fontWeight: 800,
                   letterSpacing: '0.04em', textTransform: 'uppercase',
-                  color: 'var(--hcp-amber, #F59E0B)', fontVariantNumeric: 'tabular-nums', lineHeight: 1,
+                  color: '#F7931E', fontVariantNumeric: 'tabular-nums', lineHeight: 1,
                 }}
               >
                 #{stats.yourRank} of {stats.total}

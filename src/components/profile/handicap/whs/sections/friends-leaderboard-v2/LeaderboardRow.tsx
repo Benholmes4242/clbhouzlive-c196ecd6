@@ -30,7 +30,7 @@ const T = {
   amber: '#F7931E',
   amberSoft: 'rgba(247,147,30,0.14)',
   amberInk: '#854F0B',
-  good: '#22C55E',                    // --hcp-good
+  good: '#34D399',                    // GOOD-BRIGHT (movement glyph)
 };
 
 const FONT = 'Geist, -apple-system, BlinkMacSystemFont, system-ui, sans-serif';

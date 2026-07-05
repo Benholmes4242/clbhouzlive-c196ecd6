@@ -18,16 +18,16 @@ const T = {
   green: '#059669',
   greenInk: '#065F46',
   greenTint: 'rgba(5,150,105,0.10)',
-  red: '#DC2626',
-  redInk: '#7F1D1D',
+  red: '#EF4444',
+  redInk: '#EF4444',
   redTint: 'rgba(159,29,29,0.10)',
   slate: 'var(--hcp-t-80)',
   slateInk: '#334155',
   slateTint: 'var(--hcp-bg-2)',
   neutralTint: 'var(--hcp-bg-2)',
-  hotRed: '#DC2626',
-  hotRedInk: '#DC2626',
-  hotRedTint: 'rgba(220,38,38,0.10)',
+  hotRed: '#EF4444',
+  hotRedInk: '#EF4444',
+  hotRedTint: 'rgba(239,68,68,0.10)',
   coldBlue: '#0EA5E9',
   coldBlueInk: '#0369A1',
   coldBlueTint: 'rgba(14,165,233,0.10)',
@@ -45,7 +45,7 @@ interface Theme {
 const THEMES: Record<'positive' | 'neutral' | 'negative', Theme> = {
   positive: {
     headerBg: T.hotRedTint,
-    headerBorder: 'rgba(220,38,38,0.20)',
+    headerBorder: 'rgba(239,68,68,0.20)',
     headerInk: T.hotRedInk,
     accent: T.hotRed,
     accentInk: T.hotRedInk,
@@ -115,7 +115,7 @@ export const HandicapProjectionCard: React.FC<Props> = ({ scores }) => {
               borderRadius: '50%',
               background:
                 meta.theme === 'positive'
-                  ? 'radial-gradient(circle, rgba(220, 38, 38, 0.10), transparent 70%)'
+                  ? 'radial-gradient(circle, rgba(239,68,68,0.10), transparent 70%)'
                   : meta.theme === 'negative'
                     ? 'radial-gradient(circle, rgba(14, 165, 233, 0.10), transparent 70%)'
                     : 'radial-gradient(circle, var(--hcp-bg-2), transparent 70%)',
