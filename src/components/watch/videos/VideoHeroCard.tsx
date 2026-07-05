@@ -61,9 +61,17 @@ function VideoHeroCardInner({ post, index, allPosts }: VideoHeroCardProps) {
   const courseName = (post as any).courseName as string | undefined;
   const likeCount = post.likeCount ?? 0;
 
+  const btnRef = useRef<HTMLButtonElement>(null);
   const handleTap = useCallback(() => {
-    useFullscreenFeedStore.getState().open(allPosts, index);
-  }, [allPosts, index]);
+    openWithOrigin({
+      posts: allPosts,
+      index,
+      originEl: btnRef.current,
+      posterUrl: thumb || null,
+      handOffUrls: [(media as any)?.hlsUrl],
+    });
+  }, [allPosts, index, thumb, media]);
+
 
   return (
     <section style={{ padding: '0 16px' }}>
