@@ -1,7 +1,8 @@
-import { useEffect, useRef, useState } from 'react';
+import { useRef } from 'react';
 import type { FeedPost } from '@/components/media-system/types/media';
 import AutoplayVideoCard from './AutoplayVideoCard';
 import { useEdgeFades } from '@/components/watch/shared/useEdgeFades';
+import { useWatchAutoplay } from '@/video/useWatchAutoplay';
 
 
 interface CarouselRowProps {
@@ -13,64 +14,10 @@ interface CarouselRowProps {
 
 export default function CarouselRow({ items, allPosts, baseIndex, userId }: CarouselRowProps) {
   const scrollerRef = useRef<HTMLDivElement>(null);
-  const cardRefs = useRef<Array<HTMLDivElement | null>>([]);
-  const [activeIndex, setActiveIndex] = useState(0);
-  const [inView, setInView] = useState(true);
   const containerRef = useRef<HTMLDivElement>(null);
 
-  // Detect which card is most-centred within the scroller
-  useEffect(() => {
-    const scroller = scrollerRef.current;
-    if (!scroller) return;
-
-    let raf = 0;
-    const compute = () => {
-      const rect = scroller.getBoundingClientRect();
-      const centerX = rect.left + rect.width / 2;
-      let bestIdx = 0;
-      let bestDist = Infinity;
-      cardRefs.current.forEach((el, i) => {
-        if (!el) return;
-        const r = el.getBoundingClientRect();
-        const c = r.left + r.width / 2;
-        const d = Math.abs(c - centerX);
-        if (d < bestDist) {
-          bestDist = d;
-          bestIdx = i;
-        }
-      });
-      setActiveIndex((prev) => (prev !== bestIdx ? bestIdx : prev));
-    };
-
-    const onScroll = () => {
-      if (raf) return;
-      raf = window.requestAnimationFrame(() => {
-        raf = 0;
-        compute();
-      });
-    };
-
-    compute();
-    scroller.addEventListener('scroll', onScroll, { passive: true });
-    return () => {
-      scroller.removeEventListener('scroll', onScroll);
-      if (raf) cancelAnimationFrame(raf);
-    };
-  }, [items.length]);
-
-  // Pause when the whole row is offscreen
-  useEffect(() => {
-    const el = containerRef.current;
-    if (!el) return;
-    const io = new IntersectionObserver(
-      ([entry]) => setInView(entry.isIntersecting && entry.intersectionRatio > 0.1),
-      { threshold: [0, 0.1, 0.5] }
-    );
-    io.observe(el);
-    return () => io.disconnect();
-  }, []);
-
-  // [VIDEOSTUB] Prefetch of next card removed — poster-only chassis.
+  // Engine-native activation: one hook, feed-model gates + hysteresis.
+  const activeIdx = useWatchAutoplay(scrollerRef, { railId: 'videos-carousel-row' });
 
   if (items.length === 0) return null;
 
@@ -95,7 +42,7 @@ export default function CarouselRow({ items, allPosts, baseIndex, userId }: Caro
         {items.map((post, i) => (
           <div
             key={post.id}
-            ref={(el) => { cardRefs.current[i] = el; }}
+            data-watch-tile-index={i}
             style={{ flex: '0 0 72%', scrollSnapAlign: 'center' }}
           >
             <AutoplayVideoCard
@@ -103,7 +50,7 @@ export default function CarouselRow({ items, allPosts, baseIndex, userId }: Caro
               index={baseIndex + i}
               allPosts={allPosts}
               userId={userId}
-              active={inView && i === activeIndex}
+              active={activeIdx === i}
               metaPadX={0}
             />
           </div>
@@ -145,4 +92,3 @@ function CarouselEdgeFadeBinding({
   useEdgeFades(scrollerRef, wrapperRef);
   return null;
 }
-
