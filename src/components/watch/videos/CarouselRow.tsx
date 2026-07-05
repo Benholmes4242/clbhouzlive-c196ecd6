@@ -30,7 +30,8 @@ export default function CarouselRow({ items, allPosts, baseIndex, userId }: Caro
     <div ref={containerRef} className="hrail-edge-fade" style={{ position: 'relative' }}>
       <CarouselEdgeFadeBinding scrollerRef={scrollerRef} wrapperRef={containerRef} />
       <div
-        ref={scrollerRef}
+        ref={setScrollerRef}
+
         style={{
           display: 'flex',
           gap: 12,
