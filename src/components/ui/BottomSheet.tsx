@@ -25,6 +25,7 @@ export function BottomSheet({
   style,
   ariaLabelledBy,
   variant = 'light',
+  surfaceColor,
 }: BottomSheetProps) {
   const sheetRef = useRef<HTMLDivElement>(null);
   const dragStartY = useRef<number | null>(null);
