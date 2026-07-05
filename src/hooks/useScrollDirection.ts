@@ -152,7 +152,22 @@ export function useNavScrollState(): NavState {
   return useSyncExternalStore(subscribe, getSnapshot, getSnapshot);
 }
 
-// Auto-register the window scroller once (SSR-safe).
+// Auto-register the document scroller once (SSR-safe).
+// We attach to BOTH `window` and `document.body`, because our global CSS
+// sets `body { height: 100%; overflow-y: auto }` — in that configuration
+// body is the scrolling element and scroll events fire on body, not on
+// window. Registering both is harmless (each scroller tracks its own
+// scrollTop) and covers whichever element the UA picks.
 if (typeof window !== 'undefined') {
   registerNavScroller(window);
+  if (typeof document !== 'undefined' && document.body) {
+    registerNavScroller(document.body);
+  } else if (typeof document !== 'undefined') {
+    // body not yet available at module eval — defer.
+    document.addEventListener(
+      'DOMContentLoaded',
+      () => document.body && registerNavScroller(document.body),
+      { once: true },
+    );
+  }
 }
