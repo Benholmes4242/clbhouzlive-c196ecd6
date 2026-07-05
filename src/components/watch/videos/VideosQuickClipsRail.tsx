@@ -1,8 +1,9 @@
-import { memo } from 'react';
+import { memo, useRef } from 'react';
 import SectionHeader from '@/components/ui/SectionHeader';
 import { HRail } from '../proshop/HRail';
 import WatchTile from '../WatchTile';
 import { useQuickClipsRail } from './hooks/useQuickClipsRail';
+import { useWatchAutoplay } from '@/video/useWatchAutoplay';
 
 interface VideosQuickClipsRailProps {
   userId: string | undefined;
@@ -17,6 +18,9 @@ interface VideosQuickClipsRailProps {
  */
 function VideosQuickClipsRailInner({ userId }: VideosQuickClipsRailProps) {
   const { data: posts = [], isLoading } = useQuickClipsRail(userId, 8);
+  const railRef = useRef<HTMLDivElement>(null);
+  const activeIdx = useWatchAutoplay(railRef, { railId: 'videos-quick-clips' });
+
   if (!userId) return null;
   if (isLoading) return null;
   if (posts.length < 3) return null;
@@ -24,31 +28,34 @@ function VideosQuickClipsRailInner({ userId }: VideosQuickClipsRailProps) {
   return (
     <section>
       <SectionHeader role="rail" title="Quick clips" paddingTop={8} paddingX={16} />
-      <HRail paddingBottom={20}>
-        {posts.map((post, i) => (
-          <div
-            key={post.id}
-            style={{
-              width: 132,
-              flex: '0 0 auto',
-              scrollSnapAlign: 'start',
-            }}
-          >
+      <div ref={railRef}>
+        <HRail paddingBottom={20}>
+          {posts.map((post, i) => (
             <div
+              key={post.id}
+              data-watch-tile-index={i}
               style={{
                 width: 132,
-                aspectRatio: '9 / 16',
-                borderRadius: 6,
-                overflow: 'hidden',
-                position: 'relative',
-                background: 'hsl(var(--muted))',
+                flex: '0 0 auto',
+                scrollSnapAlign: 'start',
               }}
             >
-              <WatchTile post={post} index={i} allPosts={posts} />
+              <div
+                style={{
+                  width: 132,
+                  aspectRatio: '9 / 16',
+                  borderRadius: 6,
+                  overflow: 'hidden',
+                  position: 'relative',
+                  background: 'hsl(var(--muted))',
+                }}
+              >
+                <WatchTile post={post} index={i} allPosts={posts} isAutoplayActive={activeIdx === i} />
+              </div>
             </div>
-          </div>
-        ))}
-      </HRail>
+          ))}
+        </HRail>
+      </div>
     </section>
   );
 }

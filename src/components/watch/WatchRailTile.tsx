@@ -121,7 +121,7 @@ export default function WatchRailTile({
       variant="card"
       onPress={handleClick}
       ref={cardRef as any}
-      data-rail-tile-index={index}
+      data-watch-tile-index={index}
       data-post-id={post.id}
       style={{
         flexShrink: 0,

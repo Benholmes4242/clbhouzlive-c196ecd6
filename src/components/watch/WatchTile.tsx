@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useMemo, useRef } from 'react';
 import { Film, Heart } from 'lucide-react';
 import type { FeedPost } from '@/components/media-system/types/media';
 import { openWithOrigin } from '@/lib/openWithOrigin';
@@ -7,6 +7,7 @@ import DecodedImage from './shared/DecodedImage';
 import { buildLqipUrl } from '@/utils/mediaThumbs';
 import { shouldUseLqip } from '@/utils/lqipQueue';
 import Pressable from '@/components/ui/Pressable';
+import { useRailLane } from '@/video/useRailLane';
 
 
 
@@ -22,6 +23,11 @@ interface WatchTileProps {
   allPosts?: FeedPost[];
   /** Fired once the tile's thumbnail has been decoded and painted. */
   onDecoded?: () => void;
+  /**
+   * Watch-surface-coordinated autoplay slot. When true, rent a rail lane and
+   * play muted+looped over the poster; when false, poster only.
+   */
+  isAutoplayActive?: boolean;
 }
 
 /**
@@ -31,12 +37,23 @@ interface WatchTileProps {
  * creator name bottom-left. Tap → fullscreen player. Uses the shared
  * decode-gated <DecodedImage>.
  */
-const WatchTile: React.FC<WatchTileProps> = ({ post, index, allPosts, onDecoded }) => {
+const WatchTile: React.FC<WatchTileProps> = ({ post, index, allPosts, onDecoded, isAutoplayActive = false }) => {
   const media = post.mediaItems[0];
   const thumbnailUrl = media?.thumbnailUrl;
   const posterUrl = (media as any)?.posterUrl || (media as any)?.poster || undefined;
+  const hlsUrl: string | undefined = (media as any)?.hlsUrl;
   const likeCount = post.likeCount ?? 0;
   const rootRef = useRef<HTMLElement>(null);
+
+  const isVideo = !!media && media.type === 'video' && !!hlsUrl;
+  const ownerKey = isVideo ? `${post.id}:0` : null;
+  const { hostRef: laneHostRef, ready: laneReady } = useRailLane({
+    ownerKey,
+    active: !!isAutoplayActive && isVideo,
+    hlsUrl: isVideo ? hlsUrl! : null,
+    posterUrl: thumbnailUrl ?? posterUrl ?? null,
+    postId: post.id,
+  });
 
   const handleClick = () => {
     openWithOrigin({
@@ -65,7 +82,7 @@ const WatchTile: React.FC<WatchTileProps> = ({ post, index, allPosts, onDecoded 
       as="div"
       variant="card"
       onPress={handleClick}
-      data-watch-index={index}
+      data-watch-tile-index={index}
       data-post-id={post.id}
       className="relative w-full h-full overflow-hidden select-none bg-muted/40"
       innerStyle={{ position: 'relative', width: '100%', height: '100%' }}
@@ -100,6 +117,22 @@ const WatchTile: React.FC<WatchTileProps> = ({ post, index, allPosts, onDecoded 
         <div className="absolute inset-0 flex items-center justify-center bg-muted">
           <Film className="w-8 h-8 text-muted-foreground" />
         </div>
+      )}
+
+      {/* Rail-lane video host — mounted only when we hold a rented lane. */}
+      {isVideo && (
+        <div
+          ref={laneHostRef}
+          aria-hidden
+          style={{
+            position: 'absolute',
+            inset: 0,
+            zIndex: 1,
+            opacity: laneReady ? 1 : 0,
+            transition: 'opacity 140ms linear',
+            pointerEvents: 'none',
+          }}
+        />
       )}
 
       {/* Top scrim */}

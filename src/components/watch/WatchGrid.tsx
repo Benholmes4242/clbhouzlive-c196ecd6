@@ -4,6 +4,7 @@ import type { FeedPost } from '@/components/media-system/types/media';
 import WatchTile from './WatchTile';
 import WatchGridSkeleton from './WatchGridSkeleton';
 import WatchEmptyState from './shared/WatchEmptyState';
+import { useWatchAutoplay } from '@/video/useWatchAutoplay';
 
 interface WatchGridProps {
   posts: FeedPost[];
@@ -64,6 +65,7 @@ const WatchGrid: React.FC<WatchGridProps> = ({
   const sentinelRef = useRef<HTMLDivElement>(null);
   const decodedCountRef = useRef(0);
   const firedRef = useRef(false);
+  const activeIdx = useWatchAutoplay(gridRef, { railId: 'watch-grid' });
 
   // Reset the first-row-decoded latch whenever the underlying post set
   // fundamentally changes (mood/category switch → fresh page ready gate).
@@ -215,6 +217,7 @@ const WatchGrid: React.FC<WatchGridProps> = ({
             {col.map(({ post, index, ratio }) => (
               <div
                 key={post.id}
+                data-watch-tile-index={index}
                 style={{
                   position: 'relative',
                   width: '100%',
@@ -228,7 +231,9 @@ const WatchGrid: React.FC<WatchGridProps> = ({
                   index={index}
                   allPosts={posts}
                   onDecoded={index < COLS ? handleTileDecoded : undefined}
+                  isAutoplayActive={activeIdx === index}
                 />
+
 
               </div>
             ))}

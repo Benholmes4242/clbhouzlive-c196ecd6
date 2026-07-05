@@ -10,7 +10,7 @@ import { SectionHeader } from '@/components/ui/SectionHeader';
 import { HRail } from './proshop/HRail';
 import { ClipsMark } from './proshop/SectionMarks';
 import { useFirstVisibleDecoded } from './shared/useFirstVisibleDecoded';
-import { useRailAutoplay } from './shared/useRailAutoplay';
+import { useWatchAutoplay } from '@/video/useWatchAutoplay';
 
 
 const VISIBLE_COUNT = 3;
@@ -103,7 +103,7 @@ interface BodyProps {
 
 function TrendingThisWeekBody({ topPosts, navigate, viewedPostIds, onDecoded, revealed, skeleton }: BodyProps) {
   const railRef = useRef<HTMLDivElement>(null);
-  const activeIdx = useRailAutoplay(railRef, topPosts.length);
+  const activeIdx = useWatchAutoplay(railRef, { railId: 'trending-this-week' });
   return (
     <div style={{ position: 'relative', background: 'hsl(var(--background))' }}>
       <motion.div
