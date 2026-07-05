@@ -150,6 +150,22 @@ export default function WatchRailTile({
         }}
       />
 
+      {/* Rail-lane video host — mounted only when we hold a rented lane. */}
+      {isVideo && (
+        <div
+          ref={laneHostRef}
+          aria-hidden
+          style={{
+            position: 'absolute',
+            inset: 0,
+            zIndex: 1,
+            opacity: laneReady ? 1 : 0,
+            transition: 'opacity 140ms linear',
+            pointerEvents: 'none',
+          }}
+        />
+      )}
+
       {/* Gradient */}
       <div
         style={{
