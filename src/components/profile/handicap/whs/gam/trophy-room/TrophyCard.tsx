@@ -2,7 +2,6 @@ import React, { useEffect, useRef, useState } from 'react';
 import { Lock } from 'lucide-react';
 import { renderBadgeIcon } from '../badgeIcons';
 import { GAM } from '../tokens';
-import { LEGEND_PALETTE, LOCKED_PALETTE, paletteForShowpiece, type RarityPalette } from './_shared/rarityPalette';
 import { rarityColor } from '@/lib/gam/visuals';
 import type { TrophyItem } from './_shared/normalizeTrophyItem';
 import {
@@ -12,8 +11,24 @@ import {
   shortenShowpieceCaption,
 } from './_shared/showpieces';
 
-function rgbaFrom(hex: string, a: number): string {
-  if (!hex.startsWith('#')) return hex;
+// ─── Tokens (hardcoded — sheet portal, no var(--hcp-*)) ─────────────────
+const T = {
+  card: '#1B1E27',
+  raised: '#20242E',
+  line: 'rgba(255,255,255,0.08)',
+  ink: '#F2F4F7',
+  dim: 'rgba(242,244,247,0.55)',
+  faint: 'rgba(242,244,247,0.38)',
+  faintest: 'rgba(242,244,247,0.22)',
+  glyphLocked: 'rgba(242,244,247,0.20)',
+  wmLocked: 'rgba(242,244,247,1)', // stroke, opacity applied separately
+} as const;
+
+const AMBER = '#F7931E';
+
+// ─── rgba helper ────────────────────────────────────────────────────────
+export function rgbaOf(hex: string, a: number): string {
+  if (!hex || !hex.startsWith('#')) return hex;
   const h = hex.replace('#', '');
   const r = parseInt(h.slice(0, 2), 16);
   const g = parseInt(h.slice(2, 4), 16);
@@ -26,46 +41,75 @@ interface Props {
   onTap: (item: TrophyItem) => void;
 }
 
-function paletteFor(item: TrophyItem): RarityPalette {
-  if (item.kind === 'legend') return LEGEND_PALETTE;
-  const hasProgress = item.earned || (item.currentValue != null && item.currentValue > 0);
-  if (!hasProgress) return LOCKED_PALETTE;
-  if (isShowpiece(item.badgeId)) return paletteForShowpiece(item.reachedTier, item.badgeId);
-  return LEGEND_PALETTE;
+// Rarity color for an achievement (falls back to amber).
+function achievementColor(item: TrophyItem): string {
+  if (item.kind === 'achievement') {
+    return rarityColor[item.rarity] || AMBER;
+  }
+  return AMBER;
 }
 
-function metaLine(item: TrophyItem): string {
-  if (item.kind === 'legend') {
-    return item.rank === 1 ? `#1 · ${item.formattedValue}` : `#${item.rank} · ${item.formattedValue}`;
-  }
-  if (item.earned) {
-    return item.tiers.length > 1
-      ? `Tier ${item.reachedTier} of ${item.tiers.length}`
-      : 'Earned';
-  }
-  if (item.nextThreshold != null && item.currentValue != null) {
-    return `${item.currentValue} / ${item.nextThreshold}`;
-  }
-  return 'Locked';
-}
+// ─── Watermark (kept, toned) ────────────────────────────────────────────
+const Watermark: React.FC<{ iconKey: string; color: string; opacity: number }> = ({
+  iconKey,
+  color,
+  opacity,
+}) => (
+  <div
+    aria-hidden
+    style={{
+      position: 'absolute',
+      right: -18,
+      bottom: -18,
+      color,
+      opacity,
+      pointerEvents: 'none',
+      zIndex: 0,
+    }}
+  >
+    {renderBadgeIcon(iconKey, 96, 'currentColor')}
+  </div>
+);
 
-function pillContent(item: TrophyItem): string {
-  if (item.kind === 'legend') return `#${item.rank}`;
-  if (item.tiers.length > 1) return `T${Math.max(1, item.reachedTier || 1)}`;
-  return '';
-}
+// ─── Shared card shell ──────────────────────────────────────────────────
+const CARD_BASE: React.CSSProperties = {
+  position: 'relative',
+  boxSizing: 'border-box',
+  borderRadius: 16,
+  overflow: 'hidden',
+  padding: '13px 13px 12px',
+  minHeight: 148,
+  display: 'flex',
+  flexDirection: 'column',
+  fontFamily: GAM.FONT_GEIST,
+  cursor: 'pointer',
+  textAlign: 'left',
+  color: T.ink,
+};
 
-// ─────────────────────────────────────────────────────────────────────────────
-// StandardCard — existing trophy card layout, scaled down for 3-col grid.
-// ─────────────────────────────────────────────────────────────────────────────
+// ─────────────────────────────────────────────────────────────────────────
+// StandardCard — locked + earned states
+// ─────────────────────────────────────────────────────────────────────────
 const StandardCard: React.FC<Props> = ({ item, onTap }) => {
-  const [pressed, setPressed] = React.useState(false);
-  const palette = paletteFor(item);
-  const locked =
-    item.kind === 'achievement' && !item.earned && (item.currentValue == null || item.currentValue === 0);
-  const dimmed = locked;
-  const glowColor = item.kind === 'achievement' ? rarityColor[item.rarity] : '';
-  const pill = pillContent(item);
+  const [pressed, setPressed] = useState(false);
+  const isAch = item.kind === 'achievement';
+  const locked = isAch && !item.earned && (item.currentValue == null || item.currentValue === 0);
+  const c = achievementColor(item);
+
+  const bg = locked
+    ? T.raised
+    : `linear-gradient(180deg, ${rgbaOf(c, 0.09)}, ${rgbaOf(c, 0.02)}), ${T.card}`;
+  const border = locked ? `1px solid ${T.line}` : `1px solid ${rgbaOf(c, 0.45)}`;
+
+  const chipBg = locked ? 'transparent' : rgbaOf(c, 0.12);
+  const chipBorder = locked ? `1.5px dashed ${T.faintest}` : `1px solid ${rgbaOf(c, 0.35)}`;
+  const glyphColor = locked ? T.glyphLocked : c;
+
+  const title = isAch ? item.name : '';
+  const statusLabel = locked ? 'LOCKED' : 'EARNED';
+  const statusColor = locked ? T.faint : c;
+
+  const pillText = isAch && item.tiers.length > 1 ? `T${Math.max(1, item.reachedTier || 1)}` : '';
 
   return (
     <button
@@ -75,187 +119,119 @@ const StandardCard: React.FC<Props> = ({ item, onTap }) => {
       onTouchEnd={() => setPressed(false)}
       onTouchCancel={() => setPressed(false)}
       style={{
-        position: 'relative',
-        aspectRatio: '1 / 1.22',
-        borderRadius: 12,
-        border: `1px solid ${palette.border}`,
-        background: palette.cardSweep,
-        overflow: 'hidden',
-        padding: 9,
-        cursor: 'pointer',
-        textAlign: 'left',
-        opacity: 1,
+        ...CARD_BASE,
+        background: bg,
+        border,
         transform: pressed ? 'scale(0.985)' : 'scale(1)',
-        transition: 'transform 120ms ease, opacity 160ms ease',
-        fontFamily: GAM.FONT_GEIST,
-        display: 'flex',
-        flexDirection: 'column',
-        justifyContent: 'space-between',
-        color: 'var(--hcp-t-100)',
-        boxShadow: [palette.outerGlow, '0 1px 2px rgba(0,0,0,0.25)', '0 4px 12px rgba(0,0,0,0.30)']
-          .filter(Boolean)
-          .join(', '),
+        transition: 'transform 120ms ease',
       }}
     >
-      {palette.topStripe && (
-        <div
-          aria-hidden
-          style={{
-            position: 'absolute',
-            top: 0,
-            left: 0,
-            right: 0,
-            height: 2,
-            background: palette.topStripe,
-            pointerEvents: 'none',
-          }}
-        />
-      )}
+      <Watermark
+        iconKey={item.iconKey}
+        color={locked ? '#F2F4F7' : c}
+        opacity={locked ? 0.05 : 0.09}
+      />
 
-      {/* Corner glow pad — locked only */}
-      {locked && glowColor && (
-        <div
-          aria-hidden
-          style={{
-            position: 'absolute',
-            right: -8,
-            bottom: 4,
-            width: 92,
-            height: 92,
-            borderRadius: '50%',
-            background: rgbaFrom(glowColor, 0.28),
-            filter: 'blur(18px)',
-            pointerEvents: 'none',
-            zIndex: 0,
-          }}
-        />
-      )}
-
-      {/* Watermark icon — lit in rarity colour when locked, subtle when earned */}
-      <div
-        aria-hidden
-        style={{
-          position: 'absolute',
-          right: -8,
-          bottom: 4,
-          transform: 'rotate(-12deg)',
-          opacity: locked ? 0.55 : 0.08,
-          color: locked ? glowColor : palette.color,
-          pointerEvents: 'none',
-          zIndex: 1,
-        }}
-      >
-        {renderBadgeIcon(item.iconKey, 92, 'currentColor')}
-      </div>
-
-      {/* Top row: icon tile + pill */}
+      {/* Top row: icon chip + optional tier pill */}
       <div
         style={{
           position: 'relative',
+          zIndex: 1,
           display: 'flex',
           alignItems: 'flex-start',
           justifyContent: 'space-between',
-          zIndex: 1,
         }}
       >
         <div
           style={{
-            width: 24,
-            height: 24,
-            borderRadius: 7,
-            background: `linear-gradient(180deg, ${palette.tint}, rgba(255,255,255,0.01))`,
-            border: `1px solid ${palette.border}`,
-            boxShadow: 'inset 0 1px 1px rgba(0,0,0,0.30)',
+            width: 30,
+            height: 30,
+            borderRadius: 9,
+            background: chipBg,
+            border: chipBorder,
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
-            color: palette.color,
+            color: glyphColor,
+            flexShrink: 0,
           }}
         >
-          {locked ? (
-            <Lock size={11} strokeWidth={2.0} />
+          {locked && !item.iconKey ? (
+            <Lock size={14} strokeWidth={2} />
           ) : (
-            renderBadgeIcon(item.iconKey, 11, 'currentColor')
+            renderBadgeIcon(item.iconKey, 14, 'currentColor')
           )}
         </div>
-        {pill && (
+        {pillText && (
           <span
             style={{
               padding: '2px 6px',
-              fontSize: 8,
+              fontSize: 8.5,
               fontWeight: 800,
-              letterSpacing: '0.10em',
-              color: palette.color,
-              background: `linear-gradient(180deg, ${palette.tint}, rgba(255,255,255,0.01))`,
-              border: `1px solid ${palette.border}`,
+              letterSpacing: '0.12em',
+              color: locked ? T.faint : c,
+              border: `1px solid ${locked ? T.line : rgbaOf(c, 0.35)}`,
               borderRadius: 6,
-              boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.06)',
               ...GAM.TABULAR,
             }}
           >
-            {pill}
+            {pillText}
           </span>
         )}
       </div>
 
-      {/* Bottom: name + meta */}
-      <div style={{ position: 'relative', zIndex: 1, flexShrink: 0 }}>
+      {/* Bottom: title + status */}
+      <div style={{ position: 'relative', zIndex: 1, marginTop: 'auto', paddingTop: 12 }}>
         <div
           style={{
-            fontSize: 12,
-            fontWeight: 700,
+            fontSize: 14,
+            fontWeight: 800,
             lineHeight: 1.2,
-            color: 'var(--hcp-t-100)',
-            letterSpacing: '-0.015em',
+            color: locked ? T.dim : T.ink,
+            letterSpacing: '-0.01em',
             display: '-webkit-box',
             WebkitLineClamp: 2,
             WebkitBoxOrient: 'vertical',
             overflow: 'hidden',
           }}
         >
-          {item.kind === 'legend' ? item.courseName : item.name}
+          {title}
         </div>
         <div
           style={{
-            marginTop: 4,
-            fontSize: 9.5,
-            fontWeight: 700,
-            color: palette.metaColor,
+            marginTop: 5,
+            fontSize: 8.5,
+            fontWeight: 800,
             letterSpacing: '0.12em',
-            textTransform: 'uppercase',
-            whiteSpace: 'nowrap',
-            overflow: 'hidden',
-            textOverflow: 'ellipsis',
-            opacity: dimmed ? 0.7 : 0.95,
+            color: statusColor,
             ...GAM.TABULAR,
           }}
         >
-          {item.kind === 'legend' ? item.name : metaLine(item)}
+          {statusLabel}
         </div>
       </div>
     </button>
   );
 };
 
-// ─────────────────────────────────────────────────────────────────────────────
-// ShowpieceCard — Option B layout for the 8 lifetime IDs. Big hero number,
-// animated count-up + progress bar on first paint, inline next-tier signpost.
-// ─────────────────────────────────────────────────────────────────────────────
+// ─────────────────────────────────────────────────────────────────────────
+// ShowpieceCard — tiered / in-progress
+// ─────────────────────────────────────────────────────────────────────────
 const ShowpieceCard: React.FC<Props> = ({ item, onTap }) => {
   if (item.kind !== 'achievement') return null;
   const [pressed, setPressed] = useState(false);
 
   const currentValue = item.currentValue ?? 0;
   const locked = !item.earned && currentValue === 0;
-  const palette = locked ? LOCKED_PALETTE : paletteForShowpiece(item.reachedTier, item.badgeId);
+  const c = achievementColor(item);
 
   const totalTiers = item.tiers.length;
   const atMax = !locked && item.reachedTier >= totalTiers && totalTiers > 0;
-
-  // Next tier object (0-indexed array, reachedTier is count → tiers[reachedTier] is next)
   const nextTier = !atMax && item.reachedTier < totalTiers ? item.tiers[item.reachedTier] : null;
   const prevThreshold = item.reachedTier > 0 ? item.tiers[item.reachedTier - 1].threshold : 0;
-  const nextThreshold = nextTier ? nextTier.threshold : (item.tiers[totalTiers - 1]?.threshold ?? currentValue);
+  const nextThreshold = nextTier
+    ? nextTier.threshold
+    : (item.tiers[totalTiers - 1]?.threshold ?? currentValue);
 
   const numer = currentValue - prevThreshold;
   const denom = nextThreshold - prevThreshold;
@@ -263,21 +239,15 @@ const ShowpieceCard: React.FC<Props> = ({ item, onTap }) => {
     ? 1
     : Math.max(0, Math.min(1, denom > 0 ? numer / denom : 0));
 
-  // Animations — first paint only
   const [animatedPct, setAnimatedPct] = useState(0);
-  const [animatedValue, setAnimatedValue] = useState(locked ? 0 : 0);
+  const [animatedValue, setAnimatedValue] = useState(0);
   const animatedRef = useRef(false);
 
   useEffect(() => {
     if (animatedRef.current) return;
     animatedRef.current = true;
-    if (locked) {
-      setAnimatedPct(0);
-      setAnimatedValue(0);
-      return;
-    }
+    if (locked) return;
     const barT = setTimeout(() => setAnimatedPct(targetPct), 80);
-
     if (currentValue === 0) {
       setAnimatedValue(0);
     } else {
@@ -285,8 +255,7 @@ const ShowpieceCard: React.FC<Props> = ({ item, onTap }) => {
       const start = performance.now();
       let frame = 0;
       const tick = (now: number) => {
-        const elapsed = now - start;
-        const t = Math.min(1, elapsed / duration);
+        const t = Math.min(1, (now - start) / duration);
         const eased = 1 - Math.pow(1 - t, 3);
         setAnimatedValue(Math.round(currentValue * eased));
         if (t < 1) frame = requestAnimationFrame(tick);
@@ -314,6 +283,15 @@ const ShowpieceCard: React.FC<Props> = ({ item, onTap }) => {
         ? `T${item.reachedTier}/${totalTiers}`
         : '';
 
+  // Whisper wash for in-progress/tiered — stops 0.07/0.015
+  const bg = locked
+    ? T.raised
+    : `linear-gradient(180deg, ${rgbaOf(c, 0.07)}, ${rgbaOf(c, 0.015)}), ${T.card}`;
+  const border = locked ? `1px solid ${T.line}` : `1px solid ${rgbaOf(c, 0.35)}`;
+  const chipBg = locked ? 'transparent' : rgbaOf(c, 0.12);
+  const chipBorder = locked ? `1.5px dashed ${T.faintest}` : `1px solid ${rgbaOf(c, 0.35)}`;
+  const glyphColor = locked ? T.glyphLocked : c;
+
   return (
     <button
       type="button"
@@ -322,102 +300,55 @@ const ShowpieceCard: React.FC<Props> = ({ item, onTap }) => {
       onTouchEnd={() => setPressed(false)}
       onTouchCancel={() => setPressed(false)}
       style={{
-        position: 'relative',
-        aspectRatio: '1 / 1.22',
-        borderRadius: 12,
-        border: `1px solid ${palette.border}`,
-        background: palette.cardSweep,
-        overflow: 'hidden',
-        padding: 9,
-        cursor: 'pointer',
-        textAlign: 'left',
-        opacity: 1,
+        ...CARD_BASE,
+        background: bg,
+        border,
         transform: pressed ? 'scale(0.985)' : 'scale(1)',
-        transition: 'transform 120ms ease, opacity 160ms ease',
-        fontFamily: GAM.FONT_GEIST,
-        display: 'flex',
-        flexDirection: 'column',
-        color: 'var(--hcp-t-100)',
-        boxShadow: [palette.outerGlow, '0 1px 2px rgba(0,0,0,0.25)', '0 4px 12px rgba(0,0,0,0.30)']
-          .filter(Boolean)
-          .join(', '),
+        transition: 'transform 120ms ease',
       }}
     >
-      {palette.topStripe && (
-        <div
-          aria-hidden
-          style={{
-            position: 'absolute',
-            top: 0,
-            left: 0,
-            right: 0,
-            height: 2,
-            background: palette.topStripe,
-            pointerEvents: 'none',
-          }}
-        />
-      )}
+      <Watermark
+        iconKey={item.iconKey}
+        color={locked ? '#F2F4F7' : c}
+        opacity={locked ? 0.05 : 0.09}
+      />
 
-      {/* Watermark icon — every card gets one. Lit when locked, subtle when active. */}
-      <div
-        aria-hidden
-        style={{
-          position: 'absolute',
-          right: -8,
-          bottom: 4,
-          transform: 'rotate(-12deg)',
-          opacity: locked ? 0.16 : 0.14,
-          color: locked ? 'rgba(100,116,139,0.85)' : palette.color,
-          pointerEvents: 'none',
-          zIndex: 0,
-        }}
-      >
-        {renderBadgeIcon(item.iconKey, 84, 'currentColor')}
-      </div>
-
-
-      {/* Top row: icon tile + pill */}
+      {/* Top row */}
       <div
         style={{
           position: 'relative',
+          zIndex: 1,
           display: 'flex',
           alignItems: 'flex-start',
           justifyContent: 'space-between',
-          zIndex: 1,
         }}
       >
         <div
           style={{
-            width: 22,
-            height: 22,
-            borderRadius: 7,
-            background: `linear-gradient(180deg, ${palette.tint}, rgba(255,255,255,0.01))`,
-            border: `1px solid ${palette.border}`,
-            boxShadow: 'inset 0 1px 1px rgba(0,0,0,0.30)',
+            width: 30,
+            height: 30,
+            borderRadius: 9,
+            background: chipBg,
+            border: chipBorder,
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
-            color: palette.color,
+            color: glyphColor,
+            flexShrink: 0,
           }}
         >
-          {locked ? (
-            <Lock size={10} strokeWidth={2.0} />
-          ) : (
-            renderBadgeIcon(item.iconKey, 11, 'currentColor')
-          )}
+          {locked ? <Lock size={13} strokeWidth={2} /> : renderBadgeIcon(item.iconKey, 14, 'currentColor')}
         </div>
-        {!locked && pillLabel && (
+        {pillLabel && (
           <span
             style={{
               padding: '2px 6px',
-              fontSize: 8,
+              fontSize: 8.5,
               fontWeight: 800,
-              letterSpacing: '0.10em',
-              color: palette.color,
-              background: `linear-gradient(180deg, ${palette.tint}, rgba(255,255,255,0.01))`,
-              border: `1px solid ${palette.border}`,
+              letterSpacing: '0.12em',
+              color: locked ? T.faint : c,
+              border: `1px solid ${locked ? T.line : rgbaOf(c, 0.35)}`,
               borderRadius: 6,
-              boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.06)',
               ...GAM.TABULAR,
             }}
           >
@@ -435,48 +366,46 @@ const ShowpieceCard: React.FC<Props> = ({ item, onTap }) => {
           display: 'flex',
           flexDirection: 'column',
           justifyContent: 'center',
-          gap: 2,
-          marginTop: 4,
+          gap: 3,
+          marginTop: 6,
         }}
       >
         <span
           style={{
-            fontSize: 32,
-            fontWeight: 300,
-            letterSpacing: '-0.045em',
-            color: locked ? 'var(--hcp-t-60)' : palette.color,
-            lineHeight: 0.95,
-            fontVariantNumeric: 'tabular-nums',
-            fontFeatureSettings: '"kern" 1, "liga" 1',
-            textShadow: !locked && palette.outerGlow ? `0 0 24px ${palette.color}30` : undefined,
+            fontSize: 30,
+            fontWeight: 800,
+            letterSpacing: '-0.03em',
+            color: locked ? T.dim : c,
+            lineHeight: 1,
+            ...GAM.TABULAR,
           }}
         >
           {locked ? '—' : animatedValue.toLocaleString()}
         </span>
         <span
           style={{
-            fontSize: 8,
+            fontSize: 8.5,
             fontWeight: 800,
-            color: 'var(--hcp-t-60)',
-            letterSpacing: '0.16em',
+            color: T.faint,
+            letterSpacing: '0.14em',
             textTransform: 'uppercase',
-            lineHeight: 1.3,
+            lineHeight: 1.25,
           }}
         >
           {caption}
         </span>
       </div>
 
-      {/* Next-tier signpost + progress bar + endpoints */}
+      {/* Next signpost + progress bar + endpoints */}
       <div style={{ position: 'relative', zIndex: 1, flexShrink: 0 }}>
         <div
           style={{
             fontSize: 8.5,
-            fontWeight: 700,
-            color: 'var(--hcp-t-60)',
+            fontWeight: 800,
+            color: T.faint,
             letterSpacing: '0.12em',
             textTransform: 'uppercase',
-            marginBottom: 4,
+            marginBottom: 5,
             whiteSpace: 'nowrap',
             overflow: 'hidden',
             textOverflow: 'ellipsis',
@@ -489,17 +418,16 @@ const ShowpieceCard: React.FC<Props> = ({ item, onTap }) => {
             : atMax
               ? '\u00A0'
               : nextTier
-                ? `Next: ${nextTier.threshold.toLocaleString()} → T${nextTier.tier}`
+                ? `NEXT: ${nextTier.threshold.toLocaleString()} → T${nextTier.tier}`
                 : '\u00A0'}
         </div>
-        {/* Progress bar track */}
         <div
           style={{
             position: 'relative',
             width: '100%',
-            height: 2,
-            borderRadius: 1,
-            background: 'rgba(241,245,249,0.10)',
+            height: 3.5,
+            borderRadius: 99,
+            background: 'rgba(255,255,255,0.07)',
             overflow: 'hidden',
           }}
         >
@@ -507,22 +435,20 @@ const ShowpieceCard: React.FC<Props> = ({ item, onTap }) => {
             style={{
               width: `${animatedPct * 100}%`,
               height: '100%',
-              background: palette.color,
-              opacity: 0.85,
-              borderRadius: 1,
+              background: locked ? T.faint : c,
+              borderRadius: 99,
               transition: 'width 700ms cubic-bezier(0.22,0.61,0.36,1)',
             }}
           />
         </div>
-        {/* Endpoints */}
         <div
           style={{
             display: 'flex',
             justifyContent: 'space-between',
             marginTop: 4,
             fontSize: 8,
-            fontWeight: 700,
-            color: 'var(--hcp-t-60)',
+            fontWeight: 800,
+            color: T.faint,
             letterSpacing: '0.10em',
             textTransform: 'uppercase',
             ...GAM.TABULAR,
@@ -536,7 +462,114 @@ const ShowpieceCard: React.FC<Props> = ({ item, onTap }) => {
   );
 };
 
+// ─────────────────────────────────────────────────────────────────────────
+// LegendCard — Course Legends grid card
+// ─────────────────────────────────────────────────────────────────────────
+const LegendCard: React.FC<Props> = ({ item, onTap }) => {
+  if (item.kind !== 'legend') return null;
+  const [pressed, setPressed] = useState(false);
+  const c = AMBER;
+
+  return (
+    <button
+      type="button"
+      onClick={() => onTap(item)}
+      onTouchStart={() => setPressed(true)}
+      onTouchEnd={() => setPressed(false)}
+      onTouchCancel={() => setPressed(false)}
+      style={{
+        ...CARD_BASE,
+        background: `linear-gradient(180deg, ${rgbaOf(c, 0.08)}, ${rgbaOf(c, 0.015)}), ${T.card}`,
+        border: `1px solid ${rgbaOf(c, 0.40)}`,
+        transform: pressed ? 'scale(0.985)' : 'scale(1)',
+        transition: 'transform 120ms ease',
+      }}
+    >
+      <Watermark iconKey={item.iconKey} color={c} opacity={0.09} />
+
+      {/* Top row: icon chip + #rank pill */}
+      <div
+        style={{
+          position: 'relative',
+          zIndex: 1,
+          display: 'flex',
+          alignItems: 'flex-start',
+          justifyContent: 'space-between',
+        }}
+      >
+        <div
+          style={{
+            width: 30,
+            height: 30,
+            borderRadius: 9,
+            background: rgbaOf(c, 0.12),
+            border: `1px solid ${rgbaOf(c, 0.35)}`,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            color: c,
+            flexShrink: 0,
+          }}
+        >
+          {renderBadgeIcon(item.iconKey, 14, 'currentColor')}
+        </div>
+        <span
+          style={{
+            padding: '2px 6px',
+            fontSize: 8.5,
+            fontWeight: 800,
+            letterSpacing: '0.12em',
+            color: c,
+            border: `1px solid ${rgbaOf(c, 0.35)}`,
+            borderRadius: 6,
+            ...GAM.TABULAR,
+          }}
+        >
+          #{item.rank}
+        </span>
+      </div>
+
+      {/* Bottom: course name (two lines) + category */}
+      <div style={{ position: 'relative', zIndex: 1, marginTop: 'auto', paddingTop: 12 }}>
+        <div
+          style={{
+            fontSize: 12.5,
+            fontWeight: 800,
+            lineHeight: 1.25,
+            color: T.ink,
+            letterSpacing: '-0.01em',
+            display: '-webkit-box',
+            WebkitLineClamp: 2,
+            WebkitBoxOrient: 'vertical',
+            overflow: 'hidden',
+          }}
+        >
+          {item.courseName}
+        </div>
+        <div
+          style={{
+            marginTop: 5,
+            fontSize: 8.5,
+            fontWeight: 800,
+            letterSpacing: '0.12em',
+            color: c,
+            textTransform: 'uppercase',
+            whiteSpace: 'nowrap',
+            overflow: 'hidden',
+            textOverflow: 'ellipsis',
+            ...GAM.TABULAR,
+          }}
+        >
+          {item.name} · {item.formattedValue}
+        </div>
+      </div>
+    </button>
+  );
+};
+
+// ─── Router ─────────────────────────────────────────────────────────────
 export const TrophyCard: React.FC<Props> = ({ item, onTap }) => {
+  if (item.kind === 'legend') return <LegendCard item={item} onTap={onTap} />;
   if (item.kind === 'achievement' && isShowpiece(item.badgeId)) {
     return <ShowpieceCard item={item} onTap={onTap} />;
   }
