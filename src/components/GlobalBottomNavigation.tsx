@@ -196,21 +196,28 @@ const GlobalBottomNavigation: React.FC<GlobalBottomNavigationProps> = ({ chromeS
     handleTabClick(tab);
   };
 
-  // Sizes
+  // Sizes (icons-only, no visible labels)
   const PILL_MAX_EXPANDED = 'min(360px, 100vw - 32px)';
   const PILL_MAX_CONDENSED = 'min(320px, 100vw - 48px)';
   const iconSize = condensed ? 21 : 23;
+  const iconStroke = theme === 'dark' ? 2 : 2.1;
+  const pillPadding = condensed ? '7px 10px' : '9px 10px';
   const lozengePad = condensed ? '8px 16px' : '9px 18px';
+  const inactivePad = condensed ? '8px 12px' : '9px 14px';
 
   const badges = useMemo<Record<string, number>>(() => ({ courses: unseenFriendReviews }), [unseenFriendReviews]);
 
-  // Motion tokens
-  const TRANSITION = REDUCED_MOTION
+  // Motion tokens — only max-width + padding + icon size may animate on the
+  // blurred pill. Never animate an explicit height/width on the pill itself.
+  const PILL_TRANSITION = REDUCED_MOTION
     ? 'none'
-    : 'max-width 220ms cubic-bezier(0.2,0.8,0.2,1)';
-  const LABEL_TRANSITION = REDUCED_MOTION
+    : 'max-width 220ms cubic-bezier(0.2,0.8,0.2,1), padding 220ms cubic-bezier(0.2,0.8,0.2,1)';
+  const ICON_TRANSITION = REDUCED_MOTION
     ? 'none'
-    : 'height 220ms cubic-bezier(0.2,0.8,0.2,1), opacity 150ms linear';
+    : 'width 220ms cubic-bezier(0.2,0.8,0.2,1), height 220ms cubic-bezier(0.2,0.8,0.2,1)';
+  const BUTTON_TRANSITION = REDUCED_MOTION
+    ? 'none'
+    : 'background 180ms linear, color 180ms linear, padding 220ms cubic-bezier(0.2,0.8,0.2,1)';
 
   return (
     <>
