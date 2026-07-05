@@ -103,22 +103,35 @@ export function openWithOrigin({
     posterUrl: posterUrl ?? null,
   });
 
-  // Two-way resume: prefer the live feed-active lane time when it's
-  // playing the tapped post; fall back to the engine's session lastPos map.
+  // Two-way resume: prefer the tile's live rail-lane playhead (Watch tap),
+  // then the feed-active lane (Clubhouse tap), then the engine's session
+  // lastPos map.
   let startPosition = 0;
-  let startSource: 'feedSnap' | 'lastPos' | 'zero' = 'zero';
+  let startSource: 'railLane' | 'feedSnap' | 'lastPos' | 'zero' = 'zero';
+  let railLaneCT = -1;
   let feedSnapCT = -1;
   let lastPosCT = -1;
   try {
-    const feedSnap = VideoEngine.snapshot('feed-active');
-    feedSnapCT = feedSnap.currentTime;
-    if (postId && feedSnap.currentTime > 0) {
-      startPosition = feedSnap.currentTime;
-      startSource = 'feedSnap';
-    } else if (postId) {
-      lastPosCT = VideoEngine.getLastPos(postId);
-      startPosition = lastPosCT;
-      startSource = 'lastPos';
+    if (railOwnerKey) {
+      // Lazy import to avoid a hard dep from feed tap paths.
+      const { RailLanePool } = require('@/video/railLanePool');
+      railLaneCT = RailLanePool.getCurrentTime(railOwnerKey);
+      if (railLaneCT > 0.1) {
+        startPosition = railLaneCT;
+        startSource = 'railLane';
+      }
+    }
+    if (startSource === 'zero') {
+      const feedSnap = VideoEngine.snapshot('feed-active');
+      feedSnapCT = feedSnap.currentTime;
+      if (postId && feedSnap.currentTime > 0) {
+        startPosition = feedSnap.currentTime;
+        startSource = 'feedSnap';
+      } else if (postId) {
+        lastPosCT = VideoEngine.getLastPos(postId);
+        startPosition = lastPosCT;
+        startSource = 'lastPos';
+      }
     }
   } catch {
     /* engine may not be booted yet on deep-link openers */
@@ -127,9 +140,11 @@ export function openWithOrigin({
     postId,
     startPosition: +startPosition.toFixed(3),
     source: startSource,
+    railLaneCT: +railLaneCT.toFixed(3),
     feedSnapCT: +feedSnapCT.toFixed(3),
     lastPosCT: +lastPosCT.toFixed(3),
   });
+
 
   // [VIDEOSTUB] Handoff + pool manager removed — poster-only chassis.
   void handOffUrls;
