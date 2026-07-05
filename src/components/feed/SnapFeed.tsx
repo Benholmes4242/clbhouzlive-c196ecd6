@@ -435,12 +435,14 @@ export function SnapFeed({
     }
   }
 
-  // [VDIFF] SnapFeed render trace — compare watch vs course tap line-by-line.
+  // [VDIFF] SnapFeed render trace — with prev-render diff so a 30fps
+  // re-render loop reveals which prop/selector is changing (or all-equal ⇒
+  // parent re-render).
+  const prevRenderRef = useRef<Record<string, unknown> | null>(null);
   if (isPerfEnabled()) {
     const openStartIdx = startIndex ?? 0;
     const openPost = posts[openStartIdx];
-    // eslint-disable-next-line no-console
-    console.info('[VDIFF] snapfeed.render', {
+    const snap: Record<string, unknown> = {
       surface,
       activeTab,
       readOnly: !!readOnly,
@@ -453,9 +455,23 @@ export function SnapFeed({
       openingMediaIndex,
       openPostId: openPost?.id ?? null,
       openPostMediaCount: openPost?.mediaItems?.length ?? 0,
+    };
+    const prev = prevRenderRef.current;
+    const changed: string[] = [];
+    if (prev) {
+      for (const k of Object.keys(snap)) {
+        if (prev[k] !== snap[k]) changed.push(k);
+      }
+    }
+    vdiff('snapfeed.render', {
+      layer: 'snapfeed',
+      ...snap,
       openPostMediaTypes: openPost?.mediaItems?.map(m => m.type) ?? [],
+      changedSincePrev: prev ? changed : 'first',
     });
+    prevRenderRef.current = snap;
   }
+
 
   return (
     <div
