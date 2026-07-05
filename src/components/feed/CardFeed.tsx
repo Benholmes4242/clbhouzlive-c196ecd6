@@ -25,6 +25,7 @@ import type { ActiveActor } from '@/types/actor';
 import { useFullscreenFeedStore } from '@/store/fullscreenFeedStore';
 import { openWithOrigin } from '@/lib/openWithOrigin';
 import { useClubhouseStore } from '@/store/clubhouseStore';
+import { registerNavScroller } from '@/hooks/useScrollDirection';
 
 import { VideoEngine } from '@/video/VideoEngine';
 
@@ -642,7 +643,16 @@ export const CardFeed = forwardRef<CardFeedHandle, CardFeedProps>(function CardF
       >
         <Virtuoso
           ref={virtuosoRef}
-          scrollerRef={(el) => { scrollerElRef.current = (el as HTMLElement) ?? null; }}
+          scrollerRef={(el) => {
+            const node = (el as HTMLElement) ?? null;
+            scrollerElRef.current = node;
+            // Wire this scroller into the floating-nav scroll-direction store
+            // so the pill condenses/expands as the feed scrolls. Virtuoso
+            // owns its own inner scroll div — window never scrolls on this
+            // route (PageRoot fixedHeight), so the auto-registered window
+            // scroller receives no events.
+            if (node) registerNavScroller(node);
+          }}
           data={posts}
           itemContent={itemContent}
           computeItemKey={(_, post) => post.id}
