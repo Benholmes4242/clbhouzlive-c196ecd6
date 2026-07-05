@@ -331,7 +331,7 @@ const ROUTE_CONFIGS: RoutePrefetchConfig[] = [
   // populated it (e.g. previous visit, persisted cache). This makes the
   // paths "known" to triggerPrefetch(), so tab-touchstart warm-up is a
   // no-op-safe call rather than a "not found" fall-through. Rails warm
-  // themselves on reveal via useRailAutoplay — do not compete here.
+  // themselves on reveal via useWatchAutoplay — do not compete here.
   {
     // /watch primary grid: warm HLS for any short-form video cache hit.
     path: '/watch',
