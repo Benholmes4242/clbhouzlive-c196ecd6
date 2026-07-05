@@ -65,6 +65,9 @@ interface OpenWithOriginArgs {
    * tapping a tile playing at 8s opens fullscreen at 8s, not 0.
    */
   railOwnerKey?: string | null;
+  /** Which media within the opening post to render on the opening slide.
+   *  Default 0 → identical behavior for existing callers. */
+  mediaIndex?: number;
   options?: {
     openCommentsInitially?: boolean;
     initialCommentId?: string | null;
