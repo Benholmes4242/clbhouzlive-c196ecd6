@@ -61,6 +61,7 @@ interface FullscreenFeedState {
   readOnly: boolean;
   origin: OpenOrigin | null;
   startPosition: number;
+  mediaIndex: number;
   open: (posts: FeedPost[], startIndex?: number, options?: OpenOptions) => void;
   close: () => void;
   appendPosts: (newPosts: FeedPost[]) => void;
