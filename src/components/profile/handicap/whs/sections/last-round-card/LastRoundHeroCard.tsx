@@ -19,11 +19,11 @@ interface Props {
   ownerFirstName?: string | null;
 }
 
-const MEDIA_HEIGHT = 118;
+const MEDIA_HEIGHT = 132;
 
-/** Bottom scrim so the course name reads on any photo. */
+/** Two-stop scrim ramp so the course name reads on any photo. */
 const NAME_SCRIM =
-  'linear-gradient(180deg, rgba(11,15,20,0) 30%, rgba(11,15,20,0.78) 100%)';
+  'linear-gradient(180deg, rgba(15,18,25,0.02) 0%, rgba(15,18,25,0.20) 46%, rgba(15,18,25,0.62) 74%, rgba(15,18,25,0.86) 100%)';
 
 const MediaBand: React.FC<{ src: string | null; course: string; meta: string | null }> = ({
   src,
@@ -90,13 +90,32 @@ const MediaBand: React.FC<{ src: string | null; course: string; meta: string | n
         }}
       />
 
+      {/* Masked blur bed — sits above the scrim, below the text. Gracefully
+          degrades where backdrop-filter is unavailable (scrim alone carries
+          legibility). */}
+      <div
+        aria-hidden
+        style={{
+          position: 'absolute',
+          left: 0,
+          right: 0,
+          bottom: 0,
+          height: 58,
+          backdropFilter: 'blur(7px)',
+          WebkitBackdropFilter: 'blur(7px)',
+          maskImage: 'linear-gradient(180deg, transparent 0%, black 55%)',
+          WebkitMaskImage: 'linear-gradient(180deg, transparent 0%, black 55%)',
+          pointerEvents: 'none',
+        }}
+      />
+
       {/* Course name + meta */}
       <div
         style={{
           position: 'absolute',
           left: 16,
           right: 16,
-          bottom: 12,
+          bottom: 30,
           color: '#fff',
         }}
       >
@@ -109,7 +128,6 @@ const MediaBand: React.FC<{ src: string | null; course: string; meta: string | n
             overflow: 'hidden',
             textOverflow: 'ellipsis',
             whiteSpace: 'nowrap',
-            textShadow: '0 1px 2px rgba(0,0,0,0.35)',
           }}
         >
           {course}
@@ -117,13 +135,13 @@ const MediaBand: React.FC<{ src: string | null; course: string; meta: string | n
         {meta && (
           <div
             style={{
-              marginTop: 4,
-              fontSize: 11,
+              marginTop: 3,
+              fontSize: 10.5,
               fontWeight: 700,
               letterSpacing: '0.08em',
               textTransform: 'uppercase',
               color: 'rgba(255,255,255,0.82)',
-              textShadow: '0 1px 2px rgba(0,0,0,0.35)',
+              fontVariantNumeric: 'tabular-nums',
             }}
           >
             {meta}
@@ -169,8 +187,17 @@ const LastRoundHeroCard: React.FC<Props> = ({ round, onClick }) => {
 
   // ---- consequence line ----
   // Order matters: non-counting first, then no-previous-index, then move/hold.
-  const dim: React.CSSProperties = { fontSize: 12, fontWeight: 700, color: 'var(--hcp-t-60)' };
-  const strong: React.CSSProperties = { color: 'var(--hcp-t-100)', fontWeight: 800 };
+  const dim: React.CSSProperties = {
+    fontSize: 12,
+    fontWeight: 600,
+    color: 'var(--hcp-t-60)',
+    fontVariantNumeric: 'tabular-nums',
+  };
+  const strong: React.CSSProperties = {
+    color: 'var(--hcp-t-100)',
+    fontWeight: 800,
+    fontVariantNumeric: 'tabular-nums',
+  };
   let consequence: React.ReactNode;
   if (!round.is_counter) {
     consequence = <span style={dim}>No effect on your index</span>;
@@ -197,10 +224,17 @@ const LastRoundHeroCard: React.FC<Props> = ({ round, onClick }) => {
           fontSize: 12,
           fontWeight: 700,
           color: up ? 'var(--hcp-bad)' : 'var(--hcp-good-2)',
+          fontVariantNumeric: 'tabular-nums',
         }}
       >
         {up ? '\u2191' : '\u2193'} {Math.abs(handicapDelta).toFixed(1)}{' '}
-        <span style={{ color: 'var(--hcp-t-60)', fontWeight: 700 }}>
+        <span
+          style={{
+            color: 'var(--hcp-t-60)',
+            fontWeight: 600,
+            fontVariantNumeric: 'tabular-nums',
+          }}
+        >
           {'\u00b7'} index {up ? 'climbs' : 'drops'} to{' '}
           <span style={strong}>{indexAfter.toFixed(1)}</span>
         </span>
@@ -229,78 +263,100 @@ const LastRoundHeroCard: React.FC<Props> = ({ round, onClick }) => {
     >
       <MediaBand src={round.course_thumbnail_image ?? null} course={courseName} meta={meta} />
 
-      {/* stat strip at the seam */}
-      <div
-        style={{
-          display: 'flex',
-          background: 'var(--hcp-bg-2)',
-          borderTop: '1px solid var(--hcp-line)',
-          borderBottom: '1px solid var(--hcp-line)',
-        }}
-      >
-        {(
-          [
-            ['Score diff', diffDisplay, diffColor],
-            ['Gross', gross != null ? String(gross) : '\u2014', 'var(--hcp-t-100)'],
-            [
-              'Stableford',
-              stableford != null ? String(stableford) : '\u2014',
-              'var(--hcp-t-100)',
-            ],
-          ] as const
-        ).map(([label, value, color], i) => (
+      {/* Floating glass tray — overlaps the photo seam by 22px, holds the
+          stats and consequence rows separated by a single internal hairline. */}
+      <div style={{ padding: '0 10px 10px', marginTop: -22 }}>
+        <div
+          style={{
+            position: 'relative',
+            borderRadius: 13,
+            background: 'rgba(32,36,46,0.94)',
+            backdropFilter: 'blur(10px)',
+            WebkitBackdropFilter: 'blur(10px)',
+            border: '1px solid rgba(255,255,255,0.10)',
+            boxShadow: '0 8px 24px rgba(0,0,0,0.35)',
+            overflow: 'hidden',
+          }}
+        >
+          {/* stats row */}
+          <div style={{ display: 'flex', padding: '13px 14px', alignItems: 'flex-end' }}>
+            {(
+              [
+                ['Score diff', diffDisplay, diffColor, 1.2, 22],
+                ['Gross', gross != null ? String(gross) : '\u2014', 'var(--hcp-t-100)', 1, 17],
+                [
+                  'Stableford',
+                  stableford != null ? String(stableford) : '\u2014',
+                  'var(--hcp-t-100)',
+                  1,
+                  17,
+                ],
+              ] as const
+            ).map(([label, value, color, flex, valueSize], i) => (
+              <div
+                key={label}
+                style={{
+                  flex,
+                  borderLeft: i === 0 ? 'none' : '1px solid rgba(255,255,255,0.08)',
+                  paddingLeft: i === 0 ? 0 : 14,
+                }}
+              >
+                <div
+                  style={{
+                    fontSize: 10,
+                    fontWeight: 700,
+                    letterSpacing: '0.08em',
+                    textTransform: 'uppercase',
+                    color: 'var(--hcp-t-40)',
+                    marginBottom: 4,
+                  }}
+                >
+                  {label}
+                </div>
+                <div
+                  style={{
+                    fontSize: valueSize,
+                    fontWeight: 800,
+                    color,
+                    letterSpacing: '-0.01em',
+                    fontVariantNumeric: 'tabular-nums',
+                    lineHeight: 1,
+                  }}
+                >
+                  {value}
+                </div>
+              </div>
+            ))}
+          </div>
+
+          {/* internal hairline */}
           <div
-            key={label}
             style={{
-              flex: 1,
-              padding: '12px 14px',
-              borderLeft: i === 0 ? 'none' : '1px solid var(--hcp-line)',
+              height: 1,
+              background: 'var(--hcp-line, rgba(255,255,255,0.08))',
+              margin: '0 14px',
+            }}
+          />
+
+          {/* consequence row */}
+          <div
+            style={{
+              display: 'flex',
+              justifyContent: 'space-between',
+              alignItems: 'center',
+              padding: '0 14px',
+              minHeight: 44,
             }}
           >
-            <div
-              style={{
-                fontSize: 10,
-                fontWeight: 700,
-                letterSpacing: '0.08em',
-                textTransform: 'uppercase',
-                color: 'var(--hcp-t-40)',
-                marginBottom: 4,
-              }}
-            >
-              {label}
-            </div>
-            <div
-              style={{
-                fontSize: 19,
-                fontWeight: 800,
-                color,
-                letterSpacing: '-0.02em',
-                fontVariantNumeric: 'tabular-nums',
-                lineHeight: 1,
-              }}
-            >
-              {value}
-            </div>
+            {consequence}
+            <ChevronRight
+              size={18}
+              color="rgba(242,244,247,0.38)"
+              strokeWidth={2.4}
+              style={{ flexShrink: 0, marginLeft: 8 }}
+            />
           </div>
-        ))}
-      </div>
-
-      {/* consequence line */}
-      <div
-        style={{
-          display: 'flex',
-          justifyContent: 'space-between',
-          alignItems: 'center',
-          padding: '12px 16px',
-        }}
-      >
-        {consequence}
-        <ChevronRight
-          size={18}
-          color="var(--hcp-t-60)"
-          strokeWidth={2.4}
-          style={{ flexShrink: 0, marginLeft: 8 }}
-        />
+        </div>
       </div>
     </button>
   );
