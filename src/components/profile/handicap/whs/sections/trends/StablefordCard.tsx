@@ -649,13 +649,21 @@ const KeyCell: React.FC<KeyCellProps> = ({ color, label, meta }) => (
 // ─── Scoring range block (points mode) ──────────────────────────────────
 const ScoringRangeBlock: React.FC<{
   range: { worst: number; median: number; best: number };
-  avg: number;
-}> = ({ range, avg }) => {
-  const span = Math.max(range.best - range.worst, 1);
-  const markerPct = Math.min(100, Math.max(0, ((avg - range.worst) / span) * 100));
+}> = ({ range }) => {
+  const span = range.best - range.worst;
+  const showMarker = span > 0;
+  const rawPct = showMarker ? ((range.median - range.worst) / span) * 100 : 0;
+  const markerPct = Math.min(98, Math.max(2, rawPct));
 
   return (
-    <div style={{ marginTop: 18 }}>
+    <div
+      style={{
+        marginTop: 12,
+        paddingTop: 12,
+        borderTop: '1px solid var(--hcp-line)',
+        fontFamily: FONT,
+      }}
+    >
       <div
         style={{
           display: 'flex',
@@ -668,113 +676,79 @@ const ScoringRangeBlock: React.FC<{
           style={{
             fontSize: 9.5,
             fontWeight: 800,
-            color: T.ink40,
+            color: T.inkMute,
             letterSpacing: '0.14em',
-            fontFamily: FONT,
           }}
         >
           SCORING RANGE
         </span>
         <span
           style={{
-            fontSize: 10,
-            fontWeight: 700,
-            color: T.inkMute,
-            fontFamily: FONT,
+            fontSize: 9.5,
+            fontWeight: 800,
+            color: T.ink40,
             fontVariantNumeric: 'tabular-nums',
-            letterSpacing: '0.02em',
+            letterSpacing: '0.10em',
           }}
         >
-          {range.worst} — {range.best} pts
+          {range.worst} — {range.best} PTS
         </span>
       </div>
 
-      {/* Track */}
       <div
         style={{
           position: 'relative',
           height: 5,
           borderRadius: 99,
-          background: 'rgba(15,23,42,0.06)',
+          background:
+            'linear-gradient(90deg, rgba(242,244,247,0.10) 0%, rgba(247,147,30,0.45) 50%, rgba(85,189,139,0.75) 100%)',
           overflow: 'visible',
         }}
       >
-        <div
-          style={{
-            position: 'absolute',
-            inset: 0,
-            borderRadius: 99,
-            background:
-              'linear-gradient(90deg, #DC2626 0%, #F59E0B 50%, #22C55E 100%)',
-            opacity: 0.85,
-          }}
-        />
-        {/* Marker */}
-        <div
-          style={{
-            position: 'absolute',
-            top: -4,
-            left: `${markerPct}%`,
-            transform: 'translateX(-50%)',
-            width: 4,
-            height: 13,
-            borderRadius: 2,
-            background: '#FFFFFF',
-            boxShadow: '0 1px 3px rgba(15,23,42,0.35)',
-          }}
-          aria-label={`Average ${avg.toFixed(1)} points`}
-        />
+        {showMarker && (
+          <div
+            style={{
+              position: 'absolute',
+              top: -3,
+              left: `${markerPct}%`,
+              transform: 'translateX(-50%)',
+              width: 3,
+              height: 11,
+              borderRadius: 2,
+              background: '#FFFFFF',
+            }}
+            aria-label={`Median ${range.median} points`}
+          />
+        )}
       </div>
 
-      {/* Axis */}
       <div
         style={{
-          display: 'grid',
-          gridTemplateColumns: '1fr 1fr 1fr',
-          marginTop: 10,
-          fontFamily: FONT,
+          display: 'flex',
+          justifyContent: 'space-between',
+          marginTop: 8,
+          fontSize: 9,
+          fontWeight: 800,
+          letterSpacing: '0.10em',
+          color: T.ink40,
+          fontVariantNumeric: 'tabular-nums',
         }}
       >
-        <RangeAxisCell value={range.worst} label="WORST" align="flex-start" />
-        <RangeAxisCell value={range.median} label="MEDIAN" align="center" />
-        <RangeAxisCell value={range.best} label="BEST" align="flex-end" />
+        <span>
+          <span style={{ color: T.ink40 }}>{range.worst}</span> WORST
+        </span>
+        <span style={{ color: T.inkMute }}>
+          <span style={{ color: T.inkMute }}>{range.median}</span> MEDIAN
+        </span>
+        <span>
+          <span style={{ color: T.ink40 }}>{range.best}</span> BEST
+        </span>
       </div>
     </div>
   );
 };
 
-const RangeAxisCell: React.FC<{
-  value: number;
-  label: string;
-  align: 'flex-start' | 'center' | 'flex-end';
-}> = ({ value, label, align }) => (
-  <div style={{ display: 'flex', flexDirection: 'column', alignItems: align }}>
-    <span
-      style={{
-        fontSize: 13,
-        fontWeight: 700,
-        color: T.ink,
-        fontFamily: FONT,
-        fontVariantNumeric: 'tabular-nums',
-        letterSpacing: '-0.01em',
-      }}
-    >
-      {value}
-    </span>
-    <span
-      style={{
-        fontSize: 9,
-        fontWeight: 800,
-        color: T.ink40,
-        letterSpacing: '0.08em',
-        marginTop: 2,
-        fontFamily: FONT,
-      }}
-    >
-      {label}
-    </span>
-  </div>
-);
+
 
 // ─── Shots body ─────────────────────────────────────────────────────────
 import type { TrophyAggregates } from '@/lib/whs/api';
