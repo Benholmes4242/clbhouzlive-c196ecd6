@@ -77,8 +77,16 @@ function AutoplayVideoCardInner({ post, index, allPosts, userId, active, borderR
 
 
   const handleTap = () => {
-    useFullscreenFeedStore.getState().open(allPosts, index);
+    openWithOrigin({
+      posts: allPosts,
+      index,
+      originEl: tileRef.current,
+      posterUrl: thumbnail || null,
+      handOffUrls: [hlsUrl],
+      railOwnerKey: ownerKey,
+    });
   };
+
 
   const handleShare = async () => {
     const shareUrl = `${window.location.origin}/video/${post.id}`;
