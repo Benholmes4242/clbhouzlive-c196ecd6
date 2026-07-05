@@ -32,6 +32,7 @@ interface Tile {
   eyebrow: string;
   value: string;
   caption: string | null;
+  valueColor?: string;
 }
 
 function fmtCourseDate(s: WhsScore | null): string | null {
