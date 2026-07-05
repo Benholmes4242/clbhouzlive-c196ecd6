@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { Heart, MessageCircle } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
 import { toast } from 'sonner';
-import { useFullscreenFeedStore } from '@/store/fullscreenFeedStore';
+import { openWithOrigin } from '@/lib/openWithOrigin';
 import type { FeedPost } from '@/components/media-system/types/media';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { VideoCardMenu } from '@/components/videos-tab/VideoCardMenu';
