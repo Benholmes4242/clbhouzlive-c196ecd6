@@ -174,18 +174,23 @@ export function useWatchAutoplay(
 
     const initial = root.querySelectorAll<HTMLElement>('[data-watch-tile-index]');
     observeTiles(initial);
+    // Kick a recompute after initial observe so IO's async first-batch delivery
+    // has a pending compute even if hydration bursts start immediately.
+    scheduleRecompute();
 
     // Re-scan on DOM mutations (feeds paginate / rails hydrate late).
     const mo = new MutationObserver(() => {
       const next = root.querySelectorAll<HTMLElement>('[data-watch-tile-index]');
       observeTiles(next);
+      scheduleRecompute();
     });
     mo.observe(root, { childList: true, subtree: true });
 
     return () => {
       io.disconnect();
       mo.disconnect();
-      if (settleTimer.current) clearTimeout(settleTimer.current);
+      if (settleTimer.current) { clearTimeout(settleTimer.current); settleTimer.current = null; }
+      if (maxWaitTimer.current) { clearTimeout(maxWaitTimer.current); maxWaitTimer.current = null; }
       ratiosRef.current.clear();
     };
   }, [eligible, root]);
