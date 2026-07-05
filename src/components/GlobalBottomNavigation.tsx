@@ -17,8 +17,8 @@ import { cn } from '@/lib/utils';
 
 // ---- Public token: total vertical space to reserve at the bottom of any
 // scrollable page so its last content clears the floating pill.
-// (66 pill + 10 bottom gap + 16 breathing room = 92)
-export const NAV_CLEARANCE = 'calc(env(safe-area-inset-bottom, 0px) + 92px)';
+// (~58 pill + 10 bottom gap + 16 breathing room = 84)
+export const NAV_CLEARANCE = 'calc(env(safe-area-inset-bottom, 0px) + 84px)';
 
 // Routes where bottom navigation should be hidden
 const HIDDEN_ROUTES = [
@@ -74,11 +74,11 @@ const DARK_TOKENS: ThemeTokens = {
 };
 
 const LIGHT_TOKENS: ThemeTokens = {
-  fill: 'rgba(250,251,253,0.86)',
+  fill: 'rgba(250,251,253,0.88)',
   hairline: '1px solid rgba(15,23,42,0.08)',
-  shadow: '0 10px 30px rgba(15,23,42,0.14)',
+  shadow: '0 10px 30px rgba(15,23,42,0.16)',
   ink: '#0F172A',
-  dim: 'rgba(15,23,42,0.45)',
+  dim: 'rgba(15,23,42,0.58)',
   lozenge: 'rgba(15,23,42,0.07)',
 };
 
@@ -196,21 +196,28 @@ const GlobalBottomNavigation: React.FC<GlobalBottomNavigationProps> = ({ chromeS
     handleTabClick(tab);
   };
 
-  // Sizes
+  // Sizes (icons-only, no visible labels)
   const PILL_MAX_EXPANDED = 'min(360px, 100vw - 32px)';
   const PILL_MAX_CONDENSED = 'min(320px, 100vw - 48px)';
   const iconSize = condensed ? 21 : 23;
+  const iconStroke = theme === 'dark' ? 2 : 2.1;
+  const pillPadding = condensed ? '7px 10px' : '9px 10px';
   const lozengePad = condensed ? '8px 16px' : '9px 18px';
+  const inactivePad = condensed ? '8px 12px' : '9px 14px';
 
   const badges = useMemo<Record<string, number>>(() => ({ courses: unseenFriendReviews }), [unseenFriendReviews]);
 
-  // Motion tokens
-  const TRANSITION = REDUCED_MOTION
+  // Motion tokens — only max-width + padding + icon size may animate on the
+  // blurred pill. Never animate an explicit height/width on the pill itself.
+  const PILL_TRANSITION = REDUCED_MOTION
     ? 'none'
-    : 'max-width 220ms cubic-bezier(0.2,0.8,0.2,1)';
-  const LABEL_TRANSITION = REDUCED_MOTION
+    : 'max-width 220ms cubic-bezier(0.2,0.8,0.2,1), padding 220ms cubic-bezier(0.2,0.8,0.2,1)';
+  const ICON_TRANSITION = REDUCED_MOTION
     ? 'none'
-    : 'height 220ms cubic-bezier(0.2,0.8,0.2,1), opacity 150ms linear';
+    : 'width 220ms cubic-bezier(0.2,0.8,0.2,1), height 220ms cubic-bezier(0.2,0.8,0.2,1)';
+  const BUTTON_TRANSITION = REDUCED_MOTION
+    ? 'none'
+    : 'background 180ms linear, color 180ms linear, padding 220ms cubic-bezier(0.2,0.8,0.2,1)';
 
   return (
     <>
@@ -262,8 +269,8 @@ const GlobalBottomNavigation: React.FC<GlobalBottomNavigationProps> = ({ chromeS
                 border: tokens.hairline,
                 boxShadow: tokens.shadow,
                 borderRadius: 999,
-                padding: '8px 10px',
-                transition: TRANSITION,
+                padding: pillPadding,
+                transition: PILL_TRANSITION,
                 WebkitTapHighlightColor: 'transparent',
               }}
             >
@@ -305,28 +312,25 @@ const GlobalBottomNavigation: React.FC<GlobalBottomNavigationProps> = ({ chromeS
                           border: 0,
                           background: isActive ? tokens.lozenge : 'transparent',
                           color: isActive ? activeColor : inactiveColor,
-                          padding: isActive ? lozengePad : (condensed ? '8px 10px' : '9px 12px'),
+                          padding: isActive ? lozengePad : inactivePad,
                           borderRadius: 999,
                           display: 'inline-flex',
-                          flexDirection: 'column',
                           alignItems: 'center',
                           justifyContent: 'center',
-                          gap: 2,
                           minHeight: 44,
                           fontFamily: 'inherit',
                           cursor: 'pointer',
-                          transition: REDUCED_MOTION
-                            ? 'none'
-                            : 'background 180ms linear, color 180ms linear, padding 220ms cubic-bezier(0.2,0.8,0.2,1)',
+                          transition: BUTTON_TRANSITION,
                         }}
                       >
                         <span style={{ position: 'relative', display: 'inline-flex' }}>
                           <Icon
+                            aria-hidden="true"
                             style={{
                               width: iconSize,
                               height: iconSize,
-                              strokeWidth: 1.75,
-                              transition: REDUCED_MOTION ? 'none' : 'width 220ms cubic-bezier(0.2,0.8,0.2,1), height 220ms cubic-bezier(0.2,0.8,0.2,1)',
+                              strokeWidth: iconStroke,
+                              transition: ICON_TRANSITION,
                             }}
                           />
                           {badgeCount > 0 && (
@@ -353,30 +357,22 @@ const GlobalBottomNavigation: React.FC<GlobalBottomNavigationProps> = ({ chromeS
                             </span>
                           )}
                         </span>
-                        {/* Label row — collapses in condensed state. Kept in
-                            the DOM (visually hidden) for screen readers. */}
+                        {/* Visually-hidden text label — always in DOM for
+                            screen readers (clip-rect pattern). Icons-only UI. */}
                         <span
                           style={{
-                            display: 'block',
+                            position: 'absolute',
+                            width: 1,
+                            height: 1,
+                            padding: 0,
+                            margin: -1,
                             overflow: 'hidden',
-                            height: condensed ? 0 : 14,
-                            opacity: condensed ? 0 : 1,
-                            transition: LABEL_TRANSITION,
+                            clip: 'rect(0,0,0,0)',
+                            whiteSpace: 'nowrap',
+                            border: 0,
                           }}
                         >
-                          <span
-                            style={{
-                              display: 'inline-block',
-                              fontSize: 10,
-                              lineHeight: '14px',
-                              fontWeight: 700,
-                              letterSpacing: 0.1,
-                              color: isActive ? activeColor : inactiveColor,
-                              whiteSpace: 'nowrap',
-                            }}
-                          >
-                            {displayLabel}
-                          </span>
+                          {displayLabel}
                         </span>
                       </button>
                     </li>
