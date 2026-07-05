@@ -1,10 +1,8 @@
 import React from 'react';
-import { firstName } from '@/lib/whs/utils/initials';
 import { pickAvatarSrc } from '@/lib/whs/utils/avatarSrc';
 import { getInitialsFromName, getAvatarFallbackColor } from '@/lib/avatarFallback';
 import { fmtHcp } from '@/lib/whs/format';
-import { useHandicapPercentile } from '@/lib/whs/usePercentile';
-import type { FriendLeaderboardEntry } from '@/lib/whs/types';
+import type { FriendLeaderboardEntry, FriendLeaderboardRankDelta } from '@/lib/whs/types';
 
 interface Props {
   /** The self row from the leaderboard cohort. */
@@ -15,9 +13,12 @@ interface Props {
   selfRank: number | null;
   /** Total active count. */
   totalActive: number;
-  /** Phase 3: expand state — controlled by the section. */
+  /** Same friend-circle percentile the section header prints. */
+  percentileTop: number | null;
+  /** Your 7D rank movement (matches the per-row delta shape). */
+  selfDelta?: FriendLeaderboardRankDelta;
+  /** Retained for parent compatibility. */
   expanded?: boolean;
-  /** Phase 3: tap handler for the catch-strip. */
   onToggleExpand?: () => void;
   viewMode?: 'owner' | 'friend';
   ownerFirstName?: string | null;
@@ -25,40 +26,49 @@ interface Props {
   embedded?: boolean;
 }
 
+const FONT = 'Geist, -apple-system, BlinkMacSystemFont, system-ui, sans-serif';
+const NUM: React.CSSProperties = { fontFamily: FONT, fontVariantNumeric: 'tabular-nums' };
+
 const T = {
   ink: 'var(--hcp-t-100)',
   inkMute: 'var(--hcp-t-60)',
-  inkSoft: 'var(--hcp-t-80)',
   inkFaded: 'var(--hcp-t-40)',
-  bg1: 'var(--hcp-bg-1)',
-  bg2: 'var(--hcp-bg-2)',
   bg3: 'var(--hcp-bg-3)',
-  line: 'var(--hcp-line-1)',
-  line2: 'var(--hcp-line-2)',
   amber: '#F7931E',
-  amberSoft: 'rgba(247,147,30,0.14)',
-  green: '#059669',
-  greenDeep: '#16A34A',
-  red: '#9F1D1D',
+  good: 'var(--hcp-good, #34D399)',
 };
-const FONT = 'Geist, -apple-system, BlinkMacSystemFont, system-ui, sans-serif';
 
+const MovementGlyph: React.FC<{ delta?: FriendLeaderboardRankDelta }> = ({ delta }) => {
+  if (!delta) return null;
+  const n = delta.rank_delta;
+  if (delta.is_new) {
+    return (
+      <span style={{
+        fontSize: 9, fontWeight: 800, color: T.amber,
+        background: 'rgba(247,147,30,0.14)', padding: '1px 5px',
+        borderRadius: 4, letterSpacing: '0.14em',
+      }}>
+        NEW
+      </span>
+    );
+  }
+  if (n == null) return null;
+  if (n > 0) {
+    return <span style={{ fontSize: 11, fontWeight: 800, color: T.good, ...NUM }}>▲{n}</span>;
+  }
+  if (n < 0) {
+    return <span style={{ fontSize: 11, fontWeight: 800, color: T.inkMute, ...NUM }}>▼{Math.abs(n)}</span>;
+  }
+  return <span style={{ fontSize: 11, color: 'rgba(242,244,247,0.22)', fontWeight: 800 }}>—</span>;
+};
 
 export const HeroPositionCard: React.FC<Props> = ({
   selfRow,
-  rowAbove,
   selfRank,
   totalActive,
-  expanded = false,
-  onToggleExpand,
-  viewMode = 'owner',
-  ownerFirstName = null,
-  embedded = false,
+  percentileTop,
+  selfDelta,
 }) => {
-  // Always called — never short-circuit a hook with `if (!selfRow) return null`.
-  const userId = selfRow?.friend_user_id ?? undefined;
-  const percentileQuery = useHandicapPercentile(userId);
-
   if (!selfRow) return null;
 
   const yourHcp = selfRow.friend_handicap_index;
@@ -68,31 +78,23 @@ export const HeroPositionCard: React.FC<Props> = ({
     selfRow.friend_user_id ?? (selfRow as any).friend_row_id ?? selfRow.friend_name
   );
 
-  const percentileTop =
-    percentileQuery.data?.available === true ? percentileQuery.data.percentile_top : null;
-
-  // Gap-to-catch math
-  const aboveHcp = rowAbove?.friend_handicap_index ?? null;
-  const gap =
-    yourHcp != null && aboveHcp != null ? Number((aboveHcp - yourHcp).toFixed(1)) : null;
-
   return (
     <div
       style={{
         position: 'relative',
         display: 'flex',
         alignItems: 'center',
-        gap: 13,
+        gap: 12,
         padding: '14px 16px',
         fontFamily: FONT,
       }}
     >
-      {/* Avatar — plain, no glow */}
+      {/* Avatar 46 squircle */}
       <div
         style={{
-          width: 48,
-          height: 48,
-          borderRadius: 14,
+          width: 46,
+          height: 46,
+          borderRadius: '34%',
           overflow: 'hidden',
           flexShrink: 0,
           background: selfPhoto ? T.bg3 : selfFbBg,
@@ -100,7 +102,7 @@ export const HeroPositionCard: React.FC<Props> = ({
           alignItems: 'center',
           justifyContent: 'center',
           color: '#fff',
-          fontSize: 16,
+          fontSize: 15,
           fontWeight: 800,
         }}
       >
@@ -111,41 +113,43 @@ export const HeroPositionCard: React.FC<Props> = ({
         )}
       </div>
 
-      {/* Rank + percentile + hcp/club */}
+      {/* Rank cluster + sub-line */}
       <div style={{ flex: 1, minWidth: 0 }}>
-        <div style={{ display: 'flex', alignItems: 'baseline', gap: 6, flexWrap: 'wrap' }}>
-          <span style={{ fontSize: 24, fontWeight: 800, letterSpacing: '-0.02em', color: T.ink, fontVariantNumeric: 'tabular-nums', lineHeight: 1 }}>
+        <div style={{ display: 'flex', alignItems: 'baseline', gap: 8, flexWrap: 'wrap' }}>
+          <span style={{
+            fontSize: 22, fontWeight: 800, letterSpacing: '-0.02em',
+            color: T.ink, lineHeight: 1, ...NUM,
+          }}>
             #{selfRank ?? '—'}
           </span>
-          <span style={{ fontSize: 13, fontWeight: 500, color: T.inkMute, fontVariantNumeric: 'tabular-nums' }}>
-            of {totalActive}
+          <span style={{
+            fontSize: 9, fontWeight: 800, letterSpacing: '0.12em',
+            color: T.inkMute, ...NUM,
+          }}>
+            OF {totalActive}
           </span>
-          {percentileTop != null && percentileTop <= 50 && (
-            <span style={{ marginLeft: 2, background: T.amberSoft, color: T.amber, padding: '2px 7px', borderRadius: 6, fontSize: 10, fontWeight: 800, letterSpacing: '0.08em' }}>
+          {percentileTop != null && (
+            <span style={{
+              fontSize: 9, fontWeight: 800, letterSpacing: '0.12em',
+              color: T.amber, ...NUM,
+            }}>
               TOP {percentileTop}%
             </span>
           )}
         </div>
-        <p style={{ margin: '3px 0 0', fontSize: 11, fontWeight: 500, color: T.inkMute, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-          HCP <span style={{ fontVariantNumeric: 'tabular-nums' }}>{fmtHcp(yourHcp)}</span>
+        <p style={{
+          margin: '4px 0 0', fontSize: 11.5, fontWeight: 500, color: T.inkFaded,
+          whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis',
+        }}>
+          HCP <span style={NUM}>{fmtHcp(yourHcp)}</span>
           {yourClub && <span> · {yourClub}</span>}
         </p>
       </div>
 
-      {/* Catch gap — inline, compact (no expand) */}
-      {rowAbove && gap != null && (
-        <div style={{ flexShrink: 0, textAlign: 'right', paddingLeft: 10, borderLeft: `1px solid ${T.line2}` }}>
-          <p style={{ margin: 0, fontSize: 9, fontWeight: 800, letterSpacing: '0.08em', color: T.inkMute, textTransform: 'uppercase' }}>
-            Catch {firstName(rowAbove.friend_name)}
-          </p>
-          <p style={{ margin: '2px 0 0', fontSize: 19, fontWeight: 800, color: T.green, fontVariantNumeric: 'tabular-nums', letterSpacing: '-0.02em', lineHeight: 1 }}>
-            −{Math.abs(gap).toFixed(1)}
-          </p>
-          <p style={{ margin: '1px 0 0', fontSize: 8, fontWeight: 800, letterSpacing: '0.1em', color: T.inkFaded }}>
-            STROKES
-          </p>
-        </div>
-      )}
+      {/* Right slot — your 7D movement */}
+      <div style={{ flexShrink: 0, minWidth: 32, display: 'flex', justifyContent: 'flex-end' }}>
+        <MovementGlyph delta={selfDelta} />
+      </div>
     </div>
   );
 };

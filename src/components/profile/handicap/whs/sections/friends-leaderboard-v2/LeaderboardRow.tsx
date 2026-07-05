@@ -18,37 +18,22 @@ interface Props {
 const T = {
   ink: 'var(--hcp-t-100)',
   inkMute: 'var(--hcp-t-60)',
-  inkSoft: 'var(--hcp-t-80)',
   inkFaded: 'var(--hcp-t-40)',
   ink25: 'var(--hcp-t-30)',
-  hairline: 'var(--hcp-line-2)',
+  hairline: 'var(--hcp-line)',
   hairlineSoft: 'var(--hcp-bg-3)',
   bg3: 'var(--hcp-bg-3)',
   amber: '#F7931E',
   amberSoft: 'rgba(247,147,30,0.14)',
   amberInk: '#854F0B',
-  amberTint: 'rgba(247,147,30,0.10)',
-  gold: '#FBBC2E',
-  silver: '#C0C5CF',
-  bronze: '#C97D45',
+  good: 'var(--hcp-good, #34D399)',
 };
 
-const medalColor = (rank: number | null): string => {
-  if (rank === 1) return T.gold;
-  if (rank === 2) return T.silver;
-  if (rank === 3) return T.bronze;
-  return T.inkMute;
-};
+const FONT = 'Geist, -apple-system, BlinkMacSystemFont, system-ui, sans-serif';
+const NUM: React.CSSProperties = { fontFamily: FONT, fontVariantNumeric: 'tabular-nums' };
 
 const FlameIcon: React.FC<{ size?: number }> = ({ size = 11 }) => (
-  <svg
-    width={size}
-    height={size}
-    viewBox="0 0 24 24"
-    fill="#F7931E"
-    aria-hidden
-    style={{ flexShrink: 0 }}
-  >
+  <svg width={size} height={size} viewBox="0 0 24 24" fill="#F7931E" aria-hidden style={{ flexShrink: 0 }}>
     <path d="M12 2c.4 3 2 5 4 7 2 2 3 4 3 7a7 7 0 1 1-14 0c0-2 1-4 2-5 0 2 1 3 2 3 0-3 1-7 3-12Z" />
   </svg>
 );
@@ -73,12 +58,11 @@ interface RankDeltaChipProps {
   delta: number | null;
   isNew: boolean;
   isStale: boolean;
+  hasDelta: boolean;
 }
 
-const RankDeltaChip: React.FC<RankDeltaChipProps> = ({ delta, isNew, isStale }) => {
-  if (isStale) {
-    return <span style={{ fontSize: 11, color: T.ink25, fontWeight: 700 }}>—</span>;
-  }
+const RankDeltaChip: React.FC<RankDeltaChipProps> = ({ delta, isNew, isStale, hasDelta }) => {
+  if (isStale) return null;
   if (isNew) {
     return (
       <span
@@ -96,8 +80,10 @@ const RankDeltaChip: React.FC<RankDeltaChipProps> = ({ delta, isNew, isStale }) 
       </span>
     );
   }
+  // Unknown movement — leave the slot empty (nothing, not a dash).
+  if (!hasDelta) return null;
   if (delta == null || delta === 0) {
-    return <span style={{ fontSize: 11, color: T.ink25, fontWeight: 700 }}>—</span>;
+    return <span style={{ fontSize: 11, color: 'rgba(242,244,247,0.22)', fontWeight: 800 }}>—</span>;
   }
   const climbed = delta > 0;
   return (
@@ -105,15 +91,15 @@ const RankDeltaChip: React.FC<RankDeltaChipProps> = ({ delta, isNew, isStale }) 
       style={{
         fontSize: 11,
         fontWeight: 800,
-        color: climbed ? '#059669' : '#9F1D1D',
-        fontVariantNumeric: 'tabular-nums',
+        color: climbed ? T.good : T.inkMute,
+        ...NUM,
         letterSpacing: '-0.01em',
         display: 'inline-flex',
         alignItems: 'center',
         gap: 1,
       }}
     >
-      <span style={{ fontSize: 9 }}>{climbed ? '↑' : '↓'}</span>
+      {climbed ? '▲' : '▼'}
       {Math.abs(delta)}
     </span>
   );
@@ -129,6 +115,19 @@ export const LeaderboardRow: React.FC<Props> = ({ entry, rank, isStaleRow, onCli
     entry.handicap_30d_delta <= -0.5;
   const Tag: any = onClick ? 'button' : 'div';
 
+  const selfFrame: React.CSSProperties = isYou
+    ? {
+        border: '1px solid rgba(247,147,30,0.45)',
+        borderRadius: 13,
+        margin: '6px 6px',
+        padding: '9px 14px',
+      }
+    : {
+        border: 'none',
+        borderBottom: `1px solid ${T.hairlineSoft}`,
+        padding: '10px 20px',
+      };
+
   return (
     <Tag
       type={onClick ? 'button' : undefined}
@@ -139,32 +138,26 @@ export const LeaderboardRow: React.FC<Props> = ({ entry, rank, isStaleRow, onCli
         position: 'relative',
         display: 'flex',
         alignItems: 'center',
-        width: '100%',
-        margin: 0,
+        width: isYou ? 'calc(100% - 12px)' : '100%',
         textAlign: 'left',
-        padding: '10px 20px',
-        borderBottom: `1px solid ${T.hairlineSoft}`,
-        borderLeft: 'none',
-        borderRight: 'none',
-        borderTop: 'none',
-        background: isYou ? T.amberTint : 'transparent',
+        background: 'transparent',
         opacity: isStaleRow ? 0.6 : 1,
         cursor: onClick ? 'pointer' : 'default',
         font: 'inherit',
         color: 'inherit',
+        ...selfFrame,
       }}
     >
-
       {/* Rank */}
       <div
         style={{
           width: 22,
           textAlign: 'center',
           flexShrink: 0,
-          fontSize: 12,
-          fontWeight: 700,
-          color: medalColor(rank),
-          fontVariantNumeric: 'tabular-nums',
+          fontSize: 13,
+          fontWeight: 800,
+          color: isYou ? T.amber : T.inkFaded,
+          ...NUM,
         }}
       >
         {rank ?? '\u2014'}
@@ -205,11 +198,7 @@ export const LeaderboardRow: React.FC<Props> = ({ entry, rank, isStaleRow, onCli
               }}
             >
               {avatarSrc ? (
-                <img
-                  src={avatarSrc}
-                  alt=""
-                  style={{ width: '100%', height: '100%', objectFit: 'cover' }}
-                />
+                <img src={avatarSrc} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
               ) : (
                 <span>{getInitialsFromName(entry.friend_name) || '?'}</span>
               )}
@@ -218,14 +207,7 @@ export const LeaderboardRow: React.FC<Props> = ({ entry, rank, isStaleRow, onCli
         })()}
 
         <div style={{ minWidth: 0, flex: 1 }}>
-          <div
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: 6,
-              minWidth: 0,
-            }}
-          >
+          <div style={{ display: 'flex', alignItems: 'center', gap: 6, minWidth: 0 }}>
             <p
               style={{
                 margin: 0,
@@ -273,7 +255,7 @@ export const LeaderboardRow: React.FC<Props> = ({ entry, rank, isStaleRow, onCli
         </div>
       </div>
 
-      {/* 30D slot — Phase 3 rank delta chip */}
+      {/* 7D movement slot */}
       <div
         style={{
           width: 32,
@@ -287,23 +269,18 @@ export const LeaderboardRow: React.FC<Props> = ({ entry, rank, isStaleRow, onCli
           delta={rankDelta?.rank_delta ?? null}
           isNew={rankDelta?.is_new ?? false}
           isStale={isStaleRow}
+          hasDelta={rankDelta !== undefined}
         />
       </div>
 
       {/* HCP */}
-      <div
-        style={{
-          width: 56,
-          textAlign: 'right',
-          flexShrink: 0,
-        }}
-      >
+      <div style={{ width: 56, textAlign: 'right', flexShrink: 0 }}>
         <span
           style={{
             fontSize: 15,
             fontWeight: 700,
-            color: (rank === 1 || isYou) ? T.amber : T.ink,
-            fontVariantNumeric: 'tabular-nums',
+            color: isYou ? T.amber : T.ink,
+            ...NUM,
             letterSpacing: '-0.01em',
           }}
         >

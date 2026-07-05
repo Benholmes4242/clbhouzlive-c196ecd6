@@ -12,6 +12,8 @@ import {
 } from '@/lib/whs/hooks';
 import { useHandicapPercentile } from '@/lib/whs/usePercentile';
 import { useOpenFriendSheet } from '@/components/friend-sheet/FriendSheetProvider';
+import { firstName } from '@/lib/whs/utils/initials';
+
 import { buildLeaderboardCohorts } from '@/lib/whs/utils/buildLeaderboardCohorts';
 import type { FriendLeaderboardEntry } from '@/lib/whs/types';
 
@@ -132,6 +134,12 @@ export const FriendsLeaderboardSection: React.FC<Props> = ({ userId, viewMode = 
             rowAbove={cohorts.rowAbove}
             selfRank={cohorts.selfActiveRank}
             totalActive={cohorts.totalActive}
+            percentileTop={circlePercentile}
+            selfDelta={
+              selfRow?.friend_row_id
+                ? deltasData?.byFriendRowId.get(selfRow.friend_row_id)
+                : undefined
+            }
             expanded={heroExpanded}
             onToggleExpand={() => setHeroExpanded((v) => !v)}
             viewMode={viewMode}
@@ -167,24 +175,54 @@ export const FriendsLeaderboardSection: React.FC<Props> = ({ userId, viewMode = 
             />
           ))
         ) : (
-          cohorts.topFive.map((entry) => {
-            const activeIdx = cohorts.active.findIndex((e) => e === entry);
-            const rank = activeIdx >= 0 ? activeIdx + 1 : null;
-            const delta = entry.friend_row_id
-              ? deltasData?.byFriendRowId.get(entry.friend_row_id)
-              : undefined;
-            return (
-              <LeaderboardRow
-                key={entry.is_self ? 'self' : `${entry.friend_user_id ?? ''}-${entry.friend_name}`}
-                entry={entry}
-                rank={rank}
-                isStaleRow={false}
-                rankDelta={delta}
-                onClick={entry.is_self ? undefined : () => handleRowClick(entry)}
-              />
-            );
-          })
+          (() => {
+            const rowAbove = cohorts.rowAbove;
+            const gap =
+              selfRow && rowAbove && selfRow.friend_handicap_index != null && rowAbove.friend_handicap_index != null
+                ? Number((rowAbove.friend_handicap_index - selfRow.friend_handicap_index).toFixed(1))
+                : null;
+            const catchName = rowAbove ? firstName(rowAbove.friend_name) : null;
+
+            return cohorts.topFive.map((entry) => {
+              const activeIdx = cohorts.active.findIndex((e) => e === entry);
+              const rank = activeIdx >= 0 ? activeIdx + 1 : null;
+              const delta = entry.friend_row_id
+                ? deltasData?.byFriendRowId.get(entry.friend_row_id)
+                : undefined;
+
+              const showCatchHairline = entry.is_self && gap != null && catchName;
+
+              return (
+                <React.Fragment key={entry.is_self ? 'self' : `${entry.friend_user_id ?? ''}-${entry.friend_name}`}>
+                  {showCatchHairline && (
+                    <div style={{
+                      display: 'flex', alignItems: 'center', gap: 10,
+                      padding: '7px 14px',
+                    }}>
+                      <div style={{ flex: 1, height: 1, background: 'rgba(52,211,153,0.35)' }} />
+                      <span style={{
+                        fontFamily: FONT, fontSize: 8.5, fontWeight: 800,
+                        letterSpacing: '0.12em', color: 'var(--hcp-good, #34D399)',
+                        fontVariantNumeric: 'tabular-nums',
+                      }}>
+                        {Math.abs(gap!).toFixed(1)} TO CATCH {catchName!.toUpperCase()}
+                      </span>
+                      <div style={{ flex: 1, height: 1, background: 'rgba(52,211,153,0.35)' }} />
+                    </div>
+                  )}
+                  <LeaderboardRow
+                    entry={entry}
+                    rank={rank}
+                    isStaleRow={false}
+                    rankDelta={delta}
+                    onClick={entry.is_self ? undefined : () => handleRowClick(entry)}
+                  />
+                </React.Fragment>
+              );
+            });
+          })()
         )}
+
 
         {/* See all — now the card's footer */}
         {!isLoading && cohorts.totalActive > 0 && (
