@@ -85,7 +85,10 @@ export default function WatchRailTile({
     if (!rawThumb || !thumbHeightPx) return rawThumb;
     return getThumbnailUrl({ imageUrl: rawThumb, height: thumbHeightPx });
   }, [rawThumb, thumbHeightPx]);
+  const hlsUrl = media?.hlsUrl || '';
+
   // Rail-lane rental — active only when this tile holds its rail's autoplay slot.
+
   const isVideo = !!media && media.type === 'video' && !!hlsUrl;
   const ownerKey = isVideo ? `${post.id}:0` : null;
   const { hostRef: laneHostRef, ready: laneReady } = useRailLane({
