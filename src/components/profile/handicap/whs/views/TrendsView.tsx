@@ -1,5 +1,4 @@
 import React from 'react';
-import ForecastCard from '../sections/ForecastCard';
 import RoundsThatCountCard from '../sections/RoundsThatCountCard';
 import IndexHistoryCard from '../sections/IndexHistoryCard';
 import CourseFormCard from '../sections/trends/CourseFormCard';
@@ -34,13 +33,7 @@ export const TrendsView: React.FC<Props> = ({
       className="[&>section:first-child]:!mt-0 [&>section:first-child>div:first-child]:!pt-0"
       style={{ paddingTop: 34 }}
     >
-      {/* 1. Forecast */}
-      <ForecastCard
-        connectionId={connectionId}
-        currentHandicap={currentHandicap}
-        viewMode={viewMode}
-        ownerFirstName={ownerFirstName}
-      />
+
 
 
 
