@@ -94,6 +94,23 @@ export const CourseMediaTile: React.FC<CourseMediaTileProps> = ({ post, index, f
         </div>
       )}
 
+      {isVideoLane && (
+        <div
+          ref={laneHostRef}
+          aria-hidden
+          style={{
+            position: 'absolute',
+            inset: 0,
+            zIndex: 1,
+            opacity: laneReady ? 1 : 0,
+            transition: 'opacity 140ms linear',
+            pointerEvents: 'none',
+          }}
+        />
+      )}
+
+
+
       {/* Bottom gradient overlay — 50% height */}
       <div
         style={{
