@@ -135,6 +135,10 @@ export const RARITY_DARK: Record<
     glow: 'inset 0 0 0 1px rgba(192,192,200,0.14)',
     outerGlow: '0 0 28px -10px rgba(192,192,200,0.30)',
   },
+  // EMERALD tier — scoped exemption from the palette canon.
+  // #10B981 / rgba(16,185,129,*) are permitted ONLY for rarity/tier
+  // rendering in this file. Do not use outside rarity/tier contexts;
+  // semantic "good" is #34D399 / #059669.
   emerald: {
     iconBg: 'rgba(16,185,129,0.18)',
     iconRing: 'rgba(16,185,129,0.55)',
