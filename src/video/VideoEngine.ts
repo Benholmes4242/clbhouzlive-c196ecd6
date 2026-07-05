@@ -555,6 +555,20 @@ class VideoEngineImpl {
     return Promise.resolve(p).catch((err) => {
       DBG(laneId, 'play() rejected', err);
       if (isFsv(laneId)) fsv('eng.play.rejected', { laneId, err: String(err) });
+      // Belt-and-braces retry: muted lanes rarely reject, but one deferred
+      // retry removes the stuck-paused edge case where an autoplay-policy
+      // rejection would otherwise leave wantPlay=true with no recovery.
+      setTimeout(() => {
+        const cur = this.getLane(laneId);
+        if (!cur.wantPlay || !cur.mountedHost || !cur.el.paused) return;
+        if (isFsv(laneId)) fsv('eng.play.retry', { laneId });
+        try {
+          const p2 = cur.el.play();
+          Promise.resolve(p2).catch((err2) => {
+            if (isFsv(laneId)) fsv('eng.play.retry.rejected', { laneId, err: String(err2) });
+          });
+        } catch {}
+      }, 250);
     });
   }
 
