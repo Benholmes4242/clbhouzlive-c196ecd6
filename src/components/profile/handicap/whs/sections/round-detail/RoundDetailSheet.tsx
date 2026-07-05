@@ -1,7 +1,10 @@
 import React, { useMemo } from 'react';
 import { ExternalLink } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 import { BottomSheet } from '@/components/ui/BottomSheet';
-import { useRoundDetail } from '@/lib/whs/hooks';
+import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
+import { useRoundDetail, useWhsCourseId } from '@/lib/whs/hooks';
+import { useUserProfile } from '@/hooks/useUserProfile';
 import { SCORECARD_DARK } from '@/features/courses/_shared/scorecard/scorecardTheme';
 import { TrajectoryLine, type TrajectoryHole } from '@/features/courses/_shared/scorecard/TrajectoryLine';
 import { NineGrid } from '@/features/courses/_shared/scorecard/NineGrid';
@@ -15,16 +18,19 @@ const NUM: React.CSSProperties = {
   fontFeatureSettings: '"zero" 0',
 };
 
-// ─── Props (unchanged API) ───────────────────────────────────────────────
+// ─── Props ───────────────────────────────────────────────────────────────
 interface Props {
   open: boolean;
   onClose: () => void;
   scoreId?: string | null;
   handicapDelta?: number | null;
   connectionId?: string | null;
+  /** Owner of this round — enables avatar/name → profile nav. Omit when unknown. */
+  profileUserId?: string | null;
   /** Kept for back-compat. Sheet is always dark on the handicap page. */
   variant?: 'dark' | 'light';
 }
+
 
 function strokesOf(h: WhsScoreHole): number | null {
   return h.adjusted_gross ?? h.actual_gross ?? null;
