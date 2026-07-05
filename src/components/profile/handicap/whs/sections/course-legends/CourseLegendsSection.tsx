@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
-import { Search } from 'lucide-react';
+import { Search, ArrowRight } from 'lucide-react';
 import { DarkSectionHeader } from '../_shared/darkAtoms';
 import { useUserPlayedCourses } from '@/hooks/gam/useUserPlayedCourses';
 import { useUserHomeClubCourses } from '@/hooks/gam/useUserHomeClubCourses';
@@ -20,7 +20,7 @@ import LegendPulseTicker from './LegendPulseTicker';
 import type { CourseSelection } from './types';
 
 const FONT = 'Geist, -apple-system, BlinkMacSystemFont, system-ui, sans-serif';
-const GOLD = '#FBBC2E';
+const AMBER = '#F7931E';
 
 interface Props {
   userId: string;
@@ -37,7 +37,7 @@ export const WindowToggle: React.FC<{
       display: 'inline-flex',
       flexShrink: 0,
       gap: 2,
-      background: 'var(--hcp-bg-2)',
+      background: 'rgba(255,255,255,0.04)',
       border: '1px solid var(--hcp-line)',
       borderRadius: 999,
       padding: 2,
@@ -54,13 +54,13 @@ export const WindowToggle: React.FC<{
           type="button"
           onClick={() => setWindow(o.v)}
           style={{
-            padding: '3px 9px',
+            padding: '4px 10px',
             borderRadius: 999,
-            background: active ? '#FFFFFF' : 'transparent',
-            color: active ? '#0F172A' : 'var(--hcp-t-60)',
+            background: active ? 'rgba(255,255,255,0.12)' : 'transparent',
+            color: active ? 'var(--hcp-t-100)' : 'var(--hcp-t-60)',
             border: 'none',
             fontFamily: FONT,
-            fontSize: 9.5,
+            fontSize: 10.5,
             fontWeight: 800,
             cursor: 'pointer',
             letterSpacing: '0.08em',
@@ -81,112 +81,128 @@ const SectionHero: React.FC<{
   window: LegendWindow;
   setWindow: (w: LegendWindow) => void;
   friendName?: string | null;
-  query: string;
-  setQuery: (v: string) => void;
-  searchInputRef?: React.RefObject<HTMLInputElement>;
-}> = ({ titleCount, window, setWindow, friendName = null, query, setQuery, searchInputRef }) => (
-  <div
-    style={{
-      margin: '0 16px 20px',
-      borderRadius: 16,
-      background: 'var(--hcp-bg-1)',
-      border: '1px solid var(--hcp-line)',
-      position: 'relative',
-      overflow: 'hidden',
-      fontFamily: FONT,
-    }}
-  >
+}> = ({ titleCount, window, setWindow, friendName = null }) => {
+  const owner = friendName ?? 'You';
+  const verb = friendName ? 'holds' : 'hold';
+  const isZero = titleCount === 0;
 
-    {/* Top half: title + count + toggle */}
-    <div style={{ position: 'relative', zIndex: 1, padding: '4px 0 16px' }}>
-      <DarkSectionHeader
-        eyebrow="COURSE CHAMPIONS"
-        title={
-          titleCount === 0
-            ? (friendName ? `${friendName}'s reign starts here` : 'Your reign starts here')
-            : (friendName
-                ? `${friendName} holds ${titleCount} title${titleCount === 1 ? '' : 's'}`
-                : `You hold ${titleCount} title${titleCount === 1 ? '' : 's'}`)
-        }
-      />
+  return (
+    <div
+      style={{
+        margin: '0 16px',
+        borderRadius: 18,
+        background: 'var(--hcp-bg-1)',
+        border: '1px solid var(--hcp-line)',
+        padding: '16px 18px 15px',
+        fontFamily: FONT,
+      }}
+    >
+      {/* Row 1: eyebrow */}
+      <div style={{
+        fontSize: 8.5, fontWeight: 800, letterSpacing: '0.12em',
+        color: 'var(--hcp-t-60)', textTransform: 'uppercase',
+      }}>
+        COURSE CHAMPIONS
+      </div>
 
-      <div
-        style={{
-          fontSize: 12.5,
-          color: 'var(--hcp-t-60)',
-          margin: '6px 18px 14px',
-        }}
-      >
-        {titleCount === 0
+      {/* Row 2: headline + toggle */}
+      <div style={{
+        display: 'flex', justifyContent: 'space-between',
+        alignItems: 'center', gap: 12, marginTop: 8,
+      }}>
+        <div style={{
+          fontSize: 24, fontWeight: 800, color: 'var(--hcp-t-100)',
+          letterSpacing: '-0.02em', lineHeight: 1.1,
+        }}>
+          {isZero ? (
+            friendName ? `${friendName}'s reign starts here` : 'Your reign starts here'
+          ) : (
+            <>
+              {owner} {verb}{' '}
+              <span style={{
+                color: AMBER,
+                fontFamily: FONT,
+                fontVariantNumeric: 'tabular-nums',
+              }}>
+                {titleCount}
+              </span>
+              {' '}title{titleCount === 1 ? '' : 's'}
+            </>
+          )}
+        </div>
+        <WindowToggle window={window} setWindow={setWindow} />
+      </div>
+
+      {/* Row 3: sub-line */}
+      <div style={{
+        fontSize: 12, color: 'var(--hcp-t-40)', marginTop: 6,
+      }}>
+        {isZero
           ? (friendName
               ? `${friendName} needs to top a leaderboard at any course to earn their first title`
               : 'Top the leaderboard at any course to earn your first title')
           : window === '90d'
-            ? 'across rolling 90-day leaderboards'
+            ? 'across the last 90 days'
             : 'across all-time course records'}
       </div>
-
-      <div style={{ padding: '0 18px' }}>
-        <WindowToggle window={window} setWindow={setWindow} />
-      </div>
     </div>
+  );
+};
 
-    {/* Hairline divider */}
-    <div
-      aria-hidden
-      style={{
-        height: 1,
+const SearchRow: React.FC<{
+  open: boolean;
+  query: string;
+  setQuery: (v: string) => void;
+  onOpen: () => void;
+  inputRef: React.RefObject<HTMLInputElement>;
+}> = ({ open, query, setQuery, onOpen, inputRef }) => (
+  <div style={{ margin: '0 16px', padding: '14px 4px 0' }}>
+    {open ? (
+      <div style={{
+        display: 'flex', alignItems: 'center', gap: 10,
         background: 'var(--hcp-bg-2)',
-        margin: '0 18px',
-      }}
-    />
-
-    {/* Bottom half: prompt + search field */}
-    <div style={{ position: 'relative', zIndex: 1, padding: '16px 18px 18px' }}>
-      <div
-        style={{
-          fontSize: 13.5,
-          fontWeight: 700,
-          color: 'var(--hcp-t-100)',
-          marginBottom: 10,
-          letterSpacing: '-0.005em',
-        }}
-      >
-        Search any course to see its champions.
-      </div>
-      <div
-        style={{
-          display: 'flex',
-          alignItems: 'center',
-          gap: 10,
-          background: 'var(--hcp-bg-2)',
-          border: '1px solid var(--hcp-line-2)',
-          borderRadius: 12,
-          padding: '12px 14px',
-        }}
-      >
+        border: '1px solid var(--hcp-line-2)',
+        borderRadius: 12, padding: '12px 14px',
+      }}>
         <Search size={16} color="var(--hcp-t-60)" />
         <input
-          ref={searchInputRef}
+          ref={inputRef}
           type="text"
           value={query}
           onChange={(e) => setQuery(e.target.value)}
           placeholder='Try "Augusta" or "Royal Birkdale"…'
           style={{
-            flex: 1,
-            minWidth: 0,
-            background: 'transparent',
-            border: 'none',
-            outline: 'none',
-            fontFamily: FONT,
-            fontSize: 13,
-            color: 'var(--hcp-t-100)',
+            flex: 1, minWidth: 0, background: 'transparent',
+            border: 'none', outline: 'none', fontFamily: FONT,
+            fontSize: 13, color: 'var(--hcp-t-100)',
           }}
         />
       </div>
-    </div>
+    ) : (
+      <button
+        type="button"
+        onClick={onOpen}
+        style={{
+          display: 'flex', alignItems: 'center', gap: 10, width: '100%',
+          background: 'transparent', border: 'none', padding: 0,
+          cursor: 'pointer', textAlign: 'left', fontFamily: FONT,
+          WebkitTapHighlightColor: 'transparent',
+        }}
+      >
+        <Search size={16} color="var(--hcp-t-60)" />
+        <span style={{
+          flex: 1, fontSize: 15, fontWeight: 800, color: 'var(--hcp-t-100)',
+          letterSpacing: '-0.01em',
+        }}>
+          Find any course's champions
+        </span>
+        <ArrowRight size={16} color="var(--hcp-t-100)" />
+      </button>
+    )}
   </div>
 );
+
+
 
 export const CourseLegendsSection: React.FC<Props> = ({
   userId,
