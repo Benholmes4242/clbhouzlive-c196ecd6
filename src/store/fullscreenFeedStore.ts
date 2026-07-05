@@ -110,6 +110,7 @@ export const useFullscreenFeedStore = create<FullscreenFeedState>((set, get) => 
       origin: options?.origin ?? null,
       startPosition: options?.startPosition ?? 0,
       mediaIndex: options?.mediaIndex ?? 0,
+      mediaId: options?.mediaId ?? null,
     }),
   close: () => {
     const cb = get().onCloseCallback;
