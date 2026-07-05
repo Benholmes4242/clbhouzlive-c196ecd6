@@ -1,8 +1,9 @@
-import { memo } from 'react';
+import { memo, useRef } from 'react';
 import { useVideosFollowingRail } from './hooks/useVideosFollowingRail';
 import SectionHeader from '@/components/ui/SectionHeader';
 import { HRail } from '../proshop/HRail';
 import { VideoRailTile } from './VideoRailTile';
+import { useWatchAutoplay } from '@/video/useWatchAutoplay';
 
 interface VideosFollowingRailProps {
   userId: string | undefined;
@@ -14,6 +15,8 @@ interface VideosFollowingRailProps {
  */
 function VideosFollowingRailInner({ userId }: VideosFollowingRailProps) {
   const { data: posts = [], isLoading } = useVideosFollowingRail(userId, 8);
+  const railRef = useRef<HTMLDivElement>(null);
+  const activeIdx = useWatchAutoplay(railRef, { railId: 'vids-following' });
 
   if (isLoading) return null;
   if (posts.length === 0) return null;
@@ -21,11 +24,20 @@ function VideosFollowingRailInner({ userId }: VideosFollowingRailProps) {
   return (
     <section>
       <SectionHeader role="rail" title="From creators you follow" paddingTop={20} paddingX={16} />
-      <HRail paddingBottom={10}>
-        {posts.map((post, i) => (
-          <VideoRailTile key={post.id} post={post} index={i} allPosts={posts} width={280} />
-        ))}
-      </HRail>
+      <div ref={railRef}>
+        <HRail paddingBottom={10}>
+          {posts.map((post, i) => (
+            <VideoRailTile
+              key={post.id}
+              post={post}
+              index={i}
+              allPosts={posts}
+              width={280}
+              active={activeIdx === i}
+            />
+          ))}
+        </HRail>
+      </div>
     </section>
   );
 }
