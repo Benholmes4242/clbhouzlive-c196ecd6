@@ -10,6 +10,8 @@ import { VideoCardMenu } from '@/components/videos-tab/VideoCardMenu';
 import { Pin } from '../proshop/Pin';
 import { ExpandableCaption } from '@/components/posts/ExpandableCaption';
 import DecodedImage from '../shared/DecodedImage';
+import { useRailLane } from '@/video/useRailLane';
+
 
 function formatHMS(seconds: number | null | undefined): string {
   if (!seconds || seconds <= 0) return '';
