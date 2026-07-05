@@ -210,6 +210,7 @@ export const CourseLegendsSection: React.FC<Props> = ({
   friendName,
 }) => {
   const [query, setQuery] = useState('');
+  const [searchOpen, setSearchOpen] = useState(false);
   const [window, setWindow] = useState<LegendWindow>('all_time');
   const playedQuery = useUserPlayedCourses(userId);
   const homeClubQuery = useUserHomeClubCourses(userId);
@@ -270,6 +271,11 @@ export const CourseLegendsSection: React.FC<Props> = ({
     return map;
   }, [holderRows, window]);
 
+  const openSearch = () => {
+    setSearchOpen(true);
+    requestAnimationFrame(() => searchInputRef.current?.focus());
+  };
+
   return (
     <section style={{ marginTop: 32 }}>
       <div ref={searchWrapperRef} style={{ scrollMarginTop: 12 }}>
@@ -278,11 +284,16 @@ export const CourseLegendsSection: React.FC<Props> = ({
           window={window}
           setWindow={setWindow}
           friendName={friendName}
+        />
+        <SearchRow
+          open={searchOpen || showSearchResults}
           query={query}
           setQuery={setQuery}
-          searchInputRef={searchInputRef}
+          onOpen={openSearch}
+          inputRef={searchInputRef}
         />
       </div>
+
 
       {showSearchResults ? (
         <SearchResultsSubsection
