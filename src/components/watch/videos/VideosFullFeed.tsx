@@ -15,6 +15,7 @@ import WatchEmptyState from '@/components/watch/shared/WatchEmptyState';
 import { usePendingPostsForActor } from '@/uploads/usePendingPostsForActor';
 import { PendingPostCard } from '@/components/posts-tab/PendingPostCard';
 import { useActiveActor } from '@/context/ActiveActorContext';
+import { useWatchAutoplay } from '@/video/useWatchAutoplay';
 
 interface VideosFullFeedProps {
   userId: string | undefined;
