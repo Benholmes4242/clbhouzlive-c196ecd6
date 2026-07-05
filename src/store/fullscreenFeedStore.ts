@@ -36,13 +36,16 @@ interface OpenOptions {
   readOnly?: boolean;
   /** Two-way resume: seconds to seek fullscreen lane to on first paint. */
   startPosition?: number;
-  /** Which media index within the opening post to render on the opening slide.
-   *  Defaults 0 → identical behavior for existing callers. Course media taps
-   *  a per-media tile, so it passes the tapped media's within-post index so
-   *  the opening slide renders (and plays) that exact media rather than
-   *  always media[0]. Keyed to the OPENING slide only — swiping to other
-   *  posts uses their media[0] as today. */
+  /** Positional media index within the opening post. Kept as a cheap
+   *  fallback — `mediaId` (below) is authoritative because groupMultiMedia
+   *  re-sorts / dedupes / filters mediaItems, so positional indices from
+   *  ungrouped callers won't survive the grouping step. */
   mediaIndex?: number;
+  /** Stable media item id used to pick which media within the opening post
+   *  the opening slide should render. Resolves via
+   *  `post.mediaItems.findIndex(m => m.id === mediaId)` on the opening slide;
+   *  falls back to `mediaIndex` (default 0) if the id can't be found. */
+  mediaId?: string | null;
 }
 
 interface FullscreenFeedState {
