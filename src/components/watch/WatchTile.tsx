@@ -119,6 +119,22 @@ const WatchTile: React.FC<WatchTileProps> = ({ post, index, allPosts, onDecoded,
         </div>
       )}
 
+      {/* Rail-lane video host — mounted only when we hold a rented lane. */}
+      {isVideo && (
+        <div
+          ref={laneHostRef}
+          aria-hidden
+          style={{
+            position: 'absolute',
+            inset: 0,
+            zIndex: 1,
+            opacity: laneReady ? 1 : 0,
+            transition: 'opacity 140ms linear',
+            pointerEvents: 'none',
+          }}
+        />
+      )}
+
       {/* Top scrim */}
       <div
         aria-hidden
