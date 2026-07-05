@@ -18,11 +18,13 @@ interface FullLeaderboardSheetProps {
 }
 
 const FONT = 'Geist, -apple-system, BlinkMacSystemFont, system-ui, sans-serif';
+// Hardcoded dark tokens — BottomSheet portals outside .hcp-dark scope.
+const DIM = 'rgba(242,244,247,0.55)';
 const LABEL_STYLE: React.CSSProperties = {
   fontSize: 10,
   fontWeight: 800,
   letterSpacing: '0.16em',
-  color: 'var(--hcp-t-60)',
+  color: DIM,
   textTransform: 'uppercase',
   margin: 0,
 };
@@ -45,9 +47,9 @@ export const FullLeaderboardSheet: React.FC<FullLeaderboardSheetProps> = ({
       open={open}
       onClose={onClose}
       ariaLabelledBy="full-leaderboard-title"
-      className="hcp-light"
+      variant="dark"
+      surfaceColor="#15171F"
       style={{
-        background: 'var(--hcp-bg-0)',
         maxHeight: '90vh',
         display: 'flex',
         flexDirection: 'column',
@@ -140,7 +142,7 @@ export const FullLeaderboardSheet: React.FC<FullLeaderboardSheetProps> = ({
                   padding: '10px 16px',
                   background: 'transparent',
                   border: 'none',
-                  color: 'var(--hcp-t-60)',
+                  color: DIM,
                   fontSize: 12,
                   fontWeight: 600,
                   cursor: 'pointer',
