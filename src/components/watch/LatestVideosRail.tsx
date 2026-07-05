@@ -71,14 +71,14 @@ export default function LatestVideosRail() {
           paddingX={16}
         />
 
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
-          <div ref={heroRef} style={{ padding: '0 16px' }}>
+        <div ref={railRef} style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+          <div ref={heroRef} data-watch-tile-index={0} style={{ padding: '0 16px' }}>
             <AutoplayVideoCard
               post={hero}
               index={0}
               allPosts={posts}
               userId={userId}
-              active={heroActive}
+              active={activeIdx === 0}
               borderRadius={6}
               onDecoded={onDecoded}
             />
