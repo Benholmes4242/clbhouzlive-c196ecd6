@@ -93,6 +93,7 @@ export const PersonalBests: React.FC<Props> = ({ connectionId, currentHandicap, 
         eyebrow: 'Best Diff',
         value: fmtDiff(best.handicap_differential as number),
         caption: fmtCourseDate(best),
+        valueColor: '#55BD8B',
       };
     }
 
