@@ -12,6 +12,8 @@ interface BottomSheetProps {
   ariaLabelledBy?: string;
   /** 'light' (default, uses `bg-background`) or 'dark' (ink #0F172A surface + light handle). */
   variant?: 'light' | 'dark';
+  /** Optional surface colour override for the dark variant. */
+  surfaceColor?: string;
 }
 
 export function BottomSheet({
