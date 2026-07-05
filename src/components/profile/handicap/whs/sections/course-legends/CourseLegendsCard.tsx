@@ -212,11 +212,10 @@ export const CourseLegendsCard: React.FC<Props> = ({
   const cueStyle = FOOTER_INTENT_STYLE[cue.intent];
   const selfLabel = friendName ? friendName : 'YOU';
 
-  // Row-major split into 2-column grid (claimed only)
+  // Claimed slots only — laid out as row-pairs (see grid below).
   const claimed = resolved.filter(({ row }) => !!row);
   const hasAnyClaimed = claimed.length > 0;
-  const left = claimed.filter((_, i) => i % 2 === 0);
-  const right = claimed.filter((_, i) => i % 2 === 1);
+
 
   return (
     <div
