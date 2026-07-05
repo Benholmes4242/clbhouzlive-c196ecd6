@@ -32,12 +32,14 @@ export const SheetHeader: React.FC<SheetHeaderProps> = ({
   borderBottom = true,
   dark = false,
 }) => {
-  const titleColor = dark ? 'var(--hcp-t-100)' : '#0F172A';
-  const eyebrowColor = dark ? 'var(--hcp-t-60)' : '#64748B';
-  const subColor = dark ? 'var(--hcp-t-60)' : '#64748B';
-  const borderColor = dark ? 'var(--hcp-line-2)' : 'rgba(15,23,42,0.08)';
-  const closeBg = dark ? 'var(--hcp-bg-3)' : 'rgba(15,23,42,0.06)';
-  const closeColor = dark ? 'var(--hcp-t-100)' : '#0F172A';
+  // Literal dark handicap tokens — sheets portal outside `.hcp-dark`, so
+  // `var(--hcp-*)` resolves to nothing. Values copied from handicap-dark.css.
+  const titleColor = dark ? 'rgba(255,255,255,0.96)' : '#0F172A';
+  const eyebrowColor = dark ? 'rgba(255,255,255,0.55)' : '#64748B';
+  const subColor = dark ? 'rgba(255,255,255,0.55)' : '#64748B';
+  const borderColor = dark ? 'rgba(255,255,255,0.10)' : 'rgba(15,23,42,0.08)';
+  const closeBg = dark ? '#272C37' : 'rgba(15,23,42,0.06)';
+  const closeColor = dark ? 'rgba(255,255,255,0.96)' : '#0F172A';
 
   return (
     <div
