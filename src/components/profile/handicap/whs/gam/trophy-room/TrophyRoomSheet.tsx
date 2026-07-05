@@ -1,15 +1,24 @@
 import React, { useEffect, useMemo, useState, useCallback } from 'react';
-import { Crown, ChevronDown, type LucideIcon } from 'lucide-react';
+import { Crown, ChevronDown, ChevronRight, type LucideIcon } from 'lucide-react';
 import { GamSheet } from '../../../gam/_shared/GamSheet';
 import { GAM } from '../tokens';
 import { gamAchievementsBus } from '../events';
 import { useUserAchievements } from '@/hooks/gam/useUserAchievements';
 import { useUserTopLegends } from '@/hooks/gam/useUserTopLegends';
 import { TrophyCard } from './TrophyCard';
+import { renderBadgeIcon } from '../badgeIcons';
 import { TrophyDetailSheet } from './TrophyDetailSheet';
 import { normalizeBadge, normalizeLegend, type TrophyItem } from './_shared/normalizeTrophyItem';
 import { isShowpiece, LIFETIME_ORDER } from './_shared/showpieces';
 import type { BadgeCategory } from '@/lib/gam/types';
+
+const AMBER = '#F7931E';
+const INK = '#F2F4F7';
+const DIM = 'rgba(242,244,247,0.55)';
+const FAINT = 'rgba(242,244,247,0.38)';
+const CARD = '#1B1E27';
+const LINE = 'rgba(255,255,255,0.08)';
+
 
 const CATEGORY_ORDER: BadgeCategory[] = [
   'scoring',
