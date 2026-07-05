@@ -37,12 +37,20 @@ function VideoGridCardInner({ post, index, allPosts }: VideoGridCardProps) {
   const channel = post.displayName || post.username || 'Clbhouz';
   const likeCount = post.likeCount ?? 0;
 
+  const btnRef = useRef<HTMLButtonElement>(null);
   const handleTap = useCallback(() => {
-    useFullscreenFeedStore.getState().open(allPosts, index);
-  }, [allPosts, index]);
+    openWithOrigin({
+      posts: allPosts,
+      index,
+      originEl: btnRef.current,
+      posterUrl: thumb || null,
+      handOffUrls: [(media as any)?.hlsUrl],
+    });
+  }, [allPosts, index, thumb, media]);
 
   return (
     <button
+      ref={btnRef}
       type="button"
       onClick={handleTap}
       className="block text-left active:scale-[0.99] transition-transform"
