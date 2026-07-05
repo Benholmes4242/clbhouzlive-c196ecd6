@@ -6,6 +6,8 @@ import { AlertCircle, Camera, Loader2, Film, ListChecks, Flag, Sunrise, Building
 import type { FeedPost } from '@/components/media-system/types/media';
 import { CourseMediaTile } from './CourseMediaTile';
 import { CourseMediaGridSkeleton } from './CourseMediaGridSkeleton';
+import { openWithOrigin } from '@/lib/openWithOrigin';
+import { useWatchAutoplay } from '@/video/useWatchAutoplay';
 
 import { PrimaryAmberCTA } from '@/components/ui/PrimaryAmberCTA';
 import { EmptyStateGuide } from '@/components/ui/EmptyStateGuide';
@@ -61,6 +63,12 @@ export const CourseMediaGrid = forwardRef<HTMLDivElement, CourseMediaGridProps>(
 }, ref) => {
   const navigate = useNavigate();
   const sentinelRef = useRef<HTMLDivElement>(null);
+  const { activeIdx, railRef: autoplayRef } = useWatchAutoplay({ railId: 'course-media' });
+  const setGridRef = useCallback((el: HTMLDivElement | null) => {
+    autoplayRef(el);
+    if (typeof ref === 'function') ref(el);
+    else if (ref) (ref as React.MutableRefObject<HTMLDivElement | null>).current = el;
+  }, [autoplayRef, ref]);
 
   // Infinite scroll sentinel
   useEffect(() => {
@@ -105,13 +113,33 @@ export const CourseMediaGrid = forwardRef<HTMLDivElement, CourseMediaGridProps>(
   // Single open-fullscreen entrypoint — flattens to one-media-per-slide
   // and opens the fullscreen viewer in read-only (gallery) mode with the
   // current pagination callbacks.
-  const handleOpenFullscreen = useCallback((postsToOpen: FeedPost[], index: number) => {
+  // Single open-fullscreen entrypoint — flattens to one-media-per-slide
+  // and routes through openWithOrigin so course media gets the FLIP expand +
+  // resume-at-position (via the tile's rail lane owner key).
+  const handleOpenFullscreen = useCallback((
+    postsToOpen: FeedPost[],
+    index: number,
+    ctx: {
+      originEl: HTMLElement | null;
+      railOwnerKey: string | null;
+      posterUrl: string | null;
+      handOffUrls: (string | null | undefined)[];
+    },
+  ) => {
     const { flat, offsetsByParent } = flattenPostsToMedia(postsToOpen);
-    useFullscreenFeedStore.getState().open(flat, flatIndexFor(offsetsByParent, index, 0), {
-      readOnly: true,
-      hasNextPage: hasNextPage ?? false,
-      fetchNextPage: hasNextPage ? () => fetchNextPage() : undefined,
-      isFetchingNextPage: isFetchingNextPage ?? false,
+    openWithOrigin({
+      posts: flat,
+      index: flatIndexFor(offsetsByParent, index, 0),
+      originEl: ctx.originEl,
+      posterUrl: ctx.posterUrl,
+      handOffUrls: ctx.handOffUrls,
+      railOwnerKey: ctx.railOwnerKey,
+      options: {
+        readOnly: true,
+        hasNextPage: hasNextPage ?? false,
+        fetchNextPage: hasNextPage ? () => fetchNextPage() : undefined,
+        isFetchingNextPage: isFetchingNextPage ?? false,
+      },
     });
   }, [hasNextPage, fetchNextPage, isFetchingNextPage]);
 
@@ -202,7 +230,7 @@ export const CourseMediaGrid = forwardRef<HTMLDivElement, CourseMediaGridProps>(
   })();
 
   return (
-    <div ref={ref} style={{ display: 'flex', flexDirection: 'column', gap: GAP }}>
+    <div ref={setGridRef} style={{ display: 'flex', flexDirection: 'column', gap: GAP }}>
       <div style={{ display: 'flex', gap: GAP, alignItems: 'flex-start', paddingInline: 0 }}>
         {columns.map((col, ci) => (
           <div
@@ -235,6 +263,7 @@ export const CourseMediaGrid = forwardRef<HTMLDivElement, CourseMediaGridProps>(
                     fetchNextPage={fetchNextPage}
                     hasNextPage={hasNextPage}
                     isFetchingNextPage={isFetchingNextPage}
+                    active={activeIdx === index}
                     onOpenFullscreen={handleOpenFullscreen}
                   />
                 </div>
