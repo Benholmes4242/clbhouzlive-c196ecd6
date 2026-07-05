@@ -1,4 +1,4 @@
-import { useRef } from 'react';
+import { useCallback, useRef } from 'react';
 import type { FeedPost } from '@/components/media-system/types/media';
 import AutoplayVideoCard from './AutoplayVideoCard';
 import { useEdgeFades } from '@/components/watch/shared/useEdgeFades';
