@@ -127,6 +127,7 @@ export const PersonalBests: React.FC<Props> = ({ connectionId, currentHandicap, 
         eyebrow: 'Best vs HCP',
         value: `${sign}${best.vsHcp.toFixed(1)}`,
         caption: fmtCourseDate(best.s),
+        valueColor: '#55BD8B',
       };
     }
 
