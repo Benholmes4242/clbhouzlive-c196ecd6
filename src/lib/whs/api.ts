@@ -1348,3 +1348,13 @@ export async function fetchTrophyAggregates(
 }
 
 
+
+/** Resolve a WHS-reported course name to an internal `golf_courses.id`.
+ *  Delegates to the shared alias matcher (do not reimplement matching). */
+export async function lookupWhsCourseId(
+  whsName: string,
+  countryCode?: string | null,
+): Promise<string | null> {
+  const { lookupCourseId: impl } = await import('./courseNameMatcher');
+  return impl(whsName, countryCode ?? null);
+}
