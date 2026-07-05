@@ -36,6 +36,13 @@ interface OpenOptions {
   readOnly?: boolean;
   /** Two-way resume: seconds to seek fullscreen lane to on first paint. */
   startPosition?: number;
+  /** Which media index within the opening post to render on the opening slide.
+   *  Defaults 0 → identical behavior for existing callers. Course media taps
+   *  a per-media tile, so it passes the tapped media's within-post index so
+   *  the opening slide renders (and plays) that exact media rather than
+   *  always media[0]. Keyed to the OPENING slide only — swiping to other
+   *  posts uses their media[0] as today. */
+  mediaIndex?: number;
 }
 
 interface FullscreenFeedState {
@@ -54,6 +61,7 @@ interface FullscreenFeedState {
   readOnly: boolean;
   origin: OpenOrigin | null;
   startPosition: number;
+  mediaIndex: number;
   open: (posts: FeedPost[], startIndex?: number, options?: OpenOptions) => void;
   close: () => void;
   appendPosts: (newPosts: FeedPost[]) => void;
@@ -80,6 +88,7 @@ export const useFullscreenFeedStore = create<FullscreenFeedState>((set, get) => 
   readOnly: false,
   origin: null,
   startPosition: 0,
+  mediaIndex: 0,
   open: (posts, startIndex = 0, options) =>
     set({
       isOpen: true,
@@ -95,6 +104,7 @@ export const useFullscreenFeedStore = create<FullscreenFeedState>((set, get) => 
       readOnly: !!options?.readOnly,
       origin: options?.origin ?? null,
       startPosition: options?.startPosition ?? 0,
+      mediaIndex: options?.mediaIndex ?? 0,
     }),
   close: () => {
     const cb = get().onCloseCallback;
@@ -111,6 +121,7 @@ export const useFullscreenFeedStore = create<FullscreenFeedState>((set, get) => 
       readOnly: false,
       origin: null,
       startPosition: 0,
+      mediaIndex: 0,
     });
     if (cb) {
       try { cb(); } catch {}

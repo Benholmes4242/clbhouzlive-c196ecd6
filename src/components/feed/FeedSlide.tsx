@@ -28,6 +28,13 @@ interface FeedSlideProps {
   activeIndexOverride?: number;
   /** When true, suppress the inline top-right elongated dots — fullscreen surfaces render their own segmented dots via FullscreenCarouselOverlay. */
   isFullscreen?: boolean;
+  /** Which media within this post to render on the opening slide. SnapFeed
+   *  passes this ONLY to the slide at startIndex; all other slides get 0 →
+   *  identical behavior (multi-media posts still use FeedImageCarousel from
+   *  media[0]). Course media taps a per-media tile, so passing the tapped
+   *  media's within-post index lets the opening slide mount THAT media
+   *  (video or image), fixing "video slot never mounts" for mixed posts. */
+  mediaIndex?: number;
 }
 
 export const FeedSlide = memo(function FeedSlide({
@@ -44,6 +51,7 @@ export const FeedSlide = memo(function FeedSlide({
   onZoomChange,
   activeIndexOverride,
   isFullscreen = false,
+  mediaIndex = 0,
 }: FeedSlideProps) {
   const { user } = useSupabaseSession();
   const storeActiveIndex = useClubhouseStore(s => s.activeIndex);
@@ -51,6 +59,9 @@ export const FeedSlide = memo(function FeedSlide({
   const isActive = activeIndex === index;
   const isSuggestedFeed = activeTab === 'foryou';
   const media = post.mediaItems;
+  // Opening-slide media selector — mediaIndex is threaded ONLY for the slide
+  // opened via a per-media tile tap; every other slide receives 0.
+  const openIdx = Math.min(Math.max(mediaIndex, 0), Math.max((media?.length ?? 1) - 1, 0));
   const carouselSlide = useClubhouseStore(s => s.carouselPositions.get(index) ?? 0);
   const isEditorial =
     post.postType === 'pga_card' ||
@@ -76,8 +87,13 @@ export const FeedSlide = memo(function FeedSlide({
   // cards now render as standalone Home modules (HomePGAModule, HomeCourseOfWeekModule).
   const renderContent = () => {
 
-    // Multi-media (any mix of video + image) → FeedImageCarousel
-    if (media && media.length > 1) {
+    // Multi-media (any mix of video + image) → FeedImageCarousel.
+    // Skipped when the tap opener explicitly targeted a non-zero media
+    // (mediaIndex > 0) — that opening slide renders exactly the tapped
+    // media as a single-media view so the correct video/image mounts.
+    // In-fullscreen carousel swiping across a multi-media post remains
+    // Stage 7 (existing feed callers pass mediaIndex 0 → carousel unchanged).
+    if (media && media.length > 1 && openIdx === 0) {
       return (
         <FeedImageCarousel
           mediaItems={media}
@@ -90,15 +106,17 @@ export const FeedSlide = memo(function FeedSlide({
       );
     }
 
-    // Single video — engine-backed in fullscreen, poster-only otherwise.
-    if (media?.[0]?.type === 'video') {
-      const first = media[0];
-      const posterSrc = first.thumbnailUrl || '';
+    // Opening media (video/image DECISION and rendered content both use `m`).
+    const m = media?.[openIdx] ?? media?.[0];
+
+    // Video — engine-backed in fullscreen, poster-only otherwise.
+    if (m?.type === 'video') {
+      const posterSrc = m.thumbnailUrl || '';
       if (isFullscreen) {
         return (
           <FullscreenVideoSlot
             postId={post.id}
-            hlsUrl={(first as any).hlsUrl || null}
+            hlsUrl={(m as any).hlsUrl || null}
             posterSrc={posterSrc}
             isActive={isActive}
             onFirstFrameReady={onFirstFrameReady}
@@ -124,16 +142,15 @@ export const FeedSlide = memo(function FeedSlide({
       );
     }
 
-    // Single image — apply pinch zoom
-    if (media?.[0]?.type === 'image') {
-      const first = media[0];
-      const aspect = (first.height ?? 1) > 0 && (first.width ?? 0) > 0
-        ? (first.height as number) / (first.width as number)
+    // Image — apply pinch zoom.
+    if (m?.type === 'image') {
+      const aspect = (m.height ?? 1) > 0 && (m.width ?? 0) > 0
+        ? (m.height as number) / (m.width as number)
         : 1.0;
       const objectFit: 'cover' | 'contain' = isFullscreen
         ? 'contain'
         : (isSuggestedFeed ? 'cover' : (aspect >= 1.5 ? 'cover' : 'contain'));
-      const imgSrc = first.imageUrl || first.thumbnailUrl || '';
+      const imgSrc = m.imageUrl || m.thumbnailUrl || '';
       return (
         <div className="absolute inset-0 overflow-hidden">
           {/* Backdrop — blurred image in fullscreen, solid matte otherwise. */}

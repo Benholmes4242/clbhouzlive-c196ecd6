@@ -7,6 +7,7 @@ import { haptic } from '@/utils/haptics';
 // Stage B3 teardown: HLS preload / pool wiring removed.
 import { pauseAllAudio } from '@/utils/globalVideoMute';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
+import { useFullscreenFeedStore } from '@/store/fullscreenFeedStore';
 // [VIDEOSTUB] useWatchProgressTracker call removed — no playback to track.
 
 
@@ -128,6 +129,10 @@ export function SnapFeed({
 
   const storeActiveIndex = useClubhouseStore(s => s.activeIndex);
   const setActiveIndex = useClubhouseStore(s => s.setActiveIndex);
+  // Opening-slide mediaIndex threaded from the tap opener (see openWithOrigin
+  // + fullscreenFeedStore). Only applied to the slide at `startIndex` — every
+  // other slide renders its media[0] as today.
+  const openingMediaIndex = useFullscreenFeedStore(s => s.mediaIndex);
   // When an override is supplied (e.g. by FullscreenFeedOverlay which owns its
   // own active-index store), it is the source of truth for both rendering AND
   // virtualization window math. Previously SnapFeed used storeActiveIndex for
@@ -497,6 +502,7 @@ export function SnapFeed({
             onZoomChange={handleZoomChange}
             activeIndexOverride={activeIndexOverride}
             isFullscreen={isFullscreen}
+            mediaIndex={idx === (startIndex ?? 0) ? openingMediaIndex : 0}
           />
         );
       })}
