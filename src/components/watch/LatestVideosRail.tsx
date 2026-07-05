@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useRef } from 'react';
 import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
@@ -10,6 +10,7 @@ import CompactVideoRow from './videos/CompactVideoRow';
 import { VideosMark } from './proshop/SectionMarks';
 import { useWatchReveal } from './WatchRevealContext';
 import { useFirstVisibleDecoded } from './shared/useFirstVisibleDecoded';
+import { useWatchAutoplay } from '@/video/useWatchAutoplay';
 
 const VISIBLE_COUNT = 3; // hero + 2 compact rows on-screen at rest
 
@@ -21,21 +22,12 @@ export default function LatestVideosRail() {
   const navigate = useNavigate();
   const { user } = useSupabaseSession();
   const userId = user?.id;
+  const railRef = useRef<HTMLDivElement>(null);
   const heroRef = useRef<HTMLDivElement>(null);
-  const [heroActive, setHeroActive] = useState(false);
 
   const { posts, isLoading, hasResolved } = useVideosFeed({ userId, filter: 'latest' });
 
-  useEffect(() => {
-    const el = heroRef.current;
-    if (!el) return;
-    const io = new IntersectionObserver(
-      ([entry]) => setHeroActive(entry.intersectionRatio >= 0.5),
-      { threshold: [0, 0.25, 0.5, 0.75] }
-    );
-    io.observe(el);
-    return () => io.disconnect();
-  }, [posts.length]);
+  const activeIdx = useWatchAutoplay(railRef, { railId: 'latest-videos' });
 
   const { settled: firstVisibleDecoded, onDecoded } = useFirstVisibleDecoded(posts.length, VISIBLE_COUNT);
   const isEmpty = hasResolved && posts.length === 0;
