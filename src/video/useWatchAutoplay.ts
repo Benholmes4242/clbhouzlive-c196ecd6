@@ -94,6 +94,7 @@ export function useWatchAutoplay(
 
   const ratiosRef = useRef<Map<number, number>>(new Map());
   const settleTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const maxWaitTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => {
     if (!eligible) {
