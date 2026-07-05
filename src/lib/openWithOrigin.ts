@@ -173,6 +173,7 @@ export function openWithOrigin({
     ...(options ?? {}),
     origin,
     startPosition,
+    mediaIndex: mediaIndex ?? 0,
   });
-  fsv('tap.storeOpen', { postId, index, startPosition: +startPosition.toFixed(3) });
+  fsv('tap.storeOpen', { postId, index, startPosition: +startPosition.toFixed(3), mediaIndex: mediaIndex ?? 0 });
 }
