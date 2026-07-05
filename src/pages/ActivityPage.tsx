@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useMemo, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ChevronLeft, CheckCheck, AlertCircle } from 'lucide-react';
+import { CheckCheck, AlertCircle } from 'lucide-react';
 import { useActivityFeed, ActivityNotification, checkContentExists } from '@/hooks/useActivityFeed';
 import { NotificationList } from '@/components/activity/notifications/NotificationList';
 import { ActivityEmptyState } from '@/components/activity/ActivityEmptyState';
@@ -16,7 +16,7 @@ import { toast } from 'sonner';
 import { useUnseenFriendReviews } from '@/hooks/useUnseenFriendReviews';
 import { useHideBottomNav } from '@/hooks/useBottomNavVisibility';
 import { useHideHeader } from '@/hooks/useHeaderVisibility';
-import { PageRoot } from '@/components/layout/PageRoot';
+import { ManagePageShell } from '@/components/manage/ManagePageShell';
 
 // ============ Tokens ============
 const GEIST = 'Geist, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif';
