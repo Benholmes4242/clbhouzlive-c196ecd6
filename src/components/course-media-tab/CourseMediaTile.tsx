@@ -20,42 +20,53 @@ interface CourseMediaTileProps {
   fetchNextPage?: () => void;
   hasNextPage?: boolean;
   isFetchingNextPage?: boolean;
+  /** When true, rent a rail lane and autoplay muted+looped in-place. */
+  active?: boolean;
   /** Optional opener wrapper from the grid that injects pagination callbacks
    *  into the fullscreen store. When omitted, falls back to a direct
    *  store.open() with no pagination. */
-  onOpenFullscreen?: (posts: FeedPost[], index: number) => void;
+  onOpenFullscreen?: (
+    posts: FeedPost[],
+    index: number,
+    ctx: {
+      originEl: HTMLElement | null;
+      railOwnerKey: string | null;
+      posterUrl: string | null;
+      handOffUrls: (string | null | undefined)[];
+    },
+  ) => void;
 }
 
-export const CourseMediaTile: React.FC<CourseMediaTileProps> = ({ post, index, feature, allPosts, onOpenFullscreen }) => {
+export const CourseMediaTile: React.FC<CourseMediaTileProps> = ({ post, index, feature, allPosts, active = false, onOpenFullscreen }) => {
   const media = post.mediaItems[0];
   const isVideo = media?.type === 'video';
   const thumbnailUrl = isVideo ? media?.thumbnailUrl : (media?.imageUrl || media?.thumbnailUrl);
   const duration = media?.duration;
   const tileRef = useRef<HTMLDivElement>(null);
-  const hlsUrl = media?.hlsUrl;
-
-  useEffect(() => {
-    const el = tileRef.current;
-    if (!el) return;
-    const observer = new IntersectionObserver(
-      (entries) => {
-        if (entries[0].isIntersecting) {
-          // preload hook
-        }
-      },
-      { threshold: 0.5 }
-    );
-    observer.observe(el);
-    return () => observer.disconnect();
-  }, [hlsUrl]);
+  const hlsUrl = (media as any)?.hlsUrl as string | undefined;
+  const isVideoLane = isVideo && !!hlsUrl;
+  const ownerKey = isVideoLane ? `${post.id}:0` : null;
+  const { hostRef: laneHostRef, ready: laneReady } = useRailLane({
+    ownerKey,
+    active: active && isVideoLane,
+    hlsUrl: isVideoLane ? hlsUrl! : null,
+    posterUrl: thumbnailUrl || null,
+    postId: post.id,
+  });
 
   return (
     <div
       ref={tileRef}
       data-course-media-index={index}
+      data-watch-tile-index={index}
       onClick={() => {
         const perMediaPosts = allPosts ?? [post];
-        onOpenFullscreen?.(perMediaPosts, index);
+        onOpenFullscreen?.(perMediaPosts, index, {
+          originEl: tileRef.current,
+          railOwnerKey: ownerKey,
+          posterUrl: thumbnailUrl || null,
+          handOffUrls: [hlsUrl],
+        });
       }}
       style={{
         position: 'absolute',
