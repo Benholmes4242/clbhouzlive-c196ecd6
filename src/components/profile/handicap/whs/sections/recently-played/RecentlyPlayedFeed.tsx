@@ -112,6 +112,7 @@ export const RecentlyPlayedFeed: React.FC<Props> = ({ ownerUserId }) => {
 
       <RoundDetailSheet
         scoreId={sheetActivity?.last_round_score_id ?? null}
+        profileUserId={sheetActivity?.friend_user_id ?? null}
         open={!!sheetActivity}
         onClose={() => setSheetActivity(null)}
         handicapDelta={
