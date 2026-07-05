@@ -121,11 +121,23 @@ export const FeedSlide = memo(function FeedSlide({
     // Video — engine-backed in fullscreen, poster-only otherwise.
     if (m?.type === 'video') {
       const posterSrc = m.thumbnailUrl || '';
-      if (isFullscreen) {
+      const mHlsUrl = (m as any).hlsUrl || null;
+      if (isFullscreen && !mHlsUrl) {
+        // Legacy uploads without a Cloudflare Stream id can't drive the
+        // fullscreen lane — surface loudly so bad rows are visible in DBG
+        // but still render the poster gracefully (falls through below).
+        // eslint-disable-next-line no-console
+        console.warn('[FSV] video media without hlsUrl', {
+          postId: post.id,
+          mediaId: m.id,
+          openIdx,
+        });
+      }
+      if (isFullscreen && mHlsUrl) {
         return (
           <FullscreenVideoSlot
             postId={post.id}
-            hlsUrl={(m as any).hlsUrl || null}
+            hlsUrl={mHlsUrl}
             posterSrc={posterSrc}
             isActive={isActive}
             onFirstFrameReady={onFirstFrameReady}
