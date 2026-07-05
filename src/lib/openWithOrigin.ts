@@ -114,8 +114,7 @@ export function openWithOrigin({
   let lastPosCT = -1;
   try {
     if (railOwnerKey) {
-      // Lazy import to avoid a hard dep from feed tap paths.
-      const { RailLanePool } = require('@/video/railLanePool');
+
       railLaneCT = RailLanePool.getCurrentTime(railOwnerKey);
       if (railLaneCT > 0.1) {
         startPosition = railLaneCT;
