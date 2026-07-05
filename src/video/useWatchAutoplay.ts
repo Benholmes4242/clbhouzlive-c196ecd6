@@ -36,6 +36,10 @@ const PLAY_IN = 0.5;
 const PLAY_OUT = 0.35;
 const HYSTERESIS = 0.1;
 const SETTLE_MS = 80;
+// Max-wait ceiling: guarantees recompute runs even under continuous IO bursts
+// (hydration churn on masonry/full-feed grids can otherwise starve the trailing
+// debounce indefinitely, leaving landing activation stuck at null until scroll).
+const MAX_SETTLE_MS = 250;
 
 const IO_THRESHOLDS = [0, 0.1, 0.2, 0.3, 0.35, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0];
 
