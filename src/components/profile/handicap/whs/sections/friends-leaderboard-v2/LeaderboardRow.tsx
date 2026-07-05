@@ -15,18 +15,22 @@ interface Props {
   rankDelta?: FriendLeaderboardRankDelta;
 }
 
+// Literal dark handicap tokens — this row renders inside a portalled
+// BottomSheet (outside `.hcp-dark`) as well as on-page. `var(--hcp-*)`
+// resolves to nothing in the portal scope, so we hardcode the exact
+// values from handicap-dark.css.
 const T = {
-  ink: 'var(--hcp-t-100)',
-  inkMute: 'var(--hcp-t-60)',
-  inkFaded: 'var(--hcp-t-40)',
-  ink25: 'var(--hcp-t-30)',
-  hairline: 'var(--hcp-line)',
-  hairlineSoft: 'var(--hcp-bg-3)',
-  bg3: 'var(--hcp-bg-3)',
+  ink: 'rgba(255,255,255,0.96)',      // --hcp-t-100
+  inkMute: 'rgba(255,255,255,0.55)',  // --hcp-t-60
+  inkFaded: 'rgba(255,255,255,0.38)', // --hcp-t-40
+  ink25: 'rgba(255,255,255,0.30)',    // --hcp-t-30
+  hairline: 'rgba(255,255,255,0.06)', // --hcp-line
+  hairlineSoft: '#272C37',            // --hcp-bg-3
+  bg3: '#272C37',                     // --hcp-bg-3
   amber: '#F7931E',
   amberSoft: 'rgba(247,147,30,0.14)',
   amberInk: '#854F0B',
-  good: 'var(--hcp-good, #34D399)',
+  good: '#22C55E',                    // --hcp-good
 };
 
 const FONT = 'Geist, -apple-system, BlinkMacSystemFont, system-ui, sans-serif';
