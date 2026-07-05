@@ -1,5 +1,5 @@
-import { memo, useCallback, useMemo, useState } from 'react';
-import { useFullscreenFeedStore } from '@/store/fullscreenFeedStore';
+import { memo, useCallback, useMemo, useRef, useState } from 'react';
+import { openWithOrigin } from '@/lib/openWithOrigin';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import type { FeedPost } from '@/components/media-system/types/media';
 import DecodedImage from '../shared/DecodedImage';
@@ -53,12 +53,20 @@ function CompactVideoRowInner({ post, index, allPosts, onDecoded }: CompactVideo
   const ageLabel = useMemo(() => formatAge(post.createdAt), [post.createdAt]);
   const channel = post.displayName || post.username || 'Clbhouz';
 
+  const btnRef = useRef<HTMLButtonElement>(null);
   const handleClick = useCallback(() => {
-    useFullscreenFeedStore.getState().open(allPosts, index);
-  }, [allPosts, index]);
+    openWithOrigin({
+      posts: allPosts,
+      index,
+      originEl: btnRef.current,
+      posterUrl: thumb || null,
+      handOffUrls: [(media as any)?.hlsUrl],
+    });
+  }, [allPosts, index, thumb, media]);
 
   return (
     <button
+      ref={btnRef}
       type="button"
       onClick={handleClick}
       style={{

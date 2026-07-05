@@ -1,6 +1,6 @@
-import { memo, useCallback, useMemo, useState } from 'react';
+import { memo, useCallback, useMemo, useRef, useState } from 'react';
 
-import { useFullscreenFeedStore } from '@/store/fullscreenFeedStore';
+import { openWithOrigin } from '@/lib/openWithOrigin';
 import type { FeedPost } from '@/components/media-system/types/media';
 import { Pin } from '../proshop/Pin';
 
@@ -69,14 +69,22 @@ function VideoRailTileInner({
   const ageLabel = useMemo(() => formatAge(post.createdAt), [post.createdAt]);
   const metaLine = ageLabel;
 
+  const rootRef = useRef<HTMLDivElement>(null);
   const handleClick = useCallback(() => {
-    useFullscreenFeedStore.getState().open(allPosts, index);
-  }, [allPosts, index]);
+    openWithOrigin({
+      posts: allPosts,
+      index,
+      originEl: rootRef.current,
+      posterUrl: thumb || null,
+      handOffUrls: [(media as any)?.hlsUrl],
+    });
+  }, [allPosts, index, thumb, media]);
 
   const showProgress = typeof progress === 'number' && progress > 0 && progress < 1;
 
   return (
     <div
+      ref={rootRef}
       style={{
         flexShrink: 0,
         width,
@@ -86,6 +94,7 @@ function VideoRailTileInner({
       }}
       onClick={handleClick}
     >
+
 
       {/* Thumb — 16:9 */}
       <div

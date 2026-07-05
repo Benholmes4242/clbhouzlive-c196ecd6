@@ -17,6 +17,7 @@
 import type { FeedPost } from '@/components/media-system/types/media';
 import { useFullscreenFeedStore, type OpenOrigin } from '@/store/fullscreenFeedStore';
 import { VideoEngine } from '@/video/VideoEngine';
+import { RailLanePool } from '@/video/railLanePool';
 import { fsv, fsvNewSession, fsvViewport } from '@/perf/fsvTelemetry';
 // [VIDEOSTUB] HLSPoolManager + mobileVideoDebug imports removed — engine severed.
 
@@ -58,6 +59,12 @@ interface OpenWithOriginArgs {
   posterUrl: string | null | undefined;
   /** HLS urls to hand off (typically the tapped tile's active url). */
   handOffUrls?: (string | null | undefined)[];
+  /**
+   * Watch tiles rent a `rail-*` lane via `RailLanePool`. Passing the tile's
+   * owner key lets us resume fullscreen at that lane's live playhead — so
+   * tapping a tile playing at 8s opens fullscreen at 8s, not 0.
+   */
+  railOwnerKey?: string | null;
   options?: {
     openCommentsInitially?: boolean;
     initialCommentId?: string | null;
@@ -75,9 +82,11 @@ export function openWithOrigin({
   originEl,
   posterUrl,
   handOffUrls,
+  railOwnerKey,
   options,
 }: OpenWithOriginArgs): void {
   fsvNewSession('open-tap', { index });
+
   const origin = snapshotOrigin(originEl, posterUrl ?? null);
   const postId = (posts[index] as any)?.id ?? null;
 
@@ -95,22 +104,34 @@ export function openWithOrigin({
     posterUrl: posterUrl ?? null,
   });
 
-  // Two-way resume: prefer the live feed-active lane time when it's
-  // playing the tapped post; fall back to the engine's session lastPos map.
+  // Two-way resume: prefer the tile's live rail-lane playhead (Watch tap),
+  // then the feed-active lane (Clubhouse tap), then the engine's session
+  // lastPos map.
   let startPosition = 0;
-  let startSource: 'feedSnap' | 'lastPos' | 'zero' = 'zero';
+  let startSource: 'railLane' | 'feedSnap' | 'lastPos' | 'zero' = 'zero';
+  let railLaneCT = -1;
   let feedSnapCT = -1;
   let lastPosCT = -1;
   try {
-    const feedSnap = VideoEngine.snapshot('feed-active');
-    feedSnapCT = feedSnap.currentTime;
-    if (postId && feedSnap.currentTime > 0) {
-      startPosition = feedSnap.currentTime;
-      startSource = 'feedSnap';
-    } else if (postId) {
-      lastPosCT = VideoEngine.getLastPos(postId);
-      startPosition = lastPosCT;
-      startSource = 'lastPos';
+    if (railOwnerKey) {
+
+      railLaneCT = RailLanePool.getCurrentTime(railOwnerKey);
+      if (railLaneCT > 0.1) {
+        startPosition = railLaneCT;
+        startSource = 'railLane';
+      }
+    }
+    if (startSource === 'zero') {
+      const feedSnap = VideoEngine.snapshot('feed-active');
+      feedSnapCT = feedSnap.currentTime;
+      if (postId && feedSnap.currentTime > 0) {
+        startPosition = feedSnap.currentTime;
+        startSource = 'feedSnap';
+      } else if (postId) {
+        lastPosCT = VideoEngine.getLastPos(postId);
+        startPosition = lastPosCT;
+        startSource = 'lastPos';
+      }
     }
   } catch {
     /* engine may not be booted yet on deep-link openers */
@@ -119,9 +140,11 @@ export function openWithOrigin({
     postId,
     startPosition: +startPosition.toFixed(3),
     source: startSource,
+    railLaneCT: +railLaneCT.toFixed(3),
     feedSnapCT: +feedSnapCT.toFixed(3),
     lastPosCT: +lastPosCT.toFixed(3),
   });
+
 
   // [VIDEOSTUB] Handoff + pool manager removed — poster-only chassis.
   void handOffUrls;

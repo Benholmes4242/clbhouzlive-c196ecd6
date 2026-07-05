@@ -1,12 +1,13 @@
-import { memo } from 'react';
+import { memo, useRef } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { Clock } from 'lucide-react';
 import { useVideoOfTheWeek } from './hooks/useVideoOfTheWeek';
-import { useFullscreenFeedStore } from '@/store/fullscreenFeedStore';
+import { openWithOrigin } from '@/lib/openWithOrigin';
 import { Kicker } from '../proshop/Kicker';
 import { Pin } from '../proshop/Pin';
 import { useActiveActor } from '@/context/ActiveActorContext';
 import { isPostLikedByMe } from '@/lib/likedPostIds';
+
 
 function formatHMS(seconds: number | null): string {
   if (!seconds) return '';
@@ -38,43 +39,49 @@ function VideoOfTheWeekHeroInner() {
 
   if (isLoading || !pick) return null;
 
+  const btnRef = useRef<HTMLButtonElement>(null);
+  const buildPost = () => ({
+    id: pick.post_id,
+    userId: pick.user_id,
+    actorType: 'personal',
+    actorId: pick.user_id,
+    username: pick.username ?? '',
+    displayName: pick.display_name ?? '',
+    avatarUrl: pick.avatar_url ?? '',
+    isVerified: pick.is_verified,
+    creatorRelation: 'none',
+    caption: pick.caption ?? '',
+    mediaItems: [{
+      id: pick.post_id,
+      type: 'video',
+      hlsUrl: pick.hls_url ?? undefined,
+      imageUrl: pick.thumbnail_url ?? undefined,
+      thumbnailUrl: pick.thumbnail_url ?? undefined,
+      width: 0,
+      height: 0,
+      duration: pick.duration_seconds ?? undefined,
+    }],
+    createdAt: pick.created_at,
+    likeCount: pick.like_count,
+    commentCount: pick.comment_count,
+    shareCount: 0,
+    review: null,
+    isReview: false,
+    isLikedByMe: isLiked,
+    isFollowedByMe: false,
+    courseName: pick.course_name ?? undefined,
+    courseId: pick.course_id ?? undefined,
+    tags: (pick as any).post_tags ?? [],
+  } as any);
+
   const handleTap = () => {
-    useFullscreenFeedStore.getState().open(
-      [{
-        id: pick.post_id,
-        userId: pick.user_id,
-        actorType: 'personal',
-        actorId: pick.user_id,
-        username: pick.username ?? '',
-        displayName: pick.display_name ?? '',
-        avatarUrl: pick.avatar_url ?? '',
-        isVerified: pick.is_verified,
-        creatorRelation: 'none',
-        caption: pick.caption ?? '',
-        mediaItems: [{
-          id: pick.post_id,
-          type: 'video',
-          hlsUrl: pick.hls_url ?? undefined,
-          imageUrl: pick.thumbnail_url ?? undefined,
-          thumbnailUrl: pick.thumbnail_url ?? undefined,
-          width: 0,
-          height: 0,
-          duration: pick.duration_seconds ?? undefined,
-        }],
-        createdAt: pick.created_at,
-        likeCount: pick.like_count,
-        commentCount: pick.comment_count,
-        shareCount: 0,
-        review: null,
-        isReview: false,
-        isLikedByMe: isLiked,
-        isFollowedByMe: false,
-        courseName: pick.course_name ?? undefined,
-        courseId: pick.course_id ?? undefined,
-        tags: (pick as any).post_tags ?? [],
-      } as any],
-      0,
-    );
+    openWithOrigin({
+      posts: [buildPost()],
+      index: 0,
+      originEl: btnRef.current,
+      posterUrl: pick.thumbnail_url ?? null,
+      handOffUrls: [pick.hls_url ?? null],
+    });
   };
 
   return (
@@ -82,6 +89,7 @@ function VideoOfTheWeekHeroInner() {
       <Kicker color="amber">Video of the Week</Kicker>
 
       <button
+        ref={btnRef}
         type="button"
         onClick={handleTap}
         className="block w-full text-left active:scale-[0.99] transition-transform"

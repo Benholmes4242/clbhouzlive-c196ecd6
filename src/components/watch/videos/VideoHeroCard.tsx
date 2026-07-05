@@ -1,6 +1,6 @@
-import { memo, useCallback, useMemo, useState } from 'react';
+import { memo, useCallback, useMemo, useRef, useState } from 'react';
 import { Clock, Heart } from 'lucide-react';
-import { useFullscreenFeedStore } from '@/store/fullscreenFeedStore';
+import { openWithOrigin } from '@/lib/openWithOrigin';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { Pin } from '../proshop/Pin';
 import type { FeedPost } from '@/components/media-system/types/media';
@@ -61,13 +61,22 @@ function VideoHeroCardInner({ post, index, allPosts }: VideoHeroCardProps) {
   const courseName = (post as any).courseName as string | undefined;
   const likeCount = post.likeCount ?? 0;
 
+  const btnRef = useRef<HTMLButtonElement>(null);
   const handleTap = useCallback(() => {
-    useFullscreenFeedStore.getState().open(allPosts, index);
-  }, [allPosts, index]);
+    openWithOrigin({
+      posts: allPosts,
+      index,
+      originEl: btnRef.current,
+      posterUrl: thumb || null,
+      handOffUrls: [(media as any)?.hlsUrl],
+    });
+  }, [allPosts, index, thumb, media]);
+
 
   return (
     <section style={{ padding: '0 16px' }}>
       <button
+        ref={btnRef}
         type="button"
         onClick={handleTap}
         className="block w-full text-left active:scale-[0.99] transition-transform"

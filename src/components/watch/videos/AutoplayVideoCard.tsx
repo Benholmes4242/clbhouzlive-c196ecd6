@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { Heart, MessageCircle } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
 import { toast } from 'sonner';
-import { useFullscreenFeedStore } from '@/store/fullscreenFeedStore';
+import { openWithOrigin } from '@/lib/openWithOrigin';
 import type { FeedPost } from '@/components/media-system/types/media';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { VideoCardMenu } from '@/components/videos-tab/VideoCardMenu';
@@ -77,8 +77,16 @@ function AutoplayVideoCardInner({ post, index, allPosts, userId, active, borderR
 
 
   const handleTap = () => {
-    useFullscreenFeedStore.getState().open(allPosts, index);
+    openWithOrigin({
+      posts: allPosts,
+      index,
+      originEl: tileRef.current,
+      posterUrl: thumbnail || null,
+      handOffUrls: [hlsUrl],
+      railOwnerKey: ownerKey,
+    });
   };
+
 
   const handleShare = async () => {
     const shareUrl = `${window.location.origin}/video/${post.id}`;
