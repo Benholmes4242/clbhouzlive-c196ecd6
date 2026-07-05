@@ -348,127 +348,258 @@ const PointsBody: React.FC<PointsBodyProps> = ({ dist, scope, scoringRange }) =>
     scope === '90d' ? 'vs prior 90D' :
     null;
 
-  const GREEN_GRAD = 'var(--hcp-good-deep)';
-  const AMBER_GRAD = 'var(--hcp-bg-3)';
-  const RED_GRAD = 'var(--hcp-bad)';
+  const POINTS_GOOD = '#55BD8B';
+  const POINTS_AMBER = 'var(--hcp-amber, #F7931E)';
+  const POINTS_OFF = 'rgba(242,244,247,0.22)';
+  const POINTS_BAD = 'var(--hcp-bad)';
 
-  const segs = [
-    { count: dist.inZoneCount, gradient: GREEN_GRAD },
-    { count: dist.solidCount, gradient: AMBER_GRAD },
-    { count: dist.offDayCount, gradient: RED_GRAD },
-  ].filter((s) => s.count > 0);
+  const bands = [
+    { key: 'zone', count: dist.inZoneCount, color: POINTS_GOOD },
+    { key: 'solid', count: dist.solidCount, color: POINTS_AMBER },
+    { key: 'off', count: dist.offDayCount, color: POINTS_OFF },
+  ];
 
+  const scopeShort = scope === '30d' ? '30D' : scope === '90d' ? '90D' : 'ALL';
 
   return (
     <>
-      {/* Hero: AVG number + delta pill */}
-      <div style={{ padding: '14px 20px 12px' }}>
-        <p
+      {/* Header micro-row */}
+      <div
+        style={{
+          padding: '10px 20px 0',
+          display: 'flex',
+          alignItems: 'baseline',
+          justifyContent: 'space-between',
+          gap: 8,
+        }}
+      >
+        <span
           style={{
-            margin: 0,
-            fontSize: 10,
+            fontSize: 8.5,
             fontWeight: 800,
-            letterSpacing: '0.12em',
+            letterSpacing: '0.14em',
             color: T.inkMute,
             fontFamily: FONT,
           }}
         >
-          AVG · {SCOPE_LABEL_LONG[scope]}
-        </p>
-        <div style={{ display: 'flex', alignItems: 'baseline', gap: 8, marginTop: 4, flexWrap: 'wrap' }}>
-          <span
-            style={{
-              fontSize: 56,
-              fontWeight: 200,
-              color: T.ink,
-              letterSpacing: '-0.04em',
-              lineHeight: 1,
-              fontFamily: FONT,
-              fontVariantNumeric: 'tabular-nums',
-            }}
-          >
-            {avg.toFixed(1)}
-          </span>
-          <span style={{ fontSize: 12, color: T.inkMute, fontFamily: FONT }}>pts avg</span>
-          {showDelta && delta !== null && (
-            <span
-              style={{
-                marginLeft: 'auto',
-                display: 'inline-flex',
-                alignItems: 'center',
-                gap: 3,
-                padding: '3px 8px',
-                borderRadius: 999,
-                background: delta > 0 ? T.greenSoft : T.redSoft,
-                color: delta > 0 ? T.greenInk : T.redInk,
-                fontSize: 11,
-                fontWeight: 800,
-                letterSpacing: '0.02em',
-                fontVariantNumeric: 'tabular-nums',
-                fontFamily: FONT,
-              }}
-            >
-              {delta > 0 ? <ArrowUp size={11} strokeWidth={2.6} /> : <ArrowDown size={11} strokeWidth={2.6} />}
-              {Math.abs(delta).toFixed(1)} {prevLabel}
-            </span>
-          )}
-        </div>
-      </div>
-
-      {/* Horizontal segmented bar */}
-      <div style={{ padding: '0 20px 16px' }}>
-        <div
+          {SCOPE_LABEL_LONG[scope]}
+        </span>
+        <span
           style={{
-            display: 'flex',
-            height: 48,
-            borderRadius: 12,
-            overflow: 'hidden',
-            background: T.ink04,
-            
-          }}
-          role="img"
-          aria-label={`Distribution: ${dist.inZoneCount} in zone, ${dist.solidCount} solid, ${dist.offDayCount} off`}
-        >
-          {segs.map((s, i) => (
-            <div
-              key={i}
-              style={{
-                flex: s.count,
-                background: s.gradient,
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                color: '#FFFFFF',
-                fontSize: 16,
-                fontWeight: 800,
-                letterSpacing: '-0.02em',
-                fontFamily: FONT,
-                fontVariantNumeric: 'tabular-nums',
-                transition: 'flex 0.4s cubic-bezier(0.4, 0, 0.2, 1)',
-              }}
-            >
-              {s.count > dist.total * 0.1 ? `${s.count}` : ''}
-            </div>
-          ))}
-        </div>
-        <div
-          style={{
-            display: 'grid',
-            gridTemplateColumns: `${Math.max(dist.inZoneCount, 0.5)}fr ${Math.max(dist.solidCount, 0.5)}fr ${Math.max(dist.offDayCount, 0.5)}fr`,
-            gap: 0,
-            marginTop: 10,
+            fontSize: 8.5,
+            fontWeight: 800,
+            letterSpacing: '0.14em',
+            color: T.ink40,
             fontFamily: FONT,
+            fontVariantNumeric: 'tabular-nums',
           }}
         >
-          <KeyCell color={T.green} label="IN THE ZONE" meta={`36+ · ${dist.inZonePct}%`} />
-          <KeyCell color={T.amber} label="SOLID" meta={`33–35 · ${dist.solidPct}%`} />
-          <KeyCell color={T.red} label="OFF DAY" meta={`<33 · ${dist.offDayPct}%`} />
-        </div>
-
-        {/* 4e — Scoring range block */}
-        {scoringRange && <ScoringRangeBlock range={scoringRange} avg={avg} />}
+          {dist.total} ROUNDS
+        </span>
       </div>
+
+      {/* Ring */}
+      <div style={{ display: 'flex', justifyContent: 'center', margin: '6px 0 4px' }}>
+        <PointsRing
+          bands={bands}
+          total={dist.total}
+          avg={avg}
+          scopeShort={scopeShort}
+          delta={showDelta ? delta : null}
+          goodColor={POINTS_GOOD}
+          badColor={POINTS_BAD}
+        />
+      </div>
+
+      {/* Band chips */}
+      <div style={{ padding: '0 18px', display: 'flex', gap: 7 }}>
+        {[
+          { label: 'IN THE ZONE', range: '36+ PTS', count: dist.inZoneCount, color: POINTS_GOOD },
+          { label: 'SOLID', range: '33–35 PTS', count: dist.solidCount, color: POINTS_AMBER },
+          { label: 'OFF DAY', range: '<33 PTS', count: dist.offDayCount, color: T.inkMute },
+        ].map((c) => {
+          const isZero = c.count === 0;
+          return (
+            <div
+              key={c.label}
+              style={{
+                flex: 1,
+                minWidth: 0,
+                borderRadius: 11,
+                padding: '9px 0 8px',
+                textAlign: 'center',
+                background: 'rgba(255,255,255,0.035)',
+                border: '1px solid var(--hcp-line)',
+                fontFamily: FONT,
+              }}
+            >
+              <div
+                style={{
+                  fontSize: 16,
+                  fontWeight: 800,
+                  color: isZero ? T.inkMute : c.color,
+                  fontVariantNumeric: 'tabular-nums',
+                  lineHeight: 1,
+                }}
+              >
+                {c.count}
+              </div>
+              <div
+                style={{
+                  fontSize: 8.5,
+                  fontWeight: 800,
+                  color: T.ink40,
+                  letterSpacing: '0.12em',
+                  marginTop: 6,
+                }}
+              >
+                {c.label}
+              </div>
+              <div
+                style={{
+                  fontSize: 8.5,
+                  fontWeight: 800,
+                  color: 'rgba(242,244,247,0.28)',
+                  letterSpacing: '0.10em',
+                  marginTop: 3,
+                  fontVariantNumeric: 'tabular-nums',
+                }}
+              >
+                {c.range}
+              </div>
+            </div>
+          );
+        })}
+      </div>
+
+      {/* Scoring range strip */}
+      {scoringRange && (
+        <div style={{ padding: '0 20px 16px' }}>
+          <ScoringRangeBlock range={scoringRange} />
+        </div>
+      )}
     </>
+  );
+};
+
+// ─── Points ring ────────────────────────────────────────────────────────
+interface PointsRingProps {
+  bands: { key: string; count: number; color: string }[];
+  total: number;
+  avg: number;
+  scopeShort: string;
+  delta: number | null;
+  goodColor: string;
+  badColor: string;
+}
+
+const PointsRing: React.FC<PointsRingProps> = ({
+  bands,
+  total,
+  avg,
+  scopeShort,
+  delta,
+  goodColor,
+  badColor,
+}) => {
+  const nonZero = bands.filter((b) => b.count > 0);
+  const arcs: { color: string; dasharray: string; startDeg: number }[] = [];
+
+  if (total > 0 && nonZero.length > 0) {
+    if (nonZero.length === 1) {
+      arcs.push({
+        color: nonZero[0].color,
+        dasharray: `${RING_CIRC} ${RING_CIRC}`,
+        startDeg: -90,
+      });
+    } else {
+      let cursor = 0;
+      bands.forEach((b) => {
+        if (b.count === 0) return;
+        const span = (b.count / total) * Math.PI * 2;
+        const gap = span > RING_GAP * 2 ? RING_GAP : 0;
+        const arcLen = Math.max(0, (span - gap) * RING_R);
+        const startDeg = (cursor * 180) / Math.PI - 90;
+        arcs.push({
+          color: b.color,
+          dasharray: `${arcLen} ${RING_CIRC}`,
+          startDeg,
+        });
+        cursor += span;
+      });
+    }
+  }
+
+  return (
+    <svg width={RING_SIZE} height={RING_SIZE} viewBox={`0 0 ${RING_SIZE} ${RING_SIZE}`} role="img" aria-label="Points distribution ring">
+      <circle
+        cx={RING_CX}
+        cy={RING_CY}
+        r={RING_R}
+        fill="none"
+        stroke="rgba(255,255,255,0.05)"
+        strokeWidth={RING_SW}
+      />
+      {arcs.map((a, i) => (
+        <circle
+          key={i}
+          cx={RING_CX}
+          cy={RING_CY}
+          r={RING_R}
+          fill="none"
+          stroke={a.color}
+          strokeWidth={RING_SW}
+          strokeLinecap="round"
+          strokeDasharray={a.dasharray}
+          transform={`rotate(${a.startDeg} ${RING_CX} ${RING_CY})`}
+        />
+      ))}
+      <text
+        x={RING_CX}
+        y={78}
+        textAnchor="middle"
+        style={{
+          fontFamily: FONT,
+          fontSize: 30,
+          fontWeight: 800,
+          fill: 'var(--hcp-t-100)',
+          fontVariantNumeric: 'tabular-nums',
+        }}
+      >
+        {avg.toFixed(1)}
+      </text>
+      <text
+        x={RING_CX}
+        y={96}
+        textAnchor="middle"
+        style={{
+          fontFamily: FONT,
+          fontSize: 7.5,
+          fontWeight: 800,
+          letterSpacing: '0.14em',
+          fill: 'var(--hcp-t-40)',
+        }}
+      >
+        PTS AVG · {scopeShort}
+      </text>
+      {delta !== null && delta !== 0 && (
+        <text
+          x={RING_CX}
+          y={114}
+          textAnchor="middle"
+          style={{
+            fontFamily: FONT,
+            fontSize: 10,
+            fontWeight: 800,
+            fill: delta > 0 ? goodColor : badColor,
+            fontVariantNumeric: 'tabular-nums',
+          }}
+        >
+          {delta > 0 ? '↑' : '↓'} {Math.abs(delta).toFixed(1)}
+          <tspan style={{ fontSize: 7, fill: 'var(--hcp-t-40)' }}> VS PRIOR</tspan>
+        </text>
+      )}
+    </svg>
   );
 };
 
