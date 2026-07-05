@@ -1,6 +1,7 @@
 import { memo, useCallback, useRef, useState } from 'react';
 import { Clock, Heart } from 'lucide-react';
 import { openWithOrigin } from '@/lib/openWithOrigin';
+import { useRailLane } from '@/video/useRailLane';
 import { Pin } from '../proshop/Pin';
 import type { FeedPost } from '@/components/media-system/types/media';
 
@@ -8,6 +9,8 @@ interface VideoGridCardProps {
   post: FeedPost;
   index: number;
   allPosts: FeedPost[];
+  /** When true, rent a rail lane and autoplay muted+looped in-place. */
+  active?: boolean;
 }
 
 function formatHMS(seconds: number | null | undefined): string {
@@ -28,7 +31,7 @@ function abbreviateCount(n: number): string {
   return String(n);
 }
 
-function VideoGridCardInner({ post, index, allPosts }: VideoGridCardProps) {
+function VideoGridCardInner({ post, index, allPosts, active = false }: VideoGridCardProps) {
   const media = post.mediaItems.find((m) => m.type === 'video') ?? post.mediaItems[0];
   const thumb = media?.thumbnailUrl || media?.imageUrl || '';
   const duration = media?.duration ?? 0;
@@ -37,6 +40,17 @@ function VideoGridCardInner({ post, index, allPosts }: VideoGridCardProps) {
   const channel = post.displayName || post.username || 'Clbhouz';
   const likeCount = post.likeCount ?? 0;
 
+  const hlsUrl = (media as any)?.hlsUrl as string | undefined;
+  const isVideo = !!media && media.type === 'video' && !!hlsUrl;
+  const ownerKey = isVideo ? `${post.id}:0` : null;
+  const { hostRef: laneHostRef, ready: laneReady } = useRailLane({
+    ownerKey,
+    active: active && isVideo,
+    hlsUrl: isVideo ? hlsUrl! : null,
+    posterUrl: thumb || null,
+    postId: post.id,
+  });
+
   const btnRef = useRef<HTMLButtonElement>(null);
   const handleTap = useCallback(() => {
     openWithOrigin({
@@ -44,15 +58,17 @@ function VideoGridCardInner({ post, index, allPosts }: VideoGridCardProps) {
       index,
       originEl: btnRef.current,
       posterUrl: thumb || null,
-      handOffUrls: [(media as any)?.hlsUrl],
+      handOffUrls: [hlsUrl],
+      railOwnerKey: ownerKey,
     });
-  }, [allPosts, index, thumb, media]);
+  }, [allPosts, index, thumb, hlsUrl, ownerKey]);
 
   return (
     <button
       ref={btnRef}
       type="button"
       onClick={handleTap}
+      data-watch-tile-index={index}
       className="block text-left active:scale-[0.99] transition-transform"
       style={{ flex: 1, minWidth: 0, padding: 0, background: 'transparent', border: 'none', display: 'flex', flexDirection: 'column', height: '100%' }}
     >
@@ -76,8 +92,23 @@ function VideoGridCardInner({ post, index, allPosts }: VideoGridCardProps) {
           />
         ) : null}
 
+        {isVideo && (
+          <div
+            ref={laneHostRef}
+            aria-hidden
+            style={{
+              position: 'absolute',
+              inset: 0,
+              zIndex: 1,
+              opacity: laneReady ? 1 : 0,
+              transition: 'opacity 140ms linear',
+              pointerEvents: 'none',
+            }}
+          />
+        )}
+
         {duration > 0 ? (
-          <div style={{ position: 'absolute', bottom: 6, right: 6 }}>
+          <div style={{ position: 'absolute', bottom: 6, right: 6, zIndex: 2 }}>
             <Pin variant="dark" icon={<Clock size={9} />}>
               {formatHMS(duration)}
             </Pin>
