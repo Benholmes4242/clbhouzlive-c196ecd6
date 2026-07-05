@@ -74,11 +74,11 @@ const DARK_TOKENS: ThemeTokens = {
 };
 
 const LIGHT_TOKENS: ThemeTokens = {
-  fill: 'rgba(250,251,253,0.86)',
+  fill: 'rgba(250,251,253,0.88)',
   hairline: '1px solid rgba(15,23,42,0.08)',
-  shadow: '0 10px 30px rgba(15,23,42,0.14)',
+  shadow: '0 10px 30px rgba(15,23,42,0.16)',
   ink: '#0F172A',
-  dim: 'rgba(15,23,42,0.45)',
+  dim: 'rgba(15,23,42,0.58)',
   lozenge: 'rgba(15,23,42,0.07)',
 };
 
