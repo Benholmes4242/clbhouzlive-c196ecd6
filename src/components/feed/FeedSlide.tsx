@@ -8,8 +8,9 @@ import type { FeedPost } from '@/components/media-system/types/media';
 import { useVideoLane } from '@/video/useVideoLane';
 import { VideoEngine } from '@/video/VideoEngine';
 import { useFullscreenFeedStore } from '@/store/fullscreenFeedStore';
-import { fsv } from '@/perf/fsvTelemetry';
+import { fsv, vdiff } from '@/perf/fsvTelemetry';
 import { isPerfEnabled } from '@/perf/navTiming';
+
 import { usePostViewTracker } from '@/hooks/usePostViewTracker';
 
 interface FeedSlideProps {
