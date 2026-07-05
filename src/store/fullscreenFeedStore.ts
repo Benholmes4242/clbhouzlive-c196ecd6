@@ -88,6 +88,7 @@ export const useFullscreenFeedStore = create<FullscreenFeedState>((set, get) => 
   readOnly: false,
   origin: null,
   startPosition: 0,
+  mediaIndex: 0,
   open: (posts, startIndex = 0, options) =>
     set({
       isOpen: true,
@@ -103,6 +104,7 @@ export const useFullscreenFeedStore = create<FullscreenFeedState>((set, get) => 
       readOnly: !!options?.readOnly,
       origin: options?.origin ?? null,
       startPosition: options?.startPosition ?? 0,
+      mediaIndex: options?.mediaIndex ?? 0,
     }),
   close: () => {
     const cb = get().onCloseCallback;
