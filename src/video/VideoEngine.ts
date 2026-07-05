@@ -69,11 +69,16 @@ interface Lane {
 
 
 const DBG = (...args: unknown[]) => {
-  if (typeof window !== 'undefined' && (window as any).__VIDEO_ENGINE_DBG__) {
-    // eslint-disable-next-line no-console
-    console.info('[VideoEngine]', ...args);
-  }
+  // Gate on the DBG pill (isPerfEnabled) so device WebViews (no window
+  // console) can enable traces via the on-screen toggle. Legacy
+  // window.__VIDEO_ENGINE_DBG__ still honored for quick browser flips.
+  const flag =
+    typeof window !== 'undefined' && (window as any).__VIDEO_ENGINE_DBG__;
+  if (!flag && !isPerfEnabled()) return;
+  // eslint-disable-next-line no-console
+  console.info('[VideoEngine]', ...args);
 };
+
 
 
 
