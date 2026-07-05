@@ -1,8 +1,8 @@
-import { memo } from 'react';
+import { memo, useRef } from 'react';
 import { useQuery } from '@tanstack/react-query';
 
 import { useClipOfTheWeek } from './hooks/useClipOfTheWeek';
-import { useFullscreenFeedStore } from '@/store/fullscreenFeedStore';
+import { openWithOrigin } from '@/lib/openWithOrigin';
 import { Kicker } from '../proshop/Kicker';
 import { Pin } from '../proshop/Pin';
 import { useActiveActor } from '@/context/ActiveActorContext';
