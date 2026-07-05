@@ -12,6 +12,8 @@ interface BottomSheetProps {
   ariaLabelledBy?: string;
   /** 'light' (default, uses `bg-background`) or 'dark' (ink #0F172A surface + light handle). */
   variant?: 'light' | 'dark';
+  /** Optional surface colour override for the dark variant. */
+  surfaceColor?: string;
 }
 
 export function BottomSheet({
@@ -23,6 +25,7 @@ export function BottomSheet({
   style,
   ariaLabelledBy,
   variant = 'light',
+  surfaceColor,
 }: BottomSheetProps) {
   const sheetRef = useRef<HTMLDivElement>(null);
   const dragStartY = useRef<number | null>(null);
@@ -124,7 +127,7 @@ export function BottomSheet({
           maxHeight: '90vh',
           minHeight: 0,
           paddingBottom: 'max(env(safe-area-inset-bottom, 0px), 16px)',
-          ...(variant === 'dark' ? { background: '#0F172A' } : null),
+          ...(variant === 'dark' ? { background: surfaceColor ?? '#0F172A' } : null),
           ...style,
         }}
         role="dialog"

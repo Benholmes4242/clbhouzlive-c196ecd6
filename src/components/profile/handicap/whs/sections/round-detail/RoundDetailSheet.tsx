@@ -133,6 +133,9 @@ export const RoundDetailSheet: React.FC<Props> = ({ open, onClose, scoreId, hand
 
   const dateEyebrow = fmtDateEyebrow(userData?.play_date);
   const courseName = userData?.course?.name ?? 'Unknown course';
+  const displayName = profile?.display_name ?? profile?.username ?? '';
+  const goToProfile = () => { if (profileUserId) navigate(`/handicap/${profileUserId}`); };
+  const goToCourse = () => { if (courseIdQuery.data) navigate(`/courses/${courseIdQuery.data}`); };
 
   const indexLabel = indexMoved ? 'INDEX AFTER THIS ROUND' : 'CURRENT INDEX';
   const deltaColor = handicapDelta == null ? T.dim : handicapDelta < 0 ? T.under : T.over;
@@ -153,156 +156,164 @@ export const RoundDetailSheet: React.FC<Props> = ({ open, onClose, scoreId, hand
   const plottableCount = trajectoryHoles.filter((h) => h.par != null && h.strokes != null).length;
 
   return (
-    <BottomSheet open={open} onClose={onClose} ariaLabelledBy="round-detail-sheet-title" variant="dark">
+    <BottomSheet open={open} onClose={onClose} ariaLabelledBy="round-detail-sheet-title" variant="dark" surfaceColor="#1B1E27">
       {userLoading ? (
         <SheetSkeleton />
       ) : !userData ? (
         <SheetEmpty onClose={onClose} />
       ) : (
         <>
-          {/* HEADER — tour-style identity row */}
-          <div style={{ padding: '14px 20px 6px' }}>
-            <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 14 }}>
-              {/* Avatar + name — ONE tap target → player profile */}
+          {/* HEADER — three-row identity column with centred avatar */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: 13, padding: '10px 20px 14px', borderBottom: `1px solid ${T.line}` }}>
+            {/* Avatar — same tap target as the name */}
+            <button
+              type="button"
+              disabled={!profileUserId}
+              onClick={goToProfile}
+              style={{
+                padding: 0,
+                background: 'none',
+                border: 'none',
+                flexShrink: 0,
+                cursor: profileUserId ? 'pointer' : 'default',
+                WebkitTapHighlightColor: 'transparent',
+              }}
+              aria-label="View player profile"
+            >
+              <SquircleAvatar
+                src={profile?.profile_photo_url ?? null}
+                alt={profile?.display_name ?? ''}
+                size={52}
+                userId={profileUserId ?? undefined}
+                hideRing
+              />
+            </button>
+
+            {/* Three-row text column */}
+            <div style={{ minWidth: 0, flex: 1 }}>
+              {/* Row 1: eyebrow */}
+              <div style={{ display: 'flex', alignItems: 'center', gap: 7, minWidth: 0, lineHeight: 1 }}>
+                {dateEyebrow && (
+                  <span style={{ ...NUM, fontSize: 11, fontWeight: 800, color: T.accent, letterSpacing: '0.06em' }}>
+                    {dateEyebrow}
+                  </span>
+                )}
+                {(parTotal != null || userData.slope_rating != null) && (
+                  <>
+                    {dateEyebrow && <span style={{ fontSize: 11, color: T.faint }}>·</span>}
+                    <span style={{ ...NUM, fontSize: 11, fontWeight: 700, color: T.faint, letterSpacing: '0.04em' }}>
+                      {parTotal != null ? `PAR ${parTotal}` : ''}
+                      {parTotal != null && userData.slope_rating != null ? ' · ' : ''}
+                      {userData.slope_rating != null ? `SL ${userData.slope_rating}` : ''}
+                    </span>
+                  </>
+                )}
+              </div>
+
+              {/* Row 2: name as a tap target */}
               <button
                 type="button"
-                onClick={() => profileUserId && navigate(`/handicap/${profileUserId}`)}
                 disabled={!profileUserId}
+                onClick={goToProfile}
                 style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: 13,
                   padding: 0,
                   background: 'none',
                   border: 'none',
+                  display: 'block',
+                  maxWidth: '100%',
                   textAlign: 'left',
-                  minWidth: 0,
-                  flex: 1,
                   cursor: profileUserId ? 'pointer' : 'default',
                   WebkitTapHighlightColor: 'transparent',
                 }}
-                aria-label="View player profile"
               >
-                <SquircleAvatar
-                  src={profile?.profile_photo_url ?? null}
-                  alt={profile?.display_name ?? ''}
-                  size={52}
-                  userId={profileUserId ?? undefined}
-                  hideRing
-                />
-                <div style={{ display: 'flex', flexDirection: 'column', minWidth: 0, gap: 4 }}>
-                  {/* Row 1: date · PAR · SL eyebrow */}
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 7, minWidth: 0 }}>
-                    {dateEyebrow && (
-                      <span style={{ ...NUM, fontSize: 11, fontWeight: 800, color: T.accent, letterSpacing: '0.06em' }}>
-                        {dateEyebrow}
-                      </span>
-                    )}
-                    {(parTotal != null || userData.slope_rating != null) && (
-                      <>
-                        {dateEyebrow && <span style={{ fontSize: 11, color: T.faint }}>·</span>}
-                        <span style={{ ...NUM, fontSize: 11, fontWeight: 700, color: T.faint, letterSpacing: '0.04em' }}>
-                          {parTotal != null ? `PAR ${parTotal}` : ''}
-                          {parTotal != null && userData.slope_rating != null ? ' · ' : ''}
-                          {userData.slope_rating != null ? `SL ${userData.slope_rating}` : ''}
-                        </span>
-                      </>
-                    )}
-                  </div>
-
-                  {/* Row 2: player name */}
-                  <div
-                    id="round-detail-sheet-title"
-                    style={{
-                      fontFamily: GEIST,
-                      fontSize: 19,
-                      fontWeight: 800,
-                      color: T.ink,
-                      letterSpacing: '-0.01em',
-                      lineHeight: 1.1,
-                      whiteSpace: 'nowrap',
-                      overflow: 'hidden',
-                      textOverflow: 'ellipsis',
-                      minWidth: 0,
-                    }}
-                  >
-                    {profile?.display_name ?? profile?.username ?? ''}
-                  </div>
-                </div>
+                <span
+                  id="round-detail-sheet-title"
+                  style={{
+                    fontSize: 19,
+                    fontWeight: 800,
+                    color: T.ink,
+                    letterSpacing: '-0.01em',
+                    lineHeight: 1.2,
+                    display: 'block',
+                    marginTop: 3,
+                    whiteSpace: 'nowrap',
+                    overflow: 'hidden',
+                    textOverflow: 'ellipsis',
+                  }}
+                >
+                  {displayName}
+                </span>
               </button>
 
-              {/* Round hero — right */}
-              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', flexShrink: 0 }}>
+              {/* Row 3: club as its own tap target */}
+              <button
+                type="button"
+                disabled={!courseIdQuery.data}
+                onClick={goToCourse}
+                style={{
+                  padding: 0,
+                  background: 'none',
+                  border: 'none',
+                  display: 'block',
+                  maxWidth: '100%',
+                  textAlign: 'left',
+                  cursor: courseIdQuery.data ? 'pointer' : 'default',
+                  WebkitTapHighlightColor: 'transparent',
+                }}
+              >
                 <span style={{
-                  ...NUM,
-                  fontSize: 38,
-                  fontWeight: 800,
-                  letterSpacing: '-0.03em',
-                  lineHeight: 0.9,
-                  color: roundRelColor,
+                  fontSize: 12.5,
+                  fontWeight: 700,
+                  color: courseIdQuery.data ? T.ink : T.dim,
+                  lineHeight: 1.3,
+                  display: 'block',
+                  marginTop: 3,
+                  whiteSpace: 'nowrap',
+                  overflow: 'hidden',
+                  textOverflow: 'ellipsis',
                 }}>
-                  {fmtRel(roundRel)}
+                  {courseName}
                 </span>
-                <span style={{
-                  fontFamily: GEIST, fontSize: 8.5, fontWeight: 800,
-                  color: T.faint, letterSpacing: '0.14em', marginTop: 8,
-                }}>
-                  THIS ROUND
+              </button>
+            </div>
+
+            {/* Round hero — right */}
+            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', flexShrink: 0 }}>
+              <span style={{
+                ...NUM,
+                fontSize: 38,
+                fontWeight: 800,
+                letterSpacing: '-0.03em',
+                lineHeight: 0.9,
+                color: roundRelColor,
+              }}>
+                {fmtRel(roundRel)}
+              </span>
+              <span style={{
+                fontFamily: GEIST, fontSize: 8.5, fontWeight: 800,
+                color: T.faint, letterSpacing: '0.14em', marginTop: 8,
+              }}>
+                THIS ROUND
+              </span>
+            </div>
+          </div>
+
+          {/* Mini stats */}
+          <div style={{ display: 'flex', gap: 22, padding: '14px 20px 0' }}>
+            {[
+              { label: 'GROSS', value: userData.adjusted_gross ?? null, color: T.ink },
+              { label: 'STBL', value: userData.stableford_points ?? null, color: T.ink },
+              { label: 'DIFF', value: userData.handicap_differential != null ? fmtDiff(userData.handicap_differential) : null, color: diffColor },
+            ].map((s) => (
+              <div key={s.label} style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+                <span style={{ ...NUM, fontSize: 15, fontWeight: 800, color: s.value == null ? T.faint : s.color, lineHeight: 1 }}>
+                  {s.value ?? '—'}
+                </span>
+                <span style={{ fontFamily: GEIST, fontSize: 8, fontWeight: 800, color: T.faint, letterSpacing: '0.12em' }}>
+                  {s.label}
                 </span>
               </div>
-            </div>
-
-            {/* Row 3: club name — its own tap target → course detail. Aligned
-                under the name column (avatar 52 + gap 13 = 65). */}
-            <button
-              type="button"
-              onClick={() => courseIdQuery.data && navigate(`/courses/${courseIdQuery.data}`)}
-              disabled={!courseIdQuery.data}
-              style={{
-                display: 'block',
-                background: 'none',
-                border: 'none',
-                padding: '0 0 0 65px',
-                margin: '2px 0 0',
-                textAlign: 'left',
-                width: '100%',
-                cursor: courseIdQuery.data ? 'pointer' : 'default',
-                WebkitTapHighlightColor: 'transparent',
-              }}
-              aria-label="View course details"
-            >
-              <span style={{
-                fontFamily: GEIST,
-                fontSize: 12.5,
-                fontWeight: 600,
-                color: courseIdQuery.data ? T.ink : T.dim,
-                letterSpacing: '-0.005em',
-                whiteSpace: 'nowrap',
-                overflow: 'hidden',
-                textOverflow: 'ellipsis',
-                display: 'block',
-              }}>
-                {courseName}
-              </span>
-            </button>
-
-            {/* Mini stats */}
-            <div style={{ display: 'flex', gap: 22, marginTop: 14 }}>
-              {[
-                { label: 'GROSS', value: userData.adjusted_gross ?? null, color: T.ink },
-                { label: 'STBL', value: userData.stableford_points ?? null, color: T.ink },
-                { label: 'DIFF', value: userData.handicap_differential != null ? fmtDiff(userData.handicap_differential) : null, color: diffColor },
-              ].map((s) => (
-                <div key={s.label} style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-                  <span style={{ ...NUM, fontSize: 15, fontWeight: 800, color: s.value == null ? T.faint : s.color, lineHeight: 1 }}>
-                    {s.value ?? '—'}
-                  </span>
-                  <span style={{ fontFamily: GEIST, fontSize: 8, fontWeight: 800, color: T.faint, letterSpacing: '0.12em' }}>
-                    {s.label}
-                  </span>
-                </div>
-              ))}
-            </div>
+            ))}
           </div>
 
 
