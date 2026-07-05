@@ -7,6 +7,7 @@ import { haptic } from '@/utils/haptics';
 // Stage B3 teardown: HLS preload / pool wiring removed.
 import { pauseAllAudio } from '@/utils/globalVideoMute';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
+import { useFullscreenFeedStore } from '@/store/fullscreenFeedStore';
 // [VIDEOSTUB] useWatchProgressTracker call removed — no playback to track.
 
 
