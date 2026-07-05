@@ -214,18 +214,20 @@ export const PersonalBests: React.FC<Props> = ({ connectionId, currentHandicap, 
                       <div
                         style={{
                           width: 30, height: 30, borderRadius: 9,
-                          background: 'rgba(247,147,30,0.10)',
+                          background: 'var(--hcp-bg-2)',
+                          border: '1px solid var(--hcp-line)',
                           display: 'flex', alignItems: 'center', justifyContent: 'center',
                           flexShrink: 0,
+                          boxSizing: 'border-box',
                         }}
                       >
-                        {Icon && <Icon size={15} color="#F7931E" strokeWidth={2.2} />}
+                        {Icon && <Icon size={15} color="var(--hcp-t-60)" strokeWidth={2.2} />}
                       </div>
                       <span
                         style={{
                           fontSize: 30,
                           fontWeight: 300,
-                          color: isEmpty ? 'var(--hcp-t-30)' : D_T100,
+                          color: isEmpty ? 'var(--hcp-t-30)' : (tile.valueColor ?? D_T100),
                           fontVariantNumeric: 'tabular-nums',
                           letterSpacing: '-0.04em',
                           lineHeight: 0.85,
