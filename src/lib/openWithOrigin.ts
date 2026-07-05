@@ -92,6 +92,7 @@ export function openWithOrigin({
   handOffUrls,
   railOwnerKey,
   mediaIndex,
+  mediaId,
   options,
 }: OpenWithOriginArgs): void {
   fsvNewSession('open-tap', { index });
