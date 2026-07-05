@@ -65,7 +65,12 @@ const WatchGrid: React.FC<WatchGridProps> = ({
   const sentinelRef = useRef<HTMLDivElement>(null);
   const decodedCountRef = useRef(0);
   const firedRef = useRef(false);
-  const activeIdx = useWatchAutoplay(gridRef, { railId: 'watch-grid' });
+  const { activeIdx, railRef: autoplayRef } = useWatchAutoplay({ railId: 'watch-grid' });
+  const setGridRef = useCallback((el: HTMLDivElement | null) => {
+    autoplayRef(el);
+    if (gridRef) (gridRef as React.MutableRefObject<HTMLDivElement | null>).current = el;
+  }, [autoplayRef, gridRef]);
+
 
   // Reset the first-row-decoded latch whenever the underlying post set
   // fundamentally changes (mood/category switch → fresh page ready gate).
