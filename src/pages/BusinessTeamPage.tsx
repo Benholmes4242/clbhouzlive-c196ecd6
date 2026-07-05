@@ -320,7 +320,7 @@ export default function BusinessTeamPage() {
             style={{
               paddingBottom: 'max(env(safe-area-inset-bottom, 0px), 16px)',
               paddingTop: 12,
-              background: 'linear-gradient(to top, #F4F6F8 60%, rgba(244,246,248,0))',
+              background: 'linear-gradient(to top, #F8FAFC 60%, rgba(248,250,252,0))',
             }}
           >
             <button
