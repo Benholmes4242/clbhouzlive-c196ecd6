@@ -126,7 +126,7 @@ function BucketListRailInner() {
   );
 
   const railRef = useRef<HTMLDivElement>(null);
-  const activeIdx = useRailAutoplay(railRef, orderedPosts.length);
+  const activeIdx = useWatchAutoplay(railRef, { railId: 'bucket-list' });
 
   if (!hasResolved || stillLoading) return skeleton;
   if (courses.length === 0 || orderedPosts.length === 0) return null;
