@@ -154,7 +154,7 @@ export const YourCircleSection: React.FC<Props> = ({ userId }) => {
                 flex: '0 0 auto',
                 width: 92,
                 background: 'var(--hcp-bg-1)',
-                border: '1.5px solid rgba(247,147,30,0.55)',
+                border: '1px solid rgba(247,147,30,0.55)',
                 borderRadius: 14,
                 padding: '9px 8px',
                 cursor: 'pointer',
