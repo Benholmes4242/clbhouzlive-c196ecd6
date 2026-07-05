@@ -335,7 +335,7 @@ export const StreaksSheet: React.FC<StreaksSheetProps> = ({ open, onClose }) => 
       >
         <Eyebrow />
         {/* canonical amber cut-line */}
-        <div style={{ width: 34, height: 4, borderRadius: 99, background: 'var(--hcp-amber)', marginTop: 9 }} />
+        <div style={{ width: 34, height: 3, borderRadius: 99, background: 'var(--hcp-amber)', marginTop: 9 }} />
         <div
           style={{
             fontSize: 34,

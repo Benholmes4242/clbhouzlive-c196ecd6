@@ -425,7 +425,7 @@ const ShowpieceCard: React.FC<Props> = ({ item, onTap }) => {
           style={{
             position: 'relative',
             width: '100%',
-            height: 4,
+            height: 3.5,
             borderRadius: 99,
             background: 'rgba(255,255,255,0.07)',
             overflow: 'hidden',
