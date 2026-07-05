@@ -1,11 +1,13 @@
 import React from 'react';
 import type { WhsScoreHole } from '@/lib/whs/types';
+import {
+  SC_EAGLE_DARK,
+  SC_BIRDIE_DARK,
+  SC_BOGEY_DARK,
+  SC_DOUBLE_DARK,
+} from '@/features/courses/components/holes/_constants';
 
 const FONT_GEIST = 'Geist, system-ui, -apple-system, BlinkMacSystemFont, sans-serif';
-const AMBER = '#F7931E';
-const GREEN = '#006747';
-const RED = '#EF4444';
-const MAROON = '#991B1B';
 
 interface Props {
   holes: WhsScoreHole[];
@@ -27,11 +29,12 @@ function dotFor(h: WhsScoreHole): Dot {
   if (diff === 0) {
     return { size: 4, color: 'transparent', borderColor: 'rgba(255,255,255,0.35)', key: h.hole_no };
   }
-  let color = AMBER;
-  if (diff <= -2) color = GREEN;
-  else if (diff === -1) color = AMBER;
-  else if (diff === 1) color = RED;
-  else if (diff >= 2) color = MAROON;
+  // Cinema card sits on a charcoal surface — use the SC_*_DARK ramp.
+  let color = SC_BIRDIE_DARK;
+  if (diff <= -2) color = SC_EAGLE_DARK;
+  else if (diff === -1) color = SC_BIRDIE_DARK;
+  else if (diff === 1) color = SC_BOGEY_DARK;
+  else if (diff >= 2) color = SC_DOUBLE_DARK;
   const size = abs === 1 ? 6 : 8;
   return { size, color, key: h.hole_no };
 }

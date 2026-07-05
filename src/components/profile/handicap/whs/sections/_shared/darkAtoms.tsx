@@ -1,3 +1,8 @@
+// WARNING: this file uses var(--hcp-*) tokens, which resolve ONLY
+// inside the .hcp-dark page scope. NEVER render these atoms inside
+// a portalled bottom sheet — tokens resolve to nothing there and
+// text goes invisible. For sheet-rendered UI, use literal-based
+// equivalents (see the portal rule in the palette canon).
 import React from 'react';
 
 /**

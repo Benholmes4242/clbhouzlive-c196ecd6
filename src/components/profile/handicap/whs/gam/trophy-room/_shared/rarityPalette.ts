@@ -107,6 +107,10 @@ export const MATERIAL_PALETTES: Record<1 | 2 | 3 | 4 | 5, RarityPalette> = {
     outerGlow: RARITY_DARK.silver.outerGlow,
     metaColor: RARITY_DARK.silver.labelFg,
   },
+  // EMERALD tier — scoped exemption from the palette canon.
+  // #10B981 / rgba(16,185,129,*) are permitted ONLY for rarity/tier
+  // rendering in this file. Do not use outside rarity/tier contexts;
+  // semantic "good" is #34D399 / #059669.
   3: {
     color: '#10B981',
     tint: 'rgba(16,185,129,0.16)',
