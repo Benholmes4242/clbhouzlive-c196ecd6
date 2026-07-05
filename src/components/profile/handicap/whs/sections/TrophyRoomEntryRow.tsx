@@ -8,7 +8,6 @@ import React from 'react';
 import { Trophy, ChevronRight } from 'lucide-react';
 import { openGamAchievements } from '../gam/events';
 import { useUserAchievements } from '@/hooks/gam/useUserAchievements';
-import { rarityColor } from '@/lib/gam/visuals';
 import type { BadgeRarity } from '@/lib/gam/types';
 
 const FONT = 'Geist, -apple-system, BlinkMacSystemFont, system-ui, sans-serif';
@@ -19,21 +18,60 @@ interface Props {
   ownerFirstName?: string | null;
 }
 
-const MED_SIZE = 34;
-const MED_OVERLAP = -12;
+const MED_W = 32;
+const MED_H = 34;
+const MED_RADIUS = '34%';
+const MED_OVERLAP = -9;
 
-const medBaseStyle = (z: number, first: boolean): React.CSSProperties => ({
-  width: MED_SIZE,
-  height: MED_SIZE,
-  borderRadius: '50%',
+/** Squircle chip tints derived from rarityColor -- precomputed rgba
+ *  stops (wash top, wash bottom, border, glyph). Common is dimmer by
+ *  design. If rarityColor ever changes, update these to match. */
+const CHIP_TINTS: Record<BadgeRarity, { top: string; bottom: string; border: string; glyph: string }> = {
+  common: {
+    top: 'rgba(148,163,184,0.16)',
+    bottom: 'rgba(148,163,184,0.06)',
+    border: 'rgba(148,163,184,0.35)',
+    glyph: 'rgba(148,163,184,0.85)',
+  },
+  uncommon: {
+    top: 'rgba(59,130,246,0.26)',
+    bottom: 'rgba(59,130,246,0.10)',
+    border: 'rgba(59,130,246,0.55)',
+    glyph: '#3B82F6',
+  },
+  rare: {
+    top: 'rgba(247,147,30,0.26)',
+    bottom: 'rgba(247,147,30,0.10)',
+    border: 'rgba(247,147,30,0.55)',
+    glyph: '#F7931E',
+  },
+  epic: {
+    top: 'rgba(168,85,247,0.26)',
+    bottom: 'rgba(168,85,247,0.10)',
+    border: 'rgba(168,85,247,0.55)',
+    glyph: '#A855F7',
+  },
+  legendary: {
+    top: 'rgba(251,188,46,0.26)',
+    bottom: 'rgba(251,188,46,0.10)',
+    border: 'rgba(251,188,46,0.55)',
+    glyph: '#FBBC2E',
+  },
+};
+
+const chipBaseStyle = (z: number, first: boolean): React.CSSProperties => ({
+  width: MED_W,
+  height: MED_H,
+  borderRadius: MED_RADIUS,
   marginLeft: first ? 0 : MED_OVERLAP,
   zIndex: z,
   position: 'relative',
   display: 'flex',
   alignItems: 'center',
   justifyContent: 'center',
-  boxShadow: '0 1px 2px rgba(15,23,42,0.18)',
   boxSizing: 'border-box',
+  // 2px bg-coloured outline creates clean separation ring between overlapping chips
+  outline: '2px solid var(--hcp-bg-1)',
 });
 
 const Medallion: React.FC<{ rarity: BadgeRarity; z: number; first: boolean }> = ({
@@ -41,16 +79,16 @@ const Medallion: React.FC<{ rarity: BadgeRarity; z: number; first: boolean }> = 
   z,
   first,
 }) => {
-  const color = rarityColor[rarity] || rarityColor.common;
+  const t = CHIP_TINTS[rarity] ?? CHIP_TINTS.common;
   return (
     <div
       style={{
-        ...medBaseStyle(z, first),
-        background: `radial-gradient(circle at 30% 30%, ${color} 0%, ${color} 45%, #1a1f2b 100%)`,
-        border: '2px solid var(--hcp-bg-1)',
+        ...chipBaseStyle(z, first),
+        background: `linear-gradient(to bottom, ${t.top} 0%, ${t.bottom} 100%)`,
+        border: `1px solid ${t.border}`,
       }}
     >
-      <Trophy size={14} strokeWidth={2.2} color="#FFFFFF" />
+      <Trophy size={14} strokeWidth={2.2} color={t.glyph} />
     </div>
   );
 };
@@ -58,10 +96,9 @@ const Medallion: React.FC<{ rarity: BadgeRarity; z: number; first: boolean }> = 
 const GhostMedallion: React.FC<{ z: number; first: boolean }> = ({ z, first }) => (
   <div
     style={{
-      ...medBaseStyle(z, first),
+      ...chipBaseStyle(z, first),
       background: 'transparent',
       border: '1.5px dashed var(--hcp-line)',
-      boxShadow: 'none',
     }}
   >
     <Trophy size={13} strokeWidth={1.8} color="var(--hcp-t-40, #94A3B8)" />
