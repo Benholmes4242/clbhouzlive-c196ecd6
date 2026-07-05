@@ -58,6 +58,12 @@ interface OpenWithOriginArgs {
   posterUrl: string | null | undefined;
   /** HLS urls to hand off (typically the tapped tile's active url). */
   handOffUrls?: (string | null | undefined)[];
+  /**
+   * Watch tiles rent a `rail-*` lane via `RailLanePool`. Passing the tile's
+   * owner key lets us resume fullscreen at that lane's live playhead — so
+   * tapping a tile playing at 8s opens fullscreen at 8s, not 0.
+   */
+  railOwnerKey?: string | null;
   options?: {
     openCommentsInitially?: boolean;
     initialCommentId?: string | null;
@@ -75,9 +81,11 @@ export function openWithOrigin({
   originEl,
   posterUrl,
   handOffUrls,
+  railOwnerKey,
   options,
 }: OpenWithOriginArgs): void {
   fsvNewSession('open-tap', { index });
+
   const origin = snapshotOrigin(originEl, posterUrl ?? null);
   const postId = (posts[index] as any)?.id ?? null;
 
