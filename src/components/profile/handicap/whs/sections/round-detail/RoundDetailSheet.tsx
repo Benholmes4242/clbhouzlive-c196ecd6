@@ -93,10 +93,11 @@ export const RoundDetailSheet: React.FC<Props> = ({ open, onClose, scoreId, hand
     return any ? total : null;
   }, [userData]);
 
-  const previousIndex =
-    userData && handicapDelta != null && userData.handicap_index_at_time != null
-      ? userData.handicap_index_at_time - handicapDelta
-      : null;
+  const previousIndex = userData?.handicap_index_at_time ?? null;
+  const postIndex =
+    previousIndex != null && handicapDelta != null
+      ? Number((previousIndex + handicapDelta).toFixed(1))
+      : previousIndex;
 
   const indexMoved = handicapDelta != null && Math.abs(handicapDelta) >= 0.05 && previousIndex != null;
 
