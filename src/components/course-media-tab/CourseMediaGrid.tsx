@@ -6,6 +6,8 @@ import { AlertCircle, Camera, Loader2, Film, ListChecks, Flag, Sunrise, Building
 import type { FeedPost } from '@/components/media-system/types/media';
 import { CourseMediaTile } from './CourseMediaTile';
 import { CourseMediaGridSkeleton } from './CourseMediaGridSkeleton';
+import { openWithOrigin } from '@/lib/openWithOrigin';
+import { useWatchAutoplay } from '@/video/useWatchAutoplay';
 
 import { PrimaryAmberCTA } from '@/components/ui/PrimaryAmberCTA';
 import { EmptyStateGuide } from '@/components/ui/EmptyStateGuide';
