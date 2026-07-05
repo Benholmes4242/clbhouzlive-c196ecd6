@@ -127,7 +127,7 @@ export function BottomSheet({
           maxHeight: '90vh',
           minHeight: 0,
           paddingBottom: 'max(env(safe-area-inset-bottom, 0px), 16px)',
-          ...(variant === 'dark' ? { background: '#0F172A' } : null),
+          ...(variant === 'dark' ? { background: surfaceColor ?? '#0F172A' } : null),
           ...style,
         }}
         role="dialog"
