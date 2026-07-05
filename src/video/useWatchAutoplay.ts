@@ -28,7 +28,7 @@
  * requiring the user to scroll.
  */
 
-import { useEffect, useRef, useState, type RefObject } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { usePrefersReducedMotion } from '@/hooks/usePrefersReducedMotion';
 import { useWatchRevealed } from '@/components/watch/WatchRevealContext';
 
@@ -46,20 +46,38 @@ export interface UseWatchAutoplayOptions {
   enabled?: boolean;
 }
 
+export interface UseWatchAutoplayResult {
+  /** Winning tile index, or null when no tile clears PLAY_IN or a gate is closed. */
+  activeIdx: number | null;
+  /**
+   * Callback ref — attach to the rail/grid container that holds
+   * `[data-watch-tile-index]` tiles. Owning the element in state guarantees
+   * the effect re-arms deterministically when the container mounts late
+   * (e.g. after loading skeletons unmount), instead of relying on `eligible`
+   * transitions to force a re-run (which subpages without WatchRevealProvider
+   * never get — the root cause of the subpage-autoplay hole).
+   */
+  railRef: (el: HTMLElement | null) => void;
+}
+
 /**
- * Returns the winning tile index within `railRef`, or `null` when no tile
- * clears PLAY_IN or a gate is closed.
+ * Owns the intersection observer + activation policy for a Watch rail/grid.
+ * Attach the returned `railRef` to the tile container.
  */
 export function useWatchAutoplay(
-  railRef: RefObject<HTMLElement>,
   { railId: _railId, enabled = true }: UseWatchAutoplayOptions,
-): number | null {
+): UseWatchAutoplayResult {
   const revealed = useWatchRevealed();
   const reducedMotion = usePrefersReducedMotion();
   const [docVisible, setDocVisible] = useState(
     typeof document === 'undefined' ? true : !document.hidden,
   );
   const [activeIdx, setActiveIdx] = useState<number | null>(null);
+  const [root, setRoot] = useState<HTMLElement | null>(null);
+
+  const railRef = useCallback((el: HTMLElement | null) => {
+    setRoot(el);
+  }, []);
 
   useEffect(() => {
     if (typeof document === 'undefined') return;
@@ -79,7 +97,6 @@ export function useWatchAutoplay(
       ratiosRef.current.clear();
       return;
     }
-    const root = railRef.current;
     if (!root) return;
 
     const recompute = () => {
