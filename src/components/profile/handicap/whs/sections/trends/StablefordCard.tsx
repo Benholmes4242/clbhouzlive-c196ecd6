@@ -1123,7 +1123,7 @@ const ScoreStatsRing: React.FC<ScoreStatsRingProps> = ({
       {/* Center stack */}
       <text
         x={RING_CX}
-        y={80}
+        y={RING_CY - 10}
         textAnchor="middle"
         style={{
           fontFamily: FONT,
@@ -1137,7 +1137,7 @@ const ScoreStatsRing: React.FC<ScoreStatsRingProps> = ({
       </text>
       <text
         x={RING_CX}
-        y={97}
+        y={RING_CY + 8}
         textAnchor="middle"
         style={{
           fontFamily: FONT,
@@ -1152,7 +1152,7 @@ const ScoreStatsRing: React.FC<ScoreStatsRingProps> = ({
       {delta !== null && delta !== 0 && (
         <text
           x={RING_CX}
-          y={114}
+          y={RING_CY + 26}
           textAnchor="middle"
           style={{
             fontFamily: FONT,
