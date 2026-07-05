@@ -83,10 +83,21 @@ const SheetEmpty: React.FC<{ onClose: () => void }> = ({ onClose }) => (
   </div>
 );
 
-export const RoundDetailSheet: React.FC<Props> = ({ open, onClose, scoreId, handicapDelta }) => {
+export const RoundDetailSheet: React.FC<Props> = ({ open, onClose, scoreId, handicapDelta, profileUserId }) => {
+  const navigate = useNavigate();
   const userQuery = useRoundDetail(scoreId, open);
   const userData = userQuery.data;
   const userLoading = userQuery.isLoading;
+
+  const profileQuery = useUserProfile(profileUserId ?? undefined);
+  const profile = profileQuery.data;
+
+  const courseIdQuery = useWhsCourseId(
+    userData?.course?.name ?? null,
+    (userData?.course as any)?.country_code ?? null,
+    open,
+  );
+
 
   const parTotal = useMemo<number | null>(() => {
     const holes = userData?.holes;
