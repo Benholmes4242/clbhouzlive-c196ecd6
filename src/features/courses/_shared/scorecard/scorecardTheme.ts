@@ -16,7 +16,9 @@ export const SCORECARD_LIGHT: ScorecardTheme = {
 };
 
 export const SCORECARD_DARK: ScorecardTheme = {
-  bg: '#0F1520', bg2: '#161D29', line: 'rgba(255,255,255,0.08)',
+  bg: '#1B1E27',   // --hcp-bg-1: sheet sits raised over the #15171F page
+  bg2: '#20242E',  // --hcp-bg-2: seam strip / cells
+  line: 'rgba(255,255,255,0.08)',
   ink: '#F2F4F7', dim: 'rgba(242,244,247,0.55)',
   faint: 'rgba(242,244,247,0.38)', ghost: 'rgba(242,244,247,0.20)',
   cellBg: 'rgba(255,255,255,0.04)', cellLine: 'rgba(255,255,255,0.10)',
