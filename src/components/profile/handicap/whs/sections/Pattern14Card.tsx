@@ -292,8 +292,10 @@ const PatternBar: React.FC<{
     bucket === 'better'
       ? 'var(--hcp-good-2)'
       : bucket === 'worse'
-        ? 'rgba(242,244,247,0.16)'
-        : 'var(--hcp-bg-3)';
+        ? 'rgba(242,244,247,0.16)'   // quiet slate -- worse is texture
+        : bucket === 'on'
+          ? 'var(--hcp-t-100)'       // silver -- matches the ON PACE stat
+          : 'var(--hcp-bg-3)';       // 'none' bucket unchanged
 
   const inner = (
     <div
