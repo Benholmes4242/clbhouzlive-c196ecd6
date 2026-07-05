@@ -107,6 +107,7 @@ export default function WatchRailTile({
       originEl: cardRef.current,
       posterUrl: thumb ?? null,
       handOffUrls: [hlsUrl],
+      railOwnerKey: ownerKey,
     });
   }, [allPosts, index, thumb, hlsUrl]);
 
