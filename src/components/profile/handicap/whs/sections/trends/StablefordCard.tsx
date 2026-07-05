@@ -753,160 +753,131 @@ const ShotsBody: React.FC<ShotsBodyProps> = ({ trophyAgg, shotsLoading, scope })
 
 
 
+  // Ring bands, order: birdie+, par, bogey, double+
+  const bands = [
+    { key: 'birdiePlus', count: birdiesOrBetter, color: SC_BIRDIE_DARK },
+    { key: 'par',        count: pars,            color: SC_PAR_DARK },
+    { key: 'bogey',      count: bogey,           color: SC_BOGEY_DARK },
+    { key: 'double',     count: doublePlus,      color: SC_DOUBLE_DARK },
+  ];
+
   return (
     <>
-      {/* Hero */}
-      <div style={{ padding: '14px 20px 0' }}>
-        <p
+      {/* Header micro-row */}
+      <div
+        style={{
+          padding: '10px 20px 0',
+          display: 'flex',
+          alignItems: 'baseline',
+          justifyContent: 'space-between',
+          gap: 8,
+        }}
+      >
+        <span
           style={{
-            margin: 0,
-            fontSize: 10,
+            fontSize: 8.5,
             fontWeight: 800,
-            letterSpacing: '0.12em',
+            letterSpacing: '0.14em',
             color: T.inkMute,
             fontFamily: FONT,
           }}
         >
-          BIRDIES OR BETTER
-        </p>
-        <div style={{ display: 'flex', alignItems: 'baseline', gap: 8, marginTop: 4, flexWrap: 'wrap' }}>
-          <span
-            style={{
-              fontSize: 56,
-              fontWeight: 200,
-              color: HOLE_C.birdie,
-              letterSpacing: '-0.04em',
-              lineHeight: 1,
-              fontFamily: FONT,
-              fontVariantNumeric: 'tabular-nums',
-            }}
-          >
-            {birdiesOrBetter}
-          </span>
-          <span style={{ fontSize: 12, color: T.inkMute, fontFamily: FONT }}>
-            in {totalHoles} holes · {pctBirdiesOrBetter}%
-          </span>
-          {showDelta && delta !== null && (
-            <span
+          {SCOPE_LABEL_LONG[scope]}
+        </span>
+        <span
+          style={{
+            fontSize: 8.5,
+            fontWeight: 800,
+            letterSpacing: '0.14em',
+            color: T.ink40,
+            fontFamily: FONT,
+            fontVariantNumeric: 'tabular-nums',
+          }}
+        >
+          {totalHoles} HOLES · {roundsWithHoles} ROUNDS
+        </span>
+      </div>
+
+      {/* Ring */}
+      <div style={{ display: 'flex', justifyContent: 'center', margin: '6px 0 4px' }}>
+        <ScoreStatsRing
+          bands={bands}
+          totalHoles={totalHoles}
+          birdiePlusCount={birdiesOrBetter}
+          birdiePlusRate={pctBirdiesOrBetter}
+          delta={showDelta ? delta : null}
+        />
+      </div>
+
+      {/* Band chips */}
+      <div style={{ padding: '0 18px', display: 'flex', gap: 6 }}>
+        {[
+          { label: 'BIRDIE+', count: birdiesOrBetter, color: SC_BIRDIE_DARK, isPar: false },
+          { label: 'PAR', count: pars, color: SC_PAR_DARK, isPar: true },
+          { label: 'BOGEY', count: bogey, color: SC_BOGEY_DARK, isPar: false },
+          { label: 'DOUBLE+', count: doublePlus, color: SC_DOUBLE_DARK, isPar: false },
+        ].map((c) => {
+          const pctRaw = totalHoles > 0 ? (c.count / totalHoles) * 100 : 0;
+          const pct = pctRaw < 10 ? pctRaw.toFixed(1) : Math.round(pctRaw).toString();
+          const isZero = c.count === 0;
+          const countColor = isZero ? T.ink40 : (c.isPar ? T.ink : c.color);
+          const labelColor = c.isPar ? T.ink40 : c.color;
+          return (
+            <div
+              key={c.label}
               style={{
-                marginLeft: 'auto',
-                display: 'inline-flex',
-                alignItems: 'center',
-                gap: 3,
-                padding: '3px 8px',
-                borderRadius: 999,
-                background: delta > 0 ? T.greenSoft : T.redSoft,
-                color: delta > 0 ? T.greenInk : T.redInk,
-                fontSize: 11,
-                fontWeight: 800,
-                letterSpacing: '0.02em',
-                fontVariantNumeric: 'tabular-nums',
+                flex: 1,
+                minWidth: 0,
+                borderRadius: 11,
+                padding: '9px 0 8px',
+                textAlign: 'center',
+                background: 'rgba(255,255,255,0.035)',
+                border: '1px solid var(--hcp-line)',
                 fontFamily: FONT,
               }}
             >
-              {delta > 0 ? <ArrowUp size={11} strokeWidth={2.6} /> : <ArrowDown size={11} strokeWidth={2.6} />}
-              {Math.abs(delta)} vs prior
-            </span>
-          )}
-        </div>
-      </div>
-
-      {/* 4-segment bar */}
-      <div style={{ padding: '0 18px' }}>
-        <div style={{ margin: '16px 0 0' }}>
-          <div
-            style={{
-              display: 'flex',
-              gap: 2,
-              height: 50,
-              borderRadius: 12,
-              overflow: 'hidden',
-            }}
-            role="img"
-            aria-label={`Hole distribution: ${birdiesOrBetter} birdies or better, ${pars} pars, ${bogey} bogeys, ${doublePlus} double+`}
-          >
-            {segments.map((s) => (
               <div
-                key={s.key}
                 style={{
-                  flex: s.count,
-                  background: s.background,
-                  border: s.border,
-                  transition: 'flex 0.4s cubic-bezier(0.4, 0, 0.2, 1)',
-                  minWidth: 0,
+                  fontSize: 15,
+                  fontWeight: 800,
+                  color: countColor,
+                  fontVariantNumeric: 'tabular-nums',
+                  lineHeight: 1,
                 }}
-              />
-            ))}
-          </div>
-        </div>
-
-        {/* Key row — 4 cols, count big + pct small */}
-        <div
-          style={{
-            display: 'grid',
-            gridTemplateColumns: 'repeat(4, minmax(0, 1fr))',
-            gap: 4,
-            margin: '14px 0 0',
-          }}
-        >
-          {[
-            { label: 'BIRDIE+', count: birdiesOrBetter, color: HOLE_C.birdie },
-            { label: 'PAR', count: pars, color: HOLE_C.par },
-            { label: 'BOGEY', count: bogey, color: HOLE_C.bogey },
-            { label: 'DOUBLE+', count: doublePlus, color: HOLE_C.double },
-          ].map((cell) => {
-            const pctRaw = segTotal > 0 ? (cell.count / segTotal) * 100 : 0;
-            const pct = pctRaw < 10 ? pctRaw.toFixed(1) : Math.round(pctRaw).toString();
-            const isZero = cell.count === 0;
-            return (
-              <div key={cell.label} style={{ textAlign: 'center', fontFamily: FONT, minWidth: 0 }}>
-                <div
-                  style={{
-                    fontSize: 10,
-                    fontWeight: 800,
-                    color: cell.color,
-                    letterSpacing: '0.08em',
-                    whiteSpace: 'nowrap',
-                  }}
-                >
-                  {cell.label}
-                </div>
-                <div
-                  style={{
-                    fontSize: 20,
-                    fontWeight: isZero ? 400 : 800,
-                    color: isZero ? 'var(--hcp-t-40)' : cell.color,
-                    fontVariantNumeric: 'tabular-nums',
-                    letterSpacing: '-0.02em',
-                    lineHeight: 1,
-                    marginTop: 7,
-                  }}
-                >
-                  {cell.count.toLocaleString()}
-                </div>
-                <div
-                  style={{
-                    fontSize: 10,
-                    fontWeight: 700,
-                    color: 'var(--hcp-t-40)',
-                    fontVariantNumeric: 'tabular-nums',
-                    letterSpacing: '0.04em',
-                    marginTop: 4,
-                  }}
-                >
-                  {pct}%
-                </div>
+              >
+                {c.count.toLocaleString()}
               </div>
-            );
-          })}
-        </div>
-
-
+              <div
+                style={{
+                  fontSize: 8.5,
+                  fontWeight: 800,
+                  color: labelColor,
+                  letterSpacing: '0.12em',
+                  marginTop: 6,
+                }}
+              >
+                {c.label}
+              </div>
+              <div
+                style={{
+                  fontSize: 8.5,
+                  fontWeight: 800,
+                  color: 'rgba(242,244,247,0.28)',
+                  letterSpacing: '0.10em',
+                  marginTop: 3,
+                  fontVariantNumeric: 'tabular-nums',
+                }}
+              >
+                {pct}%
+              </div>
+            </div>
+          );
+        })}
       </div>
 
-      {/* Career milestones */}
-      <div style={{ padding: '18px 18px 18px' }}>
-        <MilestonesStrip
+      {/* Career milestones ladder */}
+      <div style={{ padding: '16px 18px 18px' }}>
+        <MilestoneLadder
           aces={aces}
           albatross={albatross}
           eagles={eagles}
@@ -918,8 +889,142 @@ const ShotsBody: React.FC<ShotsBodyProps> = ({ trophyAgg, shotsLoading, scope })
   );
 };
 
-// ─── Milestones strip ───────────────────────────────────────────────────
-interface MilestonesStripProps {
+// ─── Score stats ring ───────────────────────────────────────────────────
+const RING_SIZE = 176;
+const RING_R = 72;
+const RING_SW = 11;
+const RING_GAP = 0.07; // radians
+const RING_CX = RING_SIZE / 2;
+const RING_CY = RING_SIZE / 2;
+const RING_CIRC = 2 * Math.PI * RING_R;
+
+interface Band {
+  key: string;
+  count: number;
+  color: string;
+}
+
+interface ScoreStatsRingProps {
+  bands: Band[];
+  totalHoles: number;
+  birdiePlusCount: number;
+  birdiePlusRate: number;
+  delta: number | null;
+}
+
+const ScoreStatsRing: React.FC<ScoreStatsRingProps> = ({
+  bands,
+  totalHoles,
+  birdiePlusCount,
+  birdiePlusRate,
+  delta,
+}) => {
+  const nonZero = bands.filter((b) => b.count > 0);
+  const arcs: { color: string; dasharray: string; startDeg: number }[] = [];
+
+  if (totalHoles > 0 && nonZero.length > 0) {
+    if (nonZero.length === 1) {
+      arcs.push({
+        color: nonZero[0].color,
+        dasharray: `${RING_CIRC} ${RING_CIRC}`,
+        startDeg: -90,
+      });
+    } else {
+      let cursor = 0;
+      bands.forEach((b) => {
+        if (b.count === 0) return;
+        const span = (b.count / totalHoles) * Math.PI * 2;
+        const gap = span > RING_GAP * 2 ? RING_GAP : 0;
+        const arcLen = Math.max(0, (span - gap) * RING_R);
+        const startDeg = (cursor * 180) / Math.PI - 90;
+        arcs.push({
+          color: b.color,
+          dasharray: `${arcLen} ${RING_CIRC}`,
+          startDeg,
+        });
+        cursor += span;
+      });
+    }
+  }
+
+  return (
+    <svg width={RING_SIZE} height={RING_SIZE} role="img" aria-label="Score distribution ring">
+      {/* Track */}
+      <circle
+        cx={RING_CX}
+        cy={RING_CY}
+        r={RING_R}
+        fill="none"
+        stroke="rgba(255,255,255,0.05)"
+        strokeWidth={RING_SW}
+      />
+      {arcs.map((a, i) => (
+        <circle
+          key={i}
+          cx={RING_CX}
+          cy={RING_CY}
+          r={RING_R}
+          fill="none"
+          stroke={a.color}
+          strokeWidth={RING_SW}
+          strokeLinecap="round"
+          strokeDasharray={a.dasharray}
+          transform={`rotate(${a.startDeg} ${RING_CX} ${RING_CY})`}
+        />
+      ))}
+
+      {/* Center stack */}
+      <text
+        x={RING_CX}
+        y={80}
+        textAnchor="middle"
+        style={{
+          fontFamily: FONT,
+          fontSize: 30,
+          fontWeight: 800,
+          fill: SC_BIRDIE_DARK,
+          fontVariantNumeric: 'tabular-nums',
+        }}
+      >
+        {birdiePlusCount}
+      </text>
+      <text
+        x={RING_CX}
+        y={97}
+        textAnchor="middle"
+        style={{
+          fontFamily: FONT,
+          fontSize: 7.5,
+          fontWeight: 800,
+          letterSpacing: '0.12em',
+          fill: T.ink40,
+        }}
+      >
+        BIRDIE+ · {birdiePlusRate.toFixed(1)}%
+      </text>
+      {delta !== null && delta !== 0 && (
+        <text
+          x={RING_CX}
+          y={114}
+          textAnchor="middle"
+          style={{
+            fontFamily: FONT,
+            fontSize: 10,
+            fontWeight: 800,
+            fill: delta > 0 ? 'var(--hcp-good, #55BD8B)' : 'var(--hcp-bad)',
+            fontVariantNumeric: 'tabular-nums',
+          }}
+        >
+          {delta > 0 ? '↑' : '↓'} {Math.abs(delta)}
+          <tspan style={{ fontSize: 7, fill: T.ink40 }}> VS PRIOR</tspan>
+        </text>
+      )}
+    </svg>
+  );
+};
+
+// ─── Milestone ladder ───────────────────────────────────────────────────
+interface MilestoneLadderProps {
   aces: number;
   albatross: number;
   eagles: number;
@@ -927,7 +1032,9 @@ interface MilestonesStripProps {
   totalRoundsWithHoles: number;
 }
 
-const MilestonesStrip: React.FC<MilestonesStripProps> = ({
+const GOOD = 'var(--hcp-good, #55BD8B)';
+
+const MilestoneLadder: React.FC<MilestoneLadderProps> = ({
   aces,
   albatross,
   eagles,
@@ -935,50 +1042,44 @@ const MilestonesStrip: React.FC<MilestonesStripProps> = ({
   totalRoundsWithHoles,
 }) => {
   const unlockedCount = [aces, albatross, eagles, birdies].filter((c) => c > 0).length;
-  const rate = (count: number) =>
+  const perRound = (count: number) =>
     totalRoundsWithHoles > 0 ? (count / totalRoundsWithHoles).toFixed(2) : '0.00';
 
+  // Rarest first
   const rows = [
     {
       key: 'hio',
       name: 'Hole-in-One',
       count: aces,
-      rarity: 'ULTRA RARE',
-      rings: 2,
-      meta: aces > 0 ? `${aces} career` : 'none yet · 1-in-12,500 odds',
+      tier: 'ULTRA RARE',
+      odds: '1-in-12,500',
     },
     {
       key: 'albatross',
       name: 'Albatross',
       count: albatross,
-      rarity: 'ULTRA RARE',
-      rings: 2,
-      meta:
-        albatross > 0
-          ? `${rate(albatross)}/round · ${albatross} career`
-          : 'none yet · 1-in-6,000 odds',
+      tier: 'ULTRA RARE',
+      odds: '1-in-6M',
     },
     {
       key: 'eagles',
       name: 'Eagles',
       count: eagles,
-      rarity: 'RARE',
-      rings: 1,
-      meta: eagles > 0 ? `${rate(eagles)}/round` : 'none yet',
+      tier: 'RARE',
+      odds: null as string | null,
     },
     {
       key: 'birdies',
       name: 'Birdies',
       count: birdies,
-      rarity: 'FREQUENT',
-      rings: 0,
-      meta: birdies > 0 ? `${rate(birdies)}/round` : 'none yet',
+      tier: 'FREQUENT',
+      odds: birdies > 0 || totalRoundsWithHoles > 0 ? `${perRound(birdies)}/round` : null,
     },
   ];
 
   return (
     <div>
-      {/* Header */}
+      {/* Header row */}
       <div
         style={{
           display: 'flex',
@@ -990,10 +1091,10 @@ const MilestonesStrip: React.FC<MilestonesStripProps> = ({
       >
         <span
           style={{
-            fontSize: 10,
+            fontSize: 9.5,
             fontWeight: 800,
             letterSpacing: '0.14em',
-            color: T.ink40,
+            color: T.inkMute,
             fontFamily: FONT,
           }}
         >
@@ -1001,128 +1102,121 @@ const MilestonesStrip: React.FC<MilestonesStripProps> = ({
         </span>
         <span
           style={{
-            fontSize: 10,
-            fontWeight: 700,
-            color: 'var(--hcp-t-40)',
             fontFamily: FONT,
+            fontSize: 9.5,
+            fontWeight: 800,
+            letterSpacing: '0.10em',
+            color: T.ink40,
             fontVariantNumeric: 'tabular-nums',
-            letterSpacing: '0.04em',
           }}
         >
-          <span style={{ color: HOLE_C.birdie, fontWeight: 800 }}>{unlockedCount}</span> of 4 unlocked
+          <span
+            style={{
+              fontSize: 10,
+              color: unlockedCount > 0 ? GOOD : T.inkMute,
+            }}
+          >
+            {unlockedCount}
+          </span>{' '}
+          OF {rows.length} UNLOCKED
         </span>
       </div>
 
-      {/* Container — 2×2 grid */}
+      {/* Ladder container */}
       <div
         style={{
-          display: 'grid',
-          gridTemplateColumns: '1fr 1fr',
-          gap: 10,
+          background: 'var(--hcp-bg-2)',
+          border: '1px solid var(--hcp-line)',
+          borderRadius: 13,
+          overflow: 'hidden',
         }}
       >
-        {rows.map((row) => (
-          <MilestoneCard
-            key={row.key}
-            name={row.name}
-            count={row.count}
-            rarity={row.rarity}
-            rings={row.rings}
-            meta={row.meta}
-          />
-        ))}
-      </div>
-    </div>
-  );
-};
+        {rows.map((row, i) => {
+          const unlocked = row.count > 0;
+          return (
+            <div
+              key={row.key}
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: 12,
+                padding: '12px 14px',
+                borderTop: i === 0 ? 'none' : '1px solid var(--hcp-line)',
+                background: unlocked ? 'rgba(85,189,139,0.05)' : 'transparent',
+                fontFamily: FONT,
+              }}
+            >
+              {/* Badge */}
+              <div
+                style={{
+                  width: 30,
+                  height: 30,
+                  borderRadius: '50%',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  fontSize: 12,
+                  fontWeight: 800,
+                  fontVariantNumeric: 'tabular-nums',
+                  flexShrink: 0,
+                  background: unlocked ? GOOD : 'transparent',
+                  color: unlocked ? '#12331F' : T.ink40,
+                  border: unlocked ? 'none' : '1.5px dashed rgba(242,244,247,0.25)',
+                }}
+              >
+                {row.count}
+              </div>
 
-const MilestoneCard: React.FC<{
-  name: string;
-  count: number;
-  rarity: string;
-  rings: number;
-  meta: string;
-}> = ({ name, count, rarity, rings, meta }) => {
-  const achieved = count > 0;
-  const rarityColor = rarity === 'FREQUENT' ? 'var(--hcp-t-40)' : HOLE_C.birdie;
+              {/* Text column */}
+              <div style={{ flex: 1, minWidth: 0 }}>
+                <div
+                  style={{
+                    fontSize: 14,
+                    fontWeight: 800,
+                    color: unlocked ? T.ink : T.inkMute,
+                    lineHeight: 1.15,
+                  }}
+                >
+                  {row.name}
+                </div>
+                <div
+                  style={{
+                    marginTop: 3,
+                    fontSize: 9.5,
+                    fontWeight: 800,
+                    letterSpacing: '0.10em',
+                  }}
+                >
+                  <span
+                    style={{
+                      color: unlocked ? GOOD : 'rgba(242,244,247,0.45)',
+                    }}
+                  >
+                    {row.tier}
+                  </span>
+                  {row.odds ? (
+                    <span style={{ color: T.ink40, fontWeight: 700 }}> · {row.odds}</span>
+                  ) : !unlocked ? (
+                    <span style={{ color: T.ink40, fontWeight: 700 }}> · none yet</span>
+                  ) : null}
+                </div>
+              </div>
 
-  const medalSize = 32;
-  let medalBoxShadow = 'none';
-  let medalMargin = 0;
-  if (achieved && rings === 1) {
-    medalBoxShadow = '0 0 0 2px var(--hcp-bg-1), 0 0 0 3.5px rgba(47,107,79,0.8)';
-    medalMargin = 2;
-  } else if (achieved && rings === 2) {
-    medalBoxShadow =
-      '0 0 0 2px var(--hcp-bg-1), 0 0 0 3.5px rgba(47,107,79,0.9), 0 0 0 5px var(--hcp-bg-1), 0 0 0 6.5px rgba(47,107,79,0.6)';
-    medalMargin = 4;
-  }
-
-  const medalStyle: React.CSSProperties = achieved
-    ? {
-        width: medalSize, height: medalSize, borderRadius: '50%',
-        background: `linear-gradient(135deg, ${SC_BIRDIE} 0%, ${SC_ALBATROSS} 100%)`,
-        color: '#FFFFFF', display: 'flex', alignItems: 'center', justifyContent: 'center',
-        fontSize: 12, fontWeight: 800, fontFamily: FONT, fontVariantNumeric: 'tabular-nums',
-        boxShadow: medalBoxShadow, margin: medalMargin, flexShrink: 0,
-      }
-    : {
-        width: medalSize, height: medalSize, borderRadius: '50%',
-        background: 'var(--hcp-bg-2)', border: '1px dashed var(--hcp-line-2)',
-        color: 'var(--hcp-t-30)', display: 'flex', alignItems: 'center', justifyContent: 'center',
-        fontSize: 12, fontWeight: 800, fontFamily: FONT, fontVariantNumeric: 'tabular-nums',
-        flexShrink: 0,
-      };
-
-  return (
-    <div
-      style={{
-        position: 'relative',
-        borderRadius: 14,
-        background: 'linear-gradient(180deg, var(--hcp-bg-2) 0%, var(--hcp-bg-1) 100%)',
-        border: '1px solid var(--hcp-line)',
-        padding: '13px 13px 12px',
-        overflow: 'hidden',
-        fontFamily: FONT,
-      }}
-    >
-      {achieved && (
-        <div
-          style={{
-            position: 'absolute', top: 0, left: 0, bottom: 0, width: 2,
-            background: `linear-gradient(180deg, ${SC_BIRDIE} 0%, ${SC_ALBATROSS} 100%)`, opacity: 0.8,
-          }}
-        />
-      )}
-
-      {/* top row: medal + big count */}
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-        <div style={medalStyle}>{count}</div>
-        <span
-          style={{
-            fontSize: 24, fontWeight: 200,
-            color: count > 0 ? HOLE_C.birdie : 'var(--hcp-t-30)',
-            fontVariantNumeric: 'tabular-nums', letterSpacing: '-0.04em', lineHeight: 0.9,
-          }}
-        >
-          {count}
-        </span>
-      </div>
-
-      {/* name */}
-      <div style={{ fontSize: 13, fontWeight: 800, color: 'var(--hcp-t-100)', marginTop: 10 }}>
-        {name}
-      </div>
-
-      {/* rarity · meta */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginTop: 3, flexWrap: 'wrap' }}>
-        <span style={{ fontSize: 8, fontWeight: 800, letterSpacing: '0.08em', color: rarityColor }}>
-          {rarity}
-        </span>
-        <span style={{ fontSize: 10, color: 'var(--hcp-t-40)' }}>·</span>
-        <span style={{ fontSize: 10, fontWeight: 600, color: 'var(--hcp-t-40)' }}>
-          {meta}
-        </span>
+              {/* Right count */}
+              <div
+                style={{
+                  fontSize: 17,
+                  fontWeight: 800,
+                  color: unlocked ? GOOD : 'rgba(242,244,247,0.22)',
+                  fontVariantNumeric: 'tabular-nums',
+                  letterSpacing: '-0.01em',
+                }}
+              >
+                {row.count}
+              </div>
+            </div>
+          );
+        })}
       </div>
     </div>
   );
