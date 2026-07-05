@@ -131,9 +131,20 @@ export function useWatchAutoplay(
       });
     };
 
+    const runRecompute = () => {
+      if (settleTimer.current) { clearTimeout(settleTimer.current); settleTimer.current = null; }
+      if (maxWaitTimer.current) { clearTimeout(maxWaitTimer.current); maxWaitTimer.current = null; }
+      recompute();
+    };
+
     const scheduleRecompute = () => {
       if (settleTimer.current) clearTimeout(settleTimer.current);
-      settleTimer.current = setTimeout(recompute, SETTLE_MS);
+      settleTimer.current = setTimeout(runRecompute, SETTLE_MS);
+      // Max-wait ceiling: even if bursts keep resetting the trailing timer,
+      // force a recompute so landing activation lands during hydration churn.
+      if (!maxWaitTimer.current) {
+        maxWaitTimer.current = setTimeout(runRecompute, MAX_SETTLE_MS);
+      }
     };
 
     const observeTiles = (tiles: NodeListOf<HTMLElement> | HTMLElement[]) => {
