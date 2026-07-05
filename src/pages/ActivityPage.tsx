@@ -129,15 +129,6 @@ const ActivityPage: React.FC = () => {
 
   const { data, isLoading, isFetching, error } = useActivityFeed('all', null);
 
-  // Snapshot safe-area top once so header height doesn't shift.
-  const [safeTop, setSafeTop] = useState(0);
-  useEffect(() => {
-    const probe = document.createElement('div');
-    probe.style.cssText = 'position:fixed;top:0;left:0;height:env(safe-area-inset-top,0px);width:0;visibility:hidden;pointer-events:none;';
-    document.body.appendChild(probe);
-    setSafeTop(Math.max(probe.getBoundingClientRect().height, 8));
-    document.body.removeChild(probe);
-  }, []);
 
   // Auto-mark seen on first load (parity with prior implementation).
   const hasMarkedSeen = useRef(false);
