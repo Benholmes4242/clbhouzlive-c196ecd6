@@ -126,6 +126,23 @@ export const RailLanePool = {
     };
   },
 
+  /**
+   * Current playhead (seconds) of the lane currently rented to `ownerKey`,
+   * or 0 if the owner holds no lane. Used by tap-to-fullscreen to resume at
+   * the frame the tile was showing.
+   */
+  getCurrentTime(ownerKey: OwnerKey | null | undefined): number {
+    if (!ownerKey) return 0;
+    const rec = owners.get(ownerKey);
+    if (!rec) return 0;
+    try {
+      const snap = VideoEngine.snapshot(rec.laneId);
+      return snap.currentTime || 0;
+    } catch {
+      return 0;
+    }
+  },
+
   /** Test helper — current owner → lane map. */
   _debugState() {
     return {
@@ -133,4 +150,5 @@ export const RailLanePool = {
       lanes: Array.from(laneOwner.entries()),
     };
   },
+
 };
