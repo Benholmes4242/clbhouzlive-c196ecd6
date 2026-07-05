@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useMemo, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ChevronLeft, CheckCheck, AlertCircle } from 'lucide-react';
+import { CheckCheck, AlertCircle } from 'lucide-react';
 import { useActivityFeed, ActivityNotification, checkContentExists } from '@/hooks/useActivityFeed';
 import { NotificationList } from '@/components/activity/notifications/NotificationList';
 import { ActivityEmptyState } from '@/components/activity/ActivityEmptyState';
@@ -16,7 +16,7 @@ import { toast } from 'sonner';
 import { useUnseenFriendReviews } from '@/hooks/useUnseenFriendReviews';
 import { useHideBottomNav } from '@/hooks/useBottomNavVisibility';
 import { useHideHeader } from '@/hooks/useHeaderVisibility';
-import { PageRoot } from '@/components/layout/PageRoot';
+import { ManagePageShell } from '@/components/manage/ManagePageShell';
 
 // ============ Tokens ============
 const GEIST = 'Geist, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif';
@@ -129,15 +129,6 @@ const ActivityPage: React.FC = () => {
 
   const { data, isLoading, isFetching, error } = useActivityFeed('all', null);
 
-  // Snapshot safe-area top once so header height doesn't shift.
-  const [safeTop, setSafeTop] = useState(0);
-  useEffect(() => {
-    const probe = document.createElement('div');
-    probe.style.cssText = 'position:fixed;top:0;left:0;height:env(safe-area-inset-top,0px);width:0;visibility:hidden;pointer-events:none;';
-    document.body.appendChild(probe);
-    setSafeTop(Math.max(probe.getBoundingClientRect().height, 8));
-    document.body.removeChild(probe);
-  }, []);
 
   // Auto-mark seen on first load (parity with prior implementation).
   const hasMarkedSeen = useRef(false);
@@ -276,90 +267,43 @@ const ActivityPage: React.FC = () => {
   const showEmptyState = !!data && !hasNotifications && !isFetching;
   const totalUnread = unreadCounts.all;
 
+  const chips = (
+    <div
+      className="px-4 flex gap-2 overflow-x-auto scrollbar-none"
+      style={{ paddingBottom: 12 }}
+    >
+      {CHIPS.map((c) => (
+        <ChipButton
+          key={c.key}
+          active={chip === c.key}
+          label={c.label}
+          count={unreadCounts[c.key]}
+          onClick={() => setChip(c.key)}
+        />
+      ))}
+    </div>
+  );
+
+  const markAllRead = totalUnread > 0 ? (
+    <button
+      onClick={handleMarkAllRead}
+      className="inline-flex items-center active:opacity-70"
+      style={{
+        gap: 5, padding: '6px 4px', background: 'transparent', border: 'none',
+        color: INK_45, fontSize: 12.5, fontWeight: 700, cursor: 'pointer',
+        fontFamily: GEIST,
+      }}
+    >
+      <CheckCheck size={14} strokeWidth={2.5} />
+      Mark all read
+    </button>
+  ) : undefined;
+
   return (
-    <PageRoot hasBottomNav={false} className="md:!max-w-[440px]" style={{ background: PAGE } as any}>
-      <div
-        className="min-h-screen flex flex-col w-full"
-        style={{ background: PAGE, fontFamily: GEIST }}
-      >
-        {/* ============ Header ============ */}
-        <div
-          className="sticky top-0 z-30"
-          style={{ background: PAGE, borderBottom: `1px solid ${HAIR}` }}
-        >
-          <div
-            className="flex items-center justify-between px-4"
-            style={{ paddingTop: safeTop + 6, paddingBottom: 8, minHeight: 48 }}
-          >
-            <button
-              onClick={() => navigate(-1)}
-              aria-label="Back"
-              style={{
-                width: 32, height: 32, borderRadius: '50%',
-                background: '#FFFFFF', border: `1px solid ${HAIR2}`,
-                display: 'flex', alignItems: 'center', justifyContent: 'center',
-                cursor: 'pointer',
-              }}
-            >
-              <ChevronLeft size={18} strokeWidth={2.5} color={INK} />
-            </button>
-            {totalUnread > 0 && (
-              <button
-                onClick={handleMarkAllRead}
-                className="inline-flex items-center active:opacity-70"
-                style={{
-                  gap: 5, padding: '6px 4px', background: 'transparent', border: 'none',
-                  color: INK_45, fontSize: 12.5, fontWeight: 700, cursor: 'pointer',
-                }}
-              >
-                <CheckCheck size={14} strokeWidth={2.5} />
-                Mark all read
-              </button>
-            )}
-          </div>
-
-          {/* Kicker + title */}
-          <div className="px-4" style={{ paddingBottom: 10 }}>
-            <div className="flex items-center" style={{ gap: 8, marginBottom: 6 }}>
-              <span style={{ width: 26, height: 2.5, background: AMBER, borderRadius: 2 }} />
-              <span
-                style={{
-                  fontSize: 10.5, fontWeight: 800, letterSpacing: '0.14em',
-                  textTransform: 'uppercase', color: AMBER_DEEP,
-                }}
-              >
-                Activity
-              </span>
-            </div>
-            <h1
-              style={{
-                fontSize: 26, fontWeight: 800, color: INK,
-                letterSpacing: '-0.02em', margin: 0, lineHeight: 1.1,
-              }}
-            >
-              Notifications
-            </h1>
-          </div>
-
-          {/* Chips */}
-          <div
-            className="px-4 flex gap-2 overflow-x-auto scrollbar-none"
-            style={{ paddingBottom: 12 }}
-          >
-            {CHIPS.map((c) => (
-              <ChipButton
-                key={c.key}
-                active={chip === c.key}
-                label={c.label}
-                count={unreadCounts[c.key]}
-                onClick={() => setChip(c.key)}
-              />
-            ))}
-          </div>
-        </div>
-
+    <ManagePageShell title="Notifications" right={markAllRead} belowTitle={chips}>
+      <div style={{ background: PAGE, fontFamily: GEIST }}>
         {/* ============ Content ============ */}
-        <div className="flex-1">
+        <div>
           {showSkeleton ? (
             <ActivitySkeleton />
           ) : error ? (
@@ -405,8 +349,9 @@ const ActivityPage: React.FC = () => {
         />
         <ScrollToTopGlass />
       </div>
-    </PageRoot>
+    </ManagePageShell>
   );
 };
+
 
 export default ActivityPage;

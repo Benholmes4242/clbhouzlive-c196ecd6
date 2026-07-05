@@ -1,11 +1,12 @@
-import React, { useLayoutEffect, useState } from 'react';
+import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ChevronLeft } from 'lucide-react';
 import { PageRoot } from '@/components/layout/PageRoot';
+import { PAGE_BG } from '@/components/manage/ui';
 
 const GEIST = 'Geist, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif';
 const INK = '#0F172A';
-const SLATE_BG = '#F4F6F8';
+const SLATE_BG = PAGE_BG;
 
 interface Props {
   title: string;
@@ -21,23 +22,17 @@ interface Props {
 /**
  * Direction A pushed sub-page shell used by /manage/* routes.
  * Sticky translucent header, 32px circle back chevron, 18/600 title,
- * 1px hairline bottom border, slate background.
+ * 1px hairline bottom border, slate background (#F8FAFC — matches the
+ * notch shield exactly so there is no visible seam).
+ *
+ * Safe-area ownership: `.app-shell` globally pads `padding-top: var(--sat)`
+ * on all non-immersive routes, so this header pays only an 8px comfort pad
+ * on top of that. Do NOT snapshot safe-area here — it would double the
+ * inset and open a visible gap under the notch on device.
  */
 export function ManagePageShell({ title, children, right, onBack, belowTitle }: Props) {
   const navigate = useNavigate();
   const handleBack = () => (onBack ? onBack() : navigate(-1));
-
-  // Snapshot safe-area inset once so header height doesn't shift when the
-  // mobile URL bar collapses/expands during scroll.
-  const [safeTop, setSafeTop] = useState(0);
-  useLayoutEffect(() => {
-    const probe = document.createElement('div');
-    probe.style.cssText = 'position:fixed;top:0;left:0;height:env(safe-area-inset-top,0px);width:0;visibility:hidden;pointer-events:none;';
-    document.body.appendChild(probe);
-    const measured = probe.getBoundingClientRect().height;
-    document.body.removeChild(probe);
-    setSafeTop(Math.max(measured, 8));
-  }, []);
 
   return (
     <PageRoot hasBottomNav={false} className="md:!max-w-[440px]" style={{ background: SLATE_BG } as any}>
@@ -51,7 +46,7 @@ export function ManagePageShell({ title, children, right, onBack, belowTitle }: 
         >
           <div
             className="flex items-center justify-between px-4"
-            style={{ paddingTop: safeTop, paddingBottom: belowTitle ? 8 : 12, minHeight: 56 }}
+            style={{ paddingTop: 8, paddingBottom: belowTitle ? 8 : 12, minHeight: 56 }}
           >
             <div className="flex items-center gap-3 flex-1 min-w-0">
               <button
@@ -89,3 +84,4 @@ export function ManagePageShell({ title, children, right, onBack, belowTitle }: 
 }
 
 export default ManagePageShell;
+

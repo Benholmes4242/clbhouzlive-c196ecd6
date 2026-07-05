@@ -535,39 +535,10 @@ export const UserListPage: React.FC<UserListPageProps> = ({
             </div>
           )}
 
-          {/* Kicker + title */}
-          <div className="px-4" style={{ paddingTop: hideBackButton ? 6 : 0, paddingBottom: 10 }}>
-            <div style={{ marginBottom: 6 }}>
-              <Kicker label="Network" />
-            </div>
-            <h1
-              style={{
-                fontSize: 26,
-                fontWeight: 800,
-                color: INK,
-                letterSpacing: '-0.02em',
-                margin: 0,
-                lineHeight: 1.1,
-                fontFamily: FONT_SERIF,
-              }}
-            >
-              {displayTitle}
-              {displayTotal > 0 && (
-                <>
-                  {' '}
-                  <span
-                    style={{
-                      color: AMBER_DEEP,
-                      fontVariantNumeric: 'tabular-nums',
-                      fontWeight: 800,
-                    }}
-                  >
-                    {displayTotal.toLocaleString()}
-                  </span>
-                </>
-              )}
-            </h1>
-          </div>
+          {/* NETWORK kicker + big count title intentionally removed —
+              the count now lives in the tab pills, and the shell header
+              (or CompactHeader when hideBackButton) already provides the
+              route title. */}
 
           {/* Search + tabs + filter chips */}
           <div className="px-4" style={{ paddingBottom: 10 }}>
@@ -722,7 +693,6 @@ export const UserListPage: React.FC<UserListPageProps> = ({
                 />
               ) : activeMode === 'followers' ? (
                 <EmptyState
-                  eyebrow="Empty list"
                   icon={<Users className="w-7 h-7" style={{ color: INK_SUBTLE }} />}
                   heading="No followers yet"
                   body={
@@ -736,7 +706,6 @@ export const UserListPage: React.FC<UserListPageProps> = ({
                 />
               ) : (
                 <EmptyState
-                  eyebrow="Empty list"
                   icon={<UserPlus className="w-7 h-7" style={{ color: INK_SUBTLE }} />}
                   heading="Not following anyone yet"
                   body={
@@ -796,7 +765,7 @@ export const UserListPage: React.FC<UserListPageProps> = ({
 // ---------------------------------------------------------------------------
 
 const EmptyState: React.FC<{
-  eyebrow: string;
+  eyebrow?: string;
   icon: React.ReactNode;
   heading: string;
   body: string;
