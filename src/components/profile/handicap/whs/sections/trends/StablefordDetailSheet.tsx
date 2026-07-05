@@ -15,26 +15,27 @@ interface Props {
  * explain WHS mechanics; do not friend-prefix or change to third-person.
  */
 
+// Hardcoded dark tokens — sheet portals outside .hcp-dark scope.
 const T = {
-  ink: 'var(--hcp-t-100)',
-  inkMute: 'var(--hcp-t-60)',
-  inkSoft: 'var(--hcp-t-80)',
-  hairline: 'var(--hcp-line-2)',
+  ink: '#F2F4F7',
+  inkMute: 'rgba(242,244,247,0.55)',
+  inkSoft: 'rgba(242,244,247,0.72)',
+  hairline: 'rgba(255,255,255,0.08)',
   amber: '#F7931E',
-  amberDeep: '#C97211',
-  amberTint: 'rgba(247,147,30,0.10)',
-  amberInk: '#854F0B',
-  green: '#059669',
-  greenInk: '#065F46',
-  red: '#DC2626',
-  redInk: '#7F1D1D',
-  neutralTint: 'var(--hcp-bg-2)',
+  amberDeep: '#F7931E',
+  amberTint: 'rgba(247,147,30,0.12)',
+  amberInk: '#F7931E',
+  green: '#34D399',
+  greenInk: '#34D399',
+  red: '#EF4444',
+  redInk: '#EF4444',
+  neutralTint: '#20242E',
 };
 const FONT = 'Geist, -apple-system, BlinkMacSystemFont, system-ui, sans-serif';
 
 export const StablefordDetailSheet: React.FC<Props> = ({ open, onClose, dist }) => {
   return (
-    <BottomSheet open={open} onClose={onClose} ariaLabelledBy="stableford-sheet-title" className="hcp-light" style={{ background: 'var(--hcp-bg-1)', minHeight: 0 }}>
+    <BottomSheet open={open} onClose={onClose} ariaLabelledBy="stableford-sheet-title" variant="dark" surfaceColor="#15171F" style={{ minHeight: 0 }}>
       <div
         style={{
           display: 'flex',
@@ -188,7 +189,7 @@ const BandRow: React.FC<BandRowProps> = ({ color, ink, title, description }) => 
     />
     <div>
       <p style={{ margin: 0, fontSize: 12, fontWeight: 700, color: ink, fontFamily: FONT }}>{title}</p>
-      <p style={{ margin: '2px 0 0', fontSize: 12, lineHeight: 1.5, color: 'var(--hcp-t-80)', fontFamily: FONT }}>
+      <p style={{ margin: '2px 0 0', fontSize: 12, lineHeight: 1.5, color: T.inkSoft, fontFamily: FONT }}>
         {description}
       </p>
     </div>
