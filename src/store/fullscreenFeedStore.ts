@@ -128,6 +128,7 @@ export const useFullscreenFeedStore = create<FullscreenFeedState>((set, get) => 
       origin: null,
       startPosition: 0,
       mediaIndex: 0,
+      mediaId: null,
     });
     if (cb) {
       try { cb(); } catch {}
