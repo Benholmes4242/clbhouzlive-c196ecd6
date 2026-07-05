@@ -230,7 +230,7 @@ export const CourseMediaGrid = forwardRef<HTMLDivElement, CourseMediaGridProps>(
   })();
 
   return (
-    <div ref={ref} style={{ display: 'flex', flexDirection: 'column', gap: GAP }}>
+    <div ref={setGridRef} style={{ display: 'flex', flexDirection: 'column', gap: GAP }}>
       <div style={{ display: 'flex', gap: GAP, alignItems: 'flex-start', paddingInline: 0 }}>
         {columns.map((col, ci) => (
           <div
