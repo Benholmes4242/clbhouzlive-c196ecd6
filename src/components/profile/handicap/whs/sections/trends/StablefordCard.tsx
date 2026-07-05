@@ -1019,7 +1019,7 @@ const ShotsBody: React.FC<ShotsBodyProps> = ({ trophyAgg, shotsLoading, scope })
 const RING_SIZE = 176;
 const RING_R = 72;
 const RING_SW = 11;
-const RING_GAP = 0.07; // radians
+
 const RING_CX = RING_SIZE / 2;
 const RING_CY = RING_SIZE / 2;
 const RING_CIRC = 2 * Math.PI * RING_R;
