@@ -437,11 +437,24 @@ export function SnapFeed({
 
   // [VDIFF] SnapFeed render trace — with prev-render diff so a 30fps
   // re-render loop reveals which prop/selector is changing (or all-equal ⇒
-  // parent re-render).
+  // parent re-render). Identity refs discriminate reference churn from
+  // value change: postsRef, callback props, session identity.
   const prevRenderRef = useRef<Record<string, unknown> | null>(null);
+  const prevPostsIdentityRef = useRef<unknown>(null);
+  const prevOnLikeRef = useRef<unknown>(null);
+  const prevOnCommentRef = useRef<unknown>(null);
+  const prevOnNearEndRef = useRef<unknown>(null);
+  const prevOnActiveIndexChangeRef = useRef<unknown>(null);
+  const prevSessionIdentityRef = useRef<unknown>(null);
   if (isPerfEnabled()) {
     const openStartIdx = startIndex ?? 0;
     const openPost = posts[openStartIdx];
+    const postsRefChanged = prevPostsIdentityRef.current !== null && prevPostsIdentityRef.current !== posts;
+    const onLikeRefChanged = prevOnLikeRef.current !== null && prevOnLikeRef.current !== onLike;
+    const onCommentRefChanged = prevOnCommentRef.current !== null && prevOnCommentRef.current !== onComment;
+    const onNearEndRefChanged = prevOnNearEndRef.current !== null && prevOnNearEndRef.current !== onNearEnd;
+    const onActiveIndexChangeRefChanged = prevOnActiveIndexChangeRef.current !== null && prevOnActiveIndexChangeRef.current !== onActiveIndexChange;
+    const sessionRefChanged = prevSessionIdentityRef.current !== null && prevSessionIdentityRef.current !== session;
     const snap: Record<string, unknown> = {
       surface,
       activeTab,
@@ -455,6 +468,15 @@ export function SnapFeed({
       openingMediaIndex,
       openPostId: openPost?.id ?? null,
       openPostMediaCount: openPost?.mediaItems?.length ?? 0,
+      postsRefChanged,
+      onLikeRefChanged,
+      onCommentRefChanged,
+      onNearEndRefChanged,
+      onActiveIndexChangeRefChanged,
+      sessionRefChanged,
+      locationKey: location.key,
+      storeActiveIndex,
+      anySlideZoomed,
     };
     const prev = prevRenderRef.current;
     const changed: string[] = [];
@@ -470,7 +492,14 @@ export function SnapFeed({
       changedSincePrev: prev ? changed : 'first',
     });
     prevRenderRef.current = snap;
+    prevPostsIdentityRef.current = posts;
+    prevOnLikeRef.current = onLike;
+    prevOnCommentRef.current = onComment;
+    prevOnNearEndRef.current = onNearEnd;
+    prevOnActiveIndexChangeRef.current = onActiveIndexChange;
+    prevSessionIdentityRef.current = session;
   }
+
 
 
   return (
