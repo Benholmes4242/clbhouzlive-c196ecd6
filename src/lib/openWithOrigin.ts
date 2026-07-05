@@ -86,6 +86,7 @@ export function openWithOrigin({
   posterUrl,
   handOffUrls,
   railOwnerKey,
+  mediaIndex,
   options,
 }: OpenWithOriginArgs): void {
   fsvNewSession('open-tap', { index });
