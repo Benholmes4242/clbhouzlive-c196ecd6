@@ -180,6 +180,12 @@ export function openWithOrigin({
     origin,
     startPosition,
     mediaIndex: mediaIndex ?? 0,
+    mediaId: mediaId ?? null,
   });
-  fsv('tap.storeOpen', { postId, index, startPosition: +startPosition.toFixed(3), mediaIndex: mediaIndex ?? 0 });
+  fsv('tap.storeOpen', {
+    postId, index,
+    startPosition: +startPosition.toFixed(3),
+    mediaIndex: mediaIndex ?? 0,
+    mediaId: mediaId ?? null,
+  });
 }
