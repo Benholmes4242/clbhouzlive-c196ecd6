@@ -719,7 +719,7 @@ const ScoringRangeBlock: React.FC<{
       <div
         style={{
           position: 'relative',
-          height: 5,
+          height: 4,
           borderRadius: 99,
           background:
             'linear-gradient(90deg, rgba(242,244,247,0.10) 0%, rgba(247,147,30,0.45) 50%, rgba(85,189,139,0.75) 100%)',
@@ -1018,7 +1018,7 @@ const ShotsBody: React.FC<ShotsBodyProps> = ({ trophyAgg, shotsLoading, scope })
 // ─── Score stats ring ───────────────────────────────────────────────────
 const RING_SIZE = 176;
 const RING_R = 72;
-const RING_SW = 11;
+const RING_SW = 10;
 
 const RING_CX = RING_SIZE / 2;
 const RING_CY = RING_SIZE / 2;

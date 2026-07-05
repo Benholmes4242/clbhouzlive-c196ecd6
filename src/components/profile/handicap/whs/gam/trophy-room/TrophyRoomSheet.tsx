@@ -330,7 +330,7 @@ export const TrophyRoomSheet: React.FC<Props> = ({ userId, viewerUserId, ownerFi
           }}
         >
           <Eyebrow ownerFirstName={ownerFirstName} isFriendView={isFriendView} />
-          <div style={{ width: 34, height: 3, borderRadius: 99, background: AMBER, marginTop: 9 }} />
+          <div style={{ width: 34, height: 4, borderRadius: 99, background: AMBER, marginTop: 9 }} />
           <div
             style={{
               fontSize: 38,
