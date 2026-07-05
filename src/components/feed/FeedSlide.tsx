@@ -372,8 +372,8 @@ const FullscreenVideoSlot: React.FC<{
       : !hlsUrl
         ? 'no-hlsUrl'
         : null;
-    // eslint-disable-next-line no-console
-    console.info('[VDIFF] slot.mount', {
+    vdiff('slot.mount', {
+      layer: 'fullscreen-slot',
       postId,
       isActive,
       hasHls: !!hlsUrl,
@@ -385,6 +385,7 @@ const FullscreenVideoSlot: React.FC<{
       bailReason,
     });
   }, [postId, isActive, hlsUrl, posterSrc, startPosition, isMuted]);
+
 
   React.useEffect(() => {
     VideoEngine.setObjectFit('fullscreen', 'contain');
