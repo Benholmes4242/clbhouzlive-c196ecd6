@@ -765,7 +765,7 @@ export const UserListPage: React.FC<UserListPageProps> = ({
 // ---------------------------------------------------------------------------
 
 const EmptyState: React.FC<{
-  eyebrow: string;
+  eyebrow?: string;
   icon: React.ReactNode;
   heading: string;
   body: string;
