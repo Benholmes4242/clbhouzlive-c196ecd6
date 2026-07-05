@@ -280,33 +280,64 @@ export const TrophyRoomSheet: React.FC<Props> = ({ userId, viewerUserId, ownerFi
   const isLoading = badgesLoading || legendsLoading;
   const isFriendView = viewerUserId !== undefined && viewerUserId !== userId;
 
+  const totalAchievements = allAchievements.length;
+  const earnedAchCount = earnedAchievements.length;
+  const remaining = Math.max(0, totalAchievements - earnedAchCount);
+  const railPct = totalAchievements > 0 ? (earnedAchCount / totalAchievements) * 100 : 0;
+
+  // NEXT UNLOCK — closest-to-unlock locked achievement with progress
+  const nextUnlock = useMemo(() => {
+    type A = Extract<TrophyItem, { kind: 'achievement' }>;
+    const withProgress = lockedAchievements
+      .map((item: A) => {
+        if (item.currentValue == null || item.currentValue <= 0) return null;
+        if (item.nextThreshold == null || item.nextThreshold <= 0) return null;
+        const reached = item.reachedTier ?? 0;
+        const prev = reached > 0 && item.tiers[reached - 1] ? item.tiers[reached - 1].threshold : 0;
+        const denom = item.nextThreshold - prev;
+        if (denom <= 0) return null;
+        const frac = Math.max(0, Math.min(1, (item.currentValue - prev) / denom));
+        if (frac <= 0) return null;
+        const remainingUnits = item.nextThreshold - item.currentValue;
+        return { item, frac, remainingUnits };
+      })
+      .filter((v): v is { item: A; frac: number; remainingUnits: number } => v !== null);
+
+    withProgress.sort((a, b) => {
+      if (b.frac !== a.frac) return b.frac - a.frac;
+      if (a.remainingUnits !== b.remainingUnits) return a.remainingUnits - b.remainingUnits;
+      return a.item.name.localeCompare(b.item.name);
+    });
+
+    return withProgress[0] ?? null;
+  }, [lockedAchievements]);
+
   return (
     <>
       <GamSheet open={open} onClose={() => setOpen(false)}>
         {/* Drag handle */}
         <div style={{ display: 'flex', justifyContent: 'center', paddingTop: 8, flexShrink: 0 }}>
-          <div style={{ width: 36, height: 4, borderRadius: 99, background: 'var(--hcp-line-2)' }} />
+          <div style={{ width: 36, height: 4, borderRadius: 99, background: LINE }} />
         </div>
 
         {/* Header */}
         <div
           style={{
-            padding: '12px 20px 10px',
-            borderBottom: '0.5px solid var(--hcp-line)',
+            padding: '12px 20px 12px',
+            borderBottom: `0.5px solid ${LINE}`,
             flexShrink: 0,
             fontFamily: GAM.FONT_GEIST,
           }}
         >
           <Eyebrow ownerFirstName={ownerFirstName} isFriendView={isFriendView} />
-          {/* canonical amber cut-line */}
-          <div style={{ width: 34, height: 3, borderRadius: 99, background: 'var(--hcp-amber)', marginTop: 9 }} />
+          <div style={{ width: 34, height: 3, borderRadius: 99, background: AMBER, marginTop: 9 }} />
           <div
             style={{
-              fontSize: 34,
-              fontWeight: 200,
-              letterSpacing: '-0.045em',
-              color: 'var(--hcp-t-100)',
-              marginTop: 4,
+              fontSize: 38,
+              fontWeight: 800,
+              letterSpacing: '-0.03em',
+              color: INK,
+              marginTop: 6,
               lineHeight: 0.95,
               ...GAM.TABULAR,
             }}
@@ -315,49 +346,92 @@ export const TrophyRoomSheet: React.FC<Props> = ({ userId, viewerUserId, ownerFi
             <span
               style={{
                 fontSize: 15,
-                fontWeight: 600,
-                color: 'var(--hcp-t-60)',
-                letterSpacing: '0.02em',
-                marginLeft: 6,
+                fontWeight: 700,
+                color: DIM,
+                letterSpacing: '0.01em',
+                marginLeft: 8,
               }}
             >
               earned
             </span>
           </div>
+
+          {/* Split */}
           <div
             style={{
-              fontSize: 12,
-              color: 'var(--hcp-t-60)',
-              marginTop: 6,
+              fontSize: 10,
+              color: FAINT,
+              marginTop: 8,
               display: 'flex',
-              gap: 12,
+              gap: 14,
               flexWrap: 'wrap',
+              fontWeight: 800,
+              letterSpacing: '0.14em',
+              textTransform: 'uppercase',
               ...GAM.TABULAR,
             }}
           >
             <span>
-              <span style={{ color: 'var(--hcp-t-100)', fontWeight: 700 }}>
-                {earnedAchievements.length}
-              </span>{' '}
-              {earnedAchievements.length === 1 ? 'achievement' : 'achievements'}
+              <span style={{ color: INK }}>{earnedAchievements.length}</span>{' '}
+              {earnedAchievements.length === 1 ? 'ACHIEVEMENT' : 'ACHIEVEMENTS'}
             </span>
-            <span style={{ color: 'var(--hcp-t-40)' }} aria-hidden>·</span>
+            <span aria-hidden>·</span>
             <span>
-              <span style={{ color: 'var(--hcp-t-100)', fontWeight: 700 }}>
-                {allLegends.length}
-              </span>{' '}
-              course {allLegends.length === 1 ? 'legend' : 'legends'}
+              <span style={{ color: AMBER }}>{allLegends.length}</span>{' '}
+              COURSE {allLegends.length === 1 ? 'LEGEND' : 'LEGENDS'}
             </span>
           </div>
+
+          {/* Completion rail — achievements only */}
+          {totalAchievements > 0 && (
+            <div style={{ marginTop: 12 }}>
+              <div
+                style={{
+                  position: 'relative',
+                  width: '100%',
+                  height: 3.5,
+                  borderRadius: 99,
+                  background: 'rgba(255,255,255,0.07)',
+                  overflow: 'hidden',
+                }}
+              >
+                <div
+                  style={{
+                    width: `${railPct}%`,
+                    height: '100%',
+                    background: AMBER,
+                    borderRadius: 99,
+                    transition: 'width 400ms ease',
+                  }}
+                />
+              </div>
+              <div
+                style={{
+                  display: 'flex',
+                  justifyContent: 'space-between',
+                  marginTop: 6,
+                  fontSize: 9.5,
+                  fontWeight: 800,
+                  letterSpacing: '0.12em',
+                  color: FAINT,
+                  ...GAM.TABULAR,
+                }}
+              >
+                <span>
+                  <span style={{ color: INK }}>{earnedAchCount}</span> OF {totalAchievements} ACHIEVEMENTS
+                </span>
+                <span>{remaining === 1 ? '1 TO GO' : `${remaining} TO GO`}</span>
+              </div>
+            </div>
+          )}
         </div>
 
-        {/* Tabs */}
+        {/* Filter pills */}
         <div
           style={{
             display: 'flex',
             gap: 8,
             padding: '10px 16px',
-            borderBottom: '0.5px solid var(--hcp-line)',
             flexShrink: 0,
             fontFamily: GAM.FONT_GEIST,
             overflowX: 'auto',
@@ -384,31 +458,31 @@ export const TrophyRoomSheet: React.FC<Props> = ({ userId, viewerUserId, ownerFi
                 aria-selected={active}
                 style={{
                   flex: '0 0 auto',
-                  height: 32,
-                  padding: '0 10px',
-                  borderRadius: 8,
-                  border: active ? '1px solid var(--hcp-line-3)' : '1px solid transparent',
-                  background: active ? 'var(--hcp-bg-3)' : 'transparent',
-                  color: active ? 'var(--hcp-t-100)' : 'var(--hcp-t-60)',
+                  height: 30,
+                  padding: '0 12px',
+                  borderRadius: 999,
+                  border: `1px solid ${active ? 'rgba(255,255,255,0.14)' : LINE}`,
+                  background: active ? 'rgba(255,255,255,0.10)' : 'rgba(255,255,255,0.045)',
+                  color: active ? INK : DIM,
                   fontFamily: 'inherit',
-                  fontSize: 14,
-                  fontWeight: active ? 700 : 500,
-                  letterSpacing: '-0.01em',
+                  fontSize: 12,
+                  fontWeight: 800,
+                  letterSpacing: '0.06em',
                   whiteSpace: 'nowrap',
                   cursor: 'pointer',
                   display: 'inline-flex',
                   alignItems: 'center',
                   gap: 6,
-                  transition: 'all 0.15s',
+                  transition: 'background 150ms ease, color 150ms ease',
                 }}
               >
                 {TAB_LABEL[key]}
                 <span
                   style={{
                     ...GAM.TABULAR,
-                    fontWeight: 600,
-                    fontSize: 12,
-                    color: active ? 'var(--hcp-t-100)' : 'var(--hcp-t-60)',
+                    fontWeight: 800,
+                    fontSize: 11,
+                    color: FAINT,
                   }}
                 >
                   {count}
@@ -418,6 +492,95 @@ export const TrophyRoomSheet: React.FC<Props> = ({ userId, viewerUserId, ownerFi
           })}
           <style>{`.hcp-tab-row::-webkit-scrollbar { display: none; }`}</style>
         </div>
+
+        {/* NEXT UNLOCK spotlight */}
+        {nextUnlock && (
+          <div style={{ padding: '4px 16px 8px', flexShrink: 0 }}>
+            <button
+              type="button"
+              onClick={() => openDetail(nextUnlock.item)}
+              style={{
+                width: '100%',
+                display: 'flex',
+                alignItems: 'center',
+                gap: 12,
+                padding: '12px 14px',
+                borderRadius: 14,
+                background: CARD,
+                border: `1px solid ${LINE}`,
+                borderLeft: `3px solid ${AMBER}`,
+                cursor: 'pointer',
+                textAlign: 'left',
+                fontFamily: GAM.FONT_GEIST,
+                color: INK,
+              }}
+            >
+              <div
+                style={{
+                  width: 36,
+                  height: 36,
+                  borderRadius: 10,
+                  background: 'rgba(247,147,30,0.10)',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  color: AMBER,
+                  flexShrink: 0,
+                }}
+              >
+                {renderBadgeIcon(nextUnlock.item.iconKey, 16, 'currentColor')}
+              </div>
+              <div style={{ flex: 1, minWidth: 0 }}>
+                <div
+                  style={{
+                    fontSize: 8.5,
+                    fontWeight: 800,
+                    letterSpacing: '0.14em',
+                    color: AMBER,
+                  }}
+                >
+                  NEXT UNLOCK
+                </div>
+                <div
+                  style={{
+                    fontSize: 14,
+                    fontWeight: 800,
+                    color: INK,
+                    marginTop: 2,
+                    lineHeight: 1.2,
+                    whiteSpace: 'nowrap',
+                    overflow: 'hidden',
+                    textOverflow: 'ellipsis',
+                    ...GAM.TABULAR,
+                  }}
+                >
+                  {nextUnlock.item.name} · {nextUnlock.item.currentValue} of {nextUnlock.item.nextThreshold}
+                </div>
+                <div
+                  style={{
+                    marginTop: 8,
+                    width: '100%',
+                    height: 3,
+                    borderRadius: 99,
+                    background: 'rgba(255,255,255,0.07)',
+                    overflow: 'hidden',
+                  }}
+                >
+                  <div
+                    style={{
+                      width: `${nextUnlock.frac * 100}%`,
+                      height: '100%',
+                      background: AMBER,
+                      borderRadius: 99,
+                    }}
+                  />
+                </div>
+              </div>
+              <ChevronRight size={16} color={FAINT} style={{ flexShrink: 0 }} />
+            </button>
+          </div>
+        )}
+
 
 
         {/* Body */}
