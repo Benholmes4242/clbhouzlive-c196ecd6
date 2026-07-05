@@ -90,6 +90,23 @@ export const CourseMediaLandscapeCard: React.FC<CourseMediaLandscapeCardProps> =
         </div>
       )}
 
+      {isVideoLane && (
+        <div
+          ref={laneHostRef}
+          aria-hidden
+          style={{
+            position: 'absolute',
+            inset: 0,
+            zIndex: 1,
+            opacity: laneReady ? 1 : 0,
+            transition: 'opacity 140ms linear',
+            pointerEvents: 'none',
+          }}
+        />
+      )}
+
+
+
       {/* Bottom gradient overlay — 60% for landscape */}
       <div
         style={{
