@@ -10,7 +10,7 @@ import { SectionHeader } from '@/components/ui/SectionHeader';
 import { HRail } from './proshop/HRail';
 import { ClipsMark } from './proshop/SectionMarks';
 import { useFirstVisibleDecoded } from './shared/useFirstVisibleDecoded';
-import { useRailAutoplay } from './shared/useRailAutoplay';
+import { useWatchAutoplay } from '@/video/useWatchAutoplay';
 
 
 const VISIBLE_COUNT = 3;
