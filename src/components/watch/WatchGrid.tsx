@@ -199,7 +199,8 @@ const WatchGrid: React.FC<WatchGridProps> = ({
   return (
     <>
       <div
-        ref={gridRef}
+        ref={setGridRef}
+
         style={{
           display: 'flex',
           gap: GAP,
