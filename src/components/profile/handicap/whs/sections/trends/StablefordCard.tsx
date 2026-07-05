@@ -504,30 +504,24 @@ const PointsRing: React.FC<PointsRingProps> = ({
 }) => {
   const nonZero = bands.filter((b) => b.count > 0);
   const arcs: { color: string; dasharray: string; startDeg: number }[] = [];
+  const seams: { angleRad: number }[] = [];
+  const singleColor = nonZero.length === 1 && total > 0 ? nonZero[0].color : null;
 
-  if (total > 0 && nonZero.length > 0) {
-    if (nonZero.length === 1) {
+  if (total > 0 && nonZero.length > 1) {
+    let cursor = 0;
+    bands.forEach((b) => {
+      if (b.count === 0) return;
+      const span = (b.count / total) * Math.PI * 2;
+      const arcLen = span * RING_R;
+      const startDeg = (cursor * 180) / Math.PI - 90;
       arcs.push({
-        color: nonZero[0].color,
-        dasharray: `${RING_CIRC} ${RING_CIRC}`,
-        startDeg: -90,
+        color: b.color,
+        dasharray: `${arcLen} ${RING_CIRC}`,
+        startDeg,
       });
-    } else {
-      let cursor = 0;
-      bands.forEach((b) => {
-        if (b.count === 0) return;
-        const span = (b.count / total) * Math.PI * 2;
-        const gap = span > RING_GAP * 2 ? RING_GAP : 0;
-        const arcLen = Math.max(0, (span - gap) * RING_R);
-        const startDeg = (cursor * 180) / Math.PI - 90;
-        arcs.push({
-          color: b.color,
-          dasharray: `${arcLen} ${RING_CIRC}`,
-          startDeg,
-        });
-        cursor += span;
-      });
-    }
+      seams.push({ angleRad: cursor - Math.PI / 2 });
+      cursor += span;
+    });
   }
 
   return (
@@ -540,6 +534,16 @@ const PointsRing: React.FC<PointsRingProps> = ({
         stroke="rgba(255,255,255,0.05)"
         strokeWidth={RING_SW}
       />
+      {singleColor && (
+        <circle
+          cx={RING_CX}
+          cy={RING_CY}
+          r={RING_R}
+          fill="none"
+          stroke={singleColor}
+          strokeWidth={RING_SW}
+        />
+      )}
       {arcs.map((a, i) => (
         <circle
           key={i}
@@ -549,11 +553,28 @@ const PointsRing: React.FC<PointsRingProps> = ({
           fill="none"
           stroke={a.color}
           strokeWidth={RING_SW}
-          strokeLinecap="round"
+          strokeLinecap="butt"
           strokeDasharray={a.dasharray}
           transform={`rotate(${a.startDeg} ${RING_CX} ${RING_CY})`}
         />
       ))}
+      {seams.map((s, i) => {
+        const rIn = RING_R - RING_SW / 2 - 1.5;
+        const rOut = RING_R + RING_SW / 2 + 1.5;
+        const cos = Math.cos(s.angleRad);
+        const sin = Math.sin(s.angleRad);
+        return (
+          <line
+            key={`seam-${i}`}
+            x1={RING_CX + cos * rIn}
+            y1={RING_CY + sin * rIn}
+            x2={RING_CX + cos * rOut}
+            y2={RING_CY + sin * rOut}
+            stroke="#1B1E27"
+            strokeWidth={2.5}
+          />
+        );
+      })}
       <text
         x={RING_CX}
         y={78}
@@ -998,7 +1019,7 @@ const ShotsBody: React.FC<ShotsBodyProps> = ({ trophyAgg, shotsLoading, scope })
 const RING_SIZE = 176;
 const RING_R = 72;
 const RING_SW = 11;
-const RING_GAP = 0.07; // radians
+
 const RING_CX = RING_SIZE / 2;
 const RING_CY = RING_SIZE / 2;
 const RING_CIRC = 2 * Math.PI * RING_R;
@@ -1026,30 +1047,24 @@ const ScoreStatsRing: React.FC<ScoreStatsRingProps> = ({
 }) => {
   const nonZero = bands.filter((b) => b.count > 0);
   const arcs: { color: string; dasharray: string; startDeg: number }[] = [];
+  const seams: { angleRad: number }[] = [];
+  const singleColor = nonZero.length === 1 && totalHoles > 0 ? nonZero[0].color : null;
 
-  if (totalHoles > 0 && nonZero.length > 0) {
-    if (nonZero.length === 1) {
+  if (totalHoles > 0 && nonZero.length > 1) {
+    let cursor = 0;
+    bands.forEach((b) => {
+      if (b.count === 0) return;
+      const span = (b.count / totalHoles) * Math.PI * 2;
+      const arcLen = span * RING_R;
+      const startDeg = (cursor * 180) / Math.PI - 90;
       arcs.push({
-        color: nonZero[0].color,
-        dasharray: `${RING_CIRC} ${RING_CIRC}`,
-        startDeg: -90,
+        color: b.color,
+        dasharray: `${arcLen} ${RING_CIRC}`,
+        startDeg,
       });
-    } else {
-      let cursor = 0;
-      bands.forEach((b) => {
-        if (b.count === 0) return;
-        const span = (b.count / totalHoles) * Math.PI * 2;
-        const gap = span > RING_GAP * 2 ? RING_GAP : 0;
-        const arcLen = Math.max(0, (span - gap) * RING_R);
-        const startDeg = (cursor * 180) / Math.PI - 90;
-        arcs.push({
-          color: b.color,
-          dasharray: `${arcLen} ${RING_CIRC}`,
-          startDeg,
-        });
-        cursor += span;
-      });
-    }
+      seams.push({ angleRad: cursor - Math.PI / 2 });
+      cursor += span;
+    });
   }
 
   return (
@@ -1063,6 +1078,16 @@ const ScoreStatsRing: React.FC<ScoreStatsRingProps> = ({
         stroke="rgba(255,255,255,0.05)"
         strokeWidth={RING_SW}
       />
+      {singleColor && (
+        <circle
+          cx={RING_CX}
+          cy={RING_CY}
+          r={RING_R}
+          fill="none"
+          stroke={singleColor}
+          strokeWidth={RING_SW}
+        />
+      )}
       {arcs.map((a, i) => (
         <circle
           key={i}
@@ -1072,11 +1097,28 @@ const ScoreStatsRing: React.FC<ScoreStatsRingProps> = ({
           fill="none"
           stroke={a.color}
           strokeWidth={RING_SW}
-          strokeLinecap="round"
+          strokeLinecap="butt"
           strokeDasharray={a.dasharray}
           transform={`rotate(${a.startDeg} ${RING_CX} ${RING_CY})`}
         />
       ))}
+      {seams.map((s, i) => {
+        const rIn = RING_R - RING_SW / 2 - 1.5;
+        const rOut = RING_R + RING_SW / 2 + 1.5;
+        const cos = Math.cos(s.angleRad);
+        const sin = Math.sin(s.angleRad);
+        return (
+          <line
+            key={`seam-${i}`}
+            x1={RING_CX + cos * rIn}
+            y1={RING_CY + sin * rIn}
+            x2={RING_CX + cos * rOut}
+            y2={RING_CY + sin * rOut}
+            stroke="#1B1E27"
+            strokeWidth={2.5}
+          />
+        );
+      })}
 
       {/* Center stack */}
       <text
