@@ -49,9 +49,8 @@ interface HolderCellProps {
   selfLabel: string;
 }
 
-const SquircleAvatar: React.FC<{ photoUrl: string | null; size?: number; muted?: boolean }> = ({
+const SquircleAvatar: React.FC<{ photoUrl: string | null; muted?: boolean }> = ({
   photoUrl,
-  size = 30,
   muted = false,
 }) => {
   const bg = photoUrl
@@ -63,8 +62,8 @@ const SquircleAvatar: React.FC<{ photoUrl: string | null; size?: number; muted?:
     <div
       aria-hidden
       style={{
-        width: size,
-        height: size,
+        width: 40,
+        height: 42,
         borderRadius: '34%',
         background: bg,
         boxShadow: muted
@@ -80,27 +79,21 @@ const HolderCell: React.FC<HolderCellProps> = ({ short, holder, selfLabel }) => 
   const isSelf = !!holder?.is_self;
   const isEmpty = !holder;
 
-  const nameColor = 'var(--hcp-t-100)';
-  const valueColor = nameColor;
+  const labelColor = isSelf ? '#F7931E' : 'var(--hcp-t-40)';
+  const valueColor = isSelf ? '#F7931E' : 'var(--hcp-t-100)';
 
   return (
     <div
       style={{
         display: 'flex',
-        alignItems: 'center',
-        gap: 9,
-        padding: '8px 10px',
-        background: isSelf ? 'rgba(251,188,46,0.07)' : 'transparent',
-        border: isSelf
-          ? '1px solid rgba(251,188,46,0.45)'
-          : '1px solid transparent',
-        borderRadius: 10,
+        alignItems: 'flex-start',
+        gap: 11,
         minWidth: 0,
-        boxSizing: 'border-box',
+        flex: 1,
         fontFamily: FONT,
       }}
     >
-      <SquircleAvatar photoUrl={holder?.photo_url ?? null} size={30} muted={isEmpty} />
+      <SquircleAvatar photoUrl={holder?.photo_url ?? null} muted={isEmpty} />
 
       <div style={{ flex: 1, minWidth: 0 }}>
         <div
@@ -108,35 +101,38 @@ const HolderCell: React.FC<HolderCellProps> = ({ short, holder, selfLabel }) => 
             display: 'inline-flex',
             alignItems: 'center',
             gap: 4,
-            fontSize: 8.5,
+            fontSize: 9.5,
             fontWeight: 800,
-            letterSpacing: '0.14em',
-            color: 'var(--hcp-t-100)',
-            lineHeight: 1.2,
+            letterSpacing: '0.12em',
+            color: labelColor,
+            lineHeight: 1.1,
             textTransform: 'uppercase',
           }}
         >
           {isSelf && (
             <Crown
-              size={9}
+              size={11}
               strokeWidth={2.6}
-              fill="#FBBC2E"
-              style={{ color: '#c97a10' }}
+              fill="#F7931E"
+              style={{ color: '#F7931E' }}
             />
           )}
           {short}
         </div>
         <div
           style={{
-            fontSize: 12,
-            fontWeight: 700,
-            color: isEmpty ? `var(--hcp-t-40, ${GAM.INK_40})` : nameColor,
-            lineHeight: 1.25,
-            marginTop: 1,
-            whiteSpace: 'nowrap',
-            overflow: 'hidden',
-            textOverflow: 'ellipsis',
+            fontSize: 14.5,
+            fontWeight: 800,
+            color: isEmpty ? 'var(--hcp-t-40)' : 'var(--hcp-t-100)',
+            lineHeight: 1.22,
+            marginTop: 3,
+            minHeight: '2.44em',
             letterSpacing: '-0.01em',
+            display: '-webkit-box',
+            WebkitLineClamp: 2,
+            WebkitBoxOrient: 'vertical',
+            overflow: 'hidden',
+            wordBreak: 'break-word',
           }}
         >
           {isEmpty ? 'Unclaimed' : (isSelf ? selfLabel : holder!.display_name)}
@@ -145,31 +141,25 @@ const HolderCell: React.FC<HolderCellProps> = ({ short, holder, selfLabel }) => 
 
       <div
         style={{
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'flex-end',
+          fontSize: 19,
+          fontWeight: 800,
+          color: isEmpty ? 'var(--hcp-t-40)' : valueColor,
+          ...GAM.TABULAR,
+          letterSpacing: '-0.02em',
+          lineHeight: 1.1,
           flexShrink: 0,
+          textAlign: 'right',
         }}
       >
-        <div
-          style={{
-            fontSize: 13.5,
-            fontWeight: 800,
-            color: isEmpty ? `var(--hcp-t-40, ${GAM.INK_40})` : valueColor,
-            ...GAM.TABULAR,
-            letterSpacing: '-0.01em',
-            lineHeight: 1,
-          }}
-        >
-          {isEmpty || !holder ? '—' : formatLegendValueCompact(
-            (holder.category as LegendCategory),
-            holder.value,
-          )}
-        </div>
+        {isEmpty || !holder ? '—' : formatLegendValueCompact(
+          (holder.category as LegendCategory),
+          holder.value,
+        )}
       </div>
     </div>
   );
 };
+
 
 interface Props {
   courseId: string;
@@ -222,11 +212,10 @@ export const CourseLegendsCard: React.FC<Props> = ({
   const cueStyle = FOOTER_INTENT_STYLE[cue.intent];
   const selfLabel = friendName ? friendName : 'YOU';
 
-  // Row-major split into 2-column grid (claimed only)
+  // Claimed slots only — laid out as row-pairs (see grid below).
   const claimed = resolved.filter(({ row }) => !!row);
   const hasAnyClaimed = claimed.length > 0;
-  const left = claimed.filter((_, i) => i % 2 === 0);
-  const right = claimed.filter((_, i) => i % 2 === 1);
+
 
   return (
     <div
@@ -341,39 +330,45 @@ export const CourseLegendsCard: React.FC<Props> = ({
         </div>
       </div>
 
-      {/* 2-col row-major grid of champion cells (claimed only) */}
+      {/* 2-col record grid — one anatomy per cell, hairline between row-pairs */}
       {hasAnyClaimed ? (
-        <div style={{ padding: '12px 14px 0' }}>
-          <div style={{ display: 'flex', gap: 6, alignItems: 'flex-start' }}>
-            <div style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', gap: 6 }}>
-              {left.map(({ slot, row, cat }) => (
-                <HolderCell
-                  key={slot.key}
-                  short={slot.short}
-                  holder={row}
-                  category={cat}
-                  selfLabel={selfLabel}
-                />
-              ))}
-            </div>
-            <div style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', gap: 6 }}>
-              {right.map(({ slot, row, cat }) => (
-                <HolderCell
-                  key={slot.key}
-                  short={slot.short}
-                  holder={row}
-                  category={cat}
-                  selfLabel={selfLabel}
-                />
-              ))}
-            </div>
-          </div>
+        <div style={{ padding: '2px 14px 4px' }}>
+          {(() => {
+            const rowPairs: typeof claimed[] = [];
+            for (let i = 0; i < claimed.length; i += 2) {
+              rowPairs.push(claimed.slice(i, i + 2));
+            }
+            return rowPairs.map((pair, rowIdx) => (
+              <div
+                key={rowIdx}
+                style={{
+                  display: 'flex',
+                  gap: 18,
+                  padding: '11px 0',
+                  borderTop: rowIdx === 0 ? 'none' : '1px solid var(--hcp-line)',
+                  alignItems: 'flex-start',
+                }}
+              >
+                {pair.map(({ slot, row, cat }) => (
+                  <HolderCell
+                    key={slot.key}
+                    short={slot.short}
+                    holder={row}
+                    category={cat}
+                    selfLabel={selfLabel}
+                  />
+                ))}
+                {pair.length === 1 && <div style={{ flex: 1 }} />}
+              </div>
+            ));
+          })()}
         </div>
       ) : (
         <div style={{ padding: '14px 16px', fontSize: 12, color: 'var(--hcp-t-60)', fontFamily: FONT }}>
           No champions yet — be the first to claim a title here.
         </div>
       )}
+
 
       {/* Footer */}
       <div
