@@ -133,6 +133,9 @@ export const RoundDetailSheet: React.FC<Props> = ({ open, onClose, scoreId, hand
 
   const dateEyebrow = fmtDateEyebrow(userData?.play_date);
   const courseName = userData?.course?.name ?? 'Unknown course';
+  const displayName = profile?.display_name ?? profile?.username ?? '';
+  const goToProfile = () => { if (profileUserId) navigate(`/handicap/${profileUserId}`); };
+  const goToCourse = () => { if (courseIdQuery.data) navigate(`/courses/${courseIdQuery.data}`); };
 
   const indexLabel = indexMoved ? 'INDEX AFTER THIS ROUND' : 'CURRENT INDEX';
   const deltaColor = handicapDelta == null ? T.dim : handicapDelta < 0 ? T.under : T.over;
@@ -153,7 +156,7 @@ export const RoundDetailSheet: React.FC<Props> = ({ open, onClose, scoreId, hand
   const plottableCount = trajectoryHoles.filter((h) => h.par != null && h.strokes != null).length;
 
   return (
-    <BottomSheet open={open} onClose={onClose} ariaLabelledBy="round-detail-sheet-title" variant="dark">
+    <BottomSheet open={open} onClose={onClose} ariaLabelledBy="round-detail-sheet-title" variant="dark" surfaceColor="#1B1E27">
       {userLoading ? (
         <SheetSkeleton />
       ) : !userData ? (
