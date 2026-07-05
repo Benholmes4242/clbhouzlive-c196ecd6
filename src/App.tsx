@@ -65,6 +65,7 @@ import { FEATURE_FLAGS } from '@/config/featureFlags';
 import { CourseDetailSkeleton } from '@/components/skeletons/CourseDetailSkeleton';
 import { CoursesListSkeleton } from '@/components/skeletons/CoursesListSkeleton';
 import { ProfileSkeleton } from '@/components/skeletons/ProfileSkeleton';
+import { HandicapPageSkeleton } from '@/components/skeletons/HandicapPageSkeleton';
 import { DiscoverSkeleton } from '@/components/skeletons/DiscoverSkeleton';
 import WatchGridSkeleton from '@/components/watch/WatchGridSkeleton';
 
