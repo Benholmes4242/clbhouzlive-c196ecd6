@@ -1018,7 +1018,7 @@ const ShotsBody: React.FC<ShotsBodyProps> = ({ trophyAgg, shotsLoading, scope })
 // ─── Score stats ring ───────────────────────────────────────────────────
 const RING_SIZE = 176;
 const RING_R = 72;
-const RING_SW = 11;
+const RING_SW = 8;
 
 const RING_CX = RING_SIZE / 2;
 const RING_CY = RING_SIZE / 2;
