@@ -57,13 +57,10 @@ const CardShell: React.FC<{
       overflow: 'hidden',
       borderRadius: 16,
       padding: '16px 16px 14px',
-      background:
-        tone === 'gold'
-          ? 'linear-gradient(135deg, rgba(251,188,46,0.14) 0%, rgba(251,188,46,0.04) 60%, rgba(251,188,46,0.02) 100%)'
-          : BG_1,
+      background: tone === 'gold' ? 'rgba(247,147,30,0.08)' : BG_1,
       border:
         tone === 'gold'
-          ? `1px solid rgba(251,188,46,0.32)`
+          ? `1px solid rgba(247,147,30,0.30)`
           : `1px dashed ${LINE_2}`,
       fontFamily: FONT,
     }}
@@ -79,8 +76,7 @@ const Watermark: React.FC = () => (
       position: 'absolute',
       top: -10,
       right: -10,
-      opacity: 0.08,
-      color: GOLD,
+      color: 'rgba(255,255,255,0.06)',
       pointerEvents: 'none',
     }}
   >
@@ -96,7 +92,7 @@ const BigDuelsNumber: React.FC<{ count: number }> = ({ count }) => (
       style={{
         fontSize: 38,
         fontWeight: 900,
-        color: GOLD,
+        color: AMBER,
         letterSpacing: '-0.04em',
         lineHeight: 1,
         ...TAB,
@@ -177,7 +173,7 @@ const FullCard: React.FC<{
                 style={{
                   fontSize: 22,
                   fontWeight: 900,
-                  color: rec.wins > rec.losses ? GOLD : T60,
+                  color: rec.wins > rec.losses ? AMBER : T100,
                   letterSpacing: '-0.02em',
                 }}
               >
@@ -188,7 +184,7 @@ const FullCard: React.FC<{
                 style={{
                   fontSize: 22,
                   fontWeight: 900,
-                  color: rec.losses > rec.wins ? GOLD : T60,
+                  color: rec.losses > rec.wins ? AMBER : T100,
                   letterSpacing: '-0.02em',
                 }}
               >
@@ -214,8 +210,8 @@ const FullCard: React.FC<{
                   gap: 4,
                   fontSize: 11,
                   fontWeight: 700,
-                  color: GOLD,
-                  background: 'rgba(251,188,46,0.10)',
+                  color: AMBER,
+                  background: 'rgba(247,147,30,0.10)',
                   padding: '3px 8px',
                   borderRadius: 999,
                   alignSelf: 'flex-start',
