@@ -97,13 +97,18 @@ export function useRailLane(opts: UseRailLaneOptions): UseRailLaneResult {
     const caller = opts.ownerKey ?? opts.postId ?? null;
     VideoEngine.mountLane(laneId, host);
     VideoEngine.setMuted(laneId, true);
+    // Resume at the engine's lastPos for this post — kept fresh by every lane
+    // (feed-active/fullscreen/rail-*) via onTime. Means closing fullscreen at
+    // 20s and returning to a re-acquired rail tile picks up at 20s, not 0.
+    const resumeAt = opts.postId ? VideoEngine.getLastPos(opts.postId) : 0;
     VideoEngine.load(laneId, {
       hlsUrl: opts.hlsUrl,
       posterUrl: opts.posterUrl ?? null,
-      startPosition: -1,
+      startPosition: resumeAt > 0.1 ? resumeAt : -1,
       postId: opts.postId ?? null,
     });
     void VideoEngine.play(laneId, { callerPostId: caller });
+
     return () => {
       // Local deactivation — the pool.release effect above will fire the
       // engine release and unmount cleanup; here we just stop playback.
