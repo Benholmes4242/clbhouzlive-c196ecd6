@@ -37,8 +37,9 @@ const HcpSparkline: React.FC<{ series: number[]; color: string }> = ({ series, c
   const min = Math.min(...series);
   const max = Math.max(...series);
   const range = Math.max(0.1, max - min);
+  const PADX = 3;
   const points = series.map((v, i) => [
-    (i / (series.length - 1)) * w,
+    PADX + (i / (series.length - 1)) * (w - PADX * 2),
     h - PAD - ((v - min) / range) * (h - PAD * 2),
   ]);
   const path = points
