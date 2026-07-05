@@ -51,8 +51,19 @@ function AutoplayVideoCardInner({ post, index, allPosts, userId, active, borderR
 
   const firstVideo = post.mediaItems.find((m) => m.type === 'video');
   const thumbnail = firstVideo?.thumbnailUrl || firstVideo?.imageUrl || '';
+  const hlsUrl = (firstVideo as any)?.hlsUrl as string | undefined;
   const duration = firstVideo?.duration ?? 0;
   const courseName = (post as any).courseName ?? null;
+
+  const isVideo = !!firstVideo && !!hlsUrl;
+  const ownerKey = isVideo ? `${post.id}:0` : null;
+  const { hostRef: laneHostRef, ready: laneReady } = useRailLane({
+    ownerKey,
+    active: active && isVideo,
+    hlsUrl: isVideo ? hlsUrl! : null,
+    posterUrl: thumbnail || null,
+    postId: post.id,
+  });
 
   const timeAgo = (() => {
     try {
@@ -62,7 +73,8 @@ function AutoplayVideoCardInner({ post, index, allPosts, userId, active, borderR
     }
   })();
 
-  // [VIDEOSTUB] Autoplay video mount removed — poster only.
+  // Autoplay video mount is handled by the shared RailLanePool via useRailLane.
+
 
   const handleTap = () => {
     useFullscreenFeedStore.getState().open(allPosts, index);
