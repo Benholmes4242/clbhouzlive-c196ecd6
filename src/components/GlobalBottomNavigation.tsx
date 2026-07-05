@@ -17,8 +17,8 @@ import { cn } from '@/lib/utils';
 
 // ---- Public token: total vertical space to reserve at the bottom of any
 // scrollable page so its last content clears the floating pill.
-// (66 pill + 10 bottom gap + 16 breathing room = 92)
-export const NAV_CLEARANCE = 'calc(env(safe-area-inset-bottom, 0px) + 92px)';
+// (~58 pill + 10 bottom gap + 16 breathing room = 84)
+export const NAV_CLEARANCE = 'calc(env(safe-area-inset-bottom, 0px) + 84px)';
 
 // Routes where bottom navigation should be hidden
 const HIDDEN_ROUTES = [
