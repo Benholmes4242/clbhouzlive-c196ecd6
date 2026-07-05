@@ -88,7 +88,7 @@ const REDUCED_MOTION =
 
 const GlobalBottomNavigation: React.FC<GlobalBottomNavigationProps> = ({ chromeState = 'visible' }) => {
   const location = useLocation();
-  const { isVisible, setNavRef } = useBottomNavigation();
+  const { isVisible } = useBottomNavigation();
   const { shouldHideHeader } = useModalContext();
   const { triggerPrefetch } = useAppPrefetch();
   const { activeTab, handleTabClick, handlePrefetch } = useNavigationHandlers();
