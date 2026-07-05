@@ -426,8 +426,8 @@ const CourseRow: React.FC<{
             />
             <Pill
               label={`Worst ${fmtDelta(course.worst_differential - course.expected_differential)}`}
-              color={T.redInk}
-              bg="rgba(159,29,29,0.12)"
+              color={T.slateInk}
+              bg="rgba(242,244,247,0.10)"
             />
           </div>
         ) : (
