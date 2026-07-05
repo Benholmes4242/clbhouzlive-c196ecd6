@@ -46,7 +46,20 @@ function setState(next: NavState) {
 }
 
 function getScrollTop(target: HTMLElement | Window): number {
-  if (target === window) return window.scrollY || document.documentElement.scrollTop || 0;
+  if (target === window) {
+    // Read from whichever element the UA is actually scrolling. When body
+    // is styled with `height: 100%; overflow-y: auto` (our light routes),
+    // body — not documentElement — is the scrolling element, and window
+    // never receives scroll events for the document scroll. Fall through
+    // to body as a last resort.
+    return (
+      window.scrollY ||
+      document.scrollingElement?.scrollTop ||
+      document.documentElement.scrollTop ||
+      document.body.scrollTop ||
+      0
+    );
+  }
   return (target as HTMLElement).scrollTop || 0;
 }
 
@@ -139,7 +152,22 @@ export function useNavScrollState(): NavState {
   return useSyncExternalStore(subscribe, getSnapshot, getSnapshot);
 }
 
-// Auto-register the window scroller once (SSR-safe).
+// Auto-register the document scroller once (SSR-safe).
+// We attach to BOTH `window` and `document.body`, because our global CSS
+// sets `body { height: 100%; overflow-y: auto }` — in that configuration
+// body is the scrolling element and scroll events fire on body, not on
+// window. Registering both is harmless (each scroller tracks its own
+// scrollTop) and covers whichever element the UA picks.
 if (typeof window !== 'undefined') {
   registerNavScroller(window);
+  if (typeof document !== 'undefined' && document.body) {
+    registerNavScroller(document.body);
+  } else if (typeof document !== 'undefined') {
+    // body not yet available at module eval — defer.
+    document.addEventListener(
+      'DOMContentLoaded',
+      () => document.body && registerNavScroller(document.body),
+      { once: true },
+    );
+  }
 }
