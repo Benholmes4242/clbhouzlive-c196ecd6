@@ -76,6 +76,7 @@ function VideoHeroCardInner({ post, index, allPosts }: VideoHeroCardProps) {
   return (
     <section style={{ padding: '0 16px' }}>
       <button
+        ref={btnRef}
         type="button"
         onClick={handleTap}
         className="block w-full text-left active:scale-[0.99] transition-transform"
