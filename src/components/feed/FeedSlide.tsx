@@ -151,13 +151,17 @@ export const FeedSlide = memo(function FeedSlide({
   // cards now render as standalone Home modules (HomePGAModule, HomeCourseOfWeekModule).
   const renderContent = () => {
 
-    // Multi-media (any mix of video + image) → FeedImageCarousel.
-    // Skipped when the tap opener explicitly targeted a non-zero media
-    // (mediaIndex > 0) — that opening slide renders exactly the tapped
-    // media as a single-media view so the correct video/image mounts.
-    // In-fullscreen carousel swiping across a multi-media post remains
-    // Stage 7 (existing feed callers pass mediaIndex 0 → carousel unchanged).
-    if (media && media.length > 1 && openIdx === 0) {
+    // Multi-media carousel — feed surface ONLY. In fullscreen, the carousel
+    // branch would render `FeedImageCarousel` whose per-slide `SnapVideoPlayer`
+    // is a poster-only teardown stub that never plays — so a multi-media post
+    // tapped on its first-media video (openIdx===0) previously mounted the
+    // stub instead of `FullscreenVideoSlot`. Skipping the carousel in
+    // fullscreen routes both the opening slide and any swiped-to slide
+    // through the per-`m` branches below: chosen video (w/ hlsUrl) mounts
+    // the fullscreen lane; chosen image renders the pinch-zoom image branch.
+    // In-fullscreen swiping BETWEEN a multi-media post's own media items is
+    // Stage 7 — deferred; the tapped media (or media[0] on swipe) is shown.
+    if (!isFullscreen && media && media.length > 1 && openIdx === 0) {
       return (
         <FeedImageCarousel
           mediaItems={media}
@@ -169,6 +173,7 @@ export const FeedSlide = memo(function FeedSlide({
         />
       );
     }
+
 
     // Opening media (video/image DECISION and rendered content both use `m`).
     const m = media?.[openIdx] ?? media?.[0];
