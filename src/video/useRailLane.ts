@@ -59,6 +59,17 @@ export function useRailLane(opts: UseRailLaneOptions): UseRailLaneResult {
 
   const eligible = !!(opts.active && opts.hlsUrl && opts.ownerKey);
 
+  // Log hasHls resolve rate exactly once per (ownerKey, hasHls) combination.
+  const trackedRef = useRef<string | null>(null);
+  useEffect(() => {
+    if (!opts.ownerKey) return;
+    const tag = `${opts.ownerKey}:${opts.hlsUrl ? 1 : 0}`;
+    if (trackedRef.current === tag) return;
+    trackedRef.current = tag;
+    trackHls(!!opts.hlsUrl, opts.ownerKey);
+  }, [opts.ownerKey, opts.hlsUrl]);
+
+
   // Acquire / release lane based on active state.
   useEffect(() => {
     if (!eligible) return;
