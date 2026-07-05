@@ -26,10 +26,12 @@ import {
   shouldGateForSaveData,
 } from './lanePolicy';
 import { fsv, fsvEl, fsvTimeSample } from '@/perf/fsvTelemetry';
+import { isPerfEnabled } from '@/perf/navTiming';
 
 /** Lanes we emit rich FSV telemetry for — noisy lanes (feed-next preload) skipped. */
 const FSV_LANES = new Set<LaneId>(['fullscreen', 'feed-active']);
 const isFsv = (id: LaneId): boolean => FSV_LANES.has(id);
+
 
 type LaneState = 'idle' | 'loading' | 'ready' | 'playing' | 'paused' | 'error';
 
