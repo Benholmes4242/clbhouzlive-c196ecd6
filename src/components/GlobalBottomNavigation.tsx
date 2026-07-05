@@ -250,7 +250,6 @@ const GlobalBottomNavigation: React.FC<GlobalBottomNavigationProps> = ({ chromeS
             <div
               ref={(el) => {
                 navRef.current = el;
-                setNavRef(el);
               }}
               data-chrome="bottom-nav"
               className={cn('glass-nav-pill')}
