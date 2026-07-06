@@ -117,6 +117,21 @@ export function FullscreenFeedOverlay() {
     clearBorrow();
   }, [isOpen, borrow, activeIndex, startIndex, clearBorrow]);
 
+  // Wrap close so borrow-return runs BEFORE the store clears its fields.
+  // All in-overlay callers (ESC, top-action-bar close, deep-link back) should
+  // route through this. Route-change navigation that bypasses close still
+  // gets handled by the isOpen-effect cleanup below (using borrowRef).
+  const handleClose = useCallback(() => {
+    const b = borrowRef.current;
+    if (b) {
+      returnBorrow(b, 'close');
+      borrowRef.current = null;
+    }
+    close();
+  }, [close]);
+
+
+
 
   // ── FLIP clone state ──
   // When origin is present, we mount a transform-only expanding poster clone
