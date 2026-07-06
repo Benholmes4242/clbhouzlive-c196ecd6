@@ -61,6 +61,8 @@ export const LightCardFeed: React.FC<LightCardFeedProps> = ({
   getCommentCount,
   onNearEnd,
   hasNextPage,
+  fetchNextPage,
+  isFetchingNextPage,
   topPadding = 0,
   bottomPadding = 32,
   onFollow,
