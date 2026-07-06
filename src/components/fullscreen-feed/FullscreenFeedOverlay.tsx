@@ -26,8 +26,7 @@ import { useManageableBusinessIds } from '@/hooks/useManageableBusinessIds';
 import { canManagePost } from '@/lib/canManagePost';
 import { getActorRouteByType } from '@/types/actor';
 // [VIDEOSTUB] FullscreenDebugPanel + mobileVideoDebug imports removed — engine severed.
-import { fsv, fsvViewport, vdiff } from '@/perf/fsvTelemetry';
-import { isPerfEnabled } from '@/perf/navTiming';
+import { fsv, fsvViewport } from '@/perf/fsvTelemetry';
 const fsTimeStart = (_label: string) => {};
 const fsTimeEnd = (_label: string, _note?: string) => {};
 const fsEvent = (_label: string, _data?: unknown) => {};
