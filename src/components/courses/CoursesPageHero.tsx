@@ -114,6 +114,7 @@ function CoursesPageHeroInner() {
                   color: '#F7931E',
                   marginBottom: 8,
                   fontFeatureSettings: '"tnum" 1',
+                  textShadow: '0 1px 2px rgba(15,18,25,0.45)',
                 }}
               >
                 {eyebrowParts.join(' · ')}
