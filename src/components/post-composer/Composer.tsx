@@ -33,7 +33,7 @@ import { useEditablePost } from '@/hooks/useEditablePost';
 import { useUpdatePost } from '@/hooks/useUpdatePost';
 import { useActiveActor } from '@/context/ActiveActorContext';
 import type { ActiveActor } from '@/types/actor';
-import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
+import { SquircleAvatar, LIGHT_HAIRLINE } from '@/components/ui/SquircleAvatar';
 import { CourseSearchSheet } from './CourseSearchSheet';
 import { TaggedCoursesSheet } from './TaggedCoursesSheet';
 import { MediaStage } from './MediaStage';
@@ -1121,7 +1121,7 @@ export function Composer({
                 src={displayActor.avatarUrl ?? undefined}
                 alt={displayActor.name}
                 size={36}
-                hideRing
+                hairlineRing ringColor={LIGHT_HAIRLINE}
               />
             </span>
             <span
@@ -1425,7 +1425,7 @@ export function Composer({
                 src={actor.avatarUrl ?? undefined}
                 alt={actor.name}
                 size={40}
-                hideRing
+                hairlineRing ringColor={LIGHT_HAIRLINE}
               />
               <div style={{ flex: 1, minWidth: 0, textAlign: 'left' }}>
                 <div style={{ fontSize: 14, fontWeight: isSelected ? 800 : 600, color: INK_2 }}>
