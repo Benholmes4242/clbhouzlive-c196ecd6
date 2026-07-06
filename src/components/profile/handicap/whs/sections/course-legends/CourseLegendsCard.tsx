@@ -103,7 +103,7 @@ const HolderCell: React.FC<HolderCellProps> = ({ short, holder, selfLabel }) => 
         fontFamily: FONT,
       }}
     >
-      <SquircleAvatar photoUrl={holder?.photo_url ?? null} muted={isEmpty} />
+      <LegendsSquircle photoUrl={holder?.photo_url ?? null} muted={isEmpty} />
 
       <div style={{ flex: 1, minWidth: 0 }}>
         <div
