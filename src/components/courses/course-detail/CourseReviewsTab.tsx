@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import { useFullscreenFeedStore } from '@/store/fullscreenFeedStore';
 import { openWithOrigin } from '@/lib/openWithOrigin';
-import { groupMultiMedia } from '@/components/media-system/utils/feedMapper';
+// groupMultiMedia intentionally not imported: posts are constructed one-per-review already grouped.
 
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
