@@ -33,7 +33,7 @@ export function CommentingAsIndicator({ isDark = false, className }: CommentingA
         src={activeActor.avatarUrl}
         alt={activeActor.name}
         fallback={activeActor.name.charAt(0).toUpperCase()}
-        hideRing
+        hairlineRing ringColor={LIGHT_HAIRLINE}
       />
       <span>
         Commenting as <span className="font-medium">{activeActor.name}</span>

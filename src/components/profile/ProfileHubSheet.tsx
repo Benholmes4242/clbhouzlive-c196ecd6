@@ -603,7 +603,7 @@ function ProfileHubSheet({
                         src={activeProfile.avatarUrl}
                         alt={activeProfile.name}
                         fallback={activeProfile.name?.charAt(0)?.toUpperCase() ?? '?'}
-                        hideRing
+                        hairlineRing ringColor={LIGHT_HAIRLINE}
                       />
                       <div className="flex-1 min-w-0">
                         <div

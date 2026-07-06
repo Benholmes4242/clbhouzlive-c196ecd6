@@ -73,7 +73,7 @@ const CommentPreview: React.FC<CommentPreviewProps> = ({ postId, totalComments, 
               alt={comment.username}
               userId={comment.user_id}
               size={24}
-              hideRing
+              hairlineRing ringColor={LIGHT_HAIRLINE}
             />
             <div className="flex-1 min-w-0">
               <div className="text-sm">

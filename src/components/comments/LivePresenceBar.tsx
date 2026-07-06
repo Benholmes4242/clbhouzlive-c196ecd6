@@ -113,7 +113,7 @@ export const LivePresenceBar: React.FC<LivePresenceBarProps> = ({
                   src={user.avatarUrl}
                   alt={user.name}
                   fallback={user.name.charAt(0)}
-                  hideRing
+                  hairlineRing ringColor={LIGHT_HAIRLINE}
                 />
                 {/* Pulse indicator */}
                 <div className={cn(

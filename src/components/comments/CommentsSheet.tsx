@@ -471,7 +471,7 @@ function CommentsSheet({
             src={comment.avatar_url}
             alt={comment.user_name}
             fallback={comment.user_name?.charAt(0) || '?'}
-            hideRing
+            hairlineRing ringColor={LIGHT_HAIRLINE}
           />
         </Pressable>
 
@@ -977,7 +977,7 @@ function CommentsSheet({
                             src={liker.avatarUrl}
                             alt={liker.displayName}
                             fallback={liker.displayName.charAt(0)}
-                            hideRing
+                            hairlineRing ringColor={LIGHT_HAIRLINE}
                           />
                           <div className="flex-1 min-w-0">
                             <p
@@ -1145,7 +1145,7 @@ function CommentsSheet({
                     src={effectiveActor?.avatarUrl}
                     alt={effectiveActor?.name || 'You'}
                     fallback={effectiveActor?.name?.charAt(0) || '?'}
-                    hideRing
+                    hairlineRing ringColor={LIGHT_HAIRLINE}
                   />
                   <div className="flex-1 min-w-0 relative">
                     {/* Mention autocomplete dropdown */}
@@ -1174,7 +1174,7 @@ function CommentsSheet({
                               src={u.avatar}
                               alt={u.display_name || u.username}
                               fallback={u.display_name?.charAt(0)?.toUpperCase() || '?'}
-                              hideRing
+                              hairlineRing ringColor={LIGHT_HAIRLINE}
                             />
                             <div className="flex flex-col min-w-0">
                               <span className="text-sm font-medium truncate text-foreground">
