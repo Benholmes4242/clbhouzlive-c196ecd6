@@ -155,6 +155,7 @@ export const InlineVideo: React.FC<Props> = ({
           pointerEvents: 'none',
         }}
       />
+      {isActive && <MuteToggle />}
     </div>
   );
 };
