@@ -3,8 +3,6 @@ import { useClubhouseStore } from '@/store/clubhouseStore';
 import { SnapVideoPlayer } from './SnapVideoPlayer';
 import { usePinchZoomPointer } from '@/hooks/usePinchZoomPointer';
 import { preloadHlsManifest } from '@/utils/hlsPreload';
-import { vdiff } from '@/perf/fsvTelemetry';
-import { isPerfEnabled } from '@/perf/navTiming';
 import type { MediaItem } from '@/components/media-system/types/media';
 
 
