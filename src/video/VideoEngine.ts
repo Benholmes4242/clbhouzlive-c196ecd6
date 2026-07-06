@@ -258,21 +258,36 @@ class VideoEngineImpl {
     const { hlsUrl, posterUrl = null, startPosition = -1, postId = null } = opts;
     // Same postId + same URL already loaded → no reload. This makes remount
     // (element moving between card hosts) cheap and avoids re-fetching HLS.
-    const alreadyLoaded =
+    // Shape-tolerant postId match: lane.postId may be stamped as either the
+    // bare postId or an ownerKey form ("<postId>:<index>"); accept either
+    // side matching or being a prefix of the other (dual-shape ownership
+    // fix — see Stage 7 PR-2 FIX 2). When it matches, ADOPT the incoming
+    // form so subsequent strict comparisons converge.
+    const samePost =
       lane.postId != null &&
-      lane.postId === postId &&
+      postId != null &&
+      (
+        lane.postId === postId ||
+        lane.postId.startsWith(postId + ':') ||
+        postId.startsWith(lane.postId + ':')
+      );
+    const alreadyLoaded =
+      samePost &&
       lane.hlsUrl === hlsUrl &&
       lane.state !== 'idle' &&
       lane.state !== 'error';
     if (alreadyLoaded) {
-      DBG(laneId, 'skip reload: same postId+url', { state: lane.state });
+      const adoptedPostId = lane.postId !== postId ? postId : undefined;
+      if (adoptedPostId !== undefined) lane.postId = postId;
+      DBG(laneId, 'skip reload: same postId+url', { state: lane.state, adoptedPostId });
       if (isFsv(laneId)) {
         fsvEl('eng.load', lane.el, {
-          laneId, postId, startPosition, alreadyLoaded: true, state: lane.state,
+          laneId, postId, startPosition, alreadyLoaded: true, state: lane.state, adoptedPostId,
         });
       }
       return;
     }
+
     const priorPostId = lane.postId;
     const priorHlsUrl = lane.hlsUrl;
     const priorFirstFrame = lane.firstFrame;
