@@ -1,6 +1,8 @@
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import { useFullscreenFeedStore } from '@/store/fullscreenFeedStore';
-import { flattenPostsToMedia } from '@/components/fullscreen-feed/flattenPostsToMedia';
+import { openWithOrigin } from '@/lib/openWithOrigin';
+import { groupMultiMedia } from '@/components/media-system/utils/feedMapper';
+
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
@@ -217,10 +219,15 @@ const CourseReviewsTab: React.FC<CourseReviewsTabProps> = ({
     setSearchQuery('');
   };
 
-  const handleReviewMediaClick = useCallback((media: ReviewMediaItem[], startIndex: number, review: CourseReview) => {
+  const handleReviewMediaClick = useCallback((
+    media: ReviewMediaItem[],
+    startIndex: number,
+    review: CourseReview,
+    originEl: HTMLElement | null,
+  ) => {
     if (!media || media.length === 0) return;
     const userProfile = review.user_profiles;
-    const posts: FeedPost[] = media.map((item) => {
+    const rawPosts: FeedPost[] = media.map((item) => {
       const isVideo = item.media_type === 'video';
       const mediaItem: MediaItemType = {
         id: item.id,
@@ -266,9 +273,25 @@ const CourseReviewsTab: React.FC<CourseReviewsTabProps> = ({
         tags: [],
       };
     });
-    const { flat } = flattenPostsToMedia(posts);
-    useFullscreenFeedStore.getState().open(flat, startIndex, { readOnly: true });
+    const grouped = groupMultiMedia(rawPosts);
+    const tapped = rawPosts[startIndex];
+    const parentIndex = Math.max(0, grouped.findIndex((p) => p.mediaItems.some((m) => m.id === tapped?.id)));
+    const parent = grouped[parentIndex];
+    const mediaId = tapped?.mediaItems?.[0]?.id ?? parent?.mediaItems?.[0]?.id ?? null;
+    const posterUrl = parent?.mediaItems?.find((m) => m.id === mediaId)?.thumbnailUrl
+      || parent?.mediaItems?.[0]?.thumbnailUrl
+      || null;
+    openWithOrigin({
+      posts: grouped,
+      index: parentIndex,
+      originEl,
+      posterUrl,
+      mediaId,
+      openedFrom: 'course-reviews',
+      options: { readOnly: true, hasNextPage: false },
+    });
   }, [courseName]);
+
 
   const reviews = reviewsData || [];
   const myReview = reviews.find((r) => r.user_id === user?.id);
@@ -551,9 +574,10 @@ const CourseReviewsTab: React.FC<CourseReviewsTabProps> = ({
             isHighlighted={isJustSubmittedOrUpdated}
             onToggleHelpful={handleToggleHelpful}
             onEditClick={handleRateClick}
-            onMediaClick={(index) => {
-              if (filteredMyReview.media) handleReviewMediaClick(filteredMyReview.media, index, filteredMyReview);
+            onMediaClick={(index, el) => {
+              if (filteredMyReview.media) handleReviewMediaClick(filteredMyReview.media, index, filteredMyReview, el);
             }}
+
             onUserClick={() => navigate(getProfilePathById(filteredMyReview.user_id))}
           />
           {(() => {
@@ -592,9 +616,10 @@ const CourseReviewsTab: React.FC<CourseReviewsTabProps> = ({
                   review={transformReview(review, isDeepLinked)}
                   isHighlighted={isDeepLinked}
                   onToggleHelpful={handleToggleHelpful}
-                  onMediaClick={(index) => {
-                    if (review.media) handleReviewMediaClick(review.media, index, review);
+                  onMediaClick={(index, el) => {
+                    if (review.media) handleReviewMediaClick(review.media, index, review, el);
                   }}
+
                   onUserClick={() => navigate(getProfilePathById(review.user_id))}
                 />
                 {response && <ResponseDisplay response={response} courseId={courseId} viewerClaim={businessClaim} />}

@@ -1,5 +1,5 @@
 import React, { useCallback, useMemo, useRef, useEffect } from 'react';
-import { useFullscreenFeedStore } from '@/store/fullscreenFeedStore';
+import { useFullscreenFeedStore, useIsViewerOwnedBy } from '@/store/fullscreenFeedStore';
 import type { FeedPost } from '@/components/media-system/types/media';
 import WatchTile from './WatchTile';
 import WatchGridSkeleton from './WatchGridSkeleton';
@@ -130,15 +130,17 @@ const WatchGrid: React.FC<WatchGridProps> = ({
     return () => observer.disconnect();
   }, [hasNextPage, isFetchingNextPage, fetchNextPage]);
 
-  // Sync new posts into fullscreen overlay
-  const { isOpen: isFullscreenOpen, appendPosts } = useFullscreenFeedStore();
+  // Sync new posts into fullscreen overlay — only when THIS surface owns it.
+  const isViewerOwnedByWatch = useIsViewerOwnedBy('watch');
+  const appendPosts = useFullscreenFeedStore((s) => s.appendPosts);
 
   useEffect(() => {
-    if (!isFullscreenOpen) return;
+    if (!isViewerOwnedByWatch) return;
     if (posts.length > 0) {
       appendPosts(posts);
     }
-  }, [posts.length, isFullscreenOpen, appendPosts]);
+  }, [posts.length, isViewerOwnedByWatch, appendPosts, posts]);
+
 
   // Distribute tiles across COLS by shortest-column algorithm.
   // Each column holds normalised heights (height ÷ columnWidth), so columns

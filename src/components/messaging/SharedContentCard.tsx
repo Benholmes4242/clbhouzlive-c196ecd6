@@ -280,10 +280,6 @@ function MomentShareCard({
     setCurrentIndex(prev => (prev - 1 + mediaUrls.length) % mediaUrls.length);
   };
 
-  const isVideo = (url: string) => {
-    return url.includes('.mp4') || url.includes('.mov') || url.includes('.webm');
-  };
-
   return (
     <div 
       className={cn(
@@ -297,13 +293,13 @@ function MomentShareCard({
       <div className="relative aspect-square overflow-hidden bg-muted">
         {mediaUrls.length > 0 ? (
           <>
-            {/* [VIDEOSTUB] Poster-only chassis — streaming <video> severed; render thumbnail/first frame. */}
+            {/* Poster-only chassis — image taps bubble to outer /post/ navigation. */}
             <img
               src={moment.thumbnail_url || mediaUrls[currentIndex]}
               alt="Shared moment"
               className="w-full h-full object-cover"
-              onClick={(e) => e.stopPropagation()}
             />
+
 
             
             {/* Navigation arrows for multiple media */}
@@ -337,14 +333,15 @@ function MomentShareCard({
               </>
             )}
 
-            {/* Play overlay for moment_id type */}
-            {moment.moment_id && !isVideo(mediaUrls[currentIndex]) && (
-              <div className="absolute inset-0 flex items-center justify-center bg-black/20">
+            {/* Play affordance for moment shares — thumbnail is a poster, always show. */}
+            {moment.moment_id && (
+              <div className="absolute inset-0 flex items-center justify-center bg-black/20 pointer-events-none">
                 <div className="h-12 w-12 rounded-full bg-white/90 flex items-center justify-center">
                   <Play className="h-6 w-6 text-primary fill-primary ml-1" />
                 </div>
               </div>
             )}
+
           </>
         ) : (
           <div className="w-full h-full flex items-center justify-center">

@@ -73,6 +73,7 @@ function ClipOfTheWeekHeroInner() {
 
   const handleTap = () => {
     openWithOrigin({
+      openedFrom: 'watch',
       posts: [buildPost()],
       index: 0,
       originEl: btnRef.current,

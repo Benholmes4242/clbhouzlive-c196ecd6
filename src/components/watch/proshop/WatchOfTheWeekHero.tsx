@@ -87,6 +87,7 @@ function WatchOfTheWeekHeroInner() {
     // Open fullscreen viewer with a synthetic single-post array. The viewer
     // accepts the FeedPost shape; we provide the minimum fields it needs.
     openWithOrigin({
+      openedFrom: 'watch',
       originEl: heroTileRef.current,
       posterUrl: pick.thumbnail_url ?? null,
       index: 0,

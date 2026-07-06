@@ -102,6 +102,7 @@ export default function WatchRailTile({
 
   const handleClick = useCallback(() => {
     openWithOrigin({
+      openedFrom: 'watch',
       posts: allPosts,
       index,
       originEl: cardRef.current,

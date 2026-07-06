@@ -64,6 +64,7 @@ function VideoHeroCardInner({ post, index, allPosts }: VideoHeroCardProps) {
   const btnRef = useRef<HTMLButtonElement>(null);
   const handleTap = useCallback(() => {
     openWithOrigin({
+      openedFrom: 'watch',
       posts: allPosts,
       index,
       originEl: btnRef.current,

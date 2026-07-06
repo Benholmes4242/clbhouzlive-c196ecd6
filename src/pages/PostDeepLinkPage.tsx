@@ -202,6 +202,7 @@ const PostDeepLinkPage: React.FC = () => {
     useFullscreenFeedStore.getState().open([feedPost], 0, {
       openCommentsInitially: shouldOpenComments,
       initialCommentId: navState?.initialCommentId ?? null,
+      openedFrom: 'post-deep-link',
       onClose: () => {
         // Go back if there's history; otherwise land on Clubhouse.
         if (window.history.length > 1) {
@@ -211,6 +212,7 @@ const PostDeepLinkPage: React.FC = () => {
         }
       },
     });
+
   }, [authLoading, user, isLoading, feedPost, navigate, navState, searchParams]);
 
   // --- Loading ---

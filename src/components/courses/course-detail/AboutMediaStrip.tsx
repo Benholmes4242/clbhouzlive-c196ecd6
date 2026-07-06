@@ -1,17 +1,15 @@
-import React, { useMemo } from 'react';
+import React, { useMemo, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Camera, Plus } from 'lucide-react';
-import SquareCardMedia from '@/components/explore/media/SquareCardMedia';
-import { CardType } from '@/components/explore/media/CardMediaTypes';
-import { adaptClubMediaArrayToExploreItems } from '@/lib/adapters/clubMediaToExplore';
+import { Camera, Play, Plus } from 'lucide-react';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { useClubMedia } from '@/hooks/useClubMedia';
 import { generateStreamThumbnailUrl } from '@/config/cloudflareStream';
-import { useFullscreenFeedStore } from '@/store/fullscreenFeedStore';
-import { flattenPostsToMedia, flatIndexFor } from '@/components/fullscreen-feed/flattenPostsToMedia';
+import { openWithOrigin } from '@/lib/openWithOrigin';
+import { groupMultiMedia } from '@/components/media-system/utils/feedMapper';
 import type { FeedPost, MediaItem } from '@/components/media-system/types/media';
 import { AMBER } from '@/features/courses/_shared/tokens';
 import { SectionHeader } from '@/components/ui/SectionHeader';
+
 
 interface AboutMediaStripProps {
   clubId: string;
@@ -41,11 +39,9 @@ const AboutMediaStrip: React.FC<AboutMediaStripProps> = ({ clubId, onSeeAllClick
 
   const { data: rawMedia, isLoading: loading } = useClubMedia(clubId, fetchLimit);
 
-  const items = useMemo(() => {
-    if (!rawMedia) return [];
-    const sliced = rawMedia.slice(0, maxItems);
-    return adaptClubMediaArrayToExploreItems(sliced);
-  }, [rawMedia, maxItems]);
+  // (Removed dependency on the legacy explore adapter; tiles derive
+  //  directly from `rawMedia` below.)
+
 
   const feedPosts = useMemo((): FeedPost[] => {
     if (!rawMedia) return [];
@@ -98,35 +94,25 @@ const AboutMediaStrip: React.FC<AboutMediaStripProps> = ({ clubId, onSeeAllClick
 
   const streamThumb = (uid: string) => generateStreamThumbnailUrl(uid);
 
-  const mediaTiles = (items ?? []).slice(0, maxItems).map((item) => {
-    const src = item.src ?? '';
-    const isVideo = item.type === 'video';
-
+  const mediaTiles = (rawMedia ?? []).slice(0, maxItems).map((raw: any) => {
+    const isVideo = raw.type === 'video';
+    const url = raw.url as string | undefined;
     if (isVideo) {
-      const uid = extractStreamUidFromHls(src);
-      const derivedThumb = uid ? streamThumb(uid) : undefined;
-      const apiThumb =
-        typeof item.media?.[0]?.media_url === 'string' && !item.media[0].media_url.endsWith('.m3u8')
-          ? item.media[0].media_url
-          : undefined;
-      const thumb = apiThumb || derivedThumb;
+      const uid = url ? extractStreamUidFromHls(url) : null;
+      const thumb = raw.thumbnailUrl || (uid ? streamThumb(uid) : undefined);
       return {
-        id: item.id,
+        id: raw.id,
         media_type: 'video' as const,
-        media_url: thumb ?? '/placeholder.svg',
-        thumbnail_url: thumb,
-        poster_url: thumb,
+        poster: thumb,
       };
     }
-
-    const img = item.media?.[0]?.media_url || src;
     return {
-      id: item.id,
+      id: raw.id,
       media_type: 'image' as const,
-      media_url: img || '/placeholder.svg',
-      thumbnail_url: img || undefined,
+      poster: raw.thumbnailUrl || url || '/placeholder.svg',
     };
   });
+
 
   const { photoCount, videoCount, totalCount } = useMemo(() => {
     if (loading || !rawMedia) return { photoCount: 0, videoCount: 0, totalCount: 0 };
@@ -250,18 +236,38 @@ const AboutMediaStrip: React.FC<AboutMediaStripProps> = ({ clubId, onSeeAllClick
         {mediaTiles.map((media, index) => {
           const isLastTile = index === mediaTiles.length - 1;
           const showOverflow = isLastTile && overflowCount > 0;
+          const btnRef = React.createRef<HTMLButtonElement>();
 
           return (
             <button
               key={media.id}
+              ref={btnRef}
               type="button"
               onClick={(e) => {
                 e.stopPropagation();
                 if (showOverflow) {
                   onSeeAllClick();
                 } else {
-                  const { flat, offsetsByParent } = flattenPostsToMedia(feedPosts);
-                  useFullscreenFeedStore.getState().open(flat, flatIndexFor(offsetsByParent, index, 0), { readOnly: true });
+                  const grouped = groupMultiMedia(feedPosts);
+                  const tapped = feedPosts[index];
+                  const parentIndex = Math.max(
+                    0,
+                    grouped.findIndex((p) => p.mediaItems.some((m) => m.id === tapped?.id)),
+                  );
+                  const parent = grouped[parentIndex];
+                  const mediaId = tapped?.mediaItems?.[0]?.id ?? parent?.mediaItems?.[0]?.id ?? null;
+                  const posterUrl = parent?.mediaItems?.find((m) => m.id === mediaId)?.thumbnailUrl
+                    || parent?.mediaItems?.[0]?.thumbnailUrl
+                    || null;
+                  openWithOrigin({
+                    posts: grouped,
+                    index: parentIndex,
+                    originEl: btnRef.current,
+                    posterUrl,
+                    mediaId,
+                    openedFrom: 'about-strip',
+                    options: { readOnly: true, hasNextPage: false },
+                  });
                 }
               }}
               style={{
@@ -271,12 +277,39 @@ const AboutMediaStrip: React.FC<AboutMediaStripProps> = ({ clubId, onSeeAllClick
                 overflow: 'hidden',
                 padding: 0,
                 border: 'none',
-                background: 'transparent',
+                background: '#0F172A',
                 cursor: 'pointer',
               }}
               aria-label="Open Media tab"
             >
-              <SquareCardMedia media={media} cardType={CardType.SQUARE} className="w-full h-full" />
+              {media.poster ? (
+                <img
+                  src={media.poster}
+                  alt=""
+                  loading="lazy"
+                  style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
+                />
+              ) : (
+                <div style={{ width: '100%', height: '100%', background: 'rgba(15,23,42,0.08)' }} />
+              )}
+
+              {media.media_type === 'video' && !showOverflow && (
+                <div
+                  style={{
+                    position: 'absolute', inset: 0,
+                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                    pointerEvents: 'none',
+                  }}
+                >
+                  <div style={{
+                    width: 32, height: 32, borderRadius: '50%',
+                    background: 'rgba(0,0,0,0.45)',
+                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  }}>
+                    <Play size={14} color="#fff" fill="#fff" />
+                  </div>
+                </div>
+              )}
 
               {showOverflow && (
                 <div
@@ -295,6 +328,7 @@ const AboutMediaStrip: React.FC<AboutMediaStripProps> = ({ clubId, onSeeAllClick
             </button>
           );
         })}
+
       </div>
     </div>
   );
