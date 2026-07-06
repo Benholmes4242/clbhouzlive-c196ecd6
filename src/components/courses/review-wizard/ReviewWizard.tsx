@@ -30,7 +30,7 @@ import { OverlayPortalProvider } from '@/context/OverlayPortalContext';
 import { toast } from 'sonner';
 import { useShareReview } from '@/hooks/useShareReview';
 import { useActiveActor } from '@/context/ActiveActorContext';
-import { useMedianStatusBar } from '@/hooks/useMedianStatusBar';
+// Chrome owned solely by AppRoutes; no local status-bar imports.
 import { formatCourseLocation } from '@/utils/courseLocation';
 import { MentionBottomSheet, type MentionSuggestion } from '@/components/shared/media/MentionBottomSheet';
 import { useVoiceRecorder } from '@/hooks/useVoiceRecorder';
