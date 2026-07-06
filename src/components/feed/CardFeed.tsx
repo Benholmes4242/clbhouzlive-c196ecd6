@@ -36,6 +36,38 @@ const CANVAS = '#15171F';
 /** How many neighbours on each side of the active card may mount a <video>. */
 const VIDEO_NEIGHBOUR_RADIUS = 1; // matches iOS ~3-decoder cap (active ±1 = 3)
 
+/**
+ * Reads fullscreen/borrow state from the store INSIDE the item wrapper so
+ * `itemContent` no longer depends on `fsOpen` / `borrowedOwnerKey` — that
+ * previously changed itemContent's identity on viewer-open and made
+ * react-virtuoso remount the borrowed card's FeedCard (visible in traces as
+ * a 1ms `inline.unmount` → `inline.mount` blip on the borrowed post).
+ *
+ * With this gate, viewer-open triggers only a local re-render of each
+ * mounted item — the borrowed card's InlineVideo survives (no unmount).
+ *
+ * The borrow ownerKey match accepts either the bare postId (engine writes
+ * the raw postId when InlineVideo loads) or a `${postId}:` prefix (rail
+ * lanes / carousel media use `${postId}:${mediaIndex}`).
+ */
+const FeedItemGate: React.FC<{
+  post: FeedPost;
+  index: number;
+  playingIdx: number;
+  activeIdx: number;
+  children: (v: { isActive: boolean; mountVideo: boolean }) => React.ReactNode;
+}> = ({ post, index, playingIdx, activeIdx, children }) => {
+  const fsOpen = useFullscreenFeedStore((s) => s.isOpen);
+  const borrowedOwnerKey = useFullscreenFeedStore((s) => s.borrow?.ownerKey ?? null);
+  const isBorrowedCard =
+    fsOpen && !!borrowedOwnerKey &&
+    (borrowedOwnerKey === post.id || borrowedOwnerKey.startsWith(`${post.id}:`));
+  const isActive = !fsOpen && index === playingIdx;
+  const isNear =
+    isBorrowedCard || (!fsOpen && Math.abs(index - activeIdx) <= VIDEO_NEIGHBOUR_RADIUS);
+  return <>{children({ isActive, mountVideo: isNear })}</>;
+};
+
 export interface CardFeedProps {
   posts: FeedPost[];
   onLike: (post: FeedPost, actor?: ActiveActor | null) => void;
@@ -303,11 +335,9 @@ export const CardFeed = forwardRef<CardFeedHandle, CardFeedProps>(function CardF
   const globalCarouselPositions = useClubhouseStore((s) => s.carouselPositions);
   const carouselPositions = tab ? (carouselPositionsByTab[tab] ?? globalCarouselPositions) : globalCarouselPositions;
   const openFullscreen = useFullscreenFeedStore((s) => s.open);
-  const fsOpen = useFullscreenFeedStore((s) => s.isOpen);
-  // Stage-7 PR-2: borrowed owner key (feed-active or rail). When the viewer
-  // is open on top of one of our cards, that card MUST keep its InlineVideo
-  // host mounted so returnBorrow can re-parent the live <video> back into it.
-  const borrowedOwnerKey = useFullscreenFeedStore((s) => s.borrow?.ownerKey ?? null);
+  // NOTE: fsOpen / borrow.ownerKey are intentionally NOT read at this level.
+  // They are consumed inside `FeedItemGate` so viewer-open doesn't change
+  // `itemContent` identity (which would remount the borrowed card).
 
   // Sync the active card to the global store so other consumers (top-bar
   // carousel chip, fullscreen handoff, etc.) stay in step. Routed to the
@@ -376,11 +406,6 @@ export const CardFeed = forwardRef<CardFeedHandle, CardFeedProps>(function CardF
 
 
       const initialSlide = carouselPositions.get(index) ?? 0;
-      const isBorrowedCard = fsOpen && !!borrowedOwnerKey &&
-        borrowedOwnerKey.startsWith(`${post.id}:`);
-      const isActive = !fsOpen && index === playingIdx; // PLAYS — settle-gated; suspended while fullscreen
-      const isNear = isBorrowedCard || (!fsOpen && Math.abs(index - activeIdx) <= VIDEO_NEIGHBOUR_RADIUS); // mounts InlineVideo + host so it's in the DOM before activation
-      const mountVideo = isNear;
       return (
         <div
           data-card-index={index}
@@ -394,28 +419,37 @@ export const CardFeed = forwardRef<CardFeedHandle, CardFeedProps>(function CardF
             }
           }}
         >
-          <FeedCard
+          <FeedItemGate
             post={post}
-            liked={!!likeState?.liked}
-            likeCount={likeState?.count ?? post.likeCount ?? 0}
-            commentCount={getCommentCount(post)}
-            onLike={onLike}
-            onComment={onComment}
-            onShare={onShare}
-            onProfile={onProfile}
-            onReviewTap={onReviewTap}
-            onCourse={onCourse}
-            onOpenMedia={handleOpenMedia}
-            isActive={isActive}
-            mountVideo={mountVideo}
-            initialMediaIndex={initialSlide}
-            onCarouselIndexChange={getCarouselChangeHandler(post.id)}
-            onFollow={onFollow}
-            currentUserId={currentUserId}
-            feedIndex={index}
-            isFirstCard={index === 0}
-            onContentReady={onFirstContentReady}
-          />
+            index={index}
+            playingIdx={playingIdx}
+            activeIdx={activeIdx}
+          >
+            {({ isActive, mountVideo }) => (
+              <FeedCard
+                post={post}
+                liked={!!likeState?.liked}
+                likeCount={likeState?.count ?? post.likeCount ?? 0}
+                commentCount={getCommentCount(post)}
+                onLike={onLike}
+                onComment={onComment}
+                onShare={onShare}
+                onProfile={onProfile}
+                onReviewTap={onReviewTap}
+                onCourse={onCourse}
+                onOpenMedia={handleOpenMedia}
+                isActive={isActive}
+                mountVideo={mountVideo}
+                initialMediaIndex={initialSlide}
+                onCarouselIndexChange={getCarouselChangeHandler(post.id)}
+                onFollow={onFollow}
+                currentUserId={currentUserId}
+                feedIndex={index}
+                isFirstCard={index === 0}
+                onContentReady={onFirstContentReady}
+              />
+            )}
+          </FeedItemGate>
           {/* Subtle inter-card seam — just-perceptible lift above ink chrome */}
           <div aria-hidden style={{ height: 5, background: '#1E212B' }} />
         </div>
@@ -423,10 +457,7 @@ export const CardFeed = forwardRef<CardFeedHandle, CardFeedProps>(function CardF
     },
     [
       activeIdx,
-      playingIdx,        // isActive keys off playingIdx; without this the
-                         // settle-promoted play index never reaches the tiles
-      fsOpen,            // recompute isActive/isNear when fullscreen opens/closes
-      borrowedOwnerKey,  // keeps the borrowed card's host mounted while fs open
+      playingIdx,
       carouselPositions,
       getCarouselChangeHandler,
       getCommentCount,

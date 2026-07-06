@@ -29,6 +29,26 @@ const DIVIDER = '#E5E7EA';
 /** How many neighbours on each side of the active card may mount a <video>. */
 const VIDEO_NEIGHBOUR_RADIUS = 1;
 
+/** See CardFeed.FeedItemGate — same rationale (decouple viewer-open from
+ *  `itemContent` identity so react-virtuoso doesn't remount the borrowed card). */
+const LightItemGate: React.FC<{
+  post: FeedPost;
+  index: number;
+  playingIdx: number;
+  activeIdx: number;
+  children: (v: { isActive: boolean; mountVideo: boolean }) => React.ReactNode;
+}> = ({ post, index, playingIdx, activeIdx, children }) => {
+  const fsOpen = useFullscreenFeedStore((s) => s.isOpen);
+  const borrowedOwnerKey = useFullscreenFeedStore((s) => s.borrow?.ownerKey ?? null);
+  const isBorrowedCard =
+    fsOpen && !!borrowedOwnerKey &&
+    (borrowedOwnerKey === post.id || borrowedOwnerKey.startsWith(`${post.id}:`));
+  const isActive = !fsOpen && index === playingIdx;
+  const isNear =
+    isBorrowedCard || (!fsOpen && Math.abs(index - activeIdx) <= VIDEO_NEIGHBOUR_RADIUS);
+  return <>{children({ isActive, mountVideo: isNear })}</>;
+};
+
 export interface LightCardFeedProps {
   posts: FeedPost[];
   onLike: (post: FeedPost, actor?: ActiveActor | null) => void;
@@ -159,9 +179,7 @@ export const LightCardFeed: React.FC<LightCardFeedProps> = ({
   const setCarouselPosition = useClubhouseStore((s) => s.setCarouselPosition);
   const carouselPositions = useClubhouseStore((s) => s.carouselPositions);
   const openFullscreen = useFullscreenFeedStore((s) => s.open);
-  const fsOpen = useFullscreenFeedStore((s) => s.isOpen);
-  // Stage-7 PR-2: borrowed owner key — keep origin card host alive on borrow.
-  const borrowedOwnerKey = useFullscreenFeedStore((s) => s.borrow?.ownerKey ?? null);
+  // fsOpen / borrow.ownerKey consumed inside `LightItemGate` — see CardFeed.
 
   useEffect(() => {
     setActiveIndex(activeIdx);
@@ -233,11 +251,6 @@ export const LightCardFeed: React.FC<LightCardFeedProps> = ({
     (index: number, post: FeedPost) => {
       const likeState = getLikeState(post);
       const initialSlide = carouselPositions.get(index) ?? 0;
-      const isBorrowedCard = fsOpen && !!borrowedOwnerKey &&
-        borrowedOwnerKey.startsWith(`${post.id}:`);
-      const isActive = !fsOpen && index === playingIdx;
-      const isNear = isBorrowedCard || (!fsOpen && Math.abs(index - activeIdx) <= VIDEO_NEIGHBOUR_RADIUS);
-      const mountVideo = isNear;
       return (
         <div
           data-card-index={index}
@@ -251,26 +264,35 @@ export const LightCardFeed: React.FC<LightCardFeedProps> = ({
             }
           }}
         >
-          <LightFeedCard
+          <LightItemGate
             post={post}
-            liked={!!likeState?.liked}
-            likeCount={likeState?.count ?? post.likeCount ?? 0}
-            commentCount={getCommentCount(post)}
-            onLike={onLike}
-            onComment={onComment}
-            onShare={onShare}
-            onProfile={onProfile}
-            onReviewTap={onReviewTap}
-            onCourse={onCourse}
-            onOpenMedia={handleOpenMedia}
-            isActive={isActive}
-            mountVideo={mountVideo}
-            initialMediaIndex={initialSlide}
-            onCarouselIndexChange={getCarouselChangeHandler(post.id)}
-            onFollow={onFollow}
-            currentUserId={currentUserId}
-            feedIndex={index}
-          />
+            index={index}
+            playingIdx={playingIdx}
+            activeIdx={activeIdx}
+          >
+            {({ isActive, mountVideo }) => (
+              <LightFeedCard
+                post={post}
+                liked={!!likeState?.liked}
+                likeCount={likeState?.count ?? post.likeCount ?? 0}
+                commentCount={getCommentCount(post)}
+                onLike={onLike}
+                onComment={onComment}
+                onShare={onShare}
+                onProfile={onProfile}
+                onReviewTap={onReviewTap}
+                onCourse={onCourse}
+                onOpenMedia={handleOpenMedia}
+                isActive={isActive}
+                mountVideo={mountVideo}
+                initialMediaIndex={initialSlide}
+                onCarouselIndexChange={getCarouselChangeHandler(post.id)}
+                onFollow={onFollow}
+                currentUserId={currentUserId}
+                feedIndex={index}
+              />
+            )}
+          </LightItemGate>
           {/* Inter-card divider — a touch darker than the page bg */}
           <div aria-hidden style={{ height: 5, background: DIVIDER }} />
         </div>
@@ -279,8 +301,6 @@ export const LightCardFeed: React.FC<LightCardFeedProps> = ({
     [
       activeIdx,
       playingIdx,
-      fsOpen,
-      borrowedOwnerKey,
       carouselPositions,
       getCarouselChangeHandler,
       getCommentCount,
