@@ -305,22 +305,31 @@ const CoursesContent: React.FC<CoursesContentProps> = ({ username, displayName }
           </TabsContent>
         </Tabs>
       ) : (
-        /* Main courses page - show Explore, Global Top 100, and Friends' Courses */
+        /* Main courses page - shared cinematic hero + sticky tab row above content */
         <>
-          <ShellSlot>
+          <CoursesPageHero />
+
+          <div
+            style={{
+              position: 'sticky',
+              top: 0,
+              zIndex: 30,
+              background: 'rgba(248,250,252,0.88)',
+              backdropFilter: 'blur(14px)',
+              WebkitBackdropFilter: 'blur(14px)',
+              borderBottom: '0.5px solid rgba(15,23,42,0.08)',
+            }}
+          >
             <CoursesShellTabs
               activeTab={activeTab as 'explore' | 'top100' | 'discover'}
               onTabChange={handleTabChange}
             />
-          </ShellSlot>
+          </div>
 
           {activeTab === 'discover' ? (
-            /* Compact rank-led hero — needs chrome offset so it clears the sticky tab row */
-            <div style={{ paddingTop: 'var(--chrome-total-h, 0px)' }}>
-              <ExploreTabContent embedded />
-            </div>
+            <ExploreTabContent embedded />
           ) : (
-            <div className="px-4" style={{ paddingTop: 'var(--chrome-total-h, 0px)' }}>
+            <div className="px-4">
               {/* Rate a Course nudge — data-driven (played-but-unrated) */}
               {user && (
                 <RateNudge
