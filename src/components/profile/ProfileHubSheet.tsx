@@ -26,7 +26,7 @@ import {
 import { useUnreadNotifications } from '@/hooks/useUnreadNotifications';
 import { useMessagingContext } from '@/contexts/MessagingContext';
 import { useNavigate } from 'react-router-dom';
-import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
+import { SquircleAvatar, LIGHT_HAIRLINE } from '@/components/ui/SquircleAvatar';
 import { useLogout } from '@/hooks/useLogout';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useEditProfileRoute } from '@/hooks/useEditProfileRoute';

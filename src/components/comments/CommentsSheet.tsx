@@ -27,7 +27,7 @@ import { useEditorialComments } from '@/hooks/useEditorialComments';
 import { useCommentsRealtime } from '@/hooks/useCommentsRealtime';
 import { useActiveActor } from '@/context/ActiveActorContext';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
-import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
+import { SquircleAvatar, LIGHT_HAIRLINE } from '@/components/ui/SquircleAvatar';
 import { Pressable } from '@/components/ui/Pressable';
 import { MentionText } from '@/components/comments/MentionText';
 import { CommentingAsIndicator } from '@/components/comments/CommentingAsIndicator';
