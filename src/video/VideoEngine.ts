@@ -639,6 +639,11 @@ class VideoEngineImpl {
     // cards (caller != lane.postId) must NOT pause the incoming card that
     // already took the lane. Null caller = engine-wide (pauseAll/visibility/
     // release) — always allowed.
+    // INVARIANT: callers MUST pass ownerKey-form (ownerKey ?? postId). Bare
+    // pauses on ownerKey-owned lanes are rejected as stale by design — this
+    // preserves per-slide granularity for carousel media. Do not soften the
+    // strict compare here; reconcile shapes at the caller boundary instead.
+
     if (caller != null && lane.postId != null && caller !== lane.postId) {
       if (isFsv(laneId)) {
         fsv('eng.pause.stale', { laneId, caller, lanePostId: lane.postId });
