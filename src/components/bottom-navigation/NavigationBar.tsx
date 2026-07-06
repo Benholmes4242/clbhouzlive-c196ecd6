@@ -46,6 +46,17 @@ const NavigationBar: React.FC<NavigationBarProps> = ({
   const isClubhouseTheme = variant === 'clubhouse';
   const borderColor = isClubhouseTheme ? 'hsl(var(--clubhouse-border))' : 'hsl(215 25% 27% / 0.2)';
 
+  // Per-tab optical size map — glyph pixel size so all five icons read the same
+  // on the row. Boxes/tap targets remain uniform; only the inner glyph varies.
+  const ICON_OPTICAL_PX: Record<string, number> = {
+    clubhouse: 28,
+    watch: 27,
+    post: 26,
+    courses: 29,
+    tourhub: 28,
+  };
+  const DEFAULT_ICON_PX = 28;
+
   
   return (
     <>
