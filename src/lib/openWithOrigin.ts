@@ -125,45 +125,75 @@ export function openWithOrigin({
     posterUrl: posterUrl ?? null,
   });
 
+  // ── Stage-7 PR-1: borrow decision ──
+  // If the tapped tile is currently holding a live rail-pool lane for THIS
+  // post, borrow the element: pin the lane in the pool, hand a descriptor to
+  // the store, and skip the startPosition ladder entirely (the element keeps
+  // playing — no seek required). Non-borrow openers (deep links, image
+  // posts, cold tiles) fall through to today's ladder.
+  let borrow: BorrowDescriptor | null = null;
+  if (railOwnerKey && postId) {
+    try {
+      const liveLane = RailLanePool.laneFor(railOwnerKey);
+      if (liveLane) {
+        borrow = {
+          laneId: liveLane,
+          ownerKey: railOwnerKey,
+          postId,
+          posterUrl: posterUrl ?? null,
+          viewportW: typeof window !== 'undefined' ? window.innerWidth : 0,
+          viewportH: typeof window !== 'undefined' ? window.innerHeight : 0,
+        };
+        RailLanePool.pin(liveLane);
+        BORROW_DBG('pin', { ownerKey: railOwnerKey, laneId: liveLane, postId });
+      }
+    } catch {
+      /* pool not ready — no borrow */
+    }
+  }
+
   // Two-way resume: prefer the tile's live rail-lane playhead (Watch tap),
   // then the feed-active lane (Clubhouse tap), then the engine's session
-  // lastPos map.
+  // lastPos map. Skipped entirely for borrow opens (element carries state).
   let startPosition = 0;
-  let startSource: 'railLane' | 'feedSnap' | 'lastPos' | 'zero' = 'zero';
+  let startSource: 'railLane' | 'feedSnap' | 'lastPos' | 'zero' | 'borrow' = 'zero';
   let railLaneCT = -1;
   let feedSnapCT = -1;
   let lastPosCT = -1;
-  try {
-    if (railOwnerKey) {
-
-      railLaneCT = RailLanePool.getCurrentTime(railOwnerKey);
-      if (railLaneCT > 0.1) {
-        startPosition = railLaneCT;
-        startSource = 'railLane';
+  if (borrow) {
+    startSource = 'borrow';
+  } else {
+    try {
+      if (railOwnerKey) {
+        railLaneCT = RailLanePool.getCurrentTime(railOwnerKey);
+        if (railLaneCT > 0.1) {
+          startPosition = railLaneCT;
+          startSource = 'railLane';
+        }
       }
-    }
-    if (startSource === 'zero') {
-      const feedSnap = VideoEngine.snapshot('feed-active');
-      feedSnapCT = feedSnap.currentTime;
-      // Ownership gate: only inherit the feed-active playhead when that
-      // lane is currently loaded for THIS post. lane.postId is written raw
-      // (either bare postId or `${postId}:${mediaIndex}` ownerKey depending
-      // on which entry point wrote last) — match exact OR `${postId}:` prefix.
-      const owns =
-        feedSnap.postId != null &&
-        postId != null &&
-        (feedSnap.postId === postId || feedSnap.postId.startsWith(postId + ':'));
-      if (owns && feedSnap.currentTime > 0) {
-        startPosition = feedSnap.currentTime;
-        startSource = 'feedSnap';
-      } else if (postId) {
-        lastPosCT = VideoEngine.getLastPos(postId);
-        startPosition = lastPosCT;
-        startSource = 'lastPos';
+      if (startSource === 'zero') {
+        const feedSnap = VideoEngine.snapshot('feed-active');
+        feedSnapCT = feedSnap.currentTime;
+        // Ownership gate: only inherit the feed-active playhead when that
+        // lane is currently loaded for THIS post. lane.postId is written raw
+        // (either bare postId or `${postId}:${mediaIndex}` ownerKey depending
+        // on which entry point wrote last) — match exact OR `${postId}:` prefix.
+        const owns =
+          feedSnap.postId != null &&
+          postId != null &&
+          (feedSnap.postId === postId || feedSnap.postId.startsWith(postId + ':'));
+        if (owns && feedSnap.currentTime > 0) {
+          startPosition = feedSnap.currentTime;
+          startSource = 'feedSnap';
+        } else if (postId) {
+          lastPosCT = VideoEngine.getLastPos(postId);
+          startPosition = lastPosCT;
+          startSource = 'lastPos';
+        }
       }
+    } catch {
+      /* engine may not be booted yet on deep-link openers */
     }
-  } catch {
-    /* engine may not be booted yet on deep-link openers */
   }
   fsv('tap.start', {
     postId,
@@ -173,6 +203,7 @@ export function openWithOrigin({
     feedSnapCT: +feedSnapCT.toFixed(3),
     feedSnapPostId: (() => { try { return VideoEngine.snapshot('feed-active').postId; } catch { return null; } })(),
     lastPosCT: +lastPosCT.toFixed(3),
+    borrow: !!borrow,
   });
 
 
@@ -199,6 +230,7 @@ export function openWithOrigin({
     mediaIndex: mediaIndex ?? 0,
     mediaId: mediaId ?? null,
     openedFrom,
+    borrow,
   });
 
   fsv('tap.storeOpen', {
@@ -206,5 +238,6 @@ export function openWithOrigin({
     startPosition: +startPosition.toFixed(3),
     mediaIndex: mediaIndex ?? 0,
     mediaId: mediaId ?? null,
+    borrow: !!borrow,
   });
 }
