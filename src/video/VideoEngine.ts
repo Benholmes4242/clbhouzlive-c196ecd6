@@ -258,21 +258,36 @@ class VideoEngineImpl {
     const { hlsUrl, posterUrl = null, startPosition = -1, postId = null } = opts;
     // Same postId + same URL already loaded → no reload. This makes remount
     // (element moving between card hosts) cheap and avoids re-fetching HLS.
-    const alreadyLoaded =
+    // Shape-tolerant postId match: lane.postId may be stamped as either the
+    // bare postId or an ownerKey form ("<postId>:<index>"); accept either
+    // side matching or being a prefix of the other (dual-shape ownership
+    // fix — see Stage 7 PR-2 FIX 2). When it matches, ADOPT the incoming
+    // form so subsequent strict comparisons converge.
+    const samePost =
       lane.postId != null &&
-      lane.postId === postId &&
+      postId != null &&
+      (
+        lane.postId === postId ||
+        lane.postId.startsWith(postId + ':') ||
+        postId.startsWith(lane.postId + ':')
+      );
+    const alreadyLoaded =
+      samePost &&
       lane.hlsUrl === hlsUrl &&
       lane.state !== 'idle' &&
       lane.state !== 'error';
     if (alreadyLoaded) {
-      DBG(laneId, 'skip reload: same postId+url', { state: lane.state });
+      const adoptedPostId = lane.postId !== postId ? postId : undefined;
+      if (adoptedPostId !== undefined) lane.postId = postId;
+      DBG(laneId, 'skip reload: same postId+url', { state: lane.state, adoptedPostId });
       if (isFsv(laneId)) {
         fsvEl('eng.load', lane.el, {
-          laneId, postId, startPosition, alreadyLoaded: true, state: lane.state,
+          laneId, postId, startPosition, alreadyLoaded: true, state: lane.state, adoptedPostId,
         });
       }
       return;
     }
+
     const priorPostId = lane.postId;
     const priorHlsUrl = lane.hlsUrl;
     const priorFirstFrame = lane.firstFrame;
@@ -490,8 +505,19 @@ class VideoEngineImpl {
     const onRateChange = () => { if (trace) fsvEl('el.ratechange', el, { laneId: lane.id, rate: el.playbackRate }); };
     const onCanPlayThru = () => { if (trace) fsvEl('el.canplaythru', el, { laneId: lane.id }); };
     const onTime = () => {
-      if (lane.postId) this.lastPos.set(lane.postId, lane.el.currentTime || 0);
+      if (lane.postId) {
+        const t = lane.el.currentTime || 0;
+        this.lastPos.set(lane.postId, t);
+        // Dual-shape ownership: when lane.postId is stamped in ownerKey form
+        // ("<postId>:<index>"), mirror the write to the bare postId so any
+        // bare reader (InlineVideo resume, openWithOrigin ladder,
+        // FullscreenVideoSlot storedStart) resolves regardless of which form
+        // owned the lane. Cheap extra Map.set at ~4Hz.
+        const colon = lane.postId.indexOf(':');
+        if (colon > 0) this.lastPos.set(lane.postId.slice(0, colon), t);
+      }
       if (trace) fsvTimeSample(`${lane.id}:time`, el, { laneId: lane.id, target: lane.startPosition });
+
       if (!lane.firstFrame) markReadyToShow('timeupdate');
       // Gapless loop for short clips (<15s): native loop leaves a 100-300ms
       // gap on iOS HLS. Preempt the seam by seeking to 0 + play() ourselves.
