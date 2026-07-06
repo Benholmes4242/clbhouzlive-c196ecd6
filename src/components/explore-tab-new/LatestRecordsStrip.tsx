@@ -6,6 +6,7 @@ import {
   type RecentCourseRecord,
 } from '@/hooks/gam/useRecentCourseRecords';
 import { SectionHeader } from '@/components/ui/SectionHeader';
+import { SquircleAvatar, LIGHT_HAIRLINE } from '@/components/ui/SquircleAvatar';
 import {
   INK,
   INK_MUTE,
@@ -243,32 +244,14 @@ function RecordHeroCard({ record, onTap }: CardProps) {
         }}
       >
         <div style={{ position: 'relative', flexShrink: 0 }}>
-          <div
-            style={{
-              width: 34,
-              height: 34,
-              borderRadius: 12, // ~34% squircle
-              overflow: 'hidden',
-              background: INK_TINT_06,
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              color: INK_MUTE,
-              fontSize: 12,
-              fontWeight: 700,
-            }}
-          >
-            {record.holder_avatar ? (
-              <img
-                src={record.holder_avatar}
-                alt=""
-                loading="lazy"
-                style={{ width: '100%', height: '100%', objectFit: 'cover' }}
-              />
-            ) : (
-              initials(holder)
-            )}
-          </div>
+          <SquircleAvatar
+            size={34}
+            src={record.holder_avatar}
+            alt={holder}
+            fallback={initials(holder)}
+            hairlineRing
+            ringColor={LIGHT_HAIRLINE}
+          />
           {/* Trophy badge */}
           <div
             style={{
