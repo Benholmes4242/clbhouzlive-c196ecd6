@@ -193,7 +193,9 @@ const CompactHeader: React.FC<CompactHeaderProps> = ({ className, hidden = false
     isTourTournamentRoute ||
     location.pathname === '/tourhub' ||
     location.pathname === '/tourhub/';
-  const overlayActive = tourHeroOverlay && isTourOverviewSurface;
+  // Courses landing: shared cinematic hero always renders under the header,
+  // so the CompactHeader is permanently in glass-overlay mode on that route.
+  const overlayActive = (tourHeroOverlay && isTourOverviewSurface) || isCoursesLandingRoute;
 
   // Chrome (shield + native status bar) is owned solely by AppRoutes now.
   // The previous useMedianStatusBar call here was already `enabled=false` and
