@@ -74,7 +74,7 @@ const Top100MapView: React.FC<Top100MapViewProps> = ({
   const navigate = useNavigate();
   const { session } = useSupabaseSession();
   
-  useMedianStatusBar("dark", "transparent", true, false);
+  // Chrome owned solely by AppRoutes (/top100/ is immersive → transparent).
 
   const mapContainerRef = useRef<HTMLDivElement | null>(null);
   const mapRef = useRef<mapboxgl.Map | null>(null);
