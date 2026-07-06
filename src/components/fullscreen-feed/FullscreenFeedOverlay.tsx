@@ -270,9 +270,16 @@ export function FullscreenFeedOverlay() {
         fsv('close.effect', {
           viewport: fsvViewport(),
         });
-        // FS_CLOSE currentTime read removed — playhead sync is nuked, and the
-        // fullscreen <video> is typically detached by the time this cleanup
-        // runs (always logged fsT=-1). Kept as a no-op boundary.
+        // Route-change guard: if the overlay is unmounting without an explicit
+        // close() (e.g. navigation) borrowRef still holds the descriptor. Run
+        // the return path so the pool is unpinned and the tile inherits its
+        // element again.
+        const stale = borrowRef.current;
+        if (stale) {
+          returnBorrow(stale, 'route');
+          borrowRef.current = null;
+        }
+
 
 
 
