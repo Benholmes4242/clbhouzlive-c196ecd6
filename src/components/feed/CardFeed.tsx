@@ -312,8 +312,6 @@ export const CardFeed = forwardRef<CardFeedHandle, CardFeedProps>(function CardF
     setActiveIndex(activeIdx, tab);
   }, [activeIdx, setActiveIndex, tab]);
 
-  const registerTabWarmer = useClubhouseStore((s) => s.registerTabWarmer);
-
   const handleOpenMedia = useCallback(
     (
       post: FeedPost,
