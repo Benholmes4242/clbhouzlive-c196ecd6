@@ -64,21 +64,6 @@ export const CourseMediaTile: React.FC<CourseMediaTileProps> = ({ post, index, f
       data-watch-tile-index={index}
       onClick={() => {
         const perMediaPosts = allPosts ?? [post];
-        let railCT = -1;
-        try { if (ownerKey) railCT = RailLanePool.getCurrentTime(ownerKey); } catch {}
-        vdiff('tile.tap', {
-          layer: 'course-tile',
-          postId: post.id,
-          mediaId: media?.id ?? null,
-          mediaType: media?.type ?? null,
-          hasHls: !!hlsUrl,
-          ownerKey,
-          railLaneCT: +railCT.toFixed(3),
-          railLaneReady: laneReady,
-          hasOrigin: !!tileRef.current,
-          index,
-          allPostsLen: perMediaPosts.length,
-        });
         onOpenFullscreen?.(perMediaPosts, index, {
           originEl: tileRef.current,
           railOwnerKey: ownerKey,
