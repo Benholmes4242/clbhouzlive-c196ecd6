@@ -4,12 +4,13 @@
  */
 
 import { useState, useEffect } from 'react';
-import { ChevronLeft, ChevronRight, Image, Link, MapPin, Loader2, ExternalLink, X } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Image, Link, MapPin, Loader2, ExternalLink, X, Play } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
 import { formatRatingValue } from '@/utils/formatters';
 import { AMBER, AMBER_TINT_10, AMBER_TINT_25, HAIRLINE_INK_10, HAIRLINE_INK_7, INK, INK_FAINT, INK_MUTE, INK_TINT_05, SHELL_BG, SURFACE } from './_shared/tokens';
+import { MediaPresenterDialog } from './MediaMessage';
 
 interface SharedMediaGalleryProps {
   conversationId: string;
@@ -51,6 +52,7 @@ export function SharedMediaGallery({ conversationId, onClose }: SharedMediaGalle
   const [courses, setCourses] = useState<CourseItem[]>([]);
   const [links, setLinks] = useState<LinkItem[]>([]);
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
+  const [selectedVideo, setSelectedVideo] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState<TabKey>('media');
 
   useEffect(() => {
@@ -210,16 +212,32 @@ export function SharedMediaGallery({ conversationId, onClose }: SharedMediaGalle
                 {media.map(item => (
                   <button
                     key={item.id}
-                    onClick={() => setSelectedImage(item.url)}
-                    className="overflow-hidden"
+                    onClick={() => item.type === 'video' ? setSelectedVideo(item.url) : setSelectedImage(item.url)}
+                    className="overflow-hidden relative"
                     style={{ aspectRatio: '1', borderRadius: 14, background: 'rgba(0,0,0,0.04)', border: 'none', cursor: 'pointer', padding: 0 }}
                   >
-                    {/* [VIDEOSTUB] Poster-only chassis — streaming <video> severed to <img>. */}
-                    <img
-                      src={item.type === 'image' ? item.url : ((item as any).thumbnail_url || item.url)}
-                      alt=""
-                      className="w-full h-full object-cover"
-                    />
+                    {item.type === 'image' ? (
+                      <img src={item.url} alt="" className="w-full h-full object-cover" />
+                    ) : (
+                      <>
+                        <video
+                          src={`${item.url}#t=0.001`}
+                          preload="metadata"
+                          muted
+                          playsInline
+                          aria-hidden
+                          className="w-full h-full object-cover"
+                        />
+                        <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+                          <div
+                            className="flex items-center justify-center rounded-full"
+                            style={{ width: 32, height: 32, background: 'rgba(0,0,0,0.55)' }}
+                          >
+                            <Play size={14} className="text-white" fill="currentColor" />
+                          </div>
+                        </div>
+                      </>
+                    )}
                   </button>
                 ))}
               </div>
