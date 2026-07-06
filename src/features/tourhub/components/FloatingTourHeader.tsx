@@ -5,9 +5,10 @@
  * Owns its own: positioning, scrim, safe-area, blur, status-bar transparency,
  * and shield lifecycle. No global event bus, no shared CSS vars.
  */
-import React, { useEffect } from 'react';
+import React from 'react';
 import { Menu, Search } from 'lucide-react';
-import { applyShieldColor } from '@/hooks/useMedianStatusBar';
+// Chrome (shield + status bar) owned solely by AppRoutes.
+
 
 export interface FloatingTourHeaderProps {
   onMenuTap: () => void;
