@@ -597,6 +597,17 @@ class VideoEngineImpl {
   pause(laneId: LaneId, opts: { callerPostId?: string | null } = {}): void {
     const lane = this.getLane(laneId);
     const caller = opts.callerPostId ?? null;
+    // BORROW GUARD (Stage-7 PR-1 fix): while a lane is borrowed by the
+    // fullscreen viewer, ignore owner-caller pauses — the ex-owner tile is
+    // no longer driving playback. Null-caller engine-wide pauses (pauseAll,
+    // document.hidden) MUST still pause borrowed lanes.
+    if (this.borrowedLanes.has(laneId) && caller != null) {
+      if (isFsv(laneId)) {
+        fsv('eng.pause.borrowed', { laneId, caller, lanePostId: lane.postId });
+      }
+      DBG('pause.borrowed', { laneId, caller });
+      return;
+    }
     // OWNER GUARD: only the current lane owner may pause it. Stale outgoing
     // cards (caller != lane.postId) must NOT pause the incoming card that
     // already took the lane. Null caller = engine-wide (pauseAll/visibility/
