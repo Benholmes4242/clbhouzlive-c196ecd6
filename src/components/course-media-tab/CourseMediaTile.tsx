@@ -55,6 +55,17 @@ export const CourseMediaTile: React.FC<CourseMediaTileProps> = ({ post, index, f
     postId: post.id,
   });
 
+  // Register the lane host with the origin registry so the fullscreen
+  // borrow-return path can find it on close. Only when this tile is a video
+  // lane candidate (otherwise there's nothing to return).
+  useEffect(() => {
+    if (!ownerKey) return;
+    const el = laneHostRef.current;
+    if (!el) return;
+    originHostRegistry.register(ownerKey, el);
+    return () => originHostRegistry.unregister(ownerKey, el);
+  }, [ownerKey, laneHostRef]);
+
   return (
     <div
       ref={tileRef}
