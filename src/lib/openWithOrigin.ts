@@ -57,8 +57,6 @@ interface OpenWithOriginArgs {
   index: number;
   originEl: HTMLElement | null | undefined;
   posterUrl: string | null | undefined;
-  /** HLS urls to hand off (typically the tapped tile's active url). */
-  handOffUrls?: (string | null | undefined)[];
   /**
    * Watch tiles rent a `rail-*` lane via `RailLanePool`. Passing the tile's
    * owner key lets us resume fullscreen at that lane's live playhead — so
@@ -89,7 +87,6 @@ export function openWithOrigin({
   index,
   originEl,
   posterUrl,
-  handOffUrls,
   railOwnerKey,
   mediaIndex,
   mediaId,
