@@ -1,6 +1,6 @@
 import React from 'react';
 import { useActiveActor } from '@/context/ActiveActorContext';
-import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
+import { SquircleAvatar, LIGHT_HAIRLINE } from '@/components/ui/SquircleAvatar';
 import { cn } from '@/lib/utils';
 
 interface CommentingAsIndicatorProps {
@@ -33,7 +33,7 @@ export function CommentingAsIndicator({ isDark = false, className }: CommentingA
         src={activeActor.avatarUrl}
         alt={activeActor.name}
         fallback={activeActor.name.charAt(0).toUpperCase()}
-        hideRing
+        hairlineRing ringColor={LIGHT_HAIRLINE}
       />
       <span>
         Commenting as <span className="font-medium">{activeActor.name}</span>

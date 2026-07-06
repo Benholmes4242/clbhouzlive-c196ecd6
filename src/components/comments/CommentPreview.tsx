@@ -9,7 +9,7 @@ import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import CommentsSheet from '@/components/comments/CommentsSheet';
 import { MentionText } from '@/components/comments/MentionText';
-import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
+import { SquircleAvatar, LIGHT_HAIRLINE } from '@/components/ui/SquircleAvatar';
 import { formatDistanceToNow } from 'date-fns';
 
 interface CommentPreviewProps {
@@ -73,7 +73,7 @@ const CommentPreview: React.FC<CommentPreviewProps> = ({ postId, totalComments, 
               alt={comment.username}
               userId={comment.user_id}
               size={24}
-              hideRing
+              hairlineRing ringColor={LIGHT_HAIRLINE}
             />
             <div className="flex-1 min-w-0">
               <div className="text-sm">

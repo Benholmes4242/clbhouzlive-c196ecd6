@@ -26,7 +26,7 @@ import {
 import { useUnreadNotifications } from '@/hooks/useUnreadNotifications';
 import { useMessagingContext } from '@/contexts/MessagingContext';
 import { useNavigate } from 'react-router-dom';
-import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
+import { SquircleAvatar, LIGHT_HAIRLINE } from '@/components/ui/SquircleAvatar';
 import { useLogout } from '@/hooks/useLogout';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useEditProfileRoute } from '@/hooks/useEditProfileRoute';
@@ -603,7 +603,7 @@ function ProfileHubSheet({
                         src={activeProfile.avatarUrl}
                         alt={activeProfile.name}
                         fallback={activeProfile.name?.charAt(0)?.toUpperCase() ?? '?'}
-                        hideRing
+                        hairlineRing ringColor={LIGHT_HAIRLINE}
                       />
                       <div className="flex-1 min-w-0">
                         <div

@@ -6,7 +6,7 @@ import React, { useEffect, useState, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import { supabase } from '@/integrations/supabase/client';
-import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
+import { SquircleAvatar, LIGHT_HAIRLINE } from '@/components/ui/SquircleAvatar';
 import type { RealtimeChannel } from '@supabase/supabase-js';
 
 interface PresenceUser {
@@ -113,7 +113,7 @@ export const LivePresenceBar: React.FC<LivePresenceBarProps> = ({
                   src={user.avatarUrl}
                   alt={user.name}
                   fallback={user.name.charAt(0)}
-                  hideRing
+                  hairlineRing ringColor={LIGHT_HAIRLINE}
                 />
                 {/* Pulse indicator */}
                 <div className={cn(
