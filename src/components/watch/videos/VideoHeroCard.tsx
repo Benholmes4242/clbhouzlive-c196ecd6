@@ -68,7 +68,6 @@ function VideoHeroCardInner({ post, index, allPosts }: VideoHeroCardProps) {
       index,
       originEl: btnRef.current,
       posterUrl: thumb || null,
-      handOffUrls: [(media as any)?.hlsUrl],
     });
   }, [allPosts, index, thumb, media]);
 

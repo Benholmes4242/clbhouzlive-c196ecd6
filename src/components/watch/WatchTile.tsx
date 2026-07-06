@@ -61,7 +61,6 @@ const WatchTile: React.FC<WatchTileProps> = ({ post, index, allPosts, onDecoded,
       index,
       originEl: rootRef.current as HTMLElement | null,
       posterUrl: thumbnailUrl ?? posterUrl ?? null,
-      handOffUrls: [media?.hlsUrl],
       railOwnerKey: ownerKey,
     });
   };

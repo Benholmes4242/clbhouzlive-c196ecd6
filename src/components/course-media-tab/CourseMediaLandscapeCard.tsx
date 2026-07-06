@@ -31,7 +31,6 @@ interface CourseMediaLandscapeCardProps {
       originEl: HTMLElement | null;
       railOwnerKey: string | null;
       posterUrl: string | null;
-      handOffUrls: (string | null | undefined)[];
     },
   ) => void;
 }
@@ -64,7 +63,6 @@ export const CourseMediaLandscapeCard: React.FC<CourseMediaLandscapeCardProps> =
           originEl: tileRef.current,
           railOwnerKey: ownerKey,
           posterUrl: thumbnailUrl || null,
-          handOffUrls: [hlsUrl],
         });
       }}
       style={{

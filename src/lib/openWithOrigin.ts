@@ -57,8 +57,6 @@ interface OpenWithOriginArgs {
   index: number;
   originEl: HTMLElement | null | undefined;
   posterUrl: string | null | undefined;
-  /** HLS urls to hand off (typically the tapped tile's active url). */
-  handOffUrls?: (string | null | undefined)[];
   /**
    * Watch tiles rent a `rail-*` lane via `RailLanePool`. Passing the tile's
    * owner key lets us resume fullscreen at that lane's live playhead — so
@@ -89,7 +87,6 @@ export function openWithOrigin({
   index,
   originEl,
   posterUrl,
-  handOffUrls,
   railOwnerKey,
   mediaIndex,
   mediaId,
@@ -134,7 +131,15 @@ export function openWithOrigin({
     if (startSource === 'zero') {
       const feedSnap = VideoEngine.snapshot('feed-active');
       feedSnapCT = feedSnap.currentTime;
-      if (postId && feedSnap.currentTime > 0) {
+      // Ownership gate: only inherit the feed-active playhead when that
+      // lane is currently loaded for THIS post. lane.postId is written raw
+      // (either bare postId or `${postId}:${mediaIndex}` ownerKey depending
+      // on which entry point wrote last) — match exact OR `${postId}:` prefix.
+      const owns =
+        feedSnap.postId != null &&
+        postId != null &&
+        (feedSnap.postId === postId || feedSnap.postId.startsWith(postId + ':'));
+      if (owns && feedSnap.currentTime > 0) {
         startPosition = feedSnap.currentTime;
         startSource = 'feedSnap';
       } else if (postId) {
@@ -152,12 +157,10 @@ export function openWithOrigin({
     source: startSource,
     railLaneCT: +railLaneCT.toFixed(3),
     feedSnapCT: +feedSnapCT.toFixed(3),
+    feedSnapPostId: (() => { try { return VideoEngine.snapshot('feed-active').postId; } catch { return null; } })(),
     lastPosCT: +lastPosCT.toFixed(3),
   });
 
-
-  // [VIDEOSTUB] Handoff + pool manager removed — poster-only chassis.
-  void handOffUrls;
 
   // Chrome flip at TAP time (not effect time) to kill the strobe. Scroll
   // lock is owned by the overlay's isOpen effect (ref-counted so it composes

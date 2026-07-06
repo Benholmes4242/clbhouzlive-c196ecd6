@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useCallback } from 'react';
+import React, { useState, useMemo, useCallback, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
 import { ChevronDown, Film, Flag, EyeOff, Link as LinkIcon, Loader2 } from 'lucide-react';
@@ -19,6 +19,7 @@ import { PostsFeedSkeleton } from './PostsFeedSkeleton';
 import type { FeedPost } from '@/components/media-system/types/media';
 import { LightCardFeed } from './LightCardFeed';
 import { useClubhouseStore } from '@/store/clubhouseStore';
+import { useFullscreenFeedStore } from '@/store/fullscreenFeedStore';
 
 import { useClubhouseLikes } from '@/components/clubhouse/hooks/useClubhouseLikes';
 import { useClubhouseFollows } from '@/components/clubhouse/hooks/useClubhouseFollows';
@@ -158,6 +159,26 @@ const PostsTabContent: React.FC<PostsTabContentProps> = ({
     if (hasNextPage && !isFetchingNextPage) fetchNextPage();
   }, [hasNextPage, isFetchingNextPage, fetchNextPage]);
 
+  // Mirror pagination state into the fullscreen store while the viewer is
+  // open, so swipes past the initially-loaded set can trigger more loads.
+  const isViewerOpen = useFullscreenFeedStore(s => s.isOpen);
+  const setPaginationState = useFullscreenFeedStore(s => s.setPaginationState);
+  useEffect(() => {
+    if (!isViewerOpen) return;
+    setPaginationState({
+      hasNextPage: hasNextPage ?? false,
+      isFetchingNextPage: isFetchingNextPage ?? false,
+    });
+  }, [isViewerOpen, hasNextPage, isFetchingNextPage, setPaginationState]);
+
+  // Append newly-loaded posts (already grouped at the hook) into the open
+  // viewer as growth occurs. Store dedupes by post id.
+  useEffect(() => {
+    if (!isViewerOpen) return;
+    useFullscreenFeedStore.getState().appendPosts(filteredPosts);
+  }, [isViewerOpen, filteredPosts]);
+
+
   const currentFilterLabel = FILTER_OPTIONS.find(o => o.value === activeFilter)?.label || 'All Posts';
 
   // ── Loading / error / empty states ──
@@ -256,6 +277,8 @@ const PostsTabContent: React.FC<PostsTabContentProps> = ({
           topPadding={0}
           bottomPadding={32}
           hasNextPage={hasNextPage}
+          fetchNextPage={fetchNextPage}
+          isFetchingNextPage={isFetchingNextPage}
           onNearEnd={handleNearEnd}
           onLike={(post) => handleLike(post)}
           onComment={openComments}

@@ -45,6 +45,10 @@ export interface LaneSnapshot {
   duration: number;
   muted: boolean;
   firstFrame: boolean;
+  /** RAW lane.postId — may be a bare postId or an ownerKey (`${postId}:${idx}`)
+   *  depending on which entry point wrote last. Consumers should handle both
+   *  shapes (exact match OR `${postId}:` prefix). Do NOT normalize here. */
+  postId: string | null;
   error?: string;
 }
 
@@ -666,6 +670,7 @@ class VideoEngineImpl {
       duration: isFinite(lane.el.duration) ? lane.el.duration : 0,
       muted: lane.el.muted,
       firstFrame: lane.firstFrame,
+      postId: lane.postId,
     };
   }
 
