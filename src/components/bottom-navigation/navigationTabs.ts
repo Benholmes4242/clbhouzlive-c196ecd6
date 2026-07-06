@@ -14,7 +14,7 @@ import PlusSquareIcon from '@/components/icons/PlusSquareIcon';
 export const navigationTabs = [
   { id: 'clubhouse', label: 'Home',      icon: HouseIcon,  path: '/' },
   { id: 'watch',     label: 'Watch',     icon: VideoIcon,  path: '/watch' },
-  { id: 'post',      label: 'Share',     icon: CameraIcon, path: null, isAction: true },
+  { id: 'post',      label: 'Share',     icon: PlusSquareIcon, path: null, isAction: true },
   { id: 'courses',   label: 'Courses',   icon: MapPinIcon, path: '/courses' },
   { id: 'tourhub',   label: 'Tour',      icon: TrophyIcon, path: '/tourhub' },
 ];
