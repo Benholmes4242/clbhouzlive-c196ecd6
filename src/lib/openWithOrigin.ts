@@ -15,11 +15,20 @@
  * falls back to today's plain opacity fade.
  */
 import type { FeedPost } from '@/components/media-system/types/media';
-import { useFullscreenFeedStore, type OpenOrigin } from '@/store/fullscreenFeedStore';
+import { useFullscreenFeedStore, type OpenOrigin, type BorrowDescriptor } from '@/store/fullscreenFeedStore';
 import { VideoEngine } from '@/video/VideoEngine';
 import { RailLanePool } from '@/video/railLanePool';
 import { fsv, fsvNewSession, fsvViewport } from '@/perf/fsvTelemetry';
+import { isPerfEnabled } from '@/perf/navTiming';
 // [VIDEOSTUB] HLSPoolManager + mobileVideoDebug imports removed — engine severed.
+
+const BORROW_DBG = (evt: string, payload: Record<string, unknown> = {}) => {
+  const flag =
+    typeof window !== 'undefined' && (window as any).__VIDEO_ENGINE_DBG__;
+  if (!flag && !isPerfEnabled()) return;
+  // eslint-disable-next-line no-console
+  console.info('[BORROW]', evt, payload);
+};
 
 
 function prefersReducedMotion(): boolean {
