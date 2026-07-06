@@ -13,6 +13,7 @@ import React, { useEffect, useRef } from 'react';
 import type { MediaItem } from '@/components/media-system/types/media';
 import { useVideoLane } from '@/video/useVideoLane';
 import { VideoEngine } from '@/video/VideoEngine';
+import { originHostRegistry } from '@/video/originHostRegistry';
 import { useClubhouseStore } from '@/store/clubhouseStore';
 import { fsv } from '@/perf/fsvTelemetry';
 
@@ -102,6 +103,18 @@ export const InlineVideo: React.FC<Props> = ({
     const id = requestAnimationFrame(() => onFirstFrameReady?.());
     return () => cancelAnimationFrame(id);
   }, [posterUrl, onFirstFrameReady]);
+
+  // Stage-7 PR-2: register this card's lane host in the origin registry so
+  // returnBorrow() can find it and animate the borrowed <video> back into the
+  // card on close. Element-identity guard in unregister protects against
+  // register/unregister races.
+  useEffect(() => {
+    if (!resolvedOwnerKey) return;
+    const host = lane.hostRef.current;
+    if (!host) return;
+    originHostRegistry.register(resolvedOwnerKey, host);
+    return () => originHostRegistry.unregister(resolvedOwnerKey, host);
+  }, [resolvedOwnerKey, lane.hostRef]);
 
   return (
     <div style={{ position: 'absolute', inset: 0, backgroundColor: '#0a0a0a' }}>

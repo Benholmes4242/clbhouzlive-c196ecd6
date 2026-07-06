@@ -1,57 +1,108 @@
-# Video Teardown to Poster-Only Chassis
+## Part 0 — Verification findings (from source)
 
-Goal: kill all real video playback (hls.js, pools, autoplay, prefetch) while keeping UI, layout, tap-to-open, FLIP, skeletons, LQIP identical. No new engine yet.
+**0a. HOST LIFETIME (CONFIRMED):**
+- `CardFeed.tsx:375-377` — `isActive = !fsOpen && index === playingIdx`, `isNear = !fsOpen && …`, `mountVideo = isNear`.
+- `LightCardFeed.tsx:234-236` — identical gating.
 
-Contract: every video surface renders its existing UI with a poster `<img>` where `<video>` used to be. All engine imports still resolve (stubbed), so nothing compiles-out.
+When the fullscreen viewer opens, `fsOpen` flips true → `isNear`/`mountVideo` become false on **every** card → `InlineVideo` unmounts. The origin card's lane host dies on open, so close-return always hits the target-gone fallback. Part 2 makes the borrowed card's host survive.
 
-## Stage A - Neutralize the core (engine goes inert, all imports resolve)
+**0b. UNMOUNT RACE (CONFIRMED):**
+- `useVideoLane.ts` has NO explicit `unmountLane` call — the mount effect (`:66-88`) only appends into the new host; the "old host wins" mechanic is `appendChild`'s atomic move.
+- BUT the real threat is the host `<div ref={lane.hostRef}>` (in `InlineVideo.tsx:131`) itself being **removed from the DOM** when `mountVideo` flips false. React unmounts the host `<div>`, and the engine's `<video>` element — currently parented to that div — is unmounted along with it, breaking playback. This is worse than a `pause()` call; the pause-guard doesn't cover it.
 
-Stubbed in place (keep file paths, exports, types, method names; bodies become no-ops / inert defaults):
+The engine's `unmountLane` (`VideoEngine.ts:224`) is called from `returnBorrow` itself; it isn't called by `useVideoLane`. So the Part 1 `unmountLane` guard is still needed as belt-and-braces protection against any future caller (and for tracing symmetry with `eng.pause.borrowed`) — but the **primary** fix is Part 2: keep the origin card's host `<div>` in the DOM while the viewer is open.
 
-- `src/media/runtime/*` - `MediaSystemProvider` returns inert context (no hls, `isPlaying:false`, no refs, no-op setters). `MediaRuntime` singleton methods become no-ops; subscribe returns `() => {}`.
-- `src/media/hooks/useHlsPool.ts` + `HLSPoolManager` - `attach/promote/demote/handOff/prefetch/release` all return `null`/`false`.
-- `src/media/hooks/useMediaAutoplay.ts`, `useTileVideoPlayer`, `usePausedFirstFrame`, `useVideoVisibility` - return inert shape (never active, no ref wired).
-- Add one boot log: `console.info('[VIDEOSTUB] active')` from `MediaSystemProvider` mount so we can confirm on device.
+---
 
-Result: nothing plays; app still compiles and runs.
+## Implementation plan
 
-## Stage B - Sever surfaces to poster-only (leaf-first, compile-safe)
+### Part 1 — Engine: extend borrow guard to `unmountLane`
+`src/video/VideoEngine.ts` `unmountLane(laneId)`:
+- If `this.borrowedLanes.has(laneId)`: log `DBG('unmount.borrowed', { laneId })` + `fsvEl('eng.unmount.borrowed', …)` and `return` early. Don't touch `lane.mountedHost` / `wantPlay`.
+- `returnBorrow`'s fallback park already calls `clearBorrowed` FIRST, so its own `unmountLane` executes normally.
 
-For every surface below: keep the file, the exported component name, the props, the outer layout, the reveal/LQIP/skeleton, and tap-to-open. Replace the `<video>` branch with an `<img>` bound to the existing poster / thumbnail URL. Where the poster URL is missing, wire it before removing the video branch so nothing goes blank.
+### Part 2 — Feeds: keep the borrowed card's host alive
+Both `CardFeed.tsx` and `LightCardFeed.tsx`:
+- Subscribe (Zustand selector) to `useFullscreenFeedStore(s => s.borrow?.ownerKey ?? null)` as `borrowedOwnerKey`. Memoized selector → non-borrow cards don't re-render on borrow change.
+- Change gate:
+  ```ts
+  const cardOwnerKey = `${post.id}:0`;
+  const isBorrowedCard = fsOpen && borrowedOwnerKey === cardOwnerKey;
+  const isActive = !fsOpen && index === playingIdx;
+  const isNear = isBorrowedCard || (!fsOpen && Math.abs(index - activeIdx) <= VIDEO_NEIGHBOUR_RADIUS);
+  const mountVideo = isNear;
+  ```
+- `isActive` stays false for the borrowed card while viewer is open — engine pause-guard + Part 1 unmount-guard cover any residual activation traffic.
+- All other cards keep their existing `!fsOpen` gating.
 
-- **B1 Grids**: `UnifiedMediaTile`, `UnifiedMediaGrid`, `grid/MediaTile`, `HeroTile`, `UniversalMediaGrid`, `useGridMediaRuntime`, `media-grid/MediaDisplay`, `posts/MediaGrid`.
-- **B2 Autoplay wrappers**: `WatchAutoplay`, `ExploreAutoplay`, `FriendsAutoplay`, `CourseMediaAutoplay`, `AutoplayVideoCard`, `CarouselRow`, `WatchOfTheWeekHero`, `WatchRailTile`.
-- **B3 Feed**: `InlineVideo` gutted to a poster `<img>` (file + export preserved). `MediaCarousel` always passes `renderPosterOnly=true`. `CardFeed`, `FeedCard`, `LightFeedCard`, `FeedSlide`, `SnapFeed` keep card UI, drop video slot wiring.
-- **B4 Fullscreen**: `SnapVideoPlayer` poster-only. `FullscreenFeedOverlay` keeps FLIP expand, layout, chrome; the "player" is a poster. `openWithOrigin` keeps snapshot, drops `handOff`.
-- **B5 Profile / course / misc**: `profile-v2/HeroMedia`, `MomentCard`, `MomentFullscreenViewer`, `AboutMediaStrip`, `MiniPlayer`, `MediaPreviewViewer`, `KeyframePlayer`, `VideoScrubber` (UI only), `messaging/MediaMessage`.
+### Part 3 — Origin host registration (feed variant)
+`src/components/feed/InlineVideo.tsx`:
+- Add `useEffect` that, when `resolvedOwnerKey && lane.hostRef.current`, calls `originHostRegistry.register(resolvedOwnerKey, lane.hostRef.current)`; cleanup calls `originHostRegistry.unregister(resolvedOwnerKey, lane.hostRef.current)` (element-identity guard already in registry).
 
-## Stage C - Sever side-systems
+### Part 4 — `openWithOrigin`: feed borrow detection
+`src/lib/openWithOrigin.ts`, after the existing rail-lane borrow block, if `borrow` still null:
+```ts
+if (!borrow && postId) {
+  try {
+    const snap = VideoEngine.snapshot('feed-active');
+    const candidateOwnerKey = `${postId}:${mediaIndex ?? 0}`;
+    const owns = snap.postId != null && (
+      snap.postId === candidateOwnerKey ||
+      snap.postId === postId ||
+      snap.postId.startsWith(postId + ':')
+    );
+    const isLive = (snap.state === 'playing' || snap.state === 'ready') && snap.currentTime > 0;
+    if (owns && isLive) {
+      borrow = {
+        laneId: 'feed-active',
+        ownerKey: snap.postId ?? candidateOwnerKey,
+        postId,
+        posterUrl: posterUrl ?? null,
+        viewportW: window.innerWidth,
+        viewportH: window.innerHeight,
+        // Capture pre-borrow mute state so returnBorrow can restore it.
+        wasMuted: snap.muted,
+      };
+      VideoEngine.markBorrowed('feed-active');
+      // NO pool pin — feed-active is a singleton lane, not a pool lane.
+      BORROW_DBG('mount', { source: 'feed-active', ownerKey: borrow.ownerKey, postId });
+    }
+  } catch { /* engine may not be booted */ }
+}
+```
+- Also set `startSource = 'borrow'` when the feed borrow triggers (same short-circuit as rail borrow).
 
-- `useWatchProgressTracker` -> no-op.
-- `globalVideoMute`, `pauseAllAudio` -> keep exported API as no-op.
-- `AppPrefetch` video hooks, `hlsPoolPreloader`, `prefetchTile` -> drop video prefetch, keep image/poster prefetch.
-- `blobUrlManager`, `useHlsUrlCache`, `safePlay`, `sharedBandwidth`, `videoReadyFlags` -> left as unused stubs (deleted in Stage E).
-- `PostDeepLinkPage` deep-link autoplay -> opens poster, no autoplay.
+### Part 5 — Store: `BorrowDescriptor.wasMuted`
+`src/store/fullscreenFeedStore.ts`: add optional `wasMuted?: boolean` to `BorrowDescriptor`. Rail borrows omit → defaults to muted behaviour.
 
-## Stage D - Verification gate (must pass before any deletes)
+### Part 6 — `returnBorrow`: feed-specific semantics
+`src/components/fullscreen-feed/FullscreenFeedOverlay.tsx` `returnBorrow(borrow, reason)`:
+- Detect lane kind: `const isRail = borrow.laneId.startsWith('rail-');`
+- Mute policy:
+  - Rail: unchanged — `setMuted(laneId, true)` always.
+  - Feed-active: `setMuted(laneId, borrow.wasMuted ?? true)`.
+- Pool policy:
+  - Rail: existing `RailLanePool.unpin(...)` calls unchanged.
+  - Feed-active: skip both `unpin` calls entirely (no pool interaction). Trace `return.animate` / `return.fallback` with `laneId` so telemetry stays readable.
+- `clearBorrowed(laneId)` still runs first for both.
+- Live-tile branch: registry lookup by `borrow.ownerKey` works for both; with Part 2 the feed card's host survives → live return path taken. Fallback park (`unmountLane`) unchanged for target-gone.
 
-- App builds, runs, no white screens on: Clubhouse feed, fullscreen open/close, Watch (rails + grid), clips subpage, videos subpage, course media tab, profile posts (personal + business), explore, friends, messaging media, deep links.
-- Every video surface shows a poster - never blank, never black, never a broken element.
-- No console errors from missing providers / singletons.
-- Grep proof: zero live `new Hls(`, zero live `.attachMedia(`, zero real work in `HLSPoolManager.*`.
-- `[VIDEOSTUB] active` present in console on boot.
-- Tap-to-open, reveal, skeleton, LQIP, FLIP visual, haptics, double-tap-like still work.
+### Part 7 — `BorrowedFullscreenSlot`: verify (no changes expected)
+`FeedSlide.tsx` — takes `laneId` from descriptor. `mountLane` + belt-and-braces `play(laneId, { callerPostId: ownerKey })` work identically for `'feed-active'`. Verify only; ship no change unless a bug surfaces.
 
-## Stage E - Final delete sweep (only after D)
+### Part 8 — Verify and ship
+- `tsgo --noEmit`
+- Report Part 0 findings + changed files in ship summary.
 
-Delete: `HLSPoolManager`, `useHlsPool`, `MediaRuntime` internals, `UnifiedVideoPlayer`, `HLSPlayer`, `usePausedFirstFrame`, `useTileVideoPlayer`, `hlsLoader`, `hlsPoolPreloader`, `safePlay`, `sharedBandwidth`, `videoReadyFlags`, `videoIdUtils`, `mobileVideoDebug` handoff bits, and the Stage-A stubs themselves. Re-grep to prove zero survivors. Remove `hls.js` from `package.json`.
+---
 
-## Non-goals in this brief
+## Files touched
+- `src/video/VideoEngine.ts` — Part 1
+- `src/components/feed/CardFeed.tsx` — Part 2
+- `src/components/posts-tab/LightCardFeed.tsx` — Part 2
+- `src/components/feed/InlineVideo.tsx` — Part 3
+- `src/lib/openWithOrigin.ts` — Part 4
+- `src/store/fullscreenFeedStore.ts` — Part 5 (`wasMuted` field only)
+- `src/components/fullscreen-feed/FullscreenFeedOverlay.tsx` — Part 6
 
-- No new VideoEngine. No autoplay behavior. No unmute UX. No resume-at-position. Those come in the rebuild plan.
-- Tier-3 image-only files are not touched.
-
-## Execution note
-
-This is a large multi-turn demolition (~40 files edited in Stage A+B alone, plus verification). I will execute one stage per turn, stopping after each for you to spot-check the preview before moving to the next. Stage A first: engine goes inert, app still runs, nothing plays. Confirm and I proceed to B1.
-
+Rail borrow path (PR-1) remains byte-for-byte identical for the mute + pool branches; only the lane-kind switch adds a new branch. Non-borrow openers (image posts, cold tiles, deep links) fall through to the existing ladder unchanged.

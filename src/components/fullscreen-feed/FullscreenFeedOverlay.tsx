@@ -57,37 +57,53 @@ function returnBorrow(borrow: BorrowDescriptor, reason: 'close' | 'route' | 'dem
   // Clear the engine-side borrow flag FIRST so the return sequence's pauses /
   // remounts / releases route through the normal owner-guard path again.
   try { VideoEngine.clearBorrowed(borrow.laneId); } catch {}
+  // Stage-7 PR-2: lane-kind switch. Rail lanes (rail-*) are pool-managed and
+  // always re-mute on return. Feed-active is a singleton, no pool, and
+  // restores the pre-borrow mute state.
+  const isRail = borrow.laneId.startsWith('rail-');
   const originHost = reason === 'demote' ? null : originHostRegistry.get(borrow.ownerKey);
   const viewportChanged =
     typeof window !== 'undefined' &&
     (window.innerWidth !== borrow.viewportW || window.innerHeight !== borrow.viewportH);
-  // Re-mute before re-parenting so the tile inherits muted (rails are always muted).
-  try { VideoEngine.setMuted(borrow.laneId, true); } catch {}
+  // Mute policy: rails force-mute; feed-active restores pre-borrow mute.
+  try {
+    const targetMuted = isRail ? true : (borrow.wasMuted ?? true);
+    VideoEngine.setMuted(borrow.laneId, targetMuted);
+  } catch {}
   // Reset object-fit to cover for the tile's aspect.
   try { VideoEngine.setObjectFit(borrow.laneId, 'cover'); } catch {}
   if (reason !== 'demote' && originHost && !viewportChanged) {
     try {
       VideoEngine.mountLane(borrow.laneId, originHost);
-      // Live-tile return: DO NOT execute the deferred release — the tile will
-      // re-acquire this exact lane (coalesced) as soon as the autoplay gate
-      // lifts, and tearing the source down here would blank + reload the tile.
-      const hadPendingRelease = RailLanePool.unpin(borrow.laneId, { executeDeferred: false });
+      // Live-tile return.
+      //  - Rail: DO NOT execute the deferred release — the tile will re-acquire
+      //    this exact lane (coalesced) as soon as the autoplay gate lifts, and
+      //    tearing the source down would blank + reload the tile.
+      //  - Feed-active: no pool interaction at all.
+      let hadPendingRelease = false;
+      if (isRail) {
+        hadPendingRelease = RailLanePool.unpin(borrow.laneId, { executeDeferred: false });
+      }
       BORROW_DBG('return.animate', {
         laneId: borrow.laneId, ownerKey: borrow.ownerKey, postId: borrow.postId,
-        hadPendingRelease,
+        hadPendingRelease, kind: isRail ? 'rail' : 'feed',
       });
       return;
     } catch {
       /* fall through to park */
     }
   }
-  // Park in hidden host (unmountLane) then unpin. Any deferred release fires.
+  // Park in hidden host (unmountLane) then unpin (rails only). Any deferred
+  // release fires on rails.
   try { VideoEngine.unmountLane(borrow.laneId); } catch {}
-  const hadPendingRelease = RailLanePool.unpin(borrow.laneId, { executeDeferred: true });
+  let hadPendingRelease = false;
+  if (isRail) {
+    hadPendingRelease = RailLanePool.unpin(borrow.laneId, { executeDeferred: true });
+  }
   BORROW_DBG(reason === 'demote' ? 'unpin' : 'return.fallback', {
     laneId: borrow.laneId, ownerKey: borrow.ownerKey, postId: borrow.postId,
     reason, originAlive: !!originHost, tileHostFound: !!originHost,
-    viewportChanged, hadPendingRelease,
+    viewportChanged, hadPendingRelease, kind: isRail ? 'rail' : 'feed',
   });
 }
 

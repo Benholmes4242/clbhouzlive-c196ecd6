@@ -304,6 +304,10 @@ export const CardFeed = forwardRef<CardFeedHandle, CardFeedProps>(function CardF
   const carouselPositions = tab ? (carouselPositionsByTab[tab] ?? globalCarouselPositions) : globalCarouselPositions;
   const openFullscreen = useFullscreenFeedStore((s) => s.open);
   const fsOpen = useFullscreenFeedStore((s) => s.isOpen);
+  // Stage-7 PR-2: borrowed owner key (feed-active or rail). When the viewer
+  // is open on top of one of our cards, that card MUST keep its InlineVideo
+  // host mounted so returnBorrow can re-parent the live <video> back into it.
+  const borrowedOwnerKey = useFullscreenFeedStore((s) => s.borrow?.ownerKey ?? null);
 
   // Sync the active card to the global store so other consumers (top-bar
   // carousel chip, fullscreen handoff, etc.) stay in step. Routed to the
@@ -372,8 +376,10 @@ export const CardFeed = forwardRef<CardFeedHandle, CardFeedProps>(function CardF
 
 
       const initialSlide = carouselPositions.get(index) ?? 0;
+      const cardOwnerKey = `${post.id}:0`;
+      const isBorrowedCard = fsOpen && borrowedOwnerKey === cardOwnerKey;
       const isActive = !fsOpen && index === playingIdx; // PLAYS — settle-gated; suspended while fullscreen
-      const isNear = !fsOpen && Math.abs(index - activeIdx) <= VIDEO_NEIGHBOUR_RADIUS; // mounts InlineVideo + host so it's in the DOM before activation
+      const isNear = isBorrowedCard || (!fsOpen && Math.abs(index - activeIdx) <= VIDEO_NEIGHBOUR_RADIUS); // mounts InlineVideo + host so it's in the DOM before activation
       const mountVideo = isNear;
       return (
         <div
@@ -420,6 +426,7 @@ export const CardFeed = forwardRef<CardFeedHandle, CardFeedProps>(function CardF
       playingIdx,        // isActive keys off playingIdx; without this the
                          // settle-promoted play index never reaches the tiles
       fsOpen,            // recompute isActive/isNear when fullscreen opens/closes
+      borrowedOwnerKey,  // keeps the borrowed card's host mounted while fs open
       carouselPositions,
       getCarouselChangeHandler,
       getCommentCount,

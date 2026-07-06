@@ -160,6 +160,8 @@ export const LightCardFeed: React.FC<LightCardFeedProps> = ({
   const carouselPositions = useClubhouseStore((s) => s.carouselPositions);
   const openFullscreen = useFullscreenFeedStore((s) => s.open);
   const fsOpen = useFullscreenFeedStore((s) => s.isOpen);
+  // Stage-7 PR-2: borrowed owner key — keep origin card host alive on borrow.
+  const borrowedOwnerKey = useFullscreenFeedStore((s) => s.borrow?.ownerKey ?? null);
 
   useEffect(() => {
     setActiveIndex(activeIdx);
@@ -231,8 +233,10 @@ export const LightCardFeed: React.FC<LightCardFeedProps> = ({
     (index: number, post: FeedPost) => {
       const likeState = getLikeState(post);
       const initialSlide = carouselPositions.get(index) ?? 0;
+      const cardOwnerKey = `${post.id}:0`;
+      const isBorrowedCard = fsOpen && borrowedOwnerKey === cardOwnerKey;
       const isActive = !fsOpen && index === playingIdx;
-      const isNear = !fsOpen && Math.abs(index - activeIdx) <= VIDEO_NEIGHBOUR_RADIUS;
+      const isNear = isBorrowedCard || (!fsOpen && Math.abs(index - activeIdx) <= VIDEO_NEIGHBOUR_RADIUS);
       const mountVideo = isNear;
       return (
         <div
@@ -276,6 +280,7 @@ export const LightCardFeed: React.FC<LightCardFeedProps> = ({
       activeIdx,
       playingIdx,
       fsOpen,
+      borrowedOwnerKey,
       carouselPositions,
       getCarouselChangeHandler,
       getCommentCount,
