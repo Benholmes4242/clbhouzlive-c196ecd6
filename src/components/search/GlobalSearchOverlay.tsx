@@ -778,10 +778,14 @@ function GlobalSearchOverlay({ isOpen, onClose }: GlobalSearchOverlayProps) {
                             onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); selectPerson(person); } }}
                             className="w-full flex items-center gap-3 px-4 min-h-[60px] active:bg-black/[0.02] cursor-pointer"
                           >
-                            <div className="w-[42px] h-[42px] clbhouz-squircle bg-muted overflow-hidden shrink-0 relative">
-                              {person.avatar_url && (
-                                <img src={person.avatar_url} alt="" className="w-full h-full object-cover" />
-                              )}
+                            <div className="shrink-0">
+                              <SquircleAvatar
+                                size={42}
+                                src={person.avatar_url}
+                                alt={person.display_name}
+                                hairlineRing
+                                ringColor={LIGHT_HAIRLINE}
+                              />
                             </div>
                             <div className="flex-1 min-w-0 text-left">
                               <div className="flex items-center gap-1 min-w-0">
