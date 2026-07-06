@@ -289,10 +289,15 @@ const FullscreenVideoSlot: React.FC<{
 }> = ({ postId, hlsUrl, posterSrc, isActive, onFirstFrameReady }) => {
   const isMuted = useClubhouseStore((s) => s.isMuted);
   const storedStart = useFullscreenFeedStore((s) => s.startPosition);
+  const borrow = useFullscreenFeedStore((s) => s.borrow);
+  const origin = useFullscreenFeedStore((s) => s.origin);
+  const isBorrowSlide = !!(borrow && isActive && borrow.postId === postId);
+
   // Only apply store.startPosition on the initially-tapped slide; other
-  // slides in the fullscreen deck start from 0.
+  // slides in the fullscreen deck start from 0. Borrow slide skips seeks
+  // entirely — the borrowed element carries its own currentTime.
   const startPosition = React.useMemo(() => {
-    if (!isActive) return -1;
+    if (!isActive || isBorrowSlide) return -1;
     const t = VideoEngine.getLastPos(postId);
     const chosen = t > 0 ? t : storedStart > 0 ? storedStart : -1;
     fsv('slot.mount', {
@@ -303,28 +308,32 @@ const FullscreenVideoSlot: React.FC<{
       storedStart,
       lastPos: t,
       chosen,
+      isBorrowSlide,
     });
     return chosen;
-  }, [isActive, postId, storedStart, hlsUrl]);
+  }, [isActive, postId, storedStart, hlsUrl, isBorrowSlide]);
 
+  // In borrow mode: pass hlsUrl:null + active:false so useVideoLane never
+  // touches the 'fullscreen' lane. The borrowed rail lane's element is
+  // re-parented into <BorrowedFullscreenSlot/> instead.
+  const laneHlsUrl = isBorrowSlide ? null : (isActive ? hlsUrl : null);
   const lane = useVideoLane('fullscreen', {
-    hlsUrl: isActive ? hlsUrl : null,
+    hlsUrl: laneHlsUrl,
     posterUrl: posterSrc || null,
     startPosition,
-    active: isActive,
+    active: isActive && !isBorrowSlide,
     muted: isMuted,
     postId,
   });
 
-
-
   React.useEffect(() => {
+    if (isBorrowSlide) return;
     VideoEngine.setObjectFit('fullscreen', 'contain');
-  }, []);
+  }, [isBorrowSlide]);
 
   React.useEffect(() => {
-    fsv('slot.active', { postId, isActive });
-  }, [postId, isActive]);
+    fsv('slot.active', { postId, isActive, isBorrowSlide });
+  }, [postId, isActive, isBorrowSlide]);
 
   React.useEffect(() => {
     return () => {
@@ -333,10 +342,11 @@ const FullscreenVideoSlot: React.FC<{
   }, [postId]);
 
   // Fire onFirstFrameReady ONLY when the engine has painted the real frame
-  // at (or past) startPosition — this is what the FLIP overlay listens for
-  // to crossfade the poster clone out over the already-playing video.
+  // at (or past) startPosition — for non-borrow slides. Borrow slide fires
+  // it from <BorrowedFullscreenSlot/> on the next rAF post-mount.
   const firedRef = React.useRef(false);
   React.useEffect(() => {
+    if (isBorrowSlide) return;
     if (!isActive) { firedRef.current = false; return; }
     if (firedRef.current) return;
     if (lane.snapshot.firstFrame === true) {
@@ -348,9 +358,20 @@ const FullscreenVideoSlot: React.FC<{
       });
       onFirstFrameReady?.();
     }
-  }, [isActive, lane.snapshot.firstFrame, lane.snapshot.currentTime, onFirstFrameReady, postId, startPosition]);
+  }, [isActive, isBorrowSlide, lane.snapshot.firstFrame, lane.snapshot.currentTime, onFirstFrameReady, postId, startPosition]);
 
-
+  // Borrow branch: re-parent the live rail-pool <video> into a wrapper here
+  // and run the two-phase cover→contain FLIP.
+  if (isBorrowSlide && borrow && origin) {
+    return (
+      <BorrowedFullscreenSlot
+        borrow={borrow}
+        originRect={origin.rect}
+        posterSrc={posterSrc}
+        onFirstFrameReady={onFirstFrameReady}
+      />
+    );
+  }
 
   return (
     <div className="absolute inset-0 overflow-hidden">
@@ -384,5 +405,134 @@ const FullscreenVideoSlot: React.FC<{
         }}
       />
     </div>
+  );
+};
+
+/**
+ * BorrowedFullscreenSlot — Stage-7 PR-1 borrow-open renderer.
+ *
+ * Mounts a wrapper <div> at the tile's origin rect (position:fixed), moves
+ * the borrowed rail lane's live <video> into it via VideoEngine.mountLane
+ * (atomic appendChild — element keeps playing, hls instance untouched), then
+ * runs a two-phase FLIP:
+ *   Phase 1 (300ms): wrapper animates origin rect → fullscreen rect while
+ *     object-fit stays 'cover' (pure translate/scale, no distortion).
+ *   Phase 2 (120ms): onTransitionEnd flip object-fit to 'contain' and fade
+ *     a black underlay in so letterbox bars appear rather than snap.
+ *
+ * onFirstFrameReady fires on the next rAF after mount — the element was
+ * already painting in the tile.
+ *
+ * The wrapper is FIXED (viewport-relative) for the whole viewer session.
+ * Vertical swipe demotion (overlay → clearBorrow) unmounts this component
+ * and the borrow ends before the user's swipe crosses to the next slide.
+ */
+const BorrowedFullscreenSlot: React.FC<{
+  borrow: NonNullable<ReturnType<typeof useFullscreenFeedStore.getState>['borrow']>;
+  originRect: { top: number; left: number; width: number; height: number };
+  posterSrc: string;
+  onFirstFrameReady?: () => void;
+}> = ({ borrow, originRect, posterSrc, onFirstFrameReady }) => {
+  const wrapperRef = React.useRef<HTMLDivElement>(null);
+  const [expanded, setExpanded] = React.useState(false);
+  const [fitContain, setFitContain] = React.useState(false);
+  const targetRectRef = React.useRef<{ top: number; left: number; width: number; height: number } | null>(null);
+
+  // Mount the live element on first render.
+  React.useEffect(() => {
+    const el = wrapperRef.current;
+    if (!el) return;
+    // Element is currently in the tile (or hidden host if tile evicted).
+    // mountLane atomically moves it here; hls instance stays paired.
+    VideoEngine.mountLane(borrow.laneId, el);
+    // Ensure cover for Phase 1.
+    VideoEngine.setObjectFit(borrow.laneId, 'cover');
+    // eslint-disable-next-line no-console
+    if ((window as any).__VIDEO_ENGINE_DBG__ || (globalThis as any).__perfEnabled) {
+      console.info('[BORROW]', 'mount', { laneId: borrow.laneId, ownerKey: borrow.ownerKey, postId: borrow.postId });
+    } else {
+      // Still emit via same channel — [BORROW] uses console.info gated below.
+      try { console.info('[BORROW]', 'mount', { laneId: borrow.laneId, ownerKey: borrow.ownerKey, postId: borrow.postId }); } catch {}
+    }
+
+    // Measure the fullscreen target rect from the viewport.
+    targetRectRef.current = {
+      top: 0,
+      left: 0,
+      width: window.innerWidth,
+      height: window.innerHeight,
+    };
+
+    // Fire firstFrame on next rAF — element was already painting.
+    const raf1 = requestAnimationFrame(() => {
+      onFirstFrameReady?.();
+      // rAF #2 to ensure Phase 1 transition captures the initial rect commit.
+      const raf2 = requestAnimationFrame(() => setExpanded(true));
+      (window as any).__borrow_raf2 = raf2;
+    });
+    return () => {
+      cancelAnimationFrame(raf1);
+      const raf2 = (window as any).__borrow_raf2;
+      if (raf2) cancelAnimationFrame(raf2);
+    };
+    // borrow is stable for the lifetime of this component.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  const handleTransitionEnd = React.useCallback((e: React.TransitionEvent<HTMLDivElement>) => {
+    // Only respond to the wrapper's own size/transform transitions.
+    if (e.target !== wrapperRef.current) return;
+    if (fitContain) return;
+    setFitContain(true);
+    try { VideoEngine.setObjectFit(borrow.laneId, 'contain'); } catch {}
+  }, [fitContain, borrow.laneId]);
+
+  const target = targetRectRef.current;
+  const style: React.CSSProperties = {
+    position: 'fixed',
+    top: 0,
+    left: 0,
+    transform: expanded && target
+      ? `translate(${target.left}px, ${target.top}px)`
+      : `translate(${originRect.left}px, ${originRect.top}px)`,
+    width: expanded && target ? target.width : originRect.width,
+    height: expanded && target ? target.height : originRect.height,
+    zIndex: 3,
+    background: '#000',
+    overflow: 'hidden',
+    willChange: 'transform, width, height',
+    transition: expanded
+      ? 'transform 300ms cubic-bezier(0.32,0.72,0,1), width 300ms cubic-bezier(0.32,0.72,0,1), height 300ms cubic-bezier(0.32,0.72,0,1)'
+      : 'none',
+    pointerEvents: 'none',
+  };
+
+  return (
+    <>
+      {/* Poster underlay (blurred, matches non-borrow branch aesthetic). */}
+      <div className="absolute inset-0 overflow-hidden">
+        {posterSrc && (
+          <div aria-hidden="true" className="absolute inset-0" style={{
+            backgroundImage: `url(${posterSrc})`, backgroundSize: 'cover', backgroundPosition: 'center',
+            filter: 'blur(40px) brightness(0.5) saturate(1.2)', transform: 'scale(1.2)',
+          }} />
+        )}
+        {/* Black letterbox underlay — fades in during Phase 2 fit-swap. */}
+        <div
+          aria-hidden
+          style={{
+            position: 'absolute', inset: 0, background: '#000',
+            opacity: fitContain ? 1 : 0,
+            transition: 'opacity 120ms linear',
+          }}
+        />
+      </div>
+      <div
+        ref={wrapperRef}
+        aria-hidden
+        style={style}
+        onTransitionEnd={handleTransitionEnd}
+      />
+    </>
   );
 };
