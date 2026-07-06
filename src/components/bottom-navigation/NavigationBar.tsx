@@ -46,17 +46,6 @@ const NavigationBar: React.FC<NavigationBarProps> = ({
   const isClubhouseTheme = variant === 'clubhouse';
   const borderColor = isClubhouseTheme ? 'hsl(var(--clubhouse-border))' : 'hsl(215 25% 27% / 0.2)';
 
-  // Per-tab optical size map — glyph pixel size so all five icons read the same
-  // on the row. Boxes/tap targets remain uniform; only the inner glyph varies.
-  const ICON_OPTICAL_PX: Record<string, number> = {
-    clubhouse: 28,
-    watch: 27,
-    post: 26,
-    courses: 29,
-    tourhub: 28,
-  };
-  const DEFAULT_ICON_PX = 28;
-
   
   return (
     <>
@@ -105,12 +94,10 @@ const NavigationBar: React.FC<NavigationBarProps> = ({
             }}
             aria-label={tab.label}
           >
-            <div
-              className="relative flex items-center justify-center"
-              style={{ width: 32, height: 32 }}
-            >
+            <div className="relative">
               <Icon
               className={cn(
+                "h-[28px] w-[28px] [stroke-width:1.5]",
                 isLive && tab.id === 'tourhub'
                   ? "opacity-100"
                   : isLive
@@ -124,8 +111,6 @@ const NavigationBar: React.FC<NavigationBarProps> = ({
                       : "text-[hsl(var(--clubhouse-text-muted))]"
               )}
               style={{
-                width: ICON_OPTICAL_PX[tab.id] ?? DEFAULT_ICON_PX,
-                height: ICON_OPTICAL_PX[tab.id] ?? DEFAULT_ICON_PX,
                 transform: isActive ? 'scale(1.1)' : 'scale(1)',
                 transition: 'all var(--motion-fast) var(--ease-pop)',
                 ...(isLightTheme && !isLive && { color: isActive ? '#0A0E14' : '#64748B' }),
