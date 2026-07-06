@@ -906,7 +906,7 @@ const AppInner: React.FC = () => {
         <LogHud />
         <PerfToggleButton />
         <BootTimelineToggleButton />
-        <RenderProbe name="above-providers" />
+        
         
         
 
