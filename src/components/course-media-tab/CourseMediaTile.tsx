@@ -1,7 +1,7 @@
 import React, { useRef, useEffect } from 'react';
 import { Film } from 'lucide-react';
 import type { FeedPost } from '@/components/media-system/types/media';
-import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
+
 import { useRailLane } from '@/video/useRailLane';
 import { originHostRegistry } from '@/video/originHostRegistry';
 import { INK_TINT_04, INK_TINT_06, SURFACE } from '@/features/courses/_shared/tokens';
@@ -194,13 +194,6 @@ export const CourseMediaTile: React.FC<CourseMediaTileProps> = ({ post, index, f
             maxWidth: '70%',
           }}
         >
-          <SquircleAvatar
-            src={post.avatarUrl}
-            alt={post.displayName}
-            size={feature ? 22 : 16}
-            hideRing
-            fallback={post.displayName.charAt(0).toUpperCase()}
-          />
           {feature && (
             <span
               style={{
