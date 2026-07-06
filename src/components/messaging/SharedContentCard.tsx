@@ -157,9 +157,6 @@ function TeeTimeShareCard({
   isOwnMessage?: boolean; 
 }) {
   // Game/tee-time routing decommissioned — card renders static content only.
-  const handleViewDetails = () => {
-    /* no-op: legacy game detail route removed */
-  };
 
   return (
     <div 
