@@ -1,6 +1,6 @@
 import { memo, useCallback, useMemo, useRef, useState } from 'react';
 import { openWithOrigin } from '@/lib/openWithOrigin';
-import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
+import { SquircleAvatar, LIGHT_HAIRLINE } from '@/components/ui/SquircleAvatar';
 import type { FeedPost } from '@/components/media-system/types/media';
 import DecodedImage from '../shared/DecodedImage';
 
@@ -160,7 +160,7 @@ function CompactVideoRowInner({ post, index, allPosts, onDecoded }: CompactVideo
             minWidth: 0,
           }}
         >
-          <SquircleAvatar size={20} src={post.avatarUrl} alt={channel} hideRing />
+          <SquircleAvatar size={20} src={post.avatarUrl} alt={channel} hairlineRing ringColor={LIGHT_HAIRLINE} />
           <span
             style={{
               flex: 1,

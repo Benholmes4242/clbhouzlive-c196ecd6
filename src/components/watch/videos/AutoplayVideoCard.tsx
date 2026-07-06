@@ -5,7 +5,7 @@ import { formatDistanceToNow } from 'date-fns';
 import { toast } from 'sonner';
 import { openWithOrigin } from '@/lib/openWithOrigin';
 import type { FeedPost } from '@/components/media-system/types/media';
-import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
+import { SquircleAvatar, LIGHT_HAIRLINE } from '@/components/ui/SquircleAvatar';
 import { VideoCardMenu } from '@/components/videos-tab/VideoCardMenu';
 import { Pin } from '../proshop/Pin';
 import { ExpandableCaption } from '@/components/posts/ExpandableCaption';
@@ -181,7 +181,7 @@ function AutoplayVideoCardInner({ post, index, allPosts, userId, active, borderR
             alt={post.displayName}
             userId={post.userId}
             size="sm"
-            hideRing
+            hairlineRing ringColor={LIGHT_HAIRLINE}
           />
         </button>
 
