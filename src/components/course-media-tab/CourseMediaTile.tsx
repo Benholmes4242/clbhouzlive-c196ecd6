@@ -33,7 +33,6 @@ interface CourseMediaTileProps {
       originEl: HTMLElement | null;
       railOwnerKey: string | null;
       posterUrl: string | null;
-      handOffUrls: (string | null | undefined)[];
     },
   ) => void;
 }
@@ -66,7 +65,6 @@ export const CourseMediaTile: React.FC<CourseMediaTileProps> = ({ post, index, f
           originEl: tileRef.current,
           railOwnerKey: ownerKey,
           posterUrl: thumbnailUrl || null,
-          handOffUrls: [hlsUrl],
         });
       }}
 

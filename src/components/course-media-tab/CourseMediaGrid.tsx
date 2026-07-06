@@ -133,7 +133,6 @@ export const CourseMediaGrid = forwardRef<HTMLDivElement, CourseMediaGridProps>(
       originEl: HTMLElement | null;
       railOwnerKey: string | null;
       posterUrl: string | null;
-      handOffUrls: (string | null | undefined)[];
     },
   ) => {
     const tapped = postsToOpen[index];
@@ -154,7 +153,6 @@ export const CourseMediaGrid = forwardRef<HTMLDivElement, CourseMediaGridProps>(
       index: groupedIndex,
       originEl: ctx.originEl,
       posterUrl: ctx.posterUrl,
-      handOffUrls: ctx.handOffUrls,
       railOwnerKey: ctx.railOwnerKey,
       mediaId,
       options: {
