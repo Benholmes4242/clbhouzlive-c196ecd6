@@ -48,6 +48,6 @@
 /* Small screens: adjust position */
 @media (max-width: 768px) {
   .eh-toast-wrap {
-    bottom: 66px;
+    bottom: 76px;
   }
 }
