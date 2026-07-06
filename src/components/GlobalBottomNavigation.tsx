@@ -245,7 +245,7 @@ const GlobalBottomNavigation: React.FC<GlobalBottomNavigationProps> = ({ chromeS
               position: 'fixed',
               left: 0,
               right: 0,
-              bottom: 'calc(env(safe-area-inset-bottom, 0px) + 12px)',
+              bottom: 12,
               zIndex: 100,
               pointerEvents: 'none',
               display: 'flex',
