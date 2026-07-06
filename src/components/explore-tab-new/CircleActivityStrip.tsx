@@ -274,32 +274,15 @@ function CircleActivityCard({ row, onTap }: CardProps) {
           padding: '0 12px',
         }}
       >
-        <div
-          style={{
-            width: 32,
-            height: 32,
-            borderRadius: '34%',
-            overflow: 'hidden',
-            background: INK_TINT_06,
-            flexShrink: 0,
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            color: INK_MUTE,
-            fontSize: 11,
-            fontWeight: 700,
-          }}
-        >
-          {row.friend_avatar ? (
-            <img
-              src={row.friend_avatar}
-              alt=""
-              loading="lazy"
-              style={{ width: '100%', height: '100%', objectFit: 'cover' }}
-            />
-          ) : (
-            initials(row.friend_name)
-          )}
+        <div style={{ flexShrink: 0 }}>
+          <SquircleAvatar
+            size={32}
+            src={row.friend_avatar}
+            alt={row.friend_name}
+            fallback={initials(row.friend_name)}
+            hairlineRing
+            ringColor={LIGHT_HAIRLINE}
+          />
         </div>
         <div style={{ flex: 1, minWidth: 0 }}>
           <p
