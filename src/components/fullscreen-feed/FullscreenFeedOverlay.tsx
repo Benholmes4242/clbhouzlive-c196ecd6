@@ -320,6 +320,14 @@ export function FullscreenFeedOverlay() {
   const [targetRect, setTargetRect] = useState<{ top: number; left: number; width: number; height: number } | null>(null);
 
   useEffect(() => {
+    // Borrow opens skip the poster-clone FLIP entirely — BorrowedFullscreenSlot
+    // owns its own live-element expand transition. Fire firstFrameReady so the
+    // host opacity gate below flips to 1 immediately.
+    if (isOpen && borrow) {
+      setCloneVisible(false);
+      setFirstFrameReady(true);
+      return;
+    }
     if (isOpen && origin) {
       fsv('clone.init', {
         origin,
