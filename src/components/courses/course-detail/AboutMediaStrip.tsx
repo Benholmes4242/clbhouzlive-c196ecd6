@@ -43,33 +43,67 @@ const AboutMediaStrip: React.FC<AboutMediaStripProps> = ({ clubId, onSeeAllClick
   //  directly from `rawMedia` below.)
 
 
-  const feedPosts = useMemo((): FeedPost[] => {
-    if (!rawMedia) return [];
-    return rawMedia.slice(0, maxItems).map((item: any) => {
-      const isVideo = item.type === 'video';
-      const mediaItem: MediaItem = {
-        id: item.id,
-        type: isVideo ? 'video' : 'image',
-        hlsUrl: isVideo ? item.url : undefined,
-        imageUrl: !isVideo ? item.url : undefined,
-        thumbnailUrl: item.thumbnailUrl || undefined,
-        width: item.width || 1080,
-        height: item.height || 1080,
-        duration: item.duration || undefined,
-      };
+  // Build ONE real FeedPost per parent (post/review), aggregating all of that
+  // parent's media items. mediaId targets the tapped item; vertical swipe
+  // browses BETWEEN parents. Posts arrive already grouped, so groupMultiMedia
+  // is intentionally not called.
+  const { feedPosts, tileParentIds } = useMemo((): {
+    feedPosts: FeedPost[];
+    tileParentIds: string[];
+  } => {
+    if (!rawMedia) return { feedPosts: [], tileParentIds: [] };
+    const visible = rawMedia.slice(0, maxItems);
+    // Preserve display order via first-seen parent id.
+    const parentOrder: string[] = [];
+    const byParent = new Map<string, any[]>();
+    for (const item of rawMedia as any[]) {
+      const parentId = item.sourceId || item.id;
+      if (!byParent.has(parentId)) {
+        parentOrder.push(parentId);
+        byParent.set(parentId, []);
+      }
+      byParent.get(parentId)!.push(item);
+    }
+    // Only include parents that have at least one item in the visible tile set,
+    // and order them by the first visible tile of each parent.
+    const visibleParentIds: string[] = [];
+    const seen = new Set<string>();
+    for (const item of visible as any[]) {
+      const parentId = item.sourceId || item.id;
+      if (!seen.has(parentId)) {
+        seen.add(parentId);
+        visibleParentIds.push(parentId);
+      }
+    }
+    const posts: FeedPost[] = visibleParentIds.map((parentId) => {
+      const group = byParent.get(parentId) ?? [];
+      const first = group[0];
+      const mediaItems: MediaItem[] = group.map((item: any) => {
+        const isVideo = item.type === 'video';
+        return {
+          id: item.id,
+          type: isVideo ? 'video' : 'image',
+          hlsUrl: isVideo ? item.url : undefined,
+          imageUrl: !isVideo ? item.url : undefined,
+          thumbnailUrl: item.thumbnailUrl || undefined,
+          width: item.width || 1080,
+          height: item.height || 1080,
+          duration: item.duration || undefined,
+        };
+      });
       return {
-        id: item.id,
-        userId: item.author?.id || '',
+        id: parentId,
+        userId: first?.author?.id || '',
         actorType: 'personal' as const,
-        actorId: item.author?.id || '',
-        username: item.author?.username || '',
-        displayName: item.author?.displayName || 'Golfer',
-        avatarUrl: item.author?.avatarUrl || '',
+        actorId: first?.author?.id || '',
+        username: first?.author?.username || '',
+        displayName: first?.author?.displayName || 'Golfer',
+        avatarUrl: first?.author?.avatarUrl || '',
         isVerified: false,
         creatorRelation: 'none' as const,
         caption: '',
-        mediaItems: [mediaItem],
-        createdAt: item.createdAt || new Date().toISOString(),
+        mediaItems,
+        createdAt: first?.createdAt || new Date().toISOString(),
         likeCount: 0,
         commentCount: 0,
         shareCount: 0,
@@ -80,6 +114,10 @@ const AboutMediaStrip: React.FC<AboutMediaStripProps> = ({ clubId, onSeeAllClick
         tags: [],
       };
     });
+    // Map each visible tile (by index) to its parent id, so click handlers
+    // can resolve the post index quickly.
+    const tileParentIds = (visible as any[]).map((item) => item.sourceId || item.id);
+    return { feedPosts: posts, tileParentIds };
   }, [rawMedia, maxItems]);
 
   const extractStreamUidFromHls = (hls: string) => {
