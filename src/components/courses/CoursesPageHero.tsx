@@ -18,7 +18,7 @@ import { formatRatingValue } from '@/utils/formatters';
  */
 
 const HERO_SCRIM =
-  'linear-gradient(180deg, rgba(15,23,42,0.5) 0%, rgba(15,23,42,0.12) 22%, rgba(15,23,42,0) 42%, rgba(15,23,42,0) 55%, rgba(15,23,42,0.6) 100%)';
+  'linear-gradient(180deg, rgba(15,23,42,0.5) 0%, rgba(15,23,42,0.12) 22%, rgba(15,23,42,0) 42%, rgba(15,23,42,0.18) 55%, rgba(15,23,42,0.55) 62%, rgba(15,23,42,0.88) 100%)';
 
 const HERO_MIN_HEIGHT =
   'calc(clamp(380px, 44dvh, 460px) + env(safe-area-inset-top, 0px))';
