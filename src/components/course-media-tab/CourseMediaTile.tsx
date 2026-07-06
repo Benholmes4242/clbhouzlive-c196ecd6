@@ -194,13 +194,6 @@ export const CourseMediaTile: React.FC<CourseMediaTileProps> = ({ post, index, f
             maxWidth: '70%',
           }}
         >
-          <SquircleAvatar
-            src={post.avatarUrl}
-            alt={post.displayName}
-            size={feature ? 22 : 16}
-            hideRing
-            fallback={post.displayName.charAt(0).toUpperCase()}
-          />
           {feature && (
             <span
               style={{
