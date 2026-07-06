@@ -327,11 +327,7 @@ export function FullscreenFeedOverlay() {
                   <SnapFeed
                     posts={posts}
                     activeTab="foryou"
-                    onNearEnd={() => {
-                      if (hasNextPage && fetchNextPage && !isFetchingNextPage) {
-                        fetchNextPage();
-                      }
-                    }}
+                    onNearEnd={handleNearEnd}
                     onRefresh={async () => {}}
                     isRefreshing={isFetchingNextPage}
                     hasNextPage={hasNextPage}
