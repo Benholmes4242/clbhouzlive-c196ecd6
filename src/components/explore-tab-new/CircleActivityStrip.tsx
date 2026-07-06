@@ -1,5 +1,6 @@
 import { useState, useMemo } from 'react';
 import { SectionHeader } from '@/components/ui/SectionHeader';
+import { SquircleAvatar, LIGHT_HAIRLINE } from '@/components/ui/SquircleAvatar';
 import { LinkedRingsMark } from './DiscoverMarks';
 import {
   useCircleActivity,
