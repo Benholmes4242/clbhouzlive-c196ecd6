@@ -165,27 +165,12 @@ export const LightCardFeed: React.FC<LightCardFeedProps> = ({
     setActiveIndex(activeIdx);
   }, [activeIdx, setActiveIndex]);
 
-  useEffect(() => {
-    const PREFETCH_AHEAD = 2;
-    for (let i = 1; i <= PREFETCH_AHEAD; i++) {
-      const next = posts[activeIdx + i];
-      if (!next) continue;
-      const hlsUrl = next.mediaItems?.[0]?.hlsUrl;
-    }
-  }, [activeIdx, posts]);
-
-  useEffect(() => {
-    if (!posts?.length) return;
-    [0, 1].forEach((i) => {
-      const hlsUrl = posts[i]?.mediaItems?.[0]?.hlsUrl;
-    });
-  }, [posts?.length]);
-
   const handleOpenMedia = useCallback(
     (
       post: FeedPost,
       mediaIndex: number,
-      origin?: { el: HTMLElement | null; posterUrl?: string | null; handOffUrl?: string | null },
+      origin?: { el: HTMLElement | null; posterUrl?: string | null },
+      mediaId?: string | null,
     ) => {
       const idx = posts.findIndex((p) => p.id === post.id);
       if (idx < 0) return;
@@ -197,13 +182,23 @@ export const LightCardFeed: React.FC<LightCardFeedProps> = ({
           index: idx,
           originEl: origin.el,
           posterUrl: origin.posterUrl ?? null,
-          handOffUrls: origin.handOffUrl ? [origin.handOffUrl] : undefined,
+          mediaId: mediaId ?? null,
+          options: {
+            hasNextPage: hasNextPage ?? false,
+            fetchNextPage: hasNextPage ? fetchNextPage : undefined,
+            isFetchingNextPage: isFetchingNextPage ?? false,
+          },
         });
       } else {
-        openFullscreen(posts, idx);
+        openFullscreen(posts, idx, {
+          mediaId: mediaId ?? null,
+          hasNextPage: hasNextPage ?? false,
+          fetchNextPage: hasNextPage ? fetchNextPage : undefined,
+          isFetchingNextPage: isFetchingNextPage ?? false,
+        });
       }
     },
-    [posts, setActiveIndex, setCarouselPosition, openFullscreen],
+    [posts, setActiveIndex, setCarouselPosition, openFullscreen, hasNextPage, fetchNextPage, isFetchingNextPage],
   );
 
   const carouselChangeCacheRef = useRef(new Map<string, (post: FeedPost, slide: number) => void>());
