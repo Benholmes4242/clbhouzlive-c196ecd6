@@ -67,20 +67,22 @@ type ThemeTokens = {
 const DARK_TOKENS: ThemeTokens = {
   fill: 'rgba(27,30,39,0.86)',
   hairline: '1px solid rgba(255,255,255,0.10)',
-  shadow: '0 10px 30px rgba(0,0,0,0.45)',
-  ink: '#F2F4F7',
-  dim: 'rgba(242,244,247,0.5)',
+  // Specular top-rim highlight + drop shadow (kept in both no-blur and blur paths).
+  shadow: 'inset 0 1px 0 rgba(255,255,255,0.14), 0 10px 30px rgba(0,0,0,0.45)',
+  ink: '#FFFFFF',
+  dim: 'rgba(255,255,255,0.62)',
   lozenge: 'rgba(255,255,255,0.10)',
 };
 
 const LIGHT_TOKENS: ThemeTokens = {
   fill: 'rgba(250,251,253,0.88)',
   hairline: '1px solid rgba(15,23,42,0.08)',
-  shadow: '0 10px 30px rgba(15,23,42,0.16)',
+  shadow: 'inset 0 1px 0 rgba(255,255,255,0.70), 0 10px 30px rgba(15,23,42,0.16)',
   ink: '#0F172A',
-  dim: 'rgba(15,23,42,0.58)',
+  dim: 'rgba(15,23,42,0.62)',
   lozenge: 'rgba(15,23,42,0.07)',
 };
+
 
 const REDUCED_MOTION =
   typeof window !== 'undefined' &&
@@ -200,7 +202,7 @@ const GlobalBottomNavigation: React.FC<GlobalBottomNavigationProps> = ({ chromeS
   const PILL_MAX_EXPANDED = 'min(396px, 100vw - 22px)';
   const PILL_MAX_CONDENSED = 'min(324px, 100vw - 36px)';
   const iconSize = condensed ? 23 : 25;
-  const iconStroke = theme === 'dark' ? 2.0 : 2.1;
+  const iconStroke = theme === 'dark' ? 2.1 : 2.2;
   const pillPadding = condensed ? '3px 7px' : '4px 7px';
   const lozengePad = condensed ? '10px 20px' : '11px 24px';
   const inactivePad = condensed ? '6px 12px' : '7px 16px';
@@ -212,26 +214,33 @@ const GlobalBottomNavigation: React.FC<GlobalBottomNavigationProps> = ({ chromeS
   const PILL_TRANSITION = REDUCED_MOTION
     ? 'none'
     : 'max-width 220ms cubic-bezier(0.2,0.8,0.2,1), padding 220ms cubic-bezier(0.2,0.8,0.2,1)';
-  const ICON_TRANSITION = REDUCED_MOTION
-    ? 'none'
-    : 'width 220ms cubic-bezier(0.2,0.8,0.2,1), height 220ms cubic-bezier(0.2,0.8,0.2,1)';
+  // (Icon size snaps between states — see note in the SVG style block below.)
+
   const BUTTON_TRANSITION = REDUCED_MOTION
     ? 'none'
     : 'background 180ms linear, color 180ms linear, padding 220ms cubic-bezier(0.2,0.8,0.2,1)';
 
   return (
     <>
-      {/* One-off style: gate backdrop-filter so unsupported WebViews degrade
-          gracefully to the (already 86%-opaque) fill. */}
+      {/* One-off style: gate translucency + backdrop-filter so unsupported
+          WebViews degrade to the opaque token fill. Blur-supported paths get
+          a more transparent liquid-glass fill so page content shows through. */}
       <style>{`
         .glass-nav-pill { }
         @supports (backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px)) {
           .glass-nav-pill {
-            backdrop-filter: blur(18px) saturate(160%);
-            -webkit-backdrop-filter: blur(18px) saturate(160%);
+            backdrop-filter: blur(22px) saturate(180%);
+            -webkit-backdrop-filter: blur(22px) saturate(180%);
+          }
+          .glass-nav-pill[data-theme='dark'] {
+            background: rgba(27,30,39,0.62) !important;
+          }
+          .glass-nav-pill[data-theme='light'] {
+            background: rgba(250,251,253,0.66) !important;
           }
         }
       `}</style>
+
 
       <AnimatePresence>
         {showNavigation && (
@@ -259,7 +268,9 @@ const GlobalBottomNavigation: React.FC<GlobalBottomNavigationProps> = ({ chromeS
                 navRef.current = el;
               }}
               data-chrome="bottom-nav"
+              data-theme={theme}
               className={cn('glass-nav-pill')}
+
               style={{
                 pointerEvents: 'auto',
                 margin: '0 auto',
@@ -323,16 +334,23 @@ const GlobalBottomNavigation: React.FC<GlobalBottomNavigationProps> = ({ chromeS
                           transition: BUTTON_TRANSITION,
                         }}
                       >
-                        <span style={{ position: 'relative', display: 'inline-flex' }}>
+                        <span style={{ position: 'relative', display: 'inline-flex', transform: 'translateZ(0)' }}>
                           <Icon
                             aria-hidden="true"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            shapeRendering="geometricPrecision"
                             style={{
                               width: iconSize,
                               height: iconSize,
                               strokeWidth: iconStroke,
-                              transition: ICON_TRANSITION,
+                              // No width/height transition on the SVG itself —
+                              // mid-transition rasterised strokes read soft.
+                              // The pill's max-width/padding transitions carry
+                              // the motion; icon size snaps between states.
                             }}
                           />
+
                           {badgeCount > 0 && (
                             <span
                               aria-hidden="true"
