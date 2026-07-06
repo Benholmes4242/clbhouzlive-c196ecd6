@@ -236,18 +236,38 @@ const AboutMediaStrip: React.FC<AboutMediaStripProps> = ({ clubId, onSeeAllClick
         {mediaTiles.map((media, index) => {
           const isLastTile = index === mediaTiles.length - 1;
           const showOverflow = isLastTile && overflowCount > 0;
+          const btnRef = React.createRef<HTMLButtonElement>();
 
           return (
             <button
               key={media.id}
+              ref={btnRef}
               type="button"
               onClick={(e) => {
                 e.stopPropagation();
                 if (showOverflow) {
                   onSeeAllClick();
                 } else {
-                  const { flat, offsetsByParent } = flattenPostsToMedia(feedPosts);
-                  useFullscreenFeedStore.getState().open(flat, flatIndexFor(offsetsByParent, index, 0), { readOnly: true });
+                  const grouped = groupMultiMedia(feedPosts);
+                  const tapped = feedPosts[index];
+                  const parentIndex = Math.max(
+                    0,
+                    grouped.findIndex((p) => p.mediaItems.some((m) => m.id === tapped?.id)),
+                  );
+                  const parent = grouped[parentIndex];
+                  const mediaId = tapped?.mediaItems?.[0]?.id ?? parent?.mediaItems?.[0]?.id ?? null;
+                  const posterUrl = parent?.mediaItems?.find((m) => m.id === mediaId)?.thumbnailUrl
+                    || parent?.mediaItems?.[0]?.thumbnailUrl
+                    || null;
+                  openWithOrigin({
+                    posts: grouped,
+                    index: parentIndex,
+                    originEl: btnRef.current,
+                    posterUrl,
+                    mediaId,
+                    openedFrom: 'about-strip',
+                    options: { readOnly: true, hasNextPage: false },
+                  });
                 }
               }}
               style={{
@@ -257,12 +277,39 @@ const AboutMediaStrip: React.FC<AboutMediaStripProps> = ({ clubId, onSeeAllClick
                 overflow: 'hidden',
                 padding: 0,
                 border: 'none',
-                background: 'transparent',
+                background: '#0F172A',
                 cursor: 'pointer',
               }}
               aria-label="Open Media tab"
             >
-              <SquareCardMedia media={media} cardType={CardType.SQUARE} className="w-full h-full" />
+              {media.poster ? (
+                <img
+                  src={media.poster}
+                  alt=""
+                  loading="lazy"
+                  style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
+                />
+              ) : (
+                <div style={{ width: '100%', height: '100%', background: 'rgba(15,23,42,0.08)' }} />
+              )}
+
+              {media.media_type === 'video' && !showOverflow && (
+                <div
+                  style={{
+                    position: 'absolute', inset: 0,
+                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                    pointerEvents: 'none',
+                  }}
+                >
+                  <div style={{
+                    width: 32, height: 32, borderRadius: '50%',
+                    background: 'rgba(0,0,0,0.45)',
+                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  }}>
+                    <Play size={14} color="#fff" fill="#fff" />
+                  </div>
+                </div>
+              )}
 
               {showOverflow && (
                 <div
@@ -281,6 +328,7 @@ const AboutMediaStrip: React.FC<AboutMediaStripProps> = ({ clubId, onSeeAllClick
             </button>
           );
         })}
+
       </div>
     </div>
   );
