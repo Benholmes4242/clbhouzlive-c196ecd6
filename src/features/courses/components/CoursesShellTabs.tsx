@@ -75,11 +75,12 @@ export const CoursesShellTabs: React.FC<CoursesShellTabsProps> = ({
               onClick={(e) => handleTap(tab.id, e.currentTarget)}
               className="active:opacity-70 transition-opacity"
               style={{
+                position: 'relative',
                 flex: '0 0 auto',
                 height: 44,
                 padding: '0 4px',
                 fontSize: 14,
-                fontWeight: isActive ? 700 : 600,
+                fontWeight: isActive ? 800 : 600,
                 color: isActive ? '#0A0E14' : '#64748B',
                 background: 'transparent',
                 border: 'none',
@@ -93,6 +94,20 @@ export const CoursesShellTabs: React.FC<CoursesShellTabsProps> = ({
               <span style={{ display: 'inline-block' }}>
                 {tab.label}
               </span>
+              {isActive && (
+                <span
+                  aria-hidden
+                  style={{
+                    position: 'absolute',
+                    left: 4,
+                    right: 4,
+                    bottom: 0,
+                    height: 3,
+                    borderRadius: 2,
+                    background: '#F7931E',
+                  }}
+                />
+              )}
             </button>
           );
         })}
