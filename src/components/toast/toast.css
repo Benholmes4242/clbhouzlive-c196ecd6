@@ -4,7 +4,7 @@
   position: fixed;
   left: 0;
   right: 0;
-  bottom: 84px; /* above bottom nav */
+  bottom: 76px; /* above bottom nav */
   display: flex;
   justify-content: center;
   pointer-events: none;
@@ -48,6 +48,6 @@
 /* Small screens: adjust position */
 @media (max-width: 768px) {
   .eh-toast-wrap {
-    bottom: 74px;
+    bottom: 66px;
   }
 }
