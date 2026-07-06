@@ -86,7 +86,7 @@ import { PerfHud } from '@/perf/PerfHud';
 import { LogHud } from '@/perf/LogHud';
 import { PerfToggleButton } from '@/perf/PerfToggleButton';
 import { BootTimelineToggleButton } from '@/perf/BootTimelineToggleButton';
-import { RenderProbe } from '@/perf/RenderProbe';
+
 
 
 
