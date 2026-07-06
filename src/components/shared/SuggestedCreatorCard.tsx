@@ -116,7 +116,8 @@ export const SuggestedCreatorCard: React.FC<SuggestedCreatorCardProps> = ({
           src={creator.avatarUrl}
           alt={creator.displayName}
           fallback={initials}
-          hideRing={true}
+          hairlineRing
+          ringColor={isDark ? DARK_HAIRLINE : LIGHT_HAIRLINE}
         />
         {creator.isVerified && (
           <div className="flex items-center justify-center" style={{
