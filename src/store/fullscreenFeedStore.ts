@@ -101,6 +101,12 @@ interface FullscreenFeedState {
   mediaId: string | null;
   openedFrom: string | null;
   borrow: BorrowDescriptor | null;
+  /** Stage-7 PR-3: one-shot flag set by the in-fullscreen media pager the
+   *  first time the user swipes horizontally away from the opening media on
+   *  the borrow slide. The overlay's dedicated effect consumes it and runs
+   *  the standard returnBorrow('demote') path — no engine/pool call is made
+   *  from FeedSlide itself. */
+  borrowDemoteRequested: boolean;
 
   open: (posts: FeedPost[], startIndex?: number, options?: OpenOptions) => void;
   close: () => void;
@@ -111,6 +117,10 @@ interface FullscreenFeedState {
   /** Clear the borrow descriptor once the overlay has handed the element
    *  back / demoted it. Non-borrow callers never invoke this. */
   clearBorrow: () => void;
+  /** Stage-7 PR-3: pager-triggered borrow demote. No-op when no borrow is
+   *  live. The overlay effect handles the actual returnBorrow call. */
+  demoteBorrow: () => void;
+  consumeBorrowDemoteRequested: () => void;
   /** Allow openers to push updated pagination state into the store as the
    *  underlying query progresses (e.g. hasNextPage flips false on last page,
    *  isFetchingNextPage toggles during a fetch). */
