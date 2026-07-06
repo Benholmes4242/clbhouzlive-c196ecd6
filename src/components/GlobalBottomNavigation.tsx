@@ -199,11 +199,11 @@ const GlobalBottomNavigation: React.FC<GlobalBottomNavigationProps> = ({ chromeS
   // Sizes (icons-only, no visible labels) — sized to match IG's pill.
   const PILL_MAX_EXPANDED = 'min(360px, 100vw - 22px)';
   const PILL_MAX_CONDENSED = 'min(324px, 100vw - 36px)';
-  const iconSize = condensed ? 19 : 21;
-  const iconStroke = theme === 'dark' ? 1.8 : 1.9;
+  const iconSize = condensed ? 23 : 25;
+  const iconStroke = theme === 'dark' ? 2.0 : 2.1;
   const pillPadding = condensed ? '6px 9px' : '8px 9px';
-  const lozengePad = condensed ? '7px 14px' : '8px 16px';
-  const inactivePad = condensed ? '7px 11px' : '8px 13px';
+  const lozengePad = condensed ? '10px 18px' : '11px 20px';
+  const inactivePad = condensed ? '10px 14px' : '11px 16px';
 
   const badges = useMemo<Record<string, number>>(() => ({ courses: unseenFriendReviews }), [unseenFriendReviews]);
 
