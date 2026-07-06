@@ -288,7 +288,7 @@ export const ChampionsDuelCard: React.FC<ChampionsDuelCardProps> = ({
             1
           </span>
           <div style={{ position: 'relative', flexShrink: 0 }}>
-            <SquircleAvatar photoUrl={champion?.photoUrl ?? null} size={38} />
+            <ChampionsSquircle photoUrl={champion?.photoUrl ?? null} size={38} />
             <div
               aria-hidden
               style={{
@@ -370,14 +370,14 @@ export const ChampionsDuelCard: React.FC<ChampionsDuelCardProps> = ({
           </div>
           {defending ? (
             right ? (
-              <SquircleAvatar photoUrl={right.photoUrl} size={38} />
+              <ChampionsSquircle photoUrl={right.photoUrl} size={38} />
             ) : (
-              <SquircleAvatar photoUrl={null} size={38} dashed />
+              <ChampionsSquircle photoUrl={null} size={38} dashed />
             )
           ) : selfOnBoard ? (
-            <SquircleAvatar photoUrl={selfRow?.photoUrl ?? null} size={38} />
+            <ChampionsSquircle photoUrl={selfRow?.photoUrl ?? null} size={38} />
           ) : (
-            <SquircleAvatar photoUrl={null} size={38} dashed />
+            <ChampionsSquircle photoUrl={null} size={38} dashed />
           )}
         </div>
       </div>
