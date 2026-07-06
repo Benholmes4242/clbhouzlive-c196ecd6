@@ -83,7 +83,7 @@ export function CircleActivityStrip({ userId }: Props) {
       kicker="YOUR CIRCLE"
       title="Your friends"
       sub="What your circle's been pulling off"
-      paddingTop={32}
+      paddingTop={10}
       paddingX={16}
     />
   );
