@@ -269,7 +269,9 @@ const GlobalBottomNavigation: React.FC<GlobalBottomNavigationProps> = ({ chromeS
                 navRef.current = el;
               }}
               data-chrome="bottom-nav"
+              data-theme={theme}
               className={cn('glass-nav-pill')}
+
               style={{
                 pointerEvents: 'auto',
                 margin: '0 auto',
