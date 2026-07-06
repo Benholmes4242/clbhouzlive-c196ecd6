@@ -130,6 +130,7 @@ export const useFullscreenFeedStore = create<FullscreenFeedState>((set, get) => 
   mediaIndex: 0,
   mediaId: null,
   openedFrom: null,
+  borrow: null,
 
   open: (posts, startIndex = 0, options) => {
     set({
@@ -149,6 +150,7 @@ export const useFullscreenFeedStore = create<FullscreenFeedState>((set, get) => 
       mediaIndex: options?.mediaIndex ?? 0,
       mediaId: options?.mediaId ?? null,
       openedFrom: options?.openedFrom ?? null,
+      borrow: options?.borrow ?? null,
     });
   },
   close: () => {
@@ -169,11 +171,13 @@ export const useFullscreenFeedStore = create<FullscreenFeedState>((set, get) => 
       mediaIndex: 0,
       mediaId: null,
       openedFrom: null,
+      borrow: null,
     });
     if (cb) {
       try { cb(); } catch {}
     }
   },
+  clearBorrow: () => set({ borrow: null }),
   appendPosts: (newPosts) => {
     set((s) => {
       const existing = new Set(s.posts.map((p) => p.id));
