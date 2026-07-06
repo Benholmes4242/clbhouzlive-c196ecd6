@@ -2,6 +2,7 @@ import { create } from 'zustand';
 import type { FeedPost } from '@/components/media-system/types/media';
 import { engagementBus } from '@/lib/engagementBus';
 import { applyEngagementDelta } from '@/lib/applyEngagementDelta';
+import type { LaneId } from '@/video/lanePolicy';
 
 
 
@@ -10,6 +11,22 @@ export interface OpenOrigin {
   posterUrl: string | null;
   borderRadius: string;
   aspectRatio: number;
+}
+
+/**
+ * Stage-7 PR-1 borrow descriptor. Present when the fullscreen viewer opened
+ * over a live rail-pool lane and is re-parenting that live element into the
+ * opening slide (no fullscreen-lane load for the opening slide).
+ */
+export interface BorrowDescriptor {
+  laneId: LaneId;
+  ownerKey: string;
+  postId: string;
+  posterUrl: string | null;
+  /** Cached viewport at borrow time — used on close to detect orientation
+   *  change (fallback path). */
+  viewportW: number;
+  viewportH: number;
 }
 
 interface OpenOptions {
