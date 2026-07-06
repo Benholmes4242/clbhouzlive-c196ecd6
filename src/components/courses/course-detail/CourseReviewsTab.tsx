@@ -236,6 +236,91 @@ const CourseReviewsTab: React.FC<CourseReviewsTabProps> = ({
   const filteredMyReview = filteredReviews.find((r) => r.user_id === user?.id);
   const otherReviews = filteredReviews.filter((r) => r.user_id !== user?.id);
 
+  // Build one real FeedPost per review (id = review.id, mediaItems = ALL of that
+  // review's media). Vertical swipe browses BETWEEN reviews; `mediaId` targets
+  // the tapped media within the review. Posts are constructed already-grouped,
+  // so groupMultiMedia is intentionally not called here.
+  const buildReviewFeedPost = useCallback((review: CourseReview): FeedPost => {
+    const userProfile = review.user_profiles;
+    const mediaItems: MediaItemType[] = (review.media ?? []).map((item) => {
+      const isVideo = item.media_type === 'video';
+      return {
+        id: item.id,
+        type: isVideo ? 'video' : 'image',
+        hlsUrl: isVideo ? item.media_url : undefined,
+        imageUrl: !isVideo ? item.media_url : undefined,
+        thumbnailUrl: item.poster_url || undefined,
+        width: item.width || 1080,
+        height: item.height || 1080,
+      };
+    });
+    return {
+      id: review.id,
+      userId: review.user_id,
+      actorType: 'personal' as const,
+      actorId: review.user_id,
+      username: userProfile?.username || '',
+      displayName: userProfile?.display_name || 'Golfer',
+      avatarUrl: userProfile?.profile_photo_url || '',
+      isVerified: false,
+      creatorRelation: 'none' as const,
+      caption: review.review || '',
+      mediaItems,
+      createdAt: review.review_date || new Date().toISOString(),
+      likeCount: 0,
+      commentCount: 0,
+      shareCount: 0,
+      review: {
+        reviewId: review.id,
+        courseId: review.course_id,
+        courseName: review.course?.name ?? courseName ?? '',
+        courseImageUrl: review.course?.thumbnail_image ?? null,
+        rating: review.rating ?? 0,
+        courseCountry: review.course?.country ?? null,
+        courseRegion: review.course?.region ?? null,
+        courseSubCountry: review.course?.sub_country ?? null,
+        reviewText: review.review ?? null,
+      },
+      isReview: true,
+      courseId: review.course_id,
+      courseName: review.course?.name ?? courseName,
+      isLikedByMe: false,
+      isFollowedByMe: false,
+      tags: [],
+    };
+  }, [courseName]);
+
+  const handleReviewMediaClick = useCallback((
+    review: CourseReview,
+    mediaId: string,
+    originEl: HTMLElement | null,
+  ) => {
+    // All currently-listed reviews with media, in display order.
+    // Pinned "my review" first, then the rest — matches on-screen order.
+    const listed: CourseReview[] = [];
+    if (filteredMyReview && (filteredMyReview.media?.length ?? 0) > 0) {
+      listed.push(filteredMyReview);
+    }
+    for (const r of otherReviews) {
+      if ((r.media?.length ?? 0) > 0) listed.push(r);
+    }
+    const posts = listed.map(buildReviewFeedPost);
+    const parentIndex = Math.max(0, posts.findIndex((p) => p.id === review.id));
+    const parent = posts[parentIndex];
+    const posterUrl = parent?.mediaItems?.find((m) => m.id === mediaId)?.thumbnailUrl
+      || parent?.mediaItems?.[0]?.thumbnailUrl
+      || null;
+    openWithOrigin({
+      posts,
+      index: parentIndex,
+      originEl,
+      posterUrl,
+      mediaId,
+      openedFrom: 'course-reviews',
+      options: { readOnly: true, hasNextPage: false },
+    });
+  }, [filteredMyReview, otherReviews, buildReviewFeedPost]);
+
   // Per-tier review counts for the filter sheet (computed client-side from fetched reviews)
   const reviewCountsByTier = useMemo(() => {
     const counts: Record<ScoreTier | 'all', number> = {
