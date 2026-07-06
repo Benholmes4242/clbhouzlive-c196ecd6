@@ -16,3 +16,17 @@ export const navigationTabs = [
   { id: 'courses',   label: 'Courses',   icon: MapPinIcon, path: '/courses' },
   { id: 'tourhub',   label: 'Tour',      icon: TrophyIcon, path: '/tourhub' },
 ];
+
+// Per-tab optical size map (expanded). Keyed by the REAL tab ids above.
+// Rationale: PlusSquare + YoutubeLogo carry corner ink and read large (-1/-2);
+// the MapPin teardrop reads small (+1); House/Trophy hold the 31px baseline.
+export const ICON_SIZE: Record<string, number> = {
+  clubhouse: 31,
+  watch: 30,
+  post: 29,
+  courses: 32,
+  tourhub: 31,
+};
+
+// Uniform icon-box (tap target / centering). Sized to the largest glyph.
+export const ICON_BOX = 32;

@@ -1,5 +1,5 @@
 import React from 'react';
-import { navigationTabs } from './navigationTabs';
+import { navigationTabs, ICON_SIZE, ICON_BOX } from './navigationTabs';
 import { cn } from '@/lib/utils';
 
 interface NavigationBarProps {
@@ -95,29 +95,35 @@ const NavigationBar: React.FC<NavigationBarProps> = ({
             aria-label={tab.label}
           >
             <div className="relative">
-              <Icon
-              className={cn(
-                "h-[28px] w-[28px] [stroke-width:1.5]",
-                isLive && tab.id === 'tourhub'
-                  ? "opacity-100"
-                  : isLive
-                  ? "text-green-500 opacity-100"
-                  : isLightTheme
-                    ? isActive
+              <div
+                className="flex items-center justify-center"
+                style={{ width: ICON_BOX, height: ICON_BOX }}
+              >
+                <Icon
+                  className={cn(
+                    isLive && tab.id === 'tourhub'
                       ? "opacity-100"
-                      : "opacity-90"
-                    : isDimmed
-                      ? "text-[hsl(var(--clubhouse-text-dimmed))]"
-                      : "text-[hsl(var(--clubhouse-text-muted))]"
-              )}
-              style={{
-                transform: isActive ? 'scale(1.1)' : 'scale(1)',
-                transition: 'all var(--motion-fast) var(--ease-pop)',
-                ...(isLightTheme && !isLive && { color: isActive ? '#0A0E14' : '#64748B' }),
-                ...(isClubhouseTheme && isActive && !isLive && { color: useAmberActive ? '#F79E1B' : '#F8FAFC' }),
-                ...(tab.id === 'tourhub' && isLive && { color: '#22C55E' }),
-              }}
-            />
+                      : isLive
+                      ? "text-green-500 opacity-100"
+                      : isLightTheme
+                        ? isActive
+                          ? "opacity-100"
+                          : "opacity-90"
+                        : isDimmed
+                          ? "text-[hsl(var(--clubhouse-text-dimmed))]"
+                          : "text-[hsl(var(--clubhouse-text-muted))]"
+                  )}
+                  style={{
+                    width: ICON_SIZE[tab.id] ?? 31,
+                    height: ICON_SIZE[tab.id] ?? 31,
+                    transform: isActive ? 'scale(1.1)' : 'scale(1)',
+                    transition: 'all var(--motion-fast) var(--ease-pop)',
+                    ...(isLightTheme && !isLive && { color: isActive ? '#0A0E14' : '#64748B' }),
+                    ...(isClubhouseTheme && isActive && !isLive && { color: useAmberActive ? '#F79E1B' : '#F8FAFC' }),
+                    ...(tab.id === 'tourhub' && isLive && { color: '#22C55E' }),
+                  }}
+                />
+              </div>
 
               {/* Tab badge */}
               {(tabBadges[tab.id] ?? 0) > 0 && (
