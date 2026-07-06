@@ -448,12 +448,9 @@ const BorrowedFullscreenSlot: React.FC<{
     VideoEngine.mountLane(borrow.laneId, el);
     // Ensure cover for Phase 1.
     VideoEngine.setObjectFit(borrow.laneId, 'cover');
-    // eslint-disable-next-line no-console
-    if ((window as any).__VIDEO_ENGINE_DBG__ || (globalThis as any).__perfEnabled) {
+    if (isPerfEnabled() || (typeof window !== 'undefined' && (window as any).__VIDEO_ENGINE_DBG__)) {
+      // eslint-disable-next-line no-console
       console.info('[BORROW]', 'mount', { laneId: borrow.laneId, ownerKey: borrow.ownerKey, postId: borrow.postId });
-    } else {
-      // Still emit via same channel — [BORROW] uses console.info gated below.
-      try { console.info('[BORROW]', 'mount', { laneId: borrow.laneId, ownerKey: borrow.ownerKey, postId: borrow.postId }); } catch {}
     }
 
     // Measure the fullscreen target rect from the viewport.
