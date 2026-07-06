@@ -128,7 +128,8 @@ const ClubhouseContent = () => {
   }, []);
 
   useHeaderVariant('solid-light');
-  useMedianStatusBar("auto", "transparent", true, false, true, pathname, (p) => isDarkChromeRoute(p));
+  // Chrome (shield + status bar) owned solely by AppRoutes. Do not write here.
+
   
   // route-clubhouse class is now applied by ClubhouseWrapped (eagerly loaded)
   // to prevent white flash during lazy chunk loading
