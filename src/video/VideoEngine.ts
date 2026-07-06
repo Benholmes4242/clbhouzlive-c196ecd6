@@ -128,6 +128,24 @@ class VideoEngineImpl {
   private loadingCount = 0;
   /** Session-scoped resume map, keyed by post/media id. Written by callers. */
   public lastPos = new Map<string, number>();
+  /**
+   * Stage-7 PR-1 fix: lanes currently borrowed by the fullscreen viewer.
+   * Owner-caller pauses on these lanes are ignored (the ex-owner tile no
+   * longer drives playback while borrowed). Null-caller engine-wide pauses
+   * (pauseAll, document.hidden) still pause them — visibility semantics
+   * must be preserved.
+   */
+  private borrowedLanes = new Set<LaneId>();
+
+  markBorrowed(laneId: LaneId): void {
+    this.borrowedLanes.add(laneId);
+    DBG('markBorrowed', { laneId });
+  }
+
+  clearBorrowed(laneId: LaneId): void {
+    this.borrowedLanes.delete(laneId);
+    DBG('clearBorrowed', { laneId });
+  }
 
   boot(laneIds: LaneId[] = DEFAULT_LANE_IDS): void {
     if (this.booted) return;
