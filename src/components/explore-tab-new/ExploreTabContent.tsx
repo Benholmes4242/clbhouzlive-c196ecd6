@@ -4,7 +4,7 @@ import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useExploreFeed } from './hooks/useExploreFeed';
 import { useExploreMood } from './hooks/useExploreMood';
 import { useExploreRegion } from './hooks/useExploreRegion';
-import { ExploreHero } from './ExploreHero';
+// ExploreHero removed — the standout card now lives in CoursesPageHero.
 import ConnectHandicapCue from '@/components/courses/course-detail/ConnectHandicapCue';
 import { ExploreEchoCTA } from './ExploreEchoCTA';
 import { ExploreDestinations } from './ExploreDestinations';
@@ -52,8 +52,10 @@ export default function ExploreTabContent({ embedded: _embedded = false }: Explo
 
   return (
     <div style={{ background: SLATE_50, minHeight: '100vh' }}>
-      {/* Hero: flush, full-width, first child — mirrors OverviewHero */}
-      <ExploreHero userId={userId} mood={mood} />
+      {/* NOTE: Standout course card is now rendered by CoursesPageHero above
+          the shared tab row. Do not re-add ExploreHero here. */}
+
+
 
       {/* Connect cue — self-pads; trim its outer wrapper to no h-padding */}
       <div style={{ paddingTop: 12, paddingBottom: 4 }}>

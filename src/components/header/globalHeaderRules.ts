@@ -137,6 +137,7 @@ export const IMMERSIVE_ROUTE_PREFIXES = [
 export const IMMERSIVE_EXACT_ROUTES = [
   '/',
   '/clubhouse',
+  '/courses',
 ] as const;
 
 export function isImmersiveRoute(pathname: string): boolean {
