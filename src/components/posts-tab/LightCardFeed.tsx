@@ -233,8 +233,8 @@ export const LightCardFeed: React.FC<LightCardFeedProps> = ({
     (index: number, post: FeedPost) => {
       const likeState = getLikeState(post);
       const initialSlide = carouselPositions.get(index) ?? 0;
-      const cardOwnerKey = `${post.id}:0`;
-      const isBorrowedCard = fsOpen && borrowedOwnerKey === cardOwnerKey;
+      const isBorrowedCard = fsOpen && !!borrowedOwnerKey &&
+        borrowedOwnerKey.startsWith(`${post.id}:`);
       const isActive = !fsOpen && index === playingIdx;
       const isNear = isBorrowedCard || (!fsOpen && Math.abs(index - activeIdx) <= VIDEO_NEIGHBOUR_RADIUS);
       const mountVideo = isNear;

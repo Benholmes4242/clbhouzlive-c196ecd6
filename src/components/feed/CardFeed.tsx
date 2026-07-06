@@ -376,8 +376,8 @@ export const CardFeed = forwardRef<CardFeedHandle, CardFeedProps>(function CardF
 
 
       const initialSlide = carouselPositions.get(index) ?? 0;
-      const cardOwnerKey = `${post.id}:0`;
-      const isBorrowedCard = fsOpen && borrowedOwnerKey === cardOwnerKey;
+      const isBorrowedCard = fsOpen && !!borrowedOwnerKey &&
+        borrowedOwnerKey.startsWith(`${post.id}:`);
       const isActive = !fsOpen && index === playingIdx; // PLAYS — settle-gated; suspended while fullscreen
       const isNear = isBorrowedCard || (!fsOpen && Math.abs(index - activeIdx) <= VIDEO_NEIGHBOUR_RADIUS); // mounts InlineVideo + host so it's in the DOM before activation
       const mountVideo = isNear;
