@@ -84,7 +84,8 @@ export interface LightFeedCardProps {
   onOpenMedia: (
     post: FeedPost,
     mediaIndex: number,
-    origin?: { el: HTMLElement | null; posterUrl?: string | null; handOffUrl?: string | null },
+    origin?: { el: HTMLElement | null; posterUrl?: string | null },
+    mediaId?: string | null,
   ) => void;
   onProfile: (post: FeedPost) => void;
   onReviewTap?: (post: FeedPost) => void;
