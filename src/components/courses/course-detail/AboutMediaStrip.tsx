@@ -94,35 +94,25 @@ const AboutMediaStrip: React.FC<AboutMediaStripProps> = ({ clubId, onSeeAllClick
 
   const streamThumb = (uid: string) => generateStreamThumbnailUrl(uid);
 
-  const mediaTiles = (items ?? []).slice(0, maxItems).map((item) => {
-    const src = item.src ?? '';
-    const isVideo = item.type === 'video';
-
+  const mediaTiles = (rawMedia ?? []).slice(0, maxItems).map((raw: any) => {
+    const isVideo = raw.type === 'video';
+    const url = raw.url as string | undefined;
     if (isVideo) {
-      const uid = extractStreamUidFromHls(src);
-      const derivedThumb = uid ? streamThumb(uid) : undefined;
-      const apiThumb =
-        typeof item.media?.[0]?.media_url === 'string' && !item.media[0].media_url.endsWith('.m3u8')
-          ? item.media[0].media_url
-          : undefined;
-      const thumb = apiThumb || derivedThumb;
+      const uid = url ? extractStreamUidFromHls(url) : null;
+      const thumb = raw.thumbnailUrl || (uid ? streamThumb(uid) : undefined);
       return {
-        id: item.id,
+        id: raw.id,
         media_type: 'video' as const,
-        media_url: thumb ?? '/placeholder.svg',
-        thumbnail_url: thumb,
-        poster_url: thumb,
+        poster: thumb,
       };
     }
-
-    const img = item.media?.[0]?.media_url || src;
     return {
-      id: item.id,
+      id: raw.id,
       media_type: 'image' as const,
-      media_url: img || '/placeholder.svg',
-      thumbnail_url: img || undefined,
+      poster: raw.thumbnailUrl || url || '/placeholder.svg',
     };
   });
+
 
   const { photoCount, videoCount, totalCount } = useMemo(() => {
     if (loading || !rawMedia) return { photoCount: 0, videoCount: 0, totalCount: 0 };
