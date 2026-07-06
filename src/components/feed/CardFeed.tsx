@@ -312,47 +312,14 @@ export const CardFeed = forwardRef<CardFeedHandle, CardFeedProps>(function CardF
     setActiveIndex(activeIdx, tab);
   }, [activeIdx, setActiveIndex, tab]);
 
-  // Warm-start the next 1-2 upcoming videos so they play instantly on arrival.
-  useEffect(() => {
-    const PREFETCH_AHEAD = 2; // was 3 — keep concurrent decoders within iOS cap (3)
-    for (let i = 1; i <= PREFETCH_AHEAD; i++) {
-      const next = posts[activeIdx + i];
-      if (!next) continue;
-      const media = next.mediaItems?.[0];
-      const hlsUrl = media?.hlsUrl;
-    }
-  }, [activeIdx, posts]);
-
-  // Warm the first videos on feed mount so even the initial card isn't fully cold.
-  useEffect(() => {
-    if (!posts?.length) return;
-    [0, 1].forEach((i) => {
-      const hlsUrl = posts[i]?.mediaItems?.[0]?.hlsUrl;
-    });
-  }, [posts?.length]);
-
-  // Tab warmer — fires on setActiveTab (from clubhouseStore) so tab-restore
-  // pre-warms the active card's HLS first segment (manifest is already pooled;
-  // this closes the cold-segment gap).
   const registerTabWarmer = useClubhouseStore((s) => s.registerTabWarmer);
-  const activeIdxRef = useRef(activeIdx);
-  useEffect(() => { activeIdxRef.current = activeIdx; }, [activeIdx]);
-  const postsRef = useRef(posts);
-  useEffect(() => { postsRef.current = posts; }, [posts]);
-  useEffect(() => {
-    if (!tab) return;
-    registerTabWarmer(tab, () => {
-      const idx = activeIdxRef.current;
-      const hlsUrl = postsRef.current[idx]?.mediaItems?.[0]?.hlsUrl;
-    });
-    return () => { registerTabWarmer(tab, null); };
-  }, [tab, registerTabWarmer]);
 
   const handleOpenMedia = useCallback(
     (
       post: FeedPost,
       mediaIndex: number,
-      origin?: { el: HTMLElement | null; posterUrl?: string | null; handOffUrl?: string | null },
+      origin?: { el: HTMLElement | null; posterUrl?: string | null },
+      mediaId?: string | null,
     ) => {
       const idx = posts.findIndex((p) => p.id === post.id);
       if (idx < 0) return;
@@ -364,10 +331,10 @@ export const CardFeed = forwardRef<CardFeedHandle, CardFeedProps>(function CardF
           index: idx,
           originEl: origin.el,
           posterUrl: origin.posterUrl ?? null,
-          handOffUrls: origin.handOffUrl ? [origin.handOffUrl] : undefined,
+          mediaId: mediaId ?? null,
         });
       } else {
-        openFullscreen(posts, idx);
+        openFullscreen(posts, idx, { mediaId: mediaId ?? null });
       }
     },
     [posts, setActiveIndex, setCarouselPosition, openFullscreen, tab],
