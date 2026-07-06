@@ -16,7 +16,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ArrowLeft, Search } from 'lucide-react';
-import { applyShieldColor } from '@/hooks/useMedianStatusBar';
+// Shield writes owned solely by AppRoutes; no direct applyShieldColor here.
 import { setFloatingHeaderActive } from '@/features/tourhub/_shared/floatingHeaderSignal';
 import GlobalSearchOverlay from '@/components/search/GlobalSearchOverlay';
 import { PostingAsPill } from './PostingAsPill';
