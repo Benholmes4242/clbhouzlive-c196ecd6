@@ -36,6 +36,38 @@ const CANVAS = '#15171F';
 /** How many neighbours on each side of the active card may mount a <video>. */
 const VIDEO_NEIGHBOUR_RADIUS = 1; // matches iOS ~3-decoder cap (active ±1 = 3)
 
+/**
+ * Reads fullscreen/borrow state from the store INSIDE the item wrapper so
+ * `itemContent` no longer depends on `fsOpen` / `borrowedOwnerKey` — that
+ * previously changed itemContent's identity on viewer-open and made
+ * react-virtuoso remount the borrowed card's FeedCard (visible in traces as
+ * a 1ms `inline.unmount` → `inline.mount` blip on the borrowed post).
+ *
+ * With this gate, viewer-open triggers only a local re-render of each
+ * mounted item — the borrowed card's InlineVideo survives (no unmount).
+ *
+ * The borrow ownerKey match accepts either the bare postId (engine writes
+ * the raw postId when InlineVideo loads) or a `${postId}:` prefix (rail
+ * lanes / carousel media use `${postId}:${mediaIndex}`).
+ */
+const FeedItemGate: React.FC<{
+  post: FeedPost;
+  index: number;
+  playingIdx: number;
+  activeIdx: number;
+  children: (v: { isActive: boolean; mountVideo: boolean }) => React.ReactNode;
+}> = ({ post, index, playingIdx, activeIdx, children }) => {
+  const fsOpen = useFullscreenFeedStore((s) => s.isOpen);
+  const borrowedOwnerKey = useFullscreenFeedStore((s) => s.borrow?.ownerKey ?? null);
+  const isBorrowedCard =
+    fsOpen && !!borrowedOwnerKey &&
+    (borrowedOwnerKey === post.id || borrowedOwnerKey.startsWith(`${post.id}:`));
+  const isActive = !fsOpen && index === playingIdx;
+  const isNear =
+    isBorrowedCard || (!fsOpen && Math.abs(index - activeIdx) <= VIDEO_NEIGHBOUR_RADIUS);
+  return <>{children({ isActive, mountVideo: isNear })}</>;
+};
+
 export interface CardFeedProps {
   posts: FeedPost[];
   onLike: (post: FeedPost, actor?: ActiveActor | null) => void;
