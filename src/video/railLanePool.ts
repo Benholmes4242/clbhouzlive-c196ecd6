@@ -162,20 +162,34 @@ export const RailLanePool = {
   },
 
   /**
-   * Unpin a lane. If a release() was deferred while pinned, execute it now.
-   * Returns true if a deferred release fired (informational for callers).
+   * Unpin a lane. Behavior split by `executeDeferred`:
+   *  - `true`  (default; used by fallback/demote returns): if a release() was
+   *    deferred while pinned, execute it now — release source + notify owner.
+   *  - `false` (used by live-tile animate return): CLEAR any pendingRelease
+   *    without releasing. The owner record + lane source stay intact so the
+   *    tile re-acquires via `acquire.coalesced` when the autoplay gate lifts,
+   *    with zero reload flash.
+   * Returns true if a deferred release was present (informational).
    */
-  unpin(laneId: LaneId): boolean {
+  unpin(laneId: LaneId, opts: { executeDeferred?: boolean } = {}): boolean {
+    const executeDeferred = opts.executeDeferred ?? true;
     pinnedByBorrow.delete(laneId);
     // Find the owner (if any) and consume its pendingRelease flag.
     for (const [ownerKey, rec] of owners) {
       if (rec.laneId !== laneId) continue;
       if (rec.pendingRelease) {
-        DBG('release.deferredExec', { ownerKey, laneId });
-        owners.delete(ownerKey);
-        laneOwner.delete(laneId);
-        VideoEngine.release(laneId);
-        notify(ownerKey, null);
+        if (executeDeferred) {
+          DBG('release.deferredExec', { ownerKey, laneId });
+          owners.delete(ownerKey);
+          laneOwner.delete(laneId);
+          VideoEngine.release(laneId);
+          notify(ownerKey, null);
+          return true;
+        }
+        // Coalesce path: clear the flag, keep the owner record + source.
+        rec.pendingRelease = false;
+        rec.lastUsed = ++clock;
+        POOL_DBG('release.deferredCleared', { ownerKey, laneId });
         return true;
       }
       break;
