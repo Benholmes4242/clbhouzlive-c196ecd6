@@ -82,7 +82,6 @@ function AutoplayVideoCardInner({ post, index, allPosts, userId, active, borderR
       index,
       originEl: tileRef.current,
       posterUrl: thumbnail || null,
-      handOffUrls: [hlsUrl],
       railOwnerKey: ownerKey,
     });
   };

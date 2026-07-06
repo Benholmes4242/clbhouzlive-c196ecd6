@@ -80,7 +80,6 @@ function VideoOfTheWeekHeroInner() {
       index: 0,
       originEl: btnRef.current,
       posterUrl: pick.thumbnail_url ?? null,
-      handOffUrls: [pick.hls_url ?? null],
     });
   };
 

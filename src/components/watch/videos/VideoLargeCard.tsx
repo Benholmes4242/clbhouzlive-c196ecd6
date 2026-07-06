@@ -67,7 +67,6 @@ function VideoLargeCardInner({ post, index, allPosts }: VideoLargeCardProps) {
       index,
       originEl: btnRef.current,
       posterUrl: thumb || null,
-      handOffUrls: [(media as any)?.hlsUrl],
     });
   }, [allPosts, index, thumb, media]);
 

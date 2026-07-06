@@ -91,7 +91,6 @@ function VideoRailTileInner({
       index,
       originEl: rootRef.current,
       posterUrl: thumb || null,
-      handOffUrls: [hlsUrl],
       railOwnerKey: ownerKey,
     });
   }, [allPosts, index, thumb, hlsUrl, ownerKey]);

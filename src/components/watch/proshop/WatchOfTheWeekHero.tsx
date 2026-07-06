@@ -89,7 +89,6 @@ function WatchOfTheWeekHeroInner() {
     openWithOrigin({
       originEl: heroTileRef.current,
       posterUrl: pick.thumbnail_url ?? null,
-      handOffUrls: [pick.hls_url ?? undefined],
       index: 0,
       posts:
       [{

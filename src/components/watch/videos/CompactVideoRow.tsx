@@ -60,7 +60,6 @@ function CompactVideoRowInner({ post, index, allPosts, onDecoded }: CompactVideo
       index,
       originEl: btnRef.current,
       posterUrl: thumb || null,
-      handOffUrls: [(media as any)?.hlsUrl],
     });
   }, [allPosts, index, thumb, media]);
 

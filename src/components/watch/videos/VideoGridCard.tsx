@@ -58,7 +58,6 @@ function VideoGridCardInner({ post, index, allPosts, active = false }: VideoGrid
       index,
       originEl: btnRef.current,
       posterUrl: thumb || null,
-      handOffUrls: [hlsUrl],
       railOwnerKey: ownerKey,
     });
   }, [allPosts, index, thumb, hlsUrl, ownerKey]);
