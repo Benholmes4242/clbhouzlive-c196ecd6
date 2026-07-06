@@ -335,11 +335,9 @@ export const CardFeed = forwardRef<CardFeedHandle, CardFeedProps>(function CardF
   const globalCarouselPositions = useClubhouseStore((s) => s.carouselPositions);
   const carouselPositions = tab ? (carouselPositionsByTab[tab] ?? globalCarouselPositions) : globalCarouselPositions;
   const openFullscreen = useFullscreenFeedStore((s) => s.open);
-  const fsOpen = useFullscreenFeedStore((s) => s.isOpen);
-  // Stage-7 PR-2: borrowed owner key (feed-active or rail). When the viewer
-  // is open on top of one of our cards, that card MUST keep its InlineVideo
-  // host mounted so returnBorrow can re-parent the live <video> back into it.
-  const borrowedOwnerKey = useFullscreenFeedStore((s) => s.borrow?.ownerKey ?? null);
+  // NOTE: fsOpen / borrow.ownerKey are intentionally NOT read at this level.
+  // They are consumed inside `FeedItemGate` so viewer-open doesn't change
+  // `itemContent` identity (which would remount the borrowed card).
 
   // Sync the active card to the global store so other consumers (top-bar
   // carousel chip, fullscreen handoff, etc.) stay in step. Routed to the
