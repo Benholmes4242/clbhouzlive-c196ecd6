@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
+import { SquircleAvatar, LIGHT_HAIRLINE } from '@/components/ui/SquircleAvatar';
 import { VerifiedBadge } from '@/components/ui/VerifiedBadge';
 import { Pencil, Trash2 } from 'lucide-react';
 import { Link } from 'react-router-dom';
