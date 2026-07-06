@@ -11,6 +11,15 @@
  *
  * Rails are ALWAYS muted. The fullscreen viewer + feed-active own the
  * ONE_UNMUTED_LANE budget; rails must never contend.
+ *
+ * Stage-7 PR-1 additions:
+ *   pin(laneId) / unpin(laneId)  — mark a lane as borrowed by fullscreen.
+ *     pickLruOwner() skips pinned lanes; if all owners are pinned and the
+ *     pool is full, acquire() returns null (caller keeps its poster).
+ *   release(ownerKey) on a pinned lane defers the actual VideoEngine.release
+ *     until unpin() fires (or is coalesced with a fresh acquire on unpin).
+ *   laneFor(ownerKey) — read-only lane lookup for openWithOrigin's borrow
+ *     decision at tap time.
  */
 
 import { RAIL_LANE_IDS, type LaneId } from './lanePolicy';
@@ -23,11 +32,14 @@ type OwnerListener = (laneId: LaneId | null) => void;
 interface OwnerRecord {
   laneId: LaneId;
   lastUsed: number;
+  /** Set when release() is called while lane is pinned; consumed on unpin. */
+  pendingRelease?: boolean;
 }
 
 const owners = new Map<OwnerKey, OwnerRecord>();
 const laneOwner = new Map<LaneId, OwnerKey>();
 const subs = new Map<OwnerKey, Set<OwnerListener>>();
+const pinnedByBorrow = new Set<LaneId>();
 let clock = 0;
 
 const DBG = (evt: string, payload: Record<string, unknown> = {}) => {
@@ -36,6 +48,14 @@ const DBG = (evt: string, payload: Record<string, unknown> = {}) => {
   if (!flag && !isPerfEnabled()) return;
   // eslint-disable-next-line no-console
   console.info('[RAIL]', evt, payload);
+};
+
+const POOL_DBG = (evt: string, payload: Record<string, unknown> = {}) => {
+  const flag =
+    typeof window !== 'undefined' && (window as any).__VIDEO_ENGINE_DBG__;
+  if (!flag && !isPerfEnabled()) return;
+  // eslint-disable-next-line no-console
+  console.info('[POOL]', evt, payload);
 };
 
 
@@ -58,6 +78,7 @@ function pickLruOwner(): OwnerKey | null {
   let lru: OwnerKey | null = null;
   let lruTime = Infinity;
   for (const [k, v] of owners) {
+    if (pinnedByBorrow.has(v.laneId)) continue; // skip pinned
     if (v.lastUsed < lruTime) {
       lruTime = v.lastUsed;
       lru = k;
@@ -70,9 +91,11 @@ export const RailLanePool = {
   /**
    * Acquire (or re-touch) a lane for `ownerKey`. If the owner already holds
    * a lane, its LRU timestamp is refreshed and its lane returned unchanged.
-   * If the pool is full, the LRU owner is evicted and its lane recycled.
+   * If the pool is full AND every candidate is pinned by fullscreen borrow,
+   * returns null (caller should stay on its poster; retry on next eligibility
+   * change — typically borrow unpin + next active-tile handoff).
    */
-  acquire(ownerKey: OwnerKey): LaneId {
+  acquire(ownerKey: OwnerKey): LaneId | null {
     VideoEngine.boot();
     const existing = owners.get(ownerKey);
     if (existing) {
@@ -81,9 +104,18 @@ export const RailLanePool = {
       return existing.laneId;
     }
     let lane = pickFreeLane();
+    // If free lane is pinned (shouldn't be — pinned lanes always have an
+    // owner — but defense in depth), skip and try eviction.
+    if (lane && pinnedByBorrow.has(lane)) lane = null;
     if (!lane) {
       const evictKey = pickLruOwner();
-      if (!evictKey) throw new Error('RailLanePool: no free lane and no owners to evict');
+      if (!evictKey) {
+        POOL_DBG('acquire.skipPinned', {
+          candidateOwner: ownerKey,
+          pinnedLanes: Array.from(pinnedByBorrow),
+        });
+        return null;
+      }
       const evictRec = owners.get(evictKey)!;
       lane = evictRec.laneId;
       DBG('evict', { evictedOwner: evictKey, laneId: lane, newOwner: ownerKey });
@@ -99,15 +131,53 @@ export const RailLanePool = {
     return lane;
   },
 
-  /** Release `ownerKey`'s lane (if any) and clear its source. */
+  /** Release `ownerKey`'s lane (if any). Defers if the lane is pinned. */
   release(ownerKey: OwnerKey): void {
     const rec = owners.get(ownerKey);
     if (!rec) return;
+    if (pinnedByBorrow.has(rec.laneId)) {
+      rec.pendingRelease = true;
+      POOL_DBG('release.deferred', { ownerKey, laneId: rec.laneId });
+      return;
+    }
     DBG('release', { ownerKey, laneId: rec.laneId });
     owners.delete(ownerKey);
     laneOwner.delete(rec.laneId);
     VideoEngine.release(rec.laneId);
     notify(ownerKey, null);
+  },
+
+  /** Pin a lane so LRU eviction + release() ignore it until unpin(). */
+  pin(laneId: LaneId): void {
+    pinnedByBorrow.add(laneId);
+  },
+
+  /**
+   * Unpin a lane. If a release() was deferred while pinned, execute it now.
+   * Returns true if a deferred release fired (informational for callers).
+   */
+  unpin(laneId: LaneId): boolean {
+    pinnedByBorrow.delete(laneId);
+    // Find the owner (if any) and consume its pendingRelease flag.
+    for (const [ownerKey, rec] of owners) {
+      if (rec.laneId !== laneId) continue;
+      if (rec.pendingRelease) {
+        DBG('release.deferredExec', { ownerKey, laneId });
+        owners.delete(ownerKey);
+        laneOwner.delete(laneId);
+        VideoEngine.release(laneId);
+        notify(ownerKey, null);
+        return true;
+      }
+      break;
+    }
+    return false;
+  },
+
+  /** Which lane (if any) does this owner currently hold? Null = none. */
+  laneFor(ownerKey: OwnerKey | null | undefined): LaneId | null {
+    if (!ownerKey) return null;
+    return owners.get(ownerKey)?.laneId ?? null;
   },
 
   /** Subscribe to lane-change events for a given owner (eviction → null). */
@@ -148,6 +218,7 @@ export const RailLanePool = {
     return {
       owners: Array.from(owners.entries()).map(([k, v]) => ({ ownerKey: k, ...v })),
       lanes: Array.from(laneOwner.entries()),
+      pinned: Array.from(pinnedByBorrow),
     };
   },
 

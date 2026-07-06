@@ -70,13 +70,21 @@ export function useRailLane(opts: UseRailLaneOptions): UseRailLaneResult {
   }, [opts.ownerKey, opts.hlsUrl]);
 
 
-  // Acquire / release lane based on active state.
+  // Acquire / release lane based on active state. Acquire may return null
+  // when the pool is full AND every owner is pinned by a fullscreen borrow —
+  // in that case we stay on the poster and let the next eligibility change
+  // (typically borrow-unpin + a re-activation) retry.
   useEffect(() => {
     if (!eligible) return;
     const key = opts.ownerKey as string;
     const lane = RailLanePool.acquire(key);
     setLaneId(lane);
     setReady(false);
+    if (lane == null) {
+      // No acquisition happened — no owner record to release. Still subscribe
+      // in case another owner unpins and we get notified via a later touch.
+      return;
+    }
     const unsub = RailLanePool.subscribe(key, (l) => {
       setLaneId(l);
       if (l == null) setReady(false);

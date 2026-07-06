@@ -1,8 +1,9 @@
-import React, { useRef } from 'react';
+import React, { useRef, useEffect } from 'react';
 import { Film } from 'lucide-react';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import type { FeedPost } from '@/components/media-system/types/media';
 import { useRailLane } from '@/video/useRailLane';
+import { originHostRegistry } from '@/video/originHostRegistry';
 import { AMBER, INK_TINT_04, INK_TINT_06, SURFACE } from '@/features/courses/_shared/tokens';
 
 function formatDuration(seconds?: number): string {
@@ -51,6 +52,16 @@ export const CourseMediaLandscapeCard: React.FC<CourseMediaLandscapeCardProps> =
     posterUrl: thumbnailUrl || null,
     postId: post.id,
   });
+
+  // Register lane host with the origin registry so the fullscreen borrow-
+  // return path (Stage-7 PR-1) can find the tile on close.
+  useEffect(() => {
+    if (!ownerKey) return;
+    const el = laneHostRef.current;
+    if (!el) return;
+    originHostRegistry.register(ownerKey, el);
+    return () => originHostRegistry.unregister(ownerKey, el);
+  }, [ownerKey, laneHostRef]);
 
   return (
     <div

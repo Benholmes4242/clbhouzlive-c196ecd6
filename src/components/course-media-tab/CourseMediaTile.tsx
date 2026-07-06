@@ -1,8 +1,9 @@
-import React, { useRef } from 'react';
+import React, { useRef, useEffect } from 'react';
 import { Film } from 'lucide-react';
 import type { FeedPost } from '@/components/media-system/types/media';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { useRailLane } from '@/video/useRailLane';
+import { originHostRegistry } from '@/video/originHostRegistry';
 import { INK_TINT_04, INK_TINT_06, SURFACE } from '@/features/courses/_shared/tokens';
 
 
@@ -53,6 +54,17 @@ export const CourseMediaTile: React.FC<CourseMediaTileProps> = ({ post, index, f
     posterUrl: thumbnailUrl || null,
     postId: post.id,
   });
+
+  // Register the lane host with the origin registry so the fullscreen
+  // borrow-return path can find it on close. Only when this tile is a video
+  // lane candidate (otherwise there's nothing to return).
+  useEffect(() => {
+    if (!ownerKey) return;
+    const el = laneHostRef.current;
+    if (!el) return;
+    originHostRegistry.register(ownerKey, el);
+    return () => originHostRegistry.unregister(ownerKey, el);
+  }, [ownerKey, laneHostRef]);
 
   return (
     <div

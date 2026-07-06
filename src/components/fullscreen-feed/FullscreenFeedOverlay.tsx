@@ -27,9 +27,63 @@ import { canManagePost } from '@/lib/canManagePost';
 import { getActorRouteByType } from '@/types/actor';
 // [VIDEOSTUB] FullscreenDebugPanel + mobileVideoDebug imports removed — engine severed.
 import { fsv, fsvViewport } from '@/perf/fsvTelemetry';
+import { isPerfEnabled } from '@/perf/navTiming';
+import { VideoEngine } from '@/video/VideoEngine';
+import { RailLanePool } from '@/video/railLanePool';
+import { originHostRegistry } from '@/video/originHostRegistry';
+import type { BorrowDescriptor } from '@/store/fullscreenFeedStore';
 const fsTimeStart = (_label: string) => {};
 const fsTimeEnd = (_label: string, _note?: string) => {};
 const fsEvent = (_label: string, _data?: unknown) => {};
+
+const BORROW_DBG = (evt: string, payload: Record<string, unknown> = {}) => {
+  const flag =
+    typeof window !== 'undefined' && (window as any).__VIDEO_ENGINE_DBG__;
+  if (!flag && !isPerfEnabled()) return;
+  // eslint-disable-next-line no-console
+  console.info('[BORROW]', evt, payload);
+};
+
+/**
+ * Return / demote a live borrow. Called from three sites:
+ *  - vertical swipe away from the opening slide (demote — one-shot borrow)
+ *  - explicit close (return: FLIP-back into origin tile if registered, else park)
+ *  - overlay unmount w/o close (route change edge)
+ * All paths unmount from the current wrapper, re-mount into the destination
+ * host (or the hidden host as fallback), re-mute (rails are always muted),
+ * unpin the pool, and clear the store's borrow descriptor.
+ */
+function returnBorrow(borrow: BorrowDescriptor, reason: 'close' | 'route' | 'demote'): void {
+  const originHost = reason === 'demote' ? null : originHostRegistry.get(borrow.ownerKey);
+  const viewportChanged =
+    typeof window !== 'undefined' &&
+    (window.innerWidth !== borrow.viewportW || window.innerHeight !== borrow.viewportH);
+  // Re-mute before re-parenting so the tile inherits muted (rails are always muted).
+  try { VideoEngine.setMuted(borrow.laneId, true); } catch {}
+  // Reset object-fit to cover for the tile's aspect.
+  try { VideoEngine.setObjectFit(borrow.laneId, 'cover'); } catch {}
+  if (reason !== 'demote' && originHost && !viewportChanged) {
+    try {
+      VideoEngine.mountLane(borrow.laneId, originHost);
+      const hadPendingRelease = RailLanePool.unpin(borrow.laneId);
+      BORROW_DBG('return.animate', {
+        laneId: borrow.laneId, ownerKey: borrow.ownerKey, postId: borrow.postId,
+        hadPendingRelease,
+      });
+      return;
+    } catch {
+      /* fall through to park */
+    }
+  }
+  // Park in hidden host (unmountLane) then unpin. Any deferred release fires.
+  try { VideoEngine.unmountLane(borrow.laneId); } catch {}
+  const hadPendingRelease = RailLanePool.unpin(borrow.laneId);
+  BORROW_DBG(reason === 'demote' ? 'unpin' : 'return.fallback', {
+    laneId: borrow.laneId, ownerKey: borrow.ownerKey, postId: borrow.postId,
+    reason, originAlive: !!originHost, tileHostFound: !!originHost,
+    viewportChanged, hadPendingRelease,
+  });
+}
 
 
 export function FullscreenFeedOverlay() {
@@ -42,6 +96,42 @@ export function FullscreenFeedOverlay() {
   const isFetchingNextPage = useFullscreenFeedStore(s => s.isFetchingNextPage);
   const readOnly = useFullscreenFeedStore(s => s.readOnly);
   const origin = useFullscreenFeedStore(s => s.origin);
+  const borrow = useFullscreenFeedStore(s => s.borrow);
+  const clearBorrow = useFullscreenFeedStore(s => s.clearBorrow);
+
+  // Snapshot borrow so the isOpen-cleanup path can run the return even after
+  // close() has cleared the store's borrow field synchronously.
+  const borrowRef = useRef<BorrowDescriptor | null>(null);
+  useEffect(() => { borrowRef.current = borrow; }, [borrow]);
+
+  // ── Swipe-away demotion (A1c: borrow is a one-shot property of the tap) ──
+  // When the user swipes vertically off the opening slide, unmount the
+  // borrowed lane, unpin, and clear the store's borrow so the opening slide
+  // (on swipe-back) takes the standard 'fullscreen' lane path via lastPos.
+  useEffect(() => {
+    if (!isOpen) return;
+    if (!borrow) return;
+    if (activeIndex === startIndex) return;
+    returnBorrow(borrow, 'demote');
+    borrowRef.current = null;
+    clearBorrow();
+  }, [isOpen, borrow, activeIndex, startIndex, clearBorrow]);
+
+  // Wrap close so borrow-return runs BEFORE the store clears its fields.
+  // All in-overlay callers (ESC, top-action-bar close, deep-link back) should
+  // route through this. Route-change navigation that bypasses close still
+  // gets handled by the isOpen-effect cleanup below (using borrowRef).
+  const handleClose = useCallback(() => {
+    const b = borrowRef.current;
+    if (b) {
+      returnBorrow(b, 'close');
+      borrowRef.current = null;
+    }
+    close();
+  }, [close]);
+
+
+
 
   // ── FLIP clone state ──
   // When origin is present, we mount a transform-only expanding poster clone
@@ -82,9 +172,9 @@ export function FullscreenFeedOverlay() {
 
   const handleViewProfile = useCallback(() => {
     if (!activePost) return;
-    close();
+    handleClose();
     navigate(getActorRouteByType(activePost.actorType, activePost.actorId), { state: activePost.actorType === 'business' ? { source: 'feed' } : undefined });
-  }, [activePost, close, navigate]);
+  }, [activePost, handleClose, navigate]);
 
   const handleReviewTap = useCallback(() => {
     if (!activeReview || !activePost) return;
@@ -116,11 +206,11 @@ export function FullscreenFeedOverlay() {
       // If the review sheet is open on top of this overlay, let IT handle ESC first.
       const sheetIsOpen = useReviewSheetStore.getState().isOpen;
       if (sheetIsOpen) return;
-      close();
+      handleClose();
     };
     window.addEventListener("keydown", handler);
     return () => window.removeEventListener("keydown", handler);
-  }, [isOpen, close]);
+  }, [isOpen, handleClose]);
 
   // Deep-link entry: open comments sheet on mount when requested by the opener
   // (e.g. PostDeepLinkPage routing in from a notification tap).
@@ -180,9 +270,16 @@ export function FullscreenFeedOverlay() {
         fsv('close.effect', {
           viewport: fsvViewport(),
         });
-        // FS_CLOSE currentTime read removed — playhead sync is nuked, and the
-        // fullscreen <video> is typically detached by the time this cleanup
-        // runs (always logged fsT=-1). Kept as a no-op boundary.
+        // Route-change guard: if the overlay is unmounting without an explicit
+        // close() (e.g. navigation) borrowRef still holds the descriptor. Run
+        // the return path so the pool is unpinned and the tile inherits its
+        // element again.
+        const stale = borrowRef.current;
+        if (stale) {
+          returnBorrow(stale, 'route');
+          borrowRef.current = null;
+        }
+
 
 
 
@@ -223,6 +320,14 @@ export function FullscreenFeedOverlay() {
   const [targetRect, setTargetRect] = useState<{ top: number; left: number; width: number; height: number } | null>(null);
 
   useEffect(() => {
+    // Borrow opens skip the poster-clone FLIP entirely — BorrowedFullscreenSlot
+    // owns its own live-element expand transition. Fire firstFrameReady so the
+    // host opacity gate below flips to 1 immediately.
+    if (isOpen && borrow) {
+      setCloneVisible(false);
+      setFirstFrameReady(true);
+      return;
+    }
     if (isOpen && origin) {
       fsv('clone.init', {
         origin,
@@ -268,7 +373,7 @@ export function FullscreenFeedOverlay() {
       setTargetRect(null);
       if (watchdogRef.current) clearTimeout(watchdogRef.current);
     }
-  }, [isOpen, origin]);
+  }, [isOpen, origin, borrow]);
 
   const handleSnapFeedFirstFrame = useCallback(() => {
     fsv('clone.slideFF', { note: 'onFirstFrameReady from SnapFeed' });
@@ -354,7 +459,7 @@ export function FullscreenFeedOverlay() {
                     onFollow={(post) => handleFollowChange(post.userId, !getFollowState(post))}
                     onViewProfile={handleViewProfile}
                     onReviewTap={handleReviewTap}
-                    onBeforeNavigate={close}
+                    onBeforeNavigate={handleClose}
                     overlayVisible={true}
                     isOwnPost={isOwnPost}
                     golfCourse={golfCourse}
@@ -362,7 +467,7 @@ export function FullscreenFeedOverlay() {
                     isActiveReview={isActiveReview}
                     bottomOffset={0}
                     topActionBar
-                    onClose={close}
+                    onClose={handleClose}
                     readOnly={readOnly}
                   />
 

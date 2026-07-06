@@ -2,6 +2,7 @@ import { create } from 'zustand';
 import type { FeedPost } from '@/components/media-system/types/media';
 import { engagementBus } from '@/lib/engagementBus';
 import { applyEngagementDelta } from '@/lib/applyEngagementDelta';
+import type { LaneId } from '@/video/lanePolicy';
 
 
 
@@ -10,6 +11,22 @@ export interface OpenOrigin {
   posterUrl: string | null;
   borderRadius: string;
   aspectRatio: number;
+}
+
+/**
+ * Stage-7 PR-1 borrow descriptor. Present when the fullscreen viewer opened
+ * over a live rail-pool lane and is re-parenting that live element into the
+ * opening slide (no fullscreen-lane load for the opening slide).
+ */
+export interface BorrowDescriptor {
+  laneId: LaneId;
+  ownerKey: string;
+  postId: string;
+  posterUrl: string | null;
+  /** Cached viewport at borrow time — used on close to detect orientation
+   *  change (fallback path). */
+  viewportW: number;
+  viewportH: number;
 }
 
 interface OpenOptions {
@@ -52,6 +69,11 @@ interface OpenOptions {
    *  `useIsViewerOwnedBy(surface)` so background surfaces don't leak their
    *  posts into a viewer another surface opened. */
   openedFrom?: string | null;
+  /** Stage-7 PR-1: live rail-lane borrow descriptor. Present only when the
+   *  tapped tile was actively playing a rail lane. FullscreenVideoSlot on the
+   *  opening slide takes the borrow branch (re-parents the live element)
+   *  instead of loading the 'fullscreen' lane. */
+  borrow?: BorrowDescriptor | null;
 }
 
 
@@ -74,6 +96,7 @@ interface FullscreenFeedState {
   mediaIndex: number;
   mediaId: string | null;
   openedFrom: string | null;
+  borrow: BorrowDescriptor | null;
 
   open: (posts: FeedPost[], startIndex?: number, options?: OpenOptions) => void;
   close: () => void;
@@ -81,6 +104,9 @@ interface FullscreenFeedState {
   setActiveIndex: (idx: number) => void;
   consumeOpenCommentsInitially: () => void;
   consumeInitialCommentId: () => void;
+  /** Clear the borrow descriptor once the overlay has handed the element
+   *  back / demoted it. Non-borrow callers never invoke this. */
+  clearBorrow: () => void;
   /** Allow openers to push updated pagination state into the store as the
    *  underlying query progresses (e.g. hasNextPage flips false on last page,
    *  isFetchingNextPage toggles during a fetch). */
@@ -104,6 +130,7 @@ export const useFullscreenFeedStore = create<FullscreenFeedState>((set, get) => 
   mediaIndex: 0,
   mediaId: null,
   openedFrom: null,
+  borrow: null,
 
   open: (posts, startIndex = 0, options) => {
     set({
@@ -123,6 +150,7 @@ export const useFullscreenFeedStore = create<FullscreenFeedState>((set, get) => 
       mediaIndex: options?.mediaIndex ?? 0,
       mediaId: options?.mediaId ?? null,
       openedFrom: options?.openedFrom ?? null,
+      borrow: options?.borrow ?? null,
     });
   },
   close: () => {
@@ -143,11 +171,13 @@ export const useFullscreenFeedStore = create<FullscreenFeedState>((set, get) => 
       mediaIndex: 0,
       mediaId: null,
       openedFrom: null,
+      borrow: null,
     });
     if (cb) {
       try { cb(); } catch {}
     }
   },
+  clearBorrow: () => set({ borrow: null }),
   appendPosts: (newPosts) => {
     set((s) => {
       const existing = new Set(s.posts.map((p) => p.id));
