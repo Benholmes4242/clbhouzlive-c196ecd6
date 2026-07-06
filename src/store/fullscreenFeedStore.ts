@@ -96,6 +96,7 @@ interface FullscreenFeedState {
   mediaIndex: number;
   mediaId: string | null;
   openedFrom: string | null;
+  borrow: BorrowDescriptor | null;
 
   open: (posts: FeedPost[], startIndex?: number, options?: OpenOptions) => void;
   close: () => void;
@@ -103,6 +104,9 @@ interface FullscreenFeedState {
   setActiveIndex: (idx: number) => void;
   consumeOpenCommentsInitially: () => void;
   consumeInitialCommentId: () => void;
+  /** Clear the borrow descriptor once the overlay has handed the element
+   *  back / demoted it. Non-borrow callers never invoke this. */
+  clearBorrow: () => void;
   /** Allow openers to push updated pagination state into the store as the
    *  underlying query progresses (e.g. hasNextPage flips false on last page,
    *  isFetchingNextPage toggles during a fetch). */
