@@ -406,11 +406,6 @@ export const CardFeed = forwardRef<CardFeedHandle, CardFeedProps>(function CardF
 
 
       const initialSlide = carouselPositions.get(index) ?? 0;
-      const isBorrowedCard = fsOpen && !!borrowedOwnerKey &&
-        borrowedOwnerKey.startsWith(`${post.id}:`);
-      const isActive = !fsOpen && index === playingIdx; // PLAYS — settle-gated; suspended while fullscreen
-      const isNear = isBorrowedCard || (!fsOpen && Math.abs(index - activeIdx) <= VIDEO_NEIGHBOUR_RADIUS); // mounts InlineVideo + host so it's in the DOM before activation
-      const mountVideo = isNear;
       return (
         <div
           data-card-index={index}
@@ -424,28 +419,37 @@ export const CardFeed = forwardRef<CardFeedHandle, CardFeedProps>(function CardF
             }
           }}
         >
-          <FeedCard
+          <FeedItemGate
             post={post}
-            liked={!!likeState?.liked}
-            likeCount={likeState?.count ?? post.likeCount ?? 0}
-            commentCount={getCommentCount(post)}
-            onLike={onLike}
-            onComment={onComment}
-            onShare={onShare}
-            onProfile={onProfile}
-            onReviewTap={onReviewTap}
-            onCourse={onCourse}
-            onOpenMedia={handleOpenMedia}
-            isActive={isActive}
-            mountVideo={mountVideo}
-            initialMediaIndex={initialSlide}
-            onCarouselIndexChange={getCarouselChangeHandler(post.id)}
-            onFollow={onFollow}
-            currentUserId={currentUserId}
-            feedIndex={index}
-            isFirstCard={index === 0}
-            onContentReady={onFirstContentReady}
-          />
+            index={index}
+            playingIdx={playingIdx}
+            activeIdx={activeIdx}
+          >
+            {({ isActive, mountVideo }) => (
+              <FeedCard
+                post={post}
+                liked={!!likeState?.liked}
+                likeCount={likeState?.count ?? post.likeCount ?? 0}
+                commentCount={getCommentCount(post)}
+                onLike={onLike}
+                onComment={onComment}
+                onShare={onShare}
+                onProfile={onProfile}
+                onReviewTap={onReviewTap}
+                onCourse={onCourse}
+                onOpenMedia={handleOpenMedia}
+                isActive={isActive}
+                mountVideo={mountVideo}
+                initialMediaIndex={initialSlide}
+                onCarouselIndexChange={getCarouselChangeHandler(post.id)}
+                onFollow={onFollow}
+                currentUserId={currentUserId}
+                feedIndex={index}
+                isFirstCard={index === 0}
+                onContentReady={onFirstContentReady}
+              />
+            )}
+          </FeedItemGate>
           {/* Subtle inter-card seam — just-perceptible lift above ink chrome */}
           <div aria-hidden style={{ height: 5, background: '#1E212B' }} />
         </div>
@@ -453,10 +457,7 @@ export const CardFeed = forwardRef<CardFeedHandle, CardFeedProps>(function CardF
     },
     [
       activeIdx,
-      playingIdx,        // isActive keys off playingIdx; without this the
-                         // settle-promoted play index never reaches the tiles
-      fsOpen,            // recompute isActive/isNear when fullscreen opens/closes
-      borrowedOwnerKey,  // keeps the borrowed card's host mounted while fs open
+      playingIdx,
       carouselPositions,
       getCarouselChangeHandler,
       getCommentCount,
