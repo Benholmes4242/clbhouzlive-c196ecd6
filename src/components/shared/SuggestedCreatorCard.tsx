@@ -2,7 +2,7 @@ import React, { useState, useCallback, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useQueryClient } from '@tanstack/react-query';
 import { Check } from 'lucide-react';
-import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
+import { SquircleAvatar, LIGHT_HAIRLINE, DARK_HAIRLINE } from '@/components/ui/SquircleAvatar';
 import { useFollowState } from '@/hooks/useFollowState';
 import { useToggleFollow } from '@/hooks/useToggleFollow';
 import { useActiveActor } from '@/context/ActiveActorContext';
@@ -116,7 +116,8 @@ export const SuggestedCreatorCard: React.FC<SuggestedCreatorCardProps> = ({
           src={creator.avatarUrl}
           alt={creator.displayName}
           fallback={initials}
-          hideRing={true}
+          hairlineRing
+          ringColor={isDark ? DARK_HAIRLINE : LIGHT_HAIRLINE}
         />
         {creator.isVerified && (
           <div className="flex items-center justify-center" style={{
