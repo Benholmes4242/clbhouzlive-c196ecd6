@@ -81,12 +81,18 @@ export const ResponseDisplay: React.FC<ResponseDisplayProps> = ({
             alt={response.business_name}
             size={28}
             fallback={response.business_name.slice(0, 2).toUpperCase()}
+            hairlineRing
+            ringColor={LIGHT_HAIRLINE}
           />
         ) : (
-          <div className="w-7 h-7 rounded-md bg-muted flex items-center justify-center text-xs font-semibold text-foreground">
-            {response.business_name.slice(0, 2).toUpperCase()}
-          </div>
+          <SquircleAvatar
+            size={28}
+            fallback={response.business_name.slice(0, 2).toUpperCase()}
+            hairlineRing
+            ringColor={LIGHT_HAIRLINE}
+          />
         )}
+
         <div className="flex items-center gap-1.5 flex-wrap min-w-0">
           <span className="text-sm font-semibold text-foreground truncate">
             {response.business_name}
