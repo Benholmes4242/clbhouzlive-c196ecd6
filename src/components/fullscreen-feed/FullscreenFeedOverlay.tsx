@@ -54,6 +54,9 @@ const BORROW_DBG = (evt: string, payload: Record<string, unknown> = {}) => {
  * unpin the pool, and clear the store's borrow descriptor.
  */
 function returnBorrow(borrow: BorrowDescriptor, reason: 'close' | 'route' | 'demote'): void {
+  // Clear the engine-side borrow flag FIRST so the return sequence's pauses /
+  // remounts / releases route through the normal owner-guard path again.
+  try { VideoEngine.clearBorrowed(borrow.laneId); } catch {}
   const originHost = reason === 'demote' ? null : originHostRegistry.get(borrow.ownerKey);
   const viewportChanged =
     typeof window !== 'undefined' &&
@@ -65,7 +68,10 @@ function returnBorrow(borrow: BorrowDescriptor, reason: 'close' | 'route' | 'dem
   if (reason !== 'demote' && originHost && !viewportChanged) {
     try {
       VideoEngine.mountLane(borrow.laneId, originHost);
-      const hadPendingRelease = RailLanePool.unpin(borrow.laneId);
+      // Live-tile return: DO NOT execute the deferred release — the tile will
+      // re-acquire this exact lane (coalesced) as soon as the autoplay gate
+      // lifts, and tearing the source down here would blank + reload the tile.
+      const hadPendingRelease = RailLanePool.unpin(borrow.laneId, { executeDeferred: false });
       BORROW_DBG('return.animate', {
         laneId: borrow.laneId, ownerKey: borrow.ownerKey, postId: borrow.postId,
         hadPendingRelease,
@@ -77,7 +83,7 @@ function returnBorrow(borrow: BorrowDescriptor, reason: 'close' | 'route' | 'dem
   }
   // Park in hidden host (unmountLane) then unpin. Any deferred release fires.
   try { VideoEngine.unmountLane(borrow.laneId); } catch {}
-  const hadPendingRelease = RailLanePool.unpin(borrow.laneId);
+  const hadPendingRelease = RailLanePool.unpin(borrow.laneId, { executeDeferred: true });
   BORROW_DBG(reason === 'demote' ? 'unpin' : 'return.fallback', {
     laneId: borrow.laneId, ownerKey: borrow.ownerKey, postId: borrow.postId,
     reason, originAlive: !!originHost, tileHostFound: !!originHost,

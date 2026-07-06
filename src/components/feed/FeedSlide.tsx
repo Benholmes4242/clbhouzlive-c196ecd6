@@ -446,6 +446,10 @@ const BorrowedFullscreenSlot: React.FC<{
     // Element is currently in the tile (or hidden host if tile evicted).
     // mountLane atomically moves it here; hls instance stays paired.
     VideoEngine.mountLane(borrow.laneId, el);
+    // Assert play-intent post-mount (Stage-7 PR-1 fix): sets wantPlay and
+    // recovers any owner-caller pause that raced between pin + markBorrowed.
+    // Belt-and-braces with the engine's borrow guard.
+    void VideoEngine.play(borrow.laneId, { callerPostId: borrow.ownerKey });
     // Ensure cover for Phase 1.
     VideoEngine.setObjectFit(borrow.laneId, 'cover');
     if (isPerfEnabled() || (typeof window !== 'undefined' && (window as any).__VIDEO_ENGINE_DBG__)) {
