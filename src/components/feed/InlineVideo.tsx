@@ -104,6 +104,18 @@ export const InlineVideo: React.FC<Props> = ({
     return () => cancelAnimationFrame(id);
   }, [posterUrl, onFirstFrameReady]);
 
+  // Stage-7 PR-2: register this card's lane host in the origin registry so
+  // returnBorrow() can find it and animate the borrowed <video> back into the
+  // card on close. Element-identity guard in unregister protects against
+  // register/unregister races.
+  useEffect(() => {
+    if (!resolvedOwnerKey) return;
+    const host = lane.hostRef.current;
+    if (!host) return;
+    originHostRegistry.register(resolvedOwnerKey, host);
+    return () => originHostRegistry.unregister(resolvedOwnerKey, host);
+  }, [resolvedOwnerKey, lane.hostRef]);
+
   return (
     <div style={{ position: 'absolute', inset: 0, backgroundColor: '#0a0a0a' }}>
       {posterUrl && (
