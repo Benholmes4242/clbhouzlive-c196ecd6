@@ -27,9 +27,63 @@ import { canManagePost } from '@/lib/canManagePost';
 import { getActorRouteByType } from '@/types/actor';
 // [VIDEOSTUB] FullscreenDebugPanel + mobileVideoDebug imports removed — engine severed.
 import { fsv, fsvViewport } from '@/perf/fsvTelemetry';
+import { isPerfEnabled } from '@/perf/navTiming';
+import { VideoEngine } from '@/video/VideoEngine';
+import { RailLanePool } from '@/video/railLanePool';
+import { originHostRegistry } from '@/video/originHostRegistry';
+import type { BorrowDescriptor } from '@/store/fullscreenFeedStore';
 const fsTimeStart = (_label: string) => {};
 const fsTimeEnd = (_label: string, _note?: string) => {};
 const fsEvent = (_label: string, _data?: unknown) => {};
+
+const BORROW_DBG = (evt: string, payload: Record<string, unknown> = {}) => {
+  const flag =
+    typeof window !== 'undefined' && (window as any).__VIDEO_ENGINE_DBG__;
+  if (!flag && !isPerfEnabled()) return;
+  // eslint-disable-next-line no-console
+  console.info('[BORROW]', evt, payload);
+};
+
+/**
+ * Return / demote a live borrow. Called from three sites:
+ *  - vertical swipe away from the opening slide (demote — one-shot borrow)
+ *  - explicit close (return: FLIP-back into origin tile if registered, else park)
+ *  - overlay unmount w/o close (route change edge)
+ * All paths unmount from the current wrapper, re-mount into the destination
+ * host (or the hidden host as fallback), re-mute (rails are always muted),
+ * unpin the pool, and clear the store's borrow descriptor.
+ */
+function returnBorrow(borrow: BorrowDescriptor, reason: 'close' | 'route' | 'demote'): void {
+  const originHost = reason === 'demote' ? null : originHostRegistry.get(borrow.ownerKey);
+  const viewportChanged =
+    typeof window !== 'undefined' &&
+    (window.innerWidth !== borrow.viewportW || window.innerHeight !== borrow.viewportH);
+  // Re-mute before re-parenting so the tile inherits muted (rails are always muted).
+  try { VideoEngine.setMuted(borrow.laneId, true); } catch {}
+  // Reset object-fit to cover for the tile's aspect.
+  try { VideoEngine.setObjectFit(borrow.laneId, 'cover'); } catch {}
+  if (reason !== 'demote' && originHost && !viewportChanged) {
+    try {
+      VideoEngine.mountLane(borrow.laneId, originHost);
+      const hadPendingRelease = RailLanePool.unpin(borrow.laneId);
+      BORROW_DBG('return.animate', {
+        laneId: borrow.laneId, ownerKey: borrow.ownerKey, postId: borrow.postId,
+        hadPendingRelease,
+      });
+      return;
+    } catch {
+      /* fall through to park */
+    }
+  }
+  // Park in hidden host (unmountLane) then unpin. Any deferred release fires.
+  try { VideoEngine.unmountLane(borrow.laneId); } catch {}
+  const hadPendingRelease = RailLanePool.unpin(borrow.laneId);
+  BORROW_DBG(reason === 'demote' ? 'unpin' : 'return.fallback', {
+    laneId: borrow.laneId, ownerKey: borrow.ownerKey, postId: borrow.postId,
+    reason, originAlive: !!originHost, tileHostFound: !!originHost,
+    viewportChanged, hadPendingRelease,
+  });
+}
 
 
 export function FullscreenFeedOverlay() {
