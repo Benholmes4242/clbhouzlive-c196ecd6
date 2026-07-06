@@ -280,6 +280,7 @@ export const LightCardFeed: React.FC<LightCardFeedProps> = ({
       activeIdx,
       playingIdx,
       fsOpen,
+      borrowedOwnerKey,
       carouselPositions,
       getCarouselChangeHandler,
       getCommentCount,
