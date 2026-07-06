@@ -27,6 +27,10 @@ export interface BorrowDescriptor {
    *  change (fallback path). */
   viewportW: number;
   viewportH: number;
+  /** Stage-7 PR-2: pre-borrow mute state (feed-active only). Rail borrows
+   *  omit this — returnBorrow forces mute for rails. Feed-active restores
+   *  this on return so an unmuted card stays unmuted after close. */
+  wasMuted?: boolean;
 }
 
 interface OpenOptions {
