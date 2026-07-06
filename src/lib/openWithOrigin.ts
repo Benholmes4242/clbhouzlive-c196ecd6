@@ -145,6 +145,7 @@ export function openWithOrigin({
           viewportH: typeof window !== 'undefined' ? window.innerHeight : 0,
         };
         RailLanePool.pin(liveLane);
+        VideoEngine.markBorrowed(liveLane);
         BORROW_DBG('pin', { ownerKey: railOwnerKey, laneId: liveLane, postId });
       }
     } catch {
