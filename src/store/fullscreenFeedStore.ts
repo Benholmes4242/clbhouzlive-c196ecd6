@@ -145,6 +145,7 @@ export const useFullscreenFeedStore = create<FullscreenFeedState>((set, get) => 
   mediaId: null,
   openedFrom: null,
   borrow: null,
+  borrowDemoteRequested: false,
 
   open: (posts, startIndex = 0, options) => {
     set({
