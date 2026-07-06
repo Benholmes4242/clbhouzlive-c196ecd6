@@ -39,11 +39,9 @@ const AboutMediaStrip: React.FC<AboutMediaStripProps> = ({ clubId, onSeeAllClick
 
   const { data: rawMedia, isLoading: loading } = useClubMedia(clubId, fetchLimit);
 
-  const items = useMemo(() => {
-    if (!rawMedia) return [];
-    const sliced = rawMedia.slice(0, maxItems);
-    return adaptClubMediaArrayToExploreItems(sliced);
-  }, [rawMedia, maxItems]);
+  // (Removed dependency on the legacy explore adapter; tiles derive
+  //  directly from `rawMedia` below.)
+
 
   const feedPosts = useMemo((): FeedPost[] => {
     if (!rawMedia) return [];
