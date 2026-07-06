@@ -246,10 +246,11 @@ const GlobalBottomNavigation: React.FC<GlobalBottomNavigationProps> = ({ chromeS
         {showNavigation && (
           <motion.div
             key="floating-nav"
-            initial={{ y: 24, opacity: 0 }}
-            animate={{ y: 0, opacity: 1 }}
-            exit={{ y: 24, opacity: 0 }}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
             transition={{ duration: 0.22, ease: [0.2, 0.8, 0.2, 1] }}
+
             style={{
               position: 'fixed',
               left: 0,
