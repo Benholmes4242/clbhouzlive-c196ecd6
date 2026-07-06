@@ -1,7 +1,5 @@
-import {
-  MapPinIcon,
-  TrophyIcon,
-} from '@heroicons/react/24/outline';
+import { TrophyIcon } from '@heroicons/react/24/outline';
+import MapPinIcon from '@/components/icons/MapPinIcon';
 import HouseIcon from '@/components/icons/HouseIcon';
 import VideoIcon from '@/components/icons/VideoIcon';
 import PlusSquareIcon from '@/components/icons/PlusSquareIcon';
