@@ -158,9 +158,10 @@ export function isImmersiveRoute(pathname: string): boolean {
  * The cold-launch chain (splash → shell → skeleton → feed) is all
  * `#15171F` on these routes so there is no perceptible colour transition.
  */
-export const DARK_CHROME_ROUTES = ['/', '/clubhouse'] as const;
+export const DARK_CHROME_ROUTES = ['/', '/clubhouse', '/auth', '/signup'] as const;
 
 export function isDarkChromeRoute(pathname: string): boolean {
   return (DARK_CHROME_ROUTES as readonly string[]).includes(pathname)
+    || pathname.startsWith('/auth/')
     || pathname.startsWith('/handicap');
 }
