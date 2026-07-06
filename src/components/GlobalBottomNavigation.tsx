@@ -67,20 +67,22 @@ type ThemeTokens = {
 const DARK_TOKENS: ThemeTokens = {
   fill: 'rgba(27,30,39,0.86)',
   hairline: '1px solid rgba(255,255,255,0.10)',
-  shadow: '0 10px 30px rgba(0,0,0,0.45)',
-  ink: '#F2F4F7',
-  dim: 'rgba(242,244,247,0.5)',
+  // Specular top-rim highlight + drop shadow (kept in both no-blur and blur paths).
+  shadow: 'inset 0 1px 0 rgba(255,255,255,0.14), 0 10px 30px rgba(0,0,0,0.45)',
+  ink: '#FFFFFF',
+  dim: 'rgba(255,255,255,0.62)',
   lozenge: 'rgba(255,255,255,0.10)',
 };
 
 const LIGHT_TOKENS: ThemeTokens = {
   fill: 'rgba(250,251,253,0.88)',
   hairline: '1px solid rgba(15,23,42,0.08)',
-  shadow: '0 10px 30px rgba(15,23,42,0.16)',
+  shadow: 'inset 0 1px 0 rgba(255,255,255,0.70), 0 10px 30px rgba(15,23,42,0.16)',
   ink: '#0F172A',
-  dim: 'rgba(15,23,42,0.58)',
+  dim: 'rgba(15,23,42,0.62)',
   lozenge: 'rgba(15,23,42,0.07)',
 };
+
 
 const REDUCED_MOTION =
   typeof window !== 'undefined' &&
