@@ -222,6 +222,19 @@ class VideoEngineImpl {
 
   /** Return the lane's element to the hidden host (does not release source). */
   unmountLane(laneId: LaneId): void {
+    // BORROW GUARD (Stage-7 PR-2): while a lane is borrowed by the fullscreen
+    // viewer, ignore unmountLane calls — the element lives in the viewer's
+    // wrapper right now, and re-parenting it into the hidden host would steal
+    // it back mid-playback. returnBorrow clears the borrow flag BEFORE its
+    // own fallback park, so it isn't affected.
+    if (this.borrowedLanes.has(laneId)) {
+      const lane = this.getLane(laneId);
+      if (isFsv(laneId)) {
+        fsvEl('eng.unmount.borrowed', lane.el, { laneId, postId: lane.postId });
+      }
+      DBG('unmount.borrowed', { laneId });
+      return;
+    }
     const lane = this.getLane(laneId);
     const host = ensureHiddenHost();
     if (lane.el.parentElement !== host) {
