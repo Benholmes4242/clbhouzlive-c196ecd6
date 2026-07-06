@@ -172,9 +172,9 @@ export function FullscreenFeedOverlay() {
 
   const handleViewProfile = useCallback(() => {
     if (!activePost) return;
-    close();
+    handleClose();
     navigate(getActorRouteByType(activePost.actorType, activePost.actorId), { state: activePost.actorType === 'business' ? { source: 'feed' } : undefined });
-  }, [activePost, close, navigate]);
+  }, [activePost, handleClose, navigate]);
 
   const handleReviewTap = useCallback(() => {
     if (!activeReview || !activePost) return;
