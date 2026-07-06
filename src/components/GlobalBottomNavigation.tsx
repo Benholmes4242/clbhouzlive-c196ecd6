@@ -223,17 +223,25 @@ const GlobalBottomNavigation: React.FC<GlobalBottomNavigationProps> = ({ chromeS
 
   return (
     <>
-      {/* One-off style: gate backdrop-filter so unsupported WebViews degrade
-          gracefully to the (already 86%-opaque) fill. */}
+      {/* One-off style: gate translucency + backdrop-filter so unsupported
+          WebViews degrade to the opaque token fill. Blur-supported paths get
+          a more transparent liquid-glass fill so page content shows through. */}
       <style>{`
         .glass-nav-pill { }
         @supports (backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px)) {
           .glass-nav-pill {
-            backdrop-filter: blur(18px) saturate(160%);
-            -webkit-backdrop-filter: blur(18px) saturate(160%);
+            backdrop-filter: blur(22px) saturate(180%);
+            -webkit-backdrop-filter: blur(22px) saturate(180%);
+          }
+          .glass-nav-pill[data-theme='dark'] {
+            background: rgba(27,30,39,0.62) !important;
+          }
+          .glass-nav-pill[data-theme='light'] {
+            background: rgba(250,251,253,0.66) !important;
           }
         }
       `}</style>
+
 
       <AnimatePresence>
         {showNavigation && (
