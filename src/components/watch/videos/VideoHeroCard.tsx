@@ -1,7 +1,7 @@
 import { memo, useCallback, useMemo, useRef, useState } from 'react';
 import { Clock, Heart } from 'lucide-react';
 import { openWithOrigin } from '@/lib/openWithOrigin';
-import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
+import { SquircleAvatar, LIGHT_HAIRLINE } from '@/components/ui/SquircleAvatar';
 import { Pin } from '../proshop/Pin';
 import type { FeedPost } from '@/components/media-system/types/media';
 
@@ -147,7 +147,7 @@ function VideoHeroCardInner({ post, index, allPosts }: VideoHeroCardProps) {
       </div>
 
       <div style={{ marginTop: 8, padding: '0 2px', display: 'flex', alignItems: 'center', gap: 8, minWidth: 0 }}>
-        <SquircleAvatar size={22} src={post.avatarUrl} alt={channel} hideRing />
+        <SquircleAvatar size={22} src={post.avatarUrl} alt={channel} hairlineRing ringColor={LIGHT_HAIRLINE} />
         <span style={{ display: 'inline-flex', alignItems: 'center', gap: 6, fontSize: 12.5, fontWeight: 500, color: '#64748B', minWidth: 0 }}>
           <span style={{ fontWeight: 600, color: '#475569', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{channel}</span>
           <span style={{ flexShrink: 0 }}>·</span>

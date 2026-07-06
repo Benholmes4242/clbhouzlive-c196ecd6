@@ -1,7 +1,7 @@
 import { memo, useCallback, useMemo, useRef, useState } from 'react';
 import { Clock, Heart } from 'lucide-react';
 import { openWithOrigin } from '@/lib/openWithOrigin';
-import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
+import { SquircleAvatar, LIGHT_HAIRLINE } from '@/components/ui/SquircleAvatar';
 import { Pin } from '../proshop/Pin';
 import type { FeedPost } from '@/components/media-system/types/media';
 
@@ -137,7 +137,7 @@ function VideoLargeCardInner({ post, index, allPosts }: VideoLargeCardProps) {
       </div>
 
       <div style={{ marginTop: 8, display: 'flex', alignItems: 'center', gap: 8, minWidth: 0 }}>
-        <SquircleAvatar size={28} src={post.avatarUrl} alt={channel} hideRing />
+        <SquircleAvatar size={28} src={post.avatarUrl} alt={channel} hairlineRing ringColor={LIGHT_HAIRLINE} />
         <div
           style={{
             flex: 1,

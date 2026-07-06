@@ -178,7 +178,7 @@ const WatchTile: React.FC<WatchTileProps> = ({ post, index, allPosts, onDecoded,
           pointerEvents: 'none',
         }}
       >
-        <SquircleAvatar size={17} src={post.avatarUrl} alt={creator} hideRing />
+        <SquircleAvatar size={17} src={post.avatarUrl} alt={creator} hairlineRing />
         <span
           style={{
             fontSize: 10,
