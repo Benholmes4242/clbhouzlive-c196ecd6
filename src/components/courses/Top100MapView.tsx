@@ -14,7 +14,7 @@ import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { cn } from '@/lib/utils';
 import { MapCourseSheet } from './map';
 import { MAP_CONFIG, applyClbhouzMapStyle } from '@/config/maps';
-import { useMedianStatusBar } from '@/hooks/useMedianStatusBar';
+// Chrome owned solely by AppRoutes; no local status-bar imports.
 import { Popover, PopoverTrigger, PopoverContent } from '@/components/ui/popover';
 
 type StatusFilter = 'all' | 'played' | 'want_to_play' | 'not_played';
