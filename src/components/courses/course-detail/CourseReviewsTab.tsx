@@ -589,7 +589,8 @@ const CourseReviewsTab: React.FC<CourseReviewsTabProps> = ({
             onToggleHelpful={handleToggleHelpful}
             onEditClick={handleRateClick}
             onMediaClick={(index, el) => {
-              if (filteredMyReview.media) handleReviewMediaClick(filteredMyReview.media, index, filteredMyReview, el);
+              const m = filteredMyReview.media?.[index];
+              if (m) handleReviewMediaClick(filteredMyReview, m.id, el);
             }}
 
             onUserClick={() => navigate(getProfilePathById(filteredMyReview.user_id))}
