@@ -201,8 +201,10 @@ const GlobalBottomNavigation: React.FC<GlobalBottomNavigationProps> = ({ chromeS
   // Sizes (icons-only, no visible labels) — sized to match IG's pill.
   const PILL_MAX_EXPANDED = 'min(396px, 100vw - 22px)';
   const PILL_MAX_CONDENSED = 'min(324px, 100vw - 36px)';
-  const iconSize = condensed ? 23 : 25;
-  const iconStroke = theme === 'dark' ? 2.1 : 2.2;
+  // Even integers so 1px strokes land on the device pixel grid — SF-crisp.
+  const iconSize = condensed ? 22 : 24;
+  const iconStroke = 2;
+
   const pillPadding = condensed ? '3px 7px' : '4px 7px';
   const lozengePad = condensed ? '10px 20px' : '11px 24px';
   const inactivePad = condensed ? '6px 12px' : '7px 16px';
