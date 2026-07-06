@@ -175,7 +175,7 @@ const NavigationBar: React.FC<NavigationBarProps> = ({
           {/* Vertical divider — sits between Tour tab and Sections button */}
           <div style={{
             width: 1,
-            height: 28,
+            height: ICON_BOX,
             background: 'rgba(0,0,0,0.08)',
             flexShrink: 0,
           }} />
