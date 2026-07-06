@@ -1,6 +1,6 @@
 import MapPinIcon from '@/components/icons/MapPinIcon';
 import HouseIcon from '@/components/icons/HouseIcon';
-import VideoIcon from '@/components/icons/VideoIcon';
+import YoutubeIcon from '@/components/icons/YoutubeIcon';
 import PlusSquareIcon from '@/components/icons/PlusSquareIcon';
 import TrophyIcon from '@/components/icons/TrophyIcon';
 
