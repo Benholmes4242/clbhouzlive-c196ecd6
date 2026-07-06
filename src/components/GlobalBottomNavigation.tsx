@@ -196,9 +196,9 @@ const GlobalBottomNavigation: React.FC<GlobalBottomNavigationProps> = ({ chromeS
     handleTabClick(tab);
   };
 
-  // Sizes (icons-only, no visible labels)
-  const PILL_MAX_EXPANDED = 'min(360px, 100vw - 32px)';
-  const PILL_MAX_CONDENSED = 'min(320px, 100vw - 48px)';
+  // Sizes (icons-only, no visible labels) — sized to match IG's pill.
+  const PILL_MAX_EXPANDED = 'min(400px, 100vw - 24px)';
+  const PILL_MAX_CONDENSED = 'min(360px, 100vw - 40px)';
   const iconSize = condensed ? 21 : 23;
   const iconStroke = theme === 'dark' ? 2 : 2.1;
   const pillPadding = condensed ? '7px 10px' : '9px 10px';
