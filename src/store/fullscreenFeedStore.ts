@@ -69,6 +69,11 @@ interface OpenOptions {
    *  `useIsViewerOwnedBy(surface)` so background surfaces don't leak their
    *  posts into a viewer another surface opened. */
   openedFrom?: string | null;
+  /** Stage-7 PR-1: live rail-lane borrow descriptor. Present only when the
+   *  tapped tile was actively playing a rail lane. FullscreenVideoSlot on the
+   *  opening slide takes the borrow branch (re-parents the live element)
+   *  instead of loading the 'fullscreen' lane. */
+  borrow?: BorrowDescriptor | null;
 }
 
 
