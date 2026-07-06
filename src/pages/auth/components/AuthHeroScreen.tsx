@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
-import { useMedianStatusBar } from '@/hooks/useMedianStatusBar';
+// Chrome owned solely by AppRoutes (/auth + /signup are darkChrome routes).
 import { Loader2, ArrowRight } from 'lucide-react';
 import { toast } from 'sonner';
 import { z } from 'zod';
