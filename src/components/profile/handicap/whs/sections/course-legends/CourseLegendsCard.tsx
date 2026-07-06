@@ -49,7 +49,7 @@ interface HolderCellProps {
   selfLabel: string;
 }
 
-const SquircleAvatar: React.FC<{ photoUrl: string | null; muted?: boolean }> = ({
+const LegendsSquircle: React.FC<{ photoUrl: string | null; muted?: boolean }> = ({
   photoUrl,
   muted = false,
 }) => {
@@ -62,16 +62,26 @@ const SquircleAvatar: React.FC<{ photoUrl: string | null; muted?: boolean }> = (
     <div
       aria-hidden
       style={{
+        position: 'relative',
         width: 40,
         height: 42,
         borderRadius: '34%',
         background: bg,
-        boxShadow: muted
-          ? 'inset 0 0 0 1px var(--hcp-line)'
-          : 'inset 0 0 0 1px var(--hcp-line-2)',
         flexShrink: 0,
       }}
-    />
+    >
+      {/* Traced hairline (canon: dark surface → 1px white 22%) */}
+      <div
+        aria-hidden
+        style={{
+          position: 'absolute',
+          inset: 0,
+          borderRadius: '34%',
+          border: '1px solid rgba(255,255,255,0.22)',
+          pointerEvents: 'none',
+        }}
+      />
+    </div>
   );
 };
 
