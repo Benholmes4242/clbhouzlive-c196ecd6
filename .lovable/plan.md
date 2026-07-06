@@ -1,108 +1,60 @@
-## Part 0 — Verification findings (from source)
+# Stage 7 PR-3 — In-fullscreen media carousel
 
-**0a. HOST LIFETIME (CONFIRMED):**
-- `CardFeed.tsx:375-377` — `isActive = !fsOpen && index === playingIdx`, `isNear = !fsOpen && …`, `mountVideo = isNear`.
-- `LightCardFeed.tsx:234-236` — identical gating.
+Adds a horizontal media sub-pager to each fullscreen slide for multi-media posts, wired to the SHOWING lane per active page and to a first-swipe borrow demote. Engine / pool / borrow-guard code is not touched.
 
-When the fullscreen viewer opens, `fsOpen` flips true → `isNear`/`mountVideo` become false on **every** card → `InlineVideo` unmounts. The origin card's lane host dies on open, so close-return always hits the target-gone fallback. Part 2 makes the borrowed card's host survive.
+## Scope
 
-**0b. UNMOUNT RACE (CONFIRMED):**
-- `useVideoLane.ts` has NO explicit `unmountLane` call — the mount effect (`:66-88`) only appends into the new host; the "old host wins" mechanic is `appendChild`'s atomic move.
-- BUT the real threat is the host `<div ref={lane.hostRef}>` (in `InlineVideo.tsx:131`) itself being **removed from the DOM** when `mountVideo` flips false. React unmounts the host `<div>`, and the engine's `<video>` element — currently parented to that div — is unmounted along with it, breaking playback. This is worse than a `pause()` call; the pause-guard doesn't cover it.
+- `src/components/feed/FeedSlide.tsx` — new inner `FullscreenMediaPager` component; single-media path unchanged (byte-for-byte).
+- `src/store/fullscreenFeedStore.ts` — add a one-shot `demoteBorrow()` action + a `borrowDemoteRequested` flag so the pager can request demotion without importing overlay internals.
+- `src/components/fullscreen-feed/FullscreenFeedOverlay.tsx` — subscribe to `borrowDemoteRequested`, run `returnBorrow(borrow, 'demote')` (idempotent with the existing swipe-away demote), clear the flag.
 
-The engine's `unmountLane` (`VideoEngine.ts:224`) is called from `returnBorrow` itself; it isn't called by `useVideoLane`. So the Part 1 `unmountLane` guard is still needed as belt-and-braces protection against any future caller (and for tracing symmetry with `eng.pause.borrowed`) — but the **primary** fix is Part 2: keep the origin card's host `<div>` in the DOM while the viewer is open.
+No changes to `VideoEngine`, `RailLanePool`, `useVideoLane`, `usePinchZoomPointer`, or `SnapFeed`.
 
----
+## Behavior
 
-## Implementation plan
+### Part 1 — Horizontal pager (fullscreen, media.length > 1)
 
-### Part 1 — Engine: extend borrow guard to `unmountLane`
-`src/video/VideoEngine.ts` `unmountLane(laneId)`:
-- If `this.borrowedLanes.has(laneId)`: log `DBG('unmount.borrowed', { laneId })` + `fsvEl('eng.unmount.borrowed', …)` and `return` early. Don't touch `lane.mountedHost` / `wantPlay`.
-- `returnBorrow`'s fallback park already calls `clearBorrowed` FIRST, so its own `unmountLane` executes normally.
+Wrap the media area in a horizontal scroller with CSS scroll-snap (100% per page). Each page renders through the existing per-media branches: video+hlsUrl → `FullscreenVideoSlot`; image → pinch-zoom image; anything else → poster only. Only the ACTIVE page's video mounts `FullscreenVideoSlot` (binds SHOWING lane); inactive pages render a poster-only fallback identical to the existing non-hls branch. This preserves the one-decoder-per-slide rule.
 
-### Part 2 — Feeds: keep the borrowed card's host alive
-Both `CardFeed.tsx` and `LightCardFeed.tsx`:
-- Subscribe (Zustand selector) to `useFullscreenFeedStore(s => s.borrow?.ownerKey ?? null)` as `borrowedOwnerKey`. Memoized selector → non-borrow cards don't re-render on borrow change.
-- Change gate:
-  ```ts
-  const cardOwnerKey = `${post.id}:0`;
-  const isBorrowedCard = fsOpen && borrowedOwnerKey === cardOwnerKey;
-  const isActive = !fsOpen && index === playingIdx;
-  const isNear = isBorrowedCard || (!fsOpen && Math.abs(index - activeIdx) <= VIDEO_NEIGHBOUR_RADIUS);
-  const mountVideo = isNear;
-  ```
-- `isActive` stays false for the borrowed card while viewer is open — engine pause-guard + Part 1 unmount-guard cover any residual activation traffic.
-- All other cards keep their existing `!fsOpen` gating.
+Initial page = existing `openIdx` (from `mediaId` resolution). Dots use the existing `CarouselDots` (variant `elongated`) at bottom-center, hidden for single-media (in which case the pager is not rendered at all).
 
-### Part 3 — Origin host registration (feed variant)
-`src/components/feed/InlineVideo.tsx`:
-- Add `useEffect` that, when `resolvedOwnerKey && lane.hostRef.current`, calls `originHostRegistry.register(resolvedOwnerKey, lane.hostRef.current)`; cleanup calls `originHostRegistry.unregister(resolvedOwnerKey, lane.hostRef.current)` (element-identity guard already in registry).
+Active-page transitions:
+- Track the pager's active index in local state (`activePagerIdx`, initialised to `openIdx`), updated by scroll-snap intersection observer (mirrors `FeedImageCarousel`).
+- Video → video: switching pages simply swaps which page mounts `FullscreenVideoSlot`; the new slot binds `fullscreen` lane with `postId={post.id}` and per-media resume comes for free (PR-2 fix + `VideoEngine.getLastPos` fallback keys on the bare postId; we pass the post id, not an ownerKey — matches the SHOWING-lane contract on fullscreen).
+- Image page: the previously-active video page unmounts its slot → `useVideoLane` deactivates → engine pauses the SHOWING lane. No explicit pause call needed.
 
-### Part 4 — `openWithOrigin`: feed borrow detection
-`src/lib/openWithOrigin.ts`, after the existing rail-lane borrow block, if `borrow` still null:
-```ts
-if (!borrow && postId) {
-  try {
-    const snap = VideoEngine.snapshot('feed-active');
-    const candidateOwnerKey = `${postId}:${mediaIndex ?? 0}`;
-    const owns = snap.postId != null && (
-      snap.postId === candidateOwnerKey ||
-      snap.postId === postId ||
-      snap.postId.startsWith(postId + ':')
-    );
-    const isLive = (snap.state === 'playing' || snap.state === 'ready') && snap.currentTime > 0;
-    if (owns && isLive) {
-      borrow = {
-        laneId: 'feed-active',
-        ownerKey: snap.postId ?? candidateOwnerKey,
-        postId,
-        posterUrl: posterUrl ?? null,
-        viewportW: window.innerWidth,
-        viewportH: window.innerHeight,
-        // Capture pre-borrow mute state so returnBorrow can restore it.
-        wasMuted: snap.muted,
-      };
-      VideoEngine.markBorrowed('feed-active');
-      // NO pool pin — feed-active is a singleton lane, not a pool lane.
-      BORROW_DBG('mount', { source: 'feed-active', ownerKey: borrow.ownerKey, postId });
-    }
-  } catch { /* engine may not be booted */ }
-}
-```
-- Also set `startSource = 'borrow'` when the feed borrow triggers (same short-circuit as rail borrow).
+### Part 2 — Borrow demote on first horizontal swipe
 
-### Part 5 — Store: `BorrowDescriptor.wasMuted`
-`src/store/fullscreenFeedStore.ts`: add optional `wasMuted?: boolean` to `BorrowDescriptor`. Rail borrows omit → defaults to muted behaviour.
+On the borrow slide (`borrow && post.id === borrow.postId && isActive`), the FIRST change of `activePagerIdx` away from `openIdx` triggers demotion:
 
-### Part 6 — `returnBorrow`: feed-specific semantics
-`src/components/fullscreen-feed/FullscreenFeedOverlay.tsx` `returnBorrow(borrow, reason)`:
-- Detect lane kind: `const isRail = borrow.laneId.startsWith('rail-');`
-- Mute policy:
-  - Rail: unchanged — `setMuted(laneId, true)` always.
-  - Feed-active: `setMuted(laneId, borrow.wasMuted ?? true)`.
-- Pool policy:
-  - Rail: existing `RailLanePool.unpin(...)` calls unchanged.
-  - Feed-active: skip both `unpin` calls entirely (no pool interaction). Trace `return.animate` / `return.fallback` with `laneId` so telemetry stays readable.
-- `clearBorrowed(laneId)` still runs first for both.
-- Live-tile branch: registry lookup by `borrow.ownerKey` works for both; with Part 2 the feed card's host survives → live return path taken. Fallback park (`unmountLane`) unchanged for target-gone.
+1. Log `[BORROW] carousel-demote { ownerKey, laneId, newMediaIndex }`.
+2. Call `useFullscreenFeedStore.getState().demoteBorrow()` — sets `borrowDemoteRequested = true`.
+3. Overlay effect (new) sees the flag, runs the existing `returnBorrow(borrow, 'demote')` path (park in hidden host, unpin, clear), clears the flag, calls `clearBorrow()`.
+4. Because demote runs SYNCHRONOUSLY before React commits the pager's new active page (state update batched into the same tick — we call `demoteBorrow()` first, then let the pager scroll finish), the newly active page mounts `FullscreenVideoSlot` with `isBorrowSlide=false` → standard fullscreen-lane load via `useVideoLane`. Swiping BACK to `openIdx` re-mounts the same slot (still `isBorrowSlide=false` — the store's `borrow` is now null) → standard fullscreen-lane load with `getLastPos(postId)` — no re-borrow.
 
-### Part 7 — `BorrowedFullscreenSlot`: verify (no changes expected)
-`FeedSlide.tsx` — takes `laneId` from descriptor. `mountLane` + belt-and-braces `play(laneId, { callerPostId: ownerKey })` work identically for `'feed-active'`. Verify only; ship no change unless a bug surfaces.
+The existing vertical-swipe-away demote (`activeIndex !== startIndex`) remains. `returnBorrow` is already effectively idempotent because it uses `borrowRef.current` and the overlay guards `if (!borrow) return`; we harden that with a "already cleared" no-op guard in `demoteBorrow()` (only sets the flag when `borrow` is present).
 
-### Part 8 — Verify and ship
-- `tsgo --noEmit`
-- Report Part 0 findings + changed files in ship summary.
+### Part 3 — Gesture arbitration
 
----
+Rely on native browser scroll-snap for horizontal pan + `SnapFeed`'s outer vertical scroll — CSS `overflow-x: auto; overflow-y: hidden; scroll-snap-type: x mandatory` on the pager, and the outer feed keeps `scroll-snap-type: y mandatory`. Browsers axis-lock on initial gesture and release to the parent scroller when the inner is at its scroll edge — matches `FeedImageCarousel`'s existing behavior. Pinch-zoom on image pages continues to work because `usePinchZoomPointer` is mounted per-page and captures its own pointers. No custom pointer arbitration is added (would fight the pinch hook).
 
-## Files touched
-- `src/video/VideoEngine.ts` — Part 1
-- `src/components/feed/CardFeed.tsx` — Part 2
-- `src/components/posts-tab/LightCardFeed.tsx` — Part 2
-- `src/components/feed/InlineVideo.tsx` — Part 3
-- `src/lib/openWithOrigin.ts` — Part 4
-- `src/store/fullscreenFeedStore.ts` — Part 5 (`wasMuted` field only)
-- `src/components/fullscreen-feed/FullscreenFeedOverlay.tsx` — Part 6
+### Part 4 — Preserved
 
-Rail borrow path (PR-1) remains byte-for-byte identical for the mute + pool branches; only the lane-kind switch adds a new branch. Non-borrow openers (image posts, cold tiles, deep links) fall through to the existing ladder unchanged.
+- Vertical swipe between posts, PR-1 vertical demote, one-unmuted-lane invariant, mute-restore on close, PR-2 return semantics: unchanged.
+- readOnly viewers (course media) receive the pager — it's a media control.
+- Single-media fullscreen slides skip the pager entirely (guarded by `media.length > 1`).
+
+## Technical notes
+
+- `FullscreenMediaPager` renders `media.length` full-viewport pages side-by-side, each wrapping the existing render branches. Inactive video pages render only the blurred backdrop + poster (identical to the non-hls fallback already present at lines 156-172 of `FeedSlide.tsx`).
+- Scroll-snap tracking: `IntersectionObserver` with `threshold: 0.6` per page, same pattern as `FeedImageCarousel`.
+- `demoteBorrow()` store action: `if (!get().borrow) return; set({ borrowDemoteRequested: true })`. Overlay effect on `[borrowDemoteRequested, borrow]` runs `returnBorrow(borrow, 'demote')` + `clearBorrow()` + resets the flag. This lifts the demote trigger out of FeedSlide without exposing overlay internals.
+- Log tag: reuse the existing `BORROW_DBG` helper in overlay for the `carousel-demote` trace (guarded by perf flag, same as `mount`/`unpin`).
+- No changes to `openWithOrigin`, `startPosition`, or `mediaId` handoff — the pager reads `openIdx` from existing props.
+
+## Acceptance verification
+
+After implementation:
+1. Typecheck (`tsgo --noEmit`) + `npm run build` clean.
+2. Grep confirms no changes in `VideoEngine.ts`, `useVideoLane.ts`, `useRailLane.ts`, `RailLanePool`, `SnapFeed.tsx`.
+3. Manual verification checklist matches the brief (Ben's device pass).

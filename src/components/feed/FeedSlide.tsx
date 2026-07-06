@@ -1,10 +1,10 @@
-import React, { memo, useEffect } from 'react';
+import React, { memo, useEffect, useRef, useState } from 'react';
 import { useClubhouseStore } from '@/store/clubhouseStore';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { FeedImageCarousel } from './FeedImageCarousel';
 import { usePinchZoomPointer } from '@/hooks/usePinchZoomPointer';
 import { CarouselDots } from '@/components/media/CarouselDots';
-import type { FeedPost } from '@/components/media-system/types/media';
+import type { FeedPost, MediaItem } from '@/components/media-system/types/media';
 import { useVideoLane } from '@/video/useVideoLane';
 import { VideoEngine } from '@/video/VideoEngine';
 import { useFullscreenFeedStore } from '@/store/fullscreenFeedStore';
@@ -100,16 +100,8 @@ export const FeedSlide = memo(function FeedSlide({
   // cards now render as standalone Home modules (HomePGAModule, HomeCourseOfWeekModule).
   const renderContent = () => {
 
-    // Multi-media carousel — feed surface ONLY. In fullscreen, the carousel
-    // branch would render `FeedImageCarousel` whose per-slide `SnapVideoPlayer`
-    // is a poster-only teardown stub that never plays — so a multi-media post
-    // tapped on its first-media video (openIdx===0) previously mounted the
-    // stub instead of `FullscreenVideoSlot`. Skipping the carousel in
-    // fullscreen routes both the opening slide and any swiped-to slide
-    // through the per-`m` branches below: chosen video (w/ hlsUrl) mounts
-    // the fullscreen lane; chosen image renders the pinch-zoom image branch.
-    // In-fullscreen swiping BETWEEN a multi-media post's own media items is
-    // Stage 7 — deferred; the tapped media (or media[0] on swipe) is shown.
+    // Multi-media carousel — feed surface (non-fullscreen). Fullscreen
+    // routes multi-media through <FullscreenMediaPager/> below.
     if (!isFullscreen && media && media.length > 1 && openIdx === 0) {
       return (
         <FeedImageCarousel
@@ -123,6 +115,23 @@ export const FeedSlide = memo(function FeedSlide({
       );
     }
 
+    // Stage-7 PR-3: in-fullscreen horizontal media sub-pager for multi-media
+    // posts. Only the active page mounts the SHOWING lane; inactive pages
+    // render posters. First horizontal swipe on a borrow slide triggers the
+    // one-shot demote via the store → overlay effect runs returnBorrow.
+    if (isFullscreen && media && media.length > 1) {
+      return (
+        <FullscreenMediaPager
+          post={post}
+          media={media}
+          openIdx={openIdx}
+          isSlideActive={isActive}
+          isSuggestedFeed={isSuggestedFeed}
+          onFirstFrameReady={onFirstFrameReady}
+          onZoomChange={onZoomChange}
+        />
+      );
+    }
 
     // Opening media (video/image DECISION and rendered content both use `m`).
     const m = media?.[openIdx] ?? media?.[0];
@@ -287,23 +296,34 @@ const FullscreenVideoSlot: React.FC<{
   posterSrc: string;
   isActive: boolean;
   onFirstFrameReady?: () => void;
-}> = ({ postId, hlsUrl, posterSrc, isActive, onFirstFrameReady }) => {
+  /** Stage-7 PR-3: media-level ownership key `${postId}:${mediaIdx}`. When
+   *  provided (multi-media pager pages), used as the engine caller/owner key
+   *  and lastPos lookup so each media resumes independently. Single-media
+   *  callers omit it — the lane binds under bare postId (legacy behaviour). */
+  ownerKey?: string;
+  /** Stage-7 PR-3: pager pages other than the opening media pass false so
+   *  they never take the borrow branch (only the opening media page owns the
+   *  borrowed element). Defaults true for single-media callers. */
+  allowBorrow?: boolean;
+}> = ({ postId, hlsUrl, posterSrc, isActive, onFirstFrameReady, ownerKey, allowBorrow = true }) => {
   const isMuted = useClubhouseStore((s) => s.isMuted);
   const storedStart = useFullscreenFeedStore((s) => s.startPosition);
   const borrow = useFullscreenFeedStore((s) => s.borrow);
   const origin = useFullscreenFeedStore((s) => s.origin);
-  const isBorrowSlide = !!(borrow && isActive && borrow.postId === postId);
+  const isBorrowSlide = !!(allowBorrow && borrow && isActive && borrow.postId === postId);
+  const resumeKey = ownerKey ?? postId;
 
   // Only apply store.startPosition on the initially-tapped slide; other
   // slides in the fullscreen deck start from 0. Borrow slide skips seeks
   // entirely — the borrowed element carries its own currentTime.
   const startPosition = React.useMemo(() => {
     if (!isActive || isBorrowSlide) return -1;
-    const t = VideoEngine.getLastPos(postId);
+    const t = VideoEngine.getLastPos(resumeKey);
     const chosen = t > 0 ? t : storedStart > 0 ? storedStart : -1;
     fsv('slot.mount', {
       phase: 'startPos.compute',
       postId,
+      resumeKey,
       isActive,
       hasHls: !!hlsUrl,
       storedStart,
@@ -312,7 +332,7 @@ const FullscreenVideoSlot: React.FC<{
       isBorrowSlide,
     });
     return chosen;
-  }, [isActive, postId, storedStart, hlsUrl, isBorrowSlide]);
+  }, [isActive, postId, resumeKey, storedStart, hlsUrl, isBorrowSlide]);
 
   // In borrow mode: pass hlsUrl:null + active:false so useVideoLane never
   // touches the 'fullscreen' lane. The borrowed rail lane's element is
@@ -324,7 +344,7 @@ const FullscreenVideoSlot: React.FC<{
     startPosition,
     active: isActive && !isBorrowSlide,
     muted: isMuted,
-    postId,
+    postId: resumeKey,
   });
 
   React.useEffect(() => {
@@ -537,4 +557,264 @@ const BorrowedFullscreenSlot: React.FC<{
       />
     </>
   );
+};
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Stage-7 PR-3: FullscreenMediaPager
+//
+// In-fullscreen horizontal media sub-pager for multi-media posts. Uses native
+// CSS scroll-snap so vertical gestures pass through to <SnapFeed/> and pinch
+// gestures on image pages continue to work via usePinchZoomPointer. Only the
+// active page mounts <FullscreenVideoSlot/> — inactive pages render posters
+// (one decoder per slide, matching the SHOWING-lane contract).
+//
+// Borrow demote: on the borrow slide, the FIRST horizontal swipe away from
+// the opening media triggers demoteBorrow() → overlay effect runs
+// returnBorrow('demote'). Only the openIdx page ever passes allowBorrow=true.
+// ─────────────────────────────────────────────────────────────────────────────
+const FullscreenMediaPager: React.FC<{
+  post: FeedPost;
+  media: MediaItem[];
+  openIdx: number;
+  isSlideActive: boolean;
+  isSuggestedFeed: boolean;
+  onFirstFrameReady?: () => void;
+  onZoomChange?: (zoomed: boolean) => void;
+}> = ({ post, media, openIdx, isSlideActive, isSuggestedFeed, onFirstFrameReady, onZoomChange }) => {
+  const scrollerRef = useRef<HTMLDivElement>(null);
+  const [activePagerIdx, setActivePagerIdx] = useState(openIdx);
+  const borrow = useFullscreenFeedStore((s) => s.borrow);
+  const demotedRef = useRef(false);
+
+  // Jump to the opening media on mount (auto, no smooth animation — the FLIP
+  // clone / borrow FLIP is the visual open animation).
+  useEffect(() => {
+    const el = scrollerRef.current;
+    if (!el) return;
+    // Wait a tick so layout has resolved clientWidth.
+    const raf = requestAnimationFrame(() => {
+      el.scrollLeft = openIdx * el.clientWidth;
+    });
+    return () => cancelAnimationFrame(raf);
+  }, [openIdx]);
+
+  // Track the active page by scroll-snap position. Also detects the
+  // first-swipe borrow demote and requests it via the store BEFORE the new
+  // active page mounts its slot in the next render.
+  useEffect(() => {
+    const el = scrollerRef.current;
+    if (!el) return;
+    let raf = 0;
+    const onScroll = () => {
+      if (raf) return;
+      raf = requestAnimationFrame(() => {
+        raf = 0;
+        const w = el.clientWidth;
+        if (w <= 0) return;
+        const idx = Math.round(el.scrollLeft / w);
+        if (idx === activePagerIdx) return;
+        // Borrow demote — one-shot on first horizontal move.
+        if (
+          !demotedRef.current &&
+          borrow &&
+          borrow.postId === post.id &&
+          idx !== openIdx
+        ) {
+          demotedRef.current = true;
+          useFullscreenFeedStore.getState().demoteBorrow();
+        }
+        setActivePagerIdx(idx);
+      });
+    };
+    el.addEventListener('scroll', onScroll, { passive: true });
+    return () => {
+      el.removeEventListener('scroll', onScroll);
+      if (raf) cancelAnimationFrame(raf);
+    };
+  }, [activePagerIdx, borrow, post.id, openIdx]);
+
+  return (
+    <div className="absolute inset-0">
+      <div
+        ref={scrollerRef}
+        style={{
+          position: 'absolute',
+          inset: 0,
+          display: 'flex',
+          flexDirection: 'row',
+          overflowX: 'auto',
+          overflowY: 'hidden',
+          scrollSnapType: 'x mandatory',
+          WebkitOverflowScrolling: 'touch',
+          scrollbarWidth: 'none',
+          // Let the browser axis-lock; vertical pans continue to reach
+          // SnapFeed and pinch-zoom keeps working on image pages.
+          touchAction: 'pan-x pan-y pinch-zoom',
+        }}
+      >
+        {media.map((m, i) => {
+          const ownerKey = `${post.id}:${i}`;
+          const isActivePage = i === activePagerIdx;
+          return (
+            <div
+              key={m.id || ownerKey}
+              style={{
+                position: 'relative',
+                flex: '0 0 100%',
+                width: '100%',
+                height: '100%',
+                scrollSnapAlign: 'start',
+                scrollSnapStop: 'always',
+              }}
+            >
+              <FullscreenPagerPage
+                post={post}
+                media={m}
+                pageIdx={i}
+                openIdx={openIdx}
+                ownerKey={ownerKey}
+                isActivePage={isActivePage}
+                isSlideActive={isSlideActive}
+                isSuggestedFeed={isSuggestedFeed}
+                onFirstFrameReady={isActivePage ? onFirstFrameReady : undefined}
+                onZoomChange={isActivePage ? onZoomChange : undefined}
+              />
+            </div>
+          );
+        })}
+      </div>
+      {/* Dots — bottom-center, above the action rail. */}
+      <div
+        className="absolute pointer-events-none"
+        style={{
+          left: 0,
+          right: 0,
+          bottom: 88,
+          display: 'flex',
+          justifyContent: 'center',
+          zIndex: 25,
+        }}
+      >
+        <CarouselDots count={media.length} active={activePagerIdx} variant="elongated" />
+      </div>
+    </div>
+  );
+};
+
+/**
+ * One page inside the FullscreenMediaPager. Video pages mount
+ * FullscreenVideoSlot only when active (SHOWING lane); inactive video pages
+ * render the poster fallback. Image pages get their own pinch-zoom.
+ */
+const FullscreenPagerPage: React.FC<{
+  post: FeedPost;
+  media: MediaItem;
+  pageIdx: number;
+  openIdx: number;
+  ownerKey: string;
+  isActivePage: boolean;
+  isSlideActive: boolean;
+  isSuggestedFeed: boolean;
+  onFirstFrameReady?: () => void;
+  onZoomChange?: (zoomed: boolean) => void;
+}> = ({ post, media: m, pageIdx, openIdx, ownerKey, isActivePage, isSlideActive, onFirstFrameReady, onZoomChange }) => {
+  const { ref: zoomRef, imgRef, style: zoomStyle, scale: zoomScale, reset: resetZoom } =
+    usePinchZoomPointer();
+
+  // Reset zoom when this page leaves.
+  useEffect(() => {
+    if (!isActivePage) resetZoom();
+  }, [isActivePage, resetZoom]);
+
+  // Bubble zoom state up only for the active page.
+  useEffect(() => {
+    if (!isActivePage) return;
+    onZoomChange?.(zoomScale > 1);
+  }, [isActivePage, zoomScale, onZoomChange]);
+
+  if (m?.type === 'video') {
+    const posterSrc = m.thumbnailUrl || '';
+    const mHlsUrl = (m as any).hlsUrl || null;
+    // Active video page → mount SHOWING slot. Only the opening-media page
+    // may take the borrow branch; every other page passes allowBorrow=false
+    // so a re-mount post-demote never re-triggers the borrow FLIP.
+    if (isActivePage && mHlsUrl) {
+      return (
+        <FullscreenVideoSlot
+          postId={post.id}
+          hlsUrl={mHlsUrl}
+          posterSrc={posterSrc}
+          isActive={isSlideActive}
+          onFirstFrameReady={onFirstFrameReady}
+          ownerKey={ownerKey}
+          allowBorrow={pageIdx === openIdx}
+        />
+      );
+    }
+    // Inactive video page — poster fallback (mirrors the existing non-hls
+    // branch above). No lane binding, no decoder.
+    return (
+      <div className="absolute inset-0 overflow-hidden">
+        {posterSrc && (
+          <div
+            aria-hidden="true"
+            className="absolute inset-0"
+            style={{
+              backgroundImage: `url(${posterSrc})`,
+              backgroundSize: 'cover',
+              backgroundPosition: 'center',
+              filter: 'blur(40px) brightness(0.5) saturate(1.2)',
+              transform: 'scale(1.2)',
+            }}
+          />
+        )}
+        {posterSrc && (
+          <img
+            src={posterSrc}
+            alt=""
+            aria-hidden
+            className="w-full h-full"
+            style={{ position: 'absolute', inset: 0, objectFit: 'contain', zIndex: 1 }}
+            loading="lazy"
+            draggable={false}
+          />
+        )}
+      </div>
+    );
+  }
+
+  if (m?.type === 'image') {
+    const imgSrc = m.imageUrl || m.thumbnailUrl || '';
+    return (
+      <div className="absolute inset-0 overflow-hidden">
+        <div
+          aria-hidden="true"
+          className="absolute inset-0"
+          style={{
+            backgroundImage: `url(${imgSrc})`,
+            backgroundSize: 'cover',
+            backgroundPosition: 'center',
+            filter: 'blur(40px) brightness(0.5) saturate(1.2)',
+            transform: 'scale(1.2)',
+          }}
+        />
+        <div
+          ref={zoomRef}
+          style={{ ...zoomStyle, position: 'absolute', inset: 0, zIndex: 1 }}
+        >
+          <img
+            ref={imgRef}
+            src={imgSrc}
+            alt=""
+            className="w-full h-full"
+            style={{ objectFit: 'contain' }}
+            loading={isActivePage ? 'eager' : 'lazy'}
+            draggable={false}
+          />
+        </div>
+      </div>
+    );
+  }
+
+  return null;
 };
