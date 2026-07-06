@@ -153,6 +153,45 @@ export function openWithOrigin({
     }
   }
 
+  // ── Stage-7 PR-2: feed-active borrow decision ──
+  // If no rail borrow was taken and the singleton `feed-active` lane is
+  // currently playing this post's media, borrow that element instead of
+  // opening a fresh `fullscreen` lane. No pool interaction — feed-active is
+  // not a pool lane. Cold/parked feed lanes fall through to the ladder.
+  if (!borrow && postId) {
+    try {
+      const snap = VideoEngine.snapshot('feed-active');
+      const candidateOwnerKey = `${postId}:${mediaIndex ?? 0}`;
+      const owns =
+        snap.postId != null &&
+        (snap.postId === candidateOwnerKey ||
+          snap.postId === postId ||
+          snap.postId.startsWith(postId + ':'));
+      const isLive =
+        (snap.state === 'playing' || snap.state === 'ready') && snap.currentTime > 0;
+      if (owns && isLive) {
+        borrow = {
+          laneId: 'feed-active',
+          ownerKey: snap.postId ?? candidateOwnerKey,
+          postId,
+          posterUrl: posterUrl ?? null,
+          viewportW: typeof window !== 'undefined' ? window.innerWidth : 0,
+          viewportH: typeof window !== 'undefined' ? window.innerHeight : 0,
+          wasMuted: snap.muted,
+        };
+        VideoEngine.markBorrowed('feed-active');
+        BORROW_DBG('mount', {
+          source: 'feed-active',
+          ownerKey: borrow.ownerKey,
+          postId,
+          wasMuted: snap.muted,
+        });
+      }
+    } catch {
+      /* engine may not be booted yet on deep-link openers */
+    }
+  }
+
   // Two-way resume: prefer the tile's live rail-lane playhead (Watch tap),
   // then the feed-active lane (Clubhouse tap), then the engine's session
   // lastPos map. Skipped entirely for borrow opens (element carries state).
