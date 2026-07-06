@@ -179,9 +179,7 @@ export const LightCardFeed: React.FC<LightCardFeedProps> = ({
   const setCarouselPosition = useClubhouseStore((s) => s.setCarouselPosition);
   const carouselPositions = useClubhouseStore((s) => s.carouselPositions);
   const openFullscreen = useFullscreenFeedStore((s) => s.open);
-  const fsOpen = useFullscreenFeedStore((s) => s.isOpen);
-  // Stage-7 PR-2: borrowed owner key — keep origin card host alive on borrow.
-  const borrowedOwnerKey = useFullscreenFeedStore((s) => s.borrow?.ownerKey ?? null);
+  // fsOpen / borrow.ownerKey consumed inside `LightItemGate` — see CardFeed.
 
   useEffect(() => {
     setActiveIndex(activeIdx);
