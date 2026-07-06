@@ -131,7 +131,9 @@ export function ReviewWizard({
     onSuccess: () => wizard.goToStep('success'),
   });
 
-  useMedianStatusBar('light', 'transparent', isOpen, false);
+  // Chrome owned solely by AppRoutes. Wizard opens over immersive routes
+  // (course pages), which AppRoutes already sets to transparent.
+
 
   /* ── Local ComposerMediaItem mirror for pending files ─────────────────── */
   // Source of truth for pending files = wizard.allMedia (pending entries).
