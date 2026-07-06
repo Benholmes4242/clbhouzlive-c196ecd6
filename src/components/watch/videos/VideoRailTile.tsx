@@ -87,6 +87,7 @@ function VideoRailTileInner({
   const rootRef = useRef<HTMLDivElement>(null);
   const handleClick = useCallback(() => {
     openWithOrigin({
+      openedFrom: 'watch',
       posts: allPosts,
       index,
       originEl: rootRef.current,

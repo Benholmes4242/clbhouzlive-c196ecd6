@@ -78,6 +78,7 @@ function AutoplayVideoCardInner({ post, index, allPosts, userId, active, borderR
 
   const handleTap = () => {
     openWithOrigin({
+      openedFrom: 'watch',
       posts: allPosts,
       index,
       originEl: tileRef.current,

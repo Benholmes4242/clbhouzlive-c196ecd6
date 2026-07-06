@@ -10,7 +10,7 @@ export interface ReviewMediaItem {
 
 interface ReviewMediaStripProps {
   media: ReviewMediaItem[];
-  onMediaClick: (index: number) => void;
+  onMediaClick: (index: number, el: HTMLElement | null) => void;
   /** 'default' = 96px thumbnails, 'compact' = 70px thumbnails for inline review cards */
   variant?: 'default' | 'compact';
 }
@@ -19,19 +19,22 @@ interface ReviewMediaStripProps {
 const ReviewMediaThumb: React.FC<{
   item: ReviewMediaItem;
   index: number;
-  onMediaClick: (index: number) => void;
+  onMediaClick: (index: number, el: HTMLElement | null) => void;
   dim: number;
   radius: number;
 }> = ({ item, index, onMediaClick, dim, radius }) => {
   const [isLoaded, setIsLoaded] = useState(false);
   const [isBroken, setIsBroken] = useState(false);
+  const btnRef = React.useRef<HTMLButtonElement>(null);
   const isVideo = item.media_type === 'video';
   const src = isVideo ? (item.poster_url || item.media_url) : item.media_url;
 
   return (
     <button
+      ref={btnRef}
       type="button"
-      onClick={() => onMediaClick(index)}
+      onClick={() => onMediaClick(index, btnRef.current)}
+
       style={{
         position: 'relative',
         flexShrink: 0,

@@ -71,6 +71,9 @@ interface OpenWithOriginArgs {
   /** Stable media item id — resolved against the grouped post's mediaItems on
    *  the opening slide. Preferred over the positional `mediaIndex`. */
   mediaId?: string | null;
+  /** REQUIRED surface tag. See fullscreenFeedStore's `useIsViewerOwnedBy`. */
+  openedFrom: string;
+
   options?: {
     openCommentsInitially?: boolean;
     initialCommentId?: string | null;
@@ -90,8 +93,10 @@ export function openWithOrigin({
   railOwnerKey,
   mediaIndex,
   mediaId,
+  openedFrom,
   options,
 }: OpenWithOriginArgs): void {
+
   fsvNewSession('open-tap', { index });
 
   const origin = snapshotOrigin(originEl, posterUrl ?? null);
@@ -184,7 +189,9 @@ export function openWithOrigin({
     startPosition,
     mediaIndex: mediaIndex ?? 0,
     mediaId: mediaId ?? null,
+    openedFrom,
   });
+
   fsv('tap.storeOpen', {
     postId, index,
     startPosition: +startPosition.toFixed(3),

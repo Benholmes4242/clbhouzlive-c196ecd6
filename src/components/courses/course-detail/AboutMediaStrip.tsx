@@ -1,17 +1,15 @@
-import React, { useMemo } from 'react';
+import React, { useMemo, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Camera, Plus } from 'lucide-react';
-import SquareCardMedia from '@/components/explore/media/SquareCardMedia';
-import { CardType } from '@/components/explore/media/CardMediaTypes';
-import { adaptClubMediaArrayToExploreItems } from '@/lib/adapters/clubMediaToExplore';
+import { Camera, Play, Plus } from 'lucide-react';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { useClubMedia } from '@/hooks/useClubMedia';
 import { generateStreamThumbnailUrl } from '@/config/cloudflareStream';
-import { useFullscreenFeedStore } from '@/store/fullscreenFeedStore';
-import { flattenPostsToMedia, flatIndexFor } from '@/components/fullscreen-feed/flattenPostsToMedia';
+import { openWithOrigin } from '@/lib/openWithOrigin';
+import { groupMultiMedia } from '@/components/media-system/utils/feedMapper';
 import type { FeedPost, MediaItem } from '@/components/media-system/types/media';
 import { AMBER } from '@/features/courses/_shared/tokens';
 import { SectionHeader } from '@/components/ui/SectionHeader';
+
 
 interface AboutMediaStripProps {
   clubId: string;

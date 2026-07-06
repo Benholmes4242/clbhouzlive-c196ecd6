@@ -54,6 +54,7 @@ function VideoGridCardInner({ post, index, allPosts, active = false }: VideoGrid
   const btnRef = useRef<HTMLButtonElement>(null);
   const handleTap = useCallback(() => {
     openWithOrigin({
+      openedFrom: 'watch',
       posts: allPosts,
       index,
       originEl: btnRef.current,

@@ -19,7 +19,7 @@ import { PostsFeedSkeleton } from './PostsFeedSkeleton';
 import type { FeedPost } from '@/components/media-system/types/media';
 import { LightCardFeed } from './LightCardFeed';
 import { useClubhouseStore } from '@/store/clubhouseStore';
-import { useFullscreenFeedStore } from '@/store/fullscreenFeedStore';
+import { useFullscreenFeedStore, useIsViewerOwnedBy } from '@/store/fullscreenFeedStore';
 
 import { useClubhouseLikes } from '@/components/clubhouse/hooks/useClubhouseLikes';
 import { useClubhouseFollows } from '@/components/clubhouse/hooks/useClubhouseFollows';
@@ -161,22 +161,23 @@ const PostsTabContent: React.FC<PostsTabContentProps> = ({
 
   // Mirror pagination state into the fullscreen store while the viewer is
   // open, so swipes past the initially-loaded set can trigger more loads.
-  const isViewerOpen = useFullscreenFeedStore(s => s.isOpen);
+  const isViewerOwnedHere = useIsViewerOwnedBy('posts-tab');
   const setPaginationState = useFullscreenFeedStore(s => s.setPaginationState);
   useEffect(() => {
-    if (!isViewerOpen) return;
+    if (!isViewerOwnedHere) return;
     setPaginationState({
       hasNextPage: hasNextPage ?? false,
       isFetchingNextPage: isFetchingNextPage ?? false,
     });
-  }, [isViewerOpen, hasNextPage, isFetchingNextPage, setPaginationState]);
+  }, [isViewerOwnedHere, hasNextPage, isFetchingNextPage, setPaginationState]);
 
   // Append newly-loaded posts (already grouped at the hook) into the open
   // viewer as growth occurs. Store dedupes by post id.
   useEffect(() => {
-    if (!isViewerOpen) return;
+    if (!isViewerOwnedHere) return;
     useFullscreenFeedStore.getState().appendPosts(filteredPosts);
-  }, [isViewerOpen, filteredPosts]);
+  }, [isViewerOwnedHere, filteredPosts]);
+
 
 
   const currentFilterLabel = FILTER_OPTIONS.find(o => o.value === activeFilter)?.label || 'All Posts';

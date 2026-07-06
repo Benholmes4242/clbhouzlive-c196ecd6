@@ -178,6 +178,7 @@ export const LightCardFeed: React.FC<LightCardFeedProps> = ({
       if (mediaIndex > 0) setCarouselPosition(idx, mediaIndex);
       if (origin?.el) {
         openWithOrigin({
+          openedFrom: 'posts-tab',
           posts,
           index: idx,
           originEl: origin.el,
@@ -192,10 +193,12 @@ export const LightCardFeed: React.FC<LightCardFeedProps> = ({
       } else {
         openFullscreen(posts, idx, {
           mediaId: mediaId ?? null,
+          openedFrom: 'posts-tab',
           hasNextPage: hasNextPage ?? false,
           fetchNextPage: hasNextPage ? fetchNextPage : undefined,
           isFetchingNextPage: isFetchingNextPage ?? false,
         });
+
       }
     },
     [posts, setActiveIndex, setCarouselPosition, openFullscreen, hasNextPage, fetchNextPage, isFetchingNextPage],

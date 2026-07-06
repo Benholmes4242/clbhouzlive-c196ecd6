@@ -325,6 +325,7 @@ export const CardFeed = forwardRef<CardFeedHandle, CardFeedProps>(function CardF
       if (mediaIndex > 0) setCarouselPosition(idx, mediaIndex, tab);
       if (origin?.el) {
         openWithOrigin({
+          openedFrom: 'clubhouse',
           posts,
           index: idx,
           originEl: origin.el,
@@ -332,7 +333,7 @@ export const CardFeed = forwardRef<CardFeedHandle, CardFeedProps>(function CardF
           mediaId: mediaId ?? null,
         });
       } else {
-        openFullscreen(posts, idx, { mediaId: mediaId ?? null });
+        openFullscreen(posts, idx, { mediaId: mediaId ?? null, openedFrom: 'clubhouse' });
       }
     },
     [posts, setActiveIndex, setCarouselPosition, openFullscreen, tab],

@@ -57,6 +57,7 @@ const WatchTile: React.FC<WatchTileProps> = ({ post, index, allPosts, onDecoded,
 
   const handleClick = () => {
     openWithOrigin({
+      openedFrom: 'watch',
       posts: allPosts ?? [post],
       index,
       originEl: rootRef.current as HTMLElement | null,

@@ -48,7 +48,12 @@ interface OpenOptions {
    *  `post.mediaItems.findIndex(m => m.id === mediaId)` on the opening slide;
    *  falls back to `mediaIndex` (default 0) if the id can't be found. */
   mediaId?: string | null;
+  /** Surface tag that opened the viewer. Gate append/pagination effects with
+   *  `useIsViewerOwnedBy(surface)` so background surfaces don't leak their
+   *  posts into a viewer another surface opened. */
+  openedFrom?: string | null;
 }
+
 
 interface FullscreenFeedState {
   isOpen: boolean;
@@ -68,6 +73,8 @@ interface FullscreenFeedState {
   startPosition: number;
   mediaIndex: number;
   mediaId: string | null;
+  openedFrom: string | null;
+
   open: (posts: FeedPost[], startIndex?: number, options?: OpenOptions) => void;
   close: () => void;
   appendPosts: (newPosts: FeedPost[]) => void;
@@ -96,6 +103,8 @@ export const useFullscreenFeedStore = create<FullscreenFeedState>((set, get) => 
   startPosition: 0,
   mediaIndex: 0,
   mediaId: null,
+  openedFrom: null,
+
   open: (posts, startIndex = 0, options) => {
     set({
       isOpen: true,
@@ -113,6 +122,7 @@ export const useFullscreenFeedStore = create<FullscreenFeedState>((set, get) => 
       startPosition: options?.startPosition ?? 0,
       mediaIndex: options?.mediaIndex ?? 0,
       mediaId: options?.mediaId ?? null,
+      openedFrom: options?.openedFrom ?? null,
     });
   },
   close: () => {
@@ -132,14 +142,21 @@ export const useFullscreenFeedStore = create<FullscreenFeedState>((set, get) => 
       startPosition: 0,
       mediaIndex: 0,
       mediaId: null,
+      openedFrom: null,
     });
     if (cb) {
       try { cb(); } catch {}
     }
   },
   appendPosts: (newPosts) => {
-    set((s) => ({ posts: [...s.posts, ...newPosts.filter(p => !s.posts.find(e => e.id === p.id))] }));
+    set((s) => {
+      const existing = new Set(s.posts.map((p) => p.id));
+      const additions = newPosts.filter((p) => !existing.has(p.id));
+      if (additions.length === 0) return s;
+      return { posts: [...s.posts, ...additions] };
+    });
   },
+
   setActiveIndex: (idx) => {
     const prev = get().activeIndex;
     if (prev === idx) return;
@@ -153,6 +170,17 @@ export const useFullscreenFeedStore = create<FullscreenFeedState>((set, get) => 
     set({ hasNextPage, isFetchingNextPage });
   },
 }));
+
+/**
+ * True only when the viewer is open AND was opened from `surface`.
+ * Use to gate append/pagination effects.
+ */
+export function useIsViewerOwnedBy(surface: string): boolean {
+  const isOpen = useFullscreenFeedStore((s) => s.isOpen);
+  const openedFrom = useFullscreenFeedStore((s) => s.openedFrom);
+  return isOpen && openedFrom === surface;
+}
+
 
 
 // Subscribe to engagement updates from the rest of the app. Keeps the

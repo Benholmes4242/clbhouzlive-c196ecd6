@@ -56,6 +56,7 @@ function CompactVideoRowInner({ post, index, allPosts, onDecoded }: CompactVideo
   const btnRef = useRef<HTMLButtonElement>(null);
   const handleClick = useCallback(() => {
     openWithOrigin({
+      openedFrom: 'watch',
       posts: allPosts,
       index,
       originEl: btnRef.current,

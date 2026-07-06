@@ -1,12 +1,14 @@
 import { useRef, useEffect, useCallback, useMemo, type RefObject } from 'react';
 // App-wide scroll container (#root, not window) — used by all infinite lists
 const SCROLL_ROOT = typeof document !== 'undefined' ? document.getElementById('root') : null;
-import { useFullscreenFeedStore } from '@/store/fullscreenFeedStore';
+import { useFullscreenFeedStore, useIsViewerOwnedBy } from '@/store/fullscreenFeedStore';
 import { useInView } from 'react-intersection-observer';
+import { useWatchAutoplay } from '@/video/useWatchAutoplay';
 import { Loader2 } from 'lucide-react';
 import type { FeedPost } from '@/components/media-system/types/media';
 import { ExploreTile } from './ExploreTile';
 import ExploreGridSkeleton from './ExploreGridSkeleton';
+
 
 interface ExploreGridProps {
   posts: FeedPost[];
@@ -78,15 +80,25 @@ export default function ExploreGrid({
     if (!isFetchingNextPage) fetchGuard.current = false;
   }, [isFetchingNextPage]);
 
-  // Sync new posts into fullscreen overlay
-  const { isOpen: isFullscreenOpen, appendPosts } = useFullscreenFeedStore();
+  // Sync new posts into fullscreen overlay — only when THIS surface owns it.
+  const isViewerOwnedHere = useIsViewerOwnedBy('explore');
+  const appendPosts = useFullscreenFeedStore((s) => s.appendPosts);
+
 
   useEffect(() => {
-    if (!isFullscreenOpen) return;
+    if (!isViewerOwnedHere) return;
     if (coursePosts.length > 0) {
       appendPosts(coursePosts);
     }
-  }, [coursePosts.length, isFullscreenOpen, appendPosts]);
+  }, [coursePosts.length, isViewerOwnedHere, appendPosts, coursePosts]);
+
+  // Autoplay: one active tile per viewport region, driven off data-watch-tile-index.
+  const { activeIdx, railRef: autoplayRef } = useWatchAutoplay({ railId: 'explore-grid' });
+  const setGridRef = useCallback((el: HTMLDivElement | null) => {
+    autoplayRef(el);
+    if (gridRef) (gridRef as React.MutableRefObject<HTMLDivElement | null>).current = el;
+  }, [autoplayRef, gridRef]);
+
 
   // Shortest-column masonry distribution.
   const columns = useMemo<PlacedTile[][]>(() => {
@@ -140,7 +152,8 @@ export default function ExploreGrid({
   }
 
   return (
-    <div ref={gridRef} style={{ display: 'flex', flexDirection: 'column', gap: GAP }}>
+    <div ref={setGridRef} style={{ display: 'flex', flexDirection: 'column', gap: GAP }}>
+
 
       <div
         style={{
@@ -164,7 +177,7 @@ export default function ExploreGrid({
           >
             {col.map(({ post, index, ratio }) => (
               <div
-                key={post.mediaItems[0]?.id || post.id}
+                key={post.id}
                 style={{
                   position: 'relative',
                   width: '100%',
@@ -180,9 +193,11 @@ export default function ExploreGrid({
                   fetchNextPage={fetchNextPage}
                   hasNextPage={hasNextPage}
                   isFetchingNextPage={isFetchingNextPage}
+                  active={activeIdx === index}
                 />
               </div>
             ))}
+
           </div>
         ))}
       </div>

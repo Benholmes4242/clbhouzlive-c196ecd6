@@ -1,6 +1,6 @@
 import React, { forwardRef, useCallback, useEffect, useMemo, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useFullscreenFeedStore } from '@/store/fullscreenFeedStore';
+import { useFullscreenFeedStore, useIsViewerOwnedBy } from '@/store/fullscreenFeedStore';
 import { groupMultiMedia } from '@/components/media-system/utils/feedMapper';
 import { AlertCircle, Camera, Loader2, Film, ListChecks, Flag, Sunrise, Building2 } from 'lucide-react';
 import type { FeedPost } from '@/components/media-system/types/media';
@@ -93,16 +93,16 @@ export const CourseMediaGrid = forwardRef<HTMLDivElement, CourseMediaGridProps>(
   // Mirror the hook's pagination state into the fullscreen store so
   // SnapFeed sees fresh hasNextPage / isFetchingNextPage values reactively
   // (not just the snapshot taken at .open() time).
-  const isViewerOpen = useFullscreenFeedStore(s => s.isOpen);
+  const isViewerOwnedHere = useIsViewerOwnedBy('course-media');
   const setPaginationState = useFullscreenFeedStore(s => s.setPaginationState);
 
   useEffect(() => {
-    if (!isViewerOpen) return;
+    if (!isViewerOwnedHere) return;
     setPaginationState({
       hasNextPage: hasNextPage ?? false,
       isFetchingNextPage: isFetchingNextPage ?? false,
     });
-  }, [isViewerOpen, hasNextPage, isFetchingNextPage, setPaginationState]);
+  }, [isViewerOwnedHere, hasNextPage, isFetchingNextPage, setPaginationState]);
 
   // Grouped-by-post array for the fullscreen viewer. SnapFeed rejects
   // ungrouped/duplicate-id posts, so we always hand off groupMultiMedia'd
@@ -117,9 +117,10 @@ export const CourseMediaGrid = forwardRef<HTMLDivElement, CourseMediaGridProps>(
   // dedupes by post id) so infinite scroll keeps loading without corrupting
   // the viewer with duplicate-id per-media entries.
   useEffect(() => {
-    if (!isViewerOpen) return;
+    if (!isViewerOwnedHere) return;
     useFullscreenFeedStore.getState().appendPosts(groupedForViewer);
-  }, [isViewerOpen, groupedForViewer]);
+  }, [isViewerOwnedHere, groupedForViewer]);
+
 
   // Single open-fullscreen entrypoint — routes through openWithOrigin so
   // course media gets the FLIP expand + resume-at-position (via the tile's
@@ -149,6 +150,7 @@ export const CourseMediaGrid = forwardRef<HTMLDivElement, CourseMediaGridProps>(
     const mediaId = tapped?.mediaItems?.[0]?.id ?? null;
     const groupedTarget = groupedForViewer[groupedIndex];
     openWithOrigin({
+      openedFrom: 'course-media',
       posts: groupedForViewer,
       index: groupedIndex,
       originEl: ctx.originEl,

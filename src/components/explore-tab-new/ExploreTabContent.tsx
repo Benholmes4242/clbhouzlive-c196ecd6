@@ -14,7 +14,7 @@ import { LatestRecordsStrip } from './LatestRecordsStrip';
 import { CircleActivityStrip } from './CircleActivityStrip';
 
 import ExploreGrid from './ExploreGrid';
-import ExploreAutoplay from './ExploreAutoplay';
+
 
 import { SLATE_50 } from '@/features/courses/_shared/tokens';
 
@@ -83,7 +83,7 @@ export default function ExploreTabContent({ embedded: _embedded = false }: Explo
         onRegionChange={handleRegionChange}
       />
 
-      <ExploreAutoplay posts={coursePosts} gridRef={gridRef} />
+
     </div>
   );
 }
