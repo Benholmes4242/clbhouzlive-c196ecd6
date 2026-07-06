@@ -52,8 +52,9 @@ const squircleMaskStyle: React.CSSProperties = {
   maskRepeat: 'no-repeat',
 };
 
-function SquircleAvatar({ photoUrl, size = 38, dashed = false }: { photoUrl: string | null; size?: number; dashed?: boolean }) {
+function ChampionsSquircle({ photoUrl, size = 38, dashed = false }: { photoUrl: string | null; size?: number; dashed?: boolean }) {
   if (dashed) {
+    // Dashed = empty-slot ghost, not an avatar — canon exception, no hairline overlay.
     return (
       <div
         aria-hidden
@@ -73,7 +74,17 @@ function SquircleAvatar({ photoUrl, size = 38, dashed = false }: { photoUrl: str
   return (
     <div style={{ width: size, height: size, position: 'relative', flexShrink: 0 }} aria-hidden>
       <div style={{ position: 'absolute', inset: 0, background: photoBg, ...squircleMaskStyle }} />
-      <div style={{ position: 'absolute', inset: 0, ...squircleMaskStyle, boxShadow: 'inset 0 0 0 1px var(--hcp-line)' }} />
+      {/* Traced hairline (canon: dark surface → 1px white 22%) */}
+      <div
+        aria-hidden
+        style={{
+          position: 'absolute',
+          inset: 0,
+          borderRadius: '34%',
+          border: '1px solid rgba(255,255,255,0.22)',
+          pointerEvents: 'none',
+        }}
+      />
     </div>
   );
 }
