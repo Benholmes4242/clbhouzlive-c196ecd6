@@ -454,6 +454,12 @@ class VideoEngineImpl {
         return;
       }
       lane.firstFrame = true;
+      // Once we have real painted frames, strip the poster attribute so the
+      // browser cannot re-composite the poster image on subsequent
+      // appendChild re-parents (borrow/return, host swaps). load() re-sets
+      // the poster per new source, so future cold-loads still get their
+      // pre-paint cover.
+      try { lane.el.removeAttribute('poster'); } catch {}
       if (trace) {
         fsv('eng.markFF', {
           laneId: lane.id, source, target: +target.toFixed(3),
