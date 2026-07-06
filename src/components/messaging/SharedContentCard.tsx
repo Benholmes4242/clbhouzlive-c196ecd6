@@ -280,10 +280,6 @@ function MomentShareCard({
     setCurrentIndex(prev => (prev - 1 + mediaUrls.length) % mediaUrls.length);
   };
 
-  const isVideo = (url: string) => {
-    return url.includes('.mp4') || url.includes('.mov') || url.includes('.webm');
-  };
-
   return (
     <div 
       className={cn(
@@ -297,13 +293,13 @@ function MomentShareCard({
       <div className="relative aspect-square overflow-hidden bg-muted">
         {mediaUrls.length > 0 ? (
           <>
-            {/* [VIDEOSTUB] Poster-only chassis — streaming <video> severed; render thumbnail/first frame. */}
+            {/* Poster-only chassis — image taps bubble to outer /post/ navigation. */}
             <img
               src={moment.thumbnail_url || mediaUrls[currentIndex]}
               alt="Shared moment"
               className="w-full h-full object-cover"
-              onClick={(e) => e.stopPropagation()}
             />
+
 
             
             {/* Navigation arrows for multiple media */}
