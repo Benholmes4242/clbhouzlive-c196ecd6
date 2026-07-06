@@ -96,6 +96,27 @@ export function FullscreenFeedOverlay() {
   const isFetchingNextPage = useFullscreenFeedStore(s => s.isFetchingNextPage);
   const readOnly = useFullscreenFeedStore(s => s.readOnly);
   const origin = useFullscreenFeedStore(s => s.origin);
+  const borrow = useFullscreenFeedStore(s => s.borrow);
+  const clearBorrow = useFullscreenFeedStore(s => s.clearBorrow);
+
+  // Snapshot borrow so the isOpen-cleanup path can run the return even after
+  // close() has cleared the store's borrow field synchronously.
+  const borrowRef = useRef<BorrowDescriptor | null>(null);
+  useEffect(() => { borrowRef.current = borrow; }, [borrow]);
+
+  // ── Swipe-away demotion (A1c: borrow is a one-shot property of the tap) ──
+  // When the user swipes vertically off the opening slide, unmount the
+  // borrowed lane, unpin, and clear the store's borrow so the opening slide
+  // (on swipe-back) takes the standard 'fullscreen' lane path via lastPos.
+  useEffect(() => {
+    if (!isOpen) return;
+    if (!borrow) return;
+    if (activeIndex === startIndex) return;
+    returnBorrow(borrow, 'demote');
+    borrowRef.current = null;
+    clearBorrow();
+  }, [isOpen, borrow, activeIndex, startIndex, clearBorrow]);
+
 
   // ── FLIP clone state ──
   // When origin is present, we mount a transform-only expanding poster clone
