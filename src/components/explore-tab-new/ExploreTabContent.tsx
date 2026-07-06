@@ -28,8 +28,7 @@ export default function ExploreTabContent({ embedded: _embedded = false }: Explo
   const gridRef = useRef<HTMLDivElement | null>(null);
 
   // URL-backed filter state — also read by Discover.tsx for the shell row.
-  // (mood is now consumed by CoursesPageHero, not this tab.)
-  useExploreMood();
+  const { mood } = useExploreMood();
   const { region: activeRegion, setRegion } = useExploreRegion();
 
   const {
