@@ -286,19 +286,15 @@ const AboutMediaStrip: React.FC<AboutMediaStripProps> = ({ clubId, onSeeAllClick
                 if (showOverflow) {
                   onSeeAllClick();
                 } else {
-                  const grouped = groupMultiMedia(feedPosts);
-                  const tapped = feedPosts[index];
-                  const parentIndex = Math.max(
-                    0,
-                    grouped.findIndex((p) => p.mediaItems.some((m) => m.id === tapped?.id)),
-                  );
-                  const parent = grouped[parentIndex];
-                  const mediaId = tapped?.mediaItems?.[0]?.id ?? parent?.mediaItems?.[0]?.id ?? null;
+                  const parentId = tileParentIds[index];
+                  const mediaId = media.id;
+                  const parentIndex = Math.max(0, feedPosts.findIndex((p) => p.id === parentId));
+                  const parent = feedPosts[parentIndex];
                   const posterUrl = parent?.mediaItems?.find((m) => m.id === mediaId)?.thumbnailUrl
                     || parent?.mediaItems?.[0]?.thumbnailUrl
                     || null;
                   openWithOrigin({
-                    posts: grouped,
+                    posts: feedPosts,
                     index: parentIndex,
                     originEl: btnRef.current,
                     posterUrl,
