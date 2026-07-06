@@ -1,8 +1,9 @@
-import React, { useRef } from 'react';
+import React, { useRef, useEffect } from 'react';
 import { Film } from 'lucide-react';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import type { FeedPost } from '@/components/media-system/types/media';
 import { useRailLane } from '@/video/useRailLane';
+import { originHostRegistry } from '@/video/originHostRegistry';
 import { AMBER, INK_TINT_04, INK_TINT_06, SURFACE } from '@/features/courses/_shared/tokens';
 
 function formatDuration(seconds?: number): string {
