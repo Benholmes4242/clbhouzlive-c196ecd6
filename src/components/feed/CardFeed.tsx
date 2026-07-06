@@ -426,6 +426,7 @@ export const CardFeed = forwardRef<CardFeedHandle, CardFeedProps>(function CardF
       playingIdx,        // isActive keys off playingIdx; without this the
                          // settle-promoted play index never reaches the tiles
       fsOpen,            // recompute isActive/isNear when fullscreen opens/closes
+      borrowedOwnerKey,  // keeps the borrowed card's host mounted while fs open
       carouselPositions,
       getCarouselChangeHandler,
       getCommentCount,
