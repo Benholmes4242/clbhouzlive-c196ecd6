@@ -14,8 +14,8 @@ import { useSeasonRecap } from '@/hooks/useSeasonRecap';
 import { Compass, Flag, EyeOff, Link as LinkIcon, Users } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Drawer, DrawerContent } from '@/components/ui/drawer';
-import { isDarkChromeRoute } from '@/components/header/globalHeaderRules';
-import { useMedianStatusBar } from '@/hooks/useMedianStatusBar';
+// Chrome owned solely by AppRoutes; no local status-bar imports.
+
 import { logRouteClubhouse } from '@/utils/bootTimeline';
 import { ClubhouseSkeletonShimmer } from '@/components/clubhouse/ClubhouseSkeletonShimmer';
 import { useClubhouseSkeletonTiming } from '@/hooks/useClubhouseSkeletonTiming';
@@ -128,7 +128,8 @@ const ClubhouseContent = () => {
   }, []);
 
   useHeaderVariant('solid-light');
-  useMedianStatusBar("auto", "transparent", true, false, true, pathname, (p) => isDarkChromeRoute(p));
+  // Chrome (shield + status bar) owned solely by AppRoutes. Do not write here.
+
   
   // route-clubhouse class is now applied by ClubhouseWrapped (eagerly loaded)
   // to prevent white flash during lazy chunk loading

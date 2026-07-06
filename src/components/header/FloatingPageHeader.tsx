@@ -16,7 +16,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ArrowLeft, Search } from 'lucide-react';
-import { applyShieldColor } from '@/hooks/useMedianStatusBar';
+// Shield writes owned solely by AppRoutes; no direct applyShieldColor here.
 import { setFloatingHeaderActive } from '@/features/tourhub/_shared/floatingHeaderSignal';
 import GlobalSearchOverlay from '@/components/search/GlobalSearchOverlay';
 import { PostingAsPill } from './PostingAsPill';
@@ -74,52 +74,12 @@ export const FloatingPageHeader: React.FC<FloatingPageHeaderProps> = ({
     return () => setFloatingHeaderActive(false);
   }, []);
 
-  // Self-contained notch transparency: set on mount, restore on unmount.
-  // Also reapply on visibility/focus and after fullscreen media closes, so
-  // foreground / lifecycle events can't repaint the shield grey while mounted.
-  useEffect(() => {
-    let prevShield = '#F8FAFC';
-    try {
-      const shield = document.getElementById('safe-area-shield');
-      if (shield) prevShield = shield.style.backgroundColor || '#F8FAFC';
-    } catch {}
+  // Chrome (shield + native status bar) is owned solely by AppRoutes now.
+  // FloatingPageHeader must NOT write shield / theme-color / status-bar —
+  // last-writer-wins on unmount was painting #F8FAFC over the hero on
+  // back-nav to /courses. AppRoutes classifies every immersive route to
+  // transparent from location.pathname.
 
-    const applyTransparent = () => {
-      applyShieldColor('transparent');
-      try {
-        (window as any).median?.statusbar?.set({
-          style: 'dark',
-          color: '00000000',
-          overlay: true,
-          blur: false,
-        });
-      } catch {}
-    };
-
-    applyTransparent();
-
-    const onVisibility = () => { if (!document.hidden) applyTransparent(); };
-    const onFocus = () => applyTransparent();
-    const onMediaClosed = () => applyTransparent();
-    document.addEventListener('visibilitychange', onVisibility);
-    window.addEventListener('focus', onFocus);
-    window.addEventListener('media-viewer-closed', onMediaClosed);
-
-    return () => {
-      document.removeEventListener('visibilitychange', onVisibility);
-      window.removeEventListener('focus', onFocus);
-      window.removeEventListener('media-viewer-closed', onMediaClosed);
-      applyShieldColor(prevShield && prevShield !== 'transparent' ? prevShield : '#F8FAFC');
-      try {
-        (window as any).median?.statusbar?.set({
-          style: 'light',
-          color: 'FFF8FAFC',
-          overlay: false,
-          blur: false,
-        });
-      } catch {}
-    };
-  }, []);
 
   const handleBack = () => {
     haptic('light');

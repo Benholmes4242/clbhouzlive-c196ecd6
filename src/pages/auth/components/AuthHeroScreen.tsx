@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
-import { useMedianStatusBar } from '@/hooks/useMedianStatusBar';
+// Chrome owned solely by AppRoutes (/auth + /signup are darkChrome routes).
 import { Loader2, ArrowRight } from 'lucide-react';
 import { toast } from 'sonner';
 import { z } from 'zod';
@@ -62,8 +62,8 @@ const AuthHeroScreen: React.FC<AuthHeroScreenProps> = ({
   errorNonce,
 }) => {
 
-  // Light status bar + safe-area shield for Median.co wrapper
-  useMedianStatusBar('dark', '#15171F', true, false);
+  // Chrome (shield + native status bar) owned solely by AppRoutes.
+
 
   const [loginEmail, setLoginEmail] = useState('');
   const [emailError, setEmailError] = useState<string | null>(null);

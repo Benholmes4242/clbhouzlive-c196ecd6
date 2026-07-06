@@ -5,9 +5,10 @@
  * Owns its own: positioning, scrim, safe-area, blur, status-bar transparency,
  * and shield lifecycle. No global event bus, no shared CSS vars.
  */
-import React, { useEffect } from 'react';
+import React from 'react';
 import { Menu, Search } from 'lucide-react';
-import { applyShieldColor } from '@/hooks/useMedianStatusBar';
+// Chrome (shield + status bar) owned solely by AppRoutes.
+
 
 export interface FloatingTourHeaderProps {
   onMenuTap: () => void;
@@ -47,39 +48,8 @@ export const FloatingTourHeader: React.FC<FloatingTourHeaderProps> = ({
 }) => {
 
 
-  // Self-contained notch transparency: set on mount, restore on unmount.
-  useEffect(() => {
-    // CSS shield
-    let prevShield = '#F8FAFC';
-    try {
-      const shield = document.getElementById('safe-area-shield');
-      if (shield) prevShield = shield.style.backgroundColor || '#F8FAFC';
-    } catch {}
-    applyShieldColor('transparent');
+  // Chrome owned solely by AppRoutes; FloatingTourHeader must not write shield.
 
-    // Native Median status bar
-    try {
-      (window as any).median?.statusbar?.set({
-        style: 'dark',
-        color: '00000000',
-        overlay: true,
-        blur: false,
-      });
-    } catch {}
-
-    return () => {
-      // Restore to app light default.
-      applyShieldColor(prevShield && prevShield !== 'transparent' ? prevShield : '#F8FAFC');
-      try {
-        (window as any).median?.statusbar?.set({
-          style: 'light',
-          color: 'FFF8FAFC',
-          overlay: false,
-          blur: false,
-        });
-      } catch {}
-    };
-  }, []);
 
   return (
     <div

@@ -14,7 +14,7 @@ import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { cn } from '@/lib/utils';
 import { MapCourseSheet } from './map';
 import { MAP_CONFIG, applyClbhouzMapStyle } from '@/config/maps';
-import { useMedianStatusBar } from '@/hooks/useMedianStatusBar';
+// Chrome owned solely by AppRoutes; no local status-bar imports.
 import { Popover, PopoverTrigger, PopoverContent } from '@/components/ui/popover';
 
 type StatusFilter = 'all' | 'played' | 'want_to_play' | 'not_played';
@@ -74,7 +74,7 @@ const Top100MapView: React.FC<Top100MapViewProps> = ({
   const navigate = useNavigate();
   const { session } = useSupabaseSession();
   
-  useMedianStatusBar("dark", "transparent", true, false);
+  // Chrome owned solely by AppRoutes (/top100/ is immersive → transparent).
 
   const mapContainerRef = useRef<HTMLDivElement | null>(null);
   const mapRef = useRef<mapboxgl.Map | null>(null);

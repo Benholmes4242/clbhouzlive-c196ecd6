@@ -30,7 +30,7 @@ import { OverlayPortalProvider } from '@/context/OverlayPortalContext';
 import { toast } from 'sonner';
 import { useShareReview } from '@/hooks/useShareReview';
 import { useActiveActor } from '@/context/ActiveActorContext';
-import { useMedianStatusBar } from '@/hooks/useMedianStatusBar';
+// Chrome owned solely by AppRoutes; no local status-bar imports.
 import { formatCourseLocation } from '@/utils/courseLocation';
 import { MentionBottomSheet, type MentionSuggestion } from '@/components/shared/media/MentionBottomSheet';
 import { useVoiceRecorder } from '@/hooks/useVoiceRecorder';
@@ -131,7 +131,9 @@ export function ReviewWizard({
     onSuccess: () => wizard.goToStep('success'),
   });
 
-  useMedianStatusBar('light', 'transparent', isOpen, false);
+  // Chrome owned solely by AppRoutes. Wizard opens over immersive routes
+  // (course pages), which AppRoutes already sets to transparent.
+
 
   /* ── Local ComposerMediaItem mirror for pending files ─────────────────── */
   // Source of truth for pending files = wizard.allMedia (pending entries).
