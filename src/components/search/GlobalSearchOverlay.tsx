@@ -845,6 +845,16 @@ function GlobalSearchOverlay({ isOpen, onClose }: GlobalSearchOverlayProps) {
                               ? <img src={business.logo_url} alt="" className="w-full h-full object-cover" />
                               : <Briefcase className="w-5 h-5 text-muted-foreground" />
                             }
+                            <div
+                              aria-hidden
+                              style={{
+                                position: 'absolute',
+                                inset: 0,
+                                borderRadius: '34%',
+                                border: `1px solid ${LIGHT_HAIRLINE}`,
+                                pointerEvents: 'none',
+                              }}
+                            />
                           </div>
                           <div className="flex-1 min-w-0 text-left">
                             <div className="flex items-center gap-1 min-w-0">
