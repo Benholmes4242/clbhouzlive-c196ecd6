@@ -100,16 +100,8 @@ export const FeedSlide = memo(function FeedSlide({
   // cards now render as standalone Home modules (HomePGAModule, HomeCourseOfWeekModule).
   const renderContent = () => {
 
-    // Multi-media carousel — feed surface ONLY. In fullscreen, the carousel
-    // branch would render `FeedImageCarousel` whose per-slide `SnapVideoPlayer`
-    // is a poster-only teardown stub that never plays — so a multi-media post
-    // tapped on its first-media video (openIdx===0) previously mounted the
-    // stub instead of `FullscreenVideoSlot`. Skipping the carousel in
-    // fullscreen routes both the opening slide and any swiped-to slide
-    // through the per-`m` branches below: chosen video (w/ hlsUrl) mounts
-    // the fullscreen lane; chosen image renders the pinch-zoom image branch.
-    // In-fullscreen swiping BETWEEN a multi-media post's own media items is
-    // Stage 7 — deferred; the tapped media (or media[0] on swipe) is shown.
+    // Multi-media carousel — feed surface (non-fullscreen). Fullscreen
+    // routes multi-media through <FullscreenMediaPager/> below.
     if (!isFullscreen && media && media.length > 1 && openIdx === 0) {
       return (
         <FeedImageCarousel
@@ -123,6 +115,23 @@ export const FeedSlide = memo(function FeedSlide({
       );
     }
 
+    // Stage-7 PR-3: in-fullscreen horizontal media sub-pager for multi-media
+    // posts. Only the active page mounts the SHOWING lane; inactive pages
+    // render posters. First horizontal swipe on a borrow slide triggers the
+    // one-shot demote via the store → overlay effect runs returnBorrow.
+    if (isFullscreen && media && media.length > 1) {
+      return (
+        <FullscreenMediaPager
+          post={post}
+          media={media}
+          openIdx={openIdx}
+          isSlideActive={isActive}
+          isSuggestedFeed={isSuggestedFeed}
+          onFirstFrameReady={onFirstFrameReady}
+          onZoomChange={onZoomChange}
+        />
+      );
+    }
 
     // Opening media (video/image DECISION and rendered content both use `m`).
     const m = media?.[openIdx] ?? media?.[0];
