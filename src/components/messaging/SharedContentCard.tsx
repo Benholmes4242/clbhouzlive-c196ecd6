@@ -231,17 +231,6 @@ function TeeTimeShareCard({
           </div>
         )}
 
-        <Button 
-          variant={isOwnMessage ? "secondary" : "outline"}
-          size="sm" 
-          className="w-full h-8 text-xs"
-          onClick={(e) => {
-            e.stopPropagation();
-            handleViewDetails();
-          }}
-        >
-          View Details <ExternalLink className="h-3 w-3 ml-1" />
-        </Button>
       </div>
     </div>
   );
