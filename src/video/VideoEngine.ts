@@ -760,11 +760,23 @@ class VideoEngineImpl {
     });
   }
 
-  /** Read the last known playback position for a post (session-scoped). */
+  /** Read the last known playback position for a post (session-scoped).
+   * Shape fallback: if the exact key misses and the caller passed a bare
+   * postId (no ':'), try the ownerKey-form `${postId}:0`. Single-media
+   * feed posts are now keyed :0-form by InlineVideo; without this fallback,
+   * bare readers (FullscreenVideoSlot storedStart, openWithOrigin's lastPos
+   * ladder) silently restart at 0. Read-side only — no write-path change. */
   getLastPos(postId: string | null | undefined): number {
     if (!postId) return 0;
-    return this.lastPos.get(postId) ?? 0;
+    const exact = this.lastPos.get(postId);
+    if (exact != null) return exact;
+    if (!postId.includes(':')) {
+      const zero = this.lastPos.get(`${postId}:0`);
+      if (zero != null) return zero;
+    }
+    return 0;
   }
+
 
 
 
