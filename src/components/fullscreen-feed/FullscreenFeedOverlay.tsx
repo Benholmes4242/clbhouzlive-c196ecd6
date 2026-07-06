@@ -206,11 +206,11 @@ export function FullscreenFeedOverlay() {
       // If the review sheet is open on top of this overlay, let IT handle ESC first.
       const sheetIsOpen = useReviewSheetStore.getState().isOpen;
       if (sheetIsOpen) return;
-      close();
+      handleClose();
     };
     window.addEventListener("keydown", handler);
     return () => window.removeEventListener("keydown", handler);
-  }, [isOpen, close]);
+  }, [isOpen, handleClose]);
 
   // Deep-link entry: open comments sheet on mount when requested by the opener
   // (e.g. PostDeepLinkPage routing in from a notification tap).
