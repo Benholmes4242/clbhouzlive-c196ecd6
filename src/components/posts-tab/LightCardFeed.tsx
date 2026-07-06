@@ -41,6 +41,8 @@ export interface LightCardFeedProps {
   getCommentCount: (post: FeedPost) => number;
   onNearEnd?: () => void;
   hasNextPage?: boolean;
+  fetchNextPage?: () => void;
+  isFetchingNextPage?: boolean;
   topPadding?: number | string;
   bottomPadding?: number;
   onFollow?: (post: FeedPost) => void;
