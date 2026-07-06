@@ -496,18 +496,9 @@ class VideoEngineImpl {
     const onRateChange = () => { if (trace) fsvEl('el.ratechange', el, { laneId: lane.id, rate: el.playbackRate }); };
     const onCanPlayThru = () => { if (trace) fsvEl('el.canplaythru', el, { laneId: lane.id }); };
     const onTime = () => {
-      if (lane.postId) {
-        const t = lane.el.currentTime || 0;
-        this.lastPos.set(lane.postId, t);
-        // Dual-shape ownership: when lane.postId is stamped in ownerKey form
-        // ("<postId>:<index>"), mirror the write to the bare postId so any
-        // bare reader (InlineVideo resume, openWithOrigin ladder,
-        // FullscreenVideoSlot storedStart) resolves regardless of which form
-        // owned the lane. Cheap extra Map.set at ~4Hz.
-        const colon = lane.postId.indexOf(':');
-        if (colon > 0) this.lastPos.set(lane.postId.slice(0, colon), t);
-      }
+      if (lane.postId) this.lastPos.set(lane.postId, lane.el.currentTime || 0);
       if (trace) fsvTimeSample(`${lane.id}:time`, el, { laneId: lane.id, target: lane.startPosition });
+
 
       if (!lane.firstFrame) markReadyToShow('timeupdate');
       // Gapless loop for short clips (<15s): native loop leaves a 100-300ms
