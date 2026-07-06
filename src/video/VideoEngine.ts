@@ -670,6 +670,7 @@ class VideoEngineImpl {
       duration: isFinite(lane.el.duration) ? lane.el.duration : 0,
       muted: lane.el.muted,
       firstFrame: lane.firstFrame,
+      postId: lane.postId,
     };
   }
 
