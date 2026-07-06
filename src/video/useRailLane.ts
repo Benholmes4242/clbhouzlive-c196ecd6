@@ -108,7 +108,11 @@ export function useRailLane(opts: UseRailLaneOptions): UseRailLaneResult {
     // Resume at the engine's lastPos for this post — kept fresh by every lane
     // (feed-active/fullscreen/rail-*) via onTime. Means closing fullscreen at
     // 20s and returning to a re-acquired rail tile picks up at 20s, not 0.
-    const resumeAt = opts.postId ? VideoEngine.getLastPos(opts.postId) : 0;
+    // Read via ownerKey (caller shape) so :0-form writes from InlineVideo/
+    // feed borrow resolve without relying on getLastPos's bare fallback.
+    const resumeKey = opts.ownerKey ?? opts.postId ?? null;
+    const resumeAt = resumeKey ? VideoEngine.getLastPos(resumeKey) : 0;
+
     VideoEngine.load(laneId, {
       hlsUrl: opts.hlsUrl,
       posterUrl: opts.posterUrl ?? null,

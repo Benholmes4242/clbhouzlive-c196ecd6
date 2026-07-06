@@ -258,35 +258,26 @@ class VideoEngineImpl {
     const { hlsUrl, posterUrl = null, startPosition = -1, postId = null } = opts;
     // Same postId + same URL already loaded → no reload. This makes remount
     // (element moving between card hosts) cheap and avoids re-fetching HLS.
-    // Shape-tolerant postId match: lane.postId may be stamped as either the
-    // bare postId or an ownerKey form ("<postId>:<index>"); accept either
-    // side matching or being a prefix of the other (dual-shape ownership
-    // fix — see Stage 7 PR-2 FIX 2). When it matches, ADOPT the incoming
-    // form so subsequent strict comparisons converge.
-    const samePost =
-      lane.postId != null &&
-      postId != null &&
-      (
-        lane.postId === postId ||
-        lane.postId.startsWith(postId + ':') ||
-        postId.startsWith(lane.postId + ':')
-      );
+    // STRICT postId equality is intentional — callers must speak the same
+    // key play() stamps (ownerKey-form for carousel slides). Shape reconciliation
+    // happens at the caller boundary (InlineVideo passes resolvedOwnerKey),
+    // not by mutating lane.postId here.
     const alreadyLoaded =
-      samePost &&
+      lane.postId != null &&
+      lane.postId === postId &&
       lane.hlsUrl === hlsUrl &&
       lane.state !== 'idle' &&
       lane.state !== 'error';
     if (alreadyLoaded) {
-      const adoptedPostId = lane.postId !== postId ? postId : undefined;
-      if (adoptedPostId !== undefined) lane.postId = postId;
-      DBG(laneId, 'skip reload: same postId+url', { state: lane.state, adoptedPostId });
+      DBG(laneId, 'skip reload: same postId+url', { state: lane.state });
       if (isFsv(laneId)) {
         fsvEl('eng.load', lane.el, {
-          laneId, postId, startPosition, alreadyLoaded: true, state: lane.state, adoptedPostId,
+          laneId, postId, startPosition, alreadyLoaded: true, state: lane.state,
         });
       }
       return;
     }
+
 
     const priorPostId = lane.postId;
     const priorHlsUrl = lane.hlsUrl;
@@ -505,18 +496,9 @@ class VideoEngineImpl {
     const onRateChange = () => { if (trace) fsvEl('el.ratechange', el, { laneId: lane.id, rate: el.playbackRate }); };
     const onCanPlayThru = () => { if (trace) fsvEl('el.canplaythru', el, { laneId: lane.id }); };
     const onTime = () => {
-      if (lane.postId) {
-        const t = lane.el.currentTime || 0;
-        this.lastPos.set(lane.postId, t);
-        // Dual-shape ownership: when lane.postId is stamped in ownerKey form
-        // ("<postId>:<index>"), mirror the write to the bare postId so any
-        // bare reader (InlineVideo resume, openWithOrigin ladder,
-        // FullscreenVideoSlot storedStart) resolves regardless of which form
-        // owned the lane. Cheap extra Map.set at ~4Hz.
-        const colon = lane.postId.indexOf(':');
-        if (colon > 0) this.lastPos.set(lane.postId.slice(0, colon), t);
-      }
+      if (lane.postId) this.lastPos.set(lane.postId, lane.el.currentTime || 0);
       if (trace) fsvTimeSample(`${lane.id}:time`, el, { laneId: lane.id, target: lane.startPosition });
+
 
       if (!lane.firstFrame) markReadyToShow('timeupdate');
       // Gapless loop for short clips (<15s): native loop leaves a 100-300ms
@@ -657,6 +639,11 @@ class VideoEngineImpl {
     // cards (caller != lane.postId) must NOT pause the incoming card that
     // already took the lane. Null caller = engine-wide (pauseAll/visibility/
     // release) — always allowed.
+    // INVARIANT: callers MUST pass ownerKey-form (ownerKey ?? postId). Bare
+    // pauses on ownerKey-owned lanes are rejected as stale by design — this
+    // preserves per-slide granularity for carousel media. Do not soften the
+    // strict compare here; reconcile shapes at the caller boundary instead.
+
     if (caller != null && lane.postId != null && caller !== lane.postId) {
       if (isFsv(laneId)) {
         fsv('eng.pause.stale', { laneId, caller, lanePostId: lane.postId });
@@ -778,11 +765,23 @@ class VideoEngineImpl {
     });
   }
 
-  /** Read the last known playback position for a post (session-scoped). */
+  /** Read the last known playback position for a post (session-scoped).
+   * Shape fallback: if the exact key misses and the caller passed a bare
+   * postId (no ':'), try the ownerKey-form `${postId}:0`. Single-media
+   * feed posts are now keyed :0-form by InlineVideo; without this fallback,
+   * bare readers (FullscreenVideoSlot storedStart, openWithOrigin's lastPos
+   * ladder) silently restart at 0. Read-side only — no write-path change. */
   getLastPos(postId: string | null | undefined): number {
     if (!postId) return 0;
-    return this.lastPos.get(postId) ?? 0;
+    const exact = this.lastPos.get(postId);
+    if (exact != null) return exact;
+    if (!postId.includes(':')) {
+      const zero = this.lastPos.get(`${postId}:0`);
+      if (zero != null) return zero;
+    }
+    return 0;
   }
+
 
 
 
