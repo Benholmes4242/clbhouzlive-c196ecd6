@@ -20,7 +20,6 @@ import type { FeedPost } from '@/components/media-system/types/media';
 import { LightCardFeed } from './LightCardFeed';
 import { useClubhouseStore } from '@/store/clubhouseStore';
 import { useFullscreenFeedStore } from '@/store/fullscreenFeedStore';
-import { useEffect } from 'react';
 
 import { useClubhouseLikes } from '@/components/clubhouse/hooks/useClubhouseLikes';
 import { useClubhouseFollows } from '@/components/clubhouse/hooks/useClubhouseFollows';
