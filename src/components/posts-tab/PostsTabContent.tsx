@@ -277,6 +277,8 @@ const PostsTabContent: React.FC<PostsTabContentProps> = ({
           topPadding={0}
           bottomPadding={32}
           hasNextPage={hasNextPage}
+          fetchNextPage={fetchNextPage}
+          isFetchingNextPage={isFetchingNextPage}
           onNearEnd={handleNearEnd}
           onLike={(post) => handleLike(post)}
           onComment={openComments}
