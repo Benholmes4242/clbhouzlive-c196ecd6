@@ -444,7 +444,7 @@ export function FullscreenFeedOverlay() {
                     onFollow={(post) => handleFollowChange(post.userId, !getFollowState(post))}
                     onViewProfile={handleViewProfile}
                     onReviewTap={handleReviewTap}
-                    onBeforeNavigate={close}
+                    onBeforeNavigate={handleClose}
                     overlayVisible={true}
                     isOwnPost={isOwnPost}
                     golfCourse={golfCourse}
@@ -452,7 +452,7 @@ export function FullscreenFeedOverlay() {
                     isActiveReview={isActiveReview}
                     bottomOffset={0}
                     topActionBar
-                    onClose={close}
+                    onClose={handleClose}
                     readOnly={readOnly}
                   />
 
