@@ -17,8 +17,8 @@ import { cn } from '@/lib/utils';
 
 // ---- Public token: total vertical space to reserve at the bottom of any
 // scrollable page so its last content clears the floating pill.
-// (~58 pill + 2 bottom gap + 16 breathing room = 76)
-export const NAV_CLEARANCE = 'calc(env(safe-area-inset-bottom, 0px) + 76px)';
+// (~58 pill + 12 bottom gap + 16 breathing room = 86)
+export const NAV_CLEARANCE = 'calc(env(safe-area-inset-bottom, 0px) + 86px)';
 
 // Routes where bottom navigation should be hidden
 const HIDDEN_ROUTES = [
@@ -196,9 +196,9 @@ const GlobalBottomNavigation: React.FC<GlobalBottomNavigationProps> = ({ chromeS
     handleTabClick(tab);
   };
 
-  // Sizes (icons-only, no visible labels)
-  const PILL_MAX_EXPANDED = 'min(360px, 100vw - 32px)';
-  const PILL_MAX_CONDENSED = 'min(320px, 100vw - 48px)';
+  // Sizes (icons-only, no visible labels) — sized to match IG's pill.
+  const PILL_MAX_EXPANDED = 'min(400px, 100vw - 24px)';
+  const PILL_MAX_CONDENSED = 'min(360px, 100vw - 40px)';
   const iconSize = condensed ? 21 : 23;
   const iconStroke = theme === 'dark' ? 2 : 2.1;
   const pillPadding = condensed ? '7px 10px' : '9px 10px';
@@ -245,7 +245,7 @@ const GlobalBottomNavigation: React.FC<GlobalBottomNavigationProps> = ({ chromeS
               position: 'fixed',
               left: 0,
               right: 0,
-              bottom: 'calc(env(safe-area-inset-bottom, 0px) + 2px)',
+              bottom: 'calc(env(safe-area-inset-bottom, 0px) + 12px)',
               zIndex: 100,
               pointerEvents: 'none',
               display: 'flex',
