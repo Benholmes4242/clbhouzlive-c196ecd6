@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { ThumbsUp, ThumbsDown } from 'lucide-react';
 import { SectionHeader } from '@/components/ui/SectionHeader';
 import { cn } from '@/lib/utils';
-import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
+import { SquircleAvatar, LIGHT_HAIRLINE } from '@/components/ui/SquircleAvatar';
 import { formatRatingValue } from '@/utils/formatters';
 import { getScoreRingColors } from '@/hooks/useTierStyles';
 import { ReviewMediaStrip, ReviewMediaItem } from './ReviewMediaStrip';
@@ -163,7 +163,8 @@ export const ReviewBlockFlat: React.FC<ReviewBlockFlatProps> = ({
             style={{ background: 'transparent', border: 'none', padding: 0, cursor: 'pointer', flexShrink: 0 }}
           >
             {user.avatarUrl ? (
-              <SquircleAvatar src={user.avatarUrl} alt={user.name} size={40} thinRing />
+              <SquircleAvatar src={user.avatarUrl} alt={user.name} size={40} hairlineRing ringColor={LIGHT_HAIRLINE} />
+
             ) : (
               <div
                 style={{
@@ -186,7 +187,7 @@ export const ReviewBlockFlat: React.FC<ReviewBlockFlatProps> = ({
           </button>
         ) : (
           user.avatarUrl ? (
-            <SquircleAvatar src={user.avatarUrl} alt={user.name} size={40} thinRing />
+            <SquircleAvatar src={user.avatarUrl} alt={user.name} size={40} hairlineRing ringColor={LIGHT_HAIRLINE} />
           ) : (
             <div
               style={{
