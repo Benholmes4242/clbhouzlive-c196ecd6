@@ -572,7 +572,7 @@ const FeedCardImpl: React.FC<FeedCardProps> = ({
             mountVideo={mountVideo}
             postId={post.id}
             onIndexChange={(idx) => onCarouselIndexChange?.(post, idx)}
-            onOpen={(idx) => onOpenMedia(post, idx)}
+            onOpen={(idx, mediaId) => onOpenMedia(post, idx, undefined, mediaId)}
             onDoubleTap={handleMediaDoubleTap}
           />
 
@@ -582,7 +582,6 @@ const FeedCardImpl: React.FC<FeedCardProps> = ({
               onOpenMedia(post, 0, {
                 el: singleMediaBtnRef.current,
                 posterUrl: media.thumbnailUrl ?? (media as any).imageUrl ?? null,
-                handOffUrl: (media as any).hlsUrl ?? null,
               })
             }
             onDouble={handleMediaDoubleTap}
