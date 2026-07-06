@@ -58,7 +58,7 @@ export default function ExploreTabContent({ embedded: _embedded = false }: Explo
 
 
       {/* Connect cue — self-pads; trim its outer wrapper to no h-padding */}
-      <div style={{ paddingTop: 12, paddingBottom: 4 }}>
+      <div style={{ paddingTop: 0, paddingBottom: 4 }}>
         <ConnectHandicapCue variant="discover" />
       </div>
 
