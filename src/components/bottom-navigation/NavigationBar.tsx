@@ -97,7 +97,7 @@ const NavigationBar: React.FC<NavigationBarProps> = ({
             <div className="relative">
               <Icon
               className={cn(
-                "h-[24px] w-[24px] [stroke-width:1.5]",
+                "h-[28px] w-[28px] [stroke-width:1.5]",
                 isLive && tab.id === 'tourhub'
                   ? "opacity-100"
                   : isLive
