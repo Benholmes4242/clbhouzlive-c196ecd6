@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import ShellSlot from '@/components/header/ShellSlot';
+import CoursesPageHero from './CoursesPageHero';
 import CourseExplorer from './CourseExplorer';
 import MyCourses from './MyCourses';
 import FriendsCoursesSignedOutEmpty from './FriendsCoursesSignedOutEmpty';
