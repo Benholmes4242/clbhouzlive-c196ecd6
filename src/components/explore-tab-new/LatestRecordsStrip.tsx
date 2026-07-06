@@ -6,6 +6,7 @@ import {
   type RecentCourseRecord,
 } from '@/hooks/gam/useRecentCourseRecords';
 import { SectionHeader } from '@/components/ui/SectionHeader';
+import { SquircleAvatar, LIGHT_HAIRLINE } from '@/components/ui/SquircleAvatar';
 import {
   INK,
   INK_MUTE,
