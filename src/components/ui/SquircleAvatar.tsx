@@ -21,7 +21,15 @@ import {
  * - 2px border with tier-based color
  * - Falls back to #D1D5DB (gray) for users with 0-4 courses
  * - Uses getRingColorForTotalPlayed() from clbhouzAchievementPalette.ts
+
+/**
+ * Canonical hairline ring colours.
+ * - LIGHT_HAIRLINE: use on light surfaces (ink @ 12%).
+ * - DARK_HAIRLINE:  default when hairlineRing is set on dark surfaces (white @ 22%).
  */
+export const LIGHT_HAIRLINE = 'rgba(15,23,42,0.12)';
+export const DARK_HAIRLINE = 'rgba(255,255,255,0.22)';
+
 
 // Size variants mapping
 const SIZE_MAP = {
