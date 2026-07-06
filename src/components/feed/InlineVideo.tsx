@@ -52,17 +52,19 @@ export const InlineVideo: React.FC<Props> = ({
   const firedRef = useRef(false);
   const isMuted = useClubhouseStore((s) => s.isMuted);
 
-  // Resume from engine.lastPos when we (re)activate; -1 tells hls.js "use
-  // manifest default" for first-load, positive value seeks to that time.
-  const startPosition = React.useMemo(() => {
-    if (!isActive || !postId) return -1;
-    const t = VideoEngine.getLastPos(postId);
-    return t > 0 ? t : -1;
-  }, [isActive, postId]);
-
   // Fallback ownership key so single-video callers that only pass postId
   // still get a non-null owner (closes the null-caller pause hole).
   const resolvedOwnerKey = ownerKey ?? (postId ? `${postId}:0` : null);
+
+  // Resume from engine.lastPos when we (re)activate; -1 tells hls.js "use
+  // manifest default" for first-load, positive value seeks to that time.
+  // Read via ownerKey so the borrow path (play() stamps ownerKey, onTime
+  // writes lastPos under lane.postId=ownerKey) resolves symmetrically.
+  const startPosition = React.useMemo(() => {
+    if (!isActive || !resolvedOwnerKey) return -1;
+    const t = VideoEngine.getLastPos(resolvedOwnerKey);
+    return t > 0 ? t : -1;
+  }, [isActive, resolvedOwnerKey]);
 
   const lane = useVideoLane('feed-active', {
     hlsUrl: isActive ? hlsUrl ?? null : null,
@@ -70,9 +72,12 @@ export const InlineVideo: React.FC<Props> = ({
     startPosition,
     active: isActive,
     muted: isMuted,
-    postId,
+    // Speak ownerKey to the engine so the skip-reload strict === matches
+    // whatever play() previously stamped (borrow path claims ownerKey-form).
+    postId: resolvedOwnerKey,
     ownerKey: resolvedOwnerKey,
   });
+
 
 
   // Trace inline (feed-active) lifecycle — close-flash forensics.
