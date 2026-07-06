@@ -201,8 +201,10 @@ const GlobalBottomNavigation: React.FC<GlobalBottomNavigationProps> = ({ chromeS
   // Sizes (icons-only, no visible labels) — sized to match IG's pill.
   const PILL_MAX_EXPANDED = 'min(396px, 100vw - 22px)';
   const PILL_MAX_CONDENSED = 'min(324px, 100vw - 36px)';
-  const iconSize = condensed ? 23 : 25;
-  const iconStroke = theme === 'dark' ? 2.1 : 2.2;
+  // Even integers so 1px strokes land on the device pixel grid — SF-crisp.
+  const iconSize = condensed ? 22 : 24;
+  const iconStroke = 2;
+
   const pillPadding = condensed ? '3px 7px' : '4px 7px';
   const lozengePad = condensed ? '10px 20px' : '11px 24px';
   const inactivePad = condensed ? '6px 12px' : '7px 16px';
@@ -246,10 +248,11 @@ const GlobalBottomNavigation: React.FC<GlobalBottomNavigationProps> = ({ chromeS
         {showNavigation && (
           <motion.div
             key="floating-nav"
-            initial={{ y: 24, opacity: 0 }}
-            animate={{ y: 0, opacity: 1 }}
-            exit={{ y: 24, opacity: 0 }}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
             transition={{ duration: 0.22, ease: [0.2, 0.8, 0.2, 1] }}
+
             style={{
               position: 'fixed',
               left: 0,
@@ -334,22 +337,22 @@ const GlobalBottomNavigation: React.FC<GlobalBottomNavigationProps> = ({ chromeS
                           transition: BUTTON_TRANSITION,
                         }}
                       >
-                        <span style={{ position: 'relative', display: 'inline-flex', transform: 'translateZ(0)' }}>
+                        <span style={{ position: 'relative', display: 'inline-flex' }}>
                           <Icon
                             aria-hidden="true"
                             strokeLinecap="round"
                             strokeLinejoin="round"
                             shapeRendering="geometricPrecision"
+                            vectorEffect="non-scaling-stroke"
                             style={{
                               width: iconSize,
                               height: iconSize,
                               strokeWidth: iconStroke,
-                              // No width/height transition on the SVG itself —
-                              // mid-transition rasterised strokes read soft.
-                              // The pill's max-width/padding transitions carry
-                              // the motion; icon size snaps between states.
+                              // Snap sizes between states — no SVG resize
+                              // transition (raster mid-tween reads soft).
                             }}
                           />
+
 
                           {badgeCount > 0 && (
                             <span
