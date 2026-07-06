@@ -31,6 +31,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { usePrefersReducedMotion } from '@/hooks/usePrefersReducedMotion';
 import { useWatchRevealed } from '@/components/watch/WatchRevealContext';
+import { useFullscreenFeedStore } from '@/store/fullscreenFeedStore';
 
 const PLAY_IN = 0.5;
 const PLAY_OUT = 0.35;
