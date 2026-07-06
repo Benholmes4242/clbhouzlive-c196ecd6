@@ -188,12 +188,19 @@ export const useFullscreenFeedStore = create<FullscreenFeedState>((set, get) => 
       mediaId: null,
       openedFrom: null,
       borrow: null,
+      borrowDemoteRequested: false,
     });
     if (cb) {
       try { cb(); } catch {}
     }
   },
   clearBorrow: () => set({ borrow: null }),
+  demoteBorrow: () => {
+    if (!get().borrow) return;
+    if (get().borrowDemoteRequested) return;
+    set({ borrowDemoteRequested: true });
+  },
+  consumeBorrowDemoteRequested: () => set({ borrowDemoteRequested: false }),
   appendPosts: (newPosts) => {
     set((s) => {
       const existing = new Set(s.posts.map((p) => p.id));
