@@ -306,7 +306,7 @@ const CoursesContent: React.FC<CoursesContentProps> = ({ username, displayName }
         </Tabs>
       ) : (
         /* Main courses page - shared cinematic hero + sticky tab row above content */
-        <>
+        <div>
           <CoursesPageHero />
 
           <div
@@ -343,7 +343,7 @@ const CoursesContent: React.FC<CoursesContentProps> = ({ username, displayName }
             </div>
           )}
 
-        </>
+        </div>
       )}
 
         {/* Global scroll-to-top button */}
