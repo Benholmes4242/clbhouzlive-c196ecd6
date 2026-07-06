@@ -159,6 +159,26 @@ const PostsTabContent: React.FC<PostsTabContentProps> = ({
     if (hasNextPage && !isFetchingNextPage) fetchNextPage();
   }, [hasNextPage, isFetchingNextPage, fetchNextPage]);
 
+  // Mirror pagination state into the fullscreen store while the viewer is
+  // open, so swipes past the initially-loaded set can trigger more loads.
+  const isViewerOpen = useFullscreenFeedStore(s => s.isOpen);
+  const setPaginationState = useFullscreenFeedStore(s => s.setPaginationState);
+  useEffect(() => {
+    if (!isViewerOpen) return;
+    setPaginationState({
+      hasNextPage: hasNextPage ?? false,
+      isFetchingNextPage: isFetchingNextPage ?? false,
+    });
+  }, [isViewerOpen, hasNextPage, isFetchingNextPage, setPaginationState]);
+
+  // Append newly-loaded posts (already grouped at the hook) into the open
+  // viewer as growth occurs. Store dedupes by post id.
+  useEffect(() => {
+    if (!isViewerOpen) return;
+    useFullscreenFeedStore.getState().appendPosts(filteredPosts);
+  }, [isViewerOpen, filteredPosts]);
+
+
   const currentFilterLabel = FILTER_OPTIONS.find(o => o.value === activeFilter)?.label || 'All Posts';
 
   // ── Loading / error / empty states ──
