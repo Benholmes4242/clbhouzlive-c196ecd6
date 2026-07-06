@@ -337,22 +337,22 @@ const GlobalBottomNavigation: React.FC<GlobalBottomNavigationProps> = ({ chromeS
                           transition: BUTTON_TRANSITION,
                         }}
                       >
-                        <span style={{ position: 'relative', display: 'inline-flex', transform: 'translateZ(0)' }}>
+                        <span style={{ position: 'relative', display: 'inline-flex' }}>
                           <Icon
                             aria-hidden="true"
                             strokeLinecap="round"
                             strokeLinejoin="round"
                             shapeRendering="geometricPrecision"
+                            vectorEffect="non-scaling-stroke"
                             style={{
                               width: iconSize,
                               height: iconSize,
                               strokeWidth: iconStroke,
-                              // No width/height transition on the SVG itself —
-                              // mid-transition rasterised strokes read soft.
-                              // The pill's max-width/padding transitions carry
-                              // the motion; icon size snaps between states.
+                              // Snap sizes between states — no SVG resize
+                              // transition (raster mid-tween reads soft).
                             }}
                           />
+
 
                           {badgeCount > 0 && (
                             <span
