@@ -62,8 +62,8 @@ const AuthHeroScreen: React.FC<AuthHeroScreenProps> = ({
   errorNonce,
 }) => {
 
-  // Light status bar + safe-area shield for Median.co wrapper
-  useMedianStatusBar('dark', '#15171F', true, false);
+  // Chrome (shield + native status bar) owned solely by AppRoutes.
+
 
   const [loginEmail, setLoginEmail] = useState('');
   const [emailError, setEmailError] = useState<string | null>(null);
