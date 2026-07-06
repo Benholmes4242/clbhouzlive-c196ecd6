@@ -99,6 +99,15 @@ export const RailLanePool = {
     VideoEngine.boot();
     const existing = owners.get(ownerKey);
     if (existing) {
+      // Coalesce a still-pending deferred release: same owner is re-acquiring
+      // the same lane while it's pinned by fullscreen. Clear the flag so the
+      // eventual unpin doesn't tear down the source we're about to reuse.
+      if (existing.pendingRelease) {
+        existing.pendingRelease = false;
+        existing.lastUsed = ++clock;
+        POOL_DBG('acquire.coalesced', { ownerKey, laneId: existing.laneId });
+        return existing.laneId;
+      }
       existing.lastUsed = ++clock;
       DBG('touch', { ownerKey, laneId: existing.laneId });
       return existing.laneId;
