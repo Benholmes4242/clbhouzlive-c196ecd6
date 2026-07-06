@@ -13,6 +13,7 @@ import React, { useEffect, useRef } from 'react';
 import type { MediaItem } from '@/components/media-system/types/media';
 import { useVideoLane } from '@/video/useVideoLane';
 import { VideoEngine } from '@/video/VideoEngine';
+import { originHostRegistry } from '@/video/originHostRegistry';
 import { useClubhouseStore } from '@/store/clubhouseStore';
 import { fsv } from '@/perf/fsvTelemetry';
 
