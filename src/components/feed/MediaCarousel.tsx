@@ -32,7 +32,7 @@ interface Props {
    */
   postId?: string | null;
   onIndexChange?: (idx: number) => void;
-  onOpen: (mediaIndex: number) => void;
+  onOpen: (mediaIndex: number, mediaId?: string | null) => void;
   /** Double-tap on any slide → like + heart burst (owner: FeedCard). */
   onDoubleTap?: () => void;
 }
