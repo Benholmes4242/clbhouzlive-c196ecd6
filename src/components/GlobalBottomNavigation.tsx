@@ -17,8 +17,8 @@ import { cn } from '@/lib/utils';
 
 // ---- Public token: total vertical space to reserve at the bottom of any
 // scrollable page so its last content clears the floating pill.
-// (~58 pill + 12 bottom gap + 16 breathing room = 86)
-export const NAV_CLEARANCE = 'calc(env(safe-area-inset-bottom, 0px) + 86px)';
+// (~58 pill + 0 bottom gap + 16 breathing room = 74)
+export const NAV_CLEARANCE = 'calc(env(safe-area-inset-bottom, 0px) + 74px)';
 
 // Routes where bottom navigation should be hidden
 const HIDDEN_ROUTES = [
@@ -245,7 +245,7 @@ const GlobalBottomNavigation: React.FC<GlobalBottomNavigationProps> = ({ chromeS
               position: 'fixed',
               left: 0,
               right: 0,
-              bottom: 'calc(env(safe-area-inset-bottom, 0px) + 12px)',
+              bottom: 'env(safe-area-inset-bottom, 0px)',
               zIndex: 100,
               pointerEvents: 'none',
               display: 'flex',
