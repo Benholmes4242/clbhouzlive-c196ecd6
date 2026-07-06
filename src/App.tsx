@@ -938,7 +938,7 @@ const AppInner: React.FC = () => {
                                                 {/* Global header for all pages except Clubhouse/Auth/Admin */}
                                                 <GlobalHeader />
                                                 <AppRoutes />
-                                                <RenderProbe name="app-routes-sibling" />
+                                                
                                               </div>
                                             </Suspense>
                                             {/* Mini Player - persists across navigation */}
