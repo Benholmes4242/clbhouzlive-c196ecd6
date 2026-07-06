@@ -58,35 +58,6 @@ function CoursesPageHeroInner() {
         paddingTop: 'env(safe-area-inset-top, 0px)',
       }}
     >
-      {/* Top-left kicker pill (under the header) */}
-      <div
-        style={{
-          position: 'absolute',
-          top: 'calc(env(safe-area-inset-top, 0px) + 60px)',
-          left: 16,
-          zIndex: 2,
-        }}
-      >
-        <span
-          style={{
-            display: 'inline-block',
-            padding: '5px 10px',
-            borderRadius: 999,
-            background: 'rgba(15,18,25,0.5)',
-            backdropFilter: 'blur(14px)',
-            WebkitBackdropFilter: 'blur(14px)',
-            border: '1px solid rgba(255,255,255,0.14)',
-            color: '#fff',
-            fontSize: 9.5,
-            fontWeight: 800,
-            letterSpacing: '0.12em',
-            textTransform: 'uppercase',
-          }}
-        >
-          This Week's Standout
-        </span>
-      </div>
-
       {/* Bottom-anchored identity + CTA */}
       <div
         style={{
