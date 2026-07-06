@@ -1,10 +1,10 @@
 import {
-  CameraIcon,
   MapPinIcon,
   TrophyIcon,
 } from '@heroicons/react/24/outline';
 import HouseIcon from '@/components/icons/HouseIcon';
 import VideoIcon from '@/components/icons/VideoIcon';
+import PlusSquareIcon from '@/components/icons/PlusSquareIcon';
 
 // NOTE: tab IDs are historical and do NOT match labels.
 //   id 'clubhouse' = the immersive swipe FEED at '/'   (label "Explore")
