@@ -8,7 +8,7 @@ import { CourseMediaTile } from './CourseMediaTile';
 import { CourseMediaGridSkeleton } from './CourseMediaGridSkeleton';
 import { openWithOrigin } from '@/lib/openWithOrigin';
 import { useWatchAutoplay } from '@/video/useWatchAutoplay';
-import { vdiff } from '@/perf/fsvTelemetry';
+
 
 
 import { PrimaryAmberCTA } from '@/components/ui/PrimaryAmberCTA';
