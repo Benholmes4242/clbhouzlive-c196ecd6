@@ -54,7 +54,7 @@ function CourseShareCard({
     <button 
       className={cn(
         "w-full rounded-xl overflow-hidden text-left transition-all",
-        "hover:scale-[1.02] active:scale-[0.98] shadow-sm",
+        "active:scale-[0.98] shadow-sm",
         isOwnMessage 
           ? "bg-white/10" 
           : "bg-background border border-border"
