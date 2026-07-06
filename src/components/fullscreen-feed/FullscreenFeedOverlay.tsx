@@ -373,7 +373,7 @@ export function FullscreenFeedOverlay() {
       setTargetRect(null);
       if (watchdogRef.current) clearTimeout(watchdogRef.current);
     }
-  }, [isOpen, origin]);
+  }, [isOpen, origin, borrow]);
 
   const handleSnapFeedFirstFrame = useCallback(() => {
     fsv('clone.slideFF', { note: 'onFirstFrameReady from SnapFeed' });
