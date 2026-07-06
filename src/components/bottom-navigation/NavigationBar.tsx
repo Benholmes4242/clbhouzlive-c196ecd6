@@ -105,10 +105,12 @@ const NavigationBar: React.FC<NavigationBarProps> = ({
             }}
             aria-label={tab.label}
           >
-            <div className="relative">
+            <div
+              className="relative flex items-center justify-center"
+              style={{ width: 32, height: 32 }}
+            >
               <Icon
               className={cn(
-                "h-[28px] w-[28px] [stroke-width:1.5]",
                 isLive && tab.id === 'tourhub'
                   ? "opacity-100"
                   : isLive
@@ -122,6 +124,8 @@ const NavigationBar: React.FC<NavigationBarProps> = ({
                       : "text-[hsl(var(--clubhouse-text-muted))]"
               )}
               style={{
+                width: ICON_OPTICAL_PX[tab.id] ?? DEFAULT_ICON_PX,
+                height: ICON_OPTICAL_PX[tab.id] ?? DEFAULT_ICON_PX,
                 transform: isActive ? 'scale(1.1)' : 'scale(1)',
                 transition: 'all var(--motion-fast) var(--ease-pop)',
                 ...(isLightTheme && !isLive && { color: isActive ? '#0A0E14' : '#64748B' }),
