@@ -2,7 +2,7 @@ import { create } from 'zustand';
 import type { FeedPost } from '@/components/media-system/types/media';
 import { engagementBus } from '@/lib/engagementBus';
 import { applyEngagementDelta } from '@/lib/applyEngagementDelta';
-import { vdiff } from '@/perf/fsvTelemetry';
+
 
 
 export interface OpenOrigin {
