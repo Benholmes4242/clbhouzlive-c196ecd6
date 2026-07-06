@@ -214,9 +214,8 @@ const GlobalBottomNavigation: React.FC<GlobalBottomNavigationProps> = ({ chromeS
   const PILL_TRANSITION = REDUCED_MOTION
     ? 'none'
     : 'max-width 220ms cubic-bezier(0.2,0.8,0.2,1), padding 220ms cubic-bezier(0.2,0.8,0.2,1)';
-  const ICON_TRANSITION = REDUCED_MOTION
-    ? 'none'
-    : 'width 220ms cubic-bezier(0.2,0.8,0.2,1), height 220ms cubic-bezier(0.2,0.8,0.2,1)';
+  // (Icon size snaps between states — see note in the SVG style block below.)
+
   const BUTTON_TRANSITION = REDUCED_MOTION
     ? 'none'
     : 'background 180ms linear, color 180ms linear, padding 220ms cubic-bezier(0.2,0.8,0.2,1)';
