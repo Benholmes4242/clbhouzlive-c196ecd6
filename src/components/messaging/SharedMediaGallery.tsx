@@ -378,6 +378,16 @@ export function SharedMediaGallery({ conversationId, onClose }: SharedMediaGalle
           />
         </div>
       )}
+
+      {/* Fullscreen video viewer (shared presenter) */}
+      {selectedVideo && (
+        <MediaPresenterDialog
+          open={!!selectedVideo}
+          onOpenChange={(v) => { if (!v) setSelectedVideo(null); }}
+          type="video"
+          url={selectedVideo}
+        />
+      )}
     </div>
   );
 }
