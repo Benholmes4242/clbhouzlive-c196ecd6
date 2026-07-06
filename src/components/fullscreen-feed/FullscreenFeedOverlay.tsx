@@ -120,6 +120,8 @@ export function FullscreenFeedOverlay() {
   const origin = useFullscreenFeedStore(s => s.origin);
   const borrow = useFullscreenFeedStore(s => s.borrow);
   const clearBorrow = useFullscreenFeedStore(s => s.clearBorrow);
+  const borrowDemoteRequested = useFullscreenFeedStore(s => s.borrowDemoteRequested);
+  const consumeBorrowDemoteRequested = useFullscreenFeedStore(s => s.consumeBorrowDemoteRequested);
 
   // Snapshot borrow so the isOpen-cleanup path can run the return even after
   // close() has cleared the store's borrow field synchronously.
@@ -138,6 +140,26 @@ export function FullscreenFeedOverlay() {
     borrowRef.current = null;
     clearBorrow();
   }, [isOpen, borrow, activeIndex, startIndex, clearBorrow]);
+
+  // ── Stage-7 PR-3: carousel-demote (first horizontal swipe on borrow slide)
+  // FeedSlide's inner media pager calls demoteBorrow() → sets the flag.
+  // Idempotent with the vertical-swipe demote above: the `if (!borrow)` guard
+  // makes the second trigger a no-op.
+  useEffect(() => {
+    if (!borrowDemoteRequested) return;
+    const b = borrowRef.current;
+    if (b) {
+      BORROW_DBG('carousel-demote', {
+        ownerKey: b.ownerKey,
+        laneId: b.laneId,
+        postId: b.postId,
+      });
+      returnBorrow(b, 'demote');
+      borrowRef.current = null;
+      clearBorrow();
+    }
+    consumeBorrowDemoteRequested();
+  }, [borrowDemoteRequested, clearBorrow, consumeBorrowDemoteRequested]);
 
   // Wrap close so borrow-return runs BEFORE the store clears its fields.
   // All in-overlay callers (ESC, top-action-bar close, deep-link back) should
