@@ -287,23 +287,34 @@ const FullscreenVideoSlot: React.FC<{
   posterSrc: string;
   isActive: boolean;
   onFirstFrameReady?: () => void;
-}> = ({ postId, hlsUrl, posterSrc, isActive, onFirstFrameReady }) => {
+  /** Stage-7 PR-3: media-level ownership key `${postId}:${mediaIdx}`. When
+   *  provided (multi-media pager pages), used as the engine caller/owner key
+   *  and lastPos lookup so each media resumes independently. Single-media
+   *  callers omit it — the lane binds under bare postId (legacy behaviour). */
+  ownerKey?: string;
+  /** Stage-7 PR-3: pager pages other than the opening media pass false so
+   *  they never take the borrow branch (only the opening media page owns the
+   *  borrowed element). Defaults true for single-media callers. */
+  allowBorrow?: boolean;
+}> = ({ postId, hlsUrl, posterSrc, isActive, onFirstFrameReady, ownerKey, allowBorrow = true }) => {
   const isMuted = useClubhouseStore((s) => s.isMuted);
   const storedStart = useFullscreenFeedStore((s) => s.startPosition);
   const borrow = useFullscreenFeedStore((s) => s.borrow);
   const origin = useFullscreenFeedStore((s) => s.origin);
-  const isBorrowSlide = !!(borrow && isActive && borrow.postId === postId);
+  const isBorrowSlide = !!(allowBorrow && borrow && isActive && borrow.postId === postId);
+  const resumeKey = ownerKey ?? postId;
 
   // Only apply store.startPosition on the initially-tapped slide; other
   // slides in the fullscreen deck start from 0. Borrow slide skips seeks
   // entirely — the borrowed element carries its own currentTime.
   const startPosition = React.useMemo(() => {
     if (!isActive || isBorrowSlide) return -1;
-    const t = VideoEngine.getLastPos(postId);
+    const t = VideoEngine.getLastPos(resumeKey);
     const chosen = t > 0 ? t : storedStart > 0 ? storedStart : -1;
     fsv('slot.mount', {
       phase: 'startPos.compute',
       postId,
+      resumeKey,
       isActive,
       hasHls: !!hlsUrl,
       storedStart,
@@ -312,7 +323,7 @@ const FullscreenVideoSlot: React.FC<{
       isBorrowSlide,
     });
     return chosen;
-  }, [isActive, postId, storedStart, hlsUrl, isBorrowSlide]);
+  }, [isActive, postId, resumeKey, storedStart, hlsUrl, isBorrowSlide]);
 
   // In borrow mode: pass hlsUrl:null + active:false so useVideoLane never
   // touches the 'fullscreen' lane. The borrowed rail lane's element is
@@ -324,7 +335,7 @@ const FullscreenVideoSlot: React.FC<{
     startPosition,
     active: isActive && !isBorrowSlide,
     muted: isMuted,
-    postId,
+    postId: resumeKey,
   });
 
   React.useEffect(() => {
