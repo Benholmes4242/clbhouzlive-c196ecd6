@@ -312,7 +312,7 @@ const CoursesContent: React.FC<CoursesContentProps> = ({ username, displayName }
           <div
             style={{
               position: 'sticky',
-              top: 0,
+              top: 'calc(var(--header-h, 55px) + var(--sat, 0px))',
               zIndex: 30,
               background: 'rgba(248,250,252,0.88)',
               backdropFilter: 'blur(14px)',
