@@ -52,23 +52,38 @@ export const ChampionsListRow: React.FC<ChampionsListRowProps> = ({
 
   const avatarSize = compact ? 32 : 40;
 
+  const hairlineOverlay = (
+    <div
+      aria-hidden
+      style={{
+        position: 'absolute',
+        inset: 0,
+        borderRadius: '34%',
+        border: '1px solid rgba(255,255,255,0.22)',
+        pointerEvents: 'none',
+      }}
+    />
+  );
+
   const avatar = isChampion ? (
     <div style={{ width: avatarSize, height: avatarSize, position: 'relative', flexShrink: 0 }} aria-hidden>
       <div style={{ position: 'absolute', inset: 0, background: photoBg, ...squircleMaskStyle }} />
-      <div style={{ position: 'absolute', inset: 0, ...squircleMaskStyle, boxShadow: 'inset 0 0 0 1px rgba(255,255,255,0.06)' }} />
+      {hairlineOverlay}
     </div>
   ) : (
     <div
       aria-hidden
       style={{
+        position: 'relative',
         width: avatarSize,
         height: avatarSize,
         borderRadius: '34%',
         background: photoBg,
-        boxShadow: 'inset 0 0 0 1px rgba(255,255,255,0.06)',
         flexShrink: 0,
       }}
-    />
+    >
+      {hairlineOverlay}
+    </div>
   );
 
   const subText = isChampion
