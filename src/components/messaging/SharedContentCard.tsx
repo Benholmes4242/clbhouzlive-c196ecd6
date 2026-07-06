@@ -54,7 +54,7 @@ function CourseShareCard({
     <button 
       className={cn(
         "w-full rounded-xl overflow-hidden text-left transition-all",
-        "hover:scale-[1.02] active:scale-[0.98] shadow-sm",
+        "active:scale-[0.98] shadow-sm",
         isOwnMessage 
           ? "bg-white/10" 
           : "bg-background border border-border"
@@ -157,9 +157,6 @@ function TeeTimeShareCard({
   isOwnMessage?: boolean; 
 }) {
   // Game/tee-time routing decommissioned — card renders static content only.
-  const handleViewDetails = () => {
-    /* no-op: legacy game detail route removed */
-  };
 
   return (
     <div 
@@ -234,17 +231,6 @@ function TeeTimeShareCard({
           </div>
         )}
 
-        <Button 
-          variant={isOwnMessage ? "secondary" : "outline"}
-          size="sm" 
-          className="w-full h-8 text-xs"
-          onClick={(e) => {
-            e.stopPropagation();
-            handleViewDetails();
-          }}
-        >
-          View Details <ExternalLink className="h-3 w-3 ml-1" />
-        </Button>
       </div>
     </div>
   );
