@@ -53,6 +53,16 @@ export const CourseMediaLandscapeCard: React.FC<CourseMediaLandscapeCardProps> =
     postId: post.id,
   });
 
+  // Register lane host with the origin registry so the fullscreen borrow-
+  // return path (Stage-7 PR-1) can find the tile on close.
+  useEffect(() => {
+    if (!ownerKey) return;
+    const el = laneHostRef.current;
+    if (!el) return;
+    originHostRegistry.register(ownerKey, el);
+    return () => originHostRegistry.unregister(ownerKey, el);
+  }, [ownerKey, laneHostRef]);
+
   return (
     <div
       ref={tileRef}
