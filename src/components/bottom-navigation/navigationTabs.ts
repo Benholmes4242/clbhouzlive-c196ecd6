@@ -1,10 +1,10 @@
 import {
-  CameraIcon,
   MapPinIcon,
   TrophyIcon,
 } from '@heroicons/react/24/outline';
 import HouseIcon from '@/components/icons/HouseIcon';
 import VideoIcon from '@/components/icons/VideoIcon';
+import PlusSquareIcon from '@/components/icons/PlusSquareIcon';
 
 // NOTE: tab IDs are historical and do NOT match labels.
 //   id 'clubhouse' = the immersive swipe FEED at '/'   (label "Explore")
@@ -14,7 +14,7 @@ import VideoIcon from '@/components/icons/VideoIcon';
 export const navigationTabs = [
   { id: 'clubhouse', label: 'Home',      icon: HouseIcon,  path: '/' },
   { id: 'watch',     label: 'Watch',     icon: VideoIcon,  path: '/watch' },
-  { id: 'post',      label: 'Share',     icon: CameraIcon, path: null, isAction: true },
+  { id: 'post',      label: 'Share',     icon: PlusSquareIcon, path: null, isAction: true },
   { id: 'courses',   label: 'Courses',   icon: MapPinIcon, path: '/courses' },
   { id: 'tourhub',   label: 'Tour',      icon: TrophyIcon, path: '/tourhub' },
 ];
