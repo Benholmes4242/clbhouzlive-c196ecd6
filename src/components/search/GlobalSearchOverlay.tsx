@@ -6,6 +6,7 @@ import { Search, X, Clock, BadgeCheck, Briefcase, Star, Lock, MessageCircle, Loa
 import { useStartDM } from '@/hooks/useStartDM';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { SuggestedCreatorsShelf } from '@/components/shared/SuggestedCreatorsShelf';
+import { SquircleAvatar, LIGHT_HAIRLINE } from '@/components/ui/SquircleAvatar';
 import { useNavigate } from 'react-router-dom';
 import { useDebounce } from '@/hooks/useDebounce';
 import { lockBodyScroll, unlockBodyScroll } from '@/lib/bodyScrollLock';
