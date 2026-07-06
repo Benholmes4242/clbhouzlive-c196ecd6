@@ -3,8 +3,6 @@ import { useClubhouseStore } from '@/store/clubhouseStore';
 import { SnapVideoPlayer } from './SnapVideoPlayer';
 import { usePinchZoomPointer } from '@/hooks/usePinchZoomPointer';
 import { preloadHlsManifest } from '@/utils/hlsPreload';
-import { vdiff } from '@/perf/fsvTelemetry';
-import { isPerfEnabled } from '@/perf/navTiming';
 import type { MediaItem } from '@/components/media-system/types/media';
 
 
@@ -82,28 +80,6 @@ export const FeedImageCarousel = memo(function FeedImageCarousel({
   const [currentSlide, setCurrentSlide] = useState(0);
   const [isImageZoomed, setIsImageZoomed] = useState(false);
 
-  // [VDIFF] Carousel branch render — fires when a multi-media post takes
-  // the carousel branch (fullscreen or feed). Reports the player each slide
-  // uses so the "video didn't play" gap after FeedSlide → carousel is
-  // traceable to the specific slide + component.
-  if (isPerfEnabled() && isFullscreen && isActive) {
-    vdiff('carousel.render', {
-      layer: 'carousel',
-      feedIndex,
-      isActive,
-      isFullscreen,
-      currentSlide,
-      mediaLen: mediaItems.length,
-      slides: mediaItems.map((m, i) => ({
-        idx: i,
-        id: m.id,
-        type: m.type,
-        hasHls: !!(m as any).hlsUrl,
-        player: m.type === 'video' ? 'SnapVideoPlayer' : 'ZoomableImageSlide',
-        willBeActive: isActive && i === currentSlide,
-      })),
-    });
-  }
 
 
   // ── Horizontal swipe state ──

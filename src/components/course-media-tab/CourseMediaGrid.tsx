@@ -8,7 +8,7 @@ import { CourseMediaTile } from './CourseMediaTile';
 import { CourseMediaGridSkeleton } from './CourseMediaGridSkeleton';
 import { openWithOrigin } from '@/lib/openWithOrigin';
 import { useWatchAutoplay } from '@/video/useWatchAutoplay';
-import { vdiff } from '@/perf/fsvTelemetry';
+
 
 
 import { PrimaryAmberCTA } from '@/components/ui/PrimaryAmberCTA';
@@ -149,24 +149,6 @@ export const CourseMediaGrid = forwardRef<HTMLDivElement, CourseMediaGridProps>(
     // otherwise shifts positional indices and lands the wrong media).
     const mediaId = tapped?.mediaItems?.[0]?.id ?? null;
     const groupedTarget = groupedForViewer[groupedIndex];
-    vdiff('grid.open', {
-      layer: 'course-grid',
-      flatIndex: index,
-      tappedFlatId: tappedId ?? null,
-      parentId: parentId ?? null,
-      groupedIndex,
-      groupedLen: groupedForViewer.length,
-      mediaIdPassed: mediaId,
-      groupedTargetPostId: groupedTarget?.id ?? null,
-      groupedTargetMediaCount: groupedTarget?.mediaItems?.length ?? 0,
-      groupedTargetMediaSummary: groupedTarget?.mediaItems?.map(m => ({
-        id: m.id, type: m.type, hasHls: !!(m as any).hlsUrl,
-      })) ?? [],
-      resolvedMediaIdxInGrouped: groupedTarget?.mediaItems?.findIndex(m => m.id === mediaId) ?? -1,
-      hasNextPage: !!hasNextPage,
-      isFetchingNextPage: !!isFetchingNextPage,
-      readOnly: true,
-    });
     openWithOrigin({
       posts: groupedForViewer,
       index: groupedIndex,

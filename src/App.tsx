@@ -86,7 +86,7 @@ import { PerfHud } from '@/perf/PerfHud';
 import { LogHud } from '@/perf/LogHud';
 import { PerfToggleButton } from '@/perf/PerfToggleButton';
 import { BootTimelineToggleButton } from '@/perf/BootTimelineToggleButton';
-import { RenderProbe } from '@/perf/RenderProbe';
+
 
 
 
@@ -906,7 +906,7 @@ const AppInner: React.FC = () => {
         <LogHud />
         <PerfToggleButton />
         <BootTimelineToggleButton />
-        <RenderProbe name="above-providers" />
+        
         
         
 
@@ -938,7 +938,7 @@ const AppInner: React.FC = () => {
                                                 {/* Global header for all pages except Clubhouse/Auth/Admin */}
                                                 <GlobalHeader />
                                                 <AppRoutes />
-                                                <RenderProbe name="app-routes-sibling" />
+                                                
                                               </div>
                                             </Suspense>
                                             {/* Mini Player - persists across navigation */}
@@ -948,7 +948,7 @@ const AppInner: React.FC = () => {
                                             </Suspense>
                                             {/* Fullscreen Feed Overlay - portal-based, renders above everything */}
                                             <FullscreenFeedOverlay />
-                                            <RenderProbe name="inside-providers" />
+                                            
                                             {/* Unified ReviewBottomSheet portal — single mount, store-driven */}
                                             <ReviewBottomSheetPortal />
                                             <RequestCourseSheetHost />

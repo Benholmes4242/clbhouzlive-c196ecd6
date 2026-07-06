@@ -8,8 +8,7 @@ import type { FeedPost } from '@/components/media-system/types/media';
 import { useVideoLane } from '@/video/useVideoLane';
 import { VideoEngine } from '@/video/VideoEngine';
 import { useFullscreenFeedStore } from '@/store/fullscreenFeedStore';
-import { fsv, vdiff } from '@/perf/fsvTelemetry';
-import { isPerfEnabled } from '@/perf/navTiming';
+import { fsv } from '@/perf/fsvTelemetry';
 
 import { usePostViewTracker } from '@/hooks/usePostViewTracker';
 
@@ -80,58 +79,6 @@ export const FeedSlide = memo(function FeedSlide({
     post.postType === 'course_of_week_card';
   const showInlineDots = !isFullscreen && !isEditorial && (media?.length ?? 0) > 1;
 
-  // [VDIFF] Opening-slide media-choice trace. Fires for the opening slide
-  // (mediaId supplied) OR any active fullscreen slide OR active feed slides
-  // so watch↔course tap narratives compare 1:1. Reports the exact branch
-  // FeedSlide will render + the condition that selected it.
-  if (isPerfEnabled() && (mediaId != null || isActive)) {
-    const chosen = media?.[openIdx];
-    const multiCarousel = !isFullscreen && !!(media && media.length > 1 && openIdx === 0);
-    const branch = multiCarousel
-      ? 'carousel'
-      : chosen?.type === 'video'
-        ? (isFullscreen
-            ? ((chosen as any).hlsUrl ? 'fullscreen-video-slot' : 'video-poster-fallback')
-            : 'video-poster-inline')
-        : chosen?.type === 'image'
-          ? 'image'
-          : 'text-fallback';
-    const branchReason = multiCarousel
-      ? '!isFullscreen && media.length>1 && openIdx===0'
-      : chosen?.type === 'video'
-        ? (isFullscreen && (chosen as any).hlsUrl
-            ? 'video+isFullscreen+hlsUrl'
-            : isFullscreen
-              ? 'video+isFullscreen+NO-hlsUrl'
-              : 'video+!isFullscreen')
-        : chosen?.type === 'image'
-          ? 'image'
-          : 'no-media';
-
-    vdiff('slide.mediaChoice', {
-      layer: 'slide',
-      postId: post.id,
-      index,
-      isActive,
-      isFullscreen,
-      mediaIdProp: mediaId,
-      mediaIndexProp: mediaIndex,
-      resolvedIdx,
-      openIdx,
-      mediaLen: media?.length ?? 0,
-      items: media?.map(m => ({
-        id: m.id,
-        type: m.type,
-        hasHls: !!(m as any).hlsUrl,
-        hasThumb: !!m.thumbnailUrl,
-      })) ?? [],
-      chosenId: chosen?.id ?? null,
-      chosenType: chosen?.type ?? null,
-      chosenHasHls: !!(chosen as any)?.hlsUrl,
-      branch,
-      branchReason,
-    });
-  }
 
 
   // Pinch zoom for single images
@@ -369,28 +316,6 @@ const FullscreenVideoSlot: React.FC<{
     postId,
   });
 
-  // [VDIFF] Slot mount + lane-eligibility trace. Reports the exact reason
-  // the load effect inside useVideoLane will (or won't) fire.
-  React.useEffect(() => {
-    if (!isPerfEnabled()) return;
-    const bailReason = !isActive
-      ? 'inactive'
-      : !hlsUrl
-        ? 'no-hlsUrl'
-        : null;
-    vdiff('slot.mount', {
-      layer: 'fullscreen-slot',
-      postId,
-      isActive,
-      hasHls: !!hlsUrl,
-      hlsUrlTail: hlsUrl ? hlsUrl.slice(-42) : null,
-      hasPoster: !!posterSrc,
-      startPosition,
-      isMuted,
-      laneWillLoad: !bailReason,
-      bailReason,
-    });
-  }, [postId, isActive, hlsUrl, posterSrc, startPosition, isMuted]);
 
 
   React.useEffect(() => {

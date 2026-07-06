@@ -26,8 +26,7 @@ import { useManageableBusinessIds } from '@/hooks/useManageableBusinessIds';
 import { canManagePost } from '@/lib/canManagePost';
 import { getActorRouteByType } from '@/types/actor';
 // [VIDEOSTUB] FullscreenDebugPanel + mobileVideoDebug imports removed — engine severed.
-import { fsv, fsvViewport, vdiff } from '@/perf/fsvTelemetry';
-import { isPerfEnabled } from '@/perf/navTiming';
+import { fsv, fsvViewport } from '@/perf/fsvTelemetry';
 const fsTimeStart = (_label: string) => {};
 const fsTimeEnd = (_label: string, _note?: string) => {};
 const fsEvent = (_label: string, _data?: unknown) => {};
@@ -289,59 +288,12 @@ export function FullscreenFeedOverlay() {
 
 
 
-  // [VDIFF] overlay.render trace — same prev-diff pattern as snapfeed.render.
-  // Identity booleans discriminate reference churn from value change so a
-  // 10ms re-render loop can be attributed to store set() churn, posts array
-  // rebuilds (engagementBus), session refresh, or a parent-tree re-render.
-  const prevOverlayRenderRef = useRef<Record<string, unknown> | null>(null);
-  const prevPostsIdentityRef = useRef<unknown>(null);
-  const prevStoreStateRef = useRef<unknown>(null);
-  const prevActivePostRef = useRef<unknown>(null);
-  const prevTargetRectRef = useRef<unknown>(null);
-  const prevSessionRef = useRef<unknown>(null);
-  if (isPerfEnabled()) {
-    const storeState = useFullscreenFeedStore.getState();
-    const postsRefChanged = prevPostsIdentityRef.current !== null && prevPostsIdentityRef.current !== posts;
-    const storeStateRefChanged = prevStoreStateRef.current !== null && prevStoreStateRef.current !== storeState;
-    const activePostRefChanged = prevActivePostRef.current !== null && prevActivePostRef.current !== activePost;
-    const targetRectRefChanged = prevTargetRectRef.current !== null && prevTargetRectRef.current !== targetRect;
-    const sessionRefChanged = prevSessionRef.current !== null && prevSessionRef.current !== session;
-    const snap: Record<string, unknown> = {
-      isOpen,
-      activeIndex,
-      startIndex,
-      readOnly: !!readOnly,
-      cloneVisible,
-      cloneExpanded,
-      firstFrameReady,
-      commentsOpen,
-      overlayVisible,
-      activePostId: activePost?.id ?? null,
-      postsRefChanged,
-      storeStateRefChanged,
-      activePostRefChanged,
-      targetRectRefChanged,
-      sessionRefChanged,
-    };
-    const prev = prevOverlayRenderRef.current;
-    const changed: string[] = [];
-    if (prev) {
-      for (const k of Object.keys(snap)) {
-        if (prev[k] !== snap[k]) changed.push(k);
-      }
+  const handleNearEnd = useCallback(() => {
+    if (hasNextPage && fetchNextPage && !isFetchingNextPage) {
+      fetchNextPage();
     }
-    vdiff('overlay.render', {
-      layer: 'overlay',
-      ...snap,
-      changedSincePrev: prev ? changed : 'first',
-    });
-    prevOverlayRenderRef.current = snap;
-    prevPostsIdentityRef.current = posts;
-    prevStoreStateRef.current = storeState;
-    prevActivePostRef.current = activePost;
-    prevTargetRectRef.current = targetRect;
-    prevSessionRef.current = session;
-  }
+  }, [hasNextPage, fetchNextPage, isFetchingNextPage]);
+
 
   return (
     <>
@@ -374,11 +326,7 @@ export function FullscreenFeedOverlay() {
                   <SnapFeed
                     posts={posts}
                     activeTab="foryou"
-                    onNearEnd={() => {
-                      if (hasNextPage && fetchNextPage && !isFetchingNextPage) {
-                        fetchNextPage();
-                      }
-                    }}
+                    onNearEnd={handleNearEnd}
                     onRefresh={async () => {}}
                     isRefreshing={isFetchingNextPage}
                     hasNextPage={hasNextPage}
