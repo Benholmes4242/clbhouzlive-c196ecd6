@@ -15,7 +15,7 @@ import { Heart, MapPin, MessageCircle, Share } from 'lucide-react';
 import { PostOwnerMenu } from '@/components/posts/PostOwnerMenu';
 import { useManageableBusinessIds } from '@/hooks/useManageableBusinessIds';
 import { canManagePost } from '@/lib/canManagePost';
-import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
+import { SquircleAvatar, LIGHT_HAIRLINE } from '@/components/ui/SquircleAvatar';
 import { getRatingTier, getRatingTierLabel, ratingTextColor } from '@/lib/ratingTier';
 import { formatRatingValue } from '@/utils/formatters';
 import { useActiveActor } from '@/context/ActiveActorContext';
@@ -331,7 +331,7 @@ const LightFeedCardImpl: React.FC<LightFeedCardProps> = ({
           onClick={() => onProfile(post)}
           style={{ background: 'transparent', border: 'none', padding: 0, cursor: 'pointer' }}
         >
-          <SquircleAvatar src={post.avatarUrl} alt={post.displayName} size={34} hideRing />
+          <SquircleAvatar src={post.avatarUrl} alt={post.displayName} size={34} hairlineRing ringColor={LIGHT_HAIRLINE} />
         </button>
         <div style={{ minWidth: 0, flex: 1 }}>
           <button

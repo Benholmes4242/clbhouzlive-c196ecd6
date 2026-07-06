@@ -9,7 +9,7 @@ import { motion } from 'framer-motion';
 import { Globe, Users, Lock } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { triggerHaptic } from '@/lib/ui/haptics';
-import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
+import { SquircleAvatar, LIGHT_HAIRLINE } from '@/components/ui/SquircleAvatar';
 import { VerifiedBadge } from '@/components/ui/VerifiedBadge';
 import { ActiveActor } from '@/context/ActiveActorContext';
 
@@ -187,7 +187,7 @@ export function ReviewPostingOptionsSheet({
                       src={actor.avatarUrl}
                       alt={actor.name}
                       userId={actor.id}
-                      hideRing
+                      hairlineRing ringColor={LIGHT_HAIRLINE}
                       className={cn(!canReview && "grayscale")}
                     />
                     <div style={{ flex: 1, minWidth: 0, textAlign: 'left' as const }}>
