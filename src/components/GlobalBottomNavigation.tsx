@@ -201,9 +201,9 @@ const GlobalBottomNavigation: React.FC<GlobalBottomNavigationProps> = ({ chromeS
   const PILL_MAX_CONDENSED = 'min(324px, 100vw - 36px)';
   const iconSize = condensed ? 23 : 25;
   const iconStroke = theme === 'dark' ? 2.0 : 2.1;
-  const pillPadding = condensed ? '5px 9px' : '6px 9px';
-  const lozengePad = condensed ? '8px 18px' : '9px 22px';
-  const inactivePad = condensed ? '8px 14px' : '9px 18px';
+  const pillPadding = condensed ? '3px 7px' : '4px 7px';
+  const lozengePad = condensed ? '10px 20px' : '11px 24px';
+  const inactivePad = condensed ? '6px 12px' : '7px 16px';
 
   const badges = useMemo<Record<string, number>>(() => ({ courses: unseenFriendReviews }), [unseenFriendReviews]);
 
