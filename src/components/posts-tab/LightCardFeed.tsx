@@ -29,6 +29,26 @@ const DIVIDER = '#E5E7EA';
 /** How many neighbours on each side of the active card may mount a <video>. */
 const VIDEO_NEIGHBOUR_RADIUS = 1;
 
+/** See CardFeed.FeedItemGate — same rationale (decouple viewer-open from
+ *  `itemContent` identity so react-virtuoso doesn't remount the borrowed card). */
+const LightItemGate: React.FC<{
+  post: FeedPost;
+  index: number;
+  playingIdx: number;
+  activeIdx: number;
+  children: (v: { isActive: boolean; mountVideo: boolean }) => React.ReactNode;
+}> = ({ post, index, playingIdx, activeIdx, children }) => {
+  const fsOpen = useFullscreenFeedStore((s) => s.isOpen);
+  const borrowedOwnerKey = useFullscreenFeedStore((s) => s.borrow?.ownerKey ?? null);
+  const isBorrowedCard =
+    fsOpen && !!borrowedOwnerKey &&
+    (borrowedOwnerKey === post.id || borrowedOwnerKey.startsWith(`${post.id}:`));
+  const isActive = !fsOpen && index === playingIdx;
+  const isNear =
+    isBorrowedCard || (!fsOpen && Math.abs(index - activeIdx) <= VIDEO_NEIGHBOUR_RADIUS);
+  return <>{children({ isActive, mountVideo: isNear })}</>;
+};
+
 export interface LightCardFeedProps {
   posts: FeedPost[];
   onLike: (post: FeedPost, actor?: ActiveActor | null) => void;
