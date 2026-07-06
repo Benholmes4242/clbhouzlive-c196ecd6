@@ -4,7 +4,7 @@ import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useExploreFeed } from './hooks/useExploreFeed';
 import { useExploreMood } from './hooks/useExploreMood';
 import { useExploreRegion } from './hooks/useExploreRegion';
-import { ExploreHero } from './ExploreHero';
+// ExploreHero removed — the standout card now lives in CoursesPageHero.
 import ConnectHandicapCue from '@/components/courses/course-detail/ConnectHandicapCue';
 import { ExploreEchoCTA } from './ExploreEchoCTA';
 import { ExploreDestinations } from './ExploreDestinations';
