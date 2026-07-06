@@ -58,6 +58,26 @@ function CoursesPageHeroInner() {
         paddingTop: 'env(safe-area-inset-top, 0px)',
       }}
     >
+      {/* Masked blur bed behind identity block (cinema-card recipe).
+          Renders above the scrim, below the text. Scrim alone must still
+          carry legibility if backdrop-filter is unavailable. */}
+      <div
+        aria-hidden
+        style={{
+          position: 'absolute',
+          left: 0,
+          right: 0,
+          bottom: 0,
+          height: 150,
+          backdropFilter: 'blur(9px)',
+          WebkitBackdropFilter: 'blur(9px)',
+          maskImage: 'linear-gradient(180deg, transparent 0%, black 55%)',
+          WebkitMaskImage: 'linear-gradient(180deg, transparent 0%, black 55%)',
+          pointerEvents: 'none',
+          zIndex: 0,
+        }}
+      />
+
       {/* Bottom-anchored identity + CTA */}
       <div
         style={{
