@@ -62,6 +62,7 @@ export const CourseFriendsStrip: React.FC<CourseFriendsStripProps> = ({ courseId
 
       <div style={{ display: 'flex', alignItems: 'center', gap: 4, flexShrink: 0 }}>
         <div style={{ display: 'flex' }}>
+          {/* Facepile: solid surface-colour ring for overlap separation -- deliberate exception to the hairlineRing canon. */}
           {visibleFriends.map((friend, index) => {
             const displayName = friend.profile.display_name || friend.profile.username || '?';
             const initial = displayName[0]?.toUpperCase() || '?';
@@ -72,32 +73,21 @@ export const CourseFriendsStrip: React.FC<CourseFriendsStripProps> = ({ courseId
                 src={friend.profile.profile_photo_url}
                 alt={displayName}
                 size={28}
-                thinRing
+                ringColor="#FFFFFF"
                 className={index > 0 ? '-ml-1.5' : ''}
               />
             ) : (
-              <div
+              <SquircleAvatar
                 key={friend.user_id}
+                size={28}
+                alt={displayName}
+                fallback={initial}
+                ringColor="#FFFFFF"
                 className={index > 0 ? '-ml-1.5' : ''}
-                style={{
-                  width: 28,
-                  height: 28,
-                  borderRadius: '50%',
-                  background: '#3B82F6',
-                  color: '#fff',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  fontSize: 11,
-                  fontWeight: 700,
-                  border: '1px solid #F8FAFC',
-                  flexShrink: 0,
-                }}
-              >
-                {initial}
-              </div>
+              />
             );
           })}
+
 
           {overflowCount > 0 && (
             <div
