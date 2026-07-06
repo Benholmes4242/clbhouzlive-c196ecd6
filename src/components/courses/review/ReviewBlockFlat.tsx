@@ -163,7 +163,8 @@ export const ReviewBlockFlat: React.FC<ReviewBlockFlatProps> = ({
             style={{ background: 'transparent', border: 'none', padding: 0, cursor: 'pointer', flexShrink: 0 }}
           >
             {user.avatarUrl ? (
-              <SquircleAvatar src={user.avatarUrl} alt={user.name} size={40} thinRing />
+              <SquircleAvatar src={user.avatarUrl} alt={user.name} size={40} hairlineRing ringColor={LIGHT_HAIRLINE} />
+
             ) : (
               <div
                 style={{
