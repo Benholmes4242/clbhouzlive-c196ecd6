@@ -166,6 +166,7 @@ export const useFullscreenFeedStore = create<FullscreenFeedState>((set, get) => 
       mediaId: options?.mediaId ?? null,
       openedFrom: options?.openedFrom ?? null,
       borrow: options?.borrow ?? null,
+      borrowDemoteRequested: false,
     });
   },
   close: () => {
