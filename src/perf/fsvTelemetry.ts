@@ -164,6 +164,7 @@ export function fsvViewport(): Record<string, number> {
   };
 }
 
+// vdiff: per-surface render diagnostics; call sites are added during surface wiring and stripped at sign-off.
 /**
  * [VDIFF] Comparative-diff logger — same shape as `fsv()` but under the
  * VDIFF tag family. Auto-stamped with the current session id so a single
