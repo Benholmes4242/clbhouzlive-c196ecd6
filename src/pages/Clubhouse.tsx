@@ -14,8 +14,8 @@ import { useSeasonRecap } from '@/hooks/useSeasonRecap';
 import { Compass, Flag, EyeOff, Link as LinkIcon, Users } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Drawer, DrawerContent } from '@/components/ui/drawer';
-import { isDarkChromeRoute } from '@/components/header/globalHeaderRules';
-import { useMedianStatusBar } from '@/hooks/useMedianStatusBar';
+// Chrome owned solely by AppRoutes; no local status-bar imports.
+
 import { logRouteClubhouse } from '@/utils/bootTimeline';
 import { ClubhouseSkeletonShimmer } from '@/components/clubhouse/ClubhouseSkeletonShimmer';
 import { useClubhouseSkeletonTiming } from '@/hooks/useClubhouseSkeletonTiming';
