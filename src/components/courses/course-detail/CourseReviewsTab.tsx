@@ -632,7 +632,8 @@ const CourseReviewsTab: React.FC<CourseReviewsTabProps> = ({
                   isHighlighted={isDeepLinked}
                   onToggleHelpful={handleToggleHelpful}
                   onMediaClick={(index, el) => {
-                    if (review.media) handleReviewMediaClick(review.media, index, review, el);
+                    const m = review.media?.[index];
+                    if (m) handleReviewMediaClick(review, m.id, el);
                   }}
 
                   onUserClick={() => navigate(getProfilePathById(review.user_id))}
