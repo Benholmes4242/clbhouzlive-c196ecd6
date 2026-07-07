@@ -62,19 +62,26 @@ function toMedianStyle(intent: string): string {
 }
 
 /**
- * Boot-time overlay lock (fs.open jolt fix — 2026-07-07).
+ * Boot-time overlay assertion + transition-free rationale (2026-07-07, amended).
  *
- * The Median native bridge resizes the WebView viewport when the `overlay`
- * flag on `statusbar.set` flips. That resize lands ASYNC (30–80ms after the
- * call) and, when it happened mid-animation on the fs.open path, caused the
+ * The Median native bridge resizes the WebView viewport whenever the `overlay`
+ * flag on `statusbar.set` TRANSITIONS. That resize lands ASYNC (30–80ms after
+ * the call) and, when it lands mid-animation on the fs.open path, causes the
  * feed's 100dvh slides to re-lay-out inside the expanding wrapper — visible
  * as a "jump + resize" jolt.
  *
- * Fix: fire `overlay:true` ONCE at app boot with a neutral transparent tint.
- * Every subsequent status-bar update MUST pass style + color only (never the
- * `overlay` key). With the flag never changing again, the viewport is stable
- * across route transitions and overlay opens, and the SnapFeed 100dvh
- * height stops re-resolving mid-transition.
+ * Original doctrine was "omit the overlay key after boot" — but Median's
+ * native side treats a missing key as "reset to default" (overlay:false),
+ * which silently dropped the WebView out of overlay mode on the first
+ * post-boot style/color call, producing a permanent grey band under the
+ * status bar.
+ *
+ * Corrected doctrine: EVERY `statusbar.set` call sends the FULL payload with
+ * `overlay:true`, `blur:false`. Every call is a complete idempotent
+ * statement of desired state. Because the value never changes, no transition
+ * can ever occur, so the jolt-triggering async resize never fires. This is
+ * correct under either omission semantics (persist vs. reset-to-default)
+ * and matches the pre-break behaviour that worked.
  */
 let statusBarOverlayBooted = false;
 export function ensureStatusBarOverlayBooted(): void {
@@ -102,25 +109,29 @@ export function ensureStatusBarOverlayBooted(): void {
 }
 
 /**
- * Style/color-only setter — never touches the `overlay` flag. All non-boot
- * status-bar call sites (App route effect, openWithOrigin, FullscreenFeedOverlay)
- * must go through this helper so the boot-locked overlay flag is preserved.
+ * Style/color setter — ALWAYS sends the full payload including
+ * `overlay:true` and `blur:false`. See rationale above: every call is an
+ * idempotent full-state assertion so the overlay value never transitions,
+ * which is what prevents the fs.open viewport-resize jolt AND guarantees
+ * the WebView never falls out of overlay mode (grey band regression).
  */
 export function setStatusBarStyleColor(intent: 'light' | 'dark' | 'auto', hexColor: string): void {
   if (typeof window === 'undefined') return;
   if (!navigator.userAgent.toLowerCase().includes('median')) return;
   try {
     if (window.median?.statusbar?.set) {
-      // Deliberately omit `overlay`/`blur` — boot-locked, must not be re-sent.
-      (window.median.statusbar.set as (opts: Record<string, unknown>) => void)({
+      window.median.statusbar.set({
         style: toMedianStyle(intent),
         color: toAARRGGBB(hexColor),
+        overlay: true,
+        blur: false,
       });
     }
   } catch {
     // Bridge not ready — silent no-op.
   }
 }
+
 
 // Kick a boot-attempt at module load, then again on the Median ready callback.
 if (typeof window !== 'undefined') {
