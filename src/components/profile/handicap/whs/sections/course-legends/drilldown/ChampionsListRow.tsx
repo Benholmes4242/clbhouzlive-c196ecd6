@@ -146,21 +146,6 @@ export const ChampionsListRow: React.FC<ChampionsListRowProps> = ({
       style={{
         position: 'relative',
         display: 'grid',
-        gridTemplateColumns: compact ? '18px 32px 1fr auto' : '24px 40px 1fr auto',
-        gap: compact ? 12 : 14,
-        alignItems: 'center',
-        padding: `${padY} 16px`,
-        background: rowBg,
-        boxShadow: `inset 0 -0.5px 0 ${dividerColor}`,
-      }}
-    >
-      {rank === 1 ? (
-        <div style={{ display: 'flex', justifyContent: 'flex-end', alignItems: 'center', lineHeight: 0 }} aria-label="Champion">
-  return (
-    <div
-      style={{
-        position: 'relative',
-        display: 'grid',
         gridTemplateColumns: compact ? CHAMPS_GRID_COMPACT : CHAMPS_GRID_FULL,
         gap: compact ? CHAMPS_GRID_GAP_COMPACT : CHAMPS_GRID_GAP_FULL,
         alignItems: 'center',
