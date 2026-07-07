@@ -173,7 +173,6 @@ const PostDeepLinkPage: React.FC = () => {
           poster_url: m.poster_url,
           duration_seconds: m.duration_seconds,
         })),
-        post_tags: [],
         user: {
           id: profileRow.id,
           display_name: profileRow.display_name,

@@ -52,7 +52,7 @@ export function mapActivityPostToFeedPost(post: ActivityPost): FeedPost {
     };
   }
 
-  // Map post_tags → FeedPostTag[] (start_index / end_index aren't available on
+  // User mention tags were removed — always emit empty tags.
   // the ActivityPost shape, so we omit highlighting and pass an empty array).
   const tags = [] as FeedPost['tags'];
 
