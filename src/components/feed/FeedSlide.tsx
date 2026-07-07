@@ -580,14 +580,16 @@ const BorrowedFullscreenSlot: React.FC<{
             filter: 'blur(40px) brightness(0.5) saturate(1.2)', transform: 'scale(1.2)',
           }} />
         )}
-        {/* Black letterbox underlay — fades in during Phase 2 fit-swap. */}
+        {/* Black letterbox underlay — 200ms crossfade during Phase 2.
+            Fit swap lands at the fade midpoint (see handleTransitionEnd).
+            Skipped when video/viewport aspect ratios match. */}
         <div
           aria-hidden
           data-vperf="flip-underlay"
           style={{
             position: 'absolute', inset: 0, background: '#000',
-            opacity: fitContain ? 1 : 0,
-            transition: 'opacity 120ms linear',
+            opacity: underlayVisible ? 1 : 0,
+            transition: 'opacity 200ms linear',
           }}
         />
       </div>
