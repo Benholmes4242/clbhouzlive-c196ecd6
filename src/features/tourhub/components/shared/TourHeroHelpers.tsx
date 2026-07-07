@@ -7,7 +7,7 @@ import React, { useState, useEffect, useMemo } from 'react';
 import type { WinnerStats } from '../../hooks/useWinnerScorecardStats';
 import type { WinnerSeasonStats } from '../../hooks/useWinnerSeasonStats';
 import { SCORE_COLORS } from '../../utils/scoreColors';
-import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
+import { SquircleAvatar, DARK_HAIRLINE } from '@/components/ui/SquircleAvatar';
 import { resolvePlayerAvatarCandidates } from '../../_shared/resolvePlayerAvatar';
 import type { TournamentFinisher } from '../../hooks/useTournamentLeadersWinners';
 import { useCountdown } from '@/hooks/useCountdown';
