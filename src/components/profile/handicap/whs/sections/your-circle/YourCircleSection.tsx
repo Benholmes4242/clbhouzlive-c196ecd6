@@ -165,14 +165,13 @@ export const YourCircleSection: React.FC<Props> = ({ userId }) => {
                 fontFamily: FONT,
               }}
             >
-              {/* Self chip: 1px amber self-frame on the wrapper WINS — leave */}
-              {/* this avatar ringless (canon: semantic frame replaces hairline). */}
+              {/* User override: hairline on avatar even inside amber self-frame. */}
               <SquircleAvatar
                 src={pickAvatarSrc(stats.self.friend_thumbnail_url, stats.self.friend_profile_photo_url)}
                 alt={stats.self.friend_name}
                 size={56}
                 userId={stats.self.friend_user_id ?? undefined}
-                hideRing
+                hairlineRing
               />
               <p
                 style={{
