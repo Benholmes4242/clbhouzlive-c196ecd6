@@ -129,6 +129,10 @@ export function FullscreenFeedOverlay() {
   const clearBorrow = useFullscreenFeedStore(s => s.clearBorrow);
   const borrowDemoteRequested = useFullscreenFeedStore(s => s.borrowDemoteRequested);
   const consumeBorrowDemoteRequested = useFullscreenFeedStore(s => s.consumeBorrowDemoteRequested);
+  const closeAnim = useFullscreenFeedStore(s => s.closeAnim);
+  const closeAnimDone = useFullscreenFeedStore(s => s.closeAnimDone);
+  const beginCloseAnim = useFullscreenFeedStore(s => s.beginCloseAnim);
+  const signalCloseAnimDone = useFullscreenFeedStore(s => s.signalCloseAnimDone);
 
   // Snapshot borrow so the isOpen-cleanup path can run the return even after
   // close() has cleared the store's borrow field synchronously.
@@ -168,18 +172,118 @@ export function FullscreenFeedOverlay() {
     consumeBorrowDemoteRequested();
   }, [borrowDemoteRequested, clearBorrow, consumeBorrowDemoteRequested]);
 
+  // ── Reverse-close clone (non-borrow branch) ──
+  // Mirrors the open's forward clone: at close intent we mount a poster clone
+  // AT the resting rect and animate it back to the origin tile's rect while
+  // the blur/scrim backdrop fades OUT and the black overlay wash retreats.
+  // Fires signalCloseAnimDone on transitionend (or 500ms watchdog).
+  const [reverseClone, setReverseClone] = useState<
+    | null
+    | { from: { top: number; left: number; width: number; height: number };
+        to:   { top: number; left: number; width: number; height: number };
+        posterUrl: string; borderRadius: string; }
+  >(null);
+  const [reverseCollapsed, setReverseCollapsed] = useState(false);
+  const closeWatchdogRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const closeCompletedRef = useRef(false);
+
   // Wrap close so borrow-return runs BEFORE the store clears its fields.
   // All in-overlay callers (ESC, top-action-bar close, deep-link back) should
   // route through this. Route-change navigation that bypasses close still
   // gets handled by the isOpen-effect cleanup below (using borrowRef).
   const handleClose = useCallback(() => {
+    if (closeAnim !== 'idle') return; // animation already in flight
+    const b = borrowRef.current;
+    const o = origin;
+    const sameSlide = activeIndex === startIndex;
+
+    // Instant fallback path (matches today's behaviour byte-for-byte):
+    //  • demoted slide (activeIndex !== startIndex)
+    //  • no origin descriptor (deep-link / notification opens)
+    //  • borrow with a missing origin host in the registry (target gone /
+    //    tile evicted / viewport rotated).
+    const viewportChanged =
+      b && typeof window !== 'undefined' &&
+      (window.innerWidth !== b.viewportW || window.innerHeight !== b.viewportH);
+    const borrowOriginAlive = !!(b && originHostRegistry.get(b.ownerKey) && !viewportChanged);
+    const canAnimate =
+      sameSlide && (
+        (b && borrowOriginAlive) ||
+        (!b && o && !!o.posterUrl)
+      );
+
+    if (!canAnimate) {
+      if (b) {
+        returnBorrow(b, 'close');
+        borrowRef.current = null;
+      }
+      close();
+      return;
+    }
+
+    // Animated symmetric close.
+    if (b) {
+      // BorrowedFullscreenSlot handles its own reverse motion when it sees
+      // closeAnim === 'borrow'. Overlay just waits for closeAnimDone.
+      beginCloseAnim('borrow');
+    } else {
+      // Non-borrow: mount reverse clone at the resting rect → tile rect.
+      const vp = getCurrentViewport();
+      const omw = o!.originMediaW ?? 0;
+      const omh = o!.originMediaH ?? 0;
+      const useMediaDims = omw > 0 && omh > 0;
+      const ar = useMediaDims ? omw / omh : (o!.aspectRatio > 0 ? o!.aspectRatio : 0);
+      const [mw, mh] = useMediaDims ? [omw, omh] : (ar > 0 ? [ar * 1000, 1000] : [0, 0]);
+      const kind: 'video' | 'image' = o!.mediaType ?? 'image';
+      const resting = resolveRestingRect(mw, mh, vp, kind);
+      setReverseClone({
+        from: { top: resting.top, left: resting.left, width: resting.width, height: resting.height },
+        to:   { top: o!.rect.top, left: o!.rect.left, width: o!.rect.width, height: o!.rect.height },
+        posterUrl: o!.posterUrl ?? '',
+        borderRadius: o!.borderRadius,
+      });
+      setReverseCollapsed(false);
+      beginCloseAnim('nonborrow');
+      // rAF #2: commit collapsed=true on the frame after mount so the browser
+      // interpolates FROM the resting rect (mirrors the forward clone rules).
+      requestAnimationFrame(() => {
+        requestAnimationFrame(() => setReverseCollapsed(true));
+      });
+    }
+
+    // Backstop watchdog: never trap the user behind a stalled transition.
+    closeWatchdogRef.current = setTimeout(() => {
+      signalCloseAnimDone();
+    }, 500);
+  }, [closeAnim, origin, activeIndex, startIndex, close, beginCloseAnim, signalCloseAnimDone]);
+
+  // Finalize the animated close once the moving surface (borrow slot or the
+  // non-borrow reverse clone) has signalled completion.
+  useEffect(() => {
+    if (!closeAnimDone) return;
+    if (closeCompletedRef.current) return;
+    closeCompletedRef.current = true;
+    if (closeWatchdogRef.current) {
+      clearTimeout(closeWatchdogRef.current);
+      closeWatchdogRef.current = null;
+    }
     const b = borrowRef.current;
     if (b) {
       returnBorrow(b, 'close');
       borrowRef.current = null;
     }
     close();
-  }, [close]);
+  }, [closeAnimDone, close]);
+
+  // Reset close-animation local state when the overlay is re-opened.
+  useEffect(() => {
+    if (isOpen) {
+      closeCompletedRef.current = false;
+      setReverseClone(null);
+      setReverseCollapsed(false);
+    }
+  }, [isOpen]);
+
 
 
 
@@ -493,8 +597,26 @@ export function FullscreenFeedOverlay() {
             exit={{ opacity: 0 }}
             transition={{ duration: 0.18 }}
             data-vperf="fs-overlay"
-            className="fixed inset-0 z-[200] bg-black flex flex-col"
+            className="fixed inset-0 z-[200] flex flex-col"
           >
+            {/* Black wash — solid canvas that fades OUT during the symmetric
+                close motion so the underlying page (with the origin tile) is
+                revealed as the media shrinks back into it. On open + at rest
+                it stays fully opaque (matches prior `bg-black` behaviour). */}
+            <div
+              aria-hidden
+              style={{
+                position: 'absolute',
+                inset: 0,
+                background: '#000',
+                opacity: closeAnim !== 'idle' ? 0 : 1,
+                transition: closeAnim !== 'idle'
+                  ? 'opacity 300ms cubic-bezier(0.32,0.72,0,1)'
+                  : 'none',
+                pointerEvents: 'none',
+                zIndex: 0,
+              }}
+            />
             {/* Close button is now part of the FeedOverlayLayer top action bar (left chevron). */}
 
 
@@ -513,7 +635,10 @@ export function FullscreenFeedOverlay() {
                     // midpoint at ~0.5 opacity, dimming the composite over
                     // black to ~0.75× brightness — a visible "flash" dip
                     // even when the pixels are identical.
-                    opacity: origin && !firstFrameReady ? 0 : 1,
+                    // During the symmetric close (non-borrow) the reverse
+                    // clone stands alone — hide the host under it.
+                    opacity: (origin && !firstFrameReady) || closeAnim === 'nonborrow' ? 0 : 1,
+                    pointerEvents: closeAnim !== 'idle' ? 'none' : undefined,
                   }}
                 >
 
@@ -642,10 +767,70 @@ export function FullscreenFeedOverlay() {
                     }}
                   />
                 )}
+
+                {/* ── REVERSE clone (non-borrow symmetric close) ──
+                    Mirror of the forward clone: mounts AT the resting rect
+                    (over the just-hidden host) and animates back to the
+                    origin tile rect. Blur backdrop fades OUT concurrently.
+                    On transitionend the store signals close-anim-done and
+                    the overlay finalises. */}
+                {closeAnim === 'nonborrow' && reverseClone && (
+                  <>
+                    {reverseClone.posterUrl && (
+                      <div
+                        aria-hidden
+                        style={{
+                          position: 'fixed',
+                          inset: 0,
+                          backgroundImage: `url(${reverseClone.posterUrl})`,
+                          backgroundSize: 'cover',
+                          backgroundPosition: 'center',
+                          filter: 'blur(40px) brightness(0.5) saturate(1.2)',
+                          transform: 'scale(1.2)',
+                          opacity: reverseCollapsed ? 0 : 1,
+                          transition: 'opacity 300ms cubic-bezier(0.32,0.72,0,1)',
+                          pointerEvents: 'none',
+                          zIndex: 1,
+                        }}
+                      />
+                    )}
+                    <img
+                      src={reverseClone.posterUrl || undefined}
+                      alt=""
+                      aria-hidden
+                      onTransitionEnd={(e) => {
+                        if (e.propertyName !== 'transform') return;
+                        signalCloseAnimDone();
+                      }}
+                      style={{
+                        position: 'fixed',
+                        top: 0,
+                        left: 0,
+                        width: reverseCollapsed ? reverseClone.to.width : reverseClone.from.width,
+                        height: reverseCollapsed ? reverseClone.to.height : reverseClone.from.height,
+                        transform: reverseCollapsed
+                          ? `translate(${reverseClone.to.left}px, ${reverseClone.to.top}px)`
+                          : `translate(${reverseClone.from.left}px, ${reverseClone.from.top}px)`,
+                        objectFit: 'cover',
+                        borderRadius: reverseCollapsed ? reverseClone.borderRadius : 0,
+                        willChange: 'transform, width, height, border-radius',
+                        transition:
+                          'transform 300ms cubic-bezier(0.32,0.72,0,1),' +
+                          ' width 300ms cubic-bezier(0.32,0.72,0,1),' +
+                          ' height 300ms cubic-bezier(0.32,0.72,0,1),' +
+                          ' border-radius 240ms cubic-bezier(0.32,0.72,0,1)',
+                        pointerEvents: 'none',
+                        zIndex: 2,
+                        background: '#000',
+                      }}
+                    />
+                  </>
+                )}
               </>
             )}
             {/* <FullscreenDebugPanel /> — hidden; re-enable here when debugging needed */}
           </motion.div>
+
         )}
       </AnimatePresence>
 

@@ -121,6 +121,17 @@ interface FullscreenFeedState {
    *  from FeedSlide itself. */
   borrowDemoteRequested: boolean;
 
+  /** Symmetric close animation orchestration.
+   *  'idle'      — no close in flight (or non-animated instant close).
+   *  'borrow'    — BorrowedFullscreenSlot should reverse-shrink to its origin
+   *                tile. On transitionend it flips `closeAnimDone` and the
+   *                overlay runs returnBorrow('close') + finalize.
+   *  'nonborrow' — overlay owns a reverse clone (poster shrinks resting→tile);
+   *                on transitionend it finalises.
+   *  Demote/route/target-gone closes bypass this entirely (stay 'idle'). */
+  closeAnim: 'idle' | 'borrow' | 'nonborrow';
+  closeAnimDone: boolean;
+
   open: (posts: FeedPost[], startIndex?: number, options?: OpenOptions) => void;
   close: () => void;
   appendPosts: (newPosts: FeedPost[]) => void;
@@ -134,6 +145,11 @@ interface FullscreenFeedState {
    *  live. The overlay effect handles the actual returnBorrow call. */
   demoteBorrow: () => void;
   consumeBorrowDemoteRequested: () => void;
+  /** Signal that the reverse close animation has just kicked off. */
+  beginCloseAnim: (kind: 'borrow' | 'nonborrow') => void;
+  /** Fired by the animating surface at transitionend (or watchdog). Overlay
+   *  observes and runs the finalization tail. */
+  signalCloseAnimDone: () => void;
   /** Allow openers to push updated pagination state into the store as the
    *  underlying query progresses (e.g. hasNextPage flips false on last page,
    *  isFetchingNextPage toggles during a fetch). */
@@ -159,6 +175,8 @@ export const useFullscreenFeedStore = create<FullscreenFeedState>((set, get) => 
   openedFrom: null,
   borrow: null,
   borrowDemoteRequested: false,
+  closeAnim: 'idle',
+  closeAnimDone: false,
 
   open: (posts, startIndex = 0, options) => {
     set({
@@ -224,6 +242,8 @@ export const useFullscreenFeedStore = create<FullscreenFeedState>((set, get) => 
       openedFrom: null,
       borrow: null,
       borrowDemoteRequested: false,
+      closeAnim: 'idle',
+      closeAnimDone: false,
     });
     if (cb) {
       try { cb(); } catch {}
@@ -236,6 +256,15 @@ export const useFullscreenFeedStore = create<FullscreenFeedState>((set, get) => 
     set({ borrowDemoteRequested: true });
   },
   consumeBorrowDemoteRequested: () => set({ borrowDemoteRequested: false }),
+  beginCloseAnim: (kind) => {
+    if (get().closeAnim !== 'idle') return;
+    set({ closeAnim: kind, closeAnimDone: false });
+  },
+  signalCloseAnimDone: () => {
+    if (get().closeAnim === 'idle') return;
+    if (get().closeAnimDone) return;
+    set({ closeAnimDone: true });
+  },
   appendPosts: (newPosts) => {
     set((s) => {
       const existing = new Set(s.posts.map((p) => p.id));

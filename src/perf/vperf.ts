@@ -89,10 +89,13 @@ const laneArms = new Map<string, LaneArm[]>();
 const sessions = new Map<string, SessionRec>();
 
 // Default budgets by kind (ms). Callers may override via vperfStart meta.budgetMs.
+// fs.close bumped 250→450 to accommodate the symmetric reverse-shrink close
+// motion (300ms wrapper transition + returnBorrow/handback + overlay fade).
+// Pre-motion the instant snap-handoff fit under 250; the animated mirror does not.
 const DEFAULT_BUDGETS: Record<string, number> = {
   'fs.open.borrow': 150,
   'fs.open.lane': 500,
-  'fs.close': 250,
+  'fs.close': 450,
   'autoplay.warm': 120,
   'autoplay.cold': 600,
   'swipe.vertical': 450,

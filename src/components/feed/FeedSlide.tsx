@@ -8,6 +8,7 @@ import type { FeedPost, MediaItem } from '@/components/media-system/types/media'
 import { useVideoLane } from '@/video/useVideoLane';
 import { VideoEngine } from '@/video/VideoEngine';
 import { useFullscreenFeedStore } from '@/store/fullscreenFeedStore';
+import { originHostRegistry } from '@/video/originHostRegistry';
 import { isPerfEnabled } from '@/perf/navTiming';
 import { vperfStart, vperfArmLane, vperfNextId, vperfMotionMark } from '@/perf/vperf';
 import { resolveRestingRect, getCurrentViewport, type RestingRect } from '@/lib/media/resolveRestingRect';
@@ -524,6 +525,21 @@ const BorrowedFullscreenSlot: React.FC<{
   // when the engine hasn't published a lane aspect yet (fix 3).
   const originSnap = useFullscreenFeedStore.getState().origin;
 
+  // ── Symmetric close: reverse-shrink to origin tile ──
+  // Subscribes to the store-owned close-anim flag. When it flips to 'borrow'
+  // we recompute the origin host's current rect (fresh — the tile is kept
+  // mounted while the overlay is open) and drive the wrapper back to it.
+  // On transitionend we call signalCloseAnimDone; the overlay's finalise
+  // effect runs returnBorrow('close') + close() from there.
+  const closeAnim = useFullscreenFeedStore((s) => s.closeAnim);
+  const signalCloseAnimDone = useFullscreenFeedStore((s) => s.signalCloseAnimDone);
+  const [reverseTarget, setReverseTarget] = React.useState<
+    | null
+    | { top: number; left: number; width: number; height: number }
+  >(null);
+  const [closing, setClosing] = React.useState(false);
+  const closeFiredRef = React.useRef(false);
+
   // Mount the live element on first render.
   React.useEffect(() => {
     const el = wrapperRef.current;
@@ -612,9 +628,55 @@ const BorrowedFullscreenSlot: React.FC<{
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  // Kick off the reverse-shrink when the overlay flips closeAnim to 'borrow'.
+  React.useEffect(() => {
+    if (closeAnim !== 'borrow') return;
+    if (closing) return;
+    // Fresh origin rect from the registry — the borrowed tile is still
+    // mounted (feed scroll-locked) so its host's getBoundingClientRect is
+    // valid. Fallback to the mount-time originRect prop if the host is gone.
+    let target = originRect;
+    try {
+      const host = originHostRegistry.get(borrow.ownerKey);
+      if (host) {
+        const r = host.getBoundingClientRect();
+        target = { top: r.top, left: r.left, width: r.width, height: r.height };
+      }
+    } catch {}
+    setReverseTarget(target);
+    // Fade the underlay out concurrently (contain-target letterbox bars
+    // dissolve as the wrapper shrinks past their aspect).
+    if (restingFitRef.current === 'contain') {
+      setUnderlayVisible(false);
+      // Flip fit back to cover so the shrink is a pure translate/scale.
+      try { VideoEngine.setObjectFit(borrow.laneId, 'cover'); } catch {}
+    }
+    // Commit the collapse on the next frame so the browser has a real
+    // "from" style (the current resting rect) to interpolate from.
+    requestAnimationFrame(() => {
+      try { vperfMotionMark('shrinkStart'); } catch {}
+      setClosing(true);
+    });
+  }, [closeAnim, closing, originRect, borrow.laneId, borrow.ownerKey]);
+
   const handleTransitionEnd = React.useCallback((e: React.TransitionEvent<HTMLDivElement>) => {
     // Only respond to the wrapper's own size/transform transitions.
     if (e.target !== wrapperRef.current) return;
+
+    // ── Symmetric close: shrink transition just completed ──
+    if (closing) {
+      if (closeFiredRef.current) return;
+      if (
+        e.propertyName !== 'transform' &&
+        e.propertyName !== 'width' &&
+        e.propertyName !== 'height'
+      ) return;
+      closeFiredRef.current = true;
+      try { vperfMotionMark('shrinkEnd'); } catch {}
+      signalCloseAnimDone();
+      return;
+    }
+
     // [VPERF] motion trace: phase-1 (expand) done, phase-2 (fit swap) begins.
     try { vperfMotionMark('expandEnd'); vperfMotionMark('fitSwapStart'); } catch {}
 
@@ -648,27 +710,34 @@ const BorrowedFullscreenSlot: React.FC<{
       try { VideoEngine.nudgeLevelCap(borrow.laneId); } catch {}
     }
     try { vperfMotionMark('fitSwapEnd'); } catch {}
-  }, [borrow.laneId, fitContain, onFirstFrameReady]);
+  }, [borrow.laneId, fitContain, onFirstFrameReady, closing, signalCloseAnimDone]);
 
   const target = targetRectRef.current;
+  // Style resolves in three states: initial (originRect) → expanded (target) →
+  // closing (reverseTarget). Only the transition property differs (initial is
+  // a snap; expanded/closing use the 300ms curve).
+  const rectNow = closing && reverseTarget
+    ? reverseTarget
+    : expanded && target
+      ? { top: target.top, left: target.left, width: target.width, height: target.height }
+      : { top: originRect.top, left: originRect.left, width: originRect.width, height: originRect.height };
   const style: React.CSSProperties = {
     position: 'fixed',
     top: 0,
     left: 0,
-    transform: expanded && target
-      ? `translate(${target.left}px, ${target.top}px)`
-      : `translate(${originRect.left}px, ${originRect.top}px)`,
-    width: expanded && target ? target.width : originRect.width,
-    height: expanded && target ? target.height : originRect.height,
+    transform: `translate(${rectNow.left}px, ${rectNow.top}px)`,
+    width: rectNow.width,
+    height: rectNow.height,
     zIndex: 3,
     background: '#000',
     overflow: 'hidden',
     willChange: 'transform, width, height',
-    transition: expanded
+    transition: (expanded || closing)
       ? 'transform 300ms cubic-bezier(0.32,0.72,0,1), width 300ms cubic-bezier(0.32,0.72,0,1), height 300ms cubic-bezier(0.32,0.72,0,1)'
       : 'none',
     pointerEvents: 'none',
   };
+
 
   return (
     <>
