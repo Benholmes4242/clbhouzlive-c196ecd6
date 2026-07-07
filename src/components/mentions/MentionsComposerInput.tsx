@@ -170,6 +170,10 @@ function buildMentionsStyle(text: MentionsTextStyle | undefined) {
     control: {
       background: 'transparent',
       minHeight: minH ?? 36,
+      // Full-width so hosts that wrap us in `display:flex` (e.g. review
+      // wizard verdict box) don't shrink us to intrinsic textarea width,
+      // which in turn collapses the suggestions popover.
+      width: '100%',
       // NOTE: do NOT spread sharedText here (see original comment).
       fontFamily: sharedText.fontFamily,
       fontSize: sharedText.fontSize,
