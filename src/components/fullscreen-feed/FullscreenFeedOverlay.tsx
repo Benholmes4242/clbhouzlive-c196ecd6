@@ -189,10 +189,8 @@ export function FullscreenFeedOverlay() {
   // over the (opacity-0) SnapFeed and crossfade it out on first frame.
   const [cloneVisible, setCloneVisible] = useState(false);
   const [cloneExpanded, setCloneExpanded] = useState(false);
-  const [cloneExpandDone, setCloneExpandDone] = useState(false);
   const [firstFrameReady, setFirstFrameReady] = useState(false);
   const watchdogRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const expandDoneTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   // Use the real active actor (personal or business) so users in business
   // mode can like/comment/follow as their business from fullscreen. Falls
@@ -378,59 +376,59 @@ export function FullscreenFeedOverlay() {
     // host opacity gate below flips to 1 immediately.
     if (isOpen && borrow) {
       setCloneVisible(false);
-      setCloneExpandDone(true);
       setFirstFrameReady(true);
       return;
     }
     if (isOpen && origin) {
+      // Render A (synchronous commit): clone mounts at origin.rect ("from"
+      // state). The render guard below (`origin && cloneVisible`) no longer
+      // requires targetRect, so this frame actually paints at tile size —
+      // giving the browser a real committed style to interpolate FROM.
       setCloneVisible(true);
       setCloneExpanded(false);
-      setCloneExpandDone(false);
       setFirstFrameReady(false);
       setTargetRect(null);
-      const raf = requestAnimationFrame(() => {
-        const vp = getCurrentViewport();
-        const omw = origin.originMediaW ?? 0;
-        const omh = origin.originMediaH ?? 0;
-        const useMediaDims = omw > 0 && omh > 0;
-        const ar = useMediaDims ? omw / omh : (origin.aspectRatio > 0 ? origin.aspectRatio : 0);
-        const [mw, mh] = useMediaDims ? [omw, omh] : (ar > 0 ? [ar * 1000, 1000] : [0, 0]);
-        const kind: 'video' | 'image' = origin.mediaType ?? 'image';
-        const resting = resolveRestingRect(mw, mh, vp, kind);
-        setTargetRect({
-          top: resting.top,
-          left: resting.left,
-          width: resting.width,
-          height: resting.height,
+      // Double rAF: guarantee the browser has painted render A before we
+      // commit the target rect + cloneExpanded (Render B). Without this,
+      // React can batch both updates into a single pre-paint commit and
+      // the FLIP transition has no "from" style → clone teleports.
+      let raf2: number | null = null;
+      const raf1 = requestAnimationFrame(() => {
+        raf2 = requestAnimationFrame(() => {
+          const vp = getCurrentViewport();
+          const omw = origin.originMediaW ?? 0;
+          const omh = origin.originMediaH ?? 0;
+          const useMediaDims = omw > 0 && omh > 0;
+          const ar = useMediaDims ? omw / omh : (origin.aspectRatio > 0 ? origin.aspectRatio : 0);
+          const [mw, mh] = useMediaDims ? [omw, omh] : (ar > 0 ? [ar * 1000, 1000] : [0, 0]);
+          const kind: 'video' | 'image' = origin.mediaType ?? 'image';
+          const resting = resolveRestingRect(mw, mh, vp, kind);
+          setTargetRect({
+            top: resting.top,
+            left: resting.left,
+            width: resting.width,
+            height: resting.height,
+          });
+          setCloneExpanded(true);
         });
-        setCloneExpanded(true);
-        // Backstop: mark expand done ~320ms after we flip cloneExpanded,
-        // regardless of whether the img's transitionend fires (browsers can
-        // drop it if the element is retired or if transitions coalesce).
-        expandDoneTimerRef.current = setTimeout(() => {
-          setCloneExpandDone(true);
-        }, 320);
       });
-      // Watchdog: only for video first-frame signal. Image opens rely on
-      // cloneExpandDone (below) to reveal the host — the settled image
-      // paints in the SAME rect the clone landed on.
-      const watchdogMs = origin.mediaType === 'image' ? 340 : 400;
+      // Backstop watchdog only — the primary reveal trigger is the clone's
+      // own `transitionend` (see onTransitionEnd on the <img> below). This
+      // enforces "content reveals when motion completes, never before".
       watchdogRef.current = setTimeout(() => {
         setFirstFrameReady(true);
-      }, watchdogMs);
+      }, 500);
       return () => {
-        cancelAnimationFrame(raf);
-        if (watchdogRef.current) clearTimeout(watchdogRef.current);
-        if (expandDoneTimerRef.current) clearTimeout(expandDoneTimerRef.current);
+        cancelAnimationFrame(raf1);
+        if (raf2 != null) cancelAnimationFrame(raf2);
+        if (watchdogRef.current) { clearTimeout(watchdogRef.current); watchdogRef.current = null; }
       };
     } else if (!isOpen) {
       setCloneVisible(false);
       setCloneExpanded(false);
-      setCloneExpandDone(false);
       setFirstFrameReady(false);
       setTargetRect(null);
-      if (watchdogRef.current) clearTimeout(watchdogRef.current);
-      if (expandDoneTimerRef.current) clearTimeout(expandDoneTimerRef.current);
+      if (watchdogRef.current) { clearTimeout(watchdogRef.current); watchdogRef.current = null; }
     }
   }, [isOpen, origin, borrow]);
 
@@ -439,18 +437,14 @@ export function FullscreenFeedOverlay() {
     setFirstFrameReady(true);
   }, []);
 
-  // Retire the clone only after BOTH the expand transition has completed AND
-  // the settled content is ready. Prevents the "flash" where the settled host
-  // reveals under a still-animating clone (or a clone retires before the
-  // settled content has painted).
-  const readyToHandoff = firstFrameReady && cloneExpandDone;
+  // Retire the clone shortly after the crossfade completes.
   useEffect(() => {
-    if (!readyToHandoff || !cloneVisible) return;
+    if (!firstFrameReady || !cloneVisible) return;
     const t = setTimeout(() => {
       setCloneVisible(false);
     }, 180);
     return () => clearTimeout(t);
-  }, [readyToHandoff, cloneVisible]);
+  }, [firstFrameReady, cloneVisible]);
 
 
 
@@ -485,7 +479,7 @@ export function FullscreenFeedOverlay() {
                   style={{
                     position: 'absolute',
                     inset: 0,
-                    opacity: origin && !readyToHandoff ? 0 : 1,
+                    opacity: origin && !firstFrameReady ? 0 : 1,
                     transition: 'opacity 120ms linear',
                   }}
                 >
@@ -569,19 +563,32 @@ export function FullscreenFeedOverlay() {
                   />
                 )}
 
-                {/* ── FLIP clone layer (Phase 3 shared-element expand) ── */}
-                {origin && cloneVisible && targetRect && (
+                {/* ── FLIP clone layer (Phase 3 shared-element expand) ──
+                    Rendered from Render A at origin.rect (targetRect null),
+                    so the browser has a real "from" style to interpolate
+                    from when Render B commits targetRect + cloneExpanded. */}
+                {origin && cloneVisible && (
                   <img
                     src={origin.posterUrl ?? undefined}
                     alt=""
                     aria-hidden
+                    onTransitionEnd={(e) => {
+                      // Motion clock = readiness clock. Reveal the settled
+                      // host only after the clone's own expand animation
+                      // completes (300ms transform). Guarded so it only
+                      // fires once, and only for the expand direction.
+                      if (!cloneExpanded) return;
+                      if (e.propertyName !== 'transform') return;
+                      if (watchdogRef.current) { clearTimeout(watchdogRef.current); watchdogRef.current = null; }
+                      setFirstFrameReady(true);
+                    }}
                     style={{
                       position: 'fixed',
                       top: 0,
                       left: 0,
-                      width: cloneExpanded ? targetRect.width : origin.rect.width,
-                      height: cloneExpanded ? targetRect.height : origin.rect.height,
-                      transform: cloneExpanded
+                      width: cloneExpanded && targetRect ? targetRect.width : origin.rect.width,
+                      height: cloneExpanded && targetRect ? targetRect.height : origin.rect.height,
+                      transform: cloneExpanded && targetRect
                         ? `translate(${targetRect.left}px, ${targetRect.top}px)`
                         : `translate(${origin.rect.left}px, ${origin.rect.top}px)`,
                       objectFit: 'cover',
@@ -593,21 +600,13 @@ export function FullscreenFeedOverlay() {
                         ' height 300ms cubic-bezier(0.32,0.72,0,1),' +
                         ' border-radius 240ms cubic-bezier(0.32,0.72,0,1),' +
                         ' opacity 120ms linear',
-                      opacity: readyToHandoff ? 0 : 1,
+                      opacity: firstFrameReady ? 0 : 1,
                       pointerEvents: 'none',
                       zIndex: 2,
                       // Safety fill INSIDE the media's own geometry so a
                       // partially-decoded poster never shows through to the
                       // blur backdrop mid-expand. Not a surround layer.
                       background: '#000',
-                    }}
-                    onTransitionEnd={(e) => {
-                      // Signal expand completion the moment the geometry
-                      // transition actually finishes. The setTimeout backstop
-                      // covers browsers that drop this event.
-                      if (e.propertyName === 'transform' || e.propertyName === 'width' || e.propertyName === 'height') {
-                        setCloneExpandDone(true);
-                      }
                     }}
                   />
                 )}
