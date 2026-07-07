@@ -20,6 +20,7 @@ import { VideoEngine } from '@/video/VideoEngine';
 import { RailLanePool } from '@/video/railLanePool';
 
 import { isPerfEnabled } from '@/perf/navTiming';
+import { vperfStart, vperfMark, vperfArmLane, vperfNextId } from '@/perf/vperf';
 
 
 const BORROW_DBG = (evt: string, payload: Record<string, unknown> = {}) => {
