@@ -329,6 +329,7 @@ function NumberOneCard({
                 tourCode={tourCode}
                 size="xl"
                 className="!w-full !h-full !rounded-[34%]"
+                ringColor={LIGHT_HAIRLINE}
               />
             </div>
             <div
