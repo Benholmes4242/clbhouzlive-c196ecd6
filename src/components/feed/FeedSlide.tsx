@@ -342,10 +342,18 @@ const FullscreenVideoSlot: React.FC<{
     postId: resumeKey,
   });
 
+  // Resolve the settled rect from intrinsic media dims — MUST match the
+  // clone's expand target (both consume resolveRestingRect). Prevents the
+  // clone-retire → settled-paint size delta that produced the visible
+  // "media resize after first paint" flash.
+  const settledRect = React.useMemo(() => {
+    return resolveRestingRect(mediaW, mediaH, getCurrentViewport(), 'video');
+  }, [mediaW, mediaH]);
+
   React.useEffect(() => {
     if (isBorrowSlide) return;
-    VideoEngine.setObjectFit('fullscreen', 'contain');
-  }, [isBorrowSlide]);
+    VideoEngine.setObjectFit('fullscreen', settledRect.fit);
+  }, [isBorrowSlide, settledRect.fit]);
 
   // [DECIDE] slot.bind — one line when the non-borrow fullscreen lane
   // binds. Lets us compare what the lane believed at bind-time vs what the
