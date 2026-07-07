@@ -532,7 +532,7 @@ function AppRoutes() {
         <Route path="/courses/:courseId" element={<Suspense fallback={<CourseDetailSkeleton />}><CourseDetailPage /></Suspense>} />
         <Route path="/courses/:courseId/rate" element={<Suspense fallback={<RateCoursePageSkeleton />}><RateCoursePage /></Suspense>} />
         
-        <Route path="/courses/:courseId/share-review/:reviewId" element={<Suspense fallback={<GenericPageSkeleton />}><ShareReviewPage /></Suspense>} />
+        {/* /courses/:courseId/share-review/:reviewId removed in PR-5 Part 2 — orphan surface. ReviewWizard shares inline. */}
         <Route path="/courses/:courseId/reviews" element={<Suspense fallback={<CourseDetailSkeleton />}><CourseReviewsPage /></Suspense>} />
         <Route path="/user/:username/courses" element={<Suspense fallback={<CoursesListSkeleton />}><UserCoursesPage /></Suspense>} />
         
