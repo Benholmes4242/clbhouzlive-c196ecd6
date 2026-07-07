@@ -188,6 +188,7 @@ export function CollegeComparePickerSheet({ open, onClose, c1, c1DisplayName }: 
                       paletteSeed={stats.normalized_name}
                       imageScale={0.78}
                       imageBg="#FFFFFF"
+                      ringColor={LIGHT_HAIRLINE}
                     />
                     <div style={{ minWidth: 0, flex: 1 }}>
                       <div
