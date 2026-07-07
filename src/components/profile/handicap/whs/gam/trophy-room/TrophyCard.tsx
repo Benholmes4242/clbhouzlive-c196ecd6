@@ -411,7 +411,7 @@ const ShowpieceCard: React.FC<Props> = ({ item, onTap }) => {
   const lockedHint = SHOWPIECE_LOCKED_HINT[item.badgeId] ?? null;
 
   const pillLabel = locked
-    ? 'UNFORGED'
+    ? undefined
     : started
       ? 'IN PROGRESS'
       : isObsidian
