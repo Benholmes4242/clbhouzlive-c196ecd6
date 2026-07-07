@@ -19,6 +19,11 @@ export interface OpenOrigin {
    *  `aspectRatio`. */
   originMediaW?: number;
   originMediaH?: number;
+  /** Media kind of the tapped item. Required so the overlay clone consults
+   *  resolveRestingRect with the correct branch (portrait video → cover,
+   *  landscape video → contain, image → contain). Falls back to `'image'`
+   *  when omitted for backward compat with legacy openers. */
+  mediaType?: 'video' | 'image';
 }
 
 /**
