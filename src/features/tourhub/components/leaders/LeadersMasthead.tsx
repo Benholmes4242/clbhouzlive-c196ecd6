@@ -288,7 +288,7 @@ export function LeadersMasthead({
                     srcCandidates={avatarCandidates}
                     alt={leader.player.full_name}
                     userId={leader.player.id}
-                    hideRing
+                    hairlineRing ringColor={LIGHT_HAIRLINE}
                   />
                 </div>
                 <div
