@@ -2,6 +2,20 @@ import { rarityColor, rarityColorSoft } from '@/lib/gam/visuals';
 import { RARITY_DARK } from '../../tokens';
 import type { BadgeRarity } from '@/lib/gam/types';
 
+/**
+ * THE FORGE — single source of truth for material hues used on tiered cards.
+ * Obsidian is a treatment (black-glass + gold edge), not a hue — it uses
+ * FORGE_GOLD only for glints, pills, and edges.
+ */
+export const FORGE = {
+  bronze: '#C97B4A',
+  silver: '#CDD3DE',
+  emerald: '#12B784',
+  diamond: '#7DD3FC',
+} as const;
+
+export const FORGE_GOLD = '#FBBC2E';
+
 export interface RarityPalette {
   color: string;
   tint: string;
@@ -17,6 +31,11 @@ export interface RarityPalette {
   outerGlow: string | null;
   /** Colour used for the rarity-tinted meta line. */
   metaColor: string;
+  /** Two hero dark stops (mixed with material). Material palettes only. */
+  hero1?: string;
+  hero2?: string;
+  /** PascalCase material name for user-facing strings. */
+  material?: string;
 }
 
 export const RARITY_PALETTE: Record<BadgeRarity, RarityPalette> = {
