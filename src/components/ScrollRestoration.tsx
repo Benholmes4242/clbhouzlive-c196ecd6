@@ -6,7 +6,7 @@
 import { useEffect } from 'react';
 import { useLocation, useNavigationType } from 'react-router-dom';
 
-const scrollPositions = new Map<string, number>();
+export const scrollPositions = new Map<string, number>();
 
 export const ScrollRestoration = () => {
   const location = useLocation();
