@@ -313,7 +313,9 @@ export function MentionsComposerInput({
   onBlur,
   style,
   inputRef,
+  textStyle,
 }: Props) {
+  const mentionsStyle = React.useMemo(() => buildMentionsStyle(textStyle), [textStyle]);
   return (
     <div style={{ position: 'relative', flex: 1, minWidth: 0, ...style }}>
       <MentionsInput
