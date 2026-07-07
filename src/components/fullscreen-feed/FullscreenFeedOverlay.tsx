@@ -615,7 +615,17 @@ export function FullscreenFeedOverlay() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            transition={{ duration: 0.18 }}
+            transition={{
+              // CUT mode: open ease-in uses FS_CUT_FADE_MS (anti-harshness);
+              // close fade stays at 180ms (spec: "or the existing 180ms if
+              // that reads better"). EXPAND mode: symmetric 180ms.
+              duration:
+                FS_TRANSITION_MODE === 'cut'
+                  ? (isOpen ? FS_CUT_FADE_MS / 1000 : 0.18)
+                  : 0.18,
+              ease: 'linear',
+            }}
+
             data-vperf="fs-overlay"
             className="fixed inset-0 z-[200] flex flex-col"
           >
