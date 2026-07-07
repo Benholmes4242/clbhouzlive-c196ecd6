@@ -925,6 +925,7 @@ const AppInner: React.FC = () => {
                           
                           <ScrollToTop />
                           <ScrollRestoration />
+                          <LockAnchorSync />
                           <GlobalAudioProvider>
                               {/* REMOVED: FullscreenPlayerProvider — Phase 5 fullscreen system deleted */}
                                 <TopTenProvider>
