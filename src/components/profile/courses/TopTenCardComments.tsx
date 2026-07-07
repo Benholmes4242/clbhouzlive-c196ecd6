@@ -19,7 +19,7 @@ import { useTopTenComments, TopTenComment } from '@/hooks/useTopTenComments';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { supabase } from '@/integrations/supabase/client';
 import { formatDistanceToNow } from 'date-fns';
-import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
+import { SquircleAvatar, LIGHT_HAIRLINE } from '@/components/ui/SquircleAvatar';
 import { MentionText } from '@/components/comments/MentionText';
 import { useActiveActor } from '@/context/ActiveActorContext';
 import { cn } from '@/lib/utils';
