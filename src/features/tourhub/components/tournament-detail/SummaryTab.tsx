@@ -7,6 +7,7 @@ import { Trophy } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
 import { BatchPlayerAvatar } from '../PlayerAvatar';
+import { LIGHT_HAIRLINE } from '@/components/ui/SquircleAvatar';
 import { EditorialEmpty } from './EditorialEmpty';
 import { useTournamentScoringStats } from '../../hooks/useTourHubData';
 import { playerRoute } from '../../routes';
