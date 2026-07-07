@@ -11,6 +11,7 @@ import { useActiveActor } from '@/context/ActiveActorContext';
 import { toast } from 'sonner';
 import { patchEngagement } from '@/lib/engagementCache';
 import { syncMentionsForContent } from '@/lib/mentions/syncMentions';
+import { stripMentionMarkup } from '@/lib/mentions/format';
 
 const PAGE_SIZE = 20;
 const INITIAL_REPLIES = 3;
