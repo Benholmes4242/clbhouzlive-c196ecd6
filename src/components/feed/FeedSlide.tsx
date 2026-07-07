@@ -479,8 +479,19 @@ const BorrowedFullscreenSlot: React.FC<{
     // Only respond to the wrapper's own size/transform transitions.
     if (e.target !== wrapperRef.current) return;
     if (fitContain) return;
+    // [VPERF] motion trace: phase-1 (expand) done, phase-2 (fit swap) begins.
+    try { vperfMotionMark('expandEnd'); vperfMotionMark('fitSwapStart'); } catch {}
     setFitContain(true);
     try { VideoEngine.setObjectFit(borrow.laneId, 'contain'); } catch {}
+    // Cold rail lanes were configured with capLevelToPlayerSize against the
+    // tile's small rect. Now that the wrapper fills the viewport, nudge
+    // hls.js to re-evaluate the cap so it upshifts to a viewport-appropriate
+    // level (session summary levelSwitches counter climbs after this).
+    try { VideoEngine.nudgeLevelCap(borrow.laneId); } catch {}
+    // Fade completes ~120ms after fit swap; mark end on the next paintable frame.
+    requestAnimationFrame(() => {
+      setTimeout(() => { try { vperfMotionMark('fitSwapEnd'); } catch {} }, 130);
+    });
   }, [fitContain, borrow.laneId]);
 
   const target = targetRectRef.current;
