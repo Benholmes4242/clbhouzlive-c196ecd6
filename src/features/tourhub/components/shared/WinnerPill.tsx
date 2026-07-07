@@ -8,6 +8,7 @@ import { Trophy } from 'lucide-react';
 
 import { AMBER_TINT_12 } from '../../_shared/tokens';
 import { PlayerInitialAvatar } from './PlayerInitialAvatar';
+import { LIGHT_HAIRLINE } from '@/components/ui/SquircleAvatar';
 import { resolvePlayerAvatarCandidates } from '@/features/tourhub/_shared/resolvePlayerAvatar';
 
 interface WinnerPillProps {
