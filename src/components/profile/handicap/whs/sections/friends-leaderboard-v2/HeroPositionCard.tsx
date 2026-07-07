@@ -90,27 +90,39 @@ export const HeroPositionCard: React.FC<Props> = ({
       }}
     >
       {/* Avatar 46 squircle */}
-      <div
-        style={{
-          width: 46,
-          height: 46,
-          borderRadius: '34%',
-          overflow: 'hidden',
-          flexShrink: 0,
-          background: selfPhoto ? T.bg3 : selfFbBg,
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          color: '#fff',
-          fontSize: 15,
-          fontWeight: 800,
-        }}
-      >
-        {selfPhoto ? (
-          <img src={selfPhoto} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-        ) : (
-          <span>{getInitialsFromName(selfRow.friend_name) || '?'}</span>
-        )}
+      <div style={{ position: 'relative', width: 46, height: 46, flexShrink: 0 }}>
+        <div
+          style={{
+            position: 'absolute',
+            inset: 0,
+            borderRadius: '34%',
+            overflow: 'hidden',
+            background: selfPhoto ? T.bg3 : selfFbBg,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            color: '#fff',
+            fontSize: 15,
+            fontWeight: 800,
+          }}
+        >
+          {selfPhoto ? (
+            <img src={selfPhoto} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+          ) : (
+            <span>{getInitialsFromName(selfRow.friend_name) || '?'}</span>
+          )}
+        </div>
+        {/* Traced hairline overlay -- dark canon */}
+        <div
+          aria-hidden
+          style={{
+            position: 'absolute',
+            inset: 0,
+            borderRadius: '34%',
+            border: '1px solid rgba(255,255,255,0.22)',
+            pointerEvents: 'none',
+          }}
+        />
       </div>
 
       {/* Rank cluster + sub-line */}
