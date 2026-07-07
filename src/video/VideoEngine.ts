@@ -334,8 +334,13 @@ class VideoEngineImpl {
 
     // hls.js path.
     if (!lane.hls) {
+      // Rail lanes get the small-tile cold-start profile (lowest startLevel +
+      // capLevelToPlayerSize). Feed-active/fullscreen skip the cap so they
+      // render at manifest-appropriate quality for the viewport.
+      const isRail = laneId.startsWith('rail-');
       const config: Partial<HlsConfig> = {
         ...HLS_CONFIG,
+        ...(isRail ? RAIL_HLS_OVERRIDES : {}),
         startPosition,
         // hls.js expects bps
         abrEwmaDefaultEstimate: 500_000,
