@@ -539,24 +539,66 @@ export const ChampionsDuelCard: React.FC<ChampionsDuelCardProps> = ({
         }}
       >
         {standsAlone ? null : (
-          inlineRows.map((row, i) => (
-            <ChampionsListRow
-              key={`${row.rank}-${i}`}
-              rank={row.rank}
-              name={row.name}
-              photoUrl={row.photoUrl}
-              valueDisplay={row.valueDisplay}
-              unitLabel=""
-              isSelf={row.isSelf}
-              isChampion={false}
-              gapToChampion={row.gapToChampion}
-              holdDuration={null}
-              compact
-              theme={theme}
-              rank30d={row.rank30d}
-              delta={row.delta}
-            />
-          ))
+          <>
+            {/* Column header — matches the compact list row grid so 30D and
+                SCORE sit exactly above their columns in both themes. */}
+            <div
+              style={{
+                display: 'grid',
+                gridTemplateColumns: CHAMPS_GRID_COMPACT,
+                gap: CHAMPS_GRID_GAP_COMPACT,
+                alignItems: 'center',
+                padding: `6px ${CHAMPS_ROW_PADDING_X}px 4px`,
+                borderBottom: '0.5px solid var(--hcp-line)',
+              }}
+            >
+              <span />
+              <span />
+              <span />
+              <span
+                style={{
+                  textAlign: 'center',
+                  fontSize: 9,
+                  fontWeight: 800,
+                  letterSpacing: '0.12em',
+                  textTransform: 'uppercase',
+                  color: INK_55,
+                }}
+              >
+                30D
+              </span>
+              <span
+                style={{
+                  textAlign: 'center',
+                  fontSize: 9,
+                  fontWeight: 800,
+                  letterSpacing: '0.12em',
+                  textTransform: 'uppercase',
+                  color: INK_55,
+                }}
+              >
+                SCORE
+              </span>
+            </div>
+            {inlineRows.map((row, i) => (
+              <ChampionsListRow
+                key={`${row.rank}-${i}`}
+                rank={row.rank}
+                name={row.name}
+                photoUrl={row.photoUrl}
+                valueDisplay={row.valueDisplay}
+                unitLabel=""
+                isSelf={row.isSelf}
+                isChampion={false}
+                gapToChampion={row.gapToChampion}
+                holdDuration={null}
+                compact
+                theme={theme}
+                rank30d={row.rank30d}
+                delta={row.delta}
+              />
+            ))}
+          </>
         )}
         <div style={{ padding: '8px 16px 0', display: 'flex', justifyContent: 'flex-end' }}>
           <button
