@@ -99,6 +99,8 @@ interface SectionRow {
   attained_at: string;
   isSelf: boolean;
   userId: string | null;
+  rank30d: number | null;
+  delta: number | null;
 }
 
 interface Props {
