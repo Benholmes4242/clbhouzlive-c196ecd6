@@ -3,7 +3,7 @@ import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { useSwipeable } from 'react-swipeable';
 import { motion, AnimatePresence } from 'framer-motion';
 import { getScoreTier } from '@/utils/getScoreTier';
-// [VIDEOSTUB] HLSPlayer import removed — poster-only chassis.
+
 import { cn } from '@/lib/utils';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { CreatorCapsule } from '@/components/clubhouse/cinematic/CreatorCapsule';
