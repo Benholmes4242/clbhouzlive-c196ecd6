@@ -176,13 +176,9 @@ export function Composer({
     };
   }, []);
 
-  // Auto-grow caption textarea
-  useEffect(() => {
-    const el = captionRef.current;
-    if (!el) return;
-    el.style.height = 'auto';
-    el.style.height = `${el.scrollHeight}px`;
-  });
+  // Caption autosize is owned by MentionsComposerInput / react-mentions.
+
+
 
 
   // Seed initial media once (net-new compose only — edit mode prefills below).
