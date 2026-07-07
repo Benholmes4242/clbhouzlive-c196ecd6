@@ -191,23 +191,6 @@ export const ChampionsListRow: React.FC<ChampionsListRowProps> = ({
           }}
         >
           <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{name}</span>
-          {showNew && (
-            <span
-              style={{
-                fontSize: 8,
-                fontWeight: 800,
-                color: '#16A34A',
-                background: 'rgba(52,211,153,0.10)',
-                padding: '1px 5px',
-                borderRadius: 4,
-                letterSpacing: '0.10em',
-                textTransform: 'uppercase',
-                flexShrink: 0,
-              }}
-            >
-              New
-            </span>
-          )}
         </div>
         <div
           style={{
