@@ -13,6 +13,7 @@ import {
   type RarityPalette,
 } from '../_shared/rarityPalette';
 import { rarityColor } from '@/lib/gam/visuals';
+import { rgbaOf } from '../TrophyCard';
 import type { TrophyItem } from '../_shared/normalizeTrophyItem';
 import { isShowpiece } from '../_shared/showpieces';
 
