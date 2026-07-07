@@ -47,8 +47,14 @@ export const ChampionsListRow: React.FC<ChampionsListRowProps> = ({
   isNew = false,
   compact = false,
   theme = 'dark',
+  rank30d,
+  delta,
 }) => {
   const isLight = theme === 'light';
+  // "Absent from the 30d board" is treated as NEW; extend the badge trigger
+  // so newcomers 8-30 days old are also flagged. Keeps the delta cell blank
+  // and lets the pill carry the meaning.
+  const showNew = isNew || rank30d == null;
 
   const rowBg = isLight
     ? (isSelf
