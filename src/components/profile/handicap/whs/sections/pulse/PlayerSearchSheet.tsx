@@ -39,28 +39,39 @@ const PlayerRow: React.FC<{ p: PlayerSearchResult; onTap: () => void }> = ({ p, 
       }}
     >
       {p.profile_photo_url ? (
-        <img
-          src={p.profile_photo_url}
-          alt=""
-          style={{ width: 40, height: 40, borderRadius: '34%', objectFit: 'cover', flexShrink: 0 }}
-        />
+        <div style={{ position: 'relative', width: 40, height: 40, flexShrink: 0 }}>
+          <img
+            src={p.profile_photo_url}
+            alt=""
+            style={{ width: 40, height: 40, borderRadius: '34%', objectFit: 'cover' }}
+          />
+          <div
+            aria-hidden
+            style={{ position: 'absolute', inset: 0, borderRadius: '34%', border: '1px solid rgba(255,255,255,0.22)', pointerEvents: 'none' }}
+          />
+        </div>
       ) : (
-        <div
-          style={{
-            width: 40,
-            height: 40,
-            borderRadius: '34%',
-            background: colorFromUserId(p.id),
-            color: '#fff',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            fontSize: 15,
-            fontWeight: 700,
-            flexShrink: 0,
-          }}
-        >
-          {initial}
+        <div style={{ position: 'relative', width: 40, height: 40, flexShrink: 0 }}>
+          <div
+            style={{
+              width: 40,
+              height: 40,
+              borderRadius: '34%',
+              background: colorFromUserId(p.id),
+              color: '#fff',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              fontSize: 15,
+              fontWeight: 700,
+            }}
+          >
+            {initial}
+          </div>
+          <div
+            aria-hidden
+            style={{ position: 'absolute', inset: 0, borderRadius: '34%', border: '1px solid rgba(255,255,255,0.22)', pointerEvents: 'none' }}
+          />
         </div>
       )}
       <div style={{ flex: 1, minWidth: 0 }}>
