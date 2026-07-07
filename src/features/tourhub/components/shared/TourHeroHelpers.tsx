@@ -146,7 +146,8 @@ export function PlayerAvatar({
   });
 
   if (frosted) {
-    // Frosted glass shell — translucent ring/background for dark photo cards.
+    // Frosted glass shell — translucent tint bg only; the ring is drawn by
+    // SquircleAvatar's hairlineRing overlay to avoid a double ring.
     return (
       <div
         style={{
@@ -155,7 +156,6 @@ export function PlayerAvatar({
           borderRadius: '34%',
           overflow: 'hidden',
           flexShrink: 0,
-          border: '1.5px solid rgba(255,255,255,0.18)',
           background: 'rgba(255,255,255,0.06)',
         }}
       >
