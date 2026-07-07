@@ -555,8 +555,8 @@ export function FullscreenFeedOverlay() {
                             backgroundPosition: 'center',
                             filter: 'blur(40px) brightness(0.5) saturate(1.2)',
                             transform: 'scale(1.2)',
-                            opacity: cloneExpanded ? 1 : 0,
-                            transition: 'opacity 300ms cubic-bezier(0.32,0.72,0,1)',
+                            opacity: firstFrameReady ? 0 : 1,
+                            transition: 'opacity 180ms linear',
                             pointerEvents: 'none',
                             zIndex: 1,
                           }}
