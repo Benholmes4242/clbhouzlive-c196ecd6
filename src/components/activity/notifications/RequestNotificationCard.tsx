@@ -131,7 +131,7 @@ export const RequestNotificationCard: React.FC<Props> = ({ notification, onClick
       <div className="flex items-start gap-3">
         <div className="relative shrink-0">
           <div style={{ borderRadius: '34%', lineHeight: 0 }}>
-            <SquircleAvatar src={avatarUrl} alt={actorName || 'User'} size={48} fallback={actorName?.charAt(0) || '?'} hideRing />
+            <SquircleAvatar src={avatarUrl} alt={actorName || 'User'} size={48} fallback={actorName?.charAt(0) || '?'} hairlineRing ringColor={LIGHT_HAIRLINE} />
           </div>
           <span
             className="absolute -bottom-0.5 -right-0.5 h-[20px] w-[20px] rounded-full ring-2 ring-white shadow-sm flex items-center justify-center"
