@@ -647,12 +647,7 @@ function AppRoutes() {
       </Routes>
 
       
-      {/* Video Player Modal - rendered over origin page when navigating from video feed */}
-      {showVideoModal && (
-        <Suspense fallback={null}>
-          <VideoPlayerModal />
-        </Suspense>
-      )}
+      {/* VideoPlayerModal removed in PR-5 (queue family strip). */}
     </>
   );
 }
