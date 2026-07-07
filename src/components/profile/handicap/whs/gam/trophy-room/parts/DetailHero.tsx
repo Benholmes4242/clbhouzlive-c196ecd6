@@ -368,11 +368,11 @@ export const DetailHero: React.FC<Props> = ({ item, index, total, onPrev, onNext
             fontSize: 8,
             fontWeight: 800,
             letterSpacing: '0.12em',
-            color: rarityStripColor,
             ...GAM.TABULAR,
           }}
         >
-          {rarityLabel}
+          <span style={{ color: 'rgba(255,255,255,0.38)' }}>RARITY · </span>
+          <span style={{ color: rarityStripColor }}>{rarityLabel}</span>
         </span>
       </div>
     </div>
