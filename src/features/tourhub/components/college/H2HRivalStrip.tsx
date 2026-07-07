@@ -126,6 +126,7 @@ export function H2HRivalStrip({ normalizedName, className }: H2HRivalStripProps)
                 radius={8}
                 imageScale={0.78}
                 imageBg="#FFFFFF"
+                ringColor={LIGHT_HAIRLINE}
               />
               <div style={{ flex: 1, minWidth: 0 }}>
                 <div style={{ fontSize: 13, fontWeight: 800, color: INK, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', letterSpacing: '-0.015em' }}>
