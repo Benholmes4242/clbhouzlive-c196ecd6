@@ -54,6 +54,7 @@ function prefersReducedMotion(): boolean {
 export function snapshotOrigin(
   el: HTMLElement | null | undefined,
   posterUrl: string | null | undefined,
+  mediaDims?: { w: number; h: number } | null,
 ): OpenOrigin | null {
   if (!el) return null;
   if (prefersReducedMotion()) return null;
@@ -64,11 +65,15 @@ export function snapshotOrigin(
     borderRadius = getComputedStyle(el).borderRadius || '0px';
   } catch {}
   const aspectRatio = rect.height > 0 ? rect.width / rect.height : 1;
+  const mw = mediaDims && mediaDims.w > 0 ? mediaDims.w : 0;
+  const mh = mediaDims && mediaDims.h > 0 ? mediaDims.h : 0;
   return {
     rect: { top: rect.top, left: rect.left, width: rect.width, height: rect.height },
     posterUrl: posterUrl ?? null,
     borderRadius,
     aspectRatio,
+    originMediaW: mw,
+    originMediaH: mh,
   };
 }
 
