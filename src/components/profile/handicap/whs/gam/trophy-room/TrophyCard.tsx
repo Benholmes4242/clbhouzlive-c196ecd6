@@ -117,22 +117,50 @@ const StandardCard: React.FC<Props> = ({ item, onTap }) => {
   const [pressed, setPressed] = useState(false);
   const isAch = item.kind === 'achievement';
   const locked = isAch && !item.earned && (item.currentValue == null || item.currentValue === 0);
-  const c = achievementColor(item);
+  const isTiered = isAch && item.tiers.length > 1;
+
+  // Tiered cards wear the user's CURRENT MATERIAL. One-shots keep rarity colour.
+  const reachedIdx =
+    isTiered && !locked
+      ? (Math.max(1, Math.min(5, (item as Extract<TrophyItem,{kind:'achievement'}>).reachedTier || 1)) as 1|2|3|4|5)
+      : 1;
+  const materialPal = isTiered && !locked ? MATERIAL_PALETTES[reachedIdx] : null;
+  const isObsidian = Boolean(materialPal) && isTiered && !locked && (item as any).reachedTier >= 5;
+  const c = materialPal ? materialPal.color : achievementColor(item);
 
   const bg = locked
     ? T.raised
-    : `linear-gradient(180deg, ${rgbaOf(c, 0.09)}, ${rgbaOf(c, 0.02)}), ${T.card}`;
-  const border = locked ? `1px solid ${T.line}` : `1px solid ${rgbaOf(c, 0.45)}`;
+    : isObsidian
+      ? 'linear-gradient(170deg,#12151C 0%,#07080C 100%)'
+      : `linear-gradient(180deg, ${rgbaOf(c, materialPal ? 0.13 : 0.09)}, ${rgbaOf(c, 0.02)}${materialPal ? ' 70%' : ''}), ${T.card}`;
+  const border = locked
+    ? `1px solid ${T.line}`
+    : isObsidian
+      ? 'none'
+      : `1px solid ${rgbaOf(c, 0.45)}`;
+  const boxShadow = isObsidian
+    ? 'inset 0 1px 0 rgba(255,255,255,0.07), 0 0 0 1px rgba(251,188,46,0.5), 0 6px 22px rgba(0,0,0,0.55)'
+    : materialPal
+      ? `inset 0 1px 0 ${rgbaOf(c, 0.18)}`
+      : undefined;
 
-  const chipBg = locked ? 'transparent' : rgbaOf(c, 0.12);
-  const chipBorder = locked ? `1.5px dashed ${T.faintest}` : `1px solid ${rgbaOf(c, 0.35)}`;
+  const chipBg = locked ? 'transparent' : rgbaOf(c, materialPal ? 0.14 : 0.12);
+  const chipBorder = locked ? `1.5px dashed ${T.faintest}` : `1px solid ${rgbaOf(c, materialPal ? 0.42 : 0.35)}`;
   const glyphColor = locked ? T.glyphLocked : c;
 
   const title = isAch ? item.name : '';
-  const statusLabel = locked ? 'LOCKED' : 'EARNED';
+  const statusLabel = locked
+    ? (isTiered ? 'UNFORGED' : 'LOCKED')
+    : (isTiered ? 'FORGED' : 'EARNED');
   const statusColor = locked ? T.faint : c;
 
-  const pillText = isAch && item.tiers.length > 1 ? `T${Math.max(1, item.reachedTier || 1)}` : '';
+  const pillText = isAch && item.tiers.length > 1
+    ? (materialPal
+        ? (isObsidian
+            ? `OBSIDIAN · T${item.reachedTier}/${item.tiers.length}`
+            : `${materialPal.label} · T${Math.max(1, item.reachedTier || 1)}/${item.tiers.length}`)
+        : `T${Math.max(1, item.reachedTier || 1)}`)
+    : '';
 
   return (
     <button
@@ -143,19 +171,34 @@ const StandardCard: React.FC<Props> = ({ item, onTap }) => {
       onTouchCancel={() => setPressed(false)}
       style={{
         ...CARD_BASE,
+        padding: isTiered && !locked ? '13px 13px 0' : CARD_BASE.padding,
         background: bg,
         border,
+        boxShadow,
         transform: pressed ? 'scale(0.985)' : 'scale(1)',
         transition: 'transform 120ms ease',
       }}
     >
+      {isObsidian && (
+        <div
+          aria-hidden
+          style={{
+            position: 'absolute',
+            top: 0,
+            left: '10%',
+            right: '42%',
+            height: 1.5,
+            background: 'linear-gradient(90deg,transparent,#FBBC2E,transparent)',
+            zIndex: 2,
+          }}
+        />
+      )}
       <Watermark
         iconKey={item.iconKey}
         color={locked ? '#F2F4F7' : c}
-        opacity={locked ? 0.05 : 0.09}
+        opacity={locked ? 0.05 : isObsidian ? 0.08 : materialPal ? 0.10 : 0.09}
       />
 
-      {/* Top row: icon chip + optional tier pill */}
       <div
         style={{
           position: 'relative',
@@ -167,8 +210,8 @@ const StandardCard: React.FC<Props> = ({ item, onTap }) => {
       >
         <div
           style={{
-            width: 30,
-            height: 30,
+            width: materialPal ? 31 : 30,
+            height: materialPal ? 31 : 30,
             borderRadius: 9,
             background: chipBg,
             border: chipBorder,
@@ -193,7 +236,8 @@ const StandardCard: React.FC<Props> = ({ item, onTap }) => {
               fontWeight: 800,
               letterSpacing: '0.12em',
               color: locked ? T.faint : c,
-              border: `1px solid ${locked ? T.line : rgbaOf(c, 0.35)}`,
+              border: `1px solid ${locked ? T.line : rgbaOf(c, materialPal ? 0.42 : 0.35)}`,
+              background: locked ? 'transparent' : materialPal ? rgbaOf(c, 0.10) : 'transparent',
               borderRadius: 6,
               ...GAM.TABULAR,
             }}
@@ -203,7 +247,6 @@ const StandardCard: React.FC<Props> = ({ item, onTap }) => {
         )}
       </div>
 
-      {/* Bottom: title + status */}
       <div style={{ position: 'relative', zIndex: 1, marginTop: 'auto', paddingTop: 12 }}>
         <div
           style={{
@@ -233,6 +276,9 @@ const StandardCard: React.FC<Props> = ({ item, onTap }) => {
           {statusLabel}
         </div>
       </div>
+
+      {/* Rarity footer strip — tiered forged cards only. One-shots keep rarity in body. */}
+      {isTiered && !locked && isAch && <RarityFooterStrip rarity={item.rarity} />}
     </button>
   );
 };
