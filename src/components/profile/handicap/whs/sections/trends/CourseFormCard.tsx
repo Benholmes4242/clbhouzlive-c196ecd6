@@ -231,6 +231,17 @@ const CourseRow: React.FC<{
             {!course.course_thumbnail_image && (
               <CourseImageFallback flagOpacity={0.22} />
             )}
+            {/* Traced hairline overlay -- Ben ruling: course thumbs join squircle canon */}
+            <div
+              aria-hidden
+              style={{
+                position: 'absolute',
+                inset: 0,
+                borderRadius: 9,
+                border: '1px solid rgba(255,255,255,0.22)',
+                pointerEvents: 'none',
+              }}
+            />
           </div>
 
           {/* Name + meta */}

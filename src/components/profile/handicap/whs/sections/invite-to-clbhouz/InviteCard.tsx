@@ -69,11 +69,11 @@ export const InviteCard: React.FC<Props> = ({ friend }) => {
     >
       {(() => {
         const avatarSrc = pickAvatarSrc(friend.friend_thumbnail_url, friend.friend_profile_photo_url);
-        return avatarSrc ? (
+        const inner = avatarSrc ? (
           <div
             style={{
               width: 42, height: 42, borderRadius: 12, overflow: 'hidden',
-              background: CELL_BG, flexShrink: 0,
+              background: CELL_BG,
             }}
           >
             <img src={avatarSrc} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
@@ -81,13 +81,29 @@ export const InviteCard: React.FC<Props> = ({ friend }) => {
         ) : (
           <div
             style={{
-              width: 42, height: 42, borderRadius: 12, flexShrink: 0,
+              width: 42, height: 42, borderRadius: 12,
               background: getAvatarFallbackColor(friend.friend_user_id ?? friend.friend_row_id ?? friend.friend_name),
               display: 'flex', alignItems: 'center', justifyContent: 'center',
               color: '#fff', fontSize: 15, fontWeight: 800,
             }}
           >
             {getInitialsFromName(friend.friend_name) || '?'}
+          </div>
+        );
+        return (
+          <div style={{ position: 'relative', width: 42, height: 42, flexShrink: 0 }}>
+            {inner}
+            {/* Traced hairline overlay -- dark surface canon */}
+            <div
+              aria-hidden
+              style={{
+                position: 'absolute',
+                inset: 0,
+                borderRadius: 12,
+                border: '1px solid rgba(255,255,255,0.22)',
+                pointerEvents: 'none',
+              }}
+            />
           </div>
         );
       })()}

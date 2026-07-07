@@ -107,38 +107,50 @@ export const PulseCard: React.FC<Props> = ({ friend }) => {
     >
       {/* Header row: avatar + name/recency */}
       <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-        {friend.profile_photo_url ? (
-          <img
-            src={friend.profile_photo_url}
-            alt=""
+        <div style={{ position: 'relative', width: 32, height: 34, flexShrink: 0 }}>
+          {friend.profile_photo_url ? (
+            <img
+              src={friend.profile_photo_url}
+              alt=""
+              style={{
+                width: 32,
+                height: 34,
+                borderRadius: '34%',
+                objectFit: 'cover',
+                background: 'var(--hcp-bg-2)',
+                display: 'block',
+              }}
+            />
+          ) : (
+            <div
+              style={{
+                width: 32,
+                height: 34,
+                borderRadius: '34%',
+                background: avatarBg,
+                color: '#fff',
+                fontSize: 14,
+                fontWeight: 700,
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+              }}
+            >
+              {initial}
+            </div>
+          )}
+          {/* Traced hairline overlay -- dark surface canon */}
+          <div
+            aria-hidden
             style={{
-              width: 32,
-              height: 34,
+              position: 'absolute',
+              inset: 0,
               borderRadius: '34%',
-              objectFit: 'cover',
-              background: 'var(--hcp-bg-2)',
-              flexShrink: 0,
+              border: '1px solid rgba(255,255,255,0.22)',
+              pointerEvents: 'none',
             }}
           />
-        ) : (
-          <div
-            style={{
-              width: 32,
-              height: 34,
-              borderRadius: '34%',
-              background: avatarBg,
-              color: '#fff',
-              fontSize: 14,
-              fontWeight: 700,
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              flexShrink: 0,
-            }}
-          >
-            {initial}
-          </div>
-        )}
+        </div>
         <div style={{ minWidth: 0 }}>
           <div
             style={{
