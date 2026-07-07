@@ -108,7 +108,15 @@ export const MiniPlayer: React.FC = () => {
   const handleTogglePlay = useCallback((e: React.MouseEvent) => {
     e.stopPropagation();
     // Inert shell — no engine to drive. Toggles UI only.
-    setIsPlaying(p => !p);
+    // PR-5 one-thing-plays coordination: when the PiP starts, silence engine-managed lanes.
+    // Reverse direction (engine play pausing PiP) is deferred to the Continue Watching migration.
+    setIsPlaying(p => {
+      const next = !p;
+      if (next) {
+        try { VideoEngine.pauseAll(); } catch { /* engine may be uninitialized */ }
+      }
+      return next;
+    });
   }, []);
 
   const handleClose = useCallback((e: React.MouseEvent) => {
