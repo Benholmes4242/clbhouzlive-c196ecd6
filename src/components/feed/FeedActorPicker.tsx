@@ -138,7 +138,6 @@ export const FeedActorPicker: React.FC<FeedActorPickerProps> = ({ value, onChang
                   alt={a.name}
                   userId={a.type === 'personal' ? a.id : null}
                   hairlineRing
-                  hairlineRing
                   ringColor={LIGHT_HAIRLINE}
                 />
                 <span style={{ fontSize: 15, fontWeight: 600, flex: 1 }}>{a.name}</span>
