@@ -4,6 +4,7 @@ import { useSupabaseSession } from './useSupabaseSession';
 
 import { useActiveActor } from '@/context/ActiveActorContext';
 import { patchEngagement } from '@/lib/engagementCache';
+import { stripMentionMarkup } from '@/lib/mentions/format';
 
 export interface PostComment {
   id: string;
@@ -305,7 +306,7 @@ export function usePostEngagement(postId: string | null) {
             data: { 
               post_id: postId, 
               comment_id: newComment?.id,
-              comment_preview: content.slice(0, 100),
+              comment_preview: stripMentionMarkup(content).slice(0, 100),
               commenter_actor_type: actorType,
               commenter_actor_id: actorId,
             },

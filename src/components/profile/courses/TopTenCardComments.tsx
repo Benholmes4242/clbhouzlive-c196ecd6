@@ -119,6 +119,10 @@ export const TopTenCardComments: React.FC<TopTenCardCommentsProps> = ({
           as="span"
           text={comment.body}
           className={`${isReply ? 'text-xs' : 'text-sm'} mt-0.5 block whitespace-pre-wrap`}
+          onMentionTap={(m) => {
+            onClose();
+            navigate(m.entityType === 'business' ? `/business/${m.entityId}` : `/profile/${m.entityId}`);
+          }}
         />
         <div className="flex items-center gap-3 mt-1">
           {!isReply && canInteract && (

@@ -121,6 +121,15 @@ const PostsTabContent: React.FC<PostsTabContentProps> = ({
     handleCommentDeleted,
     getCommentCount,
   } = useClubhouseComments(activeActor);
+  // Profile hosts don't drive activeIndex from a scroll-snap feed reliably, so
+  // remember the exact post the user tapped for the CommentsSheet. Without this
+  // the sheet would gate on `activePost` which can flip to null mid-open (the
+  // sheet appeared to "start opening then dismiss" on personal + business profiles).
+  const [selectedCommentPost, setSelectedCommentPost] = useState<FeedPost | null>(null);
+  const openCommentsForPost = useCallback((post: FeedPost) => {
+    setSelectedCommentPost(post);
+    openComments(post);
+  }, [openComments]);
   const { moreOptionsOpen, setMoreOptionsOpen, handleShare, handleReport, handleNotInterested } =
     useClubhouseShare(user?.id);
 
@@ -282,7 +291,7 @@ const PostsTabContent: React.FC<PostsTabContentProps> = ({
           isFetchingNextPage={isFetchingNextPage}
           onNearEnd={handleNearEnd}
           onLike={(post) => handleLike(post)}
-          onComment={openComments}
+          onComment={openCommentsForPost}
           onShare={(post) => handleShare(post)}
           onProfile={(post) => navigate(getActorRouteByType(post.actorType, post.actorId), { state: post.actorType === 'business' ? { source: 'content' } : undefined })}
           onCourse={(post) => post.courseId && navigate(`/courses/${post.courseId}`)}
@@ -305,23 +314,25 @@ const PostsTabContent: React.FC<PostsTabContentProps> = ({
       )}
 
       {/* ═══ COMMENTS + MORE OPTIONS overlays ═══ */}
+      {selectedCommentPost && (
+        <CommentsSheet
+          isOpen={commentsOpen}
+          onClose={closeComments}
+          postId={selectedCommentPost.id}
+          currentUserId={user?.id}
+          creatorUserId={selectedCommentPost.userId}
+          creatorName={selectedCommentPost.displayName}
+          creatorAvatar={selectedCommentPost.avatarUrl}
+          caption={selectedCommentPost.caption}
+          theme="light"
+          likesCount={getActiveLikeState(selectedCommentPost)?.count ?? selectedCommentPost.likeCount ?? null}
+          likeSource="post"
+          onCommentPosted={() => handleCommentPosted(selectedCommentPost)}
+          onCommentDeleted={() => handleCommentDeleted(selectedCommentPost.id, selectedCommentPost.commentCount)}
+        />
+      )}
       {activePost && filteredPosts.length > 0 && (
         <>
-          <CommentsSheet
-            isOpen={commentsOpen}
-            onClose={closeComments}
-            postId={activePost.id}
-            currentUserId={user?.id}
-            creatorUserId={activePost.userId}
-            creatorName={activePost.displayName}
-            creatorAvatar={activePost.avatarUrl}
-            caption={activePost.caption}
-            theme="light"
-            likesCount={activeLikeState?.count ?? null}
-            likeSource="post"
-            onCommentPosted={() => handleCommentPosted(activePost)}
-            onCommentDeleted={() => handleCommentDeleted(activePost.id, activePost.commentCount)}
-          />
           <Drawer open={moreOptionsOpen} onOpenChange={setMoreOptionsOpen}>
             <DrawerContent
               className="rounded-t-[20px]"
