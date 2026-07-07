@@ -133,6 +133,7 @@ export function CollegeProfilePage() {
                       imageScale={1}
                       imageBg="#FFFFFF"
                       paletteSeed={collegeSlug}
+                      ringColor={LIGHT_HAIRLINE}
                     />
                   </div>
                   {collegeRank && collegeRank <= 99 && (
