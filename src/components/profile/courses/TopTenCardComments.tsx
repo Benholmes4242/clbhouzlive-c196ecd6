@@ -19,7 +19,7 @@ import { useTopTenComments, TopTenComment } from '@/hooks/useTopTenComments';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { supabase } from '@/integrations/supabase/client';
 import { formatDistanceToNow } from 'date-fns';
-import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
+import { SquircleAvatar, LIGHT_HAIRLINE } from '@/components/ui/SquircleAvatar';
 import { MentionText } from '@/components/comments/MentionText';
 import { useActiveActor } from '@/context/ActiveActorContext';
 import { cn } from '@/lib/utils';
@@ -144,7 +144,7 @@ export const TopTenCardComments: React.FC<TopTenCardCommentsProps> = ({
           src={comment.commenter_avatar}
           alt={comment.commenter_name}
           fallback={comment.commenter_name.charAt(0).toUpperCase()}
-          hideRing
+          hairlineRing ringColor={LIGHT_HAIRLINE}
         />
       </div>
       <div className="flex-1 min-w-0">
@@ -204,7 +204,7 @@ export const TopTenCardComments: React.FC<TopTenCardCommentsProps> = ({
           alt={r.display_name}
           userId={r.reactor_id}
           fallback={r.display_name.charAt(0).toUpperCase()}
-          hideRing
+          hairlineRing ringColor={LIGHT_HAIRLINE}
         />
       </div>
       <div className="flex-1 min-w-0">
@@ -468,7 +468,7 @@ export const TopTenCardComments: React.FC<TopTenCardCommentsProps> = ({
                 src={activeActor?.avatarUrl}
                 alt={activeActor?.name || 'You'}
                 fallback={activeActor?.name?.charAt(0) || '?'}
-                hideRing
+                hairlineRing ringColor={LIGHT_HAIRLINE}
               />
               <div className="flex-1 min-w-0 relative">
                 {/* Mention dropdown */}
@@ -494,7 +494,7 @@ export const TopTenCardComments: React.FC<TopTenCardCommentsProps> = ({
                           src={u.avatar}
                           alt={u.display_name || u.username}
                           fallback={u.display_name?.charAt(0)?.toUpperCase() || '?'}
-                          hideRing
+                          hairlineRing ringColor={LIGHT_HAIRLINE}
                         />
                         <div className="flex flex-col min-w-0">
                           <span className="text-sm font-medium truncate" style={{ color: INK }}>
