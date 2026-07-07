@@ -120,7 +120,7 @@ interface Props {
   ownerFirstName?: string | null;
 }
 
-type Tab = 'all' | 'earned';
+type Tab = 'all' | 'earned' | 'locked';
 
 interface DetailContext {
   items: TrophyItem[];
@@ -130,6 +130,7 @@ interface DetailContext {
 const TAB_LABEL: Record<Tab, string> = {
   all: 'All',
   earned: 'Earned',
+  locked: 'Locked',
 };
 
 const Eyebrow: React.FC<{ ownerFirstName?: string | null; isFriendView?: boolean }> = ({
@@ -268,11 +269,18 @@ export const TrophyRoomSheet: React.FC<Props> = ({ userId, viewerUserId, ownerFi
       ),
     [achievementItems],
   );
-  const allAchievements = useMemo(
+  const lockedAchievements = useMemo(
     () =>
       achievementItems.filter(
         (a): a is Extract<TrophyItem, { kind: 'achievement' }> =>
-          a.kind === 'achievement' && (a.earned || (a.currentValue ?? 0) > 0),
+          a.kind === 'achievement' && !a.earned,
+      ),
+    [achievementItems],
+  );
+  const allAchievements = useMemo(
+    () =>
+      achievementItems.filter(
+        (a): a is Extract<TrophyItem, { kind: 'achievement' }> => a.kind === 'achievement',
       ),
     [achievementItems],
   );
@@ -283,7 +291,12 @@ export const TrophyRoomSheet: React.FC<Props> = ({ userId, viewerUserId, ownerFi
   const openDetail = useCallback(
     (item: TrophyItem) => {
       if (item.kind === 'achievement') {
-        const list = tab === 'earned' ? earnedAchievements : allAchievements;
+        const list =
+          tab === 'all'
+            ? allAchievements
+            : tab === 'earned'
+              ? earnedAchievements
+              : lockedAchievements;
         const index = list.findIndex((i) => i.id === item.id);
         setDetailCtx({ items: list, index: Math.max(0, index) });
       } else {
@@ -291,7 +304,7 @@ export const TrophyRoomSheet: React.FC<Props> = ({ userId, viewerUserId, ownerFi
         setDetailCtx({ items: allLegends, index: Math.max(0, index) });
       }
     },
-    [tab, earnedAchievements, allAchievements, allLegends],
+    [tab, earnedAchievements, allAchievements, lockedAchievements, allLegends],
   );
 
   const isLoading = badgesLoading || legendsLoading;
@@ -390,10 +403,14 @@ export const TrophyRoomSheet: React.FC<Props> = ({ userId, viewerUserId, ownerFi
           className="hcp-tab-row"
           role="tablist"
         >
-          {(['all', 'earned'] as Tab[]).map((key) => {
+          {(['all', 'earned', 'locked'] as Tab[]).map((key) => {
             const active = tab === key;
             const count =
-              key === 'all' ? allAchievements.length : earnedAchievements.length;
+              key === 'all'
+                ? allAchievements.length
+                : key === 'earned'
+                  ? earnedAchievements.length
+                  : lockedAchievements.length;
             return (
               <button
                 key={key}
@@ -764,6 +781,33 @@ export const TrophyRoomSheet: React.FC<Props> = ({ userId, viewerUserId, ownerFi
             );
           })()}
 
+          {!isLoading && tab === 'locked' && (() => {
+            const lifetime = selectLifetime(lockedAchievements);
+            const lockedGroups = groupAchievementsByCategory(lockedAchievements);
+            if (lockedAchievements.length === 0) {
+              return <EmptyState message="No locked achievements." />;
+            }
+            return (
+              <>
+                {lifetime.length > 0 && (
+                  <>
+                    <TrophyGroupLabel label="Lifetime" count={lifetime.length} />
+                    <Grid items={lifetime} onTap={openDetail} columns={2} />
+                  </>
+                )}
+                {CATEGORY_ORDER.map((cat) => {
+                  const items = lockedGroups[cat];
+                  if (!items || items.length === 0) return null;
+                  return (
+                    <React.Fragment key={`locked-${cat}`}>
+                      <TrophyGroupLabel label={CATEGORY_LABEL[cat]} count={items.length} />
+                      <Grid items={items} onTap={openDetail} />
+                    </React.Fragment>
+                  );
+                })}
+              </>
+            );
+          })()}
         </div>
       </GamSheet>
 
