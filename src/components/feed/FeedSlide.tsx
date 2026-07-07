@@ -598,6 +598,22 @@ const FullscreenMediaPager: React.FC<{
           useFullscreenFeedStore.getState().demoteBorrow();
         }
         setActivePagerIdx(idx);
+        // [VPERF] S5 swipe.pager — measure horizontal settle onto a video
+        // page → next 'playing' event on the fullscreen lane. The borrow
+        // (if any) was just demoted by this same swipe on the very first
+        // move; all non-opening pages bind the fullscreen lane, so we arm
+        // 'fullscreen' unconditionally. Image pages: no span.
+        const nextItem = media[idx];
+        if (nextItem && nextItem.type === 'video') {
+          const spanId = vperfNextId(`swipe.pager:${post.id}:${idx}`);
+          vperfStart(spanId, 'swipe.pager', {
+            postId: post.id,
+            mediaIndex: idx,
+            pageKind: 'video',
+          });
+          vperfArmLane('fullscreen', { spanId, endOn: 'firstFrame', phase: 'firstFrame' });
+          vperfArmLane('fullscreen', { spanId, endOn: 'playing' });
+        }
       });
     };
     el.addEventListener('scroll', onScroll, { passive: true });
