@@ -99,7 +99,7 @@ function WinnerCard({ winner, runnerUp, headshotMap, tournamentName }: { winner:
 
               {/* Squircle headshot */}
               <div style={{ width: '50px', height: '50px', borderRadius: '34%', overflow: 'hidden', flexShrink: 0, background: INK_TINT_06 }}>
-                <BatchPlayerAvatar playerId={winner.player?.id || ''} playerName={winner.player?.full_name || ''} size="md" />
+                <BatchPlayerAvatar playerId={winner.player?.id || ''} playerName={winner.player?.full_name || ''} size="md" ringColor={LIGHT_HAIRLINE} />
               </div>
 
               <div style={{ textAlign: 'right' as const, flexShrink: 0 }}>
