@@ -519,6 +519,8 @@ export const ChampionsDuelCard: React.FC<ChampionsDuelCardProps> = ({
               holdDuration={null}
               compact
               theme={theme}
+              rank30d={row.rank30d}
+              delta={row.delta}
             />
           ))
         )}
