@@ -58,6 +58,7 @@ import {
 } from '@/services/drafts/draftService';
 import { uploadAllDraftMedia } from '@/services/drafts/draftMediaUpload';
 import type { DraftCourseData } from '@/services/drafts/types';
+import { MentionsComposerInput } from '@/components/mentions/MentionsComposerInput';
 
 const MAX_CAPTION = 2000;
 const MAX_POST_MEDIA = 10;
