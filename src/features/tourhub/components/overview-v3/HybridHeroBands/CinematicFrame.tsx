@@ -188,7 +188,7 @@ function SoloRowDark({
         alt={name}
         userId={entry?.player?.id ?? null}
         size={26}
-        hideRing
+        hairlineRing
       />
 
       <span
