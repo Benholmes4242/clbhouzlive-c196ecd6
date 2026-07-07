@@ -111,7 +111,8 @@ export function setStatusBarStyleColor(intent: 'light' | 'dark' | 'auto', hexCol
   if (!navigator.userAgent.toLowerCase().includes('median')) return;
   try {
     if (window.median?.statusbar?.set) {
-      window.median.statusbar.set({
+      // Deliberately omit `overlay`/`blur` — boot-locked, must not be re-sent.
+      (window.median.statusbar.set as (opts: Record<string, unknown>) => void)({
         style: toMedianStyle(intent),
         color: toAARRGGBB(hexColor),
       });
