@@ -268,18 +268,11 @@ export const TrophyRoomSheet: React.FC<Props> = ({ userId, viewerUserId, ownerFi
       ),
     [achievementItems],
   );
-  const lockedAchievements = useMemo(
-    () =>
-      achievementItems.filter(
-        (a): a is Extract<TrophyItem, { kind: 'achievement' }> =>
-          a.kind === 'achievement' && !a.earned,
-      ),
-    [achievementItems],
-  );
   const allAchievements = useMemo(
     () =>
       achievementItems.filter(
-        (a): a is Extract<TrophyItem, { kind: 'achievement' }> => a.kind === 'achievement',
+        (a): a is Extract<TrophyItem, { kind: 'achievement' }> =>
+          a.kind === 'achievement' && (a.earned || (a.currentValue ?? 0) > 0),
       ),
     [achievementItems],
   );
