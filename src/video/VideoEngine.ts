@@ -443,9 +443,7 @@ class VideoEngineImpl {
           const gapId = vperfNextId(`loop.gap:${lane.id}`);
           vperfStart(gapId, 'loop.gap', { laneId: lane.id, postId: lane.postId });
           vperfSessionSuppressNextStall(lane.id);
-          import('@/perf/vperf').then((m) => {
-            m.vperfArmLane(lane.id, { spanId: gapId, endOn: 'playing' });
-          }).catch(() => {});
+          vperfArmLane(lane.id, { spanId: gapId, endOn: 'playing' });
           try { lane.el.currentTime = 0; } catch { /* noop */ }
           const p = lane.el.play();
           if (p && typeof (p as Promise<void>).catch === 'function') {
