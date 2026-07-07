@@ -433,24 +433,6 @@ export const TopTenCardComments: React.FC<TopTenCardCommentsProps> = ({
                 hairlineRing ringColor={LIGHT_HAIRLINE}
               />
               <div className="flex-1 min-w-0 relative">
-                <MentionAutocomplete
-                  isActive={mention.isActive}
-                  suggestions={mention.suggestions}
-                  isLoading={mention.isLoading}
-                  inputRef={inputRef}
-                  onSelect={(sel) => {
-                    const { newText, newCaret } = mention.applySelection(sel);
-                    setDraft(newText);
-                    setCaret(newCaret);
-                    requestAnimationFrame(() => {
-                      const el = inputRef.current;
-                      if (el) {
-                        el.focus();
-                        el.setSelectionRange(newCaret, newCaret);
-                      }
-                    });
-                  }}
-                />
                 <div
                   style={{
                     display: 'flex', alignItems: 'flex-end', gap: 4,
@@ -459,29 +441,15 @@ export const TopTenCardComments: React.FC<TopTenCardCommentsProps> = ({
                     minHeight: 42,
                   }}
                 >
-                  <textarea
-                    ref={inputRef}
+                  <MentionsComposerInput
                     value={draft}
-                    onChange={(e) => {
-                      handleDraftChange(e.target.value);
-                      setCaret(e.target.selectionStart ?? e.target.value.length);
-                    }}
-                    onKeyUp={(e) => setCaret((e.target as HTMLTextAreaElement).selectionStart ?? 0)}
-                    onClick={(e) => setCaret((e.target as HTMLTextAreaElement).selectionStart ?? 0)}
-                    onKeyDown={(e) => {
-                      if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); handleSubmit(); }
-                    }}
+                    onChange={setDraft}
+                    onSubmit={handleSubmit}
                     placeholder={replyingTo ? `Reply to ${replyingTo.name}...` : 'Add a comment...'}
-                    rows={1}
                     maxLength={500}
-                    className="flex-1 min-w-0 bg-transparent outline-none resize-none placeholder:text-[color:#94A3B8]"
-                    style={{
-                      fontSize: 14, color: INK,
-                      minHeight: 20, maxHeight: 120,
-                      lineHeight: 1.4, padding: '8px 0',
-                      fontFamily: 'inherit',
-                    }}
+                    inputRef={(el) => { (inputRef as any).current = el; }}
                   />
+
 
                   <div className="flex items-center shrink-0">
                     <button
