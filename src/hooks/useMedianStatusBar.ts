@@ -61,24 +61,81 @@ function toMedianStyle(intent: string): string {
   return intent;                            // 'auto' passes through untouched
 }
 
-function applyMedianStatusBar(style: string, hexColor: string, overlay: boolean, blur: boolean) {
+/**
+ * Boot-time overlay lock (fs.open jolt fix — 2026-07-07).
+ *
+ * The Median native bridge resizes the WebView viewport when the `overlay`
+ * flag on `statusbar.set` flips. That resize lands ASYNC (30–80ms after the
+ * call) and, when it happened mid-animation on the fs.open path, caused the
+ * feed's 100dvh slides to re-lay-out inside the expanding wrapper — visible
+ * as a "jump + resize" jolt.
+ *
+ * Fix: fire `overlay:true` ONCE at app boot with a neutral transparent tint.
+ * Every subsequent status-bar update MUST pass style + color only (never the
+ * `overlay` key). With the flag never changing again, the viewport is stable
+ * across route transitions and overlay opens, and the SnapFeed 100dvh
+ * height stops re-resolving mid-transition.
+ */
+let statusBarOverlayBooted = false;
+export function ensureStatusBarOverlayBooted(): void {
+  if (statusBarOverlayBooted) return;
   if (typeof window === 'undefined') return;
-  if (!navigator.userAgent.toLowerCase().includes('median')) return;
-
+  if (!navigator.userAgent.toLowerCase().includes('median')) {
+    statusBarOverlayBooted = true;
+    return;
+  }
   try {
-    const medianStyle = toMedianStyle(style);
-    const params = {
-      style: medianStyle,
-      color: toAARRGGBB(hexColor),
-      overlay,
-      blur,
-    };
+    // style/color here are throwaway — they get overwritten immediately by
+    // the first route/overlay setStyleColor call. What matters is overlay:true.
     if (window.median?.statusbar?.set) {
-      window.median.statusbar.set(params);
+      window.median.statusbar.set({
+        style: 'light',
+        color: '00000000',
+        overlay: true,
+        blur: false,
+      });
+      statusBarOverlayBooted = true;
     }
   } catch {
-    // Median bridge not ready — fail silently
+    // Bridge not ready — the ready callback below retries.
   }
+}
+
+/**
+ * Style/color-only setter — never touches the `overlay` flag. All non-boot
+ * status-bar call sites (App route effect, openWithOrigin, FullscreenFeedOverlay)
+ * must go through this helper so the boot-locked overlay flag is preserved.
+ */
+export function setStatusBarStyleColor(intent: 'light' | 'dark' | 'auto', hexColor: string): void {
+  if (typeof window === 'undefined') return;
+  if (!navigator.userAgent.toLowerCase().includes('median')) return;
+  try {
+    if (window.median?.statusbar?.set) {
+      window.median.statusbar.set({
+        style: toMedianStyle(intent),
+        color: toAARRGGBB(hexColor),
+      });
+    }
+  } catch {
+    // Bridge not ready — silent no-op.
+  }
+}
+
+// Kick a boot-attempt at module load, then again on the Median ready callback.
+if (typeof window !== 'undefined') {
+  ensureStatusBarOverlayBooted();
+  const prev = window.median_library_ready;
+  window.median_library_ready = () => {
+    if (typeof prev === 'function') prev();
+    ensureStatusBarOverlayBooted();
+  };
+}
+
+function applyMedianStatusBar(style: string, hexColor: string, _overlay: boolean, _blur: boolean) {
+  // Overlay/blur flags are boot-locked (see ensureStatusBarOverlayBooted).
+  // This legacy path is retained for the useMedianStatusBar hook signature
+  // but now only forwards style + color.
+  setStatusBarStyleColor(style as 'light' | 'dark' | 'auto', hexColor);
 }
 
 /**
