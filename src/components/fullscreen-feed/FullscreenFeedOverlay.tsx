@@ -391,12 +391,16 @@ export function FullscreenFeedOverlay() {
       // is no post-expand shrink.
       const raf = requestAnimationFrame(() => {
         const vp = getCurrentViewport();
-        // origin.aspectRatio is stored as tile width/height; feed tiles are
-        // cropped to the media's display aspect, so this is a faithful
-        // proxy for the intrinsic media aspect. When unknown → fall back to
-        // full viewport (matches legacy behaviour).
-        const ar = origin.aspectRatio > 0 ? origin.aspectRatio : 0;
-        const [mw, mh] = ar > 0 ? [ar * 1000, 1000] : [0, 0];
+        // Prefer the tapped media's intrinsic dims (threaded from
+        // mediaItems by openWithOrigin). Grid tiles are uniform and
+        // cover-crop, so origin.aspectRatio is only a faithful proxy on
+        // FEED cards — use it as the fallback. Final fallback: full
+        // viewport (legacy behaviour).
+        const omw = origin.originMediaW ?? 0;
+        const omh = origin.originMediaH ?? 0;
+        const useMediaDims = omw > 0 && omh > 0;
+        const ar = useMediaDims ? omw / omh : (origin.aspectRatio > 0 ? origin.aspectRatio : 0);
+        const [mw, mh] = useMediaDims ? [omw, omh] : (ar > 0 ? [ar * 1000, 1000] : [0, 0]);
         const resting = resolveRestingRect(mw, mh, vp, 'image');
         setTargetRect({
           top: resting.top,
