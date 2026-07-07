@@ -487,6 +487,3 @@ export function MentionsComposerInput({
   );
 }
 
-// Suppress unused-import lint if tree-shaken; ReactDOM re-export kept
-// intentionally minimal so consumers know createPortal path exists.
-void ReactDOM;
