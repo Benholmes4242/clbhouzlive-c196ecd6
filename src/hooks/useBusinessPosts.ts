@@ -3,21 +3,6 @@ import { supabase } from '@/integrations/supabase/client';
 import { postKeys } from '@/queryKeys/posts';
 import { buildVisibilityFilter } from '@/utils/visibilityFilter';
 
-export interface PostTag {
-  id: string;
-  post_id: string;
-  tagged_entity_id: string;
-  start_index: number | null;
-  end_index: number | null;
-  taggable_entities: {
-    id: string;
-    entity_type: 'user' | 'business' | 'golf_club';
-    entity_id: string;
-    name: string;
-    username: string | null;
-  } | null;
-}
-
 export interface BusinessPost {
   id: string;
   content: string | null;
@@ -38,7 +23,6 @@ export interface BusinessPost {
     poster_url: string | null;
     studio_edits: any;
   }>;
-  post_tags: PostTag[];
 }
 
 /**
