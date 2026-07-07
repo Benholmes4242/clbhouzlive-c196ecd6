@@ -24,8 +24,7 @@ import { SquircleAvatar, LIGHT_HAIRLINE } from '@/components/ui/SquircleAvatar';
 import { useActiveActor } from '@/context/ActiveActorContext';
 import { cn } from '@/lib/utils';
 import { MentionText } from '@/components/mentions/MentionText';
-import { MentionAutocomplete } from '@/components/mentions/MentionAutocomplete';
-import { useMentionAutocomplete } from '@/lib/mentions/useMentionAutocomplete';
+import { MentionsComposerInput } from '@/components/mentions/MentionsComposerInput';
 
 // ── Dispatch tokens (mirrored from CommentsSheet) ──
 const INK = '#0F172A';
