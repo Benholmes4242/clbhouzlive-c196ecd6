@@ -298,6 +298,7 @@ const RARITY_LABEL: Record<string, string> = {
 const RarityFooterStrip: React.FC<{ rarity: string }> = ({ rarity }) => {
   const rc = rarityColor[rarity as keyof typeof rarityColor] ?? '#94A3B8';
   const label = RARITY_LABEL[rarity] ?? String(rarity).toUpperCase();
+  const muted = rgbaOf(rc, 0.55);
   return (
     <div
       style={{
@@ -316,7 +317,7 @@ const RarityFooterStrip: React.FC<{ rarity: string }> = ({ rarity }) => {
         style={{
           width: 6,
           height: 6,
-          background: rc,
+          background: muted,
           transform: 'rotate(45deg)',
           display: 'inline-block',
           flexShrink: 0,
@@ -327,11 +328,11 @@ const RarityFooterStrip: React.FC<{ rarity: string }> = ({ rarity }) => {
           fontSize: 8,
           fontWeight: 800,
           letterSpacing: '0.12em',
+          color: muted,
           ...GAM.TABULAR,
         }}
       >
-        <span style={{ color: 'rgba(255,255,255,0.38)' }}>RARITY · </span>
-        <span style={{ color: rc }}>{label}</span>
+        RARITY · {label}
       </span>
     </div>
   );
