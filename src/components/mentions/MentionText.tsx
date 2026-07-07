@@ -11,7 +11,6 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { parseMentionSegments } from '@/lib/mentions/format';
-import { unlockBodyScroll } from '@/lib/bodyScrollLock';
 import { cn } from '@/lib/utils';
 
 interface Props {
