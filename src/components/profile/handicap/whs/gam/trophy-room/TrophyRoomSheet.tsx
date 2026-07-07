@@ -553,6 +553,46 @@ export const TrophyRoomSheet: React.FC<Props> = ({ userId, viewerUserId, ownerFi
                 </div>
               </div>
             )}
+
+            {/* FORGE INVENTORY — chip per material the user holds. */}
+            {forgeInventory.length > 0 && (
+              <div
+                style={{
+                  marginTop: 12,
+                  display: 'flex',
+                  flexWrap: 'wrap',
+                  gap: 6,
+                }}
+              >
+                {forgeInventory.map(({ tier, count }) => {
+                  const p = MATERIAL_PALETTES[tier];
+                  const chipColor = tier === 5 ? FORGE_GOLD : p.color;
+                  return (
+                    <span
+                      key={tier}
+                      style={{
+                        padding: '4px 8px',
+                        borderRadius: 999,
+                        fontSize: 9,
+                        fontWeight: 800,
+                        letterSpacing: '0.10em',
+                        color: chipColor,
+                        border: `1px solid ${
+                          tier === 5 ? 'rgba(251,188,46,0.38)' : `rgba(${hexToRgb(p.color)},0.38)`
+                        }`,
+                        background:
+                          tier === 5
+                            ? 'rgba(251,188,46,0.08)'
+                            : `rgba(${hexToRgb(p.color)},0.08)`,
+                        ...GAM.TABULAR,
+                      }}
+                    >
+                      {count}× {p.label}
+                    </span>
+                  );
+                })}
+              </div>
+            )}
           </div>
 
           {/* NEXT UNLOCK spotlight (was pinned in the previous layout) */}
