@@ -257,7 +257,7 @@ export function PlayoffStrip({ count, score }: PlayoffStripProps) {
               display: 'inline-flex',
             }}
           >
-            <SquircleAvatar size={36} hideRing hairlineRing ringColor={GOLD} />
+            <SquircleAvatar size={36} hairlineRing ringColor={GOLD} />
           </div>
         ))}
       </div>
