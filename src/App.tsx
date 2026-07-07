@@ -306,6 +306,12 @@ const CollegeComparePage = lazy(() => import("./features/tourhub/pages").then(m 
 
 // Continue Watching mini-player (queue drawer + full-screen modal deleted in PR-5).
 const MiniPlayer = lazy(() => import("./components/videos/MiniPlayer"));
+
+// PR-5: /video/:videoId is a post-id deep link. Preserve old shared links via unified /post viewer.
+const VideoIdToPostRedirect: React.FC = () => {
+  const { videoId } = useParams<{ videoId: string }>();
+  return <Navigate to={videoId ? `/post/${videoId}` : '/watch'} replace />;
+};
 const SeasonShop = lazy(() => import("./pages/SeasonShop"));
 const ChallengesPage = lazy(() => import("./pages/ChallengesPage"));
 
