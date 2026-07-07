@@ -10,6 +10,7 @@ import { renderBadgeIcon } from '../badgeIcons';
 import { TrophyDetailSheet } from './TrophyDetailSheet';
 import { normalizeBadge, normalizeLegend, type TrophyItem } from './_shared/normalizeTrophyItem';
 import { isShowpiece, LIFETIME_ORDER } from './_shared/showpieces';
+import { MATERIAL_PALETTES, FORGE_GOLD, materialNameForTier } from './_shared/rarityPalette';
 import type { BadgeCategory } from '@/lib/gam/types';
 
 const AMBER = '#F7931E';
