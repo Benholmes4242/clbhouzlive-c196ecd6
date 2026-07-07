@@ -540,14 +540,10 @@ export const TrophyRoomSheet: React.FC<Props> = ({ userId, viewerUserId, ownerFi
             )}
           </div>
 
-          {/* NEXT FORGE spotlight — destination material tint. */}
+          {/* NEXT UNLOCK banner — muted three-line stack. */}
           {nextUnlock && (
             <div style={{ padding: '4px 0 12px' }}>
               {(() => {
-                // Selection rule: nextUnlock = highest fractional progress across
-                // ANY not-fully-maxed tiered/one-shot achievement (tiebreak: fewer
-                // remainingUnits, then alpha). Tiered target uses destination
-                // material colour; one-shot fallback uses rarity colour.
                 const isOneShot = nextUnlock.item.tiers.length === 1;
                 const destColor = isOneShot
                   ? (rarityColor[nextUnlock.item.rarity as keyof typeof rarityColor] ?? '#94A3B8')
@@ -555,11 +551,13 @@ export const TrophyRoomSheet: React.FC<Props> = ({ userId, viewerUserId, ownerFi
                     ? (nextForgeDestTier === 5 ? FORGE_GOLD : nextForgeDestPal.color)
                     : AMBER;
                 const destRgb = hexToRgb(destColor);
-                const destMaterial = !isOneShot ? (nextForgeDestPal?.material ?? '') : '';
                 const remaining = Math.max(
                   0,
                   (nextUnlock.item.nextThreshold ?? 0) - (nextUnlock.item.currentValue ?? 0),
                 );
+                const line3Label = isOneShot
+                  ? String(nextUnlock.item.rarity).toUpperCase()
+                  : (nextForgeDestPal?.material ?? '');
                 return (
                   <button
                     type="button"
@@ -573,7 +571,7 @@ export const TrophyRoomSheet: React.FC<Props> = ({ userId, viewerUserId, ownerFi
                       borderRadius: 14,
                       background: CARD,
                       border: `1px solid ${LINE}`,
-                      borderLeft: `3px solid ${destColor}`,
+                      borderLeft: `3px solid rgba(${destRgb},0.35)`,
                       cursor: 'pointer',
                       textAlign: 'left',
                       fontFamily: GAM.FONT_GEIST,
@@ -585,12 +583,12 @@ export const TrophyRoomSheet: React.FC<Props> = ({ userId, viewerUserId, ownerFi
                         width: 36,
                         height: 36,
                         borderRadius: 10,
-                        background: `rgba(${destRgb},0.14)`,
-                        border: `1px solid rgba(${destRgb},0.42)`,
+                        background: 'rgba(255,255,255,0.06)',
+                        border: `1px solid ${LINE}`,
                         display: 'flex',
                         alignItems: 'center',
                         justifyContent: 'center',
-                        color: destColor,
+                        color: DIM,
                         flexShrink: 0,
                       }}
                     >
@@ -601,16 +599,16 @@ export const TrophyRoomSheet: React.FC<Props> = ({ userId, viewerUserId, ownerFi
                         style={{
                           fontSize: 8.5,
                           fontWeight: 800,
-                          letterSpacing: '0.14em',
-                          color: destColor,
+                          letterSpacing: '0.12em',
+                          color: FAINT,
+                          textTransform: 'uppercase',
                         }}
                       >
                         NEXT UNLOCK
-
                       </div>
                       <div
                         style={{
-                          fontSize: 14,
+                          fontSize: 13.5,
                           fontWeight: 800,
                           color: INK,
                           marginTop: 2,
@@ -621,11 +619,40 @@ export const TrophyRoomSheet: React.FC<Props> = ({ userId, viewerUserId, ownerFi
                           ...GAM.TABULAR,
                         }}
                       >
-                        {destMaterial ? `${destMaterial} ${nextUnlock.item.name}` : nextUnlock.item.name} · {remaining} to go
+                        {nextUnlock.item.name}
                       </div>
                       <div
                         style={{
-                          marginTop: 8,
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: 6,
+                          marginTop: 4,
+                        }}
+                      >
+                        <span
+                          style={{
+                            display: 'inline-block',
+                            width: 6,
+                            height: 6,
+                            background: `rgba(${destRgb},0.55)`,
+                            transform: 'rotate(45deg)',
+                            flexShrink: 0,
+                          }}
+                        />
+                        <span
+                          style={{
+                            fontSize: 11,
+                            fontWeight: 700,
+                            color: DIM,
+                            ...GAM.TABULAR,
+                          }}
+                        >
+                          {line3Label ? `${line3Label} · ${remaining} to go` : `${remaining} to go`}
+                        </span>
+                      </div>
+                      <div
+                        style={{
+                          marginTop: 6,
                           width: '100%',
                           height: 3,
                           borderRadius: 99,
@@ -637,7 +664,7 @@ export const TrophyRoomSheet: React.FC<Props> = ({ userId, viewerUserId, ownerFi
                           style={{
                             width: `${nextUnlock.frac * 100}%`,
                             height: '100%',
-                            background: destColor,
+                            background: `rgba(${destRgb},0.55)`,
                             borderRadius: 99,
                           }}
                         />
