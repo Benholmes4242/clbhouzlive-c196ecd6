@@ -81,6 +81,7 @@ export function IdentityCard({ player, stats, college, statDisplay = 'rank', cla
               playerName={player.full_name}
               
               size="md"
+              ringColor={LIGHT_HAIRLINE}
             />
             {/* Rank Badge - tiered colors with subtle glow */}
             {hasValidRank && (
