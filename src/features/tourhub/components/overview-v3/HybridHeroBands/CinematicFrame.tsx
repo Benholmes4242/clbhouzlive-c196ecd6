@@ -384,7 +384,7 @@ function ChampionRowDark({
           userId={entry?.player?.id ?? null}
           size={38}
           ringColor={GOLD}
-          thinRing
+          hairlineRing
         />
       </span>
       <div style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', gap: 2 }}>
