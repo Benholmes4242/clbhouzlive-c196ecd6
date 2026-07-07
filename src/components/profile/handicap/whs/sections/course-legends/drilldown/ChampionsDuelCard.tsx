@@ -174,7 +174,10 @@ export const ChampionsDuelCard: React.FC<ChampionsDuelCardProps> = ({
 }) => {
   const isLight = theme === 'light';
   const avatarRing = isLight ? 'rgba(15,23,42,0.12)' : 'rgba(255,255,255,0.22)';
-  const trackRing = isLight ? 'rgba(15,23,42,0.10)' : 'rgba(255,255,255,0.22)';
+  // Track mini-avatars: preserve current dark rendering (slate 10%) so the
+  // handicap compete drilldown stays pixel-for-pixel. Light theme uses the
+  // canonical ink-12% traced hairline.
+  const trackRing = isLight ? 'rgba(15,23,42,0.12)' : 'rgba(15,23,42,0.10)';
   const champion = rows[0];
   const defending = champion?.isSelf === true;
   const standsAlone = rows.length === 1;
