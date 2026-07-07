@@ -4,7 +4,7 @@ import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useActiveActor } from '@/context/ActiveActorContext';
 import { useArchivedConversations } from '@/hooks/useArchivedConversations';
 import { useTypingIndicator } from '@/hooks/useTypingIndicator';
-import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
+import { SquircleAvatar, LIGHT_HAIRLINE } from '@/components/ui/SquircleAvatar';
 import { Skeleton } from '@/components/ui/skeleton';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
 import { MessageCircle, Plus, Archive, ChevronDown, ChevronRight, Users, BellOff, Building2, Search, Check } from 'lucide-react';
@@ -411,7 +411,8 @@ export function ConversationList({
                   alt={name}
                   size={52}
                   fallback={initials}
-                  hideRing
+                  hairlineRing
+                  ringColor={LIGHT_HAIRLINE}
                 />
               )}
               

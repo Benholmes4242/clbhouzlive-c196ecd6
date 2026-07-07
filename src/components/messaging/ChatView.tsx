@@ -9,7 +9,7 @@ import { useActiveActor } from '@/context/ActiveActorContext';
 import { useTypingIndicator } from '@/hooks/useTypingIndicator';
 import { useMessageReactions } from '@/hooks/useMessageReactions';
 import { usePresence } from '@/hooks/usePresence';
-import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
+import { SquircleAvatar, LIGHT_HAIRLINE } from '@/components/ui/SquircleAvatar';
 import { Skeleton } from '@/components/ui/skeleton';
 import { ChevronLeft, Loader2, ChevronDown, MoreVertical, Users, MapPin } from 'lucide-react';
 import { MessageBubble } from './MessageBubble';
@@ -504,7 +504,8 @@ export function ChatView({ conversationId, onBack }: ChatViewProps) {
                 alt={headerInfo.name}
                 size={38}
                 fallback={headerInfo.initials}
-                hideRing
+                hairlineRing
+                ringColor={LIGHT_HAIRLINE}
               />
             )}
             {/* Online dot for DMs */}

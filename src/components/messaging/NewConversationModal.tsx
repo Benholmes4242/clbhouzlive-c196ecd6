@@ -4,7 +4,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useMessagingContext } from '@/contexts/MessagingContext';
 import { BottomSheet } from '@/components/ui/BottomSheet';
-import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
+import { SquircleAvatar, LIGHT_HAIRLINE } from '@/components/ui/SquircleAvatar';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { cn } from '@/lib/utils';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -262,7 +262,8 @@ export function NewConversationModal({
             alt={userProfile.display_name || userProfile.username || 'User'}
             userId={userProfile.id}
             size={44}
-            hideRing
+            hairlineRing
+            ringColor={LIGHT_HAIRLINE}
           />
           <div className="flex-1 min-w-0">
             <div className="flex items-center" style={{ gap: 6 }}>
@@ -356,7 +357,8 @@ export function NewConversationModal({
             alt={s.display_name || s.username || 'User'}
             userId={s.id}
             size={44}
-            hideRing
+            hairlineRing
+            ringColor={LIGHT_HAIRLINE}
           />
           <div className="flex-1 min-w-0">
             <div className="flex items-center" style={{ gap: 6 }}>
@@ -430,7 +432,8 @@ export function NewConversationModal({
             alt={userProfile.display_name || userProfile.username || 'User'}
             userId={userProfile.id}
             size={44}
-            hideRing
+            hairlineRing
+            ringColor={LIGHT_HAIRLINE}
           />
           <div className="flex-1 min-w-0">
             <span className="truncate block" style={{ fontSize: 14, fontWeight: 600, color: INK }}>
@@ -664,7 +667,8 @@ export function NewConversationModal({
                       alt={u.display_name || u.username || 'User'}
                       userId={u.id}
                       size={22}
-                      hideRing
+                      hairlineRing
+                      ringColor={LIGHT_HAIRLINE}
                     />
                     <span
                       className="truncate"
@@ -730,7 +734,8 @@ export function NewConversationModal({
                           alt={u.display_name || 'User'}
                           userId={u.id}
                           size={24}
-                          hideRing
+                          hairlineRing
+                          ringColor={LIGHT_HAIRLINE}
                         />
                       </div>
                     ))}
