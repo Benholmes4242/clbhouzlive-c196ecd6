@@ -352,6 +352,7 @@ export const StatOfTheWeek = memo(function StatOfTheWeek() {
                   tourCode="pga"
                   size="xl"
                   className="!w-full !h-full !rounded-[34%]"
+                  ringColor={LIGHT_HAIRLINE}
                 />
 
               </div>
