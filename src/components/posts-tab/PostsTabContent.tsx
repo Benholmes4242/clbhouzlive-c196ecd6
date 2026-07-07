@@ -121,6 +121,15 @@ const PostsTabContent: React.FC<PostsTabContentProps> = ({
     handleCommentDeleted,
     getCommentCount,
   } = useClubhouseComments(activeActor);
+  // Profile hosts don't drive activeIndex from a scroll-snap feed reliably, so
+  // remember the exact post the user tapped for the CommentsSheet. Without this
+  // the sheet would gate on `activePost` which can flip to null mid-open (the
+  // sheet appeared to "start opening then dismiss" on personal + business profiles).
+  const [selectedCommentPost, setSelectedCommentPost] = useState<FeedPost | null>(null);
+  const openCommentsForPost = useCallback((post: FeedPost) => {
+    setSelectedCommentPost(post);
+    openComments(post);
+  }, [openComments]);
   const { moreOptionsOpen, setMoreOptionsOpen, handleShare, handleReport, handleNotInterested } =
     useClubhouseShare(user?.id);
 
