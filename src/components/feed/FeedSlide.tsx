@@ -9,6 +9,7 @@ import { useVideoLane } from '@/video/useVideoLane';
 import { VideoEngine } from '@/video/VideoEngine';
 import { useFullscreenFeedStore } from '@/store/fullscreenFeedStore';
 import { isPerfEnabled } from '@/perf/navTiming';
+import { vperfStart, vperfArmLane, vperfNextId } from '@/perf/vperf';
 
 import { usePostViewTracker } from '@/hooks/usePostViewTracker';
 
