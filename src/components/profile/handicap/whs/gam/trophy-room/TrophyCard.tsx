@@ -296,9 +296,8 @@ const RARITY_LABEL: Record<string, string> = {
 };
 
 const RarityFooterStrip: React.FC<{ rarity: string }> = ({ rarity }) => {
-  const rc = rarityColor[rarity as keyof typeof rarityColor] ?? '#94A3B8';
   const label = RARITY_LABEL[rarity] ?? String(rarity).toUpperCase();
-  const muted = rgbaOf(rc, 0.55);
+  const muted = 'rgba(242,244,247,0.38)';
   return (
     <div
       style={{

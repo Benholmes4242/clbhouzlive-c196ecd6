@@ -358,7 +358,7 @@ export const DetailHero: React.FC<Props> = ({ item, index, total, onPrev, onNext
           style={{
             width: 6,
             height: 6,
-            background: rgbaOf(rarityStripColor, 0.55),
+            background: 'rgba(242,244,247,0.38)',
             transform: 'rotate(45deg)',
             display: 'inline-block',
             flexShrink: 0,
@@ -369,7 +369,7 @@ export const DetailHero: React.FC<Props> = ({ item, index, total, onPrev, onNext
             fontSize: 8,
             fontWeight: 800,
             letterSpacing: '0.12em',
-            color: rgbaOf(rarityStripColor, 0.55),
+            color: 'rgba(242,244,247,0.38)',
             ...GAM.TABULAR,
           }}
         >
