@@ -101,6 +101,16 @@ async function searchMentions(
   render(merged);
 }
 
+export interface MentionsTextStyle {
+  fontSize?: number;
+  lineHeight?: string | number;
+  padding?: string;
+  color?: string;
+  caretColor?: string;
+  minHeight?: number;
+  maxHeight?: number;
+}
+
 interface Props {
   value: string; // canonical markup
   onChange: (markup: string) => void;
@@ -114,6 +124,8 @@ interface Props {
   /** Optional inline style on the outer wrapper (rare; prefer wrapping in a styled div). */
   style?: React.CSSProperties;
   inputRef?: (el: HTMLTextAreaElement | null) => void;
+  /** Optional text metric overrides (post caption 18px, review verdict 16px, etc.). */
+  textStyle?: MentionsTextStyle;
 }
 
 /**
@@ -130,16 +142,12 @@ interface Props {
  * via `caretColor`) so exactly one copy of the text is ever painted
  * — the overlay is the sole visible layer.
  */
-const sharedText = {
-  fontFamily: 'inherit',
+const DEFAULT_TEXT_STYLE: Required<Pick<MentionsTextStyle, 'fontSize' | 'lineHeight' | 'padding' | 'color' | 'caretColor'>> = {
   fontSize: 14,
-  fontWeight: 400,
   lineHeight: '20px',
-  letterSpacing: '0px',
   padding: '8px 0',
-  border: '0px solid transparent',
-  boxSizing: 'border-box' as const,
-  margin: 0,
+  color: INK,
+  caretColor: INK,
 };
 
 const mentionsStyle = {
