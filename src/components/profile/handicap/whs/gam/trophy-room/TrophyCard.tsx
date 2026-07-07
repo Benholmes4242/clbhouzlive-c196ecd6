@@ -27,13 +27,22 @@ const T = {
 const AMBER = '#F7931E';
 
 // ─── rgba helper ────────────────────────────────────────────────────────
-export function rgbaOf(hex: string, a: number): string {
-  if (!hex || !hex.startsWith('#')) return hex;
-  const h = hex.replace('#', '');
-  const r = parseInt(h.slice(0, 2), 16);
-  const g = parseInt(h.slice(2, 4), 16);
-  const b = parseInt(h.slice(4, 6), 16);
-  return `rgba(${r}, ${g}, ${b}, ${a})`;
+// Accepts '#RRGGBB' or 'rgb[a](r,g,b[,a])'. Applying a new alpha to an
+// rgba() input REPLACES its alpha — this prevents high-alpha palette
+// entries (e.g. common='rgba(148,163,184,0.6)') from leaking as a solid
+// light slab when passed through a "wash" stop.
+export function rgbaOf(input: string, a: number): string {
+  if (!input) return input;
+  if (input.startsWith('#')) {
+    const h = input.replace('#', '');
+    const r = parseInt(h.slice(0, 2), 16);
+    const g = parseInt(h.slice(2, 4), 16);
+    const b = parseInt(h.slice(4, 6), 16);
+    return `rgba(${r}, ${g}, ${b}, ${a})`;
+  }
+  const m = input.match(/rgba?\(\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)/i);
+  if (m) return `rgba(${m[1]}, ${m[2]}, ${m[3]}, ${a})`;
+  return input;
 }
 
 interface Props {
@@ -41,10 +50,18 @@ interface Props {
   onTap: (item: TrophyItem) => void;
 }
 
-// Rarity color for an achievement (falls back to amber).
+// Slate accent used for common / unmapped rarities so earned cards still
+// read as EARNED (never identical to #20242E locked ghosts).
+const SLATE_ACCENT = '#F2F4F7';
+
+// Rarity color for an achievement (falls back to slate for common /
+// unmapped, so tint stops render as a subtle wash rather than a slab).
 function achievementColor(item: TrophyItem): string {
   if (item.kind === 'achievement') {
-    return rarityColor[item.rarity] || AMBER;
+    if (item.rarity === 'common') return SLATE_ACCENT;
+    const c = rarityColor[item.rarity];
+    if (!c || !c.startsWith('#')) return SLATE_ACCENT;
+    return c;
   }
   return AMBER;
 }
@@ -67,7 +84,7 @@ const Watermark: React.FC<{ iconKey: string; color: string; opacity: number }> =
       zIndex: 0,
     }}
   >
-    {renderBadgeIcon(iconKey, 96, 'currentColor')}
+    {renderBadgeIcon(iconKey, 96, 'currentColor', 1.6)}
   </div>
 );
 
@@ -286,7 +303,7 @@ const ShowpieceCard: React.FC<Props> = ({ item, onTap }) => {
   // Whisper wash for in-progress/tiered — stops 0.07/0.015
   const bg = locked
     ? T.raised
-    : `linear-gradient(180deg, ${rgbaOf(c, 0.07)}, ${rgbaOf(c, 0.015)}), ${T.card}`;
+    : `linear-gradient(180deg, ${rgbaOf(c, 0.09)}, ${rgbaOf(c, 0.02)}), ${T.card}`;
   const border = locked ? `1px solid ${T.line}` : `1px solid ${rgbaOf(c, 0.35)}`;
   const chipBg = locked ? 'transparent' : rgbaOf(c, 0.12);
   const chipBorder = locked ? `1.5px dashed ${T.faintest}` : `1px solid ${rgbaOf(c, 0.35)}`;
@@ -479,7 +496,7 @@ const LegendCard: React.FC<Props> = ({ item, onTap }) => {
       onTouchCancel={() => setPressed(false)}
       style={{
         ...CARD_BASE,
-        background: `linear-gradient(180deg, ${rgbaOf(c, 0.08)}, ${rgbaOf(c, 0.015)}), ${T.card}`,
+        background: `linear-gradient(180deg, ${rgbaOf(c, 0.09)}, ${rgbaOf(c, 0.02)}), ${T.card}`,
         border: `1px solid ${rgbaOf(c, 0.40)}`,
         transform: pressed ? 'scale(0.985)' : 'scale(1)',
         transition: 'transform 120ms ease',
