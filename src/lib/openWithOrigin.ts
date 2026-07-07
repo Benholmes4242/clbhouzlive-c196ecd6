@@ -55,6 +55,7 @@ export function snapshotOrigin(
   el: HTMLElement | null | undefined,
   posterUrl: string | null | undefined,
   mediaDims?: { w: number; h: number } | null,
+  mediaType?: 'video' | 'image' | null,
 ): OpenOrigin | null {
   if (!el) return null;
   if (prefersReducedMotion()) return null;
@@ -74,6 +75,7 @@ export function snapshotOrigin(
     aspectRatio,
     originMediaW: mw,
     originMediaH: mh,
+    mediaType: mediaType ?? undefined,
   };
 }
 
