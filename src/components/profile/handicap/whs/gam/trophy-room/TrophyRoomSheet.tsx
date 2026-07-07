@@ -10,6 +10,7 @@ import { renderBadgeIcon } from '../badgeIcons';
 import { TrophyDetailSheet } from './TrophyDetailSheet';
 import { normalizeBadge, normalizeLegend, type TrophyItem } from './_shared/normalizeTrophyItem';
 import { isShowpiece, LIFETIME_ORDER } from './_shared/showpieces';
+import { MATERIAL_PALETTES, FORGE_GOLD, materialNameForTier } from './_shared/rarityPalette';
 import type { BadgeCategory } from '@/lib/gam/types';
 
 const AMBER = '#F7931E';
@@ -18,6 +19,15 @@ const DIM = 'rgba(242,244,247,0.55)';
 const FAINT = 'rgba(242,244,247,0.38)';
 const CARD = '#1B1E27';
 const LINE = 'rgba(255,255,255,0.08)';
+
+function hexToRgb(hex: string): string {
+  const h = hex.replace('#', '');
+  if (h.length !== 6) return '148,163,184';
+  const r = parseInt(h.slice(0, 2), 16);
+  const g = parseInt(h.slice(2, 4), 16);
+  const b = parseInt(h.slice(4, 6), 16);
+  return `${r},${g},${b}`;
+}
 
 
 const CATEGORY_ORDER: BadgeCategory[] = [
@@ -77,13 +87,28 @@ function selectLifetime(
   items: Extract<TrophyItem, { kind: 'achievement' }>[],
 ): Extract<TrophyItem, { kind: 'achievement' }>[] {
   const showpieces = items.filter((a) => isShowpiece(a.badgeId));
+  // Material desc (obsidian>diamond>emerald>silver>bronze), then progress-to-next
+  // desc, then alpha. Locked (reachedTier 0 && no value) drop to the tail.
   showpieces.sort((a, b) => {
-    const aIdx = LIFETIME_ORDER.indexOf(a.badgeId);
-    const bIdx = LIFETIME_ORDER.indexOf(b.badgeId);
-    if (aIdx === -1 && bIdx === -1) return 0;
-    if (aIdx === -1) return 1;
-    if (bIdx === -1) return -1;
-    return aIdx - bIdx;
+    const aLocked = !a.earned && (a.currentValue ?? 0) === 0;
+    const bLocked = !b.earned && (b.currentValue ?? 0) === 0;
+    if (aLocked !== bLocked) return aLocked ? 1 : -1;
+    const am = a.reachedTier || 0;
+    const bm = b.reachedTier || 0;
+    if (am !== bm) return bm - am;
+    const progFrac = (x: Extract<TrophyItem, { kind: 'achievement' }>) => {
+      const total = x.tiers.length;
+      if (!total || x.reachedTier >= total) return -1;
+      const prev = x.reachedTier > 0 ? x.tiers[x.reachedTier - 1].threshold : 0;
+      const next = x.tiers[x.reachedTier].threshold;
+      const denom = next - prev;
+      if (denom <= 0) return 0;
+      return Math.max(0, Math.min(1, ((x.currentValue ?? 0) - prev) / denom));
+    };
+    const ap = progFrac(a);
+    const bp = progFrac(b);
+    if (ap !== bp) return bp - ap;
+    return a.name.localeCompare(b.name);
   });
   return showpieces;
 }
@@ -324,6 +349,27 @@ export const TrophyRoomSheet: React.FC<Props> = ({ userId, viewerUserId, ownerFi
     return withProgress[0] ?? null;
   }, [allAchievements]);
 
+  // FORGE INVENTORY — chip count per material the user currently holds.
+  // Counts each earned tiered badge at its current reachedTier material.
+  const forgeInventory = useMemo(() => {
+    const counts: Record<1 | 2 | 3 | 4 | 5, number> = { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0 };
+    for (const a of earnedAchievements) {
+      if (a.tiers.length <= 1) continue;
+      const t = a.reachedTier;
+      if (t >= 1 && t <= 5) counts[t as 1 | 2 | 3 | 4 | 5]++;
+    }
+    // Material rank desc: obsidian>diamond>emerald>silver>bronze
+    return [5, 4, 3, 2, 1]
+      .map((k) => ({ tier: k as 1 | 2 | 3 | 4 | 5, count: counts[k as 1 | 2 | 3 | 4 | 5] }))
+      .filter((r) => r.count > 0);
+  }, [earnedAchievements]);
+
+  // NEXT FORGE — destination material for the spotlight (tier the user is chasing).
+  const nextForgeDestTier = nextUnlock
+    ? Math.max(1, Math.min(5, (nextUnlock.item.reachedTier || 0) + 1)) as 1 | 2 | 3 | 4 | 5
+    : null;
+  const nextForgeDestPal = nextForgeDestTier ? MATERIAL_PALETTES[nextForgeDestTier] : null;
+
   return (
     <>
       <GamSheet open={open} onClose={() => setOpen(false)}>
@@ -516,93 +562,147 @@ export const TrophyRoomSheet: React.FC<Props> = ({ userId, viewerUserId, ownerFi
                 </div>
               </div>
             )}
-          </div>
 
-          {/* NEXT UNLOCK spotlight (was pinned in the previous layout) */}
-          {nextUnlock && (
-            <div style={{ padding: '4px 0 12px' }}>
-              <button
-                type="button"
-                onClick={() => openDetail(nextUnlock.item)}
+            {/* FORGE INVENTORY — chip per material the user holds. */}
+            {forgeInventory.length > 0 && (
+              <div
                 style={{
-                  width: '100%',
+                  marginTop: 12,
                   display: 'flex',
-                  alignItems: 'center',
-                  gap: 12,
-                  padding: '12px 14px',
-                  borderRadius: 14,
-                  background: CARD,
-                  border: `1px solid ${LINE}`,
-                  borderLeft: `3px solid ${AMBER}`,
-                  cursor: 'pointer',
-                  textAlign: 'left',
-                  fontFamily: GAM.FONT_GEIST,
-                  color: INK,
+                  flexWrap: 'wrap',
+                  gap: 6,
                 }}
               >
-                <div
-                  style={{
-                    width: 36,
-                    height: 36,
-                    borderRadius: 10,
-                    background: 'rgba(247,147,30,0.10)',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    color: AMBER,
-                    flexShrink: 0,
-                  }}
-                >
-                  {renderBadgeIcon(nextUnlock.item.iconKey, 16, 'currentColor')}
-                </div>
-                <div style={{ flex: 1, minWidth: 0 }}>
-                  <div
+                {forgeInventory.map(({ tier, count }) => {
+                  const p = MATERIAL_PALETTES[tier];
+                  const chipColor = tier === 5 ? FORGE_GOLD : p.color;
+                  return (
+                    <span
+                      key={tier}
+                      style={{
+                        padding: '4px 8px',
+                        borderRadius: 999,
+                        fontSize: 9,
+                        fontWeight: 800,
+                        letterSpacing: '0.10em',
+                        color: chipColor,
+                        border: `1px solid ${
+                          tier === 5 ? 'rgba(251,188,46,0.38)' : `rgba(${hexToRgb(p.color)},0.38)`
+                        }`,
+                        background:
+                          tier === 5
+                            ? 'rgba(251,188,46,0.08)'
+                            : `rgba(${hexToRgb(p.color)},0.08)`,
+                        ...GAM.TABULAR,
+                      }}
+                    >
+                      {count}× {p.label}
+                    </span>
+                  );
+                })}
+              </div>
+            )}
+          </div>
+
+          {/* NEXT FORGE spotlight — destination material tint. */}
+          {nextUnlock && (
+            <div style={{ padding: '4px 0 12px' }}>
+              {(() => {
+                const destColor = nextForgeDestPal
+                  ? (nextForgeDestTier === 5 ? FORGE_GOLD : nextForgeDestPal.color)
+                  : AMBER;
+                const destRgb = hexToRgb(destColor);
+                const destMaterial = nextForgeDestPal?.material ?? '';
+                const remaining = Math.max(
+                  0,
+                  (nextUnlock.item.nextThreshold ?? 0) - (nextUnlock.item.currentValue ?? 0),
+                );
+                return (
+                  <button
+                    type="button"
+                    onClick={() => openDetail(nextUnlock.item)}
                     style={{
-                      fontSize: 8.5,
-                      fontWeight: 800,
-                      letterSpacing: '0.14em',
-                      color: AMBER,
-                    }}
-                  >
-                    NEXT UNLOCK
-                  </div>
-                  <div
-                    style={{
-                      fontSize: 14,
-                      fontWeight: 800,
-                      color: INK,
-                      marginTop: 2,
-                      lineHeight: 1.2,
-                      whiteSpace: 'nowrap',
-                      overflow: 'hidden',
-                      textOverflow: 'ellipsis',
-                      ...GAM.TABULAR,
-                    }}
-                  >
-                    {nextUnlock.item.name} · {nextUnlock.item.currentValue} of {nextUnlock.item.nextThreshold}
-                  </div>
-                  <div
-                    style={{
-                      marginTop: 8,
                       width: '100%',
-                      height: 3,
-                      borderRadius: 99,
-                      background: 'rgba(255,255,255,0.07)',
-                      overflow: 'hidden',
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: 12,
+                      padding: '12px 14px',
+                      borderRadius: 14,
+                      background: CARD,
+                      border: `1px solid ${LINE}`,
+                      borderLeft: `3px solid ${AMBER}`,
+                      cursor: 'pointer',
+                      textAlign: 'left',
+                      fontFamily: GAM.FONT_GEIST,
+                      color: INK,
                     }}
                   >
                     <div
                       style={{
-                        width: `${nextUnlock.frac * 100}%`,
-                        height: '100%',
-                        background: AMBER,
-                        borderRadius: 99,
+                        width: 36,
+                        height: 36,
+                        borderRadius: 10,
+                        background: `rgba(${destRgb},0.14)`,
+                        border: `1px solid rgba(${destRgb},0.42)`,
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        color: destColor,
+                        flexShrink: 0,
                       }}
-                    />
-                  </div>
-                </div>
-                <ChevronRight size={16} color={FAINT} style={{ flexShrink: 0 }} />
-              </button>
+                    >
+                      {renderBadgeIcon(nextUnlock.item.iconKey, 16, 'currentColor')}
+                    </div>
+                    <div style={{ flex: 1, minWidth: 0 }}>
+                      <div
+                        style={{
+                          fontSize: 8.5,
+                          fontWeight: 800,
+                          letterSpacing: '0.14em',
+                          color: AMBER,
+                        }}
+                      >
+                        NEXT FORGE
+                      </div>
+                      <div
+                        style={{
+                          fontSize: 14,
+                          fontWeight: 800,
+                          color: INK,
+                          marginTop: 2,
+                          lineHeight: 1.2,
+                          whiteSpace: 'nowrap',
+                          overflow: 'hidden',
+                          textOverflow: 'ellipsis',
+                          ...GAM.TABULAR,
+                        }}
+                      >
+                        {destMaterial ? `${destMaterial} ${nextUnlock.item.name}` : nextUnlock.item.name} · {remaining} to go
+                      </div>
+                      <div
+                        style={{
+                          marginTop: 8,
+                          width: '100%',
+                          height: 3,
+                          borderRadius: 99,
+                          background: 'rgba(255,255,255,0.07)',
+                          overflow: 'hidden',
+                        }}
+                      >
+                        <div
+                          style={{
+                            width: `${nextUnlock.frac * 100}%`,
+                            height: '100%',
+                            background: destColor,
+                            borderRadius: 99,
+                          }}
+                        />
+                      </div>
+                    </div>
+                    <ChevronRight size={16} color={FAINT} style={{ flexShrink: 0 }} />
+                  </button>
+                );
+              })()}
             </div>
           )}
 

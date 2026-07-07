@@ -110,7 +110,7 @@ export const AchievementBody: React.FC<Props> = ({ item, viewerUserId }) => {
 
       {item.tiers.length > 1 && (
         <div>
-          <Eyebrow>TIERS</Eyebrow>
+          <Eyebrow>THE FORGE</Eyebrow>
           <div>
             {item.tiers.map((t) => (
               <TierRow key={t.tier} tier={t} metric={item.counterMetric} isShowpiece={isShowpiece(item.badgeId)} />

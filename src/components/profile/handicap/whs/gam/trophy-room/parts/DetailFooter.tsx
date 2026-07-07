@@ -2,6 +2,7 @@ import React from 'react';
 import { Share2, MapPin } from 'lucide-react';
 import { GAM } from '../../tokens';
 import type { TrophyItem } from '../_shared/normalizeTrophyItem';
+import { materialNameForTier } from '../_shared/rarityPalette';
 
 interface Props {
   item: TrophyItem;
@@ -27,6 +28,12 @@ const baseBtn: React.CSSProperties = {
 
 export const DetailFooter: React.FC<Props> = ({ item, onShare, onOpenCourse }) => {
   const isLegend = item.kind === 'legend';
+  const isTiered = item.kind === 'achievement' && item.tiers.length > 1;
+  const material =
+    isTiered && item.kind === 'achievement' && item.reachedTier >= 1
+      ? materialNameForTier(item.reachedTier)
+      : '';
+  const shareLabel = isTiered && material ? `Share your ${material}` : 'Share';
   return (
     <div
       style={{
@@ -44,7 +51,7 @@ export const DetailFooter: React.FC<Props> = ({ item, onShare, onOpenCourse }) =
         style={{ ...baseBtn, background: GAM.AMBER, color: '#1A1300' }}
       >
         <Share2 size={16} />
-        Share
+        {shareLabel}
       </button>
       {isLegend && (
         <button

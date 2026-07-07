@@ -10,6 +10,12 @@ import {
   SHOWPIECE_LOCKED_HINT,
   shortenShowpieceCaption,
 } from './_shared/showpieces';
+import {
+  MATERIAL_PALETTES,
+  FORGE_GOLD,
+  materialNameForTier,
+  paletteForShowpiece,
+} from './_shared/rarityPalette';
 
 // ─── Tokens (hardcoded — sheet portal, no var(--hcp-*)) ─────────────────
 const T = {
@@ -111,22 +117,50 @@ const StandardCard: React.FC<Props> = ({ item, onTap }) => {
   const [pressed, setPressed] = useState(false);
   const isAch = item.kind === 'achievement';
   const locked = isAch && !item.earned && (item.currentValue == null || item.currentValue === 0);
-  const c = achievementColor(item);
+  const isTiered = isAch && item.tiers.length > 1;
+
+  // Tiered cards wear the user's CURRENT MATERIAL. One-shots keep rarity colour.
+  const reachedIdx =
+    isTiered && !locked
+      ? (Math.max(1, Math.min(5, (item as Extract<TrophyItem,{kind:'achievement'}>).reachedTier || 1)) as 1|2|3|4|5)
+      : 1;
+  const materialPal = isTiered && !locked ? MATERIAL_PALETTES[reachedIdx] : null;
+  const isObsidian = Boolean(materialPal) && isTiered && !locked && (item as any).reachedTier >= 5;
+  const c = materialPal ? materialPal.color : achievementColor(item);
 
   const bg = locked
     ? T.raised
-    : `linear-gradient(180deg, ${rgbaOf(c, 0.09)}, ${rgbaOf(c, 0.02)}), ${T.card}`;
-  const border = locked ? `1px solid ${T.line}` : `1px solid ${rgbaOf(c, 0.45)}`;
+    : isObsidian
+      ? 'linear-gradient(170deg,#12151C 0%,#07080C 100%)'
+      : `linear-gradient(180deg, ${rgbaOf(c, materialPal ? 0.13 : 0.09)}, ${rgbaOf(c, 0.02)}${materialPal ? ' 70%' : ''}), ${T.card}`;
+  const border = locked
+    ? `1px solid ${T.line}`
+    : isObsidian
+      ? 'none'
+      : `1px solid ${rgbaOf(c, 0.45)}`;
+  const boxShadow = isObsidian
+    ? 'inset 0 1px 0 rgba(255,255,255,0.07), 0 0 0 1px rgba(251,188,46,0.5), 0 6px 22px rgba(0,0,0,0.55)'
+    : materialPal
+      ? `inset 0 1px 0 ${rgbaOf(c, 0.18)}`
+      : undefined;
 
-  const chipBg = locked ? 'transparent' : rgbaOf(c, 0.12);
-  const chipBorder = locked ? `1.5px dashed ${T.faintest}` : `1px solid ${rgbaOf(c, 0.35)}`;
+  const chipBg = locked ? 'transparent' : rgbaOf(c, materialPal ? 0.14 : 0.12);
+  const chipBorder = locked ? `1.5px dashed ${T.faintest}` : `1px solid ${rgbaOf(c, materialPal ? 0.42 : 0.35)}`;
   const glyphColor = locked ? T.glyphLocked : c;
 
   const title = isAch ? item.name : '';
-  const statusLabel = locked ? 'LOCKED' : 'EARNED';
+  const statusLabel = locked
+    ? (isTiered ? 'UNFORGED' : 'LOCKED')
+    : (isTiered ? 'FORGED' : 'EARNED');
   const statusColor = locked ? T.faint : c;
 
-  const pillText = isAch && item.tiers.length > 1 ? `T${Math.max(1, item.reachedTier || 1)}` : '';
+  const pillText = isAch && item.tiers.length > 1
+    ? (materialPal
+        ? (isObsidian
+            ? `OBSIDIAN · T${item.reachedTier}/${item.tiers.length}`
+            : `${materialPal.label} · T${Math.max(1, item.reachedTier || 1)}/${item.tiers.length}`)
+        : `T${Math.max(1, item.reachedTier || 1)}`)
+    : '';
 
   return (
     <button
@@ -137,19 +171,34 @@ const StandardCard: React.FC<Props> = ({ item, onTap }) => {
       onTouchCancel={() => setPressed(false)}
       style={{
         ...CARD_BASE,
+        padding: isTiered && !locked ? '13px 13px 0' : CARD_BASE.padding,
         background: bg,
         border,
+        boxShadow,
         transform: pressed ? 'scale(0.985)' : 'scale(1)',
         transition: 'transform 120ms ease',
       }}
     >
+      {isObsidian && (
+        <div
+          aria-hidden
+          style={{
+            position: 'absolute',
+            top: 0,
+            left: '10%',
+            right: '42%',
+            height: 1.5,
+            background: 'linear-gradient(90deg,transparent,#FBBC2E,transparent)',
+            zIndex: 2,
+          }}
+        />
+      )}
       <Watermark
         iconKey={item.iconKey}
         color={locked ? '#F2F4F7' : c}
-        opacity={locked ? 0.05 : 0.09}
+        opacity={locked ? 0.05 : isObsidian ? 0.08 : materialPal ? 0.10 : 0.09}
       />
 
-      {/* Top row: icon chip + optional tier pill */}
       <div
         style={{
           position: 'relative',
@@ -161,8 +210,8 @@ const StandardCard: React.FC<Props> = ({ item, onTap }) => {
       >
         <div
           style={{
-            width: 30,
-            height: 30,
+            width: materialPal ? 31 : 30,
+            height: materialPal ? 31 : 30,
             borderRadius: 9,
             background: chipBg,
             border: chipBorder,
@@ -187,7 +236,8 @@ const StandardCard: React.FC<Props> = ({ item, onTap }) => {
               fontWeight: 800,
               letterSpacing: '0.12em',
               color: locked ? T.faint : c,
-              border: `1px solid ${locked ? T.line : rgbaOf(c, 0.35)}`,
+              border: `1px solid ${locked ? T.line : rgbaOf(c, materialPal ? 0.42 : 0.35)}`,
+              background: locked ? 'transparent' : materialPal ? rgbaOf(c, 0.10) : 'transparent',
               borderRadius: 6,
               ...GAM.TABULAR,
             }}
@@ -197,7 +247,6 @@ const StandardCard: React.FC<Props> = ({ item, onTap }) => {
         )}
       </div>
 
-      {/* Bottom: title + status */}
       <div style={{ position: 'relative', zIndex: 1, marginTop: 'auto', paddingTop: 12 }}>
         <div
           style={{
@@ -227,12 +276,69 @@ const StandardCard: React.FC<Props> = ({ item, onTap }) => {
           {statusLabel}
         </div>
       </div>
+
+      {/* Rarity footer strip — tiered forged cards only. One-shots keep rarity in body. */}
+      {isTiered && !locked && isAch && <RarityFooterStrip rarity={item.rarity} />}
     </button>
   );
 };
 
 // ─────────────────────────────────────────────────────────────────────────
-// ShowpieceCard — tiered / in-progress
+// RarityFooterStrip — full-bleed strip at the base of forged/one-shot cards.
+// (Option B: gem + rarity word, tinted by rarity.)
+// ─────────────────────────────────────────────────────────────────────────
+const RARITY_LABEL: Record<string, string> = {
+  common: 'COMMON',
+  uncommon: 'UNCOMMON',
+  rare: 'RARE',
+  epic: 'EPIC',
+  legendary: 'LEGENDARY',
+};
+
+const RarityFooterStrip: React.FC<{ rarity: string }> = ({ rarity }) => {
+  const rc = rarityColor[rarity as keyof typeof rarityColor] ?? '#94A3B8';
+  const label = RARITY_LABEL[rarity] ?? String(rarity).toUpperCase();
+  return (
+    <div
+      style={{
+        position: 'relative',
+        zIndex: 1,
+        margin: '10px -13px 0',
+        padding: '7px 13px',
+        borderTop: '1px solid rgba(255,255,255,0.08)',
+        display: 'flex',
+        alignItems: 'center',
+        gap: 6,
+      }}
+    >
+      <span
+        aria-hidden
+        style={{
+          width: 6,
+          height: 6,
+          background: rc,
+          transform: 'rotate(45deg)',
+          display: 'inline-block',
+          flexShrink: 0,
+        }}
+      />
+      <span
+        style={{
+          fontSize: 8,
+          fontWeight: 800,
+          letterSpacing: '0.12em',
+          color: rc,
+          ...GAM.TABULAR,
+        }}
+      >
+        {label}
+      </span>
+    </div>
+  );
+};
+
+// ─────────────────────────────────────────────────────────────────────────
+// ShowpieceCard — TIERED, wears user's CURRENT MATERIAL. T5 = OBSIDIAN.
 // ─────────────────────────────────────────────────────────────────────────
 const ShowpieceCard: React.FC<Props> = ({ item, onTap }) => {
   if (item.kind !== 'achievement') return null;
@@ -240,7 +346,6 @@ const ShowpieceCard: React.FC<Props> = ({ item, onTap }) => {
 
   const currentValue = item.currentValue ?? 0;
   const locked = !item.earned && currentValue === 0;
-  const c = achievementColor(item);
 
   const totalTiers = item.tiers.length;
   const atMax = !locked && item.reachedTier >= totalTiers && totalTiers > 0;
@@ -252,9 +357,20 @@ const ShowpieceCard: React.FC<Props> = ({ item, onTap }) => {
 
   const numer = currentValue - prevThreshold;
   const denom = nextThreshold - prevThreshold;
-  const targetPct = atMax
+  const targetPct = atMax ? 1 : Math.max(0, Math.min(1, denom > 0 ? numer / denom : 0));
+
+  // Material palette (paletteForShowpiece resolves region badges too).
+  const reachedIdx = locked
     ? 1
-    : Math.max(0, Math.min(1, denom > 0 ? numer / denom : 0));
+    : (Math.max(1, Math.min(5, item.reachedTier || 1)) as 1 | 2 | 3 | 4 | 5);
+  const materialPal = MATERIAL_PALETTES[reachedIdx];
+  const showpiecePal = paletteForShowpiece(item.reachedTier || 1, item.badgeId);
+  // Use material for lifetime badges; region palette for regional top100 badges.
+  const isRegional = showpiecePal !== materialPal;
+  const pal = isRegional ? showpiecePal : materialPal;
+  const c = pal.color;
+
+  const isObsidian = !locked && !isRegional && item.reachedTier >= 5;
 
   const [animatedPct, setAnimatedPct] = useState(0);
   const [animatedValue, setAnimatedValue] = useState(0);
@@ -293,20 +409,32 @@ const ShowpieceCard: React.FC<Props> = ({ item, onTap }) => {
   const lockedHint = SHOWPIECE_LOCKED_HINT[item.badgeId] ?? null;
 
   const pillLabel = locked
-    ? 'LOCKED'
-    : atMax
-      ? 'MAX'
+    ? 'UNFORGED'
+    : isObsidian
+      ? `OBSIDIAN · T${item.reachedTier}/${totalTiers}`
       : totalTiers > 1
-        ? `T${item.reachedTier}/${totalTiers}`
-        : '';
+        ? `${pal.label} · T${item.reachedTier}/${totalTiers}`
+        : pal.label;
 
-  // Whisper wash for in-progress/tiered — stops 0.07/0.015
+  // Backgrounds
   const bg = locked
     ? T.raised
-    : `linear-gradient(180deg, ${rgbaOf(c, 0.09)}, ${rgbaOf(c, 0.02)}), ${T.card}`;
-  const border = locked ? `1px solid ${T.line}` : `1px solid ${rgbaOf(c, 0.35)}`;
-  const chipBg = locked ? 'transparent' : rgbaOf(c, 0.12);
-  const chipBorder = locked ? `1.5px dashed ${T.faintest}` : `1px solid ${rgbaOf(c, 0.35)}`;
+    : isObsidian
+      ? 'linear-gradient(170deg,#12151C 0%,#07080C 100%)'
+      : `linear-gradient(180deg, ${rgbaOf(c, 0.13)}, ${rgbaOf(c, 0.02)} 70%), ${T.card}`;
+  const border = locked
+    ? `1px solid ${T.line}`
+    : isObsidian
+      ? 'none'
+      : `1px solid ${rgbaOf(c, 0.45)}`;
+  const boxShadow = isObsidian
+    ? 'inset 0 1px 0 rgba(255,255,255,0.07), 0 0 0 1px rgba(251,188,46,0.5), 0 6px 22px rgba(0,0,0,0.55)'
+    : locked
+      ? undefined
+      : `inset 0 1px 0 ${rgbaOf(c, 0.18)}`;
+
+  const chipBg = locked ? 'transparent' : rgbaOf(c, 0.14);
+  const chipBorder = locked ? `1.5px dashed ${T.faintest}` : `1px solid ${rgbaOf(c, 0.42)}`;
   const glyphColor = locked ? T.glyphLocked : c;
 
   return (
@@ -318,16 +446,36 @@ const ShowpieceCard: React.FC<Props> = ({ item, onTap }) => {
       onTouchCancel={() => setPressed(false)}
       style={{
         ...CARD_BASE,
+        padding: '13px 13px 0', // strip owns bottom padding
+        minHeight: 164,
+        borderRadius: 18,
         background: bg,
         border,
+        boxShadow,
         transform: pressed ? 'scale(0.985)' : 'scale(1)',
         transition: 'transform 120ms ease',
       }}
     >
+      {/* Obsidian glint */}
+      {isObsidian && (
+        <div
+          aria-hidden
+          style={{
+            position: 'absolute',
+            top: 0,
+            left: '10%',
+            right: '42%',
+            height: 1.5,
+            background: 'linear-gradient(90deg,transparent,#FBBC2E,transparent)',
+            zIndex: 2,
+          }}
+        />
+      )}
+
       <Watermark
         iconKey={item.iconKey}
         color={locked ? '#F2F4F7' : c}
-        opacity={locked ? 0.05 : 0.09}
+        opacity={locked ? 0.05 : isObsidian ? 0.08 : 0.10}
       />
 
       {/* Top row */}
@@ -342,8 +490,8 @@ const ShowpieceCard: React.FC<Props> = ({ item, onTap }) => {
       >
         <div
           style={{
-            width: 30,
-            height: 30,
+            width: 31,
+            height: 31,
             borderRadius: 9,
             background: chipBg,
             border: chipBorder,
@@ -364,7 +512,8 @@ const ShowpieceCard: React.FC<Props> = ({ item, onTap }) => {
               fontWeight: 800,
               letterSpacing: '0.12em',
               color: locked ? T.faint : c,
-              border: `1px solid ${locked ? T.line : rgbaOf(c, 0.35)}`,
+              border: `1px solid ${locked ? T.line : rgbaOf(c, 0.42)}`,
+              background: locked ? 'transparent' : rgbaOf(c, 0.10),
               borderRadius: 6,
               ...GAM.TABULAR,
             }}
@@ -384,16 +533,17 @@ const ShowpieceCard: React.FC<Props> = ({ item, onTap }) => {
           flexDirection: 'column',
           justifyContent: 'center',
           gap: 3,
-          marginTop: 6,
+          marginTop: 8,
         }}
       >
         <span
           style={{
-            fontSize: 30,
+            fontSize: 33,
             fontWeight: 800,
             letterSpacing: '-0.03em',
-            color: locked ? T.dim : c,
+            color: locked ? T.dim : isObsidian ? '#F8F4E8' : c,
             lineHeight: 1,
+            textShadow: isObsidian ? '0 0 16px rgba(251,188,46,0.35)' : undefined,
             ...GAM.TABULAR,
           }}
         >
@@ -413,13 +563,13 @@ const ShowpieceCard: React.FC<Props> = ({ item, onTap }) => {
         </span>
       </div>
 
-      {/* Next signpost + progress bar + endpoints */}
+      {/* Next signpost + progress bar */}
       <div style={{ position: 'relative', zIndex: 1, flexShrink: 0 }}>
         <div
           style={{
             fontSize: 8.5,
             fontWeight: 800,
-            color: T.faint,
+            color: isObsidian ? 'rgba(251,188,46,0.7)' : T.faint,
             letterSpacing: '0.12em',
             textTransform: 'uppercase',
             marginBottom: 5,
@@ -432,17 +582,19 @@ const ShowpieceCard: React.FC<Props> = ({ item, onTap }) => {
         >
           {locked
             ? (lockedHint ?? '\u00A0')
-            : atMax
-              ? '\u00A0'
+            : isObsidian
+              ? 'FULLY FORGED'
               : nextTier
-                ? `NEXT: ${nextTier.threshold.toLocaleString()} → T${nextTier.tier}`
-                : '\u00A0'}
+                ? `NEXT: ${nextTier.threshold.toLocaleString()} → ${materialNameForTier(nextTier.tier).toUpperCase()}`
+                : atMax
+                  ? '\u00A0'
+                  : '\u00A0'}
         </div>
         <div
           style={{
             position: 'relative',
             width: '100%',
-            height: 3.5,
+            height: 4,
             borderRadius: 99,
             background: 'rgba(255,255,255,0.07)',
             overflow: 'hidden',
@@ -450,31 +602,25 @@ const ShowpieceCard: React.FC<Props> = ({ item, onTap }) => {
         >
           <div
             style={{
-              width: `${animatedPct * 100}%`,
+              width: `${(isObsidian ? 1 : animatedPct) * 100}%`,
               height: '100%',
-              background: locked ? T.faint : c,
+              background: isObsidian
+                ? 'linear-gradient(90deg, rgba(251,188,46,0.9), rgba(247,147,30,0.9))'
+                : locked
+                  ? T.faint
+                  : c,
               borderRadius: 99,
               transition: 'width 700ms cubic-bezier(0.22,0.61,0.36,1)',
             }}
           />
         </div>
-        <div
-          style={{
-            display: 'flex',
-            justifyContent: 'space-between',
-            marginTop: 4,
-            fontSize: 8,
-            fontWeight: 800,
-            color: T.faint,
-            letterSpacing: '0.10em',
-            textTransform: 'uppercase',
-            ...GAM.TABULAR,
-          }}
-        >
-          <span>{currentValue.toLocaleString()}</span>
-          <span>{atMax ? 'MAX' : nextThreshold.toLocaleString()}</span>
-        </div>
       </div>
+
+      {/* Rarity footer strip — every forged card. Locked has no pedigree. */}
+      {!locked && <RarityFooterStrip rarity={item.rarity} />}
+      {locked && (
+        <div style={{ height: 10, flexShrink: 0 }} />
+      )}
     </button>
   );
 };
