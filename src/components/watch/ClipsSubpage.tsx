@@ -92,7 +92,6 @@ export default function ClipsSubpage() {
             </>
           ) : (
             <>
-              <WatchAutoplay posts={posts} gridRef={gridRef as React.RefObject<HTMLDivElement>} />
               <WatchGrid
                 posts={posts}
                 isLoading={isLoading}
