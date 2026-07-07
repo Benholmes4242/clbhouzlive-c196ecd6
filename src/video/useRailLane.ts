@@ -104,6 +104,19 @@ export function useRailLane(opts: UseRailLaneOptions): UseRailLaneResult {
     const host = hostRef.current;
     if (!host) return;
     const caller = opts.ownerKey ?? opts.postId ?? null;
+
+    // [VPERF] S3 autoplay.start — measure lane-acquire → load → firstFrame.
+    // 'warm' = the engine skipped the reload (same postId+url still loaded).
+    const autoSpanId = vperfNextId(`autoplay:${caller ?? laneId}`);
+    vperfStart(autoSpanId, 'autoplay.start', {
+      laneId,
+      ownerKey: opts.ownerKey ?? null,
+      postId: opts.postId ?? null,
+      surface: 'rail',
+      // Budget picked below after load() based on warm-skip hint.
+    });
+    vperfMark(autoSpanId, 'laneAcquire');
+
     VideoEngine.mountLane(laneId, host);
     VideoEngine.setMuted(laneId, true);
     // Resume at the engine's lastPos for this post — kept fresh by every lane
@@ -120,6 +133,16 @@ export function useRailLane(opts: UseRailLaneOptions): UseRailLaneResult {
       startPosition: resumeAt > 0.1 ? resumeAt : -1,
       postId: opts.postId ?? null,
     });
+    // Warm-skip hint set by VideoEngine.load when postId+url unchanged.
+    const warm = Boolean((VideoEngine as any)._lastLoadWasWarmSkip);
+    import('@/perf/vperf').then((m) => {
+      m.vperfMeta(autoSpanId, { warm });
+      m.vperfSetBudget(autoSpanId, warm ? 120 : 600);
+    }).catch(() => {});
+    vperfMark(autoSpanId, 'load');
+    vperfArmLane(laneId, { spanId: autoSpanId, endOn: 'firstFrame', phase: 'firstFrame' });
+    vperfArmLane(laneId, { spanId: autoSpanId, endOn: 'playing' });
+
     void VideoEngine.play(laneId, { callerPostId: caller });
 
     return () => {
