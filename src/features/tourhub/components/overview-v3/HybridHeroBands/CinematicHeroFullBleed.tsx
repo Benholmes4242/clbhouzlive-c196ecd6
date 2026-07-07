@@ -1073,7 +1073,6 @@ export function CinematicHeroFullBleed({
                 srcCandidates={defChampAvatars}
                 alt={defendingChamp.name}
                 size={40}
-                hideRing
                 hairlineRing
                 ringColor={GOLD_RING}
               />
