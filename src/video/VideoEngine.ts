@@ -648,6 +648,7 @@ class VideoEngineImpl {
   /** Release the current source but keep the element+instance for reuse. */
   release(laneId: LaneId): void {
     const lane = this.getLane(laneId);
+    vperfSessionEnd(laneId, 'release');
     if (lane.hls) {
       lane.hls.stopLoad();
       lane.hls.detachMedia();
