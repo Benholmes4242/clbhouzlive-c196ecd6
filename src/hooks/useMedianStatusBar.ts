@@ -33,11 +33,39 @@ function isNativeStatusBarShell(): boolean {
   return Boolean(getNativeBridge()) || /medianapp|gonativeapp|median|gonative/.test(ua);
 }
 
+function maybeNativeStatusBarShell(): boolean {
+  if (typeof window === 'undefined' || typeof navigator === 'undefined') return false;
+  const ua = (navigator.userAgent || '').toLowerCase();
+  return /iphone|ipad|ipod|medianapp|gonativeapp|median|gonative/.test(ua) || Boolean(getNativeBridge());
+}
+
+function invokeNativeProtocol(path: string, params: Record<string, string | boolean>): void {
+  if (typeof document === 'undefined') return;
+  const search = new URLSearchParams();
+  Object.entries(params).forEach(([key, value]) => search.set(key, String(value)));
+  const w = window as any;
+  const ua = (navigator.userAgent || '').toLowerCase();
+  const scheme = w.gonative || w.gonern || ua.includes('gonative') ? 'gonative' : 'median';
+  const url = `${scheme}://${path}?${search.toString()}`;
+
+  try {
+    const anchor = document.createElement('a');
+    anchor.href = url;
+    anchor.style.display = 'none';
+    anchor.setAttribute('aria-hidden', 'true');
+    document.documentElement.appendChild(anchor);
+    anchor.click();
+    window.setTimeout(() => anchor.remove(), 1000);
+  } catch {
+    try { window.location.href = url; } catch {}
+  }
+}
+
 let overlayRetryTimer: ReturnType<typeof setTimeout> | null = null;
 let overlayRetryCount = 0;
 
 function scheduleOverlayBootRetry(): void {
-  if (statusBarOverlayBooted || overlayRetryTimer || !isNativeStatusBarShell()) return;
+  if (statusBarOverlayBooted || overlayRetryTimer || !maybeNativeStatusBarShell()) return;
   if (overlayRetryCount >= 16) return;
   overlayRetryTimer = setTimeout(() => {
     overlayRetryTimer = null;
@@ -114,7 +142,11 @@ export function ensureStatusBarOverlayBooted(): void {
   // booted on GoNative shells without ever sending `overlay:true`, leaving the
   // WebView inset below the native grey/white status bar on immersive pages.
   if (!isNativeStatusBarShell()) {
-    statusBarOverlayBooted = true;
+    // Do NOT mark booted here. On some Median/GoNative iOS builds the UA marker
+    // and bridge arrive after module evaluation; marking booted early means the
+    // later ready callback returns without ever sending overlay:true, leaving the
+    // WebView permanently inset below the native status bar.
+    scheduleOverlayBootRetry();
     return;
   }
 
@@ -137,9 +169,22 @@ export function ensureStatusBarOverlayBooted(): void {
           color: toAARRGGBB(lastStatusBarRequest.hexColor),
         });
       }
+    } else {
+      invokeNativeProtocol('statusbar/set', {
+        style: 'light',
+        color: '00000000',
+        overlay: true,
+        blur: false,
+      });
     }
   } catch {
     // Bridge not ready — the ready callback below retries.
+    invokeNativeProtocol('statusbar/set', {
+      style: 'light',
+      color: '00000000',
+      overlay: true,
+      blur: false,
+    });
   }
 
   if (!statusBarOverlayBooted) scheduleOverlayBootRetry();
@@ -163,10 +208,18 @@ export function setStatusBarStyleColor(intent: 'light' | 'dark' | 'auto', hexCol
         color: toAARRGGBB(hexColor),
       });
     } else {
+      invokeNativeProtocol('statusbar/set', {
+        style: toMedianStyle(intent),
+        color: toAARRGGBB(hexColor),
+      });
       scheduleOverlayBootRetry();
     }
   } catch {
     // Bridge not ready — silent no-op.
+    invokeNativeProtocol('statusbar/set', {
+      style: toMedianStyle(intent),
+      color: toAARRGGBB(hexColor),
+    });
     scheduleOverlayBootRetry();
   }
 }

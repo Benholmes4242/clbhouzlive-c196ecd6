@@ -498,6 +498,7 @@ function AppRoutes() {
   // Keep-alive routes configuration - these routes stay mounted when navigating away
   const keepAliveRoutes = useMemo(() => [
     { path: '/', element: <RootGate /> },
+    { path: '/index', element: <RootGate /> },
     { path: '/clubhouse', element: <Navigate to="/" replace /> },
   ], []);
 
@@ -512,6 +513,7 @@ function AppRoutes() {
       <Routes location={routesLocation}>
         {/* Keep-alive routes - rendered by KeepAliveOutlet, but need placeholder for Router */}
         <Route path="/" element={null} />
+        <Route path="/index" element={null} />
         <Route path="/clubhouse" element={null} />
         
         <Route path="/auth" element={<AuthWrapped />} />
