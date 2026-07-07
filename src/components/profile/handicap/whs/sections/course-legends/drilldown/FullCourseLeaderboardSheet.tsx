@@ -289,7 +289,7 @@ export const FullCourseLeaderboardSheet: React.FC<Props> = ({
                   textTransform: 'uppercase',
                   padding: '3px 8px',
                   borderRadius: 999,
-                  background: 'rgba(255,255,255,0.06)',
+                  background: T.pillYouBg,
                   color: INK_55,
                 }}
               >
