@@ -376,7 +376,7 @@ export const FullCourseLeaderboardSheet: React.FC<Props> = ({
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
               <Crown size={17} strokeWidth={2.5} fill={GOLD} style={{ color: DEEP_AMBER }} />
             </div>
-            <BannerAvatar photoUrl={champion.photoUrl} size={44} />
+            <BannerAvatar photoUrl={champion.photoUrl} size={44} ringColor={T.avatarRing} />
             <div style={{ minWidth: 0 }}>
               <div
                 style={{
