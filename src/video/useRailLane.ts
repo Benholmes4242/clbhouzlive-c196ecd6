@@ -11,6 +11,7 @@ import { useEffect, useRef, useState } from 'react';
 import { VideoEngine, type LaneId } from './VideoEngine';
 import { RailLanePool } from './railLanePool';
 import { isPerfEnabled } from '@/perf/navTiming';
+import { vperfStart, vperfMark, vperfArmLane, vperfNextId } from '@/perf/vperf';
 
 // Session-wide hasHls resolve-rate counter, flushed to console at 25-item
 // intervals when the DBG pill is on. Lets us confirm gate #2 (hlsUrl null
