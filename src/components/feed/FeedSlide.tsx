@@ -160,6 +160,8 @@ export const FeedSlide = memo(function FeedSlide({
             posterSrc={posterSrc}
             isActive={isActive}
             onFirstFrameReady={onFirstFrameReady}
+            mediaW={m.width ?? 0}
+            mediaH={m.height ?? 0}
           />
         );
       }
