@@ -268,7 +268,11 @@ export const DetailHero: React.FC<Props> = ({ item, index, total, onPrev, onNext
             >
               <span
                 style={{
-                  color: reachedTier >= 5 ? FORGE_GOLD : nextMaterialPal?.color ?? 'rgba(255,255,255,0.55)',
+                  color: reachedTier >= 5
+                    ? FORGE_GOLD
+                    : started
+                      ? `rgba(${hexToRgb(bronzeColor)},0.55)`
+                      : nextMaterialPal?.color ?? 'rgba(255,255,255,0.55)',
                 }}
               >
                 {reachedTier >= 5
