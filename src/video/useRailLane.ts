@@ -131,7 +131,11 @@ export function useRailLane(opts: UseRailLaneOptions): UseRailLaneResult {
       hlsUrl: opts.hlsUrl,
       posterUrl: opts.posterUrl ?? null,
       startPosition: resumeAt > 0.1 ? resumeAt : -1,
-      postId: opts.postId ?? null,
+      // Use the same owner shape that play()/pause() use. If load() speaks
+      // bare postId while play() stamps `${postId}:0`, a returned borrowed
+      // lane misses the warm-skip equality check and reloads the same HLS
+      // source — exactly the frame-0 flash seen on close back to the tile.
+      postId: resumeKey,
     });
     // Warm-skip hint set by VideoEngine.load when postId+url unchanged.
     const warm = Boolean((VideoEngine as any)._lastLoadWasWarmSkip);
