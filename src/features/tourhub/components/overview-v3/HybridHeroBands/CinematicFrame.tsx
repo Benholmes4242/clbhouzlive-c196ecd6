@@ -132,7 +132,7 @@ function StackedAvatarsDark({
             alt={it.name || ''}
             userId={it.userId ?? null}
             size={size - 3}
-            hideRing
+            hairlineRing
           />
         </div>
       ))}
