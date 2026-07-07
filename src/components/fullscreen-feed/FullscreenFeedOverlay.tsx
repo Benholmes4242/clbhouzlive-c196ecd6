@@ -34,6 +34,8 @@ import { originHostRegistry } from '@/video/originHostRegistry';
 import type { BorrowDescriptor } from '@/store/fullscreenFeedStore';
 import { setStatusBarStyleColor } from '@/hooks/useMedianStatusBar';
 import { resolveRestingRect, getCurrentViewport } from '@/lib/media/resolveRestingRect';
+import { FS_TRANSITION_MODE, FS_CUT_FADE_MS } from '@/lib/media/transitionMode';
+
 const fsTimeStart = (_label: string) => {};
 const fsTimeEnd = (_label: string, _note?: string) => {};
 const fsEvent = (_label: string, _data?: unknown) => {};
@@ -206,11 +208,16 @@ export function FullscreenFeedOverlay() {
       b && typeof window !== 'undefined' &&
       (window.innerWidth !== b.viewportW || window.innerHeight !== b.viewportH);
     const borrowOriginAlive = !!(b && originHostRegistry.get(b.ownerKey) && !viewportChanged);
+    // CUT mode: always take the instant handback path. Borrow closes still
+    // run returnBorrow('close') → live tile inherits the element; non-borrow
+    // closes short-fade the overlay via AnimatePresence exit.
     const canAnimate =
+      FS_TRANSITION_MODE === 'expand' &&
       sameSlide && (
         (b && borrowOriginAlive) ||
         (!b && o && !!o.posterUrl)
       );
+
 
     if (!canAnimate) {
       if (b) {
@@ -482,8 +489,9 @@ export function FullscreenFeedOverlay() {
 
   useEffect(() => {
     // Borrow opens skip the poster-clone FLIP entirely — BorrowedFullscreenSlot
-    // owns its own live-element expand transition. Fire firstFrameReady so the
-    // host opacity gate below flips to 1 immediately.
+    // owns its own live-element expand transition (in 'expand' mode) or mounts
+    // pre-settled (in 'cut' mode). Fire firstFrameReady so the host opacity
+    // gate below flips to 1 immediately.
     if (isOpen && borrow) {
       setCloneVisible(false);
       setFirstFrameReady(true);
@@ -491,6 +499,18 @@ export function FullscreenFeedOverlay() {
       setChildReady(true);
       return;
     }
+    // CUT mode, non-borrow: reveal the settled host immediately. The blurred
+    // surround + settled slide poster paint from frame 1; the engine's own
+    // poster→video crossfade is the only motion. Reveal-gate is trivially
+    // instant here — the host is opacity:1 with no clone on top.
+    if (isOpen && origin && FS_TRANSITION_MODE === 'cut') {
+      setCloneVisible(false);
+      setFirstFrameReady(true);
+      setMotionComplete(true);
+      setChildReady(true);
+      return;
+    }
+
     if (isOpen && origin) {
       // Render A (synchronous commit): clone mounts at origin.rect ("from"
       // state). The render guard below (`origin && cloneVisible`) no longer
@@ -595,7 +615,17 @@ export function FullscreenFeedOverlay() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            transition={{ duration: 0.18 }}
+            transition={{
+              // CUT mode: open ease-in uses FS_CUT_FADE_MS (anti-harshness);
+              // close fade stays at 180ms (spec: "or the existing 180ms if
+              // that reads better"). EXPAND mode: symmetric 180ms.
+              duration:
+                FS_TRANSITION_MODE === 'cut'
+                  ? (isOpen ? FS_CUT_FADE_MS / 1000 : 0.18)
+                  : 0.18,
+              ease: 'linear',
+            }}
+
             data-vperf="fs-overlay"
             className="fixed inset-0 z-[200] flex flex-col"
           >

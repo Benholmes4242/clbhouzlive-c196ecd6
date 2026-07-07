@@ -12,6 +12,8 @@ import { originHostRegistry } from '@/video/originHostRegistry';
 import { isPerfEnabled } from '@/perf/navTiming';
 import { vperfStart, vperfArmLane, vperfNextId, vperfMotionMark } from '@/perf/vperf';
 import { resolveRestingRect, getCurrentViewport, type RestingRect } from '@/lib/media/resolveRestingRect';
+import { FS_TRANSITION_MODE } from '@/lib/media/transitionMode';
+
 
 import { usePostViewTracker } from '@/hooks/usePostViewTracker';
 
@@ -605,6 +607,27 @@ const BorrowedFullscreenSlot: React.FC<{
       requestAnimationFrame(() => setUnderlayVisible(true));
     }
 
+    // CUT mode: mount wrapper ALREADY at the resting rect. Same live pixels,
+    // instantly reframed — no wrapper transition. Fire onFirstFrameReady on
+    // the next frame so the overlay reveal gate lifts immediately.
+    if (FS_TRANSITION_MODE === 'cut') {
+      const rafCut = requestAnimationFrame(() => {
+        setExpanded(true);
+        if (!firedFirstFrameRef.current) {
+          firedFirstFrameRef.current = true;
+          onFirstFrameReady?.();
+        }
+        // For CONTAIN targets, swap object-fit at rest — visually a no-op
+        // (the wrapper IS the letterboxed rect at the media's aspect).
+        if (restingFitRef.current === 'contain') {
+          setFitContain(true);
+          try { VideoEngine.setObjectFit(borrow.laneId, 'contain'); } catch {}
+        }
+        try { VideoEngine.nudgeLevelCap(borrow.laneId); } catch {}
+      });
+      return () => cancelAnimationFrame(rafCut);
+    }
+
     // Fix 2/5: expand FIRST, then let handleTransitionEnd fire
     // onFirstFrameReady when the wrapper's own expand transition completes.
     // The old order revealed the host before the slot was fullscreen and
@@ -624,14 +647,17 @@ const BorrowedFullscreenSlot: React.FC<{
       const raf2 = (window as any).__borrow_raf2;
       if (raf2) cancelAnimationFrame(raf2);
     };
+
     // borrow is stable for the lifetime of this component.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   // Kick off the reverse-shrink when the overlay flips closeAnim to 'borrow'.
   React.useEffect(() => {
+    if (FS_TRANSITION_MODE === 'cut') return; // cut mode: instant handback, no reverse motion
     if (closeAnim !== 'borrow') return;
     if (closing) return;
+
     // Fresh origin rect from the registry — the borrowed tile is still
     // mounted (feed scroll-locked) so its host's getBoundingClientRect is
     // valid. Fallback to the mount-time originRect prop if the host is gone.
@@ -732,9 +758,15 @@ const BorrowedFullscreenSlot: React.FC<{
     background: '#000',
     overflow: 'hidden',
     willChange: 'transform, width, height',
-    transition: (expanded || closing)
-      ? 'transform 300ms cubic-bezier(0.32,0.72,0,1), width 300ms cubic-bezier(0.32,0.72,0,1), height 300ms cubic-bezier(0.32,0.72,0,1)'
-      : 'none',
+    // CUT mode: never animate the wrapper — instant snap on open, instant
+    // handback on close. EXPAND mode: 300ms shared-element transition.
+    transition:
+      FS_TRANSITION_MODE === 'cut'
+        ? 'none'
+        : (expanded || closing)
+          ? 'transform 300ms cubic-bezier(0.32,0.72,0,1), width 300ms cubic-bezier(0.32,0.72,0,1), height 300ms cubic-bezier(0.32,0.72,0,1)'
+          : 'none',
+
     pointerEvents: 'none',
   };
 
