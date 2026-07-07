@@ -50,7 +50,7 @@ function WatchOfTheWeekHeroInner() {
   const heroReady = hasResolved && (isEmpty || heroDecoded);
   const revealed = useWatchReveal('watch-of-the-week', heroReady);
 
-  // [VIDEOSTUB] Hero autoplay video removed — poster only.
+  // Hero renders poster-only (no autoplay).
 
 
   const skeleton = (

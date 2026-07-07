@@ -250,7 +250,7 @@ const CourseDetailPage = lazy(() => import("./pages/CourseDetailPage"));
 const CourseReviewsPage = lazy(() => import("./pages/CourseReviewsPage"));
 const RateCoursePage = lazy(() => import("./pages/RateCoursePage"));
 
-const ShareReviewPage = lazy(() => import("./pages/ShareReviewPage"));
+// ShareReviewPage removed in PR-5 Part 2 (zero navigators — orphan preview surface, ReviewWizard shares inline).
 const UserCoursesPage = lazy(() => import("./pages/UserCoursesPage"));
 
 const JourneyListPage = lazy(() => import("./pages/JourneyListPage"));
@@ -306,6 +306,12 @@ const CollegeComparePage = lazy(() => import("./features/tourhub/pages").then(m 
 
 // Continue Watching mini-player (queue drawer + full-screen modal deleted in PR-5).
 const MiniPlayer = lazy(() => import("./components/videos/MiniPlayer"));
+
+// PR-5: /video/:videoId is a post-id deep link. Preserve old shared links via unified /post viewer.
+const VideoIdToPostRedirect: React.FC = () => {
+  const { videoId } = useParams<{ videoId: string }>();
+  return <Navigate to={videoId ? `/post/${videoId}` : '/watch'} replace />;
+};
 const SeasonShop = lazy(() => import("./pages/SeasonShop"));
 const ChallengesPage = lazy(() => import("./pages/ChallengesPage"));
 
@@ -526,7 +532,7 @@ function AppRoutes() {
         <Route path="/courses/:courseId" element={<Suspense fallback={<CourseDetailSkeleton />}><CourseDetailPage /></Suspense>} />
         <Route path="/courses/:courseId/rate" element={<Suspense fallback={<RateCoursePageSkeleton />}><RateCoursePage /></Suspense>} />
         
-        <Route path="/courses/:courseId/share-review/:reviewId" element={<Suspense fallback={<GenericPageSkeleton />}><ShareReviewPage /></Suspense>} />
+        {/* /courses/:courseId/share-review/:reviewId removed in PR-5 Part 2 — orphan surface. ReviewWizard shares inline. */}
         <Route path="/courses/:courseId/reviews" element={<Suspense fallback={<CourseDetailSkeleton />}><CourseReviewsPage /></Suspense>} />
         <Route path="/user/:username/courses" element={<Suspense fallback={<CoursesListSkeleton />}><UserCoursesPage /></Suspense>} />
         
@@ -540,8 +546,10 @@ function AppRoutes() {
         <Route path="/post/:postId/comment/:commentId" element={<Suspense fallback={<GenericPageSkeleton />}><CommentDeepLinkPage /></Suspense>} />
         
         
-        {/* /video/:videoId route removed in PR-5 — VideoPlayerModal deleted. Post deep-link handles video posts. */}
-        <Route path="/video/:videoId" element={<Navigate to="/watch" replace />} />
+        {/* /video/:videoId route removed in PR-5 — :videoId is a post id (shared by VideoCardMenu & AutoplayVideoCard), so preserve deep links via the unified /post viewer. */}
+        <Route path="/video/:videoId" element={<VideoIdToPostRedirect />} />
+
+
 
         
         {/* Legacy creator routes - redirect to home (creators now handled via Business profiles or Personal Creator Mode) */}
