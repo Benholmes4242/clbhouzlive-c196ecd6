@@ -144,7 +144,7 @@ export function PlayerScorecardSheet({
             fallback={initialsOf(player.name)}
             userId={player.id}
             size={44}
-            hideRing
+            hairlineRing ringColor={LIGHT_HAIRLINE}
           />
           {player.countryCode && (
             <div style={{ position: 'absolute', bottom: -2, right: -2, borderRadius: '50%', overflow: 'hidden' }}>
