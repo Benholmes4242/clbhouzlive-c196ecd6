@@ -378,12 +378,12 @@ export const ChampionsDuelCard: React.FC<ChampionsDuelCardProps> = ({
           </div>
           {defending ? (
             right ? (
-              <ChampionsSquircle photoUrl={right.photoUrl} size={38} />
+              <ChampionsSquircle photoUrl={right.photoUrl} size={38} ringColor={avatarRing} />
             ) : (
               <ChampionsSquircle photoUrl={null} size={38} dashed />
             )
           ) : selfOnBoard ? (
-            <ChampionsSquircle photoUrl={selfRow?.photoUrl ?? null} size={38} />
+            <ChampionsSquircle photoUrl={selfRow?.photoUrl ?? null} size={38} ringColor={avatarRing} />
           ) : (
             <ChampionsSquircle photoUrl={null} size={38} dashed />
           )}
