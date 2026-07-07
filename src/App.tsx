@@ -250,7 +250,7 @@ const CourseDetailPage = lazy(() => import("./pages/CourseDetailPage"));
 const CourseReviewsPage = lazy(() => import("./pages/CourseReviewsPage"));
 const RateCoursePage = lazy(() => import("./pages/RateCoursePage"));
 
-const ShareReviewPage = lazy(() => import("./pages/ShareReviewPage"));
+// ShareReviewPage removed in PR-5 Part 2 (zero navigators — orphan preview surface, ReviewWizard shares inline).
 const UserCoursesPage = lazy(() => import("./pages/UserCoursesPage"));
 
 const JourneyListPage = lazy(() => import("./pages/JourneyListPage"));
