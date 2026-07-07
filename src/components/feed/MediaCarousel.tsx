@@ -62,6 +62,7 @@ export const MediaCarousel: React.FC<Props> = ({
   onDoubleTap,
 }) => {
   const trackRef = useRef<HTMLDivElement | null>(null);
+  const slideRefs = useRef<Array<HTMLButtonElement | null>>([]);
   const [active, setActive] = useState(() =>
     Math.max(0, Math.min(initialIndex || 0, items.length - 1)),
   );
