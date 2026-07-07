@@ -152,7 +152,7 @@ export function PlayersFeed({ players, maxEvents, maxCuts }: PlayersFeedProps) {
                     })}
                     alt={stat.player?.full_name ?? ''}
                     userId={stat.player?.id ?? stat.player?.full_name ?? ''}
-                    hideRing
+                    hairlineRing ringColor={LIGHT_HAIRLINE}
                   />
                 </div>
 
