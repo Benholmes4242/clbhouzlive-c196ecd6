@@ -10,7 +10,7 @@ import { useState, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import { toTitleCase } from '@/lib/formatters';
-import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
+import { SquircleAvatar, LIGHT_HAIRLINE } from '@/components/ui/SquircleAvatar';
 import { resolvePlayerAvatarCandidates } from '../../_shared/resolvePlayerAvatar';
 import type { TourPlayerStatistics } from '../../hooks/useTourHubData';
 
@@ -152,7 +152,7 @@ export function PlayersFeed({ players, maxEvents, maxCuts }: PlayersFeedProps) {
                     })}
                     alt={stat.player?.full_name ?? ''}
                     userId={stat.player?.id ?? stat.player?.full_name ?? ''}
-                    hideRing
+                    hairlineRing ringColor={LIGHT_HAIRLINE}
                   />
                 </div>
 

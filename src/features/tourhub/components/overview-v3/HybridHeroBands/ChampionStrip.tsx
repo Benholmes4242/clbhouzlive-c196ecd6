@@ -35,7 +35,6 @@ function PlayerHead({ size = 42, src }: { size?: number; src?: string | null }) 
     <SquircleAvatar
       src={src ?? undefined}
       size={size}
-      hideRing
       hairlineRing
       ringColor={GOLD}
     />
@@ -258,7 +257,7 @@ export function PlayoffStrip({ count, score }: PlayoffStripProps) {
               display: 'inline-flex',
             }}
           >
-            <SquircleAvatar size={36} hideRing hairlineRing ringColor={GOLD} />
+            <SquircleAvatar size={36} hairlineRing ringColor={GOLD} />
           </div>
         ))}
       </div>

@@ -8,7 +8,7 @@
 import React, { useState } from 'react';
 import { INK_SOFT, INK_TINT_07 } from '../../_shared/tokens';
 import { motion } from 'framer-motion';
-import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
+import { SquircleAvatar, LIGHT_HAIRLINE } from '@/components/ui/SquircleAvatar';
 import { resolvePlayerAvatarCandidates } from '../../_shared/resolvePlayerAvatar';
 
 import ActualPositionBadge from './components/ActualPositionBadge';
@@ -142,7 +142,7 @@ export const PredictionScorecardRow: React.FC<PredictionScorecardRowProps> = ({
             srcCandidates={avatarCandidates}
             alt={prediction.playerName}
             userId={prediction.playerId}
-            hideRing
+            hairlineRing ringColor={LIGHT_HAIRLINE}
           />
            {/* Best call green star */}
           {isBestCall && (

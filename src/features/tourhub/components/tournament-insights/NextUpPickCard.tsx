@@ -5,7 +5,7 @@
 
 import React, { useState } from 'react';
 import { INK_SOFT, INK_TINT_07 } from '../../_shared/tokens';
-import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
+import { SquircleAvatar, LIGHT_HAIRLINE } from '@/components/ui/SquircleAvatar';
 import { resolvePlayerAvatarCandidates } from '../../_shared/resolvePlayerAvatar';
 import type { WinnerProfile, ContenderCard, ConfidenceTier } from './types';
 
@@ -80,7 +80,7 @@ function PickRow({
                 srcCandidates={resolvePlayerAvatarCandidates({ name: item.name, photoUrl: null, tourSlug: 'pga' })}
                 alt={item.name}
                 userId={item.id}
-                hideRing
+                hairlineRing ringColor={LIGHT_HAIRLINE}
               />
             </div>
 

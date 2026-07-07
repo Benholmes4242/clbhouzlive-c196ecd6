@@ -7,7 +7,7 @@
 import { Link } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Crown, Flame, Trophy } from 'lucide-react';
-import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
+import { SquircleAvatar, LIGHT_HAIRLINE } from '@/components/ui/SquircleAvatar';
 import { resolvePlayerAvatarCandidates } from '../../_shared/resolvePlayerAvatar';
 import { titleCaseCountry } from '../../utils/countryFlags';
 import CountryFlag from '@/components/ui/country-flag';
@@ -288,7 +288,7 @@ export function LeadersMasthead({
                     srcCandidates={avatarCandidates}
                     alt={leader.player.full_name}
                     userId={leader.player.id}
-                    hideRing
+                    hairlineRing ringColor={LIGHT_HAIRLINE}
                   />
                 </div>
                 <div

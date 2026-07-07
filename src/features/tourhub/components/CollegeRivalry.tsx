@@ -29,7 +29,7 @@ import { useDailyEditorial } from '@/hooks/championship/useDailyEditorial';
 import { formatCurrency } from '@/lib/utils/formatCurrency';
 import { getCollegeLogoUrl } from '@/utils/collegeLogo';
 import { getPlayerHeadshotCandidates } from '@/utils/playerHeadshot';
-import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
+import { SquircleAvatar, LIGHT_HAIRLINE } from '@/components/ui/SquircleAvatar';
 import { COLLEGE_RIVALRY_FALLBACK } from '../utils/editorialFallbacks';
 import { Shimmer } from './shared/Shimmer';
 
@@ -427,7 +427,7 @@ export function CollegeRivalry() {
                   srcCandidates={leaderCaptain ? getPlayerHeadshotCandidates(leaderCaptain.fullName, leaderCaptain.tourCode) : []}
                   alt={leaderCaptain?.fullName ?? '—'}
                   userId={leaderCaptain?.playerId ?? leaderCaptain?.fullName ?? null}
-                  hideRing
+                  hairlineRing ringColor={LIGHT_HAIRLINE}
                 />
                 <div style={{ minWidth: 0 }}>
                   <div style={{
@@ -473,7 +473,7 @@ export function CollegeRivalry() {
                   srcCandidates={chaserCaptain ? getPlayerHeadshotCandidates(chaserCaptain.fullName, chaserCaptain.tourCode) : []}
                   alt={chaserCaptain?.fullName ?? '—'}
                   userId={chaserCaptain?.playerId ?? chaserCaptain?.fullName ?? null}
-                  hideRing
+                  hairlineRing ringColor={LIGHT_HAIRLINE}
                 />
                 <div style={{ minWidth: 0, textAlign: 'right' }}>
                   <div style={{

@@ -3,7 +3,7 @@ import { ArrowRight, TrendingUp } from 'lucide-react';
 import { useTourSeason, useTourPlayerStatistics } from '../../hooks/useTourHubData';
 import { useMemo, useState } from 'react';
 import { cn } from '@/lib/utils';
-import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
+import { SquircleAvatar, LIGHT_HAIRLINE } from '@/components/ui/SquircleAvatar';
 import { resolvePlayerAvatarCandidates } from '../../_shared/resolvePlayerAvatar';
 
 type SortOption = 'events' | 'cuts' | 'world_rank';
@@ -147,7 +147,7 @@ export function TopPlayersPreview() {
                     })}
                     alt={stat.player?.full_name ?? ''}
                     userId={stat.player?.id ?? stat.player?.full_name ?? ''}
-                    hideRing
+                    hairlineRing ringColor={LIGHT_HAIRLINE}
                   />
                 </div>
                 <div>

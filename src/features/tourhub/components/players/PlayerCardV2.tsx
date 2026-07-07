@@ -4,7 +4,7 @@
 
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
+import { SquircleAvatar, LIGHT_HAIRLINE } from '@/components/ui/SquircleAvatar';
 import { resolvePlayerAvatarCandidates } from '../../_shared/resolvePlayerAvatar';
 import { titleCaseCountry } from '../../utils/countryFlags';
 import CountryFlag from '@/components/ui/country-flag';
@@ -199,7 +199,7 @@ export function PlayerCardV2({
             srcCandidates={avatarCandidates}
             alt={player.fullName}
             userId={player.id}
-            hideRing
+            hairlineRing ringColor={LIGHT_HAIRLINE}
           />
         </div>
 

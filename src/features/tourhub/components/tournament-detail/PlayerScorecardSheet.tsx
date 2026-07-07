@@ -2,7 +2,7 @@ import { useMemo, useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { BottomSheet } from '@/components/ui/BottomSheet';
 import CountryFlag from '@/components/ui/country-flag';
-import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
+import { SquircleAvatar, LIGHT_HAIRLINE } from '@/components/ui/SquircleAvatar';
 import { SCORECARD_LIGHT } from '@/features/courses/_shared/scorecard/scorecardTheme';
 import { TrajectoryLine, type TrajectoryHole } from '@/features/courses/_shared/scorecard/TrajectoryLine';
 import { NineGrid } from '@/features/courses/_shared/scorecard/NineGrid';
@@ -144,7 +144,7 @@ export function PlayerScorecardSheet({
             fallback={initialsOf(player.name)}
             userId={player.id}
             size={44}
-            hideRing
+            hairlineRing ringColor={LIGHT_HAIRLINE}
           />
           {player.countryCode && (
             <div style={{ position: 'absolute', bottom: -2, right: -2, borderRadius: '50%', overflow: 'hidden' }}>

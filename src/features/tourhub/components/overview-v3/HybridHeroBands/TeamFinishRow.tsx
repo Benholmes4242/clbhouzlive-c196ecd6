@@ -41,6 +41,8 @@ function TeamCrestTile({
   isChampion?: boolean;
 }) {
   const radius = Math.round(size * 0.22);
+  // Light row backdrop → 1px ink hairline traced ON the crest tile.
+  const HAIRLINE = 'inset 0 0 0 1px rgba(15,23,42,0.12)';
   if (teamCrestUrl) {
     return (
       <div
@@ -49,7 +51,7 @@ function TeamCrestTile({
           height: size,
           borderRadius: radius,
           background: `url(${teamCrestUrl}) center/cover, ${teamColor || SLATE_800}`,
-          boxShadow: isChampion ? '0 0 0 1.5px rgba(212,160,23,0.45)' : 'inset 0 0 0 0.5px rgba(15,23,42,0.10)',
+          boxShadow: isChampion ? `${HAIRLINE}, 0 0 0 1.5px rgba(212,160,23,0.45)` : HAIRLINE,
           flexShrink: 0,
         }}
         aria-hidden="true"
@@ -69,7 +71,7 @@ function TeamCrestTile({
         height: size,
         borderRadius: radius,
         background: bg,
-        boxShadow: isChampion ? '0 0 0 1.5px rgba(212,160,23,0.45)' : 'inset 0 0 0 0.5px rgba(15,23,42,0.10)',
+        boxShadow: isChampion ? `${HAIRLINE}, 0 0 0 1.5px rgba(212,160,23,0.45)` : HAIRLINE,
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',

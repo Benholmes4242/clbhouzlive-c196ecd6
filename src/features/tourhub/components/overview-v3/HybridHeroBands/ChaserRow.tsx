@@ -5,7 +5,7 @@
 
 import React from 'react';
 import CountryFlag from '@/components/ui/country-flag';
-import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
+import { SquircleAvatar, LIGHT_HAIRLINE } from '@/components/ui/SquircleAvatar';
 import {
   INK,
   INK_15,
@@ -82,7 +82,7 @@ export function ChaserRow({
           srcCandidates={avatarCandidates}
           alt={name}
           userId={playerId ?? name}
-          hideRing
+          hairlineRing ringColor={LIGHT_HAIRLINE}
         />
         <div style={{ display: 'flex', alignItems: 'center', gap: 6, minWidth: 0 }}>
           <span

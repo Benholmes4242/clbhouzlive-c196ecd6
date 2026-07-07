@@ -6,7 +6,7 @@
 import React from 'react';
 import { ChevronRight } from 'lucide-react';
 import CountryFlag from '@/components/ui/country-flag';
-import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
+import { SquircleAvatar, LIGHT_HAIRLINE } from '@/components/ui/SquircleAvatar';
 
 import {
   INK,
@@ -80,7 +80,7 @@ export function SoloLeaderRow({
           srcCandidates={avatarCandidates}
           alt={name}
           userId={playerId ?? name}
-          hideRing
+          hairlineRing ringColor={LIGHT_HAIRLINE}
         />
         <div style={{ display: 'flex', alignItems: 'center', gap: 6, minWidth: 0 }}>
           <span
@@ -166,7 +166,7 @@ export function StackedAvatars({
             srcCandidates={p.avatarCandidates}
             alt={p.name ?? ''}
             userId={p.playerId ?? p.name ?? ''}
-            hideRing
+            hairlineRing ringColor={LIGHT_HAIRLINE}
           />
         </div>
       ))}
@@ -382,7 +382,7 @@ export function ChampionRow({
           src={avatarUrl ?? undefined}
           alt={name}
           userId={name}
-          hideRing
+          hairlineRing ringColor={LIGHT_HAIRLINE}
         />
         <div style={{ display: 'flex', alignItems: 'center', gap: 6, minWidth: 0 }}>
           <span

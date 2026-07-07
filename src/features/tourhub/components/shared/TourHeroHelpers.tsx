@@ -160,7 +160,7 @@ export function PlayerAvatar({
           srcCandidates={candidates}
           alt={displayName}
           userId={nameForLookup}
-          hideRing
+          hairlineRing
         />
       </div>
     );
@@ -172,7 +172,7 @@ export function PlayerAvatar({
       srcCandidates={candidates}
       alt={displayName}
       userId={nameForLookup}
-      hideRing
+      hairlineRing
     />
   );
 }

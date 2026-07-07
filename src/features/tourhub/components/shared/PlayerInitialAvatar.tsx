@@ -38,6 +38,10 @@ export interface PlayerInitialAvatarProps {
    *  (INK_TINT_06) for player headshots; logo callers pass white/near-white so
    *  the badge fills the avatar like before. */
   imageBg?: string;
+  /** Traced 1px hairline colour. Default DARK_HAIRLINE (white @ 22%) matches
+   *  the hero/dark surfaces where these are rendered. Pass LIGHT_HAIRLINE on
+   *  light card surfaces. Set to null to disable. */
+  ringColor?: string | null;
 }
 
 export function PlayerInitialAvatar({
@@ -50,6 +54,7 @@ export function PlayerInitialAvatar({
   color,
   imageScale = 1,
   imageBg = INK_TINT_06,
+  ringColor = 'rgba(255,255,255,0.22)',
 }: PlayerInitialAvatarProps) {
   const candidates: string[] = (() => {
     if (srcCandidates && srcCandidates.length > 0) {
@@ -79,44 +84,68 @@ export function PlayerInitialAvatar({
   return (
     <div
       style={{
+        position: 'relative',
         width: size,
         height: size,
         borderRadius: radius,
-        overflow: 'hidden',
         flexShrink: 0,
-        background: showImage ? imageBg : fallbackBg,
-        display: 'flex',
+        display: 'inline-flex',
         alignItems: 'center',
         justifyContent: 'center',
       }}
       aria-label={name}
     >
-      {showImage ? (
-        <img
-          src={currentSrc!}
-          alt={name}
-          loading="lazy"
-          onError={() => setIdx((i) => i + 1)}
+      <div
+        style={{
+          width: size,
+          height: size,
+          borderRadius: radius,
+          overflow: 'hidden',
+          background: showImage ? imageBg : fallbackBg,
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+        }}
+      >
+        {showImage ? (
+          <img
+            src={currentSrc!}
+            alt={name}
+            loading="lazy"
+            onError={() => setIdx((i) => i + 1)}
+            style={{
+              width: innerSize,
+              height: innerSize,
+              objectFit: imageScale < 1 ? 'contain' : 'cover',
+              objectPosition: 'center 5%',
+            }}
+          />
+        ) : (
+          <span
+            style={{
+              fontSize: Math.round(size * 0.38),
+              fontWeight: 700,
+              color: fallbackFg,
+              letterSpacing: '0.01em',
+              lineHeight: 1,
+            }}
+          >
+            {initials}
+          </span>
+        )}
+      </div>
+      {ringColor ? (
+        <div
+          aria-hidden
           style={{
-            width: innerSize,
-            height: innerSize,
-            objectFit: imageScale < 1 ? 'contain' : 'cover',
-            objectPosition: 'center 5%',
+            position: 'absolute',
+            inset: 0,
+            borderRadius: radius,
+            border: `1px solid ${ringColor}`,
+            pointerEvents: 'none',
           }}
         />
-      ) : (
-        <span
-          style={{
-            fontSize: Math.round(size * 0.38),
-            fontWeight: 700,
-            color: fallbackFg,
-            letterSpacing: '0.01em',
-            lineHeight: 1,
-          }}
-        >
-          {initials}
-        </span>
-      )}
+      ) : null}
     </div>
   );
 }

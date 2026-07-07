@@ -134,7 +134,7 @@ function StackedAvatars({
             alt={item.name}
             userId={item.userId}
             size={size}
-            hideRing
+            hairlineRing
           />
         </div>
       ))}
@@ -588,7 +588,6 @@ export function CinematicHeroFullBleed({
             srcCandidates={champion.avatarCandidates ?? (champion.avatarUrl ? [champion.avatarUrl] : [])}
             alt={champion.name}
             size={56}
-            hideRing
             hairlineRing
             ringColor={GOLD_RING}
           />
@@ -711,7 +710,7 @@ export function CinematicHeroFullBleed({
                     alt={entryName(row.entry)}
                     userId={row.entry?.player?.id ?? null}
                     size={26}
-                    hideRing
+                    hairlineRing
                   />
                   <span
                     style={{
@@ -914,7 +913,7 @@ export function CinematicHeroFullBleed({
                     alt={entryName(row.entry)}
                     userId={row.entry?.player?.id ?? null}
                     size={26}
-                    hideRing
+                    hairlineRing
                   />
                   <span
                     style={{
@@ -1074,7 +1073,6 @@ export function CinematicHeroFullBleed({
                 srcCandidates={defChampAvatars}
                 alt={defendingChamp.name}
                 size={40}
-                hideRing
                 hairlineRing
                 ringColor={GOLD_RING}
               />

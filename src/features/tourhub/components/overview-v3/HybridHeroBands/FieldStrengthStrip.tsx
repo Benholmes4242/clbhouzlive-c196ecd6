@@ -19,6 +19,8 @@ export interface FieldStrengthStripProps {
 
 function StackedHeads({ photos }: { photos: string[] }) {
   const visible = photos.slice(0, 3);
+  // Dark cinematic backdrop → 1px white hairline traced ON the squircle.
+  const HAIRLINE = 'inset 0 0 0 1px rgba(255,255,255,0.22)';
   if (visible.length === 0) {
     return (
       <div
@@ -27,7 +29,7 @@ function StackedHeads({ photos }: { photos: string[] }) {
           height: 42,
           borderRadius: '34%',
           background: `linear-gradient(135deg, #475569 0%, ${SLATE_800} 100%)`,
-          boxShadow: '0 0 0 2px rgba(251,188,46,0.55)',
+          boxShadow: `${HAIRLINE}, 0 0 0 2px rgba(251,188,46,0.55)`,
         }}
         aria-hidden="true"
       />
@@ -44,7 +46,7 @@ function StackedHeads({ photos }: { photos: string[] }) {
             borderRadius: '34%',
             marginLeft: i === 0 ? 0 : -10,
             background: `url(${url}) center/cover, linear-gradient(135deg, #475569 0%, ${SLATE_800} 100%)`,
-            boxShadow: '0 0 0 2px rgba(251,188,46,0.55)',
+            boxShadow: `${HAIRLINE}, 0 0 0 2px rgba(251,188,46,0.55)`,
             zIndex: 3 - i,
           }}
           aria-hidden="true"

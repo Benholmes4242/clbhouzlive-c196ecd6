@@ -132,7 +132,7 @@ function StackedAvatarsDark({
             alt={it.name || ''}
             userId={it.userId ?? null}
             size={size - 3}
-            hideRing
+            hairlineRing
           />
         </div>
       ))}
@@ -188,7 +188,7 @@ function SoloRowDark({
         alt={name}
         userId={entry?.player?.id ?? null}
         size={26}
-        hideRing
+        hairlineRing
       />
 
       <span
@@ -384,7 +384,7 @@ function ChampionRowDark({
           userId={entry?.player?.id ?? null}
           size={38}
           ringColor={GOLD}
-          thinRing
+          hairlineRing
         />
       </span>
       <div style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', gap: 2 }}>
@@ -447,7 +447,7 @@ function DefendingChampionRowDark({
           alt={data.name}
           size={40}
           ringColor={GOLD}
-          thinRing
+          hairlineRing
         />
       </span>
       <div style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', gap: 3 }}>
@@ -1241,8 +1241,7 @@ export function CinematicFrame({
                       alt={name}
                       userId={entry?.player?.id ?? null}
                       size={26}
-                      hideRing={!row.isLeader}
-                      hairlineRing={row.isLeader}
+                      hairlineRing
                       ringColor={row.isLeader ? LEADER_GREEN_RING : undefined}
                     />
                     <span style={{ flex: 1, minWidth: 0, fontSize: 14, fontWeight: row.isLeader ? 700 : 600, color: 'white', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{name}</span>

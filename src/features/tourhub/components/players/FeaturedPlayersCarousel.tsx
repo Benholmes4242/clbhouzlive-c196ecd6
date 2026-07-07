@@ -7,7 +7,7 @@ import { useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import { ChevronRight } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
+import { SquircleAvatar, LIGHT_HAIRLINE } from '@/components/ui/SquircleAvatar';
 import { resolvePlayerAvatarCandidates } from '../../_shared/resolvePlayerAvatar';
 import type { TourPlayer, TourPlayerStatistics } from '../../hooks/useTourHubData';
 
@@ -78,7 +78,7 @@ function FeaturedPlayerCard({ player, stats, highlight, className }: FeaturedPla
           })}
           alt={player.full_name}
           userId={player.id}
-          hideRing
+          hairlineRing ringColor={LIGHT_HAIRLINE}
         />
       </div>
 
