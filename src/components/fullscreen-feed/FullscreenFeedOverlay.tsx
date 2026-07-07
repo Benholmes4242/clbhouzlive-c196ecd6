@@ -563,6 +563,27 @@ export function FullscreenFeedOverlay() {
                         />
                       )
                     )}
+                    {/* 0.55 SCRIM over the blur — completes the surround
+                        rule: blur UNDERNEATH + 0.55 scrim on top + clone
+                        media (z=2). Nothing fully opaque may sit between
+                        the blur and the media except the media itself.
+                        Only rendered on letterboxed (contain-mode) target
+                        rects, matching the blur gate above. */}
+                    {(targetRect.width < window.innerWidth - 1 ||
+                      targetRect.height < window.innerHeight - 1) && (
+                      <div
+                        aria-hidden="true"
+                        style={{
+                          position: 'fixed',
+                          inset: 0,
+                          background: '#000',
+                          opacity: firstFrameReady ? 0 : 0.55,
+                          transition: 'opacity 180ms linear',
+                          pointerEvents: 'none',
+                          zIndex: 1,
+                        }}
+                      />
+                    )}
                     <img
                       src={origin.posterUrl ?? undefined}
                       alt=""
