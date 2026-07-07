@@ -159,10 +159,23 @@ async function getCourseTags30d(supabase: any, userId: string, sinceIso: string)
   return { courseTags, top100CourseTags };
 }
 
-// Mentions - placeholder, return 0 for now (no mentions table yet)
-async function getMentions30d(_supabase: any, _userId: string, _sinceIso: string): Promise<{ mentions: number; uniqueMentioners: number }> {
-  // Implement when you have a mentions table
-  return { mentions: 0, uniqueMentioners: 0 };
+// Mentions — read from the canonical `mentions` table via the security-definer
+// helper `get_user_mention_signals_30d(user_id, since)`. Returns 30-day totals
+// (any mentioned_type='user' rows) and the distinct mentioner count.
+async function getMentions30d(supabase: any, userId: string, sinceIso: string): Promise<{ mentions: number; uniqueMentioners: number }> {
+  const { data, error } = await supabase.rpc('get_user_mention_signals_30d', {
+    p_user_id: userId,
+    p_since: sinceIso,
+  });
+  if (error) {
+    console.warn('get_user_mention_signals_30d failed:', error.message);
+    return { mentions: 0, uniqueMentioners: 0 };
+  }
+  const row = Array.isArray(data) ? data[0] : data;
+  return {
+    mentions: Number(row?.mentions_count ?? 0),
+    uniqueMentioners: Number(row?.unique_mentioners_count ?? 0),
+  };
 }
 
 serve(async (req) => {
