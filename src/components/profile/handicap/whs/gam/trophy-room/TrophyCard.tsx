@@ -345,8 +345,11 @@ const ShowpieceCard: React.FC<Props> = ({ item, onTap }) => {
 
   const currentValue = item.currentValue ?? 0;
   const locked = !item.earned && currentValue === 0;
-
   const totalTiers = item.tiers.length;
+  // "Started" — tiered badge with progress but below the first threshold.
+  // Uses the ghost/locked surface with LIVE content and a muted-bronze bar.
+  const started = !locked && totalTiers > 1 && item.reachedTier === 0 && currentValue > 0;
+
   const atMax = !locked && item.reachedTier >= totalTiers && totalTiers > 0;
   const nextTier = !atMax && item.reachedTier < totalTiers ? item.tiers[item.reachedTier] : null;
   const prevThreshold = item.reachedTier > 0 ? item.tiers[item.reachedTier - 1].threshold : 0;
@@ -360,14 +363,16 @@ const ShowpieceCard: React.FC<Props> = ({ item, onTap }) => {
 
   // Material palette — every tiered showpiece (including regional Top 100)
   // wears the user's CURRENT material. Region lives in the label, not the colour.
-  const reachedIdx = locked
+  const reachedIdx = locked || started
     ? 1
     : (Math.max(1, Math.min(5, item.reachedTier || 1)) as 1 | 2 | 3 | 4 | 5);
   const materialPal = MATERIAL_PALETTES[reachedIdx];
   const pal = materialPal;
   const c = pal.color;
+  // Muted bronze (the material being smelted toward) for the "started" state.
+  const bronzeC = MATERIAL_PALETTES[1].color;
 
-  const isObsidian = !locked && item.reachedTier >= 5;
+  const isObsidian = !locked && !started && item.reachedTier >= 5;
 
   const [animatedPct, setAnimatedPct] = useState(0);
   const [animatedValue, setAnimatedValue] = useState(0);
@@ -407,32 +412,44 @@ const ShowpieceCard: React.FC<Props> = ({ item, onTap }) => {
 
   const pillLabel = locked
     ? 'UNFORGED'
-    : isObsidian
-      ? `OBSIDIAN · T${item.reachedTier}/${totalTiers}`
-      : totalTiers > 1
-        ? `${pal.label} · T${item.reachedTier}/${totalTiers}`
-        : pal.label;
+    : started
+      ? 'IN PROGRESS'
+      : isObsidian
+        ? `OBSIDIAN · T${item.reachedTier}/${totalTiers}`
+        : totalTiers > 1
+          ? `${pal.label} · T${item.reachedTier}/${totalTiers}`
+          : pal.label;
 
   // Backgrounds
-  const bg = locked
+  const bg = locked || started
     ? T.raised
     : isObsidian
       ? 'linear-gradient(170deg,#12151C 0%,#07080C 100%)'
       : `linear-gradient(180deg, ${rgbaOf(c, 0.13)}, ${rgbaOf(c, 0.02)} 70%), ${T.card}`;
-  const border = locked
+  const border = locked || started
     ? `1px solid ${T.line}`
     : isObsidian
       ? 'none'
       : `1px solid ${rgbaOf(c, 0.45)}`;
   const boxShadow = isObsidian
     ? 'inset 0 1px 0 rgba(255,255,255,0.07), 0 0 0 1px rgba(251,188,46,0.5), 0 6px 22px rgba(0,0,0,0.55)'
-    : locked
+    : locked || started
       ? undefined
       : `inset 0 1px 0 ${rgbaOf(c, 0.18)}`;
 
-  const chipBg = locked ? 'transparent' : rgbaOf(c, 0.14);
-  const chipBorder = locked ? `1.5px dashed ${T.faintest}` : `1px solid ${rgbaOf(c, 0.42)}`;
-  const glyphColor = locked ? T.glyphLocked : c;
+  // Icon chip: dashed for locked (untouched); solid hairline for started
+  // (touched but not yet forged); material tint once forged.
+  const chipBg = locked
+    ? 'transparent'
+    : started
+      ? 'rgba(242,244,247,0.06)'
+      : rgbaOf(c, 0.14);
+  const chipBorder = locked
+    ? `1.5px dashed ${T.faintest}`
+    : started
+      ? `1px solid ${T.line}`
+      : `1px solid ${rgbaOf(c, 0.42)}`;
+  const glyphColor = locked || started ? T.dim : c;
 
   return (
     <button
