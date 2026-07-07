@@ -447,7 +447,7 @@ function DefendingChampionRowDark({
           alt={data.name}
           size={40}
           ringColor={GOLD}
-          thinRing
+          hairlineRing
         />
       </span>
       <div style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', gap: 3 }}>
