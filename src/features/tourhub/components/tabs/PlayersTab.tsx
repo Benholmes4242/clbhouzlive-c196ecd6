@@ -165,7 +165,7 @@ function HeroChampion({ champion, champStats, champAvatarCandidates, sort, activ
               srcCandidates={champAvatarCandidates}
               alt={champion.playerName}
               userId={champion.playerId}
-              hideRing
+              hairlineRing ringColor={LIGHT_HAIRLINE}
               priority
             />
           </div>
