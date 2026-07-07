@@ -7,7 +7,6 @@ import { usePageReady } from '@/perf/usePageReady';
 import { WatchRevealProvider, useWatchRevealed } from './WatchRevealContext';
 import TrendingThisWeek from './TrendingThisWeek';
 import LatestVideosRail from './LatestVideosRail';
-import WatchAutoplay from './WatchAutoplay';
 import WatchGrid from './WatchGrid';
 import { SectionHeader } from '@/components/ui/SectionHeader';
 // WatchSectionDivider removed in Phase 4 — kicker + h1 already separate
@@ -120,10 +119,6 @@ function UnifiedWatchFeedInner({ embedded = false }: UnifiedWatchFeedProps) {
         <div style={{ paddingTop: 0, paddingBottom: 2, marginTop: -6 }}>
           <WatchMoodChips active={mood} onChange={setMood} />
         </div>
-        <WatchAutoplay
-          posts={posts}
-          gridRef={gridRef as React.RefObject<HTMLDivElement>}
-        />
         <WatchGrid
           onFirstRowDecoded={handleFirstRowDecoded}
           posts={posts}
