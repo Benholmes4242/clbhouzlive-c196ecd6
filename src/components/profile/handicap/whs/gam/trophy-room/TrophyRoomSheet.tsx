@@ -604,91 +604,105 @@ export const TrophyRoomSheet: React.FC<Props> = ({ userId, viewerUserId, ownerFi
             )}
           </div>
 
-          {/* NEXT UNLOCK spotlight (was pinned in the previous layout) */}
+          {/* NEXT FORGE spotlight — destination material tint. */}
           {nextUnlock && (
             <div style={{ padding: '4px 0 12px' }}>
-              <button
-                type="button"
-                onClick={() => openDetail(nextUnlock.item)}
-                style={{
-                  width: '100%',
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: 12,
-                  padding: '12px 14px',
-                  borderRadius: 14,
-                  background: CARD,
-                  border: `1px solid ${LINE}`,
-                  borderLeft: `3px solid ${AMBER}`,
-                  cursor: 'pointer',
-                  textAlign: 'left',
-                  fontFamily: GAM.FONT_GEIST,
-                  color: INK,
-                }}
-              >
-                <div
-                  style={{
-                    width: 36,
-                    height: 36,
-                    borderRadius: 10,
-                    background: 'rgba(247,147,30,0.10)',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    color: AMBER,
-                    flexShrink: 0,
-                  }}
-                >
-                  {renderBadgeIcon(nextUnlock.item.iconKey, 16, 'currentColor')}
-                </div>
-                <div style={{ flex: 1, minWidth: 0 }}>
-                  <div
+              {(() => {
+                const destColor = nextForgeDestPal
+                  ? (nextForgeDestTier === 5 ? FORGE_GOLD : nextForgeDestPal.color)
+                  : AMBER;
+                const destRgb = hexToRgb(destColor);
+                const destMaterial = nextForgeDestPal?.material ?? '';
+                const remaining = Math.max(
+                  0,
+                  (nextUnlock.item.nextThreshold ?? 0) - (nextUnlock.item.currentValue ?? 0),
+                );
+                return (
+                  <button
+                    type="button"
+                    onClick={() => openDetail(nextUnlock.item)}
                     style={{
-                      fontSize: 8.5,
-                      fontWeight: 800,
-                      letterSpacing: '0.14em',
-                      color: AMBER,
-                    }}
-                  >
-                    NEXT UNLOCK
-                  </div>
-                  <div
-                    style={{
-                      fontSize: 14,
-                      fontWeight: 800,
-                      color: INK,
-                      marginTop: 2,
-                      lineHeight: 1.2,
-                      whiteSpace: 'nowrap',
-                      overflow: 'hidden',
-                      textOverflow: 'ellipsis',
-                      ...GAM.TABULAR,
-                    }}
-                  >
-                    {nextUnlock.item.name} · {nextUnlock.item.currentValue} of {nextUnlock.item.nextThreshold}
-                  </div>
-                  <div
-                    style={{
-                      marginTop: 8,
                       width: '100%',
-                      height: 3,
-                      borderRadius: 99,
-                      background: 'rgba(255,255,255,0.07)',
-                      overflow: 'hidden',
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: 12,
+                      padding: '12px 14px',
+                      borderRadius: 14,
+                      background: CARD,
+                      border: `1px solid ${LINE}`,
+                      borderLeft: `3px solid ${AMBER}`,
+                      cursor: 'pointer',
+                      textAlign: 'left',
+                      fontFamily: GAM.FONT_GEIST,
+                      color: INK,
                     }}
                   >
                     <div
                       style={{
-                        width: `${nextUnlock.frac * 100}%`,
-                        height: '100%',
-                        background: AMBER,
-                        borderRadius: 99,
+                        width: 36,
+                        height: 36,
+                        borderRadius: 10,
+                        background: `rgba(${destRgb},0.14)`,
+                        border: `1px solid rgba(${destRgb},0.42)`,
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        color: destColor,
+                        flexShrink: 0,
                       }}
-                    />
-                  </div>
-                </div>
-                <ChevronRight size={16} color={FAINT} style={{ flexShrink: 0 }} />
-              </button>
+                    >
+                      {renderBadgeIcon(nextUnlock.item.iconKey, 16, 'currentColor')}
+                    </div>
+                    <div style={{ flex: 1, minWidth: 0 }}>
+                      <div
+                        style={{
+                          fontSize: 8.5,
+                          fontWeight: 800,
+                          letterSpacing: '0.14em',
+                          color: AMBER,
+                        }}
+                      >
+                        NEXT FORGE
+                      </div>
+                      <div
+                        style={{
+                          fontSize: 14,
+                          fontWeight: 800,
+                          color: INK,
+                          marginTop: 2,
+                          lineHeight: 1.2,
+                          whiteSpace: 'nowrap',
+                          overflow: 'hidden',
+                          textOverflow: 'ellipsis',
+                          ...GAM.TABULAR,
+                        }}
+                      >
+                        {destMaterial ? `${destMaterial} ${nextUnlock.item.name}` : nextUnlock.item.name} · {remaining} to go
+                      </div>
+                      <div
+                        style={{
+                          marginTop: 8,
+                          width: '100%',
+                          height: 3,
+                          borderRadius: 99,
+                          background: 'rgba(255,255,255,0.07)',
+                          overflow: 'hidden',
+                        }}
+                      >
+                        <div
+                          style={{
+                            width: `${nextUnlock.frac * 100}%`,
+                            height: '100%',
+                            background: destColor,
+                            borderRadius: 99,
+                          }}
+                        />
+                      </div>
+                    </div>
+                    <ChevronRight size={16} color={FAINT} style={{ flexShrink: 0 }} />
+                  </button>
+                );
+              })()}
             </div>
           )}
 
