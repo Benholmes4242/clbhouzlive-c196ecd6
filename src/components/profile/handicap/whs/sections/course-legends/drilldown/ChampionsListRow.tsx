@@ -1,6 +1,7 @@
 import { GAM } from '../../../gam/tokens';
 import React from 'react';
 import { Crown } from 'lucide-react';
+import { MovementCell } from './_shared/MovementCell';
 
 interface ChampionsListRowProps {
   rank: number;
@@ -17,6 +18,9 @@ interface ChampionsListRowProps {
   compact?: boolean;
   /** Backdrop theme. Default 'dark' preserves handicap drilldown look. */
   theme?: 'light' | 'dark';
+  /** 30-day movement inputs. delta is null when rank_30d is null (NEW). */
+  rank30d?: number | null;
+  delta?: number | null;
 }
 
 const SQUIRCLE_MASK_URL =
@@ -43,8 +47,14 @@ export const ChampionsListRow: React.FC<ChampionsListRowProps> = ({
   isNew = false,
   compact = false,
   theme = 'dark',
+  rank30d,
+  delta,
 }) => {
   const isLight = theme === 'light';
+  // "Absent from the 30d board" is treated as NEW; extend the badge trigger
+  // so newcomers 8-30 days old are also flagged. Keeps the delta cell blank
+  // and lets the pill carry the meaning.
+  const showNew = isNew || rank30d == null;
 
   const rowBg = isLight
     ? (isSelf
@@ -165,7 +175,7 @@ export const ChampionsListRow: React.FC<ChampionsListRowProps> = ({
           }}
         >
           <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{name}</span>
-          {isNew && (
+          {showNew && (
             <span
               style={{
                 fontSize: 8,
@@ -196,7 +206,8 @@ export const ChampionsListRow: React.FC<ChampionsListRowProps> = ({
         </div>
       </div>
 
-      <div style={{ textAlign: 'right', flexShrink: 0, display: 'flex', alignItems: 'baseline', gap: 5 }}>
+      <div style={{ textAlign: 'right', flexShrink: 0, display: 'flex', alignItems: 'center', gap: 10, justifyContent: 'flex-end' }}>
+        <MovementCell delta={delta} rank30d={rank30d} theme={theme} size={compact ? 'chip' : 'row'} />
         <span
           style={{
             fontFamily: GAM.FONT_GEIST,

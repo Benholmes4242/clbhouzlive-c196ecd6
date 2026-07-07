@@ -76,6 +76,12 @@ export interface CourseLegendRow {
   value: number;
   attained_at: string;
   is_self: boolean;
+  /** Total visible rows in this category (echoed on every row). */
+  total_count_in_category?: number | null;
+  /** Rank on the same board 30 days ago; null = absent from the 30d board. */
+  rank_30d: number | null;
+  /** rank_30d - rank_now. Positive = climbed, negative = dropped, 0 = unchanged, null = new. */
+  delta: number | null;
 }
 
 export interface UserLegendStatus {

@@ -4,6 +4,7 @@ import { type LucideIcon, ChevronDown, ChevronUp, Crown } from 'lucide-react';
 import { BottomSheet } from '@/components/ui/BottomSheet';
 import { SheetHeader } from '@/components/ui/SheetHeader';
 import { ChampionsListRow } from './ChampionsListRow';
+import { MovementCell } from './_shared/MovementCell';
 import { formatGapFromChampion, formatHeldFor, daysSince, NEW_BADGE_DAYS } from './_shared/helpers';
 import { duelLine } from './_shared/duelTension';
 import type { LegendCategory, LegendWindow } from '@/lib/gam/types';
@@ -16,6 +17,8 @@ interface SectionRow {
   valueDisplay: string;
   attained_at: string;
   isSelf: boolean;
+  rank30d?: number | null;
+  delta?: number | null;
 }
 
 interface CategoryDescriptor {
@@ -409,18 +412,71 @@ export const FullCourseLeaderboardSheet: React.FC<Props> = ({
                 {championHoldDuration ? `${championHoldDuration} · Champion` : 'Champion'}
               </div>
             </div>
-            <div
+            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 4 }}>
+              <div
+                style={{
+                  fontSize: 24,
+                  fontWeight: 800,
+                  color: INK,
+                  letterSpacing: '-0.02em',
+                  fontVariantNumeric: 'tabular-nums',
+                  lineHeight: 1,
+                }}
+              >
+                {championValueDisplay}
+              </div>
+              <MovementCell
+                delta={champion.delta}
+                rank30d={champion.rank30d}
+                theme={theme}
+                size="row"
+              />
+            </div>
+          </div>
+        )}
+
+        {/* Column header — micro-caps "30D" above the movement cell */}
+        {champion && !standsAlone && listRows.length > 0 && (
+          <div
+            style={{
+              display: 'grid',
+              gridTemplateColumns: '24px 40px 1fr auto',
+              gap: 14,
+              alignItems: 'center',
+              padding: '10px 16px 6px',
+              background: SURFACE,
+              borderBottom: `0.5px solid ${HAIRLINE}`,
+              flexShrink: 0,
+            }}
+          >
+            <span />
+            <span />
+            <span />
+            <span
               style={{
-                fontSize: 24,
+                display: 'flex',
+                alignItems: 'center',
+                gap: 10,
+                justifyContent: 'flex-end',
+                fontSize: 9,
                 fontWeight: 800,
-                color: INK,
-                letterSpacing: '-0.02em',
-                fontVariantNumeric: 'tabular-nums',
-                lineHeight: 1,
+                letterSpacing: '0.12em',
+                textTransform: 'uppercase',
+                color: INK_55,
+                fontFamily: GAM.FONT_GEIST,
               }}
             >
-              {championValueDisplay}
-            </div>
+              <span style={{ minWidth: 26, textAlign: 'right' }}>30D</span>
+              <span
+                style={{
+                  minWidth: 40,
+                  textAlign: 'right',
+                  fontVariantNumeric: 'tabular-nums',
+                }}
+              >
+                {activeDescriptor?.unit?.toUpperCase() || 'SCORE'}
+              </span>
+            </span>
           </div>
         )}
 
@@ -482,6 +538,8 @@ export const FullCourseLeaderboardSheet: React.FC<Props> = ({
                     holdDuration={null}
                     isNew={daysSince(row.attained_at) < NEW_BADGE_DAYS}
                     theme={theme}
+                    rank30d={row.rank30d}
+                    delta={row.delta}
                   />
                 </div>
               );

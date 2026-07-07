@@ -99,6 +99,8 @@ interface SectionRow {
   attained_at: string;
   isSelf: boolean;
   userId: string | null;
+  rank30d: number | null;
+  delta: number | null;
 }
 
 interface Props {
@@ -190,6 +192,8 @@ export const CourseLegendsDrilldown: React.FC<Props> = ({ selection, hideHeader 
         attained_at: row.attained_at,
         isSelf: row.is_self,
         userId: row.user_id ?? null,
+        rank30d: row.rank_30d ?? null,
+        delta: row.delta ?? null,
       });
       entry.total = row.total_count_in_category ?? entry.rows.length;
       m.set(cat, entry);
@@ -400,6 +404,8 @@ export const CourseLegendsDrilldown: React.FC<Props> = ({ selection, hideHeader 
               isSelf: r.isSelf,
               gapToChampion: r.rank === champion.rank ? null : formatGapFromChampion(cat, r.value, champion.value),
               userId: r.userId,
+              rank30d: r.rank30d,
+              delta: r.delta,
             }));
             return (
               <div key={cat} data-category={cat}>

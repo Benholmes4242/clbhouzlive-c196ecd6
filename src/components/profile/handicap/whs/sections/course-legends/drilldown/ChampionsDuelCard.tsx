@@ -2,6 +2,7 @@ import React from 'react';
 import { Crown, Swords, type LucideIcon } from 'lucide-react';
 import type { LegendCategory } from '@/lib/gam/types';
 import { ChampionsListRow } from './ChampionsListRow';
+import { MovementCell } from './_shared/MovementCell';
 import { duelLine, chaseProgress } from './_shared/duelTension';
 import { ProBenchmarkBand } from './ProBenchmarkBand';
 import type { ProProfile, ProBandBase } from './_shared/proBenchmark';
@@ -16,6 +17,9 @@ export interface DuelRow {
   isSelf: boolean;
   gapToChampion: string | null;
   userId?: string | null;
+  /** 30-day movement inputs. */
+  rank30d?: number | null;
+  delta?: number | null;
 }
 
 interface ChampionsDuelCardProps {
@@ -323,9 +327,22 @@ export const ChampionsDuelCard: React.FC<ChampionsDuelCardProps> = ({
                 whiteSpace: 'nowrap',
                 overflow: 'hidden',
                 textOverflow: 'ellipsis',
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: 6,
               }}
             >
-              {firstName(champion?.name ?? '—')}
+              <span style={{ overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                {firstName(champion?.name ?? '—')}
+              </span>
+              {champion && (
+                <MovementCell
+                  delta={champion.delta}
+                  rank30d={champion.rank30d}
+                  theme={theme}
+                  size="chip"
+                />
+              )}
             </span>
             <span
               style={{
@@ -502,6 +519,8 @@ export const ChampionsDuelCard: React.FC<ChampionsDuelCardProps> = ({
               holdDuration={null}
               compact
               theme={theme}
+              rank30d={row.rank30d}
+              delta={row.delta}
             />
           ))
         )}
