@@ -327,9 +327,22 @@ export const ChampionsDuelCard: React.FC<ChampionsDuelCardProps> = ({
                 whiteSpace: 'nowrap',
                 overflow: 'hidden',
                 textOverflow: 'ellipsis',
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: 6,
               }}
             >
-              {firstName(champion?.name ?? '—')}
+              <span style={{ overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                {firstName(champion?.name ?? '—')}
+              </span>
+              {champion && (
+                <MovementCell
+                  delta={champion.delta}
+                  rank30d={champion.rank30d}
+                  theme={theme}
+                  size="chip"
+                />
+              )}
             </span>
             <span
               style={{
