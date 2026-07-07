@@ -4600,6 +4600,23 @@ em-emoji-picker input:focus {
   transition: none !important;
 }
 
+/* Immersive status-bar backplate: this must live after the late global
+   `html/body/#root { background: var(--bg-page) !important; }` mobile rules.
+   App.tsx writes inline black for immersive routes, but those shorthand
+   `background` rules were winning in computed style and repainting the notch
+   back to #F8FAFC. Keep app-shell/page-root transparent; only the document
+   backplate is black for any transient gap behind full-bleed heroes. */
+html[data-immersive-route='true'],
+html[data-immersive-route='true'] body {
+  background: #000000 !important;
+  background-color: #000000 !important;
+}
+
+html[data-immersive-route='true'] #root {
+  background: transparent !important;
+  background-color: transparent !important;
+}
+
 /* Sonner toast bottom positioning — sits above nav bar */
 [data-sonner-toaster] {
   bottom: 97px !important;
