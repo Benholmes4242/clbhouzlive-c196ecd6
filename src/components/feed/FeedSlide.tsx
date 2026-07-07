@@ -460,6 +460,10 @@ const FullscreenVideoSlot: React.FC<{
           aria-hidden
           style={{
             ...mediaFrameStyle, objectFit: settledRect.fit, zIndex: 1,
+            // Poster fades OUT 1→0 on top of an already-opaque video host
+            // (see below). Asymmetric crossfade — the host does NOT fade in
+            // 0→1, so the composite never dips through ~0.75× brightness
+            // (the "flash" the symmetric fade produced over black).
             opacity: lane.snapshot.firstFrame ? 0 : 1,
             transition: 'opacity 120ms linear',
           }}
@@ -471,10 +475,13 @@ const FullscreenVideoSlot: React.FC<{
         ref={lane.hostRef}
         style={{
           ...mediaFrameStyle, zIndex: 2, pointerEvents: 'none',
+          // Snap to opaque (no transition) the moment the engine paints the
+          // real first frame. Poster on top fades out over 120ms; composite
+          // brightness stays at 100% throughout — no post-settle flash.
           opacity: lane.snapshot.firstFrame ? 1 : 0,
-          transition: 'opacity 120ms linear',
         }}
       />
+
     </div>
   );
 };

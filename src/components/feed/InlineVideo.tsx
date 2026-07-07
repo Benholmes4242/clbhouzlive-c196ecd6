@@ -138,12 +138,17 @@ export const InlineVideo: React.FC<Props> = ({
           inset: 0,
           width: '100%',
           height: '100%',
-          // Fade in the video over the poster on first frame.
+          // Snap to opaque the moment firstFrame flips (no transition). The
+          // poster sits underneath at z:0; a 120ms fade here dips the
+          // composite through ~0.5×poster + ~0.5×video mid-transition, and
+          // on borrow-return that reads as a brief flash of the poster/first
+          // frame as the element re-attaches. Snapping keeps the handback
+          // pixel-exact.
           opacity: isActive && lane.snapshot.firstFrame ? 1 : 0,
-          transition: 'opacity 120ms linear',
           pointerEvents: 'none',
         }}
       />
+
       {isActive && <MuteToggle />}
     </div>
   );
