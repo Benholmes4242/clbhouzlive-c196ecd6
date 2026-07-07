@@ -7,7 +7,7 @@
 import { Link } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Crown, Flame, Trophy } from 'lucide-react';
-import { SquircleAvatar, LIGHT_HAIRLINE } from '@/components/ui/SquircleAvatar';
+import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { resolvePlayerAvatarCandidates } from '../../_shared/resolvePlayerAvatar';
 import { titleCaseCountry } from '../../utils/countryFlags';
 import CountryFlag from '@/components/ui/country-flag';
@@ -273,6 +273,8 @@ export function LeadersMasthead({
             <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
               {/* Photo + "1" badge */}
               <div style={{ position: 'relative', flexShrink: 0 }}>
+                {/* Leader frame: semantic gold ring -- canon exception, no
+                    hairline underneath. */}
                 <div
                   style={{
                     width: 80,
@@ -288,7 +290,6 @@ export function LeadersMasthead({
                     srcCandidates={avatarCandidates}
                     alt={leader.player.full_name}
                     userId={leader.player.id}
-                    hairlineRing ringColor={LIGHT_HAIRLINE}
                   />
                 </div>
                 <div
