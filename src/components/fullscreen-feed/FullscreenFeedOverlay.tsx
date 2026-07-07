@@ -601,14 +601,13 @@ export function FullscreenFeedOverlay() {
                     alt=""
                     aria-hidden
                     onTransitionEnd={(e) => {
-                      // Motion clock = readiness clock. Reveal the settled
-                      // host only after the clone's own expand animation
-                      // completes (300ms transform). Guarded so it only
-                      // fires once, and only for the expand direction.
+                      // Motion clock: clone's expand animation just finished.
+                      // The combined reveal gate above decides when to flip
+                      // firstFrameReady (waits for the video's real first
+                      // frame on video opens; images reveal immediately).
                       if (!cloneExpanded) return;
                       if (e.propertyName !== 'transform') return;
-                      if (watchdogRef.current) { clearTimeout(watchdogRef.current); watchdogRef.current = null; }
-                      setFirstFrameReady(true);
+                      setMotionComplete(true);
                     }}
                     style={{
                       position: 'fixed',
