@@ -78,9 +78,6 @@ export const TopTenCardComments: React.FC<TopTenCardCommentsProps> = ({
     }
   }, [isOpen]);
 
-  const handleDraftChange = (val: string) => {
-    setDraft(val);
-  };
 
   const handleSubmit = () => {
     if (!draft.trim()) return;
