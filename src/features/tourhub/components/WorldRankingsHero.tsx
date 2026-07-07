@@ -577,6 +577,7 @@ function MoverRow({ mover, direction, isLast }: MoverRowProps) {
         playerName={playerName}
         tourCode={mover.tourCode}
         size="sm"
+        ringColor={LIGHT_HAIRLINE}
       />
       <div style={{ flex: 1, minWidth: 0 }}>
         <div
