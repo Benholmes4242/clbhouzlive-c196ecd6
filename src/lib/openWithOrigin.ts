@@ -131,19 +131,21 @@ export function openWithOrigin({
   // clone. Prefer mediaId (grouping-safe); fall back to mediaIndex.
   const openingPost = posts[index] as any;
   let mediaDims: { w: number; h: number } | null = null;
+  let mediaKind: 'video' | 'image' | null = null;
   try {
-    const items = openingPost?.mediaItems as Array<{ id?: string; width?: number; height?: number }> | undefined;
+    const items = openingPost?.mediaItems as Array<{ id?: string; width?: number; height?: number; type?: 'video' | 'image' }> | undefined;
     if (items && items.length) {
-      let item: { id?: string; width?: number; height?: number } | undefined;
+      let item: { id?: string; width?: number; height?: number; type?: 'video' | 'image' } | undefined;
       if (mediaId) item = items.find((m) => m?.id === mediaId);
       if (!item) item = items[mediaIndex ?? 0];
       const w = Number(item?.width) || 0;
       const h = Number(item?.height) || 0;
       if (w > 0 && h > 0) mediaDims = { w, h };
+      if (item?.type === 'video' || item?.type === 'image') mediaKind = item.type;
     }
   } catch {}
 
-  const origin = snapshotOrigin(originEl, posterUrl ?? null, mediaDims);
+  const origin = snapshotOrigin(originEl, posterUrl ?? null, mediaDims, mediaKind);
   const postId = openingPost?.id ?? null;
 
   // [VPERF] S1 fs.open — captured at tap. Kind budget picked once source is
