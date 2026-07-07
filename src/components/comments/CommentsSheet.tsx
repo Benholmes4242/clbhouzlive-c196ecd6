@@ -1128,55 +1128,22 @@ function CommentsSheet({
                     hairlineRing ringColor={LIGHT_HAIRLINE}
                   />
                   <div className="flex-1 min-w-0 relative">
-                    <MentionAutocomplete
-                      isActive={mention.isActive}
-                      suggestions={mention.suggestions}
-                      isLoading={mention.isLoading}
-                      inputRef={textareaRef}
-                      onSelect={(sel) => {
-                        const { newText, newCaret } = mention.applySelection(sel);
-                        setInputText(newText);
-                        setCaret(newCaret);
-                        requestAnimationFrame(() => {
-                          const el = textareaRef.current;
-                          if (el) {
-                            el.focus();
-                            el.setSelectionRange(newCaret, newCaret);
-                          }
-                        });
-                      }}
-                    />
                     <div style={{
                       display: 'flex', alignItems: 'flex-end', gap: 4, borderRadius: 22, padding: '4px 6px 4px 14px',
                       background: '#ffffff',
                       border: `0.5px solid ${BORDER}`,
                       minHeight: 42,
                     }}>
-                      <textarea
-                        ref={textareaRef}
+                      <MentionsComposerInput
                         value={inputText}
-                        onChange={(e) => {
-                          setInputText(e.target.value);
-                          setCaret(e.target.selectionStart ?? e.target.value.length);
-                        }}
-                        onKeyUp={(e) => setCaret((e.target as HTMLTextAreaElement).selectionStart ?? 0)}
-                        onClick={(e) => setCaret((e.target as HTMLTextAreaElement).selectionStart ?? 0)}
-                        onKeyDown={handleInputKeyDown}
+                        onChange={setInputText}
+                        onSubmit={handleSend}
                         placeholder={replyingTo ? `Reply to ${replyingTo.displayName}...` : 'Add a comment...'}
-                        rows={1}
-                        className="flex-1 min-w-0 bg-transparent outline-none resize-none placeholder:text-[color:#94A3B8]"
-                        style={{
-                          fontSize: 14,
-                          color: INK,
-                          minHeight: 20,
-                          maxHeight: 120,
-                          lineHeight: 1.4,
-                          padding: '8px 0',
-                          fontFamily: 'inherit',
-                        }}
+                        inputRef={(el) => { (textareaRef as any).current = el; }}
                       />
                     </div>
                   </div>
+
 
                   <button
                     type="button"
