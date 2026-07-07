@@ -76,13 +76,7 @@ export function useDiscoverySignals(): UseDiscoverySignalsResult {
           last_position_seconds,
           duration_seconds,
           posts!inner(
-            user_id,
-            post_tags(
-              taggable_entities(
-                entity_type,
-                slug
-              )
-            )
+            user_id
           )
         `)
         .eq('user_id', user.id)
