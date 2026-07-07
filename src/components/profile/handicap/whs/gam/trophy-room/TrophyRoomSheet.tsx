@@ -544,11 +544,18 @@ export const TrophyRoomSheet: React.FC<Props> = ({ userId, viewerUserId, ownerFi
           {nextUnlock && (
             <div style={{ padding: '4px 0 12px' }}>
               {(() => {
-                const destColor = nextForgeDestPal
-                  ? (nextForgeDestTier === 5 ? FORGE_GOLD : nextForgeDestPal.color)
-                  : AMBER;
+                // Selection rule: nextUnlock = highest fractional progress across
+                // ANY not-fully-maxed tiered/one-shot achievement (tiebreak: fewer
+                // remainingUnits, then alpha). Tiered target uses destination
+                // material colour; one-shot fallback uses rarity colour.
+                const isOneShot = nextUnlock.item.tiers.length === 1;
+                const destColor = isOneShot
+                  ? (rarityColor[nextUnlock.item.rarity as keyof typeof rarityColor] ?? '#94A3B8')
+                  : nextForgeDestPal
+                    ? (nextForgeDestTier === 5 ? FORGE_GOLD : nextForgeDestPal.color)
+                    : AMBER;
                 const destRgb = hexToRgb(destColor);
-                const destMaterial = nextForgeDestPal?.material ?? '';
+                const destMaterial = !isOneShot ? (nextForgeDestPal?.material ?? '') : '';
                 const remaining = Math.max(
                   0,
                   (nextUnlock.item.nextThreshold ?? 0) - (nextUnlock.item.currentValue ?? 0),
