@@ -654,8 +654,10 @@ const BorrowedFullscreenSlot: React.FC<{
 
   // Kick off the reverse-shrink when the overlay flips closeAnim to 'borrow'.
   React.useEffect(() => {
+    if (FS_TRANSITION_MODE === 'cut') return; // cut mode: instant handback, no reverse motion
     if (closeAnim !== 'borrow') return;
     if (closing) return;
+
     // Fresh origin rect from the registry — the borrowed tile is still
     // mounted (feed scroll-locked) so its host's getBoundingClientRect is
     // valid. Fallback to the mount-time originRect prop if the host is gone.
