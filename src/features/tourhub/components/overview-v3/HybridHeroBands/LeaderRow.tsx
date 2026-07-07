@@ -166,7 +166,7 @@ export function StackedAvatars({
             srcCandidates={p.avatarCandidates}
             alt={p.name ?? ''}
             userId={p.playerId ?? p.name ?? ''}
-            hideRing
+            hairlineRing ringColor={LIGHT_HAIRLINE}
           />
         </div>
       ))}
