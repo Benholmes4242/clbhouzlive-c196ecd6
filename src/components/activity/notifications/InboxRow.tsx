@@ -5,7 +5,7 @@ import {
   Star, Reply, AtSign, BadgeCheck, XCircle, Trophy, Flag, CheckCircle2, Clock, Ban,
 } from 'lucide-react';
 import type { ActivityNotification } from '@/hooks/useActivityFeed';
-import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
+import { SquircleAvatar, LIGHT_HAIRLINE } from '@/components/ui/SquircleAvatar';
 import {
   getActorDisplayName, getActorAvatarUrl,
   isBusinessEntityNotification, isClbhouzSystemNotification,
@@ -304,7 +304,8 @@ export const InboxRow: React.FC<Props> = ({ notification: n, onClick, currentUse
                 alt={actorName || 'User'}
                 size={44}
                 fallback={actorName?.charAt(0) || '?'}
-                hideRing
+                hairlineRing
+                ringColor={LIGHT_HAIRLINE}
               />
             </div>
             <span

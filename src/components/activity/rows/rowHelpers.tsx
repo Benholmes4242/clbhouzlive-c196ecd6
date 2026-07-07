@@ -1,7 +1,7 @@
 import React from 'react';
 import { cn } from '@/lib/utils';
 import { ActivityNotification } from '@/hooks/useActivityFeed';
-import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
+import { SquircleAvatar, LIGHT_HAIRLINE } from '@/components/ui/SquircleAvatar';
 import { VerifiedBadge } from '@/components/ui/VerifiedBadge';
 import { NotificationCard, getNotificationButtonClass } from '@/components/ui/NotificationCard';
 import {
@@ -209,13 +209,14 @@ export const AvatarWithBadge: React.FC<AvatarWithBadgeProps> = ({ notification, 
 
   return (
     <div className="relative shrink-0" style={{ width: 48, height: 50 }}>
-      <div style={{ border: '0.5px solid #D1D5DB', borderRadius: '34%', padding: 0, lineHeight: 0 }}>
+      <div style={{ borderRadius: '34%', padding: 0, lineHeight: 0 }}>
         <SquircleAvatar
           src={avatarUrl}
           alt={displayName || 'User'}
           size={48}
           fallback={displayName?.charAt(0) || '?'}
-          hideRing
+          hairlineRing
+          ringColor={LIGHT_HAIRLINE}
         />
       </div>
       <span

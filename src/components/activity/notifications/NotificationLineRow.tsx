@@ -2,7 +2,7 @@ import React from 'react';
 import { motion } from 'framer-motion';
 import { Flag } from 'lucide-react';
 import type { ActivityNotification } from '@/hooks/useActivityFeed';
-import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
+import { SquircleAvatar, LIGHT_HAIRLINE } from '@/components/ui/SquircleAvatar';
 import {
   getActorDisplayName,
   getActorAvatarUrl,
@@ -49,7 +49,8 @@ export const NotificationLineRow: React.FC<Props> = ({ notification, onClick }) 
             alt={actorName || 'User'}
             size={40}
             fallback={actorName?.charAt(0) || '?'}
-            hideRing
+            hairlineRing
+            ringColor={LIGHT_HAIRLINE}
           />
         </div>
         <PinBadge />

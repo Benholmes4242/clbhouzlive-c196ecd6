@@ -3,7 +3,7 @@ import { motion } from 'framer-motion';
 import { Flag } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import type { ActivityNotification } from '@/hooks/useActivityFeed';
-import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
+import { SquircleAvatar, LIGHT_HAIRLINE } from '@/components/ui/SquircleAvatar';
 import {
   getActorDisplayName,
   getActorAvatarUrl,
@@ -111,13 +111,15 @@ export const ReviewNotificationCard: React.FC<Props> = ({ notification, onClick 
       {/* Body */}
       <div className="px-4 pt-3 pb-3.5 flex items-start gap-3">
         <div className="relative shrink-0" style={{ marginTop: -22 }}>
+          {/* 3px white wrapper = facepile-style solid separation over hero photo (canon exception). */}
           <div style={{ border: '3px solid white', borderRadius: '34%', lineHeight: 0, boxShadow: '0 2px 8px rgba(0,0,0,0.12)' }}>
             <SquircleAvatar
               src={avatarUrl}
               alt={actorName || 'User'}
               size={44}
               fallback={actorName?.charAt(0) || '?'}
-              hideRing
+              hairlineRing
+              ringColor={LIGHT_HAIRLINE}
             />
           </div>
         </div>
