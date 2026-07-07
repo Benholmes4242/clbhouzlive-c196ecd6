@@ -185,6 +185,7 @@ export function ScheduleHeroCard({ tournament, type, leaderWinner, currentIndex 
                         tourCode={winner.tourCode ?? tournament.tour_code}
                         size={48}
                         frosted
+                        ringColor={LIGHT_HAIRLINE}
                       />
                   </button>
 
