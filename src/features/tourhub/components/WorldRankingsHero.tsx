@@ -313,30 +313,22 @@ function NumberOneCard({
                 width: 80,
                 aspectRatio: '1 / 1.05',
                 borderRadius: '34%',
-                padding: 2,
-                background: GOLD,
+                border: `2px solid ${GOLD}`,
                 boxShadow: '0 0 16px rgba(255,184,0,0.20)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                overflow: 'hidden',
               }}
             >
-              <div
-                style={{
-                  width: '100%',
-                  height: '100%',
-                  borderRadius: '34%',
-                  overflow: 'hidden',
-                  background: SURFACE,
-                }}
-              >
-                <PlayerAvatar
-                  playerId={entry.player.id}
-                  playerName={playerName}
-                  photoUrl={entry.player.photo_url}
-                  tourCode={tourCode}
-                  size="xl"
-                  className="!w-full !h-full !rounded-[34%]"
-                />
-
-              </div>
+              <PlayerAvatar
+                playerId={entry.player.id}
+                playerName={playerName}
+                photoUrl={entry.player.photo_url}
+                tourCode={tourCode}
+                size="xl"
+                className="!w-full !h-full !rounded-[34%]"
+              />
             </div>
             <div
               style={{
