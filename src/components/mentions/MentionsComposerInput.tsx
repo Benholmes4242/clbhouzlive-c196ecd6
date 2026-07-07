@@ -322,7 +322,7 @@ export function MentionsComposerInput({
 }: Props) {
   const mentionsStyle = React.useMemo(() => buildMentionsStyle(textStyle), [textStyle]);
   return (
-    <div style={{ position: 'relative', flex: 1, minWidth: 0, ...style }}>
+    <div style={{ position: 'relative', flex: 1, minWidth: 0, width: '100%', ...style }}>
       <MentionsInput
         value={value}
         onChange={(_evt, newValue) => onChange(newValue)}
