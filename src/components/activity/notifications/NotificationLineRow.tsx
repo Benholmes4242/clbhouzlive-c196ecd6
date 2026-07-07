@@ -49,7 +49,8 @@ export const NotificationLineRow: React.FC<Props> = ({ notification, onClick }) 
             alt={actorName || 'User'}
             size={40}
             fallback={actorName?.charAt(0) || '?'}
-            hideRing
+            hairlineRing
+            ringColor={LIGHT_HAIRLINE}
           />
         </div>
         <PinBadge />
