@@ -21,6 +21,7 @@ import { BrowserRouter, Routes, Route, useLocation, Navigate, useParams, useNavi
 import { setNavigateRef } from '@/utils/navigation';
 import ScrollToTop from '@/components/ScrollToTop';
 import { ScrollRestoration } from '@/components/ScrollRestoration';
+import { LockAnchorSync } from '@/components/LockAnchorSync';
 import { ThemeProvider } from '@/components/theme-provider';
 
 import { SecurityHeaders } from "@/components/security/SecurityHeaders";
