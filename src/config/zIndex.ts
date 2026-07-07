@@ -57,7 +57,9 @@ export const Z = {
     composer: { zIndex: 2 },
     dropdownScrim: { zIndex: 50 },
     dropdownMenu: { zIndex: 60 },
+    mentionsPanel: { zIndex: 12010 },
   }
+
 } as const;
 
 export type ZIndexLayer = keyof typeof Z;
