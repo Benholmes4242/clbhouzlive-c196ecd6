@@ -103,6 +103,7 @@ function toMedianStyle(intent: string): string {
  * height stops re-resolving mid-transition.
  */
 let statusBarOverlayBooted = false;
+let lastStatusBarRequest: { intent: 'light' | 'dark' | 'auto'; hexColor: string } | null = null;
 export function ensureStatusBarOverlayBooted(): void {
   if (statusBarOverlayBooted) return;
   if (typeof window === 'undefined') return;
@@ -130,6 +131,12 @@ export function ensureStatusBarOverlayBooted(): void {
       });
       statusBarOverlayBooted = true;
       overlayRetryCount = 0;
+      if (lastStatusBarRequest) {
+        (bridge.statusbar.set as (opts: Record<string, unknown>) => void)({
+          style: toMedianStyle(lastStatusBarRequest.intent),
+          color: toAARRGGBB(lastStatusBarRequest.hexColor),
+        });
+      }
     }
   } catch {
     // Bridge not ready — the ready callback below retries.
@@ -145,6 +152,7 @@ export function ensureStatusBarOverlayBooted(): void {
  */
 export function setStatusBarStyleColor(intent: 'light' | 'dark' | 'auto', hexColor: string): void {
   if (typeof window === 'undefined') return;
+  lastStatusBarRequest = { intent, hexColor };
   if (!isNativeStatusBarShell()) return;
   try {
     const bridge = getNativeBridge();
@@ -154,9 +162,12 @@ export function setStatusBarStyleColor(intent: 'light' | 'dark' | 'auto', hexCol
         style: toMedianStyle(intent),
         color: toAARRGGBB(hexColor),
       });
+    } else {
+      scheduleOverlayBootRetry();
     }
   } catch {
     // Bridge not ready — silent no-op.
+    scheduleOverlayBootRetry();
   }
 }
 
