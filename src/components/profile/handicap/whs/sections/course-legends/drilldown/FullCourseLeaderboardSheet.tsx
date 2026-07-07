@@ -493,9 +493,14 @@ export const FullCourseLeaderboardSheet: React.FC<Props> = ({
           </div>
         )}
 
-        {/* Scrollable list — ranks 2+ */}
+        {/* Scrollable list — ranks 2+.
+            Scrollbar is hidden so the list's 30D/SCORE columns line up
+            pixel-perfect with the header row and pinned champion banner
+            above (which sit outside this scroller and therefore aren't
+            offset by any reserved scrollbar gutter). */}
         <div
           ref={listRef}
+          className="hcp-champs-list-scroller"
           style={{
             flex: 1,
             minHeight: 0,
@@ -503,8 +508,10 @@ export const FullCourseLeaderboardSheet: React.FC<Props> = ({
             padding: '8px 0 0',
             WebkitOverflowScrolling: 'touch',
             background: SURFACE,
-          }}
+            scrollbarWidth: 'none',
+          } as React.CSSProperties}
         >
+          <style>{`.hcp-champs-list-scroller::-webkit-scrollbar { display: none; }`}</style>
           {activeRows.length === 0 ? (
             <div
               style={{
