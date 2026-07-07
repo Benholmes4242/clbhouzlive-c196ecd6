@@ -7,7 +7,6 @@ import { usePageReady } from '@/perf/usePageReady';
 import { WatchRevealProvider, useWatchRevealed } from './WatchRevealContext';
 import TrendingThisWeek from './TrendingThisWeek';
 import LatestVideosRail from './LatestVideosRail';
-import WatchAutoplay from './WatchAutoplay';
 import WatchGrid from './WatchGrid';
 import { SectionHeader } from '@/components/ui/SectionHeader';
 // WatchSectionDivider removed in Phase 4 — kicker + h1 already separate
