@@ -190,6 +190,12 @@ export function FullscreenFeedOverlay() {
   const [cloneVisible, setCloneVisible] = useState(false);
   const [cloneExpanded, setCloneExpanded] = useState(false);
   const [firstFrameReady, setFirstFrameReady] = useState(false);
+  // Split gates: motion clock (clone transitionend) vs child readiness clock
+  // (video engine has painted the real first frame). For VIDEO opens we must
+  // wait for both — revealing the host before the video paints exposes
+  // FullscreenVideoSlot's poster→video 120ms crossfade as a post-settle flash.
+  const [motionComplete, setMotionComplete] = useState(false);
+  const [childReady, setChildReady] = useState(false);
   const watchdogRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   // Use the real active actor (personal or business) so users in business
