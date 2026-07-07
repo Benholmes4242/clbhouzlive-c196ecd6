@@ -146,7 +146,16 @@ const mentionsStyle = {
   control: {
     background: 'transparent',
     minHeight: 36,
-    ...sharedText,
+    // NOTE: do NOT spread sharedText here. react-mentions positions the
+    // textarea `absolute; top:0` inside the control, so any padding on
+    // control shifts the (in-flow) highlighter down while leaving the
+    // textarea at y=0 — producing the exact one-row selection drift the
+    // brief calls out. Padding lives on the two text layers only.
+    fontFamily: sharedText.fontFamily,
+    fontSize: sharedText.fontSize,
+    fontWeight: sharedText.fontWeight,
+    lineHeight: sharedText.lineHeight,
+    letterSpacing: sharedText.letterSpacing,
   },
   highlighter: {
     ...sharedText,
