@@ -186,6 +186,7 @@ export const LeaderboardRow: React.FC<Props> = ({ entry, rank, isStaleRow, onCli
           return (
             <div
               style={{
+                position: 'relative',
                 width: 33,
                 height: 33,
                 borderRadius: '34%',
@@ -206,6 +207,17 @@ export const LeaderboardRow: React.FC<Props> = ({ entry, rank, isStaleRow, onCli
               ) : (
                 <span>{getInitialsFromName(entry.friend_name) || '?'}</span>
               )}
+              {/* Traced hairline overlay -- dark surface canon; self-frame amber wraps row, not avatar */}
+              <div
+                aria-hidden
+                style={{
+                  position: 'absolute',
+                  inset: 0,
+                  borderRadius: '34%',
+                  border: '1px solid rgba(255,255,255,0.22)',
+                  pointerEvents: 'none',
+                }}
+              />
             </div>
           );
         })()}
