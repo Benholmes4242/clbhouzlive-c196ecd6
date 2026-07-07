@@ -158,6 +158,14 @@ const mentionsStyle = {
     overflow: 'hidden',
     whiteSpace: 'pre-wrap' as const,
     wordWrap: 'break-word' as const,
+    substring: {
+      // react-mentions hides plain substrings by default because the
+      // native textarea normally paints them. Our textarea is transparent,
+      // so the overlay must paint BOTH plain text and mention atoms.
+      visibility: 'visible' as const,
+      color: INK,
+      WebkitTextFillColor: INK,
+    },
   },
   input: {
     ...sharedText,
