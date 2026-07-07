@@ -164,7 +164,7 @@ function usePreviewBypass(): boolean {
 function detectIsMedianAppSync(): boolean {
   try {
     const w = window as any;
-    if (w.median || w.gonative || w.gonern) return true;
+    if (w.median || w.gonern) return true;
     const ua = (navigator.userAgent || '').toLowerCase();
     return /medianapp|gonativeapp|median|gonative/.test(ua);
   } catch {
@@ -386,24 +386,11 @@ function AppRoutes() {
     forceUnlockBodyScroll();
 
     const darkChrome = isDarkChromeRoute(location.pathname);
-    // Immersive route enumeration is single-sourced in
-    // src/components/header/globalHeaderRules.ts (IMMERSIVE_ROUTE_PREFIXES /
-    // IMMERSIVE_EXACT_ROUTES): Clubhouse, courses (list + detail), profile
-    // (self + other + business detail), tour hub, top100 regions, discover
-    // region pages, and any page using the hero-bleed pattern. All of these
-    // must have a TRANSPARENT shield + safe-area bleed so heroes extend into
-    // the notch. If you add a hero-bleed route, add it in globalHeaderRules —
-    // NEVER branch chrome logic per-page here.
     const immersive = isImmersiveRoute(location.pathname);
     const isAuth = location.pathname.startsWith('/auth');
-    // Immersive routes ALWAYS paint html/body pure black so the notch zone
-    // reads as cinematic jet-black. `immersive` is checked FIRST — the old
-    // `darkChrome ? '#15171F' : immersive ? '#000000' : ...` precedence made
-    // Clubhouse (darkChrome ∧ immersive) paint #15171F behind the notch,
-    // which showed as a grey band the moment the status-bar overlay flag
-    // became boot-locked and the shield became the sole chrome writer.
-    // shieldColor + statusBar already check `immersive` first — keep in sync.
-    const surface = immersive ? '#000000' : darkChrome ? '#15171F' : '#F8FAFC';
+    // Immersive routes (course/profile/business) get a DARK ink fallback so
+    // any pre-paint glimpse in the notch/safe-area is cinematic, not grey.
+    const surface = darkChrome ? '#15171F' : immersive ? '#0F172A' : '#F8FAFC';
     const shieldColor = immersive ? 'transparent' : (darkChrome ? '#15171F' : '#F8FAFC');
     // NOTE: `overlay` flag is boot-locked ONCE at app startup via
     // ensureStatusBarOverlayBooted() (see useMedianStatusBar.ts). Route
@@ -416,9 +403,7 @@ function AppRoutes() {
 
     // Idempotency: cache the last-applied values on the effect's module scope.
     // If nothing changed (very common between similar routes) skip every write.
-    // Namespace bumped to __lvChromeCache2 so the first navigation after this
-    // precedence fix cannot skip writes against a stale pre-fix cache shape.
-    const prev = (window as any).__lvChromeCache2 as
+    const prev = (window as any).__lvChromeCache as
       | { surface: string; darkChrome: boolean; isAuth: boolean; immersive: boolean; shieldColor: string; sbKey: string }
       | undefined;
     const sbKey = `${statusBar.style}|${statusBar.color}`;
@@ -474,9 +459,7 @@ function AppRoutes() {
       } catch {}
     }
 
-    (window as any).__lvChromeCache2 = { surface, darkChrome, isAuth, immersive, shieldColor, sbKey };
-    // Retire the old key so nothing downstream can consult stale pre-fix state.
-    try { delete (window as any).__lvChromeCache; } catch {}
+    (window as any).__lvChromeCache = { surface, darkChrome, isAuth, immersive, shieldColor, sbKey };
   }, [location.pathname]);
 
   
@@ -498,7 +481,6 @@ function AppRoutes() {
   // Keep-alive routes configuration - these routes stay mounted when navigating away
   const keepAliveRoutes = useMemo(() => [
     { path: '/', element: <RootGate /> },
-    { path: '/index', element: <RootGate /> },
     { path: '/clubhouse', element: <Navigate to="/" replace /> },
   ], []);
 
@@ -513,7 +495,6 @@ function AppRoutes() {
       <Routes location={routesLocation}>
         {/* Keep-alive routes - rendered by KeepAliveOutlet, but need placeholder for Router */}
         <Route path="/" element={null} />
-        <Route path="/index" element={null} />
         <Route path="/clubhouse" element={null} />
         
         <Route path="/auth" element={<AuthWrapped />} />

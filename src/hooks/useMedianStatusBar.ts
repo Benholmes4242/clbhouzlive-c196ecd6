@@ -3,7 +3,6 @@ import { useEffect, useRef } from 'react';
 declare global {
   interface Window {
     median_library_ready?: () => void;
-    gonative_library_ready?: () => void;
   }
 }
 
@@ -20,59 +19,6 @@ export let currentShieldColor = '#000000';
 // retries are pure overhead that cause a visible ~250ms repaint after every
 // SPA navigation, so we skip them.
 let medianLibraryReady = false;
-
-function getNativeBridge(): any | null {
-  if (typeof window === 'undefined') return null;
-  const w = window as any;
-  return w.median || w.gonative || w.gonern || null;
-}
-
-function isNativeStatusBarShell(): boolean {
-  if (typeof window === 'undefined' || typeof navigator === 'undefined') return false;
-  const ua = (navigator.userAgent || '').toLowerCase();
-  return Boolean(getNativeBridge()) || /medianapp|gonativeapp|median|gonative/.test(ua);
-}
-
-function maybeNativeStatusBarShell(): boolean {
-  if (typeof window === 'undefined' || typeof navigator === 'undefined') return false;
-  const ua = (navigator.userAgent || '').toLowerCase();
-  return /iphone|ipad|ipod|medianapp|gonativeapp|median|gonative/.test(ua) || Boolean(getNativeBridge());
-}
-
-function invokeNativeProtocol(path: string, params: Record<string, string | boolean>): void {
-  if (typeof document === 'undefined') return;
-  const search = new URLSearchParams();
-  Object.entries(params).forEach(([key, value]) => search.set(key, String(value)));
-  const w = window as any;
-  const ua = (navigator.userAgent || '').toLowerCase();
-  const scheme = w.gonative || w.gonern || ua.includes('gonative') ? 'gonative' : 'median';
-  const url = `${scheme}://${path}?${search.toString()}`;
-
-  try {
-    const anchor = document.createElement('a');
-    anchor.href = url;
-    anchor.style.display = 'none';
-    anchor.setAttribute('aria-hidden', 'true');
-    document.documentElement.appendChild(anchor);
-    anchor.click();
-    window.setTimeout(() => anchor.remove(), 1000);
-  } catch {
-    try { window.location.href = url; } catch {}
-  }
-}
-
-let overlayRetryTimer: ReturnType<typeof setTimeout> | null = null;
-let overlayRetryCount = 0;
-
-function scheduleOverlayBootRetry(): void {
-  if (statusBarOverlayBooted || overlayRetryTimer || !maybeNativeStatusBarShell()) return;
-  if (overlayRetryCount >= 16) return;
-  overlayRetryTimer = setTimeout(() => {
-    overlayRetryTimer = null;
-    overlayRetryCount += 1;
-    ensureStatusBarOverlayBooted();
-  }, overlayRetryCount < 4 ? 125 : 500);
-}
 
 export function applyShieldColor(color: string) {
   currentShieldColor = color;
@@ -131,63 +77,28 @@ function toMedianStyle(intent: string): string {
  * height stops re-resolving mid-transition.
  */
 let statusBarOverlayBooted = false;
-let lastStatusBarRequest: { intent: 'light' | 'dark' | 'auto'; hexColor: string } | null = null;
 export function ensureStatusBarOverlayBooted(): void {
   if (statusBarOverlayBooted) return;
   if (typeof window === 'undefined') return;
-
-  // Native shell detection must match the rest of the app: Median iOS builds
-  // can identify as GoNative and/or expose the bridge before the UA contains
-  // "median". The previous `ua.includes('median')` gate marked overlay as
-  // booted on GoNative shells without ever sending `overlay:true`, leaving the
-  // WebView inset below the native grey/white status bar on immersive pages.
-  if (!isNativeStatusBarShell()) {
-    // Do NOT mark booted here. On some Median/GoNative iOS builds the UA marker
-    // and bridge arrive after module evaluation; marking booted early means the
-    // later ready callback returns without ever sending overlay:true, leaving the
-    // WebView permanently inset below the native status bar.
-    scheduleOverlayBootRetry();
+  if (!navigator.userAgent.toLowerCase().includes('median')) {
+    statusBarOverlayBooted = true;
     return;
   }
-
   try {
     // style/color here are throwaway — they get overwritten immediately by
     // the first route/overlay setStyleColor call. What matters is overlay:true.
-    const bridge = getNativeBridge();
-    if (bridge?.statusbar?.set) {
-      bridge.statusbar.set({
+    if (window.median?.statusbar?.set) {
+      window.median.statusbar.set({
         style: 'light',
         color: '00000000',
         overlay: true,
         blur: false,
       });
       statusBarOverlayBooted = true;
-      overlayRetryCount = 0;
-      if (lastStatusBarRequest) {
-        (bridge.statusbar.set as (opts: Record<string, unknown>) => void)({
-          style: toMedianStyle(lastStatusBarRequest.intent),
-          color: toAARRGGBB(lastStatusBarRequest.hexColor),
-        });
-      }
-    } else {
-      invokeNativeProtocol('statusbar/set', {
-        style: 'light',
-        color: '00000000',
-        overlay: true,
-        blur: false,
-      });
     }
   } catch {
     // Bridge not ready — the ready callback below retries.
-    invokeNativeProtocol('statusbar/set', {
-      style: 'light',
-      color: '00000000',
-      overlay: true,
-      blur: false,
-    });
   }
-
-  if (!statusBarOverlayBooted) scheduleOverlayBootRetry();
 }
 
 /**
@@ -197,30 +108,17 @@ export function ensureStatusBarOverlayBooted(): void {
  */
 export function setStatusBarStyleColor(intent: 'light' | 'dark' | 'auto', hexColor: string): void {
   if (typeof window === 'undefined') return;
-  lastStatusBarRequest = { intent, hexColor };
-  if (!isNativeStatusBarShell()) return;
+  if (!navigator.userAgent.toLowerCase().includes('median')) return;
   try {
-    const bridge = getNativeBridge();
-    if (bridge?.statusbar?.set) {
+    if (window.median?.statusbar?.set) {
       // Deliberately omit `overlay`/`blur` — boot-locked, must not be re-sent.
-      (bridge.statusbar.set as (opts: Record<string, unknown>) => void)({
+      (window.median.statusbar.set as (opts: Record<string, unknown>) => void)({
         style: toMedianStyle(intent),
         color: toAARRGGBB(hexColor),
       });
-    } else {
-      invokeNativeProtocol('statusbar/set', {
-        style: toMedianStyle(intent),
-        color: toAARRGGBB(hexColor),
-      });
-      scheduleOverlayBootRetry();
     }
   } catch {
     // Bridge not ready — silent no-op.
-    invokeNativeProtocol('statusbar/set', {
-      style: toMedianStyle(intent),
-      color: toAARRGGBB(hexColor),
-    });
-    scheduleOverlayBootRetry();
   }
 }
 
@@ -230,11 +128,6 @@ if (typeof window !== 'undefined') {
   const prev = window.median_library_ready;
   window.median_library_ready = () => {
     if (typeof prev === 'function') prev();
-    ensureStatusBarOverlayBooted();
-  };
-  const prevGoNative = window.gonative_library_ready;
-  window.gonative_library_ready = () => {
-    if (typeof prevGoNative === 'function') prevGoNative();
     ensureStatusBarOverlayBooted();
   };
 }

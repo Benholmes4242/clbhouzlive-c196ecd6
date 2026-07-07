@@ -17,7 +17,6 @@ import { safeGoBack } from '@/utils/navigation';
 // useMedianStatusBar removed — chrome is owned solely by AppRoutes now.
 import { useWhsConnection } from '@/lib/whs/hooks';
 import { useTourHeroOverlay } from '@/hooks/useTourHeroOverlay';
-import { isImmersiveRoute } from './globalHeaderRules';
 
 interface CompactHeaderProps {
   className?: string;
@@ -197,7 +196,6 @@ const CompactHeader: React.FC<CompactHeaderProps> = ({ className, hidden = false
   // Courses landing: shared cinematic hero always renders under the header,
   // so the CompactHeader is permanently in glass-overlay mode on that route.
   const overlayActive = (tourHeroOverlay && isTourOverviewSurface) || isCoursesLandingRoute;
-  const routeImmersive = isImmersiveRoute(location.pathname);
 
   // Chrome (shield + native status bar) is owned solely by AppRoutes now.
   // The previous useMedianStatusBar call here was already `enabled=false` and
@@ -300,21 +298,21 @@ const CompactHeader: React.FC<CompactHeaderProps> = ({ className, hidden = false
         )}
         style={{
           top: 0,
-          background: hidden || routeImmersive
+          background: hidden
             ? 'transparent'
             : overlayActive
               ? 'transparent'
               : (useDarkChrome ? '#0A0E14' : 'hsl(var(--background))'),
-          backdropFilter: hidden || overlayActive || routeImmersive ? 'none' : (useDarkChrome ? 'none' : 'blur(20px)'),
-          WebkitBackdropFilter: hidden || overlayActive || routeImmersive ? 'none' : (useDarkChrome ? 'none' : 'blur(20px)'),
+          backdropFilter: hidden || overlayActive ? 'none' : (useDarkChrome ? 'none' : 'blur(20px)'),
+          WebkitBackdropFilter: hidden || overlayActive ? 'none' : (useDarkChrome ? 'none' : 'blur(20px)'),
           height: hidden ? 0 : `calc(${contentHeight}px + var(--sat, 0px))`,
           paddingTop: hidden ? 0 : 'var(--sat, 0px)',
-          borderBottom: hidden || overlayActive || routeImmersive
+          borderBottom: hidden || overlayActive
             ? 'none'
             : (useDarkChrome
                 ? '1px solid rgba(255,255,255,0.06)'
                 : '0.5px solid rgba(15,23,42,0.07)'),
-          boxShadow: !hidden && !useDarkChrome && !overlayActive && !routeImmersive && scrolled
+          boxShadow: !hidden && !useDarkChrome && !overlayActive && scrolled
             ? '0 6px 16px -6px rgba(15,23,42,0.18)'
             : 'none',
           transition: 'box-shadow 200ms ease, background 200ms ease',

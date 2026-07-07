@@ -33,7 +33,6 @@ import { RailLanePool } from '@/video/railLanePool';
 import { originHostRegistry } from '@/video/originHostRegistry';
 import type { BorrowDescriptor } from '@/store/fullscreenFeedStore';
 import { setStatusBarStyleColor } from '@/hooks/useMedianStatusBar';
-import { resolveRestingRect, getCurrentViewport } from '@/lib/media/resolveRestingRect';
 const fsTimeStart = (_label: string) => {};
 const fsTimeEnd = (_label: string, _note?: string) => {};
 const fsEvent = (_label: string, _data?: unknown) => {};
@@ -385,29 +384,19 @@ export function FullscreenFeedOverlay() {
       setFirstFrameReady(false);
       setTargetRect(null);
       // Single rAF: after the host mounts (inset:0, opacity:0) + body-class
-      // mutations settle, compute the media's RESTING RECT and expand to it.
-      // Images always rest CONTAIN inside the safe area — the clone grows
-      // into the letterboxed rect rather than the full viewport, so there
-      // is no post-expand shrink.
+      // mutations settle, measure the ACTUAL host rect and expand to it.
       const raf = requestAnimationFrame(() => {
-        const vp = getCurrentViewport();
-        // Prefer the tapped media's intrinsic dims (threaded from
-        // mediaItems by openWithOrigin). Grid tiles are uniform and
-        // cover-crop, so origin.aspectRatio is only a faithful proxy on
-        // FEED cards — use it as the fallback. Final fallback: full
-        // viewport (legacy behaviour).
-        const omw = origin.originMediaW ?? 0;
-        const omh = origin.originMediaH ?? 0;
-        const useMediaDims = omw > 0 && omh > 0;
-        const ar = useMediaDims ? omw / omh : (origin.aspectRatio > 0 ? origin.aspectRatio : 0);
-        const [mw, mh] = useMediaDims ? [omw, omh] : (ar > 0 ? [ar * 1000, 1000] : [0, 0]);
-        const resting = resolveRestingRect(mw, mh, vp, 'image');
-        setTargetRect({
-          top: resting.top,
-          left: resting.left,
-          width: resting.width,
-          height: resting.height,
-        });
+        const host = hostRef.current;
+        const measured = host
+          ? host.getBoundingClientRect()
+          : { top: 0, left: 0, width: window.innerWidth, height: window.innerHeight } as DOMRect;
+        const rect = {
+          top: measured.top,
+          left: measured.left,
+          width: measured.width,
+          height: measured.height,
+        };
+        setTargetRect(rect);
         setCloneExpanded(true);
       });
       // Watchdog: release the clone if the first-frame signal never arrives.
@@ -531,88 +520,34 @@ export function FullscreenFeedOverlay() {
 
                 {/* ── FLIP clone layer (Phase 3 shared-element expand) ── */}
                 {origin && cloneVisible && targetRect && (
-                  <>
-                    {/* Blurred self-backdrop — sourced from the already-decoded
-                        thumbnail (origin.posterUrl). Mounted at frame 0 of the
-                        clone expand and fades in over the expand duration so
-                        the backdrop is already at rest by the time the settled
-                        slide takes over. The settled slide's own backdrop uses
-                        the same source (see FeedSlide) so the handoff is
-                        pixel-identical — no black-then-blur flick. Only
-                        rendered when the target rect is letterboxed
-                        (contain-mode) so landscape video / cover-mode opens
-                        keep their black bars unchanged. */}
-                    {origin.posterUrl && (
-                      (targetRect.width < window.innerWidth - 1 ||
-                        targetRect.height < window.innerHeight - 1) && (
-                        <div
-                          aria-hidden="true"
-                          style={{
-                            position: 'fixed',
-                            inset: 0,
-                            backgroundImage: `url(${origin.posterUrl})`,
-                            backgroundSize: 'cover',
-                            backgroundPosition: 'center',
-                            filter: 'blur(40px) brightness(0.5) saturate(1.2)',
-                            transform: 'scale(1.2)',
-                            opacity: firstFrameReady ? 0 : 1,
-                            transition: 'opacity 180ms linear',
-                            pointerEvents: 'none',
-                            zIndex: 1,
-                          }}
-                        />
-                      )
-                    )}
-                    {/* 0.55 SCRIM over the blur — completes the surround
-                        rule: blur UNDERNEATH + 0.55 scrim on top + clone
-                        media (z=2). Nothing fully opaque may sit between
-                        the blur and the media except the media itself.
-                        Only rendered on letterboxed (contain-mode) target
-                        rects, matching the blur gate above. */}
-                    {(targetRect.width < window.innerWidth - 1 ||
-                      targetRect.height < window.innerHeight - 1) && (
-                      <div
-                        aria-hidden="true"
-                        style={{
-                          position: 'fixed',
-                          inset: 0,
-                          background: '#000',
-                          opacity: firstFrameReady ? 0 : 0.55,
-                          transition: 'opacity 180ms linear',
-                          pointerEvents: 'none',
-                          zIndex: 1,
-                        }}
-                      />
-                    )}
-                    <img
-                      src={origin.posterUrl ?? undefined}
-                      alt=""
-                      aria-hidden
-                      style={{
-                        position: 'fixed',
-                        top: 0,
-                        left: 0,
-                        width: cloneExpanded ? targetRect.width : origin.rect.width,
-                        height: cloneExpanded ? targetRect.height : origin.rect.height,
-                        transform: cloneExpanded
-                          ? `translate(${targetRect.left}px, ${targetRect.top}px)`
-                          : `translate(${origin.rect.left}px, ${origin.rect.top}px)`,
-                        objectFit: 'cover',
-                        borderRadius: cloneExpanded ? 0 : origin.borderRadius,
-                        willChange: 'transform, width, height, opacity, border-radius',
-                        transition:
-                          'transform 300ms cubic-bezier(0.32,0.72,0,1),' +
-                          ' width 300ms cubic-bezier(0.32,0.72,0,1),' +
-                          ' height 300ms cubic-bezier(0.32,0.72,0,1),' +
-                          ' border-radius 240ms cubic-bezier(0.32,0.72,0,1),' +
-                          ' opacity 120ms linear',
-                        opacity: firstFrameReady ? 0 : 1,
-                        pointerEvents: 'none',
-                        zIndex: 2,
-                        background: '#000',
-                      }}
-                    />
-                  </>
+                  <img
+                    src={origin.posterUrl ?? undefined}
+                    alt=""
+                    aria-hidden
+                    style={{
+                      position: 'fixed',
+                      top: 0,
+                      left: 0,
+                      width: cloneExpanded ? targetRect.width : origin.rect.width,
+                      height: cloneExpanded ? targetRect.height : origin.rect.height,
+                      transform: cloneExpanded
+                        ? `translate(${targetRect.left}px, ${targetRect.top}px)`
+                        : `translate(${origin.rect.left}px, ${origin.rect.top}px)`,
+                      objectFit: 'cover',
+                      borderRadius: cloneExpanded ? 0 : origin.borderRadius,
+                      willChange: 'transform, width, height, opacity, border-radius',
+                      transition:
+                        'transform 300ms cubic-bezier(0.32,0.72,0,1),' +
+                        ' width 300ms cubic-bezier(0.32,0.72,0,1),' +
+                        ' height 300ms cubic-bezier(0.32,0.72,0,1),' +
+                        ' border-radius 240ms cubic-bezier(0.32,0.72,0,1),' +
+                        ' opacity 120ms linear',
+                      opacity: firstFrameReady ? 0 : 1,
+                      pointerEvents: 'none',
+                      zIndex: 2,
+                      background: '#000',
+                    }}
+                  />
                 )}
               </>
             )}

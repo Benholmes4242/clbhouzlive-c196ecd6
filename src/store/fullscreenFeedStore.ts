@@ -12,13 +12,6 @@ export interface OpenOrigin {
   posterUrl: string | null;
   borderRadius: string;
   aspectRatio: number;
-  /** Intrinsic natural dimensions of the tapped media, threaded from the
-   *  post's mediaItems. Preferred over `aspectRatio` (tile proxy) because
-   *  grid tiles are uniform and cover-crop — the tile aspect is not a
-   *  faithful proxy for the media on grids. `0`/missing → fall back to
-   *  `aspectRatio`. */
-  originMediaW?: number;
-  originMediaH?: number;
 }
 
 /**

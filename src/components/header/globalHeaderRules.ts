@@ -4,7 +4,6 @@
 export const GLOBAL_HEADER_EXCLUDED_ROUTES = [
   // '/' is the Clubhouse/Watch landing — immersive, no CompactHeader.
   '/',
-  '/index',
   '/clubhouse',
   '/auth',
   '/auth/callback',
@@ -137,7 +136,6 @@ export const IMMERSIVE_ROUTE_PREFIXES = [
 
 export const IMMERSIVE_EXACT_ROUTES = [
   '/',
-  '/index',
   '/clubhouse',
   '/courses',
 ] as const;
@@ -160,7 +158,7 @@ export function isImmersiveRoute(pathname: string): boolean {
  * The cold-launch chain (splash → shell → skeleton → feed) is all
  * `#15171F` on these routes so there is no perceptible colour transition.
  */
-export const DARK_CHROME_ROUTES = ['/', '/index', '/clubhouse', '/auth', '/signup'] as const;
+export const DARK_CHROME_ROUTES = ['/', '/clubhouse', '/auth', '/signup'] as const;
 
 export function isDarkChromeRoute(pathname: string): boolean {
   return (DARK_CHROME_ROUTES as readonly string[]).includes(pathname)

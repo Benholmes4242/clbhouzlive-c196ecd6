@@ -15,8 +15,7 @@ export function isMedianApp(): boolean {
   return ua.includes('median') ||
          ua.includes('gonative') ||
          typeof (window as any).median !== 'undefined' ||
-         typeof (window as any).gonative !== 'undefined' ||
-         typeof (window as any).gonern !== 'undefined';
+         typeof (window as any).gonative !== 'undefined';
 }
 
 /**
