@@ -1122,46 +1122,6 @@ function CommentsSheet({
                     hairlineRing ringColor={LIGHT_HAIRLINE}
                   />
                   <div className="flex-1 min-w-0 relative">
-                    {/* Mention autocomplete dropdown */}
-                    {mentionResults.length > 0 && (
-                      <div style={{
-                        position: 'absolute', bottom: '100%', left: 0, right: 0, marginBottom: 6,
-                        borderRadius: 10, background: '#ffffff',
-                        border: '1px solid rgba(15,23,42,0.07)',
-                        boxShadow: '0 4px 16px rgba(0,0,0,0.08)',
-                        overflow: 'hidden', zIndex: 215,
-                      }}>
-                        {mentionResults.map(u => (
-                          <button
-                            key={u.id}
-                            type="button"
-                            onClick={() => {
-                              setInputText(prev => prev.replace(/@\w*$/, `@${u.username} `));
-                              setMentionQuery(null);
-                              setMentionResults([]);
-                              textareaRef.current?.focus();
-                            }}
-                            className="w-full flex items-center gap-3 px-3 py-2 text-left transition-colors hover:bg-[rgba(15,23,42,0.04)]"
-                          >
-                            <SquircleAvatar
-                              size={28}
-                              src={u.avatar}
-                              alt={u.display_name || u.username}
-                              fallback={u.display_name?.charAt(0)?.toUpperCase() || '?'}
-                              hairlineRing ringColor={LIGHT_HAIRLINE}
-                            />
-                            <div className="flex flex-col min-w-0">
-                              <span className="text-sm font-medium truncate text-foreground">
-                                {u.display_name}
-                              </span>
-                              <span className="text-xs truncate text-muted-foreground">
-                                @{u.username}
-                              </span>
-                            </div>
-                          </button>
-                        ))}
-                      </div>
-                    )}
                     <div style={{
                       display: 'flex', alignItems: 'flex-end', gap: 4, borderRadius: 22, padding: '4px 6px 4px 14px',
                       background: '#ffffff',
@@ -1171,17 +1131,7 @@ function CommentsSheet({
                       <textarea
                         ref={textareaRef}
                         value={inputText}
-                        onChange={(e) => {
-                          const val = e.target.value;
-                          setInputText(val);
-                          const atMatch = val.match(/@(\w*)$/);
-                          if (atMatch) {
-                            setMentionQuery(atMatch[1]);
-                          } else {
-                            setMentionQuery(null);
-                            setMentionResults([]);
-                          }
-                        }}
+                        onChange={(e) => setInputText(e.target.value)}
                         onKeyDown={handleInputKeyDown}
                         placeholder={replyingTo ? `Reply to ${replyingTo.displayName}...` : 'Add a comment...'}
                         rows={1}
