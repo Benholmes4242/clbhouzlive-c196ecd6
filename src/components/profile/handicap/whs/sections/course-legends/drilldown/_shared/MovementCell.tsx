@@ -39,7 +39,7 @@ export const MovementCell: React.FC<Props> = ({
     lineHeight: 1,
     display: 'inline-block',
     minWidth: size === 'chip' ? 22 : 26,
-    textAlign: 'right',
+    textAlign: 'center',
     whiteSpace: 'nowrap',
     flexShrink: 0,
   };
