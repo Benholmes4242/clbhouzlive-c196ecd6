@@ -23,6 +23,7 @@ import { SquircleAvatar, LIGHT_HAIRLINE } from '@/components/ui/SquircleAvatar';
 
 import { useActiveActor } from '@/context/ActiveActorContext';
 import { cn } from '@/lib/utils';
+import { MentionText } from '@/components/mentions/MentionText';
 
 // ── Dispatch tokens (mirrored from CommentsSheet) ──
 const INK = '#0F172A';

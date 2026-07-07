@@ -29,6 +29,8 @@ import { type ExtractedReviewData } from '@/lib/postHelpers';
 import { removeGolfCourseFromContent } from '@/utils/golfCourseExtractor';
 
 import { FROST, FROST_BLUR, FROST_SCORE_GRADIENT, formatFrostRating, splitCourseName } from '@/lib/frostPanel';
+import { MentionText } from '@/components/mentions/MentionText';
+import { stripMentionMarkup } from '@/lib/mentions/format';
 
 /** Animated soundwave bars for music playback indicator */
 const SoundwaveAnimation: React.FC = () => (

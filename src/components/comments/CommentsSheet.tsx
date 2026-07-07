@@ -38,6 +38,7 @@ import { overlayOpen, overlayMark } from '@/perf/overlayTiming';
 import { lockBodyScroll, unlockBodyScroll } from '@/lib/bodyScrollLock';
 
 import {
+import { MentionText } from '@/components/mentions/MentionText';
   AlertDialog,
   AlertDialogAction,
   AlertDialogCancel,

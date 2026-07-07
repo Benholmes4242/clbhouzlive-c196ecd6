@@ -11,6 +11,7 @@ import CommentsSheet from '@/components/comments/CommentsSheet';
 
 import { SquircleAvatar, LIGHT_HAIRLINE } from '@/components/ui/SquircleAvatar';
 import { formatDistanceToNow } from 'date-fns';
+import { MentionText } from '@/components/mentions/MentionText';
 
 interface CommentPreviewProps {
   postId: string;

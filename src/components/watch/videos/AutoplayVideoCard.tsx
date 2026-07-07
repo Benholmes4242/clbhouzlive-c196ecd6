@@ -11,6 +11,7 @@ import { Pin } from '../proshop/Pin';
 import { ExpandableCaption } from '@/components/posts/ExpandableCaption';
 import DecodedImage from '../shared/DecodedImage';
 import { useRailLane } from '@/video/useRailLane';
+import { MentionText } from '@/components/mentions/MentionText';
 
 
 function formatHMS(seconds: number | null | undefined): string {

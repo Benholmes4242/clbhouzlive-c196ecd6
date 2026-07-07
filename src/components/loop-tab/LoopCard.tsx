@@ -28,6 +28,7 @@ import type { FriendCourseActivity } from '@/hooks/useFriendCourseActivity';
 import { useQueryClient } from '@tanstack/react-query';
 import { useLikeMutation } from '@/components/media-system/hooks/useLikeMutation';
 import { useActiveActor } from '@/context/ActiveActorContext';
+import { MentionText } from '@/components/mentions/MentionText';
 
 interface LoopCardProps {
   post: FeedPost;
