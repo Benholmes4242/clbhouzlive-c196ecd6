@@ -106,9 +106,11 @@ interface Props {
   selection: CourseSelection;
   /** When true, suppresses the DrilldownHeader — for embedded contexts (e.g. Course Detail Legends tab) where the parent already renders a course hero. */
   hideHeader?: boolean;
+  /** Backdrop theme threaded to embedded rows/avatars and the full-leaderboard sheet. Default 'dark' preserves handicap rendering. */
+  theme?: 'light' | 'dark';
 }
 
-export const CourseLegendsDrilldown: React.FC<Props> = ({ selection, hideHeader = false }) => {
+export const CourseLegendsDrilldown: React.FC<Props> = ({ selection, hideHeader = false, theme = 'dark' }) => {
   const ctx = selection;
 
 
