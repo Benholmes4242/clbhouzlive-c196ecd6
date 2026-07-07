@@ -26,6 +26,16 @@ import {
   shouldGateForSaveData,
 } from './lanePolicy';
 import { isPerfEnabled } from '@/perf/navTiming';
+import {
+  vperfLaneEvent,
+  vperfSessionStart,
+  vperfSessionEnd,
+  vperfSessionLevel,
+  vperfSessionSuppressNextStall,
+  vperfStart,
+  vperfMark,
+  vperfNextId,
+} from '@/perf/vperf';
 
 
 
