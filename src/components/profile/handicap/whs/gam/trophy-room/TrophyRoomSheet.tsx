@@ -327,20 +327,15 @@ export const TrophyRoomSheet: React.FC<Props> = ({ userId, viewerUserId, ownerFi
   return (
     <>
       <GamSheet open={open} onClose={() => setOpen(false)}>
-        {/* Drag handle */}
+        {/* Drag handle — pinned */}
         <div style={{ display: 'flex', justifyContent: 'center', paddingTop: 8, flexShrink: 0 }}>
           <div style={{ width: 36, height: 4, borderRadius: 99, background: LINE }} />
         </div>
 
-        {/* Header */}
-        <div
-          style={{
-            padding: '12px 20px 12px',
-            borderBottom: `0.5px solid ${LINE}`,
-            flexShrink: 0,
-            fontFamily: GAM.FONT_GEIST,
-          }}
-        >
+        {/* Filter pills — pinned. Hairline border-bottom marks the pinned edge once
+            content scrolls beneath it. The header block below (moved into the
+            scrollable body in this PR) carries its own top border only when
+            visible, so no double hairline at top-of-scroll. */}
           <Eyebrow ownerFirstName={ownerFirstName} isFriendView={isFriendView} />
           <div style={{ width: 34, height: 3, borderRadius: 99, background: AMBER, marginTop: 9 }} />
           <div
