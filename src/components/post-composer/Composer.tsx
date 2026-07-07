@@ -58,6 +58,7 @@ import {
 } from '@/services/drafts/draftService';
 import { uploadAllDraftMedia } from '@/services/drafts/draftMediaUpload';
 import type { DraftCourseData } from '@/services/drafts/types';
+import { MentionsComposerInput } from '@/components/mentions/MentionsComposerInput';
 
 const MAX_CAPTION = 2000;
 const MAX_POST_MEDIA = 10;
@@ -175,13 +176,9 @@ export function Composer({
     };
   }, []);
 
-  // Auto-grow caption textarea
-  useEffect(() => {
-    const el = captionRef.current;
-    if (!el) return;
-    el.style.height = 'auto';
-    el.style.height = `${el.scrollHeight}px`;
-  });
+  // Caption autosize is owned by MentionsComposerInput / react-mentions.
+
+
 
 
   // Seed initial media once (net-new compose only — edit mode prefills below).
@@ -1194,30 +1191,25 @@ export function Composer({
           </button>
         </div>
 
-        {/* Caption */}
-        <textarea
-          ref={captionRef}
-          autoFocus
-          value={caption}
-          onChange={(e) => setCaption(e.target.value.slice(0, MAX_CAPTION))}
-          placeholder={composerPlaceholder}
-          style={{
-            width: '100%',
-            boxSizing: 'border-box',
-            border: 'none',
-            outline: 'none',
-            resize: 'none',
-            padding: '8px 16px 10px',
-            fontSize: 18,
-            lineHeight: 1.4,
-            color: INK_2,
-            caretColor: AMBER,
-            fontFamily: 'inherit',
-            background: 'transparent',
-            minHeight: hasMedia ? 56 : 180,
-            overflow: 'hidden',
-          }}
-        />
+        {/* Caption — canonical mentions-v2 composer input */}
+        <div style={{ padding: '8px 16px 10px' }}>
+          <MentionsComposerInput
+            value={caption}
+            onChange={(v) => setCaption(v.slice(0, MAX_CAPTION))}
+            placeholder={composerPlaceholder}
+            maxLength={MAX_CAPTION}
+            autoFocus
+            inputRef={(el) => { (captionRef as any).current = el; }}
+            textStyle={{
+              fontSize: 18,
+              lineHeight: '25px',
+              padding: '0',
+              color: INK_2,
+              caretColor: AMBER,
+              minHeight: hasMedia ? 56 : 180,
+            }}
+          />
+        </div>
 
         {showCounter && (
           <div

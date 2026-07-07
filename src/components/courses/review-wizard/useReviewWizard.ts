@@ -18,6 +18,7 @@ import { useReviewUpload } from '@/uploads/useReviewUpload';
 import { analyticsEvents } from '@/utils/analyticsEvents';
 import { invalidateCourseRatingCaches } from '@/utils/invalidateCourseRatingCaches';
 import { useOptimisticReviewUpdate } from '@/hooks/useOptimisticReviewUpdate';
+import { syncMentionsForContent } from '@/lib/mentions/syncMentions';
 import type { 
   WizardState, 
   ReviewWizardCourse, 
@@ -220,9 +221,24 @@ export function useReviewWizard({
       console.log('[useReviewWizard] Review submitted successfully:', ratingId);
       submissionInProgressRef.current = false; // Reset ref so user can submit again if needed
       submitCompletedRef.current = true;
-      
+
       // Store the ratingId for preview/success screens
       setSubmittedRatingId(ratingId);
+
+      // Mentions v2 — diff-sync review mentions. Fires exactly one
+      // notification per genuinely-new mentionee; unchanged rows stay
+      // put so edits don't re-notify.
+      if (currentUserId && ratingId) {
+        void syncMentionsForContent({
+          sourceType: 'review',
+          sourceId: ratingId,
+          content: state.review ?? '',
+          mentionerId: currentUserId,
+        }).catch((err) => {
+          console.warn('[useReviewWizard] mention sync failed:', err);
+        });
+      }
+
       
       // Track analytics
       analyticsEvents.ratings.submitted({

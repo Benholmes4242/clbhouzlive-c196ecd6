@@ -6,6 +6,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { detectPostCategories } from '@/utils/detectPostCategories';
 import { postEventBus } from '@/events/postEventBus';
 import type { ActorType, PostCreatedEvent } from '@/events/postEvents';
+import { syncMentionsForContent } from '@/lib/mentions/syncMentions';
 
 export interface CreatePostInput {
   userId: string;
@@ -168,6 +169,22 @@ export async function createPost(input: CreatePostInput): Promise<CreatePostResu
       // The primary course_id is still set on the post for backwards compatibility
     } else {
       console.log('[createPost] Inserted post_courses:', allCourseIds.length);
+    }
+  }
+
+  // Mentions v2 — sync mention rows for any @[Name](u|b:UUID) markup embedded
+  // in the post content. Non-blocking; the diff-sync inserts brand-new rows
+  // exactly once (edits handled by useUpdatePost).
+  if (data.content) {
+    try {
+      await syncMentionsForContent({
+        sourceType: 'post',
+        sourceId: data.id,
+        content: data.content,
+        mentionerId: user.id,
+      });
+    } catch (err) {
+      console.warn('[createPost] mention sync failed:', err);
     }
   }
 

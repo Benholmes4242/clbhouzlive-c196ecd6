@@ -43,6 +43,7 @@ import {
   filesToComposerMedia,
   type ComposerMediaItem,
 } from '@/components/post-composer/composerMedia';
+import { MentionsComposerInput } from '@/components/mentions/MentionsComposerInput';
 
 import { DiscardActionSheet } from './DiscardActionSheet';
 import { RemoveReviewActionSheet } from './RemoveReviewActionSheet';
@@ -368,19 +369,12 @@ export function ReviewWizard({
   /* ── Category set count ──────────────────────────────────────────────── */
   const setCount = Object.values(wizard.state.breakdowns).filter((x) => x != null).length;
 
-  /* ── Verdict textarea ───────────────────────────────────────────────── */
-  const taRef = useRef<HTMLTextAreaElement>(null);
-  useEffect(() => {
-    const el = taRef.current;
-    if (!el) return;
-    el.style.height = 'auto';
-    el.style.height = `${el.scrollHeight}px`;
-  }, [wizard.state.review]);
-
+  /* ── Verdict textarea (mentions-v2 composer input) ─────────────────── */
+  const taRef = useRef<HTMLTextAreaElement | null>(null);
 
   const handleReviewChange = useCallback(
-    (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-      wizard.setReview(e.target.value.slice(0, MAX_REVIEW_LENGTH));
+    (v: string) => {
+      wizard.setReview(v.slice(0, MAX_REVIEW_LENGTH));
     },
     [wizard]
   );
@@ -862,29 +856,25 @@ export function ReviewWizard({
                           : 'none',
                       }}
                     >
-                      <textarea
-                        ref={taRef}
+                      <MentionsComposerInput
                         value={wizard.state.review}
                         onChange={handleReviewChange}
                         onFocus={() => setVerdictFocused(true)}
                         onBlur={() => setVerdictFocused(false)}
                         placeholder="What stood out? Best holes, conditions, the welcome"
+                        maxLength={MAX_REVIEW_LENGTH}
+                        inputRef={(el) => { taRef.current = el; }}
                         style={{
-                          width: '100%',
-                          boxSizing: 'border-box',
-                          border: 'none',
-                          outline: 'none',
-                          resize: 'none',
-                          padding: 0,
-                          fontSize: 16,
-                          lineHeight: 1.45,
-                          color: INK,
-                          background: 'transparent',
                           flex: verdictGrows ? 1 : 'none',
-                          minHeight: verdictGrows ? 0 : 64,
-                          fontFamily: 'inherit',
-                          overflow: 'hidden',
+                          display: 'flex',
+                        }}
+                        textStyle={{
+                          fontSize: 16,
+                          lineHeight: '23px',
+                          padding: '0',
+                          color: INK,
                           caretColor: AMBER,
+                          minHeight: verdictGrows ? undefined : 64,
                         }}
                       />
 
