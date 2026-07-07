@@ -855,6 +855,10 @@ const FullscreenPagerPage: React.FC<{
     // branch above). No lane binding, no decoder.
     return (
       <div className="absolute inset-0 overflow-hidden">
+        {/* SURROUND RULE (pager inactive video page): blurred poster
+            UNDERNEATH + 0.55 scrim on top + contain poster (z=1). Nothing
+            fully opaque may sit between the blur and the media except the
+            media itself. */}
         {posterSrc && (
           <div
             aria-hidden="true"
@@ -868,6 +872,11 @@ const FullscreenPagerPage: React.FC<{
             }}
           />
         )}
+        <div
+          aria-hidden
+          data-vperf="pager-scrim"
+          style={{ position: 'absolute', inset: 0, background: '#000', opacity: 0.55, pointerEvents: 'none' }}
+        />
         {posterSrc && (
           <img
             src={posterSrc}
