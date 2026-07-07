@@ -18,6 +18,7 @@ import type { TournamentLeaderWinner } from '../../hooks/useTournamentLeadersWin
 import { useSingleCourseImage } from '../../hooks/useCourseImageResolver';
 import { getCourseImage } from '../../utils/placeholders';
 import { formatPurse, PlayerAvatar, PodiumRunnerRow, buildPodiumRows, UpcomingCountdown } from '../shared/TourHeroHelpers';
+import { LIGHT_HAIRLINE } from '@/components/ui/SquircleAvatar';
 import { getScoreColor } from '../../_shared/scoreColor';
 import { getContextLabel } from '../../utils/tournamentClassification';
 
@@ -184,6 +185,7 @@ export function ScheduleHeroCard({ tournament, type, leaderWinner, currentIndex 
                         tourCode={winner.tourCode ?? tournament.tour_code}
                         size={48}
                         frosted
+                        ringColor={LIGHT_HAIRLINE}
                       />
                   </button>
 
@@ -236,6 +238,7 @@ export function ScheduleHeroCard({ tournament, type, leaderWinner, currentIndex 
                     row={row}
                     tourCode={tournament.tour_code}
                     onPlayerTap={handlePlayerTap}
+                    ringColor={LIGHT_HAIRLINE}
                   />
                 ))}
               </div>

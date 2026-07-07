@@ -7,7 +7,7 @@ import React, { useState, useEffect, useMemo } from 'react';
 import type { WinnerStats } from '../../hooks/useWinnerScorecardStats';
 import type { WinnerSeasonStats } from '../../hooks/useWinnerSeasonStats';
 import { SCORE_COLORS } from '../../utils/scoreColors';
-import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
+import { SquircleAvatar, DARK_HAIRLINE } from '@/components/ui/SquircleAvatar';
 import { resolvePlayerAvatarCandidates } from '../../_shared/resolvePlayerAvatar';
 import type { TournamentFinisher } from '../../hooks/useTournamentLeadersWinners';
 import { useCountdown } from '@/hooks/useCountdown';
@@ -120,6 +120,7 @@ export function PlayerAvatar({
   tourCode,
   size = 44,
   frosted = false,
+  ringColor = DARK_HAIRLINE,
 }: {
   photoUrl?: string | null;
   pgaTourId?: string | null;
@@ -133,6 +134,9 @@ export function PlayerAvatar({
   size?: number;
   /** Use frosted glass styling (translucent bg + border) — for glass card contexts */
   frosted?: boolean;
+  /** Traced 1px hairline colour. Default DARK_HAIRLINE (white @ 22%) for dark
+   *  hero backdrops. Pass LIGHT_HAIRLINE for light card surfaces. */
+  ringColor?: string;
 }) {
   const nameForLookup = headshotOverride || fullName || displayName;
   const candidates = resolvePlayerAvatarCandidates({
@@ -161,6 +165,7 @@ export function PlayerAvatar({
           alt={displayName}
           userId={nameForLookup}
           hairlineRing
+          ringColor={ringColor}
         />
       </div>
     );
@@ -173,6 +178,7 @@ export function PlayerAvatar({
       alt={displayName}
       userId={nameForLookup}
       hairlineRing
+      ringColor={ringColor}
     />
   );
 }
@@ -209,10 +215,13 @@ export function PodiumRunnerRow({
   row,
   tourCode,
   onPlayerTap,
+  ringColor = DARK_HAIRLINE,
 }: {
   row: PodiumRow;
   tourCode?: string;
   onPlayerTap?: (playerId: string | null | undefined) => (e: React.MouseEvent) => void;
+  /** Traced 1px hairline colour forwarded to the podium PlayerAvatar renders. */
+  ringColor?: string;
 }) {
   const isSingle = row.players.length === 1;
   const player = row.players[0];
@@ -253,6 +262,7 @@ export function PodiumRunnerRow({
             tourCode={player.tourCode ?? tourCode}
             size={30}
             frosted
+            ringColor={ringColor}
           />
         </button>
       ) : (
@@ -275,6 +285,7 @@ export function PodiumRunnerRow({
                 tourCode={p.tourCode ?? tourCode}
                 size={26}
                 frosted
+                ringColor={ringColor}
               />
             </div>
           ))}
