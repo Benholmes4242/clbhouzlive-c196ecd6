@@ -50,7 +50,7 @@ export const ProBenchmarkBand: React.FC<Props> = ({ pro, value, sub, base }) => 
           srcCandidates={avatarCandidates}
           alt={pro.full_name}
           fallback={pro.initials}
-          hideRing
+          hairlineRing
         />
 
 

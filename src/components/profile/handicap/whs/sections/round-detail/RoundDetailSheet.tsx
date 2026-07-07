@@ -185,7 +185,7 @@ export const RoundDetailSheet: React.FC<Props> = ({ open, onClose, scoreId, hand
                 alt={profile?.display_name ?? ''}
                 size={52}
                 userId={profileUserId ?? undefined}
-                hideRing
+                hairlineRing
               />
             </button>
 

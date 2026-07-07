@@ -47,7 +47,7 @@ export const RecentlyActiveItem: React.FC<Props> = ({ entry, isActive, onClick }
         alt={entry.friend_name}
         size={56}
         userId={entry.friend_user_id ?? entry.friend_row_id}
-        hideRing
+        hairlineRing
       />
       <p
         style={{
