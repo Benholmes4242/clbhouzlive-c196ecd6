@@ -849,9 +849,7 @@ const FullscreenPagerPage: React.FC<{
   if (m?.type === 'video') {
     const posterSrc = m.thumbnailUrl || '';
     const mHlsUrl = (m as any).hlsUrl || null;
-    // Active video page → mount SHOWING slot. Only the opening-media page
-    // may take the borrow branch; every other page passes allowBorrow=false
-    // so a re-mount post-demote never re-triggers the borrow FLIP.
+    const videoRect = resolveRestingRect(m.width ?? 0, m.height ?? 0, getCurrentViewport(), 'video');
     if (isActivePage && mHlsUrl) {
       return (
         <FullscreenVideoSlot
@@ -862,11 +860,13 @@ const FullscreenPagerPage: React.FC<{
           onFirstFrameReady={onFirstFrameReady}
           ownerKey={ownerKey}
           allowBorrow={pageIdx === openIdx}
+          mediaW={m.width ?? 0}
+          mediaH={m.height ?? 0}
         />
       );
     }
-    // Inactive video page — poster fallback (mirrors the existing non-hls
-    // branch above). No lane binding, no decoder.
+    // Inactive video page — poster fallback (rect matches active slot so
+    // page-become-active does not resize).
     return (
       <div className="absolute inset-0 overflow-hidden">
         {posterSrc && (
@@ -887,8 +887,12 @@ const FullscreenPagerPage: React.FC<{
             src={posterSrc}
             alt=""
             aria-hidden
-            className="w-full h-full"
-            style={{ position: 'absolute', inset: 0, objectFit: 'contain', zIndex: 1 }}
+            style={{
+              position: 'absolute',
+              top: videoRect.top, left: videoRect.left,
+              width: videoRect.width, height: videoRect.height,
+              objectFit: videoRect.fit, zIndex: 1,
+            }}
             loading="lazy"
             draggable={false}
           />
@@ -899,6 +903,7 @@ const FullscreenPagerPage: React.FC<{
 
   if (m?.type === 'image') {
     const imgSrc = m.imageUrl || m.thumbnailUrl || '';
+    const imgRect = resolveRestingRect(m.width ?? 0, m.height ?? 0, getCurrentViewport(), 'image');
     return (
       <div className="absolute inset-0 overflow-hidden">
         <div
@@ -914,14 +919,20 @@ const FullscreenPagerPage: React.FC<{
         />
         <div
           ref={zoomRef}
-          style={{ ...zoomStyle, position: 'absolute', inset: 0, zIndex: 1 }}
+          style={{
+            ...zoomStyle,
+            position: 'absolute',
+            top: imgRect.top, left: imgRect.left,
+            width: imgRect.width, height: imgRect.height,
+            zIndex: 1,
+          }}
         >
           <img
             ref={imgRef}
             src={imgSrc}
             alt=""
             className="w-full h-full"
-            style={{ objectFit: 'contain' }}
+            style={{ objectFit: imgRect.fit }}
             loading={isActivePage ? 'eager' : 'lazy'}
             draggable={false}
           />
