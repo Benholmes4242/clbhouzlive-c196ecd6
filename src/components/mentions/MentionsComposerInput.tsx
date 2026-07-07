@@ -150,91 +150,96 @@ const DEFAULT_TEXT_STYLE: Required<Pick<MentionsTextStyle, 'fontSize' | 'lineHei
   caretColor: INK,
 };
 
-const mentionsStyle = {
-  control: {
-    background: 'transparent',
-    minHeight: 36,
-    // NOTE: do NOT spread sharedText here. react-mentions positions the
-    // textarea `absolute; top:0` inside the control, so any padding on
-    // control shifts the (in-flow) highlighter down while leaving the
-    // textarea at y=0 — producing the exact one-row selection drift the
-    // brief calls out. Padding lives on the two text layers only.
-    fontFamily: sharedText.fontFamily,
-    fontSize: sharedText.fontSize,
-    fontWeight: sharedText.fontWeight,
-    lineHeight: sharedText.lineHeight,
-    letterSpacing: sharedText.letterSpacing,
-  },
-  highlighter: {
-    ...sharedText,
-    // Overlay carries the ONLY visible copy of the text — must be
-    // ink coloured explicitly (the textarea underneath is transparent).
-    color: INK,
-    WebkitTextFillColor: INK,
-    maxHeight: 120,
-    overflow: 'hidden',
-    whiteSpace: 'pre-wrap' as const,
-    wordWrap: 'break-word' as const,
-    substring: {
-      // react-mentions hides plain substrings by default because the
-      // native textarea normally paints them. Our textarea is transparent,
-      // so the overlay must paint BOTH plain text and mention atoms.
-      visibility: 'visible' as const,
-      color: INK,
-      WebkitTextFillColor: INK,
+function buildMentionsStyle(text: MentionsTextStyle | undefined) {
+  const t = { ...DEFAULT_TEXT_STYLE, ...(text ?? {}) };
+  const sharedText = {
+    fontFamily: 'inherit',
+    fontSize: t.fontSize,
+    fontWeight: 400,
+    lineHeight: t.lineHeight,
+    letterSpacing: '0px',
+    padding: t.padding,
+    border: '0px solid transparent',
+    boxSizing: 'border-box' as const,
+    margin: 0,
+  };
+  const maxH = text?.maxHeight;
+  const minH = text?.minHeight;
+  return {
+    control: {
+      background: 'transparent',
+      minHeight: minH ?? 36,
+      // NOTE: do NOT spread sharedText here (see original comment).
+      fontFamily: sharedText.fontFamily,
+      fontSize: sharedText.fontSize,
+      fontWeight: sharedText.fontWeight,
+      lineHeight: sharedText.lineHeight,
+      letterSpacing: sharedText.letterSpacing,
     },
-  },
-  input: {
-    ...sharedText,
-    outline: 'none',
-    maxHeight: 120,
-    overflow: 'auto' as const,
-    background: 'transparent',
-    color: 'transparent',
-    caretColor: INK,
-    resize: 'none' as const,
-    whiteSpace: 'pre-wrap' as const,
-    wordWrap: 'break-word' as const,
-    WebkitTextFillColor: 'transparent',
-  },
-  suggestions: {
-    // Full composer width, above the input row. These override
-    // react-mentions' caret-relative positioning (library applies its
-    // own left/top first; our style wins).
-    position: 'absolute' as const,
-    top: 'auto',
-    bottom: '100%',
-    left: 0,
-    right: 0,
-    width: '100%',
-    marginBottom: 8,
-    zIndex: 210,
-    list: {
-      background: '#ffffff',
-      borderRadius: 12,
-      border: `0.5px solid ${BORDER}`,
-      boxShadow:
-        '0 8px 24px -8px rgba(15,23,42,0.18), 0 2px 6px rgba(15,23,42,0.08)',
-      maxHeight: 5 * 44 + 8,
-      overflowY: 'auto' as const,
-      fontSize: 13.5,
-      width: '100%',
-      minWidth: '100%',
-    },
-    item: {
-      padding: 0,
-      borderBottom: `0.5px solid ${BORDER}`,
-      '&focused': {
-        background: 'rgba(247,147,30,0.08)',
+    highlighter: {
+      ...sharedText,
+      color: t.color,
+      WebkitTextFillColor: t.color,
+      minHeight: minH,
+      maxHeight: maxH,
+      overflow: maxH ? 'hidden' : undefined,
+      whiteSpace: 'pre-wrap' as const,
+      wordWrap: 'break-word' as const,
+      substring: {
+        visibility: 'visible' as const,
+        color: t.color,
+        WebkitTextFillColor: t.color,
       },
     },
-  },
-};
+    input: {
+      ...sharedText,
+      outline: 'none',
+      minHeight: minH,
+      maxHeight: maxH,
+      overflow: maxH ? ('auto' as const) : ('hidden' as const),
+      background: 'transparent',
+      color: 'transparent',
+      caretColor: t.caretColor,
+      resize: 'none' as const,
+      whiteSpace: 'pre-wrap' as const,
+      wordWrap: 'break-word' as const,
+      WebkitTextFillColor: 'transparent',
+    },
+    suggestions: {
+      position: 'absolute' as const,
+      top: 'auto',
+      bottom: '100%',
+      left: 0,
+      right: 0,
+      width: '100%',
+      marginBottom: 8,
+      zIndex: 210,
+      list: {
+        background: '#ffffff',
+        borderRadius: 12,
+        border: `0.5px solid ${BORDER}`,
+        boxShadow:
+          '0 8px 24px -8px rgba(15,23,42,0.18), 0 2px 6px rgba(15,23,42,0.08)',
+        maxHeight: 5 * 44 + 8,
+        overflowY: 'auto' as const,
+        fontSize: 13.5,
+        width: '100%',
+        minWidth: '100%',
+      },
+      item: {
+        padding: 0,
+        borderBottom: `0.5px solid ${BORDER}`,
+        '&focused': {
+          background: 'rgba(247,147,30,0.08)',
+        },
+      },
+    },
+  };
+}
 
 const mentionStyle = {
-  // Colour-only highlight — MUST match sharedText weight/size so glyph
-  // widths after the mention line up. Bold or textShadow would shift
-  // metrics and re-introduce the overlay drift the brief calls out.
+  // Colour-only highlight — MUST match text weight/size so glyph widths after
+  // the mention line up. Bold or textShadow would shift metrics.
   color: AMBER,
   fontWeight: 400,
   background: 'transparent',
