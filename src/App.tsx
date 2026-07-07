@@ -304,11 +304,8 @@ const CollegeProfilePage = lazy(() => import("./features/tourhub/pages").then(m 
 const CollegeComparePage = lazy(() => import("./features/tourhub/pages").then(m => ({ default: m.CollegeComparePage })));
 
 
-// Video Player Modal (Phase 6A-1)
-// Video Player Modal (Phase 6A-1)
-const VideoPlayerModal = lazy(() => import("./components/videos/VideoPlayerModal"));
+// Continue Watching mini-player (queue drawer + full-screen modal deleted in PR-5).
 const MiniPlayer = lazy(() => import("./components/videos/MiniPlayer"));
-const GlobalQueueDrawer = lazy(() => import("./components/videos/GlobalQueueDrawer"));
 const SeasonShop = lazy(() => import("./pages/SeasonShop"));
 const ChallengesPage = lazy(() => import("./pages/ChallengesPage"));
 
@@ -454,12 +451,8 @@ function AppRoutes() {
   // Render origin page when we have a background location
   const routesLocation = state?.backgroundLocation || location;
   
-  // Video modal = /video/:id with backgroundLocation
-  const isVideoRoute = location.pathname.startsWith('/video/');
-  const showVideoModal = isVideoRoute && !!state?.backgroundLocation;
-  
-  // Global overlay detection - sync with <html> class
-  const overlayActive = showVideoModal || shouldHideHeader;
+  // Video full-screen modal deleted in PR-5 (queue family strip).
+  const overlayActive = shouldHideHeader;
   
   useEffect(() => {
     const el = document.documentElement;
@@ -547,7 +540,9 @@ function AppRoutes() {
         <Route path="/post/:postId/comment/:commentId" element={<Suspense fallback={<GenericPageSkeleton />}><CommentDeepLinkPage /></Suspense>} />
         
         
-        <Route path="/video/:videoId" element={<Suspense fallback={<GenericPageSkeleton />}><VideoPlayerModal /></Suspense>} />
+        {/* /video/:videoId route removed in PR-5 — VideoPlayerModal deleted. Post deep-link handles video posts. */}
+        <Route path="/video/:videoId" element={<Navigate to="/watch" replace />} />
+
         
         {/* Legacy creator routes - redirect to home (creators now handled via Business profiles or Personal Creator Mode) */}
         <Route path="/creator/*" element={<Navigate to="/" replace />} />
@@ -652,12 +647,7 @@ function AppRoutes() {
       </Routes>
 
       
-      {/* Video Player Modal - rendered over origin page when navigating from video feed */}
-      {showVideoModal && (
-        <Suspense fallback={null}>
-          <VideoPlayerModal />
-        </Suspense>
-      )}
+      {/* VideoPlayerModal removed in PR-5 (queue family strip). */}
     </>
   );
 }
@@ -939,10 +929,9 @@ const AppInner: React.FC = () => {
                                                 
                                               </div>
                                             </Suspense>
-                                            {/* Mini Player - persists across navigation */}
+                                            {/* Continue Watching mini-player - persists across navigation. Queue drawer removed in PR-5. */}
                                             <Suspense fallback={null}>
                                               <MiniPlayer />
-                                              <GlobalQueueDrawer />
                                             </Suspense>
                                             {/* Fullscreen Feed Overlay - portal-based, renders above everything */}
                                             <FullscreenFeedOverlay />

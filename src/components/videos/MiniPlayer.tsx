@@ -4,14 +4,14 @@
 // (play/pause toggle only flips local state) until the new video engine lands.
 
 import React, { useCallback, useEffect, useMemo, useState } from "react";
-import { X, Play, Pause, ListMusic, Maximize2, Volume2, VolumeX, AlertTriangle } from "lucide-react";
+import { X, Play, Pause, Maximize2, Volume2, VolumeX, AlertTriangle } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useVideoPlaybackSafe } from "@/context/VideoPlaybackContext";
 import { usePostData } from "@/hooks/usePostData";
-import { useVideoQueue } from "@/hooks/useVideoQueue";
 import { uidFromNode, generateHlsUrl, generateThumbnailUrl } from "@/utils/cloudflareStreamTransform";
 import { trackVideoCloseMini } from "@/lib/analytics/videoAnalytics";
 import { useClubhouseStore } from '@/store/clubhouseStore';
+import { VideoEngine } from '@/video/VideoEngine';
 
 type MiniVideo = {
   id: string;
@@ -39,7 +39,7 @@ export const MiniPlayer: React.FC = () => {
   const activeVideoId = context?.activeVideoId;
   const isMiniOpen = context?.isMiniOpen ?? false;
 
-  const { queueLength } = useVideoQueue();
+  // Queue drawer removed (PR-5); MiniPlayer is Continue Watching only.
 
   useEffect(() => {
     if (!activeVideoId || !isMiniOpen) {
@@ -108,7 +108,15 @@ export const MiniPlayer: React.FC = () => {
   const handleTogglePlay = useCallback((e: React.MouseEvent) => {
     e.stopPropagation();
     // Inert shell — no engine to drive. Toggles UI only.
-    setIsPlaying(p => !p);
+    // PR-5 one-thing-plays coordination: when the PiP starts, silence engine-managed lanes.
+    // Reverse direction (engine play pausing PiP) is deferred to the Continue Watching migration.
+    setIsPlaying(p => {
+      const next = !p;
+      if (next) {
+        try { VideoEngine.pauseAll(); } catch { /* engine may be uninitialized */ }
+      }
+      return next;
+    });
   }, []);
 
   const handleClose = useCallback((e: React.MouseEvent) => {
@@ -221,25 +229,7 @@ export const MiniPlayer: React.FC = () => {
             <div className="text-muted-foreground text-xs truncate">
               {videoData?.creatorName || ""}
             </div>
-            <div className="flex items-center gap-2 mt-1">
-              {queueLength > 0 && (
-                <button
-                  onClick={(e) => { e.stopPropagation(); context?.openQueue?.(); }}
-                  className="flex items-center gap-1 text-[10px] text-muted-foreground hover:text-foreground transition-colors"
-                >
-                  <ListMusic className="w-3 h-3" />
-                  Queue: {queueLength}
-                </button>
-              )}
-              {context?.nextVideoId && context?.nextMeta && (
-                <button
-                  onClick={(e) => { e.stopPropagation(); context?.openQueue?.(); }}
-                  className="text-[10px] text-primary/80 hover:text-primary truncate max-w-[120px] text-left"
-                >
-                  Next: {context.nextMeta.title}
-                </button>
-              )}
-            </div>
+            {/* Queue/Next buttons removed in PR-5 with the drawer. */}
           </div>
 
           {/* Controls (inert shells) */}
