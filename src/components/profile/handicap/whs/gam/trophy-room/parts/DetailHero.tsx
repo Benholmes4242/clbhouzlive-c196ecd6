@@ -358,7 +358,7 @@ export const DetailHero: React.FC<Props> = ({ item, index, total, onPrev, onNext
           style={{
             width: 6,
             height: 6,
-            background: rarityStripColor,
+            background: rgbaOf(rarityStripColor, 0.55),
             transform: 'rotate(45deg)',
             display: 'inline-block',
             flexShrink: 0,
@@ -369,11 +369,11 @@ export const DetailHero: React.FC<Props> = ({ item, index, total, onPrev, onNext
             fontSize: 8,
             fontWeight: 800,
             letterSpacing: '0.12em',
+            color: rgbaOf(rarityStripColor, 0.55),
             ...GAM.TABULAR,
           }}
         >
-          <span style={{ color: 'rgba(255,255,255,0.38)' }}>RARITY · </span>
-          <span style={{ color: rarityStripColor }}>{rarityLabel}</span>
+          RARITY · {rarityLabel}
         </span>
       </div>
     </div>
