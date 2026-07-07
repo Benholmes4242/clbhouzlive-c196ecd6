@@ -78,21 +78,7 @@ export const usePostData = () => {
             slug,
             logo_url
           ),
-          post_media(*),
-          post_tags(
-            id,
-            tagged_entity_id,
-            tagged_by_user_id,
-            start_index,
-            end_index,
-            tagged_entity:taggable_entities(
-              id,
-              entity_type,
-              entity_id,
-              name,
-              username
-            )
-          )
+          post_media(*)
         `)
         .eq('user_id', userId)
         .order('created_at', { ascending: false });
