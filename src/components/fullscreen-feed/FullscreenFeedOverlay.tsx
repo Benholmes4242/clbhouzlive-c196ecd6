@@ -96,6 +96,11 @@ function returnBorrow(borrow: BorrowDescriptor, reason: 'close' | 'route' | 'dem
   // Park in hidden host (unmountLane) then unpin (rails only). Any deferred
   // release fires on rails.
   try { VideoEngine.unmountLane(borrow.laneId); } catch {}
+  // Pause the parked lane so the hidden host doesn't keep decoding / drifting.
+  // clearBorrowed already ran, so this pause routes through the owner-guard path.
+  // Applies to demote AND target-gone fallback. Close-later still resumes (element
+  // state is preserved; the resume path skips reload and calls play()).
+  try { VideoEngine.pause(borrow.laneId, { callerPostId: borrow.ownerKey }); } catch {}
   let hadPendingRelease = false;
   if (isRail) {
     hadPendingRelease = RailLanePool.unpin(borrow.laneId, { executeDeferred: true });
