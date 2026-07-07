@@ -129,6 +129,10 @@ export function FullscreenFeedOverlay() {
   const clearBorrow = useFullscreenFeedStore(s => s.clearBorrow);
   const borrowDemoteRequested = useFullscreenFeedStore(s => s.borrowDemoteRequested);
   const consumeBorrowDemoteRequested = useFullscreenFeedStore(s => s.consumeBorrowDemoteRequested);
+  const closeAnim = useFullscreenFeedStore(s => s.closeAnim);
+  const closeAnimDone = useFullscreenFeedStore(s => s.closeAnimDone);
+  const beginCloseAnim = useFullscreenFeedStore(s => s.beginCloseAnim);
+  const signalCloseAnimDone = useFullscreenFeedStore(s => s.signalCloseAnimDone);
 
   // Snapshot borrow so the isOpen-cleanup path can run the return even after
   // close() has cleared the store's borrow field synchronously.
@@ -168,18 +172,118 @@ export function FullscreenFeedOverlay() {
     consumeBorrowDemoteRequested();
   }, [borrowDemoteRequested, clearBorrow, consumeBorrowDemoteRequested]);
 
+  // ── Reverse-close clone (non-borrow branch) ──
+  // Mirrors the open's forward clone: at close intent we mount a poster clone
+  // AT the resting rect and animate it back to the origin tile's rect while
+  // the blur/scrim backdrop fades OUT and the black overlay wash retreats.
+  // Fires signalCloseAnimDone on transitionend (or 500ms watchdog).
+  const [reverseClone, setReverseClone] = useState<
+    | null
+    | { from: { top: number; left: number; width: number; height: number };
+        to:   { top: number; left: number; width: number; height: number };
+        posterUrl: string; borderRadius: string; }
+  >(null);
+  const [reverseCollapsed, setReverseCollapsed] = useState(false);
+  const closeWatchdogRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const closeCompletedRef = useRef(false);
+
   // Wrap close so borrow-return runs BEFORE the store clears its fields.
   // All in-overlay callers (ESC, top-action-bar close, deep-link back) should
   // route through this. Route-change navigation that bypasses close still
   // gets handled by the isOpen-effect cleanup below (using borrowRef).
   const handleClose = useCallback(() => {
+    if (closeAnim !== 'idle') return; // animation already in flight
+    const b = borrowRef.current;
+    const o = origin;
+    const sameSlide = activeIndex === startIndex;
+
+    // Instant fallback path (matches today's behaviour byte-for-byte):
+    //  • demoted slide (activeIndex !== startIndex)
+    //  • no origin descriptor (deep-link / notification opens)
+    //  • borrow with a missing origin host in the registry (target gone /
+    //    tile evicted / viewport rotated).
+    const viewportChanged =
+      b && typeof window !== 'undefined' &&
+      (window.innerWidth !== b.viewportW || window.innerHeight !== b.viewportH);
+    const borrowOriginAlive = !!(b && originHostRegistry.get(b.ownerKey) && !viewportChanged);
+    const canAnimate =
+      sameSlide && (
+        (b && borrowOriginAlive) ||
+        (!b && o && !!o.posterUrl)
+      );
+
+    if (!canAnimate) {
+      if (b) {
+        returnBorrow(b, 'close');
+        borrowRef.current = null;
+      }
+      close();
+      return;
+    }
+
+    // Animated symmetric close.
+    if (b) {
+      // BorrowedFullscreenSlot handles its own reverse motion when it sees
+      // closeAnim === 'borrow'. Overlay just waits for closeAnimDone.
+      beginCloseAnim('borrow');
+    } else {
+      // Non-borrow: mount reverse clone at the resting rect → tile rect.
+      const vp = getCurrentViewport();
+      const omw = o!.originMediaW ?? 0;
+      const omh = o!.originMediaH ?? 0;
+      const useMediaDims = omw > 0 && omh > 0;
+      const ar = useMediaDims ? omw / omh : (o!.aspectRatio > 0 ? o!.aspectRatio : 0);
+      const [mw, mh] = useMediaDims ? [omw, omh] : (ar > 0 ? [ar * 1000, 1000] : [0, 0]);
+      const kind: 'video' | 'image' = o!.mediaType ?? 'image';
+      const resting = resolveRestingRect(mw, mh, vp, kind);
+      setReverseClone({
+        from: { top: resting.top, left: resting.left, width: resting.width, height: resting.height },
+        to:   { top: o!.rect.top, left: o!.rect.left, width: o!.rect.width, height: o!.rect.height },
+        posterUrl: o!.posterUrl ?? '',
+        borderRadius: o!.borderRadius,
+      });
+      setReverseCollapsed(false);
+      beginCloseAnim('nonborrow');
+      // rAF #2: commit collapsed=true on the frame after mount so the browser
+      // interpolates FROM the resting rect (mirrors the forward clone rules).
+      requestAnimationFrame(() => {
+        requestAnimationFrame(() => setReverseCollapsed(true));
+      });
+    }
+
+    // Backstop watchdog: never trap the user behind a stalled transition.
+    closeWatchdogRef.current = setTimeout(() => {
+      signalCloseAnimDone();
+    }, 500);
+  }, [closeAnim, origin, activeIndex, startIndex, close, beginCloseAnim, signalCloseAnimDone]);
+
+  // Finalize the animated close once the moving surface (borrow slot or the
+  // non-borrow reverse clone) has signalled completion.
+  useEffect(() => {
+    if (!closeAnimDone) return;
+    if (closeCompletedRef.current) return;
+    closeCompletedRef.current = true;
+    if (closeWatchdogRef.current) {
+      clearTimeout(closeWatchdogRef.current);
+      closeWatchdogRef.current = null;
+    }
     const b = borrowRef.current;
     if (b) {
       returnBorrow(b, 'close');
       borrowRef.current = null;
     }
     close();
-  }, [close]);
+  }, [closeAnimDone, close]);
+
+  // Reset close-animation local state when the overlay is re-opened.
+  useEffect(() => {
+    if (isOpen) {
+      closeCompletedRef.current = false;
+      setReverseClone(null);
+      setReverseCollapsed(false);
+    }
+  }, [isOpen]);
+
 
 
 
