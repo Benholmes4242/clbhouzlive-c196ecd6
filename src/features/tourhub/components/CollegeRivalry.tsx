@@ -473,7 +473,7 @@ export function CollegeRivalry() {
                   srcCandidates={chaserCaptain ? getPlayerHeadshotCandidates(chaserCaptain.fullName, chaserCaptain.tourCode) : []}
                   alt={chaserCaptain?.fullName ?? '—'}
                   userId={chaserCaptain?.playerId ?? chaserCaptain?.fullName ?? null}
-                  hideRing
+                  hairlineRing ringColor={LIGHT_HAIRLINE}
                 />
                 <div style={{ minWidth: 0, textAlign: 'right' }}>
                   <div style={{
