@@ -39,10 +39,15 @@ export const BADGE_ICON_MAP: Record<string, LucideIcon> = {
   zap: Zap,
 };
 
-export function renderBadgeIcon(name: string | null | undefined, size = 22, color = 'currentColor'): React.ReactNode {
-  if (!name) return <Trophy size={size} color={color} />;
+export function renderBadgeIcon(
+  name: string | null | undefined,
+  size = 22,
+  color = 'currentColor',
+  strokeWidth: number = 2,
+): React.ReactNode {
+  if (!name) return <Trophy size={size} color={color} strokeWidth={strokeWidth} />;
   const Icon = BADGE_ICON_MAP[name.toLowerCase()];
-  if (Icon) return <Icon size={size} color={color} />;
+  if (Icon) return <Icon size={size} color={color} strokeWidth={strokeWidth} />;
   // Fallback: a neutral trophy rather than raw text.
-  return <Trophy size={size} color={color} />;
+  return <Trophy size={size} color={color} strokeWidth={strokeWidth} />;
 }
