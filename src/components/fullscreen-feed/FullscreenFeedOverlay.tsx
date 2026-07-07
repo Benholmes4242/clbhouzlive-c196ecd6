@@ -380,63 +380,55 @@ export function FullscreenFeedOverlay() {
       return;
     }
     if (isOpen && origin) {
+      // Render A (synchronous commit): clone mounts at origin.rect ("from"
+      // state). The render guard below (`origin && cloneVisible`) no longer
+      // requires targetRect, so this frame actually paints at tile size —
+      // giving the browser a real committed style to interpolate FROM.
       setCloneVisible(true);
       setCloneExpanded(false);
       setFirstFrameReady(false);
       setTargetRect(null);
-      // Single rAF: after the host mounts (inset:0, opacity:0) + body-class
-      // mutations settle, compute the media's RESTING RECT and expand to it.
-      // Images always rest CONTAIN inside the safe area — the clone grows
-      // into the letterboxed rect rather than the full viewport, so there
-      // is no post-expand shrink.
-      const raf = requestAnimationFrame(() => {
-        const vp = getCurrentViewport();
-        // Prefer the tapped media's intrinsic dims (threaded from
-        // mediaItems by openWithOrigin). Grid tiles are uniform and
-        // cover-crop, so origin.aspectRatio is only a faithful proxy on
-        // FEED cards — use it as the fallback. Final fallback: full
-        // viewport (legacy behaviour).
-        const omw = origin.originMediaW ?? 0;
-        const omh = origin.originMediaH ?? 0;
-        const useMediaDims = omw > 0 && omh > 0;
-        const ar = useMediaDims ? omw / omh : (origin.aspectRatio > 0 ? origin.aspectRatio : 0);
-        const [mw, mh] = useMediaDims ? [omw, omh] : (ar > 0 ? [ar * 1000, 1000] : [0, 0]);
-        // Consult the resolver with the ACTUAL media type — passing 'image'
-        // for videos silently bypasses the Reels cover rule and lands
-        // portrait video letterboxed at open.
-        const kind: 'video' | 'image' = origin.mediaType ?? 'image';
-        const resting = resolveRestingRect(mw, mh, vp, kind);
-        setTargetRect({
-          top: resting.top,
-          left: resting.left,
-          width: resting.width,
-          height: resting.height,
+      // Double rAF: guarantee the browser has painted render A before we
+      // commit the target rect + cloneExpanded (Render B). Without this,
+      // React can batch both updates into a single pre-paint commit and
+      // the FLIP transition has no "from" style → clone teleports.
+      let raf2: number | null = null;
+      const raf1 = requestAnimationFrame(() => {
+        raf2 = requestAnimationFrame(() => {
+          const vp = getCurrentViewport();
+          const omw = origin.originMediaW ?? 0;
+          const omh = origin.originMediaH ?? 0;
+          const useMediaDims = omw > 0 && omh > 0;
+          const ar = useMediaDims ? omw / omh : (origin.aspectRatio > 0 ? origin.aspectRatio : 0);
+          const [mw, mh] = useMediaDims ? [omw, omh] : (ar > 0 ? [ar * 1000, 1000] : [0, 0]);
+          const kind: 'video' | 'image' = origin.mediaType ?? 'image';
+          const resting = resolveRestingRect(mw, mh, vp, kind);
+          setTargetRect({
+            top: resting.top,
+            left: resting.left,
+            width: resting.width,
+            height: resting.height,
+          });
+          setCloneExpanded(true);
         });
-        setCloneExpanded(true);
       });
-      // Watchdog: release the clone if the first-frame signal never arrives.
-      // Image opens have no first-frame event (SnapFeed only fires it for
-      // video); use a very short timeout so the settled image + chrome
-      // paint together, in the SAME rect the clone landed on (single
-      // geometry rule below). Video keeps the longer watchdog as a safety.
-      const watchdogMs = origin.mediaType === 'image' ? 60 : 400;
+      // Backstop watchdog only — the primary reveal trigger is the clone's
+      // own `transitionend` (see onTransitionEnd on the <img> below). This
+      // enforces "content reveals when motion completes, never before".
       watchdogRef.current = setTimeout(() => {
         setFirstFrameReady(true);
-      }, watchdogMs);
+      }, 500);
       return () => {
-        cancelAnimationFrame(raf);
-        if (watchdogRef.current) clearTimeout(watchdogRef.current);
-      };
-      return () => {
-        cancelAnimationFrame(raf);
-        if (watchdogRef.current) clearTimeout(watchdogRef.current);
+        cancelAnimationFrame(raf1);
+        if (raf2 != null) cancelAnimationFrame(raf2);
+        if (watchdogRef.current) { clearTimeout(watchdogRef.current); watchdogRef.current = null; }
       };
     } else if (!isOpen) {
       setCloneVisible(false);
       setCloneExpanded(false);
       setFirstFrameReady(false);
       setTargetRect(null);
-      if (watchdogRef.current) clearTimeout(watchdogRef.current);
+      if (watchdogRef.current) { clearTimeout(watchdogRef.current); watchdogRef.current = null; }
     }
   }, [isOpen, origin, borrow]);
 
