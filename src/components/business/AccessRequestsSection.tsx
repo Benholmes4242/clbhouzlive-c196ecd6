@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
+import { SquircleAvatar, LIGHT_HAIRLINE } from '@/components/ui/SquircleAvatar';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
@@ -254,6 +254,8 @@ export function AccessRequestsSection({ businessId, businessName, businessAvatar
                       src={request.requester.profile_photo_url || undefined}
                       alt={requesterName}
                       size={40}
+                      hairlineRing
+                      ringColor={LIGHT_HAIRLINE}
                     />
                     <div className="flex-1 min-w-0">
                       <p className="text-[15px] font-semibold leading-5 text-foreground truncate">
