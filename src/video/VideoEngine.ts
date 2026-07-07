@@ -651,6 +651,23 @@ class VideoEngineImpl {
     this.getLane(laneId).el.style.objectFit = fit;
   }
 
+  /**
+   * Nudge hls.js to re-evaluate the ABR level cap. Used after borrow-mounts
+   * so rail lanes (whose capLevelToPlayerSize was sized against the tile)
+   * upshift now that the element occupies the viewport. Safe no-op for
+   * non-hls (native HLS) lanes.
+   */
+  nudgeLevelCap(laneId: LaneId): void {
+    const lane = this.lanes.get(laneId);
+    if (!lane || !lane.hls) return;
+    try {
+      lane.hls.autoLevelCapping = -1;
+      // Trigger a level check on next tick — hls.js re-evaluates
+      // capLevelToPlayerSize inside its level controller.
+      lane.hls.nextLevel = lane.hls.nextLevel;
+    } catch {}
+  }
+
   /** Release the current source but keep the element+instance for reuse. */
   release(laneId: LaneId): void {
     const lane = this.getLane(laneId);
