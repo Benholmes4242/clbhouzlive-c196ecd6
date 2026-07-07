@@ -239,7 +239,7 @@ export function FullscreenReviewPost({
                   className="absolute inset-0 bg-black"
                   style={{ zIndex: 0 }}
                 />
-                {/* [VIDEOSTUB] Poster-only render — video engine severed */}
+                {/* Poster-only render for review video media. */}
                 <div className="absolute inset-0" style={{ zIndex: 1 }}>
                   <img
                     src={currentMedia.poster_url || currentMedia.media_url}
