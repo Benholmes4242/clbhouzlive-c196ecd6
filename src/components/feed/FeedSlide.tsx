@@ -531,6 +531,7 @@ const BorrowedFullscreenSlot: React.FC<{
         {/* Black letterbox underlay — fades in during Phase 2 fit-swap. */}
         <div
           aria-hidden
+          data-vperf="flip-underlay"
           style={{
             position: 'absolute', inset: 0, background: '#000',
             opacity: fitContain ? 1 : 0,
@@ -541,6 +542,7 @@ const BorrowedFullscreenSlot: React.FC<{
       <div
         ref={wrapperRef}
         aria-hidden
+        data-vperf="flip-wrapper"
         style={style}
         onTransitionEnd={handleTransitionEnd}
       />
