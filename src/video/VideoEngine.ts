@@ -438,6 +438,13 @@ class VideoEngineImpl {
       if (isFinite(dur) && dur > 0 && dur < 15) {
         const remaining = dur - (lane.el.currentTime || 0);
         if (remaining < 0.1) {
+          // [VPERF] S7 loop.gap — measure seek-to-0 → next 'playing' event.
+          const gapId = vperfNextId(`loop.gap:${lane.id}`);
+          vperfStart(gapId, 'loop.gap', { laneId: lane.id, postId: lane.postId });
+          vperfSessionSuppressNextStall(lane.id);
+          import('@/perf/vperf').then((m) => {
+            m.vperfArmLane(lane.id, { spanId: gapId, endOn: 'playing' });
+          }).catch(() => {});
           try { lane.el.currentTime = 0; } catch { /* noop */ }
           const p = lane.el.play();
           if (p && typeof (p as Promise<void>).catch === 'function') {
@@ -449,16 +456,37 @@ class VideoEngineImpl {
     };
 
     const onPlay = () => {
+      vperfLaneEvent(lane.id, 'playing');
+      // Session begins on first sustained playing state.
+      const hls = lane.hls;
+      const startLevel = hls ? (hls.currentLevel ?? null) : null;
+      const bwEstimate =
+        hls && (hls as any).bandwidthEstimate ? Math.round((hls as any).bandwidthEstimate) : null;
+      vperfSessionStart(lane.id, {
+        el: lane.el,
+        startLevel,
+        bwEstimate,
+        postId: lane.postId,
+        engine: hls ? 'hls.js' : 'native',
+      });
       this.transition(lane, 'playing');
     };
     const onPause = () => {
       if (lane.state !== 'error') this.transition(lane, 'paused');
+      // Only emit sessions for real pauses (not the borrow guard's suppressed pauses).
+      if (!lane.el.paused) return;
+      vperfSessionEnd(lane.id, 'pause');
+    };
+    const onWaiting = () => {
+      vperfLaneEvent(lane.id, 'waiting');
     };
 
     const onError = () => {
       this.transition(lane, 'error');
+      vperfSessionEnd(lane.id, 'error');
     };
     const onCanPlay = () => {
+      vperfLaneEvent(lane.id, 'canplay');
       // Honor persistent play-intent: if play() was called before/while the
       // (new) source was loading, kick it off now that it's ready.
       if (lane.wantPlay && lane.mountedHost && lane.el.paused) {
@@ -474,6 +502,7 @@ class VideoEngineImpl {
     el.addEventListener('timeupdate', onTime);
     el.addEventListener('play', onPlay);
     el.addEventListener('pause', onPause);
+    el.addEventListener('waiting', onWaiting);
     el.addEventListener('error', onError);
     lane.detachFns.push(() => {
       el.removeEventListener('loadeddata', onLoadedData);
@@ -482,8 +511,21 @@ class VideoEngineImpl {
       el.removeEventListener('timeupdate', onTime);
       el.removeEventListener('play', onPlay);
       el.removeEventListener('pause', onPause);
+      el.removeEventListener('waiting', onWaiting);
       el.removeEventListener('error', onError);
     });
+
+    // [VPERF] hls.js LEVEL_SWITCHED feeds session.levelSwitches / endLevel.
+    if (lane.hls) {
+      const hls = lane.hls;
+      const onLevel = (_evt: unknown, data: any) => {
+        const level = typeof data?.level === 'number' ? data.level : -1;
+        const bw = (hls as any).bandwidthEstimate ? Math.round((hls as any).bandwidthEstimate) : null;
+        vperfSessionLevel(lane.id, level, bw);
+      };
+      hls.on(Hls.Events.LEVEL_SWITCHED, onLevel);
+      lane.detachFns.push(() => hls.off(Hls.Events.LEVEL_SWITCHED, onLevel));
+    }
   }
 
 
