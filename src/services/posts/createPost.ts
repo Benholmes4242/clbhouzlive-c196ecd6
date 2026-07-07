@@ -6,6 +6,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { detectPostCategories } from '@/utils/detectPostCategories';
 import { postEventBus } from '@/events/postEventBus';
 import type { ActorType, PostCreatedEvent } from '@/events/postEvents';
+import { syncMentionsForContent } from '@/lib/mentions/syncMentions';
 
 export interface CreatePostInput {
   userId: string;
