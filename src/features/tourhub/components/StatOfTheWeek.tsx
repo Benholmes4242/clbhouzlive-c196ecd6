@@ -546,6 +546,7 @@ export const StatOfTheWeek = memo(function StatOfTheWeek() {
                       photoUrl={p.photoUrl}
                       tourCode="pga"
                       size="md"
+                      ringColor={LIGHT_HAIRLINE}
                     />
 
                     <div
