@@ -35,10 +35,7 @@ interface SquircleProps {
 /**
  * SVG-based squircle container with continuous corner smoothing (superellipse n=5)
  * 
- * ⚠️ FOR USER AVATARS: Use <SquircleAvatar
-                              hairlineRing
-                              ringColor={LIGHT_HAIRLINE}
-                            > from @/components/ui/SquircleAvatar.tsx instead
+ * ⚠️ FOR USER AVATARS: Use <SquircleAvatar /> from @/components/ui/SquircleAvatar.tsx instead
  * This SVG-based component should only be used for non-avatar content.
  * 
  * User avatars must use the new CSS-based SquircleAvatar which has:
