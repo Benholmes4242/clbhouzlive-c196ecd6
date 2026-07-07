@@ -15,8 +15,6 @@ export type NotificationTier = 'line' | 'review' | 'request' | 'trophy' | 'statu
 const LINE_TYPES = new Set([
   'like', 'like_post',
   'follow',
-  'mention', 'mention_post', 'comment_mention', 'top_ten_mention',
-  'tag',
   'comment', 'comment_post', 'comment_reply',
   'top_ten_comment', 'top_ten_reply',
   'friend_accept', 'friend_accepted',
