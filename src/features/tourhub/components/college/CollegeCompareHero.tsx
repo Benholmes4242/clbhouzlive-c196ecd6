@@ -209,6 +209,7 @@ function AlumniCompareBlock({ title, alumni1, alumni2, statKey, name1, name2, em
                     paletteSeed={a2.id}
                     size={26}
                     radius={'34%'}
+                    ringColor={LIGHT_HAIRLINE}
                   />
                   <div style={{ minWidth: 0 }}>
                     <div style={{ fontSize: '13px', fontWeight: 700, color: INK, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' as const }}>
