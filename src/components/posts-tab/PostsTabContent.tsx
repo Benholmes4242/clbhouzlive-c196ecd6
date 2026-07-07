@@ -314,23 +314,25 @@ const PostsTabContent: React.FC<PostsTabContentProps> = ({
       )}
 
       {/* ═══ COMMENTS + MORE OPTIONS overlays ═══ */}
+      {selectedCommentPost && (
+        <CommentsSheet
+          isOpen={commentsOpen}
+          onClose={closeComments}
+          postId={selectedCommentPost.id}
+          currentUserId={user?.id}
+          creatorUserId={selectedCommentPost.userId}
+          creatorName={selectedCommentPost.displayName}
+          creatorAvatar={selectedCommentPost.avatarUrl}
+          caption={selectedCommentPost.caption}
+          theme="light"
+          likesCount={getActiveLikeState(selectedCommentPost)?.count ?? selectedCommentPost.likeCount ?? null}
+          likeSource="post"
+          onCommentPosted={() => handleCommentPosted(selectedCommentPost)}
+          onCommentDeleted={() => handleCommentDeleted(selectedCommentPost.id, selectedCommentPost.commentCount)}
+        />
+      )}
       {activePost && filteredPosts.length > 0 && (
         <>
-          <CommentsSheet
-            isOpen={commentsOpen}
-            onClose={closeComments}
-            postId={activePost.id}
-            currentUserId={user?.id}
-            creatorUserId={activePost.userId}
-            creatorName={activePost.displayName}
-            creatorAvatar={activePost.avatarUrl}
-            caption={activePost.caption}
-            theme="light"
-            likesCount={activeLikeState?.count ?? null}
-            likeSource="post"
-            onCommentPosted={() => handleCommentPosted(activePost)}
-            onCommentDeleted={() => handleCommentDeleted(activePost.id, activePost.commentCount)}
-          />
           <Drawer open={moreOptionsOpen} onOpenChange={setMoreOptionsOpen}>
             <DrawerContent
               className="rounded-t-[20px]"
