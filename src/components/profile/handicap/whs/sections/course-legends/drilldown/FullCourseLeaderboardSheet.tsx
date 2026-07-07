@@ -433,7 +433,7 @@ export const FullCourseLeaderboardSheet: React.FC<Props> = ({
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
               <div
                 style={{
-                  fontSize: 18,
+                  fontSize: 22,
                   fontWeight: 800,
                   color: INK,
                   letterSpacing: '-0.02em',
