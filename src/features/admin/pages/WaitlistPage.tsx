@@ -3,7 +3,7 @@ import { formatDistanceToNow } from 'date-fns';
 import { ClipboardList, Copy, Check, Rocket } from 'lucide-react';
 import { useQueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
-import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
+import { SquircleAvatar, LIGHT_HAIRLINE } from '@/components/ui/SquircleAvatar';
 import { supabase } from '@/integrations/supabase/client';
 import { adminTheme as t } from '../theme';
 import KpiCard from '../components/KpiCard';
@@ -305,6 +305,8 @@ export default function WaitlistPage() {
                   src={row.profile?.profile_photo_url ?? undefined}
                   alt={row.profile?.display_name ?? undefined}
                   size={32}
+                  hairlineRing
+                  ringColor={LIGHT_HAIRLINE}
                 />
                 <div style={{ display: 'flex', flexDirection: 'column', lineHeight: 1.2, minWidth: 0, flex: 1 }}>
                   <span style={{ color: t.ink, fontWeight: 600, fontSize: 13 }}>

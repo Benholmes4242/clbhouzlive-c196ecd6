@@ -2,7 +2,7 @@ import React from 'react';
 import { cn } from '@/lib/utils';
 import { motion } from 'framer-motion';
 import { Zap, ChevronRight } from 'lucide-react';
-import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
+import { SquircleAvatar, LIGHT_HAIRLINE } from '@/components/ui/SquircleAvatar';
 import type { UserRival } from '@/types/championship';
 
 interface BeatRivalCTAProps {
@@ -53,6 +53,8 @@ export function BeatRivalCTA({ rival, onLogCourse, className }: BeatRivalCTAProp
           src={rival.avatar_url}
           alt={rival.display_name}
           fallback={initials}
+          hairlineRing
+          ringColor={LIGHT_HAIRLINE}
         />
         <div className="absolute -top-1 -right-1 w-5 h-5 bg-white rounded-full flex items-center justify-center shadow-sm">
           <Zap className="w-3 h-3 text-amber-500" />

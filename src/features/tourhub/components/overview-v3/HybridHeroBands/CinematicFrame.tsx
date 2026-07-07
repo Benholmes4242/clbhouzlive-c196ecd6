@@ -127,7 +127,9 @@ function StackedAvatarsDark({
           }}
         >
           <SquircleAvatar
-            src={it.candidates && it.candidates.length > 0 ? undefined : it.url}
+            src={it.candidates && it.candidates.length
+            hairlineRing
+          > 0 ? undefined : it.url}
             srcCandidates={it.candidates}
             alt={it.name || ''}
             userId={it.userId ?? null}

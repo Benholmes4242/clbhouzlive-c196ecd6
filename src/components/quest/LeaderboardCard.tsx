@@ -10,7 +10,7 @@ import { useNavigate } from 'react-router-dom';
 import { useFriendsLeaderboard } from '@/hooks/useFriendsLeaderboard';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useProfileData } from '@/hooks/useProfileData';
-import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
+import { SquircleAvatar, LIGHT_HAIRLINE } from '@/components/ui/SquircleAvatar';
 import { cn } from '@/lib/utils';
 
 interface LeaderboardCardProps {
@@ -193,6 +193,8 @@ export const LeaderboardCard: React.FC<LeaderboardCardProps> = ({ userId, totalP
                   src={entry.avatarUrl || undefined}
                   alt={entry.displayName}
                   fallback={entry.displayName.charAt(0).toUpperCase()}
+                  hairlineRing
+                  ringColor={LIGHT_HAIRLINE}
                 />
 
                 {/* Name */}
@@ -244,6 +246,8 @@ export const LeaderboardCard: React.FC<LeaderboardCardProps> = ({ userId, totalP
                   src={entry.avatarUrl || undefined}
                   alt={entry.displayName}
                   fallback={entry.displayName.charAt(0).toUpperCase()}
+                  hairlineRing
+                  ringColor={LIGHT_HAIRLINE}
                 />
                 <span className={cn(
                   "flex-1 text-sm truncate text-muted-foreground",

@@ -1,7 +1,7 @@
 import React from 'react';
 import { cn } from '@/lib/utils';
 import { Users, Swords } from 'lucide-react';
-import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
+import { SquircleAvatar, LIGHT_HAIRLINE } from '@/components/ui/SquircleAvatar';
 import { RivalMomentumBadge } from '../primitives';
 import type { UserRival, UserChampionshipStatus } from '@/types/championship';
 
@@ -100,6 +100,8 @@ function RivalRow({ rival }: { rival: UserRival }) {
         src={rival.avatar_url}
         alt={rival.display_name}
         fallback={initials}
+        hairlineRing
+        ringColor={LIGHT_HAIRLINE}
       />
       
       <div className="flex-1 min-w-0">

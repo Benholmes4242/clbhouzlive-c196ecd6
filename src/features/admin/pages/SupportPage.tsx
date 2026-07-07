@@ -2,7 +2,7 @@ import React, { useEffect, useMemo, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { useQueryClient } from '@tanstack/react-query';
 import { LifeBuoy } from 'lucide-react';
-import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
+import { SquircleAvatar, LIGHT_HAIRLINE } from '@/components/ui/SquircleAvatar';
 import { formatDistanceToNow } from 'date-fns';
 import { adminTheme as t } from '../theme';
 import KpiCard from '../components/KpiCard';
@@ -130,6 +130,8 @@ export default function SupportPage() {
             src={r.profile?.profile_photo_url ?? undefined}
             alt={r.profile?.display_name ?? undefined}
             size={32}
+            hairlineRing
+            ringColor={LIGHT_HAIRLINE}
           />
           <div style={{ display: 'flex', flexDirection: 'column', lineHeight: 1.2, minWidth: 0 }}>
             <span style={{ color: t.ink, fontWeight: 600, fontSize: 13 }}>
@@ -235,6 +237,8 @@ export default function SupportPage() {
                     src={row.profile?.profile_photo_url ?? undefined}
                     alt={row.profile?.display_name ?? undefined}
                     size={34}
+                    hairlineRing
+                    ringColor={LIGHT_HAIRLINE}
                   />
                   <div style={{ display: 'flex', flexDirection: 'column', lineHeight: 1.2, minWidth: 0, flex: 1 }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>

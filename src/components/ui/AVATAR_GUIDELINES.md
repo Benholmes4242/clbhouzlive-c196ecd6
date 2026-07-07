@@ -5,13 +5,15 @@
 **ALL user avatars across the entire application MUST use:**
 
 ```tsx
-import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
+import { SquircleAvatar, LIGHT_HAIRLINE } from '@/components/ui/SquircleAvatar';
 
 // Normal avatar (1px grey ring)
 <SquircleAvatar 
   src={user.avatar} 
   alt={user.name} 
-  size={56} 
+  size={56}
+  hairlineRing
+  ringColor={LIGHT_HAIRLINE}
 />
 
 // Achievement avatar (colored outer ring + grey inner ring)
@@ -57,30 +59,54 @@ The following components are **FORBIDDEN** for user avatars:
 
 All user avatars must use the **new squircle shape (1/1.05 aspect ratio, 34% border radius)** for visual consistency. This creates a premium, soft-rounded square appearance.
 
-The `<SquircleAvatar>` component is the **single source of truth** for this geometry.
+The `<SquircleAvatar
+       hairlineRing
+       ringColor={LIGHT_HAIRLINE}
+     >` component is the **single source of truth** for this geometry.
 
 ## Size Variants
 
 ```tsx
 // Extra small (28px) - for inline mentions, small lists
-<SquircleAvatar size="xs" ... />
+<SquircleAvatar size="xs" ...
+  hairlineRing
+  ringColor={LIGHT_HAIRLINE}
+/>
 // or
-<SquircleAvatar size={28} ... />
+<SquircleAvatar size={28} ...
+  hairlineRing
+  ringColor={LIGHT_HAIRLINE}
+/>
 
 // Small (40px) - for compact lists, comments
-<SquircleAvatar size="sm" ... />
+<SquircleAvatar size="sm" ...
+  hairlineRing
+  ringColor={LIGHT_HAIRLINE}
+/>
 
 // Medium (56px) - default for most user avatars
-<SquircleAvatar size="md" ... />
+<SquircleAvatar size="md" ...
+  hairlineRing
+  ringColor={LIGHT_HAIRLINE}
+/>
 
 // Large (80px) - for profile headers, featured users
-<SquircleAvatar size="lg" ... />
+<SquircleAvatar size="lg" ...
+  hairlineRing
+  ringColor={LIGHT_HAIRLINE}
+/>
 
 // Extra large (112px) - for large profile views
-<SquircleAvatar size="xl" ... />
+<SquircleAvatar size="xl" ...
+  hairlineRing
+  ringColor={LIGHT_HAIRLINE}
+/>
 
 // 2XL (144px) - for main profile page
-<SquircleAvatar size="2xl" ... />
+<SquircleAvatar size="2xl" ...
+  hairlineRing
+  ringColor={LIGHT_HAIRLINE}
+/>
 ```
 
 ## Fallback Behaviour (Updated)
@@ -100,6 +126,8 @@ initials on a deterministic coloured background:
   alt={user.display_name}
   userId={user.id}
   size="md"
+  hairlineRing
+  ringColor={LIGHT_HAIRLINE}
 />
 
 // If UUID isn't available (rare), colour hashes from the name
@@ -107,6 +135,8 @@ initials on a deterministic coloured background:
   src={null}
   alt="Chris Leeson"
   size="md"
+  hairlineRing
+  ringColor={LIGHT_HAIRLINE}
 />
 
 // Manual override for edge cases
@@ -115,6 +145,8 @@ initials on a deterministic coloured background:
   alt="Guest"
   fallback="G"
   size="md"
+  hairlineRing
+  ringColor={LIGHT_HAIRLINE}
 />
 ```
 
@@ -136,7 +168,10 @@ import { getRingColorForTotalPlayed } from '@/lib/globalAchievementMilestoneSyst
 ## Enforcement
 
 - All deprecated components will log **console.error** warnings in development
-- Code reviews should reject any new user avatars not using `<SquircleAvatar>`
+- Code reviews should reject any new user avatars not using `<SquircleAvatar
+                                                               hairlineRing
+                                                               ringColor={LIGHT_HAIRLINE}
+                                                             >`
 - Visual QA should flag any circular or non-standard avatars
 
 ## Questions?

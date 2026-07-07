@@ -2,7 +2,7 @@ import React, { useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Users, Trophy, X } from 'lucide-react';
-import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
+import { SquircleAvatar, LIGHT_HAIRLINE } from '@/components/ui/SquircleAvatar';
 import { Sheet, SheetContent } from '@/components/ui/sheet';
 
 interface FriendLeaderboardEntry {
@@ -85,6 +85,8 @@ const LeaderboardRow: React.FC<LeaderboardRowProps> = ({
           src={entry.avatarUrl}
           alt={entry.name}
           fallback={entry.name[0]?.toUpperCase() || '?'}
+          hairlineRing
+          ringColor={LIGHT_HAIRLINE}
         />
       </div>
 
