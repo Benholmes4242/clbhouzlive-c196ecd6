@@ -96,10 +96,12 @@ function TrackFace({
   entry,
   crowned = false,
   style,
+  ringColor = 'rgba(15,23,42,0.10)',
 }: {
   entry: DuelRow | null;
   crowned?: boolean;
   style?: React.CSSProperties;
+  ringColor?: string;
 }) {
   const size = 22;
   const photoUrl = entry?.photoUrl ?? null;
@@ -122,7 +124,7 @@ function TrackFace({
           background: photoBg,
           borderRadius: '34%',
           overflow: 'hidden',
-          boxShadow: '0 1px 3px rgba(15,23,42,0.18), inset 0 0 0 1px rgba(15,23,42,0.10)',
+          boxShadow: `0 1px 3px rgba(15,23,42,0.18), inset 0 0 0 1px ${ringColor}`,
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
