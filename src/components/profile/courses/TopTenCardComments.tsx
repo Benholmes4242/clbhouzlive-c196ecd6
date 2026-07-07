@@ -58,8 +58,6 @@ export const TopTenCardComments: React.FC<TopTenCardCommentsProps> = ({
 
   const [activeTab, setActiveTab] = useState<SheetTab>('comments');
   const [draft, setDraft] = useState('');
-  const [caret, setCaret] = useState(0);
-  const mention = useMentionAutocomplete(draft, caret);
   const [replyingTo, setReplyingTo] = useState<{ id: string; name: string } | null>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
 
