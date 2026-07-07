@@ -196,7 +196,7 @@ function AutoplayVideoCardInner({ post, index, allPosts, userId, active, borderR
               letterSpacing: '-0.01em',
             }}
           >
-            {post.caption || `${post.displayName} on Clbhouz`}
+            {post.caption ? <MentionText as="span" text={post.caption} /> : `${post.displayName} on Clbhouz`}
           </ExpandableCaption>
 
           <div

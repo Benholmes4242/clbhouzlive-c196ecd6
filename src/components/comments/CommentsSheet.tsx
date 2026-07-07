@@ -479,9 +479,11 @@ function CommentsSheet({
           </div>
 
           {/* Content */}
-          <span className="mt-1 text-[14px] leading-[20px] block text-foreground/90 whitespace-pre-wrap">
-            {comment.content}
-          </span>
+          <MentionText
+            as="span"
+            text={comment.content}
+            className="mt-1 text-[14px] leading-[20px] block text-foreground/90 whitespace-pre-wrap"
+          />
 
           {/* Media */}
           {(comment as any).media_url && (comment as any).media_type === 'image' && (

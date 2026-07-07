@@ -572,10 +572,11 @@ export const CreatorCapsule: React.FC<CreatorCapsuleProps> = ({
           </span>
         </button>
 
-        {/* Caption preview (collapsed) */}
+        {/* Caption preview (collapsed) — stripped for one-line display so
+            legacy markup renders as plain "@Name" text. */}
         {!isExpanded && truncatedCaption && (
           <div className="text-[11px] text-white line-clamp-1 mt-0.5">
-            {truncatedCaption}
+            {stripMentionMarkup(truncatedCaption)}
           </div>
         )}
 

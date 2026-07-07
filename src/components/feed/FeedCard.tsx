@@ -169,7 +169,7 @@ const CaptionBlock: React.FC<CaptionBlockProps> = ({ body, expanded, setExpanded
               : {}),
           }}
         >
-          {body}
+          <MentionText text={body} />
           {!isReviewMode && expanded && isClamped && (
             <button
               type="button"

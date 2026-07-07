@@ -116,11 +116,11 @@ export const TopTenCardComments: React.FC<TopTenCardCommentsProps> = ({
             {formatDistanceToNow(new Date(comment.created_at), { addSuffix: true })}
           </span>
         </div>
-        <span
+        <MentionText
+          as="span"
+          text={comment.body}
           className={`${isReply ? 'text-xs' : 'text-sm'} mt-0.5 block whitespace-pre-wrap`}
-        >
-          {comment.body}
-        </span>
+        />
         <div className="flex items-center gap-3 mt-1">
           {!isReply && canInteract && (
             <button
