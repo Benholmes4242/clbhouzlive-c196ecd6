@@ -187,6 +187,33 @@ export function vperfEnd(
   finish(rec, 'PASS', extraMeta);
 }
 
+/** Adjust the budget for an in-flight span (e.g. once you know whether the
+ *  open path is borrow vs cold-lane). No-op if the span has already ended. */
+export function vperfSetBudget(spanId: string, budgetMs: number): void {
+  if (!on()) return;
+  const rec = spans.get(spanId);
+  if (!rec) return;
+  if (isFinite(budgetMs) && budgetMs > 0) rec.budgetMs = budgetMs;
+}
+
+/** Attach additional meta to an in-flight span (e.g. source once known). */
+export function vperfMeta(spanId: string, meta: Record<string, unknown>): void {
+  if (!on()) return;
+  const rec = spans.get(spanId);
+  if (!rec) return;
+  Object.assign(rec.meta, meta);
+}
+
+  spanId: string,
+  extraMeta: Record<string, unknown> = {},
+): void {
+  if (!on()) return;
+  const rec = spans.get(spanId);
+  if (!rec) return;
+  spans.delete(spanId);
+  finish(rec, 'PASS', extraMeta);
+}
+
 // ------------------------ Lane bridging ------------------------
 
 export function vperfArmLane(
