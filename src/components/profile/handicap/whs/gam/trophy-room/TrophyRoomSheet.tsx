@@ -152,8 +152,12 @@ const TrophyGroupLabel: React.FC<{
   </div>
 );
 
-const Grid: React.FC<{ items: TrophyItem[]; onTap: (item: TrophyItem) => void }> = ({ items, onTap }) => (
-  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 8 }}>
+const Grid: React.FC<{
+  items: TrophyItem[];
+  onTap: (item: TrophyItem) => void;
+  columns?: number;
+}> = ({ items, onTap, columns = 3 }) => (
+  <div style={{ display: 'grid', gridTemplateColumns: `repeat(${columns}, 1fr)`, gap: 8 }}>
     {items.map((item) => (
       <TrophyCard key={item.id} item={item} onTap={onTap} />
     ))}
@@ -323,118 +327,20 @@ export const TrophyRoomSheet: React.FC<Props> = ({ userId, viewerUserId, ownerFi
   return (
     <>
       <GamSheet open={open} onClose={() => setOpen(false)}>
-        {/* Drag handle */}
+        {/* Drag handle — pinned */}
         <div style={{ display: 'flex', justifyContent: 'center', paddingTop: 8, flexShrink: 0 }}>
           <div style={{ width: 36, height: 4, borderRadius: 99, background: LINE }} />
         </div>
 
-        {/* Header */}
-        <div
-          style={{
-            padding: '12px 20px 12px',
-            borderBottom: `0.5px solid ${LINE}`,
-            flexShrink: 0,
-            fontFamily: GAM.FONT_GEIST,
-          }}
-        >
-          <Eyebrow ownerFirstName={ownerFirstName} isFriendView={isFriendView} />
-          <div style={{ width: 34, height: 3, borderRadius: 99, background: AMBER, marginTop: 9 }} />
-          <div
-            style={{
-              fontSize: 38,
-              fontWeight: 800,
-              letterSpacing: '-0.03em',
-              color: INK,
-              marginTop: 6,
-              lineHeight: 0.95,
-              ...GAM.TABULAR,
-            }}
-          >
-            {earnedTotal}
-            <span
-              style={{
-                fontSize: 15,
-                fontWeight: 700,
-                color: DIM,
-                letterSpacing: '0.01em',
-                marginLeft: 8,
-              }}
-            >
-              earned
-            </span>
-          </div>
-
-          {/* Split */}
-          <div
-            style={{
-              fontSize: 10,
-              color: FAINT,
-              marginTop: 8,
-              display: 'flex',
-              gap: 14,
-              flexWrap: 'wrap',
-              fontWeight: 800,
-              letterSpacing: '0.14em',
-              textTransform: 'uppercase',
-              ...GAM.TABULAR,
-            }}
-          >
-            <span>
-              <span style={{ color: INK }}>{earnedAchievements.length}</span>{' '}
-              {earnedAchievements.length === 1 ? 'ACHIEVEMENT' : 'ACHIEVEMENTS'}
-            </span>
-            <span aria-hidden>·</span>
-            <span>
-              <span style={{ color: AMBER }}>{allLegends.length}</span>{' '}
-              COURSE {allLegends.length === 1 ? 'LEGEND' : 'LEGENDS'}
-            </span>
-          </div>
-
-          {/* Completion rail — achievements only */}
-          {totalAchievements > 0 && (
-            <div style={{ marginTop: 12 }}>
-              <div
-                style={{
-                  position: 'relative',
-                  width: '100%',
-                  height: 3.5,
-                  borderRadius: 99,
-                  background: 'rgba(255,255,255,0.07)',
-                  overflow: 'hidden',
-                }}
-              >
-                <div
-                  style={{
-                    width: `${railPct}%`,
-                    height: '100%',
-                    background: AMBER,
-                    borderRadius: 99,
-                    transition: 'width 400ms ease',
-                  }}
-                />
-              </div>
-              <div
-                style={{
-                  display: 'flex',
-                  justifyContent: 'space-between',
-                  marginTop: 6,
-                  fontSize: 9.5,
-                  fontWeight: 800,
-                  letterSpacing: '0.12em',
-                  color: FAINT,
-                  ...GAM.TABULAR,
-                }}
-              >
-                <span>
-                  <span style={{ color: INK }}>{earnedAchCount}</span> OF {totalAchievements} ACHIEVEMENTS
-                </span>
-                <span>{remaining === 1 ? '1 TO GO' : `${remaining} TO GO`}</span>
-              </div>
-            </div>
-          )}
-        </div>
-
-        {/* Filter pills */}
+        {/* Filter pills — pinned. Hairline border-bottom marks the pinned edge once
+            content scrolls beneath it. The header block below (moved into the
+            scrollable body in this PR) carries its own top border only when
+            visible, so no double hairline at top-of-scroll. */}
+        {/* Filter pills — pinned. Hairline border-bottom marks the pinned edge
+            once content scrolls beneath it. The header block (eyebrow + 179 hero
+            + split + completion rail) and the NEXT UNLOCK spotlight moved into
+            the scrollable body in this PR — pinned region trims from ~247px to
+            ~62px so ~40% more content shows on open. */}
         <div
           style={{
             display: 'flex',
@@ -445,6 +351,7 @@ export const TrophyRoomSheet: React.FC<Props> = ({ userId, viewerUserId, ownerFi
             overflowX: 'auto',
             scrollbarWidth: 'none',
             msOverflowStyle: 'none',
+            borderBottom: `0.5px solid ${LINE}`,
           }}
           className="hcp-tab-row"
           role="tablist"
@@ -501,74 +408,80 @@ export const TrophyRoomSheet: React.FC<Props> = ({ userId, viewerUserId, ownerFi
           <style>{`.hcp-tab-row::-webkit-scrollbar { display: none; }`}</style>
         </div>
 
-        {/* NEXT UNLOCK spotlight */}
-        {nextUnlock && (
-          <div style={{ padding: '4px 16px 8px', flexShrink: 0 }}>
-            <button
-              type="button"
-              onClick={() => openDetail(nextUnlock.item)}
+        {/* Body — scrolls the header block, spotlight, and category sections. */}
+        <div
+          style={{
+            flex: 1,
+            minHeight: 0,
+            overflowY: 'auto',
+            willChange: 'transform',
+            padding: '0 16px 32px',
+            fontFamily: GAM.FONT_GEIST,
+          }}
+        >
+          {/* Header block (was pinned in the previous layout) */}
+          <div style={{ padding: '12px 4px 12px', fontFamily: GAM.FONT_GEIST }}>
+            <Eyebrow ownerFirstName={ownerFirstName} isFriendView={isFriendView} />
+            <div style={{ width: 34, height: 3, borderRadius: 99, background: AMBER, marginTop: 9 }} />
+            <div
               style={{
-                width: '100%',
-                display: 'flex',
-                alignItems: 'center',
-                gap: 12,
-                padding: '12px 14px',
-                borderRadius: 14,
-                background: CARD,
-                border: `1px solid ${LINE}`,
-                borderLeft: `3px solid ${AMBER}`,
-                cursor: 'pointer',
-                textAlign: 'left',
-                fontFamily: GAM.FONT_GEIST,
+                fontSize: 38,
+                fontWeight: 800,
+                letterSpacing: '-0.03em',
                 color: INK,
+                marginTop: 6,
+                lineHeight: 0.95,
+                ...GAM.TABULAR,
               }}
             >
-              <div
+              {earnedTotal}
+              <span
                 style={{
-                  width: 36,
-                  height: 36,
-                  borderRadius: 10,
-                  background: 'rgba(247,147,30,0.10)',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  color: AMBER,
-                  flexShrink: 0,
+                  fontSize: 15,
+                  fontWeight: 700,
+                  color: DIM,
+                  letterSpacing: '0.01em',
+                  marginLeft: 8,
                 }}
               >
-                {renderBadgeIcon(nextUnlock.item.iconKey, 16, 'currentColor')}
-              </div>
-              <div style={{ flex: 1, minWidth: 0 }}>
+                earned
+              </span>
+            </div>
+
+            {/* Split */}
+            <div
+              style={{
+                fontSize: 10,
+                color: FAINT,
+                marginTop: 8,
+                display: 'flex',
+                gap: 14,
+                flexWrap: 'wrap',
+                fontWeight: 800,
+                letterSpacing: '0.14em',
+                textTransform: 'uppercase',
+                ...GAM.TABULAR,
+              }}
+            >
+              <span>
+                <span style={{ color: INK }}>{earnedAchievements.length}</span>{' '}
+                {earnedAchievements.length === 1 ? 'ACHIEVEMENT' : 'ACHIEVEMENTS'}
+              </span>
+              <span aria-hidden>·</span>
+              <span>
+                <span style={{ color: AMBER }}>{allLegends.length}</span>{' '}
+                COURSE {allLegends.length === 1 ? 'LEGEND' : 'LEGENDS'}
+              </span>
+            </div>
+
+            {/* Completion rail — achievements only */}
+            {totalAchievements > 0 && (
+              <div style={{ marginTop: 12 }}>
                 <div
                   style={{
-                    fontSize: 8.5,
-                    fontWeight: 800,
-                    letterSpacing: '0.14em',
-                    color: AMBER,
-                  }}
-                >
-                  NEXT UNLOCK
-                </div>
-                <div
-                  style={{
-                    fontSize: 14,
-                    fontWeight: 800,
-                    color: INK,
-                    marginTop: 2,
-                    lineHeight: 1.2,
-                    whiteSpace: 'nowrap',
-                    overflow: 'hidden',
-                    textOverflow: 'ellipsis',
-                    ...GAM.TABULAR,
-                  }}
-                >
-                  {nextUnlock.item.name} · {nextUnlock.item.currentValue} of {nextUnlock.item.nextThreshold}
-                </div>
-                <div
-                  style={{
-                    marginTop: 8,
+                    position: 'relative',
                     width: '100%',
-                    height: 3,
+                    height: 3.5,
                     borderRadius: 99,
                     background: 'rgba(255,255,255,0.07)',
                     overflow: 'hidden',
@@ -576,47 +489,156 @@ export const TrophyRoomSheet: React.FC<Props> = ({ userId, viewerUserId, ownerFi
                 >
                   <div
                     style={{
-                      width: `${nextUnlock.frac * 100}%`,
+                      width: `${railPct}%`,
                       height: '100%',
                       background: AMBER,
                       borderRadius: 99,
+                      transition: 'width 400ms ease',
                     }}
                   />
                 </div>
-              </div>
-              <ChevronRight size={16} color={FAINT} style={{ flexShrink: 0 }} />
-            </button>
-          </div>
-        )}
-
-
-
-        {/* Body */}
-        <div
-          style={{
-            flex: 1,
-            minHeight: 0,
-            overflowY: 'auto',
-            willChange: 'transform',
-            padding: '4px 16px 32px',
-            fontFamily: GAM.FONT_GEIST,
-          }}
-        >
-          {isLoading && (
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 8, marginTop: 16 }}>
-              {Array.from({ length: 9 }).map((_, i) => (
                 <div
-                  key={i}
                   style={{
-                    aspectRatio: '1 / 1.22',
-                    background: 'rgba(255,255,255,0.06)',
-                    borderRadius: 12,
-                    animation: 'gamPulse 1.6s ease-in-out infinite',
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    marginTop: 6,
+                    fontSize: 9.5,
+                    fontWeight: 800,
+                    letterSpacing: '0.12em',
+                    color: FAINT,
+                    ...GAM.TABULAR,
                   }}
-                />
-              ))}
+                >
+                  <span>
+                    <span style={{ color: INK }}>{earnedAchCount}</span> OF {totalAchievements} ACHIEVEMENTS
+                  </span>
+                  <span>{remaining === 1 ? '1 TO GO' : `${remaining} TO GO`}</span>
+                </div>
+              </div>
+            )}
+          </div>
+
+          {/* NEXT UNLOCK spotlight (was pinned in the previous layout) */}
+          {nextUnlock && (
+            <div style={{ padding: '4px 0 12px' }}>
+              <button
+                type="button"
+                onClick={() => openDetail(nextUnlock.item)}
+                style={{
+                  width: '100%',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 12,
+                  padding: '12px 14px',
+                  borderRadius: 14,
+                  background: CARD,
+                  border: `1px solid ${LINE}`,
+                  borderLeft: `3px solid ${AMBER}`,
+                  cursor: 'pointer',
+                  textAlign: 'left',
+                  fontFamily: GAM.FONT_GEIST,
+                  color: INK,
+                }}
+              >
+                <div
+                  style={{
+                    width: 36,
+                    height: 36,
+                    borderRadius: 10,
+                    background: 'rgba(247,147,30,0.10)',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    color: AMBER,
+                    flexShrink: 0,
+                  }}
+                >
+                  {renderBadgeIcon(nextUnlock.item.iconKey, 16, 'currentColor')}
+                </div>
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <div
+                    style={{
+                      fontSize: 8.5,
+                      fontWeight: 800,
+                      letterSpacing: '0.14em',
+                      color: AMBER,
+                    }}
+                  >
+                    NEXT UNLOCK
+                  </div>
+                  <div
+                    style={{
+                      fontSize: 14,
+                      fontWeight: 800,
+                      color: INK,
+                      marginTop: 2,
+                      lineHeight: 1.2,
+                      whiteSpace: 'nowrap',
+                      overflow: 'hidden',
+                      textOverflow: 'ellipsis',
+                      ...GAM.TABULAR,
+                    }}
+                  >
+                    {nextUnlock.item.name} · {nextUnlock.item.currentValue} of {nextUnlock.item.nextThreshold}
+                  </div>
+                  <div
+                    style={{
+                      marginTop: 8,
+                      width: '100%',
+                      height: 3,
+                      borderRadius: 99,
+                      background: 'rgba(255,255,255,0.07)',
+                      overflow: 'hidden',
+                    }}
+                  >
+                    <div
+                      style={{
+                        width: `${nextUnlock.frac * 100}%`,
+                        height: '100%',
+                        background: AMBER,
+                        borderRadius: 99,
+                      }}
+                    />
+                  </div>
+                </div>
+                <ChevronRight size={16} color={FAINT} style={{ flexShrink: 0 }} />
+              </button>
             </div>
           )}
+
+          {isLoading && (
+            <>
+              {/* Lifetime skeleton — mirrors 2-up ShowpieceCards. */}
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 8, marginTop: 4 }}>
+                {Array.from({ length: 4 }).map((_, i) => (
+                  <div
+                    key={`sk-life-${i}`}
+                    style={{
+                      minHeight: 148,
+                      background: 'rgba(255,255,255,0.06)',
+                      borderRadius: 16,
+                      animation: 'gamPulse 1.6s ease-in-out infinite',
+                    }}
+                  />
+                ))}
+              </div>
+              {/* Category skeleton — 3-up matches every other section. */}
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 8, marginTop: 20 }}>
+                {Array.from({ length: 6 }).map((_, i) => (
+                  <div
+                    key={`sk-cat-${i}`}
+                    style={{
+                      aspectRatio: '1 / 1.22',
+                      background: 'rgba(255,255,255,0.06)',
+                      borderRadius: 12,
+                      animation: 'gamPulse 1.6s ease-in-out infinite',
+                    }}
+                  />
+                ))}
+              </div>
+            </>
+          )}
+
 
           {!isLoading && tab === 'earned' && (() => {
             const lifetime = selectLifetime(earnedAchievements);
@@ -633,7 +655,7 @@ export const TrophyRoomSheet: React.FC<Props> = ({ userId, viewerUserId, ownerFi
                 {lifetime.length > 0 && (
                   <>
                     <TrophyGroupLabel label="Lifetime" count={lifetime.length} />
-                    <Grid items={lifetime} onTap={openDetail} />
+                    <Grid items={lifetime} onTap={openDetail} columns={2} />
                   </>
                 )}
                 {CATEGORY_ORDER.map((cat) => {
@@ -668,7 +690,7 @@ export const TrophyRoomSheet: React.FC<Props> = ({ userId, viewerUserId, ownerFi
                 {lifetime.length > 0 && (
                   <>
                     <TrophyGroupLabel label="Lifetime" count={lifetime.length} />
-                    <Grid items={lifetime} onTap={openDetail} />
+                    <Grid items={lifetime} onTap={openDetail} columns={2} />
                   </>
                 )}
                 {CATEGORY_ORDER.map((cat) => {
@@ -699,7 +721,7 @@ export const TrophyRoomSheet: React.FC<Props> = ({ userId, viewerUserId, ownerFi
                 {lifetime.length > 0 && (
                   <>
                     <TrophyGroupLabel label="Lifetime" count={lifetime.length} />
-                    <Grid items={lifetime} onTap={openDetail} />
+                    <Grid items={lifetime} onTap={openDetail} columns={2} />
                   </>
                 )}
                 {CATEGORY_ORDER.map((cat) => {
