@@ -435,6 +435,7 @@ export const CourseLegendsDrilldown: React.FC<Props> = ({ selection, hideHeader 
         initialCategory={fullLeaderboardCategory ?? visibleCategories[0]}
         window={window}
         yourRanks={yourRanks}
+        theme={theme}
       />
     </div>
   );
