@@ -318,8 +318,10 @@ export function FullscreenFeedOverlay() {
       if (shield) shield.style.backgroundColor = 'transparent';
       document.documentElement.style.backgroundColor = '#000000';
       document.body.style.backgroundColor = '#000000';
+      // overlay flag is boot-locked (ensureStatusBarOverlayBooted). We only
+      // push style + color here — no viewport resize during open animation.
       try {
-        (window as any).median?.statusbar?.set({ style: 'dark', color: '00000000', overlay: true, blur: false });
+        setStatusBarStyleColor('dark', '00000000');
       } catch {}
 
       return () => {

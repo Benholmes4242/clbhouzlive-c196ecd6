@@ -106,7 +106,7 @@ import ErrorLogPage from "./pages/ErrorLogPage";
 import { HeaderProvider } from '@/contexts/GlobalHeaderContext';
 import GlobalHeader from '@/components/header/GlobalHeader';
 import { isImmersiveRoute, isDarkChromeRoute } from '@/components/header/globalHeaderRules';
-import { applyShieldColor } from '@/hooks/useMedianStatusBar';
+import { applyShieldColor, ensureStatusBarOverlayBooted, setStatusBarStyleColor } from '@/hooks/useMedianStatusBar';
 import { KeepAliveOutlet } from '@/components/keep-alive/KeepAliveOutlet';
 
 
@@ -392,16 +392,21 @@ function AppRoutes() {
     // any pre-paint glimpse in the notch/safe-area is cinematic, not grey.
     const surface = darkChrome ? '#15171F' : immersive ? '#0F172A' : '#F8FAFC';
     const shieldColor = immersive ? 'transparent' : (darkChrome ? '#15171F' : '#F8FAFC');
+    // NOTE: `overlay` flag is boot-locked ONCE at app startup via
+    // ensureStatusBarOverlayBooted() (see useMedianStatusBar.ts). Route
+    // transitions only update style + color — never re-send `overlay`. This
+    // is what keeps 100dvh stable through fs.open (the fix that eliminated
+    // the fs.open jolt on 2026-07-07).
     const statusBar = immersive
-      ? { style: 'dark' as const, color: '00000000', overlay: true, blur: false }
-      : { style: 'light' as const, color: darkChrome ? 'FF15171F' : 'FFF8FAFC', overlay: false, blur: false };
+      ? { style: 'dark' as const, color: '00000000' }
+      : { style: 'light' as const, color: darkChrome ? 'FF15171F' : 'FFF8FAFC' };
 
     // Idempotency: cache the last-applied values on the effect's module scope.
     // If nothing changed (very common between similar routes) skip every write.
     const prev = (window as any).__lvChromeCache as
       | { surface: string; darkChrome: boolean; isAuth: boolean; immersive: boolean; shieldColor: string; sbKey: string }
       | undefined;
-    const sbKey = `${statusBar.style}|${statusBar.color}|${statusBar.overlay}|${statusBar.blur}`;
+    const sbKey = `${statusBar.style}|${statusBar.color}`;
 
     if (
       prev &&
@@ -438,15 +443,19 @@ function AppRoutes() {
       }
     }
 
-    // Shield colour — only rewrite when it changed.
+    // Shield colour — only rewrite when it changed. Under permanent overlay
+    // mode the shield IS the visible chrome behind the transparent status bar
+    // on non-immersive routes, so its color must match the intended surface.
     if (!prev || prev.shieldColor !== shieldColor) {
       try { applyShieldColor(shieldColor); } catch {}
     }
 
-    // Native status bar bridge — only call when parameters changed.
+    // Native status bar bridge — style/color only. Boot-locked overlay flag
+    // is preserved (no viewport resize on any transition).
     if (!prev || prev.sbKey !== sbKey) {
       try {
-        (window as any).median?.statusbar?.set(statusBar);
+        ensureStatusBarOverlayBooted();
+        setStatusBarStyleColor(statusBar.style, statusBar.color);
       } catch {}
     }
 

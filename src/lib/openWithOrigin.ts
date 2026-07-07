@@ -330,13 +330,12 @@ export function openWithOrigin({
   // Chrome flip at TAP time (not effect time) to kill the strobe. Scroll
   // lock is owned by the overlay's isOpen effect (ref-counted so it composes
   // cleanly with CommentsSheet stacking on top).
+  //
+  // NOTE: overlay flag is boot-locked (see ensureStatusBarOverlayBooted in
+  // useMedianStatusBar.ts). We only push style + color here to avoid the
+  // async WebView viewport resize that caused the fs.open jolt.
   try {
-    (window as any).median?.statusbar?.set({
-      style: 'dark',
-      color: '00000000',
-      overlay: true,
-      blur: false,
-    });
+    setStatusBarStyleColor('dark', '00000000');
   } catch {}
 
   useFullscreenFeedStore.getState().open(posts, index, {
