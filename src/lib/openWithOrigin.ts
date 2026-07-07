@@ -20,6 +20,7 @@ import { VideoEngine } from '@/video/VideoEngine';
 import { RailLanePool } from '@/video/railLanePool';
 
 import { isPerfEnabled } from '@/perf/navTiming';
+import { vperfStart, vperfMark, vperfArmLane, vperfNextId, vperfSetBudget, vperfMeta } from '@/perf/vperf';
 
 
 const BORROW_DBG = (evt: string, payload: Record<string, unknown> = {}) => {
@@ -108,6 +109,15 @@ export function openWithOrigin({
 
   const origin = snapshotOrigin(originEl, posterUrl ?? null);
   const postId = (posts[index] as any)?.id ?? null;
+
+  // [VPERF] S1 fs.open — captured at tap. Kind budget picked once source is
+  // known (borrow vs lane). Phases: storeOpen → slotMount → firstFrame → playing.
+  const fsOpenSpanId = vperfNextId(`fs.open:${postId ?? 'unknown'}`);
+  vperfStart(fsOpenSpanId, 'fs.open', {
+    surface: openedFrom,
+    postId,
+    // budgetMs set below once borrow decision is known.
+  });
 
 
 
@@ -243,5 +253,17 @@ export function openWithOrigin({
     openedFrom,
     borrow,
   });
+
+  // [VPERF] end of the synchronous open() call — mark storeOpen phase and
+  // arm the target lane's next 'playing' event to close the span.
+  vperfMark(fsOpenSpanId, 'storeOpen');
+  const source: 'borrow' | 'lane' = borrow ? 'borrow' : 'lane';
+  vperfMeta(fsOpenSpanId, { source });
+  vperfSetBudget(fsOpenSpanId, source === 'borrow' ? 150 : 500);
+  const targetLaneId: string = borrow ? borrow.laneId : 'fullscreen';
+  vperfArmLane(targetLaneId, { spanId: fsOpenSpanId, endOn: 'firstFrame', phase: 'firstFrame' });
+  vperfArmLane(targetLaneId, { spanId: fsOpenSpanId, endOn: 'playing' });
 }
+
+
 
