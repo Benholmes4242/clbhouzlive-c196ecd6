@@ -1,6 +1,7 @@
 import { GAM } from '../../../gam/tokens';
 import React from 'react';
 import { Crown } from 'lucide-react';
+import { MovementCell } from './_shared/MovementCell';
 
 interface ChampionsListRowProps {
   rank: number;
@@ -17,6 +18,9 @@ interface ChampionsListRowProps {
   compact?: boolean;
   /** Backdrop theme. Default 'dark' preserves handicap drilldown look. */
   theme?: 'light' | 'dark';
+  /** 30-day movement inputs. delta is null when rank_30d is null (NEW). */
+  rank30d?: number | null;
+  delta?: number | null;
 }
 
 const SQUIRCLE_MASK_URL =
