@@ -4,6 +4,7 @@ import { useSupabaseSession } from './useSupabaseSession';
 
 import { useActiveActor } from '@/context/ActiveActorContext';
 import { patchEngagement } from '@/lib/engagementCache';
+import { stripMentionMarkup } from '@/lib/mentions/format';
 
 export interface PostComment {
   id: string;
