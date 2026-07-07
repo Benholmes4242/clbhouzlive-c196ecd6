@@ -197,6 +197,18 @@ export const LightCardFeed: React.FC<LightCardFeedProps> = ({
       if (idx < 0) return;
       setActiveIndex(idx);
       if (mediaIndex > 0) setCarouselPosition(idx, mediaIndex);
+      if (isPerfEnabled()) {
+        // eslint-disable-next-line no-console
+        console.info('[DECIDE]', 'tap.context', {
+          postId: post.id,
+          mediaId: mediaId ?? null,
+          hasOrigin: !!origin?.el,
+          isActiveCard: idx === playingIdx,
+          playingIdx,
+          tappedIdx: idx,
+          surface: 'posts-tab',
+        });
+      }
       if (origin?.el) {
         openWithOrigin({
           openedFrom: 'posts-tab',
@@ -222,7 +234,7 @@ export const LightCardFeed: React.FC<LightCardFeedProps> = ({
 
       }
     },
-    [posts, setActiveIndex, setCarouselPosition, openFullscreen, hasNextPage, fetchNextPage, isFetchingNextPage],
+    [posts, setActiveIndex, setCarouselPosition, openFullscreen, hasNextPage, fetchNextPage, isFetchingNextPage, playingIdx],
   );
 
   const carouselChangeCacheRef = useRef(new Map<string, (post: FeedPost, slide: number) => void>());
