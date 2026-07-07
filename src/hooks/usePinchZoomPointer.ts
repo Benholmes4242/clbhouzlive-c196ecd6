@@ -102,7 +102,7 @@ export function usePinchZoomPointer(opts: UsePinchZoomPointerOpts = {}) {
   // Style: allow vertical pass-through when not zoomed
   const style: CSSProperties = {
     transform: `translate3d(${dx}px, ${dy}px, 0) scale(${scale})`,
-    touchAction: scale === 1 ? "pan-y" : "none",
+    touchAction: scale === 1 ? "pan-x pan-y pinch-zoom" : "none",
     transition: scale === 1 ? "transform 0.25s ease-out" : "none",
     userSelect: "none",
   } as CSSProperties & { WebkitUserDrag: string };
