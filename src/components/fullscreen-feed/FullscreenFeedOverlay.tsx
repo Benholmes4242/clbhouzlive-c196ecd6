@@ -489,8 +489,9 @@ export function FullscreenFeedOverlay() {
 
   useEffect(() => {
     // Borrow opens skip the poster-clone FLIP entirely — BorrowedFullscreenSlot
-    // owns its own live-element expand transition. Fire firstFrameReady so the
-    // host opacity gate below flips to 1 immediately.
+    // owns its own live-element expand transition (in 'expand' mode) or mounts
+    // pre-settled (in 'cut' mode). Fire firstFrameReady so the host opacity
+    // gate below flips to 1 immediately.
     if (isOpen && borrow) {
       setCloneVisible(false);
       setFirstFrameReady(true);
@@ -498,6 +499,18 @@ export function FullscreenFeedOverlay() {
       setChildReady(true);
       return;
     }
+    // CUT mode, non-borrow: reveal the settled host immediately. The blurred
+    // surround + settled slide poster paint from frame 1; the engine's own
+    // poster→video crossfade is the only motion. Reveal-gate is trivially
+    // instant here — the host is opacity:1 with no clone on top.
+    if (isOpen && origin && FS_TRANSITION_MODE === 'cut') {
+      setCloneVisible(false);
+      setFirstFrameReady(true);
+      setMotionComplete(true);
+      setChildReady(true);
+      return;
+    }
+
     if (isOpen && origin) {
       // Render A (synchronous commit): clone mounts at origin.rect ("from"
       // state). The render guard below (`origin && cloneVisible`) no longer
