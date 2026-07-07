@@ -76,20 +76,6 @@ export function useBusinessPosts(businessId?: string) {
             media_type,
             poster_url,
             studio_edits
-          ),
-          post_tags (
-            id,
-            post_id,
-            tagged_entity_id,
-            start_index,
-            end_index,
-            taggable_entities (
-              id,
-              entity_type,
-              entity_id,
-              name,
-              username
-            )
           )
         `)
         .eq('actor_type', 'business')
