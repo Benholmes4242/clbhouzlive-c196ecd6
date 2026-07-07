@@ -32,9 +32,7 @@ interface Window {
   median?: {
     socialLogin?: MedianSocialLogin;
     statusbar?: {
-      // overlay/blur are OPTIONAL — after boot they are never re-sent (see
-      // ensureStatusBarOverlayBooted). Style/color updates omit them entirely.
-      set?: (opts: { style: string; color: string; overlay?: boolean; blur?: boolean }) => void;
+      set?: (opts: { style: string; color: string; overlay: boolean; blur: boolean }) => void;
     };
     [key: string]: any;
   };

@@ -38,7 +38,6 @@ import { overlayOpen, overlayMark } from '@/perf/overlayTiming';
 import { lockBodyScroll, unlockBodyScroll } from '@/lib/bodyScrollLock';
 
 import { MentionText } from '@/components/mentions/MentionText';
-import { MentionsComposerInput } from '@/components/mentions/MentionsComposerInput';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -161,8 +160,6 @@ function CommentsSheet({
   const [loadingReplies, setLoadingReplies] = useState<Set<string>>(new Set());
   const [commentToDelete, setCommentToDelete] = useState<CommentWithReplies | CommentReply | null>(null);
   const [inputText, setInputText] = useState('');
-
-
   const [highlightedId, setHighlightedId] = useState<string | null>(null);
   // Defer the comment-list render until AFTER the panel slide starts, so the O(N) commit
   // doesn't block framer-motion's first frame. Skeleton covers the slide window.
@@ -487,10 +484,6 @@ function CommentsSheet({
             as="span"
             text={comment.content}
             className="mt-1 text-[14px] leading-[20px] block text-foreground/90 whitespace-pre-wrap"
-            onMentionTap={(m) => {
-              onClose();
-              navigate(m.entityType === 'business' ? `/business/${m.entityId}` : `/profile/${m.entityId}`);
-            }}
           />
 
           {/* Media */}
@@ -1138,17 +1131,26 @@ function CommentsSheet({
                       border: `0.5px solid ${BORDER}`,
                       minHeight: 42,
                     }}>
-                      <MentionsComposerInput
+                      <textarea
+                        ref={textareaRef}
                         value={inputText}
-                        onChange={setInputText}
-                        onSubmit={handleSend}
+                        onChange={(e) => setInputText(e.target.value)}
+                        onKeyDown={handleInputKeyDown}
                         placeholder={replyingTo ? `Reply to ${replyingTo.displayName}...` : 'Add a comment...'}
-                        inputRef={(el) => { (textareaRef as any).current = el; }}
+                        rows={1}
+                        className="flex-1 min-w-0 bg-transparent outline-none resize-none placeholder:text-[color:#94A3B8]"
+                        style={{
+                          fontSize: 14,
+                          color: INK,
+                          minHeight: 20,
+                          maxHeight: 120,
+                          lineHeight: 1.4,
+                          padding: '8px 0',
+                          fontFamily: 'inherit',
+                        }}
                       />
                     </div>
                   </div>
-
-
                   <button
                     type="button"
                     onClick={handleSend}

@@ -22,7 +22,6 @@ import { useHideBottomNav } from '@/hooks/useBottomNavVisibility';
 import { useHideHeader } from '@/hooks/useHeaderVisibility';
 import { BIZ } from '@/components/business/businessTokens';
 import { SectionHeader } from '@/components/ui/SectionHeader';
-import { stripMentionMarkup } from '@/lib/mentions/format';
 
 type DateRange = '7d' | '30d' | '90d';
 
@@ -289,7 +288,7 @@ const TopPosts = ({
           >
             <div className="min-w-0 flex-1">
               <p className="text-[0.85rem] truncate" style={{ color: BIZ.ink }}>
-                {stripMentionMarkup(p.content_preview ?? '').trim() || 'Untitled post'}
+                {p.content_preview?.trim() || 'Untitled post'}
               </p>
               <div className="mt-1 flex items-center gap-3 text-[0.72rem]" style={{ color: BIZ.inkMute, ...numFeat }}>
                 <span className="tabular-nums">{formatNum(p.impressions)} impressions</span>

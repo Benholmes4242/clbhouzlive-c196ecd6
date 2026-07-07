@@ -486,12 +486,6 @@ export function SnapFeed({
               data-placeholder="virtual"
               className="relative w-full flex-shrink-0"
               style={{
-                // 100dvh is safe here BECAUSE the Median status-bar overlay
-                // flag is boot-locked once (see ensureStatusBarOverlayBooted
-                // in useMedianStatusBar.ts). No transition ever re-sends
-                // overlay:true, so the WebView viewport does not resize
-                // mid-animation and dvh does not re-resolve during fs.open.
-                // Do NOT reintroduce overlay-flag toggles on any hot path.
                 height: '100dvh',
                 scrollSnapAlign: 'start',
                 scrollSnapStop: 'always',

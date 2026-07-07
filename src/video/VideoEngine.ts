@@ -652,21 +652,6 @@ class VideoEngineImpl {
   }
 
   /**
-   * Return the intrinsic video aspect ratio (width / height) for a lane, or
-   * null when unknown (metadata not yet loaded). Used by the fs.open borrow
-   * path to skip the fit-swap crossfade entirely when the video aspect
-   * matches the viewport aspect (no letterbox → nothing to fade to).
-   */
-  getLaneAspect(laneId: LaneId): number | null {
-    const lane = this.lanes.get(laneId);
-    if (!lane) return null;
-    const w = (lane.el as HTMLVideoElement).videoWidth;
-    const h = (lane.el as HTMLVideoElement).videoHeight;
-    if (!w || !h) return null;
-    return w / h;
-  }
-
-  /**
    * Nudge hls.js to re-evaluate the ABR level cap. Used after borrow-mounts
    * so rail lanes (whose capLevelToPlayerSize was sized against the tile)
    * upshift now that the element occupies the viewport. Safe no-op for

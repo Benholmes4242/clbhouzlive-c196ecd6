@@ -10,8 +10,6 @@ import { useSupabaseSession } from './useSupabaseSession';
 import { useActiveActor } from '@/context/ActiveActorContext';
 import { toast } from 'sonner';
 import { patchEngagement } from '@/lib/engagementCache';
-import { syncMentionsForContent } from '@/lib/mentions/syncMentions';
-import { stripMentionMarkup } from '@/lib/mentions/format';
 
 const PAGE_SIZE = 20;
 const INITIAL_REPLIES = 3;
@@ -376,23 +374,36 @@ export function useCommentsWithReplies(
         actor_avatar_url: acterAvatar,
       };
 
-      // ── Mentions v2: diff-sync markup → mentions table ─────────
-      // The `create_mention_notification` trigger on `mentions` fires
-      // exactly one notification per row inserted, so this call
-      // handles ALL mention notifications for the new comment. The
-      // legacy @handle regex block that used to live here was
-      // removed with this integration.
+      // ── Mention notifications (non-blocking) ─────────────────────
       try {
-        await syncMentionsForContent({
-          sourceType: 'comment',
-          sourceId: newCommentId,
-          content,
-          mentionerId: currentUserId,
-        });
-      } catch (e) {
-        console.warn('[useCommentsWithReplies] mention sync failed (non-blocking):', e);
-      }
+        const mentionMatches = content.match(/@([\w]+(?:\s[\w]+)*)/g) ?? [];
+        for (const match of mentionMatches) {
+          const username = match.slice(1).trim();
+          const { data: mentionedUser } = await supabase
+            .from('user_profiles')
+            .select('id, username')
+            .eq('username', username)
+            .single();
+          if (!mentionedUser) continue;
+          if (mentionedUser.id === currentUserId) continue;
 
+          await supabase.from('notifications').insert({
+            user_id: mentionedUser.id,
+            recipient_actor_type: 'personal',
+            recipient_actor_id: mentionedUser.id,
+            actor_id: currentUserId,
+            type: 'mention',
+            title: `${acterName} mentioned you in a comment`,
+            message: content.length > 60 ? content.slice(0, 60) + '…' : content,
+            entity_type: 'comment',
+            entity_id: newCommentId,
+            is_read: false,
+            data: { post_id: postId, ...actorDataPayload },
+          });
+        }
+      } catch {
+        // Mention notifications are non-blocking
+      }
 
       // Handle reply notifications client-side (edge function doesn't do this yet)
       if (parentId) {
@@ -426,7 +437,7 @@ export function useCommentsWithReplies(
               actor_id: currentUserId,
               type: 'comment_reply',
               title: `${acterName} replied to your comment`,
-              message: (() => { const p = stripMentionMarkup(content); return p.length > 60 ? p.slice(0, 60) + '…' : p; })(),
+              message: content.length > 60 ? content.slice(0, 60) + '…' : content,
               entity_type: 'comment',
               entity_id: newCommentId,
               data: {
@@ -466,7 +477,7 @@ export function useCommentsWithReplies(
               actor_id: currentUserId,
               type: 'comment',
               title: `${acterName} commented on your post`,
-              message: (() => { const p = stripMentionMarkup(content); return p.length > 60 ? p.slice(0, 60) + '…' : p; })(),
+              message: content.length > 60 ? content.slice(0, 60) + '…' : content,
               entity_type: 'post',
               entity_id: postId,
               is_read: false,
@@ -692,18 +703,7 @@ export function useCommentsWithReplies(
 
       if (error) throw error;
 
-      // Mentions v2 diff-sync: only newly-added mentions notify,
-      // removed ones are silently revoked, kept ones don't re-fire.
-      try {
-        await syncMentionsForContent({
-          sourceType: 'comment',
-          sourceId: commentId,
-          content,
-          mentionerId: user.id,
-        });
-      } catch (e) {
-        console.warn('[useCommentsWithReplies] edit mention sync failed:', e);
-      }
+      // comment_mentions table was nuked with the mention system — no-op.
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['post-comments-with-replies', postId, actorType, actorId] });

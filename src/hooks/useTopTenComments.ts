@@ -2,7 +2,6 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { toast } from 'sonner';
-import { syncMentionsForContent } from '@/lib/mentions/syncMentions';
 
 export interface TopTenComment {
   id: string;
@@ -76,7 +75,7 @@ export function useTopTenComments(targetUserId: string, courseId: string) {
   });
 
   const addComment = useMutation({
-    mutationFn: async ({ body, parentId }: { body: string; parentId?: string }): Promise<string> => {
+    mutationFn: async ({ body, parentId }: { body: string; parentId?: string }) => {
       if (!user) throw new Error('Not authenticated');
       if (!body.trim()) throw new Error('Empty comment');
 
@@ -94,23 +93,8 @@ export function useTopTenComments(targetUserId: string, courseId: string) {
         .single();
       if (error) throw error;
 
-      const newCommentId = newComment!.id as string;
 
-      // ── Mentions v2: single canonical write path. ─────────────
-      // Trigger on the `mentions` table fires notifications for each
-      // added row — no client-side notification insert here.
-      try {
-        await syncMentionsForContent({
-          sourceType: 'top_ten_comment',
-          sourceId: newCommentId,
-          content: body,
-          mentionerId: user.id,
-        });
-      } catch (e) {
-        console.warn('[useTopTenComments] mention sync failed:', e);
-      }
-
-      // ── Reply / owner notifications (non-mention) ────────────
+      // ── Reply notification ──────────────────────────────────────
       try {
         if (parentId) {
           const { data: parentComment } = await supabase
@@ -166,8 +150,6 @@ export function useTopTenComments(targetUserId: string, courseId: string) {
       } catch {
         // Notification failure is non-blocking
       }
-
-      return newCommentId;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: qk });
@@ -194,7 +176,7 @@ export function useTopTenComments(targetUserId: string, courseId: string) {
   return {
     comments,
     isLoading,
-    addComment: (args: { body: string; parentId?: string }): Promise<string> => addComment.mutateAsync(args),
+    addComment: addComment.mutate,
     isAddingComment: addComment.isPending,
     deleteComment: deleteComment.mutate,
   };
