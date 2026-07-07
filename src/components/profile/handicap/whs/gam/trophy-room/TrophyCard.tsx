@@ -303,7 +303,7 @@ const ShowpieceCard: React.FC<Props> = ({ item, onTap }) => {
   // Whisper wash for in-progress/tiered — stops 0.07/0.015
   const bg = locked
     ? T.raised
-    : `linear-gradient(180deg, ${rgbaOf(c, 0.07)}, ${rgbaOf(c, 0.015)}), ${T.card}`;
+    : `linear-gradient(180deg, ${rgbaOf(c, 0.09)}, ${rgbaOf(c, 0.02)}), ${T.card}`;
   const border = locked ? `1px solid ${T.line}` : `1px solid ${rgbaOf(c, 0.35)}`;
   const chipBg = locked ? 'transparent' : rgbaOf(c, 0.12);
   const chipBorder = locked ? `1.5px dashed ${T.faintest}` : `1px solid ${rgbaOf(c, 0.35)}`;
