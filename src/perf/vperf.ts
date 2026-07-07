@@ -1,0 +1,406 @@
+/**
+ * vperf — permanent video Quality-of-Experience instrumentation.
+ *
+ * IG/YouTube-style timing: one summary [VPERF] line per completed span with
+ * named phase timings and a pass/fail budget verdict. NOT a per-event trace
+ * (that was the retired [FSV] telemetry — high volume, gone by design).
+ *
+ * All entry points no-op instantly when `isPerfEnabled()` is false. Nothing
+ * here changes playback behaviour — pure measurement.
+ *
+ * Public API
+ * ----------
+ * Span lifecycle:
+ *   vperfStart(spanId, kind, meta?)  — capture t0
+ *   vperfMark(spanId, phase)         — record intermediate phase
+ *   vperfEnd(spanId, extraMeta?)     — emit ONE line: { totalMs, phases, budgetMs, verdict, ...meta }
+ *
+ * Lane bridging (spans that resolve on a video event):
+ *   vperfArmLane(laneId, { spanId, endOn, phase? })
+ *     — VideoEngine will emit `vperfLaneEvent(laneId, event)` from its
+ *       existing element listeners. When `event === endOn`, the armed span
+ *       ends. `phase` (optional) records an intermediate mark instead.
+ *   vperfLaneEvent(laneId, event, data?)
+ *     — called by VideoEngine only.
+ *
+ * Session health (Part 3):
+ *   vperfSessionStart(laneId, meta)     — begin health tracking for a play session
+ *   vperfSessionStall(laneId, kind)     — 'waiting' | 'playing' (state edges)
+ *   vperfSessionLevel(laneId, level, bwEstimate?)   — hls.js LEVEL_SWITCHED
+ *   vperfSessionEnd(laneId, reason)     — emit [VPERF] session summary
+ *
+ * Emission format (single ASCII line via console.info):
+ *   [VPERF] <kind> { totalMs, phases: {a: 12, b: 31}, budgetMs, verdict, ...meta }
+ *
+ * Spans that outlive `SPAN_TTL_MS` auto-expire with verdict: 'TIMEOUT'.
+ */
+
+import { isPerfEnabled } from '@/perf/navTiming';
+
+const SPAN_TTL_MS = 15_000;
+
+type Verdict = 'PASS' | 'SLOW' | 'TIMEOUT';
+
+interface SpanRec {
+  spanId: string;
+  kind: string;
+  t0: number;
+  budgetMs: number;
+  meta: Record<string, unknown>;
+  phases: Record<string, number>;
+  lastMark: number;
+  timer: ReturnType<typeof setTimeout>;
+}
+
+interface LaneArm {
+  spanId: string;
+  endOn: LaneEvent;
+  phase?: string;
+}
+
+export type LaneEvent =
+  | 'firstFrame'
+  | 'playing'
+  | 'waiting'
+  | 'seeked'
+  | 'levelswitch'
+  | 'canplay';
+
+interface SessionRec {
+  laneId: string;
+  t0: number;
+  meta: Record<string, unknown>;
+  stallCount: number;
+  stallTotalMs: number;
+  longestStallMs: number;
+  waitingT0: number | null; // when a stall began (after startup)
+  hadFirstPlaying: boolean;
+  startFrames: number | null;
+  startDropped: number | null;
+  startLevel: number | null;
+  endLevel: number | null;
+  levelSwitches: number;
+  bwEstimateStart: number | null;
+  timer: ReturnType<typeof setTimeout>;
+}
+
+const spans = new Map<string, SpanRec>();
+const laneArms = new Map<string, LaneArm[]>();
+const sessions = new Map<string, SessionRec>();
+
+// Default budgets by kind (ms). Callers may override via vperfStart meta.budgetMs.
+const DEFAULT_BUDGETS: Record<string, number> = {
+  'fs.open.borrow': 150,
+  'fs.open.lane': 500,
+  'fs.close': 250,
+  'autoplay.warm': 120,
+  'autoplay.cold': 600,
+  'swipe.vertical': 450,
+  'swipe.pager': 450,
+  seek: 300,
+  'loop.gap': 120,
+};
+
+function on(): boolean {
+  try {
+    return isPerfEnabled();
+  } catch {
+    return false;
+  }
+}
+
+function budgetFor(kind: string, metaBudget: number | undefined): number {
+  if (typeof metaBudget === 'number' && isFinite(metaBudget) && metaBudget > 0) {
+    return metaBudget;
+  }
+  return DEFAULT_BUDGETS[kind] ?? 500;
+}
+
+function emit(kind: string, payload: Record<string, unknown>): void {
+  // eslint-disable-next-line no-console
+  console.info(`[VPERF] ${kind}`, payload);
+}
+
+function finish(rec: SpanRec, verdict: Verdict, extra: Record<string, unknown>): void {
+  clearTimeout(rec.timer);
+  const totalMs = Math.round(performance.now() - rec.t0);
+  const finalVerdict: Verdict =
+    verdict === 'TIMEOUT' ? 'TIMEOUT' : totalMs <= rec.budgetMs ? 'PASS' : 'SLOW';
+  emit(rec.kind, {
+    totalMs,
+    phases: rec.phases,
+    budgetMs: rec.budgetMs,
+    verdict: finalVerdict,
+    ...rec.meta,
+    ...extra,
+  });
+}
+
+export function vperfStart(
+  spanId: string,
+  kind: string,
+  meta: Record<string, unknown> & { budgetMs?: number } = {},
+): void {
+  if (!on()) return;
+  // Replace any prior span with the same id (e.g. rapid re-tap).
+  const prior = spans.get(spanId);
+  if (prior) clearTimeout(prior.timer);
+  const { budgetMs: metaBudget, ...restMeta } = meta;
+  const now = performance.now();
+  const rec: SpanRec = {
+    spanId,
+    kind,
+    t0: now,
+    budgetMs: budgetFor(kind, metaBudget),
+    meta: restMeta,
+    phases: {},
+    lastMark: now,
+    timer: setTimeout(() => {
+      const r = spans.get(spanId);
+      if (!r) return;
+      spans.delete(spanId);
+      finish(r, 'TIMEOUT', {});
+    }, SPAN_TTL_MS),
+  };
+  spans.set(spanId, rec);
+}
+
+export function vperfMark(spanId: string, phase: string): void {
+  if (!on()) return;
+  const rec = spans.get(spanId);
+  if (!rec) return;
+  const now = performance.now();
+  // Phase value = elapsed since last mark (or start). Named phases compose
+  // into a sequential timeline: { storeOpen: 3, slotMount: 12, firstFrame: 84, playing: 22 }.
+  rec.phases[phase] = Math.round(now - rec.lastMark);
+  rec.lastMark = now;
+}
+
+export function vperfEnd(
+  spanId: string,
+  extraMeta: Record<string, unknown> = {},
+): void {
+  if (!on()) return;
+  const rec = spans.get(spanId);
+  if (!rec) return;
+  spans.delete(spanId);
+  finish(rec, 'PASS', extraMeta);
+}
+
+// ------------------------ Lane bridging ------------------------
+
+export function vperfArmLane(
+  laneId: string,
+  arm: { spanId: string; endOn: LaneEvent; phase?: string },
+): void {
+  if (!on()) return;
+  const list = laneArms.get(laneId) ?? [];
+  list.push({ spanId: arm.spanId, endOn: arm.endOn, phase: arm.phase });
+  laneArms.set(laneId, list);
+}
+
+export function vperfClearLane(laneId: string, spanId?: string): void {
+  if (!spanId) {
+    laneArms.delete(laneId);
+    return;
+  }
+  const list = laneArms.get(laneId);
+  if (!list) return;
+  const filtered = list.filter((a) => a.spanId !== spanId);
+  if (filtered.length === 0) laneArms.delete(laneId);
+  else laneArms.set(laneId, filtered);
+}
+
+export function vperfLaneEvent(
+  laneId: string,
+  event: LaneEvent,
+  data?: Record<string, unknown>,
+): void {
+  if (!on()) return;
+  // Feed session tracker first (its counters must run before span teardown).
+  if (event === 'waiting' || event === 'playing') {
+    sessionOnStateEdge(laneId, event);
+  }
+  const list = laneArms.get(laneId);
+  if (!list || list.length === 0) return;
+  const remaining: LaneArm[] = [];
+  for (const arm of list) {
+    if (arm.endOn === event) {
+      if (arm.phase) {
+        vperfMark(arm.spanId, arm.phase);
+      } else {
+        vperfEnd(arm.spanId, data ?? {});
+      }
+      continue;
+    }
+    remaining.push(arm);
+  }
+  if (remaining.length === 0) laneArms.delete(laneId);
+  else laneArms.set(laneId, remaining);
+}
+
+// ------------------------ Session health ------------------------
+
+function readQualityDelta(
+  el: HTMLVideoElement | null | undefined,
+): { totalFrames: number | null; droppedFrames: number | null } {
+  if (!el) return { totalFrames: null, droppedFrames: null };
+  const q = (el as any).getVideoPlaybackQuality;
+  if (typeof q !== 'function') return { totalFrames: null, droppedFrames: null };
+  try {
+    const s = q.call(el);
+    return {
+      totalFrames: typeof s.totalVideoFrames === 'number' ? s.totalVideoFrames : null,
+      droppedFrames: typeof s.droppedVideoFrames === 'number' ? s.droppedVideoFrames : null,
+    };
+  } catch {
+    return { totalFrames: null, droppedFrames: null };
+  }
+}
+
+export function vperfSessionStart(
+  laneId: string,
+  meta: Record<string, unknown> & {
+    el?: HTMLVideoElement | null;
+    startLevel?: number | null;
+    bwEstimate?: number | null;
+  },
+): void {
+  if (!on()) return;
+  const prior = sessions.get(laneId);
+  if (prior) {
+    // End the prior session cleanly before starting a new one.
+    vperfSessionEnd(laneId, 'reopened');
+  }
+  const q = readQualityDelta(meta.el ?? null);
+  const rec: SessionRec = {
+    laneId,
+    t0: performance.now(),
+    meta: (() => {
+      const { el, startLevel, bwEstimate, ...rest } = meta;
+      return rest;
+    })(),
+    stallCount: 0,
+    stallTotalMs: 0,
+    longestStallMs: 0,
+    waitingT0: null,
+    hadFirstPlaying: false,
+    startFrames: q.totalFrames,
+    startDropped: q.droppedFrames,
+    startLevel: meta.startLevel ?? null,
+    endLevel: meta.startLevel ?? null,
+    levelSwitches: 0,
+    bwEstimateStart: meta.bwEstimate ?? null,
+    timer: setTimeout(() => {
+      // Absolute ceiling: 5-min sessions get flushed so long-running lanes
+      // don't accumulate silently.
+      vperfSessionEnd(laneId, 'ttl');
+    }, 5 * 60_000),
+  };
+  // Stash the element for end-time quality readback.
+  (rec as any)._el = meta.el ?? null;
+  sessions.set(laneId, rec);
+}
+
+function sessionOnStateEdge(laneId: string, edge: 'waiting' | 'playing'): void {
+  const rec = sessions.get(laneId);
+  if (!rec) return;
+  const now = performance.now();
+  if (edge === 'waiting') {
+    // Exclude the initial startup — stalls only count AFTER the first
+    // sustained playing state. Also excludes seeks (which are separate S6
+    // spans; the seek handler calls vperfSessionSuppressNextStall).
+    if (!rec.hadFirstPlaying) return;
+    if ((rec as any)._suppressNextStall) {
+      (rec as any)._suppressNextStall = false;
+      return;
+    }
+    if (rec.waitingT0 == null) rec.waitingT0 = now;
+  } else if (edge === 'playing') {
+    if (!rec.hadFirstPlaying) {
+      rec.hadFirstPlaying = true;
+      return;
+    }
+    if (rec.waitingT0 != null) {
+      const dur = now - rec.waitingT0;
+      rec.waitingT0 = null;
+      rec.stallCount += 1;
+      rec.stallTotalMs += dur;
+      if (dur > rec.longestStallMs) rec.longestStallMs = dur;
+    }
+  }
+}
+
+/** Called by VideoEngine.seek so the resulting waiting→playing pair isn't
+ *  counted as a rebuffer stall (that's the S6 seek span's territory). */
+export function vperfSessionSuppressNextStall(laneId: string): void {
+  const rec = sessions.get(laneId);
+  if (!rec) return;
+  (rec as any)._suppressNextStall = true;
+}
+
+export function vperfSessionLevel(
+  laneId: string,
+  level: number,
+  _bwEstimate?: number | null,
+): void {
+  if (!on()) return;
+  const rec = sessions.get(laneId);
+  if (!rec) return;
+  rec.levelSwitches += 1;
+  rec.endLevel = level;
+  if (rec.startLevel == null) rec.startLevel = level;
+}
+
+export function vperfSessionEnd(laneId: string, reason: string): void {
+  if (!on()) return;
+  const rec = sessions.get(laneId);
+  if (!rec) return;
+  sessions.delete(laneId);
+  clearTimeout(rec.timer);
+  const now = performance.now();
+  // If we ended mid-stall, count the tail.
+  if (rec.waitingT0 != null) {
+    const dur = now - rec.waitingT0;
+    rec.stallCount += 1;
+    rec.stallTotalMs += dur;
+    if (dur > rec.longestStallMs) rec.longestStallMs = dur;
+  }
+  const durationMs = Math.round(now - rec.t0);
+  const el: HTMLVideoElement | null = (rec as any)._el ?? null;
+  const q = readQualityDelta(el);
+  const totalFrames =
+    q.totalFrames != null && rec.startFrames != null ? q.totalFrames - rec.startFrames : null;
+  const droppedFrames =
+    q.droppedFrames != null && rec.startDropped != null
+      ? q.droppedFrames - rec.startDropped
+      : null;
+  const stallRatio = durationMs > 0 ? rec.stallTotalMs / durationMs : 0;
+  const longStall = rec.longestStallMs > 1000;
+  const verdict: Verdict = stallRatio <= 0.005 && !longStall ? 'PASS' : 'SLOW';
+  emit('session', {
+    laneId,
+    durationMs,
+    stallCount: rec.stallCount,
+    stallTotalMs: Math.round(rec.stallTotalMs),
+    longestStallMs: Math.round(rec.longestStallMs),
+    droppedFrames,
+    totalFrames,
+    levelSwitches: rec.levelSwitches,
+    startLevel: rec.startLevel,
+    endLevel: rec.endLevel,
+    bwEstimateStart: rec.bwEstimateStart,
+    verdict,
+    longStall,
+    reason,
+    ...rec.meta,
+  });
+}
+
+// ------------------------ Convenience helpers ------------------------
+
+let __seq = 0;
+export function vperfNextId(prefix: string): string {
+  __seq = (__seq + 1) | 0;
+  return `${prefix}#${__seq}`;
+}
