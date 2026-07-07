@@ -24,6 +24,7 @@ import { SquircleAvatar, LIGHT_HAIRLINE } from '@/components/ui/SquircleAvatar';
 import { useActiveActor } from '@/context/ActiveActorContext';
 import { cn } from '@/lib/utils';
 import { MentionText } from '@/components/mentions/MentionText';
+import { MentionsComposerInput } from '@/components/mentions/MentionsComposerInput';
 
 // ── Dispatch tokens (mirrored from CommentsSheet) ──
 const INK = '#0F172A';
@@ -77,9 +78,6 @@ export const TopTenCardComments: React.FC<TopTenCardCommentsProps> = ({
     }
   }, [isOpen]);
 
-  const handleDraftChange = (val: string) => {
-    setDraft(val);
-  };
 
   const handleSubmit = () => {
     if (!draft.trim()) return;
@@ -121,6 +119,10 @@ export const TopTenCardComments: React.FC<TopTenCardCommentsProps> = ({
           as="span"
           text={comment.body}
           className={`${isReply ? 'text-xs' : 'text-sm'} mt-0.5 block whitespace-pre-wrap`}
+          onMentionTap={(m) => {
+            onClose();
+            navigate(m.entityType === 'business' ? `/business/${m.entityId}` : `/profile/${m.entityId}`);
+          }}
         />
         <div className="flex items-center gap-3 mt-1">
           {!isReply && canInteract && (
@@ -440,24 +442,16 @@ export const TopTenCardComments: React.FC<TopTenCardCommentsProps> = ({
                     minHeight: 42,
                   }}
                 >
-                  <textarea
-                    ref={inputRef}
+                  <MentionsComposerInput
                     value={draft}
-                    onChange={(e) => handleDraftChange(e.target.value)}
-                    onKeyDown={(e) => {
-                      if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); handleSubmit(); }
-                    }}
+                    onChange={setDraft}
+                    onSubmit={handleSubmit}
                     placeholder={replyingTo ? `Reply to ${replyingTo.name}...` : 'Add a comment...'}
-                    rows={1}
                     maxLength={500}
-                    className="flex-1 min-w-0 bg-transparent outline-none resize-none placeholder:text-[color:#94A3B8]"
-                    style={{
-                      fontSize: 14, color: INK,
-                      minHeight: 20, maxHeight: 120,
-                      lineHeight: 1.4, padding: '8px 0',
-                      fontFamily: 'inherit',
-                    }}
+                    inputRef={(el) => { (inputRef as any).current = el; }}
                   />
+
+
                   <div className="flex items-center shrink-0">
                     <button
                       type="button"

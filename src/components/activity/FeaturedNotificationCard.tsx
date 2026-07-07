@@ -14,6 +14,7 @@ import {
   isPrivateActor,
   isIncompleteProfile,
 } from './rows/rowHelpers';
+import { stripMentionMarkup } from '@/lib/mentions/format';
 
 interface FeaturedNotificationCardProps {
   notification: ActivityNotification;
@@ -52,7 +53,8 @@ const NewBadge: React.FC = () => (
 );
 
 function getNotificationActionText(notification: ActivityNotification): string {
-  const { type, message, title } = notification;
+  const { type, message: rawMessage, title } = notification;
+  const message = rawMessage ? stripMentionMarkup(rawMessage) : rawMessage;
   switch (type) {
     case 'like': return 'liked your post';
     case 'comment': return message ? `commented: "${message.slice(0, 60)}${message.length > 60 ? '…' : ''}"` : 'commented on your post';
@@ -73,13 +75,14 @@ function getNotificationActionText(notification: ActivityNotification): string {
 }
 
 function getSubtext(notification: ActivityNotification): string | null {
-  const { type, data, message } = notification;
+  const { type, data, message: rawMessage } = notification;
+  const message = rawMessage ? stripMentionMarkup(rawMessage) : rawMessage;
   if (type === 'comment' && message && message.length > 60) return null;
   if (type === 'friend_request' && data?.mutual_friends_count) {
     return `${data.mutual_friends_count} mutual friend${data.mutual_friends_count > 1 ? 's' : ''}`;
   }
   if (data?.course_name) return data.course_name;
-  if (data?.comment_preview) return `"${data.comment_preview.slice(0, 80)}"`;
+  if (data?.comment_preview) return `"${stripMentionMarkup(String(data.comment_preview)).slice(0, 80)}"`;
   return null;
 }
 

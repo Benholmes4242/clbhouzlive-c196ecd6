@@ -33,6 +33,7 @@ import { RailLanePool } from '@/video/railLanePool';
 import { originHostRegistry } from '@/video/originHostRegistry';
 import type { BorrowDescriptor } from '@/store/fullscreenFeedStore';
 import { setStatusBarStyleColor } from '@/hooks/useMedianStatusBar';
+import { resolveRestingRect, getCurrentViewport } from '@/lib/media/resolveRestingRect';
 const fsTimeStart = (_label: string) => {};
 const fsTimeEnd = (_label: string, _note?: string) => {};
 const fsEvent = (_label: string, _data?: unknown) => {};
@@ -384,19 +385,29 @@ export function FullscreenFeedOverlay() {
       setFirstFrameReady(false);
       setTargetRect(null);
       // Single rAF: after the host mounts (inset:0, opacity:0) + body-class
-      // mutations settle, measure the ACTUAL host rect and expand to it.
+      // mutations settle, compute the media's RESTING RECT and expand to it.
+      // Images always rest CONTAIN inside the safe area — the clone grows
+      // into the letterboxed rect rather than the full viewport, so there
+      // is no post-expand shrink.
       const raf = requestAnimationFrame(() => {
-        const host = hostRef.current;
-        const measured = host
-          ? host.getBoundingClientRect()
-          : { top: 0, left: 0, width: window.innerWidth, height: window.innerHeight } as DOMRect;
-        const rect = {
-          top: measured.top,
-          left: measured.left,
-          width: measured.width,
-          height: measured.height,
-        };
-        setTargetRect(rect);
+        const vp = getCurrentViewport();
+        // Prefer the tapped media's intrinsic dims (threaded from
+        // mediaItems by openWithOrigin). Grid tiles are uniform and
+        // cover-crop, so origin.aspectRatio is only a faithful proxy on
+        // FEED cards — use it as the fallback. Final fallback: full
+        // viewport (legacy behaviour).
+        const omw = origin.originMediaW ?? 0;
+        const omh = origin.originMediaH ?? 0;
+        const useMediaDims = omw > 0 && omh > 0;
+        const ar = useMediaDims ? omw / omh : (origin.aspectRatio > 0 ? origin.aspectRatio : 0);
+        const [mw, mh] = useMediaDims ? [omw, omh] : (ar > 0 ? [ar * 1000, 1000] : [0, 0]);
+        const resting = resolveRestingRect(mw, mh, vp, 'image');
+        setTargetRect({
+          top: resting.top,
+          left: resting.left,
+          width: resting.width,
+          height: resting.height,
+        });
         setCloneExpanded(true);
       });
       // Watchdog: release the clone if the first-frame signal never arrives.

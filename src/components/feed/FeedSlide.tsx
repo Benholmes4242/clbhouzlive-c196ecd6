@@ -10,6 +10,7 @@ import { VideoEngine } from '@/video/VideoEngine';
 import { useFullscreenFeedStore } from '@/store/fullscreenFeedStore';
 import { isPerfEnabled } from '@/perf/navTiming';
 import { vperfStart, vperfArmLane, vperfNextId, vperfMotionMark } from '@/perf/vperf';
+import { resolveRestingRect, getCurrentViewport, type RestingRect } from '@/lib/media/resolveRestingRect';
 
 import { usePostViewTracker } from '@/hooks/usePostViewTracker';
 
@@ -466,7 +467,11 @@ const BorrowedFullscreenSlot: React.FC<{
   const [underlayVisible, setUnderlayVisible] = React.useState(false);
   const [fitContain, setFitContain] = React.useState(false);
   const skipFitSwapRef = React.useRef<boolean>(false);
-  const targetRectRef = React.useRef<{ top: number; left: number; width: number; height: number } | null>(null);
+  const targetRectRef = React.useRef<RestingRect | null>(null);
+  // Aspect-aware: precompute whether target rest is COVER (portrait video →
+  // full viewport, no fit swap, no underlay) or CONTAIN (landscape video →
+  // letterboxed inside safe area, underlay fades DURING expand).
+  const restingFitRef = React.useRef<'cover' | 'contain'>('cover');
 
   // Mount the live element on first render.
   React.useEffect(() => {
@@ -486,13 +491,21 @@ const BorrowedFullscreenSlot: React.FC<{
       console.info('[BORROW]', 'mount', { laneId: borrow.laneId, ownerKey: borrow.ownerKey, postId: borrow.postId });
     }
 
-    // Measure the fullscreen target rect from the viewport.
-    targetRectRef.current = {
-      top: 0,
-      left: 0,
-      width: window.innerWidth,
-      height: window.innerHeight,
-    };
+    // Aspect-aware expand target — grow INTO the media's resting rect so
+    // there is no post-expand shrink. Falls back to viewport/cover when
+    // metadata isn't ready yet; a corrective tween fires post-firstFrame.
+    const vp = getCurrentViewport();
+    const laneAspect = VideoEngine.getLaneAspect(borrow.laneId);
+    const [mw, mh] = laneAspect ? [laneAspect * 1000, 1000] : [0, 0];
+    const rect = resolveRestingRect(mw, mh, vp, 'video');
+    targetRectRef.current = rect;
+    restingFitRef.current = rect.fit;
+    // If the resting fit is CONTAIN, start the underlay fade concurrently
+    // with the expand so bars are already established when we land.
+    if (rect.fit === 'contain') {
+      // rAF-defer so initial style (originRect) commits before we flip.
+      requestAnimationFrame(() => setUnderlayVisible(true));
+    }
 
     // Fire firstFrame on next rAF — element was already painting.
     const raf1 = requestAnimationFrame(() => {
@@ -517,38 +530,30 @@ const BorrowedFullscreenSlot: React.FC<{
   const handleTransitionEnd = React.useCallback((e: React.TransitionEvent<HTMLDivElement>) => {
     // Only respond to the wrapper's own size/transform transitions.
     if (e.target !== wrapperRef.current) return;
-    if (underlayVisible) return;
     // [VPERF] motion trace: phase-1 (expand) done, phase-2 (fit swap) begins.
     try { vperfMotionMark('expandEnd'); vperfMotionMark('fitSwapStart'); } catch {}
 
-    // Aspect-match skip: if the video is already viewport-shaped (within 2%)
-    // there is nothing to letterbox and no fade is needed. Leave object-fit
-    // on 'cover' and skip both the underlay fade and the contain swap.
-    const videoAspect = VideoEngine.getLaneAspect(borrow.laneId);
-    const viewportAspect = window.innerWidth / window.innerHeight;
-    if (videoAspect && Math.abs(videoAspect - viewportAspect) / viewportAspect < 0.02) {
+    // Resting fit was decided at mount from the media's aspect ratio.
+    if (restingFitRef.current === 'cover') {
+      // Portrait/square video — wrapper already fills viewport, media already
+      // covers it, nothing to swap. Cover fast-path.
       skipFitSwapRef.current = true;
       try { VideoEngine.nudgeLevelCap(borrow.laneId); } catch {}
       try { vperfMotionMark('fitSwapEnd'); } catch {}
       return;
     }
 
-    // Start the underlay crossfade (200ms). Fit swap lands at the midpoint
-    // (~100ms in) so the aspect change is invisible under ~50% black.
-    setUnderlayVisible(true);
-    const midpointT = setTimeout(() => {
+    // CONTAIN target — the wrapper landed on the letterboxed rect itself, so
+    // flipping object-fit from cover→contain at rest is visually a no-op
+    // (cover-cropping a rect at the media's own aspect ratio IS the same as
+    // containing it). Underlay was already faded in during the expand.
+    if (!fitContain) {
       setFitContain(true);
       try { VideoEngine.setObjectFit(borrow.laneId, 'contain'); } catch {}
-      // Cold rail lanes were configured with capLevelToPlayerSize against the
-      // tile's small rect. Now that the wrapper fills the viewport, nudge
-      // hls.js to re-evaluate the cap so it upshifts to a viewport-appropriate
-      // level (session summary levelSwitches counter climbs after this).
       try { VideoEngine.nudgeLevelCap(borrow.laneId); } catch {}
-    }, 100);
-    // Fade completes ~200ms after underlay reveal begins.
-    const endT = setTimeout(() => { try { vperfMotionMark('fitSwapEnd'); } catch {} }, 210);
-    (window as any).__borrow_fit_timers = [midpointT, endT];
-  }, [underlayVisible, borrow.laneId]);
+    }
+    try { vperfMotionMark('fitSwapEnd'); } catch {}
+  }, [borrow.laneId, fitContain]);
 
   const target = targetRectRef.current;
   const style: React.CSSProperties = {
@@ -580,16 +585,16 @@ const BorrowedFullscreenSlot: React.FC<{
             filter: 'blur(40px) brightness(0.5) saturate(1.2)', transform: 'scale(1.2)',
           }} />
         )}
-        {/* Black letterbox underlay — 200ms crossfade during Phase 2.
-            Fit swap lands at the fade midpoint (see handleTransitionEnd).
-            Skipped when video/viewport aspect ratios match. */}
+        {/* Black letterbox underlay — fades in DURING the 300ms expand for
+            CONTAIN targets so the bars are already established when the
+            wrapper lands on the resting rect. COVER targets never toggle it. */}
         <div
           aria-hidden
           data-vperf="flip-underlay"
           style={{
             position: 'absolute', inset: 0, background: '#000',
             opacity: underlayVisible ? 1 : 0,
-            transition: 'opacity 200ms linear',
+            transition: 'opacity 260ms linear',
           }}
         />
       </div>

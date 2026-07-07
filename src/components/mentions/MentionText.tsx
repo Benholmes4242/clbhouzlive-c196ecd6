@@ -11,6 +11,7 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { parseMentionSegments } from '@/lib/mentions/format';
+import { unlockBodyScroll } from '@/lib/bodyScrollLock';
 import { cn } from '@/lib/utils';
 
 interface Props {
@@ -47,6 +48,15 @@ export const MentionText: React.FC<Props> = ({
         const handleClick = (e: React.MouseEvent | React.TouchEvent) => {
           e.stopPropagation();
           if (disableNavigation) return;
+          // Proactively release any active body-scroll lock BEFORE navigating.
+          // Hosts like CommentsSheet lock on mount and unlock in an unmount
+          // cleanup that runs only after the sheet's exit animation — after
+          // ScrollRestoration has already scrolled the profile to top. The
+          // deferred unlock then calls window.scrollTo(0, sourceScrollY),
+          // dropping the profile at the source page's offset. Unlocking now
+          // restores source scroll first; ScrollRestoration then wins.
+          // Reference-counted: subsequent no-op unlock on sheet unmount.
+          unlockBodyScroll();
           if (onMentionTap) {
             onMentionTap({
               entityType: seg.entityType!,

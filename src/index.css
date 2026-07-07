@@ -4616,3 +4616,52 @@ em-emoji-picker input:focus {
 }
 
 .chip-row-search-input::placeholder { color: rgba(15,23,42,0.35); }
+
+/* ============================================================
+ * react-mentions composer — overlay/input registration guards
+ * ============================================================
+ * The library's default class names are `.mentions-composer__…`
+ * (from our `className="mentions-composer"` prop). We enforce
+ * transparent input text + placeholder colour + full-width
+ * suggestions here so no third-party default can override the
+ * inline style props and re-introduce the doubled-text bug.
+ */
+.mentions-composer__input,
+.mentions-composer textarea {
+  color: transparent !important;
+  -webkit-text-fill-color: transparent !important;
+  caret-color: #0F172A !important;
+}
+.mentions-composer__input::placeholder,
+.mentions-composer textarea::placeholder {
+  color: rgba(15,23,42,0.35) !important;
+  -webkit-text-fill-color: rgba(15,23,42,0.35) !important;
+}
+.mentions-composer__suggestions {
+  width: 100% !important;
+  left: 0 !important;
+  right: 0 !important;
+  top: auto !important;
+  bottom: 100% !important;
+  margin-bottom: 8px !important;
+  z-index: 210 !important;
+}
+.mentions-composer__suggestions__list {
+  width: 100% !important;
+}
+.mentions-composer__highlighter,
+.mentions-composer__highlighter * {
+  color: #0F172A;
+  -webkit-text-fill-color: #0F172A;
+}
+.mentions-composer__highlighter__substring {
+  visibility: visible !important;
+  color: #0F172A !important;
+  -webkit-text-fill-color: #0F172A !important;
+}
+.mentions-composer__highlighter strong,
+.mentions-composer__highlighter [data-mention="true"] {
+  color: #F7931E !important;
+  -webkit-text-fill-color: #F7931E !important;
+  font-weight: 400 !important;
+}
