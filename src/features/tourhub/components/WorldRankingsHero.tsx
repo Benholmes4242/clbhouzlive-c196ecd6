@@ -33,6 +33,7 @@ import { getTourLogo } from '../utils/tourLogos';
 import { BottomSheet } from '@/components/ui/BottomSheet';
 import SheetHeader from '@/components/ui/SheetHeader';
 import { PlayerAvatar } from './PlayerAvatar';
+import { LIGHT_HAIRLINE } from '@/components/ui/SquircleAvatar';
 import { Shimmer } from './shared/Shimmer';
 import { TOUR_MAP, type TourCode } from '../constants/tourMap';
 
