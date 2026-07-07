@@ -204,16 +204,6 @@ export function vperfMeta(spanId: string, meta: Record<string, unknown>): void {
   Object.assign(rec.meta, meta);
 }
 
-  spanId: string,
-  extraMeta: Record<string, unknown> = {},
-): void {
-  if (!on()) return;
-  const rec = spans.get(spanId);
-  if (!rec) return;
-  spans.delete(spanId);
-  finish(rec, 'PASS', extraMeta);
-}
-
 // ------------------------ Lane bridging ------------------------
 
 export function vperfArmLane(
