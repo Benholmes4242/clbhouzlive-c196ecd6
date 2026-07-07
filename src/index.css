@@ -4654,6 +4654,11 @@ em-emoji-picker input:focus {
   color: #0F172A;
   -webkit-text-fill-color: #0F172A;
 }
+.mentions-composer__highlighter__substring {
+  visibility: visible !important;
+  color: #0F172A !important;
+  -webkit-text-fill-color: #0F172A !important;
+}
 .mentions-composer__highlighter strong,
 .mentions-composer__highlighter [data-mention="true"] {
   color: #F7931E !important;
