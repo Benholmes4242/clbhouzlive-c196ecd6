@@ -19,6 +19,7 @@ import { LEADER_CATEGORIES, type LeaderCategory } from './leaders/constants';
 import { BottomSheet } from '@/components/ui/BottomSheet';
 import SheetHeader from '@/components/ui/SheetHeader';
 import { PlayerAvatar } from './PlayerAvatar';
+import { LIGHT_HAIRLINE } from '@/components/ui/SquircleAvatar';
 import { Shimmer } from './shared/Shimmer';
 import CountryFlag from '@/components/ui/country-flag';
 import { SectionHeader } from '@/components/ui/SectionHeader';
