@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { MapPin, Star, Clock, Users, Play, ExternalLink, ChevronLeft, ChevronRight } from 'lucide-react';
-import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
+import { SquircleAvatar, LIGHT_HAIRLINE } from '@/components/ui/SquircleAvatar';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import { formatRatingValue } from '@/utils/formatters';
@@ -344,7 +344,8 @@ function MomentShareCard({
               src={moment.creator_avatar}
               alt={moment.creator_name || ''}
               size={24}
-              hideRing
+              hairlineRing
+              ringColor={LIGHT_HAIRLINE}
             />
             <span className={cn(
               "text-xs font-medium line-clamp-1",

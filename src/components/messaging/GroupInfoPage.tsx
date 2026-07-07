@@ -5,7 +5,7 @@ import {
   Bell, BellOff, Flag, ChevronRight, Users, MessageCircle, Loader2
 } from 'lucide-react';
 import { useStartDM } from '@/hooks/useStartDM';
-import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
+import { SquircleAvatar, LIGHT_HAIRLINE } from '@/components/ui/SquircleAvatar';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -280,7 +280,8 @@ export const GroupInfoPage: React.FC<GroupInfoPageProps> = ({
                   size={88}
                   src={conversation.avatar_url}
                   alt={conversation.name || 'Group'}
-                  hideRing
+                  hairlineRing
+                  ringColor={LIGHT_HAIRLINE}
                 />
               </div>
             ) : (
@@ -534,7 +535,8 @@ export const GroupInfoPage: React.FC<GroupInfoPageProps> = ({
                     src={participant.profile?.profile_photo_url || undefined}
                     alt={participant.profile?.display_name || participant.profile?.username || '?'}
                     userId={participant.user_id}
-                    hideRing
+                    hairlineRing
+                    ringColor={LIGHT_HAIRLINE}
                   />
 
                   {/* Info column */}

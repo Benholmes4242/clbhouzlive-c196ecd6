@@ -9,7 +9,7 @@ import {
   SheetContent,
 } from '@/components/ui/sheet';
 import { Input } from '@/components/ui/input';
-import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
+import { SquircleAvatar, LIGHT_HAIRLINE } from '@/components/ui/SquircleAvatar';
 import { useMessagingContext } from '@/contexts/MessagingContext';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { toast } from 'sonner';
@@ -160,7 +160,8 @@ export function ForwardMessageModal({
                       src={display.avatarUrl}
                       alt={display.name}
                       fallback={display.name.charAt(0).toUpperCase()}
-                      hideRing
+                      hairlineRing
+                      ringColor={LIGHT_HAIRLINE}
                     />
                   )}
                   <span className="flex-1 text-left font-medium text-foreground truncate">

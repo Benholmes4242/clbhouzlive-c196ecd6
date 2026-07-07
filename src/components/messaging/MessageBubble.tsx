@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
+import { SquircleAvatar, LIGHT_HAIRLINE } from '@/components/ui/SquircleAvatar';
 import {
   ContextMenu,
   ContextMenuContent,
@@ -128,7 +128,7 @@ export function MessageBubble({
       <div style={{ display: 'flex', gap: 8, justifyContent: isOwnMessage ? 'flex-end' : 'flex-start', alignItems: 'flex-end' }}>
         {/* Avatar for received */}
         {!isOwnMessage && showSenderInfo && (
-          <SquircleAvatar src={message.sender?.profile_photo_url} alt={senderName} size={28} hideRing className="flex-shrink-0" />
+          <SquircleAvatar src={message.sender?.profile_photo_url} alt={senderName} size={28} hairlineRing ringColor={LIGHT_HAIRLINE} className="flex-shrink-0" />
         )}
         {!isOwnMessage && !showSenderInfo && <div style={{ width: 28, flexShrink: 0 }} />}
 
@@ -316,7 +316,7 @@ export function MessageBubble({
     <div style={{ display: 'flex', gap: 8, justifyContent: isOwnMessage ? 'flex-end' : 'flex-start', alignItems: 'flex-end' }}>
       {/* Avatar for received */}
       {!isOwnMessage && showSenderInfo && (
-        <SquircleAvatar src={message.sender?.profile_photo_url} alt={senderName} size={28} hideRing className="flex-shrink-0" />
+        <SquircleAvatar src={message.sender?.profile_photo_url} alt={senderName} size={28} hairlineRing ringColor={LIGHT_HAIRLINE} className="flex-shrink-0" />
       )}
       {!isOwnMessage && !showSenderInfo && <div style={{ width: 28, flexShrink: 0 }} />}
 

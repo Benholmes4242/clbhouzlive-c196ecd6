@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Search, Check, UserPlus } from 'lucide-react';
-import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
+import { SquircleAvatar, LIGHT_HAIRLINE } from '@/components/ui/SquircleAvatar';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { BottomSheet } from '@/components/ui/BottomSheet';
@@ -178,7 +178,8 @@ export const AddMembersSheet: React.FC<AddMembersSheetProps> = ({
                     alt={user.display_name || user.username || ''}
                     userId={user.id}
                     size={40}
-                    hideRing
+                    hairlineRing
+                    ringColor={LIGHT_HAIRLINE}
                   />
                   <div className="flex-1 text-left">
                     <div className="font-medium">{user.display_name || user.username}</div>
