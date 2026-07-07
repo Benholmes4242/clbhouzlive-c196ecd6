@@ -1,6 +1,6 @@
 import React from 'react';
 import { useActiveActor } from '@/context/ActiveActorContext';
-import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
+import { SquircleAvatar, LIGHT_HAIRLINE} from '@/components/ui/SquircleAvatar';
 import { cn } from '@/lib/utils';
 
 interface ActingAsIndicatorProps {
@@ -34,7 +34,8 @@ export function ActingAsIndicator({ useLightTheme = false, className }: ActingAs
         src={activeActor.avatarUrl}
         alt={activeActor.name}
         fallback={activeActor.name.charAt(0).toUpperCase()}
-        hideRing
+        hairlineRing
+        ringColor={LIGHT_HAIRLINE}
       />
       <span className="max-w-[120px] truncate">
         Acting as {activeActor.name}

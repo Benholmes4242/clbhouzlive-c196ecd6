@@ -15,10 +15,11 @@ This rule applies to **every single place a user avatar is rendered** across Clb
 
 ## Implementation
 
-All avatars MUST use the `<SquircleAvatar>` component from `@/components/ui/SquircleAvatar.tsx`.
+All avatars MUST use the `<SquircleAvatar
+                          >` component from `@/components/ui/SquircleAvatar.tsx`.
 
 ```tsx
-import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
+import { SquircleAvatar, LIGHT_HAIRLINE } from '@/components/ui/SquircleAvatar';
 
 // User with achievement ring (shows colored ring, no grey)
 <SquircleAvatar 

@@ -11,7 +11,7 @@ import {
 import { useDashboard } from '../hooks/useDashboard';
 import { panelCan } from '@/lib/panelCan';
 import { usePanelRole } from '@/hooks/usePanelRole';
-import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
+import { SquircleAvatar, LIGHT_HAIRLINE } from '@/components/ui/SquircleAvatar';
 import { adminTheme as t } from '../theme';
 import KpiCard from '../components/KpiCard';
 import ChartCard from '../components/ChartCard';
@@ -152,7 +152,10 @@ export default function DashboardPage() {
                   >
                     {i + 1}
                   </div>
-                  <SquircleAvatar src={u.avatarUrl ?? undefined} alt={u.displayName} size={36} />
+                  <SquircleAvatar src={u.avatarUrl ?? undefined} alt={u.displayName} size={36}
+                    hairlineRing
+                    ringColor={LIGHT_HAIRLINE}
+                  />
                   <div style={{ flex: 1, minWidth: 0 }}>
                     <div style={{ color: t.ink, fontSize: 14, fontWeight: 600, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                       {u.displayName}

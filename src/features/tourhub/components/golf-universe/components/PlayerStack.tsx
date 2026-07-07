@@ -50,7 +50,7 @@ function PlayerRow({
         </div>
 
         {/* Avatar */}
-        <div className="w-10 h-10 rounded-full overflow-hidden bg-slate-100 shrink-0">
+        <div className="relative w-10 h-10 rounded-full overflow-hidden bg-slate-100 shrink-0">
           {player.photoUrl ? (
             <img src={player.photoUrl} alt={player.name} className="w-full h-full object-cover" />
           ) : (
@@ -58,6 +58,7 @@ function PlayerRow({
               {initials}
             </div>
           )}
+          <span aria-hidden className="pointer-events-none absolute inset-0 rounded-full" style={{ border: '1px solid rgba(15,23,42,0.12)' }} />
         </div>
 
         {/* Name & Country */}

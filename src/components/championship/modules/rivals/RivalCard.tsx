@@ -2,7 +2,7 @@ import React from 'react';
 import { cn } from '@/lib/utils';
 import { motion } from 'framer-motion';
 import { Swords, TrendingUp, TrendingDown, Minus } from 'lucide-react';
-import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
+import { SquircleAvatar, LIGHT_HAIRLINE } from '@/components/ui/SquircleAvatar';
 import { RivalMomentumBadge, StatusRing } from '../../primitives';
 import type { UserRival } from '@/types/championship';
 
@@ -59,6 +59,8 @@ export function RivalCard({
             src={rival.avatar_url}
             alt={rival.display_name}
             fallback={initials}
+            hairlineRing
+            ringColor={LIGHT_HAIRLINE}
           />
         </StatusRing>
 

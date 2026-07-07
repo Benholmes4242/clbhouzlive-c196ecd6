@@ -351,7 +351,7 @@ export function FullscreenReviewPost({
                 src={user.avatar}
                 alt={user.name || 'Golfer'}
                 fallback={initials}
-                hideRing
+                hairlineRing
               />
               <div className="min-w-0">
                 <div className="text-[13px] font-semibold text-white truncate">

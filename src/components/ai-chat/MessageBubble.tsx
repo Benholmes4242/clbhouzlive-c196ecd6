@@ -96,6 +96,7 @@ export const MessageBubble: React.FC<MessageBubbleProps> = ({
                     size={28}
                     src={userProfilePhoto}
                     alt={userDisplayName || 'User'}
+                    hairlineRing
                   />
                 ) : (
                   <div 

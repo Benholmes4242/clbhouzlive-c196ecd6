@@ -19,7 +19,7 @@ import {
   getTierShortName,
 } from '@/config/explorerTiers';
 
-import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
+import { SquircleAvatar, LIGHT_HAIRLINE} from '@/components/ui/SquircleAvatar';
 import CountryFlag from '@/components/ui/country-flag';
 import { ClubSearchBar } from './ClubSearchBar';
 import { CountrySelector } from '../shared/CountrySelector';
@@ -1552,7 +1552,8 @@ function PlayerStandings({
                 alt={p.display_name ?? p.username ?? ''}
                 userId={p.user_id}
                 size={30}
-                hideRing
+                hairlineRing
+                ringColor={LIGHT_HAIRLINE}
               />
             </div>
 

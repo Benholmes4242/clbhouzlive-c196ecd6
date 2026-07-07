@@ -4,7 +4,7 @@ import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useNavigate } from 'react-router-dom';
 import { useQueryClient } from '@tanstack/react-query';
 import { Loader2, RefreshCw, WifiOff, ChevronLeft, ChevronRight, Trophy } from 'lucide-react';
-import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
+import { SquircleAvatar, LIGHT_HAIRLINE} from '@/components/ui/SquircleAvatar';
 import { ExternalLinkSheet } from '@/components/shared/ExternalLinkSheet';
 import { BottomSheet } from '@/components/ui/BottomSheet';
 import { getProfilePathById } from '@/lib/profileRoutes';
@@ -1539,7 +1539,8 @@ export function ChampionshipLeaderboardView({ className }: ChampionshipLeaderboa
                   alt={p.display_name}
                   userId={p.user_id}
                   size={30}
-                  hideRing
+                  hairlineRing
+                  ringColor={LIGHT_HAIRLINE}
                 />
               </div>
 

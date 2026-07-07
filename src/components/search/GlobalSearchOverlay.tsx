@@ -659,10 +659,11 @@ function GlobalSearchOverlay({ isOpen, onClose }: GlobalSearchOverlayProps) {
                             onClick={() => selectCourse(course)}
                             className="w-full flex items-center gap-3 px-4 min-h-[56px] active:bg-black/[0.02]"
                           >
-                            <div className="w-[42px] h-[42px] rounded-[12px] bg-muted overflow-hidden shrink-0">
+                            <div className="relative w-[42px] h-[42px] rounded-[12px] bg-muted overflow-hidden shrink-0">
                               {course.logo_url && (
                                 <img src={course.logo_url} alt="" className="w-full h-full object-cover" />
                               )}
+                              <span aria-hidden className="pointer-events-none absolute inset-0 rounded-[12px]" style={{ border: `1px solid ${LIGHT_HAIRLINE}` }} />
                             </div>
                             <div className="flex-1 min-w-0 text-left">
                               <p className="text-[14px] font-medium truncate" style={{ color: INK }}>{course.name}</p>

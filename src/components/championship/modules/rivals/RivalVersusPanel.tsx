@@ -2,7 +2,7 @@ import React from 'react';
 import { cn } from '@/lib/utils';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, Swords, TrendingUp, TrendingDown, Calendar } from 'lucide-react';
-import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
+import { SquircleAvatar, LIGHT_HAIRLINE } from '@/components/ui/SquircleAvatar';
 import type { UserRival, UserChampionshipStatus } from '@/types/championship';
 
 interface RivalVersusPanelProps {
@@ -107,6 +107,8 @@ export function RivalVersusPanel({
                     alt={rival.display_name}
                     fallback={rivalInitials}
                     className="mx-auto mb-2"
+                    hairlineRing
+                    ringColor={LIGHT_HAIRLINE}
                   />
                   <div className="font-semibold text-foreground truncate max-w-[100px]">
                     {rival.display_name}

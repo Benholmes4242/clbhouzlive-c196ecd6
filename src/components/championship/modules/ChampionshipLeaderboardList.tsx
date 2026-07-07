@@ -1,7 +1,7 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { cn } from '@/lib/utils';
-import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
+import { SquircleAvatar, LIGHT_HAIRLINE } from '@/components/ui/SquircleAvatar';
 import { MedalBadge, RankMovementIndicator, ZoneIndicator } from '../primitives';
 import type { ChampionshipLeaderboardEntry } from '@/types/championship';
 
@@ -97,6 +97,8 @@ function LeaderboardRow({ entry }: { entry: ChampionshipLeaderboardEntry }) {
         alt={entry.display_name}
         fallback={initials}
         top100Count={entry.courses_this_season}
+        hairlineRing
+        ringColor={LIGHT_HAIRLINE}
       />
 
       {/* Name & Info */}

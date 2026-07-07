@@ -2,7 +2,7 @@ import React, { useEffect, useMemo, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { formatDistanceToNow } from 'date-fns';
 import { ShieldCheck } from 'lucide-react';
-import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
+import { SquircleAvatar, LIGHT_HAIRLINE } from '@/components/ui/SquircleAvatar';
 import { adminTheme as t } from '../theme';
 import SectionTabs from '../components/SectionTabs';
 import DataList, { type DataListColumn } from '../components/DataList';
@@ -150,6 +150,8 @@ function AppellantCell({ row }: { row: AppealRow }) {
         src={row.appellant?.profile_photo_url ?? undefined}
         alt={row.appellant?.display_name ?? undefined}
         size={28}
+        hairlineRing
+        ringColor={LIGHT_HAIRLINE}
       />
       <div style={{ display: 'flex', flexDirection: 'column', lineHeight: 1.2, minWidth: 0 }}>
         <span style={{ color: t.ink, fontWeight: 600, fontSize: 13 }}>

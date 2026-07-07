@@ -5,13 +5,13 @@
 **ALL user avatars across the entire application MUST use:**
 
 ```tsx
-import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
+import { SquircleAvatar, LIGHT_HAIRLINE } from '@/components/ui/SquircleAvatar';
 
 // Normal avatar (1px grey ring)
 <SquircleAvatar 
   src={user.avatar} 
   alt={user.name} 
-  size={56} 
+  size={56}
 />
 
 // Achievement avatar (colored outer ring + grey inner ring)
@@ -57,30 +57,38 @@ The following components are **FORBIDDEN** for user avatars:
 
 All user avatars must use the **new squircle shape (1/1.05 aspect ratio, 34% border radius)** for visual consistency. This creates a premium, soft-rounded square appearance.
 
-The `<SquircleAvatar>` component is the **single source of truth** for this geometry.
+The `<SquircleAvatar
+     >` component is the **single source of truth** for this geometry.
 
 ## Size Variants
 
 ```tsx
 // Extra small (28px) - for inline mentions, small lists
-<SquircleAvatar size="xs" ... />
+<SquircleAvatar size="xs" ...
+/>
 // or
-<SquircleAvatar size={28} ... />
+<SquircleAvatar size={28} ...
+/>
 
 // Small (40px) - for compact lists, comments
-<SquircleAvatar size="sm" ... />
+<SquircleAvatar size="sm" ...
+/>
 
 // Medium (56px) - default for most user avatars
-<SquircleAvatar size="md" ... />
+<SquircleAvatar size="md" ...
+/>
 
 // Large (80px) - for profile headers, featured users
-<SquircleAvatar size="lg" ... />
+<SquircleAvatar size="lg" ...
+/>
 
 // Extra large (112px) - for large profile views
-<SquircleAvatar size="xl" ... />
+<SquircleAvatar size="xl" ...
+/>
 
 // 2XL (144px) - for main profile page
-<SquircleAvatar size="2xl" ... />
+<SquircleAvatar size="2xl" ...
+/>
 ```
 
 ## Fallback Behaviour (Updated)
@@ -136,7 +144,8 @@ import { getRingColorForTotalPlayed } from '@/lib/globalAchievementMilestoneSyst
 ## Enforcement
 
 - All deprecated components will log **console.error** warnings in development
-- Code reviews should reject any new user avatars not using `<SquircleAvatar>`
+- Code reviews should reject any new user avatars not using `<SquircleAvatar
+                                                             >`
 - Visual QA should flag any circular or non-standard avatars
 
 ## Questions?

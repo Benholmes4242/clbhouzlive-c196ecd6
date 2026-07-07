@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
+import { SquircleAvatar, LIGHT_HAIRLINE} from '@/components/ui/SquircleAvatar';
 import { cn } from '@/lib/utils';
 
 interface LeaderboardRowProps {
@@ -80,7 +80,8 @@ export function LeaderboardRow({
         src={profilePhotoUrl}
         alt={displayName}
         fallback={initials}
-        hideRing
+        hairlineRing
+        ringColor={LIGHT_HAIRLINE}
       />
 
       {/* Name & Info */}

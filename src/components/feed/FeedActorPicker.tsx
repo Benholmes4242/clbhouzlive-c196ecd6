@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { ChevronDown, Check } from 'lucide-react';
 import { useActiveActor } from '@/context/ActiveActorContext';
-import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
+import { SquircleAvatar, LIGHT_HAIRLINE} from '@/components/ui/SquircleAvatar';
 import { BottomSheet } from '@/components/ui/BottomSheet';
 import { SectionHeader } from '@/components/ui/SectionHeader';
 import type { ActiveActor } from '@/types/actor';
@@ -138,7 +138,7 @@ export const FeedActorPicker: React.FC<FeedActorPickerProps> = ({ value, onChang
                   alt={a.name}
                   userId={a.type === 'personal' ? a.id : null}
                   hairlineRing
-                  hideRing={a.type === 'business'}
+                  ringColor={LIGHT_HAIRLINE}
                 />
                 <span style={{ fontSize: 15, fontWeight: 600, flex: 1 }}>{a.name}</span>
                 {isActive && <Check size={18} color="#F7931E" />}

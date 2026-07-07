@@ -140,6 +140,7 @@ export const VideoPlayerModal: React.FC = () => {
                 src={videoData.creatorAvatarUrl}
                 alt={videoData.creatorName}
                 size={40}
+                hairlineRing
               />
               <span className="text-sm font-medium">
                 {videoData.creatorName}

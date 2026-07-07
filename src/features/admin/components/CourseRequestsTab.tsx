@@ -147,6 +147,7 @@ function RequestCard({
       {/* Requester + dates */}
       <div style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 12, color: t.inkMuted }}>
         <div style={{
+          position: 'relative',
           width: 24, height: 24, borderRadius: 8, overflow: 'hidden',
           background: t.canvas, display: 'flex', alignItems: 'center', justifyContent: 'center',
           fontSize: 11, fontWeight: 700, color: t.inkFaint, flexShrink: 0,
@@ -154,6 +155,7 @@ function RequestCard({
           {row.avatarUrl
             ? <img src={row.avatarUrl} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
             : initial}
+          <span aria-hidden style={{ position: 'absolute', inset: 0, borderRadius: 8, border: '1px solid rgba(15,23,42,0.12)', pointerEvents: 'none' }} />
         </div>
         <span style={{ color: t.ink, fontWeight: 600 }}>
           {row.displayName || row.username || 'Unknown user'}

@@ -5,7 +5,7 @@ import {
   CheckCircle2, ShieldCheck, Mail, KeyRound, Trash2, Ban, X,
   UserPlus, MoreVertical, Search, ShieldAlert,
 } from 'lucide-react';
-import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
+import { SquircleAvatar, LIGHT_HAIRLINE } from '@/components/ui/SquircleAvatar';
 import { useUserActions } from '@/hooks/admin/useUserDetails';
 import { adminTheme as t } from '../theme';
 import SectionTabs from '../components/SectionTabs';
@@ -372,7 +372,10 @@ function UserDetailPanel({
       ) : (
         <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
           <div style={{ display: 'flex', gap: 12, alignItems: 'center' }}>
-            <SquircleAvatar size={56} src={detail.avatar_url} alt={detail.display_name ?? ''} userId={detail.id} />
+            <SquircleAvatar size={56} src={detail.avatar_url} alt={detail.display_name ?? ''} userId={detail.id}
+              hairlineRing
+              ringColor={LIGHT_HAIRLINE}
+            />
             <div style={{ minWidth: 0 }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
                 <span style={{ fontSize: 15, fontWeight: 700, color: t.ink }}>{detail.display_name ?? '—'}</span>
