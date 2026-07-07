@@ -79,7 +79,7 @@ const squircleMaskStyle: React.CSSProperties = {
   maskRepeat: 'no-repeat',
 };
 
-const BannerAvatar: React.FC<{ photoUrl: string | null; size?: number }> = ({ photoUrl, size = 44 }) => {
+const BannerAvatar: React.FC<{ photoUrl: string | null; size?: number; ringColor: string }> = ({ photoUrl, size = 44, ringColor }) => {
   const bg = photoUrl
     ? `url(${photoUrl}) center/cover`
     : 'linear-gradient(135deg, #cbd5e1 0%, #64748b 100%)';
@@ -91,7 +91,7 @@ const BannerAvatar: React.FC<{ photoUrl: string | null; size?: number }> = ({ ph
           position: 'absolute',
           inset: 0,
           ...squircleMaskStyle,
-          boxShadow: 'inset 0 0 0 1px rgba(15,23,42,0.10)',
+          boxShadow: `inset 0 0 0 1px ${ringColor}`,
         }}
       />
     </div>
@@ -107,7 +107,15 @@ export const FullCourseLeaderboardSheet: React.FC<Props> = ({
   initialCategory,
   window: legendWindow,
   yourRanks,
+  theme = 'dark',
 }) => {
+  const T = theme === 'light' ? LIGHT : DARK;
+  const INK = T.ink;
+  const INK_55 = T.ink55;
+  const INK_40 = T.ink40;
+  const HAIRLINE = T.hairline;
+  const SURFACE = T.surface;
+  const CARD = T.card;
   const [activeCategory, setActiveCategory] = useState<LegendCategory>(initialCategory);
 
   useEffect(() => {
