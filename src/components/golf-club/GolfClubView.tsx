@@ -230,6 +230,7 @@ const GolfClubView: React.FC<GolfClubViewProps> = ({ courseId, isInModal = false
                   courseType: (course as any).course_type ?? null,
                 }}
                 hideHeader
+                theme="light"
               />
             </div>
           </TabsContent>
