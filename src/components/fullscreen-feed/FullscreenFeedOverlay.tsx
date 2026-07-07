@@ -383,6 +383,8 @@ export function FullscreenFeedOverlay() {
     if (isOpen && borrow) {
       setCloneVisible(false);
       setFirstFrameReady(true);
+      setMotionComplete(true);
+      setChildReady(true);
       return;
     }
     if (isOpen && origin) {
@@ -393,6 +395,8 @@ export function FullscreenFeedOverlay() {
       setCloneVisible(true);
       setCloneExpanded(false);
       setFirstFrameReady(false);
+      setMotionComplete(false);
+      setChildReady(false);
       setTargetRect(null);
       // Double rAF: guarantee the browser has painted render A before we
       // commit the target rect + cloneExpanded (Render B). Without this,
@@ -418,11 +422,13 @@ export function FullscreenFeedOverlay() {
           setCloneExpanded(true);
         });
       });
-      // Backstop watchdog only — the primary reveal trigger is the clone's
-      // own `transitionend` (see onTransitionEnd on the <img> below). This
-      // enforces "content reveals when motion completes, never before".
+      // Backstop watchdog only — the primary reveal trigger is the combined
+      // motion+childReady gate below. If either clock stalls (slow decode,
+      // missed transitionend), release both after 500ms so the user is never
+      // trapped behind the clone.
       watchdogRef.current = setTimeout(() => {
-        setFirstFrameReady(true);
+        setMotionComplete(true);
+        setChildReady(true);
       }, 500);
       return () => {
         cancelAnimationFrame(raf1);
@@ -433,15 +439,31 @@ export function FullscreenFeedOverlay() {
       setCloneVisible(false);
       setCloneExpanded(false);
       setFirstFrameReady(false);
+      setMotionComplete(false);
+      setChildReady(false);
       setTargetRect(null);
       if (watchdogRef.current) { clearTimeout(watchdogRef.current); watchdogRef.current = null; }
     }
   }, [isOpen, origin, borrow]);
 
   const handleSnapFeedFirstFrame = useCallback(() => {
-    if (watchdogRef.current) clearTimeout(watchdogRef.current);
-    setFirstFrameReady(true);
+    setChildReady(true);
   }, []);
+
+  // Combined reveal gate: for VIDEO opens require BOTH motion complete AND
+  // the child's real first frame painted (kills the post-settle poster→video
+  // crossfade flash). For IMAGE opens the settled FeedSlide <img> is the
+  // same URL as the clone poster and needs no swap — motion complete alone
+  // is sufficient.
+  useEffect(() => {
+    if (!cloneVisible) return;
+    if (firstFrameReady) return;
+    if (!motionComplete) return;
+    const isVideoOpen = origin?.mediaType === 'video';
+    if (isVideoOpen && !childReady) return;
+    if (watchdogRef.current) { clearTimeout(watchdogRef.current); watchdogRef.current = null; }
+    setFirstFrameReady(true);
+  }, [cloneVisible, firstFrameReady, motionComplete, childReady, origin]);
 
   // Retire the clone shortly after the crossfade completes.
   useEffect(() => {
