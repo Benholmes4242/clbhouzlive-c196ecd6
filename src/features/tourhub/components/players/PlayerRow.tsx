@@ -66,6 +66,7 @@ export function PlayerRow({ player, stats, college, statDisplay = 'rank', classN
             playerName={player.full_name}
             
             size="md"
+            ringColor={LIGHT_HAIRLINE}
           />
           {/* Rank Badge - tiered colors */}
           {hasValidRank && (
