@@ -18,6 +18,7 @@ import { useReviewUpload } from '@/uploads/useReviewUpload';
 import { analyticsEvents } from '@/utils/analyticsEvents';
 import { invalidateCourseRatingCaches } from '@/utils/invalidateCourseRatingCaches';
 import { useOptimisticReviewUpdate } from '@/hooks/useOptimisticReviewUpdate';
+import { syncMentionsForContent } from '@/lib/mentions/syncMentions';
 import type { 
   WizardState, 
   ReviewWizardCourse, 
