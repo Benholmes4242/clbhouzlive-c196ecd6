@@ -408,12 +408,25 @@ const FullscreenVideoSlot: React.FC<{
 
   return (
     <div className="absolute inset-0 overflow-hidden">
+      {/* SURROUND RULE (settled lane branch): contained media = blurred
+          poster UNDERNEATH + 0.55 scrim on top; nothing fully opaque may sit
+          between the blur and the media except the media itself. Z-order:
+          blur (z=auto/0) → scrim (z=auto/0 after blur) → contain poster
+          fallback (z=1) → live video host (z=2). */}
       {posterSrc && (
         <div aria-hidden="true" className="absolute inset-0" style={{
           backgroundImage: `url(${posterSrc})`, backgroundSize: 'cover', backgroundPosition: 'center',
           filter: 'blur(40px) brightness(0.5) saturate(1.2)', transform: 'scale(1.2)',
         }} />
       )}
+      {/* 0.55 scrim over the blur (or over the slide root when the poster is
+          missing) — matches BorrowedFullscreenSlot so landscape-video
+          letterbox surround reads as "blur + darken", not full black. */}
+      <div
+        aria-hidden
+        data-vperf="lane-scrim"
+        style={{ position: 'absolute', inset: 0, background: '#000', opacity: 0.55, pointerEvents: 'none' }}
+      />
       {posterSrc && (
         <img
           src={posterSrc}
