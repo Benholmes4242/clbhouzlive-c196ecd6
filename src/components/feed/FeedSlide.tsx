@@ -341,6 +341,33 @@ const FullscreenVideoSlot: React.FC<{
     VideoEngine.setObjectFit('fullscreen', 'contain');
   }, [isBorrowSlide]);
 
+  // [DECIDE] slot.bind — one line when the non-borrow fullscreen lane
+  // binds. Lets us compare what the lane believed at bind-time vs what the
+  // ladder chose in openWithOrigin.
+  const didLogBindRef = React.useRef(false);
+  React.useEffect(() => {
+    if (isBorrowSlide) { didLogBindRef.current = false; return; }
+    if (!isActive) { didLogBindRef.current = false; return; }
+    if (didLogBindRef.current) return;
+    if (!isPerfEnabled()) return;
+    didLogBindRef.current = true;
+    let laneSnapPostId: string | null = null;
+    let laneSnapCt: number | null = null;
+    try {
+      const s = VideoEngine.snapshot('fullscreen');
+      laneSnapPostId = s.postId;
+      laneSnapCt = +s.currentTime.toFixed(3);
+    } catch {}
+    // eslint-disable-next-line no-console
+    console.info('[DECIDE]', 'slot.bind', {
+      laneId: 'fullscreen',
+      ownerKey: resumeKey,
+      startPosition: +Number(startPosition).toFixed(3),
+      laneSnapPostId,
+      laneSnapCt,
+    });
+  }, [isActive, isBorrowSlide, resumeKey, startPosition]);
+
   // Fire onFirstFrameReady ONLY when the engine has painted the real frame
   // at (or past) startPosition — for non-borrow slides. Borrow slide fires
   // it from <BorrowedFullscreenSlot/> on the next rAF post-mount.

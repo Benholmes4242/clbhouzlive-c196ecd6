@@ -24,6 +24,7 @@ import type { FeedPost } from '@/components/media-system/types/media';
 import type { ActiveActor } from '@/types/actor';
 import { useFullscreenFeedStore } from '@/store/fullscreenFeedStore';
 import { openWithOrigin } from '@/lib/openWithOrigin';
+import { isPerfEnabled } from '@/perf/navTiming';
 import { useClubhouseStore } from '@/store/clubhouseStore';
 import { registerNavScroller } from '@/hooks/useScrollDirection';
 
@@ -357,6 +358,18 @@ export const CardFeed = forwardRef<CardFeedHandle, CardFeedProps>(function CardF
       if (idx < 0) return;
       setActiveIndex(idx, tab);
       if (mediaIndex > 0) setCarouselPosition(idx, mediaIndex, tab);
+      if (isPerfEnabled()) {
+        // eslint-disable-next-line no-console
+        console.info('[DECIDE]', 'tap.context', {
+          postId: post.id,
+          mediaId: mediaId ?? null,
+          hasOrigin: !!origin?.el,
+          isActiveCard: idx === playingIdx,
+          playingIdx,
+          tappedIdx: idx,
+          surface: 'clubhouse',
+        });
+      }
       if (origin?.el) {
         openWithOrigin({
           openedFrom: 'clubhouse',
@@ -370,7 +383,7 @@ export const CardFeed = forwardRef<CardFeedHandle, CardFeedProps>(function CardF
         openFullscreen(posts, idx, { mediaId: mediaId ?? null, openedFrom: 'clubhouse' });
       }
     },
-    [posts, setActiveIndex, setCarouselPosition, openFullscreen, tab],
+    [posts, setActiveIndex, setCarouselPosition, openFullscreen, tab, playingIdx],
   );
 
   // Stable per-post carousel-change callback so FeedCard memo holds.

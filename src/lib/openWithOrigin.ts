@@ -31,6 +31,15 @@ const BORROW_DBG = (evt: string, payload: Record<string, unknown> = {}) => {
   console.info('[BORROW]', evt, payload);
 };
 
+// [DECIDE] instrumentation — borrow-decision + resume-ladder tracing.
+// Emits on EVERY outcome (success AND deny), isPerfEnabled-gated, one line
+// each. No behaviour changes — logging only.
+const DECIDE = (evt: string, payload: Record<string, unknown> = {}) => {
+  if (!isPerfEnabled()) return;
+  // eslint-disable-next-line no-console
+  console.info('[DECIDE]', evt, payload);
+};
+
 
 function prefersReducedMotion(): boolean {
   if (typeof window === 'undefined' || !window.matchMedia) return false;
@@ -131,6 +140,11 @@ export function openWithOrigin({
   if (railOwnerKey && postId) {
     try {
       const liveLane = RailLanePool.laneFor(railOwnerKey);
+      DECIDE('borrow.rail', {
+        ownerKey: railOwnerKey,
+        poolLane: liveLane ?? null,
+        outcome: liveLane ? 'borrow' : 'no-lane',
+      });
       if (liveLane) {
         borrow = {
           laneId: liveLane,
@@ -163,8 +177,31 @@ export function openWithOrigin({
         (snap.postId === candidateOwnerKey ||
           snap.postId === postId ||
           snap.postId.startsWith(postId + ':'));
-      const isLive =
-        (snap.state === 'playing' || snap.state === 'ready') && snap.currentTime > 0;
+      const ctGate = snap.currentTime > 0;
+      const stateGate = snap.state === 'playing' || snap.state === 'ready';
+      const isLive = stateGate && ctGate;
+      const deniedBy: 'owns' | 'state' | 'ct' | 'no-snap' | null = !snap.postId
+        ? 'no-snap'
+        : !owns
+          ? 'owns'
+          : !stateGate
+            ? 'state'
+            : !ctGate
+              ? 'ct'
+              : null;
+      DECIDE('borrow.feed', {
+        postId,
+        ownerKey: candidateOwnerKey,
+        snapPostId: snap.postId,
+        snapState: snap.state,
+        snapCt: +snap.currentTime.toFixed(3),
+        snapUrl: !!(snap as any).hlsUrl,
+        owns,
+        ctGate,
+        stateGate,
+        outcome: owns && isLive ? 'borrow' : 'denied',
+        deniedBy,
+      });
       if (owns && isLive) {
         borrow = {
           laneId: 'feed-active',
@@ -186,6 +223,16 @@ export function openWithOrigin({
     } catch {
       /* engine may not be booted yet on deep-link openers */
     }
+  }
+
+  if (!borrow) {
+    DECIDE('borrow.skip', {
+      hasOriginEl: !!originEl,
+      railOwnerKey: railOwnerKey ?? null,
+      postId,
+      mediaId: mediaId ?? null,
+      surface: openedFrom,
+    });
   }
 
   // Two-way resume: prefer the tile's live rail-lane playhead (Watch tap),
@@ -230,6 +277,48 @@ export function openWithOrigin({
     } catch {
       /* engine may not be booted yet on deep-link openers */
     }
+  }
+
+  // [DECIDE] resume ladder — one line, every open. Records what each rung
+  // reported and which one won (or 'zero'/'borrow' for the borrow branch).
+  {
+    let feedSnapPostId: string | null = null;
+    let feedSnapOwns = false;
+    if (!borrow) {
+      try {
+        const s = VideoEngine.snapshot('feed-active');
+        feedSnapPostId = s.postId;
+        feedSnapOwns =
+          s.postId != null &&
+          postId != null &&
+          (s.postId === postId || s.postId.startsWith(postId + ':'));
+      } catch {}
+    }
+    DECIDE('resume.ladder', {
+      postId,
+      ownerKey: railOwnerKey ?? null,
+      rungs: {
+        borrow: borrow ? 'taken' : 'skipped',
+        railLane: {
+          available: !!railOwnerKey,
+          ct: railLaneCT >= 0 ? +railLaneCT.toFixed(3) : null,
+        },
+        feedSnap: {
+          snapPostId: feedSnapPostId,
+          owns: feedSnapOwns,
+          ct: feedSnapCT >= 0 ? +feedSnapCT.toFixed(3) : null,
+          used: startSource === 'feedSnap',
+        },
+        lastPos: {
+          key: postId,
+          hit: lastPosCT > 0,
+          ct: lastPosCT >= 0 ? +lastPosCT.toFixed(3) : null,
+          fallbackKeyTried: false,
+        },
+      },
+      chosen: startSource,
+      startPosition: +startPosition.toFixed(3),
+    });
   }
 
   // Chrome flip at TAP time (not effect time) to kill the strobe. Scroll
