@@ -140,6 +140,11 @@ export function openWithOrigin({
   if (railOwnerKey && postId) {
     try {
       const liveLane = RailLanePool.laneFor(railOwnerKey);
+      DECIDE('borrow.rail', {
+        ownerKey: railOwnerKey,
+        poolLane: liveLane ?? null,
+        outcome: liveLane ? 'borrow' : 'no-lane',
+      });
       if (liveLane) {
         borrow = {
           laneId: liveLane,
@@ -172,8 +177,31 @@ export function openWithOrigin({
         (snap.postId === candidateOwnerKey ||
           snap.postId === postId ||
           snap.postId.startsWith(postId + ':'));
-      const isLive =
-        (snap.state === 'playing' || snap.state === 'ready') && snap.currentTime > 0;
+      const ctGate = snap.currentTime > 0;
+      const stateGate = snap.state === 'playing' || snap.state === 'ready';
+      const isLive = stateGate && ctGate;
+      const deniedBy: 'owns' | 'state' | 'ct' | 'no-snap' | null = !snap.postId
+        ? 'no-snap'
+        : !owns
+          ? 'owns'
+          : !stateGate
+            ? 'state'
+            : !ctGate
+              ? 'ct'
+              : null;
+      DECIDE('borrow.feed', {
+        postId,
+        ownerKey: candidateOwnerKey,
+        snapPostId: snap.postId,
+        snapState: snap.state,
+        snapCt: +snap.currentTime.toFixed(3),
+        snapUrl: !!(snap as any).hlsUrl,
+        owns,
+        ctGate,
+        stateGate,
+        outcome: owns && isLive ? 'borrow' : 'denied',
+        deniedBy,
+      });
       if (owns && isLive) {
         borrow = {
           laneId: 'feed-active',
@@ -195,6 +223,16 @@ export function openWithOrigin({
     } catch {
       /* engine may not be booted yet on deep-link openers */
     }
+  }
+
+  if (!borrow) {
+    DECIDE('borrow.skip', {
+      hasOriginEl: !!originEl,
+      railOwnerKey: railOwnerKey ?? null,
+      postId,
+      mediaId: mediaId ?? null,
+      surface: openedFrom,
+    });
   }
 
   // Two-way resume: prefer the tile's live rail-lane playhead (Watch tap),
