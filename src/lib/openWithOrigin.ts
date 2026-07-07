@@ -122,8 +122,27 @@ export function openWithOrigin({
   options,
 }: OpenWithOriginArgs): void {
 
-  const origin = snapshotOrigin(originEl, posterUrl ?? null);
-  const postId = (posts[index] as any)?.id ?? null;
+  // Resolve the tapped media's intrinsic dims from the post's mediaItems so
+  // the FLIP clone can grow into the correct resting rect on GRID surfaces
+  // (course media / explore / watch), where the tile aspect is uniform and
+  // cover-crops the media — origin.aspectRatio would otherwise mis-shape the
+  // clone. Prefer mediaId (grouping-safe); fall back to mediaIndex.
+  const openingPost = posts[index] as any;
+  let mediaDims: { w: number; h: number } | null = null;
+  try {
+    const items = openingPost?.mediaItems as Array<{ id?: string; width?: number; height?: number }> | undefined;
+    if (items && items.length) {
+      let item: { id?: string; width?: number; height?: number } | undefined;
+      if (mediaId) item = items.find((m) => m?.id === mediaId);
+      if (!item) item = items[mediaIndex ?? 0];
+      const w = Number(item?.width) || 0;
+      const h = Number(item?.height) || 0;
+      if (w > 0 && h > 0) mediaDims = { w, h };
+    }
+  } catch {}
+
+  const origin = snapshotOrigin(originEl, posterUrl ?? null, mediaDims);
+  const postId = openingPost?.id ?? null;
 
   // [VPERF] S1 fs.open — captured at tap. Kind budget picked once source is
   // known (borrow vs lane). Phases: storeOpen → slotMount → firstFrame → playing.
