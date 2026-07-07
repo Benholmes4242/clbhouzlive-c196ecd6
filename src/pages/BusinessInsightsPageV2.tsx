@@ -22,6 +22,7 @@ import { useHideBottomNav } from '@/hooks/useBottomNavVisibility';
 import { useHideHeader } from '@/hooks/useHeaderVisibility';
 import { BIZ } from '@/components/business/businessTokens';
 import { SectionHeader } from '@/components/ui/SectionHeader';
+import { stripMentionMarkup } from '@/lib/mentions/format';
 
 type DateRange = '7d' | '30d' | '90d';
 
