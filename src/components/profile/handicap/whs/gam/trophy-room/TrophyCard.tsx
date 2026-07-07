@@ -496,7 +496,7 @@ const LegendCard: React.FC<Props> = ({ item, onTap }) => {
       onTouchCancel={() => setPressed(false)}
       style={{
         ...CARD_BASE,
-        background: `linear-gradient(180deg, ${rgbaOf(c, 0.08)}, ${rgbaOf(c, 0.015)}), ${T.card}`,
+        background: `linear-gradient(180deg, ${rgbaOf(c, 0.09)}, ${rgbaOf(c, 0.02)}), ${T.card}`,
         border: `1px solid ${rgbaOf(c, 0.40)}`,
         transform: pressed ? 'scale(0.985)' : 'scale(1)',
         transition: 'transform 120ms ease',
