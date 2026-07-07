@@ -3,7 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { Search, Mail, AtSign, Shield, Edit3, BarChart3, Check, X, UserPlus } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { supabase } from '@/integrations/supabase/client';
-import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
+import { SquircleAvatar, LIGHT_HAIRLINE } from '@/components/ui/SquircleAvatar';
 import { ManagePageShell } from '@/components/manage/ManagePageShell';
 import { useDebounce } from '@/hooks/useDebounce';
 import { useHideBottomNav } from '@/hooks/useBottomNavVisibility';
@@ -129,7 +129,8 @@ export default function BusinessInvitePage() {
                   src={pickedUser.profile_photo_url || undefined}
                   alt={pickedUser.display_name || pickedUser.username}
                   size={40}
-                  hideRing
+                  hairlineRing
+                  ringColor={LIGHT_HAIRLINE}
                 />
                 <div className="flex-1 min-w-0">
                   <p className="font-semibold text-[14px] truncate" style={{ color: INK }}>
@@ -190,7 +191,8 @@ export default function BusinessInvitePage() {
                             src={u.profile_photo_url || undefined}
                             alt={u.display_name || u.username}
                             size={36}
-                            hideRing
+                            hairlineRing
+                            ringColor={LIGHT_HAIRLINE}
                           />
                           <div className="flex-1 min-w-0">
                             <p className="font-semibold text-[13.5px] truncate" style={{ color: INK }}>

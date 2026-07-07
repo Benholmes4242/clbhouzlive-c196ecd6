@@ -10,7 +10,7 @@ import { useDebounce } from '@/hooks/useDebounce';
 import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
 import { PageRoot } from '@/components/layout/PageRoot';
-import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
+import { SquircleAvatar, LIGHT_HAIRLINE } from '@/components/ui/SquircleAvatar';
 import { getRingColorForTotalPlayed } from '@/lib/globalAchievementMilestoneSystem';
 import { Button } from '@/components/ui/button';
 import ScrollToTopGlass from '@/components/common/ScrollToTopGlass';
@@ -372,8 +372,9 @@ const GolfersToFollowPage = () => {
                           alt={golfer.displayName}
                           size={48}
                           fallback={golfer.displayName?.charAt(0)?.toUpperCase() || '?'}
-                          ringColor={getRingColorForTotalPlayed(golfer.totalTop100Played || 0) || 'hsl(var(--border))'}
-                          hideRing={!golfer.totalTop100Played}
+                          {...(golfer.totalTop100Played
+                            ? { ringColor: getRingColorForTotalPlayed(golfer.totalTop100Played) || 'hsl(var(--border))' }
+                            : { hairlineRing: true, ringColor: LIGHT_HAIRLINE })}
                         />
                       </div>
 

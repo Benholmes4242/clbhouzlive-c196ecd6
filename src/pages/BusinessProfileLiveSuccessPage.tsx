@@ -2,7 +2,7 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Check, ArrowRight, Megaphone, BarChart3, ChevronRight, CheckCircle2 } from 'lucide-react';
 import { PageRoot } from '@/components/layout/PageRoot';
-import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
+import { SquircleAvatar, LIGHT_HAIRLINE } from '@/components/ui/SquircleAvatar';
 
 interface LocationState {
   businessId: string;
@@ -92,6 +92,8 @@ const BusinessProfileLiveSuccessPage = () => {
                 src={avatarUrl}
                 alt={businessName}
                 fallback={initials}
+                hairlineRing
+                ringColor={LIGHT_HAIRLINE}
               />
               <div className="min-w-0 flex-1">
                 <p className="font-semibold text-foreground truncate">{businessName}</p>
