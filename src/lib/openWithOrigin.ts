@@ -20,7 +20,7 @@ import { VideoEngine } from '@/video/VideoEngine';
 import { RailLanePool } from '@/video/railLanePool';
 
 import { isPerfEnabled } from '@/perf/navTiming';
-// [VIDEOSTUB] HLSPoolManager + mobileVideoDebug imports removed — engine severed.
+
 
 const BORROW_DBG = (evt: string, payload: Record<string, unknown> = {}) => {
   const flag =
