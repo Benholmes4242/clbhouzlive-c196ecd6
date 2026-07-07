@@ -38,8 +38,7 @@ import { overlayOpen, overlayMark } from '@/perf/overlayTiming';
 import { lockBodyScroll, unlockBodyScroll } from '@/lib/bodyScrollLock';
 
 import { MentionText } from '@/components/mentions/MentionText';
-import { MentionAutocomplete } from '@/components/mentions/MentionAutocomplete';
-import { useMentionAutocomplete } from '@/lib/mentions/useMentionAutocomplete';
+import { MentionsComposerInput } from '@/components/mentions/MentionsComposerInput';
 import {
   AlertDialog,
   AlertDialogAction,
