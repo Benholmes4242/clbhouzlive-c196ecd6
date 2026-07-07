@@ -296,7 +296,7 @@ export const ChampionsDuelCard: React.FC<ChampionsDuelCardProps> = ({
             1
           </span>
           <div style={{ position: 'relative', flexShrink: 0 }}>
-            <ChampionsSquircle photoUrl={champion?.photoUrl ?? null} size={38} />
+            <ChampionsSquircle photoUrl={champion?.photoUrl ?? null} size={38} ringColor={avatarRing} />
             <div
               aria-hidden
               style={{
