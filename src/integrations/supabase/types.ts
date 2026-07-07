@@ -2640,41 +2640,6 @@ export type Database = {
           },
         ]
       }
-      comment_mentions: {
-        Row: {
-          comment_id: string
-          created_at: string
-          id: string
-          mentioned_entity_id: string
-          mentioned_entity_type: string
-          mentioned_username: string
-        }
-        Insert: {
-          comment_id: string
-          created_at?: string
-          id?: string
-          mentioned_entity_id: string
-          mentioned_entity_type: string
-          mentioned_username: string
-        }
-        Update: {
-          comment_id?: string
-          created_at?: string
-          id?: string
-          mentioned_entity_id?: string
-          mentioned_entity_type?: string
-          mentioned_username?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "comment_mentions_comment_id_fkey"
-            columns: ["comment_id"]
-            isOneToOne: false
-            referencedRelation: "post_comments"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
       comment_notifications: {
         Row: {
           actor_user_id: string
@@ -6850,6 +6815,36 @@ export type Database = {
         }
         Relationships: []
       }
+      mentions: {
+        Row: {
+          created_at: string
+          id: string
+          mentioned_id: string
+          mentioned_type: string
+          mentioner_id: string
+          source_id: string
+          source_type: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          mentioned_id: string
+          mentioned_type: string
+          mentioner_id: string
+          source_id: string
+          source_type: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          mentioned_id?: string
+          mentioned_type?: string
+          mentioner_id?: string
+          source_id?: string
+          source_type?: string
+        }
+        Relationships: []
+      }
       message_reactions: {
         Row: {
           created_at: string | null
@@ -8025,51 +8020,6 @@ export type Database = {
           },
         ]
       }
-      post_tags: {
-        Row: {
-          created_at: string
-          end_index: number
-          id: string
-          post_id: string
-          start_index: number
-          tagged_by_user_id: string
-          tagged_entity_id: string
-        }
-        Insert: {
-          created_at?: string
-          end_index: number
-          id?: string
-          post_id: string
-          start_index: number
-          tagged_by_user_id: string
-          tagged_entity_id: string
-        }
-        Update: {
-          created_at?: string
-          end_index?: number
-          id?: string
-          post_id?: string
-          start_index?: number
-          tagged_by_user_id?: string
-          tagged_entity_id?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "post_tags_post_id_fkey"
-            columns: ["post_id"]
-            isOneToOne: false
-            referencedRelation: "posts"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "post_tags_tagged_entity_id_fkey"
-            columns: ["tagged_entity_id"]
-            isOneToOne: false
-            referencedRelation: "taggable_entities"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
       post_views: {
         Row: {
           created_at: string
@@ -8938,48 +8888,6 @@ export type Database = {
             columns: ["review_id"]
             isOneToOne: false
             referencedRelation: "course_ratings"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      review_tags: {
-        Row: {
-          created_at: string | null
-          end_index: number | null
-          id: string
-          review_id: string
-          start_index: number | null
-          tagged_entity_id: string
-        }
-        Insert: {
-          created_at?: string | null
-          end_index?: number | null
-          id?: string
-          review_id: string
-          start_index?: number | null
-          tagged_entity_id: string
-        }
-        Update: {
-          created_at?: string | null
-          end_index?: number | null
-          id?: string
-          review_id?: string
-          start_index?: number | null
-          tagged_entity_id?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "review_tags_review_id_fkey"
-            columns: ["review_id"]
-            isOneToOne: false
-            referencedRelation: "course_ratings"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "review_tags_tagged_entity_id_fkey"
-            columns: ["tagged_entity_id"]
-            isOneToOne: false
-            referencedRelation: "taggable_entities"
             referencedColumns: ["id"]
           },
         ]
@@ -11483,66 +11391,6 @@ export type Database = {
           username?: string | null
         }
         Relationships: []
-      }
-      top_ten_comment_mentions: {
-        Row: {
-          comment_id: string
-          created_at: string | null
-          id: string
-          mentioned_user_id: string
-          mentioned_username: string
-        }
-        Insert: {
-          comment_id: string
-          created_at?: string | null
-          id?: string
-          mentioned_user_id: string
-          mentioned_username: string
-        }
-        Update: {
-          comment_id?: string
-          created_at?: string | null
-          id?: string
-          mentioned_user_id?: string
-          mentioned_username?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "top_ten_comment_mentions_comment_id_fkey"
-            columns: ["comment_id"]
-            isOneToOne: false
-            referencedRelation: "top_ten_comments"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "top_ten_comment_mentions_mentioned_user_id_fkey"
-            columns: ["mentioned_user_id"]
-            isOneToOne: false
-            referencedRelation: "gam_friend_handicap_leaderboard_view"
-            referencedColumns: ["user_id"]
-          },
-          {
-            foreignKeyName: "top_ten_comment_mentions_mentioned_user_id_fkey"
-            columns: ["mentioned_user_id"]
-            isOneToOne: false
-            referencedRelation: "public_golfer_blurbs"
-            referencedColumns: ["user_id"]
-          },
-          {
-            foreignKeyName: "top_ten_comment_mentions_mentioned_user_id_fkey"
-            columns: ["mentioned_user_id"]
-            isOneToOne: false
-            referencedRelation: "public_profiles"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "top_ten_comment_mentions_mentioned_user_id_fkey"
-            columns: ["mentioned_user_id"]
-            isOneToOne: false
-            referencedRelation: "user_profiles"
-            referencedColumns: ["id"]
-          },
-        ]
       }
       top_ten_comments: {
         Row: {
