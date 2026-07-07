@@ -298,7 +298,7 @@ export const InboxRow: React.FC<Props> = ({ notification: n, onClick, currentUse
       <div className="relative shrink-0" style={{ width: 44, height: 46 }}>
         {hasActor && avatarUrl !== null ? (
           <>
-            <div style={{ borderRadius: '34%', lineHeight: 0, overflow: 'hidden', width: 44, height: 44 }}>
+            <div style={{ borderRadius: '34%', lineHeight: 0, width: 44, height: 44 }}>
               <SquircleAvatar
                 src={avatarUrl}
                 alt={actorName || 'User'}
