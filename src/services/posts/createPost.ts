@@ -172,6 +172,22 @@ export async function createPost(input: CreatePostInput): Promise<CreatePostResu
     }
   }
 
+  // Mentions v2 — sync mention rows for any @[Name](u|b:UUID) markup embedded
+  // in the post content. Non-blocking; the diff-sync inserts brand-new rows
+  // exactly once (edits handled by useUpdatePost).
+  if (data.content) {
+    try {
+      await syncMentionsForContent({
+        sourceType: 'post',
+        sourceId: data.id,
+        content: data.content,
+        mentionerId: user.id,
+      });
+    } catch (err) {
+      console.warn('[createPost] mention sync failed:', err);
+    }
+  }
+
   // Only emit event for immediately published posts (not scheduled)
   if (!isScheduled) {
     const evt: PostCreatedEvent = {
