@@ -605,6 +605,27 @@ const BorrowedFullscreenSlot: React.FC<{
       requestAnimationFrame(() => setUnderlayVisible(true));
     }
 
+    // CUT mode: mount wrapper ALREADY at the resting rect. Same live pixels,
+    // instantly reframed — no wrapper transition. Fire onFirstFrameReady on
+    // the next frame so the overlay reveal gate lifts immediately.
+    if (FS_TRANSITION_MODE === 'cut') {
+      const rafCut = requestAnimationFrame(() => {
+        setExpanded(true);
+        if (!firedFirstFrameRef.current) {
+          firedFirstFrameRef.current = true;
+          onFirstFrameReady?.();
+        }
+        // For CONTAIN targets, swap object-fit at rest — visually a no-op
+        // (the wrapper IS the letterboxed rect at the media's aspect).
+        if (restingFitRef.current === 'contain') {
+          setFitContain(true);
+          try { VideoEngine.setObjectFit(borrow.laneId, 'contain'); } catch {}
+        }
+        try { VideoEngine.nudgeLevelCap(borrow.laneId); } catch {}
+      });
+      return () => cancelAnimationFrame(rafCut);
+    }
+
     // Fix 2/5: expand FIRST, then let handleTransitionEnd fire
     // onFirstFrameReady when the wrapper's own expand transition completes.
     // The old order revealed the host before the slot was fullscreen and
@@ -624,6 +645,7 @@ const BorrowedFullscreenSlot: React.FC<{
       const raf2 = (window as any).__borrow_raf2;
       if (raf2) cancelAnimationFrame(raf2);
     };
+
     // borrow is stable for the lifetime of this component.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
