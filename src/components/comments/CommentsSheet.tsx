@@ -37,8 +37,8 @@ import { supabase } from '@/integrations/supabase/client';
 import { overlayOpen, overlayMark } from '@/perf/overlayTiming';
 import { lockBodyScroll, unlockBodyScroll } from '@/lib/bodyScrollLock';
 
-import {
 import { MentionText } from '@/components/mentions/MentionText';
+import {
   AlertDialog,
   AlertDialogAction,
   AlertDialogCancel,
