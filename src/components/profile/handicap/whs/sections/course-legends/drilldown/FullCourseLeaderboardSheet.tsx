@@ -210,12 +210,13 @@ export const FullCourseLeaderboardSheet: React.FC<Props> = ({
       open={open}
       onClose={onClose}
       ariaLabelledBy="course-legends-full-sheet-title"
-      variant="dark"
-      surfaceColor={SURFACE}
+      variant={theme === 'light' ? 'light' : 'dark'}
+      surfaceColor={theme === 'dark' ? SURFACE : undefined}
       style={{
         maxHeight: '80dvh',
         display: 'flex',
         flexDirection: 'column',
+        background: SURFACE,
       }}
     >
       <div
@@ -235,7 +236,9 @@ export const FullCourseLeaderboardSheet: React.FC<Props> = ({
           title={<span id="course-legends-full-sheet-title">{courseName}</span>}
           onClose={onClose}
           borderBottom={false}
+          dark={theme === 'dark'}
         />
+
 
         {/* Chase line + status pill (replaces the old "Gross Record · N entries" sub) */}
         {champion && (
