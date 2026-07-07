@@ -142,6 +142,16 @@ export const ProfilePhotoCard = forwardRef<ProfilePhotoCardHandle, ProfilePhotoC
                 <User size={28} strokeWidth={1.75} style={{ color: '#94A3B8' }} />
               </div>
             )}
+            {/* Canonical 1px traced hairline ring — ink @ 12% */}
+            <span
+              aria-hidden
+              style={{
+                position: 'absolute', inset: 0,
+                borderRadius: '34%',
+                border: '1px solid rgba(15,23,42,0.12)',
+                pointerEvents: 'none',
+              }}
+            />
           </button>
           <button
             type="button"
@@ -234,6 +244,12 @@ export const ProfilePhotoCard = forwardRef<ProfilePhotoCardHandle, ProfilePhotoC
                   <User className="w-10 h-10 text-muted-foreground/50" />
                 </div>
               )}
+              {/* Canonical 1px traced hairline ring — ink @ 12% */}
+              <span
+                aria-hidden
+                className="pointer-events-none absolute inset-0"
+                style={{ borderRadius: '34%', border: '1px solid rgba(15,23,42,0.12)' }}
+              />
             </div>
 
             <div className={cn(
