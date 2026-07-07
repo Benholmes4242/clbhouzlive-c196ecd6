@@ -242,6 +242,8 @@ export const useFullscreenFeedStore = create<FullscreenFeedState>((set, get) => 
       openedFrom: null,
       borrow: null,
       borrowDemoteRequested: false,
+      closeAnim: 'idle',
+      closeAnimDone: false,
     });
     if (cb) {
       try { cb(); } catch {}
@@ -254,6 +256,15 @@ export const useFullscreenFeedStore = create<FullscreenFeedState>((set, get) => 
     set({ borrowDemoteRequested: true });
   },
   consumeBorrowDemoteRequested: () => set({ borrowDemoteRequested: false }),
+  beginCloseAnim: (kind) => {
+    if (get().closeAnim !== 'idle') return;
+    set({ closeAnim: kind, closeAnimDone: false });
+  },
+  signalCloseAnimDone: () => {
+    if (get().closeAnim === 'idle') return;
+    if (get().closeAnimDone) return;
+    set({ closeAnimDone: true });
+  },
   appendPosts: (newPosts) => {
     set((s) => {
       const existing = new Set(s.posts.map((p) => p.id));
