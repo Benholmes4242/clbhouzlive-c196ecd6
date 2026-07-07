@@ -593,13 +593,21 @@ export function FullscreenFeedOverlay() {
                         ' height 300ms cubic-bezier(0.32,0.72,0,1),' +
                         ' border-radius 240ms cubic-bezier(0.32,0.72,0,1),' +
                         ' opacity 120ms linear',
-                      opacity: firstFrameReady ? 0 : 1,
+                      opacity: readyToHandoff ? 0 : 1,
                       pointerEvents: 'none',
                       zIndex: 2,
                       // Safety fill INSIDE the media's own geometry so a
                       // partially-decoded poster never shows through to the
                       // blur backdrop mid-expand. Not a surround layer.
                       background: '#000',
+                    }}
+                    onTransitionEnd={(e) => {
+                      // Signal expand completion the moment the geometry
+                      // transition actually finishes. The setTimeout backstop
+                      // covers browsers that drop this event.
+                      if (e.propertyName === 'transform' || e.propertyName === 'width' || e.propertyName === 'height') {
+                        setCloneExpandDone(true);
+                      }
                     }}
                   />
                 )}
