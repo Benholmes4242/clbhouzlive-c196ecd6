@@ -215,10 +215,13 @@ export function PodiumRunnerRow({
   row,
   tourCode,
   onPlayerTap,
+  ringColor = DARK_HAIRLINE,
 }: {
   row: PodiumRow;
   tourCode?: string;
   onPlayerTap?: (playerId: string | null | undefined) => (e: React.MouseEvent) => void;
+  /** Traced 1px hairline colour forwarded to the podium PlayerAvatar renders. */
+  ringColor?: string;
 }) {
   const isSingle = row.players.length === 1;
   const player = row.players[0];
