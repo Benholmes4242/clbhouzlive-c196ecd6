@@ -161,8 +161,6 @@ function CommentsSheet({
   const [loadingReplies, setLoadingReplies] = useState<Set<string>>(new Set());
   const [commentToDelete, setCommentToDelete] = useState<CommentWithReplies | CommentReply | null>(null);
   const [inputText, setInputText] = useState('');
-  const [caret, setCaret] = useState(0);
-  const mention = useMentionAutocomplete(inputText, caret);
 
 
   const [highlightedId, setHighlightedId] = useState<string | null>(null);
