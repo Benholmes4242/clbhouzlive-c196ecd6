@@ -3,7 +3,14 @@ import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { type LucideIcon, ChevronDown, ChevronUp, Crown } from 'lucide-react';
 import { BottomSheet } from '@/components/ui/BottomSheet';
 import { SheetHeader } from '@/components/ui/SheetHeader';
-import { ChampionsListRow } from './ChampionsListRow';
+import {
+  ChampionsListRow,
+  CHAMPS_GRID_FULL,
+  CHAMPS_GRID_GAP_FULL,
+  CHAMPS_ROW_PADDING_X,
+  CHAMPS_COL_30D_FULL,
+  CHAMPS_COL_SCORE_FULL,
+} from './ChampionsListRow';
 import { MovementCell } from './_shared/MovementCell';
 import { formatGapFromChampion, formatHeldFor, daysSince, NEW_BADGE_DAYS } from './_shared/helpers';
 import { duelLine } from './_shared/duelTension';
