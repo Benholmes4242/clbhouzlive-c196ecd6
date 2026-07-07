@@ -54,7 +54,7 @@ const squircleMaskStyle: React.CSSProperties = {
   maskRepeat: 'no-repeat',
 };
 
-function ChampionsSquircle({ photoUrl, size = 38, dashed = false }: { photoUrl: string | null; size?: number; dashed?: boolean }) {
+function ChampionsSquircle({ photoUrl, size = 38, dashed = false, ringColor = 'rgba(255,255,255,0.22)' }: { photoUrl: string | null; size?: number; dashed?: boolean; ringColor?: string }) {
   if (dashed) {
     // Dashed = empty-slot ghost, not an avatar — canon exception, no hairline overlay.
     return (
@@ -76,14 +76,14 @@ function ChampionsSquircle({ photoUrl, size = 38, dashed = false }: { photoUrl: 
   return (
     <div style={{ width: size, height: size, position: 'relative', flexShrink: 0 }} aria-hidden>
       <div style={{ position: 'absolute', inset: 0, background: photoBg, ...squircleMaskStyle }} />
-      {/* Traced hairline (canon: dark surface → 1px white 22%) */}
+      {/* Traced hairline (theme-aware) */}
       <div
         aria-hidden
         style={{
           position: 'absolute',
           inset: 0,
           borderRadius: '34%',
-          border: '1px solid rgba(255,255,255,0.22)',
+          border: `1px solid ${ringColor}`,
           pointerEvents: 'none',
         }}
       />
