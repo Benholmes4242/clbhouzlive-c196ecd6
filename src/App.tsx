@@ -304,11 +304,8 @@ const CollegeProfilePage = lazy(() => import("./features/tourhub/pages").then(m 
 const CollegeComparePage = lazy(() => import("./features/tourhub/pages").then(m => ({ default: m.CollegeComparePage })));
 
 
-// Video Player Modal (Phase 6A-1)
-// Video Player Modal (Phase 6A-1)
-const VideoPlayerModal = lazy(() => import("./components/videos/VideoPlayerModal"));
+// Continue Watching mini-player (queue drawer + full-screen modal deleted in PR-5).
 const MiniPlayer = lazy(() => import("./components/videos/MiniPlayer"));
-const GlobalQueueDrawer = lazy(() => import("./components/videos/GlobalQueueDrawer"));
 const SeasonShop = lazy(() => import("./pages/SeasonShop"));
 const ChallengesPage = lazy(() => import("./pages/ChallengesPage"));
 
