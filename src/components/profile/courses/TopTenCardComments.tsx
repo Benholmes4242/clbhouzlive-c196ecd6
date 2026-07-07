@@ -24,6 +24,8 @@ import { SquircleAvatar, LIGHT_HAIRLINE } from '@/components/ui/SquircleAvatar';
 import { useActiveActor } from '@/context/ActiveActorContext';
 import { cn } from '@/lib/utils';
 import { MentionText } from '@/components/mentions/MentionText';
+import { MentionAutocomplete } from '@/components/mentions/MentionAutocomplete';
+import { useMentionAutocomplete } from '@/lib/mentions/useMentionAutocomplete';
 
 // ── Dispatch tokens (mirrored from CommentsSheet) ──
 const INK = '#0F172A';
@@ -57,6 +59,8 @@ export const TopTenCardComments: React.FC<TopTenCardCommentsProps> = ({
 
   const [activeTab, setActiveTab] = useState<SheetTab>('comments');
   const [draft, setDraft] = useState('');
+  const [caret, setCaret] = useState(0);
+  const mention = useMentionAutocomplete(draft, caret);
   const [replyingTo, setReplyingTo] = useState<{ id: string; name: string } | null>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
 
@@ -432,6 +436,24 @@ export const TopTenCardComments: React.FC<TopTenCardCommentsProps> = ({
                 hairlineRing ringColor={LIGHT_HAIRLINE}
               />
               <div className="flex-1 min-w-0 relative">
+                <MentionAutocomplete
+                  isActive={mention.isActive}
+                  suggestions={mention.suggestions}
+                  isLoading={mention.isLoading}
+                  inputRef={inputRef}
+                  onSelect={(sel) => {
+                    const { newText, newCaret } = mention.applySelection(sel);
+                    setDraft(newText);
+                    setCaret(newCaret);
+                    requestAnimationFrame(() => {
+                      const el = inputRef.current;
+                      if (el) {
+                        el.focus();
+                        el.setSelectionRange(newCaret, newCaret);
+                      }
+                    });
+                  }}
+                />
                 <div
                   style={{
                     display: 'flex', alignItems: 'flex-end', gap: 4,
@@ -443,7 +465,12 @@ export const TopTenCardComments: React.FC<TopTenCardCommentsProps> = ({
                   <textarea
                     ref={inputRef}
                     value={draft}
-                    onChange={(e) => handleDraftChange(e.target.value)}
+                    onChange={(e) => {
+                      handleDraftChange(e.target.value);
+                      setCaret(e.target.selectionStart ?? e.target.value.length);
+                    }}
+                    onKeyUp={(e) => setCaret((e.target as HTMLTextAreaElement).selectionStart ?? 0)}
+                    onClick={(e) => setCaret((e.target as HTMLTextAreaElement).selectionStart ?? 0)}
                     onKeyDown={(e) => {
                       if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); handleSubmit(); }
                     }}
@@ -458,6 +485,7 @@ export const TopTenCardComments: React.FC<TopTenCardCommentsProps> = ({
                       fontFamily: 'inherit',
                     }}
                   />
+
                   <div className="flex items-center shrink-0">
                     <button
                       type="button"
