@@ -279,6 +279,48 @@ export function openWithOrigin({
     }
   }
 
+  // [DECIDE] resume ladder — one line, every open. Records what each rung
+  // reported and which one won (or 'zero'/'borrow' for the borrow branch).
+  {
+    let feedSnapPostId: string | null = null;
+    let feedSnapOwns = false;
+    if (!borrow) {
+      try {
+        const s = VideoEngine.snapshot('feed-active');
+        feedSnapPostId = s.postId;
+        feedSnapOwns =
+          s.postId != null &&
+          postId != null &&
+          (s.postId === postId || s.postId.startsWith(postId + ':'));
+      } catch {}
+    }
+    DECIDE('resume.ladder', {
+      postId,
+      ownerKey: railOwnerKey ?? null,
+      rungs: {
+        borrow: borrow ? 'taken' : 'skipped',
+        railLane: {
+          available: !!railOwnerKey,
+          ct: railLaneCT >= 0 ? +railLaneCT.toFixed(3) : null,
+        },
+        feedSnap: {
+          snapPostId: feedSnapPostId,
+          owns: feedSnapOwns,
+          ct: feedSnapCT >= 0 ? +feedSnapCT.toFixed(3) : null,
+          used: startSource === 'feedSnap',
+        },
+        lastPos: {
+          key: postId,
+          hit: lastPosCT > 0,
+          ct: lastPosCT >= 0 ? +lastPosCT.toFixed(3) : null,
+          fallbackKeyTried: false,
+        },
+      },
+      chosen: startSource,
+      startPosition: +startPosition.toFixed(3),
+    });
+  }
+
   // Chrome flip at TAP time (not effect time) to kill the strobe. Scroll
   // lock is owned by the overlay's isOpen effect (ref-counted so it composes
   // cleanly with CommentsSheet stacking on top).
