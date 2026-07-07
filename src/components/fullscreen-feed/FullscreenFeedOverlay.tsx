@@ -6,7 +6,7 @@ import { useFullscreenFeedStore } from '@/store/fullscreenFeedStore';
 
 import { SnapFeed } from '@/components/feed/SnapFeed';
 import { ClubhouseSkeletonShimmer } from '@/components/clubhouse/ClubhouseSkeletonShimmer';
-import { pauseAllAudio } from '@/utils/globalVideoMute';
+
 import { lockBodyScroll, unlockBodyScroll } from '@/lib/bodyScrollLock';
 
 
@@ -26,7 +26,7 @@ import { useManageableBusinessIds } from '@/hooks/useManageableBusinessIds';
 import { canManagePost } from '@/lib/canManagePost';
 import { getActorRouteByType } from '@/types/actor';
 // [VIDEOSTUB] FullscreenDebugPanel + mobileVideoDebug imports removed — engine severed.
-import { fsv, fsvViewport } from '@/perf/fsvTelemetry';
+
 import { isPerfEnabled } from '@/perf/navTiming';
 import { VideoEngine } from '@/video/VideoEngine';
 import { RailLanePool } from '@/video/railLanePool';
@@ -283,16 +283,15 @@ export function FullscreenFeedOverlay() {
       const rootEl = document.getElementById('root');
       const savedScrollTop = rootEl ? rootEl.scrollTop : 0;
 
-      fsv('open.effect', { startIndex, savedScrollTop });
-      const vpBefore = fsvViewport();
-
       // Clear any stale 'open' span left un-closed from a prior session before
       // starting a fresh one (prevents a leftover span producing a fake duration).
       fsTimeEnd('open', '(stale open span discarded)');
       // Timing: mark fullscreen open (tap→visible span; ends when first slide paints).
       fsTimeStart('open');
       fsEvent('🚀 FULLSCREEN_OPEN', { startIndex });
-      pauseAllAudio();
+      // NOTE: no engine-wide pauseAll here — the overlay must never pause a
+      // borrowed lane on its own open. Owner-guard + null-caller rules keep
+      // playback correct for both borrow and non-borrow entries.
       lockBodyScroll();
 
       // ── Safe area bleed (mirrors Clubhouse) ──
@@ -305,20 +304,7 @@ export function FullscreenFeedOverlay() {
         (window as any).median?.statusbar?.set({ style: 'dark', color: '00000000', overlay: true, blur: false });
       } catch {}
 
-      // Log viewport before/after body-class + statusbar mutations. The
-      // difference here is the delta that targetRect was memoised BEFORE.
-      // Use rAF so any layout-triggered viewport change is captured.
-      requestAnimationFrame(() => {
-        fsv('open.viewport', {
-          before: vpBefore,
-          afterRAF: fsvViewport(),
-        });
-      });
-
       return () => {
-        fsv('close.effect', {
-          viewport: fsvViewport(),
-        });
         // Route-change guard: if the overlay is unmounting without an explicit
         // close() (e.g. navigation) borrowRef still holds the descriptor. Run
         // the return path so the pool is unpinned and the tile inherits its
@@ -329,9 +315,6 @@ export function FullscreenFeedOverlay() {
           borrowRef.current = null;
         }
 
-
-
-
         unlockBodyScroll();
         document.body.classList.remove('route-fullscreen-overlay');
         // Restore shield to transparent (NOT #F8FAFC) so the dark feed background
@@ -341,9 +324,6 @@ export function FullscreenFeedOverlay() {
         if (shield) shield.style.backgroundColor = 'transparent';
         document.documentElement.style.backgroundColor = '';
         document.body.style.backgroundColor = '';
-
-        // Playhead-sync deleted per BRIEF_NUKE_PLAYHEAD_SYNC — short looping
-        // clips restart naturally on close, poster underlay covers the gap.
 
         // Restore #root scroll position on the next frame so the feed's scroll
         // height is settled after the overlay unmounts.
@@ -378,12 +358,6 @@ export function FullscreenFeedOverlay() {
       return;
     }
     if (isOpen && origin) {
-      fsv('clone.init', {
-        origin,
-        cloneVisibleBefore: cloneVisible,
-        cloneExpandedBefore: cloneExpanded,
-        firstFrameReadyBefore: firstFrameReady,
-      });
       setCloneVisible(true);
       setCloneExpanded(false);
       setFirstFrameReady(false);
@@ -401,14 +375,11 @@ export function FullscreenFeedOverlay() {
           width: measured.width,
           height: measured.height,
         };
-        fsv('clone.target', { rect, viewport: fsvViewport(), measuredFromHost: !!host });
         setTargetRect(rect);
-        fsv('clone.raf1', { viewport: fsvViewport() });
         setCloneExpanded(true);
       });
       // Watchdog: release the clone if the first-frame signal never arrives.
       watchdogRef.current = setTimeout(() => {
-        fsv('clone.watchdog', { note: 'firing @400ms — slide firstFrame not received' });
         setFirstFrameReady(true);
       }, 400);
       return () => {
@@ -425,7 +396,6 @@ export function FullscreenFeedOverlay() {
   }, [isOpen, origin, borrow]);
 
   const handleSnapFeedFirstFrame = useCallback(() => {
-    fsv('clone.slideFF', { note: 'onFirstFrameReady from SnapFeed' });
     if (watchdogRef.current) clearTimeout(watchdogRef.current);
     setFirstFrameReady(true);
   }, []);
@@ -434,7 +404,6 @@ export function FullscreenFeedOverlay() {
   useEffect(() => {
     if (!firstFrameReady || !cloneVisible) return;
     const t = setTimeout(() => {
-      fsv('clone.retire', {});
       setCloneVisible(false);
     }, 180);
     return () => clearTimeout(t);

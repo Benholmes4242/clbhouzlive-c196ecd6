@@ -332,8 +332,6 @@ const BusinessReviewsPage = lazy(() => import("./pages/BusinessReviewsPage"));
 
 
 const NotFound = lazy(() => import("./pages/NotFound"));
-// THROWAWAY Stage 0 route — delete after Stage 1.
-const VideoEngineTest = lazy(() => import("./pages/dev/VideoEngineTest"));
 const PrivacyPolicyPage = lazy(() => import("./pages/legal/PrivacyPolicyPage"));
 const TermsPage = lazy(() => import("./pages/legal/TermsPage"));
 const LegalDocumentPage = lazy(() => import("./pages/legal/LegalDocumentPage"));
@@ -649,7 +647,7 @@ function AppRoutes() {
         <Route path="/privacy" element={<Suspense fallback={<GenericPageSkeleton />}><PrivacyPolicyPage /></Suspense>} />
         <Route path="/terms" element={<Suspense fallback={<GenericPageSkeleton />}><TermsPage /></Suspense>} />
         <Route path="/legal/:slug" element={<Suspense fallback={<GenericPageSkeleton />}><LegalDocumentPage /></Suspense>} />
-        <Route path="/dev/video-engine" element={<Suspense fallback={<GenericPageSkeleton />}><VideoEngineTest /></Suspense>} />
+        
         <Route path="*" element={<Suspense fallback={<GenericPageSkeleton />}><NotFound /></Suspense>} />
       </Routes>
 

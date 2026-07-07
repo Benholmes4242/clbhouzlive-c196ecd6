@@ -2,7 +2,7 @@ import React, { useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
 import { ReviewBottomSheet } from './ReviewBottomSheet';
 import { useReviewSheetStore } from '@/stores/reviewSheetStore';
-import { pauseAllAudio } from '@/utils/globalVideoMute';
+import { VideoEngine } from '@/video/VideoEngine';
 
 /**
  * Single root-level mount for ReviewBottomSheet.
@@ -11,8 +11,8 @@ import { pauseAllAudio } from '@/utils/globalVideoMute';
  * will render through here.
  *
  * Side effects:
- *  - On open: mute all registered audio sources (video underneath keeps playing
- *    silently, matching how FullscreenFeedOverlay/MediaViewerOverlay behave).
+ *  - On open: engine-wide pauseAll() so any playing feed video (Clubhouse,
+ *    Watch, course media) stops while the review sheet reads over it.
  *  - On open: trap ESC to close the sheet (and stop propagation so the
  *    underlying overlay doesn't also dismiss).
  *  - On route change: auto-close any open sheet so stale state never persists.
@@ -23,11 +23,13 @@ export const ReviewBottomSheetPortal: React.FC = () => {
   const close = useReviewSheetStore((s) => s.close);
   const location = useLocation();
 
-  // Mute audio sources when the sheet opens. We don't auto-resume on close —
-  // the user's mute preference and the SnapFeed mutex take over.
+  // Pause every engine lane when the sheet opens. Null-caller = engine-wide
+  // pause, which also passes the borrow-guard so a borrowed feed lane stops.
+  // We don't auto-resume on close — the user's mute preference and the
+  // SnapFeed activation mutex take over.
   useEffect(() => {
     if (isOpen) {
-      pauseAllAudio();
+      try { VideoEngine.pauseAll(); } catch {}
     }
   }, [isOpen]);
 

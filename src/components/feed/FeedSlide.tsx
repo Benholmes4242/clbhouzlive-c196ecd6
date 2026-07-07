@@ -8,7 +8,6 @@ import type { FeedPost, MediaItem } from '@/components/media-system/types/media'
 import { useVideoLane } from '@/video/useVideoLane';
 import { VideoEngine } from '@/video/VideoEngine';
 import { useFullscreenFeedStore } from '@/store/fullscreenFeedStore';
-import { fsv } from '@/perf/fsvTelemetry';
 import { isPerfEnabled } from '@/perf/navTiming';
 
 import { usePostViewTracker } from '@/hooks/usePostViewTracker';
@@ -320,19 +319,8 @@ const FullscreenVideoSlot: React.FC<{
     if (!isActive || isBorrowSlide) return -1;
     const t = VideoEngine.getLastPos(resumeKey);
     const chosen = t > 0 ? t : storedStart > 0 ? storedStart : -1;
-    fsv('slot.mount', {
-      phase: 'startPos.compute',
-      postId,
-      resumeKey,
-      isActive,
-      hasHls: !!hlsUrl,
-      storedStart,
-      lastPos: t,
-      chosen,
-      isBorrowSlide,
-    });
     return chosen;
-  }, [isActive, postId, resumeKey, storedStart, hlsUrl, isBorrowSlide]);
+  }, [isActive, isBorrowSlide, resumeKey, storedStart]);
 
   // In borrow mode: pass hlsUrl:null + active:false so useVideoLane never
   // touches the 'fullscreen' lane. The borrowed rail lane's element is
@@ -352,16 +340,6 @@ const FullscreenVideoSlot: React.FC<{
     VideoEngine.setObjectFit('fullscreen', 'contain');
   }, [isBorrowSlide]);
 
-  React.useEffect(() => {
-    fsv('slot.active', { postId, isActive, isBorrowSlide });
-  }, [postId, isActive, isBorrowSlide]);
-
-  React.useEffect(() => {
-    return () => {
-      fsv('slot.unmount', { postId });
-    };
-  }, [postId]);
-
   // Fire onFirstFrameReady ONLY when the engine has painted the real frame
   // at (or past) startPosition — for non-borrow slides. Borrow slide fires
   // it from <BorrowedFullscreenSlot/> on the next rAF post-mount.
@@ -372,14 +350,9 @@ const FullscreenVideoSlot: React.FC<{
     if (firedRef.current) return;
     if (lane.snapshot.firstFrame === true) {
       firedRef.current = true;
-      fsv('slot.snapFF', {
-        postId,
-        ct: +lane.snapshot.currentTime.toFixed(3),
-        startPosition: +startPosition.toFixed(3),
-      });
       onFirstFrameReady?.();
     }
-  }, [isActive, isBorrowSlide, lane.snapshot.firstFrame, lane.snapshot.currentTime, onFirstFrameReady, postId, startPosition]);
+  }, [isActive, isBorrowSlide, lane.snapshot.firstFrame, onFirstFrameReady]);
 
   // Borrow branch: re-parent the live rail-pool <video> into a wrapper here
   // and run the two-phase cover→contain FLIP.

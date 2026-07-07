@@ -5,7 +5,7 @@ import { FeedSlide } from './FeedSlide';
 import type { FeedPost } from '@/components/media-system/types/media';
 import { haptic } from '@/utils/haptics';
 // Stage B3 teardown: HLS preload / pool wiring removed.
-import { pauseAllAudio } from '@/utils/globalVideoMute';
+
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useFullscreenFeedStore } from '@/store/fullscreenFeedStore';
 
@@ -143,10 +143,10 @@ export function SnapFeed({
   const activeIndex = activeIndexOverride ?? storeActiveIndex;
   const location = useLocation();
 
-  // Pause all audio when route changes away
-  useEffect(() => {
-    pauseAllAudio();
-  }, [location.pathname]);
+  // NOTE: no route-change pauseAll here — the VideoEngine owns per-lane
+  // activation via useVideoLane, and the fullscreen overlay's open path
+  // must not pause a borrowed lane on its own open. Route-change cleanup
+  // for engine lanes happens inside the engine (borrow guard + owner guard).
 
   // Watch-progress tracking — populates user_content_preferences with
   // watched_partial / watched_complete signals for whichever surface is
