@@ -1,17 +1,23 @@
 /**
  * resolveRestingRect — single-sourced geometry for fullscreen media open/close.
  *
- * Ratified product rules (2026-07-07 reconciled brief):
- *   • Portrait/square VIDEO rests COVER (full-bleed, under the notch — Reels rule).
- *     Detection: `mediaAspect <= viewportAspect * 1.05`.
- *   • Landscape VIDEO rests CONTAIN (letterboxed inside the SAFE area — bars clear
- *     the notch / home indicator).
- *   • IMAGES rest CONTAIN always (photos are never cropped by fullscreen chrome;
- *     letterboxed inside the SAFE area).
+ * SINGLE AUTHORITY for aspect classification in the fullscreen viewer. Every
+ * fullscreen media render — clone, borrow slot, settled video slot, settled
+ * image, pager pages — MUST consume this function for both `fit` and `rect`.
+ * Local aspect heuristics elsewhere are forbidden in fullscreen paths.
  *
- * Rationale: every open path used to animate toward the full viewport, then
- * shrink at rest for non-viewport-aspect media. Targeting the resting rect
- * up-front eliminates the overshoot-then-shrink jump.
+ * Aspect definition (this file is the authority — the codebase has both
+ * conventions historically): `mediaAspect = width / height`.
+ *   Examples: 9:16 portrait = 0.5625, 1:1 square = 1.0, 16:9 landscape = 1.78.
+ *
+ * Ratified product rules:
+ *   • VIDEO with `mediaAspect <= 1.05` (taller-than-wide or square-ish) rests
+ *     COVER — full-bleed under the notch (Reels rule). This is an INTRINSIC
+ *     media test, not viewport-relative: a 9:16 clip is portrait on any
+ *     device and must cover, regardless of the phone's own aspect.
+ *   • VIDEO with `mediaAspect > 1.05` (genuinely landscape) rests CONTAIN,
+ *     letterboxed inside the SAFE area — bars clear notch / home indicator.
+ *   • IMAGES rest CONTAIN always (photos are never cropped by fullscreen).
  *
  * When dims are unknown (0), the full viewport is returned as `fit: 'cover'`
  * so the wrapper visually matches today's behaviour; a caller may re-invoke
@@ -56,10 +62,12 @@ export function resolveRestingRect(
   }
 
   const mediaAspect = mediaW / mediaH;
-  const viewportAspect = viewport.w / viewport.h;
 
-  // Portrait/square video → full-bleed cover (Reels rule).
-  if (mediaType === 'video' && mediaAspect <= viewportAspect * VIDEO_COVER_TOLERANCE) {
+  // Portrait/square VIDEO → full-bleed cover (Reels rule). Intrinsic test:
+  // any clip whose width/height is <= 1.05 is portrait-or-square. Viewport
+  // aspect is deliberately NOT consulted here — a 9:16 clip must cover on
+  // every portrait phone regardless of the phone's exact aspect ratio.
+  if (mediaType === 'video' && mediaAspect <= VIDEO_COVER_TOLERANCE) {
     return {
       top: 0,
       left: 0,

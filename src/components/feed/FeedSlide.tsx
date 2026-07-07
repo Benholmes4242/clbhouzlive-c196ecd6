@@ -160,6 +160,8 @@ export const FeedSlide = memo(function FeedSlide({
             posterSrc={posterSrc}
             isActive={isActive}
             onFirstFrameReady={onFirstFrameReady}
+            mediaW={m.width ?? 0}
+            mediaH={m.height ?? 0}
           />
         );
       }
@@ -184,25 +186,49 @@ export const FeedSlide = memo(function FeedSlide({
 
     // Image — apply pinch zoom.
     if (m?.type === 'image') {
-      const aspect = (m.height ?? 1) > 0 && (m.width ?? 0) > 0
-        ? (m.height as number) / (m.width as number)
-        : 1.0;
-      const objectFit: 'cover' | 'contain' = isFullscreen
-        ? 'contain'
-        : (isSuggestedFeed ? 'cover' : (aspect >= 1.5 ? 'cover' : 'contain'));
       const imgSrc = m.imageUrl || m.thumbnailUrl || '';
-      return (
-        <div className="absolute inset-0 overflow-hidden">
-          {/* Backdrop — blurred image in fullscreen, solid matte otherwise. */}
-          {isFullscreen ? (
+      // Fullscreen: single-authority rect from resolveRestingRect (images
+      // always CONTAIN, safe-area centered). Matches the overlay clone's
+      // expand target by construction — no post-paint resize.
+      // Feed: legacy heuristic preserved verbatim (out of scope for this fix).
+      if (isFullscreen) {
+        const fsRect = resolveRestingRect(m.width ?? 0, m.height ?? 0, getCurrentViewport(), 'image');
+        return (
+          <div className="absolute inset-0 overflow-hidden">
             <div aria-hidden="true" className="absolute inset-0" style={{
               backgroundImage: `url(${imgSrc})`, backgroundSize: 'cover', backgroundPosition: 'center',
               filter: 'blur(40px) brightness(0.5) saturate(1.2)', transform: 'scale(1.2)',
             }} />
-          ) : (
-            <div className="absolute inset-0" style={{ background: '#0A0E14' }} aria-hidden="true" />
-          )}
-          {/* Main image with pinch zoom */}
+            <div
+              ref={zoomRef}
+              style={{
+                ...zoomStyle,
+                position: 'absolute',
+                top: fsRect.top, left: fsRect.left,
+                width: fsRect.width, height: fsRect.height,
+                zIndex: 1,
+              }}
+            >
+              <img
+                ref={imgRef}
+                src={imgSrc}
+                alt=""
+                className="w-full h-full"
+                style={{ objectFit: fsRect.fit }}
+                loading="eager"
+                draggable={false}
+              />
+            </div>
+          </div>
+        );
+      }
+      const aspect = (m.height ?? 1) > 0 && (m.width ?? 0) > 0
+        ? (m.height as number) / (m.width as number)
+        : 1.0;
+      const objectFit: 'cover' | 'contain' = isSuggestedFeed ? 'cover' : (aspect >= 1.5 ? 'cover' : 'contain');
+      return (
+        <div className="absolute inset-0 overflow-hidden">
+          <div className="absolute inset-0" style={{ background: '#0A0E14' }} aria-hidden="true" />
           <div
             ref={zoomRef}
             style={{ ...zoomStyle, position: 'absolute', inset: 0, zIndex: 1 }}
@@ -306,7 +332,12 @@ const FullscreenVideoSlot: React.FC<{
    *  they never take the borrow branch (only the opening media page owns the
    *  borrowed element). Defaults true for single-media callers. */
   allowBorrow?: boolean;
-}> = ({ postId, hlsUrl, posterSrc, isActive, onFirstFrameReady, ownerKey, allowBorrow = true }) => {
+  /** Intrinsic media dims — consumed by resolveRestingRect so the settled
+   *  video rect matches the clone's expand target by construction. Missing
+   *  dims fall back to full viewport (util's own default). */
+  mediaW?: number;
+  mediaH?: number;
+}> = ({ postId, hlsUrl, posterSrc, isActive, onFirstFrameReady, ownerKey, allowBorrow = true, mediaW = 0, mediaH = 0 }) => {
   const isMuted = useClubhouseStore((s) => s.isMuted);
   const storedStart = useFullscreenFeedStore((s) => s.startPosition);
   const borrow = useFullscreenFeedStore((s) => s.borrow);
@@ -337,10 +368,18 @@ const FullscreenVideoSlot: React.FC<{
     postId: resumeKey,
   });
 
+  // Resolve the settled rect from intrinsic media dims — MUST match the
+  // clone's expand target (both consume resolveRestingRect). Prevents the
+  // clone-retire → settled-paint size delta that produced the visible
+  // "media resize after first paint" flash.
+  const settledRect = React.useMemo(() => {
+    return resolveRestingRect(mediaW, mediaH, getCurrentViewport(), 'video');
+  }, [mediaW, mediaH]);
+
   React.useEffect(() => {
     if (isBorrowSlide) return;
-    VideoEngine.setObjectFit('fullscreen', 'contain');
-  }, [isBorrowSlide]);
+    VideoEngine.setObjectFit('fullscreen', settledRect.fit);
+  }, [isBorrowSlide, settledRect.fit]);
 
   // [DECIDE] slot.bind — one line when the non-borrow fullscreen lane
   // binds. Lets us compare what the lane believed at bind-time vs what the
@@ -396,6 +435,13 @@ const FullscreenVideoSlot: React.FC<{
     );
   }
 
+  const mediaFrameStyle: React.CSSProperties = {
+    position: 'absolute',
+    top: settledRect.top,
+    left: settledRect.left,
+    width: settledRect.width,
+    height: settledRect.height,
+  };
   return (
     <div className="absolute inset-0 overflow-hidden">
       {posterSrc && (
@@ -409,9 +455,8 @@ const FullscreenVideoSlot: React.FC<{
           src={posterSrc}
           alt=""
           aria-hidden
-          className="w-full h-full"
           style={{
-            position: 'absolute', inset: 0, objectFit: 'contain', zIndex: 1,
+            ...mediaFrameStyle, objectFit: settledRect.fit, zIndex: 1,
             opacity: lane.snapshot.firstFrame ? 0 : 1,
             transition: 'opacity 120ms linear',
           }}
@@ -422,7 +467,7 @@ const FullscreenVideoSlot: React.FC<{
       <div
         ref={lane.hostRef}
         style={{
-          position: 'absolute', inset: 0, zIndex: 2, pointerEvents: 'none',
+          ...mediaFrameStyle, zIndex: 2, pointerEvents: 'none',
           opacity: lane.snapshot.firstFrame ? 1 : 0,
           transition: 'opacity 120ms linear',
         }}
@@ -804,9 +849,7 @@ const FullscreenPagerPage: React.FC<{
   if (m?.type === 'video') {
     const posterSrc = m.thumbnailUrl || '';
     const mHlsUrl = (m as any).hlsUrl || null;
-    // Active video page → mount SHOWING slot. Only the opening-media page
-    // may take the borrow branch; every other page passes allowBorrow=false
-    // so a re-mount post-demote never re-triggers the borrow FLIP.
+    const videoRect = resolveRestingRect(m.width ?? 0, m.height ?? 0, getCurrentViewport(), 'video');
     if (isActivePage && mHlsUrl) {
       return (
         <FullscreenVideoSlot
@@ -817,11 +860,13 @@ const FullscreenPagerPage: React.FC<{
           onFirstFrameReady={onFirstFrameReady}
           ownerKey={ownerKey}
           allowBorrow={pageIdx === openIdx}
+          mediaW={m.width ?? 0}
+          mediaH={m.height ?? 0}
         />
       );
     }
-    // Inactive video page — poster fallback (mirrors the existing non-hls
-    // branch above). No lane binding, no decoder.
+    // Inactive video page — poster fallback (rect matches active slot so
+    // page-become-active does not resize).
     return (
       <div className="absolute inset-0 overflow-hidden">
         {posterSrc && (
@@ -842,8 +887,12 @@ const FullscreenPagerPage: React.FC<{
             src={posterSrc}
             alt=""
             aria-hidden
-            className="w-full h-full"
-            style={{ position: 'absolute', inset: 0, objectFit: 'contain', zIndex: 1 }}
+            style={{
+              position: 'absolute',
+              top: videoRect.top, left: videoRect.left,
+              width: videoRect.width, height: videoRect.height,
+              objectFit: videoRect.fit, zIndex: 1,
+            }}
             loading="lazy"
             draggable={false}
           />
@@ -854,6 +903,7 @@ const FullscreenPagerPage: React.FC<{
 
   if (m?.type === 'image') {
     const imgSrc = m.imageUrl || m.thumbnailUrl || '';
+    const imgRect = resolveRestingRect(m.width ?? 0, m.height ?? 0, getCurrentViewport(), 'image');
     return (
       <div className="absolute inset-0 overflow-hidden">
         <div
@@ -869,14 +919,20 @@ const FullscreenPagerPage: React.FC<{
         />
         <div
           ref={zoomRef}
-          style={{ ...zoomStyle, position: 'absolute', inset: 0, zIndex: 1 }}
+          style={{
+            ...zoomStyle,
+            position: 'absolute',
+            top: imgRect.top, left: imgRect.left,
+            width: imgRect.width, height: imgRect.height,
+            zIndex: 1,
+          }}
         >
           <img
             ref={imgRef}
             src={imgSrc}
             alt=""
             className="w-full h-full"
-            style={{ objectFit: 'contain' }}
+            style={{ objectFit: imgRect.fit }}
             loading={isActivePage ? 'eager' : 'lazy'}
             draggable={false}
           />
