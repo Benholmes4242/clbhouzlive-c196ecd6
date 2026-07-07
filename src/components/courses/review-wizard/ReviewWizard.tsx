@@ -369,19 +369,12 @@ export function ReviewWizard({
   /* ── Category set count ──────────────────────────────────────────────── */
   const setCount = Object.values(wizard.state.breakdowns).filter((x) => x != null).length;
 
-  /* ── Verdict textarea ───────────────────────────────────────────────── */
-  const taRef = useRef<HTMLTextAreaElement>(null);
-  useEffect(() => {
-    const el = taRef.current;
-    if (!el) return;
-    el.style.height = 'auto';
-    el.style.height = `${el.scrollHeight}px`;
-  }, [wizard.state.review]);
-
+  /* ── Verdict textarea (mentions-v2 composer input) ─────────────────── */
+  const taRef = useRef<HTMLTextAreaElement | null>(null);
 
   const handleReviewChange = useCallback(
-    (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-      wizard.setReview(e.target.value.slice(0, MAX_REVIEW_LENGTH));
+    (v: string) => {
+      wizard.setReview(v.slice(0, MAX_REVIEW_LENGTH));
     },
     [wizard]
   );
