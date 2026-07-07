@@ -83,9 +83,15 @@ function materialName(t: number) {
 
 export function normalizeBadge(b: UserBadge): TrophyItem {
   const thresholds = normalizeTiersArray(b.counter_tiers);
-  const reached = b.counter_tier ?? 0;
   const earned = Boolean(b.is_earned);
   const value = b.counter_value ?? 0;
+  // Single source of truth: DERIVE the reached tier from the live count against
+  // the current thresholds. A stored `counter_tier` computed under old thresholds
+  // would otherwise ghost-forward (e.g. GB&I=14 under [1,5,10,25,50] → tier 3;
+  // under [10,25,50,75,100] → tier 1).
+  const reached = thresholds.length > 0
+    ? thresholds.reduce((acc, t) => (value >= t ? acc + 1 : acc), 0)
+    : (b.counter_tier ?? (earned ? 1 : 0));
   const nextThreshold =
     thresholds.length > 0 && reached < thresholds.length ? thresholds[reached] : null;
 
