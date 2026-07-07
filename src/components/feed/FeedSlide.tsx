@@ -409,6 +409,13 @@ const FullscreenVideoSlot: React.FC<{
     );
   }
 
+  const mediaFrameStyle: React.CSSProperties = {
+    position: 'absolute',
+    top: settledRect.top,
+    left: settledRect.left,
+    width: settledRect.width,
+    height: settledRect.height,
+  };
   return (
     <div className="absolute inset-0 overflow-hidden">
       {posterSrc && (
@@ -422,9 +429,8 @@ const FullscreenVideoSlot: React.FC<{
           src={posterSrc}
           alt=""
           aria-hidden
-          className="w-full h-full"
           style={{
-            position: 'absolute', inset: 0, objectFit: 'contain', zIndex: 1,
+            ...mediaFrameStyle, objectFit: settledRect.fit, zIndex: 1,
             opacity: lane.snapshot.firstFrame ? 0 : 1,
             transition: 'opacity 120ms linear',
           }}
@@ -435,7 +441,7 @@ const FullscreenVideoSlot: React.FC<{
       <div
         ref={lane.hostRef}
         style={{
-          position: 'absolute', inset: 0, zIndex: 2, pointerEvents: 'none',
+          ...mediaFrameStyle, zIndex: 2, pointerEvents: 'none',
           opacity: lane.snapshot.firstFrame ? 1 : 0,
           transition: 'opacity 120ms linear',
         }}
