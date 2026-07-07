@@ -142,7 +142,7 @@ export const PredictionScorecardRow: React.FC<PredictionScorecardRowProps> = ({
             srcCandidates={avatarCandidates}
             alt={prediction.playerName}
             userId={prediction.playerId}
-            hideRing
+            hairlineRing ringColor={LIGHT_HAIRLINE}
           />
            {/* Best call green star */}
           {isBestCall && (
