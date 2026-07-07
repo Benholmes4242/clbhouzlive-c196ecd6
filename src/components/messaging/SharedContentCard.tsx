@@ -361,7 +361,7 @@ function MomentShareCard({
               "text-xs mt-1 line-clamp-2",
               isOwnMessage ? "text-primary-foreground/70" : "text-muted-foreground"
             )}>
-              {moment.caption}
+              {stripMentionMarkup(moment.caption)}
             </p>
           )}
 
