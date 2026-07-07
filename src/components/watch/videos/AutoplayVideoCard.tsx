@@ -11,6 +11,7 @@ import { Pin } from '../proshop/Pin';
 import { ExpandableCaption } from '@/components/posts/ExpandableCaption';
 import DecodedImage from '../shared/DecodedImage';
 import { useRailLane } from '@/video/useRailLane';
+import { MentionText } from '@/components/mentions/MentionText';
 
 
 function formatHMS(seconds: number | null | undefined): string {
@@ -196,7 +197,7 @@ function AutoplayVideoCardInner({ post, index, allPosts, userId, active, borderR
               letterSpacing: '-0.01em',
             }}
           >
-            {post.caption || `${post.displayName} on Clbhouz`}
+            {post.caption ? <MentionText as="span" text={post.caption} /> : `${post.displayName} on Clbhouz`}
           </ExpandableCaption>
 
           <div

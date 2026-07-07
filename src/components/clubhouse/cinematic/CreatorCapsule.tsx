@@ -29,6 +29,8 @@ import { type ExtractedReviewData } from '@/lib/postHelpers';
 import { removeGolfCourseFromContent } from '@/utils/golfCourseExtractor';
 
 import { FROST, FROST_BLUR, FROST_SCORE_GRADIENT, formatFrostRating, splitCourseName } from '@/lib/frostPanel';
+import { MentionText } from '@/components/mentions/MentionText';
+import { stripMentionMarkup } from '@/lib/mentions/format';
 
 /** Animated soundwave bars for music playback indicator */
 const SoundwaveAnimation: React.FC = () => (
@@ -572,10 +574,11 @@ export const CreatorCapsule: React.FC<CreatorCapsuleProps> = ({
           </span>
         </button>
 
-        {/* Caption preview (collapsed) */}
+        {/* Caption preview (collapsed) — stripped for one-line display so
+            legacy markup renders as plain "@Name" text. */}
         {!isExpanded && truncatedCaption && (
           <div className="text-[11px] text-white line-clamp-1 mt-0.5">
-            {truncatedCaption}
+            {stripMentionMarkup(truncatedCaption)}
           </div>
         )}
 

@@ -28,6 +28,7 @@ import type { FriendCourseActivity } from '@/hooks/useFriendCourseActivity';
 import { useQueryClient } from '@tanstack/react-query';
 import { useLikeMutation } from '@/components/media-system/hooks/useLikeMutation';
 import { useActiveActor } from '@/context/ActiveActorContext';
+import { MentionText } from '@/components/mentions/MentionText';
 
 interface LoopCardProps {
   post: FeedPost;
@@ -400,7 +401,7 @@ export const LoopCard = React.memo(function LoopCard({
         {!post.isReview && cleanCaption && (
           <div className="px-4 pt-2 pb-0">
             <ExpandableCaption lines={2} className="text-[14px] text-foreground">
-              <span style={{ whiteSpace: 'pre-wrap' }}>{cleanCaption}</span>
+              <MentionText as="span" text={cleanCaption} style={{ whiteSpace: 'pre-wrap' }} />
             </ExpandableCaption>
           </div>
         )}
@@ -408,12 +409,12 @@ export const LoopCard = React.memo(function LoopCard({
         {/* 3.25 REVIEW BODY — snippet + read affordance (reviews only) */}
         {post.isReview && post.review?.reviewText && (
           <div className="px-4 pt-2 pb-0">
-            <p
+            <MentionText
+              as="p"
+              text={post.review.reviewText}
               className="line-clamp-2 text-[13px]"
               style={{ color: '#64748B', lineHeight: 1.5 }}
-            >
-              {post.review.reviewText}
-            </p>
+            />
             <button
               type="button"
               onClick={() => {

@@ -28,6 +28,7 @@ import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useFollowState } from '@/hooks/useFollowState';
 import { useToggleFollow } from '@/hooks/useToggleFollow';
 import { useActiveActor } from '@/context/ActiveActorContext';
+import { MentionText } from '@/components/mentions/MentionText';
 
 const FONTS = {
   geist: "'Geist', -apple-system, BlinkMacSystemFont, system-ui, sans-serif",
@@ -526,8 +527,10 @@ export const ReviewBottomSheet: React.FC<ReviewBottomSheetProps> = ({
                 </div>
               )}
               {paragraphs.map((para, i) => (
-                <p
+                <MentionText
                   key={i}
+                  as="p"
+                  text={para}
                   style={{
                     fontFamily: FONTS.geist,
                     fontSize: 15,
@@ -537,9 +540,7 @@ export const ReviewBottomSheet: React.FC<ReviewBottomSheetProps> = ({
                     margin: 0,
                     marginBottom: i === paragraphs.length - 1 ? 0 : 14,
                   }}
-                >
-                  {para}
-                </p>
+                />
               ))}
             </div>
 

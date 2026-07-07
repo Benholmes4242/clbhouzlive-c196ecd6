@@ -11,6 +11,7 @@ import CommentsSheet from '@/components/comments/CommentsSheet';
 
 import { SquircleAvatar, LIGHT_HAIRLINE } from '@/components/ui/SquircleAvatar';
 import { formatDistanceToNow } from 'date-fns';
+import { MentionText } from '@/components/mentions/MentionText';
 
 interface CommentPreviewProps {
   postId: string;
@@ -80,11 +81,11 @@ const CommentPreview: React.FC<CommentPreviewProps> = ({ postId, totalComments, 
                 <span className={`font-semibold mr-2 ${isDark ? 'text-white' : 'text-foreground'}`}>
                   {comment.username}
                 </span>
-                <span
+                <MentionText
+                  as="span"
+                  text={comment.content}
                   className={`inline ${isDark ? 'text-white/90' : 'text-foreground/85'}`}
-                >
-                  {comment.content}
-                </span>
+                />
               </div>
               <span className={`text-xs mt-1 ${isDark ? 'text-white/60' : 'text-muted-foreground'}`}>
                 {formatDistanceToNow(new Date(comment.created_at), { addSuffix: true })}

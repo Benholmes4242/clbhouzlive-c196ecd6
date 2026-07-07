@@ -38,6 +38,7 @@ import { HeartBurst } from './HeartBurst';
 import { createTapHandler } from './mediaTap';
 import { triggerHaptic } from '@/lib/ui/haptics';
 import type { ActiveActor } from '@/types/actor';
+import { MentionText } from '@/components/mentions/MentionText';
 
 
 // Full-bleed charcoal chrome — one charcoal (#15171F) across the app: tab
@@ -169,7 +170,7 @@ const CaptionBlock: React.FC<CaptionBlockProps> = ({ body, expanded, setExpanded
               : {}),
           }}
         >
-          {body}
+          <MentionText text={body} />
           {!isReviewMode && expanded && isClamped && (
             <button
               type="button"

@@ -112,6 +112,7 @@ export function getNotificationBadgeIcon(type: string): React.ReactElement {
     case 'comment_reply':
     case 'top_ten_comment':
     case 'top_ten_reply':
+    case 'mention':
       return <MessageCircle {...p} />;
     case 'follow':
       return <UserPlus {...p} />;
