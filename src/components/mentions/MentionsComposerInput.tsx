@@ -1,35 +1,47 @@
 /**
  * MentionsComposerInput — canonical composer input for mentions v2.
  *
- * DECISION: adopts `react-mentions` rather than a DIY overlay. That
- * library implements exactly the display-transform pattern this brief
- * requires:
- *   - `value` is the canonical markup (`@[Name](u:UUID)`)
- *   - the visible textarea shows the display form (`@Name`)
- *   - caret positions map through the transform
- *   - Backspace into a mention deletes the WHOLE mention atomically
- *     (no half-deleted `(u:...)` states are ever possible)
+ * Suggestions panel architecture (single source; four consumers:
+ * PostComposer, ReviewWizard, CommentsSheet, TopTenCardComments):
  *
- * react-mentions' default markup template is exactly
- * `@[__display__](__id__)`, which lines up with our storage format
- * (id = `u:UUID` or `b:UUID`). No custom serialization needed —
- * `onChange(_, newValue)` hands us the canonical string.
+ *   • react-mentions renders its overlay via `suggestionsPortalHost =
+ *     document.body`, so the panel escapes every ancestor's overflow
+ *     and stacking context (sheets, wizard scroll boxes, sticky
+ *     headers).
+ *   • The overlay itself is made invisible/pointer-transparent via
+ *     `style.suggestions` — all visible chrome lives inside our
+ *     `customSuggestionsContainer` (`AnchoredMentionsPanel`), which
+ *     measures the composer's input row and fixes itself to that
+ *     rect. Width = anchor.width, left = anchor.left, placement =
+ *     above/below based on the VISUAL viewport (accounts for the iOS
+ *     keyboard shift under Median WebView).
+ *   • Listeners: ResizeObserver on the anchor + panel, plus
+ *     window.resize/scroll and visualViewport.resize/scroll — all
+ *     torn down when the panel unmounts (unmount == close). The
+ *     panel remounts every open, so first-frame measurement is
+ *     always fresh.
+ *   • z-index token: `Z.mentionsPanel` (12010) — clears sheet
+ *     surfaces (12003) so comments/top-ten hosts keep working.
  *
- * Suggestions render via `renderSuggestion` using the same Dispatch
- * squircle / verified-badge language as the standalone popup that
- * PR-2a shipped.
+ * NO host-level `.suggestions` overrides. Grep for `.suggestions`
+ * placement or `mentionsPanel` should only return this file.
  */
 
 import React from 'react';
+import ReactDOM from 'react-dom';
 import { MentionsInput, Mention, type SuggestionDataItem } from 'react-mentions';
 import { CheckCircle2, Building2 } from 'lucide-react';
 import { SquircleAvatar, LIGHT_HAIRLINE } from '@/components/ui/SquircleAvatar';
 import { supabase } from '@/integrations/supabase/client';
+import { Z } from '@/config/zIndex';
 
 const INK = '#0F172A';
 const INK_SUBTLE = '#94A3B8';
 const AMBER = '#F7931E';
 const BORDER = 'rgba(15,23,42,0.10)';
+
+const PANEL_MAX_HEIGHT = 5 * 44 + 8; // 5 rows scrollable
+const PANEL_GAP = 6;                 // px between panel and anchor
 
 /** react-mentions passes `id` as a string; we encode `${kind}:${uuid}` there. */
 interface RichSuggestion extends SuggestionDataItem {
@@ -41,10 +53,6 @@ interface RichSuggestion extends SuggestionDataItem {
   kind: 'user' | 'business';
 }
 
-/**
- * Search the two mention pools. Called by react-mentions with the
- * text after the `@` trigger and a `render(results)` callback.
- */
 async function searchMentions(
   query: string,
   render: (data: SuggestionDataItem[]) => void,
@@ -87,7 +95,6 @@ async function searchMentions(
     kind: 'business',
   }));
 
-  // Rank: prefix > contains, users before businesses at equal rank.
   const rank = (s: RichSuggestion) => {
     const d = s.display.toLowerCase();
     const qs = q.toLowerCase();
@@ -113,36 +120,19 @@ export interface MentionsTextStyle {
 }
 
 interface Props {
-  value: string; // canonical markup
+  value: string;
   onChange: (markup: string) => void;
   onSubmit?: () => void;
   placeholder?: string;
   maxLength?: number;
   autoFocus?: boolean;
-  /** Bubbles up focus/blur so the surrounding composer can style its border. */
   onFocus?: () => void;
   onBlur?: () => void;
-  /** Optional inline style on the outer wrapper (rare; prefer wrapping in a styled div). */
   style?: React.CSSProperties;
   inputRef?: (el: HTMLTextAreaElement | null) => void;
-  /** Optional text metric overrides (post caption 18px, review verdict 16px, etc.). */
   textStyle?: MentionsTextStyle;
 }
 
-/**
- * Style object for react-mentions.
- *
- * CRITICAL: the `highlighter` overlay and the `input` textarea MUST
- * share IDENTICAL text metrics (font-family, size, weight,
- * line-height, letter-spacing, padding, border-width, box-sizing) or
- * the two layers drift out of register. We compose ONE `sharedText`
- * object and spread it into BOTH so no field can be hand-edited on
- * one side only.
- *
- * The textarea's own glyphs render TRANSPARENT (caret stays visible
- * via `caretColor`) so exactly one copy of the text is ever painted
- * — the overlay is the sole visible layer.
- */
 const DEFAULT_TEXT_STYLE: Required<Pick<MentionsTextStyle, 'fontSize' | 'lineHeight' | 'padding' | 'color' | 'caretColor'>> = {
   fontSize: 14,
   lineHeight: '20px',
@@ -151,6 +141,11 @@ const DEFAULT_TEXT_STYLE: Required<Pick<MentionsTextStyle, 'fontSize' | 'lineHei
   caretColor: INK,
 };
 
+/**
+ * react-mentions style object. `.suggestions` intentionally renders
+ * a 0x0 pointer-transparent shell — the visible panel is drawn by
+ * `AnchoredMentionsPanel` (see `customSuggestionsContainer`).
+ */
 function buildMentionsStyle(text: MentionsTextStyle | undefined) {
   const t = { ...DEFAULT_TEXT_STYLE, ...(text ?? {}) };
   const sharedText = {
@@ -170,11 +165,6 @@ function buildMentionsStyle(text: MentionsTextStyle | undefined) {
     control: {
       background: 'transparent',
       minHeight: minH ?? 36,
-      // Full-width so hosts that wrap us in `display:flex` (e.g. review
-      // wizard verdict box) don't shrink us to intrinsic textarea width,
-      // which in turn collapses the suggestions popover.
-      width: '100%',
-      // NOTE: do NOT spread sharedText here (see original comment).
       fontFamily: sharedText.fontFamily,
       fontSize: sharedText.fontSize,
       fontWeight: sharedText.fontWeight,
@@ -210,30 +200,27 @@ function buildMentionsStyle(text: MentionsTextStyle | undefined) {
       wordWrap: 'break-word' as const,
       WebkitTextFillColor: 'transparent',
     },
+    // Invisible/inert shell. All visible chrome + positioning is
+    // taken over by AnchoredMentionsPanel below (customSuggestionsContainer).
     suggestions: {
-      position: 'absolute' as const,
-      top: 'auto',
-      bottom: '100%',
+      position: 'fixed' as const,
+      top: 0,
       left: 0,
-      right: 0,
-      width: '100%',
-      marginBottom: 8,
-      zIndex: 210,
+      width: 0,
+      height: 0,
+      margin: 0,
+      padding: 0,
+      pointerEvents: 'none' as const,
+      background: 'transparent',
+      zIndex: Z.mentionsPanel,
       list: {
-        background: '#ffffff',
-        borderRadius: 12,
-        border: `0.5px solid ${BORDER}`,
-        boxShadow:
-          '0 8px 24px -8px rgba(15,23,42,0.18), 0 2px 6px rgba(15,23,42,0.08)',
-        maxHeight: 5 * 44 + 8,
-        overflowY: 'auto' as const,
-        fontSize: 13.5,
-        width: '100%',
-        minWidth: '100%',
+        background: 'transparent',
+        margin: 0,
+        padding: 0,
+        listStyle: 'none',
       },
       item: {
         padding: 0,
-        borderBottom: `0.5px solid ${BORDER}`,
         '&focused': {
           background: 'rgba(247,147,30,0.08)',
         },
@@ -243,17 +230,11 @@ function buildMentionsStyle(text: MentionsTextStyle | undefined) {
 }
 
 const mentionStyle = {
-  // Colour-only highlight — MUST match text weight/size so glyph widths after
-  // the mention line up. Bold or textShadow would shift metrics.
   color: AMBER,
   fontWeight: 400,
   background: 'transparent',
 };
 
-/**
- * Convert the react-mentions `display` (which is `@Name` — the raw
- * matched string including the `@`) into just the display name.
- */
 function renderSuggestion(
   entry: SuggestionDataItem,
   _search: string,
@@ -307,6 +288,135 @@ function renderSuggestion(
   );
 }
 
+// ────────────────────────────────────────────────────────────────
+// AnchoredMentionsPanel — the actual visible suggestions surface.
+//
+// Portaled to document.body via react-mentions' suggestionsPortalHost.
+// Measures the composer's anchor row and re-measures on every event
+// that can shift geometry:
+//   - ResizeObserver on the anchor and on the panel itself
+//   - window resize / scroll (capture: true, so ancestor scroll fires)
+//   - visualViewport resize / scroll (iOS keyboard show/hide/pan)
+// Placement is judged against visualViewport.height so the wizard's
+// low verdict field flips ABOVE when the keyboard eats the space
+// below.
+// ────────────────────────────────────────────────────────────────
+interface AnchoredPanelProps {
+  anchorRef: React.RefObject<HTMLElement>;
+  children: React.ReactNode;
+}
+
+function AnchoredMentionsPanel({ anchorRef, children }: AnchoredPanelProps) {
+  const panelRef = React.useRef<HTMLDivElement | null>(null);
+  const [geom, setGeom] = React.useState<{
+    top: number;
+    left: number;
+    width: number;
+    maxHeight: number;
+    placement: 'above' | 'below';
+  } | null>(null);
+
+  const measure = React.useCallback(() => {
+    const a = anchorRef.current;
+    if (!a) return;
+    const r = a.getBoundingClientRect();
+    const vv = typeof window !== 'undefined' ? window.visualViewport : null;
+    const vTop = vv?.offsetTop ?? 0;
+    const vHeight = vv?.height ?? window.innerHeight;
+    const vBottom = vTop + vHeight;
+
+    const spaceBelow = vBottom - r.bottom - PANEL_GAP - 8;
+    const spaceAbove = r.top - vTop - PANEL_GAP - 8;
+
+    // Prefer BELOW when it fits comfortably; flip ABOVE when below
+    // is cramped and above has more room (the keyboard-up case).
+    const wantsAbove =
+      spaceBelow < Math.min(180, PANEL_MAX_HEIGHT) && spaceAbove > spaceBelow;
+
+    const panelH = panelRef.current?.getBoundingClientRect().height ?? PANEL_MAX_HEIGHT;
+
+    const maxHeight = Math.max(
+      120,
+      Math.min(PANEL_MAX_HEIGHT, wantsAbove ? spaceAbove : spaceBelow),
+    );
+
+    const top = wantsAbove
+      ? Math.max(vTop + 8, r.top - PANEL_GAP - Math.min(panelH, maxHeight))
+      : Math.min(vBottom - Math.min(panelH, maxHeight) - 8, r.bottom + PANEL_GAP);
+
+    setGeom(prev => {
+      const next = { top, left: r.left, width: r.width, maxHeight, placement: (wantsAbove ? 'above' : 'below') as 'above' | 'below' };
+      if (
+        prev &&
+        prev.top === next.top &&
+        prev.left === next.left &&
+        prev.width === next.width &&
+        prev.maxHeight === next.maxHeight &&
+        prev.placement === next.placement
+      ) {
+        return prev;
+      }
+      return next;
+    });
+  }, [anchorRef]);
+
+  // Mount-time measurement + full listener lifecycle. This effect
+  // runs every time the panel mounts (== every time suggestions
+  // open), so no "measured stale" state can persist across steps.
+  React.useLayoutEffect(() => {
+    measure();
+
+    const ro = new ResizeObserver(() => measure());
+    if (anchorRef.current) ro.observe(anchorRef.current);
+    // Observe our own panel too — first render has no height yet,
+    // so the initial `panelH` guess is PANEL_MAX_HEIGHT; the RO
+    // will re-fire once the ul lays out and correct placement.
+    if (panelRef.current) ro.observe(panelRef.current);
+
+    const onWinResize = () => measure();
+    const onWinScroll = () => measure();
+    window.addEventListener('resize', onWinResize);
+    window.addEventListener('scroll', onWinScroll, true);
+
+    const vv = window.visualViewport;
+    vv?.addEventListener('resize', onWinResize);
+    vv?.addEventListener('scroll', onWinScroll);
+
+    return () => {
+      ro.disconnect();
+      window.removeEventListener('resize', onWinResize);
+      window.removeEventListener('scroll', onWinScroll, true);
+      vv?.removeEventListener('resize', onWinResize);
+      vv?.removeEventListener('scroll', onWinScroll);
+    };
+  }, [measure, anchorRef]);
+
+  return (
+    <div
+      ref={panelRef}
+      style={{
+        position: 'fixed',
+        top: geom?.top ?? -9999,
+        left: geom?.left ?? -9999,
+        width: geom?.width ?? 0,
+        maxHeight: geom?.maxHeight ?? PANEL_MAX_HEIGHT,
+        overflowY: 'auto',
+        background: '#ffffff',
+        borderRadius: 12,
+        border: `0.5px solid ${BORDER}`,
+        boxShadow:
+          '0 8px 24px -8px rgba(15,23,42,0.18), 0 2px 6px rgba(15,23,42,0.08)',
+        fontSize: 13.5,
+        pointerEvents: 'auto',
+        opacity: geom ? 1 : 0,
+        zIndex: Z.mentionsPanel,
+      }}
+    >
+      {children}
+    </div>
+  );
+}
+
 export function MentionsComposerInput({
   value,
   onChange,
@@ -321,8 +431,26 @@ export function MentionsComposerInput({
   textStyle,
 }: Props) {
   const mentionsStyle = React.useMemo(() => buildMentionsStyle(textStyle), [textStyle]);
+  const anchorRef = React.useRef<HTMLDivElement | null>(null);
+
+  // Server-render / test safety: only enable the portal once we know
+  // document.body exists. React-mentions treats a falsy portal host
+  // as "render inline" (which is what we did before), so any SSR path
+  // still renders a valid tree.
+  const portalHost = typeof document !== 'undefined' ? document.body : undefined;
+
+  const customSuggestionsContainer = React.useCallback(
+    (children: React.ReactNode) => (
+      <AnchoredMentionsPanel anchorRef={anchorRef}>{children}</AnchoredMentionsPanel>
+    ),
+    [],
+  );
+
   return (
-    <div style={{ position: 'relative', flex: 1, minWidth: 0, width: '100%', ...style }}>
+    <div
+      ref={anchorRef}
+      style={{ position: 'relative', flex: 1, minWidth: 0, width: '100%', ...style }}
+    >
       <MentionsInput
         value={value}
         onChange={(_evt, newValue) => onChange(newValue)}
@@ -332,25 +460,24 @@ export function MentionsComposerInput({
         onFocus={onFocus}
         onBlur={onBlur}
         inputRef={inputRef as any}
+        // Let the library measure; AnchoredMentionsPanel flips based
+        // on visualViewport, so we don't force a direction here.
         allowSuggestionsAboveCursor
-        forceSuggestionsAboveCursor
+        suggestionsPortalHost={portalHost as any}
+        customSuggestionsContainer={customSuggestionsContainer}
         style={mentionsStyle}
-        // Enter submits (matches composer contract); Shift+Enter → newline.
         onKeyDown={(e: any) => {
           if (e.key === 'Enter' && !e.shiftKey && onSubmit) {
             e.preventDefault();
             onSubmit();
           }
         }}
-        // Keep placeholder colour aligned with the rest of the app.
         className="mentions-composer"
       >
         <Mention
           trigger="@"
           data={searchMentions}
           renderSuggestion={renderSuggestion}
-          // Default markup is `@[__display__](__id__)` — which for us
-          // becomes `@[Name](u:UUID)`. Do NOT override.
           displayTransform={(_id, display) => `@${display}`}
           appendSpaceOnAdd
           style={mentionStyle}
@@ -359,3 +486,7 @@ export function MentionsComposerInput({
     </div>
   );
 }
+
+// Suppress unused-import lint if tree-shaken; ReactDOM re-export kept
+// intentionally minimal so consumers know createPortal path exists.
+void ReactDOM;
