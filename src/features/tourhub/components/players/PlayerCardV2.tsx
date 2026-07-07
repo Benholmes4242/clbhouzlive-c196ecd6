@@ -199,7 +199,7 @@ export function PlayerCardV2({
             srcCandidates={avatarCandidates}
             alt={player.fullName}
             userId={player.id}
-            hideRing
+            hairlineRing ringColor={LIGHT_HAIRLINE}
           />
         </div>
 
