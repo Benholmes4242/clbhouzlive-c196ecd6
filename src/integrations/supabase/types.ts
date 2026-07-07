@@ -17945,8 +17945,10 @@ export type Database = {
         Returns: {
           attained_at: string
           category: string
+          delta: number
           is_self: boolean
           rank: number
+          rank_30d: number
           total_count_in_category: number
           user_display_name: string
           user_home_club: string
