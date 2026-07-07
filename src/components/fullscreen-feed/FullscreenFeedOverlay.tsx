@@ -189,8 +189,10 @@ export function FullscreenFeedOverlay() {
   // over the (opacity-0) SnapFeed and crossfade it out on first frame.
   const [cloneVisible, setCloneVisible] = useState(false);
   const [cloneExpanded, setCloneExpanded] = useState(false);
+  const [cloneExpandDone, setCloneExpandDone] = useState(false);
   const [firstFrameReady, setFirstFrameReady] = useState(false);
   const watchdogRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const expandDoneTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   // Use the real active actor (personal or business) so users in business
   // mode can like/comment/follow as their business from fullscreen. Falls
