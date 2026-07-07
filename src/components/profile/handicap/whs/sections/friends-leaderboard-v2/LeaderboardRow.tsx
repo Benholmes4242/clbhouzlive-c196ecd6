@@ -271,7 +271,7 @@ export const LeaderboardRow: React.FC<Props> = ({ entry, rank, isStaleRow, onCli
         </div>
       </div>
 
-      {/* 7D movement slot */}
+      {/* 30D movement slot */}
       <div
         style={{
           width: 32,
