@@ -267,6 +267,24 @@ export function useUpdatePost() {
         .eq('id', postId);
       if (postError) throw postError;
 
+      // 2b. Mentions v2 — diff-sync mention rows against the new caption.
+      // Removed markup → DELETE (no notification); added → INSERT (single
+      // notification per genuinely new mentionee); untouched entries stay
+      // put, so re-saving the same caption never re-notifies.
+      try {
+        const { data: { user } } = await supabase.auth.getUser();
+        if (user) {
+          await syncMentionsForContent({
+            sourceType: 'post',
+            sourceId: postId,
+            content: caption ?? '',
+            mentionerId: user.id,
+          });
+        }
+      } catch (err) {
+        console.warn('[useUpdatePost] mention sync failed:', err);
+      }
+
       // 3. Replace post_courses junction.
       const { error: delPcErr } = await supabase
         .from('post_courses')
