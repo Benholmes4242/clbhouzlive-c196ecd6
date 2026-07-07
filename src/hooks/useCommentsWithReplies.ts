@@ -703,9 +703,7 @@ export function useCommentsWithReplies(
 
       if (error) throw error;
 
-      // Re-extract mentions via edge function is not needed for edits since
-      // the edge function only handles creation. Client-side mention cleanup:
-      await supabase.from('comment_mentions').delete().eq('comment_id', commentId);
+      // comment_mentions table was nuked with the mention system — no-op.
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['post-comments-with-replies', postId, actorType, actorId] });
