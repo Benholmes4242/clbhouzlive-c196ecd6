@@ -184,6 +184,33 @@ const COMMENT_CONTEXT_TYPES = new Set(['comment', 'comment_post', 'comment_reply
 function getContextUrl(notification: any): string {
   const { type, entity_type, entity_id, data, actor_id } = notification;
 
+  // Mentions (v2 unified 'mention' type) — deep-link to the source item.
+  if (type === 'mention') {
+    const sourceType = data?.source_type ?? entity_type;
+    if (sourceType === 'post') {
+      const postId = data?.post_id ?? (entity_type === 'post' ? entity_id : undefined);
+      if (postId) return `/post/${postId}`;
+    }
+    if (sourceType === 'comment') {
+      const postId = data?.post_id;
+      const commentId = data?.comment_id ?? (entity_type === 'comment' ? entity_id : undefined);
+      if (postId && commentId) return `/post/${postId}/comment/${commentId}`;
+      if (postId) return `/post/${postId}?openComments=1`;
+    }
+    if (sourceType === 'review') {
+      const courseId = data?.course_id;
+      const reviewId = data?.review_id ?? (entity_type === 'review' ? entity_id : undefined);
+      if (courseId && reviewId) return `/courses/${courseId}?tab=reviews&review=${reviewId}`;
+      if (courseId) return `/courses/${courseId}?tab=reviews`;
+    }
+    if (sourceType === 'top_ten_comment') {
+      const targetId = data?.target_user_id ?? notification.user_id;
+      const commentId = data?.top_ten_comment_id;
+      const q = commentId ? `&top_ten_comment=${commentId}` : '';
+      return `/profile/${targetId}?tab=courses${q}`;
+    }
+  }
+
   if (COMMENT_CONTEXT_TYPES.has(type)) {
     const postId = data?.post_id ?? (entity_type === 'post' ? entity_id : undefined);
     const commentId = data?.comment_id;

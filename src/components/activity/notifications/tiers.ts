@@ -20,6 +20,8 @@ const LINE_TYPES = new Set([
   'friend_accept', 'friend_accepted',
   'new_post',
   'review_response_posted',
+  // Mentions v2 — canonical 'mention' type sits in the same tier as comments.
+  'mention',
 ]);
 
 const REVIEW_TYPES = new Set([
