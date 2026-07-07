@@ -35,7 +35,6 @@ function PlayerHead({ size = 42, src }: { size?: number; src?: string | null }) 
     <SquircleAvatar
       src={src ?? undefined}
       size={size}
-      hideRing
       hairlineRing
       ringColor={GOLD}
     />
