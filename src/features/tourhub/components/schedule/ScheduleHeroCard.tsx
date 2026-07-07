@@ -238,6 +238,7 @@ export function ScheduleHeroCard({ tournament, type, leaderWinner, currentIndex 
                     row={row}
                     tourCode={tournament.tour_code}
                     onPlayerTap={handlePlayerTap}
+                    ringColor={LIGHT_HAIRLINE}
                   />
                 ))}
               </div>
