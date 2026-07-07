@@ -439,8 +439,11 @@ const FullscreenVideoSlot: React.FC<{
  * runs a two-phase FLIP:
  *   Phase 1 (300ms): wrapper animates origin rect → fullscreen rect while
  *     object-fit stays 'cover' (pure translate/scale, no distortion).
- *   Phase 2 (120ms): onTransitionEnd flip object-fit to 'contain' and fade
- *     a black underlay in so letterbox bars appear rather than snap.
+ *   Phase 2 (200ms): onTransitionEnd starts a longer black-underlay crossfade;
+ *     at the fade MIDPOINT (~100ms in) we flip object-fit to 'contain' so
+ *     the aspect change reads as part of the fade rather than a discrete pop.
+ *     Skipped entirely when the video aspect matches the viewport aspect
+ *     (within 2%) — nothing to letterbox, nothing to fade.
  *
  * onFirstFrameReady fires on the next rAF after mount — the element was
  * already painting in the tile.
@@ -457,7 +460,12 @@ const BorrowedFullscreenSlot: React.FC<{
 }> = ({ borrow, originRect, posterSrc, onFirstFrameReady }) => {
   const wrapperRef = React.useRef<HTMLDivElement>(null);
   const [expanded, setExpanded] = React.useState(false);
+  // Underlay fade & fit-swap are decoupled so the aspect change lands at the
+  // fade midpoint (invisible under 50% black) rather than at the leading edge
+  // where it reads as a pop.
+  const [underlayVisible, setUnderlayVisible] = React.useState(false);
   const [fitContain, setFitContain] = React.useState(false);
+  const skipFitSwapRef = React.useRef<boolean>(false);
   const targetRectRef = React.useRef<{ top: number; left: number; width: number; height: number } | null>(null);
 
   // Mount the live element on first render.
@@ -509,21 +517,38 @@ const BorrowedFullscreenSlot: React.FC<{
   const handleTransitionEnd = React.useCallback((e: React.TransitionEvent<HTMLDivElement>) => {
     // Only respond to the wrapper's own size/transform transitions.
     if (e.target !== wrapperRef.current) return;
-    if (fitContain) return;
+    if (underlayVisible) return;
     // [VPERF] motion trace: phase-1 (expand) done, phase-2 (fit swap) begins.
     try { vperfMotionMark('expandEnd'); vperfMotionMark('fitSwapStart'); } catch {}
-    setFitContain(true);
-    try { VideoEngine.setObjectFit(borrow.laneId, 'contain'); } catch {}
-    // Cold rail lanes were configured with capLevelToPlayerSize against the
-    // tile's small rect. Now that the wrapper fills the viewport, nudge
-    // hls.js to re-evaluate the cap so it upshifts to a viewport-appropriate
-    // level (session summary levelSwitches counter climbs after this).
-    try { VideoEngine.nudgeLevelCap(borrow.laneId); } catch {}
-    // Fade completes ~120ms after fit swap; mark end on the next paintable frame.
-    requestAnimationFrame(() => {
-      setTimeout(() => { try { vperfMotionMark('fitSwapEnd'); } catch {} }, 130);
-    });
-  }, [fitContain, borrow.laneId]);
+
+    // Aspect-match skip: if the video is already viewport-shaped (within 2%)
+    // there is nothing to letterbox and no fade is needed. Leave object-fit
+    // on 'cover' and skip both the underlay fade and the contain swap.
+    const videoAspect = VideoEngine.getLaneAspect(borrow.laneId);
+    const viewportAspect = window.innerWidth / window.innerHeight;
+    if (videoAspect && Math.abs(videoAspect - viewportAspect) / viewportAspect < 0.02) {
+      skipFitSwapRef.current = true;
+      try { VideoEngine.nudgeLevelCap(borrow.laneId); } catch {}
+      try { vperfMotionMark('fitSwapEnd'); } catch {}
+      return;
+    }
+
+    // Start the underlay crossfade (200ms). Fit swap lands at the midpoint
+    // (~100ms in) so the aspect change is invisible under ~50% black.
+    setUnderlayVisible(true);
+    const midpointT = setTimeout(() => {
+      setFitContain(true);
+      try { VideoEngine.setObjectFit(borrow.laneId, 'contain'); } catch {}
+      // Cold rail lanes were configured with capLevelToPlayerSize against the
+      // tile's small rect. Now that the wrapper fills the viewport, nudge
+      // hls.js to re-evaluate the cap so it upshifts to a viewport-appropriate
+      // level (session summary levelSwitches counter climbs after this).
+      try { VideoEngine.nudgeLevelCap(borrow.laneId); } catch {}
+    }, 100);
+    // Fade completes ~200ms after underlay reveal begins.
+    const endT = setTimeout(() => { try { vperfMotionMark('fitSwapEnd'); } catch {} }, 210);
+    (window as any).__borrow_fit_timers = [midpointT, endT];
+  }, [underlayVisible, borrow.laneId]);
 
   const target = targetRectRef.current;
   const style: React.CSSProperties = {
