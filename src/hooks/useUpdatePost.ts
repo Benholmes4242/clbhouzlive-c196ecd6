@@ -9,6 +9,7 @@ import { useState } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
+import { syncMentionsForContent } from '@/lib/mentions/syncMentions';
 
 export type UpdatePostVisibility = 'anyone' | 'followers' | 'private';
 
