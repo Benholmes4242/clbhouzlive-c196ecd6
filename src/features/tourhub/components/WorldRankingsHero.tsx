@@ -474,6 +474,7 @@ function ChaserRow({
         photoUrl={entry.player.photo_url}
         tourCode={tourCode}
         size="md"
+        ringColor={LIGHT_HAIRLINE}
       />
 
 
