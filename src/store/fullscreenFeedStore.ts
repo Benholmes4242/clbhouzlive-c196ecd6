@@ -175,6 +175,8 @@ export const useFullscreenFeedStore = create<FullscreenFeedState>((set, get) => 
   openedFrom: null,
   borrow: null,
   borrowDemoteRequested: false,
+  closeAnim: 'idle',
+  closeAnimDone: false,
 
   open: (posts, startIndex = 0, options) => {
     set({
