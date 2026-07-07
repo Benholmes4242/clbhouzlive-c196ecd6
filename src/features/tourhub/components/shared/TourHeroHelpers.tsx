@@ -120,6 +120,7 @@ export function PlayerAvatar({
   tourCode,
   size = 44,
   frosted = false,
+  ringColor = DARK_HAIRLINE,
 }: {
   photoUrl?: string | null;
   pgaTourId?: string | null;
@@ -133,6 +134,9 @@ export function PlayerAvatar({
   size?: number;
   /** Use frosted glass styling (translucent bg + border) — for glass card contexts */
   frosted?: boolean;
+  /** Traced 1px hairline colour. Default DARK_HAIRLINE (white @ 22%) for dark
+   *  hero backdrops. Pass LIGHT_HAIRLINE for light card surfaces. */
+  ringColor?: string;
 }) {
   const nameForLookup = headshotOverride || fullName || displayName;
   const candidates = resolvePlayerAvatarCandidates({
@@ -161,6 +165,7 @@ export function PlayerAvatar({
           alt={displayName}
           userId={nameForLookup}
           hairlineRing
+          ringColor={ringColor}
         />
       </div>
     );
@@ -173,6 +178,7 @@ export function PlayerAvatar({
       alt={displayName}
       userId={nameForLookup}
       hairlineRing
+      ringColor={ringColor}
     />
   );
 }
