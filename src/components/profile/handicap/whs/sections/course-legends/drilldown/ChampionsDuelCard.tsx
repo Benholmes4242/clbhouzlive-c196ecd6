@@ -34,6 +34,8 @@ interface ChampionsDuelCardProps {
     sub: string;
     chaseLine?: string;
   } | null;
+  /** Backdrop theme for the embedded rows/avatars. Default 'dark'. */
+  theme?: 'light' | 'dark';
 }
 
 const INK = 'var(--hcp-t-100)';
