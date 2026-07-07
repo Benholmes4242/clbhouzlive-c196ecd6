@@ -14,6 +14,7 @@ import {
   isPrivateActor,
   isIncompleteProfile,
 } from './rows/rowHelpers';
+import { stripMentionMarkup } from '@/lib/mentions/format';
 
 interface FeaturedNotificationCardProps {
   notification: ActivityNotification;
