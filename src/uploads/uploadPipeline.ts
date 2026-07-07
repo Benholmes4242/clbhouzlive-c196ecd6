@@ -1685,28 +1685,7 @@ async function processReviewJob(jobId: string, job: any): Promise<void> {
       }
     }
     
-    // Handle review tags - always delete existing first to prevent duplicates
-    if (reviewData.selectedTags && reviewData.selectedTags.length > 0) {
-      try {
-        // ALWAYS delete existing tags first (handles both new and update cases)
-        // This prevents duplicate constraint errors when re-reviewing
-        await supabase.from('review_tags').delete().eq('review_id', ratingId);
-        
-        const tagRecords = reviewData.selectedTags.map((tag: any) => ({
-          review_id: ratingId,
-          tagged_entity_id: tag.id,
-          start_index: tag.start_index ?? null,
-          end_index: tag.end_index ?? null,
-        }));
-        
-        const { error: tagError } = await supabase.from('review_tags').insert(tagRecords);
-        if (tagError) {
-          console.error('[uploadPipeline] Failed to save review tags:', tagError);
-        }
-      } catch (tagError) {
-        console.warn('[uploadPipeline] Tag handling error (non-fatal):', tagError);
-      }
-    }
+    // Review tags (user/business mentions on reviews) were nuked — no-op.
     
     // Phase C: Complete
     uploadManager.updateStatus(jobId, 'finalizing');
