@@ -78,13 +78,28 @@ function selectLifetime(
   items: Extract<TrophyItem, { kind: 'achievement' }>[],
 ): Extract<TrophyItem, { kind: 'achievement' }>[] {
   const showpieces = items.filter((a) => isShowpiece(a.badgeId));
+  // Material desc (obsidian>diamond>emerald>silver>bronze), then progress-to-next
+  // desc, then alpha. Locked (reachedTier 0 && no value) drop to the tail.
   showpieces.sort((a, b) => {
-    const aIdx = LIFETIME_ORDER.indexOf(a.badgeId);
-    const bIdx = LIFETIME_ORDER.indexOf(b.badgeId);
-    if (aIdx === -1 && bIdx === -1) return 0;
-    if (aIdx === -1) return 1;
-    if (bIdx === -1) return -1;
-    return aIdx - bIdx;
+    const aLocked = !a.earned && (a.currentValue ?? 0) === 0;
+    const bLocked = !b.earned && (b.currentValue ?? 0) === 0;
+    if (aLocked !== bLocked) return aLocked ? 1 : -1;
+    const am = a.reachedTier || 0;
+    const bm = b.reachedTier || 0;
+    if (am !== bm) return bm - am;
+    const progFrac = (x: Extract<TrophyItem, { kind: 'achievement' }>) => {
+      const total = x.tiers.length;
+      if (!total || x.reachedTier >= total) return -1;
+      const prev = x.reachedTier > 0 ? x.tiers[x.reachedTier - 1].threshold : 0;
+      const next = x.tiers[x.reachedTier].threshold;
+      const denom = next - prev;
+      if (denom <= 0) return 0;
+      return Math.max(0, Math.min(1, ((x.currentValue ?? 0) - prev) / denom));
+    };
+    const ap = progFrac(a);
+    const bp = progFrac(b);
+    if (ap !== bp) return bp - ap;
+    return a.name.localeCompare(b.name);
   });
   return showpieces;
 }
