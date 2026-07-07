@@ -404,6 +404,8 @@ export const CourseLegendsDrilldown: React.FC<Props> = ({ selection, hideHeader 
               isSelf: r.isSelf,
               gapToChampion: r.rank === champion.rank ? null : formatGapFromChampion(cat, r.value, champion.value),
               userId: r.userId,
+              rank30d: r.rank30d,
+              delta: r.delta,
             }));
             return (
               <div key={cat} data-category={cat}>
