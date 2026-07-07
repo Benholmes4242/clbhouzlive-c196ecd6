@@ -183,6 +183,7 @@ export function FranchiseCard({
             imageScale={0.78}
             imageBg="#FFFFFF"
             paletteSeed={slug}
+            ringColor={LIGHT_HAIRLINE}
           />
 
 
