@@ -156,6 +156,21 @@ export const ChampionsListRow: React.FC<ChampionsListRowProps> = ({
     >
       {rank === 1 ? (
         <div style={{ display: 'flex', justifyContent: 'flex-end', alignItems: 'center', lineHeight: 0 }} aria-label="Champion">
+  return (
+    <div
+      style={{
+        position: 'relative',
+        display: 'grid',
+        gridTemplateColumns: compact ? CHAMPS_GRID_COMPACT : CHAMPS_GRID_FULL,
+        gap: compact ? CHAMPS_GRID_GAP_COMPACT : CHAMPS_GRID_GAP_FULL,
+        alignItems: 'center',
+        padding: `${padY} ${CHAMPS_ROW_PADDING_X}px`,
+        background: rowBg,
+        boxShadow: `inset 0 -0.5px 0 ${dividerColor}`,
+      }}
+    >
+      {rank === 1 ? (
+        <div style={{ display: 'flex', justifyContent: 'flex-end', alignItems: 'center', lineHeight: 0 }} aria-label="Champion">
           <Crown size={15} strokeWidth={2.5} fill={GAM.GOLD} style={{ color: GAM.DEEP_AMBER, flexShrink: 0 }} />
         </div>
       ) : (
@@ -222,8 +237,13 @@ export const ChampionsListRow: React.FC<ChampionsListRowProps> = ({
         </div>
       </div>
 
-      <div style={{ textAlign: 'right', flexShrink: 0, display: 'flex', alignItems: 'center', gap: 10, justifyContent: 'flex-end' }}>
+      {/* 30D column — fixed width, centered */}
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
         <MovementCell delta={delta} rank30d={rank30d} theme={theme} size={compact ? 'chip' : 'row'} />
+      </div>
+
+      {/* SCORE column — fixed width, centered */}
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
         <span
           style={{
             fontFamily: GAM.FONT_GEIST,
