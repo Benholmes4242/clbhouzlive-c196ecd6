@@ -110,6 +110,15 @@ export function openWithOrigin({
   const origin = snapshotOrigin(originEl, posterUrl ?? null);
   const postId = (posts[index] as any)?.id ?? null;
 
+  // [VPERF] S1 fs.open — captured at tap. Kind budget picked once source is
+  // known (borrow vs lane). Phases: storeOpen → slotMount → firstFrame → playing.
+  const fsOpenSpanId = vperfNextId(`fs.open:${postId ?? 'unknown'}`);
+  vperfStart(fsOpenSpanId, 'fs.open', {
+    surface: openedFrom,
+    postId,
+    // budgetMs set below once borrow decision is known.
+  });
+
 
 
   // ── Stage-7 PR-1: borrow decision ──
