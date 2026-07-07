@@ -448,7 +448,17 @@ const LightFeedCardImpl: React.FC<LightFeedCardProps> = ({
             mountVideo={mountVideo}
             postId={post.id}
             onIndexChange={(idx) => onCarouselIndexChange?.(post, idx)}
-            onOpen={(idx, mediaId) => onOpenMedia(post, idx, undefined, mediaId)}
+            onOpen={(idx, mediaId, originEl, ownerKey) => {
+              const slide = items[idx];
+              const posterUrl = slide?.thumbnailUrl ?? (slide as any)?.imageUrl ?? null;
+              onOpenMedia(
+                post,
+                idx,
+                originEl ? { el: originEl, posterUrl } : undefined,
+                mediaId,
+                ownerKey ?? null,
+              );
+            }}
           />
 
         ) : media ? (
