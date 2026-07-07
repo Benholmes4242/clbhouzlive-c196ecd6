@@ -119,10 +119,6 @@ function UnifiedWatchFeedInner({ embedded = false }: UnifiedWatchFeedProps) {
         <div style={{ paddingTop: 0, paddingBottom: 2, marginTop: -6 }}>
           <WatchMoodChips active={mood} onChange={setMood} />
         </div>
-        <WatchAutoplay
-          posts={posts}
-          gridRef={gridRef as React.RefObject<HTMLDivElement>}
-        />
         <WatchGrid
           onFirstRowDecoded={handleFirstRowDecoded}
           posts={posts}
