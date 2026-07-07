@@ -27,13 +27,22 @@ const T = {
 const AMBER = '#F7931E';
 
 // ─── rgba helper ────────────────────────────────────────────────────────
-export function rgbaOf(hex: string, a: number): string {
-  if (!hex || !hex.startsWith('#')) return hex;
-  const h = hex.replace('#', '');
-  const r = parseInt(h.slice(0, 2), 16);
-  const g = parseInt(h.slice(2, 4), 16);
-  const b = parseInt(h.slice(4, 6), 16);
-  return `rgba(${r}, ${g}, ${b}, ${a})`;
+// Accepts '#RRGGBB' or 'rgb[a](r,g,b[,a])'. Applying a new alpha to an
+// rgba() input REPLACES its alpha — this prevents high-alpha palette
+// entries (e.g. common='rgba(148,163,184,0.6)') from leaking as a solid
+// light slab when passed through a "wash" stop.
+export function rgbaOf(input: string, a: number): string {
+  if (!input) return input;
+  if (input.startsWith('#')) {
+    const h = input.replace('#', '');
+    const r = parseInt(h.slice(0, 2), 16);
+    const g = parseInt(h.slice(2, 4), 16);
+    const b = parseInt(h.slice(4, 6), 16);
+    return `rgba(${r}, ${g}, ${b}, ${a})`;
+  }
+  const m = input.match(/rgba?\(\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)/i);
+  if (m) return `rgba(${m[1]}, ${m[2]}, ${m[3]}, ${a})`;
+  return input;
 }
 
 interface Props {
@@ -41,10 +50,18 @@ interface Props {
   onTap: (item: TrophyItem) => void;
 }
 
-// Rarity color for an achievement (falls back to amber).
+// Slate accent used for common / unmapped rarities so earned cards still
+// read as EARNED (never identical to #20242E locked ghosts).
+const SLATE_ACCENT = '#F2F4F7';
+
+// Rarity color for an achievement (falls back to slate for common /
+// unmapped, so tint stops render as a subtle wash rather than a slab).
 function achievementColor(item: TrophyItem): string {
   if (item.kind === 'achievement') {
-    return rarityColor[item.rarity] || AMBER;
+    if (item.rarity === 'common') return SLATE_ACCENT;
+    const c = rarityColor[item.rarity];
+    if (!c || !c.startsWith('#')) return SLATE_ACCENT;
+    return c;
   }
   return AMBER;
 }
