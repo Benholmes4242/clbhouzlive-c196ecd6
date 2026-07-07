@@ -3,6 +3,7 @@ import { useEffect, useRef } from 'react';
 declare global {
   interface Window {
     median_library_ready?: () => void;
+    gonative_library_ready?: () => void;
   }
 }
 
@@ -19,6 +20,31 @@ export let currentShieldColor = '#000000';
 // retries are pure overhead that cause a visible ~250ms repaint after every
 // SPA navigation, so we skip them.
 let medianLibraryReady = false;
+
+function getNativeBridge(): any | null {
+  if (typeof window === 'undefined') return null;
+  const w = window as any;
+  return w.median || w.gonative || w.gonern || null;
+}
+
+function isNativeStatusBarShell(): boolean {
+  if (typeof window === 'undefined' || typeof navigator === 'undefined') return false;
+  const ua = (navigator.userAgent || '').toLowerCase();
+  return Boolean(getNativeBridge()) || /medianapp|gonativeapp|median|gonative/.test(ua);
+}
+
+let overlayRetryTimer: ReturnType<typeof setTimeout> | null = null;
+let overlayRetryCount = 0;
+
+function scheduleOverlayBootRetry(): void {
+  if (statusBarOverlayBooted || overlayRetryTimer || !isNativeStatusBarShell()) return;
+  if (overlayRetryCount >= 16) return;
+  overlayRetryTimer = setTimeout(() => {
+    overlayRetryTimer = null;
+    overlayRetryCount += 1;
+    ensureStatusBarOverlayBooted();
+  }, overlayRetryCount < 4 ? 125 : 500);
+}
 
 export function applyShieldColor(color: string) {
   currentShieldColor = color;
@@ -80,25 +106,36 @@ let statusBarOverlayBooted = false;
 export function ensureStatusBarOverlayBooted(): void {
   if (statusBarOverlayBooted) return;
   if (typeof window === 'undefined') return;
-  if (!navigator.userAgent.toLowerCase().includes('median')) {
+
+  // Native shell detection must match the rest of the app: Median iOS builds
+  // can identify as GoNative and/or expose the bridge before the UA contains
+  // "median". The previous `ua.includes('median')` gate marked overlay as
+  // booted on GoNative shells without ever sending `overlay:true`, leaving the
+  // WebView inset below the native grey/white status bar on immersive pages.
+  if (!isNativeStatusBarShell()) {
     statusBarOverlayBooted = true;
     return;
   }
+
   try {
     // style/color here are throwaway — they get overwritten immediately by
     // the first route/overlay setStyleColor call. What matters is overlay:true.
-    if (window.median?.statusbar?.set) {
-      window.median.statusbar.set({
+    const bridge = getNativeBridge();
+    if (bridge?.statusbar?.set) {
+      bridge.statusbar.set({
         style: 'light',
         color: '00000000',
         overlay: true,
         blur: false,
       });
       statusBarOverlayBooted = true;
+      overlayRetryCount = 0;
     }
   } catch {
     // Bridge not ready — the ready callback below retries.
   }
+
+  if (!statusBarOverlayBooted) scheduleOverlayBootRetry();
 }
 
 /**
@@ -108,11 +145,12 @@ export function ensureStatusBarOverlayBooted(): void {
  */
 export function setStatusBarStyleColor(intent: 'light' | 'dark' | 'auto', hexColor: string): void {
   if (typeof window === 'undefined') return;
-  if (!navigator.userAgent.toLowerCase().includes('median')) return;
+  if (!isNativeStatusBarShell()) return;
   try {
-    if (window.median?.statusbar?.set) {
+    const bridge = getNativeBridge();
+    if (bridge?.statusbar?.set) {
       // Deliberately omit `overlay`/`blur` — boot-locked, must not be re-sent.
-      (window.median.statusbar.set as (opts: Record<string, unknown>) => void)({
+      (bridge.statusbar.set as (opts: Record<string, unknown>) => void)({
         style: toMedianStyle(intent),
         color: toAARRGGBB(hexColor),
       });
@@ -128,6 +166,11 @@ if (typeof window !== 'undefined') {
   const prev = window.median_library_ready;
   window.median_library_ready = () => {
     if (typeof prev === 'function') prev();
+    ensureStatusBarOverlayBooted();
+  };
+  const prevGoNative = window.gonative_library_ready;
+  window.gonative_library_ready = () => {
+    if (typeof prevGoNative === 'function') prevGoNative();
     ensureStatusBarOverlayBooted();
   };
 }

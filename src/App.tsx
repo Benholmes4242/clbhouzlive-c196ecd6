@@ -164,7 +164,7 @@ function usePreviewBypass(): boolean {
 function detectIsMedianAppSync(): boolean {
   try {
     const w = window as any;
-    if (w.median || w.gonern) return true;
+    if (w.median || w.gonative || w.gonern) return true;
     const ua = (navigator.userAgent || '').toLowerCase();
     return /medianapp|gonativeapp|median|gonative/.test(ua);
   } catch {
