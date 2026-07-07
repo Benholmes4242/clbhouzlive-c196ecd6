@@ -28,6 +28,7 @@ import {
 import { isPerfEnabled } from '@/perf/navTiming';
 import {
   vperfLaneEvent,
+  vperfArmLane,
   vperfSessionStart,
   vperfSessionEnd,
   vperfSessionLevel,
