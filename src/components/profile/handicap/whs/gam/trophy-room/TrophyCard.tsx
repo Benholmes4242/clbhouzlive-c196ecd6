@@ -10,6 +10,12 @@ import {
   SHOWPIECE_LOCKED_HINT,
   shortenShowpieceCaption,
 } from './_shared/showpieces';
+import {
+  MATERIAL_PALETTES,
+  FORGE_GOLD,
+  materialNameForTier,
+  paletteForShowpiece,
+} from './_shared/rarityPalette';
 
 // ─── Tokens (hardcoded — sheet portal, no var(--hcp-*)) ─────────────────
 const T = {
