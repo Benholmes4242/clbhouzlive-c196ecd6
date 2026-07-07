@@ -498,6 +498,7 @@ export const ChampionsDuelCard: React.FC<ChampionsDuelCardProps> = ({
               gapToChampion={row.gapToChampion}
               holdDuration={null}
               compact
+              theme={theme}
             />
           ))
         )}
