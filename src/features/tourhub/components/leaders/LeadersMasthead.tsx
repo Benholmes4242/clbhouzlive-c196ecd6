@@ -273,6 +273,8 @@ export function LeadersMasthead({
             <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
               {/* Photo + "1" badge */}
               <div style={{ position: 'relative', flexShrink: 0 }}>
+                {/* Leader frame: semantic gold ring -- canon exception, no
+                    hairline underneath. */}
                 <div
                   style={{
                     width: 80,
@@ -288,7 +290,6 @@ export function LeadersMasthead({
                     srcCandidates={avatarCandidates}
                     alt={leader.player.full_name}
                     userId={leader.player.id}
-                    hairlineRing ringColor={LIGHT_HAIRLINE}
                   />
                 </div>
                 <div
