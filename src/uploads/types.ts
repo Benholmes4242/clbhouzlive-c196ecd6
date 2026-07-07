@@ -72,7 +72,6 @@ export interface UploadJob {
     country: string;
   } | null;
   courseIds?: string[]; // Multi-course support for junction table
-  selectedTags?: any[];
   mediaItems?: Array<{ 
     id: string; 
     file?: File; 
@@ -130,7 +129,6 @@ export interface ReviewDataPayload {
   reviewText?: string;
   playedAt?: string;
   isPrivate?: boolean;
-  selectedTags?: any[];
   coverMediaId?: string | null;
 }
 
@@ -152,7 +150,6 @@ export interface UploadJobInput {
     country: string;
   } | null;
   courseIds?: string[]; // Multi-course support for junction table
-  selectedTags?: any[];
   files: File[];
   mediaItems?: Array<{ 
     id: string; 
