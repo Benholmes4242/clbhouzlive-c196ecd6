@@ -485,7 +485,7 @@ export function FullscreenFeedOverlay() {
                   style={{
                     position: 'absolute',
                     inset: 0,
-                    opacity: origin && !firstFrameReady ? 0 : 1,
+                    opacity: origin && !readyToHandoff ? 0 : 1,
                     transition: 'opacity 120ms linear',
                   }}
                 >
