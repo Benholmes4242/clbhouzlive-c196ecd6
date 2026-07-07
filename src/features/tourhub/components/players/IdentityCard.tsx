@@ -14,6 +14,7 @@ import { cn } from '@/lib/utils';
 import type { TourPlayer, TourPlayerStatistics } from '../../hooks/useTourHubData';
 import type { CollegeMedia } from '../../hooks/useCollegeMedia';
 import { PlayerAvatar } from '../PlayerAvatar';
+import { LIGHT_HAIRLINE } from '@/components/ui/SquircleAvatar';
 
 interface IdentityCardProps {
   player: TourPlayer;
