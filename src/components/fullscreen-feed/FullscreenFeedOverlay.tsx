@@ -427,6 +427,7 @@ export function FullscreenFeedOverlay() {
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.18 }}
+            data-vperf="fs-overlay"
             className="fixed inset-0 z-[200] bg-black flex flex-col"
           >
             {/* Close button is now part of the FeedOverlayLayer top action bar (left chevron). */}
