@@ -1004,14 +1004,7 @@ async function processPostJob(jobId: string, job: any): Promise<void> {
 async function finalizePost(jobId: string, postId: string, job: any, uploadedStreamUids: string[]): Promise<void> {
   uploadManager.updateStatus(jobId, 'finalizing', postId);
 
-  // Handle tags
-  if (job.selectedTags && job.selectedTags.length > 0) {
-    try {
-      await handlePostTags(postId, job.selectedTags, job.userId, job.caption || '');
-    } catch (tagError) {
-      console.warn(`[uploadPipeline] Tag handling error (non-fatal):`, tagError);
-    }
-  }
+  // Post tags (user/business mentions) were nuked — no-op.
 
   // Course info is already linked via posts.course_id — we no longer mutate
   // posts.content to append "📍 Played at ...". Embedding the course name in
