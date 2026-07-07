@@ -78,7 +78,7 @@ function FeaturedPlayerCard({ player, stats, highlight, className }: FeaturedPla
           })}
           alt={player.full_name}
           userId={player.id}
-          hideRing
+          hairlineRing ringColor={LIGHT_HAIRLINE}
         />
       </div>
 
