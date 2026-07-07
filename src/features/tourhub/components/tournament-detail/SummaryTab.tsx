@@ -247,7 +247,7 @@ export function SummaryTab({
               style={{ display: 'flex', alignItems: 'center', gap: '10px', padding: '12px 20px 16px', background: SLATE_50, borderTop: `0.5px solid ${INK_TINT_07}`, borderBottom: `1px solid ${INK_TINT_07}`, textDecoration: 'none' }}
               className="active:bg-black/[0.02] transition-colors"
             >
-              <BatchPlayerAvatar playerId={best.playerId} playerName={best.name} size="sm" />
+              <BatchPlayerAvatar playerId={best.playerId} playerName={best.name} size="sm" ringColor={LIGHT_HAIRLINE} />
               <div style={{ flex: 1, minWidth: 0 }}>
                 <div style={{ fontSize: '15px', fontWeight: 700, color: INK, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' as const }}>{best.name}</div>
                 <div style={{ fontSize: '11px', fontWeight: 600, color: INK_MUTE, marginTop: '2px' }}>Round {best.round}</div>
