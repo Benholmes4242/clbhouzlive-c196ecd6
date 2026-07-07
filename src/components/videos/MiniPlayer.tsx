@@ -39,7 +39,7 @@ export const MiniPlayer: React.FC = () => {
   const activeVideoId = context?.activeVideoId;
   const isMiniOpen = context?.isMiniOpen ?? false;
 
-  const { queueLength } = useVideoQueue();
+  // Queue drawer removed (PR-5); MiniPlayer is Continue Watching only.
 
   useEffect(() => {
     if (!activeVideoId || !isMiniOpen) {
