@@ -68,7 +68,7 @@ function ClipOfTheWeekHeroInner() {
     isFollowedByMe: false,
     courseName: pick.course_name ?? undefined,
     courseId: pick.course_id ?? undefined,
-    tags: (pick as any).post_tags ?? [],
+    tags: [],
   } as any);
 
   const handleTap = () => {

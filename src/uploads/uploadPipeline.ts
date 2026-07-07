@@ -12,7 +12,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { uploadManager } from './UploadManager';
 import { uploadEventBus } from './uploadEventBus';
 import { createPost } from '@/services/posts/createPost';
-import { handlePostTags } from '@/hooks/usePostSubmission/uploadUtils';
+
 import { pollStreamMetadata, updatePostMediaMetadata } from '@/utils/pollStreamMetadata';
 import { queueImageProcessing } from '@/services/imageProcessing';
 import { toast } from 'sonner';
@@ -1004,14 +1004,7 @@ async function processPostJob(jobId: string, job: any): Promise<void> {
 async function finalizePost(jobId: string, postId: string, job: any, uploadedStreamUids: string[]): Promise<void> {
   uploadManager.updateStatus(jobId, 'finalizing', postId);
 
-  // Handle tags
-  if (job.selectedTags && job.selectedTags.length > 0) {
-    try {
-      await handlePostTags(postId, job.selectedTags, job.userId, job.caption || '');
-    } catch (tagError) {
-      console.warn(`[uploadPipeline] Tag handling error (non-fatal):`, tagError);
-    }
-  }
+  // Post tags (user/business mentions) were nuked — no-op.
 
   // Course info is already linked via posts.course_id — we no longer mutate
   // posts.content to append "📍 Played at ...". Embedding the course name in
@@ -1692,28 +1685,7 @@ async function processReviewJob(jobId: string, job: any): Promise<void> {
       }
     }
     
-    // Handle review tags - always delete existing first to prevent duplicates
-    if (reviewData.selectedTags && reviewData.selectedTags.length > 0) {
-      try {
-        // ALWAYS delete existing tags first (handles both new and update cases)
-        // This prevents duplicate constraint errors when re-reviewing
-        await supabase.from('review_tags').delete().eq('review_id', ratingId);
-        
-        const tagRecords = reviewData.selectedTags.map((tag: any) => ({
-          review_id: ratingId,
-          tagged_entity_id: tag.id,
-          start_index: tag.start_index ?? null,
-          end_index: tag.end_index ?? null,
-        }));
-        
-        const { error: tagError } = await supabase.from('review_tags').insert(tagRecords);
-        if (tagError) {
-          console.error('[uploadPipeline] Failed to save review tags:', tagError);
-        }
-      } catch (tagError) {
-        console.warn('[uploadPipeline] Tag handling error (non-fatal):', tagError);
-      }
-    }
+    // Review tags (user/business mentions on reviews) were nuked — no-op.
     
     // Phase C: Complete
     uploadManager.updateStatus(jobId, 'finalizing');

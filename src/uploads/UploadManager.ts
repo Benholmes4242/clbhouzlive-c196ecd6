@@ -32,7 +32,6 @@ class UploadManager {
       achievementId: input.achievementId,
       courseInfo: input.courseInfo,
       courseIds: input.courseIds,
-      selectedTags: input.selectedTags,
       files: input.files,
       mediaItems: input.mediaItems,
       studioEditsByMediaId: input.studioEditsByMediaId,

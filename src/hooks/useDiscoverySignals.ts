@@ -76,13 +76,7 @@ export function useDiscoverySignals(): UseDiscoverySignalsResult {
           last_position_seconds,
           duration_seconds,
           posts!inner(
-            user_id,
-            post_tags(
-              taggable_entities(
-                entity_type,
-                slug
-              )
-            )
+            user_id
           )
         `)
         .eq('user_id', user.id)
@@ -113,14 +107,8 @@ export function useDiscoverySignals(): UseDiscoverySignalsResult {
           creatorMap.set(creatorId, existing);
         }
 
-        // Track category preferences
-        const tags = (record.posts as any)?.post_tags || [];
-        for (const tag of tags) {
-          if (tag.taggable_entities?.entity_type === 'video_category') {
-            const slug = tag.taggable_entities.slug;
-            categoryCount.set(slug, (categoryCount.get(slug) || 0) + 1);
-          }
-        }
+        // Category preferences tracked via post_tags were removed with the
+        // mention/tag system nuke; video_category signals no longer sourced here.
       }
 
       // Sort creators by watch count, then by total watch time

@@ -20,7 +20,7 @@ import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { supabase } from '@/integrations/supabase/client';
 import { formatDistanceToNow } from 'date-fns';
 import { SquircleAvatar, LIGHT_HAIRLINE } from '@/components/ui/SquircleAvatar';
-import { MentionText } from '@/components/comments/MentionText';
+
 import { useActiveActor } from '@/context/ActiveActorContext';
 import { cn } from '@/lib/utils';
 
@@ -59,10 +59,6 @@ export const TopTenCardComments: React.FC<TopTenCardCommentsProps> = ({
   const [replyingTo, setReplyingTo] = useState<{ id: string; name: string } | null>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
 
-  // Mention autocomplete
-  const [mentionQuery, setMentionQuery] = useState<string | null>(null);
-  const [mentionResults, setMentionResults] = useState<{ id: string; username: string; display_name: string; avatar: string | null }[]>([]);
-
   const canInteract = privacySetting !== 'off' && !isOwnProfile && !!user;
   const totalReactions = Object.values(counts).reduce((a, b) => a + b, 0);
   const totalComments = comments.reduce((sum, c) => sum + 1 + (c.replies?.length ?? 0), 0);
@@ -77,45 +73,11 @@ export const TopTenCardComments: React.FC<TopTenCardCommentsProps> = ({
     if (!isOpen) {
       setDraft('');
       setReplyingTo(null);
-      setMentionQuery(null);
-      setMentionResults([]);
     }
   }, [isOpen]);
 
-  // Mention autocomplete query
-  useEffect(() => {
-    if (mentionQuery === null || mentionQuery.length < 1) {
-      setMentionResults([]);
-      return;
-    }
-    const search = async () => {
-      const { data } = await supabase
-        .from('user_profiles')
-        .select('id, username, display_name, profile_photo_url')
-        .ilike('username', `${mentionQuery}%`)
-        .limit(5);
-      setMentionResults((data ?? []).map((u: any) => ({
-        id: u.id,
-        username: u.username,
-        display_name: u.display_name,
-        avatar: u.profile_photo_url,
-      })));
-    };
-    search();
-  }, [mentionQuery]);
-
   const handleDraftChange = (val: string) => {
     setDraft(val);
-    const atMatch = val.match(/@(\w*)$/);
-    if (atMatch) setMentionQuery(atMatch[1]);
-    else { setMentionQuery(null); setMentionResults([]); }
-  };
-
-  const selectMention = (username: string) => {
-    setDraft(prev => prev.replace(/@\w*$/, `@${username} `));
-    setMentionQuery(null);
-    setMentionResults([]);
-    requestAnimationFrame(() => inputRef.current?.focus());
   };
 
   const handleSubmit = () => {
@@ -123,8 +85,6 @@ export const TopTenCardComments: React.FC<TopTenCardCommentsProps> = ({
     addComment({ body: draft, parentId: replyingTo?.id });
     setDraft('');
     setReplyingTo(null);
-    setMentionQuery(null);
-    setMentionResults([]);
   };
 
   // Group reactors by type for Reactions tab
@@ -156,11 +116,11 @@ export const TopTenCardComments: React.FC<TopTenCardCommentsProps> = ({
             {formatDistanceToNow(new Date(comment.created_at), { addSuffix: true })}
           </span>
         </div>
-        <MentionText
-          text={comment.body}
-          className={`${isReply ? 'text-xs' : 'text-sm'} mt-0.5 block`}
-          mentionClassName="font-semibold"
-        />
+        <span
+          className={`${isReply ? 'text-xs' : 'text-sm'} mt-0.5 block whitespace-pre-wrap`}
+        >
+          {comment.body}
+        </span>
         <div className="flex items-center gap-3 mt-1">
           {!isReply && canInteract && (
             <button
@@ -471,43 +431,6 @@ export const TopTenCardComments: React.FC<TopTenCardCommentsProps> = ({
                 hairlineRing ringColor={LIGHT_HAIRLINE}
               />
               <div className="flex-1 min-w-0 relative">
-                {/* Mention dropdown */}
-                {mentionResults.length > 0 && (
-                  <div
-                    style={{
-                      position: 'absolute', bottom: '100%', left: 0, right: 0, marginBottom: 6,
-                      borderRadius: 10, background: '#ffffff',
-                      border: `1px solid ${BORDER}`,
-                      boxShadow: '0 4px 16px rgba(0,0,0,0.08)',
-                      overflow: 'hidden', zIndex: 50,
-                    }}
-                  >
-                    {mentionResults.map(u => (
-                      <button
-                        key={u.id}
-                        type="button"
-                        onClick={() => selectMention(u.username)}
-                        className="w-full flex items-center gap-3 px-3 py-2 text-left transition-colors hover:bg-[rgba(15,23,42,0.04)] bg-transparent border-0 cursor-pointer"
-                      >
-                        <SquircleAvatar
-                          size={28}
-                          src={u.avatar}
-                          alt={u.display_name || u.username}
-                          fallback={u.display_name?.charAt(0)?.toUpperCase() || '?'}
-                          hairlineRing ringColor={LIGHT_HAIRLINE}
-                        />
-                        <div className="flex flex-col min-w-0">
-                          <span className="text-sm font-medium truncate" style={{ color: INK }}>
-                            {u.display_name}
-                          </span>
-                          <span className="text-xs truncate" style={{ color: INK_SUBTLE }}>
-                            @{u.username}
-                          </span>
-                        </div>
-                      </button>
-                    ))}
-                  </div>
-                )}
                 <div
                   style={{
                     display: 'flex', alignItems: 'flex-end', gap: 4,

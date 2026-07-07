@@ -22,7 +22,7 @@ import { toast } from 'sonner';
 import CommentsSheet from '@/components/comments/CommentsSheet';
 import { SquircleAvatar, LIGHT_HAIRLINE} from '@/components/ui/SquircleAvatar';
 import { LoopCardMenu } from './LoopCardMenu';
-import PostContentWithTags from '@/components/posts/PostContentWithTags';
+
 import { ExpandableCaption } from '@/components/posts/ExpandableCaption';
 import type { FriendCourseActivity } from '@/hooks/useFriendCourseActivity';
 import { useQueryClient } from '@tanstack/react-query';
@@ -400,10 +400,7 @@ export const LoopCard = React.memo(function LoopCard({
         {!post.isReview && cleanCaption && (
           <div className="px-4 pt-2 pb-0">
             <ExpandableCaption lines={2} className="text-[14px] text-foreground">
-              <PostContentWithTags
-                content={cleanCaption}
-                tags={post.tags || []}
-              />
+              <span style={{ whiteSpace: 'pre-wrap' }}>{cleanCaption}</span>
             </ExpandableCaption>
           </div>
         )}

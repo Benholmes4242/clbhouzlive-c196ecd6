@@ -14,13 +14,6 @@ export function getNotificationActionText(n: ActivityNotification): string {
         : 'commented on your post';
     case 'comment_reply':
       return 'replied to your comment';
-    case 'mention':
-    case 'mention_post':
-    case 'comment_mention':
-    case 'top_ten_mention':
-      return 'mentioned you';
-    case 'tag':
-      return 'tagged you';
     case 'follow':
       return 'started following you';
     case 'new_post':

@@ -35,7 +35,6 @@ export interface ReviewSubmitData {
   playedAt?: string;
   isPrivate?: boolean;
   files?: File[];
-  selectedTags?: any[];
   coverMediaId?: string | null;
 }
 
@@ -132,7 +131,6 @@ export function useReviewUpload(options: UseReviewUploadOptions) {
         reviewText: data.reviewText,
         playedAt: data.playedAt,
         isPrivate: data.isPrivate,
-        selectedTags: data.selectedTags,
         coverMediaId: data.coverMediaId ?? null,
       },
     });

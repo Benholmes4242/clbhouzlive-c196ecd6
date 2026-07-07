@@ -32,7 +32,7 @@ import { useShareReview } from '@/hooks/useShareReview';
 import { useActiveActor } from '@/context/ActiveActorContext';
 // Chrome owned solely by AppRoutes; no local status-bar imports.
 import { formatCourseLocation } from '@/utils/courseLocation';
-import { MentionBottomSheet, type MentionSuggestion } from '@/components/shared/media/MentionBottomSheet';
+
 import { useVoiceRecorder } from '@/hooks/useVoiceRecorder';
 import { transcribeAudio } from '@/lib/transcribeAudio';
 
@@ -378,45 +378,11 @@ export function ReviewWizard({
   }, [wizard.state.review]);
 
 
-  // Mentions
-  const [showMentions, setShowMentions] = useState(false);
-  const [mentionQuery, setMentionQuery] = useState('');
-  const [cursorPos, setCursorPos] = useState(0);
-
   const handleReviewChange = useCallback(
     (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-      const value = e.target.value;
-      const cursor = e.target.selectionStart || 0;
-      wizard.setReview(value.slice(0, MAX_REVIEW_LENGTH));
-      setCursorPos(cursor);
-      const before = value.slice(0, cursor);
-      const match = before.match(/@(\w*)$/);
-      if (match) {
-        setMentionQuery(match[1]);
-        setShowMentions(true);
-      } else {
-        setShowMentions(false);
-        setMentionQuery('');
-      }
+      wizard.setReview(e.target.value.slice(0, MAX_REVIEW_LENGTH));
     },
     [wizard]
-  );
-
-  const handleMentionSelect = useCallback(
-    (mention: MentionSuggestion) => {
-      const review = wizard.state.review;
-      const before = review.slice(0, cursorPos);
-      const after = review.slice(cursorPos);
-      const beforeMention = before.replace(/@\w*$/, '');
-      const display = mention.username || mention.name;
-      wizard.setReview(`${beforeMention}@${display} ${after}`);
-      setShowMentions(false);
-      setMentionQuery('');
-      if (!wizard.state.selectedTags.some((t) => t.id === mention.id)) {
-        wizard.setTags([...wizard.state.selectedTags, mention]);
-      }
-    },
-    [wizard, cursorPos]
   );
 
   /* ── Voice mic (record → Whisper) ────────────────────────────────────── */
@@ -1081,13 +1047,6 @@ export function ReviewWizard({
                     onDone={onEditorDone}
                   />
 
-                  {/* Mentions */}
-                  <MentionBottomSheet
-                    isOpen={showMentions}
-                    onClose={() => setShowMentions(false)}
-                    query={mentionQuery}
-                    onSelect={handleMentionSelect}
-                  />
                 </>
               )}
             </OverlayPortalProvider>

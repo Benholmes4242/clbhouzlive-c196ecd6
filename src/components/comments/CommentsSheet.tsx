@@ -29,7 +29,7 @@ import { useActiveActor } from '@/context/ActiveActorContext';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { SquircleAvatar, LIGHT_HAIRLINE } from '@/components/ui/SquircleAvatar';
 import { Pressable } from '@/components/ui/Pressable';
-import { MentionText } from '@/components/comments/MentionText';
+
 import { CommentingAsIndicator } from '@/components/comments/CommentingAsIndicator';
 import { relativeTime } from '@/utils/relativeTime';
 import { usePostLikes } from '@/hooks/usePostLikes';
@@ -163,8 +163,6 @@ function CommentsSheet({
   // Defer the comment-list render until AFTER the panel slide starts, so the O(N) commit
   // doesn't block framer-motion's first frame. Skeleton covers the slide window.
   const [listReady, setListReady] = useState(false);
-  const [mentionQuery, setMentionQuery] = useState<string | null>(null);
-  const [mentionResults, setMentionResults] = useState<{ id: string; username: string; display_name: string; avatar: string | null }[]>([]);
 
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
@@ -297,27 +295,6 @@ function CommentsSheet({
     }
   }, [inputText]);
 
-  // Mention autocomplete search
-  useEffect(() => {
-    if (!mentionQuery || mentionQuery.length < 1) {
-      setMentionResults([]);
-      return;
-    }
-    const search = async () => {
-      const { data } = await supabase
-        .from('user_profiles')
-        .select('id, username, display_name, profile_photo_url')
-        .ilike('username', `${mentionQuery}%`)
-        .limit(5);
-      setMentionResults((data ?? []).map((u: any) => ({
-        id: u.id,
-        username: u.username,
-        display_name: u.display_name,
-        avatar: u.profile_photo_url,
-      })));
-    };
-    search();
-  }, [mentionQuery]);
 
   // Infinite scroll sentinel
   useEffect(() => {
@@ -502,10 +479,9 @@ function CommentsSheet({
           </div>
 
           {/* Content */}
-          <MentionText
-            text={comment.content}
-            className="mt-1 text-[14px] leading-[20px] block text-foreground/90"
-          />
+          <span className="mt-1 text-[14px] leading-[20px] block text-foreground/90 whitespace-pre-wrap">
+            {comment.content}
+          </span>
 
           {/* Media */}
           {(comment as any).media_url && (comment as any).media_type === 'image' && (
@@ -866,11 +842,9 @@ function CommentsSheet({
                 <div className="flex-1 min-w-0">
                   {cleanCaption && (
                     <div style={{ color: INK_SOFT }}>
-                      <MentionText
-                        text={cleanCaption}
-                        className="text-[13px] leading-[18px] line-clamp-2"
-                        mentionClassName="font-semibold [color:#c97a10]"
-                      />
+                      <span className="text-[13px] leading-[18px] line-clamp-2 whitespace-pre-wrap">
+                        {cleanCaption}
+                      </span>
                     </div>
                   )}
                   {displayCourseName && (
@@ -1148,46 +1122,6 @@ function CommentsSheet({
                     hairlineRing ringColor={LIGHT_HAIRLINE}
                   />
                   <div className="flex-1 min-w-0 relative">
-                    {/* Mention autocomplete dropdown */}
-                    {mentionResults.length > 0 && (
-                      <div style={{
-                        position: 'absolute', bottom: '100%', left: 0, right: 0, marginBottom: 6,
-                        borderRadius: 10, background: '#ffffff',
-                        border: '1px solid rgba(15,23,42,0.07)',
-                        boxShadow: '0 4px 16px rgba(0,0,0,0.08)',
-                        overflow: 'hidden', zIndex: 215,
-                      }}>
-                        {mentionResults.map(u => (
-                          <button
-                            key={u.id}
-                            type="button"
-                            onClick={() => {
-                              setInputText(prev => prev.replace(/@\w*$/, `@${u.username} `));
-                              setMentionQuery(null);
-                              setMentionResults([]);
-                              textareaRef.current?.focus();
-                            }}
-                            className="w-full flex items-center gap-3 px-3 py-2 text-left transition-colors hover:bg-[rgba(15,23,42,0.04)]"
-                          >
-                            <SquircleAvatar
-                              size={28}
-                              src={u.avatar}
-                              alt={u.display_name || u.username}
-                              fallback={u.display_name?.charAt(0)?.toUpperCase() || '?'}
-                              hairlineRing ringColor={LIGHT_HAIRLINE}
-                            />
-                            <div className="flex flex-col min-w-0">
-                              <span className="text-sm font-medium truncate text-foreground">
-                                {u.display_name}
-                              </span>
-                              <span className="text-xs truncate text-muted-foreground">
-                                @{u.username}
-                              </span>
-                            </div>
-                          </button>
-                        ))}
-                      </div>
-                    )}
                     <div style={{
                       display: 'flex', alignItems: 'flex-end', gap: 4, borderRadius: 22, padding: '4px 6px 4px 14px',
                       background: '#ffffff',
@@ -1197,17 +1131,7 @@ function CommentsSheet({
                       <textarea
                         ref={textareaRef}
                         value={inputText}
-                        onChange={(e) => {
-                          const val = e.target.value;
-                          setInputText(val);
-                          const atMatch = val.match(/@(\w*)$/);
-                          if (atMatch) {
-                            setMentionQuery(atMatch[1]);
-                          } else {
-                            setMentionQuery(null);
-                            setMentionResults([]);
-                          }
-                        }}
+                        onChange={(e) => setInputText(e.target.value)}
                         onKeyDown={handleInputKeyDown}
                         placeholder={replyingTo ? `Reply to ${replyingTo.displayName}...` : 'Add a comment...'}
                         rows={1}

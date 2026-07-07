@@ -93,51 +93,6 @@ export function useTopTenComments(targetUserId: string, courseId: string) {
         .single();
       if (error) throw error;
 
-      // ── Mention extraction ──────────────────────────────────────
-      try {
-        const mentionMatches = body.match(/@([\w]+(?:\s[\w]+)*)/g) ?? [];
-        for (const match of mentionMatches) {
-          const username = match.slice(1).trim();
-          const { data: mentionedUser } = await supabase
-            .from('user_profiles')
-            .select('id, username')
-            .eq('username', username)
-            .single();
-          if (!mentionedUser) continue;
-          if (mentionedUser.id === user.id) continue;
-
-          // Store mention
-          await supabase.from('top_ten_comment_mentions' as any).insert({
-            comment_id: newComment.id,
-            mentioned_user_id: mentionedUser.id,
-            mentioned_username: username,
-          });
-
-          // Fire mention notification
-          const { data: commenterProfile } = await supabase
-            .from('user_profiles')
-            .select('display_name')
-            .eq('id', user.id)
-            .single();
-          const commenterName = commenterProfile?.display_name ?? 'Someone';
-
-          await supabase.from('notifications').insert({
-            user_id: mentionedUser.id,
-            recipient_actor_type: 'personal',
-            recipient_actor_id: mentionedUser.id,
-            actor_id: user.id,
-            type: 'top_ten_mention',
-            title: `${commenterName} mentioned you in a Top 10 comment`,
-            message: body.trim().length > 60 ? body.trim().slice(0, 60) + '…' : body.trim(),
-            entity_type: 'top_ten',
-            entity_id: courseId,
-            is_read: false,
-            data: { target_user_id: targetUserId },
-          });
-        }
-      } catch {
-        // Mention extraction is non-blocking
-      }
 
       // ── Reply notification ──────────────────────────────────────
       try {

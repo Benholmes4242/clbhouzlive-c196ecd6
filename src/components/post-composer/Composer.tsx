@@ -826,7 +826,7 @@ export function Composer({
             }
           : undefined,
         courseIds: taggedCourses.map((c) => c.courseId),
-        selectedTags: [],
+        
         visibility,
         scheduledAt,
         files: newFiles,

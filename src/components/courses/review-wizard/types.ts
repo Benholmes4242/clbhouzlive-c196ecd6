@@ -2,11 +2,6 @@
  * Review Wizard Types
  */
 
-import type { MentionSuggestion } from '@/components/shared/media/MentionBottomSheet';
-
-// Re-export for convenience
-export type ReviewTaggableEntity = MentionSuggestion;
-
 export interface ReviewWizardCourse {
   id: string;
   name: string;
@@ -66,7 +61,6 @@ export interface WizardState {
   review: string;
   media: ReviewMediaItem[];
   coverMediaId: string | null;
-  selectedTags: ReviewTaggableEntity[];
 }
 
 export interface ExistingRating {

@@ -114,35 +114,9 @@ Deno.serve(async (req: Request) => {
 
     await supabase.from('posts').update({ comment_count: totalComments ?? 0 }).eq('id', postId);
 
-    // --- Extract mentions ---
-    const mentionRegex = /@(\w+)/g;
-    let match;
-    const mentions: string[] = [];
-    while ((match = mentionRegex.exec(trimmed)) !== null) {
-      mentions.push(match[1].toLowerCase());
-    }
-
-    if (mentions.length > 0) {
-      const { data: taggedEntities } = await supabase
-        .from('taggable_entities')
-        .select('entity_id, entity_type, username')
-        .in('username', mentions);
-
-      if (taggedEntities?.length) {
-        const mentionInserts = taggedEntities.map(entity => ({
-          comment_id: comment.id,
-          mentioned_entity_id: entity.entity_id,
-          mentioned_entity_type: entity.entity_type,
-          mentioned_username: entity.username,
-        }));
-        await supabase.from('comment_mentions').insert(mentionInserts);
-      }
-    }
-
     return new Response(JSON.stringify({
       id: comment.id,
       created_at: comment.created_at,
-      mentions_found: mentions.length,
     }), {
       status: 201,
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },

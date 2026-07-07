@@ -20,7 +20,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { motion } from 'framer-motion';
 import { Z } from '@/config/zIndex';
-import PostContentWithTags from '@/components/posts/PostContentWithTags';
+
 import type { FeedPostTag } from '@/components/media-system/types/media';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { FROST, FROST_BLUR } from '@/lib/frostPanel';
@@ -279,12 +279,7 @@ export const BreathingRoomBottomBar: React.FC<BreathingRoomBottomBarProps> = ({
               displayText = lastSpace > 80 ? hardCut.slice(0, lastSpace) : hardCut;
             }
 
-            const displayTags = (tags ?? []).filter(
-              (t) => (t.end_index ?? 0) <= displayText.length,
-            );
-
-            // Plain div wrapper — no interactive nesting. Mentions inside
-            // PostContentWithTags receive their own click events directly.
+            // Plain-text caption (mention parsing has been removed).
             // The "more / less" toggle is a sibling button rendered only when long.
             return (
               <div
@@ -300,7 +295,7 @@ export const BreathingRoomBottomBar: React.FC<BreathingRoomBottomBarProps> = ({
                   wordBreak: 'break-word',
                 }}
               >
-                <PostContentWithTags content={displayText} tags={displayTags} />
+                <span style={{ whiteSpace: 'pre-wrap' }}>{displayText}</span>
                 {isLong && (
                   <>
                     {showFull ? ' ' : '… '}
