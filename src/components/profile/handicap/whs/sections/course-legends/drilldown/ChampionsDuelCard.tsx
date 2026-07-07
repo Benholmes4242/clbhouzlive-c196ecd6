@@ -340,14 +340,6 @@ export const ChampionsDuelCard: React.FC<ChampionsDuelCardProps> = ({
                 gap: 8,
               }}
             >
-              {champion && champion.delta != null && champion.delta !== 0 && (
-                <MovementCell
-                  delta={champion.delta}
-                  rank30d={champion.rank30d}
-                  theme={theme}
-                  size="chip"
-                />
-              )}
               <span
                 style={{
                   fontSize: 17,
@@ -360,6 +352,14 @@ export const ChampionsDuelCard: React.FC<ChampionsDuelCardProps> = ({
               >
                 {champion?.valueDisplay ?? '—'}
               </span>
+              {champion && champion.delta != null && champion.delta !== 0 && (
+                <MovementCell
+                  delta={champion.delta}
+                  rank30d={champion.rank30d}
+                  theme={theme}
+                  size="chip"
+                />
+              )}
             </span>
           </div>
         </div>
