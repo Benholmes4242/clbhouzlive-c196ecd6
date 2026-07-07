@@ -19494,6 +19494,13 @@ export type Database = {
           top_10_positions: number
         }[]
       }
+      get_user_mention_signals_30d: {
+        Args: { p_since: string; p_user_id: string }
+        Returns: {
+          mentions_count: number
+          unique_mentioners_count: number
+        }[]
+      }
       get_user_passport: {
         Args: { p_user_id: string }
         Returns: {
