@@ -21,6 +21,7 @@ import { RailLanePool } from '@/video/railLanePool';
 
 import { isPerfEnabled } from '@/perf/navTiming';
 import { vperfStart, vperfMark, vperfArmLane, vperfNextId, vperfSetBudget, vperfMeta, vperfMotionTrace } from '@/perf/vperf';
+import { setStatusBarStyleColor } from '@/hooks/useMedianStatusBar';
 
 
 const BORROW_DBG = (evt: string, payload: Record<string, unknown> = {}) => {
