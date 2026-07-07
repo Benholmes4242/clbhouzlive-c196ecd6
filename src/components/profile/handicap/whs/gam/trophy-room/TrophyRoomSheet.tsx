@@ -20,6 +20,15 @@ const FAINT = 'rgba(242,244,247,0.38)';
 const CARD = '#1B1E27';
 const LINE = 'rgba(255,255,255,0.08)';
 
+function hexToRgb(hex: string): string {
+  const h = hex.replace('#', '');
+  if (h.length !== 6) return '148,163,184';
+  const r = parseInt(h.slice(0, 2), 16);
+  const g = parseInt(h.slice(2, 4), 16);
+  const b = parseInt(h.slice(4, 6), 16);
+  return `${r},${g},${b}`;
+}
+
 
 const CATEGORY_ORDER: BadgeCategory[] = [
   'scoring',
