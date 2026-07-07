@@ -667,7 +667,7 @@ export function FullscreenFeedOverlay() {
                     // even when the pixels are identical.
                     // During the symmetric close (non-borrow) the reverse
                     // clone stands alone — hide the host under it.
-                    opacity: (origin && !firstFrameReady) || closeAnim === 'nonborrow' ? 0 : 1,
+                    opacity: (origin && !firstFrameReady && FS_TRANSITION_MODE !== 'cut') || closeAnim === 'nonborrow' ? 0 : 1,
                     pointerEvents: closeAnim !== 'idle' ? 'none' : undefined,
                   }}
                 >

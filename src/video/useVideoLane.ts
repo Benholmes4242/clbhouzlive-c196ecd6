@@ -100,6 +100,10 @@ export function useVideoLane(
       startPosition: opts.startPosition ?? -1,
       postId: opts.postId ?? null,
     });
+    // Close the one-render stale-snapshot window after a lane source changes.
+    // Without this, consumers can briefly see firstFrame=true from the prior
+    // owner and reveal a host before load()'s reset has reached subscribers.
+    setSnapshot(VideoEngine.snapshot(laneId));
   }, [laneId, opts.active, opts.hlsUrl, opts.posterUrl, opts.startPosition, opts.postId]);
 
   // Auto play/pause based on `active`. play() is safe to call before mount:

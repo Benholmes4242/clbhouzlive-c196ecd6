@@ -78,6 +78,10 @@ export const InlineVideo: React.FC<Props> = ({
     ownerKey: resolvedOwnerKey,
   });
 
+  const laneOwnsThisMedia = lane.snapshot.postId === resolvedOwnerKey;
+  const targetReady = startPosition <= 0 || lane.snapshot.currentTime >= startPosition - 0.3;
+  const showVideo = lane.snapshot.firstFrame && targetReady && (isActive || laneOwnsThisMedia);
+
 
 
   const lastFFRef = useRef<boolean | null>(null);
@@ -126,6 +130,8 @@ export const InlineVideo: React.FC<Props> = ({
             height: '100%',
             objectFit,
             display: 'block',
+            opacity: showVideo ? 0 : 1,
+            transition: 'opacity 120ms linear',
             pointerEvents: 'none',
           }}
         />
@@ -144,7 +150,7 @@ export const InlineVideo: React.FC<Props> = ({
           // on borrow-return that reads as a brief flash of the poster/first
           // frame as the element re-attaches. Snapping keeps the handback
           // pixel-exact.
-          opacity: isActive && lane.snapshot.firstFrame ? 1 : 0,
+          opacity: showVideo ? 1 : 0,
           pointerEvents: 'none',
         }}
       />

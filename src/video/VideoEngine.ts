@@ -268,6 +268,24 @@ class VideoEngineImpl {
       lane.state !== 'error';
     if (alreadyLoaded) {
       DBG(laneId, 'skip reload: same postId+url', { state: lane.state });
+      lane.posterUrl = posterUrl;
+      lane.startPosition = startPosition;
+      const target = startPosition > 0 ? startPosition : 0;
+      const now = lane.el.currentTime || 0;
+      const needsResumeSeek = target > 0 && Math.abs(now - target) > 0.35;
+      if (needsResumeSeek) {
+        // Same source, different desired playhead. A warm skip must still seek
+        // before surfaces reveal this lane; otherwise React sees the stale
+        // firstFrame=true snapshot for one paint and users get a frame-0/old-
+        // frame flash before playback resumes at the intended time.
+        lane.firstFrame = false;
+        this.emit(lane);
+        try { lane.el.currentTime = target; } catch { /* noop */ }
+      } else if (lane.el.readyState >= 2) {
+        lane.firstFrame = true;
+        try { lane.el.removeAttribute('poster'); } catch {}
+        this.emit(lane);
+      }
       // Signal 'warm' cache hit to any pending autoplay arm — the caller
       // (useRailLane / useWatchAutoplay) checks the returned _warmSkipHit flag.
       (this as any)._lastLoadWasWarmSkip = true;
@@ -437,9 +455,10 @@ class VideoEngineImpl {
     const onLoadedData = () => {
       if (this.loadingCount > 0) this.loadingCount--;
       if (lane.state === 'loading') this.transition(lane, 'ready');
-      // loadeddata alone does NOT flip firstFrame anymore — we wait for the
-      // seek to land. When there IS no seek target, loadeddata is enough.
-      if (lane.startPosition <= 0) markReadyToShow('loadeddata@start<=0');
+      // Do not reveal on loadeddata. WebKit can fire it before a synchronous
+      // currentTime reset/seek has visibly committed, which exposes frame 0 or
+      // the previous decoded frame for one paint. timeupdate/seeked below are
+      // the first safe composited-frame signals.
     };
     const onSeeked = () => {
       vperfLaneEvent(lane.id, 'seeked');
