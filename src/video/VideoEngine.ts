@@ -609,6 +609,14 @@ class VideoEngineImpl {
 
   seek(laneId: LaneId, seconds: number): void {
     const lane = this.getLane(laneId);
+    // [VPERF] S6 seek — measure engine.seek() → next 'playing' event.
+    // Also suppress the session's stall counter for the resulting waiting→
+    // playing pair (that latency belongs to this seek, not to rebuffering).
+    const seekId = vperfNextId(`seek:${lane.id}`);
+    vperfStart(seekId, 'seek', { laneId: lane.id, postId: lane.postId, target: seconds });
+    vperfSessionSuppressNextStall(lane.id);
+    vperfArmLane(lane.id, { spanId: seekId, endOn: 'seeked', phase: 'seeked' });
+    vperfArmLane(lane.id, { spanId: seekId, endOn: 'playing' });
     try {
       lane.el.currentTime = seconds;
     } catch {
