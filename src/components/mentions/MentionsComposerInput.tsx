@@ -28,7 +28,7 @@
  */
 
 import React from 'react';
-import ReactDOM from 'react-dom';
+// (no ReactDOM import needed — react-mentions handles the portal)
 import { MentionsInput, Mention, type SuggestionDataItem } from 'react-mentions';
 import { CheckCircle2, Building2 } from 'lucide-react';
 import { SquircleAvatar, LIGHT_HAIRLINE } from '@/components/ui/SquircleAvatar';
