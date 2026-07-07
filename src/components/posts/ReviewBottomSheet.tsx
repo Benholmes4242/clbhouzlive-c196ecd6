@@ -15,7 +15,7 @@ import { motion, AnimatePresence, useDragControls } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import { UserCheck, ChevronRight } from 'lucide-react';
 import { toast } from 'sonner';
-import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
+import { SquircleAvatar, LIGHT_HAIRLINE} from '@/components/ui/SquircleAvatar';
 import {
   FROST,
   formatFrostRating,
@@ -571,7 +571,8 @@ export const ReviewBottomSheet: React.FC<ReviewBottomSheetProps> = ({
                   src={user.avatar}
                   alt={user.name}
                   fallback={initials}
-                  hideRing
+                  hairlineRing
+                  ringColor={LIGHT_HAIRLINE}
                 />
                 <div style={{ flex: 1, minWidth: 0 }}>
                   <div

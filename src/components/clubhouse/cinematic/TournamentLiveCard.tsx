@@ -100,7 +100,7 @@ function PlayerAvatar({ name, photoUrl, tourSlug, size }: {
   const candidates = resolvePlayerAvatarCandidates({ name, photoUrl, tourSlug });
   // TODO(avatar-userid): userId not surfaced at this layer (pro player, no app user) —
   // colour hashes from alt. See src/lib/avatarFallback.ts.
-  return <SquircleAvatar srcCandidates={candidates} alt={name} size={size} hideRing />;
+  return <SquircleAvatar srcCandidates={candidates} alt={name} size={size} hairlineRing />;
 }
 
 function HeartIcon({ filled }: { filled: boolean }) {

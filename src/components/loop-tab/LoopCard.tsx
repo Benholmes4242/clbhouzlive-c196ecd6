@@ -20,7 +20,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { removeGolfCourseFromContent, extractGolfCourseFromContent } from '@/utils/golfCourseExtractor';
 import { toast } from 'sonner';
 import CommentsSheet from '@/components/comments/CommentsSheet';
-import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
+import { SquircleAvatar, LIGHT_HAIRLINE} from '@/components/ui/SquircleAvatar';
 import { LoopCardMenu } from './LoopCardMenu';
 import PostContentWithTags from '@/components/posts/PostContentWithTags';
 import { ExpandableCaption } from '@/components/posts/ExpandableCaption';
@@ -330,7 +330,8 @@ export const LoopCard = React.memo(function LoopCard({
               alt={post.displayName}
               userId={post.userId}
               size="sm"
-              hideRing
+              hairlineRing
+              ringColor={LIGHT_HAIRLINE}
             />
           </button>
           <button
@@ -451,7 +452,7 @@ export const LoopCard = React.memo(function LoopCard({
                       key={idx}
                       src={url || '/placeholder.svg'}
                       size={20}
-                      thinRing
+                      hairlineRing
                       ringColor="hsl(var(--card))"
                     />
                   ))}

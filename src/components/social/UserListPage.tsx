@@ -17,7 +17,7 @@ import {
 } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { PageRoot } from '@/components/layout/PageRoot';
-import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
+import { SquircleAvatar, LIGHT_HAIRLINE} from '@/components/ui/SquircleAvatar';
 import { useDebounce } from '@/hooks/useDebounce';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useFollowUser } from '@/hooks/useFollowUser';
@@ -927,7 +927,8 @@ const SuggestedRailCard: React.FC<{ creator: SuggestedCreator }> = ({ creator })
         alt={creator.displayName}
         size={56}
         fallback={creator.displayName?.charAt(0) || '?'}
-        hideRing
+        hairlineRing
+        ringColor={LIGHT_HAIRLINE}
         className="mb-2"
       />
       <div
@@ -1207,7 +1208,8 @@ const UserRowFlat: React.FC<UserRowFlatProps> = ({
           alt={user.displayName}
           size={46}
           fallback={user.displayName?.charAt(0) || '?'}
-          hideRing
+          hairlineRing
+          ringColor={LIGHT_HAIRLINE}
           className="flex-shrink-0"
         />
 

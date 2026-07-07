@@ -9,7 +9,7 @@
 import React, { useMemo } from 'react';
 import { motion } from 'framer-motion';
 import { ChevronRight } from 'lucide-react';
-import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
+import { SquircleAvatar, LIGHT_HAIRLINE} from '@/components/ui/SquircleAvatar';
 import { formatFrostRating, splitCourseName } from '@/lib/frostPanel';
 
 const FONTS = {
@@ -157,7 +157,8 @@ export const InlineReviewCard: React.FC<InlineReviewCardProps> = ({
             src={reviewer.avatar || undefined}
             alt={reviewer.name}
             fallback={initials}
-            hideRing
+            hairlineRing
+            ringColor={LIGHT_HAIRLINE}
           />
         </div>
         <span

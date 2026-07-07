@@ -1,5 +1,5 @@
 import React from 'react';
-import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
+import { SquircleAvatar, LIGHT_HAIRLINE} from '@/components/ui/SquircleAvatar';
 
 interface Activity {
   id: string;
@@ -45,7 +45,8 @@ export const FriendsActivityFeed: React.FC<FriendsActivityFeedProps> = ({
               alt={activity.userName}
               userId={activity.userId}
               size={32}
-              hideRing
+              hairlineRing
+              ringColor={LIGHT_HAIRLINE}
             />
             <div className="flex-1 min-w-0">
               <p className="text-sm">
