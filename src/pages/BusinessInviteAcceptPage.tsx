@@ -7,7 +7,7 @@ import { ManagePageShell } from '@/components/manage/ManagePageShell';
 import { useHideBottomNav } from '@/hooks/useBottomNavVisibility';
 import { useHideHeader } from '@/hooks/useHeaderVisibility';
 import { useAcceptInvite, BUSINESS_ROLE_LABELS, BusinessRole } from '@/hooks/useBusinessTeam';
-import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
+import { SquircleAvatar, LIGHT_HAIRLINE } from '@/components/ui/SquircleAvatar';
 
 const INK = '#0F172A';
 const INK_45 = '#64748B';
@@ -142,7 +142,8 @@ export default function BusinessInviteAcceptPage() {
                   src={invite.business_logo_url}
                   alt={invite.business_name}
                   size={72}
-                  hideRing
+                  hairlineRing
+                  ringColor={LIGHT_HAIRLINE}
                 />
               ) : (
                 <div

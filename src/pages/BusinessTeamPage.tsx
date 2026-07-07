@@ -6,7 +6,7 @@ import {
 } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { Skeleton } from '@/components/ui/skeleton';
-import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
+import { SquircleAvatar, LIGHT_HAIRLINE } from '@/components/ui/SquircleAvatar';
 import { ConfirmModal } from '@/components/ui/confirm-modal';
 import {
   DropdownMenu, DropdownMenuContent, DropdownMenuItem,
@@ -107,7 +107,8 @@ export default function BusinessTeamPage() {
           src={profile?.profile_photo_url || undefined}
           alt={name}
           size={44}
-          hideRing
+          hairlineRing
+          ringColor={LIGHT_HAIRLINE}
         />
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2 flex-wrap">
@@ -266,7 +267,8 @@ export default function BusinessTeamPage() {
                         src={invite.invitee_profile.profile_photo_url || undefined}
                         alt={label}
                         size={40}
-                        hideRing
+                        hairlineRing
+                        ringColor={LIGHT_HAIRLINE}
                       />
                     ) : (
                       <div

@@ -4,7 +4,7 @@ import { toast } from 'sonner';
 import { ManagePageShell } from '@/components/manage/ManagePageShell';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
-import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
+import { SquircleAvatar, LIGHT_HAIRLINE } from '@/components/ui/SquircleAvatar';
 import { supabase } from '@/integrations/supabase/client';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 
@@ -82,7 +82,8 @@ export default function BlockedPage() {
                     alt={p?.full_name || p?.username || ''}
                     userId={item.blocked_id}
                     size={40}
-                    hideRing
+                    hairlineRing
+                    ringColor={LIGHT_HAIRLINE}
                   />
                   <div className="flex-1 min-w-0">
                     <p className="text-[15px] font-medium text-foreground truncate">{p?.full_name ?? 'Unknown'}</p>

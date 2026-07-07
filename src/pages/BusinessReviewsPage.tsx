@@ -2,7 +2,7 @@ import { useMemo, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { MessageSquare, Star, X, Edit3, Trash2, MapPin, Sparkles } from 'lucide-react';
-import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
+import { SquircleAvatar, LIGHT_HAIRLINE } from '@/components/ui/SquircleAvatar';
 import { Skeleton } from '@/components/ui/skeleton';
 import { ConfirmModal } from '@/components/ui/confirm-modal';
 import { Sheet, SheetContent } from '@/components/ui/sheet';
@@ -136,7 +136,8 @@ function ReplySheet({
                 src={review.reviewer.profile_photo_url || undefined}
                 alt={review.reviewer.display_name || 'Reviewer'}
                 size={28}
-                hideRing
+                hairlineRing
+                ringColor={LIGHT_HAIRLINE}
               />
               <div className="text-[13px] font-semibold" style={{ color: INK }}>
                 {review.reviewer.display_name || review.reviewer.username || 'Golfer'}
@@ -306,7 +307,8 @@ function ReviewCard({
           src={r.reviewer.profile_photo_url || undefined}
           alt={name}
           size={40}
-          hideRing
+          hairlineRing
+          ringColor={LIGHT_HAIRLINE}
         />
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2 flex-wrap">
