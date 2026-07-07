@@ -16,8 +16,6 @@ This rule applies to **every single place a user avatar is rendered** across Clb
 ## Implementation
 
 All avatars MUST use the `<SquircleAvatar
-                            hairlineRing
-                            ringColor={LIGHT_HAIRLINE}
                           >` component from `@/components/ui/SquircleAvatar.tsx`.
 
 ```tsx
