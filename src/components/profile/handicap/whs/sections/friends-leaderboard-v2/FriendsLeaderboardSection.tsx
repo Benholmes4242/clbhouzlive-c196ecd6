@@ -37,7 +37,7 @@ const LABEL_STYLE: React.CSSProperties = {
 export const FriendsLeaderboardSection: React.FC<Props> = ({ userId, viewMode = 'owner', ownerFirstName = null }) => {
   const { data, isLoading } = useFriendLeaderboard(userId);
   const percentileQuery = useHandicapPercentile(userId);
-  const { data: deltasData } = useFriendLeaderboardRankDeltas(userId, 7);
+  const { data: deltasData } = useFriendLeaderboardRankDeltas(userId, 30);
   const { data: weeklyBanner } = useFriendLeaderboardWeeklyBanner(userId);
   const { open: openSheet } = useOpenFriendSheet();
   const [showInactive, setShowInactive] = useState(false);
@@ -148,7 +148,7 @@ export const FriendsLeaderboardSection: React.FC<Props> = ({ userId, viewMode = 
           />
         )}
 
-        {/* Divider + TOP 5 / 7D label row (tinted strip) */}
+        {/* Divider + TOP 5 / 30D label row (tinted strip) */}
         {!isLoading && (
           <div
             style={{
@@ -160,7 +160,7 @@ export const FriendsLeaderboardSection: React.FC<Props> = ({ userId, viewMode = 
             }}
           >
             <p style={{ ...LABEL_STYLE, flex: 1, margin: 0 }}>Top of your circle</p>
-            <p style={{ ...LABEL_STYLE, width: 32, textAlign: 'center', margin: 0 }}>7D</p>
+            <p style={{ ...LABEL_STYLE, width: 32, textAlign: 'center', margin: 0 }}>30D</p>
             <div style={{ width: 56 }} />
           </div>
         )}

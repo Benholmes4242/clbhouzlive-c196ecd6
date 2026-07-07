@@ -15,7 +15,7 @@ interface Props {
   totalActive: number;
   /** Same friend-circle percentile the section header prints. */
   percentileTop: number | null;
-  /** Your 7D rank movement (matches the per-row delta shape). */
+  /** Your 30D rank movement (matches the per-row delta shape). */
   selfDelta?: FriendLeaderboardRankDelta;
   /** Retained for parent compatibility. */
   expanded?: boolean;
@@ -158,7 +158,7 @@ export const HeroPositionCard: React.FC<Props> = ({
         </p>
       </div>
 
-      {/* Right slot — your 7D movement */}
+      {/* Right slot — your 30D movement */}
       <div style={{ flexShrink: 0, minWidth: 32, display: 'flex', justifyContent: 'flex-end' }}>
         <MovementGlyph delta={selfDelta} />
       </div>
