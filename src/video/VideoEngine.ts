@@ -240,6 +240,7 @@ class VideoEngineImpl {
     }
     lane.mountedHost = null;
     lane.wantPlay = false;
+    vperfSessionEnd(laneId, 'unmount');
   }
 
   /**
