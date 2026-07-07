@@ -541,7 +541,8 @@ function AppRoutes() {
         
         
         {/* /video/:videoId route removed in PR-5 — :videoId is a post id (shared by VideoCardMenu & AutoplayVideoCard), so preserve deep links via the unified /post viewer. */}
-        <Route path="/video/:videoId" element={<Navigate to="/post/:videoId" replace />} />
+        <Route path="/video/:videoId" element={<VideoIdToPostRedirect />} />
+
 
 
         
