@@ -396,11 +396,14 @@ function AppRoutes() {
     // NEVER branch chrome logic per-page here.
     const immersive = isImmersiveRoute(location.pathname);
     const isAuth = location.pathname.startsWith('/auth');
-    // Immersive routes: paint html/body pure black so any pre-paint gap in
-    // the notch/safe-area is cinematic jet-black, not the dark-navy #0F172A
-    // that read as a grey band once the status-bar overlay flag was
-    // boot-locked and the shield became the sole chrome writer.
-    const surface = darkChrome ? '#15171F' : immersive ? '#000000' : '#F8FAFC';
+    // Immersive routes ALWAYS paint html/body pure black so the notch zone
+    // reads as cinematic jet-black. `immersive` is checked FIRST — the old
+    // `darkChrome ? '#15171F' : immersive ? '#000000' : ...` precedence made
+    // Clubhouse (darkChrome ∧ immersive) paint #15171F behind the notch,
+    // which showed as a grey band the moment the status-bar overlay flag
+    // became boot-locked and the shield became the sole chrome writer.
+    // shieldColor + statusBar already check `immersive` first — keep in sync.
+    const surface = immersive ? '#000000' : darkChrome ? '#15171F' : '#F8FAFC';
     const shieldColor = immersive ? 'transparent' : (darkChrome ? '#15171F' : '#F8FAFC');
     // NOTE: `overlay` flag is boot-locked ONCE at app startup via
     // ensureStatusBarOverlayBooted() (see useMedianStatusBar.ts). Route
@@ -413,7 +416,9 @@ function AppRoutes() {
 
     // Idempotency: cache the last-applied values on the effect's module scope.
     // If nothing changed (very common between similar routes) skip every write.
-    const prev = (window as any).__lvChromeCache as
+    // Namespace bumped to __lvChromeCache2 so the first navigation after this
+    // precedence fix cannot skip writes against a stale pre-fix cache shape.
+    const prev = (window as any).__lvChromeCache2 as
       | { surface: string; darkChrome: boolean; isAuth: boolean; immersive: boolean; shieldColor: string; sbKey: string }
       | undefined;
     const sbKey = `${statusBar.style}|${statusBar.color}`;
@@ -469,7 +474,9 @@ function AppRoutes() {
       } catch {}
     }
 
-    (window as any).__lvChromeCache = { surface, darkChrome, isAuth, immersive, shieldColor, sbKey };
+    (window as any).__lvChromeCache2 = { surface, darkChrome, isAuth, immersive, shieldColor, sbKey };
+    // Retire the old key so nothing downstream can consult stale pre-fix state.
+    try { delete (window as any).__lvChromeCache; } catch {}
   }, [location.pathname]);
 
   
