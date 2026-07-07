@@ -190,13 +190,15 @@ export const FeaturedNotificationCard: React.FC<FeaturedNotificationCardProps> =
           {/* Avatar overlapping */}
           <div className="relative px-3.5 flex items-end gap-2.5" style={{ marginTop: -28 }}>
             <div className="relative inline-block shrink-0">
+              {/* 3px white wrapper = facepile-style solid separation over hero photo (canon exception). */}
               <div style={{ border: '3px solid white', borderRadius: '34%', lineHeight: 0, boxShadow: '0 2px 8px rgba(0,0,0,0.12)' }}>
                 <SquircleAvatar
                   src={avatarUrl}
                   alt={actorName || 'User'}
                   size={48}
                   fallback={actorName?.charAt(0) || '?'}
-                  hideRing
+                  hairlineRing
+                  ringColor={LIGHT_HAIRLINE}
                 />
               </div>
               <span
