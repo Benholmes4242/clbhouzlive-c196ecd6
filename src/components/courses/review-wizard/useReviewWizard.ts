@@ -24,7 +24,6 @@ import type {
   ExistingRating, 
   ReviewMediaItem,
   ReviewBreakdowns,
-  ReviewTaggableEntity,
   WizardStepExtended,
 } from './types';
 
@@ -35,59 +34,6 @@ interface UseReviewWizardOptions {
   onSuccess?: (ratingId: string) => void;
   /** Pre-populated media files from Post Wizard bridge flow */
   initialMediaFiles?: File[];
-}
-
-/**
- * Create notifications for users tagged in a review
- */
-async function createReviewMentionNotifications({
-  reviewId,
-  courseId,
-  courseName,
-  reviewerId,
-  taggedEntities,
-}: {
-  reviewId: string;
-  courseId: string;
-  courseName: string;
-  reviewerId: string;
-  taggedEntities: ReviewTaggableEntity[];
-}) {
-  // Filter to only user entities (businesses don't receive mention notifications)
-  const userTags = taggedEntities.filter(t => t.entity_type === 'user');
-  
-  if (userTags.length === 0) return;
-  
-  // Get user IDs from taggable_entities - entity_id is the actual user_profiles.id
-  const userIds = userTags
-    .map(t => t.entity_id)
-    .filter(id => id !== reviewerId); // Don't notify yourself
-  
-  if (userIds.length === 0) return;
-  
-  // Create notifications
-  const notifications = userIds.map(userId => ({
-    user_id: userId,
-    recipient_actor_type: 'personal',
-    recipient_actor_id: userId,
-    type: 'review_mention',
-    title: 'Mentioned you in a review',
-    message: `mentioned you in a review of ${courseName}`,
-    data: {
-      review_id: reviewId,
-      course_id: courseId,
-    },
-    actor_id: reviewerId,
-    entity_type: 'review',
-    entity_id: reviewId,
-    read: false,
-  }));
-  
-  const { error } = await supabase.from('notifications').insert(notifications);
-  
-  if (error) {
-    console.error('[ReviewWizard] Failed to create mention notifications:', error);
-  }
 }
 
 const INITIAL_BREAKDOWNS: ReviewBreakdowns = {
@@ -105,7 +51,6 @@ const INITIAL_STATE: WizardState = {
   review: '',
   media: [],
   coverMediaId: null,
-  selectedTags: [],
 };
 
 const MAX_REVIEW_MEDIA = 10;
@@ -505,43 +450,6 @@ export function useReviewWizard({
       
       console.log('[useReviewWizard] Loaded existing media:', mediaItems.length, 'items');
       
-      // Load existing tags for edit mode
-      if (existingRating?.id) {
-        (async () => {
-          try {
-            const { data: existingTagData } = await supabase
-              .from('review_tags')
-              .select(`
-                tagged_entity_id,
-                start_index,
-                end_index,
-                taggable_entities!inner(
-                  id,
-                  entity_type,
-                  entity_id,
-                  name,
-                  username
-                )
-              `)
-              .eq('review_id', existingRating.id);
-
-            const loadedTags: ReviewTaggableEntity[] = (existingTagData || []).map((t: any) => ({
-              id: t.taggable_entities.id,
-              entity_type: t.taggable_entities.entity_type,
-              entity_id: t.taggable_entities.entity_id,
-              name: t.taggable_entities.name,
-              username: t.taggable_entities.username,
-            }));
-
-            if (loadedTags.length > 0) {
-              setState(prev => ({ ...prev, selectedTags: loadedTags }));
-              console.log('[useReviewWizard] Loaded existing tags:', loadedTags.length);
-            }
-          } catch (err) {
-            console.warn('[useReviewWizard] Failed to load existing tags:', err);
-          }
-        })();
-      }
     }
   }, [isEditMode, existingMedia]);
 
@@ -615,9 +523,6 @@ export function useReviewWizard({
     setState(prev => ({ ...prev, review }));
   }, []);
 
-  const setTags = useCallback((tags: ReviewTaggableEntity[]) => {
-    setState(prev => ({ ...prev, selectedTags: tags }));
-  }, []);
 
   const setCoverMedia = useCallback((id: string | null) => {
     setState(prev => ({ ...prev, coverMediaId: id }));
@@ -844,7 +749,7 @@ export function useReviewWizard({
         isPrivate: false,
         files: orderedFiles,
         coverMediaId: effectiveCoverMediaId,
-        selectedTags: state.selectedTags,
+        
       });
       
       // Execute deferred media deletions after successful submit
@@ -1045,7 +950,7 @@ export function useReviewWizard({
     setBreakdown,
     setTitle,
     setReview,
-    setTags,
+    
     setCoverMedia,
     
     // Media

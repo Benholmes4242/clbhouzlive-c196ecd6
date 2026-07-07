@@ -27,7 +27,7 @@ import { CourseDNACard } from './CourseDNACard';
 
 import { type ExtractedReviewData } from '@/lib/postHelpers';
 import { removeGolfCourseFromContent } from '@/utils/golfCourseExtractor';
-import PostContentWithTags from '@/components/posts/PostContentWithTags';
+
 import { FROST, FROST_BLUR, FROST_SCORE_GRADIENT, formatFrostRating, splitCourseName } from '@/lib/frostPanel';
 
 /** Animated soundwave bars for music playback indicator */
@@ -263,15 +263,7 @@ export const CreatorCapsule: React.FC<CreatorCapsuleProps> = ({
           className="max-h-[100px] overflow-y-auto scrollbar-hide"
           style={{ WebkitOverflowScrolling: 'touch' }}
         >
-          {tags.length > 0 ? (
-            <PostContentWithTags
-              content={cleanCaption}
-              tags={tags}
-              className="text-[13px] leading-relaxed text-white/90"
-            />
-          ) : (
-            <p className="text-[13px] leading-relaxed text-white/90">{cleanCaption}</p>
-          )}
+          <p className="text-[13px] leading-relaxed text-white/90 whitespace-pre-wrap">{cleanCaption}</p>
         </div>
       )}
 
@@ -583,15 +575,7 @@ export const CreatorCapsule: React.FC<CreatorCapsuleProps> = ({
         {/* Caption preview (collapsed) */}
         {!isExpanded && truncatedCaption && (
           <div className="text-[11px] text-white line-clamp-1 mt-0.5">
-            {tags.length > 0 ? (
-              <PostContentWithTags
-                content={truncatedCaption}
-                tags={tags}
-                className="text-[11px] text-white line-clamp-1"
-              />
-            ) : (
-              truncatedCaption
-            )}
+            {truncatedCaption}
           </div>
         )}
 

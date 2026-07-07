@@ -1,7 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useSupabaseSession } from './useSupabaseSession';
-import { createMentionNotifications } from '@/utils/mentionExtractor';
+
 import { useActiveActor } from '@/context/ActiveActorContext';
 import { patchEngagement } from '@/lib/engagementCache';
 
@@ -313,10 +313,6 @@ export function usePostEngagement(postId: string | null) {
         }
       }
 
-      // Create mention notifications for any @mentions in the comment
-      if (newComment?.id) {
-        await createMentionNotifications(content, user.id, 'comment', newComment.id, postId);
-      }
     },
     onSuccess: () => {
       // Refetch comments list for THIS post (visible thread).

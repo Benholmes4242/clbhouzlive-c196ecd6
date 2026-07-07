@@ -29,7 +29,7 @@ import { useActiveActor } from '@/context/ActiveActorContext';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { SquircleAvatar, LIGHT_HAIRLINE } from '@/components/ui/SquircleAvatar';
 import { Pressable } from '@/components/ui/Pressable';
-import { MentionText } from '@/components/comments/MentionText';
+
 import { CommentingAsIndicator } from '@/components/comments/CommentingAsIndicator';
 import { relativeTime } from '@/utils/relativeTime';
 import { usePostLikes } from '@/hooks/usePostLikes';
@@ -163,8 +163,6 @@ function CommentsSheet({
   // Defer the comment-list render until AFTER the panel slide starts, so the O(N) commit
   // doesn't block framer-motion's first frame. Skeleton covers the slide window.
   const [listReady, setListReady] = useState(false);
-  const [mentionQuery, setMentionQuery] = useState<string | null>(null);
-  const [mentionResults, setMentionResults] = useState<{ id: string; username: string; display_name: string; avatar: string | null }[]>([]);
 
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
@@ -297,27 +295,6 @@ function CommentsSheet({
     }
   }, [inputText]);
 
-  // Mention autocomplete search
-  useEffect(() => {
-    if (!mentionQuery || mentionQuery.length < 1) {
-      setMentionResults([]);
-      return;
-    }
-    const search = async () => {
-      const { data } = await supabase
-        .from('user_profiles')
-        .select('id, username, display_name, profile_photo_url')
-        .ilike('username', `${mentionQuery}%`)
-        .limit(5);
-      setMentionResults((data ?? []).map((u: any) => ({
-        id: u.id,
-        username: u.username,
-        display_name: u.display_name,
-        avatar: u.profile_photo_url,
-      })));
-    };
-    search();
-  }, [mentionQuery]);
 
   // Infinite scroll sentinel
   useEffect(() => {
@@ -502,10 +479,9 @@ function CommentsSheet({
           </div>
 
           {/* Content */}
-          <MentionText
-            text={comment.content}
-            className="mt-1 text-[14px] leading-[20px] block text-foreground/90"
-          />
+          <span className="mt-1 text-[14px] leading-[20px] block text-foreground/90 whitespace-pre-wrap">
+            {comment.content}
+          </span>
 
           {/* Media */}
           {(comment as any).media_url && (comment as any).media_type === 'image' && (
@@ -866,11 +842,9 @@ function CommentsSheet({
                 <div className="flex-1 min-w-0">
                   {cleanCaption && (
                     <div style={{ color: INK_SOFT }}>
-                      <MentionText
-                        text={cleanCaption}
-                        className="text-[13px] leading-[18px] line-clamp-2"
-                        mentionClassName="font-semibold [color:#c97a10]"
-                      />
+                      <span className="text-[13px] leading-[18px] line-clamp-2 whitespace-pre-wrap">
+                        {cleanCaption}
+                      </span>
                     </div>
                   )}
                   {displayCourseName && (
