@@ -291,7 +291,7 @@ const PostsTabContent: React.FC<PostsTabContentProps> = ({
           isFetchingNextPage={isFetchingNextPage}
           onNearEnd={handleNearEnd}
           onLike={(post) => handleLike(post)}
-          onComment={openComments}
+          onComment={openCommentsForPost}
           onShare={(post) => handleShare(post)}
           onProfile={(post) => navigate(getActorRouteByType(post.actorType, post.actorId), { state: post.actorType === 'business' ? { source: 'content' } : undefined })}
           onCourse={(post) => post.courseId && navigate(`/courses/${post.courseId}`)}
