@@ -25,7 +25,7 @@ import { useActiveActor } from '@/context/ActiveActorContext';
 import { useManageableBusinessIds } from '@/hooks/useManageableBusinessIds';
 import { canManagePost } from '@/lib/canManagePost';
 import { getActorRouteByType } from '@/types/actor';
-// [VIDEOSTUB] FullscreenDebugPanel + mobileVideoDebug imports removed — engine severed.
+
 
 import { isPerfEnabled } from '@/perf/navTiming';
 import { VideoEngine } from '@/video/VideoEngine';
