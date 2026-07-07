@@ -695,6 +695,7 @@ function PickMiniRow({
         tourCode={pick.tourCode}
         photoUrl={(pick as any).photoUrl ?? (pick as any).photo_url ?? null}
         size="sm"
+        ringColor={LIGHT_HAIRLINE}
       />
       <div style={{ flex: 1, minWidth: 0, display: 'flex', alignItems: 'center', gap: 6 }}>
         <span
