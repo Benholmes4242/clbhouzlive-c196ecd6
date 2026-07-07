@@ -89,7 +89,7 @@ export const MyGolfLayer = memo(function MyGolfLayer({
                         key={player.id}
                         className="flex items-center gap-2 px-3 py-1.5 bg-white border border-slate-200 rounded-full"
                       >
-                        <div className="w-6 h-6 rounded-full overflow-hidden bg-slate-100">
+                        <div className="relative w-6 h-6 rounded-full overflow-hidden bg-slate-100">
                           {player.photoUrl ? (
                             <img src={player.photoUrl} alt={player.name} className="w-full h-full object-cover" />
                           ) : (
@@ -97,6 +97,7 @@ export const MyGolfLayer = memo(function MyGolfLayer({
                               {player.name.split(' ').map(n => n[0]).join('').slice(0, 2)}
                             </div>
                           )}
+                          <span aria-hidden className="pointer-events-none absolute inset-0 rounded-full" style={{ border: '1px solid rgba(15,23,42,0.12)' }} />
                         </div>
                         <span className="text-sm text-slate-700">{player.name}</span>
                         {onRemovePlayer && (

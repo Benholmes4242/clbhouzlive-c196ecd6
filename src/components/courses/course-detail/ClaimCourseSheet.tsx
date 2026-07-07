@@ -216,6 +216,7 @@ const ClaimCourseSheet: React.FC<ClaimCourseSheetProps> = ({
                       display: 'flex',
                       alignItems: 'center',
                       justifyContent: 'center',
+                      position: 'relative',
                     }}
                   >
                     {m.business.logo_url ? (
@@ -223,6 +224,7 @@ const ClaimCourseSheet: React.FC<ClaimCourseSheetProps> = ({
                     ) : (
                       <BadgeCheck size={18} color={INK_FAINT} />
                     )}
+                    <span aria-hidden style={{ position: 'absolute', inset: 0, borderRadius: 10, border: '1px solid rgba(15,23,42,0.12)', pointerEvents: 'none' }} />
                   </div>
                   <div style={{ flex: 1, minWidth: 0 }}>
                     <div style={{ fontSize: 14, fontWeight: 700, color: INK, lineHeight: 1.2 }}>
