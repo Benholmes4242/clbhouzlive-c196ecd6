@@ -120,7 +120,7 @@ interface Props {
   ownerFirstName?: string | null;
 }
 
-type Tab = 'all' | 'earned' | 'locked';
+type Tab = 'all' | 'earned';
 
 interface DetailContext {
   items: TrophyItem[];
@@ -130,7 +130,6 @@ interface DetailContext {
 const TAB_LABEL: Record<Tab, string> = {
   all: 'All',
   earned: 'Earned',
-  locked: 'Locked',
 };
 
 const Eyebrow: React.FC<{ ownerFirstName?: string | null; isFriendView?: boolean }> = ({
