@@ -507,8 +507,13 @@ export function FullscreenFeedOverlay() {
                   style={{
                     position: 'absolute',
                     inset: 0,
+                    // Snap to opaque (no transition) the moment we reveal.
+                    // The clone sits on top and fades 1→0 over 120ms; if the
+                    // host ALSO crossfaded 0→1 both layers would spend the
+                    // midpoint at ~0.5 opacity, dimming the composite over
+                    // black to ~0.75× brightness — a visible "flash" dip
+                    // even when the pixels are identical.
                     opacity: origin && !firstFrameReady ? 0 : 1,
-                    transition: 'opacity 120ms linear',
                   }}
                 >
 
