@@ -232,6 +232,15 @@ export const DetailHero: React.FC<Props> = ({ item, index, total, onPrev, onNext
               {[1, 2, 3, 4, 5].map((n) => {
                 const earned = n <= reachedTier;
                 const p = MATERIAL_PALETTES[n as 1 | 2 | 3 | 4 | 5];
+                // Started state: all segments unlit, segment 1 carries a
+                // muted-bronze partial glow at the fraction.
+                const bg = earned
+                  ? n === 5
+                    ? FORGE_GOLD
+                    : p.color
+                  : started && n === 1
+                    ? `linear-gradient(90deg, rgba(${hexToRgb(bronzeColor)},0.45) ${startedFirstPct}%, rgba(255,255,255,0.10) ${startedFirstPct}%)`
+                    : 'rgba(255,255,255,0.10)';
                 return (
                   <div
                     key={n}
@@ -239,11 +248,7 @@ export const DetailHero: React.FC<Props> = ({ item, index, total, onPrev, onNext
                       flex: 1,
                       height: 5,
                       borderRadius: 2,
-                      background: earned
-                        ? n === 5
-                          ? FORGE_GOLD
-                          : p.color
-                        : 'rgba(255,255,255,0.10)',
+                      background: bg,
                     }}
                   />
                 );
