@@ -929,10 +929,9 @@ const AppInner: React.FC = () => {
                                                 
                                               </div>
                                             </Suspense>
-                                            {/* Mini Player - persists across navigation */}
+                                            {/* Continue Watching mini-player - persists across navigation. Queue drawer removed in PR-5. */}
                                             <Suspense fallback={null}>
                                               <MiniPlayer />
-                                              <GlobalQueueDrawer />
                                             </Suspense>
                                             {/* Fullscreen Feed Overlay - portal-based, renders above everything */}
                                             <FullscreenFeedOverlay />
