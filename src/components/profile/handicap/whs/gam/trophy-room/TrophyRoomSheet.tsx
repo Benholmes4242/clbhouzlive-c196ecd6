@@ -390,14 +390,10 @@ export const TrophyRoomSheet: React.FC<Props> = ({ userId, viewerUserId, ownerFi
           className="hcp-tab-row"
           role="tablist"
         >
-          {(['all', 'earned', 'locked'] as Tab[]).map((key) => {
+          {(['all', 'earned'] as Tab[]).map((key) => {
             const active = tab === key;
             const count =
-              key === 'all'
-                ? allAchievements.length
-                : key === 'earned'
-                  ? earnedAchievements.length
-                  : lockedAchievements.length;
+              key === 'all' ? allAchievements.length : earnedAchievements.length;
             return (
               <button
                 key={key}
