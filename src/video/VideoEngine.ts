@@ -413,6 +413,8 @@ class VideoEngineImpl {
       // the poster per new source, so future cold-loads still get their
       // pre-paint cover.
       try { lane.el.removeAttribute('poster'); } catch {}
+      // [VPERF] first painted frame — resolves fs.open/autoplay firstFrame arms.
+      vperfLaneEvent(lane.id, 'firstFrame');
       this.emit(lane);
     };
     const onLoadedData = () => {
@@ -423,6 +425,7 @@ class VideoEngineImpl {
       if (lane.startPosition <= 0) markReadyToShow('loadeddata@start<=0');
     };
     const onSeeked = () => {
+      vperfLaneEvent(lane.id, 'seeked');
       markReadyToShow('seeked');
     };
 
