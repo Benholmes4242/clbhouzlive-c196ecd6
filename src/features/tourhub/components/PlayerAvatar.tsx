@@ -16,7 +16,7 @@
  */
 
 import { getPlayerHeadshotCandidates } from '@/utils/playerHeadshot';
-import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
+import { SquircleAvatar, DARK_HAIRLINE } from '@/components/ui/SquircleAvatar';
 
 interface PlayerAvatarProps {
   playerId: string;
@@ -26,6 +26,9 @@ interface PlayerAvatarProps {
   photoUrl?: string | null;
   size?: 'xs' | 'sm' | 'md' | 'lg' | 'xl' | '2xl';
   className?: string;
+  /** Traced hairline colour. Default DARK_HAIRLINE (white @ 22%) for hero
+   *  backdrops. Pass LIGHT_HAIRLINE for light card surfaces. */
+  ringColor?: string;
 }
 
 const SIZE_PX = { xs: 26, sm: 32, md: 44, lg: 64, xl: 96, '2xl': 128 } as const;
@@ -37,6 +40,7 @@ export function PlayerAvatar({
   photoUrl,
   size = 'md',
   className,
+  ringColor = DARK_HAIRLINE,
 }: PlayerAvatarProps) {
   const nameCandidates = getPlayerHeadshotCandidates(playerName, tourCode);
   // DB photo_url wins (matches the hero's resolveAvatar priority); then name-based chain.
@@ -47,7 +51,8 @@ export function PlayerAvatar({
       srcCandidates={candidates}
       alt={playerName}
       userId={playerId || playerName}
-      hideRing
+      hairlineRing
+      ringColor={ringColor}
       className={className}
     />
   );
