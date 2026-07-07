@@ -84,7 +84,6 @@ export const HeroScoreboard: React.FC<Props> = ({
             {/* YOU */}
             <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 6 }}>
               <SquircleAvatar size={48} hairlineRing src={yourAvatarUrl} alt="" fallback={(leftLabel[0] ?? '?').toUpperCase()} />
-              </div>
               <div style={{ fontSize: 11, fontWeight: 800, letterSpacing: '0.1em', color: youLead ? GOLD : 'rgba(255,255,255,0.85)', textTransform: 'uppercase' }}>
                 {leftLabel.toUpperCase()}
               </div>
