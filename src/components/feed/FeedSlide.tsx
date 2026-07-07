@@ -186,25 +186,49 @@ export const FeedSlide = memo(function FeedSlide({
 
     // Image — apply pinch zoom.
     if (m?.type === 'image') {
-      const aspect = (m.height ?? 1) > 0 && (m.width ?? 0) > 0
-        ? (m.height as number) / (m.width as number)
-        : 1.0;
-      const objectFit: 'cover' | 'contain' = isFullscreen
-        ? 'contain'
-        : (isSuggestedFeed ? 'cover' : (aspect >= 1.5 ? 'cover' : 'contain'));
       const imgSrc = m.imageUrl || m.thumbnailUrl || '';
-      return (
-        <div className="absolute inset-0 overflow-hidden">
-          {/* Backdrop — blurred image in fullscreen, solid matte otherwise. */}
-          {isFullscreen ? (
+      // Fullscreen: single-authority rect from resolveRestingRect (images
+      // always CONTAIN, safe-area centered). Matches the overlay clone's
+      // expand target by construction — no post-paint resize.
+      // Feed: legacy heuristic preserved verbatim (out of scope for this fix).
+      if (isFullscreen) {
+        const fsRect = resolveRestingRect(m.width ?? 0, m.height ?? 0, getCurrentViewport(), 'image');
+        return (
+          <div className="absolute inset-0 overflow-hidden">
             <div aria-hidden="true" className="absolute inset-0" style={{
               backgroundImage: `url(${imgSrc})`, backgroundSize: 'cover', backgroundPosition: 'center',
               filter: 'blur(40px) brightness(0.5) saturate(1.2)', transform: 'scale(1.2)',
             }} />
-          ) : (
-            <div className="absolute inset-0" style={{ background: '#0A0E14' }} aria-hidden="true" />
-          )}
-          {/* Main image with pinch zoom */}
+            <div
+              ref={zoomRef}
+              style={{
+                ...zoomStyle,
+                position: 'absolute',
+                top: fsRect.top, left: fsRect.left,
+                width: fsRect.width, height: fsRect.height,
+                zIndex: 1,
+              }}
+            >
+              <img
+                ref={imgRef}
+                src={imgSrc}
+                alt=""
+                className="w-full h-full"
+                style={{ objectFit: fsRect.fit }}
+                loading="eager"
+                draggable={false}
+              />
+            </div>
+          </div>
+        );
+      }
+      const aspect = (m.height ?? 1) > 0 && (m.width ?? 0) > 0
+        ? (m.height as number) / (m.width as number)
+        : 1.0;
+      const objectFit: 'cover' | 'contain' = isSuggestedFeed ? 'cover' : (aspect >= 1.5 ? 'cover' : 'contain');
+      return (
+        <div className="absolute inset-0 overflow-hidden">
+          <div className="absolute inset-0" style={{ background: '#0A0E14' }} aria-hidden="true" />
           <div
             ref={zoomRef}
             style={{ ...zoomStyle, position: 'absolute', inset: 0, zIndex: 1 }}
