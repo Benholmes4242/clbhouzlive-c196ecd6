@@ -452,7 +452,6 @@ export const LoopCard = React.memo(function LoopCard({
                       key={idx}
                       src={url || '/placeholder.svg'}
                       size={20}
-                      hairlineRing
                       ringColor="hsl(var(--card))"
                     />
                   ))}

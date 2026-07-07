@@ -170,7 +170,6 @@ const CourseCard: React.FC<CourseCardProps> = ({
                   alt={friend.initials}
                   userId={friend.id}
                   size={24}
-                  hairlineRing
                   ringColor="hsl(var(--background))"
                   className="pointer-events-none"
                 />
