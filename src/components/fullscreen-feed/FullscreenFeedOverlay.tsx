@@ -401,7 +401,11 @@ export function FullscreenFeedOverlay() {
         const useMediaDims = omw > 0 && omh > 0;
         const ar = useMediaDims ? omw / omh : (origin.aspectRatio > 0 ? origin.aspectRatio : 0);
         const [mw, mh] = useMediaDims ? [omw, omh] : (ar > 0 ? [ar * 1000, 1000] : [0, 0]);
-        const resting = resolveRestingRect(mw, mh, vp, 'image');
+        // Consult the resolver with the ACTUAL media type — passing 'image'
+        // for videos silently bypasses the Reels cover rule and lands
+        // portrait video letterboxed at open.
+        const kind: 'video' | 'image' = origin.mediaType ?? 'image';
+        const resting = resolveRestingRect(mw, mh, vp, kind);
         setTargetRect({
           top: resting.top,
           left: resting.left,
@@ -411,9 +415,18 @@ export function FullscreenFeedOverlay() {
         setCloneExpanded(true);
       });
       // Watchdog: release the clone if the first-frame signal never arrives.
+      // Image opens have no first-frame event (SnapFeed only fires it for
+      // video); use a very short timeout so the settled image + chrome
+      // paint together, in the SAME rect the clone landed on (single
+      // geometry rule below). Video keeps the longer watchdog as a safety.
+      const watchdogMs = origin.mediaType === 'image' ? 60 : 400;
       watchdogRef.current = setTimeout(() => {
         setFirstFrameReady(true);
-      }, 400);
+      }, watchdogMs);
+      return () => {
+        cancelAnimationFrame(raf);
+        if (watchdogRef.current) clearTimeout(watchdogRef.current);
+      };
       return () => {
         cancelAnimationFrame(raf);
         if (watchdogRef.current) clearTimeout(watchdogRef.current);
