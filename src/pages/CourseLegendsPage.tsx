@@ -49,7 +49,7 @@ export const CourseLegendsPage: React.FC = () => {
       <main
         style={{ paddingTop: 'var(--chrome-total-h, 0px)', background: 'var(--hcp-bg-0)', minHeight: '100vh' }}
       >
-        <CourseLegendsDrilldown selection={selection} />
+        <CourseLegendsDrilldown selection={selection} theme="dark" />
       </main>
     </PageRoot>
   );
