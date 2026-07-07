@@ -38,22 +38,39 @@ export const SheetHeader: React.FC<SheetHeaderProps> = ({
           position: 'relative',
           width: 56,
           height: 56,
-          borderRadius: '34%',
-          overflow: 'hidden',
-          background: BG_2,
-          border: '1px solid rgba(255,255,255,0.22)',
           flexShrink: 0,
         }}
       >
-        {avatarUrl ? (
-          <img
-            src={avatarUrl}
-            alt={formatFriendName(name)}
-            style={{ width: '100%', height: '100%', objectFit: 'cover' }}
-          />
-        ) : (
-          <PlaceholderSilhouette />
-        )}
+        <div
+          style={{
+            position: 'absolute',
+            inset: 0,
+            borderRadius: '34%',
+            overflow: 'hidden',
+            background: BG_2,
+          }}
+        >
+          {avatarUrl ? (
+            <img
+              src={avatarUrl}
+              alt={formatFriendName(name)}
+              style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+            />
+          ) : (
+            <PlaceholderSilhouette />
+          )}
+        </div>
+        {/* Traced hairline overlay -- dark sheet canon */}
+        <div
+          aria-hidden
+          style={{
+            position: 'absolute',
+            inset: 0,
+            borderRadius: '34%',
+            border: '1px solid rgba(255,255,255,0.22)',
+            pointerEvents: 'none',
+          }}
+        />
       </div>
       <div style={{ flex: 1, minWidth: 0 }}>
         <div
