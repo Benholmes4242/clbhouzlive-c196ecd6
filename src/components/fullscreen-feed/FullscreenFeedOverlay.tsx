@@ -208,11 +208,16 @@ export function FullscreenFeedOverlay() {
       b && typeof window !== 'undefined' &&
       (window.innerWidth !== b.viewportW || window.innerHeight !== b.viewportH);
     const borrowOriginAlive = !!(b && originHostRegistry.get(b.ownerKey) && !viewportChanged);
+    // CUT mode: always take the instant handback path. Borrow closes still
+    // run returnBorrow('close') → live tile inherits the element; non-borrow
+    // closes short-fade the overlay via AnimatePresence exit.
     const canAnimate =
+      FS_TRANSITION_MODE === 'expand' &&
       sameSlide && (
         (b && borrowOriginAlive) ||
         (!b && o && !!o.posterUrl)
       );
+
 
     if (!canAnimate) {
       if (b) {
