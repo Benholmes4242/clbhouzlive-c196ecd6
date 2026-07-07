@@ -276,8 +276,18 @@ export function FullscreenFeedOverlay() {
     return () => clearTimeout(t);
   }, [isOpen, openCommentsInitially, posts.length, openComments, consumeOpenCommentsInitially, consumeInitialCommentId, readOnly]);
 
-  // Body scroll lock + #root scroll preservation
-  useEffect(() => {
+  // Body scroll lock + #root scroll preservation.
+  //
+  // useLayoutEffect (not useEffect) so lockBodyScroll + the #root scrollTop
+  // restore + safe-area writes land BEFORE the overlay's first paint. The
+  // page behind the (still-translucent) overlay never visibly moves.
+  //
+  // Open-side restore: rootEl.scrollTop is snapshotted, the body is locked
+  // (which may clamp #root to 0), then rootEl.scrollTop is reassigned in the
+  // same synchronous block — so frame 0 composites with the correct scroll
+  // position. Previously the restore only ran on cleanup, which is why close
+  // was clean and open jumped.
+  useLayoutEffect(() => {
     if (isOpen) {
       // Snapshot #root scroll before any clamp/reset happens.
       const rootEl = document.getElementById('root');
@@ -293,6 +303,14 @@ export function FullscreenFeedOverlay() {
       // borrowed lane on its own open. Owner-guard + null-caller rules keep
       // playback correct for both borrow and non-borrow entries.
       lockBodyScroll();
+
+      // Same-frame restore: lockBodyScroll fixes the body which can clamp the
+      // #root scroller to 0. Reassign immediately so the pre-lock scroll
+      // position is what frame 0 composites — no visible jump behind the
+      // translucent overlay.
+      if (rootEl && rootEl.scrollTop !== savedScrollTop) {
+        rootEl.scrollTop = savedScrollTop;
+      }
 
       // ── Safe area bleed (mirrors Clubhouse) ──
       document.body.classList.add('route-fullscreen-overlay');
