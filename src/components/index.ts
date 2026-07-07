@@ -34,8 +34,7 @@ export { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from './ui/t
 export { Tabs, TabsContent, TabsList, TabsTrigger } from './ui/tabs';
 
 // Display Components
-// NOTE: Avatar/AvatarFallback/AvatarImage exports removed — use <SquircleAvatar
-                                                                 > from @/components/ui/SquircleAvatar.
+// NOTE: Avatar/AvatarFallback/AvatarImage exports removed — use <SquircleAvatar /> from @/components/ui/SquircleAvatar.
 // See src/components/ui/AVATAR_GUIDELINES.md.
 export { Separator } from './ui/separator';
 export { ScrollArea } from './ui/scroll-area';
