@@ -262,6 +262,7 @@ export function PodiumRunnerRow({
             tourCode={player.tourCode ?? tourCode}
             size={30}
             frosted
+            ringColor={ringColor}
           />
         </button>
       ) : (
@@ -284,6 +285,7 @@ export function PodiumRunnerRow({
                 tourCode={p.tourCode ?? tourCode}
                 size={26}
                 frosted
+                ringColor={ringColor}
               />
             </div>
           ))}
