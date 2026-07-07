@@ -117,101 +117,59 @@ interface Props {
 }
 
 /**
- * Style object for react-mentions.
- *
- * CRITICAL: the `highlighter` overlay and the `input` textarea MUST
- * share IDENTICAL text metrics (font-family, size, weight,
- * line-height, letter-spacing, padding, border-width, box-sizing) or
- * the two layers drift out of register. We compose ONE `sharedText`
- * object and spread it into BOTH so no field can be hand-edited on
- * one side only.
- *
- * The textarea's own glyphs render TRANSPARENT (caret stays visible
- * via `caretColor`) so exactly one copy of the text is ever painted
- * — the overlay is the sole visible layer.
+ * Style object for react-mentions. Keys map to internal DOM parts.
+ * We keep the input transparent so the surrounding composer chrome
+ * (the pill background + border) shines through.
  */
-const sharedText = {
-  fontFamily: 'inherit',
-  fontSize: 14,
-  fontWeight: 400,
-  lineHeight: '20px',
-  letterSpacing: '0px',
-  padding: '8px 0',
-  border: '0px solid transparent',
-  boxSizing: 'border-box' as const,
-  margin: 0,
-};
-
 const mentionsStyle = {
   control: {
+    fontSize: 14,
+    lineHeight: 1.4,
+    fontFamily: 'inherit',
     background: 'transparent',
-    minHeight: 36,
-    // NOTE: do NOT spread sharedText here. react-mentions positions the
-    // textarea `absolute; top:0` inside the control, so any padding on
-    // control shifts the (in-flow) highlighter down while leaving the
-    // textarea at y=0 — producing the exact one-row selection drift the
-    // brief calls out. Padding lives on the two text layers only.
-    fontFamily: sharedText.fontFamily,
-    fontSize: sharedText.fontSize,
-    fontWeight: sharedText.fontWeight,
-    lineHeight: sharedText.lineHeight,
-    letterSpacing: sharedText.letterSpacing,
+    minHeight: 20,
   },
   highlighter: {
-    ...sharedText,
-    // Overlay carries the ONLY visible copy of the text — must be
-    // ink coloured explicitly (the textarea underneath is transparent).
-    color: INK,
-    WebkitTextFillColor: INK,
+    padding: '8px 0',
+    border: 0,
+    minHeight: 20,
     maxHeight: 120,
     overflow: 'hidden',
-    whiteSpace: 'pre-wrap' as const,
-    wordWrap: 'break-word' as const,
-    substring: {
-      // react-mentions hides plain substrings by default because the
-      // native textarea normally paints them. Our textarea is transparent,
-      // so the overlay must paint BOTH plain text and mention atoms.
-      visibility: 'visible' as const,
-      color: INK,
-      WebkitTextFillColor: INK,
-    },
+    // Give mentions their visual amber weight in the overlay.
   },
   input: {
-    ...sharedText,
+    padding: '8px 0',
+    border: 0,
     outline: 'none',
+    minHeight: 20,
     maxHeight: 120,
     overflow: 'auto' as const,
     background: 'transparent',
-    color: 'transparent',
-    caretColor: INK,
+    color: INK,
+    fontFamily: 'inherit',
     resize: 'none' as const,
-    whiteSpace: 'pre-wrap' as const,
-    wordWrap: 'break-word' as const,
-    WebkitTextFillColor: 'transparent',
   },
   suggestions: {
-    // Full composer width, above the input row. These override
-    // react-mentions' caret-relative positioning (library applies its
-    // own left/top first; our style wins).
-    position: 'absolute' as const,
-    top: 'auto',
-    bottom: '100%',
-    left: 0,
-    right: 0,
-    width: '100%',
-    marginBottom: 8,
-    zIndex: 210,
+    // Anchor the suggestion list ABOVE the input, matching the PR-2a
+    // popup position. react-mentions positions it under the caret by
+    // default; the anchored composer sits at the bottom of the sheet
+    // so we flip it upward via CSS in the wrapper below.
     list: {
       background: '#ffffff',
       borderRadius: 12,
       border: `0.5px solid ${BORDER}`,
       boxShadow:
         '0 8px 24px -8px rgba(15,23,42,0.18), 0 2px 6px rgba(15,23,42,0.08)',
-      maxHeight: 5 * 44 + 8,
+      maxHeight: 260,
       overflowY: 'auto' as const,
       fontSize: 13.5,
-      width: '100%',
-      minWidth: '100%',
+      position: 'absolute' as const,
+      bottom: '100%',
+      marginBottom: 8,
+      left: 0,
+      right: 0,
+      width: 'auto',
+      zIndex: 210,
     },
     item: {
       padding: 0,
@@ -224,12 +182,12 @@ const mentionsStyle = {
 };
 
 const mentionStyle = {
-  // Colour-only highlight — MUST match sharedText weight/size so glyph
-  // widths after the mention line up. Bold or textShadow would shift
-  // metrics and re-introduce the overlay drift the brief calls out.
+  // Overlay style for a rendered mention token — amber, semibold.
   color: AMBER,
-  fontWeight: 400,
+  fontWeight: 600,
   background: 'transparent',
+  textShadow:
+    '1px 1px 1px #ffffff, 1px -1px 1px #ffffff, -1px 1px 1px #ffffff, -1px -1px 1px #ffffff',
 };
 
 /**

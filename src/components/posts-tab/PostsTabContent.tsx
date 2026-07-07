@@ -126,28 +126,10 @@ const PostsTabContent: React.FC<PostsTabContentProps> = ({
   // the sheet would gate on `activePost` which can flip to null mid-open (the
   // sheet appeared to "start opening then dismiss" on personal + business profiles).
   const [selectedCommentPost, setSelectedCommentPost] = useState<FeedPost | null>(null);
-  // Match the Clubhouse feed's delayed sheet mount. Profile footer buttons fire
-  // from Pressable's pointer-up handler; mounting the portal/backdrop in that
-  // same event lets the browser's follow-up click land on the new backdrop and
-  // immediately close the sheet. Deferring the mount until the open state has
-  // committed prevents that click-through while keeping the exit animation.
-  const [commentsMounted, setCommentsMounted] = useState(false);
   const openCommentsForPost = useCallback((post: FeedPost) => {
     setSelectedCommentPost(post);
     openComments(post);
   }, [openComments]);
-  useEffect(() => {
-    if (commentsOpen) {
-      setCommentsMounted(true);
-      return;
-    }
-
-    const t = setTimeout(() => {
-      setCommentsMounted(false);
-      setSelectedCommentPost(null);
-    }, 500);
-    return () => clearTimeout(t);
-  }, [commentsOpen]);
   const { moreOptionsOpen, setMoreOptionsOpen, handleShare, handleReport, handleNotInterested } =
     useClubhouseShare(user?.id);
 
@@ -332,7 +314,7 @@ const PostsTabContent: React.FC<PostsTabContentProps> = ({
       )}
 
       {/* ═══ COMMENTS + MORE OPTIONS overlays ═══ */}
-      {selectedCommentPost && commentsMounted && (
+      {selectedCommentPost && (
         <CommentsSheet
           isOpen={commentsOpen}
           onClose={closeComments}
