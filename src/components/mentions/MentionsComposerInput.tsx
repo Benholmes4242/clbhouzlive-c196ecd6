@@ -150,6 +150,10 @@ const mentionsStyle = {
   },
   highlighter: {
     ...sharedText,
+    // Overlay carries the ONLY visible copy of the text — must be
+    // ink coloured explicitly (the textarea underneath is transparent).
+    color: INK,
+    WebkitTextFillColor: INK,
     maxHeight: 120,
     overflow: 'hidden',
     whiteSpace: 'pre-wrap' as const,
