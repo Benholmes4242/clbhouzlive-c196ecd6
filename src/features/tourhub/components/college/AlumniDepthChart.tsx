@@ -107,6 +107,7 @@ function AlumniRow({ alumnus, index, tier, legacyContextLabel }: AlumniRowProps)
             color={tier === 'legacy'
               ? { bg: 'rgba(124,58,237,0.10)', fg: '#7C3AED' }
               : undefined}
+            ringColor={LIGHT_HAIRLINE}
           />
           <div style={{ minWidth: 0, flex: 1 }}>
             <div style={{ display: 'flex', alignItems: 'center', minWidth: 0 }}>
