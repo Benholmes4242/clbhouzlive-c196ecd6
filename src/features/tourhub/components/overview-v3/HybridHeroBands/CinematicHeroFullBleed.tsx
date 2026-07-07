@@ -588,7 +588,6 @@ export function CinematicHeroFullBleed({
             srcCandidates={champion.avatarCandidates ?? (champion.avatarUrl ? [champion.avatarUrl] : [])}
             alt={champion.name}
             size={56}
-            hideRing
             hairlineRing
             ringColor={GOLD_RING}
           />
