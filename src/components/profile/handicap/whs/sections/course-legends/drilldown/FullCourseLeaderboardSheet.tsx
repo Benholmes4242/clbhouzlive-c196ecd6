@@ -36,17 +36,37 @@ interface Props {
   window: LegendWindow;
   /** Map of category -> viewer's rank (1 = champion). Drilldown already computes this. */
   yourRanks: Partial<Record<LegendCategory, number | null>>;
+  /** Backdrop theme. Default 'dark' preserves handicap drilldown look. */
+  theme?: 'light' | 'dark';
 }
 
-// Dark-mode tokens — sheet portals outside .hcp-dark scope, so all values hardcoded.
+// Sheet portals outside the .hcp-light/.hcp-dark scope, so every color is a
+// hardcoded literal. `theme` picks between dark (handicap host) and light
+// (course-details host) palettes. Do NOT introduce var(--hcp-*) here.
 const DEEP_AMBER = '#F7931E';
 const GOLD = '#F7931E';
-const INK = '#F2F4F7';
-const INK_55 = 'rgba(242,244,247,0.55)';
-const INK_40 = 'rgba(242,244,247,0.38)';
-const HAIRLINE = 'rgba(255,255,255,0.08)';
-const SURFACE = '#15171F';
-const CARD = '#1B1E27';
+
+const DARK = {
+  ink: '#F2F4F7',
+  ink55: 'rgba(242,244,247,0.55)',
+  ink40: 'rgba(242,244,247,0.38)',
+  hairline: 'rgba(255,255,255,0.08)',
+  surface: '#15171F',
+  card: '#1B1E27',
+  avatarRing: 'rgba(255,255,255,0.22)',
+  pillYouBg: 'rgba(255,255,255,0.06)',
+} as const;
+
+const LIGHT = {
+  ink: '#0F172A',
+  ink55: '#64748B',
+  ink40: '#94A3B8',
+  hairline: 'rgba(15,23,42,0.08)',
+  surface: '#F8FAFC',
+  card: '#FFFFFF',
+  avatarRing: 'rgba(15,23,42,0.12)',
+  pillYouBg: 'rgba(15,23,42,0.05)',
+} as const;
 
 const SQUIRCLE_MASK_URL =
   "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cpath d='M40 0h20c22.091 0 40 17.909 40 40v20c0 22.091-17.909 40-40 40H40C17.909 100 0 82.091 0 60V40C0 17.909 17.909 0 40 0z'/%3E%3C/svg%3E\")";
@@ -59,7 +79,7 @@ const squircleMaskStyle: React.CSSProperties = {
   maskRepeat: 'no-repeat',
 };
 
-const BannerAvatar: React.FC<{ photoUrl: string | null; size?: number }> = ({ photoUrl, size = 44 }) => {
+const BannerAvatar: React.FC<{ photoUrl: string | null; size?: number; ringColor: string }> = ({ photoUrl, size = 44, ringColor }) => {
   const bg = photoUrl
     ? `url(${photoUrl}) center/cover`
     : 'linear-gradient(135deg, #cbd5e1 0%, #64748b 100%)';
@@ -71,7 +91,7 @@ const BannerAvatar: React.FC<{ photoUrl: string | null; size?: number }> = ({ ph
           position: 'absolute',
           inset: 0,
           ...squircleMaskStyle,
-          boxShadow: 'inset 0 0 0 1px rgba(15,23,42,0.10)',
+          boxShadow: `inset 0 0 0 1px ${ringColor}`,
         }}
       />
     </div>
@@ -87,7 +107,15 @@ export const FullCourseLeaderboardSheet: React.FC<Props> = ({
   initialCategory,
   window: legendWindow,
   yourRanks,
+  theme = 'dark',
 }) => {
+  const T = theme === 'light' ? LIGHT : DARK;
+  const INK = T.ink;
+  const INK_55 = T.ink55;
+  const INK_40 = T.ink40;
+  const HAIRLINE = T.hairline;
+  const SURFACE = T.surface;
+  const CARD = T.card;
   const [activeCategory, setActiveCategory] = useState<LegendCategory>(initialCategory);
 
   useEffect(() => {
@@ -182,12 +210,13 @@ export const FullCourseLeaderboardSheet: React.FC<Props> = ({
       open={open}
       onClose={onClose}
       ariaLabelledBy="course-legends-full-sheet-title"
-      variant="dark"
-      surfaceColor={SURFACE}
+      variant={theme === 'light' ? 'light' : 'dark'}
+      surfaceColor={theme === 'dark' ? SURFACE : undefined}
       style={{
         maxHeight: '80dvh',
         display: 'flex',
         flexDirection: 'column',
+        background: SURFACE,
       }}
     >
       <div
@@ -207,7 +236,9 @@ export const FullCourseLeaderboardSheet: React.FC<Props> = ({
           title={<span id="course-legends-full-sheet-title">{courseName}</span>}
           onClose={onClose}
           borderBottom={false}
+          dark={theme === 'dark'}
         />
+
 
         {/* Chase line + status pill (replaces the old "Gross Record · N entries" sub) */}
         {champion && (
@@ -258,7 +289,7 @@ export const FullCourseLeaderboardSheet: React.FC<Props> = ({
                   textTransform: 'uppercase',
                   padding: '3px 8px',
                   borderRadius: 999,
-                  background: 'rgba(255,255,255,0.06)',
+                  background: T.pillYouBg,
                   color: INK_55,
                 }}
               >
@@ -348,7 +379,7 @@ export const FullCourseLeaderboardSheet: React.FC<Props> = ({
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
               <Crown size={17} strokeWidth={2.5} fill={GOLD} style={{ color: DEEP_AMBER }} />
             </div>
-            <BannerAvatar photoUrl={champion.photoUrl} size={44} />
+            <BannerAvatar photoUrl={champion.photoUrl} size={44} ringColor={T.avatarRing} />
             <div style={{ minWidth: 0 }}>
               <div
                 style={{
@@ -450,6 +481,7 @@ export const FullCourseLeaderboardSheet: React.FC<Props> = ({
                     gapToChampion={formatGapFromChampion(activeCategory, row.value, championRow.value)}
                     holdDuration={null}
                     isNew={daysSince(row.attained_at) < NEW_BADGE_DAYS}
+                    theme={theme}
                   />
                 </div>
               );

@@ -15,6 +15,8 @@ interface ChampionsListRowProps {
   isNew?: boolean;
   /** Compact variant for inline duel-card top-5 lists. */
   compact?: boolean;
+  /** Backdrop theme. Default 'dark' preserves handicap drilldown look. */
+  theme?: 'light' | 'dark';
 }
 
 const SQUIRCLE_MASK_URL =
@@ -40,12 +42,29 @@ export const ChampionsListRow: React.FC<ChampionsListRowProps> = ({
   holdDuration,
   isNew = false,
   compact = false,
+  theme = 'dark',
 }) => {
-  const rowBg = isSelf
-    ? 'rgba(255,255,255,0.06)'
-    : isChampion
-      ? '#20242E'
-      : '#1B1E27';
+  const isLight = theme === 'light';
+
+  const rowBg = isLight
+    ? (isSelf
+        ? 'rgba(247,147,30,0.06)'
+        : isChampion
+          ? 'rgba(247,147,30,0.08)'
+          : '#FFFFFF')
+    : (isSelf
+        ? 'rgba(255,255,255,0.06)'
+        : isChampion
+          ? '#20242E'
+          : '#1B1E27');
+
+  const dividerColor = isLight ? 'rgba(15,23,42,0.08)' : 'rgba(255,255,255,0.06)';
+  const rankColor = isLight ? '#94A3B8' : 'rgba(255,255,255,0.30)';
+  const nameColor = isLight ? '#0F172A' : 'rgba(255,255,255,0.96)';
+  const subColor = isLight ? '#64748B' : 'rgba(255,255,255,0.55)';
+  const valueColor = isLight ? '#0F172A' : 'rgba(255,255,255,0.96)';
+  const avatarRing = isLight ? 'rgba(15,23,42,0.12)' : 'rgba(255,255,255,0.22)';
+
   const photoBg = photoUrl
     ? `url(${photoUrl}) center/cover`
     : 'linear-gradient(135deg, #cbd5e1 0%, #64748b 100%)';
@@ -59,7 +78,7 @@ export const ChampionsListRow: React.FC<ChampionsListRowProps> = ({
         position: 'absolute',
         inset: 0,
         borderRadius: '34%',
-        border: '1px solid rgba(255,255,255,0.22)',
+        border: `1px solid ${avatarRing}`,
         pointerEvents: 'none',
       }}
     />
@@ -106,7 +125,7 @@ export const ChampionsListRow: React.FC<ChampionsListRowProps> = ({
         alignItems: 'center',
         padding: `${padY} 16px`,
         background: rowBg,
-        boxShadow: 'inset 0 -0.5px 0 rgba(255,255,255,0.06)',
+        boxShadow: `inset 0 -0.5px 0 ${dividerColor}`,
       }}
     >
       {rank === 1 ? (
@@ -120,7 +139,7 @@ export const ChampionsListRow: React.FC<ChampionsListRowProps> = ({
             fontSize: compact ? 13 : 15,
             fontWeight: 700,
             fontVariantNumeric: 'tabular-nums',
-            color: 'rgba(255,255,255,0.30)',
+            color: rankColor,
             lineHeight: 1,
             textAlign: 'right',
           }}
@@ -136,7 +155,7 @@ export const ChampionsListRow: React.FC<ChampionsListRowProps> = ({
           style={{
             fontSize: nameSize,
             fontWeight: isChampion ? 800 : 600,
-            color: 'rgba(255,255,255,0.96)',
+            color: nameColor,
             letterSpacing: '-0.014em',
             lineHeight: 1.25,
             marginBottom: 1,
@@ -167,7 +186,7 @@ export const ChampionsListRow: React.FC<ChampionsListRowProps> = ({
         <div
           style={{
             fontSize: 11,
-            color: 'rgba(255,255,255,0.55)',
+            color: subColor,
             fontWeight: 500,
             letterSpacing: '-0.003em',
             fontVariantNumeric: 'tabular-nums',
@@ -183,7 +202,7 @@ export const ChampionsListRow: React.FC<ChampionsListRowProps> = ({
             fontFamily: GAM.FONT_GEIST,
             fontSize: valueSize,
             fontWeight: 700,
-            color: 'rgba(255,255,255,0.96)',
+            color: valueColor,
             letterSpacing: '-0.02em',
             fontVariantNumeric: 'tabular-nums',
             lineHeight: 1,

@@ -34,6 +34,8 @@ interface ChampionsDuelCardProps {
     sub: string;
     chaseLine?: string;
   } | null;
+  /** Backdrop theme for the embedded rows/avatars. Default 'dark'. */
+  theme?: 'light' | 'dark';
 }
 
 const INK = 'var(--hcp-t-100)';
@@ -52,7 +54,7 @@ const squircleMaskStyle: React.CSSProperties = {
   maskRepeat: 'no-repeat',
 };
 
-function ChampionsSquircle({ photoUrl, size = 38, dashed = false }: { photoUrl: string | null; size?: number; dashed?: boolean }) {
+function ChampionsSquircle({ photoUrl, size = 38, dashed = false, ringColor = 'rgba(255,255,255,0.22)' }: { photoUrl: string | null; size?: number; dashed?: boolean; ringColor?: string }) {
   if (dashed) {
     // Dashed = empty-slot ghost, not an avatar — canon exception, no hairline overlay.
     return (
@@ -74,14 +76,14 @@ function ChampionsSquircle({ photoUrl, size = 38, dashed = false }: { photoUrl: 
   return (
     <div style={{ width: size, height: size, position: 'relative', flexShrink: 0 }} aria-hidden>
       <div style={{ position: 'absolute', inset: 0, background: photoBg, ...squircleMaskStyle }} />
-      {/* Traced hairline (canon: dark surface → 1px white 22%) */}
+      {/* Traced hairline (theme-aware) */}
       <div
         aria-hidden
         style={{
           position: 'absolute',
           inset: 0,
           borderRadius: '34%',
-          border: '1px solid rgba(255,255,255,0.22)',
+          border: `1px solid ${ringColor}`,
           pointerEvents: 'none',
         }}
       />
@@ -94,10 +96,12 @@ function TrackFace({
   entry,
   crowned = false,
   style,
+  ringColor = 'rgba(15,23,42,0.10)',
 }: {
   entry: DuelRow | null;
   crowned?: boolean;
   style?: React.CSSProperties;
+  ringColor?: string;
 }) {
   const size = 22;
   const photoUrl = entry?.photoUrl ?? null;
@@ -120,7 +124,7 @@ function TrackFace({
           background: photoBg,
           borderRadius: '34%',
           overflow: 'hidden',
-          boxShadow: '0 1px 3px rgba(15,23,42,0.18), inset 0 0 0 1px rgba(15,23,42,0.10)',
+          boxShadow: `0 1px 3px rgba(15,23,42,0.18), inset 0 0 0 1px ${ringColor}`,
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
@@ -166,7 +170,14 @@ export const ChampionsDuelCard: React.FC<ChampionsDuelCardProps> = ({
   totalCount,
   onFullLeaderboardTap,
   proBenchmark,
+  theme = 'dark',
 }) => {
+  const isLight = theme === 'light';
+  const avatarRing = isLight ? 'rgba(15,23,42,0.12)' : 'rgba(255,255,255,0.22)';
+  // Track mini-avatars: preserve current dark rendering (slate 10%) so the
+  // handicap compete drilldown stays pixel-for-pixel. Light theme uses the
+  // canonical ink-12% traced hairline.
+  const trackRing = isLight ? 'rgba(15,23,42,0.12)' : 'rgba(15,23,42,0.10)';
   const champion = rows[0];
   const defending = champion?.isSelf === true;
   const standsAlone = rows.length === 1;
@@ -288,7 +299,7 @@ export const ChampionsDuelCard: React.FC<ChampionsDuelCardProps> = ({
             1
           </span>
           <div style={{ position: 'relative', flexShrink: 0 }}>
-            <ChampionsSquircle photoUrl={champion?.photoUrl ?? null} size={38} />
+            <ChampionsSquircle photoUrl={champion?.photoUrl ?? null} size={38} ringColor={avatarRing} />
             <div
               aria-hidden
               style={{
@@ -370,12 +381,12 @@ export const ChampionsDuelCard: React.FC<ChampionsDuelCardProps> = ({
           </div>
           {defending ? (
             right ? (
-              <ChampionsSquircle photoUrl={right.photoUrl} size={38} />
+              <ChampionsSquircle photoUrl={right.photoUrl} size={38} ringColor={avatarRing} />
             ) : (
               <ChampionsSquircle photoUrl={null} size={38} dashed />
             )
           ) : selfOnBoard ? (
-            <ChampionsSquircle photoUrl={selfRow?.photoUrl ?? null} size={38} />
+            <ChampionsSquircle photoUrl={selfRow?.photoUrl ?? null} size={38} ringColor={avatarRing} />
           ) : (
             <ChampionsSquircle photoUrl={null} size={38} dashed />
           )}
@@ -430,6 +441,7 @@ export const ChampionsDuelCard: React.FC<ChampionsDuelCardProps> = ({
           {/* chaser mini-avatar */}
           <TrackFace
             entry={trackChaser}
+            ringColor={trackRing}
             style={{
               position: 'absolute',
               left: `calc(${(1 - pos) * 100}% - 11px)`,
@@ -442,6 +454,7 @@ export const ChampionsDuelCard: React.FC<ChampionsDuelCardProps> = ({
           <TrackFace
             entry={trackChampion}
             crowned
+            ringColor={trackRing}
             style={{
               position: 'absolute',
               left: -2,
@@ -488,6 +501,7 @@ export const ChampionsDuelCard: React.FC<ChampionsDuelCardProps> = ({
               gapToChampion={row.gapToChampion}
               holdDuration={null}
               compact
+              theme={theme}
             />
           ))
         )}
