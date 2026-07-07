@@ -758,9 +758,15 @@ const BorrowedFullscreenSlot: React.FC<{
     background: '#000',
     overflow: 'hidden',
     willChange: 'transform, width, height',
-    transition: (expanded || closing)
-      ? 'transform 300ms cubic-bezier(0.32,0.72,0,1), width 300ms cubic-bezier(0.32,0.72,0,1), height 300ms cubic-bezier(0.32,0.72,0,1)'
-      : 'none',
+    // CUT mode: never animate the wrapper — instant snap on open, instant
+    // handback on close. EXPAND mode: 300ms shared-element transition.
+    transition:
+      FS_TRANSITION_MODE === 'cut'
+        ? 'none'
+        : (expanded || closing)
+          ? 'transform 300ms cubic-bezier(0.32,0.72,0,1), width 300ms cubic-bezier(0.32,0.72,0,1), height 300ms cubic-bezier(0.32,0.72,0,1)'
+          : 'none',
+
     pointerEvents: 'none',
   };
 
