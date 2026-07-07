@@ -353,6 +353,7 @@ export const CardFeed = forwardRef<CardFeedHandle, CardFeedProps>(function CardF
       mediaIndex: number,
       origin?: { el: HTMLElement | null; posterUrl?: string | null },
       mediaId?: string | null,
+      ownerKey?: string | null,
     ) => {
       const idx = posts.findIndex((p) => p.id === post.id);
       if (idx < 0) return;
@@ -363,6 +364,7 @@ export const CardFeed = forwardRef<CardFeedHandle, CardFeedProps>(function CardF
         console.info('[DECIDE]', 'tap.context', {
           postId: post.id,
           mediaId: mediaId ?? null,
+          ownerKey: ownerKey ?? null,
           hasOrigin: !!origin?.el,
           isActiveCard: idx === playingIdx,
           playingIdx,
@@ -378,6 +380,8 @@ export const CardFeed = forwardRef<CardFeedHandle, CardFeedProps>(function CardF
           originEl: origin.el,
           posterUrl: origin.posterUrl ?? null,
           mediaId: mediaId ?? null,
+          mediaIndex,
+          railOwnerKey: ownerKey ?? null,
         });
       } else {
         openFullscreen(posts, idx, { mediaId: mediaId ?? null, openedFrom: 'clubhouse' });

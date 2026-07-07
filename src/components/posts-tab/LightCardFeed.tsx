@@ -192,6 +192,7 @@ export const LightCardFeed: React.FC<LightCardFeedProps> = ({
       mediaIndex: number,
       origin?: { el: HTMLElement | null; posterUrl?: string | null },
       mediaId?: string | null,
+      ownerKey?: string | null,
     ) => {
       const idx = posts.findIndex((p) => p.id === post.id);
       if (idx < 0) return;
@@ -202,6 +203,7 @@ export const LightCardFeed: React.FC<LightCardFeedProps> = ({
         console.info('[DECIDE]', 'tap.context', {
           postId: post.id,
           mediaId: mediaId ?? null,
+          ownerKey: ownerKey ?? null,
           hasOrigin: !!origin?.el,
           isActiveCard: idx === playingIdx,
           playingIdx,
@@ -217,6 +219,8 @@ export const LightCardFeed: React.FC<LightCardFeedProps> = ({
           originEl: origin.el,
           posterUrl: origin.posterUrl ?? null,
           mediaId: mediaId ?? null,
+          mediaIndex,
+          railOwnerKey: ownerKey ?? null,
           options: {
             hasNextPage: hasNextPage ?? false,
             fetchNextPage: hasNextPage ? fetchNextPage : undefined,

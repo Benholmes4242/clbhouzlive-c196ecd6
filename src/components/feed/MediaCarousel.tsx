@@ -32,7 +32,18 @@ interface Props {
    */
   postId?: string | null;
   onIndexChange?: (idx: number) => void;
-  onOpen: (mediaIndex: number, mediaId?: string | null) => void;
+  /**
+   * Fired on single-tap. `originEl` is the tapped slide's host element (the
+   * same element InlineVideo registers under `ownerKey` for FLIP handoff).
+   * `ownerKey` is the per-slide key `${postId}:${i}` — thread it up so the
+   * borrow check can match the tapped slide exactly.
+   */
+  onOpen: (
+    mediaIndex: number,
+    mediaId?: string | null,
+    originEl?: HTMLElement | null,
+    ownerKey?: string | null,
+  ) => void;
   /** Double-tap on any slide → like + heart burst (owner: FeedCard). */
   onDoubleTap?: () => void;
 }
@@ -51,6 +62,7 @@ export const MediaCarousel: React.FC<Props> = ({
   onDoubleTap,
 }) => {
   const trackRef = useRef<HTMLDivElement | null>(null);
+  const slideRefs = useRef<Array<HTMLButtonElement | null>>([]);
   const [active, setActive] = useState(() =>
     Math.max(0, Math.min(initialIndex || 0, items.length - 1)),
   );
@@ -116,15 +128,31 @@ export const MediaCarousel: React.FC<Props> = ({
           const url = m.imageUrl || m.thumbnailUrl || '';
           const isVideo = m.type === 'video';
           const isActiveSlide = isCardActive && i === active;
+          const slideOwnerKey = postId
+            ? `${postId}:${i}`
+            : `${m.id ?? 'noid'}:${i}`;
+          const emitOpen = (el: HTMLButtonElement | null) =>
+            onOpen(i, items[i]?.id ?? null, el, slideOwnerKey);
           const handleTap = createTapHandler({
-            onSingle: (e) => { e.stopPropagation(); onOpen(i, items[i]?.id ?? null); },
+            onSingle: (e) => {
+              e.stopPropagation();
+              emitOpen(slideRefs.current[i] ?? (e.currentTarget as HTMLButtonElement));
+            },
             onDouble: (e) => { e.stopPropagation(); onDoubleTap?.(); },
           });
           return (
             <button
               type="button"
               key={m.id || i}
-              onClick={onDoubleTap ? handleTap : (e) => { e.stopPropagation(); onOpen(i, items[i]?.id ?? null); }}
+              ref={(el) => { slideRefs.current[i] = el; }}
+              onClick={
+                onDoubleTap
+                  ? handleTap
+                  : (e) => {
+                      e.stopPropagation();
+                      emitOpen(slideRefs.current[i] ?? (e.currentTarget as HTMLButtonElement));
+                    }
+              }
               style={{
                 flex: '0 0 100%',
                 width: '100%',
