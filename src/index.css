@@ -4649,3 +4649,14 @@ em-emoji-picker input:focus {
 .mentions-composer__suggestions__list {
   width: 100% !important;
 }
+.mentions-composer__highlighter,
+.mentions-composer__highlighter * {
+  color: #0F172A;
+  -webkit-text-fill-color: #0F172A;
+}
+.mentions-composer__highlighter strong,
+.mentions-composer__highlighter [data-mention="true"] {
+  color: #F7931E !important;
+  -webkit-text-fill-color: #F7931E !important;
+  font-weight: 400 !important;
+}
