@@ -456,6 +456,8 @@ const BusinessProfilePage: React.FC = () => {
         />
 
         {/* Avatar (squircle) — owner: tap to upload; visitor: tap to lightbox */}
+        {/* Canon exception: 2px bg-background die-cut ring over the cover photo — */}
+        {/* matches the personal profile hero avatar-on-cover rule; no hairline. */}
         <div className="absolute left-5 z-20 pointer-events-auto" style={{ bottom: '-62px' }}>
           <button
             className="relative w-[124px] h-[124px] block cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-[#F7931E] focus-visible:ring-offset-2 rounded-[34%] transition-transform hover:scale-[1.02] active:scale-[0.98]"

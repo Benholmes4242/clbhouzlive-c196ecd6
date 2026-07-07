@@ -3,7 +3,7 @@ import { Camera, Plus } from 'lucide-react';
 
 import { SectionHeader } from '@/components/ui/SectionHeader';
 import { SectionCard } from '@/components/profile/edit-v2/SectionCard';
-import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
+import { SquircleAvatar, LIGHT_HAIRLINE } from '@/components/ui/SquircleAvatar';
 import { BIZ } from '@/components/business/businessTokens';
 
 import { LABEL_CLASS } from './editorStyles';
@@ -46,6 +46,8 @@ export function BrandingSection({
                   src={effectiveLogoUrl || undefined}
                   fallback={resolvedName?.[0] || 'B'}
                   size={96}
+                  hairlineRing
+                  ringColor={LIGHT_HAIRLINE}
                 />
                 <label
                   className="absolute -bottom-1 -right-1 w-8 h-8 rounded-full text-white flex items-center justify-center cursor-pointer shadow-sm"

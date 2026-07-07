@@ -1,6 +1,6 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
+import { SquircleAvatar, LIGHT_HAIRLINE } from '@/components/ui/SquircleAvatar';
 import { useBusinessTeam, type BusinessRole } from '@/hooks/useBusinessTeam';
 
 const FRIENDLY_ROLE: Record<BusinessRole, string> = {
@@ -60,7 +60,8 @@ export const BusinessTeamTab: React.FC<BusinessTeamTabProps> = ({ businessId }) 
               src={m.user_profile?.profile_photo_url || undefined}
               alt={name}
               fallback={name.charAt(0).toUpperCase()}
-              hideRing
+              hairlineRing
+              ringColor={LIGHT_HAIRLINE}
             />
             <div className="min-w-0 flex-1">
               <p className="text-[15px] font-semibold text-foreground truncate">{name}</p>
