@@ -34,6 +34,11 @@ export const Z = {
   // Dropdown layers
   dropdownScrim: 50,
   dropdownMenu: 60,
+
+  // Mention suggestions panel — portals to <body>; must clear sheet (12003)
+  // because composers live inside CommentsSheet / TopTenCardComments / etc.
+  mentionsPanel: 12010,
+
   
   // Utility classes for inline styles
   asStyle: {
