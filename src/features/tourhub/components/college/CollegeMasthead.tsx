@@ -14,6 +14,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Crown } from 'lucide-react';
 import { getCollegeLogoUrl } from '@/utils/collegeLogo';
 import { PlayerInitialAvatar } from '../shared/PlayerInitialAvatar';
+import { LIGHT_HAIRLINE } from '@/components/ui/SquircleAvatar';
 import { formatCurrency } from '@/lib/utils/formatCurrency';
 import type { CollegeSeasonStats } from '../../hooks/useCollegeStats';
 import type { CollegeMedia } from '../../hooks/useCollegeMedia';
