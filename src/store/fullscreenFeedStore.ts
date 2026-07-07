@@ -172,6 +172,28 @@ export const useFullscreenFeedStore = create<FullscreenFeedState>((set, get) => 
   },
   close: () => {
     const cb = get().onCloseCallback;
+    const borrow = get().borrow;
+    // [VPERF] S2 fs.close — from close intent to tileLive.
+    // borrow  → tile element re-mounted + playing on its rail lane
+    // no-borrow → overlay unmounted (approximated as fullscreen lane 'paused')
+    const mode: 'flip-return' | 'no-borrow' | 'fallback' = borrow ? 'flip-return' : 'no-borrow';
+    const closeSpanId = vperfNextId('fs.close');
+    vperfStart(closeSpanId, 'fs.close', { mode, laneId: borrow ? borrow.laneId : 'fullscreen' });
+    vperfMark(closeSpanId, 'returnStart');
+    if (borrow) {
+      vperfArmLane(borrow.laneId, { spanId: closeSpanId, endOn: 'playing' });
+    } else {
+      // Fallback: no borrow — end on fullscreen lane going idle. We don't
+      // have an 'unmount' event, so end on next lane state edge that fires
+      // after close: canplay/playing/waiting/seeked all viable, but the most
+      // reliable is the release-driven session end. For now end on the next
+      // 'firstFrame' of any subsequent open (won't fire on this close) —
+      // instead close manually after one frame.
+      requestAnimationFrame(() => {
+        // eslint-disable-next-line @typescript-eslint/no-var-requires
+        import('@/perf/vperf').then((m) => m.vperfEnd(closeSpanId, { note: 'no-borrow raf' })).catch(() => {});
+      });
+    }
     set({
       isOpen: false,
       posts: [],
