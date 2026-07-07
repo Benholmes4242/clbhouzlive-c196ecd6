@@ -152,8 +152,12 @@ const TrophyGroupLabel: React.FC<{
   </div>
 );
 
-const Grid: React.FC<{ items: TrophyItem[]; onTap: (item: TrophyItem) => void }> = ({ items, onTap }) => (
-  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 8 }}>
+const Grid: React.FC<{
+  items: TrophyItem[];
+  onTap: (item: TrophyItem) => void;
+  columns?: number;
+}> = ({ items, onTap, columns = 3 }) => (
+  <div style={{ display: 'grid', gridTemplateColumns: `repeat(${columns}, 1fr)`, gap: 8 }}>
     {items.map((item) => (
       <TrophyCard key={item.id} item={item} onTap={onTap} />
     ))}
