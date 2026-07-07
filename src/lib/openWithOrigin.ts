@@ -253,5 +253,25 @@ export function openWithOrigin({
     openedFrom,
     borrow,
   });
+
+  // [VPERF] end of the synchronous open() call — mark storeOpen phase and
+  // arm the target lane's next 'playing' event to close the span.
+  vperfMark(fsOpenSpanId, 'storeOpen');
+  const targetLaneId: string = borrow ? borrow.laneId : 'fullscreen';
+  vperfArmLane(targetLaneId, { spanId: fsOpenSpanId, endOn: 'firstFrame', phase: 'firstFrame' });
+  vperfArmLane(targetLaneId, {
+    spanId: fsOpenSpanId,
+    endOn: 'playing',
+  });
+  // Budget: borrow → 150ms (element already playing), lane cold → 500ms.
+  // We can't mutate the started span's budget cleanly; instead, restart with
+  // the correct budget from the same t0 by re-issuing vperfStart is not
+  // possible (would lose phases). Encode source + let the reader compare
+  // totalMs to the source-appropriate budget. Emit source hint in extra meta
+  // via a lane-armed 'playing' end; also stash on the initial span meta.
+  // Simpler: re-issue with knownStart via a private path — not exposed.
+  // Compromise: emit a discrete '[VPERF] fs.open.hint' preroll so the reader
+  // can align. Not required by the brief; skipping.
 }
+
 
