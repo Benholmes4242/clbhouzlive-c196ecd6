@@ -74,7 +74,8 @@ serve(async (req) => {
       )
     }
 
-    // Get media from tagged posts
+    // Get media from posts attached to this course via posts.course_id.
+    // (Legacy post_tags golf_club rows were removed with the mention nuke.)
     let postQuery = supabaseClient
       .from('post_media')
       .select(`
@@ -86,17 +87,10 @@ serve(async (req) => {
           id,
           user_id,
           created_at,
-          post_tags!inner (
-            tagged_entity_id,
-            taggable_entities!inner (
-              entity_type,
-              entity_id
-            )
-          )
+          course_id
         )
       `)
-      .eq('posts.post_tags.taggable_entities.entity_type', 'golf_club')
-      .eq('posts.post_tags.taggable_entities.entity_id', clubId)
+      .eq('posts.course_id', clubId)
       .order('created_at', { ascending: false })
       .limit(limit)
 
