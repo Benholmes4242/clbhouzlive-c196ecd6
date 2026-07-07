@@ -221,25 +221,7 @@ export const MiniPlayer: React.FC = () => {
             <div className="text-muted-foreground text-xs truncate">
               {videoData?.creatorName || ""}
             </div>
-            <div className="flex items-center gap-2 mt-1">
-              {queueLength > 0 && (
-                <button
-                  onClick={(e) => { e.stopPropagation(); context?.openQueue?.(); }}
-                  className="flex items-center gap-1 text-[10px] text-muted-foreground hover:text-foreground transition-colors"
-                >
-                  <ListMusic className="w-3 h-3" />
-                  Queue: {queueLength}
-                </button>
-              )}
-              {context?.nextVideoId && context?.nextMeta && (
-                <button
-                  onClick={(e) => { e.stopPropagation(); context?.openQueue?.(); }}
-                  className="text-[10px] text-primary/80 hover:text-primary truncate max-w-[120px] text-left"
-                >
-                  Next: {context.nextMeta.title}
-                </button>
-              )}
-            </div>
+            {/* Queue/Next buttons removed in PR-5 with the drawer. */}
           </div>
 
           {/* Controls (inert shells) */}
