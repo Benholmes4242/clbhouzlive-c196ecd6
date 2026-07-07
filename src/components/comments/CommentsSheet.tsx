@@ -38,6 +38,8 @@ import { overlayOpen, overlayMark } from '@/perf/overlayTiming';
 import { lockBodyScroll, unlockBodyScroll } from '@/lib/bodyScrollLock';
 
 import { MentionText } from '@/components/mentions/MentionText';
+import { MentionAutocomplete } from '@/components/mentions/MentionAutocomplete';
+import { useMentionAutocomplete } from '@/lib/mentions/useMentionAutocomplete';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -160,6 +162,10 @@ function CommentsSheet({
   const [loadingReplies, setLoadingReplies] = useState<Set<string>>(new Set());
   const [commentToDelete, setCommentToDelete] = useState<CommentWithReplies | CommentReply | null>(null);
   const [inputText, setInputText] = useState('');
+  const [caret, setCaret] = useState(0);
+  const mention = useMentionAutocomplete(inputText, caret);
+
+
   const [highlightedId, setHighlightedId] = useState<string | null>(null);
   // Defer the comment-list render until AFTER the panel slide starts, so the O(N) commit
   // doesn't block framer-motion's first frame. Skeleton covers the slide window.
@@ -1125,6 +1131,24 @@ function CommentsSheet({
                     hairlineRing ringColor={LIGHT_HAIRLINE}
                   />
                   <div className="flex-1 min-w-0 relative">
+                    <MentionAutocomplete
+                      isActive={mention.isActive}
+                      suggestions={mention.suggestions}
+                      isLoading={mention.isLoading}
+                      inputRef={textareaRef}
+                      onSelect={(sel) => {
+                        const { newText, newCaret } = mention.applySelection(sel);
+                        setInputText(newText);
+                        setCaret(newCaret);
+                        requestAnimationFrame(() => {
+                          const el = textareaRef.current;
+                          if (el) {
+                            el.focus();
+                            el.setSelectionRange(newCaret, newCaret);
+                          }
+                        });
+                      }}
+                    />
                     <div style={{
                       display: 'flex', alignItems: 'flex-end', gap: 4, borderRadius: 22, padding: '4px 6px 4px 14px',
                       background: '#ffffff',
@@ -1134,7 +1158,12 @@ function CommentsSheet({
                       <textarea
                         ref={textareaRef}
                         value={inputText}
-                        onChange={(e) => setInputText(e.target.value)}
+                        onChange={(e) => {
+                          setInputText(e.target.value);
+                          setCaret(e.target.selectionStart ?? e.target.value.length);
+                        }}
+                        onKeyUp={(e) => setCaret((e.target as HTMLTextAreaElement).selectionStart ?? 0)}
+                        onClick={(e) => setCaret((e.target as HTMLTextAreaElement).selectionStart ?? 0)}
                         onKeyDown={handleInputKeyDown}
                         placeholder={replyingTo ? `Reply to ${replyingTo.displayName}...` : 'Add a comment...'}
                         rows={1}
@@ -1151,6 +1180,7 @@ function CommentsSheet({
                       />
                     </div>
                   </div>
+
                   <button
                     type="button"
                     onClick={handleSend}
