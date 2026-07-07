@@ -417,6 +417,7 @@ export const CourseLegendsDrilldown: React.FC<Props> = ({ selection, hideHeader 
                       ? proBenchmarkPick
                       : null
                   }
+                  theme={theme}
                 />
               </div>
             );
