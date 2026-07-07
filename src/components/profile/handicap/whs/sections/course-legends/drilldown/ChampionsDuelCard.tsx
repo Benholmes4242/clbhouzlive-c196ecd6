@@ -324,18 +324,23 @@ export const ChampionsDuelCard: React.FC<ChampionsDuelCardProps> = ({
                 fontWeight: 800,
                 color: INK,
                 letterSpacing: '-0.01em',
-                whiteSpace: 'nowrap',
+                display: '-webkit-box',
+                WebkitLineClamp: 2,
+                WebkitBoxOrient: 'vertical',
                 overflow: 'hidden',
-                textOverflow: 'ellipsis',
-                display: 'inline-flex',
-                alignItems: 'center',
-                gap: 6,
+                wordBreak: 'break-word',
               }}
             >
-              <span style={{ overflow: 'hidden', textOverflow: 'ellipsis' }}>
-                {firstName(champion?.name ?? '—')}
-              </span>
-              {champion && (
+              {firstName(champion?.name ?? '—')}
+            </span>
+            <span
+              style={{
+                display: 'inline-flex',
+                alignItems: 'baseline',
+                gap: 8,
+              }}
+            >
+              {champion && champion.delta != null && champion.delta !== 0 && (
                 <MovementCell
                   delta={champion.delta}
                   rank30d={champion.rank30d}
@@ -343,18 +348,18 @@ export const ChampionsDuelCard: React.FC<ChampionsDuelCardProps> = ({
                   size="chip"
                 />
               )}
-            </span>
-            <span
-              style={{
-                fontSize: 17,
-                fontWeight: 800,
-                color: INK,
-                fontVariantNumeric: 'tabular-nums',
-                lineHeight: 1.1,
-                letterSpacing: '-0.02em',
-              }}
-            >
-              {champion?.valueDisplay ?? '—'}
+              <span
+                style={{
+                  fontSize: 17,
+                  fontWeight: 800,
+                  color: INK,
+                  fontVariantNumeric: 'tabular-nums',
+                  lineHeight: 1.1,
+                  letterSpacing: '-0.02em',
+                }}
+              >
+                {champion?.valueDisplay ?? '—'}
+              </span>
             </span>
           </div>
         </div>
