@@ -378,34 +378,23 @@ export function FullscreenFeedOverlay() {
     // host opacity gate below flips to 1 immediately.
     if (isOpen && borrow) {
       setCloneVisible(false);
+      setCloneExpandDone(true);
       setFirstFrameReady(true);
       return;
     }
     if (isOpen && origin) {
       setCloneVisible(true);
       setCloneExpanded(false);
+      setCloneExpandDone(false);
       setFirstFrameReady(false);
       setTargetRect(null);
-      // Single rAF: after the host mounts (inset:0, opacity:0) + body-class
-      // mutations settle, compute the media's RESTING RECT and expand to it.
-      // Images always rest CONTAIN inside the safe area — the clone grows
-      // into the letterboxed rect rather than the full viewport, so there
-      // is no post-expand shrink.
       const raf = requestAnimationFrame(() => {
         const vp = getCurrentViewport();
-        // Prefer the tapped media's intrinsic dims (threaded from
-        // mediaItems by openWithOrigin). Grid tiles are uniform and
-        // cover-crop, so origin.aspectRatio is only a faithful proxy on
-        // FEED cards — use it as the fallback. Final fallback: full
-        // viewport (legacy behaviour).
         const omw = origin.originMediaW ?? 0;
         const omh = origin.originMediaH ?? 0;
         const useMediaDims = omw > 0 && omh > 0;
         const ar = useMediaDims ? omw / omh : (origin.aspectRatio > 0 ? origin.aspectRatio : 0);
         const [mw, mh] = useMediaDims ? [omw, omh] : (ar > 0 ? [ar * 1000, 1000] : [0, 0]);
-        // Consult the resolver with the ACTUAL media type — passing 'image'
-        // for videos silently bypasses the Reels cover rule and lands
-        // portrait video letterboxed at open.
         const kind: 'video' | 'image' = origin.mediaType ?? 'image';
         const resting = resolveRestingRect(mw, mh, vp, kind);
         setTargetRect({
@@ -415,30 +404,33 @@ export function FullscreenFeedOverlay() {
           height: resting.height,
         });
         setCloneExpanded(true);
+        // Backstop: mark expand done ~320ms after we flip cloneExpanded,
+        // regardless of whether the img's transitionend fires (browsers can
+        // drop it if the element is retired or if transitions coalesce).
+        expandDoneTimerRef.current = setTimeout(() => {
+          setCloneExpandDone(true);
+        }, 320);
       });
-      // Watchdog: release the clone if the first-frame signal never arrives.
-      // Image opens have no first-frame event (SnapFeed only fires it for
-      // video); use a very short timeout so the settled image + chrome
-      // paint together, in the SAME rect the clone landed on (single
-      // geometry rule below). Video keeps the longer watchdog as a safety.
-      const watchdogMs = origin.mediaType === 'image' ? 60 : 400;
+      // Watchdog: only for video first-frame signal. Image opens rely on
+      // cloneExpandDone (below) to reveal the host — the settled image
+      // paints in the SAME rect the clone landed on.
+      const watchdogMs = origin.mediaType === 'image' ? 340 : 400;
       watchdogRef.current = setTimeout(() => {
         setFirstFrameReady(true);
       }, watchdogMs);
       return () => {
         cancelAnimationFrame(raf);
         if (watchdogRef.current) clearTimeout(watchdogRef.current);
-      };
-      return () => {
-        cancelAnimationFrame(raf);
-        if (watchdogRef.current) clearTimeout(watchdogRef.current);
+        if (expandDoneTimerRef.current) clearTimeout(expandDoneTimerRef.current);
       };
     } else if (!isOpen) {
       setCloneVisible(false);
       setCloneExpanded(false);
+      setCloneExpandDone(false);
       setFirstFrameReady(false);
       setTargetRect(null);
       if (watchdogRef.current) clearTimeout(watchdogRef.current);
+      if (expandDoneTimerRef.current) clearTimeout(expandDoneTimerRef.current);
     }
   }, [isOpen, origin, borrow]);
 
@@ -447,14 +439,18 @@ export function FullscreenFeedOverlay() {
     setFirstFrameReady(true);
   }, []);
 
-  // Retire the clone shortly after the crossfade completes.
+  // Retire the clone only after BOTH the expand transition has completed AND
+  // the settled content is ready. Prevents the "flash" where the settled host
+  // reveals under a still-animating clone (or a clone retires before the
+  // settled content has painted).
+  const readyToHandoff = firstFrameReady && cloneExpandDone;
   useEffect(() => {
-    if (!firstFrameReady || !cloneVisible) return;
+    if (!readyToHandoff || !cloneVisible) return;
     const t = setTimeout(() => {
       setCloneVisible(false);
     }, 180);
     return () => clearTimeout(t);
-  }, [firstFrameReady, cloneVisible]);
+  }, [readyToHandoff, cloneVisible]);
 
 
 
