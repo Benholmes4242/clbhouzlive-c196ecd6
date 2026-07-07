@@ -538,6 +538,8 @@ export const FullCourseLeaderboardSheet: React.FC<Props> = ({
                     holdDuration={null}
                     isNew={daysSince(row.attained_at) < NEW_BADGE_DAYS}
                     theme={theme}
+                    rank30d={row.rank30d}
+                    delta={row.delta}
                   />
                 </div>
               );
