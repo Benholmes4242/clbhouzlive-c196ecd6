@@ -12,7 +12,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { uploadManager } from './UploadManager';
 import { uploadEventBus } from './uploadEventBus';
 import { createPost } from '@/services/posts/createPost';
-import { handlePostTags } from '@/hooks/usePostSubmission/uploadUtils';
+
 import { pollStreamMetadata, updatePostMediaMetadata } from '@/utils/pollStreamMetadata';
 import { queueImageProcessing } from '@/services/imageProcessing';
 import { toast } from 'sonner';
