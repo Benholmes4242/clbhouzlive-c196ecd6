@@ -158,14 +158,13 @@ export function BusinessCommandCard({
           className="w-full flex items-center gap-3 p-4 text-left active:opacity-95 transition-opacity"
           style={{ background: 'transparent', border: 'none' }}
         >
-          {/* Logo — 46px squircle */}
+          {/* Logo — 46px squircle with canonical traced hairline */}
           <div
-            className="shrink-0 overflow-hidden flex items-center justify-center"
+            className="shrink-0 relative overflow-hidden flex items-center justify-center"
             style={{
               width: 46,
               height: 46,
               background: BIZ.fillStrong,
-              border: `1px solid ${BIZ.hair}`,
               borderRadius: 14,
             }}
           >
@@ -176,6 +175,12 @@ export function BusinessCommandCard({
                 {business.name.charAt(0).toUpperCase()}
               </span>
             )}
+            {/* Canonical 1px traced hairline ring — ink @ 12% */}
+            <div
+              aria-hidden
+              className="pointer-events-none absolute inset-0"
+              style={{ border: '1px solid rgba(15,23,42,0.12)', borderRadius: 14 }}
+            />
           </div>
 
           {/* Name + sub */}
