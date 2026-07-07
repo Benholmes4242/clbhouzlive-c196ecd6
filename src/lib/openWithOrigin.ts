@@ -263,6 +263,14 @@ export function openWithOrigin({
   const targetLaneId: string = borrow ? borrow.laneId : 'fullscreen';
   vperfArmLane(targetLaneId, { spanId: fsOpenSpanId, endOn: 'firstFrame', phase: 'firstFrame' });
   vperfArmLane(targetLaneId, { spanId: fsOpenSpanId, endOn: 'playing' });
+
+  // [VPERF] fs.open motion trace — borrow opens only (the reported screen
+  // jolt is tile→fullscreen FLIP). originRect is captured pre-mount so it's
+  // comparable against frame 0 of the trace; a stale/incorrect origin rect
+  // is a prime suspect for the jump.
+  if (borrow) {
+    vperfMotionTrace(fsOpenSpanId, { originRect: origin?.rect ?? null });
+  }
 }
 
 
