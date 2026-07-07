@@ -563,19 +563,32 @@ export function FullscreenFeedOverlay() {
                   />
                 )}
 
-                {/* ── FLIP clone layer (Phase 3 shared-element expand) ── */}
-                {origin && cloneVisible && targetRect && (
+                {/* ── FLIP clone layer (Phase 3 shared-element expand) ──
+                    Rendered from Render A at origin.rect (targetRect null),
+                    so the browser has a real "from" style to interpolate
+                    from when Render B commits targetRect + cloneExpanded. */}
+                {origin && cloneVisible && (
                   <img
                     src={origin.posterUrl ?? undefined}
                     alt=""
                     aria-hidden
+                    onTransitionEnd={(e) => {
+                      // Motion clock = readiness clock. Reveal the settled
+                      // host only after the clone's own expand animation
+                      // completes (300ms transform). Guarded so it only
+                      // fires once, and only for the expand direction.
+                      if (!cloneExpanded) return;
+                      if (e.propertyName !== 'transform') return;
+                      if (watchdogRef.current) { clearTimeout(watchdogRef.current); watchdogRef.current = null; }
+                      setFirstFrameReady(true);
+                    }}
                     style={{
                       position: 'fixed',
                       top: 0,
                       left: 0,
-                      width: cloneExpanded ? targetRect.width : origin.rect.width,
-                      height: cloneExpanded ? targetRect.height : origin.rect.height,
-                      transform: cloneExpanded
+                      width: cloneExpanded && targetRect ? targetRect.width : origin.rect.width,
+                      height: cloneExpanded && targetRect ? targetRect.height : origin.rect.height,
+                      transform: cloneExpanded && targetRect
                         ? `translate(${targetRect.left}px, ${targetRect.top}px)`
                         : `translate(${origin.rect.left}px, ${origin.rect.top}px)`,
                       objectFit: 'cover',
