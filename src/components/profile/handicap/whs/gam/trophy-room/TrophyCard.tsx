@@ -84,7 +84,7 @@ const Watermark: React.FC<{ iconKey: string; color: string; opacity: number }> =
       zIndex: 0,
     }}
   >
-    {renderBadgeIcon(iconKey, 96, 'currentColor')}
+    {renderBadgeIcon(iconKey, 96, 'currentColor', 1.6)}
   </div>
 );
 
