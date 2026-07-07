@@ -134,7 +134,7 @@ function StackedAvatars({
             alt={item.name}
             userId={item.userId}
             size={size}
-            hideRing
+            hairlineRing
           />
         </div>
       ))}
