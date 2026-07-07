@@ -3,6 +3,22 @@ import React from 'react';
 import { Crown } from 'lucide-react';
 import { MovementCell } from './_shared/MovementCell';
 
+/**
+ * Shared column widths for champion boards. Header row, champion banner
+ * and every list row use these so the 30D glyph and score digits sit in
+ * fixed columns — no per-row eyeballing. Ranks column absorbs slack via
+ * the 1fr name column, so trailing columns remain anchored to the right.
+ */
+export const CHAMPS_COL_30D_FULL = 40;
+export const CHAMPS_COL_SCORE_FULL = 56;
+export const CHAMPS_COL_30D_COMPACT = 40;
+export const CHAMPS_COL_SCORE_COMPACT = 48;
+export const CHAMPS_GRID_FULL = `24px 40px 1fr ${CHAMPS_COL_30D_FULL}px ${CHAMPS_COL_SCORE_FULL}px`;
+export const CHAMPS_GRID_COMPACT = `18px 32px 1fr ${CHAMPS_COL_30D_COMPACT}px ${CHAMPS_COL_SCORE_COMPACT}px`;
+export const CHAMPS_GRID_GAP_FULL = 14;
+export const CHAMPS_GRID_GAP_COMPACT = 12;
+export const CHAMPS_ROW_PADDING_X = 16;
+
 interface ChampionsListRowProps {
   rank: number;
   name: string;
