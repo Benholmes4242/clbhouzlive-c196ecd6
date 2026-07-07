@@ -618,6 +618,16 @@ const BorrowedFullscreenSlot: React.FC<{
     // [VPERF] motion trace: phase-1 (expand) done, phase-2 (fit swap) begins.
     try { vperfMotionMark('expandEnd'); vperfMotionMark('fitSwapStart'); } catch {}
 
+    // Fix 5: motion clock = readiness clock. Reveal the fullscreen host only
+    // after the borrow wrapper's own expand transition has committed. Fires
+    // once per open, on the first size/transform transition end.
+    if (!firedFirstFrameRef.current && (
+      e.propertyName === 'transform' || e.propertyName === 'width' || e.propertyName === 'height'
+    )) {
+      firedFirstFrameRef.current = true;
+      onFirstFrameReady?.();
+    }
+
     // Resting fit was decided at mount from the media's aspect ratio.
     if (restingFitRef.current === 'cover') {
       // Portrait/square video — wrapper already fills viewport, media already
@@ -638,7 +648,7 @@ const BorrowedFullscreenSlot: React.FC<{
       try { VideoEngine.nudgeLevelCap(borrow.laneId); } catch {}
     }
     try { vperfMotionMark('fitSwapEnd'); } catch {}
-  }, [borrow.laneId, fitContain]);
+  }, [borrow.laneId, fitContain, onFirstFrameReady]);
 
   const target = targetRectRef.current;
   const style: React.CSSProperties = {
