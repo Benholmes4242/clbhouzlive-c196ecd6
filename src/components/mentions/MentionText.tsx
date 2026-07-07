@@ -43,7 +43,7 @@ export const MentionText: React.FC<Props> = ({
     <Tag className={className} style={style}>
       {segments.map((seg, i) => {
         if (seg.kind === 'text') {
-          return <React.Fragment key={i}>{seg.text}</React.Fragment>;
+          return <span key={i}>{seg.text}</span>;
         }
         const handleClick = (e: React.MouseEvent | React.TouchEvent) => {
           e.stopPropagation();
