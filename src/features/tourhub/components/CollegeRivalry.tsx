@@ -427,7 +427,7 @@ export function CollegeRivalry() {
                   srcCandidates={leaderCaptain ? getPlayerHeadshotCandidates(leaderCaptain.fullName, leaderCaptain.tourCode) : []}
                   alt={leaderCaptain?.fullName ?? '—'}
                   userId={leaderCaptain?.playerId ?? leaderCaptain?.fullName ?? null}
-                  hideRing
+                  hairlineRing ringColor={LIGHT_HAIRLINE}
                 />
                 <div style={{ minWidth: 0 }}>
                   <div style={{
