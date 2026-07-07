@@ -481,6 +481,7 @@ export const FullCourseLeaderboardSheet: React.FC<Props> = ({
                     gapToChampion={formatGapFromChampion(activeCategory, row.value, championRow.value)}
                     holdDuration={null}
                     isNew={daysSince(row.attained_at) < NEW_BADGE_DAYS}
+                    theme={theme}
                   />
                 </div>
               );
