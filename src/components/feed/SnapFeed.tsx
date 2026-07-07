@@ -144,6 +144,23 @@ export function SnapFeed({
   const activeIndex = activeIndexOverride ?? storeActiveIndex;
   const location = useLocation();
 
+  // [VPERF] S4 swipe.vertical — a vertical settle on a video slide.
+  // Ends on the next 'playing' event on the feed-active lane. We assume the
+  // active slide's primary media is a video; image-only settles simply time
+  // out (TIMEOUT verdict) and are harmless / rare in the vertical feed.
+  const prevActiveRef = useRef<number>(activeIndex);
+  useEffect(() => {
+    if (prevActiveRef.current === activeIndex) return;
+    prevActiveRef.current = activeIndex;
+    const post = posts[activeIndex];
+    if (!post) return;
+    const spanId = vperfNextId(`swipe.vertical:${post.id}`);
+    vperfStart(spanId, 'swipe.vertical', { postId: post.id, activeIndex });
+    vperfArmLane('feed-active', { spanId, endOn: 'firstFrame', phase: 'firstFrame' });
+    vperfArmLane('feed-active', { spanId, endOn: 'playing' });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [activeIndex]);
+
   // NOTE: no route-change pauseAll here — the VideoEngine owns per-lane
   // activation via useVideoLane, and the fullscreen overlay's open path
   // must not pause a borrowed lane on its own open. Route-change cleanup
