@@ -6,7 +6,7 @@
 import React from 'react';
 import { ChevronRight } from 'lucide-react';
 import CountryFlag from '@/components/ui/country-flag';
-import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
+import { SquircleAvatar, LIGHT_HAIRLINE } from '@/components/ui/SquircleAvatar';
 
 import {
   INK,
