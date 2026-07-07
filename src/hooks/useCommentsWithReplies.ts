@@ -466,7 +466,7 @@ export function useCommentsWithReplies(
               actor_id: currentUserId,
               type: 'comment',
               title: `${acterName} commented on your post`,
-              message: content.length > 60 ? content.slice(0, 60) + '…' : content,
+              message: (() => { const p = stripMentionMarkup(content); return p.length > 60 ? p.slice(0, 60) + '…' : p; })(),
               entity_type: 'post',
               entity_id: postId,
               is_read: false,
