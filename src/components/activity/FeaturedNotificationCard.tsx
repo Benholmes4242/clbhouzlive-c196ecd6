@@ -290,7 +290,7 @@ export const FeaturedNotificationCard: React.FC<FeaturedNotificationCardProps> =
           <div className="relative shrink-0">
             <div
               style={{
-                border: incomplete ? '0' : '0.5px solid #D1D5DB',
+                border: incomplete ? '0' : 'none',
                 borderRadius: '34%',
                 lineHeight: 0,
                 background: incomplete ? '#1E293B' : 'transparent',
@@ -311,7 +311,8 @@ export const FeaturedNotificationCard: React.FC<FeaturedNotificationCardProps> =
                   alt={actorName || 'User'}
                   size={44}
                   fallback={actorName?.charAt(0) || '?'}
-                  hideRing
+                  hairlineRing
+                  ringColor={LIGHT_HAIRLINE}
                 />
               )}
             </div>
