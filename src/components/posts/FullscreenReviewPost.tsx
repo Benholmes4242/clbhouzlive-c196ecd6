@@ -158,7 +158,8 @@ export function FullscreenReviewPost({
   const [isTransitioning, setIsTransitioning] = useState(false);
   const [isMuted, setIsMuted] = useState(true);
   const containerRef = useRef<HTMLDivElement>(null);
-  // [VIDEOSTUB] videoPlayerRef removed — no player mounted.
+
+
   
   const hasMultipleMedia = sortedMedia.length > 1;
   const currentMedia = sortedMedia[currentIndex];
