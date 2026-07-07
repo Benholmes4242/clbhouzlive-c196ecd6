@@ -128,15 +128,31 @@ export const MediaCarousel: React.FC<Props> = ({
           const url = m.imageUrl || m.thumbnailUrl || '';
           const isVideo = m.type === 'video';
           const isActiveSlide = isCardActive && i === active;
+          const slideOwnerKey = postId
+            ? `${postId}:${i}`
+            : `${m.id ?? 'noid'}:${i}`;
+          const emitOpen = (el: HTMLButtonElement | null) =>
+            onOpen(i, items[i]?.id ?? null, el, slideOwnerKey);
           const handleTap = createTapHandler({
-            onSingle: (e) => { e.stopPropagation(); onOpen(i, items[i]?.id ?? null); },
+            onSingle: (e) => {
+              e.stopPropagation();
+              emitOpen(slideRefs.current[i] ?? (e.currentTarget as HTMLButtonElement));
+            },
             onDouble: (e) => { e.stopPropagation(); onDoubleTap?.(); },
           });
           return (
             <button
               type="button"
               key={m.id || i}
-              onClick={onDoubleTap ? handleTap : (e) => { e.stopPropagation(); onOpen(i, items[i]?.id ?? null); }}
+              ref={(el) => { slideRefs.current[i] = el; }}
+              onClick={
+                onDoubleTap
+                  ? handleTap
+                  : (e) => {
+                      e.stopPropagation();
+                      emitOpen(slideRefs.current[i] ?? (e.currentTarget as HTMLButtonElement));
+                    }
+              }
               style={{
                 flex: '0 0 100%',
                 width: '100%',
