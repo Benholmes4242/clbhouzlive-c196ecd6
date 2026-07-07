@@ -283,12 +283,7 @@ export const TrophyRoomSheet: React.FC<Props> = ({ userId, viewerUserId, ownerFi
   const openDetail = useCallback(
     (item: TrophyItem) => {
       if (item.kind === 'achievement') {
-        const list =
-          tab === 'all'
-            ? allAchievements
-            : tab === 'earned'
-              ? earnedAchievements
-              : lockedAchievements;
+        const list = tab === 'earned' ? earnedAchievements : allAchievements;
         const index = list.findIndex((i) => i.id === item.id);
         setDetailCtx({ items: list, index: Math.max(0, index) });
       } else {
@@ -296,7 +291,7 @@ export const TrophyRoomSheet: React.FC<Props> = ({ userId, viewerUserId, ownerFi
         setDetailCtx({ items: allLegends, index: Math.max(0, index) });
       }
     },
-    [tab, earnedAchievements, allAchievements, lockedAchievements, allLegends],
+    [tab, earnedAchievements, allAchievements, allLegends],
   );
 
   const isLoading = badgesLoading || legendsLoading;
