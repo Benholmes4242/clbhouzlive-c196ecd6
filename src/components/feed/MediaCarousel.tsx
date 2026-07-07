@@ -32,7 +32,18 @@ interface Props {
    */
   postId?: string | null;
   onIndexChange?: (idx: number) => void;
-  onOpen: (mediaIndex: number, mediaId?: string | null) => void;
+  /**
+   * Fired on single-tap. `originEl` is the tapped slide's host element (the
+   * same element InlineVideo registers under `ownerKey` for FLIP handoff).
+   * `ownerKey` is the per-slide key `${postId}:${i}` — thread it up so the
+   * borrow check can match the tapped slide exactly.
+   */
+  onOpen: (
+    mediaIndex: number,
+    mediaId?: string | null,
+    originEl?: HTMLElement | null,
+    ownerKey?: string | null,
+  ) => void;
   /** Double-tap on any slide → like + heart burst (owner: FeedCard). */
   onDoubleTap?: () => void;
 }
