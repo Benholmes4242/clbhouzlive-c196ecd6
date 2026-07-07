@@ -18,7 +18,7 @@ import type { TournamentLeaderWinner } from '../../hooks/useTournamentLeadersWin
 import { useSingleCourseImage } from '../../hooks/useCourseImageResolver';
 import { getCourseImage } from '../../utils/placeholders';
 import { formatPurse, PlayerAvatar, PodiumRunnerRow, buildPodiumRows, UpcomingCountdown } from '../shared/TourHeroHelpers';
-import { LIGHT_HAIRLINE } from '@/components/ui/SquircleAvatar';
+
 import { getScoreColor } from '../../_shared/scoreColor';
 import { getContextLabel } from '../../utils/tournamentClassification';
 
