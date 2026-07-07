@@ -531,34 +531,67 @@ export function FullscreenFeedOverlay() {
 
                 {/* ── FLIP clone layer (Phase 3 shared-element expand) ── */}
                 {origin && cloneVisible && targetRect && (
-                  <img
-                    src={origin.posterUrl ?? undefined}
-                    alt=""
-                    aria-hidden
-                    style={{
-                      position: 'fixed',
-                      top: 0,
-                      left: 0,
-                      width: cloneExpanded ? targetRect.width : origin.rect.width,
-                      height: cloneExpanded ? targetRect.height : origin.rect.height,
-                      transform: cloneExpanded
-                        ? `translate(${targetRect.left}px, ${targetRect.top}px)`
-                        : `translate(${origin.rect.left}px, ${origin.rect.top}px)`,
-                      objectFit: 'cover',
-                      borderRadius: cloneExpanded ? 0 : origin.borderRadius,
-                      willChange: 'transform, width, height, opacity, border-radius',
-                      transition:
-                        'transform 300ms cubic-bezier(0.32,0.72,0,1),' +
-                        ' width 300ms cubic-bezier(0.32,0.72,0,1),' +
-                        ' height 300ms cubic-bezier(0.32,0.72,0,1),' +
-                        ' border-radius 240ms cubic-bezier(0.32,0.72,0,1),' +
-                        ' opacity 120ms linear',
-                      opacity: firstFrameReady ? 0 : 1,
-                      pointerEvents: 'none',
-                      zIndex: 2,
-                      background: '#000',
-                    }}
-                  />
+                  <>
+                    {/* Blurred self-backdrop — sourced from the already-decoded
+                        thumbnail (origin.posterUrl). Mounted at frame 0 of the
+                        clone expand and fades in over the expand duration so
+                        the backdrop is already at rest by the time the settled
+                        slide takes over. The settled slide's own backdrop uses
+                        the same source (see FeedSlide) so the handoff is
+                        pixel-identical — no black-then-blur flick. Only
+                        rendered when the target rect is letterboxed
+                        (contain-mode) so landscape video / cover-mode opens
+                        keep their black bars unchanged. */}
+                    {origin.posterUrl && (
+                      (targetRect.width < window.innerWidth - 1 ||
+                        targetRect.height < window.innerHeight - 1) && (
+                        <div
+                          aria-hidden="true"
+                          style={{
+                            position: 'fixed',
+                            inset: 0,
+                            backgroundImage: `url(${origin.posterUrl})`,
+                            backgroundSize: 'cover',
+                            backgroundPosition: 'center',
+                            filter: 'blur(40px) brightness(0.5) saturate(1.2)',
+                            transform: 'scale(1.2)',
+                            opacity: firstFrameReady ? 0 : 1,
+                            transition: 'opacity 180ms linear',
+                            pointerEvents: 'none',
+                            zIndex: 1,
+                          }}
+                        />
+                      )
+                    )}
+                    <img
+                      src={origin.posterUrl ?? undefined}
+                      alt=""
+                      aria-hidden
+                      style={{
+                        position: 'fixed',
+                        top: 0,
+                        left: 0,
+                        width: cloneExpanded ? targetRect.width : origin.rect.width,
+                        height: cloneExpanded ? targetRect.height : origin.rect.height,
+                        transform: cloneExpanded
+                          ? `translate(${targetRect.left}px, ${targetRect.top}px)`
+                          : `translate(${origin.rect.left}px, ${origin.rect.top}px)`,
+                        objectFit: 'cover',
+                        borderRadius: cloneExpanded ? 0 : origin.borderRadius,
+                        willChange: 'transform, width, height, opacity, border-radius',
+                        transition:
+                          'transform 300ms cubic-bezier(0.32,0.72,0,1),' +
+                          ' width 300ms cubic-bezier(0.32,0.72,0,1),' +
+                          ' height 300ms cubic-bezier(0.32,0.72,0,1),' +
+                          ' border-radius 240ms cubic-bezier(0.32,0.72,0,1),' +
+                          ' opacity 120ms linear',
+                        opacity: firstFrameReady ? 0 : 1,
+                        pointerEvents: 'none',
+                        zIndex: 2,
+                        background: '#000',
+                      }}
+                    />
+                  </>
                 )}
               </>
             )}

@@ -386,11 +386,21 @@ function AppRoutes() {
     forceUnlockBodyScroll();
 
     const darkChrome = isDarkChromeRoute(location.pathname);
+    // Immersive route enumeration is single-sourced in
+    // src/components/header/globalHeaderRules.ts (IMMERSIVE_ROUTE_PREFIXES /
+    // IMMERSIVE_EXACT_ROUTES): Clubhouse, courses (list + detail), profile
+    // (self + other + business detail), tour hub, top100 regions, discover
+    // region pages, and any page using the hero-bleed pattern. All of these
+    // must have a TRANSPARENT shield + safe-area bleed so heroes extend into
+    // the notch. If you add a hero-bleed route, add it in globalHeaderRules —
+    // NEVER branch chrome logic per-page here.
     const immersive = isImmersiveRoute(location.pathname);
     const isAuth = location.pathname.startsWith('/auth');
-    // Immersive routes (course/profile/business) get a DARK ink fallback so
-    // any pre-paint glimpse in the notch/safe-area is cinematic, not grey.
-    const surface = darkChrome ? '#15171F' : immersive ? '#0F172A' : '#F8FAFC';
+    // Immersive routes: paint html/body pure black so any pre-paint gap in
+    // the notch/safe-area is cinematic jet-black, not the dark-navy #0F172A
+    // that read as a grey band once the status-bar overlay flag was
+    // boot-locked and the shield became the sole chrome writer.
+    const surface = darkChrome ? '#15171F' : immersive ? '#000000' : '#F8FAFC';
     const shieldColor = immersive ? 'transparent' : (darkChrome ? '#15171F' : '#F8FAFC');
     // NOTE: `overlay` flag is boot-locked ONCE at app startup via
     // ensureStatusBarOverlayBooted() (see useMedianStatusBar.ts). Route
