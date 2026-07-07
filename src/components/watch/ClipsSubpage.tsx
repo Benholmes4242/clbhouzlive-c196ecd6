@@ -75,7 +75,6 @@ export default function ClipsSubpage() {
         <div style={{ paddingTop: 'var(--chrome-total-h, 0px)' }}>
           {isSearching ? (
             <>
-              <WatchAutoplay posts={posts} gridRef={gridRef as React.RefObject<HTMLDivElement>} />
               <WatchGrid
                 posts={posts}
                 isLoading={isLoading}
