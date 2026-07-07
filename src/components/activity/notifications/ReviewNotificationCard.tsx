@@ -3,7 +3,7 @@ import { motion } from 'framer-motion';
 import { Flag } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import type { ActivityNotification } from '@/hooks/useActivityFeed';
-import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
+import { SquircleAvatar, LIGHT_HAIRLINE } from '@/components/ui/SquircleAvatar';
 import {
   getActorDisplayName,
   getActorAvatarUrl,
