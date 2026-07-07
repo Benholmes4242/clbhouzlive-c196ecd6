@@ -488,8 +488,8 @@ const ShowpieceCard: React.FC<Props> = ({ item, onTap }) => {
 
       <Watermark
         iconKey={item.iconKey}
-        color={locked ? '#F2F4F7' : c}
-        opacity={locked ? 0.05 : isObsidian ? 0.08 : 0.10}
+        color={locked || started ? '#F2F4F7' : c}
+        opacity={locked ? 0.05 : started ? 0.05 : isObsidian ? 0.08 : 0.10}
       />
 
       {/* Top row */}
