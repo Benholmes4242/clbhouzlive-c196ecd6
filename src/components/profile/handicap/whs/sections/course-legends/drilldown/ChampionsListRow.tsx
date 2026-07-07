@@ -3,6 +3,22 @@ import React from 'react';
 import { Crown } from 'lucide-react';
 import { MovementCell } from './_shared/MovementCell';
 
+/**
+ * Shared column widths for champion boards. Header row, champion banner
+ * and every list row use these so the 30D glyph and score digits sit in
+ * fixed columns — no per-row eyeballing. Ranks column absorbs slack via
+ * the 1fr name column, so trailing columns remain anchored to the right.
+ */
+export const CHAMPS_COL_30D_FULL = 40;
+export const CHAMPS_COL_SCORE_FULL = 56;
+export const CHAMPS_COL_30D_COMPACT = 40;
+export const CHAMPS_COL_SCORE_COMPACT = 48;
+export const CHAMPS_GRID_FULL = `24px 40px 1fr ${CHAMPS_COL_30D_FULL}px ${CHAMPS_COL_SCORE_FULL}px`;
+export const CHAMPS_GRID_COMPACT = `18px 32px 1fr ${CHAMPS_COL_30D_COMPACT}px ${CHAMPS_COL_SCORE_COMPACT}px`;
+export const CHAMPS_GRID_GAP_FULL = 14;
+export const CHAMPS_GRID_GAP_COMPACT = 12;
+export const CHAMPS_ROW_PADDING_X = 16;
+
 interface ChampionsListRowProps {
   rank: number;
   name: string;
@@ -130,10 +146,10 @@ export const ChampionsListRow: React.FC<ChampionsListRowProps> = ({
       style={{
         position: 'relative',
         display: 'grid',
-        gridTemplateColumns: compact ? '18px 32px 1fr auto' : '24px 40px 1fr auto',
-        gap: compact ? 12 : 14,
+        gridTemplateColumns: compact ? CHAMPS_GRID_COMPACT : CHAMPS_GRID_FULL,
+        gap: compact ? CHAMPS_GRID_GAP_COMPACT : CHAMPS_GRID_GAP_FULL,
         alignItems: 'center',
-        padding: `${padY} 16px`,
+        padding: `${padY} ${CHAMPS_ROW_PADDING_X}px`,
         background: rowBg,
         boxShadow: `inset 0 -0.5px 0 ${dividerColor}`,
       }}
@@ -206,8 +222,13 @@ export const ChampionsListRow: React.FC<ChampionsListRowProps> = ({
         </div>
       </div>
 
-      <div style={{ textAlign: 'right', flexShrink: 0, display: 'flex', alignItems: 'center', gap: 10, justifyContent: 'flex-end' }}>
+      {/* 30D column — fixed width, centered */}
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
         <MovementCell delta={delta} rank30d={rank30d} theme={theme} size={compact ? 'chip' : 'row'} />
+      </div>
+
+      {/* SCORE column — fixed width, centered */}
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
         <span
           style={{
             fontFamily: GAM.FONT_GEIST,

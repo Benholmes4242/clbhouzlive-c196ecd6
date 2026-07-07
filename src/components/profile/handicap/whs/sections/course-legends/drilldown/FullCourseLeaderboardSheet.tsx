@@ -3,7 +3,14 @@ import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { type LucideIcon, ChevronDown, ChevronUp, Crown } from 'lucide-react';
 import { BottomSheet } from '@/components/ui/BottomSheet';
 import { SheetHeader } from '@/components/ui/SheetHeader';
-import { ChampionsListRow } from './ChampionsListRow';
+import {
+  ChampionsListRow,
+  CHAMPS_GRID_FULL,
+  CHAMPS_GRID_GAP_FULL,
+  CHAMPS_ROW_PADDING_X,
+  CHAMPS_COL_30D_FULL,
+  CHAMPS_COL_SCORE_FULL,
+} from './ChampionsListRow';
 import { MovementCell } from './_shared/MovementCell';
 import { formatGapFromChampion, formatHeldFor, daysSince, NEW_BADGE_DAYS } from './_shared/helpers';
 import { duelLine } from './_shared/duelTension';
@@ -364,25 +371,26 @@ export const FullCourseLeaderboardSheet: React.FC<Props> = ({
           })}
         </div>
 
-        {/* PINNED CHAMPION BANNER — static, never scrolls */}
+        {/* PINNED CHAMPION BANNER — static, never scrolls. Uses the shared
+            column grid so 30D + SCORE align with the header + list rows. */}
         {champion && (
           <div
             style={{
               display: 'grid',
-              gridTemplateColumns: '24px 44px 1fr auto',
-              gap: 12,
+              gridTemplateColumns: CHAMPS_GRID_FULL,
+              gap: CHAMPS_GRID_GAP_FULL,
               alignItems: 'center',
-              padding: '12px 18px',
+              padding: `12px ${CHAMPS_ROW_PADDING_X}px`,
               background: 'linear-gradient(180deg, rgba(247,147,30,0.12), rgba(247,147,30,0.05))',
               borderTop: `2px solid ${GOLD}`,
               borderBottom: `0.5px solid ${HAIRLINE}`,
               flexShrink: 0,
             }}
           >
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end' }}>
               <Crown size={17} strokeWidth={2.5} fill={GOLD} style={{ color: DEEP_AMBER }} />
             </div>
-            <BannerAvatar photoUrl={champion.photoUrl} size={44} ringColor={T.avatarRing} />
+            <BannerAvatar photoUrl={champion.photoUrl} size={40} ringColor={T.avatarRing} />
             <div style={{ minWidth: 0 }}>
               <div
                 style={{
@@ -412,10 +420,20 @@ export const FullCourseLeaderboardSheet: React.FC<Props> = ({
                 {championHoldDuration ? `${championHoldDuration} · Champion` : 'Champion'}
               </div>
             </div>
-            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 4 }}>
+            {/* 30D column */}
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+              <MovementCell
+                delta={champion.delta}
+                rank30d={champion.rank30d}
+                theme={theme}
+                size="row"
+              />
+            </div>
+            {/* SCORE column — centered under the header */}
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
               <div
                 style={{
-                  fontSize: 24,
+                  fontSize: 22,
                   fontWeight: 800,
                   color: INK,
                   letterSpacing: '-0.02em',
@@ -425,28 +443,24 @@ export const FullCourseLeaderboardSheet: React.FC<Props> = ({
               >
                 {championValueDisplay}
               </div>
-              <MovementCell
-                delta={champion.delta}
-                rank30d={champion.rank30d}
-                theme={theme}
-                size="row"
-              />
             </div>
           </div>
         )}
 
-        {/* Column header — micro-caps "30D" above the movement cell */}
+        {/* Column header — micro-caps "30D" and "SCORE" centered above their
+            fixed-width columns. Same grid template as every row below. */}
         {champion && !standsAlone && listRows.length > 0 && (
           <div
             style={{
               display: 'grid',
-              gridTemplateColumns: '24px 40px 1fr auto',
-              gap: 14,
+              gridTemplateColumns: CHAMPS_GRID_FULL,
+              gap: CHAMPS_GRID_GAP_FULL,
               alignItems: 'center',
-              padding: '10px 16px 6px',
+              padding: `10px ${CHAMPS_ROW_PADDING_X}px 6px`,
               background: SURFACE,
               borderBottom: `0.5px solid ${HAIRLINE}`,
               flexShrink: 0,
+              fontFamily: GAM.FONT_GEIST,
             }}
           >
             <span />
@@ -454,28 +468,27 @@ export const FullCourseLeaderboardSheet: React.FC<Props> = ({
             <span />
             <span
               style={{
-                display: 'flex',
-                alignItems: 'center',
-                gap: 10,
-                justifyContent: 'flex-end',
+                textAlign: 'center',
                 fontSize: 9,
                 fontWeight: 800,
                 letterSpacing: '0.12em',
                 textTransform: 'uppercase',
                 color: INK_55,
-                fontFamily: GAM.FONT_GEIST,
               }}
             >
-              <span style={{ minWidth: 26, textAlign: 'right' }}>30D</span>
-              <span
-                style={{
-                  minWidth: 40,
-                  textAlign: 'right',
-                  fontVariantNumeric: 'tabular-nums',
-                }}
-              >
-                {activeDescriptor?.unit?.toUpperCase() || 'SCORE'}
-              </span>
+              30D
+            </span>
+            <span
+              style={{
+                textAlign: 'center',
+                fontSize: 9,
+                fontWeight: 800,
+                letterSpacing: '0.12em',
+                textTransform: 'uppercase',
+                color: INK_55,
+              }}
+            >
+              {activeDescriptor?.unit?.toUpperCase() || 'SCORE'}
             </span>
           </div>
         )}
