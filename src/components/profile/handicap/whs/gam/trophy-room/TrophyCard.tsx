@@ -345,8 +345,11 @@ const ShowpieceCard: React.FC<Props> = ({ item, onTap }) => {
 
   const currentValue = item.currentValue ?? 0;
   const locked = !item.earned && currentValue === 0;
-
   const totalTiers = item.tiers.length;
+  // "Started" — tiered badge with progress but below the first threshold.
+  // Uses the ghost/locked surface with LIVE content and a muted-bronze bar.
+  const started = !locked && totalTiers > 1 && item.reachedTier === 0 && currentValue > 0;
+
   const atMax = !locked && item.reachedTier >= totalTiers && totalTiers > 0;
   const nextTier = !atMax && item.reachedTier < totalTiers ? item.tiers[item.reachedTier] : null;
   const prevThreshold = item.reachedTier > 0 ? item.tiers[item.reachedTier - 1].threshold : 0;
@@ -360,14 +363,16 @@ const ShowpieceCard: React.FC<Props> = ({ item, onTap }) => {
 
   // Material palette — every tiered showpiece (including regional Top 100)
   // wears the user's CURRENT material. Region lives in the label, not the colour.
-  const reachedIdx = locked
+  const reachedIdx = locked || started
     ? 1
     : (Math.max(1, Math.min(5, item.reachedTier || 1)) as 1 | 2 | 3 | 4 | 5);
   const materialPal = MATERIAL_PALETTES[reachedIdx];
   const pal = materialPal;
   const c = pal.color;
+  // Muted bronze (the material being smelted toward) for the "started" state.
+  const bronzeC = MATERIAL_PALETTES[1].color;
 
-  const isObsidian = !locked && item.reachedTier >= 5;
+  const isObsidian = !locked && !started && item.reachedTier >= 5;
 
   const [animatedPct, setAnimatedPct] = useState(0);
   const [animatedValue, setAnimatedValue] = useState(0);
@@ -407,32 +412,44 @@ const ShowpieceCard: React.FC<Props> = ({ item, onTap }) => {
 
   const pillLabel = locked
     ? 'UNFORGED'
-    : isObsidian
-      ? `OBSIDIAN · T${item.reachedTier}/${totalTiers}`
-      : totalTiers > 1
-        ? `${pal.label} · T${item.reachedTier}/${totalTiers}`
-        : pal.label;
+    : started
+      ? 'IN PROGRESS'
+      : isObsidian
+        ? `OBSIDIAN · T${item.reachedTier}/${totalTiers}`
+        : totalTiers > 1
+          ? `${pal.label} · T${item.reachedTier}/${totalTiers}`
+          : pal.label;
 
   // Backgrounds
-  const bg = locked
+  const bg = locked || started
     ? T.raised
     : isObsidian
       ? 'linear-gradient(170deg,#12151C 0%,#07080C 100%)'
       : `linear-gradient(180deg, ${rgbaOf(c, 0.13)}, ${rgbaOf(c, 0.02)} 70%), ${T.card}`;
-  const border = locked
+  const border = locked || started
     ? `1px solid ${T.line}`
     : isObsidian
       ? 'none'
       : `1px solid ${rgbaOf(c, 0.45)}`;
   const boxShadow = isObsidian
     ? 'inset 0 1px 0 rgba(255,255,255,0.07), 0 0 0 1px rgba(251,188,46,0.5), 0 6px 22px rgba(0,0,0,0.55)'
-    : locked
+    : locked || started
       ? undefined
       : `inset 0 1px 0 ${rgbaOf(c, 0.18)}`;
 
-  const chipBg = locked ? 'transparent' : rgbaOf(c, 0.14);
-  const chipBorder = locked ? `1.5px dashed ${T.faintest}` : `1px solid ${rgbaOf(c, 0.42)}`;
-  const glyphColor = locked ? T.glyphLocked : c;
+  // Icon chip: dashed for locked (untouched); solid hairline for started
+  // (touched but not yet forged); material tint once forged.
+  const chipBg = locked
+    ? 'transparent'
+    : started
+      ? 'rgba(242,244,247,0.06)'
+      : rgbaOf(c, 0.14);
+  const chipBorder = locked
+    ? `1.5px dashed ${T.faintest}`
+    : started
+      ? `1px solid ${T.line}`
+      : `1px solid ${rgbaOf(c, 0.42)}`;
+  const glyphColor = locked || started ? T.dim : c;
 
   return (
     <button
@@ -471,8 +488,8 @@ const ShowpieceCard: React.FC<Props> = ({ item, onTap }) => {
 
       <Watermark
         iconKey={item.iconKey}
-        color={locked ? '#F2F4F7' : c}
-        opacity={locked ? 0.05 : isObsidian ? 0.08 : 0.10}
+        color={locked || started ? '#F2F4F7' : c}
+        opacity={locked ? 0.05 : started ? 0.05 : isObsidian ? 0.08 : 0.10}
       />
 
       {/* Top row */}
@@ -508,9 +525,9 @@ const ShowpieceCard: React.FC<Props> = ({ item, onTap }) => {
               fontSize: 8.5,
               fontWeight: 800,
               letterSpacing: '0.12em',
-              color: locked ? T.faint : c,
-              border: `1px solid ${locked ? T.line : rgbaOf(c, 0.42)}`,
-              background: locked ? 'transparent' : rgbaOf(c, 0.10),
+              color: locked || started ? T.faint : c,
+              border: `1px solid ${locked || started ? T.line : rgbaOf(c, 0.42)}`,
+              background: locked || started ? 'transparent' : rgbaOf(c, 0.10),
               borderRadius: 6,
               ...GAM.TABULAR,
             }}
@@ -538,7 +555,7 @@ const ShowpieceCard: React.FC<Props> = ({ item, onTap }) => {
             fontSize: 33,
             fontWeight: 800,
             letterSpacing: '-0.03em',
-            color: locked ? T.dim : isObsidian ? '#F8F4E8' : c,
+            color: locked ? T.dim : started ? T.dim : isObsidian ? '#F8F4E8' : c,
             lineHeight: 1,
             textShadow: isObsidian ? '0 0 16px rgba(251,188,46,0.35)' : undefined,
             ...GAM.TABULAR,
@@ -605,7 +622,9 @@ const ShowpieceCard: React.FC<Props> = ({ item, onTap }) => {
                 ? 'linear-gradient(90deg, rgba(251,188,46,0.9), rgba(247,147,30,0.9))'
                 : locked
                   ? T.faint
-                  : c,
+                  : started
+                    ? rgbaOf(bronzeC, 0.45)
+                    : c,
               borderRadius: 99,
               transition: 'width 700ms cubic-bezier(0.22,0.61,0.36,1)',
             }}
@@ -613,9 +632,10 @@ const ShowpieceCard: React.FC<Props> = ({ item, onTap }) => {
         </div>
       </div>
 
-      {/* Rarity footer strip — every forged card. Locked has no pedigree. */}
-      {!locked && <RarityFooterStrip rarity={item.rarity} />}
-      {locked && (
+      {/* Rarity footer strip — pedigree arrives with the first forge.
+          Hidden for locked and "started" (pre-bronze) states. */}
+      {!locked && !started && <RarityFooterStrip rarity={item.rarity} />}
+      {(locked || started) && (
         <div style={{ height: 10, flexShrink: 0 }} />
       )}
     </button>

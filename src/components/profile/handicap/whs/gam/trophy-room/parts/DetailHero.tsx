@@ -76,15 +76,20 @@ const RoundBtn: React.FC<{
 );
 
 export const DetailHero: React.FC<Props> = ({ item, index, total, onPrev, onNext, onClose }) => {
-  const palette = paletteFor(item);
-  const locked =
-    item.kind === 'achievement' && !item.earned && (item.currentValue == null || item.currentValue === 0);
-
   const isAch = item.kind === 'achievement';
   const isTiered = isAch && item.tiers.length > 1;
   const reachedTier = isAch ? item.reachedTier : 0;
   const totalTiers = isAch ? item.tiers.length : 0;
-  const isObsidian = isTiered && reachedTier >= 5 && !locked && !isRegional(item);
+  const locked =
+    item.kind === 'achievement' && !item.earned && (item.currentValue == null || item.currentValue === 0);
+  // Pre-bronze "started": tiered, not locked, count > 0 but reachedTier still 0.
+  const started =
+    isTiered && !locked && reachedTier === 0 && ((item as any).currentValue ?? 0) > 0;
+
+  // Neutral slate palette in the "started" state — no material glow yet.
+  const palette = started ? LOCKED_PALETTE : paletteFor(item);
+
+  const isObsidian = isTiered && reachedTier >= 5 && !locked && !started && !isRegional(item);
   const nextMaterialTier = isTiered && reachedTier < totalTiers ? reachedTier + 1 : null;
   const nextMaterialPal =
     nextMaterialTier && nextMaterialTier <= 5 ? MATERIAL_PALETTES[nextMaterialTier as 1 | 2 | 3 | 4 | 5] : null;
@@ -101,17 +106,26 @@ export const DetailHero: React.FC<Props> = ({ item, index, total, onPrev, onNext
       : 'LEGENDARY';
 
   // Solid material pill on hero: material-tinted background, near-black ink derived from material.
-  const solidPillBg = isTiered && !locked ? (isObsidian ? FORGE_GOLD : c) : null;
+  const solidPillBg = isTiered && !locked && !started ? (isObsidian ? FORGE_GOLD : c) : null;
   const pillLabel = (() => {
     if (item.kind === 'legend') {
       return item.rank === 1 ? '#1 LEGEND' : `#${item.rank}`;
     }
+    if (started) return 'IN PROGRESS';
     if (isTiered && !locked) {
       const label = isObsidian ? 'OBSIDIAN' : palette.label;
       return `${label} · T${reachedTier}/${totalTiers}`;
     }
     return palette.label;
   })();
+
+  // Bronze glow anchor for the started state (muted material being smelted toward).
+  const bronzeColor = MATERIAL_PALETTES[1].color;
+  const startedFirstPct = started && isAch
+    ? Math.max(0, Math.min(100, Math.round(
+        (((item as any).currentValue ?? 0) / Math.max(1, (item as any).nextThreshold ?? 1)) * 100
+      )))
+    : 0;
 
   return (
     <div
@@ -218,6 +232,15 @@ export const DetailHero: React.FC<Props> = ({ item, index, total, onPrev, onNext
               {[1, 2, 3, 4, 5].map((n) => {
                 const earned = n <= reachedTier;
                 const p = MATERIAL_PALETTES[n as 1 | 2 | 3 | 4 | 5];
+                // Started state: all segments unlit, segment 1 carries a
+                // muted-bronze partial glow at the fraction.
+                const bg = earned
+                  ? n === 5
+                    ? FORGE_GOLD
+                    : p.color
+                  : started && n === 1
+                    ? `linear-gradient(90deg, rgba(${hexToRgb(bronzeColor)},0.45) ${startedFirstPct}%, rgba(255,255,255,0.10) ${startedFirstPct}%)`
+                    : 'rgba(255,255,255,0.10)';
                 return (
                   <div
                     key={n}
@@ -225,11 +248,7 @@ export const DetailHero: React.FC<Props> = ({ item, index, total, onPrev, onNext
                       flex: 1,
                       height: 5,
                       borderRadius: 2,
-                      background: earned
-                        ? n === 5
-                          ? FORGE_GOLD
-                          : p.color
-                        : 'rgba(255,255,255,0.10)',
+                      background: bg,
                     }}
                   />
                 );
@@ -249,7 +268,11 @@ export const DetailHero: React.FC<Props> = ({ item, index, total, onPrev, onNext
             >
               <span
                 style={{
-                  color: reachedTier >= 5 ? FORGE_GOLD : nextMaterialPal?.color ?? 'rgba(255,255,255,0.55)',
+                  color: reachedTier >= 5
+                    ? FORGE_GOLD
+                    : started
+                      ? `rgba(${hexToRgb(bronzeColor)},0.55)`
+                      : nextMaterialPal?.color ?? 'rgba(255,255,255,0.55)',
                 }}
               >
                 {reachedTier >= 5
