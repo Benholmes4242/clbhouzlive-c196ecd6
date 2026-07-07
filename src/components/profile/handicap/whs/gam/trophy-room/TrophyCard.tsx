@@ -525,9 +525,9 @@ const ShowpieceCard: React.FC<Props> = ({ item, onTap }) => {
               fontSize: 8.5,
               fontWeight: 800,
               letterSpacing: '0.12em',
-              color: locked ? T.faint : c,
-              border: `1px solid ${locked ? T.line : rgbaOf(c, 0.42)}`,
-              background: locked ? 'transparent' : rgbaOf(c, 0.10),
+              color: locked || started ? T.faint : c,
+              border: `1px solid ${locked || started ? T.line : rgbaOf(c, 0.42)}`,
+              background: locked || started ? 'transparent' : rgbaOf(c, 0.10),
               borderRadius: 6,
               ...GAM.TABULAR,
             }}
@@ -555,7 +555,7 @@ const ShowpieceCard: React.FC<Props> = ({ item, onTap }) => {
             fontSize: 33,
             fontWeight: 800,
             letterSpacing: '-0.03em',
-            color: locked ? T.dim : isObsidian ? '#F8F4E8' : c,
+            color: locked ? T.dim : started ? T.dim : isObsidian ? '#F8F4E8' : c,
             lineHeight: 1,
             textShadow: isObsidian ? '0 0 16px rgba(251,188,46,0.35)' : undefined,
             ...GAM.TABULAR,
@@ -622,7 +622,9 @@ const ShowpieceCard: React.FC<Props> = ({ item, onTap }) => {
                 ? 'linear-gradient(90deg, rgba(251,188,46,0.9), rgba(247,147,30,0.9))'
                 : locked
                   ? T.faint
-                  : c,
+                  : started
+                    ? rgbaOf(bronzeC, 0.45)
+                    : c,
               borderRadius: 99,
               transition: 'width 700ms cubic-bezier(0.22,0.61,0.36,1)',
             }}
@@ -630,9 +632,10 @@ const ShowpieceCard: React.FC<Props> = ({ item, onTap }) => {
         </div>
       </div>
 
-      {/* Rarity footer strip — every forged card. Locked has no pedigree. */}
-      {!locked && <RarityFooterStrip rarity={item.rarity} />}
-      {locked && (
+      {/* Rarity footer strip — pedigree arrives with the first forge.
+          Hidden for locked and "started" (pre-bronze) states. */}
+      {!locked && !started && <RarityFooterStrip rarity={item.rarity} />}
+      {(locked || started) && (
         <div style={{ height: 10, flexShrink: 0 }} />
       )}
     </button>
