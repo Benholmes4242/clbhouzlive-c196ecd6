@@ -380,14 +380,10 @@ export const DetailHero: React.FC<Props> = ({ item, index, total, onPrev, onNext
   );
 };
 
-function isRegional(item: TrophyItem): boolean {
-  if (item.kind !== 'achievement') return false;
-  return (
-    item.badgeId === 'top_100_worldwide' ||
-    item.badgeId === 'top_100_usa' ||
-    item.badgeId === 'top_100_gbni' ||
-    item.badgeId === 'top_100_europe'
-  );
+// Regional Top-100 badges are now fully routed through the Forge (material
+// hero, journey strip, ladder). Kept as a stub for symmetry; always false.
+function isRegional(_item: TrophyItem): boolean {
+  return false;
 }
 
 export default DetailHero;

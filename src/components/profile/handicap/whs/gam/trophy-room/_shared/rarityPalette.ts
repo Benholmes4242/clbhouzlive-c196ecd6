@@ -245,14 +245,11 @@ export function regionPaletteForBadge(badgeId: string): RarityPalette | null {
 }
 
 /**
- * Returns palette for a showpiece. Regional Top 100 badges resolve by region;
- * other showpieces fall back to material tier. Locked (tier 0) handled caller-side.
+ * Returns palette for a showpiece. All showpieces (including regional Top 100)
+ * now resolve to the user's CURRENT MATERIAL tier — region is expressed via
+ * badge label/name, not via card colour. Locked (tier 0) handled caller-side.
  */
-export function paletteForShowpiece(reachedTier: number, badgeId?: string): RarityPalette {
-  if (badgeId) {
-    const r = regionPaletteForBadge(badgeId);
-    if (r) return r;
-  }
+export function paletteForShowpiece(reachedTier: number, _badgeId?: string): RarityPalette {
   const clamped = Math.max(1, Math.min(5, reachedTier || 1)) as 1 | 2 | 3 | 4 | 5;
   return MATERIAL_PALETTES[clamped];
 }

@@ -4,6 +4,7 @@ import { GAM } from '../../tokens';
 import { useTop100ListProgress, type Top100CourseProgress } from '@/hooks/gam/useTop100ListProgress';
 import { top100BadgeIdToListSlug } from '../_shared/showpieces';
 import { Top100CourseRow } from './Top100CourseRow';
+import { AchievementBody } from './AchievementBody';
 import type { TrophyItem } from '../_shared/normalizeTrophyItem';
 
 interface Props {
@@ -26,26 +27,20 @@ export const Top100Body: React.FC<Props> = ({ item, ownerUserId, viewerUserId, o
     viewerUserId,
   );
 
-  const { played, unplayed, ownerPlayedCount, viewerPlayedCount } = useMemo(() => {
+  const { played, unplayed, viewerPlayedCount } = useMemo(() => {
     const p: Top100CourseProgress[] = [];
     const u: Top100CourseProgress[] = [];
-    let owner = 0;
     let viewer = 0;
     for (const row of rows) {
-      if (row.is_owner_played) {
-        p.push(row);
-        owner++;
-      } else {
-        u.push(row);
-      }
+      if (row.is_owner_played) p.push(row);
+      else u.push(row);
       if (row.is_viewer_played) viewer++;
     }
-    return { played: p, unplayed: u, ownerPlayedCount: owner, viewerPlayedCount: viewer };
+    return { played: p, unplayed: u, viewerPlayedCount: viewer };
   }, [rows]);
 
   const [tab, setTab] = useState<Tab>(isFriendView ? 'unplayed' : 'played');
 
-  const total = rows.length;
   const handleNavigate = (courseId: string) => {
     onClose();
     setTimeout(() => navigate(`/courses/${courseId}`), 100);
@@ -62,64 +57,42 @@ export const Top100Body: React.FC<Props> = ({ item, ownerUserId, viewerUserId, o
   return (
     <div
       style={{
-        padding: '4px 0 24px',
         fontFamily: GAM.FONT_GEIST,
         color: 'rgba(255,255,255,0.96)',
       }}
     >
-      <div style={{ padding: '14px 20px 12px' }}>
+      {/* Full Forge anatomy: title + description, NEXT journey strip,
+          THE FORGE ladder + TierKey, FriendsBlock. Hero lives in DetailHero above. */}
+      <AchievementBody item={item} viewerUserId={viewerUserId} />
+
+      {/* Friend cross-reference (kept from prior design). */}
+      {isFriendView && (
         <div
           style={{
-            fontSize: 11,
-            fontWeight: 800,
-            letterSpacing: '0.16em',
-            textTransform: 'uppercase',
-            color: 'rgba(255,255,255,0.96)',
-            display: 'flex',
-            alignItems: 'center',
-            gap: 6,
-          }}
-        >
-          <span style={{ color: GAM.AMBER }} aria-hidden>•</span>
-          {item.name}
-        </div>
-        <div
-          style={{
-            fontSize: 42,
-            fontWeight: 200,
-            letterSpacing: '-0.045em',
-            color: 'rgba(255,255,255,0.96)',
-            marginTop: 6,
-            lineHeight: 0.95,
+            padding: '0 20px 12px',
+            fontSize: 12,
+            color: 'rgba(255,255,255,0.55)',
             ...GAM.TABULAR,
           }}
         >
-          {ownerPlayedCount}
-          <span
-            style={{
-              fontSize: 17,
-              fontWeight: 600,
-              color: 'rgba(255,255,255,0.55)',
-              letterSpacing: '0.02em',
-              marginLeft: 6,
-            }}
-          >
-            of {total} played
-          </span>
+          <span style={{ color: 'rgba(255,255,255,0.96)', fontWeight: 700 }}>You</span> have played{' '}
+          <span style={{ color: GAM.AMBER, fontWeight: 700 }}>{viewerPlayedCount}</span> of these
         </div>
-        {isFriendView && (
-          <div
-            style={{
-              fontSize: 12,
-              color: 'rgba(255,255,255,0.55)',
-              marginTop: 8,
-              ...GAM.TABULAR,
-            }}
-          >
-            <span style={{ color: 'rgba(255,255,255,0.96)', fontWeight: 700 }}>You</span> have played{' '}
-            <span style={{ color: GAM.AMBER, fontWeight: 700 }}>{viewerPlayedCount}</span> of these
-          </div>
-        )}
+      )}
+
+      {/* THE COURSES — Top-100's unique value: played/unplayed tabs + list. */}
+      <div style={{ padding: '4px 20px 6px' }}>
+        <div
+          style={{
+            fontSize: 10,
+            fontWeight: 800,
+            letterSpacing: '0.14em',
+            textTransform: 'uppercase',
+            color: 'rgba(255,255,255,0.55)',
+          }}
+        >
+          THE COURSES
+        </div>
       </div>
 
       <div
@@ -166,7 +139,7 @@ export const Top100Body: React.FC<Props> = ({ item, ownerUserId, viewerUserId, o
         })}
       </div>
 
-      <div style={{ padding: '0 8px' }}>
+      <div style={{ padding: '0 8px 24px' }}>
         {isLoading ? (
           <div style={{ padding: '24px', textAlign: 'center', fontSize: 13, color: 'rgba(255,255,255,0.55)' }}>
             Loading courses…
@@ -212,3 +185,4 @@ const EmptyState: React.FC<{ message: string }> = ({ message }) => (
 );
 
 export default Top100Body;
+
