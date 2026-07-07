@@ -859,6 +859,20 @@ html[data-immersive-route='true'] .app-shell {
   padding-top: 0 !important;
 }
 
+/* IMMERSIVE PAGE ROOT — the page container inside .app-shell must also be
+   transparent so the black html/body surface (App.tsx surface ternary)
+   shows through the notch/safe-area zone instead of the page's default
+   `bg-background` / `bg-[var(--bg-page)]`. Without this, non-darkChrome
+   immersive routes (course detail, tour hub, profile, business, top100
+   regions, explore regions) painted a light band above the hero — exactly
+   the "grey band on non-darkChrome immersive routes" symptom. Ratified in
+   the immersive-band audit (2026-07-08). Single-source: page-level bg
+   classes on immersive pages MUST NOT reintroduce an opaque background at
+   y=0; heroes own the paint from the physical top down. */
+html[data-immersive-route='true'] .page-root {
+  background-color: transparent !important;
+}
+
 /* Desktop backdrop behind the app column */
 @media (min-width: 480px) {
   body {
