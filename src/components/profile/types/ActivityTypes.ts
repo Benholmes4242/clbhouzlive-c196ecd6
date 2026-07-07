@@ -49,7 +49,7 @@ export interface ActivityPost {
     poster_url?: string | null;
     duration_seconds?: number | null;
   }>;
-  post_tags: PostTag[];
+  post_tags?: PostTag[];
   user: {
     id: string;
     display_name: string | null;
