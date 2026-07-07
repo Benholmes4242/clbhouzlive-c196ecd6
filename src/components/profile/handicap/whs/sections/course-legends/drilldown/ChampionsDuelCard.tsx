@@ -2,6 +2,7 @@ import React from 'react';
 import { Crown, Swords, type LucideIcon } from 'lucide-react';
 import type { LegendCategory } from '@/lib/gam/types';
 import { ChampionsListRow } from './ChampionsListRow';
+import { MovementCell } from './_shared/MovementCell';
 import { duelLine, chaseProgress } from './_shared/duelTension';
 import { ProBenchmarkBand } from './ProBenchmarkBand';
 import type { ProProfile, ProBandBase } from './_shared/proBenchmark';
@@ -16,6 +17,9 @@ export interface DuelRow {
   isSelf: boolean;
   gapToChampion: string | null;
   userId?: string | null;
+  /** 30-day movement inputs. */
+  rank30d?: number | null;
+  delta?: number | null;
 }
 
 interface ChampionsDuelCardProps {
