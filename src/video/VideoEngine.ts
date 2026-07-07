@@ -455,9 +455,10 @@ class VideoEngineImpl {
     const onLoadedData = () => {
       if (this.loadingCount > 0) this.loadingCount--;
       if (lane.state === 'loading') this.transition(lane, 'ready');
-      // loadeddata alone does NOT flip firstFrame anymore — we wait for the
-      // seek to land. When there IS no seek target, loadeddata is enough.
-      if (lane.startPosition <= 0) markReadyToShow('loadeddata@start<=0');
+      // Do not reveal on loadeddata. WebKit can fire it before a synchronous
+      // currentTime reset/seek has visibly committed, which exposes frame 0 or
+      // the previous decoded frame for one paint. timeupdate/seeked below are
+      // the first safe composited-frame signals.
     };
     const onSeeked = () => {
       vperfLaneEvent(lane.id, 'seeked');

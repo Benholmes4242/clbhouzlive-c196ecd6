@@ -78,8 +78,9 @@ export const InlineVideo: React.FC<Props> = ({
     ownerKey: resolvedOwnerKey,
   });
 
+  const laneOwnsThisMedia = lane.snapshot.postId === resolvedOwnerKey;
   const targetReady = startPosition <= 0 || lane.snapshot.currentTime >= startPosition - 0.3;
-  const showVideo = isActive && lane.snapshot.firstFrame && targetReady;
+  const showVideo = lane.snapshot.firstFrame && targetReady && (isActive || laneOwnsThisMedia);
 
 
 
@@ -129,6 +130,8 @@ export const InlineVideo: React.FC<Props> = ({
             height: '100%',
             objectFit,
             display: 'block',
+            opacity: showVideo ? 0 : 1,
+            transition: 'opacity 120ms linear',
             pointerEvents: 'none',
           }}
         />
