@@ -3,6 +3,7 @@ import SectionHeader from '@/components/ui/SectionHeader';
 import { getCollegeLogoUrl } from '@/utils/collegeLogo';
 import { getPlayerHeadshotCandidates } from '@/utils/playerHeadshot';
 import { PlayerInitialAvatar } from '../shared/PlayerInitialAvatar';
+import { LIGHT_HAIRLINE } from '@/components/ui/SquircleAvatar';
 import { formatCurrency } from '@/lib/utils/formatCurrency';
 import { useTourSeason } from '../../hooks/useTourHubData';
 import { playerRoute } from '../../routes';
