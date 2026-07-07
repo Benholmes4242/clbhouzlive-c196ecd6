@@ -31,6 +31,15 @@ const BORROW_DBG = (evt: string, payload: Record<string, unknown> = {}) => {
   console.info('[BORROW]', evt, payload);
 };
 
+// [DECIDE] instrumentation — borrow-decision + resume-ladder tracing.
+// Emits on EVERY outcome (success AND deny), isPerfEnabled-gated, one line
+// each. No behaviour changes — logging only.
+const DECIDE = (evt: string, payload: Record<string, unknown> = {}) => {
+  if (!isPerfEnabled()) return;
+  // eslint-disable-next-line no-console
+  console.info('[DECIDE]', evt, payload);
+};
+
 
 function prefersReducedMotion(): boolean {
   if (typeof window === 'undefined' || !window.matchMedia) return false;
