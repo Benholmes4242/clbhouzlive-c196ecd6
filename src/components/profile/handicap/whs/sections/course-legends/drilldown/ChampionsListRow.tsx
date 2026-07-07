@@ -175,7 +175,7 @@ export const ChampionsListRow: React.FC<ChampionsListRowProps> = ({
           }}
         >
           <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{name}</span>
-          {isNew && (
+          {showNew && (
             <span
               style={{
                 fontSize: 8,
@@ -206,7 +206,8 @@ export const ChampionsListRow: React.FC<ChampionsListRowProps> = ({
         </div>
       </div>
 
-      <div style={{ textAlign: 'right', flexShrink: 0, display: 'flex', alignItems: 'baseline', gap: 5 }}>
+      <div style={{ textAlign: 'right', flexShrink: 0, display: 'flex', alignItems: 'center', gap: 10, justifyContent: 'flex-end' }}>
+        <MovementCell delta={delta} rank30d={rank30d} theme={theme} size={compact ? 'chip' : 'row'} />
         <span
           style={{
             fontFamily: GAM.FONT_GEIST,
