@@ -451,12 +451,8 @@ function AppRoutes() {
   // Render origin page when we have a background location
   const routesLocation = state?.backgroundLocation || location;
   
-  // Video modal = /video/:id with backgroundLocation
-  const isVideoRoute = location.pathname.startsWith('/video/');
-  const showVideoModal = isVideoRoute && !!state?.backgroundLocation;
-  
-  // Global overlay detection - sync with <html> class
-  const overlayActive = showVideoModal || shouldHideHeader;
+  // Video full-screen modal deleted in PR-5 (queue family strip).
+  const overlayActive = shouldHideHeader;
   
   useEffect(() => {
     const el = document.documentElement;
