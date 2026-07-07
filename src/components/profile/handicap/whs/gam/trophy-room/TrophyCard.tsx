@@ -359,18 +359,16 @@ const ShowpieceCard: React.FC<Props> = ({ item, onTap }) => {
   const denom = nextThreshold - prevThreshold;
   const targetPct = atMax ? 1 : Math.max(0, Math.min(1, denom > 0 ? numer / denom : 0));
 
-  // Material palette (paletteForShowpiece resolves region badges too).
+  // Material palette — every tiered showpiece (including regional Top 100)
+  // wears the user's CURRENT material. Region lives in the label, not the colour.
   const reachedIdx = locked
     ? 1
     : (Math.max(1, Math.min(5, item.reachedTier || 1)) as 1 | 2 | 3 | 4 | 5);
   const materialPal = MATERIAL_PALETTES[reachedIdx];
-  const showpiecePal = paletteForShowpiece(item.reachedTier || 1, item.badgeId);
-  // Use material for lifetime badges; region palette for regional top100 badges.
-  const isRegional = showpiecePal !== materialPal;
-  const pal = isRegional ? showpiecePal : materialPal;
+  const pal = materialPal;
   const c = pal.color;
 
-  const isObsidian = !locked && !isRegional && item.reachedTier >= 5;
+  const isObsidian = !locked && item.reachedTier >= 5;
 
   const [animatedPct, setAnimatedPct] = useState(0);
   const [animatedValue, setAnimatedValue] = useState(0);
