@@ -438,6 +438,7 @@ export const ChampionsDuelCard: React.FC<ChampionsDuelCardProps> = ({
           {/* chaser mini-avatar */}
           <TrackFace
             entry={trackChaser}
+            ringColor={trackRing}
             style={{
               position: 'absolute',
               left: `calc(${(1 - pos) * 100}% - 11px)`,
@@ -450,6 +451,7 @@ export const ChampionsDuelCard: React.FC<ChampionsDuelCardProps> = ({
           <TrackFace
             entry={trackChampion}
             crowned
+            ringColor={trackRing}
             style={{
               position: 'absolute',
               left: -2,
