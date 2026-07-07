@@ -4,6 +4,7 @@ import { type LucideIcon, ChevronDown, ChevronUp, Crown } from 'lucide-react';
 import { BottomSheet } from '@/components/ui/BottomSheet';
 import { SheetHeader } from '@/components/ui/SheetHeader';
 import { ChampionsListRow } from './ChampionsListRow';
+import { MovementCell } from './_shared/MovementCell';
 import { formatGapFromChampion, formatHeldFor, daysSince, NEW_BADGE_DAYS } from './_shared/helpers';
 import { duelLine } from './_shared/duelTension';
 import type { LegendCategory, LegendWindow } from '@/lib/gam/types';
@@ -16,6 +17,8 @@ interface SectionRow {
   valueDisplay: string;
   attained_at: string;
   isSelf: boolean;
+  rank30d?: number | null;
+  delta?: number | null;
 }
 
 interface CategoryDescriptor {
