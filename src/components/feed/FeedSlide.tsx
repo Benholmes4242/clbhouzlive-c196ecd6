@@ -306,7 +306,12 @@ const FullscreenVideoSlot: React.FC<{
    *  they never take the borrow branch (only the opening media page owns the
    *  borrowed element). Defaults true for single-media callers. */
   allowBorrow?: boolean;
-}> = ({ postId, hlsUrl, posterSrc, isActive, onFirstFrameReady, ownerKey, allowBorrow = true }) => {
+  /** Intrinsic media dims — consumed by resolveRestingRect so the settled
+   *  video rect matches the clone's expand target by construction. Missing
+   *  dims fall back to full viewport (util's own default). */
+  mediaW?: number;
+  mediaH?: number;
+}> = ({ postId, hlsUrl, posterSrc, isActive, onFirstFrameReady, ownerKey, allowBorrow = true, mediaW = 0, mediaH = 0 }) => {
   const isMuted = useClubhouseStore((s) => s.isMuted);
   const storedStart = useFullscreenFeedStore((s) => s.startPosition);
   const borrow = useFullscreenFeedStore((s) => s.borrow);
