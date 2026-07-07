@@ -285,14 +285,22 @@ export const TrophyRoomSheet: React.FC<Props> = ({ userId, viewerUserId, ownerFi
   const remaining = Math.max(0, totalAchievements - earnedAchCount);
   const railPct = totalAchievements > 0 ? (earnedAchCount / totalAchievements) * 100 : 0;
 
-  // NEXT UNLOCK — closest-to-unlock locked achievement with progress
+  // NEXT UNLOCK — closest-to-unlock achievement with tier progress.
+  // Considers ANY not-fully-maxed achievement (locked OR partially-earned
+  // tiered), because partially-earned tiered showpieces (first_birdie
+  // reached=1/5) live in earnedAchievements, not lockedAchievements — a
+  // locked-only filter empties the spotlight even when 12+ cards have
+  // visible tier progress.
   const nextUnlock = useMemo(() => {
     type A = Extract<TrophyItem, { kind: 'achievement' }>;
-    const withProgress = lockedAchievements
+    const withProgress = allAchievements
       .map((item: A) => {
+        const totalTiers = item.tiers.length;
+        if (totalTiers === 0) return null;
+        const reached = item.reachedTier ?? 0;
+        if (reached >= totalTiers) return null; // fully maxed
         if (item.currentValue == null || item.currentValue <= 0) return null;
         if (item.nextThreshold == null || item.nextThreshold <= 0) return null;
-        const reached = item.reachedTier ?? 0;
         const prev = reached > 0 && item.tiers[reached - 1] ? item.tiers[reached - 1].threshold : 0;
         const denom = item.nextThreshold - prev;
         if (denom <= 0) return null;
@@ -310,7 +318,7 @@ export const TrophyRoomSheet: React.FC<Props> = ({ userId, viewerUserId, ownerFi
     });
 
     return withProgress[0] ?? null;
-  }, [lockedAchievements]);
+  }, [allAchievements]);
 
   return (
     <>
