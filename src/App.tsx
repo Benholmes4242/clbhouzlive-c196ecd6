@@ -540,8 +540,9 @@ function AppRoutes() {
         <Route path="/post/:postId/comment/:commentId" element={<Suspense fallback={<GenericPageSkeleton />}><CommentDeepLinkPage /></Suspense>} />
         
         
-        {/* /video/:videoId route removed in PR-5 — VideoPlayerModal deleted. Post deep-link handles video posts. */}
-        <Route path="/video/:videoId" element={<Navigate to="/watch" replace />} />
+        {/* /video/:videoId route removed in PR-5 — :videoId is a post id (shared by VideoCardMenu & AutoplayVideoCard), so preserve deep links via the unified /post viewer. */}
+        <Route path="/video/:videoId" element={<Navigate to="/post/:videoId" replace />} />
+
 
         
         {/* Legacy creator routes - redirect to home (creators now handled via Business profiles or Personal Creator Mode) */}
