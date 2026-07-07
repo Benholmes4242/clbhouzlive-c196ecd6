@@ -529,6 +529,35 @@ export function FullscreenFeedOverlay() {
                   />
                 </div>
 
+                {/* ── Blurred self-backdrop (surround) ──
+                    Product rule: contained media in the fullscreen viewer is
+                    surrounded by a blurred self-backdrop, never solid black.
+                    Sourced from origin.posterUrl (the tile thumbnail — ALREADY
+                    DECODED because it was visible in the tile), so the blur is
+                    present from frame 0 of the clone expand. Styling matches
+                    the settled slide's own backdrop exactly, so when the
+                    clone retires the handoff is pixel-identical (no flick).
+                    The parent `bg-black` provides the base canvas during the
+                    fade-in; this layer sits between it and the clone. */}
+                {origin && cloneVisible && origin.posterUrl && (
+                  <div
+                    aria-hidden
+                    style={{
+                      position: 'fixed',
+                      inset: 0,
+                      backgroundImage: `url(${origin.posterUrl})`,
+                      backgroundSize: 'cover',
+                      backgroundPosition: 'center',
+                      filter: 'blur(40px) brightness(0.5) saturate(1.2)',
+                      transform: 'scale(1.2)',
+                      opacity: cloneExpanded ? 1 : 0,
+                      transition: 'opacity 300ms cubic-bezier(0.32,0.72,0,1)',
+                      pointerEvents: 'none',
+                      zIndex: 1,
+                    }}
+                  />
+                )}
+
                 {/* ── FLIP clone layer (Phase 3 shared-element expand) ── */}
                 {origin && cloneVisible && targetRect && (
                   <img
@@ -556,6 +585,9 @@ export function FullscreenFeedOverlay() {
                       opacity: firstFrameReady ? 0 : 1,
                       pointerEvents: 'none',
                       zIndex: 2,
+                      // Safety fill INSIDE the media's own geometry so a
+                      // partially-decoded poster never shows through to the
+                      // blur backdrop mid-expand. Not a surround layer.
                       background: '#000',
                     }}
                   />

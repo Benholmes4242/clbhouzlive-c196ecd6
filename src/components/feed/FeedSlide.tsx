@@ -585,15 +585,18 @@ const BorrowedFullscreenSlot: React.FC<{
             filter: 'blur(40px) brightness(0.5) saturate(1.2)', transform: 'scale(1.2)',
           }} />
         )}
-        {/* Black letterbox underlay — fades in DURING the 300ms expand for
-            CONTAIN targets so the bars are already established when the
-            wrapper lands on the resting rect. COVER targets never toggle it. */}
+        {/* Dark scrim over the blurred poster for CONTAIN targets (landscape
+            video). Product rule: contained-media surround = blur + darken,
+            NEVER solid black. 0.55 leaves the blurred poster visible beneath
+            so the letterbox reads as one blurred world, not black bars.
+            COVER (portrait/full-bleed) targets never toggle this layer.
+            Same fade timing/trigger as before. */}
         <div
           aria-hidden
           data-vperf="flip-underlay"
           style={{
             position: 'absolute', inset: 0, background: '#000',
-            opacity: underlayVisible ? 1 : 0,
+            opacity: underlayVisible ? 0.55 : 0,
             transition: 'opacity 260ms linear',
           }}
         />
