@@ -463,7 +463,11 @@ const BorrowedFullscreenSlot: React.FC<{
     const raf1 = requestAnimationFrame(() => {
       onFirstFrameReady?.();
       // rAF #2 to ensure Phase 1 transition captures the initial rect commit.
-      const raf2 = requestAnimationFrame(() => setExpanded(true));
+      const raf2 = requestAnimationFrame(() => {
+        // [VPERF] motion trace: phase-1 expand begins on this commit.
+        try { vperfMotionMark('expandStart'); } catch {}
+        setExpanded(true);
+      });
       (window as any).__borrow_raf2 = raf2;
     });
     return () => {
