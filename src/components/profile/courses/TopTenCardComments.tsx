@@ -431,43 +431,6 @@ export const TopTenCardComments: React.FC<TopTenCardCommentsProps> = ({
                 hairlineRing ringColor={LIGHT_HAIRLINE}
               />
               <div className="flex-1 min-w-0 relative">
-                {/* Mention dropdown */}
-                {mentionResults.length > 0 && (
-                  <div
-                    style={{
-                      position: 'absolute', bottom: '100%', left: 0, right: 0, marginBottom: 6,
-                      borderRadius: 10, background: '#ffffff',
-                      border: `1px solid ${BORDER}`,
-                      boxShadow: '0 4px 16px rgba(0,0,0,0.08)',
-                      overflow: 'hidden', zIndex: 50,
-                    }}
-                  >
-                    {mentionResults.map(u => (
-                      <button
-                        key={u.id}
-                        type="button"
-                        onClick={() => selectMention(u.username)}
-                        className="w-full flex items-center gap-3 px-3 py-2 text-left transition-colors hover:bg-[rgba(15,23,42,0.04)] bg-transparent border-0 cursor-pointer"
-                      >
-                        <SquircleAvatar
-                          size={28}
-                          src={u.avatar}
-                          alt={u.display_name || u.username}
-                          fallback={u.display_name?.charAt(0)?.toUpperCase() || '?'}
-                          hairlineRing ringColor={LIGHT_HAIRLINE}
-                        />
-                        <div className="flex flex-col min-w-0">
-                          <span className="text-sm font-medium truncate" style={{ color: INK }}>
-                            {u.display_name}
-                          </span>
-                          <span className="text-xs truncate" style={{ color: INK_SUBTLE }}>
-                            @{u.username}
-                          </span>
-                        </div>
-                      </button>
-                    ))}
-                  </div>
-                )}
                 <div
                   style={{
                     display: 'flex', alignItems: 'flex-end', gap: 4,
