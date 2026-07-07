@@ -5,6 +5,7 @@ import { SquircleAvatar, LIGHT_HAIRLINE } from '@/components/ui/SquircleAvatar';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import { formatRatingValue } from '@/utils/formatters';
+import { stripMentionMarkup } from '@/lib/mentions/format';
 import type { MessageType, SharedCourse, SharedTeeTime, SharedMoment } from '@/types/messaging';
 
 interface SharedContentCardProps {
@@ -360,7 +361,7 @@ function MomentShareCard({
               "text-xs mt-1 line-clamp-2",
               isOwnMessage ? "text-primary-foreground/70" : "text-muted-foreground"
             )}>
-              {moment.caption}
+              {stripMentionMarkup(moment.caption)}
             </p>
           )}
 
