@@ -11,6 +11,7 @@ import { useFullscreenFeedStore } from '@/store/fullscreenFeedStore';
 import { isPerfEnabled } from '@/perf/navTiming';
 import { vperfStart, vperfArmLane, vperfNextId, vperfMotionMark } from '@/perf/vperf';
 import { resolveRestingRect, getCurrentViewport, type RestingRect } from '@/lib/media/resolveRestingRect';
+import { resolveBlurSource } from '@/lib/media/resolveBlurSource';
 
 import { usePostViewTracker } from '@/hooks/usePostViewTracker';
 
@@ -139,7 +140,16 @@ export const FeedSlide = memo(function FeedSlide({
 
     // Video — engine-backed in fullscreen, poster-only otherwise.
     if (m?.type === 'video') {
-      const posterSrc = m.thumbnailUrl || '';
+      const mHlsUrlEarly = (m as any).hlsUrl || null;
+      const posterSrc = resolveBlurSource({
+        postId: post.id,
+        mediaId: (m as any).id,
+        thumbnailUrl: (m as any).thumbnailUrl,
+        posterUrl: (m as any).posterUrl,
+        poster: (m as any).poster,
+        streamId: (m as any).streamId,
+        hlsUrl: mHlsUrlEarly,
+      }) ?? '';
       const mHlsUrl = (m as any).hlsUrl || null;
       if (isFullscreen && !mHlsUrl) {
         // Legacy uploads without a Cloudflare Stream id can't drive the
@@ -801,8 +811,17 @@ const FullscreenPagerPage: React.FC<{
   }, [isActivePage, zoomScale, onZoomChange]);
 
   if (m?.type === 'video') {
-    const posterSrc = m.thumbnailUrl || '';
-    const mHlsUrl = (m as any).hlsUrl || null;
+    const mHlsUrlEarly = (m as any).hlsUrl || null;
+    const posterSrc = resolveBlurSource({
+      postId: post.id,
+      mediaId: (m as any).id,
+      thumbnailUrl: (m as any).thumbnailUrl,
+      posterUrl: (m as any).posterUrl,
+      poster: (m as any).poster,
+      streamId: (m as any).streamId,
+      hlsUrl: mHlsUrlEarly,
+    }) ?? '';
+    const mHlsUrl = mHlsUrlEarly;
     // Active video page → mount SHOWING slot. Only the opening-media page
     // may take the borrow branch; every other page passes allowBorrow=false
     // so a re-mount post-demote never re-triggers the borrow FLIP.
