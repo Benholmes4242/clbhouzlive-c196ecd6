@@ -18,9 +18,9 @@ import type { FeedPost } from '@/components/media-system/types/media';
 import { useFullscreenFeedStore, type OpenOrigin, type BorrowDescriptor } from '@/store/fullscreenFeedStore';
 import { VideoEngine } from '@/video/VideoEngine';
 import { RailLanePool } from '@/video/railLanePool';
-import { fsv, fsvNewSession, fsvViewport } from '@/perf/fsvTelemetry';
+
 import { isPerfEnabled } from '@/perf/navTiming';
-// [VIDEOSTUB] HLSPoolManager + mobileVideoDebug imports removed — engine severed.
+
 
 const BORROW_DBG = (evt: string, payload: Record<string, unknown> = {}) => {
   const flag =
@@ -106,24 +106,10 @@ export function openWithOrigin({
   options,
 }: OpenWithOriginArgs): void {
 
-  fsvNewSession('open-tap', { index });
-
   const origin = snapshotOrigin(originEl, posterUrl ?? null);
   const postId = (posts[index] as any)?.id ?? null;
 
-  fsv('tap', {
-    postId,
-    index,
-    hasOriginEl: !!originEl,
-    prefersReducedMotion:
-      typeof window !== 'undefined' && !!window.matchMedia?.('(prefers-reduced-motion: reduce)').matches,
-    viewport: fsvViewport(),
-  });
-  fsv('tap.origin', {
-    postId,
-    origin,
-    posterUrl: posterUrl ?? null,
-  });
+
 
   // ── Stage-7 PR-1: borrow decision ──
   // If the tapped tile is currently holding a live rail-pool lane for THIS
@@ -235,22 +221,10 @@ export function openWithOrigin({
       /* engine may not be booted yet on deep-link openers */
     }
   }
-  fsv('tap.start', {
-    postId,
-    startPosition: +startPosition.toFixed(3),
-    source: startSource,
-    railLaneCT: +railLaneCT.toFixed(3),
-    feedSnapCT: +feedSnapCT.toFixed(3),
-    feedSnapPostId: (() => { try { return VideoEngine.snapshot('feed-active').postId; } catch { return null; } })(),
-    lastPosCT: +lastPosCT.toFixed(3),
-    borrow: !!borrow,
-  });
-
 
   // Chrome flip at TAP time (not effect time) to kill the strobe. Scroll
   // lock is owned by the overlay's isOpen effect (ref-counted so it composes
   // cleanly with CommentsSheet stacking on top).
-  let statusbarOk = false;
   try {
     (window as any).median?.statusbar?.set({
       style: 'dark',
@@ -258,10 +232,7 @@ export function openWithOrigin({
       overlay: true,
       blur: false,
     });
-    statusbarOk = true;
   } catch {}
-  fsv('tap.statusbar', { attempted: true, ok: statusbarOk, viewport: fsvViewport() });
-
 
   useFullscreenFeedStore.getState().open(posts, index, {
     ...(options ?? {}),
@@ -272,12 +243,5 @@ export function openWithOrigin({
     openedFrom,
     borrow,
   });
-
-  fsv('tap.storeOpen', {
-    postId, index,
-    startPosition: +startPosition.toFixed(3),
-    mediaIndex: mediaIndex ?? 0,
-    mediaId: mediaId ?? null,
-    borrow: !!borrow,
-  });
 }
+

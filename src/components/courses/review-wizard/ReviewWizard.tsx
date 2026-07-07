@@ -116,6 +116,11 @@ export function ReviewWizard({
   useLayoutEffect(() => {
     if (!isOpen) return;
     lockBodyScroll();
+    // Engine lanes must not keep decoding under the review wizard overlay.
+    // Null-caller pauseAll also passes the borrow-guard.
+    import('@/video/VideoEngine').then(({ VideoEngine }) => {
+      try { VideoEngine.pauseAll(); } catch {}
+    });
     return () => unlockBodyScroll();
   }, [isOpen]);
 
