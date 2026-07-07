@@ -6,7 +6,6 @@ import ScrollToTopGlass from '@/components/common/ScrollToTopGlass';
 import ShellSlot from '@/components/header/ShellSlot';
 import { useDebouncedValue } from '@/hooks/useDebouncedValue';
 import { useWatchFeed } from './hooks/useWatchFeed';
-import WatchAutoplay from './WatchAutoplay';
 import WatchGrid from './WatchGrid';
 
 
