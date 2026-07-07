@@ -304,7 +304,8 @@ export const InboxRow: React.FC<Props> = ({ notification: n, onClick, currentUse
                 alt={actorName || 'User'}
                 size={44}
                 fallback={actorName?.charAt(0) || '?'}
-                hideRing
+                hairlineRing
+                ringColor={LIGHT_HAIRLINE}
               />
             </div>
             <span
