@@ -14,7 +14,6 @@ import {
   MATERIAL_PALETTES,
   FORGE_GOLD,
   materialNameForTier,
-  paletteForShowpiece,
 } from './_shared/rarityPalette';
 
 // ─── Tokens (hardcoded — sheet portal, no var(--hcp-*)) ─────────────────
