@@ -80,7 +80,7 @@ export function SoloLeaderRow({
           srcCandidates={avatarCandidates}
           alt={name}
           userId={playerId ?? name}
-          hideRing
+          hairlineRing ringColor={LIGHT_HAIRLINE}
         />
         <div style={{ display: 'flex', alignItems: 'center', gap: 6, minWidth: 0 }}>
           <span
