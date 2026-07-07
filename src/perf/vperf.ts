@@ -91,13 +91,12 @@ const sessions = new Map<string, SessionRec>();
 // Default budgets by kind (ms). Callers may override via vperfStart meta.budgetMs.
 // fs.close = 250 while FS_TRANSITION_MODE === 'cut' (snap-handoff, no reverse
 // motion). Flipping the mode back to 'expand' should widen this to ~450 to
-
-// motion (300ms wrapper transition + returnBorrow/handback + overlay fade).
-// Pre-motion the instant snap-handoff fit under 250; the animated mirror does not.
+// accommodate the 300ms wrapper shrink + returnBorrow/handback tail.
 const DEFAULT_BUDGETS: Record<string, number> = {
   'fs.open.borrow': 150,
   'fs.open.lane': 500,
-  'fs.close': 450,
+  'fs.close': 250,
+
   'autoplay.warm': 120,
   'autoplay.cold': 600,
   'swipe.vertical': 450,
