@@ -11,6 +11,7 @@ import { useFullscreenFeedStore } from '@/store/fullscreenFeedStore';
 import { isPerfEnabled } from '@/perf/navTiming';
 import { vperfStart, vperfArmLane, vperfNextId, vperfMotionMark } from '@/perf/vperf';
 import { resolveRestingRect, getCurrentViewport, type RestingRect } from '@/lib/media/resolveRestingRect';
+import { resolveBlurSource } from '@/lib/media/resolveBlurSource';
 
 import { usePostViewTracker } from '@/hooks/usePostViewTracker';
 
@@ -139,7 +140,16 @@ export const FeedSlide = memo(function FeedSlide({
 
     // Video — engine-backed in fullscreen, poster-only otherwise.
     if (m?.type === 'video') {
-      const posterSrc = m.thumbnailUrl || '';
+      const mHlsUrlEarly = (m as any).hlsUrl || null;
+      const posterSrc = resolveBlurSource({
+        postId: post.id,
+        mediaId: (m as any).id,
+        thumbnailUrl: (m as any).thumbnailUrl,
+        posterUrl: (m as any).posterUrl,
+        poster: (m as any).poster,
+        streamId: (m as any).streamId,
+        hlsUrl: mHlsUrlEarly,
+      }) ?? '';
       const mHlsUrl = (m as any).hlsUrl || null;
       if (isFullscreen && !mHlsUrl) {
         // Legacy uploads without a Cloudflare Stream id can't drive the
@@ -398,12 +408,25 @@ const FullscreenVideoSlot: React.FC<{
 
   return (
     <div className="absolute inset-0 overflow-hidden">
+      {/* SURROUND RULE (settled lane branch): contained media = blurred
+          poster UNDERNEATH + 0.55 scrim on top; nothing fully opaque may sit
+          between the blur and the media except the media itself. Z-order:
+          blur (z=auto/0) → scrim (z=auto/0 after blur) → contain poster
+          fallback (z=1) → live video host (z=2). */}
       {posterSrc && (
         <div aria-hidden="true" className="absolute inset-0" style={{
           backgroundImage: `url(${posterSrc})`, backgroundSize: 'cover', backgroundPosition: 'center',
           filter: 'blur(40px) brightness(0.5) saturate(1.2)', transform: 'scale(1.2)',
         }} />
       )}
+      {/* 0.55 scrim over the blur (or over the slide root when the poster is
+          missing) — matches BorrowedFullscreenSlot so landscape-video
+          letterbox surround reads as "blur + darken", not full black. */}
+      <div
+        aria-hidden
+        data-vperf="lane-scrim"
+        style={{ position: 'absolute', inset: 0, background: '#000', opacity: 0.55, pointerEvents: 'none' }}
+      />
       {posterSrc && (
         <img
           src={posterSrc}
@@ -801,8 +824,17 @@ const FullscreenPagerPage: React.FC<{
   }, [isActivePage, zoomScale, onZoomChange]);
 
   if (m?.type === 'video') {
-    const posterSrc = m.thumbnailUrl || '';
-    const mHlsUrl = (m as any).hlsUrl || null;
+    const mHlsUrlEarly = (m as any).hlsUrl || null;
+    const posterSrc = resolveBlurSource({
+      postId: post.id,
+      mediaId: (m as any).id,
+      thumbnailUrl: (m as any).thumbnailUrl,
+      posterUrl: (m as any).posterUrl,
+      poster: (m as any).poster,
+      streamId: (m as any).streamId,
+      hlsUrl: mHlsUrlEarly,
+    }) ?? '';
+    const mHlsUrl = mHlsUrlEarly;
     // Active video page → mount SHOWING slot. Only the opening-media page
     // may take the borrow branch; every other page passes allowBorrow=false
     // so a re-mount post-demote never re-triggers the borrow FLIP.
@@ -823,6 +855,10 @@ const FullscreenPagerPage: React.FC<{
     // branch above). No lane binding, no decoder.
     return (
       <div className="absolute inset-0 overflow-hidden">
+        {/* SURROUND RULE (pager inactive video page): blurred poster
+            UNDERNEATH + 0.55 scrim on top + contain poster (z=1). Nothing
+            fully opaque may sit between the blur and the media except the
+            media itself. */}
         {posterSrc && (
           <div
             aria-hidden="true"
@@ -836,6 +872,11 @@ const FullscreenPagerPage: React.FC<{
             }}
           />
         )}
+        <div
+          aria-hidden
+          data-vperf="pager-scrim"
+          style={{ position: 'absolute', inset: 0, background: '#000', opacity: 0.55, pointerEvents: 'none' }}
+        />
         {posterSrc && (
           <img
             src={posterSrc}
