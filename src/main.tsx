@@ -53,7 +53,7 @@ const __isPreviewHost = /(^|\.)lovableproject\.com$|(^|\.)lovable\.app$|(^|\.)lo
   window.location.hostname
 );
 const __willRenderApp = isMedianApp() || __isPreviewHost;
-if (__willRenderApp && (initialPath === '/' || initialPath === '/clubhouse')) {
+if (__willRenderApp && (initialPath === '/' || initialPath === '/index' || initialPath === '/clubhouse')) {
   document.body.classList.add('route-clubhouse');
 } else if (initialPath.startsWith('/auth')) {
   document.body.classList.add('route-auth');

@@ -826,7 +826,7 @@ html.lightbox-open {
    body class or component-level styles once they mount.
    ──────────────────────────────────────────────────────────────────────── */
 body.route-clubhouse .app-shell {
-  background-color: #F8FAFC !important;
+  background-color: #000000 !important;
 }
 body.route-handicap .app-shell {
   background-color: #F8FAFC !important;
@@ -1865,7 +1865,7 @@ body.route-clubhouse .global-header {
   inset: 0;
   height: 100svh;
   width: 100%;
-  background: #F8FAFC; /* match feed CANVAS so iPad gutters read as one continuous light surface */
+  background: #000000;
   overflow: hidden;
 }
 
