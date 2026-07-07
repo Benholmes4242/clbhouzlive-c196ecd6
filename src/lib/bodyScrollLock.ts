@@ -18,7 +18,11 @@ let saved: {
 
 export function lockBodyScroll() {
   if (typeof document === 'undefined') return;
-  if (lockCount === 0) {
+  // Hardening (C): if a prior lock exists but the body is NOT fixed (external
+  // code cleared styles, or state drifted), re-snapshot from the current
+  // scrollY so the final unlock can restore something sensible.
+  const bodyIsFixed = document.body.style.position === 'fixed';
+  if (lockCount === 0 || !bodyIsFixed) {
     const scrollY = window.scrollY;
     saved = {
       overflow: document.body.style.overflow,
@@ -37,6 +41,24 @@ export function lockBodyScroll() {
     document.body.style.width = '100%';
   }
   lockCount++;
+}
+
+/**
+ * Re-anchor the saved scrollY that the final unlock will restore.
+ * Used on route change while locks are still held (nested lock hosts:
+ * fullscreen overlay + comments sheet), so the sheet's deferred unmount
+ * unlock doesn't drop the incoming route at the source page's offset.
+ * No-op when nothing is locked.
+ */
+export function resyncLockAnchor(scrollY: number) {
+  if (typeof document === 'undefined') return;
+  if (lockCount === 0 || !saved) return;
+  saved.scrollY = scrollY;
+}
+
+/** Number of active locks (0 = body is free). Read-only. */
+export function getBodyScrollLockCount() {
+  return lockCount;
 }
 
 export function unlockBodyScroll() {
