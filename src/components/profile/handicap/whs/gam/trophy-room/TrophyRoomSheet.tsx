@@ -494,74 +494,9 @@ export const TrophyRoomSheet: React.FC<Props> = ({ userId, viewerUserId, ownerFi
               </span>
             </div>
 
-            {/* Split */}
-            <div
-              style={{
-                fontSize: 10,
-                color: FAINT,
-                marginTop: 8,
-                display: 'flex',
-                gap: 14,
-                flexWrap: 'wrap',
-                fontWeight: 800,
-                letterSpacing: '0.14em',
-                textTransform: 'uppercase',
-                ...GAM.TABULAR,
-              }}
-            >
-              <span>
-                <span style={{ color: INK }}>{earnedAchievements.length}</span>{' '}
-                {earnedAchievements.length === 1 ? 'ACHIEVEMENT' : 'ACHIEVEMENTS'}
-              </span>
-              <span aria-hidden>·</span>
-              <span>
-                <span style={{ color: AMBER }}>{allLegends.length}</span>{' '}
-                COURSE {allLegends.length === 1 ? 'LEGEND' : 'LEGENDS'}
-              </span>
-            </div>
+            {/* Split line + completion rail removed per amendment: filter pills
+                (All 27 / Earned 15 / Locked 12) already carry these counts. */}
 
-            {/* Completion rail — achievements only */}
-            {totalAchievements > 0 && (
-              <div style={{ marginTop: 12 }}>
-                <div
-                  style={{
-                    position: 'relative',
-                    width: '100%',
-                    height: 3.5,
-                    borderRadius: 99,
-                    background: 'rgba(255,255,255,0.07)',
-                    overflow: 'hidden',
-                  }}
-                >
-                  <div
-                    style={{
-                      width: `${railPct}%`,
-                      height: '100%',
-                      background: AMBER,
-                      borderRadius: 99,
-                      transition: 'width 400ms ease',
-                    }}
-                  />
-                </div>
-                <div
-                  style={{
-                    display: 'flex',
-                    justifyContent: 'space-between',
-                    marginTop: 6,
-                    fontSize: 9.5,
-                    fontWeight: 800,
-                    letterSpacing: '0.12em',
-                    color: FAINT,
-                    ...GAM.TABULAR,
-                  }}
-                >
-                  <span>
-                    <span style={{ color: INK }}>{earnedAchCount}</span> OF {totalAchievements} ACHIEVEMENTS
-                  </span>
-                  <span>{remaining === 1 ? '1 TO GO' : `${remaining} TO GO`}</span>
-                </div>
-              </div>
-            )}
 
             {/* FORGE INVENTORY — chip per material the user holds. */}
             {forgeInventory.length > 0 && (
