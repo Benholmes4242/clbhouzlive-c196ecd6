@@ -56,6 +56,7 @@ export function WinnerPill({ name, fullName, photoUrl, headshotOverride, score, 
         })}
         size={20}
         radius="34%"
+        ringColor={LIGHT_HAIRLINE}
       />
       <button
         type="button"
