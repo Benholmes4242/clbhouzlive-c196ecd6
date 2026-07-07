@@ -114,7 +114,7 @@ export function ProfileSwitcherPopover({
                       src={profile.avatarUrl}
                       alt={profile.name}
                       fallback={profile.name?.charAt(0)?.toUpperCase() ?? '?'}
-                      hideRing
+                      hairlineRing ringColor={LIGHT_HAIRLINE}
                     />
                     <div style={{ minWidth: 0, flex: 1 }}>
                       <div
