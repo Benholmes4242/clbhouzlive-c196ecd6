@@ -161,6 +161,7 @@ export function CollegeMasthead({
                     imageScale={1}
                     imageBg="#FFFFFF"
                     paletteSeed={slug}
+                    ringColor={LIGHT_HAIRLINE}
                   />
                 </div>
                 <div style={{
