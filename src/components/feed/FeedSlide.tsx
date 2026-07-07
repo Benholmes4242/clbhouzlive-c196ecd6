@@ -415,15 +415,18 @@ const FullscreenVideoSlot: React.FC<{
   // at (or past) startPosition — for non-borrow slides. Borrow slide fires
   // it from <BorrowedFullscreenSlot/> on the next rAF post-mount.
   const firedRef = React.useRef(false);
+  const targetReady = startPosition <= 0 || lane.snapshot.currentTime >= startPosition - 0.3;
+  const showVideo = lane.snapshot.firstFrame && targetReady;
+
   React.useEffect(() => {
     if (isBorrowSlide) return;
     if (!isActive) { firedRef.current = false; return; }
     if (firedRef.current) return;
-    if (lane.snapshot.firstFrame === true) {
+    if (showVideo) {
       firedRef.current = true;
       onFirstFrameReady?.();
     }
-  }, [isActive, isBorrowSlide, lane.snapshot.firstFrame, onFirstFrameReady]);
+  }, [isActive, isBorrowSlide, showVideo, onFirstFrameReady]);
 
   // Borrow branch: re-parent the live rail-pool <video> into a wrapper here
   // and run the two-phase cover→contain FLIP.
@@ -464,7 +467,7 @@ const FullscreenVideoSlot: React.FC<{
             // (see below). Asymmetric crossfade — the host does NOT fade in
             // 0→1, so the composite never dips through ~0.75× brightness
             // (the "flash" the symmetric fade produced over black).
-            opacity: lane.snapshot.firstFrame ? 0 : 1,
+            opacity: showVideo ? 0 : 1,
             transition: 'opacity 120ms linear',
           }}
           loading="eager"
@@ -478,7 +481,7 @@ const FullscreenVideoSlot: React.FC<{
           // Snap to opaque (no transition) the moment the engine paints the
           // real first frame. Poster on top fades out over 120ms; composite
           // brightness stays at 100% throughout — no post-settle flash.
-          opacity: lane.snapshot.firstFrame ? 1 : 0,
+          opacity: showVideo ? 1 : 0,
         }}
       />
 
@@ -514,26 +517,52 @@ const BorrowedFullscreenSlot: React.FC<{
   posterSrc: string;
   onFirstFrameReady?: () => void;
 }> = ({ borrow, originRect, posterSrc, onFirstFrameReady }) => {
+  // Origin snapshot — used as the second link in the aspect fallback chain
+  // when the engine hasn't published a lane aspect yet.
+  const originSnap = useFullscreenFeedStore.getState().origin;
+  const initialTargetRect = React.useMemo(() => {
+    const vp = getCurrentViewport();
+    const laneAspect = VideoEngine.getLaneAspect(borrow.laneId);
+    let mw = 0;
+    let mh = 0;
+    if (laneAspect && laneAspect > 0) {
+      mw = laneAspect * 1000;
+      mh = 1000;
+    } else if (
+      originSnap &&
+      (originSnap.originMediaW ?? 0) > 0 &&
+      (originSnap.originMediaH ?? 0) > 0
+    ) {
+      mw = originSnap.originMediaW as number;
+      mh = originSnap.originMediaH as number;
+    } else {
+      mw = vp.w;
+      mh = Math.max(1, Math.round(vp.w * 0.5625));
+    }
+    return resolveRestingRect(mw, mh, vp, 'video');
+    // borrow is stable for the lifetime of this component.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
   const wrapperRef = React.useRef<HTMLDivElement>(null);
-  const [expanded, setExpanded] = React.useState(false);
+  const [expanded, setExpanded] = React.useState(FS_TRANSITION_MODE === 'cut');
   // Underlay fade & fit-swap are decoupled so the aspect change lands at the
   // fade midpoint (invisible under 50% black) rather than at the leading edge
   // where it reads as a pop.
-  const [underlayVisible, setUnderlayVisible] = React.useState(false);
-  const [fitContain, setFitContain] = React.useState(false);
+  const [underlayVisible, setUnderlayVisible] = React.useState(
+    FS_TRANSITION_MODE === 'cut' && initialTargetRect.fit === 'contain',
+  );
+  const [fitContain, setFitContain] = React.useState(
+    FS_TRANSITION_MODE === 'cut' && initialTargetRect.fit === 'contain',
+  );
   const skipFitSwapRef = React.useRef<boolean>(false);
-  const targetRectRef = React.useRef<RestingRect | null>(null);
+  const targetRectRef = React.useRef<RestingRect | null>(initialTargetRect);
   // Aspect-aware: precompute whether target rest is COVER (portrait video →
   // full viewport, no fit swap, no underlay) or CONTAIN (landscape video →
   // letterboxed inside safe area, underlay fades DURING expand).
-  const restingFitRef = React.useRef<'cover' | 'contain'>('cover');
+  const restingFitRef = React.useRef<'cover' | 'contain'>(initialTargetRect.fit);
   // Guard so onFirstFrameReady is fired exactly once from transitionend
   // (fix 5: motion clock = readiness clock).
   const firedFirstFrameRef = React.useRef<boolean>(false);
-  // Origin snapshot — used as the second link in the aspect fallback chain
-  // when the engine hasn't published a lane aspect yet (fix 3).
-  const originSnap = useFullscreenFeedStore.getState().origin;
-
   // ── Symmetric close: reverse-shrink to origin tile ──
   // Subscribes to the store-owned close-anim flag. When it flips to 'borrow'
   // we recompute the origin host's current rect (fresh — the tile is kept
@@ -550,7 +579,7 @@ const BorrowedFullscreenSlot: React.FC<{
   const closeFiredRef = React.useRef(false);
 
   // Mount the live element on first render.
-  React.useEffect(() => {
+  React.useLayoutEffect(() => {
     const el = wrapperRef.current;
     if (!el) return;
     // Element is currently in the tile (or hidden host if tile evicted).
@@ -614,25 +643,21 @@ const BorrowedFullscreenSlot: React.FC<{
       requestAnimationFrame(() => setUnderlayVisible(true));
     }
 
-    // CUT mode: mount wrapper ALREADY at the resting rect. Same live pixels,
-    // instantly reframed — no wrapper transition. Fire onFirstFrameReady on
-    // the next frame so the overlay reveal gate lifts immediately.
+    // CUT mode: wrapper rendered at the resting rect on the first commit, and
+    // this layout effect reparents the live <video> before paint. No rAF gap,
+    // no tile-sized/first-frame flash before the fullscreen pixels are live.
     if (FS_TRANSITION_MODE === 'cut') {
-      const rafCut = requestAnimationFrame(() => {
-        setExpanded(true);
-        if (!firedFirstFrameRef.current) {
-          firedFirstFrameRef.current = true;
-          onFirstFrameReady?.();
-        }
-        // For CONTAIN targets, swap object-fit at rest — visually a no-op
-        // (the wrapper IS the letterboxed rect at the media's aspect).
-        if (restingFitRef.current === 'contain') {
-          setFitContain(true);
-          try { VideoEngine.setObjectFit(borrow.laneId, 'contain'); } catch {}
-        }
-        try { VideoEngine.nudgeLevelCap(borrow.laneId); } catch {}
-      });
-      return () => cancelAnimationFrame(rafCut);
+      setExpanded(true);
+      if (restingFitRef.current === 'contain') {
+        setFitContain(true);
+        try { VideoEngine.setObjectFit(borrow.laneId, 'contain'); } catch {}
+      }
+      if (!firedFirstFrameRef.current) {
+        firedFirstFrameRef.current = true;
+        onFirstFrameReady?.();
+      }
+      try { VideoEngine.nudgeLevelCap(borrow.laneId); } catch {}
+      return;
     }
 
     // Fix 2/5: expand FIRST, then let handleTransitionEnd fire

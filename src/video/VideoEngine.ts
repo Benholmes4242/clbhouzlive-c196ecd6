@@ -268,6 +268,24 @@ class VideoEngineImpl {
       lane.state !== 'error';
     if (alreadyLoaded) {
       DBG(laneId, 'skip reload: same postId+url', { state: lane.state });
+      lane.posterUrl = posterUrl;
+      lane.startPosition = startPosition;
+      const target = startPosition > 0 ? startPosition : 0;
+      const now = lane.el.currentTime || 0;
+      const needsResumeSeek = target > 0 && Math.abs(now - target) > 0.35;
+      if (needsResumeSeek) {
+        // Same source, different desired playhead. A warm skip must still seek
+        // before surfaces reveal this lane; otherwise React sees the stale
+        // firstFrame=true snapshot for one paint and users get a frame-0/old-
+        // frame flash before playback resumes at the intended time.
+        lane.firstFrame = false;
+        this.emit(lane);
+        try { lane.el.currentTime = target; } catch { /* noop */ }
+      } else if (lane.el.readyState >= 2) {
+        lane.firstFrame = true;
+        try { lane.el.removeAttribute('poster'); } catch {}
+        this.emit(lane);
+      }
       // Signal 'warm' cache hit to any pending autoplay arm — the caller
       // (useRailLane / useWatchAutoplay) checks the returned _warmSkipHit flag.
       (this as any)._lastLoadWasWarmSkip = true;
