@@ -266,7 +266,16 @@ class VideoEngineImpl {
       lane.state !== 'error';
     if (alreadyLoaded) {
       DBG(laneId, 'skip reload: same postId+url', { state: lane.state });
+      // Signal 'warm' cache hit to any pending autoplay arm — the caller
+      // (useRailLane / useWatchAutoplay) checks the returned _warmSkipHit flag.
+      (this as any)._lastLoadWasWarmSkip = true;
       return;
+    }
+    (this as any)._lastLoadWasWarmSkip = false;
+    // Session re-point: if a session was running on this lane, close it out
+    // before the new source takes over.
+    if (lane.postId != null && lane.postId !== postId) {
+      vperfSessionEnd(laneId, 'load-repoint');
     }
 
 
