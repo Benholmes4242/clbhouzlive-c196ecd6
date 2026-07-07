@@ -10,9 +10,11 @@ interface Props {
   metric: string | null;
   /** When true, render the earned state in this tier's material colour. */
   isShowpiece?: boolean;
+  /** When true, this row is the next-to-forge (muted material chip on ghost row). */
+  isNext?: boolean;
 }
 
-export const TierRow: React.FC<Props> = ({ tier, metric, isShowpiece = false }) => {
+export const TierRow: React.FC<Props> = ({ tier, metric, isShowpiece = false, isNext = false }) => {
   const earned = tier.earned;
   const tierIndex = Math.max(1, Math.min(5, tier.tier)) as 1 | 2 | 3 | 4 | 5;
   const materialPalette = isShowpiece ? MATERIAL_PALETTES[tierIndex] : null;
@@ -20,6 +22,24 @@ export const TierRow: React.FC<Props> = ({ tier, metric, isShowpiece = false }) 
   const earnedBg = materialPalette ? materialPalette.tint : GAM.AMBER_14;
   const earnedFg = materialPalette ? materialPalette.color : GAM.AMBER;
   const earnedBorder = materialPalette ? `1px solid ${materialPalette.border}` : 'none';
+
+  // NEXT row for tiered showpieces gets a muted-bronze/material chip on the ghost row.
+  const nextMuted = isNext && !earned && materialPalette;
+  const chipBg = earned
+    ? earnedBg
+    : nextMuted
+      ? materialPalette!.tint
+      : '#20242E';
+  const chipFg = earned
+    ? earnedFg
+    : nextMuted
+      ? materialPalette!.color
+      : 'rgba(255,255,255,0.55)';
+  const chipBorder = earned
+    ? earnedBorder
+    : nextMuted
+      ? `1px solid ${materialPalette!.border}`
+      : 'none';
 
   return (
     <div
@@ -29,7 +49,7 @@ export const TierRow: React.FC<Props> = ({ tier, metric, isShowpiece = false }) 
         gap: 12,
         padding: '8px 0',
         borderBottom: '0.5px solid rgba(255,255,255,0.06)',
-        opacity: earned ? 1 : 0.55,
+        opacity: earned || nextMuted ? 1 : 0.55,
         fontFamily: GAM.FONT_GEIST,
       }}
     >
@@ -38,9 +58,9 @@ export const TierRow: React.FC<Props> = ({ tier, metric, isShowpiece = false }) 
           width: 28,
           height: 28,
           borderRadius: 8,
-          background: earned ? earnedBg : '#20242E',
-          color: earned ? earnedFg : 'rgba(255,255,255,0.55)',
-          border: earned ? earnedBorder : 'none',
+          background: chipBg,
+          color: chipFg,
+          border: chipBorder,
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
