@@ -856,29 +856,25 @@ export function ReviewWizard({
                           : 'none',
                       }}
                     >
-                      <textarea
-                        ref={taRef}
+                      <MentionsComposerInput
                         value={wizard.state.review}
                         onChange={handleReviewChange}
                         onFocus={() => setVerdictFocused(true)}
                         onBlur={() => setVerdictFocused(false)}
                         placeholder="What stood out? Best holes, conditions, the welcome"
+                        maxLength={MAX_REVIEW_LENGTH}
+                        inputRef={(el) => { taRef.current = el; }}
                         style={{
-                          width: '100%',
-                          boxSizing: 'border-box',
-                          border: 'none',
-                          outline: 'none',
-                          resize: 'none',
-                          padding: 0,
-                          fontSize: 16,
-                          lineHeight: 1.45,
-                          color: INK,
-                          background: 'transparent',
                           flex: verdictGrows ? 1 : 'none',
-                          minHeight: verdictGrows ? 0 : 64,
-                          fontFamily: 'inherit',
-                          overflow: 'hidden',
+                          display: 'flex',
+                        }}
+                        textStyle={{
+                          fontSize: 16,
+                          lineHeight: '23px',
+                          padding: '0',
+                          color: INK,
                           caretColor: AMBER,
+                          minHeight: verdictGrows ? undefined : 64,
                         }}
                       />
 
