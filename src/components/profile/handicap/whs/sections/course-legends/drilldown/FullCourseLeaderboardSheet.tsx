@@ -36,17 +36,37 @@ interface Props {
   window: LegendWindow;
   /** Map of category -> viewer's rank (1 = champion). Drilldown already computes this. */
   yourRanks: Partial<Record<LegendCategory, number | null>>;
+  /** Backdrop theme. Default 'dark' preserves handicap drilldown look. */
+  theme?: 'light' | 'dark';
 }
 
-// Dark-mode tokens — sheet portals outside .hcp-dark scope, so all values hardcoded.
+// Sheet portals outside the .hcp-light/.hcp-dark scope, so every color is a
+// hardcoded literal. `theme` picks between dark (handicap host) and light
+// (course-details host) palettes. Do NOT introduce var(--hcp-*) here.
 const DEEP_AMBER = '#F7931E';
 const GOLD = '#F7931E';
-const INK = '#F2F4F7';
-const INK_55 = 'rgba(242,244,247,0.55)';
-const INK_40 = 'rgba(242,244,247,0.38)';
-const HAIRLINE = 'rgba(255,255,255,0.08)';
-const SURFACE = '#15171F';
-const CARD = '#1B1E27';
+
+const DARK = {
+  ink: '#F2F4F7',
+  ink55: 'rgba(242,244,247,0.55)',
+  ink40: 'rgba(242,244,247,0.38)',
+  hairline: 'rgba(255,255,255,0.08)',
+  surface: '#15171F',
+  card: '#1B1E27',
+  avatarRing: 'rgba(255,255,255,0.22)',
+  pillYouBg: 'rgba(255,255,255,0.06)',
+} as const;
+
+const LIGHT = {
+  ink: '#0F172A',
+  ink55: '#64748B',
+  ink40: '#94A3B8',
+  hairline: 'rgba(15,23,42,0.08)',
+  surface: '#F8FAFC',
+  card: '#FFFFFF',
+  avatarRing: 'rgba(15,23,42,0.12)',
+  pillYouBg: 'rgba(15,23,42,0.05)',
+} as const;
 
 const SQUIRCLE_MASK_URL =
   "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cpath d='M40 0h20c22.091 0 40 17.909 40 40v20c0 22.091-17.909 40-40 40H40C17.909 100 0 82.091 0 60V40C0 17.909 17.909 0 40 0z'/%3E%3C/svg%3E\")";
