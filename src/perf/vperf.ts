@@ -414,6 +414,161 @@ export function vperfSessionEnd(laneId: string, reason: string): void {
   });
 }
 
+// ------------------------ Motion trace (fs.open jump diagnosis) ------------------------
+//
+// Chromium-only Layout Instability API is absent in the iOS WebView, so this
+// is the manual equivalent: rAF-sample the FLIP wrapper / overlay / underlay
+// rects and viewport state for a bounded window inside an fs.open span, plus
+// event-log any visualViewport/window resizes and the body-scroll-lock edge.
+// Emits ONE compact summary line at end. Strict no-op when DBG is off.
+
+interface MotionRec {
+  spanId: string;
+  t0: number;
+  originRect: { top: number; left: number; width: number; height: number } | null;
+  frames: number[][]; // compact tuples — see FRAME_SHAPE below
+  events: Array<{ t: number; kind: string; data?: Record<string, unknown> }>;
+  phaseMarks: Record<string, number>;
+  rafId: number;
+  timerId: ReturnType<typeof setTimeout>;
+  cleanup: () => void;
+  ended: boolean;
+}
+// Frame tuple layout (indices, all numbers):
+//  0 t
+//  1..4  wrapper x,y,w,h
+//  5..8  overlay x,y,w,h
+//  9 underlay opacity (0..1, 2dp)
+// 10 objectFit  (0=cover, 1=contain, -1=n/a)
+// 11 scrollY
+// 12 vvOffsetTop
+// 13 vvScale (3dp)
+// 14 bodyScrollLock (1|0)
+const FRAME_SHAPE =
+  't,wx,wy,ww,wh,ox,oy,ow,oh,uOpacity,fit,scrollY,vvTop,vvScale,lock';
+
+const activeMotion = new Map<string, MotionRec>();
+let activeMotionSpanId: string | null = null;
+
+function rr(v: number): number { return Math.round(v); }
+function r2(v: number): number { return Math.round(v * 100) / 100; }
+function r3(v: number): number { return Math.round(v * 1000) / 1000; }
+
+function readRect(el: Element | null): [number, number, number, number] {
+  if (!el) return [0, 0, 0, 0];
+  const r = (el as HTMLElement).getBoundingClientRect();
+  return [rr(r.left), rr(r.top), rr(r.width), rr(r.height)];
+}
+
+function isBodyLocked(): number {
+  if (typeof document === 'undefined') return 0;
+  return document.body.style.position === 'fixed' ? 1 : 0;
+}
+
+export function vperfMotionTrace(
+  spanId: string,
+  opts: {
+    originRect?: { top: number; left: number; width: number; height: number } | null;
+    windowMs?: number;
+  } = {},
+): void {
+  if (!on()) return;
+  if (typeof window === 'undefined') return;
+  // Replace any prior trace for this span.
+  const prior = activeMotion.get(spanId);
+  if (prior) { try { prior.cleanup(); } catch {} }
+
+  const windowMs = opts.windowMs ?? 700;
+  const t0 = performance.now();
+  const rec: MotionRec = {
+    spanId,
+    t0,
+    originRect: opts.originRect ?? null,
+    frames: [],
+    events: [],
+    phaseMarks: {},
+    rafId: 0,
+    timerId: 0 as unknown as ReturnType<typeof setTimeout>,
+    cleanup: () => {},
+    ended: false,
+  };
+
+  const onVvResize = () => rec.events.push({ t: rr(performance.now() - t0), kind: 'vv.resize' });
+  const onVvScroll = () => rec.events.push({ t: rr(performance.now() - t0), kind: 'vv.scroll' });
+  const onWinResize = () => rec.events.push({ t: rr(performance.now() - t0), kind: 'win.resize' });
+  const vv = (window as any).visualViewport as VisualViewport | undefined;
+  try { vv?.addEventListener('resize', onVvResize); } catch {}
+  try { vv?.addEventListener('scroll', onVvScroll); } catch {}
+  try { window.addEventListener('resize', onWinResize); } catch {}
+
+  let lastLock = -1;
+  const sample = () => {
+    if (rec.ended) return;
+    const t = rr(performance.now() - t0);
+    const wrapper = document.querySelector('[data-vperf="flip-wrapper"]');
+    const overlay = document.querySelector('[data-vperf="fs-overlay"]');
+    const underlay = document.querySelector('[data-vperf="flip-underlay"]') as HTMLElement | null;
+    const video = wrapper?.querySelector('video') as HTMLVideoElement | null;
+    const [wx, wy, ww, wh] = readRect(wrapper);
+    const [ox, oy, ow, oh] = readRect(overlay);
+    const uOpacity = underlay ? r2(parseFloat(underlay.style.opacity || '0') || 0) : 0;
+    const fitStr = video ? video.style.objectFit : '';
+    const fit = fitStr === 'contain' ? 1 : fitStr === 'cover' ? 0 : -1;
+    const scrollY = rr(window.scrollY || 0);
+    const vvTop = vv ? rr(vv.offsetTop) : 0;
+    const vvScale = vv ? r3(vv.scale) : 1;
+    const lock = isBodyLocked();
+    if (lock !== lastLock) {
+      rec.events.push({ t, kind: 'bodyScrollLock', data: { locked: !!lock } });
+      lastLock = lock;
+    }
+    rec.frames.push([t, wx, wy, ww, wh, ox, oy, ow, oh, uOpacity, fit, scrollY, vvTop, vvScale, lock]);
+    rec.rafId = requestAnimationFrame(sample);
+  };
+  rec.rafId = requestAnimationFrame(sample);
+
+  rec.cleanup = () => {
+    if (rec.ended) return;
+    rec.ended = true;
+    try { cancelAnimationFrame(rec.rafId); } catch {}
+    try { clearTimeout(rec.timerId); } catch {}
+    try { vv?.removeEventListener('resize', onVvResize); } catch {}
+    try { vv?.removeEventListener('scroll', onVvScroll); } catch {}
+    try { window.removeEventListener('resize', onWinResize); } catch {}
+    activeMotion.delete(spanId);
+    if (activeMotionSpanId === spanId) activeMotionSpanId = null;
+    emit('fs.open.motion', {
+      spanId,
+      shape: FRAME_SHAPE,
+      originRect: rec.originRect,
+      phaseMarks: rec.phaseMarks,
+      frames: rec.frames,
+      events: rec.events,
+    });
+  };
+  rec.timerId = setTimeout(() => rec.cleanup(), windowMs);
+  activeMotion.set(spanId, rec);
+  activeMotionSpanId = spanId;
+}
+
+/** Mark a phase on the currently-armed motion trace (single-active model —
+ *  motion tracing is always tied to the in-flight fs.open borrow span). */
+export function vperfMotionMark(phase: string): void {
+  if (!on()) return;
+  const spanId = activeMotionSpanId;
+  if (!spanId) return;
+  const rec = activeMotion.get(spanId);
+  if (!rec) return;
+  rec.phaseMarks[phase] = rr(performance.now() - rec.t0);
+}
+
+/** End the active motion trace early (e.g. on vperfEnd of the parent span). */
+export function vperfMotionEnd(spanId: string): void {
+  const rec = activeMotion.get(spanId);
+  if (!rec) return;
+  rec.cleanup();
+}
+
 // ------------------------ Convenience helpers ------------------------
 
 let __seq = 0;

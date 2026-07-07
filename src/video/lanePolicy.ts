@@ -64,9 +64,20 @@ export const HLS_CONFIG = {
   maxBufferLength: 20,
   maxMaxBufferLength: 40,
   maxBufferSize: 30 * 1024 * 1024,
-  // ABR cap enforced via config; hls.js reads bitrates in bps.
-  capLevelToPlayerSize: true,
+  // NOTE: capLevelToPlayerSize is applied per-lane in VideoEngine (rails only).
+  // Feed-active + fullscreen lanes render at viewport size; capping there
+  // would only cost quality. Rails render in small tiles — worth the cap.
   // Don't let hls thrash when tabs backgrounded.
   enableWorker: true,
   lowLatencyMode: false,
+} as const;
+
+/** Rail-only overrides applied on top of HLS_CONFIG for lanes with id
+ *  prefix `rail-`. Keeps cold-start segment fetch small (lowest rung) and
+ *  caps subsequent levels to the tile's rendered size — the Instagram-grid
+ *  approach; capLevelToPlayerSize auto-upshifts on element grow, so borrowed
+ *  rail lanes re-parented into fullscreen scale up naturally. */
+export const RAIL_HLS_OVERRIDES = {
+  capLevelToPlayerSize: true,
+  startLevel: 0,
 } as const;

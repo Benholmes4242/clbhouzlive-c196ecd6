@@ -9,7 +9,7 @@ import { useVideoLane } from '@/video/useVideoLane';
 import { VideoEngine } from '@/video/VideoEngine';
 import { useFullscreenFeedStore } from '@/store/fullscreenFeedStore';
 import { isPerfEnabled } from '@/perf/navTiming';
-import { vperfStart, vperfArmLane, vperfNextId } from '@/perf/vperf';
+import { vperfStart, vperfArmLane, vperfNextId, vperfMotionMark } from '@/perf/vperf';
 
 import { usePostViewTracker } from '@/hooks/usePostViewTracker';
 
@@ -463,7 +463,11 @@ const BorrowedFullscreenSlot: React.FC<{
     const raf1 = requestAnimationFrame(() => {
       onFirstFrameReady?.();
       // rAF #2 to ensure Phase 1 transition captures the initial rect commit.
-      const raf2 = requestAnimationFrame(() => setExpanded(true));
+      const raf2 = requestAnimationFrame(() => {
+        // [VPERF] motion trace: phase-1 expand begins on this commit.
+        try { vperfMotionMark('expandStart'); } catch {}
+        setExpanded(true);
+      });
       (window as any).__borrow_raf2 = raf2;
     });
     return () => {
@@ -479,8 +483,19 @@ const BorrowedFullscreenSlot: React.FC<{
     // Only respond to the wrapper's own size/transform transitions.
     if (e.target !== wrapperRef.current) return;
     if (fitContain) return;
+    // [VPERF] motion trace: phase-1 (expand) done, phase-2 (fit swap) begins.
+    try { vperfMotionMark('expandEnd'); vperfMotionMark('fitSwapStart'); } catch {}
     setFitContain(true);
     try { VideoEngine.setObjectFit(borrow.laneId, 'contain'); } catch {}
+    // Cold rail lanes were configured with capLevelToPlayerSize against the
+    // tile's small rect. Now that the wrapper fills the viewport, nudge
+    // hls.js to re-evaluate the cap so it upshifts to a viewport-appropriate
+    // level (session summary levelSwitches counter climbs after this).
+    try { VideoEngine.nudgeLevelCap(borrow.laneId); } catch {}
+    // Fade completes ~120ms after fit swap; mark end on the next paintable frame.
+    requestAnimationFrame(() => {
+      setTimeout(() => { try { vperfMotionMark('fitSwapEnd'); } catch {} }, 130);
+    });
   }, [fitContain, borrow.laneId]);
 
   const target = targetRectRef.current;
@@ -516,6 +531,7 @@ const BorrowedFullscreenSlot: React.FC<{
         {/* Black letterbox underlay — fades in during Phase 2 fit-swap. */}
         <div
           aria-hidden
+          data-vperf="flip-underlay"
           style={{
             position: 'absolute', inset: 0, background: '#000',
             opacity: fitContain ? 1 : 0,
@@ -526,6 +542,7 @@ const BorrowedFullscreenSlot: React.FC<{
       <div
         ref={wrapperRef}
         aria-hidden
+        data-vperf="flip-wrapper"
         style={style}
         onTransitionEnd={handleTransitionEnd}
       />
