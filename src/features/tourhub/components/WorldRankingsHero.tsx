@@ -33,6 +33,7 @@ import { getTourLogo } from '../utils/tourLogos';
 import { BottomSheet } from '@/components/ui/BottomSheet';
 import SheetHeader from '@/components/ui/SheetHeader';
 import { PlayerAvatar } from './PlayerAvatar';
+import { LIGHT_HAIRLINE } from '@/components/ui/SquircleAvatar';
 import { Shimmer } from './shared/Shimmer';
 import { TOUR_MAP, type TourCode } from '../constants/tourMap';
 
@@ -328,6 +329,7 @@ function NumberOneCard({
                 tourCode={tourCode}
                 size="xl"
                 className="!w-full !h-full !rounded-[34%]"
+                ringColor={LIGHT_HAIRLINE}
               />
             </div>
             <div
@@ -472,6 +474,7 @@ function ChaserRow({
         photoUrl={entry.player.photo_url}
         tourCode={tourCode}
         size="md"
+        ringColor={LIGHT_HAIRLINE}
       />
 
 
@@ -574,6 +577,7 @@ function MoverRow({ mover, direction, isLast }: MoverRowProps) {
         playerName={playerName}
         tourCode={mover.tourCode}
         size="sm"
+        ringColor={LIGHT_HAIRLINE}
       />
       <div style={{ flex: 1, minWidth: 0 }}>
         <div

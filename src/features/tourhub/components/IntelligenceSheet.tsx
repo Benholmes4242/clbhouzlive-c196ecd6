@@ -24,6 +24,7 @@ import {
 } from 'lucide-react';
 import { BottomSheet } from '@/components/ui/BottomSheet';
 import { PlayerAvatar } from './PlayerAvatar';
+import { LIGHT_HAIRLINE } from '@/components/ui/SquircleAvatar';
 import {
   useIntelligenceHistoricalPicks,
   type IntelligenceHistoricalTournament,
@@ -694,6 +695,7 @@ function PickMiniRow({
         tourCode={pick.tourCode}
         photoUrl={(pick as any).photoUrl ?? (pick as any).photo_url ?? null}
         size="sm"
+        ringColor={LIGHT_HAIRLINE}
       />
       <div style={{ flex: 1, minWidth: 0, display: 'flex', alignItems: 'center', gap: 6 }}>
         <span

@@ -3,6 +3,7 @@ import SectionHeader from '@/components/ui/SectionHeader';
 import { getCollegeLogoUrl } from '@/utils/collegeLogo';
 import { getPlayerHeadshotCandidates } from '@/utils/playerHeadshot';
 import { PlayerInitialAvatar } from '../shared/PlayerInitialAvatar';
+import { LIGHT_HAIRLINE } from '@/components/ui/SquircleAvatar';
 import { formatCurrency } from '@/lib/utils/formatCurrency';
 import { useTourSeason } from '../../hooks/useTourHubData';
 import { playerRoute } from '../../routes';
@@ -175,6 +176,7 @@ function AlumniCompareBlock({ title, alumni1, alumni2, statKey, name1, name2, em
                     paletteSeed={a1.id}
                     size={26}
                     radius={'34%'}
+                    ringColor={LIGHT_HAIRLINE}
                   />
                   <div style={{ minWidth: 0 }}>
                     <div style={{ fontSize: '13px', fontWeight: 700, color: INK, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' as const }}>
@@ -207,6 +209,7 @@ function AlumniCompareBlock({ title, alumni1, alumni2, statKey, name1, name2, em
                     paletteSeed={a2.id}
                     size={26}
                     radius={'34%'}
+                    ringColor={LIGHT_HAIRLINE}
                   />
                   <div style={{ minWidth: 0 }}>
                     <div style={{ fontSize: '13px', fontWeight: 700, color: INK, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' as const }}>

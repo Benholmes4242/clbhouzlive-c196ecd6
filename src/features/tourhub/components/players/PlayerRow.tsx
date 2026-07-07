@@ -13,6 +13,7 @@ import { cn } from '@/lib/utils';
 import type { TourPlayer, TourPlayerStatistics } from '../../hooks/useTourHubData';
 import type { CollegeMedia } from '../../hooks/useCollegeMedia';
 import { PlayerAvatar } from '../PlayerAvatar';
+import { LIGHT_HAIRLINE } from '@/components/ui/SquircleAvatar';
 
 interface PlayerRowProps {
   player: TourPlayer;
@@ -65,6 +66,7 @@ export function PlayerRow({ player, stats, college, statDisplay = 'rank', classN
             playerName={player.full_name}
             
             size="md"
+            ringColor={LIGHT_HAIRLINE}
           />
           {/* Rank Badge - tiered colors */}
           {hasValidRank && (

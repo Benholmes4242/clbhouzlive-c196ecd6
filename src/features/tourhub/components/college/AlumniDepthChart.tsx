@@ -21,6 +21,7 @@ import { useLegacyAlumni } from '../../hooks/useLegacyAlumni';
 import { getPlayerHeadshotCandidates } from '@/utils/playerHeadshot';
 import { formatCurrency } from '@/lib/utils/formatCurrency';
 import { PlayerInitialAvatar } from '../shared/PlayerInitialAvatar';
+import { LIGHT_HAIRLINE } from '@/components/ui/SquircleAvatar';
 
 import { TIER_SUBTITLES } from '../../constants/legacyAlumni';
 import { playerRoute } from '../../routes';
@@ -106,6 +107,7 @@ function AlumniRow({ alumnus, index, tier, legacyContextLabel }: AlumniRowProps)
             color={tier === 'legacy'
               ? { bg: 'rgba(124,58,237,0.10)', fg: '#7C3AED' }
               : undefined}
+            ringColor={LIGHT_HAIRLINE}
           />
           <div style={{ minWidth: 0, flex: 1 }}>
             <div style={{ display: 'flex', alignItems: 'center', minWidth: 0 }}>

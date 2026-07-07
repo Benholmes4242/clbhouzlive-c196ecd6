@@ -24,6 +24,7 @@ import type { AlumniFace } from '../../hooks/useBatchCollegeAlumni';
 import type { FranchiseCaptain } from '../../hooks/useFranchiseCaptains';
 import { MovementIndicator } from '../shared/MovementIndicator';
 import { PlayerInitialAvatar } from '../shared/PlayerInitialAvatar';
+import { LIGHT_HAIRLINE } from '@/components/ui/SquircleAvatar';
 import { splitStatValue } from '../../utils/splitStatValue';
 import {
   captainDominates,
@@ -182,6 +183,7 @@ export function FranchiseCard({
             imageScale={0.78}
             imageBg="#FFFFFF"
             paletteSeed={slug}
+            ringColor={LIGHT_HAIRLINE}
           />
 
 

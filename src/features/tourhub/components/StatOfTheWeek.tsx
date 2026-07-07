@@ -19,6 +19,7 @@ import { LEADER_CATEGORIES, type LeaderCategory } from './leaders/constants';
 import { BottomSheet } from '@/components/ui/BottomSheet';
 import SheetHeader from '@/components/ui/SheetHeader';
 import { PlayerAvatar } from './PlayerAvatar';
+import { LIGHT_HAIRLINE } from '@/components/ui/SquircleAvatar';
 import { Shimmer } from './shared/Shimmer';
 import CountryFlag from '@/components/ui/country-flag';
 import { SectionHeader } from '@/components/ui/SectionHeader';
@@ -351,6 +352,7 @@ export const StatOfTheWeek = memo(function StatOfTheWeek() {
                   tourCode="pga"
                   size="xl"
                   className="!w-full !h-full !rounded-[34%]"
+                  ringColor={LIGHT_HAIRLINE}
                 />
 
               </div>
@@ -544,6 +546,7 @@ export const StatOfTheWeek = memo(function StatOfTheWeek() {
                       photoUrl={p.photoUrl}
                       tourCode="pga"
                       size="md"
+                      ringColor={LIGHT_HAIRLINE}
                     />
 
                     <div

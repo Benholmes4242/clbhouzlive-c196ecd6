@@ -22,6 +22,7 @@ import { useCollegeRivalries } from '../../hooks/useCollegeMovers';
 import { useCollegeMediaMap } from '../../hooks/useCollegeMedia';
 import { collegeH2HRoute } from '../../routes';
 import { PlayerInitialAvatar } from '../shared/PlayerInitialAvatar';
+import { LIGHT_HAIRLINE } from '@/components/ui/SquircleAvatar';
 import { SectionHeader } from '@/components/ui/SectionHeader';
 import { CollegeComparePickerSheet } from './CollegeComparePickerSheet';
 import { HAIRLINE_INK_8, INK, INK_FAINT, INK_MUTE, INK_TINT_06, INK_TINT_07, SLATE_50, SURFACE } from '../../_shared/tokens';
@@ -125,6 +126,7 @@ export function H2HRivalStrip({ normalizedName, className }: H2HRivalStripProps)
                 radius={8}
                 imageScale={0.78}
                 imageBg="#FFFFFF"
+                ringColor={LIGHT_HAIRLINE}
               />
               <div style={{ flex: 1, minWidth: 0 }}>
                 <div style={{ fontSize: 13, fontWeight: 800, color: INK, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', letterSpacing: '-0.015em' }}>

@@ -11,6 +11,7 @@ import {
   H2HRivalStrip,
 } from '../components/college';
 import { PlayerInitialAvatar } from '../components/shared/PlayerInitialAvatar';
+import { LIGHT_HAIRLINE } from '@/components/ui/SquircleAvatar';
 import { splitStatValue } from '../utils/splitStatValue';
 
 import { useCollegeStats, useCollegeSeasonStats } from '../hooks/useCollegeStats';
@@ -132,6 +133,7 @@ export function CollegeProfilePage() {
                       imageScale={1}
                       imageBg="#FFFFFF"
                       paletteSeed={collegeSlug}
+                      ringColor={LIGHT_HAIRLINE}
                     />
                   </div>
                   {collegeRank && collegeRank <= 99 && (

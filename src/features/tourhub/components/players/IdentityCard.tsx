@@ -14,6 +14,7 @@ import { cn } from '@/lib/utils';
 import type { TourPlayer, TourPlayerStatistics } from '../../hooks/useTourHubData';
 import type { CollegeMedia } from '../../hooks/useCollegeMedia';
 import { PlayerAvatar } from '../PlayerAvatar';
+import { LIGHT_HAIRLINE } from '@/components/ui/SquircleAvatar';
 
 interface IdentityCardProps {
   player: TourPlayer;
@@ -80,6 +81,7 @@ export function IdentityCard({ player, stats, college, statDisplay = 'rank', cla
               playerName={player.full_name}
               
               size="md"
+              ringColor={LIGHT_HAIRLINE}
             />
             {/* Rank Badge - tiered colors with subtle glow */}
             {hasValidRank && (
