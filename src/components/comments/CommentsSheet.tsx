@@ -487,6 +487,10 @@ function CommentsSheet({
             as="span"
             text={comment.content}
             className="mt-1 text-[14px] leading-[20px] block text-foreground/90 whitespace-pre-wrap"
+            onMentionTap={(m) => {
+              onClose();
+              navigate(m.entityType === 'business' ? `/business/${m.entityId}` : `/profile/${m.entityId}`);
+            }}
           />
 
           {/* Media */}
