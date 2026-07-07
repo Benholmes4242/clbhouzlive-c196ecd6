@@ -59,10 +59,6 @@ export const TopTenCardComments: React.FC<TopTenCardCommentsProps> = ({
   const [replyingTo, setReplyingTo] = useState<{ id: string; name: string } | null>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
 
-  // Mention autocomplete
-  const [mentionQuery, setMentionQuery] = useState<string | null>(null);
-  const [mentionResults, setMentionResults] = useState<{ id: string; username: string; display_name: string; avatar: string | null }[]>([]);
-
   const canInteract = privacySetting !== 'off' && !isOwnProfile && !!user;
   const totalReactions = Object.values(counts).reduce((a, b) => a + b, 0);
   const totalComments = comments.reduce((sum, c) => sum + 1 + (c.replies?.length ?? 0), 0);
@@ -77,45 +73,11 @@ export const TopTenCardComments: React.FC<TopTenCardCommentsProps> = ({
     if (!isOpen) {
       setDraft('');
       setReplyingTo(null);
-      setMentionQuery(null);
-      setMentionResults([]);
     }
   }, [isOpen]);
 
-  // Mention autocomplete query
-  useEffect(() => {
-    if (mentionQuery === null || mentionQuery.length < 1) {
-      setMentionResults([]);
-      return;
-    }
-    const search = async () => {
-      const { data } = await supabase
-        .from('user_profiles')
-        .select('id, username, display_name, profile_photo_url')
-        .ilike('username', `${mentionQuery}%`)
-        .limit(5);
-      setMentionResults((data ?? []).map((u: any) => ({
-        id: u.id,
-        username: u.username,
-        display_name: u.display_name,
-        avatar: u.profile_photo_url,
-      })));
-    };
-    search();
-  }, [mentionQuery]);
-
   const handleDraftChange = (val: string) => {
     setDraft(val);
-    const atMatch = val.match(/@(\w*)$/);
-    if (atMatch) setMentionQuery(atMatch[1]);
-    else { setMentionQuery(null); setMentionResults([]); }
-  };
-
-  const selectMention = (username: string) => {
-    setDraft(prev => prev.replace(/@\w*$/, `@${username} `));
-    setMentionQuery(null);
-    setMentionResults([]);
-    requestAnimationFrame(() => inputRef.current?.focus());
   };
 
   const handleSubmit = () => {
@@ -123,8 +85,6 @@ export const TopTenCardComments: React.FC<TopTenCardCommentsProps> = ({
     addComment({ body: draft, parentId: replyingTo?.id });
     setDraft('');
     setReplyingTo(null);
-    setMentionQuery(null);
-    setMentionResults([]);
   };
 
   // Group reactors by type for Reactions tab
