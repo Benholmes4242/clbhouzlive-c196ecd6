@@ -24,6 +24,7 @@ import {
 } from 'lucide-react';
 import { BottomSheet } from '@/components/ui/BottomSheet';
 import { PlayerAvatar } from './PlayerAvatar';
+import { LIGHT_HAIRLINE } from '@/components/ui/SquircleAvatar';
 import {
   useIntelligenceHistoricalPicks,
   type IntelligenceHistoricalTournament,
