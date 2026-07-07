@@ -327,11 +327,11 @@ const RarityFooterStrip: React.FC<{ rarity: string }> = ({ rarity }) => {
           fontSize: 8,
           fontWeight: 800,
           letterSpacing: '0.12em',
-          color: rc,
           ...GAM.TABULAR,
         }}
       >
-        {label}
+        <span style={{ color: 'rgba(255,255,255,0.38)' }}>RARITY · </span>
+        <span style={{ color: rc }}>{label}</span>
       </span>
     </div>
   );

@@ -11,6 +11,7 @@ import { TrophyDetailSheet } from './TrophyDetailSheet';
 import { normalizeBadge, normalizeLegend, type TrophyItem } from './_shared/normalizeTrophyItem';
 import { isShowpiece, LIFETIME_ORDER } from './_shared/showpieces';
 import { MATERIAL_PALETTES, FORGE_GOLD, materialNameForTier } from './_shared/rarityPalette';
+import { rarityColor } from '@/lib/gam/visuals';
 import type { BadgeCategory } from '@/lib/gam/types';
 
 const AMBER = '#F7931E';
@@ -494,74 +495,9 @@ export const TrophyRoomSheet: React.FC<Props> = ({ userId, viewerUserId, ownerFi
               </span>
             </div>
 
-            {/* Split */}
-            <div
-              style={{
-                fontSize: 10,
-                color: FAINT,
-                marginTop: 8,
-                display: 'flex',
-                gap: 14,
-                flexWrap: 'wrap',
-                fontWeight: 800,
-                letterSpacing: '0.14em',
-                textTransform: 'uppercase',
-                ...GAM.TABULAR,
-              }}
-            >
-              <span>
-                <span style={{ color: INK }}>{earnedAchievements.length}</span>{' '}
-                {earnedAchievements.length === 1 ? 'ACHIEVEMENT' : 'ACHIEVEMENTS'}
-              </span>
-              <span aria-hidden>·</span>
-              <span>
-                <span style={{ color: AMBER }}>{allLegends.length}</span>{' '}
-                COURSE {allLegends.length === 1 ? 'LEGEND' : 'LEGENDS'}
-              </span>
-            </div>
+            {/* Split line + completion rail removed per amendment: filter pills
+                (All 27 / Earned 15 / Locked 12) already carry these counts. */}
 
-            {/* Completion rail — achievements only */}
-            {totalAchievements > 0 && (
-              <div style={{ marginTop: 12 }}>
-                <div
-                  style={{
-                    position: 'relative',
-                    width: '100%',
-                    height: 3.5,
-                    borderRadius: 99,
-                    background: 'rgba(255,255,255,0.07)',
-                    overflow: 'hidden',
-                  }}
-                >
-                  <div
-                    style={{
-                      width: `${railPct}%`,
-                      height: '100%',
-                      background: AMBER,
-                      borderRadius: 99,
-                      transition: 'width 400ms ease',
-                    }}
-                  />
-                </div>
-                <div
-                  style={{
-                    display: 'flex',
-                    justifyContent: 'space-between',
-                    marginTop: 6,
-                    fontSize: 9.5,
-                    fontWeight: 800,
-                    letterSpacing: '0.12em',
-                    color: FAINT,
-                    ...GAM.TABULAR,
-                  }}
-                >
-                  <span>
-                    <span style={{ color: INK }}>{earnedAchCount}</span> OF {totalAchievements} ACHIEVEMENTS
-                  </span>
-                  <span>{remaining === 1 ? '1 TO GO' : `${remaining} TO GO`}</span>
-                </div>
-              </div>
-            )}
 
             {/* FORGE INVENTORY — chip per material the user holds. */}
             {forgeInventory.length > 0 && (
@@ -608,11 +544,18 @@ export const TrophyRoomSheet: React.FC<Props> = ({ userId, viewerUserId, ownerFi
           {nextUnlock && (
             <div style={{ padding: '4px 0 12px' }}>
               {(() => {
-                const destColor = nextForgeDestPal
-                  ? (nextForgeDestTier === 5 ? FORGE_GOLD : nextForgeDestPal.color)
-                  : AMBER;
+                // Selection rule: nextUnlock = highest fractional progress across
+                // ANY not-fully-maxed tiered/one-shot achievement (tiebreak: fewer
+                // remainingUnits, then alpha). Tiered target uses destination
+                // material colour; one-shot fallback uses rarity colour.
+                const isOneShot = nextUnlock.item.tiers.length === 1;
+                const destColor = isOneShot
+                  ? (rarityColor[nextUnlock.item.rarity as keyof typeof rarityColor] ?? '#94A3B8')
+                  : nextForgeDestPal
+                    ? (nextForgeDestTier === 5 ? FORGE_GOLD : nextForgeDestPal.color)
+                    : AMBER;
                 const destRgb = hexToRgb(destColor);
-                const destMaterial = nextForgeDestPal?.material ?? '';
+                const destMaterial = !isOneShot ? (nextForgeDestPal?.material ?? '') : '';
                 const remaining = Math.max(
                   0,
                   (nextUnlock.item.nextThreshold ?? 0) - (nextUnlock.item.currentValue ?? 0),
@@ -630,7 +573,7 @@ export const TrophyRoomSheet: React.FC<Props> = ({ userId, viewerUserId, ownerFi
                       borderRadius: 14,
                       background: CARD,
                       border: `1px solid ${LINE}`,
-                      borderLeft: `3px solid ${AMBER}`,
+                      borderLeft: `3px solid ${destColor}`,
                       cursor: 'pointer',
                       textAlign: 'left',
                       fontFamily: GAM.FONT_GEIST,
@@ -659,10 +602,11 @@ export const TrophyRoomSheet: React.FC<Props> = ({ userId, viewerUserId, ownerFi
                           fontSize: 8.5,
                           fontWeight: 800,
                           letterSpacing: '0.14em',
-                          color: AMBER,
+                          color: destColor,
                         }}
                       >
-                        NEXT FORGE
+                        NEXT UNLOCK
+
                       </div>
                       <div
                         style={{
