@@ -43,6 +43,7 @@ import {
   filesToComposerMedia,
   type ComposerMediaItem,
 } from '@/components/post-composer/composerMedia';
+import { MentionsComposerInput } from '@/components/mentions/MentionsComposerInput';
 
 import { DiscardActionSheet } from './DiscardActionSheet';
 import { RemoveReviewActionSheet } from './RemoveReviewActionSheet';
