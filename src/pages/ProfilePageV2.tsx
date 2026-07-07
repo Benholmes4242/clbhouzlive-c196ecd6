@@ -624,7 +624,8 @@ const ProfilePageV2Content: React.FC = () => {
             }}
             aria-label={isSelf ? "Change profile photo" : "View profile photo"}
           >
-            {/* 2px ring (matches background) */}
+            {/* Avatar-on-cover: solid bg ring for separation --
+                canon exception, no hairline. */}
             <div className="clbhouz-squircle absolute inset-0 bg-background" />
 
             {/* Avatar image */}
