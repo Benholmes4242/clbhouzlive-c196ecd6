@@ -565,7 +565,7 @@ export const TrophyRoomSheet: React.FC<Props> = ({ userId, viewerUserId, ownerFi
                       borderRadius: 14,
                       background: CARD,
                       border: `1px solid ${LINE}`,
-                      borderLeft: `3px solid ${AMBER}`,
+                      borderLeft: `3px solid ${destColor}`,
                       cursor: 'pointer',
                       textAlign: 'left',
                       fontFamily: GAM.FONT_GEIST,
@@ -594,10 +594,11 @@ export const TrophyRoomSheet: React.FC<Props> = ({ userId, viewerUserId, ownerFi
                           fontSize: 8.5,
                           fontWeight: 800,
                           letterSpacing: '0.14em',
-                          color: AMBER,
+                          color: destColor,
                         }}
                       >
-                        NEXT FORGE
+                        NEXT UNLOCK
+
                       </div>
                       <div
                         style={{
