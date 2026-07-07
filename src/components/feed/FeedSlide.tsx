@@ -517,6 +517,12 @@ const BorrowedFullscreenSlot: React.FC<{
   // full viewport, no fit swap, no underlay) or CONTAIN (landscape video →
   // letterboxed inside safe area, underlay fades DURING expand).
   const restingFitRef = React.useRef<'cover' | 'contain'>('cover');
+  // Guard so onFirstFrameReady is fired exactly once from transitionend
+  // (fix 5: motion clock = readiness clock).
+  const firedFirstFrameRef = React.useRef<boolean>(false);
+  // Origin snapshot — used as the second link in the aspect fallback chain
+  // when the engine hasn't published a lane aspect yet (fix 3).
+  const originSnap = useFullscreenFeedStore.getState().origin;
 
   // Mount the live element on first render.
   React.useEffect(() => {
@@ -537,11 +543,42 @@ const BorrowedFullscreenSlot: React.FC<{
     }
 
     // Aspect-aware expand target — grow INTO the media's resting rect so
-    // there is no post-expand shrink. Falls back to viewport/cover when
-    // metadata isn't ready yet; a corrective tween fires post-firstFrame.
+    // there is no post-expand shrink.
+    //
+    // Fallback chain (fix 3):
+    //   1. VideoEngine.getLaneAspect(laneId)       — live element metadata
+    //   2. origin.originMediaW / originMediaH      — threaded from tap
+    //   3. viewport + contain                      — safe last resort
+    // Emit [DECIDE] restingRect.late when we fall past step 1 so we can
+    // quantify how often the tail fires (drives whether a corrective tween
+    // is worth building).
     const vp = getCurrentViewport();
     const laneAspect = VideoEngine.getLaneAspect(borrow.laneId);
-    const [mw, mh] = laneAspect ? [laneAspect * 1000, 1000] : [0, 0];
+    let mw = 0;
+    let mh = 0;
+    let source: 'lane' | 'origin' | 'viewport-contain' = 'lane';
+    if (laneAspect && laneAspect > 0) {
+      mw = laneAspect * 1000; mh = 1000;
+    } else if (
+      originSnap && (originSnap.originMediaW ?? 0) > 0 && (originSnap.originMediaH ?? 0) > 0
+    ) {
+      mw = originSnap.originMediaW as number;
+      mh = originSnap.originMediaH as number;
+      source = 'origin';
+      // eslint-disable-next-line no-console
+      console.info('[DECIDE]', 'restingRect.late', {
+        laneId: borrow.laneId, source, mw, mh,
+      });
+    } else {
+      // Force contain fallback by feeding the resolver landscape-ish dims
+      // that will letterbox inside safe area instead of covering full VP.
+      mw = vp.w; mh = Math.max(1, Math.round(vp.w * 0.5625));
+      source = 'viewport-contain';
+      // eslint-disable-next-line no-console
+      console.info('[DECIDE]', 'restingRect.late', {
+        laneId: borrow.laneId, source, mw, mh,
+      });
+    }
     const rect = resolveRestingRect(mw, mh, vp, 'video');
     targetRectRef.current = rect;
     restingFitRef.current = rect.fit;
@@ -552,9 +589,12 @@ const BorrowedFullscreenSlot: React.FC<{
       requestAnimationFrame(() => setUnderlayVisible(true));
     }
 
-    // Fire firstFrame on next rAF — element was already painting.
+    // Fix 2/5: expand FIRST, then let handleTransitionEnd fire
+    // onFirstFrameReady when the wrapper's own expand transition completes.
+    // The old order revealed the host before the slot was fullscreen and
+    // showed a one-frame flash of the underlying SnapFeed at fullscreen
+    // geometry around a tile-sized borrow slot.
     const raf1 = requestAnimationFrame(() => {
-      onFirstFrameReady?.();
       // rAF #2 to ensure Phase 1 transition captures the initial rect commit.
       const raf2 = requestAnimationFrame(() => {
         // [VPERF] motion trace: phase-1 expand begins on this commit.
