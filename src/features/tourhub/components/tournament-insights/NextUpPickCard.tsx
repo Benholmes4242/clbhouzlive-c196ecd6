@@ -80,7 +80,7 @@ function PickRow({
                 srcCandidates={resolvePlayerAvatarCandidates({ name: item.name, photoUrl: null, tourSlug: 'pga' })}
                 alt={item.name}
                 userId={item.id}
-                hideRing
+                hairlineRing ringColor={LIGHT_HAIRLINE}
               />
             </div>
 
