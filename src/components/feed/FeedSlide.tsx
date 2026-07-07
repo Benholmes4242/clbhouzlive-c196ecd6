@@ -8,6 +8,7 @@ import type { FeedPost, MediaItem } from '@/components/media-system/types/media'
 import { useVideoLane } from '@/video/useVideoLane';
 import { VideoEngine } from '@/video/VideoEngine';
 import { useFullscreenFeedStore } from '@/store/fullscreenFeedStore';
+import { originHostRegistry } from '@/video/originHostRegistry';
 import { isPerfEnabled } from '@/perf/navTiming';
 import { vperfStart, vperfArmLane, vperfNextId, vperfMotionMark } from '@/perf/vperf';
 import { resolveRestingRect, getCurrentViewport, type RestingRect } from '@/lib/media/resolveRestingRect';
