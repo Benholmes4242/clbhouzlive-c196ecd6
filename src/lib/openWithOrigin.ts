@@ -171,12 +171,17 @@ export function openWithOrigin({
   if (!borrow && postId) {
     try {
       const snap = VideoEngine.snapshot('feed-active');
-      const candidateOwnerKey = `${postId}:${mediaIndex ?? 0}`;
+      const tappedIdx = mediaIndex ?? 0;
+      const tappedOwnerKey = `${postId}:${tappedIdx}`;
+      // Exact-slide gate: borrow only when the lane's ownerKey matches the
+      // tapped slide's ownerKey exactly, OR when the lane wrote a bare postId
+      // (single-media convention) AND the tap targets slide 0. Prevents a
+      // playing slide 5 from being borrowed by a tap on slide 2 of the same
+      // post — that's a lane open on the tapped media, not a borrow.
       const owns =
         snap.postId != null &&
-        (snap.postId === candidateOwnerKey ||
-          snap.postId === postId ||
-          snap.postId.startsWith(postId + ':'));
+        (snap.postId === tappedOwnerKey ||
+          (snap.postId === postId && tappedIdx === 0));
       const ctGate = snap.currentTime > 0;
       const stateGate = snap.state === 'playing' || snap.state === 'ready';
       const isLive = stateGate && ctGate;
@@ -191,7 +196,8 @@ export function openWithOrigin({
               : null;
       DECIDE('borrow.feed', {
         postId,
-        ownerKey: candidateOwnerKey,
+        ownerKey: tappedOwnerKey,
+        tappedOwnerKey,
         snapPostId: snap.postId,
         snapState: snap.state,
         snapCt: +snap.currentTime.toFixed(3),
@@ -205,7 +211,7 @@ export function openWithOrigin({
       if (owns && isLive) {
         borrow = {
           laneId: 'feed-active',
-          ownerKey: snap.postId ?? candidateOwnerKey,
+          ownerKey: snap.postId ?? tappedOwnerKey,
           postId,
           posterUrl: posterUrl ?? null,
           viewportW: typeof window !== 'undefined' ? window.innerWidth : 0,
