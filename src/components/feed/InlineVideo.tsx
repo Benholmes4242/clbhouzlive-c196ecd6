@@ -256,6 +256,7 @@ export const InlineVideo: React.FC<Props> = ({
     <div style={{ position: 'absolute', inset: 0, backgroundColor: '#0a0a0a' }}>
       {posterUrl && (
         <img
+          ref={posterElRef}
           src={posterUrl}
           alt=""
           aria-hidden
