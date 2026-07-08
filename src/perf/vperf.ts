@@ -791,6 +791,8 @@ export function vperfScorecard(trigger: 'auto' | 'nav' | 'manual' = 'manual'): v
   lines.push(
     `  prefetch: issued=${ps.issued} aborted=${abortParts.join(' ') || '0'} activationsWithPrefetch=${ps.activationsWithPrefetch} warmHits=${ps.activationsWithPrefetchWarm} hitRate=${(hitRate*100).toFixed(1)}%`,
   );
+  // [FLOW] card lifecycle + handover continuity rollup
+  try { for (const l of __vperfFlowRollupLines()) lines.push(l); } catch {}
   // eslint-disable-next-line no-console
   console.info(lines.join('\n'));
 }
