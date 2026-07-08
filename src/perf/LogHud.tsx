@@ -92,12 +92,12 @@ export const LogHud = memo(function LogHud() {
 
 
   const lines = consoleCapture.getLines();
-  return (
+  return createPortal(
     <div
       style={{
         position: 'fixed',
         inset: 0,
-        zIndex: 99999,
+        zIndex: Z.logHud,
         background: 'rgba(0,0,0,0.92)',
         display: 'flex',
         flexDirection: 'column',
@@ -137,8 +137,10 @@ export const LogHud = memo(function LogHud() {
           </div>
         ))}
       </div>
-    </div>
+    </div>,
+    document.body
   );
 });
+
 
 export default LogHud;
