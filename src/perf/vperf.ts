@@ -36,7 +36,7 @@
  */
 
 import { isPerfEnabled } from '@/perf/navTiming';
-import { writeBandwidthSample } from '@/video/bandwidthMemory';
+import { writeBandwidthSample, getNetClass } from '@/video/bandwidthMemory';
 
 
 const SPAN_TTL_MS = 15_000;
@@ -443,6 +443,7 @@ export function vperfSessionEnd(laneId: string, reason: string): void {
     bwEstimateStart: rec.bwEstimateStart,
     bwEstimateEnd: rec.bwEstimateEnd,
     seededBw: rec.seededBw,
+    netClass: getNetClass(),
     verdict,
     longStall,
     reason,
