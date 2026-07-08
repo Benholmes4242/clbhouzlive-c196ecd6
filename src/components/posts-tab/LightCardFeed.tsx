@@ -96,6 +96,7 @@ export const LightCardFeed: React.FC<LightCardFeedProps> = ({
   // ── Active-card tracking (ported from CardFeed) ──
   const [activeIdx, setActiveIdx] = useState(0);
   const [playingIdx, setPlayingIdx] = useState(0);
+  const [earlyIdx, setEarlyIdx] = useState<number>(-1);
   const [scrollParent, setScrollParent] = useState<HTMLElement | undefined>(undefined);
   const settleTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const SETTLE_MS = 80;
@@ -104,11 +105,21 @@ export const LightCardFeed: React.FC<LightCardFeedProps> = ({
   const PLAY_IN = 0.30;
   const PLAY_OUT = 0.20;
   const HYSTERESIS = 0.1;
+  // Early-motion handover (mirrors CardFeed) — see CardFeed.EARLY_MOTION_*
+  const EARLY_MOTION_FRACTION = 0.12;
+  const EARLY_MOTION_CLEAR = 0.08;
+  const EARLY_VELOCITY_MAX = 3; // px/ms
   const visibilityRef = useRef<Map<number, number>>(new Map());
   const scrollDirRef = useRef<number>(0); // +1 down, -1 up, 0 idle
   const lastScrollTopRef = useRef<number>(0);
+  const lastScrollTsRef = useRef<number>(0);
+  const scrollVelocityRef = useRef<number>(0); // px/ms
   const observerRef = useRef<IntersectionObserver | null>(null);
   const cardEls = useRef<Map<number, HTMLElement>>(new Map());
+  const playingIdxRef = useRef(0);
+  const postsRef = useRef(posts);
+  useEffect(() => { playingIdxRef.current = playingIdx; }, [playingIdx]);
+  useEffect(() => { postsRef.current = posts; }, [posts]);
 
   useEffect(() => {
     // On this app, #root is the actual scroll container (see ScrollToTopGlass).
