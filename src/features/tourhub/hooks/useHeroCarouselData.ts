@@ -18,7 +18,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { TOUR_CONFIG, type TourId } from './useOverviewData';
 import { useTournamentsCache, type CachedTournament } from '@/hooks/useTournamentsCache';
 import { getContextLabel } from '../utils/tournamentClassification';
-import { isAnyMajor } from '../utils/majorScope';
+import { isAnyMajor, getMajorType } from '../utils/majorScope';
 import { isTournamentDecided } from '@/utils/tournamentDecided';
 
 // Tour priority order for sorting live tournaments
