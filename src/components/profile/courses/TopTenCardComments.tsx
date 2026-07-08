@@ -44,11 +44,19 @@ interface TopTenCardCommentsProps {
   courseName: string;
   isOwnProfile: boolean;
   privacySetting?: string;
+  /** Deep-link: scroll to + highlight this comment id on open. Accepts
+   *  either a top-level comment or a reply. When it's a reply and the
+   *  parent id is unknown, we search loaded comments' replies to resolve
+   *  it before scrolling. If the reply was deleted, we fall back to the
+   *  parent (or the top of the sheet). Mirrors CommentsSheet's contract. */
+  initialCommentId?: string | null;
+  initialParentCommentId?: string | null;
 }
 
 export const TopTenCardComments: React.FC<TopTenCardCommentsProps> = ({
   isOpen, onClose, targetUserId, courseId, courseName,
   isOwnProfile, privacySetting = 'followers',
+  initialCommentId = null, initialParentCommentId = null,
 }) => {
   const { user } = useSupabaseSession();
   const navigate = useNavigate();
@@ -59,6 +67,11 @@ export const TopTenCardComments: React.FC<TopTenCardCommentsProps> = ({
   const [activeTab, setActiveTab] = useState<SheetTab>('comments');
   const [draft, setDraft] = useState('');
   const [replyingTo, setReplyingTo] = useState<{ id: string; name: string } | null>(null);
+  const [highlightedId, setHighlightedId] = useState<string | null>(null);
+  const commentElsRef = useRef<Map<string, HTMLDivElement>>(new Map());
+  const registerCommentRef = (id: string) => (el: HTMLDivElement | null) => {
+    if (el) commentElsRef.current.set(id, el); else commentElsRef.current.delete(id);
+  };
   const inputRef = useRef<HTMLTextAreaElement>(null);
 
   const canInteract = privacySetting !== 'off' && !isOwnProfile && !!user;
@@ -77,6 +90,40 @@ export const TopTenCardComments: React.FC<TopTenCardCommentsProps> = ({
       setReplyingTo(null);
     }
   }, [isOpen]);
+
+  // Deep-link scroll + highlight (Item 2B / Item 3 for Top-10). Runs once
+  // per open when initialCommentId is present and comments have loaded.
+  // Resolves reply → parent from loaded comments if parentId not supplied.
+  const didHandleDeepLink = useRef(false);
+  useEffect(() => {
+    if (!isOpen) { didHandleDeepLink.current = false; return; }
+    if (!initialCommentId || didHandleDeepLink.current) return;
+    if (comments.length === 0) return; // wait for data
+    didHandleDeepLink.current = true;
+
+    // Locate the target — top-level first, then within replies.
+    const isTopLevel = comments.some((c) => c.id === initialCommentId);
+    let targetId = initialCommentId;
+    if (!isTopLevel) {
+      const parent = initialParentCommentId
+        ? comments.find((c) => c.id === initialParentCommentId)
+        : comments.find((c) => c.replies?.some((r: any) => r.id === initialCommentId));
+      const replyExists = parent?.replies?.some((r: any) => r.id === initialCommentId) ?? false;
+      // If the reply was deleted, fall back to the parent; if the parent is
+      // also gone, do nothing (open at top).
+      targetId = replyExists ? initialCommentId : (parent?.id ?? '');
+    }
+    if (!targetId) return;
+
+    // Two RAFs to give DOM a chance to attach refs even if replies just
+    // rendered from an expansion.
+    requestAnimationFrame(() => requestAnimationFrame(() => {
+      const el = commentElsRef.current.get(targetId!);
+      if (el) el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      setHighlightedId(targetId!);
+      setTimeout(() => setHighlightedId(null), 1400);
+    }));
+  }, [isOpen, initialCommentId, initialParentCommentId, comments]);
 
 
   const handleSubmit = () => {
