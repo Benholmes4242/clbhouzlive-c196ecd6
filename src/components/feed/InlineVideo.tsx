@@ -160,7 +160,48 @@ export const InlineVideo: React.FC<Props> = ({
     void VideoEngine.play('feed-next', { callerPostId: resolvedOwnerKey });
     vperfMarkEarlyStarted(resolvedOwnerKey);
     const startedAt = performance.now();
+
+    // [FLOW] card.earlyStart — capture visible fraction at intent moment.
+    let motionRaf = 0;
+    if (isPerfEnabled()) {
+      vperfCardEarlyStart(resolvedOwnerKey, {
+        idx: feedIndex ?? -1,
+        postId: postId ?? null,
+        fraction: vperfCardFraction(host),
+      });
+      // Poll feed-next currentTime for first advance → card.playing (moving-
+      // before-1/3 verdict source). rAF is cheap; effect cleanup cancels.
+      const ct0 = VideoEngine.snapshot('feed-next').currentTime || 0;
+      const tick = () => {
+        try {
+          const s = VideoEngine.snapshot('feed-next');
+          if ((s.currentTime || 0) > ct0 + 0.001) {
+            vperfCardFirstMotion(resolvedOwnerKey, {
+              fraction: vperfCardFraction(host),
+              source: 'feed-next',
+            });
+            return;
+          }
+        } catch { /* ignore */ }
+        motionRaf = requestAnimationFrame(tick);
+      };
+      motionRaf = requestAnimationFrame(tick);
+    }
+
     return () => {
+      if (motionRaf) cancelAnimationFrame(motionRaf);
+      // [FLOW] handover probe — arm BEFORE unmount so tUnmount stamps at the
+      // exact moment feed-next leaves the host. Reads feed-next currentTime
+      // now so posJumpMs measures playhead continuity across the swap.
+      if (isPerfEnabled()) {
+        const feedNextCT = VideoEngine.snapshot('feed-next').currentTime || 0;
+        vperfHandoverStart(resolvedOwnerKey, {
+          idx: feedIndex ?? -1,
+          hostEl: host,
+          posterEl: posterElRef.current,
+          feedNextCurrentTime: feedNextCT,
+        });
+      }
       // Even if pauseAll (fullscreen / creation overlay / visibility) has
       // already paused the lane, unmount is what removes the <video> from
       // this host so the incoming feed-active mount doesn't stack on top.
@@ -168,7 +209,47 @@ export const InlineVideo: React.FC<Props> = ({
       VideoEngine.unmountLane('feed-next');
       vperfDualActiveAdd(performance.now() - startedAt);
     };
-  }, [earlyMotion, isActive, hlsUrl, postId, resolvedOwnerKey, lane.hostRef]);
+  }, [earlyMotion, isActive, hlsUrl, postId, resolvedOwnerKey, feedIndex, lane.hostRef]);
+
+  // [FLOW] card.promoted / card.released + card.playing + handover.frame ─
+  // Tracks the promoted card's lifecycle on `feed-active`. All entry points
+  // strict no-op when DBG off (each vperf helper checks isPerfEnabled).
+  const promotedRef = useRef(false);
+  const firstMotionRef = useRef(false);
+  useEffect(() => {
+    if (!resolvedOwnerKey || !hlsUrl) return;
+    if (isActive && !promotedRef.current) {
+      promotedRef.current = true;
+      firstMotionRef.current = false;
+      const host = lane.hostRef.current;
+      vperfCardPromoted(resolvedOwnerKey, {
+        idx: feedIndex ?? -1,
+        fraction: vperfCardFraction(host),
+      });
+    }
+    if (!isActive && promotedRef.current) {
+      promotedRef.current = false;
+      firstMotionRef.current = false;
+      const host = lane.hostRef.current;
+      vperfCardReleased(resolvedOwnerKey, { fraction: vperfCardFraction(host) });
+    }
+  }, [isActive, resolvedOwnerKey, hlsUrl, feedIndex, lane.hostRef]);
+
+  // First painted frame on feed-active while promoted → close both the
+  // card.playing arm and the handover probe with real playhead + fraction.
+  useEffect(() => {
+    if (!isActive || !resolvedOwnerKey || firstMotionRef.current) return;
+    const ct = lane.snapshot.currentTime;
+    if (!lane.snapshot.firstFrame && !(ct > 0)) return;
+    firstMotionRef.current = true;
+    const host = lane.hostRef.current;
+    vperfCardFirstMotion(resolvedOwnerKey, {
+      fraction: vperfCardFraction(host),
+      source: 'feed-active',
+    });
+    vperfHandoverFrame(resolvedOwnerKey, { feedActiveCurrentTime: ct || 0 });
+  }, [isActive, resolvedOwnerKey, lane.snapshot.firstFrame, lane.snapshot.currentTime, lane.hostRef]);
+
 
 
   return (
