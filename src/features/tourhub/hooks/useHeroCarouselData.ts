@@ -18,7 +18,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { TOUR_CONFIG, type TourId } from './useOverviewData';
 import { useTournamentsCache, type CachedTournament } from '@/hooks/useTournamentsCache';
 import { getContextLabel } from '../utils/tournamentClassification';
-import { isAnyMajor } from '../utils/majorScope';
+import { isAnyMajor, getMajorType } from '../utils/majorScope';
 import { isTournamentDecided } from '@/utils/tournamentDecided';
 
 // Tour priority order for sorting live tournaments
@@ -344,7 +344,7 @@ export function useHeroCarouselData() {
       // major from a non-PGA tour into upcomingByTour['pga'] so it competes there by date.
       const crossTourMajors = upcomingTournaments
         .map(t => transformTournament(t, false))
-        .filter(t => t.isMajor && t.tourSlug !== 'pga');
+        .filter(t => getMajorType(t.name || '') === 'mens' && t.tourSlug !== 'pga');
 
       crossTourMajors.forEach(major => {
         const alreadyInPga = upcomingByTour['pga'].some(t => t.id === major.id);
@@ -382,7 +382,7 @@ export function useHeroCarouselData() {
           // These are stored under EURO in Sportradar but should only appear as PGA upcoming cards
           const nextTrueEvent = tour === 'pga'
             ? upcoming[0]
-            : upcoming.find(t => !t.isMajor) ?? upcoming[0];
+            : upcoming.find(t => getMajorType(t.name || '') !== 'mens') ?? upcoming[0];
           upcomingSlides.push({ tournament: nextTrueEvent, type: 'upcoming' });
         }
       });
