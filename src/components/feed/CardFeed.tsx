@@ -326,6 +326,11 @@ export const CardFeed = forwardRef<CardFeedHandle, CardFeedProps>(function CardF
   useEffect(() => {
     let raf = 0;
     const onScroll = () => {
+      // Signed scroll direction — reused as a directional tie-break in recheckActive.
+      const st = scrollerElRef.current?.scrollTop ?? window.scrollY;
+      const dy = st - lastScrollTopRef.current;
+      if (Math.abs(dy) > 0.5) scrollDirRef.current = dy > 0 ? 1 : -1;
+      lastScrollTopRef.current = st;
       if (raf) return;
       raf = requestAnimationFrame(() => {
         raf = 0;
