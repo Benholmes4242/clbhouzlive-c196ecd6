@@ -38,6 +38,8 @@ import {
   vperfMark,
   vperfNextId,
 } from '@/perf/vperf';
+import { readSeededBandwidth } from './bandwidthMemory';
+
 
 
 
