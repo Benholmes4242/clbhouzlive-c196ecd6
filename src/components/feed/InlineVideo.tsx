@@ -130,15 +130,22 @@ export const InlineVideo: React.FC<Props> = ({
   // cards actually load + play; neighbour "bound" roles stay paused.
   const playbackIntent = isActive || (earlyMotion && role !== null);
 
-  // Start position: read lastPos when we (re)activate the active role. The
-  // PR-B seamless-promotion case (early lane already playing → becomes
-  // active with the SAME physical lane) never re-fires load (deps unchanged),
-  // so startPosition is only consulted on a cold active mount.
+  // Start position: for the KEPT-BOUND promotion path (physical lane already
+  // parented to this card and holding the true paused frame), skip the seed
+  // entirely — passing -1 makes VideoEngine.load's alreadyLoaded branch a
+  // true no-op (no seek), and the element resumes from wherever the decoder
+  // actually is. Only cold mounts (lane not yet bound to this ownerKey) read
+  // getLastPos, which is now written synchronously by pause()/pauseAll()/
+  // useVideoLane unbind cleanup so it reflects the true scroll-out position.
+  const laneAlreadyOwnsThisMedia =
+    !!laneId &&
+    VideoEngine.snapshot(laneId).postId === resolvedOwnerKey;
   const startPosition = React.useMemo(() => {
     if (!isActive || !resolvedOwnerKey) return -1;
+    if (laneAlreadyOwnsThisMedia) return -1; // kept-bound: no seek
     const t = VideoEngine.getLastPos(resolvedOwnerKey);
     return t > 0 ? t : -1;
-  }, [isActive, resolvedOwnerKey]);
+  }, [isActive, resolvedOwnerKey, laneAlreadyOwnsThisMedia]);
 
   const lane = useVideoLane(laneId, {
     hlsUrl: playbackIntent ? hlsUrl ?? null : null,
