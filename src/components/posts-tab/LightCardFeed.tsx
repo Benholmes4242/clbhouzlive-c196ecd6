@@ -22,6 +22,8 @@ import { openWithOrigin } from '@/lib/openWithOrigin';
 import { isPerfEnabled } from '@/perf/navTiming';
 import { useClubhouseStore } from '@/store/clubhouseStore';
 import { getDocumentScrollParent } from '@/lib/getScrollParent';
+import { VideoEngine } from '@/video/VideoEngine';
+import { vperfFeedActivateStart, vperfFeedActivateEnd, vperfConsumeEarlyStarted } from '@/perf/vperf';
 import { LightFeedCard } from './LightFeedCard';
 
 const PAGE_BG = '#F8FAFC';
