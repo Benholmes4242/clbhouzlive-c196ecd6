@@ -84,11 +84,21 @@ export const InlineVideo: React.FC<Props> = ({
   // manifest default" for first-load, positive value seeks to that time.
   // Read via ownerKey so the borrow path (play() stamps ownerKey, onTime
   // writes lastPos under lane.postId=ownerKey) resolves symmetrically.
+  //
+  // Early-motion handover: prefer the exact playhead stashed at the
+  // feed-next unmount moment (below). The lastPos ladder is written on
+  // `timeupdate` and throttled ~250ms, so it can be up to a quarter-second
+  // stale at the swap — that reads as a small JUMP in the [FLOW] handover
+  // probe. The stash is one-shot and only affects the promoted card; every
+  // other resume path (tab return, borrow return, cold mount) is unchanged.
   const startPosition = React.useMemo(() => {
     if (!isActive || !resolvedOwnerKey) return -1;
+    const handover = consumeHandoverResume(resolvedOwnerKey);
+    if (handover != null && handover > 0) return handover;
     const t = VideoEngine.getLastPos(resolvedOwnerKey);
     return t > 0 ? t : -1;
   }, [isActive, resolvedOwnerKey]);
+
 
   const lane = useVideoLane('feed-active', {
     hlsUrl: isActive ? hlsUrl ?? null : null,
