@@ -5,7 +5,10 @@
  * final unlock), so overlapping overlays can't stomp each other's saved state
  * and leave the body stuck `position: fixed` (which freezes the whole page).
  */
+import { scrollPositions } from '@/components/ScrollRestoration';
+
 let lockCount = 0;
+let lockOwnerPath: string | null = null;
 let saved: {
   overflow: string;
   position: string;
@@ -33,6 +36,9 @@ export function lockBodyScroll() {
       width: document.body.style.width,
       scrollY,
     };
+    lockOwnerPath = (typeof window !== 'undefined')
+      ? window.location.pathname + window.location.search
+      : null;
     document.body.style.overflow = 'hidden';
     document.body.style.position = 'fixed';
     document.body.style.top = `-${scrollY}px`;
@@ -73,8 +79,17 @@ export function unlockBodyScroll() {
     document.body.style.left = saved.left;
     document.body.style.right = saved.right;
     document.body.style.width = saved.width;
+    const currentPath = (typeof window !== 'undefined')
+      ? window.location.pathname + window.location.search
+      : null;
+    const navigatedAway = lockOwnerPath !== null
+      && currentPath !== null && currentPath !== lockOwnerPath;
+    const target = navigatedAway
+      ? (scrollPositions.get(currentPath!) ?? 0)
+      : scrollY;
     saved = null;
-    window.scrollTo(0, scrollY);
+    lockOwnerPath = null;
+    window.scrollTo(0, target);
   }
 }
 
@@ -82,6 +97,7 @@ export function unlockBodyScroll() {
 export function forceUnlockBodyScroll() {
   if (typeof document === 'undefined') return;
   lockCount = 0;
+  lockOwnerPath = null;
   if (saved) {
     document.body.style.overflow = saved.overflow;
     document.body.style.position = saved.position;
