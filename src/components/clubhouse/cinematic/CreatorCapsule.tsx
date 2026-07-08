@@ -25,6 +25,7 @@ import { getProfilePathById } from '@/lib/profileRoutes';
 import { getActorRouteByType } from '@/types/actor';
 import { CourseDNACard } from './CourseDNACard';
 import { MentionText } from '@/components/mentions/MentionText';
+import { stripMentionMarkup } from '@/lib/mentions/format';
 
 import { type ExtractedReviewData } from '@/lib/postHelpers';
 import { removeGolfCourseFromContent } from '@/utils/golfCourseExtractor';
