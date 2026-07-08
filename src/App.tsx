@@ -370,6 +370,20 @@ function AppRoutes() {
   const location = useLocation();
   const state = location.state as { backgroundLocation?: Location; fromHub?: boolean; fromVideo?: boolean } | null;
   const { shouldHideHeader } = useModalContext();
+
+  // [VPERF] page tag — feeds every emit so metrics are comparable across pages.
+  useEffect(() => {
+    const p = location.pathname;
+    const page =
+      p === '/' || p === '/clubhouse' ? 'clubhouse'
+      : p.startsWith('/watch') ? 'watch'
+      : p.startsWith('/discover') ? 'discover'
+      : p.startsWith('/courses') ? 'courses'
+      : p.startsWith('/profile') ? 'profile'
+      : p.startsWith('/tour') ? 'tourhub'
+      : p.split('/')[1] || 'root';
+    import('@/perf/vperf').then((m) => m.vperfSetPage(page)).catch(() => {});
+  }, [location.pathname]);
   
   // BUG-1 FIX (flicker pass): the previous baseline `shield = transparent` step
   // was removed — it exposed the raw #0d0d0d .app-shell background for a frame
