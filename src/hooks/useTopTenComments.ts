@@ -110,64 +110,14 @@ export function useTopTenComments(targetUserId: string, courseId: string) {
         console.warn('[useTopTenComments] mention sync failed:', e);
       }
 
-      // ── Reply / owner notifications (non-mention) ────────────
-      try {
-        if (parentId) {
-          const { data: parentComment } = await supabase
-            .from('top_ten_comments')
-            .select('commenter_id')
-            .eq('id', parentId)
-            .single();
+      // Reply / owner notifications are written by the
+      // `trg_top_ten_comments_create_notification` DB trigger
+      // (public.create_top_ten_comment_notification). Client-side
+      // inserts were removed 2026-07-08 for the same reason as the
+      // post-comment path: bare .insert() silently swallowed 23505
+      // unique_violation collisions on idx_notifications_dedup.
 
-          if (parentComment && parentComment.commenter_id !== user.id) {
-            const { data: commenterProfile } = await supabase
-              .from('user_profiles')
-              .select('display_name')
-              .eq('id', user.id)
-              .single();
-            const commenterName = commenterProfile?.display_name ?? 'Someone';
 
-            await supabase.from('notifications').insert({
-              user_id: parentComment.commenter_id,
-              recipient_actor_type: 'personal',
-              recipient_actor_id: parentComment.commenter_id,
-              actor_id: user.id,
-              type: 'top_ten_reply',
-              title: `${commenterName} replied to your comment`,
-              message: body.trim().length > 60 ? body.trim().slice(0, 60) + '…' : body.trim(),
-              entity_type: 'top_ten',
-              entity_id: courseId,
-              is_read: false,
-              data: { target_user_id: targetUserId },
-            });
-          }
-        } else if (user.id !== targetUserId) {
-          // Top-level comment notification to top ten owner
-          const { data: profile } = await supabase
-            .from('user_profiles')
-            .select('display_name')
-            .eq('id', user.id)
-            .single();
-          const name = profile?.display_name ?? 'Someone';
-          await supabase.from('notifications').insert({
-            user_id: targetUserId,
-            recipient_actor_type: 'personal',
-            recipient_actor_id: targetUserId,
-            actor_id: user.id,
-            type: 'top_ten_comment',
-            title: `${name} commented on your Top 10`,
-            message: body.trim().length > 60 ? body.trim().slice(0, 60) + '…' : body.trim(),
-            entity_type: 'top_ten',
-            entity_id: courseId,
-            is_read: false,
-            data: { target_user_id: targetUserId },
-          });
-        }
-      } catch (e) {
-        // Non-blocking, but LOUD — a bare catch{} on notification inserts
-        // is what hid the six-month comment-notification outage.
-        console.warn('[useTopTenComments] notification insert failed:', e);
-      }
 
 
       return newCommentId;
