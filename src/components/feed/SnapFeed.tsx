@@ -8,7 +8,7 @@ import { haptic } from '@/utils/haptics';
 
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useFullscreenFeedStore } from '@/store/fullscreenFeedStore';
-import { vperfStart, vperfArmLane, vperfNextId } from '@/perf/vperf';
+import { vperfStart, vperfArmLane, vperfNextId, vperfFeedScrollTick, vperfFeedActivateStart, vperfFeedActivateEnd } from '@/perf/vperf';
 
 
 
