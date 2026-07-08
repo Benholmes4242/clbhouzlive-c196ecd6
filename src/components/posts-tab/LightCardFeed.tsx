@@ -264,12 +264,13 @@ export const LightCardFeed: React.FC<LightCardFeedProps> = ({
     };
   }, [recheckActive]);
 
-  // Symmetric neighbour warm-up (PR-A): next → feed-next, prev → feed-prev.
+  // Symmetric neighbour warm-up via role lookup — see CardFeed.
   useEffect(() => {
-    const warm = (laneId: 'feed-next' | 'feed-prev', post: any) => {
+    const warm = (role: 'next' | 'prev', post: any) => {
       const m = post?.mediaItems?.[0];
       if (!post || !m || m.type !== 'video' || !m.hlsUrl) return;
       try {
+        const laneId = feedLaneRoles.laneForRole(role);
         VideoEngine.preload(laneId, {
           hlsUrl: m.hlsUrl,
           posterUrl: m.thumbnailUrl ?? null,
@@ -277,8 +278,8 @@ export const LightCardFeed: React.FC<LightCardFeedProps> = ({
         });
       } catch { /* engine may not be booted yet — safe to ignore */ }
     };
-    warm('feed-next', posts[playingIdx + 1]);
-    warm('feed-prev', posts[playingIdx - 1]);
+    warm('next', posts[playingIdx + 1]);
+    warm('prev', posts[playingIdx - 1]);
   }, [playingIdx, posts]);
 
   // Promotion + fullscreen clears — see CardFeed for rationale.
