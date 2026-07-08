@@ -14,6 +14,7 @@ import type { MediaItem } from '@/components/media-system/types/media';
 import { useVideoLane } from '@/video/useVideoLane';
 import { VideoEngine } from '@/video/VideoEngine';
 import { originHostRegistry } from '@/video/originHostRegistry';
+import { setHandoverResume, consumeHandoverResume } from '@/video/handoverResume';
 import { useClubhouseStore } from '@/store/clubhouseStore';
 import { MuteToggle } from '@/components/feed/MuteToggle';
 import {
