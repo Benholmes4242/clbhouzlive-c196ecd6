@@ -29,7 +29,9 @@ import { useClubhouseStore } from '@/store/clubhouseStore';
 import { registerNavScroller } from '@/hooks/useScrollDirection';
 
 import { VideoEngine } from '@/video/VideoEngine';
+import { feedLaneRoles } from '@/video/feedLaneRoles';
 import { vperfFeedActivateStart, vperfFeedActivateEnd, vperfConsumeEarlyStarted } from '@/perf/vperf';
+import { isPerfEnabled as _isPerfEnabledForRotate } from '@/perf/navTiming';
 
 import { FeedCard } from './FeedCard';
 
