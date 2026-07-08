@@ -296,9 +296,13 @@ export function patchFollow(
   // Active invalidations for keys we ALWAYS want to refetch:
   //  - notifications ("X followed you" entry)
   //  - followers/following list sheets (modal, gated by enabled: isOpen)
+  //  - discovery-exclusions (followingIds sits in the exclusion bag with a
+  //    30s staleTime; without this a just-(un)followed user stays hidden
+  //    from the golfers-discovery browsing tabs)
   queryClient.invalidateQueries({ queryKey: ['notifications'] });
   queryClient.invalidateQueries({ queryKey: ['followers-list'] });
   queryClient.invalidateQueries({ queryKey: ['following-list'] });
+  queryClient.invalidateQueries({ queryKey: ['discovery-exclusions'] });
 }
 
 /**
