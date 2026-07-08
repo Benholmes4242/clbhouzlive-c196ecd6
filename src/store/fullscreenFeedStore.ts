@@ -208,20 +208,26 @@ export const useFullscreenFeedStore = create<FullscreenFeedState>((set, get) => 
     // no-borrow → overlay unmounted (approximated as fullscreen lane 'paused')
     const mode: 'flip-return' | 'no-borrow' | 'fallback' = borrow ? 'flip-return' : 'no-borrow';
     const closeSpanId = vperfNextId('fs.close');
-    vperfStart(closeSpanId, 'fs.close', { mode, laneId: borrow ? borrow.laneId : 'fullscreen' });
-    vperfMark(closeSpanId, 'returnStart');
+    vperfStart(closeSpanId, 'fs.close', {
+      mode,
+      hadBorrow: !!borrow,
+      laneId: borrow ? borrow.laneId : 'fullscreen',
+    });
+    vperfMark(closeSpanId, 'closeIntent');
     if (borrow) {
+      // handback = returnBorrow tail done (approximated on next frame); tileLive
+      // = lane playing on tile (armed on the borrowed lane's next 'playing').
+      requestAnimationFrame(() => {
+        import('@/perf/vperf').then((m) => m.vperfMark(closeSpanId, 'handback')).catch(() => {});
+      });
+      vperfArmLane(borrow.laneId, { spanId: closeSpanId, endOn: 'playing', phase: 'tileLive' });
       vperfArmLane(borrow.laneId, { spanId: closeSpanId, endOn: 'playing' });
     } else {
-      // Fallback: no borrow — end on fullscreen lane going idle. We don't
-      // have an 'unmount' event, so end on next lane state edge that fires
-      // after close: canplay/playing/waiting/seeked all viable, but the most
-      // reliable is the release-driven session end. For now end on the next
-      // 'firstFrame' of any subsequent open (won't fire on this close) —
-      // instead close manually after one frame.
       requestAnimationFrame(() => {
-        // eslint-disable-next-line @typescript-eslint/no-var-requires
-        import('@/perf/vperf').then((m) => m.vperfEnd(closeSpanId, { note: 'no-borrow raf' })).catch(() => {});
+        import('@/perf/vperf').then((m) => {
+          m.vperfMark(closeSpanId, 'tileLive');
+          m.vperfEnd(closeSpanId, { note: 'no-borrow raf' });
+        }).catch(() => {});
       });
     }
     set({
