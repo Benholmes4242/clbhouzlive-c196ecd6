@@ -396,8 +396,9 @@ export const LightCardFeed: React.FC<LightCardFeedProps> = ({
             index={index}
             playingIdx={playingIdx}
             activeIdx={activeIdx}
+            earlyIdx={earlyIdx}
           >
-            {({ isActive, mountVideo }) => (
+            {({ isActive, mountVideo, earlyMotion }) => (
               <LightFeedCard
                 post={post}
                 liked={!!likeState?.liked}
@@ -412,6 +413,7 @@ export const LightCardFeed: React.FC<LightCardFeedProps> = ({
                 onOpenMedia={handleOpenMedia}
                 isActive={isActive}
                 mountVideo={mountVideo}
+                earlyMotion={earlyMotion}
                 initialMediaIndex={initialSlide}
                 onCarouselIndexChange={getCarouselChangeHandler(post.id)}
                 onFollow={onFollow}
