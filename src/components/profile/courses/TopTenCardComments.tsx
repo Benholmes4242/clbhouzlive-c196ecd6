@@ -143,7 +143,15 @@ export const TopTenCardComments: React.FC<TopTenCardCommentsProps> = ({
   }, [reactors]);
 
   const renderComment = (comment: TopTenComment, isReply = false) => (
-    <div key={comment.id} className={isReply ? 'flex gap-2.5' : 'flex gap-3'}>
+    <div
+      key={comment.id}
+      ref={registerCommentRef(comment.id)}
+      className={cn(
+        isReply ? 'flex gap-2.5' : 'flex gap-3',
+        'transition-colors duration-300 rounded-md',
+        highlightedId === comment.id && 'bg-[rgba(247,147,30,0.10)]',
+      )}
+    >
       <div className="flex-shrink-0">
         <SquircleAvatar
           size={isReply ? 24 : 32}
