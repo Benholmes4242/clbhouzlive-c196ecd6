@@ -727,6 +727,18 @@ export function vperfDecideTally(bucket: string, key: string): void {
   m.set(key, (m.get(key) ?? 0) + 1);
 }
 
+/** [PREDICT] PrefetchController tallies. `reason` is required for aborts. */
+export function vperfPrefetchTally(evt: 'issued' | 'aborted', reason?: string): void {
+  if (!on()) return;
+  if (evt === 'issued') {
+    prefetchStats.issued += 1;
+  } else {
+    const k = reason || 'unknown';
+    prefetchStats.aborted.set(k, (prefetchStats.aborted.get(k) ?? 0) + 1);
+  }
+}
+
+
 function pct(arr: number[], p: number): number {
   if (arr.length === 0) return 0;
   const sorted = [...arr].sort((a, b) => a - b);
