@@ -120,9 +120,10 @@ async function searchMentions(
     console.info('[MENTIONS] render', { q, rows: merged.length });
     render(merged);
   } catch (e) {
-    // [MENTIONS-DIAG] catch — proves whether the awaited path threw.
+    // [MENTIONS-DIAG] catch — logs then re-throws so behavior is unchanged
+    // (original code had no catch; the library ignores the returned promise).
     console.warn('[MENTIONS] search threw', { q, err: e });
-    render([]);
+    throw e;
   }
 }
 
