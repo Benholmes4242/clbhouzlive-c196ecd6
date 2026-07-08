@@ -382,7 +382,7 @@ export function useHeroCarouselData() {
           // These are stored under EURO in Sportradar but should only appear as PGA upcoming cards
           const nextTrueEvent = tour === 'pga'
             ? upcoming[0]
-            : upcoming.find(t => !t.isMajor) ?? upcoming[0];
+            : upcoming.find(t => getMajorType(t.name || '') !== 'mens') ?? upcoming[0];
           upcomingSlides.push({ tournament: nextTrueEvent, type: 'upcoming' });
         }
       });
