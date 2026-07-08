@@ -252,7 +252,15 @@ const ActivityPage: React.FC = () => {
   const groups = useMemo(() => {
     const b = data?.buckets;
     if (!b) return [];
-    const combineToday = [...(b.new ?? []), ...(b.today ?? [])];
+    // `new` = unread subset of today's items; `today` = all today items.
+    // Merge with id-dedupe so unread today rows don't render twice
+    // (repro: any friend_request/friend_accepted lands in both buckets).
+    const newItems = b.new ?? [];
+    const newIds = new Set(newItems.map((n) => n.id));
+    const combineToday = [
+      ...newItems,
+      ...(b.today ?? []).filter((n) => !newIds.has(n.id)),
+    ];
     const sections = [
       { label: 'Today', items: combineToday.filter((n) => matchesChip(n, chip)) },
       { label: 'Yesterday', items: (b.yesterday ?? []).filter((n) => matchesChip(n, chip)) },
