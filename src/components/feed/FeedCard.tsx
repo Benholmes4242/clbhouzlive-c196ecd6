@@ -617,6 +617,7 @@ const FeedCardImpl: React.FC<FeedCardProps> = ({
                   item={media}
                   isActive={isActive}
                   isNear={mountVideo}
+                  earlyMotion={earlyMotion}
                   feedIndex={feedIndex}
                   postId={post.id}
                   ownerKey={`${post.id}:0`}
