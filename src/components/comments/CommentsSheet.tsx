@@ -313,17 +313,39 @@ function CommentsSheet({
     return () => observer.disconnect();
   }, [hasNextPage, isFetchingNextPage, fetchNextPage]);
 
-  // Deep link to comment
+  // Deep link to comment (Item 3: reply-aware).
+  // When initialParentCommentId is present, this is a reply notification —
+  // expand the parent's replies AND await the reply load before firing the
+  // highlight, otherwise the reply row hasn't mounted yet and scrollIntoView
+  // silently no-ops (leaving the user at the top of the sheet).
   const hasHandledDeepLink = useRef(false);
   useEffect(() => {
     if (!isOpen) { hasHandledDeepLink.current = false; return; }
     if (!initialCommentId || commentsLoading || hasHandledDeepLink.current) return;
     hasHandledDeepLink.current = true;
-    if (initialParentCommentId) {
-      setExpandedReplies(prev => new Set(prev).add(initialParentCommentId));
-    }
-    setTimeout(() => highlightComment(initialCommentId), 200);
-  }, [isOpen, initialCommentId, initialParentCommentId, commentsLoading]);
+
+    (async () => {
+      if (initialParentCommentId) {
+        setExpandedReplies(prev => new Set(prev).add(initialParentCommentId));
+        try {
+          await loadAllReplies(initialParentCommentId);
+        } catch { /* fall through — parent still highlights below */ }
+        // Give React one commit + one paint to attach the reply row refs
+        // after loadAllReplies resolves and comment.replies populates.
+        await new Promise<void>((r) => requestAnimationFrame(() => requestAnimationFrame(() => r())));
+        const replyEl = commentElsRef.current.get(initialCommentId);
+        if (replyEl) {
+          highlightComment(initialCommentId);
+        } else {
+          // Reply was deleted — fall back to the parent.
+          highlightComment(initialParentCommentId);
+        }
+      } else {
+        // Top-level comment path — original behaviour.
+        setTimeout(() => highlightComment(initialCommentId), 200);
+      }
+    })();
+  }, [isOpen, initialCommentId, initialParentCommentId, commentsLoading, loadAllReplies]);
 
   // ── Callbacks ──
 
