@@ -17,6 +17,7 @@ import { usePostStudioStore } from '@/stores/usePostStudioStore';
 import type { ComposerMediaItem } from './composerMedia';
 import type { StudioActorType, TaggedCourse } from './types';
 import { VideoEngine } from '@/video/VideoEngine';
+import { useCreationOverlayStore } from '@/stores/creationOverlayStore';
 
 type Screen = 'choose' | 'post' | 'editor';
 
