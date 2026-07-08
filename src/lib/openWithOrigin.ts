@@ -330,7 +330,7 @@ export function openWithOrigin({
     let feedSnapOwns = false;
     if (!borrow) {
       try {
-        const s = VideoEngine.snapshot('feed-active');
+        const s = VideoEngine.snapshot(feedLaneRoles.laneForRole('active'));
         feedSnapPostId = s.postId;
         feedSnapOwns =
           s.postId != null &&
