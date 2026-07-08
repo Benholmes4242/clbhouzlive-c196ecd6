@@ -115,6 +115,24 @@ export const FavouritesCarousel: React.FC<FavouritesCarouselProps> = ({
     }
   }, [handleScroll]);
 
+  // Scroll the deep-linked card into view once the list has data (Item 2B).
+  const didScrollToDeepLink = useRef(false);
+  useEffect(() => {
+    if (didScrollToDeepLink.current) return;
+    if (!initialCourseId || topTen.length === 0) return;
+    const container = scrollContainerRef.current;
+    if (!container) return;
+    const target = container.querySelector<HTMLElement>(
+      `[data-top-ten-course-id="${initialCourseId}"]`,
+    );
+    if (!target) return;
+    didScrollToDeepLink.current = true;
+    // Next frame so layout is stable.
+    requestAnimationFrame(() => {
+      target.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+    });
+  }, [initialCourseId, topTen.length]);
+
 
   const firstName = displayName?.split(' ')[0] || 'Their';
   const getTitle = () => {
