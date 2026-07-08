@@ -9,10 +9,10 @@
  * life. This component never creates elements — the engine owns them and
  * appendChild's them into `hostRef` on demand.
  */
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import type { MediaItem } from '@/components/media-system/types/media';
 import { useVideoLane } from '@/video/useVideoLane';
-import { VideoEngine } from '@/video/VideoEngine';
+import { VideoEngine, type LaneId, type LaneSnapshot } from '@/video/VideoEngine';
 import { originHostRegistry } from '@/video/originHostRegistry';
 import { setHandoverResume, consumeHandoverResume } from '@/video/handoverResume';
 import { useClubhouseStore } from '@/store/clubhouseStore';
@@ -115,7 +115,43 @@ export const InlineVideo: React.FC<Props> = ({
 
   const laneOwnsThisMedia = lane.snapshot.postId === resolvedOwnerKey;
   const targetReady = startPosition <= 0 || lane.snapshot.currentTime >= startPosition - 0.3;
-  const showVideo = lane.snapshot.firstFrame && targetReady && (isActive || laneOwnsThisMedia);
+
+  // PR-A: during earlyMotion the poster host must reveal the EARLY lane
+  // (feed-next when scrolling down, feed-prev when scrolling up) — not the
+  // feed-active lane, which still holds the previous card. We resolve the
+  // early lane by inspecting both snapshots for a postId match against this
+  // card's ownerKey / postId, then subscribe so re-renders track its
+  // firstFrame flip. Without this, the video plays invisibly and the poster
+  // stays on screen the whole pre-centre period.
+  const [earlyLaneId, setEarlyLaneId] = useState<LaneId | null>(null);
+  const [earlySnap, setEarlySnap] = useState<LaneSnapshot | null>(null);
+  useEffect(() => {
+    if (!earlyMotion || isActive || !resolvedOwnerKey) {
+      setEarlyLaneId(null);
+      setEarlySnap(null);
+      return;
+    }
+    const matches = (snap: LaneSnapshot) =>
+      snap.postId != null &&
+      (snap.postId === postId || snap.postId === resolvedOwnerKey);
+    const nextSnap = VideoEngine.snapshot('feed-next');
+    const prevSnap = VideoEngine.snapshot('feed-prev');
+    const chosen: LaneId | null = matches(nextSnap)
+      ? 'feed-next'
+      : matches(prevSnap)
+        ? 'feed-prev'
+        : null;
+    setEarlyLaneId(chosen);
+    if (!chosen) { setEarlySnap(null); return; }
+    return VideoEngine.subscribe(chosen, setEarlySnap);
+  }, [earlyMotion, isActive, resolvedOwnerKey, postId]);
+
+  const earlyReveal =
+    !!earlyMotion && !isActive && !!earlySnap && earlySnap.firstFrame === true;
+
+  const showVideo = earlyReveal
+    ? true
+    : lane.snapshot.firstFrame && targetReady && (isActive || laneOwnsThisMedia);
 
 
 
@@ -159,16 +195,25 @@ export const InlineVideo: React.FC<Props> = ({
   // cards do not early-start — they take the normal PLAY_IN promotion.
   useEffect(() => {
     if (!earlyMotion || isActive || !hlsUrl || !resolvedOwnerKey) return;
-    const snap = VideoEngine.snapshot('feed-next');
-    const warm = snap.postId != null &&
+    // Pick whichever early lane is warm for this card. feed-next is warmed
+    // for downward scroll; feed-prev is warmed for upward scroll (PR-A).
+    const isWarm = (snap: LaneSnapshot) =>
+      snap.postId != null &&
       (snap.postId === postId || snap.postId === resolvedOwnerKey) &&
       (snap.state === 'ready' || snap.state === 'playing' || snap.state === 'loading');
-    if (!warm) return;
+    const nextSnap = VideoEngine.snapshot('feed-next');
+    const prevSnap = VideoEngine.snapshot('feed-prev');
+    const chosenLane: LaneId | null = isWarm(nextSnap)
+      ? 'feed-next'
+      : isWarm(prevSnap)
+        ? 'feed-prev'
+        : null;
+    if (!chosenLane) return;
     const host = lane.hostRef.current;
     if (!host) return;
-    VideoEngine.mountLane('feed-next', host);
-    VideoEngine.setMuted('feed-next', true); // feed is muted — no audio conflict
-    void VideoEngine.play('feed-next', { callerPostId: resolvedOwnerKey });
+    VideoEngine.mountLane(chosenLane, host);
+    VideoEngine.setMuted(chosenLane, true); // feed is muted — no audio conflict
+    void VideoEngine.play(chosenLane, { callerPostId: resolvedOwnerKey });
     vperfMarkEarlyStarted(resolvedOwnerKey);
     const startedAt = performance.now();
 
@@ -180,12 +225,10 @@ export const InlineVideo: React.FC<Props> = ({
         postId: postId ?? null,
         fraction: vperfCardFraction(host),
       });
-      // Poll feed-next currentTime for first advance → card.playing (moving-
-      // before-1/3 verdict source). rAF is cheap; effect cleanup cancels.
-      const ct0 = VideoEngine.snapshot('feed-next').currentTime || 0;
+      const ct0 = VideoEngine.snapshot(chosenLane).currentTime || 0;
       const tick = () => {
         try {
-          const s = VideoEngine.snapshot('feed-next');
+          const s = VideoEngine.snapshot(chosenLane);
           if ((s.currentTime || 0) > ct0 + 0.001) {
             vperfCardFirstMotion(resolvedOwnerKey, {
               fraction: vperfCardFraction(host),
@@ -201,29 +244,18 @@ export const InlineVideo: React.FC<Props> = ({
 
     return () => {
       if (motionRaf) cancelAnimationFrame(motionRaf);
-      // Read feed-next's exact playhead at the unmount moment and stash it
-      // so the incoming feed-active load resumes from precisely here — the
-      // lastPos ladder is timeupdate-throttled ~250ms and would leave a
-      // sub-frame JUMP across the swap. Only this ownerKey, one-shot.
-      const feedNextCT = VideoEngine.snapshot('feed-next').currentTime || 0;
-      setHandoverResume(resolvedOwnerKey, feedNextCT);
-      // [FLOW] handover probe — arm BEFORE unmount so tUnmount stamps at the
-      // exact moment feed-next leaves the host. Uses the same feedNextCT
-      // sample so posJumpMs reflects the value we actually handed to
-      // feed-active (not a re-read after pause).
+      const earlyCT = VideoEngine.snapshot(chosenLane).currentTime || 0;
+      setHandoverResume(resolvedOwnerKey, earlyCT);
       if (isPerfEnabled()) {
         vperfHandoverStart(resolvedOwnerKey, {
           idx: feedIndex ?? -1,
           hostEl: host,
           posterEl: posterElRef.current,
-          feedNextCurrentTime: feedNextCT,
+          feedNextCurrentTime: earlyCT,
         });
       }
-      // Even if pauseAll (fullscreen / creation overlay / visibility) has
-      // already paused the lane, unmount is what removes the <video> from
-      // this host so the incoming feed-active mount doesn't stack on top.
-      VideoEngine.pause('feed-next', { callerPostId: resolvedOwnerKey });
-      VideoEngine.unmountLane('feed-next');
+      VideoEngine.pause(chosenLane, { callerPostId: resolvedOwnerKey });
+      VideoEngine.unmountLane(chosenLane);
       vperfDualActiveAdd(performance.now() - startedAt);
     };
   }, [earlyMotion, isActive, hlsUrl, postId, resolvedOwnerKey, feedIndex, lane.hostRef]);
