@@ -215,14 +215,14 @@ function CountdownPills({ hoursUntilStart }: { hoursUntilStart: number }) {
   }
 
   return (
-    <div style={{ display: 'flex', gap: 7 }}>
+    <div style={{ display: 'flex', gap: 8 }}>
       {pills.map(p => (
         <div
           key={p.label}
           style={{
-            minWidth: 48,
-            padding: '6px 9px',
-            borderRadius: 9,
+            minWidth: 56,
+            padding: '8px 10px',
+            borderRadius: 10,
             background: 'rgba(255,255,255,0.08)',
             border: '0.5px solid rgba(255,255,255,0.14)',
             display: 'flex',
@@ -234,7 +234,7 @@ function CountdownPills({ hoursUntilStart }: { hoursUntilStart: number }) {
           <span
             style={{
               ...NUMERIC_STYLE,
-              fontSize: 18,
+              fontSize: 22,
               fontWeight: 800,
               letterSpacing: '-0.02em',
               color: 'white',
@@ -245,7 +245,7 @@ function CountdownPills({ hoursUntilStart }: { hoursUntilStart: number }) {
           </span>
           <span
             style={{
-              fontSize: 8,
+              fontSize: 8.5,
               fontWeight: 800,
               letterSpacing: '0.14em',
               color: 'rgba(255,255,255,0.55)',
@@ -506,8 +506,7 @@ export function CinematicHeroFullBleed({
       style={{
         position: 'relative',
         width: '100%',
-        // Match Course Detail cinematic hero sizing (see GolfClubView.tsx).
-        minHeight: 'calc(clamp(380px, 44dvh, 460px) + env(safe-area-inset-top, 0px))',
+        minHeight: '78vh',
         background,
         backgroundColor: INK_BASE,
         display: 'flex',
@@ -516,8 +515,7 @@ export function CinematicHeroFullBleed({
       }}
     >
       {/* Spacer */}
-      <div style={{ flex: 1, minHeight: 140 }} />
-
+      <div style={{ flex: 1, minHeight: 220 }} />
 
       {/* Title block */}
       <div
@@ -536,9 +534,9 @@ export function CinematicHeroFullBleed({
           style={{
             margin: 0,
             fontFamily: "'Geist', -apple-system, BlinkMacSystemFont, sans-serif",
-            fontSize: 'clamp(22px, 6.4vw, 26px)',
+            fontSize: 'clamp(24px, 7.8vw, 30px)',
             fontWeight: 800,
-            lineHeight: 1.05,
+            lineHeight: 0.98,
             letterSpacing: '-0.01em',
             color: 'white',
             textTransform: 'uppercase',
@@ -552,7 +550,7 @@ export function CinematicHeroFullBleed({
         {isUpcoming && upcomingSub && (
           <div
             style={{
-              fontSize: 11.5,
+              fontSize: 12,
               fontWeight: 600,
               color: 'rgba(255,255,255,0.7)',
               letterSpacing: '0.02em',
@@ -565,12 +563,11 @@ export function CinematicHeroFullBleed({
         )}
 
         {isUpcoming && hoursUntilStart != null && Number.isFinite(hoursUntilStart) && (
-          <div style={{ marginTop: 10 }}>
+          <div style={{ marginTop: 14 }}>
             <CountdownPills hoursUntilStart={hoursUntilStart} />
           </div>
         )}
       </div>
-
 
       {/* ============ RESULTS: Champion celebration block ============ */}
       {isResults && !awaitingPlayoff && champion && (
@@ -578,26 +575,26 @@ export function CinematicHeroFullBleed({
           style={{
             position: 'relative',
             zIndex: 2,
-            padding: '12px 18px 14px',
+            padding: '16px 18px 18px',
             borderTop: '0.5px solid rgba(255,255,255,0.10)',
             background:
               'linear-gradient(180deg, rgba(232,194,106,0.06) 0%, rgba(232,194,106,0) 100%)',
             display: 'flex',
             alignItems: 'center',
-            gap: 12,
+            gap: 14,
           }}
         >
           <SquircleAvatar
             srcCandidates={champion.avatarCandidates ?? (champion.avatarUrl ? [champion.avatarUrl] : [])}
             alt={champion.name}
-            size={48}
+            size={56}
             hairlineRing
             ringColor={GOLD_RING}
           />
-          <div style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', gap: 3 }}>
+          <div style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', gap: 4 }}>
             <span
               style={{
-                fontSize: 9,
+                fontSize: 9.5,
                 fontWeight: 800,
                 letterSpacing: '0.14em',
                 color: GOLD,
@@ -608,7 +605,7 @@ export function CinematicHeroFullBleed({
             </span>
             <span
               style={{
-                fontSize: 19,
+                fontSize: 22,
                 fontWeight: 800,
                 color: 'white',
                 lineHeight: 1.05,
@@ -624,7 +621,7 @@ export function CinematicHeroFullBleed({
               <span
                 style={{
                   ...NUMERIC_STYLE,
-                  fontSize: 16,
+                  fontSize: 18,
                   fontWeight: 800,
                   letterSpacing: '-0.02em',
                   color: LEADER_GREEN,
