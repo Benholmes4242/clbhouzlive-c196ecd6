@@ -37,6 +37,11 @@ const BORROW_DBG = (evt: string, payload: Record<string, unknown> = {}) => {
 // each. No behaviour changes — logging only.
 const DECIDE = (evt: string, payload: Record<string, unknown> = {}) => {
   if (!isPerfEnabled()) return;
+  // [BASELINE] tally the decision outcome per event for the scorecard.
+  try {
+    const outcome = String((payload as any).outcome ?? (payload as any).deniedBy ?? evt);
+    import('@/perf/vperf').then((m) => m.vperfDecideTally(evt, outcome)).catch(() => {});
+  } catch {}
   // eslint-disable-next-line no-console
   console.info('[DECIDE]', evt, payload);
 };
