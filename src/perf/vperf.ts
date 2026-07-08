@@ -889,6 +889,7 @@ export function vperfFeedActivateEnd(opts: {
   idx: number;
   mediaType: 'image' | 'video';
   warm?: boolean;
+  prefetched?: boolean;
 }): void {
   if (!on()) return;
   const totalMs = Math.round(performance.now() - opts.t0);
@@ -897,11 +898,13 @@ export function vperfFeedActivateEnd(opts: {
     idx: opts.idx,
     mediaType: opts.mediaType,
     warm: !!opts.warm,
+    prefetched: !!opts.prefetched,
     totalMs,
     budgetMs: budget,
     verdict: totalMs <= budget ? 'PASS' : 'SLOW',
   });
 }
+
 
 // ---------------- Image phase helper (Part 1) ----------------
 
