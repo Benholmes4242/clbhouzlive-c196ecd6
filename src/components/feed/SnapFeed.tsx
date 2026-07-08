@@ -9,6 +9,8 @@ import { haptic } from '@/utils/haptics';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useFullscreenFeedStore } from '@/store/fullscreenFeedStore';
 import { vperfStart, vperfArmLane, vperfNextId, vperfFeedScrollTick, vperfFeedActivateStart, vperfFeedActivateEnd } from '@/perf/vperf';
+import { PrefetchController } from '@/video/PrefetchController';
+
 
 
 
