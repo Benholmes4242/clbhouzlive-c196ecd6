@@ -83,8 +83,11 @@ interface SessionRec {
   endLevel: number | null;
   levelSwitches: number;
   bwEstimateStart: number | null;
+  bwEstimateEnd: number | null;
+  seededBw: number | null;
   timer: ReturnType<typeof setTimeout>;
 }
+
 
 const spans = new Map<string, SpanRec>();
 const laneArms = new Map<string, LaneArm[]>();
