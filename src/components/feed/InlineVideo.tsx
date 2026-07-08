@@ -16,7 +16,18 @@ import { VideoEngine } from '@/video/VideoEngine';
 import { originHostRegistry } from '@/video/originHostRegistry';
 import { useClubhouseStore } from '@/store/clubhouseStore';
 import { MuteToggle } from '@/components/feed/MuteToggle';
-import { vperfMarkEarlyStarted, vperfDualActiveAdd } from '@/perf/vperf';
+import {
+  vperfMarkEarlyStarted,
+  vperfDualActiveAdd,
+  vperfCardFraction,
+  vperfCardEarlyStart,
+  vperfCardFirstMotion,
+  vperfCardPromoted,
+  vperfCardReleased,
+  vperfHandoverStart,
+  vperfHandoverFrame,
+} from '@/perf/vperf';
+import { isPerfEnabled } from '@/perf/navTiming';
 
 
 interface Props {
