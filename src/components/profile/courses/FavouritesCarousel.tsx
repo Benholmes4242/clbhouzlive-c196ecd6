@@ -19,6 +19,10 @@ interface FavouritesCarouselProps {
   className?: string;
   onManage?: () => void;
   displayName?: string;
+  /** Deep-link consumption for top_ten_comment notifications (Item 2B). */
+  initialCourseId?: string | null;
+  initialCommentId?: string | null;
+  initialParentCommentId?: string | null;
 }
 
 export const FavouritesCarousel: React.FC<FavouritesCarouselProps> = ({
@@ -27,6 +31,9 @@ export const FavouritesCarousel: React.FC<FavouritesCarouselProps> = ({
   className,
   onManage,
   displayName,
+  initialCourseId = null,
+  initialCommentId = null,
+  initialParentCommentId = null,
 }) => {
   const navigate = useNavigate();
   const { topTen, isLoading } = useUserTopTenCourses(userId);
