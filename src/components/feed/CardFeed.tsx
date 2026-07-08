@@ -484,8 +484,9 @@ export const CardFeed = forwardRef<CardFeedHandle, CardFeedProps>(function CardF
             index={index}
             playingIdx={playingIdx}
             activeIdx={activeIdx}
+            earlyIdx={earlyIdx}
           >
-            {({ isActive, mountVideo }) => (
+            {({ isActive, mountVideo, earlyMotion }) => (
               <FeedCard
                 post={post}
                 liked={!!likeState?.liked}
@@ -500,6 +501,7 @@ export const CardFeed = forwardRef<CardFeedHandle, CardFeedProps>(function CardF
                 onOpenMedia={handleOpenMedia}
                 isActive={isActive}
                 mountVideo={mountVideo}
+                earlyMotion={earlyMotion}
                 initialMediaIndex={initialSlide}
                 onCarouselIndexChange={getCarouselChangeHandler(post.id)}
                 onFollow={onFollow}
