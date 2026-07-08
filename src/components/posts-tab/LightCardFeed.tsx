@@ -175,14 +175,21 @@ export const LightCardFeed: React.FC<LightCardFeedProps> = ({
 
   useEffect(() => {
     let raf = 0;
+    const scroller: HTMLElement | Window = document.getElementById('root') ?? window;
+    const readScrollTop = () =>
+      scroller instanceof Window ? scroller.scrollY : (scroller as HTMLElement).scrollTop;
     const onScroll = () => {
+      // Signed scroll direction — reused as a directional tie-break in recheckActive.
+      const st = readScrollTop();
+      const dy = st - lastScrollTopRef.current;
+      if (Math.abs(dy) > 0.5) scrollDirRef.current = dy > 0 ? 1 : -1;
+      lastScrollTopRef.current = st;
       if (raf) return;
       raf = requestAnimationFrame(() => {
         raf = 0;
         recheckActive();
       });
     };
-    const scroller: HTMLElement | Window = document.getElementById('root') ?? window;
     scroller.addEventListener('scroll', onScroll, { passive: true, capture: true } as any);
     return () => {
       scroller.removeEventListener('scroll', onScroll, { capture: true } as any);
