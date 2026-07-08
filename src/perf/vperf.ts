@@ -36,6 +36,8 @@
  */
 
 import { isPerfEnabled } from '@/perf/navTiming';
+import { writeBandwidthSample } from '@/video/bandwidthMemory';
+
 
 const SPAN_TTL_MS = 15_000;
 
