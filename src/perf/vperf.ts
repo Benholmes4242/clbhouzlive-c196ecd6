@@ -891,6 +891,9 @@ export function vperfFeedActivateEnd(opts: {
   mediaType: 'image' | 'video';
   warm?: boolean;
   prefetched?: boolean;
+  /** True when the incoming card was already playing (early-motion handover)
+   *  at the moment it was promoted to playingIdx. See vperfMarkEarlyStarted. */
+  earlyStarted?: boolean;
 }): void {
   if (!on()) return;
   const totalMs = Math.round(performance.now() - opts.t0);
@@ -900,10 +903,45 @@ export function vperfFeedActivateEnd(opts: {
     mediaType: opts.mediaType,
     warm: !!opts.warm,
     prefetched: !!opts.prefetched,
+    earlyStarted: !!opts.earlyStarted,
+    dualActiveMs: __dualActiveMsTotal,
     totalMs,
     budgetMs: budget,
     verdict: totalMs <= budget ? 'PASS' : 'SLOW',
   });
+}
+
+// ---------------- Early-motion handover telemetry ----------------
+//
+// The feed's early-motion window plays the incoming card on the `feed-next`
+// lane (already warm from preload) BEFORE it centers. On promotion the
+// normal lane rotation runs untouched; earlyStarted below records whether
+// the promoted card was already in motion at the handover moment.
+//
+// dualActiveMs accumulates the total time two feed lanes were playing
+// simultaneously, so the decode cost is visible in every capture.
+
+const __earlyStartedSet = new Set<string>(); // ownerKey → seen an early-start
+let __dualActiveMsTotal = 0;
+
+/** InlineVideo calls this the moment it plays feed-next for early motion. */
+export function vperfMarkEarlyStarted(ownerKey: string | null | undefined): void {
+  if (!ownerKey) return;
+  __earlyStartedSet.add(ownerKey);
+}
+
+/** Feed calls this on promotion to read+clear the flag for one ownerKey. */
+export function vperfConsumeEarlyStarted(ownerKey: string | null | undefined): boolean {
+  if (!ownerKey) return false;
+  const hit = __earlyStartedSet.has(ownerKey);
+  if (hit) __earlyStartedSet.delete(ownerKey);
+  return hit;
+}
+
+/** InlineVideo calls this on cleanup with the elapsed dual-active duration. */
+export function vperfDualActiveAdd(ms: number): void {
+  if (!isFinite(ms) || ms <= 0) return;
+  __dualActiveMsTotal += Math.round(ms);
 }
 
 
