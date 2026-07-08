@@ -29,7 +29,6 @@ import { useClubhouseStore } from '@/store/clubhouseStore';
 import { registerNavScroller } from '@/hooks/useScrollDirection';
 
 import { VideoEngine } from '@/video/VideoEngine';
-import { useFullscreenFeedStore } from '@/store/fullscreenFeedStore';
 import { vperfFeedActivateStart, vperfFeedActivateEnd, vperfConsumeEarlyStarted } from '@/perf/vperf';
 
 import { FeedCard } from './FeedCard';
