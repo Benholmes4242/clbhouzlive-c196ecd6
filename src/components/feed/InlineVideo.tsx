@@ -71,6 +71,7 @@ function useLaneForRole(role: FeedRole | null): LaneId | null {
 export const InlineVideo: React.FC<Props> = ({
   item,
   isActive,
+  isNear = false,
   postId,
   ownerKey,
   feedIndex,
@@ -78,6 +79,7 @@ export const InlineVideo: React.FC<Props> = ({
   earlyMotion = false,
   onFirstFrameReady,
 }) => {
+
   const posterUrl =
     (item as any).thumbnailUrl ||
     (item as any).imageUrl ||
