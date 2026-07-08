@@ -163,9 +163,12 @@ export function useTopTenComments(targetUserId: string, courseId: string) {
             data: { target_user_id: targetUserId },
           });
         }
-      } catch {
-        // Notification failure is non-blocking
+      } catch (e) {
+        // Non-blocking, but LOUD — a bare catch{} on notification inserts
+        // is what hid the six-month comment-notification outage.
+        console.warn('[useTopTenComments] notification insert failed:', e);
       }
+
 
       return newCommentId;
     },
