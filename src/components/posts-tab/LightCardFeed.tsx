@@ -23,6 +23,8 @@ import { isPerfEnabled } from '@/perf/navTiming';
 import { useClubhouseStore } from '@/store/clubhouseStore';
 import { getDocumentScrollParent } from '@/lib/getScrollParent';
 import { VideoEngine } from '@/video/VideoEngine';
+import { feedLaneRoles } from '@/video/feedLaneRoles';
+import { isPerfEnabled as _isPerfEnabledForRotate } from '@/perf/navTiming';
 import { vperfFeedActivateStart, vperfFeedActivateEnd, vperfConsumeEarlyStarted } from '@/perf/vperf';
 import { LightFeedCard } from './LightFeedCard';
 
