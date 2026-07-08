@@ -146,6 +146,49 @@ const ActivityPage: React.FC = () => {
     })();
   }, [user?.id, isLoading, data, queryClient, markCoursesAsSeen]);
 
+  // ── Auto mark-all-read on dwell (Item 1) ──
+  // Industry-standard mark-read-on-view. When the Activity page has rendered
+  // with real data (not skeletons) and there is at least one unread, start a
+  // 1000ms dwell timer. On fire, batch-mark all unread server-side (same
+  // mutation as the header button) and zero the tab/nav badge. Rows KEEP
+  // their unread styling for the current viewing session (we do NOT patch
+  // the feed cache) so nothing greys out mid-read; next visit renders read.
+  // Cancels on unmount / tab hidden / navigation-away. Runs at most once per
+  // visit — remount re-arms.
+  const dwellFired = useRef(false);
+  useEffect(() => {
+    if (dwellFired.current) return;
+    if (!user?.id || isLoading || !data) return;
+    const hasUnread = (data.allItems ?? []).some((n: ActivityNotification) => n.is_unread);
+    if (!hasUnread) return;
+
+    let cancelled = false;
+    const timer = window.setTimeout(async () => {
+      if (cancelled || dwellFired.current) return;
+      dwellFired.current = true;
+      const now = new Date().toISOString();
+      // Live badge clear — nav + tab pill go to zero immediately.
+      queryClient.setQueryData(['activity-unread-count'], 0);
+      try {
+        await supabase.from('notifications').update({ is_read: true })
+          .eq('user_id', user.id).lte('created_at', now);
+        await supabase.from('user_profiles').update({ last_notifications_seen_at: now }).eq('id', user.id);
+        // Only invalidate the badge count — do NOT invalidate the feed here
+        // (that would flip row styling in the current session).
+        queryClient.invalidateQueries({ queryKey: ['activity-unread-count'] });
+      } catch { /* server error → dwell can re-arm on next visit */ }
+    }, 1000);
+
+    const onVis = () => { if (document.hidden) { cancelled = true; window.clearTimeout(timer); } };
+    document.addEventListener('visibilitychange', onVis);
+
+    return () => {
+      cancelled = true;
+      window.clearTimeout(timer);
+      document.removeEventListener('visibilitychange', onVis);
+    };
+  }, [user?.id, isLoading, data, queryClient]);
+
   useEffect(() => () => { queryClient.invalidateQueries({ queryKey: ['activity-feed'] }); }, [queryClient]);
 
   // NOTE: isRehydrating early-return moved BELOW the useMemos so hook order
