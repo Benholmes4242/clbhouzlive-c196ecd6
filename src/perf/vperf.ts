@@ -95,6 +95,7 @@ const sessions = new Map<string, SessionRec>();
 const DEFAULT_BUDGETS: Record<string, number> = {
   'fs.open.borrow': 150,
   'fs.open.lane': 500,
+  'fs.open.image': 200,
   'fs.close': 250,
 
   'autoplay.warm': 120,
@@ -103,7 +104,21 @@ const DEFAULT_BUDGETS: Record<string, number> = {
   'swipe.pager': 450,
   seek: 300,
   'loop.gap': 120,
+
+  'feed.scroll': 0,
+  'feed.activate.image': 250,
+  'feed.activate.video.warm': 120,
+  'feed.activate.video.cold': 600,
 };
+
+// -------- page tag (auto-injected into every emit) --------
+let __currentPage: string = 'unknown';
+export function vperfSetPage(page: string): void {
+  __currentPage = page || 'unknown';
+  // Trigger per-page nav summary when the page changes.
+  try { scorecardEmitOnNav(); } catch {}
+}
+export function vperfGetPage(): string { return __currentPage; }
 
 function on(): boolean {
   try {
