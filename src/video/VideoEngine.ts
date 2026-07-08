@@ -616,8 +616,33 @@ class VideoEngineImpl {
     });
   }
 
+  /**
+   * Capture the element's LIVE currentTime → lastPos for the lane's current
+   * owner, synchronously. Safe to call any time; never gated. Used to:
+   *  - freeze lastPos at the true scroll-out position on pause/unbind
+   *    (timeupdate is throttled and stops at pause, so it would otherwise
+   *    be stale by up to seconds under iOS scroll load), and
+   *  - keep the emitted snapshot's currentTime in sync so subscribers
+   *    (InlineVideo) see the true value on the next render.
+   */
+  captureLastPos(laneId: LaneId): void {
+    const lane = this.lanes.get(laneId);
+    if (!lane || !lane.postId) return;
+    const t = lane.el.currentTime;
+    if (typeof t === 'number' && isFinite(t) && t >= 0) {
+      this.lastPos.set(lane.postId, t);
+      this.emit(lane);
+    }
+  }
+
   pause(laneId: LaneId, opts: { callerPostId?: string | null } = {}): void {
     const lane = this.getLane(laneId);
+    // GUARD (paused-frame accuracy): capture the TRUE currentTime BEFORE any
+    // early-return below. The borrow/owner guards correctly refuse to PAUSE
+    // a borrowed or handed-off lane, but the true position is always worth
+    // recording — capturing is side-effect-free and prevents stale lastPos
+    // from surviving into resume. Only the pause ACTION is guarded.
+    this.captureLastPos(laneId);
     const caller = opts.callerPostId ?? null;
     // BORROW GUARD (Stage-7 PR-1 fix): while a lane is borrowed by the
     // fullscreen viewer, ignore owner-caller pauses — the ex-owner tile is
@@ -647,8 +672,16 @@ class VideoEngineImpl {
 
   pauseAll(): void {
     this.lanes.forEach((lane) => {
+      // Capture true currentTime → lastPos before pausing (see pause()).
+      if (lane.postId) {
+        const t = lane.el.currentTime;
+        if (typeof t === 'number' && isFinite(t) && t >= 0) {
+          this.lastPos.set(lane.postId, t);
+        }
+      }
       lane.wantPlay = false;
       if (!lane.el.paused) lane.el.pause();
+      this.emit(lane);
     });
   }
 
