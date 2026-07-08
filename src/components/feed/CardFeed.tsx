@@ -267,20 +267,22 @@ export const CardFeed = forwardRef<CardFeedHandle, CardFeedProps>(function CardF
     };
   }, [activeIdx, posts]);
 
-  // Warm the NEXT card's HLS into the `feed-next` lane so its manifest
-  // + first segment are already in the CDN/hls cache when it becomes active.
+  // Warm the neighbour cards' HLS symmetrically: next → `feed-next`,
+  // prev → `feed-prev`. Up-scroll must not be permanently cold (PR-A).
   useEffect(() => {
-    const next = posts[playingIdx + 1];
-    const nextMedia = next?.mediaItems?.[0];
-    if (next && nextMedia?.type === 'video' && (nextMedia as any).hlsUrl) {
+    const warm = (laneId: 'feed-next' | 'feed-prev', post: FeedPost | undefined) => {
+      const m = post?.mediaItems?.[0];
+      if (!post || !m || m.type !== 'video' || !(m as any).hlsUrl) return;
       try {
-        VideoEngine.preload('feed-next', {
-          hlsUrl: (nextMedia as any).hlsUrl,
-          posterUrl: (nextMedia as any).thumbnailUrl ?? null,
-          postId: next.id,
+        VideoEngine.preload(laneId, {
+          hlsUrl: (m as any).hlsUrl,
+          posterUrl: (m as any).thumbnailUrl ?? null,
+          postId: post.id,
         });
       } catch { /* engine may not be booted yet — safe to ignore */ }
-    }
+    };
+    warm('feed-next', posts[playingIdx + 1]);
+    warm('feed-prev', posts[playingIdx - 1]);
   }, [playingIdx, posts]);
 
 
