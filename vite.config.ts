@@ -10,7 +10,11 @@ export default defineConfig(({ mode }) => ({
     // Cache-buster for the persisted React Query store (see src/lib/queryPersister.ts).
     // Every build produces a fresh id — schema changes wipe the persisted cache cleanly.
     __BUILD_ID__: JSON.stringify(Date.now().toString(36)),
+    // Human-readable ISO stamp emitted at boot into consoleCapture, so every
+    // copied LogHud capture identifies the build it was taken against.
+    __BUILD_STAMP__: JSON.stringify(new Date().toISOString()),
   },
+
   base: '/',
   server: {
     host: true,
