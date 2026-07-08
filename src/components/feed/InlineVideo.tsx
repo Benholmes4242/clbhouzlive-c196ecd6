@@ -76,7 +76,6 @@ export const InlineVideo: React.FC<Props> = ({
   feedIndex,
   objectFit = 'cover',
   earlyMotion = false,
-  earlyDir = 0,
   onFirstFrameReady,
 }) => {
   const posterUrl =
