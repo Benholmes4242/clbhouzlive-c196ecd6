@@ -38,6 +38,8 @@ import {
   vperfMark,
   vperfNextId,
 } from '@/perf/vperf';
+import { readSeededBandwidth } from './bandwidthMemory';
+
 
 
 
@@ -356,19 +358,27 @@ class VideoEngineImpl {
       // capLevelToPlayerSize). Feed-active/fullscreen skip the cap so they
       // render at manifest-appropriate quality for the viewport.
       const isRail = laneId.startsWith('rail-');
+      // [PREDICT] Part 1 — seed ABR from persisted bandwidth memory for
+      // FEED-ACTIVE / FULLSCREEN lanes only. Rails intentionally excluded:
+      // their startLevel:0 + capLevelToPlayerSize profile is correct for
+      // small tiles and seeding would only cost data on the first tile.
+      const seededBw = isRail ? null : readSeededBandwidth();
+      (lane as any)._seededBw = seededBw;
       const config: Partial<HlsConfig> = {
         ...HLS_CONFIG,
         ...(isRail ? RAIL_HLS_OVERRIDES : {}),
         startPosition,
-        // hls.js expects bps
-        abrEwmaDefaultEstimate: 500_000,
+        // hls.js expects bps. When we have a fresh seed, use it; otherwise
+        // fall back to the conservative default the engine has always used.
+        abrEwmaDefaultEstimate: seededBw ?? 500_000,
         maxStarvationDelay: 4,
         // Cap ABR to policy ceiling
         capLevelOnFPSDrop: true,
       };
       lane.hls = new Hls(config);
       lane.hls.attachMedia(lane.el); // one-time bind for this element's life
-      DBG(laneId, 'created hls instance');
+      DBG(laneId, 'created hls instance', { seededBw });
+
     } else {
       // Re-point: stop current load, then load new source. Instance & element stay.
       lane.hls.stopLoad();
@@ -500,9 +510,13 @@ class VideoEngineImpl {
         el: lane.el,
         startLevel,
         bwEstimate,
+        // [PREDICT] seededBw — the value fed to abrEwmaDefaultEstimate for
+        // this lane's hls instance (null when unavailable / rail lane).
+        seededBw: (lane as any)._seededBw ?? null,
         postId: lane.postId,
         engine: hls ? 'hls.js' : 'native',
       });
+
       this.transition(lane, 'playing');
     };
     const onPause = () => {
@@ -792,6 +806,17 @@ class VideoEngineImpl {
   listLanes(): LaneId[] {
     return Array.from(this.lanes.keys());
   }
+
+  /** [PREDICT] Prefetch gating: true when any lane is currently loading a
+   *  manifest / segments — the PrefetchController must never compete with
+   *  an active fetch on the critical path. */
+  isAnyLaneLoading(): boolean {
+    for (const lane of this.lanes.values()) {
+      if (lane.state === 'loading') return true;
+    }
+    return false;
+  }
+
 }
 
 export const VideoEngine = new VideoEngineImpl();

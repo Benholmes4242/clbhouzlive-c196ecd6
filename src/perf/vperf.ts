@@ -36,6 +36,8 @@
  */
 
 import { isPerfEnabled } from '@/perf/navTiming';
+import { writeBandwidthSample } from '@/video/bandwidthMemory';
+
 
 const SPAN_TTL_MS = 15_000;
 
@@ -81,8 +83,11 @@ interface SessionRec {
   endLevel: number | null;
   levelSwitches: number;
   bwEstimateStart: number | null;
+  bwEstimateEnd: number | null;
+  seededBw: number | null;
   timer: ReturnType<typeof setTimeout>;
 }
+
 
 const spans = new Map<string, SpanRec>();
 const laneArms = new Map<string, LaneArm[]>();
@@ -302,6 +307,7 @@ export function vperfSessionStart(
     el?: HTMLVideoElement | null;
     startLevel?: number | null;
     bwEstimate?: number | null;
+    seededBw?: number | null;
   },
 ): void {
   if (!on()) return;
@@ -315,7 +321,7 @@ export function vperfSessionStart(
     laneId,
     t0: performance.now(),
     meta: (() => {
-      const { el, startLevel, bwEstimate, ...rest } = meta;
+      const { el, startLevel, bwEstimate, seededBw, ...rest } = meta;
       return rest;
     })(),
     stallCount: 0,
@@ -329,6 +335,9 @@ export function vperfSessionStart(
     endLevel: meta.startLevel ?? null,
     levelSwitches: 0,
     bwEstimateStart: meta.bwEstimate ?? null,
+    bwEstimateEnd: meta.bwEstimate ?? null,
+    seededBw: meta.seededBw ?? null,
+
     timer: setTimeout(() => {
       // Absolute ceiling: 5-min sessions get flushed so long-running lanes
       // don't accumulate silently.
@@ -380,7 +389,7 @@ export function vperfSessionSuppressNextStall(laneId: string): void {
 export function vperfSessionLevel(
   laneId: string,
   level: number,
-  _bwEstimate?: number | null,
+  bwEstimate?: number | null,
 ): void {
   if (!on()) return;
   const rec = sessions.get(laneId);
@@ -388,7 +397,11 @@ export function vperfSessionLevel(
   rec.levelSwitches += 1;
   rec.endLevel = level;
   if (rec.startLevel == null) rec.startLevel = level;
+  if (typeof bwEstimate === 'number' && bwEstimate > 0) {
+    rec.bwEstimateEnd = Math.round(bwEstimate);
+  }
 }
+
 
 export function vperfSessionEnd(laneId: string, reason: string): void {
   if (!on()) return;
@@ -428,12 +441,25 @@ export function vperfSessionEnd(laneId: string, reason: string): void {
     startLevel: rec.startLevel,
     endLevel: rec.endLevel,
     bwEstimateStart: rec.bwEstimateStart,
+    bwEstimateEnd: rec.bwEstimateEnd,
+    seededBw: rec.seededBw,
     verdict,
     longStall,
     reason,
     ...rec.meta,
   });
+  // [PREDICT] Part 1a — persist the terminal bandwidth estimate so the next
+  // cold hls.js instance can seed its ABR. Only feed-active / fullscreen
+  // lanes contribute (rails run capped at level 0 — not representative).
+  if (
+    (laneId === 'feed-active' || laneId === 'fullscreen') &&
+    rec.bwEstimateEnd != null &&
+    durationMs >= 3000
+  ) {
+    try { writeBandwidthSample(rec.bwEstimateEnd); } catch {}
+  }
 }
+
 
 // ------------------------ Motion trace (fs.open jump diagnosis) ------------------------
 //
@@ -624,6 +650,17 @@ const sessionHealth = {
 const decideCounters = new Map<string, Map<string, number>>(); // bucket → key → count
 const feedRollup = new Map<string, { scrolls: number; longFrames: number; frames: number; worstMs: number; activateWarm: number; activateCold: number }>(); // per page
 
+// [PREDICT] scorecard extras — per-lane-class start levels (median target)
+// and prefetch counters (issued / aborted / hit-rate).
+const startLevelsByLane = new Map<string, number[]>(); // laneId → startLevels
+const prefetchStats = {
+  issued: 0,
+  aborted: new Map<string, number>(),
+  activationsWithPrefetch: 0,
+  activationsWithPrefetchWarm: 0,
+};
+
+
 function bucketKey(kind: string, page: string): string { return `${kind}|${page}`; }
 
 function scorecardIngest(kind: string, payload: Record<string, unknown>): void {
@@ -639,6 +676,14 @@ function scorecardIngest(kind: string, payload: Record<string, unknown>): void {
     sessionHealth.levelSwitches += Number((payload as any).levelSwitches) || 0;
     sessionHealth.totalFrames += Number((payload as any).totalFrames) || 0;
     sessionHealth.droppedFrames += Number((payload as any).droppedFrames) || 0;
+    const laneId = String((payload as any).laneId ?? '');
+    const sl = (payload as any).startLevel;
+    if (typeof sl === 'number' && (laneId === 'feed-active' || laneId === 'fullscreen')) {
+      const arr = startLevelsByLane.get(laneId) ?? [];
+      arr.push(sl);
+      if (arr.length > 500) arr.shift();
+      startLevelsByLane.set(laneId, arr);
+    }
     return;
   }
 
@@ -654,7 +699,12 @@ function scorecardIngest(kind: string, payload: Record<string, unknown>): void {
     const r = feedRollup.get(page) ?? { scrolls: 0, longFrames: 0, frames: 0, worstMs: 0, activateWarm: 0, activateCold: 0 };
     if ((payload as any).warm) r.activateWarm += 1; else r.activateCold += 1;
     feedRollup.set(page, r);
+    if ((payload as any).prefetched === true) {
+      prefetchStats.activationsWithPrefetch += 1;
+      if ((payload as any).warm) prefetchStats.activationsWithPrefetchWarm += 1;
+    }
   }
+
 
   if (!isFinite(totalMs) || totalMs < 0) return;
   const key = bucketKey(kind, page);
@@ -676,6 +726,18 @@ export function vperfDecideTally(bucket: string, key: string): void {
   if (!m) { m = new Map(); decideCounters.set(bucket, m); }
   m.set(key, (m.get(key) ?? 0) + 1);
 }
+
+/** [PREDICT] PrefetchController tallies. `reason` is required for aborts. */
+export function vperfPrefetchTally(evt: 'issued' | 'aborted', reason?: string): void {
+  if (!on()) return;
+  if (evt === 'issued') {
+    prefetchStats.issued += 1;
+  } else {
+    const k = reason || 'unknown';
+    prefetchStats.aborted.set(k, (prefetchStats.aborted.get(k) ?? 0) + 1);
+  }
+}
+
 
 function pct(arr: number[], p: number): number {
   if (arr.length === 0) return 0;
@@ -713,9 +775,25 @@ export function vperfScorecard(trigger: 'auto' | 'nav' | 'manual' = 'manual'): v
     for (const [k, v] of m) parts.push(`${k}=${v}`);
     lines.push(`  decide.${bucket}: ${parts.join(' ')}`);
   }
+  // [PREDICT] median startLevel per feed lane class.
+  for (const [laneId, arr] of startLevelsByLane) {
+    if (arr.length === 0) continue;
+    lines.push(`  startLevel.${laneId}: n=${arr.length} p50=${pct(arr, 0.5)} p95=${pct(arr, 0.95)}`);
+  }
+  // [PREDICT] prefetch counters.
+  const ps = prefetchStats;
+  const hitRate = ps.activationsWithPrefetch > 0
+    ? (ps.activationsWithPrefetchWarm / ps.activationsWithPrefetch)
+    : 0;
+  const abortParts: string[] = [];
+  for (const [k, v] of ps.aborted) abortParts.push(`${k}=${v}`);
+  lines.push(
+    `  prefetch: issued=${ps.issued} aborted=${abortParts.join(' ') || '0'} activationsWithPrefetch=${ps.activationsWithPrefetch} warmHits=${ps.activationsWithPrefetchWarm} hitRate=${(hitRate*100).toFixed(1)}%`,
+  );
   // eslint-disable-next-line no-console
   console.info(lines.join('\n'));
 }
+
 
 function scorecardEmitOnNav(): void {
   if (!on()) return;
@@ -811,6 +889,7 @@ export function vperfFeedActivateEnd(opts: {
   idx: number;
   mediaType: 'image' | 'video';
   warm?: boolean;
+  prefetched?: boolean;
 }): void {
   if (!on()) return;
   const totalMs = Math.round(performance.now() - opts.t0);
@@ -819,11 +898,13 @@ export function vperfFeedActivateEnd(opts: {
     idx: opts.idx,
     mediaType: opts.mediaType,
     warm: !!opts.warm,
+    prefetched: !!opts.prefetched,
     totalMs,
     budgetMs: budget,
     verdict: totalMs <= budget ? 'PASS' : 'SLOW',
   });
 }
+
 
 // ---------------- Image phase helper (Part 1) ----------------
 
