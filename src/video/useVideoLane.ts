@@ -1,29 +1,23 @@
 /**
  * useVideoLane — thin React binding for VideoEngine.
  *
- * Mounts a lane's <video> element into `hostRef` **only when the card is
- * active**, so the shared lane element FOLLOWS activation across the feed
- * (appendChild atomically moves the node from the previous host to the new
- * one). React never owns the lane element — the engine does. This hook
- * only wires refs and reports state.
+ * PR-B: `laneId` may now be null. When null, the hook is inert (no mount,
+ * no load, no play, no pause). Consumers that want role-based rotation
+ * resolve `laneId` via `feedLaneRoles.laneForRole(role)` and pass null
+ * when the card holds no role.
  *
- * The mount / load / play effects are all keyed on `active`: exactly one
- * card at a time asks the engine to mount + load + play. Neighbours stay
- * on their posters until they take over.
+ * Effect cleanups pause the CURRENT-effect laneId (captured by closure), so
+ * a role rotation that changes the resolved laneId cleanly pauses the OLD
+ * physical lane before the new effect mounts the NEW physical lane. When
+ * laneId is unchanged across a rotation (typical promotion path: role
+ * 'next' → 'active' after rotate() ran first), the effect deps are equal
+ * and NO teardown/setup fires — the same element keeps playing without a
+ * load(), seek(), or attach cycle.
  */
 
 import { useEffect, useRef, useState } from 'react';
 import { VideoEngine, type LaneId, type LaneSnapshot } from './VideoEngine';
 import { useCreationOverlayStore } from '@/stores/creationOverlayStore';
-
-
-
-
-
-
-
-
-
 
 export interface UseVideoLaneOptions {
   hlsUrl: string | null | undefined;
@@ -44,7 +38,7 @@ export interface UseVideoLaneOptions {
 
 export interface UseVideoLaneResult {
   hostRef: React.RefObject<HTMLDivElement>;
-  snapshot: LaneSnapshot;
+  snapshot: LaneSnapshot | null;
   play: () => Promise<void>;
   pause: () => void;
   seek: (t: number) => void;
@@ -52,24 +46,35 @@ export interface UseVideoLaneResult {
   release: () => void;
 }
 
+const NULL_SNAP: LaneSnapshot = {
+  laneId: 'feed-active',
+  state: 'idle',
+  currentTime: 0,
+  readyState: 0,
+  duration: 0,
+  muted: true,
+  firstFrame: false,
+  postId: null,
+};
+
 export function useVideoLane(
-  laneId: LaneId,
+  laneId: LaneId | null,
   opts: UseVideoLaneOptions
 ): UseVideoLaneResult {
   const hostRef = useRef<HTMLDivElement>(null);
-  const [snapshot, setSnapshot] = useState<LaneSnapshot>(() => {
+  const [snapshot, setSnapshot] = useState<LaneSnapshot | null>(() => {
+    if (!laneId) return null;
     VideoEngine.boot();
     return VideoEngine.snapshot(laneId);
   });
 
   // Mount the lane element into THIS card's host — but only while active.
-  // When another card becomes active, its mount effect appendChild's the
-  // element out of us automatically; no explicit unmount needed here.
+  // On laneId change or unmount, the previous lane's element stays where it
+  // was parented; a rotation will re-appendChild it into the new host via
+  // the new binding. No explicit unmount is issued here (elements never
+  // move BETWEEN lanes; they can freely re-parent between hosts).
   useEffect(() => {
-    if (!opts.active) return;
-    // Belt-and-braces: if the host ref hasn't attached yet (rare timing edge
-    // when the card mounts + activates in the same commit), retry on the
-    // next frame instead of silently dropping the mount.
+    if (!laneId || !opts.active) return;
     let raf = 0;
     const tryMount = () => {
       const host = hostRef.current;
@@ -87,58 +92,60 @@ export function useVideoLane(
 
   // Subscribe to lane state.
   useEffect(() => {
+    if (!laneId) {
+      setSnapshot(null);
+      return;
+    }
     return VideoEngine.subscribe(laneId, setSnapshot);
   }, [laneId]);
 
-  // Load source — only for the active card (avoids every mounted card
-  // thrashing the shared lane on scroll). Same postId+url is a no-op
-  // inside the engine, so remounting the active card is cheap.
+  // Load source — only for the active card. Same postId+url is a no-op
+  // inside the engine (alreadyLoaded skip), so a role rotation that lands
+  // the same postId on the same physical lane is a true no-op: no reload,
+  // no seek. This is the PR-B seamless promotion guarantee.
   useEffect(() => {
-    if (!opts.active || !opts.hlsUrl) return;
+    if (!laneId || !opts.active || !opts.hlsUrl) return;
     VideoEngine.load(laneId, {
       hlsUrl: opts.hlsUrl,
       posterUrl: opts.posterUrl ?? null,
       startPosition: opts.startPosition ?? -1,
       postId: opts.postId ?? null,
     });
-    // Close the one-render stale-snapshot window after a lane source changes.
-    // Without this, consumers can briefly see firstFrame=true from the prior
-    // owner and reveal a host before load()'s reset has reached subscribers.
     setSnapshot(VideoEngine.snapshot(laneId));
   }, [laneId, opts.active, opts.hlsUrl, opts.posterUrl, opts.startPosition, opts.postId]);
 
-  // Auto play/pause based on `active`. play() is safe to call before mount:
-  // the engine queues it and consumes on the next mountLane.
+  // Auto play/pause with cleanup — cleanup pauses the CURRENT-effect laneId
+  // (captured by closure). This is what makes role rotation safe: when the
+  // ex-active card's role goes null → laneId goes null, the cleanup fires
+  // for the OLD laneId (the physical lane it was bound to) and pauses it.
   useEffect(() => {
-    // Prefer media-level ownerKey; fall back to postId for legacy callers.
+    if (!laneId) return;
     const callerPostId = opts.ownerKey ?? opts.postId ?? null;
     if (opts.active) {
       void VideoEngine.play(laneId, { callerPostId });
-    } else {
-      VideoEngine.pause(laneId, { callerPostId });
     }
+    return () => {
+      if (opts.active) {
+        VideoEngine.pause(laneId, { callerPostId });
+      }
+    };
   }, [laneId, opts.active, opts.ownerKey, opts.postId]);
 
-  // Resume-on-creation-overlay-close. The composer / review wizard / review
-  // sheet call VideoEngine.pauseAll() on open; activeIndex hasn't changed
-  // so the effect above won't re-fire on its own. When the overlay closes
-  // it bumps creationClosedAt — re-issue the same play-intent for the
-  // current active card so the feed resumes without needing a scroll.
-  // Rails use useRailLane (not this hook), so they are unaffected.
+  // Resume-on-creation-overlay-close. Re-issue play-intent on the currently
+  // bound lane when the overlay closes.
   const creationClosedAt = useCreationOverlayStore((s) => s.creationClosedAt);
   useEffect(() => {
-    if (creationClosedAt === 0) return; // initial value, ignore
-    if (!opts.active) return;
+    if (creationClosedAt === 0) return;
+    if (!laneId || !opts.active) return;
     if (typeof document !== 'undefined' && document.hidden) return;
     const callerPostId = opts.ownerKey ?? opts.postId ?? null;
     void VideoEngine.play(laneId, { callerPostId });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [creationClosedAt]);
 
-
-
   // Apply mute.
   useEffect(() => {
+    if (!laneId) return;
     if (typeof opts.muted === 'boolean') {
       VideoEngine.setMuted(laneId, opts.muted);
     }
@@ -146,11 +153,11 @@ export function useVideoLane(
 
   return {
     hostRef,
-    snapshot,
-    play: () => VideoEngine.play(laneId),
-    pause: () => VideoEngine.pause(laneId),
-    seek: (t: number) => VideoEngine.seek(laneId, t),
-    setMuted: (m: boolean) => VideoEngine.setMuted(laneId, m),
-    release: () => VideoEngine.release(laneId),
+    snapshot: snapshot ?? (laneId ? NULL_SNAP : null),
+    play: () => (laneId ? VideoEngine.play(laneId) : Promise.resolve()),
+    pause: () => { if (laneId) VideoEngine.pause(laneId); },
+    seek: (t: number) => { if (laneId) VideoEngine.seek(laneId, t); },
+    setMuted: (m: boolean) => { if (laneId) VideoEngine.setMuted(laneId, m); },
+    release: () => { if (laneId) VideoEngine.release(laneId); },
   };
 }
