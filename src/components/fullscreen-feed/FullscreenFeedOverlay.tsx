@@ -288,6 +288,16 @@ export function FullscreenFeedOverlay() {
       closeCompletedRef.current = false;
       setReverseClone(null);
       setReverseCollapsed(false);
+      // [BASELINE] image fs.open phases — mark blurMount + chromePaint on open.
+      try {
+        const sid: string | undefined = (window as any).__vperfFsOpenSpanId;
+        if (sid) {
+          import('@/perf/vperf').then((m) => {
+            m.vperfImagePhase(sid, 'blurMount');
+            requestAnimationFrame(() => m.vperfImagePhase(sid, 'chromePaint'));
+          }).catch(() => {});
+        }
+      } catch {}
     }
   }, [isOpen]);
 
