@@ -63,16 +63,17 @@ export const LogHud = memo(function LogHud() {
   }, []);
 
   if (!enabled) return null;
+  if (typeof document === 'undefined') return null;
 
   if (!open) {
-    return (
+    return createPortal(
       <button
         onClick={() => setOpen(true)}
         style={{
           position: 'fixed',
           bottom: 80,
           right: 8,
-          zIndex: 99999,
+          zIndex: Z.logHud,
           padding: '6px 10px',
           fontSize: 12,
           fontFamily: 'monospace',
@@ -84,9 +85,11 @@ export const LogHud = memo(function LogHud() {
         aria-label="Open LogHud"
       >
         LOG
-      </button>
+      </button>,
+      document.body
     );
   }
+
 
   const lines = consoleCapture.getLines();
   return (
