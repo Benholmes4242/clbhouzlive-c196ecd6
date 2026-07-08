@@ -806,6 +806,17 @@ class VideoEngineImpl {
   listLanes(): LaneId[] {
     return Array.from(this.lanes.keys());
   }
+
+  /** [PREDICT] Prefetch gating: true when any lane is currently loading a
+   *  manifest / segments — the PrefetchController must never compete with
+   *  an active fetch on the critical path. */
+  isAnyLaneLoading(): boolean {
+    for (const lane of this.lanes.values()) {
+      if (lane.state === 'loading') return true;
+    }
+    return false;
+  }
+
 }
 
 export const VideoEngine = new VideoEngineImpl();
