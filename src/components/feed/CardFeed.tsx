@@ -29,6 +29,7 @@ import { useClubhouseStore } from '@/store/clubhouseStore';
 import { registerNavScroller } from '@/hooks/useScrollDirection';
 
 import { VideoEngine } from '@/video/VideoEngine';
+import { vperfFeedActivateStart, vperfFeedActivateEnd, vperfConsumeEarlyStarted } from '@/perf/vperf';
 
 import { FeedCard } from './FeedCard';
 
@@ -56,8 +57,9 @@ const FeedItemGate: React.FC<{
   index: number;
   playingIdx: number;
   activeIdx: number;
-  children: (v: { isActive: boolean; mountVideo: boolean }) => React.ReactNode;
-}> = ({ post, index, playingIdx, activeIdx, children }) => {
+  earlyIdx: number;
+  children: (v: { isActive: boolean; mountVideo: boolean; earlyMotion: boolean }) => React.ReactNode;
+}> = ({ post, index, playingIdx, activeIdx, earlyIdx, children }) => {
   const fsOpen = useFullscreenFeedStore((s) => s.isOpen);
   const borrowedOwnerKey = useFullscreenFeedStore((s) => s.borrow?.ownerKey ?? null);
   const isBorrowedCard =
@@ -66,7 +68,8 @@ const FeedItemGate: React.FC<{
   const isActive = !fsOpen && index === playingIdx;
   const isNear =
     isBorrowedCard || (!fsOpen && Math.abs(index - activeIdx) <= VIDEO_NEIGHBOUR_RADIUS);
-  return <>{children({ isActive, mountVideo: isNear })}</>;
+  const earlyMotion = !fsOpen && index === earlyIdx && index !== playingIdx;
+  return <>{children({ isActive, mountVideo: isNear, earlyMotion })}</>;
 };
 
 export interface CardFeedProps {
@@ -215,6 +218,15 @@ export const CardFeed = forwardRef<CardFeedHandle, CardFeedProps>(function CardF
   // centre tile is promoted to "playing". Prevents load-thrash mid-scroll
   // (iOS cold HLS attach ~1.3s vs. active-window ~400-800ms during scroll).
   const [playingIdx, setPlayingIdx] = useState(0);
+  // earlyIdx — the NEXT card in the current scroll direction whose media is
+  // already warm on the feed-next lane and whose visible fraction has
+  // crossed EARLY_MOTION_FRACTION. When set, InlineVideo mounts+plays the
+  // feed-next lane into that card's host so it enters ALREADY MOVING (IG
+  // handover feel). Strictly playingIdx ± 1. Cleared on: direction reversal,
+  // visibility below EARLY_MOTION_CLEAR, promotion to playingIdx, and
+  // fullscreen open. Creation-overlay open pauses all lanes via pauseAll —
+  // the flag can stay set (the effect won't re-fire without a state change).
+  const [earlyIdx, setEarlyIdx] = useState<number>(-1);
   const settleTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const SETTLE_MS = 80;
   // IG-style early activation: cheap now that feed-next preload + PREDICT cache
@@ -222,11 +234,24 @@ export const CardFeed = forwardRef<CardFeedHandle, CardFeedProps>(function CardF
   const PLAY_IN = 0.30;
   const PLAY_OUT = 0.20;
   const HYSTERESIS = 0.1;
+  // Early-motion handover (only touches feed-next; feed-active untouched).
+  const EARLY_MOTION_FRACTION = 0.12; // start earlyIdx once neighbour clears 12%
+  const EARLY_MOTION_CLEAR = 0.08;    // drop earlyIdx below 8% (hysteresis)
+  const EARLY_VELOCITY_MAX = 3;       // px/ms — above this = flick, no early
   const visibilityRef = useRef<Map<number, number>>(new Map());
   const scrollDirRef = useRef<number>(0); // +1 down, -1 up, 0 idle
   const lastScrollTopRef = useRef<number>(0);
+  const lastScrollTsRef = useRef<number>(0);
+  const scrollVelocityRef = useRef<number>(0); // px/ms
   const observerRef = useRef<IntersectionObserver | null>(null);
   const cardEls = useRef<Map<number, HTMLElement>>(new Map());
+  // Refs mirroring state/props so recheckActive (stable useCallback) can
+  // read the latest values without re-binding — matches the existing
+  // visibility/scroll ref pattern above.
+  const playingIdxRef = useRef(0);
+  const postsRef = useRef(posts);
+  useEffect(() => { playingIdxRef.current = playingIdx; }, [playingIdx]);
+  useEffect(() => { postsRef.current = posts; }, [posts]);
 
   // Debounce: promote activeIdx → playingIdx only after the centre has
   // held steady for SETTLE_MS. While scrolling, playingIdx stays put so
@@ -292,6 +317,45 @@ export const CardFeed = forwardRef<CardFeedHandle, CardFeedProps>(function CardF
       if (prev >= 0 && prevRatio >= PLAY_OUT) return prev;
       return bestIdx >= 0 && bestRatio >= PLAY_OUT ? bestIdx : prev;
     });
+
+    // ── Early-motion candidate (Part 1) ─────────────────────────────
+    // playingIdx ± 1 in the current scroll direction, gated on:
+    //   1. velocity ceiling (skip during flicks)
+    //   2. candidate visibility >= EARLY_MOTION_FRACTION (with hysteresis
+    //      down to EARLY_MOTION_CLEAR when the current earlyIdx retreats)
+    //   3. candidate warm on feed-next (snapshot.postId === candidate.id)
+    // Cold cards are never force-started here — they fall back to the
+    // normal PLAY_IN promotion path. Direction reversal, promotion, and
+    // visibility retreat all clear via the same setter.
+    setEarlyIdx((prevEarly) => {
+      // Reading playingIdx via a state read is fine — recheckActive runs on
+      // rAF/IO, playingIdx settles independently on its own timer.
+      const dir = scrollDirRef.current;
+      const vel = scrollVelocityRef.current;
+      const currentPlay = playingIdxRef.current;
+      if (dir === 0 || vel > EARLY_VELOCITY_MAX || currentPlay < 0) return -1;
+      const cand = currentPlay + dir;
+      if (cand < 0 || cand >= postsRef.current.length) return -1;
+      const ratio = visibilityRef.current.get(cand) ?? 0;
+
+      // Hysteresis: keep current earlyIdx while it's still barely visible.
+      if (prevEarly === cand && ratio >= EARLY_MOTION_CLEAR) return cand;
+      if (prevEarly !== cand && ratio < EARLY_MOTION_FRACTION) return -1;
+      if (ratio < EARLY_MOTION_CLEAR) return -1;
+
+      // Warm-only guard — never force a cold HLS attach at 12%.
+      const cardPost = postsRef.current[cand];
+      if (!cardPost) return -1;
+      try {
+        const snap = VideoEngine.snapshot('feed-next');
+        const warm = snap.postId != null &&
+          (snap.postId === cardPost.id || snap.postId === `${cardPost.id}:0`) &&
+          (snap.state === 'ready' || snap.state === 'playing' || snap.state === 'loading');
+        if (!warm) return -1;
+      } catch { return -1; }
+
+      return cand;
+    });
   }, []);
 
   useEffect(() => {
@@ -328,9 +392,17 @@ export const CardFeed = forwardRef<CardFeedHandle, CardFeedProps>(function CardF
     const onScroll = () => {
       // Signed scroll direction — reused as a directional tie-break in recheckActive.
       const st = scrollerElRef.current?.scrollTop ?? window.scrollY;
+      const now = performance.now();
       const dy = st - lastScrollTopRef.current;
+      const dt = Math.max(1, now - (lastScrollTsRef.current || now));
+      // Instant velocity in px/ms. EMA-smoothed so a single jitter tick
+      // doesn't flip the flick verdict on/off; enough responsiveness to
+      // catch real flicks within one frame.
+      const inst = Math.abs(dy) / dt;
+      scrollVelocityRef.current = scrollVelocityRef.current * 0.5 + inst * 0.5;
       if (Math.abs(dy) > 0.5) scrollDirRef.current = dy > 0 ? 1 : -1;
       lastScrollTopRef.current = st;
+      lastScrollTsRef.current = now;
       if (raf) return;
       raf = requestAnimationFrame(() => {
         raf = 0;
@@ -343,6 +415,49 @@ export const CardFeed = forwardRef<CardFeedHandle, CardFeedProps>(function CardF
       if (raf) cancelAnimationFrame(raf);
     };
   }, [recheckActive]);
+
+  // Clear earlyIdx whenever the current earlyIdx is promoted to playingIdx —
+  // the useEffect in InlineVideo already cleans up (unmount + accumulate
+  // dualActiveMs) when earlyMotion flips false, so the incoming feed-active
+  // mount lands into an empty host as required.
+  useEffect(() => {
+    if (earlyIdx === playingIdx && earlyIdx !== -1) setEarlyIdx(-1);
+  }, [earlyIdx, playingIdx]);
+
+  // Fullscreen open — clear earlyIdx so the InlineVideo cleanup runs
+  // (pause + unmount feed-next) instead of leaving a stale early lane behind
+  // the borrowed feed-active. pauseAll from viewer-open pauses playback
+  // regardless; this clears the DOM residue.
+  const fsIsOpen = useFullscreenFeedStore((s) => s.isOpen);
+  useEffect(() => {
+    if (fsIsOpen && earlyIdx !== -1) setEarlyIdx(-1);
+  }, [fsIsOpen, earlyIdx]);
+
+  // ── Activation scorecard ────────────────────────────────────────────
+  // Emit one feed.activate line per promotion so early-motion telemetry
+  // (earlyStarted + running dualActiveMs) is visible in every capture.
+  // SnapFeed owns the fullscreen equivalent; this covers the inline feed.
+  const activateT0Ref = useRef<number>(0);
+  useEffect(() => {
+    const post = posts[playingIdx];
+    if (!post) return;
+    const ownerKey = `${post.id}:0`;
+    const hasVideo = (post as any)?.mediaItems?.some?.((m: any) => m?.type === 'video');
+    const mediaType: 'image' | 'video' = hasVideo ? 'video' : 'image';
+    activateT0Ref.current = vperfFeedActivateStart('clubhouse');
+    // Resolve on next frame — feed-active event wiring already emits its
+    // own [VPERF] lines; here we just need earlyStarted + dualActiveMs.
+    const raf = requestAnimationFrame(() => {
+      vperfFeedActivateEnd({
+        t0: activateT0Ref.current,
+        idx: playingIdx,
+        mediaType,
+        earlyStarted: vperfConsumeEarlyStarted(ownerKey),
+      });
+    });
+    return () => cancelAnimationFrame(raf);
+  }, [playingIdx, posts]);
+
 
   // Virtuoso's rangeChanged kept as a no-op; center-proximity owns activeIdx.
   const handleRangeChanged = useCallback(
@@ -466,8 +581,9 @@ export const CardFeed = forwardRef<CardFeedHandle, CardFeedProps>(function CardF
             index={index}
             playingIdx={playingIdx}
             activeIdx={activeIdx}
+            earlyIdx={earlyIdx}
           >
-            {({ isActive, mountVideo }) => (
+            {({ isActive, mountVideo, earlyMotion }) => (
               <FeedCard
                 post={post}
                 liked={!!likeState?.liked}
@@ -482,6 +598,7 @@ export const CardFeed = forwardRef<CardFeedHandle, CardFeedProps>(function CardF
                 onOpenMedia={handleOpenMedia}
                 isActive={isActive}
                 mountVideo={mountVideo}
+                earlyMotion={earlyMotion}
                 initialMediaIndex={initialSlide}
                 onCarouselIndexChange={getCarouselChangeHandler(post.id)}
                 onFollow={onFollow}
@@ -500,6 +617,7 @@ export const CardFeed = forwardRef<CardFeedHandle, CardFeedProps>(function CardF
     [
       activeIdx,
       playingIdx,
+      earlyIdx,
       carouselPositions,
       getCarouselChangeHandler,
       getCommentCount,

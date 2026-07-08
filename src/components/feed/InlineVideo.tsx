@@ -16,6 +16,7 @@ import { VideoEngine } from '@/video/VideoEngine';
 import { originHostRegistry } from '@/video/originHostRegistry';
 import { useClubhouseStore } from '@/store/clubhouseStore';
 import { MuteToggle } from '@/components/feed/MuteToggle';
+import { vperfMarkEarlyStarted, vperfDualActiveAdd } from '@/perf/vperf';
 
 
 interface Props {
@@ -32,6 +33,15 @@ interface Props {
    * VideoEngine owner-guard can reject stale outgoing cards on scroll.
    */
   ownerKey?: string | null;
+  /**
+   * Early-motion handover: the parent feed has decided this card is the next
+   * incoming card in the current scroll direction AND is warm on `feed-next`.
+   * When true (and !isActive) we mount+play `feed-next` into this card's
+   * host so the video is ALREADY MOVING as the card scrolls in. Parent
+   * clears this on promotion, direction reversal, visibility drop, or
+   * fullscreen/creation-overlay open. See CardFeed.EARLY_MOTION_FRACTION.
+   */
+  earlyMotion?: boolean;
   /** Fires once when the poster image has painted. */
   onFirstFrameReady?: () => void;
 }
@@ -42,6 +52,7 @@ export const InlineVideo: React.FC<Props> = ({
   postId,
   ownerKey,
   objectFit = 'cover',
+  earlyMotion = false,
   onFirstFrameReady,
 }) => {
   const posterUrl =
@@ -109,6 +120,43 @@ export const InlineVideo: React.FC<Props> = ({
     originHostRegistry.register(resolvedOwnerKey, host);
     return () => originHostRegistry.unregister(resolvedOwnerKey, host);
   }, [resolvedOwnerKey, lane.hostRef]);
+
+  // ── Early-motion handover ──────────────────────────────────────────
+  // The parent feed hands us `earlyMotion` when this card is the next
+  // incoming card in the scroll direction AND `feed-next` is already warm
+  // for its media. Mount+play `feed-next` into our host so the incoming
+  // card is ALREADY MOVING as it enters. On promotion the outer
+  // useVideoLane('feed-active') binding takes over (existing lane rotation
+  // runs untouched); cleanup pauses and returns feed-next to the hidden
+  // host so we never leave two <video>s stacked in the same host.
+  //
+  // Warm-only: verified via VideoEngine.snapshot('feed-next').postId ===
+  // raw postId (CardFeed.preload stamps raw postId, not ownerKey). Cold
+  // cards do not early-start — they take the normal PLAY_IN promotion.
+  useEffect(() => {
+    if (!earlyMotion || isActive || !hlsUrl || !resolvedOwnerKey) return;
+    const snap = VideoEngine.snapshot('feed-next');
+    const warm = snap.postId != null &&
+      (snap.postId === postId || snap.postId === resolvedOwnerKey) &&
+      (snap.state === 'ready' || snap.state === 'playing' || snap.state === 'loading');
+    if (!warm) return;
+    const host = lane.hostRef.current;
+    if (!host) return;
+    VideoEngine.mountLane('feed-next', host);
+    VideoEngine.setMuted('feed-next', true); // feed is muted — no audio conflict
+    void VideoEngine.play('feed-next', { callerPostId: resolvedOwnerKey });
+    vperfMarkEarlyStarted(resolvedOwnerKey);
+    const startedAt = performance.now();
+    return () => {
+      // Even if pauseAll (fullscreen / creation overlay / visibility) has
+      // already paused the lane, unmount is what removes the <video> from
+      // this host so the incoming feed-active mount doesn't stack on top.
+      VideoEngine.pause('feed-next', { callerPostId: resolvedOwnerKey });
+      VideoEngine.unmountLane('feed-next');
+      vperfDualActiveAdd(performance.now() - startedAt);
+    };
+  }, [earlyMotion, isActive, hlsUrl, postId, resolvedOwnerKey, lane.hostRef]);
+
 
   return (
     <div style={{ position: 'absolute', inset: 0, backgroundColor: '#0a0a0a' }}>

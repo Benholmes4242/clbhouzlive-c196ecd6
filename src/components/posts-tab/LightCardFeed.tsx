@@ -22,6 +22,8 @@ import { openWithOrigin } from '@/lib/openWithOrigin';
 import { isPerfEnabled } from '@/perf/navTiming';
 import { useClubhouseStore } from '@/store/clubhouseStore';
 import { getDocumentScrollParent } from '@/lib/getScrollParent';
+import { VideoEngine } from '@/video/VideoEngine';
+import { vperfFeedActivateStart, vperfFeedActivateEnd, vperfConsumeEarlyStarted } from '@/perf/vperf';
 import { LightFeedCard } from './LightFeedCard';
 
 const PAGE_BG = '#F8FAFC';
@@ -37,8 +39,9 @@ const LightItemGate: React.FC<{
   index: number;
   playingIdx: number;
   activeIdx: number;
-  children: (v: { isActive: boolean; mountVideo: boolean }) => React.ReactNode;
-}> = ({ post, index, playingIdx, activeIdx, children }) => {
+  earlyIdx: number;
+  children: (v: { isActive: boolean; mountVideo: boolean; earlyMotion: boolean }) => React.ReactNode;
+}> = ({ post, index, playingIdx, activeIdx, earlyIdx, children }) => {
   const fsOpen = useFullscreenFeedStore((s) => s.isOpen);
   const borrowedOwnerKey = useFullscreenFeedStore((s) => s.borrow?.ownerKey ?? null);
   const isBorrowedCard =
@@ -47,7 +50,8 @@ const LightItemGate: React.FC<{
   const isActive = !fsOpen && index === playingIdx;
   const isNear =
     isBorrowedCard || (!fsOpen && Math.abs(index - activeIdx) <= VIDEO_NEIGHBOUR_RADIUS);
-  return <>{children({ isActive, mountVideo: isNear })}</>;
+  const earlyMotion = !fsOpen && index === earlyIdx && index !== playingIdx;
+  return <>{children({ isActive, mountVideo: isNear, earlyMotion })}</>;
 };
 
 export interface LightCardFeedProps {
@@ -92,6 +96,7 @@ export const LightCardFeed: React.FC<LightCardFeedProps> = ({
   // ── Active-card tracking (ported from CardFeed) ──
   const [activeIdx, setActiveIdx] = useState(0);
   const [playingIdx, setPlayingIdx] = useState(0);
+  const [earlyIdx, setEarlyIdx] = useState<number>(-1);
   const [scrollParent, setScrollParent] = useState<HTMLElement | undefined>(undefined);
   const settleTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const SETTLE_MS = 80;
@@ -100,11 +105,21 @@ export const LightCardFeed: React.FC<LightCardFeedProps> = ({
   const PLAY_IN = 0.30;
   const PLAY_OUT = 0.20;
   const HYSTERESIS = 0.1;
+  // Early-motion handover (mirrors CardFeed) — see CardFeed.EARLY_MOTION_*
+  const EARLY_MOTION_FRACTION = 0.12;
+  const EARLY_MOTION_CLEAR = 0.08;
+  const EARLY_VELOCITY_MAX = 3; // px/ms
   const visibilityRef = useRef<Map<number, number>>(new Map());
   const scrollDirRef = useRef<number>(0); // +1 down, -1 up, 0 idle
   const lastScrollTopRef = useRef<number>(0);
+  const lastScrollTsRef = useRef<number>(0);
+  const scrollVelocityRef = useRef<number>(0); // px/ms
   const observerRef = useRef<IntersectionObserver | null>(null);
   const cardEls = useRef<Map<number, HTMLElement>>(new Map());
+  const playingIdxRef = useRef(0);
+  const postsRef = useRef(posts);
+  useEffect(() => { playingIdxRef.current = playingIdx; }, [playingIdx]);
+  useEffect(() => { postsRef.current = posts; }, [posts]);
 
   useEffect(() => {
     // On this app, #root is the actual scroll container (see ScrollToTopGlass).
@@ -149,6 +164,30 @@ export const LightCardFeed: React.FC<LightCardFeedProps> = ({
       if (prev >= 0 && prevRatio >= PLAY_OUT) return prev;
       return bestIdx >= 0 && bestRatio >= PLAY_OUT ? bestIdx : prev;
     });
+
+    // Early-motion candidate — mirrors CardFeed. See there for the rationale.
+    setEarlyIdx((prevEarly) => {
+      const dir = scrollDirRef.current;
+      const vel = scrollVelocityRef.current;
+      const currentPlay = playingIdxRef.current;
+      if (dir === 0 || vel > EARLY_VELOCITY_MAX || currentPlay < 0) return -1;
+      const cand = currentPlay + dir;
+      if (cand < 0 || cand >= postsRef.current.length) return -1;
+      const ratio = visibilityRef.current.get(cand) ?? 0;
+      if (prevEarly === cand && ratio >= EARLY_MOTION_CLEAR) return cand;
+      if (prevEarly !== cand && ratio < EARLY_MOTION_FRACTION) return -1;
+      if (ratio < EARLY_MOTION_CLEAR) return -1;
+      const cardPost = postsRef.current[cand];
+      if (!cardPost) return -1;
+      try {
+        const snap = VideoEngine.snapshot('feed-next');
+        const warm = snap.postId != null &&
+          (snap.postId === cardPost.id || snap.postId === `${cardPost.id}:0`) &&
+          (snap.state === 'ready' || snap.state === 'playing' || snap.state === 'loading');
+        if (!warm) return -1;
+      } catch { return -1; }
+      return cand;
+    });
   }, []);
 
   useEffect(() => {
@@ -179,11 +218,15 @@ export const LightCardFeed: React.FC<LightCardFeedProps> = ({
     const readScrollTop = () =>
       scroller instanceof Window ? scroller.scrollY : (scroller as HTMLElement).scrollTop;
     const onScroll = () => {
-      // Signed scroll direction — reused as a directional tie-break in recheckActive.
       const st = readScrollTop();
+      const now = performance.now();
       const dy = st - lastScrollTopRef.current;
+      const dt = Math.max(1, now - (lastScrollTsRef.current || now));
+      const inst = Math.abs(dy) / dt;
+      scrollVelocityRef.current = scrollVelocityRef.current * 0.5 + inst * 0.5;
       if (Math.abs(dy) > 0.5) scrollDirRef.current = dy > 0 ? 1 : -1;
       lastScrollTopRef.current = st;
+      lastScrollTsRef.current = now;
       if (raf) return;
       raf = requestAnimationFrame(() => {
         raf = 0;
@@ -193,10 +236,55 @@ export const LightCardFeed: React.FC<LightCardFeedProps> = ({
     scroller.addEventListener('scroll', onScroll, { passive: true, capture: true } as any);
     return () => {
       scroller.removeEventListener('scroll', onScroll, { capture: true } as any);
-
       if (raf) cancelAnimationFrame(raf);
     };
   }, [recheckActive]);
+
+  // Preload feed-next for the incoming playing card so early-motion has a
+  // warm lane to hand off from. CardFeed does the same — mirrored here so
+  // the profile posts feed also benefits from the IG-style handover.
+  useEffect(() => {
+    const next = posts[playingIdx + 1];
+    const nextMedia = next?.mediaItems?.[0];
+    if (next && nextMedia?.type === 'video' && (nextMedia as any).hlsUrl) {
+      try {
+        VideoEngine.preload('feed-next', {
+          hlsUrl: (nextMedia as any).hlsUrl,
+          posterUrl: (nextMedia as any).thumbnailUrl ?? null,
+          postId: next.id,
+        });
+      } catch { /* engine may not be booted yet — safe to ignore */ }
+    }
+  }, [playingIdx, posts]);
+
+  // Promotion + fullscreen clears — see CardFeed for rationale.
+  useEffect(() => {
+    if (earlyIdx === playingIdx && earlyIdx !== -1) setEarlyIdx(-1);
+  }, [earlyIdx, playingIdx]);
+  const fsIsOpen = useFullscreenFeedStore((s) => s.isOpen);
+  useEffect(() => {
+    if (fsIsOpen && earlyIdx !== -1) setEarlyIdx(-1);
+  }, [fsIsOpen, earlyIdx]);
+
+  // Activation scorecard — one feed.activate emit per promotion.
+  const activateT0Ref = useRef<number>(0);
+  useEffect(() => {
+    const post = posts[playingIdx];
+    if (!post) return;
+    const ownerKey = `${post.id}:0`;
+    const hasVideo = (post as any)?.mediaItems?.some?.((m: any) => m?.type === 'video');
+    const mediaType: 'image' | 'video' = hasVideo ? 'video' : 'image';
+    activateT0Ref.current = vperfFeedActivateStart('posts-tab');
+    const raf = requestAnimationFrame(() => {
+      vperfFeedActivateEnd({
+        t0: activateT0Ref.current,
+        idx: playingIdx,
+        mediaType,
+        earlyStarted: vperfConsumeEarlyStarted(ownerKey),
+      });
+    });
+    return () => cancelAnimationFrame(raf);
+  }, [playingIdx, posts]);
 
   const setActiveIndex = useClubhouseStore((s) => s.setActiveIndex);
   const setCarouselPosition = useClubhouseStore((s) => s.setCarouselPosition);
@@ -308,8 +396,9 @@ export const LightCardFeed: React.FC<LightCardFeedProps> = ({
             index={index}
             playingIdx={playingIdx}
             activeIdx={activeIdx}
+            earlyIdx={earlyIdx}
           >
-            {({ isActive, mountVideo }) => (
+            {({ isActive, mountVideo, earlyMotion }) => (
               <LightFeedCard
                 post={post}
                 liked={!!likeState?.liked}
@@ -324,6 +413,7 @@ export const LightCardFeed: React.FC<LightCardFeedProps> = ({
                 onOpenMedia={handleOpenMedia}
                 isActive={isActive}
                 mountVideo={mountVideo}
+                earlyMotion={earlyMotion}
                 initialMediaIndex={initialSlide}
                 onCarouselIndexChange={getCarouselChangeHandler(post.id)}
                 onFollow={onFollow}
@@ -340,6 +430,7 @@ export const LightCardFeed: React.FC<LightCardFeedProps> = ({
     [
       activeIdx,
       playingIdx,
+      earlyIdx,
       carouselPositions,
       getCarouselChangeHandler,
       getCommentCount,

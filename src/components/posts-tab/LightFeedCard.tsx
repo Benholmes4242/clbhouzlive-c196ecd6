@@ -93,6 +93,8 @@ export interface LightFeedCardProps {
   onCourse?: (post: FeedPost) => void;
   isActive?: boolean;
   mountVideo?: boolean;
+  /** Early-motion handover — see InlineVideo.earlyMotion. */
+  earlyMotion?: boolean;
   initialMediaIndex?: number;
   onCarouselIndexChange?: (post: FeedPost, idx: number) => void;
   onFollow?: (post: FeedPost) => void;
@@ -224,6 +226,7 @@ const LightFeedCardImpl: React.FC<LightFeedCardProps> = ({
   onCourse,
   isActive = false,
   mountVideo = false,
+  earlyMotion = false,
   initialMediaIndex = 0,
   onCarouselIndexChange,
   onFollow,
@@ -497,6 +500,7 @@ const LightFeedCardImpl: React.FC<LightFeedCardProps> = ({
                     item={media}
                     isActive={isActive}
                     isNear={mountVideo}
+                    earlyMotion={earlyMotion}
                     feedIndex={feedIndex}
                     postId={post.id}
                     ownerKey={`${post.id}:0`}

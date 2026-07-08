@@ -106,6 +106,8 @@ export interface FeedCardProps {
    * immediate neighbours; other cards show the thumbnail poster only.
    */
   mountVideo?: boolean;
+  /** Early-motion handover — see InlineVideo.earlyMotion. */
+  earlyMotion?: boolean;
   /** Initial carousel slide for multi-media posts (from persisted store). */
   initialMediaIndex?: number;
   /** Notified when user swipes the multi-media carousel. */
@@ -248,6 +250,7 @@ const FeedCardImpl: React.FC<FeedCardProps> = ({
   onCourse,
   isActive = false,
   mountVideo = false,
+  earlyMotion = false,
   initialMediaIndex = 0,
   onCarouselIndexChange,
   onFollow,
@@ -614,6 +617,7 @@ const FeedCardImpl: React.FC<FeedCardProps> = ({
                   item={media}
                   isActive={isActive}
                   isNear={mountVideo}
+                  earlyMotion={earlyMotion}
                   feedIndex={feedIndex}
                   postId={post.id}
                   ownerKey={`${post.id}:0`}
