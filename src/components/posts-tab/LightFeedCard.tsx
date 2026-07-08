@@ -226,6 +226,7 @@ const LightFeedCardImpl: React.FC<LightFeedCardProps> = ({
   onCourse,
   isActive = false,
   mountVideo = false,
+  earlyMotion = false,
   initialMediaIndex = 0,
   onCarouselIndexChange,
   onFollow,
