@@ -445,7 +445,16 @@ class VideoEngineImpl {
     // seeked to (or past) the requested position — preventing frame-0 flash.
     const markReadyToShow = (_source: string) => {
       if (lane.firstFrame) return;
-      if (lane.id !== 'fullscreen' && lane.id !== 'feed-active' && !lane.id.startsWith('rail-')) return;
+      // PR-A: feed-next / feed-prev added so early-motion can actually
+      // reveal moving frames while the card scrolls in (previously the
+      // lane played invisibly because firstFrame never flipped).
+      if (
+        lane.id !== 'fullscreen' &&
+        lane.id !== 'feed-active' &&
+        lane.id !== 'feed-next' &&
+        lane.id !== 'feed-prev' &&
+        !lane.id.startsWith('rail-')
+      ) return;
       const target = lane.startPosition > 0 ? lane.startPosition : 0;
       const now = lane.el.currentTime || 0;
       // With a seek target, wait until element playhead is at/past target - 0.3s.
