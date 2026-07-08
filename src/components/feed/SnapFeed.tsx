@@ -206,13 +206,59 @@ export function SnapFeed({
 
 
   // [BASELINE] feed.scroll sampler — subscribes to the outer scroll element.
+  // [PREDICT] Part 2 — coalesced velocity/direction sampling drives the
+  // PrefetchController: video cards predicted to enter the activation zone
+  // within ~1.5s get their HLS manifest + first-rung segment fetched into
+  // the browser HTTP cache before the user arrives.
   useEffect(() => {
     const el = containerRef.current;
     if (!el) return;
-    const onScroll = () => vperfFeedScrollTick('snapfeed');
+    let lastTop = el.scrollTop;
+    let lastTs = performance.now();
+    let lastDir: 1 | -1 | 0 = 0;
+    const onScroll = () => {
+      vperfFeedScrollTick('snapfeed');
+      const now = performance.now();
+      const top = el.scrollTop;
+      const dt = now - lastTs;
+      const dy = top - lastTop;
+      lastTs = now;
+      lastTop = top;
+      if (dt <= 0) return;
+      const vel = dy / dt; // px per ms (signed)
+      const dir: 1 | -1 | 0 = vel > 0.02 ? 1 : vel < -0.02 ? -1 : 0;
+      if (dir === 0) return;
+      if (lastDir !== 0 && dir !== lastDir) {
+        PrefetchController.abortAll('reversedDir');
+      }
+      lastDir = dir;
+      const slideH = el.clientHeight || window.innerHeight;
+      if (slideH <= 0) return;
+      const activeIdx = Math.round(top / slideH);
+      const allPosts = postsRef.current;
+      const speed = Math.abs(vel);
+      // Look at the two upcoming slides in scroll direction.
+      for (let k = 1; k <= 2; k++) {
+        const idx = activeIdx + dir * k;
+        if (idx < 0 || idx >= allPosts.length) continue;
+        const post = allPosts[idx];
+        if (!post) continue;
+        const media0 = post.mediaItems?.[0];
+        if (!media0 || media0.type !== 'video') continue;
+        const hlsUrl = (media0 as any).hlsUrl as string | undefined;
+        if (!hlsUrl) continue;
+        const slideTop = idx * slideH;
+        const distance = Math.abs(slideTop - top);
+        const arrivalMs = distance / speed;
+        if (arrivalMs > 0 && arrivalMs <= 1500) {
+          PrefetchController.request(`${post.id}:0`, hlsUrl);
+        }
+      }
+    };
     el.addEventListener('scroll', onScroll, { passive: true });
     return () => el.removeEventListener('scroll', onScroll);
   }, []);
+
 
 
   // NOTE: no route-change pauseAll here — the VideoEngine owns per-lane
