@@ -374,12 +374,14 @@ export const CardFeed = forwardRef<CardFeedHandle, CardFeedProps>(function CardF
       if (prevEarly !== cand && ratio < EARLY_MOTION_FRACTION) return -1;
       if (ratio < EARLY_MOTION_CLEAR) return -1;
 
-      // Warm-only guard — never force a cold HLS attach at 12%.
-      // Down-scroll uses feed-next; up-scroll uses feed-prev (PR-A).
+      // Warm-only guard — never force a cold HLS attach at 12%. Resolve
+      // via role: down-scroll consults role='next'; up-scroll consults
+      // role='prev'. Rotation may have re-pointed those roles to any
+      // physical feed lane — the role lookup handles that transparently.
       const cardPost = postsRef.current[cand];
       if (!cardPost) return -1;
       try {
-        const laneId = dir > 0 ? 'feed-next' : 'feed-prev';
+        const laneId = feedLaneRoles.laneForRole(dir > 0 ? 'next' : 'prev');
         const snap = VideoEngine.snapshot(laneId);
         const warm = snap.postId != null &&
           (snap.postId === cardPost.id || snap.postId === `${cardPost.id}:0`) &&
