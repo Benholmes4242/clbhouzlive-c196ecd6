@@ -392,9 +392,17 @@ export const CardFeed = forwardRef<CardFeedHandle, CardFeedProps>(function CardF
     const onScroll = () => {
       // Signed scroll direction — reused as a directional tie-break in recheckActive.
       const st = scrollerElRef.current?.scrollTop ?? window.scrollY;
+      const now = performance.now();
       const dy = st - lastScrollTopRef.current;
+      const dt = Math.max(1, now - (lastScrollTsRef.current || now));
+      // Instant velocity in px/ms. EMA-smoothed so a single jitter tick
+      // doesn't flip the flick verdict on/off; enough responsiveness to
+      // catch real flicks within one frame.
+      const inst = Math.abs(dy) / dt;
+      scrollVelocityRef.current = scrollVelocityRef.current * 0.5 + inst * 0.5;
       if (Math.abs(dy) > 0.5) scrollDirRef.current = dy > 0 ? 1 : -1;
       lastScrollTopRef.current = st;
+      lastScrollTsRef.current = now;
       if (raf) return;
       raf = requestAnimationFrame(() => {
         raf = 0;
@@ -407,6 +415,49 @@ export const CardFeed = forwardRef<CardFeedHandle, CardFeedProps>(function CardF
       if (raf) cancelAnimationFrame(raf);
     };
   }, [recheckActive]);
+
+  // Clear earlyIdx whenever the current earlyIdx is promoted to playingIdx —
+  // the useEffect in InlineVideo already cleans up (unmount + accumulate
+  // dualActiveMs) when earlyMotion flips false, so the incoming feed-active
+  // mount lands into an empty host as required.
+  useEffect(() => {
+    if (earlyIdx === playingIdx && earlyIdx !== -1) setEarlyIdx(-1);
+  }, [earlyIdx, playingIdx]);
+
+  // Fullscreen open — clear earlyIdx so the InlineVideo cleanup runs
+  // (pause + unmount feed-next) instead of leaving a stale early lane behind
+  // the borrowed feed-active. pauseAll from viewer-open pauses playback
+  // regardless; this clears the DOM residue.
+  const fsIsOpen = useFullscreenFeedStore((s) => s.isOpen);
+  useEffect(() => {
+    if (fsIsOpen && earlyIdx !== -1) setEarlyIdx(-1);
+  }, [fsIsOpen, earlyIdx]);
+
+  // ── Activation scorecard ────────────────────────────────────────────
+  // Emit one feed.activate line per promotion so early-motion telemetry
+  // (earlyStarted + running dualActiveMs) is visible in every capture.
+  // SnapFeed owns the fullscreen equivalent; this covers the inline feed.
+  const activateT0Ref = useRef<number>(0);
+  useEffect(() => {
+    const post = posts[playingIdx];
+    if (!post) return;
+    const ownerKey = `${post.id}:0`;
+    const hasVideo = (post as any)?.mediaItems?.some?.((m: any) => m?.type === 'video');
+    const mediaType: 'image' | 'video' = hasVideo ? 'video' : 'image';
+    activateT0Ref.current = vperfFeedActivateStart('clubhouse');
+    // Resolve on next frame — feed-active event wiring already emits its
+    // own [VPERF] lines; here we just need earlyStarted + dualActiveMs.
+    const raf = requestAnimationFrame(() => {
+      vperfFeedActivateEnd({
+        t0: activateT0Ref.current,
+        idx: playingIdx,
+        mediaType,
+        earlyStarted: vperfConsumeEarlyStarted(ownerKey),
+      });
+    });
+    return () => cancelAnimationFrame(raf);
+  }, [playingIdx, posts]);
+
 
   // Virtuoso's rangeChanged kept as a no-op; center-proximity owns activeIdx.
   const handleRangeChanged = useCallback(
