@@ -199,6 +199,15 @@ function getDetail(n: ActivityNotification): string | null {
       const reason = d.reason || d.note || n.message;
       return reason ? truncate(reason, 160) : null;
     }
+    // Friend request / accepted: title already reads "{Name} {verb}".
+    // The trigger's enriched `message` is a full sentence starting with the
+    // same name, so echoing it below the title double-speaks. Suppress the
+    // detail line for these single-line social rows. Push copy is unaffected
+    // (push notifications read n.message directly, not this renderer).
+    case 'friend_request':
+    case 'friend_request_sent':
+    case 'friend_accepted':
+      return null;
     default: {
       // For system / support / handicap / anything without special copy,
       // surface the message so nothing renders blank.
