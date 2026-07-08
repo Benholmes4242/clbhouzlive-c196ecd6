@@ -15,6 +15,22 @@ export function getNotificationActionText(n: ActivityNotification): string {
         : 'commented on your post';
     case 'comment_reply':
       return 'replied to your comment';
+    case 'top_ten_comment': {
+      // `data.course_name` populated by the enriched trigger (routed to Ben).
+      // Until applied, all rows gracefully render without the course name.
+      const courseName = (n as any).data?.course_name as string | undefined;
+      return courseName
+        ? `commented on your ${courseName} Top 10`
+        : 'commented on your Top 10';
+    }
+    case 'top_ten_reply': {
+      // Dormant — no reply UI exists yet; branch present so the day the UI
+      // ships, the notification renders correctly without another patch.
+      const courseName = (n as any).data?.course_name as string | undefined;
+      return courseName
+        ? `replied to your comment on ${courseName}`
+        : 'replied to your Top 10 comment';
+    }
     case 'follow':
       return 'started following you';
     case 'new_post':

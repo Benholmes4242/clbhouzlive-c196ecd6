@@ -132,6 +132,16 @@ function getVerb(n: ActivityNotification): string {
     case 'comment':
     case 'comment_post': return 'commented on your post';
     case 'comment_reply': return 'replied to your comment';
+    case 'top_ten_comment': {
+      // Course-aware phrasing when the enriched trigger has populated
+      // data.course_name; otherwise fall back to a course-less variant.
+      const cn = (n.data as any)?.course_name as string | undefined;
+      return cn ? `commented on your ${cn} Top 10` : 'commented on your Top 10';
+    }
+    case 'top_ten_reply': {
+      const cn = (n.data as any)?.course_name as string | undefined;
+      return cn ? `replied to your comment on ${cn}` : 'replied to your Top 10 comment';
+    }
     case 'mention':
     case 'mention_post':
     case 'comment_mention':
@@ -199,13 +209,17 @@ function getDetail(n: ActivityNotification): string | null {
       const reason = d.reason || d.note || n.message;
       return reason ? truncate(reason, 160) : null;
     }
-    // Friend request / accepted: title already reads "{Name} {verb}".
-    // The trigger's enriched `message` is a full sentence starting with the
-    // same name, so echoing it below the title double-speaks. Suppress the
-    // detail line for these single-line social rows. Push copy is unaffected
-    // (push notifications read n.message directly, not this renderer).
+    // Types whose enriched trigger message is a FULL SENTENCE that begins
+    // with the actor's name — echoing it below the composed title line
+    // double-speaks. Suppress the detail line for these single-line social
+    // rows. Push copy is unaffected (push reads n.message directly, not
+    // this renderer). See ship-note Item 4 for the full audit table.
     case 'friend_request':
     case 'friend_request_sent':
+    case 'follow':
+    case 'new_post':
+    case 'business_member_added':
+    case 'business_team_member_joined':
       return null;
     case 'friend_accepted':
       return "You're now connected";

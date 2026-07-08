@@ -19,6 +19,10 @@ interface FavouritesCarouselProps {
   className?: string;
   onManage?: () => void;
   displayName?: string;
+  /** Deep-link consumption for top_ten_comment notifications (Item 2B). */
+  initialCourseId?: string | null;
+  initialCommentId?: string | null;
+  initialParentCommentId?: string | null;
 }
 
 export const FavouritesCarousel: React.FC<FavouritesCarouselProps> = ({
@@ -27,6 +31,9 @@ export const FavouritesCarousel: React.FC<FavouritesCarouselProps> = ({
   className,
   onManage,
   displayName,
+  initialCourseId = null,
+  initialCommentId = null,
+  initialParentCommentId = null,
 }) => {
   const navigate = useNavigate();
   const { topTen, isLoading } = useUserTopTenCourses(userId);
@@ -107,6 +114,24 @@ export const FavouritesCarousel: React.FC<FavouritesCarouselProps> = ({
       return () => container.removeEventListener('scroll', handleScroll);
     }
   }, [handleScroll]);
+
+  // Scroll the deep-linked card into view once the list has data (Item 2B).
+  const didScrollToDeepLink = useRef(false);
+  useEffect(() => {
+    if (didScrollToDeepLink.current) return;
+    if (!initialCourseId || topTen.length === 0) return;
+    const container = scrollContainerRef.current;
+    if (!container) return;
+    const target = container.querySelector<HTMLElement>(
+      `[data-top-ten-course-id="${initialCourseId}"]`,
+    );
+    if (!target) return;
+    didScrollToDeepLink.current = true;
+    // Next frame so layout is stable.
+    requestAnimationFrame(() => {
+      target.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+    });
+  }, [initialCourseId, topTen.length]);
 
 
   const firstName = displayName?.split(' ')[0] || 'Their';
@@ -226,9 +251,14 @@ export const FavouritesCarousel: React.FC<FavouritesCarouselProps> = ({
         {topTen.map((course) => {
           const ratingData = ratingsMap[course.course_id];
           const displayRating = course.rating ?? ratingData?.rating;
-          
+          const isDeepLinked = !!initialCourseId && course.course_id === initialCourseId;
+
           return (
-            <div key={course.id} className="snap-center flex-shrink-0">
+            <div
+              key={course.id}
+              className="snap-center flex-shrink-0"
+              data-top-ten-course-id={course.course_id}
+            >
               <Top10CourseCard
                 course={course}
                 position={course.position}
@@ -236,6 +266,8 @@ export const FavouritesCarousel: React.FC<FavouritesCarouselProps> = ({
                 isOwnProfile={isOwnProfile}
                 userId={userId}
                 privacySetting={privacyData ?? 'followers'}
+                initialCommentId={isDeepLinked ? initialCommentId : null}
+                initialParentCommentId={isDeepLinked ? initialParentCommentId : null}
               />
             </div>
           );

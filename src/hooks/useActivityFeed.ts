@@ -206,8 +206,11 @@ function getContextUrl(notification: any): string {
     if (sourceType === 'top_ten_comment') {
       const targetId = data?.target_user_id ?? notification.user_id;
       const commentId = data?.top_ten_comment_id;
-      const q = commentId ? `&top_ten_comment=${commentId}` : '';
-      return `/profile/${targetId}?tab=courses${q}`;
+      const courseId = data?.course_id;
+      const parts = [`tab=courses`];
+      if (courseId) parts.push(`course=${courseId}`);
+      if (commentId) parts.push(`top_ten_comment=${commentId}`);
+      return `/profile/${targetId}?${parts.join('&')}`;
     }
   }
 
@@ -255,9 +258,20 @@ function getContextUrl(notification: any): string {
   if (entity_type === 'club' && entity_id) {
     return `/clubs/${entity_id}`;
   }
-  if (entity_type === 'top_ten') {
+  // Native top-ten comment / reply notifications (not via 'mention'). The
+  // trigger writes entity_type='top_ten' with data.top_ten_comment_id +
+  // course_id + target_user_id. Reply carries data.parent_comment_id so the
+  // sheet can expand + scroll to it.
+  if (type === 'top_ten_comment' || type === 'top_ten_reply' || entity_type === 'top_ten') {
     const targetId = data?.target_user_id ?? notification.user_id;
-    return `/profile/${targetId}?tab=courses`;
+    const commentId = data?.top_ten_comment_id ?? data?.comment_id;
+    const courseId = data?.course_id;
+    const parentId = data?.parent_comment_id;
+    const parts = [`tab=courses`];
+    if (courseId) parts.push(`course=${courseId}`);
+    if (commentId) parts.push(`top_ten_comment=${commentId}`);
+    if (parentId) parts.push(`top_ten_parent=${parentId}`);
+    return `/profile/${targetId}?${parts.join('&')}`;
   }
   // Business verification outcome — deep-link to the verification hub
   if (

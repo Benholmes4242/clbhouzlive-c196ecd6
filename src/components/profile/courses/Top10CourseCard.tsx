@@ -29,6 +29,9 @@ interface Top10CourseCardProps {
   isOwnProfile?: boolean;
   userId?: string;
   privacySetting?: string;
+  /** Deep-link: auto-open the comments sheet and scroll to this comment id. */
+  initialCommentId?: string | null;
+  initialParentCommentId?: string | null;
 }
 
 export const Top10CourseCard: React.FC<Top10CourseCardProps> = ({
@@ -39,14 +42,25 @@ export const Top10CourseCard: React.FC<Top10CourseCardProps> = ({
   isOwnProfile = true,
   userId,
   privacySetting,
+  initialCommentId = null,
+  initialParentCommentId = null,
 }) => {
   const [commentsOpen, setCommentsOpen] = useState(false);
   const [tappedReaction, setTappedReaction] = useState<string | null>(null);
-  
+
   const { user } = useSupabaseSession();
   const targetUserId = userId ?? '';
   const { counts, myReaction, toggleReaction } = useTopTenReactions(targetUserId, course.course_id);
-  
+
+  // Auto-open the sheet when this card is the deep-link target (Item 2B).
+  const didAutoOpen = React.useRef(false);
+  React.useEffect(() => {
+    if (didAutoOpen.current) return;
+    if (!initialCommentId) return;
+    didAutoOpen.current = true;
+    setCommentsOpen(true);
+  }, [initialCommentId]);
+
   const handleCardClick = () => {
     setCommentsOpen(true);
   };
@@ -238,6 +252,8 @@ export const Top10CourseCard: React.FC<Top10CourseCardProps> = ({
         courseName={course.name}
         isOwnProfile={isOwnProfile ?? true}
         privacySetting={privacySetting ?? 'followers'}
+        initialCommentId={initialCommentId}
+        initialParentCommentId={initialParentCommentId}
       />
     </>
   );
