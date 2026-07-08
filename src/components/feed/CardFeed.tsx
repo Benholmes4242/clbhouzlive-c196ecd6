@@ -303,16 +303,23 @@ export const CardFeed = forwardRef<CardFeedHandle, CardFeedProps>(function CardF
       if (!post || !m || m.type !== 'video' || !(m as any).hlsUrl) return;
       try {
         const laneId = feedLaneRoles.laneForRole(role);
+        // Canonical owner key: primary media of a feed post is `${postId}:0`
+        // — matches what InlineVideo's `resolvedOwnerKey` stamps on load/play.
+        // Passing bare `post.id` here causes VideoEngine.alreadyLoaded to
+        // MISS on promotion (`abc` vs `abc:0`), forcing a reload → poster
+        // flash → stale-resume. Normalise at the write site.
+        const ownerKey = `${post.id}:0`;
         VideoEngine.preload(laneId, {
           hlsUrl: (m as any).hlsUrl,
           posterUrl: (m as any).thumbnailUrl ?? null,
-          postId: post.id,
+          postId: ownerKey,
         });
       } catch { /* engine may not be booted yet — safe to ignore */ }
     };
     warm('next', posts[playingIdx + 1]);
     warm('prev', posts[playingIdx - 1]);
   }, [playingIdx, posts]);
+
 
 
   const recheckActive = useCallback(() => {
