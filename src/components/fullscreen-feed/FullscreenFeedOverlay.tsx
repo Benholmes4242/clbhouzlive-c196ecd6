@@ -29,6 +29,7 @@ import { getActorRouteByType } from '@/types/actor';
 
 import { isPerfEnabled } from '@/perf/navTiming';
 import { VideoEngine } from '@/video/VideoEngine';
+import { feedLaneRoles } from '@/video/feedLaneRoles';
 import { RailLanePool } from '@/video/railLanePool';
 import { originHostRegistry } from '@/video/originHostRegistry';
 import type { BorrowDescriptor } from '@/store/fullscreenFeedStore';
