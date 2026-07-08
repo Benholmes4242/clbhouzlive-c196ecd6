@@ -127,13 +127,24 @@ export const LightCardFeed: React.FC<LightCardFeedProps> = ({
   const recheckActive = useCallback(() => {
     let bestIdx = -1;
     let bestRatio = 0;
+    const eligible: number[] = [];
     visibilityRef.current.forEach((ratio, idx) => {
       if (ratio > bestRatio) { bestRatio = ratio; bestIdx = idx; }
+      if (ratio >= PLAY_IN) eligible.push(idx);
     });
+
+    // Directional tie-break: prefer the card entering in the scroll direction.
+    let dirWinner = -1;
+    if (eligible.length > 1 && scrollDirRef.current !== 0) {
+      dirWinner = scrollDirRef.current > 0
+        ? Math.max(...eligible)
+        : Math.min(...eligible);
+    }
 
     setActiveIdx((prev) => {
       const prevRatio = prev >= 0 ? (visibilityRef.current.get(prev) ?? 0) : 0;
       if (prev >= 0 && prevRatio >= PLAY_OUT && (bestRatio - prevRatio) < HYSTERESIS) return prev;
+      if (dirWinner >= 0) return dirWinner;
       if (bestIdx >= 0 && bestRatio >= PLAY_IN) return bestIdx;
       if (prev >= 0 && prevRatio >= PLAY_OUT) return prev;
       return bestIdx >= 0 && bestRatio >= PLAY_OUT ? bestIdx : prev;
