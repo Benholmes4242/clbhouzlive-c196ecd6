@@ -578,26 +578,26 @@ export function CinematicHeroFullBleed({
           style={{
             position: 'relative',
             zIndex: 2,
-            padding: '16px 18px 18px',
+            padding: '12px 18px 14px',
             borderTop: '0.5px solid rgba(255,255,255,0.10)',
             background:
               'linear-gradient(180deg, rgba(232,194,106,0.06) 0%, rgba(232,194,106,0) 100%)',
             display: 'flex',
             alignItems: 'center',
-            gap: 14,
+            gap: 12,
           }}
         >
           <SquircleAvatar
             srcCandidates={champion.avatarCandidates ?? (champion.avatarUrl ? [champion.avatarUrl] : [])}
             alt={champion.name}
-            size={56}
+            size={48}
             hairlineRing
             ringColor={GOLD_RING}
           />
-          <div style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', gap: 4 }}>
+          <div style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', gap: 3 }}>
             <span
               style={{
-                fontSize: 9.5,
+                fontSize: 9,
                 fontWeight: 800,
                 letterSpacing: '0.14em',
                 color: GOLD,
@@ -608,7 +608,7 @@ export function CinematicHeroFullBleed({
             </span>
             <span
               style={{
-                fontSize: 22,
+                fontSize: 19,
                 fontWeight: 800,
                 color: 'white',
                 lineHeight: 1.05,
@@ -624,7 +624,7 @@ export function CinematicHeroFullBleed({
               <span
                 style={{
                   ...NUMERIC_STYLE,
-                  fontSize: 18,
+                  fontSize: 16,
                   fontWeight: 800,
                   letterSpacing: '-0.02em',
                   color: LEADER_GREEN,
