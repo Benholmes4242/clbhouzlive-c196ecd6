@@ -344,7 +344,7 @@ export function useHeroCarouselData() {
       // major from a non-PGA tour into upcomingByTour['pga'] so it competes there by date.
       const crossTourMajors = upcomingTournaments
         .map(t => transformTournament(t, false))
-        .filter(t => t.isMajor && t.tourSlug !== 'pga');
+        .filter(t => getMajorType(t.name || '') === 'mens' && t.tourSlug !== 'pga');
 
       crossTourMajors.forEach(major => {
         const alreadyInPga = upcomingByTour['pga'].some(t => t.id === major.id);
