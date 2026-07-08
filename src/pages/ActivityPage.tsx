@@ -272,6 +272,8 @@ const ActivityPage: React.FC = () => {
     return sections.filter((s) => s.items.length > 0);
   }, [data, chip]);
 
+  if (isRehydrating) return <ActivityPageSkeleton />;
+
   const hasNotifications = allItems.length > 0;
   const showSkeleton = !data;
   const showEmptyState = !!data && !hasNotifications && !isFetching;
