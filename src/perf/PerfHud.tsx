@@ -48,15 +48,17 @@ export const PerfHud = memo(function PerfHud() {
 
   if (!enabled) return null;
 
+  if (typeof document === 'undefined') return null;
+
   if (!expanded) {
-    return (
+    return createPortal(
       <button
         onClick={() => setExpanded(true)}
         style={{
           position: 'fixed',
           top: 8,
           right: 8,
-          zIndex: 99999,
+          zIndex: Z.logHud,
           padding: '2px 6px',
           fontSize: 10,
           fontFamily: 'monospace',
@@ -70,9 +72,11 @@ export const PerfHud = memo(function PerfHud() {
         aria-label="Open PerfHud"
       >
         PERF
-      </button>
+      </button>,
+      document.body
     );
   }
+
 
   const cur = snap.current;
   const recent = snap.recent;
