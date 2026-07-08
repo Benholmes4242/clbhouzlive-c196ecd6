@@ -233,9 +233,14 @@ export const FavouritesCarousel: React.FC<FavouritesCarouselProps> = ({
         {topTen.map((course) => {
           const ratingData = ratingsMap[course.course_id];
           const displayRating = course.rating ?? ratingData?.rating;
-          
+          const isDeepLinked = !!initialCourseId && course.course_id === initialCourseId;
+
           return (
-            <div key={course.id} className="snap-center flex-shrink-0">
+            <div
+              key={course.id}
+              className="snap-center flex-shrink-0"
+              data-top-ten-course-id={course.course_id}
+            >
               <Top10CourseCard
                 course={course}
                 position={course.position}
@@ -243,6 +248,8 @@ export const FavouritesCarousel: React.FC<FavouritesCarouselProps> = ({
                 isOwnProfile={isOwnProfile}
                 userId={userId}
                 privacySetting={privacyData ?? 'followers'}
+                initialCommentId={isDeepLinked ? initialCommentId : null}
+                initialParentCommentId={isDeepLinked ? initialParentCommentId : null}
               />
             </div>
           );
