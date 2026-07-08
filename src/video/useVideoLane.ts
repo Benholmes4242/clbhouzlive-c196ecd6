@@ -14,6 +14,7 @@
 
 import { useEffect, useRef, useState } from 'react';
 import { VideoEngine, type LaneId, type LaneSnapshot } from './VideoEngine';
+import { useCreationOverlayStore } from '@/stores/creationOverlayStore';
 
 
 
