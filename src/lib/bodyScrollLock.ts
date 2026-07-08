@@ -36,6 +36,9 @@ export function lockBodyScroll() {
       width: document.body.style.width,
       scrollY,
     };
+    lockOwnerPath = (typeof window !== 'undefined')
+      ? window.location.pathname + window.location.search
+      : null;
     document.body.style.overflow = 'hidden';
     document.body.style.position = 'fixed';
     document.body.style.top = `-${scrollY}px`;
