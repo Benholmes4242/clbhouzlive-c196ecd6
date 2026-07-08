@@ -39,6 +39,11 @@ export const Z = {
   // because composers live inside CommentsSheet / TopTenCardComments / etc.
   mentionsPanel: 12010,
 
+  // LogHud floating button + panel — portals to <body>; must clear wizard
+  // (z-[9999]), Composer overlays (10001), and mentionsPanel (12010) so the
+  // LOG button remains tappable on-device while wizards are open.
+  logHud: 13000,
+
   
   // Utility classes for inline styles
   asStyle: {
@@ -58,7 +63,9 @@ export const Z = {
     dropdownScrim: { zIndex: 50 },
     dropdownMenu: { zIndex: 60 },
     mentionsPanel: { zIndex: 12010 },
+    logHud: { zIndex: 13000 },
   }
+
 
 } as const;
 
