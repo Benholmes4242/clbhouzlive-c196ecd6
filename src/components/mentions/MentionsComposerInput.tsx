@@ -58,55 +58,72 @@ async function searchMentions(
   render: (data: SuggestionDataItem[]) => void,
 ) {
   const q = (query ?? '').trim();
+  // [MENTIONS-DIAG] entry — temporary instrumentation, no logic change.
+  console.info('[MENTIONS] search', { q });
   if (q.length === 0) {
     render([]);
     return;
   }
   const like = `%${q.replace(/[%_]/g, ch => '\\' + ch)}%`;
-  const [users, businesses] = await Promise.all([
-    supabase
-      .from('user_profiles')
-      .select('id, display_name, username, profile_photo_url, is_verified')
-      .or(`display_name.ilike.${like},username.ilike.${like},first_name.ilike.${like}`)
-      .eq('is_suspended', false)
-      .limit(6),
-    supabase
-      .from('business_accounts')
-      .select('id, name, logo_url, is_verified, city, country')
-      .ilike('name', like)
-      .eq('is_deleted', false)
-      .limit(4),
-  ]);
+  try {
+    const [users, businesses] = await Promise.all([
+      supabase
+        .from('user_profiles')
+        .select('id, display_name, username, profile_photo_url, is_verified')
+        .or(`display_name.ilike.${like},username.ilike.${like},first_name.ilike.${like}`)
+        .eq('is_suspended', false)
+        .limit(6),
+      supabase
+        .from('business_accounts')
+        .select('id, name, logo_url, is_verified, city, country')
+        .ilike('name', like)
+        .eq('is_deleted', false)
+        .limit(4),
+    ]);
 
-  const userRows: RichSuggestion[] = (users.data ?? []).map(u => ({
-    id: `u:${u.id}`,
-    display: u.display_name || u.username || 'Golfer',
-    secondary: u.username ? `@${u.username}` : undefined,
-    avatarUrl: u.profile_photo_url ?? null,
-    isVerified: !!u.is_verified,
-    kind: 'user',
-  }));
-  const bizRows: RichSuggestion[] = (businesses.data ?? []).map(b => ({
-    id: `b:${b.id}`,
-    display: b.name,
-    secondary: [b.city, b.country].filter(Boolean).join(', ') || undefined,
-    avatarUrl: b.logo_url ?? null,
-    isVerified: !!b.is_verified,
-    kind: 'business',
-  }));
+    // [MENTIONS-DIAG] post-fetch — surface both errors and counts.
+    console.info('[MENTIONS] results', {
+      q,
+      usersErr: users.error, usersCount: users.data?.length ?? null,
+      bizErr:   businesses.error, bizCount: businesses.data?.length ?? null,
+    });
 
-  const rank = (s: RichSuggestion) => {
-    const d = s.display.toLowerCase();
-    const qs = q.toLowerCase();
-    if (d.startsWith(qs)) return 0;
-    if (s.secondary?.toLowerCase().includes(qs)) return 1;
-    return 2;
-  };
-  const merged = [...userRows, ...bizRows]
-    .sort((a, b) => rank(a) - rank(b))
-    .slice(0, 6);
+    const userRows: RichSuggestion[] = (users.data ?? []).map(u => ({
+      id: `u:${u.id}`,
+      display: u.display_name || u.username || 'Golfer',
+      secondary: u.username ? `@${u.username}` : undefined,
+      avatarUrl: u.profile_photo_url ?? null,
+      isVerified: !!u.is_verified,
+      kind: 'user',
+    }));
+    const bizRows: RichSuggestion[] = (businesses.data ?? []).map(b => ({
+      id: `b:${b.id}`,
+      display: b.name,
+      secondary: [b.city, b.country].filter(Boolean).join(', ') || undefined,
+      avatarUrl: b.logo_url ?? null,
+      isVerified: !!b.is_verified,
+      kind: 'business',
+    }));
 
-  render(merged);
+    const rank = (s: RichSuggestion) => {
+      const d = s.display.toLowerCase();
+      const qs = q.toLowerCase();
+      if (d.startsWith(qs)) return 0;
+      if (s.secondary?.toLowerCase().includes(qs)) return 1;
+      return 2;
+    };
+    const merged = [...userRows, ...bizRows]
+      .sort((a, b) => rank(a) - rank(b))
+      .slice(0, 6);
+
+    // [MENTIONS-DIAG] pre-render — row count actually handed to library.
+    console.info('[MENTIONS] render', { q, rows: merged.length });
+    render(merged);
+  } catch (e) {
+    // [MENTIONS-DIAG] catch — proves whether the awaited path threw.
+    console.warn('[MENTIONS] search threw', { q, err: e });
+    render([]);
+  }
 }
 
 export interface MentionsTextStyle {
