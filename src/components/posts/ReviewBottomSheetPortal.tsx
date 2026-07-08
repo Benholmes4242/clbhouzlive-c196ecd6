@@ -26,11 +26,14 @@ export const ReviewBottomSheetPortal: React.FC = () => {
 
   // Pause every engine lane when the sheet opens. Null-caller = engine-wide
   // pause, which also passes the borrow-guard so a borrowed feed lane stops.
-  // We don't auto-resume on close — the user's mute preference and the
-  // SnapFeed activation mutex take over.
+  // On close, bump the creation-overlay store so the visible feed surface
+  // re-issues play-intent for its current active card (IG-standard resume).
   useEffect(() => {
     if (isOpen) {
       try { VideoEngine.pauseAll(); } catch {}
+      return () => {
+        try { useCreationOverlayStore.getState().notifyClosed(); } catch {}
+      };
     }
   }, [isOpen]);
 
