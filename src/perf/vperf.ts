@@ -307,6 +307,7 @@ export function vperfSessionStart(
     el?: HTMLVideoElement | null;
     startLevel?: number | null;
     bwEstimate?: number | null;
+    seededBw?: number | null;
   },
 ): void {
   if (!on()) return;
@@ -320,7 +321,7 @@ export function vperfSessionStart(
     laneId,
     t0: performance.now(),
     meta: (() => {
-      const { el, startLevel, bwEstimate, ...rest } = meta;
+      const { el, startLevel, bwEstimate, seededBw, ...rest } = meta;
       return rest;
     })(),
     stallCount: 0,
@@ -334,6 +335,9 @@ export function vperfSessionStart(
     endLevel: meta.startLevel ?? null,
     levelSwitches: 0,
     bwEstimateStart: meta.bwEstimate ?? null,
+    bwEstimateEnd: meta.bwEstimate ?? null,
+    seededBw: meta.seededBw ?? null,
+
     timer: setTimeout(() => {
       // Absolute ceiling: 5-min sessions get flushed so long-running lanes
       // don't accumulate silently.
