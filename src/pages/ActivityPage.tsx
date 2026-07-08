@@ -148,7 +148,9 @@ const ActivityPage: React.FC = () => {
 
   useEffect(() => () => { queryClient.invalidateQueries({ queryKey: ['activity-feed'] }); }, [queryClient]);
 
-  if (isRehydrating) return <ActivityPageSkeleton />;
+  // NOTE: isRehydrating early-return moved BELOW the useMemos so hook order
+  // stays stable across the rehydration flip (was crashing with
+  // "Rendered more hooks than during the previous render").
 
   // ---- Mutations ----
   const handleMarkRead = async (id: string) => {
@@ -252,23 +254,28 @@ const ActivityPage: React.FC = () => {
   const groups = useMemo(() => {
     const b = data?.buckets;
     if (!b) return [];
-    // `new` = unread subset of today's items; `today` = all today items.
-    // Merge with id-dedupe so unread today rows don't render twice
-    // (repro: any friend_request/friend_accepted lands in both buckets).
+    // `new` is unread items across ALL dates (useActivityFeed filters purely
+    // by is_unread). Naively concatenating `new` into Today while also
+    // rendering yesterday/thisWeek/earlier duplicates any unread row from
+    // an older bucket. Dedupe every date section against `new` by id so
+    // each notification renders exactly once.
+    // Repro before fix: any single unread friend_request / friend_accepted
+    // row rendered twice (once in Today via `new`, once in its own bucket).
     const newItems = b.new ?? [];
     const newIds = new Set(newItems.map((n) => n.id));
-    const combineToday = [
-      ...newItems,
-      ...(b.today ?? []).filter((n) => !newIds.has(n.id)),
-    ];
+    const dedupe = (arr: ActivityNotification[]) =>
+      arr.filter((n) => !newIds.has(n.id));
+    const combineToday = [...newItems, ...dedupe(b.today ?? [])];
     const sections = [
       { label: 'Today', items: combineToday.filter((n) => matchesChip(n, chip)) },
-      { label: 'Yesterday', items: (b.yesterday ?? []).filter((n) => matchesChip(n, chip)) },
-      { label: 'This week', items: (b.thisWeek ?? []).filter((n) => matchesChip(n, chip)) },
-      { label: 'Earlier', items: (b.earlier ?? []).filter((n) => matchesChip(n, chip)) },
+      { label: 'Yesterday', items: dedupe(b.yesterday ?? []).filter((n) => matchesChip(n, chip)) },
+      { label: 'This week', items: dedupe(b.thisWeek ?? []).filter((n) => matchesChip(n, chip)) },
+      { label: 'Earlier', items: dedupe(b.earlier ?? []).filter((n) => matchesChip(n, chip)) },
     ];
     return sections.filter((s) => s.items.length > 0);
   }, [data, chip]);
+
+  if (isRehydrating) return <ActivityPageSkeleton />;
 
   const hasNotifications = allItems.length > 0;
   const showSkeleton = !data;
