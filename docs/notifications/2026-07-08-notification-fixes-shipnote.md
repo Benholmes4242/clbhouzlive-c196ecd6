@@ -44,20 +44,17 @@ Dedicated branches for `type='top_ten_comment'` and `type='top_ten_reply'`:
 The client renders correctly for all existing rows immediately (no backfill).
 The reply variant is dormant today — see `docs/notifications/2026-07-08-top-ten-reply-dormant.md`.
 
-### 2A — Trigger enrichment (SQL — ROUTED TO BEN, NOT APPLIED)
+### 2A — Trigger enrichment (SQL — SUPERSEDED / DO NOT RUN)
 
-The current `create_top_ten_comment_notification` writes `course_id` into
-`data` but not `course_name`. Enrichment mirrors the comment-trigger pattern
-(resolves the course name once and stores it on the payload — no per-row
-client queries).
-
-**Schema verification:** `top_ten_comments.course_id` → `golf_courses.id`
-(FK `top_ten_comments_course_id_fkey`, `src/integrations/supabase/types.ts:11456`).
-Course name lives at `golf_courses.name`.
+> **Stale draft — preserved below for diff context only.**  
+> **Do not run this block.** The live body is in the next section.
 
 ```sql
--- Ben: enriches create_top_ten_comment_notification to embed course_name
--- into notifications.data. Non-destructive; safe to re-run.
+-- SUPERSEDED / DO NOT RUN
+--
+-- This draft is missing: reply routing to parent commenter, self guard,
+-- bidirectional block guard, mention-markup strip, recipient_actor columns,
+-- ON CONFLICT bump, actor_avatar, comment_id alias, and correct title copy.
 
 CREATE OR REPLACE FUNCTION public.create_top_ten_comment_notification()
 RETURNS TRIGGER
@@ -114,6 +111,124 @@ BEGIN
       'comment',            v_body_preview
     )
   );
+
+  RETURN NEW;
+END;
+$$;
+```
+
+### 2A — create_top_ten_comment_notification — as live, manually applied by Ben 2026-07-08
+
+This is the **canonical** body now in production. It supersedes the stale draft above.
+
+```sql
+-- create_top_ten_comment_notification — as live, manually applied by Ben
+-- 2026-07-08 (supersedes the stale draft in section 2A — DO NOT RUN that one).
+-- Preserves: reply routing to parent commenter, self guard, bidirectional
+-- block guard, mention-markup strip, recipient_actor columns, ON CONFLICT
+-- bump. Adds: course_name resolution into title + data; actor avatar under
+-- both key conventions; comment_id alias alongside top_ten_comment_id.
+
+CREATE OR REPLACE FUNCTION public.create_top_ten_comment_notification()
+RETURNS TRIGGER
+LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path = public
+AS $$
+DECLARE
+  v_recipient_uid    UUID;
+  v_type             TEXT;
+  v_title_suffix     TEXT;
+  v_actor_name       TEXT;
+  v_actor_avatar     TEXT;
+  v_course_name      TEXT;
+  v_preview          TEXT;
+  v_parent_commenter UUID;
+BEGIN
+  IF NEW.parent_id IS NOT NULL THEN
+    SELECT commenter_id INTO v_parent_commenter
+      FROM public.top_ten_comments
+     WHERE id = NEW.parent_id;
+    IF v_parent_commenter IS NULL THEN
+      RETURN NEW;
+    END IF;
+    v_recipient_uid := v_parent_commenter;
+    v_type          := 'top_ten_reply';
+    v_title_suffix  := ' replied to your comment';
+  ELSE
+    v_recipient_uid := NEW.target_user_id;
+    v_type          := 'top_ten_comment';
+    v_title_suffix  := ' commented on your Top 10';
+  END IF;
+
+  IF v_recipient_uid = NEW.commenter_id THEN
+    RETURN NEW;
+  END IF;
+
+  IF EXISTS (
+    SELECT 1 FROM public.user_blocks
+     WHERE (blocker_id = v_recipient_uid AND blocked_id = NEW.commenter_id)
+        OR (blocker_id = NEW.commenter_id AND blocked_id = v_recipient_uid)
+  ) THEN
+    RETURN NEW;
+  END IF;
+
+  SELECT COALESCE(up.display_name, up.username, 'Someone'),
+         up.profile_photo_url
+    INTO v_actor_name, v_actor_avatar
+    FROM public.user_profiles up
+   WHERE up.id = NEW.commenter_id;
+
+  v_actor_name := COALESCE(v_actor_name, 'Someone');
+
+  SELECT gc.name INTO v_course_name
+    FROM public.golf_courses gc
+   WHERE gc.id = NEW.course_id;
+
+  IF v_type = 'top_ten_comment' AND v_course_name IS NOT NULL THEN
+    v_title_suffix := ' commented on your ' || v_course_name || ' Top 10';
+  END IF;
+
+  v_preview := regexp_replace(
+    COALESCE(NEW.body, ''),
+    '@\[([^\]]+)\]\((u|b):[0-9a-fA-F-]{36}\)',
+    '@\1',
+    'g'
+  );
+  IF length(v_preview) > 60 THEN
+    v_preview := left(v_preview, 60) || '…';
+  END IF;
+
+  INSERT INTO public.notifications (
+    user_id, recipient_actor_type, recipient_actor_id,
+    actor_id, type, title, message,
+    entity_type, entity_id, is_read, read, data
+  ) VALUES (
+    v_recipient_uid, 'personal', v_recipient_uid,
+    NEW.commenter_id, v_type,
+    v_actor_name || v_title_suffix,
+    v_preview,
+    'top_ten', NEW.course_id, FALSE, FALSE,
+    jsonb_build_object(
+      'target_user_id',    NEW.target_user_id,
+      'course_id',         NEW.course_id,
+      'course_name',       v_course_name,
+      'top_ten_comment_id', NEW.id,
+      'comment_id',        NEW.id,
+      'parent_comment_id', NEW.parent_id,
+      'actor_name',        v_actor_name,
+      'actor_avatar',      v_actor_avatar,
+      'actor_avatar_url',  v_actor_avatar
+    )
+  )
+  ON CONFLICT (user_id, type, actor_id, entity_id) DO UPDATE
+    SET message    = EXCLUDED.message,
+        title      = EXCLUDED.title,
+        data       = EXCLUDED.data,
+        is_read    = FALSE,
+        read       = FALSE,
+        is_deleted = FALSE,
+        updated_at = now();
 
   RETURN NEW;
 END;
