@@ -2,6 +2,7 @@ import React, { useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
 import { ReviewBottomSheet } from './ReviewBottomSheet';
 import { useReviewSheetStore } from '@/stores/reviewSheetStore';
+import { useCreationOverlayStore } from '@/stores/creationOverlayStore';
 import { VideoEngine } from '@/video/VideoEngine';
 
 /**
