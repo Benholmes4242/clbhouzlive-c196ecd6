@@ -244,12 +244,25 @@ export function useGolfersDiscovery() {
 
   // Apply exclusions and sorting client-side
   const processedGolfers = useMemo(() => {
-    const excludedIds = exclusions?.excludedIds || new Set<string>();
     const isSearching = searchQuery.trim().length > 0;
     const rawGolfers = isSearching ? searchResults || [] : filteredData?.golfers || [];
-    
+
+    // Search path: viewer + blocked only. Already-friended / pending /
+    // already-followed users MUST remain findable via search (opening
+    // profile, DM, etc. from find-a-player). The full exclusion bag is
+    // still applied to the browsing tabs below.
+    // Blocked is bidirectional — `useDiscoveryExclusions` unions both
+    // (blocker_id = viewer OR blocked_id = viewer) into blockedIds.
+    const excludedIds = isSearching
+      ? new Set<string>([
+          ...(user?.id ? [user.id] : []),
+          ...(exclusions?.blockedIds || []),
+        ])
+      : (exclusions?.excludedIds || new Set<string>());
+
     // Filter out excluded users
     let filtered = rawGolfers.filter(g => !excludedIds.has(g.id));
+
     
     // For suggested tab, apply ranking: same home club first, then verified, then by created_at
     if (activeTab === 'suggested' && !isSearching) {
