@@ -1044,7 +1044,7 @@ export function vperfCardEarlyStart(
   const rec = getCardRec(ownerKey, opts.idx, opts.postId);
   rec.earlyStartT = performance.now();
   rec.earlyStarted = true;
-  emit('card.earlyStart', {
+  emitFlow('card.earlyStart', {
     idx: rec.idx, postId: rec.postId, ownerKey, fraction: opts.fraction,
     t: Math.round(rec.earlyStartT),
   });
@@ -1059,7 +1059,7 @@ export function vperfCardFirstMotion(
   if (!rec || rec.playingT != null) return; // idempotent
   rec.playingT = performance.now();
   rec.fractionAtFirstMotion = opts.fraction;
-  emit('card.playing', {
+  emitFlow('card.playing', {
     idx: rec.idx, postId: rec.postId, ownerKey,
     fraction: opts.fraction, source: opts.source ?? null,
     t: Math.round(rec.playingT),
@@ -1074,7 +1074,7 @@ export function vperfCardPromoted(
   const rec = getCardRec(ownerKey, opts.idx);
   if (rec.promotedT != null) return; // idempotent
   rec.promotedT = performance.now();
-  emit('card.promoted', {
+  emitFlow('card.promoted', {
     idx: rec.idx, postId: rec.postId, ownerKey, fraction: opts.fraction,
     t: Math.round(rec.promotedT),
   });
@@ -1092,7 +1092,7 @@ export function vperfCardReleased(
   if (rec.promotedT != null) {
     rec.playedMs = Math.max(0, Math.round(rec.releasedT - rec.promotedT));
   }
-  emit('card.released', {
+  emitFlow('card.released', {
     idx: rec.idx, postId: rec.postId, ownerKey, fraction: opts.fraction,
     t: Math.round(rec.releasedT),
   });
@@ -1101,7 +1101,7 @@ export function vperfCardReleased(
   const verdict: 'IG' | 'LATE' = fFM != null && fFM <= 0.33 ? 'IG' : 'LATE';
   const motionLeadMs = (rec.earlyStartT != null && rec.promotedT != null)
     ? Math.max(0, Math.round(rec.promotedT - rec.earlyStartT)) : null;
-  emit('card.summary', {
+  emitFlow('card.summary', {
     idx: rec.idx, postId: rec.postId, ownerKey,
     earlyStarted: rec.earlyStarted,
     fractionAtFirstMotion: fFM,
@@ -1212,7 +1212,7 @@ export function vperfHandoverFrame(
   if (opts.timedOut || gapMs > 32 || posterExposed) verdict = 'HICCUP';
   else if (posJumpMs > 120) verdict = 'JUMP';
   else verdict = 'SEAMLESS';
-  emit('handover', {
+  emitFlow('handover', {
     idx: rec.idx, ownerKey,
     gapMs, posterExposed, posJumpMs,
     timedOut: !!opts.timedOut,
