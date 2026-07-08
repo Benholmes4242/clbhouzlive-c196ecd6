@@ -285,34 +285,11 @@ export function usePostEngagement(postId: string | null) {
 
       if (error) throw error;
 
-      // Create notification for post owner
-      const postOwnerInfo = await getPostOwnerInfo();
-      if (postOwnerInfo) {
-        const recipientActorType = postOwnerInfo.actorType;
-        const recipientActorId = postOwnerInfo.actorId;
-        
-        // Don't notify self (same actor)
-        if (!(recipientActorType === actorType && recipientActorId === actorId)) {
-          await supabase.from('notifications').insert({
-            user_id: postOwnerInfo.userId, // For legacy compatibility
-            recipient_actor_type: recipientActorType,
-            recipient_actor_id: recipientActorId,
-            actor_id: actorId, // Who performed the action
-            type: 'comment',
-            title: 'New comment',
-            message: 'commented on your post',
-            entity_type: 'post',
-            entity_id: postId,
-            data: { 
-              post_id: postId, 
-              comment_id: newComment?.id,
-              comment_preview: stripMentionMarkup(content).slice(0, 100),
-              commenter_actor_type: actorType,
-              commenter_actor_id: actorId,
-            },
-          });
-        }
-      }
+      // Comment notification to post owner is written by the
+      // `trg_post_comments_create_notification` DB trigger. Client-side
+      // insert removed 2026-07-08 (see useCommentsWithReplies.ts note).
+
+
 
     },
     onSuccess: () => {
