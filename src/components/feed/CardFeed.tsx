@@ -256,26 +256,53 @@ export const CardFeed = forwardRef<CardFeedHandle, CardFeedProps>(function CardF
   useEffect(() => { postsRef.current = posts; }, [posts]);
 
   // Debounce: promote activeIdx → playingIdx only after the centre has
-  // held steady for SETTLE_MS. While scrolling, playingIdx stays put so
-  // no tile is asked to play (frames still paint via the paused-first-frame
-  // primitive on mounted neighbours).
+  // held steady for SETTLE_MS. PR-B: at the promotion moment we ROTATE
+  // ROLES first, then flip playingIdx. Rotation is pure bookkeeping — no
+  // engine load/seek fires. The early card's binding (role='next'/'prev')
+  // resolves to the SAME physical lane as the incoming 'active' role
+  // after rotate(), so useVideoLane's deps are unchanged and no reload
+  // occurs — the same <video> element keeps playing seamlessly.
+  const lastPromotedRef = useRef<number>(0);
   useEffect(() => {
     if (settleTimer.current) clearTimeout(settleTimer.current);
     settleTimer.current = setTimeout(() => {
-      setPlayingIdx(activeIdx);
+      const prev = lastPromotedRef.current;
+      const next = activeIdx;
+      if (next !== prev && next >= 0 && prev >= 0) {
+        const dir: 'down' | 'up' = next > prev ? 'down' : 'up';
+        const recycled = feedLaneRoles.rotate(dir);
+        if (_isPerfEnabledForRotate()) {
+          const snap = feedLaneRoles.snapshot();
+          // eslint-disable-next-line no-console
+          console.info('[DECIDE]', 'rotation.promote', {
+            direction: dir,
+            fromIdx: prev,
+            toIdx: next,
+            recycledLane: recycled,
+            borrowedFrozen: snap.frozen,
+            map: { active: snap.active, next: snap.next, prev: snap.prev },
+          });
+        }
+      }
+      lastPromotedRef.current = next;
+      setPlayingIdx(next);
     }, SETTLE_MS);
     return () => {
       if (settleTimer.current) clearTimeout(settleTimer.current);
     };
   }, [activeIdx, posts]);
 
-  // Warm the neighbour cards' HLS symmetrically: next → `feed-next`,
-  // prev → `feed-prev`. Up-scroll must not be permanently cold (PR-A).
+  // Warm the neighbour cards' HLS symmetrically via role lookup: the RECYCLED
+  // lane in each direction is whichever physical lane currently holds the
+  // 'next' / 'prev' role. Warming is idempotent (alreadyLoaded skip in the
+  // engine); a two-lane degraded window (one lane frozen by a borrow) simply
+  // warms into the ex-active — safe by construction.
   useEffect(() => {
-    const warm = (laneId: 'feed-next' | 'feed-prev', post: FeedPost | undefined) => {
+    const warm = (role: 'next' | 'prev', post: FeedPost | undefined) => {
       const m = post?.mediaItems?.[0];
       if (!post || !m || m.type !== 'video' || !(m as any).hlsUrl) return;
       try {
+        const laneId = feedLaneRoles.laneForRole(role);
         VideoEngine.preload(laneId, {
           hlsUrl: (m as any).hlsUrl,
           posterUrl: (m as any).thumbnailUrl ?? null,
@@ -283,8 +310,8 @@ export const CardFeed = forwardRef<CardFeedHandle, CardFeedProps>(function CardF
         });
       } catch { /* engine may not be booted yet — safe to ignore */ }
     };
-    warm('feed-next', posts[playingIdx + 1]);
-    warm('feed-prev', posts[playingIdx - 1]);
+    warm('next', posts[playingIdx + 1]);
+    warm('prev', posts[playingIdx - 1]);
   }, [playingIdx, posts]);
 
 
