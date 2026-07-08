@@ -443,6 +443,7 @@ export function vperfSessionEnd(laneId: string, reason: string): void {
     bwEstimateStart: rec.bwEstimateStart,
     bwEstimateEnd: rec.bwEstimateEnd,
     seededBw: rec.seededBw,
+    netClass: getNetClass(),
     verdict,
     longStall,
     reason,
