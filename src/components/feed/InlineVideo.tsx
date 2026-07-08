@@ -201,11 +201,17 @@ export const InlineVideo: React.FC<Props> = ({
 
     return () => {
       if (motionRaf) cancelAnimationFrame(motionRaf);
+      // Read feed-next's exact playhead at the unmount moment and stash it
+      // so the incoming feed-active load resumes from precisely here — the
+      // lastPos ladder is timeupdate-throttled ~250ms and would leave a
+      // sub-frame JUMP across the swap. Only this ownerKey, one-shot.
+      const feedNextCT = VideoEngine.snapshot('feed-next').currentTime || 0;
+      setHandoverResume(resolvedOwnerKey, feedNextCT);
       // [FLOW] handover probe — arm BEFORE unmount so tUnmount stamps at the
-      // exact moment feed-next leaves the host. Reads feed-next currentTime
-      // now so posJumpMs measures playhead continuity across the swap.
+      // exact moment feed-next leaves the host. Uses the same feedNextCT
+      // sample so posJumpMs reflects the value we actually handed to
+      // feed-active (not a re-read after pause).
       if (isPerfEnabled()) {
-        const feedNextCT = VideoEngine.snapshot('feed-next').currentTime || 0;
         vperfHandoverStart(resolvedOwnerKey, {
           idx: feedIndex ?? -1,
           hostEl: host,
