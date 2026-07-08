@@ -62,6 +62,7 @@ export const InlineVideo: React.FC<Props> = ({
   isActive,
   postId,
   ownerKey,
+  feedIndex,
   objectFit = 'cover',
   earlyMotion = false,
   onFirstFrameReady,
@@ -72,6 +73,7 @@ export const InlineVideo: React.FC<Props> = ({
     '';
   const hlsUrl = (item as any).hlsUrl as string | undefined;
   const firedRef = useRef(false);
+  const posterElRef = useRef<HTMLImageElement | null>(null);
   const isMuted = useClubhouseStore((s) => s.isMuted);
 
   // Fallback ownership key so single-video callers that only pass postId
