@@ -17,6 +17,7 @@ import { useManageableBusinessIds } from '@/hooks/useManageableBusinessIds';
 import { canManagePost } from '@/lib/canManagePost';
 import { SquircleAvatar, LIGHT_HAIRLINE } from '@/components/ui/SquircleAvatar';
 import { getRatingTier, getRatingTierLabel, ratingTextColor } from '@/lib/ratingTier';
+import { MentionText } from '@/components/mentions/MentionText';
 import { formatRatingValue } from '@/utils/formatters';
 import { useActiveActor } from '@/context/ActiveActorContext';
 
@@ -150,7 +151,7 @@ const CaptionBlock: React.FC<CaptionBlockProps> = ({ body, expanded, setExpanded
               : {}),
           }}
         >
-          {body}
+          <MentionText text={body} />
           {!isReviewMode && expanded && isClamped && (
             <button
               type="button"

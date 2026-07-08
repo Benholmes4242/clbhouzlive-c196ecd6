@@ -6,6 +6,8 @@ import { SquircleAvatar, LIGHT_HAIRLINE } from '@/components/ui/SquircleAvatar';
 import { formatRatingValue } from '@/utils/formatters';
 import { getScoreRingColors } from '@/hooks/useTierStyles';
 import { ReviewMediaStrip, ReviewMediaItem } from './ReviewMediaStrip';
+import { MentionText } from '@/components/mentions/MentionText';
+import { stripMentionMarkup } from '@/lib/mentions/format';
 
 interface Review {
   id: string;
@@ -131,9 +133,10 @@ export const ReviewBlockFlat: React.FC<ReviewBlockFlatProps> = ({
     .map((s) => ({ label: s.label, value: review[s.key] as number | null | undefined }))
     .filter((s) => s.value !== null && s.value !== undefined);
 
-  const words = text ? text.split(' ') : [];
-  const isLong = words.length > 28;
-  const truncated = isLong && !showFull ? words.slice(0, 28).join(' ') + '…' : text;
+  const strippedText = text ? stripMentionMarkup(text) : '';
+  const strippedWords = strippedText ? strippedText.split(' ') : [];
+  const isLong = strippedWords.length > 28;
+  const collapsedText = isLong && !showFull ? strippedWords.slice(0, 28).join(' ') + '…' : null;
 
   return (
     <article
@@ -248,9 +251,17 @@ export const ReviewBlockFlat: React.FC<ReviewBlockFlatProps> = ({
       {/* Review text */}
       {text && text.trim().length > 0 && (
         <>
-          <p style={{ fontSize: 13, color: '#475569', lineHeight: 1.65, margin: '0 0 6px' }}>
-            {truncated}
-          </p>
+          {collapsedText !== null ? (
+            <p style={{ fontSize: 13, color: '#475569', lineHeight: 1.65, margin: '0 0 6px' }}>
+              {collapsedText}
+            </p>
+          ) : (
+            <MentionText
+              as="p"
+              text={text}
+              style={{ fontSize: 13, color: '#475569', lineHeight: 1.65, margin: '0 0 6px' }}
+            />
+          )}
           {isLong && (
             <button
               type="button"

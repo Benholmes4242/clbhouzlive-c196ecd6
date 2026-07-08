@@ -24,6 +24,7 @@ import { FiMapPin } from 'react-icons/fi';
 import { getProfilePathById } from '@/lib/profileRoutes';
 import { getActorRouteByType } from '@/types/actor';
 import { CourseDNACard } from './CourseDNACard';
+import { MentionText } from '@/components/mentions/MentionText';
 
 import { type ExtractedReviewData } from '@/lib/postHelpers';
 import { removeGolfCourseFromContent } from '@/utils/golfCourseExtractor';
@@ -265,7 +266,7 @@ export const CreatorCapsule: React.FC<CreatorCapsuleProps> = ({
           className="max-h-[100px] overflow-y-auto scrollbar-hide"
           style={{ WebkitOverflowScrolling: 'touch' }}
         >
-          <p className="text-[13px] leading-relaxed text-white/90 whitespace-pre-wrap">{cleanCaption}</p>
+          <MentionText as="p" text={cleanCaption} className="text-[13px] leading-relaxed text-white/90 whitespace-pre-wrap" />
         </div>
       )}
 
