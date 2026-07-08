@@ -14,6 +14,7 @@ import type { MediaItem } from '@/components/media-system/types/media';
 import { useVideoLane } from '@/video/useVideoLane';
 import { VideoEngine } from '@/video/VideoEngine';
 import { originHostRegistry } from '@/video/originHostRegistry';
+import { setHandoverResume, consumeHandoverResume } from '@/video/handoverResume';
 import { useClubhouseStore } from '@/store/clubhouseStore';
 import { MuteToggle } from '@/components/feed/MuteToggle';
 import {
@@ -84,11 +85,21 @@ export const InlineVideo: React.FC<Props> = ({
   // manifest default" for first-load, positive value seeks to that time.
   // Read via ownerKey so the borrow path (play() stamps ownerKey, onTime
   // writes lastPos under lane.postId=ownerKey) resolves symmetrically.
+  //
+  // Early-motion handover: prefer the exact playhead stashed at the
+  // feed-next unmount moment (below). The lastPos ladder is written on
+  // `timeupdate` and throttled ~250ms, so it can be up to a quarter-second
+  // stale at the swap — that reads as a small JUMP in the [FLOW] handover
+  // probe. The stash is one-shot and only affects the promoted card; every
+  // other resume path (tab return, borrow return, cold mount) is unchanged.
   const startPosition = React.useMemo(() => {
     if (!isActive || !resolvedOwnerKey) return -1;
+    const handover = consumeHandoverResume(resolvedOwnerKey);
+    if (handover != null && handover > 0) return handover;
     const t = VideoEngine.getLastPos(resolvedOwnerKey);
     return t > 0 ? t : -1;
   }, [isActive, resolvedOwnerKey]);
+
 
   const lane = useVideoLane('feed-active', {
     hlsUrl: isActive ? hlsUrl ?? null : null,
@@ -190,11 +201,17 @@ export const InlineVideo: React.FC<Props> = ({
 
     return () => {
       if (motionRaf) cancelAnimationFrame(motionRaf);
+      // Read feed-next's exact playhead at the unmount moment and stash it
+      // so the incoming feed-active load resumes from precisely here — the
+      // lastPos ladder is timeupdate-throttled ~250ms and would leave a
+      // sub-frame JUMP across the swap. Only this ownerKey, one-shot.
+      const feedNextCT = VideoEngine.snapshot('feed-next').currentTime || 0;
+      setHandoverResume(resolvedOwnerKey, feedNextCT);
       // [FLOW] handover probe — arm BEFORE unmount so tUnmount stamps at the
-      // exact moment feed-next leaves the host. Reads feed-next currentTime
-      // now so posJumpMs measures playhead continuity across the swap.
+      // exact moment feed-next leaves the host. Uses the same feedNextCT
+      // sample so posJumpMs reflects the value we actually handed to
+      // feed-active (not a re-read after pause).
       if (isPerfEnabled()) {
-        const feedNextCT = VideoEngine.snapshot('feed-next').currentTime || 0;
         vperfHandoverStart(resolvedOwnerKey, {
           idx: feedIndex ?? -1,
           hostEl: host,
