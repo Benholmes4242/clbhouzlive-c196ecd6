@@ -500,6 +500,7 @@ const LightFeedCardImpl: React.FC<LightFeedCardProps> = ({
                     item={media}
                     isActive={isActive}
                     isNear={mountVideo}
+                    earlyMotion={earlyMotion}
                     feedIndex={feedIndex}
                     postId={post.id}
                     ownerKey={`${post.id}:0`}
