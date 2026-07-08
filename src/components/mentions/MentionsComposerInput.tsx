@@ -376,9 +376,17 @@ function AnchoredMentionsPanel({ anchorRef, children }: AnchoredPanelProps) {
       ) {
         return prev;
       }
+      // [MENTIONS-DIAG] geom — every applied set.
+      console.info('[MENTIONS] geom', {
+        ...next,
+        anchor: { top: r.top, left: r.left, bottom: r.bottom, width: r.width, height: r.height },
+        vv: { top: vTop, height: vHeight, bottom: vBottom },
+        spaceBelow, spaceAbove,
+      });
       return next;
     });
   }, [anchorRef]);
+
 
   // Mount-time measurement + full listener lifecycle. This effect
   // runs every time the panel mounts (== every time suggestions
