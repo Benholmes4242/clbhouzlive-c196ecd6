@@ -389,7 +389,7 @@ export function vperfSessionSuppressNextStall(laneId: string): void {
 export function vperfSessionLevel(
   laneId: string,
   level: number,
-  _bwEstimate?: number | null,
+  bwEstimate?: number | null,
 ): void {
   if (!on()) return;
   const rec = sessions.get(laneId);
@@ -397,7 +397,11 @@ export function vperfSessionLevel(
   rec.levelSwitches += 1;
   rec.endLevel = level;
   if (rec.startLevel == null) rec.startLevel = level;
+  if (typeof bwEstimate === 'number' && bwEstimate > 0) {
+    rec.bwEstimateEnd = Math.round(bwEstimate);
+  }
 }
+
 
 export function vperfSessionEnd(laneId: string, reason: string): void {
   if (!on()) return;
