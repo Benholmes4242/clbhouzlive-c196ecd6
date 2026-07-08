@@ -148,7 +148,9 @@ const ActivityPage: React.FC = () => {
 
   useEffect(() => () => { queryClient.invalidateQueries({ queryKey: ['activity-feed'] }); }, [queryClient]);
 
-  if (isRehydrating) return <ActivityPageSkeleton />;
+  // NOTE: isRehydrating early-return moved BELOW the useMemos so hook order
+  // stays stable across the rehydration flip (was crashing with
+  // "Rendered more hooks than during the previous render").
 
   // ---- Mutations ----
   const handleMarkRead = async (id: string) => {
