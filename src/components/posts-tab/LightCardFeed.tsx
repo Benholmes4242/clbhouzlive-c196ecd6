@@ -242,21 +242,21 @@ export const LightCardFeed: React.FC<LightCardFeedProps> = ({
     };
   }, [recheckActive]);
 
-  // Preload feed-next for the incoming playing card so early-motion has a
-  // warm lane to hand off from. CardFeed does the same — mirrored here so
-  // the profile posts feed also benefits from the IG-style handover.
+  // Symmetric neighbour warm-up (PR-A): next → feed-next, prev → feed-prev.
   useEffect(() => {
-    const next = posts[playingIdx + 1];
-    const nextMedia = next?.mediaItems?.[0];
-    if (next && nextMedia?.type === 'video' && (nextMedia as any).hlsUrl) {
+    const warm = (laneId: 'feed-next' | 'feed-prev', post: any) => {
+      const m = post?.mediaItems?.[0];
+      if (!post || !m || m.type !== 'video' || !m.hlsUrl) return;
       try {
-        VideoEngine.preload('feed-next', {
-          hlsUrl: (nextMedia as any).hlsUrl,
-          posterUrl: (nextMedia as any).thumbnailUrl ?? null,
-          postId: next.id,
+        VideoEngine.preload(laneId, {
+          hlsUrl: m.hlsUrl,
+          posterUrl: m.thumbnailUrl ?? null,
+          postId: post.id,
         });
       } catch { /* engine may not be booted yet — safe to ignore */ }
-    }
+    };
+    warm('feed-next', posts[playingIdx + 1]);
+    warm('feed-prev', posts[playingIdx - 1]);
   }, [playingIdx, posts]);
 
   // Promotion + fullscreen clears — see CardFeed for rationale.
