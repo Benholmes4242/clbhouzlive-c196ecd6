@@ -90,11 +90,24 @@ export const InlineVideo: React.FC<Props> = ({
   const resolvedOwnerKey = ownerKey ?? (postId ? `${postId}:0` : null);
 
   // Role selection — single source of truth. Priority: active > early.
+  // Early role is detected by which role's currently-bound physical lane is
+  // warmed for this card's media (parent's warm effect stamps postId on
+  // preload before the visibility gate flips earlyMotion true).
+  const detectEarlyRole = (): FeedRole | null => {
+    if (!resolvedOwnerKey) return null;
+    const matches = (s: LaneSnapshot) =>
+      s.postId != null && (s.postId === postId || s.postId === resolvedOwnerKey);
+    try {
+      const nextLane = feedLaneRoles.laneForRole('next');
+      if (matches(VideoEngine.snapshot(nextLane))) return 'next';
+      const prevLane = feedLaneRoles.laneForRole('prev');
+      if (matches(VideoEngine.snapshot(prevLane))) return 'prev';
+    } catch { /* engine not booted */ }
+    return null;
+  };
   const role: FeedRole | null = isActive
     ? 'active'
-    : earlyMotion
-      ? (earlyDir < 0 ? 'prev' : 'next')
-      : null;
+    : (earlyMotion ? detectEarlyRole() : null);
 
   const laneId = useLaneForRole(role);
 
