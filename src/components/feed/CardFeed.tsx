@@ -217,10 +217,14 @@ export const CardFeed = forwardRef<CardFeedHandle, CardFeedProps>(function CardF
   const [playingIdx, setPlayingIdx] = useState(0);
   const settleTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const SETTLE_MS = 80;
-  const PLAY_IN = 0.5;
-  const PLAY_OUT = 0.35;
+  // IG-style early activation: cheap now that feed-next preload + PREDICT cache
+  // warming + bandwidth seeding are in place. Playing by ~1/3 up feels native.
+  const PLAY_IN = 0.30;
+  const PLAY_OUT = 0.20;
   const HYSTERESIS = 0.1;
   const visibilityRef = useRef<Map<number, number>>(new Map());
+  const scrollDirRef = useRef<number>(0); // +1 down, -1 up, 0 idle
+  const lastScrollTopRef = useRef<number>(0);
   const observerRef = useRef<IntersectionObserver | null>(null);
   const cardEls = useRef<Map<number, HTMLElement>>(new Map());
 
@@ -258,18 +262,31 @@ export const CardFeed = forwardRef<CardFeedHandle, CardFeedProps>(function CardF
   const recheckActive = useCallback(() => {
     // Platform-standard card-feed activation: eligible at >=PLAY_IN visible,
     // most-visible eligible card wins, asymmetric PLAY_OUT + hysteresis to
-    // prevent boundary flicker.
+    // prevent boundary flicker. When multiple cards clear PLAY_IN, tie-break
+    // in favour of the card ENTERING in the current scroll direction (reuses
+    // the same signed direction signal that feeds the PrefetchController).
     let bestIdx = -1;
     let bestRatio = 0;
+    const eligible: number[] = [];
     visibilityRef.current.forEach((ratio, idx) => {
       if (ratio > bestRatio) { bestRatio = ratio; bestIdx = idx; }
+      if (ratio >= PLAY_IN) eligible.push(idx);
     });
+
+    // Directional tie-break amongst eligible cards.
+    let dirWinner = -1;
+    if (eligible.length > 1 && scrollDirRef.current !== 0) {
+      dirWinner = scrollDirRef.current > 0
+        ? Math.max(...eligible) // scrolling down → prefer entering-from-bottom
+        : Math.min(...eligible); // scrolling up   → prefer entering-from-top
+    }
 
     setActiveIdx((prev) => {
       const prevRatio = prev >= 0 ? (visibilityRef.current.get(prev) ?? 0) : 0;
       // Keep current active while it's still >=PLAY_OUT and no one clearly beats it.
       if (prev >= 0 && prevRatio >= PLAY_OUT && (bestRatio - prevRatio) < HYSTERESIS) return prev;
-      // Switch only to a card that has cleared the play-in threshold.
+      // Switch to a card that has cleared the play-in threshold — directional winner first.
+      if (dirWinner >= 0) return dirWinner;
       if (bestIdx >= 0 && bestRatio >= PLAY_IN) return bestIdx;
       // If nothing qualifies (between cards), keep last active if still barely visible.
       if (prev >= 0 && prevRatio >= PLAY_OUT) return prev;
@@ -309,6 +326,11 @@ export const CardFeed = forwardRef<CardFeedHandle, CardFeedProps>(function CardF
   useEffect(() => {
     let raf = 0;
     const onScroll = () => {
+      // Signed scroll direction — reused as a directional tie-break in recheckActive.
+      const st = scrollerElRef.current?.scrollTop ?? window.scrollY;
+      const dy = st - lastScrollTopRef.current;
+      if (Math.abs(dy) > 0.5) scrollDirRef.current = dy > 0 ? 1 : -1;
+      lastScrollTopRef.current = st;
       if (raf) return;
       raf = requestAnimationFrame(() => {
         raf = 0;

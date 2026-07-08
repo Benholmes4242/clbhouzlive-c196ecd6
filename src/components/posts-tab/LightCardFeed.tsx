@@ -95,10 +95,14 @@ export const LightCardFeed: React.FC<LightCardFeedProps> = ({
   const [scrollParent, setScrollParent] = useState<HTMLElement | undefined>(undefined);
   const settleTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const SETTLE_MS = 80;
-  const PLAY_IN = 0.5;
-  const PLAY_OUT = 0.35;
+  // IG-style early activation: cheap now that feed-next preload + PREDICT cache
+  // warming + bandwidth seeding are in place. Playing by ~1/3 up feels native.
+  const PLAY_IN = 0.30;
+  const PLAY_OUT = 0.20;
   const HYSTERESIS = 0.1;
   const visibilityRef = useRef<Map<number, number>>(new Map());
+  const scrollDirRef = useRef<number>(0); // +1 down, -1 up, 0 idle
+  const lastScrollTopRef = useRef<number>(0);
   const observerRef = useRef<IntersectionObserver | null>(null);
   const cardEls = useRef<Map<number, HTMLElement>>(new Map());
 
@@ -123,13 +127,24 @@ export const LightCardFeed: React.FC<LightCardFeedProps> = ({
   const recheckActive = useCallback(() => {
     let bestIdx = -1;
     let bestRatio = 0;
+    const eligible: number[] = [];
     visibilityRef.current.forEach((ratio, idx) => {
       if (ratio > bestRatio) { bestRatio = ratio; bestIdx = idx; }
+      if (ratio >= PLAY_IN) eligible.push(idx);
     });
+
+    // Directional tie-break: prefer the card entering in the scroll direction.
+    let dirWinner = -1;
+    if (eligible.length > 1 && scrollDirRef.current !== 0) {
+      dirWinner = scrollDirRef.current > 0
+        ? Math.max(...eligible)
+        : Math.min(...eligible);
+    }
 
     setActiveIdx((prev) => {
       const prevRatio = prev >= 0 ? (visibilityRef.current.get(prev) ?? 0) : 0;
       if (prev >= 0 && prevRatio >= PLAY_OUT && (bestRatio - prevRatio) < HYSTERESIS) return prev;
+      if (dirWinner >= 0) return dirWinner;
       if (bestIdx >= 0 && bestRatio >= PLAY_IN) return bestIdx;
       if (prev >= 0 && prevRatio >= PLAY_OUT) return prev;
       return bestIdx >= 0 && bestRatio >= PLAY_OUT ? bestIdx : prev;
@@ -160,14 +175,21 @@ export const LightCardFeed: React.FC<LightCardFeedProps> = ({
 
   useEffect(() => {
     let raf = 0;
+    const scroller: HTMLElement | Window = document.getElementById('root') ?? window;
+    const readScrollTop = () =>
+      scroller instanceof Window ? scroller.scrollY : (scroller as HTMLElement).scrollTop;
     const onScroll = () => {
+      // Signed scroll direction — reused as a directional tie-break in recheckActive.
+      const st = readScrollTop();
+      const dy = st - lastScrollTopRef.current;
+      if (Math.abs(dy) > 0.5) scrollDirRef.current = dy > 0 ? 1 : -1;
+      lastScrollTopRef.current = st;
       if (raf) return;
       raf = requestAnimationFrame(() => {
         raf = 0;
         recheckActive();
       });
     };
-    const scroller: HTMLElement | Window = document.getElementById('root') ?? window;
     scroller.addEventListener('scroll', onScroll, { passive: true, capture: true } as any);
     return () => {
       scroller.removeEventListener('scroll', onScroll, { capture: true } as any);
