@@ -106,6 +106,8 @@ export interface FeedCardProps {
    * immediate neighbours; other cards show the thumbnail poster only.
    */
   mountVideo?: boolean;
+  /** Early-motion handover — see InlineVideo.earlyMotion. */
+  earlyMotion?: boolean;
   /** Initial carousel slide for multi-media posts (from persisted store). */
   initialMediaIndex?: number;
   /** Notified when user swipes the multi-media carousel. */
