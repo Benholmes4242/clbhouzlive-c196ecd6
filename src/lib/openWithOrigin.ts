@@ -298,7 +298,8 @@ export function openWithOrigin({
         }
       }
       if (startSource === 'zero') {
-        const feedSnap = VideoEngine.snapshot('feed-active');
+        // PR-B: resolve the physical lane currently holding the 'active' role.
+        const feedSnap = VideoEngine.snapshot(feedLaneRoles.laneForRole('active'));
         feedSnapCT = feedSnap.currentTime;
         // Ownership gate: only inherit the feed-active playhead when that
         // lane is currently loaded for THIS post. lane.postId is written raw
