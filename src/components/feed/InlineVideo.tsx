@@ -115,7 +115,43 @@ export const InlineVideo: React.FC<Props> = ({
 
   const laneOwnsThisMedia = lane.snapshot.postId === resolvedOwnerKey;
   const targetReady = startPosition <= 0 || lane.snapshot.currentTime >= startPosition - 0.3;
-  const showVideo = lane.snapshot.firstFrame && targetReady && (isActive || laneOwnsThisMedia);
+
+  // PR-A: during earlyMotion the poster host must reveal the EARLY lane
+  // (feed-next when scrolling down, feed-prev when scrolling up) — not the
+  // feed-active lane, which still holds the previous card. We resolve the
+  // early lane by inspecting both snapshots for a postId match against this
+  // card's ownerKey / postId, then subscribe so re-renders track its
+  // firstFrame flip. Without this, the video plays invisibly and the poster
+  // stays on screen the whole pre-centre period.
+  const [earlyLaneId, setEarlyLaneId] = useState<LaneId | null>(null);
+  const [earlySnap, setEarlySnap] = useState<LaneSnapshot | null>(null);
+  useEffect(() => {
+    if (!earlyMotion || isActive || !resolvedOwnerKey) {
+      setEarlyLaneId(null);
+      setEarlySnap(null);
+      return;
+    }
+    const matches = (snap: LaneSnapshot) =>
+      snap.postId != null &&
+      (snap.postId === postId || snap.postId === resolvedOwnerKey);
+    const nextSnap = VideoEngine.snapshot('feed-next');
+    const prevSnap = VideoEngine.snapshot('feed-prev');
+    const chosen: LaneId | null = matches(nextSnap)
+      ? 'feed-next'
+      : matches(prevSnap)
+        ? 'feed-prev'
+        : null;
+    setEarlyLaneId(chosen);
+    if (!chosen) { setEarlySnap(null); return; }
+    return VideoEngine.subscribe(chosen, setEarlySnap);
+  }, [earlyMotion, isActive, resolvedOwnerKey, postId]);
+
+  const earlyReveal =
+    !!earlyMotion && !isActive && !!earlySnap && earlySnap.firstFrame === true;
+
+  const showVideo = earlyReveal
+    ? true
+    : lane.snapshot.firstFrame && targetReady && (isActive || laneOwnsThisMedia);
 
 
 
