@@ -17,6 +17,7 @@
 import type { FeedPost } from '@/components/media-system/types/media';
 import { useFullscreenFeedStore, type OpenOrigin, type BorrowDescriptor } from '@/store/fullscreenFeedStore';
 import { VideoEngine } from '@/video/VideoEngine';
+import { feedLaneRoles } from '@/video/feedLaneRoles';
 import { RailLanePool } from '@/video/railLanePool';
 
 import { isPerfEnabled } from '@/perf/navTiming';
