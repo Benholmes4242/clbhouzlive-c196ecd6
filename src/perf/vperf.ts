@@ -136,8 +136,10 @@ function budgetFor(kind: string, metaBudget: number | undefined): number {
 }
 
 function emit(kind: string, payload: Record<string, unknown>): void {
+  const merged = { ...payload, page: (payload as any).page ?? __currentPage };
+  try { scorecardIngest(kind, merged); } catch {}
   // eslint-disable-next-line no-console
-  console.info(`[VPERF] ${kind}`, payload);
+  console.info(`[VPERF] ${kind}`, merged);
 }
 
 function finish(rec: SpanRec, verdict: Verdict, extra: Record<string, unknown>): void {
