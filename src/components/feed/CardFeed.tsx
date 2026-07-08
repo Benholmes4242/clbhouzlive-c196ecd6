@@ -520,6 +520,7 @@ export const CardFeed = forwardRef<CardFeedHandle, CardFeedProps>(function CardF
     [
       activeIdx,
       playingIdx,
+      earlyIdx,
       carouselPositions,
       getCarouselChangeHandler,
       getCommentCount,
