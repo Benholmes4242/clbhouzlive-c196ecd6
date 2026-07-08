@@ -536,9 +536,9 @@ export function CinematicHeroFullBleed({
           style={{
             margin: 0,
             fontFamily: "'Geist', -apple-system, BlinkMacSystemFont, sans-serif",
-            fontSize: 'clamp(24px, 7.8vw, 30px)',
+            fontSize: 'clamp(22px, 6.4vw, 26px)',
             fontWeight: 800,
-            lineHeight: 0.98,
+            lineHeight: 1.05,
             letterSpacing: '-0.01em',
             color: 'white',
             textTransform: 'uppercase',
@@ -552,7 +552,7 @@ export function CinematicHeroFullBleed({
         {isUpcoming && upcomingSub && (
           <div
             style={{
-              fontSize: 12,
+              fontSize: 11.5,
               fontWeight: 600,
               color: 'rgba(255,255,255,0.7)',
               letterSpacing: '0.02em',
@@ -565,11 +565,12 @@ export function CinematicHeroFullBleed({
         )}
 
         {isUpcoming && hoursUntilStart != null && Number.isFinite(hoursUntilStart) && (
-          <div style={{ marginTop: 14 }}>
+          <div style={{ marginTop: 10 }}>
             <CountdownPills hoursUntilStart={hoursUntilStart} />
           </div>
         )}
       </div>
+
 
       {/* ============ RESULTS: Champion celebration block ============ */}
       {isResults && !awaitingPlayoff && champion && (
