@@ -14,6 +14,7 @@
 
 import { useEffect, useRef, useState } from 'react';
 import { VideoEngine, type LaneId, type LaneSnapshot } from './VideoEngine';
+import { useCreationOverlayStore } from '@/stores/creationOverlayStore';
 
 
 
@@ -117,6 +118,22 @@ export function useVideoLane(
       VideoEngine.pause(laneId, { callerPostId });
     }
   }, [laneId, opts.active, opts.ownerKey, opts.postId]);
+
+  // Resume-on-creation-overlay-close. The composer / review wizard / review
+  // sheet call VideoEngine.pauseAll() on open; activeIndex hasn't changed
+  // so the effect above won't re-fire on its own. When the overlay closes
+  // it bumps creationClosedAt — re-issue the same play-intent for the
+  // current active card so the feed resumes without needing a scroll.
+  // Rails use useRailLane (not this hook), so they are unaffected.
+  const creationClosedAt = useCreationOverlayStore((s) => s.creationClosedAt);
+  useEffect(() => {
+    if (creationClosedAt === 0) return; // initial value, ignore
+    if (!opts.active) return;
+    if (typeof document !== 'undefined' && document.hidden) return;
+    const callerPostId = opts.ownerKey ?? opts.postId ?? null;
+    void VideoEngine.play(laneId, { callerPostId });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [creationClosedAt]);
 
 
 

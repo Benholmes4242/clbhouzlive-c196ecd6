@@ -122,7 +122,13 @@ export function ReviewWizard({
     import('@/video/VideoEngine').then(({ VideoEngine }) => {
       try { VideoEngine.pauseAll(); } catch {}
     });
-    return () => unlockBodyScroll();
+    return () => {
+      unlockBodyScroll();
+      // Signal the visible feed surface to resume its active card.
+      import('@/stores/creationOverlayStore').then(({ useCreationOverlayStore }) => {
+        try { useCreationOverlayStore.getState().notifyClosed(); } catch {}
+      });
+    };
   }, [isOpen]);
 
   useEffect(() => {

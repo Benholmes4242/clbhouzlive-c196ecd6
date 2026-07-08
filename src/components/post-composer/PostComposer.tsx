@@ -17,6 +17,7 @@ import { usePostStudioStore } from '@/stores/usePostStudioStore';
 import type { ComposerMediaItem } from './composerMedia';
 import type { StudioActorType, TaggedCourse } from './types';
 import { VideoEngine } from '@/video/VideoEngine';
+import { useCreationOverlayStore } from '@/stores/creationOverlayStore';
 
 type Screen = 'choose' | 'post' | 'editor';
 
@@ -101,7 +102,11 @@ export function PostComposer({
     // Engine lanes must not keep decoding under the creation overlay.
     // Null-caller pauseAll passes the borrow-guard too.
     try { VideoEngine.pauseAll(); } catch {}
-    return () => unlockBodyScroll();
+    return () => {
+      unlockBodyScroll();
+      // Signal the visible feed surface to resume its active card.
+      try { useCreationOverlayStore.getState().notifyClosed(); } catch {}
+    };
   }, [open]);
 
   const handleReviewPick = useCallback(
