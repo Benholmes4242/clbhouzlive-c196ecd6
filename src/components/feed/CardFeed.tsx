@@ -57,8 +57,9 @@ const FeedItemGate: React.FC<{
   index: number;
   playingIdx: number;
   activeIdx: number;
-  children: (v: { isActive: boolean; mountVideo: boolean }) => React.ReactNode;
-}> = ({ post, index, playingIdx, activeIdx, children }) => {
+  earlyIdx: number;
+  children: (v: { isActive: boolean; mountVideo: boolean; earlyMotion: boolean }) => React.ReactNode;
+}> = ({ post, index, playingIdx, activeIdx, earlyIdx, children }) => {
   const fsOpen = useFullscreenFeedStore((s) => s.isOpen);
   const borrowedOwnerKey = useFullscreenFeedStore((s) => s.borrow?.ownerKey ?? null);
   const isBorrowedCard =
@@ -67,7 +68,8 @@ const FeedItemGate: React.FC<{
   const isActive = !fsOpen && index === playingIdx;
   const isNear =
     isBorrowedCard || (!fsOpen && Math.abs(index - activeIdx) <= VIDEO_NEIGHBOUR_RADIUS);
-  return <>{children({ isActive, mountVideo: isNear })}</>;
+  const earlyMotion = !fsOpen && index === earlyIdx && index !== playingIdx;
+  return <>{children({ isActive, mountVideo: isNear, earlyMotion })}</>;
 };
 
 export interface CardFeedProps {
