@@ -246,7 +246,12 @@ export const InboxRow: React.FC<Props> = ({ notification: n, onClick, currentUse
   const actorName = getActorDisplayName(n);
   const avatarUrl = getActorAvatarUrl(n);
   const hasActor = !!avatarUrl || (!!n.actor_id && !isClbhouzSystemNotification(n.type));
-  const target = getTarget(n);
+
+  // Verbs for these types already embed the course name in the sentence
+  // ("...your {course} Top 10"), so appending the target would double it.
+  const VERB_EMBEDS_TARGET = new Set(['top_ten_comment', 'top_ten_reply']);
+  const target = VERB_EMBEDS_TARGET.has(n.type) ? null : getTarget(n);
+
   const verb = getVerb(n);
   const detail = getDetail(n);
   const isUnread = n.is_unread;
