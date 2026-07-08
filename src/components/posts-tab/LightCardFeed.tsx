@@ -164,6 +164,30 @@ export const LightCardFeed: React.FC<LightCardFeedProps> = ({
       if (prev >= 0 && prevRatio >= PLAY_OUT) return prev;
       return bestIdx >= 0 && bestRatio >= PLAY_OUT ? bestIdx : prev;
     });
+
+    // Early-motion candidate — mirrors CardFeed. See there for the rationale.
+    setEarlyIdx((prevEarly) => {
+      const dir = scrollDirRef.current;
+      const vel = scrollVelocityRef.current;
+      const currentPlay = playingIdxRef.current;
+      if (dir === 0 || vel > EARLY_VELOCITY_MAX || currentPlay < 0) return -1;
+      const cand = currentPlay + dir;
+      if (cand < 0 || cand >= postsRef.current.length) return -1;
+      const ratio = visibilityRef.current.get(cand) ?? 0;
+      if (prevEarly === cand && ratio >= EARLY_MOTION_CLEAR) return cand;
+      if (prevEarly !== cand && ratio < EARLY_MOTION_FRACTION) return -1;
+      if (ratio < EARLY_MOTION_CLEAR) return -1;
+      const cardPost = postsRef.current[cand];
+      if (!cardPost) return -1;
+      try {
+        const snap = VideoEngine.snapshot('feed-next');
+        const warm = snap.postId != null &&
+          (snap.postId === cardPost.id || snap.postId === `${cardPost.id}:0`) &&
+          (snap.state === 'ready' || snap.state === 'playing' || snap.state === 'loading');
+        if (!warm) return -1;
+      } catch { return -1; }
+      return cand;
+    });
   }, []);
 
   useEffect(() => {
