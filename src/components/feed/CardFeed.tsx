@@ -346,10 +346,12 @@ export const CardFeed = forwardRef<CardFeedHandle, CardFeedProps>(function CardF
       if (ratio < EARLY_MOTION_CLEAR) return -1;
 
       // Warm-only guard — never force a cold HLS attach at 12%.
+      // Down-scroll uses feed-next; up-scroll uses feed-prev (PR-A).
       const cardPost = postsRef.current[cand];
       if (!cardPost) return -1;
       try {
-        const snap = VideoEngine.snapshot('feed-next');
+        const laneId = dir > 0 ? 'feed-next' : 'feed-prev';
+        const snap = VideoEngine.snapshot(laneId);
         const warm = snap.postId != null &&
           (snap.postId === cardPost.id || snap.postId === `${cardPost.id}:0`) &&
           (snap.state === 'ready' || snap.state === 'playing' || snap.state === 'loading');
