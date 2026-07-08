@@ -775,9 +775,25 @@ export function vperfScorecard(trigger: 'auto' | 'nav' | 'manual' = 'manual'): v
     for (const [k, v] of m) parts.push(`${k}=${v}`);
     lines.push(`  decide.${bucket}: ${parts.join(' ')}`);
   }
+  // [PREDICT] median startLevel per feed lane class.
+  for (const [laneId, arr] of startLevelsByLane) {
+    if (arr.length === 0) continue;
+    lines.push(`  startLevel.${laneId}: n=${arr.length} p50=${pct(arr, 0.5)} p95=${pct(arr, 0.95)}`);
+  }
+  // [PREDICT] prefetch counters.
+  const ps = prefetchStats;
+  const hitRate = ps.activationsWithPrefetch > 0
+    ? (ps.activationsWithPrefetchWarm / ps.activationsWithPrefetch)
+    : 0;
+  const abortParts: string[] = [];
+  for (const [k, v] of ps.aborted) abortParts.push(`${k}=${v}`);
+  lines.push(
+    `  prefetch: issued=${ps.issued} aborted=${abortParts.join(' ') || '0'} activationsWithPrefetch=${ps.activationsWithPrefetch} warmHits=${ps.activationsWithPrefetchWarm} hitRate=${(hitRate*100).toFixed(1)}%`,
+  );
   // eslint-disable-next-line no-console
   console.info(lines.join('\n'));
 }
+
 
 function scorecardEmitOnNav(): void {
   if (!on()) return;
