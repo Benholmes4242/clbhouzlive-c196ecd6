@@ -81,13 +81,13 @@ export const PerfHud = memo(function PerfHud() {
   const cur = snap.current;
   const recent = snap.recent;
 
-  return (
+  return createPortal(
     <div
       style={{
         position: 'fixed',
         top: 8,
         right: 8,
-        zIndex: 99999,
+        zIndex: Z.logHud,
         width: 320,
         maxHeight: '60vh',
         overflow: 'auto',
@@ -136,8 +136,10 @@ export const PerfHud = memo(function PerfHud() {
           </div>
         </div>
       ))}
-    </div>
+    </div>,
+    document.body
   );
+
 });
 
 function PhaseBar({ s }: { s: Summary }) {
