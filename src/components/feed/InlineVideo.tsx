@@ -16,6 +16,7 @@ import { VideoEngine } from '@/video/VideoEngine';
 import { originHostRegistry } from '@/video/originHostRegistry';
 import { useClubhouseStore } from '@/store/clubhouseStore';
 import { MuteToggle } from '@/components/feed/MuteToggle';
+import { vperfMarkEarlyStarted, vperfDualActiveAdd } from '@/perf/vperf';
 
 
 interface Props {
@@ -32,6 +33,15 @@ interface Props {
    * VideoEngine owner-guard can reject stale outgoing cards on scroll.
    */
   ownerKey?: string | null;
+  /**
+   * Early-motion handover: the parent feed has decided this card is the next
+   * incoming card in the current scroll direction AND is warm on `feed-next`.
+   * When true (and !isActive) we mount+play `feed-next` into this card's
+   * host so the video is ALREADY MOVING as the card scrolls in. Parent
+   * clears this on promotion, direction reversal, visibility drop, or
+   * fullscreen/creation-overlay open. See CardFeed.EARLY_MOTION_FRACTION.
+   */
+  earlyMotion?: boolean;
   /** Fires once when the poster image has painted. */
   onFirstFrameReady?: () => void;
 }
