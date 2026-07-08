@@ -215,14 +215,14 @@ function CountdownPills({ hoursUntilStart }: { hoursUntilStart: number }) {
   }
 
   return (
-    <div style={{ display: 'flex', gap: 8 }}>
+    <div style={{ display: 'flex', gap: 7 }}>
       {pills.map(p => (
         <div
           key={p.label}
           style={{
-            minWidth: 56,
-            padding: '8px 10px',
-            borderRadius: 10,
+            minWidth: 48,
+            padding: '6px 9px',
+            borderRadius: 9,
             background: 'rgba(255,255,255,0.08)',
             border: '0.5px solid rgba(255,255,255,0.14)',
             display: 'flex',
@@ -234,7 +234,7 @@ function CountdownPills({ hoursUntilStart }: { hoursUntilStart: number }) {
           <span
             style={{
               ...NUMERIC_STYLE,
-              fontSize: 22,
+              fontSize: 18,
               fontWeight: 800,
               letterSpacing: '-0.02em',
               color: 'white',
@@ -245,7 +245,7 @@ function CountdownPills({ hoursUntilStart }: { hoursUntilStart: number }) {
           </span>
           <span
             style={{
-              fontSize: 8.5,
+              fontSize: 8,
               fontWeight: 800,
               letterSpacing: '0.14em',
               color: 'rgba(255,255,255,0.55)',
