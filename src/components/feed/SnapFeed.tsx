@@ -8,7 +8,7 @@ import { haptic } from '@/utils/haptics';
 
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useFullscreenFeedStore } from '@/store/fullscreenFeedStore';
-import { vperfStart, vperfArmLane, vperfNextId } from '@/perf/vperf';
+import { vperfStart, vperfArmLane, vperfNextId, vperfFeedScrollTick, vperfFeedActivateStart, vperfFeedActivateEnd } from '@/perf/vperf';
 
 
 
@@ -149,6 +149,9 @@ export function SnapFeed({
   // active slide's primary media is a video; image-only settles simply time
   // out (TIMEOUT verdict) and are harmless / rare in the vertical feed.
   const prevActiveRef = useRef<number>(activeIndex);
+  const activateT0Ref = useRef<number>(0);
+  const activateWarmRef = useRef<boolean>(false);
+  const activateDoneRef = useRef<boolean>(true);
   useEffect(() => {
     if (prevActiveRef.current === activeIndex) return;
     prevActiveRef.current = activeIndex;
@@ -158,8 +161,52 @@ export function SnapFeed({
     vperfStart(spanId, 'swipe.vertical', { postId: post.id, activeIndex });
     vperfArmLane('feed-active', { spanId, endOn: 'firstFrame', phase: 'firstFrame' });
     vperfArmLane('feed-active', { spanId, endOn: 'playing' });
+
+    // [BASELINE] feed.activate — activation → media visible latency.
+    activateT0Ref.current = vperfFeedActivateStart();
+    activateDoneRef.current = false;
+    // Heuristic warm: if activation happens within 400ms of prior activation,
+    // treat as warm (fast swipes reuse buffered adjacent lanes).
+    const hasVideo = (post as any)?.mediaItems?.some?.((m: any) => m?.type === 'video');
+    const mediaType: 'image' | 'video' = hasVideo ? 'video' : 'image';
+    // Rely on the swipe.vertical span's arming: when a 'playing' or 'firstFrame'
+    // event fires on feed-active, we approximate activation completion by
+    // ending here on the next microtask if not already ended. Simpler path:
+    // measure until 'playing'/'firstFrame' via a lane arm.
+    const armId = vperfNextId(`feed.activate:${post.id}`);
+    vperfStart(armId, mediaType === 'image' ? 'feed.activate.image' : 'feed.activate.video.cold', { idx: activeIndex });
+    if (mediaType === 'video') {
+      vperfArmLane('feed-active', { spanId: armId, endOn: 'firstFrame' });
+      vperfArmLane('feed-active', { spanId: armId, endOn: 'playing' });
+    }
+    // Emit the aggregator-facing feed.activate line as well (short, budgeted).
+    const finalize = () => {
+      if (activateDoneRef.current) return;
+      activateDoneRef.current = true;
+      vperfFeedActivateEnd({
+        t0: activateT0Ref.current,
+        idx: activeIndex,
+        mediaType,
+        warm: activateWarmRef.current,
+      });
+    };
+    // Fallback finalize after 900ms if lane events never arrive.
+    const to = window.setTimeout(finalize, 900);
+    // For images, resolve on next frame — image branch has no lane events.
+    if (mediaType === 'image') requestAnimationFrame(() => { finalize(); });
+    return () => { clearTimeout(to); finalize(); };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [activeIndex]);
+
+  // [BASELINE] feed.scroll sampler — subscribes to the outer scroll element.
+  useEffect(() => {
+    const el = containerRef.current;
+    if (!el) return;
+    const onScroll = () => vperfFeedScrollTick('snapfeed');
+    el.addEventListener('scroll', onScroll, { passive: true });
+    return () => el.removeEventListener('scroll', onScroll);
+  }, []);
+
 
   // NOTE: no route-change pauseAll here — the VideoEngine owns per-lane
   // activation via useVideoLane, and the fullscreen overlay's open path

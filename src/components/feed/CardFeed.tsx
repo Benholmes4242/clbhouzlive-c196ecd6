@@ -361,16 +361,19 @@ export const CardFeed = forwardRef<CardFeedHandle, CardFeedProps>(function CardF
       if (mediaIndex > 0) setCarouselPosition(idx, mediaIndex, tab);
       if (isPerfEnabled()) {
         // eslint-disable-next-line no-console
-        console.info('[DECIDE]', 'tap.context', {
-          postId: post.id,
-          mediaId: mediaId ?? null,
-          ownerKey: ownerKey ?? null,
-          hasOrigin: !!origin?.el,
-          isActiveCard: idx === playingIdx,
-          playingIdx,
-          tappedIdx: idx,
-          surface: 'clubhouse',
-        });
+        import('@/perf/vperf').then(({ vperfSinceActiveMs }) => {
+          console.info('[DECIDE]', 'tap.context', {
+            postId: post.id,
+            mediaId: mediaId ?? null,
+            ownerKey: ownerKey ?? null,
+            hasOrigin: !!origin?.el,
+            isActiveCard: idx === playingIdx,
+            playingIdx,
+            tappedIdx: idx,
+            surface: 'clubhouse',
+            sinceActiveMs: vperfSinceActiveMs('clubhouse'),
+          });
+        }).catch(() => {});
       }
       if (origin?.el) {
         openWithOrigin({

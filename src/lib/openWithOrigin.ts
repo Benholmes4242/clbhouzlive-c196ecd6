@@ -37,6 +37,11 @@ const BORROW_DBG = (evt: string, payload: Record<string, unknown> = {}) => {
 // each. No behaviour changes — logging only.
 const DECIDE = (evt: string, payload: Record<string, unknown> = {}) => {
   if (!isPerfEnabled()) return;
+  // [BASELINE] tally the decision outcome per event for the scorecard.
+  try {
+    const outcome = String((payload as any).outcome ?? (payload as any).deniedBy ?? evt);
+    import('@/perf/vperf').then((m) => m.vperfDecideTally(evt, outcome)).catch(() => {});
+  } catch {}
   // eslint-disable-next-line no-console
   console.info('[DECIDE]', evt, payload);
 };
@@ -381,11 +386,20 @@ export function openWithOrigin({
   // arm the target lane's next 'playing' event to close the span.
   vperfMark(fsOpenSpanId, 'storeOpen');
   const source: 'borrow' | 'lane' = borrow ? 'borrow' : 'lane';
-  vperfMeta(fsOpenSpanId, { source });
-  vperfSetBudget(fsOpenSpanId, source === 'borrow' ? 150 : 500);
-  const targetLaneId: string = borrow ? borrow.laneId : 'fullscreen';
-  vperfArmLane(targetLaneId, { spanId: fsOpenSpanId, endOn: 'firstFrame', phase: 'firstFrame' });
-  vperfArmLane(targetLaneId, { spanId: fsOpenSpanId, endOn: 'playing' });
+  const isImage = mediaKind === 'image';
+  vperfMeta(fsOpenSpanId, { source, type: isImage ? 'image' : 'video' });
+  if (isImage) {
+    // Image path: 200ms to settled. Image branch has no lane events; settled
+    // is marked by the overlay's clone onTransitionEnd (see FullscreenFeedOverlay).
+    vperfSetBudget(fsOpenSpanId, 200);
+    // Stash spanId globally so the overlay can mark image phases without prop plumbing.
+    try { (window as any).__vperfFsOpenSpanId = fsOpenSpanId; } catch {}
+  } else {
+    vperfSetBudget(fsOpenSpanId, source === 'borrow' ? 150 : 500);
+    const targetLaneId: string = borrow ? borrow.laneId : 'fullscreen';
+    vperfArmLane(targetLaneId, { spanId: fsOpenSpanId, endOn: 'firstFrame', phase: 'firstFrame' });
+    vperfArmLane(targetLaneId, { spanId: fsOpenSpanId, endOn: 'playing' });
+  }
 
   // [VPERF] fs.open motion trace — borrow opens only (the reported screen
   // jolt is tile→fullscreen FLIP). originRect is captured pre-mount so it's

@@ -288,6 +288,16 @@ export function FullscreenFeedOverlay() {
       closeCompletedRef.current = false;
       setReverseClone(null);
       setReverseCollapsed(false);
+      // [BASELINE] image fs.open phases — mark blurMount + chromePaint on open.
+      try {
+        const sid: string | undefined = (window as any).__vperfFsOpenSpanId;
+        if (sid) {
+          import('@/perf/vperf').then((m) => {
+            m.vperfImagePhase(sid, 'blurMount');
+            requestAnimationFrame(() => m.vperfImagePhase(sid, 'chromePaint'));
+          }).catch(() => {});
+        }
+      } catch {}
     }
   }, [isOpen]);
 
@@ -761,13 +771,20 @@ export function FullscreenFeedOverlay() {
                     alt=""
                     aria-hidden
                     onTransitionEnd={(e) => {
-                      // Motion clock: clone's expand animation just finished.
-                      // The combined reveal gate above decides when to flip
-                      // firstFrameReady (waits for the video's real first
-                      // frame on video opens; images reveal immediately).
                       if (!cloneExpanded) return;
                       if (e.propertyName !== 'transform') return;
                       setMotionComplete(true);
+                      // [BASELINE] image fs.open — mark settled + end span.
+                      try {
+                        const sid: string | undefined = (window as any).__vperfFsOpenSpanId;
+                        if (sid && origin?.mediaType === 'image') {
+                          import('@/perf/vperf').then((m) => {
+                            m.vperfImagePhase(sid, 'settled');
+                            m.vperfEnd(sid, {});
+                            (window as any).__vperfFsOpenSpanId = null;
+                          }).catch(() => {});
+                        }
+                      } catch {}
                     }}
                     style={{
                       position: 'fixed',

@@ -95,6 +95,7 @@ const sessions = new Map<string, SessionRec>();
 const DEFAULT_BUDGETS: Record<string, number> = {
   'fs.open.borrow': 150,
   'fs.open.lane': 500,
+  'fs.open.image': 200,
   'fs.close': 250,
 
   'autoplay.warm': 120,
@@ -103,7 +104,21 @@ const DEFAULT_BUDGETS: Record<string, number> = {
   'swipe.pager': 450,
   seek: 300,
   'loop.gap': 120,
+
+  'feed.scroll': 0,
+  'feed.activate.image': 250,
+  'feed.activate.video.warm': 120,
+  'feed.activate.video.cold': 600,
 };
+
+// -------- page tag (auto-injected into every emit) --------
+let __currentPage: string = 'unknown';
+export function vperfSetPage(page: string): void {
+  __currentPage = page || 'unknown';
+  // Trigger per-page nav summary when the page changes.
+  try { scorecardEmitOnNav(); } catch {}
+}
+export function vperfGetPage(): string { return __currentPage; }
 
 function on(): boolean {
   try {
@@ -121,8 +136,10 @@ function budgetFor(kind: string, metaBudget: number | undefined): number {
 }
 
 function emit(kind: string, payload: Record<string, unknown>): void {
+  const merged = { ...payload, page: (payload as any).page ?? __currentPage };
+  try { scorecardIngest(kind, merged); } catch {}
   // eslint-disable-next-line no-console
-  console.info(`[VPERF] ${kind}`, payload);
+  console.info(`[VPERF] ${kind}`, merged);
 }
 
 function finish(rec: SpanRec, verdict: Verdict, extra: Record<string, unknown>): void {
@@ -580,3 +597,245 @@ export function vperfNextId(prefix: string): string {
   __seq = (__seq + 1) | 0;
   return `${prefix}#${__seq}`;
 }
+
+// ============================================================================
+// BASELINE — session scorecard aggregator, feed metrics, image phase helper,
+// [DECIDE] tally, per-page "sinceActiveMs" bookkeeping. All isPerfEnabled-gated.
+// ============================================================================
+
+interface KindStat {
+  count: number;
+  pass: number;
+  slow: number;
+  timeout: number;
+  totals: number[]; // durations for p50/p95/worst
+}
+
+const scorecardBuckets = new Map<string, KindStat>();      // key = `${kind}|${page}`
+const sessionHealth = {
+  sessionCount: 0,
+  totalStalls: 0,
+  totalDurationMs: 0,
+  totalStallMs: 0,
+  levelSwitches: 0,
+  totalFrames: 0,
+  droppedFrames: 0,
+};
+const decideCounters = new Map<string, Map<string, number>>(); // bucket → key → count
+const feedRollup = new Map<string, { scrolls: number; longFrames: number; frames: number; worstMs: number; activateWarm: number; activateCold: number }>(); // per page
+
+function bucketKey(kind: string, page: string): string { return `${kind}|${page}`; }
+
+function scorecardIngest(kind: string, payload: Record<string, unknown>): void {
+  const page = String((payload as any).page ?? 'unknown');
+  const totalMs = Number((payload as any).totalMs);
+  const verdict = String((payload as any).verdict ?? '');
+
+  if (kind === 'session') {
+    sessionHealth.sessionCount += 1;
+    sessionHealth.totalStalls += Number((payload as any).stallCount) || 0;
+    sessionHealth.totalDurationMs += Number((payload as any).durationMs) || 0;
+    sessionHealth.totalStallMs += Number((payload as any).stallTotalMs) || 0;
+    sessionHealth.levelSwitches += Number((payload as any).levelSwitches) || 0;
+    sessionHealth.totalFrames += Number((payload as any).totalFrames) || 0;
+    sessionHealth.droppedFrames += Number((payload as any).droppedFrames) || 0;
+    return;
+  }
+
+  if (kind === 'feed.scroll') {
+    const r = feedRollup.get(page) ?? { scrolls: 0, longFrames: 0, frames: 0, worstMs: 0, activateWarm: 0, activateCold: 0 };
+    r.scrolls += 1;
+    r.longFrames += Number((payload as any).longFrames) || 0;
+    r.frames += Number((payload as any).frames) || 0;
+    r.worstMs = Math.max(r.worstMs, Number((payload as any).worstFrameMs) || 0);
+    feedRollup.set(page, r);
+  }
+  if (kind === 'feed.activate') {
+    const r = feedRollup.get(page) ?? { scrolls: 0, longFrames: 0, frames: 0, worstMs: 0, activateWarm: 0, activateCold: 0 };
+    if ((payload as any).warm) r.activateWarm += 1; else r.activateCold += 1;
+    feedRollup.set(page, r);
+  }
+
+  if (!isFinite(totalMs) || totalMs < 0) return;
+  const key = bucketKey(kind, page);
+  const stat = scorecardBuckets.get(key) ?? { count: 0, pass: 0, slow: 0, timeout: 0, totals: [] };
+  stat.count += 1;
+  if (verdict === 'PASS') stat.pass += 1;
+  else if (verdict === 'SLOW') stat.slow += 1;
+  else if (verdict === 'TIMEOUT') stat.timeout += 1;
+  stat.totals.push(totalMs);
+  if (stat.totals.length > 500) stat.totals.shift();
+  scorecardBuckets.set(key, stat);
+}
+
+/** Tally a [DECIDE] outcome for the scorecard's counters. Call sites are
+ *  incremental; unused buckets don't render. */
+export function vperfDecideTally(bucket: string, key: string): void {
+  if (!on()) return;
+  let m = decideCounters.get(bucket);
+  if (!m) { m = new Map(); decideCounters.set(bucket, m); }
+  m.set(key, (m.get(key) ?? 0) + 1);
+}
+
+function pct(arr: number[], p: number): number {
+  if (arr.length === 0) return 0;
+  const sorted = [...arr].sort((a, b) => a - b);
+  const i = Math.min(sorted.length - 1, Math.floor(sorted.length * p));
+  return Math.round(sorted[i]);
+}
+
+/** Emit one multi-line [BASELINE] scorecard block. */
+export function vperfScorecard(trigger: 'auto' | 'nav' | 'manual' = 'manual'): void {
+  if (!on()) return;
+  const lines: string[] = [];
+  lines.push(`[BASELINE] trigger=${trigger} page=${__currentPage} @${Math.round(performance.now())}ms`);
+  lines.push('  kind|page                              count  p50   p95  worst  PASS%');
+  const keys = [...scorecardBuckets.keys()].sort();
+  for (const k of keys) {
+    const s = scorecardBuckets.get(k)!;
+    const passPct = s.count > 0 ? Math.round((s.pass / s.count) * 100) : 0;
+    const worst = s.totals.reduce((m, v) => v > m ? v : m, 0);
+    lines.push(
+      `  ${k.padEnd(36)} ${String(s.count).padStart(5)} ${String(pct(s.totals, 0.5)).padStart(4)} ${String(pct(s.totals, 0.95)).padStart(5)} ${String(Math.round(worst)).padStart(6)}  ${String(passPct).padStart(3)}%  (SLOW=${s.slow} TO=${s.timeout})`,
+    );
+  }
+  const sh = sessionHealth;
+  const stallRate = sh.totalDurationMs > 0 ? (sh.totalStallMs / sh.totalDurationMs) : 0;
+  const dropRate = sh.totalFrames > 0 ? (sh.droppedFrames / sh.totalFrames) : 0;
+  const avgLevelSw = sh.sessionCount > 0 ? (sh.levelSwitches / sh.sessionCount) : 0;
+  lines.push(`  session-health: sessions=${sh.sessionCount} stalls=${sh.totalStalls} stallRate=${(stallRate*100).toFixed(2)}% dropRate=${(dropRate*100).toFixed(2)}% avgLevelSw=${avgLevelSw.toFixed(2)}`);
+  for (const [page, r] of feedRollup) {
+    const longPct = r.frames > 0 ? (r.longFrames / r.frames) * 100 : 0;
+    lines.push(`  feed@${page}: scrolls=${r.scrolls} longFrames=${longPct.toFixed(1)}% worstFrame=${Math.round(r.worstMs)}ms activateWarm=${r.activateWarm} activateCold=${r.activateCold}`);
+  }
+  for (const [bucket, m] of decideCounters) {
+    const parts: string[] = [];
+    for (const [k, v] of m) parts.push(`${k}=${v}`);
+    lines.push(`  decide.${bucket}: ${parts.join(' ')}`);
+  }
+  // eslint-disable-next-line no-console
+  console.info(lines.join('\n'));
+}
+
+function scorecardEmitOnNav(): void {
+  if (!on()) return;
+  vperfScorecard('nav');
+}
+
+// Auto-emit every 60s while enabled (installed once at module eval).
+if (typeof window !== 'undefined') {
+  setInterval(() => { try { if (on()) vperfScorecard('auto'); } catch {} }, 60_000);
+  (window as any).vperfScorecard = vperfScorecard;
+}
+
+// ---------------- Feed scroll sampler ----------------
+
+interface FeedScrollRec {
+  page: string;
+  t0: number;
+  frames: number;
+  longFrames: number;
+  worstMs: number;
+  lastFrameT: number;
+  rafId: number;
+  idleTimer: ReturnType<typeof setTimeout>;
+}
+const feedScroll = new Map<string, FeedScrollRec>();
+
+/** Called on scroll events. Coalesces sampling into one span per scroll burst. */
+export function vperfFeedScrollTick(key: string = 'default'): void {
+  if (!on()) return;
+  const now = performance.now();
+  let rec = feedScroll.get(key);
+  if (!rec) {
+    rec = {
+      page: __currentPage,
+      t0: now,
+      frames: 0,
+      longFrames: 0,
+      worstMs: 0,
+      lastFrameT: now,
+      rafId: 0,
+      idleTimer: 0 as any,
+    };
+    const sample = () => {
+      const t = performance.now();
+      const dt = t - rec!.lastFrameT;
+      rec!.lastFrameT = t;
+      rec!.frames += 1;
+      if (dt > rec!.worstMs) rec!.worstMs = dt;
+      if (dt > 26) rec!.longFrames += 1;
+      rec!.rafId = requestAnimationFrame(sample);
+    };
+    rec.rafId = requestAnimationFrame(sample);
+    feedScroll.set(key, rec);
+  }
+  clearTimeout(rec.idleTimer);
+  rec.idleTimer = setTimeout(() => {
+    const r = feedScroll.get(key);
+    if (!r) return;
+    feedScroll.delete(key);
+    cancelAnimationFrame(r.rafId);
+    const durationMs = Math.round(performance.now() - r.t0);
+    emit('feed.scroll', {
+      page: r.page,
+      durationMs,
+      frames: r.frames,
+      longFrames: r.longFrames,
+      worstFrameMs: Math.round(r.worstMs),
+      avgMs: r.frames > 0 ? Math.round(durationMs / r.frames) : 0,
+      budgetMs: 0,
+      verdict: r.frames > 0 && (r.longFrames / r.frames) <= 0.05 ? 'PASS' : 'SLOW',
+    });
+  }, 120);
+}
+
+// ---------------- Feed activate ----------------
+
+const lastActivateAt = new Map<string, number>(); // per-page timestamp
+
+export function vperfFeedActivateStart(page?: string): number {
+  const t = performance.now();
+  lastActivateAt.set(page ?? __currentPage, t);
+  return t;
+}
+
+/** Age (ms) of the currently-active card since it became active on this page. */
+export function vperfSinceActiveMs(page?: string): number | null {
+  const t = lastActivateAt.get(page ?? __currentPage);
+  return t == null ? null : Math.round(performance.now() - t);
+}
+
+export function vperfFeedActivateEnd(opts: {
+  t0: number;
+  idx: number;
+  mediaType: 'image' | 'video';
+  warm?: boolean;
+}): void {
+  if (!on()) return;
+  const totalMs = Math.round(performance.now() - opts.t0);
+  const budget = opts.mediaType === 'image' ? 250 : (opts.warm ? 120 : 600);
+  emit('feed.activate', {
+    idx: opts.idx,
+    mediaType: opts.mediaType,
+    warm: !!opts.warm,
+    totalMs,
+    budgetMs: budget,
+    verdict: totalMs <= budget ? 'PASS' : 'SLOW',
+  });
+}
+
+// ---------------- Image phase helper (Part 1) ----------------
+
+/** Mark an image-specific phase on an fs.open span. Also updates the span's
+ *  meta (upscaleFactor, cacheHit, etc.). Safe no-op if span isn't live. */
+export function vperfImagePhase(
+  spanId: string,
+  phase: 'blurMount' | 'chromePaint' | 'fullResRequested' | 'fullResDecoded' | 'settled',
+  meta?: Record<string, unknown>,
+): void {
+  if (!on()) return;
+  vperfMark(spanId, phase);
+  if (meta) vperfMeta(spanId, meta);
+}
+
