@@ -252,6 +252,8 @@ export const Top10CourseCard: React.FC<Top10CourseCardProps> = ({
         courseName={course.name}
         isOwnProfile={isOwnProfile ?? true}
         privacySetting={privacySetting ?? 'followers'}
+        initialCommentId={initialCommentId}
+        initialParentCommentId={initialParentCommentId}
       />
     </>
   );
