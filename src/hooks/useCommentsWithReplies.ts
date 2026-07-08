@@ -441,42 +441,14 @@ export function useCommentsWithReplies(
         }
       }
 
-      // ── Top-level comment notification to post owner (non-blocking) ──
-      try {
-        if (!parentId && postId) {
-          const { data: postData } = await supabase
-            .from('posts')
-            .select('user_id, actor_type, actor_id')
-            .eq('id', postId)
-            .single();
-          const postOwnerId = postData?.user_id;
-          const postActorType = (postData?.actor_type || 'personal') as 'personal' | 'business';
-          const postActorId = postData?.actor_id || postOwnerId;
+      // Top-level comment notification to the post owner is written by
+      // the `trg_post_comments_create_notification` DB trigger
+      // (public.create_comment_notification). Client-side insert was
+      // removed 2026-07-08: it silently swallowed 23505 unique_violation
+      // collisions against idx_notifications_dedup for six months and
+      // dropped legitimate comment notifications on the floor.
 
-          // Self-comment guard — compare ACTOR, not just user
-          const isSelf =
-            (actorType === 'personal' && postActorType === 'personal' && postOwnerId === currentUserId) ||
-            (actorType === 'business' && postActorType === 'business' && postActorId === actorId);
 
-          if (postOwnerId && !isSelf) {
-            await supabase.from('notifications').insert({
-              user_id: postOwnerId,
-              recipient_actor_type: postActorType,
-              recipient_actor_id: postActorId,
-              actor_id: currentUserId,
-              type: 'comment',
-              title: `${acterName} commented on your post`,
-              message: (() => { const p = stripMentionMarkup(content); return p.length > 60 ? p.slice(0, 60) + '…' : p; })(),
-              entity_type: 'post',
-              entity_id: postId,
-              is_read: false,
-              data: { post_id: postId, comment_id: newCommentId, ...actorDataPayload },
-            });
-          }
-        }
-      } catch {
-        // Non-blocking
-      }
 
 
       return newCommentId;
