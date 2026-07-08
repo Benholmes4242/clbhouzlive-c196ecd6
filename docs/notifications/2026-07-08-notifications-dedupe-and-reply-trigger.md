@@ -85,3 +85,107 @@ Every `INSERT INTO public.notifications` on the primary paths now uses
 column-form dedup. Remaining bare-insert conversions
 (edge functions / admin paths) are queued for after the test-harness
 run, not part of this batch.
+
+## Ben's friend-trigger bodies as live (2026-07-08)
+
+Both applied manually by Ben in Supabase, verified via
+`pg_get_functiondef`. Recorded verbatim here so the migration record
+matches production.
+
+### 1. `create_friend_request_notification`
+
+Column-form `ON CONFLICT` hotfix only; body otherwise original.
+
+```sql
+CREATE OR REPLACE FUNCTION public.create_friend_request_notification()
+RETURNS trigger
+LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path TO 'public'
+AS $function$
+BEGIN
+  IF NEW.status = 'pending' THEN
+    INSERT INTO notifications (
+      user_id, type, actor_id, recipient_actor_id,
+      title, message, data, entity_type, entity_id, is_read
+    )
+    VALUES (
+      NEW.friend_id,
+      'friend_request',
+      NEW.user_id,
+      NEW.friend_id,
+      'Friend request',
+      'sent you a friend request',
+      jsonb_build_object('requester_id', NEW.user_id, 'request_id', NEW.id),
+      'friend_request',
+      NEW.id,
+      false
+    )
+    ON CONFLICT (user_id, type, actor_id, entity_id)
+    DO NOTHING;
+  END IF;
+  RETURN NEW;
+END;
+$function$;
+```
+
+### 2. `create_friend_accepted_notification`
+
+Hotfix + actor enrichment. `data` carries `actor_name`, `actor_avatar`,
+and `actor_avatar_url` so both fallback conventions in
+`useActivityFeed` resolve without an extra join.
+
+```sql
+CREATE OR REPLACE FUNCTION public.create_friend_accepted_notification()
+RETURNS trigger
+LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path TO 'public'
+AS $function$
+DECLARE
+  v_actor_name   TEXT;
+  v_actor_avatar TEXT;
+BEGIN
+  IF OLD.status = 'pending' AND NEW.status = 'accepted' THEN
+    SELECT COALESCE(up.display_name, up.username, 'Someone'),
+           up.profile_photo_url
+      INTO v_actor_name, v_actor_avatar
+      FROM public.user_profiles up
+     WHERE up.id = NEW.friend_id;
+
+    v_actor_name := COALESCE(v_actor_name, 'Someone');
+
+    INSERT INTO notifications (
+      user_id, type, actor_id, recipient_actor_id,
+      title, message, data, entity_type, entity_id, is_read
+    )
+    VALUES (
+      NEW.user_id, 'friend_accepted', NEW.friend_id, NEW.user_id,
+      'Friend request accepted',
+      v_actor_name || ' accepted your friend request',
+      jsonb_build_object(
+        'friend_id', NEW.friend_id,
+        'friendship_id', NEW.id,
+        'actor_name', v_actor_name,
+        'actor_avatar', v_actor_avatar,
+        'actor_avatar_url', v_actor_avatar
+      ),
+      'friendship', NEW.id, false
+    )
+    ON CONFLICT (user_id, type, actor_id, entity_id) DO NOTHING;
+  END IF;
+  RETURN NEW;
+END;
+$function$;
+```
+
+## TODO — normalise avatar fallback chain in `useActivityFeed`
+
+The `friend_accepted` trigger writes both `data.actor_avatar` and
+`data.actor_avatar_url`. The comment / mention / top-ten triggers
+write only `data.actor_avatar`. Harmless today because those types
+resolve avatars via `actor_id` enrichment before falling back to
+`data`, but the fallback chain in `useActivityFeed` currently reads
+`data.actor_avatar_url` only. Next time in that file: extend the
+chain to read either key (`data.actor_avatar_url ?? data.actor_avatar`)
+so any future trigger that omits enrichment still renders correctly.
