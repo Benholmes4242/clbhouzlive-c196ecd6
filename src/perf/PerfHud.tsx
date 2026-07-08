@@ -5,7 +5,10 @@
  */
 
 import React, { useEffect, useState, useCallback, memo } from 'react';
+import { createPortal } from 'react-dom';
 import { navTiming, isPerfEnabled, subscribePerfLive, type NavTransaction } from './navTiming';
+import { Z } from '@/config/zIndex';
+
 
 type Summary = ReturnType<typeof navTiming.getRecent>[number];
 
@@ -45,15 +48,17 @@ export const PerfHud = memo(function PerfHud() {
 
   if (!enabled) return null;
 
+  if (typeof document === 'undefined') return null;
+
   if (!expanded) {
-    return (
+    return createPortal(
       <button
         onClick={() => setExpanded(true)}
         style={{
           position: 'fixed',
           top: 8,
           right: 8,
-          zIndex: 99999,
+          zIndex: Z.logHud,
           padding: '2px 6px',
           fontSize: 10,
           fontFamily: 'monospace',
@@ -67,20 +72,22 @@ export const PerfHud = memo(function PerfHud() {
         aria-label="Open PerfHud"
       >
         PERF
-      </button>
+      </button>,
+      document.body
     );
   }
+
 
   const cur = snap.current;
   const recent = snap.recent;
 
-  return (
+  return createPortal(
     <div
       style={{
         position: 'fixed',
         top: 8,
         right: 8,
-        zIndex: 99999,
+        zIndex: Z.logHud,
         width: 320,
         maxHeight: '60vh',
         overflow: 'auto',
@@ -129,8 +136,10 @@ export const PerfHud = memo(function PerfHud() {
           </div>
         </div>
       ))}
-    </div>
+    </div>,
+    document.body
   );
+
 });
 
 function PhaseBar({ s }: { s: Summary }) {

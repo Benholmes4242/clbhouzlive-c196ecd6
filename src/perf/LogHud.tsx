@@ -1,8 +1,11 @@
 // On-screen log viewer for on-device testing. Tap the floating button to open.
 // Production-safe: returns null unless DEV || ?perf=1. Mirrors PerfHud.
 import React, { useEffect, useState, useCallback, memo } from 'react';
+import { createPortal } from 'react-dom';
 import { consoleCapture, type LogLine } from './consoleCapture';
 import { subscribePerfLive } from './navTiming';
+import { Z } from '@/config/zIndex';
+
 
 
 const LEVEL_COLOR: Record<LogLine['level'], string> = {
@@ -60,16 +63,17 @@ export const LogHud = memo(function LogHud() {
   }, []);
 
   if (!enabled) return null;
+  if (typeof document === 'undefined') return null;
 
   if (!open) {
-    return (
+    return createPortal(
       <button
         onClick={() => setOpen(true)}
         style={{
           position: 'fixed',
           bottom: 80,
           right: 8,
-          zIndex: 99999,
+          zIndex: Z.logHud,
           padding: '6px 10px',
           fontSize: 12,
           fontFamily: 'monospace',
@@ -81,17 +85,19 @@ export const LogHud = memo(function LogHud() {
         aria-label="Open LogHud"
       >
         LOG
-      </button>
+      </button>,
+      document.body
     );
   }
 
+
   const lines = consoleCapture.getLines();
-  return (
+  return createPortal(
     <div
       style={{
         position: 'fixed',
         inset: 0,
-        zIndex: 99999,
+        zIndex: Z.logHud,
         background: 'rgba(0,0,0,0.92)',
         display: 'flex',
         flexDirection: 'column',
@@ -131,8 +137,10 @@ export const LogHud = memo(function LogHud() {
           </div>
         ))}
       </div>
-    </div>
+    </div>,
+    document.body
   );
 });
+
 
 export default LogHud;

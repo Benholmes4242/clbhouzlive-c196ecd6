@@ -39,6 +39,16 @@ export function installConsoleCapture(): void {
   // First buffered line: when capture actually installed (so the copied log shows what preceded it).
   buffer.push({ t: 0, level: 'info', text: `consoleCapture installed (boot +${Math.round(performance.now())}ms)` });
 
+  // Build stamp — surfaces at the top of every LogHud capture so ship notes
+  // unambiguously identify the build. Guarded so tests/older tooling without
+  // the vite `define` don't ReferenceError.
+  try {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const stamp = typeof __BUILD_STAMP__ !== 'undefined' ? __BUILD_STAMP__ : null;
+    if (stamp) console.info('[boot] build ' + stamp);
+  } catch { /* ignore */ }
+
+
   // Drain anything the index.html early-log shim captured before modules evaluated.
   try {
     const early = (window as any).__earlyLogs as Array<[string, number, unknown[]]> | undefined;
