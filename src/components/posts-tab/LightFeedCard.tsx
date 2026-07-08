@@ -93,6 +93,8 @@ export interface LightFeedCardProps {
   onCourse?: (post: FeedPost) => void;
   isActive?: boolean;
   mountVideo?: boolean;
+  /** Early-motion handover — see InlineVideo.earlyMotion. */
+  earlyMotion?: boolean;
   initialMediaIndex?: number;
   onCarouselIndexChange?: (post: FeedPost, idx: number) => void;
   onFollow?: (post: FeedPost) => void;
