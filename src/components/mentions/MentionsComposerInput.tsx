@@ -59,8 +59,6 @@ async function searchMentions(
   render: (data: SuggestionDataItem[]) => void,
 ) {
   const q = (query ?? '').trim();
-  // [MENTIONS-DIAG] entry — temporary instrumentation, no logic change.
-  console.info('[MENTIONS] search', { q });
   if (q.length === 0) {
     render([]);
     return;
@@ -81,13 +79,6 @@ async function searchMentions(
         .eq('is_deleted', false)
         .limit(4),
     ]);
-
-    // [MENTIONS-DIAG] post-fetch — surface both errors and counts.
-    console.info('[MENTIONS] results', {
-      q,
-      usersErr: users.error, usersCount: users.data?.length ?? null,
-      bizErr:   businesses.error, bizCount: businesses.data?.length ?? null,
-    });
 
     const userRows: RichSuggestion[] = (users.data ?? []).map(u => ({
       id: `u:${u.id}`,
@@ -117,16 +108,14 @@ async function searchMentions(
       .sort((a, b) => rank(a) - rank(b))
       .slice(0, 6);
 
-    // [MENTIONS-DIAG] pre-render — row count actually handed to library.
-    console.info('[MENTIONS] render', { q, rows: merged.length });
     render(merged);
-  } catch (e) {
-    // [MENTIONS-DIAG] catch — logs then re-throws so behavior is unchanged
-    // (original code had no catch; the library ignores the returned promise).
-    console.warn('[MENTIONS] search threw', { q, err: e });
-    throw e;
+  } catch {
+    // Silent — the library ignores our returned promise, and empty results
+    // simply keep the panel closed. Errors don't cascade.
+    render([]);
   }
 }
+
 
 export interface MentionsTextStyle {
   fontSize?: number;
