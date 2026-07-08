@@ -138,7 +138,8 @@ export const InlineVideo: React.FC<Props> = ({
   // getLastPos, which is now written synchronously by pause()/pauseAll()/
   // useVideoLane unbind cleanup so it reflects the true scroll-out position.
   const laneAlreadyOwnsThisMedia =
-    !!snapshot && snapshot.postId === resolvedOwnerKey;
+    !!laneId &&
+    VideoEngine.snapshot(laneId).postId === resolvedOwnerKey;
   const startPosition = React.useMemo(() => {
     if (!isActive || !resolvedOwnerKey) return -1;
     if (laneAlreadyOwnsThisMedia) return -1; // kept-bound: no seek
