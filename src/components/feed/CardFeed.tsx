@@ -310,6 +310,45 @@ export const CardFeed = forwardRef<CardFeedHandle, CardFeedProps>(function CardF
       if (prev >= 0 && prevRatio >= PLAY_OUT) return prev;
       return bestIdx >= 0 && bestRatio >= PLAY_OUT ? bestIdx : prev;
     });
+
+    // ── Early-motion candidate (Part 1) ─────────────────────────────
+    // playingIdx ± 1 in the current scroll direction, gated on:
+    //   1. velocity ceiling (skip during flicks)
+    //   2. candidate visibility >= EARLY_MOTION_FRACTION (with hysteresis
+    //      down to EARLY_MOTION_CLEAR when the current earlyIdx retreats)
+    //   3. candidate warm on feed-next (snapshot.postId === candidate.id)
+    // Cold cards are never force-started here — they fall back to the
+    // normal PLAY_IN promotion path. Direction reversal, promotion, and
+    // visibility retreat all clear via the same setter.
+    setEarlyIdx((prevEarly) => {
+      // Reading playingIdx via a state read is fine — recheckActive runs on
+      // rAF/IO, playingIdx settles independently on its own timer.
+      const dir = scrollDirRef.current;
+      const vel = scrollVelocityRef.current;
+      const currentPlay = playingIdxRef.current;
+      if (dir === 0 || vel > EARLY_VELOCITY_MAX || currentPlay < 0) return -1;
+      const cand = currentPlay + dir;
+      if (cand < 0 || cand >= postsRef.current.length) return -1;
+      const ratio = visibilityRef.current.get(cand) ?? 0;
+
+      // Hysteresis: keep current earlyIdx while it's still barely visible.
+      if (prevEarly === cand && ratio >= EARLY_MOTION_CLEAR) return cand;
+      if (prevEarly !== cand && ratio < EARLY_MOTION_FRACTION) return -1;
+      if (ratio < EARLY_MOTION_CLEAR) return -1;
+
+      // Warm-only guard — never force a cold HLS attach at 12%.
+      const cardPost = postsRef.current[cand];
+      if (!cardPost) return -1;
+      try {
+        const snap = VideoEngine.snapshot('feed-next');
+        const warm = snap.postId != null &&
+          (snap.postId === cardPost.id || snap.postId === `${cardPost.id}:0`) &&
+          (snap.state === 'ready' || snap.state === 'playing' || snap.state === 'loading');
+        if (!warm) return -1;
+      } catch { return -1; }
+
+      return cand;
+    });
   }, []);
 
   useEffect(() => {
