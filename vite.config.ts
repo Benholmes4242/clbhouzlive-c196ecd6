@@ -56,6 +56,10 @@ export default defineConfig(({ mode }) => ({
     chunkSizeWarningLimit: 500,
   },
   esbuild: {
+    // Preserve function/class names through minification so the top-level
+    // ErrorBoundary's componentStack shows real component names on device
+    // (sourcemaps stay OFF — this is name preservation only, no OOM risk).
+    keepNames: true,
     // Remove console.log in production (keep errors/warns)
     drop: mode === 'production' ? ['debugger'] : [],
     pure: mode === 'production' ? ['console.log', 'console.debug'] : [],
