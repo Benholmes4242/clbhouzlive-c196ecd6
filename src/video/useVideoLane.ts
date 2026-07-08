@@ -68,12 +68,14 @@ export function useVideoLane(
     return VideoEngine.snapshot(laneId);
   });
 
-  // Mount the lane element into THIS card's host — but only while active.
-  // On laneId change or unmount, the previous lane's element stays where it
-  // was parented; a rotation will re-appendChild it into the new host via
-  // the new binding. No explicit unmount is issued here (elements never
-  // move BETWEEN lanes; they can freely re-parent between hosts).
+  // Mount the lane element into THIS card's host whenever we HOLD a lane
+  // (regardless of play-intent). This is what enables the "keep bound +
+  // paused" pattern for playingIdx±1 neighbours: the physical <video>
+  // stays parented in the neighbour's host, showing its real paused frame
+  // — no re-parenting fires because feed lane rotation is pointer-only.
+  // Load/play remain gated by opts.active below.
   useEffect(() => {
+
     if (!laneId) return;
     let raf = 0;
     const tryMount = () => {
