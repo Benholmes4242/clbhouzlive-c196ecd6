@@ -218,11 +218,15 @@ export const LightCardFeed: React.FC<LightCardFeedProps> = ({
     const readScrollTop = () =>
       scroller instanceof Window ? scroller.scrollY : (scroller as HTMLElement).scrollTop;
     const onScroll = () => {
-      // Signed scroll direction — reused as a directional tie-break in recheckActive.
       const st = readScrollTop();
+      const now = performance.now();
       const dy = st - lastScrollTopRef.current;
+      const dt = Math.max(1, now - (lastScrollTsRef.current || now));
+      const inst = Math.abs(dy) / dt;
+      scrollVelocityRef.current = scrollVelocityRef.current * 0.5 + inst * 0.5;
       if (Math.abs(dy) > 0.5) scrollDirRef.current = dy > 0 ? 1 : -1;
       lastScrollTopRef.current = st;
+      lastScrollTsRef.current = now;
       if (raf) return;
       raf = requestAnimationFrame(() => {
         raf = 0;
@@ -232,10 +236,55 @@ export const LightCardFeed: React.FC<LightCardFeedProps> = ({
     scroller.addEventListener('scroll', onScroll, { passive: true, capture: true } as any);
     return () => {
       scroller.removeEventListener('scroll', onScroll, { capture: true } as any);
-
       if (raf) cancelAnimationFrame(raf);
     };
   }, [recheckActive]);
+
+  // Preload feed-next for the incoming playing card so early-motion has a
+  // warm lane to hand off from. CardFeed does the same — mirrored here so
+  // the profile posts feed also benefits from the IG-style handover.
+  useEffect(() => {
+    const next = posts[playingIdx + 1];
+    const nextMedia = next?.mediaItems?.[0];
+    if (next && nextMedia?.type === 'video' && (nextMedia as any).hlsUrl) {
+      try {
+        VideoEngine.preload('feed-next', {
+          hlsUrl: (nextMedia as any).hlsUrl,
+          posterUrl: (nextMedia as any).thumbnailUrl ?? null,
+          postId: next.id,
+        });
+      } catch { /* engine may not be booted yet — safe to ignore */ }
+    }
+  }, [playingIdx, posts]);
+
+  // Promotion + fullscreen clears — see CardFeed for rationale.
+  useEffect(() => {
+    if (earlyIdx === playingIdx && earlyIdx !== -1) setEarlyIdx(-1);
+  }, [earlyIdx, playingIdx]);
+  const fsIsOpen = useFullscreenFeedStore((s) => s.isOpen);
+  useEffect(() => {
+    if (fsIsOpen && earlyIdx !== -1) setEarlyIdx(-1);
+  }, [fsIsOpen, earlyIdx]);
+
+  // Activation scorecard — one feed.activate emit per promotion.
+  const activateT0Ref = useRef<number>(0);
+  useEffect(() => {
+    const post = posts[playingIdx];
+    if (!post) return;
+    const ownerKey = `${post.id}:0`;
+    const hasVideo = (post as any)?.mediaItems?.some?.((m: any) => m?.type === 'video');
+    const mediaType: 'image' | 'video' = hasVideo ? 'video' : 'image';
+    activateT0Ref.current = vperfFeedActivateStart('posts-tab');
+    const raf = requestAnimationFrame(() => {
+      vperfFeedActivateEnd({
+        t0: activateT0Ref.current,
+        idx: playingIdx,
+        mediaType,
+        earlyStarted: vperfConsumeEarlyStarted(ownerKey),
+      });
+    });
+    return () => cancelAnimationFrame(raf);
+  }, [playingIdx, posts]);
 
   const setActiveIndex = useClubhouseStore((s) => s.setActiveIndex);
   const setCarouselPosition = useClubhouseStore((s) => s.setCarouselPosition);
