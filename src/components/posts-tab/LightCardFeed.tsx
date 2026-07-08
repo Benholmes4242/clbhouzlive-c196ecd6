@@ -131,10 +131,30 @@ export const LightCardFeed: React.FC<LightCardFeedProps> = ({
 
 
 
+  // Promotion → rotate roles first, then flip playingIdx. See CardFeed for the
+  // full rationale (seamless-promotion invariant).
+  const lastPromotedRef = useRef<number>(0);
   useEffect(() => {
     if (settleTimer.current) clearTimeout(settleTimer.current);
     settleTimer.current = setTimeout(() => {
-      setPlayingIdx(activeIdx);
+      const prev = lastPromotedRef.current;
+      const next = activeIdx;
+      if (next !== prev && next >= 0 && prev >= 0) {
+        const dir: 'down' | 'up' = next > prev ? 'down' : 'up';
+        const recycled = feedLaneRoles.rotate(dir);
+        if (_isPerfEnabledForRotate()) {
+          const snap = feedLaneRoles.snapshot();
+          // eslint-disable-next-line no-console
+          console.info('[DECIDE]', 'rotation.promote', {
+            direction: dir, fromIdx: prev, toIdx: next,
+            recycledLane: recycled, borrowedFrozen: snap.frozen,
+            map: { active: snap.active, next: snap.next, prev: snap.prev },
+            surface: 'posts-tab',
+          });
+        }
+      }
+      lastPromotedRef.current = next;
+      setPlayingIdx(next);
     }, SETTLE_MS);
     return () => {
       if (settleTimer.current) clearTimeout(settleTimer.current);
