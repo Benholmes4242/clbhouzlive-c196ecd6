@@ -231,6 +231,34 @@ const ProfilePageV2Content: React.FC = () => {
     const validTabs = ['activity', 'courses', 'top100', 'handicap', 'stats'];
     return tabParam && validTabs.includes(tabParam) ? tabParam : 'activity';
   }, []);
+
+  // Deep-link consumption for Top-10 comment notifications (Item 2B).
+  // URL contract: ?tab=courses&course=<id>&top_ten_comment=<id>[&top_ten_parent=<id>]
+  // One-shot: capture on mount, then clear the params so back-navigation
+  // doesn't re-open the sheet.
+  const deepLinkTopTen = useRef<{
+    courseId: string | null;
+    commentId: string | null;
+    parentId: string | null;
+  } | null>(null);
+  if (deepLinkTopTen.current === null) {
+    deepLinkTopTen.current = {
+      courseId: searchParams.get('course'),
+      commentId: searchParams.get('top_ten_comment'),
+      parentId: searchParams.get('top_ten_parent'),
+    };
+  }
+  useEffect(() => {
+    if (!deepLinkTopTen.current?.commentId) return;
+    // Strip the one-shot params so re-entering the page doesn't re-fire.
+    const next = new URLSearchParams(searchParams);
+    let changed = false;
+    for (const k of ['course', 'top_ten_comment', 'top_ten_parent']) {
+      if (next.has(k)) { next.delete(k); changed = true; }
+    }
+    if (changed) setSearchParams(next, { replace: true });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
   
   const [activeSection, setActiveSection] = useState(initialTab);
   const [bioExpanded, setBioExpanded] = useState(false);
