@@ -5,7 +5,10 @@
  * final unlock), so overlapping overlays can't stomp each other's saved state
  * and leave the body stuck `position: fixed` (which freezes the whole page).
  */
+import { scrollPositions } from '@/components/ScrollRestoration';
+
 let lockCount = 0;
+let lockOwnerPath: string | null = null;
 let saved: {
   overflow: string;
   position: string;
