@@ -510,9 +510,13 @@ class VideoEngineImpl {
         el: lane.el,
         startLevel,
         bwEstimate,
+        // [PREDICT] seededBw — the value fed to abrEwmaDefaultEstimate for
+        // this lane's hls instance (null when unavailable / rail lane).
+        seededBw: (lane as any)._seededBw ?? null,
         postId: lane.postId,
         engine: hls ? 'hls.js' : 'native',
       });
+
       this.transition(lane, 'playing');
     };
     const onPause = () => {
