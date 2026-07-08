@@ -857,7 +857,15 @@ export const CardFeed = forwardRef<CardFeedHandle, CardFeedProps>(function CardF
           computeItemKey={(_, post) => post.id}
           rangeChanged={handleRangeChanged}
           endReached={handleEndReached}
-          increaseViewportBy={{ top: 400, bottom: 800 }}
+          // Symmetric viewport-anchored keep window. Top was previously 400
+          // (half of bottom), which unmounted playingIdx-1 under any real
+          // down-flick velocity. On reversal the up-entering card had no
+          // host and no observer entry, starving the (verified-symmetric)
+          // role rotation + warm + early-motion chain. Widening top to
+          // match bottom keeps playingIdx-1 always mounted with its paused
+          // first frame and playingIdx-2 as the observer's early-warning
+          // entry. See docs/video/2026-07-08-pr-c-symmetric-mount-window-shipnote.md
+          increaseViewportBy={{ top: 800, bottom: 800 }}
           overscan={{ main: 400, reverse: 400 }}
           components={components}
           restoreStateFrom={initialState}

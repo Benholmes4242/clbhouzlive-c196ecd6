@@ -494,7 +494,12 @@ export const LightCardFeed: React.FC<LightCardFeedProps> = ({
           computeItemKey={(_, post) => post.id}
           endReached={handleEndReached}
           defaultItemHeight={950}
-          increaseViewportBy={{ top: 600, bottom: 1200 }}
+          // Symmetric viewport-anchored keep window — see CardFeed for the
+          // full rationale. Top was previously 600 (half of bottom), which
+          // unmounted playingIdx-1 under sustained down-scroll and starved
+          // up-scroll early motion. Matching bottom keeps playingIdx-1 and
+          // playingIdx-2 mounted with their paused first frames.
+          increaseViewportBy={{ top: 1200, bottom: 1200 }}
           overscan={{ main: 600, reverse: 600 }}
           components={components}
         />
