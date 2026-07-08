@@ -199,11 +199,11 @@ export const LightCardFeed: React.FC<LightCardFeedProps> = ({
       if (prevEarly === cand && ratio >= EARLY_MOTION_CLEAR) return cand;
       if (prevEarly !== cand && ratio < EARLY_MOTION_FRACTION) return -1;
       if (ratio < EARLY_MOTION_CLEAR) return -1;
+      // Warm-only guard via role lookup — see CardFeed for rationale.
       const cardPost = postsRef.current[cand];
       if (!cardPost) return -1;
       try {
-        // Down-scroll uses feed-next; up-scroll uses feed-prev (PR-A).
-        const laneId = dir > 0 ? 'feed-next' : 'feed-prev';
+        const laneId = feedLaneRoles.laneForRole(dir > 0 ? 'next' : 'prev');
         const snap = VideoEngine.snapshot(laneId);
         const warm = snap.postId != null &&
           (snap.postId === cardPost.id || snap.postId === `${cardPost.id}:0`) &&
