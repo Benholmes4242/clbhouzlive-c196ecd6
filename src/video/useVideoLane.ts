@@ -89,6 +89,12 @@ export function useVideoLane(
     tryMount();
     return () => {
       if (raf) cancelAnimationFrame(raf);
+      // Role-loss / unbind: capture live currentTime → lastPos BEFORE any
+      // downstream unparent or src teardown can idle the decoder. Belt-and-
+      // braces with the capture already inside VideoEngine.pause(); covers
+      // the case where a card drops its laneId without an accompanying pause
+      // (e.g. non-active bound-only neighbour whose role goes null).
+      VideoEngine.captureLastPos(laneId);
     };
   }, [laneId]);
 
