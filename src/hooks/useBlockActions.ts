@@ -18,6 +18,9 @@ export const useBlockActions = ({ currentUserId }: UseBlockActionsProps) => {
     queryClient.invalidateQueries({ queryKey: ['following-list'] });
     queryClient.invalidateQueries({ queryKey: ['friends-list'] });
     queryClient.invalidateQueries({ queryKey: ['nearby-users'] });
+    // blockedIds is bidirectional in the discovery-exclusions bag; refresh
+    // so a just-(un)blocked user reappears/disappears from search + tabs.
+    queryClient.invalidateQueries({ queryKey: ['discovery-exclusions'] });
   };
 
   const blockUser = async (targetUserId: string) => {
