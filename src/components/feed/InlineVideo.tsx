@@ -89,27 +89,44 @@ export const InlineVideo: React.FC<Props> = ({
 
   const resolvedOwnerKey = ownerKey ?? (postId ? `${postId}:0` : null);
 
-  // Role selection — single source of truth. Priority: active > early.
-  // Early role is detected by which role's currently-bound physical lane is
-  // warmed for this card's media (parent's warm effect stamps postId on
-  // preload before the visibility gate flips earlyMotion true).
-  const detectEarlyRole = (): FeedRole | null => {
+  // Role selection — single source of truth. Priority:
+  //   active > early(next/prev, playing) > bound(neighbour, PAUSED)
+  //
+  // The "bound" tier is what keeps the real paused frame visible for
+  // playingIdx±1 neighbours after they lose active/early. Any of the 3
+  // feed roles whose currently-bound physical lane carries THIS card's
+  // postId counts — that means the element is already parented in our
+  // host with firstFrame painted, paused at its true lastPos by the
+  // play-effect cleanup. We hold the role for mount-intent only; hlsUrl
+  // and playback stay off so no load/seek/play fires.
+  const detectRoleForMatch = (): FeedRole | null => {
     if (!resolvedOwnerKey) return null;
     const matches = (s: LaneSnapshot) =>
       s.postId != null && (s.postId === postId || s.postId === resolvedOwnerKey);
     try {
-      const nextLane = feedLaneRoles.laneForRole('next');
-      if (matches(VideoEngine.snapshot(nextLane))) return 'next';
-      const prevLane = feedLaneRoles.laneForRole('prev');
-      if (matches(VideoEngine.snapshot(prevLane))) return 'prev';
+      for (const r of ['next', 'prev', 'active'] as FeedRole[]) {
+        const lane = feedLaneRoles.laneForRole(r);
+        if (matches(VideoEngine.snapshot(lane))) return r;
+      }
     } catch { /* engine not booted */ }
     return null;
   };
+  // Early role — restricted to next/prev, since 'active' during earlyMotion
+  // would collide with a real active card.
+  const detectEarlyRole = (): FeedRole | null => {
+    const r = detectRoleForMatch();
+    return r === 'next' || r === 'prev' ? r : null;
+  };
   const role: FeedRole | null = isActive
     ? 'active'
-    : (earlyMotion ? detectEarlyRole() : null);
+    : (earlyMotion
+        ? detectEarlyRole()
+        : (isNear ? detectRoleForMatch() : null));
 
   const laneId = useLaneForRole(role);
+  // Playback intent — separate from role/mount. Only active or early-motion
+  // cards actually load + play; neighbour "bound" roles stay paused.
+  const playbackIntent = isActive || (earlyMotion && role !== null);
 
   // Start position: read lastPos when we (re)activate the active role. The
   // PR-B seamless-promotion case (early lane already playing → becomes
@@ -122,12 +139,13 @@ export const InlineVideo: React.FC<Props> = ({
   }, [isActive, resolvedOwnerKey]);
 
   const lane = useVideoLane(laneId, {
-    hlsUrl: role ? hlsUrl ?? null : null,
+    hlsUrl: playbackIntent ? hlsUrl ?? null : null,
     posterUrl: posterUrl || null,
     startPosition,
-    active: !!role,
+    active: playbackIntent,
     muted: isMuted,
     postId: resolvedOwnerKey,
+
     ownerKey: resolvedOwnerKey,
   });
 
