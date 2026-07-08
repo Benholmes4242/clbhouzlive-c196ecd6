@@ -185,11 +185,15 @@ export function SnapFeed({
     const finalize = () => {
       if (activateDoneRef.current) return;
       activateDoneRef.current = true;
+      // [PREDICT] prefetched flag — did the PrefetchController warm this
+      // ownerKey (post.id:0 for the primary media) before activation?
+      const wasPrefetched = PrefetchController.wasPrefetched(`${post.id}:0`);
       vperfFeedActivateEnd({
         t0: activateT0Ref.current,
         idx: activeIndex,
         mediaType,
         warm: activateWarmRef.current,
+        prefetched: wasPrefetched,
       });
     };
     // Fallback finalize after 900ms if lane events never arrive.
@@ -199,6 +203,7 @@ export function SnapFeed({
     return () => { clearTimeout(to); finalize(); };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [activeIndex]);
+
 
   // [BASELINE] feed.scroll sampler — subscribes to the outer scroll element.
   useEffect(() => {
