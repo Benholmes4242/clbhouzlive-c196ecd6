@@ -245,6 +245,13 @@ export const CardFeed = forwardRef<CardFeedHandle, CardFeedProps>(function CardF
   const scrollVelocityRef = useRef<number>(0); // px/ms
   const observerRef = useRef<IntersectionObserver | null>(null);
   const cardEls = useRef<Map<number, HTMLElement>>(new Map());
+  // Refs mirroring state/props so recheckActive (stable useCallback) can
+  // read the latest values without re-binding — matches the existing
+  // visibility/scroll ref pattern above.
+  const playingIdxRef = useRef(0);
+  const postsRef = useRef(posts);
+  useEffect(() => { playingIdxRef.current = playingIdx; }, [playingIdx]);
+  useEffect(() => { postsRef.current = posts; }, [posts]);
 
   // Debounce: promote activeIdx → playingIdx only after the centre has
   // held steady for SETTLE_MS. While scrolling, playingIdx stays put so
