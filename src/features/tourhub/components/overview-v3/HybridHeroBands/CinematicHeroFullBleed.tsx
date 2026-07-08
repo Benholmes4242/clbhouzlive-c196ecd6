@@ -506,7 +506,8 @@ export function CinematicHeroFullBleed({
       style={{
         position: 'relative',
         width: '100%',
-        minHeight: '78vh',
+        // Match Course Detail cinematic hero sizing (see GolfClubView.tsx).
+        minHeight: 'calc(clamp(380px, 44dvh, 460px) + env(safe-area-inset-top, 0px))',
         background,
         backgroundColor: INK_BASE,
         display: 'flex',
@@ -515,7 +516,8 @@ export function CinematicHeroFullBleed({
       }}
     >
       {/* Spacer */}
-      <div style={{ flex: 1, minHeight: 220 }} />
+      <div style={{ flex: 1, minHeight: 140 }} />
+
 
       {/* Title block */}
       <div
