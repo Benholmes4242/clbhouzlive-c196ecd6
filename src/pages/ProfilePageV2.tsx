@@ -1195,6 +1195,9 @@ const ProfilePageV2Content: React.FC = () => {
               isOwnProfile={isSelf}
               onManage={isSelf ? () => setShowTopTenModal(true) : undefined}
               displayName={profile.display_name ?? profile.username ?? undefined}
+              initialCourseId={deepLinkTopTen.current?.courseId ?? null}
+              initialCommentId={deepLinkTopTen.current?.commentId ?? null}
+              initialParentCommentId={deepLinkTopTen.current?.parentId ?? null}
             />
             {showTopTenModal && isSelf && (
               <AddCourseModal
