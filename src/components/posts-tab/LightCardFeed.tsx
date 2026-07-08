@@ -274,7 +274,7 @@ export const LightCardFeed: React.FC<LightCardFeedProps> = ({
         VideoEngine.preload(laneId, {
           hlsUrl: m.hlsUrl,
           posterUrl: m.thumbnailUrl ?? null,
-          postId: post.id,
+          postId: `${post.id}:0`,
         });
       } catch { /* engine may not be booted yet — safe to ignore */ }
     };
