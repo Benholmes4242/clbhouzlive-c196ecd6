@@ -250,6 +250,7 @@ const FeedCardImpl: React.FC<FeedCardProps> = ({
   onCourse,
   isActive = false,
   mountVideo = false,
+  earlyMotion = false,
   initialMediaIndex = 0,
   onCarouselIndexChange,
   onFollow,
