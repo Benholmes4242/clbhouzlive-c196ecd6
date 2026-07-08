@@ -1,8 +1,11 @@
 // On-screen log viewer for on-device testing. Tap the floating button to open.
 // Production-safe: returns null unless DEV || ?perf=1. Mirrors PerfHud.
 import React, { useEffect, useState, useCallback, memo } from 'react';
+import { createPortal } from 'react-dom';
 import { consoleCapture, type LogLine } from './consoleCapture';
 import { subscribePerfLive } from './navTiming';
+import { Z } from '@/config/zIndex';
+
 
 
 const LEVEL_COLOR: Record<LogLine['level'], string> = {
