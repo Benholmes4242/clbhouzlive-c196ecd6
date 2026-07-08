@@ -16,6 +16,7 @@ import { FS_TRANSITION_MODE } from '@/lib/media/transitionMode';
 
 
 import { usePostViewTracker } from '@/hooks/usePostViewTracker';
+import { MentionText } from '@/components/mentions/MentionText';
 
 interface FeedSlideProps {
   post: FeedPost;
@@ -253,9 +254,7 @@ export const FeedSlide = memo(function FeedSlide({
     // Text-only fallback
     return (
       <div className="absolute inset-0 flex items-center justify-center px-8">
-        <p className="text-white text-lg text-center leading-relaxed">
-          {post.caption || ''}
-        </p>
+        <MentionText as="p" text={post.caption || ''} className="text-white text-lg text-center leading-relaxed" />
       </div>
     );
   };

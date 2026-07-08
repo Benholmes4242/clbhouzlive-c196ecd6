@@ -7,6 +7,7 @@ import { useFullscreenFeedStore } from '@/store/fullscreenFeedStore';
 import { recordPostViewOnce } from '@/hooks/usePostViewTracker';
 import { mapActivityPostToFeedPost } from '@/lib/activityPostMapper';
 import type { ActivityPost } from '@/components/profile/types/ActivityTypes';
+import { MentionText } from '@/components/mentions/MentionText';
 
 interface PostPreview {
   id: string;
@@ -332,9 +333,9 @@ const PostDeepLinkPage: React.FC = () => {
 
           {/* Caption */}
           {post.caption && (
-            <p className="text-white/80 text-[13px] leading-[1.45] line-clamp-3">
-              {post.caption}
-            </p>
+            <div className="text-white/80 text-[13px] leading-[1.45] line-clamp-3">
+              <MentionText text={post.caption} />
+            </div>
           )}
         </div>
 
