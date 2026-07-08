@@ -209,13 +209,17 @@ function getDetail(n: ActivityNotification): string | null {
       const reason = d.reason || d.note || n.message;
       return reason ? truncate(reason, 160) : null;
     }
-    // Friend request / accepted: title already reads "{Name} {verb}".
-    // The trigger's enriched `message` is a full sentence starting with the
-    // same name, so echoing it below the title double-speaks. Suppress the
-    // detail line for these single-line social rows. Push copy is unaffected
-    // (push notifications read n.message directly, not this renderer).
+    // Types whose enriched trigger message is a FULL SENTENCE that begins
+    // with the actor's name — echoing it below the composed title line
+    // double-speaks. Suppress the detail line for these single-line social
+    // rows. Push copy is unaffected (push reads n.message directly, not
+    // this renderer). See ship-note Item 4 for the full audit table.
     case 'friend_request':
     case 'friend_request_sent':
+    case 'follow':
+    case 'new_post':
+    case 'business_member_added':
+    case 'business_team_member_joined':
       return null;
     case 'friend_accepted':
       return "You're now connected";
