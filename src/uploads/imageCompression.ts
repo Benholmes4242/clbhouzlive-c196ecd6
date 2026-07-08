@@ -80,13 +80,21 @@ export async function compressImage(
 ): Promise<CompressionResult> {
   const mergedOptions = { ...DEFAULT_OPTIONS, ...options };
   const originalSize = file.size;
-  
+
+  console.log('[UPLOAD/COMPRESS] begin', {
+    name: file.name, type: file.type, size: file.size,
+    useWebWorker: true,
+  });
+
   // Get original dimensions first
   const originalDimensions = await getImageDimensions(file);
   
   // Skip compression for small images or if already small enough
   if (originalSize < COMPRESSION_THRESHOLD_BYTES) {
     console.log(`[ImageCompression] Skipping ${file.name}: already small (${formatBytes(originalSize)})`);
+    console.log('[UPLOAD/COMPRESS] ok', {
+      name: file.name, outSize: originalSize, wasCompressed: false,
+    });
     return {
       file,
       originalSize,
@@ -120,6 +128,9 @@ export async function compressImage(
       `${formatBytes(originalSize)} → ${formatBytes(compressedSize)} ` +
       `(${reductionPercent}% reduction)`
     );
+    console.log('[UPLOAD/COMPRESS] ok', {
+      name: file.name, outSize: compressedSize, wasCompressed: true,
+    });
     
     return {
       file: compressedFile,
@@ -132,8 +143,14 @@ export async function compressImage(
     };
   } catch (error) {
     console.error('[ImageCompression] Failed, using original:', error);
+    console.error('[UPLOAD/COMPRESS] failed', {
+      name: file.name,
+      errName: error instanceof Error ? error.name : typeof error,
+      errMessage: error instanceof Error ? error.message : String(error),
+      stackHead: error instanceof Error ? (error.stack || '').slice(0, 300) : undefined,
+    });
     
-    // Fall back to original file
+    // Fall back to original file (unchanged behaviour)
     return {
       file,
       originalSize,

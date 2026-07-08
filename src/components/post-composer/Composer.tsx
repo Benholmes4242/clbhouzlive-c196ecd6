@@ -159,6 +159,20 @@ export function Composer({
 
   const canSwitchActor = availableActors.length > 1;
 
+  // One-time platform log for upload diagnostics ([UPLOAD/ENV]).
+  useEffect(() => {
+    try {
+      // Dynamic import so the log stays passive and never branches control flow.
+      import('@/uploads/medianBridge').then(({ detectMedianBridge }) => {
+        console.log('[UPLOAD/ENV]', {
+          ua: navigator.userAgent,
+          median: JSON.stringify(detectMedianBridge()),
+          onLine: navigator.onLine,
+        });
+      });
+    } catch {}
+  }, []);
+
   // Visual viewport — for keyboard docking
   useEffect(() => {
     const vv = window.visualViewport;

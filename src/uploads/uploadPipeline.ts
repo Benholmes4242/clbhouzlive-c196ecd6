@@ -480,11 +480,13 @@ async function processPostJob(jobId: string, job: any): Promise<void> {
       const mediaItem = job.mediaItems?.[index];
       const fileId = mediaItem?.id || `file-${index}`;
       
-      console.log(`[uploadPipeline] Uploading file ${index + 1}/${job.files.length}: ${file.name}`);
+      console.log(`[uploadPipeline] Uploading file ${index + 1}/${job.files.length}: ${file.name}`, {
+        type: file.type, size: file.size, onLine: navigator.onLine,
+      });
 
       // Check network status before upload - wait if offline
       if (!navigator.onLine) {
-        console.log('[uploadPipeline] Offline, waiting for connection...');
+        console.warn('[UPLOAD/PIPE] PAUSED navigator.onLine=false');
         uploadEventBus.emit('file:upload-progress', {
           type: 'file:upload-progress',
           jobId,
@@ -770,7 +772,11 @@ async function processPostJob(jobId: string, job: any): Promise<void> {
         fileUploadResults.push({ index, status: 'completed' });
 
       } catch (fileError: any) {
-        console.error(`[uploadPipeline] Failed to upload file ${file.name}:`, fileError);
+        console.error(`[uploadPipeline] Failed to upload file ${file.name}:`, fileError, {
+          errName: fileError?.name,
+          errMessage: fileError?.message,
+          stackHead: (fileError?.stack || '').slice(0, 300),
+        });
         
         // Emit file upload failed event
         uploadEventBus.emit('file:upload-failed', {
@@ -1439,11 +1445,13 @@ async function processReviewJob(jobId: string, job: any): Promise<void> {
         const mediaItem = job.mediaItems?.[index];
         const fileId = mediaItem?.id || `file-${index}`;
         
-        console.log(`[uploadPipeline] Uploading review file ${index + 1}/${job.files.length}: ${file.name}`);
+        console.log(`[uploadPipeline] Uploading review file ${index + 1}/${job.files.length}: ${file.name}`, {
+          type: file.type, size: file.size, onLine: navigator.onLine,
+        });
         
         // Check network status
         if (!navigator.onLine) {
-          console.log('[uploadPipeline] Offline, waiting for connection...');
+          console.warn('[UPLOAD/PIPE] PAUSED navigator.onLine=false');
           uploadEventBus.emit('file:upload-progress', {
             type: 'file:upload-progress',
             jobId,
@@ -1561,6 +1569,11 @@ async function processReviewJob(jobId: string, job: any): Promise<void> {
             
           } catch (videoError: any) {
             clearTimeout(timeoutId);
+            console.error(`[uploadPipeline] Failed to upload review video ${file.name}:`, videoError, {
+              errName: videoError?.name,
+              errMessage: videoError?.message,
+              stackHead: (videoError?.stack || '').slice(0, 300),
+            });
             
             // Emit specific error for this file
             uploadEventBus.emit('file:upload-failed', {
