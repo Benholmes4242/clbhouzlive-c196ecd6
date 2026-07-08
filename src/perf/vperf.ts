@@ -650,6 +650,17 @@ const sessionHealth = {
 const decideCounters = new Map<string, Map<string, number>>(); // bucket → key → count
 const feedRollup = new Map<string, { scrolls: number; longFrames: number; frames: number; worstMs: number; activateWarm: number; activateCold: number }>(); // per page
 
+// [PREDICT] scorecard extras — per-lane-class start levels (median target)
+// and prefetch counters (issued / aborted / hit-rate).
+const startLevelsByLane = new Map<string, number[]>(); // laneId → startLevels
+const prefetchStats = {
+  issued: 0,
+  aborted: new Map<string, number>(),
+  activationsWithPrefetch: 0,
+  activationsWithPrefetchWarm: 0,
+};
+
+
 function bucketKey(kind: string, page: string): string { return `${kind}|${page}`; }
 
 function scorecardIngest(kind: string, payload: Record<string, unknown>): void {
