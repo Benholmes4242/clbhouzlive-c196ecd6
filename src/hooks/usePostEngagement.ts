@@ -74,21 +74,11 @@ export function usePostEngagement(postId: string | null) {
     },
   });
 
-  // Helper to get post owner ID and actor info
-  const getPostOwnerInfo = async (): Promise<{ userId: string; actorType: string; actorId: string } | null> => {
-    if (!postId) return null;
-    const { data } = await supabase
-      .from('posts')
-      .select('user_id, actor_type, actor_id')
-      .eq('id', postId)
-      .single();
-    if (!data) return null;
-    return {
-      userId: data.user_id,
-      actorType: data.actor_type || 'personal',
-      actorId: data.actor_id || data.user_id,
-    };
-  };
+  // getPostOwnerInfo helper removed 2026-07-08 with the client-side
+  // comment notification write — the DB trigger now looks up the post
+  // owner itself.
+
+
 
   // 2) Like toggle mutation (actor-aware)
   const toggleLikeMutation = useMutation({
