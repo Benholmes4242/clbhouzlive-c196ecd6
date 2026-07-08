@@ -441,12 +441,25 @@ export function vperfSessionEnd(laneId: string, reason: string): void {
     startLevel: rec.startLevel,
     endLevel: rec.endLevel,
     bwEstimateStart: rec.bwEstimateStart,
+    bwEstimateEnd: rec.bwEstimateEnd,
+    seededBw: rec.seededBw,
     verdict,
     longStall,
     reason,
     ...rec.meta,
   });
+  // [PREDICT] Part 1a — persist the terminal bandwidth estimate so the next
+  // cold hls.js instance can seed its ABR. Only feed-active / fullscreen
+  // lanes contribute (rails run capped at level 0 — not representative).
+  if (
+    (laneId === 'feed-active' || laneId === 'fullscreen') &&
+    rec.bwEstimateEnd != null &&
+    durationMs >= 3000
+  ) {
+    try { writeBandwidthSample(rec.bwEstimateEnd); } catch {}
+  }
 }
+
 
 // ------------------------ Motion trace (fs.open jump diagnosis) ------------------------
 //
