@@ -9,10 +9,10 @@
  * life. This component never creates elements — the engine owns them and
  * appendChild's them into `hostRef` on demand.
  */
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import type { MediaItem } from '@/components/media-system/types/media';
 import { useVideoLane } from '@/video/useVideoLane';
-import { VideoEngine } from '@/video/VideoEngine';
+import { VideoEngine, type LaneId, type LaneSnapshot } from '@/video/VideoEngine';
 import { originHostRegistry } from '@/video/originHostRegistry';
 import { setHandoverResume, consumeHandoverResume } from '@/video/handoverResume';
 import { useClubhouseStore } from '@/store/clubhouseStore';
