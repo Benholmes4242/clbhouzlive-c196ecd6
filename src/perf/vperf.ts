@@ -977,6 +977,12 @@ export function vperfImagePhase(
 // All entry points strict no-op when DBG off. Zero behaviour changes.
 // ============================================================================
 
+function emitFlow(kind: string, payload: Record<string, unknown>): void {
+  const merged = { ...payload, page: (payload as any).page ?? __currentPage };
+  // eslint-disable-next-line no-console
+  console.info(`[FLOW] ${kind}`, merged);
+}
+
 /** Visible fraction of `el` inside the current viewport, 2dp, clamped 0..1. */
 export function vperfCardFraction(el: HTMLElement | null | undefined): number {
   if (!el || typeof window === 'undefined') return 0;
