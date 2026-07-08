@@ -293,7 +293,7 @@ export function useGolfersDiscovery() {
     }
     
     return filtered;
-  }, [searchResults, filteredData?.golfers, exclusions?.excludedIds, activeTab, viewerPrimaryClubId, searchQuery]);
+  }, [searchResults, filteredData?.golfers, exclusions?.excludedIds, exclusions?.blockedIds, activeTab, viewerPrimaryClubId, searchQuery, user?.id]);
 
   // Paginate the processed results
   const paginatedGolfers = useMemo(() => {
