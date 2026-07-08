@@ -1,16 +1,43 @@
 // Pre-launch visible debug toggle. Mounted app-wide in App.tsx. REMOVE before public release.
-import React, { useState, useEffect } from 'react';
+// Long-press the pill (600ms) → emit the [BASELINE] scorecard.
+import React, { useState, useEffect, useRef } from 'react';
 import { isPerfEnabled, setPerfLive, subscribePerfLive } from '@/perf/navTiming';
+import { vperfScorecard } from '@/perf/vperf';
 
 export function PerfToggleButton() {
   const [, force] = useState(0);
   useEffect(() => subscribePerfLive(() => force((n) => n + 1)), []);
   const on = isPerfEnabled();
+  const longPressTimer = useRef<number | null>(null);
+  const longPressFired = useRef(false);
+
+  const startLongPress = () => {
+    longPressFired.current = false;
+    longPressTimer.current = window.setTimeout(() => {
+      longPressFired.current = true;
+      try { vperfScorecard('manual'); } catch {}
+      try { (navigator as any).vibrate?.(20); } catch {}
+    }, 600);
+  };
+  const cancelLongPress = () => {
+    if (longPressTimer.current != null) {
+      clearTimeout(longPressTimer.current);
+      longPressTimer.current = null;
+    }
+  };
+
   return (
     <button
       type="button"
-      onClick={() => setPerfLive(!on)}
-      aria-label="Toggle debug logging"
+      onClick={() => {
+        if (longPressFired.current) { longPressFired.current = false; return; }
+        setPerfLive(!on);
+      }}
+      onPointerDown={startLongPress}
+      onPointerUp={cancelLongPress}
+      onPointerLeave={cancelLongPress}
+      onPointerCancel={cancelLongPress}
+      aria-label="Toggle debug logging (long-press for scorecard)"
       style={{
         position: 'fixed',
         bottom: 80,
