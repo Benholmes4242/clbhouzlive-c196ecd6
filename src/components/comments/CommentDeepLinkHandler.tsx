@@ -3,66 +3,70 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { Loader2 } from 'lucide-react';
 
-const CommentDeepLinkHandler = React.lazy(() =>
-  Promise.resolve({
-    default: () => {
-      const { postId, commentId } = useParams<{ postId: string; commentId: string }>();
-      const navigate = useNavigate();
-      const [parentCommentId, setParentCommentId] = useState<string | undefined>();
-      const [isLoading, setIsLoading] = useState(true);
-      const [postExists, setPostExists] = useState(false);
+/**
+ * Deep-link handler for `/post/:postId/comment/:commentId`.
+ *
+ * Resolves the comment's parent (if it's a reply), then replaces the URL
+ * with `/post/:postId` and hands the comments-sheet state to the post page.
+ *
+ * NOTE: This is a plain component with a default export. It is registered
+ * as a `React.lazy(() => import(...))` route in `App.tsx` — do NOT wrap it
+ * in `React.lazy` here or the route mount crashes with
+ * "Lazy element type must resolve to a class or function".
+ */
+const CommentDeepLinkHandler: React.FC = () => {
+  const { postId, commentId } = useParams<{ postId: string; commentId: string }>();
+  const navigate = useNavigate();
+  const [parentCommentId, setParentCommentId] = useState<string | undefined>();
+  const [isLoading, setIsLoading] = useState(true);
+  const [postExists, setPostExists] = useState(false);
 
-      useEffect(() => {
-        if (!postId) { navigate('/', { replace: true }); return; }
+  useEffect(() => {
+    if (!postId) { navigate('/', { replace: true }); return; }
 
-        const init = async () => {
-          // Verify post exists
-          const { data: post } = await supabase
-            .from('posts')
-            .select('id')
-            .eq('id', postId)
-            .maybeSingle();
+    const init = async () => {
+      const { data: post } = await supabase
+        .from('posts')
+        .select('id')
+        .eq('id', postId)
+        .maybeSingle();
 
-          if (!post) { navigate('/', { replace: true }); return; }
-          setPostExists(true);
+      if (!post) { navigate('/', { replace: true }); return; }
+      setPostExists(true);
 
-          // Check if comment is a reply
-          if (commentId) {
-            const { data: comment } = await supabase
-              .from('post_comments')
-              .select('parent_id')
-              .eq('id', commentId)
-              .maybeSingle();
-            if (comment?.parent_id) setParentCommentId(comment.parent_id);
-          }
+      if (commentId) {
+        const { data: comment } = await supabase
+          .from('post_comments')
+          .select('parent_id')
+          .eq('id', commentId)
+          .maybeSingle();
+        if (comment?.parent_id) setParentCommentId(comment.parent_id);
+      }
 
-          setIsLoading(false);
-        };
+      setIsLoading(false);
+    };
 
-        init();
-      }, [postId, commentId, navigate]);
+    init();
+  }, [postId, commentId, navigate]);
 
-      useEffect(() => {
-        if (!isLoading && postExists) {
-          // Navigate to the post deep link page with comment state
-          navigate(`/post/${postId}`, {
-            replace: true,
-            state: {
-              openComments: true,
-              initialCommentId: commentId,
-              initialParentCommentId: parentCommentId,
-            },
-          });
-        }
-      }, [isLoading, postExists, postId, commentId, parentCommentId, navigate]);
+  useEffect(() => {
+    if (!isLoading && postExists) {
+      navigate(`/post/${postId}`, {
+        replace: true,
+        state: {
+          openComments: true,
+          initialCommentId: commentId,
+          initialParentCommentId: parentCommentId,
+        },
+      });
+    }
+  }, [isLoading, postExists, postId, commentId, parentCommentId, navigate]);
 
-      return (
-        <div className="flex items-center justify-center h-screen bg-background">
-          <Loader2 className="w-8 h-8 animate-spin text-muted-foreground" />
-        </div>
-      );
-    },
-  })
-);
+  return (
+    <div className="flex items-center justify-center h-screen bg-background">
+      <Loader2 className="w-8 h-8 animate-spin text-muted-foreground" />
+    </div>
+  );
+};
 
 export default CommentDeepLinkHandler;
