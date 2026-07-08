@@ -29,6 +29,7 @@ import { getActorRouteByType } from '@/types/actor';
 
 import { isPerfEnabled } from '@/perf/navTiming';
 import { VideoEngine } from '@/video/VideoEngine';
+import { feedLaneRoles } from '@/video/feedLaneRoles';
 import { RailLanePool } from '@/video/railLanePool';
 import { originHostRegistry } from '@/video/originHostRegistry';
 import type { BorrowDescriptor } from '@/store/fullscreenFeedStore';
@@ -61,6 +62,16 @@ function returnBorrow(borrow: BorrowDescriptor, reason: 'close' | 'route' | 'dem
   // Clear the engine-side borrow flag FIRST so the return sequence's pauses /
   // remounts / releases route through the normal owner-guard path again.
   try { VideoEngine.clearBorrowed(borrow.laneId); } catch {}
+  // PR-B: if this was a feed physical lane, unfreeze it — it rejoins role
+  // rotation at role='prev' (the safe slot, recycled on next opposite-
+  // direction rotation without disturbing the current active card).
+  // Applies to demote AND close: the demote path releases the lane back to
+  // the feed while fullscreen stays open; close returns it fully.
+  try {
+    if (feedLaneRoles.isFeedLane(borrow.laneId)) {
+      feedLaneRoles.unfreeze(borrow.laneId, 'prev');
+    }
+  } catch {}
   // Stage-7 PR-2: lane-kind switch. Rail lanes (rail-*) are pool-managed and
   // always re-mute on return. Feed-active is a singleton, no pool, and
   // restores the pre-borrow mute state.

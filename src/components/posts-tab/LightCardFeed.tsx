@@ -23,6 +23,8 @@ import { isPerfEnabled } from '@/perf/navTiming';
 import { useClubhouseStore } from '@/store/clubhouseStore';
 import { getDocumentScrollParent } from '@/lib/getScrollParent';
 import { VideoEngine } from '@/video/VideoEngine';
+import { feedLaneRoles } from '@/video/feedLaneRoles';
+import { isPerfEnabled as _isPerfEnabledForRotate } from '@/perf/navTiming';
 import { vperfFeedActivateStart, vperfFeedActivateEnd, vperfConsumeEarlyStarted } from '@/perf/vperf';
 import { LightFeedCard } from './LightFeedCard';
 
@@ -129,10 +131,30 @@ export const LightCardFeed: React.FC<LightCardFeedProps> = ({
 
 
 
+  // Promotion → rotate roles first, then flip playingIdx. See CardFeed for the
+  // full rationale (seamless-promotion invariant).
+  const lastPromotedRef = useRef<number>(0);
   useEffect(() => {
     if (settleTimer.current) clearTimeout(settleTimer.current);
     settleTimer.current = setTimeout(() => {
-      setPlayingIdx(activeIdx);
+      const prev = lastPromotedRef.current;
+      const next = activeIdx;
+      if (next !== prev && next >= 0 && prev >= 0) {
+        const dir: 'down' | 'up' = next > prev ? 'down' : 'up';
+        const recycled = feedLaneRoles.rotate(dir);
+        if (_isPerfEnabledForRotate()) {
+          const snap = feedLaneRoles.snapshot();
+          // eslint-disable-next-line no-console
+          console.info('[DECIDE]', 'rotation.promote', {
+            direction: dir, fromIdx: prev, toIdx: next,
+            recycledLane: recycled, borrowedFrozen: snap.frozen,
+            map: { active: snap.active, next: snap.next, prev: snap.prev },
+            surface: 'posts-tab',
+          });
+        }
+      }
+      lastPromotedRef.current = next;
+      setPlayingIdx(next);
     }, SETTLE_MS);
     return () => {
       if (settleTimer.current) clearTimeout(settleTimer.current);
@@ -177,11 +199,11 @@ export const LightCardFeed: React.FC<LightCardFeedProps> = ({
       if (prevEarly === cand && ratio >= EARLY_MOTION_CLEAR) return cand;
       if (prevEarly !== cand && ratio < EARLY_MOTION_FRACTION) return -1;
       if (ratio < EARLY_MOTION_CLEAR) return -1;
+      // Warm-only guard via role lookup — see CardFeed for rationale.
       const cardPost = postsRef.current[cand];
       if (!cardPost) return -1;
       try {
-        // Down-scroll uses feed-next; up-scroll uses feed-prev (PR-A).
-        const laneId = dir > 0 ? 'feed-next' : 'feed-prev';
+        const laneId = feedLaneRoles.laneForRole(dir > 0 ? 'next' : 'prev');
         const snap = VideoEngine.snapshot(laneId);
         const warm = snap.postId != null &&
           (snap.postId === cardPost.id || snap.postId === `${cardPost.id}:0`) &&
@@ -242,12 +264,13 @@ export const LightCardFeed: React.FC<LightCardFeedProps> = ({
     };
   }, [recheckActive]);
 
-  // Symmetric neighbour warm-up (PR-A): next → feed-next, prev → feed-prev.
+  // Symmetric neighbour warm-up via role lookup — see CardFeed.
   useEffect(() => {
-    const warm = (laneId: 'feed-next' | 'feed-prev', post: any) => {
+    const warm = (role: 'next' | 'prev', post: any) => {
       const m = post?.mediaItems?.[0];
       if (!post || !m || m.type !== 'video' || !m.hlsUrl) return;
       try {
+        const laneId = feedLaneRoles.laneForRole(role);
         VideoEngine.preload(laneId, {
           hlsUrl: m.hlsUrl,
           posterUrl: m.thumbnailUrl ?? null,
@@ -255,8 +278,8 @@ export const LightCardFeed: React.FC<LightCardFeedProps> = ({
         });
       } catch { /* engine may not be booted yet — safe to ignore */ }
     };
-    warm('feed-next', posts[playingIdx + 1]);
-    warm('feed-prev', posts[playingIdx - 1]);
+    warm('next', posts[playingIdx + 1]);
+    warm('prev', posts[playingIdx - 1]);
   }, [playingIdx, posts]);
 
   // Promotion + fullscreen clears — see CardFeed for rationale.

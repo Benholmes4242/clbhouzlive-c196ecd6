@@ -17,6 +17,7 @@
 import type { FeedPost } from '@/components/media-system/types/media';
 import { useFullscreenFeedStore, type OpenOrigin, type BorrowDescriptor } from '@/store/fullscreenFeedStore';
 import { VideoEngine } from '@/video/VideoEngine';
+import { feedLaneRoles } from '@/video/feedLaneRoles';
 import { RailLanePool } from '@/video/railLanePool';
 
 import { isPerfEnabled } from '@/perf/navTiming';
@@ -197,21 +198,19 @@ export function openWithOrigin({
     }
   }
 
-  // ── Stage-7 PR-2: feed-active borrow decision ──
-  // If no rail borrow was taken and the singleton `feed-active` lane is
-  // currently playing this post's media, borrow that element instead of
-  // opening a fresh `fullscreen` lane. No pool interaction — feed-active is
-  // not a pool lane. Cold/parked feed lanes fall through to the ladder.
+  // ── Stage-7 PR-2 (PR-B role-aware): feed active-role borrow decision ──
+  // Resolve the physical lane currently holding role='active' at TAP time
+  // (rotation may have re-pointed it to any of the three feed lanes). If
+  // that lane is actively playing this post's media, borrow its element
+  // and FREEZE the physical lane out of role rotation for the duration
+  // of the borrow — a rotation over a lane whose element is now in the
+  // fullscreen viewer would violate the "no content in-use" invariant.
   if (!borrow && postId) {
     try {
-      const snap = VideoEngine.snapshot('feed-active');
+      const activeLaneId = feedLaneRoles.laneForRole('active');
+      const snap = VideoEngine.snapshot(activeLaneId);
       const tappedIdx = mediaIndex ?? 0;
       const tappedOwnerKey = `${postId}:${tappedIdx}`;
-      // Exact-slide gate: borrow only when the lane's ownerKey matches the
-      // tapped slide's ownerKey exactly, OR when the lane wrote a bare postId
-      // (single-media convention) AND the tap targets slide 0. Prevents a
-      // playing slide 5 from being borrowed by a tap on slide 2 of the same
-      // post — that's a lane open on the tapped media, not a borrow.
       const owns =
         snap.postId != null &&
         (snap.postId === tappedOwnerKey ||
@@ -239,12 +238,14 @@ export function openWithOrigin({
         owns,
         ctGate,
         stateGate,
+        activeLaneId,
+        activeRole: feedLaneRoles.roleForLane(activeLaneId),
         outcome: owns && isLive ? 'borrow' : 'denied',
         deniedBy,
       });
       if (owns && isLive) {
         borrow = {
-          laneId: 'feed-active',
+          laneId: activeLaneId,
           ownerKey: snap.postId ?? tappedOwnerKey,
           postId,
           posterUrl: posterUrl ?? null,
@@ -252,9 +253,11 @@ export function openWithOrigin({
           viewportH: typeof window !== 'undefined' ? window.innerHeight : 0,
           wasMuted: snap.muted,
         };
-        VideoEngine.markBorrowed('feed-active');
+        VideoEngine.markBorrowed(activeLaneId);
+        feedLaneRoles.freeze(activeLaneId);
         BORROW_DBG('mount', {
-          source: 'feed-active',
+          source: 'feed-active-role',
+          activeLaneId,
           ownerKey: borrow.ownerKey,
           postId,
           wasMuted: snap.muted,
@@ -295,7 +298,8 @@ export function openWithOrigin({
         }
       }
       if (startSource === 'zero') {
-        const feedSnap = VideoEngine.snapshot('feed-active');
+        // PR-B: resolve the physical lane currently holding the 'active' role.
+        const feedSnap = VideoEngine.snapshot(feedLaneRoles.laneForRole('active'));
         feedSnapCT = feedSnap.currentTime;
         // Ownership gate: only inherit the feed-active playhead when that
         // lane is currently loaded for THIS post. lane.postId is written raw
@@ -326,7 +330,7 @@ export function openWithOrigin({
     let feedSnapOwns = false;
     if (!borrow) {
       try {
-        const s = VideoEngine.snapshot('feed-active');
+        const s = VideoEngine.snapshot(feedLaneRoles.laneForRole('active'));
         feedSnapPostId = s.postId;
         feedSnapOwns =
           s.postId != null &&
