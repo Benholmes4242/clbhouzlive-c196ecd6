@@ -325,8 +325,6 @@ interface AnchoredPanelProps {
 
 function AnchoredMentionsPanel({ anchorRef, children }: AnchoredPanelProps) {
   const panelRef = React.useRef<HTMLDivElement | null>(null);
-  // [MENTIONS-DIAG] mount — confirms the overlay tree actually rendered.
-  console.info('[MENTIONS] panel mount', { hasAnchor: !!anchorRef.current });
   const [geom, setGeom] = React.useState<{
     top: number;
     left: number;
@@ -375,17 +373,9 @@ function AnchoredMentionsPanel({ anchorRef, children }: AnchoredPanelProps) {
       ) {
         return prev;
       }
-      // [MENTIONS-DIAG] geom — every applied set.
-      console.info('[MENTIONS] geom', {
-        ...next,
-        anchor: { top: r.top, left: r.left, bottom: r.bottom, width: r.width, height: r.height },
-        vv: { top: vTop, height: vHeight, bottom: vBottom },
-        spaceBelow, spaceAbove,
-      });
       return next;
     });
   }, [anchorRef]);
-
 
   // Mount-time measurement + full listener lifecycle. This effect
   // runs every time the panel mounts (== every time suggestions
@@ -400,107 +390,6 @@ function AnchoredMentionsPanel({ anchorRef, children }: AnchoredPanelProps) {
     // will re-fire once the ul lays out and correct placement.
     if (panelRef.current) ro.observe(panelRef.current);
 
-    // [MENTIONS-DIAG] paint reality — after mount rAF, log the actual
-    // painted rect + computed style + any ancestor that breaks the
-    // fixed-positioning viewport context (transform/filter/perspective/
-    // contain/will-change:transform on ancestor => fixed anchors to it).
-    const rafId = requestAnimationFrame(() => {
-      const p = panelRef.current;
-      if (!p) { console.info('[MENTIONS] paint', { panel: null }); return; }
-      const rect = p.getBoundingClientRect();
-      const cs = getComputedStyle(p);
-      // [MENTIONS-DIAG] full stringified rect + explicit zIndex — no
-      // collapsed objects (console truncation was hiding the values).
-      console.info('[MENTIONS] paint', {
-        rectJSON: JSON.stringify({ x: rect.x, y: rect.y, top: rect.top, left: rect.left, width: rect.width, height: rect.height, bottom: rect.bottom, right: rect.right }),
-        position: cs.position, display: cs.display, visibility: cs.visibility,
-        opacity: cs.opacity,
-        zIndexRaw: cs.zIndex,
-        zIndexStr: String(cs.zIndex),
-        transform: cs.transform,
-        parentTag: p.parentElement?.tagName, parentId: p.parentElement?.id,
-      });
-
-      // [MENTIONS-DIAG] occluder probe — hit-test the panel's centre point.
-      // If elementFromPoint returns the panel (or a descendant), NOTHING is
-      // covering it and the bug is inside the panel's own paint. Otherwise
-      // the returned element IS the occluder and its z beats ours.
-      const cx = Math.round(rect.left + rect.width / 2);
-      const cy = Math.round(rect.top + rect.height / 2);
-      const hit = document.elementFromPoint(cx, cy) as HTMLElement | null;
-      const hitCs = hit ? getComputedStyle(hit) : null;
-      console.info('[MENTIONS] occluder', {
-        cx, cy,
-        tag: hit?.tagName ?? null,
-        id: hit?.id ?? null,
-        cls: (hit?.className?.toString?.() ?? '').slice(0, 120),
-        zIndex: hitCs?.zIndex ?? null,
-        position: hitCs?.position ?? null,
-        opacity: hitCs?.opacity ?? null,
-        pointerEvents: hitCs?.pointerEvents ?? null,
-        isPanelOrChild: !!(hit && p.contains(hit)),
-      });
-
-      // [MENTIONS-DIAG] sheet z snapshot — empirical comparison against any
-      // live comments/top-ten/wizard sheet root at this exact moment.
-      const sheetSelectors = [
-        '[data-radix-dialog-content]',
-        '[data-vaul-drawer]',
-        '[role="dialog"]',
-        '.comments-sheet-root',
-        '[data-comments-sheet]',
-      ];
-      const sheets: Array<Record<string, unknown>> = [];
-      for (const sel of sheetSelectors) {
-        const nodes = document.querySelectorAll(sel);
-        nodes.forEach((n, i) => {
-          if (i > 2) return;
-          const cs2 = getComputedStyle(n as HTMLElement);
-          sheets.push({
-            sel,
-            tag: (n as HTMLElement).tagName,
-            zIndex: cs2.zIndex,
-            position: cs2.position,
-            transform: cs2.transform,
-          });
-        });
-      }
-      console.info('[MENTIONS] sheet-z', { count: sheets.length, sheets });
-
-      const breakers: Array<Record<string, string | null>> = [];
-      let el: HTMLElement | null = p.parentElement;
-      let depth = 0;
-      while (el && el !== document.body && depth < 40) {
-        const s = getComputedStyle(el);
-        const bad =
-          (s.transform && s.transform !== 'none') ||
-          (s.filter && s.filter !== 'none') ||
-          (s.perspective && s.perspective !== 'none') ||
-          (s.contain && s.contain !== 'none' && s.contain !== 'normal') ||
-          (s.willChange && s.willChange.includes('transform'));
-        if (bad) {
-          breakers.push({
-            depth: String(depth),
-            tag: el.tagName,
-            id: el.id || null,
-            cls: el.className?.toString().slice(0, 80) || null,
-            transform: s.transform,
-            filter: s.filter,
-            perspective: s.perspective,
-            contain: s.contain,
-            willChange: s.willChange,
-            overflow: s.overflow,
-            width: s.width,
-            height: s.height,
-          });
-        }
-        el = el.parentElement;
-        depth++;
-      }
-      console.info('[MENTIONS] ancestor-breakers', { count: breakers.length, breakers });
-    });
-
-
     const onWinResize = () => measure();
     const onWinScroll = () => measure();
     window.addEventListener('resize', onWinResize);
@@ -511,19 +400,25 @@ function AnchoredMentionsPanel({ anchorRef, children }: AnchoredPanelProps) {
     vv?.addEventListener('scroll', onWinScroll);
 
     return () => {
-      cancelAnimationFrame(rafId);
       ro.disconnect();
       window.removeEventListener('resize', onWinResize);
       window.removeEventListener('scroll', onWinScroll, true);
       vv?.removeEventListener('resize', onWinResize);
       vv?.removeEventListener('scroll', onWinScroll);
     };
-
   }, [measure, anchorRef]);
 
-  return (
+  // Portal the visible chrome DIRECTLY to <body>, as a SIBLING of the
+  // react-mentions shell — nothing about the shell (0x0, pointer-none)
+  // can clip / pierce / occlude it. React tree is unchanged, so the
+  // library's synthetic click handlers on the <li>s still route.
+  if (typeof document === 'undefined') return null;
+  return ReactDOM.createPortal(
     <div
       ref={panelRef}
+      // Preserve textarea focus so react-mentions' click handler lands
+      // before blur closes the suggestions overlay.
+      onMouseDown={(e) => e.preventDefault()}
       style={{
         position: 'fixed',
         top: geom?.top ?? -9999,
@@ -531,11 +426,11 @@ function AnchoredMentionsPanel({ anchorRef, children }: AnchoredPanelProps) {
         width: geom?.width ?? 0,
         maxHeight: geom?.maxHeight ?? PANEL_MAX_HEIGHT,
         overflowY: 'auto',
-        background: '#ffffff',
-        borderRadius: 12,
-        border: `0.5px solid ${BORDER}`,
+        background: '#FFFFFF',
+        borderRadius: 14,
+        border: `1px solid rgba(15,23,42,0.08)`,
         boxShadow:
-          '0 8px 24px -8px rgba(15,23,42,0.18), 0 2px 6px rgba(15,23,42,0.08)',
+          '0 12px 32px -8px rgba(15,23,42,0.22), 0 2px 6px rgba(15,23,42,0.08)',
         fontSize: 13.5,
         pointerEvents: 'auto',
         opacity: geom ? 1 : 0,
@@ -543,9 +438,11 @@ function AnchoredMentionsPanel({ anchorRef, children }: AnchoredPanelProps) {
       }}
     >
       {children}
-    </div>
+    </div>,
+    document.body,
   );
 }
+
 
 export function MentionsComposerInput({
   value,
