@@ -460,12 +460,14 @@ function AnchoredMentionsPanel({ anchorRef, children }: AnchoredPanelProps) {
     vv?.addEventListener('scroll', onWinScroll);
 
     return () => {
+      cancelAnimationFrame(rafId);
       ro.disconnect();
       window.removeEventListener('resize', onWinResize);
       window.removeEventListener('scroll', onWinScroll, true);
       vv?.removeEventListener('resize', onWinResize);
       vv?.removeEventListener('scroll', onWinScroll);
     };
+
   }, [measure, anchorRef]);
 
   return (
