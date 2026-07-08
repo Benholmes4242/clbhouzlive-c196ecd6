@@ -74,7 +74,7 @@ export function useVideoLane(
   // the new binding. No explicit unmount is issued here (elements never
   // move BETWEEN lanes; they can freely re-parent between hosts).
   useEffect(() => {
-    if (!laneId || !opts.active) return;
+    if (!laneId) return;
     let raf = 0;
     const tryMount = () => {
       const host = hostRef.current;
@@ -88,7 +88,8 @@ export function useVideoLane(
     return () => {
       if (raf) cancelAnimationFrame(raf);
     };
-  }, [laneId, opts.active]);
+  }, [laneId]);
+
 
   // Subscribe to lane state.
   useEffect(() => {
