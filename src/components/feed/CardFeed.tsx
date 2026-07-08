@@ -262,18 +262,31 @@ export const CardFeed = forwardRef<CardFeedHandle, CardFeedProps>(function CardF
   const recheckActive = useCallback(() => {
     // Platform-standard card-feed activation: eligible at >=PLAY_IN visible,
     // most-visible eligible card wins, asymmetric PLAY_OUT + hysteresis to
-    // prevent boundary flicker.
+    // prevent boundary flicker. When multiple cards clear PLAY_IN, tie-break
+    // in favour of the card ENTERING in the current scroll direction (reuses
+    // the same signed direction signal that feeds the PrefetchController).
     let bestIdx = -1;
     let bestRatio = 0;
+    const eligible: number[] = [];
     visibilityRef.current.forEach((ratio, idx) => {
       if (ratio > bestRatio) { bestRatio = ratio; bestIdx = idx; }
+      if (ratio >= PLAY_IN) eligible.push(idx);
     });
+
+    // Directional tie-break amongst eligible cards.
+    let dirWinner = -1;
+    if (eligible.length > 1 && scrollDirRef.current !== 0) {
+      dirWinner = scrollDirRef.current > 0
+        ? Math.max(...eligible) // scrolling down → prefer entering-from-bottom
+        : Math.min(...eligible); // scrolling up   → prefer entering-from-top
+    }
 
     setActiveIdx((prev) => {
       const prevRatio = prev >= 0 ? (visibilityRef.current.get(prev) ?? 0) : 0;
       // Keep current active while it's still >=PLAY_OUT and no one clearly beats it.
       if (prev >= 0 && prevRatio >= PLAY_OUT && (bestRatio - prevRatio) < HYSTERESIS) return prev;
-      // Switch only to a card that has cleared the play-in threshold.
+      // Switch to a card that has cleared the play-in threshold — directional winner first.
+      if (dirWinner >= 0) return dirWinner;
       if (bestIdx >= 0 && bestRatio >= PLAY_IN) return bestIdx;
       // If nothing qualifies (between cards), keep last active if still barely visible.
       if (prev >= 0 && prevRatio >= PLAY_OUT) return prev;
