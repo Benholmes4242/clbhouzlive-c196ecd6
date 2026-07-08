@@ -218,6 +218,15 @@ export const CardFeed = forwardRef<CardFeedHandle, CardFeedProps>(function CardF
   // centre tile is promoted to "playing". Prevents load-thrash mid-scroll
   // (iOS cold HLS attach ~1.3s vs. active-window ~400-800ms during scroll).
   const [playingIdx, setPlayingIdx] = useState(0);
+  // earlyIdx — the NEXT card in the current scroll direction whose media is
+  // already warm on the feed-next lane and whose visible fraction has
+  // crossed EARLY_MOTION_FRACTION. When set, InlineVideo mounts+plays the
+  // feed-next lane into that card's host so it enters ALREADY MOVING (IG
+  // handover feel). Strictly playingIdx ± 1. Cleared on: direction reversal,
+  // visibility below EARLY_MOTION_CLEAR, promotion to playingIdx, and
+  // fullscreen open. Creation-overlay open pauses all lanes via pauseAll —
+  // the flag can stay set (the effect won't re-fire without a state change).
+  const [earlyIdx, setEarlyIdx] = useState<number>(-1);
   const settleTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const SETTLE_MS = 80;
   // IG-style early activation: cheap now that feed-next preload + PREDICT cache
@@ -225,9 +234,15 @@ export const CardFeed = forwardRef<CardFeedHandle, CardFeedProps>(function CardF
   const PLAY_IN = 0.30;
   const PLAY_OUT = 0.20;
   const HYSTERESIS = 0.1;
+  // Early-motion handover (only touches feed-next; feed-active untouched).
+  const EARLY_MOTION_FRACTION = 0.12; // start earlyIdx once neighbour clears 12%
+  const EARLY_MOTION_CLEAR = 0.08;    // drop earlyIdx below 8% (hysteresis)
+  const EARLY_VELOCITY_MAX = 3;       // px/ms — above this = flick, no early
   const visibilityRef = useRef<Map<number, number>>(new Map());
   const scrollDirRef = useRef<number>(0); // +1 down, -1 up, 0 idle
   const lastScrollTopRef = useRef<number>(0);
+  const lastScrollTsRef = useRef<number>(0);
+  const scrollVelocityRef = useRef<number>(0); // px/ms
   const observerRef = useRef<IntersectionObserver | null>(null);
   const cardEls = useRef<Map<number, HTMLElement>>(new Map());
 
