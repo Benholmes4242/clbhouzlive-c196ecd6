@@ -50,13 +50,11 @@ interface Props {
   /**
    * Early-motion signal from the parent feed. When true and !isActive, the
    * card mounts + plays the DIRECTIONAL early lane (role='next' down /
-   * role='prev' up). Parent clears on promotion, direction reversal,
-   * visibility drop, fullscreen open.
+   * role='prev' up), detected by inspecting which role's physical lane is
+   * currently warmed for this card's media (parent's warm effect stamps
+   * postId on preload before the visibility gate flips earlyMotion true).
    */
   earlyMotion?: boolean;
-  /** Scroll direction at earlyMotion assignment (+1 down, -1 up). Determines
-   *  which role/physical-lane this card binds during early motion. */
-  earlyDir?: 1 | -1 | 0;
   onFirstFrameReady?: () => void;
 }
 
