@@ -258,18 +258,35 @@ class VideoEngineImpl {
     const { hlsUrl, posterUrl = null, startPosition = -1, postId = null } = opts;
     // Same postId + same URL already loaded → no reload. This makes remount
     // (element moving between card hosts) cheap and avoids re-fetching HLS.
-    // STRICT postId equality is intentional — callers must speak the same
-    // key play() stamps (ownerKey-form for carousel slides). Shape reconciliation
-    // happens at the caller boundary (InlineVideo passes resolvedOwnerKey),
-    // not by mutating lane.postId here.
+    //
+    // OWNER-KEY EQUIVALENCE (scoped): treat a BARE `X` and canonical `X:0`
+    // as the SAME primary-media owner. Historically the feed warm-preload
+    // wrote bare `post.id` while active playback wrote `${postId}:0`, so
+    // this compare missed on promotion → reload → poster flash. The write
+    // sites are now canonical, but this defensive normalisation prevents
+    // any future caller from reintroducing the bug.
+    //
+    // HARD CONSTRAINT — bare↔`:0` ONLY. Carousel slides `X:1`, `X:2`, …
+    // MUST remain distinct owners; this is NOT "strip everything after the
+    // colon". Implementation: if a key has no ':', treat it as `${key}:0`;
+    // then compare full strings.
+    const normalizeOwnerKey = (k: string | null): string | null =>
+      k == null ? null : (k.includes(':') ? k : `${k}:0`);
+    const laneOwner = normalizeOwnerKey(lane.postId);
+    const callOwner = normalizeOwnerKey(postId);
     const alreadyLoaded =
-      lane.postId != null &&
-      lane.postId === postId &&
+      laneOwner != null &&
+      laneOwner === callOwner &&
       lane.hlsUrl === hlsUrl &&
       lane.state !== 'idle' &&
       lane.state !== 'error';
     if (alreadyLoaded) {
-      DBG(laneId, 'skip reload: same postId+url', { state: lane.state });
+      DBG(laneId, 'skip reload: same postId+url', {
+        state: lane.state,
+        lanePostId: lane.postId,
+        callPostId: postId,
+      });
+
       lane.posterUrl = posterUrl;
       lane.startPosition = startPosition;
       const target = startPosition > 0 ? startPosition : 0;

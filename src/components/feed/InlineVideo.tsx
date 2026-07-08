@@ -163,6 +163,19 @@ export const InlineVideo: React.FC<Props> = ({
   const targetReady =
     startPosition <= 0 || (!!snap && snap.currentTime >= startPosition - 0.3);
 
+  // KEPT-BOUND NEIGHBOUR PAUSE (explicit): when this card holds a bound role
+  // but no playback intent (playingIdx±1 kept-bound), affirm the lane is
+  // paused — wantPlay=false + element paused. VideoEngine.pause() is
+  // idempotent, owner-guarded (rejects if we no longer own the lane), and
+  // does NOT seek or reset firstFrame, so the real paused decoder frame is
+  // preserved. Prevents any wantPlay residue from auto-resuming a neighbour.
+  useEffect(() => {
+    if (!laneId || !resolvedOwnerKey) return;
+    if (playbackIntent) return;
+    if (!laneOwnsThisMedia) return;
+    VideoEngine.pause(laneId, { callerPostId: resolvedOwnerKey });
+  }, [laneId, resolvedOwnerKey, playbackIntent, laneOwnsThisMedia]);
+
   // Show video when: our currently-bound physical lane has painted a frame
   // (either the promoted 'active' lane or the early 'next'/'prev' lane).
   const showVideo =
@@ -170,6 +183,7 @@ export const InlineVideo: React.FC<Props> = ({
     snap.firstFrame === true &&
     laneOwnsThisMedia &&
     (isActive ? targetReady : true);
+
 
   // Register this card's lane host in the origin registry for borrow-return
   // FLIP. Uses the CURRENTLY bound physical lane so the borrow-return path
