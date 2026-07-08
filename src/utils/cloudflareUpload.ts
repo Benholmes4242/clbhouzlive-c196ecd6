@@ -14,15 +14,25 @@ export const uploadToCloudflareR2 = async (
   originalFileName?: string
 ): Promise<CloudflareUploadResult> => {
   try {
+    console.log('[UPLOAD/R2] begin', {
+      name: file.name, type: file.type, size: file.size,
+      bucketType, onLine: typeof navigator !== 'undefined' ? navigator.onLine : undefined,
+      visibility: typeof document !== 'undefined' ? document.visibilityState : undefined,
+    });
     // Offline guard — surface a clear connection error instead of
     // a misleading "Not authenticated" when getSession() fails because
     // the network is down.
     if (typeof navigator !== 'undefined' && navigator.onLine === false) {
+      console.error('[UPLOAD/R2] BLOCKED by navigator.onLine=false');
       throw new Error('No connection - reconnect and try again');
     }
 
     // Get the current session
     const { data: { session } } = await supabase.auth.getSession();
+    console.log('[UPLOAD/R2] session', {
+      hasSession: !!session,
+      tokenLen: session?.access_token?.length ?? 0,
+    });
     if (!session) {
       if (typeof navigator !== 'undefined' && navigator.onLine === false) {
         throw new Error('No connection - reconnect and try again');
@@ -36,6 +46,9 @@ export const uploadToCloudflareR2 = async (
     formData.append('fileName', originalFileName || file.name);
     formData.append('bucketType', bucketType);
 
+    console.log('[UPLOAD/R2] invoke -> cloudflare-r2-upload', {
+      formKeys: ['file', 'fileName', 'bucketType'],
+    });
     // Call the Cloudflare R2 upload edge function
     const { data, error } = await supabase.functions.invoke('cloudflare-r2-upload', {
       body: formData,
@@ -45,13 +58,34 @@ export const uploadToCloudflareR2 = async (
     });
 
     if (error) {
-      console.error('Upload error:', error);
+      console.error('[UPLOAD/R2] invoke error', {
+        name: (error as any)?.name, message: error.message,
+      });
+      const ctx: any = (error as any).context;
+      if (ctx && typeof ctx.text === 'function') {
+        try {
+          const status = ctx.status;
+          const body = await ctx.text();
+          console.error('[UPLOAD/R2] invoke error response', {
+            status, body: body?.slice(0, 500),
+          });
+        } catch (e) {
+          console.error('[UPLOAD/R2] could not read error.context', e);
+        }
+      }
       throw new Error(error.message);
     }
 
+    console.log('[UPLOAD/R2] ok', {
+      name: file.name, hasUrl: !!(data && (data as any).publicUrl),
+    });
     return data as CloudflareUploadResult;
   } catch (error) {
-    console.error('Cloudflare R2 upload failed:', error);
+    console.error('[UPLOAD/R2] failed', {
+      name: file.name,
+      errName: error instanceof Error ? error.name : typeof error,
+      errMessage: error instanceof Error ? error.message : String(error),
+    });
     return {
       success: false,
       error: error instanceof Error ? error.message : 'Upload failed'

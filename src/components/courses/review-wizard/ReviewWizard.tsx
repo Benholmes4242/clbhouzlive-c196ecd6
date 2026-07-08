@@ -113,6 +113,19 @@ export function ReviewWizard({
     else setOverlayRoot(null);
   }, [isOpen]);
 
+  // One-time platform log for upload diagnostics ([UPLOAD/ENV]).
+  useEffect(() => {
+    try {
+      import('@/uploads/medianBridge').then(({ detectMedianBridge }) => {
+        console.log('[UPLOAD/ENV]', {
+          ua: navigator.userAgent,
+          median: JSON.stringify(detectMedianBridge()),
+          onLine: navigator.onLine,
+        });
+      });
+    } catch {}
+  }, []);
+
   // Scroll lock — shared, reference-counted util
   useLayoutEffect(() => {
     if (!isOpen) return;
