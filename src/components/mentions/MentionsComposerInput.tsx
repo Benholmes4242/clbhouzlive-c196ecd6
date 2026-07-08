@@ -326,6 +326,8 @@ interface AnchoredPanelProps {
 
 function AnchoredMentionsPanel({ anchorRef, children }: AnchoredPanelProps) {
   const panelRef = React.useRef<HTMLDivElement | null>(null);
+  // [MENTIONS-DIAG] mount — confirms the overlay tree actually rendered.
+  console.info('[MENTIONS] panel mount', { hasAnchor: !!anchorRef.current });
   const [geom, setGeom] = React.useState<{
     top: number;
     left: number;
