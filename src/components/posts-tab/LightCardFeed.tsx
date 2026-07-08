@@ -430,6 +430,7 @@ export const LightCardFeed: React.FC<LightCardFeedProps> = ({
     [
       activeIdx,
       playingIdx,
+      earlyIdx,
       carouselPositions,
       getCarouselChangeHandler,
       getCommentCount,
