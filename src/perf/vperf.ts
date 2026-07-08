@@ -959,3 +959,286 @@ export function vperfImagePhase(
   if (meta) vperfMeta(spanId, meta);
 }
 
+
+// ============================================================================
+// [FLOW] card lifecycle + handover continuity telemetry
+// ----------------------------------------------------------------------------
+// Objective verdicts for the early-motion feed:
+//   1. Card timeline — earlyStart → playing → promoted → released → summary,
+//      each stamped with the tile's visible fraction at that instant. The
+//      key answer number is fractionAtFirstMotion (IG ≤ 0.33 = moving before
+//      one-third centred, LATE otherwise).
+//   2. Handover continuity — at each promotion where the incoming tile was
+//      running on `feed-next`, measure the gap between the feed-next unmount
+//      and the feed-active first painted frame; sample poster opacity across
+//      that gap (poster >0.1 = the eye saw the still); diff playhead position
+//      across the swap. SEAMLESS / HICCUP / JUMP verdict per handover.
+//
+// All entry points strict no-op when DBG off. Zero behaviour changes.
+// ============================================================================
+
+/** Visible fraction of `el` inside the current viewport, 2dp, clamped 0..1. */
+export function vperfCardFraction(el: HTMLElement | null | undefined): number {
+  if (!el || typeof window === 'undefined') return 0;
+  try {
+    const r = el.getBoundingClientRect();
+    const vh = window.innerHeight || 1;
+    if (r.height <= 0) return 0;
+    const visible = Math.max(0, Math.min(r.bottom, vh) - Math.max(r.top, 0));
+    return Math.round((visible / r.height) * 100) / 100;
+  } catch { return 0; }
+}
+
+interface CardRec {
+  ownerKey: string;
+  idx: number;
+  postId: string | null;
+  earlyStartT: number | null;
+  playingT: number | null;
+  fractionAtFirstMotion: number | null;
+  promotedT: number | null;
+  releasedT: number | null;
+  playedMs: number;
+  earlyStarted: boolean;
+  released: boolean;
+}
+const __cardRecs = new Map<string, CardRec>();
+// Scorecard rollup
+const __cardStats = { activations: 0, ig: 0, fractions: [] as number[] };
+
+function getCardRec(ownerKey: string, idx?: number, postId?: string | null): CardRec {
+  let rec = __cardRecs.get(ownerKey);
+  if (!rec) {
+    rec = {
+      ownerKey,
+      idx: idx ?? -1,
+      postId: postId ?? null,
+      earlyStartT: null,
+      playingT: null,
+      fractionAtFirstMotion: null,
+      promotedT: null,
+      releasedT: null,
+      playedMs: 0,
+      earlyStarted: false,
+      released: false,
+    };
+    __cardRecs.set(ownerKey, rec);
+  } else {
+    if (idx != null && idx >= 0) rec.idx = idx;
+    if (postId != null) rec.postId = postId;
+  }
+  return rec;
+}
+
+export function vperfCardEarlyStart(
+  ownerKey: string | null | undefined,
+  opts: { idx: number; postId: string | null; fraction: number },
+): void {
+  if (!on() || !ownerKey) return;
+  const rec = getCardRec(ownerKey, opts.idx, opts.postId);
+  rec.earlyStartT = performance.now();
+  rec.earlyStarted = true;
+  emit('card.earlyStart', {
+    idx: rec.idx, postId: rec.postId, ownerKey, fraction: opts.fraction,
+    t: Math.round(rec.earlyStartT),
+  });
+}
+
+export function vperfCardFirstMotion(
+  ownerKey: string | null | undefined,
+  opts: { fraction: number; source?: 'feed-next' | 'feed-active' },
+): void {
+  if (!on() || !ownerKey) return;
+  const rec = __cardRecs.get(ownerKey);
+  if (!rec || rec.playingT != null) return; // idempotent
+  rec.playingT = performance.now();
+  rec.fractionAtFirstMotion = opts.fraction;
+  emit('card.playing', {
+    idx: rec.idx, postId: rec.postId, ownerKey,
+    fraction: opts.fraction, source: opts.source ?? null,
+    t: Math.round(rec.playingT),
+  });
+}
+
+export function vperfCardPromoted(
+  ownerKey: string | null | undefined,
+  opts: { idx: number; fraction: number },
+): void {
+  if (!on() || !ownerKey) return;
+  const rec = getCardRec(ownerKey, opts.idx);
+  if (rec.promotedT != null) return; // idempotent
+  rec.promotedT = performance.now();
+  emit('card.promoted', {
+    idx: rec.idx, postId: rec.postId, ownerKey, fraction: opts.fraction,
+    t: Math.round(rec.promotedT),
+  });
+}
+
+export function vperfCardReleased(
+  ownerKey: string | null | undefined,
+  opts: { fraction: number },
+): void {
+  if (!on() || !ownerKey) return;
+  const rec = __cardRecs.get(ownerKey);
+  if (!rec || rec.released) return;
+  rec.released = true;
+  rec.releasedT = performance.now();
+  if (rec.promotedT != null) {
+    rec.playedMs = Math.max(0, Math.round(rec.releasedT - rec.promotedT));
+  }
+  emit('card.released', {
+    idx: rec.idx, postId: rec.postId, ownerKey, fraction: opts.fraction,
+    t: Math.round(rec.releasedT),
+  });
+  // Summary
+  const fFM = rec.fractionAtFirstMotion;
+  const verdict: 'IG' | 'LATE' = fFM != null && fFM <= 0.33 ? 'IG' : 'LATE';
+  const motionLeadMs = (rec.earlyStartT != null && rec.promotedT != null)
+    ? Math.max(0, Math.round(rec.promotedT - rec.earlyStartT)) : null;
+  emit('card.summary', {
+    idx: rec.idx, postId: rec.postId, ownerKey,
+    earlyStarted: rec.earlyStarted,
+    fractionAtFirstMotion: fFM,
+    motionLeadMs,
+    playedMs: rec.playedMs,
+    verdict,
+  });
+  // Scorecard
+  if (rec.promotedT != null) {
+    __cardStats.activations += 1;
+    if (verdict === 'IG') __cardStats.ig += 1;
+    if (fFM != null) {
+      __cardStats.fractions.push(fFM);
+      if (__cardStats.fractions.length > 500) __cardStats.fractions.shift();
+    }
+  }
+  __cardRecs.delete(ownerKey);
+}
+
+// ---------------- Handover continuity probe ----------------
+
+interface HandoverRec {
+  ownerKey: string;
+  idx: number;
+  tUnmount: number;
+  feedNextCT: number;
+  posterEl: HTMLElement | null;
+  maxPosterOpacity: number;
+  rafId: number;
+  timeoutId: ReturnType<typeof setTimeout> | null;
+  emitted: boolean;
+}
+const __handoverRecs = new Map<string, HandoverRec>();
+const __handoverStats = {
+  seamless: 0, hiccup: 0, jump: 0,
+  gapMs: [] as number[], posJumpMs: [] as number[],
+};
+
+function readOpacity(el: HTMLElement | null): number {
+  if (!el) return 0;
+  try {
+    const inline = parseFloat((el.style && el.style.opacity) || '');
+    if (isFinite(inline)) return inline;
+    const cs = getComputedStyle(el);
+    const v = parseFloat(cs.opacity || '1');
+    return isFinite(v) ? v : 1;
+  } catch { return 1; }
+}
+
+export function vperfHandoverStart(
+  ownerKey: string | null | undefined,
+  opts: {
+    idx: number;
+    hostEl: HTMLElement | null;
+    posterEl: HTMLElement | null;
+    feedNextCurrentTime: number;
+  },
+): void {
+  if (!on() || !ownerKey) return;
+  // Replace any stale rec
+  const stale = __handoverRecs.get(ownerKey);
+  if (stale) {
+    cancelAnimationFrame(stale.rafId);
+    if (stale.timeoutId) clearTimeout(stale.timeoutId);
+    __handoverRecs.delete(ownerKey);
+  }
+  const rec: HandoverRec = {
+    ownerKey,
+    idx: opts.idx,
+    tUnmount: performance.now(),
+    feedNextCT: Math.max(0, opts.feedNextCurrentTime || 0),
+    posterEl: opts.posterEl,
+    maxPosterOpacity: readOpacity(opts.posterEl),
+    rafId: 0,
+    timeoutId: null,
+    emitted: false,
+  };
+  const tick = () => {
+    const r = __handoverRecs.get(ownerKey);
+    if (!r || r.emitted) return;
+    r.maxPosterOpacity = Math.max(r.maxPosterOpacity, readOpacity(r.posterEl));
+    r.rafId = requestAnimationFrame(tick);
+  };
+  rec.rafId = requestAnimationFrame(tick);
+  // Failsafe: force-emit at 500ms even if the frame callback never lands
+  rec.timeoutId = setTimeout(() => {
+    vperfHandoverFrame(ownerKey, { feedActiveCurrentTime: NaN, timedOut: true });
+  }, 500);
+  __handoverRecs.set(ownerKey, rec);
+}
+
+export function vperfHandoverFrame(
+  ownerKey: string | null | undefined,
+  opts: { feedActiveCurrentTime: number; timedOut?: boolean },
+): void {
+  if (!on() || !ownerKey) return;
+  const rec = __handoverRecs.get(ownerKey);
+  if (!rec || rec.emitted) return;
+  rec.emitted = true;
+  cancelAnimationFrame(rec.rafId);
+  if (rec.timeoutId) clearTimeout(rec.timeoutId);
+  const tFrames = performance.now();
+  const gapMs = Math.max(0, Math.round(tFrames - rec.tUnmount));
+  const posterExposed = rec.maxPosterOpacity > 0.1;
+  const feedActiveCT = isFinite(opts.feedActiveCurrentTime) ? opts.feedActiveCurrentTime : rec.feedNextCT;
+  const posJumpMs = Math.round(Math.abs(feedActiveCT - rec.feedNextCT) * 1000);
+  let verdict: 'SEAMLESS' | 'HICCUP' | 'JUMP';
+  if (opts.timedOut || gapMs > 32 || posterExposed) verdict = 'HICCUP';
+  else if (posJumpMs > 120) verdict = 'JUMP';
+  else verdict = 'SEAMLESS';
+  emit('handover', {
+    idx: rec.idx, ownerKey,
+    gapMs, posterExposed, posJumpMs,
+    timedOut: !!opts.timedOut,
+    verdict,
+  });
+  if (verdict === 'SEAMLESS') __handoverStats.seamless += 1;
+  else if (verdict === 'JUMP') __handoverStats.jump += 1;
+  else __handoverStats.hiccup += 1;
+  __handoverStats.gapMs.push(gapMs);
+  __handoverStats.posJumpMs.push(posJumpMs);
+  if (__handoverStats.gapMs.length > 500) __handoverStats.gapMs.shift();
+  if (__handoverStats.posJumpMs.length > 500) __handoverStats.posJumpMs.shift();
+  __handoverRecs.delete(ownerKey);
+}
+
+// Expose small rollup for the scorecard renderer.
+export function __vperfFlowRollupLines(): string[] {
+  const lines: string[] = [];
+  const cs = __cardStats;
+  if (cs.activations > 0) {
+    const igPct = Math.round((cs.ig / cs.activations) * 100);
+    lines.push(
+      `  flow.cards: activations=${cs.activations} IG=${igPct}% medianFractionAtFirstMotion=${(pct(cs.fractions.map(f => Math.round(f * 100)), 0.5) / 100).toFixed(2)}`,
+    );
+  }
+  const hs = __handoverStats;
+  const hsTotal = hs.seamless + hs.hiccup + hs.jump;
+  if (hsTotal > 0) {
+    lines.push(
+      `  flow.handover: n=${hsTotal} SEAMLESS=${hs.seamless} HICCUP=${hs.hiccup} JUMP=${hs.jump} p95gapMs=${pct(hs.gapMs, 0.95)} p95posJumpMs=${pct(hs.posJumpMs, 0.95)}`,
+    );
+  }
+  return lines;
+}
+
