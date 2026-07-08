@@ -217,10 +217,14 @@ export const CardFeed = forwardRef<CardFeedHandle, CardFeedProps>(function CardF
   const [playingIdx, setPlayingIdx] = useState(0);
   const settleTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const SETTLE_MS = 80;
-  const PLAY_IN = 0.5;
-  const PLAY_OUT = 0.35;
+  // IG-style early activation: cheap now that feed-next preload + PREDICT cache
+  // warming + bandwidth seeding are in place. Playing by ~1/3 up feels native.
+  const PLAY_IN = 0.30;
+  const PLAY_OUT = 0.20;
   const HYSTERESIS = 0.1;
   const visibilityRef = useRef<Map<number, number>>(new Map());
+  const scrollDirRef = useRef<number>(0); // +1 down, -1 up, 0 idle
+  const lastScrollTopRef = useRef<number>(0);
   const observerRef = useRef<IntersectionObserver | null>(null);
   const cardEls = useRef<Map<number, HTMLElement>>(new Map());
 
