@@ -4,17 +4,21 @@
  * Suggestions panel architecture (single source; four consumers:
  * PostComposer, ReviewWizard, CommentsSheet, TopTenCardComments):
  *
- *   • react-mentions renders its overlay via `suggestionsPortalHost =
- *     document.body`, so the panel escapes every ancestor's overflow
- *     and stacking context (sheets, wizard scroll boxes, sticky
- *     headers).
- *   • The overlay itself is made invisible/pointer-transparent via
- *     `style.suggestions` — all visible chrome lives inside our
- *     `customSuggestionsContainer` (`AnchoredMentionsPanel`), which
- *     measures the composer's input row and fixes itself to that
- *     rect. Width = anchor.width, left = anchor.left, placement =
- *     above/below based on the VISUAL viewport (accounts for the iOS
- *     keyboard shift under Median WebView).
+ *   • react-mentions' own overlay shell (`.suggestions`) is styled
+ *     0x0 / pointer-transparent — it exists only as an open/closed
+ *     bridge that hands us `children`. We used to render our visible
+ *     panel INSIDE that shell; the shell's own layout was piercing
+ *     hit-tests (elementFromPoint returned the composer beneath),
+ *     so the panel painted but felt invisible.
+ *   • AnchoredMentionsPanel now portals its visible chrome directly
+ *     to `document.body` via `ReactDOM.createPortal`, as a SIBLING
+ *     of the react-mentions shell — no shell/ancestor layout can
+ *     clip or occlude it. React tree is unchanged, so the library's
+ *     click handlers on the rendered `<li>`s still route normally.
+ *   • Placement: measures the composer's input row and fixes itself
+ *     to that rect. Width = anchor.width, left = anchor.left,
+ *     placement = above/below based on the VISUAL viewport (accounts
+ *     for the iOS keyboard shift under Median WebView).
  *   • Listeners: ResizeObserver on the anchor + panel, plus
  *     window.resize/scroll and visualViewport.resize/scroll — all
  *     torn down when the panel unmounts (unmount == close). The
@@ -22,10 +26,15 @@
  *     always fresh.
  *   • z-index token: `Z.mentionsPanel` (12010) — clears sheet
  *     surfaces (12003) so comments/top-ten hosts keep working.
+ *   • Mouse-down suppression: `onMouseDown` preventDefault on the
+ *     panel root keeps the textarea focused so react-mentions'
+ *     click handler on the `<li>` lands before blur closes the
+ *     suggestions.
  *
  * NO host-level `.suggestions` overrides. Grep for `.suggestions`
  * placement or `mentionsPanel` should only return this file.
  */
+
 
 import React from 'react';
 import ReactDOM from 'react-dom';
