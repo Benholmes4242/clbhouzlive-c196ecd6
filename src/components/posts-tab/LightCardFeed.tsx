@@ -180,7 +180,9 @@ export const LightCardFeed: React.FC<LightCardFeedProps> = ({
       const cardPost = postsRef.current[cand];
       if (!cardPost) return -1;
       try {
-        const snap = VideoEngine.snapshot('feed-next');
+        // Down-scroll uses feed-next; up-scroll uses feed-prev (PR-A).
+        const laneId = dir > 0 ? 'feed-next' : 'feed-prev';
+        const snap = VideoEngine.snapshot(laneId);
         const warm = snap.postId != null &&
           (snap.postId === cardPost.id || snap.postId === `${cardPost.id}:0`) &&
           (snap.state === 'ready' || snap.state === 'playing' || snap.state === 'loading');
