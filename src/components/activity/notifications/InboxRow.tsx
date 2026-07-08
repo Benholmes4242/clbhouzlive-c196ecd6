@@ -206,8 +206,9 @@ function getDetail(n: ActivityNotification): string | null {
     // (push notifications read n.message directly, not this renderer).
     case 'friend_request':
     case 'friend_request_sent':
-    case 'friend_accepted':
       return null;
+    case 'friend_accepted':
+      return "You're now connected";
     default: {
       // For system / support / handicap / anything without special copy,
       // surface the message so nothing renders blank.
