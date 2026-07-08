@@ -132,6 +132,16 @@ function getVerb(n: ActivityNotification): string {
     case 'comment':
     case 'comment_post': return 'commented on your post';
     case 'comment_reply': return 'replied to your comment';
+    case 'top_ten_comment': {
+      // Course-aware phrasing when the enriched trigger has populated
+      // data.course_name; otherwise fall back to a course-less variant.
+      const cn = (n.data as any)?.course_name as string | undefined;
+      return cn ? `commented on your ${cn} Top 10` : 'commented on your Top 10';
+    }
+    case 'top_ten_reply': {
+      const cn = (n.data as any)?.course_name as string | undefined;
+      return cn ? `replied to your comment on ${cn}` : 'replied to your Top 10 comment';
+    }
     case 'mention':
     case 'mention_post':
     case 'comment_mention':
