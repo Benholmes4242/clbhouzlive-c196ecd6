@@ -410,12 +410,64 @@ function AnchoredMentionsPanel({ anchorRef, children }: AnchoredPanelProps) {
       if (!p) { console.info('[MENTIONS] paint', { panel: null }); return; }
       const rect = p.getBoundingClientRect();
       const cs = getComputedStyle(p);
+      // [MENTIONS-DIAG] full stringified rect + explicit zIndex — no
+      // collapsed objects (console truncation was hiding the values).
       console.info('[MENTIONS] paint', {
-        rect: { top: rect.top, left: rect.left, width: rect.width, height: rect.height, bottom: rect.bottom, right: rect.right },
+        rectJSON: JSON.stringify({ x: rect.x, y: rect.y, top: rect.top, left: rect.left, width: rect.width, height: rect.height, bottom: rect.bottom, right: rect.right }),
         position: cs.position, display: cs.display, visibility: cs.visibility,
-        opacity: cs.opacity, zIndex: cs.zIndex, transform: cs.transform,
+        opacity: cs.opacity,
+        zIndexRaw: cs.zIndex,
+        zIndexStr: String(cs.zIndex),
+        transform: cs.transform,
         parentTag: p.parentElement?.tagName, parentId: p.parentElement?.id,
       });
+
+      // [MENTIONS-DIAG] occluder probe — hit-test the panel's centre point.
+      // If elementFromPoint returns the panel (or a descendant), NOTHING is
+      // covering it and the bug is inside the panel's own paint. Otherwise
+      // the returned element IS the occluder and its z beats ours.
+      const cx = Math.round(rect.left + rect.width / 2);
+      const cy = Math.round(rect.top + rect.height / 2);
+      const hit = document.elementFromPoint(cx, cy) as HTMLElement | null;
+      const hitCs = hit ? getComputedStyle(hit) : null;
+      console.info('[MENTIONS] occluder', {
+        cx, cy,
+        tag: hit?.tagName ?? null,
+        id: hit?.id ?? null,
+        cls: (hit?.className?.toString?.() ?? '').slice(0, 120),
+        zIndex: hitCs?.zIndex ?? null,
+        position: hitCs?.position ?? null,
+        opacity: hitCs?.opacity ?? null,
+        pointerEvents: hitCs?.pointerEvents ?? null,
+        isPanelOrChild: !!(hit && p.contains(hit)),
+      });
+
+      // [MENTIONS-DIAG] sheet z snapshot — empirical comparison against any
+      // live comments/top-ten/wizard sheet root at this exact moment.
+      const sheetSelectors = [
+        '[data-radix-dialog-content]',
+        '[data-vaul-drawer]',
+        '[role="dialog"]',
+        '.comments-sheet-root',
+        '[data-comments-sheet]',
+      ];
+      const sheets: Array<Record<string, unknown>> = [];
+      for (const sel of sheetSelectors) {
+        const nodes = document.querySelectorAll(sel);
+        nodes.forEach((n, i) => {
+          if (i > 2) return;
+          const cs2 = getComputedStyle(n as HTMLElement);
+          sheets.push({
+            sel,
+            tag: (n as HTMLElement).tagName,
+            zIndex: cs2.zIndex,
+            position: cs2.position,
+            transform: cs2.transform,
+          });
+        });
+      }
+      console.info('[MENTIONS] sheet-z', { count: sheets.length, sheets });
+
       const breakers: Array<Record<string, string | null>> = [];
       let el: HTMLElement | null = p.parentElement;
       let depth = 0;
