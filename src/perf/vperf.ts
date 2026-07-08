@@ -676,6 +676,14 @@ function scorecardIngest(kind: string, payload: Record<string, unknown>): void {
     sessionHealth.levelSwitches += Number((payload as any).levelSwitches) || 0;
     sessionHealth.totalFrames += Number((payload as any).totalFrames) || 0;
     sessionHealth.droppedFrames += Number((payload as any).droppedFrames) || 0;
+    const laneId = String((payload as any).laneId ?? '');
+    const sl = (payload as any).startLevel;
+    if (typeof sl === 'number' && (laneId === 'feed-active' || laneId === 'fullscreen')) {
+      const arr = startLevelsByLane.get(laneId) ?? [];
+      arr.push(sl);
+      if (arr.length > 500) arr.shift();
+      startLevelsByLane.set(laneId, arr);
+    }
     return;
   }
 
@@ -691,7 +699,12 @@ function scorecardIngest(kind: string, payload: Record<string, unknown>): void {
     const r = feedRollup.get(page) ?? { scrolls: 0, longFrames: 0, frames: 0, worstMs: 0, activateWarm: 0, activateCold: 0 };
     if ((payload as any).warm) r.activateWarm += 1; else r.activateCold += 1;
     feedRollup.set(page, r);
+    if ((payload as any).prefetched === true) {
+      prefetchStats.activationsWithPrefetch += 1;
+      if ((payload as any).warm) prefetchStats.activationsWithPrefetchWarm += 1;
+    }
   }
+
 
   if (!isFinite(totalMs) || totalMs < 0) return;
   const key = bucketKey(kind, page);
