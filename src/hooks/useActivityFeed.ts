@@ -206,8 +206,11 @@ function getContextUrl(notification: any): string {
     if (sourceType === 'top_ten_comment') {
       const targetId = data?.target_user_id ?? notification.user_id;
       const commentId = data?.top_ten_comment_id;
-      const q = commentId ? `&top_ten_comment=${commentId}` : '';
-      return `/profile/${targetId}?tab=courses${q}`;
+      const courseId = data?.course_id;
+      const parts = [`tab=courses`];
+      if (courseId) parts.push(`course=${courseId}`);
+      if (commentId) parts.push(`top_ten_comment=${commentId}`);
+      return `/profile/${targetId}?${parts.join('&')}`;
     }
   }
 
