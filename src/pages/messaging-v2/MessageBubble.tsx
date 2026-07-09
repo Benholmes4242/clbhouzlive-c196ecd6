@@ -1,6 +1,8 @@
 import React from 'react';
 import { Check, AlertCircle, Clock } from 'lucide-react';
-import type { ThreadMessage, MessageReaction } from '@/types/messaging';
+import type { ThreadMessage, MessageReaction, MessageAttachment } from '@/types/messaging';
+import { MessageImage } from './MessageImage';
+import { VoiceNote } from './VoiceNote';
 
 const INK = '#1F2428';
 const SUB = '#8A9099';
