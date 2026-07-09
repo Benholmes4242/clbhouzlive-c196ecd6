@@ -131,7 +131,7 @@ function VideosFullFeedInner({ userId, mood, searchQuery, onClearSearch, onReset
   const useRhythm = !searchQuery && mood === 'for_you';
   const segments = useMemo(() => (useRhythm ? buildRhythm(posts) : []), [useRhythm, posts]);
 
-  const { activeIdx: activeGridIdx, railRef: feedRef } = useWatchAutoplay({ railId: 'vids-fullfeed', posts });
+  const { activeIndices, railRef: feedRef } = useWatchAutoplay({ railId: 'vids-fullfeed', posts, maxActive: 3 });
 
 
   const renderVideoFeedBody = () => {
