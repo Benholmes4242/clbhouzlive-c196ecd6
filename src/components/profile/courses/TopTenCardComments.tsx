@@ -504,6 +504,7 @@ export const TopTenCardComments: React.FC<TopTenCardCommentsProps> = ({
                     placeholder={replyingTo ? `Reply to ${replyingTo.name}...` : 'Add a comment...'}
                     maxLength={500}
                     inputRef={(el) => { (inputRef as any).current = el; }}
+                    currentUserId={user?.id ?? null}
                   />
 
 
