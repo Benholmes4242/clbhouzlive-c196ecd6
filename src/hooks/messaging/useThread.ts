@@ -1,7 +1,14 @@
-import { useEffect, useMemo, useRef } from 'react';
+import { useCallback, useEffect, useMemo, useRef } from 'react';
 import { useInfiniteQuery, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useMessagingActor } from './useMessagingActor';
+import {
+  dedupeByClientId,
+  insertOptimistic as cacheInsertOptimistic,
+  resolveOptimistic as cacheResolveOptimistic,
+  markFailed as cacheMarkFailed,
+  removeOptimistic as cacheRemoveOptimistic,
+} from './threadCache';
 import type { ThreadMessage, MessageReaction } from '@/types/messaging';
 
 const PAGE_SIZE = 30;
@@ -38,12 +45,13 @@ export function useThread(conversationId: string | null) {
   });
 
   // Pages are newest-first per page; flatten then reverse for oldest->newest.
+  // Dedupe by client_id so an optimistic bubble and its server twin never coexist.
   const messages = useMemo<ThreadMessage[]>(() => {
     const pages = query.data?.pages ?? [];
-    // Concatenate newest-first across pages, then reverse.
     const flat: ThreadMessage[] = [];
     for (const p of pages) flat.push(...p);
-    return flat.slice().reverse();
+    const chronological = flat.slice().reverse();
+    return dedupeByClientId(chronological);
   }, [query.data]);
 
   // Realtime channel
@@ -102,6 +110,36 @@ export function useThread(conversationId: string | null) {
       .then(() => undefined, () => undefined);
   }, [conversationId, actor, newestId]);
 
+  // Cache mutators bound to this conversationId (convenience for consumers).
+  const insertOptimistic = useCallback(
+    (msg: ThreadMessage) => {
+      if (!conversationId) return;
+      cacheInsertOptimistic(queryClient, conversationId, msg);
+    },
+    [conversationId, queryClient],
+  );
+  const resolveOptimistic = useCallback(
+    (clientId: string, serverRow: Partial<ThreadMessage>) => {
+      if (!conversationId) return;
+      cacheResolveOptimistic(queryClient, conversationId, clientId, serverRow);
+    },
+    [conversationId, queryClient],
+  );
+  const markFailed = useCallback(
+    (clientId: string) => {
+      if (!conversationId) return;
+      cacheMarkFailed(queryClient, conversationId, clientId);
+    },
+    [conversationId, queryClient],
+  );
+  const removeOptimistic = useCallback(
+    (clientId: string) => {
+      if (!conversationId) return;
+      cacheRemoveOptimistic(queryClient, conversationId, clientId);
+    },
+    [conversationId, queryClient],
+  );
+
   return {
     messages,
     fetchOlder: query.fetchNextPage,
@@ -109,5 +147,9 @@ export function useThread(conversationId: string | null) {
     isLoading: query.isLoading,
     isFetchingOlder: query.isFetchingNextPage,
     error: query.error,
+    insertOptimistic,
+    resolveOptimistic,
+    markFailed,
+    removeOptimistic,
   };
 }
