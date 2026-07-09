@@ -43,7 +43,18 @@ export function useDeleteAccount(userId: string | undefined) {
       const { error } = await supabase.functions.invoke('delete-account', {
         headers: { Authorization: `Bearer ${session.access_token}` },
       });
-      if (error) throw error;
+      if (error) {
+        let serverReason: string | null = null;
+        const ctx = (error as any).context;
+        if (ctx && typeof ctx.text === 'function') {
+          try { serverReason = (await ctx.text())?.slice(0, 300); } catch {}
+        }
+        console.error('[deleteAccount] edge error', {
+          name: error.name, message: error.message,
+          status: ctx?.status, body: serverReason,
+        });
+        throw error;
+      }
       await supabase.auth.signOut();
       queryClient.clear();
       await removePersistedQueryCache();
