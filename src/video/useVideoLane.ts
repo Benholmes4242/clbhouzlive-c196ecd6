@@ -132,6 +132,16 @@ export function useVideoLane(
   // no seek. This is the PR-B seamless promotion guarantee.
   useEffect(() => {
     if (!laneId || !opts.active || !opts.hlsUrl) return;
+    {
+      const openT = traceLookup({ ownerKey: opts.postId ?? opts.ownerKey ?? null });
+      trace('lane.load.call', {
+        openId: openT?.openId,
+        laneId,
+        ownerKey: opts.postId ?? null,
+        hlsUrl: opts.hlsUrl,
+        startPosition: opts.startPosition ?? -1,
+      });
+    }
     VideoEngine.load(laneId, {
       hlsUrl: opts.hlsUrl,
       posterUrl: opts.posterUrl ?? null,
