@@ -3,7 +3,7 @@ import { RequestCourseCTA } from '@/components/courses/RequestCourseCTA';
 import { createPortal } from 'react-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Search, X, Clock, BadgeCheck, Briefcase, Star, Lock, MessageCircle, Loader2, ChevronRight } from 'lucide-react';
-import { useStartDM } from '@/hooks/useStartDM';
+import { useStartConversation } from '@/hooks/messaging/useStartConversation';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { SuggestedCreatorsShelf } from '@/components/shared/SuggestedCreatorsShelf';
 import { SquircleAvatar, LIGHT_HAIRLINE } from '@/components/ui/SquircleAvatar';
@@ -185,7 +185,7 @@ interface GlobalSearchOverlayProps {
 function GlobalSearchOverlay({ isOpen, onClose }: GlobalSearchOverlayProps) {
   const navigate = useNavigate();
   const { user } = useSupabaseSession();
-  const { startDM, isStarting: dmStarting } = useStartDM();
+  const { start: startConversation, isStarting: dmStarting } = useStartConversation();
   const inputRef = useRef<HTMLInputElement>(null);
   const [inputValue, setInputValue] = useState('');
   const debouncedQuery = useDebounce(inputValue, 250);
