@@ -39,6 +39,7 @@ import {
   vperfNextId,
 } from '@/perf/vperf';
 import { readSeededBandwidth } from './bandwidthMemory';
+import { coldOpenAttach, coldOpenFirstFrame } from '@/perf/coldOpen';
 
 
 
