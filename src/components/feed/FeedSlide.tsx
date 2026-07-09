@@ -11,6 +11,7 @@ import { useFullscreenFeedStore } from '@/store/fullscreenFeedStore';
 import { originHostRegistry } from '@/video/originHostRegistry';
 import { isPerfEnabled } from '@/perf/navTiming';
 import { vperfStart, vperfArmLane, vperfNextId, vperfMotionMark } from '@/perf/vperf';
+import { trace, traceLookup } from '@/perf/trace';
 import { resolveRestingRect, getCurrentViewport, type RestingRect } from '@/lib/media/resolveRestingRect';
 import { FS_TRANSITION_MODE } from '@/lib/media/transitionMode';
 
