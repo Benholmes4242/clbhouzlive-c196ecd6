@@ -106,12 +106,12 @@ export const MessageBubble: React.FC<Props> = ({
           background: isDeleted ? 'transparent' : bg,
           color: fg,
           borderRadius,
-          padding: isDeleted ? '0' : '8px 12px',
+          padding: isDeleted ? '0' : hugMedia ? '3px' : '8px 12px',
           border: isDeleted ? `0.5px dashed ${HAIRLINE}` : 'none',
           opacity: isSending ? 0.7 : 1,
           display: 'flex',
           flexDirection: 'column',
-          gap: 4,
+          gap: hugMedia ? 0 : 4,
           wordBreak: 'break-word',
         }}
       >
@@ -167,34 +167,77 @@ export const MessageBubble: React.FC<Props> = ({
               </div>
             ) : null}
 
-            <span
-              style={{
-                fontSize: 14,
-                lineHeight: 1.4,
-                whiteSpace: 'pre-wrap',
-                color: fg,
-              }}
-            >
-              {message.type === 'text' || message.type === 'system'
-                ? message.body ?? ''
-                : message.body?.trim()
-                  ? message.body
-                  : '[media]'}
-              {message.edited_at ? (
-                <span
-                  style={{
-                    color: isOutgoing ? 'rgba(245,246,247,0.55)' : HINT,
-                    fontSize: 11,
-                    marginLeft: 6,
-                  }}
-                >
-                  (edited)
-                </span>
-              ) : null}
-            </span>
+            {images.length > 0 ? (
+              <div
+                style={{
+                  display: 'flex',
+                  flexDirection: 'column',
+                  gap: 4,
+                  borderRadius: hugMedia ? 12 : 0,
+                  overflow: 'hidden',
+                }}
+              >
+                {images.map((att, i) => (
+                  <MessageImage
+                    key={att.path ?? att.localUrl ?? i}
+                    attachment={att}
+                    isOutgoing={isOutgoing}
+                  />
+                ))}
+              </div>
+            ) : null}
+
+            {voices.length > 0 ? (
+              <div
+                style={{
+                  display: 'flex',
+                  flexDirection: 'column',
+                  gap: 4,
+                  padding: hugMedia ? '6px 8px' : 0,
+                }}
+              >
+                {voices.map((att, i) => (
+                  <VoiceNote
+                    key={att.path ?? att.localUrl ?? i}
+                    attachment={att}
+                    isOutgoing={isOutgoing}
+                  />
+                ))}
+              </div>
+            ) : null}
+
+            {hasBody ||
+            message.type === 'text' ||
+            message.type === 'system' ? (
+              <span
+                style={{
+                  fontSize: 14,
+                  lineHeight: 1.4,
+                  whiteSpace: 'pre-wrap',
+                  color: fg,
+                  padding: hugMedia ? '4px 8px 6px' : 0,
+                }}
+              >
+                {message.type === 'text' || message.type === 'system'
+                  ? message.body ?? ''
+                  : message.body ?? ''}
+                {message.edited_at ? (
+                  <span
+                    style={{
+                      color: isOutgoing ? 'rgba(245,246,247,0.55)' : HINT,
+                      fontSize: 11,
+                      marginLeft: 6,
+                    }}
+                  >
+                    (edited)
+                  </span>
+                ) : null}
+              </span>
+            ) : null}
           </>
         )}
       </div>
+
 
       {reactions.length > 0 && !isDeleted ? (
         <div
