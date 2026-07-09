@@ -93,7 +93,7 @@ export default function ExploreGrid({
   }, [coursePosts.length, isViewerOwnedHere, appendPosts, coursePosts]);
 
   // Autoplay: one active tile per viewport region, driven off data-watch-tile-index.
-  const { activeIdx, railRef: autoplayRef } = useWatchAutoplay({ railId: 'explore-grid' });
+  const { activeIdx, railRef: autoplayRef } = useWatchAutoplay({ railId: 'explore-grid', posts });
   const setGridRef = useCallback((el: HTMLDivElement | null) => {
     autoplayRef(el);
     if (gridRef) (gridRef as React.MutableRefObject<HTMLDivElement | null>).current = el;

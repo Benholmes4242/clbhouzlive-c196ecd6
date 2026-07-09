@@ -102,7 +102,7 @@ interface BodyProps {
 }
 
 function TrendingThisWeekBody({ topPosts, navigate, viewedPostIds, onDecoded, revealed, skeleton }: BodyProps) {
-  const { activeIdx, railRef } = useWatchAutoplay({ railId: 'trending-this-week' });
+  const { activeIdx, railRef } = useWatchAutoplay({ railId: 'trending-this-week', posts: topPosts });
 
   return (
     <div style={{ position: 'relative', background: 'hsl(var(--background))' }}>
