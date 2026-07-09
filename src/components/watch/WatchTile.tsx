@@ -92,6 +92,7 @@ const WatchTile: React.FC<WatchTileProps> = ({ post, index, allPosts, onDecoded,
       as="div"
       variant="media"
       onPress={handleClick}
+      onPrerouteArm={onPrerouteArm}
       onPreroute={onPreroute}
       onPrerouteCancel={onPrerouteCancel}
       data-watch-tile-index={index}
