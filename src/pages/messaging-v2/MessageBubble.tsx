@@ -1,0 +1,248 @@
+import React from 'react';
+import { Check, AlertCircle, Clock } from 'lucide-react';
+import type { ThreadMessage, MessageReaction } from '@/types/messaging';
+
+const INK = '#1F2428';
+const SUB = '#8A9099';
+const HINT = '#AEB4BC';
+const HAIRLINE = 'rgba(0,0,0,0.07)';
+
+const IN_BG = '#EDEFF2';
+const OUT_BG = '#15171F';
+const OUT_FG = '#F5F6F7';
+
+interface Props {
+  message: ThreadMessage;
+  isOutgoing: boolean;
+  isFirstOfRun: boolean;
+  isLastOfRun: boolean;
+  showTicks: boolean;
+}
+
+function formatTime(iso: string): string {
+  const d = new Date(iso);
+  if (isNaN(d.getTime())) return '';
+  const hh = String(d.getHours()).padStart(2, '0');
+  const mm = String(d.getMinutes()).padStart(2, '0');
+  return `${hh}:${mm}`;
+}
+
+function groupReactions(rs: MessageReaction[]): { emoji: string; count: number }[] {
+  const map = new Map<string, number>();
+  for (const r of rs) map.set(r.emoji, (map.get(r.emoji) ?? 0) + 1);
+  return Array.from(map.entries()).map(([emoji, count]) => ({ emoji, count }));
+}
+
+/** Double-check (read ticks) rendered in monochrome grey. */
+const DoubleCheck: React.FC<{ color: string }> = ({ color }) => (
+  <span
+    style={{
+      display: 'inline-flex',
+      alignItems: 'center',
+      color,
+      lineHeight: 0,
+    }}
+    aria-label="Sent"
+  >
+    <Check size={12} strokeWidth={2.5} />
+    <Check size={12} strokeWidth={2.5} style={{ marginLeft: -6 }} />
+  </span>
+);
+
+export const MessageBubble: React.FC<Props> = ({
+  message,
+  isOutgoing,
+  isFirstOfRun,
+  isLastOfRun,
+  showTicks,
+}) => {
+  const isDeleted = message.deleted_at != null;
+  const isSending = message.status === 'sending';
+  const isFailed = message.status === 'failed';
+
+  const bg = isOutgoing ? OUT_BG : IN_BG;
+  const fg = isOutgoing ? OUT_FG : INK;
+
+  const R_LG = 18;
+  const R_SM = 6;
+  // Flatten inner-adjacent corners for stacked runs.
+  const topInner = isFirstOfRun ? R_LG : R_SM;
+  const bottomInner = isLastOfRun ? R_LG : R_SM;
+  const borderRadius = isOutgoing
+    ? `${R_LG}px ${topInner}px ${bottomInner}px ${R_LG}px`
+    : `${topInner}px ${R_LG}px ${R_LG}px ${bottomInner}px`;
+
+  const reactions = groupReactions(message.reactions ?? []);
+
+  const reply = message.reply_preview;
+  const replyRule = isOutgoing ? 'rgba(255,255,255,0.35)' : 'rgba(0,0,0,0.25)';
+  const replyName = isOutgoing ? 'rgba(245,246,247,0.9)' : SUB;
+  const replySnippet = isOutgoing ? 'rgba(245,246,247,0.6)' : SUB;
+
+  return (
+    <div
+      className="w-full flex flex-col"
+      style={{
+        alignItems: isOutgoing ? 'flex-end' : 'flex-start',
+        marginTop: isFirstOfRun ? 10 : 3,
+      }}
+    >
+      <div
+        style={{
+          maxWidth: '78%',
+          background: isDeleted ? 'transparent' : bg,
+          color: fg,
+          borderRadius,
+          padding: isDeleted ? '0' : '8px 12px',
+          border: isDeleted ? `0.5px dashed ${HAIRLINE}` : 'none',
+          opacity: isSending ? 0.7 : 1,
+          display: 'flex',
+          flexDirection: 'column',
+          gap: 4,
+          wordBreak: 'break-word',
+        }}
+      >
+        {isDeleted ? (
+          <span
+            style={{
+              padding: '8px 12px',
+              fontSize: 14,
+              lineHeight: 1.4,
+              fontStyle: 'italic',
+              color: SUB,
+            }}
+          >
+            Message deleted
+          </span>
+        ) : (
+          <>
+            {reply ? (
+              <div
+                style={{
+                  borderLeft: `2px solid ${replyRule}`,
+                  paddingLeft: 8,
+                  marginBottom: 2,
+                  display: 'flex',
+                  flexDirection: 'column',
+                  gap: 2,
+                  minWidth: 0,
+                }}
+              >
+                <span
+                  style={{
+                    fontSize: 12,
+                    fontWeight: 500,
+                    color: replyName,
+                    lineHeight: 1.3,
+                  }}
+                >
+                  {reply.sender_name ?? 'Unknown'}
+                </span>
+                <span
+                  className="truncate"
+                  style={{
+                    fontSize: 12,
+                    color: replySnippet,
+                    lineHeight: 1.3,
+                    maxWidth: '100%',
+                  }}
+                >
+                  {reply.deleted
+                    ? 'Message deleted'
+                    : reply.body?.trim() || `[${reply.type}]`}
+                </span>
+              </div>
+            ) : null}
+
+            <span
+              style={{
+                fontSize: 14,
+                lineHeight: 1.4,
+                whiteSpace: 'pre-wrap',
+                color: fg,
+              }}
+            >
+              {message.type === 'text' || message.type === 'system'
+                ? message.body ?? ''
+                : message.body?.trim()
+                  ? message.body
+                  : '[media]'}
+              {message.edited_at ? (
+                <span
+                  style={{
+                    color: isOutgoing ? 'rgba(245,246,247,0.55)' : HINT,
+                    fontSize: 11,
+                    marginLeft: 6,
+                  }}
+                >
+                  (edited)
+                </span>
+              ) : null}
+            </span>
+          </>
+        )}
+      </div>
+
+      {reactions.length > 0 && !isDeleted ? (
+        <div
+          className="flex flex-wrap gap-1"
+          style={{
+            marginTop: 4,
+            justifyContent: isOutgoing ? 'flex-end' : 'flex-start',
+          }}
+        >
+          {reactions.map((r) => (
+            <span
+              key={r.emoji}
+              className="inline-flex items-center"
+              style={{
+                background: '#FFFFFF',
+                border: '0.5px solid rgba(0,0,0,0.08)',
+                borderRadius: 11,
+                padding: '1px 7px',
+                fontSize: 12,
+                lineHeight: '18px',
+                color: INK,
+                gap: 3,
+              }}
+            >
+              <span>{r.emoji}</span>
+              {r.count > 1 ? <span style={{ color: SUB }}>{r.count}</span> : null}
+            </span>
+          ))}
+        </div>
+      ) : null}
+
+      {isLastOfRun ? (
+        <div
+          className="flex items-center gap-1.5"
+          style={{
+            marginTop: 4,
+            paddingLeft: isOutgoing ? 0 : 4,
+            paddingRight: isOutgoing ? 4 : 0,
+          }}
+        >
+          {isFailed ? (
+            <span
+              className="inline-flex items-center gap-1"
+              style={{ color: '#DC2626', fontSize: 10.5, fontWeight: 500 }}
+            >
+              <AlertCircle size={11} />
+              Failed
+            </span>
+          ) : isSending ? (
+            <Clock size={11} style={{ color: HINT }} />
+          ) : null}
+          <span style={{ color: HINT, fontSize: 10.5, lineHeight: 1 }}>
+            {formatTime(message.created_at)}
+          </span>
+          {showTicks && !isFailed && !isSending ? (
+            <DoubleCheck color={HINT} />
+          ) : null}
+        </div>
+      ) : null}
+    </div>
+  );
+};
+
+export default MessageBubble;
