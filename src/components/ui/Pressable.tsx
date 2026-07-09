@@ -36,6 +36,11 @@ const TRANSITION = 'transform 120ms cubic-bezier(0.2, 0, 0.2, 1), background-col
 // Movement / time thresholds for tap-vs-scroll disambiguation.
 const MOVE_THRESHOLD_PX = 8;
 const MAX_TAP_MS = 350;
+// Preroute (scroll-guarded pointerdown warm) — fire once the pointer has
+// stayed still long enough to be a tap-in-progress, cancel if it becomes a
+// scroll/drag or long-press.
+const PREROUTE_FIRE_MS = 40;
+const PREROUTE_LONGPRESS_MS = 500;
 
 interface VariantSpec {
   pressedScale: number | null;
