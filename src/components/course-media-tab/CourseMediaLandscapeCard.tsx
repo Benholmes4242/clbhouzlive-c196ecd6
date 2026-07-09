@@ -240,6 +240,6 @@ export const CourseMediaLandscapeCard: React.FC<CourseMediaLandscapeCardProps> =
           </div>
         )}
       </div>
-    </div>
+    </Pressable>
   );
 };
