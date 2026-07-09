@@ -44,7 +44,7 @@ export const CourseMediaLandscapeCard: React.FC<CourseMediaLandscapeCardProps> =
   const thumbnailUrl = isVideo ? media?.thumbnailUrl : (media?.imageUrl || media?.thumbnailUrl);
   const duration = media?.duration;
   const hlsUrl = (media as any)?.hlsUrl as string | undefined;
-  const tileRef = useRef<HTMLDivElement>(null);
+  const tileRef = useRef<HTMLElement>(null);
   const isVideoLane = isVideo && !!hlsUrl;
   const ownerKey = isVideoLane ? `${post.id}:0` : null;
   const { hostRef: laneHostRef, ready: laneReady } = useRailLane({
@@ -65,19 +65,33 @@ export const CourseMediaLandscapeCard: React.FC<CourseMediaLandscapeCardProps> =
     return () => originHostRegistry.unregister(ownerKey, el);
   }, [ownerKey, laneHostRef]);
 
+  // Scroll-guarded pointerdown warm — cold (non-active) video tiles only.
+  const { onPrerouteArm, onPreroute, onPrerouteCancel } = usePreroutePrefetch({
+    ownerKey,
+    hlsUrl: isVideoLane ? hlsUrl! : null,
+    enabled: isVideoLane && !active,
+  });
+
+  const handlePress = () => {
+    const perMediaPosts = allPosts ?? [post];
+    onOpenFullscreen?.(perMediaPosts, index, {
+      originEl: tileRef.current,
+      railOwnerKey: ownerKey,
+      posterUrl: thumbnailUrl || null,
+    });
+  };
+
   return (
-    <div
+    <Pressable
       ref={tileRef}
+      as="div"
+      variant="media"
+      onPress={handlePress}
+      onPrerouteArm={onPrerouteArm}
+      onPreroute={onPreroute}
+      onPrerouteCancel={onPrerouteCancel}
       data-course-media-index={index}
       data-watch-tile-index={index}
-      onClick={() => {
-        const perMediaPosts = allPosts ?? [post];
-        onOpenFullscreen?.(perMediaPosts, index, {
-          originEl: tileRef.current,
-          railOwnerKey: ownerKey,
-          posterUrl: thumbnailUrl || null,
-        });
-      }}
       style={{
         position: 'relative',
         aspectRatio: '16/9',
@@ -87,7 +101,7 @@ export const CourseMediaLandscapeCard: React.FC<CourseMediaLandscapeCardProps> =
         background: INK_TINT_04,
       }}
       className="transition-transform"
-    >
+    >{'\n'}
       {thumbnailUrl ? (
         <img
           src={thumbnailUrl}
