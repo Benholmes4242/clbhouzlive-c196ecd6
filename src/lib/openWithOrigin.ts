@@ -281,17 +281,6 @@ export function openWithOrigin({
   // Two-way resume: prefer the tile's live rail-lane playhead (Watch tap),
   // then the feed-active lane (Clubhouse tap), then the engine's session
   // lastPos map. Skipped entirely for borrow opens (element carries state).
-  //
-  // WATCH SURFACE EXCEPTION: cold non-borrow taps from the Watch grid/rails
-  // (i.e. tiles that were NOT auto-playing at tap time — no live rail-lane
-  // playhead to inherit) always start from 0. Short-form clips on Watch
-  // carry no user expectation of "resume where I left off", and a stale
-  // lastPos (from an earlier autoplay session that was then evicted) was
-  // producing the "poster + blur, never plays" stall: hls.js's startPosition
-  // seek didn't always commit, so `markReadyToShow`'s target-gate held
-  // `firstFrame` false forever → poster never faded out. Starting from 0
-  // eliminates that entire failure mode for the reported case.
-  const isWatchSurface = openedFrom === 'watch';
   let startPosition = 0;
   let startSource: 'railLane' | 'feedSnap' | 'lastPos' | 'zero' | 'borrow' = 'zero';
   let railLaneCT = -1;
@@ -308,7 +297,7 @@ export function openWithOrigin({
           startSource = 'railLane';
         }
       }
-      if (startSource === 'zero' && !isWatchSurface) {
+      if (startSource === 'zero') {
         // PR-B: resolve the physical lane currently holding the 'active' role.
         const feedSnap = VideoEngine.snapshot(feedLaneRoles.laneForRole('active'));
         feedSnapCT = feedSnap.currentTime;

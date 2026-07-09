@@ -476,13 +476,7 @@ class VideoEngineImpl {
       const now = lane.el.currentTime || 0;
       // With a seek target, wait until element playhead is at/past target - 0.3s.
       // Without a target (startPosition<=0), any painted frame counts.
-      // STALL SAFETY NET: once the element is actually playing (paused=false
-      // AND readyState>=2), the decoder has real frames to composite — reveal
-      // even if the target seek hasn't visibly committed. Otherwise a stale
-      // resume position on a re-loaded lane could hold firstFrame=false
-      // forever and trap the fullscreen viewer on the poster.
-      const actuallyPlaying = !lane.el.paused && lane.el.readyState >= 2;
-      if (target > 0 && now < target - 0.3 && !actuallyPlaying) return;
+      if (target > 0 && now < target - 0.3) return;
       lane.firstFrame = true;
       // Once we have real painted frames, strip the poster attribute so the
       // browser cannot re-composite the poster image on subsequent
