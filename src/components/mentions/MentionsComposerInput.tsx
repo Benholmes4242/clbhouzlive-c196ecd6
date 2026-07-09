@@ -52,7 +52,7 @@ const AMBER = '#F7931E';
 const BORDER = 'rgba(15,23,42,0.10)';
 
 const PANEL_MAX_HEIGHT = 6 * 44 + 44 + 8; // 6 rows + eyebrow header + gutter
-const PANEL_GAP = 6;                 // px between panel and anchor
+
 
 /** react-mentions passes `id` as a string; we encode `${kind}:${uuid}` there. */
 interface RichSuggestion extends SuggestionDataItem {
@@ -353,62 +353,27 @@ interface AnchoredPanelProps {
 function AnchoredMentionsPanel({ anchorRef, children }: AnchoredPanelProps) {
   const panelRef = React.useRef<HTMLDivElement | null>(null);
   const [geom, setGeom] = React.useState<{
-    top: number;
     left: number;
     width: number;
+    bottom: number;
     maxHeight: number;
-    placement: 'above' | 'below';
   } | null>(null);
 
   const measure = React.useCallback(() => {
-    const a = anchorRef.current;
-    if (!a) return;
-    const r = a.getBoundingClientRect();
-    const vv = typeof window !== 'undefined' ? window.visualViewport : null;
-    const vTop = vv?.offsetTop ?? 0;
-    const vHeight = vv?.height ?? window.innerHeight;
-    const vBottom = vTop + vHeight;
-
-    const spaceBelow = vBottom - r.bottom - PANEL_GAP - 8;
-    const spaceAbove = r.top - vTop - PANEL_GAP - 8;
-
-    // Prefer BELOW when it fits comfortably; flip ABOVE when below
-    // is cramped and above has more room (the keyboard-up case).
-    const wantsAbove =
-      spaceBelow < Math.min(180, PANEL_MAX_HEIGHT) && spaceAbove > spaceBelow;
-
-    const panelH = panelRef.current?.getBoundingClientRect().height ?? PANEL_MAX_HEIGHT;
-
-    const maxHeight = Math.max(
-      120,
-      Math.min(PANEL_MAX_HEIGHT, wantsAbove ? spaceAbove : spaceBelow),
-    );
-
-    const top = wantsAbove
-      ? Math.max(vTop + 8, r.top - PANEL_GAP - Math.min(panelH, maxHeight))
-      : Math.min(vBottom - Math.min(panelH, maxHeight) - 8, r.bottom + PANEL_GAP);
-
-    // Clamp to visual viewport so a narrow sheet can never cause overflow.
-    const vLeft = vv?.offsetLeft ?? 0;
-    const vW = vv?.width ?? window.innerWidth;
-    const clampedLeft = Math.max(vLeft + 8, r.left);
-    const clampedWidth = Math.min(r.width, vW - 16);
-
+    if (typeof window === 'undefined') return;
+    const vv = window.visualViewport;
+    const innerH = window.innerHeight;
+    const vHeight = vv?.height ?? innerH;
+    const vOffsetTop = vv?.offsetTop ?? 0;
+    const keyboardH = Math.max(0, innerH - vHeight - vOffsetTop);
+    const maxHeight = Math.min(PANEL_MAX_HEIGHT, Math.round(vHeight * 0.45));
     setGeom(prev => {
-      const next = { top, left: clampedLeft, width: clampedWidth, maxHeight, placement: (wantsAbove ? 'above' : 'below') as 'above' | 'below' };
-      if (
-        prev &&
-        prev.top === next.top &&
-        prev.left === next.left &&
-        prev.width === next.width &&
-        prev.maxHeight === next.maxHeight &&
-        prev.placement === next.placement
-      ) {
-        return prev;
-      }
+      const next = { left: 0, width: window.innerWidth, bottom: keyboardH, maxHeight };
+      if (prev && prev.left === next.left && prev.width === next.width &&
+          prev.bottom === next.bottom && prev.maxHeight === next.maxHeight) return prev;
       return next;
     });
-  }, [anchorRef]);
+  }, []);
 
   // Mount-time measurement + full listener lifecycle. This effect
   // runs every time the panel mounts (== every time suggestions
@@ -417,10 +382,6 @@ function AnchoredMentionsPanel({ anchorRef, children }: AnchoredPanelProps) {
     measure();
 
     const ro = new ResizeObserver(() => measure());
-    if (anchorRef.current) ro.observe(anchorRef.current);
-    // Observe our own panel too — first render has no height yet,
-    // so the initial `panelH` guess is PANEL_MAX_HEIGHT; the RO
-    // will re-fire once the ul lays out and correct placement.
     if (panelRef.current) ro.observe(panelRef.current);
 
     const onWinResize = () => measure();
@@ -439,7 +400,7 @@ function AnchoredMentionsPanel({ anchorRef, children }: AnchoredPanelProps) {
       vv?.removeEventListener('resize', onWinResize);
       vv?.removeEventListener('scroll', onWinScroll);
     };
-  }, [measure, anchorRef]);
+  }, [measure]);
 
   // Portal the visible chrome DIRECTLY to <body>, as a SIBLING of the
   // react-mentions shell — nothing about the shell (0x0, pointer-none)
@@ -447,7 +408,6 @@ function AnchoredMentionsPanel({ anchorRef, children }: AnchoredPanelProps) {
   // library's synthetic click handlers on the <li>s still route.
   if (typeof document === 'undefined') return null;
   const hasChildren = React.Children.count(children) > 0;
-  const placement = geom?.placement ?? 'below';
   return ReactDOM.createPortal(
     <div
       ref={panelRef}
@@ -456,48 +416,67 @@ function AnchoredMentionsPanel({ anchorRef, children }: AnchoredPanelProps) {
       onMouseDown={(e) => e.preventDefault()}
       style={{
         position: 'fixed',
-        top: geom?.top ?? -9999,
-        left: geom?.left ?? -9999,
-        width: geom?.width ?? 0,
+        left: 0,
+        right: 0,
+        bottom: geom?.bottom ?? 0,
+        width: '100%',
         maxHeight: geom?.maxHeight ?? PANEL_MAX_HEIGHT,
         overflowY: 'auto',
         background: '#FFFFFF',
-        borderRadius:
-          placement === 'above' ? '16px 16px 4px 4px' : '4px 4px 16px 16px',
-        border: `1px solid rgba(15,23,42,0.08)`,
-        boxShadow:
-          placement === 'above'
-            ? '0 -8px 28px -6px rgba(15,23,42,0.18), 0 -1px 4px rgba(15,23,42,0.06)'
-            : '0 12px 32px -8px rgba(15,23,42,0.22), 0 2px 6px rgba(15,23,42,0.08)',
-        fontSize: 13.5,
+        borderRadius: '18px 18px 0 0',
+        borderTop: '1px solid rgba(15,23,42,0.12)',
+        boxShadow: '0 -10px 30px -6px rgba(15,23,42,0.16)',
         pointerEvents: 'auto',
         opacity: geom ? 1 : 0,
         zIndex: Z.mentionsPanel,
+        WebkitOverflowScrolling: 'touch',
       }}
     >
       {hasChildren && (
         <div
-          aria-hidden
           style={{
             position: 'sticky',
             top: 0,
             zIndex: 1,
-            display: 'flex',
-            alignItems: 'center',
-            gap: 6,
-            padding: '10px 14px 8px',
             background: '#FFFFFF',
-            borderBottom: `1px solid ${BORDER}`,
-            fontSize: 10.5,
-            fontWeight: 700,
-            letterSpacing: '0.08em',
-            textTransform: 'uppercase',
-            color: INK_SUBTLE,
-            pointerEvents: 'none',
           }}
         >
-          <AtSign size={11} strokeWidth={2.25} style={{ color: INK_SUBTLE }} />
-          Mention someone
+          <div
+            aria-hidden
+            style={{
+              display: 'flex',
+              justifyContent: 'center',
+              padding: '10px 0 6px',
+            }}
+          >
+            <div
+              style={{
+                width: 36,
+                height: 4,
+                borderRadius: 999,
+                background: 'rgba(15,23,42,0.16)',
+              }}
+            />
+          </div>
+          <div
+            aria-hidden
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: 6,
+              padding: '2px 14px 8px',
+              borderBottom: `1px solid ${BORDER}`,
+              fontSize: 10.5,
+              fontWeight: 700,
+              letterSpacing: '0.08em',
+              textTransform: 'uppercase',
+              color: INK_SUBTLE,
+              pointerEvents: 'none',
+            }}
+          >
+            <AtSign size={11} strokeWidth={2.25} style={{ color: INK_SUBTLE }} />
+            Mention someone
+          </div>
         </div>
       )}
       {children}
