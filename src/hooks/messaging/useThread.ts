@@ -45,12 +45,13 @@ export function useThread(conversationId: string | null) {
   });
 
   // Pages are newest-first per page; flatten then reverse for oldest->newest.
+  // Dedupe by client_id so an optimistic bubble and its server twin never coexist.
   const messages = useMemo<ThreadMessage[]>(() => {
     const pages = query.data?.pages ?? [];
-    // Concatenate newest-first across pages, then reverse.
     const flat: ThreadMessage[] = [];
     for (const p of pages) flat.push(...p);
-    return flat.slice().reverse();
+    const chronological = flat.slice().reverse();
+    return dedupeByClientId(chronological);
   }, [query.data]);
 
   // Realtime channel
