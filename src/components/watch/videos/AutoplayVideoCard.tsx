@@ -109,7 +109,7 @@ function AutoplayVideoCardInner({ post, index, allPosts, userId, active, borderR
       <button
         type="button"
         onClick={handleTap}
-        className="block w-full text-left active:scale-[0.99] transition-transform"
+        className="block w-full text-left"
         style={{
           position: 'relative',
           width: '100%',

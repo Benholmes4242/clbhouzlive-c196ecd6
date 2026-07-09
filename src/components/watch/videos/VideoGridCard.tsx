@@ -69,7 +69,7 @@ function VideoGridCardInner({ post, index, allPosts, active = false }: VideoGrid
       type="button"
       onClick={handleTap}
       data-watch-tile-index={index}
-      className="block text-left active:scale-[0.99] transition-transform"
+      className="block text-left"
       style={{ flex: 1, minWidth: 0, padding: 0, background: 'transparent', border: 'none', display: 'flex', flexDirection: 'column', height: '100%' }}
     >
       <div
