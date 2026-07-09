@@ -377,8 +377,14 @@ function AnchoredMentionsPanel({ anchorRef, children }: AnchoredPanelProps) {
       ? Math.max(vTop + 8, r.top - PANEL_GAP - Math.min(panelH, maxHeight))
       : Math.min(vBottom - Math.min(panelH, maxHeight) - 8, r.bottom + PANEL_GAP);
 
+    // Clamp to visual viewport so a narrow sheet can never cause overflow.
+    const vLeft = vv?.offsetLeft ?? 0;
+    const vW = vv?.width ?? window.innerWidth;
+    const clampedLeft = Math.max(vLeft + 8, r.left);
+    const clampedWidth = Math.min(r.width, vW - 16);
+
     setGeom(prev => {
-      const next = { top, left: r.left, width: r.width, maxHeight, placement: (wantsAbove ? 'above' : 'below') as 'above' | 'below' };
+      const next = { top, left: clampedLeft, width: clampedWidth, maxHeight, placement: (wantsAbove ? 'above' : 'below') as 'above' | 'below' };
       if (
         prev &&
         prev.top === next.top &&
