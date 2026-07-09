@@ -18,6 +18,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { VideoEngine, type LaneId, type LaneSnapshot } from './VideoEngine';
 import { useCreationOverlayStore } from '@/stores/creationOverlayStore';
+import { trace, traceLookup, elIdOf } from '@/perf/trace';
 
 export interface UseVideoLaneOptions {
   hlsUrl: string | null | undefined;
@@ -77,6 +78,23 @@ export function useVideoLane(
   useEffect(() => {
 
     if (!laneId) return;
+    // [TRACE] lane.mount — capture the initial snapshot the hook read at
+    // setState() time. This is the stale-state suspect.
+    {
+      const initial = VideoEngine.snapshot(laneId);
+      const openT = traceLookup({
+        ownerKey: opts.ownerKey ?? null,
+        postId: opts.postId ?? initial.postId ?? null,
+      });
+      trace('lane.mount', {
+        openId: openT?.openId,
+        laneId,
+        initialSnapshotFirstFrame: initial.firstFrame,
+        initialSnapshotPostId: initial.postId,
+        ownerKey: opts.ownerKey ?? null,
+        postId: opts.postId ?? null,
+      });
+    }
     let raf = 0;
     const tryMount = () => {
       const host = hostRef.current;
@@ -114,6 +132,16 @@ export function useVideoLane(
   // no seek. This is the PR-B seamless promotion guarantee.
   useEffect(() => {
     if (!laneId || !opts.active || !opts.hlsUrl) return;
+    {
+      const openT = traceLookup({ ownerKey: opts.postId ?? opts.ownerKey ?? null });
+      trace('lane.load.call', {
+        openId: openT?.openId,
+        laneId,
+        ownerKey: opts.postId ?? null,
+        hlsUrl: opts.hlsUrl,
+        startPosition: opts.startPosition ?? -1,
+      });
+    }
     VideoEngine.load(laneId, {
       hlsUrl: opts.hlsUrl,
       posterUrl: opts.posterUrl ?? null,

@@ -40,6 +40,7 @@ import {
 } from '@/perf/vperf';
 import { readSeededBandwidth } from './bandwidthMemory';
 import { coldOpenAttach, coldOpenFirstFrame } from '@/perf/coldOpen';
+import { trace, traceLookup, elIdOf, traceGenElId } from '@/perf/trace';
 
 
 
@@ -118,6 +119,9 @@ function ensureHiddenHost(): HTMLElement {
 function createLaneElement(laneId: LaneId): HTMLVideoElement {
   const el = document.createElement('video');
   el.dataset.laneId = laneId;
+  // [TRACE] element identity — every lane <video> carries a stable short id
+  // so trace lines across layers can prove they hold the SAME element.
+  (el.dataset as any).vid = traceGenElId();
   el.playsInline = true;
   el.muted = true;
   el.loop = true; // Stage-1 polish: loop by default on both feed + fullscreen lanes.
@@ -201,9 +205,31 @@ class VideoEngineImpl {
   }
 
   private resetFirstFrameForLane(lane: Lane, reason: string): void {
-    if (!lane.firstFrame) return;
+    if (!lane.firstFrame) {
+      // Still log the reset intent so ordering (reset BEFORE snapshot read)
+      // is provable even when firstFrame was already false.
+      const openT = traceLookup({ postId: lane.postId });
+      trace('engine.reset', {
+        openId: openT?.openId,
+        laneId: lane.id,
+        elId: elIdOf(lane.el),
+        reason,
+        wasTrue: false,
+      });
+      return;
+    }
     lane.firstFrame = false;
     DBG(lane.id, 'firstFrame.reset', { reason, postId: lane.postId });
+    {
+      const openT = traceLookup({ postId: lane.postId });
+      trace('engine.reset', {
+        openId: openT?.openId,
+        laneId: lane.id,
+        elId: elIdOf(lane.el),
+        reason,
+        wasTrue: true,
+      });
+    }
     this.emit(lane);
   }
 
@@ -271,6 +297,19 @@ class VideoEngineImpl {
   ): void {
     const lane = this.getLane(laneId);
     const { hlsUrl, posterUrl = null, startPosition = -1, postId = null } = opts;
+    // [TRACE] engine.load — one line per load() call, before any decisions.
+    {
+      const openT = traceLookup({ ownerKey: postId, postId: lane.postId });
+      trace('engine.load', {
+        openId: openT?.openId,
+        laneId,
+        ownerKeyIn: postId,
+        priorPostId: lane.postId,
+        priorFirstFrame: lane.firstFrame,
+        elId: elIdOf(lane.el),
+        hlsInstanceReused: !!lane.hls,
+      });
+    }
     // Same postId + same URL already loaded → no reload. This makes remount
     // (element moving between card hosts) cheap and avoids re-fetching HLS.
     //
@@ -369,6 +408,16 @@ class VideoEngineImpl {
     if (usingNative) {
       // Safari path — no hls.js instance, use the element's native player.
       lane.el.src = hlsUrl;
+      {
+        const openT = traceLookup({ ownerKey: lane.postId });
+        trace('engine.attach', {
+          openId: openT?.openId,
+          laneId,
+          elId: elIdOf(lane.el),
+          srcSet: hlsUrl,
+          hlsAttached: false,
+        });
+      }
       this.wireElementEvents(lane, /* usingHls */ false);
       if (startPosition > 0) {
         const onMeta = () => {
@@ -421,6 +470,17 @@ class VideoEngineImpl {
     const hls = lane.hls;
     hls.config.startPosition = startPosition;
     hls.loadSource(hlsUrl);
+    // [TRACE] engine.attach — source pointed at this lane's element.
+    {
+      const openT = traceLookup({ ownerKey: lane.postId });
+      trace('engine.attach', {
+        openId: openT?.openId,
+        laneId,
+        elId: elIdOf(lane.el),
+        srcSet: hlsUrl,
+        hlsAttached: true,
+      });
+    }
 
     // [COLDOPEN] attach — trace only wires up if this is the 'fullscreen'
     // lane taking the cold path started by openWithOrigin.
@@ -515,6 +575,21 @@ class VideoEngineImpl {
       // the poster per new source, so future cold-loads still get their
       // pre-paint cover.
       try { lane.el.removeAttribute('poster'); } catch {}
+      // [TRACE] engine.firstFrame — REAL frame? videoWidth>0 == real,
+      // videoWidth==0 == phantom (stale flag re-emit).
+      {
+        const openT = traceLookup({ ownerKey: lane.postId });
+        trace('engine.firstFrame', {
+          openId: openT?.openId,
+          laneId: lane.id,
+          elId: elIdOf(lane.el),
+          currentTime: +(lane.el.currentTime || 0).toFixed(3),
+          readyState: lane.el.readyState,
+          videoWidth: (lane.el as HTMLVideoElement).videoWidth || 0,
+          videoHeight: (lane.el as HTMLVideoElement).videoHeight || 0,
+          source: _source,
+        });
+      }
       // [VPERF] first painted frame — resolves fs.open/autoplay firstFrame arms.
       vperfLaneEvent(lane.id, 'firstFrame');
       // [COLDOPEN] firstFrame — trace only reacts if this lane matches.
