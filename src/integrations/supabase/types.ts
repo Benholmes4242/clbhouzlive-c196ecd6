@@ -19663,6 +19663,11 @@ export type Database = {
           thumbnail_image: string
         }[]
       }
+      msg_can_act_as: {
+        Args: { p_actor_id: string; p_actor_type: string }
+        Returns: boolean
+      }
+      msg_is_member: { Args: { p_conversation_id: string }; Returns: boolean }
       nearby_golfers: {
         Args: {
           limit_rows?: number
