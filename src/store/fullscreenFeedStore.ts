@@ -4,6 +4,7 @@ import { engagementBus } from '@/lib/engagementBus';
 import { applyEngagementDelta } from '@/lib/applyEngagementDelta';
 import type { LaneId } from '@/video/lanePolicy';
 import { vperfStart, vperfMark, vperfArmLane, vperfNextId } from '@/perf/vperf';
+import { trace, traceLookup } from '@/perf/trace';
 
 
 
