@@ -26,7 +26,7 @@ import React, {
 } from 'react';
 import { triggerHaptic, type HapticType } from '@/lib/ui/haptics';
 
-export type PressableVariant = 'card' | 'icon' | 'row' | 'toggle';
+export type PressableVariant = 'card' | 'icon' | 'row' | 'toggle' | 'media';
 export type PressableHaptic = 'none' | HapticType;
 
 // Single shared transition token — used everywhere press feedback lives.
