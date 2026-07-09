@@ -77,7 +77,7 @@ function VideoLargeCardInner({ post, index, allPosts }: VideoLargeCardProps) {
         ref={btnRef}
         type="button"
         onClick={handleTap}
-        className="block w-full text-left active:scale-[0.99] transition-transform"
+        className="block w-full text-left"
         style={{
           position: 'relative',
           width: '100%',
