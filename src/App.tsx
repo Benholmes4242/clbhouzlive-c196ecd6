@@ -262,6 +262,7 @@ const News = lazy(() => import("./pages/News"));
 
 const MessagesPage = lazy(() => import("./pages/MessagesPage"));
 const InboxV2Page = lazy(() => import("./pages/messaging-v2/InboxV2Page"));
+const ThreadV2Page = lazy(() => import("./pages/messaging-v2/ThreadV2Page"));
 
 const ActivityPageWrapped = lazy(() => import("./pages/ActivityPageWrapped"));
 const GolfersToFollowPage = lazy(() => import("./pages/GolfersToFollowPage"));
