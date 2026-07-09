@@ -19663,11 +19663,205 @@ export type Database = {
           thumbnail_image: string
         }[]
       }
+      msg_add_members: {
+        Args: {
+          p_as_actor_id: string
+          p_as_actor_type: string
+          p_conversation_id: string
+          p_members: Json
+        }
+        Returns: undefined
+      }
+      msg_block: {
+        Args: {
+          p_as_actor_id: string
+          p_as_actor_type: string
+          p_blocked_actor_id: string
+          p_blocked_actor_type: string
+        }
+        Returns: undefined
+      }
       msg_can_act_as: {
         Args: { p_actor_id: string; p_actor_type: string }
         Returns: boolean
       }
+      msg_create_group: {
+        Args: {
+          p_as_actor_id: string
+          p_as_actor_type: string
+          p_avatar_url?: string
+          p_members: Json
+          p_title: string
+        }
+        Returns: string
+      }
+      msg_delete: {
+        Args: {
+          p_as_actor_id: string
+          p_as_actor_type: string
+          p_message_id: string
+        }
+        Returns: undefined
+      }
+      msg_dm_key: {
+        Args: { a_id: string; a_type: string; b_id: string; b_type: string }
+        Returns: string
+      }
+      msg_edit: {
+        Args: {
+          p_as_actor_id: string
+          p_as_actor_type: string
+          p_body: string
+          p_message_id: string
+        }
+        Returns: undefined
+      }
+      msg_is_admin: {
+        Args: {
+          p_actor_id: string
+          p_actor_type: string
+          p_conversation_id: string
+        }
+        Returns: boolean
+      }
       msg_is_member: { Args: { p_conversation_id: string }; Returns: boolean }
+      msg_leave: {
+        Args: {
+          p_as_actor_id: string
+          p_as_actor_type: string
+          p_conversation_id: string
+        }
+        Returns: undefined
+      }
+      msg_mark_read: {
+        Args: {
+          p_as_actor_id: string
+          p_as_actor_type: string
+          p_conversation_id: string
+          p_up_to_message_id: string
+        }
+        Returns: undefined
+      }
+      msg_react: {
+        Args: {
+          p_as_actor_id: string
+          p_as_actor_type: string
+          p_emoji: string
+          p_message_id: string
+        }
+        Returns: undefined
+      }
+      msg_remove_member: {
+        Args: {
+          p_as_actor_id: string
+          p_as_actor_type: string
+          p_conversation_id: string
+          p_target_actor_id: string
+          p_target_actor_type: string
+        }
+        Returns: undefined
+      }
+      msg_send: {
+        Args: {
+          p_as_actor_id: string
+          p_as_actor_type: string
+          p_attachments?: Json
+          p_body?: string
+          p_client_id?: string
+          p_conversation_id: string
+          p_metadata?: Json
+          p_reply_to_id?: string
+          p_type?: string
+        }
+        Returns: {
+          attachments: Json | null
+          body: string | null
+          client_id: string | null
+          conversation_id: string
+          created_at: string
+          deleted_at: string | null
+          edited_at: string | null
+          id: string
+          metadata: Json | null
+          reply_to_id: string | null
+          sender_actor_id: string
+          sender_actor_type: string
+          sender_user_id: string
+          type: string
+        }
+        SetofOptions: {
+          from: "*"
+          to: "messages"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
+      msg_set_archive: {
+        Args: {
+          p_archived: boolean
+          p_as_actor_id: string
+          p_as_actor_type: string
+          p_conversation_id: string
+        }
+        Returns: undefined
+      }
+      msg_set_mute: {
+        Args: {
+          p_as_actor_id: string
+          p_as_actor_type: string
+          p_conversation_id: string
+          p_until: string
+        }
+        Returns: undefined
+      }
+      msg_set_role: {
+        Args: {
+          p_as_actor_id: string
+          p_as_actor_type: string
+          p_conversation_id: string
+          p_role: string
+          p_target_actor_id: string
+          p_target_actor_type: string
+        }
+        Returns: undefined
+      }
+      msg_start_direct: {
+        Args: {
+          p_as_actor_id: string
+          p_as_actor_type: string
+          p_target_actor_id: string
+          p_target_actor_type: string
+        }
+        Returns: string
+      }
+      msg_unblock: {
+        Args: {
+          p_as_actor_id: string
+          p_as_actor_type: string
+          p_blocked_actor_id: string
+          p_blocked_actor_type: string
+        }
+        Returns: undefined
+      }
+      msg_unreact: {
+        Args: {
+          p_as_actor_id: string
+          p_as_actor_type: string
+          p_emoji: string
+          p_message_id: string
+        }
+        Returns: undefined
+      }
+      msg_update_group: {
+        Args: {
+          p_as_actor_id: string
+          p_as_actor_type: string
+          p_avatar_url?: string
+          p_conversation_id: string
+          p_title?: string
+        }
+        Returns: undefined
+      }
       nearby_golfers: {
         Args: {
           limit_rows?: number
