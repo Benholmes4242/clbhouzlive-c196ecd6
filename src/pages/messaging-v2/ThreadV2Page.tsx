@@ -9,6 +9,7 @@ import { useSendMessage } from '@/hooks/messaging/useSendMessage';
 import { useKeyboardHeight } from '@/hooks/messaging/useKeyboardHeight';
 import { MessageBubble } from './MessageBubble';
 import { Composer } from './Composer';
+import { ConversationSettingsSheet } from './ConversationSettingsSheet';
 import type {
   InboxConversation,
   InboxParticipant,
@@ -148,6 +149,7 @@ const ThreadV2Page: React.FC = () => {
   const { retry } = useSendMessage(conversationId);
   const keyboardHeight = useKeyboardHeight();
   const [composerHeight, setComposerHeight] = useState(56);
+  const [settingsOpen, setSettingsOpen] = useState(false);
 
   const scrollerRef = useRef<HTMLDivElement | null>(null);
   const bottomAnchorRef = useRef<HTMLDivElement | null>(null);
@@ -306,6 +308,7 @@ const ThreadV2Page: React.FC = () => {
           type="button"
           aria-label="More"
           className="active:opacity-60"
+          onClick={() => setSettingsOpen(true)}
           style={{
             width: 40,
             height: 40,
@@ -402,6 +405,12 @@ const ThreadV2Page: React.FC = () => {
         conversationId={conversationId}
         onHeightChange={setComposerHeight}
         onAfterSend={scrollToBottom}
+      />
+
+      <ConversationSettingsSheet
+        open={settingsOpen}
+        conversationId={conversationId}
+        onClose={() => setSettingsOpen(false)}
       />
     </div>
   );
