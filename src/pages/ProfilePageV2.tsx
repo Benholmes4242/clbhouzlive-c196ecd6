@@ -686,7 +686,11 @@ const ProfilePageV2Content: React.FC = () => {
                   backdropFilter: 'blur(8px)',
                   WebkitBackdropFilter: 'blur(8px)',
                   border: '2px solid white',
+                  cursor: 'pointer',
                 }}
+                onClick={(e) => { e.stopPropagation(); setPhotoSheet('avatar'); }}
+                role="button"
+                aria-label="Change profile photo"
               >
                 <Camera className="w-3.5 h-3.5 text-white" />
               </div>

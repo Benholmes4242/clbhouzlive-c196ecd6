@@ -486,7 +486,10 @@ const BusinessProfilePage: React.FC = () => {
             {isOwner && (
               <div
                 className="absolute bottom-0 right-0 w-7 h-7 rounded-full flex items-center justify-center z-10"
-                style={{ background: 'rgba(0,0,0,0.55)', backdropFilter: 'blur(8px)', WebkitBackdropFilter: 'blur(8px)', border: '2px solid white' }}
+                style={{ background: 'rgba(0,0,0,0.55)', backdropFilter: 'blur(8px)', WebkitBackdropFilter: 'blur(8px)', border: '2px solid white', cursor: 'pointer' }}
+                onClick={(e) => { e.stopPropagation(); setPhotoSheet('logo'); }}
+                role="button"
+                aria-label="Change logo"
               >
                 {uploadingLogo ? (
                   <div className="w-3 h-3 border-2 border-white/40 border-t-white rounded-full animate-spin" />
