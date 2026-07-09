@@ -17297,6 +17297,14 @@ export type Database = {
           start_date: string
         }[]
       }
+      get_actor_dm_unread_counts: {
+        Args: never
+        Returns: {
+          actor_id: string
+          actor_type: string
+          unread_count: number
+        }[]
+      }
       get_actor_social_counts: {
         Args: { p_actor_id: string; p_actor_type: string }
         Returns: {
@@ -18214,6 +18222,22 @@ export type Database = {
             Args: { p_user_profile_ids: string[]; p_viewer_id: string }
             Returns: Json
           }
+      get_inbox: {
+        Args: { p_actor_id: string; p_actor_type: string }
+        Returns: {
+          avatar_url: string
+          conversation_id: string
+          is_archived: boolean
+          is_muted: boolean
+          last_message_at: string
+          last_message_preview: string
+          my_role: string
+          participants: Json
+          title: string
+          type: string
+          unread_count: number
+        }[]
+      }
       get_leaderboard_countries: {
         Args: never
         Returns: {
