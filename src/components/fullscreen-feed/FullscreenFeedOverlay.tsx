@@ -99,6 +99,8 @@ function returnBorrow(borrow: BorrowDescriptor, reason: 'close' | 'route' | 'dem
       let hadPendingRelease = false;
       if (isRail) {
         hadPendingRelease = RailLanePool.unpin(borrow.laneId, { executeDeferred: false });
+        // Return complete — lane may be re-acquired for new opens again.
+        RailLanePool.clearReturning(borrow.laneId);
       }
       BORROW_DBG('return.animate', {
         laneId: borrow.laneId, ownerKey: borrow.ownerKey, postId: borrow.postId,
@@ -120,6 +122,8 @@ function returnBorrow(borrow: BorrowDescriptor, reason: 'close' | 'route' | 'dem
   let hadPendingRelease = false;
   if (isRail) {
     hadPendingRelease = RailLanePool.unpin(borrow.laneId, { executeDeferred: true });
+    // Fallback / demote path also completes any pending "returning" state.
+    RailLanePool.clearReturning(borrow.laneId);
   }
   BORROW_DBG(reason === 'demote' ? 'unpin' : 'return.fallback', {
     laneId: borrow.laneId, ownerKey: borrow.ownerKey, postId: borrow.postId,
@@ -244,6 +248,13 @@ export function FullscreenFeedOverlay() {
     if (b) {
       // BorrowedFullscreenSlot handles its own reverse motion when it sees
       // closeAnim === 'borrow'. Overlay just waits for closeAnimDone.
+      // Reserve the rail lane for the duration of the flip-return animation:
+      // during this window the pool must not hand it to any new open (borrow
+      // or fresh acquire) — that's the 6s flip-return-race we hit before.
+      // Cleared inside returnBorrow once mount-home completes.
+      if (b.laneId.startsWith('rail-')) {
+        try { RailLanePool.markReturning(b.laneId); } catch {}
+      }
       beginCloseAnim('borrow');
     } else {
       // Non-borrow: mount reverse clone at the resting rect → tile rect.
