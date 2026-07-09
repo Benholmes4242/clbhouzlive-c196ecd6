@@ -460,6 +460,7 @@ class VideoEngineImpl {
       // capLevelToPlayerSize). Feed-active/fullscreen skip the cap so they
       // render at manifest-appropriate quality for the viewport.
       const isRail = laneId.startsWith('rail-');
+      const coldFullscreen = laneId === 'fullscreen';
       // [PREDICT] Part 1 — seed ABR from persisted bandwidth memory for
       // FEED-ACTIVE / FULLSCREEN lanes only. Rails intentionally excluded:
       // their startLevel:0 + capLevelToPlayerSize profile is correct for
@@ -469,6 +470,7 @@ class VideoEngineImpl {
       const config: Partial<HlsConfig> = {
         ...HLS_CONFIG,
         ...(isRail ? RAIL_HLS_OVERRIDES : {}),
+        ...(coldFullscreen ? { startLevel: 0 } : {}),
         startPosition,
         // hls.js expects bps. When we have a fresh seed, use it; otherwise
         // fall back to the conservative default the engine has always used.
