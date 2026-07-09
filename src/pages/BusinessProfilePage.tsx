@@ -459,26 +459,14 @@ const BusinessProfilePage: React.FC = () => {
         {/* Canon exception: 2px bg-background die-cut ring over the cover photo — */}
         {/* matches the personal profile hero avatar-on-cover rule; no hairline. */}
         <div className="absolute left-5 z-20 pointer-events-auto" style={{ bottom: '-62px' }}>
-          <div
-            role="button"
-            tabIndex={0}
+          <button
             className="relative w-[124px] h-[124px] block cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-[#F7931E] focus-visible:ring-offset-2 rounded-[34%] transition-transform hover:scale-[1.02] active:scale-[0.98]"
             onClick={() => {
-              if (isOwner) { if (!uploadingLogo) setPhotoSheet('logo'); }
+              if (isOwner) setPhotoSheet('logo');
               else if (!uploadingLogo) setIsAvatarLightboxOpen(true);
-            }}
-            onKeyDown={(e) => {
-              if (e.key === 'Enter' || e.key === ' ') {
-                e.preventDefault();
-                if (isOwner) { if (!uploadingLogo) setPhotoSheet('logo'); }
-                else if (!uploadingLogo) setIsAvatarLightboxOpen(true);
-              }
             }}
             aria-label={isOwner ? 'Change business logo' : 'View business logo'}
           >
-            {/* Invisible hit expander — enlarges tap target beyond the masked
-                squircle corners so the whole avatar + camera area is tappable. */}
-            <div aria-hidden="true" className="absolute" style={{ inset: '-14px' }} />
             <div className="clbhouz-squircle absolute inset-0 bg-background" />
             <div
               className="clbhouz-squircle absolute overflow-hidden"
@@ -497,8 +485,7 @@ const BusinessProfilePage: React.FC = () => {
             </div>
             {isOwner && (
               <div
-                aria-hidden="true"
-                className="absolute bottom-0 right-0 w-7 h-7 rounded-full flex items-center justify-center pointer-events-none"
+                className="absolute bottom-0 right-0 w-7 h-7 rounded-full flex items-center justify-center z-10"
                 style={{ background: 'rgba(0,0,0,0.55)', backdropFilter: 'blur(8px)', WebkitBackdropFilter: 'blur(8px)', border: '2px solid white' }}
               >
                 {uploadingLogo ? (
@@ -508,7 +495,7 @@ const BusinessProfilePage: React.FC = () => {
                 )}
               </div>
             )}
-          </div>
+          </button>
         </div>
 
         {/* City pill (right of hero) */}

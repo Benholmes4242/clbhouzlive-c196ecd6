@@ -635,9 +635,7 @@ const ProfilePageV2Content: React.FC = () => {
           className="absolute left-5 z-20 pointer-events-auto"
           style={{ bottom: '-62px' }}
         >
-          <div
-            role="button"
-            tabIndex={0}
+          <button
             className="relative w-[124px] h-[124px] cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-[#F7931E] focus-visible:ring-offset-2 rounded-[34%] transition-transform hover:scale-[1.02] active:scale-[0.98]"
             data-debug-id="profile-photo"
             onPointerDown={(e) => {
@@ -652,20 +650,8 @@ const ProfilePageV2Content: React.FC = () => {
                 setIsAvatarLightboxOpen(true);
               }
             }}
-            onKeyDown={(e) => {
-              if (e.key === 'Enter' || e.key === ' ') {
-                e.preventDefault();
-                if (isUploadingAvatar) return;
-                if (isSelf) setPhotoSheet('avatar');
-                else setIsAvatarLightboxOpen(true);
-              }
-            }}
             aria-label={isSelf ? "Change profile photo" : "View profile photo"}
           >
-            {/* Invisible hit expander — enlarges the tap target beyond the
-                masked squircle corners so a comfortable ring around the whole
-                avatar + camera badge is tappable. Clicks bubble to the wrapper. */}
-            <div aria-hidden="true" className="absolute" style={{ inset: '-14px' }} />
             {/* Avatar-on-cover: solid bg ring for separation --
                 canon exception, no hairline. */}
             <div className="clbhouz-squircle absolute inset-0 bg-background" />
@@ -691,12 +677,10 @@ const ProfilePageV2Content: React.FC = () => {
               )}
             </div>
 
-            {/* Camera badge — purely decorative overlay; taps bubble to the
-                avatar wrapper so the whole photo (badge included) is one hit target. */}
+            {/* Camera badge — bottom right, Instagram style */}
             {isSelf && !isUploadingAvatar && (
               <div
-                aria-hidden="true"
-                className="absolute bottom-0 right-0 w-7 h-7 rounded-full flex items-center justify-center pointer-events-none"
+                className="absolute bottom-0 right-0 w-7 h-7 rounded-full flex items-center justify-center z-10"
                 style={{
                   background: 'rgba(0, 0, 0, 0.55)',
                   backdropFilter: 'blur(8px)',
@@ -711,8 +695,7 @@ const ProfilePageV2Content: React.FC = () => {
             {/* Spinner badge — shows during upload */}
             {isSelf && isUploadingAvatar && (
               <div
-                aria-hidden="true"
-                className="absolute bottom-0 right-0 w-7 h-7 rounded-full flex items-center justify-center pointer-events-none"
+                className="absolute bottom-0 right-0 w-7 h-7 rounded-full flex items-center justify-center z-10"
                 style={{
                   background: 'rgba(0, 0, 0, 0.55)',
                   border: '2px solid white',
@@ -721,7 +704,7 @@ const ProfilePageV2Content: React.FC = () => {
                 <div className="w-3 h-3 border-2 border-white/40 border-t-white rounded-full animate-spin" />
               </div>
             )}
-          </div>
+          </button>
         </div>
 
       </div>
