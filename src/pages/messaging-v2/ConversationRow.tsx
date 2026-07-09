@@ -5,7 +5,7 @@ import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { useMessagingActor } from '@/hooks/messaging/useMessagingActor';
 import type { InboxConversation, InboxParticipant } from '@/types/messaging';
 
-const INK = '#1A1D21';
+const INK = '#1F2428';
 const SUB = '#8A9099';
 const HINT = '#AEB4BC';
 const AMBER = '#F7931E';
@@ -88,17 +88,23 @@ export const ConversationRow: React.FC<Props> = ({ conversation }) => {
 
   const unread = conversation.unread_count > 0;
   const time = formatRelative(conversation.last_message_at);
+  const previewColor = unread ? INK : SUB;
+  const nameWeight = unread ? 500 : 500;
+  const previewWeight = unread ? 500 : 400;
+  const timeColor = unread ? AMBER : HINT;
 
   return (
     <button
       type="button"
       onClick={() => navigate(`/messages-v2/${conversation.conversation_id}`)}
-      className="w-full text-left flex items-center gap-3 active:opacity-70 transition-opacity"
+      className="w-full text-left flex items-center gap-3 active:bg-black/[0.03] transition-colors"
       style={{
-        padding: '10px 16px',
+        padding: '11px 14px',
         minHeight: 72,
-        borderBottom: `1px solid ${HAIRLINE}`,
-        background: '#FFFFFF',
+        borderBottom: `0.5px solid ${HAIRLINE}`,
+        background: 'transparent',
+        border: 'none',
+        borderRadius: 0,
       }}
     >
       <SquircleAvatar
@@ -107,53 +113,52 @@ export const ConversationRow: React.FC<Props> = ({ conversation }) => {
         alt={identity.name}
         size={52}
       />
-      <div className="flex-1 min-w-0 flex flex-col justify-center gap-1">
-        <div className="flex items-center gap-2">
+      <div className="flex-1 min-w-0 flex items-center gap-3">
+        <div className="flex-1 min-w-0 flex flex-col justify-center gap-1">
+          <div className="flex items-center gap-1.5 min-w-0">
+            <span
+              className="truncate"
+              style={{
+                color: INK,
+                fontSize: 16,
+                fontWeight: nameWeight,
+                lineHeight: '20px',
+                minWidth: 0,
+              }}
+            >
+              {identity.name}
+            </span>
+            {identity.verified ? (
+              <BadgeCheck size={14} style={{ color: AMBER, flexShrink: 0 }} />
+            ) : null}
+          </div>
           <span
             className="truncate"
             style={{
-              color: INK,
-              fontSize: 16,
-              fontWeight: 500,
-              lineHeight: '20px',
-              flex: 1,
-              minWidth: 0,
-            }}
-          >
-            {identity.name}
-          </span>
-          {identity.verified ? (
-            <BadgeCheck size={14} style={{ color: AMBER, flexShrink: 0 }} />
-          ) : null}
-          <span
-            style={{
-              color: HINT,
-              fontSize: 12,
-              lineHeight: '16px',
-              flexShrink: 0,
-              marginLeft: 4,
-            }}
-          >
-            {time}
-          </span>
-        </div>
-        <div className="flex items-center gap-2">
-          <span
-            className="truncate"
-            style={{
-              color: SUB,
+              color: previewColor,
               fontSize: 14,
               lineHeight: '18px',
-              flex: 1,
+              fontWeight: previewWeight,
               minWidth: 0,
-              fontWeight: unread ? 500 : 400,
             }}
           >
             {conversation.last_message_preview ?? ''}
           </span>
-          {conversation.is_muted ? (
-            <BellOff size={14} style={{ color: HINT, flexShrink: 0 }} />
-          ) : null}
+        </div>
+        <div
+          className="flex flex-col items-end justify-center gap-1"
+          style={{ flexShrink: 0, minWidth: 40 }}
+        >
+          <span
+            style={{
+              color: timeColor,
+              fontSize: 12,
+              lineHeight: '16px',
+              fontWeight: unread ? 500 : 400,
+            }}
+          >
+            {time}
+          </span>
           {unread ? (
             <span
               className="inline-flex items-center justify-center rounded-full"
@@ -165,12 +170,13 @@ export const ConversationRow: React.FC<Props> = ({ conversation }) => {
                 minWidth: 20,
                 height: 20,
                 padding: '0 6px',
-                flexShrink: 0,
                 lineHeight: '20px',
               }}
             >
               {conversation.unread_count > 99 ? '99+' : conversation.unread_count}
             </span>
+          ) : conversation.is_muted ? (
+            <BellOff size={14} style={{ color: HINT }} />
           ) : null}
         </div>
       </div>
