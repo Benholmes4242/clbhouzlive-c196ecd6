@@ -239,7 +239,7 @@ const WatchGrid: React.FC<WatchGridProps> = ({
                   index={index}
                   allPosts={posts}
                   onDecoded={index < COLS ? handleTileDecoded : undefined}
-                  isAutoplayActive={activeIdx === index}
+                  isAutoplayActive={activeIndices.has(index)}
                 />
 
 
