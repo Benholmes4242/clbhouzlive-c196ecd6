@@ -248,6 +248,13 @@ export function FullscreenFeedOverlay() {
     if (b) {
       // BorrowedFullscreenSlot handles its own reverse motion when it sees
       // closeAnim === 'borrow'. Overlay just waits for closeAnimDone.
+      // Reserve the rail lane for the duration of the flip-return animation:
+      // during this window the pool must not hand it to any new open (borrow
+      // or fresh acquire) — that's the 6s flip-return-race we hit before.
+      // Cleared inside returnBorrow once mount-home completes.
+      if (b.laneId.startsWith('rail-')) {
+        try { RailLanePool.markReturning(b.laneId); } catch {}
+      }
       beginCloseAnim('borrow');
     } else {
       // Non-borrow: mount reverse clone at the resting rect → tile rect.
