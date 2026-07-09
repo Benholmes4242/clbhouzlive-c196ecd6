@@ -78,6 +78,15 @@ export const MessageBubble: React.FC<Props> = ({
 
   const reactions = groupReactions(message.reactions ?? []);
 
+  const atts: MessageAttachment[] = Array.isArray(message.attachments)
+    ? (message.attachments as unknown as MessageAttachment[])
+    : [];
+  const images = atts.filter((a) => a && a.kind === 'image');
+  const voices = atts.filter((a) => a && a.kind === 'voice');
+  const hasMedia = images.length > 0 || voices.length > 0;
+  const hasBody = !!message.body?.trim();
+  const hugMedia = hasMedia && !hasBody && !message.reply_preview;
+
   const reply = message.reply_preview;
   const replyRule = isOutgoing ? 'rgba(255,255,255,0.35)' : 'rgba(0,0,0,0.25)';
   const replyName = isOutgoing ? 'rgba(245,246,247,0.9)' : SUB;
