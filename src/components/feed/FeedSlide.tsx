@@ -352,7 +352,11 @@ const FullscreenVideoSlot: React.FC<{
   const borrow = useFullscreenFeedStore((s) => s.borrow);
   const origin = useFullscreenFeedStore((s) => s.origin);
   const isBorrowSlide = !!(allowBorrow && borrow && isActive && borrow.postId === postId);
-  const resumeKey = ownerKey ?? postId;
+  // Belt-and-braces: if a caller ever renders this slot without an ownerKey
+  // and the postId is bare (no colon), inject `:0` so the engine lane, the
+  // reveal-gate, and lastPos all key on the canonical `${postId}:0`. Never
+  // collapses `:1/:2` (multi-media pager passes those explicitly).
+  const resumeKey = ownerKey ?? (postId.includes(':') ? postId : `${postId}:0`);
 
   // Only apply store.startPosition on the initially-tapped slide; other
   // slides in the fullscreen deck start from 0. Borrow slide skips seeks
