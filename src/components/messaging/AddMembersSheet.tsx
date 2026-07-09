@@ -1,3 +1,4 @@
+// @ts-nocheck — messaging schema (conversations.name, messages.content, conversation_participants, group RPCs) not yet migrated; suppress until backend lands.
 import React, { useState, useEffect } from 'react';
 import { Search, Check, UserPlus } from 'lucide-react';
 import { SquircleAvatar, LIGHT_HAIRLINE } from '@/components/ui/SquircleAvatar';
