@@ -308,6 +308,7 @@ const ThreadV2Page: React.FC = () => {
           type="button"
           aria-label="More"
           className="active:opacity-60"
+          onClick={() => setSettingsOpen(true)}
           style={{
             width: 40,
             height: 40,
