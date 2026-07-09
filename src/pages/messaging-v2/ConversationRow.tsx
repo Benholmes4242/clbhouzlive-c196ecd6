@@ -96,7 +96,7 @@ export const ConversationRow: React.FC<Props> = ({ conversation }) => {
   return (
     <button
       type="button"
-      onClick={() => navigate(`/messages-v2/${conversation.conversation_id}`)}
+      onClick={() => navigate(`/messages/${conversation.conversation_id}`)}
       className="w-full text-left flex items-center gap-3 active:bg-black/[0.03] transition-colors"
       style={{
         padding: '11px 14px',
