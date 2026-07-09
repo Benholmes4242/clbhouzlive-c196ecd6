@@ -577,7 +577,7 @@ const ProfilePageV2Content: React.FC = () => {
   return (
     <PageRoot className="min-h-screen" style={{ background: BG_COLOR, position: 'relative' }} immersiveStatusBar immersive>
       {/* Hero Section - full-bleed immersive, extends behind notch */}
-      <div className="relative pointer-events-none" style={{ zIndex: 1 }}>
+      <div className="relative pointer-events-none" style={{ zIndex: 11 }}>
         {/* Hero Image Container - full-bleed behind notch */}
         <div className="relative w-full overflow-hidden" style={{ height: '35dvh' }}>
           {heroUrl ? (
