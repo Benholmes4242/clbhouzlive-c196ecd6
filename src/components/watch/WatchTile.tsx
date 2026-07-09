@@ -57,7 +57,7 @@ const WatchTile: React.FC<WatchTileProps> = ({ post, index, allPosts, onDecoded,
   });
 
   // Scroll-guarded pointerdown warm — cold (non-borrow) video tiles only.
-  const { onPreroute, onPrerouteCancel } = usePreroutePrefetch({
+  const { onPrerouteArm, onPreroute, onPrerouteCancel } = usePreroutePrefetch({
     ownerKey,
     hlsUrl: isVideo ? hlsUrl! : null,
     enabled: isVideo && !isAutoplayActive,
@@ -92,6 +92,7 @@ const WatchTile: React.FC<WatchTileProps> = ({ post, index, allPosts, onDecoded,
       as="div"
       variant="media"
       onPress={handleClick}
+      onPrerouteArm={onPrerouteArm}
       onPreroute={onPreroute}
       onPrerouteCancel={onPrerouteCancel}
       data-watch-tile-index={index}

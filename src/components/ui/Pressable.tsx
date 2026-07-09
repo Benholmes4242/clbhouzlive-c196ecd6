@@ -107,11 +107,16 @@ export interface PressableProps
    */
   onPreroute?: () => void;
   /**
-   * Fires when a preroute that already fired needs to be cancelled — pointer
-   * moved past the tap threshold after the fire, or held past the long-press
-   * window without releasing. Tiles use it to abort the in-flight warm.
+   * Fires when a preroute is CANCELLED, with the reason. Called for every
+   * cancel path — before or after `onPreroute` fired — so consumers can log
+   * arm/cancel independent of whether the warm actually ran.
+   * `moved`     → pointer exceeded the tap threshold (drag/scroll on-tile)
+   * `scroll`    → pointercancel (native scroller took over the gesture)
+   * `longpress` → still holding after the long-press window
    */
-  onPrerouteCancel?: () => void;
+  onPrerouteCancel?: (reason: 'moved' | 'scroll' | 'longpress') => void;
+  /** Fires once at pointerdown — the moment a preroute is armed (pre-guard). */
+  onPrerouteArm?: () => void;
 }
 
 const Pressable = forwardRef<HTMLElement, PressableProps>(function Pressable(
@@ -129,6 +134,7 @@ const Pressable = forwardRef<HTMLElement, PressableProps>(function Pressable(
     innerStyle,
     onPreroute,
     onPrerouteCancel,
+    onPrerouteArm,
     children,
     ...rest
   },
@@ -149,15 +155,21 @@ const Pressable = forwardRef<HTMLElement, PressableProps>(function Pressable(
     startY: 0,
     startT: 0,
     pointerId: -1,
+    prerouteArmed: false,
     prerouteFired: false,
     prerouteFireTimer: 0 as number | 0,
     prerouteLongPressTimer: 0 as number | 0,
   });
 
   // Keep the latest preroute callbacks reachable from stable pointer handlers.
-  const prerouteRef = useRef({ fire: onPreroute, cancel: onPrerouteCancel });
+  const prerouteRef = useRef({
+    fire: onPreroute,
+    cancel: onPrerouteCancel,
+    arm: onPrerouteArm,
+  });
   prerouteRef.current.fire = onPreroute;
   prerouteRef.current.cancel = onPrerouteCancel;
+  prerouteRef.current.arm = onPrerouteArm;
 
   const clearPrerouteTimers = useCallback(() => {
     const s = stateRef.current;
@@ -171,12 +183,12 @@ const Pressable = forwardRef<HTMLElement, PressableProps>(function Pressable(
     }
   }, []);
 
-  const cancelPrerouteIfFired = useCallback(() => {
+  const cancelPreroute = useCallback((reason: 'moved' | 'scroll' | 'longpress') => {
     const s = stateRef.current;
-    if (s.prerouteFired) {
-      s.prerouteFired = false;
-      try { prerouteRef.current.cancel?.(); } catch {}
-    }
+    if (!s.prerouteArmed) return;
+    s.prerouteArmed = false;
+    s.prerouteFired = false;
+    try { prerouteRef.current.cancel?.(reason); } catch {}
   }, []);
 
   const applyPressed = useCallback(() => {
@@ -224,12 +236,14 @@ const Pressable = forwardRef<HTMLElement, PressableProps>(function Pressable(
       // the pointer is still down and not aborted (by scroll/drag). Also arm
       // a long-press guard that cancels a fired warm if the tap never lands.
       if (prerouteRef.current.fire) {
+        s.prerouteArmed = true;
         s.prerouteFired = false;
         clearPrerouteTimers();
+        try { prerouteRef.current.arm?.(); } catch {}
         s.prerouteFireTimer = window.setTimeout(() => {
           s.prerouteFireTimer = 0;
           const cur = stateRef.current;
-          if (!cur.active || cur.aborted) return;
+          if (!cur.active || cur.aborted || !cur.prerouteArmed) return;
           cur.prerouteFired = true;
           try { prerouteRef.current.fire?.(); } catch {}
         }, PREROUTE_FIRE_MS);
@@ -237,13 +251,13 @@ const Pressable = forwardRef<HTMLElement, PressableProps>(function Pressable(
           s.prerouteLongPressTimer = 0;
           const cur = stateRef.current;
           // Still holding after long-press window → not a tap. Abort.
-          if (cur.active) {
-            cancelPrerouteIfFired();
+          if (cur.active && cur.prerouteArmed) {
+            cancelPreroute('longpress');
           }
         }, PREROUTE_LONGPRESS_MS);
       }
     },
-    [applyPressed, disabled, clearPrerouteTimers, cancelPrerouteIfFired],
+    [applyPressed, disabled, clearPrerouteTimers, cancelPreroute],
   );
 
   const handlePointerMove = useCallback(
@@ -259,10 +273,10 @@ const Pressable = forwardRef<HTMLElement, PressableProps>(function Pressable(
         releasePressed();
         // Cancel any pending preroute + abort in-flight warm if already fired.
         clearPrerouteTimers();
-        cancelPrerouteIfFired();
+        cancelPreroute('moved');
       }
     },
-    [releasePressed, clearPrerouteTimers, cancelPrerouteIfFired],
+    [releasePressed, clearPrerouteTimers, cancelPreroute],
   );
 
   const handlePointerUp = useCallback(
@@ -284,6 +298,7 @@ const Pressable = forwardRef<HTMLElement, PressableProps>(function Pressable(
       // Tap committed (or aborted) — stop the long-press guard. A warm that
       // already fired stays in-flight; the imminent open will hit warm cache.
       clearPrerouteTimers();
+      s.prerouteArmed = false;
       s.prerouteFired = false;
 
       if (wasAborted || dx > MOVE_THRESHOLD_PX || dy > MOVE_THRESHOLD_PX || dt > MAX_TAP_MS) {
@@ -307,8 +322,9 @@ const Pressable = forwardRef<HTMLElement, PressableProps>(function Pressable(
     s.aborted = false;
     releasePressed();
     clearPrerouteTimers();
-    cancelPrerouteIfFired();
-  }, [releasePressed, clearPrerouteTimers, cancelPrerouteIfFired]);
+    // pointercancel on mobile ~ native scroller took over the gesture.
+    cancelPreroute('scroll');
+  }, [releasePressed, clearPrerouteTimers, cancelPreroute]);
 
   // iOS :active deadzone: a no-op touchstart listener flips iOS into applying
   // active/press styles on tap. Not strictly needed here (we don't rely on

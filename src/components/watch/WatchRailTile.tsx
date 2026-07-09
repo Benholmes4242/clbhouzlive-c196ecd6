@@ -101,7 +101,7 @@ export default function WatchRailTile({
   });
 
   // Scroll-guarded pointerdown warm — cold (non-borrow) video tiles only.
-  const { onPreroute, onPrerouteCancel } = usePreroutePrefetch({
+  const { onPrerouteArm, onPreroute, onPrerouteCancel } = usePreroutePrefetch({
     ownerKey,
     hlsUrl: isVideo ? hlsUrl : null,
     enabled: isVideo && !isAutoplayActive,
@@ -129,6 +129,7 @@ export default function WatchRailTile({
       as="div"
       variant="media"
       onPress={handleClick}
+      onPrerouteArm={onPrerouteArm}
       onPreroute={onPreroute}
       onPrerouteCancel={onPrerouteCancel}
       ref={cardRef as any}
