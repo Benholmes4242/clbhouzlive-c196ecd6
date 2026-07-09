@@ -80,3 +80,26 @@ export interface ThreadMessage {
   /** Idempotency key. Server rows include this; optimistic rows set it too. */
   client_id?: string | null;
 }
+
+export type AttachmentKind = 'image' | 'video' | 'voice' | 'file';
+
+export interface MessageAttachment {
+  /** Durable storage path in the private message-media bucket. */
+  path: string;
+  kind: AttachmentKind;
+  /** Pixel width (images/video) for no-layout-shift rendering. */
+  w?: number | null;
+  /** Pixel height (images/video) for no-layout-shift rendering. */
+  h?: number | null;
+  /** Seconds (video/voice). */
+  duration?: number | null;
+  /** Optional poster path for video. */
+  poster?: string | null;
+  /** Bytes. */
+  size?: number | null;
+  /** Client-only during optimistic send; never persisted. */
+  localUrl?: string | null;
+  /** Client-only upload state; never persisted. */
+  uploadStatus?: 'uploading' | 'uploaded' | 'failed';
+}
+
