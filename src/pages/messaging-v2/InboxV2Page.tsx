@@ -13,9 +13,10 @@ const SkeletonRow: React.FC = () => (
   <div
     className="flex items-center gap-3"
     style={{
-      padding: '10px 16px',
+      padding: '11px 14px',
       minHeight: 72,
-      borderBottom: `1px solid ${HAIRLINE}`,
+      borderBottom: `0.5px solid ${HAIRLINE}`,
+      background: 'transparent',
     }}
   >
     <div
@@ -28,7 +29,7 @@ const SkeletonRow: React.FC = () => (
     />
     <div className="flex-1 flex flex-col gap-2">
       <div style={{ height: 12, width: '40%', background: '#EEF0F2', borderRadius: 4 }} />
-      <div style={{ height: 10, width: '70%', background: '#F3F5F7', borderRadius: 4 }} />
+      <div style={{ height: 10, width: '70%', background: '#EEF0F2', borderRadius: 4 }} />
     </div>
   </div>
 );
