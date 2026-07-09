@@ -2,6 +2,7 @@ import React, { useCallback, useLayoutEffect, useRef, useState } from 'react';
 import { Plus, ArrowUp } from 'lucide-react';
 import { useSendMessage } from '@/hooks/messaging/useSendMessage';
 import { useKeyboardHeight } from '@/hooks/messaging/useKeyboardHeight';
+import { pickMediaFiles, validateMediaFiles } from '@/utils/media/pickMediaFiles';
 
 const INK = '#1F2428';
 const SUB = '#8A9099';
@@ -30,7 +31,8 @@ export const Composer: React.FC<Props> = ({
   onHeightChange,
   onAfterSend,
 }) => {
-  const { send } = useSendMessage(conversationId);
+  const { send, sendMedia } = useSendMessage(conversationId);
+  const [picking, setPicking] = useState(false);
   const keyboardHeight = useKeyboardHeight();
   const [text, setText] = useState('');
   const textareaRef = useRef<HTMLTextAreaElement | null>(null);
@@ -66,6 +68,29 @@ export const Composer: React.FC<Props> = ({
     onAfterSend?.();
   }, [text, disabled, send, onAfterSend]);
 
+  const handleAttach = useCallback(async () => {
+    if (disabled || picking) return;
+    setPicking(true);
+    try {
+      const picked = await pickMediaFiles({
+        accept: 'image/*',
+        multiple: true,
+        maxFiles: 10,
+      });
+      if (!picked.length) return;
+      const valid = await validateMediaFiles(picked);
+      const images = valid.filter((f) => f.type.startsWith('image/'));
+      for (const file of images) {
+        void sendMedia({ file, kind: 'image' });
+      }
+      if (images.length > 0) onAfterSend?.();
+    } catch (e) {
+      console.warn('[composer] attach failed', e);
+    } finally {
+      setPicking(false);
+    }
+  }, [disabled, picking, sendMedia, onAfterSend]);
+
   return (
     <div
       ref={containerRef}
@@ -87,10 +112,9 @@ export const Composer: React.FC<Props> = ({
     >
       <button
         type="button"
-        aria-label="Attach"
-        onClick={() => {
-          /* placeholder — media is a later brief */
-        }}
+        aria-label="Attach image"
+        onClick={handleAttach}
+        disabled={disabled || picking}
         className="active:opacity-60"
         style={{
           width: 36,
