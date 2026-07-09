@@ -44,6 +44,7 @@ import { CheckCircle2, Building2, AtSign } from 'lucide-react';
 import { SquircleAvatar, LIGHT_HAIRLINE } from '@/components/ui/SquircleAvatar';
 import { supabase } from '@/integrations/supabase/client';
 import { Z } from '@/config/zIndex';
+import { extractMentions } from '@/lib/mentions/format';
 
 const INK = '#0F172A';
 const INK_SUBTLE = '#94A3B8';
