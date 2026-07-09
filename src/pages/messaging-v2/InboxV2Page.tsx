@@ -35,7 +35,7 @@ const SkeletonRow: React.FC = () => (
 );
 
 const InboxV2Page: React.FC = () => {
-  const navigate = useNavigate();
+  const [composeOpen, setComposeOpen] = useState(false);
   const { conversations, isLoading, error, refetch } = useConversations();
 
   return (
