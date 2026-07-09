@@ -65,7 +65,7 @@ const WatchGrid: React.FC<WatchGridProps> = ({
   const sentinelRef = useRef<HTMLDivElement>(null);
   const decodedCountRef = useRef(0);
   const firedRef = useRef(false);
-  const { activeIdx, railRef: autoplayRef } = useWatchAutoplay({ railId: 'watch-grid', posts });
+  const { activeIndices, railRef: autoplayRef } = useWatchAutoplay({ railId: 'watch-grid', posts, maxActive: 3 });
   const setGridRef = useCallback((el: HTMLDivElement | null) => {
     autoplayRef(el);
     if (gridRef) (gridRef as React.MutableRefObject<HTMLDivElement | null>).current = el;
@@ -239,7 +239,7 @@ const WatchGrid: React.FC<WatchGridProps> = ({
                   index={index}
                   allPosts={posts}
                   onDecoded={index < COLS ? handleTileDecoded : undefined}
-                  isAutoplayActive={activeIdx === index}
+                  isAutoplayActive={activeIndices.has(index)}
                 />
 
 
