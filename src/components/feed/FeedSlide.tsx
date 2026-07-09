@@ -164,6 +164,13 @@ export const FeedSlide = memo(function FeedSlide({
             posterSrc={posterSrc}
             isActive={isActive}
             onFirstFrameReady={onFirstFrameReady}
+            // Canonical `${postId}:0` for single-media video — matches the
+            // key the tile / rail pool / prefetch wrote under, so the
+            // fullscreen lane loads under the SAME ownerKey the cold-path
+            // reveal gate and lastPos reads look up. Without this the lane
+            // loaded under a bare postId, the poster/blur never swapped,
+            // and prefetch.wasPrefetched(`${id}:0`) missed on cold opens.
+            ownerKey={`${post.id}:0`}
             mediaW={m.width ?? 0}
             mediaH={m.height ?? 0}
           />
@@ -345,7 +352,11 @@ const FullscreenVideoSlot: React.FC<{
   const borrow = useFullscreenFeedStore((s) => s.borrow);
   const origin = useFullscreenFeedStore((s) => s.origin);
   const isBorrowSlide = !!(allowBorrow && borrow && isActive && borrow.postId === postId);
-  const resumeKey = ownerKey ?? postId;
+  // Belt-and-braces: if a caller ever renders this slot without an ownerKey
+  // and the postId is bare (no colon), inject `:0` so the engine lane, the
+  // reveal-gate, and lastPos all key on the canonical `${postId}:0`. Never
+  // collapses `:1/:2` (multi-media pager passes those explicitly).
+  const resumeKey = ownerKey ?? (postId.includes(':') ? postId : `${postId}:0`);
 
   // Only apply store.startPosition on the initially-tapped slide; other
   // slides in the fullscreen deck start from 0. Borrow slide skips seeks
