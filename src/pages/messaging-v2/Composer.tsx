@@ -112,10 +112,9 @@ export const Composer: React.FC<Props> = ({
     >
       <button
         type="button"
-        aria-label="Attach"
-        onClick={() => {
-          /* placeholder — media is a later brief */
-        }}
+        aria-label="Attach image"
+        onClick={handleAttach}
+        disabled={disabled || picking}
         className="active:opacity-60"
         style={{
           width: 36,
