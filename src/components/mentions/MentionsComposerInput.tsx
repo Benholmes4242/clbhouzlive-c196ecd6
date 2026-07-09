@@ -435,6 +435,8 @@ function AnchoredMentionsPanel({ anchorRef, children }: AnchoredPanelProps) {
   // can clip / pierce / occlude it. React tree is unchanged, so the
   // library's synthetic click handlers on the <li>s still route.
   if (typeof document === 'undefined') return null;
+  const hasChildren = React.Children.count(children) > 0;
+  const placement = geom?.placement ?? 'below';
   return ReactDOM.createPortal(
     <div
       ref={panelRef}
@@ -449,16 +451,44 @@ function AnchoredMentionsPanel({ anchorRef, children }: AnchoredPanelProps) {
         maxHeight: geom?.maxHeight ?? PANEL_MAX_HEIGHT,
         overflowY: 'auto',
         background: '#FFFFFF',
-        borderRadius: 14,
+        borderRadius:
+          placement === 'above' ? '16px 16px 4px 4px' : '4px 4px 16px 16px',
         border: `1px solid rgba(15,23,42,0.08)`,
         boxShadow:
-          '0 12px 32px -8px rgba(15,23,42,0.22), 0 2px 6px rgba(15,23,42,0.08)',
+          placement === 'above'
+            ? '0 -8px 28px -6px rgba(15,23,42,0.18), 0 -1px 4px rgba(15,23,42,0.06)'
+            : '0 12px 32px -8px rgba(15,23,42,0.22), 0 2px 6px rgba(15,23,42,0.08)',
         fontSize: 13.5,
         pointerEvents: 'auto',
         opacity: geom ? 1 : 0,
         zIndex: Z.mentionsPanel,
       }}
     >
+      {hasChildren && (
+        <div
+          aria-hidden
+          style={{
+            position: 'sticky',
+            top: 0,
+            zIndex: 1,
+            display: 'flex',
+            alignItems: 'center',
+            gap: 6,
+            padding: '10px 14px 8px',
+            background: '#FFFFFF',
+            borderBottom: `1px solid ${BORDER}`,
+            fontSize: 10.5,
+            fontWeight: 700,
+            letterSpacing: '0.08em',
+            textTransform: 'uppercase',
+            color: INK_SUBTLE,
+            pointerEvents: 'none',
+          }}
+        >
+          <AtSign size={11} strokeWidth={2.25} style={{ color: INK_SUBTLE }} />
+          Mention someone
+        </div>
+      )}
       {children}
     </div>,
     document.body,
