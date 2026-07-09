@@ -1,7 +1,14 @@
-import { useEffect, useMemo, useRef } from 'react';
+import { useCallback, useEffect, useMemo, useRef } from 'react';
 import { useInfiniteQuery, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useMessagingActor } from './useMessagingActor';
+import {
+  dedupeByClientId,
+  insertOptimistic as cacheInsertOptimistic,
+  resolveOptimistic as cacheResolveOptimistic,
+  markFailed as cacheMarkFailed,
+  removeOptimistic as cacheRemoveOptimistic,
+} from './threadCache';
 import type { ThreadMessage, MessageReaction } from '@/types/messaging';
 
 const PAGE_SIZE = 30;
